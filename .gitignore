@@ -1,0 +1,14 @@
+# ide
+.idea
+
+# unittests
+.coverage
+cover/*
+openatlas/cover/*
+
+
+__pycache__/*
+*.pyc
+
+# cache
+__pycache__
