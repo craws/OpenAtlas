@@ -1,14 +1,17 @@
-# ide
-.idea
+# sensitive data
+openatlas/instance/*
+
+# cache
+__pycache__/*
+
+# compiled files
+*.pyc
 
 # unittests
 .coverage
 cover/*
 openatlas/cover/*
 
+# ide
+.idea
 
-__pycache__/*
-*.pyc
-
-# cache
-__pycache__
