@@ -1,0 +1,10 @@
+# all crawlers
+User-agent: *
+
+# deny all
+# Disallow: /
+
+# make sure that patterns matching directories have the final '/' character appended
+
+# Crawl-delay is a number of seconds to wait between successive requests to the same server
+# Crawl-delay: 10

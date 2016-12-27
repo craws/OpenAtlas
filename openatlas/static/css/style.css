@@ -1,0 +1,16 @@
+@charset "UTF-8";
+
+html, body, input, select, textarea {
+    font-family: helvetica, arial, sans-serif;
+}
+
+#header {
+    padding: 0.5em 1em;
+    height: 7em;
+}
+
+#content {
+    margin: 1em;
+    text-align: left;
+    font-size: 0.9em;
+}
