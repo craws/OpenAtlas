@@ -1,0 +1,14 @@
+@charset "UTF-8";
+
+#logo {
+    float: left;
+    width: 370px;
+    margin-bottom: 1em;
+    background-image: url('/static/images/layout/logo.png');
+    background-repeat: no-repeat;
+}
+
+#logo a {
+    display: block;
+    height: 100px;
+}

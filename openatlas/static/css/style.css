@@ -4,6 +4,10 @@ html, body, input, select, textarea {
     font-family: helvetica, arial, sans-serif;
 }
 
+a {
+    text-decoration: none;
+}
+
 #header {
     padding: 0.5em 1em;
     height: 7em;
@@ -13,4 +17,48 @@ html, body, input, select, textarea {
     margin: 1em;
     text-align: left;
     font-size: 0.9em;
+}
+
+#site-name {
+    font-size: 1.4em;
+    font-weight: bold;
+    float: left;
+    padding: 0.5em;
+}
+
+#menu {
+    height: 3.2em;
+}
+
+#menu, #breadcrumb  {
+    padding-left: 1em;
+    padding-right: 1em;
+    font-weight: bold;
+}
+
+#breadcrumb {
+    padding-top: 0.6em;
+    height: 1.9em;
+}
+
+#menu > div {
+    float: left;
+    margin-right: 1em;
+    margin-top: 1em;
+}
+
+#menu > div.active {
+    height: 1.8em;
+    border-bottom-width: 0.4em;
+    border-bottom-style: solid;
+}
+
+#menu a, #breadcrumb div span {
+    display: block;
+    text-decoration: none;
+}
+
+#powered-by {
+    font-size: 0.8em;
+    margin-top: 1em;
 }

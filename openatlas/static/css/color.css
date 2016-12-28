@@ -1,13 +1,47 @@
 @charset "UTF-8";
 
-body {
+body,
+#breadcrumb a:hover
+{
     color: #000000;
 }
 
-body {
+#menu div a,
+#breadcrumb a
+{
+    color: #ffffff;
+}
+
+a,
+#menu div a:hover,
+#menu div.active a,
+#menu div.active a:hover
+{
+    color: #4088c3;
+}
+
+body
+{
     background-color: #efefef;
 }
 
-#header {
+#header
+{
     background-color: #ffffff;
+}
+
+#menu
+{
+    background-color: #000000;
+}
+
+
+#breadcrumb
+{
+    background-color: #4088c3;
+}
+
+#menu > div.active
+{
+    border-color: #4088c3;
 }

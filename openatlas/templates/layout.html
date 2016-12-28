@@ -9,21 +9,40 @@
         <link rel="manifest" href="/favicon/manifest.json" />
         <link rel="mask-icon" href="/favicon/safari-pinned-tab.svg" />
         <meta name="theme-color" content="#ffffff" />
-        <link rel="stylesheet" href="/css/reset.css" />
         <link rel="stylesheet" href="{{ url_for('static', filename='css/reset.css') }}"/>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}"/>
         <link rel="stylesheet" href="{{ url_for('static', filename='css/color.css') }}"/>
+        <link rel="stylesheet" href="{{ url_for('static', filename='css/images.css') }}"/>
     </head>
     <body>
         <div id="header">
             <div id="logo"><a href="/"></a></div>
             <div id="site-name">
-                project_name <span class="info">local</span>
+                project_name
+                {% if 'local' in request['url_root'] %}
+                    local
+                {% endif %}
             </div>
+        </div>
+        <div id="menu">
+            <div class="active"><a href="/">overview</a></div>
+            <div><a href="/">test_menu_item</a></div>
+        </div>
+        <div id="breadcrumb">
+            {% block breadcrumb %}{% endblock %}
         </div>
         <div id="content">
             <noscript><div id="noscript-warning" class="error">warning_no_js</div></noscript>
             {% block body %}{% endblock %}
+            {% if 'craws.net' in request['url_root'] %}
+            <div id="powered-by">
+                Another
+                <a href="http://openatlas.eu" onclick="window.open(this.href); return false;">OpenAtlas</a>
+                project powered by
+                <a href="http://craws.net" onclick="window.open(this.href); return false;"> craws.net</a>
+            </div>
+        {% endif %}
         </div>
+
     </body>
 </html>
