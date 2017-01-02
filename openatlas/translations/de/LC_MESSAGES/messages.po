@@ -1,0 +1,38 @@
+# German translations for PROJECT.
+# Copyright (C) 2017 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2017.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2017-01-02 21:42+0100\n"
+"PO-Revision-Date: 2017-01-02 21:47+0100\n"
+"Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
+"Language-Team: de <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 1.3\n"
+"Language: de\n"
+"X-Generator: Poedit 1.6.10\n"
+
+#: ../templates/layout.html:30
+msgid "zoom in"
+msgstr "Schrift vergrößern"
+
+#: ../templates/layout.html:32
+msgid "zoom out"
+msgstr "Schrift verkleinern"
+
+#: ../templates/layout.html:44 ../templates/overview/index.html:2
+msgid "overview"
+msgstr "Übersicht"
+
+#: ../templates/layout.html:51
+msgid "warning no js"
+msgstr ""
+"JavaScript scheint deaktiviert zu sein. Die Funktionalität dieser Seite ist "
+"dadurch eingeschränkt."
