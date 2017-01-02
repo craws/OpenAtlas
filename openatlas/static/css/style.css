@@ -13,6 +13,32 @@ a {
     height: 7em;
 }
 
+noscript div {
+    font-size: 0.8em;
+    font-weight: normal;
+    margin-top: 1em;
+}
+
+#header-menu {
+    float: right;
+    font-weight: bold;
+    font-size: 0.9em;
+}
+
+#header-menu a, #header-menu span {
+    padding: 0.2em 0.4em;
+}
+
+#zoom-menu {
+    margin-right: 5.6em;
+    float: left;
+}
+
+#zoom-menu img {
+    cursor: pointer;
+    margin-right: 1em;
+}
+
 #content {
     margin: 1em;
     text-align: left;
@@ -30,7 +56,7 @@ a {
     height: 3.2em;
 }
 
-#menu, #breadcrumb  {
+#menu, #breadcrumb {
     padding-left: 1em;
     padding-right: 1em;
     font-weight: bold;

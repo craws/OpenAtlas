@@ -7,7 +7,9 @@ body,
 }
 
 #menu div a,
-#breadcrumb a
+#breadcrumb a,
+#header-menu span,
+#header-menu a
 {
     color: #ffffff;
 }
@@ -20,6 +22,11 @@ a,
     color: #4088c3;
 }
 
+.error
+{
+    color: #e60005;
+}
+
 body
 {
     background-color: #efefef;
@@ -30,9 +37,15 @@ body
     background-color: #ffffff;
 }
 
-#menu
+#menu,
+#header-menu span
 {
     background-color: #000000;
+}
+
+#header-menu a
+{
+    background-color: #adadad;
 }
 
 
