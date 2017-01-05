@@ -108,3 +108,9 @@ div.changelog-version {
 div.changelog-date {
     margin: 0.5em 0;
 }
+
+h1 {
+    font-weight: bold;
+    margin-bottom: 1em;
+    font-size: 1.1em;
+}
