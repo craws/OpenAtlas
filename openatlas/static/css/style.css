@@ -35,7 +35,8 @@ noscript div {
 
 img.zoom {
     cursor: pointer;
-    margin-right: 1em;
+    margin-right: 0.5em;
+    vertical-align: middle;
 }
 
 #content {
