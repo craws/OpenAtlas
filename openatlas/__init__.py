@@ -9,7 +9,7 @@ sys.setdefaultencoding('utf8')
 
 app = Flask(__name__, instance_relative_config=True)
 
-from openatlas.views import overview
+from openatlas.views import index
 
 app.config.from_object('config.default')  # load config/default.py
 app.config.from_pyfile('config.py')  # load instance/config.py

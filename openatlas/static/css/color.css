@@ -1,60 +1,52 @@
 @charset "UTF-8";
 
 body,
-#breadcrumb a:hover
-{
+#breadcrumb a:hover {
     color: #000000;
 }
 
 #menu div a,
 #breadcrumb a,
 #header-menu span,
-#header-menu a
-{
+#language-menu a,
+.changelog-version {
     color: #ffffff;
 }
 
 a,
 #menu div a:hover,
 #menu div.active a,
-#menu div.active a:hover
-{
+#menu div.active a:hover {
     color: #4088c3;
 }
 
-.error
-{
+.error {
     color: #e60005;
 }
 
-body
-{
+body {
     background-color: #efefef;
 }
 
-#header
-{
+#header {
     background-color: #ffffff;
 }
 
 #menu,
-#header-menu span
-{
+#header-menu span {
     background-color: #000000;
 }
 
-#header-menu a
-{
+#language-menu a {
     background-color: #adadad;
 }
 
 
-#breadcrumb
-{
+#breadcrumb,
+.changelog-version {
     background-color: #4088c3;
 }
 
-#menu > div.active
-{
+#menu > div.active {
     border-color: #4088c3;
 }

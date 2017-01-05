@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}<a href="/">{{ _('overview')|uc_first }}</a> > {{ _('changelog')|uc_first }}{% endblock %}
+{% block body %}
+    {% for version_name, version in versions.iteritems() %}
+        <div class="changelog-version">{{ _('version')|uc_first }} {{ version_name }}</div>
+        <div class="changelog-date">{{ version['date'] }}</div>
+        <p>
+            {% for issue_type, issues in version['data'].iteritems() %}
+                {% for issue_number, issue_text in issues.iteritems() %}
+                    {% if issue_number %}
+                        &#8226 {{ issue_type|uc_first }} <a href="http://redmine.craws.net/issues/{{ issue_number }}"
+                        onclick="window.open(this.href); return false;">#{{ issue_number }}</a> {{ issue_text }}<br />
+                    {% else %}
+                        {{ issue_text|safe }}
+                    {% endif %}
+                {% endfor %}
+            {% endfor %}
+        </p>
+    {% endfor %}
+{% endblock %}

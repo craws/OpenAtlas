@@ -8,6 +8,10 @@ a {
     text-decoration: none;
 }
 
+p {
+    margin: 0.5em 0 1em;
+}
+
 #header {
     padding: 0.5em 1em;
     height: 7em;
@@ -25,16 +29,11 @@ noscript div {
     font-size: 0.9em;
 }
 
-#header-menu a, #header-menu span {
+#language-menu a, #language-menu span {
     padding: 0.2em 0.4em;
 }
 
-#zoom-menu {
-    margin-right: 5.6em;
-    float: left;
-}
-
-#zoom-menu img {
+img.zoom {
     cursor: pointer;
     margin-right: 1em;
 }
@@ -67,6 +66,10 @@ noscript div {
     height: 1.9em;
 }
 
+#breadcrumb a {
+    margin-right: 0.2em;
+}
+
 #menu > div {
     float: left;
     margin-right: 1em;
@@ -84,7 +87,24 @@ noscript div {
     text-decoration: none;
 }
 
+#language-menu {
+    float: right;
+    margin-top: 1em;
+}
+
 #powered-by {
     font-size: 0.8em;
     margin-top: 1em;
+}
+
+div.changelog-version {
+    font-size: 1.1em;
+    font-weight: bold;
+    padding: 0.3em;
+    margin-top: 1em;
+    width: 30em;;
+}
+
+div.changelog-date {
+    margin: 0.5em 0;
 }
