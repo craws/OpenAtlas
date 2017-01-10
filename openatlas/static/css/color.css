@@ -1,6 +1,9 @@
 @charset "UTF-8";
 
+/* font color */
+
 body,
+table.tablesorter tbody td,
 #breadcrumb a:hover {
     color: #000000;
 }
@@ -9,11 +12,17 @@ body,
 #breadcrumb a,
 #header-menu span,
 #language-menu a,
-.changelog-version {
+button,
+.button-bar a,
+.changelog-version,
+.inverse-heading,
+table.tablesorter thead tr th,
+table.tablesorter tfoot tr th {
     color: #ffffff;
 }
 
 a,
+.info,
 #menu div a:hover,
 #menu div.active a,
 #menu div.active a:hover {
@@ -24,27 +33,42 @@ a,
     color: #e60005;
 }
 
+/* background color */
+
 body {
     background-color: #efefef;
 }
 
-#header {
+#header,
+.info,
+table.tablesorter tbody td {
     background-color: #ffffff;
 }
 
 #menu,
-#header-menu span {
+#header-menu span,
+.inverse-heading,
+table.tablesorter thead tr th,
+table.tablesorter tfoot tr th {
     background-color: #000000;
 }
 
-#language-menu a {
+#language-menu a,
+table.tablesorter tbody tr.odd td {
     background-color: #adadad;
 }
 
-
+button,
 #breadcrumb,
+.button-bar a,
 .changelog-version {
     background-color: #4088c3;
+}
+
+/* border color */
+
+.text-preview {
+    border-color: #000000;
 }
 
 #menu > div.active {

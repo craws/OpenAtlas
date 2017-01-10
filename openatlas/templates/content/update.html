@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="/content">{{ _('content')|uc_first }}</a> >
+    <a href="/content/view/{{ item }}">{{ item|uc_first }}</a> >
+    {{ _('update')|uc_first }}
+{% endblock %}
+{% block body %}
+<form method="post">
+    {{ form.csrf_token }}
+    {% for language in languages: %}
+        <p class="inverse-heading">{{ language|upper }}</p>
+        {{ form[language](class='tinymce') }}<br />
+    {% endfor %}
+    <p><button type="submit">{{ _('save')|uc_first }}</button></p>
+</form>
+{% endblock %}

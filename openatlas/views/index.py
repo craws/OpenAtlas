@@ -1,22 +1,32 @@
 # -*- coding: utf-8 -*-
 from collections import OrderedDict
 from flask import request, session
-from werkzeug.utils import redirect
-
 from flask import render_template
 from openatlas import app
+from openatlas.models.content import ContentMapper
+from werkzeug.utils import redirect
 
 
 @app.route('/')
 @app.route('/index')
 def index():
-    return render_template('index/index.html')
+    return render_template('index/index.html', intro=ContentMapper.get_translation('intro'))
 
 
 @app.route('/index/setlocale/<language>')
 def new_locale(language):
     session['language'] = language
     return redirect(request.referrer)
+
+
+@app.route('/index/contact')
+def index_contact():
+    return render_template('index/contact.html', contact=ContentMapper.get_translation('contact'))
+
+
+@app.route('/index/faq')
+def index_faq():
+    return render_template('index/faq.html', faq=ContentMapper.get_translation('faq'))
 
 
 @app.route('/index/credits')

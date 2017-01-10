@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="/content">{{ _('content')|uc_first }}</a> > {{ item|uc_first }}
+{% endblock %}
+{% block body %}
+    <div class="button-bar">
+        <a href="/content/update/{{ item }}">{{ _('edit')|uc_first }}</a>
+    </div>
+    {% for language, text in content[item].iteritems() %}
+        <p class="inverse-heading">{{ language|upper }}</p>
+        <div class="text-preview">{{ text|safe }}</div>
+    {% endfor %}
+{% endblock %}

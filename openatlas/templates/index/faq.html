@@ -1,0 +1,5 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}<a href="/">{{ _('overview')|uc_first }}</a> > {{ _('faq')|uc_first }}{% endblock %}
+{% block body %}
+    {{ faq|safe }}
+{% endblock %}

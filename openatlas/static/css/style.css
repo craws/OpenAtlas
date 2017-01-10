@@ -5,6 +5,7 @@ html, body, input, select, textarea {
 }
 
 a {
+    font-weight: bold;
     text-decoration: none;
 }
 
@@ -12,9 +13,49 @@ p {
     margin: 0.5em 0 1em;
 }
 
+p.inverse-heading {
+    display: inline-block;
+    font-size: 1.1em;
+    font-weight: bold;
+    margin-bottom: 0.3em;
+    padding: 0.4em;
+}
+
+button {
+    cursor: pointer;
+    display: inline-block;
+    font-weight: bold;
+    font-size: 1em;
+    margin-right: 1em;
+    padding: 0.3em 0.5em;
+    text-decoration: none;
+    border: none;
+}
+
+div.mce-tinymce {
+    display: table-cell;
+}
+
+.message {
+    font-size: 0.7em;
+    font-weight: normal;
+}
+
 #header {
     padding: 0.5em 1em;
     height: 7em;
+}
+
+
+.button-bar {
+    margin-bottom: 1em;
+}
+
+.button-bar a {
+    cursor: pointer;
+    display: inline-block;
+    margin-right: 1em;
+    padding: 0.3em 0.5em;
 }
 
 noscript div {
@@ -43,6 +84,13 @@ img.zoom {
     margin: 1em;
     text-align: left;
     font-size: 0.9em;
+}
+
+.text-preview {
+    border-style: solid;
+    border-width: 1px;
+    padding: 0.5em;
+    width: 60em;
 }
 
 #site-name {
@@ -103,7 +151,7 @@ div.changelog-version {
     font-weight: bold;
     padding: 0.3em;
     margin-top: 1em;
-    width: 30em;;
+    width: 30em;
 }
 
 div.changelog-date {
@@ -114,4 +162,36 @@ h1 {
     font-weight: bold;
     margin-bottom: 1em;
     font-size: 1.1em;
+}
+
+/* tables */
+table {
+    border-collapse: inherit;
+    border-spacing: 0.2em;
+}
+
+table.tablesorter {
+    margin: 0.4em 0;
+    text-align: left;
+}
+
+table.tablesorter thead tr th, table.tablesorter tfoot tr th {
+    font-weight: bold;
+    padding: 0.4em 2em 0.4em 0.4em;
+}
+
+table.tablesorter tbody td {
+    padding: 0.3em;
+    vertical-align: top;
+    white-space: nowrap;
+}
+
+table.tablesorter thead tr th.sorter-false {
+    background-color: inherit;
+    border: none;
+    cursor: default;
+}
+
+.tablesorter .filtered {
+    display: none;
 }

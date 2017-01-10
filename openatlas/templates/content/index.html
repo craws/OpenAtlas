@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ _('content')|uc_first }}{% endblock %}
+{% block breadcrumb %}
+    {{ _('content')|uc_first }}
+{% endblock %}
 {% block body %}
-
+    {{ table_content|pager|safe }}
 {% endblock %}

@@ -1,5 +1,6 @@
 # sensitive data
 openatlas/instance/*
+openatlas/db.conf
 
 # cache
 __pycache__/*
