@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*-
+# Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
 from collections import OrderedDict
 from flask import request, session
 from flask import render_template
