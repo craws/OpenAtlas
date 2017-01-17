@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
+import openatlas
 from collections import OrderedDict
 from flask import session
-
-import openatlas
 
 
 class ContentMapper(object):
@@ -23,6 +22,7 @@ class ContentMapper(object):
     @staticmethod
     def get_translation(name):
         translations = ContentMapper.get_content()[name]
+        # To do: take language default from config (remove hardcoded en)
         content = translations[session['language']] if translations[session['language']] else translations['en']
         return content
 

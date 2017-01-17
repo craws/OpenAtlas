@@ -53,11 +53,17 @@ from openatlas.views import index, content
 babel = Babel(app)
 app.register_blueprint(filters.blueprint)
 
+
 @babel.localeselector
 def get_locale():
     if 'language' in session:
         return session['language']
     return request.accept_languages.best_match(app.config['LANGUAGES'].keys())
+
+
+@app.before_request
+def before_request():
+    session['language'] = get_locale()
 
 if __name__ == "__main__":  # pragma: no cover
     app.run()
