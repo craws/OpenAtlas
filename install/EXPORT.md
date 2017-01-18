@@ -4,7 +4,7 @@ Some examples to extract data from the database
 
 ### Database Structure
 
-    pg_dump -sc --if-exists -n model -n gis -n log -n web openatlas_master > structure.sql
+    pg_dump -sc --if-exists -n model -n gis -n log -n web openatlas_python > structure.sql
 
 add "CREATE EXTENSION postgis;" and uncomment after installation for unittests
 
