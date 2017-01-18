@@ -8,10 +8,9 @@ __pycache__/*
 # compiled files
 *.pyc
 
-# unittests
-.coverage
-cover/*
-openatlas/cover/*
+# unit tests
+openatlas/tests/.coverage
+openatlas/tests/cover
 
 # ide
 .idea
