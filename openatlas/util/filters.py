@@ -2,16 +2,27 @@
 # -*- coding: utf-8 -*-
 import jinja2
 import flask
+import re
 
 from openatlas.util import util
+from jinja2 import evalcontextfilter, Markup, escape
 
 blueprint = flask.Blueprint('filters', __name__)
+paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def uc_first(self, string):
     return util.uc_first(string)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+@evalcontextfilter
+def nl2br(self, value):
+    result = u'\n\n'.join(u'<p>%s</p>' % p.replace('\n', '<br>\n') for p in paragraph_re.split(escape(value)))
+    return Markup(result)
 
 
 @jinja2.contextfilter

@@ -2,5 +2,15 @@
 {% block breadcrumb %}{{ _('overview')|uc_first }}{% endblock %}
 {% block body %}
     <div>{{ intro|safe }}</div>
-    <div>{{ _('text_intro') }}</div>
+    <div>
+        <p>
+            {{ _('text_intro',
+                link_openatlas='<a href="http://openatlas.eu/" onclick="window.open(this.href); return false;">OpenAtlas</a>'|safe,
+                link_github='<a href="https://github.com/craws/OpenAtlas" onclick="window.open(this.href); return false;">GitHub</a>'|safe,
+                link_cidoc='<a href="http://www.cidoc-crm.org/" onclick="window.open(this.href); return false;">CIDOC CRM</a>'|safe,
+                link_wiki='<a href="http://redmine.craws.net/projects/uni/wiki" onclick="window.open(this.href); return false;">Wiki</a>'|safe,
+                link_demo='<a href="http://openatlas.craws.net" onclick="window.open(this.href); return false;">Demo</a>'|safe
+            )|nl2br|safe }}
+        </p>
+    </div>
 {% endblock %}

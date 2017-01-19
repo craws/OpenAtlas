@@ -8,14 +8,14 @@ class IndexTestCase(TestBaseCase):
     def test_index(self):
         response = self.app.get('/')
         assert b'Overview' in response.data
-        # response = self.app.get('/some_missing_site')
-        # assert b'404' in response.data
+        response = self.app.get('/some_missing_site')
+        assert b'404' in response.data
         response = self.app.get('/index/changelog')
         assert b'Version' in response.data
         response = self.app.get('/index/contact')
-        assert b'Contact' in response.data  # needs better assertion
+        assert b'Contact' in response.data
         response = self.app.get('/index/credits')
         assert b'Stefan Eichert' in response.data
         response = self.app.get('/index/faq')
-        assert b'Faq' in response.data  # needs better assertion
-        self.app.get('/index/setlocale/de')  # needs assertion
+        assert b'Faq' in response.data
+        self.app.get('/index/setlocale/en')
