@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-01-02 21:42+0100\n"
-"PO-Revision-Date: 2017-01-02 21:47+0100\n"
+"POT-Creation-Date: 2017-01-19 11:56+0100\n"
+"PO-Revision-Date: 2017-01-19 12:10+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language-Team: en <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -19,20 +19,72 @@ msgstr ""
 "Language: en\n"
 "X-Generator: Poedit 1.6.10\n"
 
-#: ../templates/layout.html:30
-msgid "zoom in"
-msgstr "Larger font size"
-
-#: ../templates/layout.html:32
-msgid "zoom out"
-msgstr "Smaller font size"
-
-#: ../templates/layout.html:44 ../templates/overview/index.html:2
-msgid "overview"
-msgstr "overview"
-
-#: ../templates/layout.html:51
+#: ../templates/layout.html:29
 msgid "warning no js"
 msgstr ""
 "JavaScript seems to be disabled. The functionality of this site will be "
 "limited."
+
+#: ../templates/layout.html:40 ../templates/index/changelog.html:5
+msgid "version"
+msgstr "version"
+
+#: ../templates/layout.html:41 ../templates/index/changelog.html:2
+msgid "changelog"
+msgstr "changelog"
+
+#: ../templates/layout.html:42 ../templates/index/credits.html:2
+msgid "credits"
+msgstr "credits"
+
+#: ../templates/layout.html:43 ../templates/index/contact.html:2
+msgid "contact"
+msgstr "contact"
+
+#: ../templates/layout.html:44 ../templates/index/faq.html:2
+msgid "faq"
+msgstr "faq"
+
+#: ../templates/layout.html:47 ../templates/layout.html:48
+msgid "zoom in"
+msgstr "Larger font size"
+
+#: ../templates/layout.html:49 ../templates/layout.html:50
+msgid "zoom out"
+msgstr "Smaller font size"
+
+#: ../templates/layout.html:62 ../templates/index/changelog.html:2
+#: ../templates/index/contact.html:2 ../templates/index/credits.html:2
+#: ../templates/index/faq.html:2 ../templates/index/index.html:2
+msgid "overview"
+msgstr "overview"
+
+#: ../templates/layout.html:63 ../templates/content/index.html:3
+#: ../templates/content/update.html:3 ../templates/content/view.html:3
+msgid "content"
+msgstr "content"
+
+#: ../templates/content/update.html:5 ../templates/content/view.html:7
+msgid "edit"
+msgstr "edit"
+
+#: ../templates/content/update.html:14
+msgid "save"
+msgstr "save"
+
+#: ../templates/index/index.html:5
+msgid "text_intro"
+msgstr ""
+"%(link_openatlas)s is a database application that enables you to manage "
+"complex historical, archeological  and geospatial data.\n"
+"\n"
+"OpenAtlas is Open Source and available on %(link_github)s. It uses open "
+"source technology like Apache, PostgreSQL, PostGIS, PHP, Zend Framework and "
+"Leaflet.\n"
+"\n"
+"The data model is based on classes and properties of the %(link_cidoc)s "
+"which is an internationally established standard for historical "
+"documentation.\n"
+"\n"
+"For detailed information please visit our %(link_wiki)s and project "
+"management site or try out our %(link_demo)s."
