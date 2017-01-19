@@ -1,3 +1,4 @@
+# Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
 import os
 import unittest
 from openatlas import app, get_cursor
@@ -12,6 +13,7 @@ class TestBaseCase(unittest.TestCase):
             cursor.execute(sql)
 
     def setUp(self):
+        app.config['language'] = 'en'
         self.setup_database()
         self.app = app.test_client()
 

@@ -22,8 +22,8 @@ class ContentMapper(object):
     @staticmethod
     def get_translation(name):
         translations = ContentMapper.get_content()[name]
-        # To do: take language default from config (remove hardcoded en), remove "if session['language'] in translations" which seems to be needed in unit tests
-        content = translations[session['language']] if session['language'] in translations and translations[session['language']] else translations['en']
+        # To do: take language default from config (remove hardcoded en)
+        content = translations[session['language']] if translations[session['language']] else translations['en']
         return content
 
     @staticmethod

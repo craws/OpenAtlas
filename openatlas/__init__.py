@@ -58,7 +58,9 @@ app.register_blueprint(filters.blueprint)
 def get_locale():
     if 'language' in session:
         return session['language']
-    return request.accept_languages.best_match(app.config['LANGUAGES'].keys())
+    best_match = request.accept_languages.best_match(app.config['LANGUAGES'].keys())
+    # To do: take language default from config (remove hardcoded en)
+    return best_match if best_match else 'en'  # check if best_match is set (in tests it isn't)
 
 
 @app.before_request
