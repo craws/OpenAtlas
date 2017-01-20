@@ -195,3 +195,66 @@ table.tablesorter thead tr th.sorter-false {
 .tablesorter .filtered {
     display: none;
 }
+
+/* tabs */
+.ui-tabs .ui-tabs-nav li.ui-tabs-active a {
+    cursor: pointer;
+}
+
+.ui-tabs-vertical .ui-tabs-nav {
+    float: left;
+}
+
+.ui-tabs-vertical .ui-tabs-nav li {
+    float: none;
+    width: 100%;
+}
+
+#content .ui-tabs-vertical .ui-tabs-nav li a {
+    float: none;
+    display: block;
+}
+
+.ui-tabs-vertical .ui-tabs-panel {
+    float: right;
+}
+
+.tabs-container .ui-widget-header, .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header
+.ui-state-default, .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
+    background: none;
+    border: none;
+}
+
+.ui-tabs .ui-tabs-nav li {
+    margin: 1px;
+}
+
+.tabs-container {
+    display: inline-block;
+}
+
+.tabs-container .ui-widget-header, .ui-widget-header {
+    border: none;
+    background: none;
+    background-color: inherit;
+}
+
+.tabs-container .ui-corner-all, .ui-corner-all {
+    border-radius: 0;
+}
+
+.tabs-container.ui-widget-content {
+    border: none;
+}
+
+.ui-tabs {
+    padding: 0;
+}
+
+.ui-tabs .ui-tabs-panel {
+    padding: 1em;
+}
+
+.tabs-container .pagesize, .overlay-container .pagesize {
+    font-size: 0.9em;
+}

@@ -1,17 +1,19 @@
 ## INFO
 
-   Before executing SQL statements replace database role "openatlas_master" if needed.
+   Before executing SQL statements make a backup of the database and replace database role "openatlas_master" if needed.
 
 ### 2.3.0 to 3.0.0 Upgrade (PHP to Python upgrade)
 
 #### Content
 
     Website text translations where completely rewritten.
-    So please backup your text translations (Intro, Contact, FAQ) at "Content" in the web interface and enter them again after executing the SQL below.
+    So please backup your text translations (Intro, Contact, FAQ) at "Content" in the web interface and
+    enter them in "Settings" again after executing the SQL below.
 
 #### Database update
 
     BEGIN;
+    UPDATE web.settings SET name = 'site_name' WHERE name = 'sitename';
     DROP TABLE IF EXISTS web.i18n;
     DROP TABLE IF EXISTS web.language;
     DROP TABLE IF EXISTS web.content;

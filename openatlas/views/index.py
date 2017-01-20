@@ -8,7 +8,7 @@ from werkzeug.utils import redirect
 
 
 @app.route('/')
-@app.route('/index')
+@app.route('/overview')
 def index():
     return render_template('index/index.html', intro=ContentMapper.get_translation('intro'))
 

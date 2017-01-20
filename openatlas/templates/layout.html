@@ -12,8 +12,10 @@
         <link rel="stylesheet" href="/static/css/style.css?v={{ config['VERSION'] }}" />
         <link rel="stylesheet" href="/static/css/color.css?v={{ config['VERSION'] }}" />
         <link rel="stylesheet" href="/static/css/images.css?v={{ config['VERSION'] }}" />
+        <link rel="stylesheet" href="/static/js/jquery/jquery-ui-1.12.1/jquery-ui.min.css" />
         <script type="text/javascript" src="/static/js/jquery/jquery-3.1.1.min.js"></script>
         <script type="text/javascript" src="/static/js/jquery/jquery.tablesorter.min.js"></script>
+        <script type="text/javascript" src="/static/js/jquery/jquery-ui-1.12.1/jquery-ui.min.js"></script>
         <script type="text/javascript" src="/static/js/tinymce/tinymce.min.js"></script>
         <script type="text/javascript" src="/static/js/functions.js"></script>
         <title>project_name</title>
@@ -59,8 +61,10 @@
             </div>
         </div>
         <div id="menu">
-            <div class="active"><a href="/">{{ _('overview')|uc_first }}</a></div>
-            <div><a href="/content">{{ _('content')|uc_first }}</a></div>
+            {% for item in ['overview', 'settings', 'content'] %}
+                {% set css = ' class="active"' if item in request.path or (item == 'overview' and request.path == '/') %}
+                <div {{ css|safe }}><a href="/{{ item }}">{{ item|uc_first }}</a></div>
+            {% endfor %}
         </div>
         <div id="breadcrumb">
             {% block breadcrumb %}{% endblock %}

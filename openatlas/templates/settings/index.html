@@ -1,0 +1,37 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    {{ _('settings')|uc_first }}
+{% endblock %}
+{% block body %}
+    <div id="tabs" class="tabs-container">
+        <ul>
+            {% for group in groups: %}
+                <li><a href="#tab-{{ group }}">{{ group }}</a></li>
+            {% endfor %}
+        </ul>
+        {% for group, items in groups.iteritems(): %}
+            <div id="tab-{{ group }}">
+                <div class="dataTable">
+                    {% for name, value in items.iteritems() %}
+                        {% set style = 'class ="faded"' if 'mail' in name and settings['mail'] else '' %}
+                        <div {{ style }}><div>{{ name }}</div><div>{{ value }}</div></div>
+                    {% endfor %}
+                </div>
+                {% if settings['mail'] and group == 'mail' %}
+                    <form id="test-mail-form" name="test-mail-form" style="margin-top:1em;" method="post"
+                          action="/settings#tab-mail">
+                        <input id="test-mail-receiver" name="test-mail-receiver"
+                               value="{{ settings['mail_from_email'] }}" class="required"><br />
+                        <button id="form-submit" name="form-submit" style="font-size:0.9em;"
+                            type="submit">{{ _('send_test_mail') }}</button>
+                    </form>
+                {% endif %}
+            </div>
+        {% endfor %}
+    </div>
+    <script type="text/javascript">
+        $(function () {
+            $("#tabs").tabs();
+        });
+    </script>
+{% endblock %}
