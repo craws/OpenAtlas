@@ -6,12 +6,12 @@
     <div id="tabs" class="tabs-container">
         <ul>
             {% for group in groups: %}
-                <li><a href="#tab-{{ group }}">{{ group }}</a></li>
+                <li><a href="#tab-{{ group }}">{{ group|uc_first }}</a></li>
             {% endfor %}
         </ul>
         {% for group, items in groups.iteritems(): %}
             <div id="tab-{{ group }}">
-                <div class="dataTable">
+                <div class="data-table">
                     {% for name, value in items.iteritems() %}
                         {% set style = 'class ="faded"' if 'mail' in name and settings['mail'] else '' %}
                         <div {{ style }}><div>{{ name }}</div><div>{{ value }}</div></div>

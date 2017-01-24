@@ -196,7 +196,39 @@ table.tablesorter thead tr th.sorter-false {
     display: none;
 }
 
-/* tabs */
+div.data-table > div {
+    display: table-row;
+}
+
+div.data-table > div > div {
+    display: table-cell;
+    padding: 0.2em;
+    width: inherit;
+}
+
+
+.tabs-container .ui-widget-header,
+.ui-state-active,
+.ui-state-default,
+.ui-tabs .ui-tabs-panel,
+.tabs-container .ui-widget-header, .ui-widget-header,
+.ui-widget-content .ui-state-default,
+.ui-widget-content .ui-state-active,
+.ui-widget-header .ui-state-default,
+.ui-widget-header .ui-state-active,
+.ui-widget.ui-widget-content {
+    border: none;
+    background: none;
+}
+
+/* important to hide jquery ui dotted line of selected tabs */
+:focus {
+    outline:none;
+}
+::-moz-focus-inner {
+    border:0;
+}
+
 .ui-tabs .ui-tabs-nav li.ui-tabs-active a {
     cursor: pointer;
 }
@@ -217,12 +249,6 @@ table.tablesorter thead tr th.sorter-false {
 
 .ui-tabs-vertical .ui-tabs-panel {
     float: right;
-}
-
-.tabs-container .ui-widget-header, .ui-state-default, .ui-widget-content .ui-state-default, .ui-widget-header
-.ui-state-default, .ui-state-active, .ui-widget-content .ui-state-active, .ui-widget-header .ui-state-active {
-    background: none;
-    border: none;
 }
 
 .ui-tabs .ui-tabs-nav li {

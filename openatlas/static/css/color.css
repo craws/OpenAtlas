@@ -3,8 +3,10 @@
 /* font color */
 
 body,
+tabs-container .ui-state-active a,
 table.tablesorter tbody td,
-#breadcrumb a:hover {
+#breadcrumb a:hover,
+div.tabs-container .ui-state-active a {
     color: #000000;
 }
 
@@ -16,6 +18,12 @@ button,
 .button-bar a,
 .changelog-version,
 .inverse-heading,
+.tabs-container .ui-widget-content a.button,
+.tabs-container .ui-widget-content .buttonBar a,
+.ui-widget-header,
+.ui-state-default a,
+.ui-state-default a:link,
+.ui-state-default a:visited,
 table.tablesorter thead tr th,
 table.tablesorter tfoot tr th {
     color: #ffffff;
@@ -39,18 +47,26 @@ body {
     background-color: #efefef;
 }
 
-#header,
-.info,
-table.tablesorter tbody td {
-    background-color: #ffffff;
-}
-
 #menu,
 #header-menu span,
 .inverse-heading,
+.ui-widget-header .ui-state-default,
+.ui-widget-header,
 table.tablesorter thead tr th,
 table.tablesorter tfoot tr th {
     background-color: #000000;
+}
+
+#header,
+.info,
+.ui-tabs .ui-tabs-panel,
+.ui-widget-content .ui-state-active,
+.ui-widget-header .ui-state-active,
+div.tabsContainer .ui-widget-content,
+div.tabsContainer .ui-state-active.ui-state-hover,
+div.tabsContainer .ui-state-active,
+table.tablesorter tbody td {
+    background-color: #ffffff;
 }
 
 #language-menu a,
@@ -61,6 +77,7 @@ table.tablesorter tbody tr.odd td {
 button,
 #breadcrumb,
 .button-bar a,
+.ui-state-default,
 .changelog-version {
     background-color: #4088c3;
 }
