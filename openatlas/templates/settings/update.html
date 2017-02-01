@@ -1,6 +1,60 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="/settings">{{ _('settings')|uc_first }}</a> > {{ update|uc_first }}
+    <a href="/settings">{{ _('settings')|uc_first }}</a> > {{ _('update')|uc_first }}
 {% endblock %}
 {% block body %}
+    <div class="button-bar">
+        <a href="/settings/update">{{ _('save')|uc_first }}</a>
+    </div>
+    {% set data_general = [
+        {'site_name': form.site_name},
+        {'default_language': form.default_language},
+        {'default_table_rows': form.default_table_rows},
+        {'log_level': form.log_level},
+        {'maintenance': form.maintenance},
+        {'offline': form.offline},
+    ] %}
+    {% set data_mail = [
+        {'mail': form.mail},
+        {'mail_transport_username': form.mail_transport_username},
+        {'mail_transport_host': form.mail_transport_host},
+        {'mail_transport_port': form.mail_transport_port},
+        {'mail_transport_type': form.mail_transport_type},
+        {'mail_transport_ssl': form.mail_transport_ssl},
+        {'mail_transport_auth': form.mail_transport_auth},
+        {'mail_from_email': form.mail_from_email},
+        {'mail_from_name': form.mail_from_name},
+        {'mail_recipients_login': form.mail_recipients_login},
+        {'mail_recipients_feedback': form.mail_recipients_feedback},
+    ] %}
+    {% set data_authentication = [
+        {'random_password_length': form.random_password_length},
+        {'reset_confirm_hours': form.reset_confirm_hours},
+        {'failed_login_tries': form.failed_login_tries},
+        {'failed_login_forget_minutes': form.failed_login_forget_minutes},
+    ] %}
+    <form method="post">
+        {{ form.csrf_token }}
+        <div id="tabs" class="tabs-container">
+            <ul>
+                <li><a href="#tab-general">{{ 'general'|uc_first }}</a></li>
+                <li><a href="#tab-mail">{{ 'mail'|uc_first }}</a></li>
+                <li><a href="#tab-authentication">{{ 'authentication'|uc_first }}</a></li>
+            </ul>
+            <div id="tab-general">
+                {{ data_general|data_table()|safe }}
+            </div>
+            <div id="tab-mail">
+                {{ data_mail|data_table()|safe }}
+            </div>
+            <div id="tab-authentication">
+                {{ data_authentication|data_table()|safe }}
+            </div>
+        </div>
+    </form>
+    <script type="text/javascript">
+        $(function () {
+            $("#tabs").tabs();
+        });
+    </script>
 {% endblock %}

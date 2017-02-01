@@ -3,6 +3,9 @@
     {{ _('settings')|uc_first }}
 {% endblock %}
 {% block body %}
+    <div class="button-bar">
+        <a href="/settings/update">{{ _('edit')|uc_first }}</a>
+    </div>
     <div id="tabs" class="tabs-container">
         <ul>
             {% for group in groups: %}

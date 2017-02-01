@@ -27,6 +27,18 @@ def nl2br(self, value):
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
+def data_table(self, data):
+    html = '<div class="data-table">'
+    for item in data:
+        key, value = item.popitem()
+        if value or value == 0:
+            html += '<div><div>' + key.capitalize() + '</div><div class="table-cell">' + str(value) + '</div></div>'
+    html += '</div>'
+    return html
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
 def pager(self, data):
     # To do: remove no cover when more content to test
     if not data['data']:  # pragma: no cover

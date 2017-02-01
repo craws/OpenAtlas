@@ -8,13 +8,39 @@ from openatlas import app
 from openatlas.models.settings import SettingsMapper
 from openatlas.util import util
 from werkzeug.utils import redirect
-from wtforms import TextAreaField
+from wtforms import StringField, BooleanField
 
 from openatlas.util.util import uc_first
 
 
 class SettingsForm(Form):
-    pass
+
+    # General
+    site_name = StringField('site_name')
+    default_language = StringField('default_language')
+    default_table_rows = StringField('default_table_rows')
+    log_level = StringField('log_level')
+    maintenance = BooleanField('maintenance')
+    offline = BooleanField('offline')
+
+    # Mail
+    mail = BooleanField('mail')
+    mail_transport_username = StringField('mail_transport_username')
+    mail_transport_host = StringField('mail_transport_host')
+    mail_transport_port = StringField('mail_transport_port')
+    mail_transport_type = StringField('mail_transport_type')
+    mail_transport_ssl = StringField('mail_transport_ssl')
+    mail_transport_auth = StringField('mail_transport_auth')
+    mail_from_email = StringField('mail_from_email')
+    mail_from_name = StringField('mail_from_name')
+    mail_recipients_login = StringField('mail_recipients_login')
+    mail_recipients_feedback = StringField('mail_recipients_feedback')
+
+    # Authentication
+    random_password_length = StringField('random_password_length')
+    reset_confirm_hours = StringField('reset_confirm_hours')
+    failed_login_tries = StringField('failed_login_tries')
+    failed_login_forget_minutes = StringField('failed_login_forget_minutes')
 
 
 @app.route('/settings')
@@ -64,4 +90,5 @@ def settings_index():
 
 @app.route('/settings/update', methods=["GET", "POST"])
 def settings_update():
-    return render_template('settings/update.html', settings=SettingsMapper.get_settings())
+    form = SettingsForm()
+    return render_template('settings/update.html', form=form, settings=SettingsMapper.get_settings())
