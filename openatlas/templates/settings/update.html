@@ -1,37 +1,37 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="/settings">{{ _('settings')|uc_first }}</a> > {{ _('update')|uc_first }}
+    <a href="/settings">{{ _('settings')|uc_first }}</a> > {{ _('edit')|uc_first }}
 {% endblock %}
 {% block body %}
     <div class="button-bar">
         <a href="/settings/update">{{ _('save')|uc_first }}</a>
     </div>
     {% set data_general = [
-        {'site_name': form.site_name},
-        {'default_language': form.default_language},
-        {'default_table_rows': form.default_table_rows},
-        {'log_level': form.log_level},
-        {'maintenance': form.maintenance},
-        {'offline': form.offline},
+        {form.site_name.label: form.site_name},
+        {form.default_language.label: form.default_language},
+        {form.default_table_rows.label: form.default_table_rows},
+        {form.log_level.label: form.log_level},
+        {form.maintenance.label: form.maintenance},
+        {form.offline.label: form.offline},
     ] %}
     {% set data_mail = [
-        {'mail': form.mail},
-        {'mail_transport_username': form.mail_transport_username},
-        {'mail_transport_host': form.mail_transport_host},
-        {'mail_transport_port': form.mail_transport_port},
-        {'mail_transport_type': form.mail_transport_type},
-        {'mail_transport_ssl': form.mail_transport_ssl},
-        {'mail_transport_auth': form.mail_transport_auth},
-        {'mail_from_email': form.mail_from_email},
-        {'mail_from_name': form.mail_from_name},
-        {'mail_recipients_login': form.mail_recipients_login},
-        {'mail_recipients_feedback': form.mail_recipients_feedback},
+        {form.mail.label: form.mail},
+        {form.mail_transport_username.label: form.mail_transport_username},
+        {form.mail_transport_host.label: form.mail_transport_host},
+        {form.mail_transport_port.label: form.mail_transport_port},
+        {form.mail_transport_type.label: form.mail_transport_type},
+        {form.mail_transport_ssl.label: form.mail_transport_ssl},
+        {form.mail_transport_auth.label: form.mail_transport_auth},
+        {form.mail_from_email.label: form.mail_from_email},
+        {form.mail_from_name.label: form.mail_from_name},
+        {form.mail_recipients_login.label: form.mail_recipients_login},
+        {form.mail_recipients_feedback.label: form.mail_recipients_feedback},
     ] %}
     {% set data_authentication = [
-        {'random_password_length': form.random_password_length},
-        {'reset_confirm_hours': form.reset_confirm_hours},
-        {'failed_login_tries': form.failed_login_tries},
-        {'failed_login_forget_minutes': form.failed_login_forget_minutes},
+        {form.random_password_length.label: form.random_password_length},
+        {form.reset_confirm_hours.label: form.reset_confirm_hours},
+        {form.failed_login_tries.label: form.failed_login_tries},
+        {form.failed_login_forget_minutes.label: form.failed_login_forget_minutes},
     ] %}
     <form method="post">
         {{ form.csrf_token }}

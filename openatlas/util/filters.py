@@ -32,7 +32,7 @@ def data_table(self, data):
     for item in data:
         key, value = item.popitem()
         if value or value == 0:
-            html += '<div><div>' + key.capitalize() + '</div><div class="table-cell">' + str(value) + '</div></div>'
+            html += '<div><div>' + str(key) + '</div><div class="table-cell">' + str(value) + '</div></div>'
     html += '</div>'
     return html
 
