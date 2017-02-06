@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-01-19 11:56+0100\n"
-"PO-Revision-Date: 2017-01-19 12:10+0100\n"
+"POT-Creation-Date: 2017-02-06 17:45+0100\n"
+"PO-Revision-Date: 2017-02-06 17:49+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language-Team: en <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -19,60 +19,61 @@ msgstr ""
 "Language: en\n"
 "X-Generator: Poedit 1.6.10\n"
 
-#: ../templates/layout.html:29
+#: ../templates/layout.html:31
 msgid "warning no js"
 msgstr ""
 "JavaScript seems to be disabled. The functionality of this site will be "
 "limited."
 
-#: ../templates/layout.html:40 ../templates/index/changelog.html:5
+#: ../templates/layout.html:42 ../templates/index/changelog.html:5
 msgid "version"
 msgstr "version"
 
-#: ../templates/layout.html:41 ../templates/index/changelog.html:2
+#: ../templates/layout.html:43 ../templates/index/changelog.html:2
 msgid "changelog"
 msgstr "changelog"
 
-#: ../templates/layout.html:42 ../templates/index/credits.html:2
+#: ../templates/layout.html:44 ../templates/index/credits.html:2
 msgid "credits"
 msgstr "credits"
 
-#: ../templates/layout.html:43 ../templates/index/contact.html:2
+#: ../templates/layout.html:45 ../templates/index/contact.html:2
 msgid "contact"
 msgstr "contact"
 
-#: ../templates/layout.html:44 ../templates/index/faq.html:2
+#: ../templates/layout.html:46 ../templates/index/faq.html:2
 msgid "faq"
 msgstr "faq"
 
-#: ../templates/layout.html:47 ../templates/layout.html:48
+#: ../templates/layout.html:49 ../templates/layout.html:50
 msgid "zoom in"
 msgstr "Larger font size"
 
-#: ../templates/layout.html:49 ../templates/layout.html:50
+#: ../templates/layout.html:51 ../templates/layout.html:52
 msgid "zoom out"
 msgstr "Smaller font size"
 
-#: ../templates/layout.html:62 ../templates/index/changelog.html:2
-#: ../templates/index/contact.html:2 ../templates/index/credits.html:2
-#: ../templates/index/faq.html:2 ../templates/index/index.html:2
-msgid "overview"
-msgstr "overview"
-
-#: ../templates/layout.html:63 ../templates/content/index.html:3
-#: ../templates/content/update.html:3 ../templates/content/view.html:3
+#: ../templates/content/index.html:3 ../templates/content/update.html:3
+#: ../templates/content/view.html:3
 msgid "content"
 msgstr "content"
 
 #: ../templates/content/update.html:5 ../templates/content/view.html:7
+#: ../templates/settings/index.html:7 ../templates/settings/update.html:3
 msgid "edit"
 msgstr "edit"
 
-#: ../templates/content/update.html:14
+#: ../templates/content/update.html:14 ../templates/settings/update.html:7
 msgid "save"
 msgstr "save"
 
-#: ../templates/index/index.html:5
+#: ../templates/index/changelog.html:2 ../templates/index/contact.html:2
+#: ../templates/index/credits.html:2 ../templates/index/faq.html:2
+#: ../templates/index/index.html:2
+msgid "overview"
+msgstr "overview"
+
+#: ../templates/index/index.html:7
 msgid "text_intro"
 msgstr ""
 "%(link_openatlas)s is a database application that enables you to manage "
@@ -88,3 +89,95 @@ msgstr ""
 "\n"
 "For detailed information please visit our %(link_wiki)s and project "
 "management site or try out our %(link_demo)s."
+
+#: ../templates/settings/index.html:3 ../templates/settings/update.html:3
+msgid "settings"
+msgstr "settings"
+
+#: ../templates/settings/index.html:29
+msgid "send_test_mail"
+msgstr "Send test mail"
+
+#: ../views/settings.py:20 ../views/settings.py:62
+msgid "site name"
+msgstr "site name"
+
+#: ../views/settings.py:21 ../views/settings.py:63
+msgid "default language"
+msgstr "default language"
+
+#: ../views/settings.py:22 ../views/settings.py:64
+msgid "default table rows"
+msgstr "default table rows"
+
+#: ../views/settings.py:23 ../views/settings.py:65
+msgid "log level"
+msgstr "log level"
+
+#: ../views/settings.py:24 ../views/settings.py:66
+msgid "maintenance"
+msgstr "maintenance"
+
+#: ../views/settings.py:25 ../views/settings.py:67
+msgid "offline"
+msgstr "offline"
+
+#: ../views/settings.py:28 ../views/settings.py:70
+msgid "mail"
+msgstr "email"
+
+#: ../views/settings.py:29 ../views/settings.py:71
+msgid "mail transport username"
+msgstr "username"
+
+#: ../views/settings.py:30 ../views/settings.py:72
+msgid "mail transport host"
+msgstr "host"
+
+#: ../views/settings.py:31 ../views/settings.py:73
+msgid "mail transport port"
+msgstr "port"
+
+#: ../views/settings.py:32 ../views/settings.py:74
+msgid "mail transport type"
+msgstr "transport type"
+
+#: ../views/settings.py:33 ../views/settings.py:75
+msgid "mail transport ssl"
+msgstr "SSL"
+
+#: ../views/settings.py:34 ../views/settings.py:76
+msgid "mail transport auth"
+msgstr "auth"
+
+#: ../views/settings.py:35 ../views/settings.py:77
+msgid "mail from email"
+msgstr "email from"
+
+#: ../views/settings.py:36 ../views/settings.py:78
+msgid "mail from name"
+msgstr "from name"
+
+#: ../views/settings.py:37 ../views/settings.py:79
+msgid "mail recipients login"
+msgstr "recipients login"
+
+#: ../views/settings.py:38 ../views/settings.py:80
+msgid "mail recipients feedback"
+msgstr "recipients feedback"
+
+#: ../views/settings.py:41 ../views/settings.py:83
+msgid "random password length"
+msgstr "random password length"
+
+#: ../views/settings.py:42 ../views/settings.py:84
+msgid "reset confirm hours"
+msgstr "reset confirm hours"
+
+#: ../views/settings.py:43 ../views/settings.py:85
+msgid "failed login tries"
+msgstr "failed logins"
+
+#: ../views/settings.py:44 ../views/settings.py:86
+msgid "failed login forget minutes"
+msgstr "Failed login forget minutes"
