@@ -1,17 +1,12 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
 from collections import OrderedDict
 
-import openatlas
-from flask import flash, session, render_template
+from flask import session, render_template
 from flask_wtf import Form
-from openatlas import app
-from openatlas.models.settings import SettingsMapper
-from openatlas.util import util
-from werkzeug.utils import redirect
-from wtforms import StringField, BooleanField
-
-from openatlas.util.util import uc_first
 from flask.ext.babel import lazy_gettext as _
+from openatlas import app
+from openatlas.util.util import uc_first
+from wtforms import StringField, BooleanField
 
 
 class SettingsForm(Form):
@@ -46,7 +41,7 @@ class SettingsForm(Form):
 
 @app.route('/settings')
 def settings_index():
-    settings = SettingsMapper.get_settings()
+    settings = session['settings']
     log_array = {
         '0': 'Emergency',
         '1': 'Alert',
@@ -92,4 +87,11 @@ def settings_index():
 @app.route('/settings/update', methods=["GET", "POST"])
 def settings_update():
     form = SettingsForm()
-    return render_template('settings/update.html', form=form, settings=SettingsMapper.get_settings())
+    fields = ['site_name', 'default_language', 'default_table_rows', 'log_level', 'maintenance', 'offline', 'mail',
+              'mail_transport_username', 'mail_transport_host', 'mail_transport_port', 'mail_transport_type',
+              'mail_transport_ssl', 'mail_transport_auth', 'mail_from_email', 'mail_from_name', 'mail_recipients_login',
+              'mail_recipients_feedback', 'random_password_length', 'reset_confirm_hours', 'failed_login_tries',
+              'failed_login_forget_minutes']
+    for field in fields:
+        getattr(form, field).data = session['settings'][field]
+    return render_template('settings/update.html', form=form, settings=session['settings'])

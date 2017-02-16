@@ -8,12 +8,15 @@ from flask import Flask, request, session
 import psycopg2.extras
 
 from flask.ext.babel import Babel, gettext
+
+from openatlas.models.settings import SettingsMapper
 from openatlas.util import filters
 
 reload(sys)
 sys.setdefaultencoding('utf8')
 
 app = Flask(__name__, instance_relative_config=True)
+settings = []
 
 
 def connect(config_name='production'):
@@ -66,6 +69,7 @@ def get_locale():
 @app.before_request
 def before_request():
     session['language'] = get_locale()
+    session['settings'] = SettingsMapper.get_settings()
 
 if __name__ == "__main__":  # pragma: no cover
     app.run()
