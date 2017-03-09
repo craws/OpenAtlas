@@ -1,9 +1,15 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
 from collections import OrderedDict
+from flask import flash
 
 from flask import session, render_template
 from flask_wtf import Form
+from werkzeug.utils import redirect
+
 from flask.ext.babel import lazy_gettext as _
+
+import openatlas
+from openatlas import SettingsMapper
 from openatlas import app
 from openatlas.util.util import uc_first
 from wtforms import StringField, BooleanField
@@ -16,11 +22,11 @@ class SettingsForm(Form):
     default_language = StringField(_('default language'))
     default_table_rows = StringField(_('default table rows'))
     log_level = StringField(_('log level'))
-    maintenance = BooleanField(_('maintenance'))
-    offline = BooleanField(_('offline'))
+    maintenance = BooleanField(_('maintenance'), false_values='false')
+    offline = BooleanField(_('offline'), false_values='false')
 
     # Mail
-    mail = BooleanField(_('mail'))
+    mail = BooleanField(_('mail'), false_values='false')
     mail_transport_username = StringField(_('mail transport username'))
     mail_transport_host = StringField(_('mail transport host'))
     mail_transport_port = StringField(_('mail transport port'))
@@ -58,11 +64,11 @@ def settings_index():
             (_('default language'), settings['default_language']),
             (_('default table rows'), settings['default_table_rows']),
             (_('log level'), log_array[settings['log_level']]),
-            (_('maintenance'), uc_first('on') if settings['maintenance'] else uc_first('off')),
-            (_('offline'), uc_first('on') if settings['offline'] else uc_first('off')),
+            (_('maintenance'), uc_first('on') if settings['maintenance'] == 'true' else uc_first('off')),
+            (_('offline'), uc_first('on') if settings['offline'] == 'true' else uc_first('off')),
         ])),
         ('mail', OrderedDict([
-            (_('mail'), uc_first('on') if settings['mail'] else uc_first('off')),
+            (_('mail'), uc_first('on') if settings['mail'] == 'true' else uc_first('off')),
             (_('mail transport username'), settings['mail_transport_username']),
             (_('mail transport host'), settings['mail_transport_host']),
             (_('mail transport port'), settings['mail_transport_port']),
@@ -87,11 +93,15 @@ def settings_index():
 @app.route('/settings/update', methods=["GET", "POST"])
 def settings_update():
     form = SettingsForm()
-    fields = ['site_name', 'default_language', 'default_table_rows', 'log_level', 'maintenance', 'offline', 'mail',
-              'mail_transport_username', 'mail_transport_host', 'mail_transport_port', 'mail_transport_type',
-              'mail_transport_ssl', 'mail_transport_auth', 'mail_from_email', 'mail_from_name', 'mail_recipients_login',
-              'mail_recipients_feedback', 'random_password_length', 'reset_confirm_hours', 'failed_login_tries',
-              'failed_login_forget_minutes']
-    for field in fields:
+    if form.validate_on_submit():
+        openatlas.get_cursor().execute('BEGIN')
+        SettingsMapper.update(form)
+        openatlas.get_cursor().execute('END')
+        flash('info update', 'info')
+        return redirect('/settings')
+
+    for field in SettingsMapper.fields:
         getattr(form, field).data = session['settings'][field]
+        if isinstance(getattr(form, field), BooleanField):
+            getattr(form, field).data = True if session['settings'][field] == 'true' else False
     return render_template('settings/update.html', form=form, settings=session['settings'])
