@@ -12,37 +12,37 @@ import openatlas
 from openatlas import SettingsMapper
 from openatlas import app
 from openatlas.util.util import uc_first
-from wtforms import StringField, BooleanField
+from wtforms import StringField, BooleanField, SelectField
 
 
 class SettingsForm(Form):
 
     # General
-    site_name = StringField(_('site name'))
-    default_language = StringField(_('default language'))
-    default_table_rows = StringField(_('default table rows'))
-    log_level = StringField(_('log level'))
-    maintenance = BooleanField(_('maintenance'), false_values='false')
-    offline = BooleanField(_('offline'), false_values='false')
+    site_name = StringField(uc_first(_('site name')))
+    default_language = SelectField(uc_first(_('default language')), choices=[])
+    default_table_rows = StringField(uc_first(_('default table rows')))
+    log_level = StringField(uc_first(_('log level')))
+    maintenance = BooleanField(uc_first(_('maintenance')), false_values='false')
+    offline = BooleanField(uc_first(_('offline')), false_values='false')
 
     # Mail
-    mail = BooleanField(_('mail'), false_values='false')
-    mail_transport_username = StringField(_('mail transport username'))
-    mail_transport_host = StringField(_('mail transport host'))
-    mail_transport_port = StringField(_('mail transport port'))
-    mail_transport_type = StringField(_('mail transport type'))
-    mail_transport_ssl = StringField(_('mail transport ssl'))
-    mail_transport_auth = StringField(_('mail transport auth'))
-    mail_from_email = StringField(_('mail from email'))
-    mail_from_name = StringField(_('mail from name'))
-    mail_recipients_login = StringField(_('mail recipients login'))
-    mail_recipients_feedback = StringField(_('mail recipients feedback'))
+    mail = BooleanField(uc_first(_('mail')), false_values='false')
+    mail_transport_username = StringField(uc_first(_('mail transport username')))
+    mail_transport_host = StringField(uc_first(_('mail transport host')))
+    mail_transport_port = StringField(uc_first(_('mail transport port')))
+    mail_transport_type = StringField(uc_first(_('mail transport type')))
+    mail_transport_ssl = StringField(uc_first(_('mail transport ssl')))
+    mail_transport_auth = StringField(uc_first(_('mail transport auth')))
+    mail_from_email = StringField(uc_first(_('mail from email')))
+    mail_from_name = StringField(uc_first(_('mail from name')))
+    mail_recipients_login = StringField(uc_first(_('mail recipients login')))
+    mail_recipients_feedback = StringField(uc_first(_('mail recipients feedback')))
 
     # Authentication
-    random_password_length = StringField(_('random password length'))
-    reset_confirm_hours = StringField(_('reset confirm hours'))
-    failed_login_tries = StringField(_('failed login tries'))
-    failed_login_forget_minutes = StringField(_('failed login forget minutes'))
+    random_password_length = StringField(uc_first(_('random password length')))
+    reset_confirm_hours = StringField(uc_first(_('reset confirm hours')))
+    failed_login_tries = StringField(uc_first(_('failed login tries')))
+    failed_login_forget_minutes = StringField(uc_first(_('failed login forget minutes')))
 
 
 @app.route('/settings')
@@ -93,15 +93,19 @@ def settings_index():
 @app.route('/settings/update', methods=["GET", "POST"])
 def settings_update():
     form = SettingsForm()
+    data_lang = []
+    for language in openatlas.app.config['LANGUAGES'].keys():
+        data_lang.append((language, language))
+    getattr(form, 'default_language').choices = data_lang
     if form.validate_on_submit():
         openatlas.get_cursor().execute('BEGIN')
         SettingsMapper.update(form)
         openatlas.get_cursor().execute('END')
         flash('info update', 'info')
         return redirect('/settings')
-
     for field in SettingsMapper.fields:
-        getattr(form, field).data = session['settings'][field]
         if isinstance(getattr(form, field), BooleanField):
             getattr(form, field).data = True if session['settings'][field] == 'true' else False
+        else:
+            getattr(form, field).data = session['settings'][field]
     return render_template('settings/update.html', form=form, settings=session['settings'])

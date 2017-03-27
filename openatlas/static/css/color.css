@@ -14,6 +14,7 @@ div.tabs-container .ui-state-active a {
 #breadcrumb a,
 #header-menu span,
 #language-menu a,
+input[type=submit],
 button,
 .button-bar a,
 .changelog-version,
@@ -59,6 +60,7 @@ table.tablesorter tfoot tr th {
 
 #header,
 .info,
+select,
 .ui-tabs .ui-tabs-panel,
 .ui-widget-content .ui-state-active,
 .ui-widget-header .ui-state-active,
@@ -76,6 +78,7 @@ table.tablesorter tbody tr.odd td {
 
 button,
 #breadcrumb,
+input[type=submit],
 .button-bar a,
 .ui-state-default,
 .changelog-version {
@@ -90,4 +93,12 @@ button,
 
 #menu > div.active {
     border-color: #4088c3;
+}
+
+textarea,
+input[type=text],
+input[type=password],
+select
+{
+    border-color: #adadad;
 }

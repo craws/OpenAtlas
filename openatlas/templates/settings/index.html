@@ -17,7 +17,7 @@
                 <div class="data-table">
                     {% for name, value in items.iteritems() %}
                         {% set style = 'class ="faded"' if 'mail' in name and settings['mail'] else '' %}
-                        <div {{ style }}><div>{{ name }}</div><div>{{ value }}</div></div>
+                        <div {{ style }}><div>{{ name|uc_first }}</div><div>{{ value }}</div></div>
                     {% endfor %}
                 </div>
                 {% if settings['mail'] and group == 'mail' %}
