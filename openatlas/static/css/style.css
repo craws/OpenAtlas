@@ -47,7 +47,6 @@ div.mce-tinymce {
     height: 7em;
 }
 
-
 .button-bar {
     margin-bottom: 1em;
 }
@@ -212,8 +211,6 @@ input[type=text], input[type=password], textarea, select  {
 }
 
 input[type=text], input[type=password], select {
-    padding: 0;
-    margin: 0;
     width: 15.6em;
     height: 1.6em;
     -ms-box-sizing:content-box;

@@ -1,14 +1,12 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
 import ConfigParser
 import locale
+import psycopg2.extras
 import os
 import sys
+
 from flask import Flask, request, session
-
-import psycopg2.extras
-
-from flask.ext.babel import Babel, gettext
-
+from flask_babel import Babel
 from openatlas.models.settings import SettingsMapper
 from openatlas.util import filters
 
@@ -62,14 +60,14 @@ def get_locale():
     if 'language' in session:
         return session['language']
     best_match = request.accept_languages.best_match(app.config['LANGUAGES'].keys())
-    # To do: take language default from config (remove hardcoded en)
-    return best_match if best_match else 'en'  # check if best_match is set (in tests it isn't)
+    return best_match if best_match else session['settings']['default_language']  # check if best_match is set (in tests it isn't)
 
 
 @app.before_request
 def before_request():
-    session['language'] = get_locale()
     session['settings'] = SettingsMapper.get_settings()
+    session['language'] = get_locale()
+
 
 if __name__ == "__main__":  # pragma: no cover
     app.run()
