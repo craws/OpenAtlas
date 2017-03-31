@@ -1,18 +1,15 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
 from collections import OrderedDict
-from flask import flash
-
-from flask import session, render_template
+from flask import flash, render_template, session
+from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-
-from flask.ext.babel import lazy_gettext as _
+from wtforms import StringField, BooleanField, SelectField
 
 import openatlas
 from openatlas import SettingsMapper
 from openatlas import app
 from openatlas.util.util import uc_first
-from wtforms import StringField, BooleanField, SelectField
 
 
 class SettingsForm(Form):
@@ -20,8 +17,8 @@ class SettingsForm(Form):
     # General
     site_name = StringField(uc_first(_('site name')))
     default_language = SelectField(uc_first(_('default language')), choices=[])
-    default_table_rows = StringField(uc_first(_('default table rows')))
-    log_level = StringField(uc_first(_('log level')))
+    default_table_rows = SelectField(uc_first(_('default table rows')), choices=[], coerce=int)
+    log_level = SelectField(uc_first(_('log level')), choices=[], coerce=int)
     maintenance = BooleanField(uc_first(_('maintenance')), false_values='false')
     offline = BooleanField(uc_first(_('offline')), false_values='false')
 
@@ -48,22 +45,12 @@ class SettingsForm(Form):
 @app.route('/settings')
 def settings_index():
     settings = session['settings']
-    log_array = {
-        '0': 'Emergency',
-        '1': 'Alert',
-        '2': 'Critical',
-        '3': 'Error',
-        '4': 'Warn',
-        '5': 'Notice',
-        '6': 'Info',
-        '7': 'Debug'
-    }
     groups = OrderedDict([
         ('general', OrderedDict([
             (_('site name'), settings['site_name']),
-            (_('default language'), settings['default_language']),
-            (_('default table rows'), settings['default_table_rows']),
-            (_('log level'), log_array[settings['log_level']]),
+            (_('default language'), openatlas.app.config['LANGUAGES'][settings['default_language']]),
+            (_('default table rows'), openatlas.default_table_rows[int(settings['default_table_rows'])]),
+            (_('log level'), openatlas.log_levels[int(settings['log_level'])]),
             (_('maintenance'), uc_first('on') if settings['maintenance'] == 'true' else uc_first('off')),
             (_('offline'), uc_first('on') if settings['offline'] == 'true' else uc_first('off')),
         ])),
@@ -93,10 +80,9 @@ def settings_index():
 @app.route('/settings/update', methods=["GET", "POST"])
 def settings_update():
     form = SettingsForm()
-    data_lang = []
-    for language in openatlas.app.config['LANGUAGES'].keys():
-        data_lang.append((language, language))
-    getattr(form, 'default_language').choices = data_lang
+    getattr(form, 'default_language').choices = openatlas.app.config['LANGUAGES'].items()
+    getattr(form, 'log_level').choices = openatlas.log_levels.items()
+    getattr(form, 'default_table_rows').choices = openatlas.default_table_rows.items()
     if form.validate_on_submit():
         openatlas.get_cursor().execute('BEGIN')
         SettingsMapper.update(form)

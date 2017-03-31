@@ -18,7 +18,10 @@
         <script type="text/javascript" src="/static/js/jquery/jquery-ui-1.12.1/jquery-ui.min.js"></script>
         <script type="text/javascript" src="/static/js/tinymce/tinymce.min.js"></script>
         <script type="text/javascript" src="/static/js/functions.js"></script>
-        <title>{{ session['settings']['site_name'] }}</title>
+        <title>
+            {{ session['settings']['site_name'] }}
+            {{ ' - ' + request.path.split('/')[1]|uc_first if request.path.split('/')[1] else '' }}
+        </title>
     </head>
     <body>
         <div id="header">

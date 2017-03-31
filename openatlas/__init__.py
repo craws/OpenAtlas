@@ -4,6 +4,7 @@ import locale
 import psycopg2.extras
 import os
 import sys
+from collections import OrderedDict
 
 from flask import Flask, request, session
 from flask_babel import Babel
@@ -53,6 +54,24 @@ from openatlas.views import content, index, settings
 
 babel = Babel(app)
 app.register_blueprint(filters.blueprint)
+
+# To do: maybe store these values somewhere else, config?
+
+default_table_rows = OrderedDict()
+default_table_rows[10] = '10'
+default_table_rows[20] = '20'
+default_table_rows[50] = '50'
+default_table_rows[100] = '100'
+
+log_levels = OrderedDict()
+log_levels[0] = 'emergency'
+log_levels[1] = 'alert'
+log_levels[2] = 'critical'
+log_levels[3] = 'error'
+log_levels[4] = 'warn'
+log_levels[5] = 'notice'
+log_levels[6] = 'info'
+log_levels[7] = 'debug'
 
 
 @babel.localeselector
