@@ -64,7 +64,7 @@
             </div>
         </div>
         <div id="menu">
-            {% for item in ['overview', 'settings', 'content'] %}
+            {% for item in ['overview', 'model', 'settings', 'content'] %}
                 {% set css = ' class="active"' if item in request.path or (item == 'overview' and request.path == '/') %}
                 <div {{ css|safe }}><a href="/{{ item }}">{{ item|uc_first }}</a></div>
             {% endfor %}
