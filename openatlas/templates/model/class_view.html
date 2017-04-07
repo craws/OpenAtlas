@@ -12,9 +12,15 @@
         {{ data|data_table()|safe }}
     </div>
     <div style="float:left;padding-right:2em;">
+        <p><strong>{{ _('super')|uc_first }}</strong></p>
+        {% for id in classes[class_id].super %}
+            {{ classes[id]|link|safe }}<br />
+        {% endfor %}
+    </div>
+    <div style="float:left;padding-right:2em;">
         <p><strong>{{ _('subs')|uc_first }}</strong></p>
-        {% for sub_id in classes[class_id].sub %}
-            {{ classes[sub_id].code }} {{ classes[sub_id].name_translated}}<br />
+        {% for id in classes[class_id].sub %}
+            {{ classes[id]|link|safe }}<br />
         {% endfor %}
     </div>
 {% endblock %}

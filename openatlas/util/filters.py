@@ -13,6 +13,12 @@ paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
+def link(self, entity):
+    return util.link(entity)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
 def uc_first(self, string):
     return util.uc_first(string)
 

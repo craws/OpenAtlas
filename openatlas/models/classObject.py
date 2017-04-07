@@ -50,7 +50,7 @@ class ClassMapper(object):
         cursor.execute('SELECT super_id, sub_id FROM model.class_inheritance;')
         for row in cursor.fetchall():
             classes[row.super_id].sub.append(row.sub_id)
-            #classes[row.sub_id].super.append(row.super_id)
+            classes[row.sub_id].super.append(row.super_id)
         return classes
 
     @staticmethod
