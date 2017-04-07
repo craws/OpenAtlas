@@ -102,3 +102,10 @@ select
 {
     border-color: #adadad;
 }
+
+div.pagedisplay {
+    border-top-color: #969392;
+    border-left-color: #969392;
+    border-bottom-color: #ffffff;
+    border-right-color: #ffffff;
+}

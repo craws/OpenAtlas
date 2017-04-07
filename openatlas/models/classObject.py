@@ -4,6 +4,19 @@ from flask import session
 import openatlas
 
 
+class ClassObject(object):
+
+    code = None
+    comment_translated = None
+    created = None
+    id = None
+    modified = None
+    name = None
+    name_translated = None
+    sub = []
+    super = []
+
+
 class ClassMapper(object):
 
     @staticmethod
@@ -26,9 +39,28 @@ class ClassMapper(object):
         """
         classes = {}
         cursor = openatlas.get_cursor()
-        # remove hardcoded language code
-        cursor.execute(sql, {'language_code': 'en', 'language_default_code': 'en'})
+        cursor.execute(sql, {
+            'language_code': openatlas.get_locale(),
+            'language_default_code': session['settings']['default_language']
+        })
         for row in cursor.fetchall():
-            # to do: created class class_ and a populate method in mapper
-            pass
+            classes[row.id] = ClassMapper.populate(row)
+            classes[row.id].sub = []
+            classes[row.id].super = []
+        cursor.execute('SELECT super_id, sub_id FROM model.class_inheritance;')
+        for row in cursor.fetchall():
+            classes[row.super_id].sub.append(row.sub_id)
+            #classes[row.sub_id].super.append(row.super_id)
         return classes
+
+    @staticmethod
+    def populate(row):
+        object_ = ClassObject()
+        object_.id = row.id
+        object_.name = row.name
+        object_.created = row.created
+        object_.modified = row.modified
+        object_.code = row.code
+        object_.name_translated = row.name_i18n
+        object_.comment_translated = row.comment_i18n
+        return object_

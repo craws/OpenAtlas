@@ -1,0 +1,20 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="/">{{ _('model')|uc_first }}</a> > <a href="/model/class">{{ _('classes')|uc_first }}</a> > {{ classes[class_id].code }}
+{% endblock %}
+{% block body %}
+    <div style="float:left;padding-right:2em;">
+        <p><strong>{{ _('info')|uc_first }}</strong></p>
+        {% set data = [
+            {'code': classes[class_id].code},
+            {'name': classes[class_id].name_translated},
+        ] %}
+        {{ data|data_table()|safe }}
+    </div>
+    <div style="float:left;padding-right:2em;">
+        <p><strong>{{ _('subs')|uc_first }}</strong></p>
+        {% for sub_id in classes[class_id].sub %}
+            {{ classes[sub_id].code }} {{ classes[sub_id].name_translated}}<br />
+        {% endfor %}
+    </div>
+{% endblock %}
