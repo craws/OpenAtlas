@@ -2,25 +2,4 @@
 {% block breadcrumb %}<a href="/">{{ _('model')|uc_first }}</a> > {{ _('classes')|uc_first }}{% endblock %}
 {% block body %}
     {{ table_classes|pager|safe }}
-    <script type="text/javascript">
-        $.tablesorter.addParser({
-            id: 'code',
-            is: function (string, table, cell, $cell) {
-                return false;
-            },
-            format: function (string, table, cell, cellIndex) {
-                return string.replace(/E/, '');
-            },
-            type: 'numeric'
-        });
-        $(function() {
-            $("#classes-table").tablesorter({
-                headers: {
-                    0: {
-                        sorter:'code'
-                    }
-                }
-            });
-        });
-    </script>
 {% endblock %}

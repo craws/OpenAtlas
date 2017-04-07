@@ -17,3 +17,14 @@ function resizeText(multiplier) {
     }
     document.body.style.fontSize = parseFloat(document.body.style.fontSize) + (multiplier * 0.2) + "em";
 }
+
+$.tablesorter.addParser({
+    id: 'class_code',
+    is: function (s) {
+        return false;
+    },
+    format: function (s) {
+        return s.replace(/E/,'');
+    },
+    type: 'text'
+});

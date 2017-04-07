@@ -15,7 +15,8 @@ def model_class():
     table_classes = {
         'name': 'classes',
         'header': ['code', 'name'],
-        'data': []
+        'data': [],
+        'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'
     }
     for class_id, class_ in ClassMapper.get_all().iteritems():
         table_classes['data'].append([

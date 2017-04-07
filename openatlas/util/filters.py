@@ -83,16 +83,13 @@ def pager(self, data):
     html += '</tbody>'
     html += '</table>'
     sort = 'sortList: [[0, 0]]' if 'sort' not in data else data['sort']
-    headers = 'headers: { 1: { sorter: "digit" } },' if 'headers' in data else ''
-    text_extractions = "textExtraction: function(node){return $(node).text().replace(/[,€]/g,'');}"
     html += '<script type="text/javascript">'
     if 'hide_pager' in data:
-        html += '$("#' + name + '-table").tablesorter({' + sort + ', widgets: [\'zebra\'],'
-        html += text_extractions + '});'
+        html += '$("#' + name + '-table").tablesorter({' + sort + ', widgets: [\'zebra\']});'
     else:  # pragma: no cover
         html += '$("#' + name + '-table")'
-        html += '.tablesorter({ ' + headers + ' ' + sort + ', dateFormat: "ddmmyyyy" '
-        html += ' , widgets: [\'zebra\', \'filter\'],  ' + text_extractions + ','
+        html += '.tablesorter({ ' + sort + ', dateFormat: "ddmmyyyy" '
+        html += ' , widgets: [\'zebra\', \'filter\'],'
         html += 'widgetOptions: {filter_external: \'#' + name + '-search\', filter_columnFilters: false}})'
         html += '.tablesorterPager({positionFixed: false, container: $("#' + name + '-pager"), size: 20});'
     html += '</script>'
