@@ -14,6 +14,10 @@ p {
     max-width: 80em;
 }
 
+div.description {
+    max-width: 72em;
+}
+
 p.inverse-heading {
     display: inline-block;
     font-size: 1.1em;

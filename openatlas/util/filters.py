@@ -45,13 +45,24 @@ def data_table(self, data):
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
+def description(self, entity):
+    html = ''
+    if entity.description:
+        html += '<div class="description">' + entity.info.replace('\r\n', '<br />') + '</div>'
+    return html
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
 def pager(self, data):
     # To do: remove no cover when more content to test
     if not data['data']:  # pragma: no cover
         return ''
     html = ''
     name = data['name']
-    if 'hide_pager' not in data:  # pragma: no cover
+    # To do: remove hardcoded table pager limit when user profiles available
+    show_pager = False if 'hide_pager' in data or len(data) < 20 else True
+    if show_pager:  # pragma: no cover
         html += '<div id="' + name + '-pager" class="pager">'
         html += """
                 <div class="navigation first"></div>
@@ -90,13 +101,13 @@ def pager(self, data):
     html += '</table>'
     sort = 'sortList: [[0, 0]]' if 'sort' not in data else data['sort']
     html += '<script type="text/javascript">'
-    if 'hide_pager' in data:
-        html += '$("#' + name + '-table").tablesorter({' + sort + ', widgets: [\'zebra\']});'
-    else:  # pragma: no cover
+    if show_pager:
         html += '$("#' + name + '-table")'
         html += '.tablesorter({ ' + sort + ', dateFormat: "ddmmyyyy" '
         html += ' , widgets: [\'zebra\', \'filter\'],'
         html += 'widgetOptions: {filter_external: \'#' + name + '-search\', filter_columnFilters: false}})'
         html += '.tablesorterPager({positionFixed: false, container: $("#' + name + '-pager"), size: 20});'
+    else:  # pragma: no cover
+        html += '$("#' + name + '-table").tablesorter({' + sort + ', widgets: [\'zebra\']});'
     html += '</script>'
     return html

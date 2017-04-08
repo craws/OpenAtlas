@@ -1,26 +1,27 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="/">{{ _('model')|uc_first }}</a> > <a href="/model/class">{{ _('classes')|uc_first }}</a> > {{ classes[class_id].code }}
+    <a href="/">{{ _('model')|uc_first }}</a> > <a href="/model/class">{{ _('classes')|uc_first }}</a> > {{ class_.code }}
 {% endblock %}
 {% block body %}
     <div style="float:left;padding-right:2em;">
         <p><strong>{{ _('info')|uc_first }}</strong></p>
         {% set data = [
-            {'code': classes[class_id].code},
-            {'name': classes[class_id].name_translated},
+            {'code': class_.code},
+            {'name': class_.name_translated},
         ] %}
         {{ data|data_table()|safe }}
     </div>
-    <div style="float:left;padding-right:2em;">
-        <p><strong>{{ _('super')|uc_first }}</strong></p>
-        {% for id in classes[class_id].super %}
-            {{ classes[id]|link|safe }}<br />
-        {% endfor %}
-    </div>
-    <div style="float:left;padding-right:2em;">
-        <p><strong>{{ _('subs')|uc_first }}</strong></p>
-        {% for id in classes[class_id].sub %}
-            {{ classes[id]|link|safe }}<br />
-        {% endfor %}
+    {% for name, table in tables.iteritems() %}
+        {% if table['data']|length > 0 %}
+            <div style="float:left;padding-right:2em;">
+                <p><strong>{{ name|uc_first }}</strong></p>
+                {{ tables[name]|pager|safe }}
+            </div>
+        {% endif %}
+    {% endfor %}
+    <div style="clear:both"></div>
+    <div class="description">
+        <strong>{{ _('description')|uc_first }}</strong>
+        <p>{{ class_.comment_translated }}</p>
     </div>
 {% endblock %}

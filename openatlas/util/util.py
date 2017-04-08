@@ -12,5 +12,5 @@ def link(entity):  # pragma: no cover
     if not entity:
         return ''
     if isinstance(entity, ClassObject):
-        return '<a href="/model/class_view/' + str(entity.id) + '">' + entity.code + ' ' + entity.name_translated + '</a>'
+        return '<a href="/model/class_view/' + str(entity.id) + '">' + entity.code + '</a>'
     return entity.name + ' (' + entity.class_.name + ')'
