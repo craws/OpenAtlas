@@ -19,12 +19,24 @@ function resizeText(multiplier) {
 }
 
 $.tablesorter.addParser({
-    id: 'class_code',
-    is: function (s) {
-        return false;
-    },
-    format: function (s) {
-        return s.replace(/E/,'');
-    },
-    type: 'text'
-});
+        id: 'class_code',
+        is: function (string) {
+            return false;
+        },
+        format: function (string) {
+            return string.replace(/E/,'');
+        },
+        type: 'numeric'
+    }
+);
+$.tablesorter.addParser({
+        id: 'property_code',
+        is: function (string) {
+            return false;
+        },
+        format: function(string) {
+            return string.replace(/P/,'');
+        },
+        type: 'numeric'
+    }
+);

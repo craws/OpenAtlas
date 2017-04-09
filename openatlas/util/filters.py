@@ -54,14 +54,14 @@ def description(self, entity):
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def pager(self, data):
+def pager(self, table):
     # To do: remove no cover when more content to test
-    if not data['data']:  # pragma: no cover
+    if not table['data']:  # pragma: no cover
         return ''
     html = ''
-    name = data['name']
+    name = table['name']
     # To do: remove hardcoded table pager limit when user profiles available
-    show_pager = False if 'hide_pager' in data or len(data) < 20 else True
+    show_pager = False if 'hide_pager' in table or len(table['data']) < 20 else True
     if show_pager:  # pragma: no cover
         html += '<div id="' + name + '-pager" class="pager">'
         html += """
@@ -82,11 +82,11 @@ def pager(self, data):
         html += '</div>'
     html += '<table id="' + name + '-table" class="tablesorter">'
     html += '<thead><tr>'
-    for header in data['header']:
+    for header in table['header']:
         style = '' if header else 'class=sorter-false '
         html += '<th ' + style + '>' + header.capitalize() + '</th>'
     html += '</tr></thead><tbody>'
-    for row in data['data']:
+    for row in table['data']:
         html += '<tr>'
         for entry in row:
             entry = str(entry) if entry and entry != 'None' else ''
@@ -99,7 +99,7 @@ def pager(self, data):
         html += '</tr>'
     html += '</tbody>'
     html += '</table>'
-    sort = 'sortList: [[0, 0]]' if 'sort' not in data else data['sort']
+    sort = 'sortList: [[0, 0]]' if 'sort' not in table else table['sort']
     html += '<script type="text/javascript">'
     if show_pager:
         html += '$("#' + name + '-table")'
