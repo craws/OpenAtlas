@@ -17,6 +17,18 @@ class Property(object):
     sub = []
 
 
+    def find_object(self, attr, value):
+        properties = PropertyMapper.get_all()
+        if getattr(self, attr) == value:
+            return True
+        else:
+            for sub in self.sub:
+                match = properties[sub].find_object(attr, value)
+                if match:
+                    return True
+        # return False
+
+
 class PropertyMapper(object):
 
     @staticmethod
@@ -49,6 +61,8 @@ class PropertyMapper(object):
         })
         for row in cursor.fetchall():
             properties[row.id] = PropertyMapper.populate(row)
+            properties[row.id].sub = []
+            properties[row.id].super = []
         cursor.execute('SELECT super_id, sub_id FROM model.property_inheritance;')
         for row in cursor.fetchall():
             properties[row.super_id].sub.append(row.sub_id)

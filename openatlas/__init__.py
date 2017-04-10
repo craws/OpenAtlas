@@ -55,7 +55,7 @@ from openatlas.views import content, index, settings, model
 babel = Babel(app)
 app.register_blueprint(filters.blueprint)
 
-# To do: maybe store these values somewhere else, config?
+# To do: store these values somewhere else, config?
 
 default_table_rows = OrderedDict()
 default_table_rows[10] = '10'

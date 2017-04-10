@@ -1,15 +1,18 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
     <a href="/model">{{ _('model')|uc_first }}</a> >
-    <a href="/model/class">{{ _('classes')|uc_first }}</a> >
-    {{ class_.code }}
+    <a href="/model/property">{{ _('properties')|uc_first }}</a> >
+    {{ property.code }}
 {% endblock %}
 {% block body %}
     <div style="float:left;padding-right:2em;">
         <p><strong>{{ _('info')|uc_first }}</strong></p>
         {% set data = [
-            {'code': class_.code},
-            {'name': class_.name_translated},
+            {'code': property.code},
+            {'name': property.name_translated},
+            {'inverse': property.name_inverse_translated},
+            {'domain': classes[property.domain_id]|link + ' ' + classes[property.domain_id].name_translated},
+            {'range': classes[property.range_id]|link + ' ' + classes[property.range_id].name_translated},
         ] %}
         {{ data|data_table()|safe }}
     </div>
@@ -24,6 +27,6 @@
     <div style="clear:both"></div>
     <div class="description">
         <strong>{{ _('description')|uc_first }}</strong>
-        <p>{{ class_.comment_translated }}</p>
+        <p>{{ property.comment_translated }}</p>
     </div>
 {% endblock %}

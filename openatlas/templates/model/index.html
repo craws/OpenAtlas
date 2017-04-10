@@ -5,7 +5,44 @@
         <a href="/model/class">{{ _('classes')|uc_first }}</a> -
         <a href="/model/property">{{ _('properties')|uc_first }}</a>
     </p>
-    <a href="/static/images/model/openatlas_schema.png">
-        <img src="/static/images/model/openatlas_schema.png" style="width:500px" alt="OpenAtlas schema" />
-    </a>
+    <div style="float:left">
+        <a href="/static/images/model/openatlas_schema.png">
+            <img src="/static/images/model/openatlas_schema.png" style="width:500px" alt="OpenAtlas schema" />
+        </a>
+    </div>
+    <div style="float:left">
+        <p style="font-weight: bold;">{{ _('check for valid links')|uc_first }}</p>
+        <form method="post">
+            {{ form.csrf_token }}
+            {% set data = [
+                {form.domain.label: form.domain},
+                {form.property.label: form.property},
+                {form.range.label: form.range},
+            ] %}
+            {{ data|data_table()|safe }}
+            <input type="submit" value="{{ _('test')|uc_first }}" />
+        </form>
+    </div>
+    {% if test_result: %}
+        <p>
+            {{ _('result') }}
+            {{ test_result['domain']|link|safe }} > {{ test_result['property']|link|safe }} > {{ test_result['range']|link|safe }}
+        </p>
+        <p>
+            {% if test_result['domain_error'] %}
+                <span class="error">{{ _('wrong domain') }}</span>
+                {{ test_result['domain']|link|safe }} {{ _('for') }} {{ test_result['property']|link|safe }}<br/>
+            {% endif %}
+            {% if test_result['range_error'] %}
+                <span class="error">{{ _('wrong range') }}</span>
+                {{ test_result['range']|link|safe }} {{ _('for') }} {{ test_result['property']|link|safe }}<br/>
+            {% endif %}
+            {% if not test_result['domain_error'] and not test_result['range_error'] %}
+                Valid link<br/>
+            {% endif %}
+            {% if test_result['domain_whitelisted']: %}
+                {{ test_result['domain']|link|safe }} {{ _("as domain is white listed and won't checked") }}
+            {% endif %}
+        </p>
+    {% endif %}
 {% endblock %}

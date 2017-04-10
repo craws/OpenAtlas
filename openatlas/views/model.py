@@ -1,14 +1,49 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
+from collections import OrderedDict
 from flask import render_template
+from flask_babel import lazy_gettext as _
+from flask_wtf import Form
+from wtforms import SelectField
 from openatlas import app
 from openatlas.models.classObject import ClassMapper
 from openatlas.models.property import PropertyMapper
-from openatlas.util.util import link
+from openatlas.util.util import link, uc_first
 
 
-@app.route('/model')
+class LinkCheckForm(Form):
+    domain = SelectField(uc_first(_('domain')), choices=[], coerce=int)
+    property = SelectField(uc_first(_('property')), choices=[], coerce=int)
+    range = SelectField(uc_first(_('range')), choices=[], coerce=int)
+
+
+@app.route('/model', methods=["GET", "POST"])
 def model_index():
-    return render_template('model/index.html')
+    classes = ClassMapper.get_all()
+    properties = PropertyMapper.get_all()
+    form = LinkCheckForm()
+    form_classes = OrderedDict()
+    for id_, class_ in classes.iteritems():
+        form_classes[id_] = class_.code + ' ' + class_.name_translated
+    form.domain.choices = form_classes.iteritems()
+    form.range.choices = form_classes.iteritems()
+    form_properties = OrderedDict()
+    for id_, property_ in properties.iteritems():
+        form_properties[id_] = property_.code + ' ' + property_.name_translated
+    form.property.choices = form_properties.iteritems()
+    if form.validate_on_submit():
+        domain = classes[int(form.domain.data)]
+        range = classes[int(form.range.data)]
+        property = properties[int(form.property.data)]
+        # whitelistDomains = Zend_Registry::get('config')->get('linkcheckIgnoreDomains')->toArray();
+        test_result = {}
+        test_result['domain_error'] = False if property.find_object('id', domain.id) else True
+        test_result['range_error'] = False if property.find_object('id', range.id) else True
+        test_result['domain_whitelisted'] = True if domain.code in ['E61'] else False
+        test_result['domain'] = domain
+        test_result['property'] = property
+        test_result['range'] = range
+        return render_template('model/index.html', form=form, test_result=test_result)
+    return render_template('model/index.html',form=form)
 
 
 @app.route('/model/class')
@@ -30,21 +65,23 @@ def model_class():
 
 @app.route('/model/property')
 def model_property():
-    properties = PropertyMapper.get_all()
     classes = ClassMapper.get_all()
+    properties = PropertyMapper.get_all()
     table = {
         'name': 'properties',
-        'header': ['code', 'name', 'inverse', 'domain', 'range'],
+        'header': ['code', 'name', 'inverse', 'domain', 'domain name', 'range', 'range name'],
         'data': [],
-        'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }, 3: { sorter: "class_code" }, 4: { sorter: "class_code" }}'
+        'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }, 3: { sorter: "class_code" }, 5: { sorter: "class_code" }}'
     }
     for property_id, property_ in properties.iteritems():
         table['data'].append([
             link(property_),
             property_.name_translated,
             property_.name_inverse_translated,
-            link(classes[property_.domain_id]) + ' ' + classes[property_.domain_id].name_translated,
-            link(classes[property_.range_id]) + ' ' + classes[property_.domain_id].name_translated
+            link(classes[property_.domain_id]),
+            classes[property_.domain_id].name_translated,
+            link(classes[property_.range_id]),
+            classes[property_.domain_id].name_translated
         ])
     return render_template('model/property.html', table=table)
 
@@ -52,7 +89,8 @@ def model_property():
 @app.route('/model/class_view/<int:class_id>')
 def model_class_view(class_id):
     classes = ClassMapper.get_all()
-    tables = {}
+    properties = PropertyMapper.get_all()
+    tables = OrderedDict()
     for table in ['super', 'sub']:
         tables[table] = {
             'name': table,
@@ -61,8 +99,42 @@ def model_class_view(class_id):
             'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'
         }
         for id_ in getattr(classes[class_id], table):
-            tables[table]['data'].append([
-                link(classes[id_]),
-                classes[id_].name_translated
-            ])
+            tables[table]['data'].append([link(classes[id_]), classes[id_].name_translated])
+    tables['domains'] = {
+            'name': 'domains',
+            'header': ['code', 'name'],
+            'data': [],
+            'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'
+    }
+    tables['ranges'] = {
+            'name': 'ranges',
+            'header': ['code', 'name'],
+            'data': [],
+            'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'
+    }
+    for id_, property in properties.iteritems():
+        if class_id == property.domain_id:
+            tables['domains']['data'].append([link(properties[id_]), properties[id_].name_translated])
+        elif class_id == property.range_id:
+            tables['ranges']['data'].append([link(properties[id_]), properties[id_].name_translated])
+
     return render_template('model/class_view.html', class_=classes[class_id], tables=tables)
+
+
+@app.route('/model/property_view/<int:property_id>')
+def model_property_view(property_id):
+    properties = PropertyMapper.get_all()
+    tables = {}
+    for table in ['super', 'sub']:
+        tables[table] = {
+            'name': table,
+            'header': ['code', 'name'],
+            'data': [],
+            'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }}'
+        }
+        for id_ in getattr(properties[property_id], table):
+            tables[table]['data'].append([
+                link(properties[id_]),
+                properties[id_].name_translated
+            ])
+    return render_template('model/property_view.html', property=properties[property_id], tables=tables, classes=ClassMapper.get_all())
