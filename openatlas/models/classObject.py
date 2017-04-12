@@ -15,6 +15,16 @@ class ClassObject(object):
     name_translated = None
     sub = []
     super = []
+    i18n = {}
+
+    def get_name_translated(self):
+        locale_session = openatlas.get_locale()
+        locale_default = session['settings']['default_language']
+        if locale_session in self.i18n and 'name' in self.i18n[locale_session]:
+            return self.i18n[locale_session]['name']
+        elif locale_default in self.i18n and 'name' in self.i18n[locale_default]:
+            return self.i18n[locale_default]['name']
+        return self.name
 
 
 class ClassMapper(object):
@@ -51,6 +61,11 @@ class ClassMapper(object):
             classes[row.id] = ClassMapper.populate(row)
             classes[row.id].sub = []
             classes[row.id].super = []
+        cursor.execute("SELECT text, language_code, table_field, table_id FROM model.i18n WHERE table_name = 'class';")
+        for row in cursor.fetchall():
+            if row.language_code not in classes[row.table_id].i18n:
+                classes[row.table_id].i18n = {row.language_code: {}}
+            classes[row.table_id].i18n[row.language_code][row.table_field] = row.text
         cursor.execute('SELECT super_id, sub_id FROM model.class_inheritance;')
         for row in cursor.fetchall():
             classes[row.super_id].sub.append(row.sub_id)

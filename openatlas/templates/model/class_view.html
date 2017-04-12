@@ -9,7 +9,7 @@
         <p><strong>{{ _('info')|uc_first }}</strong></p>
         {% set data = [
             {'code': class_.code},
-            {'name': class_.name_translated},
+            {'name': class_.get_name_translated()},
         ] %}
         {{ data|data_table()|safe }}
     </div>

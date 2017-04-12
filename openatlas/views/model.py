@@ -57,7 +57,7 @@ def model_class():
     for class_id, class_ in openatlas.classes.iteritems():
         table['data'].append([
             link(class_),
-            class_.name_translated
+            class_.get_name_translated()
         ])
     return render_template('model/class.html', table=table)
 
