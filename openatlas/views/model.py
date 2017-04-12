@@ -4,6 +4,8 @@ from flask import render_template
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from wtforms import SelectField
+
+import openatlas
 from openatlas import app
 from openatlas.models.classObject import ClassMapper
 from openatlas.models.property import PropertyMapper
@@ -18,22 +20,20 @@ class LinkCheckForm(Form):
 
 @app.route('/model', methods=["GET", "POST"])
 def model_index():
-    classes = ClassMapper.get_all()
-    properties = PropertyMapper.get_all()
     form = LinkCheckForm()
     form_classes = OrderedDict()
-    for id_, class_ in classes.iteritems():
+    for id_, class_ in openatlas.classes.iteritems():
         form_classes[id_] = class_.code + ' ' + class_.name_translated
     form.domain.choices = form_classes.iteritems()
     form.range.choices = form_classes.iteritems()
     form_properties = OrderedDict()
-    for id_, property_ in properties.iteritems():
+    for id_, property_ in openatlas.properties.iteritems():
         form_properties[id_] = property_.code + ' ' + property_.name_translated
     form.property.choices = form_properties.iteritems()
     if form.validate_on_submit():
-        domain = classes[int(form.domain.data)]
-        range = classes[int(form.range.data)]
-        property = properties[int(form.property.data)]
+        domain = openatlas.classes[int(form.domain.data)]
+        range = openatlas.classes[int(form.range.data)]
+        property = openatlas.properties[int(form.property.data)]
         # whitelistDomains = Zend_Registry::get('config')->get('linkcheckIgnoreDomains')->toArray();
         test_result = {}
         test_result['domain_error'] = False if property.find_object('id', domain.id) else True
@@ -48,14 +48,13 @@ def model_index():
 
 @app.route('/model/class')
 def model_class():
-    classes = ClassMapper.get_all()
     table = {
         'name': 'classes',
         'header': ['code', 'name'],
         'data': [],
         'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'
     }
-    for class_id, class_ in classes.iteritems():
+    for class_id, class_ in openatlas.classes.iteritems():
         table['data'].append([
             link(class_),
             class_.name_translated
@@ -65,8 +64,8 @@ def model_class():
 
 @app.route('/model/property')
 def model_property():
-    classes = ClassMapper.get_all()
-    properties = PropertyMapper.get_all()
+    classes = openatlas.classes
+    properties = openatlas.properties
     table = {
         'name': 'properties',
         'header': ['code', 'name', 'inverse', 'domain', 'domain name', 'range', 'range name'],
@@ -88,8 +87,8 @@ def model_property():
 
 @app.route('/model/class_view/<int:class_id>')
 def model_class_view(class_id):
-    classes = ClassMapper.get_all()
-    properties = PropertyMapper.get_all()
+    classes = openatlas.classes
+    properties = openatlas.properties
     tables = OrderedDict()
     for table in ['super', 'sub']:
         tables[table] = {
@@ -123,7 +122,7 @@ def model_class_view(class_id):
 
 @app.route('/model/property_view/<int:property_id>')
 def model_property_view(property_id):
-    properties = PropertyMapper.get_all()
+    properties = openatlas.properties
     tables = {}
     for table in ['super', 'sub']:
         tables[table] = {
@@ -137,4 +136,4 @@ def model_property_view(property_id):
                 link(properties[id_]),
                 properties[id_].name_translated
             ])
-    return render_template('model/property_view.html', property=properties[property_id], tables=tables, classes=ClassMapper.get_all())
+    return render_template('model/property_view.html', property=properties[property_id], tables=tables, classes=openatlas.classes)

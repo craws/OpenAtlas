@@ -40,9 +40,13 @@ class ClassMapper(object):
         classes = {}
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {
-            'language_code': openatlas.get_locale(),
-            'language_default_code': session['settings']['default_language']
+            'language_code': 'en',
+            'language_default_code': 'en'
         })
+        #cursor.execute(sql, {
+        #    'language_code': openatlas.get_locale(),
+        #    'language_default_code': session['settings']['default_language']
+        #})
         for row in cursor.fetchall():
             classes[row.id] = ClassMapper.populate(row)
             classes[row.id].sub = []

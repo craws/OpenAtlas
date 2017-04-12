@@ -18,12 +18,11 @@ class Property(object):
 
 
     def find_object(self, attr, value):
-        properties = PropertyMapper.get_all()
         if getattr(self, attr) == value:
             return True
         else:
             for sub in self.sub:
-                match = properties[sub].find_object(attr, value)
+                match = openatlas.properties[sub].find_object(attr, value)
                 if match:
                     return True
         # return False
@@ -56,9 +55,13 @@ class PropertyMapper(object):
         properties = {}
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {
-            'language_code': openatlas.get_locale(),
-            'language_default_code': session['settings']['default_language']
+            'language_code': 'en',
+            'language_default_code': 'en'
         })
+        #cursor.execute(sql, {
+        #    'language_code': openatlas.get_locale(),
+        #    'language_default_code': session['settings']['default_language']
+        #})
         for row in cursor.fetchall():
             properties[row.id] = PropertyMapper.populate(row)
             properties[row.id].sub = []

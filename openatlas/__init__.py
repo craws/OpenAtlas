@@ -8,6 +8,9 @@ from collections import OrderedDict
 
 from flask import Flask, request, session
 from flask_babel import Babel
+
+from openatlas.models.property import PropertyMapper
+from openatlas.models.classObject import ClassMapper
 from openatlas.models.settings import SettingsMapper
 from openatlas.util import filters
 
@@ -55,6 +58,9 @@ from openatlas.views import content, index, settings, model
 babel = Babel(app)
 app.register_blueprint(filters.blueprint)
 
+classes = ClassMapper.get_all()
+properties = PropertyMapper.get_all()
+
 # To do: store these values somewhere else, config?
 
 default_table_rows = OrderedDict()
@@ -73,7 +79,6 @@ log_levels[5] = 'notice'
 log_levels[6] = 'info'
 log_levels[7] = 'debug'
 
-
 @babel.localeselector
 def get_locale():
     if 'language' in session:
@@ -86,7 +91,6 @@ def get_locale():
 def before_request():
     session['settings'] = SettingsMapper.get_settings()
     session['language'] = get_locale()
-
 
 if __name__ == "__main__":  # pragma: no cover
     app.run()
