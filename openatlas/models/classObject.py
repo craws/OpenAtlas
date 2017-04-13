@@ -63,9 +63,11 @@ class ClassMapper(object):
             classes[row.id].super = []
         cursor.execute("SELECT text, language_code, table_field, table_id FROM model.i18n WHERE table_name = 'class';")
         for row in cursor.fetchall():
-            if row.language_code not in classes[row.table_id].i18n:
-                classes[row.table_id].i18n = {row.language_code: {}}
-            classes[row.table_id].i18n[row.language_code][row.table_field] = row.text
+            class_ = classes[row.table_id]
+            text = row.text
+            if row.language_code not in class_.i18n:
+                class_.i18n[row.language_code] = {}
+            class_.i18n[row.language_code][row.table_field] = text
         cursor.execute('SELECT super_id, sub_id FROM model.class_inheritance;')
         for row in cursor.fetchall():
             classes[row.super_id].sub.append(row.sub_id)
