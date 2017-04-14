@@ -123,6 +123,7 @@ def model_class_view(class_id):
 @app.route('/model/property_view/<int:property_id>')
 def model_property_view(property_id):
     properties = openatlas.properties
+    property_ = properties[property_id]
     tables = {}
     for table in ['super', 'sub']:
         tables[table] = {
@@ -131,14 +132,9 @@ def model_property_view(property_id):
             'data': [],
             'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }}'
         }
-        for id_ in getattr(properties[property_id], table):
+        for id_ in getattr(property_, table):
             tables[table]['data'].append([
-                link(properties[id_]),
+                link(property_),
                 properties[id_].name
             ])
-    return render_template(
-        'model/property_view.html',
-        property=properties[property_id],
-        tables=tables,
-        classes=openatlas.classes
-    )
+    return render_template('model/property_view.html', property=property_, tables=tables, classes=openatlas.classes)

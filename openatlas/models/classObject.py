@@ -45,7 +45,9 @@ class ClassMapper(object):
         for row in cursor.fetchall():
             classes[row.super_id].sub.append(row.sub_id)
             classes[row.sub_id].super.append(row.super_id)
-        cursor.execute("SELECT text, language_code, table_field, table_id FROM model.i18n WHERE table_name = 'class';")
+        sql = """SELECT text, language_code, table_field, table_id FROM model.i18n
+                WHERE table_name = 'class' AND language_code IN %(language_codes)s;"""
+        cursor.execute(sql, {'language_codes': tuple(openatlas.app.config['LANGUAGES'].keys())})
         for row in cursor.fetchall():
             class_ = classes[row.table_id]
             if row.language_code not in class_.i18n:

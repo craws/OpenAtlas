@@ -62,8 +62,9 @@ class PropertyMapper(object):
         for row in cursor.fetchall():
             properties[row.super_id].sub.append(row.sub_id)
             properties[row.sub_id].super.append(row.super_id)
-        sql = "SELECT text, language_code, table_field, table_id FROM model.i18n WHERE table_name = 'property';"
-        cursor.execute(sql)
+        sql = """SELECT text, language_code, table_field, table_id FROM model.i18n
+                WHERE table_name = 'property' AND language_code IN %(language_codes)s;"""
+        cursor.execute(sql, {'language_codes': tuple(openatlas.app.config['LANGUAGES'].keys())})
         for row in cursor.fetchall():
             if row.language_code not in properties[row.table_id].i18n:
                 properties[row.table_id].i18n[row.language_code] = {}
