@@ -11,8 +11,8 @@
             {'code': property.code},
             {'name': property.name_translated},
             {'inverse': property.name_inverse_translated},
-            {'domain': classes[property.domain_id]|link + ' ' + classes[property.domain_id].name_translated},
-            {'range': classes[property.range_id]|link + ' ' + classes[property.range_id].name_translated},
+            {'domain': classes[property.domain_id]|link + ' ' + classes[property.domain_id].get_i18n('name')},
+            {'range': classes[property.range_id]|link + ' ' + classes[property.range_id].get_i18n('name')},
         ] %}
         {{ data|data_table()|safe }}
     </div>
