@@ -28,7 +28,7 @@ def model_index():
     form.range.choices = form_classes.iteritems()
     form_properties = OrderedDict()
     for id_, property_ in openatlas.properties.iteritems():
-        form_properties[id_] = property_.code + ' ' + property_.name_translated
+        form_properties[id_] = property_.code + ' ' + property_.get_i18n('name')
     form.property.choices = form_properties.iteritems()
     if form.validate_on_submit():
         domain = openatlas.classes[int(form.domain.data)]
@@ -75,8 +75,8 @@ def model_property():
     for property_id, property_ in properties.iteritems():
         table['data'].append([
             link(property_),
-            property_.name_translated,
-            property_.name_inverse_translated,
+            property_.get_i18n('name'),
+            property_.get_i18n('name_inverse'),
             link(classes[property_.domain_id]),
             classes[property_.domain_id].get_i18n('name'),
             link(classes[property_.range_id]),
@@ -113,9 +113,9 @@ def model_class_view(class_id):
     }
     for id_, property in properties.iteritems():
         if class_id == property.domain_id:
-            tables['domains']['data'].append([link(properties[id_]), properties[id_].name_translated])
+            tables['domains']['data'].append([link(properties[id_]), properties[id_].get_i18n('name')])
         elif class_id == property.range_id:
-            tables['ranges']['data'].append([link(properties[id_]), properties[id_].name_translated])
+            tables['ranges']['data'].append([link(properties[id_]), properties[id_].get_i18n('name')])
 
     return render_template('model/class_view.html', class_=classes[class_id], tables=tables)
 
@@ -134,6 +134,6 @@ def model_property_view(property_id):
         for id_ in getattr(properties[property_id], table):
             tables[table]['data'].append([
                 link(properties[id_]),
-                properties[id_].name_translated
+                properties[id_].get_i18n('name')
             ])
     return render_template('model/property_view.html', property=properties[property_id], tables=tables, classes=openatlas.classes)

@@ -1,21 +1,29 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
 from flask import session
-
 import openatlas
 
 
 class Property(object):
-    code = None
-    comment_translated = None
-    domain_id = None
-    name = None
-    name_inverse = None
-    name_inverse_translated = None
-    name_translated = None
-    range_id = None
-    super = []
-    sub = []
 
+    def __init__(self, row):
+        self.code = row.code
+        self.domain_id = row.domain_class_id
+        self.id = row.id
+        self.i18n = {}
+        self.name = row.name
+        self.name_inverse = row.name_inverse
+        self.range_id = row.range_class_id
+        self.super = []
+        self.sub = []
+
+    def get_i18n(self, attribute):
+        locale_session = openatlas.get_locale()
+        locale_default = session['settings']['default_language']
+        if locale_session in self.i18n and attribute in self.i18n[locale_session]:
+            return self.i18n[locale_session][attribute]
+        elif locale_default in self.i18n and attribute in self.i18n[locale_default]:
+            return self.i18n[locale_default][attribute]
+        return self.name if attribute == 'name' else ''
 
     def find_object(self, attr, value):
         if getattr(self, attr) == value:
@@ -32,58 +40,20 @@ class PropertyMapper(object):
 
     @staticmethod
     def get_all():
-        sql = """SELECT p.id, p.code, p.domain_class_id, p.range_class_id, p.name, p.name_inverse, p.created, p.modified,
-                COALESCE (
-                  (SELECT text FROM model.i18n WHERE table_name = 'property' AND table_field = 'name' AND
-                    table_id = p.id AND language_code = %(language_code)s),
-                  (SELECT text FROM model.i18n WHERE table_name = 'property' AND table_field = 'name' AND
-                    table_id = p.id AND language_code = %(language_default_code)s)
-                ) as name_i18n,
-                COALESCE (
-                  (SELECT text FROM model.i18n WHERE table_name = 'property' AND table_field = 'name_inverse' AND
-                    table_id = p.id AND language_code = %(language_code)s),
-                  (SELECT text FROM model.i18n WHERE table_name = 'property' AND table_field = 'name_inverse' AND
-                    table_id = p.id AND language_code = %(language_default_code)s)
-                ) as name_inverse_i18n,
-                COALESCE (
-                  (SELECT text FROM model.i18n WHERE table_name = 'property' AND table_field = 'comment' AND
-                    table_id = p.id AND language_code = %(language_code)s),
-                  (SELECT text FROM model.i18n WHERE table_name = 'property' AND table_field = 'comment' AND
-                    table_id = p.id AND language_code = %(language_default_code)s)
-                ) as comment_i18n
-                FROM model.property p"""
         properties = {}
         cursor = openatlas.get_cursor()
-        cursor.execute(sql, {
-            'language_code': 'en',
-            'language_default_code': 'en'
-        })
-        #cursor.execute(sql, {
-        #    'language_code': openatlas.get_locale(),
-        #    'language_default_code': session['settings']['default_language']
-        #})
+        cursor.execute("SELECT id, code, domain_class_id, range_class_id, name, name_inverse FROM model.property;")
         for row in cursor.fetchall():
-            properties[row.id] = PropertyMapper.populate(row)
-            properties[row.id].sub = []
-            properties[row.id].super = []
+            properties[row.id] = Property(row)
         cursor.execute('SELECT super_id, sub_id FROM model.property_inheritance;')
         for row in cursor.fetchall():
             properties[row.super_id].sub.append(row.sub_id)
             properties[row.sub_id].super.append(row.super_id)
+        sql = "SELECT text, language_code, table_field, table_id FROM model.i18n WHERE table_name = 'property';"
+        cursor.execute(sql)
+        for row in cursor.fetchall():
+            property = properties[row.table_id]
+            if row.language_code not in property.i18n:
+                property.i18n[row.language_code] = {}
+            property.i18n[row.language_code][row.table_field] = row.text
         return properties
-
-    @staticmethod
-    def populate(row):
-        object_ = Property()
-        object_.id = row.id
-        object_.domain_id = row.domain_class_id
-        object_.range_id = row.range_class_id
-        object_.name = row.name
-        object_.created = row.created
-        object_.modified = row.modified
-        object_.code = row.code
-        object_.name_translated = row.name_i18n
-        object_.name_inverse = row.name_inverse
-        object_.name_inverse_translated = row.name_inverse_i18n
-        object_.comment_translated = row.comment_i18n
-        return object_
