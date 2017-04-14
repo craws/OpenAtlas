@@ -9,10 +9,10 @@
         <p><strong>{{ _('info')|uc_first }}</strong></p>
         {% set data = [
             {'code': property.code},
-            {'name': property.get_i18n('name')},
-            {'inverse': property.get_i18n('name_inverse')},
-            {'domain': classes[property.domain_id]|link + ' ' + classes[property.domain_id].get_i18n('name')},
-            {'range': classes[property.range_id]|link + ' ' + classes[property.range_id].get_i18n('name')},
+            {'name': property.name},
+            {'inverse': property.name_inverse},
+            {'domain': classes[property.domain_id]|link + ' ' + classes[property.domain_id].name},
+            {'range': classes[property.range_id]|link + ' ' + classes[property.range_id].name},
         ] %}
         {{ data|data_table()|safe }}
     </div>
@@ -27,6 +27,6 @@
     <div style="clear:both"></div>
     <div class="description">
         <strong>{{ _('description')|uc_first }}</strong>
-        <p>{{ property.get_i18n('comment') }}</p>
+        <p>{{ property.comment }}</p>
     </div>
 {% endblock %}

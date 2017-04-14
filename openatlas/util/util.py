@@ -9,7 +9,7 @@ def uc_first(string):
     return new_string[0].upper() + new_string[1:]
 
 
-def link(entity):  # pragma: no cover
+def link(entity):
     if not entity:
         return ''
     if isinstance(entity, ClassObject):

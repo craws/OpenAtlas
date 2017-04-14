@@ -23,12 +23,12 @@ def model_index():
     form = LinkCheckForm()
     form_classes = OrderedDict()
     for id_, class_ in openatlas.classes.iteritems():
-        form_classes[id_] = class_.code + ' ' + class_.get_i18n('name')
+        form_classes[id_] = class_.code + ' ' + class_.name
     form.domain.choices = form_classes.iteritems()
     form.range.choices = form_classes.iteritems()
     form_properties = OrderedDict()
     for id_, property_ in openatlas.properties.iteritems():
-        form_properties[id_] = property_.code + ' ' + property_.get_i18n('name')
+        form_properties[id_] = property_.code + ' ' + property_.name
     form.property.choices = form_properties.iteritems()
     if form.validate_on_submit():
         domain = openatlas.classes[int(form.domain.data)]
@@ -57,7 +57,7 @@ def model_class():
     for class_id, class_ in openatlas.classes.iteritems():
         table['data'].append([
             link(class_),
-            class_.get_i18n('name')
+            class_.name
         ])
     return render_template('model/class.html', table=table)
 
@@ -75,12 +75,12 @@ def model_property():
     for property_id, property_ in properties.iteritems():
         table['data'].append([
             link(property_),
-            property_.get_i18n('name'),
-            property_.get_i18n('name_inverse'),
+            property_.name,
+            property_.name_inverse,
             link(classes[property_.domain_id]),
-            classes[property_.domain_id].get_i18n('name'),
+            classes[property_.domain_id].name,
             link(classes[property_.range_id]),
-            classes[property_.domain_id].get_i18n('name')
+            classes[property_.domain_id].name
         ])
     return render_template('model/property.html', table=table)
 
@@ -98,7 +98,7 @@ def model_class_view(class_id):
             'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'
         }
         for id_ in getattr(classes[class_id], table):
-            tables[table]['data'].append([link(classes[id_]), classes[id_].get_i18n('name')])
+            tables[table]['data'].append([link(classes[id_]), classes[id_].name])
     tables['domains'] = {
             'name': 'domains',
             'header': ['code', 'name'],
@@ -113,9 +113,9 @@ def model_class_view(class_id):
     }
     for id_, property in properties.iteritems():
         if class_id == property.domain_id:
-            tables['domains']['data'].append([link(properties[id_]), properties[id_].get_i18n('name')])
+            tables['domains']['data'].append([link(properties[id_]), properties[id_].name])
         elif class_id == property.range_id:
-            tables['ranges']['data'].append([link(properties[id_]), properties[id_].get_i18n('name')])
+            tables['ranges']['data'].append([link(properties[id_]), properties[id_].name])
 
     return render_template('model/class_view.html', class_=classes[class_id], tables=tables)
 
@@ -134,6 +134,6 @@ def model_property_view(property_id):
         for id_ in getattr(properties[property_id], table):
             tables[table]['data'].append([
                 link(properties[id_]),
-                properties[id_].get_i18n('name')
+                properties[id_].name
             ])
     return render_template('model/property_view.html', property=properties[property_id], tables=tables, classes=openatlas.classes)

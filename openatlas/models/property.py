@@ -7,14 +7,27 @@ class Property(object):
 
     def __init__(self, row):
         self.code = row.code
+        self._comment = ''
         self.domain_id = row.domain_class_id
         self.id = row.id
         self.i18n = {}
-        self.name = row.name
-        self.name_inverse = row.name_inverse
+        self._name = row.name
+        self._name_inverse = row.name_inverse
         self.range_id = row.range_class_id
         self.super = []
         self.sub = []
+
+    @property
+    def name(self):
+        return self.get_i18n('name')
+
+    @property
+    def name_inverse(self):
+        return self.get_i18n('name_inverse')
+
+    @property
+    def comment(self):
+        return self.get_i18n('comment')
 
     def get_i18n(self, attribute):
         locale_session = openatlas.get_locale()
@@ -23,7 +36,7 @@ class Property(object):
             return self.i18n[locale_session][attribute]
         elif locale_default in self.i18n and attribute in self.i18n[locale_default]:
             return self.i18n[locale_default][attribute]
-        return self.name if attribute == 'name' else ''
+        return getattr(self, '_' + attribute)
 
     def find_object(self, attr, value):
         if getattr(self, attr) == value:

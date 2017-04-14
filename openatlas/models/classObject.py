@@ -7,11 +7,20 @@ class ClassObject(object):
 
     def __init__(self, row):
         self.code = row.code
+        self._comment = ''
         self.id = row.id
         self.i18n = {}
-        self.name = row.name
+        self._name = row.name
         self.sub = []
         self.super = []
+
+    @property
+    def name(self):
+        return self.get_i18n('name')
+
+    @property
+    def comment(self):
+        return self.get_i18n('comment')
 
     def get_i18n(self, attribute):
         locale_session = openatlas.get_locale()
@@ -20,7 +29,7 @@ class ClassObject(object):
             return self.i18n[locale_session][attribute]
         elif locale_default in self.i18n and attribute in self.i18n[locale_default]:
             return self.i18n[locale_default][attribute]
-        return self.name if attribute == 'name' else ''
+        return getattr(self, '_' + attribute)
 
 
 class ClassMapper(object):
