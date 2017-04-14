@@ -7,8 +7,6 @@ from wtforms import SelectField
 
 import openatlas
 from openatlas import app
-from openatlas.models.classObject import ClassMapper
-from openatlas.models.property import PropertyMapper
 from openatlas.util.util import link, uc_first
 
 
@@ -32,18 +30,19 @@ def model_index():
     form.property.choices = form_properties.iteritems()
     if form.validate_on_submit():
         domain = openatlas.classes[int(form.domain.data)]
-        range = openatlas.classes[int(form.range.data)]
-        property = openatlas.properties[int(form.property.data)]
-        # whitelistDomains = Zend_Registry::get('config')->get('linkcheckIgnoreDomains')->toArray();
-        test_result = {}
-        test_result['domain_error'] = False if property.find_object('id', domain.id) else True
-        test_result['range_error'] = False if property.find_object('id', range.id) else True
-        test_result['domain_whitelisted'] = True if domain.code in ['E61'] else False
-        test_result['domain'] = domain
-        test_result['property'] = property
-        test_result['range'] = range
+        range_ = openatlas.classes[int(form.range.data)]
+        property_ = openatlas.properties[int(form.property.data)]
+        # whitelistDomains = Zend_Registry::get('config')->get('link_check_ignore_domains')->toArray();
+        test_result = {
+            'domain_error': False if property_.find_object('id', domain.id) else True,
+            'range_error': False if property_.find_object('id', range_.id) else True,
+            'domain_whitelisted': True if domain.code in ['E61'] else False,
+            'domain': domain,
+            'property': property_,
+            'range': range_
+        }
         return render_template('model/index.html', form=form, test_result=test_result)
-    return render_template('model/index.html',form=form)
+    return render_template('model/index.html', form=form)
 
 
 @app.route('/model/class')
@@ -70,7 +69,8 @@ def model_property():
         'name': 'properties',
         'header': ['code', 'name', 'inverse', 'domain', 'domain name', 'range', 'range name'],
         'data': [],
-        'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }, 3: { sorter: "class_code" }, 5: { sorter: "class_code" }}'
+        'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }, 3: { sorter: "class_code" }, '
+                '5: { sorter: "class_code" }}'
     }
     for property_id, property_ in properties.iteritems():
         table['data'].append([
@@ -111,10 +111,10 @@ def model_class_view(class_id):
             'data': [],
             'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'
     }
-    for id_, property in properties.iteritems():
-        if class_id == property.domain_id:
+    for id_, property_ in properties.iteritems():
+        if class_id == property_.domain_id:
             tables['domains']['data'].append([link(properties[id_]), properties[id_].name])
-        elif class_id == property.range_id:
+        elif class_id == property_.range_id:
             tables['ranges']['data'].append([link(properties[id_]), properties[id_].name])
 
     return render_template('model/class_view.html', class_=classes[class_id], tables=tables)
@@ -136,4 +136,9 @@ def model_property_view(property_id):
                 link(properties[id_]),
                 properties[id_].name
             ])
-    return render_template('model/property_view.html', property=properties[property_id], tables=tables, classes=openatlas.classes)
+    return render_template(
+        'model/property_view.html',
+        property=properties[property_id],
+        tables=tables,
+        classes=openatlas.classes
+    )

@@ -6,11 +6,11 @@ import openatlas
 class ClassObject(object):
 
     def __init__(self, row):
-        self.code = row.code
         self._comment = ''
+        self._name = row.name
+        self.code = row.code
         self.id = row.id
         self.i18n = {}
-        self._name = row.name
         self.sub = []
         self.super = []
 

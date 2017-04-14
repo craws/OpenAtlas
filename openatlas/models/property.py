@@ -6,13 +6,13 @@ import openatlas
 class Property(object):
 
     def __init__(self, row):
-        self.code = row.code
         self._comment = ''
+        self._name = row.name
+        self._name_inverse = row.name_inverse
+        self.code = row.code
         self.domain_id = row.domain_class_id
         self.id = row.id
         self.i18n = {}
-        self._name = row.name
-        self._name_inverse = row.name_inverse
         self.range_id = row.range_class_id
         self.super = []
         self.sub = []
@@ -65,8 +65,7 @@ class PropertyMapper(object):
         sql = "SELECT text, language_code, table_field, table_id FROM model.i18n WHERE table_name = 'property';"
         cursor.execute(sql)
         for row in cursor.fetchall():
-            property = properties[row.table_id]
-            if row.language_code not in property.i18n:
-                property.i18n[row.language_code] = {}
-            property.i18n[row.language_code][row.table_field] = row.text
+            if row.language_code not in properties[row.table_id].i18n:
+                properties[row.table_id].i18n[row.language_code] = {}
+            properties[row.table_id].i18n[row.language_code][row.table_field] = row.text
         return properties

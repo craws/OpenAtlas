@@ -79,6 +79,7 @@ log_levels[5] = 'notice'
 log_levels[6] = 'info'
 log_levels[7] = 'debug'
 
+
 @babel.localeselector
 def get_locale():
     if 'language' in session:
