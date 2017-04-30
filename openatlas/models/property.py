@@ -43,6 +43,7 @@ class Property(object):
             return True
         else:
             for sub in self.sub:
+                1/0
                 match = openatlas.properties[sub].find_object(attr, value)
                 if match:
                     return True

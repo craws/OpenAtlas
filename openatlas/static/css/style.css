@@ -18,6 +18,25 @@ div.description {
     max-width: 72em;
 }
 
+.ui-dialog,
+.ui-dialog .ui-dialog-content,
+.ui-state-active,
+.ui-state-default,
+.ui-widget-content .ui-state-default,
+.ui-widget-header .ui-state-default,
+.ui-widget-content .ui-state-active,
+.ui-widget-header,
+.ui-widget-header .ui-state-active {
+    background: none;
+}
+
+.overlay {
+    display: none;
+    left: 0;
+    position: absolute;
+    top: 0;
+}
+
 p.inverse-heading {
     display: inline-block;
     font-size: 1.1em;
@@ -263,7 +282,7 @@ input[type=submit] {
     border:0;
 }
 
-.ui-tabs .ui-tabs-nav li.ui-tabs-active a {
+.ui-tabs .ui-tabs-nav li.ui-tabs-active a , .ui-widget-content a{
     cursor: pointer;
 }
 

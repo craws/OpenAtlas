@@ -3,7 +3,7 @@ from collections import OrderedDict
 from flask import render_template
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
-from wtforms import SelectField
+from wtforms import HiddenField
 
 import openatlas
 from openatlas import app
@@ -11,9 +11,9 @@ from openatlas.util.util import link, uc_first
 
 
 class LinkCheckForm(Form):
-    domain = SelectField(uc_first(_('domain')), choices=[], coerce=int)
-    property = SelectField(uc_first(_('property')), choices=[], coerce=int)
-    range = SelectField(uc_first(_('range')), choices=[], coerce=int)
+    domain = HiddenField()
+    property = HiddenField()
+    range = HiddenField()
 
 
 @app.route('/model', methods=["GET", "POST"])
@@ -28,21 +28,25 @@ def model_index():
     for id_, property_ in openatlas.properties.iteritems():
         form_properties[id_] = property_.code + ' ' + property_.name
     form.property.choices = form_properties.iteritems()
+    test_result = None
     if form.validate_on_submit():
         domain = openatlas.classes[int(form.domain.data)]
         range_ = openatlas.classes[int(form.range.data)]
         property_ = openatlas.properties[int(form.property.data)]
         # whitelistDomains = Zend_Registry::get('config')->get('link_check_ignore_domains')->toArray();
         test_result = {
-            'domain_error': False if property_.find_object('id', domain.id) else True,
-            'range_error': False if property_.find_object('id', range_.id) else True,
+            'domain_error': False if property_.find_object('domain_id', domain.id) else True,
+            'range_error': False if property_.find_object('range_id', range_.id) else True,
             'domain_whitelisted': True if domain.code in ['E61'] else False,
             'domain': domain,
             'property': property_,
             'range': range_
         }
-        return render_template('model/index.html', form=form, test_result=test_result)
-    return render_template('model/index.html', form=form)
+    return render_template(
+        'model/index.html',
+        form=form,
+        test_result=test_result
+    )
 
 
 @app.route('/model/class')

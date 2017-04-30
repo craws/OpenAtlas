@@ -34,7 +34,8 @@ a,
 .info,
 #menu div a:hover,
 #menu div.active a,
-#menu div.active a:hover {
+#menu div.active a:hover,
+.ui-widget-content a {
     color: #4088c3;
 }
 
@@ -44,7 +45,7 @@ a,
 
 /* background color */
 
-body {
+body, .ui-widget-content, .ui-dialog .ui-dialog-content {
     background-color: #efefef;
 }
 

@@ -4,6 +4,8 @@ import jinja2
 import flask
 import re
 
+import openatlas
+from openatlas import PropertyMapper, ClassMapper
 from openatlas.util import util
 from jinja2 import evalcontextfilter, Markup, escape
 
@@ -49,6 +51,33 @@ def description(self, entity):
     html = ''
     if entity.description:
         html += '<div class="description">' + entity.info.replace('\r\n', '<br />') + '</div>'
+    return html
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def table_select_model(self, name, selected=None):
+    if name in ['domain', 'range']:
+        entities = openatlas.classes
+        sorter = 'sortList: [[0, 0]], headers: {0: { sorter: "class_code" }}'
+    else:
+        entities = openatlas.properties
+        sorter = 'sortList: [[0, 0]], headers: {0: { sorter: "property_code" }}'
+    table = {
+        'name': name,
+        'header': ['code', 'name'],
+        'sort': sorter,
+        'data': []}
+    for id_ in entities:
+        table['data'].append([
+            '<a onclick="selectFromTable(this, \'' + name + '\', ' + str(id_) + ')">' + entities[id_].code + '</a>',
+            '<a onclick="selectFromTable(this, \'' + name + '\', ' + str(id_) + ')">' + entities[id_].name + '</a>'
+        ])
+    html = '<input id="' + name + '-button" name="' + name + '-button" class="table-select" type="text"'
+    html += ' onfocus="this.blur()" readonly="readonly" value=""> '
+    html += '<div id="' + name + '-overlay" class="overlay">'
+    html += '<div id="' + name + '-dialog" class="overlay-container">' + pager(None, table) + '</div></div>'
+    html += '<script type="text/javascript">$(document).ready(function () {createOverlay("' + name + '");});</script>'
     return html
 
 
