@@ -1,13 +1,12 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
 from collections import OrderedDict
 from flask import render_template
-from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from wtforms import HiddenField
 
 import openatlas
-from openatlas import app
-from openatlas.util.util import link, uc_first
+from openatlas import app, ClassMapper, PropertyMapper
+from openatlas.util.util import link
 
 
 class LinkCheckForm(Form):
@@ -42,10 +41,20 @@ def model_index():
             'property': property_,
             'range': range_
         }
+    else:
+        domain = ClassMapper.get_by_code('E1')
+        property_ = PropertyMapper.get_by_code('P1')
+        range_ = domain
+        form.domain.data = domain.id
+        form.property.data = property_.id
+        form.range.data = range_.id
     return render_template(
         'model/index.html',
         form=form,
-        test_result=test_result
+        test_result=test_result,
+        domain=domain,
+        property=property_,
+        range=range_,
     )
 
 

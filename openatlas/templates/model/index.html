@@ -15,9 +15,9 @@
         <form method="post">
             {{ form.csrf_token }}
             {% set data = [
-                {form.domain.label: form.domain|string + 'domain'|table_select_model('domain')},
-                {form.property.label: form.property|string + 'property'|table_select_model('property')},
-                {form.range.label: form.range|string + 'range'|table_select_model('range')},
+                {form.domain.label: form.domain|string + 'domain'|table_select_model(domain)},
+                {form.property.label: form.property|string + 'property'|table_select_model(property)},
+                {form.range.label: form.range|string + 'range'|table_select_model(range)},
             ] %}
             {{ data|data_table()|safe }}
             <input type="submit" value="{{ _('test')|uc_first }}" />
@@ -31,19 +31,18 @@
             </p>
             <p>
                 {% if not test_result['domain_error'] and not test_result['range_error'] %}
-                    Valid link<br/>
+                    {{ _('valid link')|uc_first }}<br/>
                 {% endif %}
                 {% if test_result['domain_error'] %}
-                    <span class="error">{{ _('wrong domain') }}</span>
+                    <span class="error">{{ _('wrong domain')|uc_first }}</span>
                     {{ test_result['domain']|link|safe }} {{ _('for') }} {{ test_result['property']|link|safe }}<br/>
                 {% endif %}
                 {% if test_result['range_error'] %}
-                    <span class="error">{{ _('wrong range') }}</span>
+                    <span class="error">{{ _('wrong range')|uc_first }}</span>
                     {{ test_result['range']|link|safe }} {{ _('for') }} {{ test_result['property']|link|safe }}<br/>
                 {% endif %}
-
                 {% if test_result['domain_whitelisted']: %}
-                    {{ test_result['domain']|link|safe }} {{ _("as domain is white listed and won't checked") }}
+                    {{ test_result['domain']|link|safe }} {{ _('no check because whitelisted')|uc_first }}
                 {% endif %}
             </p>
         {% endif %}

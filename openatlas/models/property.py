@@ -38,16 +38,18 @@ class Property(object):
             return self.i18n[locale_default][attribute]
         return getattr(self, '_' + attribute)
 
-    def find_object(self, attr, value):
-        if getattr(self, attr) == value:
+    def find_object(self, attr, class_id):
+        valid_domain_id = getattr(self, attr)
+        if valid_domain_id == class_id:
             return True
-        else:
-            for sub in self.sub:
-                1/0
-                match = openatlas.properties[sub].find_object(attr, value)
-                if match:
-                    return True
-        # return False
+        return self.find_subs(attr, class_id, openatlas.classes[valid_domain_id].sub)
+
+    def find_subs(self, attr, class_id, valid_subs):
+        for sub_id in valid_subs:
+            if sub_id == class_id:
+                return True
+            elif self.find_subs(attr, class_id, openatlas.classes[sub_id].sub):
+                return True
 
 
 class PropertyMapper(object):
@@ -71,3 +73,9 @@ class PropertyMapper(object):
                 properties[row.table_id].i18n[row.language_code] = {}
             properties[row.table_id].i18n[row.language_code][row.table_field] = row.text
         return properties
+
+    @staticmethod
+    def get_by_code(code):
+        for id_ in openatlas.properties:
+            if openatlas.properties[id_].code == code:
+                return openatlas.properties[id_]

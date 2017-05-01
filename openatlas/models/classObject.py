@@ -54,3 +54,9 @@ class ClassMapper(object):
                 class_.i18n[row.language_code] = {}
             class_.i18n[row.language_code][row.table_field] = row.text
         return classes
+
+    @staticmethod
+    def get_by_code(code):
+        for id_ in openatlas.classes:
+            if openatlas.classes[id_].code == code:
+                return openatlas.classes[id_]

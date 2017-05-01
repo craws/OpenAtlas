@@ -5,7 +5,6 @@ import flask
 import re
 
 import openatlas
-from openatlas import PropertyMapper, ClassMapper
 from openatlas.util import util
 from jinja2 import evalcontextfilter, Markup, escape
 
@@ -73,8 +72,9 @@ def table_select_model(self, name, selected=None):
             '<a onclick="selectFromTable(this, \'' + name + '\', ' + str(id_) + ')">' + entities[id_].code + '</a>',
             '<a onclick="selectFromTable(this, \'' + name + '\', ' + str(id_) + ')">' + entities[id_].name + '</a>'
         ])
+    value = selected.code + ' ' + selected.name if selected else ''
     html = '<input id="' + name + '-button" name="' + name + '-button" class="table-select" type="text"'
-    html += ' onfocus="this.blur()" readonly="readonly" value=""> '
+    html += ' onfocus="this.blur()" readonly="readonly" value="' + value + '"> '
     html += '<div id="' + name + '-overlay" class="overlay">'
     html += '<div id="' + name + '-dialog" class="overlay-container">' + pager(None, table) + '</div></div>'
     html += '<script type="text/javascript">$(document).ready(function () {createOverlay("' + name + '");});</script>'
