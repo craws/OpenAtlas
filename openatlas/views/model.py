@@ -32,11 +32,11 @@ def model_index():
         domain = openatlas.classes[int(form.domain.data)]
         range_ = openatlas.classes[int(form.range.data)]
         property_ = openatlas.properties[int(form.property.data)]
-        # whitelistDomains = Zend_Registry::get('config')->get('link_check_ignore_domains')->toArray();
+        ignore = app.config['WHITELISTED_DOMAINS']
         test_result = {
-            'domain_error': False if property_.find_object('domain_id', domain.id) else True,
+            'domain_error': False if property_.find_object('domain_id', domain.id) or domain.code in ignore else True,
             'range_error': False if property_.find_object('range_id', range_.id) else True,
-            'domain_whitelisted': True if domain.code in ['E61'] else False,
+            'domain_whitelisted': True if domain.code in ignore else False,
             'domain': domain,
             'property': property_,
             'range': range_
@@ -147,7 +147,7 @@ def model_property_view(property_id):
         }
         for id_ in getattr(property_, table):
             tables[table]['data'].append([
-                link(property_),
+                link(properties[id_]),
                 properties[id_].name
             ])
     return render_template('model/property_view.html', property=property_, tables=tables, classes=openatlas.classes)

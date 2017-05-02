@@ -60,6 +60,10 @@ div.mce-tinymce {
     display: table-cell;
 }
 
+input.table-select {
+    cursor: pointer;
+}
+
 .message {
     font-size: 0.7em;
     font-weight: normal;

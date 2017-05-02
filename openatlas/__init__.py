@@ -46,7 +46,6 @@ try:  # To do: elegant way to use different configs (e.g production and testing)
     import mod_wsgi
     connection = connect('production')  # pragma: no cover
 except ImportError:
-    app.config['WTF_CSRF_ENABLED'] = False
     connection = connect('testing')
 
 app.config.from_object('config.default')  # load config/default.py

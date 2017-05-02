@@ -6,11 +6,11 @@ class ContentTestCase(TestBaseCase):
 
     def test_content(self):
         response = self.app.get('/content/view/contact')
-        assert b'Edit' in response.data
+        assert 'Edit' in response.data
         response = self.app.get('/content/update/contact')
-        assert b'Save' in response.data
-        form_data = {'en': 'contact', 'de': 'Kontakt'}
+        assert 'Save' in response.data
+        form_data = {'en': 'contact', 'de': 'german'}
         response = self.app.post('/content/update/contact', data=form_data, follow_redirects=True)
-        assert b'Kontakt' in response.data
+        assert 'german' in response.data
         response = self.app.get('/content')
-        assert b'Text' in response.data
+        assert 'Text' in response.data

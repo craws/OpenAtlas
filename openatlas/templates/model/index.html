@@ -29,22 +29,24 @@
                 {{ test_result['property']|link|safe }} >
                 {{ test_result['range']|link|safe }}
             </p>
-            <p>
-                {% if not test_result['domain_error'] and not test_result['range_error'] %}
-                    {{ _('valid link')|uc_first }}<br/>
-                {% endif %}
-                {% if test_result['domain_error'] %}
+            {% if not test_result['domain_error'] and not test_result['range_error'] %}
+                <p>{{ _('valid link')|uc_first }}<br/>
+            {% endif %}
+            {% if test_result['domain_error'] %}
+                <p>
                     <span class="error">{{ _('wrong domain')|uc_first }}</span>
-                    {{ test_result['domain']|link|safe }} {{ _('for') }} {{ test_result['property']|link|safe }}<br/>
-                {% endif %}
-                {% if test_result['range_error'] %}
+                    {{ test_result['domain']|link|safe }} {{ _('for') }} {{ test_result['property']|link|safe }}
+                </p>
+            {% endif %}
+            {% if test_result['range_error'] %}
+                <p>
                     <span class="error">{{ _('wrong range')|uc_first }}</span>
-                    {{ test_result['range']|link|safe }} {{ _('for') }} {{ test_result['property']|link|safe }}<br/>
-                {% endif %}
-                {% if test_result['domain_whitelisted']: %}
-                    {{ test_result['domain']|link|safe }} {{ _('no check because whitelisted')|uc_first }}
-                {% endif %}
-            </p>
+                    {{ test_result['range']|link|safe }} {{ _('for') }} {{ test_result['property']|link|safe }}
+                </p>
+            {% endif %}
+            {% if test_result['domain_whitelisted']: %}
+                <p>{{ test_result['domain']|link|safe }} {{ _('no check because whitelisted') }}</p>
+            {% endif %}
         {% endif %}
     </div>
 {% endblock %}
