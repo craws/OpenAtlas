@@ -9,24 +9,33 @@
         <link rel="manifest" href="/favicon/manifest.json" />
         <link rel="mask-icon" href="/favicon/safari-pinned-tab.svg" />
         <link rel="stylesheet" href="/static/css/reset.css?v={{ config['VERSION'] }}" />
+        <link rel="stylesheet" href="/static/js/jquery/jquery-ui-1.12.1/jquery-ui.min.css" />
         <link rel="stylesheet" href="/static/css/style.css?v={{ config['VERSION'] }}" />
         <link rel="stylesheet" href="/static/css/color.css?v={{ config['VERSION'] }}" />
         <link rel="stylesheet" href="/static/css/images.css?v={{ config['VERSION'] }}" />
         <script type="text/javascript" src="/static/js/jquery/jquery-3.1.1.min.js"></script>
-        <script type="text/javascript" src="/static/js/jquery/jquery.tablesorter.min.js"></script>
+        <script type="text/javascript" src="/static/js/jquery/tablesorter-2.28.5/js/jquery.tablesorter.min.js"></script>
+        <script type="text/javascript" src="/static/js/jquery/tablesorter-2.28.5/js/jquery.tablesorter.widgets.min.js"></script>
+        <script type="text/javascript" src="/static/js/jquery/tablesorter-2.28.5/js/extras/jquery.tablesorter.pager.min.js"></script>
+        <script type="text/javascript" src="/static/js/jquery/tablesorter-2.28.5/js/parsers/parser-input-select.min.js"></script>
+        <script type="text/javascript" src="/static/js/jquery/jquery-validation-1.15.0/jquery.validate.min.js"></script>
+        <script type="text/javascript" src="/static/js/jquery/jquery-ui-1.12.1/jquery-ui.min.js"></script>
         <script type="text/javascript" src="/static/js/tinymce/tinymce.min.js"></script>
         <script type="text/javascript" src="/static/js/functions.js"></script>
-        <title>project_name</title>
+        <title>
+            {{ session['settings']['site_name'] }}
+            {{ ' - ' + request.path.split('/')[1]|uc_first if request.path.split('/')[1] else '' }}
+        </title>
     </head>
     <body>
         <div id="header">
             <div id="logo"><a href="/"></a></div>
             <div id="site-name">
-                project_name
+                {{ session['settings']['site_name'] }}
                 {% if 'local' in request['url_root'] %}
                     local
                 {% endif %}
-                <noscript><div class="error">{{ _('warning no js') }}</div></noscript><br />
+                <noscript><div class="error">{{ _('warning no js') }}</div></noscript><br /><br />
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         {% for category, message in messages %}
@@ -59,8 +68,10 @@
             </div>
         </div>
         <div id="menu">
-            <div class="active"><a href="/">{{ _('overview')|uc_first }}</a></div>
-            <div><a href="/content">{{ _('content')|uc_first }}</a></div>
+            {% for item in ['overview', 'model', 'settings', 'content'] %}
+                {% set css = ' class="active"' if item in request.path or (item == 'overview' and request.path == '/') %}
+                <div {{ css|safe }}><a href="/{{ item }}">{{ item|uc_first }}</a></div>
+            {% endfor %}
         </div>
         <div id="breadcrumb">
             {% block breadcrumb %}{% endblock %}

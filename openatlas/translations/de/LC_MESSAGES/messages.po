@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-01-19 11:56+0100\n"
-"PO-Revision-Date: 2017-01-19 12:45+0100\n"
+"POT-Creation-Date: 2017-02-06 17:45+0100\n"
+"PO-Revision-Date: 2017-02-06 17:50+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language-Team: de <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
@@ -19,60 +19,61 @@ msgstr ""
 "Language: de\n"
 "X-Generator: Poedit 1.6.10\n"
 
-#: ../templates/layout.html:29
+#: ../templates/layout.html:31
 msgid "warning no js"
 msgstr ""
 "JavaScript scheint deaktiviert zu sein. Die Funktionalität dieser Seite ist "
 "dadurch eingeschränkt."
 
-#: ../templates/layout.html:40 ../templates/index/changelog.html:5
+#: ../templates/layout.html:42 ../templates/index/changelog.html:5
 msgid "version"
 msgstr "Version"
 
-#: ../templates/layout.html:41 ../templates/index/changelog.html:2
+#: ../templates/layout.html:43 ../templates/index/changelog.html:2
 msgid "changelog"
 msgstr "Changelog"
 
-#: ../templates/layout.html:42 ../templates/index/credits.html:2
+#: ../templates/layout.html:44 ../templates/index/credits.html:2
 msgid "credits"
 msgstr "Credits"
 
-#: ../templates/layout.html:43 ../templates/index/contact.html:2
+#: ../templates/layout.html:45 ../templates/index/contact.html:2
 msgid "contact"
 msgstr "Kontakt"
 
-#: ../templates/layout.html:44 ../templates/index/faq.html:2
+#: ../templates/layout.html:46 ../templates/index/faq.html:2
 msgid "faq"
 msgstr "FAQ"
 
-#: ../templates/layout.html:47 ../templates/layout.html:48
+#: ../templates/layout.html:49 ../templates/layout.html:50
 msgid "zoom in"
 msgstr "Schrift vergrößern"
 
-#: ../templates/layout.html:49 ../templates/layout.html:50
+#: ../templates/layout.html:51 ../templates/layout.html:52
 msgid "zoom out"
 msgstr "Schrift verkleinern"
 
-#: ../templates/layout.html:62 ../templates/index/changelog.html:2
-#: ../templates/index/contact.html:2 ../templates/index/credits.html:2
-#: ../templates/index/faq.html:2 ../templates/index/index.html:2
-msgid "overview"
-msgstr "Übersicht"
-
-#: ../templates/layout.html:63 ../templates/content/index.html:3
-#: ../templates/content/update.html:3 ../templates/content/view.html:3
+#: ../templates/content/index.html:3 ../templates/content/update.html:3
+#: ../templates/content/view.html:3
 msgid "content"
 msgstr "Inhalt"
 
 #: ../templates/content/update.html:5 ../templates/content/view.html:7
+#: ../templates/settings/index.html:7 ../templates/settings/update.html:3
 msgid "edit"
 msgstr "bearbeiten"
 
-#: ../templates/content/update.html:14
+#: ../templates/content/update.html:14 ../templates/settings/update.html:7
 msgid "save"
 msgstr "speichern"
 
-#: ../templates/index/index.html:5
+#: ../templates/index/changelog.html:2 ../templates/index/contact.html:2
+#: ../templates/index/credits.html:2 ../templates/index/faq.html:2
+#: ../templates/index/index.html:2
+msgid "overview"
+msgstr "Übersicht"
+
+#: ../templates/index/index.html:7
 msgid "text_intro"
 msgstr ""
 "%(link_openatlas)s ist eine Datenbank Anwendung die es ermöglicht komplexe "
@@ -87,3 +88,95 @@ msgstr ""
 "\n"
 "Näheres ist auf unserem %(link_wiki)s  nachzulesen oder probiere unsere "
 "%(link_demo)s."
+
+#: ../templates/settings/index.html:3 ../templates/settings/update.html:3
+msgid "settings"
+msgstr "Einstellungen"
+
+#: ../templates/settings/index.html:29
+msgid "send_test_mail"
+msgstr "Test E-Mail verschicken"
+
+#: ../views/settings.py:20 ../views/settings.py:62
+msgid "site name"
+msgstr "Seitenname"
+
+#: ../views/settings.py:21 ../views/settings.py:63
+msgid "default language"
+msgstr "Standardsprache"
+
+#: ../views/settings.py:22 ../views/settings.py:64
+msgid "default table rows"
+msgstr "Standard Tabellenreihen"
+
+#: ../views/settings.py:23 ../views/settings.py:65
+msgid "log level"
+msgstr "Log Level"
+
+#: ../views/settings.py:24 ../views/settings.py:66
+msgid "maintenance"
+msgstr "Wartung"
+
+#: ../views/settings.py:25 ../views/settings.py:67
+msgid "offline"
+msgstr "Offline"
+
+#: ../views/settings.py:28 ../views/settings.py:70
+msgid "mail"
+msgstr "E-Mail"
+
+#: ../views/settings.py:29 ../views/settings.py:71
+msgid "mail transport username"
+msgstr "Username"
+
+#: ../views/settings.py:30 ../views/settings.py:72
+msgid "mail transport host"
+msgstr "Host"
+
+#: ../views/settings.py:31 ../views/settings.py:73
+msgid "mail transport port"
+msgstr "Port"
+
+#: ../views/settings.py:32 ../views/settings.py:74
+msgid "mail transport type"
+msgstr "Transport type"
+
+#: ../views/settings.py:33 ../views/settings.py:75
+msgid "mail transport ssl"
+msgstr "SSL"
+
+#: ../views/settings.py:34 ../views/settings.py:76
+msgid "mail transport auth"
+msgstr "Auth"
+
+#: ../views/settings.py:35 ../views/settings.py:77
+msgid "mail from email"
+msgstr "E-Mail Sender"
+
+#: ../views/settings.py:36 ../views/settings.py:78
+msgid "mail from name"
+msgstr "Name"
+
+#: ../views/settings.py:37 ../views/settings.py:79
+msgid "mail recipients login"
+msgstr "Login Empfänger"
+
+#: ../views/settings.py:38 ../views/settings.py:80
+msgid "mail recipients feedback"
+msgstr "Feedback Empfänger"
+
+#: ../views/settings.py:41 ../views/settings.py:83
+msgid "random password length"
+msgstr "Länge des Zufallspassworts"
+
+#: ../views/settings.py:42 ../views/settings.py:84
+msgid "reset confirm hours"
+msgstr "Reset Stunden Limit"
+
+#: ../views/settings.py:43 ../views/settings.py:85
+msgid "failed login tries"
+msgstr "Maximale Anmeldeversuche"
+
+#: ../views/settings.py:44 ../views/settings.py:86
+msgid "failed login forget minutes"
+msgstr "Anmeldeversuche vergessen Minuten"

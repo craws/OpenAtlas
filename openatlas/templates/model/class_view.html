@@ -1,0 +1,29 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="/model">{{ _('model')|uc_first }}</a> >
+    <a href="/model/class">{{ _('classes')|uc_first }}</a> >
+    {{ class_.code }}
+{% endblock %}
+{% block body %}
+    <div style="float:left;padding-right:2em;">
+        <p><strong>{{ _('info')|uc_first }}</strong></p>
+        {% set data = [
+            {'code': class_.code},
+            {'name': class_.name}
+        ] %}
+        {{ data|data_table()|safe }}
+    </div>
+    {% for name, table in tables.iteritems() %}
+        {% if table['data']|length > 0 %}
+            <div style="float:left;padding-right:2em;">
+                <p><strong>{{ name|uc_first }}</strong></p>
+                {{ tables[name]|pager|safe }}
+            </div>
+        {% endif %}
+    {% endfor %}
+    <div style="clear:both"></div>
+    <div class="description">
+        <strong>{{ _('description')|uc_first }}</strong>
+        <p>{{ class_.comment }}</p>
+    </div>
+{% endblock %}

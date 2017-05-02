@@ -1,0 +1,5 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}<a href="/model">{{ _('model')|uc_first }}</a> > {{ _('classes')|uc_first }}{% endblock %}
+{% block body %}
+    {{ table|pager|safe }}
+{% endblock %}

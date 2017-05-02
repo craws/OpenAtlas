@@ -4,11 +4,18 @@ import jinja2
 import flask
 import re
 
+import openatlas
 from openatlas.util import util
 from jinja2 import evalcontextfilter, Markup, escape
 
 blueprint = flask.Blueprint('filters', __name__)
 paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def link(self, entity):
+    return util.link(entity)
 
 
 @jinja2.contextfilter
@@ -27,13 +34,64 @@ def nl2br(self, value):
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def pager(self, data):
+def data_table(self, data):
+    html = '<div class="data-table">'
+    for item in data:
+        key, value = item.popitem()
+        if value or value == 0:
+            html += '<div><div>' + util.uc_first(key) + '</div><div class="table-cell">' + str(value) + '</div></div>'
+    html += '</div>'
+    return html
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def description(self, entity):
+    html = ''
+    if entity.description:
+        html += '<div class="description">' + entity.info.replace('\r\n', '<br />') + '</div>'
+    return html
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def table_select_model(self, name, selected=None):
+    if name in ['domain', 'range']:
+        entities = openatlas.classes
+        sorter = 'sortList: [[0, 0]], headers: {0: { sorter: "class_code" }}'
+    else:
+        entities = openatlas.properties
+        sorter = 'sortList: [[0, 0]], headers: {0: { sorter: "property_code" }}'
+    table = {
+        'name': name,
+        'header': ['code', 'name'],
+        'sort': sorter,
+        'data': []}
+    for id_ in entities:
+        table['data'].append([
+            '<a onclick="selectFromTable(this, \'' + name + '\', ' + str(id_) + ')">' + entities[id_].code + '</a>',
+            '<a onclick="selectFromTable(this, \'' + name + '\', ' + str(id_) + ')">' + entities[id_].name + '</a>'
+        ])
+    value = selected.code + ' ' + selected.name if selected else ''
+    html = '<input id="' + name + '-button" name="' + name + '-button" class="table-select" type="text"'
+    html += ' onfocus="this.blur()" readonly="readonly" value="' + value + '"> '
+    html += '<div id="' + name + '-overlay" class="overlay">'
+    html += '<div id="' + name + '-dialog" class="overlay-container">' + pager(None, table) + '</div></div>'
+    html += '<script type="text/javascript">$(document).ready(function () {createOverlay("' + name + '");});</script>'
+    return html
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def pager(self, table):
     # To do: remove no cover when more content to test
-    if not data['data']:  # pragma: no cover
+    if not table['data']:  # pragma: no cover
         return ''
     html = ''
-    name = data['name']
-    if 'hide_pager' not in data:  # pragma: no cover
+    name = table['name']
+    # To do: remove hardcoded table pager limit when user profiles available
+    show_pager = False if 'hide_pager' in table or len(table['data']) < 20 else True
+    if show_pager:  # pragma: no cover
         html += '<div id="' + name + '-pager" class="pager">'
         html += """
                 <div class="navigation first"></div>
@@ -53,11 +111,11 @@ def pager(self, data):
         html += '</div>'
     html += '<table id="' + name + '-table" class="tablesorter">'
     html += '<thead><tr>'
-    for header in data['header']:
+    for header in table['header']:
         style = '' if header else 'class=sorter-false '
         html += '<th ' + style + '>' + header.capitalize() + '</th>'
     html += '</tr></thead><tbody>'
-    for row in data['data']:
+    for row in table['data']:
         html += '<tr>'
         for entry in row:
             entry = str(entry) if entry and entry != 'None' else ''
@@ -70,18 +128,15 @@ def pager(self, data):
         html += '</tr>'
     html += '</tbody>'
     html += '</table>'
-    sort = 'sortList: [[0, 0]]' if 'sort' not in data else data['sort']
-    headers = 'headers: { 1: { sorter: "digit" } },' if 'headers' in data else ''
-    text_extractions = "textExtraction: function(node){return $(node).text().replace(/[,€]/g,'');}"
+    sort = 'sortList: [[0, 0]]' if 'sort' not in table else table['sort']
     html += '<script type="text/javascript">'
-    if 'hide_pager' in data:
-        html += '$("#' + name + '-table").tablesorter({' + sort + ', widgets: [\'zebra\'],'
-        html += text_extractions + '});'
-    else:  # pragma: no cover
+    if show_pager:
         html += '$("#' + name + '-table")'
-        html += '.tablesorter({ ' + headers + ' ' + sort + ', dateFormat: "ddmmyyyy" '
-        html += ' , widgets: [\'zebra\', \'filter\'],  ' + text_extractions + ','
+        html += '.tablesorter({ ' + sort + ', dateFormat: "ddmmyyyy" '
+        html += ' , widgets: [\'zebra\', \'filter\'],'
         html += 'widgetOptions: {filter_external: \'#' + name + '-search\', filter_columnFilters: false}})'
         html += '.tablesorterPager({positionFixed: false, container: $("#' + name + '-pager"), size: 20});'
+    else:  # pragma: no cover
+        html += '$("#' + name + '-table").tablesorter({' + sort + ', widgets: [\'zebra\']});'
     html += '</script>'
     return html

@@ -20,24 +20,29 @@ table.tablesorter thead tr .tablesorter-header {
     cursor: pointer;
 }
 
-table.tablesorter thead tr .tablesorter-header:hover {
-    background-image: url("/static/images/icons/arrow_updown_hover.png");
+div.pager div.first {
+    background-image: url("/static/images/icons/first.png");
 }
-
-table.tablesorter thead tr .tablesorter-headerDesc {
-    background-image: url("/static/images/icons/arrow_down.png");
+div.pager div.first:hover {
+    background-image: url("/static/images/icons/first_hover.png");
 }
-
-table.tablesorter thead tr .tablesorter-headerDesc:hover {
-    background-image: url("/static/images/icons/arrow_down_hover.png");
+div.pager div.prev {
+    background-image: url("/static/images/icons/prev.png");
 }
-
-table.tablesorter thead tr .tablesorter-headerAsc {
-    background-image: url("/static/images/icons/arrow_up.png");
+div.pager div.prev:hover {
+    background-image: url("/static/images/icons/prev_hover.png");
 }
-
-table.tablesorter thead tr .tablesorter-headerAsc:hover {
-    background-image: url("/static/images/icons/arrow_up_hover.png");
+div.pager div.next {
+    background-image: url("/static/images/icons/next.png");
+}
+div.pager div.next:hover {
+    background-image: url("/static/images/icons/next_hover.png");
+}
+div.pager div.last {
+    background-image: url("/static/images/icons/last.png");
+}
+div.pager div.last:hover {
+    background-image: url("/static/images/icons/last_hover.png");
 }
 
 table.tablesorter thead tr .sorter-false, table.tablesorter thead tr .sorter-false:hover {
