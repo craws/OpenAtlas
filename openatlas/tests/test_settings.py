@@ -3,7 +3,7 @@ from openatlas import SettingsMapper
 from openatlas.test_base import TestBaseCase
 
 
-class SettingsTestCase(TestBaseCase):
+class SettingsTests(TestBaseCase):
 
     def test_settings(self):
         response = self.app.get('/settings')

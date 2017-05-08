@@ -2,7 +2,7 @@
 from openatlas.test_base import TestBaseCase
 
 
-class ContentTestCase(TestBaseCase):
+class ContentTests(TestBaseCase):
 
     def test_content(self):
         response = self.app.get('/content/view/contact')

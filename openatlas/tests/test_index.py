@@ -2,7 +2,7 @@
 from openatlas.test_base import TestBaseCase
 
 
-class IndexTestCase(TestBaseCase):
+class IndexTests(TestBaseCase):
 
     def test_index(self):
         response = self.app.get('/')

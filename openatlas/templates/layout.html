@@ -48,9 +48,12 @@
                 <div>
                     {{ _('version')|uc_first }} {{ config['VERSION'] }} |
                     <a href="/index/changelog">{{ _('changelog')|uc_first }}</a> |
+                    <a href="/model">{{ _('model')|uc_first }}</a> |
                     <a href="/index/credits">{{ _('credits')|uc_first }}</a> |
                     <a href="/index/contact">{{ _('contact')|uc_first }}</a> |
-                    <a href="/index/faq">{{ _('faq')|uc_first }}</a>
+                    <a href="/index/faq">{{ _('faq')|uc_first }}</a> |
+                    <a href="/settings">{{ _('settings')|uc_first }}</a> |
+                    <a href="/content">{{ _('content')|uc_first }}</a>
                 </div>
                 <div id="language-menu">
                     <img class="zoom" src="/static/images/icons/zoom-in.png" title="{{ _('zoom in') }}"
@@ -68,7 +71,7 @@
             </div>
         </div>
         <div id="menu">
-            {% for item in ['overview', 'model', 'settings', 'content'] %}
+            {% for item in ['overview', 'source', 'event', 'actor', 'place', 'reference', 'hierarchy'] %}
                 {% set css = ' class="active"' if item in request.path or (item == 'overview' and request.path == '/') %}
                 <div {{ css|safe }}><a href="/{{ item }}">{{ item|uc_first }}</a></div>
             {% endfor %}

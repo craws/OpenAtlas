@@ -3,7 +3,7 @@ from openatlas import ClassMapper, PropertyMapper
 from openatlas.test_base import TestBaseCase
 
 
-class ModelTestCase(TestBaseCase):
+class ModelTests(TestBaseCase):
 
     def test_model(self):
         response = self.app.get('/model')

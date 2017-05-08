@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}<a href="/">{{ _('overview')|uc_first }}</a> > {{ _('changelog')|uc_first }}{% endblock %}
+{% block breadcrumb %}{{ _('changelog')|uc_first }}{% endblock %}
 {% block body %}
     {% for version_name, version in versions.iteritems() %}
         <div class="changelog-version">{{ _('version')|uc_first }} {{ version_name }}</div>
