@@ -1,0 +1,9 @@
+{% set data = [
+    {form.name.label|string + ' *': form.name(class_="required")},
+    {form.description.label: form.description},
+    {'': '<button type="submit">' + _('save')|uc_first + '</button>'}
+] %}
+<form method="post">
+    {{ form.csrf_token }}
+    {{ data|data_table()|safe }}
+</form>

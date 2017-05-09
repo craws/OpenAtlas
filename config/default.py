@@ -1,4 +1,4 @@
-DEBUG = False
+DEBUG = True
 VERSION = '0.3.0'
 LANGUAGES = {
     'en': 'English',

@@ -5,8 +5,9 @@ from openatlas.models.property import Property
 
 
 def uc_first(string):
-    new_string = _(string)
-    return new_string[0].upper() + new_string[1:]
+    if not string:
+        return ''
+    return str(string)[0].upper() + str(string)[1:]
 
 
 def link(entity):

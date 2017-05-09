@@ -22,6 +22,7 @@
         <script type="text/javascript" src="/static/js/jquery/jquery-ui-1.12.1/jquery-ui.min.js"></script>
         <script type="text/javascript" src="/static/js/tinymce/tinymce.min.js"></script>
         <script type="text/javascript" src="/static/js/functions.js"></script>
+        <script type="text/javascript" src="/static/js/forms.js"></script>
         <title>
             {{ session['settings']['site_name'] }}
             {{ ' - ' + request.path.split('/')[1]|uc_first if request.path.split('/')[1] else '' }}
@@ -80,7 +81,7 @@
             {% block breadcrumb %}{% endblock %}
         </div>
         <div id="content">
-            {% block body %}{% endblock %}
+            {% block content %}{% endblock %}
             {% if 'craws.net' in request['url_root'] %}
             <div id="powered-by">
                 Another

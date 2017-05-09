@@ -39,7 +39,8 @@ def data_table(self, data):
     for item in data:
         key, value = item.popitem()
         if value or value == 0:
-            html += '<div><div>' + util.uc_first(key) + '</div><div class="table-cell">' + str(value) + '</div></div>'
+            html += '<div class="table-row"><div>' + util.uc_first(key) + '</div>'
+            html += '<div class="table-cell">' + str(value) + '</div></div>'
     html += '</div>'
     return html
 

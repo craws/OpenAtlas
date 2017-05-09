@@ -232,6 +232,19 @@ div.data-table > div > div {
     width: inherit;
 }
 
+form div.table-row div {
+    text-align: right;
+}
+
+form div.table-row div.table-cell {
+    text-align: left;
+}
+
+
+label.error {
+    padding-left: 0.5em;
+}
+
 input[type=text], input[type=password], textarea, select  {
     border-width: 1px;
     border-style: solid;

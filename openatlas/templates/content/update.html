@@ -4,7 +4,7 @@
     <a href="/content/view/{{ item }}">{{ item|uc_first }}</a> >
     {{ _('edit')|uc_first }}
 {% endblock %}
-{% block body %}
+{% block content %}
     <form method="post">
         {{ form.csrf_token }}
         {% for language in languages: %}
