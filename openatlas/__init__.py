@@ -17,9 +17,13 @@ from openatlas.util import filters
 reload(sys)
 sys.setdefaultencoding('utf8')
 
-app = Flask(__name__, instance_relative_config=True)
-settings = []
+app = Flask(
+    __name__,
+    static_url_path='',
+    static_folder='static',
+    instance_relative_config=True)
 
+settings = []
 
 def connect(config_name='production'):
     config = ConfigParser.ConfigParser()

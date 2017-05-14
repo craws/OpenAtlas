@@ -8,21 +8,21 @@
         <link rel="icon" type="image/png" href="/favicon/favicon-16x16.png" sizes="16x16" />
         <link rel="manifest" href="/favicon/manifest.json" />
         <link rel="mask-icon" href="/favicon/safari-pinned-tab.svg" />
-        <link rel="stylesheet" href="/static/css/reset.css?v={{ config['VERSION'] }}" />
-        <link rel="stylesheet" href="/static/js/jquery/jquery-ui-1.12.1/jquery-ui.min.css" />
-        <link rel="stylesheet" href="/static/css/style.css?v={{ config['VERSION'] }}" />
-        <link rel="stylesheet" href="/static/css/color.css?v={{ config['VERSION'] }}" />
-        <link rel="stylesheet" href="/static/css/images.css?v={{ config['VERSION'] }}" />
-        <script type="text/javascript" src="/static/js/jquery/jquery-3.1.1.min.js"></script>
-        <script type="text/javascript" src="/static/js/jquery/tablesorter-2.28.5/js/jquery.tablesorter.min.js"></script>
-        <script type="text/javascript" src="/static/js/jquery/tablesorter-2.28.5/js/jquery.tablesorter.widgets.min.js"></script>
-        <script type="text/javascript" src="/static/js/jquery/tablesorter-2.28.5/js/extras/jquery.tablesorter.pager.min.js"></script>
-        <script type="text/javascript" src="/static/js/jquery/tablesorter-2.28.5/js/parsers/parser-input-select.min.js"></script>
-        <script type="text/javascript" src="/static/js/jquery/jquery-validation-1.15.0/jquery.validate.min.js"></script>
-        <script type="text/javascript" src="/static/js/jquery/jquery-ui-1.12.1/jquery-ui.min.js"></script>
-        <script type="text/javascript" src="/static/js/tinymce/tinymce.min.js"></script>
-        <script type="text/javascript" src="/static/js/functions.js"></script>
-        <script type="text/javascript" src="/static/js/forms.js"></script>
+        <link rel="stylesheet" href="/css/reset.css?v={{ config['VERSION'] }}" />
+        <link rel="stylesheet" href="/js/jquery/jquery-ui-1.12.1/jquery-ui.min.css" />
+        <link rel="stylesheet" href="/css/style.css?v={{ config['VERSION'] }}" />
+        <link rel="stylesheet" href="/css/color.css?v={{ config['VERSION'] }}" />
+        <link rel="stylesheet" href="/css/images.css?v={{ config['VERSION'] }}" />
+        <script type="text/javascript" src="/js/jquery/jquery-3.1.1.min.js"></script>
+        <script type="text/javascript" src="/js/jquery/tablesorter-2.28.5/js/jquery.tablesorter.min.js"></script>
+        <script type="text/javascript" src="/js/jquery/tablesorter-2.28.5/js/jquery.tablesorter.widgets.min.js"></script>
+        <script type="text/javascript" src="/js/jquery/tablesorter-2.28.5/js/extras/jquery.tablesorter.pager.min.js"></script>
+        <script type="text/javascript" src="/js/jquery/tablesorter-2.28.5/js/parsers/parser-input-select.min.js"></script>
+        <script type="text/javascript" src="/js/jquery/jquery-validation-1.15.0/jquery.validate.min.js"></script>
+        <script type="text/javascript" src="/js/jquery/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+        <script type="text/javascript" src="/js/tinymce/tinymce.min.js"></script>
+        <script type="text/javascript" src="/js/functions.js"></script>
+        <script type="text/javascript" src="/js/forms.js"></script>
         <title>
             {{ session['settings']['site_name'] }}
             {{ ' - ' + request.path.split('/')[1]|uc_first if request.path.split('/')[1] else '' }}
@@ -57,9 +57,9 @@
                     <a href="/content">{{ _('content')|uc_first }}</a>
                 </div>
                 <div id="language-menu">
-                    <img class="zoom" src="/static/images/icons/zoom-in.png" title="{{ _('zoom in') }}"
+                    <img class="zoom" src="/images/icons/zoom-in.png" title="{{ _('zoom in') }}"
                         onclick="resizeText(1)" alt="{{ _('zoom in') }}" />
-                    <img class="zoom" src="/static/images/icons/zoom-out.png" title="{{ _('zoom out') }}"
+                    <img class="zoom" src="/images/icons/zoom-out.png" title="{{ _('zoom out') }}"
                         onclick="resizeText(-1)" alt="{{ _('zoom out') }}" />
                     {% for language in config['LANGUAGES'].keys()|sort: %}
                         {% if 'language' in session and session['language'] == language: %}

@@ -34,6 +34,11 @@ def index_credits():
     return render_template('index/credits.html')
 
 
+@app.errorhandler(404)
+def page_not_found(e):
+    return render_template('404.html'), 404
+
+
 @app.route('/index/changelog')
 def index_changelog():
     versions = OrderedDict()

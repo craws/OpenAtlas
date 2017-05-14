@@ -26,7 +26,7 @@ def content_index():
         'data': []}
     for item, languages in ContentMapper.get_content().iteritems():
         content = ['<a href="/content/view/' + item + '">' + util.uc_first(item) + '</a>']
-        html_ok = '<img src="/static/images/icons/dialog-apply.png" alt="ok" \>'
+        html_ok = '<img src="/images/icons/dialog-apply.png" alt="ok" \>'
         for language in openatlas.app.config['LANGUAGES'].keys():
             content.append(html_ok if languages[language] else '')
         content.append(languages[session['language']])
