@@ -4,11 +4,13 @@ import locale
 import psycopg2.extras
 import os
 import sys
+import time
 from collections import OrderedDict
 
 from flask import Flask, request, session
 from flask_babel import Babel
 
+import openatlas
 from openatlas.models.property import PropertyMapper
 from openatlas.models.classObject import ClassMapper
 from openatlas.models.settings import SettingsMapper
@@ -61,11 +63,7 @@ from openatlas.views import content, index, settings, model, source, event, acto
 babel = Babel(app)
 app.register_blueprint(filters.blueprint)
 
-classes = ClassMapper.get_all()
-properties = PropertyMapper.get_all()
-
 # To do: store these values somewhere else, config?
-
 default_table_rows = OrderedDict()
 default_table_rows[10] = '10'
 default_table_rows[20] = '20'
@@ -91,10 +89,25 @@ def get_locale():
     return best_match if best_match else session['settings']['default_language']  # check if best_match is set (in tests it isn't)
 
 
+debug = OrderedDict()
+openatlas.debug['by id'] = 0
+openatlas.debug['by ids'] = 0
+openatlas.debug['linked'] = 0
+debug['current'] = time.time()
+classes = ClassMapper.get_all()
+properties = PropertyMapper.get_all()
+debug['model'] = time.time() - debug['current']
+debug['current'] = time.time()
+
+
 @app.before_request
 def before_request():
     session['settings'] = SettingsMapper.get_settings()
     session['language'] = get_locale()
+    openatlas.debug['current'] = time.time()
+    openatlas.debug['by id'] = 0
+    openatlas.debug['by ids'] = 0
+    openatlas.debug['linked'] = 0
 
 if __name__ == "__main__":  # pragma: no cover
     app.run()
