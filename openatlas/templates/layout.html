@@ -81,7 +81,25 @@
             {% block breadcrumb %}{% endblock %}
         </div>
         <div id="content">
-            {% block content %}{% endblock %}
+            <div style="float:left">{% block content %}{% endblock %}</div>
+            {% if debug %}
+                <div class="data-table" style="float:right;margin:1em;">
+                    <p>Debug</p>
+                    {% for name, value in debug_model.iteritems() %}
+                        {% if name in ['by codes', 'by id', 'by ids', 'linked'] %}
+                            <div>
+                                <div>{{ name }}</div>
+                                <div class="table-cell" style="text-align:right;">{{ value }}</div>
+                            </div>
+                        {% elif name not in ['current'] %}
+                            <div>
+                                <div>{{ name }}</div>
+                                <div class="table-cell" style="text-align:right;">{{ '%0.2f'|format(value) }}</div>
+                            </div>
+                        {% endif %}
+                    {% endfor %}
+                </div>
+            {% endif %}
             {% if 'craws.net' in request['url_root'] %}
             <div id="powered-by">
                 Another <a target="_blank" href="http://openatlas.eu">OpenAtlas</a> project powered by

@@ -2,4 +2,5 @@
 {% block breadcrumb %}{{ _('source')|uc_first }}{% endblock %}
 {% block content %}
     <div class="button-bar"><a href="/source/insert/E33">+ {{ _('source')|uc_first }}</a></div>
+    {{ tables['source']|pager|safe }}
 {% endblock %}

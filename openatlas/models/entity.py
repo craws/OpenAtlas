@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 import openatlas
+from openatlas import ClassMapper
 
 
 class Entity(object):
@@ -39,5 +40,21 @@ class EntityMapper(object):
             FROM model.entity e WHERE e.id = %(id)s;"""
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {'id': entity_id})
-        openatlas.debug['by id'] += 1
+        openatlas.debug_model['by id'] += 1
         return Entity(cursor.fetchone())
+
+    @staticmethod
+    def get_by_codes(codes):
+        class_ids = []
+        for code in codes if isinstance(codes, list) else [codes]:
+            class_ids.append(ClassMapper.get_by_code(code).id)
+        sql = """
+            SELECT e.id, e.name, e.class_id, e.description, e.created, e.modified
+            FROM model.entity e WHERE class_id IN %(class_ids)s;"""
+        cursor = openatlas.get_cursor()
+        cursor.execute(sql, {'class_ids': tuple(class_ids)})
+        entities = []
+        for row in cursor.fetchall():
+            entities.append(Entity(row))
+        openatlas.debug_model['by codes'] += 1
+        return entities

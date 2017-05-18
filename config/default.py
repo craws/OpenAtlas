@@ -1,5 +1,5 @@
 DEBUG = True
-VERSION = '0.3.0'
+VERSION = '3.0.0'
 LANGUAGES = {
     'en': 'English',
     'de': 'Deutsch'

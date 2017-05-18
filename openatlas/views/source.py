@@ -1,5 +1,5 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
-from flask import render_template, flash, url_for
+from flask import render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
@@ -8,7 +8,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import uc_first
+from openatlas.util.util import uc_first, link, truncate_string
 
 
 class SourceForm(Form):
@@ -18,7 +18,17 @@ class SourceForm(Form):
 
 @app.route('/source')
 def source_index():
-    return render_template('source/index.html')
+    tables = {'source': {
+        'name': 'source',
+        # 'sort': 'sortList: [[3, 1]]',
+        'header': ['name', 'info'],
+        'data': []}}
+    for source in EntityMapper.get_by_codes('E33'):
+        tables['source']['data'].append([
+            link(source),
+            truncate_string(source.description)
+        ])
+    return render_template('source/index.html', tables=tables)
 
 
 @app.route('/source/insert/<code>', methods=['POST', 'GET'])

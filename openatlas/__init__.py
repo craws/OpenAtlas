@@ -86,28 +86,33 @@ def get_locale():
     if 'language' in session:
         return session['language']
     best_match = request.accept_languages.best_match(app.config['LANGUAGES'].keys())
-    return best_match if best_match else session['settings']['default_language']  # check if best_match is set (in tests it isn't)
+    # check if best_match is set (in tests it isn't)
+    return best_match if best_match else session['settings']['default_language']
 
 
-debug = OrderedDict()
-openatlas.debug['by id'] = 0
-openatlas.debug['by ids'] = 0
-openatlas.debug['linked'] = 0
-debug['current'] = time.time()
+debug_model = OrderedDict()
+openatlas.debug_model['by id'] = 0
+openatlas.debug_model['by ids'] = 0
+openatlas.debug_model['by codes'] = 0
+openatlas.debug_model['linked'] = 0
+debug_model['current'] = time.time()
 classes = ClassMapper.get_all()
 properties = PropertyMapper.get_all()
-debug['model'] = time.time() - debug['current']
-debug['current'] = time.time()
+debug_model['model'] = time.time() - debug_model['current']
+debug_model['current'] = time.time()
 
 
 @app.before_request
 def before_request():
     session['settings'] = SettingsMapper.get_settings()
     session['language'] = get_locale()
-    openatlas.debug['current'] = time.time()
-    openatlas.debug['by id'] = 0
-    openatlas.debug['by ids'] = 0
-    openatlas.debug['linked'] = 0
+    openatlas.debug_model['current'] = time.time()
+    openatlas.debug_model['by id'] = 0
+    openatlas.debug_model['by ids'] = 0
+    openatlas.debug_model['linked'] = 0
+
+app.add_template_global(app.debug, 'debug')
+app.add_template_global(debug_model, 'debug_model')
 
 if __name__ == "__main__":  # pragma: no cover
     app.run()

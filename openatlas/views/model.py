@@ -59,7 +59,7 @@ def model_index():
 
 
 @app.route('/model/class')
-def model_class():
+def class_index():
     table = {
         'name': 'classes',
         'header': ['code', 'name'],
@@ -75,7 +75,7 @@ def model_class():
 
 
 @app.route('/model/property')
-def model_property():
+def property_index():
     classes = openatlas.classes
     properties = openatlas.properties
     table = {
@@ -99,7 +99,7 @@ def model_property():
 
 
 @app.route('/model/class_view/<int:class_id>')
-def model_class_view(class_id):
+def class_view(class_id):
     classes = openatlas.classes
     properties = openatlas.properties
     tables = OrderedDict()
@@ -134,7 +134,7 @@ def model_class_view(class_id):
 
 
 @app.route('/model/property_view/<int:property_id>')
-def model_property_view(property_id):
+def property_view(property_id):
     properties = openatlas.properties
     property_ = properties[property_id]
     tables = {}
