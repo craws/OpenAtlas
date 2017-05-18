@@ -357,7 +357,7 @@ def index_changelog():
         'data': OrderedDict(
             feature=OrderedDict([
                 ('', 'Initial version based on the "Zend Base" project from '
-                     '<a onclick="window.open(this.href); return false;" href="http://craws.net"> craws.net</a>'),
+                     '<a target="_blank" href="http://craws.net">craws.net</a>'),
             ])
         )
     }

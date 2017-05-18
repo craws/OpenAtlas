@@ -84,10 +84,8 @@
             {% block content %}{% endblock %}
             {% if 'craws.net' in request['url_root'] %}
             <div id="powered-by">
-                Another
-                <a href="http://openatlas.eu" onclick="window.open(this.href); return false;">OpenAtlas</a>
-                project powered by
-                <a href="http://craws.net" onclick="window.open(this.href); return false;">craws.net</a>
+                Another <a target="_blank" href="http://openatlas.eu">OpenAtlas</a> project powered by
+                <a target="_blank" href="http://craws.net">craws.net</a>
             </div>
         {% endif %}
         </div>
