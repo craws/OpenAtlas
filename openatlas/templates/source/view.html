@@ -1,9 +1,27 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ _('source')|uc_first }}{% endblock %}
-{% block content %}
-    <div class="button-bar">
-        <a href="/source/update/{{ source_id }}">{{ _('update')|uc_first }}</a>
-        <a href="/source/delete/{{ source_id }}">{{ _('delete')|uc_first }}</a>
-    </div>
+{% block breadcrumb %}
+    <a href="{{ url_for('source_index') }}">{{ _('source')|uc_first }}</a> >
     {{ source.name }}
+{% endblock %}
+{% block content %}
+<div id="tabs" class="tabs-container">
+    <ul>
+        <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
+    </ul>
+    <div id="tab-info">
+        <div class="button-bar">
+            <a href="{{ url_for('source_update', source_id=source.id) }}">{{ _('update')|uc_first }}</a>
+            <a href="{{ url_for('source_delete', source_id=source.id) }}">{{ _('delete')|uc_first }}</a>
+        </div>
+        <h1>{{ source.name }}</h1>
+        {% set data = [
+            {'name': source.name},
+        ] %}
+        {{ data|data_table()|safe }}
+        {{ source|description|safe }}
+    </div>
+</div>
+<script type="text/javascript">
+    $(function () {$("#tabs").tabs();});
+</script>
 {% endblock %}

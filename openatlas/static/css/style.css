@@ -18,6 +18,11 @@ div.description {
     max-width: 72em;
 }
 
+p.description-title {
+    font-weight: bold;
+    margin-top: 1em;
+}
+
 .ui-dialog,
 .ui-dialog .ui-dialog-content,
 .ui-state-active,

@@ -57,6 +57,6 @@ class ClassMapper(object):
 
     @staticmethod
     def get_by_code(code):
-        for id_ in openatlas.classes:
-            if openatlas.classes[id_].code == code:
-                return openatlas.classes[id_]
+        for id_, class_ in openatlas.classes.iteritems():
+            if class_.code == code:
+                return class_

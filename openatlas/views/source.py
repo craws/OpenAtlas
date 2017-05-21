@@ -45,3 +45,13 @@ def source_insert(code):
 def source_view(source_id):
     source = EntityMapper.get_by_id(source_id)
     return render_template('source/view.html', source=source)
+
+
+@app.route('/source/delete/<int:source_id>')
+def source_delete(source_id):
+    pass
+
+
+@app.route('/source/update/<int:source_id>')
+def source_update(source_id):
+    pass

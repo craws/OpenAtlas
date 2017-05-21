@@ -4,9 +4,11 @@ import jinja2
 import flask
 import re
 
+from jinja2 import evalcontextfilter, Markup, escape
+from flask_babel import lazy_gettext as _
+
 import openatlas
 from openatlas.util import util
-from jinja2 import evalcontextfilter, Markup, escape
 
 blueprint = flask.Blueprint('filters', __name__)
 paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
@@ -140,4 +142,14 @@ def pager(self, table):
     else:  # pragma: no cover
         html += '$("#' + name + '-table").tablesorter({' + sort + ', widgets: [\'zebra\']});'
     html += '</script>'
+    return html
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def description(self, entity):
+    if not entity.description:
+        return ''
+    html = '<div class="description"><p class="description-title">' + util.uc_first(_('description')) + '</p>'
+    html += '<p>' + entity.description + '</p></div>'
     return html
