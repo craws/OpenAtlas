@@ -1,10 +1,10 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="/content">{{ _('content')|uc_first }}</a> > {{ item|uc_first }}
+    <a href="{{ url_for('content_index') }}">{{ _('content')|uc_first }}</a> > {{ item|uc_first }}
 {% endblock %}
 {% block content %}
     <div class="button-bar">
-        <a href="/content/update/{{ item }}">{{ _('edit')|uc_first }}</a>
+        <a href="{{ url_for('content_update', item=item) }}">{{ _('edit')|uc_first }}</a>
     </div>
     {% for language, text in content[item].iteritems() %}
         <p class="inverse-heading">{{ language|upper }}</p>

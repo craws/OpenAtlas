@@ -40,7 +40,7 @@
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         {% for category, message in messages %}
-                            <div class="message {{ category }}">{{ message }}</div>
+                            <div class="message {{ category }}">{{ message|uc_first }}</div>
                         {% endfor %}
                     {% endif %}
                 {% endwith %}
@@ -48,13 +48,13 @@
             <div id="header-menu">
                 <div>
                     {{ _('version')|uc_first }} {{ config['VERSION'] }} |
-                    <a href="/index/changelog">{{ _('changelog')|uc_first }}</a> |
-                    <a href="/model">{{ _('model')|uc_first }}</a> |
-                    <a href="/index/credits">{{ _('credits')|uc_first }}</a> |
-                    <a href="/index/contact">{{ _('contact')|uc_first }}</a> |
-                    <a href="/index/faq">{{ _('faq')|uc_first }}</a> |
-                    <a href="/settings">{{ _('settings')|uc_first }}</a> |
-                    <a href="/content">{{ _('content')|uc_first }}</a>
+                    <a href="{{ url_for('index_changelog') }}">{{ _('changelog')|uc_first }}</a> |
+                    <a href="{{ url_for('model_index') }}">{{ _('model')|uc_first }}</a> |
+                    <a href="{{ url_for('index_credits') }}">{{ _('credits')|uc_first }}</a> |
+                    <a href="{{ url_for('index_contact') }}">{{ _('contact')|uc_first }}</a> |
+                    <a href="{{ url_for('index_faq') }}">{{ _('faq')|uc_first }}</a> |
+                    <a href="{{ url_for('settings_index') }}">{{ _('settings')|uc_first }}</a> |
+                    <a href="{{ url_for('content_index') }}">{{ _('content')|uc_first }}</a>
                 </div>
                 <div id="language-menu">
                     <img class="zoom" src="/images/icons/zoom-in.png" title="{{ _('zoom in') }}"
@@ -65,7 +65,7 @@
                         {% if 'language' in session and session['language'] == language: %}
                             <span>{{ language|upper }}</span>
                         {% else: %}
-                            <a href="/index/setlocale/{{ language }}">{{ language|upper }}</a>
+                            <a href="{{ url_for('set_locale', language=language) }}">{{ language|upper }}</a>
                         {% endif %}
                     {% endfor %}
                 </div>
@@ -73,8 +73,8 @@
         </div>
         <div id="menu">
             {% for item in ['overview', 'source', 'event', 'actor', 'place', 'reference', 'hierarchy'] %}
-                {% set css = ' class="active"' if item in request.path or (item == 'overview' and request.path == '/') %}
-                <div {{ css|safe }}><a href="/{{ item }}">{{ item|uc_first }}</a></div>
+                {% set css = 'active' if item in request.path or (item == 'overview' and request.path == '/') %}
+                <div class="{{ css|safe }}"><a href="/{{ item }}">{{ item|uc_first }}</a></div>
             {% endfor %}
         </div>
         <div id="breadcrumb">

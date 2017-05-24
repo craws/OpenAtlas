@@ -14,7 +14,7 @@ def index():
 
 
 @app.route('/index/setlocale/<language>')
-def new_locale(language):
+def set_locale(language):
     session['language'] = language
     return redirect(request.referrer)
 
@@ -36,7 +36,7 @@ def index_credits():
 
 @app.errorhandler(404)
 def page_not_found(e):
-    return render_template('404.html'), 404
+    return render_template('404.html', e=e), 404
 
 
 @app.route('/index/changelog')

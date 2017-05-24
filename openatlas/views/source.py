@@ -1,6 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
-from flask import render_template, url_for
-from flask_babel import lazy_gettext as _
+from flask import render_template, url_for, flash
+from flask_babel import gettext, lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import StringField, TextAreaField
@@ -36,7 +36,7 @@ def source_insert(code):
     form = SourceForm()
     if form.validate_on_submit():
         source = EntityMapper.insert(code, form.name.data, form.description.data)
-        # flash('Entity created', 'success')
+        flash(gettext('entity created'), 'info')
         return redirect(url_for('source_view', source_id=source.id))
     return render_template('source/insert.html', form=form)
 

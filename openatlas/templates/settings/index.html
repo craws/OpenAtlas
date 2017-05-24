@@ -4,7 +4,7 @@
 {% endblock %}
 {% block content %}
     <div class="button-bar">
-        <a href="/settings/update">{{ _('edit')|uc_first }}</a>
+        <a href="{{ url_for('settings_update') }}">{{ _('edit')|uc_first }}</a>
     </div>
     <div id="tabs" class="tabs-container">
         <ul>

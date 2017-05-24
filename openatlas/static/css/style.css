@@ -14,13 +14,9 @@ p {
     max-width: 80em;
 }
 
-div.description {
-    max-width: 72em;
-}
-
-p.description-title {
-    font-weight: bold;
-    margin-top: 1em;
+#description {
+    height: 8em;
+    width: 33em;
 }
 
 .ui-dialog,
@@ -227,13 +223,17 @@ table.tablesorter thead tr th.sorter-false {
     display: none;
 }
 
+div.data-table, textarea {
+    margin-bottom: 0.5em;
+}
+
 div.data-table > div {
     display: table-row;
 }
 
 div.data-table > div > div {
     display: table-cell;
-    padding: 0.2em;
+    padding: 0.2em 0.4em 0.2em 0;
     width: inherit;
 }
 
@@ -244,7 +244,6 @@ form div.table-row div {
 form div.table-row div.table-cell {
     text-align: left;
 }
-
 
 label.error {
     padding-left: 0.5em;
