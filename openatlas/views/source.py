@@ -6,6 +6,7 @@ from werkzeug.utils import redirect
 from wtforms import StringField, TextAreaField, HiddenField
 from wtforms.validators import InputRequired
 
+import openatlas
 from openatlas import app
 from openatlas.models.entity import EntityMapper
 from openatlas.util.util import uc_first, link, truncate_string
@@ -52,7 +53,11 @@ def source_view(source_id):
 
 @app.route('/source/delete/<int:source_id>')
 def source_delete(source_id):
-    pass
+    openatlas.get_cursor().execute('BEGIN')
+    EntityMapper.delete(source_id)
+    openatlas.get_cursor().execute('COMMIT')
+    flash(gettext('entity deleted'), 'info')
+    return redirect(url_for('source_index'))
 
 
 @app.route('/source/update/<int:source_id>')

@@ -58,3 +58,8 @@ class EntityMapper(object):
             entities.append(Entity(row))
         openatlas.debug_model['by codes'] += 1
         return entities
+
+    @staticmethod
+    def delete(entity_id):
+        sql = "DELETE FROM model.entity WHERE id = %(entity_id)s;"
+        openatlas.get_cursor().execute(sql, {'entity_id': entity_id})
