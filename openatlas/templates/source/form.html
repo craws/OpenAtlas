@@ -1,10 +1,14 @@
 {% set data = [
     {form.name.label|string + ' *': form.name(class_="required")},
 ] %}
-<form method="post">
+<form method="post" id="source-form">
     {{ form.csrf_token }}
+    {{ form.continue_ }}
     {{ data|data_table()|safe }}
     {{ form.description.label }}<br />
     {{ form.description }}<br />
     <button type="submit">{{ _('insert')|uc_first }}</button>
+    <button type="submit" onclick="$('#continue_').val('yes');$('#source-form').submit();return false;">
+        {{ _('insert and continue')|uc_first }}
+    </button>
 </form>

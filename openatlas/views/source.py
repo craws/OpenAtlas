@@ -3,7 +3,7 @@ from flask import render_template, url_for, flash
 from flask_babel import gettext, lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import StringField, TextAreaField
+from wtforms import StringField, TextAreaField, HiddenField
 from wtforms.validators import InputRequired
 
 from openatlas import app
@@ -14,6 +14,7 @@ from openatlas.util.util import uc_first, link, truncate_string
 class SourceForm(Form):
     name = StringField(uc_first(_('name')), validators=[InputRequired()])
     description = TextAreaField(uc_first(_('content')))
+    continue_ = HiddenField()
 
 
 @app.route('/source')
@@ -37,6 +38,8 @@ def source_insert(code):
     if form.validate_on_submit():
         source = EntityMapper.insert(code, form.name.data, form.description.data)
         flash(gettext('entity created'), 'info')
+        if form.continue_.data == 'yes':
+            return redirect(url_for('source_insert', code='E33'))
         return redirect(url_for('source_view', source_id=source.id))
     return render_template('source/insert.html', form=form)
 
