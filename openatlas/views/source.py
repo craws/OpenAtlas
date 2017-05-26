@@ -60,6 +60,16 @@ def source_delete(source_id):
     return redirect(url_for('source_index'))
 
 
-@app.route('/source/update/<int:source_id>')
+@app.route('/source/update/<int:source_id>', methods=['POST', 'GET'])
 def source_update(source_id):
-    pass
+    source = EntityMapper.get_by_id(source_id)
+    form = SourceForm()
+    if form.validate_on_submit():
+        source.name = form.name.data
+        source.description = form.description.data
+        source.update()
+        flash(gettext('entity updated'), 'info')
+        return redirect(url_for('source_view', source_id=source.id))
+    form.name.data = source.name
+    form.description.data = source.description
+    return render_template('source/update.html', form=form, source=source)

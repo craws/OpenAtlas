@@ -16,7 +16,15 @@ p {
 
 #description {
     height: 8em;
-    width: 33em;
+    width: 40em;
+}
+
+.description {
+    margin-top: 1em;
+}
+
+.description-title {
+    font-weight: bold;
 }
 
 .ui-dialog,
@@ -155,7 +163,7 @@ img.zoom {
 
 #menu > div.active {
     height: 1.8em;
-    border-bottom-width: 0.4em;
+    border-bottom-width: 0.5em;
     border-bottom-style: solid;
 }
 

@@ -14,8 +14,17 @@ class Entity(object):
         self.end = row.end if hasattr(row, 'end') else None
         self.class_ = openatlas.classes[row.class_id]
 
+    def update(self):
+        EntityMapper.update(self)
+
 
 class EntityMapper(object):
+
+    @staticmethod
+    def update(entity):
+        sql = "UPDATE model.entity SET (name, description) = (%(name)s, %(description)s) WHERE id = %(id)s;"
+        cursor = openatlas.get_cursor()
+        cursor.execute(sql, {'id': entity.id, 'name': entity.name, 'description': entity.description})
 
     @staticmethod
     def insert(code, name, description=None):

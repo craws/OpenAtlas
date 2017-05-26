@@ -1,0 +1,8 @@
+{% extends 'layout.html' %}
+{% block breadcrumb %}
+    <a href="{{ url_for('source_index') }}">{{ _('source')|uc_first }}</a> >
+    {{ source|link|safe }} > {{ _('edit')|uc_first }}
+{% endblock %}
+{% block content %}
+     {% include 'source/form.html' %}
+{% endblock %}

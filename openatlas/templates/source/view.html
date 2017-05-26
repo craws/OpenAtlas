@@ -10,7 +10,7 @@
     </ul>
     <div id="tab-info">
         <div class="button-bar">
-            <a href="{{ url_for('source_update', source_id=source.id) }}">{{ _('update')|uc_first }}</a>
+            <a href="{{ url_for('source_update', source_id=source.id) }}">{{ _('edit')|uc_first }}</a>
             <a onclick="return confirm('{{ _('delete')|uc_first }} {{ source.name.replace('\'', '') }}?')"
                href="{{ url_for('source_delete', source_id=source.id) }}">{{ _('delete')|uc_first }}</a>
         </div>

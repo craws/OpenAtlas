@@ -49,15 +49,6 @@ def data_table(self, data):
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def description(self, entity):
-    html = ''
-    if entity.description:
-        html += '<div class="description">' + entity.info.replace('\r\n', '<br />') + '</div>'
-    return html
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
 def table_select_model(self, name, selected=None):
     if name in ['domain', 'range']:
         entities = openatlas.classes
@@ -153,3 +144,4 @@ def description(self, entity):
     html = '<div class="description"><p class="description-title">' + util.uc_first(_('description')) + '</p>'
     html += '<p>' + entity.description + '</p></div>'
     return html
+
