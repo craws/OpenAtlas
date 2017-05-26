@@ -33,7 +33,7 @@ div.pager div.prev:hover {
     background-image: url("/images/icons/prev_hover.png");
 }
 div.pager div.next {
-    background-image: url("c/images/icons/next.png");
+    background-image: url("/images/icons/next.png");
 }
 div.pager div.next:hover {
     background-image: url("/images/icons/next_hover.png");
