@@ -1,5 +1,11 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}{{ _('event')|uc_first }}{% endblock %}
 {% block content %}
-
+    <div class="button-bar">
+        <a href="{{ url_for('event_insert', code='E7') }}">+ {{ 'E7'|get_class_name }}</a>
+        <a href="{{ url_for('event_insert', code='E8') }}">+ {{ 'E8'|get_class_name }}</a>
+        <a href="{{ url_for('event_insert', code='E12') }}">+ {{ 'E12'|get_class_name }}</a>
+        <a href="{{ url_for('event_insert', code='E6') }}">+ {{ 'E6'|get_class_name }}</a>
+    </div>
+    {{ tables['event']|pager|safe }}
 {% endblock %}

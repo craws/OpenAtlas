@@ -23,6 +23,8 @@ def link(entity):
         # To do: what if translation or the like?
         if entity.class_.code == 'E33':
             return '<a href="' + url_for('source_view', source_id=entity.id) + '">' + entity.name + '</a>'
+        if entity.class_.code in ('E7', 'E8', 'E12', 'E6'):
+            return '<a href="' + url_for('event_view', event_id=entity.id) + '">' + entity.name + '</a>'
     return entity.name + ' (' + entity.class_.name + ')'
 
 

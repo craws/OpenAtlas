@@ -64,6 +64,7 @@ babel = Babel(app)
 app.register_blueprint(filters.blueprint)
 
 # To do: store these values somewhere else, config?
+
 default_table_rows = OrderedDict()
 default_table_rows[10] = '10'
 default_table_rows[20] = '20'

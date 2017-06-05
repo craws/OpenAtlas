@@ -8,6 +8,7 @@ from jinja2 import evalcontextfilter, Markup, escape
 from flask_babel import lazy_gettext as _
 
 import openatlas
+from openatlas import ClassMapper
 from openatlas.util import util
 
 blueprint = flask.Blueprint('filters', __name__)
@@ -145,3 +146,8 @@ def description(self, entity):
     html += '<p>' + entity.description + '</p></div>'
     return html
 
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def get_class_name(self, code):
+    return ClassMapper.get_by_code(code).name

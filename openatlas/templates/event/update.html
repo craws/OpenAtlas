@@ -1,0 +1,8 @@
+{% extends 'layout.html' %}
+{% block breadcrumb %}
+    <a href="{{ url_for('event_index') }}">{{ _('event')|uc_first }}</a> >
+    {{ event|link|safe }} > {{ _('edit')|uc_first }}
+{% endblock %}
+{% block content %}
+     {% include 'event/form.html' %}
+{% endblock %}
