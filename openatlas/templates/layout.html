@@ -13,16 +13,16 @@
         <link rel="stylesheet" href="/css/style.css?v={{ config['VERSION'] }}" />
         <link rel="stylesheet" href="/css/color.css?v={{ config['VERSION'] }}" />
         <link rel="stylesheet" href="/css/images.css?v={{ config['VERSION'] }}" />
-        <script type="text/javascript" src="/js/jquery/jquery-3.1.1.min.js"></script>
-        <script type="text/javascript" src="/js/jquery/tablesorter-2.28.5/js/jquery.tablesorter.min.js"></script>
-        <script type="text/javascript" src="/js/jquery/tablesorter-2.28.5/js/jquery.tablesorter.widgets.min.js"></script>
-        <script type="text/javascript" src="/js/jquery/tablesorter-2.28.5/js/extras/jquery.tablesorter.pager.min.js"></script>
-        <script type="text/javascript" src="/js/jquery/tablesorter-2.28.5/js/parsers/parser-input-select.min.js"></script>
-        <script type="text/javascript" src="/js/jquery/jquery-validation-1.15.0/jquery.validate.min.js"></script>
-        <script type="text/javascript" src="/js/jquery/jquery-ui-1.12.1/jquery-ui.min.js"></script>
-        <script type="text/javascript" src="/js/tinymce/tinymce.min.js"></script>
-        <script type="text/javascript" src="/js/functions.js"></script>
-        <script type="text/javascript" src="/js/forms.js"></script>
+        <script src="/js/jquery/jquery-3.1.1.min.js"></script>
+        <script src="/js/jquery/tablesorter-2.28.5/js/jquery.tablesorter.min.js"></script>
+        <script src="/js/jquery/tablesorter-2.28.5/js/jquery.tablesorter.widgets.min.js"></script>
+        <script src="/js/jquery/tablesorter-2.28.5/js/extras/jquery.tablesorter.pager.min.js"></script>
+        <script src="/js/jquery/tablesorter-2.28.5/js/parsers/parser-input-select.min.js"></script>
+        <script src="/js/jquery/jquery-validation-1.15.0/jquery.validate.min.js"></script>
+        <script src="/js/jquery/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+        <script src="/js/tinymce/tinymce.min.js"></script>
+        <script src="/js/functions.js"></script>
+        <script src="/js/forms.js"></script>
         <title>
             {{ session['settings']['site_name'] }}
             {{ ' - ' + request.path.split('/')[1]|uc_first if request.path.split('/')[1] else '' }}
@@ -101,11 +101,11 @@
                 </div>
             {% endif %}
             {% if 'craws.net' in request['url_root'] %}
-            <div id="powered-by">
-                Another <a target="_blank" href="http://openatlas.eu">OpenAtlas</a> project powered by
-                <a target="_blank" href="http://craws.net">craws.net</a>
-            </div>
-        {% endif %}
+                <div id="powered-by">
+                    Another <a target="_blank" href="http://openatlas.eu">OpenAtlas</a> project powered by
+                    <a target="_blank" href="http://craws.net">craws.net</a>
+                </div>
+            {% endif %}
         </div>
     </body>
 </html>

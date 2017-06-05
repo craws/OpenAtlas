@@ -71,7 +71,7 @@ def table_select_model(self, name, selected=None):
     html += ' onfocus="this.blur()" readonly="readonly" value="' + value + '"> '
     html += '<div id="' + name + '-overlay" class="overlay">'
     html += '<div id="' + name + '-dialog" class="overlay-container">' + pager(None, table) + '</div></div>'
-    html += '<script type="text/javascript">$(document).ready(function () {createOverlay("' + name + '");});</script>'
+    html += '<script>$(document).ready(function () {createOverlay("' + name + '");});</script>'
     return html
 
 
@@ -123,7 +123,7 @@ def pager(self, table):
     html += '</tbody>'
     html += '</table>'
     sort = 'sortList: [[0, 0]]' if 'sort' not in table else table['sort']
-    html += '<script type="text/javascript">'
+    html += '<script>'
     if show_pager:
         html += '$("#' + name + '-table")'
         html += '.tablesorter({ ' + sort + ', dateFormat: "ddmmyyyy" '
