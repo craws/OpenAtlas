@@ -1,5 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
 from flask import url_for
+from markupsafe import Markup
 
 from openatlas.models.classObject import ClassObject
 from openatlas.models.entity import Entity
@@ -16,18 +17,18 @@ def link(entity):
     if not entity:
         return ''
     if isinstance(entity, ClassObject):
-        return '<a href="' + url_for('class_view', class_id=entity.id) + '">' + entity.code + '</a>'
+        return Markup('<a href="' + url_for('class_view', class_id=entity.id) + '">' + entity.code + '</a>')
     elif isinstance(entity, Property):
-        return '<a href="' + url_for('property_view', property_id=entity.id) + '">' + entity.code + '</a>'
+        return Markup('<a href="' + url_for('property_view', property_id=entity.id) + '">' + entity.code + '</a>')
     elif isinstance(entity, Entity):
         # To do: what if translation or the like?
         if entity.class_.code == 'E33':
-            return '<a href="' + url_for('source_view', source_id=entity.id) + '">' + entity.name + '</a>'
+            return Markup('<a href="' + url_for('source_view', source_id=entity.id) + '">' + entity.name + '</a>')
         if entity.class_.code in ('E7', 'E8', 'E12', 'E6'):
-            return '<a href="' + url_for('event_view', event_id=entity.id) + '">' + entity.name + '</a>'
+            return Markup('<a href="' + url_for('event_view', event_id=entity.id) + '">' + entity.name + '</a>')
         if entity.class_.code in ('E21', 'E74', 'E40'):
-            return '<a href="' + url_for('actor_view', actor_id=entity.id) + '">' + entity.name + '</a>'
-    return entity.name + ' (' + entity.class_.name + ')'
+            return Markup('<a href="' + url_for('actor_view', actor_id=entity.id) + '">' + entity.name + '</a>')
+    return Markup(entity.name + ' (' + entity.class_.name + ')')
 
 
 def truncate_string(string, length=40, encoding='utf-8'):

@@ -11,13 +11,13 @@
             {'code': class_.code},
             {'name': class_.name}
         ] %}
-        {{ data|data_table()|safe }}
+        {{ data|data_table }}
     </div>
     {% for name, table in tables.iteritems() %}
         {% if table['data']|length > 0 %}
             <div style="float:left;padding-right:2em;">
                 <p><strong>{{ name|uc_first }}</strong></p>
-                {{ tables[name]|pager|safe }}
+                {{ tables[name]|pager }}
             </div>
         {% endif %}
     {% endfor %}

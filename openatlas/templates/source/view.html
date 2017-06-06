@@ -18,8 +18,8 @@
         {% set data = [
             {'name': source.name},
         ] %}
-        {{ data|data_table()|safe }}
-        {{ source|description|safe }}
+        {{ data|data_table }}
+        {{ source|description }}
     </div>
 </div>
 {% endblock %}

@@ -20,8 +20,8 @@
         {% set data = [
             {'name': event.name},
         ] %}
-        {{ data|data_table()|safe }}
-        {{ event|description|safe }}
+        {{ data|data_table }}
+        {{ event|description }}
     </div>
 </div>
 {% endblock %}

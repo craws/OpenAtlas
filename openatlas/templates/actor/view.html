@@ -20,7 +20,7 @@
         {% set data = [
             {'name': actor.name},
         ] %}
-        {{ data|data_table()|safe }}
+        {{ data|data_table }}
         {{ actor|description }}
     </div>
 </div>

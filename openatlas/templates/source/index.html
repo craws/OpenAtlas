@@ -4,5 +4,5 @@
     <div class="button-bar">
         <a href="{{ url_for('source_insert', code='E33') }}">+ {{ _('source')|uc_first }}</a>
     </div>
-    {{ tables['source']|pager|safe }}
+    {{ tables['source']|pager }}
 {% endblock %}

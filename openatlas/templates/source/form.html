@@ -4,7 +4,7 @@
 <form method="post" id="source-form">
     {{ form.csrf_token }}
     {{ form.continue_ }}
-    {{ data|data_table()|safe }}
+    {{ data|data_table }}
     {{ form.description.label }}<br />
     {{ form.description }}<br />
     {% if not source %}

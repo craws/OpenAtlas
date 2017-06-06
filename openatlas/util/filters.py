@@ -45,7 +45,7 @@ def data_table(self, data):
             html += '<div class="table-row"><div>' + util.uc_first(key) + '</div>'
             html += '<div class="table-cell">' + str(value) + '</div></div>'
     html += '</div>'
-    return html
+    return Markup(html)
 
 
 @jinja2.contextfilter
@@ -134,7 +134,7 @@ def pager(self, table):
     else:  # pragma: no cover
         html += '$("#' + name + '-table").tablesorter({' + sort + ', widgets: [\'zebra\']});'
     html += '</script>'
-    return html
+    return Markup(html)
 
 
 @jinja2.contextfilter
@@ -144,7 +144,7 @@ def description(self, entity):
         return ''
     html = '<div class="description"><p class="description-title">' + util.uc_first(_('description')) + '</p>'
     html += '<p>' + entity.description.replace('\r\n', '<br />') + '</p></div>'
-    return html
+    return Markup(html)
 
 
 @jinja2.contextfilter

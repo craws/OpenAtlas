@@ -42,9 +42,9 @@
             <li><a href="#tab-mail">{{ 'mail'|uc_first }}</a></li>
             <li><a href="#tab-authentication">{{ 'authentication'|uc_first }}</a></li>
         </ul>
-        <div id="tab-general">{{ data_general|data_table()|safe }}</div>
-        <div id="tab-mail">{{ data_mail|data_table()|safe }}</div>
-        <div id="tab-authentication">{{ data_authentication|data_table()|safe }}</div>
+        <div id="tab-general">{{ data_general|data_table }}</div>
+        <div id="tab-mail">{{ data_mail|data_table }}</div>
+        <div id="tab-authentication">{{ data_authentication|data_table }}</div>
     </div>
 </form>
 {% for field, errors in form.errors.iteritems() %}

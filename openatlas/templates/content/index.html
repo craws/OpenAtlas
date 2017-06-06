@@ -3,5 +3,5 @@
     {{ _('content')|uc_first }}
 {% endblock %}
 {% block content %}
-    {{ table_content|pager|safe }}
+    {{ table_content|pager }}
 {% endblock %}
