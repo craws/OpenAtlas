@@ -1,8 +1,82 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
-from flask import render_template
+from flask import render_template, url_for, flash
+from flask_babel import gettext, lazy_gettext as _
+from flask_wtf import Form
+from werkzeug.utils import redirect
+from wtforms import StringField, TextAreaField, HiddenField
+from wtforms.validators import InputRequired
+
+import openatlas
 from openatlas import app
+from openatlas.models.entity import EntityMapper
+from openatlas.util.util import uc_first, link, truncate_string
+
+
+class ActorForm(Form):
+    name = StringField(uc_first(_('name')), validators=[InputRequired()])
+    description = TextAreaField(uc_first(_('description')))
+    continue_ = HiddenField()
+
+
+@app.route('/actor/view/<int:actor_id>')
+def actor_view(actor_id):
+    actor = EntityMapper.get_by_id(actor_id)
+    return render_template('actor/view.html', actor=actor)
 
 
 @app.route('/actor')
 def actor_index():
-    return render_template('actor/index.html')
+    tables = {'actor': {
+        'name': 'actor',
+        # 'sort': 'sortList: [[3, 1]]',
+        'header': ['name', 'class', 'info'],
+        'data': []}}
+    for actor in EntityMapper.get_by_codes(['E21', 'E74', 'E40']):
+        tables['actor']['data'].append([
+            link(actor),
+            openatlas.classes[actor.class_.id].name,
+            truncate_string(actor.description)
+        ])
+    return render_template('actor/index.html', tables=tables)
+
+
+@app.route('/actor/insert/<code>', methods=['POST', 'GET'])
+def actor_insert(code):
+    form = ActorForm()
+    if form.validate_on_submit() and form.name.data != openatlas.app.config['EVENT_ROOT_NAME']:
+        actor = EntityMapper.insert(code, form.name.data, form.description.data)
+        flash(gettext('entity created'), 'info')
+        if form.continue_.data == 'yes':
+            return redirect(url_for('actor_insert', code=code))
+        return redirect(url_for('actor_view', actor_id=actor.id))
+    return render_template('actor/insert.html', form=form, code=code)
+
+
+@app.route('/actor/delete/<int:actor_id>')
+def actor_delete(actor_id):
+    if EntityMapper.get_by_id(actor_id).name == openatlas.app.config['EVENT_ROOT_NAME']:
+        flash(gettext('error forbidden'), 'error')
+        return redirect(url_for('actor_index'))
+    openatlas.get_cursor().execute('BEGIN')
+    EntityMapper.delete(actor_id)
+    openatlas.get_cursor().execute('COMMIT')
+    flash(gettext('entity deleted'), 'info')
+    return redirect(url_for('actor_index'))
+
+
+@app.route('/actor/update/<int:actor_id>', methods=['POST', 'GET'])
+def actor_update(actor_id):
+    actor = EntityMapper.get_by_id(actor_id)
+    form = ActorForm()
+    if actor.name == openatlas.app.config['EVENT_ROOT_NAME']:
+        flash(gettext('error forbidden'), 'error')
+        return redirect(url_for('actor_index'))
+    if form.validate_on_submit():
+        actor.name = form.name.data
+        actor.description = form.description.data
+        actor.update()
+        flash(gettext('entity updated'), 'info')
+        return redirect(url_for('actor_view', actor_id=actor.id))
+    form.name.data = actor.name
+    form.description.data = actor.description
+    return render_template('actor/update.html', form=form, actor=actor)

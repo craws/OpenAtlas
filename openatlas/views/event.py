@@ -14,7 +14,7 @@ from openatlas.util.util import uc_first, link, truncate_string
 
 class EventForm(Form):
     name = StringField(uc_first(_('name')), validators=[InputRequired()])
-    description = TextAreaField(uc_first(_('content')))
+    description = TextAreaField(uc_first(_('description')))
     continue_ = HiddenField()
 
 

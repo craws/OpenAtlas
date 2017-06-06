@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('actor_index') }}">{{ _('actor')|uc_first }}</a> >
+    {{ actor.name }}
+{% endblock %}
+{% block content %}
+<div id="tabs" class="tabs-container">
+    <ul>
+        <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
+    </ul>
+    <div id="tab-info">
+        {% if actor.name != config['EVENT_ROOT_NAME'] %}
+            <div class="button-bar">
+                <a href="{{ url_for('actor_update', actor_id=actor.id) }}">{{ _('edit')|uc_first }}</a>
+                <a onclick="return confirm('{{ _('delete')|uc_first }} {{ actor.name.replace('\'', '') }}?')"
+                   href="{{ url_for('actor_delete', actor_id=actor.id) }}">{{ _('delete')|uc_first }}</a>
+            </div>
+        {% endif %}
+        <h1>{{ actor.name }}</h1>
+        {% set data = [
+            {'name': actor.name},
+        ] %}
+        {{ data|data_table()|safe }}
+        {{ actor|description }}
+    </div>
+</div>
+{% endblock %}

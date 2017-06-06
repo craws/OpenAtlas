@@ -81,7 +81,7 @@ def table_select_model(self, name, selected=None):
 def pager(self, table):
     # To do: remove no cover when more content to test
     if not table['data']:  # pragma: no cover
-        return ''
+        return '<p>' + _('no entries') + '</p>'
     html = ''
     name = table['name']
     # To do: remove hardcoded table pager limit when user profiles available
@@ -143,7 +143,7 @@ def description(self, entity):
     if not entity.description:
         return ''
     html = '<div class="description"><p class="description-title">' + util.uc_first(_('description')) + '</p>'
-    html += '<p>' + entity.description + '</p></div>'
+    html += '<p>' + entity.description.replace('\r\n', '<br />') + '</p></div>'
     return html
 
 
