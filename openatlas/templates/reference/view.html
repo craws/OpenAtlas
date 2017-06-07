@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('reference_index') }}">{{ _('reference')|uc_first }}</a> >
+    {{ reference.name }}
+{% endblock %}
+{% block content %}
+<div id="tabs" class="tabs-container">
+    <ul>
+        <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
+    </ul>
+    <div id="tab-info">
+        {% if reference.name != config['EVENT_ROOT_NAME'] %}
+            <div class="button-bar">
+                <a href="{{ url_for('reference_update', reference_id=reference.id) }}">{{ _('edit')|uc_first }}</a>
+                <a onclick="return confirm('{{ _('delete')|uc_first }} {{ reference.name.replace('\'', '') }}?')"
+                   href="{{ url_for('reference_delete', reference_id=reference.id) }}">{{ _('delete')|uc_first }}</a>
+            </div>
+        {% endif %}
+        <h1>{{ reference.name }}</h1>
+        {% set data = [
+            {'name': reference.name},
+        ] %}
+        {{ data|data_table }}
+        {{ reference|description }}
+    </div>
+</div>
+{% endblock %}

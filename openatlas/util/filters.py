@@ -81,7 +81,7 @@ def table_select_model(self, name, selected=None):
 def pager(self, table):
     # To do: remove no cover when more content to test
     if not table['data']:  # pragma: no cover
-        return '<p>' + _('no entries') + '</p>'
+        return Markup('<p>' + util.uc_first(_('no entries')) + '</p>')
     html = ''
     name = table['name']
     # To do: remove hardcoded table pager limit when user profiles available

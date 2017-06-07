@@ -1,0 +1,25 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('place_index') }}">{{ _('place')|uc_first }}</a> >
+    {{ place.name }}
+{% endblock %}
+{% block content %}
+<div id="tabs" class="tabs-container">
+    <ul>
+        <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
+    </ul>
+    <div id="tab-info">
+        <div class="button-bar">
+            <a href="{{ url_for('place_update', place_id=place.id) }}">{{ _('edit')|uc_first }}</a>
+            <a onclick="return confirm('{{ _('delete')|uc_first }} {{ place.name.replace('\'', '') }}?')"
+               href="{{ url_for('place_delete', place_id=place.id) }}">{{ _('delete')|uc_first }}</a>
+        </div>
+        <h1>{{ place.name }}</h1>
+        {% set data = [
+            {'name': place.name},
+        ] %}
+        {{ data|data_table }}
+        {{ place|description }}
+    </div>
+</div>
+{% endblock %}

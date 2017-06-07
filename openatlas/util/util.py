@@ -28,6 +28,10 @@ def link(entity):
             return Markup('<a href="' + url_for('event_view', event_id=entity.id) + '">' + entity.name + '</a>')
         if entity.class_.code in ('E21', 'E74', 'E40'):
             return Markup('<a href="' + url_for('actor_view', actor_id=entity.id) + '">' + entity.name + '</a>')
+        if entity.class_.code == 'E18':
+            return Markup('<a href="' + url_for('place_view', place_id=entity.id) + '">' + entity.name + '</a>')
+        if entity.class_.code in ('E31', 'E84'):
+            return Markup('<a href="' + url_for('reference_view', reference_id=entity.id) + '">' + entity.name + '</a>')
     return Markup(entity.name + ' (' + entity.class_.name + ')')
 
 
