@@ -5,5 +5,5 @@ from openatlas.test_base import TestBaseCase
 class SourceTest(TestBaseCase):
 
     def test_source(self):
-        response = self.app.get('/source')
-        #assert 'Overview' in response.data
+        rv = self.app.get('/source')
+        #assert 'Overview' in rv.data

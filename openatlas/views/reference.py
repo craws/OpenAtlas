@@ -47,7 +47,7 @@ def reference_index():
 @app.route('/reference/insert/<code>', methods=['POST', 'GET'])
 def reference_insert(code):
     form = ReferenceForm()
-    if form.validate_on_submit() and form.name.data != openatlas.app.config['EVENT_ROOT_NAME']:
+    if form.validate_on_submit():
         reference = EntityMapper.insert('E84' if code == 'carrier' else 'E31', form.name.data, form.description.data)
         flash(gettext('entity created'), 'info')
         if form.continue_.data == 'yes':
@@ -58,9 +58,6 @@ def reference_insert(code):
 
 @app.route('/reference/delete/<int:reference_id>')
 def reference_delete(reference_id):
-    if EntityMapper.get_by_id(reference_id).name == openatlas.app.config['EVENT_ROOT_NAME']:
-        flash(gettext('error forbidden'), 'error')
-        return redirect(url_for('reference_index'))
     openatlas.get_cursor().execute('BEGIN')
     EntityMapper.delete(reference_id)
     openatlas.get_cursor().execute('COMMIT')
@@ -72,9 +69,6 @@ def reference_delete(reference_id):
 def reference_update(reference_id):
     reference = EntityMapper.get_by_id(reference_id)
     form = ReferenceForm()
-    if reference.name == openatlas.app.config['EVENT_ROOT_NAME']:
-        flash(gettext('error forbidden'), 'error')
-        return redirect(url_for('reference_index'))
     if form.validate_on_submit():
         reference.name = form.name.data
         reference.description = form.description.data

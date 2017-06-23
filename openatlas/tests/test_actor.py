@@ -5,5 +5,5 @@ from openatlas.test_base import TestBaseCase
 class ActorTests(TestBaseCase):
 
     def test_actor(self):
-        response = self.app.get('/actor')
-        #assert 'Overview' in response.data
+        rv = self.app.get('/actor')
+        #assert 'Overview' in rv.data

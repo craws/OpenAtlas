@@ -5,5 +5,5 @@ from openatlas.test_base import TestBaseCase
 class EventTest(TestBaseCase):
 
     def test_event(self):
-        response = self.app.get('/event')
-        #assert 'Overview' in response.data
+        rv = self.app.get('/event')
+        #assert 'Overview' in rv.data

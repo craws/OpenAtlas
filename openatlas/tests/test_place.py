@@ -5,5 +5,5 @@ from openatlas.test_base import TestBaseCase
 class PlaceTest(TestBaseCase):
 
     def test_place(self):
-        response = self.app.get('/place')
-        #assert 'Overview' in response.data
+        rv = self.app.get('/place')
+        #assert 'Overview' in rv.data

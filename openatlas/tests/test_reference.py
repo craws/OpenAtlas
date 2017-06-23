@@ -5,5 +5,24 @@ from openatlas.test_base import TestBaseCase
 class ReferenceTest(TestBaseCase):
 
     def test_reference(self):
-        response = self.app.get('/reference')
-        #assert 'Overview' in response.data
+        rv = self.app.get('/reference/insert/bibliography')
+        assert '+ Bibliography' in rv.data
+        rv = self.app.get('/reference/insert/edition')
+        assert '+ Edition' in rv.data
+        rv = self.app.get('/reference/insert/carrier')
+        assert '+ Carrier' in rv.data
+        form_data = {'name': 'Test reference', 'description': 'Reference description'}
+        rv = self.app.post('/reference/insert/bibliography', data=form_data)
+        bibliography_id = rv.location.split('/')[-1]
+        form_data['continue_'] = 'yes'
+        rv = self.app.post('/reference/insert/carrier', data=form_data, follow_redirects=True)
+        assert 'Entity created' in rv.data
+        rv = self.app.get('/reference')
+        assert 'Test reference' in rv.data
+        rv = self.app.get('/reference/update/' + bibliography_id)
+        assert 'Test reference' in rv.data
+        form_data['name'] = 'Test reference updated'
+        rv = self.app.post('/reference/update/' + bibliography_id, data=form_data, follow_redirects=True)
+        assert 'Test reference updated' in rv.data
+        rv = self.app.get('/reference/delete/' + bibliography_id, follow_redirects=True)
+        assert 'Entity deleted' in rv.data

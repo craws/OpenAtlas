@@ -43,7 +43,7 @@ def actor_index():
 @app.route('/actor/insert/<code>', methods=['POST', 'GET'])
 def actor_insert(code):
     form = ActorForm()
-    if form.validate_on_submit() and form.name.data != openatlas.app.config['EVENT_ROOT_NAME']:
+    if form.validate_on_submit():
         actor = EntityMapper.insert(code, form.name.data, form.description.data)
         flash(gettext('entity created'), 'info')
         if form.continue_.data == 'yes':
@@ -54,9 +54,6 @@ def actor_insert(code):
 
 @app.route('/actor/delete/<int:actor_id>')
 def actor_delete(actor_id):
-    if EntityMapper.get_by_id(actor_id).name == openatlas.app.config['EVENT_ROOT_NAME']:
-        flash(gettext('error forbidden'), 'error')
-        return redirect(url_for('actor_index'))
     openatlas.get_cursor().execute('BEGIN')
     EntityMapper.delete(actor_id)
     openatlas.get_cursor().execute('COMMIT')
@@ -68,9 +65,6 @@ def actor_delete(actor_id):
 def actor_update(actor_id):
     actor = EntityMapper.get_by_id(actor_id)
     form = ActorForm()
-    if actor.name == openatlas.app.config['EVENT_ROOT_NAME']:
-        flash(gettext('error forbidden'), 'error')
-        return redirect(url_for('actor_index'))
     if form.validate_on_submit():
         actor.name = form.name.data
         actor.description = form.description.data
