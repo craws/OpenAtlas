@@ -7,7 +7,7 @@ from openatlas import app, get_cursor
 class TestBaseCase(unittest.TestCase):
     @staticmethod
     def setup_database():
-        for file_name in ['structure.sql', 'data_web.sql', 'data_model.sql']:
+        for file_name in ['structure.sql', 'data_web.sql', 'data_model.sql', 'data_node.sql']:
             with open(os.path.dirname(__file__) + '/../install/' + file_name, 'r') as sqlFile:
                 sql = sqlFile.read()
                 cursor = get_cursor()
