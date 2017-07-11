@@ -71,7 +71,7 @@ def event_update(event_id):
     if event.name == openatlas.app.config['EVENT_ROOT_NAME']:
         flash(gettext('error forbidden'), 'error')
         return redirect(url_for('event_index'))
-    if form.validate_on_submit():
+    if form.validate_on_submit() and form.name.data != openatlas.app.config['EVENT_ROOT_NAME']:
         event.name = form.name.data
         event.description = form.description.data
         event.update()

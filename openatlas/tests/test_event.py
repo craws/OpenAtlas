@@ -1,5 +1,4 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
-import openatlas
 from openatlas.models.entity import EntityMapper
 from openatlas.test_base import TestBaseCase
 
@@ -23,8 +22,6 @@ class EventTest(TestBaseCase):
         form_data['name'] = 'Test event updated'
         rv = self.app.post('/event/update/' + event_id, data=form_data, follow_redirects=True)
         assert 'Test event updated' in rv.data
-        # form_data['name'] = openatlas.app.config['EVENT_ROOT_NAME']
-        # self.app.post('/event/insert/E7', data=form_data, follow_redirects=True)
         rv = self.app.post('/event/update/' + str(root_event.id), data=form_data, follow_redirects=True)
         assert 'Error' in rv.data
         rv = self.app.get('/event/delete/' + str(root_event.id), data=form_data, follow_redirects=True)
