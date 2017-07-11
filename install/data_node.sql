@@ -64,13 +64,13 @@ INSERT INTO link (property_id, range_id, domain_id) VALUES
 ((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Involvement'), (SELECT id FROM entity WHERE name='Offender'));
 
 INSERT INTO entity (class_id, name) VALUES
-((SELECT id FROM class WHERE code='E55'), 'Gender'),
+((SELECT id FROM class WHERE code='E55'), 'Sex'),
 ((SELECT id FROM class WHERE code='E55'), 'Female'),
 ((SELECT id FROM class WHERE code='E55'), 'Male');
 
 INSERT INTO link (property_id, range_id, domain_id) VALUES
-((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Gender'), (SELECT id FROM entity WHERE name='Female')),
-((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Gender'), (SELECT id FROM entity WHERE name='Male'));
+((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Sex'), (SELECT id FROM entity WHERE name='Female')),
+((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Sex'), (SELECT id FROM entity WHERE name='Male'));
 
 INSERT INTO entity (class_id, name) VALUES
 ((SELECT id FROM class WHERE code='E55'), 'Event'),
@@ -233,7 +233,7 @@ INSERT INTO web.hierarchy (id, name, multiple, system, extendable, directional) 
 ((SELECT id FROM entity WHERE name='Actor Actor Relation'), 'Actor Actor Relation', 0, 1, 1, 1),
 ((SELECT id FROM entity WHERE name='Actor Function'), 'Actor Function', 0, 1, 1, 0),
 ((SELECT id FROM entity WHERE name='Involvement'), 'Involvement', 0, 1, 1, 0),
-((SELECT id FROM entity WHERE name='Gender'), 'Gender', 0, 1, 1, 0),
+((SELECT id FROM entity WHERE name='Sex'), 'Sex', 0, 1, 1, 0),
 ((SELECT id FROM entity WHERE name='Site'), 'Site', 0, 1, 1, 0),
 ((SELECT id FROM entity WHERE name='Information Carrier'), 'Information Carrier', 0, 1, 1, 0),
 ((SELECT id FROM entity WHERE name='Bibliography'), 'Bibliography', 0, 1, 1, 0),
@@ -259,7 +259,7 @@ INSERT INTO web.form (name, extendable) VALUES
 ;
 
 INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Gender'),(SELECT id FROM web.form WHERE name LIKE 'Person')),
+((SELECT id FROM web.hierarchy WHERE name LIKE 'Sex'),(SELECT id FROM web.form WHERE name LIKE 'Person')),
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Source'),(SELECT id FROM web.form WHERE name LIKE 'Source')),
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Event'),(SELECT id FROM web.form WHERE name LIKE 'Event')),
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Site'),(SELECT id FROM web.form WHERE name LIKE 'Place')),
@@ -292,8 +292,8 @@ UPDATE model.entity SET description =
 'Categories for the type of events like Change of property, Conflict, Movement, Attendance etc.'
 WHERE name LIKE 'Event';
 UPDATE model.entity SET description =
-'Categories for gender like male, female.'
-WHERE name LIKE 'Gender';
+'Categories for sex like female, male.'
+WHERE name LIKE 'Sex';
 UPDATE model.entity SET description =
 'Hierarchy of historical places respectively historical administrative units like: Duchy of Bavaria, Lombard Kingdom etc.'
 WHERE name LIKE 'Historical Place';
