@@ -1,0 +1,8 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}{{ _('user')|uc_first }}{% endblock %}
+{% block content %}
+    <div class="button-bar">
+        <a href="">+ {{ _('user')|uc_first }}</a>
+    </div>
+    {{ tables['user']|pager }}
+{% endblock %}

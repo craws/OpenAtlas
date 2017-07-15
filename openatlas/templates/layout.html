@@ -49,6 +49,7 @@
                 <div>
                     {{ _('version')|uc_first }} {{ config['VERSION'] }} |
                     <a href="{{ url_for('index_changelog') }}">{{ _('changelog')|uc_first }}</a> |
+                    <a href="{{ url_for('user_index') }}">{{ _('user')|uc_first }}</a> |
                     <a href="{{ url_for('model_index') }}">{{ _('model')|uc_first }}</a> |
                     <a href="{{ url_for('index_credits') }}">{{ _('credits')|uc_first }}</a> |
                     <a href="{{ url_for('index_contact') }}">{{ _('contact')|uc_first }}</a> |
@@ -86,7 +87,7 @@
                 <div class="data-table" style="float:right;margin:1em;">
                     <p>Debug</p>
                     {% for name, value in debug_model.iteritems() %}
-                        {% if name in ['by codes', 'by id', 'by ids', 'linked'] %}
+                        {% if name in ['by codes', 'by id', 'by ids', 'linked', 'user'] %}
                             <div>
                                 <div>{{ name }}</div>
                                 <div class="table-cell" style="text-align:right;">{{ value }}</div>

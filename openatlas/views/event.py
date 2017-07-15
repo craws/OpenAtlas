@@ -28,8 +28,7 @@ def event_view(event_id):
 def event_index():
     tables = {'event': {
         'name': 'event',
-        # 'sort': 'sortList: [[3, 1]]',
-        'header': ['name', 'class', 'info'],
+        'header': [_('name'), _('class'), _('info')],
         'data': []}}
     for event in EntityMapper.get_by_codes(['E7', 'E8', 'E12', 'E6']):
         tables['event']['data'].append([

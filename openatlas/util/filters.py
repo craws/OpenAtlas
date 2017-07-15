@@ -50,6 +50,12 @@ def data_table(self, data):
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
+def format_date(self, value, text_format='%Y-%m-%d'):
+    return util.format_date(value, text_format)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
 def table_select_model(self, name, selected=None):
     if name in ['domain', 'range']:
         entities = openatlas.classes

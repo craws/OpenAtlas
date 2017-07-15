@@ -58,7 +58,7 @@ app.config.from_object('config.default')  # load config/default.py
 app.config.from_pyfile('config.py')  # load instance/config.py
 locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 
-from openatlas.views import content, index, settings, model, source, event, actor, place, reference, hierarchy
+from openatlas.views import content, index, settings, model, source, event, actor, place, reference, hierarchy, user
 
 babel = Babel(app)
 app.register_blueprint(filters.blueprint)
@@ -96,6 +96,7 @@ openatlas.debug_model['by id'] = 0
 openatlas.debug_model['by ids'] = 0
 openatlas.debug_model['by codes'] = 0
 openatlas.debug_model['linked'] = 0
+openatlas.debug_model['user'] = 0
 debug_model['current'] = time.time()
 classes = ClassMapper.get_all()
 properties = PropertyMapper.get_all()
@@ -111,6 +112,7 @@ def before_request():
     openatlas.debug_model['by id'] = 0
     openatlas.debug_model['by ids'] = 0
     openatlas.debug_model['linked'] = 0
+    openatlas.debug_model['user'] = 0
 
 app.add_template_global(app.debug, 'debug')
 app.add_template_global(debug_model, 'debug_model')

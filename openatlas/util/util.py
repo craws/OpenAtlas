@@ -1,6 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
 from flask import url_for
 from markupsafe import Markup
+from datetime import datetime
 
 from openatlas.models.classObject import ClassObject
 from openatlas.models.entity import Entity
@@ -11,6 +12,15 @@ def uc_first(string):
     if not string:
         return ''
     return str(string)[0].upper() + str(string)[1:]
+
+
+def format_date(value, formatstring='%Y-%m-%d'):
+    if not value:
+        return 'Never'
+    try:
+        return datetime.strftime(value, formatstring)
+    except:
+        return "Invalid date: {} for format:{}".format(value, formatstring)
 
 
 def link(entity):
