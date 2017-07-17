@@ -1,0 +1,7 @@
+{% extends 'layout.html' %}
+{% block breadcrumb %}
+     <a href="{{ url_for('user_index') }}">{{ _('user')|uc_first }}</a> > + {{ _('user')|uc_first }}
+{% endblock %}
+{% block content %}
+     {% include 'user/form.html' %}
+{% endblock %}
