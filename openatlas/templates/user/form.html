@@ -5,8 +5,8 @@
 ] %}
 {% if not user %}
     {% set data = data + [
-        {form.password.label|string + ' *': form.password},
-        {form.password2.label|string + ' *': form.password2}
+        {form.password.label|string + ' *': form.password(class_="required")},
+        {form.password2.label|string + ' *': form.password2(class_="required")}
     ] %}
 {% endif %}
 {% set data = data + [

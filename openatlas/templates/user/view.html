@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('user_index') }}">{{ _('user')|uc_first }}</a> > {{ user.username }}
+{% endblock %}
+{% block content %}
+    <div class="button-bar">
+        <a class="button" href="{{ url_for('user_update', user_id=user.id) }}">{{ _('edit')|uc_first }}</a>
+        <a class="button"
+           onclick="return confirm('{{_('delete')|uc_first }} {{ user.username }}?')"
+           href="{{ url_for('user_delete', user_id=user.id) }}">{{ _('delete')|uc_first }}</a>
+    </div>
+    {% set data = [
+        {_('username'): user.username},
+        {_('group'): 'To do'},
+        {_('name'): user.name},
+        {_('email'): user.email},
+        {_('language'): 'To do'},
+        {_('last login'): 'To do'},
+        {_('failed logins'): 'To do'},
+    ] %}
+    {{ data|data_table|safe }}
+    {{ user|description }}
+{% endblock %}
