@@ -24,6 +24,10 @@ class User(object):
         self.created = row.created
         self.modified = row.modified
 
+    def update(self):
+        UserMapper.update(self)
+        return
+
 
 class UserMapper(object):
     sql = '''
@@ -53,16 +57,31 @@ class UserMapper(object):
     def insert(form):
         cursor = openatlas.get_cursor()
         sql = '''INSERT INTO web.user (username, real_name, info, email, active, password, group_id) VALUES
-            (%(username)s, %(name)s, %(info)s, %(email)s, %(active)s, %(password)s, %(group_id)s) RETURNING id;'''
+            (%(username)s, %(real_name)s, %(info)s, %(email)s, %(active)s, %(password)s, %(group_id)s) RETURNING id;'''
         cursor.execute(sql, {
             'username': form.username.data,
-            'name': form.name.data,
+            'real_name': form.real_name.data,
             'info': form.description.data,
             'email': form.email.data,
             'active': form.active.data,
             'group_id': 1,
             'password': bcrypt.hashpw(form.password.data, bcrypt.gensalt(12))})
         return cursor.fetchone()[0]
+
+    @staticmethod
+    def update(user):
+        cursor = openatlas.get_cursor()
+        sql = '''UPDATE web.user SET (username, real_name, info, email, active, group_id) =
+            (%(username)s, %(real_name)s, %(info)s, %(email)s, %(active)s, %(group_id)s) WHERE id = %(id)s;'''
+        cursor.execute(sql, {
+            'id': user.id,
+            'username': user.username,
+            'real_name': user.real_name,
+            'info': user.description,
+            'email': user.email,
+            'active': user.active,
+            'group_id': 1})
+        return
 
     @staticmethod
     def delete(user_id):

@@ -6,6 +6,7 @@ from datetime import datetime
 from openatlas.models.classObject import ClassObject
 from openatlas.models.entity import Entity
 from openatlas.models.property import Property
+from openatlas.models.user import User
 
 
 def uc_first(string):
@@ -26,6 +27,8 @@ def format_date(value, formatstring='%Y-%m-%d'):
 def link(entity):
     if not entity:
         return ''
+    if isinstance(entity, User):
+        return Markup('<a href="' + url_for('user_view', user_id=entity.id) + '">' + entity.username + '</a>')
     if isinstance(entity, ClassObject):
         return Markup('<a href="' + url_for('class_view', class_id=entity.id) + '">' + entity.code + '</a>')
     elif isinstance(entity, Property):

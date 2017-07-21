@@ -42,7 +42,7 @@
     CREATE TRIGGER update_modified BEFORE UPDATE ON i18n FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
     UPDATE model.entity SET name = 'Sex', description = 'Categories for sex like female, male.' WHERE name = 'Gender';
     UPDATE web.hierarchy SET name = 'Sex' WHERE name = 'Gender';
-    ALTER TABLE "web"."user" ALTER COLUMN "active" DROP DEFAULT;
-    ALTER TABLE "web"."user" ALTER COLUMN "active" TYPE bool USING active::bool;
-    ALTER TABLE "web"."user" ALTER COLUMN "active" SET DEFAULT FALSE;
+    ALTER TABLE web."user" ALTER COLUMN "active" DROP DEFAULT;
+    ALTER TABLE web."user" ALTER COLUMN "active" TYPE bool USING active::bool;
+    ALTER TABLE web."user" ALTER COLUMN "active" SET DEFAULT FALSE;
     COMMIT;
