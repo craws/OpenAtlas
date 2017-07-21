@@ -28,13 +28,15 @@ def link(entity):
     if not entity:
         return ''
     if isinstance(entity, User):
-        return Markup('<a href="' + url_for('user_view', user_id=entity.id) + '">' + entity.username + '</a>')
+        style = '' if entity.active else 'class="inactive"'
+        html = '<a ' + style + ' href="' + url_for('user_view', user_id=entity.id) + '">' + entity.username + '</a>'
+        return Markup(html)
     if isinstance(entity, ClassObject):
         return Markup('<a href="' + url_for('class_view', class_id=entity.id) + '">' + entity.code + '</a>')
     elif isinstance(entity, Property):
         return Markup('<a href="' + url_for('property_view', property_id=entity.id) + '">' + entity.code + '</a>')
     elif isinstance(entity, Entity):
-        # To do: what if translation or the like?
+        # To do: what if E33 is a translation  or the like?
         if entity.class_.code == 'E33':
             return Markup('<a href="' + url_for('source_view', source_id=entity.id) + '">' + entity.name + '</a>')
         if entity.class_.code in ('E7', 'E8', 'E12', 'E6'):

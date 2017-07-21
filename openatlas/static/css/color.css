@@ -10,6 +10,11 @@ div.tabs-container .ui-state-active a {
     color: #000000;
 }
 
+.inactive,
+.inactive a {
+    color: #666666;
+}
+
 #menu div a,
 #breadcrumb a,
 #header-menu span,

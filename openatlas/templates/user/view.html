@@ -10,7 +10,7 @@
            href="{{ url_for('user_delete', user_id=user.id) }}">{{ _('delete')|uc_first }}</a>
     </div>
     {% set data = [
-        {_('username'): user.username},
+        {_('username'): user|link},
         {_('group'): 'To do'},
         {_('name'): user.name},
         {_('email'): user.email},

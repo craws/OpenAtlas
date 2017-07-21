@@ -6,13 +6,13 @@ from werkzeug.utils import redirect
 from wtforms import StringField, TextAreaField, HiddenField, PasswordField, BooleanField
 from wtforms.validators import InputRequired, Email
 
-import openatlas
 from openatlas import app
 from openatlas.util.util import uc_first, format_date, link
-from openatlas.models.user import UserMapper
+from openatlas.models.user import UserMapper, User
 
 
 class UserForm(Form):
+    user_id = None
     active = BooleanField(uc_first(_('active')))
     username = StringField(uc_first(_('username')), validators=[InputRequired()])
     password = PasswordField(uc_first(_('password')), validators=[InputRequired()])
@@ -22,6 +22,33 @@ class UserForm(Form):
     email = StringField(uc_first(_('email')), validators=[InputRequired(), Email()])
     send_info = BooleanField(_('send account information'))
     continue_ = HiddenField()
+
+    def validate(self, extra_validators=None):
+        valid = Form.validate(self)
+        user = UserMapper.get_by_id(self.user_id) if self.user_id else User()
+        if user.username != self.username.data and UserMapper.get_by_attribute('username', self.username.data):
+            self.username.errors.append(str(_('error username exists')))
+            valid = False
+        if user.email != self.email.data and UserMapper.get_by_attribute('email', self.email.data):
+            self.email.errors.append(str(_('error email exists')))
+            valid = False
+
+        password = getattr(self, 'password', None)
+        if password:
+            if password.data != self.password2.data:
+                password.errors.append(str(_('error passwords must match')))
+                form_validity = False
+            # if len(password.data) < app.config['PASSWORD_MINIMUM_LENGTH']:
+            #     password.errors.append(str(_('error password length')))
+            #    form_validity = False
+            # if app.config['PASSWORD_REQUIRE_CHARACTER_MIX']:
+            #    lowercase_letters = sum(1 for c in password.data if c.islower())
+            #    uppercase_letters = sum(1 for c in password.data if c.isupper())
+            #    digits = sum(1 for c in password.data if c.isdigit())
+            #    if lowercase_letters < 1 or uppercase_letters < 1 or digits < 1:
+            #        password.errors.append(str(_('error password complexity')))
+            #        form_validity = False
+        return valid
 
 
 @app.route('/user/view/<int:user_id>')
@@ -53,6 +80,7 @@ def user_index():
 def user_update(user_id):
     user = UserMapper.get_by_id(user_id)
     form = UserForm()
+    form.user_id = user_id
     del form.password
     del form.password2
     del form.send_info
@@ -79,7 +107,7 @@ def user_insert():
     form.active.data = True
     if form.validate_on_submit():
         user_id = UserMapper.insert(form)
-        flash(gettext('user created'), 'success')
+        flash(gettext('user created'), 'info')
         return redirect(url_for('user_view', user_id=user_id))
     return render_template('user/insert.html', form=form)
 
@@ -87,5 +115,5 @@ def user_insert():
 @app.route('/admin/user/delete/<int:user_id>')
 def user_delete(user_id):
     UserMapper.delete(user_id)
-    flash(_('user deleted'), 'success')
+    flash(gettext('user deleted'), 'info')
     return redirect(url_for('user_index'))

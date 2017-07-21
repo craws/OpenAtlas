@@ -54,6 +54,22 @@ class UserMapper(object):
         return User(cursor.fetchone())
 
     @staticmethod
+    def get_by_email(email):
+        cursor = openatlas.get_cursor()
+        cursor.execute(UserMapper.sql + ' WHERE u.email = %(email)s;', {'email': email})
+        if cursor.rowcount == 1:
+            return User(cursor.fetchone())
+        return False
+
+    @staticmethod
+    def get_by_username(username):
+        cursor = openatlas.get_cursor()
+        cursor.execute(UserMapper.sql + ' WHERE u.username = %(username)s;', {'username': username})
+        if cursor.rowcount == 1:
+            return User(cursor.fetchone())
+        return False
+
+    @staticmethod
     def insert(form):
         cursor = openatlas.get_cursor()
         sql = '''INSERT INTO web.user (username, real_name, info, email, active, password, group_id) VALUES
