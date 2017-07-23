@@ -16,7 +16,7 @@
         ] %}
         {{ data|data_table }}
     </div>
-    {% for name, table in tables.iteritems() %}
+    {% for name, table in tables.items() %}
         {% if table['data']|length > 0 %}
             <div style="float:left;padding-right:2em;">
                 <p><strong>{{ name|uc_first }}</strong></p>

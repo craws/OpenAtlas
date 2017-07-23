@@ -50,10 +50,9 @@ def link(entity):
     return Markup(entity.name + ' (' + entity.class_.name + ')')
 
 
-def truncate_string(string, length=40, encoding='utf-8'):
+def truncate_string(string, length=40):
     if string is None:
         return ''  # pragma: no cover
-    string = string.encode(encoding)
     title = string.replace('"', '')
     string = '<span title="' + title + '">' + string[:length] + '..</span>' if len(string) > length + 2 else string
-    return string.decode(encoding, 'ignore')
+    return string

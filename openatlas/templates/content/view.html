@@ -6,7 +6,7 @@
     <div class="button-bar">
         <a href="{{ url_for('content_update', item=item) }}">{{ _('edit')|uc_first }}</a>
     </div>
-    {% for language, text in content[item].iteritems() %}
+    {% for language, text in content[item].items() %}
         <p class="inverse-heading">{{ language|upper }}</p>
         <div class="text-preview">{{ text|safe }}</div>
     {% endfor %}

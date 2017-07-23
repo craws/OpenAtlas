@@ -24,7 +24,7 @@ def content_index():
         'header': header,
         'hide_pager': True,
         'data': []}
-    for item, languages in ContentMapper.get_content().iteritems():
+    for item, languages in ContentMapper.get_content().items():
         content = ['<a href="/content/view/' + item + '">' + util.uc_first(item) + '</a>']
         html_ok = '<img src="/images/icons/dialog-apply.png" alt="ok" \>'
         for language in openatlas.app.config['LANGUAGES'].keys():

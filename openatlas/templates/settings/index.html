@@ -12,10 +12,10 @@
                 <li><a href="#tab-{{ group }}">{{ group|uc_first }}</a></li>
             {% endfor %}
         </ul>
-        {% for group, items in groups.iteritems(): %}
+        {% for group, items in groups.items(): %}
             <div id="tab-{{ group }}">
                 <div class="data-table">
-                    {% for name, value in items.iteritems() %}
+                    {% for name, value in items.items() %}
                         {% set style = 'class ="faded"' if 'mail' in name and settings['mail'] else '' %}
                         <div {{ style }}><div>{{ name|uc_first }}</div><div>{{ value }}</div></div>
                     {% endfor %}

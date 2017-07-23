@@ -19,14 +19,14 @@ class LinkCheckForm(Form):
 def model_index():
     form = LinkCheckForm()
     form_classes = OrderedDict()
-    for id_, class_ in openatlas.classes.iteritems():
+    for id_, class_ in openatlas.classes.items():
         form_classes[id_] = class_.code + ' ' + class_.name
-    form.domain.choices = form_classes.iteritems()
-    form.range.choices = form_classes.iteritems()
+    form.domain.choices = form_classes.items()
+    form.range.choices = form_classes.items()
     form_properties = OrderedDict()
-    for id_, property_ in openatlas.properties.iteritems():
+    for id_, property_ in openatlas.properties.items():
         form_properties[id_] = property_.code + ' ' + property_.name
-    form.property.choices = form_properties.iteritems()
+    form.property.choices = form_properties.items()
     test_result = None
     if form.validate_on_submit():
         domain = openatlas.classes[int(form.domain.data)]
@@ -66,7 +66,7 @@ def class_index():
         'data': [],
         'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'
     }
-    for class_id, class_ in openatlas.classes.iteritems():
+    for class_id, class_ in openatlas.classes.items():
         table['data'].append([
             link(class_),
             class_.name
@@ -85,7 +85,7 @@ def property_index():
         'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }, 3: { sorter: "class_code" }, '
                 '5: { sorter: "class_code" }}'
     }
-    for property_id, property_ in properties.iteritems():
+    for property_id, property_ in properties.items():
         table['data'].append([
             link(property_),
             property_.name,
@@ -124,7 +124,7 @@ def class_view(class_id):
             'data': [],
             'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'
     }
-    for id_, property_ in properties.iteritems():
+    for id_, property_ in properties.items():
         if class_id == property_.domain_id:
             tables['domains']['data'].append([link(properties[id_]), properties[id_].name])
         elif class_id == property_.range_id:

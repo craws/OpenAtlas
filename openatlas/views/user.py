@@ -26,10 +26,10 @@ class UserForm(Form):
     def validate(self, extra_validators=None):
         valid = Form.validate(self)
         user = UserMapper.get_by_id(self.user_id) if self.user_id else User()
-        if user.username != self.username.data and UserMapper.get_by_attribute('username', self.username.data):
+        if user.username != self.username.data and UserMapper.get_by_username(self.username.data):
             self.username.errors.append(str(_('error username exists')))
             valid = False
-        if user.email != self.email.data and UserMapper.get_by_attribute('email', self.email.data):
+        if user.email != self.email.data and UserMapper.get_by_email(self.email.data):
             self.email.errors.append(str(_('error email exists')))
             valid = False
 

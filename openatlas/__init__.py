@@ -1,9 +1,8 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
-import ConfigParser
+import configparser
 import locale
 import psycopg2.extras
 import os
-import sys
 import time
 from collections import OrderedDict
 
@@ -16,9 +15,6 @@ from openatlas.models.classObject import ClassMapper
 from openatlas.models.settings import SettingsMapper
 from openatlas.util import filters
 
-reload(sys)
-sys.setdefaultencoding('utf8')
-
 app = Flask(
     __name__,
     static_url_path='',
@@ -28,8 +24,8 @@ app = Flask(
 settings = []
 
 def connect(config_name='production'):
-    config = ConfigParser.ConfigParser()
-    config.readfp(open(os.path.dirname(__file__) + '/db.conf'))
+    config = configparser.ConfigParser()
+    config.read_file(open(os.path.dirname(__file__) + '/db.conf'))
     db_name = config.get(config_name, 'database_name')
     db_user = config.get(config_name, 'database_user')
     db_port = config.get(config_name, 'database_port')

@@ -5,7 +5,12 @@ import openatlas
 
 
 class User(object):
-    def __init__(self, row):
+    def __init__(self, row=None):
+        self.id = None
+        self.username = None
+        self.email = None
+        if not row:
+            return
         self.id = row.id
         self.active = True if row.active == 1 else False
         self.username = row.username
@@ -81,7 +86,7 @@ class UserMapper(object):
             'email': form.email.data,
             'active': form.active.data,
             'group_id': 1,
-            'password': bcrypt.hashpw(form.password.data, bcrypt.gensalt(12))})
+            'password': bcrypt.hashpw(form.password.data.encode('utf-8'), bcrypt.gensalt(12))})
         return cursor.fetchone()[0]
 
     @staticmethod

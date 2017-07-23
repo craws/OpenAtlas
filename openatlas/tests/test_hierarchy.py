@@ -6,4 +6,4 @@ class HierachyTest(TestBaseCase):
 
     def test_hierarchy(self):
         rv = self.app.get('/hierarchy')
-        #assert 'Overview' in rv.data
+        #assert b'Overview' in rv.data

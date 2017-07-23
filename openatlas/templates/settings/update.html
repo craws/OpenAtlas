@@ -47,7 +47,7 @@
         <div id="tab-authentication">{{ data_authentication|data_table }}</div>
     </div>
 </form>
-{% for field, errors in form.errors.iteritems() %}
+{% for field, errors in form.errors.items() %}
     {{ form[field].label }}: {{ ', '.join(errors) }}
 {% endfor %}
 {% endblock %}

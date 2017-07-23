@@ -6,19 +6,19 @@ class SourceTest(TestBaseCase):
 
     def test_source(self):
         rv = self.app.get('/source/insert/E33')
-        assert '+ Source' in rv.data
+        assert b'+ Source' in rv.data
         form_data = {'name': 'Test source'}
         rv = self.app.post('/source/insert/E18', data=form_data)
         source_id = rv.location.split('/')[-1]
         form_data['continue_'] = 'yes'
         rv = self.app.post('/source/insert/E33', data=form_data, follow_redirects=True)
-        assert 'Entity created' in rv.data
+        assert b'Entity created' in rv.data
         rv = self.app.get('/source')
-        assert 'Test source' in rv.data
+        assert b'Test source' in rv.data
         rv = self.app.get('/source/update/' + source_id)
-        assert 'Test source' in rv.data
+        assert b'Test source' in rv.data
         form_data['name'] = 'Test source updated'
         rv = self.app.post('/source/update/' + source_id, data=form_data, follow_redirects=True)
-        assert 'Test source updated' in rv.data
+        assert b'Test source updated' in rv.data
         rv = self.app.get('/source/delete/' + source_id, follow_redirects=True)
-        assert 'Entity deleted' in rv.data
+        assert b'Entity deleted' in rv.data

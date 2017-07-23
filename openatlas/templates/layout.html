@@ -86,7 +86,7 @@
             {% if debug %}
                 <div class="data-table" style="float:right;margin:1em;">
                     <p>Debug</p>
-                    {% for name, value in debug_model.iteritems() %}
+                    {% for name, value in debug_model.items() %}
                         {% if name in ['by codes', 'by id', 'by ids', 'linked', 'user'] %}
                             <div>
                                 <div>{{ name }}</div>

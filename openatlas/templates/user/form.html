@@ -12,7 +12,7 @@
 {% set data = data + [
     {form.real_name.label: form.real_name},
 ] %}
-{% for field, errors in form.errors.iteritems() %}
+{% for field, errors in form.errors.items() %}
     {{ form[field].label }}: <span class="error">{{ ', '.join(errors) }}</span>
 {% endfor %}
 <form method="post" id="user-form">

@@ -26,6 +26,6 @@ class SettingsMapper(object):
         sql = 'UPDATE web.settings SET "value" = %(value)s WHERE "name" = %(name)s;'
         for field in SettingsMapper.fields:
             session['settings'][field] = getattr(form, field).data
-        for name, value in session['settings'].iteritems():
+        for name, value in session['settings'].items():
             cursor = openatlas.get_cursor()
             cursor.execute(sql, {'value': value, 'name': name})
