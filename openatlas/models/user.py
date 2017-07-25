@@ -1,6 +1,5 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
 import bcrypt
-
 import openatlas
 
 
@@ -78,14 +77,16 @@ class UserMapper(object):
     def insert(form):
         cursor = openatlas.get_cursor()
         sql = '''INSERT INTO web.user (username, real_name, info, email, active, password, group_id) VALUES
-            (%(username)s, %(real_name)s, %(info)s, %(email)s, %(active)s, %(password)s, %(group_id)s) RETURNING id;'''
+            (%(username)s, %(real_name)s, %(info)s, %(email)s, %(active)s, %(password)s,
+                (SELECT id FROM web.group WHERE name LIKE %(group_name)s))
+            RETURNING id;'''
         cursor.execute(sql, {
             'username': form.username.data,
             'real_name': form.real_name.data,
             'info': form.description.data,
             'email': form.email.data,
             'active': form.active.data,
-            'group_id': 1,
+            'group_name': form.group.data,
             'password': bcrypt.hashpw(form.password.data.encode('utf-8'), bcrypt.gensalt(12))})
         return cursor.fetchone()[0]
 
@@ -108,3 +109,13 @@ class UserMapper(object):
     def delete(user_id):
         sql = 'DELETE FROM web."user" WHERE id = %(user_id)s;'
         openatlas.get_cursor().execute(sql, {'user_id': user_id})
+
+    @staticmethod
+    def get_groups():
+        cursor = openatlas.get_cursor()
+        sql = 'SELECT name FROM web.group ORDER BY name;'
+        cursor.execute(sql)
+        groups = []
+        for row in cursor.fetchall():
+            groups.append((row.name, row.name))
+        return groups

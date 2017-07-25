@@ -1,6 +1,7 @@
 {% set data = [
     {form.active.label: form.active},
     {form.username.label|string + ' *': form.username(class_="required")},
+    {form.group.label: form.group},
     {form.email.label|string + ' *': form.email(class_="required")},
 ] %}
 {% if not user %}

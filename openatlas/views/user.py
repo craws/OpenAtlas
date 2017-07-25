@@ -3,7 +3,7 @@ from flask_babel import gettext, lazy_gettext as _
 from flask import render_template, flash, url_for
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import StringField, TextAreaField, HiddenField, PasswordField, BooleanField
+from wtforms import StringField, TextAreaField, HiddenField, PasswordField, BooleanField, SelectField
 from wtforms.validators import InputRequired, Email
 
 from openatlas import app
@@ -13,7 +13,7 @@ from openatlas.models.user import UserMapper, User
 
 class UserForm(Form):
     user_id = None
-    active = BooleanField(uc_first(_('active')))
+    active = BooleanField(uc_first(_('active')), default=True)
     username = StringField(uc_first(_('username')), validators=[InputRequired()])
     password = PasswordField(uc_first(_('password')), validators=[InputRequired()])
     password2 = PasswordField(uc_first(_('repeat password')), validators=[InputRequired()])
@@ -21,6 +21,7 @@ class UserForm(Form):
     real_name = StringField(uc_first(_('name')))
     email = StringField(uc_first(_('email')), validators=[InputRequired(), Email()])
     send_info = BooleanField(_('send account information'))
+    group = SelectField(uc_first(_('group')), choices=UserMapper.get_groups(), default='readonly')
     continue_ = HiddenField()
 
     def validate(self, extra_validators=None):
@@ -37,7 +38,7 @@ class UserForm(Form):
         if password:
             if password.data != self.password2.data:
                 password.errors.append(str(_('error passwords must match')))
-                form_validity = False
+                valid = False
             # if len(password.data) < app.config['PASSWORD_MINIMUM_LENGTH']:
             #     password.errors.append(str(_('error password length')))
             #    form_validity = False
@@ -90,6 +91,7 @@ def user_update(user_id):
         user.username = form.username.data
         user.email = form.email.data
         user.description = form.description.data
+        user.group = form.group.data
         user.update()
         flash(gettext('user updated'), 'info')
         return redirect(url_for('user_view', user_id=user_id))
@@ -104,10 +106,11 @@ def user_update(user_id):
 @app.route('/user/insert', methods=['POST', 'GET'])
 def user_insert():
     form = UserForm()
-    form.active.data = True
     if form.validate_on_submit():
         user_id = UserMapper.insert(form)
         flash(gettext('user created'), 'info')
+        if form.continue_.data == 'yes':
+            return redirect(url_for('user_insert'))
         return redirect(url_for('user_view', user_id=user_id))
     return render_template('user/insert.html', form=form)
 

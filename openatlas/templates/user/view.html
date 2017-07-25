@@ -11,7 +11,7 @@
     </div>
     {% set data = [
         {_('username'): user|link},
-        {_('group'): 'To do'},
+        {_('group'): user.group},
         {_('name'): user.name},
         {_('email'): user.email},
         {_('language'): 'To do'},

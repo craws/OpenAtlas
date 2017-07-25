@@ -66,6 +66,7 @@ table.tablesorter tfoot tr th {
 #header,
 .info,
 select,
+input[type="text"],
 .ui-tabs .ui-tabs-panel,
 .ui-widget-content .ui-state-active,
 .ui-widget-header .ui-state-active,
