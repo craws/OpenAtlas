@@ -1,9 +1,10 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
 import bcrypt
+from flask_login import UserMixin
 import openatlas
 
 
-class User(object):
+class User(UserMixin):
     def __init__(self, row=None):
         self.id = None
         self.username = None
@@ -87,7 +88,8 @@ class UserMapper(object):
             'email': form.email.data,
             'active': form.active.data,
             'group_name': form.group.data,
-            'password': bcrypt.hashpw(form.password.data.encode('utf-8'), bcrypt.gensalt(12))})
+            'password': bcrypt.hashpw(form.password.data.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        })
         return cursor.fetchone()[0]
 
     @staticmethod
