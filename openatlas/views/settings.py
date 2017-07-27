@@ -1,5 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
 from collections import OrderedDict
+
 from flask import flash, render_template, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
@@ -9,7 +10,7 @@ from wtforms import StringField, BooleanField, SelectField
 import openatlas
 from openatlas import SettingsMapper
 from openatlas import app
-from openatlas.util.util import uc_first
+from openatlas.util.util import uc_first, required_group
 
 
 class SettingsForm(Form):
@@ -43,6 +44,7 @@ class SettingsForm(Form):
 
 
 @app.route('/settings')
+@required_group('admin')
 def settings_index():
     settings = session['settings']
     groups = OrderedDict([
@@ -78,6 +80,7 @@ def settings_index():
 
 
 @app.route('/settings/update', methods=["GET", "POST"])
+@required_group('admin')
 def settings_update():
     form = SettingsForm()
     getattr(form, 'default_language').choices = openatlas.app.config['LANGUAGES'].items()

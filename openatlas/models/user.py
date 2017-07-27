@@ -77,8 +77,9 @@ class UserMapper(object):
     @staticmethod
     def insert(form):
         cursor = openatlas.get_cursor()
-        sql = '''INSERT INTO web.user (username, real_name, info, email, active, password, group_id) VALUES
-            (%(username)s, %(real_name)s, %(info)s, %(email)s, %(active)s, %(password)s,
+        sql = '''
+            INSERT INTO web.user (username, real_name, info, email, active, password, group_id) VALUES
+                (%(username)s, %(real_name)s, %(info)s, %(email)s, %(active)s, %(password)s,
                 (SELECT id FROM web.group WHERE name LIKE %(group_name)s))
             RETURNING id;'''
         cursor.execute(sql, {
@@ -95,8 +96,11 @@ class UserMapper(object):
     @staticmethod
     def update(user):
         cursor = openatlas.get_cursor()
-        sql = '''UPDATE web.user SET (username, real_name, info, email, active, group_id) =
-            (%(username)s, %(real_name)s, %(info)s, %(email)s, %(active)s, %(group_id)s) WHERE id = %(id)s;'''
+        sql = '''
+            UPDATE web.user SET (username, real_name, info, email, active, group_id) =
+                (%(username)s, %(real_name)s, %(info)s, %(email)s, %(active)s,
+                (SELECT id FROM web.group WHERE name LIKE %(group_name)s))
+            WHERE id = %(id)s;'''
         cursor.execute(sql, {
             'id': user.id,
             'username': user.username,
@@ -104,7 +108,7 @@ class UserMapper(object):
             'info': user.description,
             'email': user.email,
             'active': user.active,
-            'group_id': 1})
+            'group_name': user.group})
         return
 
     @staticmethod

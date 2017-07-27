@@ -8,12 +8,15 @@ from openatlas.util import util
 from werkzeug.utils import redirect
 from wtforms import TextAreaField
 
+from openatlas.util.util import required_group
+
 
 class ContentForm(Form):
     pass
 
 
 @app.route('/content')
+@required_group('manager')
 def content_index():
     header = ['name']
     for language in openatlas.app.config['LANGUAGES'].keys():
@@ -35,11 +38,13 @@ def content_index():
 
 
 @app.route('/content/view/<string:item>')
+@required_group('manager')
 def content_view(item):
     return render_template('content/view.html', item=item, content=ContentMapper.get_content())
 
 
 @app.route('/content/update/<string:item>', methods=["GET", "POST"])
+@required_group('manager')
 def content_update(item):
     languages = openatlas.app.config['LANGUAGES'].keys()
     for language in languages:

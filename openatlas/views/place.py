@@ -9,7 +9,7 @@ from wtforms.validators import InputRequired
 import openatlas
 from openatlas import app
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import uc_first, link, truncate_string
+from openatlas.util.util import uc_first, link, truncate_string, required_group
 
 
 class PlaceForm(Form):
@@ -19,6 +19,7 @@ class PlaceForm(Form):
 
 
 @app.route('/place')
+@required_group('readonly')
 def place_index():
     tables = {'place': {
         'name': 'place',
@@ -34,6 +35,7 @@ def place_index():
 
 
 @app.route('/place/insert/<code>', methods=['POST', 'GET'])
+@required_group('editor')
 def place_insert(code):
     form = PlaceForm()
     if form.validate_on_submit():
@@ -46,12 +48,14 @@ def place_insert(code):
 
 
 @app.route('/place/view/<int:place_id>')
+@required_group('readonly')
 def place_view(place_id):
     place = EntityMapper.get_by_id(place_id)
     return render_template('place/view.html', place=place)
 
 
 @app.route('/place/delete/<int:place_id>')
+@required_group('editor')
 def place_delete(place_id):
     openatlas.get_cursor().execute('BEGIN')
     EntityMapper.delete(place_id)
@@ -61,6 +65,7 @@ def place_delete(place_id):
 
 
 @app.route('/place/update/<int:place_id>', methods=['POST', 'GET'])
+@required_group('editor')
 def place_update(place_id):
     place = EntityMapper.get_by_id(place_id)
     form = PlaceForm()

@@ -9,7 +9,7 @@ from wtforms.validators import InputRequired
 import openatlas
 from openatlas import app
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import uc_first, link, truncate_string
+from openatlas.util.util import uc_first, link, truncate_string, required_group
 
 
 class ActorForm(Form):
@@ -19,12 +19,14 @@ class ActorForm(Form):
 
 
 @app.route('/actor/view/<int:actor_id>')
+@required_group('readonly')
 def actor_view(actor_id):
     actor = EntityMapper.get_by_id(actor_id)
     return render_template('actor/view.html', actor=actor)
 
 
 @app.route('/actor')
+@required_group('readonly')
 def actor_index():
     tables = {'actor': {
         'name': 'actor',
@@ -41,6 +43,7 @@ def actor_index():
 
 
 @app.route('/actor/insert/<code>', methods=['POST', 'GET'])
+@required_group('editor')
 def actor_insert(code):
     form = ActorForm()
     if form.validate_on_submit():
@@ -53,6 +56,7 @@ def actor_insert(code):
 
 
 @app.route('/actor/delete/<int:actor_id>')
+@required_group('editor')
 def actor_delete(actor_id):
     openatlas.get_cursor().execute('BEGIN')
     EntityMapper.delete(actor_id)
@@ -62,6 +66,7 @@ def actor_delete(actor_id):
 
 
 @app.route('/actor/update/<int:actor_id>', methods=['POST', 'GET'])
+@required_group('editor')
 def actor_update(actor_id):
     actor = EntityMapper.get_by_id(actor_id)
     form = ActorForm()

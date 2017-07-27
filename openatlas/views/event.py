@@ -9,7 +9,7 @@ from wtforms.validators import InputRequired
 import openatlas
 from openatlas import app
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import uc_first, link, truncate_string
+from openatlas.util.util import uc_first, link, truncate_string, required_group
 
 
 class EventForm(Form):
@@ -19,12 +19,14 @@ class EventForm(Form):
 
 
 @app.route('/event/view/<int:event_id>')
+@required_group('readonly')
 def event_view(event_id):
     event = EntityMapper.get_by_id(event_id)
     return render_template('event/view.html', event=event)
 
 
 @app.route('/event')
+@required_group('readonly')
 def event_index():
     tables = {'event': {
         'name': 'event',
@@ -40,6 +42,7 @@ def event_index():
 
 
 @app.route('/event/insert/<code>', methods=['POST', 'GET'])
+@required_group('editor')
 def event_insert(code):
     form = EventForm()
     if form.validate_on_submit() and form.name.data != openatlas.app.config['EVENT_ROOT_NAME']:
@@ -52,6 +55,7 @@ def event_insert(code):
 
 
 @app.route('/event/delete/<int:event_id>')
+@required_group('editor')
 def event_delete(event_id):
     if EntityMapper.get_by_id(event_id).name == openatlas.app.config['EVENT_ROOT_NAME']:
         flash(gettext('error forbidden'), 'error')
@@ -64,6 +68,7 @@ def event_delete(event_id):
 
 
 @app.route('/event/update/<int:event_id>', methods=['POST', 'GET'])
+@required_group('editor')
 def event_update(event_id):
     event = EntityMapper.get_by_id(event_id)
     form = EventForm()

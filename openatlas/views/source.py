@@ -9,7 +9,7 @@ from wtforms.validators import InputRequired
 import openatlas
 from openatlas import app
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import uc_first, link, truncate_string
+from openatlas.util.util import uc_first, link, truncate_string, required_group
 
 
 class SourceForm(Form):
@@ -19,6 +19,7 @@ class SourceForm(Form):
 
 
 @app.route('/source')
+@required_group('readonly')
 def source_index():
     tables = {'source': {
         'name': 'source',
@@ -34,6 +35,7 @@ def source_index():
 
 
 @app.route('/source/insert/<code>', methods=['POST', 'GET'])
+@required_group('editor')
 def source_insert(code):
     form = SourceForm()
     if form.validate_on_submit():
@@ -46,12 +48,14 @@ def source_insert(code):
 
 
 @app.route('/source/view/<int:source_id>')
+@required_group('readonly')
 def source_view(source_id):
     source = EntityMapper.get_by_id(source_id)
     return render_template('source/view.html', source=source)
 
 
 @app.route('/source/delete/<int:source_id>')
+@required_group('editor')
 def source_delete(source_id):
     openatlas.get_cursor().execute('BEGIN')
     EntityMapper.delete(source_id)
@@ -61,6 +65,7 @@ def source_delete(source_id):
 
 
 @app.route('/source/update/<int:source_id>', methods=['POST', 'GET'])
+@required_group('editor')
 def source_update(source_id):
     source = EntityMapper.get_by_id(source_id)
     form = SourceForm()

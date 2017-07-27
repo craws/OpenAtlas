@@ -7,7 +7,7 @@ from wtforms import StringField, TextAreaField, HiddenField, PasswordField, Bool
 from wtforms.validators import InputRequired, Email
 
 from openatlas import app
-from openatlas.util.util import uc_first, format_date, link
+from openatlas.util.util import uc_first, format_date, link, required_group
 from openatlas.models.user import UserMapper, User
 
 
@@ -53,12 +53,14 @@ class UserForm(Form):
 
 
 @app.route('/user/view/<int:user_id>')
+@required_group('manager')
 def user_view(user_id):
     user = UserMapper.get_by_id(user_id)
     return render_template('user/view.html', user=user)
 
 
 @app.route('/user')
+@required_group('manager')
 def user_index():
     tables = {'user': {
         'name': 'user',
@@ -78,6 +80,7 @@ def user_index():
 
 
 @app.route('/user/update/<int:user_id>', methods=['POST', 'GET'])
+@required_group('manager')
 def user_update(user_id):
     user = UserMapper.get_by_id(user_id)
     form = UserForm()
@@ -96,6 +99,7 @@ def user_update(user_id):
         flash(gettext('user updated'), 'info')
         return redirect(url_for('user_view', user_id=user_id))
     form.username.data = user.username
+    form.group.data = user.group
     form.real_name.data = user.real_name
     form.active.data = user.active
     form.email.data = user.email
@@ -104,6 +108,7 @@ def user_update(user_id):
 
 
 @app.route('/user/insert', methods=['POST', 'GET'])
+@required_group('manager')
 def user_insert():
     form = UserForm()
     if form.validate_on_submit():
@@ -116,6 +121,7 @@ def user_insert():
 
 
 @app.route('/admin/user/delete/<int:user_id>')
+@required_group('manager')
 def user_delete(user_id):
     UserMapper.delete(user_id)
     flash(gettext('user deleted'), 'info')

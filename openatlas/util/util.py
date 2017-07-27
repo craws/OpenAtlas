@@ -1,12 +1,43 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
-from flask import url_for
+from functools import wraps
+
+from flask import abort, url_for
+from flask_login import current_user
 from markupsafe import Markup
 from datetime import datetime
 
+from werkzeug.utils import redirect
 from openatlas.models.classObject import ClassObject
 from openatlas.models.entity import Entity
 from openatlas.models.property import Property
 from openatlas.models.user import User
+
+
+def required_group(group):
+    def wrapper(f):
+        @wraps(f)
+        def wrapped(*args, **kwargs):
+            if not current_user.is_authenticated:
+                return redirect(url_for('login'))
+            if not is_authorized(group):
+                abort(403)
+            return f(*args, **kwargs)
+        return wrapped
+    return wrapper
+
+
+def is_authorized(group):
+    if not current_user.is_authenticated:
+        return False
+    if group == 'admin' and current_user.group != 'admin':
+        return False
+    if group == 'manager' and current_user.group not in ['admin', 'manager']:
+        return False
+    if group == 'editor' and current_user.group not in ['admin', 'manager', 'editor']:
+        return False
+    if group == 'readonly' and current_user.group not in ['admin', 'manager', 'editor', 'readonly']:
+        return False
+    return True
 
 
 def uc_first(string):

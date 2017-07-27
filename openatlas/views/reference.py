@@ -9,7 +9,7 @@ from wtforms.validators import InputRequired
 import openatlas
 from openatlas import app
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import uc_first, link, truncate_string
+from openatlas.util.util import uc_first, link, truncate_string, required_group
 
 
 class ReferenceForm(Form):
@@ -19,12 +19,14 @@ class ReferenceForm(Form):
 
 
 @app.route('/reference/view/<int:reference_id>')
+@required_group('readonly')
 def reference_view(reference_id):
     reference = EntityMapper.get_by_id(reference_id)
     return render_template('reference/view.html', reference=reference)
 
 
 @app.route('/reference')
+@required_group('readonly')
 def reference_index():
     tables = {'reference': {
         'name': 'reference',
@@ -45,6 +47,7 @@ def reference_index():
 
 
 @app.route('/reference/insert/<code>', methods=['POST', 'GET'])
+@required_group('editor')
 def reference_insert(code):
     form = ReferenceForm()
     if form.validate_on_submit():
@@ -57,6 +60,7 @@ def reference_insert(code):
 
 
 @app.route('/reference/delete/<int:reference_id>')
+@required_group('editor')
 def reference_delete(reference_id):
     openatlas.get_cursor().execute('BEGIN')
     EntityMapper.delete(reference_id)
@@ -66,6 +70,7 @@ def reference_delete(reference_id):
 
 
 @app.route('/reference/update/<int:reference_id>', methods=['POST', 'GET'])
+@required_group('editor')
 def reference_update(reference_id):
     reference = EntityMapper.get_by_id(reference_id)
     form = ReferenceForm()
