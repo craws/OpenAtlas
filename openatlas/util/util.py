@@ -29,6 +29,8 @@ def required_group(group):
 def is_authorized(group):
     if not current_user.is_authenticated:
         return False
+    if group not in ['admin', 'manager', 'editor', 'readonly']:
+        return False
     if group == 'admin' and current_user.group != 'admin':
         return False
     if group == 'manager' and current_user.group not in ['admin', 'manager']:

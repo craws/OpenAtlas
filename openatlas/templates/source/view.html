@@ -8,11 +8,13 @@
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
     </ul>
     <div id="tab-info">
-        <div class="button-bar">
-            <a href="{{ url_for('source_update', source_id=source.id) }}">{{ _('edit')|uc_first }}</a>
-            <a onclick="return confirm('{{ _('delete')|uc_first }} {{ source.name.replace('\'', '') }}?')"
-               href="{{ url_for('source_delete', source_id=source.id) }}">{{ _('delete')|uc_first }}</a>
-        </div>
+        {% if 'editor'|is_authorized: %}
+            <div class="button-bar">
+                <a href="{{ url_for('source_update', source_id=source.id) }}">{{ _('edit')|uc_first }}</a>
+                <a onclick="return confirm('{{ _('delete')|uc_first }} {{ source.name.replace('\'', '') }}?')"
+                   href="{{ url_for('source_delete', source_id=source.id) }}">{{ _('delete')|uc_first }}</a>
+            </div>
+        {% endif %}
         <h1>{{ source.name }}</h1>
         {% set data = [
             {'name': source.name},

@@ -1,10 +1,12 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}{{ _('actor')|uc_first }}{% endblock %}
 {% block content %}
-    <div class="button-bar">
-        <a href="{{ url_for('actor_insert', code='E21') }}">+ {{ 'E21'|get_class_name }}</a>
-        <a href="{{ url_for('actor_insert', code='E74') }}">+ {{ 'E74'|get_class_name }}</a>
-        <a href="{{ url_for('actor_insert', code='E40') }}">+ {{ 'E40'|get_class_name }}</a>
-    </div>
+    {% if 'editor'|is_authorized: %}
+        <div class="button-bar">
+            <a href="{{ url_for('actor_insert', code='E21') }}">+ {{ 'E21'|get_class_name }}</a>
+            <a href="{{ url_for('actor_insert', code='E74') }}">+ {{ 'E74'|get_class_name }}</a>
+            <a href="{{ url_for('actor_insert', code='E40') }}">+ {{ 'E40'|get_class_name }}</a>
+        </div>
+    {% endif %}
     {{ tables['actor']|pager }}
 {% endblock %}

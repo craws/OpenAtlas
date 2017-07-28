@@ -9,7 +9,7 @@
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
     </ul>
     <div id="tab-info">
-        {% if actor.name != config['EVENT_ROOT_NAME'] %}
+        {% if 'editor'|is_authorized: %}
             <div class="button-bar">
                 <a href="{{ url_for('actor_update', actor_id=actor.id) }}">{{ _('edit')|uc_first }}</a>
                 <a onclick="return confirm('{{ _('delete')|uc_first }} {{ actor.name.replace('\'', '') }}?')"

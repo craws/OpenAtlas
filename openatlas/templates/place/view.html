@@ -9,11 +9,13 @@
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
     </ul>
     <div id="tab-info">
-        <div class="button-bar">
-            <a href="{{ url_for('place_update', place_id=place.id) }}">{{ _('edit')|uc_first }}</a>
-            <a onclick="return confirm('{{ _('delete')|uc_first }} {{ place.name.replace('\'', '') }}?')"
-               href="{{ url_for('place_delete', place_id=place.id) }}">{{ _('delete')|uc_first }}</a>
-        </div>
+        {% if 'editor'|is_authorized: %}
+            <div class="button-bar">
+                <a href="{{ url_for('place_update', place_id=place.id) }}">{{ _('edit')|uc_first }}</a>
+                <a onclick="return confirm('{{ _('delete')|uc_first }} {{ place.name.replace('\'', '') }}?')"
+                   href="{{ url_for('place_delete', place_id=place.id) }}">{{ _('delete')|uc_first }}</a>
+            </div>
+        {% endif %}
         <h1>{{ place.name }}</h1>
         {% set data = [
             {'name': place.name},
