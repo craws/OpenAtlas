@@ -1,5 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
 import bcrypt
+import datetime
+from flask import session
 from flask_login import UserMixin
 import openatlas
 
@@ -32,6 +34,15 @@ class User(UserMixin):
     def update(self):
         UserMapper.update(self)
         return
+
+    def login_attempts_exceeded(self):
+        if not self.login_last_failure or self.login_failed_count <= int(session['settings']['failed_login_tries']):
+            return False
+        last_failure_date = self.login_last_failure
+        last_failure_date += datetime.timedelta(minutes=int(session['settings']['failed_login_forget_minutes']))
+        if last_failure_date > datetime.datetime.now():
+            return True
+        return False
 
 
 class UserMapper(object):
@@ -97,8 +108,10 @@ class UserMapper(object):
     def update(user):
         cursor = openatlas.get_cursor()
         sql = '''
-            UPDATE web.user SET (username, real_name, info, email, active, group_id) =
+            UPDATE web.user SET (username, real_name, info, email, active,
+                login_last_success, login_last_failure, login_failed_count, group_id) =
                 (%(username)s, %(real_name)s, %(info)s, %(email)s, %(active)s,
+                %(login_last_success)s, %(login_last_failure)s, %(login_failed_count)s,
                 (SELECT id FROM web.group WHERE name LIKE %(group_name)s))
             WHERE id = %(id)s;'''
         cursor.execute(sql, {
@@ -108,7 +121,11 @@ class UserMapper(object):
             'info': user.description,
             'email': user.email,
             'active': user.active,
-            'group_name': user.group})
+            'group_name': user.group,
+            'login_last_success': user.login_last_success,
+            'login_last_failure': user.login_last_failure,
+            'login_failed_count': user.login_failed_count,
+        })
         return
 
     @staticmethod
