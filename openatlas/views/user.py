@@ -1,6 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
 from flask_babel import gettext, lazy_gettext as _
-from flask import render_template, flash, url_for
+from flask import abort, flash, render_template, url_for
+from flask_login import current_user
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import StringField, TextAreaField, HiddenField, PasswordField, BooleanField, SelectField
@@ -83,6 +84,8 @@ def user_index():
 @required_group('manager')
 def user_update(user_id):
     user = UserMapper.get_by_id(user_id)
+    if user.group == 'admin' and current_user.group != 'admin':
+        abort(403)
     form = UserForm()
     form.user_id = user_id
     del form.password
@@ -90,6 +93,8 @@ def user_update(user_id):
     del form.send_info
     if form.validate_on_submit():
         user.active = form.active.data
+        if user.id == current_user.id:  # don't allow setting oneself as inactive
+            user.active = True
         user.real_name = form.real_name.data
         user.username = form.username.data
         user.email = form.email.data
@@ -123,6 +128,10 @@ def user_insert():
 @app.route('/admin/user/delete/<int:user_id>')
 @required_group('manager')
 def user_delete(user_id):
+    user = UserMapper.get_by_id(user_id)
+    if (user.group == 'admin' and current_user.group != 'admin') and user.id != current_user.id:
+        flash(gettext('error user deleted'), 'info')
+        return redirect(url_for('user_index'))
     UserMapper.delete(user_id)
     flash(gettext('user deleted'), 'info')
     return redirect(url_for('user_index'))

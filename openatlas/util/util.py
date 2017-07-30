@@ -27,7 +27,7 @@ def required_group(group):
 
 
 def is_authorized(group):
-    if not current_user.is_authenticated:
+    if not current_user.is_authenticated or not hasattr(current_user, 'group'):
         return False
     if group not in ['admin', 'manager', 'editor', 'readonly']:
         return False
@@ -53,8 +53,8 @@ def format_date(value, formatstring='%Y-%m-%d'):
         return 'Never'
     try:
         return datetime.strftime(value, formatstring)
-    except:
-        return "Invalid date: {} for format:{}".format(value, formatstring)
+    except ValueError:
+        return 'Invalid date: ' + value + ' for format: ' + formatstring
 
 
 def link(entity):

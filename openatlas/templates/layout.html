@@ -61,6 +61,11 @@
                         <a href="{{ url_for('settings_index') }}">{{ _('settings')|uc_first }}</a> |
                     {% endif  %}
                 </div>
+                {% if current_user.is_authenticated %}
+                    <div>
+                        {{ _('hello')|uc_first }} {{ current_user.username }}
+                    </div>
+                {% endif %}
                 <div id="language-menu">
                     <img class="zoom" src="/images/icons/zoom-in.png" title="{{ _('zoom in') }}"
                         onclick="resizeText(1)" alt="{{ _('zoom in') }}" />
