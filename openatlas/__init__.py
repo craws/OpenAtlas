@@ -23,6 +23,7 @@ app = Flask(
 
 settings = []
 
+
 def connect(config_name='production'):
     config = configparser.ConfigParser()
     config.read_file(open(os.path.dirname(__file__) + '/db.conf'))
@@ -54,8 +55,8 @@ app.config.from_object('config.default')  # load config/default.py
 app.config.from_pyfile('config.py')  # load instance/config.py
 locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 
-from openatlas.views import content, index, settings, model, source, event, actor, place, reference, hierarchy, user, \
-    login
+from openatlas.views import actor, ajax, content, index, settings, model, source, event, place, reference, hierarchy, \
+    user, login
 
 babel = Babel(app)
 app.register_blueprint(filters.blueprint)

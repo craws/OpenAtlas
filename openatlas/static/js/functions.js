@@ -69,7 +69,18 @@ function createOverlay(name, multiple = false, type = 'table') {
                 $('#' + name + '-overlay').css('display', 'none');
             }
         });
-        $("#" + name + "-table").trigger('applyWidgets');
+        $('#' + name + '-table').trigger('applyWidgets');
         $('#' + name + '-search').focus();
+    });
+}
+
+function ajaxBookmark(entityId) {
+    $.ajax({
+        type: 'POST',
+        url: '/ajax/bookmark',
+        data: 'entity_id=' + entityId,
+        success: function (label) {
+            $('#bookmark' + entityId).html(label);
+        }
     });
 }

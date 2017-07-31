@@ -142,3 +142,14 @@ class UserMapper(object):
         for row in cursor.fetchall():
             groups.append((row.name, row.name))
         return groups
+
+    @staticmethod
+    def bookmark(entity_id, user):
+        cursor = openatlas.get_cursor()
+        sql = 'INSERT INTO web.user_bookmarks (user_id, entity_id) VALUES (%(user_id)s, %(entity_id)s);'
+        label = 'bookmark_remove'
+        if entity_id in user.bookmarks:
+            sql = 'DELETE FROM web.user_bookmarks WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s;'
+            label = 'bookmark'
+        cursor.execute(sql, {'user_id': user.id, 'entity_id': entity_id})
+        return label

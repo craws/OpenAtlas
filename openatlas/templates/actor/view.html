@@ -9,13 +9,14 @@
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
     </ul>
     <div id="tab-info">
-        {% if 'editor'|is_authorized: %}
-            <div class="button-bar">
+        <div class="button-bar">
+            {% if 'editor'|is_authorized: %}
                 <a href="{{ url_for('actor_update', actor_id=actor.id) }}">{{ _('edit')|uc_first }}</a>
                 <a onclick="return confirm('{{ _('delete')|uc_first }} {{ actor.name.replace('\'', '') }}?')"
-                   href="{{ url_for('actor_delete', actor_id=actor.id) }}">{{ _('delete')|uc_first }}</a>
-            </div>
-        {% endif %}
+                       href="{{ url_for('actor_delete', actor_id=actor.id) }}">{{ _('delete')|uc_first }}</a>
+            {% endif %}
+            {{ actor.id|bookmark_toggle }}
+        </div>
         <h1>{{ actor.name }}</h1>
         {% set data = [
             {'name': actor.name},

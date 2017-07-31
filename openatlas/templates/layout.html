@@ -87,10 +87,14 @@
             </div>
         </div>
         <div id="menu">
-            {% for item in ['overview', 'source', 'event', 'actor', 'place', 'reference', 'hierarchy'] %}
-                {% set css = 'active' if item in request.path or (item == 'overview' and request.path == '/') %}
-                <div class="{{ css|safe }}"><a href="/{{ item }}">{{ item|uc_first }}</a></div>
-            {% endfor %}
+            {% if current_user.is_authenticated %}
+                {% for item in ['overview', 'source', 'event', 'actor', 'place', 'reference', 'hierarchy'] %}
+                    {% set css = 'active' if item in request.path or (item == 'overview' and request.path == '/') %}
+                    <div class="{{ css|safe }}"><a href="/{{ item }}">{{ _(item)|uc_first }}</a></div>
+                {% endfor %}
+            {% else %}
+                <div class="active"><a href="/">{{ _('overview')|uc_first }}</a></div>
+            {% endif %}
         </div>
         <div id="breadcrumb">
             {% block breadcrumb %}{% endblock %}
