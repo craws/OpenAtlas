@@ -17,10 +17,10 @@ from openatlas.util.util import link, truncate_string, bookmark_toggle
 @app.route('/')
 @app.route('/overview')
 def index():
-    tables = {'bookmarks': {
-        'name': 'bookmarks',
-        'header': ['name', 'class', 'date', 'info', ''],
-        'data': []}}
+    tables = {
+        'bookmarks': {'name': 'bookmarks', 'header': ['name', 'class', 'date', 'info', ''], 'data': []},
+        'counts': {'name': 'bookmarks', 'header': ['name', 'class'], 'data': []}
+    }
     if current_user.is_authenticated:
         for entity_id in current_user.bookmarks:
             entity = EntityMapper.get_by_id(entity_id)
@@ -29,9 +29,15 @@ def index():
                 openatlas.classes[entity.class_.id].name,
                 entity.begin,
                 truncate_string(entity.description),
-                bookmark_toggle(entity.id)
-            ])
-    return render_template('index/index.html', intro=ContentMapper.get_translation('intro'), tables=tables)
+                bookmark_toggle(entity.id)])
+        overview_counts = EntityMapper.get_overview_counts()
+        for name, count in overview_counts.items():
+            tables['counts']['data'].append([name, count])
+    return render_template(
+        'index/index.html',
+        intro=ContentMapper.get_translation('intro'),
+        tables=tables,
+    )
 
 
 @app.route('/index/setlocale/<language>')

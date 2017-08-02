@@ -72,3 +72,23 @@ class EntityMapper(object):
     def delete(entity_id):
         sql = "DELETE FROM model.entity WHERE id = %(entity_id)s;"
         openatlas.get_cursor().execute(sql, {'entity_id': entity_id})
+
+    @staticmethod
+    def get_overview_counts():
+        sql = """
+            SELECT
+            (SELECT COUNT(*) FROM model.entity e JOIN model.class c ON e.class_id = c.id
+                WHERE c.code IN ('E21', 'E74', 'E40')) AS actor_count,
+            (SELECT COUNT(*) FROM model.entity e JOIN model.class c ON e.class_id = c.id
+                WHERE c.code IN ('E31', 'E84')) AS reference_count,
+            (SELECT COUNT(*) FROM model.entity e JOIN model.class c ON e.class_id = c.id
+                WHERE c.code = 'E18') AS object_count,
+            COUNT(*) AS source_count FROM model.entity e JOIN model.class c ON e.class_id = c.id
+                WHERE c.code = 'E33';"""
+        cursor = openatlas.get_cursor()
+        cursor.execute(sql)
+        row = cursor.fetchone()
+        counts = {}  # To do: one liner possible to get a dict of record?
+        for idx, col in enumerate(cursor.description):
+            counts[col[0]] = row[idx]
+        return counts

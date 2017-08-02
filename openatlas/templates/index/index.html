@@ -1,9 +1,12 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}{{ _('overview')|uc_first }}{% endblock %}
 {% block content %}
-    {% if tables['bookmarks'].data %}
-        <h1>Bookmarks</h1>
-        {{ tables['bookmarks']|pager }}
+    {% if current_user.is_authenticated %}
+        {{ tables['counts']|pager }}
+        {% if tables['bookmarks'].data %}
+            <h1>Bookmarks</h1>
+            {{ tables['bookmarks']|pager }}
+        {% endif %}
     {% endif %}
     {% if not current_user.is_authenticated %}
         <div>{{ intro|safe }}</div>
