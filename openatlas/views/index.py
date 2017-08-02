@@ -3,15 +3,35 @@ from collections import OrderedDict
 
 from flask import request, session
 from flask import render_template
+from flask_login import current_user
+
+import openatlas
 from openatlas import app
 from openatlas.models.content import ContentMapper
 from werkzeug.utils import redirect
+
+from openatlas.models.entity import EntityMapper
+from openatlas.util.util import link, truncate_string, bookmark_toggle
 
 
 @app.route('/')
 @app.route('/overview')
 def index():
-    return render_template('index/index.html', intro=ContentMapper.get_translation('intro'))
+    tables = {'bookmarks': {
+        'name': 'bookmarks',
+        'header': ['name', 'class', 'date', 'info', ''],
+        'data': []}}
+    if current_user.is_authenticated:
+        for entity_id in current_user.bookmarks:
+            entity = EntityMapper.get_by_id(entity_id)
+            tables['bookmarks']['data'].append([
+                link(entity),
+                openatlas.classes[entity.class_.id].name,
+                entity.begin,
+                truncate_string(entity.description),
+                bookmark_toggle(entity.id)
+            ])
+    return render_template('index/index.html', intro=ContentMapper.get_translation('intro'), tables=tables)
 
 
 @app.route('/index/setlocale/<language>')

@@ -7,7 +7,7 @@ import openatlas
 
 
 class User(UserMixin):
-    def __init__(self, row=None):
+    def __init__(self, row=None, bookmarks=[]):
         self.id = None
         self.username = None
         self.email = None
@@ -24,7 +24,7 @@ class User(UserMixin):
         self.email = row.email
         self.description = row.info
         self.settings = []
-        self.bookmarks = []
+        self.bookmarks = bookmarks
         self.password_reset_code = row.password_reset_code
         self.password_reset_date = row.password_reset_date
         self.group = row.group_name
@@ -43,6 +43,9 @@ class User(UserMixin):
         if last_failure_date > datetime.datetime.now():
             return True
         return False
+
+    def get_bookmarks(self):
+        self.bookmarks = UserMapper.get_bookmarks(self)
 
 
 class UserMapper(object):
@@ -66,8 +69,13 @@ class UserMapper(object):
     @staticmethod
     def get_by_id(user_id):
         cursor = openatlas.get_cursor()
+        sql = 'SELECT entity_id FROM web.user_bookmarks WHERE user_id = %(user_id)s;'
+        cursor.execute(sql, {'user_id': user_id})
+        bookmarks = []
+        for row in cursor.fetchall():
+            bookmarks.append(row.entity_id)
         cursor.execute(UserMapper.sql + ' WHERE u.id = %(id)s;', {'id': user_id})
-        return User(cursor.fetchone())
+        return User(cursor.fetchone(), bookmarks)
 
     @staticmethod
     def get_by_email(email):
@@ -147,8 +155,8 @@ class UserMapper(object):
     def bookmark(entity_id, user):
         cursor = openatlas.get_cursor()
         sql = 'INSERT INTO web.user_bookmarks (user_id, entity_id) VALUES (%(user_id)s, %(entity_id)s);'
-        label = 'bookmark_remove'
-        if entity_id in user.bookmarks:
+        label = 'bookmark remove'
+        if int(entity_id) in user.bookmarks:
             sql = 'DELETE FROM web.user_bookmarks WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s;'
             label = 'bookmark'
         cursor.execute(sql, {'user_id': user.id, 'entity_id': entity_id})

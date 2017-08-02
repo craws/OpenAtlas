@@ -4,7 +4,6 @@ import jinja2
 import flask
 import re
 
-from flask_login import current_user
 from jinja2 import evalcontextfilter, Markup, escape
 from flask_babel import lazy_gettext as _
 from markdown import markdown
@@ -65,10 +64,7 @@ def format_date(self, value, text_format='%Y-%m-%d'):
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def bookmark_toggle(self, entity_id):
-    html = '<button id="' + str(entity_id) + '" type="button" onclick="ajaxBookmark(' + str(entity_id) + ');">'
-    html += util.uc_first(_('bookmark remove')) if entity_id in current_user.bookmarks else util.uc_first(_('bookmark'))
-    html += '</button>'
-    return Markup(html)
+    return util.bookmark_toggle(entity_id)
 
 
 @jinja2.contextfilter

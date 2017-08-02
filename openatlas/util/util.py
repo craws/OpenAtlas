@@ -3,6 +3,7 @@ from functools import wraps
 
 from flask import abort, url_for
 from flask_login import current_user
+from flask_babel import lazy_gettext as _
 from markupsafe import Markup
 from datetime import datetime
 
@@ -24,6 +25,13 @@ def required_group(group):
             return f(*args, **kwargs)
         return wrapped
     return wrapper
+
+
+def bookmark_toggle(entity_id):
+    html = '<button id="bookmark' + str(entity_id) + '" type="button" onclick="ajaxBookmark(' + str(entity_id) + ');">'
+    html += uc_first(_('bookmark remove')) if entity_id in current_user.bookmarks else uc_first(_('bookmark'))
+    html += '</button>'
+    return Markup(html)
 
 
 def is_authorized(group):
