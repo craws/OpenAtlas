@@ -1,8 +1,9 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
 from collections import OrderedDict
 
-from flask import request, session
+from flask import request, session, url_for
 from flask import render_template
+from flask_babel import lazy_gettext as _
 from flask_login import current_user
 
 import openatlas
@@ -11,7 +12,7 @@ from openatlas.models.content import ContentMapper
 from werkzeug.utils import redirect
 
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import link, truncate_string, bookmark_toggle
+from openatlas.util.util import link, truncate_string, bookmark_toggle, uc_first
 
 
 @app.route('/')
@@ -19,7 +20,7 @@ from openatlas.util.util import link, truncate_string, bookmark_toggle
 def index():
     tables = {
         'bookmarks': {'name': 'bookmarks', 'header': ['name', 'class', 'date', 'info', ''], 'data': []},
-        'counts': {'name': 'bookmarks', 'header': ['name', 'class'], 'data': []}
+        'counts': {'name': 'bookmarks', 'header': [], 'data': []}
     }
     if current_user.is_authenticated:
         for entity_id in current_user.bookmarks:
@@ -30,9 +31,10 @@ def index():
                 entity.begin,
                 truncate_string(entity.description),
                 bookmark_toggle(entity.id)])
-        overview_counts = EntityMapper.get_overview_counts()
-        for name, count in overview_counts.items():
-            tables['counts']['data'].append([name, count])
+        for name, count in EntityMapper.get_overview_counts().items():
+            tables['counts']['data'].append([
+                '<a href="' + url_for(name + '_index') + '">' + uc_first(_(name)) + '</a>',
+                count])
     return render_template(
         'index/index.html',
         intro=ContentMapper.get_translation('intro'),

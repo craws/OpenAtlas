@@ -1,4 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
+from collections import OrderedDict
+
 import openatlas
 from openatlas import ClassMapper
 
@@ -78,17 +80,19 @@ class EntityMapper(object):
         sql = """
             SELECT
             (SELECT COUNT(*) FROM model.entity e JOIN model.class c ON e.class_id = c.id
-                WHERE c.code IN ('E21', 'E74', 'E40')) AS actor_count,
+                WHERE c.code = 'E33') AS source,
             (SELECT COUNT(*) FROM model.entity e JOIN model.class c ON e.class_id = c.id
-                WHERE c.code IN ('E31', 'E84')) AS reference_count,
+                WHERE c.code IN ('E6', 'E7', 'E8', 'E12')) AS event,
             (SELECT COUNT(*) FROM model.entity e JOIN model.class c ON e.class_id = c.id
-                WHERE c.code = 'E18') AS object_count,
-            COUNT(*) AS source_count FROM model.entity e JOIN model.class c ON e.class_id = c.id
-                WHERE c.code = 'E33';"""
+                WHERE c.code IN ('E21', 'E74', 'E40')) AS actor,
+            (SELECT COUNT(*) FROM model.entity e JOIN model.class c ON e.class_id = c.id
+                WHERE c.code = 'E18') AS place,
+            COUNT(*) AS reference FROM model.entity e JOIN model.class c ON e.class_id = c.id
+                WHERE c.code IN ('E31', 'E84');"""
         cursor = openatlas.get_cursor()
         cursor.execute(sql)
         row = cursor.fetchone()
-        counts = {}  # To do: one liner possible to get a dict of record?
+        counts = OrderedDict()  # To do: one liner possible to get a dict of record?
         for idx, col in enumerate(cursor.description):
             counts[col[0]] = row[idx]
         return counts

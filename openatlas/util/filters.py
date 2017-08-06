@@ -98,13 +98,12 @@ def table_select_model(self, name, selected=None):
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def pager(self, table):
-    # To do: remove no cover when more content to test
-    if not table['data']:  # pragma: no cover
+    if not table['data']:
         return Markup('<p>' + util.uc_first(_('no entries')) + '</p>')
     html = ''
     name = table['name']
     # To do: remove hardcoded table pager limit when user profiles available
-    show_pager = False if 'hide_pager' in table or len(table['data']) < 20 else True
+    show_pager = False if len(table['data']) < 20 else True
     if show_pager:  # pragma: no cover
         html += '<div id="' + name + '-pager" class="pager">'
         html += """
