@@ -7,7 +7,7 @@ import openatlas
 
 
 class User(UserMixin):
-    def __init__(self, row=None, bookmarks=[]):
+    def __init__(self, row=None, bookmarks=None):
         self.id = None
         self.username = None
         self.email = None
@@ -23,7 +23,7 @@ class User(UserMixin):
         self.real_name = row.real_name
         self.email = row.email
         self.description = row.info
-        self.settings = []
+        self.settings = UserMapper.get_settings(row.id)
         self.bookmarks = bookmarks
         self.password_reset_code = row.password_reset_code
         self.password_reset_date = row.password_reset_date
@@ -43,9 +43,6 @@ class User(UserMixin):
         if last_failure_date > datetime.datetime.now():
             return True
         return False
-
-    def get_bookmarks(self):
-        self.bookmarks = UserMapper.get_bookmarks(self)
 
 
 class UserMapper(object):
@@ -132,8 +129,7 @@ class UserMapper(object):
             'group_name': user.group,
             'login_last_success': user.login_last_success,
             'login_last_failure': user.login_last_failure,
-            'login_failed_count': user.login_failed_count,
-        })
+            'login_failed_count': user.login_failed_count})
         return
 
     @staticmethod
@@ -152,7 +148,7 @@ class UserMapper(object):
         return groups
 
     @staticmethod
-    def bookmark(entity_id, user):
+    def toggle_bookmark(entity_id, user):
         cursor = openatlas.get_cursor()
         sql = 'INSERT INTO web.user_bookmarks (user_id, entity_id) VALUES (%(user_id)s, %(entity_id)s);'
         label = 'bookmark remove'
@@ -161,3 +157,13 @@ class UserMapper(object):
             label = 'bookmark'
         cursor.execute(sql, {'user_id': user.id, 'entity_id': entity_id})
         return label
+
+    @staticmethod
+    def get_settings(user_id):
+        cursor = openatlas.get_cursor()
+        sql = 'SELECT "name", value FROM web.user_settings WHERE user_id = %(user_id)s;'
+        cursor.execute(sql, {'user_id': user_id})
+        settings = {}
+        for row in cursor.fetchall():
+            settings[row.name] = row.value
+        return settings

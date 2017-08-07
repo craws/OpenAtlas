@@ -62,9 +62,11 @@
                     {% endif  %}
                 </div>
                 {% if current_user.is_authenticated %}
-                    <div>
-                        {{ _('hello')|uc_first }} {{ current_user.username }}
+                    <div id="greeting">
+                        {{ _('hello')|uc_first }} {{ current_user.username }} |
+                        <a href="{{ url_for('profile_index') }}">{{ _('profile')|uc_first }}</a>
                     </div>
+                    <div style="clear:both;"></div>
                 {% endif %}
                 <div id="language-menu">
                     <img class="zoom" src="/images/icons/zoom-in.png" title="{{ _('zoom in') }}"

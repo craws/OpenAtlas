@@ -56,7 +56,7 @@ app.config.from_pyfile('config.py')  # load instance/config.py
 locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 
 from openatlas.views import actor, ajax, content, index, settings, model, source, event, place, reference, hierarchy, \
-    user, login
+    user, login, profile
 
 babel = Babel(app)
 app.register_blueprint(filters.blueprint)

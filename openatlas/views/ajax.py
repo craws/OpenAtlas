@@ -9,5 +9,5 @@ from openatlas.util.util import uc_first
 
 @app.route('/ajax/bookmark', methods=['POST'])
 def ajax_bookmark():
-    label = UserMapper.bookmark(request.form['entity_id'], current_user)
+    label = UserMapper.toggle_bookmark(request.form['entity_id'], current_user)
     return jsonify(uc_first(label))
