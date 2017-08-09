@@ -12,7 +12,7 @@ SET client_min_messages = warning;
 SET search_path = model, pg_catalog;
 
 --
--- Data for Name: class; Type: TABLE DATA; Schema: model; Owner: openatlas_master
+-- Data for Name: class; Type: TABLE DATA; Schema: model; Owner: openatlas
 --
 
 INSERT INTO class VALUES (1, 'E1', 'CRM Entity', '2015-06-11 19:26:28.25822', NULL);
@@ -104,14 +104,14 @@ INSERT INTO class VALUES (86, 'E62', 'String', '2015-06-11 19:26:28.25822', NULL
 
 
 --
--- Name: class_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas_master
+-- Name: class_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
 --
 
 SELECT pg_catalog.setval('class_id_seq', 86, true);
 
 
 --
--- Data for Name: class_inheritance; Type: TABLE DATA; Schema: model; Owner: openatlas_master
+-- Data for Name: class_inheritance; Type: TABLE DATA; Schema: model; Owner: openatlas
 --
 
 INSERT INTO class_inheritance VALUES (1, 1, 2, '2015-06-11 19:26:28.25822', NULL);
@@ -214,27 +214,27 @@ INSERT INTO class_inheritance VALUES (97, 83, 86, '2015-06-11 19:26:28.25822', N
 
 
 --
--- Name: class_inheritance_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas_master
+-- Name: class_inheritance_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
 --
 
 SELECT pg_catalog.setval('class_inheritance_id_seq', 97, true);
 
 
 --
--- Data for Name: entity; Type: TABLE DATA; Schema: model; Owner: openatlas_master
+-- Data for Name: entity; Type: TABLE DATA; Schema: model; Owner: openatlas
 --
 
 
 
 --
--- Name: entity_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas_master
+-- Name: entity_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
 --
 
 SELECT pg_catalog.setval('entity_id_seq', 1, false);
 
 
 --
--- Data for Name: i18n; Type: TABLE DATA; Schema: model; Owner: openatlas_master
+-- Data for Name: i18n; Type: TABLE DATA; Schema: model; Owner: openatlas
 --
 
 INSERT INTO i18n VALUES (1, 'class', 'name', 1, 'el', 'Οντότητα CIDOC CRM', '2015-06-11 19:26:28.25822', NULL);
@@ -3349,14 +3349,14 @@ INSERT INTO i18n VALUES (2570, 'property', 'comment', 149, 'en', 'OA10 is used t
 
 
 --
--- Name: i18n_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas_master
+-- Name: i18n_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
 --
 
 SELECT pg_catalog.setval('i18n_id_seq', 2570, true);
 
 
 --
--- Data for Name: property; Type: TABLE DATA; Schema: model; Owner: openatlas_master
+-- Data for Name: property; Type: TABLE DATA; Schema: model; Owner: openatlas
 --
 
 INSERT INTO property VALUES (1, 'P1', 40, 1, 'is identified by', 'identifies', '2015-06-11 19:26:28.25822', NULL);
@@ -3511,40 +3511,40 @@ INSERT INTO property VALUES (149, 'OA9', 51, 70, 'appears for the last time in',
 
 
 --
--- Data for Name: link; Type: TABLE DATA; Schema: model; Owner: openatlas_master
+-- Data for Name: link; Type: TABLE DATA; Schema: model; Owner: openatlas
 --
 
 
 
 --
--- Name: link_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas_master
+-- Name: link_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
 --
 
 SELECT pg_catalog.setval('link_id_seq', 1, false);
 
 
 --
--- Data for Name: link_property; Type: TABLE DATA; Schema: model; Owner: openatlas_master
+-- Data for Name: link_property; Type: TABLE DATA; Schema: model; Owner: openatlas
 --
 
 
 
 --
--- Name: link_property_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas_master
+-- Name: link_property_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
 --
 
 SELECT pg_catalog.setval('link_property_id_seq', 1, false);
 
 
 --
--- Name: property_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas_master
+-- Name: property_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
 --
 
 SELECT pg_catalog.setval('property_id_seq', 149, true);
 
 
 --
--- Data for Name: property_inheritance; Type: TABLE DATA; Schema: model; Owner: openatlas_master
+-- Data for Name: property_inheritance; Type: TABLE DATA; Schema: model; Owner: openatlas
 --
 
 INSERT INTO property_inheritance VALUES (1, 11, 10, '2015-06-11 19:26:28.25822', NULL);
@@ -3624,7 +3624,7 @@ INSERT INTO property_inheritance VALUES (74, 10, 139, '2015-06-11 19:26:28.25822
 
 
 --
--- Name: property_inheritance_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas_master
+-- Name: property_inheritance_id_seq; Type: SEQUENCE SET; Schema: model; Owner: openatlas
 --
 
 SELECT pg_catalog.setval('property_inheritance_id_seq', 74, true);

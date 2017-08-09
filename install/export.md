@@ -10,11 +10,11 @@ add "CREATE EXTENSION postgis;" and uncomment after installation for unittests
 
 ### Model Data
 
-    pg_dump -a -n model openatlas_master > data/install/data_model.sql
+    pg_dump -a -n model openatlas > data/install/data_model.sql
 
 ### Web Schema
 
-    pg_dump -n web openatlas_master > /tmp/openatlas_web.sql
+    pg_dump -n web openatlas > /tmp/openatlas_web.sql
 
 ### CSV Export
 

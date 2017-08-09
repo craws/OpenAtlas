@@ -10,7 +10,7 @@ Installation with examples from a Debian 9 (Stretch) system.
 
 ### Python 3 and Flask
 
-    # apt-get install python3 python3-bcrypt python3-dateutil python3-jinja2 python3-psycopg2
+    # apt-get install python3 python3-bcrypt python3-dateutil python3-jinja2 python3-psycopg2 python3-markdown
     # apt-get install python3-flask python3-flask-babel python3-flask-login python3-flaskext.wtf
 
 ### Apache 2.4
@@ -19,7 +19,7 @@ Installation with examples from a Debian 9 (Stretch) system.
 
 ### PostgreSQL 9.6
 
-    # apt-get install postgresql postgresql-9.6-postgis-2.3 postgresql-9.6-postgis-2.3-scripts
+    # apt-get install python3-coverage python3-nose
 
 ### gettext
 
@@ -29,11 +29,16 @@ Installation with examples from a Debian 9 (Stretch) system.
 
 ## Database
 
+
+
 As postgres
 
     $ createuser openatlas -P
     $ createdb openatlas -O openatlas
-    $ cd data/install
+
+    Uncomment "CREATE EXTENSION postgis;" in top off install/structure.sql
+
+    $ cd install
     $ cat structure.sql data_web.sql data_model.sql | psql -d openatlas -f -
 
 Optional: create database openatlas_test for tests
