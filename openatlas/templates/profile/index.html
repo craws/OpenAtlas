@@ -1,4 +1,16 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}{{ _('profile')|uc_first }}{% endblock %}
 {% block content %}
+    <div class="button-bar">
+        <a href="{{ url_for('profile_update') }}">{{ _('edit')|uc_first }}</a>
+        <a href="{{ url_for('profile_password') }}">{{ _('change password')|uc_first }}</a>
+    </div>
+    <div style="float:left;">
+        <h1>{{ _('information')|uc_first }}</h1>
+        {{ tables['info']|data_table }}
+    </div>
+    <div style="float:left;">
+        <h1>{{ _('display')|uc_first }}</h1>
+
+    </div>
 {% endblock %}
