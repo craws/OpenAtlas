@@ -1,7 +1,10 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}Login{% endblock %}
+{% block breadcrumb %}
+    <a href="{{ url_for('index_faq') }}">{{ _('overview')|uc_first }}</a> >
+    {{ _('login')|uc_first }}
+{% endblock %}
 {% block content %}
-    <form action="" method="post">
+    <form method="post">
         {{ form.csrf_token }}
         <p>
             {{ form.username(class="required") }}

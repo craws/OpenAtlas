@@ -1,8 +1,9 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
 import bcrypt
 import datetime
+
 from openatlas import app
-from flask import render_template, request, flash
+from flask import render_template, request, flash, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import LoginManager, login_required, login_user, logout_user
 from flask_wtf import Form
@@ -42,9 +43,7 @@ def login():
                     user.login_last_success = datetime.datetime.now()
                     user.login_failed_count = 0
                     user.update()
-                    if request.args.get('next'):
-                        return redirect(request.args.get('next'))
-                    return redirect('/')
+                    return redirect(request.args.get('next') or url_for('index'))
                 else:
                     flash(_('error inactive'), 'error')
             else:
