@@ -57,6 +57,20 @@ def data_table(self, data):
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
+def data_table2(self, data):
+    html = '<div class="data-table">'
+    for key, value in data:
+        if value or value == 0:
+            value = util.uc_first(_('no')) if value is False else value
+            value = util.uc_first(_('yes')) if value is True else value
+            html += '<div class="table-row"><div>' + util.uc_first(key) + '</div>'
+            html += '<div class="table-cell">' + str(value) + '</div></div>'
+    html += '</div>'
+    return Markup(html)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
 def format_date(self, value, text_format='%Y-%m-%d'):
     return util.format_date(value, text_format)
 
@@ -105,21 +119,22 @@ def pager(self, table):
     # To do: remove hardcoded table pager limit when user profiles available
     show_pager = False if len(table['data']) < 20 else True
     if show_pager:  # pragma: no cover
+        # To do: refactor html to one string with name string replacement
         html += '<div id="' + name + '-pager" class="pager">'
-        html += """
-                <div class="navigation first"></div>
-                <div class="navigation prev"></div>
-                <div class="pagedisplay"><input class="pagedisplay" type="text" disabled="disabled"></div>
-                <div class="navigation next"></div>
-                <div class="navigation last"></div>
-                <div>
-                    <select class="pagesize">
-                        <option value="10">10</option>
-                        <option value="20" selected="selected">20</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                </div>"""
+        html += '''
+            <div class="navigation first"></div>
+            <div class="navigation prev"></div>
+            <div class="pagedisplay"><input class="pagedisplay" type="text" disabled="disabled"></div>
+            <div class="navigation next"></div>
+            <div class="navigation last"></div>
+            <div>
+                <select class="pagesize">
+                    <option value="10">10</option>
+                    <option value="20" selected="selected">20</option>
+                    <option value="50">50</option>
+                    <option value="100">100</option>
+                </select>
+            </div>'''
         html += '<input id="' + name + '-search" class="search" type="text" data-column="all" placeholder="Filter">'
         html += '</div>'
     html += '<table id="' + name + '-table" class="tablesorter">'

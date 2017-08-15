@@ -44,12 +44,9 @@ class User(UserMixin):
             return True
         return False
 
-    def get_setting(self, name, needed_for='system'):
+    def get_setting(self, name):
         if name in self.settings:
             return self.settings[name]
-        else:
-            if needed_for == 'display':
-                return ''
         return False
 
 

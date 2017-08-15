@@ -13,15 +13,6 @@
                href="{{ url_for('user_delete', user_id=user.id) }}">{{ _('delete')|uc_first }}</a>
         {% endif %}
     </div>
-    {% set data = [
-        {_('username'): user|link},
-        {_('group'): user.group},
-        {_('name'): user.name},
-        {_('email'): user.email},
-        {_('language'): 'To do'},
-        {_('last login'): 'To do'},
-        {_('failed logins'): 'To do'},
-    ] %}
-    {{ data|data_table|safe }}
+    {{ tables['user']|data_table2 }}
     {{ user|description }}
 {% endblock %}

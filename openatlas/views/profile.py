@@ -3,20 +3,18 @@ from flask import render_template
 from flask_babel import lazy_gettext as _
 from flask_login import login_required, current_user
 from openatlas import app
-from openatlas.util.util import uc_first
 
 
 @app.route('/profile')
 @login_required
 def profile_index():
-    tables = {}
-    tables['info'] = [
-        {uc_first(_('username')): current_user.username},
-        {uc_first(_('name')): current_user.real_name},
-        {uc_first(_('email')): current_user.email},
-        {uc_first(_('show email')): current_user.get_setting('show_email', 'display')},
-        {uc_first(_('newsletter')): current_user.get_setting('newsletter', 'display')}
-    ]
+    tables = {'info': [
+        (_('username'), current_user.username),
+        (_('name'), current_user.real_name),
+        (_('email'), current_user.email),
+        (_('show email'), current_user.get_setting('show_email')),
+        (_('newsletter'), current_user.get_setting('newsletter')),
+    ]}
     return render_template('profile/index.html', tables=tables)
 
 

@@ -57,7 +57,16 @@ class UserForm(Form):
 @required_group('manager')
 def user_view(user_id):
     user = UserMapper.get_by_id(user_id)
-    return render_template('user/view.html', user=user)
+    tables = {'user': [(uc_first(_('username')), link(user)),
+        (_('group'), user.group),
+        (_('name'), user.real_name),
+        (_('email'), user.email),
+        (_('language'), 'To do'),
+        (_('last login'), 'To do'),
+        (_('failed logins'), 'To do'),
+        (_('edit'), 'edit')
+    ]}
+    return render_template('user/view.html', user=user, tables=tables)
 
 
 @app.route('/user')
