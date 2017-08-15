@@ -22,7 +22,10 @@ class EventForm(Form):
 @required_group('readonly')
 def event_view(event_id):
     event = EntityMapper.get_by_id(event_id)
-    return render_template('event/view.html', event=event)
+    data = {'info': [
+        (_('name'), event.name),
+    ]}
+    return render_template('event/view.html', event=event, data=data)
 
 
 @app.route('/event')

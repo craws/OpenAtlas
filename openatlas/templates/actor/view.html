@@ -18,10 +18,7 @@
             {{ actor.id|bookmark_toggle }}
         </div>
         <h1>{{ actor.name }}</h1>
-        {% set data = [
-            {'name': actor.name},
-        ] %}
-        {{ data|data_table }}
+        {{ data['info']|data_table2 }}
         {{ actor|description }}
     </div>
 </div>

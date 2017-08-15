@@ -101,7 +101,7 @@ def property_index():
 @app.route('/model/class_view/<int:class_id>')
 def class_view(class_id):
     classes = openatlas.classes
-    properties = openatlas.properties
+    class_ = classes[class_id]
     tables = OrderedDict()
     for table in ['super', 'sub']:
         tables[table] = {
@@ -113,24 +113,25 @@ def class_view(class_id):
         for id_ in getattr(classes[class_id], table):
             tables[table]['data'].append([link(classes[id_]), classes[id_].name])
     tables['domains'] = {
-            'name': 'domains',
-            'header': ['code', 'name'],
-            'data': [],
-            'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'
+        'name': 'domains',
+        'header': ['code', 'name'],
+        'data': [],
+        'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'
     }
     tables['ranges'] = {
-            'name': 'ranges',
-            'header': ['code', 'name'],
-            'data': [],
-            'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'
+        'name': 'ranges',
+        'header': ['code', 'name'],
+        'data': [],
+        'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'
     }
-    for id_, property_ in properties.items():
+    for key, property_ in openatlas.properties.items():
         if class_id == property_.domain_id:
-            tables['domains']['data'].append([link(properties[id_]), properties[id_].name])
+            tables['domains']['data'].append([link(property_), property_.name])
         elif class_id == property_.range_id:
-            tables['ranges']['data'].append([link(properties[id_]), properties[id_].name])
+            tables['ranges']['data'].append([link(property_), property_.name])
 
-    return render_template('model/class_view.html', class_=classes[class_id], tables=tables)
+    data = {'info': [('code', class_.code), ('name', class_.name)]}
+    return render_template('model/class_view.html', class_=class_, tables=tables, data=data)
 
 
 @app.route('/model/property_view/<int:property_id>')

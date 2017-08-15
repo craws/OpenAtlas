@@ -22,7 +22,10 @@ class ActorForm(Form):
 @required_group('readonly')
 def actor_view(actor_id):
     actor = EntityMapper.get_by_id(actor_id)
-    return render_template('actor/view.html', actor=actor)
+    data = {'info': [
+        (_('name'), actor.name),
+    ]}
+    return render_template('actor/view.html', actor=actor, data=data)
 
 
 @app.route('/actor')

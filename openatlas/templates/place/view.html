@@ -18,10 +18,7 @@
             {{ place.id|bookmark_toggle }}
         </div>
         <h1>{{ place.name }}</h1>
-        {% set data = [
-            {'name': place.name},
-        ] %}
-        {{ data|data_table }}
+        {{ data['info']|data_table2 }}
         {{ place|description }}
     </div>
 </div>

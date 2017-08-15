@@ -1,17 +1,17 @@
 {% set data = [
-    {form.active.label: form.active},
-    {form.username.label|string + ' *': form.username(class_="required")},
-    {form.group.label: form.group},
-    {form.email.label|string + ' *': form.email(class_="required")},
+    (form.active.label, form.active),
+    (form.username.label|string + ' *', form.username(class_="required")),
+    (form.group.label, form.group),
+    (form.email.label|string + ' *', form.email(class_="required")),
 ] %}
 {% if not user %}
     {% set data = data + [
-        {form.password.label|string + ' *': form.password(class_="required")},
-        {form.password2.label|string + ' *': form.password2(class_="required")}
+        (form.password.label|string + ' *', form.password(class_="required")),
+        (form.password2.label|string + ' *', form.password2(class_="required"))
     ] %}
 {% endif %}
 {% set data = data + [
-    {form.real_name.label: form.real_name},
+    (form.real_name.label, form.real_name),
 ] %}
 {% for field, errors in form.errors.items() %}
     {{ form[field].label }}: <span class="error">{{ ', '.join(errors) }}</span>
@@ -19,7 +19,7 @@
 <form method="post" id="user-form">
     {{ form.csrf_token }}
     {{ form.continue_ }}
-    {{ data|data_table }}
+    {{ data|data_table2 }}
     {{ form.description.label }}<br />{{ form.description }}<br />
     {% if not user %}
         <p>{{ form.send_info.label }} {{ form.send_info }}</p>

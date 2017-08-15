@@ -22,7 +22,10 @@ class ReferenceForm(Form):
 @required_group('readonly')
 def reference_view(reference_id):
     reference = EntityMapper.get_by_id(reference_id)
-    return render_template('reference/view.html', reference=reference)
+    data = {'info': [
+        (_('name'), reference.name),
+    ]}
+    return render_template('reference/view.html', reference=reference, data=data)
 
 
 @app.route('/reference')

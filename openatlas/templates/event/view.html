@@ -22,7 +22,7 @@
         {% set data = [
             {'name': event.name},
         ] %}
-        {{ data|data_table }}
+        {{ data['info']|data_table2 }}
         {{ event|description }}
     </div>
 </div>

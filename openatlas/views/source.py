@@ -51,7 +51,10 @@ def source_insert(code):
 @required_group('readonly')
 def source_view(source_id):
     source = EntityMapper.get_by_id(source_id)
-    return render_template('source/view.html', source=source)
+    data = {'info': [
+        (_('name'), source.name),
+    ]}
+    return render_template('source/view.html', source=source, data=data)
 
 
 @app.route('/source/delete/<int:source_id>')

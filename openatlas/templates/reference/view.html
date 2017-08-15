@@ -18,10 +18,7 @@
             {{ reference.id|bookmark_toggle }}
         </div>
         <h1>{{ reference.name }}</h1>
-        {% set data = [
-            {'name': reference.name},
-        ] %}
-        {{ data|data_table }}
+        {{ data['info']|data_table2 }}
         {{ reference|description }}
     </div>
 </div>

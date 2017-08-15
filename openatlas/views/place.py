@@ -51,7 +51,10 @@ def place_insert(code):
 @required_group('readonly')
 def place_view(place_id):
     place = EntityMapper.get_by_id(place_id)
-    return render_template('place/view.html', place=place)
+    data = {'info': [
+        (_('name'), place.name),
+    ]}
+    return render_template('place/view.html', place=place, data=data)
 
 
 @app.route('/place/delete/<int:place_id>')
