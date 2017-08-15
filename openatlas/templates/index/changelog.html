@@ -1,5 +1,8 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ _('changelog')|uc_first }}{% endblock %}
+{% block breadcrumb %}
+    <a href="{{ url_for('index_faq') }}">{{ _('overview')|uc_first }}</a> >
+    {{ _('changelog')|uc_first }}
+{% endblock %}
 {% block content %}
     {% for version_name, version in versions.items() %}
         <div class="changelog-version">{{ _('version')|uc_first }} {{ version_name }}</div>

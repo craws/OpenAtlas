@@ -1,7 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
 from functools import wraps
 
-from flask import abort, url_for
+from flask import abort, url_for, request
 from flask_login import current_user
 from flask_babel import lazy_gettext as _
 from markupsafe import Markup
@@ -19,7 +19,7 @@ def required_group(group):
         @wraps(f)
         def wrapped(*args, **kwargs):
             if not current_user.is_authenticated:
-                return redirect(url_for('login'))
+                return redirect(url_for('login', next=request.path))
             if not is_authorized(group):
                 abort(403)
             return f(*args, **kwargs)
