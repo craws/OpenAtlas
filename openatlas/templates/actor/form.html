@@ -1,5 +1,5 @@
 {% set data = [
-    {form.name.label|string + ' *': form.name(class_="required")},
+    (form.name.label|string + ' *', form.name(class_="required")),
 ] %}
 <form method="post" id="actor-form">
     {{ form.csrf_token }}

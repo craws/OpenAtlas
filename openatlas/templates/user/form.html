@@ -19,7 +19,7 @@
 <form method="post" id="user-form">
     {{ form.csrf_token }}
     {{ form.continue_ }}
-    {{ data|data_table2 }}
+    {{ data|data_table }}
     {{ form.description.label }}<br />{{ form.description }}<br />
     {% if not user %}
         <p>{{ form.send_info.label }} {{ form.send_info }}</p>

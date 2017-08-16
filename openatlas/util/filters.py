@@ -46,19 +46,6 @@ def nl2br(self, value):
 @blueprint.app_template_filter()
 def data_table(self, data):
     html = '<div class="data-table">'
-    for item in data:
-        key, value = item.popitem()
-        if value or value == 0:
-            html += '<div class="table-row"><div>' + util.uc_first(key) + '</div>'
-            html += '<div class="table-cell">' + str(value) + '</div></div>'
-    html += '</div>'
-    return Markup(html)
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
-def data_table2(self, data):
-    html = '<div class="data-table">'
     for key, value in data:
         if value or value == 0:
             value = util.uc_first(_('no')) if value is False else value
@@ -146,7 +133,7 @@ def pager(self, table):
     for row in table['data']:
         html += '<tr>'
         for entry in row:
-            entry = str(entry) if entry and entry != 'None' else ''
+            entry = str(entry) if (entry and entry != 'None') or entry == 0 else ''
             try:
                 float(entry.replace(',', ''))
                 style = ' style="text-align:right;"'  # pragma: no cover

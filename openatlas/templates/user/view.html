@@ -13,6 +13,6 @@
                href="{{ url_for('user_delete', user_id=user.id) }}">{{ _('delete')|uc_first }}</a>
         {% endif %}
     </div>
-    {{ data['info']|data_table2 }}
+    {{ data['info']|data_table }}
     {{ user|description }}
 {% endblock %}

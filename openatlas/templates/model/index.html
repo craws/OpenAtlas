@@ -16,9 +16,9 @@
         <form method="post">
             {{ form.csrf_token }}
             {% set data = [
-                {form.domain.label: form.domain|string + 'domain'|table_select_model(domain)},
-                {form.property.label: form.property|string + 'property'|table_select_model(property)},
-                {form.range.label: form.range|string + 'range'|table_select_model(range)},
+                (form.domain.label, form.domain|string + 'domain'|table_select_model(domain)),
+                (form.property.label, form.property|string + 'property'|table_select_model(property)),
+                (form.range.label, form.range|string + 'range'|table_select_model(range)),
             ] %}
             {{ data|data_table }}
             <input type="submit" value="{{ _('test')|uc_first }}" />

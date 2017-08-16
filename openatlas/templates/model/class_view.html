@@ -7,7 +7,7 @@
 {% block content %}
     <div style="float:left;padding-right:2em;">
         <p><strong>{{ _('info')|uc_first }}</strong></p>
-        {{ data['info']|data_table2 }}
+        {{ data['info']|data_table }}
     </div>
     {% for name, table in tables.items() %}
         {% if table['data']|length > 0 %}
