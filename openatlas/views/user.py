@@ -1,4 +1,4 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
+# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask_babel import gettext, lazy_gettext as _
 from flask import abort, flash, render_template, url_for
 from flask_login import current_user

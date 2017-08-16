@@ -1,4 +1,4 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see the file README.md for licensing information
+# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import configparser
 import locale
 import psycopg2.extras
