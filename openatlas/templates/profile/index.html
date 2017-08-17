@@ -7,10 +7,17 @@
     </div>
     <div style="float:left;">
         <h1>{{ _('information')|uc_first }}</h1>
-        {{ tables['info']|data_table }}
+        {{ data['info']|data_table }}
     </div>
-    <div style="float:left;">
+    <div style="float:left;margin-left:1em;">
         <h1>{{ _('display')|uc_first }}</h1>
-
+        <form id="display-form" method="post">
+            {{ data['display']|data_table }}
+        </form>
     </div>
+    <script type="text/javascript">
+    $('#display-form').change(function () {
+        $('#display-form').submit();
+    });
+</script>
 {% endblock %}
