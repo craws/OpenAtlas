@@ -27,16 +27,15 @@ def profile_index():
         (_('email'), current_user.email),
         (_('show email'), current_user.get_setting('show_email')),
         (_('newsletter'), current_user.get_setting('newsletter'))]}
-
     form = ProfileForm()
     getattr(form, 'language').choices = openatlas.app.config['LANGUAGES'].items()
     getattr(form, 'table_rows').choices = openatlas.default_table_rows.items()
+    form.language.data = current_user.get_setting('language')
     data['display'] = [
         (form.language.label, form.language),
         # (form.theme.label, form.theme),
         (form.layout.label, form.layout),
         (form.table_rows.label, form.table_rows)]
-
     return render_template('profile/index.html', data=data, form=form)
 
 

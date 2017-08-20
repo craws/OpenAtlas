@@ -5,6 +5,7 @@
         <a href="{{ url_for('profile_update') }}">{{ _('edit')|uc_first }}</a>
         <a href="{{ url_for('profile_password') }}">{{ _('change password')|uc_first }}</a>
     </div>
+    {{ current_user.get_setting('language') }}
     <div style="float:left;">
         <h1>{{ _('information')|uc_first }}</h1>
         {{ data['info']|data_table }}
