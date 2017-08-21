@@ -35,6 +35,10 @@ class User(UserMixin):
         UserMapper.update(self)
         return
 
+    def update_settings(self):
+        UserMapper.update_settings(self)
+        return
+
     def login_attempts_exceeded(self):
         if not self.login_last_failure or self.login_failed_count <= int(session['settings']['failed_login_tries']):
             return False
@@ -47,6 +51,13 @@ class User(UserMixin):
     def get_setting(self, name):
         if name in self.settings:
             return self.settings[name]
+        if name == 'language':
+            return openatlas.get_locale()
+        settings = session['settings']
+        if name == 'layout':
+            return 'default'
+        if name == 'table_rows':
+            return settings['default_table_rows']
         return False
 
 
@@ -136,6 +147,20 @@ class UserMapper(object):
             'login_last_failure': user.login_last_failure,
             'login_failed_count': user.login_failed_count})
         return
+
+    @staticmethod
+    def update_settings(user):
+        old_settings = UserMapper.get_settings(user.id)
+        new_settings = user.settings
+        cursor = openatlas.get_cursor()
+        for name, value in new_settings.items():
+            if name in old_settings:
+                sql = '''UPDATE web.user_settings SET "value" = %(value)s
+                    WHERE user_id = %(user_id)s AND "name" = %(name)s;'''
+            else:
+                sql = '''INSERT INTO web.user_settings (user_id, "name", "value")
+                    VALUES (%(user_id)s, %(name)s, %(value)s);'''
+            cursor.execute(sql, {'user_id': user.id, 'name': name, 'value': value})
 
     @staticmethod
     def delete(user_id):
