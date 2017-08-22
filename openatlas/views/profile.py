@@ -1,5 +1,5 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import render_template, url_for, flash
+from flask import render_template, url_for, flash, session
 from flask_babel import lazy_gettext as _
 from flask_login import login_required, current_user
 from flask_wtf import Form
@@ -14,8 +14,8 @@ from openatlas.util.util import uc_first
 class ProfileForm(Form):
     language = SelectField(uc_first(_('language')), choices=[])
     # theme = SelectField(uc_first(_('theme')), choices=[])
-    layout = SelectField(uc_first(_('layout')), choices=[
-        ('default', uc_first(_('default'))), ('advanced', uc_first(_('advanced')))])
+    # layout = SelectField(uc_first(_('layout')), choices=[
+    #    ('default', uc_first(_('default'))), ('advanced', uc_first(_('advanced')))])
     table_rows = SelectField(uc_first(_('table rows')), choices=[])
 
 
@@ -33,19 +33,22 @@ def profile_index():
     getattr(form, 'table_rows').choices = openatlas.default_table_rows.items()
     if form.validate_on_submit():
         current_user.settings['language'] = form.language.data
-        current_user.settings['layout'] = form.layout.data
+        # current_user.settings['layout'] = form.layout.data
         current_user.settings['table_rows'] = form.table_rows.data
+        openatlas.get_cursor().execute('BEGIN')
         current_user.update_settings()
+        openatlas.get_cursor().execute('COMMIT')
+        session['language'] = form.language.data
         flash(_('info update'), 'info')
         return redirect(url_for('profile_index'))
 
     form.language.data = current_user.get_setting('language')
-    form.layout.data = current_user.get_setting('layout')
+    # form.layout.data = current_user.get_setting('layout')
     form.table_rows.data = current_user.get_setting('table_rows')
     data['display'] = [
         (form.language.label, form.language),
         # (form.theme.label, form.theme),
-        (form.layout.label, form.layout),
+        # (form.layout.label, form.layout),
         (form.table_rows.label, form.table_rows)]
     return render_template('profile/index.html', data=data, form=form)
 

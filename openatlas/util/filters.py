@@ -4,6 +4,7 @@ import jinja2
 import flask
 import re
 
+from flask_login import current_user
 from jinja2 import evalcontextfilter, Markup, escape
 from flask_babel import lazy_gettext as _
 from markdown import markdown
@@ -102,30 +103,26 @@ def pager(self, table):
     if not table['data']:
         return Markup('<p>' + util.uc_first(_('no entries')) + '</p>')
     html = ''
-    name = table['name']
-    # To do: remove hardcoded table pager limit when user profiles available
-    show_pager = False if len(table['data']) < 20 else True
-    if show_pager:  # pragma: no cover
-        # To do: refactor html to one string with name string replacement
-        html += '<div id="' + name + '-pager" class="pager">'
-        html += '''
-            <div class="navigation first"></div>
-            <div class="navigation prev"></div>
-            <div class="pagedisplay"><input class="pagedisplay" type="text" disabled="disabled"></div>
-            <div class="navigation next"></div>
-            <div class="navigation last"></div>
-            <div>
-                <select class="pagesize">
-                    <option value="10">10</option>
-                    <option value="20" selected="selected">20</option>
-                    <option value="50">50</option>
-                    <option value="100">100</option>
-                </select>
-            </div>'''
-        html += '<input id="' + name + '-search" class="search" type="text" data-column="all" placeholder="Filter">'
-        html += '</div>'
-    html += '<table id="' + name + '-table" class="tablesorter">'
-    html += '<thead><tr>'
+    show_pager = False if len(table['data']) < int(current_user.get_setting('table_rows')) else True
+    if show_pager:
+        html += """
+            <div id="{name}-pager" class="pager">
+                <div class="navigation first"></div>
+                <div class="navigation prev"></div>
+                <div class="pagedisplay"><input class="pagedisplay" type="text" disabled="disabled"></div>
+                <div class="navigation next"></div>
+                <div class="navigation last"></div>
+                <div>
+                    <select class="pagesize">
+                        <option value="10">10</option>
+                        <option value="20" selected="selected">20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+                <input id="{name}-search" class="search" type="text" data-column="all" placeholder="{filter}">
+            </div>""".format(name=table['name'], filter=util.uc_first(_('filter')))
+    html += '<table id="{name}-table" class="tablesorter"><thead><tr>'.format(name=table['name'])
     for header in table['header']:
         style = '' if header else 'class=sorter-false '
         html += '<th ' + style + '>' + header.capitalize() + '</th>'
@@ -143,16 +140,19 @@ def pager(self, table):
         html += '</tr>'
     html += '</tbody>'
     html += '</table>'
-    sort = 'sortList: [[0, 0]]' if 'sort' not in table else table['sort']
     html += '<script>'
+    sort = 'sortList: [[0, 0]]' if 'sort' not in table else table['sort']
     if show_pager:
-        html += '$("#' + name + '-table")'
-        html += '.tablesorter({ ' + sort + ', dateFormat: "ddmmyyyy" '
-        html += ' , widgets: [\'zebra\', \'filter\'],'
-        html += 'widgetOptions: {filter_external: \'#' + name + '-search\', filter_columnFilters: false}})'
-        html += '.tablesorterPager({positionFixed: false, container: $("#' + name + '-pager"), size: 20});'
-    else:  # pragma: no cover
-        html += '$("#' + name + '-table").tablesorter({' + sort + ', widgets: [\'zebra\']});'
+        html += """
+            $("#{name}-table").tablesorter({{ 
+                {sort},
+                dateFormat: "ddmmyyyy",
+                widgets: [\'zebra\', \'filter\'],
+                widgetOptions: {{filter_external: \'#{name}-search\', filter_columnFilters: false}}}})
+            .tablesorterPager({{positionFixed: false, container: $("#{name}-pager"), size: 20}});
+        """.format(name=table['name'], sort=sort)
+    else:
+        html += '$("#' + table['name'] + '-table").tablesorter({' + sort + ',widgets:[\'zebra\']});'
     html += '</script>'
     return Markup(html)
 
