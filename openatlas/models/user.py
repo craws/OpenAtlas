@@ -53,11 +53,10 @@ class User(UserMixin):
             return self.settings[name]
         if name == 'language':
             return openatlas.get_locale()
-        settings = session['settings']
         if name == 'layout':
             return 'default'
         if name == 'table_rows':
-            return settings['default_table_rows']
+            return session['settings']['default_table_rows']
         return False
 
 

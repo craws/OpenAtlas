@@ -50,7 +50,7 @@ def settings_index():
         ('general', OrderedDict([
             (_('site name'), settings['site_name']),
             (_('default language'), openatlas.app.config['LANGUAGES'][settings['default_language']]),
-            (_('default table rows'), openatlas.default_table_rows[int(settings['default_table_rows'])]),
+            (_('default table rows'), int(settings['default_table_rows'])),
             (_('log level'), openatlas.log_levels[int(settings['log_level'])]),
             (_('maintenance'), uc_first('on') if settings['maintenance'] == 'true' else uc_first('off')),
             (_('offline'), uc_first('on') if settings['offline'] == 'true' else uc_first('off')),

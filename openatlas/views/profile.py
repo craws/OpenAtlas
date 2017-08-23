@@ -1,22 +1,31 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import render_template, url_for, flash, session
+import distutils
+
+from flask import flash, render_template, session, url_for
 from flask_babel import lazy_gettext as _
-from flask_login import login_required, current_user
+from flask_login import current_user, login_required
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import SelectField
+from wtforms import BooleanField, SelectField, StringField
 
 import openatlas
 from openatlas import app
 from openatlas.util.util import uc_first
 
 
-class ProfileForm(Form):
+class DisplayForm(Form):
     language = SelectField(uc_first(_('language')), choices=[])
     # theme = SelectField(uc_first(_('theme')), choices=[])
     # layout = SelectField(uc_first(_('layout')), choices=[
     #    ('default', uc_first(_('default'))), ('advanced', uc_first(_('advanced')))])
     table_rows = SelectField(uc_first(_('table rows')), choices=[])
+
+
+class ProfileForm(Form):
+    name = StringField(uc_first(_('name')))
+    email = StringField(uc_first(_('email')))
+    show_email = BooleanField(uc_first(_('show email')), false_values='false')
+    newsletter = BooleanField(uc_first(_('newsletter')), false_values='false')
 
 
 @app.route('/profile', methods=['POST', 'GET'])
@@ -26,9 +35,9 @@ def profile_index():
         (_('username'), current_user.username),
         (_('name'), current_user.real_name),
         (_('email'), current_user.email),
-        (_('show email'), current_user.get_setting('show_email')),
-        (_('newsletter'), current_user.get_setting('newsletter'))]}
-    form = ProfileForm()
+        (_('show email'), uc_first('on') if distutils.util.strtobool(current_user.get_setting('show_email')) else uc_first('off')),
+        (_('newsletter'), uc_first('on') if distutils.util.strtobool(current_user.get_setting('newsletter')) else uc_first('off'))]}
+    form = DisplayForm()
     getattr(form, 'language').choices = openatlas.app.config['LANGUAGES'].items()
     getattr(form, 'table_rows').choices = openatlas.default_table_rows.items()
     if form.validate_on_submit():
@@ -53,10 +62,31 @@ def profile_index():
     return render_template('profile/index.html', data=data, form=form)
 
 
-@app.route('/profile/update')
+@app.route('/profile/update', methods=['POST', 'GET'])
 @login_required
 def profile_update():
-    return render_template('profile/update.html')
+    form = ProfileForm()
+    if form.validate_on_submit():
+        current_user.real_name = form.name.data
+        current_user.email = form.email.data
+        current_user.settings['show_email'] = form.show_email.data
+        current_user.settings['newsletter'] = form.newsletter.data
+        openatlas.get_cursor().execute('BEGIN')
+        current_user.update()
+        current_user.update_settings()
+        openatlas.get_cursor().execute('COMMIT')
+        flash(_('info update'), 'info')
+        return redirect(url_for('profile_index'))
+    form.name.data = current_user.real_name
+    form.email.data = current_user.email
+    form.show_email.data = distutils.util.strtobool(current_user.get_setting('show_email'))
+    form.newsletter.data = distutils.util.strtobool('newsletter')
+    data = {'profile': [
+        (form.name.label, form.name),
+        (form.email.label, form.email),
+        (form.show_email.label, form.show_email),
+        (form.newsletter.label, form.newsletter)]}
+    return render_template('profile/update.html', form=form, data=data)
 
 
 @app.route('/profile/password')

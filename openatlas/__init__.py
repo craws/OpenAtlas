@@ -63,10 +63,10 @@ app.register_blueprint(filters.blueprint)
 
 # To do: store these values somewhere else, config?
 default_table_rows = OrderedDict()
-default_table_rows['10'] = '10'
-default_table_rows['20'] = '20'
-default_table_rows['50'] = '50'
-default_table_rows['100'] = '100'
+default_table_rows[10] = '10'
+default_table_rows[20] = '20'
+default_table_rows[50] = '50'
+default_table_rows[100] = '100'
 
 log_levels = OrderedDict()
 log_levels[0] = 'emergency'

@@ -18,6 +18,8 @@ class SettingsMapper(object):
         cursor.execute("SELECT name, value FROM web.settings;")
         for row in cursor.fetchall():
             settings[row.name] = row.value
+            if row.name == 'default_table_rows':
+                settings[row.name] = int(row.value)
         return settings
 
     @staticmethod

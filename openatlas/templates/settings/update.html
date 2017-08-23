@@ -4,50 +4,50 @@
     {{ _('edit')|uc_first }}
 {% endblock %}
 {% block content %}
-<form method="post">
-    <div class="button-bar">
-        <input type="submit" value="{{ _('save')|uc_first }}" />
-    </div>
-    {% set data_general = [
-        (form.site_name.label, form.site_name),
-        (form.default_language.label, form.default_language),
-        (form.default_table_rows.label, form.default_table_rows),
-        (form.log_level.label, form.log_level),
-        (form.maintenance.label, form.maintenance),
-        (form.offline.label, form.offline),
-    ] %}
-    {% set data_mail = [
-        (form.mail.label, form.mail),
-        (form.mail_transport_username.label, form.mail_transport_username),
-        (form.mail_transport_host.label, form.mail_transport_host),
-        (form.mail_transport_port.label, form.mail_transport_port),
-        (form.mail_transport_type.label, form.mail_transport_type),
-        (form.mail_transport_ssl.label, form.mail_transport_ssl),
-        (form.mail_transport_auth.label, form.mail_transport_auth),
-        (form.mail_from_email.label, form.mail_from_email),
-        (form.mail_from_name.label, form.mail_from_name),
-        (form.mail_recipients_login.label, form.mail_recipients_login),
-        (form.mail_recipients_feedback.label, form.mail_recipients_feedback),
-    ] %}
-    {% set data_authentication = [
-        (form.random_password_length.label, form.random_password_length),
-        (form.reset_confirm_hours.label, form.reset_confirm_hours),
-        (form.failed_login_tries.label, form.failed_login_tries),
-        (form.failed_login_forget_minutes.label, form.failed_login_forget_minutes),
-    ] %}
-    {{ form.csrf_token }}
-    <div id="tabs" class="tabs-container">
-        <ul>
-            <li><a href="#tab-general">{{ 'general'|uc_first }}</a></li>
-            <li><a href="#tab-mail">{{ 'mail'|uc_first }}</a></li>
-            <li><a href="#tab-authentication">{{ 'authentication'|uc_first }}</a></li>
-        </ul>
-        <div id="tab-general">{{ data_general|data_table }}</div>
-        <div id="tab-mail">{{ data_mail|data_table }}</div>
-        <div id="tab-authentication">{{ data_authentication|data_table }}</div>
-    </div>
-</form>
-{% for field, errors in form.errors.items() %}
-    {{ form[field].label }}: {{ ', '.join(errors) }}
-{% endfor %}
+    <form method="post">
+        <div class="button-bar">
+            <input type="submit" value="{{ _('save')|uc_first }}" />
+        </div>
+        {% set data_general = [
+            (form.site_name.label, form.site_name),
+            (form.default_language.label, form.default_language),
+            (form.default_table_rows.label, form.default_table_rows),
+            (form.log_level.label, form.log_level),
+            (form.maintenance.label, form.maintenance),
+            (form.offline.label, form.offline),
+        ] %}
+        {% set data_mail = [
+            (form.mail.label, form.mail),
+            (form.mail_transport_username.label, form.mail_transport_username),
+            (form.mail_transport_host.label, form.mail_transport_host),
+            (form.mail_transport_port.label, form.mail_transport_port),
+            (form.mail_transport_type.label, form.mail_transport_type),
+            (form.mail_transport_ssl.label, form.mail_transport_ssl),
+            (form.mail_transport_auth.label, form.mail_transport_auth),
+            (form.mail_from_email.label, form.mail_from_email),
+            (form.mail_from_name.label, form.mail_from_name),
+            (form.mail_recipients_login.label, form.mail_recipients_login),
+            (form.mail_recipients_feedback.label, form.mail_recipients_feedback),
+        ] %}
+        {% set data_authentication = [
+            (form.random_password_length.label, form.random_password_length),
+            (form.reset_confirm_hours.label, form.reset_confirm_hours),
+            (form.failed_login_tries.label, form.failed_login_tries),
+            (form.failed_login_forget_minutes.label, form.failed_login_forget_minutes),
+        ] %}
+        {{ form.csrf_token }}
+        <div id="tabs" class="tabs-container">
+            <ul>
+                <li><a href="#tab-general">{{ 'general'|uc_first }}</a></li>
+                <li><a href="#tab-mail">{{ 'mail'|uc_first }}</a></li>
+                <li><a href="#tab-authentication">{{ 'authentication'|uc_first }}</a></li>
+            </ul>
+            <div id="tab-general">{{ data_general|data_table }}</div>
+            <div id="tab-mail">{{ data_mail|data_table }}</div>
+            <div id="tab-authentication">{{ data_authentication|data_table }}</div>
+        </div>
+    </form>
+    {% for field, errors in form.errors.items() %}
+        {{ form[field].label }}: {{ ', '.join(errors) }}
+    {% endfor %}
 {% endblock %}
