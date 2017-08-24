@@ -48,17 +48,6 @@ class User(UserMixin):
             return True
         return False
 
-    def get_setting(self, name):
-        if name in self.settings:
-            return self.settings[name]
-        if name == 'language':
-            return openatlas.get_locale()
-        if name == 'layout':
-            return 'default'
-        if name == 'table_rows':
-            return session['settings']['default_table_rows']
-        return False
-
 
 class UserMapper(object):
     sql = '''
@@ -149,16 +138,16 @@ class UserMapper(object):
 
     @staticmethod
     def update_settings(user):
-        old_settings = UserMapper.get_settings(user.id)
-        new_settings = user.settings
         cursor = openatlas.get_cursor()
-        for name, value in new_settings.items():
-            if name in old_settings:
-                sql = '''UPDATE web.user_settings SET "value" = %(value)s
-                    WHERE user_id = %(user_id)s AND "name" = %(name)s;'''
-            else:
-                sql = '''INSERT INTO web.user_settings (user_id, "name", "value")
-                    VALUES (%(user_id)s, %(name)s, %(value)s);'''
+        for name, value in user.settings.items():
+            if name == 'newsletter':
+                value = 'True' if user.settings['newsletter'] else ''
+            if name == 'show_email':
+                value = 'True' if user.settings['show_email'] else ''
+            sql = '''
+                INSERT INTO web.user_settings (user_id, "name", "value")
+                    VALUES (%(user_id)s, %(name)s, %(value)s)
+                ON CONFLICT (user_id, name) DO UPDATE SET "value" = excluded.value;'''
             cursor.execute(sql, {'user_id': user.id, 'name': name, 'value': value})
 
     @staticmethod
@@ -195,4 +184,8 @@ class UserMapper(object):
         settings = {}
         for row in cursor.fetchall():
             settings[row.name] = row.value
+        for item in ['newsletter', 'show_email']:
+            settings[item] = True if item in settings and settings[item] == 'True' else False
+        settings['language'] = settings['language'] if 'language' in settings else openatlas.get_locale()
+        settings['table_rows'] = int(settings['table_rows']) if 'table_rows' in settings else session['settings']['default_table_rows']
         return settings

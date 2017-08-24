@@ -119,7 +119,13 @@
                             </div>
                         {% endif %}
                     {% endfor %}
+                    {% if form and form.errors %}
+                        {% for fieldName, errorMessages in form.errors.items(): %}
+                            {{ fieldName }} - {{ errorMessages }}
+                        {% endfor %}
+                    {% endif %}
                 </div>
+
             {% endif %}
             {% if 'craws.net' in request['url_root'] %}
                 <div id="powered-by">

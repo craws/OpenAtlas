@@ -103,7 +103,7 @@ def pager(self, table):
     if not table['data']:
         return Markup('<p>' + util.uc_first(_('no entries')) + '</p>')
     html = ''
-    show_pager = False if len(table['data']) < int(current_user.get_setting('table_rows')) else True
+    show_pager = False if len(table['data']) < current_user.settings['table_rows'] else True
     if show_pager:
         html += """
             <div id="{name}-pager" class="pager">

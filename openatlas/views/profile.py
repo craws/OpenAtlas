@@ -1,6 +1,4 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-import distutils
-
 from flask import flash, render_template, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_required
@@ -35,8 +33,8 @@ def profile_index():
         (_('username'), current_user.username),
         (_('name'), current_user.real_name),
         (_('email'), current_user.email),
-        (_('show email'), uc_first('on') if distutils.util.strtobool(current_user.get_setting('show_email')) else uc_first('off')),
-        (_('newsletter'), uc_first('on') if distutils.util.strtobool(current_user.get_setting('newsletter')) else uc_first('off'))]}
+        (_('show email'), uc_first('on') if current_user.settings['show_email'] else uc_first('off')),
+        (_('newsletter'), uc_first('on') if current_user.settings['newsletter'] else uc_first('off'))]}
     form = DisplayForm()
     getattr(form, 'language').choices = openatlas.app.config['LANGUAGES'].items()
     getattr(form, 'table_rows').choices = openatlas.default_table_rows.items()
@@ -51,9 +49,9 @@ def profile_index():
         flash(_('info update'), 'info')
         return redirect(url_for('profile_index'))
 
-    form.language.data = current_user.get_setting('language')
+    form.language.data = current_user.settings['language']
     # form.layout.data = current_user.get_setting('layout')
-    form.table_rows.data = current_user.get_setting('table_rows')
+    form.table_rows.data = str(current_user.settings['table_rows'])
     data['display'] = [
         (form.language.label, form.language),
         # (form.theme.label, form.theme),
@@ -79,8 +77,8 @@ def profile_update():
         return redirect(url_for('profile_index'))
     form.name.data = current_user.real_name
     form.email.data = current_user.email
-    form.show_email.data = distutils.util.strtobool(current_user.get_setting('show_email'))
-    form.newsletter.data = distutils.util.strtobool('newsletter')
+    form.show_email.data = current_user.settings['show_email']
+    form.newsletter.data = current_user.settings['newsletter']
     data = {'profile': [
         (form.name.label, form.name),
         (form.email.label, form.email),
