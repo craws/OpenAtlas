@@ -5,7 +5,7 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_required
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import BooleanField, PasswordField, SelectField, StringField
+from wtforms import BooleanField, PasswordField, SelectField, SubmitField, StringField
 from wtforms.validators import InputRequired
 
 import openatlas
@@ -22,9 +22,10 @@ class DisplayForm(Form):
 
 
 class PasswordForm(Form):
-    password_old = PasswordField(uc_first(_('old password')), validators=[InputRequired()])
-    password = PasswordField(uc_first(_('password')), validators=[InputRequired()])
-    password2 = PasswordField(uc_first(_('repeat password')), validators=[InputRequired()])
+    password_old = PasswordField(_('old password'), validators=[InputRequired()])
+    password = PasswordField(_('password'), validators=[InputRequired()])
+    password2 = PasswordField(_('repeat password'), validators=[InputRequired()])
+    save = SubmitField(_('save'))
 
     def validate(self, extra_validators=None):
         valid = Form.validate(self)
@@ -40,10 +41,11 @@ class PasswordForm(Form):
 
 
 class ProfileForm(Form):
-    name = StringField(uc_first(_('name')))
-    email = StringField(uc_first(_('email')))
-    show_email = BooleanField(uc_first(_('show email')), false_values='false')
-    newsletter = BooleanField(uc_first(_('newsletter')), false_values='false')
+    name = StringField(_('name'))
+    email = StringField(_('email'))
+    show_email = BooleanField(_('show email'), false_values='false')
+    newsletter = BooleanField(_('newsletter'), false_values='false')
+    save = SubmitField(_('save'))
 
 
 @app.route('/profile', methods=['POST', 'GET'])
@@ -99,12 +101,7 @@ def profile_update():
     form.email.data = current_user.email
     form.show_email.data = current_user.settings['show_email']
     form.newsletter.data = current_user.settings['newsletter']
-    data = {'profile': [
-        (form.name.label, form.name),
-        (form.email.label, form.email),
-        (form.show_email.label, form.show_email),
-        (form.newsletter.label, form.newsletter)]}
-    return render_template('profile/update.html', form=form, data=data)
+    return render_template('profile/update.html', form=form)
 
 
 @app.route('/profile/password', methods=['POST', 'GET'])

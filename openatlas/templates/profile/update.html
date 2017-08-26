@@ -4,9 +4,5 @@
     {{ _('edit')|uc_first }}
 {% endblock %}
 {% block content %}
-    <form method="post">
-        {{ form.csrf_token }}
-        {{ data['profile']|data_table }}
-        <input type="submit" value="{{ _('save')|uc_first }}" />
-    </form>
+    {{ form|display_form }}
 {% endblock %}

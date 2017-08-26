@@ -181,16 +181,18 @@ def display_form(self, form):
         if field.type == 'CSRFTokenField':
             html += str(field)
             continue
-        label = util.uc_first(str(field.label))
-        class_ = ''
+        if field.type == 'SubmitField':
+            field.label.text = util.uc_first(field.label.text)
+            html += '<br />' + str(field)  # To do: better way for margin instead of using <br />
+            continue
+        field.label.text = util.uc_first(field.label.text)
         errors = ''
         for error in field.errors:
             errors += util.uc_first(error)
         errors = ' <span class="error">' + errors + ' </span>' if errors else ''
-        if field.flags.required:
-            label += ' *'
-            class_ = "required"
-        html += '<div class="table-row"><div>' + label + '</div>'
+        class_ = "required" if field.flags.required else ''
+        field.label.text += ' *' if field.flags.required else ''
+        html += '<div class="table-row"><div>' + str(field.label) + '</div>'
         html += '<div class="table-cell">' + str(field(class_=class_)) + errors + '</div></div>'
-    html += '</div><input type = "submit" value = "' + util.uc_first(_('save')) + '" /></form>'
+    html += '</div></form>'
     return Markup(html)
