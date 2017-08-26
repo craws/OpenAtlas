@@ -171,3 +171,26 @@ def description(self, entity):
 @blueprint.app_template_filter()
 def get_class_name(self, code):
     return ClassMapper.get_by_code(code).name
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def display_form(self, form):
+    html = '<form method="post">' + '<div class="data-table">'
+    for field in form:
+        if field.type == 'CSRFTokenField':
+            html += str(field)
+            continue
+        label = util.uc_first(str(field.label))
+        class_ = ''
+        errors = ''
+        for error in field.errors:
+            errors += util.uc_first(error)
+        errors = ' <span class="error">' + errors + ' </span>' if errors else ''
+        if field.flags.required:
+            label += ' *'
+            class_ = "required"
+        html += '<div class="table-row"><div>' + label + '</div>'
+        html += '<div class="table-cell">' + str(field(class_=class_)) + errors + '</div></div>'
+    html += '</div><input type = "submit" value = "' + util.uc_first(_('save')) + '" /></form>'
+    return Markup(html)

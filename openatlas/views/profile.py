@@ -1,10 +1,12 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+import bcrypt
 from flask import flash, render_template, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_required
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import BooleanField, SelectField, StringField
+from wtforms import BooleanField, PasswordField, SelectField, StringField
+from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app
@@ -17,6 +19,24 @@ class DisplayForm(Form):
     # layout = SelectField(uc_first(_('layout')), choices=[
     #    ('default', uc_first(_('default'))), ('advanced', uc_first(_('advanced')))])
     table_rows = SelectField(uc_first(_('table rows')), choices=[])
+
+
+class PasswordForm(Form):
+    password_old = PasswordField(uc_first(_('old password')), validators=[InputRequired()])
+    password = PasswordField(uc_first(_('password')), validators=[InputRequired()])
+    password2 = PasswordField(uc_first(_('repeat password')), validators=[InputRequired()])
+
+    def validate(self, extra_validators=None):
+        valid = Form.validate(self)
+        password_hashed = bcrypt.hashpw(self.password_old.data.encode('utf-8'), current_user.password.encode('utf-8'))
+        if password_hashed != current_user.password.encode('utf-8'):
+            self.password_old.errors.append(_('error wrong password'))
+            valid = False
+        if self.password.data != self.password2.data:
+            self.password.errors.append(_('error passwords must match'))
+            self.password2.errors.append(_('error passwords must match'))
+            valid = False
+        return valid
 
 
 class ProfileForm(Form):
@@ -87,7 +107,13 @@ def profile_update():
     return render_template('profile/update.html', form=form, data=data)
 
 
-@app.route('/profile/password')
+@app.route('/profile/password', methods=['POST', 'GET'])
 @login_required
 def profile_password():
-    return render_template('profile/password.html')
+    form = PasswordForm()
+    if form.validate_on_submit():
+        current_user.password = bcrypt.hashpw(form.password.data.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        current_user.update()
+        flash(_('info password updated'), 'info')
+        return redirect(url_for('profile_index'))
+    return render_template('profile/password.html', form=form)

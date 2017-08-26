@@ -117,16 +117,17 @@ class UserMapper(object):
     def update(user):
         cursor = openatlas.get_cursor()
         sql = '''
-            UPDATE web.user SET (username, real_name, info, email, active,
-                login_last_success, login_last_failure, login_failed_count, group_id) =
-                (%(username)s, %(real_name)s, %(info)s, %(email)s, %(active)s,
-                %(login_last_success)s, %(login_last_failure)s, %(login_failed_count)s,
+            UPDATE web.user SET (username, password, real_name, info, email, active, login_last_success,
+                login_last_failure, login_failed_count, group_id) =
+            (%(username)s, %(password)s, %(real_name)s, %(info)s, %(email)s, %(active)s, %(login_last_success)s,
+                %(login_last_failure)s, %(login_failed_count)s,
                 (SELECT id FROM web.group WHERE name LIKE %(group_name)s))
             WHERE id = %(id)s;'''
         cursor.execute(sql, {
             'id': user.id,
             'username': user.username,
             'real_name': user.real_name,
+            'password': user.password,
             'info': user.description,
             'email': user.email,
             'active': user.active,
@@ -145,8 +146,7 @@ class UserMapper(object):
             if name == 'show_email':
                 value = 'True' if user.settings['show_email'] else ''
             sql = '''
-                INSERT INTO web.user_settings (user_id, "name", "value")
-                    VALUES (%(user_id)s, %(name)s, %(value)s)
+                INSERT INTO web.user_settings (user_id, "name", "value") VALUES (%(user_id)s, %(name)s, %(value)s)
                 ON CONFLICT (user_id, name) DO UPDATE SET "value" = excluded.value;'''
             cursor.execute(sql, {'user_id': user.id, 'name': name, 'value': value})
 

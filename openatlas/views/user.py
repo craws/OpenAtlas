@@ -37,7 +37,7 @@ class UserForm(Form):
 
         password = getattr(self, 'password', None)
         if password:
-            if password.data != self.password2.data:
+            if self.password.data != self.password2.data:
                 password.errors.append(str(_('error passwords must match')))
                 valid = False
             # if len(password.data) < app.config['PASSWORD_MINIMUM_LENGTH']:

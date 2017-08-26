@@ -121,7 +121,7 @@
                     {% endfor %}
                     {% if form and form.errors %}
                         {% for fieldName, errorMessages in form.errors.items(): %}
-                            {{ fieldName }} - {{ errorMessages }}
+                            {{ fieldName }} - {{ errorMessages[0] }}<br />
                         {% endfor %}
                     {% endif %}
                 </div>
