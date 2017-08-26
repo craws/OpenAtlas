@@ -1,14 +1,17 @@
 ## INFO
 
-   Before executing SQL statements make a backup of the database and replace database role "openatlas" if needed.
+Before executing SQL statements make a backup of the database.
+
+Replace database role "openatlas" if needed.
 
 ### 2.3.0 to 3.0.0 Upgrade (PHP to Python upgrade)
 
 #### Content
 
-    Website text translations where completely rewritten.
-    So please backup your text translations (Intro, Contact, FAQ) at "Content" in the web interface and
-    enter them in "Settings" again after executing the SQL below.
+Website text translations where completely rewritten.
+
+Please backup your text translations (Intro, Contact, FAQ) at "Content" in the web interface and
+enter them in "Settings" again after executing the SQL below.
 
 #### Database update
 
@@ -45,4 +48,6 @@
     ALTER TABLE web."user" ALTER COLUMN "active" DROP DEFAULT;
     ALTER TABLE web."user" ALTER COLUMN "active" TYPE bool USING active::bool;
     ALTER TABLE web."user" ALTER COLUMN "active" SET DEFAULT FALSE;
+    ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_user_id_name_value_key;
+    ALTER TABLE ONLY web.user_settings ADD CONSTRAINT user_settings_user_id_name_key UNIQUE (user_id, name);
     COMMIT;
