@@ -50,4 +50,5 @@ enter them in "Settings" again after executing the SQL below.
     ALTER TABLE web."user" ALTER COLUMN "active" SET DEFAULT FALSE;
     ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_user_id_name_value_key;
     ALTER TABLE ONLY web.user_settings ADD CONSTRAINT user_settings_user_id_name_key UNIQUE (user_id, name);
+    INSERT INTO web.settings (name, value) VALUES ('minimum_password_length', '12');
     COMMIT;

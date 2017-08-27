@@ -7,17 +7,12 @@ INSERT INTO "group" (name) VALUES
 ('readonly');
 
 INSERT INTO settings (name, value) VALUES
+('default_language', 'en'),
+('default_table_rows', '20'),
 ('failed_login_forget_minutes', '1'),
 ('failed_login_tries', '3'),
-('random_password_length', '16'),
-('reset_confirm_hours', '24'),
-('default_language', 'en'),
 ('log_level', '6'),
 ('maintenance', '0'),
-('offline', '1'),
-('site_name', 'OpenAtlas'),
-('default_table_rows', '20'),
-('notify_login', '1'),
 ('mail', '0'),
 ('mail_transport_username', ''),
 ('mail_transport_password', ''),
@@ -30,4 +25,10 @@ INSERT INTO settings (name, value) VALUES
 ('mail_from_name', ''),
 ('mail_recipients_login', ''),
 ('mail_recipients_feedback', '')
+('minimum_password_length', '12'),
+('notify_login', '1'),
+('offline', '1'),
+('random_password_length', '16'),
+('reset_confirm_hours', '24'),
+('site_name', 'OpenAtlas')
 ;

@@ -31,6 +31,7 @@
         ] %}
         {% set data_authentication = [
             (form.random_password_length.label, form.random_password_length),
+            (form.minimum_password_length.label, form.minimum_password_length),
             (form.reset_confirm_hours.label, form.reset_confirm_hours),
             (form.failed_login_tries.label, form.failed_login_tries),
             (form.failed_login_forget_minutes.label, form.failed_login_forget_minutes),

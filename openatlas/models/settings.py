@@ -5,11 +5,31 @@ import openatlas
 
 class SettingsMapper(object):
 
-    fields = ['site_name', 'default_language', 'default_table_rows', 'log_level', 'maintenance', 'offline', 'mail',
-              'mail_transport_username', 'mail_transport_host', 'mail_transport_port', 'mail_transport_type',
-              'mail_transport_ssl', 'mail_transport_auth', 'mail_from_email', 'mail_from_name', 'mail_recipients_login',
-              'mail_recipients_feedback', 'random_password_length', 'reset_confirm_hours', 'failed_login_tries',
-              'failed_login_forget_minutes']
+    fields = [
+        'default_language',
+        'default_table_rows',
+        'failed_login_forget_minutes',
+        'failed_login_tries',
+        'log_level',
+        'maintenance',
+        'mail',
+        'mail_transport_username',
+        # 'mail_transport_password',
+        'mail_transport_ssl',
+        'mail_transport_type',
+        'mail_transport_auth',
+        'mail_transport_port',
+        'mail_transport_host',
+        'mail_from_email',
+        'mail_from_name',
+        'mail_recipients_login',
+        'mail_recipients_feedback',
+        'minimum_password_length',
+        # 'notify_login',
+        'offline',
+        'random_password_length',
+        'reset_confirm_hours',
+    ]
 
     @staticmethod
     def get_settings():
@@ -18,7 +38,14 @@ class SettingsMapper(object):
         cursor.execute("SELECT name, value FROM web.settings;")
         for row in cursor.fetchall():
             settings[row.name] = row.value
-            if row.name == 'default_table_rows':
+            if row.name in [
+                'default_table_rows',
+                'failed_login_forget_minutes',
+                'failed_login_tries',
+                'minimum_password_length',
+                'random_password_length',
+                'reset_confirm_hours'
+            ]:
                 settings[row.name] = int(row.value)
         return settings
 

@@ -6,7 +6,7 @@ from flask_login import current_user, login_required
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import BooleanField, PasswordField, SelectField, SubmitField, StringField
-from wtforms.validators import InputRequired
+from wtforms.validators import Email, InputRequired, Length
 
 import openatlas
 from openatlas import app
@@ -42,7 +42,7 @@ class PasswordForm(Form):
 
 class ProfileForm(Form):
     name = StringField(_('name'))
-    email = StringField(_('email'))
+    email = StringField(_('email'), validators=[InputRequired(), Email()])
     show_email = BooleanField(_('show email'), false_values='false')
     newsletter = BooleanField(_('newsletter'), false_values='false')
     save = SubmitField(_('save'))
@@ -108,6 +108,8 @@ def profile_update():
 @login_required
 def profile_password():
     form = PasswordForm()
+    form.password.validators.append(Length(min=session['settings']['minimum_password_length']))
+    form.password2.validators.append(Length(min=session['settings']['minimum_password_length']))
     if form.validate_on_submit():
         current_user.password = bcrypt.hashpw(form.password.data.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
         current_user.update()

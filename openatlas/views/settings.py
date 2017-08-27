@@ -17,7 +17,7 @@ class SettingsForm(Form):
     # General
     site_name = StringField(uc_first(_('site name')))
     default_language = SelectField(uc_first(_('default language')), choices=[])
-    default_table_rows = SelectField(uc_first(_('default table rows')), choices=[], coerce=int)
+    default_table_rows = SelectField(uc_first(_('default table rows')), choices=[])
     log_level = SelectField(uc_first(_('log level')), choices=[], coerce=int)
     maintenance = BooleanField(uc_first(_('maintenance')), false_values='false')
     offline = BooleanField(uc_first(_('offline')), false_values='false')
@@ -51,7 +51,7 @@ def settings_index():
         ('general', OrderedDict([
             (_('site name'), settings['site_name']),
             (_('default language'), openatlas.app.config['LANGUAGES'][settings['default_language']]),
-            (_('default table rows'), int(settings['default_table_rows'])),
+            (_('default table rows'), settings['default_table_rows']),
             (_('log level'), openatlas.log_levels[int(settings['log_level'])]),
             (_('maintenance'), uc_first('on') if settings['maintenance'] == 'true' else uc_first('off')),
             (_('offline'), uc_first('on') if settings['offline'] == 'true' else uc_first('off')),
@@ -71,6 +71,7 @@ def settings_index():
         ])),
         ('authentication', OrderedDict([
             (_('random password length'), settings['random_password_length']),
+            (_('minimum password length'), settings['minimum_password_length']),
             (_('reset confirm hours'), settings['reset_confirm_hours']),
             (_('failed login tries'), settings['failed_login_tries']),
             (_('failed login forget minutes'), settings['failed_login_forget_minutes'])

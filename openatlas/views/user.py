@@ -1,11 +1,11 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask_babel import gettext, lazy_gettext as _
-from flask import abort, flash, render_template, url_for
+from flask import abort, flash, render_template, session, url_for
 from flask_login import current_user
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import BooleanField, HiddenField, PasswordField, SelectField, StringField, SubmitField, TextAreaField
-from wtforms.validators import Email, InputRequired
+from wtforms.validators import Email, InputRequired, Length
 
 from openatlas import app
 from openatlas.util.util import format_date, link, required_group, uc_first
@@ -36,21 +36,10 @@ class UserForm(Form):
         if user.email != self.email.data and UserMapper.get_by_email(self.email.data):
             self.email.errors.append(str(_('error email exists')))
             valid = False
-
         if getattr(self, 'password', None) and self.password.data != self.password2.data:
             self.password.errors.append(_('error passwords must match'))
             self.password2.errors.append(_('error passwords must match'))
             valid = False
-            # if len(password.data) < app.config['PASSWORD_MINIMUM_LENGTH']:
-            #     password.errors.append(str(_('error password length')))
-            #    form_validity = False
-            # if app.config['PASSWORD_REQUIRE_CHARACTER_MIX']:
-            #    lowercase_letters = sum(1 for c in password.data if c.islower())
-            #    uppercase_letters = sum(1 for c in password.data if c.isupper())
-            #    digits = sum(1 for c in password.data if c.isdigit())
-            #    if lowercase_letters < 1 or uppercase_letters < 1 or digits < 1:
-            #        password.errors.append(str(_('error password complexity')))
-            #        form_validity = False
         return valid
 
 
@@ -124,6 +113,8 @@ def user_update(user_id):
 @required_group('manager')
 def user_insert():
     form = UserForm()
+    form.password.validators.append(Length(min=session['settings']['minimum_password_length']))
+    form.password2.validators.append(Length(min=session['settings']['minimum_password_length']))
     if form.validate_on_submit():
         user_id = UserMapper.insert(form)
         flash(gettext('user created'), 'info')
