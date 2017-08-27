@@ -177,22 +177,22 @@ def get_class_name(self, code):
 @blueprint.app_template_filter()
 def display_form(self, form):
     html = '<form method="post">' + '<div class="data-table">'
+    info = ''
     for field in form:
-        if field.type == 'CSRFTokenField':
+        if field.type in ['CSRFTokenField', 'HiddenField']:
             html += str(field)
             continue
-        if field.type == 'SubmitField':
-            field.label.text = util.uc_first(field.label.text)
-            html += '<br />' + str(field)  # To do: better way for margin instead of using <br />
-            continue
         field.label.text = util.uc_first(field.label.text)
+        field.label.text += ' *' if field.flags.required else ''
+        if field.type == 'SubmitField':
+            html += str(field)
+            continue
         errors = ''
         for error in field.errors:
             errors += util.uc_first(error)
         errors = ' <span class="error">' + errors + ' </span>' if errors else ''
         class_ = "required" if field.flags.required else ''
-        field.label.text += ' *' if field.flags.required else ''
         html += '<div class="table-row"><div>' + str(field.label) + '</div>'
         html += '<div class="table-cell">' + str(field(class_=class_)) + errors + '</div></div>'
-    html += '</div></form>'
+    html += info + '</div></form>'
     return Markup(html)

@@ -246,6 +246,12 @@ div.data-table > div > div {
 
 form div.table-row div {
     text-align: right;
+    vertical-align: top;
+}
+
+form div.table-row div label {
+    display: inline-block;
+    margin-top: 0.3em;
 }
 
 form div.table-row div.table-cell {
@@ -270,7 +276,7 @@ input[type=text], input[type=password], select {
     box-sizing:content-box;
 }
 
-input[type=text], input[type=password] {
+input[type=text], input[type=password], textarea {
     padding-left: 0.2em;
     padding-right: 0.2em;
 }

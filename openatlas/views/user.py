@@ -4,25 +4,27 @@ from flask import abort, flash, render_template, url_for
 from flask_login import current_user
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import StringField, TextAreaField, HiddenField, PasswordField, BooleanField, SelectField
-from wtforms.validators import InputRequired, Email
+from wtforms import BooleanField, HiddenField, PasswordField, SelectField, StringField, SubmitField, TextAreaField
+from wtforms.validators import Email, InputRequired
 
 from openatlas import app
-from openatlas.util.util import uc_first, format_date, link, required_group
-from openatlas.models.user import UserMapper, User
+from openatlas.util.util import format_date, link, required_group, uc_first
+from openatlas.models.user import User, UserMapper
 
 
 class UserForm(Form):
     user_id = None
     active = BooleanField(uc_first(_('active')), default=True)
     username = StringField(uc_first(_('username')), validators=[InputRequired()])
+    group = SelectField(uc_first(_('group')), choices=UserMapper.get_groups(), default='readonly')
+    email = StringField(uc_first(_('email')), validators=[InputRequired(), Email()])
     password = PasswordField(uc_first(_('password')), validators=[InputRequired()])
     password2 = PasswordField(uc_first(_('repeat password')), validators=[InputRequired()])
-    description = TextAreaField(uc_first(_('info')))
     real_name = StringField(uc_first(_('name')))
-    email = StringField(uc_first(_('email')), validators=[InputRequired(), Email()])
+    description = TextAreaField(uc_first(_('info')))
     send_info = BooleanField(_('send account information'))
-    group = SelectField(uc_first(_('group')), choices=UserMapper.get_groups(), default='readonly')
+    save = SubmitField(_('save'))
+    insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
 
     def validate(self, extra_validators=None):
@@ -35,11 +37,10 @@ class UserForm(Form):
             self.email.errors.append(str(_('error email exists')))
             valid = False
 
-        password = getattr(self, 'password', None)
-        if password:
-            if self.password.data != self.password2.data:
-                password.errors.append(str(_('error passwords must match')))
-                valid = False
+        if getattr(self, 'password', None) and self.password.data != self.password2.data:
+            self.password.errors.append(_('error passwords must match'))
+            self.password2.errors.append(_('error passwords must match'))
+            valid = False
             # if len(password.data) < app.config['PASSWORD_MINIMUM_LENGTH']:
             #     password.errors.append(str(_('error password length')))
             #    form_validity = False
@@ -97,9 +98,7 @@ def user_update(user_id):
         abort(403)
     form = UserForm()
     form.user_id = user_id
-    del form.password
-    del form.password2
-    del form.send_info
+    del form.password, form.password2, form.send_info, form.insert_and_continue
     if form.validate_on_submit():
         user.active = form.active.data
         if user.id == current_user.id:  # don't allow setting oneself as inactive

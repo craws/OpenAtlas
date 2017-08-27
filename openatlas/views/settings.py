@@ -37,6 +37,7 @@ class SettingsForm(Form):
 
     # Authentication
     random_password_length = StringField(uc_first(_('random password length')))
+    minimum_password_length = StringField(uc_first(_('minimum password length')))
     reset_confirm_hours = StringField(uc_first(_('reset confirm hours')))
     failed_login_tries = StringField(uc_first(_('failed login tries')))
     failed_login_forget_minutes = StringField(uc_first(_('failed login forget minutes')))
