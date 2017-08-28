@@ -3,5 +3,5 @@
      <a href="{{ url_for('user_index') }}">{{ _('user')|uc_first }}</a> > + {{ _('user')|uc_first }}
 {% endblock %}
 {% block content %}
-     {{ form|display_form }}
+     {{ form|display_form('user-form') }}
 {% endblock %}

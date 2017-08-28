@@ -2,13 +2,13 @@
 tinymce.init({
     menubar: false,
     relative_urls : false,
-    mode: "specific_textareas",
-    editor_selector: "tinymce",
-    resize: "both",
+    mode: 'specific_textareas',
+    editor_selector: 'tinymce',
+    resize: 'both',
     toolbar_items_size : 'small',
-    plugins: "link code textcolor colorpicker",
-    toolbar: "bold italic underline strikethrough alignleft aligncenter alignright alignjustify undo redo link " +
-        "unlink fontselect fontsizeselect forecolor code",
+    plugins: 'link code textcolor colorpicker',
+    toolbar: 'bold italic underline strikethrough alignleft aligncenter alignright alignjustify undo redo link ' +
+        'unlink fontselect fontsizeselect forecolor code',
 });
 
 $.tablesorter.addParser({
@@ -26,10 +26,10 @@ $.tablesorter.addParser({
 });
 
 function resizeText(multiplier) {
-    if (document.body.style.fontSize === "") {
-        document.body.style.fontSize = "1.0em";
+    if (document.body.style.fontSize === '') {
+        document.body.style.fontSize = '1.0em';
     }
-    document.body.style.fontSize = parseFloat(document.body.style.fontSize) + (multiplier * 0.2) + "em";
+    document.body.style.fontSize = parseFloat(document.body.style.fontSize) + (multiplier * 0.2) + 'em';
 }
 
 function ucString(string) {
@@ -37,11 +37,11 @@ function ucString(string) {
 }
 
 function selectFromTable(element, table, id) {
-    $("#" + table).attr('value', id);
-    $("#" + table + "-button").val(element.innerHTML);
-    $("#" + table + "-button").focus(); /* to refresh/fill button and remove validation errors */
-    $("#" + table + "-clear").show();
-    $(".ui-dialog-titlebar-close").trigger('click');
+    $('#' + table).attr('value', id);
+    $('#' + table + '-button').val(element.innerHTML);
+    $('#' + table + '-button').focus(); /* to refresh/fill button and remove validation errors */
+    $('#' + table + '-clear').show();
+    $('.ui-dialog-titlebar-close').trigger('click');
 }
 
 function createOverlay(name, multiple = false, type = 'table') {

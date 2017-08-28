@@ -4,6 +4,7 @@ import jinja2
 import flask
 import re
 
+import os
 from flask_login import current_user
 from jinja2 import evalcontextfilter, Markup, escape
 from flask_babel import lazy_gettext as _
@@ -175,8 +176,9 @@ def get_class_name(self, code):
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_form(self, form):
-    html = '<form method="post">' + '<div class="data-table">'
+def display_form(self, form, form_id=None):
+    form_id = ' id="' + form_id + '" ' if form_id else ''
+    html = '<form method="post"' + form_id + '>' + '<div class="data-table">'
     info = ''
     for field in form:
         if field.type in ['CSRFTokenField', 'HiddenField']:
@@ -196,3 +198,11 @@ def display_form(self, form):
         html += '<div class="table-cell">' + str(field(class_=class_)) + errors + '</div></div>'
     html += info + '</div></form>'
     return Markup(html)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def test_file(self, file_name):
+    if os.path.isfile(openatlas.app.root_path + '/static/' + file_name):
+        return file_name
+    return False

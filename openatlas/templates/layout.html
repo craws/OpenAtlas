@@ -23,6 +23,13 @@
         <script src="/js/tinymce/tinymce.min.js"></script>
         <script src="/js/functions.js"></script>
         <script src="/js/forms.js"></script>
+        {% set js_translation_file = '/js/messages_' + session['language'] + '.js' %}
+        {% if js_translation_file|test_file %}
+            <script src="{{ js_translation_file }}"></script>
+        {% endif %}
+        <script type="text/javascript">
+            minimumPasswordLength = {{ session['settings']['minimum_password_length'] }};
+        </script>
         <title>
             {{ session['settings']['site_name'] }}
             {{ ' - ' + request.path.split('/')[1]|uc_first if request.path.split('/')[1] else '' }}
