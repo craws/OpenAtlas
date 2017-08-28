@@ -52,9 +52,9 @@ def user_view(user_id):
         (_('group'), user.group),
         (_('name'), user.real_name),
         (_('email'), user.email),
-        (_('language'), 'To do'),
-        (_('last login'), 'To do'),
-        (_('failed logins'), 'To do')
+        (_('language'), user.settings['language']),
+        (_('last login'), format_date(user.login_last_success)),
+        (_('failed logins'), user.login_failed_count)
     ]}
     return render_template('user/view.html', user=user, data=data)
 
@@ -72,7 +72,7 @@ def user_index():
             link(user),
             user.group,
             user.email,
-            '',  # user.newsletter
+            user.settings['newsletter'],
             format_date(user.created),
             format_date(user.login_last_success)
         ])

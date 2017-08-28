@@ -3,7 +3,7 @@ import bcrypt
 import datetime
 
 from openatlas import app
-from flask import render_template, request, flash, url_for
+from flask import render_template, request, flash, url_for, session
 from flask_babel import lazy_gettext as _
 from flask_login import LoginManager, login_required, login_user, logout_user
 from flask_wtf import Form
@@ -40,6 +40,8 @@ def login():
             if password_hashed == user.password.encode('utf-8'):
                 if user.active:
                     login_user(user)
+                    session['login_previous_success'] = user.login_last_success
+                    session['login_previous_failures'] = user.login_failed_count
                     user.login_last_success = datetime.datetime.now()
                     user.login_failed_count = 0
                     user.update()
