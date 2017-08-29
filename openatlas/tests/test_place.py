@@ -13,7 +13,7 @@ class PlaceTest(TestBaseCase):
         place_id = rv.location.split('/')[-1]
         form_data['continue_'] = 'yes'
         rv = self.app.post('/place/insert/E21', data=form_data, follow_redirects=True)
-        assert b'Entity created' in rv.data
+        assert b'An entry has been created' in rv.data
         rv = self.app.get('/place')
         assert b'Test place' in rv.data
         rv = self.app.get('/place/update/' + place_id)
@@ -22,4 +22,4 @@ class PlaceTest(TestBaseCase):
         rv = self.app.post('/place/update/' + place_id, data=form_data, follow_redirects=True)
         assert b'Test place updated' in rv.data
         rv = self.app.get('/place/delete/' + place_id, follow_redirects=True)
-        assert b'Entity deleted' in rv.data
+        assert b'The entry has been deleted.' in rv.data

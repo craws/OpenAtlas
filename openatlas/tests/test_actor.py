@@ -13,7 +13,7 @@ class ActorTests(TestBaseCase):
         actor_id = rv.location.split('/')[-1]
         form_data['continue_'] = 'yes'
         rv = self.app.post('/actor/insert/E21', data=form_data, follow_redirects=True)
-        assert b'Entity created' in rv.data
+        assert b'An entry has been created' in rv.data
         rv = self.app.get('/actor')
         assert b'Test actor' in rv.data
         rv = self.app.get('/actor/update/' + actor_id)
@@ -22,4 +22,4 @@ class ActorTests(TestBaseCase):
         rv = self.app.post('/actor/update/' + actor_id, data=form_data, follow_redirects=True)
         assert b'Test actor updated' in rv.data
         rv = self.app.get('/actor/delete/' + actor_id, follow_redirects=True)
-        assert b'Entity deleted' in rv.data
+        assert b'The entry has been deleted.' in rv.data

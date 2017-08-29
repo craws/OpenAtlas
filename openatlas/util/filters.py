@@ -6,11 +6,10 @@ import re
 
 import os
 
-from flask import session
+from flask import session, render_template_string
 from flask_login import current_user
 from jinja2 import evalcontextfilter, Markup, escape
 from flask_babel import lazy_gettext as _
-from markdown import markdown
 
 import openatlas
 from openatlas import ClassMapper
@@ -95,7 +94,7 @@ def table_select_model(self, name, selected=None):
     html = '<input id="' + name + '-button" name="' + name + '-button" class="table-select" type="text"'
     html += ' onfocus="this.blur()" readonly="readonly" value="' + value + '"> '
     html += '<div id="' + name + '-overlay" class="overlay">'
-    html += '<div id="' + name + '-dialog" class="overlay-container">' + markdown(pager(None, table)) + '</div></div>'
+    html += '<div id="' + name + '-dialog" class="overlay-container">' + render_template_string(pager(None, table)) + '</div></div>'
     html += '<script>$(document).ready(function () {createOverlay("' + name + '");});</script>'
     return Markup(html)
 

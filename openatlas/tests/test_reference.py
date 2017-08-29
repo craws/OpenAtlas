@@ -17,7 +17,7 @@ class ReferenceTest(TestBaseCase):
         bibliography_id = rv.location.split('/')[-1]
         form_data['continue_'] = 'yes'
         rv = self.app.post('/reference/insert/carrier', data=form_data, follow_redirects=True)
-        assert b'Entity created' in rv.data
+        assert b'An entry has been created' in rv.data
         rv = self.app.get('/reference')
         assert b'Test reference' in rv.data
         rv = self.app.get('/reference/update/' + bibliography_id)
@@ -26,4 +26,4 @@ class ReferenceTest(TestBaseCase):
         rv = self.app.post('/reference/update/' + bibliography_id, data=form_data, follow_redirects=True)
         assert b'Test reference updated' in rv.data
         rv = self.app.get('/reference/delete/' + bibliography_id, follow_redirects=True)
-        assert b'Entity deleted' in rv.data
+        assert b'The entry has been deleted.' in rv.data

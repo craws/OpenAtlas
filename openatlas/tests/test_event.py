@@ -15,7 +15,7 @@ class EventTest(TestBaseCase):
         event_id = rv.location.split('/')[-1]
         form_data['continue_'] = 'yes'
         rv = self.app.post('/event/insert/E8', data=form_data, follow_redirects=True)
-        assert b'Entity created' in rv.data
+        assert b'An entry has been created' in rv.data
         rv = self.app.get('/event')
         assert b'Test event' in rv.data
         rv = self.app.get('/event/update/' + event_id)
@@ -24,8 +24,8 @@ class EventTest(TestBaseCase):
         rv = self.app.post('/event/update/' + event_id, data=form_data, follow_redirects=True)
         assert b'Test event updated' in rv.data
         rv = self.app.post('/event/update/' + str(root_event.id), data=form_data, follow_redirects=True)
-        assert b'Error' in rv.data
+        assert b'Forbidden' in rv.data
         rv = self.app.get('/event/delete/' + str(root_event.id), data=form_data, follow_redirects=True)
-        assert b'Error' in rv.data
+        assert b'Forbidden' in rv.data
         rv = self.app.get('/event/delete/' + event_id, follow_redirects=True)
-        assert b'Entity deleted' in rv.data
+        assert b'The entry has been deleted.' in rv.data

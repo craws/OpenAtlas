@@ -7,23 +7,22 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-29 20:58+0200\n"
+"POT-Creation-Date: 2017-08-29 21:32+0200\n"
 "PO-Revision-Date: 2017-08-29 21:31+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: de\n"
 "Language-Team: de <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+"Plural-Forms: nplurals=2; plural=(n != 1)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
-"X-Generator: Poedit 1.8.11\n"
 
 #: templates/layout.html:46
 msgid "warning no js"
 msgstr ""
-"JavaScript scheint deaktiviert zu sein. Die Funktionalität dieser Seite ist "
-"dadurch eingeschränkt."
+"JavaScript scheint deaktiviert zu sein. Die Funktionalität dieser Seite "
+"ist dadurch eingeschränkt."
 
 #: templates/index/changelog.html:8 templates/layout.html:57
 msgid "version"
@@ -166,8 +165,8 @@ msgstr "Hierarchie"
 msgid "last login"
 msgstr "Letzte Anmeldung"
 
-#: templates/index/index.html:9
-msgid "failed logins since last login"
+#: templates/index/index.html:9 views/user.py:57
+msgid "failed logins"
 msgstr "Fehlerhafte Anmeldungen"
 
 #: templates/index/index.html:13
@@ -177,15 +176,16 @@ msgstr "Das ist die erste Anmeldung. Herzlich willkommen!"
 #: templates/index/index.html:24
 msgid "text_intro"
 msgstr ""
-"%(link_openatlas)s ist eine Datenbank Anwendung die es ermöglicht komplexe "
-"historische, archäologische und geospatiale Daten zu verwalten.\n"
+"%(link_openatlas)s ist eine Datenbank Anwendung die es ermöglicht "
+"komplexe historische, archäologische und geospatiale Daten zu verwalten."
+"\n"
 "\n"
 "OpenAtlas ist Open Source und auf %(link_github)s vefügbar.  Es benutzt "
 "Open Source Technologien wie Apache, PostgreSQL, PostGIS, PHP, Zend "
 "Framework und Leaflet.\n"
 "\n"
-"Das Datenmodell basiert auf Klassen und Eigenschaften des %(link_cidoc)s, "
-"einem international anerkannter Standard für historische Daten ist.\n"
+"Das Datenmodell basiert auf Klassen und Eigenschaften des %(link_cidoc)s,"
+" einem international anerkannter Standard für historische Daten ist.\n"
 "\n"
 "Näheres ist auf unserem %(link_wiki)s  nachzulesen oder probiere unsere "
 "%(link_demo)s."
@@ -333,15 +333,15 @@ msgstr "Die Änderungen wurden gespeichert."
 msgid "class"
 msgstr "Klasse"
 
-#: views/event.py:64 views/event.py:79
+#: views/event.py:64 views/event.py:79 views/user.py:132
 msgid "error forbidden"
 msgstr "Zugriff verweigert"
 
 #: views/login.py:37
 msgid "error login attempts exceeded"
 msgstr ""
-"Zu viele Anmeldeversuche mit diesem User. Nach ein paar Minuten kannst du "
-"es wieder probieren."
+"Zu viele Anmeldeversuche mit diesem User. Nach ein paar Minuten kannst du"
+" es wieder probieren."
 
 #: views/login.py:50
 msgid "error inactive"
@@ -512,10 +512,6 @@ msgstr "Dieser Username ist bereits in Verwendung."
 msgid "error email exists"
 msgstr "Diese E-Mail Adresse ist bereits in Verwendung."
 
-#: views/user.py:57
-msgid "failed logins"
-msgstr "Fehlerhafte Anmeldungen"
-
 #: views/user.py:68
 msgid "created"
 msgstr "erstellt"
@@ -528,10 +524,13 @@ msgstr "Der User wurde geändert."
 msgid "user created"
 msgstr "Der User wurde angelegt."
 
-#: views/user.py:132
-msgid "error user deleted"
-msgstr ""
-
 #: views/user.py:135
 msgid "user deleted"
 msgstr "Der User wurde gelöscht."
+
+#~ msgid "failed logins since last login"
+#~ msgstr "Fehlerhafte Anmeldungen"
+
+#~ msgid "error user deleted"
+#~ msgstr ""
+

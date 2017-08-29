@@ -7,16 +7,17 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-29 20:58+0200\n"
-"PO-Revision-Date: 2017-02-06 17:49+0100\n"
+"POT-Creation-Date: 2017-08-29 21:32+0200\n"
+"PO-Revision-Date: 2017-08-29 21:53+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
-"Plural-Forms: nplurals=2; plural=(n != 1)\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
+"X-Generator: Poedit 1.8.11\n"
 
 #: templates/layout.html:46
 msgid "warning no js"
@@ -36,7 +37,7 @@ msgstr "changelog"
 #: templates/model/class_view.html:3 templates/model/index.html:2
 #: templates/model/property.html:3 templates/model/property_view.html:3
 msgid "model"
-msgstr ""
+msgstr "model"
 
 #: templates/index/credits.html:4 templates/layout.html:60
 msgid "credits"
@@ -54,7 +55,7 @@ msgstr "faq"
 #: templates/user/index.html:5 templates/user/insert.html:3
 #: templates/user/update.html:3 templates/user/view.html:3
 msgid "user"
-msgstr ""
+msgstr "user"
 
 #: templates/content/index.html:3 templates/content/update.html:3
 #: templates/content/view.html:3 templates/layout.html:65 views/place.py:17
@@ -69,12 +70,12 @@ msgstr "settings"
 
 #: templates/layout.html:73
 msgid "hello"
-msgstr ""
+msgstr "hello"
 
 #: templates/layout.html:74 templates/profile/index.html:2
 #: templates/profile/password.html:3 templates/profile/update.html:3
 msgid "profile"
-msgstr ""
+msgstr "profile"
 
 #: templates/layout.html:79 templates/layout.html:80
 msgid "zoom in"
@@ -86,11 +87,11 @@ msgstr "Smaller font size"
 
 #: templates/layout.html:91
 msgid "logout"
-msgstr ""
+msgstr "logout"
 
 #: templates/layout.html:93 templates/login/index.html:4
 msgid "login"
-msgstr ""
+msgstr "login"
 
 #: templates/index/changelog.html:3 templates/index/contact.html:3
 #: templates/index/credits.html:3 templates/index/faq.html:3
@@ -103,13 +104,13 @@ msgstr "overview"
 #: templates/place/form.html:11 templates/reference/form.html:11
 #: templates/source/form.html:11
 msgid "insert"
-msgstr ""
+msgstr "Insert"
 
 #: templates/actor/form.html:13 templates/event/form.html:13
 #: templates/place/form.html:13 templates/reference/form.html:13
 #: templates/source/form.html:13 views/user.py:27
 msgid "insert and continue"
-msgstr ""
+msgstr "insert and continue"
 
 #: templates/actor/form.html:16 templates/content/update.html:14
 #: templates/event/form.html:16 templates/place/form.html:16
@@ -122,7 +123,7 @@ msgstr "save"
 #: templates/actor/index.html:2 templates/actor/insert.html:3
 #: templates/actor/update.html:3 templates/actor/view.html:3
 msgid "actor"
-msgstr ""
+msgstr "actor"
 
 #: templates/actor/update.html:4 templates/actor/view.html:14
 #: templates/content/update.html:5 templates/content/view.html:7
@@ -141,7 +142,7 @@ msgstr "edit"
 #: templates/place/view.html:9 templates/reference/view.html:9
 #: templates/source/view.html:8 views/event.py:36 views/user.py:24
 msgid "info"
-msgstr ""
+msgstr "info"
 
 #: templates/actor/view.html:15 templates/actor/view.html:16
 #: templates/event/view.html:15 templates/event/view.html:16
@@ -150,28 +151,28 @@ msgstr ""
 #: templates/source/view.html:14 templates/source/view.html:15
 #: templates/user/view.html:12 templates/user/view.html:13
 msgid "delete"
-msgstr ""
+msgstr "delete"
 
 #: templates/event/index.html:2 templates/event/insert.html:3
 #: templates/event/update.html:3 templates/event/view.html:3
 msgid "event"
-msgstr ""
+msgstr "event"
 
 #: templates/hierarchy/index.html:2
 msgid "hierarchy"
-msgstr ""
+msgstr "hierarchy"
 
 #: templates/index/index.html:7 views/user.py:56 views/user.py:68
 msgid "last login"
-msgstr ""
+msgstr "last login"
 
-#: templates/index/index.html:9
-msgid "failed logins since last login"
-msgstr ""
+#: templates/index/index.html:9 views/user.py:57
+msgid "failed logins"
+msgstr "failed Logins"
 
 #: templates/index/index.html:13
 msgid "first login"
-msgstr ""
+msgstr "This is your first log in. Welcome!"
 
 #: templates/index/index.html:24
 msgid "text_intro"
@@ -180,8 +181,8 @@ msgstr ""
 "complex historical, archeological  and geospatial data.\n"
 "\n"
 "OpenAtlas is Open Source and available on %(link_github)s. It uses open "
-"source technology like Apache, PostgreSQL, PostGIS, PHP, Zend Framework "
-"and Leaflet.\n"
+"source technology like Apache, PostgreSQL, PostGIS, PHP, Zend Framework and "
+"Leaflet.\n"
 "\n"
 "The data model is based on classes and properties of the %(link_cidoc)s "
 "which is an internationally established standard for historical "
@@ -193,85 +194,85 @@ msgstr ""
 #: templates/model/class.html:4 templates/model/class_view.html:4
 #: templates/model/index.html:12
 msgid "classes"
-msgstr ""
+msgstr "classes"
 
 #: templates/model/class_view.html:22 templates/model/property_view.html:29
 #: util/filters.py:169 views/actor.py:17 views/event.py:17
 #: views/reference.py:17
 msgid "description"
-msgstr ""
+msgstr "description"
 
 #: templates/model/index.html:11
 msgid "browse"
-msgstr ""
+msgstr "browse"
 
 #: templates/model/index.html:13 templates/model/property.html:4
 #: templates/model/property_view.html:4
 msgid "properties"
-msgstr ""
+msgstr "properties"
 
 #: templates/model/index.html:15
 msgid "check for valid links"
-msgstr ""
+msgstr "check for valid links"
 
 #: templates/model/index.html:24
 msgid "test"
-msgstr ""
+msgstr "test"
 
 #: templates/model/index.html:28
 msgid "result for"
-msgstr ""
+msgstr "result for"
 
 #: templates/model/index.html:34
 msgid "valid link"
-msgstr ""
+msgstr "valid link"
 
 #: templates/model/index.html:38
 msgid "wrong domain"
-msgstr ""
+msgstr "wrong domain"
 
 #: templates/model/index.html:39 templates/model/index.html:45
 msgid "for"
-msgstr ""
+msgstr "for"
 
 #: templates/model/index.html:44
 msgid "wrong range"
-msgstr ""
+msgstr "wrong range"
 
 #: templates/model/index.html:49
 msgid "no check because whitelisted"
-msgstr ""
+msgstr "not checked because whitelisted"
 
 #: templates/place/index.html:2 templates/place/index.html:6
 #: templates/place/insert.html:3 templates/place/update.html:3
 #: templates/place/view.html:3
 msgid "place"
-msgstr ""
+msgstr "place"
 
 #: templates/profile/index.html:6 templates/profile/password.html:4
 msgid "change password"
-msgstr ""
+msgstr "change password"
 
 #: templates/profile/index.html:9
 msgid "information"
-msgstr ""
+msgstr "information"
 
 #: templates/profile/index.html:13
 msgid "display"
-msgstr ""
+msgstr "display"
 
 #: templates/reference/index.html:2 templates/reference/insert.html:3
 #: templates/reference/update.html:3 templates/reference/view.html:3
 msgid "reference"
-msgstr ""
+msgstr "reference"
 
 #: templates/reference/index.html:6
 msgid "bibliography"
-msgstr ""
+msgstr "bibliography"
 
 #: templates/reference/index.html:7
 msgid "edition"
-msgstr ""
+msgstr "edition"
 
 #: templates/settings/index.html:29
 msgid "send_test_mail"
@@ -281,126 +282,126 @@ msgstr "Send test mail"
 #: templates/source/insert.html:3 templates/source/update.html:3
 #: templates/source/view.html:3
 msgid "source"
-msgstr ""
+msgstr "source"
 
 #: util/filters.py:55
 msgid "no"
-msgstr ""
+msgstr "no"
 
 #: util/filters.py:56
 msgid "yes"
-msgstr ""
+msgstr "yes"
 
 #: util/filters.py:107
 msgid "no entries"
-msgstr ""
+msgstr "no entries"
 
 #: util/filters.py:128
 msgid "filter"
-msgstr ""
+msgstr "filter"
 
 #: util/util.py:32
 msgid "bookmark remove"
-msgstr ""
+msgstr "remove bookmark"
 
 #: util/util.py:32
 msgid "bookmark"
-msgstr ""
+msgstr "bookmark"
 
 #: views/actor.py:16 views/actor.py:26 views/event.py:16 views/event.py:26
 #: views/event.py:36 views/place.py:16 views/place.py:55 views/profile.py:44
 #: views/profile.py:56 views/reference.py:16 views/reference.py:26
 #: views/source.py:16 views/source.py:55 views/user.py:23 views/user.py:53
 msgid "name"
-msgstr ""
+msgstr "name"
 
 #: views/actor.py:54 views/event.py:53 views/place.py:43 views/reference.py:58
 #: views/source.py:43
 msgid "entity created"
-msgstr ""
+msgstr "An entry has been created."
 
 #: views/actor.py:67 views/event.py:69 views/place.py:66 views/reference.py:71
 #: views/source.py:66
 msgid "entity deleted"
-msgstr ""
+msgstr "The entry has been deleted."
 
 #: views/actor.py:80 views/event.py:85 views/place.py:79 views/reference.py:84
 #: views/source.py:79
 msgid "entity updated"
-msgstr ""
+msgstr "Changes have been saved."
 
 #: views/event.py:36
 msgid "class"
-msgstr ""
+msgstr "class"
 
-#: views/event.py:64 views/event.py:79
+#: views/event.py:64 views/event.py:79 views/user.py:132
 msgid "error forbidden"
-msgstr ""
+msgstr "Forbidden"
 
 #: views/login.py:37
 msgid "error login attempts exceeded"
-msgstr ""
+msgstr "Too many login attempts. You can try again after a few minutes."
 
 #: views/login.py:50
 msgid "error inactive"
-msgstr ""
+msgstr "This user is not activated."
 
 #: views/login.py:55 views/profile.py:34
 msgid "error wrong password"
-msgstr ""
+msgstr "Wrong Password"
 
 #: views/login.py:57
 msgid "error username"
-msgstr ""
+msgstr "No user with this name found."
 
 #: views/profile.py:17 views/user.py:55
 msgid "language"
-msgstr ""
+msgstr "language"
 
 #: views/profile.py:21
 msgid "table rows"
-msgstr ""
+msgstr "table rows"
 
 #: views/profile.py:25
 msgid "old password"
-msgstr ""
+msgstr "old password"
 
 #: views/profile.py:26 views/user.py:21
 msgid "password"
-msgstr ""
+msgstr "password"
 
 #: views/profile.py:27 views/user.py:22
 msgid "repeat password"
-msgstr ""
+msgstr "repeat password"
 
 #: views/profile.py:37 views/profile.py:38 views/user.py:40 views/user.py:41
 msgid "error passwords must match"
-msgstr ""
+msgstr "The passwords didn't match."
 
 #: views/profile.py:45 views/profile.py:57 views/user.py:20 views/user.py:54
 #: views/user.py:68
 msgid "email"
-msgstr ""
+msgstr "email"
 
 #: views/profile.py:46 views/profile.py:58
 msgid "show email"
-msgstr ""
+msgstr "show email"
 
 #: views/profile.py:47 views/profile.py:59 views/user.py:68
 msgid "newsletter"
-msgstr ""
+msgstr "newsletter"
 
 #: views/profile.py:55 views/user.py:18 views/user.py:51 views/user.py:68
 msgid "username"
-msgstr ""
+msgstr "username"
 
 #: views/profile.py:71 views/profile.py:98
 msgid "info update"
-msgstr ""
+msgstr "Changes have been saved."
 
 #: views/profile.py:116
 msgid "info password updated"
-msgstr ""
+msgstr "Your password has been updated."
 
 #: views/settings.py:18 views/settings.py:52
 msgid "site name"
@@ -476,7 +477,7 @@ msgstr "random password length"
 
 #: views/settings.py:40 views/settings.py:74
 msgid "minimum password length"
-msgstr ""
+msgstr "minimum password length"
 
 #: views/settings.py:41 views/settings.py:75
 msgid "reset confirm hours"
@@ -492,45 +493,36 @@ msgstr "Failed login forget minutes"
 
 #: views/user.py:17
 msgid "active"
-msgstr ""
+msgstr "active"
 
 #: views/user.py:19 views/user.py:52 views/user.py:68
 msgid "group"
-msgstr ""
+msgstr "group"
 
 #: views/user.py:25
 msgid "send account information"
-msgstr ""
+msgstr "send account information"
 
 #: views/user.py:34
 msgid "error username exists"
-msgstr ""
+msgstr "This username is already in use."
 
 #: views/user.py:37
 msgid "error email exists"
-msgstr ""
-
-#: views/user.py:57
-msgid "failed logins"
-msgstr ""
+msgstr "This email is already in use."
 
 #: views/user.py:68
 msgid "created"
-msgstr ""
+msgstr "created"
 
 #: views/user.py:101
 msgid "user updated"
-msgstr ""
+msgstr "A user was updated."
 
 #: views/user.py:120
 msgid "user created"
-msgstr ""
-
-#: views/user.py:132
-msgid "error user deleted"
-msgstr ""
+msgstr "A user was created."
 
 #: views/user.py:135
 msgid "user deleted"
-msgstr ""
-
+msgstr "A user as deleted."

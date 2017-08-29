@@ -13,7 +13,7 @@ class SourceTest(TestBaseCase):
         source_id = rv.location.split('/')[-1]
         form_data['continue_'] = 'yes'
         rv = self.app.post('/source/insert/E33', data=form_data, follow_redirects=True)
-        assert b'Entity created' in rv.data
+        assert b'An entry has been created' in rv.data
         rv = self.app.get('/source')
         assert b'Test source' in rv.data
         rv = self.app.get('/source/update/' + source_id)
@@ -22,4 +22,4 @@ class SourceTest(TestBaseCase):
         rv = self.app.post('/source/update/' + source_id, data=form_data, follow_redirects=True)
         assert b'Test source updated' in rv.data
         rv = self.app.get('/source/delete/' + source_id, follow_redirects=True)
-        assert b'Entity deleted' in rv.data
+        assert b'The entry has been deleted.' in rv.data

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-08-29 20:58+0200\n"
+"POT-Creation-Date: 2017-08-29 21:32+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -162,8 +162,8 @@ msgstr ""
 msgid "last login"
 msgstr ""
 
-#: templates/index/index.html:9
-msgid "failed logins since last login"
+#: templates/index/index.html:9 views/user.py:57
+msgid "failed logins"
 msgstr ""
 
 #: templates/index/index.html:13
@@ -317,7 +317,7 @@ msgstr ""
 msgid "class"
 msgstr ""
 
-#: views/event.py:64 views/event.py:79
+#: views/event.py:64 views/event.py:79 views/user.py:132
 msgid "error forbidden"
 msgstr ""
 
@@ -494,10 +494,6 @@ msgstr ""
 msgid "error email exists"
 msgstr ""
 
-#: views/user.py:57
-msgid "failed logins"
-msgstr ""
-
 #: views/user.py:68
 msgid "created"
 msgstr ""
@@ -508,10 +504,6 @@ msgstr ""
 
 #: views/user.py:120
 msgid "user created"
-msgstr ""
-
-#: views/user.py:132
-msgid "error user deleted"
 msgstr ""
 
 #: views/user.py:135
