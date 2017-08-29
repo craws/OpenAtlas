@@ -2,11 +2,12 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.5.5
--- Dumped by pg_dump version 9.5.5
+-- Dumped from database version 9.6.4
+-- Dumped by pg_dump version 9.6.4
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
+SET idle_in_transaction_session_timeout = 0;
 SET client_encoding = 'UTF8';
 SET standard_conforming_strings = on;
 SET check_function_bodies = false;
@@ -76,7 +77,7 @@ DROP TRIGGER IF EXISTS update_modified ON gis.point;
 SET search_path = web, pg_catalog;
 
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_username_key;
-ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_user_id_name_value_key;
+ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_user_id_name_key;
 ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_pkey;
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_pkey;
 ALTER TABLE IF EXISTS ONLY web.user_log DROP CONSTRAINT IF EXISTS user_log_pkey;
@@ -205,9 +206,6 @@ DROP TABLE IF EXISTS gis.linestring;
 SET search_path = model, pg_catalog;
 
 DROP FUNCTION IF EXISTS model.update_modified();
-SET search_path = gis, pg_catalog;
-
-DROP FUNCTION IF EXISTS gis.geometry_creation();
 DROP SCHEMA IF EXISTS web;
 DROP SCHEMA IF EXISTS model;
 DROP SCHEMA IF EXISTS log;
@@ -247,40 +245,6 @@ CREATE SCHEMA web;
 
 
 ALTER SCHEMA web OWNER TO openatlas;
-
-SET search_path = gis, pg_catalog;
-
---
--- Name: geometry_creation(); Type: FUNCTION; Schema: gis; Owner: openatlas
---
-
-CREATE FUNCTION geometry_creation() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $$  BEGIN
-   IF (NEW.geom IS NULL) THEN
-    NEW.geom = ST_SetSRID(ST_MakePoint(NEW.easting, NEW.northing), 4326);
-   END IF;
-
-   IF (NEW.easting IS NULL) THEN
-    NEW.easting = ST_X(NEW.geom);
-    NEW.northing = ST_Y(NEW.geom);
-   END IF;
-
-   IF (NEW.northing IS NULL) THEN
-    NEW.easting = ST_X(NEW.geom);
-    NEW.northing = ST_Y(NEW.geom);
-   END IF;
-
-    NEW.easting = ST_X(NEW.geom);
-    NEW.northing = ST_Y(NEW.geom);
-
-
-   RETURN NEW;
-  END;
-$$;
-
-
-ALTER FUNCTION gis.geometry_creation() OWNER TO openatlas;
 
 SET search_path = model, pg_catalog;
 
@@ -1066,7 +1030,7 @@ CREATE TABLE "user" (
     group_id integer NOT NULL,
     username text NOT NULL,
     password text NOT NULL,
-    active integer DEFAULT 0 NOT NULL,
+    active boolean DEFAULT false NOT NULL,
     real_name text DEFAULT ''::text NOT NULL,
     email text,
     info text DEFAULT ''::text NOT NULL,
@@ -1217,21 +1181,21 @@ ALTER SEQUENCE user_settings_id_seq OWNED BY user_settings.id;
 SET search_path = gis, pg_catalog;
 
 --
--- Name: id; Type: DEFAULT; Schema: gis; Owner: openatlas
+-- Name: linestring id; Type: DEFAULT; Schema: gis; Owner: openatlas
 --
 
 ALTER TABLE ONLY linestring ALTER COLUMN id SET DEFAULT nextval('linestring_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: gis; Owner: openatlas
+-- Name: point id; Type: DEFAULT; Schema: gis; Owner: openatlas
 --
 
 ALTER TABLE ONLY point ALTER COLUMN id SET DEFAULT nextval('point_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: gis; Owner: openatlas
+-- Name: polygon id; Type: DEFAULT; Schema: gis; Owner: openatlas
 --
 
 ALTER TABLE ONLY polygon ALTER COLUMN id SET DEFAULT nextval('polygon_id_seq'::regclass);
@@ -1240,14 +1204,14 @@ ALTER TABLE ONLY polygon ALTER COLUMN id SET DEFAULT nextval('polygon_id_seq'::r
 SET search_path = log, pg_catalog;
 
 --
--- Name: id; Type: DEFAULT; Schema: log; Owner: openatlas
+-- Name: detail id; Type: DEFAULT; Schema: log; Owner: openatlas
 --
 
 ALTER TABLE ONLY detail ALTER COLUMN id SET DEFAULT nextval('detail_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: log; Owner: openatlas
+-- Name: log id; Type: DEFAULT; Schema: log; Owner: openatlas
 --
 
 ALTER TABLE ONLY log ALTER COLUMN id SET DEFAULT nextval('log_id_seq'::regclass);
@@ -1256,56 +1220,56 @@ ALTER TABLE ONLY log ALTER COLUMN id SET DEFAULT nextval('log_id_seq'::regclass)
 SET search_path = model, pg_catalog;
 
 --
--- Name: id; Type: DEFAULT; Schema: model; Owner: openatlas
+-- Name: class id; Type: DEFAULT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY class ALTER COLUMN id SET DEFAULT nextval('class_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: model; Owner: openatlas
+-- Name: class_inheritance id; Type: DEFAULT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY class_inheritance ALTER COLUMN id SET DEFAULT nextval('class_inheritance_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: model; Owner: openatlas
+-- Name: entity id; Type: DEFAULT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY entity ALTER COLUMN id SET DEFAULT nextval('entity_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: model; Owner: openatlas
+-- Name: i18n id; Type: DEFAULT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY i18n ALTER COLUMN id SET DEFAULT nextval('i18n_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: model; Owner: openatlas
+-- Name: link id; Type: DEFAULT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY link ALTER COLUMN id SET DEFAULT nextval('link_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: model; Owner: openatlas
+-- Name: link_property id; Type: DEFAULT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY link_property ALTER COLUMN id SET DEFAULT nextval('link_property_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: model; Owner: openatlas
+-- Name: property id; Type: DEFAULT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY property ALTER COLUMN id SET DEFAULT nextval('property_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: model; Owner: openatlas
+-- Name: property_inheritance id; Type: DEFAULT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY property_inheritance ALTER COLUMN id SET DEFAULT nextval('property_inheritance_id_seq'::regclass);
@@ -1314,70 +1278,70 @@ ALTER TABLE ONLY property_inheritance ALTER COLUMN id SET DEFAULT nextval('prope
 SET search_path = web, pg_catalog;
 
 --
--- Name: id; Type: DEFAULT; Schema: web; Owner: openatlas
+-- Name: form id; Type: DEFAULT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY form ALTER COLUMN id SET DEFAULT nextval('form_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: web; Owner: openatlas
+-- Name: group id; Type: DEFAULT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY "group" ALTER COLUMN id SET DEFAULT nextval('group_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: web; Owner: openatlas
+-- Name: hierarchy id; Type: DEFAULT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY hierarchy ALTER COLUMN id SET DEFAULT nextval('hierarchy_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: web; Owner: openatlas
+-- Name: hierarchy_form id; Type: DEFAULT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY hierarchy_form ALTER COLUMN id SET DEFAULT nextval('hierarchy_form_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: web; Owner: openatlas
+-- Name: i18n id; Type: DEFAULT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY i18n ALTER COLUMN id SET DEFAULT nextval('i18n_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: web; Owner: openatlas
+-- Name: settings id; Type: DEFAULT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY settings ALTER COLUMN id SET DEFAULT nextval('settings_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: web; Owner: openatlas
+-- Name: user id; Type: DEFAULT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY "user" ALTER COLUMN id SET DEFAULT nextval('user_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: web; Owner: openatlas
+-- Name: user_bookmarks id; Type: DEFAULT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY user_bookmarks ALTER COLUMN id SET DEFAULT nextval('user_bookmarks_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: web; Owner: openatlas
+-- Name: user_log id; Type: DEFAULT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY user_log ALTER COLUMN id SET DEFAULT nextval('user_log_id_seq'::regclass);
 
 
 --
--- Name: id; Type: DEFAULT; Schema: web; Owner: openatlas
+-- Name: user_settings id; Type: DEFAULT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY user_settings ALTER COLUMN id SET DEFAULT nextval('user_settings_id_seq'::regclass);
@@ -1386,7 +1350,7 @@ ALTER TABLE ONLY user_settings ALTER COLUMN id SET DEFAULT nextval('user_setting
 SET search_path = gis, pg_catalog;
 
 --
--- Name: linestring_pkey; Type: CONSTRAINT; Schema: gis; Owner: openatlas
+-- Name: linestring linestring_pkey; Type: CONSTRAINT; Schema: gis; Owner: openatlas
 --
 
 ALTER TABLE ONLY linestring
@@ -1394,7 +1358,7 @@ ALTER TABLE ONLY linestring
 
 
 --
--- Name: point_pkey; Type: CONSTRAINT; Schema: gis; Owner: openatlas
+-- Name: point point_pkey; Type: CONSTRAINT; Schema: gis; Owner: openatlas
 --
 
 ALTER TABLE ONLY point
@@ -1402,7 +1366,7 @@ ALTER TABLE ONLY point
 
 
 --
--- Name: polygon_pkey; Type: CONSTRAINT; Schema: gis; Owner: openatlas
+-- Name: polygon polygon_pkey; Type: CONSTRAINT; Schema: gis; Owner: openatlas
 --
 
 ALTER TABLE ONLY polygon
@@ -1412,7 +1376,7 @@ ALTER TABLE ONLY polygon
 SET search_path = log, pg_catalog;
 
 --
--- Name: log_detail_pkey; Type: CONSTRAINT; Schema: log; Owner: openatlas
+-- Name: detail log_detail_pkey; Type: CONSTRAINT; Schema: log; Owner: openatlas
 --
 
 ALTER TABLE ONLY detail
@@ -1420,7 +1384,7 @@ ALTER TABLE ONLY detail
 
 
 --
--- Name: log_pkey; Type: CONSTRAINT; Schema: log; Owner: openatlas
+-- Name: log log_pkey; Type: CONSTRAINT; Schema: log; Owner: openatlas
 --
 
 ALTER TABLE ONLY log
@@ -1430,7 +1394,7 @@ ALTER TABLE ONLY log
 SET search_path = model, pg_catalog;
 
 --
--- Name: class_code_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: class class_code_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY class
@@ -1438,7 +1402,7 @@ ALTER TABLE ONLY class
 
 
 --
--- Name: class_inheritance_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: class_inheritance class_inheritance_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY class_inheritance
@@ -1446,7 +1410,7 @@ ALTER TABLE ONLY class_inheritance
 
 
 --
--- Name: class_inheritance_super_id_sub_id_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: class_inheritance class_inheritance_super_id_sub_id_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY class_inheritance
@@ -1454,7 +1418,7 @@ ALTER TABLE ONLY class_inheritance
 
 
 --
--- Name: class_name_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: class class_name_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY class
@@ -1462,7 +1426,7 @@ ALTER TABLE ONLY class
 
 
 --
--- Name: class_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: class class_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY class
@@ -1470,7 +1434,7 @@ ALTER TABLE ONLY class
 
 
 --
--- Name: entity_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: entity entity_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY entity
@@ -1478,7 +1442,7 @@ ALTER TABLE ONLY entity
 
 
 --
--- Name: i18n_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: i18n i18n_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY i18n
@@ -1486,7 +1450,7 @@ ALTER TABLE ONLY i18n
 
 
 --
--- Name: i18n_table_name_table_field_table_id_language_code_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: i18n i18n_table_name_table_field_table_id_language_code_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY i18n
@@ -1494,7 +1458,7 @@ ALTER TABLE ONLY i18n
 
 
 --
--- Name: link_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: link link_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY link
@@ -1502,7 +1466,7 @@ ALTER TABLE ONLY link
 
 
 --
--- Name: link_property_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: link_property link_property_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY link_property
@@ -1510,7 +1474,7 @@ ALTER TABLE ONLY link_property
 
 
 --
--- Name: property_code_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: property property_code_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY property
@@ -1518,7 +1482,7 @@ ALTER TABLE ONLY property
 
 
 --
--- Name: property_inheritance_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: property_inheritance property_inheritance_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY property_inheritance
@@ -1526,7 +1490,7 @@ ALTER TABLE ONLY property_inheritance
 
 
 --
--- Name: property_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: property property_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY property
@@ -1536,7 +1500,7 @@ ALTER TABLE ONLY property
 SET search_path = web, pg_catalog;
 
 --
--- Name: form_name_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: form form_name_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY form
@@ -1544,7 +1508,7 @@ ALTER TABLE ONLY form
 
 
 --
--- Name: form_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: form form_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY form
@@ -1552,7 +1516,7 @@ ALTER TABLE ONLY form
 
 
 --
--- Name: group_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: group group_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY "group"
@@ -1560,7 +1524,7 @@ ALTER TABLE ONLY "group"
 
 
 --
--- Name: hierarchy_form_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: hierarchy_form hierarchy_form_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY hierarchy_form
@@ -1568,7 +1532,7 @@ ALTER TABLE ONLY hierarchy_form
 
 
 --
--- Name: hierarchy_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: hierarchy hierarchy_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY hierarchy
@@ -1576,7 +1540,7 @@ ALTER TABLE ONLY hierarchy
 
 
 --
--- Name: i18n_name_language_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: i18n i18n_name_language_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY i18n
@@ -1584,7 +1548,7 @@ ALTER TABLE ONLY i18n
 
 
 --
--- Name: i18n_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: i18n i18n_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY i18n
@@ -1592,7 +1556,7 @@ ALTER TABLE ONLY i18n
 
 
 --
--- Name: settings_name_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: settings settings_name_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY settings
@@ -1600,7 +1564,7 @@ ALTER TABLE ONLY settings
 
 
 --
--- Name: settings_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: settings settings_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY settings
@@ -1608,7 +1572,7 @@ ALTER TABLE ONLY settings
 
 
 --
--- Name: unsubscribe_code_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: user unsubscribe_code_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY "user"
@@ -1616,7 +1580,7 @@ ALTER TABLE ONLY "user"
 
 
 --
--- Name: user_bookmarks_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: user_bookmarks user_bookmarks_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY user_bookmarks
@@ -1624,7 +1588,7 @@ ALTER TABLE ONLY user_bookmarks
 
 
 --
--- Name: user_bookmarks_user_id_entity_id_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: user_bookmarks user_bookmarks_user_id_entity_id_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY user_bookmarks
@@ -1632,7 +1596,7 @@ ALTER TABLE ONLY user_bookmarks
 
 
 --
--- Name: user_email_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: user user_email_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY "user"
@@ -1640,7 +1604,7 @@ ALTER TABLE ONLY "user"
 
 
 --
--- Name: user_log_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: user_log user_log_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY user_log
@@ -1648,7 +1612,7 @@ ALTER TABLE ONLY user_log
 
 
 --
--- Name: user_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: user user_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY "user"
@@ -1656,7 +1620,7 @@ ALTER TABLE ONLY "user"
 
 
 --
--- Name: user_settings_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: user_settings user_settings_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY user_settings
@@ -1664,15 +1628,15 @@ ALTER TABLE ONLY user_settings
 
 
 --
--- Name: user_settings_user_id_name_value_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: user_settings user_settings_user_id_name_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY user_settings
-    ADD CONSTRAINT user_settings_user_id_name_value_key UNIQUE (user_id, name, value);
+    ADD CONSTRAINT user_settings_user_id_name_key UNIQUE (user_id, name);
 
 
 --
--- Name: user_username_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: user user_username_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY "user"
@@ -1682,21 +1646,21 @@ ALTER TABLE ONLY "user"
 SET search_path = gis, pg_catalog;
 
 --
--- Name: update_modified; Type: TRIGGER; Schema: gis; Owner: openatlas
+-- Name: point update_modified; Type: TRIGGER; Schema: gis; Owner: openatlas
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON point FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
--- Name: update_modified; Type: TRIGGER; Schema: gis; Owner: openatlas
+-- Name: linestring update_modified; Type: TRIGGER; Schema: gis; Owner: openatlas
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON linestring FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
--- Name: update_modified; Type: TRIGGER; Schema: gis; Owner: openatlas
+-- Name: polygon update_modified; Type: TRIGGER; Schema: gis; Owner: openatlas
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON polygon FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
@@ -1705,56 +1669,56 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON polygon FOR EACH ROW EXECUTE PRO
 SET search_path = model, pg_catalog;
 
 --
--- Name: update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+-- Name: class update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON class FOR EACH ROW EXECUTE PROCEDURE update_modified();
 
 
 --
--- Name: update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+-- Name: class_inheritance update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON class_inheritance FOR EACH ROW EXECUTE PROCEDURE update_modified();
 
 
 --
--- Name: update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+-- Name: i18n update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON i18n FOR EACH ROW EXECUTE PROCEDURE update_modified();
 
 
 --
--- Name: update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+-- Name: property update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON property FOR EACH ROW EXECUTE PROCEDURE update_modified();
 
 
 --
--- Name: update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+-- Name: entity update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON entity FOR EACH ROW EXECUTE PROCEDURE update_modified();
 
 
 --
--- Name: update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+-- Name: link update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON link FOR EACH ROW EXECUTE PROCEDURE update_modified();
 
 
 --
--- Name: update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+-- Name: property_inheritance update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON property_inheritance FOR EACH ROW EXECUTE PROCEDURE update_modified();
 
 
 --
--- Name: update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+-- Name: link_property update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON link_property FOR EACH ROW EXECUTE PROCEDURE update_modified();
@@ -1763,56 +1727,56 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON link_property FOR EACH ROW EXECU
 SET search_path = web, pg_catalog;
 
 --
--- Name: update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
+-- Name: user update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON "user" FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
--- Name: update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
+-- Name: group update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON "group" FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
--- Name: update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
+-- Name: user_settings update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON user_settings FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
--- Name: update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
+-- Name: user_bookmarks update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON user_bookmarks FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
--- Name: update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
+-- Name: hierarchy update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON hierarchy FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
--- Name: update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
+-- Name: form update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON form FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
--- Name: update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
+-- Name: hierarchy_form update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON hierarchy_form FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
--- Name: update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
+-- Name: i18n update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON i18n FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
@@ -1821,7 +1785,7 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON i18n FOR EACH ROW EXECUTE PROCED
 SET search_path = gis, pg_catalog;
 
 --
--- Name: linestring_entity_id_fkey; Type: FK CONSTRAINT; Schema: gis; Owner: openatlas
+-- Name: linestring linestring_entity_id_fkey; Type: FK CONSTRAINT; Schema: gis; Owner: openatlas
 --
 
 ALTER TABLE ONLY linestring
@@ -1829,7 +1793,7 @@ ALTER TABLE ONLY linestring
 
 
 --
--- Name: point_entity_id_fkey; Type: FK CONSTRAINT; Schema: gis; Owner: openatlas
+-- Name: point point_entity_id_fkey; Type: FK CONSTRAINT; Schema: gis; Owner: openatlas
 --
 
 ALTER TABLE ONLY point
@@ -1837,7 +1801,7 @@ ALTER TABLE ONLY point
 
 
 --
--- Name: polygon_entity_id_fkey; Type: FK CONSTRAINT; Schema: gis; Owner: openatlas
+-- Name: polygon polygon_entity_id_fkey; Type: FK CONSTRAINT; Schema: gis; Owner: openatlas
 --
 
 ALTER TABLE ONLY polygon
@@ -1847,7 +1811,7 @@ ALTER TABLE ONLY polygon
 SET search_path = log, pg_catalog;
 
 --
--- Name: detail_log_id_fkey; Type: FK CONSTRAINT; Schema: log; Owner: openatlas
+-- Name: detail detail_log_id_fkey; Type: FK CONSTRAINT; Schema: log; Owner: openatlas
 --
 
 ALTER TABLE ONLY detail
@@ -1857,7 +1821,7 @@ ALTER TABLE ONLY detail
 SET search_path = model, pg_catalog;
 
 --
--- Name: class_inheritance_sub_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: class_inheritance class_inheritance_sub_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY class_inheritance
@@ -1865,7 +1829,7 @@ ALTER TABLE ONLY class_inheritance
 
 
 --
--- Name: class_inheritance_super_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: class_inheritance class_inheritance_super_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY class_inheritance
@@ -1873,7 +1837,7 @@ ALTER TABLE ONLY class_inheritance
 
 
 --
--- Name: entity_class_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: entity entity_class_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY entity
@@ -1881,7 +1845,7 @@ ALTER TABLE ONLY entity
 
 
 --
--- Name: link_domain_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: link link_domain_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY link
@@ -1889,7 +1853,7 @@ ALTER TABLE ONLY link
 
 
 --
--- Name: link_property_domain_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: link_property link_property_domain_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY link_property
@@ -1897,7 +1861,7 @@ ALTER TABLE ONLY link_property
 
 
 --
--- Name: link_property_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: link link_property_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY link
@@ -1905,7 +1869,7 @@ ALTER TABLE ONLY link
 
 
 --
--- Name: link_property_property_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: link_property link_property_property_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY link_property
@@ -1913,7 +1877,7 @@ ALTER TABLE ONLY link_property
 
 
 --
--- Name: link_property_range_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: link_property link_property_range_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY link_property
@@ -1921,7 +1885,7 @@ ALTER TABLE ONLY link_property
 
 
 --
--- Name: link_range_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: link link_range_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY link
@@ -1929,7 +1893,7 @@ ALTER TABLE ONLY link
 
 
 --
--- Name: property_domain_class_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: property property_domain_class_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY property
@@ -1937,7 +1901,7 @@ ALTER TABLE ONLY property
 
 
 --
--- Name: property_inheritance_sub_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: property_inheritance property_inheritance_sub_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY property_inheritance
@@ -1945,7 +1909,7 @@ ALTER TABLE ONLY property_inheritance
 
 
 --
--- Name: property_inheritance_super_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: property_inheritance property_inheritance_super_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY property_inheritance
@@ -1953,7 +1917,7 @@ ALTER TABLE ONLY property_inheritance
 
 
 --
--- Name: property_range_class_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: property property_range_class_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY property
@@ -1963,7 +1927,7 @@ ALTER TABLE ONLY property
 SET search_path = web, pg_catalog;
 
 --
--- Name: hierarchy_form_form_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: hierarchy_form hierarchy_form_form_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY hierarchy_form
@@ -1971,7 +1935,7 @@ ALTER TABLE ONLY hierarchy_form
 
 
 --
--- Name: hierarchy_form_hierarchy_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: hierarchy_form hierarchy_form_hierarchy_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY hierarchy_form
@@ -1979,7 +1943,7 @@ ALTER TABLE ONLY hierarchy_form
 
 
 --
--- Name: hierarchy_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: hierarchy hierarchy_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY hierarchy
@@ -1987,7 +1951,7 @@ ALTER TABLE ONLY hierarchy
 
 
 --
--- Name: user_bookmarks_entity_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: user_bookmarks user_bookmarks_entity_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY user_bookmarks
@@ -1995,7 +1959,7 @@ ALTER TABLE ONLY user_bookmarks
 
 
 --
--- Name: user_bookmarks_user_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: user_bookmarks user_bookmarks_user_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY user_bookmarks
@@ -2003,7 +1967,7 @@ ALTER TABLE ONLY user_bookmarks
 
 
 --
--- Name: user_group_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: user user_group_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY "user"
@@ -2011,7 +1975,7 @@ ALTER TABLE ONLY "user"
 
 
 --
--- Name: user_settings_user_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: user_settings user_settings_user_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
 --
 
 ALTER TABLE ONLY user_settings

@@ -6,6 +6,10 @@ Replace database role "openatlas" if needed.
 
 ### 2.3.0 to 3.0.0 Upgrade (PHP to Python upgrade)
 
+#### Passwords
+
+Since the password hash function changed to Bcrypt, all passwords from the PHP version will be invalid.
+
 #### Content
 
 Website text translations where completely rewritten.
@@ -17,6 +21,7 @@ enter them in "Settings" again after executing the SQL below.
 
     BEGIN;
     UPDATE web.settings SET name = 'site_name' WHERE name = 'sitename';
+    UPDATE web.settings SET value = 'en' WHERE name = 'default_language';
     DROP TABLE IF EXISTS web.i18n;
     DROP TABLE IF EXISTS web.language;
     DROP TABLE IF EXISTS web.content;
