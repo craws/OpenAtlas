@@ -5,6 +5,7 @@ from openatlas.test_base import TestBaseCase
 class ContentTests(TestBaseCase):
 
     def test_content(self):
+        self.login()
         rv = self.app.get('/content/view/contact')
         assert b'Edit' in rv.data
         rv = self.app.get('/content/update/contact')

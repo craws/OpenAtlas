@@ -6,6 +6,7 @@ from openatlas.test_base import TestBaseCase
 class SettingsTests(TestBaseCase):
 
     def test_settings(self):
+        self.login()
         rv = self.app.get('/settings')
         assert b'Edit' in rv.data
         rv = self.app.get('/settings/update')
@@ -15,6 +16,11 @@ class SettingsTests(TestBaseCase):
             form_data[name] = ''
         form_data['default_language'] = 'en'
         form_data['default_table_rows'] = '10'
+        form_data['failed_login_forget_minutes'] = '10'
+        form_data['failed_login_tries'] = '10'
+        form_data['minimum_password_length'] = '10'
+        form_data['random_password_length'] = '10'
+        form_data['reset_confirm_hours'] = '10'
         form_data['log_level'] = '0'
         rv = self.app.post('/settings/update', data=form_data, follow_redirects=True)
         assert b'Edit' in rv.data

@@ -5,6 +5,7 @@ from openatlas.test_base import TestBaseCase
 class ReferenceTest(TestBaseCase):
 
     def test_reference(self):
+        self.login()
         rv = self.app.get('/reference/insert/bibliography')
         assert b'+ Bibliography' in rv.data
         rv = self.app.get('/reference/insert/edition')

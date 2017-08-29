@@ -18,3 +18,4 @@ class IndexTests(TestBaseCase):
         rv = self.app.get('/index/faq')
         assert b'Faq' in rv.data
         self.app.get('/index/setlocale/en')
+        self.login()

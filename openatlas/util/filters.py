@@ -5,6 +5,8 @@ import flask
 import re
 
 import os
+
+from flask import session
 from flask_login import current_user
 from jinja2 import evalcontextfilter, Markup, escape
 from flask_babel import lazy_gettext as _
@@ -104,7 +106,8 @@ def pager(self, table):
     if not table['data']:
         return Markup('<p>' + util.uc_first(_('no entries')) + '</p>')
     html = ''
-    show_pager = False if len(table['data']) < current_user.settings['table_rows'] else True
+    table_rows = current_user.settings['table_rows'] if hasattr(current_user, 'table_rows') else session['settings']['default_table_rows']
+    show_pager = False if len(table['data']) < table_rows else True
     if show_pager:
         html += """
             <div id="{name}-pager" class="pager">

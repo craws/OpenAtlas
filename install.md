@@ -29,8 +29,6 @@ Installation with examples from a Debian 9 (Stretch) system.
 
 ## Database
 
-
-
 As postgres
 
     $ createuser openatlas -P

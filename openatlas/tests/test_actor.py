@@ -5,6 +5,7 @@ from openatlas.test_base import TestBaseCase
 class ActorTests(TestBaseCase):
 
     def test_actor(self):
+        self.login()
         rv = self.app.get('/actor/insert/E21')
         assert b'+ Person' in rv.data
         form_data = {'name': 'Test actor', 'description': 'Actor description'}

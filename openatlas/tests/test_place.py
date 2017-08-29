@@ -5,6 +5,7 @@ from openatlas.test_base import TestBaseCase
 class PlaceTest(TestBaseCase):
 
     def test_place(self):
+        self.login()
         rv = self.app.get('/place/insert/E18')
         assert b'+ Place' in rv.data
         form_data = {'name': 'Test place'}

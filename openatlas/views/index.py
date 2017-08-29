@@ -47,7 +47,7 @@ def index():
 @app.route('/index/setlocale/<language>')
 def set_locale(language):
     session['language'] = language
-    if current_user.id:
+    if hasattr(current_user, 'id') and current_user.id:
         current_user.settings['language'] = language
         current_user.update_settings()
     return redirect(request.referrer)

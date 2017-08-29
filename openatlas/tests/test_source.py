@@ -5,6 +5,7 @@ from openatlas.test_base import TestBaseCase
 class SourceTest(TestBaseCase):
 
     def test_source(self):
+        self.login()
         rv = self.app.get('/source/insert/E33')
         assert b'+ Source' in rv.data
         form_data = {'name': 'Test source'}
