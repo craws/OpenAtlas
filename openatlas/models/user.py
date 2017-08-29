@@ -89,7 +89,7 @@ class UserMapper(object):
     @staticmethod
     def get_by_username(username):
         cursor = openatlas.get_cursor()
-        cursor.execute(UserMapper.sql + ' WHERE u.username = %(username)s;', {'username': username})
+        cursor.execute(UserMapper.sql + ' WHERE LOWER(u.username) = LOWER(%(username)s);', {'username': username})
         if cursor.rowcount == 1:
             return User(cursor.fetchone())
         return False
