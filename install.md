@@ -34,7 +34,7 @@ As postgres
     $ createuser openatlas -P
     $ createdb openatlas -O openatlas
 
-    Uncomment "CREATE EXTENSION postgis;" in top off install/structure.sql
+Uncomment "CREATE EXTENSION postgis;" in top off install/structure.sql
 
     $ cd install
     $ cat structure.sql data_web.sql data_model.sql | psql -d openatlas -f -
@@ -61,9 +61,26 @@ use install/apache_example.conf as template for a new vhost
     # apacha2ctl configtest
     # service apache2 restart
 
-## Python packages to run tests
+## Unit tests (optional)
 
+Install required packages:    
+    
     # apt-get install python3-coverage python3-nose
+    
+As postgres
+
+    $ createdb openatlas -O openatlas
+    
+Uncomment "CREATE EXTENSION postgis;" in top off install/structure.sql
+
+    $ cd install    
+    $ cat structure.sql data_web.sql data_model.sql | psql -d openatlas_test -f -
+
+Comment "CREATE EXTENSION postgis;" again before running tests.
+
+Use these parameters for running with coverage and HTML report:
+
+    --with-coverage --cover-package openatlas --cover-html --cover-tests --cover-erase   
 
 ## Finishing
 
