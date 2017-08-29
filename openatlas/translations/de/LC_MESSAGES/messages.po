@@ -7,81 +7,182 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-02-06 17:45+0100\n"
-"PO-Revision-Date: 2017-02-06 17:50+0100\n"
+"POT-Creation-Date: 2017-08-29 20:58+0200\n"
+"PO-Revision-Date: 2017-08-29 21:31+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
+"Language: de\n"
 "Language-Team: de <LL@li.org>\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 1.3\n"
-"Language: de\n"
-"X-Generator: Poedit 1.6.10\n"
+"Generated-By: Babel 2.3.4\n"
+"X-Generator: Poedit 1.8.11\n"
 
-#: ../templates/layout.html:31
+#: templates/layout.html:46
 msgid "warning no js"
 msgstr ""
 "JavaScript scheint deaktiviert zu sein. Die Funktionalität dieser Seite ist "
 "dadurch eingeschränkt."
 
-#: ../templates/layout.html:42 ../templates/index/changelog.html:5
+#: templates/index/changelog.html:8 templates/layout.html:57
 msgid "version"
 msgstr "Version"
 
-#: ../templates/layout.html:43 ../templates/index/changelog.html:2
+#: templates/index/changelog.html:4 templates/layout.html:58
 msgid "changelog"
 msgstr "Changelog"
 
-#: ../templates/layout.html:44 ../templates/index/credits.html:2
+#: templates/layout.html:59 templates/model/class.html:3
+#: templates/model/class_view.html:3 templates/model/index.html:2
+#: templates/model/property.html:3 templates/model/property_view.html:3
+msgid "model"
+msgstr "Modell"
+
+#: templates/index/credits.html:4 templates/layout.html:60
 msgid "credits"
 msgstr "Credits"
 
-#: ../templates/layout.html:45 ../templates/index/contact.html:2
+#: templates/index/contact.html:4 templates/layout.html:61
 msgid "contact"
 msgstr "Kontakt"
 
-#: ../templates/layout.html:46 ../templates/index/faq.html:2
+#: templates/index/faq.html:4 templates/layout.html:62
 msgid "faq"
 msgstr "FAQ"
 
-#: ../templates/layout.html:49 ../templates/layout.html:50
-msgid "zoom in"
-msgstr "Schrift vergrößern"
+#: templates/layout.html:64 templates/user/index.html:2
+#: templates/user/index.html:5 templates/user/insert.html:3
+#: templates/user/update.html:3 templates/user/view.html:3
+msgid "user"
+msgstr "User"
 
-#: ../templates/layout.html:51 ../templates/layout.html:52
-msgid "zoom out"
-msgstr "Schrift verkleinern"
-
-#: ../templates/content/index.html:3 ../templates/content/update.html:3
-#: ../templates/content/view.html:3
+#: templates/content/index.html:3 templates/content/update.html:3
+#: templates/content/view.html:3 templates/layout.html:65 views/place.py:17
+#: views/source.py:17
 msgid "content"
 msgstr "Inhalt"
 
-#: ../templates/content/update.html:5 ../templates/content/view.html:7
-#: ../templates/settings/index.html:7 ../templates/settings/update.html:3
-msgid "edit"
-msgstr "bearbeiten"
+#: templates/layout.html:68 templates/settings/index.html:3
+#: templates/settings/update.html:3
+msgid "settings"
+msgstr "Einstellungen"
 
-#: ../templates/content/update.html:14 ../templates/settings/update.html:7
-msgid "save"
-msgstr "speichern"
+#: templates/layout.html:73
+msgid "hello"
+msgstr "Hallo"
 
-#: ../templates/index/changelog.html:2 ../templates/index/contact.html:2
-#: ../templates/index/credits.html:2 ../templates/index/faq.html:2
-#: ../templates/index/index.html:2
+#: templates/layout.html:74 templates/profile/index.html:2
+#: templates/profile/password.html:3 templates/profile/update.html:3
+msgid "profile"
+msgstr "Profil"
+
+#: templates/layout.html:79 templates/layout.html:80
+msgid "zoom in"
+msgstr "Schrift vergrößernSchrift vergrößern"
+
+#: templates/layout.html:81 templates/layout.html:82
+msgid "zoom out"
+msgstr "Schrift verkleinern"
+
+#: templates/layout.html:91
+msgid "logout"
+msgstr "Abmelden"
+
+#: templates/layout.html:93 templates/login/index.html:4
+msgid "login"
+msgstr "Anmelden"
+
+#: templates/index/changelog.html:3 templates/index/contact.html:3
+#: templates/index/credits.html:3 templates/index/faq.html:3
+#: templates/index/index.html:2 templates/layout.html:105
+#: templates/login/index.html:3
 msgid "overview"
 msgstr "Übersicht"
 
-#: ../templates/index/index.html:7
+#: templates/actor/form.html:11 templates/event/form.html:11
+#: templates/place/form.html:11 templates/reference/form.html:11
+#: templates/source/form.html:11
+msgid "insert"
+msgstr "Anlegen"
+
+#: templates/actor/form.html:13 templates/event/form.html:13
+#: templates/place/form.html:13 templates/reference/form.html:13
+#: templates/source/form.html:13 views/user.py:27
+msgid "insert and continue"
+msgstr "Anlegen und weiter"
+
+#: templates/actor/form.html:16 templates/content/update.html:14
+#: templates/event/form.html:16 templates/place/form.html:16
+#: templates/reference/form.html:16 templates/settings/update.html:9
+#: templates/source/form.html:16 views/profile.py:28 views/profile.py:48
+#: views/user.py:26
+msgid "save"
+msgstr "speichern"
+
+#: templates/actor/index.html:2 templates/actor/insert.html:3
+#: templates/actor/update.html:3 templates/actor/view.html:3
+msgid "actor"
+msgstr "Akteur"
+
+#: templates/actor/update.html:4 templates/actor/view.html:14
+#: templates/content/update.html:5 templates/content/view.html:7
+#: templates/event/update.html:4 templates/event/view.html:14
+#: templates/place/update.html:5 templates/place/view.html:14
+#: templates/profile/index.html:5 templates/profile/update.html:4
+#: templates/reference/update.html:4 templates/reference/view.html:14
+#: templates/settings/index.html:7 templates/settings/update.html:4
+#: templates/source/update.html:5 templates/source/view.html:13
+#: templates/user/update.html:5 templates/user/view.html:8
+msgid "edit"
+msgstr "bearbeiten"
+
+#: templates/actor/view.html:9 templates/event/view.html:9
+#: templates/model/class_view.html:9 templates/model/property_view.html:9
+#: templates/place/view.html:9 templates/reference/view.html:9
+#: templates/source/view.html:8 views/event.py:36 views/user.py:24
+msgid "info"
+msgstr "Info"
+
+#: templates/actor/view.html:15 templates/actor/view.html:16
+#: templates/event/view.html:15 templates/event/view.html:16
+#: templates/place/view.html:15 templates/place/view.html:16
+#: templates/reference/view.html:15 templates/reference/view.html:16
+#: templates/source/view.html:14 templates/source/view.html:15
+#: templates/user/view.html:12 templates/user/view.html:13
+msgid "delete"
+msgstr "löschen"
+
+#: templates/event/index.html:2 templates/event/insert.html:3
+#: templates/event/update.html:3 templates/event/view.html:3
+msgid "event"
+msgstr "Ereignis"
+
+#: templates/hierarchy/index.html:2
+msgid "hierarchy"
+msgstr "Hierarchie"
+
+#: templates/index/index.html:7 views/user.py:56 views/user.py:68
+msgid "last login"
+msgstr "Letzte Anmeldung"
+
+#: templates/index/index.html:9
+msgid "failed logins since last login"
+msgstr "Fehlerhafte Anmeldungen"
+
+#: templates/index/index.html:13
+msgid "first login"
+msgstr "Das ist die erste Anmeldung. Herzlich willkommen!"
+
+#: templates/index/index.html:24
 msgid "text_intro"
 msgstr ""
 "%(link_openatlas)s ist eine Datenbank Anwendung die es ermöglicht komplexe "
 "historische, archäologische und geospatiale Daten zu verwalten.\n"
 "\n"
-"OpenAtlas ist Open Source und auf %(link_github)s vefügbar.  Es benutzt Open "
-"Source Technologien wie Apache, PostgreSQL, PostGIS, PHP, Zend Framework und "
-"Leaflet.\n"
+"OpenAtlas ist Open Source und auf %(link_github)s vefügbar.  Es benutzt "
+"Open Source Technologien wie Apache, PostgreSQL, PostGIS, PHP, Zend "
+"Framework und Leaflet.\n"
 "\n"
 "Das Datenmodell basiert auf Klassen und Eigenschaften des %(link_cidoc)s, "
 "einem international anerkannter Standard für historische Daten ist.\n"
@@ -89,94 +190,348 @@ msgstr ""
 "Näheres ist auf unserem %(link_wiki)s  nachzulesen oder probiere unsere "
 "%(link_demo)s."
 
-#: ../templates/settings/index.html:3 ../templates/settings/update.html:3
-msgid "settings"
-msgstr "Einstellungen"
+#: templates/model/class.html:4 templates/model/class_view.html:4
+#: templates/model/index.html:12
+msgid "classes"
+msgstr "Klassen"
 
-#: ../templates/settings/index.html:29
+#: templates/model/class_view.html:22 templates/model/property_view.html:29
+#: util/filters.py:169 views/actor.py:17 views/event.py:17
+#: views/reference.py:17
+msgid "description"
+msgstr "Beschreibung"
+
+#: templates/model/index.html:11
+msgid "browse"
+msgstr "browse"
+
+#: templates/model/index.html:13 templates/model/property.html:4
+#: templates/model/property_view.html:4
+msgid "properties"
+msgstr "Eigenschaften"
+
+#: templates/model/index.html:15
+msgid "check for valid links"
+msgstr "Gültigkeit von Links überprüfen"
+
+#: templates/model/index.html:24
+msgid "test"
+msgstr "test"
+
+#: templates/model/index.html:28
+msgid "result for"
+msgstr "Ergebnis für"
+
+#: templates/model/index.html:34
+msgid "valid link"
+msgstr "Gültiger Link"
+
+#: templates/model/index.html:38
+msgid "wrong domain"
+msgstr "Falsche Domain"
+
+#: templates/model/index.html:39 templates/model/index.html:45
+msgid "for"
+msgstr "für"
+
+#: templates/model/index.html:44
+msgid "wrong range"
+msgstr "Falsche Range"
+
+#: templates/model/index.html:49
+msgid "no check because whitelisted"
+msgstr "Keine Überprüfung da auf Whitelist."
+
+#: templates/place/index.html:2 templates/place/index.html:6
+#: templates/place/insert.html:3 templates/place/update.html:3
+#: templates/place/view.html:3
+msgid "place"
+msgstr "Ort"
+
+#: templates/profile/index.html:6 templates/profile/password.html:4
+msgid "change password"
+msgstr "Passwort ändern"
+
+#: templates/profile/index.html:9
+msgid "information"
+msgstr "Information"
+
+#: templates/profile/index.html:13
+msgid "display"
+msgstr "Anzeige"
+
+#: templates/reference/index.html:2 templates/reference/insert.html:3
+#: templates/reference/update.html:3 templates/reference/view.html:3
+msgid "reference"
+msgstr "Referenz"
+
+#: templates/reference/index.html:6
+msgid "bibliography"
+msgstr "Bibliographie"
+
+#: templates/reference/index.html:7
+msgid "edition"
+msgstr "Edition"
+
+#: templates/settings/index.html:29
 msgid "send_test_mail"
 msgstr "Test E-Mail verschicken"
 
-#: ../views/settings.py:20 ../views/settings.py:62
+#: templates/source/index.html:2 templates/source/index.html:6
+#: templates/source/insert.html:3 templates/source/update.html:3
+#: templates/source/view.html:3
+msgid "source"
+msgstr "Quelle"
+
+#: util/filters.py:55
+msgid "no"
+msgstr "Nein"
+
+#: util/filters.py:56
+msgid "yes"
+msgstr "Ja"
+
+#: util/filters.py:107
+msgid "no entries"
+msgstr "Keine Einträge"
+
+#: util/filters.py:128
+msgid "filter"
+msgstr "Filter"
+
+#: util/util.py:32
+msgid "bookmark remove"
+msgstr "Bookmark entfernen"
+
+#: util/util.py:32
+msgid "bookmark"
+msgstr "Bookmark"
+
+#: views/actor.py:16 views/actor.py:26 views/event.py:16 views/event.py:26
+#: views/event.py:36 views/place.py:16 views/place.py:55 views/profile.py:44
+#: views/profile.py:56 views/reference.py:16 views/reference.py:26
+#: views/source.py:16 views/source.py:55 views/user.py:23 views/user.py:53
+msgid "name"
+msgstr "Name"
+
+#: views/actor.py:54 views/event.py:53 views/place.py:43 views/reference.py:58
+#: views/source.py:43
+msgid "entity created"
+msgstr "Neuer Eintrag angelegt"
+
+#: views/actor.py:67 views/event.py:69 views/place.py:66 views/reference.py:71
+#: views/source.py:66
+msgid "entity deleted"
+msgstr "Der Eintrag wurde gelöscht."
+
+#: views/actor.py:80 views/event.py:85 views/place.py:79 views/reference.py:84
+#: views/source.py:79
+msgid "entity updated"
+msgstr "Die Änderungen wurden gespeichert."
+
+#: views/event.py:36
+msgid "class"
+msgstr "Klasse"
+
+#: views/event.py:64 views/event.py:79
+msgid "error forbidden"
+msgstr "Zugriff verweigert"
+
+#: views/login.py:37
+msgid "error login attempts exceeded"
+msgstr ""
+"Zu viele Anmeldeversuche mit diesem User. Nach ein paar Minuten kannst du "
+"es wieder probieren."
+
+#: views/login.py:50
+msgid "error inactive"
+msgstr "Dieser User ist nicht aktiviert."
+
+#: views/login.py:55 views/profile.py:34
+msgid "error wrong password"
+msgstr "Falsches Passwort"
+
+#: views/login.py:57
+msgid "error username"
+msgstr "Es wurde kein User mit diesem Namen gefunden."
+
+#: views/profile.py:17 views/user.py:55
+msgid "language"
+msgstr "Sprache"
+
+#: views/profile.py:21
+msgid "table rows"
+msgstr "Tabellenreihen"
+
+#: views/profile.py:25
+msgid "old password"
+msgstr "Altes Passwort"
+
+#: views/profile.py:26 views/user.py:21
+msgid "password"
+msgstr "Passwort"
+
+#: views/profile.py:27 views/user.py:22
+msgid "repeat password"
+msgstr "Passwort wiederholen"
+
+#: views/profile.py:37 views/profile.py:38 views/user.py:40 views/user.py:41
+msgid "error passwords must match"
+msgstr "Die Passwörter stimmen nicht überein."
+
+#: views/profile.py:45 views/profile.py:57 views/user.py:20 views/user.py:54
+#: views/user.py:68
+msgid "email"
+msgstr "E-Mail"
+
+#: views/profile.py:46 views/profile.py:58
+msgid "show email"
+msgstr "E-Mail anzeigen"
+
+#: views/profile.py:47 views/profile.py:59 views/user.py:68
+msgid "newsletter"
+msgstr "Newsletter"
+
+#: views/profile.py:55 views/user.py:18 views/user.py:51 views/user.py:68
+msgid "username"
+msgstr "Username"
+
+#: views/profile.py:71 views/profile.py:98
+msgid "info update"
+msgstr "Die Änderungen wurden gespeichert."
+
+#: views/profile.py:116
+msgid "info password updated"
+msgstr "Das Passwort wurde geändert."
+
+#: views/settings.py:18 views/settings.py:52
 msgid "site name"
 msgstr "Seitenname"
 
-#: ../views/settings.py:21 ../views/settings.py:63
+#: views/settings.py:19 views/settings.py:53
 msgid "default language"
 msgstr "Standardsprache"
 
-#: ../views/settings.py:22 ../views/settings.py:64
+#: views/settings.py:20 views/settings.py:54
 msgid "default table rows"
 msgstr "Standard Tabellenreihen"
 
-#: ../views/settings.py:23 ../views/settings.py:65
+#: views/settings.py:21 views/settings.py:55
 msgid "log level"
 msgstr "Log Level"
 
-#: ../views/settings.py:24 ../views/settings.py:66
+#: views/settings.py:22 views/settings.py:56
 msgid "maintenance"
 msgstr "Wartung"
 
-#: ../views/settings.py:25 ../views/settings.py:67
+#: views/settings.py:23 views/settings.py:57
 msgid "offline"
 msgstr "Offline"
 
-#: ../views/settings.py:28 ../views/settings.py:70
+#: views/settings.py:26 views/settings.py:60
 msgid "mail"
 msgstr "E-Mail"
 
-#: ../views/settings.py:29 ../views/settings.py:71
+#: views/settings.py:27 views/settings.py:61
 msgid "mail transport username"
 msgstr "Username"
 
-#: ../views/settings.py:30 ../views/settings.py:72
+#: views/settings.py:28 views/settings.py:62
 msgid "mail transport host"
 msgstr "Host"
 
-#: ../views/settings.py:31 ../views/settings.py:73
+#: views/settings.py:29 views/settings.py:63
 msgid "mail transport port"
 msgstr "Port"
 
-#: ../views/settings.py:32 ../views/settings.py:74
+#: views/settings.py:30 views/settings.py:64
 msgid "mail transport type"
 msgstr "Transport type"
 
-#: ../views/settings.py:33 ../views/settings.py:75
+#: views/settings.py:31 views/settings.py:65
 msgid "mail transport ssl"
 msgstr "SSL"
 
-#: ../views/settings.py:34 ../views/settings.py:76
+#: views/settings.py:32 views/settings.py:66
 msgid "mail transport auth"
 msgstr "Auth"
 
-#: ../views/settings.py:35 ../views/settings.py:77
+#: views/settings.py:33 views/settings.py:67
 msgid "mail from email"
 msgstr "E-Mail Sender"
 
-#: ../views/settings.py:36 ../views/settings.py:78
+#: views/settings.py:34 views/settings.py:68
 msgid "mail from name"
 msgstr "Name"
 
-#: ../views/settings.py:37 ../views/settings.py:79
+#: views/settings.py:35 views/settings.py:69
 msgid "mail recipients login"
 msgstr "Login Empfänger"
 
-#: ../views/settings.py:38 ../views/settings.py:80
+#: views/settings.py:36 views/settings.py:70
 msgid "mail recipients feedback"
 msgstr "Feedback Empfänger"
 
-#: ../views/settings.py:41 ../views/settings.py:83
+#: views/settings.py:39 views/settings.py:73
 msgid "random password length"
 msgstr "Länge des Zufallspassworts"
 
-#: ../views/settings.py:42 ../views/settings.py:84
+#: views/settings.py:40 views/settings.py:74
+msgid "minimum password length"
+msgstr "Mindestpasswortlänge"
+
+#: views/settings.py:41 views/settings.py:75
 msgid "reset confirm hours"
 msgstr "Reset Stunden Limit"
 
-#: ../views/settings.py:43 ../views/settings.py:85
+#: views/settings.py:42 views/settings.py:76
 msgid "failed login tries"
 msgstr "Maximale Anmeldeversuche"
 
-#: ../views/settings.py:44 ../views/settings.py:86
+#: views/settings.py:43 views/settings.py:77
 msgid "failed login forget minutes"
 msgstr "Anmeldeversuche vergessen Minuten"
+
+#: views/user.py:17
+msgid "active"
+msgstr "aktiv"
+
+#: views/user.py:19 views/user.py:52 views/user.py:68
+msgid "group"
+msgstr "Gruppe"
+
+#: views/user.py:25
+msgid "send account information"
+msgstr "Zugangsdaten an den User schicken."
+
+#: views/user.py:34
+msgid "error username exists"
+msgstr "Dieser Username ist bereits in Verwendung."
+
+#: views/user.py:37
+msgid "error email exists"
+msgstr "Diese E-Mail Adresse ist bereits in Verwendung."
+
+#: views/user.py:57
+msgid "failed logins"
+msgstr "Fehlerhafte Anmeldungen"
+
+#: views/user.py:68
+msgid "created"
+msgstr "erstellt"
+
+#: views/user.py:101
+msgid "user updated"
+msgstr "Der User wurde geändert."
+
+#: views/user.py:120
+msgid "user created"
+msgstr "Der User wurde angelegt."
+
+#: views/user.py:132
+msgid "error user deleted"
+msgstr ""
+
+#: views/user.py:135
+msgid "user deleted"
+msgstr "Der User wurde gelöscht."

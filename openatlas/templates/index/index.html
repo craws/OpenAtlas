@@ -6,7 +6,7 @@
             <p style="font-size:0.9em;">
                 {{ _('last login')|uc_first }}: {{ session['login_previous_success'] }}
                 {% if session['login_previous_failures'] > 0 %}
-                    - {{ _('failed logins since last login')|uc_first }}: {{ session['login_previous_failures'] }}
+                    - {{ _('failed logins')|uc_first }}: {{ session['login_previous_failures'] }}
                 {% endif %}
             </p>
         {% else %}

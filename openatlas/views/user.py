@@ -129,7 +129,7 @@ def user_insert():
 def user_delete(user_id):
     user = UserMapper.get_by_id(user_id)
     if (user.group == 'admin' and current_user.group != 'admin') and user.id != current_user.id:
-        flash(gettext('error user deleted'), 'info')
+        flash(gettext('error forbidden'), 'info')
         return redirect(url_for('user_index'))
     UserMapper.delete(user_id)
     flash(gettext('user deleted'), 'info')
