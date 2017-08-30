@@ -1,5 +1,5 @@
 # sensitive data
-openatlas/instance/*
+instance/*
 openatlas/db.conf
 
 # cache

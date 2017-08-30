@@ -45,17 +45,18 @@ Optional: create database openatlas_test for tests
 
 Copy the files to /var/www/your_sitename
 
-Create the folder /var/www/your_sitename/instance
-
 ## Configuration
 
-Copy install/instance_config.py instance/config.py
+Create the folder /var/www/your_sitename/instance
 
-Change the values in instance/config.py as appropriate
+Copy install/example_config.py to instance/config.py
+Copy install/example_db.conf to openatlas/db.conf
+
+Change the values as appropriate
 
 ## Apache
 
-use install/apache_example.conf as template for a new vhost
+use install/example_apache.conf as template for a new vhost
 
     # a2ensite your_sitename
     # apacha2ctl configtest
