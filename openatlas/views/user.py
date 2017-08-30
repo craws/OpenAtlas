@@ -124,7 +124,7 @@ def user_insert():
     return render_template('user/insert.html', form=form)
 
 
-@app.route('/admin/user/delete/<int:user_id>')
+@app.route('/user/delete/<int:user_id>')
 @required_group('manager')
 def user_delete(user_id):
     user = UserMapper.get_by_id(user_id)

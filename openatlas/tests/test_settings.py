@@ -22,5 +22,6 @@ class SettingsTests(TestBaseCase):
         form_data['random_password_length'] = '10'
         form_data['reset_confirm_hours'] = '10'
         form_data['log_level'] = '0'
+        form_data['site_name'] = 'Nostromo'
         rv = self.app.post('/settings/update', data=form_data, follow_redirects=True)
-        assert b'Edit' in rv.data
+        assert b'Nostromo' in rv.data
