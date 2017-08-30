@@ -2,8 +2,9 @@
 from openatlas.test_base import TestBaseCase
 
 
-class HierachyTest(TestBaseCase):
+class HierarchyTest(TestBaseCase):
 
     def test_hierarchy(self):
+        self.login()
         rv = self.app.get('/hierarchy')
-        #assert b'Overview' in rv.data
+        assert b'Overview' in rv.data

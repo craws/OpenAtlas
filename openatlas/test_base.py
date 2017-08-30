@@ -24,4 +24,4 @@ class TestBaseCase(unittest.TestCase):
         pass
 
     def login(self):
-        self.app.post('/login', data={'username': 'Leeloo', 'password': 'test'})
+        self.app.post('/login', data={'username': 'Alice', 'password': 'test'})

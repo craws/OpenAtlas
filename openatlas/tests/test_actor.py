@@ -8,18 +8,24 @@ class ActorTests(TestBaseCase):
         self.login()
         rv = self.app.get('/actor/insert/E21')
         assert b'+ Person' in rv.data
-        form_data = {'name': 'Test actor', 'description': 'Actor description'}
+        form_data = {'name': 'Sigourney Weaver', 'description': 'Susan Alexandra Weaver is an American actress.'}
         rv = self.app.post('/actor/insert/E21', data=form_data)
         actor_id = rv.location.split('/')[-1]
         form_data['continue_'] = 'yes'
         rv = self.app.post('/actor/insert/E21', data=form_data, follow_redirects=True)
         assert b'An entry has been created' in rv.data
         rv = self.app.get('/actor')
-        assert b'Test actor' in rv.data
+        assert b'Sigourney Weaver' in rv.data
         rv = self.app.get('/actor/update/' + actor_id)
-        assert b'Test actor' in rv.data
-        form_data['name'] = 'Test actor updated'
+        assert b'American actress' in rv.data
+        form_data['name'] = 'Susan Alexandra Weaver'
         rv = self.app.post('/actor/update/' + actor_id, data=form_data, follow_redirects=True)
-        assert b'Test actor updated' in rv.data
+        assert b'Susan Alexandra Weaver' in rv.data
+        rv = self.app.post('/ajax/bookmark', data={'entity_id': actor_id}, follow_redirects=True)
+        assert b'Remove bookmark' in rv.data
+        rv = self.app.get('/')
+        assert b'Weaver' in rv.data
+        rv = self.app.post('/ajax/bookmark', data={'entity_id': actor_id}, follow_redirects=True)
+        assert b'Bookmark' in rv.data
         rv = self.app.get('/actor/delete/' + actor_id, follow_redirects=True)
         assert b'The entry has been deleted.' in rv.data

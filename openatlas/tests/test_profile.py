@@ -7,21 +7,20 @@ class ProfileTests(TestBaseCase):
     def test_profile(self):
         self.login()
         rv = self.app.get('/profile')
-        assert b'leeloo@sarcophagus.org' in rv.data
+        assert b'alice@umbrella.net' in rv.data
         rv = self.app.post('/profile', data={'language': 'en', 'table_rows': '100'}, follow_redirects=True)
         assert b'100' in rv.data
         rv = self.app.get('/profile/update')
         assert b'Newsletter' in rv.data
         form_data = {
-            'name': 'Ekbat de Sebat',
-            'email': 'leeloo@sarcophagus.org',
+            'name': 'Alice Abernathy',
+            'email': 'alice@umbrella.net',
             'show_email': '',
             'newsletter': '',
         }
         rv = self.app.post('/profile/update', data=form_data, follow_redirects=True)
-        assert b'Ekbat de Sebat' in rv.data
+        assert b'Alice Abernathy' in rv.data
         rv = self.app.get('/profile/password')
-        print(rv.data)
         assert b'Old password' in rv.data
         form_data = {
             'password_old': 'test',
