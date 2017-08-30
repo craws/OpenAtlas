@@ -50,9 +50,10 @@ Copy the files to /var/www/your_sitename
 Create the folder /var/www/your_sitename/instance
 
 Copy install/example_config.py to instance/config.py
+
 Copy install/example_db.conf to openatlas/db.conf
 
-Change the values as appropriate
+Change the values as appropriate.
 
 ## Apache
 
