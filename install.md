@@ -15,11 +15,11 @@ Installation with examples from a Debian 9 (Stretch) system.
 
 ### Apache 2.4
 
-    # apt-get install apache2 libapache2-mod-python libapache2-mod-wsgi-py3
+    # apt-get install apache2 libapache2-mod-wsgi-py3
 
 ### PostgreSQL 9.6
 
-    # apt-get install python3-coverage python3-nose
+    # apt-get install postgresql postgresql-9.6-postgis-2.3 postgresql-9.6-postgis-2.3-scripts
 
 ### gettext
 

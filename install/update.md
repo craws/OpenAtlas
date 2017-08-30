@@ -6,6 +6,8 @@ Replace database role "openatlas" if needed.
 
 ### 2.3.0 to 3.0.0 Upgrade (PHP to Python upgrade)
 
+Be sure to have upgraded the database at least to the PHP Version 2.3.2
+
 #### Passwords
 
 Since the password hash function changed to Bcrypt, all passwords from the PHP version will be invalid.
