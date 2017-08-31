@@ -15,8 +15,6 @@ class IndexTests(TestBaseCase):
         assert b'Contact' in rv.data
         rv = self.app.get('/index/credits')
         assert b'Stefan Eichert' in rv.data
-        rv = self.app.get('/index/faq')
-        assert b'Faq' in rv.data
         self.app.get('/index/setlocale/en')
         rv = self.app.get('/login')
         assert b'Password' in rv.data

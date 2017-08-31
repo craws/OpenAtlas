@@ -1,6 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask_babel import gettext, lazy_gettext as _
 from flask import abort, flash, render_template, session, url_for
+from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import Form
 from werkzeug.utils import redirect
@@ -98,7 +98,7 @@ def user_update(user_id):
         user.description = form.description.data
         user.group = form.group.data
         user.update()
-        flash(gettext('user updated'), 'info')
+        flash(_('info updated'), 'info')
         return redirect(url_for('user_view', user_id=user_id))
     form.username.data = user.username
     form.group.data = user.group
@@ -117,7 +117,7 @@ def user_insert():
     form.password2.validators.append(Length(min=session['settings']['minimum_password_length']))
     if form.validate_on_submit():
         user_id = UserMapper.insert(form)
-        flash(gettext('user created'), 'info')
+        flash(_('user created'), 'info')
         if form.continue_.data == 'yes':
             return redirect(url_for('user_insert'))
         return redirect(url_for('user_view', user_id=user_id))
@@ -129,8 +129,8 @@ def user_insert():
 def user_delete(user_id):
     user = UserMapper.get_by_id(user_id)
     if (user.group == 'admin' and current_user.group != 'admin') and user.id != current_user.id:
-        flash(gettext('error forbidden'), 'info')
+        flash(_('error forbidden'), 'info')
         return redirect(url_for('user_index'))
     UserMapper.delete(user_id)
-    flash(gettext('user deleted'), 'info')
+    flash(_('user deleted'), 'info')
     return redirect(url_for('user_index'))

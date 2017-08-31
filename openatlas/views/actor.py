@@ -1,6 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import render_template, url_for, flash
-from flask_babel import gettext, lazy_gettext as _
+from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import StringField, TextAreaField, HiddenField
@@ -51,7 +51,7 @@ def actor_insert(code):
     form = ActorForm()
     if form.validate_on_submit():
         actor = EntityMapper.insert(code, form.name.data, form.description.data)
-        flash(gettext('entity created'), 'info')
+        flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
             return redirect(url_for('actor_insert', code=code))
         return redirect(url_for('actor_view', actor_id=actor.id))
@@ -64,7 +64,7 @@ def actor_delete(actor_id):
     openatlas.get_cursor().execute('BEGIN')
     EntityMapper.delete(actor_id)
     openatlas.get_cursor().execute('COMMIT')
-    flash(gettext('entity deleted'), 'info')
+    flash(_('entity deleted'), 'info')
     return redirect(url_for('actor_index'))
 
 
@@ -77,7 +77,7 @@ def actor_update(actor_id):
         actor.name = form.name.data
         actor.description = form.description.data
         actor.update()
-        flash(gettext('entity updated'), 'info')
+        flash(_('info updated'), 'info')
         return redirect(url_for('actor_view', actor_id=actor.id))
     form.name.data = actor.name
     form.description.data = actor.description

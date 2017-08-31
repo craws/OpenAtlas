@@ -1,8 +1,0 @@
-{% extends "layout.html" %}
-{% block breadcrumb %}
-    <a href="{{ url_for('index_faq') }}">{{ _('overview')|uc_first }}</a> >
-    {{ _('faq')|uc_first }}
-{% endblock %}
-{% block content %}
-    {{ faq|safe }}
-{% endblock %}

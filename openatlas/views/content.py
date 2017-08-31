@@ -1,6 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import openatlas
 from flask import flash, session, render_template, url_for
+from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from openatlas import app
 from openatlas.models.content import ContentMapper
@@ -48,7 +49,7 @@ def content_update(item):
     form = ContentForm()
     if form.validate_on_submit():
         ContentMapper.update_content(item, form)
-        flash('info update', 'info')
+        flash(_('info update'), 'info')
         return redirect(url_for('content_view', item=item))
     content = ContentMapper.get_content()
     for language in languages:

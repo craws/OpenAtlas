@@ -1,6 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import render_template, url_for, flash
-from flask_babel import gettext, lazy_gettext as _
+from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import StringField, TextAreaField, HiddenField
@@ -50,7 +50,7 @@ def event_insert(code):
     form = EventForm()
     if form.validate_on_submit() and form.name.data != openatlas.app.config['EVENT_ROOT_NAME']:
         event = EntityMapper.insert(code, form.name.data, form.description.data)
-        flash(gettext('entity created'), 'info')
+        flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
             return redirect(url_for('event_insert', code=code))
         return redirect(url_for('event_view', event_id=event.id))
@@ -61,12 +61,12 @@ def event_insert(code):
 @required_group('editor')
 def event_delete(event_id):
     if EntityMapper.get_by_id(event_id).name == openatlas.app.config['EVENT_ROOT_NAME']:
-        flash(gettext('error forbidden'), 'error')
+        flash(_('error forbidden'), 'error')
         return redirect(url_for('event_index'))
     openatlas.get_cursor().execute('BEGIN')
     EntityMapper.delete(event_id)
     openatlas.get_cursor().execute('COMMIT')
-    flash(gettext('entity deleted'), 'info')
+    flash(_('entity deleted'), 'info')
     return redirect(url_for('event_index'))
 
 
@@ -76,13 +76,13 @@ def event_update(event_id):
     event = EntityMapper.get_by_id(event_id)
     form = EventForm()
     if event.name == openatlas.app.config['EVENT_ROOT_NAME']:
-        flash(gettext('error forbidden'), 'error')
+        flash(_('error forbidden'), 'error')
         return redirect(url_for('event_index'))
     if form.validate_on_submit() and form.name.data != openatlas.app.config['EVENT_ROOT_NAME']:
         event.name = form.name.data
         event.description = form.description.data
         event.update()
-        flash(gettext('entity updated'), 'info')
+        flash(_('info updated'), 'info')
         return redirect(url_for('event_view', event_id=event.id))
     form.name.data = event.name
     form.description.data = event.description

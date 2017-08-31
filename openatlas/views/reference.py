@@ -1,6 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import render_template, url_for, flash
-from flask_babel import gettext, lazy_gettext as _
+from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import StringField, TextAreaField, HiddenField
@@ -55,7 +55,7 @@ def reference_insert(code):
     form = ReferenceForm()
     if form.validate_on_submit():
         reference = EntityMapper.insert('E84' if code == 'carrier' else 'E31', form.name.data, form.description.data)
-        flash(gettext('entity created'), 'info')
+        flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
             return redirect(url_for('reference_insert', code=code))
         return redirect(url_for('reference_view', reference_id=reference.id))
@@ -68,7 +68,7 @@ def reference_delete(reference_id):
     openatlas.get_cursor().execute('BEGIN')
     EntityMapper.delete(reference_id)
     openatlas.get_cursor().execute('COMMIT')
-    flash(gettext('entity deleted'), 'info')
+    flash(_('entity deleted'), 'info')
     return redirect(url_for('reference_index'))
 
 
@@ -81,7 +81,7 @@ def reference_update(reference_id):
         reference.name = form.name.data
         reference.description = form.description.data
         reference.update()
-        flash(gettext('entity updated'), 'info')
+        flash(_('info updated'), 'info')
         return redirect(url_for('reference_view', reference_id=reference.id))
     form.name.data = reference.name
     form.description.data = reference.description

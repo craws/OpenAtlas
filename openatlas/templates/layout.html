@@ -59,7 +59,6 @@
                     <a href="{{ url_for('model_index') }}">{{ _('model')|uc_first }}</a> |
                     <a href="{{ url_for('index_credits') }}">{{ _('credits')|uc_first }}</a> |
                     <a href="{{ url_for('index_contact') }}">{{ _('contact')|uc_first }}</a> |
-                    <a href="{{ url_for('index_faq') }}">{{ _('faq')|uc_first }}</a> |
                     {% if 'manager'|is_authorized: %}
                         <a href="{{ url_for('user_index') }}">{{ _('user')|uc_first }}</a> |
                         <a href="{{ url_for('content_index') }}">{{ _('content')|uc_first }}</a> |

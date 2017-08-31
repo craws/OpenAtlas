@@ -19,7 +19,7 @@ from openatlas.util.util import link, truncate_string, bookmark_toggle, uc_first
 @app.route('/overview')
 def index():
     tables = {
-        'counts': {'name': 'bookmarks', 'header': [], 'data': []},
+        'counts': {'name': 'overview', 'header': [], 'data': []},
         'bookmarks': {
             'name': 'bookmarks',
             'header': ['name', 'class', 'date', 'info', ''],
@@ -56,11 +56,6 @@ def set_locale(language):
 @app.route('/index/contact')
 def index_contact():
     return render_template('index/contact.html', contact=ContentMapper.get_translation('contact'))
-
-
-@app.route('/index/faq')
-def index_faq():
-    return render_template('index/faq.html', faq=ContentMapper.get_translation('faq'))
 
 
 @app.route('/index/credits')

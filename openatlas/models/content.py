@@ -9,7 +9,7 @@ class ContentMapper(object):
     @staticmethod
     def get_content():
         content = OrderedDict()
-        for name in ['intro', 'faq', 'contact']:
+        for name in ['intro', 'contact']:
             content[name] = OrderedDict()
             for language in openatlas.app.config['LANGUAGES'].keys():
                 content[name][language] = ''

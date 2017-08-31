@@ -1,6 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import render_template, url_for, flash
-from flask_babel import gettext, lazy_gettext as _
+from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import StringField, TextAreaField, HiddenField
@@ -40,7 +40,7 @@ def place_insert(code):
     form = PlaceForm()
     if form.validate_on_submit():
         place = EntityMapper.insert(code, form.name.data, form.description.data)
-        flash(gettext('entity created'), 'info')
+        flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
             return redirect(url_for('place_insert', code='E18'))
         return redirect(url_for('place_view', place_id=place.id))
@@ -63,7 +63,7 @@ def place_delete(place_id):
     openatlas.get_cursor().execute('BEGIN')
     EntityMapper.delete(place_id)
     openatlas.get_cursor().execute('COMMIT')
-    flash(gettext('entity deleted'), 'info')
+    flash(_('entity deleted'), 'info')
     return redirect(url_for('place_index'))
 
 
@@ -76,7 +76,7 @@ def place_update(place_id):
         place.name = form.name.data
         place.description = form.description.data
         place.update()
-        flash(gettext('entity updated'), 'info')
+        flash(_('info updated'), 'info')
         return redirect(url_for('place_view', place_id=place.id))
     form.name.data = place.name
     form.description.data = place.description

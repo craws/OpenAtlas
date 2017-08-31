@@ -91,7 +91,7 @@ def settings_update():
         openatlas.get_cursor().execute('BEGIN')
         SettingsMapper.update(form)
         openatlas.get_cursor().execute('END')
-        flash('info update', 'info')
+        flash(_('info update'), 'info')
         return redirect(url_for('settings_index'))
     for field in SettingsMapper.fields:
         if isinstance(getattr(form, field), BooleanField):

@@ -16,8 +16,8 @@ Since the password hash function changed to Bcrypt, all passwords from the PHP v
 
 Website text translations where completely rewritten.
 
-Please backup your text translations (Intro, Contact, FAQ) at "Content" in the web interface and
-enter them in "Settings" again after executing the SQL below.
+Please backup your text translations at "Content" in the web interface and
+enter them in "Settings" (intro and contact; faq was removed) again after executing the SQL below.
 
 #### Database update
 
