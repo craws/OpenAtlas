@@ -25,6 +25,7 @@ class PasswordForm(Form):
     password_old = PasswordField(_('old password'), validators=[InputRequired()])
     password = PasswordField(_('password'), validators=[InputRequired()])
     password2 = PasswordField(_('repeat password'), validators=[InputRequired()])
+    show_passwords = BooleanField(_('show passwords'))
     save = SubmitField(_('save'))
 
     def validate(self, extra_validators=None):

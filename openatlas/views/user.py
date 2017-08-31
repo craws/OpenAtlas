@@ -20,6 +20,7 @@ class UserForm(Form):
     email = StringField(uc_first(_('email')), validators=[InputRequired(), Email()])
     password = PasswordField(uc_first(_('password')), validators=[InputRequired()])
     password2 = PasswordField(uc_first(_('repeat password')), validators=[InputRequired()])
+    show_passwords = BooleanField(_('show passwords'))
     real_name = StringField(uc_first(_('name')))
     description = TextAreaField(uc_first(_('info')))
     send_info = BooleanField(_('send account information'))

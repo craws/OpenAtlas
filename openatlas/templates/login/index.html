@@ -4,20 +4,5 @@
     {{ _('login')|uc_first }}
 {% endblock %}
 {% block content %}
-    <form method="post">
-        {{ form.csrf_token }}
-        <p>
-            {{ form.username(class="required") }}
-            {% if form.username.errors %}
-                <span class="error">{% for error in form.username.errors %}{{ error }} {% endfor %}</span>
-            {% endif %}
-        </p>
-        <p>
-            {{ form.password(class="required") }}
-            {% if form.password.errors %}
-                <span class="error">{% for error in form.password.errors %}{{ error }} {% endfor %}</span>
-            {% endif %}
-        </p>
-        <p><input type="submit" value="Login">
-    </form>
+    {{ form|display_form() }}
 {% endblock %}

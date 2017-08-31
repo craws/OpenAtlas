@@ -5,10 +5,10 @@ import datetime
 from openatlas import app
 from flask import render_template, request, flash, url_for, session
 from flask_babel import lazy_gettext as _
-from flask_login import LoginManager, login_required, login_user, logout_user
+from flask_login import current_user, LoginManager, login_required, login_user, logout_user
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import PasswordField, StringField
+from wtforms import BooleanField, PasswordField, StringField, SubmitField
 from wtforms.validators import InputRequired
 from openatlas.models.user import UserMapper
 
@@ -23,12 +23,16 @@ def load_user(user_id):
 
 
 class LoginForm(Form):
-    username = StringField('username', validators=[InputRequired()])
-    password = PasswordField('password', validators=[InputRequired()])
+    username = StringField(_('username'), validators=[InputRequired()])
+    password = PasswordField(_('password'), validators=[InputRequired()])
+    show_passwords = BooleanField(_('show password'))
+    save = SubmitField(_('login'))
 
 
 @app.route("/login", methods=["GET", "POST"])
 def login():
+    if current_user.is_authenticated:
+        return redirect('/')
     form = LoginForm()
     if form.validate_on_submit():
         user = UserMapper.get_by_username(request.form['username'])

@@ -4,6 +4,10 @@ html, body, input, select, textarea {
     font-family: helvetica, arial, sans-serif;
 }
 
+#show_passwords, form div.table-row div label[for='show_passwords'] {
+    display: none;
+}
+
 a {
     font-weight: bold;
     text-decoration: none;
@@ -251,7 +255,7 @@ form div.table-row div {
 
 form div.table-row div label {
     display: inline-block;
-    margin-top: 0.3em;
+    margin-top: 0.2em;
 }
 
 form div.table-row div.table-cell {
@@ -289,6 +293,7 @@ input[type=submit] {
     font-size: 1em;
     font-weight: bold;
     margin-right: 1em;
+    margin-top: 1em;
     padding: 0.3em 0.5em;
     text-decoration: none;
     white-space: nowrap;
