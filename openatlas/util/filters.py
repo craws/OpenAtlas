@@ -92,7 +92,7 @@ def table_select_model(self, name, selected=None):
         ])
     value = selected.code + ' ' + selected.name if selected else ''
     html = '''
-        <input id="{name}-button" name="{name}-button" class="table-select" type="text"
+        <input id="{name}-button" class="table-select" type="text" 
             onfocus="this.blur()" readonly="readonly" value="{value}">
         <div id="{name}-overlay" class="overlay">
             <div id="{name}-dialog" class="overlay-container">
