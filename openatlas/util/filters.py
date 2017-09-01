@@ -179,15 +179,15 @@ def get_class_name(self, code):
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_form(self, form, form_id=None):
-    form_id = ' id="' + form_id + '" ' if form_id else ''
-    html = '<form method="post"' + form_id + '>' + '<div class="data-table">'
+    id_attribute = ' id="' + form_id + '" ' if form_id else ''
+    html = '<form method="post"' + id_attribute + '>' + '<div class="data-table">'
     info = ''
     for field in form:
         if field.type in ['CSRFTokenField', 'HiddenField']:
             html += str(field)
             continue
         field.label.text = util.uc_first(field.label.text)
-        field.label.text += ' *' if field.flags.required else ''
+        field.label.text += ' *' if field.flags.required and form_id != 'login-form' else ''
         if field.type == 'SubmitField':
             html += str(field)
             continue
