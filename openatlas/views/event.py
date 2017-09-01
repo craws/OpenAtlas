@@ -1,20 +1,36 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import render_template, url_for, flash
+from flask import flash, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import StringField, TextAreaField, HiddenField
+from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import uc_first, link, truncate_string, required_group
+from openatlas.util.util import link, required_group, truncate_string, uc_first
 
 
 class EventForm(Form):
     name = StringField(uc_first(_('name')), validators=[InputRequired()])
+    date_begin_year = StringField()
+    date_begin_month = StringField()
+    date_begin_day = StringField()
+    date_begin2_year = StringField()
+    date_begin2_month = StringField()
+    date_begin2_day = StringField()
+    date_begin_info = StringField()
+    date_end_year = StringField()
+    date_end_month = StringField()
+    date_end_day = StringField()
+    date_end2_year = StringField()
+    date_end2_month = StringField()
+    date_end2_day = StringField()
+    date_end_info = StringField()
     description = TextAreaField(uc_first(_('description')))
+    save = SubmitField(_('save'))
+    insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
 
 

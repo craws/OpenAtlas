@@ -92,8 +92,8 @@ def table_select_model(self, name, selected=None):
         ])
     value = selected.code + ' ' + selected.name if selected else ''
     html = '''
-        <input id="{name}-button" class="table-select" type="text" 
-            onfocus="this.blur()" readonly="readonly" value="{value}">
+        <input id="{name}-button" value="{value}" class="table-select" type="text" onfocus="this.blur()"
+            readonly="readonly" />
         <div id="{name}-overlay" class="overlay">
             <div id="{name}-dialog" class="overlay-container">
                 {pager}
@@ -196,10 +196,14 @@ def display_form(self, form, form_id=None):
             html += str(field)
             continue
         field.label.text = util.uc_first(field.label.text)
-        field.label.text += ' *' if field.flags.required and form_id != 'login-form' else ''
         if field.type == 'SubmitField':
             html += str(field)
             continue
+        if field.id.split('_', 1)[0] == 'date':  # if it's a date field use a function to add dates
+            if field.id == 'date_begin_year':
+                html += util.add_dates_to_form(form)
+            continue
+        field.label.text += ' *' if field.flags.required and form_id != 'login-form' else ''
         errors = ''
         for error in field.errors:
             errors += util.uc_first(error)

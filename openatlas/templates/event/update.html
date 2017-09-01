@@ -4,5 +4,5 @@
     {{ event|link }} > {{ _('edit')|uc_first }}
 {% endblock %}
 {% block content %}
-     {% include 'event/form.html' %}
+     {{ form|display_form() }}
 {% endblock %}

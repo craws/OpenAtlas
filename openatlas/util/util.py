@@ -14,6 +14,14 @@ from openatlas.models.property import Property
 from openatlas.models.user import User
 
 
+def add_dates_to_form(form):
+    html = ''
+    errors = ''
+    html += '<div class="table-row"><div>' + uc_first(_('begin')) + '</div>'
+    html += '<div class="table-cell">' + str(form.date_begin_year(class_='year')) + errors + '</div></div>'
+    return html
+
+
 def required_group(group):
     def wrapper(f):
         @wraps(f)
