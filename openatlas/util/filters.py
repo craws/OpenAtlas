@@ -91,11 +91,17 @@ def table_select_model(self, name, selected=None):
             '<a onclick="selectFromTable(this, \'' + name + '\', ' + str(id_) + ')">' + entities[id_].name + '</a>'
         ])
     value = selected.code + ' ' + selected.name if selected else ''
-    html = '<input id="' + name + '-button" name="' + name + '-button" class="table-select" type="text"'
-    html += ' onfocus="this.blur()" readonly="readonly" value="' + value + '"> '
-    html += '<div id="' + name + '-overlay" class="overlay">'
-    html += '<div id="' + name + '-dialog" class="overlay-container">' + render_template_string(pager(None, table)) + '</div></div>'
-    html += '<script>$(document).ready(function () {createOverlay("' + name + '");});</script>'
+    html = '''
+        <input id="{name}-button" name="{name}-button" class="table-select" type="text"
+            onfocus="this.blur()" readonly="readonly" value="{value}">
+        <div id="{name}-overlay" class="overlay">
+            <div id="{name}-dialog" class="overlay-container">
+                {pager}
+            </div>
+        </div>
+        <script>$(document).ready(function () {{createOverlay("{name}");}});</script>
+    '''.format(name=name, value=value, pager=render_template_string(pager(None, table)))
+
     return Markup(html)
 
 
@@ -105,10 +111,12 @@ def pager(self, table):
     if not table['data']:
         return Markup('<p>' + util.uc_first(_('no entries')) + '</p>')
     html = ''
-    table_rows = current_user.settings['table_rows'] if hasattr(current_user, 'table_rows') else session['settings']['default_table_rows']
+    table_rows = session['settings']['default_table_rows']
+    if hasattr(current_user, 'table_rows'):
+        table_rows = current_user.settings['table_rows']
     show_pager = False if len(table['data']) < table_rows else True
     if show_pager:
-        html += """
+        html += '''
             <div id="{name}-pager" class="pager">
                 <div class="navigation first"></div>
                 <div class="navigation prev"></div>
@@ -124,7 +132,8 @@ def pager(self, table):
                     </select>
                 </div>
                 <input id="{name}-search" class="search" type="text" data-column="all" placeholder="{filter}">
-            </div>""".format(name=table['name'], filter=util.uc_first(_('filter')))
+            </div>
+            '''.format(name=table['name'], filter=util.uc_first(_('filter')))
     html += '<table id="{name}-table" class="tablesorter"><thead><tr>'.format(name=table['name'])
     for header in table['header']:
         style = '' if header else 'class=sorter-false '
