@@ -76,7 +76,7 @@ def place_update(place_id):
         place.name = form.name.data
         place.description = form.description.data
         place.update()
-        flash(_('info updated'), 'info')
+        flash(_('info update'), 'info')
         return redirect(url_for('place_view', place_id=place.id))
     form.name.data = place.name
     form.description.data = place.description

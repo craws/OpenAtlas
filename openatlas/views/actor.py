@@ -77,7 +77,7 @@ def actor_update(actor_id):
         actor.name = form.name.data
         actor.description = form.description.data
         actor.update()
-        flash(_('info updated'), 'info')
+        flash(_('info update'), 'info')
         return redirect(url_for('actor_view', actor_id=actor.id))
     form.name.data = actor.name
     form.description.data = actor.description

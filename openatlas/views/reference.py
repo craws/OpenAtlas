@@ -81,7 +81,7 @@ def reference_update(reference_id):
         reference.name = form.name.data
         reference.description = form.description.data
         reference.update()
-        flash(_('info updated'), 'info')
+        flash(_('info update'), 'info')
         return redirect(url_for('reference_view', reference_id=reference.id))
     form.name.data = reference.name
     form.description.data = reference.description

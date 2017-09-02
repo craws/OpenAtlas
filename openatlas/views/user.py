@@ -99,7 +99,7 @@ def user_update(user_id):
         user.description = form.description.data
         user.group = form.group.data
         user.update()
-        flash(_('info updated'), 'info')
+        flash(_('info update'), 'info')
         return redirect(url_for('user_view', user_id=user_id))
     form.username.data = user.username
     form.group.data = user.group

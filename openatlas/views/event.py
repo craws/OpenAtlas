@@ -13,21 +13,21 @@ from openatlas.util.util import link, required_group, truncate_string, uc_first
 
 
 class EventForm(Form):
-    name = StringField(uc_first(_('name')), validators=[InputRequired()])
-    date_begin_year = StringField()
-    date_begin_month = StringField()
-    date_begin_day = StringField()
-    date_begin2_year = StringField()
-    date_begin2_month = StringField()
-    date_begin2_day = StringField()
-    date_begin_info = StringField()
-    date_end_year = StringField()
-    date_end_month = StringField()
-    date_end_day = StringField()
-    date_end2_year = StringField()
-    date_end2_month = StringField()
-    date_end2_day = StringField()
-    date_end_info = StringField()
+    name = StringField(_('name'), validators=[InputRequired()])
+    date_begin_year = StringField(uc_first(_('begin')), render_kw={'placeholder': _('yyyy')})
+    date_begin_month = StringField(render_kw={'placeholder': _('mm')})
+    date_begin_day = StringField(render_kw={'placeholder': _('dd')})
+    date_begin2_year = StringField(render_kw={'placeholder': _('yyyy')})
+    date_begin2_month = StringField(render_kw={'placeholder': _('mm')})
+    date_begin2_day = StringField(render_kw={'placeholder': _('dd')})
+    date_begin_info = StringField(render_kw={'placeholder': _('comment')})
+    date_end_year = StringField(uc_first(_('end')), render_kw={'placeholder': _('yyyy')})
+    date_end_month = StringField(render_kw={'placeholder': _('mm')})
+    date_end_day = StringField(render_kw={'placeholder': _('dd')})
+    date_end2_year = StringField(render_kw={'placeholder': _('yyyy')})
+    date_end2_month = StringField(render_kw={'placeholder': _('mm')})
+    date_end2_day = StringField(render_kw={'placeholder': _('dd')})
+    date_end_info = StringField(render_kw={'placeholder': _('comment')})
     description = TextAreaField(uc_first(_('description')))
     save = SubmitField(_('save'))
     insert_and_continue = SubmitField(_('insert and continue'))
@@ -65,7 +65,10 @@ def event_index():
 def event_insert(code):
     form = EventForm()
     if form.validate_on_submit() and form.name.data != openatlas.app.config['EVENT_ROOT_NAME']:
+        openatlas.get_cursor().execute('BEGIN')
         event = EntityMapper.insert(code, form.name.data, form.description.data)
+        # event.save_dates(form)
+        openatlas.get_cursor().execute('COMMIT')
         flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
             return redirect(url_for('event_insert', code=code))
@@ -91,6 +94,7 @@ def event_delete(event_id):
 def event_update(event_id):
     event = EntityMapper.get_by_id(event_id)
     form = EventForm()
+    del form.insert_and_continue
     if event.name == openatlas.app.config['EVENT_ROOT_NAME']:
         flash(_('error forbidden'), 'error')
         return redirect(url_for('event_index'))
@@ -98,7 +102,7 @@ def event_update(event_id):
         event.name = form.name.data
         event.description = form.description.data
         event.update()
-        flash(_('info updated'), 'info')
+        flash(_('info update'), 'info')
         return redirect(url_for('event_view', event_id=event.id))
     form.name.data = event.name
     form.description.data = event.description

@@ -76,7 +76,7 @@ def source_update(source_id):
         source.name = form.name.data
         source.description = form.description.data
         source.update()
-        flash(_('info updated'), 'info')
+        flash(_('info update'), 'info')
         return redirect(url_for('source_view', source_id=source.id))
     form.name.data = source.name
     form.description.data = source.description

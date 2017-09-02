@@ -18,6 +18,26 @@ p {
     max-width: 80em;
 }
 
+form input[type="text"].year {
+    text-align: right;
+    width: 4em;
+}
+
+span.tooltip {
+    font-family: courier new, monospace;
+    padding: 0.1em 0.2em 0 0.2em;
+    font-weight: bold;
+    border-width: 1px;
+    border-style: solid;
+    cursor: help;
+    position: relative;
+}
+
+form input[type="text"].month, form input[type="text"].day {
+    text-align: right;
+    width: 2em;
+}
+
 #description {
     height: 8em;
     width: 40em;
@@ -58,7 +78,7 @@ p.inverse-heading {
     padding: 0.4em;
 }
 
-button {
+button, span.button {
     cursor: pointer;
     display: inline-block;
     font-weight: bold;
@@ -407,4 +427,8 @@ div.pager div.navigation {
 
 select.pagesize {
     width: 4em;
+}
+
+div.data-table div.display-none {
+    display: none;
 }

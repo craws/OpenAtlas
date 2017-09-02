@@ -15,10 +15,37 @@ from openatlas.models.user import User
 
 
 def add_dates_to_form(form):
-    html = ''
-    errors = ''
-    html += '<div class="table-row"><div>' + uc_first(_('begin')) + '</div>'
-    html += '<div class="table-cell">' + str(form.date_begin_year(class_='year')) + errors + '</div></div>'
+    html = '''
+        <div class="table-row">
+            <div><label>{date}</label> <span class="tooltip" title="{tip} ?>">i</span></div>
+            <div class="table-cell date-switcher"><span id="date-switcher" class="button">{show}</span></div>
+        </div>'''.format(date=uc_first(_('date')), tip=_('tooltip date'), show=uc_first(_('show')))
+    html += '<div class="table-row date-switch">'
+    html += '<div>' + str(form.date_begin_year.label) + '</div><div class="table-cell">'
+    html += str(form.date_begin_year(class_='year')) + ' '
+    html += str(form.date_begin_month(class_='month')) + ' '
+    html += str(form.date_begin_day(class_='day')) + ' '
+    html += str(form.date_begin_info())
+    html += '</div></div>'
+    html += '<div class="table-row date-switch">'
+    html += '<div></div><div class="table-cell">'
+    html += str(form.date_begin2_year(class_='year')) + ' '
+    html += str(form.date_begin2_month(class_='month')) + ' '
+    html += str(form.date_begin2_day(class_='day')) + ' '
+    html += '</div></div>'
+    html += '<div class="table-row date-switch">'
+    html += '<div>' + str(form.date_end_year.label) + '</div><div class="table-cell">'
+    html += str(form.date_end_year(class_='year')) + ' '
+    html += str(form.date_end_month(class_='month')) + ' '
+    html += str(form.date_end_day(class_='day')) + ' '
+    html += str(form.date_end_info())
+    html += '</div></div>'
+    html += '<div class="table-row date-switch">'
+    html += '<div></div><div class="table-cell">'
+    html += str(form.date_end2_year(class_='year')) + ' '
+    html += str(form.date_end2_month(class_='month')) + ' '
+    html += str(form.date_end2_day(class_='day')) + ' '
+    html += '</div></div>'
     return html
 
 

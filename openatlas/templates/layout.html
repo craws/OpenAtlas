@@ -29,6 +29,16 @@
         {% endif %}
         <script type="text/javascript">
             minimumPasswordLength = {{ session['settings']['minimum_password_length'] }};
+                $(document).ready(function () {
+                    show = '{{ _('show')|uc_first }}';
+                    hide = '{{ _('hide')|uc_first }}';
+                    $("#date-switcher").click(function () {
+                        $(".date-switch").toggleClass('display-none');
+                        $(this).text(function(i, text){
+                            return text === show ? hide : show;
+                        })
+                    });
+                });
         </script>
         <title>
             {{ session['settings']['site_name'] }}

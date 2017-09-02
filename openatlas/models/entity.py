@@ -19,6 +19,9 @@ class Entity(object):
     def update(self):
         EntityMapper.update(self)
 
+    def save_dates(self, form):
+        EntityMapper.save_dates(self, form)
+
 
 class EntityMapper(object):
 
@@ -74,6 +77,35 @@ class EntityMapper(object):
     def delete(entity_id):
         sql = "DELETE FROM model.entity WHERE id = %(entity_id)s;"
         openatlas.get_cursor().execute(sql, {'entity_id': entity_id})
+
+    @staticmethod
+    def save_dates(entity, form):
+        code_begin = 'OA1'
+        code_end = 'OA2'
+        if entity.class_.name in ['Activity', 'Destruction', 'Acquisition', 'Production']:
+            code_begin = 'OA5'
+            code_end = 'OA6'
+        if entity.class_.name == 'Person':
+            if form.birth.data:
+                code_begin = 'OA3'
+            if form.death.data:
+                code_end = 'OA4'
+        EntityMapper.save_date(entity, form, 'begin', code_begin)
+        EntityMapper.save_date(entity, form, 'end', code_end)
+
+    @staticmethod
+    def save_date(entity, form, name, code):
+        if not getattr(form, 'date-' + name + '-year').data:
+            return
+        date = {
+            'year': getattr(form, 'date-' + name + '-year').data,
+            'month': getattr(form, 'date-' + name + '-month').data,
+            'day': getattr(form, 'date-' + name + '-day').data,
+            'year2': getattr(form, 'date-' + name + '2-year').data,
+            'month2': getattr(form, 'date-' + name + '2-month').data,
+            'day2': getattr(form, 'date-' + name + '2-day').data,
+            'comment': getattr(form, 'date-' + name + 'info').data}
+
 
     @staticmethod
     def get_overview_counts():

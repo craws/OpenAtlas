@@ -21,6 +21,8 @@ div.tabs-container .ui-state-active a {
 #language-menu a,
 input[type=submit],
 button,
+.date-switch,
+span.button,
 .button-bar a,
 .changelog-version,
 .inverse-heading,
@@ -36,6 +38,7 @@ table.tablesorter tfoot tr th {
 
 a,
 .info,
+span.tooltip,
 #menu div a:hover,
 #menu div.active a,
 #menu div.active a:hover,
@@ -66,6 +69,7 @@ table.tablesorter tfoot tr th {
 #header,
 .info,
 select,
+span.tooltip,
 input[type="text"],
 .ui-tabs .ui-tabs-panel,
 .ui-widget-content .ui-state-active,
@@ -84,7 +88,9 @@ table.tablesorter tbody tr.odd td {
 
 button,
 #breadcrumb,
+.date-switch,
 input[type=submit],
+span.button,
 .button-bar a,
 .ui-state-default,
 .changelog-version {
