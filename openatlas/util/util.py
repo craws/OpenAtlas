@@ -17,7 +17,7 @@ from openatlas.models.user import User
 def add_dates_to_form(form):
     html = '''
         <div class="table-row">
-            <div><label>{date}</label> <span class="tooltip" title="{tip} ?>">i</span></div>
+            <div><label>{date}</label> <span class="tooltip" title="{tip}">i</span></div>
             <div class="table-cell date-switcher"><span id="date-switcher" class="button">{show}</span></div>
         </div>'''.format(date=uc_first(_('date')), tip=_('tooltip date'), show=uc_first(_('show')))
     html += '<div class="table-row date-switch">'

@@ -9,12 +9,6 @@ from collections import OrderedDict
 from flask import Flask, request, session
 from flask_babel import Babel
 
-import openatlas
-from openatlas.models.property import PropertyMapper
-from openatlas.models.classObject import ClassMapper
-from openatlas.models.settings import SettingsMapper
-from openatlas.util import filters
-
 app = Flask(
     __name__,
     static_url_path='',
@@ -55,11 +49,7 @@ app.config.from_object('config.default')  # load config/default.py
 app.config.from_pyfile('config.py')  # load instance/config.py
 locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 
-from openatlas.views import actor, ajax, content, index, settings, model, source, event, place, reference, hierarchy, \
-    user, login, profile
-
 babel = Babel(app)
-app.register_blueprint(filters.blueprint)
 
 # To do: store these values somewhere else, config?
 default_table_rows = OrderedDict()
@@ -87,31 +77,50 @@ def get_locale():
     # check if best_match is set (in tests it isn't)
     return best_match if best_match else session['settings']['default_language']
 
-
 debug_model = OrderedDict()
-openatlas.debug_model['by id'] = 0
-openatlas.debug_model['by ids'] = 0
-openatlas.debug_model['by codes'] = 0
-openatlas.debug_model['linked'] = 0
-openatlas.debug_model['user'] = 0
+debug_model['current'] = time.time()
+debug_model['by id'] = 0
+debug_model['by ids'] = 0
+debug_model['by codes'] = 0
+debug_model['linked'] = 0
+debug_model['user'] = 0
+
+# get id of property 'has type' because its needed in EntityMapper
+cursor = get_cursor()
+cursor.execute("SELECT id FROM model.property WHERE name = 'has type';")
+has_type_id = cursor.fetchone()[0]
+
+import openatlas
+from openatlas.models.classObject import ClassMapper
+from openatlas.models.node import NodeMapper
+from openatlas.models.property import PropertyMapper
+from openatlas.models.settings import SettingsMapper
+from openatlas.util import filters
+
 debug_model['current'] = time.time()
 classes = ClassMapper.get_all()
 properties = PropertyMapper.get_all()
 debug_model['model'] = time.time() - debug_model['current']
 debug_model['current'] = time.time()
 
+nodes = {}
+
 
 @app.before_request
 def before_request():
     session['settings'] = SettingsMapper.get_settings()
     session['language'] = get_locale()
-    openatlas.debug_model['current'] = time.time()
-    openatlas.debug_model['by id'] = 0
-    openatlas.debug_model['by ids'] = 0
-    openatlas.debug_model['linked'] = 0
-    openatlas.debug_model['user'] = 0
+    openatlas.nodes = NodeMapper.get_all_nodes()
+    debug_model['current'] = time.time()
+    debug_model['by id'] = 0
+    debug_model['by ids'] = 0
+    debug_model['linked'] = 0
+    debug_model['user'] = 0
 
-app.add_template_global(app.debug, 'debug')
+from openatlas.views import actor, ajax, content, index, settings, model, source, event, place, reference, hierarchy
+from openatlas.views import user, login, profile
+
+app.register_blueprint(filters.blueprint)
 app.add_template_global(debug_model, 'debug_model')
 
 if __name__ == "__main__":  # pragma: no cover
