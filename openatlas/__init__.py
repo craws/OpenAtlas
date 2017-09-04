@@ -102,7 +102,6 @@ classes = ClassMapper.get_all()
 properties = PropertyMapper.get_all()
 debug_model['model'] = time.time() - debug_model['current']
 debug_model['current'] = time.time()
-
 nodes = {}
 
 

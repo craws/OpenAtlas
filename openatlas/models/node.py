@@ -47,7 +47,9 @@ class NodeMapper(EntityMapper):
             node.count = row.count
             node.count_subs = 0
             node.subs = []
-            node.root = [row.super_id] if row.super_id else []
+            node.super = [row.super_id] if row.super_id else []
+        for hierarchy in NodeMapper.get_hierarchies():
+            root_node = nodes[5]
         return nodes
 
     @staticmethod
