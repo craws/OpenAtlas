@@ -1,5 +1,25 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}{{ _('hierarchy')|uc_first }}{% endblock %}
 {% block content %}
-    {{ tabs|safe }}
+    <div id="tabs">
+    <ul>
+        {% for root, tree in nodes.items(): %}
+            <li><a href="#tab-{{ root.id }}">{{ root.name|uc_first }}</a></li>
+        {% endfor %}
+    </ul>
+    {% for root, tree in nodes.items(): %}
+        <div id="tab-{{ root.id }}">
+            <form method="post" action="/node/insert/{{ root.id }}" style="margin-bottom:1em;">
+                <input
+                    class="tree-filter"
+                    id="{{ root.name|sanitize }}-tree-search"
+                    placeholder="Filter"
+                    name="name"
+                    style="width:8em;"/>
+                <button value="insert" name="submit" type="submit">+</button>
+            </form>
+            {{ tree|safe }}
+        </div>
+    {% endfor %}
+</div>
 {% endblock %}

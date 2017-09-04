@@ -221,3 +221,9 @@ def test_file(self, file_name):
     if os.path.isfile(openatlas.app.root_path + '/static/' + file_name):
         return file_name
     return False
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def sanitize(self, string):
+    return util.sanitize(string)

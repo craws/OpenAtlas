@@ -1,4 +1,5 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+import re
 from functools import wraps
 
 from flask import abort, url_for, request
@@ -12,6 +13,10 @@ from openatlas.models.classObject import ClassObject
 from openatlas.models.entity import Entity
 from openatlas.models.property import Property
 from openatlas.models.user import User
+
+
+def sanitize(string):
+    return re.sub('[^A-Za-z0-9]+', '', string)
 
 
 def add_dates_to_form(form):

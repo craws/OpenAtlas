@@ -5,6 +5,12 @@
 body,
 tabs-container .ui-state-active a,
 table.tablesorter tbody td,
+.ui-widget-content,
+.ui-tabs .ui-tabs-panel,
+div.tabs-container .ui-state-active a,
+li.ui-state-active a,
+li.ui-state-active a:link,
+li.ui-state-active a:visited,
 #breadcrumb a:hover,
 div.tabs-container .ui-state-active a {
     color: #000000;
@@ -26,9 +32,7 @@ span.button,
 .button-bar a,
 .changelog-version,
 .inverse-heading,
-.tabs-container .ui-widget-content .button-bar a,
 .ui-widget-header,
-.ui-state-default a,
 .ui-state-default a:link,
 .ui-state-default a:visited,
 table.tablesorter thead tr th,
@@ -60,7 +64,6 @@ body, .ui-widget-content, .ui-dialog .ui-dialog-content {
 #header-menu span,
 .inverse-heading,
 .ui-widget-header .ui-state-default,
-.ui-widget-header,
 table.tablesorter thead tr th,
 table.tablesorter tfoot tr th {
     background-color: #000000;

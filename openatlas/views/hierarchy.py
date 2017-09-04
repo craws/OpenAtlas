@@ -1,40 +1,56 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+from collections import OrderedDict
+
 from flask import render_template
 from flask_login import current_user
 from flask_babel import lazy_gettext as _
 
 import openatlas
-from openatlas import app
-from openatlas.util.util import required_group, uc_first
+from openatlas import app, NodeMapper
+from openatlas.util.util import required_group, sanitize, uc_first
 
 
 @app.route('/hierarchy')
 @required_group('readonly')
 def hierarchy_index():
-    tabs = {'system ul': '', 'system div': '', 'custom ul': '', 'custom div': ''}
+    nodes = OrderedDict()
     for id_, node in openatlas.nodes.items():
         if not node.root:
-            hierarchy = 'system'
-            tabs[hierarchy + ' ul'] += '<li><a href="#tab' + str(node.id) + '">' + node.name + '</a></li>'
-            tabs[hierarchy + ' div'] += ''
-            tabs[hierarchy + ' div'] += '''
-                <div id="tab{node_id}"><p><strong>{node_name}</strong></p>
-                    <div style="float:left;margin-right:3em;">
-                    <div class="button-bar" style="margin-bottom:0.5em;">
-                        <form method="post" action="/admin/hierarchy/insert/id/{node_id}" style="margin-bottom:1em;">
-                            <input class="tree-filter" id="{node_id}-tree-search" placeholder="Filter" style="width:8em;" name="name" />
-                            <input type="hidden" name="mode" value="insert" />
-                            <button value="insert" name="add-hierarchy-submit" type="submit">+</button>
-                '''.format(node_id=str(node.id), node_name=node.name)
-            #if not node.system and current_user.group in ['admin', 'manager']:
-            #    tabs[hierarchy + ' div'] += ' <a href="/admin/hierarchy/update-hierarchy/id/' + node.id + '">'
-                # tabs[hierarchy + ' div'] += uc_first(_('edit')) + '</a>' + link(node, 'delete')
-            tabs[hierarchy + ' div'] += '</form></div>item[tree]</div>'
-            tabs[hierarchy + ' div'] += '<div style="float:left;">'
-            #if node.forms:
-            #    tabs[hierarchy + ' div'] += '<p style="margin-top:0">' + uc_first(_('forms')) + ':</strong> '
-            #    tabs[hierarchy + ' div'] += ' ,'.join(node.forms) + '</p>'
-            if node.description:
-                tabs[hierarchy + ' div'] += '<p style="width:500px;">' + node.description + '</p>'
-            tabs[hierarchy + ' div'] += '</div></div>'
-    return render_template('hierarchy/index.html', tabs=tabs)
+            nodes[node] = tree_select(node.name)
+    return render_template('hierarchy/index.html', nodes=nodes)
+
+
+def walk_tree(param):
+    items = param if isinstance(param, list) else [param]
+    text = ''
+    for id_ in items:
+        item = openatlas.nodes[id_]
+        count_subs = " (" + str(item.count_subs) + ")" if item.count_subs else ''
+        text += "{href: '/node/view/" + str(item.id) + "',"
+        text += "text: '" + item.name + " " + str(item.count) + count_subs + "', 'id':'" + str(item.id) + "'"
+        if item.subs:
+            text += ",'children' : ["
+            for sub in item.subs:
+                text += walk_tree(sub)
+            text += "]"
+        text += "},"
+    return text
+
+
+def tree_select(name):
+    tree = "'core':{'data':[" + walk_tree(NodeMapper.get_nodes(name)) + "]}"
+    name = sanitize(name)
+    html = '<div id="' + name + '-tree"></div>'
+    html += '<script>'
+    html += '    $(document).ready(function () {'
+    html += '        $("#' + name + '-tree").jstree({'
+    html += '            "search": {"case_insensitive": true, "show_only_matches": true},'
+    html += '            "plugins" : ["core", "html_data", "search"],' + tree + '});'
+    html += '        $("#' + name + '-tree-search").keyup(function() {'
+    html += '            $("#' + name + '-tree").jstree("search", $(this).val());'
+    html += '        });'
+    html += '        $("#' + name + '-tree").on("select_node.jstree", '
+    html += '           function (e, data) { document.location.href = data.node.original.href; })'
+    html += '    });'
+    html += '</script>'
+    return html

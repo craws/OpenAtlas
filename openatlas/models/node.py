@@ -26,7 +26,7 @@ class NodeMapper(EntityMapper):
             -- get super
             LEFT JOIN model.link l
                 ON e.id = l.domain_id AND
-                l.property_id = (SELECT id FROM model.property WHERE name = 'has super')
+                l.property_id = (SELECT id FROM model.property WHERE code IN ('P127'))
             LEFT JOIN model.entity es ON l.range_id = es.id
 
             -- get count
@@ -47,10 +47,27 @@ class NodeMapper(EntityMapper):
             node.count = row.count
             node.count_subs = 0
             node.subs = []
-            node.super = [row.super_id] if row.super_id else []
-        for hierarchy in NodeMapper.get_hierarchies():
-            root_node = nodes[5]
+            node.root = [row.super_id] if row.super_id else []
+        #for hierarchy in NodeMapper.get_hierarchies():
+        #    root_node = nodes[5]
         return nodes
+
+    @staticmethod
+    def populate_subs():
+        for id_, node in openatlas.nodes.items():
+            if node.root:
+                super_ = openatlas.nodes[node.root[0]]
+                super_.subs.append(id_)
+                node.root = NodeMapper.get_root_path(node, node.root[0], node.root)
+
+    @staticmethod
+    def get_root_path(node, super_id, root):
+        super_ = openatlas.nodes[super_id]
+        super_.count_subs += node.count
+        if not super_.root:
+            return root
+        node.root.append(super_.root[0])
+        return NodeMapper.get_root_path(node, super_.root[0], root)
 
     @staticmethod
     def get_hierarchies():
@@ -69,22 +86,6 @@ class NodeMapper(EntityMapper):
             forms[row['name']]['extendable'] = row['extendable']
         return forms
 
-    @staticmethod
-    def populate_subs():
-        for id_, node in openatlas.nodes.items():
-            if node.root:
-                super_ = openatlas.nodes[node.root[0]]
-                super_.subs.append(id_)
-                node.root = NodeMapper.get_root_path(node, node.root[0], node.root)
-
-    @staticmethod
-    def get_root_path(node, super_id, root):
-        openatlas.nodes[super_id].count_subs = openatlas.nodes[super_id].count_subs + node.count
-        super_ = openatlas.nodes[super_id]
-        if not super_.root:
-            return root
-        node.root.append(super_.root[0])
-        return NodeMapper.get_root_path(node, super_.root[0], root)
 
     @staticmethod
     def get_nodes(name):
