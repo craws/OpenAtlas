@@ -1,22 +1,20 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
-
 from flask import render_template
-from flask_login import current_user
-from flask_babel import lazy_gettext as _
 
 import openatlas
 from openatlas import app, NodeMapper
-from openatlas.util.util import required_group, sanitize, uc_first
+from openatlas.util.util import required_group, sanitize
 
 
 @app.route('/hierarchy')
 @required_group('readonly')
 def hierarchy_index():
-    nodes = OrderedDict()
+    nodes = {'system': OrderedDict(), 'custom': OrderedDict()}
     for id_, node in openatlas.nodes.items():
-        if not node.root:
-            nodes[node] = tree_select(node.name)
+        if hasattr(node, 'extendable') and node.extendable and not node.root:
+            type_ = 'system' if node.system else 'custom'
+            nodes[type_][node] = tree_select(node.name)
     return render_template('hierarchy/index.html', nodes=nodes)
 
 

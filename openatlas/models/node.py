@@ -48,17 +48,38 @@ class NodeMapper(EntityMapper):
             node.count_subs = 0
             node.subs = []
             node.root = [row.super_id] if row.super_id else []
-        #for hierarchy in NodeMapper.get_hierarchies():
-        #    root_node = nodes[5]
         return nodes
 
     @staticmethod
     def populate_subs():
+        forms = {}
+        cursor = openatlas.get_cursor()
+        cursor.execute("SELECT id, name, extendable FROM web.form ORDER BY name ASC;")
+        for row in cursor.fetchall():
+            forms[row.id] = {'id': row.id, 'name': row.name, 'extendable': row.extendable}
+        sql = """
+            SELECT h.id, h.name, h.multiple, h.system, h.extendable, h.directional,
+                (SELECT ARRAY(SELECT f.id FROM web.form f JOIN web.hierarchy_form hf ON f.id = hf.form_id
+                    AND hf.hierarchy_id = h.id )) AS form_ids
+            FROM web.hierarchy h;"""
+        cursor = openatlas.get_cursor()
+        cursor.execute(sql)
+        hierarchies = {}
+        for row in cursor.fetchall():
+            hierarchies[row.id] = row
         for id_, node in openatlas.nodes.items():
             if node.root:
                 super_ = openatlas.nodes[node.root[0]]
                 super_.subs.append(id_)
                 node.root = NodeMapper.get_root_path(node, node.root[0], node.root)
+            else:
+                node.directional = hierarchies[node.id].directional
+                node.extendable = hierarchies[node.id].extendable
+                node.multiple = hierarchies[node.id].multiple
+                node.system = hierarchies[node.id].system
+                node.forms = {}
+                for form_id in hierarchies[node.id].form_ids:
+                    node.forms[form_id] = forms[form_id]
 
     @staticmethod
     def get_root_path(node, super_id, root):
@@ -68,24 +89,6 @@ class NodeMapper(EntityMapper):
             return root
         node.root.append(super_.root[0])
         return NodeMapper.get_root_path(node, super_.root[0], root)
-
-    @staticmethod
-    def get_hierarchies():
-        sql = """
-            SELECT f.id, f.name, f.extendable,
-                (SELECT ARRAY(SELECT h.id FROM web.hierarchy h JOIN web.hierarchy_form hf ON h.id = hf.hierarchy_id
-                    WHERE hf.form_id = f.id )) AS hierarchy_ids
-            FROM web.form f ORDER BY name ASC;"""
-        cursor = openatlas.get_cursor()
-        cursor.execute(sql)
-        forms = OrderedDict()
-        for row in cursor.fetchall():
-            forms[row['name']]['id'] = row['id']
-            forms[row['name']]['name'] = row['name']
-            # forms[row['name']]['hierarchy_ids'] = str_getcsv(trim(row['hierarchy_ids'], '{}'))
-            forms[row['name']]['extendable'] = row['extendable']
-        return forms
-
 
     @staticmethod
     def get_nodes(name):

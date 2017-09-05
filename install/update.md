@@ -58,4 +58,17 @@ enter them in "Settings" (intro and contact; faq was removed) again after execut
     ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_user_id_name_value_key;
     ALTER TABLE ONLY web.user_settings ADD CONSTRAINT user_settings_user_id_name_key UNIQUE (user_id, name);
     INSERT INTO web.settings (name, value) VALUES ('minimum_password_length', '12');
+    ALTER TABLE web.hierarchy ALTER COLUMN multiple DROP DEFAULT;
+    ALTER TABLE web.hierarchy ALTER COLUMN multiple TYPE bool USING multiple::bool;
+    ALTER TABLE web.hierarchy ALTER COLUMN multiple SET DEFAULT FALSE;
+    ALTER TABLE web.hierarchy ALTER COLUMN system DROP DEFAULT;
+    ALTER TABLE web.hierarchy ALTER COLUMN system TYPE bool USING system::bool;
+    ALTER TABLE web.hierarchy ALTER COLUMN system SET DEFAULT FALSE;
+    ALTER TABLE web.hierarchy ALTER COLUMN extendable DROP DEFAULT;
+    ALTER TABLE web.hierarchy ALTER COLUMN extendable TYPE bool USING extendable::bool;
+    ALTER TABLE web.hierarchy ALTER COLUMN extendable SET DEFAULT FALSE;
+    ALTER TABLE web.hierarchy ALTER COLUMN directional DROP DEFAULT;
+    ALTER TABLE web.hierarchy ALTER COLUMN directional TYPE bool USING directional::bool;
+    ALTER TABLE web.hierarchy ALTER COLUMN directional SET DEFAULT FALSE;
+    ALTER TABLE ONLY hierarchy ADD CONSTRAINT hierarchy_name_key UNIQUE (name);
     COMMIT;

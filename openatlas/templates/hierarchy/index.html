@@ -1,25 +1,124 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}{{ _('hierarchy')|uc_first }}{% endblock %}
 {% block content %}
-    <div id="tabs">
-    <ul>
-        {% for root, tree in nodes.items(): %}
-            <li><a href="#tab-{{ root.id }}">{{ root.name|uc_first }}</a></li>
-        {% endfor %}
-    </ul>
-    {% for root, tree in nodes.items(): %}
-        <div id="tab-{{ root.id }}">
-            <form method="post" action="/node/insert/{{ root.id }}" style="margin-bottom:1em;">
-                <input
-                    class="tree-filter"
-                    id="{{ root.name|sanitize }}-tree-search"
-                    placeholder="Filter"
-                    name="name"
-                    style="width:8em;"/>
-                <button value="insert" name="submit" type="submit">+</button>
-            </form>
-            {{ tree|safe }}
+    <div id="tabs-menu" class="tabs-container">
+        <ul>
+            <li><a href="#menu-tab-system">{{ _('system')|uc_first }}</a></li>
+            <li><a href="#menu-tab-custom">{{ _('custom')|uc_first }}</a></li>
+        </ul>
+        <div id="menu-tab-system" style="padding: 0;" class="tab-content">
+            <div id="tabs-system" class="tabs-container">
+                <ul>
+                    {% for node, tree in nodes['system'].items(): %}
+                        <li><a href="#tab-{{ node.id }}">{{ node.name }}</a></li>
+                    {% endfor %}
+                </ul>
+                {% for node, tree in nodes['system'].items(): %}
+                    <div id="tab-{{ node.id }}"><p><strong>{{ node.name }}</strong></p>
+                        <div style="float:left;margin-right:3em;">
+                            <div class="button-bar">
+                                <form method="post" action="/admin/hierarchy/insert/id/{{ node.id }}">
+                                    <input
+                                        class="tree-filter"
+                                        id="{{ node.name|sanitize }}-tree-search"
+                                        placeholder="{{ _('filter')|uc_first }}"
+                                        name="name"
+                                        style="width:8em;"/>
+                                    <input type="hidden" name="mode" value="insert" />
+                                    <button value="insert" name="add-hierarchy-submit" type="submit">+</button>
+                                    {% if not node.system and 'manager'|is_authorized: %}
+                                        <a href="/admin/hierarchy/update-hierarchy/id/{{ node.id }}">{{ _('edit')|uc_first }}</a>
+                                        <a href="/admin/hierarchy/update-hierarchy/id/{{ node.id }}">{{ _('delete')|uc_first }}</a>
+                                    {% endif %}
+                                </form>
+                            </div>
+                            {{ tree|safe }}
+                        </div>
+                        <div style="float:left;">
+                            {% if node.forms: %}
+                                <p style="margin-top:0;"><strong>{{ _('forms')|uc_first }}</strong>:
+                                    {% for id, form in node.forms.items(): %}
+                                        {{ form['name'] }}
+                                    {% endfor %}
+                                </p>
+                            {% endif %}
+                            {% if node.description %}
+                                <p style="width:40em;">{{ node.description }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
         </div>
-    {% endfor %}
-</div>
+        <div id="menu-tab-custom" style="padding: 0;" class="tab-content">
+            <div id="tabs-custom" class="tabs-container">
+                <ul>
+                    {% for node, tree in nodes['custom'].items(): %}
+                        <li><a href="#tab-{{ node.id }}">{{ node.name }}</a></li>
+                    {% endfor %}
+                </ul>
+                {% for node, tree in nodes['custom'].items(): %}
+                    <div id="tab-{{ node.id }}"><p><strong>{{ node.name }}</strong></p>
+                        <div style="float:left;margin-right:3em;">
+                            <div class="button-bar">
+                                <form method="post" action="/admin/hierarchy/insert/id/{{ node.id }}">
+                                    <input
+                                        class="tree-filter"
+                                        id="{{ node.name|sanitize }}-tree-search"
+                                        placeholder="{{ _('filter')|uc_first }}"
+                                        name="name"
+                                        style="width:8em;"/>
+                                    <input type="hidden" name="mode" value="insert" />
+                                    <button value="insert" name="add-hierarchy-submit" type="submit">+</button>
+                                    {% if not node.custom and 'manager'|is_authorized: %}
+                                        <a href="/admin/hierarchy/update-hierarchy/id/{{ node.id }}">{{ _('edit')|uc_first }}</a>
+                                        <a href="/admin/hierarchy/update-hierarchy/id/{{ node.id }}">{{ _('delete')|uc_first }}</a>
+                                    {% endif %}
+                                </form>
+                            </div>
+                            {{ tree|safe }}
+                        </div>
+                        <div style="float:left;">
+                            {% if node.forms: %}
+                                <p style="margin-top:0;"><strong>{{ _('forms')|uc_first }}</strong>:
+                                    {% for id, form in node.forms.items(): %}
+                                        {{ form['name'] }}
+                                    {% endfor %}
+                                </p>
+                            {% endif %}
+                            {% if node.description %}
+                                <p style="width:40em;">{{ node.description }}</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#tabs-menu").tabs();
+            $("#tabs-system").tabs().addClass("ui-tabs-vertical");
+            $("#tabs-custom").tabs().addClass("ui-tabs-vertical");
+            openParentTab();
+        });
+        function openParentTab() {
+            locationHash = location.hash.substring(1);
+            console.log(locationHash);
+            if (locationHash) {
+                var hash = $('#' + locationHash);
+                if (hash.length) {
+                    if (hash.closest(".tab-content").length) {
+                        var tabNumber = hash.closest(".tab-content").index();
+                        $("#tabs-menu").tabs({active: tabNumber - 1});
+                        hash.get(0).scrollIntoView();
+                        setTimeout(function () {
+                            hash.get(0).scrollIntoView();
+                        }, 1000);
+                    }
+                }
+            }
+        }
+    </script>
+
 {% endblock %}
