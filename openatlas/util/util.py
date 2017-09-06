@@ -128,6 +128,8 @@ def link(entity):
             return Markup('<a href="' + url_for('place_view', place_id=entity.id) + '">' + entity.name + '</a>')
         if entity.class_.code in ('E31', 'E84'):
             return Markup('<a href="' + url_for('reference_view', reference_id=entity.id) + '">' + entity.name + '</a>')
+        if entity.class_.code == 'E55':
+            return Markup('<a href="' + url_for('node_view', node_id=entity.id) + '">' + entity.name + '</a>')
     return Markup(entity.name + ' (' + entity.class_.name + ')')
 
 

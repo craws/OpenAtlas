@@ -117,7 +117,7 @@ def before_request():
     debug_model['linked'] = 0
     debug_model['user'] = 0
 
-from openatlas.views import actor, ajax, content, index, settings, model, source, event, place, reference, hierarchy
+from openatlas.views import actor, ajax, content, index, settings, model, source, event, place, reference, node
 from openatlas.views import user, login, profile
 
 app.register_blueprint(filters.blueprint)

@@ -1,0 +1,82 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}{{ _('hierarchy')|uc_first }}{% endblock %}
+{% block content %}
+    <div id="tabs-menu" class="tabs-container">
+        <ul>
+            <li><a href="#menu-tab-system">{{ _('system')|uc_first }}</a></li>
+            <li><a href="#menu-tab-custom">{{ _('custom')|uc_first }}</a></li>
+        </ul>
+        {% for type_ in ['system', 'custom'] %}
+            <div id="menu-tab-{{ type_ }}" style="padding: 0;" class="tab-content">
+                <div id="tabs-{{ type_ }}" class="tabs-container">
+                    <ul>
+                        {% for node, tree in nodes[type_].items(): %}
+                            <li><a href="#tab-{{ node.id }}">{{ node.name }}</a></li>
+                        {% endfor %}
+                    </ul>
+                    {% for node, tree in nodes[type_].items(): %}
+                        <div id="tab-{{ node.id }}"><p><strong>{{ node.name }}</strong></p>
+                            <div style="float:left;margin-right:3em;">
+                                <div class="button-bar">
+                                    <form method="post" action="{{ url_for('node_insert', root_id=node.id) }}">
+                                        <input
+                                            class="tree-filter"
+                                            id="{{ node.name|sanitize }}-tree-search"
+                                            placeholder="{{ _('filter')|uc_first }}"
+                                            name="name"
+                                            style="width:8em;"/>
+                                        <input type="hidden" name="mode" value="insert" />
+                                        <button value="insert" name="add-node-submit" type="submit">+</button>
+                                        {% if not node.system and 'manager'|is_authorized: %}
+                                            <a href="{{ url_for('node_insert', node_id=node.id) }}">{{ _('edit')|uc_first }}</a>
+                                            <a href="{{ url_for('node_delete', node_id=node.id) }}">{{ _('delete')|uc_first }}</a>
+                                        {% endif %}
+                                    </form>
+                                </div>
+                                {{ tree|safe }}
+                            </div>
+                            <div style="float:left;">
+                                {% if node.forms: %}
+                                    <p style="margin-top:0;"><strong>{{ _('forms')|uc_first }}</strong>:
+                                        {% for id, form in node.forms.items(): %}
+                                            {{ form['name'] }},
+                                        {% endfor %}
+                                    </p>
+                                {% endif %}
+                                {% if node.description %}
+                                    <p style="width:40em;">{{ node.description }}</p>
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+        {% endfor %}
+    </div>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            $("#tabs-menu").tabs();
+            $("#tabs-system").tabs().addClass("ui-tabs-vertical");
+            $("#tabs-custom").tabs().addClass("ui-tabs-vertical");
+            openParentTab();
+        });
+        function openParentTab() {
+            locationHash = location.hash.substring(1);
+            console.log(locationHash);
+            if (locationHash) {
+                var hash = $('#' + locationHash);
+                if (hash.length) {
+                    if (hash.closest(".tab-content").length) {
+                        var tabNumber = hash.closest(".tab-content").index();
+                        $("#tabs-menu").tabs({active: tabNumber - 1});
+                        hash.get(0).scrollIntoView();
+                        setTimeout(function () {
+                            hash.get(0).scrollIntoView();
+                        }, 1000);
+                    }
+                }
+            }
+        }
+    </script>
+
+{% endblock %}
