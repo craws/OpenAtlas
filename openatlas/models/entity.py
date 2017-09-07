@@ -2,7 +2,8 @@
 from collections import OrderedDict
 
 import openatlas
-from openatlas import ClassMapper
+from .classObject import ClassMapper
+from .link import LinkMapper
 
 
 class Entity(object):
@@ -106,6 +107,43 @@ class EntityMapper(object):
             'day2': getattr(form, 'date-' + name + '2-day').data,
             'comment': getattr(form, 'date-' + name + 'info').data}
 
+        nodes = {}
+        for node in openatlas.node.NodeMapper.get_hierarchy_by_name('Date value type'):
+            nodes[node.name] = node.id
+        if date['year2']:
+            date_from = {
+                'year': date['year'],
+                'month': date['month'] if date['month'] else 1,
+                'day': date['day'] if date['day'] else 1}
+            date_from_id = EntityMapper.insert('E61', '', date['comment'], date_from)
+            LinkMapper.insert('P2', date_from_id, nodes['From date value'])
+            LinkMapper.insert(code, entity.id, date_from_id)
+            date_to = {
+                'year': date['year2'],
+                'month': date['month2'] if date['month2'] else 1,
+                'day': date['day2'] if date['day2'] else 1}
+            date_to_id = EntityMapper.insert('E61', '', date_to)
+            LinkMapper.insert('P2', date_to_id, nodes['To date value'])
+            LinkMapper.insert(code, entity.id, date_to_id)
+        else:
+            if date['month'] and date['day']:
+                exact_date_id = EntityMapper.insert('E61', '', date['comment'], date)
+                LinkMapper.insert('P2', exact_date_id, nodes['Exact date value'])
+                LinkMapper.insert(code, entity.id, exact_date_id)
+            date_from = {
+                'year': date['year'],
+                'month': date['month'] if date['month'] else 1,
+                'day': date['day'] if date['day'] else 1}
+            date_from_id = EntityMapper.insert('E61', '', date['comment'], date_from)
+            LinkMapper.insert('P2', date_from_id, nodes['From date value'])
+            LinkMapper.insert(code, entity.id, date_from_id)
+            date_to = {
+                'year': date['year2'],
+                'month': date['month2'] if date['month2'] else 1,
+                'day': date['day2'] if date['day2'] else 1}
+            date_to_id = EntityMapper.insert('E61', '', date_to)
+            LinkMapper.insert('P2', date_to_id, nodes['To date value'])
+            LinkMapper.insert(code, entity.id, date_to_id)
 
     @staticmethod
     def get_overview_counts():

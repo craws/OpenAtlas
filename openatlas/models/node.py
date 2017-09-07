@@ -8,7 +8,6 @@ class NodeMapper(EntityMapper):
 
     @staticmethod
     def get_all_nodes():
-
         sql = """
             SELECT
                 e.id,
@@ -19,7 +18,6 @@ class NodeMapper(EntityMapper):
                 e.modified,
                 es.id AS super_id,
                 COUNT(p2.id) AS count
-
             FROM model.entity e            
             JOIN model.class c ON e.class_id = c.id AND c.code = 'E55'
 
@@ -34,7 +32,6 @@ class NodeMapper(EntityMapper):
             LEFT JOIN model.property p2 ON
                 l2.property_id = p2.id AND
                 p2.name IN ('is located at', 'has type')
-
             GROUP BY e.id, es.id
             ORDER BY e.name;
         """
@@ -95,6 +92,12 @@ class NodeMapper(EntityMapper):
         for id_, node in openatlas.nodes.items():
             if node.name == name:
                 return node.subs
+
+    @staticmethod
+    def get_hierarchy_by_name(name):
+        for node in openatlas.nodes:
+            if node.name == name and not node.root:
+                return node
 
     @staticmethod
     def move_entities(old_node_id, new_node_id, entity_ids):

@@ -23,13 +23,11 @@
                                             class="tree-filter"
                                             id="{{ node.name|sanitize }}-tree-search"
                                             placeholder="{{ _('filter')|uc_first }}"
-                                            name="name"
+                                            name="name_search"
                                             style="width:8em;"/>
                                         <input type="hidden" name="mode" value="insert" />
                                         <button value="insert" name="add-node-submit" type="submit">+</button>
                                         {% if not node.system and 'manager'|is_authorized: %}
-                                            <a href="{{ url_for('node_insert', node_id=node.id) }}">{{ _('edit')|uc_first }}</a>
-                                            <a href="{{ url_for('node_delete', node_id=node.id) }}">{{ _('delete')|uc_first }}</a>
                                         {% endif %}
                                     </form>
                                 </div>

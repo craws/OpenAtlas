@@ -1,5 +1,4 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-# -*- coding: utf-8 -*-
 import jinja2
 import flask
 import re
@@ -12,8 +11,8 @@ from jinja2 import evalcontextfilter, Markup, escape
 from flask_babel import lazy_gettext as _
 
 import openatlas
-from openatlas import ClassMapper
-from openatlas.util import util
+from openatlas.models.classObject import ClassMapper
+from . import util
 
 blueprint = flask.Blueprint('filters', __name__)
 paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')

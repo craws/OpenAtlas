@@ -1,6 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
-from flask import render_template, flash, url_for
+from flask import render_template, flash, url_for, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
@@ -31,7 +31,7 @@ def node_index():
     return render_template('node/index.html', nodes=nodes)
 
 
-@app.route('/node/insert/<int:root_id>', methods=['POST', 'GET'])
+@app.route('/node/insert/<int:root_id>', methods=['POST'])
 @required_group('editor')
 def node_insert(root_id):
     root = openatlas.nodes[root_id]
@@ -41,7 +41,7 @@ def node_insert(root_id):
     form = NodeForm()
     if not root.directional:
         del form.inverse_test
-    if form.validate_on_submit():
+    if 'name_search' not in request.form and form.validate_on_submit():
         name = form.name.data + (form.inverse_text.data if hasattr(form, 'inverse_test') in form else '')
         openatlas.get_cursor().execute('BEGIN')
         node = NodeMapper.insert('E55', name, form.description.data)
@@ -50,6 +50,8 @@ def node_insert(root_id):
         if form.continue_.data == 'yes':
             return redirect(url_for('node_insert', node_id=root.id))
         return redirect(url_for('node_view', node_id=node.id))
+    if 'name_search' in request.form:
+        form.name.data = request.form['name_search']
     return render_template('node/insert.html', form=form, root=root)
 
 
@@ -61,7 +63,7 @@ def node_update(node_id):
     return render_template('node/update.html')
 
 
-@app.route('/node/delete/<int:node_id>')
+@app.route('/node/view/<int:node_id>')
 @required_group('editor')
 def node_view(node_id):
     return render_template('node/view.html')
