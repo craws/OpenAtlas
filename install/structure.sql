@@ -69,6 +69,8 @@ DROP TRIGGER IF EXISTS update_modified ON model.property;
 DROP TRIGGER IF EXISTS update_modified ON model.i18n;
 DROP TRIGGER IF EXISTS update_modified ON model.class_inheritance;
 DROP TRIGGER IF EXISTS update_modified ON model.class;
+DROP TRIGGER IF EXISTS on_delete_link_property ON model.link_property;
+DROP TRIGGER IF EXISTS on_delete_link ON model.link;
 SET search_path = gis, pg_catalog;
 
 DROP TRIGGER IF EXISTS update_modified ON gis.polygon;
@@ -90,6 +92,7 @@ ALTER TABLE IF EXISTS ONLY web.settings DROP CONSTRAINT IF EXISTS settings_name_
 ALTER TABLE IF EXISTS ONLY web.i18n DROP CONSTRAINT IF EXISTS i18n_pkey;
 ALTER TABLE IF EXISTS ONLY web.i18n DROP CONSTRAINT IF EXISTS i18n_name_language_key;
 ALTER TABLE IF EXISTS ONLY web.hierarchy DROP CONSTRAINT IF EXISTS hierarchy_pkey;
+ALTER TABLE IF EXISTS ONLY web.hierarchy DROP CONSTRAINT IF EXISTS hierarchy_name_key;
 ALTER TABLE IF EXISTS ONLY web.hierarchy_form DROP CONSTRAINT IF EXISTS hierarchy_form_pkey;
 ALTER TABLE IF EXISTS ONLY web."group" DROP CONSTRAINT IF EXISTS group_pkey;
 ALTER TABLE IF EXISTS ONLY web.form DROP CONSTRAINT IF EXISTS form_pkey;
@@ -206,6 +209,7 @@ DROP TABLE IF EXISTS gis.linestring;
 SET search_path = model, pg_catalog;
 
 DROP FUNCTION IF EXISTS model.update_modified();
+DROP FUNCTION IF EXISTS model.delete_dates();
 DROP SCHEMA IF EXISTS web;
 DROP SCHEMA IF EXISTS model;
 DROP SCHEMA IF EXISTS log;
@@ -247,6 +251,22 @@ CREATE SCHEMA web;
 ALTER SCHEMA web OWNER TO openatlas;
 
 SET search_path = model, pg_catalog;
+
+--
+-- Name: delete_dates(); Type: FUNCTION; Schema: model; Owner: openatlas
+--
+
+CREATE FUNCTION delete_dates() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+        BEGIN
+            DELETE FROM model.entity WHERE id = OLD.range_id AND class_id = (SELECT id FROM model.class WHERE code = 'E61');
+            RETURN OLD;
+        END;
+    $$;
+
+
+ALTER FUNCTION model.delete_dates() OWNER TO openatlas;
 
 --
 -- Name: update_modified(); Type: FUNCTION; Schema: model; Owner: openatlas
@@ -868,10 +888,10 @@ ALTER SEQUENCE group_id_seq OWNED BY "group".id;
 CREATE TABLE hierarchy (
     id integer NOT NULL,
     name text NOT NULL,
-    multiple integer DEFAULT 0 NOT NULL,
-    system integer DEFAULT 0 NOT NULL,
-    extendable integer DEFAULT 0 NOT NULL,
-    directional integer DEFAULT 0 NOT NULL,
+    multiple boolean DEFAULT false NOT NULL,
+    system boolean DEFAULT false NOT NULL,
+    extendable boolean DEFAULT false NOT NULL,
+    directional boolean DEFAULT false NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone
 );
@@ -1532,6 +1552,14 @@ ALTER TABLE ONLY hierarchy_form
 
 
 --
+-- Name: hierarchy hierarchy_name_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY hierarchy
+    ADD CONSTRAINT hierarchy_name_key UNIQUE (name);
+
+
+--
 -- Name: hierarchy hierarchy_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
@@ -1667,6 +1695,20 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON polygon FOR EACH ROW EXECUTE PRO
 
 
 SET search_path = model, pg_catalog;
+
+--
+-- Name: link on_delete_link; Type: TRIGGER; Schema: model; Owner: openatlas
+--
+
+CREATE TRIGGER on_delete_link AFTER DELETE ON link FOR EACH ROW EXECUTE PROCEDURE delete_dates();
+
+
+--
+-- Name: link_property on_delete_link_property; Type: TRIGGER; Schema: model; Owner: openatlas
+--
+
+CREATE TRIGGER on_delete_link_property AFTER DELETE ON link_property FOR EACH ROW EXECUTE PROCEDURE delete_dates();
+
 
 --
 -- Name: class update_modified; Type: TRIGGER; Schema: model; Owner: openatlas

@@ -70,5 +70,19 @@ enter them in "Settings" (intro and contact; faq was removed) again after execut
     ALTER TABLE web.hierarchy ALTER COLUMN directional DROP DEFAULT;
     ALTER TABLE web.hierarchy ALTER COLUMN directional TYPE bool USING directional::bool;
     ALTER TABLE web.hierarchy ALTER COLUMN directional SET DEFAULT FALSE;
-    ALTER TABLE ONLY hierarchy ADD CONSTRAINT hierarchy_name_key UNIQUE (name);
+    ALTER TABLE ONLY web.hierarchy ADD CONSTRAINT hierarchy_name_key UNIQUE (name);
+    DROP TRIGGER IF EXISTS on_delete_link_property ON model.link_property;
+    DROP TRIGGER IF EXISTS on_delete_link ON model.link;
+    DROP FUNCTION IF EXISTS model.delete_dates();
+    CREATE FUNCTION model.delete_dates() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+        BEGIN
+            DELETE FROM model.entity WHERE id = OLD.range_id AND class_id = (SELECT id FROM model.class WHERE code = 'E61');
+            RETURN OLD;
+        END;
+    $$;
+    ALTER FUNCTION model.delete_dates() OWNER TO openatlas;
+    CREATE TRIGGER on_delete_link AFTER DELETE ON model.link FOR EACH ROW EXECUTE PROCEDURE model.delete_dates();
+    CREATE TRIGGER on_delete_link_property AFTER DELETE ON model.link_property FOR EACH ROW EXECUTE PROCEDURE model.delete_dates();
     COMMIT;
