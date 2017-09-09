@@ -228,20 +228,20 @@ INSERT INTO link (property_id, range_id, domain_id) VALUES
 ((SELECT id FROM property WHERE code='P89'), (SELECT id FROM entity WHERE name='Historical Place'), (SELECT id FROM entity WHERE name='Kingdom of Serbia'));
 
 INSERT INTO web.hierarchy (id, name, multiple, system, extendable, directional) VALUES
-((SELECT id FROM entity WHERE name='Source'), 'Source', 0, 1, 1, 0),
-((SELECT id FROM entity WHERE name='Event'), 'Event', 0, 1, 1, 0),
-((SELECT id FROM entity WHERE name='Actor Actor Relation'), 'Actor Actor Relation', 0, 1, 1, 1),
-((SELECT id FROM entity WHERE name='Actor Function'), 'Actor Function', 0, 1, 1, 0),
-((SELECT id FROM entity WHERE name='Involvement'), 'Involvement', 0, 1, 1, 0),
-((SELECT id FROM entity WHERE name='Sex'), 'Sex', 0, 1, 1, 0),
-((SELECT id FROM entity WHERE name='Site'), 'Site', 0, 1, 1, 0),
-((SELECT id FROM entity WHERE name='Information Carrier'), 'Information Carrier', 0, 1, 1, 0),
-((SELECT id FROM entity WHERE name='Bibliography'), 'Bibliography', 0, 1, 1, 0),
-((SELECT id FROM entity WHERE name='Edition'), 'Edition', 0, 1, 1, 0),
-((SELECT id FROM entity WHERE name='Date value type'), 'Date value type', 0, 1, 0, 0),
-((SELECT id FROM entity WHERE name='Linguistic object classification'), 'Linguistic object classification', 0, 1, 0, 0),
-((SELECT id FROM entity WHERE name='Administrative Unit'), 'Administrative Unit', 1, 1, 1, 0),
-((SELECT id FROM entity WHERE name='Historical Place'), 'Historical Place', 1, 1, 1, 0);
+((SELECT id FROM entity WHERE name='Source'), 'Source', False, True, True, False),
+((SELECT id FROM entity WHERE name='Event'), 'Event', False, True, True, False),
+((SELECT id FROM entity WHERE name='Actor Actor Relation'), 'Actor Actor Relation', False, True, True, True),
+((SELECT id FROM entity WHERE name='Actor Function'), 'Actor Function', False, True, True, False),
+((SELECT id FROM entity WHERE name='Involvement'), 'Involvement', False, True, True, False),
+((SELECT id FROM entity WHERE name='Sex'), 'Sex', False, True, True, False),
+((SELECT id FROM entity WHERE name='Site'), 'Site', False, True, True, False),
+((SELECT id FROM entity WHERE name='Information Carrier'), 'Information Carrier', False, True, True, False),
+((SELECT id FROM entity WHERE name='Bibliography'), 'Bibliography', False, True, True, False),
+((SELECT id FROM entity WHERE name='Edition'), 'Edition', False, True, True, False),
+((SELECT id FROM entity WHERE name='Date value type'), 'Date value type', False, True, False, False),
+((SELECT id FROM entity WHERE name='Linguistic object classification'), 'Linguistic object classification', False, True, False, False),
+((SELECT id FROM entity WHERE name='Administrative Unit'), 'Administrative Unit', True, True, True, False),
+((SELECT id FROM entity WHERE name='Historical Place'), 'Historical Place', True, True, True, False);
 
 INSERT INTO web.form (name, extendable) VALUES
 ('Source', 1),
