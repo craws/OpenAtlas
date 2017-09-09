@@ -91,14 +91,13 @@ cursor.execute("SELECT id FROM model.property WHERE name = 'has type';")
 has_type_id = cursor.fetchone()[0]
 
 import openatlas
-from openatlas.models.classObject import ClassMapper
 from openatlas.models.node import NodeMapper
 from openatlas.models.property import PropertyMapper
 from openatlas.models.settings import SettingsMapper
 from openatlas.util import filters
 
 debug_model['current'] = time.time()
-classes = ClassMapper.get_all()
+classes = openatlas.models.classObject.ClassMapper.get_all()
 properties = PropertyMapper.get_all()
 debug_model['model'] = time.time() - debug_model['current']
 debug_model['current'] = time.time()
@@ -116,12 +115,38 @@ def before_request():
     debug_model['by ids'] = 0
     debug_model['linked'] = 0
     debug_model['user'] = 0
+    debug_model['div sql'] = 0
 
 from openatlas.views import actor, ajax, content, index, settings, model, source, event, place, reference, node
 from openatlas.views import user, login, profile
 
 app.register_blueprint(filters.blueprint)
 app.add_template_global(debug_model, 'debug_model')
+app.debug = True
+
+
+@app.context_processor
+def inject_debug():
+    return dict(debug=app.debug)
 
 if __name__ == "__main__":  # pragma: no cover
     app.run()
+
+    # below is a try to debug with pycharm
+    # import argparse
+    #
+    # parser = argparse.ArgumentParser(description='Development Server Help')
+    # parser.add_argument("-d", "--debug", action="store_true", dest="debug_mode",
+    #                     help="run in debug mode (for use with PyCharm)", default=False)
+    # parser.add_argument("-p", "--port", dest="port", help="port of server (default:%(default)s)", type=int,
+    #                     default=5000)
+    #
+    # cmd_args = parser.parse_args()
+    # app_options = {"port": cmd_args.port}
+    #
+    # if cmd_args.debug_mode:
+    #     app_options["debug"] = True
+    #     app_options["use_debugger"] = False
+    #     app_options["use_reloader"] = False
+    #
+    # app.run(**app_options)

@@ -17,12 +17,9 @@
             {% endif %}
             {{ event.id|bookmark_toggle }}
         </div>
-
         <h1>{{ event.name }}</h1>
-        {% set data = [
-            {'name': event.name},
-        ] %}
         {{ data['info']|data_table }}
+        {{ event|print_entity_dates }}
         {{ event|description }}
     </div>
 </div>

@@ -226,3 +226,25 @@ def test_file(self, file_name):
 @blueprint.app_template_filter()
 def sanitize(self, string):
     return util.sanitize(string)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def print_entity_dates(self, entity):
+    date_types = {
+        'OA1': _('first'),
+        'OA3': _('birth'),
+        'OA2': _('last'),
+        'OA4': _('death'),
+        'OA5': _('begin'),
+        'OA6': _('end')
+    }
+    html = ''
+    for code, label in date_types.items():
+        if code in entity.dates:
+            if 'Exact date value' in entity.dates[code]:
+                html += util.uc_first(label) + ': ' + util.format_date(entity.dates[code]['Exact date value']) + '<br />'
+            else:
+                html += util.uc_first(label) + ': ' + _('between') + ' ' + util.format_date(entity.dates[code]['From date value'])
+                html += ' and ' + util.format_date(entity.dates[code]['To date value']) + '<br />'
+    return Markup(html)

@@ -33,15 +33,15 @@ def actor_view(actor_id):
 def actor_index():
     tables = {'actor': {
         'name': 'actor',
-        # 'sort': 'sortList: [[3, 1]]',
-        'header': ['name', 'class', 'info'],
+        'header': ['name', 'class', 'first', 'last', 'info'],
         'data': []}}
     for actor in EntityMapper.get_by_codes(['E21', 'E74', 'E40']):
         tables['actor']['data'].append([
             link(actor),
             openatlas.classes[actor.class_.id].name,
-            truncate_string(actor.description)
-        ])
+            actor.first,
+            actor.last,
+            truncate_string(actor.description)])
     return render_template('actor/index.html', tables=tables)
 
 

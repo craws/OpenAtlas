@@ -22,7 +22,7 @@ def index():
         'counts': {'name': 'overview', 'header': [], 'data': []},
         'bookmarks': {
             'name': 'bookmarks',
-            'header': ['name', 'class', 'date', 'info', ''],
+            'header': ['name', 'class', 'first', 'last', ''],
             'data': []}}
     if current_user.is_authenticated:
         for entity_id in current_user.bookmarks:
@@ -30,8 +30,8 @@ def index():
             tables['bookmarks']['data'].append([
                 link(entity),
                 openatlas.classes[entity.class_.id].name,
-                entity.begin,
-                truncate_string(entity.description),
+                entity.first,
+                entity.last,
                 bookmark_toggle(entity.id)])
         for name, count in EntityMapper.get_overview_counts().items():
             tables['counts']['data'].append([

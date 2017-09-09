@@ -7,36 +7,34 @@ class Link(object):
     def __init__(self, row):
         self.id = row.id
         self.property = openatlas.properties[row.property_id]
-        self.domain = openatlas.EntityMapper.get_by_id(row.domain_id)
-        self.range = openatlas.EntityMapper.get_by_id(row.range_id)
+        self.domain = openatlas.models.entity.EntityMapper.get_by_id(row.domain_id)
+        self.range = openatlas.models.entity.EntityMapper.get_by_id(row.range_id)
 
-    #def delete(self):
+    # def delete(self):
     #    LinkMapper.delete(self)
 
 
 class LinkMapper(object):
 
     @staticmethod
-    def insert(domain_param, property_name, range_params):
+    def insert(domain_param, property_code, range_params):
         if not domain_param or not range_params:
             return
-        # range_params = range_params if isinstance(range_params, list) else [range_params]
-        # for range_param in range_params:
-        #     if not range_param:
-        #         continue
-        #     domain_id = domain_param.id if isinstance(domain_param, openatlas.Entity) else int(domain_param)
-        #     if isinstance(range_param, openatlas.Entity):
-        #         range_id = range_param.id
-        #     else:
-        #         range_id = int(range_param)
-        #     sql = """INSERT INTO model.link (property_id, domain_id, range_id)
-        #         VALUES ((SELECT id FROM model.property WHERE name = %(property_name)s), %(domain_id)s, %(range_id)s);"""
-        #     cursor = openatlas.get_cursor()
-        #     cursor.execute(sql, {
-        #         'property_name': property_name.strip(),
-        #         'domain_id': domain_id,
-        #         'range_id': range_id
-        #     })
+        range_params = range_params if isinstance(range_params, list) else [range_params]
+        for range_param in range_params:
+            if not range_param:
+                continue
+            domain_id = domain_param.id if type(domain_param) is openatlas.models.entity.Entity else int(domain_param)
+            range_id = range_param.id if type(range_param) is openatlas.models.entity.Entity else int(range_param)
+            sql = """INSERT INTO model.link (property_id, domain_id, range_id)
+                VALUES ((SELECT id FROM model.property WHERE code = %(property_code)s), %(domain_id)s, %(range_id)s);"""
+            # To do: build only sql and get execution out of loop
+            cursor = openatlas.get_cursor()
+            cursor.execute(sql, {
+                'property_code': property_code,
+                'domain_id': domain_id,
+                'range_id': range_id
+            })
 
     # @staticmethod
     # def get_linked_entity(entity, property_name, inverse=False):

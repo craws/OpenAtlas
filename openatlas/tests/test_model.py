@@ -1,5 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from openatlas import ClassMapper, PropertyMapper
+from openatlas import PropertyMapper
+from openatlas.models.classObject import ClassMapper
 from openatlas.test_base import TestBaseCase
 
 

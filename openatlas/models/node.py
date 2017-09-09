@@ -95,7 +95,7 @@ class NodeMapper(EntityMapper):
 
     @staticmethod
     def get_hierarchy_by_name(name):
-        for node in openatlas.nodes:
+        for id_, node in openatlas.nodes.items():
             if node.name == name and not node.root:
                 return node
 

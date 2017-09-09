@@ -5,7 +5,8 @@ from flask_wtf import Form
 from wtforms import HiddenField
 
 import openatlas
-from openatlas import app, ClassMapper, PropertyMapper
+from openatlas import app, PropertyMapper
+from openatlas.models.classObject import ClassMapper
 from openatlas.util.util import link
 
 
