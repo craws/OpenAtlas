@@ -2,11 +2,11 @@
 import re
 from functools import wraps
 
-from flask import abort, url_for, request
+import babel
+from flask import abort, url_for, request, session
 from flask_login import current_user
 from flask_babel import lazy_gettext as _
 from markupsafe import Markup
-from datetime import datetime
 
 from werkzeug.utils import redirect
 from openatlas.models.classObject import ClassObject
@@ -96,13 +96,10 @@ def uc_first(string):
     return str(string)[0].upper() + str(string)[1:]
 
 
-def format_date(value, formatstring='%Y-%m-%d'):
+def format_date(value):
     if not value:
-        return 'Never'
-    try:
-        return datetime.strftime(value, formatstring)
-    except ValueError:
-        return 'Invalid date: ' + value + ' for format: ' + formatstring
+        return ''
+    return babel.dates.format_date(value, locale=session['language'])
 
 
 def link(entity):

@@ -33,6 +33,29 @@ class EventForm(Form):
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
 
+    def populate_dates(self, entity):
+        for code, types in entity.dates.items():
+            if code in ['OA1', 'OA3', 'OA5']:
+                for type_, date in types.items():
+                    if type_ in ['Exact date value', 'From date value']:
+                        self.date_begin_year.data = date.year
+                        self.date_begin_month.data = date.month
+                        self.date_begin_day.data = date.day
+                    else:
+                        self.date_begin_year2.data = date.year
+                        self.date_begin_month2.data = date.month
+                        self.date_begin_day2.data = date.day
+            else:
+                for type_, date in types.items():
+                    if type_ in ['Exact date value', 'From date value']:
+                        self.date_end_year.data = date.year
+                        self.date_end_month.data = date.month
+                        self.date_end_day.data = date.day
+                    else:
+                        self.date_end_year2.data = date.year
+                        self.date_end_month2.data = date.month
+                        self.date_end_day2.data = date.day
+
 
 @app.route('/event')
 @required_group('readonly')
@@ -88,6 +111,7 @@ def event_delete(event_id):
 @required_group('editor')
 def event_update(event_id):
     event = EntityMapper.get_by_id(event_id)
+    event.set_dates()
     form = EventForm()
     del form.insert_and_continue
     if event.name == openatlas.app.config['EVENT_ROOT_NAME']:
@@ -105,6 +129,7 @@ def event_update(event_id):
         return redirect(url_for('event_view', event_id=event.id))
     form.name.data = event.name
     form.description.data = event.description
+    form.populate_dates(event)
     return render_template('event/update.html', form=form, event=event)
 
 
