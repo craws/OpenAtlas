@@ -46,6 +46,17 @@ class DateMapper(object):
         DateMapper.save_date(entity, form, 'end', code_end)
 
     @staticmethod
+    def delete_dates(entity):
+        sql = """
+            DELETE FROM model.entity WHERE id in (
+                SELECT e.id FROM model.entity e
+                JOIN model.link l ON e.id = l.range_id AND l.domain_id = %(entity_id)s
+                JOIN model.class c ON e.class_id = c.id AND c.code = 'E61');"""
+        openatlas.get_cursor().execute(sql, {'entity_id': entity.id})
+        openatlas.debug_model['div sql'] += 1
+        return
+
+    @staticmethod
     def save_date(entity, form, name, code):
 
         # To do: clean up this mess

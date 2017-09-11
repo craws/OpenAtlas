@@ -96,7 +96,11 @@ def event_update(event_id):
     if form.validate_on_submit() and form.name.data != openatlas.app.config['EVENT_ROOT_NAME']:
         event.name = form.name.data
         event.description = form.description.data
+        openatlas.get_cursor().execute('BEGIN')
         event.update()
+        event.delete_dates()
+        event.save_dates(form)
+        openatlas.get_cursor().execute('COMMIT')
         flash(_('info update'), 'info')
         return redirect(url_for('event_view', event_id=event.id))
     form.name.data = event.name

@@ -1,4 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+from collections import OrderedDict
+
 import jinja2
 import flask
 import re
@@ -231,20 +233,21 @@ def sanitize(self, string):
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def print_entity_dates(self, entity):
-    date_types = {
-        'OA1': _('first'),
-        'OA3': _('birth'),
-        'OA2': _('last'),
-        'OA4': _('death'),
-        'OA5': _('begin'),
-        'OA6': _('end')
-    }
+    date_types = OrderedDict([
+        ('OA1', _('first')),
+        ('OA3', _('birth')),
+        ('OA2', _('last')),
+        ('OA4', _('death')),
+        ('OA5', _('begin')),
+        ('OA6', _('end')),
+    ])
     html = ''
     for code, label in date_types.items():
         if code in entity.dates:
             if 'Exact date value' in entity.dates[code]:
-                html += util.uc_first(label) + ': ' + util.format_date(entity.dates[code]['Exact date value']) + '<br />'
+                html += util.uc_first(label) + ': ' + util.format_date(entity.dates[code]['Exact date value']) + '<br/>'
             else:
-                html += util.uc_first(label) + ': ' + _('between') + ' ' + util.format_date(entity.dates[code]['From date value'])
+                html += util.uc_first(label) + ': ' + util.uc_first(_('between')) + ' '
+                html += util.format_date(entity.dates[code]['From date value'])
                 html += ' and ' + util.format_date(entity.dates[code]['To date value']) + '<br />'
     return Markup(html)

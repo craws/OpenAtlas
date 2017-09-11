@@ -23,6 +23,9 @@ class Entity(object):
     def save_dates(self, form):
         DateMapper.save_dates(self, form)
 
+    def delete_dates(self):
+        DateMapper.delete_dates(self)
+
     def set_dates(self):
         self.dates = DateMapper.get_dates(self)
 
