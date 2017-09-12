@@ -245,9 +245,16 @@ def print_entity_dates(self, entity):
     for code, label in date_types.items():
         if code in entity.dates:
             if 'Exact date value' in entity.dates[code]:
-                html += util.uc_first(label) + ': ' + util.format_date(entity.dates[code]['Exact date value']) + '<br/>'
+                html += util.uc_first(label) + ': '
+                html += util.format_date(entity.dates[code]['Exact date value']['timestamp'])
+                if entity.dates[code]['Exact date value']['info']:
+                    html += ' ' + entity.dates[code]['Exact date value']['info']
+                html += '<br />'
             else:
                 html += util.uc_first(label) + ': ' + util.uc_first(_('between')) + ' '
-                html += util.format_date(entity.dates[code]['From date value'])
-                html += ' and ' + util.format_date(entity.dates[code]['To date value']) + '<br />'
+                html += util.format_date(entity.dates[code]['From date value']['timestamp'])
+                html += ' and ' + util.format_date(entity.dates[code]['To date value']['timestamp'])
+                if entity.dates[code]['From date value']['info']:
+                    html += ' ' + entity.dates[code]['From date value']['info']
+                html += '<br />'
     return Markup(html)

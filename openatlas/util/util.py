@@ -1,5 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import re
+from datetime import datetime, timedelta, date
 from functools import wraps
 
 import babel
@@ -136,3 +137,10 @@ def truncate_string(string, length=40):
     title = string.replace('"', '')
     string = '<span title="' + title + '">' + string[:length] + '..</span>' if len(string) > length + 2 else string
     return string
+
+
+def create_date_from_form(form_date):
+    date_ = date(form_date['year'], form_date['month'] if form_date['month'] else 1, 1)
+    if form_date['day']:
+        date_ += timedelta(days=form_date['day']-1)
+    return date_

@@ -3,8 +3,8 @@ from flask import flash, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import HiddenField, StringField, SubmitField, TextAreaField
-from wtforms.validators import InputRequired
+from wtforms import HiddenField, StringField, SubmitField, TextAreaField, IntegerField
+from wtforms.validators import InputRequired, NumberRange, Optional
 
 import openatlas
 from openatlas import app
@@ -14,19 +14,57 @@ from openatlas.util.util import link, required_group, truncate_string, uc_first
 
 class EventForm(Form):
     name = StringField(_('name'), validators=[InputRequired()])
-    date_begin_year = StringField(uc_first(_('begin')), render_kw={'placeholder': _('yyyy')})
-    date_begin_month = StringField(render_kw={'placeholder': _('mm')})
-    date_begin_day = StringField(render_kw={'placeholder': _('dd')})
-    date_begin_year2 = StringField(render_kw={'placeholder': _('yyyy')})
-    date_begin_month2 = StringField(render_kw={'placeholder': _('mm')})
-    date_begin_day2 = StringField(render_kw={'placeholder': _('dd')})
-    date_begin_info = StringField(render_kw={'placeholder': _('comment')})
-    date_end_year = StringField(uc_first(_('end')), render_kw={'placeholder': _('yyyy')})
-    date_end_month = StringField(render_kw={'placeholder': _('mm')})
-    date_end_day = StringField(render_kw={'placeholder': _('dd')})
-    date_end_year2 = StringField(render_kw={'placeholder': _('yyyy')})
-    date_end_month2 = StringField(render_kw={'placeholder': _('mm')})
-    date_end_day2 = StringField(render_kw={'placeholder': _('dd')})
+    date_begin_year = IntegerField(
+        uc_first(_('begin')),
+        render_kw={'placeholder': _('yyyy')},
+        validators=[Optional(), NumberRange(min=-4713)]
+    )
+    date_begin_month = IntegerField(
+        render_kw={'placeholder': _('mm')},
+        validators=[Optional(), NumberRange(min=1,max=12)]
+    )
+    date_begin_day = IntegerField(
+        render_kw={'placeholder': _('dd')},
+        validators=[Optional(), NumberRange(min=1, max=31)]
+    )
+    date_begin_year2 = IntegerField(
+        render_kw={'placeholder': _('yyyy')},
+        validators=[Optional(), NumberRange(min=-4713)]
+    )
+    date_begin_month2 = IntegerField(
+        render_kw={'placeholder': _('mm')},
+        validators=[Optional(), NumberRange(min=1, max=12)]
+    )
+    date_begin_day2 = IntegerField(
+        render_kw={'placeholder': _('dd')},
+        validators=[Optional(), NumberRange(min=1, max=31)]
+    )
+    date_begin_info = StringField(render_kw={'placeholder': _('comment')},)
+    date_end_year = IntegerField(
+        uc_first(_('end')),
+        render_kw={'placeholder': _('yyyy')},
+        validators=[Optional(), NumberRange(min=-4713)]
+    )
+    date_end_month = IntegerField(
+        render_kw={'placeholder': _('mm')},
+        validators=[Optional(), NumberRange(min=1, max=12)]
+    )
+    date_end_day = IntegerField(
+        render_kw={'placeholder': _('dd')},
+        validators=[Optional(), NumberRange(min=1, max=31)]
+    )
+    date_end_year2 = IntegerField(
+        render_kw={'placeholder': _('yyyy')},
+        validators=[Optional(), NumberRange(min=-4713)]
+    )
+    date_end_month2 = IntegerField(
+        render_kw={'placeholder': _('mm')},
+        validators=[Optional(), NumberRange(min=1, max=12)]
+    )
+    date_end_day2 = IntegerField(
+        render_kw={'placeholder': _('dd')},
+        validators=[Optional(), NumberRange(min=1, max=31)]
+    )
     date_end_info = StringField(render_kw={'placeholder': _('comment')})
     description = TextAreaField(uc_first(_('description')))
     save = SubmitField(_('save'))
@@ -38,23 +76,25 @@ class EventForm(Form):
             if code in ['OA1', 'OA3', 'OA5']:
                 for type_, date in types.items():
                     if type_ in ['Exact date value', 'From date value']:
-                        self.date_begin_year.data = date.year
-                        self.date_begin_month.data = date.month
-                        self.date_begin_day.data = date.day
+                        self.date_begin_year.data = date['timestamp'].year
+                        self.date_begin_month.data = date['timestamp'].month
+                        self.date_begin_day.data = date['timestamp'].day
+                        self.date_begin_info.data = date['info']
                     else:
-                        self.date_begin_year2.data = date.year
-                        self.date_begin_month2.data = date.month
-                        self.date_begin_day2.data = date.day
+                        self.date_begin_year2.data = date['timestamp'].year
+                        self.date_begin_month2.data = date['timestamp'].month
+                        self.date_begin_day2.data = date['timestamp'].day
             else:
                 for type_, date in types.items():
                     if type_ in ['Exact date value', 'From date value']:
-                        self.date_end_year.data = date.year
-                        self.date_end_month.data = date.month
-                        self.date_end_day.data = date.day
+                        self.date_end_year.data = date['timestamp'].year
+                        self.date_end_month.data = date['timestamp'].month
+                        self.date_end_day.data = date['timestamp'].day
+                        self.date_end_info.data = date['info']
                     else:
-                        self.date_end_year2.data = date.year
-                        self.date_end_month2.data = date.month
-                        self.date_end_day2.data = date.day
+                        self.date_end_year2.data = date['timestamp'].year
+                        self.date_end_month2.data = date['timestamp'].month
+                        self.date_end_day2.data = date['timestamp'].day
 
 
 @app.route('/event')

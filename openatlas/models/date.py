@@ -12,7 +12,7 @@ class DateMapper(object):
     @staticmethod
     def get_dates(entity):
         sql = """
-            SELECT e2.value_timestamp, p.code, e3.name AS type_name
+            SELECT e2.value_timestamp, e2.description, p.code, e3.name AS type_name
             FROM model.entity e
             JOIN model.link l ON e.id = l.domain_id
             JOIN model.entity e2 ON l.range_id = e2.id
@@ -26,7 +26,7 @@ class DateMapper(object):
         for row in cursor.fetchall():
             if row.code not in dates:
                 dates[row.code] = {}
-            dates[row.code][row.type_name] = row.value_timestamp
+            dates[row.code][row.type_name] = {'timestamp': row.value_timestamp, 'info': row.description}
         openatlas.debug_model['div sql'] += 1
         return dates
 
@@ -73,31 +73,22 @@ class DateMapper(object):
         for node_id in openatlas.node.NodeMapper.get_hierarchy_by_name('Date value type').subs:
             nodes[openatlas.nodes[node_id].name] = node_id
         if date['year2']:
-            date_from = datetime.date(
-                date['year'],
-                date['month'] if date['month'] else 1,
-                date['day'] if date['day'] else 1)
+            date_from = openatlas.util.util.create_date_from_form(date)
             date_from_id = EntityMapper.insert('E61', '', description, date_from)
             LinkMapper.insert(date_from_id, 'P2', nodes['From date value'])
             LinkMapper.insert(entity.id, code, date_from_id)
-            date_to = datetime.date(
-                date['year2'],
-                date['month2'] if date['month2'] else 1,
-                date['day2'] if date['day2'] else 1)
+            date_to = openatlas.util.util.create_date_from_form(date)
             date_to_id = EntityMapper.insert('E61', '', '', date_to)
             LinkMapper.insert(date_to_id, 'P2', nodes['To date value'])
             LinkMapper.insert(entity.id, code, date_to_id)
         else:
             if date['month'] and date['day']:
-                date_from = datetime.date(
-                    date['year'],
-                    date['month'] if date['month'] else 1,
-                    date['day'] if date['day'] else 1)
+                date_from = openatlas.util.util.create_date_from_form(date)
                 exact_date_id = EntityMapper.insert('E61', '', description, date_from)
                 LinkMapper.insert(exact_date_id, 'P2', nodes['Exact date value'])
                 LinkMapper.insert(entity.id, code, exact_date_id)
             elif date['month'] and not date['day']:
-                date_from = datetime.date(date['year'], date['month'], 1)
+                date_from = openatlas.util.util.create_date_from_form(date)
                 date_from_id = EntityMapper.insert('E61', '', '', date_from)
                 LinkMapper.insert(date_from_id, 'P2', nodes['From date value'])
                 LinkMapper.insert(entity.id, code, date_from_id)
@@ -106,7 +97,7 @@ class DateMapper(object):
                 LinkMapper.insert(date_to_id, 'P2', nodes['To date value'])
                 LinkMapper.insert(entity.id, code, date_to_id)
             else:
-                date_from = datetime.date(date['year'], 1, 1)
+                date_from = openatlas.util.util.create_date_from_form(date)
                 date_from_id = EntityMapper.insert('E61', '', '', date_from)
                 LinkMapper.insert(date_from_id, 'P2', nodes['From date value'])
                 LinkMapper.insert(entity.id, code, date_from_id)

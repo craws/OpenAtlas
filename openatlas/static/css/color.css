@@ -25,6 +25,7 @@ div.tabs-container .ui-state-active a {
 #breadcrumb a,
 #header-menu span,
 #language-menu a,
+.date-switch label.error,
 input[type=submit],
 button,
 .date-switch,
