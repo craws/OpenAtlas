@@ -139,8 +139,8 @@ def truncate_string(string, length=40):
     return string
 
 
-def create_date_from_form(form_date):
-    date_ = date(form_date['year'], form_date['month'] if form_date['month'] else 1, 1)
-    if form_date['day']:
-        date_ += timedelta(days=form_date['day']-1)
+def create_date_from_form(form_date, postfix=''):
+    date_ = date(form_date['year' + postfix], form_date['month' + postfix] if form_date['month' + postfix] else 1, 1)
+    if form_date['day' + postfix]:  # add days to date to prevent errors for e.g. February 31
+        date_ += timedelta(days=form_date['day' + postfix]-1)
     return date_

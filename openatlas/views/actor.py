@@ -1,18 +1,18 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import render_template, url_for, flash
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import StringField, TextAreaField, HiddenField
 from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app
+from openatlas.forms import DateForm
 from openatlas.models.entity import EntityMapper
 from openatlas.util.util import uc_first, link, truncate_string, required_group
 
 
-class ActorForm(Form):
+class ActorForm(DateForm):
     name = StringField(uc_first(_('name')), validators=[InputRequired()])
     description = TextAreaField(uc_first(_('description')))
     continue_ = HiddenField()
@@ -22,9 +22,8 @@ class ActorForm(Form):
 @required_group('readonly')
 def actor_view(actor_id):
     actor = EntityMapper.get_by_id(actor_id)
-    data = {'info': [
-        (_('name'), actor.name),
-    ]}
+    actor.set_dates()
+    data = {'info': [(_('name'), actor.name)]}
     return render_template('actor/view.html', actor=actor, data=data)
 
 
@@ -33,7 +32,7 @@ def actor_view(actor_id):
 def actor_index():
     tables = {'actor': {
         'name': 'actor',
-        'header': ['name', 'class', 'first', 'last', 'info'],
+        'header': [_('name'), _('class'), _('first'), _('last'), _('info')],
         'data': []}}
     for actor in EntityMapper.get_by_codes(['E21', 'E74', 'E40']):
         tables['actor']['data'].append([
@@ -50,7 +49,10 @@ def actor_index():
 def actor_insert(code):
     form = ActorForm()
     if form.validate_on_submit():
+        openatlas.get_cursor().execute('BEGIN')
         actor = EntityMapper.insert(code, form.name.data, form.description.data)
+        actor.save_dates(form)
+        openatlas.get_cursor().execute('COMMIT')
         flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
             return redirect(url_for('actor_insert', code=code))

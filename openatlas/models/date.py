@@ -62,22 +62,27 @@ class DateMapper(object):
         # To do: clean up this mess
 
         from openatlas.models.entity import EntityMapper
+
         if not getattr(form, 'date_' + name + '_year').data:
             return
-        date = {}
+
+        nodes = {}  # get date types for later use
+        for node_id in openatlas.node.NodeMapper.get_hierarchy_by_name('Date value type').subs:
+            nodes[openatlas.nodes[node_id].name] = node_id
+
+        description = getattr(form, 'date_' + name + '_info').data
+
+        date = {}  # put date form values in a dictionary
         for item in ['year', 'month', 'day', 'year2', 'month2', 'day2']:
             value = getattr(form, 'date_' + name + '_' + item).data
             date[item] = int(value) if value else ''
-        description = getattr(form, 'date_' + name + '_info').data
-        nodes = {}
-        for node_id in openatlas.node.NodeMapper.get_hierarchy_by_name('Date value type').subs:
-            nodes[openatlas.nodes[node_id].name] = node_id
+
         if date['year2']:
             date_from = openatlas.util.util.create_date_from_form(date)
             date_from_id = EntityMapper.insert('E61', '', description, date_from)
             LinkMapper.insert(date_from_id, 'P2', nodes['From date value'])
             LinkMapper.insert(entity.id, code, date_from_id)
-            date_to = openatlas.util.util.create_date_from_form(date)
+            date_to = openatlas.util.util.create_date_from_form(date, '2')
             date_to_id = EntityMapper.insert('E61', '', '', date_to)
             LinkMapper.insert(date_to_id, 'P2', nodes['To date value'])
             LinkMapper.insert(entity.id, code, date_to_id)

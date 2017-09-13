@@ -1,100 +1,23 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import flash, render_template, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import HiddenField, StringField, SubmitField, TextAreaField, IntegerField
-from wtforms.validators import InputRequired, NumberRange, Optional
+from wtforms import HiddenField, StringField, SubmitField, TextAreaField
+from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app
+from openatlas.forms import DateForm
 from openatlas.models.entity import EntityMapper
 from openatlas.util.util import link, required_group, truncate_string, uc_first
 
 
-class EventForm(Form):
+class EventForm(DateForm):
     name = StringField(_('name'), validators=[InputRequired()])
-    date_begin_year = IntegerField(
-        uc_first(_('begin')),
-        render_kw={'placeholder': _('yyyy')},
-        validators=[Optional(), NumberRange(min=-4713)]
-    )
-    date_begin_month = IntegerField(
-        render_kw={'placeholder': _('mm')},
-        validators=[Optional(), NumberRange(min=1,max=12)]
-    )
-    date_begin_day = IntegerField(
-        render_kw={'placeholder': _('dd')},
-        validators=[Optional(), NumberRange(min=1, max=31)]
-    )
-    date_begin_year2 = IntegerField(
-        render_kw={'placeholder': _('yyyy')},
-        validators=[Optional(), NumberRange(min=-4713)]
-    )
-    date_begin_month2 = IntegerField(
-        render_kw={'placeholder': _('mm')},
-        validators=[Optional(), NumberRange(min=1, max=12)]
-    )
-    date_begin_day2 = IntegerField(
-        render_kw={'placeholder': _('dd')},
-        validators=[Optional(), NumberRange(min=1, max=31)]
-    )
-    date_begin_info = StringField(render_kw={'placeholder': _('comment')},)
-    date_end_year = IntegerField(
-        uc_first(_('end')),
-        render_kw={'placeholder': _('yyyy')},
-        validators=[Optional(), NumberRange(min=-4713)]
-    )
-    date_end_month = IntegerField(
-        render_kw={'placeholder': _('mm')},
-        validators=[Optional(), NumberRange(min=1, max=12)]
-    )
-    date_end_day = IntegerField(
-        render_kw={'placeholder': _('dd')},
-        validators=[Optional(), NumberRange(min=1, max=31)]
-    )
-    date_end_year2 = IntegerField(
-        render_kw={'placeholder': _('yyyy')},
-        validators=[Optional(), NumberRange(min=-4713)]
-    )
-    date_end_month2 = IntegerField(
-        render_kw={'placeholder': _('mm')},
-        validators=[Optional(), NumberRange(min=1, max=12)]
-    )
-    date_end_day2 = IntegerField(
-        render_kw={'placeholder': _('dd')},
-        validators=[Optional(), NumberRange(min=1, max=31)]
-    )
-    date_end_info = StringField(render_kw={'placeholder': _('comment')})
     description = TextAreaField(uc_first(_('description')))
     save = SubmitField(_('save'))
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
-
-    def populate_dates(self, entity):
-        for code, types in entity.dates.items():
-            if code in ['OA1', 'OA3', 'OA5']:
-                for type_, date in types.items():
-                    if type_ in ['Exact date value', 'From date value']:
-                        self.date_begin_year.data = date['timestamp'].year
-                        self.date_begin_month.data = date['timestamp'].month
-                        self.date_begin_day.data = date['timestamp'].day
-                        self.date_begin_info.data = date['info']
-                    else:
-                        self.date_begin_year2.data = date['timestamp'].year
-                        self.date_begin_month2.data = date['timestamp'].month
-                        self.date_begin_day2.data = date['timestamp'].day
-            else:
-                for type_, date in types.items():
-                    if type_ in ['Exact date value', 'From date value']:
-                        self.date_end_year.data = date['timestamp'].year
-                        self.date_end_month.data = date['timestamp'].month
-                        self.date_end_day.data = date['timestamp'].day
-                        self.date_end_info.data = date['info']
-                    else:
-                        self.date_end_year2.data = date['timestamp'].year
-                        self.date_end_month2.data = date['timestamp'].month
-                        self.date_end_day2.data = date['timestamp'].day
 
 
 @app.route('/event')
@@ -131,7 +54,7 @@ def event_insert(code):
         if form.continue_.data == 'yes':
             return redirect(url_for('event_insert', code=code))
         return redirect(url_for('event_view', event_id=event.id))
-    return render_template('event/insert.html', form=form, code=code, nodes=nodes)
+    return render_template('event/insert.html', form=form, code=code)
 
 
 @app.route('/event/delete/<int:event_id>')

@@ -19,6 +19,7 @@
         </div>
         <h1>{{ actor.name }}</h1>
         {{ data['info']|data_table }}
+        {{ actor|print_entity_dates }}
         {{ actor|description }}
     </div>
 </div>
