@@ -4,5 +4,5 @@
     {{ actor|link }} > {{ _('edit')|uc_first }}
 {% endblock %}
 {% block content %}
-     {% include 'actor/form.html' %}
+     {{ form|display_form() }}
 {% endblock %}

@@ -1,6 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import re
-from datetime import datetime, timedelta, date
+from datetime import timedelta, date
 from functools import wraps
 
 import babel
@@ -20,7 +20,7 @@ def sanitize(string):
     return re.sub('[^A-Za-z0-9]+', '', string)
 
 
-def add_dates_to_form(form):
+def add_dates_to_form(form, for_person=False):
     html = '''
         <div class="table-row">
             <div><label>{date}</label> <span class="tooltip" title="{tip}">i</span></div>
@@ -38,6 +38,8 @@ def add_dates_to_form(form):
     html += str(form.date_begin_year2(class_='year')) + ' '
     html += str(form.date_begin_month2(class_='month')) + ' '
     html += str(form.date_begin_day2(class_='day')) + ' '
+    if for_person:
+        html += str(form.date_birth) + str(form.date_birth.label)
     html += '</div></div>'
     html += '<div class="table-row date-switch">'
     html += '<div>' + str(form.date_end_year.label) + '</div><div class="table-cell">'
@@ -51,6 +53,8 @@ def add_dates_to_form(form):
     html += str(form.date_end_year2(class_='year')) + ' '
     html += str(form.date_end_month2(class_='month')) + ' '
     html += str(form.date_end_day2(class_='day')) + ' '
+    if for_person:
+        html += str(form.date_death) + str(form.date_death.label)
     html += '</div></div>'
     return html
 

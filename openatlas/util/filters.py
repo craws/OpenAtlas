@@ -188,7 +188,7 @@ def get_class_name(self, code):
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_form(self, form, form_id=None):
+def display_form(self, form, form_id=None, for_persons=False):
     id_attribute = ' id="' + form_id + '" ' if form_id else ''
     html = '<form method="post"' + id_attribute + '>' + '<div class="data-table">'
     info = ''
@@ -202,7 +202,7 @@ def display_form(self, form, form_id=None):
             continue
         if field.id.split('_', 1)[0] == 'date':  # if it's a date field use a function to add dates
             if field.id == 'date_begin_year':
-                html += util.add_dates_to_form(form)
+                html += util.add_dates_to_form(form, for_persons)
             continue
         field.label.text += ' *' if field.flags.required and form_id != 'login-form' else ''
         errors = ''

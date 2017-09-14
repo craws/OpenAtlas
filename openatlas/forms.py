@@ -1,7 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
-from wtforms import IntegerField, StringField
+from wtforms import IntegerField, StringField, BooleanField
 from wtforms.validators import NumberRange, Optional
 
 from openatlas.util.util import uc_first
@@ -33,6 +33,9 @@ class DateForm(Form):
                         self.date_end_year2.data = date['timestamp'].year
                         self.date_end_month2.data = date['timestamp'].month
                         self.date_end_day2.data = date['timestamp'].day
+
+    date_birth = BooleanField(uc_first(_('birth')))
+    date_death = BooleanField(uc_first(_('death')))
 
     date_begin_year = IntegerField(
         uc_first(_('begin')),
@@ -86,5 +89,3 @@ class DateForm(Form):
         validators=[Optional(), NumberRange(min=1, max=31)]
     )
     date_end_info = StringField(render_kw={'placeholder': _('comment')})
-
-
