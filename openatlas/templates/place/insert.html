@@ -3,5 +3,5 @@
      <a href="{{ url_for('place_index') }}">{{ _('place')|uc_first }}</a> > + {{ _('place')|uc_first }}
 {% endblock %}
 {% block content %}
-     {% include 'place/form.html' %}
+     {{ form|display_form() }}
 {% endblock %}

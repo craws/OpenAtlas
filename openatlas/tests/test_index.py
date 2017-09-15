@@ -30,6 +30,8 @@ class IndexTests(TestBaseCase):
         self.login()
         rv = self.app.get('/')
         assert b'0' in rv.data
+        rv = self.app.get('/login', follow_redirects=True)  # test redirection to overview if trying to login again
+        assert b'first' in rv.data
         rv = self.app.get('/index/setlocale/de', follow_redirects=True)
         assert b'Quelle' in rv.data
         rv = self.app.get('/logout', follow_redirects=True)

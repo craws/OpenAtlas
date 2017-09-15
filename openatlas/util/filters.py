@@ -189,6 +189,11 @@ def get_class_name(self, code):
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_form(self, form, form_id=None, for_persons=False):
+    if hasattr(form, 'name') and form.name.data:  # if name.data exists it's an update so change buttons
+        if hasattr(form, 'save'):
+            form.save.label.text = _('save')
+        if hasattr(form, 'insert_and_continue'):
+            del form.insert_and_continue
     id_attribute = ' id="' + form_id + '" ' if form_id else ''
     html = '<form method="post"' + id_attribute + '>' + '<div class="data-table">'
     info = ''

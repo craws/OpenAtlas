@@ -33,6 +33,10 @@ class DateForm(Form):
                         self.date_end_year2.data = date['timestamp'].year
                         self.date_end_month2.data = date['timestamp'].month
                         self.date_end_day2.data = date['timestamp'].day
+            if code == 'OA3':
+                self.date_birth.data = True
+            if code == 'OA4':
+                self.date_death.data = True
 
     date_birth = BooleanField(uc_first(_('birth')))
     date_death = BooleanField(uc_first(_('death')))

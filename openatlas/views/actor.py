@@ -2,7 +2,7 @@
 from flask import render_template, url_for, flash
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
-from wtforms import StringField, TextAreaField, HiddenField
+from wtforms import StringField, TextAreaField, HiddenField, SubmitField
 from wtforms.validators import InputRequired
 
 import openatlas
@@ -15,6 +15,8 @@ from openatlas.util.util import uc_first, link, truncate_string, required_group
 class ActorForm(DateForm):
     name = StringField(uc_first(_('name')), validators=[InputRequired()])
     description = TextAreaField(uc_first(_('description')))
+    save = SubmitField(_('insert'))
+    insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
 
 
@@ -74,13 +76,19 @@ def actor_delete(actor_id):
 @required_group('editor')
 def actor_update(actor_id):
     actor = EntityMapper.get_by_id(actor_id)
+    actor.set_dates()
     form = ActorForm()
     if form.validate_on_submit():
         actor.name = form.name.data
         actor.description = form.description.data
+        openatlas.get_cursor().execute('BEGIN')
         actor.update()
+        actor.delete_dates()
+        actor.save_dates(form)
+        openatlas.get_cursor().execute('COMMIT')
         flash(_('info update'), 'info')
         return redirect(url_for('actor_view', actor_id=actor.id))
     form.name.data = actor.name
     form.description.data = actor.description
+    form.populate_dates(actor)
     return render_template('actor/update.html', form=form, actor=actor)

@@ -19,6 +19,7 @@
         </div>
         <h1>{{ place.name }}</h1>
         {{ data['info']|data_table }}
+        {{ place|print_entity_dates }}
         {{ place|description }}
     </div>
 </div>

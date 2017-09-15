@@ -38,9 +38,9 @@ class DateMapper(object):
             code_begin = 'OA5'
             code_end = 'OA6'
         if entity.class_.name == 'Person':
-            if form.birth.data:
+            if form.date_birth.data:
                 code_begin = 'OA3'
-            if form.death.data:
+            if form.date_death.data:
                 code_end = 'OA4'
         DateMapper.save_date(entity, form, 'begin', code_begin)
         DateMapper.save_date(entity, form, 'end', code_end)
@@ -58,55 +58,43 @@ class DateMapper(object):
 
     @staticmethod
     def save_date(entity, form, name, code):
-
-        # To do: clean up this mess
-
         from openatlas.models.entity import EntityMapper
+        from openatlas.models.node import NodeMapper
+        from openatlas.util.util import create_date_from_form
 
         if not getattr(form, 'date_' + name + '_year').data:
             return
 
-        nodes = {}  # get date types for later use
-        for node_id in openatlas.node.NodeMapper.get_hierarchy_by_name('Date value type').subs:
-            nodes[openatlas.nodes[node_id].name] = node_id
-
         description = getattr(form, 'date_' + name + '_info').data
-
+        nodes = {}  # get date types for later use
+        for node_id in NodeMapper.get_hierarchy_by_name('Date value type').subs:
+            nodes[openatlas.nodes[node_id].name] = node_id
         date = {}  # put date form values in a dictionary
         for item in ['year', 'month', 'day', 'year2', 'month2', 'day2']:
             value = getattr(form, 'date_' + name + '_' + item).data
             date[item] = int(value) if value else ''
 
+        if not date['year2'] and date['month'] and date['year']:  # exact date
+            date_from = create_date_from_form(date)
+            exact_date_id = EntityMapper.insert('E61', '', description, date_from)
+            LinkMapper.insert(exact_date_id, 'P2', nodes['Exact date value'])
+            LinkMapper.insert(entity.id, code, exact_date_id)
+            return
+
         if date['year2']:
-            date_from = openatlas.util.util.create_date_from_form(date)
-            date_from_id = EntityMapper.insert('E61', '', description, date_from)
-            LinkMapper.insert(date_from_id, 'P2', nodes['From date value'])
-            LinkMapper.insert(entity.id, code, date_from_id)
-            date_to = openatlas.util.util.create_date_from_form(date, '2')
-            date_to_id = EntityMapper.insert('E61', '', '', date_to)
-            LinkMapper.insert(date_to_id, 'P2', nodes['To date value'])
-            LinkMapper.insert(entity.id, code, date_to_id)
-        else:
-            if date['month'] and date['day']:
-                date_from = openatlas.util.util.create_date_from_form(date)
-                exact_date_id = EntityMapper.insert('E61', '', description, date_from)
-                LinkMapper.insert(exact_date_id, 'P2', nodes['Exact date value'])
-                LinkMapper.insert(entity.id, code, exact_date_id)
-            elif date['month'] and not date['day']:
-                date_from = openatlas.util.util.create_date_from_form(date)
-                date_from_id = EntityMapper.insert('E61', '', '', date_from)
-                LinkMapper.insert(date_from_id, 'P2', nodes['From date value'])
-                LinkMapper.insert(entity.id, code, date_from_id)
+            date_from = create_date_from_form(date)
+            date_to = create_date_from_form(date, '2')
+        else:  # try to guess time spans from incomplete "from date"
+            if date['month'] and not date['day']:
+                date_from = create_date_from_form(date)
                 date_to = (date_from + relativedelta(months=1)) - datetime.timedelta(days=1)
-                date_to_id = EntityMapper.insert('E61', '', '', date_to)
-                LinkMapper.insert(date_to_id, 'P2', nodes['To date value'])
-                LinkMapper.insert(entity.id, code, date_to_id)
             else:
-                date_from = openatlas.util.util.create_date_from_form(date)
-                date_from_id = EntityMapper.insert('E61', '', '', date_from)
-                LinkMapper.insert(date_from_id, 'P2', nodes['From date value'])
-                LinkMapper.insert(entity.id, code, date_from_id)
+                date_from = create_date_from_form(date)
                 date_to = (date_from + relativedelta(years=1)) - datetime.timedelta(days=1)
-                date_to_id = EntityMapper.insert('E61', '', '', date_to)
-                LinkMapper.insert(date_to_id, 'P2', nodes['To date value'])
-                LinkMapper.insert(entity.id, code, date_to_id)
+
+        date_from_id = EntityMapper.insert('E61', '', description, date_from)
+        LinkMapper.insert(date_from_id, 'P2', nodes['From date value'])
+        LinkMapper.insert(entity.id, code, date_from_id)
+        date_to_id = EntityMapper.insert('E61', '', '', date_to)
+        LinkMapper.insert(date_to_id, 'P2', nodes['To date value'])
+        LinkMapper.insert(entity.id, code, date_to_id)

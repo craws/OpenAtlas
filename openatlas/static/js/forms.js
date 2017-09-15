@@ -36,7 +36,7 @@ $(document).ready(function () {
     });
 
     $.validator.addClassRules({
-        year: {number: true, min: -4713},
+        year: {number: true, min: 1},
         month: {digits: true, max: 12},
         day: {digits: true, max: 31}
     });

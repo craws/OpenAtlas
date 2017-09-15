@@ -4,5 +4,5 @@
     {{ actor|link }} > {{ _('edit')|uc_first }}
 {% endblock %}
 {% block content %}
-     {{ form|display_form() }}
+     {{ form|display_form('', True if actor.class_.code=='E21' else False) }}
 {% endblock %}

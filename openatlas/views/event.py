@@ -15,7 +15,7 @@ from openatlas.util.util import link, required_group, truncate_string, uc_first
 class EventForm(DateForm):
     name = StringField(_('name'), validators=[InputRequired()])
     description = TextAreaField(uc_first(_('description')))
-    save = SubmitField(_('save'))
+    save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
 
@@ -76,7 +76,6 @@ def event_update(event_id):
     event = EntityMapper.get_by_id(event_id)
     event.set_dates()
     form = EventForm()
-    del form.insert_and_continue
     if event.name == openatlas.app.config['EVENT_ROOT_NAME']:
         flash(_('error forbidden'), 'error')
         return redirect(url_for('event_index'))
