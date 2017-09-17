@@ -14,10 +14,9 @@ from openatlas.util.util import required_group, sanitize, uc_first
 
 class NodeForm(Form):
     name = StringField(uc_first(_('name')), validators=[InputRequired()])
-    inverse_test = StringField(uc_first(_('inverse')), validators=[InputRequired()])
+    name_inverse = StringField(uc_first(_('inverse')))
     description = TextAreaField(uc_first(_('description')))
-    insert_and_continue = SubmitField(_('insert and continue'))
-    continue_ = HiddenField()
+    save = SubmitField(_('insert'))
 
 
 @app.route('/node')
@@ -40,9 +39,9 @@ def node_insert(root_id):
         return redirect(url_for('node_index'))
     form = NodeForm()
     if not root.directional:
-        del form.inverse_test
+        del form.name_inverse
     if 'name_search' not in request.form and form.validate_on_submit():
-        name = form.name.data + (form.inverse_text.data if hasattr(form, 'inverse_test') in form else '')
+        name = form.name.data + (form.name_inverse.data if hasattr(form, 'name_inverse') in form else '')
         openatlas.get_cursor().execute('BEGIN')
         node = NodeMapper.insert('E55', name, form.description.data)
         openatlas.get_cursor().execute('COMMIT')

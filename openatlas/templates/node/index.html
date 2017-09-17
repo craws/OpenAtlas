@@ -26,9 +26,7 @@
                                             name="name_search"
                                             style="width:8em;"/>
                                         <input type="hidden" name="mode" value="insert" />
-                                        <!-- button value="insert" name="add-node-submit" type="submit">+</button -->
-                                        {% if not node.system and 'manager'|is_authorized: %}
-                                        {% endif %}
+                                        <button type="submit" value="insert" name="add-node-submit">+</button>
                                     </form>
                                 </div>
                                 {{ tree|safe }}
