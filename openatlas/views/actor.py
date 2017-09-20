@@ -7,7 +7,7 @@ from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app
-from openatlas.forms import DateForm
+from openatlas.forms import DateForm, TreeMultiField, TreeField
 from openatlas.models.entity import EntityMapper
 from openatlas.util.util import uc_first, link, truncate_string, required_group
 
@@ -49,6 +49,13 @@ def actor_index():
 @app.route('/actor/insert/<code>', methods=['POST', 'GET'])
 @required_group('editor')
 def actor_insert(code):
+    for id_, node in openatlas.models.node.NodeMapper.get_nodes_for_form('Person').items():
+        if node.multiple:
+            field = TreeMultiField(str(id_))
+            setattr(ActorForm, str(id_), field)
+        else:
+            field = TreeField(str(id_))
+            setattr(ActorForm, str(id_), field)
     form = ActorForm()
     if form.validate_on_submit():
         openatlas.get_cursor().execute('BEGIN')

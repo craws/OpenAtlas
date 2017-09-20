@@ -30,6 +30,7 @@ input[type=submit],
 button,
 .date-switch,
 span.button,
+a.button,
 .button-bar a,
 .changelog-version,
 .inverse-heading,
@@ -93,6 +94,7 @@ table.tablesorter tbody tr.odd td {
 }
 
 button,
+a.button,
 #breadcrumb,
 .date-switch,
 input[type=submit],

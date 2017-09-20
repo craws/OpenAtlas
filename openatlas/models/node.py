@@ -108,22 +108,8 @@ class NodeMapper(EntityMapper):
         # life.get_cursor().execute(sql, params)
 
     @staticmethod
-    def get_tree_data(name, entity=None):
-        selected_tag_ids = []
-        if entity and entity.id:
-            if entity.class_.name == 'type':
-                super_ = entity.get_linked_entity('has super')
-                if super_:
-                    selected_tag_ids.append(super_.id)  # pragma: no cover
-            if name == 'place':
-                place = entity.get_linked_entity('is located at')
-                if place:
-                    id_ = place.id if place.class_.name == 'place' else place.get_linked_entity('has super').id
-                    selected_tag_ids.append(id_)
-            else:
-                for tag in entity.get_nodes(name):
-                    selected_tag_ids.append(tag.id)
-        return "'core':{'data':[" + NodeMapper.walk_tree(NodeMapper.get_nodes(name), selected_tag_ids) + "]}"
+    def get_tree_data(node_id):
+        return "'core':{'data':[" + NodeMapper.walk_tree(node_id, None) + "]}"
 
     @staticmethod
     def walk_tree(param, selected_ids=None):
@@ -141,3 +127,16 @@ class NodeMapper(EntityMapper):
                 text += "]"
             text += "},"
         return text
+
+    @staticmethod
+    def get_nodes_for_form(form_id):
+        sql = '''
+            SELECT h.id FROM web.hierarchy h
+            JOIN web.hierarchy_form hf ON h.id = hf.hierarchy_id
+            JOIN web.form f ON hf.form_id = f.id AND f.name = %(form_name)s;'''
+        cursor = openatlas.get_cursor()
+        cursor.execute(sql, {'form_name': form_id})
+        nodes = {}
+        for row in cursor.fetchall():
+            nodes[row.id] = openatlas.nodes[row.id]
+        return nodes
