@@ -1,14 +1,32 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import openatlas
 from collections import OrderedDict
+
+from openatlas.models.link import LinkMapper
 from .entity import Entity, EntityMapper
 
 
 class NodeMapper(EntityMapper):
 
     @staticmethod
+    def save_nodes(entity, form):
+        for field in form:
+            if field.type in ['TreeField', 'TreeMultiField'] and field.data:
+                for node_id in field.data:
+                    LinkMapper.insert(entity, 'P2', node_id)
+        return
+
+    @staticmethod
+    def delete_nodes(entity):
+        sql = '''DELETE FROM model.link WHERE domain_id = %(entity_id)s AND property_id =
+            (SELECT id FROM model.property WHERE code = 'P2');'''
+        openatlas.get_cursor().execute(sql, {'entity_id': entity.id})
+        openatlas.debug_model['div sql'] += 1
+        return
+
+    @staticmethod
     def get_all_nodes():
-        sql = """
+        sql = '''
             SELECT
                 e.id,
                 e.name,
@@ -34,7 +52,7 @@ class NodeMapper(EntityMapper):
                 p2.name IN ('is located at', 'has type')
             GROUP BY e.id, es.id
             ORDER BY e.name;
-        """
+        '''
         cursor = openatlas.get_cursor()
         cursor.execute(sql)
         nodes = OrderedDict()
@@ -54,11 +72,11 @@ class NodeMapper(EntityMapper):
         cursor.execute("SELECT id, name, extendable FROM web.form ORDER BY name ASC;")
         for row in cursor.fetchall():
             forms[row.id] = {'id': row.id, 'name': row.name, 'extendable': row.extendable}
-        sql = """
+        sql = '''
             SELECT h.id, h.name, h.multiple, h.system, h.extendable, h.directional,
                 (SELECT ARRAY(SELECT f.id FROM web.form f JOIN web.hierarchy_form hf ON f.id = hf.form_id
                     AND hf.hierarchy_id = h.id )) AS form_ids
-            FROM web.hierarchy h;"""
+            FROM web.hierarchy h;'''
         cursor = openatlas.get_cursor()
         cursor.execute(sql)
         hierarchies = {}
@@ -109,24 +127,25 @@ class NodeMapper(EntityMapper):
 
     @staticmethod
     def get_tree_data(node_id):
-        return "'core':{'data':[" + NodeMapper.walk_tree(node_id, None) + "]}"
+        node = openatlas.nodes[node_id]
+        return "'core':{'data':[" + NodeMapper.walk_tree(node.subs, None) + "]}"
 
     @staticmethod
     def walk_tree(param, selected_ids=None):
         items = param if isinstance(param, list) else [param]
         selected_ids = selected_ids if isinstance(selected_ids, list) else [selected_ids]
-        text = ''
+        string = ''
         for id_ in items:
             item = openatlas.nodes[id_]
             selected = ",'state' : {'selected' : true}" if item.id in selected_ids else ''
-            text += "{'text':'" + item.name + "', 'id':'" + str(item.id) + "'" + selected
+            string += "{'text':'" + item.name + "', 'id':'" + str(item.id) + "'" + selected
             if item.subs:
-                text += ",'children' : ["
+                string += ",'children' : ["
                 for sub in item.subs:
-                    text += NodeMapper.walk_tree(sub, selected_ids)
-                text += "]"
-            text += "},"
-        return text
+                    string += NodeMapper.walk_tree(sub, selected_ids)
+                string += "]"
+            string += "},"
+        return string
 
     @staticmethod
     def get_nodes_for_form(form_id):

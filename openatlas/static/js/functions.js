@@ -36,7 +36,7 @@ function ucString(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-function createOverlay(name, multiple = false, type = 'table') {
+function createOverlay(name, title, multiple = false, type = 'table') {
     $('#' + name + '-overlay').click(function () {
         $('#' + name + '-dialog').dialog('close');
     });
@@ -47,7 +47,7 @@ function createOverlay(name, multiple = false, type = 'table') {
         $('#' + name + '-dialog').dialog({
             position: {my: 'center top', at: 'center top+80', of: window},
             closeText: 'X',
-            title: ucString(name),
+            title: ucString(title),
             closeOnEscape: true,
             width: 'auto',
             height: 'auto',

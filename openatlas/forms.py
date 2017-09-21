@@ -13,6 +13,16 @@ from openatlas.util.filters import pager
 from openatlas.util.util import uc_first
 
 
+def add_form_fields(form, form_name):
+    for id_, node in openatlas.models.node.NodeMapper.get_nodes_for_form(form_name).items():
+        if node.multiple:
+            field = TreeMultiField(str(id_))
+            setattr(form, str(id_), field)
+        else:
+            field = TreeField(str(id_))
+            setattr(form, str(id_), field)
+
+
 class TreeSelect(HiddenInput):
 
     def __call__(self, field, **kwargs):
@@ -29,7 +39,7 @@ class TreeSelect(HiddenInput):
             </div>
             <script>
                 $(document).ready(function () {{
-                    createOverlay("{name}");
+                    createOverlay("{name}","{title}");
                     $("#{name}-tree").jstree({{
                         "search": {{"case_insensitive": true, "show_only_matches": true}},
                         "plugins" : ["search"],{tree}
@@ -44,6 +54,7 @@ class TreeSelect(HiddenInput):
             </script>
         '''.format(
             name=field.id,
+            title=openatlas.nodes[int(field.id)].name,
             selection=selection,
             tree=openatlas.models.node.NodeMapper.get_tree_data(int(field.id)),
             clear_style='' if selection else ' style="display: none;" ',
@@ -64,7 +75,7 @@ class TreeMultiSelect(HiddenInput):
                 selection += openatlas.nodes[entity_id].name + '<br />'
         html = '''
             <span id="{name}-button" class="button">Change</span>
-            <div id="{name}-selection"  style="text-align:left;">{selection}</div>
+            <div id="{name}-selection" style="text-align:left;">{selection}</div>
             <div id="{name}-overlay" class="overlay">
                <div id="{name}-dialog" class="overlay-container">
                    <input class="tree-filter" id="{name}-tree-search" placeholder="Filter" />
@@ -72,7 +83,7 @@ class TreeMultiSelect(HiddenInput):
                </div>
             </div>
             <script>
-                createOverlay("{name}", true, "tree");
+                createOverlay("{name}", "{title}", true, "tree");
                 $("#{name}-tree").jstree({{
                     "search": {{"case_insensitive": true, "show_only_matches": true}},
                     "plugins": ["search", "checkbox"],
@@ -84,6 +95,7 @@ class TreeMultiSelect(HiddenInput):
             </script>
         '''.format(
             name=field.id,
+            title=openatlas.nodes[int(field.id)].name,
             selection=selection,
             tree=openatlas.models.node.NodeMapper.get_tree_data(int(field.id)))
         return super(TreeMultiSelect, self).__call__(field, **kwargs) + html

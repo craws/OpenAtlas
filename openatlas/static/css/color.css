@@ -66,7 +66,9 @@ body, .ui-widget-content, .ui-dialog .ui-dialog-content {
 
 #menu,
 #header-menu span,
+.overlay,
 .inverse-heading,
+.ui-widget-header,
 .ui-widget-header .ui-state-default,
 table.tablesorter thead tr th,
 table.tablesorter tfoot tr th {

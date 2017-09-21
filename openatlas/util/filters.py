@@ -156,14 +156,14 @@ def pager(self, table):
     html += '<script>'
     sort = 'sortList: [[0, 0]]' if 'sort' not in table else table['sort']
     if show_pager:
-        html += """
+        html += '''
             $("#{name}-table").tablesorter({{ 
                 {sort},
                 dateFormat: "ddmmyyyy",
                 widgets: [\'zebra\', \'filter\'],
                 widgetOptions: {{filter_external: \'#{name}-search\', filter_columnFilters: false}}}})
             .tablesorterPager({{positionFixed: false, container: $("#{name}-pager"), size: 20}});
-        """.format(name=table['name'], sort=sort)
+        '''.format(name=table['name'], sort=sort)
     else:
         html += '$("#' + table['name'] + '-table").tablesorter({' + sort + ',widgets:[\'zebra\']});'
     html += '</script>'

@@ -7,7 +7,7 @@ from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app
-from openatlas.forms import DateForm, TreeMultiField, TreeField
+from openatlas.forms import DateForm, add_form_fields
 from openatlas.models.entity import EntityMapper
 from openatlas.util.util import uc_first, link, truncate_string, required_group
 
@@ -49,19 +49,11 @@ def actor_index():
 @app.route('/actor/insert/<code>', methods=['POST', 'GET'])
 @required_group('editor')
 def actor_insert(code):
-    for id_, node in openatlas.models.node.NodeMapper.get_nodes_for_form('Person').items():
-        if node.multiple:
-            field = TreeMultiField(str(id_))
-            setattr(ActorForm, str(id_), field)
-        else:
-            field = TreeField(str(id_))
-            setattr(ActorForm, str(id_), field)
+    forms = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
+    add_form_fields(ActorForm, forms[code])
     form = ActorForm()
     if form.validate_on_submit():
-        openatlas.get_cursor().execute('BEGIN')
-        actor = EntityMapper.insert(code, form.name.data, form.description.data)
-        actor.save_dates(form)
-        openatlas.get_cursor().execute('COMMIT')
+        actor = save(form, code)
         flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
             return redirect(url_for('actor_insert', code=code))
@@ -84,18 +76,30 @@ def actor_delete(actor_id):
 def actor_update(actor_id):
     actor = EntityMapper.get_by_id(actor_id)
     actor.set_dates()
+    forms = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
+    add_form_fields(ActorForm, forms[actor.class_.code])
     form = ActorForm()
     if form.validate_on_submit():
-        actor.name = form.name.data
-        actor.description = form.description.data
-        openatlas.get_cursor().execute('BEGIN')
-        actor.update()
-        actor.delete_dates()
-        actor.save_dates(form)
-        openatlas.get_cursor().execute('COMMIT')
+        save(form, '', actor)
         flash(_('info update'), 'info')
         return redirect(url_for('actor_view', actor_id=actor.id))
     form.name.data = actor.name
     form.description.data = actor.description
     form.populate_dates(actor)
     return render_template('actor/update.html', form=form, actor=actor)
+
+
+def save(form, code, entity=None):
+    openatlas.get_cursor().execute('BEGIN')
+    if entity:
+        entity.name = form.name.data
+        entity.description = form.description.data
+        entity.update()
+        entity.delete_dates()
+        entity.delete_nodes()
+    else:
+        entity = EntityMapper.insert(code, form.name.data, form.description.data)
+    entity.save_dates(form)
+    entity.save_nodes(form)
+    openatlas.get_cursor().execute('COMMIT')
+    return entity

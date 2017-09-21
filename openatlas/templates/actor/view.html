@@ -20,6 +20,9 @@
         <h1>{{ actor.name }}</h1>
         {{ data['info']|data_table }}
         {{ actor|print_entity_dates }}
+        {% for node in actor.types %}
+            {{ node|link }}<br />
+        {% endfor %}
         {{ actor|description }}
     </div>
 </div>
