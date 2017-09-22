@@ -9,12 +9,12 @@ import openatlas
 from openatlas import app
 from openatlas.forms import DateForm
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import uc_first, link, truncate_string, required_group
+from openatlas.util.util import link, truncate_string, required_group
 
 
 class PlaceForm(DateForm):
-    name = StringField(uc_first(_('name')), validators=[InputRequired()])
-    description = TextAreaField(uc_first(_('content')))
+    name = StringField(_('name'), validators=[InputRequired()])
+    description = TextAreaField(_('content'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()

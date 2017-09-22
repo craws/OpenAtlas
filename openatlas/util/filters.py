@@ -196,7 +196,6 @@ def display_form(self, form, form_id=None, for_persons=False):
             del form.insert_and_continue
     id_attribute = ' id="' + form_id + '" ' if form_id else ''
     html = '<form method="post"' + id_attribute + '>' + '<div class="data-table">'
-    info = ''
     for field in form:
         if field.type in ['CSRFTokenField', 'HiddenField']:
             html += str(field)
@@ -217,7 +216,7 @@ def display_form(self, form, form_id=None, for_persons=False):
         class_ = "required" if field.flags.required else ''
         html += '<div class="table-row"><div>' + str(field.label) + '</div>'
         html += '<div class="table-cell">' + str(field(class_=class_)) + errors + '</div></div>'
-    html += info + '</div></form>'
+    html += '</div></form>'
     return Markup(html)
 
 
