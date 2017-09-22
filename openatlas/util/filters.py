@@ -156,14 +156,14 @@ def pager(self, table):
     html += '<script>'
     sort = 'sortList: [[0, 0]]' if 'sort' not in table else table['sort']
     if show_pager:
-        html += """
+        html += '''
             $("#{name}-table").tablesorter({{ 
                 {sort},
                 dateFormat: "ddmmyyyy",
                 widgets: [\'zebra\', \'filter\'],
                 widgetOptions: {{filter_external: \'#{name}-search\', filter_columnFilters: false}}}})
             .tablesorterPager({{positionFixed: false, container: $("#{name}-pager"), size: 20}});
-        """.format(name=table['name'], sort=sort)
+        '''.format(name=table['name'], sort=sort)
     else:
         html += '$("#' + table['name'] + '-table").tablesorter({' + sort + ',widgets:[\'zebra\']});'
     html += '</script>'
@@ -196,13 +196,22 @@ def display_form(self, form, form_id=None, for_persons=False):
             del form.insert_and_continue
     id_attribute = ' id="' + form_id + '" ' if form_id else ''
     html = '<form method="post"' + id_attribute + '>' + '<div class="data-table">'
+    footer = ''
     for field in form:
+        if field.type in ['TreeField', 'TreeMultiField']:
+            node = openatlas.nodes[int(field.id)]
+            html += '<div class="table-row"><div><label>' + node.name + '</label></div>'
+            html += '<div class="table-cell">' + str(field(class_=class_)) + errors + '</div></div>'
+            continue
         if field.type in ['CSRFTokenField', 'HiddenField']:
             html += str(field)
             continue
         field.label.text = util.uc_first(field.label.text)
+        if field.id == 'description':
+            footer += '<br />' + str(field.label) + '<br />' + str(field) + '<br />'
+            continue
         if field.type == 'SubmitField':
-            html += str(field)
+            footer += str(field)
             continue
         if field.id.split('_', 1)[0] == 'date':  # if it's a date field use a function to add dates
             if field.id == 'date_begin_year':
@@ -216,7 +225,7 @@ def display_form(self, form, form_id=None, for_persons=False):
         class_ = "required" if field.flags.required else ''
         html += '<div class="table-row"><div>' + str(field.label) + '</div>'
         html += '<div class="table-cell">' + str(field(class_=class_)) + errors + '</div></div>'
-    html += '</div></form>'
+    html += footer + '</div></form>'
     return Markup(html)
 
 

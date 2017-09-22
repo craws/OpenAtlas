@@ -36,15 +36,7 @@ function ucString(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-function selectFromTable(element, table, id) {
-    $('#' + table).attr('value', id);
-    $('#' + table + '-button').val(element.innerHTML);
-    $('#' + table + '-button').focus(); /* to refresh/fill button and remove validation errors */
-    $('#' + table + '-clear').show();
-    $('.ui-dialog-titlebar-close').trigger('click');
-}
-
-function createOverlay(name, multiple = false, type = 'table') {
+function createOverlay(name, title, multiple = false, type = 'table') {
     $('#' + name + '-overlay').click(function () {
         $('#' + name + '-dialog').dialog('close');
     });
@@ -55,7 +47,7 @@ function createOverlay(name, multiple = false, type = 'table') {
         $('#' + name + '-dialog').dialog({
             position: {my: 'center top', at: 'center top+80', of: window},
             closeText: 'X',
-            title: ucString(name),
+            title: ucString(title),
             closeOnEscape: true,
             width: 'auto',
             height: 'auto',
@@ -83,4 +75,51 @@ function ajaxBookmark(entityId) {
             $('#bookmark' + entityId).html(label);
         }
     });
+}
+
+function selectFromTree(name, id, text) {
+    $('#' + name).val(id)
+    $('#' + name + '-button').val(text);
+    $('#' + name + '-dialog').dialog('close');
+    $('#' + name + '-clear').show();
+}
+
+function selectFromTreeMulti(name) {
+    var checkedNames = '';
+    var ids = $('#' + name + '-tree').jstree('get_selected');
+    ids.forEach(function (item, index, array) {
+        var node = $('#' + name + '-tree').jstree().get_node(item);
+        checkedNames += node['text'] + "<br />";
+    });
+    $("#" + name + "-selection").html(checkedNames);
+    /* To do: js required validation with trigger on multi fields not working anymore (have '[]') e.g. event */
+    $("#" + name).val('[' + ids + ']').trigger('change');
+}
+
+function selectFromTable(element, table, id) {
+    $("#" + table).attr('value', id);
+    $("#" + table + "-button").val(element.innerHTML);
+    $("#" + table + "-button").focus(); /* to refresh/fill button and remove validation errors */
+    $("#" + table + "-clear").show();
+    $(".ui-dialog-titlebar-close").trigger('click');
+}
+
+function selectFromTableMulti(name) {
+    var checkedNames = '';
+    var ids = [];
+    $(".multi-table-select").each(function () {
+        if ($(this).is(':checked')) {
+            checkedNames += $(this).val() + "<br />";
+            ids.push($(this).attr('id'));
+        }
+    });
+    $("#" + name).val('[' + ids + ']');
+    $("#" + name + "-selection").html(checkedNames);
+}
+
+function clearSelect(name) {
+    $('#' + name).attr('value', '');
+    $('#' + name + '-button').val('');
+    $('#' + name + '-tree').jstree('deselect_all');
+    $('#' + name + '-clear').hide();
 }

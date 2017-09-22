@@ -82,7 +82,7 @@ p.inverse-heading {
     padding: 0.4em;
 }
 
-button, span.button {
+button, span.button, a.button {
     cursor: pointer;
     display: inline-block;
     font-weight: bold;
@@ -398,7 +398,7 @@ input[type=submit] {
     padding: 1em;
 }
 
-.tabs-container .pagesize, .overlay-container .pagesize {
+.tabs-container .pagesize, .overlay-container .pagesize, a.button {
     font-size: 0.9em;
 }
 
