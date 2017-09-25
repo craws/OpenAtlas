@@ -68,10 +68,10 @@
             <div id="header-menu">
                 <div>
                     {{ _('version')|uc_first }} {{ config['VERSION'] }} -
-                    <a href="{{ url_for('index_changelog') }}">{{ _('changelog')|uc_first }}</a> -
-                    <a href="{{ url_for('model_index') }}">{{ _('model')|uc_first }}</a> -
-                    <a href="{{ url_for('index_credits') }}">{{ _('credits')|uc_first }}</a> -
-                    <a href="{{ url_for('index_contact') }}">{{ _('contact')|uc_first }}</a>
+                    <a href="{{ url_for('index_changelog') }}">{{ _('changelog')|uc_first }}</a>
+                    - <a href="{{ url_for('index_contact') }}">{{ _('contact')|uc_first }}</a>
+                    - <a href="{{ url_for('model_index') }}">{{ _('model')|uc_first }}</a>
+                    - <a href="{{ url_for('index_credits') }}">{{ _('credits')|uc_first }}</a>
                     {% if 'manager'|is_authorized: %}
                         - <a href="{{ url_for('user_index') }}">{{ _('user')|uc_first }}</a>
                         - <a href="{{ url_for('content_index') }}">{{ _('content')|uc_first }}</a>
@@ -109,7 +109,7 @@
         </div>
         <div id="menu">
             {% if current_user.is_authenticated %}
-                {% for item in ['overview', 'source', 'event', 'actor', 'place', 'reference', 'node'] %}
+                {% for item in ['overview', 'source', 'event', 'actor', 'place', 'reference'] %}
                     {% set css = 'active' if item in request.path or (item == 'overview' and request.path == '/') %}
                     <div class="{{ css|safe }}"><a href="/{{ item }}">{{ _(item)|uc_first }}</a></div>
                 {% endfor %}
