@@ -44,10 +44,10 @@ class UserForm(Form):
         return valid
 
 
-@app.route('/admin/user/view/<int:user_id>')
+@app.route('/admin/user/view/<int:id_>')
 @required_group('manager')
-def user_view(user_id):
-    user = UserMapper.get_by_id(user_id)
+def user_view(id_):
+    user = UserMapper.get_by_id(id_)
     data = {'info': [
         (_('username'), link(user)),
         (_('group'), user.group),
@@ -80,14 +80,14 @@ def user_index():
     return render_template('user/index.html', tables=tables)
 
 
-@app.route('/admin/user/update/<int:user_id>', methods=['POST', 'GET'])
+@app.route('/admin/user/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('manager')
-def user_update(user_id):
-    user = UserMapper.get_by_id(user_id)
+def user_update(id_):
+    user = UserMapper.get_by_id(id_)
     if user.group == 'admin' and current_user.group != 'admin':
         abort(403)
     form = UserForm()
-    form.user_id = user_id
+    form.user_id = id_
     del form.password, form.password2, form.send_info, form.insert_and_continue
     if form.validate_on_submit():
         user.active = form.active.data
@@ -100,7 +100,7 @@ def user_update(user_id):
         user.group = form.group.data
         user.update()
         flash(_('info update'), 'info')
-        return redirect(url_for('user_view', user_id=user_id))
+        return redirect(url_for('user_view', id_=id_))
     form.username.data = user.username
     form.group.data = user.group
     form.real_name.data = user.real_name
@@ -121,17 +121,17 @@ def user_insert():
         flash(_('user created'), 'info')
         if form.continue_.data == 'yes':
             return redirect(url_for('user_insert'))
-        return redirect(url_for('user_view', user_id=user_id))
+        return redirect(url_for('user_view', id_=user_id))
     return render_template('user/insert.html', form=form)
 
 
-@app.route('/admin/user/delete/<int:user_id>')
+@app.route('/admin/user/delete/<int:id_>')
 @required_group('manager')
-def user_delete(user_id):
-    user = UserMapper.get_by_id(user_id)
+def user_delete(id_):
+    user = UserMapper.get_by_id(id_)
     if (user.group == 'admin' and current_user.group != 'admin') and user.id != current_user.id:
         flash(_('error forbidden'), 'info')
         return redirect(url_for('user_index'))
-    UserMapper.delete(user_id)
+    UserMapper.delete(id_)
     flash(_('user deleted'), 'info')
     return redirect(url_for('user_index'))

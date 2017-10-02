@@ -20,10 +20,10 @@ class ActorForm(DateForm):
     continue_ = HiddenField()
 
 
-@app.route('/actor/view/<int:actor_id>')
+@app.route('/actor/view/<int:id_>')
 @required_group('readonly')
-def actor_view(actor_id):
-    actor = EntityMapper.get_by_id(actor_id)
+def actor_view(id_):
+    actor = EntityMapper.get_by_id(id_)
     actor.set_dates()
     data = {'info': [(_('name'), actor.name)]}
     return render_template('actor/view.html', actor=actor, data=data)
@@ -57,24 +57,24 @@ def actor_insert(code):
         flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
             return redirect(url_for('actor_insert', code=code))
-        return redirect(url_for('actor_view', actor_id=actor.id))
+        return redirect(url_for('actor_view', id_=actor.id))
     return render_template('actor/insert.html', form=form, code=code)
 
 
-@app.route('/actor/delete/<int:actor_id>')
+@app.route('/actor/delete/<int:id_>')
 @required_group('editor')
-def actor_delete(actor_id):
+def actor_delete(id_):
     openatlas.get_cursor().execute('BEGIN')
-    EntityMapper.delete(actor_id)
+    EntityMapper.delete(id_)
     openatlas.get_cursor().execute('COMMIT')
     flash(_('entity deleted'), 'info')
     return redirect(url_for('actor_index'))
 
 
-@app.route('/actor/update/<int:actor_id>', methods=['POST', 'GET'])
+@app.route('/actor/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
-def actor_update(actor_id):
-    actor = EntityMapper.get_by_id(actor_id)
+def actor_update(id_):
+    actor = EntityMapper.get_by_id(id_)
     actor.set_dates()
     forms = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
     add_form_fields(ActorForm, forms[actor.class_.code])
@@ -82,7 +82,7 @@ def actor_update(actor_id):
     if form.validate_on_submit():
         save(form, '', actor)
         flash(_('info update'), 'info')
-        return redirect(url_for('actor_view', actor_id=actor.id))
+        return redirect(url_for('actor_view', id_=id_))
     form.name.data = actor.name
     form.description.data = actor.description
     form.populate_dates(actor)

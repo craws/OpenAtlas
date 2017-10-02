@@ -18,10 +18,10 @@ class ReferenceForm(Form):
     continue_ = HiddenField()
 
 
-@app.route('/reference/view/<int:reference_id>')
+@app.route('/reference/view/<int:id_>')
 @required_group('readonly')
-def reference_view(reference_id):
-    reference = EntityMapper.get_by_id(reference_id)
+def reference_view(id_):
+    reference = EntityMapper.get_by_id(id_)
     data = {'info': [
         (_('name'), reference.name),
     ]}
@@ -58,31 +58,31 @@ def reference_insert(code):
         flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
             return redirect(url_for('reference_insert', code=code))
-        return redirect(url_for('reference_view', reference_id=reference.id))
+        return redirect(url_for('reference_view', id_=reference.id))
     return render_template('reference/insert.html', form=form, code=code)
 
 
-@app.route('/reference/delete/<int:reference_id>')
+@app.route('/reference/delete/<int:id_>')
 @required_group('editor')
-def reference_delete(reference_id):
+def reference_delete(id_):
     openatlas.get_cursor().execute('BEGIN')
-    EntityMapper.delete(reference_id)
+    EntityMapper.delete(id_)
     openatlas.get_cursor().execute('COMMIT')
     flash(_('entity deleted'), 'info')
     return redirect(url_for('reference_index'))
 
 
-@app.route('/reference/update/<int:reference_id>', methods=['POST', 'GET'])
+@app.route('/reference/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
-def reference_update(reference_id):
-    reference = EntityMapper.get_by_id(reference_id)
+def reference_update(id_):
+    reference = EntityMapper.get_by_id(id_)
     form = ReferenceForm()
     if form.validate_on_submit():
         reference.name = form.name.data
         reference.description = form.description.data
         reference.update()
         flash(_('info update'), 'info')
-        return redirect(url_for('reference_view', reference_id=reference.id))
+        return redirect(url_for('reference_view', id_=id_))
     form.name.data = reference.name
     form.description.data = reference.description
     return render_template('reference/update.html', form=form, reference=reference)

@@ -43,41 +43,41 @@ def source_insert(code):
         flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
             return redirect(url_for('source_insert', code='E33'))
-        return redirect(url_for('source_view', source_id=source.id))
+        return redirect(url_for('source_view', id_=source.id))
     return render_template('source/insert.html', form=form)
 
 
-@app.route('/source/view/<int:source_id>')
+@app.route('/source/view/<int:id_>')
 @required_group('readonly')
-def source_view(source_id):
-    source = EntityMapper.get_by_id(source_id)
+def source_view(id_):
+    source = EntityMapper.get_by_id(id_)
     data = {'info': [
         (_('name'), source.name),
     ]}
     return render_template('source/view.html', source=source, data=data)
 
 
-@app.route('/source/delete/<int:source_id>')
+@app.route('/source/delete/<int:id_>')
 @required_group('editor')
-def source_delete(source_id):
+def source_delete(id_):
     openatlas.get_cursor().execute('BEGIN')
-    EntityMapper.delete(source_id)
+    EntityMapper.delete(id_)
     openatlas.get_cursor().execute('COMMIT')
     flash(_('entity deleted'), 'info')
     return redirect(url_for('source_index'))
 
 
-@app.route('/source/update/<int:source_id>', methods=['POST', 'GET'])
+@app.route('/source/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
-def source_update(source_id):
-    source = EntityMapper.get_by_id(source_id)
+def source_update(id_):
+    source = EntityMapper.get_by_id(id_)
     form = SourceForm()
     if form.validate_on_submit():
         source.name = form.name.data
         source.description = form.description.data
         source.update()
         flash(_('info update'), 'info')
-        return redirect(url_for('source_view', source_id=source.id))
+        return redirect(url_for('source_view', id_=id_))
     form.name.data = source.name
     form.description.data = source.description
     return render_template('source/update.html', form=form, source=source)

@@ -46,14 +46,14 @@ def place_insert(code):
         flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
             return redirect(url_for('place_insert', code='E18'))
-        return redirect(url_for('place_view', place_id=place.id))
+        return redirect(url_for('place_view', id_=place.id))
     return render_template('place/insert.html', form=form)
 
 
-@app.route('/place/view/<int:place_id>')
+@app.route('/place/view/<int:id_>')
 @required_group('readonly')
-def place_view(place_id):
-    place = EntityMapper.get_by_id(place_id)
+def place_view(id_):
+    place = EntityMapper.get_by_id(id_)
     place.set_dates()
     data = {'info': [
         (_('name'), place.name),
@@ -61,20 +61,20 @@ def place_view(place_id):
     return render_template('place/view.html', place=place, data=data)
 
 
-@app.route('/place/delete/<int:place_id>')
+@app.route('/place/delete/<int:id_>')
 @required_group('editor')
-def place_delete(place_id):
+def place_delete(id_):
     openatlas.get_cursor().execute('BEGIN')
-    EntityMapper.delete(place_id)
+    EntityMapper.delete(id_)
     openatlas.get_cursor().execute('COMMIT')
     flash(_('entity deleted'), 'info')
     return redirect(url_for('place_index'))
 
 
-@app.route('/place/update/<int:place_id>', methods=['POST', 'GET'])
+@app.route('/place/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
-def place_update(place_id):
-    place = EntityMapper.get_by_id(place_id)
+def place_update(id_):
+    place = EntityMapper.get_by_id(id_)
     place.set_dates()
     form = PlaceForm()
     if form.validate_on_submit():
@@ -86,7 +86,7 @@ def place_update(place_id):
         place.save_dates(form)
         openatlas.get_cursor().execute('COMMIT')
         flash(_('info update'), 'info')
-        return redirect(url_for('place_view', place_id=place.id))
+        return redirect(url_for('place_view', id_=id_))
     form.name.data = place.name
     form.description.data = place.description
     form.populate_dates(place)

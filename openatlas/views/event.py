@@ -53,27 +53,27 @@ def event_insert(code):
         flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
             return redirect(url_for('event_insert', code=code))
-        return redirect(url_for('event_view', event_id=event.id))
+        return redirect(url_for('event_view', id_=event.id))
     return render_template('event/insert.html', form=form, code=code)
 
 
-@app.route('/event/delete/<int:event_id>')
+@app.route('/event/delete/<int:id_>')
 @required_group('editor')
-def event_delete(event_id):
-    if EntityMapper.get_by_id(event_id).name == openatlas.app.config['EVENT_ROOT_NAME']:
+def event_delete(id_):
+    if EntityMapper.get_by_id(id_).name == openatlas.app.config['EVENT_ROOT_NAME']:
         flash(_('error forbidden'), 'error')
         return redirect(url_for('event_index'))
     openatlas.get_cursor().execute('BEGIN')
-    EntityMapper.delete(event_id)
+    EntityMapper.delete(id_)
     openatlas.get_cursor().execute('COMMIT')
     flash(_('entity deleted'), 'info')
     return redirect(url_for('event_index'))
 
 
-@app.route('/event/update/<int:event_id>', methods=['POST', 'GET'])
+@app.route('/event/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
-def event_update(event_id):
-    event = EntityMapper.get_by_id(event_id)
+def event_update(id_):
+    event = EntityMapper.get_by_id(id_)
     event.set_dates()
     form = EventForm()
     if event.name == openatlas.app.config['EVENT_ROOT_NAME']:
@@ -88,17 +88,17 @@ def event_update(event_id):
         event.save_dates(form)
         openatlas.get_cursor().execute('COMMIT')
         flash(_('info update'), 'info')
-        return redirect(url_for('event_view', event_id=event.id))
+        return redirect(url_for('event_view', id_=id_))
     form.name.data = event.name
     form.description.data = event.description
     form.populate_dates(event)
     return render_template('event/update.html', form=form, event=event)
 
 
-@app.route('/event/view/<int:event_id>')
+@app.route('/event/view/<int:id_>')
 @required_group('readonly')
-def event_view(event_id):
-    event = EntityMapper.get_by_id(event_id)
+def event_view(id_):
+    event = EntityMapper.get_by_id(id_)
     event.set_dates()
     data = {'info': [(_('name'), event.name)]}
     return render_template('event/view.html', event=event, data=data)

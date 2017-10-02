@@ -11,9 +11,9 @@
     <div id="tab-info">
         <div class="button-bar">
             {% if 'editor'|is_authorized: %}
-                <a href="{{ url_for('actor_update', actor_id=actor.id) }}">{{ _('edit')|uc_first }}</a>
+                <a href="{{ url_for('actor_update', id_=actor.id) }}">{{ _('edit')|uc_first }}</a>
                 <a onclick="return confirm('{{ _('delete')|uc_first }} {{ actor.name.replace('\'', '') }}?')"
-                       href="{{ url_for('actor_delete', actor_id=actor.id) }}">{{ _('delete')|uc_first }}</a>
+                       href="{{ url_for('actor_delete', id_=actor.id) }}">{{ _('delete')|uc_first }}</a>
             {% endif %}
             {{ actor.id|bookmark_toggle }}
         </div>

@@ -28,15 +28,15 @@ class UserTests(TestBaseCase):
             form_data['password2'] = 'same same, but different'
             rv = self.app.post(url_for('user_insert'), data=form_data)
             assert b'match' in rv.data
-            rv = self.app.get(url_for('user_view', user_id=user_id))
+            rv = self.app.get(url_for('user_view', id_=user_id))
             assert b'Ripley' in rv.data
-            rv = self.app.get(url_for('user_update', user_id=user_id))
+            rv = self.app.get(url_for('user_update', id_=user_id))
             assert b'ripley@nostromo.org' in rv.data
             form_data['description'] = 'The warrant officer'
             rv = self.app.post(
-                url_for('user_update', user_id=user_id),
+                url_for('user_update', id_=user_id),
                 data=form_data,
                 follow_redirects=True)
             assert b'The warrant officer' in rv.data
-            rv = self.app.get(url_for('user_delete', user_id=user_id), follow_redirects=True)
+            rv = self.app.get(url_for('user_delete', id_=user_id), follow_redirects=True)
             assert b'A user was deleted' in rv.data
