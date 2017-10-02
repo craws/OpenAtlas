@@ -26,8 +26,8 @@ class LinkMapper(object):
                 continue
             domain_id = domain_param.id if type(domain_param) is openatlas.models.entity.Entity else int(domain_param)
             range_id = range_param.id if type(range_param) is openatlas.models.entity.Entity else int(range_param)
-            sql = '''INSERT INTO model.link (property_id, domain_id, range_id)
-                VALUES ((SELECT id FROM model.property WHERE code = %(property_code)s), %(domain_id)s, %(range_id)s);'''
+            sql = """INSERT INTO model.link (property_id, domain_id, range_id)
+                VALUES ((SELECT id FROM model.property WHERE code = %(property_code)s), %(domain_id)s, %(range_id)s);"""
             # To do: build only sql and get execution out of loop
             cursor = openatlas.get_cursor()
             cursor.execute(sql, {
@@ -38,15 +38,15 @@ class LinkMapper(object):
 
     # @staticmethod
     # def get_linked_entity(entity, property_name, inverse=False):
-    #     sql = '''
+    #     sql = """
     #         SELECT range_id AS result_id
     #         FROM model.link
-    #         WHERE domain_id = %(entity_id)s AND property_id = %(property_id)s;'''
+    #         WHERE domain_id = %(entity_id)s AND property_id = %(property_id)s;"""
     #     if inverse:
-    #         sql = '''
+    #         sql = """
     #             SELECT domain_id AS result_id
     #             FROM model.link
-    #             WHERE range_id = %(entity_id)s AND property_id = %(property_id)s;'''
+    #             WHERE range_id = %(entity_id)s AND property_id = %(property_id)s;"""
     #     cursor = openatlas.get_cursor()
     #     cursor.execute(sql, {
     #         'entity_id': entity.id,
@@ -61,15 +61,15 @@ class LinkMapper(object):
     # def get_linked_entities(entity, property_names, inverse=False):
     #     property_names = property_names if isinstance(property_names, list) else [property_names]
     #     cursor = openatlas.get_cursor()
-    #     sql = '''
+    #     sql = """
     #         SELECT range_id AS result_id
     #         FROM model.link
-    #         WHERE domain_id = %(entity_id)s AND property_id IN %(property_ids)s;'''
+    #         WHERE domain_id = %(entity_id)s AND property_id IN %(property_ids)s;"""
     #     if inverse:
-    #         sql = '''
+    #         sql = """
     #             SELECT domain_id AS result_id
     #             FROM model.link
-    #             WHERE range_id = %(entity_id)s AND property_id IN %(property_ids)s;'''
+    #             WHERE range_id = %(entity_id)s AND property_id IN %(property_ids)s;"""
     #     cursor.execute(sql, {
     #         'entity_id': entity.id,
     #         'property_ids': tuple(openatlas.PropertyMapper.get_ids_by_names(property_names))})
@@ -93,17 +93,17 @@ class LinkMapper(object):
     # def get_links(entity, property_names, inverse=False):
     #     links = []
     #     property_names = property_names if isinstance(property_names, list) else [property_names]
-    #     sql = '''
+    #     sql = """
     #         SELECT l.id, l.property_id, l.domain_id, l.range_id FROM model.link l
     #         JOIN model.entity e ON l.domain_id = e.id AND l.domain_id = %(entity_id)s
     #         WHERE l.property_id IN %(property_ids)s
-    #         ORDER BY e.name;'''
+    #         ORDER BY e.name;"""
     #     if inverse:
-    #         sql = '''
+    #         sql = """
     #         SELECT l.id, l.property_id, l.domain_id, l.range_id FROM model.link l
     #         JOIN model.entity e ON l.range_id = e.id AND l.range_id = %(entity_id)s
     #         WHERE l.property_id IN %(property_ids)s
-    #         ORDER BY e.name;'''
+    #         ORDER BY e.name;"""
     #     cursor = openatlas.get_cursor()
     #     cursor.execute(sql, {
     #         'entity_id': entity.id,

@@ -11,7 +11,7 @@ class DateMapper(object):
 
     @staticmethod
     def get_dates(entity):
-        sql = '''
+        sql = """
             SELECT e2.value_timestamp, e2.description, p.code, e3.name AS type_name
             FROM model.entity e
             JOIN model.link l ON e.id = l.domain_id
@@ -19,7 +19,7 @@ class DateMapper(object):
             JOIN model.link l2 ON l.range_id = l2.domain_id
             JOIN model.entity e3 ON l2.range_id = e3.id
             JOIN model.property p ON l.property_id = p.id AND p.code in ('OA1', 'OA2', 'OA3', 'OA4', 'OA5', 'OA6')
-            WHERE e.id = %(id)s;'''
+            WHERE e.id = %(id)s;"""
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {'id': entity.id})
         dates = {}
@@ -47,11 +47,11 @@ class DateMapper(object):
 
     @staticmethod
     def delete_dates(entity):
-        sql = '''
+        sql = """
             DELETE FROM model.entity WHERE id in (
                 SELECT e.id FROM model.entity e
                 JOIN model.link l ON e.id = l.range_id AND l.domain_id = %(entity_id)s
-                JOIN model.class c ON e.class_id = c.id AND c.code = 'E61');'''
+                JOIN model.class c ON e.class_id = c.id AND c.code = 'E61');"""
         openatlas.get_cursor().execute(sql, {'entity_id': entity.id})
         openatlas.debug_model['div sql'] += 1
         return

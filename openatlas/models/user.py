@@ -51,12 +51,12 @@ class User(UserMixin):
 
 
 class UserMapper(object):
-    sql = '''
+    sql = """
         SELECT u.id, u.username, u.password, u.active, u.real_name, u.info, u.created, u.modified,
             u.login_last_success, u.login_last_failure, u.login_failed_count, u.password_reset_code,
             u.password_reset_date, u.email, r.name as group_name
         FROM web."user" u
-        LEFT JOIN web.group r ON u.group_id = r.id'''
+        LEFT JOIN web.group r ON u.group_id = r.id"""
 
     @staticmethod
     def get_all():
@@ -98,11 +98,11 @@ class UserMapper(object):
     @staticmethod
     def insert(form):
         cursor = openatlas.get_cursor()
-        sql = '''
+        sql = """
             INSERT INTO web.user (username, real_name, info, email, active, password, group_id) VALUES
                 (%(username)s, %(real_name)s, %(info)s, %(email)s, %(active)s, %(password)s,
                 (SELECT id FROM web.group WHERE name LIKE %(group_name)s))
-            RETURNING id;'''
+            RETURNING id;"""
         cursor.execute(sql, {
             'username': form.username.data,
             'real_name': form.real_name.data,
@@ -117,13 +117,13 @@ class UserMapper(object):
     @staticmethod
     def update(user):
         cursor = openatlas.get_cursor()
-        sql = '''
+        sql = """
             UPDATE web.user SET (username, password, real_name, info, email, active, login_last_success,
                 login_last_failure, login_failed_count, group_id) =
             (%(username)s, %(password)s, %(real_name)s, %(info)s, %(email)s, %(active)s, %(login_last_success)s,
                 %(login_last_failure)s, %(login_failed_count)s,
                 (SELECT id FROM web.group WHERE name LIKE %(group_name)s))
-            WHERE id = %(id)s;'''
+            WHERE id = %(id)s;"""
         cursor.execute(sql, {
             'id': user.id,
             'username': user.username,
@@ -146,9 +146,9 @@ class UserMapper(object):
                 value = 'True' if user.settings['newsletter'] else ''
             if name == 'show_email':
                 value = 'True' if user.settings['show_email'] else ''
-            sql = '''
+            sql = """
                 INSERT INTO web.user_settings (user_id, "name", "value") VALUES (%(user_id)s, %(name)s, %(value)s)
-                ON CONFLICT (user_id, name) DO UPDATE SET "value" = excluded.value;'''
+                ON CONFLICT (user_id, name) DO UPDATE SET "value" = excluded.value;"""
             cursor.execute(sql, {'user_id': user.id, 'name': name, 'value': value})
 
     @staticmethod

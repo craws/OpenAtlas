@@ -18,15 +18,15 @@ class NodeMapper(EntityMapper):
 
     @staticmethod
     def delete_nodes(entity):
-        sql = '''DELETE FROM model.link WHERE domain_id = %(entity_id)s AND property_id =
-            (SELECT id FROM model.property WHERE code = 'P2');'''
+        sql = """DELETE FROM model.link WHERE domain_id = %(entity_id)s AND property_id =
+            (SELECT id FROM model.property WHERE code = 'P2');"""
         openatlas.get_cursor().execute(sql, {'entity_id': entity.id})
         openatlas.debug_model['div sql'] += 1
         return
 
     @staticmethod
     def get_all_nodes():
-        sql = '''
+        sql = """
             SELECT
                 e.id,
                 e.name,
@@ -52,7 +52,7 @@ class NodeMapper(EntityMapper):
                 p2.name IN ('is located at', 'has type')
             GROUP BY e.id, es.id
             ORDER BY e.name;
-        '''
+        """
         cursor = openatlas.get_cursor()
         cursor.execute(sql)
         nodes = OrderedDict()
@@ -72,11 +72,11 @@ class NodeMapper(EntityMapper):
         cursor.execute("SELECT id, name, extendable FROM web.form ORDER BY name ASC;")
         for row in cursor.fetchall():
             forms[row.id] = {'id': row.id, 'name': row.name, 'extendable': row.extendable}
-        sql = '''
+        sql = """
             SELECT h.id, h.name, h.multiple, h.system, h.extendable, h.directional,
                 (SELECT ARRAY(SELECT f.id FROM web.form f JOIN web.hierarchy_form hf ON f.id = hf.form_id
                     AND hf.hierarchy_id = h.id )) AS form_ids
-            FROM web.hierarchy h;'''
+            FROM web.hierarchy h;"""
         cursor = openatlas.get_cursor()
         cursor.execute(sql)
         hierarchies = {}
@@ -149,10 +149,10 @@ class NodeMapper(EntityMapper):
 
     @staticmethod
     def get_nodes_for_form(form_id):
-        sql = '''
+        sql = """
             SELECT h.id FROM web.hierarchy h
             JOIN web.hierarchy_form hf ON h.id = hf.hierarchy_id
-            JOIN web.form f ON hf.form_id = f.id AND f.name = %(form_name)s;'''
+            JOIN web.form f ON hf.form_id = f.id AND f.name = %(form_name)s;"""
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {'form_name': form_id})
         nodes = {}

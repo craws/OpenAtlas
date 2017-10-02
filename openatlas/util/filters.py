@@ -92,7 +92,7 @@ def table_select_model(self, name, selected=None):
             '<a onclick="selectFromTable(this, \'' + name + '\', ' + str(id_) + ')">' + entities[id_].name + '</a>'
         ])
     value = selected.code + ' ' + selected.name if selected else ''
-    html = '''
+    html = """
         <input id="{name}-button" value="{value}" class="table-select" type="text" onfocus="this.blur()"
             readonly="readonly" />
         <div id="{name}-overlay" class="overlay">
@@ -101,7 +101,7 @@ def table_select_model(self, name, selected=None):
             </div>
         </div>
         <script>$(document).ready(function () {{createOverlay("{name}");}});</script>
-    '''.format(name=name, value=value, pager=render_template_string(pager(None, table)))
+    """.format(name=name, value=value, pager=render_template_string(pager(None, table)))
 
     return Markup(html)
 
@@ -117,7 +117,7 @@ def pager(self, table):
         table_rows = current_user.settings['table_rows']
     show_pager = False if len(table['data']) < table_rows else True
     if show_pager:
-        html += '''
+        html += """
             <div id="{name}-pager" class="pager">
                 <div class="navigation first"></div>
                 <div class="navigation prev"></div>
@@ -134,7 +134,7 @@ def pager(self, table):
                 </div>
                 <input id="{name}-search" class="search" type="text" data-column="all" placeholder="{filter}">
             </div>
-            '''.format(name=table['name'], filter=util.uc_first(_('filter')))
+            """.format(name=table['name'], filter=util.uc_first(_('filter')))
     html += '<table id="{name}-table" class="tablesorter"><thead><tr>'.format(name=table['name'])
     for header in table['header']:
         style = '' if header else 'class=sorter-false '
@@ -156,14 +156,14 @@ def pager(self, table):
     html += '<script>'
     sort = 'sortList: [[0, 0]]' if 'sort' not in table else table['sort']
     if show_pager:
-        html += '''
+        html += """
             $("#{name}-table").tablesorter({{ 
                 {sort},
                 dateFormat: "ddmmyyyy",
                 widgets: [\'zebra\', \'filter\'],
                 widgetOptions: {{filter_external: \'#{name}-search\', filter_columnFilters: false}}}})
             .tablesorterPager({{positionFixed: false, container: $("#{name}-pager"), size: 20}});
-        '''.format(name=table['name'], sort=sort)
+        """.format(name=table['name'], sort=sort)
     else:
         html += '$("#' + table['name'] + '-table").tablesorter({' + sort + ',widgets:[\'zebra\']});'
     html += '</script>'

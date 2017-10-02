@@ -21,11 +21,11 @@ def sanitize(string):
 
 
 def add_dates_to_form(form, for_person=False):
-    html = '''
+    html = """
         <div class="table-row">
             <div><label>{date}</label> <span class="tooltip" title="{tip}">i</span></div>
             <div class="table-cell date-switcher"><span id="date-switcher" class="button">{show}</span></div>
-        </div>'''.format(date=uc_first(_('date')), tip=_('tooltip date'), show=uc_first(_('show')))
+        </div>""".format(date=uc_first(_('date')), tip=_('tooltip date'), show=uc_first(_('show')))
     html += '<div class="table-row date-switch">'
     html += '<div>' + str(form.date_begin_year.label) + '</div><div class="table-cell">'
     html += str(form.date_begin_year(class_='year')) + ' '

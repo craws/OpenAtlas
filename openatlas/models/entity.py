@@ -45,7 +45,7 @@ class EntityMapper(object):
 
     # To do: performance - refactor sub selects, get_by_class
     # To do: performance - use first and last only for get_by_codes?
-    sql = '''
+    sql = """
         SELECT
             e.id, e.class_id, e.name, e.description, e.created, e.modified, c.code, e.value_timestamp, e.value_integer,
             string_agg(CAST(t.id AS text), ',') AS types,
@@ -66,7 +66,7 @@ class EntityMapper(object):
         LEFT JOIN model.link dl2 ON e.id = dl2.domain_id
             AND dl2.property_id IN (SELECT id FROM model.property WHERE code in ('OA2', 'OA4', 'OA6'))
         LEFT JOIN model.entity d2 ON dl2.range_id = d2.id
-    '''
+    """
 
     @staticmethod
     def update(entity):
@@ -78,13 +78,13 @@ class EntityMapper(object):
     def insert(code, name, description=None, date=None):
         if date:
             name = str(date)
-        sql = '''
+        sql = """
             INSERT INTO model.entity (name, description, class_id, value_timestamp) VALUES (
                 %(name)s,
                 %(description)s,
                 (SELECT id FROM model.class WHERE code = %(code)s),
                 %(value_timestamp)s
-            ) RETURNING id;'''
+            ) RETURNING id;"""
         params = {
             'name': name.strip(),
             'code': code,
@@ -124,7 +124,7 @@ class EntityMapper(object):
 
     @staticmethod
     def get_overview_counts():
-        sql = '''
+        sql = """
             SELECT
             (SELECT COUNT(*) FROM model.entity e JOIN model.class c ON e.class_id = c.id
                 WHERE c.code = 'E33') AS source,
@@ -135,7 +135,7 @@ class EntityMapper(object):
             (SELECT COUNT(*) FROM model.entity e JOIN model.class c ON e.class_id = c.id
                 WHERE c.code = 'E18') AS place,
             COUNT(*) AS reference FROM model.entity e JOIN model.class c ON e.class_id = c.id
-                WHERE c.code IN ('E31', 'E84');'''
+                WHERE c.code IN ('E31', 'E84');"""
         cursor = openatlas.get_cursor()
         cursor.execute(sql)
         row = cursor.fetchone()
