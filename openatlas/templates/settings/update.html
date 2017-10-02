@@ -1,7 +1,8 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('settings_index') }}">{{ _('settings')|uc_first }}</a> >
-    {{ _('edit')|uc_first }}
+    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
+    > <a href="{{ url_for('settings_index') }}">{{ _('settings')|uc_first }}</a>
+    > {{ _('edit')|uc_first }}
 {% endblock %}
 {% block content %}
     <form method="post">

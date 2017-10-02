@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ _('settings')|uc_first }}
+    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
+    > {{ _('settings')|uc_first }}
 {% endblock %}
 {% block content %}
     <div class="button-bar">

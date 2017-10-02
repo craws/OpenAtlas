@@ -12,7 +12,7 @@ from openatlas.models.content import ContentMapper
 from werkzeug.utils import redirect
 
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import link, truncate_string, bookmark_toggle, uc_first
+from openatlas.util.util import link, bookmark_toggle, uc_first
 
 
 @app.route('/')
@@ -40,8 +40,7 @@ def index():
     return render_template(
         'index/index.html',
         intro=ContentMapper.get_translation('intro'),
-        tables=tables,
-    )
+        tables=tables)
 
 
 @app.route('/index/setlocale/<language>')

@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ _('content')|uc_first }}
+    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
+    > {{ _('content')|uc_first }}
 {% endblock %}
 {% block content %}
     {{ table_content|pager }}

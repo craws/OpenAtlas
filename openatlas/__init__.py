@@ -43,6 +43,7 @@ try:  # To do: better way to use different configs (e.g production and testing)
     import mod_wsgi
     connection = connect('production')  # pragma: no cover
 except ImportError:
+    app.config['SERVER_NAME'] = 'localhost'
     connection = connect('testing')
 
 app.config.from_object('config.default')  # load config/default.py
@@ -117,8 +118,8 @@ def before_request():
     debug_model['user'] = 0
     debug_model['div sql'] = 0
 
-from openatlas.views import actor, ajax, content, index, settings, model, source, event, place, reference, node
-from openatlas.views import user, login, profile
+from openatlas.views import (actor, admin, ajax, content, index, settings, model, source, event,
+                             place, reference, node, user, login, profile)
 
 app.register_blueprint(filters.blueprint)
 app.add_template_global(debug_model, 'debug_model')

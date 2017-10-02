@@ -44,7 +44,7 @@ class UserForm(Form):
         return valid
 
 
-@app.route('/user/view/<int:user_id>')
+@app.route('/admin/user/view/<int:user_id>')
 @required_group('manager')
 def user_view(user_id):
     user = UserMapper.get_by_id(user_id)
@@ -60,7 +60,7 @@ def user_view(user_id):
     return render_template('user/view.html', user=user, data=data)
 
 
-@app.route('/user')
+@app.route('/admin/user')
 @required_group('manager')
 def user_index():
     tables = {'user': {
@@ -80,7 +80,7 @@ def user_index():
     return render_template('user/index.html', tables=tables)
 
 
-@app.route('/user/update/<int:user_id>', methods=['POST', 'GET'])
+@app.route('/admin/user/update/<int:user_id>', methods=['POST', 'GET'])
 @required_group('manager')
 def user_update(user_id):
     user = UserMapper.get_by_id(user_id)
@@ -110,7 +110,7 @@ def user_update(user_id):
     return render_template('user/update.html', form=form, user=user)
 
 
-@app.route('/user/insert', methods=['POST', 'GET'])
+@app.route('/admin/user/insert', methods=['POST', 'GET'])
 @required_group('manager')
 def user_insert():
     form = UserForm()
@@ -125,7 +125,7 @@ def user_insert():
     return render_template('user/insert.html', form=form)
 
 
-@app.route('/user/delete/<int:user_id>')
+@app.route('/admin/user/delete/<int:user_id>')
 @required_group('manager')
 def user_delete(user_id):
     user = UserMapper.get_by_id(user_id)

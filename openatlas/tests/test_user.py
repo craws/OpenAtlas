@@ -1,4 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+from flask import url_for
+
+from openatlas import app
 from openatlas.test_base import TestBaseCase
 
 
@@ -17,19 +20,23 @@ class UserTests(TestBaseCase):
             'send_info': ''
         }
         self.login()
-        rv = self.app.get('/user/insert')
-        assert b'+ User' in rv.data
-        rv = self.app.post('/user/insert', data=form_data)
-        user_id = rv.location.split('/')[-1]
-        form_data['password2'] = 'same same, but different'
-        rv = self.app.post('/user/insert', data=form_data)
-        assert b'match' in rv.data
-        rv = self.app.get('/user/view/' + user_id)
-        assert b'Ripley' in rv.data
-        rv = self.app.get('/user/update/' + user_id)
-        assert b'ripley@nostromo.org' in rv.data
-        form_data['description'] = 'The warrant officer'
-        rv = self.app.post('/user/update/' + user_id, data=form_data, follow_redirects=True)
-        assert b'The warrant officer' in rv.data
-        rv = self.app.get('/user/delete/' + user_id, follow_redirects=True)
-        assert b'A user was deleted' in rv.data
+        with app.app_context():
+            rv = self.app.get(url_for('user_insert'))
+            assert b'+ User' in rv.data
+            rv = self.app.post(url_for('user_insert'), data=form_data)
+            user_id = rv.location.split('/')[-1]
+            form_data['password2'] = 'same same, but different'
+            rv = self.app.post(url_for('user_insert'), data=form_data)
+            assert b'match' in rv.data
+            rv = self.app.get(url_for('user_view', user_id=user_id))
+            assert b'Ripley' in rv.data
+            rv = self.app.get(url_for('user_update', user_id=user_id))
+            assert b'ripley@nostromo.org' in rv.data
+            form_data['description'] = 'The warrant officer'
+            rv = self.app.post(
+                url_for('user_update', user_id=user_id),
+                data=form_data,
+                follow_redirects=True)
+            assert b'The warrant officer' in rv.data
+            rv = self.app.get(url_for('user_delete', user_id=user_id), follow_redirects=True)
+            assert b'A user was deleted' in rv.data

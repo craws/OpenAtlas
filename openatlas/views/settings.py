@@ -43,7 +43,7 @@ class SettingsForm(Form):
     failed_login_forget_minutes = StringField(uc_first(_('failed login forget minutes')))
 
 
-@app.route('/settings')
+@app.route('/admin/settings')
 @required_group('admin')
 def settings_index():
     settings = session['settings']
@@ -80,7 +80,7 @@ def settings_index():
     return render_template('settings/index.html', groups=groups, settings=settings)
 
 
-@app.route('/settings/update', methods=["GET", "POST"])
+@app.route('/admin/settings/update', methods=["GET", "POST"])
 @required_group('admin')
 def settings_update():
     form = SettingsForm()

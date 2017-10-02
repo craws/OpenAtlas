@@ -1,6 +1,8 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('user_index') }}">{{ _('user')|uc_first }}</a> > {{ user.username }}
+    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
+    > <a href="{{ url_for('user_index') }}">{{ _('user')|uc_first }}</a>
+    > {{ user.username }}
 {% endblock %}
 {% block content %}
     <div class="button-bar">

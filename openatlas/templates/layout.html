@@ -72,13 +72,6 @@
                     - <a href="{{ url_for('index_contact') }}">{{ _('contact')|uc_first }}</a>
                     - <a href="{{ url_for('model_index') }}">{{ _('model')|uc_first }}</a>
                     - <a href="{{ url_for('index_credits') }}">{{ _('credits')|uc_first }}</a>
-                    {% if 'manager'|is_authorized: %}
-                        - <a href="{{ url_for('user_index') }}">{{ _('user')|uc_first }}</a>
-                        - <a href="{{ url_for('content_index') }}">{{ _('content')|uc_first }}</a>
-                    {% endif  %}
-                    {% if 'admin'|is_authorized: %}
-                        - <a href="{{ url_for('settings_index') }}">{{ _('settings')|uc_first }}</a>
-                    {% endif  %}
                 </div>
                 {% if current_user.is_authenticated %}
                     <div id="greeting">
@@ -113,8 +106,10 @@
                     {% set css = 'active' if item in request.path or (item == 'overview' and request.path == '/') %}
                     <div class="{{ css|safe }}"><a href="/{{ item }}">{{ _(item)|uc_first }}</a></div>
                 {% endfor %}
-            {% else %}
-                <div class="active"><a href="/">{{ _('overview')|uc_first }}</a></div>
+                {% if 'manager'|is_authorized: %}
+                    {% set css = 'active' if 'admin' in request.path %}
+                    <div class="{{ css|safe }}"><a href="/admin">{{ _('admin')|uc_first }}</a></div>
+                {% endif %}
             {% endif %}
         </div>
         <div id="breadcrumb">

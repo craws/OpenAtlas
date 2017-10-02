@@ -1,0 +1,17 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}{{ _('admin')|uc_first }}{% endblock %}
+{% block content %}
+    {% if 'manager'|is_authorized: %}
+        <p>
+            <a class="button" href="{{ url_for('user_index') }}">{{ _('user')|uc_first }}</a>
+        </p>
+        <p>
+            <a class="button" href="{{ url_for('content_index') }}">{{ _('content')|uc_first }}</a>
+        </p>
+    {% endif  %}
+    {% if 'admin'|is_authorized: %}
+        <p>
+            <a class="button" href="{{ url_for('settings_index') }}">{{ _('settings')|uc_first }}</a>
+        </p>
+    {% endif  %}
+{% endblock %}
