@@ -6,6 +6,7 @@
             {{ tables['counts']|pager }}
         </div>
         <div style="float:left;">
+            <a href="{{ url_for('model_network') }}">{{ _('network')|uc_first }}</a>
             {% if session['login_previous_success']: %}
                 <p style="font-size:0.9em;">
                     {{ _('last login')|uc_first }}: {{ session['login_previous_success'] }}
@@ -22,8 +23,7 @@
             <h1>Bookmarks</h1>
             {{ tables['bookmarks']|pager }}
         {% endif %}
-    {% endif %}
-    {% if not current_user.is_authenticated %}
+    {% else %}
         <div>{{ intro|safe }}</div>
         <div>
             {{ _('text_intro',
