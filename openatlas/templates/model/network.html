@@ -1,0 +1,96 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    {{ _('network')|uc_first }}
+{% endblock %}
+{% block content %}
+<link rel="stylesheet" href="/css/d3.css" />
+<script src="/js/d3/d3-3.5.17.min.js"></script>
+<svg style="float:left;"></svg>
+<div style="float:left;margin-left:2em;">
+    {{ form|display_form }}
+    <p>
+        <a href="http://redmine.craws.net/projects/uni/wiki/Manual#Network-visualization"
+            target="_blank">{{ _('manual')|uc_first }}</a>
+    </p>
+</div>
+<script>
+    function dragstarted(d) {
+        d3.event.sourceEvent.stopPropagation();
+        d3.select(this).classed("dragging", true);
+    }
+    function dragged(d) {
+        d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
+    }
+    function dragended(d) {
+        d3.select(this).classed("dragging", false);
+    }
+    var drag, force, graph, height, l, links, n, nodes, svg, width, _i, _j, _len, _len2, _ref, _ref2;
+    width = {{ network_params['options']['width'] }};
+    height = {{ network_params['options']['height'] }};
+    var svg = d3.select('svg')
+        .attr('width', width)
+        .attr('height', height)
+        .call(d3.behavior.zoom().on("zoom", function () {
+            svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
+        })).append("g")
+    nodes = svg.selectAll('.node');
+    links = svg.selectAll('.link');
+    force = d3.layout.force()
+        .size([width, height])
+        .charge({{ network_params['options']['charge'] }})
+        .linkDistance({{ network_params['options']['distance'] }})
+        .on('tick', (function () {
+            nodes.attr('transform', function (d) {
+                return "translate(" + d.x + "," + d.y + ")";
+            });
+            return links.attr('x1', function (d) {
+                return d.source.x;
+            }).attr('y1', function (d) {
+                return d.source.y;
+            }).attr('x2', function (d) {
+                return d.target.x;
+            }).attr('y2', function (d) {
+                return d.target.y;
+            });
+        }));
+    var drag = force.drag()
+        .origin(function (d) {return d;})
+        .on("dragstart", dragstarted)
+        .on("drag", dragged)
+        .on("dragend", dragended);
+
+    {{ json_data|safe }}
+
+    _ref = graph.links;
+    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
+        l = _ref[_i];
+        _ref2 = graph.nodes;
+        for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
+            n = _ref2[_j];
+            if (l.source === n.id) {
+                l.source = n;
+                continue;
+            }
+            if (l.target === n.id) {
+                l.target = n;
+                continue;
+            }
+        }
+    }
+    links = links.data(graph.links).enter().append('line').attr('class', 'link');
+    nodes = nodes.data(graph.nodes).enter().append('g').attr('class', 'node').call(drag);
+    nodes.append('circle')
+        .attr('r', 12).
+        style("fill", function (d) {
+            return d.color;
+        });
+    nodes.append("text")
+        .attr("x", 0)
+        .attr("y", 20)
+        .attr("dy", ".35em")
+        .text(function (d) {
+            return d.name;
+        });
+    force.nodes(graph.nodes).links(graph.links).start();
+</script>
+{% endblock %}
