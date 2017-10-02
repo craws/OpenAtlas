@@ -92,6 +92,7 @@ cursor.execute("SELECT id FROM model.property WHERE name = 'has type';")
 has_type_id = cursor.fetchone()[0]
 
 import openatlas
+from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.node import NodeMapper
 from openatlas.models.property import PropertyMapper
 from openatlas.models.settings import SettingsMapper

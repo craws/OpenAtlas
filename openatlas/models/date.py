@@ -18,7 +18,8 @@ class DateMapper(object):
             JOIN model.entity e2 ON l.range_id = e2.id
             JOIN model.link l2 ON l.range_id = l2.domain_id
             JOIN model.entity e3 ON l2.range_id = e3.id
-            JOIN model.property p ON l.property_id = p.id AND p.code in ('OA1', 'OA2', 'OA3', 'OA4', 'OA5', 'OA6')
+            JOIN model.property p ON l.property_id = p.id
+                AND p.code in ('OA1', 'OA2', 'OA3', 'OA4', 'OA5', 'OA6')
             WHERE e.id = %(id)s;"""
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {'id': entity.id})
@@ -26,7 +27,8 @@ class DateMapper(object):
         for row in cursor.fetchall():
             if row.code not in dates:
                 dates[row.code] = {}
-            dates[row.code][row.type_name] = {'timestamp': row.value_timestamp, 'info': row.description}
+            dates[row.code][row.type_name] = {
+                'timestamp': row.value_timestamp, 'info': row.description}
         openatlas.debug_model['div sql'] += 1
         return dates
 

@@ -35,7 +35,9 @@ class ContentMapper(object):
         for language in openatlas.app.config['LANGUAGES'].keys():
             sql = 'DELETE FROM web.i18n WHERE name = %(name)s AND language = %(language)s'
             cursor.execute(sql, {'name': name, 'language': language})
-            sql = 'INSERT INTO web.i18n (name, language, text) VALUES (%(name)s, %(language)s, %(text)s);'
+            sql = """
+                INSERT INTO web.i18n (name, language, text)
+                VALUES (%(name)s, %(language)s, %(text)s);"""
             cursor.execute(sql, {
                 'name': name,
                 'language': language,

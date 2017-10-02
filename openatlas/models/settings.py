@@ -29,8 +29,7 @@ class SettingsMapper(object):
         'offline',
         'random_password_length',
         'reset_confirm_hours',
-        'site_name'
-    ]
+        'site_name']
 
     @staticmethod
     def get_settings():

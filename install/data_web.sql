@@ -30,5 +30,4 @@ INSERT INTO settings (name, value) VALUES
 ('offline', '1'),
 ('random_password_length', '16'),
 ('reset_confirm_hours', '24'),
-('site_name', 'OpenAtlas')
-;
+('site_name', 'OpenAtlas');

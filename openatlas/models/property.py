@@ -58,15 +58,19 @@ class PropertyMapper(object):
     def get_all():
         properties = {}
         cursor = openatlas.get_cursor()
-        cursor.execute("SELECT id, code, domain_class_id, range_class_id, name, name_inverse FROM model.property;")
+        sql = """
+            SELECT id, code, domain_class_id, range_class_id, name, name_inverse
+            FROM model.property;"""
+        cursor.execute(sql)
         for row in cursor.fetchall():
             properties[row.id] = Property(row)
         cursor.execute('SELECT super_id, sub_id FROM model.property_inheritance;')
         for row in cursor.fetchall():
             properties[row.super_id].sub.append(row.sub_id)
             properties[row.sub_id].super.append(row.super_id)
-        sql = """SELECT text, language_code, table_field, table_id FROM model.i18n
-                WHERE table_name = 'property' AND language_code IN %(language_codes)s;"""
+        sql = """
+            SELECT text, language_code, table_field, table_id FROM model.i18n
+            WHERE table_name = 'property' AND language_code IN %(language_codes)s;"""
         cursor.execute(sql, {'language_codes': tuple(openatlas.app.config['LANGUAGES'].keys())})
         for row in cursor.fetchall():
             if row.language_code not in properties[row.table_id].i18n:
