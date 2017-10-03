@@ -1,18 +1,25 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('source_index') }}">{{ _('source')|uc_first }}</a> > {{ source.name }}
+    <a href="{{ url_for('source_index') }}">{{ _('source')|uc_first }}</a>
+    > {{ source.name }}
 {% endblock %}
 {% block content %}
 <div id="tabs" class="tabs-container">
     <ul>
-        <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
+        <li>
+            <a href="#tab-info">{{ _('info')|uc_first }}</a>
+        </li>
     </ul>
     <div id="tab-info">
         <div class="button-bar">
             {% if 'editor'|is_authorized: %}
-                <a href="{{ url_for('source_update', id_=source.id) }}">{{ _('edit')|uc_first }}</a>
+                <a href="{{ url_for('source_update', id_=source.id) }}">
+                    {{ _('edit')|uc_first }}
+                </a>
                 <a onclick="return confirm('{{ _('delete')|uc_first }} {{ source.name.replace('\'', '') }}?')"
-                   href="{{ url_for('source_delete', id_=source.id) }}">{{ _('delete')|uc_first }}</a>
+                   href="{{ url_for('source_delete', id_=source.id) }}">
+                    {{ _('delete')|uc_first }}
+                </a>
             {% endif %}
             {{ source.id|bookmark_toggle }}
         </div>

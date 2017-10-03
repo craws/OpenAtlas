@@ -1,9 +1,12 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ _('model')|uc_first }}{% endblock %}
+{% block breadcrumb %}
+    {{ _('model')|uc_first }}
+{% endblock %}
 {% block content %}
     <div style="float:left">
         <a href="/images/model/openatlas_schema.png">
-            <img src="/images/model/openatlas_schema.png" style="width:500px" alt="OpenAtlas schema" />
+            <img src="/images/model/openatlas_schema.png"
+                 style="width:500px" alt="OpenAtlas schema" />
         </a>
     </div>
     <div style="float:left;margin-left:1em;">
@@ -12,7 +15,9 @@
             <a href="{{ url_for('class_index') }}">{{ _('classes')|uc_first }}</a>,
             <a href="{{ url_for('property_index') }}">{{ _('properties')|uc_first }}</a>
         </p>
-        <p style="font-weight: bold;">{{ _('check for valid links')|uc_first }}</p>
+        <p style="font-weight: bold;">
+            {{ _('check for valid links')|uc_first }}
+        </p>
         <form method="post">
             {{ form.csrf_token }}
             {% set data = [
@@ -36,17 +41,21 @@
             {% if test_result['domain_error'] %}
                 <p>
                     <span class="error">{{ _('wrong domain')|uc_first }}</span>
-                    {{ test_result['domain']|link }} {{ _('for') }} {{ test_result['property']|link }}
+                    {{ test_result['domain']|link }} {{ _('for') }}
+                    {{ test_result['property']|link }}
                 </p>
             {% endif %}
             {% if test_result['range_error'] %}
                 <p>
                     <span class="error">{{ _('wrong range')|uc_first }}</span>
-                    {{ test_result['range']|link }} {{ _('for') }} {{ test_result['property']|link }}
+                    {{ test_result['range']|link }} {{ _('for') }}
+                    {{ test_result['property']|link }}
                 </p>
             {% endif %}
             {% if test_result['domain_whitelisted']: %}
-                <p>{{ test_result['domain']|link }} {{ _('no check because whitelisted') }}</p>
+                <p>
+                    {{ test_result['domain']|link }} {{ _('no check because whitelisted') }}
+                </p>
             {% endif %}
         {% endif %}
     </div>

@@ -1,7 +1,8 @@
 {% extends 'layout.html' %}
 {% block breadcrumb %}
-     <a href="{{ url_for('event_index') }}">{{ _('event')|uc_first }}</a> > + {{ code|get_class_name }}
+    <a href="{{ url_for('event_index') }}">{{ _('event')|uc_first }}</a>
+    > + {{ code|get_class_name }}
 {% endblock %}
 {% block content %}
-     {{ form|display_form() }}
+    {{ form|display_form() }}
 {% endblock %}

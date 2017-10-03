@@ -1,17 +1,25 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ _('hierarchy')|uc_first }}{% endblock %}
+{% block breadcrumb %}
+    {{ _('hierarchy')|uc_first }}
+{% endblock %}
 {% block content %}
     <div id="tabs-menu" class="tabs-container">
         <ul>
-            <li><a href="#menu-tab-system">{{ _('system')|uc_first }}</a></li>
-            <li><a href="#menu-tab-custom">{{ _('custom')|uc_first }}</a></li>
+            <li>
+                <a href="#menu-tab-system">{{ _('system')|uc_first }}</a>
+            </li>
+            <li>
+                <a href="#menu-tab-custom">{{ _('custom')|uc_first }}</a>
+            </li>
         </ul>
         {% for type_ in ['system', 'custom'] %}
             <div id="menu-tab-{{ type_ }}" style="padding: 0;" class="tab-content">
                 <div id="tabs-{{ type_ }}" class="tabs-container">
                     <ul>
                         {% for node, tree in nodes[type_].items(): %}
-                            <li><a href="#tab-{{ node.id }}">{{ node.name }}</a></li>
+                            <li>
+                                <a href="#tab-{{ node.id }}">{{ node.name }}</a>
+                            </li>
                         {% endfor %}
                     </ul>
                     {% for node, tree in nodes[type_].items(): %}
@@ -26,21 +34,26 @@
                                             name="name_search"
                                             style="width:8em;"/>
                                         <input type="hidden" name="mode" value="insert" />
-                                        <button type="submit" value="insert" name="add-node-submit">+</button>
+                                        <button type="submit" value="insert" name="add-node-submit">
+                                            +
+                                        </button>
                                     </form>
                                 </div>
                                 {{ tree|safe }}
                             </div>
                             <div style="float:left;">
                                 {% if node.forms: %}
-                                    <p style="margin-top:0;"><strong>{{ _('forms')|uc_first }}</strong>:
+                                    <p style="margin-top:0;">
+                                        <strong>{{ _('forms')|uc_first }}</strong>:
                                         {% for id, form in node.forms.items(): %}
                                             {{ form['name'] }},
                                         {% endfor %}
                                     </p>
                                 {% endif %}
                                 {% if node.description %}
-                                    <p style="width:40em;">{{ node.description }}</p>
+                                    <p style="width:40em;">
+                                        {{ node.description }}
+                                    </p>
                                 {% endif %}
                             </div>
                         </div>
@@ -74,5 +87,4 @@
             }
         }
     </script>
-
 {% endblock %}

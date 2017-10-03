@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ _('profile')|uc_first }}{% endblock %}
+{% block breadcrumb %}
+    {{ _('profile')|uc_first }}
+{% endblock %}
 {% block content %}
     <div class="button-bar">
         <a href="{{ url_for('profile_update') }}">{{ _('edit')|uc_first }}</a>

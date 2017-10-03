@@ -56,11 +56,16 @@
                 {% if 'local' in request['url_root'] %}
                     local
                 {% endif %}
-                <noscript><div class="error">{{ _('warning no js') }}</div></noscript><br /><br />
+                <noscript>
+                    <div class="error">{{ _('warning no js') }}</div>
+                </noscript>
+                <br /><br />
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         {% for category, message in messages %}
-                            <div class="message {{ category }}">{{ message|uc_first }}</div>
+                            <div class="message {{ category }}">
+                                {{ message|uc_first }}
+                            </div>
                         {% endfor %}
                     {% endif %}
                 {% endwith %}
@@ -89,7 +94,9 @@
                         {% if 'language' in session and session['language'] == language: %}
                             <span>{{ language|upper }}</span>
                         {% else: %}
-                            <a href="{{ url_for('set_locale', language=language) }}">{{ language|upper }}</a>
+                            <a href="{{ url_for('set_locale', language=language) }}">
+                                {{ language|upper }}
+                            </a>
                         {% endif %}
                     {% endfor %} |
                     {% if current_user.is_authenticated %}
@@ -104,11 +111,15 @@
             {% if current_user.is_authenticated %}
                 {% for item in ['overview', 'source', 'event', 'actor', 'place', 'reference'] %}
                     {% set css = 'active' if item in request.path or (item == 'overview' and request.path == '/') %}
-                    <div class="{{ css|safe }}"><a href="/{{ item }}">{{ _(item)|uc_first }}</a></div>
+                    <div class="{{ css|safe }}">
+                        <a href="/{{ item }}">{{ _(item)|uc_first }}</a>
+                    </div>
                 {% endfor %}
                 {% if 'manager'|is_authorized: %}
                     {% set css = 'active' if 'admin' in request.path %}
-                    <div class="{{ css|safe }}"><a href="/admin">{{ _('admin')|uc_first }}</a></div>
+                    <div class="{{ css|safe }}">
+                        <a href="/admin">{{ _('admin')|uc_first }}</a>
+                    </div>
                 {% endif %}
             {% endif %}
         </div>
@@ -124,12 +135,16 @@
                         {% if name in ['by codes', 'by id', 'by ids', 'linked', 'user'] %}
                             <div>
                                 <div>{{ name }}</div>
-                                <div class="table-cell" style="text-align:right;">{{ value }}</div>
+                                <div class="table-cell" style="text-align:right;">
+                                    {{ value }}
+                                </div>
                             </div>
                         {% elif name not in ['current'] %}
                             <div>
                                 <div>{{ name }}</div>
-                                <div class="table-cell" style="text-align:right;">{{ '%0.2f'|format(value) }}</div>
+                                <div class="table-cell" style="text-align:right;">
+                                    {{ '%0.2f'|format(value) }}
+                                </div>
                             </div>
                         {% endif %}
                     {% endfor %}
@@ -143,8 +158,8 @@
             {% if 'craws.net' in request['url_root'] %}
                 <div style="clear:both;"></div>
                 <div id="powered-by">
-                    Another <a target="_blank" href="http://openatlas.eu">OpenAtlas</a> project powered by
-                    <a target="_blank" href="http://craws.net">craws.net</a>
+                    Another <a target="_blank" href="http://openatlas.eu">OpenAtlas</a>
+                    project powered by <a target="_blank" href="http://craws.net">craws.net</a>
                 </div>
             {% endif %}
         </div>

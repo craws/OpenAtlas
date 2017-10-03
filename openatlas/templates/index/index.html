@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ _('overview')|uc_first }}{% endblock %}
+{% block breadcrumb %}
+    {{ _('overview')|uc_first }}
+{% endblock %}
 {% block content %}
     {% if current_user.is_authenticated %}
         <div style="float:left;margin-right:2em;">
@@ -15,7 +17,9 @@
                     {% endif %}
                 </p>
             {% else %}
-                <p style="margin-top:1em;">{{ _('first login') }}</p>
+                <p style="margin-top:1em;">
+                    {{ _('first login') }}
+                </p>
             {% endif %}
         </div>
         <div style="clear:both;"></div>

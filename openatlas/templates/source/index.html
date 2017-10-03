@@ -1,9 +1,13 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ _('source')|uc_first }}{% endblock %}
+{% block breadcrumb %}
+    {{ _('source')|uc_first }}
+{% endblock %}
 {% block content %}
     {% if 'editor'|is_authorized: %}
         <div class="button-bar">
-            <a href="{{ url_for('source_insert', code='E33') }}">+ {{ _('source')|uc_first }}</a>
+            <a href="{{ url_for('source_insert', code='E33') }}">
+                + {{ _('source')|uc_first }}
+            </a>
         </div>
     {% endif %}
     {{ tables['source']|pager }}

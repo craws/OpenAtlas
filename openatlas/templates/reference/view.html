@@ -1,19 +1,25 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('reference_index') }}">{{ _('reference')|uc_first }}</a> >
-    {{ reference.name }}
+    <a href="{{ url_for('reference_index') }}">{{ _('reference')|uc_first }}</a>
+    > {{ reference.name }}
 {% endblock %}
 {% block content %}
 <div id="tabs" class="tabs-container">
     <ul>
-        <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
+        <li>
+            <a href="#tab-info">{{ _('info')|uc_first }}</a>
+        </li>
     </ul>
     <div id="tab-info">
         <div class="button-bar">
             {% if 'editor'|is_authorized: %}
-                <a href="{{ url_for('reference_update', id_=reference.id) }}">{{ _('edit')|uc_first }}</a>
+                <a href="{{ url_for('reference_update', id_=reference.id) }}">
+                    {{ _('edit')|uc_first }}
+                </a>
                 <a onclick="return confirm('{{ _('delete')|uc_first }} {{ reference.name.replace('\'', '') }}?')"
-                   href="{{ url_for('reference_delete', id_=reference.id) }}">{{ _('delete')|uc_first }}</a>
+                   href="{{ url_for('reference_delete', id_=reference.id) }}">
+                    {{ _('delete')|uc_first }}
+                </a>
             {% endif %}
             {{ reference.id|bookmark_toggle }}
         </div>

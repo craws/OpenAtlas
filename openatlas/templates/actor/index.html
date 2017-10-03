@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ _('actor')|uc_first }}{% endblock %}
+{% block breadcrumb %}
+    {{ _('actor')|uc_first }}
+{% endblock %}
 {% block content %}
     {% if 'editor'|is_authorized: %}
         <div class="button-bar">

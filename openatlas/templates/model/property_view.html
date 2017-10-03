@@ -1,12 +1,14 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('model_index') }}">{{ _('model')|uc_first }}</a> >
-    <a href="{{ url_for('property_index') }}">{{ _('properties')|uc_first }}</a> >
-    {{ property.code }}
+    <a href="{{ url_for('model_index') }}">{{ _('model')|uc_first }}</a>
+    > <a href="{{ url_for('property_index') }}">{{ _('properties')|uc_first }}</a>
+    > {{ property.code }}
 {% endblock %}
 {% block content %}
     <div style="float:left;padding-right:2em;">
-        <p><strong>{{ _('info')|uc_first }}</strong></p>
+        <p>
+            <strong>{{ _('info')|uc_first }}</strong>
+        </p>
         {% set data = [
             ('code', property.code),
             ('name', property.name),
@@ -19,7 +21,9 @@
     {% for name, table in tables.items() %}
         {% if table['data']|length > 0 %}
             <div style="float:left;padding-right:2em;">
-                <p><strong>{{ name|uc_first }}</strong></p>
+                <p>
+                    <strong>{{ name|uc_first }}</strong>
+                </p>
                 {{ tables[name]|pager }}
             </div>
         {% endif %}
@@ -27,6 +31,8 @@
     <div style="clear:both"></div>
     <div class="description">
         <strong>{{ _('description')|uc_first }}</strong>
-        <p>{{ property.comment }}</p>
+        <p>
+            {{ property.comment }}
+        </p>
     </div>
 {% endblock %}

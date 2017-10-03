@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('model_index') }}">{{ _('model')|uc_first }}</a> >
-    {{ _('classes')|uc_first }}
+    <a href="{{ url_for('model_index') }}">{{ _('model')|uc_first }}</a>
+    > {{ _('classes')|uc_first }}
 {% endblock %}
 {% block content %}
     {{ table|pager }}
