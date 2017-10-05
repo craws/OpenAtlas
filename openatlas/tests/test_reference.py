@@ -23,7 +23,10 @@ class ReferenceTest(TestBaseCase):
         rv = self.app.get('/reference/update/' + bibliography_id)
         assert b'Test reference' in rv.data
         form_data['name'] = 'Test reference updated'
-        rv = self.app.post('/reference/update/' + bibliography_id, data=form_data, follow_redirects=True)
+        rv = self.app.post(
+            '/reference/update/' + bibliography_id,
+            data=form_data,
+            follow_redirects=True)
         assert b'Test reference updated' in rv.data
         rv = self.app.get('/reference/delete/' + bibliography_id, follow_redirects=True)
         assert b'The entry has been deleted.' in rv.data

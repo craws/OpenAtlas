@@ -8,7 +8,10 @@ class ProfileTests(TestBaseCase):
         self.login()
         rv = self.app.get('/profile')
         assert b'alice@umbrella.net' in rv.data
-        rv = self.app.post('/profile', data={'language': 'en', 'table_rows': '100'}, follow_redirects=True)
+        rv = self.app.post(
+            '/profile',
+            data={'language': 'en', 'table_rows': '100'},
+            follow_redirects=True)
         assert b'100' in rv.data
         rv = self.app.get('/profile/update')
         assert b'Newsletter' in rv.data
@@ -16,8 +19,7 @@ class ProfileTests(TestBaseCase):
             'name': 'Alice Abernathy',
             'email': 'alice@umbrella.net',
             'show_email': '',
-            'newsletter': '',
-        }
+            'newsletter': ''}
         rv = self.app.post('/profile/update', data=form_data, follow_redirects=True)
         assert b'Alice Abernathy' in rv.data
         rv = self.app.get('/profile/password')
@@ -25,8 +27,7 @@ class ProfileTests(TestBaseCase):
         form_data = {
             'password_old': 'test',
             'password': 'you_never_guess_this',
-            'password2': 'you_never_guess_this',
-        }
+            'password2': 'you_never_guess_this'}
         rv = self.app.post('/profile/password', data=form_data, follow_redirects=True)
         assert b'Your password has been updated' in rv.data
         form_data['password2'] = 'same same, but different'

@@ -17,8 +17,7 @@ class UserTests(TestBaseCase):
             'group': 'admin',
             'name': 'Ripley Weaver',
             'description': '',
-            'send_info': ''
-        }
+            'send_info': ''}
         self.login()
         with app.app_context():
             rv = self.app.get(url_for('user_insert'))

@@ -23,9 +23,15 @@ class EventTest(TestBaseCase):
         form_data['name'] = 'Test event updated'
         rv = self.app.post('/event/update/' + event_id, data=form_data, follow_redirects=True)
         assert b'Test event updated' in rv.data
-        rv = self.app.post('/event/update/' + str(root_event.id), data=form_data, follow_redirects=True)
+        rv = self.app.post(
+            '/event/update/' + str(root_event.id),
+            data=form_data,
+            follow_redirects=True)
         assert b'Forbidden' in rv.data
-        rv = self.app.get('/event/delete/' + str(root_event.id), data=form_data, follow_redirects=True)
+        rv = self.app.get(
+            '/event/delete/' + str(root_event.id),
+            data=form_data,
+            follow_redirects=True)
         assert b'Forbidden' in rv.data
         rv = self.app.get('/event/delete/' + event_id, follow_redirects=True)
         assert b'The entry has been deleted.' in rv.data

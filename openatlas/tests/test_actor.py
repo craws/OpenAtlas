@@ -16,8 +16,7 @@ class ActorTests(TestBaseCase):
             'date_begin_day': '8',
             'date_end_year': '2049',
             'date_birth': True,
-            'date_death': True,
-        }
+            'date_death': True}
         rv = self.app.post('/actor/insert/E21', data=form_data)
         actor_id = rv.location.split('/')[-1]
         form_data['continue_'] = 'yes'

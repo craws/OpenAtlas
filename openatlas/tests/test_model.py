@@ -20,7 +20,6 @@ class ModelTests(TestBaseCase):
         form_data = {
             'domain': ClassMapper.get_by_code('E1').id,
             'range': ClassMapper.get_by_code('E1').id,
-            'property': PropertyMapper.get_by_code('P1').id
-        }
+            'property': PropertyMapper.get_by_code('P1').id}
         rv = self.app.post('/model', data=form_data)
         assert b'Wrong' in rv.data
