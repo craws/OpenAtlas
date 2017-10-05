@@ -3,7 +3,7 @@ import re
 from datetime import timedelta, date
 from functools import wraps
 
-import babel
+from babel import dates
 from flask import abort, url_for, request, session
 from flask_login import current_user
 from flask_babel import lazy_gettext as _
@@ -23,8 +23,12 @@ def sanitize(string):
 def add_dates_to_form(form, for_person=False):
     html = """
         <div class="table-row">
-            <div><label>{date}</label> <span class="tooltip" title="{tip}">i</span></div>
-            <div class="table-cell date-switcher"><span id="date-switcher" class="button">{show}</span></div>
+            <div>
+                <label>{date}</label> <span class="tooltip" title="{tip}">i</span>
+            </div>
+            <div class="table-cell date-switcher">
+                <span id="date-switcher" class="button">{show}</span>
+            </div>
         </div>""".format(date=uc_first(_('date')), tip=_('tooltip date'), show=uc_first(_('show')))
     html += '<div class="table-row date-switch">'
     html += '<div>' + str(form.date_begin_year.label) + '</div><div class="table-cell">'
@@ -73,9 +77,11 @@ def required_group(group):
 
 
 def bookmark_toggle(entity_id):
-    html = '<button id="bookmark' + str(entity_id) + '" type="button" onclick="ajaxBookmark(' + str(entity_id) + ');">'
-    html += uc_first(_('bookmark remove')) if entity_id in current_user.bookmarks else uc_first(_('bookmark'))
-    html += '</button>'
+    label = uc_first(_('bookmark'))
+    if entity_id in current_user.bookmarks:
+        label = uc_first(_('bookmark remove'))
+    html = """<button id="bookmark{entity_id}" onclick="ajaxBookmark('{entity_id}');"
+        type="button">{label}</button>""".format(entity_id=entity_id, label=label)
     return Markup(html)
 
 
@@ -102,49 +108,54 @@ def uc_first(string):
 
 
 def format_date(value):
-    if not value:
-        return ''
-    return babel.dates.format_date(value, locale=session['language'])
+    return dates.format_date(value, locale=session['language']) if value else ''
 
 
 def link(entity):
     if not entity:
         return ''
+    html = ''
     if isinstance(entity, User):
         style = '' if entity.active else 'class="inactive"'
-        html = '<a ' + style + ' href="' + url_for('user_view', id_=entity.id) + '">' + entity.username + '</a>'
-        return Markup(html)
-    if isinstance(entity, ClassObject):
-        return Markup('<a href="' + url_for('class_view', class_id=entity.id) + '">' + entity.code + '</a>')
+        url = url_for('user_view', id_=entity.id)
+        html = '<a ' + style + ' href="' + url + '">' + entity.username + '</a>'
+    elif isinstance(entity, ClassObject):
+        url = url_for('class_view', class_id=entity.id)
+        html = '<a href="' + url + '">' + entity.code + '</a>'
     elif isinstance(entity, Property):
-        return Markup('<a href="' + url_for('property_view', property_id=entity.id) + '">' + entity.code + '</a>')
+        url = url_for('property_view', property_id=entity.id)
+        html = '<a href="' + url + '">' + entity.code + '</a>'
     elif isinstance(entity, Entity):
-        # To do: what if E33 is a translation  or the like?
-        if entity.class_.code == 'E33':
-            return Markup('<a href="' + url_for('source_view', id_=entity.id) + '">' + entity.name + '</a>')
-        if entity.class_.code in ('E7', 'E8', 'E12', 'E6'):
-            return Markup('<a href="' + url_for('event_view', id_=entity.id) + '">' + entity.name + '</a>')
-        if entity.class_.code in ('E21', 'E74', 'E40'):
-            return Markup('<a href="' + url_for('actor_view', id_=entity.id) + '">' + entity.name + '</a>')
-        if entity.class_.code == 'E18':
-            return Markup('<a href="' + url_for('place_view', id_=entity.id) + '">' + entity.name + '</a>')
-        if entity.class_.code in ('E31', 'E84'):
-            return Markup('<a href="' + url_for('reference_view', id_=entity.id) + '">' + entity.name + '</a>')
-        if entity.class_.code == 'E55':
-            return Markup('<a href="' + url_for('node_view', node_id=entity.id) + '">' + entity.name + '</a>')
-    return Markup(entity.name + ' (' + entity.class_.name + ')')
+        url = ''
+        if entity.class_.code == 'E33':  # Todo: what if E33 is a translation or the like?
+            url = url_for('source_view', id_=entity.id)
+        elif entity.class_.code in ('E7', 'E8', 'E12', 'E6'):
+            url = url_for('event_view', id_=entity.id)
+        elif entity.class_.code in ('E21', 'E74', 'E40'):
+            url = url_for('actor_view', id_=entity.id)
+        elif entity.class_.code == 'E18':
+            url = url_for('place_view', id_=entity.id)
+        elif entity.class_.code in ('E31', 'E84'):
+            url = url_for('reference_view', id_=entity.id)
+        elif entity.class_.code == 'E55':
+            url = url_for('node_view', node_id=entity.id)
+        html = '<a href="' + url + '">' + entity.name + '</a>' if url else '? ' + entity.class_.name
+    return Markup(html)
 
 
 def truncate_string(string, length=40):
     if string is None:
         return ''  # pragma: no cover
-    title = string.replace('"', '')
-    string = '<span title="' + title + '">' + string[:length] + '..</span>' if len(string) > length + 2 else string
-    return string
+    if len(string) > length + 2:
+        string = '<span title="' + string.replace('"', '') + '">' + string[:length] + '..</span>'
+    return Markup(string)
 
 
 def create_date_from_form(form_date, postfix=''):
-    date_ = date(form_date['year' + postfix], form_date['month' + postfix] if form_date['month' + postfix] else 1, 1)
+    date_ = date(
+        form_date['year' + postfix],
+        form_date['month' + postfix] if form_date['month' + postfix] else 1,
+        1)
     if form_date['day' + postfix]:  # add days to date to prevent errors for e.g. February 31
         date_ += timedelta(days=form_date['day' + postfix]-1)
     return date_

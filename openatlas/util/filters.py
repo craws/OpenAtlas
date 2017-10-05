@@ -93,8 +93,8 @@ def table_select_model(self, name, selected=None):
         ])
     value = selected.code + ' ' + selected.name if selected else ''
     html = """
-        <input id="{name}-button" value="{value}" class="table-select" type="text" onfocus="this.blur()"
-            readonly="readonly" />
+        <input id="{name}-button" value="{value}" class="table-select" type="text"
+            onfocus="this.blur()" readonly="readonly" />
         <div id="{name}-overlay" class="overlay">
             <div id="{name}-dialog" class="overlay-container">
                 {pager}
@@ -121,7 +121,9 @@ def pager(self, table):
             <div id="{name}-pager" class="pager">
                 <div class="navigation first"></div>
                 <div class="navigation prev"></div>
-                <div class="pagedisplay"><input class="pagedisplay" type="text" disabled="disabled"></div>
+                <div class="pagedisplay">
+                    <input class="pagedisplay" type="text" disabled="disabled">
+                </div>
                 <div class="navigation next"></div>
                 <div class="navigation last"></div>
                 <div>
@@ -132,7 +134,8 @@ def pager(self, table):
                         <option value="100">100</option>
                     </select>
                 </div>
-                <input id="{name}-search" class="search" type="text" data-column="all" placeholder="{filter}">
+                <input id="{name}-search" class="search" type="text" data-column="all"
+                    placeholder="{filter}">
             </div>
             """.format(name=table['name'], filter=util.uc_first(_('filter')))
     html += '<table id="{name}-table" class="tablesorter"><thead><tr>'.format(name=table['name'])
@@ -175,8 +178,13 @@ def pager(self, table):
 def description(self, entity):
     if not entity.description:
         return ''
-    html = '<div class="description"><p class="description-title">' + util.uc_first(_('description')) + '</p>'
-    html += '<p>' + entity.description.replace('\r\n', '<br />') + '</p></div>'
+    html = """
+        <div class="description">
+            <p class="description-title">{label}</p>'
+            <p>{description}</p>
+        </div>""".format(
+            label=util.uc_first(_('description')),
+            description=entity.description.replace('\r\n', '<br />'))
     return Markup(html)
 
 
@@ -189,7 +197,7 @@ def get_class_name(self, code):
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_form(self, form, form_id=None, for_persons=False):
-    if hasattr(form, 'name') and form.name.data:  # if name.data exists it's an update so change buttons
+    if hasattr(form, 'name') and form.name.data:  # if name.data exists it's an update
         if hasattr(form, 'save'):
             form.save.label.text = _('save')
         if hasattr(form, 'insert_and_continue'):
@@ -198,6 +206,10 @@ def display_form(self, form, form_id=None, for_persons=False):
     html = '<form method="post"' + id_attribute + '>' + '<div class="data-table">'
     footer = ''
     for field in form:
+        class_ = "required" if field.flags.required else ''
+        errors = ''
+        for error in field.errors:
+            errors += util.uc_first(error)
         if field.type in ['TreeField', 'TreeMultiField']:
             node = openatlas.nodes[int(field.id)]
             html += '<div class="table-row"><div><label>' + node.name + '</label></div>'
@@ -218,11 +230,7 @@ def display_form(self, form, form_id=None, for_persons=False):
                 html += util.add_dates_to_form(form, for_persons)
             continue
         field.label.text += ' *' if field.flags.required and form_id != 'login-form' else ''
-        errors = ''
-        for error in field.errors:
-            errors += util.uc_first(error)
         errors = ' <span class="error">' + errors + ' </span>' if errors else ''
-        class_ = "required" if field.flags.required else ''
         html += '<div class="table-row"><div>' + str(field.label) + '</div>'
         html += '<div class="table-cell">' + str(field(class_=class_)) + errors + '</div></div>'
     html += footer + '</div></form>'
@@ -252,8 +260,7 @@ def print_entity_dates(self, entity):
         ('OA2', _('last')),
         ('OA4', _('death')),
         ('OA5', _('begin')),
-        ('OA6', _('end')),
-    ])
+        ('OA6', _('end'))])
     html = ''
     for code, label in date_types.items():
         if code in entity.dates:
