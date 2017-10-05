@@ -74,9 +74,9 @@
                 <div>
                     {{ _('version')|uc_first }} {{ config['VERSION'] }} -
                     <a href="{{ url_for('index_changelog') }}">{{ _('changelog')|uc_first }}</a>
-                    - <a href="{{ url_for('index_contact') }}">{{ _('contact')|uc_first }}</a>
                     - <a href="{{ url_for('model_index') }}">{{ _('model')|uc_first }}</a>
                     - <a href="{{ url_for('index_credits') }}">{{ _('credits')|uc_first }}</a>
+                    - <a href="{{ url_for('index_contact') }}">{{ _('contact')|uc_first }}</a>
                 </div>
                 {% if current_user.is_authenticated %}
                     <div id="greeting">
@@ -89,20 +89,18 @@
                     <img class="zoom" src="/images/icons/zoom-in.png" title="{{ _('zoom in') }}"
                         onclick="resizeText(1)" alt="{{ _('zoom in') }}" />
                     <img class="zoom" src="/images/icons/zoom-out.png" title="{{ _('zoom out') }}"
-                        onclick="resizeText(-1)" alt="{{ _('zoom out') }}" /> |
+                        onclick="resizeText(-1)" alt="{{ _('zoom out') }}" />
                     {% for language in config['LANGUAGES'].keys()|sort: %}
                         {% if 'language' in session and session['language'] == language: %}
                             <span>{{ language|upper }}</span>
                         {% else: %}
-                            <a href="{{ url_for('set_locale', language=language) }}">
-                                {{ language|upper }}
-                            </a>
+                            <a href="{{ url_for('set_locale', language=language) }}">{{ language|upper }}</a>
                         {% endif %}
-                    {% endfor %} |
+                    {% endfor %}
                     {% if current_user.is_authenticated %}
-                        <a href="/logout">{{ _('logout')|uc_first }}</a>
+                        <a href="/logout" style="margin-left:1em;">{{ _('logout')|uc_first }}</a>
                     {% else %}
-                        <a href="/login">{{ _('login')|uc_first }}</a>
+                        <a href="/login" style="margin-left:1em;">{{ _('login')|uc_first }}</a>
                     {% endif %}
                 </div>
             </div>

@@ -22,9 +22,7 @@ class ReferenceForm(Form):
 @required_group('readonly')
 def reference_view(id_):
     reference = EntityMapper.get_by_id(id_)
-    data = {'info': [
-        (_('name'), reference.name),
-    ]}
+    data = {'info': [(_('name'), reference.name)]}
     return render_template('reference/view.html', reference=reference, data=data)
 
 
@@ -33,7 +31,6 @@ def reference_view(id_):
 def reference_index():
     tables = {'reference': {
         'name': 'reference',
-        # 'sort': 'sortList: [[3, 1]]',
         'header': ['name', 'class', 'info'],
         'data': []}}
     for reference in EntityMapper.get_by_codes(['E31', 'E84']):
@@ -44,8 +41,7 @@ def reference_index():
         tables['reference']['data'].append([
             link(reference),
             class_name,
-            truncate_string(reference.description)
-        ])
+            truncate_string(reference.description)])
     return render_template('reference/index.html', tables=tables)
 
 
@@ -54,7 +50,10 @@ def reference_index():
 def reference_insert(code):
     form = ReferenceForm()
     if form.validate_on_submit():
-        reference = EntityMapper.insert('E84' if code == 'carrier' else 'E31', form.name.data, form.description.data)
+        reference = EntityMapper.insert(
+            'E84' if code == 'carrier' else 'E31',
+            form.name.data,
+            form.description.data)
         flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
             return redirect(url_for('reference_insert', code=code))

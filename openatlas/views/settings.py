@@ -50,11 +50,14 @@ def settings_index():
     groups = OrderedDict([
         ('general', OrderedDict([
             (_('site name'), settings['site_name']),
-            (_('default language'), openatlas.app.config['LANGUAGES'][settings['default_language']]),
+            (_('default language'),
+                openatlas.app.config['LANGUAGES'][settings['default_language']]),
             (_('default table rows'), settings['default_table_rows']),
             (_('log level'), openatlas.log_levels[int(settings['log_level'])]),
-            (_('maintenance'), uc_first('on') if settings['maintenance'] == 'true' else uc_first('off')),
-            (_('offline'), uc_first('on') if settings['offline'] == 'true' else uc_first('off')),
+            (_('maintenance'),
+                uc_first('on') if settings['maintenance'] == 'true' else uc_first('off')),
+            (_('offline'),
+                uc_first('on') if settings['offline'] == 'true' else uc_first('off')),
         ])),
         ('mail', OrderedDict([
             (_('mail'), uc_first('on') if settings['mail'] == 'true' else uc_first('off')),

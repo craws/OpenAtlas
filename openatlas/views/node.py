@@ -4,7 +4,7 @@ from flask import render_template, flash, url_for, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import HiddenField, StringField, SubmitField, TextAreaField
+from wtforms import StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 import openatlas
@@ -41,36 +41,39 @@ def node_insert(root_id):
     if not root.directional:
         del form.name_inverse
     if 'name_search' not in request.form and form.validate_on_submit():
-        name = form.name.data + (form.name_inverse.data if hasattr(form, 'name_inverse') in form else '')
+        name = form.name.data
+        if hasattr(form, 'name_inverse') in form:
+            name += ' (' + form.name_inverse.data + ')'
         openatlas.get_cursor().execute('BEGIN')
         node = NodeMapper.insert('E55', name, form.description.data)
         openatlas.get_cursor().execute('COMMIT')
         flash(_('entity created'), 'info')
-        if form.continue_.data == 'yes':
-            return redirect(url_for('node_insert', node_id=root.id))
         return redirect(url_for('node_view', node_id=node.id))
     if 'name_search' in request.form:
         form.name.data = request.form['name_search']
     return render_template('node/insert.html', form=form, root=root)
 
 
-@app.route('/node/update/<int:node_id>', methods=['POST', 'GET'])
+@app.route('/node/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
-def node_update(node_id):
+def node_update(id_):
+    node = openatlas.nodes[id_]
     openatlas.get_cursor().execute('BEGIN')
     openatlas.get_cursor().execute('COMMIT')
-    return render_template('node/update.html')
+    return render_template('node/update.html', node=node)
 
 
-@app.route('/node/view/<int:node_id>')
+@app.route('/node/view/<int:id_>')
 @required_group('editor')
-def node_view(node_id):
-    return render_template('node/view.html')
+def node_view(id_):
+    node = openatlas.nodes[id_]
+    return render_template('node/view.html', node=node)
 
 
-@app.route('/node/delete/<int:node_id>', methods=['POST', 'GET'])
+@app.route('/node/delete/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
-def node_delete(node_id):
+def node_delete(id_):
+    node = openatlas.nodes[id_]
     openatlas.get_cursor().execute('BEGIN')
     openatlas.get_cursor().execute('COMMIT')
     flash(_('entity deleted'), 'info')
@@ -84,7 +87,8 @@ def walk_tree(param):
         item = openatlas.nodes[id_]
         count_subs = " (" + str(item.count_subs) + ")" if item.count_subs else ''
         text += "{href: '/node/view/" + str(item.id) + "',"
-        text += "text: '" + item.name + " " + str(item.count) + count_subs + "', 'id':'" + str(item.id) + "'"
+        text += "text: '" + item.name + " " + str(item.count) + count_subs
+        text += "', 'id':'" + str(item.id) + "'"
         if item.subs:
             text += ",'children' : ["
             for sub in item.subs:

@@ -23,14 +23,16 @@ class PlaceForm(DateForm):
 @app.route('/place')
 @required_group('readonly')
 def place_index():
-    tables = {'place': {'name': 'place', 'header': ['name', _('first'), _('last'), 'info'], 'data': []}}
+    tables = {'place': {
+        'name': 'place',
+        'header': ['name', _('first'), _('last'), 'info'],
+        'data': []}}
     for place in EntityMapper.get_by_codes('E18'):
         tables['place']['data'].append([
             link(place),
             format(place.first),
             format(place.last),
-            truncate_string(place.description)
-        ])
+            truncate_string(place.description)])
     return render_template('place/index.html', tables=tables)
 
 
@@ -55,9 +57,7 @@ def place_insert(code):
 def place_view(id_):
     place = EntityMapper.get_by_id(id_)
     place.set_dates()
-    data = {'info': [
-        (_('name'), place.name),
-    ]}
+    data = {'info': [(_('name'), place.name)]}
     return render_template('place/view.html', place=place, data=data)
 
 

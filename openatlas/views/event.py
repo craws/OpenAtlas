@@ -33,8 +33,7 @@ def event_index():
             openatlas.classes[event.class_.id].name,
             format(event.first),
             format(event.last),
-            truncate_string(event.description)
-        ])
+            truncate_string(event.description)])
     return render_template('event/index.html', tables=tables)
 
 

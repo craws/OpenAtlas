@@ -23,14 +23,12 @@ class SourceForm(Form):
 def source_index():
     tables = {'source': {
         'name': 'source',
-        # 'sort': 'sortList: [[3, 1]]',
         'header': ['name', 'info'],
         'data': []}}
     for source in EntityMapper.get_by_codes('E33'):
         tables['source']['data'].append([
             link(source),
-            truncate_string(source.description)
-        ])
+            truncate_string(source.description)])
     return render_template('source/index.html', tables=tables)
 
 
@@ -51,9 +49,7 @@ def source_insert(code):
 @required_group('readonly')
 def source_view(id_):
     source = EntityMapper.get_by_id(id_)
-    data = {'info': [
-        (_('name'), source.name),
-    ]}
+    data = {'info': [(_('name'), source.name)]}
     return render_template('source/view.html', source=source, data=data)
 
 

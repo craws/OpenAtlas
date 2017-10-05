@@ -28,9 +28,11 @@ class TreeSelect(HiddenInput):
     def __call__(self, field, **kwargs):
         selection = openatlas.nodes[int(field.data)].name if field.data else ''
         html = """
-            <input id="{name}-button" name="{name}-button" type="text" class="table-select {required}"
-                onfocus="this.blur()" readonly="readonly" value="{selection}" placeholder="Select" />
-            <a id="{name}-clear" {clear_style} class="button" onclick="clearSelect('{name}');">Clear</a>
+            <input id="{name}-button" name="{name}-button" type="text"
+                class="table-select {required}" onfocus="this.blur()"
+                readonly="readonly" value="{selection}" placeholder="Select" />
+            <a id="{name}-clear" {clear_style} class="button"
+                onclick="clearSelect('{name}');">Clear</a>
             <div id="{name}-overlay" class="overlay">
                 <div id="{name}-dialog" class="overlay-container">
                     <input class="tree-filter" id="{name}-tree-search" placeholder="Filter" />
@@ -114,24 +116,26 @@ class TableSelect(HiddenInput):
             if field.data and entity.id == int(field.data):
                 selection = entity.name
             table['data'].append([
-                """<a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>""".format(
-                    name=field.id, entity_id=entity.id, entity_name=entity.name),
+                """<a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
+                    """.format(name=field.id, entity_id=entity.id, entity_name=entity.name),
                 ', '.join(map(str, entity.types[field.id])) if field.id in entity.types else '',
                 util.truncate_string(entity.info)
             ])
         html = """
-            <input id="{name}-button" name="{name}-button" class="table-select {required}" type="text"
-                placeholder="Select" onfocus="this.blur()" readonly="readonly" value="{selection}"> 
-            <a id="{name}-clear" class="button" {clear_style} onclick="clearSelect('{name}');">Clear</a>
+            <input id="{name}-button" name="{name}-button" class="table-select {required}"
+                type="text" placeholder="Select" onfocus="this.blur()" readonly="readonly"
+                value="{selection}">
+            <a id="{name}-clear" class="button" {clear_style}
+                onclick="clearSelect('{name}');">Clear</a>
             <div id="{name}-overlay" class="overlay">
             <div id="{name}-dialog" class="overlay-container">{pager}</div></div>
             <script>$(document).ready(function () {{createOverlay("{name}");}});</script>
-        """.format(
-            name=field.id,
-            pager=pager(None, table),
-            selection=selection,
-            clear_style='' if selection else ' style="display: none;" ',
-            required=' required' if field.flags.required else '')
+            """.format(
+                name=field.id,
+                pager=pager(None, table),
+                selection=selection,
+                clear_style='' if selection else ' style="display: none;" ',
+                required=' required' if field.flags.required else '')
         return super(TableSelect, self).__call__(field, **kwargs) + html
 
 
@@ -142,24 +146,30 @@ class TableField(HiddenField):
 class TableMultiSelect(HiddenInput):
 
     def __call__(self, field, **kwargs):
-        field.data = ast.literal_eval(field.data) if field.data and isinstance(field.data, str) else field.data
+        if field.data and isinstance(field.data, str):
+            field.data = ast.literal_eval(field.data)
         selection = ''
-        table = {'name': field.id, 'header': ['name', 'x'], 'data': [], 'sort': 'sortList: [[1,0],[0,0]]'}
+        table = {
+            'name': field.id,
+            'header': ['name', 'x'],
+            'data': [], 'sort': 'sortList: [[1,0],[0,0]]'}
         for entity in openatlas.models.entity.EntityMapper.get_by_class(field.id.split('_')[0]):
             selection += entity.name + '<br />' if field.data and entity.id in field.data else ''
+            checked = ''
+            if field.data and entity.id in field.data:
+                checked = 'checked = "checked"'
             table['data'].append([
                 entity.name,
-                """<input id="{id}" {checked} value="{name}" class="multi-table-select" type="checkbox" />""".format(
-                    id=str(entity.id),
-                    name=entity.name,
-                    checked='checked = "checked"' if field.data and entity.id in field.data else '')])
+                """<input id="{id}" {checked} value="{name}" class="multi-table-select"
+                    type="checkbox" />
+                """.format(id=str(entity.id), name=entity.name, checked=checked)])
         html = """
             <span id="{name}-button" class="button">Select</span><br />
             <div id="{name}-selection" class="selection" style="text-align:left;">{selection}</div>
             <div id="{name}-overlay" class="overlay">
             <div id="{name}-dialog" class="overlay-container">{pager}</div></div>
             <script>$(document).ready(function () {{createOverlay("{name}", true);}});</script>
-        """.format(name=field.id, selection=selection, pager=pager(None, table, True))
+            """.format(name=field.id, selection=selection, pager=pager(None, table, True))
         return super(TableMultiSelect, self).__call__(field, **kwargs) + html
 
 

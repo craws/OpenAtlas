@@ -1,5 +1,5 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-import bcrypt
+from bcrypt import hashpw
 import datetime
 
 from openatlas import app
@@ -40,8 +40,8 @@ def login():
             if user.login_attempts_exceeded():
                 flash(_('error login attempts exceeded'), 'error')
                 return render_template('login/index.html', form=form)
-            password_hashed = bcrypt.hashpw(request.form['password'].encode('utf-8'), user.password.encode('utf-8'))
-            if password_hashed == user.password.encode('utf-8'):
+            hash_ = hashpw(request.form['password'].encode('utf-8'), user.password.encode('utf-8'))
+            if hash_ == user.password.encode('utf-8'):
                 if user.active:
                     login_user(user)
                     session['login_previous_success'] = user.login_last_success

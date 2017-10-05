@@ -4,8 +4,10 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import BooleanField, HiddenField, PasswordField, SelectField, StringField, SubmitField, TextAreaField
 from wtforms.validators import Email, InputRequired, Length
+
+from wtforms import (BooleanField, HiddenField, PasswordField, SelectField, StringField,
+                     SubmitField, TextAreaField)
 
 from openatlas import app
 from openatlas.util.util import format_date, link, required_group, uc_first
@@ -55,8 +57,7 @@ def user_view(id_):
         (_('email'), user.email),
         (_('language'), user.settings['language']),
         (_('last login'), format_date(user.login_last_success)),
-        (_('failed logins'), user.login_failed_count)
-    ]}
+        (_('failed logins'), user.login_failed_count)]}
     return render_template('user/view.html', user=user, data=data)
 
 
@@ -66,7 +67,8 @@ def user_index():
     tables = {'user': {
         'name': 'user',
         'sort': 'sortList: [[3, 1]]',
-        'header': [_('username'), _('group'), _('email'), _('newsletter'), _('created'), _('last login')],
+        'header': [_('username'), _('group'), _('email'), _('newsletter'),
+                   _('created'), _('last login')],
         'data': []}}
     for user in UserMapper.get_all():
         tables['user']['data'].append([
@@ -75,8 +77,7 @@ def user_index():
             user.email,
             user.settings['newsletter'],
             format_date(user.created),
-            format_date(user.login_last_success)
-        ])
+            format_date(user.login_last_success)])
     return render_template('user/index.html', tables=tables)
 
 

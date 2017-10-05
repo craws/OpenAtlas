@@ -15,9 +15,6 @@ from openatlas.util.util import uc_first
 
 class DisplayForm(Form):
     language = SelectField(uc_first(_('language')), choices=[])
-    # theme = SelectField(uc_first(_('theme')), choices=[])
-    # layout = SelectField(uc_first(_('layout')), choices=[
-    #    ('default', uc_first(_('default'))), ('advanced', uc_first(_('advanced')))])
     table_rows = SelectField(uc_first(_('table rows')), choices=[])
 
 
@@ -30,8 +27,10 @@ class PasswordForm(Form):
 
     def validate(self, extra_validators=None):
         valid = Form.validate(self)
-        password_hashed = bcrypt.hashpw(self.password_old.data.encode('utf-8'), current_user.password.encode('utf-8'))
-        if password_hashed != current_user.password.encode('utf-8'):
+        hash_ = bcrypt.hashpw(
+            self.password_old.data.encode('utf-8'),
+            current_user.password.encode('utf-8'))
+        if hash_ != current_user.password.encode('utf-8'):
             self.password_old.errors.append(_('error wrong password'))
             valid = False
         if self.password.data != self.password2.data:
@@ -56,14 +55,15 @@ def profile_index():
         (_('username'), current_user.username),
         (_('name'), current_user.real_name),
         (_('email'), current_user.email),
-        (_('show email'), uc_first('on') if current_user.settings['show_email'] else uc_first('off')),
-        (_('newsletter'), uc_first('on') if current_user.settings['newsletter'] else uc_first('off'))]}
+        (_('show email'),
+            uc_first('on') if current_user.settings['show_email'] else uc_first('off')),
+        (_('newsletter'),
+            uc_first('on') if current_user.settings['newsletter'] else uc_first('off'))]}
     form = DisplayForm()
     getattr(form, 'language').choices = openatlas.app.config['LANGUAGES'].items()
     getattr(form, 'table_rows').choices = openatlas.default_table_rows.items()
     if form.validate_on_submit():
         current_user.settings['language'] = form.language.data
-        # current_user.settings['layout'] = form.layout.data
         current_user.settings['table_rows'] = form.table_rows.data
         openatlas.get_cursor().execute('BEGIN')
         current_user.update_settings()
@@ -73,12 +73,9 @@ def profile_index():
         return redirect(url_for('profile_index'))
 
     form.language.data = current_user.settings['language']
-    # form.layout.data = current_user.get_setting('layout')
     form.table_rows.data = str(current_user.settings['table_rows'])
     data['display'] = [
         (form.language.label, form.language),
-        # (form.theme.label, form.theme),
-        # (form.layout.label, form.layout),
         (form.table_rows.label, form.table_rows)]
     return render_template('profile/index.html', data=data, form=form)
 
@@ -112,7 +109,9 @@ def profile_password():
     form.password.validators.append(Length(min=session['settings']['minimum_password_length']))
     form.password2.validators.append(Length(min=session['settings']['minimum_password_length']))
     if form.validate_on_submit():
-        current_user.password = bcrypt.hashpw(form.password.data.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+        current_user.password = bcrypt.hashpw(
+            form.password.data.encode('utf-8'),
+            bcrypt.gensalt()).decode('utf-8')
         current_user.update()
         flash(_('info password updated'), 'info')
         return redirect(url_for('profile_index'))

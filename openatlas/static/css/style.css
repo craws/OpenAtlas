@@ -199,7 +199,12 @@ img.zoom {
     text-decoration: none;
 }
 
-#language-menu, #greeting {
+#language-menu {
+    float: right;
+    margin-top: 2em;
+}
+
+#greeting {
     float: right;
     margin-top: 1em;
 }
