@@ -13,20 +13,50 @@ from openatlas.util.filters import pager
 from openatlas.util.util import uc_first
 
 
-def add_form_fields(form, form_name):
-    for id_, node in openatlas.models.node.NodeMapper.get_nodes_for_form(form_name).items():
+def build_custom_form(form, form_name, entity=None):
+
+    # Add custom fields
+    custom_list = []
+    for id_, node in openatlas.NodeMapper.get_nodes_for_form(form_name).items():
+        custom_list.append(id_)
         if node.multiple:
             field = TreeMultiField(str(id_))
             setattr(form, str(id_), field)
         else:
             field = TreeField(str(id_))
             setattr(form, str(id_), field)
+    form_instance = form(obj=entity)
+
+    # Delete custom fields except the ones specified for the form
+    delete_list = []
+    for field in form_instance:
+        if isinstance(field, (TreeField, TreeMultiField)) and int(field.id) not in custom_list:
+            delete_list.append(field.id)
+    for item in delete_list:
+        if hasattr(form_instance, item):
+            delattr(form_instance, item)
+
+    # Set field data if available
+    if entity:
+        node_data = {}
+        for node in entity.nodes:
+            root = openatlas.nodes[node.root[-1]] if node.root else node
+            if root.id not in node_data:
+                node_data[root.id] = []
+            node_data[root.id].append(node.id)
+        for root_id, nodes in node_data.items():
+            if hasattr(form_instance, str(root_id)):
+                getattr(form_instance, str(root_id)).data = nodes
+    return form_instance
 
 
 class TreeSelect(HiddenInput):
 
     def __call__(self, field, **kwargs):
-        selection = openatlas.nodes[int(field.data)].name if field.data else ''
+        selection = ''
+        if field.data:
+            field.data = field.data[0] if isinstance(field.data, list) else field.data
+            selection = openatlas.nodes[field.data].name
         html = """
             <input id="{name}-button" name="{name}-button" type="text"
                 class="table-select {required}" onfocus="this.blur()"
@@ -58,7 +88,7 @@ class TreeSelect(HiddenInput):
             name=field.id,
             title=openatlas.nodes[int(field.id)].name,
             selection=selection,
-            tree=openatlas.models.node.NodeMapper.get_tree_data(int(field.id)),
+            tree=openatlas.NodeMapper.get_tree_data(int(field.id)),
             clear_style='' if selection else ' style="display: none;" ',
             required=' required' if field.flags.required else '')
         return super(TreeSelect, self).__call__(field, **kwargs) + html
@@ -99,7 +129,7 @@ class TreeMultiSelect(HiddenInput):
             name=field.id,
             title=openatlas.nodes[int(field.id)].name,
             selection=selection,
-            tree=openatlas.models.node.NodeMapper.get_tree_data(int(field.id)))
+            tree=openatlas.NodeMapper.get_tree_data(int(field.id)))
         return super(TreeMultiSelect, self).__call__(field, **kwargs) + html
 
 
@@ -112,15 +142,14 @@ class TableSelect(HiddenInput):
         selection = ''
         table = {'name': field.id, 'header': ['name', 'type', 'info'], 'data': []}
         for entity in openatlas.models.entity.EntityMapper.get_by_class(field.id.split('_')[0]):
-            # To do: don't show self e.g. at relations
+            # Todo: don't show self e.g. at relations
             if field.data and entity.id == int(field.data):
                 selection = entity.name
             table['data'].append([
                 """<a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
                     """.format(name=field.id, entity_id=entity.id, entity_name=entity.name),
                 ', '.join(map(str, entity.types[field.id])) if field.id in entity.types else '',
-                util.truncate_string(entity.info)
-            ])
+                util.truncate_string(entity.info)])
         html = """
             <input id="{name}-button" name="{name}-button" class="table-select {required}"
                 type="text" placeholder="Select" onfocus="this.blur()" readonly="readonly"

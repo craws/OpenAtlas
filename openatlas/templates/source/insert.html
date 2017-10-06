@@ -4,5 +4,5 @@
     > + {{ _('source')|uc_first }}
 {% endblock %}
 {% block content %}
-    {% include 'source/form.html' %}
+    {{ form|display_form() }}
 {% endblock %}

@@ -180,7 +180,7 @@ def description(self, entity):
         return ''
     html = """
         <div class="description">
-            <p class="description-title">{label}</p>'
+            <p class="description-title">{label}</p>
             <p>{description}</p>
         </div>""".format(
             label=util.uc_first(_('description')),
@@ -227,7 +227,7 @@ def display_form(self, form, form_id=None, for_persons=False):
             continue
         if field.id.split('_', 1)[0] == 'date':  # if it's a date field use a function to add dates
             if field.id == 'date_begin_year':
-                html += util.add_dates_to_form(form, for_persons)
+                footer += util.add_dates_to_form(form, for_persons)
             continue
         field.label.text += ' *' if field.flags.required and form_id != 'login-form' else ''
         errors = ' <span class="error">' + errors + ' </span>' if errors else ''

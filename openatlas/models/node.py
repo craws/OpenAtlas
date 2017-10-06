@@ -2,28 +2,11 @@
 import openatlas
 from collections import OrderedDict
 
-from openatlas.models.link import LinkMapper
+from openatlas.forms import TreeField, TreeMultiField
 from .entity import Entity, EntityMapper
 
 
 class NodeMapper(EntityMapper):
-
-    @staticmethod
-    def save_nodes(entity, form):
-        for field in form:
-            if field.type in ['TreeField', 'TreeMultiField'] and field.data:
-                for node_id in field.data:
-                    LinkMapper.insert(entity, 'P2', node_id)
-        return
-
-    @staticmethod
-    def delete_nodes(entity):
-        sql = """
-            DELETE FROM model.link WHERE domain_id = %(entity_id)s AND property_id =
-            (SELECT id FROM model.property WHERE code = 'P2');"""
-        openatlas.get_cursor().execute(sql, {'entity_id': entity.id})
-        openatlas.debug_model['div sql'] += 1
-        return
 
     @staticmethod
     def get_all_nodes():
@@ -160,3 +143,17 @@ class NodeMapper(EntityMapper):
         for row in cursor.fetchall():
             nodes[row.id] = openatlas.nodes[row.id]
         return nodes
+
+    @staticmethod
+    def save_entity_nodes(entity, form):
+        # Todo: don't delete/save if not changed
+        if hasattr(entity, 'nodes'):
+            sql = """
+                    DELETE FROM model.link
+                    WHERE domain_id = %(entity_id)s AND property_id = %(property_id)s"""
+            openatlas.get_cursor().execute(sql, {
+                'entity_id': entity.id,
+                'property_id': openatlas.has_type_id})
+        for field in form:
+            if isinstance(field, (TreeField, TreeMultiField)) and field.data:
+                entity.link('P2', field.data)

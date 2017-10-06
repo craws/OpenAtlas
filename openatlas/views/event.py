@@ -7,7 +7,7 @@ from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app
-from openatlas.forms import DateForm
+from openatlas.forms import DateForm, build_custom_form
 from openatlas.models.entity import EntityMapper
 from openatlas.util.util import link, required_group, truncate_string
 
@@ -43,7 +43,7 @@ def event_insert(code):
     nodes = {}
     for node_id in openatlas.node.NodeMapper.get_hierarchy_by_name('Date value type').subs:
         nodes[openatlas.nodes[node_id].name] = node_id
-    form = EventForm()
+    form = build_custom_form(EventForm, 'Event')
     if form.validate_on_submit() and form.name.data != openatlas.app.config['EVENT_ROOT_NAME']:
         openatlas.get_cursor().execute('BEGIN')
         event = EntityMapper.insert(code, form.name.data, form.description.data)

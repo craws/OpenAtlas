@@ -3,16 +3,17 @@ import ast
 from collections import OrderedDict
 import openatlas
 from openatlas.models.date import DateMapper
+from openatlas.models.link import LinkMapper
 from .classObject import ClassMapper
 
 
 class Entity(object):
     def __init__(self, row):
         self.id = row.id
-        self.types = []
-        if hasattr(row, 'types') and self.types:
+        self.nodes = []
+        if hasattr(row, 'types') and row.types:
             for node_id in ast.literal_eval('[' + row.types + ']'):
-                self.types.append(openatlas.nodes[node_id])
+                self.nodes.append(openatlas.nodes[node_id])
         self.name = row.name
         self.description = row.description if row.description else ''
         self.created = row.created
@@ -22,6 +23,9 @@ class Entity(object):
         self.class_ = openatlas.classes[row.class_id]
         self.dates = {}
 
+    def link(self, code, range_):
+        LinkMapper.insert(self, code, range_)
+
     def update(self):
         EntityMapper.update(self)
 
@@ -29,10 +33,7 @@ class Entity(object):
         DateMapper.save_dates(self, form)
 
     def save_nodes(self, form):
-        openatlas.NodeMapper.save_nodes(self, form)
-
-    def delete_nodes(self):
-        openatlas.NodeMapper.delete_nodes(self)
+        openatlas.NodeMapper.save_entity_nodes(self, form)
 
     def set_dates(self):
         self.dates = DateMapper.get_dates(self)
@@ -145,7 +146,7 @@ class EntityMapper(object):
         cursor = openatlas.get_cursor()
         cursor.execute(sql)
         row = cursor.fetchone()
-        counts = OrderedDict()  # To do: one liner possible to get a dict of record?
+        counts = OrderedDict()  # Todo: one liner to get a dict of record?
         for idx, col in enumerate(cursor.description):
             counts[col[0]] = row[idx]
         return counts

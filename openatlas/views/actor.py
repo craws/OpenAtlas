@@ -7,7 +7,7 @@ from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app
-from openatlas.forms import DateForm, add_form_fields
+from openatlas.forms import DateForm, build_custom_form
 from openatlas.models.entity import EntityMapper
 from openatlas.util.util import link, truncate_string, required_group
 
@@ -50,8 +50,7 @@ def actor_index():
 @required_group('editor')
 def actor_insert(code):
     forms = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
-    add_form_fields(ActorForm, forms[code])
-    form = ActorForm()
+    form = build_custom_form(ActorForm, forms[code])
     if form.validate_on_submit():
         actor = save(form, code)
         flash(_('entity created'), 'info')
@@ -77,7 +76,7 @@ def actor_update(id_):
     actor = EntityMapper.get_by_id(id_)
     actor.set_dates()
     forms = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
-    add_form_fields(ActorForm, forms[actor.class_.code])
+    build_custom_form(ActorForm, forms[actor.class_.code])
     form = ActorForm()
     if form.validate_on_submit():
         save(form, '', actor)
@@ -95,7 +94,6 @@ def save(form, code, entity=None):
         entity.name = form.name.data
         entity.description = form.description.data
         entity.update()
-        entity.delete_nodes()
     else:
         entity = EntityMapper.insert(code, form.name.data, form.description.data)
     entity.save_dates(form)

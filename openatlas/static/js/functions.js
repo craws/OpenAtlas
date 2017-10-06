@@ -92,7 +92,7 @@ function selectFromTreeMulti(name) {
         checkedNames += node['text'] + "<br />";
     });
     $("#" + name + "-selection").html(checkedNames);
-    /* To do: js required validation with trigger on multi fields not working anymore (have '[]') e.g. event */
+    /* Todo: js required validation with trigger on multi fields not working anymore (have '[]') e.g. event */
     $("#" + name).val('[' + ids + ']').trigger('change');
 }
 

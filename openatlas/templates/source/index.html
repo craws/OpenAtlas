@@ -5,9 +5,7 @@
 {% block content %}
     {% if 'editor'|is_authorized: %}
         <div class="button-bar">
-            <a href="{{ url_for('source_insert', code='E33') }}">
-                + {{ _('source')|uc_first }}
-            </a>
+            <a href="{{ url_for('source_insert') }}">+ {{ _('source')|uc_first }}</a>
         </div>
     {% endif %}
     {{ tables['source']|pager }}

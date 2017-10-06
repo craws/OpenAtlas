@@ -1,13 +1,16 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import render_template, url_for, flash
+from collections import OrderedDict
+
+from flask import render_template, url_for, flash, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import StringField, TextAreaField, HiddenField
+from wtforms import StringField, TextAreaField, HiddenField, SubmitField
 from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app
+from openatlas.forms import build_custom_form
 from openatlas.models.entity import EntityMapper
 from openatlas.util.util import uc_first, link, truncate_string, required_group
 
@@ -15,6 +18,8 @@ from openatlas.util.util import uc_first, link, truncate_string, required_group
 class SourceForm(Form):
     name = StringField(uc_first(_('name')), validators=[InputRequired()])
     description = TextAreaField(uc_first(_('content')))
+    save = SubmitField(_('insert'))
+    insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
 
 
@@ -32,15 +37,15 @@ def source_index():
     return render_template('source/index.html', tables=tables)
 
 
-@app.route('/source/insert/<code>', methods=['POST', 'GET'])
+@app.route('/source/insert', methods=['POST', 'GET'])
 @required_group('editor')
-def source_insert(code):
-    form = SourceForm()
+def source_insert():
+    form = build_custom_form(SourceForm, 'Source')
     if form.validate_on_submit():
-        source = EntityMapper.insert(code, form.name.data, form.description.data)
+        source = save(form)
         flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
-            return redirect(url_for('source_insert', code='E33'))
+            return redirect(url_for('source_insert'))
         return redirect(url_for('source_view', id_=source.id))
     return render_template('source/insert.html', form=form)
 
@@ -50,6 +55,18 @@ def source_insert(code):
 def source_view(id_):
     source = EntityMapper.get_by_id(id_)
     data = {'info': [(_('name'), source.name)]}
+    type_data = OrderedDict()
+    for node in source.nodes:
+        if not node.root:
+            continue
+        root = openatlas.nodes[node.root[-1]]
+        if not root.extendable:
+            continue
+        if root.name not in type_data:
+            type_data[root.name] = []
+        type_data[root.name].append(node.name)
+    for root_name, nodes in type_data.items():
+        data['info'].append((root_name, '<br />'.join(nodes)))
     return render_template('source/view.html', source=source, data=data)
 
 
@@ -67,13 +84,28 @@ def source_delete(id_):
 @required_group('editor')
 def source_update(id_):
     source = EntityMapper.get_by_id(id_)
-    form = SourceForm()
+    form = build_custom_form(SourceForm, 'Source', source if request.method == 'GET' else None)
     if form.validate_on_submit():
-        source.name = form.name.data
-        source.description = form.description.data
-        source.update()
+        save(form, source)
         flash(_('info update'), 'info')
         return redirect(url_for('source_view', id_=id_))
-    form.name.data = source.name
-    form.description.data = source.description
     return render_template('source/update.html', form=form, source=source)
+
+
+def save(form, source=None):
+    openatlas.get_cursor().execute('BEGIN')
+    if source:
+        pass
+    else:
+        source = EntityMapper.insert('E33', form.name.data)
+    source.name = form.name.data
+    source.description = form.description.data
+    source.update()
+    source.save_nodes(form)
+    from openatlas import NodeMapper
+    for node_id in NodeMapper.get_nodes('Linguistic object classification'):
+        if openatlas.nodes[node_id].name == 'Source Content':
+            source.link('P2', node_id)
+            break
+    openatlas.get_cursor().execute('COMMIT')
+    return source

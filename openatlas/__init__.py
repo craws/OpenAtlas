@@ -39,7 +39,7 @@ def get_cursor():
     return connection.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
 
 
-try:  # To do: better way to use different configs (e.g production and testing)
+try:  # Todo: better way to use different configs (e.g production and testing)
     import mod_wsgi
     connection = connect('production')  # pragma: no cover
 except ImportError:
@@ -52,7 +52,7 @@ locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 
 babel = Babel(app)
 
-# To do: store these values somewhere else, config?
+# Todo: store these values somewhere else, config?
 default_table_rows = OrderedDict()
 default_table_rows['10'] = '10'
 default_table_rows['20'] = '20'
@@ -125,7 +125,6 @@ from openatlas.views import (actor, admin, ajax, content, index, settings, model
 app.register_blueprint(filters.blueprint)
 app.add_template_global(debug_model, 'debug_model')
 app.debug = True
-
 
 @app.context_processor
 def inject_debug():
