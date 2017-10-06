@@ -83,7 +83,6 @@ def event_update(id_):
         event.description = form.description.data
         openatlas.get_cursor().execute('BEGIN')
         event.update()
-        event.delete_dates()
         event.save_dates(form)
         openatlas.get_cursor().execute('COMMIT')
         flash(_('info update'), 'info')

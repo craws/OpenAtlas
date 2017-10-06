@@ -95,7 +95,6 @@ def save(form, code, entity=None):
         entity.name = form.name.data
         entity.description = form.description.data
         entity.update()
-        entity.delete_dates()
         entity.delete_nodes()
     else:
         entity = EntityMapper.insert(code, form.name.data, form.description.data)

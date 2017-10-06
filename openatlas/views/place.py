@@ -82,7 +82,6 @@ def place_update(id_):
         place.description = form.description.data
         openatlas.get_cursor().execute('BEGIN')
         place.update()
-        place.delete_dates()
         place.save_dates(form)
         openatlas.get_cursor().execute('COMMIT')
         flash(_('info update'), 'info')

@@ -37,6 +37,7 @@ class LinkMapper(object):
                 'property_code': property_code,
                 'domain_id': domain_id,
                 'range_id': range_id})
+            openatlas.debug_model['div sql'] += 1
 
     # @staticmethod
     # def get_linked_entity(entity, property_name, inverse=False):

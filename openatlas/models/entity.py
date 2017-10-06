@@ -34,9 +34,6 @@ class Entity(object):
     def delete_nodes(self):
         openatlas.NodeMapper.delete_nodes(self)
 
-    def delete_dates(self):
-        DateMapper.delete_dates(self)
-
     def set_dates(self):
         self.dates = DateMapper.get_dates(self)
 

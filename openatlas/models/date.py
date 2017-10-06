@@ -34,6 +34,9 @@ class DateMapper(object):
 
     @staticmethod
     def save_dates(entity, form):
+        # Todo: refactor to not delete/save dates if not changed
+        if entity.dates:
+            DateMapper.delete_dates(entity)
         code_begin = 'OA1'
         code_end = 'OA2'
         if entity.class_.name in ['Activity', 'Destruction', 'Acquisition', 'Production']:
