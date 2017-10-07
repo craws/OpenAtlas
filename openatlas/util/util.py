@@ -1,5 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import re
+from collections import OrderedDict
 from datetime import timedelta, date
 from functools import wraps
 
@@ -10,6 +11,8 @@ from flask_babel import lazy_gettext as _
 from markupsafe import Markup
 
 from werkzeug.utils import redirect
+
+import openatlas
 from openatlas.models.classObject import ClassObject
 from openatlas.models.entity import Entity
 from openatlas.models.property import Property
@@ -18,6 +21,22 @@ from openatlas.models.user import User
 
 def sanitize(string):
     return re.sub('[^A-Za-z0-9]+', '', string)
+
+
+def append_node_data(data, entity):
+    type_data = OrderedDict()
+    for node in entity.nodes:
+        if not node.root:
+            continue
+        root = openatlas.nodes[node.root[-1]]
+        if not root.extendable:
+            continue
+        if root.name not in type_data:
+            type_data[root.name] = []
+        type_data[root.name].append(node.name)
+    for root_name, nodes in type_data.items():
+        data.append((root_name, '<br />'.join(nodes)))
+    return data
 
 
 def add_dates_to_form(form, for_person=False):

@@ -36,6 +36,7 @@ def build_custom_form(form, form_name, entity=None):
         if hasattr(form_instance, item):
             delattr(form_instance, item)
 
+    # Todo: try to set field.data with all entity.nodes at creation
     # Set field data if available
     if entity:
         node_data = {}

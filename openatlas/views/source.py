@@ -1,5 +1,4 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from collections import OrderedDict
 
 from flask import render_template, url_for, flash, request
 from flask_babel import lazy_gettext as _
@@ -12,7 +11,7 @@ import openatlas
 from openatlas import app
 from openatlas.forms import build_custom_form
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import uc_first, link, truncate_string, required_group
+from openatlas.util.util import uc_first, link, truncate_string, required_group, append_node_data
 
 
 class SourceForm(Form):
@@ -54,19 +53,8 @@ def source_insert():
 @required_group('readonly')
 def source_view(id_):
     source = EntityMapper.get_by_id(id_)
-    data = {'info': [(_('name'), source.name)]}
-    type_data = OrderedDict()
-    for node in source.nodes:
-        if not node.root:
-            continue
-        root = openatlas.nodes[node.root[-1]]
-        if not root.extendable:
-            continue
-        if root.name not in type_data:
-            type_data[root.name] = []
-        type_data[root.name].append(node.name)
-    for root_name, nodes in type_data.items():
-        data['info'].append((root_name, '<br />'.join(nodes)))
+    data = {'info': []}
+    append_node_data(data['info'], source)
     return render_template('source/view.html', source=source, data=data)
 
 
@@ -92,20 +80,18 @@ def source_update(id_):
     return render_template('source/update.html', form=form, source=source)
 
 
-def save(form, source=None):
+def save(form, entity=None):
     openatlas.get_cursor().execute('BEGIN')
-    if source:
-        pass
-    else:
-        source = EntityMapper.insert('E33', form.name.data)
-    source.name = form.name.data
-    source.description = form.description.data
-    source.update()
-    source.save_nodes(form)
+    if not entity:
+        entity = EntityMapper.insert('E33', form.name.data)
+    entity.name = form.name.data
+    entity.description = form.description.data
+    entity.update()
+    entity.save_nodes(form)
     from openatlas import NodeMapper
     for node_id in NodeMapper.get_nodes('Linguistic object classification'):
         if openatlas.nodes[node_id].name == 'Source Content':
-            source.link('P2', node_id)
+            entity.link('P2', node_id)
             break
     openatlas.get_cursor().execute('COMMIT')
-    return source
+    return entity

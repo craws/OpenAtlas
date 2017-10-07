@@ -212,7 +212,8 @@ def display_form(self, form, form_id=None, for_persons=False):
             errors += util.uc_first(error)
         if field.type in ['TreeField', 'TreeMultiField']:
             node = openatlas.nodes[int(field.id)]
-            html += '<div class="table-row"><div><label>' + node.name + '</label></div>'
+            html += '<div class="table-row"><div><label>' + node.name + '</label>'
+            html += ' <span class="tooltip" title="' + _('tooltip type') + '">i</span></div>'
             html += '<div class="table-cell">' + str(field(class_=class_)) + errors + '</div></div>'
             continue
         if field.type in ['CSRFTokenField', 'HiddenField']:

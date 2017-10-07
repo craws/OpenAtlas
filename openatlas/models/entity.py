@@ -12,7 +12,9 @@ class Entity(object):
         self.id = row.id
         self.nodes = []
         if hasattr(row, 'types') and row.types:
-            for node_id in ast.literal_eval('[' + row.types + ']'):
+            nodes_list = ast.literal_eval('[' + row.types + ']')
+            # converting nodes_list to set, to list to avoid duplicates (from the sql statement)
+            for node_id in list(set(nodes_list)):
                 self.nodes.append(openatlas.nodes[node_id])
         self.name = row.name
         self.description = row.description if row.description else ''
