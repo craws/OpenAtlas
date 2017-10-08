@@ -1,20 +1,23 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import render_template, url_for, flash
+from flask import render_template, url_for, flash, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import StringField, TextAreaField, HiddenField
+from wtforms import StringField, TextAreaField, HiddenField, SubmitField
 from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app
+from openatlas.forms import build_custom_form
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import uc_first, link, truncate_string, required_group
+from openatlas.util.util import uc_first, link, truncate_string, required_group, append_node_data
 
 
 class ReferenceForm(Form):
     name = StringField(uc_first(_('name')), validators=[InputRequired()])
     description = TextAreaField(uc_first(_('description')))
+    save = SubmitField(_('insert'))
+    insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
 
 
@@ -22,7 +25,8 @@ class ReferenceForm(Form):
 @required_group('readonly')
 def reference_view(id_):
     reference = EntityMapper.get_by_id(id_)
-    data = {'info': [(_('name'), reference.name)]}
+    data = {'info': []}
+    append_node_data(data['info'], reference)
     return render_template('reference/view.html', reference=reference, data=data)
 
 
@@ -48,12 +52,11 @@ def reference_index():
 @app.route('/reference/insert/<code>', methods=['POST', 'GET'])
 @required_group('editor')
 def reference_insert(code):
-    form = ReferenceForm()
+    form_code = 'Information Carrier' if code == 'carrier' else uc_first(code)
+    form = build_custom_form(ReferenceForm, uc_first(form_code))
     if form.validate_on_submit():
-        reference = EntityMapper.insert(
-            'E84' if code == 'carrier' else 'E31',
-            form.name.data,
-            form.description.data)
+        class_code = 'E84' if code == 'carrier' else 'E31'
+        reference = save(form, EntityMapper.insert(class_code, form.name.data))
         flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
             return redirect(url_for('reference_insert', code=code))
@@ -75,13 +78,20 @@ def reference_delete(id_):
 @required_group('editor')
 def reference_update(id_):
     reference = EntityMapper.get_by_id(id_)
-    form = ReferenceForm()
+    # Todo: find out which form is needed
+    form = build_custom_form(ReferenceForm, 'Information Carrier', reference, request)
     if form.validate_on_submit():
-        reference.name = form.name.data
-        reference.description = form.description.data
-        reference.update()
+        save(form, reference)
         flash(_('info update'), 'info')
         return redirect(url_for('reference_view', id_=id_))
-    form.name.data = reference.name
-    form.description.data = reference.description
     return render_template('reference/update.html', form=form, reference=reference)
+
+
+def save(form, entity):
+    openatlas.get_cursor().execute('BEGIN')
+    entity.name = form.name.data
+    entity.description = form.description.data
+    entity.update()
+    entity.save_nodes(form)
+    openatlas.get_cursor().execute('COMMIT')
+    return entity

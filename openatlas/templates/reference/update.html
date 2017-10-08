@@ -4,5 +4,5 @@
     > {{ reference|link }} > {{ _('edit')|uc_first }}
 {% endblock %}
 {% block content %}
-    {% include 'reference/form.html' %}
+    {{ form|display_form() }}
 {% endblock %}
