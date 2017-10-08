@@ -1,4 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+import ast
+
 import openatlas
 from collections import OrderedDict
 
@@ -110,14 +112,13 @@ class NodeMapper(EntityMapper):
         openatlas.get_cursor().execute(sql, params)
 
     @staticmethod
-    def get_tree_data(node_id):
+    def get_tree_data(node_id, selected_ids):
         node = openatlas.nodes[node_id]
-        return "'core':{'data':[" + NodeMapper.walk_tree(node.subs, None) + "]}"
+        return "'core':{'data':[" + NodeMapper.walk_tree(node.subs, selected_ids) + "]}"
 
     @staticmethod
-    def walk_tree(param, selected_ids=None):
+    def walk_tree(param, selected_ids):
         items = param if isinstance(param, list) else [param]
-        selected_ids = selected_ids if isinstance(selected_ids, list) else [selected_ids]
         string = ''
         for id_ in items:
             item = openatlas.nodes[id_]
@@ -156,4 +157,8 @@ class NodeMapper(EntityMapper):
                 'property_id': openatlas.has_type_id})
         for field in form:
             if isinstance(field, (TreeField, TreeMultiField)) and field.data:
-                entity.link('P2', field.data)
+                try:
+                    range_param = int(field.data)
+                except ValueError:
+                    range_param = ast.literal_eval(field.data)
+                entity.link('P2', range_param)

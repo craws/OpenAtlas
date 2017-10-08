@@ -24,6 +24,7 @@ def sanitize(string):
 
 
 def append_node_data(data, entity):
+    # nodes
     type_data = OrderedDict()
     for node in entity.nodes:
         if not node.root:
@@ -36,6 +37,26 @@ def append_node_data(data, entity):
         type_data[root.name].append(node.name)
     for root_name, nodes in type_data.items():
         data.append((root_name, '<br />'.join(nodes)))
+    # dates
+    date_types = OrderedDict([
+        ('OA1', _('first')),
+        ('OA3', _('birth')),
+        ('OA2', _('last')),
+        ('OA4', _('death')),
+        ('OA5', _('begin')),
+        ('OA6', _('end'))])
+    for code, label in date_types.items():
+        if code in entity.dates:
+            if 'Exact date value' in entity.dates[code]:
+                html = format_date(entity.dates[code]['Exact date value']['timestamp'])
+                html += ' ' + entity.dates[code]['Exact date value']['info']
+                data.append((uc_first(label), html))
+            else:
+                html = uc_first(_('between')) + ' '
+                html += format_date(entity.dates[code]['From date value']['timestamp'])
+                html += ' and ' + format_date(entity.dates[code]['To date value']['timestamp'])
+                html += ' ' + entity.dates[code]['From date value']['info']
+                data.append((uc_first(label), html))
     return data
 
 

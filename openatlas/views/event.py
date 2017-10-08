@@ -42,7 +42,7 @@ def event_index():
 def event_insert(code):
     form = build_custom_form(EventForm, 'Event')
     if form.validate_on_submit() and form.name.data != openatlas.app.config['EVENT_ROOT_NAME']:
-        event = save(form, None, code)
+        event = save(form, EntityMapper.insert(code, form.name.data))
         flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
             return redirect(url_for('event_insert', code=code))
@@ -68,7 +68,7 @@ def event_delete(id_):
 def event_update(id_):
     event = EntityMapper.get_by_id(id_)
     event.set_dates()
-    form = build_custom_form(EventForm, 'Event', event if request.method == 'GET' else None)
+    form = build_custom_form(EventForm, 'Event', event, request)
     if event.name == openatlas.app.config['EVENT_ROOT_NAME']:
         flash(_('error forbidden'), 'error')
         return redirect(url_for('event_index'))
@@ -76,9 +76,6 @@ def event_update(id_):
         save(form, event)
         flash(_('info update'), 'info')
         return redirect(url_for('event_view', id_=id_))
-    form.name.data = event.name
-    form.description.data = event.description
-    form.populate_dates(event)
     return render_template('event/update.html', form=form, event=event)
 
 
@@ -92,10 +89,8 @@ def event_view(id_):
     return render_template('event/view.html', event=event, data=data)
 
 
-def save(form, entity=None, code=None):
+def save(form, entity):
     openatlas.get_cursor().execute('BEGIN')
-    if not entity:
-        entity = EntityMapper.insert(code, form.name.data, form.description.data)
     entity.name = form.name.data
     entity.description = form.description.data
     entity.update()

@@ -13,7 +13,7 @@ from openatlas.util.filters import pager
 from openatlas.util.util import uc_first
 
 
-def build_custom_form(form, form_name, entity=None):
+def build_custom_form(form, form_name, entity=None, request_origin=None):
 
     # Add custom fields
     custom_list = []
@@ -37,8 +37,10 @@ def build_custom_form(form, form_name, entity=None):
             delattr(form_instance, item)
 
     # Todo: try to set field.data with all entity.nodes at creation
-    # Set field data if available
-    if entity:
+    # Set field data if available and only if it's a GET request
+    if entity and request_origin and request_origin.method == 'GET':
+        if isinstance(form_instance, DateForm):
+            form_instance.populate_dates(entity)
         node_data = {}
         for node in entity.nodes:
             root = openatlas.nodes[node.root[-1]] if node.root else node
@@ -55,9 +57,11 @@ class TreeSelect(HiddenInput):
 
     def __call__(self, field, **kwargs):
         selection = ''
+        selected_ids = []
         if field.data:
             field.data = field.data[0] if isinstance(field.data, list) else field.data
             selection = openatlas.nodes[field.data].name
+            selected_ids.append(openatlas.nodes[field.data].id)
         html = """
             <input id="{name}-button" name="{name}-button" type="text"
                 class="table-select {required}" onfocus="this.blur()"
@@ -89,7 +93,7 @@ class TreeSelect(HiddenInput):
             name=field.id,
             title=openatlas.nodes[int(field.id)].name,
             selection=selection,
-            tree=openatlas.NodeMapper.get_tree_data(int(field.id)),
+            tree=openatlas.NodeMapper.get_tree_data(int(field.id), selected_ids),
             clear_style='' if selection else ' style="display: none;" ',
             required=' required' if field.flags.required else '')
         return super(TreeSelect, self).__call__(field, **kwargs) + html
@@ -103,8 +107,10 @@ class TreeMultiSelect(HiddenInput):
 
     def __call__(self, field, **kwargs):
         selection = ''
+        selected_ids = []
         if field.data:
             for entity_id in field.data:
+                selected_ids.append(entity_id)
                 selection += openatlas.nodes[entity_id].name + '<br />'
         html = """
             <span id="{name}-button" class="button">Change</span>
@@ -130,7 +136,7 @@ class TreeMultiSelect(HiddenInput):
             name=field.id,
             title=openatlas.nodes[int(field.id)].name,
             selection=selection,
-            tree=openatlas.NodeMapper.get_tree_data(int(field.id)))
+            tree=openatlas.NodeMapper.get_tree_data(int(field.id), selected_ids))
         return super(TreeMultiSelect, self).__call__(field, **kwargs) + html
 
 

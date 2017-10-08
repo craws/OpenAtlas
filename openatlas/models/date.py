@@ -28,7 +28,8 @@ class DateMapper(object):
             if row.code not in dates:
                 dates[row.code] = {}
             dates[row.code][row.type_name] = {
-                'timestamp': row.value_timestamp, 'info': row.description}
+                'timestamp': row.value_timestamp,
+                'info': row.description if row.description else ''}
         openatlas.debug_model['div sql'] += 1
         return dates
 

@@ -86,7 +86,4 @@ def place_update(id_):
         openatlas.get_cursor().execute('COMMIT')
         flash(_('info update'), 'info')
         return redirect(url_for('place_view', id_=id_))
-    form.name.data = place.name
-    form.description.data = place.description
-    form.populate_dates(place)
     return render_template('place/update.html', form=form, place=place)

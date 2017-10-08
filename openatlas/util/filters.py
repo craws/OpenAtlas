@@ -1,6 +1,4 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from collections import OrderedDict
-
 import jinja2
 import flask
 import re
@@ -62,8 +60,8 @@ def data_table(self, data):
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def format_date(self, value, text_format='%Y-%m-%d'):
-    return util.format_date(value, text_format)
+def format_date(self, value):
+    return util.format_date(value)
 
 
 @jinja2.contextfilter
@@ -164,7 +162,10 @@ def pager(self, table):
                 {sort},
                 dateFormat: "ddmmyyyy",
                 widgets: [\'zebra\', \'filter\'],
-                widgetOptions: {{filter_external: \'#{name}-search\', filter_columnFilters: false}}}})
+                widgetOptions: {{
+                    filter_external: \'#{name}-search\',
+                    filter_columnFilters: false
+                }}}})
             .tablesorterPager({{positionFixed: false, container: $("#{name}-pager"), size: 20}});
         """.format(name=table['name'], sort=sort)
     else:
@@ -250,32 +251,3 @@ def test_file(self, file_name):
 @blueprint.app_template_filter()
 def sanitize(self, string):
     return util.sanitize(string)
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
-def print_entity_dates(self, entity):
-    date_types = OrderedDict([
-        ('OA1', _('first')),
-        ('OA3', _('birth')),
-        ('OA2', _('last')),
-        ('OA4', _('death')),
-        ('OA5', _('begin')),
-        ('OA6', _('end'))])
-    html = ''
-    for code, label in date_types.items():
-        if code in entity.dates:
-            if 'Exact date value' in entity.dates[code]:
-                html += util.uc_first(label) + ': '
-                html += util.format_date(entity.dates[code]['Exact date value']['timestamp'])
-                if entity.dates[code]['Exact date value']['info']:
-                    html += ' ' + entity.dates[code]['Exact date value']['info']
-                html += '<br />'
-            else:
-                html += util.uc_first(label) + ': ' + util.uc_first(_('between')) + ' '
-                html += util.format_date(entity.dates[code]['From date value']['timestamp'])
-                html += ' and ' + util.format_date(entity.dates[code]['To date value']['timestamp'])
-                if entity.dates[code]['From date value']['info']:
-                    html += ' ' + entity.dates[code]['From date value']['info']
-                html += '<br />'
-    return Markup(html)

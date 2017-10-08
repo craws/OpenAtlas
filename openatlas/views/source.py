@@ -41,7 +41,7 @@ def source_index():
 def source_insert():
     form = build_custom_form(SourceForm, 'Source')
     if form.validate_on_submit():
-        source = save(form)
+        source = save(form, EntityMapper.insert('E33', form.name.data))
         flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
             return redirect(url_for('source_insert'))
@@ -72,7 +72,7 @@ def source_delete(id_):
 @required_group('editor')
 def source_update(id_):
     source = EntityMapper.get_by_id(id_)
-    form = build_custom_form(SourceForm, 'Source', source if request.method == 'GET' else None)
+    form = build_custom_form(SourceForm, 'Source', source, request)
     if form.validate_on_submit():
         save(form, source)
         flash(_('info update'), 'info')
@@ -80,10 +80,8 @@ def source_update(id_):
     return render_template('source/update.html', form=form, source=source)
 
 
-def save(form, entity=None):
+def save(form, entity):
     openatlas.get_cursor().execute('BEGIN')
-    if not entity:
-        entity = EntityMapper.insert('E33', form.name.data)
     entity.name = form.name.data
     entity.description = form.description.data
     entity.update()
