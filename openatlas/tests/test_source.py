@@ -6,13 +6,13 @@ class SourceTest(TestBaseCase):
 
     def test_source(self):
         self.login()
-        rv = self.app.get('/source/insert/E33')
+        rv = self.app.get('/source/insert')
         assert b'+ Source' in rv.data
         form_data = {'name': 'Test source'}
-        rv = self.app.post('/source/insert/E18', data=form_data)
+        rv = self.app.post('/source/insert', data=form_data)
         source_id = rv.location.split('/')[-1]
         form_data['continue_'] = 'yes'
-        rv = self.app.post('/source/insert/E33', data=form_data, follow_redirects=True)
+        rv = self.app.post('/source/insert', data=form_data, follow_redirects=True)
         assert b'An entry has been created' in rv.data
         rv = self.app.get('/source')
         assert b'Test source' in rv.data

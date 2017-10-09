@@ -22,13 +22,13 @@ class NodeMapper(EntityMapper):
                 e.modified,
                 es.id AS super_id,
                 COUNT(p2.id) AS count
-            FROM model.entity e            
-            JOIN model.class c ON e.class_id = c.id AND c.code = 'E55'
+            FROM model.entity e
+            JOIN model.class c ON e.class_id = c.id AND c.code = '{class_code}' {class_condition}
 
             -- get super
             LEFT JOIN model.link l
                 ON e.id = l.domain_id AND
-                l.property_id = (SELECT id FROM model.property WHERE code IN ('P127'))
+                l.property_id = (SELECT id FROM model.property WHERE code = '{property_code}')
             LEFT JOIN model.entity es ON l.range_id = es.id
 
             -- get count
@@ -39,9 +39,15 @@ class NodeMapper(EntityMapper):
             GROUP BY e.id, es.id
             ORDER BY e.name;"""
         cursor = openatlas.get_cursor()
-        cursor.execute(sql)
+        cursor.execute(sql.format(class_code='E55', property_code='P127', class_condition=''))
+        types = cursor.fetchall()
+        cursor.execute(sql.format(
+            class_code='E53',
+            property_code='P89',
+            class_condition="AND e.name NOT LIKE 'Location of %'"))
+        places = cursor.fetchall()
         nodes = OrderedDict()
-        for row in cursor.fetchall():
+        for row in types + places:
             node = Entity(row)
             nodes[node.id] = node
             node.count = row.count
@@ -137,10 +143,11 @@ class NodeMapper(EntityMapper):
         sql = """
             SELECT h.id FROM web.hierarchy h
             JOIN web.hierarchy_form hf ON h.id = hf.hierarchy_id
-            JOIN web.form f ON hf.form_id = f.id AND f.name = %(form_name)s;"""
+            JOIN web.form f ON hf.form_id = f.id AND f.name = %(form_name)s
+            ORDER BY h.name;"""
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {'form_name': form_id})
-        nodes = {}
+        nodes = OrderedDict()
         for row in cursor.fetchall():
             nodes[row.id] = openatlas.nodes[row.id]
         return nodes

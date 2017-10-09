@@ -107,7 +107,7 @@
         </div>
         <div id="menu">
             {% if current_user.is_authenticated %}
-                {% for item in ['overview', 'source', 'event', 'actor', 'place', 'reference'] %}
+                {% for item in ['overview', 'source', 'event', 'actor', 'place', 'reference', 'node'] %}
                     {% set css = 'active' if item in request.path or (item == 'overview' and request.path == '/') %}
                     <div class="{{ css|safe }}">
                         <a href="/{{ item }}">{{ _(item)|uc_first }}</a>

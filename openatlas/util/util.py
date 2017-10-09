@@ -178,7 +178,7 @@ def link(entity):
         elif entity.class_.code in ('E31', 'E84'):
             url = url_for('reference_view', id_=entity.id)
         elif entity.class_.code == 'E55':
-            url = url_for('node_view', node_id=entity.id)
+            url = url_for('node_view', id_=entity.id)
         html = '<a href="' + url + '">' + entity.name + '</a>' if url else '? ' + entity.class_.name
     return Markup(html)
 
