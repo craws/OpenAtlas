@@ -12,6 +12,7 @@ class NodeMapper(EntityMapper):
 
     @staticmethod
     def get_all_nodes():
+        """Get and return all type and place nodes"""
         sql = """
             SELECT
                 e.id,
@@ -35,7 +36,7 @@ class NodeMapper(EntityMapper):
             LEFT JOIN model.link l2 ON l2.range_id = e.id
             LEFT JOIN model.property p2 ON
                 l2.property_id = p2.id AND
-                p2.name IN ('is located at', 'has type')
+                p2.code IN ('P2', 'P89')
             GROUP BY e.id, es.id
             ORDER BY e.name;"""
         cursor = openatlas.get_cursor()
@@ -166,6 +167,11 @@ class NodeMapper(EntityMapper):
             if isinstance(field, (TreeField, TreeMultiField)) and field.data:
                 try:
                     range_param = int(field.data)
+                    node_class = openatlas.classes[openatlas.nodes[range_param].class_.id].code
                 except ValueError:
                     range_param = ast.literal_eval(field.data)
-                entity.link('P2', range_param)
+                    if range_param:
+                        node_class = openatlas.classes[openatlas.nodes[range_param].class_.id].code
+                    else:
+                        node_class = ''
+                entity.link('P2' if node_class == 'E55' else 'P127', range_param)
