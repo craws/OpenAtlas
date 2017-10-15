@@ -58,7 +58,7 @@ class EntityMapper(object):
         LEFT JOIN model.link tl ON e.id = tl.domain_id
         LEFT JOIN model.entity t ON
             tl.range_id = t.id
-                AND tl.property_id = (SELECT id FROM model.property WHERE code = 'P2')
+                AND tl.property_id IN (SELECT id FROM model.property WHERE code IN ('P2', 'P89'))
 
         LEFT JOIN model.link dl1 ON e.id = dl1.domain_id
             AND dl1.property_id IN

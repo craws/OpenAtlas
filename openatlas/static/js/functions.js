@@ -7,8 +7,8 @@ tinymce.init({
     resize: 'both',
     toolbar_items_size : 'small',
     plugins: 'link code textcolor colorpicker',
-    toolbar: 'bold italic underline strikethrough alignleft aligncenter alignright alignjustify undo redo link ' +
-        'unlink fontselect fontsizeselect forecolor code',
+    toolbar: 'bold italic underline strikethrough alignleft aligncenter alignright alignjustify ' +
+        ' undo redo link unlink fontselect fontsizeselect forecolor code',
 });
 
 $.tablesorter.addParser({
@@ -29,14 +29,21 @@ function resizeText(multiplier) {
     if (document.body.style.fontSize === '') {
         document.body.style.fontSize = '1.0em';
     }
-    document.body.style.fontSize = parseFloat(document.body.style.fontSize) + (multiplier * 0.2) + 'em';
+    document.body.style.fontSize =
+        parseFloat(document.body.style.fontSize) + (multiplier * 0.2) + 'em';
 }
 
 function ucString(string) {
+    if (!string) {
+        return '';
+    }
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 function createOverlay(name, title, multiple = false, type = 'table') {
+    if (!title) {
+        title = name;
+    }
     $('#' + name + '-overlay').click(function () {
         $('#' + name + '-dialog').dialog('close');
     });
@@ -92,7 +99,8 @@ function selectFromTreeMulti(name) {
         checkedNames += node['text'] + "<br />";
     });
     $("#" + name + "-selection").html(checkedNames);
-    /* Todo: js required validation with trigger on multi fields not working anymore (have '[]') e.g. event */
+    /* Todo: js required validation with trigger on multi fields not working anymore (have '[]') */
+    /* e.g. event */
     $("#" + name).val('[' + ids + ']').trigger('change');
 }
 

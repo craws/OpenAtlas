@@ -1,5 +1,5 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import render_template, url_for, flash
+from flask import render_template, url_for, flash, request
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from wtforms import StringField, TextAreaField, HiddenField, SubmitField
@@ -9,7 +9,7 @@ import openatlas
 from openatlas import app
 from openatlas.forms import DateForm, build_custom_form
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import link, truncate_string, required_group
+from openatlas.util.util import link, truncate_string, required_group, append_node_data
 
 
 class PlaceForm(DateForm):
@@ -36,15 +36,13 @@ def place_index():
     return render_template('place/index.html', tables=tables)
 
 
-@app.route('/place/insert/<code>', methods=['POST', 'GET'])
+@app.route('/place/insert', methods=['POST', 'GET'])
 @required_group('editor')
-def place_insert(code):
+def place_insert():
     form = build_custom_form(PlaceForm, 'Place')
     if form.validate_on_submit():
-        openatlas.get_cursor().execute('BEGIN')
-        place = EntityMapper.insert(code, form.name.data, form.description.data)
-        place.save_dates(form)
-        openatlas.get_cursor().execute('COMMIT')
+        object = save(form, EntityMapper.insert('E18', form.name.data))
+        place = save(form, EntityMapper.insert('E18', form.name.data))
         flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
             return redirect(url_for('place_insert', code='E18'))
@@ -57,7 +55,8 @@ def place_insert(code):
 def place_view(id_):
     place = EntityMapper.get_by_id(id_)
     place.set_dates()
-    data = {'info': [(_('name'), place.name)]}
+    data = {'info': []}
+    append_node_data(data['info'], place)
     return render_template('place/view.html', place=place, data=data)
 
 
@@ -76,14 +75,20 @@ def place_delete(id_):
 def place_update(id_):
     place = EntityMapper.get_by_id(id_)
     place.set_dates()
-    form = PlaceForm()
+    form = build_custom_form(PlaceForm, 'Place', place, request)
     if form.validate_on_submit():
-        place.name = form.name.data
-        place.description = form.description.data
-        openatlas.get_cursor().execute('BEGIN')
-        place.update()
-        place.save_dates(form)
-        openatlas.get_cursor().execute('COMMIT')
+        save(form, place)
         flash(_('info update'), 'info')
         return redirect(url_for('place_view', id_=id_))
     return render_template('place/update.html', form=form, place=place)
+
+
+def save(form, entity):
+    openatlas.get_cursor().execute('BEGIN')
+    entity.name = form.name.data
+    entity.description = form.description.data
+    entity.update()
+    entity.save_dates(form)
+    # entity.save_nodes(form)
+    openatlas.get_cursor().execute('COMMIT')
+    return entity
