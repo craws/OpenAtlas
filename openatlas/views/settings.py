@@ -4,7 +4,7 @@ from flask import flash, render_template, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import StringField, BooleanField, SelectField
+from wtforms import StringField, BooleanField, SelectField, PasswordField
 
 import openatlas
 from openatlas import SettingsMapper
@@ -25,6 +25,8 @@ class SettingsForm(Form):
     # Mail
     mail = BooleanField(uc_first(_('mail')), false_values='false')
     mail_transport_username = StringField(uc_first(_('mail transport username')))
+    mail_transport_password = PasswordField(_('mail password'))
+    mail_transport_password2 = PasswordField(_('mail retype password'))
     mail_transport_host = StringField(uc_first(_('mail transport host')))
     mail_transport_port = StringField(uc_first(_('mail transport port')))
     mail_transport_type = StringField(uc_first(_('mail transport type')))
@@ -57,8 +59,7 @@ def settings_index():
             (_('maintenance'),
                 uc_first('on') if settings['maintenance'] == 'true' else uc_first('off')),
             (_('offline'),
-                uc_first('on') if settings['offline'] == 'true' else uc_first('off')),
-        ])),
+                uc_first('on') if settings['offline'] == 'true' else uc_first('off'))])),
         ('mail', OrderedDict([
             (_('mail'), uc_first('on') if settings['mail'] == 'true' else uc_first('off')),
             (_('mail transport username'), settings['mail_transport_username']),
@@ -69,17 +70,14 @@ def settings_index():
             (_('mail transport auth'), settings['mail_transport_auth']),
             (_('mail from email'), settings['mail_from_email']),
             (_('mail from name'), settings['mail_from_name']),
-            (_('mail recipients login'), settings['mail_recipients_login']),
-            (_('mail recipients feedback'), settings['mail_recipients_feedback']),
-        ])),
+            (_('mail recipients login'), ', '.join(settings['mail_recipients_login'])),
+            (_('mail recipients feedback'), ', '.join(settings['mail_recipients_feedback']))])),
         ('authentication', OrderedDict([
             (_('random password length'), settings['random_password_length']),
             (_('minimum password length'), settings['minimum_password_length']),
             (_('reset confirm hours'), settings['reset_confirm_hours']),
             (_('failed login tries'), settings['failed_login_tries']),
-            (_('failed login forget minutes'), settings['failed_login_forget_minutes'])
-        ]))
-    ])
+            (_('failed login forget minutes'), settings['failed_login_forget_minutes'])]))])
     return render_template('settings/index.html', groups=groups, settings=settings)
 
 
@@ -97,8 +95,12 @@ def settings_update():
         flash(_('info update'), 'info')
         return redirect(url_for('settings_index'))
     for field in SettingsMapper.fields:
-        if isinstance(getattr(form, field), BooleanField):
+        if field == 'mail_transport_password2':
+            getattr(form, field).data = session['settings']['mail_transport_password']
+        elif isinstance(getattr(form, field), BooleanField):
             getattr(form, field).data = True if session['settings'][field] == 'true' else False
+        elif field in ['mail_recipients_login', 'mail_recipients_feedback']:
+            getattr(form, field).data = ', '.join(session['settings'][field])
         else:
             getattr(form, field).data = session['settings'][field]
     return render_template('settings/update.html', form=form, settings=session['settings'])

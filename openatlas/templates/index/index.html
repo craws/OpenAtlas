@@ -8,6 +8,10 @@
             {{ tables['counts']|pager }}
         </div>
         <div style="float:left;">
+            <p>
+                {{ _('feedback teaser') }}:
+                <a href="{{ url_for('index_feedback') }}">{{ _('feedback')|uc_first }}</a>
+            </p>
             <a href="{{ url_for('model_network') }}">{{ _('network')|uc_first }}</a>
             {% if session['login_previous_success']: %}
                 <p style="font-size:0.9em;">
@@ -17,7 +21,7 @@
                     {% endif %}
                 </p>
             {% else %}
-                <p style="margin-top:1em;">
+                <p>
                     {{ _('first login') }}
                 </p>
             {% endif %}

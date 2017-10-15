@@ -14,7 +14,8 @@ class SettingsMapper(object):
         'maintenance',
         'mail',
         'mail_transport_username',
-        # 'mail_transport_password',
+        'mail_transport_password',
+        'mail_transport_password2',
         'mail_transport_ssl',
         'mail_transport_type',
         'mail_transport_auth',
@@ -25,7 +26,6 @@ class SettingsMapper(object):
         'mail_recipients_login',
         'mail_recipients_feedback',
         'minimum_password_length',
-        # 'notify_login',
         'offline',
         'random_password_length',
         'reset_confirm_hours',
@@ -47,6 +47,8 @@ class SettingsMapper(object):
                 'reset_confirm_hours'
             ]:
                 settings[row.name] = int(row.value)
+            elif row.name in ['mail_recipients_login', 'mail_recipients_feedback']:
+                settings[row.name] = row.value.split(', ')
         return settings
 
     @staticmethod

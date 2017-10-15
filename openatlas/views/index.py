@@ -11,7 +11,7 @@ from openatlas.util.changelog import Changelog
 from werkzeug.utils import redirect
 
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import link, bookmark_toggle, uc_first
+from openatlas.util.util import link, bookmark_toggle, uc_first, required_group
 
 
 @app.route('/')
@@ -49,6 +49,12 @@ def set_locale(language):
         current_user.settings['language'] = language
         current_user.update_settings()
     return redirect(request.referrer)
+
+
+@app.route('/index/feedback')
+@required_group('readonly')
+def index_feedback():
+    return render_template('index/feedback.html')
 
 
 @app.route('/index/contact')
