@@ -6,13 +6,13 @@ class PlaceTest(TestBaseCase):
 
     def test_place(self):
         self.login()
-        rv = self.app.get('/place/insert/E18')
+        rv = self.app.get('/place/insert')
         assert b'+ Place' in rv.data
         form_data = {'name': 'Test place'}
-        rv = self.app.post('/place/insert/E18', data=form_data)
+        rv = self.app.post('/place/insert', data=form_data)
         place_id = rv.location.split('/')[-1]
         form_data['continue_'] = 'yes'
-        rv = self.app.post('/place/insert/E21', data=form_data, follow_redirects=True)
+        rv = self.app.post('/place/insert', data=form_data, follow_redirects=True)
         assert b'An entry has been created' in rv.data
         rv = self.app.get('/place')
         assert b'Test place' in rv.data

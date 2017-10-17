@@ -1,1 +1,2 @@
-SECRET_KEY = "it's an open atlas for an open world"
+SECRET_KEY = "CHANGE ME"
+MAIL_TRANSPORT_PASSWORD = "CHANGE ME"

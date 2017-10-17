@@ -4,7 +4,7 @@ from flask import flash, render_template, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import StringField, BooleanField, SelectField, PasswordField
+from wtforms import StringField, BooleanField, SelectField
 
 import openatlas
 from openatlas import SettingsMapper
@@ -25,8 +25,6 @@ class SettingsForm(Form):
     # Mail
     mail = BooleanField(uc_first(_('mail')), false_values='false')
     mail_transport_username = StringField(uc_first(_('mail transport username')))
-    mail_transport_password = PasswordField(_('mail password'))
-    mail_transport_password2 = PasswordField(_('mail retype password'))
     mail_transport_host = StringField(uc_first(_('mail transport host')))
     mail_transport_port = StringField(uc_first(_('mail transport port')))
     mail_transport_type = StringField(uc_first(_('mail transport type')))
@@ -95,9 +93,7 @@ def settings_update():
         flash(_('info update'), 'info')
         return redirect(url_for('settings_index'))
     for field in SettingsMapper.fields:
-        if field == 'mail_transport_password2':
-            getattr(form, field).data = session['settings']['mail_transport_password']
-        elif isinstance(getattr(form, field), BooleanField):
+        if isinstance(getattr(form, field), BooleanField):
             getattr(form, field).data = True if session['settings'][field] == 'true' else False
         elif field in ['mail_recipients_login', 'mail_recipients_feedback']:
             getattr(form, field).data = ', '.join(session['settings'][field])

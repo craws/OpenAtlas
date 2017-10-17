@@ -10,7 +10,11 @@ Be sure to have upgraded the database to the PHP Version 2.3.2
 
 #### Passwords
 
-Since the password hash function changed to Bcrypt, all passwords from the PHP version will be invalid.
+The password hash function changed to Bcrypt so all user passwords from the PHP version will be
+invalid.
+
+The mail password is not being stored in the database anymore and has to be set in the
+/instance/config.py (MAIL_TRANSPORT_PASSWORD). See /install/example_config.py
 
 #### Content
 
@@ -22,6 +26,7 @@ enter them in "Settings" (intro and contact; faq was removed) again after execut
 #### Database update
 
     BEGIN;
+    DELETE FROM web.settings WHERE name = 'mail_transport_password';
     UPDATE web.settings SET name = 'site_name' WHERE name = 'sitename';
     UPDATE web.settings SET value = 'en' WHERE name = 'default_language';
     DROP TABLE IF EXISTS web.i18n;

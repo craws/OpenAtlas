@@ -14,8 +14,6 @@ class SettingsMapper(object):
         'maintenance',
         'mail',
         'mail_transport_username',
-        'mail_transport_password',
-        'mail_transport_password2',
         'mail_transport_ssl',
         'mail_transport_type',
         'mail_transport_auth',

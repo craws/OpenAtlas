@@ -15,7 +15,6 @@ INSERT INTO settings (name, value) VALUES
 ('maintenance', '0'),
 ('mail', '0'),
 ('mail_transport_username', ''),
-('mail_transport_password', ''),
 ('mail_transport_ssl', ''),
 ('mail_transport_type', ''),
 ('mail_transport_auth', ''),
