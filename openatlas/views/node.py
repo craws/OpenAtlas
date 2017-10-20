@@ -24,7 +24,7 @@ class NodeForm(Form):
 def node_index():
     nodes = {'system': OrderedDict(), 'custom': OrderedDict()}
     for id_, node in openatlas.nodes.items():
-        if hasattr(node, 'extendable') and node.extendable and not node.root:
+        if not node.root:
             type_ = 'system' if node.system else 'custom'
             nodes[type_][node] = tree_select(node.name)
     return render_template('node/index.html', nodes=nodes)
@@ -45,7 +45,7 @@ def node_insert(root_id):
         if hasattr(form, 'name_inverse') in form:
             name += ' (' + form.name_inverse.data + ')'
         openatlas.get_cursor().execute('BEGIN')
-        node = NodeMapper.insert('E55', name, form.description.data)
+        node = NodeMapper.insert('E55', name, None, form.description.data)
         openatlas.get_cursor().execute('COMMIT')
         flash(_('entity created'), 'info')
         return redirect(url_for('node_view', node_id=node.id))

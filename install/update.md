@@ -63,19 +63,6 @@ enter them in "Settings" (intro and contact; faq was removed) again after execut
     ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_user_id_name_value_key;
     ALTER TABLE ONLY web.user_settings ADD CONSTRAINT user_settings_user_id_name_key UNIQUE (user_id, name);
     INSERT INTO web.settings (name, value) VALUES ('minimum_password_length', '12');
-    ALTER TABLE web.hierarchy ALTER COLUMN multiple DROP DEFAULT;
-    ALTER TABLE web.hierarchy ALTER COLUMN multiple TYPE bool USING multiple::bool;
-    ALTER TABLE web.hierarchy ALTER COLUMN multiple SET DEFAULT FALSE;
-    ALTER TABLE web.hierarchy ALTER COLUMN system DROP DEFAULT;
-    ALTER TABLE web.hierarchy ALTER COLUMN system TYPE bool USING system::bool;
-    ALTER TABLE web.hierarchy ALTER COLUMN system SET DEFAULT FALSE;
-    ALTER TABLE web.hierarchy ALTER COLUMN extendable DROP DEFAULT;
-    ALTER TABLE web.hierarchy ALTER COLUMN extendable TYPE bool USING extendable::bool;
-    ALTER TABLE web.hierarchy ALTER COLUMN extendable SET DEFAULT FALSE;
-    ALTER TABLE web.hierarchy ALTER COLUMN directional DROP DEFAULT;
-    ALTER TABLE web.hierarchy ALTER COLUMN directional TYPE bool USING directional::bool;
-    ALTER TABLE web.hierarchy ALTER COLUMN directional SET DEFAULT FALSE;
-    ALTER TABLE ONLY web.hierarchy ADD CONSTRAINT hierarchy_name_key UNIQUE (name);
     DROP TRIGGER IF EXISTS on_delete_link_property ON model.link_property;
     DROP TRIGGER IF EXISTS on_delete_link ON model.link;
     DROP FUNCTION IF EXISTS model.delete_dates();
@@ -90,4 +77,45 @@ enter them in "Settings" (intro and contact; faq was removed) again after execut
     ALTER FUNCTION model.delete_dates() OWNER TO openatlas;
     CREATE TRIGGER on_delete_link AFTER DELETE ON model.link FOR EACH ROW EXECUTE PROCEDURE model.delete_dates();
     CREATE TRIGGER on_delete_link_property AFTER DELETE ON model.link_property FOR EACH ROW EXECUTE PROCEDURE model.delete_dates();
+
+    -- Types
+
+    ALTER TABLE model.entity ADD COLUMN system_type text;
+
+    -- Source Type
+
+    UPDATE web.hierarchy SET extendable = True, system = False WHERE name = 'Linguistic object classification';
+
+    UPDATE model.entity SET system_type = 'source content'
+    WHERE id IN (
+        SELECT e.id FROM model.entity e
+        JOIN model.link l ON e.id = l.domain_id AND l.range_id = (SELECT id FROM model.entity WHERE name = 'Source Content'));
+
+    UPDATE model.entity SET system_type = 'source translation'
+    WHERE id IN (
+        SELECT e.id FROM model.entity e
+        JOIN model.link l ON e.id = l.range_id AND l.property_id = (SELECT id FROM model.property WHERE code = 'P73'));
+
+    DELETE FROM model.entity WHERE id = (SELECT id FROM model.entity WHERE name = 'Source Content');
+    UPDATE model.entity SET name = 'Source translation' WHERE id = (SELECT id FROM model.entity WHERE name = 'Linguistic object classification');
+    UPDATE web.hierarchy SET name = 'Source translation' WHERE name = 'Linguistic object classification';
+    UPDATE model.entity SET name = 'Original text' WHERE id = (SELECT id FROM model.entity WHERE name = 'Source Original Text');
+    UPDATE model.entity SET name = 'Translation' WHERE id = (SELECT id FROM model.entity WHERE name = 'Source Translation');
+    UPDATE model.entity SET name = 'Transliteration' WHERE id = (SELECT id FROM model.entity WHERE name = 'Source Transliteration');
+    ((SELECT id FROM class WHERE code='E55'), 'Source Original Text'),
+
+    ALTER TABLE web.hierarchy ALTER COLUMN multiple DROP DEFAULT;
+    ALTER TABLE web.hierarchy ALTER COLUMN multiple TYPE bool USING multiple::bool;
+    ALTER TABLE web.hierarchy ALTER COLUMN multiple SET DEFAULT FALSE;
+    ALTER TABLE web.hierarchy ALTER COLUMN system DROP DEFAULT;
+    ALTER TABLE web.hierarchy ALTER COLUMN system TYPE bool USING system::bool;
+    ALTER TABLE web.hierarchy ALTER COLUMN system SET DEFAULT FALSE;
+    ALTER TABLE web.hierarchy ALTER COLUMN extendable DROP DEFAULT;
+    ALTER TABLE web.hierarchy ALTER COLUMN extendable TYPE bool USING extendable::bool;
+    ALTER TABLE web.hierarchy ALTER COLUMN extendable SET DEFAULT FALSE;
+    ALTER TABLE web.hierarchy ALTER COLUMN directional DROP DEFAULT;
+    ALTER TABLE web.hierarchy ALTER COLUMN directional TYPE bool USING directional::bool;
+    ALTER TABLE web.hierarchy ALTER COLUMN directional SET DEFAULT FALSE;
+    ALTER TABLE ONLY web.hierarchy ADD CONSTRAINT hierarchy_name_key UNIQUE (name);
+
     COMMIT;

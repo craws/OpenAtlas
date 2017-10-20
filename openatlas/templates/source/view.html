@@ -9,6 +9,11 @@
         <li>
             <a href="#tab-info">{{ _('info')|uc_first }}</a>
         </li>
+        <li>
+            <a href="#tab-translations">
+                {{ _('translations')|uc_first }} ({{ translations|length }})
+            </a>
+        </li>
     </ul>
     <div id="tab-info">
         <div class="button-bar">
@@ -26,6 +31,8 @@
         <h1>{{ source.name }}</h1>
         {{ data['info']|data_table }}
         {{ source|description }}
+    </div>
+    <div id="tab-translations">
     </div>
 </div>
 {% endblock %}

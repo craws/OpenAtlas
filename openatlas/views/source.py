@@ -1,5 +1,4 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-
 from flask import render_template, url_for, flash, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
@@ -29,7 +28,7 @@ def source_index():
         'name': 'source',
         'header': ['name', 'info'],
         'data': []}}
-    for source in EntityMapper.get_by_codes('E33'):
+    for source in EntityMapper.get_by_codes('E33', 'source content'):
         tables['source']['data'].append([
             link(source),
             truncate_string(source.description)])
@@ -41,7 +40,7 @@ def source_index():
 def source_insert():
     form = build_custom_form(SourceForm, 'Source')
     if form.validate_on_submit():
-        source = save(form, EntityMapper.insert('E33', form.name.data))
+        source = save(form, EntityMapper.insert('E33', form.name.data, 'source content'))
         flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
             return redirect(url_for('source_insert'))
@@ -55,7 +54,8 @@ def source_view(id_):
     source = EntityMapper.get_by_id(id_)
     data = {'info': []}
     append_node_data(data['info'], source)
-    return render_template('source/view.html', source=source, data=data)
+    translations = source.get_linked_entities('P73')
+    return render_template('source/view.html', source=source, data=data, translations=translations)
 
 
 @app.route('/source/delete/<int:id_>')
@@ -86,10 +86,5 @@ def save(form, entity):
     entity.description = form.description.data
     entity.update()
     entity.save_nodes(form)
-    from openatlas import NodeMapper
-    for node_id in NodeMapper.get_nodes('Linguistic object classification'):
-        if openatlas.nodes[node_id].name == 'Source Content':
-            entity.link('P2', node_id)
-            break
     openatlas.get_cursor().execute('COMMIT')
     return entity

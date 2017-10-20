@@ -18,12 +18,16 @@ class Entity(object):
                 self.nodes.append(openatlas.nodes[node_id])
         self.name = row.name
         self.description = row.description if row.description else ''
+        self.system_type = row.system_type
         self.created = row.created
         self.modified = row.modified
         self.first = int(row.first) if hasattr(row, 'first') and row.first else None
         self.last = int(row.last) if hasattr(row, 'last') and row.last else None
         self.class_ = openatlas.classes[row.class_id]
         self.dates = {}
+
+    def get_linked_entities(self, code):
+        return LinkMapper.get_linked_entities(self, code)
 
     def link(self, code, range_):
         LinkMapper.insert(self, code, range_)
@@ -47,7 +51,7 @@ class EntityMapper(object):
     sql = """
         SELECT
             e.id, e.class_id, e.name, e.description, e.created, e.modified, c.code,
-                e.value_timestamp, e.value_integer,
+                e.value_timestamp, e.value_integer, e.system_type,
             string_agg(CAST(t.id AS text), ',') AS types,
             min(date_part('year', d1.value_timestamp)) AS first,
             max(date_part('year', d2.value_timestamp)) AS last
@@ -83,19 +87,20 @@ class EntityMapper(object):
             'description': entity.description})
 
     @staticmethod
-    def insert(code, name, description=None, date=None):
+    def insert(code, name, system_type=None, description=None, date=None):
         if date:
             name = str(date)
         sql = """
-            INSERT INTO model.entity (name, description, class_id, value_timestamp) VALUES (
+            INSERT INTO model.entity (name, system_type, class_id, description, value_timestamp) VALUES (
                 %(name)s,
-                %(description)s,
+                %(system_type)s,
                 (SELECT id FROM model.class WHERE code = %(code)s),
                 %(value_timestamp)s
             ) RETURNING id;"""
         params = {
             'name': name.strip(),
             'code': code,
+            'system_type': system_type.strip() if system_type else None,
             'description': description.strip() if description else None,
             'value_timestamp': date}
         cursor = openatlas.get_cursor()
@@ -111,19 +116,38 @@ class EntityMapper(object):
         return Entity(cursor.fetchone())
 
     @staticmethod
-    def get_by_codes(codes):
-        class_ids = []
-        for code in codes if isinstance(codes, list) else [codes]:
-            class_ids.append(ClassMapper.get_by_code(code).id)
-        sql = EntityMapper.sql + """
-            WHERE e.class_id IN %(class_ids)s
-            GROUP BY e.id, c.code ORDER BY e.name;"""
+    def get_by_ids(entity_ids):
+        if not entity_ids:
+            return []
+        sql = EntityMapper.sql + ' WHERE e.id IN %(ids)s GROUP BY e.id, c.code ORDER BY e.name;'
         cursor = openatlas.get_cursor()
-        cursor.execute(sql, {'class_ids': tuple(class_ids)})
+        cursor.execute(sql, {'ids': tuple(entity_ids)})
+        openatlas.debug_model['by id'] += 1
         entities = []
         for row in cursor.fetchall():
             entities.append(Entity(row))
+        return entities
+
+    @staticmethod
+    def get_by_codes(codes, system_type=None):
+        class_ids = []
+        for code in codes if isinstance(codes, list) else [codes]:
+            class_ids.append(ClassMapper.get_by_code(code).id)
+        cursor = openatlas.get_cursor()
+        if system_type:
+            sql = EntityMapper.sql + """
+                WHERE e.class_id IN %(class_ids)s AND e.system_type = %(system_type)s
+                GROUP BY e.id, c.code ORDER BY e.name;"""
+            cursor.execute(sql, {'class_ids': tuple(class_ids), 'system_type': system_type})
+        else:
+            sql = EntityMapper.sql + """
+                WHERE e.class_id IN %(class_ids)s
+                GROUP BY e.id, c.code ORDER BY e.name;"""
+            cursor.execute(sql, {'class_ids': tuple(class_ids)})
         openatlas.debug_model['by codes'] += 1
+        entities = []
+        for row in cursor.fetchall():
+            entities.append(Entity(row))
         return entities
 
     @staticmethod

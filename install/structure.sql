@@ -587,7 +587,8 @@ CREATE TABLE entity (
     value_integer integer,
     value_timestamp timestamp without time zone,
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
+    modified timestamp without time zone,
+    system_type text
 );
 
 

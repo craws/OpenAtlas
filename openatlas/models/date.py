@@ -82,7 +82,7 @@ class DateMapper(object):
 
         if not date['year2'] and date['month'] and date['year']:  # exact date
             date_from = create_date_from_form(date)
-            exact_date_id = EntityMapper.insert('E61', '', description, date_from)
+            exact_date_id = EntityMapper.insert('E61', '', None, description, date_from)
             LinkMapper.insert(exact_date_id, 'P2', nodes['Exact date value'])
             LinkMapper.insert(entity.id, code, exact_date_id)
             return
@@ -98,9 +98,9 @@ class DateMapper(object):
                 date_from = create_date_from_form(date)
                 date_to = (date_from + relativedelta(years=1)) - datetime.timedelta(days=1)
 
-        date_from_id = EntityMapper.insert('E61', '', description, date_from)
+        date_from_id = EntityMapper.insert('E61', '', None, description, date_from)
         LinkMapper.insert(date_from_id, 'P2', nodes['From date value'])
         LinkMapper.insert(entity.id, code, date_from_id)
-        date_to_id = EntityMapper.insert('E61', '', '', date_to)
+        date_to_id = EntityMapper.insert('E61', '', None, '', date_to)
         LinkMapper.insert(date_to_id, 'P2', nodes['To date value'])
         LinkMapper.insert(entity.id, code, date_to_id)

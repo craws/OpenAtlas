@@ -46,8 +46,6 @@ class Network(object):
         for row in cursor.fetchall():
             if row.name == 'History of the World':
                 continue
-            if row.code == 'E53':
-                continue
             if row.name.startswith('Location of '):
                 row.name = row.name.replace('Location of ', '')
             if params['options']['orphans'] or row.id in entities:

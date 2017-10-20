@@ -19,6 +19,7 @@ class NodeMapper(EntityMapper):
                 e.name,
                 e.class_id,
                 e.description,
+                e.system_type,
                 e.created,
                 e.modified,
                 es.id AS super_id,
