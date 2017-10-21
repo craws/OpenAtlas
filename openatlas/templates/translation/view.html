@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('source_index') }}">{{ _('source')|uc_first }}</a>
+    > {{ source|link }}
+    > {{ translation.name }}
+{% endblock %}
+{% block content %}
+<div class="button-bar">
+    {% if 'editor'|is_authorized: %}
+        <a href="{{ url_for('translation_update', id_=translation.id) }}">
+            {{ _('edit')|uc_first }}
+        </a>
+        <a onclick="return confirm('{{ _('delete')|uc_first }} {{ translation.name.replace('\'', '') }}?')"
+           href="{{ url_for('translation_delete', id_=translation.id) }}">
+            {{ _('delete')|uc_first }}
+        </a>
+    {% endif %}
+</div>
+{{ data['info']|data_table }}
+{{ translation|description }}
+{% endblock %}
