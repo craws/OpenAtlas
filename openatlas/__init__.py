@@ -120,7 +120,7 @@ def before_request():
     debug_model['div sql'] = 0
 
 from openatlas.views import (actor, admin, ajax, content, index, settings, model, source, event,
-                             place, reference, node, user, login, profile)
+                             place, reference, node, user, login, profile, translation)
 
 app.register_blueprint(filters.blueprint)
 app.add_template_global(debug_model, 'debug_model')

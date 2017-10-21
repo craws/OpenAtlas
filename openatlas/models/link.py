@@ -37,6 +37,15 @@ class LinkMapper(object):
             openatlas.debug_model['div sql'] += 1
 
     @staticmethod
+    def get_linked_entity(entity, code, inverse=False):
+        result = LinkMapper.get_linked_entities(entity, code, inverse)
+        if len(result) > 1:
+            1/0  # Todo: do something
+        if result:
+            return result[0]
+        return
+
+    @staticmethod
     def get_linked_entities(entity, codes, inverse=False):
         codes = codes if isinstance(codes, list) else [codes]
         cursor = openatlas.get_cursor()
@@ -47,9 +56,10 @@ class LinkMapper(object):
             WHERE domain_id = %(entity_id)s;"""
         if inverse:
             sql = """
-                SELECT domain_id AS result_id
-                FROM model.link
-                WHERE range_id = %(entity_id)s AND property_id IN %(property_ids)s;"""
+                SELECT l.domain_id AS result_id
+                FROM model.link l
+                JOIN model.property p ON l.property_id = p.id AND p.code IN %(codes)s
+                WHERE l.range_id = %(entity_id)s;"""
         cursor.execute(sql, {'entity_id': entity.id, 'codes': tuple(codes)})
         openatlas.debug_model['div sql'] += 1
         ids = [element for (element,) in cursor.fetchall()]

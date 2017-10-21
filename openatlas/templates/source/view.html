@@ -11,7 +11,7 @@
         </li>
         <li>
             <a href="#tab-translations">
-                {{ _('translations')|uc_first }} ({{ translations|length }})
+                {{ _('translations')|uc_first }} ({{ tables['translation']['data']|length }})
             </a>
         </li>
     </ul>
@@ -33,6 +33,14 @@
         {{ source|description }}
     </div>
     <div id="tab-translations">
+        {% if 'editor'|is_authorized: %}
+            <div class="button-bar">
+                <a href="{{ url_for('translation_insert', source_id=source.id) }}">
+                    + {{ _('translation')|uc_first }}
+                </a>
+            </div>
+        {% endif %}
+        {{ tables['translation']|pager }}
     </div>
 </div>
 {% endblock %}

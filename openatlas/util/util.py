@@ -20,10 +20,20 @@ from openatlas.models.user import User
 
 
 def sanitize(string):
+    """Remove all characters from a string except letters and numbers"""
     return re.sub('[^A-Za-z0-9]+', '', string)
 
 
+def print_base_type(entity, root_name):
+    root_id = openatlas.NodeMapper.get_hierarchy_by_name(root_name).id
+    for node in entity.nodes:
+        if node.root[0] == root_id:
+            return node.name
+    return ''
+
+
 def append_node_data(data, entity):
+    """Append additional entity information to a data table for view"""
     # nodes
     type_data = OrderedDict()
     for node in entity.nodes:
@@ -167,8 +177,11 @@ def link(entity):
         html = '<a href="' + url + '">' + entity.code + '</a>'
     elif isinstance(entity, Entity):
         url = ''
-        if entity.class_.code == 'E33':  # Todo: what if E33 is a translation or the like?
-            url = url_for('source_view', id_=entity.id)
+        if entity.class_.code == 'E33':
+            if entity.system_type == 'source content':
+                url = url_for('source_view', id_=entity.id)
+            elif entity.system_type == 'source translation':
+                url = url_for('translation_view', id_=entity.id)
         elif entity.class_.code in ('E7', 'E8', 'E12', 'E6'):
             url = url_for('event_view', id_=entity.id)
         elif entity.class_.code in ('E21', 'E74', 'E40'):

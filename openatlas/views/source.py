@@ -10,7 +10,8 @@ import openatlas
 from openatlas import app
 from openatlas.forms import build_custom_form
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import uc_first, link, truncate_string, required_group, append_node_data
+from openatlas.util.util import (uc_first, link, truncate_string, required_group, append_node_data,
+                                 print_base_type)
 
 
 class SourceForm(Form):
@@ -26,11 +27,12 @@ class SourceForm(Form):
 def source_index():
     tables = {'source': {
         'name': 'source',
-        'header': ['name', 'info'],
+        'header': ['name', 'type', 'info'],
         'data': []}}
     for source in EntityMapper.get_by_codes('E33', 'source content'):
         tables['source']['data'].append([
             link(source),
+            print_base_type(source, 'Source'),
             truncate_string(source.description)])
     return render_template('source/index.html', tables=tables)
 
@@ -54,8 +56,16 @@ def source_view(id_):
     source = EntityMapper.get_by_id(id_)
     data = {'info': []}
     append_node_data(data['info'], source)
-    translations = source.get_linked_entities('P73')
-    return render_template('source/view.html', source=source, data=data, translations=translations)
+    tables = {'translation': {
+        'name': 'translation',
+        'header': ['translations', 'type', 'text'],
+        'data': []}}
+    for translation in source.get_linked_entities('P73'):
+        tables['translation']['data'].append([
+            link(translation),
+            translation.nodes[0].name if translation.nodes else '',
+            truncate_string(translation.description)])
+    return render_template('source/view.html', source=source, data=data, tables=tables)
 
 
 @app.route('/source/delete/<int:id_>')

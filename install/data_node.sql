@@ -295,13 +295,11 @@ INSERT INTO entity (class_id, name, description) VALUES (
 );
 
 INSERT INTO entity (class_id, name) VALUES
-((SELECT id FROM class WHERE code='E55'), 'Comment'),
 ((SELECT id FROM class WHERE code='E55'), 'Original Text'),
 ((SELECT id FROM class WHERE code='E55'), 'Translation'),
 ((SELECT id FROM class WHERE code='E55'), 'Transliteration');
 
 INSERT INTO link (property_id, range_id, domain_id) VALUES
-((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Source translation'), (SELECT id FROM entity WHERE name='Comment')),
 ((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Source translation'), (SELECT id FROM entity WHERE name='Original Text')),
 ((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Source translation'), (SELECT id FROM entity WHERE name='Translation')),
 ((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Source translation'), (SELECT id FROM entity WHERE name='Transliteration'));
@@ -352,7 +350,8 @@ INSERT INTO web.form (name, extendable) VALUES
 ('Information Carrier', 1),
 ('Actor Actor Relation', 0),
 ('Involvement', 0),
-('Member', 0)
+('Member', 0),
+('Source translation', 0)
 ;
 
 INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
@@ -367,5 +366,6 @@ INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Information Carrier'),(SELECT id FROM web.form WHERE name LIKE 'Information Carrier')),
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Actor Actor Relation'),(SELECT id FROM web.form WHERE name LIKE 'Actor Actor Relation')),
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Involvement'),(SELECT id FROM web.form WHERE name LIKE 'Involvement')),
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Actor Function'),(SELECT id FROM web.form WHERE name LIKE 'Member'))
+((SELECT id FROM web.hierarchy WHERE name LIKE 'Actor Function'),(SELECT id FROM web.form WHERE name LIKE 'Member')),
+((SELECT id FROM web.hierarchy WHERE name LIKE 'Source translation'),(SELECT id FROM web.form WHERE name LIKE 'Source translation'))
 ;

@@ -84,7 +84,7 @@ enter them in "Settings" (intro and contact; faq was removed) again after execut
 
     -- Source Type
 
-    UPDATE web.hierarchy SET extendable = True, system = False WHERE name = 'Linguistic object classification';
+    UPDATE web.hierarchy SET extendable = True WHERE name = 'Linguistic object classification';
 
     UPDATE model.entity SET system_type = 'source content'
     WHERE id IN (
@@ -102,7 +102,13 @@ enter them in "Settings" (intro and contact; faq was removed) again after execut
     UPDATE model.entity SET name = 'Original text' WHERE id = (SELECT id FROM model.entity WHERE name = 'Source Original Text');
     UPDATE model.entity SET name = 'Translation' WHERE id = (SELECT id FROM model.entity WHERE name = 'Source Translation');
     UPDATE model.entity SET name = 'Transliteration' WHERE id = (SELECT id FROM model.entity WHERE name = 'Source Transliteration');
-    ((SELECT id FROM class WHERE code='E55'), 'Source Original Text'),
+
+    INSERT INTO web.form (name, extendable) VALUES ('Source translation', 0);
+    INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
+        ((SELECT id FROM web.hierarchy WHERE name LIKE 'Source translation'),(SELECT id FROM web.form WHERE name LIKE 'Source translation'));
+
+    -- Rest
+
 
     ALTER TABLE web.hierarchy ALTER COLUMN multiple DROP DEFAULT;
     ALTER TABLE web.hierarchy ALTER COLUMN multiple TYPE bool USING multiple::bool;
