@@ -10,8 +10,7 @@ import openatlas
 from openatlas import app
 from openatlas.forms import build_custom_form
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import uc_first, link, truncate_string, required_group, append_node_data, \
-    print_base_type
+from openatlas.util.util import uc_first, required_group, append_node_data
 
 
 class TranslationForm(Form):
@@ -27,6 +26,12 @@ class TranslationForm(Form):
 def translation_insert(source_id):
     source = EntityMapper.get_by_id(source_id)
     form = build_custom_form(TranslationForm, 'Source translation')
+    if form.validate_on_submit():
+        translation = save(form, None, source)
+        flash(_('entity created'), 'info')
+        if form.continue_.data == 'yes':
+            return redirect(url_for('translation_insert', source_id=source.id))
+        return redirect(url_for('translation_view', id_=translation.id))
     return render_template('translation/insert.html', source=source, form=form)
 
 
@@ -44,18 +49,41 @@ def translation_view(id_):
         data=data)
 
 
-@app.route('/translation/delete/<int:id_>')
+@app.route('/translation/delete/<int:id_>/<int:source_id>')
 @required_group('editor')
-def translation_delete(id_):
+def translation_delete(id_, source_id):
     openatlas.get_cursor().execute('BEGIN')
     EntityMapper.delete(id_)
     openatlas.get_cursor().execute('COMMIT')
     flash(_('entity deleted'), 'info')
-    return redirect(url_for('source_index'))
+    return redirect(url_for('source_view', id_=source_id))
 
 
 @app.route('/translation/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
 def translation_update(id_):
     translation = EntityMapper.get_by_id(id_)
-    return render_template('translation/update.html', translation=translation)
+    source = translation.get_linked_entity('P73', True)
+    form = build_custom_form(TranslationForm, 'Source translation', translation, request)
+    if form.validate_on_submit():
+        save(form, translation)
+        flash(_('info update'), 'info')
+        return redirect(url_for('translation_view', id_=translation.id))
+    return render_template(
+        'translation/update.html',
+        translation=translation,
+        source=source,
+        form=form)
+
+
+def save(form, entity=None, source=None):
+    openatlas.get_cursor().execute('BEGIN')
+    if not entity:
+        entity = EntityMapper.insert('E33', form.name.data, 'source translation')
+        source.link('P73', entity)
+    entity.name = form.name.data
+    entity.description = form.description.data
+    entity.update()
+    entity.save_nodes(form)
+    openatlas.get_cursor().execute('COMMIT')
+    return entity

@@ -94,10 +94,17 @@ class EntityMapper(object):
         if date:
             name = str(date)
         sql = """
-            INSERT INTO model.entity (name, system_type, class_id, description, value_timestamp) VALUES (
+            INSERT INTO model.entity (
+                name,
+                system_type,
+                class_id,
+                description,
+                value_timestamp)
+            VALUES (
                 %(name)s,
                 %(system_type)s,
                 (SELECT id FROM model.class WHERE code = %(code)s),
+                %(description)s,
                 %(value_timestamp)s
             ) RETURNING id;"""
         params = {

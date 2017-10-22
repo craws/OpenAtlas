@@ -60,7 +60,7 @@ class TreeSelect(HiddenInput):
         selected_ids = []
         if field.data:
             field.data = field.data[0] if isinstance(field.data, list) else field.data
-            selection = openatlas.nodes[field.data].name
+            selection = openatlas.nodes[int(field.data)].name
             selected_ids.append(openatlas.nodes[field.data].id)
         html = """
             <input id="{name}-button" name="{name}-button" type="text"
