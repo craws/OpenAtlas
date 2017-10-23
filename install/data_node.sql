@@ -313,7 +313,7 @@ INSERT INTO web.hierarchy (id, name, multiple, system, extendable, directional) 
 ((SELECT id FROM entity WHERE name='Actor Actor Relation'), 'Actor Actor Relation', False, True, True, True),
 ((SELECT id FROM entity WHERE name='Actor Function'), 'Actor Function', False, True, True, False),
 ((SELECT id FROM entity WHERE name='Involvement'), 'Involvement', False, True, True, False),
-((SELECT id FROM entity WHERE name='Sex'), 'Sex', False, True, True, False),
+((SELECT id FROM entity WHERE name='Sex'), 'Sex', False, False, True, False),
 ((SELECT id FROM entity WHERE name='Site'), 'Site', False, True, True, False),
 ((SELECT id FROM entity WHERE name='Information Carrier'), 'Information Carrier', False, True, True, False),
 ((SELECT id FROM entity WHERE name='Bibliography'), 'Bibliography', False, True, True, False),

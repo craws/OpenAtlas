@@ -46,11 +46,10 @@ class Network(object):
         for row in cursor.fetchall():
             if row.name == 'History of the World':
                 continue
-            if row.name.startswith('Location of '):
-                row.name = row.name.replace('Location of ', '')
+            name = row.name.replace("'", "").replace('Location of ', '')
             if params['options']['orphans'] or row.id in entities:
                 entities_already.append(row.id)
-                nodes += "{'id':'" + str(row.id) + "', 'name':'" + row.name.replace("'", '')
+                nodes += "{'id':'" + str(row.id) + "', 'name':'" + name
                 nodes += "', 'color':'" + params['classes'][row.code]['color'] + "'},"
         # Get elements of links which weren't present in class selection
         array_diff = Network.diff(entities, entities_already)
@@ -62,6 +61,7 @@ class Network(object):
             cursor = openatlas.get_cursor()
             cursor.execute(sql, {'array_diff': tuple(array_diff)})
             for row in cursor.fetchall():
-                nodes += "{'id':'" + str(row.id) + "', 'name':'" + row.name.replace("'", "")
+                name = row.name.replace("'", "").replace('Location of ', '')
+                nodes += "{'id':'" + str(row.id) + "', 'name':'" + name
                 nodes += "', 'color':'" + params['classes'][row.code]['color'] + "'},"
         return "graph = {'nodes': [" + nodes + "], " + edges + "};"
