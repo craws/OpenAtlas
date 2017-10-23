@@ -43,7 +43,6 @@ class LinkMapper(object):
             1/0  # Todo: do something
         if result:
             return result[0]
-        return
 
     @staticmethod
     def get_linked_entities(entity, codes, inverse=False):

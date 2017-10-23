@@ -10,6 +10,8 @@ class SettingsTests(TestBaseCase):
     def test_settings(self):
         with app.app_context():
             self.login()
+            rv = self.app.get(url_for('admin_index'))
+            assert b'User' in rv.data
             rv = self.app.get(url_for('settings_index'))
             assert b'Edit' in rv.data
             rv = self.app.get(url_for('settings_update'))

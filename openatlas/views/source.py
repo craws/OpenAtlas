@@ -10,6 +10,7 @@ import openatlas
 from openatlas import app
 from openatlas.forms import build_custom_form
 from openatlas.models.entity import EntityMapper
+from openatlas.models.link import LinkMapper
 from openatlas.util.util import (uc_first, link, truncate_string, required_group, append_node_data,
                                  print_base_type)
 
@@ -71,8 +72,11 @@ def source_view(id_):
 @app.route('/source/delete/<int:id_>')
 @required_group('editor')
 def source_delete(id_):
+    source = EntityMapper.get_by_id(id_)
     openatlas.get_cursor().execute('BEGIN')
-    EntityMapper.delete(id_)
+    for translation in source.get_linked_entities('P73'):
+        EntityMapper.delete(translation.id)
+    EntityMapper.delete(source.id)
     openatlas.get_cursor().execute('COMMIT')
     flash(_('entity deleted'), 'info')
     return redirect(url_for('source_index'))

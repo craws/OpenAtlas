@@ -37,7 +37,7 @@ As postgres
 Uncomment "CREATE EXTENSION postgis;" in top off install/structure.sql
 
     $ cd install
-    $ cat structure.sql data_web.sql data_model.sql | psql -d openatlas -f -
+    $ cat structure.sql data_web.sql data_model.sql data_node.sql | psql -d openatlas -f -
 
 Optional: create database openatlas_test for tests
 
