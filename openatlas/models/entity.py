@@ -91,8 +91,6 @@ class EntityMapper(object):
 
     @staticmethod
     def insert(code, name, system_type=None, description=None, date=None):
-        if date:
-            name = str(date)
         sql = """
             INSERT INTO model.entity (
                 name,
@@ -108,7 +106,7 @@ class EntityMapper(object):
                 %(value_timestamp)s
             ) RETURNING id;"""
         params = {
-            'name': name.strip(),
+            'name': date if date else name.strip(),
             'code': code,
             'system_type': system_type.strip() if system_type else None,
             'description': description.strip() if description else None,

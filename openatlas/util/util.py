@@ -57,15 +57,15 @@ def append_node_data(data, entity):
         ('OA6', _('end'))])
     for code, label in date_types.items():
         if code in entity.dates:
-            if 'Exact date value' in entity.dates[code]:
-                html = format_date(entity.dates[code]['Exact date value']['timestamp'])
-                html += ' ' + entity.dates[code]['Exact date value']['info']
+            if 'exact date value' in entity.dates[code]:
+                html = format_date(entity.dates[code]['exact date value']['timestamp'])
+                html += ' ' + entity.dates[code]['exact date value']['info']
                 data.append((uc_first(label), html))
             else:
                 html = uc_first(_('between')) + ' '
-                html += format_date(entity.dates[code]['From date value']['timestamp'])
-                html += ' and ' + format_date(entity.dates[code]['To date value']['timestamp'])
-                html += ' ' + entity.dates[code]['From date value']['info']
+                html += format_date(entity.dates[code]['from date value']['timestamp'])
+                html += ' and ' + format_date(entity.dates[code]['to date value']['timestamp'])
+                html += ' ' + entity.dates[code]['from date value']['info']
                 data.append((uc_first(label), html))
     return data
 

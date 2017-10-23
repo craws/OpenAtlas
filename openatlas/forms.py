@@ -219,7 +219,7 @@ class DateForm(Form):
         for code, types in entity.dates.items():
             if code in ['OA1', 'OA3', 'OA5']:
                 for type_, date in types.items():
-                    if type_ in ['Exact date value', 'From date value']:
+                    if type_ in ['exact date value', 'from date value']:
                         self.date_begin_year.data = date['timestamp'].year
                         self.date_begin_month.data = date['timestamp'].month
                         self.date_begin_day.data = date['timestamp'].day
@@ -230,7 +230,7 @@ class DateForm(Form):
                         self.date_begin_day2.data = date['timestamp'].day
             else:
                 for type_, date in types.items():
-                    if type_ in ['Exact date value', 'From date value']:
+                    if type_ in ['exact date value', 'from date value']:
                         self.date_end_year.data = date['timestamp'].year
                         self.date_end_month.data = date['timestamp'].month
                         self.date_end_day.data = date['timestamp'].day

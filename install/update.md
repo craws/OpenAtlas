@@ -107,6 +107,26 @@ enter them in "Settings" (intro and contact; faq was removed) again after execut
     INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
         ((SELECT id FROM web.hierarchy WHERE name LIKE 'Source translation'),(SELECT id FROM web.form WHERE name LIKE 'Source translation'));
 
+    -- Date Type
+
+    UPDATE model.entity SET system_type = 'exact date value'
+    WHERE id IN (
+        SELECT e.id FROM model.entity e
+        JOIN model.link l ON e.id = l.domain_id AND l.range_id = (SELECT id FROM model.entity WHERE name = 'Exact date value'));
+    UPDATE model.entity SET system_type = 'from date value'
+    WHERE id IN (
+        SELECT e.id FROM model.entity e
+        JOIN model.link l ON e.id = l.domain_id AND l.range_id = (SELECT id FROM model.entity WHERE name = 'From date value'));
+    UPDATE model.entity SET system_type = 'to date value'
+    WHERE id IN (
+        SELECT e.id FROM model.entity e
+        JOIN model.link l ON e.id = l.domain_id AND l.range_id = (SELECT id FROM model.entity WHERE name = 'To date value'));
+
+    DELETE FROM model.entity WHERE id = (SELECT id FROM model.entity WHERE name = 'To date value');
+    DELETE FROM model.entity WHERE id = (SELECT id FROM model.entity WHERE name = 'Exact date value');
+    DELETE FROM model.entity WHERE id = (SELECT id FROM model.entity WHERE name = 'From date value');
+    DELETE FROM model.entity WHERE id = (SELECT id FROM model.entity WHERE name = 'Date value type');
+
     -- Rest
 
 

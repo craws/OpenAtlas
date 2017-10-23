@@ -304,21 +304,6 @@ INSERT INTO link (property_id, range_id, domain_id) VALUES
 ((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Source translation'), (SELECT id FROM entity WHERE name='Translation')),
 ((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Source translation'), (SELECT id FROM entity WHERE name='Transliteration'));
 
------------------
--- System Types --
------------------
-
-INSERT INTO entity (class_id, name) VALUES
-((SELECT id FROM class WHERE code='E55'), 'Date value type'),
-((SELECT id FROM class WHERE code='E55'), 'Exact date value'),
-((SELECT id FROM class WHERE code='E55'), 'From date value'),
-((SELECT id FROM class WHERE code='E55'), 'To date value');
-
-INSERT INTO link (property_id, range_id, domain_id) VALUES
-((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Date value type'), (SELECT id FROM entity WHERE name='Exact date value')),
-((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Date value type'), (SELECT id FROM entity WHERE name='From date value')),
-((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Date value type'), (SELECT id FROM entity WHERE name='To date value'));
-
 -------------------------------
 -- Web hierarchies and forms --
 -------------------------------
@@ -333,7 +318,6 @@ INSERT INTO web.hierarchy (id, name, multiple, system, extendable, directional) 
 ((SELECT id FROM entity WHERE name='Information Carrier'), 'Information Carrier', False, True, True, False),
 ((SELECT id FROM entity WHERE name='Bibliography'), 'Bibliography', False, True, True, False),
 ((SELECT id FROM entity WHERE name='Edition'), 'Edition', False, True, True, False),
-((SELECT id FROM entity WHERE name='Date value type'), 'Date value type', False, True, False, False),
 ((SELECT id FROM entity WHERE name='Source translation'), 'Source translation', False, False, True, False),
 ((SELECT id FROM entity WHERE name='Administrative Unit'), 'Administrative Unit', True, True, True, False),
 ((SELECT id FROM entity WHERE name='Historical Place'), 'Historical Place', True, True, True, False);
