@@ -44,12 +44,12 @@ def get_cursor():
     return connection.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
 
 
-try:  # Todo: better way to use different configs (e.g production and testing)
+try:
     import mod_wsgi
-    connection = connect('production')  # pragma: no cover
 except ImportError:
-    app.config['SERVER_NAME'] = 'localhost'
-    connection = connect('testing')
+    pass
+
+connection = connect()
 
 app.config.from_object('config.default')  # load config/default.py
 app.config.from_pyfile('config.py')  # load instance/config.py

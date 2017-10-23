@@ -24,7 +24,7 @@ INSERT INTO link (property_id, range_id, domain_id) VALUES
 ---------------
 INSERT INTO entity (class_id, name, description) VALUES (
     (SELECT id FROM class WHERE code='E55'),
-    'Bibliography'),
+    'Bibliography',
     'Categories for bibliographical entries as used for example in BibTeX, e.g. Book, Inbook, Article etc.'
 );
 
@@ -43,7 +43,7 @@ INSERT INTO link (property_id, range_id, domain_id) VALUES
 ----------
 INSERT INTO entity (class_id, name, description) VALUES (
     (SELECT id FROM class WHERE code='E55'),
-    'Edition'),
+    'Edition',
     'Categories for the classification of written sources'' editions like charter editions, chronicle edition etc.'
 );
 
@@ -60,7 +60,7 @@ INSERT INTO link (property_id, range_id, domain_id) VALUES
 -----------------
 -- Actor Function
 -----------------
-INSERT INTO entity (class_id, name) VALUES (
+INSERT INTO entity (class_id, name, description) VALUES (
     (SELECT id FROM class WHERE code='E55'),
     'Actor Function',
     'Definitions of an actor''s function within a group or legal body. An actor can for example be member of a legal body and this membership is defined by a certain function during a certain period of time. E.g. actor "Charlemagne" is member of the legal body "Frankish Reign" from 768 to 814 in the function of "King" and he is member of the legal body "Roman Empire" from 800 to 814 in the function "Emperor".'
