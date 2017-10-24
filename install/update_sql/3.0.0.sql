@@ -105,6 +105,31 @@ DELETE FROM model.entity WHERE id = (SELECT id FROM model.entity WHERE name = 'E
 DELETE FROM model.entity WHERE id = (SELECT id FROM model.entity WHERE name = 'From date value');
 DELETE FROM model.entity WHERE id = (SELECT id FROM model.entity WHERE name = 'Date value type');
 
+-- References
+
+UPDATE model.entity SET system_type = 'information carrier'
+WHERE id IN (SELECT e.id FROM model.entity e JOIN model.class c ON e.class_id = c.id AND c.code = 'E84');
+
+UPDATE model.entity e SET system_type = 'edition'
+WHERE id IN (
+    SELECT e2.id FROM model.entity e2
+    JOIN model.link l ON e2.id = l.domain_id
+        AND l.property_id = (SELECT id FROM model.property WHERE code = 'P2')
+        AND (l.range_id = (SELECT id FROM model.entity WHERE name = 'Edition')
+            OR l.range_id IN (
+            SELECT e.id FROM model.entity e
+            JOIN model.link l ON e.id = l.domain_id AND l.range_id = (SELECT id FROM model.entity WHERE name = 'Edition'))));
+
+UPDATE model.entity e SET system_type = 'bibliography'
+WHERE id IN (
+    SELECT e2.id FROM model.entity e2
+    JOIN model.link l ON e2.id = l.domain_id
+        AND l.property_id = (SELECT id FROM model.property WHERE code = 'P2')
+        AND (l.range_id = (SELECT id FROM model.entity WHERE name = 'Bibliography')
+            OR l.range_id IN (
+            SELECT e.id FROM model.entity e
+            JOIN model.link l ON e.id = l.domain_id AND l.range_id = (SELECT id FROM model.entity WHERE name = 'Bibliography'))));
+
 -- Location of places
 UPDATE model.entity SET system_type = 'place location' WHERE name LIKE 'Location of%' AND class_id = (SELECT id FROM model.class WHERE code = 'E53');
 

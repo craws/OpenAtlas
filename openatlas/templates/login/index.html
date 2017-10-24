@@ -5,4 +5,9 @@
 {% endblock %}
 {% block content %}
     {{ form|display_form('login-form') }}
+    <script>
+        $(function () {
+            $("#username").focus();
+        });
+    </script>
 {% endblock %}

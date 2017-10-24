@@ -10,7 +10,8 @@ import openatlas
 from openatlas import app
 from openatlas.forms import build_custom_form
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import uc_first, link, truncate_string, required_group, append_node_data
+from openatlas.util.util import uc_first, link, truncate_string, required_group, append_node_data, \
+    print_base_type
 
 
 class ReferenceForm(Form):
@@ -35,16 +36,14 @@ def reference_view(id_):
 def reference_index():
     tables = {'reference': {
         'name': 'reference',
-        'header': ['name', 'class', 'info'],
+        'header': ['name', 'class', 'type', 'info'],
         'data': []}}
     for reference in EntityMapper.get_by_codes(['E31', 'E84']):
-        if openatlas.classes[reference.class_.id].code == 'E84':
-            class_name = openatlas.classes[reference.class_.id].name
-        else:
-            class_name = 'Bibliography or Edition (to do)'
+        class_name = _(reference.system_type).title()
         tables['reference']['data'].append([
             link(reference),
             class_name,
+            print_base_type(reference, reference.system_type.title()),
             truncate_string(reference.description)])
     return render_template('reference/index.html', tables=tables)
 
@@ -55,8 +54,12 @@ def reference_insert(code):
     form_code = 'Information Carrier' if code == 'carrier' else uc_first(code)
     form = build_custom_form(ReferenceForm, uc_first(form_code))
     if form.validate_on_submit():
-        class_code = 'E84' if code == 'carrier' else 'E31'
-        reference = save(form, EntityMapper.insert(class_code, form.name.data))
+        class_code = 'E31'
+        system_type = code
+        if code == 'carrier':
+            class_code = 'E84'
+            system_type = 'information carrier'
+        reference = save(form, EntityMapper.insert(class_code, form.name.data, system_type))
         flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
             return redirect(url_for('reference_insert', code=code))
@@ -78,8 +81,7 @@ def reference_delete(id_):
 @required_group('editor')
 def reference_update(id_):
     reference = EntityMapper.get_by_id(id_)
-    # Todo: find out which form is needed
-    form = build_custom_form(ReferenceForm, 'Information Carrier', reference, request)
+    form = build_custom_form(ReferenceForm, reference.system_type.title(), reference, request)
     if form.validate_on_submit():
         save(form, reference)
         flash(_('info update'), 'info')

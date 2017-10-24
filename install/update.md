@@ -6,7 +6,8 @@ Replace database role "openatlas" if needed.
 
 ### 2.4.1 to 3.0.0 Upgrade (PHP to Python upgrade)
 
-Be sure to have upgraded the database to the PHP Version 2.3.2
+Be sure to have upgraded the database to the PHP Version 2.3.2 and have read this document before
+upgrading the database.
 
 #### Passwords
 
@@ -22,6 +23,11 @@ Website text translations where completely rewritten.
 
 Please backup your text translations at "Content" in the web interface and
 enter them in "Settings" (intro and contact; faq was removed) again after upgrading.
+
+#### Edition and Bibliography
+
+Edition and bibliography types are only checked one level deep. Meaning if your
+edition/bibliography subtypes have also subtypes you have to remove them or adapt the SQL.
 
 #### Database update
 
