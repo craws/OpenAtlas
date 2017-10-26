@@ -156,7 +156,9 @@ class NodeMapper(EntityMapper):
     @staticmethod
     def save_entity_nodes(entity, form):
 
-        if hasattr(entity, 'nodes'):  # Todo: don't delete/save if not changed
+        # Todo: don't delete/save if not changed
+        # Todo: just delete node ids?
+        if hasattr(entity, 'nodes'):
             entity.delete_links(['P2', 'P89'])
 
         for field in form:
