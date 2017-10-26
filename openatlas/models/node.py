@@ -155,23 +155,20 @@ class NodeMapper(EntityMapper):
 
     @staticmethod
     def save_entity_nodes(entity, form):
-        # Todo: don't delete/save if not changed
-        if hasattr(entity, 'nodes'):
-            sql = """
-                    DELETE FROM model.link
-                    WHERE domain_id = %(entity_id)s AND property_id = %(property_id)s"""
-            openatlas.get_cursor().execute(sql, {
-                'entity_id': entity.id,
-                'property_id': openatlas.has_type_id})
+
+        if hasattr(entity, 'nodes'):  # Todo: don't delete/save if not changed
+            entity.delete_links(['P2', 'P89'])
+
         for field in form:
             if isinstance(field, (TreeField, TreeMultiField)) and field.data:
                 try:
                     range_param = int(field.data)
-                    node_class = openatlas.classes[openatlas.nodes[range_param].class_.id].code
                 except ValueError:
                     range_param = ast.literal_eval(field.data)
-                    if range_param:
-                        node_class = openatlas.classes[openatlas.nodes[range_param].class_.id].code
-                    else:
-                        node_class = ''
-                entity.link('P2' if node_class == 'E55' else 'P127', range_param)
+                node = openatlas.nodes[int(field.id)]
+                if node.name in ['Administrative Unit', 'Historical Place']:
+                    if openatlas.classes[entity.class_.id].code == 'E53':
+                        entity.link('P89', range_param)
+                else:
+                    if openatlas.classes[entity.class_.id].code != 'E53':
+                        entity.link('P2', range_param)

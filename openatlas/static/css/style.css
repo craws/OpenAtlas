@@ -290,6 +290,10 @@ form div.table-row div.table-cell {
     text-align: left;
 }
 
+form div.table-row div.table-cell div {
+    margin-top: 0.3em;
+}
+
 label.error {
     padding-left: 0.5em;
 }

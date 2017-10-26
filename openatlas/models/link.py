@@ -63,3 +63,13 @@ class LinkMapper(object):
         openatlas.debug_model['div sql'] += 1
         ids = [element for (element,) in cursor.fetchall()]
         return openatlas.EntityMapper.get_by_ids(ids)
+
+    @staticmethod
+    def delete(entity, codes):
+        from openatlas import PropertyMapper
+        codes = codes if isinstance(codes, list) else [codes]
+        property_ids = []
+        for code in codes:
+            property_ids.append(PropertyMapper.get_by_code(code).id)
+        sql = "DELETE FROM model.link WHERE domain_id = %(id)s AND property_id IN %(property_ids)s;"
+        openatlas.get_cursor().execute(sql, {'id': entity.id, 'property_ids': tuple(property_ids)})

@@ -32,11 +32,12 @@ def print_base_type(entity, root_name):
     return ''
 
 
-def append_node_data(data, entity):
+def append_node_data(data, entity, entity2=None):
     """Append additional entity information to a data table for view"""
     # nodes
     type_data = OrderedDict()
-    for node in entity.nodes:
+    nodes = entity.nodes + (entity2.nodes if entity2 else [])
+    for node in nodes:
         if not node.root:
             continue
         root = openatlas.nodes[node.root[-1]]
@@ -45,8 +46,10 @@ def append_node_data(data, entity):
         if root.name not in type_data:
             type_data[root.name] = []
         type_data[root.name].append(node.name)
+    type_data = OrderedDict(sorted(type_data.items(), key=lambda t: t[0]))  # sort by name
     for root_name, nodes in type_data.items():
         data.append((root_name, '<br />'.join(nodes)))
+
     # dates
     date_types = OrderedDict([
         ('OA1', _('first')),

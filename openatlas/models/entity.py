@@ -26,7 +26,7 @@ class Entity(object):
         self.class_ = openatlas.classes[row.class_id]
         self.dates = {}
 
-    def get_linked_entity(self, code, inverse):
+    def get_linked_entity(self, code, inverse=False):
         return LinkMapper.get_linked_entity(self, code, inverse)
 
     def get_linked_entities(self, code, inverse=False):
@@ -34,6 +34,9 @@ class Entity(object):
 
     def link(self, code, range_):
         LinkMapper.insert(self, code, range_)
+
+    def delete_links(self, codes):
+        LinkMapper.delete(self, codes)
 
     def update(self):
         EntityMapper.update(self)

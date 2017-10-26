@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
     <a href="{{ url_for('place_index') }}">{{ _('place')|uc_first }}</a>
-    > {{ place.name }}
+    > {{ object_.name }}
 {% endblock %}
 {% block content %}
 <div id="tabs" class="tabs-container">
@@ -13,19 +13,19 @@
     <div id="tab-info">
         <div class="button-bar">
             {% if 'editor'|is_authorized: %}
-                <a href="{{ url_for('place_update', id_=place.id) }}">
+                <a href="{{ url_for('place_update', id_=object_.id) }}">
                     {{ _('edit')|uc_first }}
                 </a>
-                <a onclick="return confirm('{{ _('delete')|uc_first }} {{ place.name.replace('\'', '') }}?')"
-                   href="{{ url_for('place_delete', id_=place.id) }}">
+                <a onclick="return confirm('{{ _('delete')|uc_first }} {{ object_.name.replace('\'', '') }}?')"
+                   href="{{ url_for('place_delete', id_=object_.id) }}">
                     {{ _('delete')|uc_first }}
                 </a>
             {% endif %}
-            {{ place.id|bookmark_toggle }}
+            {{ object_.id|bookmark_toggle }}
         </div>
-        <h1>{{ place.name }}</h1>
+        <h1>{{ object_.name }}</h1>
         {{ data['info']|data_table }}
-        {{ place|description }}
+        {{ object_|description }}
     </div>
 </div>
 {% endblock %}

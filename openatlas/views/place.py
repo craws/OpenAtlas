@@ -41,23 +41,23 @@ def place_index():
 def place_insert():
     form = build_custom_form(PlaceForm, 'Place')
     if form.validate_on_submit():
-        object = save(form, EntityMapper.insert('E18', form.name.data))
-        place = save(form, EntityMapper.insert('E18', form.name.data))
+        object_ = save(form)
         flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
             return redirect(url_for('place_insert', code='E18'))
-        return redirect(url_for('place_view', id_=place.id))
+        return redirect(url_for('place_view', id_=object_.id))
     return render_template('place/insert.html', form=form)
 
 
 @app.route('/place/view/<int:id_>')
 @required_group('readonly')
 def place_view(id_):
-    place = EntityMapper.get_by_id(id_)
-    place.set_dates()
+    object_ = EntityMapper.get_by_id(id_)
+    object_.set_dates()
+    location = object_.get_linked_entity('P53')
     data = {'info': []}
-    append_node_data(data['info'], place)
-    return render_template('place/view.html', place=place, data=data)
+    append_node_data(data['info'], object_, location)
+    return render_template('place/view.html', object_=object_, data=data)
 
 
 @app.route('/place/delete/<int:id_>')
@@ -73,22 +73,30 @@ def place_delete(id_):
 @app.route('/place/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
 def place_update(id_):
-    place = EntityMapper.get_by_id(id_)
-    place.set_dates()
-    form = build_custom_form(PlaceForm, 'Place', place, request)
+    object_ = EntityMapper.get_by_id(id_)
+    object_.set_dates()
+    location = object_.get_linked_entity('P53')
+    form = build_custom_form(PlaceForm, 'Place', object_, request, location)
     if form.validate_on_submit():
-        save(form, place)
+        save(form, object_, location)
         flash(_('info update'), 'info')
         return redirect(url_for('place_view', id_=id_))
-    return render_template('place/update.html', form=form, place=place)
+    return render_template('place/update.html', form=form, object_=object_)
 
 
-def save(form, entity):
+def save(form, object_=None, location=None):
     openatlas.get_cursor().execute('BEGIN')
-    entity.name = form.name.data
-    entity.description = form.description.data
-    entity.update()
-    entity.save_dates(form)
-    # entity.save_nodes(form)
+    if not object_:
+        object_ = EntityMapper.insert('E18', form.name.data)
+        location = EntityMapper.insert('E53', 'Location of ' + form.name.data, 'place location')
+        object_.link('P53', location)
+    object_.name = form.name.data
+    object_.description = form.description.data
+    object_.update()
+    object_.save_dates(form)
+    object_.save_nodes(form)
+    location.name = 'Location of ' + form.name.data
+    location.update()
+    location.save_nodes(form)
     openatlas.get_cursor().execute('COMMIT')
-    return entity
+    return object_

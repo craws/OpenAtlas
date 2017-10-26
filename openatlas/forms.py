@@ -13,7 +13,7 @@ from openatlas.util.filters import pager
 from openatlas.util.util import uc_first
 
 
-def build_custom_form(form, form_name, entity=None, request_origin=None):
+def build_custom_form(form, form_name, entity=None, request_origin=None, entity2=None):
 
     # Add custom fields
     custom_list = []
@@ -42,9 +42,10 @@ def build_custom_form(form, form_name, entity=None, request_origin=None):
         if isinstance(form_instance, DateForm):
             form_instance.populate_dates(entity)
         node_data = {}
-        for node in entity.nodes:
+        nodes = entity.nodes + (entity2.nodes if entity2 else [])
+        for node in nodes:
             root = openatlas.nodes[node.root[-1]] if node.root else node
-            if root.id not in node_data:
+            if root.id not in node_data:  # append only non root nodes
                 node_data[root.id] = []
             node_data[root.id].append(node.id)
         for root_id, nodes in node_data.items():
