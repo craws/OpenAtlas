@@ -9,7 +9,7 @@ from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app, NodeMapper
-from openatlas.util.util import required_group, sanitize, uc_first
+from openatlas.util.util import required_group, sanitize, uc_first, link, truncate_string
 
 
 class NodeForm(Form):
@@ -61,10 +61,30 @@ def node_update(id_):
 
 
 @app.route('/node/view/<int:id_>')
-@required_group('editor')
+@required_group('readonly')
 def node_view(id_):
     node = openatlas.nodes[id_]
-    return render_template('node/view.html', node=node)
+    super_ = openatlas.nodes[node.root[0]] if node.root else None
+    tables = {'entities': {
+        'name': 'entities',
+        'header': [_('name'), _('class'), _('info')],
+        'data': []}}
+    for entity in node.get_linked_entities('P2', True):
+        tables['entities']['data'].append([
+            link(entity),
+            openatlas.classes[entity.class_.id].name,
+            truncate_string(entity.description)])
+    tables['subs'] = {
+        'name': 'subs',
+        'header': [_('name'), _('count'), _('info')],
+        'data': []}
+    for sub_id in node.subs:
+        sub = openatlas.nodes[sub_id]
+        tables['subs']['data'].append([
+            link(sub),
+            sub.count,
+            truncate_string(sub.description)])
+    return render_template('node/view.html', node=node, super_=super_, tables=tables)
 
 
 @app.route('/node/delete/<int:id_>', methods=['POST', 'GET'])

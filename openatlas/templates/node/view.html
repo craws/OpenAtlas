@@ -1,7 +1,50 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ _('hierarchy')|uc_first }}
+    <a href="{{ url_for('node_index') }}">{{ _('node')|uc_first }}</a>
+    > {{ node.name }}
 {% endblock %}
 {% block content %}
-    Sorry, but this feature is still in development.
+<div id="tabs" class="tabs-container">
+    <ul>
+        <li>
+            <a href="#tab-info">{{ _('info')|uc_first }}</a>
+        </li>
+        {% if tables['subs'].data %}
+            <li>
+                <a href="#tab-subs">{{ _('subs')|uc_first }} ({{ tables['subs']['data']|length }})</a>
+            </li>
+        {% endif %}
+        {% if tables['entities'].data %}
+            <li>
+                <a href="#tab-entities">{{ _('entities')|uc_first }} ({{ tables['entities']['data']|length }})</a>
+            </li>
+        {% endif %}
+    </ul>
+    <div id="tab-info">
+        {% if 'editor'|is_authorized and not node.system: %}
+            <div class="button-bar">
+                <a href="{{ url_for('node_update', id_=node.id) }}">{{ _('edit')|uc_first }}</a>
+                {% if not node.system and node.count < 1 %}
+                    <a onclick="return confirm('{{ _('delete')|uc_first }} {{ node.name.replace('\'', '') }}?')"
+                       href="{{ url_for('node_delete', id_=node.id) }}">{{ _('delete')|uc_first }}</a>
+                {% endif %}
+            </div>
+        {% endif %}
+        <h1>{{ node.name }}</h1>
+        {% if super_ %}
+            {{_('super')|uc_first}}: {{ super_|link }}
+        {% endif %}
+        {{ node|description }}
+    </div>
+    {% if tables['subs'].data %}
+        <div id="tab-subs">
+            {{ tables['subs']|pager }}
+        </div>
+    {% endif %}
+    {% if tables['entities'].data %}
+        <div id="tab-entities">
+            {{ tables['entities']|pager }}
+        </div>
+    {% endif %}
+</div>
 {% endblock %}
