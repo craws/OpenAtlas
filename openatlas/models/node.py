@@ -80,6 +80,7 @@ class NodeMapper(EntityMapper):
                 super_ = openatlas.nodes[node.root[0]]
                 super_.subs.append(id_)
                 node.root = NodeMapper.get_root_path(node, node.root[0], node.root)
+                node.system = False
             else:
                 node.directional = hierarchies[node.id].directional
                 node.multiple = hierarchies[node.id].multiple
@@ -120,7 +121,7 @@ class NodeMapper(EntityMapper):
     @staticmethod
     def get_tree_data(node_id, selected_ids):
         node = openatlas.nodes[node_id]
-        return "'core':{'data':[" + NodeMapper.walk_tree(node.subs, selected_ids) + "]}"
+        return NodeMapper.walk_tree(node.subs, selected_ids)
 
     @staticmethod
     def walk_tree(param, selected_ids):

@@ -20,13 +20,11 @@ def build_custom_form(form, form_name, entity=None, request_origin=None, entity2
     for id_, node in openatlas.NodeMapper.get_nodes_for_form(form_name).items():
         custom_list.append(id_)
         if node.multiple:
-            field = TreeMultiField(str(id_))
-            setattr(form, str(id_), field)
+            setattr(form, str(id_), TreeMultiField(str(id_)))
         else:
-            field = TreeField(str(id_))
-            setattr(form, str(id_), field)
-    form_instance = form(obj=entity)
+            setattr(form, str(id_), TreeField(str(id_)))
 
+    form_instance = form(obj=entity)
     # Delete custom fields except the ones specified for the form
     delete_list = []
     for field in form_instance:
@@ -51,6 +49,26 @@ def build_custom_form(form, form_name, entity=None, request_origin=None, entity2
         for root_id, nodes in node_data.items():
             if hasattr(form_instance, str(root_id)):
                 getattr(form_instance, str(root_id)).data = nodes
+    return form_instance
+
+
+def build_node_update_form(form, node, request_origin):
+    root = openatlas.nodes[node.root[-1]] if node.root else None
+    setattr(form, str(root.id), TreeField(str(root.id)))
+    form_instance = form(obj=node)
+    if not root: # only non roots can change their super
+        delattr(form_instance, root.id)
+    if not root.directional:
+        del form_instance.name_inverse
+    # Set field data if available and only if it's a GET request
+    if node and request_origin and request_origin.method == 'GET':
+        form_instance.name.data = node.name
+        form_instance.description.data = node.description
+        if root:
+            super_ = openatlas.nodes[node.root[0]] if node.root else None
+            getattr(form_instance, str(root.id)).data = super_.id
+        if root.directional:
+            form_instance.name_inverse.data = node.name
     return form_instance
 
 
@@ -79,8 +97,9 @@ class TreeSelect(HiddenInput):
                 $(document).ready(function () {{
                     createOverlay("{name}","{title}");
                     $("#{name}-tree").jstree({{
+                        "core" : {{"check_callback" : true, 'data':[{tree_data}] }},
                         "search": {{"case_insensitive": true, "show_only_matches": true}},
-                        "plugins" : ["search"],{tree}
+                        "plugins" : ["search"],
                     }});
                     $("#{name}-tree").on("select_node.jstree", function (e, data) {{
                         selectFromTree("{name}", data.node.id, data.node.text);
@@ -94,7 +113,7 @@ class TreeSelect(HiddenInput):
             name=field.id,
             title=openatlas.nodes[int(field.id)].name,
             selection=selection,
-            tree=openatlas.NodeMapper.get_tree_data(int(field.id), selected_ids),
+            tree_data=openatlas.NodeMapper.get_tree_data(int(field.id), selected_ids),
             clear_style='' if selection else ' style="display: none;" ',
             required=' required' if field.flags.required else '')
         return super(TreeSelect, self).__call__(field, **kwargs) + html
@@ -125,9 +144,10 @@ class TreeMultiSelect(HiddenInput):
             <script>
                 createOverlay("{name}", "{title}", true, "tree");
                 $("#{name}-tree").jstree({{
+                    "core" : {{ "check_callback" : true, 'data':[{tree_data}] }},
                     "search": {{"case_insensitive": true, "show_only_matches": true}},
                     "plugins": ["search", "checkbox"],
-                    "checkbox": {{"three_state": false}},{tree}
+                    "checkbox": {{"three_state": false}}
                 }});
                 $("#{name}-tree-search").keyup(function(){{
                     $("#{name}-tree").jstree("search", $(this).val());
@@ -137,7 +157,7 @@ class TreeMultiSelect(HiddenInput):
             name=field.id,
             title=openatlas.nodes[int(field.id)].name,
             selection=selection,
-            tree=openatlas.NodeMapper.get_tree_data(int(field.id), selected_ids))
+            tree_data=openatlas.NodeMapper.get_tree_data(int(field.id), selected_ids))
         return super(TreeMultiSelect, self).__call__(field, **kwargs) + html
 
 

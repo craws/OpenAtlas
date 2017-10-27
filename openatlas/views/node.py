@@ -9,6 +9,7 @@ from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app, NodeMapper
+from openatlas.forms import build_node_update_form
 from openatlas.util.util import required_group, sanitize, uc_first, link, truncate_string
 
 
@@ -55,9 +56,16 @@ def node_insert(root_id):
 @required_group('editor')
 def node_update(id_):
     node = openatlas.nodes[id_]
-    openatlas.get_cursor().execute('BEGIN')
-    openatlas.get_cursor().execute('COMMIT')
-    return render_template('node/update.html', node=node)
+    root = openatlas.nodes[node.root[-1]] if node.root else None
+    if node.system:
+        flash(_('error forbidden'), 'error')
+        return redirect(url_for('node_view', id_=id_))
+    form = build_node_update_form(NodeForm, node, request)
+    if form.validate_on_submit():
+        save(form, node)
+        flash(_('info update'), 'info')
+        return redirect(url_for('node_view', id_=id_))
+    return render_template('node/update.html', node=node, root=root, form=form)
 
 
 @app.route('/node/view/<int:id_>')
@@ -91,6 +99,9 @@ def node_view(id_):
 @required_group('editor')
 def node_delete(id_):
     node = openatlas.nodes[id_]
+    if node.system or node.subs or node.count:
+        flash(_('error forbidden'), 'error')
+        return redirect(url_for('node_view', id_=id_))
     openatlas.get_cursor().execute('BEGIN')
     openatlas.get_cursor().execute('COMMIT')
     flash(_('entity deleted'), 'info')
@@ -132,3 +143,22 @@ def tree_select(name):
     html += '    });'
     html += '</script>'
     return html
+
+
+def save(form, node=None):
+    root = openatlas.nodes[node.root[-1]] if node and node.root else None
+    super_ = openatlas.nodes[node.root[0]] if node and node.root else None
+    node.name = form.name.data
+    node.description = form.description.data
+    openatlas.get_cursor().execute('BEGIN')
+    node.update()
+    new_super_id = getattr(form, str(root.id)).data
+    if super_ and super_.id != new_super_id:
+        property_code = 'P127' if node.class_.code == 'E55' else 'P89'
+        node.delete_links(property_code)
+        if new_super_id:
+            node.link(property_code, getattr(form, str(root.id)).data)
+        else:
+            node.link(property_code, root.id)
+    openatlas.get_cursor().execute('COMMIT')
+    return node

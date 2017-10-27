@@ -10,7 +10,6 @@ import openatlas
 from openatlas import app
 from openatlas.forms import build_custom_form
 from openatlas.models.entity import EntityMapper
-from openatlas.models.link import LinkMapper
 from openatlas.util.util import (uc_first, link, truncate_string, required_group, append_node_data,
                                  print_base_type)
 
