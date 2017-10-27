@@ -27,7 +27,7 @@ def sanitize(string):
 def print_base_type(entity, root_name):
     root_id = openatlas.NodeMapper.get_hierarchy_by_name(root_name).id
     for node in entity.nodes:
-        if node.root[0] == root_id:
+        if node.root[-1] == root_id:
             return node.name
     return ''
 
@@ -41,8 +41,6 @@ def append_node_data(data, entity, entity2=None):
         if not node.root:
             continue
         root = openatlas.nodes[node.root[-1]]
-        if not root.extendable:
-            continue
         if root.name not in type_data:
             type_data[root.name] = []
         type_data[root.name].append(node.name)

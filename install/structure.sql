@@ -891,7 +891,6 @@ CREATE TABLE hierarchy (
     name text NOT NULL,
     multiple boolean DEFAULT false NOT NULL,
     system boolean DEFAULT false NOT NULL,
-    extendable boolean DEFAULT false NOT NULL,
     directional boolean DEFAULT false NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone

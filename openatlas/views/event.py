@@ -9,7 +9,8 @@ import openatlas
 from openatlas import app
 from openatlas.forms import DateForm, build_custom_form
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import link, required_group, truncate_string, append_node_data
+from openatlas.util.util import link, required_group, truncate_string, append_node_data, \
+    print_base_type
 
 
 class EventForm(DateForm):
@@ -25,12 +26,13 @@ class EventForm(DateForm):
 def event_index():
     tables = {'event': {
         'name': 'event',
-        'header': [_('name'), _('class'), _('first'), _('last'), _('info')],
+        'header': [_('name'), _('class'), _('type'), _('first'), _('last'), _('info')],
         'data': []}}
     for event in EntityMapper.get_by_codes(['E7', 'E8', 'E12', 'E6']):
         tables['event']['data'].append([
             link(event),
             openatlas.classes[event.class_.id].name,
+            print_base_type(event, 'Event'),
             format(event.first),
             format(event.last),
             truncate_string(event.description)])

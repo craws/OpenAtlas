@@ -63,8 +63,6 @@ CREATE TRIGGER on_delete_link_property AFTER DELETE ON model.link_property FOR E
 ALTER TABLE model.entity ADD COLUMN system_type text;
 
 -- Source Type
-UPDATE web.hierarchy SET extendable = True WHERE name = 'Linguistic object classification';
-
 UPDATE model.entity SET system_type = 'source content'
 WHERE id IN (
     SELECT e.id FROM model.entity e
@@ -141,12 +139,17 @@ ALTER TABLE web.hierarchy ALTER COLUMN multiple SET DEFAULT FALSE;
 ALTER TABLE web.hierarchy ALTER COLUMN system DROP DEFAULT;
 ALTER TABLE web.hierarchy ALTER COLUMN system TYPE bool USING system::bool;
 ALTER TABLE web.hierarchy ALTER COLUMN system SET DEFAULT FALSE;
-ALTER TABLE web.hierarchy ALTER COLUMN extendable DROP DEFAULT;
-ALTER TABLE web.hierarchy ALTER COLUMN extendable TYPE bool USING extendable::bool;
-ALTER TABLE web.hierarchy ALTER COLUMN extendable SET DEFAULT FALSE;
 ALTER TABLE web.hierarchy ALTER COLUMN directional DROP DEFAULT;
 ALTER TABLE web.hierarchy ALTER COLUMN directional TYPE bool USING directional::bool;
 ALTER TABLE web.hierarchy ALTER COLUMN directional SET DEFAULT FALSE;
+
+ALTER TABLE web.hierarchy DROP COLUMN extendable;
+
+-- Remove all links to node roots because not needed anymore
+DELETE FROM model.link WHERE
+    property_id = (SELECT id FROM model.property WHERE code = 'P2')
+    AND range_id IN (SELECT id FROM web.hierarchy);
+
 
 -- Change gender to sex and remove system flag
 UPDATE model.entity SET name = 'Sex', description = 'Categories for sex like female, male.'

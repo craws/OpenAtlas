@@ -9,7 +9,8 @@ import openatlas
 from openatlas import app
 from openatlas.forms import DateForm, build_custom_form
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import link, truncate_string, required_group, append_node_data
+from openatlas.util.util import (link, truncate_string, required_group, append_node_data,
+                                 print_base_type)
 
 
 class PlaceForm(DateForm):
@@ -25,11 +26,12 @@ class PlaceForm(DateForm):
 def place_index():
     tables = {'place': {
         'name': 'place',
-        'header': ['name', _('first'), _('last'), 'info'],
+        'header': [_('name'), _('site'), _('first'), _('last'), _('info')],
         'data': []}}
     for place in EntityMapper.get_by_codes('E18'):
         tables['place']['data'].append([
             link(place),
+            print_base_type(place, 'Site'),
             format(place.first),
             format(place.last),
             truncate_string(place.description)])
@@ -63,7 +65,9 @@ def place_view(id_):
 @app.route('/place/delete/<int:id_>')
 @required_group('editor')
 def place_delete(id_):
+    place = EntityMapper.get_by_id(id_)
     openatlas.get_cursor().execute('BEGIN')
+    EntityMapper.delete(place.get_linked_entity('P53'))
     EntityMapper.delete(id_)
     openatlas.get_cursor().execute('COMMIT')
     flash(_('entity deleted'), 'info')

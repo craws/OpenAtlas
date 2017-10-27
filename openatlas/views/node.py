@@ -34,9 +34,6 @@ def node_index():
 @required_group('editor')
 def node_insert(root_id):
     root = openatlas.nodes[root_id]
-    if not root.extendable:
-        flash(_('error forbidden'), 'info')
-        return redirect(url_for('node_index'))
     form = NodeForm()
     if not root.directional:
         del form.name_inverse

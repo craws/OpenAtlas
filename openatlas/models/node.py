@@ -65,7 +65,7 @@ class NodeMapper(EntityMapper):
         for row in cursor.fetchall():
             forms[row.id] = {'id': row.id, 'name': row.name, 'extendable': row.extendable}
         sql = """
-            SELECT h.id, h.name, h.multiple, h.system, h.extendable, h.directional,
+            SELECT h.id, h.name, h.multiple, h.system, h.directional,
                 (SELECT ARRAY(
                     SELECT f.id FROM web.form f JOIN web.hierarchy_form hf ON f.id = hf.form_id
                     AND hf.hierarchy_id = h.id)) AS form_ids
@@ -82,7 +82,6 @@ class NodeMapper(EntityMapper):
                 node.root = NodeMapper.get_root_path(node, node.root[0], node.root)
             else:
                 node.directional = hierarchies[node.id].directional
-                node.extendable = hierarchies[node.id].extendable
                 node.multiple = hierarchies[node.id].multiple
                 node.system = hierarchies[node.id].system
                 node.forms = {}

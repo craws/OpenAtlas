@@ -307,20 +307,20 @@ INSERT INTO link (property_id, range_id, domain_id) VALUES
 -------------------------------
 -- Web hierarchies and forms --
 -------------------------------
-INSERT INTO web.hierarchy (id, name, multiple, system, extendable, directional) VALUES
-((SELECT id FROM entity WHERE name='Source'), 'Source', False, True, True, False),
-((SELECT id FROM entity WHERE name='Event'), 'Event', False, True, True, False),
-((SELECT id FROM entity WHERE name='Actor Actor Relation'), 'Actor Actor Relation', False, True, True, True),
-((SELECT id FROM entity WHERE name='Actor Function'), 'Actor Function', False, True, True, False),
-((SELECT id FROM entity WHERE name='Involvement'), 'Involvement', False, True, True, False),
-((SELECT id FROM entity WHERE name='Sex'), 'Sex', False, False, True, False),
-((SELECT id FROM entity WHERE name='Site'), 'Site', False, True, True, False),
-((SELECT id FROM entity WHERE name='Information Carrier'), 'Information Carrier', False, True, True, False),
-((SELECT id FROM entity WHERE name='Bibliography'), 'Bibliography', False, True, True, False),
-((SELECT id FROM entity WHERE name='Edition'), 'Edition', False, True, True, False),
-((SELECT id FROM entity WHERE name='Source translation'), 'Source translation', False, False, True, False),
-((SELECT id FROM entity WHERE name='Administrative Unit'), 'Administrative Unit', True, True, True, False),
-((SELECT id FROM entity WHERE name='Historical Place'), 'Historical Place', True, True, True, False);
+INSERT INTO web.hierarchy (id, name, multiple, system, directional) VALUES
+((SELECT id FROM entity WHERE name='Source'), 'Source', False, True, False),
+((SELECT id FROM entity WHERE name='Event'), 'Event', False, True, False),
+((SELECT id FROM entity WHERE name='Actor Actor Relation'), 'Actor Actor Relation', False, True, True),
+((SELECT id FROM entity WHERE name='Actor Function'), 'Actor Function', False, True, False),
+((SELECT id FROM entity WHERE name='Involvement'), 'Involvement', False, True, False),
+((SELECT id FROM entity WHERE name='Sex'), 'Sex', False, False, False),
+((SELECT id FROM entity WHERE name='Site'), 'Site', False, True, False),
+((SELECT id FROM entity WHERE name='Information Carrier'), 'Information Carrier', False, True, False),
+((SELECT id FROM entity WHERE name='Bibliography'), 'Bibliography', False, True, False),
+((SELECT id FROM entity WHERE name='Edition'), 'Edition', False, True, False),
+((SELECT id FROM entity WHERE name='Source translation'), 'Source translation', False, False, False),
+((SELECT id FROM entity WHERE name='Administrative Unit'), 'Administrative Unit', True, True, False),
+((SELECT id FROM entity WHERE name='Historical Place'), 'Historical Place', True, True, False);
 
 INSERT INTO web.form (name, extendable) VALUES
 ('Source', 1),
