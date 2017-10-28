@@ -47,8 +47,12 @@ def build_custom_form(form, form_name, entity=None, request_origin=None, entity2
     return form_instance
 
 
-def build_node_update_form(form, node, request_origin):
-    root = openatlas.nodes[node.root[-1]] if node.root else None
+def build_node_update_form(form, node, request_origin=None):
+    if not request_origin:
+        root = node
+        node = None
+    else:
+        root = openatlas.nodes[node.root[-1]] if node.root else None
     setattr(form, str(root.id), TreeField(str(root.id)))
     form_instance = form(obj=node)
     if not root: # only non roots can change their super
@@ -68,8 +72,7 @@ def build_node_update_form(form, node, request_origin):
     if node and request_origin and request_origin.method == 'GET':
         form_instance.name.data = node.name
         form_instance.description.data = node.description
-        # Set super if exists and is not same as root
-        if root:
+        if root:  # Set super if exists and is not same as root
             super_ = openatlas.nodes[node.root[0]]
             getattr(form_instance, str(root.id)).data = super_.id if super_.id != root.id else None
         if root.directional:
@@ -85,7 +88,7 @@ class TreeSelect(HiddenInput):
         if field.data:
             field.data = field.data[0] if isinstance(field.data, list) else field.data
             selection = openatlas.nodes[int(field.data)].name
-            selected_ids.append(openatlas.nodes[field.data].id)
+            selected_ids.append(openatlas.nodes[int(field.data)].id)
         html = """
             <input id="{name}-button" name="{name}-button" type="text"
                 class="table-select {required}" onfocus="this.blur()"

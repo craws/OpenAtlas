@@ -8,7 +8,7 @@ from wtforms import StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 import openatlas
-from openatlas import app, NodeMapper
+from openatlas import app, NodeMapper, EntityMapper
 from openatlas.forms import build_node_update_form
 from openatlas.util.util import required_group, sanitize, uc_first, link, truncate_string
 
@@ -35,18 +35,15 @@ def node_index():
 @required_group('editor')
 def node_insert(root_id):
     root = openatlas.nodes[root_id]
-    form = NodeForm()
-    if not root.directional:
-        del form.name_inverse
+    form = build_node_update_form(NodeForm, root)
+    # check if form is valid and if it wasn't a submit of the search form
     if 'name_search' not in request.form and form.validate_on_submit():
         name = form.name.data
         if hasattr(form, 'name_inverse') in form:
             name += ' (' + form.name_inverse.data + ')'
-        openatlas.get_cursor().execute('BEGIN')
-        node = NodeMapper.insert('E55', name, None, form.description.data)
-        openatlas.get_cursor().execute('COMMIT')
+        node = save(form, None, root)
         flash(_('entity created'), 'info')
-        return redirect(url_for('node_view', node_id=node.id))
+        return redirect(url_for('node_view', id_=node.id))
     if 'name_search' in request.form:
         form.name.data = request.form['name_search']
     return render_template('node/insert.html', form=form, root=root)
@@ -60,11 +57,12 @@ def node_update(id_):
         flash(_('error forbidden'), 'error')
         return redirect(url_for('node_view', id_=id_))
     form = build_node_update_form(NodeForm, node, request)
-    if form.validate_on_submit():
-        save(form, node)
-        flash(_('info update'), 'info')
-        return redirect(url_for('node_view', id_=id_))
     root = openatlas.nodes[node.root[-1]] if node.root else None
+    if form.validate_on_submit():
+        if save(form, node):
+            flash(_('info update'), 'info')
+            return redirect(url_for('node_view', id_=id_))
+        return render_template('node/update.html', node=node, root=root, form=form)
     return render_template('node/update.html', node=node, root=root, form=form)
 
 
@@ -72,6 +70,7 @@ def node_update(id_):
 @required_group('readonly')
 def node_view(id_):
     node = openatlas.nodes[id_]
+    root = openatlas.nodes[node.root[-1]] if node.root else None
     super_ = openatlas.nodes[node.root[0]] if node.root else None
     tables = {'entities': {
         'name': 'entities',
@@ -92,7 +91,7 @@ def node_view(id_):
             link(sub),
             sub.count,
             truncate_string(sub.description)])
-    return render_template('node/view.html', node=node, super_=super_, tables=tables)
+    return render_template('node/view.html', node=node, super_=super_, tables=tables, root=root)
 
 
 @app.route('/node/delete/<int:id_>', methods=['POST', 'GET'])
@@ -103,8 +102,12 @@ def node_delete(id_):
         flash(_('error forbidden'), 'error')
         return redirect(url_for('node_view', id_=id_))
     openatlas.get_cursor().execute('BEGIN')
+    EntityMapper.delete(node.id)
     openatlas.get_cursor().execute('COMMIT')
     flash(_('entity deleted'), 'info')
+    root = openatlas.nodes[node.root[-1]] if node.root else None
+    if root:
+        return redirect(url_for('node_view', id_=root.id))
     return redirect(url_for('node_index'))
 
 
@@ -145,25 +148,30 @@ def tree_select(name):
     return html
 
 
-def save(form, node=None):
-    if node:
+def save(form, node=None, root=None):
+    openatlas.get_cursor().execute('BEGIN')
+    if not node:
+        node = NodeMapper.insert('E55', form.name.data)
+        super_ = 'new'
+    else:
         root = openatlas.nodes[node.root[-1]] if node.root else None
         super_ = openatlas.nodes[node.root[0]] if node.root else None
-    node.name = form.name.data
-    node.description = form.description.data
-    super_id = getattr(form, str(root.id)).data
-    new_super = openatlas.nodes[int(super_id)] if super_id else openatlas.nodes[root.id]
-    openatlas.get_cursor().execute('BEGIN')
-    node.update()
-    # update super if changed and node is not a root node
-    if super_ and super_.id != new_super.id:
+    new_super_id = getattr(form, str(root.id)).data
+    new_super = openatlas.nodes[int(new_super_id)] if new_super_id else openatlas.nodes[root.id]
+    if node:
         if new_super.id == node.id:
             flash(_('error node self as super'), 'error')
-        elif new_super.root and node.id in new_super.root:
+            return False
+        if new_super.root and node.id in new_super.root:
             flash(_('error node sub as super'), 'error')
-        else:
-            property_code = 'P127' if node.class_.code == 'E55' else 'P89'
-            node.delete_links(property_code)
-            node.link(property_code, getattr(form, str(root.id)).data)
+            return False
+    node.name = form.name.data
+    node.description = form.description.data
+    node.update()
+    # update super if changed and node is not a root node
+    if super_ and (super_ == 'new' or super_.id != new_super.id):
+        property_code = 'P127' if node.class_.code == 'E55' else 'P89'
+        node.delete_links(property_code)
+        node.link(property_code, new_super.id)
     openatlas.get_cursor().execute('COMMIT')
     return node

@@ -1,6 +1,9 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
     <a href="{{ url_for('node_index') }}">{{ _('node')|uc_first }}</a>
+    {% if root %}
+        > {{ root|link }}
+    {% endif %}
     > {{ node.name }}
 {% endblock %}
 {% block content %}
@@ -21,7 +24,7 @@
         {% endif %}
     </ul>
     <div id="tab-info">
-        {% if 'editor'|is_authorized and not node.system: %}
+        {% if 'editor'|is_authorized and node.root: %}
             <div class="button-bar">
                 <a href="{{ url_for('node_update', id_=node.id) }}">{{ _('edit')|uc_first }}</a>
                 {% if not node.system and node.count < 1 %}
