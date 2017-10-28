@@ -19,22 +19,17 @@ def build_custom_form(form, form_name, entity=None, request_origin=None, entity2
     custom_list = []
     for id_, node in openatlas.NodeMapper.get_nodes_for_form(form_name).items():
         custom_list.append(id_)
-        if node.multiple:
-            setattr(form, str(id_), TreeMultiField(str(id_)))
-        else:
-            setattr(form, str(id_), TreeField(str(id_)))
+        setattr(form, str(id_), TreeMultiField(str(id_)) if node.multiple else TreeField(str(id_)))
 
     form_instance = form(obj=entity)
     # Delete custom fields except the ones specified for the form
-    delete_list = []
+    delete_list = []  # Can't delete fields in the loop so creating a list for later deletion
     for field in form_instance:
         if isinstance(field, (TreeField, TreeMultiField)) and int(field.id) not in custom_list:
             delete_list.append(field.id)
     for item in delete_list:
-        if hasattr(form_instance, item):
-            delattr(form_instance, item)
+        delattr(form_instance, item)
 
-    # Todo: try to set field.data with all entity.nodes at creation
     # Set field data if available and only if it's a GET request
     if entity and request_origin and request_origin.method == 'GET':
         if isinstance(form_instance, DateForm):
@@ -60,13 +55,23 @@ def build_node_update_form(form, node, request_origin):
         delattr(form_instance, root.id)
     if not root.directional:
         del form_instance.name_inverse
+
+    # Delete custom fields except the one specified for the form
+    delete_list = []  # Can't delete fields in the loop so creating a list for later deletion
+    for field in form_instance:
+        if isinstance(field, TreeField) and int(field.id) != root.id:
+            delete_list.append(field.id)
+    for item in delete_list:
+        delattr(form_instance, item)
+
     # Set field data if available and only if it's a GET request
     if node and request_origin and request_origin.method == 'GET':
         form_instance.name.data = node.name
         form_instance.description.data = node.description
+        # Set super if exists and is not same as root
         if root:
-            super_ = openatlas.nodes[node.root[0]] if node.root else None
-            getattr(form_instance, str(root.id)).data = super_.id
+            super_ = openatlas.nodes[node.root[0]]
+            getattr(form_instance, str(root.id)).data = super_.id if super_.id != root.id else None
         if root.directional:
             form_instance.name_inverse.data = node.name
     return form_instance
