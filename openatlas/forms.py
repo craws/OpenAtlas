@@ -10,7 +10,7 @@ from wtforms.widgets import HiddenInput
 import openatlas
 from openatlas.util import util
 from openatlas.util.filters import pager
-from openatlas.util.util import uc_first
+from openatlas.util.util import uc_first, sanitize
 
 
 def build_custom_form(form, form_name, entity=None, request_origin=None, entity2=None):
@@ -47,16 +47,14 @@ def build_custom_form(form, form_name, entity=None, request_origin=None, entity2
     return form_instance
 
 
-def build_node_update_form(form, node, request_origin=None):
+def build_node_form(form, node, request_origin=None):
     if not request_origin:
         root = node
         node = None
     else:
-        root = openatlas.nodes[node.root[-1]] if node.root else None
+        root = openatlas.nodes[node.root[-1]]
     setattr(form, str(root.id), TreeField(str(root.id)))
     form_instance = form(obj=node)
-    if not root: # only non roots can change their super
-        delattr(form_instance, root.id)
     if not root.directional:
         del form_instance.name_inverse
 
@@ -70,13 +68,14 @@ def build_node_update_form(form, node, request_origin=None):
 
     # Set field data if available and only if it's a GET request
     if node and request_origin and request_origin.method == 'GET':
-        form_instance.name.data = node.name
+        name_parts = node.name.split(' (')
+        form_instance.name.data = sanitize(name_parts[0], 'node')
+        if root.directional and len(name_parts) > 1:
+            form_instance.name_inverse.data = sanitize(name_parts[1], 'node')
         form_instance.description.data = node.description
         if root:  # Set super if exists and is not same as root
             super_ = openatlas.nodes[node.root[0]]
             getattr(form_instance, str(root.id)).data = super_.id if super_.id != root.id else None
-        if root.directional:
-            form_instance.name_inverse.data = node.name
     return form_instance
 
 

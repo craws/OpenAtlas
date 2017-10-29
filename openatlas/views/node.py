@@ -9,7 +9,7 @@ from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app, NodeMapper, EntityMapper
-from openatlas.forms import build_node_update_form
+from openatlas.forms import build_node_form
 from openatlas.util.util import required_group, sanitize, uc_first, link, truncate_string
 
 
@@ -35,7 +35,7 @@ def node_index():
 @required_group('editor')
 def node_insert(root_id):
     root = openatlas.nodes[root_id]
-    form = build_node_update_form(NodeForm, root)
+    form = build_node_form(NodeForm, root)
     # check if form is valid and if it wasn't a submit of the search form
     if 'name_search' not in request.form and form.validate_on_submit():
         name = form.name.data
@@ -56,7 +56,7 @@ def node_update(id_):
     if node.system:
         flash(_('error forbidden'), 'error')
         return redirect(url_for('node_view', id_=id_))
-    form = build_node_update_form(NodeForm, node, request)
+    form = build_node_form(NodeForm, node, request)
     root = openatlas.nodes[node.root[-1]] if node.root else None
     if form.validate_on_submit():
         if save(form, node):
@@ -165,7 +165,9 @@ def save(form, node=None, root=None):
         if new_super.root and node.id in new_super.root:
             flash(_('error node sub as super'), 'error')
             return False
-    node.name = form.name.data
+    node.name = sanitize(form.name.data, 'node')
+    if root.directional and sanitize(form.name_inverse.data, 'node'):
+        node.name += ' (' + sanitize(form.name_inverse.data, 'node') + ')'
     node.description = form.description.data
     node.update()
     # update super if changed and node is not a root node

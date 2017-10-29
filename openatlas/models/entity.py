@@ -82,6 +82,7 @@ class EntityMapper(object):
 
     @staticmethod
     def update(entity):
+        from openatlas.util.util import sanitize
         sql = """
             UPDATE model.entity
             SET (name, description) = (%(name)s, %(description)s)
@@ -90,7 +91,7 @@ class EntityMapper(object):
         cursor.execute(sql, {
             'id': entity.id,
             'name': entity.name,
-            'description': entity.description})
+            'description': sanitize(entity.description, 'description')})
 
     @staticmethod
     def insert(code, name, system_type=None, description=None, date=None):

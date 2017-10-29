@@ -8,6 +8,7 @@ from babel import dates
 from flask import abort, url_for, request, session
 from flask_login import current_user
 from flask_babel import lazy_gettext as _
+from html.parser import HTMLParser
 from markupsafe import Markup
 
 from werkzeug.utils import redirect
@@ -19,9 +20,33 @@ from openatlas.models.property import Property
 from openatlas.models.user import User
 
 
-def sanitize(string):
-    """Remove all characters from a string except letters and numbers"""
-    return re.sub('[^A-Za-z0-9]+', '', string)
+class MLStripper(HTMLParser):
+
+    def __init__(self):
+        super().__init__()
+        self.reset()
+        self.strict = False
+        self.convert_charrefs = True
+        self.fed = []
+
+    def handle_data(self, d):
+        self.fed.append(d)
+
+    def get_data(self):
+        return ''.join(self.fed)
+
+
+def sanitize(string, mode=None):
+    if not mode:
+        """Remove all characters from a string except ASCII letters and numbers"""
+        return re.sub('[^A-Za-z0-9]+', '', string)
+    if mode == 'node':
+        """Remove all characters from a string except letters, numbers and spaces"""
+        return re.sub(r'([^\s\w]|_)+', '', string).strip()
+    if mode == 'description':
+        s = MLStripper()
+        s.feed(string)
+        return s.get_data()
 
 
 def print_base_type(entity, root_name):
