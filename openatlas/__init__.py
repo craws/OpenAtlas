@@ -15,24 +15,18 @@ app = Flask(
     static_folder='static',
     instance_relative_config=True)
 
-settings = []
-
 
 def connect(config_name='production'):
     config = configparser.ConfigParser()
-    config.read_file(open(os.path.dirname(__file__) + '/db.conf'))
-    db_name = config.get(config_name, 'database_name')
-    db_user = config.get(config_name, 'database_user')
-    db_port = config.get(config_name, 'database_port')
-    db_pass = config.get(config_name, 'database_pass')
-    db_host = config.get(config_name, 'database_host')
+    with open(os.path.dirname(__file__) + '/db.conf') as config_file:
+        config.read_file(open(os.path.dirname(__file__) + '/db.conf'))
     try:
         connection_ = psycopg2.connect(
-            database=db_name,
-            user=db_user,
-            password=db_pass,
-            port=db_port,
-            host=db_host)
+            database=config.get(config_name, 'database_name'),
+            user=config.get(config_name, 'database_user'),
+            password=config.get(config_name, 'database_pass'),
+            port=config.get(config_name, 'database_port'),
+            host=config.get(config_name, 'database_host'))
         connection_.autocommit = True
         return connection_
     except Exception as e:  # pragma: no cover
@@ -130,6 +124,7 @@ from openatlas.views import (actor, admin, ajax, content, index, settings, model
 app.register_blueprint(filters.blueprint)
 app.add_template_global(debug_model, 'debug_model')
 app.debug = True
+
 
 @app.context_processor
 def inject_debug():
