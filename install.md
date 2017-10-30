@@ -1,6 +1,7 @@
 # Important Notice
 
-This is the Python/Flask port of OpenAtlas. It is still in development and not for productive use. Use at own risk!
+This is the Python/Flask port of OpenAtlas. It is still in development and not for productive use.
+Use at own risk!
 
 # Installation Notes
 
@@ -10,8 +11,9 @@ Installation with examples from a Debian 9 (Stretch) system.
 
 ### Python 3 and Flask
 
-    # apt-get install python3 python3-bcrypt python3-dateutil python3-jinja2 python3-psycopg2 python3-markdown
+    # apt-get install python3 python3-bcrypt python3-dateutil python3-jinja2 python3-psycopg2
     # apt-get install python3-flask python3-flask-babel python3-flask-login python3-flaskext.wtf
+    # apt-get install python3-markdown
 
 ### Apache 2.4
 
@@ -47,13 +49,9 @@ Copy the files to /var/www/your_sitename
 
 ## Configuration
 
-Create the folder /var/www/your_sitename/instance
+Create the folder and file instance/production.py
 
-Copy install/example_config.py to instance/config.py
-
-Copy install/example_db.conf to openatlas/db.conf
-
-Change the values as appropriate.
+Copy install/example_config.py to instance/production.py and add/change the values as appropriate.
 
 ## Apache
 
@@ -87,7 +85,3 @@ Use these parameters for running with coverage and HTML report:
 ## Finishing
 
 Remove the data/install directory on production systems
-
-
-
-
