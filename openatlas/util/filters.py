@@ -11,6 +11,7 @@ from jinja2 import evalcontextfilter, Markup, escape
 from flask_babel import lazy_gettext as _
 
 import openatlas
+from openatlas import app
 from openatlas.models.classObject import ClassMapper
 from . import util
 
@@ -111,7 +112,7 @@ def pager(self, table):
         return Markup('<p>' + util.uc_first(_('no entries')) + '</p>')
     html = ''
     table_rows = session['settings']['default_table_rows']
-    if hasattr(current_user, 'table_rows'):
+    if hasattr(current_user, 'settings'):
         table_rows = current_user.settings['table_rows']
     show_pager = False if len(table['data']) < table_rows else True
     if show_pager:
@@ -166,8 +167,8 @@ def pager(self, table):
                     filter_external: \'#{name}-search\',
                     filter_columnFilters: false
                 }}}})
-            .tablesorterPager({{positionFixed: false, container: $("#{name}-pager"), size: 20}});
-        """.format(name=table['name'], sort=sort)
+            .tablesorterPager({{positionFixed: false, container: $("#{name}-pager"), size:{size}}});
+        """.format(name=table['name'], sort=sort, size=table_rows)
     else:
         html += '$("#' + table['name'] + '-table").tablesorter({' + sort + ',widgets:[\'zebra\']});'
     html += '</script>'
@@ -242,7 +243,7 @@ def display_form(self, form, form_id=None, for_persons=False):
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def test_file(self, file_name):
-    if os.path.isfile(openatlas.app.root_path + '/static/' + file_name):
+    if os.path.isfile(app.root_path + '/static/' + file_name):
         return file_name
     return False
 

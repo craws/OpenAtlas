@@ -1,6 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import session
 import openatlas
+from openatlas import app
 
 
 class Property(object):
@@ -71,7 +72,7 @@ class PropertyMapper(object):
         sql = """
             SELECT text, language_code, table_field, table_id FROM model.i18n
             WHERE table_name = 'property' AND language_code IN %(language_codes)s;"""
-        cursor.execute(sql, {'language_codes': tuple(openatlas.app.config['LANGUAGES'].keys())})
+        cursor.execute(sql, {'language_codes': tuple(app.config['LANGUAGES'].keys())})
         for row in cursor.fetchall():
             if row.language_code not in properties[row.table_id].i18n:
                 properties[row.table_id].i18n[row.language_code] = {}

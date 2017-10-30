@@ -17,7 +17,7 @@ class SettingsForm(Form):
     # General
     site_name = StringField(uc_first(_('site name')))
     default_language = SelectField(uc_first(_('default language')), choices=[])
-    default_table_rows = SelectField(uc_first(_('default table rows')), choices=[])
+    default_table_rows = SelectField(uc_first(_('default table rows')), choices=[], coerce=int)
     log_level = SelectField(uc_first(_('log level')), choices=[], coerce=int)
     maintenance = BooleanField(uc_first(_('maintenance')), false_values='false')
     offline = BooleanField(uc_first(_('offline')), false_values='false')
@@ -51,9 +51,9 @@ def settings_index():
         ('general', OrderedDict([
             (_('site name'), settings['site_name']),
             (_('default language'),
-                openatlas.app.config['LANGUAGES'][settings['default_language']]),
+                app.config['LANGUAGES'][settings['default_language']]),
             (_('default table rows'), settings['default_table_rows']),
-            (_('log level'), openatlas.log_levels[int(settings['log_level'])]),
+            (_('log level'), app.config['LOG_LEVELS'][int(settings['log_level'])]),
             (_('maintenance'),
                 uc_first('on') if settings['maintenance'] == 'true' else uc_first('off')),
             (_('offline'),
@@ -83,9 +83,9 @@ def settings_index():
 @required_group('admin')
 def settings_update():
     form = SettingsForm()
-    getattr(form, 'default_language').choices = openatlas.app.config['LANGUAGES'].items()
-    getattr(form, 'log_level').choices = openatlas.log_levels.items()
-    getattr(form, 'default_table_rows').choices = openatlas.default_table_rows.items()
+    getattr(form, 'default_language').choices = app.config['LANGUAGES'].items()
+    getattr(form, 'log_level').choices = app.config['LOG_LEVELS'].items()
+    getattr(form, 'default_table_rows').choices = app.config['DEFAULT_TABLE_ROWS'].items()
     if form.validate_on_submit():
         openatlas.get_cursor().execute('BEGIN')
         SettingsMapper.update(form)
@@ -97,6 +97,8 @@ def settings_update():
             getattr(form, field).data = True if session['settings'][field] == 'true' else False
         elif field in ['mail_recipients_login', 'mail_recipients_feedback']:
             getattr(form, field).data = ', '.join(session['settings'][field])
+        elif field in ['default_table_rows', 'log_level']:
+            getattr(form, field).data = int(session['settings'][field])
         else:
             getattr(form, field).data = session['settings'][field]
     return render_template('settings/update.html', form=form, settings=session['settings'])

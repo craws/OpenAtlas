@@ -52,7 +52,7 @@ def sanitize(string, mode=None):
 def print_base_type(entity, root_name):
     root_id = openatlas.NodeMapper.get_hierarchy_by_name(root_name).id
     for node in entity.nodes:
-        if node.root[-1] == root_id:
+        if node.root and node.root[-1] == root_id:
             return node.name
     return ''
 

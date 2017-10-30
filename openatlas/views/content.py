@@ -20,14 +20,14 @@ class ContentForm(Form):
 @required_group('manager')
 def content_index():
     header = ['name']
-    for language in openatlas.app.config['LANGUAGES'].keys():
+    for language in app.config['LANGUAGES'].keys():
         header.append(language)
     header.append('text')
     table_content = {'name': 'content', 'header': header, 'data': []}
     for item, languages in ContentMapper.get_content().items():
         content = ['<a href="' + url_for('content_view', item=item) + '">' + util.uc_first(item) + '</a>']
         html_ok = '<img src="/images/icons/dialog-apply.png" alt="ok" \>'
-        for language in openatlas.app.config['LANGUAGES'].keys():
+        for language in app.config['LANGUAGES'].keys():
             content.append(html_ok if languages[language] else '')
         content.append(languages[session['language']])
         table_content['data'].append(content)
@@ -43,7 +43,7 @@ def content_view(item):
 @app.route('/admin/content/update/<string:item>', methods=["GET", "POST"])
 @required_group('manager')
 def content_update(item):
-    languages = openatlas.app.config['LANGUAGES'].keys()
+    languages = app.config['LANGUAGES'].keys()
     for language in languages:
         setattr(ContentForm, language, TextAreaField())
     form = ContentForm()

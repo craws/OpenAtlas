@@ -43,6 +43,9 @@ def get_cursor():
 
 
 connection = connect()
+locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
+babel = Babel(app)
+
 
 import openatlas
 from openatlas.models.classObject import ClassMapper
@@ -53,27 +56,6 @@ from openatlas.models.settings import SettingsMapper
 from openatlas.util import filters
 from openatlas.views import (actor, admin, ajax, content, index, settings, model, source, event,
                              place, reference, node, user, login, profile, translation)
-
-
-locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
-babel = Babel(app)
-
-# Todo: store these values somewhere else, config?
-default_table_rows = OrderedDict()
-default_table_rows['10'] = '10'
-default_table_rows['20'] = '20'
-default_table_rows['50'] = '50'
-default_table_rows['100'] = '100'
-
-log_levels = OrderedDict()
-log_levels[0] = 'emergency'
-log_levels[1] = 'alert'
-log_levels[2] = 'critical'
-log_levels[3] = 'error'
-log_levels[4] = 'warn'
-log_levels[5] = 'notice'
-log_levels[6] = 'info'
-log_levels[7] = 'debug'
 
 
 @babel.localeselector
@@ -92,12 +74,14 @@ debug_model['by ids'] = 0
 debug_model['by codes'] = 0
 debug_model['linked'] = 0
 debug_model['user'] = 0
-
 debug_model['current'] = time.time()
+
 classes = ClassMapper.get_all()
 properties = PropertyMapper.get_all()
+
 debug_model['model'] = time.time() - debug_model['current']
 debug_model['current'] = time.time()
+
 nodes = {}
 
 

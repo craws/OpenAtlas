@@ -60,8 +60,8 @@ def profile_index():
         (_('newsletter'),
             uc_first('on') if current_user.settings['newsletter'] else uc_first('off'))]}
     form = DisplayForm()
-    getattr(form, 'language').choices = openatlas.app.config['LANGUAGES'].items()
-    getattr(form, 'table_rows').choices = openatlas.default_table_rows.items()
+    getattr(form, 'language').choices = app.config['LANGUAGES'].items()
+    getattr(form, 'table_rows').choices = app.config['DEFAULT_TABLE_ROWS'].items()
     if form.validate_on_submit():
         current_user.settings['language'] = form.language.data
         current_user.settings['table_rows'] = form.table_rows.data

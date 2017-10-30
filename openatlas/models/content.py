@@ -1,7 +1,8 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-import openatlas
 from collections import OrderedDict
 from flask import session
+import openatlas
+from openatlas import app
 
 
 class ContentMapper(object):
@@ -11,7 +12,7 @@ class ContentMapper(object):
         content = OrderedDict()
         for name in ['intro', 'contact']:
             content[name] = OrderedDict()
-            for language in openatlas.app.config['LANGUAGES'].keys():
+            for language in app.config['LANGUAGES'].keys():
                 content[name][language] = ''
         cursor = openatlas.get_cursor()
         cursor.execute("SELECT name, language, text FROM web.i18n;")
@@ -32,7 +33,7 @@ class ContentMapper(object):
     def update_content(name, form):
         cursor = openatlas.get_cursor()
         cursor.execute('BEGIN')
-        for language in openatlas.app.config['LANGUAGES'].keys():
+        for language in app.config['LANGUAGES'].keys():
             sql = 'DELETE FROM web.i18n WHERE name = %(name)s AND language = %(language)s'
             cursor.execute(sql, {'name': name, 'language': language})
             sql = """
@@ -41,6 +42,5 @@ class ContentMapper(object):
             cursor.execute(sql, {
                 'name': name,
                 'language': language,
-                'text': form.__getattribute__(language).data.strip()
-            })
+                'text': form.__getattribute__(language).data.strip()})
         cursor.execute('COMMIT')

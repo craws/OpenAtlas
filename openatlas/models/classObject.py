@@ -1,6 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import session
 import openatlas
+from openatlas import app
 
 
 class ClassObject(object):
@@ -49,7 +50,7 @@ class ClassMapper(object):
             SELECT text, language_code, table_field, table_id
             FROM model.i18n
             WHERE table_name = 'class' AND language_code IN %(language_codes)s;"""
-        cursor.execute(sql, {'language_codes': tuple(openatlas.app.config['LANGUAGES'].keys())})
+        cursor.execute(sql, {'language_codes': tuple(app.config['LANGUAGES'].keys())})
         for row in cursor.fetchall():
             class_ = classes[row.table_id]
             if row.language_code not in class_.i18n:
