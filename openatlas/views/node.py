@@ -151,7 +151,7 @@ def tree_select(name):
 def save(form, node=None, root=None):
     openatlas.get_cursor().execute('BEGIN')
     if not node:
-        node = NodeMapper.insert('E55', form.name.data)
+        node = NodeMapper.insert(root.class_.code, form.name.data)
         super_ = 'new'
     else:
         root = openatlas.nodes[node.root[-1]] if node.root else None

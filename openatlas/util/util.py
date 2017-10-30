@@ -216,8 +216,10 @@ def link(entity):
             url = url_for('place_view', id_=entity.id)
         elif entity.class_.code in ('E31', 'E84'):
             url = url_for('reference_view', id_=entity.id)
-        elif entity.class_.code == 'E55':
+        elif entity.class_.code in ['E55', 'E53']:
             url = url_for('node_view', id_=entity.id)
+            if not entity.root:
+                url = url_for('node_index') + '#tab-' + str(entity.id)
         html = '<a href="' + url + '">' + entity.name + '</a>' if url else '? ' + entity.class_.name
     return Markup(html)
 
