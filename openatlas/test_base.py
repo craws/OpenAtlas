@@ -1,14 +1,12 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import os
 import unittest
-import openatlas
 from openatlas import app, get_cursor
 
 
 class TestBaseCase(unittest.TestCase):
     @staticmethod
     def setup_database():
-        openatlas.connection = openatlas.connect('testing')
         for file_name in [
             'structure.sql',
             'data_web.sql',
@@ -23,8 +21,6 @@ class TestBaseCase(unittest.TestCase):
 
     def setUp(self):
         app.config['SERVER_NAME'] = 'localhost'
-        app.config['LANGUAGE'] = 'en'
-        app.config['WHITELISTED_DOMAINS'] = 'E61'
         app.config['WTF_CSRF_ENABLED'] = False
         self.setup_database()
         self.app = app.test_client()

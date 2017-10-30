@@ -1,13 +1,16 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-import configparser
 import locale
 import psycopg2.extras
-import os
+import sys
 import time
 from collections import OrderedDict
-
 from flask import Flask, request, session
 from flask_babel import Babel
+
+try:
+    import mod_wsgi
+except ImportError:
+    mod_wsgi = None
 
 app = Flask(
     __name__,
@@ -15,18 +18,19 @@ app = Flask(
     static_folder='static',
     instance_relative_config=True)
 
+instance_name = 'production' if '--cover-tests' not in sys.argv else 'testing'
+app.config.from_object('config.default')  # load config/INSTANCE_NAME.py
+app.config.from_pyfile(instance_name + '.py')  # load instance/INSTANCE_NAME.py
 
-def connect(config_name='production'):
-    config = configparser.ConfigParser()
-    with open(os.path.dirname(__file__) + '/db.conf') as config_file:
-        config.read_file(open(os.path.dirname(__file__) + '/db.conf'))
+
+def connect():
     try:
         connection_ = psycopg2.connect(
-            database=config.get(config_name, 'database_name'),
-            user=config.get(config_name, 'database_user'),
-            password=config.get(config_name, 'database_pass'),
-            port=config.get(config_name, 'database_port'),
-            host=config.get(config_name, 'database_host'))
+            database=app.config['DATABASE_NAME'],
+            user=app.config['DATABASE_USER'],
+            password=app.config['DATABASE_PASS'],
+            port=app.config['DATABASE_PORT'],
+            host=app.config['DATABASE_HOST'])
         connection_.autocommit = True
         return connection_
     except Exception as e:  # pragma: no cover
@@ -38,17 +42,20 @@ def get_cursor():
     return connection.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
 
 
-try:
-    import mod_wsgi
-except ImportError:
-    pass
-
 connection = connect()
 
-app.config.from_object('config.default')  # load config/default.py
-app.config.from_pyfile('config.py')  # load instance/config.py
-locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
+import openatlas
+from openatlas.models.classObject import ClassMapper
+from openatlas.models.entity import Entity, EntityMapper
+from openatlas.models.node import NodeMapper
+from openatlas.models.property import PropertyMapper
+from openatlas.models.settings import SettingsMapper
+from openatlas.util import filters
+from openatlas.views import (actor, admin, ajax, content, index, settings, model, source, event,
+                             place, reference, node, user, login, profile, translation)
 
+
+locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 babel = Babel(app)
 
 # Todo: store these values somewhere else, config?
@@ -77,6 +84,7 @@ def get_locale():
     # check if best_match is set (in tests it isn't)
     return best_match if best_match else session['settings']['default_language']
 
+
 debug_model = OrderedDict()
 debug_model['current'] = time.time()
 debug_model['by id'] = 0
@@ -85,20 +93,8 @@ debug_model['by codes'] = 0
 debug_model['linked'] = 0
 debug_model['user'] = 0
 
-# get id of property 'has type' because its needed in EntityMapper
-cursor = get_cursor()
-cursor.execute("SELECT id FROM model.property WHERE name = 'has type';")
-has_type_id = cursor.fetchone()[0]
-
-import openatlas
-from openatlas.models.entity import Entity, EntityMapper
-from openatlas.models.node import NodeMapper
-from openatlas.models.property import PropertyMapper
-from openatlas.models.settings import SettingsMapper
-from openatlas.util import filters
-
 debug_model['current'] = time.time()
-classes = openatlas.models.classObject.ClassMapper.get_all()
+classes = ClassMapper.get_all()
 properties = PropertyMapper.get_all()
 debug_model['model'] = time.time() - debug_model['current']
 debug_model['current'] = time.time()
@@ -118,17 +114,16 @@ def before_request():
     debug_model['user'] = 0
     debug_model['div sql'] = 0
 
-from openatlas.views import (actor, admin, ajax, content, index, settings, model, source, event,
-                             place, reference, node, user, login, profile, translation)
 
 app.register_blueprint(filters.blueprint)
 app.add_template_global(debug_model, 'debug_model')
-app.debug = True
+app.debug = app.config['DEBUG']
 
 
 @app.context_processor
 def inject_debug():
     return dict(debug=app.debug)
+
 
 if __name__ == "__main__":  # pragma: no cover
     app.run()
