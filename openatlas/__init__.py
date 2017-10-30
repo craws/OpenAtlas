@@ -101,7 +101,6 @@ def before_request():
 
 app.register_blueprint(filters.blueprint)
 app.add_template_global(debug_model, 'debug_model')
-app.debug = app.config['DEBUG']
 
 
 @app.context_processor

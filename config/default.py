@@ -1,6 +1,6 @@
 from collections import OrderedDict
 
-DEBUG = True
+DEBUG = False
 VERSION = '3.0.0'
 LANGUAGES = {'en': 'English', 'de': 'Deutsch'}
 
