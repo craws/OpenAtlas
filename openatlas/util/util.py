@@ -4,6 +4,7 @@ from collections import OrderedDict
 from datetime import timedelta, date
 from functools import wraps
 
+from markdown import markdown
 from babel import dates
 from flask import abort, url_for, request, session
 from flask_login import current_user
@@ -220,7 +221,9 @@ def link(entity):
             url = url_for('node_view', id_=entity.id)
             if not entity.root:
                 url = url_for('node_index') + '#tab-' + str(entity.id)
-        html = '<a href="' + url + '">' + entity.name + '</a>' if url else '? ' + entity.class_.name
+        if not url:
+            return '?: ' + entity.class_.name
+        return Markup('<a href="' + url + '">') + truncate_string(entity.name) + Markup('</a>')
     return Markup(html)
 
 
