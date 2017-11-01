@@ -5,25 +5,32 @@
 {% block content %}
     <div id="tabs-menu" class="tabs-container">
         <ul>
-            <li>
-                <a href="#menu-tab-system">{{ _('system')|uc_first }}</a>
-            </li>
-            <li>
-                <a href="#menu-tab-custom">{{ _('custom')|uc_first }}</a>
-            </li>
+            <li><a href="#menu-tab-system">{{ _('system')|uc_first }}</a></li>
+            <li><a href="#menu-tab-custom">{{ _('custom')|uc_first }}</a></li>
         </ul>
         {% for type_ in ['system', 'custom'] %}
             <div id="menu-tab-{{ type_ }}" style="padding: 0;" class="tab-content">
                 <div id="tabs-{{ type_ }}" class="tabs-container">
                     <ul>
                         {% for node, tree in nodes[type_].items(): %}
-                            <li>
-                                <a href="#tab-{{ node.id }}">{{ node.name }}</a>
-                            </li>
+                            <li><a href="#tab-{{ node.id }}">{{ node.name }}</a></li>
                         {% endfor %}
+                        {% if type_ == 'custom' and 'manager'|is_authorized %}
+                            <div class="button-bar">
+                                <a href="{{ url_for('hierarchy_insert') }}" style="margin:0.5em 1em;">+ {{ _('type')|uc_first }}</a>
+                            </div>
+                        {% endif %}
                     </ul>
                     {% for node, tree in nodes[type_].items(): %}
-                        <div id="tab-{{ node.id }}"><p><strong>{{ node.name }}</strong></p>
+                        <div id="tab-{{ node.id }}">
+                            <p><strong>{{ node.name }}</strong></p>
+                            <div class="button-bar">
+                                {% if type_ == 'custom' and 'manager'|is_authorized %}
+                                    <a href="{{ url_for('hierarchy_update', id_=node.id) }} ">{{ _('edit')|uc_first }}</a>
+                                    <a onclick="return confirm('{{ _('delete')|uc_first }} {{ node.name.replace('\'', '') }}?')"
+                                        href="{{ url_for('hierarchy_delete', id_=node.id) }} ">{{ _('delete')|uc_first }}</a>
+                                {% endif %}
+                            </div>
                             <div style="float:left;margin-right:3em;">
                                 <div class="button-bar">
                                     <form method="post" action="{{ url_for('node_insert', root_id=node.id) }}">
@@ -34,9 +41,7 @@
                                             name="name_search"
                                             style="width:8em;"/>
                                         <input type="hidden" name="mode" value="insert" />
-                                        <button type="submit" value="insert" name="add-node-submit">
-                                            +
-                                        </button>
+                                        <button type="submit" value="insert" name="add-node-submit">+</button>
                                     </form>
                                 </div>
                                 {{ tree|safe }}
@@ -69,22 +74,5 @@
             $("#tabs-custom").tabs().addClass("ui-tabs-vertical");
             openParentTab();
         });
-        function openParentTab() {
-            locationHash = location.hash.substring(1);
-            console.log(locationHash);
-            if (locationHash) {
-                var hash = $('#' + locationHash);
-                if (hash.length) {
-                    if (hash.closest(".tab-content").length) {
-                        var tabNumber = hash.closest(".tab-content").index();
-                        $("#tabs-menu").tabs({active: tabNumber - 1});
-                        hash.get(0).scrollIntoView();
-                        setTimeout(function () {
-                            hash.get(0).scrollIntoView();
-                        }, 1000);
-                    }
-                }
-            }
-        }
     </script>
 {% endblock %}

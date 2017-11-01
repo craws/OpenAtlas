@@ -8,7 +8,7 @@ from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app
-from openatlas.forms import build_custom_form
+from openatlas.forms import build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.util.util import uc_first, required_group, append_node_data
 
@@ -25,7 +25,7 @@ class TranslationForm(Form):
 @required_group('editor')
 def translation_insert(source_id):
     source = EntityMapper.get_by_id(source_id)
-    form = build_custom_form(TranslationForm, 'Source translation')
+    form = build_form(TranslationForm, 'Source translation')
     if form.validate_on_submit():
         translation = save(form, None, source)
         flash(_('entity created'), 'info')
@@ -64,7 +64,7 @@ def translation_delete(id_, source_id):
 def translation_update(id_):
     translation = EntityMapper.get_by_id(id_)
     source = translation.get_linked_entity('P73', True)
-    form = build_custom_form(TranslationForm, 'Source translation', translation, request)
+    form = build_form(TranslationForm, 'Source translation', translation, request)
     if form.validate_on_submit():
         save(form, translation)
         flash(_('info update'), 'info')

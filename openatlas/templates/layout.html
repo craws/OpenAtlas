@@ -113,7 +113,7 @@
                         <a href="/{{ item }}">{{ _(item)|uc_first }}</a>
                     </div>
                 {% endfor %}
-                {% if 'manager'|is_authorized: %}
+                {% if 'manager'|is_authorized %}
                     {% set css = 'active' if 'admin' in request.path %}
                     <div class="{{ css|safe }}">
                         <a href="/admin">{{ _('admin')|uc_first }}</a>

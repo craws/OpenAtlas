@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('node_index') }}">{{ _('node')|uc_first }}</a>
+    > {{ node|link }}
+    > {{ _('update') }}
+{% endblock %}
+{% block content %}
+    {{ form|display_form() }}
+{% endblock %}

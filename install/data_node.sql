@@ -323,19 +323,19 @@ INSERT INTO web.hierarchy (id, name, multiple, system, directional) VALUES
 ((SELECT id FROM entity WHERE name='Historical Place'), 'Historical Place', True, True, False);
 
 INSERT INTO web.form (name, extendable) VALUES
-('Source', 1),
-('Event', 1),
-('Person', 1),
-('Group', 1),
-('Legal Body', 1),
-('Place', 1),
-('Bibliography', 1),
-('Edition', 1),
-('Information Carrier', 1),
-('Actor Actor Relation', 0),
-('Involvement', 0),
-('Member', 0),
-('Source translation', 0)
+('Source', True),
+('Event', True),
+('Person', True),
+('Group', True),
+('Legal Body', True),
+('Place', True),
+('Bibliography', True),
+('Edition', True),
+('Information Carrier', True),
+('Actor Actor Relation', False),
+('Involvement', False),
+('Member', False),
+('Source translation', False)
 ;
 
 INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES

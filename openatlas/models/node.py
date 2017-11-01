@@ -154,6 +154,16 @@ class NodeMapper(EntityMapper):
         return nodes
 
     @staticmethod
+    def get_forms():
+        sql = "SELECT f.id, f.name FROM web.form f WHERE f.extendable = True ORDER BY name ASC;"
+        cursor = openatlas.get_cursor()
+        cursor.execute(sql)
+        forms = []
+        for row in cursor.fetchall():
+            forms.append((row.id, row.name))
+        return forms
+
+    @staticmethod
     def save_entity_nodes(entity, form):
 
         # Todo: don't delete/save if not changed

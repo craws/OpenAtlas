@@ -1,4 +1,4 @@
--- Upgrade to 3.0.0, be sure to backup and read the update notes before executing this!
+-- Upgrade to 3.0.0, be sure to backup the database and read the update notes before executing this!
 
 BEGIN;
 
@@ -156,5 +156,11 @@ UPDATE model.entity SET name = 'Sex', description = 'Categories for sex like fem
     WHERE id = (SELECT id from model.entity WHERE name = 'Gender');
 UPDATE web.hierarchy SET name = 'Sex' WHERE id name = 'Gender';
 UPDATE web.hierarchy SET system = False WHERE name = 'Sex';
+
+-- New
+
+ALTER TABLE web.form ALTER COLUMN extendable DROP DEFAULT;
+ALTER TABLE web.form ALTER COLUMN extendable TYPE bool USING active::bool;
+ALTER TABLE web.form ALTER COLUMN extendable SET DEFAULT FALSE;
 
 COMMIT;

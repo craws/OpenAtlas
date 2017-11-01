@@ -7,7 +7,7 @@ from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app
-from openatlas.forms import DateForm, build_custom_form
+from openatlas.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.util.util import link, required_group, truncate_string, append_node_data, \
     print_base_type
@@ -42,7 +42,7 @@ def event_index():
 @app.route('/event/insert/<code>', methods=['POST', 'GET'])
 @required_group('editor')
 def event_insert(code):
-    form = build_custom_form(EventForm, 'Event')
+    form = build_form(EventForm, 'Event')
     if form.validate_on_submit() and form.name.data != app.config['EVENT_ROOT_NAME']:
         event = save(form, EntityMapper.insert(code, form.name.data))
         flash(_('entity created'), 'info')
@@ -70,7 +70,7 @@ def event_delete(id_):
 def event_update(id_):
     event = EntityMapper.get_by_id(id_)
     event.set_dates()
-    form = build_custom_form(EventForm, 'Event', event, request)
+    form = build_form(EventForm, 'Event', event, request)
     if event.name == app.config['EVENT_ROOT_NAME']:
         flash(_('error forbidden'), 'error')
         return redirect(url_for('event_index'))

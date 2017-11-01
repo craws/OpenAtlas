@@ -13,7 +13,7 @@ from openatlas.util.filters import pager
 from openatlas.util.util import uc_first, sanitize
 
 
-def build_custom_form(form, form_name, entity=None, request_origin=None, entity2=None):
+def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
 
     # Add custom fields
     custom_list = []

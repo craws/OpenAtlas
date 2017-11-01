@@ -818,7 +818,7 @@ SET default_with_oids = false;
 CREATE TABLE form (
     id integer NOT NULL,
     name text NOT NULL,
-    extendable integer DEFAULT 0 NOT NULL,
+    extendable boolean DEFAULT false NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone
 );

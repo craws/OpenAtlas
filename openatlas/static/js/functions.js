@@ -131,3 +131,17 @@ function clearSelect(name) {
     $('#' + name + '-tree').jstree('deselect_all');
     $('#' + name + '-clear').hide();
 }
+
+function openParentTab() {
+    locationHash = location.hash.substring(1);
+    console.log(locationHash);
+    if (locationHash) {
+        var hash = $('#' + locationHash);
+        if (hash.length) {
+            if (hash.closest(".tab-content").length) {
+                var tabNumber = hash.closest(".tab-content").index();
+                $("#tabs-menu").tabs({active: tabNumber - 1});
+            }
+        }
+    }
+}

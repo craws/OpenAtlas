@@ -8,7 +8,7 @@ from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app
-from openatlas.forms import build_custom_form
+from openatlas.forms import build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.util.util import uc_first, link, truncate_string, required_group, append_node_data, \
     print_base_type
@@ -52,7 +52,7 @@ def reference_index():
 @required_group('editor')
 def reference_insert(code):
     form_code = 'Information Carrier' if code == 'carrier' else uc_first(code)
-    form = build_custom_form(ReferenceForm, uc_first(form_code))
+    form = build_form(ReferenceForm, uc_first(form_code))
     if form.validate_on_submit():
         class_code = 'E31'
         system_type = code
@@ -81,7 +81,7 @@ def reference_delete(id_):
 @required_group('editor')
 def reference_update(id_):
     reference = EntityMapper.get_by_id(id_)
-    form = build_custom_form(ReferenceForm, reference.system_type.title(), reference, request)
+    form = build_form(ReferenceForm, reference.system_type.title(), reference, request)
     if form.validate_on_submit():
         save(form, reference)
         flash(_('info update'), 'info')

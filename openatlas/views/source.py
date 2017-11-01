@@ -8,7 +8,7 @@ from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app
-from openatlas.forms import build_custom_form
+from openatlas.forms import build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.util.util import (uc_first, link, truncate_string, required_group, append_node_data,
                                  print_base_type)
@@ -40,7 +40,7 @@ def source_index():
 @app.route('/source/insert', methods=['POST', 'GET'])
 @required_group('editor')
 def source_insert():
-    form = build_custom_form(SourceForm, 'Source')
+    form = build_form(SourceForm, 'Source')
     if form.validate_on_submit():
         source = save(form)
         flash(_('entity created'), 'info')
@@ -85,7 +85,7 @@ def source_delete(id_):
 @required_group('editor')
 def source_update(id_):
     source = EntityMapper.get_by_id(id_)
-    form = build_custom_form(SourceForm, 'Source', source, request)
+    form = build_form(SourceForm, 'Source', source, request)
     if form.validate_on_submit():
         save(form, source)
         flash(_('info update'), 'info')

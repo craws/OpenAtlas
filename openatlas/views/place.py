@@ -7,7 +7,7 @@ from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app
-from openatlas.forms import DateForm, build_custom_form
+from openatlas.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.util.util import (link, truncate_string, required_group, append_node_data,
                                  print_base_type)
@@ -41,7 +41,7 @@ def place_index():
 @app.route('/place/insert', methods=['POST', 'GET'])
 @required_group('editor')
 def place_insert():
-    form = build_custom_form(PlaceForm, 'Place')
+    form = build_form(PlaceForm, 'Place')
     if form.validate_on_submit():
         object_ = save(form)
         flash(_('entity created'), 'info')
@@ -80,7 +80,7 @@ def place_update(id_):
     object_ = EntityMapper.get_by_id(id_)
     object_.set_dates()
     location = object_.get_linked_entity('P53')
-    form = build_custom_form(PlaceForm, 'Place', object_, request, location)
+    form = build_form(PlaceForm, 'Place', object_, request, location)
     if form.validate_on_submit():
         save(form, object_, location)
         flash(_('info update'), 'info')

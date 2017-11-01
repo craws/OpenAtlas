@@ -54,8 +54,8 @@ from openatlas.models.node import NodeMapper
 from openatlas.models.property import PropertyMapper
 from openatlas.models.settings import SettingsMapper
 from openatlas.util import filters
-from openatlas.views import (actor, admin, ajax, content, index, settings, model, source, event,
-                             place, reference, node, user, login, profile, translation)
+from openatlas.views import (actor, admin, ajax, content, event, hierarchy, index, login, node,
+                             model, place, profile, reference, settings, source, translation, user)
 
 
 @babel.localeselector

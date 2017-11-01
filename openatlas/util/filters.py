@@ -233,6 +233,8 @@ def display_form(self, form, form_id=None, for_persons=False):
                 footer += util.add_dates_to_form(form, for_persons)
             continue
         field.label.text += ' *' if field.flags.required and form_id != 'login-form' else ''
+        if field.description:
+            field.label.text += ' <span class="tooltip" title="' + field.description + '">i</span>'
         errors = ' <span class="error">' + errors + ' </span>' if errors else ''
         html += '<div class="table-row"><div>' + str(field.label) + '</div>'
         html += '<div class="table-cell">' + str(field(class_=class_)) + errors + '</div></div>'

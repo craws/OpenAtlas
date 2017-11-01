@@ -158,13 +158,12 @@ def save(form, node=None, root=None):
         super_ = openatlas.nodes[node.root[0]] if node.root else None
     new_super_id = getattr(form, str(root.id)).data
     new_super = openatlas.nodes[int(new_super_id)] if new_super_id else openatlas.nodes[root.id]
-    if node:
-        if new_super.id == node.id:
-            flash(_('error node self as super'), 'error')
-            return False
-        if new_super.root and node.id in new_super.root:
-            flash(_('error node sub as super'), 'error')
-            return False
+    if new_super.id == node.id:
+        flash(_('error node self as super'), 'error')
+        return False
+    if new_super.root and node.id in new_super.root:
+        flash(_('error node sub as super'), 'error')
+        return False
     node.name = sanitize(form.name.data, 'node')
     if root.directional and sanitize(form.name_inverse.data, 'node'):
         node.name += ' (' + sanitize(form.name_inverse.data, 'node') + ')'
