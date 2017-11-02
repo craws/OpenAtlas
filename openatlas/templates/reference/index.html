@@ -16,5 +16,5 @@
             </a>
         </div>
     {% endif %}
-    {{ tables['reference']|pager }}
+    {{ tables['reference']|pager|safe }}
 {% endblock %}

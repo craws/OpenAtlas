@@ -9,7 +9,7 @@
         <p>
             <strong>{{ _('info')|uc_first }}</strong>
         </p>
-        {{ data['info']|data_table }}
+        {{ data['info']|data_table|safe }}
     </div>
     {% for name, table in tables.items() %}
         {% if table['data']|length > 0 %}
@@ -17,13 +17,13 @@
                 <p>
                     <strong>{{ name|uc_first }}</strong>
                 </p>
-                {{ tables[name]|pager }}
+                {{ tables[name]|pager|safe }}
             </div>
         {% endif %}
     {% endfor %}
     <div style="clear:both"></div>
     <div class="description">
-        <strong>{{ _('description')|uc_first }}</strong>
+        <strong>{{ _('description')|uc_first|safe }}</strong>
         <p>
             {{ class_.comment }}
         </p>

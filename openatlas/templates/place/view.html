@@ -6,9 +6,7 @@
 {% block content %}
 <div id="tabs" class="tabs-container">
     <ul>
-        <li>
-            <a href="#tab-info">{{ _('info')|uc_first }}</a>
-        </li>
+        <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
     </ul>
     <div id="tab-info">
         <div class="button-bar">
@@ -21,11 +19,11 @@
                     {{ _('delete')|uc_first }}
                 </a>
             {% endif %}
-            {{ object_.id|bookmark_toggle }}
+            {{ object_.id|bookmark_toggle|safe }}
         </div>
         <h1>{{ object_.name }}</h1>
-        {{ data['info']|data_table }}
-        {{ object_|description }}
+        {{ data['info']|data_table|safe }}
+        {{ object_|description|safe }}
     </div>
 </div>
 {% endblock %}

@@ -17,6 +17,7 @@ class Entity(object):
             for node_id in list(set(nodes_list)):
                 self.nodes.append(openatlas.nodes[node_id])
         self.name = row.name
+        self.root = None
         self.description = row.description if row.description else ''
         self.system_type = row.system_type
         self.created = row.created

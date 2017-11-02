@@ -2,9 +2,9 @@
 {% block breadcrumb %}
     <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
     > <a href="{{ url_for('user_index') }}">{{ _('user')|uc_first }}</a>
-    > {{ user|link }}
+    > {{ user|link|safe }}
     > {{ _('edit')|uc_first }}
 {% endblock %}
 {% block content %}
-    {{ form|display_form('user-form') }}
+    {{ form|display_form('user-form')|safe }}
 {% endblock %}

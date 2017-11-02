@@ -7,7 +7,7 @@
 <script src="/js/d3/d3-3.5.17.min.js"></script>
 <svg style="float:left;"></svg>
 <div style="float:left;margin-left:2em;">
-    {{ form|display_form }}
+    {{ form|display_form|safe }}
     <p>
         <a href="http://redmine.craws.net/projects/uni/wiki/Manual#Network-visualization"
             target="_blank">{{ _('manual')|uc_first }}</a>

@@ -11,5 +11,5 @@
             <a href="{{ url_for('event_insert', code='E6') }}">+ {{ 'E6'|get_class_name }}</a>
         </div>
     {% endif %}
-    {{ tables['event']|pager }}
+    {{ tables['event']|pager|safe }}
 {% endblock %}

@@ -4,13 +4,11 @@ from collections import OrderedDict
 from datetime import timedelta, date
 from functools import wraps
 
-from markdown import markdown
 from babel import dates
 from flask import abort, url_for, request, session
 from flask_login import current_user
 from flask_babel import lazy_gettext as _
 from html.parser import HTMLParser
-from markupsafe import Markup
 
 from werkzeug.utils import redirect
 
@@ -159,7 +157,7 @@ def bookmark_toggle(entity_id):
         label = uc_first(_('bookmark remove'))
     html = """<button id="bookmark{entity_id}" onclick="ajaxBookmark('{entity_id}');"
         type="button">{label}</button>""".format(entity_id=entity_id, label=label)
-    return Markup(html)
+    return html
 
 
 def is_authorized(group):
@@ -223,8 +221,8 @@ def link(entity):
                 url = url_for('node_index') + '#tab-' + str(entity.id)
         if not url:
             return '?: ' + entity.class_.name
-        return Markup('<a href="' + url + '">') + truncate_string(entity.name) + Markup('</a>')
-    return Markup(html)
+        return '<a href="' + url + '">' + truncate_string(entity.name) + '</a>'
+    return html
 
 
 def truncate_string(string, length=40):
@@ -232,7 +230,7 @@ def truncate_string(string, length=40):
         return ''  # pragma: no cover
     if len(string) > length + 2:
         string = '<span title="' + string.replace('"', '') + '">' + string[:length] + '..</span>'
-    return Markup(string)
+    return string
 
 
 def create_date_from_form(form_date, postfix=''):

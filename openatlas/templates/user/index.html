@@ -7,5 +7,5 @@
     <div class="button-bar">
         <a href="{{ url_for('user_insert') }}">+ {{ _('user')|uc_first }}</a>
     </div>
-    {{ tables['user']|pager }}
+    {{ tables['user']|pager|safe }}
 {% endblock %}

@@ -21,14 +21,14 @@
                     {{ _('delete')|uc_first }}
                 </a>
             {% endif %}
-            {{ actor.id|bookmark_toggle }}
+            {{ actor.id|bookmark_toggle|safe }}
         </div>
         <h1>{{ actor.name }}</h1>
-        {{ data['info']|data_table }}
+        {{ data['info']|data_table|safe }}
         {% for node in actor.types %}
-            {{ node|link }}<br />
+            {{ node|link|safe }}<br />
         {% endfor %}
-        {{ actor|description }}
+        {{ actor|description|safe }}
     </div>
 </div>
 {% endblock %}

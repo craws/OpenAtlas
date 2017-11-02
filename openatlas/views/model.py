@@ -136,7 +136,14 @@ def class_view(class_id):
 def property_view(property_id):
     properties = openatlas.properties
     property_ = properties[property_id]
-    tables = {}
+    classes = openatlas.classes
+    tables = {
+        'info': {
+            ('code', property_.code),
+            ('name', property_.name),
+            ('inverse', property_.name_inverse),
+            ('domain', link(classes[property_.domain_id]) + ' ' + classes[property_.domain_id].name),
+            ('range', link(classes[property_.range_id]) + ' ' + classes[property_.range_id].name)}}
     for table in ['super', 'sub']:
         tables[table] = {
             'name': table,
@@ -147,11 +154,7 @@ def property_view(property_id):
             tables[table]['data'].append([
                 link(properties[id_]),
                 properties[id_].name])
-    return render_template(
-        'model/property_view.html',
-        property=property_,
-        tables=tables,
-        classes=openatlas.classes)
+    return render_template('model/property_view.html', property=property_, tables=tables)
 
 
 class NetworkForm(Form):

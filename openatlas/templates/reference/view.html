@@ -21,11 +21,11 @@
                     {{ _('delete')|uc_first }}
                 </a>
             {% endif %}
-            {{ reference.id|bookmark_toggle }}
+            {{ reference.id|bookmark_toggle|safe }}
         </div>
         <h1>{{ reference.name }}</h1>
-        {{ data['info']|data_table }}
-        {{ reference|description }}
+        {{ data['info']|data_table|safe }}
+        {{ reference|description|safe }}
     </div>
 </div>
 {% endblock %}

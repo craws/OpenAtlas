@@ -1,10 +1,10 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
     <a href="{{ url_for('source_index') }}">{{ _('source')|uc_first }}</a>
-    > {{ source|link }}
-    > {{ translation|link }}
+    > {{ source|link|safe }}
+    > {{ translation|link|safe }}
     > {{ _('update')|uc_first }}
 {% endblock %}
 {% block content %}
-    {{ form|display_form() }}
+    {{ form|display_form|safe }}
 {% endblock %}

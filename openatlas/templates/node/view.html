@@ -2,7 +2,7 @@
 {% block breadcrumb %}
     <a href="{{ url_for('node_index') }}">{{ _('node')|uc_first }}</a>
     {% if root %}
-        > {{ root|link }}
+        > {{ root|link|safe }}
     {% endif %}
     > {{ node.name }}
 {% endblock %}
@@ -35,18 +35,18 @@
         {% endif %}
         <h1>{{ node.name }}</h1>
         {% if super_ %}
-            {{_('super')|uc_first}}: {{ super_|link }}
+            {{_('super')|uc_first}}: {{ super_|link|safe }}
         {% endif %}
-        {{ node|description }}
+        {{ node|description|safe }}
     </div>
     {% if tables['subs'].data %}
         <div id="tab-subs">
-            {{ tables['subs']|pager }}
+            {{ tables['subs']|pager|safe }}
         </div>
     {% endif %}
     {% if tables['entities'].data %}
         <div id="tab-entities">
-            {{ tables['entities']|pager }}
+            {{ tables['entities']|pager|safe }}
         </div>
     {% endif %}
 </div>

@@ -9,13 +9,13 @@
     </div>
     <div style="float:left;">
         <h1>{{ _('information')|uc_first }}</h1>
-        {{ data['info']|data_table }}
+        {{ data['info']|data_table|safe }}
     </div>
     <div style="float:left;margin-left:1em;">
         <h1>{{ _('display')|uc_first }}</h1>
         <form id="display-form" method="post">
             {{ form.csrf_token }}
-            {{ data['display']|data_table }}
+            {{ data['display']|data_table|safe }}
         </form>
     </div>
     <script type="text/javascript">

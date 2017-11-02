@@ -5,5 +5,5 @@
     > + {{ _('user')|uc_first }}
 {% endblock %}
 {% block content %}
-    {{ form|display_form('user-form') }}
+    {{ form|display_form('user-form')|safe }}
 {% endblock %}

@@ -2,11 +2,11 @@
 {% block breadcrumb %}
     <a href="{{ url_for('node_index') }}">{{ _('node')|uc_first }}</a>
     {% if root %}
-        > {{ root|link }}
+        > {{ root|link|safe }}
     {% endif %}
-    > {{ node|link }}
+    > {{ node|link|safe }}
     > {{ _('update') }}
 {% endblock %}
 {% block content %}
-    {{ form|display_form() }}
+    {{ form|display_form|safe }}
 {% endblock %}

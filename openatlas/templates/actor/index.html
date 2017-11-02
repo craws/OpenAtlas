@@ -10,5 +10,5 @@
             <a href="{{ url_for('actor_insert', code='E40') }}">+ {{ 'E40'|get_class_name }}</a>
         </div>
     {% endif %}
-    {{ tables['actor']|pager }}
+    {{ tables['actor']|pager|safe }}
 {% endblock %}

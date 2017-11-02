@@ -26,11 +26,11 @@
                     {{ _('delete')|uc_first }}
                 </a>
             {% endif %}
-            {{ source.id|bookmark_toggle }}
+            {{ source.id|bookmark_toggle|safe }}
         </div>
         <h1>{{ source.name }}</h1>
-        {{ data['info']|data_table }}
-        {{ source|description }}
+        {{ data['info']|data_table|safe }}
+        {{ source|description|safe }}
     </div>
     <div id="tab-translations">
         {% if 'editor'|is_authorized: %}
@@ -40,7 +40,7 @@
                 </a>
             </div>
         {% endif %}
-        {{ tables['translation']|pager }}
+        {{ tables['translation']|pager|safe }}
     </div>
 </div>
 {% endblock %}

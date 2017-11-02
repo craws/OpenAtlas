@@ -4,7 +4,7 @@
     > {{ _('login')|uc_first }}
 {% endblock %}
 {% block content %}
-    {{ form|display_form('login-form') }}
+    {{ form|display_form('login-form')|safe }}
     <script>
         $(function () {
             $("#username").focus();

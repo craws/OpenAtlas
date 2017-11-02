@@ -7,7 +7,7 @@ import os
 
 from flask import session, render_template_string
 from flask_login import current_user
-from jinja2 import evalcontextfilter, Markup, escape
+from jinja2 import evalcontextfilter, escape
 from flask_babel import lazy_gettext as _
 
 import openatlas
@@ -42,7 +42,7 @@ def uc_first(self, string):
 @evalcontextfilter
 def nl2br(self, value):
     result = u'\n\n'.join(u'<p>%s</p>' % p.replace('\n', '<br>\n') for p in paragraph_re.split(escape(value)))
-    return Markup(result)
+    return result
 
 
 @jinja2.contextfilter
@@ -56,7 +56,7 @@ def data_table(self, data):
             html += '<div class="table-row"><div>' + util.uc_first(key) + '</div>'
             html += '<div class="table-cell">' + str(value) + '</div></div>'
     html += '</div>'
-    return Markup(html)
+    return html
 
 
 @jinja2.contextfilter
@@ -102,14 +102,14 @@ def table_select_model(self, name, selected=None):
         <script>$(document).ready(function () {{createOverlay("{name}");}});</script>
     """.format(name=name, value=value, pager=render_template_string(pager(None, table)))
 
-    return Markup(html)
+    return html
 
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def pager(self, table):
     if not table['data']:
-        return Markup('<p>' + util.uc_first(_('no entries')) + '</p>')
+        return '<p>' + util.uc_first(_('no entries')) + '</p>'
     html = ''
     table_rows = session['settings']['default_table_rows']
     if hasattr(current_user, 'settings'):
@@ -172,7 +172,7 @@ def pager(self, table):
     else:
         html += '$("#' + table['name'] + '-table").tablesorter({' + sort + ',widgets:[\'zebra\']});'
     html += '</script>'
-    return Markup(html)
+    return html
 
 
 @jinja2.contextfilter
@@ -187,7 +187,7 @@ def description(self, entity):
         </div>""".format(
             label=util.uc_first(_('description')),
             description=entity.description.replace('\r\n', '<br />'))
-    return Markup(html)
+    return html
 
 
 @jinja2.contextfilter
@@ -239,7 +239,7 @@ def display_form(self, form, form_id=None, for_persons=False):
         html += '<div class="table-row"><div>' + str(field.label) + '</div>'
         html += '<div class="table-cell">' + str(field(class_=class_)) + errors + '</div></div>'
     html += footer + '</div></form>'
-    return Markup(html)
+    return html
 
 
 @jinja2.contextfilter

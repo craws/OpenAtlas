@@ -9,14 +9,7 @@
         <p>
             <strong>{{ _('info')|uc_first }}</strong>
         </p>
-        {% set data = [
-            ('code', property.code),
-            ('name', property.name),
-            ('inverse', property.name_inverse),
-            ('domain', classes[property.domain_id]|link + ' ' + classes[property.domain_id].name),
-            ('range', classes[property.range_id]|link + ' ' + classes[property.range_id].name),
-        ] %}
-        {{ data|data_table }}
+        {{ tables['info']|data_table|safe }}
     </div>
     {% for name, table in tables.items() %}
         {% if table['data']|length > 0 %}
@@ -24,7 +17,7 @@
                 <p>
                     <strong>{{ name|uc_first }}</strong>
                 </p>
-                {{ tables[name]|pager }}
+                {{ tables[name]|pager|safe }}
             </div>
         {% endif %}
     {% endfor %}

@@ -25,15 +25,15 @@
                 (form.property.label, form.property|string + 'property'|table_select_model(property)),
                 (form.range.label, form.range|string + 'range'|table_select_model(range)),
             ] %}
-            {{ data|data_table }}
+            {{ data|data_table|safe }}
             <input type="submit" value="{{ _('test')|uc_first }}" />
         </form>
         {% if test_result: %}
             <p style="margin-top:1em;">
                 {{ _('result for')|uc_first }}
-                {{ test_result['domain']|link }} >
-                {{ test_result['property']|link }} >
-                {{ test_result['range']|link }}
+                {{ test_result['domain']|link|safe }} >
+                {{ test_result['property']|link|safe }} >
+                {{ test_result['range']|link|safe }}
             </p>
             {% if not test_result['domain_error'] and not test_result['range_error'] %}
                 <p>{{ _('valid link')|uc_first }}<br/>
@@ -41,20 +41,20 @@
             {% if test_result['domain_error'] %}
                 <p>
                     <span class="error">{{ _('wrong domain')|uc_first }}</span>
-                    {{ test_result['domain']|link }} {{ _('for') }}
-                    {{ test_result['property']|link }}
+                    {{ test_result['domain']|link|safe }} {{ _('for') }}
+                    {{ test_result['property']|link|safe }}
                 </p>
             {% endif %}
             {% if test_result['range_error'] %}
                 <p>
                     <span class="error">{{ _('wrong range')|uc_first }}</span>
-                    {{ test_result['range']|link }} {{ _('for') }}
-                    {{ test_result['property']|link }}
+                    {{ test_result['range']|link|safe }} {{ _('for') }}
+                    {{ test_result['property']|link|safe }}
                 </p>
             {% endif %}
             {% if test_result['domain_whitelisted']: %}
                 <p>
-                    {{ test_result['domain']|link }} {{ _('no check because whitelisted') }}
+                    {{ test_result['domain']|link|safe }} {{ _('no check because whitelisted') }}
                 </p>
             {% endif %}
         {% endif %}
