@@ -6,4 +6,11 @@
 {% endblock %}
 {% block content %}
     {{ form|display_form|safe }}
+    <script>
+        $.each({{ forms|safe }}, function () {
+            if ($('#' + this).is(':checked')) {
+                $('#' + this).attr('disabled', true);
+            }
+        });
+    </script>
 {% endblock %}

@@ -15,13 +15,15 @@ from openatlas.util.util import required_group, sanitize, uc_first
 
 class HierarchyForm(Form):
     name = StringField(uc_first(_('name')), validators=[InputRequired()])
-    multiple = BooleanField(uc_first(_('multiple')), uc_first(_('active')))
+    multiple = BooleanField(uc_first(_('multiple')),description=_('tooltip hierarchy multiple'))
     forms = SelectMultipleField(
         uc_first(_('forms')),
-        description=_('tooltip multiple hierarchies'),
-        choices=NodeMapper.get_forms(),
+        render_kw={'disabled': True},
+        description=_('tooltip hierarchy forms'),
+        choices=NodeMapper.get_form_choices(),
         option_widget=widgets.CheckboxInput(),
-        widget=widgets.ListWidget(prefix_label=False))
+        widget=widgets.ListWidget(prefix_label=False),
+        coerce=int)
     description = TextAreaField(uc_first(_('description')))
     save = SubmitField(_('insert'))
 
@@ -45,12 +47,19 @@ def hierarchy_update(id_):
         flash(_('error forbidden'), 'error')
         return redirect(url_for('node_view', id_=id_))
     form = build_form(HierarchyForm, 'hierarchy', node)
+    if node.multiple:
+        form.multiple.render_kw = {'disabled': 'disabled'}
     if form.validate_on_submit():
         if save(form, node):
             flash(_('info update'), 'info')
             return redirect(url_for('node_index') + '#tab-' + str(node.id))
-        return render_template('hierarchy/update.html', node=node, form=form)
-    return render_template('hierarchy/update.html', node=node, form=form)
+        return render_template('hierarchy/update.html', node=node)
+    form.multiple = node.multiple
+    return render_template(
+        'hierarchy/update.html',
+        node=node,
+        form=form,
+        forms=[form.id for form in form.forms])
 
 
 @app.route('/hierarchy/delete/<int:id_>', methods=['POST', 'GET'])
@@ -70,10 +79,13 @@ def hierarchy_delete(id_):
 def save(form, node=None):
     openatlas.get_cursor().execute('BEGIN')
     if not node:
-        node = NodeMapper.insert('E55', form.name.data)
+        node = NodeMapper.insert('E55', sanitize(form.name.data, 'node'))
+        NodeMapper.insert_hierarchy(node, form)
     else:
         node = openatlas.nodes[node.id]
+        NodeMapper.update_hierarchy(node, form)
     node.name = sanitize(form.name.data, 'node')
     node.description = form.description.data
+    node.update()
     openatlas.get_cursor().execute('COMMIT')
     return node

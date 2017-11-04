@@ -154,7 +154,7 @@ class NodeMapper(EntityMapper):
         return nodes
 
     @staticmethod
-    def get_forms():
+    def get_form_choices():
         sql = "SELECT f.id, f.name FROM web.form f WHERE f.extendable = True ORDER BY name ASC;"
         cursor = openatlas.get_cursor()
         cursor.execute(sql)
@@ -165,7 +165,6 @@ class NodeMapper(EntityMapper):
 
     @staticmethod
     def save_entity_nodes(entity, form):
-
         # Todo: don't delete/save if not changed
         # Todo: just delete node ids?
         if hasattr(entity, 'nodes'):
@@ -184,3 +183,30 @@ class NodeMapper(EntityMapper):
                 else:
                     if openatlas.classes[entity.class_.id].code != 'E53':
                         entity.link('P2', range_param)
+
+    @staticmethod
+    def insert_hierarchy(node, form):
+        sql = """
+            INSERT INTO web.hierarchy (id, name, multiple)
+            VALUES (%(id)s, %(name)s, %(multiple)s);"""
+        openatlas.get_cursor().execute(sql, {
+            'id': node.id,
+            'name': node.name,
+            'multiple': form.multiple.data})
+        NodeMapper.add_forms_to_hierarchy(node, form)
+
+    @staticmethod
+    def update_hierarchy(node, form):
+        sql = "UPDATE web.hierarchy SET multiple = %(multiple)s WHERE id = %(id)s;"
+        multiple = True if node.multiple or form.multiple.data else False
+        openatlas.get_cursor().execute(sql, {'id': node.id, 'multiple': multiple})
+        NodeMapper.add_forms_to_hierarchy(node, form)
+
+    @staticmethod
+    def add_forms_to_hierarchy(node, form):
+        cursor = openatlas.get_cursor()
+        for form_id in form.forms.data:
+            sql = """
+                INSERT INTO web.hierarchy_form (hierarchy_id, form_id)
+                VALUES (%(node_id)s, %(form_id)s);"""
+            cursor.execute(sql, {'node_id': node.id, 'form_id': form_id})
