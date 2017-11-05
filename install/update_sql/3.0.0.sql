@@ -3,7 +3,7 @@
 BEGIN;
 
 -- Settings
-DELETE FROM web.settings WHERE name = 'mail_transport_password';
+DELETE FROM web.settings WHERE name IN ('mail_transport_password', 'mail_transport_auth', 'mail_transport_ssl', 'mail_transport_type');
 UPDATE web.settings SET name = 'site_name' WHERE name = 'sitename';
 UPDATE web.settings SET value = 'en' WHERE name = 'default_language';
 INSERT INTO web.settings (name, value) VALUES ('minimum_password_length', '12');
@@ -104,7 +104,6 @@ DELETE FROM model.entity WHERE id = (SELECT id FROM model.entity WHERE name = 'F
 DELETE FROM model.entity WHERE id = (SELECT id FROM model.entity WHERE name = 'Date value type');
 
 -- References
-
 UPDATE model.entity SET system_type = 'information carrier'
 WHERE id IN (SELECT e.id FROM model.entity e JOIN model.class c ON e.class_id = c.id AND c.code = 'E84');
 
@@ -131,8 +130,9 @@ WHERE id IN (
 -- Location of places
 UPDATE model.entity SET system_type = 'place location' WHERE name LIKE 'Location of%' AND class_id = (SELECT id FROM model.class WHERE code = 'E53');
 
--- Alter web.hierarchy with booleans and unique key for name
+-- Alter web.hierarchy and form with booleans and clean up
 ALTER TABLE ONLY web.hierarchy ADD CONSTRAINT hierarchy_name_key UNIQUE (name);
+ALTER TABLE web.hierarchy DROP COLUMN extendable;
 ALTER TABLE web.hierarchy ALTER COLUMN multiple DROP DEFAULT;
 ALTER TABLE web.hierarchy ALTER COLUMN multiple TYPE bool USING multiple::bool;
 ALTER TABLE web.hierarchy ALTER COLUMN multiple SET DEFAULT FALSE;
@@ -142,14 +142,14 @@ ALTER TABLE web.hierarchy ALTER COLUMN system SET DEFAULT FALSE;
 ALTER TABLE web.hierarchy ALTER COLUMN directional DROP DEFAULT;
 ALTER TABLE web.hierarchy ALTER COLUMN directional TYPE bool USING directional::bool;
 ALTER TABLE web.hierarchy ALTER COLUMN directional SET DEFAULT FALSE;
-
-ALTER TABLE web.hierarchy DROP COLUMN extendable;
+ALTER TABLE web.form ALTER COLUMN extendable DROP DEFAULT;
+ALTER TABLE web.form ALTER COLUMN extendable TYPE bool USING active::bool;
+ALTER TABLE web.form ALTER COLUMN extendable SET DEFAULT FALSE;
 
 -- Remove all links to node roots because not needed anymore
 DELETE FROM model.link WHERE
     property_id = (SELECT id FROM model.property WHERE code = 'P2')
     AND range_id IN (SELECT id FROM web.hierarchy);
-
 
 -- Change gender to sex and remove system flag
 UPDATE model.entity SET name = 'Sex', description = 'Categories for sex like female, male.'
@@ -157,10 +157,8 @@ UPDATE model.entity SET name = 'Sex', description = 'Categories for sex like fem
 UPDATE web.hierarchy SET name = 'Sex' WHERE id name = 'Gender';
 UPDATE web.hierarchy SET system = False WHERE name = 'Sex';
 
--- New
+-- Drop
 
-ALTER TABLE web.form ALTER COLUMN extendable DROP DEFAULT;
-ALTER TABLE web.form ALTER COLUMN extendable TYPE bool USING active::bool;
-ALTER TABLE web.form ALTER COLUMN extendable SET DEFAULT FALSE;
+
 
 COMMIT;
