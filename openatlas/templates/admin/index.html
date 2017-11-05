@@ -3,23 +3,11 @@
     {{ _('admin')|uc_first }}
 {% endblock %}
 {% block content %}
-    {% if 'manager'|is_authorized: %}
-        <p>
-            <a class="button" href="{{ url_for('user_index') }}">
-                {{ _('user')|uc_first }}
-            </a>
-        </p>
-        <p>
-            <a class="button" href="{{ url_for('content_index') }}">
-                {{ _('content')|uc_first }}
-            </a>
-        </p>
-    {% endif  %}
-    {% if 'admin'|is_authorized: %}
-        <p>
-            <a class="button" href="{{ url_for('settings_index') }}">
-                {{ _('settings')|uc_first }}
-            </a>
-        </p>
-    {% endif  %}
+    <div class="button-bar">
+        <a href="{{ url_for('user_index') }}">{{ _('user')|uc_first }}</a>
+        <a href="{{ url_for('content_index') }}">{{ _('content')|uc_first }}</a>
+        {% if 'admin'|is_authorized: %}
+            <a href="{{ url_for('settings_index') }}">{{ _('settings')|uc_first }}</a>
+        {% endif  %}
+    </div>
 {% endblock %}

@@ -16,9 +16,17 @@ class SettingsForm(Form):
 
     # General
     site_name = StringField(uc_first(_('site name')))
-    default_language = SelectField(uc_first(_('default language')), choices=[])
-    default_table_rows = SelectField(uc_first(_('default table rows')), choices=[], coerce=int)
-    log_level = SelectField(uc_first(_('log level')), choices=[], coerce=int)
+    default_language = SelectField(
+        uc_first(_('default language')),
+        choices=app.config['LANGUAGES'].items())
+    default_table_rows = SelectField(
+        uc_first(_('default table rows')),
+        choices=app.config['DEFAULT_TABLE_ROWS'].items(),
+        coerce=int)
+    log_level = SelectField(
+        uc_first(_('log level')),
+        choices=app.config['LOG_LEVELS'].items(),
+        coerce=int)
     maintenance = BooleanField(uc_first(_('maintenance')), false_values='false')
     offline = BooleanField(uc_first(_('offline')), false_values='false')
 
@@ -27,9 +35,6 @@ class SettingsForm(Form):
     mail_transport_username = StringField(uc_first(_('mail transport username')))
     mail_transport_host = StringField(uc_first(_('mail transport host')))
     mail_transport_port = StringField(uc_first(_('mail transport port')))
-    mail_transport_type = StringField(uc_first(_('mail transport type')))
-    mail_transport_ssl = StringField(uc_first(_('mail transport ssl')))
-    mail_transport_auth = StringField(uc_first(_('mail transport auth')))
     mail_from_email = StringField(uc_first(_('mail from email')))
     mail_from_name = StringField(uc_first(_('mail from name')))
     mail_recipients_login = StringField(uc_first(_('mail recipients login')))
@@ -63,9 +68,6 @@ def settings_index():
             (_('mail transport username'), settings['mail_transport_username']),
             (_('mail transport host'), settings['mail_transport_host']),
             (_('mail transport port'), settings['mail_transport_port']),
-            (_('mail transport type'), settings['mail_transport_type']),
-            (_('mail transport ssl'), settings['mail_transport_ssl']),
-            (_('mail transport auth'), settings['mail_transport_auth']),
             (_('mail from email'), settings['mail_from_email']),
             (_('mail from name'), settings['mail_from_name']),
             (_('mail recipients login'), ', '.join(settings['mail_recipients_login'])),
@@ -83,9 +85,6 @@ def settings_index():
 @required_group('admin')
 def settings_update():
     form = SettingsForm()
-    getattr(form, 'default_language').choices = app.config['LANGUAGES'].items()
-    getattr(form, 'log_level').choices = app.config['LOG_LEVELS'].items()
-    getattr(form, 'default_table_rows').choices = app.config['DEFAULT_TABLE_ROWS'].items()
     if form.validate_on_submit():
         openatlas.get_cursor().execute('BEGIN')
         SettingsMapper.update(form)

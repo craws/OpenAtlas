@@ -1,8 +1,11 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import request, session, url_for
+from flask import request, session, url_for, flash
 from flask import render_template
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
+from flask_wtf import Form
+from wtforms import SubmitField, TextAreaField, SelectField
+from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app
@@ -11,7 +14,13 @@ from openatlas.util.changelog import Changelog
 from werkzeug.utils import redirect
 
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import link, bookmark_toggle, uc_first, required_group
+from openatlas.util.util import link, bookmark_toggle, uc_first, required_group, send_mail
+
+
+class FeedbackForm(Form):
+    subject = SelectField(_('subject'), choices=app.config['FEEDBACK_SUBJECTS'].items())
+    description = TextAreaField(_('description'), validators=[InputRequired()])
+    send = SubmitField(_('send'))
 
 
 @app.route('/')
@@ -51,10 +60,21 @@ def set_locale(language):
     return redirect(request.referrer)
 
 
-@app.route('/index/feedback')
+@app.route('/overview/feedback', methods=['POST', 'GET'])
 @required_group('readonly')
-def index_feedback():
-    return render_template('index/feedback.html')
+def overview_feedback():
+    form = FeedbackForm()
+    if form.validate_on_submit():
+        subject = form.subject.data + ' from ' + session['settings']['site_name']
+        user = current_user
+        body = form.subject.data + ' from ' + user.username + ' (' + str(user.id) + ') '
+        body += user.email + ' at ' + request.headers['Host'] + "\n\n" + form.description.data
+        if send_mail(subject, body, session['settings']['mail_recipients_feedback']):
+            flash(_('info feedback thanks'), 'info')
+        else:
+            flash(_('error mail send'), 'error')
+        return redirect(url_for('index'))
+    return render_template('index/feedback.html', form=form)
 
 
 @app.route('/index/contact')

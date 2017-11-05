@@ -1,15 +1,15 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import re
+import smtplib
 from collections import OrderedDict
 from datetime import timedelta, date
 from functools import wraps
 
 from babel import dates
-from flask import abort, url_for, request, session
+from flask import abort, url_for, request, session, flash
 from flask_login import current_user
 from flask_babel import lazy_gettext as _
 from html.parser import HTMLParser
-
 from werkzeug.utils import redirect
 
 import openatlas
@@ -17,6 +17,32 @@ from openatlas.models.classObject import ClassObject
 from openatlas.models.entity import Entity
 from openatlas.models.property import Property
 from openatlas.models.user import User
+
+
+def send_mail(subject, text, recipients):
+    if not session['settings']['mail']:
+        return
+    sender = session['settings']['mail_transport_username']
+    from_ = session['settings']['mail_from_name']
+    from_ += ' <' + session['settings']['mail_from_email'] + '>'
+    server = smtplib.SMTP(
+        session['settings']['mail_transport_host'],
+        session['settings']['mail_transport_port'])
+    server.ehlo()
+    server.starttls()
+    server.login(sender, openatlas.app.config['MAIL_PASSWORD'])
+    try:
+        for recipient in recipients if isinstance(recipients, list) else [recipients]:
+            body = '\r\n'.join([
+                'To: %s' % recipient,
+                'From: %s' % from_,
+                'Subject: %s' % subject,
+                '', text])
+            server.sendmail(sender, recipient, body)
+        return True
+    except:
+        flash(_('email failed'), 'error')
+    return False
 
 
 class MLStripper(HTMLParser):

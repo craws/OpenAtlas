@@ -222,8 +222,9 @@ def display_form(self, form, form_id=None, for_persons=False):
             html += str(field)
             continue
         field.label.text = util.uc_first(field.label.text)
+        field.label.text += ' *' if field.flags.required and form_id != 'login-form' else ''
         if field.id == 'description':
-            footer += '<br />' + str(field.label) + '<br />' + str(field) + '<br />'
+            footer += '<br />' + str(field.label) + '<br />' + str(field(class_=class_)) + '<br />'
             continue
         if field.type == 'SubmitField':
             footer += str(field)
@@ -232,7 +233,6 @@ def display_form(self, form, form_id=None, for_persons=False):
             if field.id == 'date_begin_year':
                 footer += util.add_dates_to_form(form, for_persons)
             continue
-        field.label.text += ' *' if field.flags.required and form_id != 'login-form' else ''
         if field.description:
             field.label.text += ' <span class="tooltip" title="' + field.description + '">i</span>'
         errors = ' <span class="error">' + errors + ' </span>' if errors else ''

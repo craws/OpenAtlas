@@ -1,4 +1,7 @@
 from collections import OrderedDict
+from flask_babel import lazy_gettext as _
+
+from openatlas.util.util import uc_first
 
 DEBUG = False
 VERSION = '3.0.0'
@@ -11,6 +14,7 @@ DATABASE_PORT = 5432
 
 # Set these options in /instance/INSTANCE_NAME.py e.g. in /instance/production.py
 DATABASE_PASS = 'CHANGE ME'
+MAIL_PASSWORD = 'CHANGE ME'
 SECRET_KEY = 'CHANGE ME'
 
 # Whitelisted domains are ignored by the link checker
@@ -34,3 +38,8 @@ LOG_LEVELS[4] = 'warn'
 LOG_LEVELS[5] = 'notice'
 LOG_LEVELS[6] = 'info'
 LOG_LEVELS[7] = 'debug'
+
+FEEDBACK_SUBJECTS = OrderedDict()
+FEEDBACK_SUBJECTS[uc_first(_('suggestion'))] = uc_first(_('suggestion'))
+FEEDBACK_SUBJECTS[uc_first(_('question'))] = uc_first(_('question'))
+FEEDBACK_SUBJECTS[uc_first(_('problem'))] = uc_first(_('problem'))
