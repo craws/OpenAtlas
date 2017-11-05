@@ -254,3 +254,9 @@ def test_file(self, file_name):
 @blueprint.app_template_filter()
 def sanitize(self, string):
     return util.sanitize(string)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def truncate_string(self, string):
+    return util.truncate_string(string)

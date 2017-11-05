@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
     <a href="{{ url_for('event_index') }}">{{ _('event')|uc_first }}</a>
-    > {{ event.name }}
+    > {{ event.name|truncate_string|safe }}
 {% endblock %}
 {% block content %}
 <div id="tabs" class="tabs-container">

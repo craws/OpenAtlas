@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
     <a href="{{ url_for('reference_index') }}">{{ _('reference')|uc_first }}</a>
-    > {{ reference.name }}
+    > {{ reference.name|truncate_string|safe }}
 {% endblock %}
 {% block content %}
 <div id="tabs" class="tabs-container">
