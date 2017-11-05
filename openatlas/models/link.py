@@ -1,4 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+from flask import flash
+from flask_babel import lazy_gettext as _
+
 import openatlas
 
 
@@ -23,6 +26,26 @@ class LinkMapper(object):
                 continue
             domain_id = domain.id if type(domain) is openatlas.Entity else int(domain)
             range_id = range_param.id if type(range_param) is openatlas.Entity else int(range_param)
+            # Todo: test links only if in debug mode
+            if True:
+                domain = domain if type(
+                    domain) is openatlas.Entity else openatlas.EntityMapper.get_by_id(int(domain))
+                range_ = range_param if type(
+                    range_param) is openatlas.Entity else openatlas.EntityMapper.get_by_id(
+                    int(range_param))
+                domain_class = openatlas.classes[domain.class_.id]
+                range_class = openatlas.classes[range_.class_.id]
+                property_ = openatlas.PropertyMapper.get_by_code(property_code)
+                ignore = openatlas.app.config['WHITELISTED_DOMAINS']
+                domain_error = True
+                if property_.find_object('domain_id', domain_class.id) or domain_class.code in ignore:
+                    domain_error = False
+                range_error = False if property_.find_object('range_id', range_class.id) else True
+                if domain_error or range_error:
+                    text = _('error link') + ': ' + domain_class.name + ' > '
+                    text += property_code + ' > ' + range_class.name
+                    flash(text, 'error')
+                    continue
             sql = """
                 INSERT INTO model.link (property_id, domain_id, range_id)
                 VALUES ((
