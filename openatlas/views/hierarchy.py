@@ -50,10 +50,8 @@ def hierarchy_update(id_):
     if node.multiple:
         form.multiple.render_kw = {'disabled': 'disabled'}
     if form.validate_on_submit():
-        if save(form, node):
-            flash(_('info update'), 'info')
-            return redirect(url_for('node_index') + '#tab-' + str(node.id))
-        return render_template('hierarchy/update.html', node=node)
+        flash(_('info update'), 'info')
+        return redirect(url_for('node_index') + '#tab-' + str(node.id))
     form.multiple = node.multiple
     return render_template(
         'hierarchy/update.html',
