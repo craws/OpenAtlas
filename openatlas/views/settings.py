@@ -27,11 +27,12 @@ class SettingsForm(Form):
         uc_first(_('log level')),
         choices=app.config['LOG_LEVELS'].items(),
         coerce=int)
-    maintenance = BooleanField(uc_first(_('maintenance')), false_values='false')
-    offline = BooleanField(uc_first(_('offline')), false_values='false')
+    debug_mode = BooleanField(uc_first(_('debug mode')))
+    maintenance = BooleanField(uc_first(_('maintenance')))
+    offline = BooleanField(uc_first(_('offline')))
 
     # Mail
-    mail = BooleanField(uc_first(_('mail')), false_values='false')
+    mail = BooleanField(uc_first(_('mail')))
     mail_transport_username = StringField(uc_first(_('mail transport username')))
     mail_transport_host = StringField(uc_first(_('mail transport host')))
     mail_transport_port = StringField(uc_first(_('mail transport port')))
@@ -55,16 +56,15 @@ def settings_index():
     groups = OrderedDict([
         ('general', OrderedDict([
             (_('site name'), settings['site_name']),
-            (_('default language'),
-                app.config['LANGUAGES'][settings['default_language']]),
+            (_('default language'), app.config['LANGUAGES'][settings['default_language']]),
             (_('default table rows'), settings['default_table_rows']),
             (_('log level'), app.config['LOG_LEVELS'][int(settings['log_level'])]),
+            (_('debug mode'), uc_first(_('on')) if settings['debug_mode'] else uc_first(_('off'))),
             (_('maintenance'),
-                uc_first('on') if settings['maintenance'] == 'true' else uc_first('off')),
-            (_('offline'),
-                uc_first('on') if settings['offline'] == 'true' else uc_first('off'))])),
+                uc_first(_('on')) if settings['maintenance'] else uc_first(_('off'))),
+            (_('offline'), uc_first(_('on')) if settings['offline'] else uc_first(_('off')))])),
         ('mail', OrderedDict([
-            (_('mail'), uc_first('on') if settings['mail'] == 'true' else uc_first('off')),
+            (_('mail'), uc_first(_('on')) if settings['mail'] else uc_first(_('off'))),
             (_('mail transport username'), settings['mail_transport_username']),
             (_('mail transport host'), settings['mail_transport_host']),
             (_('mail transport port'), settings['mail_transport_port']),
@@ -92,9 +92,7 @@ def settings_update():
         flash(_('info update'), 'info')
         return redirect(url_for('settings_index'))
     for field in SettingsMapper.fields:
-        if isinstance(getattr(form, field), BooleanField):
-            getattr(form, field).data = True if session['settings'][field] == 'true' else False
-        elif field in ['mail_recipients_login', 'mail_recipients_feedback']:
+        if field in ['mail_recipients_login', 'mail_recipients_feedback']:
             getattr(form, field).data = ', '.join(session['settings'][field])
         elif field in ['default_table_rows', 'log_level']:
             getattr(form, field).data = int(session['settings'][field])

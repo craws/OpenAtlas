@@ -1,5 +1,5 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import flash
+from flask import flash, session
 from flask_babel import lazy_gettext as _
 
 import openatlas
@@ -26,8 +26,7 @@ class LinkMapper(object):
                 continue
             domain_id = domain.id if type(domain) is openatlas.Entity else int(domain)
             range_id = range_param.id if type(range_param) is openatlas.Entity else int(range_param)
-            # Todo: test links only if in debug mode
-            if True:
+            if session['settings']['debug_mode']:
                 domain = domain if type(
                     domain) is openatlas.Entity else openatlas.EntityMapper.get_by_id(int(domain))
                 range_ = range_param if type(

@@ -6,6 +6,7 @@ import openatlas
 class SettingsMapper(object):
 
     fields = [
+        'debug_mode',
         'default_language',
         'default_table_rows',
         'failed_login_forget_minutes',
@@ -48,9 +49,10 @@ class SettingsMapper(object):
 
     @staticmethod
     def update(form):
+        cursor = openatlas.get_cursor()
         sql = 'UPDATE web.settings SET "value" = %(value)s WHERE "name" = %(name)s;'
         for field in SettingsMapper.fields:
-            session['settings'][field] = getattr(form, field).data
-        for name, value in session['settings'].items():
-            cursor = openatlas.get_cursor()
-            cursor.execute(sql, {'value': value, 'name': name})
+            value = getattr(form, field).data
+            if field in ['debug_mode', 'maintenance', 'mail', 'offline']:
+                value = 'True' if getattr(form, field).data else ''
+            cursor.execute(sql, {'name': field, 'value': value})

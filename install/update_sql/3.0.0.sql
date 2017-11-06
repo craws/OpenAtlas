@@ -3,10 +3,13 @@
 BEGIN;
 
 -- Settings
-DELETE FROM web.settings WHERE name IN ('mail_transport_password', 'mail_transport_auth', 'mail_transport_ssl', 'mail_transport_type');
+DELETE FROM web.settings WHERE name IN
+    ('mail_transport_password', 'mail_transport_auth', 'mail_transport_ssl', 'mail_transport_type', 'notify_login');
 UPDATE web.settings SET name = 'site_name' WHERE name = 'sitename';
 UPDATE web.settings SET value = 'en' WHERE name = 'default_language';
+UPDATE web.settings SET value = '' WHERE value = 'false';
 INSERT INTO web.settings (name, value) VALUES ('minimum_password_length', '12');
+INSERT INTO web.settings (name, value) VALUES ('debug_mode', '');
 
 -- Web content
 DROP TABLE IF EXISTS web.i18n;
@@ -143,7 +146,7 @@ ALTER TABLE web.hierarchy ALTER COLUMN directional DROP DEFAULT;
 ALTER TABLE web.hierarchy ALTER COLUMN directional TYPE bool USING directional::bool;
 ALTER TABLE web.hierarchy ALTER COLUMN directional SET DEFAULT FALSE;
 ALTER TABLE web.form ALTER COLUMN extendable DROP DEFAULT;
-ALTER TABLE web.form ALTER COLUMN extendable TYPE bool USING active::bool;
+ALTER TABLE web.form ALTER COLUMN extendable TYPE bool USING extendable::bool;
 ALTER TABLE web.form ALTER COLUMN extendable SET DEFAULT FALSE;
 
 -- Remove all links to node roots because not needed anymore
@@ -156,9 +159,5 @@ UPDATE model.entity SET name = 'Sex', description = 'Categories for sex like fem
     WHERE id = (SELECT id from model.entity WHERE name = 'Gender');
 UPDATE web.hierarchy SET name = 'Sex' WHERE id name = 'Gender';
 UPDATE web.hierarchy SET system = False WHERE name = 'Sex';
-
--- Drop
-
-
 
 COMMIT;

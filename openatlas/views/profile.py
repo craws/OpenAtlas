@@ -43,8 +43,8 @@ class PasswordForm(Form):
 class ProfileForm(Form):
     name = StringField(_('name'))
     email = StringField(_('email'), validators=[InputRequired(), Email()])
-    show_email = BooleanField(_('show email'), false_values='false')
-    newsletter = BooleanField(_('newsletter'), false_values='false')
+    show_email = BooleanField(_('show email'))
+    newsletter = BooleanField(_('newsletter'))
     save = SubmitField(_('save'))
 
 
@@ -56,9 +56,9 @@ def profile_index():
         (_('name'), current_user.real_name),
         (_('email'), current_user.email),
         (_('show email'),
-            uc_first('on') if current_user.settings['show_email'] else uc_first('off')),
+            uc_first(_('on')) if current_user.settings['show_email'] else uc_first(_('off'))),
         (_('newsletter'),
-            uc_first('on') if current_user.settings['newsletter'] else uc_first('off'))]}
+            uc_first(_('on')) if current_user.settings['newsletter'] else uc_first(_('off')))]}
     form = DisplayForm()
     getattr(form, 'language').choices = app.config['LANGUAGES'].items()
     getattr(form, 'table_rows').choices = app.config['DEFAULT_TABLE_ROWS'].items()

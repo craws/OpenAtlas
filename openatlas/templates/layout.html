@@ -126,7 +126,7 @@
         </div>
         <div id="content">
             <div style="float:left">{% block content %}{% endblock %}</div>
-            {% if debug and 'admin'|is_authorized %}
+            {% if session['settings']['debug_mode'] and 'admin'|is_authorized %}
                 <div class="data-table" style="float:right;margin:1em;">
                     <p>Debug</p>
                     {% for name, value in debug_model.items() %}
