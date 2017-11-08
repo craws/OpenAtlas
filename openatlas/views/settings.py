@@ -15,38 +15,31 @@ from openatlas.util.util import uc_first, required_group
 class SettingsForm(Form):
 
     # General
-    site_name = StringField(uc_first(_('site name')))
-    default_language = SelectField(
-        uc_first(_('default language')),
-        choices=app.config['LANGUAGES'].items())
+    site_name = StringField(_('site name'))
+    default_language = SelectField(_('default language'), choices=app.config['LANGUAGES'].items())
     default_table_rows = SelectField(
-        uc_first(_('default table rows')),
-        choices=app.config['DEFAULT_TABLE_ROWS'].items(),
-        coerce=int)
-    log_level = SelectField(
-        uc_first(_('log level')),
-        choices=app.config['LOG_LEVELS'].items(),
-        coerce=int)
-    debug_mode = BooleanField(uc_first(_('debug mode')))
-    maintenance = BooleanField(uc_first(_('maintenance')))
-    offline = BooleanField(uc_first(_('offline')))
+        _('default table rows'), choices=app.config['DEFAULT_TABLE_ROWS'].items(), coerce=int)
+    log_level = SelectField(_('log level'), choices=app.config['LOG_LEVELS'].items(), coerce=int)
+    debug_mode = BooleanField(_('debug mode'))
+    maintenance = BooleanField(_('maintenance'))
+    offline = BooleanField(_('offline'))
 
     # Mail
-    mail = BooleanField(uc_first(_('mail')))
-    mail_transport_username = StringField(uc_first(_('mail transport username')))
-    mail_transport_host = StringField(uc_first(_('mail transport host')))
-    mail_transport_port = StringField(uc_first(_('mail transport port')))
-    mail_from_email = StringField(uc_first(_('mail from email')))
-    mail_from_name = StringField(uc_first(_('mail from name')))
-    mail_recipients_login = StringField(uc_first(_('mail recipients login')))
-    mail_recipients_feedback = StringField(uc_first(_('mail recipients feedback')))
+    mail = BooleanField(_('mail'))
+    mail_transport_username = StringField(_('mail transport username'))
+    mail_transport_host = StringField(_('mail transport host'))
+    mail_transport_port = StringField(_('mail transport port'))
+    mail_from_email = StringField(_('mail from email'))
+    mail_from_name = StringField(_('mail from name'))
+    mail_recipients_login = StringField(_('mail recipients login'))
+    mail_recipients_feedback = StringField(_('mail recipients feedback'))
 
     # Authentication
-    random_password_length = StringField(uc_first(_('random password length')))
-    minimum_password_length = StringField(uc_first(_('minimum password length')))
-    reset_confirm_hours = StringField(uc_first(_('reset confirm hours')))
-    failed_login_tries = StringField(uc_first(_('failed login tries')))
-    failed_login_forget_minutes = StringField(uc_first(_('failed login forget minutes')))
+    random_password_length = StringField(_('random password length'))
+    minimum_password_length = StringField(_('minimum password length'))
+    reset_confirm_hours = StringField(_('reset confirm hours'))
+    failed_login_tries = StringField(_('failed login tries'))
+    failed_login_forget_minutes = StringField(_('failed login forget minutes'))
 
 
 @app.route('/admin/settings')

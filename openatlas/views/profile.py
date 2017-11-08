@@ -14,8 +14,8 @@ from openatlas.util.util import uc_first
 
 
 class DisplayForm(Form):
-    language = SelectField(uc_first(_('language')), choices=[])
-    table_rows = SelectField(uc_first(_('table rows')), choices=[])
+    language = SelectField(_('language'), choices=[])
+    table_rows = SelectField(_('table rows'), choices=[])
 
 
 class PasswordForm(Form):

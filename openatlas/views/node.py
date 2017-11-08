@@ -14,9 +14,9 @@ from openatlas.util.util import required_group, sanitize, uc_first, link, trunca
 
 
 class NodeForm(Form):
-    name = StringField(uc_first(_('name')), validators=[InputRequired()])
-    name_inverse = StringField(uc_first(_('inverse')))
-    description = TextAreaField(uc_first(_('description')))
+    name = StringField(_('name'), validators=[InputRequired()])
+    name_inverse = StringField(_('inverse'))
+    description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
 
 

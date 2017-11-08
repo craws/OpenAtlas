@@ -3,7 +3,7 @@
     <a href="{{ url_for('source_index') }}">{{ _('source')|uc_first }}</a>
     > {{ source|link|safe }}
     > {{ translation|link|safe }}
-    > {{ _('update')|uc_first }}
+    > {{ _('edit')|uc_first }}
 {% endblock %}
 {% block content %}
     {{ form|display_form|safe }}

@@ -41,7 +41,7 @@ def send_mail(subject, text, recipients):
             server.sendmail(sender, recipient, body)
         return True
     except:
-        flash(_('email failed'), 'error')
+        flash(_('error mail send'), 'error')
     return False
 
 

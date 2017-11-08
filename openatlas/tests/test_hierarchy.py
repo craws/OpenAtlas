@@ -27,5 +27,4 @@ class HierarchyTest(TestBaseCase):
             assert b'Changes have been saved.' in rv.data
             actor_node = NodeMapper.get_hierarchy_by_name('Actor Actor Relation')
             rv = self.app.get(url_for('hierarchy_update', id_=actor_node.id), follow_redirects=True)
-            print(rv.data)
             assert b'Forbidden' in rv.data

@@ -14,17 +14,17 @@ from openatlas.util.util import required_group, sanitize, uc_first
 
 
 class HierarchyForm(Form):
-    name = StringField(uc_first(_('name')), validators=[InputRequired()])
-    multiple = BooleanField(uc_first(_('multiple')),description=_('tooltip hierarchy multiple'))
+    name = StringField(_('name'), validators=[InputRequired()])
+    multiple = BooleanField(_('multiple'),description=_('tooltip hierarchy multiple'))
     forms = SelectMultipleField(
-        uc_first(_('forms')),
+        _('forms'),
         render_kw={'disabled': True},
         description=_('tooltip hierarchy forms'),
         choices=NodeMapper.get_form_choices(),
         option_widget=widgets.CheckboxInput(),
         widget=widgets.ListWidget(prefix_label=False),
         coerce=int)
-    description = TextAreaField(uc_first(_('description')))
+    description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
 
 

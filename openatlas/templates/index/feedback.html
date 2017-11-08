@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ _('overview')|uc_first }}
+    <a href="{{ url_for('index') }}">{{ _('overview')|uc_first }}</a>
     > {{ _('feedback')|uc_first }}
 {% endblock %}
 {% block content %}
@@ -21,6 +21,7 @@
             </a>
         </p>
         {% if session['settings']['mail'] and session['settings']['mail_recipients_feedback']: %}
+            <p>- {{ _('feedback_form') }}:</p>
             {{ form|display_form('feedback-form')|safe }}
         {% endif %}
     {% endif %}
