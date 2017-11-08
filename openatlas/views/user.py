@@ -16,15 +16,15 @@ from openatlas.models.user import User, UserMapper
 
 class UserForm(Form):
     user_id = None
-    active = BooleanField(uc_first(_('active')), default=True)
-    username = StringField(uc_first(_('username')), validators=[InputRequired()])
-    group = SelectField(uc_first(_('group')), choices=UserMapper.get_groups(), default='readonly')
-    email = StringField(uc_first(_('email')), validators=[InputRequired(), Email()])
-    password = PasswordField(uc_first(_('password')), validators=[InputRequired()])
-    password2 = PasswordField(uc_first(_('repeat password')), validators=[InputRequired()])
+    active = BooleanField(_('active'), default=True)
+    username = StringField(_('username'), validators=[InputRequired()])
+    group = SelectField(_('group'), choices=UserMapper.get_groups(), default='readonly')
+    email = StringField(_('email'), validators=[InputRequired(), Email()])
+    password = PasswordField(_('password'), validators=[InputRequired()])
+    password2 = PasswordField(_('repeat password'), validators=[InputRequired()])
     show_passwords = BooleanField(_('show passwords'))
-    real_name = StringField(uc_first(_('name')))
-    description = TextAreaField(uc_first(_('info')))
+    real_name = StringField(_('name'))
+    description = TextAreaField(_('info'))
     send_info = BooleanField(_('send account information'))
     save = SubmitField(_('save'))
     insert_and_continue = SubmitField(_('insert and continue'))

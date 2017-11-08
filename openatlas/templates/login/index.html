@@ -5,9 +5,16 @@
 {% endblock %}
 {% block content %}
     {{ form|display_form('login-form')|safe }}
+    {% if config['DEMO_MODE'] %}
+        <p>User: Demolina, Pass: Demolina</p>
+    {% endif %}
     <script>
         $(function () {
             $("#username").focus();
+            {% if config['DEMO_MODE'] %}
+                $("#username").val('Demolina');
+                $("#password").val('Demolina');
+            {% endif %}
         });
     </script>
 {% endblock %}
