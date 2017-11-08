@@ -12,11 +12,11 @@ OpenAtlas is an open source application for archeological, historical and geospa
 
 Website: http://openatlas.eu/website
 
-Demo: http://openatlas3.craws.net
+Demo: https://openatlas3.craws.net
 
 Wiki and issue tracker: http://redmine.craws.net/projects/uni/wiki
 
-Features: http://redmine.craws.net/projects/uni/wiki/Features
+Features: https://redmine.craws.net/projects/uni/wiki/Features
 
 GitHub: https://github.com/craws/OpenAtlas-Python
 
