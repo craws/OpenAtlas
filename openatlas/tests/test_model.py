@@ -1,8 +1,9 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import url_for
+from flask import url_for, current_app
 
-from openatlas import app, PropertyMapper
+from openatlas import app, PropertyMapper, EntityMapper
 from openatlas.models.classObject import ClassMapper
+from openatlas.models.link import LinkMapper
 from openatlas.test_base import TestBaseCase
 
 
@@ -28,8 +29,16 @@ class ModelTests(TestBaseCase):
             rv = self.app.post(url_for('model_index'), data=form_data)
             assert b'Wrong' in rv.data
             self.login()
+            # insert some data for network
+            actor = EntityMapper.insert('E21', 'King Arthur')
+            event = EntityMapper.insert('E7', 'Battle of Camlann')
+            prop_object = EntityMapper.insert('E89', 'Propositional Object')
+            with current_app.test_request_context():
+                LinkMapper.insert(actor, 'P11', event)
+                LinkMapper.insert(actor, 'P67', prop_object)
             rv = self.app.get(url_for('model_network'))
             assert b'Orphans' in rv.data
-            self.app.post(
+            rv = self.app.post(
                 url_for('model_network'),
-                data={'orphans': True, 'width': 100, 'height': 40, 'distance': -800, 'charge': 500})
+                data={'orphans': True, 'width': 100, 'height': 40, 'distance': -666, 'charge': 500})
+            assert b'666' in rv.data

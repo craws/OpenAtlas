@@ -19,7 +19,7 @@ class LinkCheckForm(Form):
     range = HiddenField()
 
 
-@app.route('/model', methods=["GET", "POST"])
+@app.route('/overview/model', methods=["GET", "POST"])
 def model_index():
     form = LinkCheckForm()
     form_classes = OrderedDict()
@@ -63,7 +63,7 @@ def model_index():
         range=range_)
 
 
-@app.route('/model/class')
+@app.route('/overview/model/class')
 def class_index():
     table = {
         'name': 'classes',
@@ -77,7 +77,7 @@ def class_index():
     return render_template('model/class.html', table=table)
 
 
-@app.route('/model/property')
+@app.route('/overview/model/property')
 def property_index():
     classes = openatlas.classes
     properties = openatlas.properties
@@ -99,7 +99,7 @@ def property_index():
     return render_template('model/property.html', table=table)
 
 
-@app.route('/model/class_view/<int:class_id>')
+@app.route('/overview/model/class_view/<int:class_id>')
 def class_view(class_id):
     classes = openatlas.classes
     class_ = classes[class_id]
@@ -132,7 +132,7 @@ def class_view(class_id):
     return render_template('model/class_view.html', class_=class_, tables=tables, data=data)
 
 
-@app.route('/model/property_view/<int:property_id>')
+@app.route('/overview/model/property_view/<int:property_id>')
 def property_view(property_id):
     properties = openatlas.properties
     property_ = properties[property_id]
@@ -166,7 +166,7 @@ class NetworkForm(Form):
     save = SubmitField(_('apply'))
 
 
-@app.route('/model/network/', methods=["GET", "POST"])
+@app.route('/overview/network/', methods=["GET", "POST"])
 @required_group('readonly')
 def model_network():
     params = {

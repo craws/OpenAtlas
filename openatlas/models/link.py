@@ -26,7 +26,7 @@ class LinkMapper(object):
                 continue
             domain_id = domain.id if type(domain) is openatlas.Entity else int(domain)
             range_id = range_param.id if type(range_param) is openatlas.Entity else int(range_param)
-            if session['settings']['debug_mode']:  # pragma: no cover
+            if 'settings' in session and session['settings']['debug_mode']:  # pragma: no cover
                 domain = domain if type(
                     domain) is openatlas.Entity else openatlas.EntityMapper.get_by_id(int(domain))
                 range_ = range_param if type(

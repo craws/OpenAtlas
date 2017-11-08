@@ -63,5 +63,5 @@ class Network(object):
             for row in cursor.fetchall():
                 name = row.name.replace("'", "").replace('Location of ', '')
                 nodes += "{'id':'" + str(row.id) + "', 'name':'" + name
-                nodes += "', 'color':'" + params['classes'][row.code]['color'] + "'},"
+                nodes += "', 'color':'" + params['classes'][row.id]['color'] + "'}," if row.id in params['classes'] else ''
         return "graph = {'nodes': [" + nodes + "], " + edges + "};"

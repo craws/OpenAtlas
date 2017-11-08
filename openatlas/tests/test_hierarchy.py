@@ -1,7 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import url_for
 
-from openatlas import app
+from openatlas import app, NodeMapper
 from openatlas.test_base import TestBaseCase
 
 
@@ -25,3 +25,7 @@ class HierarchyTest(TestBaseCase):
                 data=form_data,
                 follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
+            actor_node = NodeMapper.get_hierarchy_by_name('Actor Actor Relation')
+            rv = self.app.get(url_for('hierarchy_update', id_=actor_node.id), follow_redirects=True)
+            print(rv.data)
+            assert b'Forbidden' in rv.data

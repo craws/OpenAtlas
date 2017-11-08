@@ -77,12 +77,12 @@ def overview_feedback():
     return render_template('index/feedback.html', form=form)
 
 
-@app.route('/index/contact')
+@app.route('/overview/contact')
 def index_contact():
     return render_template('index/contact.html', contact=ContentMapper.get_translation('contact'))
 
 
-@app.route('/index/credits')
+@app.route('/overview/credits')
 def index_credits():
     return render_template('index/credits.html')
 
@@ -97,6 +97,6 @@ def forbidden(e):
     return render_template('403.html', e=e), 403
 
 
-@app.route('/index/changelog')
+@app.route('/overview/changelog')
 def index_changelog():
     return render_template('index/changelog.html', versions=Changelog.versions)
