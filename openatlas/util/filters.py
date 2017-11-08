@@ -5,13 +5,13 @@ import re
 
 import os
 
-from flask import session, render_template_string
+from flask import session, render_template_string, url_for
 from flask_login import current_user
 from jinja2 import evalcontextfilter, escape
 from flask_babel import lazy_gettext as _
 
 import openatlas
-from openatlas import app
+from openatlas import app, EntityMapper
 from openatlas.models.classObject import ClassMapper
 from . import util
 
@@ -88,8 +88,7 @@ def table_select_model(self, name, selected=None):
     for id_ in entities:
         table['data'].append([
             '<a onclick="selectFromTable(this, \'' + name + '\', ' + str(id_) + ')">' + entities[id_].code + '</a>',
-            '<a onclick="selectFromTable(this, \'' + name + '\', ' + str(id_) + ')">' + entities[id_].name + '</a>'
-        ])
+            '<a onclick="selectFromTable(this, \'' + name + '\', ' + str(id_) + ')">' + entities[id_].name + '</a>'])
     value = selected.code + ' ' + selected.name if selected else ''
     html = """
         <input id="{name}-button" value="{value}" class="table-select" type="text"
@@ -188,6 +187,41 @@ def description(self, entity):
             label=util.uc_first(_('description')),
             description=entity.description.replace('\r\n', '<br />'))
     return html
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def page_buttons(self, entity):
+        class_codes = {
+            'source': ['E33'],
+            'event': ['E6', 'E7', 'E8', 'E12'],
+            'actor': ['E21', 'E40', 'E74'],
+            'place': ['E18'],
+            'reference': ['E31', 'E84']}
+        view = None
+        for view, codes in class_codes.items():
+            if entity.class_.code in codes:
+                break
+        if not view:
+            return ''
+        html = ''
+        pager_ids = EntityMapper.get_page_ids(entity, codes)
+        if pager_ids.first_id and pager_ids.first_id != entity.id:
+            html += """
+                <a href="{url_first}"><div class="navigation first disabled"></div></a>
+                <a href="{url_prev}"><div class="navigation prev disabled"></div></a>""".format(
+                    url_first=url_for(view + '_view', id_=pager_ids.first_id),
+                    url_prev=url_for(view + '_view', id_=pager_ids.previous_id))
+        if pager_ids.last_id and pager_ids.last_id != entity.id:
+            html += """
+                <a href="{url_next}"><div class="navigation next"></div></a>
+                <a href="{url_last}"><div class="navigation last"></div></a>""".format(
+                    url_next=url_for(view + '_view', id_=pager_ids.next_id),
+                    url_last=url_for(view + '_view', id_=pager_ids.last_id))
+        if html:
+            html = '<div class="pager" style="float:left;margin:0.1em 0.5em 0 0;"">' + html
+            html += '</div>'
+        return html
 
 
 @jinja2.contextfilter

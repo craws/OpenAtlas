@@ -10,6 +10,7 @@
     </ul>
     <div id="tab-info">
         <div class="button-bar">
+            {{ event|page_buttons|safe }}
             {% if 'editor'|is_authorized and event.name != config['EVENT_ROOT_NAME']: %}
                 <a href="{{ url_for('event_update', id_=event.id) }}">
                     {{ _('edit')|uc_first }}
