@@ -10,10 +10,10 @@
     <p>
         - {{ _('feedback redmine') }}:
         <a href="http://redmine.craws.net/projects/uni" target="_blank">
-            http://redmine.craws.net
+            https://redmine.craws.net
         </a>
     </p>
-    {% if session['settings']['mail_recipients_feedback']: %}
+    {% if session['settings']['mail_recipients_feedback'][0]: %}
         <p>
             - {{ _('feedback mail') }}
             <a href="mailto:{{ session['settings']['mail_recipients_feedback'][0] }}">

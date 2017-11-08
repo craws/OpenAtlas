@@ -7,11 +7,10 @@
 {% block content %}
     <div class="button-bar">
         {% if user.group != 'admin' or current_user.group == 'admin' %}
-            <a class="button" href="{{ url_for('user_update', id_=user.id) }}">{{ _('edit')|uc_first }}</a>
+            <a href="{{ url_for('user_update', id_=user.id) }}">{{ _('edit')|uc_first }}</a>
         {% endif %}
         {% if user.id != current_user.id and (user.group != 'admin' or current_user.group == 'admin') %}
-            <a class="button"
-               onclick="return confirm('{{_('delete')|uc_first }} {{ user.username }}?')"
+            <a onclick="return confirm('{{_('delete')|uc_first }} {{ user.username }}?')"
                href="{{ url_for('user_delete', id_=user.id) }}">{{ _('delete')|uc_first }}</a>
         {% endif %}
     </div>

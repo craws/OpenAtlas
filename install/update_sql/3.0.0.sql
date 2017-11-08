@@ -157,7 +157,6 @@ DELETE FROM model.link WHERE
 -- Change gender to sex and remove system flag
 UPDATE model.entity SET name = 'Sex', description = 'Categories for sex like female, male.'
     WHERE id = (SELECT id from model.entity WHERE name = 'Gender');
-UPDATE web.hierarchy SET name = 'Sex' WHERE id name = 'Gender';
-UPDATE web.hierarchy SET system = False WHERE name = 'Sex';
+UPDATE web.hierarchy SET name = 'Sex', system = False WHERE name = 'Gender';
 
 COMMIT;
