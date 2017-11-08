@@ -12,7 +12,7 @@ OpenAtlas is an open source application for archeological, historical and geospa
 
 Website: http://openatlas.eu/website
 
-Demo: http://openatlas.craws.net (PHP version)
+Demo: http://openatlas3.craws.net
 
 Wiki and issue tracker: http://redmine.craws.net/projects/uni/wiki
 
