@@ -9,6 +9,10 @@
         <li>
             <a href="#tab-info">{{ _('info')|uc_first }}</a>
         </li>
+        <li><a href="#tab-event">{{ _('events')|uc_first }} ()</a></li>
+        <li><a href="#tab-actor">{{ _('actors')|uc_first }} ()</a></li>
+        <li><a href="#tab-place">{{ _('places')|uc_first }}()</a></li>
+        <li><a href="#tab-reference">{{ _('references')|uc_first }} ()</a></li>
         <li>
             <a href="#tab-translations">
                 {{ _('translations')|uc_first }} ({{ tables['translation']['data']|length }})
@@ -32,6 +36,22 @@
         <h1>{{ source.name }}</h1>
         {{ data['info']|data_table|safe }}
         {{ source|description|safe }}
+    </div>
+    <div id="tab-event">
+    <div class="button-bar">
+        </div>
+    </div>
+    <div id="tab-actor">
+        <div class="button-bar">
+        </div>
+    </div>
+    <div id="tab-place">
+        <div class="button-bar">
+        </div>
+    </div>
+    <div id="tab-reference">
+        <div class="button-bar">
+        </div>
     </div>
     <div id="tab-translations">
         {% if 'editor'|is_authorized: %}

@@ -172,18 +172,15 @@ class EntityMapper(object):
 
     @staticmethod
     def get_overview_counts():
+        sub_select = 'SELECT COUNT(*) FROM model.entity e JOIN model.class c ON e.class_id = c.id'
         sql = """
             SELECT
-            (SELECT COUNT(*) FROM model.entity e JOIN model.class c ON e.class_id = c.id
-                WHERE c.code = 'E33') AS source,
-            (SELECT COUNT(*) FROM model.entity e JOIN model.class c ON e.class_id = c.id
-                WHERE c.code IN ('E6', 'E7', 'E8', 'E12')) AS event,
-            (SELECT COUNT(*) FROM model.entity e JOIN model.class c ON e.class_id = c.id
-                WHERE c.code IN ('E21', 'E74', 'E40')) AS actor,
-            (SELECT COUNT(*) FROM model.entity e JOIN model.class c ON e.class_id = c.id
-                WHERE c.code = 'E18') AS place,
+            ({sub_select} WHERE c.code = 'E33') AS source,
+            ({sub_select} WHERE c.code IN ('E6', 'E7', 'E8', 'E12')) AS event,
+            ({sub_select} WHERE c.code IN ('E21', 'E74', 'E40')) AS actor,
+            ({sub_select} WHERE c.code = 'E18') AS place,
             COUNT(*) AS reference FROM model.entity e JOIN model.class c ON e.class_id = c.id
-                WHERE c.code IN ('E31', 'E84');"""
+                WHERE c.code IN ('E31', 'E84');""".format(sub_select=sub_select)
         cursor = openatlas.get_cursor()
         cursor.execute(sql)
         row = cursor.fetchone()

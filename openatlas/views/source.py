@@ -65,6 +65,7 @@ def source_view(id_):
             link(translation),
             translation.nodes[0].name if translation.nodes else '',
             truncate_string(translation.description)])
+
     return render_template('source/view.html', source=source, data=data, tables=tables)
 
 

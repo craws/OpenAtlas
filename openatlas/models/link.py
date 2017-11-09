@@ -10,6 +10,7 @@ class Link(object):
     def __init__(self, row):
         self.id = row.id
         self.property = openatlas.properties[row.property_id]
+        # Todo: performance - if it's a node don't call get_by_id
         self.domain = openatlas.EntityMapper.get_by_id(row.domain_id)
         self.range = openatlas.EntityMapper.get_by_id(row.range_id)
 
@@ -69,7 +70,6 @@ class LinkMapper(object):
     @staticmethod
     def get_linked_entities(entity, codes, inverse=False):
         codes = codes if isinstance(codes, list) else [codes]
-        cursor = openatlas.get_cursor()
         sql = """
             SELECT l.range_id AS result_id
             FROM model.link l
@@ -81,10 +81,49 @@ class LinkMapper(object):
                 FROM model.link l
                 JOIN model.property p ON l.property_id = p.id AND p.code IN %(codes)s
                 WHERE l.range_id = %(entity_id)s;"""
+        cursor = openatlas.get_cursor()
         cursor.execute(sql, {'entity_id': entity.id, 'codes': tuple(codes)})
         openatlas.debug_model['div sql'] += 1
         ids = [element for (element,) in cursor.fetchall()]
         return openatlas.EntityMapper.get_by_ids(ids)
+
+    @staticmethod
+    def get_links(entity, codes, inverse=False):
+        codes = codes if isinstance(codes, list) else [codes]
+        entity_id = entity.id if type(entity) is openatlas.Entity else int(entity)
+        first = 'range' if inverse else 'domain'
+        second = 'domain' if inverse else 'range'
+        sql = """
+            SELECT l.id, l.property_id, l.domain_id, l.range_id, l.description, l.created,
+                l.modified, e.name,
+                min(date_part('year', d1.value_timestamp)) AS first,
+                max(date_part('year', d2.value_timestamp)) AS last,
+                (SELECT t.id FROM model.entity t
+                    JOIN model.link_property lp ON t.id = lp.range_id AND lp.domain_id = l.id
+                    WHERE lp.property_id = (SELECT id FROM model.property WHERE code = 'P2')
+                ) AS type_id
+
+            FROM model.link l
+            JOIN model.entity e ON l.{second}_id = e.id
+            JOIN model.property p ON l.property_id = p.id AND p.code IN %(codes)s
+
+            LEFT JOIN model.link_property dl1 ON l.id = dl1.domain_id AND
+                dl1.property_id IN (SELECT id FROM model.property WHERE code = 'OA5')
+            LEFT JOIN model.entity d1 ON dl1.range_id = d1.id
+
+            LEFT JOIN model.link_property dl2 ON l.id = dl2.domain_id
+                AND dl2.property_id IN (SELECT id FROM model.property WHERE code = 'OA6')
+            LEFT JOIN model.entity d2 ON dl2.range_id = d2.id
+
+            WHERE l.{first}_id = %(entity_id)s GROUP BY l.id, e.name ORDER BY e.name;""".format(
+            first=first, second=second)
+        cursor = openatlas.get_cursor()
+        cursor.execute(sql, {'entity_id': entity_id, 'codes': tuple(codes)})
+        links = []
+        for row in cursor.fetchall():
+            links.append(Link(row))
+        return links
+
 
     @staticmethod
     def delete(entity, codes):

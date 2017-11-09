@@ -198,12 +198,20 @@ def page_buttons(self, entity):
             'actor': ['E21', 'E40', 'E74'],
             'place': ['E18'],
             'reference': ['E31', 'E84']}
-        view = None
-        for view, codes in class_codes.items():
-            if entity.class_.code in codes:
-                break
-        if not view:
-            return ''
+        code_class = {
+            'E33': 'source',
+            'E6': 'event',
+            'E7': 'event',
+            'E8': 'event',
+            'E12': 'event',
+            'E21': 'actor',
+            'E40': 'actor',
+            'E74': 'actor',
+            'E18': 'place',
+            'E31': 'reference',
+            'E84': 'reference'}
+        view = code_class[entity.class_.code]
+        codes = class_codes[view]
         html = ''
         pager_ids = EntityMapper.get_page_ids(entity, codes)
         if pager_ids.first_id and pager_ids.first_id != entity.id:
