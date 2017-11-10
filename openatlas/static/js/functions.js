@@ -11,6 +11,8 @@ tinymce.init({
         ' undo redo link unlink fontselect fontsizeselect forecolor code',
 });
 
+$.jstree.defaults.core.themes.dots = false;
+
 $.tablesorter.addParser({
     id: 'class_code',
     is: function (string) {return false;},
