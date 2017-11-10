@@ -8,6 +8,10 @@ html, body, input, select, textarea {
     display: none;
 }
 
+.tooltip {
+    z-index:-1;
+}
+
 .jstree li > a > .jstree-icon {
     display: none;
 }
