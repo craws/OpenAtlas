@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2017-11-08 15:35+0100\n"
-"PO-Revision-Date: 2017-11-08 17:36+0100\n"
+"PO-Revision-Date: 2017-11-11 11:55+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -242,7 +242,7 @@ msgstr "Our feedback form"
 
 #: templates/index/index.html:12
 msgid "feedback teaser"
-msgstr "Want a new feature or experience any problems? Tell us about it:"
+msgstr "Want a new feature or experience any problems? Tell us about it"
 
 #: templates/index/index.html:15 templates/model/network.html:3
 msgid "network"
