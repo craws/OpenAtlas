@@ -10,7 +10,7 @@ import openatlas
 from openatlas import app
 from openatlas.forms import build_form
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import (uc_first, link, truncate_string, required_group, append_node_data,
+from openatlas.util.util import (link, truncate_string, required_group, append_node_data,
                                  print_base_type)
 
 
@@ -29,7 +29,7 @@ def source_index():
         'name': 'source',
         'header': ['name', 'type', 'info'],
         'data': []}}
-    for source in EntityMapper.get_by_codes('E33', 'source content'):
+    for source in EntityMapper.get_by_codes('source'):
         tables['source']['data'].append([
             link(source),
             print_base_type(source, 'Source'),
@@ -65,8 +65,35 @@ def source_view(id_):
             link(translation),
             translation.nodes[0].name if translation.nodes else '',
             truncate_string(translation.description)])
-
+    tables['event'] = {'name': 'event', 'header': ['name', 'class', 'first', 'last'], 'data': []}
+    for link_ in source.get_links('P67'):
+        code = link_.range.class_.code
+        if code in app.config['CLASS_CODES']['event']:
+            tables['event']['data'].append([
+                link(link_.range),
+                link_.range.class_.name,
+                format(link_.range.first),
+                format(link_.range.last)])
     return render_template('source/view.html', source=source, data=data, tables=tables)
+
+
+@app.route('/source/add/<int:id_>/<class_name>')
+@required_group('editor')
+def source_add(id_, class_name):
+    source = EntityMapper.get_by_id(id_)
+    table = {
+        'name': class_name,
+        'header': [_('name'), _('class'), _('type'),  _('first'), _('last'), ''],
+        'data': []}
+    for item in EntityMapper.get_by_codes(class_name):
+        table['data'].append([
+            link(item),
+            item.class_.name,
+            print_base_type(item, 'Event'),
+            format(item.first),
+            format(item.last),
+            ''])
+    return render_template('source/add.html', source=source, class_name=class_name, table=table)
 
 
 @app.route('/source/delete/<int:id_>')

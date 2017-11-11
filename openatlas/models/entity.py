@@ -36,6 +36,9 @@ class Entity(object):
     def link(self, code, range_):
         LinkMapper.insert(self, code, range_)
 
+    def get_links(self, code, inverse=False):
+        return LinkMapper.get_links(self, code, inverse)
+
     def delete_links(self, codes):
         LinkMapper.delete(self, codes)
 
@@ -142,16 +145,16 @@ class EntityMapper(object):
         return entities
 
     @staticmethod
-    def get_by_codes(codes, system_type=None):
+    def get_by_codes(class_name):
         class_ids = []
-        for code in codes if isinstance(codes, list) else [codes]:
+        for code in openatlas.app.config['CLASS_CODES'][class_name]:
             class_ids.append(ClassMapper.get_by_code(code).id)
         cursor = openatlas.get_cursor()
-        if system_type:
+        if class_name == 'source':
             sql = EntityMapper.sql + """
-                WHERE e.class_id IN %(class_ids)s AND e.system_type = %(system_type)s
+                WHERE e.class_id IN %(class_ids)s AND e.system_type ='source content'
                 GROUP BY e.id, c.code ORDER BY e.name;"""
-            cursor.execute(sql, {'class_ids': tuple(class_ids), 'system_type': system_type})
+            cursor.execute(sql, {'class_ids': tuple(class_ids)})
         else:
             sql = EntityMapper.sql + """
                 WHERE e.class_id IN %(class_ids)s
@@ -207,7 +210,6 @@ class EntityMapper(object):
             ({sql_next}) AS next_id, ({sql_prev}) AS previous_id
             FROM model.entity e JOIN model.class c ON e.class_id = c.id WHERE """.format(
                 sql_next=sql_next, sql_prev=sql_prev) + sql_where
-        print(sql)
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {'id': entity.id})
         return cursor.fetchone()

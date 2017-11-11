@@ -108,7 +108,7 @@
         <div id="menu">
             {% if current_user.is_authenticated %}
                 {% for item in ['overview', 'source', 'event', 'actor', 'place', 'reference', 'types'] %}
-                    {% set css = 'active' if item in request.path or (item == 'overview' and request.path == '/') %}
+                    {% set css = 'active' if request.path.startswith('/' + item) or (item == 'overview' and request.path == '/') %}
                     <div class="{{ css|safe }}">
                         <a href="/{{ item }}">{{ _(item)|uc_first }}</a>
                     </div>

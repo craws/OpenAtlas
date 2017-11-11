@@ -45,3 +45,24 @@ FEEDBACK_SUBJECTS = OrderedDict()
 FEEDBACK_SUBJECTS[uc_first(_('suggestion'))] = uc_first(_('suggestion'))
 FEEDBACK_SUBJECTS[uc_first(_('question'))] = uc_first(_('question'))
 FEEDBACK_SUBJECTS[uc_first(_('problem'))] = uc_first(_('problem'))
+
+CODE_CLASS = {
+    'E33': 'source',
+    'E6': 'event',
+    'E7': 'event',
+    'E8': 'event',
+    'E12': 'event',
+    'E21': 'actor',
+    'E40': 'actor',
+    'E74': 'actor',
+    'E18': 'place',
+    'E31': 'reference',
+    'E84': 'reference'}
+
+# Todo: get class_codes from code_class automatically
+CLASS_CODES = {
+    'source': ['E33'],
+    'event': ['E6', 'E7', 'E8', 'E12'],
+    'actor': ['E21', 'E40', 'E74'],
+    'place': ['E18'],
+    'reference': ['E31', 'E84']}

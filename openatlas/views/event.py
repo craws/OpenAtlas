@@ -28,7 +28,7 @@ def event_index():
         'name': 'event',
         'header': [_('name'), _('class'), _('type'), _('first'), _('last'), _('info')],
         'data': []}}
-    for event in EntityMapper.get_by_codes(['E7', 'E8', 'E12', 'E6']):
+    for event in EntityMapper.get_by_codes('event'):
         tables['event']['data'].append([
             link(event),
             openatlas.classes[event.class_.id].name,

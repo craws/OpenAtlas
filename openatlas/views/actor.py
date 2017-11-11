@@ -37,7 +37,7 @@ def actor_index():
         'name': 'actor',
         'header': [_('name'), _('class'), _('first'), _('last'), _('info')],
         'data': []}}
-    for actor in EntityMapper.get_by_codes(['E21', 'E74', 'E40']):
+    for actor in EntityMapper.get_by_codes('actor'):
         tables['actor']['data'].append([
             link(actor),
             openatlas.classes[actor.class_.id].name,

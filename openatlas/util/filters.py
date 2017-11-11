@@ -192,26 +192,8 @@ def description(self, entity):
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def page_buttons(self, entity):
-        class_codes = {
-            'source': ['E33'],
-            'event': ['E6', 'E7', 'E8', 'E12'],
-            'actor': ['E21', 'E40', 'E74'],
-            'place': ['E18'],
-            'reference': ['E31', 'E84']}
-        code_class = {
-            'E33': 'source',
-            'E6': 'event',
-            'E7': 'event',
-            'E8': 'event',
-            'E12': 'event',
-            'E21': 'actor',
-            'E40': 'actor',
-            'E74': 'actor',
-            'E18': 'place',
-            'E31': 'reference',
-            'E84': 'reference'}
-        view = code_class[entity.class_.code]
-        codes = class_codes[view]
+        view = app.config['CODE_CLASS'][entity.class_.code]
+        codes = app.config['CLASS_CODES'][view]
         html = ''
         pager_ids = EntityMapper.get_page_ids(entity, codes)
         if pager_ids.first_id and pager_ids.first_id != entity.id:

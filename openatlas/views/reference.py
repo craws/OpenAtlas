@@ -38,7 +38,7 @@ def reference_index():
         'name': 'reference',
         'header': ['name', 'class', 'type', 'info'],
         'data': []}}
-    for reference in EntityMapper.get_by_codes(['E31', 'E84']):
+    for reference in EntityMapper.get_by_codes('reference'):
         class_name = _(reference.system_type).title()
         tables['reference']['data'].append([
             link(reference),

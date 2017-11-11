@@ -28,7 +28,7 @@ def place_index():
         'name': 'place',
         'header': [_('name'), _('site'), _('first'), _('last'), _('info')],
         'data': []}}
-    for place in EntityMapper.get_by_codes('E18'):
+    for place in EntityMapper.get_by_codes('place'):
         tables['place']['data'].append([
             link(place),
             print_base_type(place, 'Site'),

@@ -7,7 +7,7 @@ class EventTest(TestBaseCase):
 
     def test_event(self):
         self.login()
-        root_event = EntityMapper.get_by_codes('E7')[0]
+        root_event = EntityMapper.get_by_codes('event')[0]
         rv = self.app.get('/event/insert/E7')
         assert b'+ Activity' in rv.data
         form_data = {'name': 'Test event', 'description': 'Event description'}
