@@ -4,7 +4,7 @@ from flask_babel import lazy_gettext as _
 from openatlas.util.util import uc_first
 
 VERSION = '3.0.0'
-DEBUG = False  # If in debug mode and user is admin, debug information is displayed
+DEBUG = False
 DEMO_MODE = False  # If in demo mode some options are disabled and the login form is pre filled
 
 LANGUAGES = {'en': 'English', 'de': 'Deutsch'}
