@@ -17,7 +17,7 @@ class HierarchyTest(TestBaseCase):
                 'multiple': True,
                 'description': 'Very important!'}
             rv = self.app.post(url_for('hierarchy_insert'), data=form_data)
-            hierarchy_id = rv.location.split('/')[-1].replace('node#tab-', '')
+            hierarchy_id = rv.location.split('/')[-1].replace('types#tab-', '')
             rv = self.app.get(url_for('hierarchy_update', id_=hierarchy_id))
             assert b'Geronimo' in rv.data
             rv = self.app.post(

@@ -1,14 +1,15 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ _('node')|uc_first }}
+    {{ _('types')|uc_first }}
 {% endblock %}
 {% block content %}
     <div id="tabs-menu" class="tabs-container">
         <ul>
             <li><a href="#menu-tab-system">{{ _('system types')|uc_first }}</a></li>
             <li><a href="#menu-tab-custom">{{ _('custom types')|uc_first }}</a></li>
+            <li><a href="#menu-tab-places">{{ _('places')|uc_first }}</a></li>
         </ul>
-        {% for type_ in ['system', 'custom'] %}
+        {% for type_ in ['system', 'custom', 'places'] %}
             <div id="menu-tab-{{ type_ }}" style="padding: 0;" class="tab-content">
                 <div id="tabs-{{ type_ }}" class="tabs-container">
                     <ul>
@@ -76,6 +77,7 @@
             $("#tabs-menu").tabs();
             $("#tabs-system").tabs().addClass("ui-tabs-vertical");
             $("#tabs-custom").tabs().addClass("ui-tabs-vertical");
+            $("#tabs-places").tabs().addClass("ui-tabs-vertical");
             openParentTab();
         });
     </script>

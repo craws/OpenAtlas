@@ -10,7 +10,7 @@ from wtforms.validators import InputRequired
 import openatlas
 from openatlas import app, NodeMapper, EntityMapper
 from openatlas.forms import build_node_form
-from openatlas.util.util import required_group, sanitize, uc_first, link, truncate_string
+from openatlas.util.util import required_group, sanitize, link, truncate_string
 
 
 class NodeForm(Form):
@@ -20,18 +20,19 @@ class NodeForm(Form):
     save = SubmitField(_('insert'))
 
 
-@app.route('/node')
+@app.route('/types')
 @required_group('readonly')
 def node_index():
-    nodes = {'system': OrderedDict(), 'custom': OrderedDict()}
+    nodes = {'system': OrderedDict(), 'custom': OrderedDict(), 'places': OrderedDict()}
     for id_, node in openatlas.nodes.items():
         if not node.root:
             type_ = 'system' if node.system else 'custom'
+            type_ = 'places' if node.class_.code == 'E53' else type_
             nodes[type_][node] = tree_select(node.name)
-    return render_template('node/index.html', nodes=nodes)
+    return render_template('types/index.html', nodes=nodes)
 
 
-@app.route('/node/insert/<int:root_id>', methods=['POST'])
+@app.route('/types/insert/<int:root_id>', methods=['POST'])
 @required_group('editor')
 def node_insert(root_id):
     root = openatlas.nodes[root_id]
@@ -46,10 +47,10 @@ def node_insert(root_id):
         return redirect(url_for('node_view', id_=node.id))
     if 'name_search' in request.form:
         form.name.data = request.form['name_search']
-    return render_template('node/insert.html', form=form, root=root)
+    return render_template('types/insert.html', form=form, root=root)
 
 
-@app.route('/node/update/<int:id_>', methods=['POST', 'GET'])
+@app.route('/types/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
 def node_update(id_):
     node = openatlas.nodes[id_]
@@ -62,11 +63,11 @@ def node_update(id_):
         if save(form, node):
             flash(_('info update'), 'info')
             return redirect(url_for('node_view', id_=id_))
-        return render_template('node/update.html', node=node, root=root, form=form)
-    return render_template('node/update.html', node=node, root=root, form=form)
+        return render_template('types/update.html', node=node, root=root, form=form)
+    return render_template('types/update.html', node=node, root=root, form=form)
 
 
-@app.route('/node/view/<int:id_>')
+@app.route('/types/view/<int:id_>')
 @required_group('readonly')
 def node_view(id_):
     node = openatlas.nodes[id_]
@@ -91,10 +92,10 @@ def node_view(id_):
             link(sub),
             sub.count,
             truncate_string(sub.description)])
-    return render_template('node/view.html', node=node, super_=super_, tables=tables, root=root)
+    return render_template('types/view.html', node=node, super_=super_, tables=tables, root=root)
 
 
-@app.route('/node/delete/<int:id_>', methods=['POST', 'GET'])
+@app.route('/types/delete/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
 def node_delete(id_):
     node = openatlas.nodes[id_]
@@ -117,7 +118,7 @@ def walk_tree(param):
     for id_ in items:
         item = openatlas.nodes[id_]
         count_subs = " (" + str(item.count_subs) + ")" if item.count_subs else ''
-        text += "{href: '/node/view/" + str(item.id) + "',"
+        text += "{href: '" + url_for('node_view', id_=item.id) + "',"
         text += "text: '" + item.name + " " + str(item.count) + count_subs
         text += "', 'id':'" + str(item.id) + "'"
         if item.subs:
