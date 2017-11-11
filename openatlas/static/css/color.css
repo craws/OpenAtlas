@@ -54,6 +54,17 @@ span.tooltip,
     color: #4088c3;
 }
 
+input[type=submit]:hover,
+div.tabsContainer table a:hover,
+div.tabsContainer .ui-state-hover,
+table a:hover,
+a.button:hover,
+button:hover,
+.button-bar a:hover,
+span.button:hover {
+    background-color: #46779f;
+}
+
 .error {
     color: #e60005;
 }
