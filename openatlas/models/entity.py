@@ -191,58 +191,23 @@ class EntityMapper(object):
 
     @staticmethod
     def get_page_ids(entity, codes):
-        # Todo: needs a complete rewrite
-        sql_first = """
-            SELECT min(e.id) AS id
-            FROM model.entity e
-            JOIN model.class c ON e.class_id = c.id """
-        if entity.class_.name == 'Linguistic Object':
-            sql_first += """
-                JOIN model.link tl ON e.id = tl.domain_id
-                JOIN model.entity t ON
-                    tl.range_id = t.id AND
-                    tl.property_id = (SELECT id FROM model.property WHERE code = 'P2') AND
-                    NOT t.name = ANY ('{Comment,Source Content,Source Original Text,Source Translation,Source Transliteration}'::text[])"""
-        sql_first += " WHERE c.code IN ('{codes}')".format(codes="','".join(codes))
+        """
+        Return ids for pager (first, previous, next, last) for entity and class codes arguments
+        """
+        sql_where = " c.code IN ('{codes}')".format(codes="','".join(codes)) + " AND "
+        sql_where += "e.system_type='source content'" if 'E33' in codes else "e.system_type IS NULL"
         sql_prev = """
-            SELECT max(e.id) AS id
-            FROM model.entity e
-            JOIN model.class c ON e.class_id = c.id """
-        if entity.class_.name == 'Linguistic Object':
-            sql_prev += """
-                JOIN model.link tl ON e.id = tl.domain_id
-                JOIN model.entity t ON
-                    tl.range_id = t.id AND
-                    tl.property_id = (SELECT id FROM model.property WHERE code = 'P2') AND
-                    NOT t.name = ANY ('{Comment,Source Content,Source Original Text,Source Translation,Source Transliteration}'::text[])"""
-        sql_prev += " WHERE e.id < %(id)s AND c.code IN ('{codes}')".format(codes="','".join(codes))
+            SELECT max(e.id) AS id FROM model.entity e
+            JOIN model.class c ON e.class_id = c.id WHERE e.id < %(id)s AND """ + sql_where
         sql_next = """
-            SELECT min(e.id) AS id
-            FROM model.entity e
-            JOIN model.class c ON e.class_id = c.id """
-        if entity.class_.name == 'Linguistic Object':
-            sql_next += """
-                JOIN model.link tl ON e.id = tl.domain_id
-                JOIN model.entity t ON
-                    tl.range_id = t.id AND
-                    tl.property_id = (SELECT id FROM model.property WHERE code = 'P2') AND
-                    NOT t.name = ANY ('{Comment,Source Content,Source Original Text,Source Translation,Source Transliteration}'::text[])"""
-        sql_next += " WHERE e.id > %(id)s AND c.code IN ('{codes}')".format(codes="','".join(codes))
-        sql_last = "SELECT max(e.id) AS last_id, "
-        sql_last += "(" + sql_next + ") AS next_id, "
-        sql_last += "(" + sql_first + ") AS first_id, "
-        sql_last += "(" + sql_prev + ") AS previous_id "
-        sql_last += """
-            FROM model.entity e
-            JOIN model.class c ON e.class_id = c.id """
-        if entity.class_.name == 'Linguistic Object':
-            sql_last += """
-                JOIN model.link tl ON e.id = tl.domain_id
-                JOIN model.entity t ON
-                    tl.range_id = t.id AND
-                    tl.property_id = (SELECT id FROM model.property WHERE code = 'P2') AND
-                    NOT t.name = ANY ('{Comment,Source Content,Source Original Text,Source Translation,Source Transliteration}'::text[])"""
-        sql_last += " WHERE c.code IN ('{codes}')".format(codes="','".join(codes))
+            SELECT min(e.id) AS id FROM model.entity e
+            JOIN model.class c ON e.class_id = c.id WHERE e.id > %(id)s AND """ + sql_where
+        sql = """
+            SELECT min(e.id) AS first_id, max(e.id) AS last_id,
+            ({sql_next}) AS next_id, ({sql_prev}) AS previous_id
+            FROM model.entity e JOIN model.class c ON e.class_id = c.id WHERE """.format(
+                sql_next=sql_next, sql_prev=sql_prev) + sql_where
+        print(sql)
         cursor = openatlas.get_cursor()
-        cursor.execute(sql_last, {'id':entity.id})
+        cursor.execute(sql, {'id': entity.id})
         return cursor.fetchone()
