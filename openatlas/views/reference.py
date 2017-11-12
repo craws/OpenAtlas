@@ -10,8 +10,7 @@ import openatlas
 from openatlas import app
 from openatlas.forms import build_form
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import (uc_first, link, truncate_string, required_group, append_node_data,
-                                 print_base_type)
+from openatlas.util.util import uc_first, link, truncate_string, required_group, append_node_data
 
 
 class ReferenceForm(Form):
@@ -43,7 +42,7 @@ def reference_index():
         tables['reference']['data'].append([
             link(reference),
             class_name,
-            print_base_type(reference, reference.system_type.title()),
+            reference.print_base_type(),
             truncate_string(reference.description)])
     return render_template('reference/index.html', tables=tables)
 

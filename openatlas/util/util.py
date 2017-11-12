@@ -74,14 +74,6 @@ def sanitize(string, mode=None):
         return s.get_data()
 
 
-def print_base_type(entity, root_name):
-    root_id = openatlas.NodeMapper.get_hierarchy_by_name(root_name).id
-    for node in entity.nodes:
-        if node.root and node.root[-1] == root_id:
-            return node.name
-    return ''
-
-
 def build_table_form(class_name, linked_entities):
     # Todo: add CSRF token
     form = '<form id="add-source-form" name="add-source-form" class="table" method="post">'
@@ -96,7 +88,7 @@ def build_table_form(class_name, linked_entities):
         table['data'].append([
             link(entity),
             entity.class_.name,
-            print_base_type(entity, 'Event'),
+            entity.print_base_type(),
             format(entity.first),
             format(entity.last),
             '<input id="{id}" name="values" type="checkbox" value="{id}">'.format(id=entity.id)])

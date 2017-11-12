@@ -54,6 +54,18 @@ class Entity(object):
     def set_dates(self):
         self.dates = DateMapper.get_dates(self)
 
+    def print_base_type(self):
+        root_name = openatlas.app.config['CODE_CLASS'][self.class_.code].title()
+        if self.class_.code in openatlas.app.config['CLASS_CODES']['place']:
+            root_name = 'Site'
+        elif self.class_.code in openatlas.app.config['CLASS_CODES']['reference']:
+            root_name = self.system_type.title()
+        root_id = openatlas.NodeMapper.get_hierarchy_by_name(root_name).id
+        for node in self.nodes:
+            if node.root and node.root[-1] == root_id:
+                return node.name
+        return ''
+
 
 class EntityMapper(object):
     # Todo: performance - refactor sub selects, get_by_class

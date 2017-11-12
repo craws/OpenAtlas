@@ -9,8 +9,7 @@ import openatlas
 from openatlas import app
 from openatlas.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import (link, truncate_string, required_group, append_node_data,
-                                 print_base_type)
+from openatlas.util.util import link, truncate_string, required_group, append_node_data
 
 
 class PlaceForm(DateForm):
@@ -31,7 +30,7 @@ def place_index():
     for place in EntityMapper.get_by_codes('place'):
         tables['place']['data'].append([
             link(place),
-            print_base_type(place, 'Site'),
+            place.print_base_type(),
             format(place.first),
             format(place.last),
             truncate_string(place.description)])

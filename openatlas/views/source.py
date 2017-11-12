@@ -12,7 +12,7 @@ from openatlas.forms import build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (link, truncate_string, required_group, append_node_data,
-                                 print_base_type, build_table_form, uc_first)
+                                 build_table_form, uc_first)
 
 
 class SourceForm(Form):
@@ -33,7 +33,7 @@ def source_index():
     for source in EntityMapper.get_by_codes('source'):
         tables['source']['data'].append([
             link(source),
-            print_base_type(source, 'Source'),
+            source.print_base_type(),
             truncate_string(source.description)])
     return render_template('source/index.html', tables=tables)
 
@@ -71,7 +71,7 @@ def source_view(id_, unlink_id=None):
             truncate_string(translation.description)])
     tables['event'] = {
         'name': 'event',
-        'header': ['name', 'class', 'first', 'last', ''],
+        'header': ['name', 'class', 'type', 'first', 'last', ''],
         'data': []}
     for link_ in source.get_links('P67'):
         code = link_.range.class_.code
@@ -80,6 +80,7 @@ def source_view(id_, unlink_id=None):
             tables['event']['data'].append([
                 link(link_.range),
                 link_.range.class_.name,
+                link_.range.print_base_type(),
                 format(link_.range.first),
                 format(link_.range.last),
                 '<a href="' + unlink_link + '#tab-event">' + uc_first(_('remove')) + '</a>'])
