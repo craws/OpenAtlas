@@ -77,21 +77,32 @@ def sanitize(string, mode=None):
 def build_table_form(class_name, linked_entities):
     # Todo: add CSRF token
     form = '<form id="add-source-form" name="add-source-form" class="table" method="post">'
-    table = {
-        'name': class_name,
-        'header': [_('name'), _('class'), _('type'), _('first'), _('last'), ''],
-        'data': []}
+    header = [_('name'), _('class'), _('type'), _('first'), _('last'), '']
+    if class_name == 'actor':
+        header = [_('name'), _('class'), _('first'), _('last'), '']
+    elif class_name == 'place':
+        header = [_('name'), _('type'), _('first'), _('last'), '']
+    table = {'name': class_name, 'header': header, 'data': []}
     linked_ids = [entity.id for entity in linked_entities]
     for entity in EntityMapper.get_by_codes(class_name):
         if entity.id in linked_ids:
             continue
-        table['data'].append([
-            link(entity),
-            entity.class_.name,
-            entity.print_base_type(),
-            format(entity.first),
-            format(entity.last),
-            '<input id="{id}" name="values" type="checkbox" value="{id}">'.format(id=entity.id)])
+        input_ = '<input id="{id}" name="values" type="checkbox" value="{id}">'.format(id=entity.id)
+        if class_name == 'event':
+            table['data'].append([
+                link(entity),
+                entity.class_.name,
+                entity.print_base_type(),
+                format(entity.first),
+                format(entity.last),
+                input_])
+        else:
+            table['data'].append([
+                link(entity),
+                entity.class_.name if class_name == 'actor' else entity.print_base_type(),
+                format(entity.first),
+                format(entity.last),
+                input_])
     if not table['data']:
         return uc_first(_('no entries'))
     form += pager(table)
@@ -351,14 +362,12 @@ def pager(table):
                 style = ''
             html += '<td' + style + '>' + entry + '</td>'
         html += '</tr>'
-    html += '</tbody>'
-    html += '</table>'
-    html += '<script>'
-    sort = 'sortList: [[0, 0]]' if 'sort' not in table else table['sort']
+    html += '</tbody></table><script>'
+    sort = '' if 'sort' not in table else table['sort'] + ','
     if show_pager:
         html += """
             $("#{name}-table").tablesorter({{
-                {sort},
+                {sort}
                 dateFormat: "ddmmyyyy",
                 widgets: [\'zebra\', \'filter\'],
                 widgetOptions: {{
@@ -368,6 +377,6 @@ def pager(table):
             .tablesorterPager({{positionFixed: false, container: $("#{name}-pager"), size:{size}}});
         """.format(name=table['name'], sort=sort, size=table_rows)
     else:
-        html += '$("#' + table['name'] + '-table").tablesorter({' + sort + ',widgets:[\'zebra\']});'
+        html += '$("#' + table['name'] + '-table").tablesorter({' + sort + 'widgets:[\'zebra\']});'
     html += '</script>'
     return html

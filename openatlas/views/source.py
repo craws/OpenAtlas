@@ -26,16 +26,13 @@ class SourceForm(Form):
 @app.route('/source')
 @required_group('readonly')
 def source_index():
-    tables = {'source': {
-        'name': 'source',
-        'header': ['name', 'type', 'info'],
-        'data': []}}
+    table = {'name': 'source', 'header': ['name', 'type', 'info'], 'data': []}
     for source in EntityMapper.get_by_codes('source'):
-        tables['source']['data'].append([
+        table['data'].append([
             link(source),
             source.print_base_type(),
             truncate_string(source.description)])
-    return render_template('source/index.html', tables=tables)
+    return render_template('source/index.html', table=table)
 
 
 @app.route('/source/insert', methods=['POST', 'GET'])
@@ -69,19 +66,34 @@ def source_view(id_, unlink_id=None):
             link(translation),
             translation.nodes[0].name if translation.nodes else '',
             truncate_string(translation.description)])
+    tables['actor'] = {
+        'name': 'actor',
+        'header': ['name', 'class', 'first', 'last', ''],
+        'data': []}
+    tables['place'] = {
+        'name': 'place',
+        'header': ['name', 'type', 'first', 'last', ''],
+        'data': []}
     tables['event'] = {
         'name': 'event',
         'header': ['name', 'class', 'type', 'first', 'last', ''],
         'data': []}
     for link_ in source.get_links('P67'):
-        code = link_.range.class_.code
-        if code in app.config['CLASS_CODES']['event']:
-            entity = link_.range
-            unlink_url = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-event'
-            tables['event']['data'].append([
+        name = app.config['CODE_CLASS'][link_.range.class_.code]
+        entity = link_.range
+        unlink_url = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-' + name
+        if name == 'event':  # show class and base type in event
+            tables[name]['data'].append([
                 link(entity),
                 entity.class_.name,
                 entity.print_base_type(),
+                format(entity.first),
+                format(entity.last),
+                build_remove_link(unlink_url, entity.name)])
+        else:  # actor has no base type, place always the same class
+            tables[name]['data'].append([
+                link(entity),
+                entity.class_.name if name == 'actor' else entity.print_base_type(),
                 format(entity.first),
                 format(entity.last),
                 build_remove_link(unlink_url, entity.name)])

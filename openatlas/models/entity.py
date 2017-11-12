@@ -55,6 +55,8 @@ class Entity(object):
         self.dates = DateMapper.get_dates(self)
 
     def print_base_type(self):
+        if self.class_.code in openatlas.app.config['CLASS_CODES']['actor']:
+            return ''  # actors have no base type
         root_name = openatlas.app.config['CODE_CLASS'][self.class_.code].title()
         if self.class_.code in openatlas.app.config['CLASS_CODES']['place']:
             root_name = 'Site'

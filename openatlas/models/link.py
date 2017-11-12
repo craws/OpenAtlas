@@ -38,7 +38,9 @@ class LinkMapper(object):
                 property_ = openatlas.PropertyMapper.get_by_code(property_code)
                 ignore = openatlas.app.config['WHITELISTED_DOMAINS']
                 domain_error = True
-                if property_.find_object('domain_id', domain_class.id) or domain_class.code in ignore:
+                if property_.find_object('domain_id', domain_class.id):
+                    domain_error = False
+                if domain_class.code in ignore:
                     domain_error = False
                 range_error = False if property_.find_object('range_id', range_class.id) else True
                 if domain_error or range_error:
@@ -63,7 +65,9 @@ class LinkMapper(object):
     def get_linked_entity(entity, code, inverse=False):
         result = LinkMapper.get_linked_entities(entity, code, inverse)
         if len(result) > 1:
-            1/0  # Todo: do something
+            # Todo: log this error
+            flash('alert multiple linked entities found', 'error')
+            return result[0]  # return first one nevertheless to not bring the application down
         if result:
             return result[0]
 
