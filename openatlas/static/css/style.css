@@ -433,7 +433,7 @@ div.pager div {
 div.pager a {
     border: none;
     font-size: 0.9em;
-    padding: 0;
+    padding: 0.1em 0 0 0;
     margin-right: 0.5em;
 }
 

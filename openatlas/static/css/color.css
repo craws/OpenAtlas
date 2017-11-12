@@ -54,15 +54,9 @@ span.tooltip,
     color: #4088c3;
 }
 
-input[type=submit]:hover,
 div.tabsContainer table a:hover,
-div.tabsContainer .ui-state-hover,
-table a:hover,
-a.button:hover,
-button:hover,
-.button-bar a:hover,
-span.button:hover {
-    background-color: #46779f;
+table a:hover {
+    color: #46779f;
 }
 
 .error {
@@ -116,6 +110,15 @@ span.button,
 .ui-state-default,
 .changelog-version {
     background-color: #4088c3;
+}
+
+input[type=submit]:hover,
+div.tabsContainer .ui-state-hover,
+a.button:hover,
+button:hover,
+.button-bar a:hover,
+span.button:hover {
+    background-color: #46779f;
 }
 
 /* border color */
