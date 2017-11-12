@@ -10,7 +10,7 @@
         <li><a href="#tab-event">{{ _('events')|uc_first }} ({{ tables['event']['data']|length }})</a></li>
         <li><a href="#tab-actor">{{ _('actors')|uc_first }} ({{ tables['actor']['data']|length }})</a></li>
         <li><a href="#tab-place">{{ _('places')|uc_first }} ({{ tables['place']['data']|length }})</a></li>
-        <li><a href="#tab-reference">{{ _('references')|uc_first }} ()</a></li>
+        <li><a href="#tab-reference">{{ _('references')|uc_first }} ({{ tables['reference']['data']|length }})</a></li>
         <li><a href="#tab-translations">{{ _('translations')|uc_first }} ({{ tables['translation']['data']|length }})</a></li>
     </ul>
     <div id="tab-info">
@@ -41,8 +41,11 @@
         </div>
     {% endfor %}
     <div id="tab-reference">
-        <div class="button-bar">
-        </div>
+        {% if 'editor'|is_authorized: %}
+            <div class="button-bar">
+            </div>
+        {% endif %}
+        {{ tables['reference']|pager|safe }}
     </div>
     <div id="tab-translations">
         {% if 'editor'|is_authorized: %}

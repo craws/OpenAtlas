@@ -9,6 +9,7 @@ class Link(object):
 
     def __init__(self, row):
         self.id = row.id
+        self.description = row.description
         self.property = openatlas.properties[row.property_id]
         # Todo: performance - if it's a node don't call get_by_id
         self.domain = openatlas.EntityMapper.get_by_id(row.domain_id)
