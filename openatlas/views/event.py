@@ -9,7 +9,8 @@ import openatlas
 from openatlas import app
 from openatlas.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import link, required_group, truncate_string, append_node_data
+from openatlas.util.util import (link, required_group, truncate_string, append_node_data,
+                                 build_delete_link)
 
 
 class EventForm(DateForm):
@@ -87,7 +88,8 @@ def event_view(id_):
     event.set_dates()
     data = {'info': []}
     append_node_data(data['info'], event)
-    return render_template('event/view.html', event=event, data=data)
+    delete_link = build_delete_link(url_for('event_delete', id_=event.id), event.name)
+    return render_template('event/view.html', event=event, data=data, delete_link=delete_link)
 
 
 def save(form, entity):

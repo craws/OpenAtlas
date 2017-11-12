@@ -100,6 +100,24 @@ def build_table_form(class_name, linked_entities):
     return form
 
 
+def build_remove_link(url, name):
+    """
+    Build a link to remove a link with a JavaScript confirmation dialog
+    """
+    name = name.replace('\'', '')
+    confirm = 'onclick="return confirm(\'' + _('confirm remove', name=name) + '\')"'
+    return '<a ' + confirm + ' href="' + url + '">' + uc_first(_('remove')) + '</a>'
+
+
+def build_delete_link(url, name):
+    """
+    Build a link to delete an entity with a JavaScript confirmation dialog
+    """
+    name = name.replace('\'', '')
+    confirm = 'onclick="return confirm(\'' + _('confirm delete', name=name) + '\')"'
+    return '<a ' + confirm + ' href="' + url + '">' + uc_first(_('delete')) + '</a>'
+
+
 def append_node_data(data, entity, entity2=None):
     """Append additional entity information to a data table for view"""
     # nodes

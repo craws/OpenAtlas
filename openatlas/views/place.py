@@ -9,7 +9,8 @@ import openatlas
 from openatlas import app
 from openatlas.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import link, truncate_string, required_group, append_node_data
+from openatlas.util.util import (link, truncate_string, required_group, append_node_data,
+                                 build_delete_link)
 
 
 class PlaceForm(DateForm):
@@ -58,7 +59,8 @@ def place_view(id_):
     location = object_.get_linked_entity('P53')
     data = {'info': []}
     append_node_data(data['info'], object_, location)
-    return render_template('place/view.html', object_=object_, data=data)
+    delete_link = build_delete_link(url_for('place_delete', id_=object_.id), object_.name)
+    return render_template('place/view.html', object_=object_, data=data, delete_link=delete_link)
 
 
 @app.route('/place/delete/<int:id_>')

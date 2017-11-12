@@ -12,13 +12,8 @@
         <div class="button-bar">
             {{ event|page_buttons|safe }}
             {% if 'editor'|is_authorized and event.name != config['EVENT_ROOT_NAME']: %}
-                <a href="{{ url_for('event_update', id_=event.id) }}">
-                    {{ _('edit')|uc_first }}
-                </a>
-                <a onclick="return confirm('{{ _('delete')|uc_first }} {{ event.name.replace('\'', '') }}?')"
-                   href="{{ url_for('event_delete', id_=event.id) }}">
-                    {{ _('delete')|uc_first }}
-                </a>
+                <a href="{{ url_for('event_update', id_=event.id) }}">{{ _('edit')|uc_first }}</a>
+                {{ delete_link|safe }}
             {% endif %}
             {{ event.id|bookmark_toggle|safe }}
         </div>

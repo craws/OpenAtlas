@@ -17,10 +17,7 @@
                 <a href="{{ url_for('reference_update', id_=reference.id) }}">
                     {{ _('edit')|uc_first }}
                 </a>
-                <a onclick="return confirm('{{ _('delete')|uc_first }} {{ reference.name.replace('\'', '') }}?')"
-                   href="{{ url_for('reference_delete', id_=reference.id) }}">
-                    {{ _('delete')|uc_first }}
-                </a>
+                {{ delete_link|safe }}
             {% endif %}
             {{ reference.id|bookmark_toggle|safe }}
         </div>

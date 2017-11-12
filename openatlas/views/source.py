@@ -12,7 +12,7 @@ from openatlas.forms import build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (link, truncate_string, required_group, append_node_data,
-                                 build_table_form, uc_first)
+                                 build_table_form, build_remove_link, build_delete_link)
 
 
 class SourceForm(Form):
@@ -76,15 +76,21 @@ def source_view(id_, unlink_id=None):
     for link_ in source.get_links('P67'):
         code = link_.range.class_.code
         if code in app.config['CLASS_CODES']['event']:
-            unlink_link = url_for('source_view', id_=source.id, unlink_id=link_.id)
+            entity = link_.range
+            unlink_url = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-event'
             tables['event']['data'].append([
-                link(link_.range),
-                link_.range.class_.name,
-                link_.range.print_base_type(),
-                format(link_.range.first),
-                format(link_.range.last),
-                '<a href="' + unlink_link + '#tab-event">' + uc_first(_('remove')) + '</a>'])
-    return render_template('source/view.html', source=source, data=data, tables=tables)
+                link(entity),
+                entity.class_.name,
+                entity.print_base_type(),
+                format(entity.first),
+                format(entity.last),
+                build_remove_link(unlink_url, entity.name)])
+    return render_template(
+        'source/view.html',
+        source=source,
+        data=data,
+        tables=tables,
+        delete_link=build_delete_link(url_for('source_delete', id_=source.id), source.name))
 
 
 @app.route('/source/add/<int:id_>/<class_name>', methods=['POST', 'GET'])

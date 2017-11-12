@@ -26,10 +26,7 @@
                 <a href="{{ url_for('source_update', id_=source.id) }}">
                     {{ _('edit')|uc_first }}
                 </a>
-                <a onclick="return confirm('{{ _('delete')|uc_first }} {{ source.name.replace('\'', '') }}?')"
-                   href="{{ url_for('source_delete', id_=source.id) }}">
-                    {{ _('delete')|uc_first }}
-                </a>
+                {{ delete_link|safe }}
             {% endif %}
             {{ source.id|bookmark_toggle|safe }}
         </div>

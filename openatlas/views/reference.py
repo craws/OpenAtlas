@@ -10,7 +10,8 @@ import openatlas
 from openatlas import app
 from openatlas.forms import build_form
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import uc_first, link, truncate_string, required_group, append_node_data
+from openatlas.util.util import uc_first, link, truncate_string, required_group, append_node_data, \
+    build_delete_link
 
 
 class ReferenceForm(Form):
@@ -27,7 +28,12 @@ def reference_view(id_):
     reference = EntityMapper.get_by_id(id_)
     data = {'info': []}
     append_node_data(data['info'], reference)
-    return render_template('reference/view.html', reference=reference, data=data)
+    delete_link = build_delete_link(url_for('reference_delete', id_=reference.id), reference.name)
+    return render_template(
+        'reference/view.html',
+        reference=reference,
+        data=data,
+        delete_link=delete_link)
 
 
 @app.route('/reference')
