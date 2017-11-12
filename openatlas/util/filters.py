@@ -100,78 +100,13 @@ def table_select_model(self, name, selected=None):
         </div>
         <script>$(document).ready(function () {{createOverlay("{name}");}});</script>
     """.format(name=name, value=value, pager=render_template_string(pager(None, table)))
-
     return html
 
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def pager(self, table):
-    if not table['data']:
-        return '<p>' + util.uc_first(_('no entries')) + '</p>'
-    html = ''
-    table_rows = session['settings']['default_table_rows']
-    if hasattr(current_user, 'settings'):
-        table_rows = current_user.settings['table_rows']
-    show_pager = False if len(table['data']) < table_rows else True
-    if show_pager:
-        html += """
-            <div id="{name}-pager" class="pager">
-                <div class="navigation first"></div>
-                <div class="navigation prev"></div>
-                <div class="pagedisplay">
-                    <input class="pagedisplay" type="text" disabled="disabled">
-                </div>
-                <div class="navigation next"></div>
-                <div class="navigation last"></div>
-                <div>
-                    <select class="pagesize">
-                        <option value="10">10</option>
-                        <option value="20" selected="selected">20</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                </div>
-                <input id="{name}-search" class="search" type="text" data-column="all"
-                    placeholder="{filter}">
-            </div>
-            """.format(name=table['name'], filter=util.uc_first(_('filter')))
-    html += '<table id="{name}-table" class="tablesorter"><thead><tr>'.format(name=table['name'])
-    for header in table['header']:
-        style = '' if header else 'class=sorter-false '
-        html += '<th ' + style + '>' + header.capitalize() + '</th>'
-    html += '</tr></thead><tbody>'
-    for row in table['data']:
-        html += '<tr>'
-        for entry in row:
-            entry = str(entry) if (entry and entry != 'None') or entry == 0 else ''
-            try:
-                float(entry.replace(',', ''))
-                style = ' style="text-align:right;"'  # pragma: no cover
-            except ValueError:
-                style = ''
-            html += '<td' + style + '>' + entry + '</td>'
-        html += '</tr>'
-    html += '</tbody>'
-    html += '</table>'
-    html += '<script>'
-    sort = 'sortList: [[0, 0]]' if 'sort' not in table else table['sort']
-    if show_pager:
-        html += """
-            $("#{name}-table").tablesorter({{ 
-                {sort},
-                dateFormat: "ddmmyyyy",
-                widgets: [\'zebra\', \'filter\'],
-                widgetOptions: {{
-                    filter_external: \'#{name}-search\',
-                    filter_columnFilters: false
-                }}}})
-            .tablesorterPager({{positionFixed: false, container: $("#{name}-pager"), size:{size}}});
-        """.format(name=table['name'], sort=sort, size=table_rows)
-    else:
-        html += '$("#' + table['name'] + '-table").tablesorter({' + sort + ',widgets:[\'zebra\']});'
-    html += '</script>'
-    return html
+    return util.pager(table)
 
 
 @jinja2.contextfilter

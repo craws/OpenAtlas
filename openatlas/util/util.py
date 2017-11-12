@@ -14,7 +14,7 @@ from werkzeug.utils import redirect
 
 import openatlas
 from openatlas.models.classObject import ClassObject
-from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.property import Property
 from openatlas.models.user import User
 
@@ -80,6 +80,32 @@ def print_base_type(entity, root_name):
         if node.root and node.root[-1] == root_id:
             return node.name
     return ''
+
+
+def build_table_form(class_name, linked_entities):
+    # Todo: add CSRF token
+    form = '<form id="add-source-form" name="add-source-form" class="table" method="post">'
+    table = {
+        'name': class_name,
+        'header': [_('name'), _('class'), _('type'), _('first'), _('last'), ''],
+        'data': []}
+    linked_ids = [entity.id for entity in linked_entities]
+    for entity in EntityMapper.get_by_codes(class_name):
+        if entity.id in linked_ids:
+            continue
+        table['data'].append([
+            link(entity),
+            entity.class_.name,
+            print_base_type(entity, 'Event'),
+            format(entity.first),
+            format(entity.last),
+            '<input id="{id}" name="values" type="checkbox" value="{id}">'.format(id=entity.id)])
+    if not table['data']:
+        return uc_first(_('no entries'))
+    form += pager(table)
+    form += '<button name="form-submit" id="form-submit" type="submit">'
+    form += uc_first(_('add')) + '</button></form>'
+    return form
 
 
 def append_node_data(data, entity, entity2=None):
@@ -267,3 +293,71 @@ def create_date_from_form(form_date, postfix=''):
     if form_date['day' + postfix]:  # add days to date to prevent errors for e.g. February 31
         date_ += timedelta(days=form_date['day' + postfix]-1)
     return date_
+
+
+def pager(table):
+    if not table['data']:
+        return '<p>' + uc_first(_('no entries')) + '</p>'
+    html = ''
+    table_rows = session['settings']['default_table_rows']
+    if hasattr(current_user, 'settings'):
+        table_rows = current_user.settings['table_rows']
+    show_pager = False if len(table['data']) < table_rows else True
+    if show_pager:
+        html += """
+            <div id="{name}-pager" class="pager">
+                <div class="navigation first"></div>
+                <div class="navigation prev"></div>
+                <div class="pagedisplay">
+                    <input class="pagedisplay" type="text" disabled="disabled">
+                </div>
+                <div class="navigation next"></div>
+                <div class="navigation last"></div>
+                <div>
+                    <select class="pagesize">
+                        <option value="10">10</option>
+                        <option value="20" selected="selected">20</option>
+                        <option value="50">50</option>
+                        <option value="100">100</option>
+                    </select>
+                </div>
+                <input id="{name}-search" class="search" type="text" data-column="all"
+                    placeholder="{filter}">
+            </div>
+            """.format(name=table['name'], filter=uc_first(_('filter')))
+    html += '<table id="{name}-table" class="tablesorter"><thead><tr>'.format(name=table['name'])
+    for header in table['header']:
+        style = '' if header else 'class=sorter-false '
+        html += '<th ' + style + '>' + header.capitalize() + '</th>'
+    html += '</tr></thead><tbody>'
+    for row in table['data']:
+        html += '<tr>'
+        for entry in row:
+            entry = str(entry) if (entry and entry != 'None') or entry == 0 else ''
+            try:
+                float(entry.replace(',', ''))
+                style = ' style="text-align:right;"'  # pragma: no cover
+            except ValueError:
+                style = ''
+            html += '<td' + style + '>' + entry + '</td>'
+        html += '</tr>'
+    html += '</tbody>'
+    html += '</table>'
+    html += '<script>'
+    sort = 'sortList: [[0, 0]]' if 'sort' not in table else table['sort']
+    if show_pager:
+        html += """
+            $("#{name}-table").tablesorter({{
+                {sort},
+                dateFormat: "ddmmyyyy",
+                widgets: [\'zebra\', \'filter\'],
+                widgetOptions: {{
+                    filter_external: \'#{name}-search\',
+                    filter_columnFilters: false
+                }}}})
+            .tablesorterPager({{positionFixed: false, container: $("#{name}-pager"), size:{size}}});
+        """.format(name=table['name'], sort=sort, size=table_rows)
+    else:
+        html += '$("#' + table['name'] + '-table").tablesorter({' + sort + ',widgets:[\'zebra\']});'
+    html += '</script>'
+    return html

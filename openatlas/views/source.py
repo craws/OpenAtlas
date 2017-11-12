@@ -10,8 +10,9 @@ import openatlas
 from openatlas import app
 from openatlas.forms import build_form
 from openatlas.models.entity import EntityMapper
+from openatlas.models.link import LinkMapper
 from openatlas.util.util import (link, truncate_string, required_group, append_node_data,
-                                 print_base_type)
+                                 print_base_type, build_table_form, uc_first)
 
 
 class SourceForm(Form):
@@ -50,10 +51,13 @@ def source_insert():
     return render_template('source/insert.html', form=form)
 
 
+@app.route('/source/view/<int:id_>/<int:unlink_id>')
 @app.route('/source/view/<int:id_>')
 @required_group('readonly')
-def source_view(id_):
+def source_view(id_, unlink_id=None):
     source = EntityMapper.get_by_id(id_)
+    if unlink_id:
+        LinkMapper.delete_by_id(unlink_id)
     data = {'info': []}
     append_node_data(data['info'], source)
     tables = {'translation': {
@@ -65,35 +69,33 @@ def source_view(id_):
             link(translation),
             translation.nodes[0].name if translation.nodes else '',
             truncate_string(translation.description)])
-    tables['event'] = {'name': 'event', 'header': ['name', 'class', 'first', 'last'], 'data': []}
+    tables['event'] = {
+        'name': 'event',
+        'header': ['name', 'class', 'first', 'last', ''],
+        'data': []}
     for link_ in source.get_links('P67'):
         code = link_.range.class_.code
         if code in app.config['CLASS_CODES']['event']:
+            unlink_link = url_for('source_view', id_=source.id, unlink_id=link_.id)
             tables['event']['data'].append([
                 link(link_.range),
                 link_.range.class_.name,
                 format(link_.range.first),
-                format(link_.range.last)])
+                format(link_.range.last),
+                '<a href="' + unlink_link + '#tab-event">' + uc_first(_('remove')) + '</a>'])
     return render_template('source/view.html', source=source, data=data, tables=tables)
 
 
-@app.route('/source/add/<int:id_>/<class_name>')
+@app.route('/source/add/<int:id_>/<class_name>', methods=['POST', 'GET'])
 @required_group('editor')
 def source_add(id_, class_name):
     source = EntityMapper.get_by_id(id_)
-    table = {
-        'name': class_name,
-        'header': [_('name'), _('class'), _('type'),  _('first'), _('last'), ''],
-        'data': []}
-    for item in EntityMapper.get_by_codes(class_name):
-        table['data'].append([
-            link(item),
-            item.class_.name,
-            print_base_type(item, 'Event'),
-            format(item.first),
-            format(item.last),
-            ''])
-    return render_template('source/add.html', source=source, class_name=class_name, table=table)
+    if request.method == 'POST':
+        for value in request.form.getlist('values'):
+            source.link('P67', int(value))
+        return redirect(url_for('source_view', id_=source.id) + '#tab-' + class_name)
+    form = build_table_form(class_name, source.get_linked_entities('P67'))
+    return render_template('source/add.html', source=source, class_name=class_name, form=form)
 
 
 @app.route('/source/delete/<int:id_>')

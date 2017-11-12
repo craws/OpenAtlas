@@ -40,7 +40,7 @@ class Entity(object):
         return LinkMapper.get_links(self, code, inverse)
 
     def delete_links(self, codes):
-        LinkMapper.delete(self, codes)
+        LinkMapper.delete_by_codes(self, codes)
 
     def update(self):
         EntityMapper.update(self)

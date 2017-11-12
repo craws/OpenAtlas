@@ -244,6 +244,7 @@ table {
 
 table.tablesorter {
     text-align: left;
+    margin-bottom: 0.5em;
 }
 
 table.tablesorter thead tr th, table.tablesorter tfoot tr th {
