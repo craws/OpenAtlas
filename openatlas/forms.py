@@ -10,7 +10,7 @@ from wtforms.widgets import HiddenInput
 import openatlas
 from openatlas.util import util
 from openatlas.util.filters import pager
-from openatlas.util.util import uc_first, sanitize
+from openatlas.util.util import uc_first, sanitize, truncate_string
 
 
 def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
@@ -176,15 +176,18 @@ class TableSelect(HiddenInput):
     def __call__(self, field, **kwargs):
         selection = ''
         table = {'name': field.id, 'header': ['name', 'type', 'info'], 'data': []}
-        for entity in openatlas.models.entity.EntityMapper.get_by_class(field.id.split('_')[0]):
+        for entity in openatlas.models.entity.EntityMapper.get_by_codes(field.id):
             # Todo: don't show self e.g. at relations
             if field.data and entity.id == int(field.data):
                 selection = entity.name
             table['data'].append([
                 """<a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
-                    """.format(name=field.id, entity_id=entity.id, entity_name=entity.name),
-                ', '.join(map(str, entity.types[field.id])) if field.id in entity.types else '',
-                util.truncate_string(entity.info)])
+                    """.format(
+                    name=field.id,
+                    entity_id=entity.id,
+                    entity_name=truncate_string(entity.name, 40, False)),
+                entity.print_base_type(),
+                truncate_string(entity.description)])
         html = """
             <input id="{name}-button" name="{name}-button" class="table-select {required}"
                 type="text" placeholder="Select" onfocus="this.blur()" readonly="readonly"
@@ -217,16 +220,15 @@ class TableMultiSelect(HiddenInput):
             'name': field.id,
             'header': ['name', 'x'],
             'data': [], 'sort': 'sortList: [[1,0],[0,0]]'}
-        for entity in openatlas.models.entity.EntityMapper.get_by_class(field.id.split('_')[0]):
+        for entity in openatlas.models.entity.EntityMapper.get_by_codes(field.id):
             selection += entity.name + '<br />' if field.data and entity.id in field.data else ''
             checked = ''
             if field.data and entity.id in field.data:
                 checked = 'checked = "checked"'
             table['data'].append([
                 entity.name,
-                """<input id="{id}" {checked} value="{name}" class="multi-table-select"
-                    type="checkbox" />
-                """.format(id=str(entity.id), name=entity.name, checked=checked)])
+                '<input id="{id}" {checked} value="{name}" class="multi-table-select"'.format(
+                    id=str(entity.id), name=entity.name, checked=checked)])
         html = """
             <span id="{name}-button" class="button">Select</span><br />
             <div id="{name}-selection" class="selection" style="text-align:left;">{selection}</div>
@@ -278,52 +280,40 @@ class DateForm(Form):
     date_begin_year = IntegerField(
         uc_first(_('begin')),
         render_kw={'placeholder': _('yyyy')},
-        validators=[Optional(), NumberRange(min=-4713)]
-    )
+        validators=[Optional(), NumberRange(min=-4713)])
     date_begin_month = IntegerField(
         render_kw={'placeholder': _('mm')},
-        validators=[Optional(), NumberRange(min=1, max=12)]
-    )
+        validators=[Optional(), NumberRange(min=1, max=12)])
     date_begin_day = IntegerField(
         render_kw={'placeholder': _('dd')},
-        validators=[Optional(), NumberRange(min=1, max=31)]
-    )
+        validators=[Optional(), NumberRange(min=1, max=31)])
     date_begin_year2 = IntegerField(
         render_kw={'placeholder': _('yyyy')},
-        validators=[Optional(), NumberRange(min=-4713)]
-    )
+        validators=[Optional(), NumberRange(min=-4713)])
     date_begin_month2 = IntegerField(
         render_kw={'placeholder': _('mm')},
-        validators=[Optional(), NumberRange(min=1, max=12)]
-    )
+        validators=[Optional(), NumberRange(min=1, max=12)])
     date_begin_day2 = IntegerField(
         render_kw={'placeholder': _('dd')},
-        validators=[Optional(), NumberRange(min=1, max=31)]
-    )
+        validators=[Optional(), NumberRange(min=1, max=31)])
     date_begin_info = StringField(render_kw={'placeholder': _('comment')},)
     date_end_year = IntegerField(
         uc_first(_('end')),
         render_kw={'placeholder': _('yyyy')},
-        validators=[Optional(), NumberRange(min=-4713)]
-    )
+        validators=[Optional(), NumberRange(min=-4713)])
     date_end_month = IntegerField(
         render_kw={'placeholder': _('mm')},
-        validators=[Optional(), NumberRange(min=1, max=12)]
-    )
+        validators=[Optional(), NumberRange(min=1, max=12)])
     date_end_day = IntegerField(
         render_kw={'placeholder': _('dd')},
-        validators=[Optional(), NumberRange(min=1, max=31)]
-    )
+        validators=[Optional(), NumberRange(min=1, max=31)])
     date_end_year2 = IntegerField(
         render_kw={'placeholder': _('yyyy')},
-        validators=[Optional(), NumberRange(min=-4713)]
-    )
+        validators=[Optional(), NumberRange(min=-4713)])
     date_end_month2 = IntegerField(
         render_kw={'placeholder': _('mm')},
-        validators=[Optional(), NumberRange(min=1, max=12)]
-    )
+        validators=[Optional(), NumberRange(min=1, max=12)])
     date_end_day2 = IntegerField(
         render_kw={'placeholder': _('dd')},
-        validators=[Optional(), NumberRange(min=1, max=31)]
-    )
+        validators=[Optional(), NumberRange(min=1, max=31)])
     date_end_info = StringField(render_kw={'placeholder': _('comment')})

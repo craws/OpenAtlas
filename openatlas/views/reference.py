@@ -8,7 +8,7 @@ from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app
-from openatlas.forms import build_form
+from openatlas.forms import build_form, TableField
 from openatlas.models.entity import EntityMapper
 from openatlas.util.util import uc_first, link, truncate_string, required_group, append_node_data, \
     build_delete_link
@@ -20,6 +20,20 @@ class ReferenceForm(Form):
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
+
+
+class AddReferenceForm(Form):
+    source = TableField(_('source'))
+    pages = StringField(_('pages'))
+    save = SubmitField(_('insert'))
+
+
+@app.route('/reference/add/<int:origin_id>')
+@required_group('editor')
+def reference_add(origin_id):
+    origin = EntityMapper.get_by_id(origin_id)
+    form = AddReferenceForm()
+    return render_template('reference/add.html', origin=origin, form=form)
 
 
 @app.route('/reference/view/<int:id_>')

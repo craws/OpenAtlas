@@ -17,9 +17,7 @@
         <div class="button-bar">
             {{ source|page_buttons|safe }}
             {% if 'editor'|is_authorized: %}
-                <a href="{{ url_for('source_update', id_=source.id) }}">
-                    {{ _('edit')|uc_first }}
-                </a>
+                <a href="{{ url_for('source_update', id_=source.id) }}">{{ _('edit')|uc_first }}</a>
                 {{ delete_link|safe }}
             {% endif %}
             {{ source.id|bookmark_toggle|safe }}
@@ -32,9 +30,7 @@
         <div id="tab-{{ name }}">
             {% if 'editor'|is_authorized: %}
                 <div class="button-bar">
-                    <a href="{{ url_for('source_add', id_=source.id, class_name=name)}}">
-                        {{ _('add')|uc_first }}
-                    </a>
+                    <a href="{{ url_for('source_add', id_=source.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
                 </div>
             {% endif %}
             {{ tables[name]|pager|safe }}
@@ -43,6 +39,7 @@
     <div id="tab-reference">
         {% if 'editor'|is_authorized: %}
             <div class="button-bar">
+                <a href="{{ url_for('reference_add', origin_id=source.id)}}">{{ _('add')|uc_first }}</a>
             </div>
         {% endif %}
         {{ tables['reference']|pager|safe }}
@@ -50,9 +47,7 @@
     <div id="tab-translations">
         {% if 'editor'|is_authorized: %}
             <div class="button-bar">
-                <a href="{{ url_for('translation_insert', source_id=source.id) }}">
-                    + {{ _('translation')|uc_first }}
-                </a>
+                <a href="{{ url_for('translation_insert', source_id=source.id) }}">+ {{ _('translation')|uc_first }}</a>
             </div>
         {% endif %}
         {{ tables['translation']|pager|safe }}

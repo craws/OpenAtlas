@@ -298,11 +298,13 @@ def link(entity):
     return html
 
 
-def truncate_string(string, length=40):
+def truncate_string(string, length=40, span=True):
     if string is None:
         return ''  # pragma: no cover
     if len(string) > length + 2:
-        string = '<span title="' + string.replace('"', '') + '">' + string[:length] + '..</span>'
+        string = string[:length] + '..'
+        if span:
+            string = '<span title="' + string.replace('"', '') + '">' + string + '</span>'
     return string
 
 
