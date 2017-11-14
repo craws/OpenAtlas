@@ -8,7 +8,6 @@ from wtforms.validators import NumberRange, Optional
 from wtforms.widgets import HiddenInput
 
 import openatlas
-from openatlas.util import util
 from openatlas.util.filters import pager
 from openatlas.util.util import uc_first, sanitize, truncate_string
 
@@ -175,8 +174,11 @@ class TreeMultiField(HiddenField):
 class TableSelect(HiddenInput):
     def __call__(self, field, **kwargs):
         selection = ''
-        table = {'name': field.id, 'header': ['name', 'type', 'info'], 'data': []}
+        table = {'name': field.id, 'header': ['name', 'class', 'type', 'info'], 'data': []}
         for entity in openatlas.models.entity.EntityMapper.get_by_codes(field.id):
+            class_ = openatlas.classes[entity.class_.id].name
+            if field.id == 'reference':
+                class_ = uc_first(_(entity.system_type))
             # Todo: don't show self e.g. at relations
             if field.data and entity.id == int(field.data):
                 selection = entity.name
@@ -186,6 +188,7 @@ class TableSelect(HiddenInput):
                     name=field.id,
                     entity_id=entity.id,
                     entity_name=truncate_string(entity.name, 40, False)),
+                class_,
                 entity.print_base_type(),
                 truncate_string(entity.description)])
         html = """

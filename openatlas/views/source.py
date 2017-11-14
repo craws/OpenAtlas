@@ -102,14 +102,14 @@ def source_view(id_, unlink_id=None):
         'header': ['name', 'class', 'type', 'page', '', ''],
         'data': []}
     for link_ in source.get_links('P67', True):
-        entity = link_.range
+        entity = link_.domain
         unlink_url = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-reference'
         tables['reference']['data'].append([
             link(entity),
-            entity.class_.name,
+            uc_first(_(entity.system_type)),
             entity.print_base_type(),
             link_.description,
-            '<a href="">' + uc_first(_('edit')) + '</a>',
+            '<a href="' + url_for('reference_link_update', link_id=link_.id, origin_id=source.id) + '">' + uc_first(_('edit')) + '</a>',
             build_remove_link(unlink_url, entity.name)])
     return render_template(
         'source/view.html',

@@ -15,11 +15,14 @@ class Link(object):
         self.domain = openatlas.EntityMapper.get_by_id(row.domain_id)
         self.range = openatlas.EntityMapper.get_by_id(row.range_id)
 
+    def update(self):
+        LinkMapper.update(self)
+
 
 class LinkMapper(object):
 
     @staticmethod
-    def insert(domain, property_code, range_):
+    def insert(domain, property_code, range_, description=False):
         if not domain or not range_:
             return
         range_ = range_ if isinstance(range_, list) else [range_]
@@ -50,16 +53,19 @@ class LinkMapper(object):
                     flash(text, 'error')
                     continue
             sql = """
-                INSERT INTO model.link (property_id, domain_id, range_id)
-                VALUES ((
-                    SELECT id FROM model.property
-                    WHERE code = %(property_code)s), %(domain_id)s, %(range_id)s);"""
+                INSERT INTO model.link (property_id, domain_id, range_id, description)
+                VALUES (
+                    (SELECT id FROM model.property WHERE code = %(property_code)s),
+                    %(domain_id)s,
+                    %(range_id)s,
+                    %(description)s);"""
             # Todo: build only sql and get execution out of loop
             cursor = openatlas.get_cursor()
             cursor.execute(sql, {
                 'property_code': property_code,
                 'domain_id': domain_id,
-                'range_id': range_id})
+                'range_id': range_id,
+                'description': description})
             openatlas.debug_model['div sql'] += 1
 
     @staticmethod
@@ -142,3 +148,14 @@ class LinkMapper(object):
     @staticmethod
     def delete_by_id(id_):
         openatlas.get_cursor().execute("DELETE FROM model.link WHERE id = %(id)s;", {'id': id_})
+
+    @staticmethod
+    def update(link):
+        sql = """UPDATE model.link SET (property_id, domain_id, range_id, description) =
+            (%(property_id)s, %(domain_id)s, %(range_id)s, %(description)s) WHERE id = %(id)s;"""
+        openatlas.get_cursor().execute(sql, {
+            'id': link.id,
+            'property_id': link.property.id,
+            'domain_id': link.domain.id,
+            'range_id': link.range.id,
+            'description': link.description})

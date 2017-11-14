@@ -23,17 +23,40 @@ class ReferenceForm(Form):
 
 
 class AddReferenceForm(Form):
-    source = TableField(_('source'))
+    reference = TableField(_('reference'))
     pages = StringField(_('pages'))
     save = SubmitField(_('insert'))
 
 
-@app.route('/reference/add/<int:origin_id>')
+@app.route('/reference/add/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('editor')
 def reference_add(origin_id):
     origin = EntityMapper.get_by_id(origin_id)
+    class_name = app.config['CODE_CLASS'][origin.class_.code]
     form = AddReferenceForm()
-    return render_template('reference/add.html', origin=origin, form=form)
+    if form.validate_on_submit():
+        reference = EntityMapper.get_by_id(form.reference.data)
+        reference.link('P67', origin.id, form.pages.data)
+        return redirect(url_for(class_name + '_view', id_=origin.id) + '#tab-reference')
+    return render_template('reference/add.html', origin=origin, form=form, class_name=class_name)
+
+
+@app.route('/reference/link-update/<int:link_id>/<int:origin_id>', methods=['POST', 'GET'])
+@required_group('editor')
+def reference_link_update(link_id, origin_id):
+    origin = EntityMapper.get_by_id(origin_id)
+    class_name = app.config['CODE_CLASS'][origin.class_.code]
+    form = AddReferenceForm()
+    del form.reference
+    if form.validate_on_submit():
+        # Todo, set domain and range for link, performance?
+        # link.update()
+        return redirect(url_for(class_name + '_view', id_=origin.id) + '#tab-reference')
+    return render_template(
+        'reference/link-update.html',
+        origin=origin,
+        form=form,
+        class_name=class_name)
 
 
 @app.route('/reference/view/<int:id_>')

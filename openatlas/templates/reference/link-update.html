@@ -2,7 +2,7 @@
 {% block breadcrumb %}
     <a href="{{ url_for(class_name + '_index') }}">{{ _(class_name)|uc_first }}</a>
     > {{ origin|link|safe }}
-    > {{ _('add')|uc_first }} {{ _('reference')|uc_first }}
+    > {{ _('edit')|uc_first }}
 {% endblock %}
 {% block content %}
     {{ form|display_form|safe }}
