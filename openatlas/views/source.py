@@ -35,17 +35,22 @@ def source_index():
     return render_template('source/index.html', table=table)
 
 
+@app.route('/source/insert/<int:origin_id>', methods=['POST', 'GET'])
 @app.route('/source/insert', methods=['POST', 'GET'])
 @required_group('editor')
-def source_insert():
+def source_insert(origin_id=None):
+    origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(SourceForm, 'Source')
     if form.validate_on_submit():
-        source = save(form)
+        source = save(form, None, origin_id)
         flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
-            return redirect(url_for('source_insert'))
+            return redirect(url_for('source_insert', origin_id=origin_id))
+        if origin:
+            view = app.config['CODE_CLASS'][origin.class_.code]
+            return redirect(url_for(view + '_view', id_=origin.id) + '#tab-source')
         return redirect(url_for('source_view', id_=source.id))
-    return render_template('source/insert.html', form=form)
+    return render_template('source/insert.html', form=form, origin=origin)
 
 
 @app.route('/source/view/<int:id_>/<int:unlink_id>')
@@ -104,12 +109,13 @@ def source_view(id_, unlink_id=None):
     for link_ in source.get_links('P67', True):
         entity = link_.domain
         unlink_url = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-reference'
+        update_url = url_for('reference_link_update', link_id=link_.id, origin_id=source.id)
         tables['reference']['data'].append([
             link(entity),
             uc_first(_(entity.system_type)),
             entity.print_base_type(),
             link_.description,
-            '<a href="' + url_for('reference_link_update', link_id=link_.id, origin_id=source.id) + '">' + uc_first(_('edit')) + '</a>',
+            '<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>',
             build_remove_link(unlink_url, entity.name)])
     return render_template(
         'source/view.html',
@@ -119,16 +125,31 @@ def source_view(id_, unlink_id=None):
         delete_link=build_delete_link(url_for('source_delete', id_=source.id), source.name))
 
 
-@app.route('/source/add/<int:id_>/<class_name>', methods=['POST', 'GET'])
+@app.route('/source/add/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('editor')
-def source_add(id_, class_name):
+def source_add(origin_id):
+    origin = EntityMapper.get_by_id(origin_id)
+    origin_view_name = app.config['CODE_CLASS'][origin.class_.code]
+    if request.method == 'POST':
+        openatlas.get_cursor().execute('BEGIN')
+        for value in request.form.getlist('values'):
+            LinkMapper.insert(int(value), 'P67', origin.id)
+        openatlas.get_cursor().execute('COMMIT')
+        return redirect(url_for(origin_view_name + '_view', id_=origin.id) + '#tab-source')
+    form = build_table_form('source', origin.get_linked_entities('P67', True))
+    return render_template('source/add.html', origin=origin, form=form)
+
+
+@app.route('/source/add2/<int:id_>/<class_name>', methods=['POST', 'GET'])
+@required_group('editor')
+def source_add2(id_, class_name):
     source = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
         for value in request.form.getlist('values'):
             source.link('P67', int(value))
         return redirect(url_for('source_view', id_=source.id) + '#tab-' + class_name)
     form = build_table_form(class_name, source.get_linked_entities('P67'))
-    return render_template('source/add.html', source=source, class_name=class_name, form=form)
+    return render_template('source/add2.html', source=source, class_name=class_name, form=form)
 
 
 @app.route('/source/delete/<int:id_>')
@@ -156,7 +177,7 @@ def source_update(id_):
     return render_template('source/update.html', form=form, source=source)
 
 
-def save(form, entity=None):
+def save(form, entity=None, origin=None):
     openatlas.get_cursor().execute('BEGIN')
     if not entity:
         entity = EntityMapper.insert('E33', form.name.data, 'source content')
@@ -164,5 +185,7 @@ def save(form, entity=None):
     entity.description = form.description.data
     entity.update()
     entity.save_nodes(form)
+    if origin:
+        entity.link('P67', origin)
     openatlas.get_cursor().execute('COMMIT')
     return entity

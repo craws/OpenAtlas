@@ -5,10 +5,9 @@
 {% block content %}
     {% if 'editor'|is_authorized: %}
         <div class="button-bar">
-            <a href="{{ url_for('event_insert', code='E7') }}">+ {{ 'E7'|get_class_name }}</a>
-            <a href="{{ url_for('event_insert', code='E8') }}">+ {{ 'E8'|get_class_name }}</a>
-            <a href="{{ url_for('event_insert', code='E12') }}">+ {{ 'E12'|get_class_name }}</a>
-            <a href="{{ url_for('event_insert', code='E6') }}">+ {{ 'E6'|get_class_name }}</a>
+            {% for code in config['CLASS_CODES']['event']%}
+                <a href="{{ url_for('event_insert', code=code) }}">+ {{ code|get_class_name }}</a>
+            {% endfor %}
         </div>
     {% endif %}
     {{ tables['event']|pager|safe }}

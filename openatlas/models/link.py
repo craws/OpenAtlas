@@ -130,6 +130,7 @@ class LinkMapper(object):
             first=first, second=second)
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {'entity_id': entity_id, 'codes': tuple(codes)})
+        openatlas.debug_model['div sql'] += 1
         links = []
         for row in cursor.fetchall():
             links.append(Link(row))
@@ -146,6 +147,33 @@ class LinkMapper(object):
         openatlas.get_cursor().execute(sql, {'id': entity.id, 'property_ids': tuple(property_ids)})
 
     @staticmethod
+    def get_by_id(id_):
+        sql = """
+            SELECT l.id, l.property_id, l.domain_id, l.range_id, l.description, l.created,
+                l.modified,
+                min(date_part('year', d1.value_timestamp)) AS first,
+                max(date_part('year', d2.value_timestamp)) AS last,
+                (SELECT t.id FROM model.entity t
+                    JOIN model.link_property lp ON t.id = lp.range_id AND lp.domain_id = l.id
+                    WHERE lp.property_id = (SELECT id FROM model.property WHERE code = 'P2')
+                ) AS type_id
+
+            FROM model.link l
+
+            LEFT JOIN model.link_property dl1 ON l.id = dl1.domain_id AND
+                dl1.property_id IN (SELECT id FROM model.property WHERE code = 'OA5')
+            LEFT JOIN model.entity d1 ON dl1.range_id = d1.id
+            LEFT JOIN model.link_property dl2 ON l.id = dl2.domain_id
+                AND dl2.property_id IN (SELECT id FROM model.property WHERE code = 'OA6')
+            LEFT JOIN model.entity d2 ON dl2.range_id = d2.id
+
+            WHERE l.id = %(id)s GROUP BY l.id;"""
+        cursor = openatlas.get_cursor()
+        cursor.execute(sql, {'id': id_})
+        openatlas.debug_model['div sql'] += 1
+        return Link(cursor.fetchone())
+
+    @staticmethod
     def delete_by_id(id_):
         openatlas.get_cursor().execute("DELETE FROM model.link WHERE id = %(id)s;", {'id': id_})
 
@@ -159,3 +187,4 @@ class LinkMapper(object):
             'domain_id': link.domain.id,
             'range_id': link.range.id,
             'description': link.description})
+        openatlas.debug_model['div sql'] += 1

@@ -2,6 +2,7 @@
 {% block breadcrumb %}
     <a href="{{ url_for(class_name + '_index') }}">{{ _(class_name)|uc_first }}</a>
     > {{ origin|link|safe }}
+    > {{ range|link|safe }}
     > {{ _('edit')|uc_first }}
 {% endblock %}
 {% block content %}

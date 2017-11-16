@@ -82,6 +82,8 @@ def build_table_form(class_name, linked_entities):
         header = [_('name'), _('class'), _('first'), _('last'), '']
     elif class_name == 'place':
         header = [_('name'), _('type'), _('first'), _('last'), '']
+    elif class_name == 'source':
+        header = ['name', 'type', '']
     table = {'name': class_name, 'header': header, 'data': []}
     linked_ids = [entity.id for entity in linked_entities]
     for entity in EntityMapper.get_by_codes(class_name):
@@ -96,6 +98,8 @@ def build_table_form(class_name, linked_entities):
                 format(entity.first),
                 format(entity.last),
                 input_])
+        elif class_name == 'source':
+            table['data'].append([link(entity), entity.print_base_type(), input_])
         else:
             table['data'].append([
                 link(entity),

@@ -30,7 +30,10 @@
         <div id="tab-{{ name }}">
             {% if 'editor'|is_authorized: %}
                 <div class="button-bar">
-                    <a href="{{ url_for('source_add', id_=source.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
+                    <a href="{{ url_for('source_add2', id_=source.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
+                    {% for code in config['CLASS_CODES'][name]%}
+                        <a href="{{ url_for(name + '_insert', code=code, origin_id=source.id) }}">+ {{ code|get_class_name }}</a>
+                    {% endfor %}
                 </div>
             {% endif %}
             {{ tables[name]|pager|safe }}

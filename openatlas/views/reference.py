@@ -10,6 +10,7 @@ import openatlas
 from openatlas import app
 from openatlas.forms import build_form, TableField
 from openatlas.models.entity import EntityMapper
+from openatlas.models.link import LinkMapper
 from openatlas.util.util import uc_first, link, truncate_string, required_group, append_node_data, \
     build_delete_link
 
@@ -44,17 +45,22 @@ def reference_add(origin_id):
 @app.route('/reference/link-update/<int:link_id>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('editor')
 def reference_link_update(link_id, origin_id):
+    link_ = LinkMapper.get_by_id(link_id)
     origin = EntityMapper.get_by_id(origin_id)
     class_name = app.config['CODE_CLASS'][origin.class_.code]
     form = AddReferenceForm()
+    form.save.label.text = _('save')
     del form.reference
     if form.validate_on_submit():
-        # Todo, set domain and range for link, performance?
-        # link.update()
+        link_.description = form.pages.data
+        link_.update()
+        flash(_('info update'), 'info')
         return redirect(url_for(class_name + '_view', id_=origin.id) + '#tab-reference')
+    form.pages.data = link_.description
     return render_template(
         'reference/link-update.html',
         origin=origin,
+        range=link_.domain,
         form=form,
         class_name=class_name)
 
