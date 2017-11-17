@@ -102,7 +102,7 @@ def reference_view(id_, unlink_id=None):
         'header': ['name', 'class', 'type', 'page', '', ''],
         'data': []}
     for link_ in reference.get_links('P67'):
-        name = app.config['CODE_CLASS'][link_.domain.class_.code]
+        name = app.config['CODE_CLASS'][link_.range.class_.code]
         entity = link_.range
         unlink_url = url_for(
             'reference_view', id_=reference.id, unlink_id=link_.id) + '#tab-' + name
