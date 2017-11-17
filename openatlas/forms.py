@@ -174,7 +174,10 @@ class TreeMultiField(HiddenField):
 class TableSelect(HiddenInput):
     def __call__(self, field, **kwargs):
         selection = ''
-        table = {'name': field.id, 'header': ['name', 'class', 'type', 'info'], 'data': []}
+        header = ['name', 'class', 'type', 'info']
+        if field.id == 'source':
+            header = ['name', 'type', 'info']
+        table = {'name': field.id, 'header': header, 'data': []}
         for entity in openatlas.models.entity.EntityMapper.get_by_codes(field.id):
             class_ = openatlas.classes[entity.class_.id].name
             if field.id == 'reference':
@@ -182,15 +185,25 @@ class TableSelect(HiddenInput):
             # Todo: don't show self e.g. at relations
             if field.data and entity.id == int(field.data):
                 selection = entity.name
-            table['data'].append([
-                """<a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
-                    """.format(
-                    name=field.id,
-                    entity_id=entity.id,
-                    entity_name=truncate_string(entity.name, 40, False)),
-                class_,
-                entity.print_base_type(),
-                truncate_string(entity.description)])
+            if field.id == 'source':
+                table['data'].append([
+                    """<a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
+                        """.format(
+                        name=field.id,
+                        entity_id=entity.id,
+                        entity_name=truncate_string(entity.name, 40, False)),
+                    entity.print_base_type(),
+                    truncate_string(entity.description)])
+            else:
+                table['data'].append([
+                    """<a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
+                        """.format(
+                        name=field.id,
+                        entity_id=entity.id,
+                        entity_name=truncate_string(entity.name, 40, False)),
+                    class_,
+                    entity.print_base_type(),
+                    truncate_string(entity.description)])
         html = """
             <input id="{name}-button" name="{name}-button" class="table-select {required}"
                 type="text" placeholder="Select" onfocus="this.blur()" readonly="readonly"

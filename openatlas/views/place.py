@@ -9,8 +9,9 @@ import openatlas
 from openatlas import app
 from openatlas.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper
+from openatlas.models.link import LinkMapper
 from openatlas.util.util import (link, truncate_string, required_group, append_node_data,
-                                 build_delete_link)
+                                 build_delete_link, build_remove_link)
 
 
 class PlaceForm(DateForm):
@@ -39,28 +40,50 @@ def place_index():
 
 
 @app.route('/place/insert', methods=['POST', 'GET'])
+@app.route('/place/insert/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('editor')
-def place_insert():
+def place_insert(origin_id=None):
+    origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(PlaceForm, 'Place')
     if form.validate_on_submit():
-        object_ = save(form)
+        object_ = save(form, None, None, origin)
         flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
-            return redirect(url_for('place_insert', code='E18'))
+            return redirect(url_for('place_insert', origin_id=origin_id))
+        if origin:
+            view = app.config['CODE_CLASS'][origin.class_.code]
+            return redirect(url_for(view + '_view', id_=origin.id) + '#tab-place')
         return redirect(url_for('place_view', id_=object_.id))
-    return render_template('place/insert.html', form=form)
+    return render_template('place/insert.html', form=form, origin=origin)
 
 
 @app.route('/place/view/<int:id_>')
+@app.route('/place/view/<int:id_>/<int:unlink_id>')
 @required_group('readonly')
-def place_view(id_):
+def place_view(id_, unlink_id=None):
     object_ = EntityMapper.get_by_id(id_)
+    if unlink_id:
+        LinkMapper.delete_by_id(unlink_id)
     object_.set_dates()
     location = object_.get_linked_entity('P53')
-    data = {'info': []}
-    append_node_data(data['info'], object_, location)
+    tables = {'info': []}
+    append_node_data(tables['info'], object_, location)
+    tables['source'] = {'name': 'source', 'header': ['name', 'type', 'info', ''], 'data': []}
+    for link_ in object_.get_links('P67', True):
+        name = app.config['CODE_CLASS'][link_.domain.class_.code]
+        entity = link_.domain
+        unlink_url = url_for('place_view', id_=object_.id, unlink_id=link_.id) + '#tab-' + name
+        tables['source']['data'].append([
+            link(entity),
+            entity.print_base_type(),
+            truncate_string(entity.description),
+            build_remove_link(unlink_url, entity.name)])
     delete_link = build_delete_link(url_for('place_delete', id_=object_.id), object_.name)
-    return render_template('place/view.html', object_=object_, data=data, delete_link=delete_link)
+    return render_template(
+        'place/view.html',
+        object_=object_,
+        tables=tables,
+        delete_link=delete_link)
 
 
 @app.route('/place/delete/<int:id_>')
@@ -89,7 +112,7 @@ def place_update(id_):
     return render_template('place/update.html', form=form, object_=object_)
 
 
-def save(form, object_=None, location=None):
+def save(form, object_=None, location=None, origin=None):
     openatlas.get_cursor().execute('BEGIN')
     if not object_:
         object_ = EntityMapper.insert('E18', form.name.data)
@@ -103,5 +126,7 @@ def save(form, object_=None, location=None):
     location.name = 'Location of ' + form.name.data
     location.update()
     location.save_nodes(form)
+    if origin:
+        origin.link('P67', object_)
     openatlas.get_cursor().execute('COMMIT')
     return object_

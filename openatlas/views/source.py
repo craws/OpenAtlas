@@ -9,7 +9,7 @@ from wtforms.validators import InputRequired
 import openatlas
 from openatlas import app
 from openatlas.forms import build_form
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import EntityMapper, Entity
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (link, truncate_string, required_group, append_node_data,
                                  build_table_form, build_remove_link, build_delete_link, uc_first)
@@ -41,15 +41,19 @@ def source_index():
 def source_insert(origin_id=None):
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(SourceForm, 'Source')
+    if origin:
+        del form.insert_and_continue
     if form.validate_on_submit():
-        source = save(form, None, origin_id)
+        result = save(form, None, origin)
         flash(_('entity created'), 'info')
+        if not isinstance(result, Entity):
+            return redirect(url_for('reference_link_update', link_id=result, origin_id=origin_id))
         if form.continue_.data == 'yes':
             return redirect(url_for('source_insert', origin_id=origin_id))
         if origin:
             view = app.config['CODE_CLASS'][origin.class_.code]
             return redirect(url_for(view + '_view', id_=origin.id) + '#tab-source')
-        return redirect(url_for('source_view', id_=source.id))
+        return redirect(url_for('source_view', id_=result.id))
     return render_template('source/insert.html', form=form, origin=origin)
 
 
@@ -60,12 +64,12 @@ def source_view(id_, unlink_id=None):
     source = EntityMapper.get_by_id(id_)
     if unlink_id:
         LinkMapper.delete_by_id(unlink_id)
-    data = {'info': []}
-    append_node_data(data['info'], source)
-    tables = {'translation': {
+    tables = {'info': []}
+    append_node_data(tables['info'], source)
+    tables['translation'] = {
         'name': 'translation',
         'header': ['translations', 'type', 'text'],
-        'data': []}}
+        'data': []}
     for translation in source.get_linked_entities('P73'):
         tables['translation']['data'].append([
             link(translation),
@@ -120,7 +124,6 @@ def source_view(id_, unlink_id=None):
     return render_template(
         'source/view.html',
         source=source,
-        data=data,
         tables=tables,
         delete_link=build_delete_link(url_for('source_delete', id_=source.id), source.name))
 
@@ -128,6 +131,7 @@ def source_view(id_, unlink_id=None):
 @app.route('/source/add/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('editor')
 def source_add(origin_id):
+    """Link an entity to source coming from the entity."""
     origin = EntityMapper.get_by_id(origin_id)
     origin_view_name = app.config['CODE_CLASS'][origin.class_.code]
     if request.method == 'POST':
@@ -143,6 +147,7 @@ def source_add(origin_id):
 @app.route('/source/add2/<int:id_>/<class_name>', methods=['POST', 'GET'])
 @required_group('editor')
 def source_add2(id_, class_name):
+    """Link an entity to source coming from the source."""
     source = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
         for value in request.form.getlist('values'):
@@ -179,13 +184,14 @@ def source_update(id_):
 
 def save(form, entity=None, origin=None):
     openatlas.get_cursor().execute('BEGIN')
-    if not entity:
-        entity = EntityMapper.insert('E33', form.name.data, 'source content')
+    entity = entity if entity else EntityMapper.insert('E33', form.name.data, 'source content')
     entity.name = form.name.data
     entity.description = form.description.data
     entity.update()
     entity.save_nodes(form)
     if origin:
+        if origin.class_.code in app.config['CLASS_CODES']['reference']:
+            return origin.link('P67', entity, '')
         entity.link('P67', origin)
     openatlas.get_cursor().execute('COMMIT')
     return entity

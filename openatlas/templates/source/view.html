@@ -23,7 +23,7 @@
             {{ source.id|bookmark_toggle|safe }}
         </div>
         <h1>{{ source.name }}</h1>
-        {{ data['info']|data_table|safe }}
+        {{ tables['info']|data_table|safe }}
         {{ source|description|safe }}
     </div>
     {% for name in ['event', 'actor', 'place'] %}
@@ -31,9 +31,13 @@
             {% if 'editor'|is_authorized: %}
                 <div class="button-bar">
                     <a href="{{ url_for('source_add2', id_=source.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
-                    {% for code in config['CLASS_CODES'][name]%}
-                        <a href="{{ url_for(name + '_insert', code=code, origin_id=source.id) }}">+ {{ code|get_class_name }}</a>
-                    {% endfor %}
+                    {% if name == 'place' %}
+                        <a href="{{ url_for('place_insert', origin_id=source.id) }}">+ {{ _('place')|uc_first }}</a>
+                    {% else %}
+                        {% for code in config['CLASS_CODES'][name]%}
+                            <a href="{{ url_for(name + '_insert', code=code, origin_id=source.id) }}">+ {{ code|get_class_name }}</a>
+                        {% endfor %}
+                    {% endif %}
                 </div>
             {% endif %}
             {{ tables[name]|pager|safe }}
@@ -43,6 +47,9 @@
         {% if 'editor'|is_authorized: %}
             <div class="button-bar">
                 <a href="{{ url_for('reference_add', origin_id=source.id)}}">{{ _('add')|uc_first }}</a>
+                <a href="{{ url_for('reference_insert', code='bibliography', origin_id=source.id) }}">+ {{ _('bibliography')|uc_first }}</a>
+                <a href="{{ url_for('reference_insert', code='edition', origin_id=source.id) }}">+ {{ _('edition')|uc_first }}</a>
+                <a href="{{ url_for('reference_insert', code='carrier', origin_id=source.id) }}">+ {{ 'E84'|get_class_name }}</a>
             </div>
         {% endif %}
         {{ tables['reference']|pager|safe }}

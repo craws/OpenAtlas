@@ -1,5 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import openatlas
+from openatlas.util.util import truncate_string
 
 
 class Network(object):
@@ -46,7 +47,7 @@ class Network(object):
         for row in cursor.fetchall():
             if row.name == 'History of the World':
                 continue
-            name = row.name.replace("'", "").replace('Location of ', '')
+            name = truncate_string(row.name.replace("'", "").replace('Location of ', ''), 40, False)
             if params['options']['orphans'] or row.id in entities:
                 entities_already.append(row.id)
                 nodes += "{'id':'" + str(row.id) + "', 'name':'" + name
@@ -61,8 +62,8 @@ class Network(object):
             cursor = openatlas.get_cursor()
             cursor.execute(sql, {'array_diff': tuple(array_diff)})
             for row in cursor.fetchall():
-                name = row.name.replace("'", "").replace('Location of ', '')
+                name = truncate_string(row.name.replace("'", "").replace('Location of ', ''), 40, False)
                 nodes += "{'id':'" + str(row.id) + "', 'name':'" + name
-                nodes += "', 'color':'" + params['classes'][row.id]['color'] if row.id in params['classes'] else ''
+                nodes += "', 'color':'" + params['classes'][row.code]['color'] if row.code in params['classes'] else ''
                 nodes += "'},"
         return "graph = {'nodes': [" + nodes + "], " + edges + "};"

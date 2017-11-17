@@ -6,9 +6,8 @@
 {% block content %}
 <div id="tabs" class="tabs-container">
     <ul>
-        <li>
-            <a href="#tab-info">{{ _('info')|uc_first }}</a>
-        </li>
+        <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
+        <li><a href="#tab-source">{{ _('sources')|uc_first }} ({{ tables['source']['data']|length }})</a></li>
     </ul>
     <div id="tab-info">
         <div class="button-bar">
@@ -20,11 +19,20 @@
             {{ actor.id|bookmark_toggle|safe }}
         </div>
         <h1>{{ actor.name }}</h1>
-        {{ data['info']|data_table|safe }}
+        {{ tables['info']|data_table|safe }}
         {% for node in actor.types %}
             {{ node|link|safe }}<br />
         {% endfor %}
         {{ actor|description|safe }}
+    </div>
+    <div id="tab-source">
+        {% if 'editor'|is_authorized: %}
+            <div class="button-bar">
+                <a href="{{ url_for('source_add', origin_id=actor.id)}}">{{ _('add')|uc_first }}</a>
+                <a href="{{ url_for('source_insert', origin_id=actor.id) }}">+ {{ _('source')|uc_first }}</a>
+            </div>
+        {% endif %}
+        {{ tables['source']|pager|safe }}
     </div>
 </div>
 {% endblock %}

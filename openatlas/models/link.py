@@ -58,7 +58,8 @@ class LinkMapper(object):
                     (SELECT id FROM model.property WHERE code = %(property_code)s),
                     %(domain_id)s,
                     %(range_id)s,
-                    %(description)s);"""
+                    %(description)s)
+                RETURNING id;"""
             # Todo: build only sql and get execution out of loop
             cursor = openatlas.get_cursor()
             cursor.execute(sql, {
@@ -67,6 +68,7 @@ class LinkMapper(object):
                 'range_id': range_id,
                 'description': description})
             openatlas.debug_model['div sql'] += 1
+            return cursor.fetchone()[0]
 
     @staticmethod
     def get_linked_entity(entity, code, inverse=False):

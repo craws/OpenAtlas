@@ -168,7 +168,7 @@ img.zoom {
 }
 
 #menu {
-    height: 3.2em;
+    height: 3em;
 }
 
 #menu, #breadcrumb {
@@ -179,7 +179,7 @@ img.zoom {
 
 #breadcrumb {
     padding-top: 0.6em;
-    height: 1.9em;
+    height: 1.8em;
 }
 
 #breadcrumb a {
@@ -193,7 +193,7 @@ img.zoom {
 }
 
 #menu > div.active {
-    height: 1.8em;
+    height: 1.6em;
     border-bottom-width: 0.5em;
     border-bottom-style: solid;
 }

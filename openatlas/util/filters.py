@@ -5,8 +5,7 @@ import re
 
 import os
 
-from flask import session, render_template_string, url_for
-from flask_login import current_user
+from flask import render_template_string, url_for
 from jinja2 import evalcontextfilter, escape
 from flask_babel import lazy_gettext as _
 

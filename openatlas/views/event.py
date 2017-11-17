@@ -87,18 +87,17 @@ def event_update(id_):
     return render_template('event/update.html', form=form, event=event)
 
 
-@app.route('/source/view/<int:id_>/<int:unlink_id>')
 @app.route('/event/view/<int:id_>')
+@app.route('/event/view/<int:id_>/<int:unlink_id>')
 @required_group('readonly')
 def event_view(id_, unlink_id=None):
     event = EntityMapper.get_by_id(id_)
     if unlink_id:
         LinkMapper.delete_by_id(unlink_id)
     event.set_dates()
-    data = {'info': []}
-    append_node_data(data['info'], event)
-    delete_link = build_delete_link(url_for('event_delete', id_=event.id), event.name)
-    tables = {'source': {'name': 'source', 'header': ['name', 'type', 'info', ''], 'data': []}}
+    tables = {'info': []}
+    append_node_data(tables['info'], event)
+    tables['source'] = {'name': 'source', 'header': ['name', 'type', 'info', ''], 'data': []}
     for link_ in event.get_links('P67', True):
         name = app.config['CODE_CLASS'][link_.domain.class_.code]
         entity = link_.domain
@@ -108,17 +107,13 @@ def event_view(id_, unlink_id=None):
             entity.print_base_type(),
             truncate_string(entity.description),
             build_remove_link(unlink_url, entity.name)])
-    return render_template(
-        'event/view.html',
-        event=event,
-        data=data,
-        delete_link=delete_link,
-        tables=tables)
+    delete_link = build_delete_link(url_for('event_delete', id_=event.id), event.name)
+    return render_template('event/view.html', event=event, delete_link=delete_link, tables=tables)
 
 
 def save(form, entity=None, code=None, origin=None):
     openatlas.get_cursor().execute('BEGIN')
-    entity = EntityMapper.insert(code, form.name.data) if not entity else entity
+    entity = entity if entity else EntityMapper.insert(code, form.name.data)
     entity.name = form.name.data
     entity.description = form.description.data
     entity.update()

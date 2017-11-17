@@ -76,7 +76,7 @@ def sanitize(string, mode=None):
 
 def build_table_form(class_name, linked_entities):
     # Todo: add CSRF token
-    form = '<form id="add-source-form" name="add-source-form" class="table" method="post">'
+    form = '<form class="table" method="post">'
     header = [_('name'), _('class'), _('type'), _('first'), _('last'), '']
     if class_name == 'actor':
         header = [_('name'), _('class'), _('first'), _('last'), '']
