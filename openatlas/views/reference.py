@@ -198,6 +198,6 @@ def save(form, entity, code=None, origin=None):
     entity.update()
     entity.save_nodes(form)
     if origin:
-        return entity.link('P67', origin, '')
+        link_ = entity.link('P67', origin, '')
     openatlas.get_cursor().execute('COMMIT')
-    return entity
+    return entity if not origin else link_
