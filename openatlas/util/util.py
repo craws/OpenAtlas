@@ -228,12 +228,16 @@ def required_group(group):
     return wrapper
 
 
-def bookmark_toggle(entity_id):
+def bookmark_toggle(entity_id, for_table=False):
     label = uc_first(_('bookmark'))
     if entity_id in current_user.bookmarks:
         label = uc_first(_('bookmark remove'))
-    html = """<button id="bookmark{entity_id}" onclick="ajaxBookmark('{entity_id}');"
-        type="button">{label}</button>""".format(entity_id=entity_id, label=label)
+    if for_table:
+        html = """<a id="bookmark{entity_id}" onclick="ajaxBookmark('{entity_id}');"
+            style="cursor:pointer;">{label}</a>""".format(entity_id=entity_id, label=label)
+    else:
+        html = """<button id="bookmark{entity_id}" onclick="ajaxBookmark('{entity_id}');"
+            type="button">{label}</button>""".format(entity_id=entity_id, label=label)
     return html
 
 

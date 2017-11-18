@@ -98,8 +98,20 @@ def reference_view(id_, unlink_id=None):
     tables = {'info': []}
     append_node_data(tables['info'], reference)
     tables['source'] = {
-        'name': 'reference',
+        'name': 'source',
         'header': ['name', 'class', 'type', 'page', '', ''],
+        'data': []}
+    tables['event'] = {
+        'name': 'event',
+        'header': ['name', 'class', 'type', 'first', 'last', 'page', '', ''],
+        'data': []}
+    tables['actor'] = {
+        'name': 'actor',
+        'header': ['name', 'class', 'first', 'last', 'page', '', ''],
+        'data': []}
+    tables['place'] = {
+        'name': 'place',
+        'header': ['name', 'type', 'first', 'last', 'page', '', ''],
         'data': []}
     for link_ in reference.get_links('P67'):
         name = app.config['CODE_CLASS'][link_.range.class_.code]
@@ -107,13 +119,20 @@ def reference_view(id_, unlink_id=None):
         unlink_url = url_for(
             'reference_view', id_=reference.id, unlink_id=link_.id) + '#tab-' + name
         update_url = url_for('reference_link_update', link_id=link_.id, origin_id=reference.id)
-        tables['source']['data'].append([
-            link(entity),
-            uc_first(_(entity.system_type)),
-            entity.print_base_type(),
-            truncate_string(link_.description),
-            '<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>',
-            build_remove_link(unlink_url, entity.name)])
+        data = [link(entity)]
+        if name in ['event', 'actor']:
+            data.append(openatlas.classes[entity.class_.id].name)
+        if name in ['source']:
+            data.append(uc_first(_(entity.system_type)))
+        if name in ['event', 'actor', 'place']:
+            data.append(format(entity.first))
+            data.append(format(entity.last))
+        if name in ['event', 'place', 'source']:
+            data.append(entity.print_base_type())
+        data.append(truncate_string(link_.description))
+        data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
+        data.append(build_remove_link(unlink_url, entity.name))
+        tables[name]['data'].append(data)
     delete_link = build_delete_link(url_for('reference_delete', id_=reference.id), reference.name)
     return render_template(
         'reference/view.html',
@@ -197,7 +216,6 @@ def save(form, entity, code=None, origin=None):
     entity.description = form.description.data
     entity.update()
     entity.save_nodes(form)
-    if origin:
-        link_ = entity.link('P67', origin, '')
+    link_ = entity.link('P67', origin, '') if origin else None
     openatlas.get_cursor().execute('COMMIT')
-    return entity if not origin else link_
+    return link_ if link_ else entity

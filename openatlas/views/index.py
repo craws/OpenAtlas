@@ -40,7 +40,7 @@ def index():
                 openatlas.classes[entity.class_.id].name,
                 entity.first,
                 entity.last,
-                bookmark_toggle(entity.id)])
+                bookmark_toggle(entity.id, True)])
         for name, count in EntityMapper.get_overview_counts().items():
             tables['counts']['data'].append([
                 '<a href="' + url_for(name + '_index') + '">' + uc_first(_(name)) + '</a>',

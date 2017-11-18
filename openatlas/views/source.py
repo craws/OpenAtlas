@@ -91,21 +91,13 @@ def source_view(id_, unlink_id=None):
         name = app.config['CODE_CLASS'][link_.range.class_.code]
         entity = link_.range
         unlink_url = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-' + name
-        if name == 'event':  # show class and base type in event
-            tables[name]['data'].append([
-                link(entity),
-                entity.class_.name,
-                entity.print_base_type(),
-                format(entity.first),
-                format(entity.last),
-                build_remove_link(unlink_url, entity.name)])
-        else:  # actor has no base type, place always the same class
-            tables[name]['data'].append([
-                link(entity),
-                entity.class_.name if name == 'actor' else entity.print_base_type(),
-                format(entity.first),
-                format(entity.last),
-                build_remove_link(unlink_url, entity.name)])
+        data = [link(entity), entity.class_.name if name == 'actor' else entity.print_base_type()]
+        if name == 'event':
+            data.append(entity.print_base_type())
+        data.append(format(entity.first))
+        data.append(format(entity.last))
+        data.append(build_remove_link(unlink_url, entity.name))
+        tables[name]['data'].append(data)
     tables['reference'] = {
         'name': 'reference',
         'header': ['name', 'class', 'type', 'page', '', ''],
