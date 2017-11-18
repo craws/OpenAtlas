@@ -11,8 +11,8 @@ from openatlas import app
 from openatlas.forms import build_form, TableField
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import uc_first, link, truncate_string, required_group, append_node_data, \
-    build_delete_link, build_remove_link
+from openatlas.util.util import (uc_first, truncate_string, required_group, append_node_data,
+                                 build_delete_link, build_remove_link, get_base_table_data)
 
 
 class ReferenceForm(Form):
@@ -97,41 +97,18 @@ def reference_view(id_, unlink_id=None):
         LinkMapper.delete_by_id(unlink_id)
     tables = {'info': []}
     append_node_data(tables['info'], reference)
-    tables['source'] = {
-        'name': 'source',
-        'header': ['name', 'class', 'type', 'page', '', ''],
-        'data': []}
-    tables['event'] = {
-        'name': 'event',
-        'header': ['name', 'class', 'type', 'first', 'last', 'page', '', ''],
-        'data': []}
-    tables['actor'] = {
-        'name': 'actor',
-        'header': ['name', 'class', 'first', 'last', 'page', '', ''],
-        'data': []}
-    tables['place'] = {
-        'name': 'place',
-        'header': ['name', 'type', 'first', 'last', 'page', '', ''],
-        'data': []}
+    for name in ['source', 'event', 'actor', 'place']:
+        header = app.config['TABLE_HEADERS'][name] + ['page', '', '']
+        tables[name] = {'name': name, 'header': header, 'data': []}
     for link_ in reference.get_links('P67'):
         name = app.config['CODE_CLASS'][link_.range.class_.code]
-        entity = link_.range
+        update_url = url_for('reference_link_update', link_id=link_.id, origin_id=reference.id)
         unlink_url = url_for(
             'reference_view', id_=reference.id, unlink_id=link_.id) + '#tab-' + name
-        update_url = url_for('reference_link_update', link_id=link_.id, origin_id=reference.id)
-        data = [link(entity)]
-        if name in ['event', 'actor']:
-            data.append(openatlas.classes[entity.class_.id].name)
-        if name in ['source']:
-            data.append(uc_first(_(entity.system_type)))
-        if name in ['event', 'actor', 'place']:
-            data.append(format(entity.first))
-            data.append(format(entity.last))
-        if name in ['event', 'place', 'source']:
-            data.append(entity.print_base_type())
+        data = get_base_table_data(link_.range)
         data.append(truncate_string(link_.description))
         data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
-        data.append(build_remove_link(unlink_url, entity.name))
+        data.append(build_remove_link(unlink_url, link_.range.name))
         tables[name]['data'].append(data)
     delete_link = build_delete_link(url_for('reference_delete', id_=reference.id), reference.name)
     return render_template(
@@ -144,18 +121,13 @@ def reference_view(id_, unlink_id=None):
 @app.route('/reference')
 @required_group('readonly')
 def reference_index():
-    tables = {'reference': {
-        'name': 'reference',
-        'header': ['name', 'class', 'type', 'info'],
-        'data': []}}
+    header = app.config['TABLE_HEADERS']['reference'] + ['description']
+    table = {'name': 'reference', 'header': header, 'data': []}
     for reference in EntityMapper.get_by_codes('reference'):
-        class_name = _(reference.system_type).title()
-        tables['reference']['data'].append([
-            link(reference),
-            class_name,
-            reference.print_base_type(),
-            truncate_string(reference.description)])
-    return render_template('reference/index.html', tables=tables)
+        data = get_base_table_data(reference)
+        data.append(truncate_string(reference.description))
+        table['data'].append(data)
+    return render_template('reference/index.html', table=table)
 
 
 @app.route('/reference/insert/<code>', methods=['POST', 'GET'])

@@ -8,5 +8,5 @@
             <a href="{{ url_for('place_insert') }}">+ {{ _('place')|uc_first }}</a>
         </div>
     {% endif %}
-    {{ tables['place']|pager|safe }}
+    {{ table|pager|safe }}
 {% endblock %}

@@ -10,8 +10,8 @@ from openatlas import app
 from openatlas.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import (link, truncate_string, required_group, append_node_data,
-                                 build_delete_link, build_remove_link)
+from openatlas.util.util import (truncate_string, required_group, append_node_data,
+                                 build_delete_link, build_remove_link, get_base_table_data)
 
 
 class ActorForm(DateForm):
@@ -32,35 +32,28 @@ def actor_view(id_, unlink_id=None):
     actor.set_dates()
     tables = {'info': []}
     append_node_data(tables['info'], actor)
-    delete_link = build_delete_link(url_for('actor_delete', id_=actor.id), actor.name)
-    tables['source'] = {'name': 'source', 'header': ['name', 'type', 'info', ''], 'data': []}
+    header = app.config['TABLE_HEADERS']['source'] + ['description', '']
+    tables['source'] = {'name': 'source', 'header': header, 'data': []}
     for link_ in actor.get_links('P67', True):
-        name = app.config['CODE_CLASS'][link_.domain.class_.code]
-        entity = link_.domain
-        unlink_url = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab-' + name
-        tables['source']['data'].append([
-            link(entity),
-            entity.print_base_type(),
-            truncate_string(entity.description),
-            build_remove_link(unlink_url, entity.name)])
+        unlink_url = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab-source'
+        data = get_base_table_data(link_.domain)
+        data.append(truncate_string(link_.domain.description))
+        data.append(build_remove_link(unlink_url, link_.domain.name))
+        tables['source']['data'].append(data)
+    delete_link = build_delete_link(url_for('actor_delete', id_=actor.id), actor.name)
     return render_template('actor/view.html', actor=actor, tables=tables, delete_link=delete_link)
 
 
 @app.route('/actor')
 @required_group('readonly')
 def actor_index():
-    tables = {'actor': {
-        'name': 'actor',
-        'header': [_('name'), _('class'), _('first'), _('last'), _('info')],
-        'data': []}}
+    header = app.config['TABLE_HEADERS']['actor'] + ['description']
+    table = {'name': 'actor', 'header': header, 'data': []}
     for actor in EntityMapper.get_by_codes('actor'):
-        tables['actor']['data'].append([
-            link(actor),
-            openatlas.classes[actor.class_.id].name,
-            actor.first,
-            actor.last,
-            truncate_string(actor.description)])
-    return render_template('actor/index.html', tables=tables)
+        data = get_base_table_data(actor)
+        data.append(truncate_string(actor.description))
+        table['data'].append(data)
+    return render_template('actor/index.html', table=table)
 
 
 @app.route('/actor/insert/<code>', methods=['POST', 'GET'])

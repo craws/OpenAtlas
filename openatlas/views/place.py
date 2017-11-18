@@ -10,8 +10,8 @@ from openatlas import app
 from openatlas.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import (link, truncate_string, required_group, append_node_data,
-                                 build_delete_link, build_remove_link)
+from openatlas.util.util import (truncate_string, required_group, append_node_data,
+                                 build_delete_link, build_remove_link, get_base_table_data)
 
 
 class PlaceForm(DateForm):
@@ -25,18 +25,10 @@ class PlaceForm(DateForm):
 @app.route('/place')
 @required_group('readonly')
 def place_index():
-    tables = {'place': {
-        'name': 'place',
-        'header': [_('name'), _('site'), _('first'), _('last'), _('info')],
-        'data': []}}
+    table = {'name': 'place', 'header': app.config['TABLE_HEADERS']['place'], 'data': []}
     for place in EntityMapper.get_by_codes('place'):
-        tables['place']['data'].append([
-            link(place),
-            place.print_base_type(),
-            format(place.first),
-            format(place.last),
-            truncate_string(place.description)])
-    return render_template('place/index.html', tables=tables)
+        table['data'].append(get_base_table_data(place))
+    return render_template('place/index.html', table=table)
 
 
 @app.route('/place/insert', methods=['POST', 'GET'])
@@ -68,22 +60,16 @@ def place_view(id_, unlink_id=None):
     location = object_.get_linked_entity('P53')
     tables = {'info': []}
     append_node_data(tables['info'], object_, location)
-    tables['source'] = {'name': 'source', 'header': ['name', 'type', 'info', ''], 'data': []}
+    header = app.config['TABLE_HEADERS']['source'] + ['description', '']
+    tables['source'] = {'name': 'source', 'header': header, 'data': []}
     for link_ in object_.get_links('P67', True):
-        name = app.config['CODE_CLASS'][link_.domain.class_.code]
-        entity = link_.domain
-        unlink_url = url_for('place_view', id_=object_.id, unlink_id=link_.id) + '#tab-' + name
-        tables['source']['data'].append([
-            link(entity),
-            entity.print_base_type(),
-            truncate_string(entity.description),
-            build_remove_link(unlink_url, entity.name)])
-    delete_link = build_delete_link(url_for('place_delete', id_=object_.id), object_.name)
-    return render_template(
-        'place/view.html',
-        object_=object_,
-        tables=tables,
-        delete_link=delete_link)
+        unlink_url = url_for('place_view', id_=object_.id, unlink_id=link_.id) + '#tab-source'
+        data = get_base_table_data(link_.domain)
+        data.append(truncate_string(link_.domain.description))
+        data.append(build_remove_link(unlink_url, link_.domain.name))
+        tables['source']['data'].append(data)
+    del_link = build_delete_link(url_for('place_delete', id_=object_.id), object_.name)
+    return render_template('place/view.html', object_=object_, tables=tables, delete_link=del_link)
 
 
 @app.route('/place/delete/<int:id_>')

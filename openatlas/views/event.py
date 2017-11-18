@@ -10,8 +10,8 @@ from openatlas import app
 from openatlas.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import (link, required_group, truncate_string, append_node_data,
-                                 build_delete_link, build_remove_link)
+from openatlas.util.util import (required_group, truncate_string, append_node_data,
+                                 build_delete_link, build_remove_link, get_base_table_data)
 
 
 class EventForm(DateForm):
@@ -25,19 +25,13 @@ class EventForm(DateForm):
 @app.route('/event')
 @required_group('readonly')
 def event_index():
-    tables = {'event': {
-        'name': 'event',
-        'header': [_('name'), _('class'), _('type'), _('first'), _('last'), _('info')],
-        'data': []}}
+    header = app.config['TABLE_HEADERS']['event'] + ['description']
+    table = {'name': 'event', 'header': header, 'data': []}
     for event in EntityMapper.get_by_codes('event'):
-        tables['event']['data'].append([
-            link(event),
-            openatlas.classes[event.class_.id].name,
-            event.print_base_type(),
-            format(event.first),
-            format(event.last),
-            truncate_string(event.description)])
-    return render_template('event/index.html', tables=tables)
+        data = get_base_table_data(event)
+        data.append(truncate_string(event.description))
+        table['data'].append(data)
+    return render_template('event/index.html', table=table)
 
 
 @app.route('/event/insert/<code>', methods=['POST', 'GET'])
@@ -97,16 +91,14 @@ def event_view(id_, unlink_id=None):
     event.set_dates()
     tables = {'info': []}
     append_node_data(tables['info'], event)
-    tables['source'] = {'name': 'source', 'header': ['name', 'type', 'info', ''], 'data': []}
+    header = app.config['TABLE_HEADERS']['source'] + ['description', '']
+    tables['source'] = {'name': 'source', 'header': header, 'data': []}
     for link_ in event.get_links('P67', True):
-        name = app.config['CODE_CLASS'][link_.domain.class_.code]
-        entity = link_.domain
-        unlink_url = url_for('event_view', id_=event.id, unlink_id=link_.id) + '#tab-' + name
-        tables['source']['data'].append([
-            link(entity),
-            entity.print_base_type(),
-            truncate_string(entity.description),
-            build_remove_link(unlink_url, entity.name)])
+        unlink_url = url_for('event_view', id_=event.id, unlink_id=link_.id) + '#tab-source'
+        data = get_base_table_data(link_.domain)
+        data.append(truncate_string(link_.domain.description))
+        data.append(build_remove_link(unlink_url, link_.domain.name))
+        tables['source']['data'].append(data)
     delete_link = build_delete_link(url_for('event_delete', id_=event.id), event.name)
     return render_template('event/view.html', event=event, delete_link=delete_link, tables=tables)
 

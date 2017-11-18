@@ -75,38 +75,17 @@ def sanitize(string, mode=None):
 
 
 def build_table_form(class_name, linked_entities):
+    """Returns a form with a list of entities with checkboxes"""
     # Todo: add CSRF token
     form = '<form class="table" method="post">'
-    header = [_('name'), _('class'), _('type'), _('first'), _('last'), '']
-    if class_name == 'actor':
-        header = [_('name'), _('class'), _('first'), _('last'), '']
-    elif class_name == 'place':
-        header = [_('name'), _('type'), _('first'), _('last'), '']
-    elif class_name == 'source':
-        header = ['name', 'type', '']
+    header = openatlas.app.config['TABLE_HEADERS'][class_name] + ['']
     table = {'name': class_name, 'header': header, 'data': []}
     linked_ids = [entity.id for entity in linked_entities]
     for entity in EntityMapper.get_by_codes(class_name):
         if entity.id in linked_ids:
-            continue
+            continue  # don't show already linked entries
         input_ = '<input id="{id}" name="values" type="checkbox" value="{id}">'.format(id=entity.id)
-        if class_name == 'event':
-            table['data'].append([
-                link(entity),
-                entity.class_.name,
-                entity.print_base_type(),
-                format(entity.first),
-                format(entity.last),
-                input_])
-        elif class_name == 'source':
-            table['data'].append([link(entity), entity.print_base_type(), input_])
-        else:
-            table['data'].append([
-                link(entity),
-                entity.class_.name if class_name == 'actor' else entity.print_base_type(),
-                format(entity.first),
-                format(entity.last),
-                input_])
+        table['data'].append(get_base_table_data(entity) + [input_])
     if not table['data']:
         return uc_first(_('no entries'))
     form += pager(table)
@@ -116,18 +95,14 @@ def build_table_form(class_name, linked_entities):
 
 
 def build_remove_link(url, name):
-    """
-    Build a link to remove a link with a JavaScript confirmation dialog
-    """
+    """Build a link to remove a link with a JavaScript confirmation dialog"""
     name = name.replace('\'', '')
     confirm = 'onclick="return confirm(\'' + _('confirm remove', name=name) + '\')"'
     return '<a ' + confirm + ' href="' + url + '">' + uc_first(_('remove')) + '</a>'
 
 
 def build_delete_link(url, name):
-    """
-    Build a link to delete an entity with a JavaScript confirmation dialog
-    """
+    """Build a link to delete an entity with a JavaScript confirmation dialog"""
     name = name.replace('\'', '')
     confirm = 'onclick="return confirm(\'' + _('confirm delete', name=name) + '\')"'
     return '<a ' + confirm + ' href="' + url + '">' + uc_first(_('delete')) + '</a>'
@@ -307,13 +282,17 @@ def link(entity):
 
 
 def truncate_string(string, length=40, span=True):
+    """
+    Returns a truncates string with '..' at the end if it was longer than length
+    Also adds a span title (for mouseover) with the original string if parameter "span" is True
+    """
     if string is None:
         return ''  # pragma: no cover
-    if len(string) > length + 2:
-        string = string[:length] + '..'
-        if span:
-            string = '<span title="' + string.replace('"', '') + '">' + string + '</span>'
-    return string
+    if len(string) < length + 1:
+        return string
+    if not span:
+        return string[:length] + '..'
+    return '<span title="' + string.replace('"', '') + '">' + string[:length] + '..' + '</span>'
 
 
 def create_date_from_form(form_date, postfix=''):
@@ -359,7 +338,7 @@ def pager(table):
     html += '<table id="{name}-table" class="tablesorter"><thead><tr>'.format(name=table['name'])
     for header in table['header']:
         style = '' if header else 'class=sorter-false '
-        html += '<th ' + style + '>' + header.capitalize() + '</th>'
+        html += '<th ' + style + '>' + _(header).capitalize() if header else '' + '</th>'
     html += '</tr></thead><tbody>'
     for row in table['data']:
         html += '<tr>'
@@ -390,3 +369,19 @@ def pager(table):
         html += '$("#' + table['name'] + '-table").tablesorter({' + sort + 'widgets:[\'zebra\']});'
     html += '</script>'
     return html
+
+
+def get_base_table_data(entity):
+    """Returns standard table data for an entity"""
+    name = openatlas.app.config['CODE_CLASS'][entity.class_.code]
+    data = [link(entity)]
+    if name in ['event', 'actor']:
+        data.append(openatlas.classes[entity.class_.id].name)
+    if name in ['reference']:
+        data.append(uc_first(_(entity.system_type)))
+    if name in ['event', 'place', 'source', 'reference']:
+        data.append(entity.print_base_type())
+    if name in ['event', 'actor', 'place']:
+        data.append(format(entity.first))
+        data.append(format(entity.last))
+    return data

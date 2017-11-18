@@ -66,3 +66,11 @@ CLASS_CODES = {
     'actor': ['E21', 'E74', 'E40'],
     'place': ['E18'],
     'reference': ['E31', 'E84']}
+
+# default table columns based on class
+TABLE_HEADERS = {
+    'source': ['name', 'type'],
+    'event': ['name', 'class', 'type', 'first', 'last'],
+    'actor': ['name', 'class', 'first', 'last'],
+    'place': ['name', 'type', 'first', 'last'],
+    'reference': ['name', 'class', 'type']}

@@ -12,7 +12,8 @@ from openatlas.forms import build_form
 from openatlas.models.entity import EntityMapper, Entity
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (link, truncate_string, required_group, append_node_data,
-                                 build_table_form, build_remove_link, build_delete_link, uc_first)
+                                 build_table_form, build_remove_link, build_delete_link, uc_first,
+                                 get_base_table_data)
 
 
 class SourceForm(Form):
@@ -26,12 +27,12 @@ class SourceForm(Form):
 @app.route('/source')
 @required_group('readonly')
 def source_index():
-    table = {'name': 'source', 'header': ['name', 'type', 'info'], 'data': []}
+    header = app.config['TABLE_HEADERS']['source'] + ['description']
+    table = {'name': 'source', 'header': header, 'data': []}
     for source in EntityMapper.get_by_codes('source'):
-        table['data'].append([
-            link(source),
-            source.print_base_type(),
-            truncate_string(source.description)])
+        data = get_base_table_data(source)
+        data.append(truncate_string(source.description))
+        table['data'].append(data)
     return render_template('source/index.html', table=table)
 
 
@@ -75,49 +76,27 @@ def source_view(id_, unlink_id=None):
             link(translation),
             translation.nodes[0].name if translation.nodes else '',
             truncate_string(translation.description)])
-    tables['actor'] = {
-        'name': 'actor',
-        'header': ['name', 'class', 'first', 'last', ''],
-        'data': []}
-    tables['place'] = {
-        'name': 'place',
-        'header': ['name', 'type', 'first', 'last', ''],
-        'data': []}
-    tables['event'] = {
-        'name': 'event',
-        'header': ['name', 'class', 'type', 'first', 'last', ''],
-        'data': []}
+    for name in ['event', 'place', 'actor']:
+        header = app.config['TABLE_HEADERS'][name] + ['']
+        tables[name] = {'name': name, 'header': header, 'data': []}
     for link_ in source.get_links('P67'):
+        data = get_base_table_data(link_.range)
         name = app.config['CODE_CLASS'][link_.range.class_.code]
-        entity = link_.range
         unlink_url = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-' + name
-        data = [link(entity), entity.class_.name if name == 'actor' else entity.print_base_type()]
-        if name == 'event':
-            data.append(entity.print_base_type())
-        data.append(format(entity.first))
-        data.append(format(entity.last))
-        data.append(build_remove_link(unlink_url, entity.name))
+        data.append(build_remove_link(unlink_url, link_.range.name))
         tables[name]['data'].append(data)
-    tables['reference'] = {
-        'name': 'reference',
-        'header': ['name', 'class', 'type', 'page', '', ''],
-        'data': []}
+    header = app.config['TABLE_HEADERS']['reference'] + ['page', '', '']
+    tables['reference'] = {'name': 'source', 'header': header, 'data': []}
     for link_ in source.get_links('P67', True):
-        entity = link_.domain
         unlink_url = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-reference'
         update_url = url_for('reference_link_update', link_id=link_.id, origin_id=source.id)
-        tables['reference']['data'].append([
-            link(entity),
-            uc_first(_(entity.system_type)),
-            entity.print_base_type(),
-            link_.description,
-            '<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>',
-            build_remove_link(unlink_url, entity.name)])
-    return render_template(
-        'source/view.html',
-        source=source,
-        tables=tables,
-        delete_link=build_delete_link(url_for('source_delete', id_=source.id), source.name))
+        data = get_base_table_data(link_.domain)
+        data.append(link_.description)
+        data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
+        data.append(build_remove_link(unlink_url, link_.domain.name))
+        tables['reference']['data'].append(data)
+    del_link = build_delete_link(url_for('source_delete', id_=source.id), source.name)
+    return render_template('source/view.html', source=source, tables=tables, delete_link=del_link)
 
 
 @app.route('/source/add/<int:origin_id>', methods=['POST', 'GET'])
@@ -125,13 +104,13 @@ def source_view(id_, unlink_id=None):
 def source_add(origin_id):
     """Link an entity to source coming from the entity."""
     origin = EntityMapper.get_by_id(origin_id)
-    origin_view_name = app.config['CODE_CLASS'][origin.class_.code]
     if request.method == 'POST':
         openatlas.get_cursor().execute('BEGIN')
         for value in request.form.getlist('values'):
             LinkMapper.insert(int(value), 'P67', origin.id)
         openatlas.get_cursor().execute('COMMIT')
-        return redirect(url_for(origin_view_name + '_view', id_=origin.id) + '#tab-source')
+        view_name = app.config['CODE_CLASS'][origin.class_.code]
+        return redirect(url_for(view_name + '_view', id_=origin.id) + '#tab-source')
     form = build_table_form('source', origin.get_linked_entities('P67', True))
     return render_template('source/add.html', origin=origin, form=form)
 
