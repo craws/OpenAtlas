@@ -197,9 +197,10 @@ class NodeMapper(EntityMapper):
 
     @staticmethod
     def update_hierarchy(node, form):
-        sql = "UPDATE web.hierarchy SET multiple = %(multiple)s WHERE id = %(id)s;"
+        sql = "UPDATE web.hierarchy SET name = %(name)s, multiple = %(multiple)s WHERE id = %(id)s;"
         multiple = True if node.multiple or form.multiple.data else False
-        openatlas.get_cursor().execute(sql, {'id': node.id, 'multiple': multiple})
+        openatlas.get_cursor().execute(sql, {
+            'id': node.id, 'name': form.name.data, 'multiple': multiple})
         NodeMapper.add_forms_to_hierarchy(node, form)
 
     @staticmethod

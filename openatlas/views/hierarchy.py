@@ -33,6 +33,9 @@ class HierarchyForm(Form):
 def hierarchy_insert():
     form = build_form(HierarchyForm, 'hierarchy')
     if form.validate_on_submit():
+        if NodeMapper.get_nodes(form.name.data):
+            flash(_('error name exists'), 'error')
+            return render_template('hierarchy/insert.html', form=form)
         node = save(form)
         flash(_('entity created'), 'info')
         return redirect(url_for('node_index') + '#tab-' + str(node.id))
@@ -50,6 +53,9 @@ def hierarchy_update(id_):
     if node.multiple:
         form.multiple.render_kw = {'disabled': 'disabled'}
     if form.validate_on_submit():
+        if form.name.data != node.name and NodeMapper.get_nodes(form.name.data):
+            flash(_('error name exists'), 'error')
+            return redirect(url_for('node_index') + '#tab-' + str(node.id))
         save(form, node)
         flash(_('info update'), 'info')
         return redirect(url_for('node_index') + '#tab-' + str(node.id))
