@@ -12,7 +12,7 @@ from openatlas.models.entity import EntityMapper, Entity
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (required_group, truncate_string, append_node_data,
                                  build_delete_link, build_remove_link, get_base_table_data,
-                                 uc_first)
+                                 uc_first, link)
 
 
 class EventForm(DateForm):
@@ -96,6 +96,19 @@ def event_view(id_, unlink_id=None):
     event.set_dates()
     tables = {'info': []}
     append_node_data(tables['info'], event)
+    tables['actor'] = {
+        'name': 'actor',
+        'header': app.config['TABLE_HEADERS']['actor'] + ['involvement', '', ''],
+        'data': []}
+    for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
+        tables['actor']['data'].append ([
+            link(link_.range),
+            openatlas.classes[link_.range.class_.id].name,
+            'todo first',
+            'todo last',
+            'todo involvement',
+            'todo edit',
+            'todo delete'])
     tables['source'] = {
         'name': 'source',
         'header': app.config['TABLE_HEADERS']['source'] + ['description', ''],

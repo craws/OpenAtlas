@@ -8,6 +8,7 @@
     <ul>
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
         <li><a href="#tab-source">{{ _('source')|uc_first }} ({{ tables['source']['data']|length }})</a></li>
+        <li><a href="#tab-actor">{{ _('actor')|uc_first }} ({{ tables['actor']['data']|length }})</a></li>
         <li><a href="#tab-reference">{{ _('reference')|uc_first }} ({{ tables['reference']['data']|length }})</a></li>
     </ul>
     <div id="tab-info">
@@ -31,6 +32,13 @@
             </div>
         {% endif %}
         {{ tables['source']|pager|safe }}
+    </div>
+    <div id="tab-actor">
+        {% if 'editor'|is_authorized: %}
+            <div class="button-bar">
+            </div>
+        {% endif %}
+        {{ tables['actor']|pager|safe }}
     </div>
     <div id="tab-reference">
         {% if 'editor'|is_authorized: %}
