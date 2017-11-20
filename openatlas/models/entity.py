@@ -58,9 +58,7 @@ class Entity(object):
         if self.class_.code in openatlas.app.config['CLASS_CODES']['actor']:
             return ''  # actors have no base type
         root_name = openatlas.app.config['CODE_CLASS'][self.class_.code].title()
-        if self.class_.code in openatlas.app.config['CLASS_CODES']['place']:
-            root_name = 'Site'
-        elif self.class_.code in openatlas.app.config['CLASS_CODES']['reference']:
+        if self.class_.code in openatlas.app.config['CLASS_CODES']['reference']:
             root_name = self.system_type.title()
         root_id = openatlas.NodeMapper.get_hierarchy_by_name(root_name).id
         for node in self.nodes:

@@ -210,7 +210,7 @@ INSERT INTO link (property_id, range_id, domain_id) VALUES
 ----------
 INSERT INTO entity (class_id, name, description) VALUES (
     (SELECT id FROM class WHERE code='E55'),
-    'Site',
+    'Place',
     'Types for non-moveable entities (i.e. places) with a certain extent and/or location like Settlement, Burial site, Ritual site, Fortification etc.'
 );
 
@@ -225,14 +225,14 @@ INSERT INTO entity (class_id, name) VALUES
 ((SELECT id FROM class WHERE code='E55'), 'Topographical Entity');
 
 INSERT INTO link (property_id, range_id, domain_id) VALUES
-((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Site'), (SELECT id FROM entity WHERE name='Settlement')),
-((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Site'), (SELECT id FROM entity WHERE name='Military Facility')),
-((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Site'), (SELECT id FROM entity WHERE name='Ritual Site')),
-((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Site'), (SELECT id FROM entity WHERE name='Burial Site')),
-((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Site'), (SELECT id FROM entity WHERE name='Infrastructure')),
-((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Site'), (SELECT id FROM entity WHERE name='Economic Site')),
-((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Site'), (SELECT id FROM entity WHERE name='Boundary Mark')),
-((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Site'), (SELECT id FROM entity WHERE name='Topographical Entity'));
+((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Place'), (SELECT id FROM entity WHERE name='Settlement')),
+((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Place'), (SELECT id FROM entity WHERE name='Military Facility')),
+((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Place'), (SELECT id FROM entity WHERE name='Ritual Site')),
+((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Place'), (SELECT id FROM entity WHERE name='Burial Site')),
+((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Place'), (SELECT id FROM entity WHERE name='Infrastructure')),
+((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Place'), (SELECT id FROM entity WHERE name='Economic Site')),
+((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Place'), (SELECT id FROM entity WHERE name='Boundary Mark')),
+((SELECT id FROM property WHERE code='P127'), (SELECT id FROM entity WHERE name='Place'), (SELECT id FROM entity WHERE name='Topographical Entity'));
 
 -------------------------
 -- Administrative Unit --
@@ -342,7 +342,7 @@ INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Sex'),(SELECT id FROM web.form WHERE name LIKE 'Person')),
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Source'),(SELECT id FROM web.form WHERE name LIKE 'Source')),
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Event'),(SELECT id FROM web.form WHERE name LIKE 'Event')),
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Site'),(SELECT id FROM web.form WHERE name LIKE 'Place')),
+((SELECT id FROM web.hierarchy WHERE name LIKE 'Place'),(SELECT id FROM web.form WHERE name LIKE 'Place')),
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Administrative Unit'),(SELECT id FROM web.form WHERE name LIKE 'Place')),
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Historical Place'),(SELECT id FROM web.form WHERE name LIKE 'Place')),
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Bibliography'),(SELECT id FROM web.form WHERE name LIKE 'Bibliography')),

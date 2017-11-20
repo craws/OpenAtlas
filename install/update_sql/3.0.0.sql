@@ -65,6 +65,10 @@ CREATE TRIGGER on_delete_link_property AFTER DELETE ON model.link_property FOR E
 -- Types
 ALTER TABLE model.entity ADD COLUMN system_type text;
 
+-- Place Types
+UPDATE model.entity SET name = 'Place' WHERE id = (SELECT id FROM model.entity WHERE name = 'Site');
+UPDATE web.hierarchy set name = 'Place' WHERE name = 'Site';
+
 -- Source Type
 UPDATE model.entity SET system_type = 'source content'
 WHERE id IN (

@@ -75,4 +75,4 @@ TABLE_HEADERS = {
     'place': ['name', 'type', 'first', 'last'],
     'reference': ['name', 'class', 'type']}
 
-BASE_TYPES = ['Site', 'Information Carrier', 'Bibliography', 'Source', 'Edition', 'Event', 'Actor']
+BASE_TYPES = ['Place', 'Information Carrier', 'Bibliography', 'Source', 'Edition', 'Event', 'Actor']
