@@ -133,21 +133,23 @@ def walk_tree(param):
 
 
 def tree_select(name):
-    tree = "'core':{'data':[" + walk_tree(NodeMapper.get_nodes(name)) + "]}"
-    name = sanitize(name)
-    html = '<div id="' + name + '-tree"></div>'
-    html += '<script>'
-    html += '    $(document).ready(function () {'
-    html += '        $("#' + name + '-tree").jstree({'
-    html += '            "search": {"case_insensitive": true, "show_only_matches": true},'
-    html += '            "plugins" : ["core", "html_data", "search"],' + tree + '});'
-    html += '        $("#' + name + '-tree-search").keyup(function() {'
-    html += '            $("#' + name + '-tree").jstree("search", $(this).val());'
-    html += '        });'
-    html += '        $("#' + name + '-tree").on("select_node.jstree", '
-    html += '           function (e, data) { document.location.href = data.node.original.href; })'
-    html += '    });'
-    html += '</script>'
+    html = """
+        <div id="{name}-tree"></div>
+        <script>
+            $(document).ready(function () {{
+                $("#{name}-tree").jstree({{
+                    "search": {{ "case_insensitive": true, "show_only_matches": true }},
+                    "plugins" : ["core", "html_data", "search"],
+                    "core":{{ "data":[{tree}] }}
+                }});
+                $("#{name}-tree-search").keyup(function() {{
+                    $("#{name}-tree").jstree("search", $(this).val());
+                }});
+                $("#{name}-tree").on("select_node.jstree", function (e, data) {{
+                    document.location.href = data.node.original.href;
+                }});
+            }});
+        </script>""".format(name=sanitize(name), tree=walk_tree(NodeMapper.get_nodes(name)))
     return html
 
 

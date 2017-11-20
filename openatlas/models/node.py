@@ -101,7 +101,7 @@ class NodeMapper(EntityMapper):
     @staticmethod
     def get_nodes(name):
         for id_, node in openatlas.nodes.items():
-            if node.name == name:
+            if node.name == name and not node.root:
                 return node.subs
 
     @staticmethod
