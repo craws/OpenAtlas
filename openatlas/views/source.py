@@ -160,9 +160,11 @@ def save(form, entity=None, origin=None):
     entity.description = form.description.data
     entity.update()
     entity.save_nodes(form)
+    link_ = None
     if origin:
         if origin.class_.code in app.config['CLASS_CODES']['reference']:
-            return origin.link('P67', entity, '')
-        entity.link('P67', origin)
+            link_ = origin.link('P67', entity)
+        else:
+            entity.link('P67', origin)
     openatlas.get_cursor().execute('COMMIT')
-    return entity
+    return link_ if link_ else entity

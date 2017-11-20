@@ -23,14 +23,32 @@ class ReferenceForm(Form):
     continue_ = HiddenField()
 
 
+class AddReferenceForm(Form):
+    reference = TableField(_('reference'))
+    page = StringField(_('page'))
+    save = SubmitField(_('insert'))
+
+
 class AddSourceForm(Form):
     source = TableField(_('source'))
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
 
-class AddReferenceForm(Form):
-    reference = TableField(_('reference'))
+class AddEventForm(Form):
+    event = TableField(_('event'))
+    page = StringField(_('page'))
+    save = SubmitField(_('insert'))
+
+
+class AddActorForm(Form):
+    actor = TableField(_('actor'))
+    page = StringField(_('page'))
+    save = SubmitField(_('insert'))
+
+
+class AddPlaceForm(Form):
+    place = TableField(_('place'))
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
@@ -49,15 +67,15 @@ def reference_add(origin_id):
     return render_template('reference/add.html', origin=origin, form=form, class_name=class_name)
 
 
-@app.route('/reference/add2/<int:reference_id>', methods=['POST', 'GET'])
+@app.route('/reference/add2/<int:reference_id>/<class_name>', methods=['POST', 'GET'])
 @required_group('editor')
-def reference_add2(reference_id):
+def reference_add2(reference_id, class_name):
     """Link an entity to reference coming from the reference."""
     reference = EntityMapper.get_by_id(reference_id)
-    form = AddSourceForm()
+    form = getattr(openatlas.reference, 'Add' + uc_first(class_name) + 'Form')()
     if form.validate_on_submit():
-        reference.link('P67', form.source.data, form.page.data)
-        return redirect(url_for('reference_view', id_=reference.id) + '#tab-source')
+        reference.link('P67', getattr(form, class_name).data, form.page.data)
+        return redirect(url_for('reference_view', id_=reference.id) + '#tab-' + class_name)
     return render_template(
         'reference/add.html', origin=reference, form=form, class_name='reference')
 
@@ -188,6 +206,6 @@ def save(form, entity, code=None, origin=None):
     entity.description = form.description.data
     entity.update()
     entity.save_nodes(form)
-    link_ = entity.link('P67', origin, '') if origin else None
+    link_ = entity.link('P67', origin) if origin else None
     openatlas.get_cursor().execute('COMMIT')
     return link_ if link_ else entity

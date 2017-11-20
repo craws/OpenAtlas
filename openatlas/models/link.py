@@ -22,7 +22,7 @@ class Link(object):
 class LinkMapper(object):
 
     @staticmethod
-    def insert(domain, property_code, range_, description=False):
+    def insert(domain, property_code, range_, description=None):
         if not domain or not range_:
             return
         range_ = range_ if isinstance(range_, list) else [range_]
@@ -68,7 +68,7 @@ class LinkMapper(object):
                 'range_id': range_id,
                 'description': description})
             openatlas.debug_model['div sql'] += 1
-            return cursor.fetchone()[0]
+        return cursor.fetchone()[0]
 
     @staticmethod
     def get_linked_entity(entity, code, inverse=False):

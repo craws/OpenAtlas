@@ -102,7 +102,6 @@ function selectFromTreeMulti(name) {
     });
     $("#" + name + "-selection").html(checkedNames);
     /* Todo: js required validation with trigger on multi fields not working anymore (have '[]') */
-    /* e.g. event */
     $("#" + name).val('[' + ids + ']').trigger('change');
 }
 

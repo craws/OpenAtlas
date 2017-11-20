@@ -7,7 +7,8 @@
 <div id="tabs" class="tabs-container">
     <ul>
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
-        <li><a href="#tab-source">{{ _('sources')|uc_first }} ({{ tables['source']['data']|length }})</a></li>
+        <li><a href="#tab-source">{{ _('source')|uc_first }} ({{ tables['source']['data']|length }})</a></li>
+        <li><a href="#tab-reference">{{ _('reference')|uc_first }} ({{ tables['reference']['data']|length }})</a></li>
     </ul>
     <div id="tab-info">
         <div class="button-bar">
@@ -30,6 +31,17 @@
             </div>
         {% endif %}
         {{ tables['source']|pager|safe }}
+    </div>
+    <div id="tab-reference">
+        {% if 'editor'|is_authorized: %}
+            <div class="button-bar">
+                <a href="{{ url_for('reference_add', origin_id=event.id)}}">{{ _('add')|uc_first }}</a>
+                <a href="{{ url_for('reference_insert', code='bibliography', origin_id=event.id) }}">+ {{ _('bibliography')|uc_first }}</a>
+                <a href="{{ url_for('reference_insert', code='edition', origin_id=event.id) }}">+ {{ _('edition')|uc_first }}</a>
+                <a href="{{ url_for('reference_insert', code='carrier', origin_id=event.id) }}">+ {{ 'E84'|get_class_name }}</a>
+            </div>
+        {% endif %}
+        {{ tables['reference']|pager|safe }}
     </div>
 </div>
 {% endblock %}

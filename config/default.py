@@ -74,3 +74,5 @@ TABLE_HEADERS = {
     'actor': ['name', 'class', 'first', 'last'],
     'place': ['name', 'type', 'first', 'last'],
     'reference': ['name', 'class', 'type']}
+
+BASE_TYPES = ['Site', 'Information Carrier', 'Bibliography', 'Source', 'Edition', 'Event', 'Actor']

@@ -8,10 +8,11 @@ from wtforms.validators import InputRequired
 import openatlas
 from openatlas import app
 from openatlas.forms import DateForm, build_form
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import EntityMapper, Entity
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (truncate_string, required_group, append_node_data,
-                                 build_delete_link, build_remove_link, get_base_table_data)
+                                 build_delete_link, build_remove_link, get_base_table_data,
+                                 uc_first)
 
 
 class ActorForm(DateForm):
@@ -32,14 +33,26 @@ def actor_view(id_, unlink_id=None):
     actor.set_dates()
     tables = {'info': []}
     append_node_data(tables['info'], actor)
-    header = app.config['TABLE_HEADERS']['source'] + ['description', '']
-    tables['source'] = {'name': 'source', 'header': header, 'data': []}
+    tables['source'] = {
+        'name': 'source',
+        'header': app.config['TABLE_HEADERS']['source'] + ['description', ''],
+        'data': []}
+    tables['reference'] = {
+        'name': 'reference',
+        'header': app.config['TABLE_HEADERS']['reference'] + ['pages', '', ''],
+        'data': []}
     for link_ in actor.get_links('P67', True):
-        unlink_url = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab-source'
+        name = app.config['CODE_CLASS'][link_.domain.class_.code]
+        unlink_url = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab' + name
         data = get_base_table_data(link_.domain)
-        data.append(truncate_string(link_.domain.description))
+        if name == 'source':
+            data.append(truncate_string(link_.domain.description))
+        else:
+            data.append(truncate_string(link_.description))
+            update_url = url_for('reference_link_update', link_id=link_.id, origin_id=actor.id)
+            data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
         data.append(build_remove_link(unlink_url, link_.domain.name))
-        tables['source']['data'].append(data)
+        tables[name]['data'].append(data)
     delete_link = build_delete_link(url_for('actor_delete', id_=actor.id), actor.name)
     return render_template('actor/view.html', actor=actor, tables=tables, delete_link=delete_link)
 
@@ -63,15 +76,19 @@ def actor_insert(code, origin_id=None):
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     forms = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
     form = build_form(ActorForm, forms[code])
+    if origin:
+        del form.insert_and_continue
     if form.validate_on_submit():
-        actor = save(form, None, code, origin)
+        result = save(form, None, code, origin)
         flash(_('entity created'), 'info')
+        if not isinstance(result, Entity):
+            return redirect(url_for('reference_link_update', link_id=result, origin_id=origin_id))
         if form.continue_.data == 'yes':
             return redirect(url_for('actor_insert', code=code, origin_id=origin_id))
         if origin:
             view = app.config['CODE_CLASS'][origin.class_.code]
             return redirect(url_for(view + '_view', id_=origin.id) + '#tab-actor')
-        return redirect(url_for('actor_view', id_=actor.id))
+        return redirect(url_for('actor_view', id_=result.id))
     return render_template('actor/insert.html', form=form, code=code, origin=origin)
 
 
@@ -107,7 +124,11 @@ def save(form, entity=None, code=None, origin=None):
     entity.update()
     entity.save_dates(form)
     entity.save_nodes(form)
+    link_ = None
     if origin:
-        origin.link('P67', entity)
+        if origin.class_.code in app.config['CLASS_CODES']['reference']:
+            link_ = origin.link('P67', entity)
+        else:
+            origin.link('P67', entity)
     openatlas.get_cursor().execute('COMMIT')
-    return entity
+    return link_ if link_ else entity

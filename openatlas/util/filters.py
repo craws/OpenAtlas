@@ -163,8 +163,7 @@ def display_form(self, form, form_id=None, for_persons=False):
         if hasattr(form, 'insert_and_continue'):
             del form.insert_and_continue
     id_attribute = ' id="' + form_id + '" ' if form_id else ''
-    html = '<form method="post"' + id_attribute + '>' + '<div class="data-table">'
-    footer = ''
+    html = {'main': '', 'types': '', 'header': '', 'footer': ''}
     for field in form:
         class_ = "required" if field.flags.required else ''
         errors = ''
@@ -172,32 +171,44 @@ def display_form(self, form, form_id=None, for_persons=False):
             errors += util.uc_first(error)
         if field.type in ['TreeField', 'TreeMultiField']:
             node = openatlas.nodes[int(field.id)]
-            html += '<div class="table-row"><div><label>' + node.name + '</label>'
-            html += ' <span class="tooltip" title="' + _('tooltip type') + '">i</span></div>'
-            html += '<div class="table-cell">' + str(field(class_=class_)) + errors + '</div></div>'
+            if node.name in app.config['BASE_TYPES']:
+                base_type = '<div class="table-row"><div><label>' + util.uc_first(_('type')) + '</label>'
+                base_type += ' <span class="tooltip" title="' + _('tooltip type') + '">i</span></div>'
+                base_type += '<div class="table-cell">' + str(field(class_=class_)) + errors + '</div></div>'
+                html['types'] = base_type + html['types']
+                continue
+            html['types'] += '<div class="table-row"><div><label>' + node.name + '</label>'
+            html['types'] += ' <span class="tooltip" title="' + _('tooltip type') + '">i</span></div>'
+            html['types'] += '<div class="table-cell">' + str(field(class_=class_)) + errors + '</div></div>'
             continue
         if field.type in ['CSRFTokenField', 'HiddenField']:
-            html += str(field)
+            html['header'] += str(field)
             continue
         field.label.text = util.uc_first(field.label.text)
         field.label.text += ' *' if field.flags.required and form_id != 'login-form' else ''
         if field.id == 'description':
-            footer += '<br />' + str(field.label) + '<br />' + str(field(class_=class_)) + '<br />'
+            html['footer'] += '<br />' + str(field.label) + '<br />' + str(field(class_=class_)) + '<br />'
             continue
         if field.type == 'SubmitField':
-            footer += str(field)
+            html['footer'] += str(field)
             continue
         if field.id.split('_', 1)[0] == 'date':  # if it's a date field use a function to add dates
             if field.id == 'date_begin_year':
-                footer += util.add_dates_to_form(form, for_persons)
+                html['footer'] += util.add_dates_to_form(form, for_persons)
             continue
         if field.description:
             field.label.text += ' <span class="tooltip" title="' + field.description + '">i</span>'
         errors = ' <span class="error">' + errors + ' </span>' if errors else ''
-        html += '<div class="table-row"><div>' + str(field.label) + '</div>'
-        html += '<div class="table-cell">' + str(field(class_=class_)) + errors + '</div></div>'
-    html += footer + '</div></form>'
-    return html
+        if field.id == 'name':
+            html['header'] += '<div class="table-row"><div>' + str(field.label) + '</div>'
+            html['header'] += '<div class="table-cell">' + str(field(class_=class_)) + errors + '</div></div>'
+            continue
+        html['main'] += '<div class="table-row"><div>' + str(field.label) + '</div>'
+        html['main'] += '<div class="table-cell">' + str(field(class_=class_)) + errors + '</div></div>'
+
+    html_all = '<form method="post"' + id_attribute + '>' + '<div class="data-table">'
+    html_all += html['header'] + html['types'] + html['main'] + html['footer'] + '</div></form>'
+    return html_all
 
 
 @jinja2.contextfilter
