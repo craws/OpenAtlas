@@ -42,7 +42,7 @@ function ucString(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-function createOverlay(name, title, multiple = false, type = 'table') {
+function createOverlay(name, title=false, multiple=false, type='table') {
     if (!title) {
         title = name;
     }

@@ -36,6 +36,7 @@
     <div id="tab-actor">
         {% if 'editor'|is_authorized: %}
             <div class="button-bar">
+                <a href="{{ url_for('involvement_insert', origin_id=event.id)}}">{{ _('add')|uc_first }}</a>
             </div>
         {% endif %}
         {{ tables['actor']|pager|safe }}

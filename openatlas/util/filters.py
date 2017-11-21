@@ -170,7 +170,11 @@ def display_form(self, form, form_id=None, for_persons=False):
         for error in field.errors:
             errors += util.uc_first(error)
         if field.type in ['TreeField', 'TreeMultiField']:
-            node = openatlas.nodes[int(field.id)]
+            try:
+                hierarchy_id = int(field.id)
+            except:
+                hierarchy_id = openatlas.NodeMapper.get_hierarchy_by_name(util.uc_first(field.id)).id
+            node = openatlas.nodes[hierarchy_id]
             if node.name in app.config['BASE_TYPES']:
                 base_type = '<div class="table-row"><div><label>' + util.uc_first(_('type')) + '</label>'
                 base_type += ' <span class="tooltip" title="' + _('tooltip type') + '">i</span></div>'

@@ -1,0 +1,11 @@
+{% extends 'layout.html' %}
+{% block breadcrumb %}
+    <a href="{{ url_for(config['CODE_CLASS'][origin.class_.code] + '_index') }}">
+        {{ _(config['CODE_CLASS'][origin.class_.code])|uc_first }}
+    </a>
+    > {{ origin|link|safe }}
+    > + {{ _involvement }}
+{% endblock %}
+{% block content %}
+    form|display_form|safe
+{% endblock %}

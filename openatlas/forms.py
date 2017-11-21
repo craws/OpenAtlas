@@ -8,8 +8,7 @@ from wtforms.validators import NumberRange, Optional
 from wtforms.widgets import HiddenInput
 
 import openatlas
-from openatlas.util.filters import pager
-from openatlas.util.util import uc_first, sanitize, truncate_string
+from openatlas.util.util import uc_first, sanitize, truncate_string, pager, get_base_table_data
 
 
 def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
@@ -87,6 +86,10 @@ class TreeSelect(HiddenInput):
             field.data = field.data[0] if isinstance(field.data, list) else field.data
             selection = openatlas.nodes[int(field.data)].name
             selected_ids.append(openatlas.nodes[int(field.data)].id)
+        try:
+            hierarchy_id = int(field.id)
+        except:
+            hierarchy_id = openatlas.NodeMapper.get_hierarchy_by_name(uc_first(field.id)).id
         html = """
             <input id="{name}-button" name="{name}-button" type="text"
                 class="table-select {required}" onfocus="this.blur()"
@@ -117,9 +120,9 @@ class TreeSelect(HiddenInput):
             </script>
         """.format(
             name=field.id,
-            title=openatlas.nodes[int(field.id)].name,
+            title=openatlas.nodes[hierarchy_id].name,
             selection=selection,
-            tree_data=openatlas.NodeMapper.get_tree_data(int(field.id), selected_ids),
+            tree_data=openatlas.NodeMapper.get_tree_data(hierarchy_id, selected_ids),
             clear_style='' if selection else ' style="display: none;" ',
             required=' required' if field.flags.required else '')
         return super(TreeSelect, self).__call__(field, **kwargs) + html
@@ -174,36 +177,19 @@ class TreeMultiField(HiddenField):
 class TableSelect(HiddenInput):
     def __call__(self, field, **kwargs):
         selection = ''
-        header = ['name', 'class', 'type', 'info']
-        if field.id == 'source':
-            header = ['name', 'type', 'info']
+        header = openatlas.app.config['TABLE_HEADERS'][field.id]
         table = {'name': field.id, 'header': header, 'data': []}
         for entity in openatlas.models.entity.EntityMapper.get_by_codes(field.id):
-            class_ = openatlas.classes[entity.class_.id].name
-            if field.id == 'reference':
-                class_ = uc_first(_(entity.system_type))
-            # Todo: don't show self e.g. at relations
+            # Todo: don't show self e.g. at source
             if field.data and entity.id == int(field.data):
                 selection = entity.name
-            if field.id == 'source':
-                table['data'].append([
-                    """<a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
+            data = get_base_table_data(entity)
+            data[0] = """<a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
                         """.format(
                         name=field.id,
                         entity_id=entity.id,
-                        entity_name=truncate_string(entity.name, 40, False)),
-                    entity.print_base_type(),
-                    truncate_string(entity.description)])
-            else:
-                table['data'].append([
-                    """<a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
-                        """.format(
-                        name=field.id,
-                        entity_id=entity.id,
-                        entity_name=truncate_string(entity.name, 40, False)),
-                    class_,
-                    entity.print_base_type(),
-                    truncate_string(entity.description)])
+                        entity_name=truncate_string(entity.name, 40, False))
+            table['data'].append(data)
         html = """
             <input id="{name}-button" name="{name}-button" class="table-select {required}"
                 type="text" placeholder="Select" onfocus="this.blur()" readonly="readonly"
@@ -215,7 +201,7 @@ class TableSelect(HiddenInput):
             <script>$(document).ready(function () {{createOverlay("{name}");}});</script>
             """.format(
                 name=field.id,
-                pager=pager(None, table),
+                pager=pager(table),
                 selection=selection,
                 clear_style='' if selection else ' style="display: none;" ',
                 required=' required' if field.flags.required else '')
@@ -227,31 +213,39 @@ class TableField(HiddenField):
 
 
 class TableMultiSelect(HiddenInput):
+    """Table with checkboxes used in forms."""
 
     def __call__(self, field, **kwargs):
         if field.data and isinstance(field.data, str):
             field.data = ast.literal_eval(field.data)
         selection = ''
+        # Todo: adapt sort list for different header amount
         table = {
             'name': field.id,
-            'header': ['name', 'x'],
+            'header': openatlas.app.config['TABLE_HEADERS'][field.id] + [''],
             'data': [], 'sort': 'sortList: [[1,0],[0,0]]'}
         for entity in openatlas.models.entity.EntityMapper.get_by_codes(field.id):
             selection += entity.name + '<br />' if field.data and entity.id in field.data else ''
             checked = ''
             if field.data and entity.id in field.data:
                 checked = 'checked = "checked"'
-            table['data'].append([
-                entity.name,
-                '<input id="{id}" {checked} value="{name}" class="multi-table-select"'.format(
-                    id=str(entity.id), name=entity.name, checked=checked)])
+            data = get_base_table_data(entity)
+            data[0] = truncate_string(entity.name)  # replace entity link with just the entity name
+            data.append('<input type="checkbox" id="{id}" {checked} value="{name}" class="multi-table-select">'.format(
+                    id=str(entity.id), name=entity.name, checked=checked))
+            table['data'].append(data)
         html = """
             <span id="{name}-button" class="button">Select</span><br />
             <div id="{name}-selection" class="selection" style="text-align:left;">{selection}</div>
             <div id="{name}-overlay" class="overlay">
             <div id="{name}-dialog" class="overlay-container">{pager}</div></div>
-            <script>$(document).ready(function () {{createOverlay("{name}", true);}});</script>
-            """.format(name=field.id, selection=selection, pager=pager(None, table, True))
+            <script>
+                $(document).ready(function () {{createOverlay("{name}", "{name}", true);}});
+            </script>
+            """.format(
+                name=field.id,
+                selection=selection,
+                pager=pager(table))
         return super(TableMultiSelect, self).__call__(field, **kwargs) + html
 
 

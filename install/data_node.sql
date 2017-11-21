@@ -314,7 +314,7 @@ INSERT INTO web.hierarchy (id, name, multiple, system, directional) VALUES
 ((SELECT id FROM entity WHERE name='Actor Function'), 'Actor Function', False, True, False),
 ((SELECT id FROM entity WHERE name='Involvement'), 'Involvement', False, True, False),
 ((SELECT id FROM entity WHERE name='Sex'), 'Sex', False, False, False),
-((SELECT id FROM entity WHERE name='Site'), 'Site', False, True, False),
+((SELECT id FROM entity WHERE name='Place'), 'Place', False, True, False),
 ((SELECT id FROM entity WHERE name='Information Carrier'), 'Information Carrier', False, True, False),
 ((SELECT id FROM entity WHERE name='Bibliography'), 'Bibliography', False, True, False),
 ((SELECT id FROM entity WHERE name='Edition'), 'Edition', False, True, False),
