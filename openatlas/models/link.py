@@ -26,6 +26,7 @@ class LinkMapper(object):
         if not domain or not range_:
             return
         range_ = range_ if isinstance(range_, list) else [range_]
+        result = None
         for range_param in range_:
             if not range_param:
                 continue
@@ -68,7 +69,8 @@ class LinkMapper(object):
                 'range_id': range_id,
                 'description': description})
             openatlas.debug_model['div sql'] += 1
-        return cursor.fetchone()[0]
+            result = cursor.fetchone()[0]
+        return result
 
     @staticmethod
     def get_linked_entity(entity, code, inverse=False):

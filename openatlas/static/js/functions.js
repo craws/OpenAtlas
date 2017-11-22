@@ -101,8 +101,13 @@ function selectFromTreeMulti(name) {
         checkedNames += node['text'] + "<br />";
     });
     $("#" + name + "-selection").html(checkedNames);
-    /* Todo: js required validation with trigger on multi fields not working anymore (have '[]') */
-    $("#" + name).val('[' + ids + ']').trigger('change');
+    if (ids.length > 0) {
+        $("#" + name).val('[' + ids + ']');
+    } else {
+        $("#" + name).val('');
+    }
+    $("#" + name).trigger('change');
+
 }
 
 function selectFromTable(element, table, id) {
@@ -122,7 +127,11 @@ function selectFromTableMulti(name) {
             ids.push($(this).attr('id'));
         }
     });
-    $("#" + name).val('[' + ids + ']');
+    if (ids.length > 0) {
+        $("#" + name).val('[' + ids + ']');
+    } else {
+        $("#" + name).val('');
+    }
     $("#" + name + "-selection").html(checkedNames);
 }
 
