@@ -98,17 +98,26 @@ def event_view(id_, unlink_id=None):
     append_node_data(tables['info'], event)
     tables['actor'] = {
         'name': 'actor',
-        'header': app.config['TABLE_HEADERS']['actor'] + ['involvement', '', ''],
+        'header': ['actor', 'class', 'activity', 'involvement', 'first', 'last', '', ''],
         'data': []}
     for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
+        first = link_.first
+        if not link_.first and event.first:
+            first = '<span class="inactive" style="float:right">' + str(event.first) + '</span>'
+        last = link_.last
+        if not link_.last and event.last:
+            '<span class="inactive" style="float:right">' + str(event.last) + '</span>'
+        unlink_url = url_for('event_view', id_=event.id, unlink_id=link_.id) + '#tab-actor'
+        update_url = url_for('involvement_update', id_=link_.id, origin_id=event.id)
         tables['actor']['data'].append ([
             link(link_.range),
             openatlas.classes[link_.range.class_.id].name,
-            'todo first',
-            'todo last',
-            'todo involvement',
-            'todo edit',
-            'todo delete'])
+            link_.property.name_inverse,
+            openatlas.nodes[link_.type_id].name if link_.type_id else '',
+            first,
+            last,
+            '<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>',
+            build_remove_link(unlink_url, link_.range.name)])
     tables['source'] = {
         'name': 'source',
         'header': app.config['TABLE_HEADERS']['source'] + ['description', ''],

@@ -256,6 +256,7 @@ class TableMultiField(HiddenField):
 class DateForm(Form):
 
     def populate_dates(self, entity):
+        # Todo: comment and reflect that entity can be a link, too
         for code, types in entity.dates.items():
             if code in ['OA1', 'OA3', 'OA5']:
                 for type_, date in types.items():

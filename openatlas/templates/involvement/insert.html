@@ -8,9 +8,4 @@
 {% endblock %}
 {% block content %}
     {{ form|display_form|safe }}
-    <script>
-        $.validator.setDefaults({
-            ignore: [], // enable validation for hidden fields
-        });
-    </script>
 {% endblock %}

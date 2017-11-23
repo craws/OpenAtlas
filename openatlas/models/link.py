@@ -14,9 +14,20 @@ class Link(object):
         # Todo: performance - if it's a node don't call get_by_id
         self.domain = openatlas.EntityMapper.get_by_id(row.domain_id)
         self.range = openatlas.EntityMapper.get_by_id(row.range_id)
+        self.type_id = row.type_id
+        self.first = int(row.first) if hasattr(row, 'first') and row.first else None
+        self.last = int(row.last) if hasattr(row, 'last') and row.last else None
+        self.dates = {}
 
     def update(self):
         LinkMapper.update(self)
+
+    def delete(self):
+        LinkMapper.delete_by_id(self.id)
+
+    def set_dates(self):
+        from openatlas.models.date import DateMapper
+        self.dates = DateMapper.get_link_dates(self)
 
 
 class LinkMapper(object):

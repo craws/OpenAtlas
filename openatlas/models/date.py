@@ -4,6 +4,7 @@ import datetime
 from dateutil.relativedelta import relativedelta
 
 import openatlas
+from openatlas.models.linkProperty import LinkPropertyMapper
 from .link import LinkMapper
 
 
@@ -32,6 +33,27 @@ class DateMapper(object):
         return dates
 
     @staticmethod
+    def get_link_dates(link):
+        sql = """
+            SELECT e.value_timestamp, e.description, e.system_type, p.code
+            FROM model.link_property lp
+            JOIN model.link l ON lp.domain_id = l.id
+            JOIN model.entity e ON lp.range_id = e.id
+            JOIN model.property p ON lp.property_id = p.id AND p.code in ('OA5', 'OA6')
+            WHERE l.id = %(id)s;"""
+        cursor = openatlas.get_cursor()
+        cursor.execute(sql, {'id': link.id})
+        dates = {}
+        for row in cursor.fetchall():
+            if row.code not in dates:
+                dates[row.code] = {}
+            dates[row.code][row.system_type] = {
+                'timestamp': row.value_timestamp,
+                'info': row.description if row.description else ''}
+        openatlas.debug_model['div sql'] += 1
+        return dates
+
+    @staticmethod
     def save_dates(entity, form):
         # Todo: refactor to not delete/save dates if not changed
         if entity.dates:
@@ -46,8 +68,13 @@ class DateMapper(object):
                 code_begin = 'OA3'
             if form.date_death.data:
                 code_end = 'OA4'
-        DateMapper.save_date(entity, form, 'begin', code_begin)
-        DateMapper.save_date(entity, form, 'end', code_end)
+        DateMapper.save_date(entity.id, form, 'begin', code_begin, LinkMapper)
+        DateMapper.save_date(entity.id, form, 'end', code_end, LinkMapper)
+
+    @staticmethod
+    def save_link_dates(link_id, form):
+        DateMapper.save_date(link_id, form, 'begin', 'OA5', LinkPropertyMapper)
+        DateMapper.save_date(link_id, form, 'end', 'OA6', LinkPropertyMapper)
 
     @staticmethod
     def delete_dates(entity):
@@ -61,7 +88,7 @@ class DateMapper(object):
         return
 
     @staticmethod
-    def save_date(entity, form, name, code):
+    def save_date(id_, form, name, code, link_mapper):
         from openatlas.models.entity import EntityMapper
         from openatlas.util.util import create_date_from_form
 
@@ -77,7 +104,7 @@ class DateMapper(object):
         if not date['year2'] and date['month'] and date['year']:  # exact date
             date_from = create_date_from_form(date)
             exact_date = EntityMapper.insert('E61', '', 'exact date value', description, date_from)
-            LinkMapper.insert(entity.id, code, exact_date)
+            link_mapper.insert(id_, code, exact_date)
             return
 
         if date['year2']:
@@ -92,6 +119,6 @@ class DateMapper(object):
                 date_to = (date_from + relativedelta(years=1)) - datetime.timedelta(days=1)
 
         date_from = EntityMapper.insert('E61', '', 'from date value', description, date_from)
-        LinkMapper.insert(entity.id, code, date_from)
+        link_mapper.insert(id_, code, date_from)
         date_to = EntityMapper.insert('E61', '', 'to date value', None, date_to)
-        LinkMapper.insert(entity.id, code, date_to)
+        link_mapper.insert(id_, code, date_to)
