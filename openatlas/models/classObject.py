@@ -41,7 +41,7 @@ class ClassMapper(object):
         cursor = openatlas.get_cursor()
         cursor.execute("SELECT id, code, name FROM model.class;")
         for row in cursor.fetchall():
-            classes[row.id] = ClassObject(row)
+            classes[row.code] = ClassObject(row)
         cursor.execute("SELECT super_id, sub_id FROM model.class_inheritance;")
         for row in cursor.fetchall():
             classes[row.super_id].sub.append(row.sub_id)

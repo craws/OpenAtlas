@@ -17,30 +17,25 @@ class NodeMapper(EntityMapper):
             SELECT
                 e.id,
                 e.name,
-                e.class_id,
+                e.class_code,
                 e.description,
                 e.system_type,
                 e.created,
                 e.modified,
                 es.id AS super_id,
-                COUNT(p2.id) AS count
-            FROM model.entity e
-            JOIN model.class c ON e.class_id = c.id
-                AND c.code = %(class_code)s
-                AND (e.system_type IS NULL OR e.system_type != 'place location')
+                COUNT(l2.id) AS count
+            FROM model.entity e                
 
             -- get super
-            LEFT JOIN model.link l
-                ON e.id = l.domain_id AND
-                l.property_id = (SELECT id FROM model.property WHERE code = %(property_code)s)
+            LEFT JOIN model.link l ON e.id = l.domain_id AND l.property_code = %(property_code)s
             LEFT JOIN model.entity es ON l.range_id = es.id
 
             -- get count
-            LEFT JOIN model.link l2 ON l2.range_id = e.id
-            LEFT JOIN model.property p2 ON
-                l2.property_id = p2.id AND
-                p2.code IN ('P2', 'P89')
-            GROUP BY e.id, es.id
+            LEFT JOIN model.link l2 ON l2.range_id = e.id AND l2.property_code IN ('P2', 'P89')
+            
+            WHERE e.class_code = %(class_code)s
+                AND (e.system_type IS NULL OR e.system_type != 'place location')
+            GROUP BY e.id, es.id                        
             ORDER BY e.name;"""
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {'class_code': 'E55', 'property_code': 'P127'})

@@ -24,7 +24,7 @@ class Entity(object):
         self.modified = row.modified
         self.first = int(row.first) if hasattr(row, 'first') and row.first else None
         self.last = int(row.last) if hasattr(row, 'last') and row.last else None
-        self.class_ = openatlas.classes[row.class_id]
+        self.class_ = openatlas.classes[row.class_name]
         self.dates = {}
 
     def get_linked_entity(self, code, inverse=False):
