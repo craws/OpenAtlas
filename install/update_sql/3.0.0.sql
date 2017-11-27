@@ -163,4 +163,23 @@ UPDATE model.entity SET name = 'Sex', description = 'Categories for sex like fem
     WHERE id = (SELECT id from model.entity WHERE name = 'Gender');
 UPDATE web.hierarchy SET name = 'Sex', system = False WHERE name = 'Gender';
 
+-- Change foreign keys at entity/class and links/property from id to code
+ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_class_id_fkey;
+ALTER TABLE model.entity ALTER COLUMN class_id TYPE text;
+ALTER TABLE model.entity RENAME class_id TO class_code;
+UPDATE model.entity SET class_code = (SELECT code FROM model.class WHERE id = class_code::integer);
+ALTER TABLE ONLY model.entity ADD CONSTRAINT entity_class_code_fkey FOREIGN KEY (class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_property_id_fkey;
+ALTER TABLE model.link ALTER COLUMN property_id TYPE text;
+ALTER TABLE model.link RENAME property_id TO property_code;
+UPDATE model.link SET property_code = (SELECT code FROM model.property WHERE id = property_code::integer);
+ALTER TABLE ONLY model.link ADD CONSTRAINT link_property_code_fkey FOREIGN KEY (property_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE IF EXISTS ONLY model.link_property DROP CONSTRAINT IF EXISTS link_property_property_id_fkey;
+ALTER TABLE model.link_property ALTER COLUMN property_id TYPE text;
+ALTER TABLE model.link_property RENAME property_id TO property_code;
+UPDATE model.link_property SET property_code = (SELECT code FROM model.property WHERE id = property_code::integer);
+ALTER TABLE ONLY model.link_property ADD CONSTRAINT link_property_domain_id_fkey FOREIGN KEY (domain_id) REFERENCES model.link(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
 COMMIT;

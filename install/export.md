@@ -4,13 +4,13 @@ Some examples to extract data from the database
 
 ### Database Structure
 
-    pg_dump -sc --if-exists -n model -n gis -n log -n web openatlas > structure.sql
+    pg_dump -sc --if-exists -n model -n gis -n log -n web openatlas > install/structure.sql
 
 add "CREATE EXTENSION postgis;" and uncomment after installation for unittests
 
 ### Model Data
 
-    pg_dump -a -n model openatlas > data/install/data_model.sql
+    pg_dump -a -n model openatlas > install/data_model.sql
 
 ### Web Schema
 

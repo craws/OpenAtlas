@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.6.4
--- Dumped by pg_dump version 9.6.4
+-- Dumped from database version 9.6.6
+-- Dumped by pg_dump version 9.6.6
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -14,8 +14,8 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET row_security = off;
 
--- Uncomment below for first install, it's important that this statement is above setting search_path
--- CREATE EXTENSION postgis;
+--- Uncomment below for first install, it's important that this statement is above setting search_path
+--- CREATE EXTENSION postgis;
 
 SET search_path = web, pg_catalog;
 
@@ -34,11 +34,11 @@ ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS 
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_domain_class_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_range_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.link_property DROP CONSTRAINT IF EXISTS link_property_range_id_fkey;
-ALTER TABLE IF EXISTS ONLY model.link_property DROP CONSTRAINT IF EXISTS link_property_property_id_fkey;
-ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_property_id_fkey;
+ALTER TABLE IF EXISTS ONLY model.link_property DROP CONSTRAINT IF EXISTS link_property_property_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.link_property DROP CONSTRAINT IF EXISTS link_property_domain_id_fkey;
+ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_property_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_domain_id_fkey;
-ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_class_id_fkey;
+ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_class_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_id_fkey;
 SET search_path = log, pg_catalog;
@@ -581,7 +581,7 @@ ALTER SEQUENCE class_inheritance_id_seq OWNED BY class_inheritance.id;
 
 CREATE TABLE entity (
     id integer NOT NULL,
-    class_id integer NOT NULL,
+    class_code text NOT NULL,
     name text NOT NULL,
     description text,
     value_integer integer,
@@ -660,7 +660,7 @@ ALTER SEQUENCE i18n_id_seq OWNED BY i18n.id;
 
 CREATE TABLE link (
     id integer NOT NULL,
-    property_id integer NOT NULL,
+    property_code text NOT NULL,
     domain_id integer NOT NULL,
     range_id integer NOT NULL,
     description text,
@@ -698,7 +698,7 @@ ALTER SEQUENCE link_id_seq OWNED BY link.id;
 
 CREATE TABLE link_property (
     id integer NOT NULL,
-    property_id integer NOT NULL,
+    property_code text NOT NULL,
     domain_id integer NOT NULL,
     range_id integer NOT NULL,
     description text,
@@ -1879,11 +1879,11 @@ ALTER TABLE ONLY class_inheritance
 
 
 --
--- Name: entity entity_class_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: entity entity_class_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY entity
-    ADD CONSTRAINT entity_class_id_fkey FOREIGN KEY (class_id) REFERENCES class(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT entity_class_code_fkey FOREIGN KEY (class_code) REFERENCES class(code) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -1895,6 +1895,14 @@ ALTER TABLE ONLY link
 
 
 --
+-- Name: link link_property_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY link
+    ADD CONSTRAINT link_property_code_fkey FOREIGN KEY (property_code) REFERENCES property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
 -- Name: link_property link_property_domain_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
@@ -1903,19 +1911,11 @@ ALTER TABLE ONLY link_property
 
 
 --
--- Name: link link_property_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
---
-
-ALTER TABLE ONLY link
-    ADD CONSTRAINT link_property_id_fkey FOREIGN KEY (property_id) REFERENCES property(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: link_property link_property_property_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: link_property link_property_property_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY link_property
-    ADD CONSTRAINT link_property_property_id_fkey FOREIGN KEY (property_id) REFERENCES property(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT link_property_property_code_fkey FOREIGN KEY (property_code) REFERENCES property(code) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
