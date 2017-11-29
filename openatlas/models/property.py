@@ -11,10 +11,10 @@ class Property(object):
         self._name = row.name
         self._name_inverse = row.name_inverse
         self.code = row.code
-        self.domain_id = row.domain_class_id
+        self.domain_class_code = row.domain_class_code
         self.id = row.id
         self.i18n = {}
-        self.range_id = row.range_class_id
+        self.range_class_code = row.range_class_code
         self.super = []
         self.sub = []
 
@@ -60,27 +60,22 @@ class PropertyMapper(object):
         properties = {}
         cursor = openatlas.get_cursor()
         sql = """
-            SELECT id, code, domain_class_id, range_class_id, name, name_inverse
+            SELECT id, code, domain_class_code, range_class_code, name, name_inverse
             FROM model.property;"""
         cursor.execute(sql)
         for row in cursor.fetchall():
-            properties[row.id] = Property(row)
-        cursor.execute('SELECT super_id, sub_id FROM model.property_inheritance;')
+            properties[row.code] = Property(row)
+        cursor.execute('SELECT super_code, sub_code FROM model.property_inheritance;')
         for row in cursor.fetchall():
-            properties[row.super_id].sub.append(row.sub_id)
-            properties[row.sub_id].super.append(row.super_id)
+            properties[row.super_code].sub.append(row.sub_code)
+            properties[row.sub_code].super.append(row.super_code)
         sql = """
-            SELECT text, language_code, table_field, table_id FROM model.i18n
-            WHERE table_name = 'property' AND language_code IN %(language_codes)s;"""
+            SELECT property_code, language_code, attribute, text FROM model.property_i18n
+            WHERE language_code IN %(language_codes)s;"""
         cursor.execute(sql, {'language_codes': tuple(app.config['LANGUAGES'].keys())})
         for row in cursor.fetchall():
-            if row.language_code not in properties[row.table_id].i18n:
-                properties[row.table_id].i18n[row.language_code] = {}
-            properties[row.table_id].i18n[row.language_code][row.table_field] = row.text
+            property_ = properties[row.property_code]
+            if row.language_code not in property_.i18n:
+                property_.i18n[row.language_code] = {}
+            property_.i18n[row.language_code][row.attribute] = row.text
         return properties
-
-    @staticmethod
-    def get_by_code(code):
-        for id_ in openatlas.properties:
-            if openatlas.properties[id_].code == code:
-                return openatlas.properties[id_]

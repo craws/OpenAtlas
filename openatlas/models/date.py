@@ -13,20 +13,19 @@ class DateMapper(object):
     @staticmethod
     def get_dates(entity):
         sql = """
-            SELECT e2.value_timestamp, e2.description, e2.system_type , p.code
+            SELECT e2.value_timestamp, e2.description, e2.system_type, l.property_code
             FROM model.entity e
             JOIN model.link l ON e.id = l.domain_id
+                AND l.property_code IN ('OA1', 'OA2', 'OA3', 'OA4', 'OA5', 'OA6')
             JOIN model.entity e2 ON l.range_id = e2.id
-            JOIN model.property p ON l.property_id = p.id
-                AND p.code in ('OA1', 'OA2', 'OA3', 'OA4', 'OA5', 'OA6')
             WHERE e.id = %(id)s;"""
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {'id': entity.id})
         dates = {}
         for row in cursor.fetchall():
-            if row.code not in dates:
-                dates[row.code] = {}
-            dates[row.code][row.system_type] = {
+            if row.property_code not in dates:
+                dates[row.property_code] = {}
+            dates[row.property_code][row.system_type] = {
                 'timestamp': row.value_timestamp,
                 'info': row.description if row.description else ''}
         openatlas.debug_model['div sql'] += 1
@@ -82,7 +81,7 @@ class DateMapper(object):
             DELETE FROM model.entity WHERE id in (
                 SELECT e.id FROM model.entity e
                 JOIN model.link l ON e.id = l.range_id AND l.domain_id = %(entity_id)s
-                JOIN model.class c ON e.class_id = c.id AND c.code = 'E61');"""
+                    AND l.property_code IN ('OA1', 'OA2', 'OA3', 'OA4', 'OA5', 'OA6'));"""
         openatlas.get_cursor().execute(sql, {'entity_id': entity.id})
         openatlas.debug_model['div sql'] += 1
         return

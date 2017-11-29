@@ -111,7 +111,7 @@ def event_view(id_, unlink_id=None):
         update_url = url_for('involvement_update', id_=link_.id, origin_id=event.id)
         tables['actor']['data'].append ([
             link(link_.range),
-            openatlas.classes[link_.range.class_.id].name,
+            openatlas.classes[link_.range.class_.code].name,
             link_.property.name_inverse,
             openatlas.nodes[link_.type_id].name if link_.type_id else '',
             first,

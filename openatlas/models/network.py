@@ -21,10 +21,7 @@ class Network(object):
         for code, param in params['properties'].items():
             if param['active']:
                 properties.append(code)
-        sql = """
-            SELECT l.domain_id, l.range_id FROM model.link l
-            JOIN model.property p ON l.property_id = p.id
-            WHERE p.code IN %(properties)s;"""
+        sql = "SELECT domain_id, range_id FROM model.link WHERE property_code IN %(properties)s;"
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {'properties': tuple(properties)})
         entities = []
@@ -37,11 +34,7 @@ class Network(object):
         edges = " links: [" + edges + "]"
         nodes = ''
         entities_already = []
-        sql = """
-            SELECT e.id, e.class_id, e.name, c.code
-            FROM model.entity e
-            JOIN model.class c ON e.class_id = c.id
-            WHERE c.code IN %(classes)s;"""
+        sql = "SELECT id, class_code, name FROM model.entity WHERE class_code IN %(classes)s;"
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {'classes': tuple(classes)})
         for row in cursor.fetchall():
@@ -51,19 +44,18 @@ class Network(object):
             if params['options']['orphans'] or row.id in entities:
                 entities_already.append(row.id)
                 nodes += "{'id':'" + str(row.id) + "', 'name':'" + name
-                nodes += "', 'color':'" + params['classes'][row.code]['color'] + "'},"
+                nodes += "', 'color':'" + params['classes'][row.class_code]['color'] + "'},"
         # Get elements of links which weren't present in class selection
         array_diff = Network.diff(entities, entities_already)
         if array_diff:
-            sql = """
-                SELECT e.id, e.class_id, e.name, c.code FROM model.entity e
-                JOIN model.class c ON e.class_id = c.id
-                WHERE e.id IN %(array_diff)s;"""
+            sql = "SELECT id, class_code, name FROM model.entity WHERE id IN %(array_diff)s;"
             cursor = openatlas.get_cursor()
             cursor.execute(sql, {'array_diff': tuple(array_diff)})
             for row in cursor.fetchall():
-                name = truncate_string(row.name.replace("'", "").replace('Location of ', ''), 40, False)
-                nodes += "{'id':'" + str(row.id) + "', 'name':'" + name
-                nodes += "', 'color':'" + params['classes'][row.code]['color'] if row.code in params['classes'] else ''
-                nodes += "'},"
+                color = ''
+                if row.class_code in params['classes']:
+                    color = params['classes'][row.class_code]['color']
+                name = row.name.replace("'", "").replace('Location of ', '')
+                nodes += "{'id':'" + str(row.id) + "', 'name':'" + truncate_string(name, 40, False)
+                nodes += "', 'color':'" + color + "'},"
         return "graph = {'nodes': [" + nodes + "], " + edges + "};"

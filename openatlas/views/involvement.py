@@ -37,12 +37,12 @@ def involvement_insert(origin_id):
     origin = EntityMapper.get_by_id(origin_id)
     form = ActorForm()
     if origin.class_.code in ['E6', 'E7', 'E8', 'E12']:
-        form.activity.choices = [('P11', PropertyMapper.get_by_code('P11').name)]
+        form.activity.choices = [('P11', openatlas.properties['P11'].name)]
         if origin.class_.code in ['E7', 'E8', 'E12']:
-            form.activity.choices.append(('P14', PropertyMapper.get_by_code('P14').name))
+            form.activity.choices.append(('P14', openatlas.properties['P14'].name))
         if origin.class_.code == 'E8':
-            form.activity.choices.append(('P22', PropertyMapper.get_by_code('P22').name))
-            form.activity.choices.append(('P23', PropertyMapper.get_by_code('P23').name))
+            form.activity.choices.append(('P22', openatlas.properties['P22'].name))
+            form.activity.choices.append(('P23', openatlas.properties['P23'].name))
     if form.validate_on_submit():
         if origin.class_.code in ['E6', 'E7', 'E8', 'E12']:
             openatlas.get_cursor().execute('BEGIN')
@@ -66,12 +66,12 @@ def involvement_update(id_, origin_id):
     form.save.label.text = _('save')
     del form.actor, form.insert_and_continue
     if origin.class_.code in ['E6', 'E7', 'E8', 'E12']:
-        form.activity.choices = [('P11', PropertyMapper.get_by_code('P11').name)]
+        form.activity.choices = [('P11', openatlas.properties['P11'].name)]
         if origin.class_.code in ['E7', 'E8', 'E12']:
-            form.activity.choices.append(('P14', PropertyMapper.get_by_code('P14').name))
+            form.activity.choices.append(('P14', openatlas.properties['P14'].name))
         if origin.class_.code == 'E8':
-            form.activity.choices.append(('P22', PropertyMapper.get_by_code('P22').name))
-            form.activity.choices.append(('P23', PropertyMapper.get_by_code('P23').name))
+            form.activity.choices.append(('P22', openatlas.properties['P22'].name))
+            form.activity.choices.append(('P23', openatlas.properties['P23'].name))
     if form.validate_on_submit():
         openatlas.get_cursor().execute('BEGIN')
         domain = link_.domain

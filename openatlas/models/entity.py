@@ -4,7 +4,6 @@ from collections import OrderedDict
 import openatlas
 from openatlas.models.date import DateMapper
 from openatlas.models.link import LinkMapper
-from .classObject import ClassMapper
 
 
 class Entity(object):
@@ -24,7 +23,7 @@ class Entity(object):
         self.modified = row.modified
         self.first = int(row.first) if hasattr(row, 'first') and row.first else None
         self.last = int(row.last) if hasattr(row, 'last') and row.last else None
-        self.class_ = openatlas.classes[row.class_name]
+        self.class_ = openatlas.classes[row.class_code]
         self.dates = {}
 
     def get_linked_entity(self, code, inverse=False):
@@ -72,36 +71,28 @@ class EntityMapper(object):
     # Todo: performance - use first and last only for get_by_codes?
     sql = """
         SELECT
-            e.id, e.class_id, e.name, e.description, e.created, e.modified, c.code,
-                e.value_timestamp, e.value_integer, e.system_type,
-            string_agg(CAST(t.id AS text), ',') AS types,
+            e.id, e.class_code, e.name, e.description, e.created, e.modified, e.value_timestamp,
+            e.value_integer, e.system_type,
+            string_agg(CAST(t.range_id AS text), ',') AS types,
             min(date_part('year', d1.value_timestamp)) AS first,
             max(date_part('year', d2.value_timestamp)) AS last
 
         FROM model.entity e
-        JOIN model.class c ON e.class_id = c.id
-
-        LEFT JOIN model.link tl ON e.id = tl.domain_id
-        LEFT JOIN model.entity t ON
-            tl.range_id = t.id
-                AND tl.property_id IN (SELECT id FROM model.property WHERE code IN ('P2', 'P89'))
+        LEFT JOIN model.link t ON e.id = t.domain_id AND t.property_code IN ('P2', 'P89')
 
         LEFT JOIN model.link dl1 ON e.id = dl1.domain_id
-            AND dl1.property_id IN
-                (SELECT id FROM model.property WHERE code in ('OA1', 'OA3', 'OA5'))
+            AND dl1.property_code IN ('OA1', 'OA3', 'OA5')
         LEFT JOIN model.entity d1 ON dl1.range_id = d1.id
 
         LEFT JOIN model.link dl2 ON e.id = dl2.domain_id
-            AND dl2.property_id IN 
-                (SELECT id FROM model.property WHERE code in ('OA2', 'OA4', 'OA6'))
+            AND dl2.property_code IN ('OA2', 'OA4', 'OA6')
         LEFT JOIN model.entity d2 ON dl2.range_id = d2.id"""
 
     @staticmethod
     def update(entity):
         from openatlas.util.util import sanitize
         sql = """
-            UPDATE model.entity
-            SET (name, description) = (%(name)s, %(description)s)
+            UPDATE model.entity SET (name, description) = (%(name)s, %(description)s)
             WHERE id = %(id)s;"""
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {
@@ -112,19 +103,9 @@ class EntityMapper(object):
     @staticmethod
     def insert(code, name, system_type=None, description=None, date=None):
         sql = """
-            INSERT INTO model.entity (
-                name,
-                system_type,
-                class_id,
-                description,
-                value_timestamp)
-            VALUES (
-                %(name)s,
-                %(system_type)s,
-                (SELECT id FROM model.class WHERE code = %(code)s),
-                %(description)s,
-                %(value_timestamp)s
-            ) RETURNING id;"""
+            INSERT INTO model.entity (name, system_type, class_code, description, value_timestamp)
+            VALUES (%(name)s, %(system_type)s, %(code)s, %(description)s, %(value_timestamp)s)
+            RETURNING id;"""
         params = {
             'name': date if date else name.strip(),
             'code': code,
@@ -137,7 +118,7 @@ class EntityMapper(object):
 
     @staticmethod
     def get_by_id(entity_id):
-        sql = EntityMapper.sql + ' WHERE e.id = %(id)s GROUP BY e.id, c.code ORDER BY e.name;'
+        sql = EntityMapper.sql + ' WHERE e.id = %(id)s GROUP BY e.id ORDER BY e.name;'
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {'id': entity_id})
         openatlas.debug_model['by id'] += 1
@@ -147,7 +128,7 @@ class EntityMapper(object):
     def get_by_ids(entity_ids):
         if not entity_ids:
             return []
-        sql = EntityMapper.sql + ' WHERE e.id IN %(ids)s GROUP BY e.id, c.code ORDER BY e.name;'
+        sql = EntityMapper.sql + ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name;'
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {'ids': tuple(entity_ids)})
         openatlas.debug_model['by id'] += 1
@@ -158,20 +139,15 @@ class EntityMapper(object):
 
     @staticmethod
     def get_by_codes(class_name):
-        class_ids = []
-        for code in openatlas.app.config['CLASS_CODES'][class_name]:
-            class_ids.append(ClassMapper.get_by_code(code).id)
         cursor = openatlas.get_cursor()
         if class_name == 'source':
             sql = EntityMapper.sql + """
-                WHERE e.class_id IN %(class_ids)s AND e.system_type ='source content'
-                GROUP BY e.id, c.code ORDER BY e.name;"""
-            cursor.execute(sql, {'class_ids': tuple(class_ids)})
+                WHERE e.class_code IN %(codes)s AND e.system_type ='source content'
+                GROUP BY e.id ORDER BY e.name;"""
         else:
             sql = EntityMapper.sql + """
-                WHERE e.class_id IN %(class_ids)s
-                GROUP BY e.id, c.code ORDER BY e.name;"""
-            cursor.execute(sql, {'class_ids': tuple(class_ids)})
+                WHERE e.class_code IN %(codes)s GROUP BY e.id ORDER BY e.name;"""
+        cursor.execute(sql, {'codes': tuple(openatlas.app.config['CLASS_CODES'][class_name])})
         openatlas.debug_model['by codes'] += 1
         entities = []
         for row in cursor.fetchall():
@@ -187,15 +163,14 @@ class EntityMapper(object):
 
     @staticmethod
     def get_overview_counts():
-        sub_select = 'SELECT COUNT(*) FROM model.entity e JOIN model.class c ON e.class_id = c.id'
         sql = """
             SELECT
-            ({sub_select} WHERE c.code = 'E33') AS source,
-            ({sub_select} WHERE c.code IN ('E6', 'E7', 'E8', 'E12')) AS event,
-            ({sub_select} WHERE c.code IN ('E21', 'E74', 'E40')) AS actor,
-            ({sub_select} WHERE c.code = 'E18') AS place,
-            COUNT(*) AS reference FROM model.entity e JOIN model.class c ON e.class_id = c.id
-                WHERE c.code IN ('E31', 'E84');""".format(sub_select=sub_select)
+            SUM(CASE WHEN class_code = 'E18' THEN 1 END) AS place,
+            SUM(CASE WHEN class_code = 'E33' THEN 1 END) AS source,
+            SUM(CASE WHEN class_code IN ('E31', 'E84') THEN 1 END) AS reference,
+            SUM(CASE WHEN class_code IN ('E21', 'E74', 'E40') THEN 1 END) AS actor,
+            SUM(CASE WHEN class_code IN ('E6', 'E7', 'E8', 'E12') THEN 1 END) AS event
+            FROM model.entity;"""
         cursor = openatlas.get_cursor()
         cursor.execute(sql)
         row = cursor.fetchone()
@@ -209,18 +184,14 @@ class EntityMapper(object):
         """
         Return ids for pager (first, previous, next, last) for entity and class codes arguments
         """
-        sql_where = " c.code IN ('{codes}')".format(codes="','".join(codes)) + " AND "
+        sql_where = " e.class_code IN ('{codes}')".format(codes="','".join(codes)) + " AND "
         sql_where += "e.system_type='source content'" if 'E33' in codes else "e.system_type IS NULL"
-        sql_prev = """
-            SELECT max(e.id) AS id FROM model.entity e
-            JOIN model.class c ON e.class_id = c.id WHERE e.id < %(id)s AND """ + sql_where
-        sql_next = """
-            SELECT min(e.id) AS id FROM model.entity e
-            JOIN model.class c ON e.class_id = c.id WHERE e.id > %(id)s AND """ + sql_where
+        sql_prev = "SELECT max(e.id) AS id FROM model.entity e WHERE e.id < %(id)s AND " + sql_where
+        sql_next = "SELECT min(e.id) AS id FROM model.entity e WHERE e.id > %(id)s AND " + sql_where
         sql = """
             SELECT min(e.id) AS first_id, max(e.id) AS last_id,
-            ({sql_next}) AS next_id, ({sql_prev}) AS previous_id
-            FROM model.entity e JOIN model.class c ON e.class_id = c.id WHERE """.format(
+                ({sql_next}) AS next_id, ({sql_prev}) AS previous_id
+            FROM model.entity e WHERE """.format(
                 sql_next=sql_next, sql_prev=sql_prev) + sql_where
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {'id': entity.id})

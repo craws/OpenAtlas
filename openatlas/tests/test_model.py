@@ -15,17 +15,14 @@ class ModelTests(TestBaseCase):
             assert b'Browse' in rv.data
             rv = self.app.get(url_for('class_index'))
             assert b'E1' in rv.data
-            rv = self.app.get(url_for('class_view', class_id=ClassMapper.get_by_code('E2').id))
+            rv = self.app.get(url_for('class_view', code='E2'))
             assert b'E2' in rv.data
             rv = self.app.get(url_for('property_index'))
             assert b'P1' in rv.data
             rv = self.app.get(
-                url_for('property_view', property_id=PropertyMapper.get_by_code('P68').id))
+                url_for('property_view', code='P68'))
             assert b'P68' in rv.data
-            form_data = {
-                'domain': ClassMapper.get_by_code('E1').id,
-                'range': ClassMapper.get_by_code('E1').id,
-                'property': PropertyMapper.get_by_code('P1').id}
+            form_data = {'domain': 'E1', 'range': 'E1', 'property': 'P1'}
             rv = self.app.post(url_for('model_index'), data=form_data)
             assert b'Wrong' in rv.data
             self.login()

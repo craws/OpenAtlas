@@ -86,8 +86,8 @@ def table_select_model(self, name, selected=None):
         'data': []}
     for id_ in entities:
         table['data'].append([
-            '<a onclick="selectFromTable(this, \'' + name + '\', ' + str(id_) + ')">' + entities[id_].code + '</a>',
-            '<a onclick="selectFromTable(this, \'' + name + '\', ' + str(id_) + ')">' + entities[id_].name + '</a>'])
+            '<a onclick="selectFromTable(this, \'' + name + '\', \'' + str(id_) + '\')">' + entities[id_].code + '</a>',
+            '<a onclick="selectFromTable(this, \'' + name + '\', \'' + str(id_) + '\')">' + entities[id_].name + '</a>'])
     value = selected.code + ' ' + selected.name if selected else ''
     html = """
         <input id="{name}-button" value="{value}" class="table-select" type="text"
@@ -151,7 +151,7 @@ def page_buttons(self, entity):
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def get_class_name(self, code):
-    return ClassMapper.get_by_code(code).name
+    return openatlas.classes[code].name
 
 
 @jinja2.contextfilter

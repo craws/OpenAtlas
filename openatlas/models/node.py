@@ -173,10 +173,10 @@ class NodeMapper(EntityMapper):
                     range_param = ast.literal_eval(field.data)
                 node = openatlas.nodes[int(field.id)]
                 if node.name in ['Administrative Unit', 'Historical Place']:
-                    if openatlas.classes[entity.class_.id].code == 'E53':
+                    if entity.class_.code == 'E53':
                         entity.link('P89', range_param)
                 else:
-                    if openatlas.classes[entity.class_.id].code != 'E53':
+                    if entity.class_.code != 'E53':
                         entity.link('P2', range_param)
 
     @staticmethod

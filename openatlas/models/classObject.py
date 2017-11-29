@@ -42,24 +42,17 @@ class ClassMapper(object):
         cursor.execute("SELECT id, code, name FROM model.class;")
         for row in cursor.fetchall():
             classes[row.code] = ClassObject(row)
-        cursor.execute("SELECT super_id, sub_id FROM model.class_inheritance;")
+        cursor.execute("SELECT super_code, sub_code FROM model.class_inheritance;")
         for row in cursor.fetchall():
-            classes[row.super_id].sub.append(row.sub_id)
-            classes[row.sub_id].super.append(row.super_id)
+            classes[row.super_code].sub.append(row.sub_code)
+            classes[row.sub_code].super.append(row.super_code)
         sql = """
-            SELECT text, language_code, table_field, table_id
-            FROM model.i18n
-            WHERE table_name = 'class' AND language_code IN %(language_codes)s;"""
+            SELECT class_code, language_code, attribute, text FROM model.class_i18n
+            WHERE language_code IN %(language_codes)s;"""
         cursor.execute(sql, {'language_codes': tuple(app.config['LANGUAGES'].keys())})
         for row in cursor.fetchall():
-            class_ = classes[row.table_id]
+            class_ = classes[row.class_code]
             if row.language_code not in class_.i18n:
                 class_.i18n[row.language_code] = {}
-            class_.i18n[row.language_code][row.table_field] = row.text
+            class_.i18n[row.language_code][row.attribute] = row.text
         return classes
-
-    @staticmethod
-    def get_by_code(code):
-        for id_, class_ in openatlas.classes.items():
-            if class_.code == code:
-                return class_

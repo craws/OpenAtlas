@@ -258,10 +258,10 @@ def link(entity):
         url = url_for('user_view', id_=entity.id)
         html = '<a ' + style + ' href="' + url + '">' + entity.username + '</a>'
     elif isinstance(entity, ClassObject):
-        url = url_for('class_view', class_id=entity.id)
+        url = url_for('class_view', code=entity.code)
         html = '<a href="' + url + '">' + entity.code + '</a>'
     elif isinstance(entity, Property):
-        url = url_for('property_view', property_id=entity.id)
+        url = url_for('property_view', code=entity.code)
         html = '<a href="' + url + '">' + entity.code + '</a>'
     elif isinstance(entity, Entity):
         url = ''
@@ -291,7 +291,7 @@ def link(entity):
 def truncate_string(string, length=40, span=True):
     """
     Returns a truncates string with '..' at the end if it was longer than length
-    Also adds a span title (for mouseover) with the original string if parameter "span" is True
+    Also adds a span title (for mouse over) with the original string if parameter "span" is True
     """
     if string is None:
         return ''  # pragma: no cover
@@ -383,7 +383,7 @@ def get_base_table_data(entity):
     name = openatlas.app.config['CODE_CLASS'][entity.class_.code]
     data = [link(entity)]
     if name in ['event', 'actor']:
-        data.append(openatlas.classes[entity.class_.id].name)
+        data.append(openatlas.classes[entity.class_.code].name)
     if name in ['reference']:
         data.append(uc_first(_(entity.system_type)))
     if name in ['event', 'place', 'source', 'reference']:

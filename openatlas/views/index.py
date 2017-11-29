@@ -37,7 +37,7 @@ def index():
             entity = EntityMapper.get_by_id(entity_id)
             tables['bookmarks']['data'].append([
                 link(entity),
-                openatlas.classes[entity.class_.id].name,
+                openatlas.classes[entity.class_.code].name,
                 entity.first,
                 entity.last,
                 bookmark_toggle(entity.id, True)])
