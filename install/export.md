@@ -10,7 +10,7 @@ add "CREATE EXTENSION postgis;" and uncomment after installation for unittests
 
 ### Model Data
 
-    pg_dump -a -n model openatlas > install/data_model.sql
+    pg_dump openatlas --inserts -a -t model.class -t model.class_i18n -t model.class_inheritance -t model.property -t model.property_i18n -t model.property_inheritance > data_model.sql 
 
 ### Web Schema
 

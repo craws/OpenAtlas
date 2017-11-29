@@ -180,6 +180,127 @@ ALTER TABLE IF EXISTS ONLY model.link_property DROP CONSTRAINT IF EXISTS link_pr
 ALTER TABLE model.link_property ALTER COLUMN property_id TYPE text;
 ALTER TABLE model.link_property RENAME property_id TO property_code;
 UPDATE model.link_property SET property_code = (SELECT code FROM model.property WHERE id = property_code::integer);
-ALTER TABLE ONLY model.link_property ADD CONSTRAINT link_property_domain_id_fkey FOREIGN KEY (domain_id) REFERENCES model.link(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY link_property ADD CONSTRAINT link_property_property_code_fkey FOREIGN KEY (property_code) REFERENCES property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE model.class_inheritance RENAME modfied TO modified;
+ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_id_fkey;
+ALTER TABLE model.class_inheritance ALTER COLUMN sub_id TYPE text;
+ALTER TABLE model.class_inheritance RENAME sub_id TO sub_code;
+UPDATE model.class_inheritance SET sub_code = (SELECT code FROM model.class WHERE id = sub_code::integer);
+ALTER TABLE ONLY class_inheritance ADD CONSTRAINT class_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_id_fkey;
+ALTER TABLE model.class_inheritance ALTER COLUMN super_id TYPE text;
+ALTER TABLE model.class_inheritance RENAME super_id TO super_code;
+UPDATE model.class_inheritance SET super_code = (SELECT code FROM model.class WHERE id = super_code::integer);
+ALTER TABLE ONLY class_inheritance ADD CONSTRAINT class_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_sub_id_fkey;
+ALTER TABLE model.property_inheritance ALTER COLUMN sub_id TYPE text;
+ALTER TABLE model.property_inheritance RENAME sub_id TO sub_code;
+UPDATE model.property_inheritance SET sub_code = (SELECT code FROM model.property WHERE id = sub_code::integer);
+ALTER TABLE ONLY property_inheritance ADD CONSTRAINT property_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_super_id_fkey;
+ALTER TABLE model.property_inheritance ALTER COLUMN super_id TYPE text;
+ALTER TABLE model.property_inheritance RENAME super_id TO super_code;
+UPDATE model.property_inheritance SET super_code = (SELECT code FROM model.property WHERE id = super_code::integer);
+ALTER TABLE ONLY property_inheritance ADD CONSTRAINT property_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_domain_class_id_fkey;
+ALTER TABLE model.property ALTER COLUMN domain_class_id TYPE text;
+ALTER TABLE model.property RENAME domain_class_id TO domain_class_code;
+UPDATE model.property SET domain_class_code = (SELECT code FROM model.class WHERE id = domain_class_code::integer);
+ALTER TABLE ONLY property ADD CONSTRAINT property_domain_class_code_fkey FOREIGN KEY (domain_class_code) REFERENCES class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_range_class_id_fkey;
+ALTER TABLE model.property ALTER COLUMN range_class_id TYPE text;
+ALTER TABLE model.property RENAME range_class_id TO range_class_code;
+UPDATE model.property SET range_class_code = (SELECT code FROM model.class WHERE id = range_class_code::integer);
+ALTER TABLE ONLY property ADD CONSTRAINT property_range_class_code_fkey FOREIGN KEY (range_class_code) REFERENCES class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE model.i18n ALTER COLUMN range_class_id TYPE text;
+ALTER TABLE model.property RENAME range_class_id TO range_class_code;
+UPDATE model.property SET range_class_code = (SELECT code FROM model.class WHERE id = range_class_code::integer);
+
+
+-- Split i18n table for classes and properties, use code as foreign key
+SET search_path = model, pg_catalog;
+
+CREATE TABLE class_i18n (
+    id integer NOT NULL,
+    class_code text NOT NULL,
+    language_code text NOT NULL,
+    attribute text NOT NULL,
+    text text NOT NULL,
+    created timestamp without time zone DEFAULT now() NOT NULL,
+    modified time without time zone
+);
+ALTER TABLE class_i18n OWNER TO openatlas;
+
+CREATE SEQUENCE class_i18n_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER TABLE class_i18n_id_seq OWNER TO openatlas;
+ALTER SEQUENCE class_i18n_id_seq OWNED BY class_i18n.id;
+ALTER TABLE ONLY class_i18n ALTER COLUMN id SET DEFAULT nextval('class_i18n_id_seq'::regclass);
+ALTER TABLE ONLY class_i18n ADD CONSTRAINT class_i18n_class_code_language_code_attribute_key UNIQUE (class_code, language_code, attribute);
+ALTER TABLE ONLY class_i18n ADD CONSTRAINT class_i18n_pkey PRIMARY KEY (id);
+CREATE TRIGGER update_modified BEFORE UPDATE ON class_i18n FOR EACH ROW EXECUTE PROCEDURE update_modified();
+ALTER TABLE ONLY class_i18n ADD CONSTRAINT class_i18n_class_code_fkey FOREIGN KEY (class_code) REFERENCES class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+CREATE TABLE property_i18n (
+    id integer NOT NULL,
+    property_code text NOT NULL,
+    language_code text NOT NULL,
+    attribute text NOT NULL,
+    text text NOT NULL,
+    created timestamp without time zone DEFAULT now() NOT NULL,
+    modified timestamp without time zone
+);
+ALTER TABLE property_i18n OWNER TO blade;
+
+CREATE SEQUENCE property_i18n_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER TABLE property_i18n_id_seq OWNER TO blade;
+ALTER SEQUENCE property_i18n_id_seq OWNED BY property_i18n.id;
+ALTER TABLE ONLY property_i18n ALTER COLUMN id SET DEFAULT nextval('property_i18n_id_seq'::regclass);
+ALTER TABLE ONLY property_i18n ADD CONSTRAINT property_i18n_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY property_i18n ADD CONSTRAINT property_i18n_property_code_language_code_attribute_key UNIQUE (property_code, language_code, attribute);
+CREATE TRIGGER update_modified BEFORE UPDATE ON property_i18n FOR EACH ROW EXECUTE PROCEDURE update_modified();
+ALTER TABLE ONLY property_i18n ADD CONSTRAINT property_i18n_property_code_fkey FOREIGN KEY (property_code) REFERENCES property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+INSERT INTO model.class_i18n (class_code, language_code, attribute, text)
+    SELECT c.code, i.language_code, i.table_field, i.text FROM model.i18n i JOIN model.class c ON i.table_id = c.id AND i.table_name = 'class';
+
+INSERT INTO model.property_i18n (property_code, language_code, attribute, text)
+    SELECT p.code, i.language_code, i.table_field, i.text FROM model.i18n i JOIN model.property p ON i.table_id = p.id AND i.table_name = 'property';
+
+DROP TABLE i18n;
+
+-- Update trigger functions
+DROP TRIGGER IF EXISTS on_delete_link ON model.link;
+DROP TRIGGER IF EXISTS on_delete_link_property ON model.link_property;
+DROP FUNCTION IF EXISTS model.delete_dates();
+CREATE FUNCTION model.delete_dates() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+        BEGIN
+            DELETE FROM model.entity WHERE id = OLD.range_id AND class_code = 'E61';
+            RETURN OLD;
+        END;
+    $$;
+ALTER FUNCTION model.delete_dates() OWNER TO openatlas;
+CREATE TRIGGER on_delete_link AFTER DELETE ON model.link FOR EACH ROW EXECUTE PROCEDURE model.delete_dates();
+CREATE TRIGGER on_delete_link_property AFTER DELETE ON model.link_property FOR EACH ROW EXECUTE PROCEDURE model.delete_dates();
 
 COMMIT;

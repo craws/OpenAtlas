@@ -14,8 +14,8 @@ SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET row_security = off;
 
---- Uncomment below for first install, it's important that this statement is above setting search_path
---- CREATE EXTENSION postgis;
+-- Uncomment below for first install, it's important that this statement is above setting search_path
+-- CREATE EXTENSION postgis;
 
 SET search_path = web, pg_catalog;
 
@@ -28,10 +28,11 @@ ALTER TABLE IF EXISTS ONLY web.hierarchy_form DROP CONSTRAINT IF EXISTS hierarch
 ALTER TABLE IF EXISTS ONLY web.hierarchy_form DROP CONSTRAINT IF EXISTS hierarchy_form_form_id_fkey;
 SET search_path = model, pg_catalog;
 
-ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_range_class_id_fkey;
-ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_super_id_fkey;
-ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_sub_id_fkey;
-ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_domain_class_id_fkey;
+ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_range_class_code_fkey;
+ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_super_code_fkey;
+ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_sub_code_fkey;
+ALTER TABLE IF EXISTS ONLY model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property_code_fkey;
+ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_domain_class_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_range_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.link_property DROP CONSTRAINT IF EXISTS link_property_range_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.link_property DROP CONSTRAINT IF EXISTS link_property_property_code_fkey;
@@ -39,8 +40,9 @@ ALTER TABLE IF EXISTS ONLY model.link_property DROP CONSTRAINT IF EXISTS link_pr
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_property_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_domain_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_class_code_fkey;
-ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_id_fkey;
-ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_id_fkey;
+ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
+ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_code_fkey;
+ALTER TABLE IF EXISTS ONLY model.class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_fkey;
 SET search_path = log, pg_catalog;
 
 ALTER TABLE IF EXISTS ONLY log.detail DROP CONSTRAINT IF EXISTS detail_log_id_fkey;
@@ -61,12 +63,13 @@ DROP TRIGGER IF EXISTS update_modified ON web."group";
 DROP TRIGGER IF EXISTS update_modified ON web."user";
 SET search_path = model, pg_catalog;
 
+DROP TRIGGER IF EXISTS update_modified ON model.property_i18n;
+DROP TRIGGER IF EXISTS update_modified ON model.class_i18n;
 DROP TRIGGER IF EXISTS update_modified ON model.link_property;
 DROP TRIGGER IF EXISTS update_modified ON model.property_inheritance;
 DROP TRIGGER IF EXISTS update_modified ON model.link;
 DROP TRIGGER IF EXISTS update_modified ON model.entity;
 DROP TRIGGER IF EXISTS update_modified ON model.property;
-DROP TRIGGER IF EXISTS update_modified ON model.i18n;
 DROP TRIGGER IF EXISTS update_modified ON model.class_inheritance;
 DROP TRIGGER IF EXISTS update_modified ON model.class;
 DROP TRIGGER IF EXISTS on_delete_link_property ON model.link_property;
@@ -101,16 +104,18 @@ SET search_path = model, pg_catalog;
 
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_pkey;
 ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_pkey;
+ALTER TABLE IF EXISTS ONLY model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property_code_language_code_attribute_key;
+ALTER TABLE IF EXISTS ONLY model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_pkey;
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_code_key;
 ALTER TABLE IF EXISTS ONLY model.link_property DROP CONSTRAINT IF EXISTS link_property_pkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_pkey;
-ALTER TABLE IF EXISTS ONLY model.i18n DROP CONSTRAINT IF EXISTS i18n_table_name_table_field_table_id_language_code_key;
-ALTER TABLE IF EXISTS ONLY model.i18n DROP CONSTRAINT IF EXISTS i18n_pkey;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_pkey;
 ALTER TABLE IF EXISTS ONLY model.class DROP CONSTRAINT IF EXISTS class_pkey;
 ALTER TABLE IF EXISTS ONLY model.class DROP CONSTRAINT IF EXISTS class_name_key;
 ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_id_sub_id_key;
 ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_pkey;
+ALTER TABLE IF EXISTS ONLY model.class_i18n DROP CONSTRAINT IF EXISTS class_i18n_pkey;
+ALTER TABLE IF EXISTS ONLY model.class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_language_code_attribute_key;
 ALTER TABLE IF EXISTS ONLY model.class DROP CONSTRAINT IF EXISTS class_code_key;
 SET search_path = log, pg_catalog;
 
@@ -136,12 +141,13 @@ ALTER TABLE IF EXISTS web.form ALTER COLUMN id DROP DEFAULT;
 SET search_path = model, pg_catalog;
 
 ALTER TABLE IF EXISTS model.property_inheritance ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS model.property_i18n ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.property ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.link_property ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.link ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS model.i18n ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.entity ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.class_inheritance ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS model.class_i18n ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.class ALTER COLUMN id DROP DEFAULT;
 SET search_path = log, pg_catalog;
 
@@ -179,18 +185,20 @@ SET search_path = model, pg_catalog;
 DROP SEQUENCE IF EXISTS model.property_inheritance_id_seq;
 DROP TABLE IF EXISTS model.property_inheritance;
 DROP SEQUENCE IF EXISTS model.property_id_seq;
+DROP SEQUENCE IF EXISTS model.property_i18n_id_seq;
+DROP TABLE IF EXISTS model.property_i18n;
 DROP TABLE IF EXISTS model.property;
 DROP SEQUENCE IF EXISTS model.link_property_id_seq;
 DROP TABLE IF EXISTS model.link_property;
 DROP SEQUENCE IF EXISTS model.link_id_seq;
 DROP TABLE IF EXISTS model.link;
-DROP SEQUENCE IF EXISTS model.i18n_id_seq;
-DROP TABLE IF EXISTS model.i18n;
 DROP SEQUENCE IF EXISTS model.entity_id_seq;
 DROP TABLE IF EXISTS model.entity;
 DROP SEQUENCE IF EXISTS model.class_inheritance_id_seq;
 DROP TABLE IF EXISTS model.class_inheritance;
 DROP SEQUENCE IF EXISTS model.class_id_seq;
+DROP SEQUENCE IF EXISTS model.class_i18n_id_seq;
+DROP TABLE IF EXISTS model.class_i18n;
 DROP TABLE IF EXISTS model.class;
 SET search_path = log, pg_catalog;
 
@@ -260,7 +268,7 @@ CREATE FUNCTION delete_dates() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
         BEGIN
-            DELETE FROM model.entity WHERE id = OLD.range_id AND class_id = (SELECT id FROM model.class WHERE code = 'E61');
+            DELETE FROM model.entity WHERE id = OLD.range_id AND class_code = 'E61';
             RETURN OLD;
         END;
     $$;
@@ -519,6 +527,44 @@ COMMENT ON COLUMN class.name IS 'e.g. Person';
 
 
 --
+-- Name: class_i18n; Type: TABLE; Schema: model; Owner: openatlas
+--
+
+CREATE TABLE class_i18n (
+    id integer NOT NULL,
+    class_code text NOT NULL,
+    language_code text NOT NULL,
+    attribute text NOT NULL,
+    text text NOT NULL,
+    created timestamp without time zone DEFAULT now() NOT NULL,
+    modified time without time zone
+);
+
+
+ALTER TABLE class_i18n OWNER TO openatlas;
+
+--
+-- Name: class_i18n_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
+--
+
+CREATE SEQUENCE class_i18n_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE class_i18n_id_seq OWNER TO openatlas;
+
+--
+-- Name: class_i18n_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
+--
+
+ALTER SEQUENCE class_i18n_id_seq OWNED BY class_i18n.id;
+
+
+--
 -- Name: class_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
 --
 
@@ -545,10 +591,10 @@ ALTER SEQUENCE class_id_seq OWNED BY class.id;
 
 CREATE TABLE class_inheritance (
     id integer NOT NULL,
-    super_id integer NOT NULL,
-    sub_id integer NOT NULL,
+    super_code text NOT NULL,
+    sub_code text NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modfied timestamp without time zone
+    modified timestamp without time zone
 );
 
 
@@ -613,45 +659,6 @@ ALTER TABLE entity_id_seq OWNER TO openatlas;
 --
 
 ALTER SEQUENCE entity_id_seq OWNED BY entity.id;
-
-
---
--- Name: i18n; Type: TABLE; Schema: model; Owner: openatlas
---
-
-CREATE TABLE i18n (
-    id integer NOT NULL,
-    table_name text NOT NULL,
-    table_field text NOT NULL,
-    table_id integer NOT NULL,
-    language_code text NOT NULL,
-    text text NOT NULL,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
-);
-
-
-ALTER TABLE i18n OWNER TO openatlas;
-
---
--- Name: i18n_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
---
-
-CREATE SEQUENCE i18n_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE i18n_id_seq OWNER TO openatlas;
-
---
--- Name: i18n_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
---
-
-ALTER SEQUENCE i18n_id_seq OWNED BY i18n.id;
 
 
 --
@@ -737,8 +744,8 @@ ALTER SEQUENCE link_property_id_seq OWNED BY link_property.id;
 CREATE TABLE property (
     id integer NOT NULL,
     code text NOT NULL,
-    range_class_id integer NOT NULL,
-    domain_class_id integer NOT NULL,
+    range_class_code text NOT NULL,
+    domain_class_code text NOT NULL,
     name text NOT NULL,
     name_inverse text,
     created timestamp without time zone DEFAULT now() NOT NULL,
@@ -747,6 +754,44 @@ CREATE TABLE property (
 
 
 ALTER TABLE property OWNER TO openatlas;
+
+--
+-- Name: property_i18n; Type: TABLE; Schema: model; Owner: openatlas
+--
+
+CREATE TABLE property_i18n (
+    id integer NOT NULL,
+    property_code text NOT NULL,
+    language_code text NOT NULL,
+    attribute text NOT NULL,
+    text text NOT NULL,
+    created timestamp without time zone DEFAULT now() NOT NULL,
+    modified timestamp without time zone
+);
+
+
+ALTER TABLE property_i18n OWNER TO openatlas;
+
+--
+-- Name: property_i18n_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
+--
+
+CREATE SEQUENCE property_i18n_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE property_i18n_id_seq OWNER TO openatlas;
+
+--
+-- Name: property_i18n_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
+--
+
+ALTER SEQUENCE property_i18n_id_seq OWNED BY property_i18n.id;
+
 
 --
 -- Name: property_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
@@ -777,8 +822,8 @@ SET default_with_oids = true;
 
 CREATE TABLE property_inheritance (
     id integer NOT NULL,
-    super_id integer NOT NULL,
-    sub_id integer NOT NULL,
+    super_code text NOT NULL,
+    sub_code text NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone
 );
@@ -1247,6 +1292,13 @@ ALTER TABLE ONLY class ALTER COLUMN id SET DEFAULT nextval('class_id_seq'::regcl
 
 
 --
+-- Name: class_i18n id; Type: DEFAULT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY class_i18n ALTER COLUMN id SET DEFAULT nextval('class_i18n_id_seq'::regclass);
+
+
+--
 -- Name: class_inheritance id; Type: DEFAULT; Schema: model; Owner: openatlas
 --
 
@@ -1258,13 +1310,6 @@ ALTER TABLE ONLY class_inheritance ALTER COLUMN id SET DEFAULT nextval('class_in
 --
 
 ALTER TABLE ONLY entity ALTER COLUMN id SET DEFAULT nextval('entity_id_seq'::regclass);
-
-
---
--- Name: i18n id; Type: DEFAULT; Schema: model; Owner: openatlas
---
-
-ALTER TABLE ONLY i18n ALTER COLUMN id SET DEFAULT nextval('i18n_id_seq'::regclass);
 
 
 --
@@ -1286,6 +1331,13 @@ ALTER TABLE ONLY link_property ALTER COLUMN id SET DEFAULT nextval('link_propert
 --
 
 ALTER TABLE ONLY property ALTER COLUMN id SET DEFAULT nextval('property_id_seq'::regclass);
+
+
+--
+-- Name: property_i18n id; Type: DEFAULT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY property_i18n ALTER COLUMN id SET DEFAULT nextval('property_i18n_id_seq'::regclass);
 
 
 --
@@ -1422,6 +1474,22 @@ ALTER TABLE ONLY class
 
 
 --
+-- Name: class_i18n class_i18n_class_code_language_code_attribute_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY class_i18n
+    ADD CONSTRAINT class_i18n_class_code_language_code_attribute_key UNIQUE (class_code, language_code, attribute);
+
+
+--
+-- Name: class_i18n class_i18n_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY class_i18n
+    ADD CONSTRAINT class_i18n_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: class_inheritance class_inheritance_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
@@ -1434,7 +1502,7 @@ ALTER TABLE ONLY class_inheritance
 --
 
 ALTER TABLE ONLY class_inheritance
-    ADD CONSTRAINT class_inheritance_super_id_sub_id_key UNIQUE (super_id, sub_id);
+    ADD CONSTRAINT class_inheritance_super_id_sub_id_key UNIQUE (super_code, sub_code);
 
 
 --
@@ -1462,22 +1530,6 @@ ALTER TABLE ONLY entity
 
 
 --
--- Name: i18n i18n_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
---
-
-ALTER TABLE ONLY i18n
-    ADD CONSTRAINT i18n_pkey PRIMARY KEY (id);
-
-
---
--- Name: i18n i18n_table_name_table_field_table_id_language_code_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
---
-
-ALTER TABLE ONLY i18n
-    ADD CONSTRAINT i18n_table_name_table_field_table_id_language_code_key UNIQUE (table_name, table_field, table_id, language_code);
-
-
---
 -- Name: link link_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
@@ -1499,6 +1551,22 @@ ALTER TABLE ONLY link_property
 
 ALTER TABLE ONLY property
     ADD CONSTRAINT property_code_key UNIQUE (code);
+
+
+--
+-- Name: property_i18n property_i18n_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY property_i18n
+    ADD CONSTRAINT property_i18n_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: property_i18n property_i18n_property_code_language_code_attribute_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY property_i18n
+    ADD CONSTRAINT property_i18n_property_code_language_code_attribute_key UNIQUE (property_code, language_code, attribute);
 
 
 --
@@ -1725,13 +1793,6 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON class_inheritance FOR EACH ROW E
 
 
 --
--- Name: i18n update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON i18n FOR EACH ROW EXECUTE PROCEDURE update_modified();
-
-
---
 -- Name: property update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
@@ -1764,6 +1825,20 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON property_inheritance FOR EACH RO
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON link_property FOR EACH ROW EXECUTE PROCEDURE update_modified();
+
+
+--
+-- Name: class_i18n update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON class_i18n FOR EACH ROW EXECUTE PROCEDURE update_modified();
+
+
+--
+-- Name: property_i18n update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON property_i18n FOR EACH ROW EXECUTE PROCEDURE update_modified();
 
 
 SET search_path = web, pg_catalog;
@@ -1863,19 +1938,27 @@ ALTER TABLE ONLY detail
 SET search_path = model, pg_catalog;
 
 --
--- Name: class_inheritance class_inheritance_sub_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: class_i18n class_i18n_class_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY class_i18n
+    ADD CONSTRAINT class_i18n_class_code_fkey FOREIGN KEY (class_code) REFERENCES class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: class_inheritance class_inheritance_sub_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY class_inheritance
-    ADD CONSTRAINT class_inheritance_sub_id_fkey FOREIGN KEY (sub_id) REFERENCES class(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT class_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES class(code) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
--- Name: class_inheritance class_inheritance_super_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: class_inheritance class_inheritance_super_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY class_inheritance
-    ADD CONSTRAINT class_inheritance_super_id_fkey FOREIGN KEY (super_id) REFERENCES class(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT class_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES class(code) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
@@ -1935,35 +2018,43 @@ ALTER TABLE ONLY link
 
 
 --
--- Name: property property_domain_class_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: property property_domain_class_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY property
-    ADD CONSTRAINT property_domain_class_id_fkey FOREIGN KEY (domain_class_id) REFERENCES class(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT property_domain_class_code_fkey FOREIGN KEY (domain_class_code) REFERENCES class(code) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
--- Name: property_inheritance property_inheritance_sub_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: property_i18n property_i18n_property_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY property_i18n
+    ADD CONSTRAINT property_i18n_property_code_fkey FOREIGN KEY (property_code) REFERENCES property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: property_inheritance property_inheritance_sub_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY property_inheritance
-    ADD CONSTRAINT property_inheritance_sub_id_fkey FOREIGN KEY (sub_id) REFERENCES property(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT property_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES property(code) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
--- Name: property_inheritance property_inheritance_super_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: property_inheritance property_inheritance_super_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY property_inheritance
-    ADD CONSTRAINT property_inheritance_super_id_fkey FOREIGN KEY (super_id) REFERENCES property(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT property_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES property(code) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
--- Name: property property_range_class_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: property property_range_class_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY property
-    ADD CONSTRAINT property_range_class_id_fkey FOREIGN KEY (range_class_id) REFERENCES class(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT property_range_class_code_fkey FOREIGN KEY (range_class_code) REFERENCES class(code) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 SET search_path = web, pg_catalog;
