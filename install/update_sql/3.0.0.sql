@@ -164,69 +164,64 @@ UPDATE model.entity SET name = 'Sex', description = 'Categories for sex like fem
 UPDATE web.hierarchy SET name = 'Sex', system = False WHERE name = 'Gender';
 
 -- Change foreign keys at entity/class and links/property from id to code
-ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_class_id_fkey;
-ALTER TABLE model.entity ALTER COLUMN class_id TYPE text;
-ALTER TABLE model.entity RENAME class_id TO class_code;
-UPDATE model.entity SET class_code = (SELECT code FROM model.class WHERE id = class_code::integer);
-ALTER TABLE ONLY model.entity ADD CONSTRAINT entity_class_code_fkey FOREIGN KEY (class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
-
-ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_property_id_fkey;
-ALTER TABLE model.link ALTER COLUMN property_id TYPE text;
-ALTER TABLE model.link RENAME property_id TO property_code;
-UPDATE model.link SET property_code = (SELECT code FROM model.property WHERE id = property_code::integer);
-ALTER TABLE ONLY model.link ADD CONSTRAINT link_property_code_fkey FOREIGN KEY (property_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
-
-ALTER TABLE IF EXISTS ONLY model.link_property DROP CONSTRAINT IF EXISTS link_property_property_id_fkey;
-ALTER TABLE model.link_property ALTER COLUMN property_id TYPE text;
-ALTER TABLE model.link_property RENAME property_id TO property_code;
-UPDATE model.link_property SET property_code = (SELECT code FROM model.property WHERE id = property_code::integer);
-ALTER TABLE ONLY link_property ADD CONSTRAINT link_property_property_code_fkey FOREIGN KEY (property_code) REFERENCES property(code) ON UPDATE CASCADE ON DELETE CASCADE;
-
-ALTER TABLE model.class_inheritance RENAME modfied TO modified;
-ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_id_fkey;
-ALTER TABLE model.class_inheritance ALTER COLUMN sub_id TYPE text;
-ALTER TABLE model.class_inheritance RENAME sub_id TO sub_code;
-UPDATE model.class_inheritance SET sub_code = (SELECT code FROM model.class WHERE id = sub_code::integer);
-ALTER TABLE ONLY class_inheritance ADD CONSTRAINT class_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES class(code) ON UPDATE CASCADE ON DELETE CASCADE;
-
-ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_id_fkey;
-ALTER TABLE model.class_inheritance ALTER COLUMN super_id TYPE text;
-ALTER TABLE model.class_inheritance RENAME super_id TO super_code;
-UPDATE model.class_inheritance SET super_code = (SELECT code FROM model.class WHERE id = super_code::integer);
-ALTER TABLE ONLY class_inheritance ADD CONSTRAINT class_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES class(code) ON UPDATE CASCADE ON DELETE CASCADE;
-
-ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_sub_id_fkey;
-ALTER TABLE model.property_inheritance ALTER COLUMN sub_id TYPE text;
-ALTER TABLE model.property_inheritance RENAME sub_id TO sub_code;
-UPDATE model.property_inheritance SET sub_code = (SELECT code FROM model.property WHERE id = sub_code::integer);
-ALTER TABLE ONLY property_inheritance ADD CONSTRAINT property_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES property(code) ON UPDATE CASCADE ON DELETE CASCADE;
-
-ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_super_id_fkey;
-ALTER TABLE model.property_inheritance ALTER COLUMN super_id TYPE text;
-ALTER TABLE model.property_inheritance RENAME super_id TO super_code;
-UPDATE model.property_inheritance SET super_code = (SELECT code FROM model.property WHERE id = super_code::integer);
-ALTER TABLE ONLY property_inheritance ADD CONSTRAINT property_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES property(code) ON UPDATE CASCADE ON DELETE CASCADE;
-
-ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_domain_class_id_fkey;
-ALTER TABLE model.property ALTER COLUMN domain_class_id TYPE text;
-ALTER TABLE model.property RENAME domain_class_id TO domain_class_code;
-UPDATE model.property SET domain_class_code = (SELECT code FROM model.class WHERE id = domain_class_code::integer);
-ALTER TABLE ONLY property ADD CONSTRAINT property_domain_class_code_fkey FOREIGN KEY (domain_class_code) REFERENCES class(code) ON UPDATE CASCADE ON DELETE CASCADE;
-
-ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_range_class_id_fkey;
-ALTER TABLE model.property ALTER COLUMN range_class_id TYPE text;
-ALTER TABLE model.property RENAME range_class_id TO range_class_code;
-UPDATE model.property SET range_class_code = (SELECT code FROM model.class WHERE id = range_class_code::integer);
-ALTER TABLE ONLY property ADD CONSTRAINT property_range_class_code_fkey FOREIGN KEY (range_class_code) REFERENCES class(code) ON UPDATE CASCADE ON DELETE CASCADE;
-
-ALTER TABLE model.i18n ALTER COLUMN range_class_id TYPE text;
-ALTER TABLE model.property RENAME range_class_id TO range_class_code;
-UPDATE model.property SET range_class_code = (SELECT code FROM model.class WHERE id = range_class_code::integer);
-
-
--- Split i18n table for classes and properties, use code as foreign key
 SET search_path = model, pg_catalog;
 
+ALTER TABLE IF EXISTS ONLY entity DROP CONSTRAINT IF EXISTS entity_class_id_fkey;
+ALTER TABLE entity ALTER COLUMN class_id TYPE text;
+ALTER TABLE entity RENAME class_id TO class_code;
+UPDATE entity SET class_code = (SELECT code FROM class WHERE id = class_code::integer);
+ALTER TABLE ONLY entity ADD CONSTRAINT entity_class_code_fkey FOREIGN KEY (class_code) REFERENCES class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE IF EXISTS ONLY link DROP CONSTRAINT IF EXISTS link_property_id_fkey;
+ALTER TABLE link ALTER COLUMN property_id TYPE text;
+ALTER TABLE link RENAME property_id TO property_code;
+UPDATE link SET property_code = (SELECT code FROM property WHERE id = property_code::integer);
+ALTER TABLE ONLY link ADD CONSTRAINT link_property_code_fkey FOREIGN KEY (property_code) REFERENCES property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE IF EXISTS ONLY link_property DROP CONSTRAINT IF EXISTS link_property_property_id_fkey;
+ALTER TABLE link_property ALTER COLUMN property_id TYPE text;
+ALTER TABLE link_property RENAME property_id TO property_code;
+UPDATE link_property SET property_code = (SELECT code FROM property WHERE id = property_code::integer);
+ALTER TABLE ONLY link_property ADD CONSTRAINT link_property_property_code_fkey FOREIGN KEY (property_code) REFERENCES property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE class_inheritance RENAME modfied TO modified;
+ALTER TABLE IF EXISTS ONLY class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_id_fkey;
+ALTER TABLE class_inheritance ALTER COLUMN sub_id TYPE text;
+ALTER TABLE class_inheritance RENAME sub_id TO sub_code;
+UPDATE class_inheritance SET sub_code = (SELECT code FROM class WHERE id = sub_code::integer);
+ALTER TABLE ONLY class_inheritance ADD CONSTRAINT class_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE IF EXISTS ONLY class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_id_fkey;
+ALTER TABLE class_inheritance ALTER COLUMN super_id TYPE text;
+ALTER TABLE class_inheritance RENAME super_id TO super_code;
+UPDATE class_inheritance SET super_code = (SELECT code FROM class WHERE id = super_code::integer);
+ALTER TABLE ONLY class_inheritance ADD CONSTRAINT class_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE IF EXISTS ONLY property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_sub_id_fkey;
+ALTER TABLE property_inheritance ALTER COLUMN sub_id TYPE text;
+ALTER TABLE property_inheritance RENAME sub_id TO sub_code;
+UPDATE property_inheritance SET sub_code = (SELECT code FROM property WHERE id = sub_code::integer);
+ALTER TABLE ONLY property_inheritance ADD CONSTRAINT property_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE IF EXISTS ONLY property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_super_id_fkey;
+ALTER TABLE property_inheritance ALTER COLUMN super_id TYPE text;
+ALTER TABLE property_inheritance RENAME super_id TO super_code;
+UPDATE property_inheritance SET super_code = (SELECT code FROM property WHERE id = super_code::integer);
+ALTER TABLE ONLY property_inheritance ADD CONSTRAINT property_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE IF EXISTS ONLY property DROP CONSTRAINT IF EXISTS property_domain_class_id_fkey;
+ALTER TABLE property ALTER COLUMN domain_class_id TYPE text;
+ALTER TABLE property RENAME domain_class_id TO domain_class_code;
+UPDATE property SET domain_class_code = (SELECT code FROM class WHERE id = domain_class_code::integer);
+ALTER TABLE ONLY property ADD CONSTRAINT property_domain_class_code_fkey FOREIGN KEY (domain_class_code) REFERENCES class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+ALTER TABLE IF EXISTS ONLY property DROP CONSTRAINT IF EXISTS property_range_class_id_fkey;
+ALTER TABLE property ALTER COLUMN range_class_id TYPE text;
+ALTER TABLE property RENAME range_class_id TO range_class_code;
+UPDATE property SET range_class_code = (SELECT code FROM class WHERE id = range_class_code::integer);
+ALTER TABLE ONLY property ADD CONSTRAINT property_range_class_code_fkey FOREIGN KEY (range_class_code) REFERENCES class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+-- Split i18n table for classes and properties, use code as foreign key
 CREATE TABLE class_i18n (
     id integer NOT NULL,
     class_code text NOT NULL,
@@ -262,7 +257,7 @@ CREATE TABLE property_i18n (
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone
 );
-ALTER TABLE property_i18n OWNER TO blade;
+ALTER TABLE property_i18n OWNER TO openatlas;
 
 CREATE SEQUENCE property_i18n_id_seq
     START WITH 1
@@ -271,7 +266,7 @@ CREATE SEQUENCE property_i18n_id_seq
     NO MAXVALUE
     CACHE 1;
 
-ALTER TABLE property_i18n_id_seq OWNER TO blade;
+ALTER TABLE property_i18n_id_seq OWNER TO openatlas;
 ALTER SEQUENCE property_i18n_id_seq OWNED BY property_i18n.id;
 ALTER TABLE ONLY property_i18n ALTER COLUMN id SET DEFAULT nextval('property_i18n_id_seq'::regclass);
 ALTER TABLE ONLY property_i18n ADD CONSTRAINT property_i18n_pkey PRIMARY KEY (id);
@@ -279,11 +274,11 @@ ALTER TABLE ONLY property_i18n ADD CONSTRAINT property_i18n_property_code_langua
 CREATE TRIGGER update_modified BEFORE UPDATE ON property_i18n FOR EACH ROW EXECUTE PROCEDURE update_modified();
 ALTER TABLE ONLY property_i18n ADD CONSTRAINT property_i18n_property_code_fkey FOREIGN KEY (property_code) REFERENCES property(code) ON UPDATE CASCADE ON DELETE CASCADE;
 
-INSERT INTO model.class_i18n (class_code, language_code, attribute, text)
-    SELECT c.code, i.language_code, i.table_field, i.text FROM model.i18n i JOIN model.class c ON i.table_id = c.id AND i.table_name = 'class';
+INSERT INTO class_i18n (class_code, language_code, attribute, text)
+    SELECT c.code, i.language_code, i.table_field, i.text FROM i18n i JOIN class c ON i.table_id = c.id AND i.table_name = 'class';
 
-INSERT INTO model.property_i18n (property_code, language_code, attribute, text)
-    SELECT p.code, i.language_code, i.table_field, i.text FROM model.i18n i JOIN model.property p ON i.table_id = p.id AND i.table_name = 'property';
+INSERT INTO property_i18n (property_code, language_code, attribute, text)
+    SELECT p.code, i.language_code, i.table_field, i.text FROM i18n i JOIN property p ON i.table_id = p.id AND i.table_name = 'property';
 
 DROP TABLE i18n;
 
