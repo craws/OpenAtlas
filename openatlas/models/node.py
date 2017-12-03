@@ -50,10 +50,11 @@ class NodeMapper(EntityMapper):
             node.count_subs = 0
             node.subs = []
             node.root = [row.super_id] if row.super_id else []
+        NodeMapper.populate_subs(nodes)
         return nodes
 
     @staticmethod
-    def populate_subs():
+    def populate_subs(nodes):
         forms = {}
         cursor = openatlas.get_cursor()
         cursor.execute("SELECT id, name, extendable FROM web.form ORDER BY name ASC;")
@@ -65,16 +66,15 @@ class NodeMapper(EntityMapper):
                     SELECT f.id FROM web.form f JOIN web.hierarchy_form hf ON f.id = hf.form_id
                     AND hf.hierarchy_id = h.id)) AS form_ids
             FROM web.hierarchy h;"""
-        cursor = openatlas.get_cursor()
         cursor.execute(sql)
         hierarchies = {}
         for row in cursor.fetchall():
             hierarchies[row.id] = row
-        for id_, node in openatlas.nodes.items():
+        for id_, node in nodes.items():
             if node.root:
-                super_ = openatlas.nodes[node.root[0]]
+                super_ = nodes[node.root[0]]
                 super_.subs.append(id_)
-                node.root = NodeMapper.get_root_path(node, node.root[0], node.root)
+                node.root = NodeMapper.get_root_path(nodes, node, node.root[0], node.root)
                 node.system = False
             else:
                 node.directional = hierarchies[node.id].directional
@@ -85,13 +85,13 @@ class NodeMapper(EntityMapper):
                     node.forms[form_id] = forms[form_id]
 
     @staticmethod
-    def get_root_path(node, super_id, root):
-        super_ = openatlas.nodes[super_id]
+    def get_root_path(nodes, node, super_id, root):
+        super_ = nodes[super_id]
         super_.count_subs += node.count
         if not super_.root:
             return root
         node.root.append(super_.root[0])
-        return NodeMapper.get_root_path(node, super_.root[0], root)
+        return NodeMapper.get_root_path(nodes, node, super_.root[0], root)
 
     @staticmethod
     def get_nodes(name):

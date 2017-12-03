@@ -91,7 +91,6 @@ def before_request():
     session['settings'] = SettingsMapper.get_settings()
     session['language'] = get_locale()
     openatlas.nodes = NodeMapper.get_all_nodes()
-    NodeMapper.populate_subs()
     debug_model['current'] = time.time()
     debug_model['by id'] = 0
     debug_model['by ids'] = 0
