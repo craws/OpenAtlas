@@ -82,7 +82,7 @@ def node_view(id_):
         entity = entity if node.class_.code == 'E55' else entity.get_linked_entity('P53', True)
         tables['entities']['data'].append([
             link(entity),
-            openatlas.classes[entity.class_.id].name,
+            openatlas.classes[entity.class_.code].name,
             truncate_string(entity.description)])
     tables['subs'] = {
         'name': 'subs',
