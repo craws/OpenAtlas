@@ -56,6 +56,7 @@ def build_node_form(form, node, request_origin=None):
     if not root.directional:
         del form_instance.name_inverse
 
+    # Todo: is deletion needed here?
     # Delete custom fields except the one specified for the form
     delete_list = []  # Can't delete fields in the loop so creating a list for later deletion
     for field in form_instance:
@@ -64,6 +65,7 @@ def build_node_form(form, node, request_origin=None):
     for item in delete_list:
         delattr(form_instance, item)
 
+    # Todo: is name parts and directional needed here?
     # Set field data if available and only if it's a GET request
     if node and request_origin and request_origin.method == 'GET':
         name_parts = node.name.split(' (')
