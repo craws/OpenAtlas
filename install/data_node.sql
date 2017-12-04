@@ -1,7 +1,5 @@
 SET search_path = model;
 
-INSERT INTO entity (class_code, name) VALUES ('E7', 'History of the World');
-
 -------------------------
 -- Information Carrier --
 -------------------------

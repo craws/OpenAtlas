@@ -22,9 +22,6 @@ SECRET_KEY = 'CHANGE ME'
 # Whitelisted domains are ignored by the link checker
 WHITELISTED_DOMAINS = ['E61']
 
-# This prevents editing/deleting the event root, only change it if you need to rename this entity
-EVENT_ROOT_NAME = 'History of the World'
-
 DEFAULT_TABLE_ROWS = OrderedDict()
 DEFAULT_TABLE_ROWS[10] = '10'
 DEFAULT_TABLE_ROWS[20] = '20'

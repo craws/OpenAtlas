@@ -2,7 +2,6 @@
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
 from openatlas.test_base import TestBaseCase
 
 
@@ -11,7 +10,6 @@ class EventTest(TestBaseCase):
     def test_event(self):
         with app.app_context():
             self.login()
-            root_event = EntityMapper.get_by_codes('event')[0]
             rv = self.app.get(url_for('event_insert', code='E7'))
             assert b'+ Activity' in rv.data
             form_data = {'name': 'Test event', 'description': 'Event description'}
@@ -35,15 +33,5 @@ class EventTest(TestBaseCase):
             assert b'Test event updated' in rv.data
             rv = self.app.get(url_for('involvement_insert', origin_id=event_id))
             assert b'+ Involvement' in rv.data
-            rv = self.app.post(
-                url_for('event_update', id_=root_event.id),
-                data=form_data,
-                follow_redirects=True)
-            assert b'Forbidden' in rv.data
-            rv = self.app.get(
-                url_for('event_delete', id_=root_event.id),
-                data=form_data,
-                follow_redirects=True)
-            assert b'Forbidden' in rv.data
             rv = self.app.get(url_for('event_delete', id_=event_id), follow_redirects=True)
             assert b'The entry has been deleted.' in rv.data

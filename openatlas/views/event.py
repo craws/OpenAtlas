@@ -44,7 +44,7 @@ def event_insert(code, origin_id=None):
     form = build_form(EventForm, 'Event')
     if origin:
         del form.insert_and_continue
-    if form.validate_on_submit() and form.name.data != app.config['EVENT_ROOT_NAME']:
+    if form.validate_on_submit():
         result = save(form, None, code, origin)
         flash(_('entity created'), 'info')
         if not isinstance(result, Entity):
@@ -61,9 +61,6 @@ def event_insert(code, origin_id=None):
 @app.route('/event/delete/<int:id_>')
 @required_group('editor')
 def event_delete(id_):
-    if EntityMapper.get_by_id(id_).name == app.config['EVENT_ROOT_NAME']:
-        flash(_('error forbidden'), 'error')
-        return redirect(url_for('event_index'))
     openatlas.get_cursor().execute('BEGIN')
     EntityMapper.delete(id_)
     openatlas.get_cursor().execute('COMMIT')
@@ -77,10 +74,7 @@ def event_update(id_):
     event = EntityMapper.get_by_id(id_)
     event.set_dates()
     form = build_form(EventForm, 'Event', event, request)
-    if event.name == app.config['EVENT_ROOT_NAME']:
-        flash(_('error forbidden'), 'error')
-        return redirect(url_for('event_index'))
-    if form.validate_on_submit() and form.name.data != app.config['EVENT_ROOT_NAME']:
+    if form.validate_on_submit():
         save(form, event)
         flash(_('info update'), 'info')
         return redirect(url_for('event_view', id_=id_))

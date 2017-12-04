@@ -38,8 +38,6 @@ class Network(object):
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {'classes': tuple(classes)})
         for row in cursor.fetchall():
-            if row.name == 'History of the World':
-                continue
             name = truncate_string(row.name.replace("'", "").replace('Location of ', ''), 40, False)
             if params['options']['orphans'] or row.id in entities:
                 entities_already.append(row.id)
