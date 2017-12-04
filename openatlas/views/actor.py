@@ -8,11 +8,10 @@ from wtforms.validators import InputRequired
 import openatlas
 from openatlas import app
 from openatlas.forms import DateForm, build_form
-from openatlas.models.entity import EntityMapper, Entity
+from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper, Link
 from openatlas.util.util import (truncate_string, required_group, append_node_data,
-                                 build_delete_link, build_remove_link, get_base_table_data,
-                                 uc_first)
+                                 build_remove_link, get_base_table_data, uc_first)
 
 
 class ActorForm(DateForm):
@@ -53,8 +52,7 @@ def actor_view(id_, unlink_id=None):
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
         data.append(build_remove_link(unlink_url, link_.domain.name))
         tables[name]['data'].append(data)
-    delete_link = build_delete_link(url_for('actor_delete', id_=actor.id), actor.name)
-    return render_template('actor/view.html', actor=actor, tables=tables, delete_link=delete_link)
+    return render_template('actor/view.html', actor=actor, tables=tables)
 
 
 @app.route('/actor')
@@ -83,12 +81,14 @@ def actor_insert(code, origin_id=None):
         flash(_('entity created'), 'info')
         if isinstance(result, Link):
             if result.property_code == 'P67':
-                return redirect(url_for('reference_link_update', link_id=result, origin_id=origin_id))
+                return redirect(
+                    url_for('reference_link_update', link_id=result, origin_id=origin_id))
         if form.continue_.data == 'yes':
             return redirect(url_for('actor_insert', code=code, origin_id=origin_id))
         if origin:
             if origin.class_.code in app.config['CLASS_CODES']['event']:
-                return redirect(url_for('involvement_insert', origin_id=origin_id, actor_id=result.id))
+                return redirect(
+                    url_for('involvement_insert', origin_id=origin_id, actor_id=result.id))
             view = app.config['CODE_CLASS'][origin.class_.code]
             return redirect(url_for(view + '_view', id_=origin.id) + '#tab-actor')
         return redirect(url_for('actor_view', id_=result.id))

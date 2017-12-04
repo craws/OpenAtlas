@@ -12,7 +12,7 @@ from openatlas.forms import build_form, TableField
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (uc_first, truncate_string, required_group, append_node_data,
-                                 build_delete_link, build_remove_link, get_base_table_data)
+                                 build_remove_link, get_base_table_data)
 
 
 class ReferenceForm(Form):
@@ -128,12 +128,7 @@ def reference_view(id_, unlink_id=None):
         data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
         data.append(build_remove_link(unlink_url, link_.range.name))
         tables[name]['data'].append(data)
-    delete_link = build_delete_link(url_for('reference_delete', id_=reference.id), reference.name)
-    return render_template(
-        'reference/view.html',
-        reference=reference,
-        tables=tables,
-        delete_link=delete_link)
+    return render_template('reference/view.html', reference=reference, tables=tables)
 
 
 @app.route('/reference')

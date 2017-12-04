@@ -11,8 +11,7 @@ from openatlas.forms import DateForm, build_form, TableField
 from openatlas.models.entity import EntityMapper, Entity
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (required_group, truncate_string, append_node_data,
-                                 build_delete_link, build_remove_link, get_base_table_data,
-                                 uc_first, link)
+                                 build_remove_link, get_base_table_data, uc_first, link)
 
 
 class EventForm(DateForm):
@@ -104,7 +103,7 @@ def event_view(id_, unlink_id=None):
             '<span class="inactive" style="float:right">' + str(event.last) + '</span>'
         unlink_url = url_for('event_view', id_=event.id, unlink_id=link_.id) + '#tab-actor'
         update_url = url_for('involvement_update', id_=link_.id, origin_id=event.id)
-        tables['actor']['data'].append ([
+        tables['actor']['data'].append([
             link(link_.range),
             openatlas.classes[link_.range.class_.code].name,
             link_.property.name_inverse,
@@ -139,13 +138,10 @@ def event_view(id_, unlink_id=None):
         'data': []}
     for sub_event in event.get_linked_entities('P117', True):
         tables['subs']['data'].append(get_base_table_data(sub_event))
-
-    delete_link = build_delete_link(url_for('event_delete', id_=event.id), event.name)
     return render_template(
         'event/view.html',
         event=event,
         super_event=event.get_linked_entity('P117'),
-        delete_link=delete_link,
         tables=tables)
 
 

@@ -17,7 +17,7 @@
                 <a href="{{ url_for('place_update', id_=object_.id) }}">
                     {{ _('edit')|uc_first }}
                 </a>
-                {{ delete_link|safe }}
+                {{ object_|build_delete_link|safe }}
             {% endif %}
             {{ object_.id|bookmark_toggle|safe }}
         </div>

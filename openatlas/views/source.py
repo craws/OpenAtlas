@@ -11,9 +11,8 @@ from openatlas import app
 from openatlas.forms import build_form
 from openatlas.models.entity import EntityMapper, Entity
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import (link, truncate_string, required_group, append_node_data,
-                                 build_table_form, build_remove_link, build_delete_link, uc_first,
-                                 get_base_table_data)
+from openatlas.util.util import (link, truncate_string, required_group, append_node_data, uc_first,
+                                 build_table_form, build_remove_link, get_base_table_data)
 
 
 class SourceForm(Form):
@@ -95,8 +94,7 @@ def source_view(id_, unlink_id=None):
         data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
         data.append(build_remove_link(unlink_url, link_.domain.name))
         tables['reference']['data'].append(data)
-    del_link = build_delete_link(url_for('source_delete', id_=source.id), source.name)
-    return render_template('source/view.html', source=source, tables=tables, delete_link=del_link)
+    return render_template('source/view.html', source=source, tables=tables)
 
 
 @app.route('/source/add/<int:origin_id>', methods=['POST', 'GET'])

@@ -1,22 +1,20 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
 
-from flask import flash, render_template, url_for, request
+from flask import flash, render_template, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
-from wtforms import HiddenField, StringField, SubmitField, TextAreaField, SelectField
+from wtforms import HiddenField, SubmitField, TextAreaField, SelectField
 from wtforms.validators import InputRequired
 
 import openatlas
-from openatlas import app, PropertyMapper
-from openatlas.forms import DateForm, build_form, TableMultiField, TreeField
+from openatlas import app
+from openatlas.forms import DateForm, TableMultiField, TreeField
 from openatlas.models.date import DateMapper
-from openatlas.models.entity import EntityMapper, Entity
+from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.models.linkProperty import LinkPropertyMapper
-from openatlas.util.util import (required_group, truncate_string, append_node_data,
-                                 build_delete_link, build_remove_link, get_base_table_data,
-                                 uc_first, link)
+from openatlas.util.util import required_group
 
 # Todo: insert and continue
 

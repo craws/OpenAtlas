@@ -11,8 +11,7 @@ from openatlas.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper, Entity
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (truncate_string, required_group, append_node_data,
-                                 build_delete_link, build_remove_link, get_base_table_data,
-                                 uc_first)
+                                 build_remove_link, get_base_table_data, uc_first)
 
 
 class PlaceForm(DateForm):
@@ -85,8 +84,7 @@ def place_view(id_, unlink_id=None):
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
         data.append(build_remove_link(unlink_url, link_.domain.name))
         tables[name]['data'].append(data)
-    del_link = build_delete_link(url_for('place_delete', id_=object_.id), object_.name)
-    return render_template('place/view.html', object_=object_, tables=tables, delete_link=del_link)
+    return render_template('place/view.html', object_=object_, tables=tables)
 
 
 @app.route('/place/delete/<int:id_>')
