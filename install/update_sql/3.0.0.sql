@@ -298,4 +298,7 @@ ALTER FUNCTION model.delete_dates() OWNER TO openatlas;
 CREATE TRIGGER on_delete_link AFTER DELETE ON model.link FOR EACH ROW EXECUTE PROCEDURE model.delete_dates();
 CREATE TRIGGER on_delete_link_property AFTER DELETE ON model.link_property FOR EACH ROW EXECUTE PROCEDURE model.delete_dates();
 
+-- Delete obsolete "History of the World" Event
+DELETE FROM model.entity WHERE id = (SELECT id from model.entity WHERE name = 'History of the World');
+
 COMMIT;
