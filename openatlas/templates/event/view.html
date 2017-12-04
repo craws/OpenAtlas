@@ -7,6 +7,9 @@
 <div id="tabs" class="tabs-container">
     <ul>
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
+        {% if tables['subs']['data']|length > 0 %}
+            <li><a href="#tab-subs">{{ _('sub events')|uc_first }} ({{ tables['subs']['data']|length }})</a></li>
+        {% endif %}
         <li><a href="#tab-source">{{ _('source')|uc_first }} ({{ tables['source']['data']|length }})</a></li>
         <li><a href="#tab-actor">{{ _('actor')|uc_first }} ({{ tables['actor']['data']|length }})</a></li>
         <li><a href="#tab-reference">{{ _('reference')|uc_first }} ({{ tables['reference']['data']|length }})</a></li>
@@ -21,9 +24,17 @@
             {{ event.id|bookmark_toggle|safe }}
         </div>
         <h1>{{ event.name }}</h1>
+        {% if super_event %}
+            {{ _('sub event of')|uc_first }}: {{ super_event|link|safe }}
+        {% endif %}
         {{ tables['info']|data_table|safe }}
         {{ event|description|safe }}
     </div>
+    {% if tables['subs']['data']|length > 0 %}
+        <div id="tab-subs">
+            {{ tables['subs']|pager|safe }}
+        </div>
+    {% endif %}
     <div id="tab-source">
         {% if 'editor'|is_authorized: %}
             <div class="button-bar">

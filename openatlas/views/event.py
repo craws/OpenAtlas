@@ -7,7 +7,7 @@ from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app
-from openatlas.forms import DateForm, build_form
+from openatlas.forms import DateForm, build_form, TableField
 from openatlas.models.entity import EntityMapper, Entity
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (required_group, truncate_string, append_node_data,
@@ -17,6 +17,7 @@ from openatlas.util.util import (required_group, truncate_string, append_node_da
 
 class EventForm(DateForm):
     name = StringField(_('name'), validators=[InputRequired()])
+    event = TableField(_('sub event of'))
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
@@ -138,8 +139,20 @@ def event_view(id_, unlink_id=None):
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
         data.append(build_remove_link(unlink_url, link_.domain.name))
         tables[name]['data'].append(data)
+    tables['subs'] = {
+        'name': 'sub-event',
+        'header': app.config['TABLE_HEADERS']['event'],
+        'data': []}
+    for sub_event in event.get_linked_entities('P117', True):
+        tables['subs']['data'].append(get_base_table_data(sub_event))
+
     delete_link = build_delete_link(url_for('event_delete', id_=event.id), event.name)
-    return render_template('event/view.html', event=event, delete_link=delete_link, tables=tables)
+    return render_template(
+        'event/view.html',
+        event=event,
+        super_event=event.get_linked_entity('P117'),
+        delete_link=delete_link,
+        tables=tables)
 
 
 def save(form, entity=None, code=None, origin=None):
@@ -150,6 +163,8 @@ def save(form, entity=None, code=None, origin=None):
     entity.update()
     entity.save_dates(form)
     entity.save_nodes(form)
+    if form.event.data:
+        entity.link('P117', form.event.data)
     link_ = None
     if origin:
         if origin.class_.code in app.config['CLASS_CODES']['reference']:
