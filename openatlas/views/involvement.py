@@ -31,9 +31,10 @@ class ActorForm(DateForm):
     continue_ = HiddenField()
 
 
+@app.route('/involvement/insert/<int:origin_id>/<int:actor_id>', methods=['POST', 'GET'])
 @app.route('/involvement/insert/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('editor')
-def involvement_insert(origin_id):
+def involvement_insert(origin_id, actor_id=None):
     origin = EntityMapper.get_by_id(origin_id)
     form = ActorForm()
     if origin.class_.code in ['E6', 'E7', 'E8', 'E12']:
@@ -53,6 +54,9 @@ def involvement_insert(origin_id):
             openatlas.get_cursor().execute('COMMIT')
             flash(_('entity created'), 'info')
             return redirect(url_for('event_view', id_=origin.id) + '#tab-actor')
+    if actor_id:
+        form.actor.data = [actor_id]
+        del form.insert_and_continue
     return render_template('involvement/insert.html', origin=origin, form=form)
 
 

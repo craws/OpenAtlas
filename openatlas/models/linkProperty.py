@@ -12,11 +12,8 @@ class LinkPropertyMapper(object):
         link_id = link.id if type(link) is Link else int(link)
         range_id = range_.id if type(range_) is openatlas.Entity else int(range_)
         sql = """
-            INSERT INTO model.link_property (property_id, domain_id, range_id)
-            VALUES (
-                (SELECT id FROM model.property WHERE code = %(property_code)s),
-                %(domain_id)s,
-                %(range_id)s);"""
+            INSERT INTO model.link_property (property_code, domain_id, range_id)
+            VALUES (%(property_code)s, %(domain_id)s, %(range_id)s);"""
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {
             'property_code': property_code,

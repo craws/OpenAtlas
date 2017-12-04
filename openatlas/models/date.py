@@ -34,19 +34,18 @@ class DateMapper(object):
     @staticmethod
     def get_link_dates(link):
         sql = """
-            SELECT e.value_timestamp, e.description, e.system_type, p.code
+            SELECT e.value_timestamp, e.description, e.system_type, lp.property_code
             FROM model.link_property lp
-            JOIN model.link l ON lp.domain_id = l.id
+            JOIN model.link l ON lp.domain_id = l.id AND lp.property_code IN ('OA5', 'OA6')
             JOIN model.entity e ON lp.range_id = e.id
-            JOIN model.property p ON lp.property_id = p.id AND p.code in ('OA5', 'OA6')
             WHERE l.id = %(id)s;"""
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {'id': link.id})
         dates = {}
         for row in cursor.fetchall():
-            if row.code not in dates:
-                dates[row.code] = {}
-            dates[row.code][row.system_type] = {
+            if row.property_code not in dates:
+                dates[row.property_code] = {}
+            dates[row.property_code][row.system_type] = {
                 'timestamp': row.value_timestamp,
                 'info': row.description if row.description else ''}
         openatlas.debug_model['div sql'] += 1

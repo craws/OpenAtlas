@@ -9,7 +9,7 @@ import openatlas
 from openatlas import app
 from openatlas.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper, Entity
-from openatlas.models.link import LinkMapper
+from openatlas.models.link import LinkMapper, Link
 from openatlas.util.util import (truncate_string, required_group, append_node_data,
                                  build_delete_link, build_remove_link, get_base_table_data,
                                  uc_first)
@@ -81,11 +81,14 @@ def actor_insert(code, origin_id=None):
     if form.validate_on_submit():
         result = save(form, None, code, origin)
         flash(_('entity created'), 'info')
-        if not isinstance(result, Entity):
-            return redirect(url_for('reference_link_update', link_id=result, origin_id=origin_id))
+        if isinstance(result, Link):
+            if result.property_code == 'P67':
+                return redirect(url_for('reference_link_update', link_id=result, origin_id=origin_id))
         if form.continue_.data == 'yes':
             return redirect(url_for('actor_insert', code=code, origin_id=origin_id))
         if origin:
+            if origin.class_.code in app.config['CLASS_CODES']['event']:
+                return redirect(url_for('involvement_insert', origin_id=origin_id, actor_id=result.id))
             view = app.config['CODE_CLASS'][origin.class_.code]
             return redirect(url_for(view + '_view', id_=origin.id) + '#tab-actor')
         return redirect(url_for('actor_view', id_=result.id))
@@ -128,7 +131,7 @@ def save(form, entity=None, code=None, origin=None):
     if origin:
         if origin.class_.code in app.config['CLASS_CODES']['reference']:
             link_ = origin.link('P67', entity)
-        else:
+        elif origin.class_.code in app.config['CLASS_CODES']['source']:
             origin.link('P67', entity)
     openatlas.get_cursor().execute('COMMIT')
     return link_ if link_ else entity

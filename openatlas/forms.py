@@ -221,7 +221,7 @@ class TableMultiSelect(HiddenInput):
         if field.data and isinstance(field.data, str):
             field.data = ast.literal_eval(field.data)
         selection = ''
-        # Todo: adapt sort list for different header amount
+        # Todo: adapt sort list for different header amount, show selected on top
         table = {
             'name': field.id,
             'header': openatlas.app.config['TABLE_HEADERS'][field.id] + [''],
@@ -244,10 +244,7 @@ class TableMultiSelect(HiddenInput):
             <script>
                 $(document).ready(function () {{createOverlay("{name}", "{name}", true);}});
             </script>
-            """.format(
-                name=field.id,
-                selection=selection,
-                pager=pager(table))
+            """.format(name=field.id, selection=selection, pager=pager(table))
         return super(TableMultiSelect, self).__call__(field, **kwargs) + html
 
 

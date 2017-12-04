@@ -73,7 +73,7 @@ def profile_index():
         return redirect(url_for('profile_index'))
 
     form.language.data = current_user.settings['language']
-    form.table_rows.data = str(current_user.settings['table_rows'])
+    form.table_rows.data = current_user.settings['table_rows']
     data['display'] = [
         (form.language.label, form.language),
         (form.table_rows.label, form.table_rows)]

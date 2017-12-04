@@ -321,6 +321,10 @@ def pager(table):
         table_rows = current_user.settings['table_rows']
     show_pager = False if len(table['data']) < table_rows else True
     if show_pager:
+        options = ''
+        for amount in openatlas.app.config['DEFAULT_TABLE_ROWS']:
+            options += '<option value="{amount}"{selected}>{amount}</option>'.format(
+                amount=amount, selected=' selected="selected"' if amount == table_rows else '')
         html += """
             <div id="{name}-pager" class="pager">
                 <div class="navigation first"></div>
@@ -330,18 +334,11 @@ def pager(table):
                 </div>
                 <div class="navigation next"></div>
                 <div class="navigation last"></div>
-                <div>
-                    <select class="pagesize">
-                        <option value="10">10</option>
-                        <option value="20" selected="selected">20</option>
-                        <option value="50">50</option>
-                        <option value="100">100</option>
-                    </select>
-                </div>
+                <div><select class="pagesize">{options}</select></div>
                 <input id="{name}-search" class="search" type="text" data-column="all"
                     placeholder="{filter}">
             </div>
-            """.format(name=table['name'], filter=uc_first(_('filter')))
+            """.format(name=table['name'], filter=uc_first(_('filter')), options=options)
     html += '<table id="{name}-table" class="tablesorter"><thead><tr>'.format(name=table['name'])
     for header in table['header']:
         style = '' if header else 'class=sorter-false '
