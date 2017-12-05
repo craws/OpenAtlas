@@ -113,11 +113,10 @@ def append_node_data(data, entity, entity2=None):
         if not node.root:
             continue
         root = openatlas.nodes[node.root[-1]]
-        if root.name in openatlas.app.config['BASE_TYPES']:
-            root.name = 'type'  # rename base type to "type"
+        name = 'type' if root.name in openatlas.app.config['BASE_TYPES'] else root.name
         if root.name not in type_data:
-            type_data[root.name] = []
-        type_data[root.name].append(node.name)
+            type_data[name] = []
+        type_data[name].append(node.name)
     type_data = OrderedDict(sorted(type_data.items(), key=lambda t: t[0]))  # sort by name
     if 'type' in type_data:  # move the base type to the top
         type_data.move_to_end('type', last=False)

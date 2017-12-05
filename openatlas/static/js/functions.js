@@ -121,7 +121,7 @@ function selectFromTable(element, table, id) {
 function selectFromTableMulti(name) {
     var checkedNames = '';
     var ids = [];
-    $(".multi-table-select").each(function () {
+    $("#" + name + "-table .multi-table-select").each(function () {
         if ($(this).is(':checked')) {
             checkedNames += $(this).val() + "<br />";
             ids.push($(this).attr('id'));

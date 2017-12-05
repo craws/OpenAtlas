@@ -82,8 +82,8 @@ class LinkMapper(object):
         return result
 
     @staticmethod
-    def get_linked_entity(entity, code, inverse=False):
-        result = LinkMapper.get_linked_entities(entity, code, inverse)
+    def get_linked_entity(entity_param, code, inverse=False):
+        result = LinkMapper.get_linked_entities(entity_param, code, inverse)
         if len(result) > 1:
             # Todo: log this error
             flash('alert multiple linked entities found', 'error')
@@ -102,7 +102,9 @@ class LinkMapper(object):
                 SELECT domain_id AS result_id FROM model.link
                 WHERE range_id = %(entity_id)s AND property_code IN %(codes)s;"""
         cursor = openatlas.get_cursor()
-        cursor.execute(sql, {'entity_id': entity.id, 'codes': tuple(codes)})
+        cursor.execute(sql, {
+            'entity_id': entity.id if isinstance(entity, openatlas.Entity) else int(entity),
+            'codes': tuple(codes)})
         openatlas.debug_model['div sql'] += 1
         ids = [element for (element,) in cursor.fetchall()]
         return openatlas.EntityMapper.get_by_ids(ids)
@@ -110,7 +112,7 @@ class LinkMapper(object):
     @staticmethod
     def get_links(entity, codes, inverse=False):
         codes = codes if isinstance(codes, list) else [codes]
-        entity_id = entity.id if type(entity) is openatlas.Entity else int(entity)
+        entity_id = entity.id if isinstance(entity, openatlas.Entity) else int(entity)
         first = 'range' if inverse else 'domain'
         second = 'domain' if inverse else 'range'
         sql = """

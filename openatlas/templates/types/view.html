@@ -9,25 +9,19 @@
 {% block content %}
 <div id="tabs" class="tabs-container">
     <ul>
-        <li>
-            <a href="#tab-info">{{ _('info')|uc_first }}</a>
-        </li>
+        <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
         {% if tables['subs'].data %}
-            <li>
-                <a href="#tab-subs">{{ _('subs')|uc_first }} ({{ tables['subs']['data']|length }})</a>
-            </li>
+            <li><a href="#tab-subs">{{ _('subs')|uc_first }} ({{ tables['subs']['data']|length }})</a></li>
         {% endif %}
         {% if tables['entities'].data %}
-            <li>
-                <a href="#tab-entities">{{ _('entities')|uc_first }} ({{ tables['entities']['data']|length }})</a>
-            </li>
+            <li><a href="#tab-entities">{{ _('entities')|uc_first }} ({{ tables['entities']['data']|length }})</a></li>
         {% endif %}
     </ul>
     <div id="tab-info">
         {% if 'editor'|is_authorized and node.root: %}
             <div class="button-bar">
                 <a href="{{ url_for('node_update', id_=node.id) }}">{{ _('edit')|uc_first }}</a>
-                {% if not node.system and node.count < 1 %}
+                {% if not node.system and node.count < 1 and not node.subs %}
                     <a onclick="return confirm('{{ _('delete')|uc_first }} {{ node.name.replace('\'', '') }}?')"
                        href="{{ url_for('node_delete', id_=node.id) }}">{{ _('delete')|uc_first }}</a>
                 {% endif %}

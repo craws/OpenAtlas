@@ -1,13 +1,16 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+import ast
+
 from flask import flash, render_template, url_for, request
 from flask_babel import lazy_gettext as _
+from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app
-from openatlas.forms import DateForm, build_form, TableField
+from openatlas.forms import DateForm, build_form, TableField, TableMultiField
 from openatlas.models.entity import EntityMapper, Entity
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (required_group, truncate_string, append_node_data,
@@ -17,10 +20,26 @@ from openatlas.util.util import (required_group, truncate_string, append_node_da
 class EventForm(DateForm):
     name = StringField(_('name'), validators=[InputRequired()])
     event = TableField(_('sub event of'))
+    place = TableField()
+    event_id = HiddenField()
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
+    # acquisition
+    recipient = TableMultiField()
+    donor = TableMultiField()
+    given_place = TableMultiField()
+
+    def validate(self, extra_validators=None):
+        """Check if selected super event is allowed"""
+        # Todo: also check if super is not a sub event of itself (recursively)
+        valid = Form.validate(self)
+        if self.event.data:
+            if str(self.event.data) == str(self.event_id.data):
+                self.event.errors.append(_('error node self as super'))
+                valid = False
+        return valid
 
 
 @app.route('/event')
@@ -41,6 +60,8 @@ def event_index():
 def event_insert(code, origin_id=None):
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(EventForm, 'Event')
+    if code != 'E8':
+        del form.recipient, form.donor, form.given_place
     if origin:
         del form.insert_and_continue
     if form.validate_on_submit():
@@ -73,10 +94,21 @@ def event_update(id_):
     event = EntityMapper.get_by_id(id_)
     event.set_dates()
     form = build_form(EventForm, 'Event', event, request)
+    if event.class_.code != 'E8':
+        del form.recipient, form.donor, form.given_place
+    form.event_id.data = event.id
     if form.validate_on_submit():
         save(form, event)
         flash(_('info update'), 'info')
         return redirect(url_for('event_view', id_=id_))
+    super_event = event.get_linked_entity('P117')
+    form.event.data = super_event.id if super_event else ''
+    place = event.get_linked_entity('P7')
+    form.place.data = place.get_linked_entity('P53', True).id if place else ''
+    if event.class_.code == 'E8':  # Form data for acquisition
+        form.recipient.data = [entity.id for entity in event.get_linked_entities('P22')]
+        form.donor.data = [entity.id for entity in event.get_linked_entities('P23')]
+        form.given_place.data = [entity.id for entity in event.get_linked_entities('P24')]
     return render_template('event/update.html', form=form, event=event)
 
 
@@ -120,6 +152,7 @@ def event_view(id_, unlink_id=None):
         'name': 'reference',
         'header': app.config['TABLE_HEADERS']['reference'] + ['pages', '', ''],
         'data': []}
+
     for link_ in event.get_links('P67', True):
         name = app.config['CODE_CLASS'][link_.domain.class_.code]
         unlink_url = url_for('event_view', id_=event.id, unlink_id=link_.id) + '#tab-' + name
@@ -138,28 +171,39 @@ def event_view(id_, unlink_id=None):
         'data': []}
     for sub_event in event.get_linked_entities('P117', True):
         tables['subs']['data'].append(get_base_table_data(sub_event))
+    place = event.get_linked_entity('P7')
     return render_template(
         'event/view.html',
         event=event,
         super_event=event.get_linked_entity('P117'),
+        place=place.get_linked_entity('P53', True) if place else None,
         tables=tables)
 
 
-def save(form, entity=None, code=None, origin=None):
+def save(form, event=None, code=None, origin=None):
     openatlas.get_cursor().execute('BEGIN')
-    entity = entity if entity else EntityMapper.insert(code, form.name.data)
-    entity.name = form.name.data
-    entity.description = form.description.data
-    entity.update()
-    entity.save_dates(form)
-    entity.save_nodes(form)
-    if form.event.data:
-        entity.link('P117', form.event.data)
+    if event:
+        LinkMapper.delete_by_codes(event, ['P117', 'P7', 'P22', 'P23', 'P24'])
+    else:
+        event = EntityMapper.insert(code, form.name.data)
+    event.name = form.name.data
+    event.description = form.description.data
+    event.update()
+    event.save_dates(form)
+    event.save_nodes(form)
+    event.link('P117', form.event.data)
+    if form.place.data:
+        place = LinkMapper.get_linked_entity(form.place.data, 'P53')
+        event.link('P7', place)
+    if event.class_.code == 'E8':  # Links for acquisition
+        event.link('P22', ast.literal_eval(form.recipient.data) if form.recipient.data else None)
+        event.link('P23', ast.literal_eval(form.donor.data) if form.donor.data else None)
+        event.link('P24', ast.literal_eval(form.given_place.data) if form.given_place.data else None)
     link_ = None
     if origin:
         if origin.class_.code in app.config['CLASS_CODES']['reference']:
-            link_ = origin.link('P67', entity)
+            link_ = origin.link('P67', event)
         else:
-            origin.link('P67', entity)
+            origin.link('P67', event)
     openatlas.get_cursor().execute('COMMIT')
-    return link_ if link_ else entity
+    return link_ if link_ else event

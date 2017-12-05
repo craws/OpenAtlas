@@ -39,8 +39,10 @@
                                     </form>
                                     {% if type_ == 'custom' and 'manager'|is_authorized %}
                                         <a href="{{ url_for('hierarchy_update', id_=node.id) }} ">{{ _('edit')|uc_first }}</a>
-                                        <a onclick="return confirm('{{ _('delete')|uc_first }} {{ node.name.replace('\'', '') }}?')"
-                                            href="{{ url_for('hierarchy_delete', id_=node.id) }} ">{{ _('delete')|uc_first }}</a>
+                                        {% if not node.system and node.count < 1 and not node.subs %}
+                                            <a onclick="return confirm('{{ _('delete')|uc_first }} {{ node.name.replace('\'', '') }}?')"
+                                                href="{{ url_for('hierarchy_delete', id_=node.id) }} ">{{ _('delete')|uc_first }}</a>
+                                        {% endif %}
                                     {% endif %}
                                 </div>
                                 <div style="clear:both;"></div>

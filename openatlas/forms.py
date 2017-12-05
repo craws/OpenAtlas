@@ -90,7 +90,7 @@ class TreeSelect(HiddenInput):
             selected_ids.append(openatlas.nodes[int(field.data)].id)
         try:
             hierarchy_id = int(field.id)
-        except:
+        except ValueError:
             hierarchy_id = openatlas.NodeMapper.get_hierarchy_by_name(uc_first(field.id)).id
         html = """
             <input id="{name}-button" name="{name}-button" type="text"
@@ -140,6 +140,8 @@ class TreeMultiSelect(HiddenInput):
         selection = ''
         selected_ids = []
         if field.data:
+            if isinstance(field.data, str):
+                field.data = ast.literal_eval(field.data)
             for entity_id in field.data:
                 selected_ids.append(entity_id)
                 selection += openatlas.nodes[entity_id].name + '<br />'
@@ -221,20 +223,27 @@ class TableMultiSelect(HiddenInput):
         if field.data and isinstance(field.data, str):
             field.data = ast.literal_eval(field.data)
         selection = ''
+        class_ = field.id
+        if class_ in ['donor', 'recipient']:
+            class_ = 'actor'
+        if class_ in ['given_place']:
+            class_ = 'place'
         # Todo: adapt sort list for different header amount, show selected on top
         table = {
             'name': field.id,
-            'header': openatlas.app.config['TABLE_HEADERS'][field.id] + [''],
+            'header': openatlas.app.config['TABLE_HEADERS'][class_] + [''],
             'data': [], 'sort': 'sortList: [[1,0],[0,0]]'}
-        for entity in openatlas.models.entity.EntityMapper.get_by_codes(field.id):
+        for entity in openatlas.models.entity.EntityMapper.get_by_codes(class_):
             selection += entity.name + '<br />' if field.data and entity.id in field.data else ''
             checked = ''
             if field.data and entity.id in field.data:
                 checked = 'checked = "checked"'
             data = get_base_table_data(entity)
             data[0] = truncate_string(entity.name)  # replace entity link with just the entity name
-            data.append('<input type="checkbox" id="{id}" {checked} value="{name}" class="multi-table-select">'.format(
-                    id=str(entity.id), name=entity.name, checked=checked))
+            html = '''<input type="checkbox" id="{id}" {checked} value="{name}"
+                class="multi-table-select">'''.format(
+                id=str(entity.id), name=entity.name, checked=checked)
+            data.append(html)
             table['data'].append(data)
         html = """
             <span id="{name}-button" class="button">Select</span><br />
