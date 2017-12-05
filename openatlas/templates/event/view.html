@@ -24,12 +24,6 @@
             {{ event.id|bookmark_toggle|safe }}
         </div>
         <h1>{{ event.name }}</h1>
-        {% if super_event %}
-            {{ _('sub event of')|uc_first }}: {{ super_event|link|safe }}<br />
-        {% endif %}
-        {% if place %}
-            {{ _('place')|uc_first }}: {{ place|link|safe }}<br />
-        {% endif %}
         {{ tables['info']|data_table|safe }}
         {{ event|description|safe }}
     </div>

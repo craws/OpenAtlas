@@ -123,6 +123,35 @@ def append_node_data(data, entity, entity2=None):
     for root_name, nodes in type_data.items():
         data.append((root_name, '<br />'.join(nodes)))
 
+    # Info for events
+    if entity.class_.code in openatlas.app.config['CLASS_CODES']['event']:
+        super_event = entity.get_linked_entity('P117')
+        if super_event:
+            data.append((uc_first(_('Sub event of')), link(super_event)))
+        place = entity.get_linked_entity('P7')
+        if place:
+            data.append((uc_first(_('location')), link(place.get_linked_entity('P53', True))))
+        # Info for acquisitions
+        if entity.class_.code == 'E8':
+            recipients = entity.get_linked_entities('P22')
+            if recipients:
+                html = ''
+                for recipient in recipients:
+                    html += link(recipient) + '<br />'
+                data.append((uc_first(_('recipient')), html))
+            donors = entity.get_linked_entities('P23')
+            if donors:
+                html = ''
+                for donor in donors:
+                    html += link(donor) + '<br />'
+                data.append((uc_first(_('donor')), html))
+            given_places = entity.get_linked_entities('P24')
+            if given_places:
+                html = ''
+                for given_place in given_places:
+                    html += link(given_place) + '<br />'
+                data.append((uc_first(_('given place')), html))
+
     # dates
     date_types = OrderedDict([
         ('OA1', _('first')),
@@ -143,6 +172,7 @@ def append_node_data(data, entity, entity2=None):
                 html += ' and ' + format_date(entity.dates[code]['to date value']['timestamp'])
                 html += ' ' + entity.dates[code]['from date value']['info']
                 data.append((uc_first(label), html))
+
     return data
 
 

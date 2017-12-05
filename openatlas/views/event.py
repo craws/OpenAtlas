@@ -20,7 +20,7 @@ from openatlas.util.util import (required_group, truncate_string, append_node_da
 class EventForm(DateForm):
     name = StringField(_('name'), validators=[InputRequired()])
     event = TableField(_('sub event of'))
-    place = TableField()
+    place = TableField(_('location'))
     event_id = HiddenField()
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
@@ -152,7 +152,6 @@ def event_view(id_, unlink_id=None):
         'name': 'reference',
         'header': app.config['TABLE_HEADERS']['reference'] + ['pages', '', ''],
         'data': []}
-
     for link_ in event.get_links('P67', True):
         name = app.config['CODE_CLASS'][link_.domain.class_.code]
         unlink_url = url_for('event_view', id_=event.id, unlink_id=link_.id) + '#tab-' + name
@@ -171,13 +170,7 @@ def event_view(id_, unlink_id=None):
         'data': []}
     for sub_event in event.get_linked_entities('P117', True):
         tables['subs']['data'].append(get_base_table_data(sub_event))
-    place = event.get_linked_entity('P7')
-    return render_template(
-        'event/view.html',
-        event=event,
-        super_event=event.get_linked_entity('P117'),
-        place=place.get_linked_entity('P53', True) if place else None,
-        tables=tables)
+    return render_template('event/view.html', event=event, tables=tables)
 
 
 def save(form, event=None, code=None, origin=None):
