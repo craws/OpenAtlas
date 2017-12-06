@@ -152,6 +152,17 @@ def append_node_data(data, entity, entity2=None):
                     html += link(given_place) + '<br />'
                 data.append((uc_first(_('given place')), html))
 
+    # Info for actors
+    if entity.class_.code in openatlas.app.config['CLASS_CODES']['actor']:
+        residence = entity.get_linked_entity('P74')
+        if residence:
+            data.append((uc_first(_('residence')), link(residence.get_linked_entity('P53', True))))
+        first = entity.get_linked_entity('OA8')
+        if first:
+            data.append((uc_first(_('appears first')), link(first.get_linked_entity('P53', True))))
+        last = entity.get_linked_entity('OA9')
+        if last:
+            data.append((uc_first(_('appears last')), link(last.get_linked_entity('P53', True))))
     # dates
     date_types = OrderedDict([
         ('OA1', _('first')),

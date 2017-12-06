@@ -11,7 +11,7 @@ from openatlas.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper, Entity
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (truncate_string, required_group, append_node_data,
-                                 build_remove_link, get_base_table_data, uc_first)
+                                 build_remove_link, get_base_table_data, uc_first, link)
 
 
 class PlaceForm(DateForm):
@@ -84,6 +84,28 @@ def place_view(id_, unlink_id=None):
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
         data.append(build_remove_link(unlink_url, link_.domain.name))
         tables[name]['data'].append(data)
+    tables['event'] = {
+        'name': 'event',
+        'header': app.config['TABLE_HEADERS']['event'],
+        'data': []}
+    for event in location.get_linked_entities('P7', True):
+        data = get_base_table_data(event)
+        tables['event']['data'].append(data)
+    for event in object_.get_linked_entities('P24', True):
+        data = get_base_table_data(event)
+        tables['event']['data'].append(data)
+    tables['actor'] = {
+        'name': 'actor',
+        'header': [_('actor'), _('property'), _('class'), _('first'), _('last')],
+        'data': []}
+    for link_ in location.get_links(['P74', 'OA8', 'OA9'], True):
+        actor = EntityMapper.get_by_id(link_.domain.id)
+        tables['actor']['data'].append([
+            link(actor),
+            openatlas.properties[link_.property.code].name,
+            actor.class_.name,
+            actor.first,
+            actor.last])
     return render_template('place/view.html', object_=object_, tables=tables)
 
 

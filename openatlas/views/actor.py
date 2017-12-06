@@ -7,7 +7,7 @@ from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app
-from openatlas.forms import DateForm, build_form
+from openatlas.forms import DateForm, build_form, TableField
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper, Link
 from openatlas.util.util import (truncate_string, required_group, append_node_data,
@@ -16,6 +16,9 @@ from openatlas.util.util import (truncate_string, required_group, append_node_da
 
 class ActorForm(DateForm):
     name = StringField(_('name'), validators=[InputRequired()])
+    residence = TableField(_('residence'))
+    appears_first = TableField(_('appears first'))
+    appears_last = TableField(_('appears last'))
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
@@ -116,22 +119,40 @@ def actor_update(id_):
         save(form, actor)
         flash(_('info update'), 'info')
         return redirect(url_for('actor_view', id_=id_))
+    residence = actor.get_linked_entity('P74')
+    form.residence.data = residence.get_linked_entity('P53', True).id if residence else ''
+    first = actor.get_linked_entity('OA8')
+    form.appears_first.data = first.get_linked_entity('P53', True).id if first else ''
+    last = actor.get_linked_entity('OA9')
+    form.appears_last.data = last.get_linked_entity('P53', True).id if last else ''
     return render_template('actor/update.html', form=form, actor=actor)
 
 
-def save(form, entity=None, code=None, origin=None):
+def save(form, actor=None, code=None, origin=None):
     openatlas.get_cursor().execute('BEGIN')
-    entity = entity if entity else EntityMapper.insert(code, form.name.data)
-    entity.name = form.name.data
-    entity.description = form.description.data
-    entity.update()
-    entity.save_dates(form)
-    entity.save_nodes(form)
+    if actor:
+        LinkMapper.delete_by_codes(actor, ['P74', 'OA8', 'OA9'])
+    else:
+        actor = EntityMapper.insert(code, form.name.data)
+    actor.name = form.name.data
+    actor.description = form.description.data
+    actor.update()
+    actor.save_dates(form)
+    actor.save_nodes(form)
+    if form.residence.data:
+        object_ = EntityMapper.get_by_id(form.residence.data)
+        actor.link('P74', object_.get_linked_entity('P53'))
+    if form.appears_first.data:
+        object_ = EntityMapper.get_by_id(form.appears_first.data)
+        actor.link('OA8', object_.get_linked_entity('P53'))
+    if form.appears_last.data:
+        object_ = EntityMapper.get_by_id(form.appears_last.data)
+        actor.link('OA9', object_.get_linked_entity('P53'))
     link_ = None
     if origin:
         if origin.class_.code in app.config['CLASS_CODES']['reference']:
-            link_ = origin.link('P67', entity)
+            link_ = origin.link('P67', actor)
         elif origin.class_.code in app.config['CLASS_CODES']['source']:
-            origin.link('P67', entity)
+            origin.link('P67', actor)
     openatlas.get_cursor().execute('COMMIT')
-    return link_ if link_ else entity
+    return link_ if link_ else actor

@@ -181,9 +181,12 @@ class TreeMultiField(HiddenField):
 class TableSelect(HiddenInput):
     def __call__(self, field, **kwargs):
         selection = ''
-        header = openatlas.app.config['TABLE_HEADERS'][field.id]
+        class_ = field.id
+        if class_ in ['residence', 'appears_first', 'appears_last']:
+            class_ = 'place'
+        header = openatlas.app.config['TABLE_HEADERS'][class_]
         table = {'name': field.id, 'header': header, 'data': []}
-        for entity in openatlas.models.entity.EntityMapper.get_by_codes(field.id):
+        for entity in openatlas.models.entity.EntityMapper.get_by_codes(class_):
             # Todo: don't show self e.g. at source
             if field.data and entity.id == int(field.data):
                 selection = entity.name
