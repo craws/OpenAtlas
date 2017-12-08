@@ -38,6 +38,9 @@ class Entity(object):
     def get_links(self, code, inverse=False):
         return LinkMapper.get_links(self, code, inverse)
 
+    def delete(self):
+        EntityMapper.delete(self.id)
+
     def delete_links(self, codes):
         LinkMapper.delete_by_codes(self, codes)
 

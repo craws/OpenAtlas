@@ -163,6 +163,9 @@ def append_node_data(data, entity, entity2=None):
         last = entity.get_linked_entity('OA9')
         if last:
             data.append((uc_first(_('appears last')), link(last.get_linked_entity('P53', True))))
+        aliases = entity.get_linked_entities('P131')
+        if aliases:
+            data.append((uc_first(_('alias')), '<br />'.join([x.name for x in aliases])))
     # dates
     date_types = OrderedDict([
         ('OA1', _('first')),
@@ -183,7 +186,6 @@ def append_node_data(data, entity, entity2=None):
                 html += ' and ' + format_date(entity.dates[code]['to date value']['timestamp'])
                 html += ' ' + entity.dates[code]['from date value']['info']
                 data.append((uc_first(label), html))
-
     return data
 
 

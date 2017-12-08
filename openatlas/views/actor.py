@@ -2,7 +2,7 @@
 from flask import render_template, url_for, flash, request
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
-from wtforms import StringField, TextAreaField, HiddenField, SubmitField
+from wtforms import StringField, TextAreaField, HiddenField, SubmitField, FieldList
 from wtforms.validators import InputRequired
 
 import openatlas
@@ -23,6 +23,7 @@ class ActorForm(DateForm):
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
+    alias = FieldList(StringField(''))
 
 
 @app.route('/actor/view/<int:id_>')
@@ -145,6 +146,9 @@ def actor_update(id_):
     form.appears_first.data = first.get_linked_entity('P53', True).id if first else ''
     last = actor.get_linked_entity('OA9')
     form.appears_last.data = last.get_linked_entity('P53', True).id if last else ''
+    for alias in [x.name for x in actor.get_linked_entities('P131')]:
+        form.alias.append_entry(alias)
+    form.alias.append_entry('')
     return render_template('actor/update.html', form=form, actor=actor)
 
 
@@ -152,6 +156,8 @@ def save(form, actor=None, code=None, origin=None):
     openatlas.get_cursor().execute('BEGIN')
     if actor:
         LinkMapper.delete_by_codes(actor, ['P74', 'OA8', 'OA9'])
+        for alias in actor.get_linked_entities('P131'):
+            alias.delete()
     else:
         actor = EntityMapper.insert(code, form.name.data)
     actor.name = form.name.data
@@ -168,6 +174,9 @@ def save(form, actor=None, code=None, origin=None):
     if form.appears_last.data:
         object_ = EntityMapper.get_by_id(form.appears_last.data)
         actor.link('OA9', object_.get_linked_entity('P53'))
+    for alias in form.alias.data:
+        if alias.strip(): # check if it isn't and empty entry
+            actor.link('P131', EntityMapper.insert('E82', alias))
     link_ = None
     if origin:
         if origin.class_.code in app.config['CLASS_CODES']['reference']:
