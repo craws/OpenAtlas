@@ -106,7 +106,8 @@ def append_node_data(data, entity, entity2=None):
     Append additional entity information to a data table for view.
     The entity2 parameter is for places which have a location attached.
     """
-    # nodes
+
+    # Nodes
     type_data = OrderedDict()
     nodes = entity.nodes + (entity2.nodes if entity2 else [])
     for node in nodes:
@@ -122,6 +123,12 @@ def append_node_data(data, entity, entity2=None):
         type_data.move_to_end('type', last=False)
     for root_name, nodes in type_data.items():
         data.append((root_name, '<br />'.join(nodes)))
+
+    # Info for places
+    if entity.class_.code in openatlas.app.config['CLASS_CODES']['place']:
+        aliases = entity.get_linked_entities('P1')
+        if aliases:
+            data.append((uc_first(_('alias')), '<br />'.join([x.name for x in aliases])))
 
     # Info for events
     if entity.class_.code in openatlas.app.config['CLASS_CODES']['event']:

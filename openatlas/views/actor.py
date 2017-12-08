@@ -16,6 +16,7 @@ from openatlas.util.util import (truncate_string, required_group, append_node_da
 
 class ActorForm(DateForm):
     name = StringField(_('name'), validators=[InputRequired()])
+    alias = FieldList(StringField(''))
     residence = TableField(_('residence'))
     appears_first = TableField(_('appears first'))
     appears_last = TableField(_('appears last'))
@@ -23,7 +24,6 @@ class ActorForm(DateForm):
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
-    alias = FieldList(StringField(''))
 
 
 @app.route('/actor/view/<int:id_>')
@@ -116,6 +116,7 @@ def actor_insert(code, origin_id=None):
             view = app.config['CODE_CLASS'][origin.class_.code]
             return redirect(url_for(view + '_view', id_=origin.id) + '#tab-actor')
         return redirect(url_for('actor_view', id_=result.id))
+    form.alias.append_entry('')
     return render_template('actor/insert.html', form=form, code=code, origin=origin)
 
 
@@ -175,7 +176,7 @@ def save(form, actor=None, code=None, origin=None):
         object_ = EntityMapper.get_by_id(form.appears_last.data)
         actor.link('OA9', object_.get_linked_entity('P53'))
     for alias in form.alias.data:
-        if alias.strip(): # check if it isn't and empty entry
+        if alias.strip():  # check if it isn't empty
             actor.link('P131', EntityMapper.insert('E82', alias))
     link_ = None
     if origin:

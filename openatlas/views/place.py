@@ -2,7 +2,7 @@
 from flask import render_template, url_for, flash, request
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
-from wtforms import StringField, TextAreaField, HiddenField, SubmitField
+from wtforms import StringField, TextAreaField, HiddenField, SubmitField, FieldList
 from wtforms.validators import InputRequired
 
 import openatlas
@@ -16,6 +16,7 @@ from openatlas.util.util import (truncate_string, required_group, append_node_da
 
 class PlaceForm(DateForm):
     name = StringField(_('name'), validators=[InputRequired()])
+    alias = FieldList(StringField(''))
     description = TextAreaField(_('content'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
@@ -50,6 +51,7 @@ def place_insert(origin_id=None):
             view = app.config['CODE_CLASS'][origin.class_.code]
             return redirect(url_for(view + '_view', id_=origin.id) + '#tab-place')
         return redirect(url_for('place_view', id_=result.id))
+    form.alias.append_entry('')
     return render_template('place/insert.html', form=form, origin=origin)
 
 
@@ -132,12 +134,18 @@ def place_update(id_):
         save(form, object_, location)
         flash(_('info update'), 'info')
         return redirect(url_for('place_view', id_=id_))
+    for alias in [x.name for x in object_.get_linked_entities('P1')]:
+        form.alias.append_entry(alias)
+    form.alias.append_entry('')
     return render_template('place/update.html', form=form, object_=object_)
 
 
 def save(form, object_=None, location=None, origin=None):
     openatlas.get_cursor().execute('BEGIN')
-    if not object_:
+    if object:
+        for alias in object_.get_linked_entities('P1'):
+            alias.delete()
+    else:
         object_ = EntityMapper.insert('E18', form.name.data)
         location = EntityMapper.insert('E53', 'Location of ' + form.name.data, 'place location')
         object_.link('P53', location)
@@ -149,6 +157,9 @@ def save(form, object_=None, location=None, origin=None):
     location.name = 'Location of ' + form.name.data
     location.update()
     location.save_nodes(form)
+    for alias in form.alias.data:
+        if alias.strip():  # check if it isn't empty
+            object_.link('P1', EntityMapper.insert('E41', alias))
     link_ = None
     if origin:
         if origin.class_.code in app.config['CLASS_CODES']['reference']:
