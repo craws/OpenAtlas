@@ -5,6 +5,7 @@ import openatlas
 from collections import OrderedDict
 
 from openatlas.forms import TreeField, TreeMultiField
+from openatlas.models.linkProperty import LinkPropertyMapper
 from .entity import Entity, EntityMapper
 
 
@@ -178,6 +179,12 @@ class NodeMapper(EntityMapper):
                 else:
                     if entity.class_.code != 'E53':
                         entity.link('P2', range_param)
+
+    @staticmethod
+    def save_link_nodes(link_id, form):
+        for field in form:
+            if isinstance(field, TreeField) and field.data:
+                LinkPropertyMapper.insert(link_id, 'P2', int(field.data))
 
     @staticmethod
     def insert_hierarchy(node, form):

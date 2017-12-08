@@ -140,7 +140,7 @@ def event_view(id_, unlink_id=None):
         tables['actor']['data'].append([
             link(link_.range),
             openatlas.classes[link_.range.class_.code].name,
-            openatlas.nodes[link_.type_id].name if link_.type_id else '',
+            link_.type.name if link_.type else '',
             first,
             last,
             truncate_string(link_.description),

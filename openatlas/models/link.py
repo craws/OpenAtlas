@@ -14,7 +14,7 @@ class Link(object):
         # Todo: performance - if it's a node don't call get_by_id
         self.domain = openatlas.EntityMapper.get_by_id(row.domain_id)
         self.range = openatlas.EntityMapper.get_by_id(row.range_id)
-        self.type_id = row.type_id
+        self.type = openatlas.nodes[row.type_id] if row.type_id else None
         self.first = int(row.first) if hasattr(row, 'first') and row.first else None
         self.last = int(row.last) if hasattr(row, 'last') and row.last else None
         self.dates = {}

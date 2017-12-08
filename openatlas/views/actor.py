@@ -73,12 +73,34 @@ def actor_view(id_, unlink_id=None):
         tables['event']['data'].append([
             link(event),
             openatlas.classes[event.class_.code].name,
-            openatlas.nodes[link_.type_id].name if link_.type_id else '',
+            link_.type.name if link_.type else '',
             first,
             last,
             truncate_string(link_.description),
             '<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>',
             build_remove_link(unlink_url, link_.range.name)])
+    tables['relation'] = {
+        'name': 'relation',
+        'sort': 'sortList:[[0,0]]',
+        'header': ['relation', 'actor', 'first', 'last', 'description'],
+        'data': []}
+    for link_ in actor.get_links('OA7') + actor.get_links('OA7', True):
+        if actor.id == link_.domain.id:
+            type_ = link_.type.get_name_directed() if link_.type else ''
+            related = link_.range
+        else:
+            type_ = link_.type.get_name_directed(True) if link_.type else ''
+            related = link_.domain
+        update_url = url_for('relation_update', id_=link_.id, origin_id=actor.id)
+        unlink_url = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab-relation'
+        tables['relation']['data'].append([
+            type_,
+            link(related),
+            link_.first,
+            link_.last,
+            truncate_string(link_.description),
+            '<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>',
+            build_remove_link(unlink_url, related.name)])
     return render_template('actor/view.html', actor=actor, tables=tables)
 
 

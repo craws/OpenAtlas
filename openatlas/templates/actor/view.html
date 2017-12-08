@@ -9,6 +9,7 @@
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
         <li><a href="#tab-source">{{ _('source')|uc_first }} ({{ tables['source']['data']|length }})</a></li>
         <li><a href="#tab-event">{{ _('event')|uc_first }} ({{ tables['event']['data']|length }})</a></li>
+        <li><a href="#tab-relation">{{ _('relation')|uc_first }} ({{ tables['relation']['data']|length }})</a></li>
         <li><a href="#tab-reference">{{ _('reference')|uc_first }} ({{ tables['reference']['data']|length }})</a></li>
     </ul>
     <div id="tab-info">
@@ -43,6 +44,17 @@
             </div>
         {% endif %}
         {{ tables['event']|pager|safe }}
+    </div>
+    <div id="tab-relation">
+        {% if 'editor'|is_authorized: %}
+            <div class="button-bar">
+                <a href="{{ url_for('relation_insert', origin_id=actor.id)}}">{{ _('add')|uc_first }}</a>
+                {% for code in config['CLASS_CODES']['actor'] %}
+                    <a href="{{ url_for('actor_insert', code=code, origin_id=actor.id) }}">+ {{ code|get_class_name }}</a>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {{ tables['relation']|pager|safe }}
     </div>
     <div id="tab-reference">
         {% if 'editor'|is_authorized: %}
