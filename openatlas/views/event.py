@@ -12,7 +12,7 @@ import openatlas
 from openatlas import app
 from openatlas.forms import DateForm, build_form, TableField, TableMultiField
 from openatlas.models.entity import EntityMapper, Entity
-from openatlas.models.link import LinkMapper
+from openatlas.models.link import LinkMapper, Link
 from openatlas.util.util import (required_group, truncate_string, append_node_data,
                                  build_remove_link, get_base_table_data, uc_first, link)
 
@@ -67,11 +67,14 @@ def event_insert(code, origin_id=None):
     if form.validate_on_submit():
         result = save(form, None, code, origin)
         flash(_('entity created'), 'info')
-        if not isinstance(result, Entity):
+        if isinstance(result, Link) and result.property_code == 'P67':
             return redirect(url_for('reference_link_update', link_id=result, origin_id=origin_id))
         if form.continue_.data == 'yes':
             return redirect(url_for('event_insert', code=code, origin_id=origin_id))
         if origin:
+            if origin.class_.code in app.config['CLASS_CODES']['actor']:
+                return redirect(
+                    url_for('involvement_insert', origin_id=origin_id, related_id=result.id))
             view = app.config['CODE_CLASS'][origin.class_.code]
             return redirect(url_for(view + '_view', id_=origin.id) + '#tab-event')
         return redirect(url_for('event_view', id_=result.id))
@@ -124,7 +127,7 @@ def event_view(id_, unlink_id=None):
     append_node_data(tables['info'], event)
     tables['actor'] = {
         'name': 'actor',
-        'header': ['actor', 'class', 'activity', 'involvement', 'first', 'last', '', ''],
+        'header': ['actor', 'class', 'involvement', 'first', 'last', 'description', '', ''],
         'data': []}
     for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
         first = link_.first
@@ -132,16 +135,16 @@ def event_view(id_, unlink_id=None):
             first = '<span class="inactive" style="float:right">' + str(event.first) + '</span>'
         last = link_.last
         if not link_.last and event.last:
-            '<span class="inactive" style="float:right">' + str(event.last) + '</span>'
+            last = '<span class="inactive" style="float:right">' + str(event.last) + '</span>'
         unlink_url = url_for('event_view', id_=event.id, unlink_id=link_.id) + '#tab-actor'
         update_url = url_for('involvement_update', id_=link_.id, origin_id=event.id)
         tables['actor']['data'].append([
             link(link_.range),
             openatlas.classes[link_.range.class_.code].name,
-            link_.property.name_inverse,
             openatlas.nodes[link_.type_id].name if link_.type_id else '',
             first,
             last,
+            truncate_string(link_.description),
             '<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>',
             build_remove_link(unlink_url, link_.range.name)])
     tables['source'] = {
@@ -196,7 +199,7 @@ def save(form, event=None, code=None, origin=None):
     if origin:
         if origin.class_.code in app.config['CLASS_CODES']['reference']:
             link_ = origin.link('P67', event)
-        else:
+        elif origin.class_.code in app.config['CLASS_CODES']['source']:
             origin.link('P67', event)
     openatlas.get_cursor().execute('COMMIT')
     return link_ if link_ else event

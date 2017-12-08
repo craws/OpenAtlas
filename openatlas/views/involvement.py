@@ -21,6 +21,7 @@ from openatlas.util.util import required_group
 
 class ActorForm(DateForm):
     actor = TableMultiField(_('actor'), validators=[InputRequired()])
+    event = TableMultiField(_('event'), validators=[InputRequired()])
     involvement = TreeField()
     activity = SelectField(_('activity'))
     description = TextAreaField(_('description'))
@@ -29,61 +30,82 @@ class ActorForm(DateForm):
     continue_ = HiddenField()
 
 
-@app.route('/involvement/insert/<int:origin_id>/<int:actor_id>', methods=['POST', 'GET'])
+@app.route('/involvement/insert/<int:origin_id>/<int:related_id>', methods=['POST', 'GET'])
 @app.route('/involvement/insert/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('editor')
-def involvement_insert(origin_id, actor_id=None):
+def involvement_insert(origin_id, related_id=None):
     origin = EntityMapper.get_by_id(origin_id)
+    origin_class = openatlas.app.config['CODE_CLASS'][origin.class_.code]
     form = ActorForm()
-    if origin.class_.code in ['E6', 'E7', 'E8', 'E12']:
-        form.activity.choices = [('P11', openatlas.properties['P11'].name)]
-        if origin.class_.code in ['E7', 'E8', 'E12']:
-            form.activity.choices.append(('P14', openatlas.properties['P14'].name))
-        if origin.class_.code == 'E8':
-            form.activity.choices.append(('P22', openatlas.properties['P22'].name))
-            form.activity.choices.append(('P23', openatlas.properties['P23'].name))
+    if origin_class == 'event':
+        del form.event
+    if origin_class == 'actor':
+        del form.actor
+    form.activity.choices = [('P11', openatlas.properties['P11'].name)]
+    if origin.class_.code in ['E7', 'E8', 'E12']:
+        form.activity.choices.append(('P14', openatlas.properties['P14'].name))
+    if origin.class_.code == 'E8':
+        form.activity.choices.append(('P22', openatlas.properties['P22'].name))
+        form.activity.choices.append(('P23', openatlas.properties['P23'].name))
     if form.validate_on_submit():
-        if origin.class_.code in ['E6', 'E7', 'E8', 'E12']:
-            openatlas.get_cursor().execute('BEGIN')
+        openatlas.get_cursor().execute('BEGIN')
+        if origin_class == 'event':
             for actor_id in ast.literal_eval(form.actor.data):
                 link_id = origin.link(form.activity.data, actor_id, form.description.data)
                 DateMapper.save_link_dates(link_id, form)
                 LinkPropertyMapper.insert(link_id, 'P2', form.involvement.data)
-            openatlas.get_cursor().execute('COMMIT')
-            flash(_('entity created'), 'info')
-            return redirect(url_for('event_view', id_=origin.id) + '#tab-actor')
-    if actor_id:
-        form.actor.data = [actor_id]
+        else:
+            for event_id in ast.literal_eval(form.event.data):
+                link_id = LinkMapper.insert(
+                    event_id,
+                    form.activity.data,
+                    origin.id,
+                    form.description.data)
+                DateMapper.save_link_dates(link_id, form)
+                LinkPropertyMapper.insert(link_id, 'P2', form.involvement.data)
+        openatlas.get_cursor().execute('COMMIT')
+        flash(_('entity created'), 'info')
+        if form.continue_.data == 'yes':
+            return redirect(url_for('involvement_insert', origin_id=origin_id))
+        tab = 'actor' if origin_class == 'event' else 'event'
+        return redirect(url_for(origin_class + '_view', id_=origin.id) + '#tab-' + tab)
+    if related_id and origin_class == 'event':
         del form.insert_and_continue
+        if form.event:
+            form.event.data = [related_id]
+    if related_id and origin_class == 'actor':
+        del form.insert_and_continue
+        if form.actor:
+            form.actor.data = [related_id]
     return render_template('involvement/insert.html', origin=origin, form=form)
 
 
 @app.route('/involvement/update/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('editor')
 def involvement_update(id_, origin_id):
-    origin = EntityMapper.get_by_id(origin_id)
     link_ = LinkMapper.get_by_id(id_)
-    linked_object_id = link_.domain.id if link_.domain.id != origin.id else link_.range.id
+    event = EntityMapper.get_by_id(link_.domain.id)
+    actor = EntityMapper.get_by_id(link_.range.id)
+    origin = event if origin_id == event.id else actor
     form = ActorForm()
     form.save.label.text = _('save')
-    del form.actor, form.insert_and_continue
-    if origin.class_.code in ['E6', 'E7', 'E8', 'E12']:
-        form.activity.choices = [('P11', openatlas.properties['P11'].name)]
-        if origin.class_.code in ['E7', 'E8', 'E12']:
-            form.activity.choices.append(('P14', openatlas.properties['P14'].name))
-        if origin.class_.code == 'E8':
-            form.activity.choices.append(('P22', openatlas.properties['P22'].name))
-            form.activity.choices.append(('P23', openatlas.properties['P23'].name))
+    del form.actor, form.event, form.insert_and_continue
+    form.activity.choices = [('P11', openatlas.properties['P11'].name)]
+    if event.class_.code in ['E7', 'E8', 'E12']:
+        form.activity.choices.append(('P14', openatlas.properties['P14'].name))
+    if event.class_.code == 'E8':
+        form.activity.choices.append(('P22', openatlas.properties['P22'].name))
+        form.activity.choices.append(('P23', openatlas.properties['P23'].name))
     if form.validate_on_submit():
         openatlas.get_cursor().execute('BEGIN')
-        domain = link_.domain
-        range_ = link_.range
         link_.delete()
-        link_id = domain.link(form.activity.data, range_, form.description.data)
+        link_id = event.link(form.activity.data, actor, form.description.data)
         DateMapper.save_link_dates(link_id, form)
         LinkPropertyMapper.insert(link_id, 'P2', form.involvement.data)
         openatlas.get_cursor().execute('COMMIT')
-        return redirect(url_for('event_view', id_=origin.id) + '#tab-actor')
+        class_ = openatlas.app.config['CODE_CLASS'][origin.class_.code]
+        tab = 'actor' if class_ == 'event' else 'event'
+        return redirect(url_for(class_ + '_view', id_=origin.id) + '#tab-' + tab)
     form.activity.data = link_.property.code
     form.description.data = link_.description
     if link_.type_id:
@@ -94,4 +116,4 @@ def involvement_update(id_, origin_id):
         'involvement/update.html',
         origin=origin,
         form=form,
-        linked_object=EntityMapper.get_by_id(linked_object_id))
+        linked_object=event if origin_id != event.id else actor)

@@ -11,7 +11,7 @@ from openatlas.forms import DateForm, build_form, TableField
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper, Link
 from openatlas.util.util import (truncate_string, required_group, append_node_data,
-                                 build_remove_link, get_base_table_data, uc_first)
+                                 build_remove_link, get_base_table_data, uc_first, link)
 
 
 class ActorForm(DateForm):
@@ -45,7 +45,6 @@ def actor_view(id_, unlink_id=None):
         'data': []}
     for link_ in actor.get_links('P67', True):
         name = app.config['CODE_CLASS'][link_.domain.class_.code]
-        unlink_url = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab' + name
         data = get_base_table_data(link_.domain)
         if name == 'source':
             data.append(truncate_string(link_.domain.description))
@@ -53,8 +52,32 @@ def actor_view(id_, unlink_id=None):
             data.append(truncate_string(link_.description))
             update_url = url_for('reference_link_update', link_id=link_.id, origin_id=actor.id)
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
+        unlink_url = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab' + name
         data.append(build_remove_link(unlink_url, link_.domain.name))
         tables[name]['data'].append(data)
+    tables['event'] = {
+        'name': 'event',
+        'header': ['event', 'class', 'involvement', 'first', 'last', 'description'],
+        'data': []}
+    for link_ in actor.get_links(['P11', 'P14', 'P22', 'P23'], True):
+        event = link_.domain
+        first = link_.first
+        if not link_.first and event.first:
+            first = '<span class="inactive" style="float:right">' + str(event.first) + '</span>'
+        last = link_.last
+        if not link_.last and event.last:
+            last = '<span class="inactive" style="float:right">' + str(event.last) + '</span>'
+        update_url = url_for('involvement_update', id_=link_.id, origin_id=actor.id)
+        unlink_url = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab-event'
+        tables['event']['data'].append([
+            link(event),
+            openatlas.classes[event.class_.code].name,
+            openatlas.nodes[link_.type_id].name if link_.type_id else '',
+            first,
+            last,
+            truncate_string(link_.description),
+            '<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>',
+            build_remove_link(unlink_url, link_.range.name)])
     return render_template('actor/view.html', actor=actor, tables=tables)
 
 
@@ -82,16 +105,14 @@ def actor_insert(code, origin_id=None):
     if form.validate_on_submit():
         result = save(form, None, code, origin)
         flash(_('entity created'), 'info')
-        if isinstance(result, Link):
-            if result.property_code == 'P67':
-                return redirect(
-                    url_for('reference_link_update', link_id=result, origin_id=origin_id))
+        if isinstance(result, Link) and result.property_code == 'P67':
+            return redirect(url_for('reference_link_update', link_id=result, origin_id=origin_id))
         if form.continue_.data == 'yes':
             return redirect(url_for('actor_insert', code=code, origin_id=origin_id))
         if origin:
             if origin.class_.code in app.config['CLASS_CODES']['event']:
                 return redirect(
-                    url_for('involvement_insert', origin_id=origin_id, actor_id=result.id))
+                    url_for('involvement_insert', origin_id=origin_id, related_id=result.id))
             view = app.config['CODE_CLASS'][origin.class_.code]
             return redirect(url_for(view + '_view', id_=origin.id) + '#tab-actor')
         return redirect(url_for('actor_view', id_=result.id))
