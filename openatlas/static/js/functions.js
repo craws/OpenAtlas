@@ -112,7 +112,7 @@ function selectFromTreeMulti(name) {
 
 function selectFromTable(element, table, id) {
     $("#" + table).attr('value', id);
-    $("#" + table + "-button").val(element.innerHTML);
+    $("#" + table + "-button").val(element.innerText);
     $("#" + table + "-button").focus(); /* to refresh/fill button and remove validation errors */
     $("#" + table + "-clear").show();
     $(".ui-dialog-titlebar-close").trigger('click');
