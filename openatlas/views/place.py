@@ -10,7 +10,7 @@ from openatlas import app
 from openatlas.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper, Entity
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import (truncate_string, required_group, append_node_data,
+from openatlas.util.util import (truncate_string, required_group, get_entity_data,
                                  build_remove_link, get_base_table_data, uc_first, link)
 
 
@@ -64,16 +64,16 @@ def place_view(id_, unlink_id=None):
         LinkMapper.delete_by_id(unlink_id)
     object_.set_dates()
     location = object_.get_linked_entity('P53')
-    tables = {'info': []}
-    append_node_data(tables['info'], object_, location)
-    tables['source'] = {
-        'name': 'source',
-        'header': app.config['TABLE_HEADERS']['source'] + ['description', ''],
-        'data': []}
-    tables['reference'] = {
-        'name': 'reference',
-        'header': app.config['TABLE_HEADERS']['reference'] + ['pages', '', ''],
-        'data': []}
+    tables = {
+        'info': get_entity_data(object_, location),
+        'source': {
+            'name': 'source',
+            'header': app.config['TABLE_HEADERS']['source'] + ['description', ''],
+            'data': []},
+        'reference': {
+            'name': 'reference',
+            'header': app.config['TABLE_HEADERS']['reference'] + ['pages', '', ''],
+            'data': []}}
     for link_ in object_.get_links('P67', True):
         name = app.config['CODE_CLASS'][link_.domain.class_.code]
         unlink_url = url_for('place_view', id_=object_.id, unlink_id=link_.id) + '#tab-' + name
@@ -142,7 +142,7 @@ def place_update(id_):
 
 def save(form, object_=None, location=None, origin=None):
     openatlas.get_cursor().execute('BEGIN')
-    if object:
+    if object_:
         for alias in object_.get_linked_entities('P1'):
             alias.delete()
     else:

@@ -10,7 +10,7 @@ import openatlas
 from openatlas import app
 from openatlas.forms import build_form
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import uc_first, required_group, append_node_data
+from openatlas.util.util import required_group, get_entity_data
 
 
 class TranslationForm(Form):
@@ -21,7 +21,7 @@ class TranslationForm(Form):
     continue_ = HiddenField()
 
 
-@app.route('/translation/insert/<int:source_id>', methods=['POST', 'GET'])
+@app.route('/source/translation/insert/<int:source_id>', methods=['POST', 'GET'])
 @required_group('editor')
 def translation_insert(source_id):
     source = EntityMapper.get_by_id(source_id)
@@ -35,21 +35,19 @@ def translation_insert(source_id):
     return render_template('translation/insert.html', source=source, form=form)
 
 
-@app.route('/translation/view/<int:id_>')
+@app.route('/source/translation/view/<int:id_>')
 @required_group('readonly')
 def translation_view(id_):
     translation = EntityMapper.get_by_id(id_)
     source = translation.get_linked_entity('P73', True)
-    data = {'info': []}
-    append_node_data(data['info'], translation)
     return render_template(
         'translation/view.html',
-        translation=translation,
         source=source,
-        data=data)
+        translation=translation,
+        tables={'info': get_entity_data(source)})
 
 
-@app.route('/translation/delete/<int:id_>/<int:source_id>')
+@app.route('/source/translation/delete/<int:id_>/<int:source_id>')
 @required_group('editor')
 def translation_delete(id_, source_id):
     openatlas.get_cursor().execute('BEGIN')
@@ -59,7 +57,7 @@ def translation_delete(id_, source_id):
     return redirect(url_for('source_view', id_=source_id))
 
 
-@app.route('/translation/update/<int:id_>', methods=['POST', 'GET'])
+@app.route('/source/translation/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
 def translation_update(id_):
     translation = EntityMapper.get_by_id(id_)

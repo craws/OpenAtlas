@@ -10,7 +10,7 @@ from openatlas import app
 from openatlas.forms import DateForm, build_form, TableField
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper, Link
-from openatlas.util.util import (truncate_string, required_group, append_node_data,
+from openatlas.util.util import (truncate_string, required_group, get_entity_data,
                                  build_remove_link, get_base_table_data, uc_first, link)
 
 
@@ -34,16 +34,16 @@ def actor_view(id_, unlink_id=None):
     if unlink_id:
         LinkMapper.delete_by_id(unlink_id)
     actor.set_dates()
-    tables = {'info': []}
-    append_node_data(tables['info'], actor)
-    tables['source'] = {
-        'name': 'source',
-        'header': app.config['TABLE_HEADERS']['source'] + ['description', ''],
-        'data': []}
-    tables['reference'] = {
-        'name': 'reference',
-        'header': app.config['TABLE_HEADERS']['reference'] + ['pages', '', ''],
-        'data': []}
+    tables = {
+        'info': get_entity_data(actor),
+        'source': {
+            'name': 'source',
+            'header': app.config['TABLE_HEADERS']['source'] + ['description', ''],
+            'data': []},
+        'reference': {
+            'name': 'reference',
+            'header': app.config['TABLE_HEADERS']['reference'] + ['pages', '', ''],
+            'data': []}}
     for link_ in actor.get_links('P67', True):
         name = app.config['CODE_CLASS'][link_.domain.class_.code]
         data = get_base_table_data(link_.domain)

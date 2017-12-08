@@ -13,7 +13,7 @@ from openatlas import app
 from openatlas.forms import DateForm, build_form, TableField, TableMultiField
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper, Link
-from openatlas.util.util import (required_group, truncate_string, append_node_data,
+from openatlas.util.util import (required_group, truncate_string, get_entity_data,
                                  build_remove_link, get_base_table_data, uc_first, link)
 
 
@@ -122,12 +122,12 @@ def event_view(id_, unlink_id=None):
     if unlink_id:
         LinkMapper.delete_by_id(unlink_id)
     event.set_dates()
-    tables = {'info': []}
-    append_node_data(tables['info'], event)
-    tables['actor'] = {
-        'name': 'actor',
-        'header': ['actor', 'class', 'involvement', 'first', 'last', 'description', '', ''],
-        'data': []}
+    tables = {
+        'info': get_entity_data(event),
+        'actor': {
+            'name': 'actor',
+            'header': ['actor', 'class', 'involvement', 'first', 'last', 'description', '', ''],
+            'data': []}}
     for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
         first = link_.first
         if not link_.first and event.first:

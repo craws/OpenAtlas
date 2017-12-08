@@ -2,7 +2,7 @@
 {% block breadcrumb %}
     <a href="{{ url_for('source_index') }}">{{ _('source')|uc_first }}</a>
     > {{ source|link|safe }}
-    > {{ translation.name }}
+    > {{ translation.name|truncate_string|safe }}
 {% endblock %}
 {% block content %}
 <div class="button-bar">
@@ -16,6 +16,7 @@
         </a>
     {% endif %}
 </div>
-{{ data['info']|data_table|safe }}
+<h1>{{ translation.name }}</h1>
+{{ tables['info']|data_table|safe }}
 {{ translation|description|safe }}
 {% endblock %}

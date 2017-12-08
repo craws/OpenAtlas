@@ -11,7 +11,7 @@ from openatlas import app
 from openatlas.forms import build_form, TableField
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import (uc_first, truncate_string, required_group, append_node_data,
+from openatlas.util.util import (uc_first, truncate_string, required_group, get_entity_data,
                                  build_remove_link, get_base_table_data)
 
 
@@ -113,8 +113,7 @@ def reference_view(id_, unlink_id=None):
     reference = EntityMapper.get_by_id(id_)
     if unlink_id:
         LinkMapper.delete_by_id(unlink_id)
-    tables = {'info': []}
-    append_node_data(tables['info'], reference)
+    tables = {'info': get_entity_data(reference)}
     for name in ['source', 'event', 'actor', 'place']:
         header = app.config['TABLE_HEADERS'][name] + ['page', '', '']
         tables[name] = {'name': name, 'header': header, 'data': []}

@@ -30,8 +30,8 @@ def send_mail(subject, text, recipients):
         session['settings']['mail_transport_port'])
     server.ehlo()
     server.starttls()
-    server.login(sender, openatlas.app.config['MAIL_PASSWORD'])
     try:
+        server.login(sender, openatlas.app.config['MAIL_PASSWORD'])
         for recipient in recipients if isinstance(recipients, list) else [recipients]:
             body = '\r\n'.join([
                 'To: %s' % recipient,
@@ -39,10 +39,13 @@ def send_mail(subject, text, recipients):
                 'Subject: %s' % subject,
                 '', text])
             server.sendmail(sender, recipient, body)
-        return True
+    except smtplib.SMTPAuthenticationError:
+        flash(_('error mail login'), 'error')
+        return False
     except:
         flash(_('error mail send'), 'error')
-    return False
+        return False
+    return True
 
 
 class MLStripper(HTMLParser):
@@ -101,15 +104,15 @@ def build_remove_link(url, name):
     return '<a ' + confirm + ' href="' + url + '">' + uc_first(_('remove')) + '</a>'
 
 
-def append_node_data(data, entity, entity2=None):
+def get_entity_data(entity, location=None):
     """
-    Append additional entity information to a data table for view.
-    The entity2 parameter is for places which have a location attached.
+    Return related entity information for a table for view.
+    The location parameter is for places which have a location attached.
     """
-
+    data = []
     # Nodes
     type_data = OrderedDict()
-    nodes = entity.nodes + (entity2.nodes if entity2 else [])
+    nodes = entity.nodes + (location.nodes if location else [])
     for node in nodes:
         if not node.root:
             continue
