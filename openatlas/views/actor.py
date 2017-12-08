@@ -111,8 +111,7 @@ def actor_insert(code, origin_id=None):
             return redirect(url_for('actor_insert', code=code, origin_id=origin_id))
         if origin:
             if origin.class_.code in app.config['CLASS_CODES']['event']:
-                return redirect(
-                    url_for('involvement_insert', origin_id=origin_id, related_id=result.id))
+                return redirect(url_for('involvement_update', id_=result, origin_id=origin_id))
             view = app.config['CODE_CLASS'][origin.class_.code]
             return redirect(url_for(view + '_view', id_=origin.id) + '#tab-actor')
         return redirect(url_for('actor_view', id_=result.id))
@@ -175,5 +174,7 @@ def save(form, actor=None, code=None, origin=None):
             link_ = origin.link('P67', actor)
         elif origin.class_.code in app.config['CLASS_CODES']['source']:
             origin.link('P67', actor)
+        elif origin.class_.code in app.config['CLASS_CODES']['event']:
+            link_ = origin.link('P11', actor)
     openatlas.get_cursor().execute('COMMIT')
     return link_ if link_ else actor

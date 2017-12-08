@@ -11,6 +11,15 @@ tinymce.init({
         ' undo redo link unlink fontselect fontsizeselect forecolor code',
 });
 
+$(document).ready(function () {
+    $("#date-switcher").click(function () {
+        $(".date-switch").toggleClass('display-none');
+        $(this).text(function(i, text){
+            return text === show ? hide : show;
+        })
+    });
+});
+
 $.jstree.defaults.core.themes.dots = false;
 
 $.tablesorter.addParser({

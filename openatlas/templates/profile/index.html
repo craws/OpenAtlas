@@ -20,9 +20,9 @@
             {{ data['display']|data_table|safe }}
         </form>
     </div>
-    <script type="text/javascript">
-    $('#display-form').change(function () {
-        $('#display-form').submit();
-    });
-</script>
+    <script>
+        $('#display-form').change(function () {
+            $('#display-form').submit();
+        });
+    </script>
 {% endblock %}

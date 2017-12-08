@@ -11,7 +11,7 @@ from wtforms.validators import InputRequired
 import openatlas
 from openatlas import app
 from openatlas.forms import DateForm, build_form, TableField, TableMultiField
-from openatlas.models.entity import EntityMapper, Entity
+from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper, Link
 from openatlas.util.util import (required_group, truncate_string, append_node_data,
                                  build_remove_link, get_base_table_data, uc_first, link)
@@ -73,8 +73,7 @@ def event_insert(code, origin_id=None):
             return redirect(url_for('event_insert', code=code, origin_id=origin_id))
         if origin:
             if origin.class_.code in app.config['CLASS_CODES']['actor']:
-                return redirect(
-                    url_for('involvement_insert', origin_id=origin_id, related_id=result.id))
+                return redirect(url_for('involvement_update', id_=result, origin_id=origin_id))
             view = app.config['CODE_CLASS'][origin.class_.code]
             return redirect(url_for(view + '_view', id_=origin.id) + '#tab-event')
         return redirect(url_for('event_view', id_=result.id))
@@ -201,5 +200,7 @@ def save(form, event=None, code=None, origin=None):
             link_ = origin.link('P67', event)
         elif origin.class_.code in app.config['CLASS_CODES']['source']:
             origin.link('P67', event)
+        elif origin.class_.code in app.config['CLASS_CODES']['actor']:
+            link_ = event.link('P11', origin)
     openatlas.get_cursor().execute('COMMIT')
     return link_ if link_ else event

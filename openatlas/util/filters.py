@@ -5,13 +5,13 @@ import re
 
 import os
 
-from flask import render_template_string, url_for
+from flask import render_template_string, url_for, request
+from flask_login import current_user
 from jinja2 import evalcontextfilter, escape
 from flask_babel import lazy_gettext as _
 
 import openatlas
 from openatlas import app, EntityMapper
-from openatlas.models.classObject import ClassMapper
 from . import util
 
 blueprint = flask.Blueprint('filters', __name__)
@@ -172,7 +172,7 @@ def display_form(self, form, form_id=None, for_persons=False):
         if field.type in ['TreeField', 'TreeMultiField']:
             try:
                 hierarchy_id = int(field.id)
-            except:
+            except ValueError:
                 hierarchy_id = openatlas.NodeMapper.get_hierarchy_by_name(util.uc_first(field.id)).id
             node = openatlas.nodes[hierarchy_id]
             if node.name in app.config['BASE_TYPES']:
@@ -238,8 +238,55 @@ def truncate_string(self, string):
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def build_delete_link(self, entity):
-    """Build a link to delete an entity with a JavaScript confirmation dialog"""
+    """Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
     confirm = 'onclick="return confirm(\'' + _('confirm delete', name=name) + '\')"'
     url = url_for(app.config['CODE_CLASS'][entity.class_.code] + '_delete', id_=entity.id)
     return '<a ' + confirm + ' href="' + url + '">' + util.uc_first(_('delete')) + '</a>'
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def display_menu(self, origin):
+    """Returns html with the menu and mark appropriate item as selected."""
+    html = ''
+    if current_user.is_authenticated:
+        selected = ''
+        if origin:
+            selected = openatlas.app.config['CODE_CLASS'][origin.class_.code]
+        for item in ['overview', 'source', 'event', 'actor', 'place', 'reference', 'types']:
+            if selected:
+                css = 'active' if item == selected else ''
+            else:
+                css = 'active' if request.path.startswith('/' + item) or \
+                                  (item == 'overview' and request.path == '/') else ''
+            html += '<div class="{css}"><a href="/{item}">{label}</a></div>'.format(
+                css=css, item=item, label=util.uc_first(_(item)))
+        if util.is_authorized('manager'):
+            css = 'active' if 'admin' in request.path else ''
+            html += '<div class="{css}"><a href="/admin">{label}</a></div>'.format(
+                css=css, label=util.uc_first(_('admin')))
+    return html
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def display_debug_info(self, debug_model, form):
+    """Returns html with debug information about database queries and form errors."""
+    html = ''
+    for name, value in debug_model.items():
+        if name in ['current']:
+            continue  # Don't display current time counter
+        if name not in ['by codes', 'by id', 'by ids', 'linked', 'user', 'div sql']:
+            value = '{:10.2f}'.format(value)
+        html += """
+            <div>
+                <div>{name}</div>
+                <div class="table-cell" style="text-align:right;">
+                    {value}
+                </div>
+            </div>""".format(name=name, value=value)
+    if form and form.errors:
+        for fieldName, errorMessages in form.errors.items():
+            html += fieldName + ' - ' + errorMessages[0] + '<br />'
+    return html

@@ -17,9 +17,11 @@
                             <li><a href="#tab-{{ node.id }}">{{ node.name }}</a></li>
                         {% endfor %}
                         {% if type_ == 'custom' and 'manager'|is_authorized %}
-                            <div class="button-bar">
-                                <a href="{{ url_for('hierarchy_insert') }}" style="margin:0.5em 1em;">+ {{ _('type')|uc_first }}</a>
-                            </div>
+                            <li style="background-color:#ffffff;">
+                                <a class="button" href="{{ url_for('hierarchy_insert') }}" style="margin:1em;color:#ffffff;">
+                                    + {{ _('type')|uc_first }}
+                                </a>
+                            </li>
                         {% endif %}
                     </ul>
                     {% for node, tree in nodes[type_].items(): %}
@@ -74,7 +76,7 @@
             </div>
         {% endfor %}
     </div>
-    <script type="text/javascript">
+    <script>
         $(document).ready(function () {
             $("#tabs-menu").tabs();
             $("#tabs-system").tabs().addClass("ui-tabs-vertical");
