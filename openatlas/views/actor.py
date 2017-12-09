@@ -133,8 +133,11 @@ def actor_insert(code, origin_id=None):
         if form.continue_.data == 'yes':
             return redirect(url_for('actor_insert', code=code, origin_id=origin_id))
         if origin:
-            if origin.class_.code in app.config['CLASS_CODES']['event']:
+            origin_class = app.config['CODE_CLASS'][origin.class_.code]
+            if origin_class == 'event':
                 return redirect(url_for('involvement_update', id_=result, origin_id=origin_id))
+            if origin_class == 'actor':
+                return redirect(url_for('relation_update', id_=result, origin_id=origin_id))
             view = app.config['CODE_CLASS'][origin.class_.code]
             return redirect(url_for(view + '_view', id_=origin.id) + '#tab-actor')
         return redirect(url_for('actor_view', id_=result.id))
@@ -202,11 +205,14 @@ def save(form, actor=None, code=None, origin=None):
             actor.link('P131', EntityMapper.insert('E82', alias))
     link_ = None
     if origin:
-        if origin.class_.code in app.config['CLASS_CODES']['reference']:
+        origin_class = app.config['CODE_CLASS'][origin.class_.code]
+        if origin_class == 'reference':
             link_ = origin.link('P67', actor)
-        elif origin.class_.code in app.config['CLASS_CODES']['source']:
+        elif origin_class == 'source':
             origin.link('P67', actor)
-        elif origin.class_.code in app.config['CLASS_CODES']['event']:
+        elif origin_class == 'event':
             link_ = origin.link('P11', actor)
+        elif origin_class == 'actor':
+            link_ = origin.link('OA7', actor)
     openatlas.get_cursor().execute('COMMIT')
     return link_ if link_ else actor
