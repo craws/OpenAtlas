@@ -8,7 +8,7 @@ from wtforms.validators import NumberRange, Optional
 from wtforms.widgets import HiddenInput
 
 import openatlas
-from openatlas import Entity
+from openatlas import Entity, app
 from openatlas.util.util import uc_first, sanitize, truncate_string, pager, get_base_table_data
 
 
@@ -183,14 +183,16 @@ class TreeMultiField(HiddenField):
 
 
 class TableSelect(HiddenInput):
+
     def __call__(self, field, **kwargs):
+        from openatlas.models.entity import EntityMapper
         selection = ''
         class_ = field.id
         if class_ in ['residence', 'appears_first', 'appears_last']:
             class_ = 'place'
-        header = openatlas.app.config['TABLE_HEADERS'][class_]
+        header = app.config['TABLE_HEADERS'][class_]
         table = {'name': field.id, 'header': header, 'data': []}
-        for entity in openatlas.models.entity.EntityMapper.get_by_codes(class_):
+        for entity in EntityMapper.get_by_codes(class_):
             # Todo: don't show self e.g. at source
             if field.data and entity.id == int(field.data):
                 selection = entity.name
@@ -227,6 +229,7 @@ class TableMultiSelect(HiddenInput):
     """Table with checkboxes used in forms."""
 
     def __call__(self, field, **kwargs):
+        from openatlas.models.entity import EntityMapper
         if field.data and isinstance(field.data, str):
             field.data = ast.literal_eval(field.data)
         selection = ''
@@ -238,9 +241,9 @@ class TableMultiSelect(HiddenInput):
         # Todo: adapt sort list for different header amount, show selected on top
         table = {
             'name': field.id,
-            'header': openatlas.app.config['TABLE_HEADERS'][class_] + [''],
+            'header': app.config['TABLE_HEADERS'][class_] + [''],
             'data': [], 'sort': 'sortList: [[1,0],[0,0]]'}
-        for entity in openatlas.models.entity.EntityMapper.get_by_codes(class_):
+        for entity in EntityMapper.get_by_codes(class_):
             selection += entity.name + '<br />' if field.data and entity.id in field.data else ''
             checked = ''
             if field.data and entity.id in field.data:

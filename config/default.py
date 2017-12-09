@@ -61,6 +61,7 @@ CLASS_CODES = {
     'source': ['E33'],
     'event': ['E7', 'E8', 'E12', 'E6'],
     'actor': ['E21', 'E74', 'E40'],
+    'group': ['E40', 'E74'],
     'place': ['E18'],
     'reference': ['E31', 'E84']}
 
@@ -69,6 +70,7 @@ TABLE_HEADERS = {
     'source': ['name', 'type'],
     'event': ['name', 'class', 'type', 'first', 'last'],
     'actor': ['name', 'class', 'first', 'last'],
+    'group': ['name', 'class', 'first', 'last'],
     'place': ['name', 'type', 'first', 'last'],
     'reference': ['name', 'class', 'type']}
 

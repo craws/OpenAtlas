@@ -30,7 +30,7 @@ class ActorForm(DateForm):
 @required_group('editor')
 def involvement_insert(origin_id):
     origin = EntityMapper.get_by_id(origin_id)
-    origin_class = openatlas.app.config['CODE_CLASS'][origin.class_.code]
+    origin_class = app.config['CODE_CLASS'][origin.class_.code]
     form = build_form(ActorForm, 'Involvement')
     if origin_class == 'event':
         del form.event
@@ -90,7 +90,7 @@ def involvement_update(id_, origin_id):
         DateMapper.save_link_dates(link_id, form)
         NodeMapper.save_link_nodes(link_id, form)
         openatlas.get_cursor().execute('COMMIT')
-        class_ = openatlas.app.config['CODE_CLASS'][origin.class_.code]
+        class_ = app.config['CODE_CLASS'][origin.class_.code]
         tab = 'actor' if class_ == 'event' else 'event'
         return redirect(url_for(class_ + '_view', id_=origin.id) + '#tab-' + tab)
     form.activity.data = link_.property.code

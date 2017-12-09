@@ -56,7 +56,7 @@ from openatlas.models.settings import SettingsMapper
 from openatlas.util import filters
 from openatlas.views import (actor, admin, ajax, content, event, hierarchy, index, login, types,
                              model, place, profile, reference, settings, source, translation, user,
-                             involvement, relation)
+                             involvement, relation, member)
 
 
 @babel.localeselector

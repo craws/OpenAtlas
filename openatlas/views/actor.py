@@ -101,6 +101,37 @@ def actor_view(id_, unlink_id=None):
             truncate_string(link_.description),
             '<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>',
             build_remove_link(unlink_url, related.name)])
+    tables['member_of'] = {
+        'name': 'member_of',
+        'header': ['member of', 'function', 'first', 'last', 'description', '', ''],
+        'data': []}
+    for link_ in actor.get_links('P107', True):
+        update_url = url_for('member_update', id_=link_.id, origin_id=actor.id)
+        unlink_url = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab-member-of'
+        tables['member_of']['data'].append([
+            link(link_.domain),
+            link_.type.name,
+            link_.first,
+            link_.last,
+            truncate_string(link_.description),
+            '<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>',
+            build_remove_link(unlink_url, link_.domain.name)])
+    if actor.class_.code in app.config['CLASS_CODES']['group']:
+        tables['member'] = {
+            'name': 'member',
+            'header': ['member', 'function', 'first', 'last', 'description', '', ''],
+            'data': []}
+        for link_ in actor.get_links('P107'):
+            update_url = url_for('member_update', id_=link_.id, origin_id=actor.id)
+            unlink_url = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab-member'
+            tables['member']['data'].append([
+                link(link_.range),
+                link_.type.name,
+                link_.first,
+                link_.last,
+                truncate_string(link_.description),
+                '<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>',
+                build_remove_link(unlink_url, link_.range.name)])
     return render_template('actor/view.html', actor=actor, tables=tables)
 
 
@@ -121,10 +152,7 @@ def actor_index():
 @required_group('editor')
 def actor_insert(code, origin_id=None):
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
-    forms = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
-    form = build_form(ActorForm, forms[code])
-    if origin:
-        del form.insert_and_continue
+    form = build_form(ActorForm, uc_first(app.config['CODE_CLASS'][code]))
     if form.validate_on_submit():
         result = save(form, None, code, origin)
         flash(_('entity created'), 'info')
@@ -142,6 +170,8 @@ def actor_insert(code, origin_id=None):
             return redirect(url_for(view + '_view', id_=origin.id) + '#tab-actor')
         return redirect(url_for('actor_view', id_=result.id))
     form.alias.append_entry('')
+    if origin:
+        del form.insert_and_continue
     return render_template('actor/insert.html', form=form, code=code, origin=origin)
 
 

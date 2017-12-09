@@ -253,7 +253,7 @@ def display_menu(self, origin):
     if current_user.is_authenticated:
         selected = ''
         if origin:
-            selected = openatlas.app.config['CODE_CLASS'][origin.class_.code]
+            selected = app.config['CODE_CLASS'][origin.class_.code]
         for item in ['overview', 'source', 'event', 'actor', 'place', 'reference', 'types']:
             if selected:
                 css = 'active' if item == selected else ''

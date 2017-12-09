@@ -2,6 +2,7 @@
 import ast
 from collections import OrderedDict
 import openatlas
+from openatlas import app
 from openatlas.models.date import DateMapper
 from openatlas.models.link import LinkMapper
 
@@ -57,10 +58,10 @@ class Entity(object):
         self.dates = DateMapper.get_dates(self)
 
     def print_base_type(self):
-        if self.class_.code in openatlas.app.config['CLASS_CODES']['actor']:
+        if self.class_.code in app.config['CLASS_CODES']['actor']:
             return ''  # actors have no base type
-        root_name = openatlas.app.config['CODE_CLASS'][self.class_.code].title()
-        if self.class_.code in openatlas.app.config['CLASS_CODES']['reference']:
+        root_name = app.config['CODE_CLASS'][self.class_.code].title()
+        if self.class_.code in app.config['CLASS_CODES']['reference']:
             root_name = self.system_type.title()
         root_id = openatlas.NodeMapper.get_hierarchy_by_name(root_name).id
         for node in self.nodes:
@@ -158,7 +159,7 @@ class EntityMapper(object):
         else:
             sql = EntityMapper.sql + """
                 WHERE e.class_code IN %(codes)s GROUP BY e.id ORDER BY e.name;"""
-        cursor.execute(sql, {'codes': tuple(openatlas.app.config['CLASS_CODES'][class_name])})
+        cursor.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][class_name])})
         openatlas.debug_model['by codes'] += 1
         entities = []
         for row in cursor.fetchall():

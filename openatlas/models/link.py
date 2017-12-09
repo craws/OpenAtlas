@@ -3,6 +3,7 @@ from flask import flash, session
 from flask_babel import lazy_gettext as _
 
 import openatlas
+from openatlas import app
 
 
 class Link(object):
@@ -52,7 +53,7 @@ class LinkMapper(object):
                 domain_class = openatlas.classes[domain.class_.code]
                 range_class = openatlas.classes[range_.class_.code]
                 property_ = openatlas.properties[property_code]
-                ignore = openatlas.app.config['WHITELISTED_DOMAINS']
+                ignore = app.config['WHITELISTED_DOMAINS']
                 domain_error = True
                 range_error = True
                 if property_.find_object('domain_class_code', domain_class.code):

@@ -1,0 +1,10 @@
+{% extends 'layout.html' %}
+{% block breadcrumb %}
+    <a href="{{ url_for('actor_index') }}">{{ _('actor')|uc_first }}</a>
+    > {{ origin|link|safe }}
+    > {{ related|link|safe }}
+    > {{ _('edit')|uc_first }}
+{% endblock %}
+{% block content %}
+    {{ form|display_form|safe }}
+{% endblock %}

@@ -13,6 +13,7 @@ from html.parser import HTMLParser
 from werkzeug.utils import redirect
 
 import openatlas
+from openatlas import app
 from openatlas.models.classObject import ClassObject
 from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.property import Property
@@ -31,7 +32,7 @@ def send_mail(subject, text, recipients):
     server.ehlo()
     server.starttls()
     try:
-        server.login(sender, openatlas.app.config['MAIL_PASSWORD'])
+        server.login(sender, app.config['MAIL_PASSWORD'])
         for recipient in recipients if isinstance(recipients, list) else [recipients]:
             body = '\r\n'.join([
                 'To: %s' % recipient,
@@ -81,7 +82,7 @@ def build_table_form(class_name, linked_entities):
     """Returns a form with a list of entities with checkboxes"""
     # Todo: add CSRF token
     form = '<form class="table" method="post">'
-    header = openatlas.app.config['TABLE_HEADERS'][class_name] + ['']
+    header = app.config['TABLE_HEADERS'][class_name] + ['']
     table = {'name': class_name, 'header': header, 'data': []}
     linked_ids = [entity.id for entity in linked_entities]
     for entity in EntityMapper.get_by_codes(class_name):
@@ -117,7 +118,7 @@ def get_entity_data(entity, location=None):
         if not node.root:
             continue
         root = openatlas.nodes[node.root[-1]]
-        name = 'type' if root.name in openatlas.app.config['BASE_TYPES'] else root.name
+        name = 'type' if root.name in app.config['BASE_TYPES'] else root.name
         if root.name not in type_data:
             type_data[name] = []
         type_data[name].append(node.name)
@@ -128,13 +129,13 @@ def get_entity_data(entity, location=None):
         data.append((root_name, '<br />'.join(nodes)))
 
     # Info for places
-    if entity.class_.code in openatlas.app.config['CLASS_CODES']['place']:
+    if entity.class_.code in app.config['CLASS_CODES']['place']:
         aliases = entity.get_linked_entities('P1')
         if aliases:
             data.append((uc_first(_('alias')), '<br />'.join([x.name for x in aliases])))
 
     # Info for events
-    if entity.class_.code in openatlas.app.config['CLASS_CODES']['event']:
+    if entity.class_.code in app.config['CLASS_CODES']['event']:
         super_event = entity.get_linked_entity('P117')
         if super_event:
             data.append((uc_first(_('Sub event of')), link(super_event)))
@@ -163,7 +164,7 @@ def get_entity_data(entity, location=None):
                 data.append((uc_first(_('given place')), html))
 
     # Info for actors
-    if entity.class_.code in openatlas.app.config['CLASS_CODES']['actor']:
+    if entity.class_.code in app.config['CLASS_CODES']['actor']:
         residence = entity.get_linked_entity('P74')
         if residence:
             data.append((uc_first(_('residence')), link(residence.get_linked_entity('P53', True))))
@@ -367,7 +368,7 @@ def pager(table):
     show_pager = False if len(table['data']) < table_rows else True
     if show_pager:
         options = ''
-        for amount in openatlas.app.config['DEFAULT_TABLE_ROWS']:
+        for amount in app.config['DEFAULT_TABLE_ROWS']:
             options += '<option value="{amount}"{selected}>{amount}</option>'.format(
                 amount=amount, selected=' selected="selected"' if amount == table_rows else '')
         html += """
@@ -422,7 +423,7 @@ def pager(table):
 
 def get_base_table_data(entity):
     """Returns standard table data for an entity"""
-    name = openatlas.app.config['CODE_CLASS'][entity.class_.code]
+    name = app.config['CODE_CLASS'][entity.class_.code]
     data = [link(entity)]
     if name in ['event', 'actor']:
         data.append(openatlas.classes[entity.class_.code].name)
