@@ -16,6 +16,9 @@
         {% if tables['entities'].data %}
             <li><a href="#tab-entities">{{ _('entities')|uc_first }} ({{ tables['entities']['data']|length }})</a></li>
         {% endif %}
+        {% if tables['link_entities'].data %}
+            <li><a href="#tab-link-entities">{{ _('entities')|uc_first }} ({{ tables['link_entities']['data']|length }})</a></li>
+        {% endif %}
     </ul>
     <div id="tab-info">
         {% if 'editor'|is_authorized and node.root: %}
@@ -41,6 +44,11 @@
     {% if tables['entities'].data %}
         <div id="tab-entities">
             {{ tables['entities']|pager|safe }}
+        </div>
+    {% endif %}
+    {% if tables['link_entities'].data %}
+        <div id="tab-link-entities">
+            {{ tables['link_entities']|pager|safe }}
         </div>
     {% endif %}
 </div>

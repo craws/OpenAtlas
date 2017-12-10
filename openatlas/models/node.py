@@ -24,7 +24,8 @@ class NodeMapper(EntityMapper):
                 e.created,
                 e.modified,
                 es.id AS super_id,
-                COUNT(l2.id) AS count
+                COUNT(l2.id) AS count,
+                COUNT(lp.id) AS count_property
             FROM model.entity e                
 
             -- get super
@@ -32,7 +33,8 @@ class NodeMapper(EntityMapper):
             LEFT JOIN model.entity es ON l.range_id = es.id
 
             -- get count
-            LEFT JOIN model.link l2 ON l2.range_id = e.id AND l2.property_code IN ('P2', 'P89')
+            LEFT JOIN model.link l2 ON e.id = l2.range_id AND l2.property_code IN ('P2', 'P89')
+            LEFT JOIN model.link_property lp ON e.id = lp.range_id AND lp.property_code = 'P2'
             
             WHERE e.class_code = %(class_code)s
                 AND (e.system_type IS NULL OR e.system_type != 'place location')
@@ -47,7 +49,7 @@ class NodeMapper(EntityMapper):
         for row in types + places:
             node = Entity(row)
             nodes[node.id] = node
-            node.count = row.count
+            node.count = row.count + row.count_property
             node.count_subs = 0
             node.subs = []
             node.root = [row.super_id] if row.super_id else []
