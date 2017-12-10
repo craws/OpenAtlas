@@ -238,11 +238,13 @@ class TableMultiSelect(HiddenInput):
             class_ = 'actor'
         if class_ in ['given_place']:
             class_ = 'place'
-        # Todo: adapt sort list for different header amount, show selected on top
         table = {
             'name': field.id,
-            'header': app.config['TABLE_HEADERS'][class_] + [''],
-            'data': [], 'sort': 'sortList: [[1,0],[0,0]]'}
+            'header': app.config['TABLE_HEADERS'][class_],
+            'data': []}
+        # make checkbox column sortable and show selected on top
+        table['headers'] = 'headers: { ' + str(len(table['header'])) + ': { sorter: "checkbox" } }'
+        table['sort'] = 'sortList: [[' + str(len(table['header'])) + ',0],[0,0]]'
         for entity in EntityMapper.get_by_codes(class_):
             selection += entity.name + '<br />' if field.data and entity.id in field.data else ''
             checked = ''

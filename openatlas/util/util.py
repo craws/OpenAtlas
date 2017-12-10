@@ -408,6 +408,7 @@ def pager(table):
     if show_pager:
         html += """
             $("#{name}-table").tablesorter({{
+                {headers}
                 {sort}
                 dateFormat: "ddmmyyyy",
                 widgets: [\'zebra\', \'filter\'],
@@ -416,7 +417,11 @@ def pager(table):
                     filter_columnFilters: false
                 }}}})
             .tablesorterPager({{positionFixed: false, container: $("#{name}-pager"), size:{size}}});
-        """.format(name=table['name'], sort=sort, size=table_rows)
+        """.format(
+            name=table['name'],
+            sort=sort,
+            size=table_rows,
+            headers='' if 'headers' not in table else table['headers'] + ',')
     else:
         html += '$("#' + table['name'] + '-table").tablesorter({' + sort + 'widgets:[\'zebra\']});'
     html += '</script>'
