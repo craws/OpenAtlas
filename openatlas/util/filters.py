@@ -113,13 +113,12 @@ def pager(self, table):
 def description(self, entity):
     if not entity.description:
         return ''
+    text = entity.description.replace('\r\n', '<br />')
     html = """
-        <div class="description">
-            <p class="description-title">{label}</p>
-            <p>{description}</p>
-        </div>""".format(
-            label=util.uc_first(_('description')),
-            description=entity.description.replace('\r\n', '<br />'))
+        <p class="description-title">{label}</p>
+        <div class="description more">
+            {description}
+        </div>""".format(label=util.uc_first(_('description')), description=text)
     return html
 
 

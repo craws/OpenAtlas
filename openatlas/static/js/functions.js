@@ -11,12 +11,41 @@ tinymce.init({
         ' undo redo link unlink fontselect fontsizeselect forecolor code',
 });
 
-$(document).ready(function () {
+$(document).ready(function() {
+
+    // Offer a show/hide button for date input fields
     $("#date-switcher").click(function () {
         $(".date-switch").toggleClass('display-none');
         $(this).text(function(i, text){
             return text === show ? hide : show;
         })
+    });
+
+    // Function to show only limited characters (showChar) and offer a show more/less button
+    var showChar = 800;
+    var ellipsesText = "...";
+    $('.more').each(function() {
+        var content = $(this).html();
+        if (content.length > showChar) {
+            var c = content.substr(0, showChar);
+            var h = content.substr(showChar, content.length - showChar);
+            var html = c + '<span class="more-ellipses">' + ellipsesText + '</span>'
+            html += '<span class="more-content"><span>' + h + '</span>'
+            html += '<a href="" class="more-link">' + moreText + '</a></span>';
+            $(this).html(html);
+        }
+    });
+    $(".more-link").click(function(){
+        if($(this).hasClass("less")) {
+            $(this).removeClass("less");
+            $(this).html(moreText);
+        } else {
+            $(this).addClass("less");
+            $(this).html(lessText);
+        }
+        $(this).parent().prev().toggle();
+        $(this).prev().toggle();
+        return false;
     });
 });
 

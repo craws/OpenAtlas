@@ -8,6 +8,19 @@ html, body, input, select, textarea {
     display: none;
 }
 
+.complete {
+    display:none;
+}
+
+.more-content span {
+    display: none;
+}
+
+.more-link {
+    margin-top:1em;
+    display: block;
+}
+
 .overlay {
     z-index: 1;
 }
@@ -53,6 +66,7 @@ form input[type="text"].month, form input[type="text"].day {
 
 .description {
     margin-top: 1em;
+    max-width: 80em;
 }
 
 .description-title {
