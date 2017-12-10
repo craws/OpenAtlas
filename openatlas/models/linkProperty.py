@@ -10,7 +10,7 @@ class LinkPropertyMapper(object):
         if not link or not range_:
             return
         link_id = link.id if isinstance(link, Link) else int(link)
-        range_id = range_.id if type(range_) is openatlas.Entity else int(range_)
+        range_id = range_.id if isinstance(range_, openatlas.Entity) else int(range_)
         sql = """
             INSERT INTO model.link_property (property_code, domain_id, range_id)
             VALUES (%(property_code)s, %(domain_id)s, %(range_id)s);"""

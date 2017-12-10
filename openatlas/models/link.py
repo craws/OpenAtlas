@@ -39,17 +39,17 @@ class LinkMapper(object):
             return
         range_ = range_ if isinstance(range_, list) else [range_]
         result = None
-        for range_param in range_:
-            if not range_param:
+        for range_ in range_:
+            if not range_:
                 continue
-            domain_id = domain.id if type(domain) is openatlas.Entity else int(domain)
-            range_id = range_param.id if type(range_param) is openatlas.Entity else int(range_param)
+            domain_id = domain.id if isinstance(domain, openatlas.Entity) else int(domain)
+            range_id = range_.id if isinstance(range_, openatlas.Entity) else int(range_)
             if 'settings' in session and session['settings']['debug_mode']:  # pragma: no cover
-                domain = domain if type(
-                    domain) is openatlas.Entity else openatlas.EntityMapper.get_by_id(int(domain))
-                range_ = range_param if type(
-                    range_param) is openatlas.Entity else openatlas.EntityMapper.get_by_id(
-                    int(range_param))
+                domain = domain if isinstance(
+                    domain, openatlas.Entity) else openatlas.EntityMapper.get_by_id(int(domain))
+                range_ = range_ if isinstance(
+                    range_, openatlas.Entity) else openatlas.EntityMapper.get_by_id(
+                    int(range_))
                 domain_class = openatlas.classes[domain.class_.code]
                 range_class = openatlas.classes[range_.class_.code]
                 property_ = openatlas.properties[property_code]
