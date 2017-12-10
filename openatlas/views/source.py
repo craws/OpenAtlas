@@ -12,7 +12,8 @@ from openatlas.forms import build_form
 from openatlas.models.entity import EntityMapper, Entity
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (link, truncate_string, required_group, get_entity_data, uc_first,
-                                 build_table_form, build_remove_link, get_base_table_data)
+                                 build_table_form, build_remove_link, get_base_table_data,
+                                 is_authorized)
 
 
 class SourceForm(Form):
@@ -62,8 +63,9 @@ def source_insert(origin_id=None):
 @required_group('readonly')
 def source_view(id_, unlink_id=None):
     source = EntityMapper.get_by_id(id_)
-    if unlink_id:
+    if unlink_id and is_authorized('editor'):
         LinkMapper.delete_by_id(unlink_id)
+        flash(_('link removed'), 'info')
     tables = {
         'info': get_entity_data(source),
         'translation': {
@@ -76,23 +78,25 @@ def source_view(id_, unlink_id=None):
             translation.nodes[0].name if translation.nodes else '',
             truncate_string(translation.description)])
     for name in ['event', 'place', 'actor']:
-        header = app.config['TABLE_HEADERS'][name] + ['']
+        header = app.config['TABLE_HEADERS'][name]
         tables[name] = {'name': name, 'header': header, 'data': []}
     for link_ in source.get_links('P67'):
         data = get_base_table_data(link_.range)
         name = app.config['CODE_CLASS'][link_.range.class_.code]
-        unlink_url = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-' + name
-        data.append(build_remove_link(unlink_url, link_.range.name))
+        if is_authorized('editor'):
+            unlink_url = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-' + name
+            data.append(build_remove_link(unlink_url, link_.range.name))
         tables[name]['data'].append(data)
-    header = app.config['TABLE_HEADERS']['reference'] + ['page', '', '']
+    header = app.config['TABLE_HEADERS']['reference'] + ['page']
     tables['reference'] = {'name': 'source', 'header': header, 'data': []}
     for link_ in source.get_links('P67', True):
-        unlink_url = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-reference'
-        update_url = url_for('reference_link_update', link_id=link_.id, origin_id=source.id)
         data = get_base_table_data(link_.domain)
         data.append(link_.description)
-        data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
-        data.append(build_remove_link(unlink_url, link_.domain.name))
+        if is_authorized('editor'):
+            unlink = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-reference'
+            update_url = url_for('reference_link_update', link_id=link_.id, origin_id=source.id)
+            data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
+            data.append(build_remove_link(unlink, link_.domain.name))
         tables['reference']['data'].append(data)
     return render_template('source/view.html', source=source, tables=tables)
 

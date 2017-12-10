@@ -30,7 +30,7 @@ def index():
         'counts': {'name': 'overview', 'header': [], 'data': []},
         'bookmarks': {
             'name': 'bookmarks',
-            'header': ['name', 'class', 'first', 'last', ''],
+            'header': ['name', 'class', 'first', 'last'],
             'data': []}}
     if current_user.is_authenticated:
         for entity_id in current_user.bookmarks:

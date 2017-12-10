@@ -10,8 +10,8 @@ from openatlas import app
 from openatlas.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper, Entity
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import (truncate_string, required_group, get_entity_data,
-                                 build_remove_link, get_base_table_data, uc_first, link)
+from openatlas.util.util import (truncate_string, required_group, get_entity_data, uc_first,
+                                 build_remove_link, get_base_table_data, link, is_authorized)
 
 
 class PlaceForm(DateForm):
@@ -60,31 +60,35 @@ def place_insert(origin_id=None):
 @required_group('readonly')
 def place_view(id_, unlink_id=None):
     object_ = EntityMapper.get_by_id(id_)
-    if unlink_id:
+    if unlink_id and is_authorized('editor'):
         LinkMapper.delete_by_id(unlink_id)
+        flash(_('link removed'), 'info')
     object_.set_dates()
     location = object_.get_linked_entity('P53')
     tables = {
         'info': get_entity_data(object_, location),
         'source': {
             'name': 'source',
-            'header': app.config['TABLE_HEADERS']['source'] + ['description', ''],
+            'header': app.config['TABLE_HEADERS']['source'] + ['description'],
             'data': []},
         'reference': {
             'name': 'reference',
-            'header': app.config['TABLE_HEADERS']['reference'] + ['pages', '', ''],
+            'header': app.config['TABLE_HEADERS']['reference'] + ['pages'],
             'data': []}}
     for link_ in object_.get_links('P67', True):
         name = app.config['CODE_CLASS'][link_.domain.class_.code]
-        unlink_url = url_for('place_view', id_=object_.id, unlink_id=link_.id) + '#tab-' + name
+
         data = get_base_table_data(link_.domain)
         if name == 'source':
             data.append(truncate_string(link_.domain.description))
         else:
             data.append(truncate_string(link_.description))
-            update_url = url_for('reference_link_update', link_id=link_.id, origin_id=object_.id)
-            data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
-        data.append(build_remove_link(unlink_url, link_.domain.name))
+            if is_authorized('editor'):
+                url = url_for('reference_link_update', link_id=link_.id, origin_id=object_.id)
+                data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
+        if is_authorized('editor'):
+            unlink_url = url_for('place_view', id_=object_.id, unlink_id=link_.id) + '#tab-' + name
+            data.append(build_remove_link(unlink_url, link_.domain.name))
         tables[name]['data'].append(data)
     tables['event'] = {
         'name': 'event',

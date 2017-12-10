@@ -142,8 +142,7 @@ def page_buttons(self, entity):
                     url_next=url_for(view + '_view', id_=pager_ids.next_id),
                     url_last=url_for(view + '_view', id_=pager_ids.last_id))
         if html:
-            html = '<div class="pager" style="float:left;margin:0.1em 0.5em 0 0;"">' + html
-            html += '</div>'
+            html = '<div class="pager">' + html + '</div>'
         return html
 
 

@@ -12,7 +12,7 @@ from openatlas.forms import build_form, TableField
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (uc_first, truncate_string, required_group, get_entity_data,
-                                 build_remove_link, get_base_table_data)
+                                 build_remove_link, get_base_table_data, is_authorized)
 
 
 class ReferenceForm(Form):
@@ -111,21 +111,23 @@ def reference_link_update(link_id, origin_id):
 @required_group('readonly')
 def reference_view(id_, unlink_id=None):
     reference = EntityMapper.get_by_id(id_)
-    if unlink_id:
+    if unlink_id and is_authorized('editor'):
         LinkMapper.delete_by_id(unlink_id)
+        flash(_('link removed'), 'info')
     tables = {'info': get_entity_data(reference)}
     for name in ['source', 'event', 'actor', 'place']:
-        header = app.config['TABLE_HEADERS'][name] + ['page', '', '']
+        header = app.config['TABLE_HEADERS'][name] + ['page']
         tables[name] = {'name': name, 'header': header, 'data': []}
     for link_ in reference.get_links('P67'):
         name = app.config['CODE_CLASS'][link_.range.class_.code]
-        update_url = url_for('reference_link_update', link_id=link_.id, origin_id=reference.id)
-        unlink_url = url_for(
-            'reference_view', id_=reference.id, unlink_id=link_.id) + '#tab-' + name
         data = get_base_table_data(link_.range)
         data.append(truncate_string(link_.description))
-        data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
-        data.append(build_remove_link(unlink_url, link_.range.name))
+        if is_authorized('editor'):
+            update_url = url_for('reference_link_update', link_id=link_.id, origin_id=reference.id)
+            unlink_url = url_for(
+                'reference_view', id_=reference.id, unlink_id=link_.id) + '#tab-' + name
+            data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
+            data.append(build_remove_link(unlink_url, link_.range.name))
         tables[name]['data'].append(data)
     return render_template('reference/view.html', reference=reference, tables=tables)
 

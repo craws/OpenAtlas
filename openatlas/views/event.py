@@ -13,8 +13,8 @@ from openatlas import app
 from openatlas.forms import DateForm, build_form, TableField, TableMultiField
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper, Link
-from openatlas.util.util import (required_group, truncate_string, get_entity_data,
-                                 build_remove_link, get_base_table_data, uc_first, link)
+from openatlas.util.util import (required_group, truncate_string, get_entity_data, uc_first,
+                                 build_remove_link, get_base_table_data, link, is_authorized)
 
 
 class EventForm(DateForm):
@@ -119,14 +119,15 @@ def event_update(id_):
 @required_group('readonly')
 def event_view(id_, unlink_id=None):
     event = EntityMapper.get_by_id(id_)
-    if unlink_id:
+    if unlink_id and is_authorized('editor'):
         LinkMapper.delete_by_id(unlink_id)
+        flash(_('link removed'), 'info')
     event.set_dates()
     tables = {
         'info': get_entity_data(event),
         'actor': {
             'name': 'actor',
-            'header': ['actor', 'class', 'involvement', 'first', 'last', 'description', '', ''],
+            'header': ['actor', 'class', 'involvement', 'first', 'last', 'description'],
             'data': []}}
     for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
         first = link_.first
@@ -135,36 +136,40 @@ def event_view(id_, unlink_id=None):
         last = link_.last
         if not link_.last and event.last:
             last = '<span class="inactive" style="float:right">' + str(event.last) + '</span>'
-        unlink_url = url_for('event_view', id_=event.id, unlink_id=link_.id) + '#tab-actor'
-        update_url = url_for('involvement_update', id_=link_.id, origin_id=event.id)
-        tables['actor']['data'].append([
+        data = ([
             link(link_.range),
             openatlas.classes[link_.range.class_.code].name,
             link_.type.name if link_.type else '',
             first,
             last,
-            truncate_string(link_.description),
-            '<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>',
-            build_remove_link(unlink_url, link_.range.name)])
+            truncate_string(link_.description)])
+        if is_authorized('editor'):
+            unlink_url = url_for('event_view', id_=event.id, unlink_id=link_.id) + '#tab-actor'
+            update_url = url_for('involvement_update', id_=link_.id, origin_id=event.id)
+            data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
+            data.append(build_remove_link(unlink_url, link_.range.name))
+        tables['actor']['data'].append(data)
     tables['source'] = {
         'name': 'source',
-        'header': app.config['TABLE_HEADERS']['source'] + ['description', ''],
+        'header': app.config['TABLE_HEADERS']['source'] + ['description'],
         'data': []}
     tables['reference'] = {
         'name': 'reference',
-        'header': app.config['TABLE_HEADERS']['reference'] + ['pages', '', ''],
+        'header': app.config['TABLE_HEADERS']['reference'] + ['pages'],
         'data': []}
     for link_ in event.get_links('P67', True):
         name = app.config['CODE_CLASS'][link_.domain.class_.code]
-        unlink_url = url_for('event_view', id_=event.id, unlink_id=link_.id) + '#tab-' + name
         data = get_base_table_data(link_.domain)
         if name == 'source':
             data.append(truncate_string(link_.domain.description))
         else:
             data.append(truncate_string(link_.description))
-            update_url = url_for('reference_link_update', link_id=link_.id, origin_id=event.id)
-            data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
-        data.append(build_remove_link(unlink_url, link_.domain.name))
+            if is_authorized('editor'):
+                update_url = url_for('reference_link_update', link_id=link_.id, origin_id=event.id)
+                data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
+        if is_authorized('editor'):
+            unlink_url = url_for('event_view', id_=event.id, unlink_id=link_.id) + '#tab-' + name
+            data.append(build_remove_link(unlink_url, link_.domain.name))
         tables[name]['data'].append(data)
     tables['subs'] = {
         'name': 'sub-event',
