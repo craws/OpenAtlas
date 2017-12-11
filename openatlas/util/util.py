@@ -138,7 +138,7 @@ def get_entity_data(entity, location=None):
     if entity.class_.code in app.config['CLASS_CODES']['event']:
         super_event = entity.get_linked_entity('P117')
         if super_event:
-            data.append((uc_first(_('Sub event of')), link(super_event)))
+            data.append((uc_first(_('sub event of')), link(super_event)))
         place = entity.get_linked_entity('P7')
         if place:
             data.append((uc_first(_('location')), link(place.get_linked_entity('P53', True))))
