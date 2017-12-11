@@ -3,15 +3,14 @@
 BEGIN;
 
 -- Settings
-DELETE FROM web.settings WHERE name IN
-    ('mail_transport_password', 'mail_transport_auth', 'mail_transport_ssl', 'mail_transport_type', 'notify_login');
+DELETE FROM web.settings WHERE name IN ('mail_transport_password', 'mail_transport_auth', 'mail_transport_ssl', 'mail_transport_type', 'notify_login');
 UPDATE web.settings SET name = 'site_name' WHERE name = 'sitename';
 UPDATE web.settings SET value = 'en' WHERE name = 'default_language';
 UPDATE web.settings SET value = '' WHERE value = 'false';
 INSERT INTO web.settings (name, value) VALUES ('minimum_password_length', '12');
 INSERT INTO web.settings (name, value) VALUES ('debug_mode', '');
 
--- Web content
+-- Web content (intro and contact text)
 DROP TABLE IF EXISTS web.i18n;
 DROP TABLE IF EXISTS web.language;
 DROP TABLE IF EXISTS web.content;
@@ -25,12 +24,7 @@ CREATE TABLE i18n (
     modified timestamp without time zone
 );
 ALTER TABLE i18n OWNER TO openatlas;
-CREATE SEQUENCE i18n_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
+CREATE SEQUENCE i18n_id_seq START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
 ALTER TABLE i18n_id_seq OWNER TO openatlas;
 ALTER SEQUENCE i18n_id_seq OWNED BY i18n.id;
 ALTER TABLE ONLY i18n ALTER COLUMN id SET DEFAULT nextval('i18n_id_seq'::regclass);
@@ -38,7 +32,7 @@ ALTER TABLE ONLY i18n ADD CONSTRAINT i18n_name_language_key UNIQUE (name, langua
 ALTER TABLE ONLY i18n ADD CONSTRAINT i18n_pkey PRIMARY KEY (id);
 CREATE TRIGGER update_modified BEFORE UPDATE ON i18n FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
--- User
+-- User (using boolean type, adding a constraint)
 ALTER TABLE web."user" ALTER COLUMN "active" DROP DEFAULT;
 ALTER TABLE web."user" ALTER COLUMN "active" TYPE bool USING active::bool;
 ALTER TABLE web."user" ALTER COLUMN "active" SET DEFAULT FALSE;
@@ -232,13 +226,7 @@ CREATE TABLE class_i18n (
     modified time without time zone
 );
 ALTER TABLE class_i18n OWNER TO openatlas;
-
-CREATE SEQUENCE class_i18n_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
+CREATE SEQUENCE class_i18n_id_seq START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
 
 ALTER TABLE class_i18n_id_seq OWNER TO openatlas;
 ALTER SEQUENCE class_i18n_id_seq OWNED BY class_i18n.id;
@@ -258,13 +246,7 @@ CREATE TABLE property_i18n (
     modified timestamp without time zone
 );
 ALTER TABLE property_i18n OWNER TO openatlas;
-
-CREATE SEQUENCE property_i18n_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
+CREATE SEQUENCE property_i18n_id_seq START WITH 1 INCREMENT BY 1 NO MINVALUE NO MAXVALUE CACHE 1;
 
 ALTER TABLE property_i18n_id_seq OWNER TO openatlas;
 ALTER SEQUENCE property_i18n_id_seq OWNED BY property_i18n.id;
@@ -300,5 +282,8 @@ CREATE TRIGGER on_delete_link_property AFTER DELETE ON model.link_property FOR E
 
 -- Delete obsolete "History of the World" Event
 DELETE FROM model.entity WHERE id = (SELECT id from model.entity WHERE name = 'History of the World');
+
+-- Remove an unused description field
+ALTER TABLE model.link_property DROP COLUMN description;
 
 COMMIT;

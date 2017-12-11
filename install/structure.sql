@@ -708,7 +708,6 @@ CREATE TABLE link_property (
     property_code text NOT NULL,
     domain_id integer NOT NULL,
     range_id integer NOT NULL,
-    description text,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone
 );
