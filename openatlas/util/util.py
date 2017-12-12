@@ -20,7 +20,7 @@ from openatlas.models.property import Property
 from openatlas.models.user import User
 
 
-def send_mail(subject, text, recipients):
+def send_mail(subject, text, recipients):  # pragma: no cover
     if not session['settings']['mail']:
         return
     sender = session['settings']['mail_transport_username']

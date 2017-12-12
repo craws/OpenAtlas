@@ -64,7 +64,7 @@ def set_locale(language):
 @required_group('readonly')
 def overview_feedback():
     form = FeedbackForm()
-    if form.validate_on_submit():
+    if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
         subject = form.subject.data + ' from ' + session['settings']['site_name']
         user = current_user
         body = form.subject.data + ' from ' + user.username + ' (' + str(user.id) + ') '

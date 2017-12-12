@@ -60,10 +60,10 @@ def relation_update(id_, origin_id):
     if form.validate_on_submit():
         openatlas.get_cursor().execute('BEGIN')
         link_.delete()
-        if form.inverse.data:
-            link_id = related.link('OA7', origin, form.description.data)
-        else:
-            link_id = origin.link('OA7', related, form.description.data)
+        link_id = related.link(
+            'OA7',
+            origin if form.inverse.data else related,
+            form.description.data)
         DateMapper.save_link_dates(link_id, form)
         NodeMapper.save_link_nodes(link_id, form)
         openatlas.get_cursor().execute('COMMIT')

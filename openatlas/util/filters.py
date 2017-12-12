@@ -284,7 +284,7 @@ def display_debug_info(self, debug_model, form):
                     {value}
                 </div>
             </div>""".format(name=name, value=value)
-    if form and form.errors:
+    if form and hasattr(form, 'errors'):
         for fieldName, errorMessages in form.errors.items():
             html += fieldName + ' - ' + errorMessages[0] + '<br />'
     return html

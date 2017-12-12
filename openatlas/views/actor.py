@@ -116,7 +116,7 @@ def actor_view(id_, unlink_id=None):
     for link_ in actor.get_links('P107', True):
         data = ([
             link(link_.domain),
-            link_.type.name,
+            link_.type.name if link_.type else '',
             link_.first,
             link_.last,
             truncate_string(link_.description)])
@@ -134,7 +134,7 @@ def actor_view(id_, unlink_id=None):
         for link_ in actor.get_links('P107'):
             data = ([
                 link(link_.range),
-                link_.type.name,
+                link_.type.name if link_.type else '',
                 link_.first,
                 link_.last,
                 truncate_string(link_.description)])

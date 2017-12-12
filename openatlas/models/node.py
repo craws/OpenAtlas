@@ -123,9 +123,8 @@ class NodeMapper(EntityMapper):
 
     @staticmethod
     def walk_tree(param, selected_ids):
-        items = param if isinstance(param, list) else [param]
         string = ''
-        for id_ in items:
+        for id_ in param if isinstance(param, list) else [param]:
             item = openatlas.nodes[id_]
             selected = ",'state' : {'selected' : true}" if item.id in selected_ids else ''
             string += "{'text':'" + item.name + "', 'id':'" + str(item.id) + "'" + selected

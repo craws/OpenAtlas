@@ -124,9 +124,8 @@ def node_delete(id_):
 
 
 def walk_tree(param):
-    items = param if isinstance(param, list) else [param]
     text = ''
-    for id_ in items:
+    for id_ in param if isinstance(param, list) else [param]:
         item = openatlas.nodes[id_]
         count_subs = " (" + str(item.count_subs) + ")" if item.count_subs else ''
         text += "{href: '" + url_for('node_view', id_=item.id) + "',"

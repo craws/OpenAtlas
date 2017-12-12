@@ -34,7 +34,7 @@ def involvement_insert(origin_id):
     form = build_form(ActorForm, 'Involvement')
     if origin_class == 'event':
         del form.event
-    if origin_class == 'actor':
+    else:
         del form.actor
     form.activity.choices = [('P11', openatlas.properties['P11'].name)]
     if origin.class_.code in ['E7', 'E8', 'E12']:

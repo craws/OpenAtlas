@@ -60,7 +60,6 @@ def build_node_form(form, node, request_origin=None):
     if not root.directional:
         del form_instance.name_inverse
 
-    # Todo: is deletion needed here?
     # Delete custom fields except the one specified for the form
     delete_list = []  # Can't delete fields in the loop so creating a list for later deletion
     for field in form_instance:
@@ -276,7 +275,7 @@ class TableMultiField(HiddenField):
 class DateForm(Form):
 
     def populate_dates(self, entity):
-        # Todo: comment and reflect that entity can be a link, too
+        # Todo: write comment, reflect that entity can be a link
         for code, types in entity.dates.items():
             if code in ['OA1', 'OA3', 'OA5']:
                 for type_, date in types.items():

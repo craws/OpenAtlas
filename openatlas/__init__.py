@@ -18,7 +18,8 @@ app = Flask(
     static_folder='static',
     instance_relative_config=True)
 
-instance_name = 'production' if '--cover-tests' not in sys.argv else 'testing'
+# use the test database if running tests
+instance_name = 'production' if 'test_runner.py' not in sys.argv[0] else 'testing'
 app.config.from_object('config.default')  # load config/INSTANCE_NAME.py
 app.config.from_pyfile(instance_name + '.py')  # load instance/INSTANCE_NAME.py
 

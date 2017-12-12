@@ -42,14 +42,12 @@ class LinkMapper(object):
         for range_ in range_:
             if not range_:
                 continue
-            domain_id = domain.id if isinstance(domain, openatlas.Entity) else int(domain)
-            range_id = range_.id if isinstance(range_, openatlas.Entity) else int(range_)
+            domain_id = domain if isinstance(domain, int) else domain.id
+            range_id = range_ if isinstance(range_, int) else range_.id
             if 'settings' in session and session['settings']['debug_mode']:  # pragma: no cover
-                domain = domain if isinstance(
-                    domain, openatlas.Entity) else openatlas.EntityMapper.get_by_id(int(domain))
-                range_ = range_ if isinstance(
-                    range_, openatlas.Entity) else openatlas.EntityMapper.get_by_id(
-                    int(range_))
+                from openatlas.models.entity import EntityMapper
+                domain = domain if not isinstance(domain, int) else EntityMapper.get_by_id(domain)
+                range_ = range_ if not isinstance(range_, int) else EntityMapper.get_by_id(range_)
                 domain_class = openatlas.classes[domain.class_.code]
                 range_class = openatlas.classes[range_.class_.code]
                 property_ = openatlas.properties[property_code]
@@ -94,7 +92,6 @@ class LinkMapper(object):
 
     @staticmethod
     def get_linked_entities(entity, codes, inverse=False):
-        codes = codes if isinstance(codes, list) else [codes]
         sql = """
             SELECT range_id AS result_id FROM model.link
             WHERE domain_id = %(entity_id)s AND property_code IN %(codes)s;"""
@@ -104,18 +101,14 @@ class LinkMapper(object):
                 WHERE range_id = %(entity_id)s AND property_code IN %(codes)s;"""
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {
-            'entity_id': entity.id if isinstance(entity, openatlas.Entity) else int(entity),
-            'codes': tuple(codes)})
+            'entity_id': entity if isinstance(entity, int) else entity.id,
+            'codes': tuple(codes if isinstance(codes, list) else [codes])})
         openatlas.debug_model['div sql'] += 1
         ids = [element for (element,) in cursor.fetchall()]
         return openatlas.EntityMapper.get_by_ids(ids)
 
     @staticmethod
     def get_links(entity, codes, inverse=False):
-        codes = codes if isinstance(codes, list) else [codes]
-        entity_id = entity.id if isinstance(entity, openatlas.Entity) else int(entity)
-        first = 'range' if inverse else 'domain'
-        second = 'domain' if inverse else 'range'
         sql = """
             SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description, l.created,
                 l.modified, e.name,
@@ -133,9 +126,11 @@ class LinkMapper(object):
             LEFT JOIN model.link_property dl2 ON l.id = dl2.domain_id AND dl2.property_code = 'OA6'
             LEFT JOIN model.entity d2 ON dl2.range_id = d2.id
             WHERE l.{first}_id = %(entity_id)s GROUP BY l.id, e.name ORDER BY e.name;""".format(
-            first=first, second=second)
+            first='range' if inverse else 'domain', second='domain' if inverse else 'range')
         cursor = openatlas.get_cursor()
-        cursor.execute(sql, {'entity_id': entity_id, 'codes': tuple(codes)})
+        cursor.execute(sql, {
+            'entity_id': entity if isinstance(entity, int) else entity.id,
+            'codes': tuple(codes if isinstance(codes, list) else [codes])})
         openatlas.debug_model['div sql'] += 1
         links = []
         for row in cursor.fetchall():
