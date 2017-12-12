@@ -19,27 +19,30 @@ class IndexTests(TestBaseCase):
             assert b'Contact' in rv.data
             rv = self.app.get(url_for('index_credits'))
             assert b'Stefan Eichert' in rv.data
-            self.app.get('/index/setlocale/en')
-            rv = self.app.get('/login')
+            self.app.get(url_for('set_locale', language='en'))
+            rv = self.app.get(url_for('login'))
             assert b'Password' in rv.data
-            rv = self.app.post('/login', data={'username': 'Never', 'password': 'wrong'})
+            rv = self.app.post(url_for('login'), data={'username': 'Never', 'password': 'wrong'})
             assert b'No user with this name found' in rv.data
-            rv = self.app.post('/login', data={'username': 'Alice', 'password': 'wrong'})
+            rv = self.app.post(url_for('login'), data={'username': 'Alice', 'password': 'wrong'})
             assert b'Wrong Password' in rv.data
-            rv = self.app.post('/login', data={'username': 'inactive', 'password': 'test'})
+            rv = self.app.post(url_for('login'), data={'username': 'inactive', 'password': 'test'})
             assert b'This user is not activated' in rv.data
             for i in range(4):
-                rv = self.app.post('/login', data={'username': 'inactive', 'password': 'wrong'})
+                rv = self.app.post(url_for('login'), data={'username': 'inactive', 'password': '?'})
             assert b'Too many login attempts' in rv.data
             self.login()
             rv = self.app.get('/')
             assert b'0' in rv.data
+            rv = self.app.get(url_for('overview_feedback'))
+            assert b'Thank you' in rv.data
+
             # test redirection to overview if trying to login again
-            rv = self.app.get('/login', follow_redirects=True)
+            rv = self.app.get(url_for('login'), follow_redirects=True)
             assert b'first' in rv.data
-            rv = self.app.get('/index/setlocale/de', follow_redirects=True)
+            rv = self.app.get(url_for('set_locale', language='de'), follow_redirects=True)
             assert b'Quelle' in rv.data
-            rv = self.app.get('/logout', follow_redirects=True)
+            rv = self.app.get(url_for('logout'), follow_redirects=True)
             assert b'Password' in rv.data
             rv = self.app.get('/404')
             assert b'404' in rv.data

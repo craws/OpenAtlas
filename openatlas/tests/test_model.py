@@ -1,8 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import url_for, current_app
 
-from openatlas import app, PropertyMapper, EntityMapper
-from openatlas.models.classObject import ClassMapper
+from openatlas import app, EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.test_base import TestBaseCase
 

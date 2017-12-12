@@ -25,6 +25,8 @@ class HierarchyTest(TestBaseCase):
                 data=form_data,
                 follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
+            rv = self.app.post(url_for('hierarchy_delete', id_=hierarchy_id), follow_redirects=True)
+            assert b'deleted' in rv.data
             actor_node = NodeMapper.get_hierarchy_by_name('Actor Actor Relation')
             rv = self.app.get(url_for('hierarchy_update', id_=actor_node.id), follow_redirects=True)
             assert b'Forbidden' in rv.data

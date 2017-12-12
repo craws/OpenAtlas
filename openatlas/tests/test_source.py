@@ -1,7 +1,8 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import url_for
 
-from openatlas import app
+from openatlas import app, EntityMapper
+from openatlas.models.link import LinkMapper
 from openatlas.test_base import TestBaseCase
 
 
@@ -10,43 +11,64 @@ class SourceTest(TestBaseCase):
     def test_source(self):
         self.login()
         with app.app_context():
+
+            # source insert
             rv = self.app.get(url_for('source_insert'))
             assert b'+ Source' in rv.data
-            form_data = {'name': 'Test source'}
-            rv = self.app.post(url_for('source_insert'), data=form_data)
-            source_id = rv.location.split('/')[-1]
-            form_data['continue_'] = 'yes'
-            rv = self.app.post(url_for('source_insert'), data=form_data, follow_redirects=True)
+            rv = self.app.post(
+                url_for('source_insert', origin_id=EntityMapper.insert('E21', 'Hansi').id),
+                data={'name': 'Test source'},
+                follow_redirects=True)
+            assert b'An entry has been created' in rv.data
+            source_id = EntityMapper.get_by_codes('source')[0].id
+            rv = self.app.post(
+                url_for('source_insert'),
+                data={'name': 'Test source', 'continue_': 'yes'},
+                follow_redirects=True)
             assert b'An entry has been created' in rv.data
             rv = self.app.get(url_for('source_index'))
             assert b'Test source' in rv.data
+
+            # link source
+            rv = self.app.post(
+                url_for('reference_insert', code='carrier', origin_id=source_id),
+                data={'name': 'Test reference'},
+                follow_redirects=True)
+            assert b'Test source' in rv.data
+
+            actor_id = EntityMapper.insert('E21', 'Tha Ref').id
+            self.app.get(url_for('source_add', origin_id=actor_id))
+            rv = self.app.post(
+                url_for('source_add', origin_id=actor_id),
+                data={'values': source_id},
+                follow_redirects=True)
+            assert b'Tha Ref' in rv.data
+            link_id = LinkMapper.get_links(source_id, 'P67')[0].id
+            rv = self.app.get(url_for('source_view', id_=source_id, unlink_id=link_id))
+            assert b'removed'in rv.data
+
+            self.app.get(url_for(
+                'source_add2',
+                origin_id=actor_id,
+                id_=source_id,
+                class_name='actor'))
+            rv = self.app.post(
+                url_for('source_add2', id_=source_id, class_name='actor'),
+                data={'values': actor_id},
+                follow_redirects=True)
+            assert b'Tha Ref' in rv.data
+            rv = self.app.get(url_for('source_view', id_=source_id))
+            assert b'Tha Ref' in rv.data
+
+            # update source
             rv = self.app.get(url_for('source_update', id_=source_id))
             assert b'Test source' in rv.data
-            form_data['name'] = 'Test source updated'
             rv = self.app.post(
                 url_for('source_update', id_=source_id),
-                data=form_data,
+                data={'name': 'Source updated'},
                 follow_redirects=True)
-            assert b'Test source updated' in rv.data
-            rv = self.app.get(url_for('translation_insert', source_id=source_id))
-            assert b'+ Translation' in rv.data
-            rv = self.app.post(
-                url_for('translation_insert', source_id=source_id),
-                data={'name': 'Test translation'})
-            translation_id = rv.location.split('/')[-1]
-            self.app.get(url_for('translation_update', id_=translation_id, source_id=source_id))
-            rv = self.app.post(
-                url_for('translation_update', id_=translation_id, source_id=source_id),
-                data={'name': 'Translation updated'},
-                follow_redirects=True)
-            assert b'Translation updated' in rv.data
-            rv = self.app.get(
-                url_for('translation_delete', id_=translation_id, source_id=source_id),
-                follow_redirects=True)
-            assert b'The entry has been deleted.' in rv.data
-            self.app.post(
-                url_for('translation_insert', source_id=source_id),
-                data={'name': 'Test translation continued', 'continue_': 'yes'},
-                follow_redirects=True)
+            assert b'Source updated' in rv.data
+
+            # delete source
             rv = self.app.get(url_for('source_delete', id_=source_id), follow_redirects=True)
             assert b'The entry has been deleted.' in rv.data
