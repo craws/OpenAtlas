@@ -32,7 +32,7 @@ def index():
             'name': 'bookmarks',
             'header': ['name', 'class', 'first', 'last'],
             'data': []}}
-    if current_user.is_authenticated:
+    if current_user.is_authenticated and hasattr(current_user, 'bookmarks'):
         for entity_id in current_user.bookmarks:
             entity = EntityMapper.get_by_id(entity_id)
             tables['bookmarks']['data'].append([
