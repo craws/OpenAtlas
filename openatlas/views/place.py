@@ -9,6 +9,7 @@ import openatlas
 from openatlas import app
 from openatlas.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper, Entity
+from openatlas.models.gis import GisMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (truncate_string, required_group, get_entity_data, uc_first,
                                  build_remove_link, get_base_table_data, link, is_authorized)
@@ -29,7 +30,7 @@ def place_index():
     table = {'name': 'place', 'header': app.config['TABLE_HEADERS']['place'], 'data': []}
     for place in EntityMapper.get_by_codes('place'):
         table['data'].append(get_base_table_data(place))
-    return render_template('place/index.html', table=table)
+    return render_template('place/index.html', table=table, gis_data=GisMapper.get_all())
 
 
 @app.route('/place/insert', methods=['POST', 'GET'])

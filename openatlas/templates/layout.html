@@ -24,6 +24,9 @@
         <script src="/js/jquery/jstree-3.3.4/jstree.min.js"></script>
         <script src="/js/jquery/jstree-3.3.4/jstree.search.js"></script>
         <script src="/js/tinymce/tinymce.min.js"></script>
+        {% if gis_data %}
+            {% include "map.html" %}
+        {% endif %}
         <script>
             minimumPasswordLength = {{ session['settings']['minimum_password_length'] }};
             show = '{{ _('show')|uc_first }}';

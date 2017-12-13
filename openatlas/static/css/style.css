@@ -4,6 +4,13 @@ html, body, input, select, textarea {
     font-family: helvetica, arial, sans-serif;
 }
 
+#map {
+    float: left;
+    height: 440px;
+    width: 600px;
+    margin-left: 1em;
+}
+
 #show_passwords, form div.table-row div label[for='show_passwords'] {
     display: none;
 }

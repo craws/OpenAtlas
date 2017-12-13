@@ -11,6 +11,8 @@
         {% endif %}
         {{ table|pager|safe }}
     </div>
-    <div id="map" class="map"></div>
-    <script type="text/javascript" src="/js/leaflet/map.js"></script>
+    {% if gis_data %}
+        <div id="map" class="map"></div>
+        <script src="/js/leaflet/map.js"></script>
+    {% endif %}
 {% endblock %}

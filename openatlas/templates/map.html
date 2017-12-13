@@ -1,0 +1,34 @@
+<script>
+    var gisPointAll = {{ gis_data['gisPointAll']|safe }};
+    var gisPointSelected = {{ gis_data['gisPointSelected']|safe }};
+    var gisPolygonAll = {{ gis_data['gisPolygonAll']|safe }};
+    var gisPolygonSelected = {{ gis_data['gisPolygonSelected']|safe }};
+    var gisPolygonPointSelected = {{ gis_data['gisPolygonPointSelected']|safe }};
+    var jsonSearch = [];
+    var translate = [];
+    translate['save'] = '{{ _('save')|uc_first|safe }}';
+    translate['edit'] = '{{ _('edit')|uc_first|safe }}';
+    translate['delete'] = '{{ _('delete')|uc_first|safe }}';
+    translate['details'] = '{{ _('details')|uc_first|safe }}';
+    translate['map_clear'] = '{{ _('map_clear')|uc_first|safe }}';
+    translate['map_info_reedit'] = '{{ _('map_info_reedit')|uc_first|safe }}';
+    translate['map_info_shape'] = '{{ _('map_info_shape')|uc_first|safe }}';
+    translate['map_info_area'] = '{{ _('map_info_area')|uc_first|safe }}';
+    translate['map_info_point'] = '{{ _('map_info_point')|uc_first|safe }}';
+    translate['map_info_close'] = '{{ _('map_info_close')|uc_first|safe }}';
+    translate['map_info_description'] = '{{ _('map_info_description')|safe }}';
+</script>
+<script src="/js/leaflet/mapbox.js"></script>
+<script src="/js/leaflet/L.Control.Geonames.js"></script>
+<!--<script type="text/javascript" src="/js/leaflet/L.Control.sitesearch.js"></script>-->
+<script src="/js/leaflet/leaflet.usermarker.js"></script>
+<script src="/js/leaflet/leaflet.fullscreen-master/Control.FullScreen.js"></script>
+<script src="/js/leaflet/easy-button.js"></script>
+<link rel="stylesheet" href="/js/leaflet/leaflet.fullscreen-master/Control.FullScreen.css" />
+<link rel="stylesheet" href="/js/leaflet/leaflet.css" />
+<link rel="stylesheet" href="/js/leaflet/font-awesome/css/font-awesome.min.css" />
+<link rel="stylesheet" href="/js/leaflet/L.Control.Geonames.css" />
+<!--<link rel="stylesheet" href="/js/leaflet/L.Control.sitesearch.css" />-->
+<link rel="stylesheet" href="/js/leaflet/leaflet.usermarker.css" />
+<link href="/js/leaflet/draw/leaflet.draw.css" rel="stylesheet" type="text/css"/>
+<link href="/js/leaflet/shapeedit.css" rel="stylesheet" type="text/css"/>
