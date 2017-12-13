@@ -3,10 +3,14 @@
     {{ _('place')|uc_first }}
 {% endblock %}
 {% block content %}
-    {% if 'editor'|is_authorized: %}
-        <div class="button-bar">
-            <a href="{{ url_for('place_insert') }}">+ {{ _('place')|uc_first }}</a>
-        </div>
-    {% endif %}
-    {{ table|pager|safe }}
+    <div style="float:left;">
+        {% if 'editor'|is_authorized: %}
+            <div class="button-bar">
+                <a href="{{ url_for('place_insert') }}">+ {{ _('place')|uc_first }}</a>
+            </div>
+        {% endif %}
+        {{ table|pager|safe }}
+    </div>
+    <div id="map" class="map"></div>
+    <script type="text/javascript" src="/js/leaflet/map.js"></script>
 {% endblock %}
