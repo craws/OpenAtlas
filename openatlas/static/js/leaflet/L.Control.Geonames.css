@@ -1,0 +1,56 @@
+.leaflet-geonames-search {
+    background-color: #FFF;
+}
+.leaflet-geonames-search a{
+    font-size: 18px;
+    border-radius: 4px;
+    display: inline-block;
+    float:right;
+}
+.leaflet-geonames-search a {
+    background: none !important;
+    border: none !important;
+}
+.leaflet-geonames-search form {
+    float: left;
+}
+.leaflet-geonames-search input {
+    padding: 2px;
+    margin: 4px;
+    border: none;
+    display: none;
+}
+.leaflet-geonames-search ul {
+    display: none;
+    list-style: none;
+    padding: 0 0 2px 0;
+    margin: 0;
+    clear:both;
+    max-width: 250px;
+}
+.leaflet-geonames-search ul li {
+    padding: 4px;
+    border-top: 1px solid #DDD;
+}
+.leaflet-geonames-search ul.hasResults li:hover {
+    background: #F2F2F2;
+    cursor: pointer;
+}
+.leaflet-geonames-search input:focus {
+    outline: 0;
+}
+.leaflet-geonames-search.active a {
+    border-radius: 0 4px 4px 0;
+    border-bottom-color: #FFF;
+}
+.leaflet-geonames-search.active input {
+    display: inline-block;
+}
+.leaflet-geonames-search ul.hasResults,
+.leaflet-geonames-search ul.noResults{
+    display: block;
+}
+.leaflet-geonames-search ul.noResults {
+    color: #999;
+    font-style: italic;
+}
