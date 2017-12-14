@@ -74,11 +74,12 @@ class GisMapper(object):
                 else:
                     all_[shape].append(item)
                 if hasattr(row, 'polygon_point'):
-                    item['geometry'] = json.loads(row.polygon_point)
+                    polygon_point_item = dict(item)  # make a copy to prevent overriding geometry
+                    polygon_point_item['geometry'] = json.loads(row.polygon_point)
                     if row.object_id in object_ids:
-                        selected['polygon_point'].append(item)
+                        selected['polygon_point'].append(polygon_point_item)
                     else:
-                        all_['point'].append(item)
+                        all_['point'].append(polygon_point_item)
         gis = {
             'gisPointAll': json.dumps(all_['point']),
             'gisPointSelected': json.dumps(selected['point']),
