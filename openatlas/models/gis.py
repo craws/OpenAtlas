@@ -1,7 +1,9 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+import ast
 
 from flask import json
 import openatlas
+from openatlas.util.util import uc_first
 
 
 class GisMapper(object):
@@ -26,6 +28,7 @@ class GisMapper(object):
                     ST_AsGeoJSON({shape}.geom) AS geojson, {polygon_point_sql}
                     object.name AS object_name,
                     object.description AS object_description,
+                    string_agg(CAST(t.range_id AS text), ',') AS types,
                     (SELECT COUNT(*) FROM gis.point point2
                         WHERE {shape}.entity_id = point2.entity_id) AS point_count,
                     (SELECT COUNT(*) FROM gis.polygon polygon2
@@ -34,11 +37,14 @@ class GisMapper(object):
                 JOIN model.link l ON place.id = l.range_id
                 JOIN model.entity object ON l.domain_id = object.id
                 JOIN gis.{shape} {shape} ON place.id = {shape}.entity_id
-                WHERE place.class_code = 'E53' AND l.property_code = 'P53';""".format(
+                LEFT JOIN model.link t ON object.id = t.domain_id AND t.property_code = 'P2'
+                WHERE place.class_code = 'E53' AND l.property_code = 'P53'
+                GROUP BY object.id, {shape}.id;""".format(
                         shape=shape,
                         polygon_point_sql=polygon_point_sql if shape == 'polygon' else '')
             cursor = openatlas.get_cursor()
             cursor.execute(sql)
+            place_type_root_id = openatlas.NodeMapper.get_hierarchy_by_name('Place').id
             for row in cursor.fetchall():
                 item = {
                     'type': 'Feature',
@@ -50,9 +56,18 @@ class GisMapper(object):
                         'id': row.id,
                         'name': row.name.replace('"', '\"'),
                         'description': row.description.replace('"', '\"') if row.description else '',
-                        'siteType': 'To do',
-                        'shapeType': row.type,
+                        'siteType': '',
+                        'shapeType': uc_first(row.type),
                         'count': row.point_count + row.polygon_count}}
+
+                if hasattr(row, 'types') and row.types:
+                    nodes_list = ast.literal_eval('[' + row.types + ']')
+                    for node_id in list(set(nodes_list)):
+                        node = openatlas.nodes[node_id]
+                        if node.root and node.root[-1] == place_type_root_id:
+                            item['properties']['siteType'] = node.name
+                            break
+
                 if row.object_id in object_ids:
                     selected[shape].append(item)
                 else:
