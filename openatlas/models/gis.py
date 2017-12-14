@@ -46,6 +46,7 @@ class GisMapper(object):
             cursor.execute(sql)
             place_type_root_id = openatlas.NodeMapper.get_hierarchy_by_name('Place').id
             for row in cursor.fetchall():
+                description = row.description.replace('"', '\"') if row.description else ''
                 item = {
                     'type': 'Feature',
                     'geometry': json.loads(row.geojson),
@@ -55,7 +56,7 @@ class GisMapper(object):
                         'objectDescription': row.object_description.replace('"', '\"'),
                         'id': row.id,
                         'name': row.name.replace('"', '\"'),
-                        'description': row.description.replace('"', '\"') if row.description else '',
+                        'description': description,
                         'siteType': '',
                         'shapeType': uc_first(row.type),
                         'count': row.point_count + row.polygon_count}}
@@ -85,3 +86,32 @@ class GisMapper(object):
             'gisPolygonSelected': json.dumps(selected['polygon']),
             'gisPolygonPointSelected': json.dumps(selected['polygon_point'])}
         return gis
+
+    @staticmethod
+    def insert(entity, form):
+        cursor = openatlas.get_cursor()
+        for shape in ['point', 'polygon']:
+            for item in json.loads(getattr(form, 'gis_' + shape + 's').data):
+                sql = """
+                    INSERT INTO gis.{shape} (entity_id, name, description, type, geom)
+                    VALUES (
+                        %(entity_id)s,
+                        %(name)s,
+                        %(description)s,
+                        %(type)s,
+                        ST_SetSRID(ST_GeomFromGeoJSON(%(geojson)s),4326)
+                    );""".format(shape=shape)
+                cursor.execute(sql, {
+                    'entity_id': entity.id,
+                    'name': item['properties']['name'],
+                    'description': item['properties']['description'],
+                    'type': item['properties']['shapeType'],
+                    'geojson': json.dumps(item['geometry'])})
+
+    @staticmethod
+    def delete_by_entity(entity):
+        cursor = openatlas.get_cursor()
+        sql = 'DELETE FROM gis.point WHERE entity_id = %(entity_id)s;'
+        cursor.execute(sql, {'entity_id': entity.id})
+        sql = 'DELETE FROM gis.polygon WHERE entity_id = %(entity_id)s;'
+        cursor.execute(sql, {'entity_id': entity.id})

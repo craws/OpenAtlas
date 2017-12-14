@@ -198,16 +198,16 @@ if (gisPointSelected == "") {
 }
 
 if (myurl.indexOf('insert') >= 0) {
-    $('#gisPoints').val('[]');
-    $('#gisPolygons').val('[]');
+    $('#gis_points').val('[]');
+    $('#gis_polygons').val('[]');
     if (mypoints) {
         map.removeLayer(mypoints);
     }
 }
 
 if (myurl.indexOf('update') >= 0) {
-    $('#gisPoints').val(JSON.stringify(gisPointSelected));
-    $('#gisPolygons').val(JSON.stringify(gisPolygonSelected));
+    $('#gis_points').val(JSON.stringify(gisPointSelected));
+    $('#gis_polygons').val(JSON.stringify(gisPolygonSelected));
     if (mysites) {
         map.removeLayer(mysites);
     }
@@ -305,7 +305,7 @@ function setpopup(feature, layer) {
         '<div id="popup"><strong>' + feature.properties.name + '</strong><br/>' +
         '<div style="max-height:140px; overflow-y: auto;">' + feature.properties.description + '<br/></div>' +
         '<i>' + feature.properties.shapeType + '</i><br/><br/>' +
-        '<div id="btnBar">' +
+        '<div id="btnBar" style="white-space:nowrap;">' +
         '<button id="editBtn" onclick="editshape()"/>' + translate['edit'] + '</button> <button id="delBtn" onclick="deleteshape()"/>' + translate['delete'] + '</button></div>' +
         '</div>'
         );

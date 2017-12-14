@@ -21,6 +21,8 @@ class PlaceForm(DateForm):
     description = TextAreaField(_('content'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
+    gis_points = HiddenField()
+    gis_polygons = HiddenField()
     continue_ = HiddenField()
 
 
@@ -53,7 +55,8 @@ def place_insert(origin_id=None):
             return redirect(url_for(view + '_view', id_=origin.id) + '#tab-place')
         return redirect(url_for('place_view', id_=result.id))
     form.alias.append_entry('')
-    return render_template('place/insert.html', form=form, origin=origin)
+    gis_data = GisMapper.get_all()
+    return render_template('place/insert.html', form=form, origin=origin, gis_data=gis_data)
 
 
 @app.route('/place/view/<int:id_>')
@@ -142,7 +145,8 @@ def place_update(id_):
     for alias in [x.name for x in object_.get_linked_entities('P1')]:
         form.alias.append_entry(alias)
     form.alias.append_entry('')
-    return render_template('place/update.html', form=form, object_=object_)
+    gis_data = GisMapper.get_all(object_.id)
+    return render_template('place/update.html', form=form, object_=object_, gis_data=gis_data)
 
 
 def save(form, object_=None, location=None, origin=None):
@@ -150,6 +154,7 @@ def save(form, object_=None, location=None, origin=None):
     if object_:
         for alias in object_.get_linked_entities('P1'):
             alias.delete()
+        GisMapper.delete_by_entity(location)
     else:
         object_ = EntityMapper.insert('E18', form.name.data)
         location = EntityMapper.insert('E53', 'Location of ' + form.name.data, 'place location')
@@ -171,5 +176,6 @@ def save(form, object_=None, location=None, origin=None):
             link_ = origin.link('P67', object_)
         else:
             origin.link('P67', object_)
+    GisMapper.insert(location, form)
     openatlas.get_cursor().execute('COMMIT')
     return link_ if link_ else object_

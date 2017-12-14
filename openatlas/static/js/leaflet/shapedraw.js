@@ -324,7 +324,7 @@ function editsavetodb() {
     // Now selectedshape is the ID of the shape of the object and no longer of the object
     // loop through array of existing
     if (geometrytype == 'Point') {
-        var points = JSON.parse($('#gisPoints').val());
+        var points = JSON.parse($('#gis_points').val());
         $.each(points, function (key, value) {
             var id = (JSON.stringify(value.properties.id));
             var index = ((JSON.stringify(key)));
@@ -334,19 +334,19 @@ function editsavetodb() {
             }
         });
 
-        $('#gisPoints').val(JSON.stringify(points)); // write array back to form field
+        $('#gis_points').val(JSON.stringify(points)); // write array back to form field
         var point = '{"type":"Feature","geometry":{"type":"Point","coordinates":[' + $('#easting').val() + ',' + $('#northing').val() + ']},"properties":';
         point += '{"name": "' + $('#shapename').val() + '","description": "' + $('#shapedescription').val() + '","marker-color": "#fc4353","siteType":"To do","shapeType": "centerpoint"}}';
-        var points = JSON.parse($('#gisPoints').val());
+        var points = JSON.parse($('#gis_points').val());
         points.push(JSON.parse(point));
-        $('#gisPoints').val(JSON.stringify(points));
+        $('#gis_points').val(JSON.stringify(points));
     }
 
     // here we need the id of the shape/point not "selectedshape" which seems to be the id of the place
     // Now selectedshape is the ID of the shape of the object and no longer of the object
     // loop through array of existing
     if (geometrytype == 'Polygon') {
-        var polygons = JSON.parse($('#gisPolygons').val());
+        var polygons = JSON.parse($('#gis_polygons').val());
         $.each(polygons, function (key, value) {
             var id = (JSON.stringify(value.properties.id));
             var index = ((JSON.stringify(key)));
@@ -355,12 +355,12 @@ function editsavetodb() {
                 return false;
             }
         });
-        $('#gisPolygons').val(JSON.stringify(polygons));
+        $('#gis_polygons').val(JSON.stringify(polygons));
         var polygon = '{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[' + geoJsonArray.join(',') + ']]},"properties":';
         polygon += '{"name": "' + $('#shapename').val() + '","description": "' + $('#shapedescription').val() + '", "shapeType": "' + shapetype + '"}}';
-        var polygons = JSON.parse($('#gisPolygons').val());
+        var polygons = JSON.parse($('#gis_polygons').val());
         polygons.push(JSON.parse(polygon));
-        $('#gisPolygons').val(JSON.stringify(polygons));
+        $('#gis_polygons').val(JSON.stringify(polygons));
     }
     editclosemyformsave();
 }
@@ -376,7 +376,7 @@ function deleteshape() {
             var dataString = 'uid=' + selectedshape + '&geometrytype=' + geometrytype;
         }
         if (geometrytype == 'Point') {
-            var points = JSON.parse($('#gisPoints').val());
+            var points = JSON.parse($('#gis_points').val());
             $.each(points, function (key, value) {
                 var id = (JSON.stringify(value.properties.id));
                 var index = ((JSON.stringify(key)));
@@ -385,10 +385,10 @@ function deleteshape() {
                     return false;
                 }
             });
-            $('#gisPoints').val(JSON.stringify(points)); // write array back to form field
+            $('#gis_points').val(JSON.stringify(points)); // write array back to form field
         }
         if (geometrytype == 'Polygon') {
-            var polygons = JSON.parse($('#gisPolygons').val());
+            var polygons = JSON.parse($('#gis_polygons').val());
             $.each(polygons, function (key, value) {
                 var id = (JSON.stringify(value.properties.id));
                 var index = ((JSON.stringify(key)));
@@ -397,7 +397,7 @@ function deleteshape() {
                     return false;
                 }
             });
-            $('#gisPolygons').val(JSON.stringify(polygons)); // write array back to form field
+            $('#gis_polygons').val(JSON.stringify(polygons)); // write array back to form field
         }
     }
 }
@@ -531,9 +531,9 @@ function saveMarker() {
     document.getElementById('savebtn').style.display = 'none';
     var point = '{"type":"Feature","geometry":{"type":"Point","coordinates":[' + $('#easting').val() + ',' + $('#northing').val() + ']},"properties":';
     point += '{"name": "' + $('#shapename').val() + '","description": "' + $('#shapedescription').val() + '", "shapeType": "centerpoint"}}';
-    var points = JSON.parse($('#gisPoints').val());
+    var points = JSON.parse($('#gis_points').val());
     points.push(JSON.parse(point));
-    $('#gisPoints').val(JSON.stringify(points));
+    $('#gis_points').val(JSON.stringify(points));
     var newmarker = L.marker(([$('#northing').val(), $('#easting').val()]), {icon: newIcon}).addTo(map);
     newmarker.bindPopup(
         '<div id="popup"><strong>' + objectName + '</strong></br>' +
@@ -556,9 +556,9 @@ function savetodb() {
     $('#gisData').val($('#gisData').val() + dataString);
     var polygon = '{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[' + geoJsonArray.join(',') + ']]},"properties":';
     polygon += '{"name": "' + $('#shapename').val() + '","description": "' + $('#shapedescription').val() + '", "shapeType": "' + shapetype + '"}}';
-    var polygons = JSON.parse($('#gisPolygons').val());
+    var polygons = JSON.parse($('#gis_polygons').val());
     polygons.push(JSON.parse(polygon));
-    $('#gisPolygons').val(JSON.stringify(polygons));
+    $('#gis_polygons').val(JSON.stringify(polygons));
     layer.bindPopup('<div id="popup"><strong>' + objectName + '</strong><br/>' +
         '<div id="popup"><strong>' + shapename + '</strong> <br/>' +
         '<i>' + shapetype + '</i> <br/> <br/>' +

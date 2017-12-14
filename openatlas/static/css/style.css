@@ -76,6 +76,11 @@ form input[type="text"].month, form input[type="text"].day {
     width: 40em;
 }
 
+#map-info-display #description {
+    height: 8em;
+    width: 25em;
+}
+
 .description {
     margin-top: 1em;
     max-width: 80em;
