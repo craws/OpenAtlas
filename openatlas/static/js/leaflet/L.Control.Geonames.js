@@ -60,7 +60,7 @@ L.Control.Geonames = L.Control.extend({
         //clear results
         this._hasResults = false;
         this._resultsList.innerHTML = '';
-        var url = 'http://api.geonames.org/searchJSON?q=' + encodeURIComponent(this._input.value)
+        var url = 'https://secure.geonames.org/searchJSON?q=' + encodeURIComponent(this._input.value)
             + '&maxRows=' + this.options.maxresults
             + '&username=' + this.options.username
             + '&style=LONG';
