@@ -113,7 +113,7 @@ function setSitesInfo(e) { // set Popup Information of existing sites
         '<div id="popuptype"><i>' + marker.toGeoJSON().properties.siteType + '</i><br/><br/></div>' +
         '<div style="max-height:100px; max-width:200px; overflow-y: auto">' + marker.toGeoJSON().properties.objectDescription + '<br/></div></div><br/>' +
         '<div style="max-height:100px; max-width:200px; overflow-y: auto">' + marker.toGeoJSON().properties.shapeType + '<br/></div></div>' +
-        '<a href="/admin/place/view/id/' + marker.feature.properties.objectId + '">' + translate['details'] + '</a>',
+        '<a href="/place/view/' + marker.feature.properties.objectId + '">' + translate['details'] + '</a>',
         {autoPanPaddingTopLeft: new L.Point(40, 10), autoPanPaddingBottomRight: new L.Point(50, 10)}
     );
 }

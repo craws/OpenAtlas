@@ -17,15 +17,15 @@
 	<script src="Control.FullScreen.js"></script>
 </head>
 <body>
-	
+
 	<div id="map"></div>
-	
+
 	<script>
 		var base = new L.TileLayer('http://{s}.www.toolserver.org/tiles/bw-mapnik/{z}/{x}/{y}.png', {
 			maxZoom: 18,
 			attribution: '&copy; <a href="http://openstreetmap.org">OpenStreetMap</a> contributors, <a href="http://creativecommons.org/licenses/by-sa/2.0/">CC-BY-SA</a>'
 		});
-		
+
 		var map = new L.Map('map', {
 			layers: [base],
 			center: new L.LatLng(48.5, -4.5),
