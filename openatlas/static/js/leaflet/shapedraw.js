@@ -59,7 +59,15 @@ var pointbutton = L.easyButton(
         drawmarker();
     },
     translate['map_info_point']
-    );
+);
+
+function check_coordinates_input() {
+    if ($('#easting').val() && $('#northing').val()) {
+        $("#markersavebtn").prop('disabled', false);
+    } else {
+        $("#markersavebtn").prop('disabled', true);
+    }
+}
 
 var datainput = L.control();
 datainput.onAdd = function (map) {
@@ -81,8 +89,8 @@ datainput.onAdd = function (map) {
                 <span><input type='text' id='shapename' placeholder='enter name if desired'/></span> </div>\
                 <span><textarea rows='3' cols='70' id='shapedescription' placeholder='" + translate['map_info_description'] + "'/></textarea></span>\
                 <span><input type='text' id='shapetype' value='NULL'/></span>\
-                <span><label id='eastinglabel' style='display: none'> Easting: </label><input type='text' id='easting' placeholder='decimal degrees' /></span>\
-                <span><label id='northinglabel' style='display: none'> Northing:</label><input type='text' id='northing' placeholder='decimal degrees' /></span>\
+                <span><label id='eastinglabel' style='display: none'> Easting: </label><input type='text' oninput='check_coordinates_input()' id='easting' placeholder='decimal degrees' /></span>\
+                <span><label id='northinglabel' style='display: none'> Northing:</label><input type='text' oninput='check_coordinates_input()' id='northing' placeholder='decimal degrees' /></span>\
                 <div style='display: none'>\
                     <label> Coordinates: </label>\
                     <span><textarea rows='4' cols='50' id='shapecoords'/></textarea></span>\

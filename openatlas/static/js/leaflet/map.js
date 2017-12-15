@@ -149,7 +149,6 @@ if (gisPointAll != "") {
     });
     sitesmarkers.setGeoJSON(gisPointAll); //set layer content to geojson
     map.addLayer(sitesmarkers);
-    ;
 }
 
 if (gisPolygonAll != "") {
@@ -308,7 +307,7 @@ function setpopup(feature, layer) {
         '<div id="btnBar" style="white-space:nowrap;">' +
         '<button id="editBtn" onclick="editshape()"/>' + translate['edit'] + '</button> <button id="delBtn" onclick="deleteshape()"/>' + translate['delete'] + '</button></div>' +
         '</div>'
-        );
+    );
 }
 
 function setpopup2(feature, layer) {
@@ -319,5 +318,5 @@ function setpopup2(feature, layer) {
         '<div style="max-height:140px; overflow-y: auto;">' + feature.properties.description + '<br/></div>' +
         '<i>' + feature.properties.shapeType + '</i><br/><br/>' +
         '<a href="/place/view/' + feature.properties.objectId + '">' + translate['details'] + '</a>',
-        );
+    );
 }
