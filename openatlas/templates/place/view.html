@@ -7,6 +7,9 @@
 <div id="tabs" class="tabs-container">
     <ul>
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
+        {% if gis_data %}
+            <li><a href="#tab-map" id="link3">{{ _('map')|uc_first }}</a></li>
+        {% endif %}
         <li><a href="#tab-source">{{ _('source')|uc_first }} ({{ tables['source']['data']|length }})</a></li>
         {% if tables['event']['data']|length > 0 %}
             <li><a href="#tab-event">{{ _('event')|uc_first }} ({{ tables['event']['data']|length }})</a></li>
@@ -29,6 +32,16 @@
         {{ tables['info']|data_table|safe }}
         {{ object_|description|safe }}
     </div>
+    {% if gis_data %}
+        <div id="tab-map">
+            <div id="map" class="map" style="float:none;margin:0;width:70em;"></div>
+        </div>
+        <script src="/js/leaflet/map.js"></script>
+        // workaround for leaflet bug when map not in the first tab
+        $("body").on('click','#link3', function() {
+            map.panBy(new L.Point(0, -150));
+        });
+    {% endif %}
     <div id="tab-source">
         {% if 'editor'|is_authorized: %}
             <div class="button-bar">

@@ -165,6 +165,8 @@ def actor_view(id_, unlink_id=None):
                 data.append(build_remove_link(unlink_url, link_.range.name))
             tables['member']['data'].append(data)
     gis_data = GisMapper.get_all(object_ids) if object_ids else None
+    if gis_data and gis_data['gisPointSelected'] == '[]':
+        gis_data = None
     return render_template('actor/view.html', actor=actor, tables=tables, gis_data=gis_data)
 
 

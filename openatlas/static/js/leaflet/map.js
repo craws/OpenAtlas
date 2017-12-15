@@ -317,6 +317,7 @@ function setpopup2(feature, layer) {
         '<div id="popup"><i>' + feature.properties.siteType + '</i><br/>' +
         '<div id="popup"><strong>' + feature.properties.name + '</strong><br/>' +
         '<div style="max-height:140px; overflow-y: auto;">' + feature.properties.description + '<br/></div>' +
-        '<i>' + feature.properties.shapeType + '</i><br/><br/>'
+        '<i>' + feature.properties.shapeType + '</i><br/><br/>' +
+        '<a href="/place/view/' + feature.properties.objectId + '">' + translate['details'] + '</a>',
         );
 }

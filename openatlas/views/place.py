@@ -116,7 +116,10 @@ def place_view(id_, unlink_id=None):
             actor.class_.name,
             actor.first,
             actor.last])
-    return render_template('place/view.html', object_=object_, tables=tables)
+    gis_data = GisMapper.get_all(object_.id) if location else None
+    if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]':
+        gis_data = None
+    return render_template('place/view.html', object_=object_, tables=tables, gis_data=gis_data)
 
 
 @app.route('/place/delete/<int:id_>')

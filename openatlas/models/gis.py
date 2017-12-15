@@ -60,7 +60,6 @@ class GisMapper(object):
                         'siteType': '',
                         'shapeType': uc_first(row.type),
                         'count': row.point_count + row.polygon_count}}
-
                 if hasattr(row, 'types') and row.types:
                     nodes_list = ast.literal_eval('[' + row.types + ']')
                     for node_id in list(set(nodes_list)):
@@ -68,7 +67,6 @@ class GisMapper(object):
                         if node.root and node.root[-1] == place_type_root_id:
                             item['properties']['siteType'] = node.name
                             break
-
                 if row.object_id in object_ids:
                     selected[shape].append(item)
                 else:
