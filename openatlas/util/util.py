@@ -165,18 +165,10 @@ def get_entity_data(entity, location=None):
 
     # Info for actors
     if entity.class_.code in app.config['CLASS_CODES']['actor']:
-        residence = entity.get_linked_entity('P74')
-        if residence:
-            data.append((uc_first(_('residence')), link(residence.get_linked_entity('P53', True))))
-        first = entity.get_linked_entity('OA8')
-        if first:
-            data.append((uc_first(_('appears first')), link(first.get_linked_entity('P53', True))))
-        last = entity.get_linked_entity('OA9')
-        if last:
-            data.append((uc_first(_('appears last')), link(last.get_linked_entity('P53', True))))
         aliases = entity.get_linked_entities('P131')
         if aliases:
             data.append((uc_first(_('alias')), '<br />'.join([x.name for x in aliases])))
+
     # dates
     date_types = OrderedDict([
         ('OA1', _('first')),
@@ -383,7 +375,7 @@ def pager(table):
                 <div><select class="pagesize">{options}</select></div>
                 <input id="{name}-search" class="search" type="text" data-column="all"
                     placeholder="{filter}">
-            </div>
+            </div><div style="clear-both"></div>
             """.format(name=table['name'], filter=uc_first(_('filter')), options=options)
     html += '<table id="{name}-table" class="tablesorter"><thead><tr>'.format(name=table['name'])
     for header in table['header']:

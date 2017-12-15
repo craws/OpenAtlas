@@ -193,7 +193,7 @@ def save(form, event=None, code=None, origin=None):
     event.save_nodes(form)
     event.link('P117', form.event.data)
     if form.place.data:
-        place = LinkMapper.get_linked_entity(form.place.data, 'P53')
+        place = LinkMapper.get_linked_entity(int(form.place.data), 'P53')
         event.link('P7', place)
     if event.class_.code == 'E8':  # Links for acquisition
         event.link('P22', ast.literal_eval(form.recipient.data) if form.recipient.data else None)

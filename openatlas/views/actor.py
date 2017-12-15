@@ -9,6 +9,7 @@ import openatlas
 from openatlas import app
 from openatlas.forms import DateForm, build_form, TableField
 from openatlas.models.entity import EntityMapper
+from openatlas.models.gis import GisMapper
 from openatlas.models.link import LinkMapper, Link
 from openatlas.util.util import (truncate_string, required_group, get_entity_data, uc_first,
                                  build_remove_link, get_base_table_data, link, is_authorized)
@@ -35,8 +36,25 @@ def actor_view(id_, unlink_id=None):
         LinkMapper.delete_by_id(unlink_id)
         flash(_('link removed'), 'info')
     actor.set_dates()
+    object_ids = []
+    info = get_entity_data(actor)
+    residence = actor.get_linked_entity('P74')
+    if residence:
+        object_ = residence.get_linked_entity('P53', True)
+        object_ids.append(object_.id)
+        info.append((uc_first(_('residence')), link(object_)))
+    first = actor.get_linked_entity('OA8')
+    if first:
+        object_ = first.get_linked_entity('P53', True)
+        object_ids.append(object_.id)
+        info.append((uc_first(_('appears first')), link(object_)))
+    last = actor.get_linked_entity('OA9')
+    if last:
+        object_ = last.get_linked_entity('P53', True)
+        object_ids.append(object_.id)
+        info.append((uc_first(_('appears last')), link(object_)))
     tables = {
-        'info': get_entity_data(actor),
+        'info': info,
         'source': {
             'name': 'source',
             'header': app.config['TABLE_HEADERS']['source'] + ['description'],
@@ -66,6 +84,9 @@ def actor_view(id_, unlink_id=None):
     for link_ in actor.get_links(['P11', 'P14', 'P22', 'P23'], True):
         event = link_.domain
         first = link_.first
+        place = event.get_linked_entity('P7')
+        if place:
+            object_ids.append(place.get_linked_entity('P53', True).id)
         if not link_.first and event.first:
             first = '<span class="inactive" style="float:right">' + str(event.first) + '</span>'
         last = link_.last
@@ -96,7 +117,6 @@ def actor_view(id_, unlink_id=None):
         else:
             type_ = link_.type.get_name_directed(True) if link_.type else ''
             related = link_.domain
-
         data = ([
             type_,
             link(related),
@@ -144,7 +164,8 @@ def actor_view(id_, unlink_id=None):
                 data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
                 data.append(build_remove_link(unlink_url, link_.range.name))
             tables['member']['data'].append(data)
-    return render_template('actor/view.html', actor=actor, tables=tables)
+    gis_data = GisMapper.get_all(object_ids) if object_ids else None
+    return render_template('actor/view.html', actor=actor, tables=tables, gis_data=gis_data)
 
 
 @app.route('/actor')
