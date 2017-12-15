@@ -8,6 +8,7 @@
         <a href="{{ url_for('content_index') }}">{{ _('content')|uc_first }}</a>
         {% if 'admin'|is_authorized: %}
             <a href="{{ url_for('settings_index') }}">{{ _('settings')|uc_first }}</a>
+            <a href="{{ url_for('admin_orphans') }}">{{ _('orphans')|uc_first }}</a>
         {% endif  %}
     </div>
 {% endblock %}

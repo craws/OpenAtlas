@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
+    > {{ _('orphans')|uc_first }}
+{% endblock %}
+{% block content %}
+    <h1>{{ _('orphans')|uc_first }}</h1>
+    {% if tables['orphans']['data']|length > 0 %}
+        <div class="button-bar">
+            <a onclick="return confirm('{{_('delete orphans')|uc_first }}?')"
+               href="{{ url_for('admin_orphans', delete='orphans') }}">{{ _('delete orphans')|uc_first }}</a>
+        </div>
+    {% endif %}
+    {{ tables['orphans']|pager|safe }}
+    <h1>{{ _('unlinked')|uc_first }}</h1>
+    {% if tables['unlinked']['data']|length > 0 %}
+        <div class="button-bar">
+            <a onclick="return confirm('{{_('delete unlinked')|uc_first }}?')"
+               href="{{ url_for('admin_orphans', delete='unlinked') }}">{{ _('delete unlinked')|uc_first }}</a>
+        </div>
+    {% endif %}
+    {{ tables['unlinked']|pager|safe }}
+{% endblock %}

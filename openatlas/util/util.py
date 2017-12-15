@@ -320,8 +320,10 @@ def link(entity):
             url = url_for('node_view', id_=entity.id)
             if not entity.root:
                 url = url_for('node_index') + '#tab-' + str(entity.id)
+        if entity.class_.code == 'E61':
+            return format_date(entity.timestamp)
         if not url:
-            return '?: ' + entity.class_.name
+            return entity.name + ' (' + entity.class_.name + ')'
         return '<a href="' + url + '">' + truncate_string(entity.name) + '</a>'
     return html
 

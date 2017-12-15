@@ -20,6 +20,7 @@ class Entity(object):
         self.root = None
         self.description = row.description if row.description else ''
         self.system_type = row.system_type
+        self.timestamp = row.value_timestamp if hasattr(row, 'value_timestamp') else None
         self.created = row.created
         self.modified = row.modified
         self.first = int(row.first) if hasattr(row, 'first') and row.first else None
@@ -58,6 +59,8 @@ class Entity(object):
         self.dates = DateMapper.get_dates(self)
 
     def print_base_type(self):
+        if self.class_.code not in app.config['CODE_CLASS']:
+            return ''
         if self.class_.code in app.config['CLASS_CODES']['actor']:
             return ''  # actors have no base type
         root_name = app.config['CODE_CLASS'][self.class_.code].title()
@@ -99,6 +102,18 @@ class EntityMapper(object):
         LEFT JOIN model.link dl2 ON e.id = dl2.domain_id
             AND dl2.property_code IN ('OA2', 'OA4', 'OA6')
         LEFT JOIN model.entity d2 ON dl2.range_id = d2.id"""
+
+    sql_orphan = """
+        SELECT e.id FROM model.entity e
+        LEFT JOIN model.link l1 on e.id = l1.domain_id
+        LEFT JOIN model.link l2 on e.id = l2.range_id
+        LEFT JOIN model.link_property lp1 on e.id = lp1.domain_id
+        LEFT JOIN model.link_property lp2 on e.id = lp2.range_id
+        WHERE
+            l1.domain_id IS NULL AND
+            l2.range_id IS NULL AND
+            lp1.domain_id IS NULL AND
+            lp2.range_id IS NULL """
 
     @staticmethod
     def update(entity):
@@ -207,3 +222,30 @@ class EntityMapper(object):
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {'id': entity.id})
         return cursor.fetchone()
+
+    @staticmethod
+    def get_orphans():
+        """
+            Returns entities without links.
+            Doesn't detect dates of property links because they still have a type.
+        """
+        entities = []
+        cursor = openatlas.get_cursor()
+        cursor.execute(EntityMapper.sql_orphan)
+        openatlas.debug_model['div sql'] += 1
+        for row in cursor.fetchall():
+            entities.append(EntityMapper.get_by_id(row.id))
+        return entities
+
+    @staticmethod
+    def delete_orphans(parameter):
+        if parameter == 'orphans':
+            sql_where = EntityMapper.sql_orphan + " AND e.class_code NOT IN %(class_codes)s"
+        elif parameter == 'unlinked':
+            sql_where = EntityMapper.sql_orphan + " AND e.class_code IN %(class_codes)s"
+        else:
+            return 0
+        sql = "DELETE FROM model.entity WHERE id IN (" + sql_where + ");"
+        cursor = openatlas.get_cursor()
+        cursor.execute(sql, {'class_codes': tuple(app.config['CODE_CLASS'].keys())})
+        return cursor.rowcount

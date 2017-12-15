@@ -56,7 +56,6 @@ CODE_CLASS = {
     'E31': 'reference',
     'E84': 'reference'}
 
-# Todo: get class_codes from code_class with a function instead hardcoding them
 CLASS_CODES = {
     'source': ['E33'],
     'event': ['E7', 'E8', 'E12', 'E6'],
