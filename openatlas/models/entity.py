@@ -107,12 +107,10 @@ class EntityMapper(object):
         SELECT e.id FROM model.entity e
         LEFT JOIN model.link l1 on e.id = l1.domain_id
         LEFT JOIN model.link l2 on e.id = l2.range_id
-        LEFT JOIN model.link_property lp1 on e.id = lp1.domain_id
         LEFT JOIN model.link_property lp2 on e.id = lp2.range_id
         WHERE
             l1.domain_id IS NULL AND
             l2.range_id IS NULL AND
-            lp1.domain_id IS NULL AND
             lp2.range_id IS NULL """
 
     @staticmethod

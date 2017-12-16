@@ -133,11 +133,8 @@ def source_add2(id_, class_name):
 @app.route('/source/delete/<int:id_>')
 @required_group('editor')
 def source_delete(id_):
-    source = EntityMapper.get_by_id(id_)
     openatlas.get_cursor().execute('BEGIN')
-    for translation in source.get_linked_entities('P73'):
-        EntityMapper.delete(translation.id)
-    EntityMapper.delete(source.id)
+    EntityMapper.delete(id_)
     openatlas.get_cursor().execute('COMMIT')
     flash(_('entity deleted'), 'info')
     return redirect(url_for('source_index'))

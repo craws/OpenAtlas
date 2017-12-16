@@ -125,9 +125,7 @@ def place_view(id_, unlink_id=None):
 @app.route('/place/delete/<int:id_>')
 @required_group('editor')
 def place_delete(id_):
-    place = EntityMapper.get_by_id(id_)
     openatlas.get_cursor().execute('BEGIN')
-    EntityMapper.delete(place.get_linked_entity('P53'))
     EntityMapper.delete(id_)
     openatlas.get_cursor().execute('COMMIT')
     flash(_('entity deleted'), 'info')

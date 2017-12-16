@@ -1,6 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import render_template, flash
+from flask import render_template, flash, url_for
 from flask_babel import lazy_gettext as _
+from werkzeug.utils import redirect
 
 from openatlas import app, EntityMapper
 from openatlas.util.util import required_group, link, truncate_string
@@ -18,22 +19,24 @@ def admin_index():
 def admin_orphans(delete=None):
     if delete:
         count = EntityMapper.delete_orphans(delete)
-        flash(_('info orphans deleted:') + str(count), 'info')
+        flash(_('info orphans deleted:') + ' ' + str(count), 'info')
+        return redirect(url_for('admin_orphans'))
     tables = {
         'orphans': {
             'name': 'orphans',
-            'header': ['name', 'class', 'type', 'created', 'updated', 'description'],
+            'header': ['name', 'class', 'type', 'system type', 'created', 'updated', 'description'],
             'data': []},
         'unlinked': {
             'name': 'unlinked',
-            'header': ['name', 'class', 'type', 'created', 'updated', 'description'],
+            'header': ['name', 'class', 'type', 'system type', 'created', 'updated', 'description'],
             'data': []}}
     for entity in EntityMapper.get_orphans():
-        table_name = 'unlinked' if entity.class_.code in app.config['CODE_CLASS'].keys() else 'orphans'
-        tables[table_name]['data'].append([
+        name = 'unlinked' if entity.class_.code in app.config['CODE_CLASS'].keys() else 'orphans'
+        tables[name]['data'].append([
             link(entity),
             link(entity.class_),
             entity.print_base_type(),
+            entity.system_type,
             entity.created,
             entity.modified,
             truncate_string(entity.description)])
