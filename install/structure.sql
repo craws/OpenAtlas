@@ -73,7 +73,7 @@ DROP TRIGGER IF EXISTS update_modified ON model.property;
 DROP TRIGGER IF EXISTS update_modified ON model.class_inheritance;
 DROP TRIGGER IF EXISTS update_modified ON model.class;
 DROP TRIGGER IF EXISTS on_delete_link_property ON model.link_property;
-DROP TRIGGER IF EXISTS on_delete_link ON model.link;
+DROP TRIGGER IF EXISTS on_delete_entity ON model.entity;
 SET search_path = gis, pg_catalog;
 
 DROP TRIGGER IF EXISTS update_modified ON gis.polygon;
@@ -217,7 +217,8 @@ DROP TABLE IF EXISTS gis.linestring;
 SET search_path = model, pg_catalog;
 
 DROP FUNCTION IF EXISTS model.update_modified();
-DROP FUNCTION IF EXISTS model.delete_dates();
+DROP FUNCTION IF EXISTS model.delete_link_dates();
+DROP FUNCTION IF EXISTS model.delete_entity_related();
 DROP SCHEMA IF EXISTS web;
 DROP SCHEMA IF EXISTS model;
 DROP SCHEMA IF EXISTS log;
@@ -261,20 +262,55 @@ ALTER SCHEMA web OWNER TO openatlas;
 SET search_path = model, pg_catalog;
 
 --
--- Name: delete_dates(); Type: FUNCTION; Schema: model; Owner: openatlas
+-- Name: delete_entity_related(); Type: FUNCTION; Schema: model; Owner: openatlas
 --
 
-CREATE FUNCTION delete_dates() RETURNS trigger
+CREATE FUNCTION delete_entity_related() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
         BEGIN
-            DELETE FROM model.entity WHERE id = OLD.range_id AND class_code = 'E61';
+            -- If it is an source, event place, actor or reference
+            IF OLD.class_code IN ('E6', 'E7', 'E8', 'E12', 'E21', 'E40', 'E74', 'E18') THEN
+                -- Delete dates (E61), aliases (E41, E82)
+                DELETE FROM model.entity WHERE id IN (
+                    SELECT range_id FROM model.link WHERE domain_id = OLD.id AND class_code IN ('E41', 'E61', 'E82'));
+            END IF;
+
+            -- If it is a physical object (E18) delete the location (E53)
+            IF OLD.class_code = 'E18' THEN
+                DELETE FROM model.entity WHERE id = (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P53');
+            END IF;
+
+            -- If it is a document (E33) delete the translations (E33)
+            IF OLD.class_code = 'E33' THEN
+                DELETE FROM model.entity WHERE id = (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P73');
+            END IF;
+
+            RETURN OLD;
+        END;
+
+    $$;
+
+
+ALTER FUNCTION model.delete_entity_related() OWNER TO openatlas;
+
+--
+-- Name: delete_link_dates(); Type: FUNCTION; Schema: model; Owner: openatlas
+--
+
+CREATE FUNCTION delete_link_dates() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+        BEGIN
+            IF OLD.property_code IN ('OA5', 'OA6') THEN
+                DELETE FROM model.entity WHERE id = OLD.range_id AND class_code = 'E61';
+            END IF;
             RETURN OLD;
         END;
     $$;
 
 
-ALTER FUNCTION model.delete_dates() OWNER TO openatlas;
+ALTER FUNCTION model.delete_link_dates() OWNER TO openatlas;
 
 --
 -- Name: update_modified(); Type: FUNCTION; Schema: model; Owner: openatlas
@@ -1764,17 +1800,17 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON polygon FOR EACH ROW EXECUTE PRO
 SET search_path = model, pg_catalog;
 
 --
--- Name: link on_delete_link; Type: TRIGGER; Schema: model; Owner: openatlas
+-- Name: entity on_delete_entity; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
-CREATE TRIGGER on_delete_link AFTER DELETE ON link FOR EACH ROW EXECUTE PROCEDURE delete_dates();
+CREATE TRIGGER on_delete_entity BEFORE DELETE ON entity FOR EACH ROW EXECUTE PROCEDURE delete_entity_related();
 
 
 --
 -- Name: link_property on_delete_link_property; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
-CREATE TRIGGER on_delete_link_property AFTER DELETE ON link_property FOR EACH ROW EXECUTE PROCEDURE delete_dates();
+CREATE TRIGGER on_delete_link_property AFTER DELETE ON link_property FOR EACH ROW EXECUTE PROCEDURE delete_link_dates();
 
 
 --
