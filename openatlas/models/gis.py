@@ -15,7 +15,7 @@ class GisMapper(object):
         object_ids = object_ids if object_ids else []
         object_ids = object_ids if isinstance(object_ids, list) else [object_ids]
         polygon_point_sql = """
-            (SELECT ST_AsGeoJSON(ST_PointOnSurface(p.geom))
+            (SELECT public.ST_AsGeoJSON(public.ST_PointOnSurface(p.geom))
             FROM gis.polygon p WHERE id = polygon.id) AS polygon_point, """
         for shape in ['point', 'polygon']:
             sql = """
@@ -25,7 +25,7 @@ class GisMapper(object):
                     {shape}.name,
                     {shape}.description,
                     {shape}.type,
-                    ST_AsGeoJSON({shape}.geom) AS geojson, {polygon_point_sql}
+                    public.ST_AsGeoJSON({shape}.geom) AS geojson, {polygon_point_sql}
                     object.name AS object_name,
                     object.description AS object_description,
                     string_agg(CAST(t.range_id AS text), ',') AS types,
@@ -90,7 +90,10 @@ class GisMapper(object):
     def insert(entity, form):
         cursor = openatlas.get_cursor()
         for shape in ['point', 'polygon']:
-            for item in json.loads(getattr(form, 'gis_' + shape + 's').data):
+            data = getattr(form, 'gis_' + shape + 's').data
+            if not data:
+                continue
+            for item in json.loads(data):
                 sql = """
                     INSERT INTO gis.{shape} (entity_id, name, description, type, geom)
                     VALUES (
@@ -98,8 +101,7 @@ class GisMapper(object):
                         %(name)s,
                         %(description)s,
                         %(type)s,
-                        ST_SetSRID(ST_GeomFromGeoJSON(%(geojson)s),4326)
-                    );""".format(shape=shape)
+                        ST_SetSRID(ST_GeomFromGeoJSON(%(geojson)s),4326));""".format(shape=shape)
                 cursor.execute(sql, {
                     'entity_id': entity.id,
                     'name': item['properties']['name'],
