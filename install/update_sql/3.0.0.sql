@@ -270,9 +270,8 @@ CREATE FUNCTION model.delete_entity_related() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
         BEGIN
-            -- If it is an source, event place, actor or reference
+            -- If it is an event, place or actor delete dates (E61) and aliases (E41, E82)
             IF OLD.class_code IN ('E6', 'E7', 'E8', 'E12', 'E21', 'E40', 'E74', 'E18') THEN
-                -- Delete dates (E61), aliases (E41, E82)
                 DELETE FROM model.entity WHERE id IN (
                     SELECT range_id FROM model.link WHERE domain_id = OLD.id AND class_code IN ('E41', 'E61', 'E82'));
             END IF;

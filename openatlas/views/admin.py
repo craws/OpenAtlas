@@ -3,7 +3,8 @@ from flask import render_template, flash, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 
-from openatlas import app, EntityMapper
+import openatlas
+from openatlas import app, EntityMapper, NodeMapper
 from openatlas.util.util import required_group, link, truncate_string
 
 
@@ -21,15 +22,11 @@ def admin_orphans(delete=None):
         count = EntityMapper.delete_orphans(delete)
         flash(_('info orphans deleted:') + ' ' + str(count), 'info')
         return redirect(url_for('admin_orphans'))
+    header = ['name', 'class', 'type', 'system type', 'created', 'updated', 'description']
     tables = {
-        'orphans': {
-            'name': 'orphans',
-            'header': ['name', 'class', 'type', 'system type', 'created', 'updated', 'description'],
-            'data': []},
-        'unlinked': {
-            'name': 'unlinked',
-            'header': ['name', 'class', 'type', 'system type', 'created', 'updated', 'description'],
-            'data': []}}
+        'orphans': {'name': 'orphans', 'header': header, 'data': []},
+        'unlinked': {'name': 'unlinked', 'header': header, 'data': []},
+        'nodes': {'name': 'nodes', 'header': ['name', 'root'], 'data': []}}
     for entity in EntityMapper.get_orphans():
         name = 'unlinked' if entity.class_.code in app.config['CODE_CLASS'].keys() else 'orphans'
         tables[name]['data'].append([
@@ -40,4 +37,6 @@ def admin_orphans(delete=None):
             entity.created,
             entity.modified,
             truncate_string(entity.description)])
+    for node in NodeMapper.get_orphans():
+        tables['nodes']['data'].append([link(node), link(openatlas.nodes[node.root[-1]])])
     return render_template('admin/orphans.html', tables=tables)

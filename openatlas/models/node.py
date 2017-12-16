@@ -214,3 +214,11 @@ class NodeMapper(EntityMapper):
                 INSERT INTO web.hierarchy_form (hierarchy_id, form_id)
                 VALUES (%(node_id)s, %(form_id)s);"""
             cursor.execute(sql, {'node_id': node.id, 'form_id': form_id})
+
+    @staticmethod
+    def get_orphans():
+        nodes = []
+        for key, node in openatlas.nodes.items():
+            if node.root and node.count < 1 and not node.subs:
+                nodes.append(node)
+        return nodes

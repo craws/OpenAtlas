@@ -181,6 +181,7 @@ class EntityMapper(object):
 
     @staticmethod
     def delete(entity):
+        # Triggers function model.delete_entity_related() for deleting related entities
         entity_id = entity if isinstance(entity, int) else entity.id
         sql = "DELETE FROM model.entity WHERE id = %(entity_id)s;"
         openatlas.get_cursor().execute(sql, {'entity_id': entity_id})
