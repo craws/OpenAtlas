@@ -264,21 +264,48 @@ INSERT INTO property_i18n (property_code, language_code, attribute, text)
 
 DROP TABLE i18n;
 
--- Update trigger functions
-DROP TRIGGER IF EXISTS on_delete_link ON model.link;
-DROP TRIGGER IF EXISTS on_delete_link_property ON model.link_property;
-DROP FUNCTION IF EXISTS model.delete_dates();
-CREATE FUNCTION model.delete_dates() RETURNS trigger
+-- Update trigger functions for deleting related entities at delete to avoid orphaned data
+DROP FUNCTION IF EXISTS model.delete_dates() CASCADE;
+CREATE FUNCTION model.delete_entity_related() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
         BEGIN
-            DELETE FROM model.entity WHERE id = OLD.range_id AND class_code = 'E61';
+            -- If it is an source, event place, actor or reference
+            IF OLD.class_code IN ('E6', 'E7', 'E8', 'E12', 'E21', 'E40', 'E74', 'E18') THEN
+                -- Delete dates (E61), aliases (E41, E82)
+                DELETE FROM model.entity WHERE id IN (
+                    SELECT range_id FROM model.link WHERE domain_id = OLD.id AND class_code IN ('E41', 'E61', 'E82'));
+            END IF;
+
+            -- If it is a physical object (E18) delete the location (E53)
+            IF OLD.class_code = 'E18' THEN
+                DELETE FROM model.entity WHERE id = (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P53');
+            END IF;
+
+            -- If it is a document (E33) delete the translations (E33)
+            IF OLD.class_code = 'E33' THEN
+                DELETE FROM model.entity WHERE id = (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P73');
+            END IF;
+
+            RETURN OLD;
+        END;
+
+    $$;
+ALTER FUNCTION model.delete_entity_related() OWNER TO openatlas;
+CREATE TRIGGER on_delete_entity BEFORE DELETE ON model.entity FOR EACH ROW EXECUTE PROCEDURE model.delete_entity_related();
+
+CREATE FUNCTION model.delete_link_dates() RETURNS trigger
+    LANGUAGE plpgsql
+    AS $$
+        BEGIN
+            IF OLD.property_code IN ('OA5', 'OA6') THEN
+                DELETE FROM model.entity WHERE id = OLD.range_id AND class_code = 'E61';
+            END IF;
             RETURN OLD;
         END;
     $$;
-ALTER FUNCTION model.delete_dates() OWNER TO openatlas;
-CREATE TRIGGER on_delete_link AFTER DELETE ON model.link FOR EACH ROW EXECUTE PROCEDURE model.delete_dates();
-CREATE TRIGGER on_delete_link_property AFTER DELETE ON model.link_property FOR EACH ROW EXECUTE PROCEDURE model.delete_dates();
+ALTER FUNCTION model.delete_link_dates() OWNER TO openatlas;
+CREATE TRIGGER on_delete_link_property AFTER DELETE ON model.link_property FOR EACH ROW EXECUTE PROCEDURE model.delete_link_dates();
 
 -- Delete obsolete "History of the World" Event
 DELETE FROM model.entity WHERE id = (SELECT id from model.entity WHERE name = 'History of the World');
