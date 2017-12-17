@@ -81,7 +81,6 @@ def place_view(id_, unlink_id=None):
             'data': []}}
     for link_ in object_.get_links('P67', True):
         name = app.config['CODE_CLASS'][link_.domain.class_.code]
-
         data = get_base_table_data(link_.domain)
         if name == 'source':
             data.append(truncate_string(link_.domain.description))
@@ -98,12 +97,8 @@ def place_view(id_, unlink_id=None):
         'name': 'event',
         'header': app.config['TABLE_HEADERS']['event'],
         'data': []}
-    for event in location.get_linked_entities('P7', True):
-        data = get_base_table_data(event)
-        tables['event']['data'].append(data)
-    for event in object_.get_linked_entities('P24', True):
-        data = get_base_table_data(event)
-        tables['event']['data'].append(data)
+    for event in location.get_linked_entities(['P7', 'P24'], True):
+        tables['event']['data'].append(get_base_table_data(event))
     tables['actor'] = {
         'name': 'actor',
         'header': [_('actor'), _('property'), _('class'), _('first'), _('last')],

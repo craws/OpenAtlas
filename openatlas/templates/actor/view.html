@@ -16,7 +16,7 @@
         {% endif %}
         <li><a href="#tab-reference">{{ _('reference')|uc_first }} ({{ tables['reference']['data']|length }})</a></li>
         {% if gis_data %}
-            <li><a href="#tab-map" id="link3">{{ _('map')|uc_first }}</a></li>
+            <li><a href="#tab-map" id="map-tab-id">{{ _('map')|uc_first }}</a></li>
         {% endif %}
     </ul>
     <div id="tab-info">
@@ -98,9 +98,9 @@
         </div>
         <script src="/js/leaflet/map.js"></script>
         <script>
-            // workaround for leaflet bug when map not in the first tab
-            $("body").on('click','#link3', function() {
-                map.panBy(new L.Point(0, -150));
+            /* workaround for leaflet bug when map not in the first tab */
+            $("body").on('click','#map-tab-id', function() {
+                map.panBy(new L.Point(0, -1));
             });
         </script>
     {% endif %}

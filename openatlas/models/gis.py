@@ -101,7 +101,8 @@ class GisMapper(object):
                         %(name)s,
                         %(description)s,
                         %(type)s,
-                        ST_SetSRID(ST_GeomFromGeoJSON(%(geojson)s),4326));""".format(shape=shape)
+                        public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));
+                    """.format(shape=shape)
                 cursor.execute(sql, {
                     'entity_id': entity.id,
                     'name': item['properties']['name'],
