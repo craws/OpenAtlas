@@ -5,12 +5,11 @@ from flask_login import current_user
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms.validators import Email, InputRequired, Length
-
 from wtforms import (BooleanField, HiddenField, PasswordField, SelectField, StringField,
                      SubmitField, TextAreaField)
 
 from openatlas import app
-from openatlas.util.util import format_date, link, required_group, uc_first
+from openatlas.util.util import format_date, link, required_group
 from openatlas.models.user import User, UserMapper
 
 
@@ -89,7 +88,7 @@ def user_update(id_):
         abort(403)
     form = UserForm()
     form.user_id = id_
-    del form.password, form.password2, form.send_info, form.insert_and_continue
+    del form.password, form.password2, form.send_info, form.insert_and_continue, form.show_passwords
     if form.validate_on_submit():
         user.active = form.active.data
         if user.id == current_user.id:  # don't allow setting oneself as inactive
