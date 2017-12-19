@@ -3,6 +3,7 @@
 #logo {
     float: left;
     width: 370px;
+    height: 120px;
     margin-bottom: 1em;
     background-image: url('/images/layout/logo.png');
     background-repeat: no-repeat;

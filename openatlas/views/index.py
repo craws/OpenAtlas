@@ -10,7 +10,6 @@ from wtforms.validators import InputRequired
 import openatlas
 from openatlas import app
 from openatlas.models.content import ContentMapper
-from openatlas.models.gis import GisMapper
 from openatlas.util.changelog import Changelog
 from werkzeug.utils import redirect
 
