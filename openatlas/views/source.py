@@ -13,7 +13,7 @@ from openatlas.models.entity import EntityMapper, Entity
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (link, truncate_string, required_group, get_entity_data, uc_first,
                                  build_table_form, build_remove_link, get_base_table_data,
-                                 is_authorized)
+                                 is_authorized, was_modified)
 
 
 class SourceForm(Form):
@@ -22,6 +22,7 @@ class SourceForm(Form):
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
+    opened = HiddenField()
 
 
 @app.route('/source')
@@ -146,6 +147,10 @@ def source_update(id_):
     source = EntityMapper.get_by_id(id_)
     form = build_form(SourceForm, 'Source', source, request)
     if form.validate_on_submit():
+        if was_modified(form, source):
+            del form.save
+            flash(_('error modified'), 'error')
+            return render_template('source/update.html', form=form, source=source)
         save(form, source)
         flash(_('info update'), 'info')
         return redirect(url_for('source_view', id_=id_))

@@ -2,7 +2,7 @@
 import re
 import smtplib
 from collections import OrderedDict
-from datetime import timedelta, date
+from datetime import timedelta, date, datetime
 from functools import wraps
 
 from babel import dates
@@ -436,3 +436,12 @@ def get_base_table_data(entity):
         data.append(format(entity.first))
         data.append(format(entity.last))
     return data
+
+
+def was_modified(form, entity):
+    """Checks if an entity was modified after an update form was opened."""
+    if not entity.modified or not form.opened.data:
+        return False
+    if entity.modified < datetime.fromtimestamp(float(form.opened.data)):
+        return False
+    return True

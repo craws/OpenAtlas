@@ -12,7 +12,8 @@ from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
 from openatlas.models.link import LinkMapper, Link
 from openatlas.util.util import (truncate_string, required_group, get_entity_data, uc_first,
-                                 build_remove_link, get_base_table_data, link, is_authorized)
+                                 build_remove_link, get_base_table_data, link, is_authorized,
+                                 was_modified)
 
 
 class ActorForm(DateForm):
@@ -25,6 +26,7 @@ class ActorForm(DateForm):
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
+    opened = HiddenField()
 
 
 @app.route('/actor/view/<int:id_>')
@@ -228,6 +230,10 @@ def actor_update(id_):
     forms = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
     form = build_form(ActorForm, forms[actor.class_.code], actor, request)
     if form.validate_on_submit():
+        if was_modified(form, actor):
+            del form.save
+            flash(_('error modified'), 'error')
+            return render_template('actor/update.html', form=form, actor=actor)
         save(form, actor)
         flash(_('info update'), 'info')
         return redirect(url_for('actor_view', id_=id_))

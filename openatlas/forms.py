@@ -1,5 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
+import time
 
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
@@ -36,6 +37,8 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
         node_data = {}
         if isinstance(entity, Entity):
             nodes = entity.nodes + (entity2.nodes if entity2 else [])
+            if hasattr(form, 'opened'):
+                form_instance.opened.data = time.time()
         else:
             nodes = [entity.type] if entity.type else []  # it's a link so use the link.type
         for node in nodes:

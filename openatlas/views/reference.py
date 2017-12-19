@@ -12,7 +12,8 @@ from openatlas.forms import build_form, TableField
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (uc_first, truncate_string, required_group, get_entity_data,
-                                 build_remove_link, get_base_table_data, is_authorized)
+                                 build_remove_link, get_base_table_data, is_authorized,
+                                 was_modified)
 
 
 class ReferenceForm(Form):
@@ -21,6 +22,7 @@ class ReferenceForm(Form):
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
+    opened = HiddenField()
 
 
 class AddReferenceForm(Form):
@@ -183,6 +185,10 @@ def reference_update(id_):
     reference = EntityMapper.get_by_id(id_)
     form = build_form(ReferenceForm, reference.system_type.title(), reference, request)
     if form.validate_on_submit():
+        if was_modified(form, reference):
+            del form.save
+            flash(_('error modified'), 'error')
+            return render_template('reference/update.html', form=form, reference=reference)
         save(form, reference)
         flash(_('info update'), 'info')
         return redirect(url_for('reference_view', id_=id_))

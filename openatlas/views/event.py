@@ -14,7 +14,8 @@ from openatlas.forms import DateForm, build_form, TableField, TableMultiField
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper, Link
 from openatlas.util.util import (required_group, truncate_string, get_entity_data, uc_first,
-                                 build_remove_link, get_base_table_data, link, is_authorized)
+                                 build_remove_link, get_base_table_data, link, is_authorized,
+                                 was_modified)
 
 
 class EventForm(DateForm):
@@ -26,6 +27,7 @@ class EventForm(DateForm):
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
+    opened = HiddenField()
     # acquisition
     recipient = TableMultiField()
     donor = TableMultiField()
@@ -100,6 +102,10 @@ def event_update(id_):
         del form.recipient, form.donor, form.given_place
     form.event_id.data = event.id
     if form.validate_on_submit():
+        if was_modified(form, event):
+            del form.save
+            flash(_('error modified'), 'error')
+            return render_template('event/update.html', form=form, event=event)
         save(form, event)
         flash(_('info update'), 'info')
         return redirect(url_for('event_view', id_=id_))

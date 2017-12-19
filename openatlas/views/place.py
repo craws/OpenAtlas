@@ -12,7 +12,8 @@ from openatlas.models.entity import EntityMapper, Entity
 from openatlas.models.gis import GisMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (truncate_string, required_group, get_entity_data, uc_first,
-                                 build_remove_link, get_base_table_data, link, is_authorized)
+                                 build_remove_link, get_base_table_data, link, is_authorized,
+                                 was_modified)
 
 
 class PlaceForm(DateForm):
@@ -24,6 +25,7 @@ class PlaceForm(DateForm):
     gis_points = HiddenField()
     gis_polygons = HiddenField()
     continue_ = HiddenField()
+    opened = HiddenField()
 
 
 @app.route('/place')
@@ -135,6 +137,10 @@ def place_update(id_):
     location = object_.get_linked_entity('P53')
     form = build_form(PlaceForm, 'Place', object_, request, location)
     if form.validate_on_submit():
+        if was_modified(form, object_):
+            del form.save
+            flash(_('error modified'), 'error')
+            return render_template('place/update.html', form=form, object_=object_)
         save(form, object_, location)
         flash(_('info update'), 'info')
         return redirect(url_for('place_view', id_=id_))
