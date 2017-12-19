@@ -13,6 +13,7 @@ from openatlas.models.link import LinkMapper
 class Entity(object):
     def __init__(self, row):
         if not row:
+            openatlas.logger.log('error', 'model', 'invalid id')
             abort(418)
         self.id = row.id
         self.nodes = []

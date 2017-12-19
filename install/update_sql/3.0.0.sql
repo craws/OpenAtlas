@@ -296,4 +296,8 @@ DELETE FROM model.entity WHERE id = (SELECT id from model.entity WHERE name = 'H
 -- Remove an unused description field
 ALTER TABLE model.link_property DROP COLUMN description;
 
+-- New logging system
+DROP TABLE log.details;
+ALTER TABLE log.log RENAME agent TO info;
+
 COMMIT;

@@ -2,6 +2,7 @@
 from bcrypt import hashpw
 import datetime
 
+import openatlas
 from openatlas import app
 from flask import render_template, request, flash, url_for, session
 from flask_babel import lazy_gettext as _

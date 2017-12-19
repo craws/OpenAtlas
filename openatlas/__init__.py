@@ -1,5 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import locale
+import logging
 import psycopg2.extras
 import sys
 import time
@@ -47,7 +48,6 @@ connection = connect()
 locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 babel = Babel(app)
 
-
 import openatlas
 from openatlas.models.classObject import ClassMapper
 from openatlas.models.entity import Entity, EntityMapper
@@ -58,6 +58,9 @@ from openatlas.util import filters
 from openatlas.views import (actor, admin, ajax, content, event, hierarchy, index, login, types,
                              model, place, profile, reference, settings, source, translation, user,
                              involvement, relation, member)
+
+from openatlas.models.logger import DBHandler
+logger = DBHandler()
 
 
 @babel.localeselector

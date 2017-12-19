@@ -46,3 +46,7 @@ class IndexTests(TestBaseCase):
             assert b'Password' in rv.data
             rv = self.app.get('/404')
             assert b'404' in rv.data
+            # raise an id not found error
+            self.login()
+            rv = self.app.get('/actor/view/666', follow_redirects=True)
+            assert b'teapot' in rv.data

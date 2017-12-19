@@ -503,7 +503,7 @@ CREATE TABLE log (
     message text NOT NULL,
     user_id integer,
     ip text,
-    agent text,
+    info text,
     created timestamp without time zone DEFAULT now() NOT NULL
 );
 
