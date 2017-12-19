@@ -97,6 +97,11 @@ def forbidden(e):
     return render_template('403.html', e=e), 403
 
 
+@app.errorhandler(418)
+def invalid_id(e):
+    return render_template('418.html', e=e), 418
+
+
 @app.route('/overview/changelog')
 def index_changelog():
     return render_template('index/changelog.html', versions=Changelog.versions)

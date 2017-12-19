@@ -1,6 +1,9 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
 from collections import OrderedDict
+
+from werkzeug.exceptions import abort
+
 import openatlas
 from openatlas import app
 from openatlas.models.date import DateMapper
@@ -9,6 +12,8 @@ from openatlas.models.link import LinkMapper
 
 class Entity(object):
     def __init__(self, row):
+        if not row:
+            abort(418)
         self.id = row.id
         self.nodes = []
         if hasattr(row, 'types') and row.types:
