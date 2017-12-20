@@ -39,6 +39,7 @@ def login():
         user = UserMapper.get_by_username(request.form['username'])
         if user:
             if user.login_attempts_exceeded():
+                openatlas.logger.log('notice', 'auth', 'Login attempts exceeded: ' + user.username)
                 flash(_('error login attempts exceeded'), 'error')
                 return render_template('login/index.html', form=form)
             hash_ = hashpw(request.form['password'].encode('utf-8'), user.password.encode('utf-8'))
@@ -50,15 +51,19 @@ def login():
                     user.login_last_success = datetime.datetime.now()
                     user.login_failed_count = 0
                     user.update()
+                    openatlas.logger.log('info', 'auth', 'Login of ' + user.username)
                     return redirect(request.args.get('next') or url_for('index'))
                 else:
+                    openatlas.logger.log('notice', 'auth', 'Inactive login try ' + user.username)
                     flash(_('error inactive'), 'error')
             else:
+                openatlas.logger.log('notice', 'auth', 'Wrong password: ' + user.username)
                 user.login_failed_count += 1
                 user.login_last_failure = datetime.datetime.now()
                 user.update()
                 flash(_('error wrong password'), 'error')
         else:
+            openatlas.logger.log('notice', 'auth', 'Wrong username: ' + request.form['username'])
             flash(_('error username'), 'error')
         return render_template('login/index.html', form=form)
     return render_template('login/index.html', form=form)

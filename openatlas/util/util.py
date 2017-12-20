@@ -444,4 +444,5 @@ def was_modified(form, entity):
         return False
     if entity.modified < datetime.fromtimestamp(float(form.opened.data)):
         return False
+    openatlas.logger.log('info', 'multi user', 'Multi user overwrite prevented.')
     return True

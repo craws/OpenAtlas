@@ -83,6 +83,7 @@ def settings_update():
         SettingsMapper.update(form)
         openatlas.get_cursor().execute('END')
         flash(_('info update'), 'info')
+        openatlas.logger.log('info', 'settings', 'Settings updated')
         return redirect(url_for('settings_index'))
     for field in SettingsMapper.fields:
         if field in ['mail_recipients_login', 'mail_recipients_feedback']:

@@ -63,6 +63,7 @@ class LinkMapper(object):
                 if domain_error or range_error:
                     text = _('error link') + ': ' + domain_class.name + ' > '
                     text += property_code + ' > ' + range_class.name
+                    openatlas.logger.log('error', 'model', text)
                     flash(text, 'error')
                     continue
             sql = """
