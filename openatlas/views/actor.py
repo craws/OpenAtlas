@@ -230,7 +230,7 @@ def actor_update(id_):
     forms = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
     form = build_form(ActorForm, forms[actor.class_.code], actor, request)
     if form.validate_on_submit():
-        if was_modified(form, actor):
+        if was_modified(form, actor):  # pragma: no cover
             del form.save
             flash(_('error modified'), 'error')
             return render_template('actor/update.html', form=form, actor=actor)

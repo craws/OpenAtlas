@@ -442,7 +442,7 @@ def get_base_table_data(entity):
     return data
 
 
-def was_modified(form, entity):
+def was_modified(form, entity):   # pragma: no cover
     """Checks if an entity was modified after an update form was opened."""
     if not entity.modified or not form.opened.data:
         return False

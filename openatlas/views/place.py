@@ -137,7 +137,7 @@ def place_update(id_):
     location = object_.get_linked_entity('P53')
     form = build_form(PlaceForm, 'Place', object_, request, location)
     if form.validate_on_submit():
-        if was_modified(form, object_):
+        if was_modified(form, object_):  # pragma: no cover
             del form.save
             flash(_('error modified'), 'error')
             return render_template('place/update.html', form=form, object_=object_)

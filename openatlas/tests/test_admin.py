@@ -16,3 +16,11 @@ class ContentTests(TestBaseCase):
             assert b'Oliver Twist' in rv.data
             rv = self.app.get(url_for('admin_orphans', delete='orphans'))
             assert b'2017-04-01' not in rv.data
+
+    def test_logs(self):
+        self.login()
+        with app.app_context():
+            rv = self.app.get(url_for('admin_log'))
+            assert b'Login' in rv.data
+            rv = self.app.get(url_for('admin_log_delete', follow_redirects=True))
+            assert b'Login' not in rv.data

@@ -26,6 +26,8 @@ class RelationTests(TestBaseCase):
                 data={'actor': '[' + str(related_id) + ']', 'continue_': 'yes'},
                 follow_redirects=True)
             assert b'The Kurgan' in rv.data
+            rv = self.app.get(url_for('actor_view', id_=actor_id))
+            assert b'The Kurgan' in rv.data
 
             # update relationship
             link_id = LinkMapper.get_links(actor_id, 'OA7')[0].id

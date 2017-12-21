@@ -102,7 +102,7 @@ def event_update(id_):
         del form.recipient, form.donor, form.given_place
     form.event_id.data = event.id
     if form.validate_on_submit():
-        if was_modified(form, event):
+        if was_modified(form, event):  # pragma: no cover
             del form.save
             flash(_('error modified'), 'error')
             return render_template('event/update.html', form=form, event=event)
@@ -197,7 +197,8 @@ def save(form, event=None, code=None, origin=None):
     event.update()
     event.save_dates(form)
     event.save_nodes(form)
-    event.link('P117', form.event.data)
+    if form.event.data:
+        event.link('P117', int(form.event.data))
     if form.place.data:
         place = LinkMapper.get_linked_entity(int(form.place.data), 'P53')
         event.link('P7', place)

@@ -84,10 +84,11 @@ class LinkMapper(object):
     @staticmethod
     def get_linked_entity(entity_param, code, inverse=False):
         result = LinkMapper.get_linked_entities(entity_param, code, inverse)
-        if len(result) > 1:
-            # Todo: log this error
-            flash('alert multiple linked entities found', 'error')
-            return result[0]  # return first one nevertheless to not bring the application down
+        if len(result) > 1:  # pragma: no cover
+            message = 'multiple linked entities found for ' + code
+            openatlas.logger.log('error', 'model', message)
+            flash(_('error multiple linked entities found'), 'error')
+            return result[0]  # return first one nevertheless
         if result:
             return result[0]
 

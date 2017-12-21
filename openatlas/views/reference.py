@@ -76,7 +76,7 @@ def reference_add2(reference_id, class_name):
     reference = EntityMapper.get_by_id(reference_id)
     form = getattr(openatlas.reference, 'Add' + uc_first(class_name) + 'Form')()
     if form.validate_on_submit():
-        reference.link('P67', getattr(form, class_name).data, form.page.data)
+        reference.link('P67', int(getattr(form, class_name).data), form.page.data)
         return redirect(url_for('reference_view', id_=reference.id) + '#tab-' + class_name)
     return render_template(
         'reference/add.html', origin=reference, form=form, class_name='reference')
@@ -162,9 +162,6 @@ def reference_insert(code, origin_id=None):
             return redirect(url_for('reference_link_update', link_id=result, origin_id=origin_id))
         if form.continue_.data == 'yes':
             return redirect(url_for('reference_insert', code=code, origin_id=origin_id))
-        if origin:
-            view = app.config['CODE_CLASS'][origin.class_.code]
-            return redirect(url_for(view + '_view', id_=origin.id) + '#tab-reference')
         return redirect(url_for('reference_view', id_=result.id))
     return render_template('reference/insert.html', form=form, code=code, origin=origin)
 
@@ -185,7 +182,7 @@ def reference_update(id_):
     reference = EntityMapper.get_by_id(id_)
     form = build_form(ReferenceForm, reference.system_type.title(), reference, request)
     if form.validate_on_submit():
-        if was_modified(form, reference):
+        if was_modified(form, reference):  # pragma: no cover
             del form.save
             flash(_('error modified'), 'error')
             return render_template('reference/update.html', form=form, reference=reference)

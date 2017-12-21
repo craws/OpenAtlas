@@ -147,7 +147,7 @@ def source_update(id_):
     source = EntityMapper.get_by_id(id_)
     form = build_form(SourceForm, 'Source', source, request)
     if form.validate_on_submit():
-        if was_modified(form, source):
+        if was_modified(form, source):  # pragma: no cover
             del form.save
             flash(_('error modified'), 'error')
             return render_template('source/update.html', form=form, source=source)
