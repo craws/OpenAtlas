@@ -283,8 +283,12 @@ def uc_first(string):
     return str(string)[0].upper() + str(string)[1:]
 
 
-def format_date(value):
-    return dates.format_date(value, locale=session['language']) if value else ''
+def format_datetime(value, format_='medium'):
+    return dates.format_datetime(value, format=format_, locale=session['language']) if value else ''
+
+
+def format_date(value, format_='medium'):
+    return dates.format_date(value, format=format_, locale=session['language']) if value else ''
 
 
 def link(entity):

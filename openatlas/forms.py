@@ -254,8 +254,8 @@ class TableMultiSelect(HiddenInput):
                 checked = 'checked = "checked"'
             data = get_base_table_data(entity)
             data[0] = truncate_string(entity.name)  # replace entity link with just the entity name
-            html = '''<input type="checkbox" id="{id}" {checked} value="{name}"
-                class="multi-table-select">'''.format(
+            html = """<input type="checkbox" id="{id}" {checked} value="{name}"
+                class="multi-table-select">""".format(
                 id=str(entity.id), name=entity.name, checked=checked)
             data.append(html)
             table['data'].append(data)

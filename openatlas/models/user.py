@@ -171,6 +171,16 @@ class UserMapper(object):
         return groups
 
     @staticmethod
+    def get_users():
+        cursor = openatlas.get_cursor()
+        sql = 'SELECT id, username FROM web.user ORDER BY username;'
+        cursor.execute(sql)
+        users = []
+        for row in cursor.fetchall():
+            users.append((row.id, row.username))
+        return users
+
+    @staticmethod
     def toggle_bookmark(entity_id, user):
         cursor = openatlas.get_cursor()
         sql = """

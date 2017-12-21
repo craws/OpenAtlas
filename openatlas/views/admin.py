@@ -1,11 +1,21 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import render_template, flash, url_for
 from flask_babel import lazy_gettext as _
+from flask_wtf import Form
 from werkzeug.utils import redirect
+from wtforms import SelectField, SubmitField
 
 import openatlas
 from openatlas import app, EntityMapper, NodeMapper
-from openatlas.util.util import required_group, link, truncate_string
+from openatlas.models.user import UserMapper
+from openatlas.util.util import required_group, link, truncate_string, format_datetime
+
+
+class LogForm(Form):
+    limit = SelectField(_('limit'), choices=((0, 'all'), (100, 100), (500, 500)), default=100)
+    priority = SelectField(_('priority'), choices=(app.config['LOG_LEVELS'].items()), default=6)
+    user = SelectField(_('user'), choices=([(0, 'all')] + UserMapper.get_users()), default=0)
+    apply = SubmitField(_('apply'))
 
 
 @app.route('/admin')
@@ -40,3 +50,31 @@ def admin_orphans(delete=None):
     for node in NodeMapper.get_orphans():
         tables['nodes']['data'].append([link(node), link(openatlas.nodes[node.root[-1]])])
     return render_template('admin/orphans.html', tables=tables)
+
+
+@app.route('/admin/log', methods=['POST', 'GET'])
+@required_group('admin')
+def admin_log():
+    form = LogForm()
+    table = {
+        'name': 'log',
+        'header': ['date', 'priority', 'type', 'message', 'user', 'IP', 'info'],
+        'data': []}
+    for row in openatlas.logger.get_logs(form.limit.data, form.priority.data, form.user.data):
+        table['data'].append([
+            format_datetime(row.created),
+            str(row.priority) + ' ' + app.config['LOG_LEVELS'][row.priority],
+            row.type,
+            row.message,
+            link(UserMapper.get_by_id(row.user_id)) if row.user_id else '',
+            row.ip,
+            truncate_string(row.info)])
+    return render_template('admin/log.html', table=table, form=form)
+
+
+@app.route('/admin/log/delete')
+@required_group('admin')
+def admin_log_delete():
+    openatlas.logger.delete_all()
+    flash(_('Logs deleted'))
+    return redirect(url_for('admin_log'))

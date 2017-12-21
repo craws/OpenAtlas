@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
+    > {{ _('logs')|uc_first }}
+{% endblock %}
+{% block content %}
+    <div class="button-bar">
+        <a onclick="return confirm('{{_('delete all logs?')|uc_first }}')"
+               href="{{ url_for('admin_log_delete') }}">{{ _('delete all')|uc_first }}</a>
+    </div>
+    {{ form|display_form|safe }}
+    {{ table|pager|safe }}
+{% endblock %}
