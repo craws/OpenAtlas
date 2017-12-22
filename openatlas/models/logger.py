@@ -19,7 +19,7 @@ class DBHandler:
             agent=request.headers.get('User-Agent'),
             info=info)
         sql = """
-            INSERT INTO log.log (priority, type, message, user_id, ip, info)
+            INSERT INTO web.system_log (priority, type, message, user_id, ip, info)
             VALUES(%(priority)s, %(type)s, %(message)s, %(user_id)s, %(ip)s, %(info)s)
             RETURNING id;"""
         params = {
@@ -36,7 +36,7 @@ class DBHandler:
     def get_logs(limit, priority, user_id):
         sql = """
             SELECT id, priority, type, message, user_id, ip, info, created
-            FROM log.log
+            FROM web.system_log
             WHERE priority <= %(priority)s"""
         sql += ' AND user_id = %(user_id)s' if int(user_id) > 0 else ''
         sql += ' ORDER BY created DESC'
@@ -47,4 +47,4 @@ class DBHandler:
 
     @staticmethod
     def delete_all():
-        openatlas.get_cursor().execute('TRUNCATE TABLE log.log RESTART IDENTITY CASCADE;')
+        openatlas.get_cursor().execute('TRUNCATE TABLE web.system_log RESTART IDENTITY CASCADE;')

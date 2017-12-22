@@ -43,9 +43,6 @@ ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_class_c
 ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_fkey;
-SET search_path = log, pg_catalog;
-
-ALTER TABLE IF EXISTS ONLY log.detail DROP CONSTRAINT IF EXISTS detail_log_id_fkey;
 SET search_path = gis, pg_catalog;
 
 ALTER TABLE IF EXISTS ONLY gis.polygon DROP CONSTRAINT IF EXISTS polygon_entity_id_fkey;
@@ -91,7 +88,7 @@ ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_boo
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_pkey;
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS unsubscribe_code_key;
 ALTER TABLE IF EXISTS ONLY web.settings DROP CONSTRAINT IF EXISTS settings_pkey;
-ALTER TABLE IF EXISTS ONLY web.settings DROP CONSTRAINT IF EXISTS settings_name_key;
+ALTER TABLE IF EXISTS ONLY web.system_log DROP CONSTRAINT IF EXISTS log_pkey;
 ALTER TABLE IF EXISTS ONLY web.i18n DROP CONSTRAINT IF EXISTS i18n_pkey;
 ALTER TABLE IF EXISTS ONLY web.i18n DROP CONSTRAINT IF EXISTS i18n_name_language_key;
 ALTER TABLE IF EXISTS ONLY web.hierarchy DROP CONSTRAINT IF EXISTS hierarchy_pkey;
@@ -117,10 +114,6 @@ ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS cla
 ALTER TABLE IF EXISTS ONLY model.class_i18n DROP CONSTRAINT IF EXISTS class_i18n_pkey;
 ALTER TABLE IF EXISTS ONLY model.class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_language_code_attribute_key;
 ALTER TABLE IF EXISTS ONLY model.class DROP CONSTRAINT IF EXISTS class_code_key;
-SET search_path = log, pg_catalog;
-
-ALTER TABLE IF EXISTS ONLY log.log DROP CONSTRAINT IF EXISTS log_pkey;
-ALTER TABLE IF EXISTS ONLY log.detail DROP CONSTRAINT IF EXISTS log_detail_pkey;
 SET search_path = gis, pg_catalog;
 
 ALTER TABLE IF EXISTS ONLY gis.polygon DROP CONSTRAINT IF EXISTS polygon_pkey;
@@ -132,6 +125,7 @@ ALTER TABLE IF EXISTS web.user_settings ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.user_log ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.user_bookmarks ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web."user" ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS web.system_log ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.settings ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.i18n ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.hierarchy_form ALTER COLUMN id DROP DEFAULT;
@@ -149,10 +143,6 @@ ALTER TABLE IF EXISTS model.entity ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.class_inheritance ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.class_i18n ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.class ALTER COLUMN id DROP DEFAULT;
-SET search_path = log, pg_catalog;
-
-ALTER TABLE IF EXISTS log.log ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS log.detail ALTER COLUMN id DROP DEFAULT;
 SET search_path = gis, pg_catalog;
 
 ALTER TABLE IF EXISTS gis.polygon ALTER COLUMN id DROP DEFAULT;
@@ -170,6 +160,8 @@ DROP TABLE IF EXISTS web.user_bookmarks;
 DROP TABLE IF EXISTS web."user";
 DROP SEQUENCE IF EXISTS web.settings_id_seq;
 DROP TABLE IF EXISTS web.settings;
+DROP SEQUENCE IF EXISTS web.log_id_seq;
+DROP TABLE IF EXISTS web.system_log;
 DROP SEQUENCE IF EXISTS web.i18n_id_seq;
 DROP TABLE IF EXISTS web.i18n;
 DROP SEQUENCE IF EXISTS web.hierarchy_id_seq;
@@ -200,12 +192,6 @@ DROP SEQUENCE IF EXISTS model.class_id_seq;
 DROP SEQUENCE IF EXISTS model.class_i18n_id_seq;
 DROP TABLE IF EXISTS model.class_i18n;
 DROP TABLE IF EXISTS model.class;
-SET search_path = log, pg_catalog;
-
-DROP SEQUENCE IF EXISTS log.log_id_seq;
-DROP TABLE IF EXISTS log.log;
-DROP SEQUENCE IF EXISTS log.detail_id_seq;
-DROP TABLE IF EXISTS log.detail;
 SET search_path = gis, pg_catalog;
 
 DROP SEQUENCE IF EXISTS gis.polygon_id_seq;
@@ -221,7 +207,6 @@ DROP FUNCTION IF EXISTS model.delete_link_dates();
 DROP FUNCTION IF EXISTS model.delete_entity_related();
 DROP SCHEMA IF EXISTS web;
 DROP SCHEMA IF EXISTS model;
-DROP SCHEMA IF EXISTS log;
 DROP SCHEMA IF EXISTS gis;
 --
 -- Name: gis; Type: SCHEMA; Schema: -; Owner: openatlas
@@ -231,15 +216,6 @@ CREATE SCHEMA gis;
 
 
 ALTER SCHEMA gis OWNER TO openatlas;
-
---
--- Name: log; Type: SCHEMA; Schema: -; Owner: openatlas
---
-
-CREATE SCHEMA log;
-
-
-ALTER SCHEMA log OWNER TO openatlas;
 
 --
 -- Name: model; Type: SCHEMA; Schema: -; Owner: openatlas
@@ -269,9 +245,8 @@ CREATE FUNCTION delete_entity_related() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
         BEGIN
-            -- If it is an source, event place, actor or reference
+            -- If it is an event, place or actor delete dates (E61) and aliases (E41, E82)
             IF OLD.class_code IN ('E6', 'E7', 'E8', 'E12', 'E21', 'E40', 'E74', 'E18') THEN
-                -- Delete dates (E61), aliases (E41, E82)
                 DELETE FROM model.entity WHERE id IN (
                     SELECT range_id FROM model.link WHERE domain_id = OLD.id AND class_code IN ('E41', 'E61', 'E82'));
             END IF;
@@ -453,82 +428,6 @@ ALTER TABLE polygon_id_seq OWNER TO openatlas;
 --
 
 ALTER SEQUENCE polygon_id_seq OWNED BY polygon.id;
-
-
-SET search_path = log, pg_catalog;
-
---
--- Name: detail; Type: TABLE; Schema: log; Owner: openatlas
---
-
-CREATE TABLE detail (
-    id integer NOT NULL,
-    log_id integer NOT NULL,
-    key text NOT NULL,
-    value text NOT NULL
-);
-
-
-ALTER TABLE detail OWNER TO openatlas;
-
---
--- Name: detail_id_seq; Type: SEQUENCE; Schema: log; Owner: openatlas
---
-
-CREATE SEQUENCE detail_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE detail_id_seq OWNER TO openatlas;
-
---
--- Name: detail_id_seq; Type: SEQUENCE OWNED BY; Schema: log; Owner: openatlas
---
-
-ALTER SEQUENCE detail_id_seq OWNED BY detail.id;
-
-
---
--- Name: log; Type: TABLE; Schema: log; Owner: openatlas
---
-
-CREATE TABLE log (
-    id integer NOT NULL,
-    priority integer NOT NULL,
-    type text,
-    message text NOT NULL,
-    user_id integer,
-    ip text,
-    info text,
-    created timestamp without time zone DEFAULT now() NOT NULL
-);
-
-
-ALTER TABLE log OWNER TO openatlas;
-
---
--- Name: log_id_seq; Type: SEQUENCE; Schema: log; Owner: openatlas
---
-
-CREATE SEQUENCE log_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE log_id_seq OWNER TO openatlas;
-
---
--- Name: log_id_seq; Type: SEQUENCE OWNED BY; Schema: log; Owner: openatlas
---
-
-ALTER SEQUENCE log_id_seq OWNED BY log.id;
 
 
 SET search_path = model, pg_catalog;
@@ -1088,6 +987,45 @@ ALTER SEQUENCE i18n_id_seq OWNED BY i18n.id;
 
 
 --
+-- Name: system_log; Type: TABLE; Schema: web; Owner: openatlas
+--
+
+CREATE TABLE system_log (
+    id integer NOT NULL,
+    priority integer NOT NULL,
+    type text,
+    message text NOT NULL,
+    user_id integer,
+    ip text,
+    info text,
+    created timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE system_log OWNER TO openatlas;
+
+--
+-- Name: log_id_seq; Type: SEQUENCE; Schema: web; Owner: openatlas
+--
+
+CREATE SEQUENCE log_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE log_id_seq OWNER TO openatlas;
+
+--
+-- Name: log_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
+--
+
+ALTER SEQUENCE log_id_seq OWNED BY system_log.id;
+
+
+--
 -- Name: settings; Type: TABLE; Schema: web; Owner: openatlas
 --
 
@@ -1301,22 +1239,6 @@ ALTER TABLE ONLY point ALTER COLUMN id SET DEFAULT nextval('point_id_seq'::regcl
 ALTER TABLE ONLY polygon ALTER COLUMN id SET DEFAULT nextval('polygon_id_seq'::regclass);
 
 
-SET search_path = log, pg_catalog;
-
---
--- Name: detail id; Type: DEFAULT; Schema: log; Owner: openatlas
---
-
-ALTER TABLE ONLY detail ALTER COLUMN id SET DEFAULT nextval('detail_id_seq'::regclass);
-
-
---
--- Name: log id; Type: DEFAULT; Schema: log; Owner: openatlas
---
-
-ALTER TABLE ONLY log ALTER COLUMN id SET DEFAULT nextval('log_id_seq'::regclass);
-
-
 SET search_path = model, pg_catalog;
 
 --
@@ -1427,6 +1349,13 @@ ALTER TABLE ONLY settings ALTER COLUMN id SET DEFAULT nextval('settings_id_seq':
 
 
 --
+-- Name: system_log id; Type: DEFAULT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY system_log ALTER COLUMN id SET DEFAULT nextval('log_id_seq'::regclass);
+
+
+--
 -- Name: user id; Type: DEFAULT; Schema: web; Owner: openatlas
 --
 
@@ -1478,24 +1407,6 @@ ALTER TABLE ONLY point
 
 ALTER TABLE ONLY polygon
     ADD CONSTRAINT polygon_pkey PRIMARY KEY (id);
-
-
-SET search_path = log, pg_catalog;
-
---
--- Name: detail log_detail_pkey; Type: CONSTRAINT; Schema: log; Owner: openatlas
---
-
-ALTER TABLE ONLY detail
-    ADD CONSTRAINT log_detail_pkey PRIMARY KEY (id);
-
-
---
--- Name: log log_pkey; Type: CONSTRAINT; Schema: log; Owner: openatlas
---
-
-ALTER TABLE ONLY log
-    ADD CONSTRAINT log_pkey PRIMARY KEY (id);
 
 
 SET search_path = model, pg_catalog;
@@ -1687,11 +1598,11 @@ ALTER TABLE ONLY i18n
 
 
 --
--- Name: settings settings_name_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+-- Name: system_log log_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
-ALTER TABLE ONLY settings
-    ADD CONSTRAINT settings_name_key UNIQUE (name);
+ALTER TABLE ONLY system_log
+    ADD CONSTRAINT log_pkey PRIMARY KEY (id);
 
 
 --
@@ -1958,16 +1869,6 @@ ALTER TABLE ONLY point
 
 ALTER TABLE ONLY polygon
     ADD CONSTRAINT polygon_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
-SET search_path = log, pg_catalog;
-
---
--- Name: detail detail_log_id_fkey; Type: FK CONSTRAINT; Schema: log; Owner: openatlas
---
-
-ALTER TABLE ONLY detail
-    ADD CONSTRAINT detail_log_id_fkey FOREIGN KEY (log_id) REFERENCES log(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 SET search_path = model, pg_catalog;

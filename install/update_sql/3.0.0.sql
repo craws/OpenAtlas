@@ -299,5 +299,8 @@ ALTER TABLE model.link_property DROP COLUMN description;
 -- New logging system
 DROP TABLE log.details;
 ALTER TABLE log.log RENAME agent TO info;
+ALTER TABLE log.log SET SCHEMA web;
+ALTER TABLE web.log RENAME TO system_log;
+DROP SCHEMA log;
 
 COMMIT;
