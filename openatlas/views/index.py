@@ -14,7 +14,8 @@ from openatlas.util.changelog import Changelog
 from werkzeug.utils import redirect
 
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import link, bookmark_toggle, uc_first, required_group, send_mail
+from openatlas.util.util import (link, bookmark_toggle, uc_first, required_group, send_mail,
+                                 format_date)
 
 
 class FeedbackForm(Form):
@@ -31,6 +32,10 @@ def index():
         'bookmarks': {
             'name': 'bookmarks',
             'header': ['name', 'class', 'first', 'last'],
+            'data': []},
+        'latest': {
+            'name': 'latest',
+            'header': ['name', 'class', 'first', 'last', 'date', 'user'],
             'data': []}}
     if current_user.is_authenticated and hasattr(current_user, 'bookmarks'):
         for entity_id in current_user.bookmarks:
@@ -43,8 +48,16 @@ def index():
                 bookmark_toggle(entity.id, True)])
         for name, count in EntityMapper.get_overview_counts().items():
             tables['counts']['data'].append([
-                '<a href="' + url_for(name + '_index') + '">' + uc_first(_(name)) + '</a>',
-                count])
+                '<a href="' + url_for(name + '_index') + '">' + uc_first(_(name)) + '</a>', count])
+        for entity in EntityMapper.get_latest(8):
+            tables['latest']['data'].append([
+                link(entity),
+                openatlas.classes[entity.class_.code].name,
+                entity.first,
+                entity.last,
+                format_date(entity.created),
+                openatlas.logger.get_log_for_advanced_view(entity.id)['creator_name']])
+
     return render_template(
         'index/index.html',
         intro=ContentMapper.get_translation('intro'),

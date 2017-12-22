@@ -4,5 +4,9 @@
     > {{ reference|link|safe }} > {{ _('edit')|uc_first }}
 {% endblock %}
 {% block content %}
+    {% if modifier %}
+        <p class="error">{{_('error modified by')}}: {{ modifier }}</p>
+        <p><a class="button" href="{{ url_for('reference_update', id_=reference.id) }}">{{ _('reload')|uc_first }}</a></p>
+    {% endif %}
     {{ form|display_form|safe }}
 {% endblock %}

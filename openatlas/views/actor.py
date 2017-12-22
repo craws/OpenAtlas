@@ -234,7 +234,8 @@ def actor_update(id_):
         if was_modified(form, actor):  # pragma: no cover
             del form.save
             flash(_('error modified'), 'error')
-            return render_template('actor/update.html', form=form, actor=actor, modified=True)
+            modifier = openatlas.logger.get_log_for_advanced_view(actor.id)['modifier_name']
+            return render_template('actor/update.html', form=form, actor=actor, modifier=modifier)
         save(form, actor)
         flash(_('info update'), 'info')
         return redirect(url_for('actor_view', id_=id_))

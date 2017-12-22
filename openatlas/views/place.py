@@ -141,7 +141,9 @@ def place_update(id_):
         if was_modified(form, object_):  # pragma: no cover
             del form.save
             flash(_('error modified'), 'error')
-            return render_template('place/update.html', form=form, object_=object_)
+            modifier = openatlas.logger.get_log_for_advanced_view(object_.id)['modifier_name']
+            return render_template(
+                'place/update.html', form=form, object_=object_, modifier=modifier)
         save(form, object_, location)
         flash(_('info update'), 'info')
         return redirect(url_for('place_view', id_=id_))

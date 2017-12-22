@@ -44,7 +44,7 @@ def translation_view(id_):
         'translation/view.html',
         source=source,
         translation=translation,
-        tables={'info': get_entity_data(source)})
+        tables={'info': get_entity_data(translation)})
 
 
 @app.route('/source/translation/delete/<int:id_>/<int:source_id>')
@@ -76,9 +76,12 @@ def translation_update(id_):
 
 def save(form, entity=None, source=None):
     openatlas.get_cursor().execute('BEGIN')
-    if not entity:
+    if entity:
+        openatlas.logger.log_user(entity.id, 'update')
+    else:
         entity = EntityMapper.insert('E33', form.name.data, 'source translation')
         source.link('P73', entity)
+        openatlas.logger.log_user(entity.id, 'insert')
     entity.name = form.name.data
     entity.description = form.description.data
     entity.update()

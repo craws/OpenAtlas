@@ -5,8 +5,9 @@
     > {{ _('edit')|uc_first }}
 {% endblock %}
 {% block content %}
-    {% if modified %}
-        <a class="button" href="{{ url_for('actor_update', id_=actor.id) }}">{{ _('reload'|uc_first) }}</a>
+    {% if modifier %}
+        <p class="error">{{_('error modified by')}}: {{ modifier }}</p>
+        <p><a class="button" href="{{ url_for('actor_update', id_=actor.id) }}">{{ _('reload')|uc_first }}</a></p>
     {% endif %}
     {{ form|display_form('', True if actor.class_.code=='E21' else False)|safe }}
 {% endblock %}

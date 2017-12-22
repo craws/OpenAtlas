@@ -27,6 +27,10 @@
             {% endif %}
         </div>
         <div style="clear:both;"></div>
+        {% if tables['latest'].data %}
+            <h1>Latest</h1>
+            {{ tables['latest']|pager|safe }}
+        {% endif %}
         {% if tables['bookmarks'].data %}
             <h1>Bookmarks</h1>
             {{ tables['bookmarks']|pager|safe }}

@@ -243,6 +243,23 @@ class EntityMapper(object):
         return entities
 
     @staticmethod
+    def get_latest(limit):
+        codes = []
+        for class_, class_codes in app.config['CLASS_CODES'].items():
+            codes += class_codes
+        sql = EntityMapper.sql + """
+                WHERE e.class_code IN %(codes)s
+                GROUP BY e.id
+                ORDER BY e.created DESC LIMIT %(limit)s;"""
+        cursor = openatlas.get_cursor()
+        cursor.execute(sql, {'codes': tuple(codes), 'limit': limit})
+        openatlas.debug_model['div sql'] += 1
+        entities = []
+        for row in cursor.fetchall():
+            entities.append(Entity(row))
+        return entities
+
+    @staticmethod
     def delete_orphans(parameter):
         if parameter == 'orphans':
             sql_where = EntityMapper.sql_orphan + " AND e.class_code NOT IN %(class_codes)s"

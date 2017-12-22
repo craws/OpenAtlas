@@ -5,6 +5,10 @@
     > {{ _('edit')|uc_first }}
 {% endblock %}
 {% block content %}
+    {% if modifier %}
+        <p class="error">{{_('error modified by')}}: {{ modifier }}</p>
+        <p><a class="button" href="{{ url_for('place_update', id_=object_.id) }}">{{ _('reload')|uc_first }}</a></p>
+    {% endif %}
     <div id='map-info-display' style="float:left;">
         {{ form|display_form|safe }}
     </div>
