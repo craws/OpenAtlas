@@ -60,7 +60,7 @@ def admin_log():
         'name': 'log',
         'header': ['date', 'priority', 'type', 'message', 'user', 'IP', 'info'],
         'data': []}
-    for row in openatlas.logger.get_logs(form.limit.data, form.priority.data, form.user.data):
+    for row in openatlas.logger.get_system_logs(form.limit.data, form.priority.data, form.user.data):
         table['data'].append([
             format_datetime(row.created),
             str(row.priority) + ' ' + app.config['LOG_LEVELS'][row.priority],
@@ -75,6 +75,6 @@ def admin_log():
 @app.route('/admin/log/delete')
 @required_group('admin')
 def admin_log_delete():
-    openatlas.logger.delete_all()
+    openatlas.logger.delete_all_system_logs()
     flash(_('Logs deleted'))
     return redirect(url_for('admin_log'))

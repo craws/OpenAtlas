@@ -33,7 +33,7 @@ class DBHandler:
         cursor.execute(sql, params)
 
     @staticmethod
-    def get_logs(limit, priority, user_id):
+    def get_system_logs(limit, priority, user_id):
         sql = """
             SELECT id, priority, type, message, user_id, ip, info, created
             FROM web.system_log
@@ -46,5 +46,13 @@ class DBHandler:
         return cursor.fetchall()
 
     @staticmethod
-    def delete_all():
+    def delete_all_system_logs():
         openatlas.get_cursor().execute('TRUNCATE TABLE web.system_log RESTART IDENTITY CASCADE;')
+
+    @staticmethod
+    def log_user(entity_id, action):
+        sql = """
+            INSERT INTO web.user_log (user_id, entity_id, action)
+            VALUES (%(user_id)s, %(entity_id)s, %(action)s);"""
+        cursor = openatlas.get_cursor()
+        cursor.execute(sql, {'user_id': current_user.id, 'entity_id': entity_id, 'action': action})

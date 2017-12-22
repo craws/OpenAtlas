@@ -136,6 +136,7 @@ def source_add2(id_, class_name):
 def source_delete(id_):
     openatlas.get_cursor().execute('BEGIN')
     EntityMapper.delete(id_)
+    openatlas.logger.log_user(id_, 'delete')
     openatlas.get_cursor().execute('COMMIT')
     flash(_('entity deleted'), 'info')
     return redirect(url_for('source_index'))
@@ -157,18 +158,22 @@ def source_update(id_):
     return render_template('source/update.html', form=form, source=source)
 
 
-def save(form, entity=None, origin=None):
+def save(form, source=None, origin=None):
     openatlas.get_cursor().execute('BEGIN')
-    entity = entity if entity else EntityMapper.insert('E33', form.name.data, 'source content')
-    entity.name = form.name.data
-    entity.description = form.description.data
-    entity.update()
-    entity.save_nodes(form)
+    if source:
+        openatlas.logger.log_user(source.id, 'update')
+    else:
+        source = EntityMapper.insert('E33', form.name.data, 'source content')
+        openatlas.logger.log_user(source.id, 'insert')
+    source.name = form.name.data
+    source.description = form.description.data
+    source.update()
+    source.save_nodes(form)
     link_ = None
     if origin:
         if origin.class_.code in app.config['CLASS_CODES']['reference']:
-            link_ = origin.link('P67', entity)
+            link_ = origin.link('P67', source)
         else:
-            entity.link('P67', origin)
+            source.link('P67', origin)
     openatlas.get_cursor().execute('COMMIT')
-    return link_ if link_ else entity
+    return link_ if link_ else source

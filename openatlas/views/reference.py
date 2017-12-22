@@ -171,6 +171,7 @@ def reference_insert(code, origin_id=None):
 def reference_delete(id_):
     openatlas.get_cursor().execute('BEGIN')
     EntityMapper.delete(id_)
+    openatlas.logger.log_user(id_, 'delete')
     openatlas.get_cursor().execute('COMMIT')
     flash(_('entity deleted'), 'info')
     return redirect(url_for('reference_index'))
@@ -192,19 +193,22 @@ def reference_update(id_):
     return render_template('reference/update.html', form=form, reference=reference)
 
 
-def save(form, entity, code=None, origin=None):
+def save(form, reference, code=None, origin=None):
     openatlas.get_cursor().execute('BEGIN')
-    if not entity:
+    if reference:
+        openatlas.logger.log_user(reference.id, 'update')
+    else:
         class_code = 'E31'
         system_type = code
         if code == 'carrier':
             class_code = 'E84'
             system_type = 'information carrier'
-        entity = EntityMapper.insert(class_code, form.name.data, system_type)
-    entity.name = form.name.data
-    entity.description = form.description.data
-    entity.update()
-    entity.save_nodes(form)
-    link_ = entity.link('P67', origin) if origin else None
+        reference = EntityMapper.insert(class_code, form.name.data, system_type)
+        openatlas.logger.log_user(reference.id, 'insert')
+    reference.name = form.name.data
+    reference.description = form.description.data
+    reference.update()
+    reference.save_nodes(form)
+    link_ = reference.link('P67', origin) if origin else None
     openatlas.get_cursor().execute('COMMIT')
-    return link_ if link_ else entity
+    return link_ if link_ else reference

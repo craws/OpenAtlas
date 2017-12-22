@@ -217,6 +217,7 @@ def actor_insert(code, origin_id=None):
 def actor_delete(id_):
     openatlas.get_cursor().execute('BEGIN')
     EntityMapper.delete(id_)
+    openatlas.logger.log_user(id_, 'delete')
     openatlas.get_cursor().execute('COMMIT')
     flash(_('entity deleted'), 'info')
     return redirect(url_for('actor_index'))
@@ -255,8 +256,10 @@ def save(form, actor=None, code=None, origin=None):
         LinkMapper.delete_by_codes(actor, ['P74', 'OA8', 'OA9'])
         for alias in actor.get_linked_entities('P131'):
             alias.delete()
+        openatlas.logger.log_user(actor.id, 'update')
     else:
         actor = EntityMapper.insert(code, form.name.data)
+        openatlas.logger.log_user(actor.id, 'insert')
     actor.name = form.name.data
     actor.description = form.description.data
     actor.update()

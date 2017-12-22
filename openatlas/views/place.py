@@ -124,6 +124,7 @@ def place_view(id_, unlink_id=None):
 def place_delete(id_):
     openatlas.get_cursor().execute('BEGIN')
     EntityMapper.delete(id_)
+    openatlas.logger.log_user(id_, 'delete')
     openatlas.get_cursor().execute('COMMIT')
     flash(_('entity deleted'), 'info')
     return redirect(url_for('place_index'))
@@ -157,10 +158,12 @@ def save(form, object_=None, location=None, origin=None):
         for alias in object_.get_linked_entities('P1'):
             alias.delete()
         GisMapper.delete_by_entity(location)
+        openatlas.logger.log_user(object_.id, 'update')
     else:
         object_ = EntityMapper.insert('E18', form.name.data)
         location = EntityMapper.insert('E53', 'Location of ' + form.name.data, 'place location')
         object_.link('P53', location)
+        openatlas.logger.log_user(object_.id, 'insert')
     object_.name = form.name.data
     object_.description = form.description.data
     object_.update()

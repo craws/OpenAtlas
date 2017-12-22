@@ -1149,8 +1149,7 @@ ALTER SEQUENCE user_id_seq OWNED BY "user".id;
 CREATE TABLE user_log (
     id integer NOT NULL,
     user_id integer NOT NULL,
-    table_name text NOT NULL,
-    table_id integer NOT NULL,
+    entity_id integer NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,
     action text NOT NULL
 );

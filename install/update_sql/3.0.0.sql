@@ -303,4 +303,8 @@ ALTER TABLE log.log SET SCHEMA web;
 ALTER TABLE web.log RENAME TO system_log;
 DROP SCHEMA log;
 
+DELETE FROM web.user_log WHERE table_name = 'link';
+ALTER TABLE web.user_log DROP COLUMN table_name;
+ALTER TABLE web.user_log RENAME table_id TO entity_id;
+
 COMMIT;
