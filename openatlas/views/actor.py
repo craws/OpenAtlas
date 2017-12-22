@@ -234,7 +234,7 @@ def actor_update(id_):
         if was_modified(form, actor):  # pragma: no cover
             del form.save
             flash(_('error modified'), 'error')
-            return render_template('actor/update.html', form=form, actor=actor)
+            return render_template('actor/update.html', form=form, actor=actor, modified=True)
         save(form, actor)
         flash(_('info update'), 'info')
         return redirect(url_for('actor_view', id_=id_))

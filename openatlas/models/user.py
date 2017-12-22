@@ -205,6 +205,7 @@ class UserMapper(object):
             settings[row.name] = row.value
         for item in ['newsletter', 'show_email']:
             settings[item] = True if item in settings and settings[item] == 'True' else False
+        settings['layout'] = settings['layout'] if 'layout' in settings else 'default'
         settings['language'] = settings['language'] if 'language' in settings else openatlas.get_locale()
         settings['table_rows'] = int(settings['table_rows']) if 'table_rows' in settings else session['settings']['default_table_rows']
         return settings

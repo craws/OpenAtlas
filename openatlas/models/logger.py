@@ -56,3 +56,25 @@ class DBHandler:
             VALUES (%(user_id)s, %(entity_id)s, %(action)s);"""
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {'user_id': current_user.id, 'entity_id': entity_id, 'action': action})
+
+    @staticmethod
+    def get_log_for_advanced_view(entity_id):
+        cursor = openatlas.get_cursor()
+        sql = """
+            SELECT ul.created, ul.user_id, ul.entity_id, u.username
+            FROM web.user_log ul
+            JOIN web.user u ON ul.user_id = u.id
+            WHERE ul.entity_id = %(entity_id)s AND ul.action = %(action)s
+            ORDER BY ul.created DESC LIMIT 1;"""
+        cursor.execute(sql, {'entity_id': entity_id, 'action': 'insert'})
+        row_insert = cursor.fetchone()
+        cursor.execute(sql, {'entity_id': entity_id, 'action': 'update'})
+        row_update = cursor.fetchone()
+        log = {
+            'creator_id': row_insert.user_id if row_insert else None,
+            'creator_name': row_insert.username if row_insert else None,
+            'created': row_insert.created if row_insert else None,
+            'modifier_id': row_update.user_id if row_update else None,
+            'modifier_name': row_update.username if row_update else None,
+            'modified': row_update.created if row_update else None}
+        return log

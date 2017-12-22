@@ -14,8 +14,13 @@ from openatlas.util.util import uc_first
 
 
 class DisplayForm(Form):
-    language = SelectField(_('language'), choices=[])
-    table_rows = SelectField(_('table rows'), choices=[], coerce=int)
+    language = SelectField(uc_first(_('language')), choices=[])
+    table_rows = SelectField(
+        uc_first(_('table rows')), description='tip table rows', choices=[], coerce=int)
+    layout = SelectField(
+        uc_first(_('layout')),
+        description='tip layout',
+        choices=[('default', uc_first(_('default'))), ('advanced', uc_first(_('advanced')))])
 
 
 class PasswordForm(Form):
@@ -65,6 +70,7 @@ def profile_index():
     if form.validate_on_submit():
         current_user.settings['language'] = form.language.data
         current_user.settings['table_rows'] = form.table_rows.data
+        current_user.settings['layout'] = form.layout.data
         openatlas.get_cursor().execute('BEGIN')
         current_user.update_settings()
         openatlas.get_cursor().execute('COMMIT')
@@ -74,9 +80,14 @@ def profile_index():
 
     form.language.data = current_user.settings['language']
     form.table_rows.data = current_user.settings['table_rows']
+    form.layout.data = current_user.settings['layout']
     data['display'] = [
         (form.language.label, form.language),
-        (form.table_rows.label, form.table_rows)]
+        (str(form.table_rows.label) +
+            ' <span class="tooltip" title="' + form.table_rows.description + '">i</span>',
+            form.table_rows),
+        (str(form.layout.label) +
+            ' <span class="tooltip" title="' + form.layout.description + '">i</span>', form.layout)]
     return render_template('profile/index.html', data=data, form=form)
 
 
