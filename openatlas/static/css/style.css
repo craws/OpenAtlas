@@ -56,6 +56,10 @@ form input[type="text"].year {
     width: 4em;
 }
 
+.faded {
+    opacity: 0.5;
+}
+
 span.tooltip {
     font-family: courier new, monospace;
     padding: 0.1em 0.2em 0 0.2em;

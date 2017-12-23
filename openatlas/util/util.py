@@ -23,6 +23,7 @@ from openatlas.models.user import User
 def send_mail(subject, text, recipients):  # pragma: no cover
     if not session['settings']['mail']:
         return
+    recipients = recipients if isinstance(recipients, list) else [recipients]
     sender = session['settings']['mail_transport_username']
     from_ = session['settings']['mail_from_name']
     from_ += ' <' + session['settings']['mail_from_email'] + '>'
@@ -33,23 +34,31 @@ def send_mail(subject, text, recipients):  # pragma: no cover
     server.starttls()
     try:
         server.login(sender, app.config['MAIL_PASSWORD'])
-        for recipient in recipients if isinstance(recipients, list) else [recipients]:
+        for recipient in recipients:
             body = '\r\n'.join([
                 'To: %s' % recipient,
                 'From: %s' % from_,
                 'Subject: %s' % subject,
                 '', text])
             server.sendmail(sender, recipient, body)
-    except smtplib.SMTPAuthenticationError:
+        message = 'Mail send from for ' + from_ + ' to ' + ', '.join(recipients)
+        message += ' Subject: ' + subject + ' Content: ' + text
+        openatlas.logger.log('info', 'mail', 'Mail send from ' + sender, message)
+    except smtplib.SMTPAuthenticationError as e:
+        openatlas.logger.log('error', 'mail', 'Error mail login for ' + sender, str(e))
         flash(_('error mail login'), 'error')
         return False
-    except:
+    except Exception as e:
+        openatlas.logger.log('error', 'mail', 'Error send mail for ' + sender, str(e))
         flash(_('error mail send'), 'error')
         return False
     return True
 
 
 class MLStripper(HTMLParser):
+
+    def error(self, message):
+        pass
 
     def __init__(self):
         super().__init__()
@@ -396,7 +405,7 @@ def pager(table):
                 <div><select class="pagesize">{options}</select></div>
                 <input id="{name}-search" class="search" type="text" data-column="all"
                     placeholder="{filter}">
-            </div><div style="clear-both"></div>
+            </div><div style="clear:both;"></div>
             """.format(name=table['name'], filter=uc_first(_('filter')), options=options)
     html += '<table id="{name}-table" class="tablesorter"><thead><tr>'.format(name=table['name'])
     for header in table['header']:

@@ -61,12 +61,13 @@ def admin_log():
         'header': ['date', 'priority', 'type', 'message', 'user', 'IP', 'info'],
         'data': []}
     for row in openatlas.logger.get_system_logs(form.limit.data, form.priority.data, form.user.data):
+        user = UserMapper.get_by_id(row.user_id) if row.user_id else None
         table['data'].append([
             format_datetime(row.created),
             str(row.priority) + ' ' + app.config['LOG_LEVELS'][row.priority],
             row.type,
             row.message,
-            link(UserMapper.get_by_id(row.user_id)) if row.user_id else '',
+            link(user) if user and user.id else row.user_id,
             row.ip,
             truncate_string(row.info)])
     return render_template('admin/log.html', table=table, form=form)

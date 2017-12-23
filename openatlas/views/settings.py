@@ -1,15 +1,22 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
-from flask import flash, render_template, session, url_for
+from flask import flash, render_template, session, url_for, request
 from flask_babel import lazy_gettext as _
+from flask_login import current_user
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import StringField, BooleanField, SelectField
+from wtforms import StringField, BooleanField, SelectField, SubmitField
+from wtforms.validators import Email, InputRequired
 
 import openatlas
 from openatlas import SettingsMapper
 from openatlas import app
-from openatlas.util.util import uc_first, required_group
+from openatlas.util.util import uc_first, required_group, send_mail
+
+
+class TestMail(Form):
+    receiver = StringField(_('test mail receiver'), validators=[InputRequired(), Email()])
+    send = SubmitField(_('send test mail'))
 
 
 class SettingsForm(Form):
@@ -49,9 +56,19 @@ class SettingsForm(Form):
     failed_login_forget_minutes = StringField(uc_first(_('failed login forget minutes')))
 
 
-@app.route('/admin/settings')
+@app.route('/admin/settings', methods=["GET", "POST"])
 @required_group('admin')
 def settings_index():
+    form = TestMail()
+    if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
+        user = current_user
+        subject = _('Test mail from') + ' ' + session['settings']['site_name']
+        body = _('This test mail was sent by') + ' ' + user.username + ' ' + request.headers['Host']
+        if send_mail(subject, body, form.receiver.data):
+            flash(_('A test mail was sent to ') + form.receiver.data)
+    else:
+        form.receiver.data = current_user.email
+
     settings = session['settings']
     groups = OrderedDict([
         ('general', OrderedDict([
@@ -78,7 +95,7 @@ def settings_index():
             (_('reset confirm hours'), settings['reset_confirm_hours']),
             (_('failed login tries'), settings['failed_login_tries']),
             (_('failed login forget minutes'), settings['failed_login_forget_minutes'])]))])
-    return render_template('settings/index.html', groups=groups, settings=settings)
+    return render_template('settings/index.html', groups=groups, settings=settings, form=form)
 
 
 @app.route('/admin/settings/update', methods=["GET", "POST"])
