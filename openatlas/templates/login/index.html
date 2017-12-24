@@ -8,6 +8,11 @@
     {% if config['DEMO_MODE'] %}
         <p>User: Demolina, Pass: Demolina</p>
     {% endif %}
+    {% if session['settings']['mail'] %}
+        <p>
+            <a href="{{ url_for('reset_password') }}">{{ _('Forgot your password?') }}</a>
+        </p>
+    {% endif %}
     <script>
         $(function () {
             $("#username").focus();

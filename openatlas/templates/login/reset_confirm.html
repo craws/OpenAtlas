@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('index') }}">{{ _('overview')|uc_first }}</a>
+    > <a href="{{ url_for('login') }}">{{ _('login')|uc_first }}</a>
+    > {{ _('forgot your password?') }}
+{% endblock %}
+{% block content %}
+    <p>{{ _('info password reset confirm') }}</p>
+{% endblock %}

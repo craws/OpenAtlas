@@ -1,4 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+import random
+import string
+
 import bcrypt
 import datetime
 from flask import session
@@ -71,32 +74,37 @@ class UserMapper(object):
         return users
 
     @staticmethod
-    def get_by_id(user_id):
+    def get_by_id(user_id, with_bookmarks=False):
         cursor = openatlas.get_cursor()
-        sql = 'SELECT entity_id FROM web.user_bookmarks WHERE user_id = %(user_id)s;'
-        cursor.execute(sql, {'user_id': user_id})
-        bookmarks = []
-        for row in cursor.fetchall():
-            bookmarks.append(row.entity_id)
+        bookmarks = None
+        if with_bookmarks:
+            sql = 'SELECT entity_id FROM web.user_bookmarks WHERE user_id = %(user_id)s;'
+            cursor.execute(sql, {'user_id': user_id})
+            bookmarks = []
+            for row in cursor.fetchall():
+                bookmarks.append(row.entity_id)
         cursor.execute(UserMapper.sql + ' WHERE u.id = %(id)s;', {'id': user_id})
-        return User(cursor.fetchone(), bookmarks)
+        return User(cursor.fetchone(), bookmarks) if cursor.rowcount == 1 else None
+
+    @staticmethod
+    def get_by_reset_code(code):
+        cursor = openatlas.get_cursor()
+        cursor.execute(UserMapper.sql + ' WHERE u.password_reset_code = %(code)s;', {'code': code})
+        return User(cursor.fetchone()) if cursor.rowcount == 1 else None
 
     @staticmethod
     def get_by_email(email):
+        sql = UserMapper.sql + ' WHERE LOWER(u.email) = LOWER(%(email)s);'
         cursor = openatlas.get_cursor()
-        cursor.execute(UserMapper.sql + ' WHERE u.email = %(email)s;', {'email': email})
-        if cursor.rowcount == 1:
-            return User(cursor.fetchone())
-        return False
+        cursor.execute(sql, {'email': email})
+        return User(cursor.fetchone()) if cursor.rowcount == 1 else None
 
     @staticmethod
     def get_by_username(username):
+        sql = UserMapper.sql + ' WHERE LOWER(u.username) = LOWER(%(username)s);'
         cursor = openatlas.get_cursor()
-        cursor.execute(UserMapper.sql +
-                       ' WHERE LOWER(u.username) = LOWER(%(username)s);', {'username': username})
-        if cursor.rowcount == 1:
-            return User(cursor.fetchone())
-        return False
+        cursor.execute(sql, {'username': username})
+        return User(cursor.fetchone()) if cursor.rowcount == 1 else None
 
     @staticmethod
     def insert(form):
@@ -122,10 +130,12 @@ class UserMapper(object):
         cursor = openatlas.get_cursor()
         sql = """
             UPDATE web.user SET (username, password, real_name, info, email, active,
-                login_last_success, login_last_failure, login_failed_count, group_id) =
+                login_last_success, login_last_failure, login_failed_count, group_id,
+                password_reset_code, password_reset_date) =
             (%(username)s, %(password)s, %(real_name)s, %(info)s, %(email)s, %(active)s,
                 %(login_last_success)s, %(login_last_failure)s, %(login_failed_count)s,
-                (SELECT id FROM web.group WHERE name LIKE %(group_name)s))
+                (SELECT id FROM web.group WHERE name LIKE %(group_name)s),
+                %(password_reset_code)s, %(password_reset_date)s)
             WHERE id = %(id)s;"""
         cursor.execute(sql, {
             'id': user.id,
@@ -138,7 +148,9 @@ class UserMapper(object):
             'group_name': user.group,
             'login_last_success': user.login_last_success,
             'login_last_failure': user.login_last_failure,
-            'login_failed_count': user.login_failed_count})
+            'login_failed_count': user.login_failed_count,
+            'password_reset_code': user.password_reset_code,
+            'password_reset_date': user.password_reset_date})
         return
 
     @staticmethod
@@ -209,3 +221,12 @@ class UserMapper(object):
         settings['language'] = settings['language'] if 'language' in settings else openatlas.get_locale()
         settings['table_rows'] = int(settings['table_rows']) if 'table_rows' in settings else session['settings']['default_table_rows']
         return settings
+
+    @staticmethod
+    def generate_password(length=None):
+        length = length if length else session['settings']['random_password_length']
+        # with python 3.6 following can be used instead:
+        # ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(length))
+        password = ''.join(random.SystemRandom().choice(
+            string.ascii_uppercase + string.digits) for _ in range(length))
+        return password

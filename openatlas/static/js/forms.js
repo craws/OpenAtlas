@@ -23,6 +23,11 @@ $(document).ready(function () {
             password2: {equalTo: "#password"}
         }
     });
+    $("#password-reset").validate({
+        rules: {
+            email: {email: true}
+        }
+    });
     $("#profile-form").validate({
         rules: {
             email: {email: true}
