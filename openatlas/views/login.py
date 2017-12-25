@@ -139,4 +139,4 @@ def reset_confirm(code):
 def logout():
     logout_user()
     openatlas.logger.log('info', 'auth', 'logout')
-    return redirect('/login')
+    return redirect(url_for('login'))

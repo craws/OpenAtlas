@@ -1,5 +1,5 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import abort, flash, render_template, session, url_for
+from flask import abort, flash, render_template, session, url_for, request
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import Form
@@ -9,7 +9,7 @@ from wtforms import (BooleanField, HiddenField, PasswordField, SelectField, Stri
                      SubmitField, TextAreaField)
 
 from openatlas import app
-from openatlas.util.util import format_date, link, required_group
+from openatlas.util.util import format_date, link, required_group, send_mail, uc_first
 from openatlas.models.user import User, UserMapper
 
 
@@ -119,6 +119,17 @@ def user_insert():
     if form.validate_on_submit():
         user_id = UserMapper.insert(form)
         flash(_('user created'), 'info')
+        if form.send_info.data and session['settings']['mail']:  # pragma: no cover
+            subject = _('mail registration subject') + ' ' + session['settings']['site_name']
+            body = _('mail account information for') + ' ' + form.username.data + ' '
+            body += _('at') + ' ' + request.scheme + '://' + request.headers['Host'] + '\n\n'
+            body += uc_first(_('username')) + ': ' + form.username.data + '\n'
+            body += uc_first(_('password')) + ': ' + form.password.data + '\n'
+            if send_mail(subject, body, form.email.data):
+                flash(_('Sent account information mail to ') + form.email.data, 'info')
+            else:
+                flash(_('Failed to send account details to ') + form.email.data, 'error')
+            return redirect(url_for('user_index'))
         if form.continue_.data == 'yes':
             return redirect(url_for('user_insert'))
         return redirect(url_for('user_view', id_=user_id))
