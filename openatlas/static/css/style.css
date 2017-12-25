@@ -60,6 +60,17 @@ form input[type="text"].year {
     opacity: 0.5;
 }
 
+#newsletter-form textarea {
+    font-size: 1em;
+    width: 30em;
+    height: 10em;
+}
+
+#newsletter-form input[type='text'] {
+    font-size: 1em;
+    width: 30em;
+}
+
 span.tooltip {
     font-family: courier new, monospace;
     padding: 0.1em 0.2em 0 0.2em;

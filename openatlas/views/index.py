@@ -10,6 +10,7 @@ from wtforms.validators import InputRequired
 import openatlas
 from openatlas import app
 from openatlas.models.content import ContentMapper
+from openatlas.models.user import UserMapper
 from openatlas.util.changelog import Changelog
 from werkzeug.utils import redirect
 
@@ -118,3 +119,16 @@ def invalid_id(e):
 @app.route('/overview/changelog')
 def index_changelog():
     return render_template('index/changelog.html', versions=Changelog.versions)
+
+
+@app.route('/unsubscribe/<code>')
+def index_unsubscribe(code):
+    user = UserMapper.get_by_unsubscribe_code(code)
+    text = _('unsubscribe link not valid')
+    if user:
+        user.settings['newsletter'] = ''
+        user.update()
+        user.unsubscribe_code = ''
+        user.update_settings()
+        text = _('unsubscribe_confirmation')
+    return render_template('index/unsubscribe.html', text=text)

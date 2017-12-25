@@ -248,15 +248,14 @@ class TableMultiSelect(HiddenInput):
         table['headers'] = 'headers: { ' + str(len(table['header'])) + ': { sorter: "checkbox" } }'
         table['sort'] = 'sortList: [[' + str(len(table['header'])) + ',0],[0,0]]'
         for entity in EntityMapper.get_by_codes(class_):
-            selection += entity.name + '<br />' if field.data and entity.id in field.data else ''
-            checked = ''
-            if field.data and entity.id in field.data:
-                checked = 'checked = "checked"'
+            selection += entity.name + '<br/>' if field.data and entity.id in field.data else ''
             data = get_base_table_data(entity)
-            data[0] = truncate_string(entity.name)  # replace entity link with just the entity name
+            data[0] = truncate_string(entity.name)  # replace entity link with entity name
             html = """<input type="checkbox" id="{id}" {checked} value="{name}"
                 class="multi-table-select">""".format(
-                id=str(entity.id), name=entity.name, checked=checked)
+                    id=str(entity.id),
+                    name=entity.name,
+                    checked='checked = "checked"' if field.data and entity.id in field.data else '')
             data.append(html)
             table['data'].append(data)
         html = """

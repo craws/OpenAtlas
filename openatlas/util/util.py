@@ -21,9 +21,9 @@ from openatlas.models.user import User
 
 
 def send_mail(subject, text, recipients):  # pragma: no cover
-    if not session['settings']['mail']:
-        return
     recipients = recipients if isinstance(recipients, list) else [recipients]
+    if not session['settings']['mail'] or len(recipients) < 1:
+        return
     sender = session['settings']['mail_transport_username']
     from_ = session['settings']['mail_from_name']
     from_ += ' <' + session['settings']['mail_from_email'] + '>'

@@ -1,14 +1,16 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import render_template, flash, url_for
+from flask import render_template, flash, url_for, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import SelectField, SubmitField
+from wtforms.validators import InputRequired
+from wtforms import SelectField, SubmitField, TextAreaField, StringField
 
 import openatlas
 from openatlas import app, EntityMapper, NodeMapper
 from openatlas.models.user import UserMapper
-from openatlas.util.util import required_group, link, truncate_string, format_datetime
+from openatlas.util.util import (required_group, link, truncate_string, format_datetime, uc_first,
+                                 send_mail)
 
 
 class LogForm(Form):
@@ -16,6 +18,12 @@ class LogForm(Form):
     priority = SelectField(_('priority'), choices=(app.config['LOG_LEVELS'].items()), default=6)
     user = SelectField(_('user'), choices=([(0, 'all')] + UserMapper.get_users()), default=0)
     apply = SubmitField(_('apply'))
+
+
+class NewsLetterForm(Form):
+    subject = StringField('', [InputRequired()], render_kw={"placeholder": uc_first(_('subject'))})
+    body = TextAreaField('', [InputRequired()], render_kw={"placeholder": uc_first(_('content'))})
+    send = SubmitField(uc_first(_('send')))
 
 
 @app.route('/admin')
@@ -60,7 +68,8 @@ def admin_log():
         'name': 'log',
         'header': ['date', 'priority', 'type', 'message', 'user', 'IP', 'info'],
         'data': []}
-    for row in openatlas.logger.get_system_logs(form.limit.data, form.priority.data, form.user.data):
+    logs = openatlas.logger.get_system_logs(form.limit.data, form.priority.data, form.user.data)
+    for row in logs:
         user = UserMapper.get_by_id(row.user_id) if row.user_id else None
         table['data'].append([
             format_datetime(row.created),
@@ -79,3 +88,31 @@ def admin_log_delete():
     openatlas.logger.delete_all_system_logs()
     flash(_('Logs deleted'))
     return redirect(url_for('admin_log'))
+
+
+@app.route('/admin/newsletter', methods=['POST', 'GET'])
+@required_group('admin')
+def admin_newsletter():
+    form = NewsLetterForm()
+    if form.validate_on_submit():  # pragma: no cover
+        recipients = 0
+        for user_id in (request.form.getlist('recipient')):
+            user = UserMapper.get_by_id(user_id)
+            if user.settings['newsletter']:
+                code = UserMapper.generate_password()
+                user.unsubscribe_code = code
+                user.update()
+                link_ = request.scheme + '://' + request.headers['Host']
+                link_ += url_for('index_unsubscribe', code=code)
+                unsubscribe = '\n\n' + _('mail unsubscribe ') + link_
+                if send_mail(form.subject.data + unsubscribe, form.body.data, user.email):
+                    recipients += 1
+        flash(_('Newsletter send') + ': ' + str(recipients), 'info')
+        return redirect(url_for('admin_index'))
+    table = {'name': 'user', 'header': ['username', 'email', 'receiver'], 'data': []}
+    for user in UserMapper.get_all():
+        if user.settings['newsletter']:
+            checkbox = '<input value="' + str(user.id) + '" name="recipient"'
+            checkbox += ' type="checkbox" checked="checked">'
+            table['data'].append([user.username, user.email, checkbox])
+    return render_template('admin/newsletter.html', form=form, table=table)

@@ -31,6 +31,7 @@ class User(UserMixin):
         self.bookmarks = bookmarks
         self.password_reset_code = row.password_reset_code
         self.password_reset_date = row.password_reset_date
+        self.unsubscribe_code = row.unsubscribe_code
         self.group = row.group_name
         self.created = row.created
         self.modified = row.modified
@@ -59,7 +60,7 @@ class UserMapper(object):
     sql = """
         SELECT u.id, u.username, u.password, u.active, u.real_name, u.info, u.created, u.modified,
             u.login_last_success, u.login_last_failure, u.login_failed_count, u.password_reset_code,
-            u.password_reset_date, u.email, r.name as group_name
+            u.password_reset_date, u.email, r.name as group_name, u.unsubscribe_code
         FROM web."user" u
         LEFT JOIN web.group r ON u.group_id = r.id"""
 
@@ -107,6 +108,14 @@ class UserMapper(object):
         return User(cursor.fetchone()) if cursor.rowcount == 1 else None
 
     @staticmethod
+    def get_by_unsubscribe_code(code):
+        if not code:
+            return
+        cursor = openatlas.get_cursor()
+        cursor.execute(UserMapper.sql + ' WHERE u.unsubscribe_code = %(code)s;', {'code': code})
+        return User(cursor.fetchone()) if cursor.rowcount == 1 else None
+
+    @staticmethod
     def insert(form):
         cursor = openatlas.get_cursor()
         sql = """
@@ -131,11 +140,11 @@ class UserMapper(object):
         sql = """
             UPDATE web.user SET (username, password, real_name, info, email, active,
                 login_last_success, login_last_failure, login_failed_count, group_id,
-                password_reset_code, password_reset_date) =
+                password_reset_code, password_reset_date, unsubscribe_code) =
             (%(username)s, %(password)s, %(real_name)s, %(info)s, %(email)s, %(active)s,
                 %(login_last_success)s, %(login_last_failure)s, %(login_failed_count)s,
                 (SELECT id FROM web.group WHERE name LIKE %(group_name)s),
-                %(password_reset_code)s, %(password_reset_date)s)
+                %(password_reset_code)s, %(password_reset_date)s, %(unsubscribe_code)s)
             WHERE id = %(id)s;"""
         cursor.execute(sql, {
             'id': user.id,
@@ -149,6 +158,7 @@ class UserMapper(object):
             'login_last_success': user.login_last_success,
             'login_last_failure': user.login_last_failure,
             'login_failed_count': user.login_failed_count,
+            'unsubscribe_code': user.unsubscribe_code,
             'password_reset_code': user.password_reset_code,
             'password_reset_date': user.password_reset_date})
         return
