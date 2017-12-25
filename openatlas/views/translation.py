@@ -14,7 +14,7 @@ from openatlas.util.util import required_group, get_entity_data
 
 
 class TranslationForm(Form):
-    name = StringField(_('name'), validators=[InputRequired()])
+    name = StringField(_('name'), [InputRequired()])
     description = TextAreaField(_('content'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))

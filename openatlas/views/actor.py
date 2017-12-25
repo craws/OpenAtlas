@@ -17,7 +17,7 @@ from openatlas.util.util import (truncate_string, required_group, get_entity_dat
 
 
 class ActorForm(DateForm):
-    name = StringField(_('name'), validators=[InputRequired()])
+    name = StringField(_('name'), [InputRequired()])
     alias = FieldList(StringField(''))
     residence = TableField(_('residence'))
     appears_first = TableField(_('appears first'))

@@ -10,12 +10,12 @@ from wtforms.validators import InputRequired
 import openatlas
 from openatlas import app, NodeMapper, EntityMapper
 from openatlas.forms import build_form
-from openatlas.util.util import required_group, sanitize, uc_first
+from openatlas.util.util import required_group, sanitize
 
 
 class HierarchyForm(Form):
-    name = StringField(_('name'), validators=[InputRequired()])
-    multiple = BooleanField(_('multiple'),description=_('tooltip hierarchy multiple'))
+    name = StringField(_('name'), [InputRequired()])
+    multiple = BooleanField(_('multiple'), description=_('tooltip hierarchy multiple'))
     forms = SelectMultipleField(
         _('forms'),
         render_kw={'disabled': True},

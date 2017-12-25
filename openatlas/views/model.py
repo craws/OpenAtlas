@@ -7,8 +7,7 @@ from wtforms import BooleanField, HiddenField, IntegerField, SubmitField
 from wtforms.validators import InputRequired
 
 import openatlas
-from openatlas import app, PropertyMapper
-from openatlas.models.classObject import ClassMapper
+from openatlas import app
 from openatlas.models.network import Network
 from openatlas.util.util import link, required_group
 

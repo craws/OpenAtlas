@@ -21,7 +21,7 @@ from openatlas.util.util import (link, bookmark_toggle, uc_first, required_group
 
 class FeedbackForm(Form):
     subject = SelectField(_('subject'), choices=app.config['FEEDBACK_SUBJECTS'].items())
-    description = TextAreaField(_('description'), validators=[InputRequired()])
+    description = TextAreaField(_('description'), [InputRequired()])
     send = SubmitField(_('send'))
 
 

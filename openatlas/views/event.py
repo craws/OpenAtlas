@@ -19,7 +19,7 @@ from openatlas.util.util import (required_group, truncate_string, get_entity_dat
 
 
 class EventForm(DateForm):
-    name = StringField(_('name'), validators=[InputRequired()])
+    name = StringField(_('name'), [InputRequired()])
     event = TableField(_('sub event of'))
     place = TableField(_('location'))
     event_id = HiddenField()

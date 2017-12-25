@@ -15,7 +15,7 @@ from openatlas.util.util import uc_first, required_group, send_mail
 
 
 class TestMail(Form):
-    receiver = StringField(_('test mail receiver'), validators=[InputRequired(), Email()])
+    receiver = StringField(_('test mail receiver'), [InputRequired(), Email()])
     send = SubmitField(_('send test mail'))
 
 

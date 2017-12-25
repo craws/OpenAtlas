@@ -17,8 +17,8 @@ from openatlas.util.util import required_group
 
 
 class MemberForm(DateForm):
-    actor = TableMultiField(_('actor'), validators=[InputRequired()])
-    group = TableMultiField(_('actor'), validators=[InputRequired()])
+    actor = TableMultiField(_('actor'), [InputRequired()])
+    group = TableMultiField(_('actor'), [InputRequired()])
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))

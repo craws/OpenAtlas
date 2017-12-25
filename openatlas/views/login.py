@@ -26,14 +26,14 @@ def load_user(user_id):
 
 
 class LoginForm(Form):
-    username = StringField(_('username'), validators=[InputRequired()])
-    password = PasswordField(_('password'), validators=[InputRequired()])
+    username = StringField(_('username'), [InputRequired()])
+    password = PasswordField(_('password'), [InputRequired()])
     show_passwords = BooleanField(_('show password'))
     save = SubmitField(_('login'))
 
 
 class PasswordResetForm(Form):
-    email = StringField(_('email'), validators=[InputRequired(), Email()])
+    email = StringField(_('email'), [InputRequired(), Email()])
     save = SubmitField(_('submit'))
 
 

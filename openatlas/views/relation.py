@@ -18,7 +18,7 @@ from openatlas.util.util import required_group
 
 class RelationForm(DateForm):
     inverse = BooleanField(_('inverse'))
-    actor = TableMultiField(_('actor'), validators=[InputRequired()])
+    actor = TableMultiField(_('actor'), [InputRequired()])
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))

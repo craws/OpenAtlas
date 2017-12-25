@@ -24,9 +24,9 @@ class DisplayForm(Form):
 
 
 class PasswordForm(Form):
-    password_old = PasswordField(_('old password'), validators=[InputRequired()])
-    password = PasswordField(_('password'), validators=[InputRequired()])
-    password2 = PasswordField(_('repeat password'), validators=[InputRequired()])
+    password_old = PasswordField(_('old password'), [InputRequired()])
+    password = PasswordField(_('password'), [InputRequired()])
+    password2 = PasswordField(_('repeat password'), [InputRequired()])
     show_passwords = BooleanField(_('show passwords'))
     save = SubmitField(_('save'))
 
@@ -47,7 +47,7 @@ class PasswordForm(Form):
 
 class ProfileForm(Form):
     name = StringField(_('name'))
-    email = StringField(_('email'), validators=[InputRequired(), Email()])
+    email = StringField(_('email'), [InputRequired(), Email()])
     show_email = BooleanField(_('show email'))
     newsletter = BooleanField(_('newsletter'))
     save = SubmitField(_('save'))

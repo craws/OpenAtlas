@@ -17,7 +17,7 @@ from openatlas.util.util import (uc_first, truncate_string, required_group, get_
 
 
 class ReferenceForm(Form):
-    name = StringField(_('name'), validators=[InputRequired()])
+    name = StringField(_('name'), [InputRequired()])
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))

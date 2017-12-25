@@ -16,11 +16,11 @@ from openatlas.models.user import User, UserMapper
 class UserForm(Form):
     user_id = None
     active = BooleanField(_('active'), default=True)
-    username = StringField(_('username'), validators=[InputRequired()])
+    username = StringField(_('username'), [InputRequired()])
     group = SelectField(_('group'), choices=UserMapper.get_groups(), default='readonly')
-    email = StringField(_('email'), validators=[InputRequired(), Email()])
-    password = PasswordField(_('password'), validators=[InputRequired()])
-    password2 = PasswordField(_('repeat password'), validators=[InputRequired()])
+    email = StringField(_('email'), [InputRequired(), Email()])
+    password = PasswordField(_('password'), [InputRequired()])
+    password2 = PasswordField(_('repeat password'), [InputRequired()])
     show_passwords = BooleanField(_('show passwords'))
     real_name = StringField(_('name'))
     description = TextAreaField(_('info'))
