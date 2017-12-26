@@ -60,6 +60,17 @@ form input[type="text"].year {
     opacity: 0.5;
 }
 
+#menu > #index-search {
+    float: right;
+    margin: 0;
+    padding: 0;
+}
+
+#index-search #search {
+    font-size: 0.8em;
+    margin-right: 0;
+}
+
 #newsletter-form textarea {
     font-size: 1em;
     width: 30em;

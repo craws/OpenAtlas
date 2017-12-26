@@ -2,6 +2,7 @@
 import ast
 from collections import OrderedDict
 
+from flask_login import current_user
 from werkzeug.exceptions import abort
 
 import openatlas
@@ -271,3 +272,29 @@ class EntityMapper(object):
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {'class_codes': tuple(app.config['CODE_CLASS'].keys())})
         return cursor.rowcount
+
+    @staticmethod
+    def search(term, codes, description=False, own=False):
+        sql = EntityMapper.sql
+        if own:
+            sql += " LEFT JOIN web.user_log ul ON e.id = ul.entity_id "
+        sql += " WHERE LOWER(e.name) LIKE LOWER(%(term)s)"
+        sql += " OR lower(e.description) LIKE lower(%(term)s) AND " if description else " AND "
+        sql += " ul.user_id = %(user_id)s AND " if own else ''
+        sql += " e.class_code IN %(codes)s"
+        sql += " GROUP BY e.id ORDER BY e.name"
+        cursor = openatlas.get_cursor()
+        cursor.execute(sql, {
+            'term': '%' + term + '%',
+            'codes': tuple(codes),
+            'user_id': current_user.id})
+        openatlas.debug_model['div sql'] += 1
+        entities = []
+        for row in cursor.fetchall():
+            if row.class_code == 'E82':  # if found in actor alias
+                entities.append(LinkMapper.get_linked_entity(row.id, 'P131', True))
+            elif row.class_code == 'E41':  # if found in place alias
+                entities.append(LinkMapper.get_linked_entity(row.id, 'P1', True))
+            else:
+                entities.append(Entity(row))
+        return entities

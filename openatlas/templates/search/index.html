@@ -1,0 +1,21 @@
+{% extends 'layout.html' %}
+{% block breadcrumb %}
+    <a href="{{ url_for('index') }}">{{ _('overview')|uc_first }}</a>
+    > {{ _('search')|uc_first }}
+{% endblock %}
+{% block content %}
+    <div style="float:left;">
+        <form method="post">
+            {{ form.csrf_token }}
+            {{ form.term }}<br /><br />
+            {{ form.own }} {{ form.own.label }}<br />
+            {{ form.desc }} {{ form.desc.label }}<br /><br />
+            <span style="font-weight:bold;">{{ _('classes')|uc_first }}</span><br />
+            {{ form.classes }}
+            {{ form.search }}
+        </form>
+    </div>
+    <div style="float:left;margin-left: 1em;">
+        {{ table|pager|safe }}
+    </div>
+{% endblock %}

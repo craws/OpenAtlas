@@ -96,6 +96,15 @@
         </div>
         <div id="menu">
             {{ origin|display_menu|safe }}
+            {% if current_user.is_authenticated %}
+                <div id="index-search">
+                    <form method="post" action="{{ url_for('index_search') }}">
+                        {{ search_form.csrf_token }}
+                        {{ search_form.terminus }}
+                        {{ search_form.search}}
+                    </form>
+                </div>
+            {% endif %}
         </div>
         <div id="breadcrumb">
             {% block breadcrumb %}{% endblock %}

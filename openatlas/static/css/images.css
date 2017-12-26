@@ -20,6 +20,30 @@ table.tablesorter thead tr .tablesorter-header {
     cursor: pointer;
 }
 
+table.tablesorter thead tr .tablesorter-header:hover {
+    background-image: url("/images/icons/arrow_updown_hover.png");
+}
+
+table.tablesorter thead tr .tablesorter-headerDesc {
+    background-image: url("/images/icons/arrow_down.png");
+}
+
+table.tablesorter thead tr .tablesorter-headerDesc:hover {
+    background-image: url("/images/icons/arrow_down_hover.png");
+}
+
+table.tablesorter thead tr .tablesorter-headerAsc {
+    background-image: url("/images/icons/arrow_up.png");
+}
+
+table.tablesorter thead tr .tablesorter-headerAsc:hover {
+    background-image: url("/images/icons/arrow_up_hover.png");
+}
+
+table.tablesorter thead tr .sorter-false, table.tablesorter thead tr .sorter-false:hover {
+    background-image: none;
+}
+
 div.pager div.first {
     background-image: url("/images/icons/first.png");
 }

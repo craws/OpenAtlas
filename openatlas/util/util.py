@@ -409,7 +409,7 @@ def pager(table):
             """.format(name=table['name'], filter=uc_first(_('filter')), options=options)
     html += '<table id="{name}-table" class="tablesorter"><thead><tr>'.format(name=table['name'])
     for header in table['header']:
-        style = '' if header else 'class=sorter-false '  # only show and sort  headers with a title
+        style = '' if header else 'class=sorter-false '  # only show and sort headers with a title
         html += '<th ' + style + '>' + (_(header).capitalize() if header else '') + '</th>'
     # append missing headers
     html += '<th class=sorter-false></th>' * (len(table['data'][0]) - len(table['header']))

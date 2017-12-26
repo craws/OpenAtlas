@@ -1,12 +1,14 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import locale
-import logging
 import psycopg2.extras
 import sys
 import time
 from collections import OrderedDict
 from flask import Flask, request, session
-from flask_babel import Babel
+from flask_babel import Babel, _
+from flask_wtf import Form
+from wtforms import StringField, SubmitField
+from wtforms.validators import InputRequired
 
 try:
     import mod_wsgi
@@ -57,7 +59,7 @@ from openatlas.models.settings import SettingsMapper
 from openatlas.util import filters
 from openatlas.views import (actor, admin, ajax, content, event, hierarchy, index, login, types,
                              model, place, profile, reference, settings, source, translation, user,
-                             involvement, relation, member)
+                             involvement, relation, member, search)
 
 from openatlas.models.logger import DBHandler
 logger = DBHandler()
@@ -101,6 +103,17 @@ def before_request():
     debug_model['linked'] = 0
     debug_model['user'] = 0
     debug_model['div sql'] = 0
+
+
+class GlobalSearchForm(Form):
+    from openatlas.util.util import uc_first
+    terminus = StringField('', render_kw={"placeholder": uc_first(_('search term'))})
+    search = SubmitField(uc_first(_('search')))
+
+
+@app.context_processor
+def inject_search_form():
+    return dict(search_form=GlobalSearchForm())
 
 
 app.register_blueprint(filters.blueprint)

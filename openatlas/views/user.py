@@ -66,8 +66,7 @@ def user_index():
     tables = {'user': {
         'name': 'user',
         'sort': 'sortList: [[3, 1]]',
-        'header': [_('username'), _('group'), _('email'), _('newsletter'),
-                   _('created'), _('last login')],
+        'header': ['username', 'group', 'email', 'newsletter', 'created', 'last login'],
         'data': []}}
     for user in UserMapper.get_all():
         tables['user']['data'].append([
