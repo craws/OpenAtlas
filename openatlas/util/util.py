@@ -110,7 +110,7 @@ def build_table_form(class_name, linked_entities):
 def build_remove_link(url, name):
     """Build a link to remove a link with a JavaScript confirmation dialog"""
     name = name.replace('\'', '')
-    confirm = 'onclick="return confirm(\'' + _('confirm remove', name=name) + '\')"'
+    confirm = 'onclick="return confirm(\'' + _('Remove %(name)s?', name=name) + '\')"'
     return '<a ' + confirm + ' href="' + url + '">' + uc_first(_('remove')) + '</a>'
 
 

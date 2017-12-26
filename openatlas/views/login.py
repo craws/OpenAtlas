@@ -104,15 +104,20 @@ def reset_password():
             user.update()
             link = request.scheme + '://' + request.headers['Host']
             link += url_for('reset_confirm', code=code)
-            subject = _('mail subject reset_password') + ' ' + session['settings']['site_name']
-            body = _('mail received request for') + ' ' + user.username + ' '
-            body += _('at') + request.headers['Host'] + '\n' + _('reset password link') + ':\n\n'
-            body += link + '\n\n' + _('link is valid for') + ' '
-            body += str(session['settings']['reset_confirm_hours']) + ' ' + _('hours')
+            subject = _('Password reset request for %(sitename)s',
+                        sitename=session['settings']['site_name'])
+            body = _(
+                'We received a password reset request for %(username)s', username=user.username)
+            body += ' ' + _('at') + ' '
+            body += request.headers['Host'] + '\n\n' + _('reset password link') + ':\n\n'
+            body += link + '\n\n' + _('The link is valid for') + ' '
+            body += str(session['settings']['reset_confirm_hours']) + ' ' + _('hours') + '.'
             if send_mail(subject, body, form.email.data):
-                flash(_('A password reset confirm mail send to ') + form.email.data, 'info')
+                flash(_('A password reset confirmation mail was send to %(email)s.',
+                        email=form.email.data), 'info')
             else:
-                flash(_('Failed to send password confirmation mail to ') + form.email.data, 'error')
+                flash(_('Failed to send password reset confirmation mail to %(email)s.',
+                        email=form.email.data), 'error')
             return redirect(url_for('login'))
     return render_template('login/reset_password.html', form=form)
 
@@ -134,16 +139,16 @@ def reset_confirm(code):
     user.password_reset_code = None
     user.password_reset_date = None
     user.update()
-    subject = _('mail new password') + ' ' + session['settings']['site_name']
-    body = _('mail new password for') + ' ' + user.username + ' '
-    body += _('at') + ' ' + request.headers['Host'] + ':\n\n'
+    subject = _('New password for %(sitename)s', sitename=session['settings']['site_name'])
+    body = _('New password for %(username)s', username=user.username) + ' '
+    body += _('at') + ' ' + request.scheme + '://' + request.headers['Host'] + ':\n\n'
     body += uc_first(_('username')) + ': ' + user.username + '\n'
     body += uc_first(_('password')) + ': ' + password + '\n'
     if send_mail(subject, body, user.email):
-        flash(_('New password mail to ') + user.email, 'info')
+        flash(_('Send new password mail to %(email)s.', email=user.email), 'info')
     else:
-        flash(_('Failed to send password mail to ') + user.email, 'error')
-    return render_template('login/reset_confirm.html')
+        flash(_('Failed to send password mail to %(email)s.', email=user.email), 'error')
+    return redirect(url_for('login'))
 
 
 @app.route('/logout')

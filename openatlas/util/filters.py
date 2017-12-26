@@ -238,7 +238,7 @@ def truncate_string(self, string):
 def build_delete_link(self, entity):
     """Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
-    confirm = 'onclick="return confirm(\'' + _('confirm delete', name=name) + '\')"'
+    confirm = 'onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
     url = url_for(app.config['CODE_CLASS'][entity.class_.code] + '_delete', id_=entity.id)
     return '<a ' + confirm + ' href="' + url + '">' + util.uc_first(_('delete')) + '</a>'
 

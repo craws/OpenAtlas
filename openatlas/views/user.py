@@ -119,15 +119,21 @@ def user_insert():
         user_id = UserMapper.insert(form)
         flash(_('user created'), 'info')
         if form.send_info.data and session['settings']['mail']:  # pragma: no cover
-            subject = _('mail registration subject') + ' ' + session['settings']['site_name']
-            body = _('mail account information for') + ' ' + form.username.data + ' '
+            subject = _(
+                'Your account information for %(sitename)s',
+                sitename=session['settings']['site_name'])
+            body = _('Account information for %(username)s', username=form.username.data) + ' '
             body += _('at') + ' ' + request.scheme + '://' + request.headers['Host'] + '\n\n'
             body += uc_first(_('username')) + ': ' + form.username.data + '\n'
             body += uc_first(_('password')) + ': ' + form.password.data + '\n'
             if send_mail(subject, body, form.email.data):
-                flash(_('Sent account information mail to ') + form.email.data, 'info')
+                flash(
+                    _('Sent account information mail to %(email)s.', email=form.email.data), 'info')
             else:
-                flash(_('Failed to send account details to ') + form.email.data, 'error')
+                flash(
+                    _('Failed to send account details to %(email)s.',
+                      email=form.email.data),
+                    'error')
             return redirect(url_for('user_index'))
         if form.continue_.data == 'yes':
             return redirect(url_for('user_insert'))

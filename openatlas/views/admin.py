@@ -104,7 +104,7 @@ def admin_newsletter():
                 user.update()
                 link_ = request.scheme + '://' + request.headers['Host']
                 link_ += url_for('index_unsubscribe', code=code)
-                unsubscribe = '\n\n' + _('mail unsubscribe ') + link_
+                unsubscribe = '\n\n' + _('To unsubscribe use the link below.') + '\n\n' + link_
                 if send_mail(form.subject.data + unsubscribe, form.body.data, user.email):
                     recipients += 1
         flash(_('Newsletter send') + ': ' + str(recipients), 'info')
