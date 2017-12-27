@@ -41,8 +41,6 @@ Uncomment "CREATE EXTENSION postgis;" in top off install/structure.sql
     $ cd install
     $ cat structure.sql data_web.sql data_model.sql data_node.sql | psql -d openatlas -f -
 
-Optional: create database openatlas_test for tests
-
 ### Files
 
 Copy the files to /var/www/your_sitename
@@ -61,6 +59,10 @@ use install/example_apache.conf as template for a new vhost
     # apacha2ctl configtest
     # service apache2 restart
 
+## Finishing
+
+Remove the data/install directory on production systems
+
 ## Unit tests (optional)
 
 Install required packages:    
@@ -69,7 +71,7 @@ Install required packages:
     
 As postgres
 
-    $ createdb openatlas -O openatlas
+    $ createdb openatlas_test -O openatlas
     
 Uncomment "CREATE EXTENSION postgis;" in top off install/structure.sql
 
@@ -82,6 +84,4 @@ Use these parameters for running with coverage and HTML report:
 
     --with-coverage --cover-package openatlas --cover-html --cover-tests --cover-erase   
 
-## Finishing
 
-Remove the data/install directory on production systems
