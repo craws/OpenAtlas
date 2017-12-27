@@ -297,7 +297,7 @@ DELETE FROM model.entity WHERE id = (SELECT id from model.entity WHERE name = 'H
 ALTER TABLE model.link_property DROP COLUMN description;
 
 -- New logging system
-DROP TABLE log.details;
+DROP TABLE log.detail;
 ALTER TABLE log.log RENAME agent TO info;
 ALTER TABLE log.log SET SCHEMA web;
 ALTER TABLE web.log RENAME TO system_log;

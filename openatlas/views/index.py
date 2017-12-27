@@ -125,7 +125,7 @@ def index_changelog():
 def index_unsubscribe(code):
     user = UserMapper.get_by_unsubscribe_code(code)
     text = _('unsubscribe link not valid')
-    if user:
+    if user:  # pragma: no cover
         user.settings['newsletter'] = ''
         user.update()
         user.unsubscribe_code = ''

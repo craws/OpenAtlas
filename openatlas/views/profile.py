@@ -16,10 +16,10 @@ from openatlas.util.util import uc_first
 class DisplayForm(Form):
     language = SelectField(uc_first(_('language')), choices=[])
     table_rows = SelectField(
-        uc_first(_('table rows')), description='tip table rows', choices=[], coerce=int)
+        uc_first(_('table rows')), description=_('tip table rows'), choices=[], coerce=int)
     layout = SelectField(
         uc_first(_('layout')),
-        description='tip layout',
+        description=_('tip layout'),
         choices=[('default', uc_first(_('default'))), ('advanced', uc_first(_('advanced')))])
 
 

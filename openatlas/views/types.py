@@ -79,12 +79,13 @@ def node_view(id_):
         'header': [_('name'), _('class'), _('info')],
         'data': []}}
     for entity in node.get_linked_entities(['P2', 'P89'], True):
-        # if its a place location get the corresponding object
+        # If it is a place location get the corresponding object
         entity = entity if node.class_.code == 'E55' else entity.get_linked_entity('P53', True)
-        tables['entities']['data'].append([
-            link(entity),
-            openatlas.classes[entity.class_.code].name,
-            truncate_string(entity.description)])
+        if entity:  # If not entity it is a place node, so do not add
+            tables['entities']['data'].append([
+                link(entity),
+                openatlas.classes[entity.class_.code].name,
+                truncate_string(entity.description)])
     tables['link_entities'] = {
         'name': 'link_entities',
         'header': [_('domain'), _('range')],

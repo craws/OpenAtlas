@@ -111,7 +111,7 @@ def admin_newsletter():
         return redirect(url_for('admin_index'))
     table = {'name': 'user', 'header': ['username', 'email', 'receiver'], 'data': []}
     for user in UserMapper.get_all():
-        if user.settings['newsletter']:
+        if user.settings['newsletter']:  # pragma: no cover
             checkbox = '<input value="' + str(user.id) + '" name="recipient"'
             checkbox += ' type="checkbox" checked="checked">'
             table['data'].append([user.username, user.email, checkbox])

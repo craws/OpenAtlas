@@ -37,6 +37,14 @@ class IndexTests(TestBaseCase):
             rv = self.app.get(url_for('overview_feedback'))
             assert b'Thank you' in rv.data
 
+            # test reset password, unsubscribe
+            rv = self.app.get(url_for('reset_password'))
+            assert b'Forgot your password?' in rv.data
+            rv = self.app.get(url_for('reset_confirm', code='1234'))
+            assert b'404' in rv.data
+            rv = self.app.get(url_for('index_unsubscribe', code='1234'))
+            assert b'invalid' in rv.data
+
             # test redirection to overview if trying to login again
             rv = self.app.get(url_for('login'), follow_redirects=True)
             assert b'first' in rv.data
@@ -45,7 +53,8 @@ class IndexTests(TestBaseCase):
             rv = self.app.get(url_for('logout'), follow_redirects=True)
             assert b'Password' in rv.data
             rv = self.app.get('/404')
-            assert b'404' in rv.data
+            assert b'not found' in rv.data
+
             # raise an id not found error
             self.login()
             rv = self.app.get('/actor/view/666', follow_redirects=True)

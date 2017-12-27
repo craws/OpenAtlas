@@ -214,7 +214,7 @@ class EntityMapper(object):
     @staticmethod
     def get_page_ids(entity, codes):
         """
-        Return ids for pager (first, previous, next, last) for entity and class codes arguments
+            Return ids for pager (first, previous, next, last) for entity and class codes arguments
         """
         sql_where = " e.class_code IN ('{codes}')".format(codes="','".join(codes)) + " AND "
         sql_where += "e.system_type='source content'" if 'E33' in codes else "e.system_type IS NULL"
@@ -233,7 +233,6 @@ class EntityMapper(object):
     def get_orphans():
         """
             Returns entities without links.
-            Doesn't detect dates of property links because they still have a type.
         """
         entities = []
         cursor = openatlas.get_cursor()
@@ -245,6 +244,9 @@ class EntityMapper(object):
 
     @staticmethod
     def get_latest(limit):
+        """
+            Returns the newest created entities
+        """
         codes = []
         for class_, class_codes in app.config['CLASS_CODES'].items():
             codes += class_codes
