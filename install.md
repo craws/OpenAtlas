@@ -31,6 +31,11 @@ Installation with examples from a Debian 9 (Stretch) system.
 
 ## Database
 
+Important!
+
+A user with username "OpenAtlas" and password "change_me_PLEASE!" is created.
+Change this account immediately!
+
 As postgres
 
     $ createuser openatlas -P
@@ -61,6 +66,7 @@ use install/example_apache.conf as template for a new vhost
 
 ## Finishing
 
+Login with username "OpenAtlas" and password "change_me_PLEASE!" and change the password in profile.
 Remove the data/install directory on production systems
 
 ## Unit tests (optional)
