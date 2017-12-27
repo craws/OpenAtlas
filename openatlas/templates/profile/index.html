@@ -15,10 +15,7 @@
     </div>
     <div style="float:left;margin-left:1em;">
         <h1>{{ _('display')|uc_first }}</h1>
-        <form id="display-form" method="post">
-            {{ form.csrf_token }}
-            {{ data['display']|data_table|safe }}
-        </form>
+        {{ form|display_form|safe }}
     </div>
     <script>
         $('#display-form').change(function () {

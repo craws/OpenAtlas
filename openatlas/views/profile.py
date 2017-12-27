@@ -14,13 +14,14 @@ from openatlas.util.util import uc_first
 
 
 class DisplayForm(Form):
-    language = SelectField(uc_first(_('language')), choices=[])
+    language = SelectField(_('language'), choices=app.config['LANGUAGES'].items())
     table_rows = SelectField(
-        uc_first(_('table rows')), description=_('tip table rows'), choices=[], coerce=int)
-    layout = SelectField(
-        uc_first(_('layout')),
-        description=_('tip layout'),
-        choices=[('default', uc_first(_('default'))), ('advanced', uc_first(_('advanced')))])
+        _('table rows'),
+        description=_('tip table rows'),
+        choices=app.config['DEFAULT_TABLE_ROWS'].items(),
+        coerce=int)
+    layout_choices = [('default', _('default')), ('advanced', _('advanced'))]
+    layout = SelectField(_('layout'), description=_('tip layout'), choices=layout_choices)
 
 
 class PasswordForm(Form):
@@ -56,31 +57,29 @@ class ProfileForm(Form):
 @app.route('/profile', methods=['POST', 'GET'])
 @login_required
 def profile_index():
+    user = current_user
     data = {'info': [
-        (_('username'), current_user.username),
-        (_('name'), current_user.real_name),
-        (_('email'), current_user.email),
-        (_('show email'),
-            uc_first(_('on')) if current_user.settings['show_email'] else uc_first(_('off'))),
-        (_('newsletter'),
-            uc_first(_('on')) if current_user.settings['newsletter'] else uc_first(_('off')))]}
+        (_('username'), user.username),
+        (_('name'), user.real_name),
+        (_('email'), user.email),
+        (_('show email'), uc_first(_('on')) if user.settings['show_email'] else uc_first(_('off'))),
+        (_('newsletter'), uc_first(_('on')) if user.settings['newsletter'] else uc_first(_('off')))
+    ]}
     form = DisplayForm()
-    getattr(form, 'language').choices = app.config['LANGUAGES'].items()
-    getattr(form, 'table_rows').choices = app.config['DEFAULT_TABLE_ROWS'].items()
     if form.validate_on_submit():
-        current_user.settings['language'] = form.language.data
-        current_user.settings['table_rows'] = form.table_rows.data
-        current_user.settings['layout'] = form.layout.data
+        user.settings['language'] = form.language.data
+        user.settings['table_rows'] = form.table_rows.data
+        user.settings['layout'] = form.layout.data
         openatlas.get_cursor().execute('BEGIN')
-        current_user.update_settings()
+        user.update_settings()
         openatlas.get_cursor().execute('COMMIT')
         session['language'] = form.language.data
         flash(_('info update'), 'info')
         return redirect(url_for('profile_index'))
 
-    form.language.data = current_user.settings['language']
-    form.table_rows.data = current_user.settings['table_rows']
-    form.layout.data = current_user.settings['layout']
+    form.language.data = user.settings['language']
+    form.table_rows.data = user.settings['table_rows']
+    form.layout.data = user.settings['layout']
     data['display'] = [
         (form.language.label, form.language),
         (str(form.table_rows.label) +

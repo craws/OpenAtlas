@@ -11,7 +11,7 @@ class SearchTest(TestBaseCase):
         self.login()
         EntityMapper.insert('E21', 'Waldo')
         with app.app_context():
-            rv = self.app.post(url_for('index_search'), data={'terminus': 'wal'})
+            rv = self.app.post(url_for('index_search'), data={'global-term': 'wal'})
             assert b'Waldo' in rv.data
             data = {'term': 'do', 'classes': 'actor'}
             rv = self.app.post(url_for('index_search'), data=data)

@@ -107,13 +107,13 @@ def before_request():
 
 class GlobalSearchForm(Form):
     from openatlas.util.util import uc_first
-    terminus = StringField('', render_kw={"placeholder": uc_first(_('search term'))})
+    term = StringField('', render_kw={"placeholder": uc_first(_('search term'))})
     search = SubmitField(uc_first(_('search')))
 
 
 @app.context_processor
 def inject_search_form():
-    return dict(search_form=GlobalSearchForm())
+    return dict(search_form=GlobalSearchForm(prefix="global"))
 
 
 app.register_blueprint(filters.blueprint)

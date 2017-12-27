@@ -100,7 +100,7 @@
                 <div id="index-search">
                     <form method="post" action="{{ url_for('index_search') }}">
                         {{ search_form.csrf_token }}
-                        {{ search_form.terminus }}
+                        {{ search_form.term }}
                         {{ search_form.search}}
                     </form>
                 </div>

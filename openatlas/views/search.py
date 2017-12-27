@@ -31,9 +31,9 @@ def index_search():
     form.classes.default = classes
     form.classes.process(request.form)
     table = {'data': []}
-    if request.method == 'POST' and 'terminus' in request.form and request.form['terminus']:
+    if request.method == 'POST' and 'global-term' in request.form and request.form['global-term']:
         # coming from global search
-        form.term.data = request.form['terminus']
+        form.term.data = request.form['global-term']
         form.classes.data = classes
         table = build_search_table(form)
     if form.validate_on_submit():

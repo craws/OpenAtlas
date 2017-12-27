@@ -1,5 +1,5 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import render_template, flash, url_for
+from flask import abort, render_template, flash, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
@@ -47,8 +47,7 @@ def hierarchy_insert():
 def hierarchy_update(id_):
     node = openatlas.nodes[id_]
     if node.system:
-        flash(_('error forbidden'), 'error')
-        return redirect(url_for('node_view', id_=id_))
+        abort(403)
     form = build_form(HierarchyForm, 'hierarchy', node)
     if node.multiple:
         form.multiple.render_kw = {'disabled': 'disabled'}
@@ -72,8 +71,7 @@ def hierarchy_update(id_):
 def hierarchy_delete(id_):
     node = openatlas.nodes[id_]
     if node.system or node.subs or node.count:
-        flash(_('error forbidden'), 'error')
-        return redirect(url_for('node_view', id_=id_))
+        abort(403)
     openatlas.get_cursor().execute('BEGIN')
     EntityMapper.delete(node.id)
     openatlas.get_cursor().execute('COMMIT')

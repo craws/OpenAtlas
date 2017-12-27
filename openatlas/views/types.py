@@ -1,6 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
-from flask import render_template, flash, url_for, request
+from flask import abort, render_template, flash, url_for, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
@@ -55,8 +55,7 @@ def node_insert(root_id):
 def node_update(id_):
     node = openatlas.nodes[id_]
     if node.system:
-        flash(_('error forbidden'), 'error')
-        return redirect(url_for('node_view', id_=id_))
+        abort(403)
     form = build_node_form(NodeForm, node, request)
     root = openatlas.nodes[node.root[-1]] if node.root else None
     if form.validate_on_submit():
@@ -112,8 +111,7 @@ def node_view(id_):
 def node_delete(id_):
     node = openatlas.nodes[id_]
     if node.system or node.subs or node.count:
-        flash(_('error forbidden'), 'error')
-        return redirect(url_for('node_view', id_=id_))
+        abort(403)
     openatlas.get_cursor().execute('BEGIN')
     EntityMapper.delete(node.id)
     openatlas.get_cursor().execute('COMMIT')

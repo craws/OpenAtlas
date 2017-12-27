@@ -9,15 +9,16 @@ from wtforms import (BooleanField, HiddenField, PasswordField, SelectField, Stri
                      SubmitField, TextAreaField)
 
 from openatlas import app
-from openatlas.util.util import format_date, link, required_group, send_mail, uc_first
 from openatlas.models.user import User, UserMapper
+from openatlas.util.util import (format_date, link, required_group, send_mail, uc_first,
+                                 is_authorized)
 
 
 class UserForm(Form):
     user_id = None
     active = BooleanField(_('active'), default=True)
     username = StringField(_('username'), [InputRequired()])
-    group = SelectField(_('group'), choices=UserMapper.get_groups(), default='readonly')
+    group = SelectField(_('group'), choices=[])
     email = StringField(_('email'), [InputRequired(), Email()])
     password = PasswordField(_('password'), [InputRequired()])
     password2 = PasswordField(_('repeat password'), [InputRequired()])
@@ -88,6 +89,7 @@ def user_update(id_):
     form = UserForm()
     form.user_id = id_
     del form.password, form.password2, form.send_info, form.insert_and_continue, form.show_passwords
+    form.group.choices = get_groups()
     if form.validate_on_submit():
         user.active = form.active.data
         if user.id == current_user.id:  # don't allow setting oneself as inactive
@@ -106,6 +108,8 @@ def user_update(id_):
     form.active.data = user.active
     form.email.data = user.email
     form.description.data = user.description
+    if user.id == current_user.id:
+        del form.active
     return render_template('user/update.html', form=form, user=user)
 
 
@@ -115,6 +119,7 @@ def user_insert():
     form = UserForm()
     form.password.validators.append(Length(min=session['settings']['minimum_password_length']))
     form.password2.validators.append(Length(min=session['settings']['minimum_password_length']))
+    form.group.choices = get_groups()
     if form.validate_on_submit():
         user_id = UserMapper.insert(form)
         flash(_('user created'), 'info')
@@ -141,13 +146,22 @@ def user_insert():
     return render_template('user/insert.html', form=form)
 
 
+def get_groups():
+    """
+        Returns groups, hardcoded because order is relevant (weakest permissions to strongest)
+    """
+    choices = [('readonly', 'readonly'), ('editor', 'editor'), ('manager', 'manager')]
+    if is_authorized('admin'):
+        choices.append(('admin', 'admin'))  # admin group is only available for admins
+    return choices
+
+
 @app.route('/admin/user/delete/<int:id_>')
 @required_group('manager')
 def user_delete(id_):
     user = UserMapper.get_by_id(id_)
     if (user.group == 'admin' and current_user.group != 'admin') and user.id != current_user.id:
-        flash(_('error forbidden'), 'info')
-        return redirect(url_for('user_index'))
+        abort(403)
     UserMapper.delete(id_)
     flash(_('user deleted'), 'info')
     return redirect(url_for('user_index'))
