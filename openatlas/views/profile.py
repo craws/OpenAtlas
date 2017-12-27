@@ -17,11 +17,11 @@ class DisplayForm(Form):
     language = SelectField(_('language'), choices=app.config['LANGUAGES'].items())
     table_rows = SelectField(
         _('table rows'),
-        description=_('tip table rows'),
+        description=_('tooltip table rows'),
         choices=app.config['DEFAULT_TABLE_ROWS'].items(),
         coerce=int)
     layout_choices = [('default', _('default')), ('advanced', _('advanced'))]
-    layout = SelectField(_('layout'), description=_('tip layout'), choices=layout_choices)
+    layout = SelectField(_('layout'), description=_('tooltip layout'), choices=layout_choices)
 
 
 class PasswordForm(Form):
@@ -48,9 +48,9 @@ class PasswordForm(Form):
 
 class ProfileForm(Form):
     name = StringField(_('name'))
-    email = StringField(_('email'), [InputRequired(), Email()])
-    show_email = BooleanField(_('show email'))
-    newsletter = BooleanField(_('newsletter'))
+    email = StringField(_('email'), [InputRequired(), Email()], description=_('tooltip email'))
+    show_email = BooleanField(_('show email'), description=_('tooltip show email'))
+    newsletter = BooleanField(_('newsletter'), description=_('tooltip newsletter'))
     save = SubmitField(_('save'))
 
 

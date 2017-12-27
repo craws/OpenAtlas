@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-26 19:32+0100\n"
-"PO-Revision-Date: 2017-12-26 19:36+0100\n"
+"POT-Creation-Date: 2017-12-27 21:15+0100\n"
+"PO-Revision-Date: 2017-12-27 21:22+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: de\n"
 "Language-Team: de <LL@li.org>\n"
@@ -147,8 +147,8 @@ msgstr "Anmelden"
 
 #: templates/content/update.html:16 templates/map.html:9
 #: templates/settings/update.html:10 util/filters.py:160 views/involvement.py:78
-#: views/member.py:87 views/profile.py:31 views/profile.py:53
-#: views/reference.py:92 views/relation.py:73 views/user.py:28
+#: views/member.py:87 views/profile.py:32 views/profile.py:54
+#: views/reference.py:92 views/relation.py:73 views/user.py:29
 msgid "save"
 msgstr "speichern"
 
@@ -247,8 +247,8 @@ msgstr "Neu laden"
 #: templates/actor/view.html:9 templates/event/view.html:9
 #: templates/model/class_view.html:10 templates/model/property_view.html:10
 #: templates/place/view.html:9 templates/reference/view.html:9
-#: templates/source/view.html:9 templates/types/view.html:12 views/types.py:79
-#: views/types.py:98 views/user.py:26
+#: templates/source/view.html:9 templates/types/view.html:12 views/types.py:78
+#: views/types.py:98 views/user.py:27
 msgid "info"
 msgstr "Info"
 
@@ -358,7 +358,7 @@ msgid "log"
 msgstr "Log"
 
 #: templates/admin/index.html:14 templates/admin/newsletter.html:4
-#: views/profile.py:52 views/profile.py:65
+#: views/profile.py:53 views/profile.py:66
 msgid "newsletter"
 msgstr "Newsletter"
 
@@ -443,11 +443,11 @@ msgstr "Hast du Anregungen? Wir freuen uns über"
 msgid "network"
 msgstr "Netzwerk"
 
-#: templates/index/index.html:18 views/user.py:58
+#: templates/index/index.html:18 views/user.py:59
 msgid "last login"
 msgstr "Letzte Anmeldung"
 
-#: templates/index/index.html:20 views/user.py:59
+#: templates/index/index.html:20 views/user.py:60
 msgid "failed logins"
 msgstr "Fehlerhafte Anmeldungen"
 
@@ -695,7 +695,7 @@ msgstr "Letztes"
 msgid "between"
 msgstr "zwischen"
 
-#: util/util.py:204 views/place.py:106 views/types.py:79
+#: util/util.py:204 views/place.py:106 views/types.py:78
 msgid "class"
 msgstr "Klasse"
 
@@ -717,9 +717,9 @@ msgstr ""
 "Es kann ein Beginn, ein Ende Datum oder Zeitspannen für jedes angegeben werden."
 
 #: views/actor.py:20 views/event.py:22 views/hierarchy.py:17 views/place.py:20
-#: views/profile.py:49 views/profile.py:61 views/reference.py:20
-#: views/source.py:20 views/translation.py:17 views/types.py:17 views/types.py:79
-#: views/types.py:98 views/user.py:25 views/user.py:55
+#: views/profile.py:50 views/profile.py:63 views/reference.py:20
+#: views/source.py:20 views/translation.py:17 views/types.py:17 views/types.py:78
+#: views/types.py:98 views/user.py:26 views/user.py:56
 msgid "name"
 msgstr "Name"
 
@@ -746,7 +746,7 @@ msgstr "Anlegen"
 
 #: views/actor.py:27 views/event.py:28 views/involvement.py:25 views/member.py:24
 #: views/place.py:24 views/reference.py:23 views/relation.py:24 views/source.py:23
-#: views/translation.py:20 views/user.py:29
+#: views/translation.py:20 views/user.py:30
 msgid "insert and continue"
 msgstr "Anlegen und weiter"
 
@@ -762,9 +762,9 @@ msgstr "Verbindung gelöscht."
 msgid "entity created"
 msgstr "Neuer Eintrag angelegt"
 
-#: views/actor.py:222 views/event.py:92 views/hierarchy.py:80 views/place.py:129
+#: views/actor.py:222 views/event.py:92 views/hierarchy.py:78 views/place.py:129
 #: views/reference.py:176 views/source.py:141 views/translation.py:56
-#: views/types.py:119
+#: views/types.py:118
 msgid "entity deleted"
 msgstr "Der Eintrag wurde gelöscht."
 
@@ -773,10 +773,10 @@ msgstr "Der Eintrag wurde gelöscht."
 msgid "error modified"
 msgstr "Änderung fehlgeschlagen."
 
-#: views/actor.py:240 views/content.py:51 views/event.py:112 views/hierarchy.py:60
-#: views/place.py:148 views/profile.py:78 views/profile.py:107
+#: views/actor.py:240 views/content.py:51 views/event.py:112 views/hierarchy.py:59
+#: views/place.py:148 views/profile.py:77 views/profile.py:106
 #: views/reference.py:97 views/reference.py:193 views/settings.py:110
-#: views/source.py:158 views/translation.py:68 views/types.py:64 views/user.py:101
+#: views/source.py:158 views/translation.py:68 views/types.py:63 views/user.py:103
 msgid "info update"
 msgstr "Die Änderungen wurden gespeichert."
 
@@ -816,7 +816,7 @@ msgstr "Um den Newsletter abzubestellen benütze folgenden Link"
 msgid "Newsletter send"
 msgstr "Newsletter gesendet"
 
-#: views/event.py:42 views/types.py:175
+#: views/event.py:42 views/types.py:174
 msgid "error node self as super"
 msgstr "Der Eintrag kann nicht sich selber als Super wählen."
 
@@ -828,14 +828,9 @@ msgstr "Aktivieren wenn mehrfach Verwendung für ein Objekt möglich sein soll."
 msgid "tooltip hierarchy forms"
 msgstr "Auswahl für Formulare in denen dieser Typ verwendet werden kann."
 
-#: views/hierarchy.py:37 views/hierarchy.py:57
+#: views/hierarchy.py:37 views/hierarchy.py:56
 msgid "error name exists"
 msgstr "Dieser Name wird bereits verwendet."
-
-#: views/hierarchy.py:50 views/hierarchy.py:75 views/types.py:58
-#: views/types.py:114 views/user.py:149
-msgid "error forbidden"
-msgstr "Zugriff verweigert"
 
 #: views/index.py:87
 msgid "info feedback thanks"
@@ -856,13 +851,13 @@ msgstr ""
 msgid "activity"
 msgstr "Aktivität"
 
-#: views/login.py:29 views/login.py:145 views/profile.py:60 views/user.py:19
-#: views/user.py:53 views/user.py:127
+#: views/login.py:29 views/login.py:145 views/profile.py:62 views/user.py:20
+#: views/user.py:54 views/user.py:132
 msgid "username"
 msgstr "Username"
 
-#: views/login.py:30 views/login.py:146 views/profile.py:28 views/user.py:22
-#: views/user.py:128
+#: views/login.py:30 views/login.py:146 views/profile.py:29 views/user.py:23
+#: views/user.py:133
 msgid "password"
 msgstr "Passwort"
 
@@ -870,8 +865,8 @@ msgstr "Passwort"
 msgid "show password"
 msgstr "Passwort anzeigen"
 
-#: views/login.py:36 views/profile.py:50 views/profile.py:62 views/user.py:21
-#: views/user.py:56
+#: views/login.py:36 views/profile.py:51 views/profile.py:64 views/user.py:22
+#: views/user.py:57
 msgid "email"
 msgstr "E-Mail"
 
@@ -889,7 +884,7 @@ msgstr ""
 msgid "error inactive"
 msgstr "Dieser User ist nicht aktiviert."
 
-#: views/login.py:72 views/profile.py:39
+#: views/login.py:72 views/profile.py:40
 msgid "error wrong password"
 msgstr "Falsches Passwort"
 
@@ -911,7 +906,7 @@ msgstr "Wir erhielten eine Passwort Zurücksetzungs Anfrage für %(sitename)s"
 msgid "We received a password reset request for %(username)s"
 msgstr "Wir haben eine Passwort Zurücksetzungs Anfrage von %(username)s erhalten."
 
-#: views/login.py:111 views/login.py:144 views/settings.py:67 views/user.py:126
+#: views/login.py:111 views/login.py:144 views/settings.py:67 views/user.py:131
 msgid "at"
 msgstr "von"
 
@@ -971,7 +966,7 @@ msgstr "Das Verschicken eines Passwort E-Mails an %(email)s ist fehlgeschlagen."
 msgid "property"
 msgstr "Eigenschaft"
 
-#: views/profile.py:17 views/user.py:57
+#: views/profile.py:17 views/user.py:58
 msgid "language"
 msgstr "Sprache"
 
@@ -979,9 +974,11 @@ msgstr "Sprache"
 msgid "table rows"
 msgstr "Tabellenreihen"
 
-#: views/profile.py:21
-msgid "layout"
-msgstr "Layout"
+#: views/profile.py:20
+msgid "tooltip table rows"
+msgstr ""
+"Wie viele Tabellenreihen in Listen angezeigt werden sollen. Möglicherweise erst "
+"nach Neustart des Browsers wirksam."
 
 #: views/profile.py:23
 msgid "default"
@@ -989,39 +986,65 @@ msgstr "Standard"
 
 #: views/profile.py:23
 msgid "advanced"
-msgstr "erweitert"
+msgstr "Erweitert"
 
-#: views/profile.py:27
+#: views/profile.py:24
+msgid "layout"
+msgstr "Layout"
+
+#: views/profile.py:24
+msgid "tooltip layout"
+msgstr ""
+"Bei Layout Erweitert werden zusätzliche Informationen gezeigt, z.B. "
+"Informationen wer, wann einen Eintrag angelegt hat."
+
+#: views/profile.py:28
 msgid "old password"
 msgstr "Altes Passwort"
 
-#: views/profile.py:29 views/user.py:23
+#: views/profile.py:30 views/user.py:24
 msgid "repeat password"
 msgstr "Passwort wiederholen"
 
-#: views/profile.py:30 views/user.py:24
+#: views/profile.py:31 views/user.py:25
 msgid "show passwords"
 msgstr "Passwörter anzeigen"
 
-#: views/profile.py:42 views/profile.py:43 views/user.py:42 views/user.py:43
+#: views/profile.py:43 views/profile.py:44 views/user.py:43 views/user.py:44
 msgid "error passwords must match"
 msgstr "Die Passwörter stimmen nicht überein."
 
-#: views/profile.py:51 views/profile.py:63
+#: views/profile.py:51
+msgid "tooltip email"
+msgstr ""
+"Eine gültige E-Mail Adresse ist wichtig für Passwort Zurücksetzten und "
+"Newsletter."
+
+#: views/profile.py:52 views/profile.py:65
 msgid "show email"
 msgstr "E-Mail anzeigen"
 
-#: views/profile.py:64 views/profile.py:66 views/settings.py:80
+#: views/profile.py:52
+msgid "tooltip show email"
+msgstr "Wenn markiert, kann die E-Mail Adresse für andere Benutzer sichtbar sein."
+
+#: views/profile.py:53
+msgid "tooltip newsletter"
+msgstr ""
+"Wenn markiert wird ungefähr einmal im Monat ein Newsletter bezüglich Neuerungen "
+"und Wartungsarbeiten verschickt."
+
+#: views/profile.py:65 views/profile.py:66 views/settings.py:80
 #: views/settings.py:82 views/settings.py:83 views/settings.py:85
 msgid "on"
 msgstr "An"
 
-#: views/profile.py:64 views/profile.py:66 views/settings.py:80
+#: views/profile.py:65 views/profile.py:66 views/settings.py:80
 #: views/settings.py:82 views/settings.py:83 views/settings.py:85
 msgid "off"
 msgstr "Aus"
 
-#: views/profile.py:127
+#: views/profile.py:126
 msgid "info password updated"
 msgstr "Das Passwort wurde geändert."
 
@@ -1157,55 +1180,55 @@ msgstr "Zielklasse"
 msgid "count"
 msgstr "Anzahl"
 
-#: views/types.py:178
+#: views/types.py:177
 msgid "error node sub as super"
 msgstr "Der Eintrag kann nicht ein Sub als Super wählen."
 
-#: views/user.py:18
+#: views/user.py:19
 msgid "active"
 msgstr "aktiv"
 
-#: views/user.py:20 views/user.py:54
+#: views/user.py:21 views/user.py:55
 msgid "group"
 msgstr "Gruppe"
 
-#: views/user.py:27
+#: views/user.py:28
 msgid "send account information"
 msgstr "Zugangsdaten an den User schicken."
 
-#: views/user.py:36
+#: views/user.py:37
 msgid "error username exists"
 msgstr "Dieser Username ist bereits in Verwendung."
 
-#: views/user.py:39
+#: views/user.py:40
 msgid "error email exists"
 msgstr "Diese E-Mail Adresse ist bereits in Verwendung."
 
-#: views/user.py:120
+#: views/user.py:125
 msgid "user created"
 msgstr "Der User wurde angelegt."
 
-#: views/user.py:122
+#: views/user.py:127
 #, python-format
 msgid "Your account information for %(sitename)s"
 msgstr "eine Zugangsdaten für %(sitename)s"
 
-#: views/user.py:125
+#: views/user.py:130
 #, python-format
 msgid "Account information for %(username)s"
 msgstr "Zugangs Information für %(username)s"
 
-#: views/user.py:131
+#: views/user.py:136
 #, python-format
 msgid "Sent account information mail to %(email)s."
 msgstr "Zugangsdaten wurden an %(email)s verschickt."
 
-#: views/user.py:134
+#: views/user.py:139
 #, python-format
 msgid "Failed to send account details to %(email)s."
 msgstr "Verschicken von Zugangsdaten an %(email)s ist fehlgeschlagen."
 
-#: views/user.py:152
+#: views/user.py:166
 msgid "user deleted"
 msgstr "Der User wurde gelöscht."
 
@@ -1256,3 +1279,16 @@ msgstr "Der User wurde gelöscht."
 
 #~ msgid "confirm remove"
 #~ msgstr "%(name)s entfernen?"
+
+#~ msgid "error forbidden"
+#~ msgstr "Zugriff verweigert"
+
+#~ msgid "tip table rows"
+#~ msgstr ""
+#~ "Wie viele Tabellenreihen in Listen angezeigt werden sollen. Möglicherweise "
+#~ "erst nach Neustart des Browsers wirksam."
+
+#~ msgid "tip layout"
+#~ msgstr ""
+#~ "Bei Layout Erweitert werden zusätzliche Informationen gezeigt, z.B. "
+#~ "Informationen wer, wann einen Eintrag angelegt hat."
