@@ -39,10 +39,14 @@ class UserForm(Form):
         if user.email != self.email.data and UserMapper.get_by_email(self.email.data):
             self.email.errors.append(str(_('error email exists')))
             valid = False
-        if getattr(self, 'password', None) and self.password.data != self.password2.data:
-            self.password.errors.append(_('error passwords must match'))
-            self.password2.errors.append(_('error passwords must match'))
-            valid = False
+        if getattr(self, 'password'):
+            if self.password.data != self.password2.data:
+                self.password.errors.append(_('error passwords must match'))
+                self.password2.errors.append(_('error passwords must match'))
+                valid = False
+            if len(self.password.data) < session['settings']['minimum_password_length']:
+                self.password.errors.append(_('error password too short'))
+                valid = False
         return valid
 
 
@@ -117,8 +121,6 @@ def user_update(id_):
 @required_group('manager')
 def user_insert():
     form = UserForm()
-    form.password.validators.append(Length(min=session['settings']['minimum_password_length']))
-    form.password2.validators.append(Length(min=session['settings']['minimum_password_length']))
     form.group.choices = get_groups()
     if form.validate_on_submit():
         user_id = UserMapper.insert(form)

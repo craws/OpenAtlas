@@ -46,6 +46,9 @@ class PasswordForm(Form):
         if self.password_old.data == self.password.data:
             self.password.errors.append(_('error new password like old password'))
             valid = False
+        if len(self.password.data) < session['settings']['minimum_password_length']:
+            self.password.errors.append(_('error password too short'))
+            valid = False
         return valid
 
 
@@ -127,8 +130,6 @@ def profile_update():
 @login_required
 def profile_password():
     form = PasswordForm()
-    form.password.validators.append(Length(min=session['settings']['minimum_password_length']))
-    form.password2.validators.append(Length(min=session['settings']['minimum_password_length']))
     if form.validate_on_submit():
         current_user.password = bcrypt.hashpw(
             form.password.data.encode('utf-8'),
