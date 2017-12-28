@@ -3,6 +3,10 @@ $(document).ready(function () {
     $.validator.setDefaults({
         ignore: [], // enable validation for hidden fields
     });
+    $.validator.addMethod("notEqual", function(value, element, param) {
+        return this.optional(element) || value != $(param).val();
+    }, "This has to be different");
+
     $('#tabs').tabs();
     $('#show_passwords').show();
     $(".date-switch").addClass('display-none');
@@ -20,7 +24,8 @@ $(document).ready(function () {
     $("#password-form").validate({
         rules: {
             password: {minlength: minimumPasswordLength},
-            password2: {equalTo: "#password"}
+            password2: {equalTo: "#password"},
+            password: {notEqual: "#password_old"}
         }
     });
     $("#password-reset").validate({

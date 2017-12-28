@@ -43,6 +43,9 @@ class PasswordForm(Form):
             self.password.errors.append(_('error passwords must match'))
             self.password2.errors.append(_('error passwords must match'))
             valid = False
+        if self.password_old.data == self.password.data:
+            self.password.errors.append(_('error new password like old password'))
+            valid = False
         return valid
 
 
