@@ -35,8 +35,6 @@ class SettingsForm(Form):
         choices=app.config['LOG_LEVELS'].items(),
         coerce=int)
     debug_mode = BooleanField(uc_first(_('debug mode')))
-    maintenance = BooleanField(uc_first(_('maintenance')))
-    offline = BooleanField(uc_first(_('offline')))
 
     # Mail
     mail = BooleanField(uc_first(_('mail')))

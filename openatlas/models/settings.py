@@ -12,7 +12,6 @@ class SettingsMapper(object):
         'failed_login_forget_minutes',
         'failed_login_tries',
         'log_level',
-        'maintenance',
         'mail',
         'mail_transport_username',
         'mail_transport_port',
@@ -22,7 +21,6 @@ class SettingsMapper(object):
         'mail_recipients_login',
         'mail_recipients_feedback',
         'minimum_password_length',
-        'offline',
         'random_password_length',
         'reset_confirm_hours',
         'site_name']
@@ -53,6 +51,6 @@ class SettingsMapper(object):
         sql = 'UPDATE web.settings SET "value" = %(value)s WHERE "name" = %(name)s;'
         for field in SettingsMapper.fields:
             value = getattr(form, field).data
-            if field in ['debug_mode', 'maintenance', 'mail', 'offline']:
+            if field in ['debug_mode', 'mail']:
                 value = 'True' if getattr(form, field).data else ''
             cursor.execute(sql, {'name': field, 'value': value})
