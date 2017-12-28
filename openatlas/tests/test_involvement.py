@@ -17,15 +17,13 @@ class InvolvementTests(TestBaseCase):
             # add involvement
             rv = self.app.get(url_for('involvement_insert', origin_id=actor_id))
             assert b'Involvement' in rv.data
+            data = {'event': '[' + str(event_id) + ']', 'activity': 'P11', involvement_id: 8}
             rv = self.app.post(
-                url_for('involvement_insert', origin_id=actor_id),
-                data={'event': '[' + str(event_id) + ']', 'activity': 'P11', involvement_id: 8},
-                follow_redirects=True)
+                url_for('involvement_insert', origin_id=actor_id), data=data, follow_redirects=True)
             assert b'Event Horizon' in rv.data
+            data = {'actor': '[' + str(actor_id) + ']', 'continue_': 'yes', 'activity': 'P11'}
             rv = self.app.post(
-                url_for('involvement_insert', origin_id=event_id),
-                data={'actor': '[' + str(actor_id) + ']', 'continue_': 'yes', 'activity': 'P11'},
-                follow_redirects=True)
+                url_for('involvement_insert', origin_id=event_id), data=data, follow_redirects=True)
             assert b'Event Horizon' in rv.data
 
             # update involvement

@@ -21,8 +21,8 @@ class ModelTests(TestBaseCase):
             rv = self.app.get(
                 url_for('property_view', code='P68'))
             assert b'P68' in rv.data
-            form_data = {'domain': 'E1', 'range': 'E1', 'property': 'P1'}
-            rv = self.app.post(url_for('model_index'), data=form_data)
+            data = {'domain': 'E1', 'range': 'E1', 'property': 'P1'}
+            rv = self.app.post(url_for('model_index'), data=data)
             assert b'Wrong' in rv.data
             self.login()
             # insert some data for network

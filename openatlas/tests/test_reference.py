@@ -18,12 +18,12 @@ class ReferenceTest(TestBaseCase):
             assert b'+ Edition' in rv.data
             rv = self.app.get(url_for('reference_insert', code='carrier'))
             assert b'+ Carrier' in rv.data
-            form_data = {'name': 'Test reference', 'description': 'Reference description'}
-            rv = self.app.post(url_for('reference_insert', code='bibliography'), data=form_data)
+            data = {'name': 'Test reference', 'description': 'Reference description'}
+            rv = self.app.post(url_for('reference_insert', code='bibliography'), data=data)
             bibliography_id = rv.location.split('/')[-1]
-            form_data['continue_'] = 'yes'
+            data['continue_'] = 'yes'
             rv = self.app.post(
-                url_for('reference_insert', code='carrier'), data=form_data, follow_redirects=True)
+                url_for('reference_insert', code='carrier'), data=data, follow_redirects=True)
             assert b'An entry has been created' in rv.data
             rv = self.app.get(url_for('reference_index'))
 
@@ -31,11 +31,9 @@ class ReferenceTest(TestBaseCase):
             assert b'Test reference' in rv.data
             rv = self.app.get(url_for('reference_update', id_=bibliography_id))
             assert b'Test reference' in rv.data
-            form_data['name'] = 'Test reference updated'
+            data['name'] = 'Test reference updated'
             rv = self.app.post(
-                url_for('reference_update', id_=bibliography_id),
-                data=form_data,
-                follow_redirects=True)
+                url_for('reference_update', id_=bibliography_id), data=data, follow_redirects=True)
             assert b'Test reference updated' in rv.data
 
             # reference link

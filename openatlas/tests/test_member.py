@@ -16,27 +16,23 @@ class MemberTests(TestBaseCase):
             # add membership
             rv = self.app.get(url_for('member_insert', origin_id=group_id))
             assert b'Actor Function' in rv.data
+            data = {'group': '[' + str(group_id) + ']'}
             rv = self.app.post(
-                url_for('membership_insert', origin_id=actor_id),
-                data={'group': '[' + str(group_id) + ']'},
-                follow_redirects=True)
+                url_for('membership_insert', origin_id=actor_id), data=data, follow_redirects=True)
             assert b'Space Marines' in rv.data
+            data = {'group': '[' + str(group_id) + ']', 'continue_': 'yes'}
             rv = self.app.post(
-                url_for('membership_insert', origin_id=actor_id),
-                data={'group': '[' + str(group_id) + ']', 'continue_': 'yes'},
-                follow_redirects=True)
+                url_for('membership_insert', origin_id=actor_id), data=data, follow_redirects=True)
             assert b'Space Marines' in rv.data
 
             # add member to group
+            data = {'actor': '[' + str(actor_id) + ']'}
             rv = self.app.post(
-                url_for('member_insert', origin_id=group_id),
-                data={'actor': '[' + str(actor_id) + ']'},
-                follow_redirects=True)
+                url_for('member_insert', origin_id=group_id), data=data, follow_redirects=True)
             assert b'Ripley' in rv.data
+            data['continue_'] = 'yes'
             rv = self.app.post(
-                url_for('member_insert', origin_id=group_id),
-                data={'actor': '[' + str(actor_id) + ']', 'continue_': 'yes'},
-                follow_redirects=True)
+                url_for('member_insert', origin_id=group_id), data=data, follow_redirects=True)
             assert b'Ripley' in rv.data
 
             # update member
