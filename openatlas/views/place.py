@@ -123,9 +123,13 @@ def place_view(id_, unlink_id=None):
 @required_group('editor')
 def place_delete(id_):
     openatlas.get_cursor().execute('BEGIN')
-    EntityMapper.delete(id_)
-    openatlas.logger.log_user(id_, 'delete')
-    openatlas.get_cursor().execute('COMMIT')
+    try:
+        EntityMapper.delete(id_)
+        openatlas.logger.log_user(id_, 'delete')
+        openatlas.get_cursor().execute('COMMIT')
+    except Exception as e:
+        openatlas.get_cursor().execute('ROLLBACK')
+        openatlas.logger.log('error', 'database', 'transaction failed', e)
     flash(_('entity deleted'), 'info')
     return redirect(url_for('place_index'))
 
@@ -156,33 +160,37 @@ def place_update(id_):
 
 def save(form, object_=None, location=None, origin=None):
     openatlas.get_cursor().execute('BEGIN')
-    if object_:
-        for alias in object_.get_linked_entities('P1'):
-            alias.delete()
-        GisMapper.delete_by_entity(location)
-        openatlas.logger.log_user(object_.id, 'update')
-    else:
-        object_ = EntityMapper.insert('E18', form.name.data)
-        location = EntityMapper.insert('E53', 'Location of ' + form.name.data, 'place location')
-        object_.link('P53', location)
-        openatlas.logger.log_user(object_.id, 'insert')
-    object_.name = form.name.data
-    object_.description = form.description.data
-    object_.update()
-    object_.save_dates(form)
-    object_.save_nodes(form)
-    location.name = 'Location of ' + form.name.data
-    location.update()
-    location.save_nodes(form)
-    for alias in form.alias.data:
-        if alias.strip():  # check if it isn't empty
-            object_.link('P1', EntityMapper.insert('E41', alias))
-    link_ = None
-    if origin:
-        if origin.class_.code in app.config['CLASS_CODES']['reference']:
-            link_ = origin.link('P67', object_)
+    try:
+        if object_:
+            for alias in object_.get_linked_entities('P1'):
+                alias.delete()
+            GisMapper.delete_by_entity(location)
+            openatlas.logger.log_user(object_.id, 'update')
         else:
-            origin.link('P67', object_)
-    GisMapper.insert(location, form)
-    openatlas.get_cursor().execute('COMMIT')
+            object_ = EntityMapper.insert('E18', form.name.data)
+            location = EntityMapper.insert('E53', 'Location of ' + form.name.data, 'place location')
+            object_.link('P53', location)
+            openatlas.logger.log_user(object_.id, 'insert')
+        object_.name = form.name.data
+        object_.description = form.description.data
+        object_.update()
+        object_.save_dates(form)
+        object_.save_nodes(form)
+        location.name = 'Location of ' + form.name.data
+        location.update()
+        location.save_nodes(form)
+        for alias in form.alias.data:
+            if alias.strip():  # check if it isn't empty
+                object_.link('P1', EntityMapper.insert('E41', alias))
+        link_ = None
+        if origin:
+            if origin.class_.code in app.config['CLASS_CODES']['reference']:
+                link_ = origin.link('P67', object_)
+            else:
+                origin.link('P67', object_)
+        GisMapper.insert(location, form)
+        openatlas.get_cursor().execute('COMMIT')
+    except Exception as e:  # pragma: no cover
+        openatlas.get_cursor().execute('ROLLBACK')
+        openatlas.logger.log('error', 'database', 'transaction failed', e)
     return link_ if link_ else object_

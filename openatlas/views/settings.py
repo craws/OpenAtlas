@@ -103,10 +103,14 @@ def settings_update():
     form = SettingsForm()
     if form.validate_on_submit():
         openatlas.get_cursor().execute('BEGIN')
-        SettingsMapper.update(form)
-        openatlas.get_cursor().execute('END')
-        flash(_('info update'), 'info')
-        openatlas.logger.log('info', 'settings', 'Settings updated')
+        try:
+            SettingsMapper.update(form)
+            openatlas.logger.log('info', 'settings', 'Settings updated')
+            openatlas.get_cursor().execute('COMMIT')
+            flash(_('info update'), 'info')
+        except Exception as e:  # pragma: no cover
+            openatlas.get_cursor().execute('ROLLBACK')
+            openatlas.logger.log('error', 'database', 'transaction failed', e)
         return redirect(url_for('settings_index'))
     for field in SettingsMapper.fields:
         if field in ['mail_recipients_login', 'mail_recipients_feedback']:

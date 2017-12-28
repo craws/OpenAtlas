@@ -44,22 +44,26 @@ def involvement_insert(origin_id):
         form.activity.choices.append(('P23', openatlas.properties['P23'].name))
     if form.validate_on_submit():
         openatlas.get_cursor().execute('BEGIN')
-        if origin_class == 'event':
-            for actor_id in ast.literal_eval(form.actor.data):
-                link_id = origin.link(form.activity.data, actor_id, form.description.data)
-                DateMapper.save_link_dates(link_id, form)
-                NodeMapper.save_link_nodes(link_id, form)
-        else:
-            for event_id in ast.literal_eval(form.event.data):
-                link_id = LinkMapper.insert(
-                    event_id,
-                    form.activity.data,
-                    origin.id,
-                    form.description.data)
-                DateMapper.save_link_dates(link_id, form)
-                NodeMapper.save_link_nodes(link_id, form)
-        openatlas.get_cursor().execute('COMMIT')
-        flash(_('entity created'), 'info')
+        try:
+            if origin_class == 'event':
+                for actor_id in ast.literal_eval(form.actor.data):
+                    link_id = origin.link(form.activity.data, actor_id, form.description.data)
+                    DateMapper.save_link_dates(link_id, form)
+                    NodeMapper.save_link_nodes(link_id, form)
+            else:
+                for event_id in ast.literal_eval(form.event.data):
+                    link_id = LinkMapper.insert(
+                        event_id,
+                        form.activity.data,
+                        origin.id,
+                        form.description.data)
+                    DateMapper.save_link_dates(link_id, form)
+                    NodeMapper.save_link_nodes(link_id, form)
+            openatlas.get_cursor().execute('COMMIT')
+            flash(_('entity created'), 'info')
+        except Exception as e:  # pragma: no cover
+            openatlas.get_cursor().execute('ROLLBACK')
+            openatlas.logger.log('error', 'database', 'transaction failed', e)
         if form.continue_.data == 'yes':
             return redirect(url_for('involvement_insert', origin_id=origin_id))
         tab = 'actor' if origin_class == 'event' else 'event'
@@ -85,11 +89,15 @@ def involvement_update(id_, origin_id):
         form.activity.choices.append(('P23', openatlas.properties['P23'].name))
     if form.validate_on_submit():
         openatlas.get_cursor().execute('BEGIN')
-        link_.delete()
-        link_id = event.link(form.activity.data, actor, form.description.data)
-        DateMapper.save_link_dates(link_id, form)
-        NodeMapper.save_link_nodes(link_id, form)
-        openatlas.get_cursor().execute('COMMIT')
+        try:
+            link_.delete()
+            link_id = event.link(form.activity.data, actor, form.description.data)
+            DateMapper.save_link_dates(link_id, form)
+            NodeMapper.save_link_nodes(link_id, form)
+            openatlas.get_cursor().execute('COMMIT')
+        except Exception as e:  # pragma: no cover
+            openatlas.get_cursor().execute('ROLLBACK')
+            openatlas.logger.log('error', 'database', 'transaction failed', e)
         class_ = app.config['CODE_CLASS'][origin.class_.code]
         tab = 'actor' if class_ == 'event' else 'event'
         return redirect(url_for(class_ + '_view', id_=origin.id) + '#tab-' + tab)

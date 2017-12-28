@@ -86,10 +86,14 @@ def event_insert(code, origin_id=None):
 @required_group('editor')
 def event_delete(id_):
     openatlas.get_cursor().execute('BEGIN')
-    EntityMapper.delete(id_)
-    openatlas.logger.log_user(id_, 'delete')
-    openatlas.get_cursor().execute('COMMIT')
-    flash(_('entity deleted'), 'info')
+    try:
+        EntityMapper.delete(id_)
+        openatlas.logger.log_user(id_, 'delete')
+        openatlas.get_cursor().execute('COMMIT')
+        flash(_('entity deleted'), 'info')
+    except Exception as e:  # pragma: no cover
+        openatlas.get_cursor().execute('ROLLBACK')
+        openatlas.logger.log('error', 'database', 'transaction failed', e)
     return redirect(url_for('event_index'))
 
 
@@ -190,34 +194,38 @@ def event_view(id_, unlink_id=None):
 
 def save(form, event=None, code=None, origin=None):
     openatlas.get_cursor().execute('BEGIN')
-    if event:
-        LinkMapper.delete_by_codes(event, ['P117', 'P7', 'P22', 'P23', 'P24'])
-        openatlas.logger.log_user(event.id, 'update')
-    else:
-        event = EntityMapper.insert(code, form.name.data)
-        openatlas.logger.log_user(event.id, 'insert')
-    event.name = form.name.data
-    event.description = form.description.data
-    event.update()
-    event.save_dates(form)
-    event.save_nodes(form)
-    if form.event.data:
-        event.link('P117', int(form.event.data))
-    if form.place.data:
-        place = LinkMapper.get_linked_entity(int(form.place.data), 'P53')
-        event.link('P7', place)
-    if event.class_.code == 'E8':  # Links for acquisition
-        event.link('P22', ast.literal_eval(form.recipient.data) if form.recipient.data else None)
-        event.link('P23', ast.literal_eval(form.donor.data) if form.donor.data else None)
-        if form.given_place.data:
-            event.link('P24', ast.literal_eval(form.given_place.data))
-    link_ = None
-    if origin:
-        if origin.class_.code in app.config['CLASS_CODES']['reference']:
-            link_ = origin.link('P67', event)
-        elif origin.class_.code in app.config['CLASS_CODES']['source']:
-            origin.link('P67', event)
-        elif origin.class_.code in app.config['CLASS_CODES']['actor']:
-            link_ = event.link('P11', origin)
-    openatlas.get_cursor().execute('COMMIT')
+    try:
+        if event:
+            LinkMapper.delete_by_codes(event, ['P117', 'P7', 'P22', 'P23', 'P24'])
+            openatlas.logger.log_user(event.id, 'update')
+        else:
+            event = EntityMapper.insert(code, form.name.data)
+            openatlas.logger.log_user(event.id, 'insert')
+        event.name = form.name.data
+        event.description = form.description.data
+        event.update()
+        event.save_dates(form)
+        event.save_nodes(form)
+        if form.event.data:
+            event.link('P117', int(form.event.data))
+        if form.place.data:
+            place = LinkMapper.get_linked_entity(int(form.place.data), 'P53')
+            event.link('P7', place)
+        if event.class_.code == 'E8':  # Links for acquisition
+            event.link('P22', ast.literal_eval(form.recipient.data) if form.recipient.data else None)
+            event.link('P23', ast.literal_eval(form.donor.data) if form.donor.data else None)
+            if form.given_place.data:
+                event.link('P24', ast.literal_eval(form.given_place.data))
+        link_ = None
+        if origin:
+            if origin.class_.code in app.config['CLASS_CODES']['reference']:
+                link_ = origin.link('P67', event)
+            elif origin.class_.code in app.config['CLASS_CODES']['source']:
+                origin.link('P67', event)
+            elif origin.class_.code in app.config['CLASS_CODES']['actor']:
+                link_ = event.link('P11', origin)
+        openatlas.get_cursor().execute('COMMIT')
+    except Exception as e:  # pragma: no cover
+        openatlas.get_cursor().execute('ROLLBACK')
+        openatlas.logger.log('error', 'database', 'transaction failed', e)
     return link_ if link_ else event

@@ -33,12 +33,16 @@ def membership_insert(origin_id):
     del form.actor
     if form.validate_on_submit():
         openatlas.get_cursor().execute('BEGIN')
-        for actor_id in ast.literal_eval(form.group.data):
-            link_id = LinkMapper.insert(actor_id, 'P107', origin.id, form.description.data)
-            DateMapper.save_link_dates(link_id, form)
-            NodeMapper.save_link_nodes(link_id, form)
-        openatlas.get_cursor().execute('COMMIT')
-        flash(_('entity created'), 'info')
+        try:
+            for actor_id in ast.literal_eval(form.group.data):
+                link_id = LinkMapper.insert(actor_id, 'P107', origin.id, form.description.data)
+                DateMapper.save_link_dates(link_id, form)
+                NodeMapper.save_link_nodes(link_id, form)
+            openatlas.get_cursor().execute('COMMIT')
+            flash(_('entity created'), 'info')
+        except Exception as e:
+            openatlas.get_cursor().execute('ROLLBACK')
+            openatlas.logger.log('error', 'database', 'transaction failed', e)
         if form.continue_.data == 'yes':
             return redirect(url_for('membership_insert', origin_id=origin_id))
         return redirect(url_for('actor_view', id_=origin.id) + '#tab-member-of')
@@ -53,12 +57,16 @@ def member_insert(origin_id):
     del form.group
     if form.validate_on_submit():
         openatlas.get_cursor().execute('BEGIN')
-        for actor_id in ast.literal_eval(form.actor.data):
-            link_id = origin.link('P107', actor_id, form.description.data)
-            DateMapper.save_link_dates(link_id, form)
-            NodeMapper.save_link_nodes(link_id, form)
-        openatlas.get_cursor().execute('COMMIT')
-        flash(_('entity created'), 'info')
+        try:
+            for actor_id in ast.literal_eval(form.actor.data):
+                link_id = origin.link('P107', actor_id, form.description.data)
+                DateMapper.save_link_dates(link_id, form)
+                NodeMapper.save_link_nodes(link_id, form)
+            openatlas.get_cursor().execute('COMMIT')
+            flash(_('entity created'), 'info')
+        except Exception as e:  # pragma: no cover
+            openatlas.get_cursor().execute('ROLLBACK')
+            openatlas.logger.log('error', 'database', 'transaction failed', e)
         if form.continue_.data == 'yes':
             return redirect(url_for('member_insert', origin_id=origin_id))
         return redirect(url_for('actor_view', id_=origin.id) + '#tab-member')
@@ -77,11 +85,15 @@ def member_update(id_, origin_id):
     del form.actor, form.group, form.insert_and_continue
     if form.validate_on_submit():
         openatlas.get_cursor().execute('BEGIN')
-        link_.delete()
-        link_id = domain.link('P107', range_, form.description.data)
-        DateMapper.save_link_dates(link_id, form)
-        NodeMapper.save_link_nodes(link_id, form)
-        openatlas.get_cursor().execute('COMMIT')
+        try:
+            link_.delete()
+            link_id = domain.link('P107', range_, form.description.data)
+            DateMapper.save_link_dates(link_id, form)
+            NodeMapper.save_link_nodes(link_id, form)
+            openatlas.get_cursor().execute('COMMIT')
+        except Exception as e:  # pragma: no cover
+            openatlas.get_cursor().execute('ROLLBACK')
+            openatlas.logger.log('error', 'database', 'transaction failed', e)
         tab = '#tab-member-of' if origin.id == range_.id else '#tab-member'
         return redirect(url_for('actor_view', id_=origin.id) + tab)
     form.save.label.text = _('save')

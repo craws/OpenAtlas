@@ -73,22 +73,30 @@ def hierarchy_delete(id_):
     if node.system or node.subs or node.count:
         abort(403)
     openatlas.get_cursor().execute('BEGIN')
-    EntityMapper.delete(node.id)
-    openatlas.get_cursor().execute('COMMIT')
-    flash(_('entity deleted'), 'info')
+    try:
+        EntityMapper.delete(node.id)
+        openatlas.get_cursor().execute('COMMIT')
+        flash(_('entity deleted'), 'info')
+    except Exception as e:  # pragma: no cover
+        openatlas.get_cursor().execute('ROLLBACK')
+        openatlas.logger.log('error', 'database', 'transaction failed', e)
     return redirect(url_for('node_index'))
 
 
 def save(form, node=None):
     openatlas.get_cursor().execute('BEGIN')
-    if not node:
-        node = NodeMapper.insert('E55', sanitize(form.name.data, 'node'))
-        NodeMapper.insert_hierarchy(node, form)
-    else:
-        node = openatlas.nodes[node.id]
-        NodeMapper.update_hierarchy(node, form)
-    node.name = sanitize(form.name.data, 'node')
-    node.description = form.description.data
-    node.update()
-    openatlas.get_cursor().execute('COMMIT')
+    try:
+        if not node:
+            node = NodeMapper.insert('E55', sanitize(form.name.data, 'node'))
+            NodeMapper.insert_hierarchy(node, form)
+        else:
+            node = openatlas.nodes[node.id]
+            NodeMapper.update_hierarchy(node, form)
+        node.name = sanitize(form.name.data, 'node')
+        node.description = form.description.data
+        node.update()
+        openatlas.get_cursor().execute('COMMIT')
+    except Exception as e:  # pragma: no cover
+        openatlas.get_cursor().execute('ROLLBACK')
+        openatlas.logger.log('error', 'database', 'transaction failed', e)
     return node

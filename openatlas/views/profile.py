@@ -74,10 +74,14 @@ def profile_index():
         user.settings['table_rows'] = form.table_rows.data
         user.settings['layout'] = form.layout.data
         openatlas.get_cursor().execute('BEGIN')
-        user.update_settings()
-        openatlas.get_cursor().execute('COMMIT')
+        try:
+            user.update_settings()
+            openatlas.get_cursor().execute('COMMIT')
+            flash(_('info update'), 'info')
+        except Exception as e:  # pragma: no cover
+            openatlas.get_cursor().execute('ROLLBACK')
+            openatlas.logger.log('error', 'database', 'transaction failed', e)
         session['language'] = form.language.data
-        flash(_('info update'), 'info')
         return redirect(url_for('profile_index'))
 
     form.language.data = user.settings['language']
@@ -103,10 +107,14 @@ def profile_update():
         current_user.settings['show_email'] = form.show_email.data
         current_user.settings['newsletter'] = form.newsletter.data
         openatlas.get_cursor().execute('BEGIN')
-        current_user.update()
-        current_user.update_settings()
-        openatlas.get_cursor().execute('COMMIT')
-        flash(_('info update'), 'info')
+        try:
+            current_user.update()
+            current_user.update_settings()
+            openatlas.get_cursor().execute('COMMIT')
+            flash(_('info update'), 'info')
+        except Exception as e:  # pragma: no cover
+            openatlas.get_cursor().execute('ROLLBACK')
+            openatlas.logger.log('error', 'database', 'transaction failed', e)
         return redirect(url_for('profile_index'))
     form.name.data = current_user.real_name
     form.email.data = current_user.email
