@@ -12,18 +12,16 @@ class HierarchyTest(TestBaseCase):
         with app.app_context():
             rv = self.app.get(url_for('hierarchy_insert'))
             assert b'+ Custom' in rv.data
-            form_data = {
+            data = {
                 'name': 'Geronimo',
                 'multiple': True,
                 'description': 'Very important!'}
-            rv = self.app.post(url_for('hierarchy_insert'), data=form_data)
+            rv = self.app.post(url_for('hierarchy_insert'), data=data)
             hierarchy_id = rv.location.split('/')[-1].replace('types#tab-', '')
             rv = self.app.get(url_for('hierarchy_update', id_=hierarchy_id))
             assert b'Geronimo' in rv.data
             rv = self.app.post(
-                url_for('hierarchy_update', id_=hierarchy_id),
-                data=form_data,
-                follow_redirects=True)
+                url_for('hierarchy_update', id_=hierarchy_id), data=data, follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
             rv = self.app.post(url_for('hierarchy_delete', id_=hierarchy_id), follow_redirects=True)
             assert b'deleted' in rv.data

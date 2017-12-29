@@ -51,9 +51,13 @@ def translation_view(id_):
 @required_group('editor')
 def translation_delete(id_, source_id):
     openatlas.get_cursor().execute('BEGIN')
-    EntityMapper.delete(id_)
-    openatlas.get_cursor().execute('COMMIT')
-    flash(_('entity deleted'), 'info')
+    try:
+        EntityMapper.delete(id_)
+        openatlas.get_cursor().execute('COMMIT')
+        flash(_('entity deleted'), 'info')
+    except Exception as e:  # pragma: no cover
+        openatlas.get_cursor().execute('ROLLBACK')
+        openatlas.logger.log('error', 'database', 'transaction failed', e)
     return redirect(url_for('source_view', id_=source_id))
 
 
@@ -76,15 +80,19 @@ def translation_update(id_):
 
 def save(form, entity=None, source=None):
     openatlas.get_cursor().execute('BEGIN')
-    if entity:
-        openatlas.logger.log_user(entity.id, 'update')
-    else:
-        entity = EntityMapper.insert('E33', form.name.data, 'source translation')
-        source.link('P73', entity)
-        openatlas.logger.log_user(entity.id, 'insert')
-    entity.name = form.name.data
-    entity.description = form.description.data
-    entity.update()
-    entity.save_nodes(form)
-    openatlas.get_cursor().execute('COMMIT')
+    try:
+        if entity:
+            openatlas.logger.log_user(entity.id, 'update')
+        else:
+            entity = EntityMapper.insert('E33', form.name.data, 'source translation')
+            source.link('P73', entity)
+            openatlas.logger.log_user(entity.id, 'insert')
+        entity.name = form.name.data
+        entity.description = form.description.data
+        entity.update()
+        entity.save_nodes(form)
+        openatlas.get_cursor().execute('COMMIT')
+    except Exception as e:  # pragma: no cover
+        openatlas.get_cursor().execute('ROLLBACK')
+        openatlas.logger.log('error', 'database', 'transaction failed', e)
     return entity

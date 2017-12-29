@@ -109,9 +109,13 @@ def source_add(origin_id):
     origin = EntityMapper.get_by_id(origin_id)
     if request.method == 'POST':
         openatlas.get_cursor().execute('BEGIN')
-        for value in request.form.getlist('values'):
-            LinkMapper.insert(int(value), 'P67', origin.id)
-        openatlas.get_cursor().execute('COMMIT')
+        try:
+            for value in request.form.getlist('values'):
+                LinkMapper.insert(int(value), 'P67', origin.id)
+            openatlas.get_cursor().execute('COMMIT')
+        except Exception as e:  # pragma: no cover
+            openatlas.get_cursor().execute('ROLLBACK')
+            openatlas.logger.log('error', 'database', 'transaction failed', e)
         view_name = app.config['CODE_CLASS'][origin.class_.code]
         return redirect(url_for(view_name + '_view', id_=origin.id) + '#tab-source')
     form = build_table_form('source', origin.get_linked_entities('P67', True))
@@ -135,10 +139,14 @@ def source_add2(id_, class_name):
 @required_group('editor')
 def source_delete(id_):
     openatlas.get_cursor().execute('BEGIN')
-    EntityMapper.delete(id_)
-    openatlas.logger.log_user(id_, 'delete')
-    openatlas.get_cursor().execute('COMMIT')
-    flash(_('entity deleted'), 'info')
+    try:
+        EntityMapper.delete(id_)
+        openatlas.logger.log_user(id_, 'delete')
+        openatlas.get_cursor().execute('COMMIT')
+        flash(_('entity deleted'), 'info')
+    except Exception as e:  # pragma: no cover
+        openatlas.get_cursor().execute('ROLLBACK')
+        openatlas.logger.log('error', 'database', 'transaction failed', e)
     return redirect(url_for('source_index'))
 
 
@@ -162,20 +170,24 @@ def source_update(id_):
 
 def save(form, source=None, origin=None):
     openatlas.get_cursor().execute('BEGIN')
-    if source:
-        openatlas.logger.log_user(source.id, 'update')
-    else:
-        source = EntityMapper.insert('E33', form.name.data, 'source content')
-        openatlas.logger.log_user(source.id, 'insert')
-    source.name = form.name.data
-    source.description = form.description.data
-    source.update()
-    source.save_nodes(form)
-    link_ = None
-    if origin:
-        if origin.class_.code in app.config['CLASS_CODES']['reference']:
-            link_ = origin.link('P67', source)
+    try:
+        if source:
+            openatlas.logger.log_user(source.id, 'update')
         else:
-            source.link('P67', origin)
-    openatlas.get_cursor().execute('COMMIT')
+            source = EntityMapper.insert('E33', form.name.data, 'source content')
+            openatlas.logger.log_user(source.id, 'insert')
+        source.name = form.name.data
+        source.description = form.description.data
+        source.update()
+        source.save_nodes(form)
+        link_ = None
+        if origin:
+            if origin.class_.code in app.config['CLASS_CODES']['reference']:
+                link_ = origin.link('P67', source)
+            else:
+                source.link('P67', origin)
+        openatlas.get_cursor().execute('COMMIT')
+    except Exception as e:  # pragma: no cover
+        openatlas.get_cursor().execute('ROLLBACK')
+        openatlas.logger.log('error', 'database', 'transaction failed', e)
     return link_ if link_ else source

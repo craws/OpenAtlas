@@ -43,6 +43,12 @@ class PasswordForm(Form):
             self.password.errors.append(_('error passwords must match'))
             self.password2.errors.append(_('error passwords must match'))
             valid = False
+        if self.password_old.data == self.password.data:
+            self.password.errors.append(_('error new password like old password'))
+            valid = False
+        if len(self.password.data) < session['settings']['minimum_password_length']:
+            self.password.errors.append(_('error password too short'))
+            valid = False
         return valid
 
 
@@ -71,10 +77,14 @@ def profile_index():
         user.settings['table_rows'] = form.table_rows.data
         user.settings['layout'] = form.layout.data
         openatlas.get_cursor().execute('BEGIN')
-        user.update_settings()
-        openatlas.get_cursor().execute('COMMIT')
+        try:
+            user.update_settings()
+            openatlas.get_cursor().execute('COMMIT')
+            flash(_('info update'), 'info')
+        except Exception as e:  # pragma: no cover
+            openatlas.get_cursor().execute('ROLLBACK')
+            openatlas.logger.log('error', 'database', 'transaction failed', e)
         session['language'] = form.language.data
-        flash(_('info update'), 'info')
         return redirect(url_for('profile_index'))
 
     form.language.data = user.settings['language']
@@ -100,10 +110,14 @@ def profile_update():
         current_user.settings['show_email'] = form.show_email.data
         current_user.settings['newsletter'] = form.newsletter.data
         openatlas.get_cursor().execute('BEGIN')
-        current_user.update()
-        current_user.update_settings()
-        openatlas.get_cursor().execute('COMMIT')
-        flash(_('info update'), 'info')
+        try:
+            current_user.update()
+            current_user.update_settings()
+            openatlas.get_cursor().execute('COMMIT')
+            flash(_('info update'), 'info')
+        except Exception as e:  # pragma: no cover
+            openatlas.get_cursor().execute('ROLLBACK')
+            openatlas.logger.log('error', 'database', 'transaction failed', e)
         return redirect(url_for('profile_index'))
     form.name.data = current_user.real_name
     form.email.data = current_user.email
@@ -116,8 +130,6 @@ def profile_update():
 @login_required
 def profile_password():
     form = PasswordForm()
-    form.password.validators.append(Length(min=session['settings']['minimum_password_length']))
-    form.password2.validators.append(Length(min=session['settings']['minimum_password_length']))
     if form.validate_on_submit():
         current_user.password = bcrypt.hashpw(
             form.password.data.encode('utf-8'),

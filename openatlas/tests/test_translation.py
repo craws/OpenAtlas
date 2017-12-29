@@ -13,9 +13,8 @@ class TranslationTest(TestBaseCase):
             source_id = EntityMapper.insert('E33', 'Necronomicon', 'source content').id
             rv = self.app.get(url_for('translation_insert', source_id=source_id))
             assert b'+ Translation' in rv.data
-            rv = self.app.post(
-                url_for('translation_insert', source_id=source_id),
-                data={'name': 'Test translation'})
+            data = {'name': 'Test translation'}
+            rv = self.app.post(url_for('translation_insert', source_id=source_id), data=data)
             translation_id = rv.location.split('/')[-1]
             self.app.get(url_for('translation_update', id_=translation_id, source_id=source_id))
             rv = self.app.post(
@@ -27,6 +26,5 @@ class TranslationTest(TestBaseCase):
                 url_for('translation_delete', id_=translation_id, source_id=source_id),
                 follow_redirects=True)
             assert b'The entry has been deleted.' in rv.data
-            self.app.post(
-                url_for('translation_insert', source_id=source_id),
-                data={'name': 'Translation continued', 'continue_': 'yes'})
+            data = {'name': 'Translation continued', 'continue_': 'yes'}
+            self.app.post(url_for('translation_insert', source_id=source_id), data=data)

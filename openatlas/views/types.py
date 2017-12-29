@@ -113,9 +113,13 @@ def node_delete(id_):
     if node.system or node.subs or node.count:
         abort(403)
     openatlas.get_cursor().execute('BEGIN')
-    EntityMapper.delete(node.id)
-    openatlas.get_cursor().execute('COMMIT')
-    flash(_('entity deleted'), 'info')
+    try:
+        EntityMapper.delete(node.id)
+        openatlas.get_cursor().execute('COMMIT')
+        flash(_('entity deleted'), 'info')
+    except Exception as e:  # pragma: no cover
+        openatlas.get_cursor().execute('ROLLBACK')
+        openatlas.logger.log('error', 'database', 'transaction failed', e)
     root = openatlas.nodes[node.root[-1]] if node.root else None
     if root:
         return redirect(url_for('node_view', id_=root.id))
@@ -162,29 +166,33 @@ def tree_select(name):
 
 def save(form, node=None, root=None):
     openatlas.get_cursor().execute('BEGIN')
-    if not node:
-        node = NodeMapper.insert(root.class_.code, form.name.data)
-        super_ = 'new'
-    else:
-        root = openatlas.nodes[node.root[-1]] if node.root else None
-        super_ = openatlas.nodes[node.root[0]] if node.root else None
-    new_super_id = getattr(form, str(root.id)).data
-    new_super = openatlas.nodes[int(new_super_id)] if new_super_id else openatlas.nodes[root.id]
-    if new_super.id == node.id:
-        flash(_('error node self as super'), 'error')
-        return False
-    if new_super.root and node.id in new_super.root:
-        flash(_('error node sub as super'), 'error')
-        return False
-    node.name = sanitize(form.name.data, 'node')
-    if root.directional and sanitize(form.name_inverse.data, 'node'):
-        node.name += ' (' + sanitize(form.name_inverse.data, 'node') + ')'
-    node.description = form.description.data
-    node.update()
-    # update super if changed and node is not a root node
-    if super_ and (super_ == 'new' or super_.id != new_super.id):
-        property_code = 'P127' if node.class_.code == 'E55' else 'P89'
-        node.delete_links(property_code)
-        node.link(property_code, new_super.id)
-    openatlas.get_cursor().execute('COMMIT')
+    try:
+        if not node:
+            node = NodeMapper.insert(root.class_.code, form.name.data)
+            super_ = 'new'
+        else:
+            root = openatlas.nodes[node.root[-1]] if node.root else None
+            super_ = openatlas.nodes[node.root[0]] if node.root else None
+        new_super_id = getattr(form, str(root.id)).data
+        new_super = openatlas.nodes[int(new_super_id)] if new_super_id else openatlas.nodes[root.id]
+        if new_super.id == node.id:
+            flash(_('error node self as super'), 'error')
+            return False
+        if new_super.root and node.id in new_super.root:
+            flash(_('error node sub as super'), 'error')
+            return False
+        node.name = sanitize(form.name.data, 'node')
+        if root.directional and sanitize(form.name_inverse.data, 'node'):
+            node.name += ' (' + sanitize(form.name_inverse.data, 'node') + ')'
+        node.description = form.description.data
+        node.update()
+        # update super if changed and node is not a root node
+        if super_ and (super_ == 'new' or super_.id != new_super.id):
+            property_code = 'P127' if node.class_.code == 'E55' else 'P89'
+            node.delete_links(property_code)
+            node.link(property_code, new_super.id)
+        openatlas.get_cursor().execute('COMMIT')
+    except Exception as e:  # pragma: no cover
+        openatlas.get_cursor().execute('ROLLBACK')
+        openatlas.logger.log('error', 'database', 'transaction failed', e)
     return node

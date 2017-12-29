@@ -170,10 +170,14 @@ def reference_insert(code, origin_id=None):
 @required_group('editor')
 def reference_delete(id_):
     openatlas.get_cursor().execute('BEGIN')
-    EntityMapper.delete(id_)
-    openatlas.logger.log_user(id_, 'delete')
-    openatlas.get_cursor().execute('COMMIT')
-    flash(_('entity deleted'), 'info')
+    try:
+        EntityMapper.delete(id_)
+        openatlas.logger.log_user(id_, 'delete')
+        openatlas.get_cursor().execute('COMMIT')
+        flash(_('entity deleted'), 'info')
+    except Exception as e:  # pragma: no cover
+        openatlas.get_cursor().execute('ROLLBACK')
+        openatlas.logger.log('error', 'database', 'transaction failed', e)
     return redirect(url_for('reference_index'))
 
 
@@ -197,20 +201,24 @@ def reference_update(id_):
 
 def save(form, reference, code=None, origin=None):
     openatlas.get_cursor().execute('BEGIN')
-    if reference:
-        openatlas.logger.log_user(reference.id, 'update')
-    else:
-        class_code = 'E31'
-        system_type = code
-        if code == 'carrier':
-            class_code = 'E84'
-            system_type = 'information carrier'
-        reference = EntityMapper.insert(class_code, form.name.data, system_type)
-        openatlas.logger.log_user(reference.id, 'insert')
-    reference.name = form.name.data
-    reference.description = form.description.data
-    reference.update()
-    reference.save_nodes(form)
-    link_ = reference.link('P67', origin) if origin else None
-    openatlas.get_cursor().execute('COMMIT')
+    try:
+        if reference:
+            openatlas.logger.log_user(reference.id, 'update')
+        else:
+            class_code = 'E31'
+            system_type = code
+            if code == 'carrier':
+                class_code = 'E84'
+                system_type = 'information carrier'
+            reference = EntityMapper.insert(class_code, form.name.data, system_type)
+            openatlas.logger.log_user(reference.id, 'insert')
+        reference.name = form.name.data
+        reference.description = form.description.data
+        reference.update()
+        reference.save_nodes(form)
+        link_ = reference.link('P67', origin) if origin else None
+        openatlas.get_cursor().execute('COMMIT')
+    except Exception as e:  # pragma: no cover
+        openatlas.get_cursor().execute('ROLLBACK')
+        openatlas.logger.log('error', 'database', 'transaction failed', e)
     return link_ if link_ else reference

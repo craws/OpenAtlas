@@ -16,17 +16,17 @@ class SettingsTests(TestBaseCase):
             assert b'Edit' in rv.data
             rv = self.app.get(url_for('settings_update'))
             assert b'Save' in rv.data
-            form_data = {}
+            data = {}
             for name in SettingsMapper.fields:
-                form_data[name] = ''
-            form_data['default_language'] = 'en'
-            form_data['default_table_rows'] = '10'
-            form_data['failed_login_forget_minutes'] = '10'
-            form_data['failed_login_tries'] = '10'
-            form_data['minimum_password_length'] = '10'
-            form_data['random_password_length'] = '10'
-            form_data['reset_confirm_hours'] = '10'
-            form_data['log_level'] = '0'
-            form_data['site_name'] = 'Nostromo'
-            rv = self.app.post(url_for('settings_update'), data=form_data, follow_redirects=True)
+                data[name] = ''
+            data['default_language'] = 'en'
+            data['default_table_rows'] = '10'
+            data['failed_login_forget_minutes'] = '10'
+            data['failed_login_tries'] = '10'
+            data['minimum_password_length'] = '10'
+            data['random_password_length'] = '10'
+            data['reset_confirm_hours'] = '10'
+            data['log_level'] = '0'
+            data['site_name'] = 'Nostromo'
+            rv = self.app.post(url_for('settings_update'), data=data, follow_redirects=True)
             assert b'Nostromo' in rv.data

@@ -216,10 +216,14 @@ def actor_insert(code, origin_id=None):
 @required_group('editor')
 def actor_delete(id_):
     openatlas.get_cursor().execute('BEGIN')
-    EntityMapper.delete(id_)
-    openatlas.logger.log_user(id_, 'delete')
-    openatlas.get_cursor().execute('COMMIT')
-    flash(_('entity deleted'), 'info')
+    try:
+        EntityMapper.delete(id_)
+        openatlas.logger.log_user(id_, 'delete')
+        openatlas.get_cursor().execute('COMMIT')
+        flash(_('entity deleted'), 'info')
+    except Exception as e:  # pragma: no cover
+        openatlas.get_cursor().execute('ROLLBACK')
+        openatlas.logger.log('error', 'database', 'transaction failed', e)
     return redirect(url_for('actor_index'))
 
 
@@ -253,41 +257,45 @@ def actor_update(id_):
 
 def save(form, actor=None, code=None, origin=None):
     openatlas.get_cursor().execute('BEGIN')
-    if actor:
-        LinkMapper.delete_by_codes(actor, ['P74', 'OA8', 'OA9'])
-        for alias in actor.get_linked_entities('P131'):
-            alias.delete()
-        openatlas.logger.log_user(actor.id, 'update')
-    else:
-        actor = EntityMapper.insert(code, form.name.data)
-        openatlas.logger.log_user(actor.id, 'insert')
-    actor.name = form.name.data
-    actor.description = form.description.data
-    actor.update()
-    actor.save_dates(form)
-    actor.save_nodes(form)
-    if form.residence.data:
-        object_ = EntityMapper.get_by_id(form.residence.data)
-        actor.link('P74', object_.get_linked_entity('P53'))
-    if form.appears_first.data:
-        object_ = EntityMapper.get_by_id(form.appears_first.data)
-        actor.link('OA8', object_.get_linked_entity('P53'))
-    if form.appears_last.data:
-        object_ = EntityMapper.get_by_id(form.appears_last.data)
-        actor.link('OA9', object_.get_linked_entity('P53'))
-    for alias in form.alias.data:
-        if alias.strip():  # check if it isn't empty
-            actor.link('P131', EntityMapper.insert('E82', alias))
-    link_ = None
-    if origin:
-        origin_class = app.config['CODE_CLASS'][origin.class_.code]
-        if origin_class == 'reference':
-            link_ = origin.link('P67', actor)
-        elif origin_class == 'source':
-            origin.link('P67', actor)
-        elif origin_class == 'event':
-            link_ = origin.link('P11', actor)
-        elif origin_class == 'actor':
-            link_ = origin.link('OA7', actor)
-    openatlas.get_cursor().execute('COMMIT')
+    try:
+        if actor:
+            LinkMapper.delete_by_codes(actor, ['P74', 'OA8', 'OA9'])
+            for alias in actor.get_linked_entities('P131'):
+                alias.delete()
+            openatlas.logger.log_user(actor.id, 'update')
+        else:
+            actor = EntityMapper.insert(code, form.name.data)
+            openatlas.logger.log_user(actor.id, 'insert')
+        actor.name = form.name.data
+        actor.description = form.description.data
+        actor.update()
+        actor.save_dates(form)
+        actor.save_nodes(form)
+        if form.residence.data:
+            object_ = EntityMapper.get_by_id(form.residence.data)
+            actor.link('P74', object_.get_linked_entity('P53'))
+        if form.appears_first.data:
+            object_ = EntityMapper.get_by_id(form.appears_first.data)
+            actor.link('OA8', object_.get_linked_entity('P53'))
+        if form.appears_last.data:
+            object_ = EntityMapper.get_by_id(form.appears_last.data)
+            actor.link('OA9', object_.get_linked_entity('P53'))
+        for alias in form.alias.data:
+            if alias.strip():  # check if it isn't empty
+                actor.link('P131', EntityMapper.insert('E82', alias))
+        link_ = None
+        if origin:
+            origin_class = app.config['CODE_CLASS'][origin.class_.code]
+            if origin_class == 'reference':
+                link_ = origin.link('P67', actor)
+            elif origin_class == 'source':
+                origin.link('P67', actor)
+            elif origin_class == 'event':
+                link_ = origin.link('P11', actor)
+            elif origin_class == 'actor':
+                link_ = origin.link('OA7', actor)
+        openatlas.get_cursor().execute('COMMIT')
+    except Exception as e:  # pragma: no cover
+        openatlas.get_cursor().execute('ROLLBACK')
+        openatlas.logger.log('error', 'database', 'transaction failed', e)
     return link_ if link_ else actor

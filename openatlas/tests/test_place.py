@@ -13,16 +13,16 @@ class PlaceTest(TestBaseCase):
         with app.app_context():
             rv = self.app.get(url_for('place_insert'))
             assert b'+ Place' in rv.data
-            form_data = {'name': 'Asgard', 'alias-0': 'Valhöll'}
+            data = {'name': 'Asgard', 'alias-0': 'Valhöll'}
             reference_id = EntityMapper.insert('E84', 'Ancient Books', 'information carrier').id
             rv = self.app.post(
                 url_for('place_insert', origin_id=reference_id),
-                data=form_data,
+                data=data,
                 follow_redirects=True)
             assert b'Asgard' in rv.data
             gis_points = """[{"type":"Feature", "geometry":{"type":"Point", "coordinates":[9,17]},
                     "properties":{"name":"Valhalla","description":"","shapeType":"centerpoint"}}]"""
-            form_data['gis_points'] = gis_points
+            data['gis_points'] = gis_points
             gis_polygons = """[{"geometry":{
                 "coordinates":[[[9.75307425847859,17.8111792731339],
                 [9.75315472474904,17.8110005175436],[9.75333711496205,17.8110873417098],
@@ -30,28 +30,28 @@ class PlaceTest(TestBaseCase):
                 "properties":{"count":4,"description":"","id":8,"name":"",
                 "objectDescription":"","objectId":185,"shapeType":"Shape",
                 "siteType":"Settlement","title":""},"type":"Feature"}]"""
-            form_data['gis_polygons'] = gis_polygons
+            data['gis_polygons'] = gis_polygons
             place_node = NodeMapper.get_hierarchy_by_name('Place')
-            form_data[place_node.id] = place_node.subs
+            data[place_node.id] = place_node.subs
             rv = self.app.post(
                 url_for('place_insert', origin_id=EntityMapper.insert('E33', 'Tha source').id),
-                data=form_data,
+                data=data,
                 follow_redirects=True)
             assert b'Tha source' in rv.data
             places = EntityMapper.get_by_codes('place')
             place_id = places[0].id
             second_place_id = places[1].id
-            form_data['continue_'] = 'yes'
-            rv = self.app.post(url_for('place_insert'), data=form_data, follow_redirects=True)
+            data['continue_'] = 'yes'
+            rv = self.app.post(url_for('place_insert'), data=data, follow_redirects=True)
             assert b'An entry has been created' in rv.data
             rv = self.app.get(url_for('place_index'))
             assert b'Asgard' in rv.data
             rv = self.app.get(url_for('place_update', id_=place_id))
             assert b'Valhalla' in rv.data
-            form_data['continue_'] = ''
-            form_data['alias-1'] = 'Val-hall'
+            data['continue_'] = ''
+            data['alias-1'] = 'Val-hall'
             rv = self.app.post(
-                url_for('place_update', id_=place_id), data=form_data, follow_redirects=True)
+                url_for('place_update', id_=place_id), data=data, follow_redirects=True)
             assert b'Val-hall' in rv.data
             event = EntityMapper.insert('E8', 'Valhalla rising')
             location = LinkMapper.get_linked_entity(second_place_id, 'P53')

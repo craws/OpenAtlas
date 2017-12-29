@@ -8,7 +8,6 @@ from flask import Flask, request, session
 from flask_babel import Babel, _
 from flask_wtf import Form
 from wtforms import StringField, SubmitField
-from wtforms.validators import InputRequired
 
 try:
     import mod_wsgi

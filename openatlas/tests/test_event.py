@@ -1,5 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import url_for
+
 from openatlas import app, EntityMapper
 from openatlas.test_base import TestBaseCase
 
@@ -18,7 +19,6 @@ class EventTest(TestBaseCase):
             rv = self.app.get(url_for('event_insert', code='E7'))
             assert b'+ Activity' in rv.data
             actor_id = EntityMapper.insert('E21', 'Hansi').id
-
             reference_id = EntityMapper.insert('E84', 'Ancient Books', 'information carrier').id
             rv = self.app.post(
                 url_for('event_insert', code='E7', origin_id=reference_id),
@@ -49,28 +49,25 @@ class EventTest(TestBaseCase):
             assert b'An entry has been created' in rv.data
             rv = self.app.get(url_for('event_index'))
             assert b'Test event' in rv.data
-
+            self.app.get(url_for('event_view', id_=activity_id))
             rv = self.app.get(
-                url_for('event_view', id_=actor_id, unlink_id=666),
-                follow_redirects=True)
-            assert b'removed'in rv.data
+                url_for('event_view', id_=actor_id, unlink_id=666), follow_redirects=True)
+            assert b'removed' in rv.data
 
             # event update
             rv = self.app.get(url_for('event_update', id_=activity_id))
             assert b'Test event' in rv.data
             rv = self.app.get(url_for('event_update', id_=event_id))
             assert b'1. Whatever' in rv.data
+            data = {'name': 'Event updated'}
             rv = self.app.post(
-                url_for('event_update', id_=event_id),
-                data={'name': 'Event updated'},
-                follow_redirects=True)
+                url_for('event_update', id_=event_id), data=data, follow_redirects=True)
             assert b'Event updated' in rv.data
 
             # test super event validation
+            data = {'name': 'Event Horizon', 'event': event_id}
             rv = self.app.post(
-                url_for('event_update', id_=event_id),
-                data={'name': 'Event Horizon', 'event': event_id},
-                follow_redirects=True)
+                url_for('event_update', id_=event_id), data=data, follow_redirects=True)
             assert b'error' in rv.data
 
             # delete event

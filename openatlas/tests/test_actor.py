@@ -19,7 +19,7 @@ class ActorTests(TestBaseCase):
             # actor insert
             rv = self.app.get(url_for('actor_insert', code='E21'))
             assert b'+ Person' in rv.data
-            form_data = {
+            data = {
                 'name': 'Sigourney Weaver',
                 'alias-1': 'Ripley',
                 'residence': residence_id,
@@ -32,11 +32,17 @@ class ActorTests(TestBaseCase):
                 'date_end_year': '2049',
                 'date_birth': True,
                 'date_death': True}
-            rv = self.app.post(url_for('actor_insert', code='E21'), data=form_data)
+            rv = self.app.post(url_for('actor_insert', code='E21'), data=data)
             actor_id = rv.location.split('/')[-1]
-            form_data['continue_'] = 'yes'
+            reference_id = EntityMapper.insert('E84', 'Ancient Books', 'information carrier').id
             rv = self.app.post(
-                url_for('actor_insert', code='E21'), data=form_data, follow_redirects=True)
+                url_for('actor_insert', code='E21', origin_id=reference_id),
+                data=data,
+                follow_redirects=True)
+            assert b'An entry has been created' in rv.data
+            data['continue_'] = 'yes'
+            rv = self.app.post(
+                url_for('actor_insert', code='E21'), data=data, follow_redirects=True)
             assert b'An entry has been created' in rv.data
             rv = self.app.get(url_for('actor_index'))
             assert b'Sigourney Weaver' in rv.data
@@ -44,12 +50,12 @@ class ActorTests(TestBaseCase):
             # actor update
             rv = self.app.get(url_for('actor_update', id_=actor_id))
             assert b'American actress' in rv.data
-            form_data['name'] = 'Susan Alexandra Weaver'
-            form_data['date_end_year'] = ''
-            form_data['date_begin_year2'] = '1950'
-            form_data['date_begin_day'] = ''
+            data['name'] = 'Susan Alexandra Weaver'
+            data['date_end_year'] = ''
+            data['date_begin_year2'] = '1950'
+            data['date_begin_day'] = ''
             rv = self.app.post(
-                url_for('actor_update', id_=actor_id), data=form_data, follow_redirects=True)
+                url_for('actor_update', id_=actor_id), data=data, follow_redirects=True)
             assert b'Susan Alexandra Weaver' in rv.data
             rv = self.app.post(
                 url_for('ajax_bookmark'), data={'entity_id': actor_id}, follow_redirects=True)
@@ -61,8 +67,7 @@ class ActorTests(TestBaseCase):
             assert b'Bookmark' in rv.data
 
             rv = self.app.get(
-                url_for('actor_view', id_=actor_id, unlink_id=666),
-                follow_redirects=True)
+                url_for('actor_view', id_=actor_id, unlink_id=666), follow_redirects=True)
             assert b'removed'in rv.data
 
             # actor delete
