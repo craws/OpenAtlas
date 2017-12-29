@@ -48,6 +48,7 @@ def index():
                 entity.last,
                 bookmark_toggle(entity.id, True)])
         for name, count in EntityMapper.get_overview_counts().items():
+            count = count if count else 0
             tables['counts']['data'].append([
                 '<a href="' + url_for(name + '_index') + '">' + uc_first(_(name)) + '</a>', count])
         for entity in EntityMapper.get_latest(8):
@@ -58,11 +59,8 @@ def index():
                 entity.last,
                 format_date(entity.created),
                 openatlas.logger.get_log_for_advanced_view(entity.id)['creator_name']])
-
-    return render_template(
-        'index/index.html',
-        intro=ContentMapper.get_translation('intro'),
-        tables=tables)
+    intro = ContentMapper.get_translation('intro')
+    return render_template('index/index.html', intro=intro, tables=tables)
 
 
 @app.route('/index/setlocale/<language>')

@@ -27,7 +27,7 @@ class GisMapper(object):
                     {shape}.type,
                     public.ST_AsGeoJSON({shape}.geom) AS geojson, {polygon_point_sql}
                     object.name AS object_name,
-                    object.description AS object_description,
+                    object.description AS object_desc,
                     string_agg(CAST(t.range_id AS text), ',') AS types,
                     (SELECT COUNT(*) FROM gis.point point2
                         WHERE {shape}.entity_id = point2.entity_id) AS point_count,
@@ -47,13 +47,14 @@ class GisMapper(object):
             place_type_root_id = openatlas.NodeMapper.get_hierarchy_by_name('Place').id
             for row in cursor.fetchall():
                 description = row.description.replace('"', '\"') if row.description else ''
+                object_desc = row.object_desc.replace('"', '\"') if row.object_desc else ''
                 item = {
                     'type': 'Feature',
                     'geometry': json.loads(row.geojson),
                     'properties': {
                         'title': row.object_name.replace('"', '\"'),
                         'objectId': row.object_id,
-                        'objectDescription': row.object_description.replace('"', '\"'),
+                        'objectDescription': object_desc,
                         'id': row.id,
                         'name': row.name.replace('"', '\"'),
                         'description': description,

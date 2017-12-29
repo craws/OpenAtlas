@@ -206,7 +206,7 @@ def display_form(self, form, form_id=None, for_persons=False):
             html['header'] += '<div class="table-cell">' + str(field(class_=class_)) + errors + '</div></div>'
             continue
         html['main'] += '<div class="table-row"><div>' + str(field.label) + '</div>'
-        html['main'] += '<div class="table-cell">' + str(field(class_=class_)) + errors + '</div></div>'
+        html['main'] += '<div class="table-cell">' + str(field(class_=class_)).replace('> ', '>') + errors + '</div></div>'
 
     html_all = '<form method="post"' + id_attribute + '>' + '<div class="data-table">'
     html_all += html['header'] + html['types'] + html['main'] + html['footer'] + '</div></form>'

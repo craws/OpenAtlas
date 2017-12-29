@@ -94,6 +94,7 @@ def event_delete(id_):
     except Exception as e:  # pragma: no cover
         openatlas.get_cursor().execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
+        flash(_('error transaction'), 'error')
     return redirect(url_for('event_index'))
 
 
@@ -228,4 +229,5 @@ def save(form, event=None, code=None, origin=None):
     except Exception as e:  # pragma: no cover
         openatlas.get_cursor().execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
+        flash(_('error transaction'), 'error')
     return link_ if link_ else event

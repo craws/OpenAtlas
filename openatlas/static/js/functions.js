@@ -95,7 +95,7 @@ function createOverlay(name, title=false, multiple=false, type='table') {
         $('#' + name + '-dialog').dialog({
             position: {my: 'center top', at: 'center top+80', of: window},
             closeText: 'X',
-            title: ucString(title),
+            title: ucString(title).replace('_', ' '),
             closeOnEscape: true,
             width: 'auto',
             height: 'auto',

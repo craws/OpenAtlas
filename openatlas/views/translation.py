@@ -58,6 +58,7 @@ def translation_delete(id_, source_id):
     except Exception as e:  # pragma: no cover
         openatlas.get_cursor().execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
+        flash(_('error transaction'), 'error')
     return redirect(url_for('source_view', id_=source_id))
 
 
@@ -95,4 +96,5 @@ def save(form, entity=None, source=None):
     except Exception as e:  # pragma: no cover
         openatlas.get_cursor().execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
+        flash(_('error transaction'), 'error')
     return entity

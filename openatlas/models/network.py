@@ -12,7 +12,9 @@ class Network(object):
 
     @staticmethod
     def get_network_json(params):
-
+        """
+            Returns JavaScript data string for d3.js
+        """
         classes = []
         for code, param in params['classes'].items():
             if param['active']:
@@ -27,10 +29,11 @@ class Network(object):
         entities = []
         edges = ''
         for row in cursor.fetchall():
-            edges += "{'source': '" + str(row.domain_id)
-            edges += "', 'target': '" + str(row.range_id) + "' },"
-            entities.append(row.domain_id)
-            entities.append(row.range_id)
+            if row.domain_id != row.range_id:  # prevent circular dependencies
+                edges += "{'source': '" + str(row.domain_id)
+                edges += "', 'target': '" + str(row.range_id) + "' },"
+                entities.append(row.domain_id)
+                entities.append(row.range_id)
         edges = " links: [" + edges + "]"
         nodes = ''
         entities_already = []
@@ -38,11 +41,12 @@ class Network(object):
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {'classes': tuple(classes)})
         for row in cursor.fetchall():
-            name = truncate_string(row.name.replace("'", "").replace('Location of ', ''), 40, False)
             if params['options']['orphans'] or row.id in entities:
+                name = row.name.replace("'", "").replace('Location of ', '')
                 entities_already.append(row.id)
-                nodes += "{'id':'" + str(row.id) + "', 'name':'" + name
+                nodes += "{'id':'" + str(row.id) + "', 'name':'" + truncate_string(name, 40, False)
                 nodes += "', 'color':'" + params['classes'][row.class_code]['color'] + "'},"
+
         # Get elements of links which weren't present in class selection
         array_diff = Network.diff(entities, entities_already)
         if array_diff:

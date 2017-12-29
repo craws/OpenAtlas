@@ -84,6 +84,7 @@ def profile_index():
         except Exception as e:  # pragma: no cover
             openatlas.get_cursor().execute('ROLLBACK')
             openatlas.logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
         session['language'] = form.language.data
         return redirect(url_for('profile_index'))
 
@@ -118,6 +119,7 @@ def profile_update():
         except Exception as e:  # pragma: no cover
             openatlas.get_cursor().execute('ROLLBACK')
             openatlas.logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
         return redirect(url_for('profile_index'))
     form.name.data = current_user.real_name
     form.email.data = current_user.email

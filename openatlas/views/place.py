@@ -18,7 +18,7 @@ from openatlas.util.util import (truncate_string, required_group, get_entity_dat
 
 class PlaceForm(DateForm):
     name = StringField(_('name'), [InputRequired()])
-    alias = FieldList(StringField(''))
+    alias = FieldList(StringField(''), description=_('tooltip alias'))
     description = TextAreaField(_('content'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
@@ -130,6 +130,7 @@ def place_delete(id_):
     except Exception as e:
         openatlas.get_cursor().execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
+        flash(_('error transaction'), 'error')
     flash(_('entity deleted'), 'info')
     return redirect(url_for('place_index'))
 
@@ -193,4 +194,5 @@ def save(form, object_=None, location=None, origin=None):
     except Exception as e:  # pragma: no cover
         openatlas.get_cursor().execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
+        flash(_('error transaction'), 'error')
     return link_ if link_ else object_

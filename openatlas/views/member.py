@@ -19,10 +19,23 @@ from openatlas.util.util import required_group
 class MemberForm(DateForm):
     actor = TableMultiField(_('actor'), [InputRequired()])
     group = TableMultiField(_('actor'), [InputRequired()])
+    origin_id = HiddenField()
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
+
+    def validate(self, extra_validators=None):
+        valid = DateForm.validate(self)
+        if hasattr(self, 'actor') and self.actor is not None:
+            if self.origin_id.data in ast.literal_eval(self.actor.data):
+                self.actor.errors.append(_("Can't link to itself."))
+                valid = False
+        if hasattr(self, 'group') and self.group is not None:
+            if self.origin_id.data in ast.literal_eval(self.group.data):
+                self.group.errors.append(_("Can't link to itself."))
+                valid = False
+        return valid
 
 
 @app.route('/membership/insert/<int:origin_id>', methods=['POST', 'GET'])
@@ -31,6 +44,7 @@ def membership_insert(origin_id):
     origin = EntityMapper.get_by_id(origin_id)
     form = build_form(MemberForm, 'Member')
     del form.actor
+    form.origin_id.data = origin.id
     if form.validate_on_submit():
         openatlas.get_cursor().execute('BEGIN')
         try:
@@ -43,6 +57,7 @@ def membership_insert(origin_id):
         except Exception as e:
             openatlas.get_cursor().execute('ROLLBACK')
             openatlas.logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
         if form.continue_.data == 'yes':
             return redirect(url_for('membership_insert', origin_id=origin_id))
         return redirect(url_for('actor_view', id_=origin.id) + '#tab-member-of')
@@ -55,6 +70,7 @@ def member_insert(origin_id):
     origin = EntityMapper.get_by_id(origin_id)
     form = build_form(MemberForm, 'Member')
     del form.group
+    form.origin_id.data = origin.id
     if form.validate_on_submit():
         openatlas.get_cursor().execute('BEGIN')
         try:
@@ -67,6 +83,7 @@ def member_insert(origin_id):
         except Exception as e:  # pragma: no cover
             openatlas.get_cursor().execute('ROLLBACK')
             openatlas.logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
         if form.continue_.data == 'yes':
             return redirect(url_for('member_insert', origin_id=origin_id))
         return redirect(url_for('actor_view', id_=origin.id) + '#tab-member')
@@ -94,6 +111,7 @@ def member_update(id_, origin_id):
         except Exception as e:  # pragma: no cover
             openatlas.get_cursor().execute('ROLLBACK')
             openatlas.logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
         tab = '#tab-member-of' if origin.id == range_.id else '#tab-member'
         return redirect(url_for('actor_view', id_=origin.id) + tab)
     form.save.label.text = _('save')

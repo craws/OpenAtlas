@@ -66,6 +66,11 @@ form input[type="text"].year {
     padding: 0;
 }
 
+#overview-table thead {
+    display: none;
+}
+
+list-style-type: none;
 #global-search {
     font-size: 0.8em;
     margin-right: 0;
@@ -84,7 +89,7 @@ form input[type="text"].year {
 
 span.tooltip {
     font-family: courier new, monospace;
-    padding: 0.1em 0.2em 0 0.2em;
+    padding: 0.2em 0.2em 0 0.1em;
     font-weight: bold;
     border-width: 1px;
     border-style: solid;

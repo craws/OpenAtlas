@@ -18,7 +18,7 @@ from openatlas.util.util import (truncate_string, required_group, get_entity_dat
 
 class ActorForm(DateForm):
     name = StringField(_('name'), [InputRequired()])
-    alias = FieldList(StringField(''))
+    alias = FieldList(StringField(''), description=_('tooltip alias'))
     residence = TableField(_('residence'))
     appears_first = TableField(_('appears first'))
     appears_last = TableField(_('appears last'))
@@ -224,6 +224,7 @@ def actor_delete(id_):
     except Exception as e:  # pragma: no cover
         openatlas.get_cursor().execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
+        flash(_('error transaction'), 'error')
     return redirect(url_for('actor_index'))
 
 
@@ -298,4 +299,5 @@ def save(form, actor=None, code=None, origin=None):
     except Exception as e:  # pragma: no cover
         openatlas.get_cursor().execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
+        flash(_('error transaction'), 'error')
     return link_ if link_ else actor

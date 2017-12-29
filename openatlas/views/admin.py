@@ -10,7 +10,7 @@ import openatlas
 from openatlas import app, EntityMapper, NodeMapper
 from openatlas.models.user import UserMapper
 from openatlas.util.util import (required_group, link, truncate_string, format_datetime, uc_first,
-                                 send_mail)
+                                 send_mail, format_date)
 
 
 class LogForm(Form):
@@ -52,8 +52,8 @@ def admin_orphans(delete=None):
             link(entity.class_),
             entity.print_base_type(),
             entity.system_type,
-            entity.created,
-            entity.modified,
+            format_date(entity.created),
+            format_date(entity.modified),
             truncate_string(entity.description)])
     for node in NodeMapper.get_orphans():
         tables['nodes']['data'].append([link(node), link(openatlas.nodes[node.root[-1]])])

@@ -213,9 +213,10 @@ class TableSelect(HiddenInput):
                 onclick="clearSelect('{name}');">Clear</a>
             <div id="{name}-overlay" class="overlay">
             <div id="{name}-dialog" class="overlay-container">{pager}</div></div>
-            <script>$(document).ready(function () {{createOverlay("{name}");}});</script>
+            <script>$(document).ready(function () {{createOverlay("{name}", "{title}");}});</script>
             """.format(
                 name=field.id,
+                title=_(field.id.replace('_', ' ')),
                 pager=pager(table),
                 selection=selection,
                 clear_style='' if selection else ' style="display: none;" ',
@@ -264,9 +265,13 @@ class TableMultiSelect(HiddenInput):
             <div id="{name}-overlay" class="overlay">
             <div id="{name}-dialog" class="overlay-container">{pager}</div></div>
             <script>
-                $(document).ready(function () {{createOverlay("{name}", "{name}", true);}});
+                $(document).ready(function () {{createOverlay("{name}", "{title}", true);}});
             </script>
-            """.format(name=field.id, selection=selection, pager=pager(table))
+            """.format(
+                name=field.id,
+                title=_(field.id.replace('_', ' ')),
+                selection=selection,
+                pager=pager(table))
         return super(TableMultiSelect, self).__call__(field, **kwargs) + html
 
 

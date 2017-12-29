@@ -116,6 +116,7 @@ def source_add(origin_id):
         except Exception as e:  # pragma: no cover
             openatlas.get_cursor().execute('ROLLBACK')
             openatlas.logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
         view_name = app.config['CODE_CLASS'][origin.class_.code]
         return redirect(url_for(view_name + '_view', id_=origin.id) + '#tab-source')
     form = build_table_form('source', origin.get_linked_entities('P67', True))
@@ -147,6 +148,7 @@ def source_delete(id_):
     except Exception as e:  # pragma: no cover
         openatlas.get_cursor().execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
+        flash(_('error transaction'), 'error')
     return redirect(url_for('source_index'))
 
 
@@ -190,4 +192,5 @@ def save(form, source=None, origin=None):
     except Exception as e:  # pragma: no cover
         openatlas.get_cursor().execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
+        flash(_('error transaction'), 'error')
     return link_ if link_ else source

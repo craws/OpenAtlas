@@ -197,11 +197,12 @@ class EntityMapper(object):
     def get_overview_counts():
         sql = """
             SELECT
-            SUM(CASE WHEN class_code = 'E18' THEN 1 END) AS place,
-            SUM(CASE WHEN class_code = 'E33' THEN 1 END) AS source,
-            SUM(CASE WHEN class_code IN ('E31', 'E84') THEN 1 END) AS reference,
+            SUM(CASE WHEN
+                class_code = 'E33' AND system_type = 'source content' THEN 1 END) AS source,
+            SUM(CASE WHEN class_code IN ('E6', 'E7', 'E8', 'E12') THEN 1 END) AS event,
             SUM(CASE WHEN class_code IN ('E21', 'E74', 'E40') THEN 1 END) AS actor,
-            SUM(CASE WHEN class_code IN ('E6', 'E7', 'E8', 'E12') THEN 1 END) AS event
+            SUM(CASE WHEN class_code = 'E18' THEN 1 END) AS place,
+            SUM(CASE WHEN class_code IN ('E31', 'E84') THEN 1 END) AS reference
             FROM model.entity;"""
         cursor = openatlas.get_cursor()
         cursor.execute(sql)

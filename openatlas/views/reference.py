@@ -178,6 +178,7 @@ def reference_delete(id_):
     except Exception as e:  # pragma: no cover
         openatlas.get_cursor().execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
+        flash(_('error transaction'), 'error')
     return redirect(url_for('reference_index'))
 
 
@@ -221,4 +222,5 @@ def save(form, reference, code=None, origin=None):
     except Exception as e:  # pragma: no cover
         openatlas.get_cursor().execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
+        flash(_('error transaction'), 'error')
     return link_ if link_ else reference

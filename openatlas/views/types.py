@@ -120,6 +120,7 @@ def node_delete(id_):
     except Exception as e:  # pragma: no cover
         openatlas.get_cursor().execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
+        flash(_('error transaction'), 'error')
     root = openatlas.nodes[node.root[-1]] if node.root else None
     if root:
         return redirect(url_for('node_view', id_=root.id))
@@ -195,4 +196,5 @@ def save(form, node=None, root=None):
     except Exception as e:  # pragma: no cover
         openatlas.get_cursor().execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
+        flash(_('error transaction'), 'error')
     return node

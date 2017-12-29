@@ -64,6 +64,7 @@ def involvement_insert(origin_id):
         except Exception as e:  # pragma: no cover
             openatlas.get_cursor().execute('ROLLBACK')
             openatlas.logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
         if form.continue_.data == 'yes':
             return redirect(url_for('involvement_insert', origin_id=origin_id))
         tab = 'actor' if origin_class == 'event' else 'event'
@@ -98,6 +99,7 @@ def involvement_update(id_, origin_id):
         except Exception as e:  # pragma: no cover
             openatlas.get_cursor().execute('ROLLBACK')
             openatlas.logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
         class_ = app.config['CODE_CLASS'][origin.class_.code]
         tab = 'actor' if class_ == 'event' else 'event'
         return redirect(url_for(class_ + '_view', id_=origin.id) + '#tab-' + tab)

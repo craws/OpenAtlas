@@ -111,6 +111,7 @@ def settings_update():
         except Exception as e:  # pragma: no cover
             openatlas.get_cursor().execute('ROLLBACK')
             openatlas.logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
         return redirect(url_for('settings_index'))
     for field in SettingsMapper.fields:
         if field in ['mail_recipients_login', 'mail_recipients_feedback']:
