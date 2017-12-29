@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-27 21:15+0100\n"
-"PO-Revision-Date: 2017-12-27 21:17+0100\n"
+"POT-Creation-Date: 2017-12-29 19:15+0100\n"
+"PO-Revision-Date: 2017-12-29 19:16+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -19,43 +19,43 @@ msgstr ""
 "Generated-By: Babel 2.3.4\n"
 "X-Generator: Poedit 1.8.11\n"
 
-#: __init__.py:110 views/search.py:13
+#: __init__.py:109 views/search.py:13
 msgid "search term"
 msgstr "search term"
 
-#: __init__.py:111 templates/search/index.html:4
+#: __init__.py:110 templates/search/index.html:4
 msgid "search"
 msgstr "search"
 
-#: forms.py:309 util/util.py:184
+#: forms.py:314 util/util.py:184
 msgid "birth"
 msgstr "birth"
 
-#: forms.py:310 util/util.py:186
+#: forms.py:315 util/util.py:186
 msgid "death"
 msgstr "death"
 
-#: forms.py:313 util/util.py:187
+#: forms.py:318 util/util.py:187
 msgid "begin"
 msgstr "begin"
 
-#: forms.py:314 forms.py:323 forms.py:334 forms.py:343
+#: forms.py:319 forms.py:328 forms.py:339 forms.py:348
 msgid "yyyy"
 msgstr "yyyy"
 
-#: forms.py:317 forms.py:326 forms.py:337 forms.py:346
+#: forms.py:322 forms.py:331 forms.py:342 forms.py:351
 msgid "mm"
 msgstr "mm"
 
-#: forms.py:320 forms.py:329 forms.py:340 forms.py:349
+#: forms.py:325 forms.py:334 forms.py:345 forms.py:354
 msgid "dd"
 msgstr "dd"
 
-#: forms.py:331 forms.py:351
+#: forms.py:336 forms.py:356
 msgid "comment"
 msgstr "comment"
 
-#: forms.py:333 util/util.py:188
+#: forms.py:338 util/util.py:188
 msgid "end"
 msgstr "end"
 
@@ -146,9 +146,9 @@ msgid "login"
 msgstr "login"
 
 #: templates/content/update.html:16 templates/map.html:9
-#: templates/settings/update.html:10 util/filters.py:160 views/involvement.py:78
-#: views/member.py:87 views/profile.py:32 views/profile.py:54
-#: views/reference.py:92 views/relation.py:73 views/user.py:29
+#: templates/settings/update.html:10 util/filters.py:160 views/involvement.py:83
+#: views/member.py:117 views/profile.py:32 views/profile.py:60
+#: views/reference.py:92 views/relation.py:94 views/user.py:29
 msgid "save"
 msgstr "save"
 
@@ -164,17 +164,17 @@ msgstr "save"
 #: templates/settings/index.html:8 templates/settings/update.html:5
 #: templates/source/update.html:5 templates/source/view.html:20
 #: templates/translation/update.html:6 templates/translation/view.html:11
-#: templates/types/index.html:43 templates/types/update.html:8
+#: templates/types/index.html:41 templates/types/update.html:8
 #: templates/types/view.html:26 templates/user/update.html:6
 #: templates/user/view.html:10 views/actor.py:77 views/actor.py:107
-#: views/actor.py:131 views/actor.py:148 views/actor.py:166 views/event.py:157
-#: views/event.py:177 views/place.py:93 views/reference.py:131 views/source.py:99
+#: views/actor.py:131 views/actor.py:148 views/actor.py:166 views/event.py:162
+#: views/event.py:182 views/place.py:93 views/reference.py:131 views/source.py:99
 msgid "edit"
 msgstr "edit"
 
 #: templates/map.html:11 templates/translation/view.html:13
-#: templates/translation/view.html:15 templates/types/index.html:45
-#: templates/types/index.html:46 templates/types/view.html:28
+#: templates/translation/view.html:15 templates/types/index.html:43
+#: templates/types/index.html:44 templates/types/view.html:28
 #: templates/types/view.html:29 templates/user/view.html:13
 #: templates/user/view.html:14 util/filters.py:243
 msgid "delete"
@@ -354,7 +354,7 @@ msgid "log"
 msgstr "log"
 
 #: templates/admin/index.html:14 templates/admin/newsletter.html:4
-#: views/profile.py:53 views/profile.py:66
+#: views/profile.py:59 views/profile.py:72
 msgid "newsletter"
 msgstr "newsletter"
 
@@ -382,7 +382,7 @@ msgstr "orphan"
 msgid "unlinked"
 msgstr "Entities without links"
 
-#: templates/admin/orphans.html:11 templates/types/index.html:22
+#: templates/admin/orphans.html:11 templates/types/index.html:21
 #: util/filters.py:177
 msgid "type"
 msgstr "type"
@@ -441,11 +441,11 @@ msgstr "Want a new feature or experience any problems? Tell us about it"
 msgid "network"
 msgstr "network"
 
-#: templates/index/index.html:18 views/user.py:59
+#: templates/index/index.html:18 views/user.py:63
 msgid "last login"
 msgstr "last login"
 
-#: templates/index/index.html:20 views/user.py:60
+#: templates/index/index.html:20 views/user.py:64
 msgid "failed logins"
 msgstr "failed Logins"
 
@@ -493,10 +493,10 @@ msgid "classes"
 msgstr "classes"
 
 #: templates/model/class_view.html:26 templates/model/property_view.html:26
-#: templates/types/index.html:68 util/filters.py:121 views/actor.py:25
+#: templates/types/index.html:66 util/filters.py:121 views/actor.py:25
 #: views/event.py:26 views/hierarchy.py:27 views/index.py:24
-#: views/involvement.py:23 views/member.py:22 views/reference.py:21
-#: views/relation.py:22 views/types.py:19
+#: views/involvement.py:23 views/member.py:23 views/reference.py:21
+#: views/relation.py:23 views/types.py:19
 msgid "description"
 msgstr "description"
 
@@ -591,19 +591,19 @@ msgstr "custom types"
 msgid "places"
 msgstr "places"
 
-#: templates/types/index.html:36 util/util.py:409
+#: templates/types/index.html:34 util/util.py:409
 msgid "filter"
 msgstr "filter"
 
-#: templates/types/index.html:56 views/hierarchy.py:18
+#: templates/types/index.html:54 views/hierarchy.py:18
 msgid "multiple"
 msgstr "multiple"
 
-#: templates/types/index.html:56
+#: templates/types/index.html:54
 msgid "single"
 msgstr "single"
 
-#: templates/types/index.html:60 views/hierarchy.py:20
+#: templates/types/index.html:58 views/hierarchy.py:20
 msgid "forms"
 msgstr "forms"
 
@@ -640,7 +640,7 @@ msgstr "Delete %(name)s?"
 msgid "error mail login"
 msgstr "Couldn't connect to the mail server."
 
-#: util/util.py:53 views/index.py:89
+#: util/util.py:53 views/index.py:87
 msgid "error mail send"
 msgstr "The mail couldn't be sent."
 
@@ -714,11 +714,15 @@ msgid "tooltip date"
 msgstr "You can declare a begin date, an end date or timespans for each of them."
 
 #: views/actor.py:20 views/event.py:22 views/hierarchy.py:17 views/place.py:20
-#: views/profile.py:50 views/profile.py:63 views/reference.py:20
+#: views/profile.py:56 views/profile.py:69 views/reference.py:20
 #: views/source.py:20 views/translation.py:17 views/types.py:17 views/types.py:78
-#: views/types.py:98 views/user.py:26 views/user.py:56
+#: views/types.py:98 views/user.py:26 views/user.py:60
 msgid "name"
 msgstr "name"
+
+#: views/actor.py:21 views/place.py:21
+msgid "tooltip alias"
+msgstr "To add more aliases save and edit again."
 
 #: views/actor.py:22 views/actor.py:47
 msgid "residence"
@@ -733,48 +737,60 @@ msgid "appears last"
 msgstr "appears last"
 
 #: views/actor.py:26 views/event.py:27 views/hierarchy.py:28
-#: views/involvement.py:24 views/member.py:23 views/place.py:23
+#: views/involvement.py:24 views/member.py:24 views/place.py:23
 #: views/reference.py:22 views/reference.py:31 views/reference.py:37
 #: views/reference.py:43 views/reference.py:49 views/reference.py:55
-#: views/relation.py:23 views/source.py:22 views/translation.py:19
+#: views/relation.py:24 views/source.py:22 views/translation.py:19
 #: views/types.py:20
 msgid "insert"
 msgstr "Insert"
 
-#: views/actor.py:27 views/event.py:28 views/involvement.py:25 views/member.py:24
-#: views/place.py:24 views/reference.py:23 views/relation.py:24
+#: views/actor.py:27 views/event.py:28 views/involvement.py:25 views/member.py:25
+#: views/place.py:24 views/reference.py:23 views/relation.py:25
 #: views/source.py:23 views/translation.py:20 views/user.py:30
 msgid "insert and continue"
 msgstr "insert and continue"
 
-#: views/actor.py:39 views/event.py:132 views/place.py:71 views/reference.py:118
+#: views/actor.py:39 views/event.py:137 views/place.py:71 views/reference.py:118
 #: views/source.py:69
 msgid "link removed"
 msgstr "link removed"
 
 #: views/actor.py:195 views/event.py:71 views/hierarchy.py:40
-#: views/involvement.py:62 views/member.py:41 views/member.py:61
-#: views/place.py:50 views/reference.py:160 views/relation.py:43
+#: views/involvement.py:63 views/member.py:56 views/member.py:82
+#: views/place.py:50 views/reference.py:160 views/relation.py:54
 #: views/source.py:50 views/translation.py:31 views/types.py:46
 msgid "entity created"
 msgstr "An entry has been created."
 
-#: views/actor.py:222 views/event.py:92 views/hierarchy.py:78 views/place.py:129
-#: views/reference.py:176 views/source.py:141 views/translation.py:56
-#: views/types.py:118
+#: views/actor.py:223 views/event.py:93 views/hierarchy.py:79 views/place.py:134
+#: views/reference.py:177 views/source.py:147 views/translation.py:57
+#: views/types.py:119
 msgid "entity deleted"
 msgstr "The entry has been deleted."
 
-#: views/actor.py:236 views/event.py:108 views/place.py:143
-#: views/reference.py:188 views/source.py:153
+#: views/actor.py:227 views/actor.py:302 views/event.py:97 views/event.py:232
+#: views/hierarchy.py:83 views/hierarchy.py:103 views/involvement.py:67
+#: views/involvement.py:102 views/member.py:60 views/member.py:86
+#: views/member.py:114 views/place.py:133 views/place.py:197 views/profile.py:87
+#: views/profile.py:122 views/reference.py:181 views/reference.py:225
+#: views/relation.py:58 views/relation.py:90 views/settings.py:114
+#: views/source.py:119 views/source.py:151 views/source.py:195
+#: views/translation.py:61 views/translation.py:99 views/types.py:123
+#: views/types.py:199
+msgid "error transaction"
+msgstr "A transaction error. Please report this."
+
+#: views/actor.py:241 views/event.py:113 views/place.py:148
+#: views/reference.py:193 views/source.py:163
 msgid "error modified"
 msgstr "Update failed."
 
-#: views/actor.py:240 views/content.py:51 views/event.py:112
-#: views/hierarchy.py:59 views/place.py:148 views/profile.py:77
-#: views/profile.py:106 views/reference.py:97 views/reference.py:193
-#: views/settings.py:110 views/source.py:158 views/translation.py:68
-#: views/types.py:63 views/user.py:103
+#: views/actor.py:245 views/content.py:51 views/event.py:117
+#: views/hierarchy.py:59 views/place.py:153 views/profile.py:83
+#: views/profile.py:118 views/reference.py:97 views/reference.py:198
+#: views/relation.py:86 views/settings.py:110 views/source.py:168
+#: views/translation.py:73 views/types.py:63 views/user.py:107
 msgid "info update"
 msgstr "Changes have been saved."
 
@@ -814,7 +830,7 @@ msgstr "To unsubscribe use the link below."
 msgid "Newsletter send"
 msgstr "Newsletter send"
 
-#: views/event.py:42 views/types.py:174
+#: views/event.py:42 views/types.py:180
 msgid "error node self as super"
 msgstr "Type can't have itself as super."
 
@@ -830,17 +846,17 @@ msgstr "Choose in which forms this type will be available."
 msgid "error name exists"
 msgstr "The name is already in use."
 
-#: views/index.py:87
+#: views/index.py:85
 msgid "info feedback thanks"
 msgstr "Thank you for your feedback."
 
-#: views/index.py:127
+#: views/index.py:125
 msgid "unsubscribe link not valid"
 msgstr ""
 "Sorry, but this link seems invalid, You can also unsubscribe from the "
 "newsletter in your profile."
 
-#: views/index.py:133
+#: views/index.py:131
 msgid ""
 "You have successfully unsubscribed. You can subscribe again in your Profile."
 msgstr ""
@@ -850,13 +866,13 @@ msgstr ""
 msgid "activity"
 msgstr "activity"
 
-#: views/login.py:29 views/login.py:145 views/profile.py:62 views/user.py:20
-#: views/user.py:54 views/user.py:132
+#: views/login.py:29 views/login.py:145 views/profile.py:68 views/user.py:20
+#: views/user.py:58 views/user.py:134
 msgid "username"
 msgstr "username"
 
 #: views/login.py:30 views/login.py:146 views/profile.py:29 views/user.py:23
-#: views/user.py:133
+#: views/user.py:135
 msgid "password"
 msgstr "password"
 
@@ -864,8 +880,8 @@ msgstr "password"
 msgid "show password"
 msgstr "show password"
 
-#: views/login.py:36 views/profile.py:51 views/profile.py:64 views/user.py:22
-#: views/user.py:57
+#: views/login.py:36 views/profile.py:57 views/profile.py:70 views/user.py:22
+#: views/user.py:61
 msgid "email"
 msgstr "email"
 
@@ -903,7 +919,7 @@ msgstr "Password reset request for %(sitename)s"
 msgid "We received a password reset request for %(username)s"
 msgstr "We received a password reset request for %(username)s"
 
-#: views/login.py:111 views/login.py:144 views/settings.py:67 views/user.py:131
+#: views/login.py:111 views/login.py:144 views/settings.py:65 views/user.py:133
 msgid "at"
 msgstr "at"
 
@@ -957,11 +973,15 @@ msgstr "Send new password mail to %(email)s."
 msgid "Failed to send password mail to %(email)s."
 msgstr "Failed to send password mail to %(email)s."
 
+#: views/member.py:32 views/member.py:36 views/relation.py:32
+msgid "Can't link to itself."
+msgstr "Can't link to itself."
+
 #: views/place.py:106
 msgid "property"
 msgstr "property"
 
-#: views/profile.py:17 views/user.py:58
+#: views/profile.py:17 views/user.py:62
 msgid "language"
 msgstr "Language"
 
@@ -1004,40 +1024,48 @@ msgstr "repeat password"
 msgid "show passwords"
 msgstr "show passwords"
 
-#: views/profile.py:43 views/profile.py:44 views/user.py:43 views/user.py:44
+#: views/profile.py:43 views/profile.py:44 views/user.py:44 views/user.py:45
 msgid "error passwords must match"
 msgstr "The passwords didn't match."
 
-#: views/profile.py:51
+#: views/profile.py:47
+msgid "error new password like old password"
+msgstr "New password is like old one."
+
+#: views/profile.py:50 views/user.py:48
+msgid "error password too short"
+msgstr "The password is too short."
+
+#: views/profile.py:57
 msgid "tooltip email"
 msgstr ""
 "Providing a valid email is import in case you''ll have to reset your password."
 
-#: views/profile.py:52 views/profile.py:65
+#: views/profile.py:58 views/profile.py:71
 msgid "show email"
 msgstr "show email"
 
-#: views/profile.py:52
+#: views/profile.py:58
 msgid "tooltip show email"
 msgstr "If checked your email can be displayed to other users."
 
-#: views/profile.py:53
+#: views/profile.py:59
 msgid "tooltip newsletter"
 msgstr ""
 "If checked you will receive newsletters approximately once per month about "
 "updates and maintenance downtime."
 
-#: views/profile.py:65 views/profile.py:66 views/settings.py:80
-#: views/settings.py:82 views/settings.py:83 views/settings.py:85
+#: views/profile.py:71 views/profile.py:72 views/settings.py:78
+#: views/settings.py:80 views/settings.py:81 views/settings.py:83
 msgid "on"
 msgstr "on"
 
-#: views/profile.py:65 views/profile.py:66 views/settings.py:80
-#: views/settings.py:82 views/settings.py:83 views/settings.py:85
+#: views/profile.py:71 views/profile.py:72 views/settings.py:78
+#: views/settings.py:80 views/settings.py:81 views/settings.py:83
 msgid "off"
 msgstr "off"
 
-#: views/profile.py:126
+#: views/profile.py:140
 msgid "info password updated"
 msgstr "Your password has been updated."
 
@@ -1066,100 +1094,100 @@ msgstr "test mail receiver"
 msgid "send test mail"
 msgstr "send test mail"
 
-#: views/settings.py:25 views/settings.py:76
+#: views/settings.py:25 views/settings.py:74
 msgid "site name"
 msgstr "site name"
 
-#: views/settings.py:27 views/settings.py:77
+#: views/settings.py:27 views/settings.py:75
 msgid "default language"
 msgstr "default language"
 
-#: views/settings.py:30 views/settings.py:78
+#: views/settings.py:30 views/settings.py:76
 msgid "default table rows"
 msgstr "default table rows"
 
-#: views/settings.py:34 views/settings.py:79
+#: views/settings.py:34 views/settings.py:77
 msgid "log level"
 msgstr "log level"
 
-#: views/settings.py:37 views/settings.py:80
+#: views/settings.py:37 views/settings.py:78
 msgid "debug mode"
 msgstr "debug mode"
 
-#: views/settings.py:38 views/settings.py:81
-msgid "maintenance"
-msgstr "maintenance"
-
-#: views/settings.py:39 views/settings.py:83
-msgid "offline"
-msgstr "offline"
-
-#: views/settings.py:42 views/settings.py:85
+#: views/settings.py:40 views/settings.py:83
 msgid "mail"
 msgstr "email"
 
-#: views/settings.py:43 views/settings.py:86
+#: views/settings.py:41 views/settings.py:84
 msgid "mail transport username"
 msgstr "username"
 
-#: views/settings.py:44 views/settings.py:87
+#: views/settings.py:42 views/settings.py:85
 msgid "mail transport host"
 msgstr "host"
 
-#: views/settings.py:45 views/settings.py:88
+#: views/settings.py:43 views/settings.py:86
 msgid "mail transport port"
 msgstr "port"
 
-#: views/settings.py:46 views/settings.py:89
+#: views/settings.py:44 views/settings.py:87
 msgid "mail from email"
 msgstr "email from"
 
-#: views/settings.py:47 views/settings.py:90
+#: views/settings.py:45 views/settings.py:88
 msgid "mail from name"
 msgstr "from name"
 
-#: views/settings.py:48 views/settings.py:91
+#: views/settings.py:46 views/settings.py:89
 msgid "mail recipients login"
 msgstr "recipients login"
 
-#: views/settings.py:49 views/settings.py:92
+#: views/settings.py:47 views/settings.py:90
 msgid "mail recipients feedback"
 msgstr "recipients feedback"
 
-#: views/settings.py:52 views/settings.py:94
+#: views/settings.py:50 views/settings.py:92
 msgid "random password length"
 msgstr "random password length"
 
-#: views/settings.py:53 views/settings.py:95
+#: views/settings.py:51 views/settings.py:93
 msgid "minimum password length"
 msgstr "minimum password length"
 
-#: views/settings.py:54 views/settings.py:96
+#: views/settings.py:52 views/settings.py:94
 msgid "reset confirm hours"
 msgstr "reset confirm hours"
 
-#: views/settings.py:55 views/settings.py:97
+#: views/settings.py:53 views/settings.py:95
 msgid "failed login tries"
 msgstr "failed logins"
 
-#: views/settings.py:56 views/settings.py:98
+#: views/settings.py:54 views/settings.py:96
 msgid "failed login forget minutes"
 msgstr "Failed login forget minutes"
 
-#: views/settings.py:65
+#: views/settings.py:63
 #, python-format
 msgid "Test mail from %(sitename)s"
 msgstr "Test mail from %(sitename)s"
 
-#: views/settings.py:66
+#: views/settings.py:64
 #, python-format
 msgid "This test mail was sent by %(username)s"
 msgstr "This test mail was sent by %(username)s"
 
-#: views/settings.py:69
+#: views/settings.py:67
 #, python-format
 msgid "A test mail was sent to %(email)s."
 msgstr "A test mail was sent to %(email)s."
+
+#: views/settings.py:79
+msgid "maintenance"
+msgstr "maintenance"
+
+#: views/settings.py:81
+msgid "offline"
+msgstr "offline"
 
 #: views/types.py:90
 msgid "domain"
@@ -1173,7 +1201,7 @@ msgstr "range"
 msgid "count"
 msgstr "count"
 
-#: views/types.py:177
+#: views/types.py:183
 msgid "error node sub as super"
 msgstr "Type can't have a sub as super."
 
@@ -1181,7 +1209,7 @@ msgstr "Type can't have a sub as super."
 msgid "active"
 msgstr "active"
 
-#: views/user.py:21 views/user.py:55
+#: views/user.py:21 views/user.py:59
 msgid "group"
 msgstr "group"
 
@@ -1197,31 +1225,31 @@ msgstr "This username is already in use."
 msgid "error email exists"
 msgstr "This email is already in use."
 
-#: views/user.py:125
+#: views/user.py:127
 msgid "user created"
 msgstr "A user was created."
 
-#: views/user.py:127
+#: views/user.py:129
 #, python-format
 msgid "Your account information for %(sitename)s"
 msgstr "Your account information for %(sitename)s"
 
-#: views/user.py:130
+#: views/user.py:132
 #, python-format
 msgid "Account information for %(username)s"
 msgstr "Account information for %(username)s"
 
-#: views/user.py:136
+#: views/user.py:138
 #, python-format
 msgid "Sent account information mail to %(email)s."
 msgstr "Sent account information mail to %(email)s."
 
-#: views/user.py:139
+#: views/user.py:141
 #, python-format
 msgid "Failed to send account details to %(email)s."
 msgstr "Failed to send account details to %(email)s."
 
-#: views/user.py:166
+#: views/user.py:168
 msgid "user deleted"
 msgstr "A user was deleted."
 
