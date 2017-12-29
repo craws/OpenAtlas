@@ -10,7 +10,7 @@
         <div style="float:left;">
             <p>
                 {{ _('feedback teaser') }}:
-                <a href="{{ url_for('overview_feedback') }}">{{ _('feedback')|uc_first }}</a>
+                <a href="{{ url_for('index_feedback') }}">{{ _('feedback')|uc_first }}</a>
             </p>
             <a href="{{ url_for('model_network') }}">{{ _('network')|uc_first }}</a>
             {% if session['login_previous_success']: %}

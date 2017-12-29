@@ -36,7 +36,7 @@ def send_mail(subject, text, recipients):  # pragma: no cover
         server.login(sender, app.config['MAIL_PASSWORD'])
         for recipient in recipients:
             body = '\r\n'.join([
-                'To: %s' % recipient,
+                'To: %s' % recipient.strip(),
                 'From: %s' % from_,
                 'Subject: %s' % subject,
                 '', text])

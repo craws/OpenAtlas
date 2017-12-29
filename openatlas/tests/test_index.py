@@ -34,7 +34,7 @@ class IndexTests(TestBaseCase):
             self.login()
             rv = self.app.get('/')
             assert b'0' in rv.data
-            rv = self.app.get(url_for('overview_feedback'))
+            rv = self.app.get(url_for('index_feedback'))
             assert b'Thank you' in rv.data
 
             # test reset password, unsubscribe

@@ -39,7 +39,7 @@ class ProfileTests(TestBaseCase):
             assert b'match' in rv.data
             data['password_old'] = new_pass
             rv = self.app.post(url_for('profile_password'), data=data, follow_redirects=True)
-            assert b'like old password' in rv.data
+            assert b'New password is like old one' in rv.data
             data['password'] = 'short'
             rv = self.app.post(url_for('profile_password'), data=data, follow_redirects=True)
             assert b'too short' in rv.data

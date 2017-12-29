@@ -42,7 +42,7 @@ class SettingsMapper(object):
             ]:
                 settings[row.name] = int(row.value)
             elif row.name in ['mail_recipients_login', 'mail_recipients_feedback']:
-                settings[row.name] = row.value.split(', ')
+                settings[row.name] = row.value.split(';')
         return settings
 
     @staticmethod

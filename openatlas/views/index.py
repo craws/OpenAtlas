@@ -74,7 +74,7 @@ def set_locale(language):
 
 @app.route('/overview/feedback', methods=['POST', 'GET'])
 @required_group('readonly')
-def overview_feedback():
+def index_feedback():
     form = FeedbackForm()
     if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
         subject = form.subject.data + ' from ' + session['settings']['site_name']
