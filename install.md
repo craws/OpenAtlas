@@ -1,8 +1,3 @@
-# Important Notice
-
-This is the Python/Flask port of OpenAtlas. It is still in development and not for productive use.
-Use at own risk!
-
 # Installation Notes
 
 Installation with examples from a Debian 9 (Stretch) system.

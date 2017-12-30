@@ -1,18 +1,10 @@
-# Important Notice
-
-This is the Python/Flask port of OpenAtlas. It is still in development and not for productive use.
-
-We estimate that the port will be finished at the end of 2017.
-
-For the current PHP version please take a look at https://github.com/craws/OpenAtlas
-
 # About
 
 OpenAtlas is an open source application for archeological, historical and geospatial data.
 
 Website: http://openatlas.eu/website
 
-Demo: https://openatlas3.craws.net
+Demo: https://openatlas.craws.net
 
 Wiki and issue tracker: https://redmine.craws.net/projects/uni/wiki
 
