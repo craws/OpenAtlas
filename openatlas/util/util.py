@@ -20,7 +20,7 @@ from openatlas.models.property import Property
 from openatlas.models.user import User
 
 
-def send_mail(subject, text, recipients):  # pragma: no cover
+def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
     recipients = recipients if isinstance(recipients, list) else [recipients]
     if not session['settings']['mail'] or len(recipients) < 1:
         return
@@ -42,7 +42,9 @@ def send_mail(subject, text, recipients):  # pragma: no cover
                 '', text])
             server.sendmail(sender, recipient, body)
         message = 'Mail send from for ' + from_ + ' to ' + ', '.join(recipients)
-        message += ' Subject: ' + subject + ' Content: ' + text
+        message += ' Subject: ' + subject
+        # Don't log sensitive data, e.g. passwords
+        message += ' Content: ' + text if log_body else ''
         openatlas.logger.log('info', 'mail', 'Mail send from ' + sender, message)
     except smtplib.SMTPAuthenticationError as e:
         openatlas.logger.log('error', 'mail', 'Error mail login for ' + sender, str(e))

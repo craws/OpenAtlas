@@ -133,7 +133,7 @@ def user_insert():
             body += _('at') + ' ' + request.scheme + '://' + request.headers['Host'] + '\n\n'
             body += uc_first(_('username')) + ': ' + form.username.data + '\n'
             body += uc_first(_('password')) + ': ' + form.password.data + '\n'
-            if send_mail(subject, body, form.email.data):
+            if send_mail(subject, body, form.email.data, False):
                 flash(
                     _('Sent account information mail to %(email)s.', email=form.email.data), 'info')
             else:
