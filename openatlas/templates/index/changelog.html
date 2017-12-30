@@ -18,7 +18,7 @@
                         &#8226 {{ issue_type|uc_first }}
                         <a target="_blank" href="https://redmine.craws.net/issues/{{ issue_number }}">
                             #{{ issue_number }}
-                        </a> {{ issue_text }}<br />
+                        </a> {{ issue_text|safe }}<br />
                     {% else %}
                         {{ issue_text|safe }}
                     {% endif %}
