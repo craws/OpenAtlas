@@ -3,6 +3,8 @@ import re
 import smtplib
 from collections import OrderedDict
 from datetime import timedelta, date, datetime
+from email.header import Header
+from email.mime.text import MIMEText
 from functools import wraps
 
 from babel import dates
@@ -35,12 +37,11 @@ def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
     try:
         server.login(sender, app.config['MAIL_PASSWORD'])
         for recipient in recipients:
-            body = '\r\n'.join([
-                'To: %s' % recipient.strip(),
-                'From: %s' % from_,
-                'Subject: %s' % subject,
-                '', text])
-            server.sendmail(sender, recipient, body)
+            msg = MIMEText(text, 'plain', 'utf-8')
+            msg['From'] = from_
+            msg['To'] = recipient.strip()
+            msg['Subject'] = Header(subject.encode('utf-8'), 'utf-8')
+            server.sendmail(sender, recipient, msg.as_string())
         message = 'Mail send from for ' + from_ + ' to ' + ', '.join(recipients)
         message += ' Subject: ' + subject
         # Don't log sensitive data, e.g. passwords
