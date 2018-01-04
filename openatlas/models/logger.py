@@ -47,7 +47,7 @@ class DBHandler:
 
     @staticmethod
     def delete_all_system_logs():
-        openatlas.get_cursor().execute('TRUNCATE TABLE web.system_log RESTART IDENTITY CASCADE;')
+        openatlas.get_cursor().execute('TRUNCATE TABLE web.system_log RESTART IDENTITY;')
 
     @staticmethod
     def log_user(entity_id, action):

@@ -302,6 +302,7 @@ ALTER TABLE log.log RENAME agent TO info;
 ALTER TABLE log.log SET SCHEMA web;
 ALTER TABLE web.log RENAME TO system_log;
 DROP SCHEMA log;
+TRUNCATE web.system_log RESTART IDENTITY;
 
 DELETE FROM web.user_log WHERE table_name = 'link';
 ALTER TABLE web.user_log DROP COLUMN table_name;
