@@ -26,10 +26,12 @@ class ActorTests(TestBaseCase):
                 'appears_first': residence_id,
                 'appears_last': residence_id,
                 'description': 'Susan Alexandra Weaver is an American actress.',
-                'date_begin_year': '1949',
+                'date_begin_year': '-1949',
                 'date_begin_month': '10',
                 'date_begin_day': '8',
+                'date_begin_year2': '-1948',
                 'date_end_year': '2049',
+                'date_end_year2': '2050',
                 'date_birth': True,
                 'date_death': True}
             rv = self.app.post(url_for('actor_insert', code='E21'), data=data)

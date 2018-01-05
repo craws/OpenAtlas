@@ -1,7 +1,5 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-
-import datetime
-from dateutil.relativedelta import relativedelta
+from astropy.time import Time, TimeDelta
 
 import openatlas
 from openatlas.models.linkProperty import LinkPropertyMapper
@@ -13,7 +11,11 @@ class DateMapper(object):
     @staticmethod
     def get_dates(entity):
         sql = """
-            SELECT e2.value_timestamp, e2.description, e2.system_type, l.property_code
+            SELECT
+                COALESCE(to_char(e2.value_timestamp, 'yyyy-mm-dd bc'), '') AS value_timestamp,
+                e2.description,
+                e2.system_type,
+                l.property_code
             FROM model.entity e
             JOIN model.link l ON e.id = l.domain_id
                 AND l.property_code IN ('OA1', 'OA2', 'OA3', 'OA4', 'OA5', 'OA6')
@@ -26,15 +28,52 @@ class DateMapper(object):
             if row.property_code not in dates:
                 dates[row.property_code] = {}
             dates[row.property_code][row.system_type] = {
-                'timestamp': row.value_timestamp,
+                'date': DateMapper.timestamp_to_astropy(row.value_timestamp),
                 'info': row.description if row.description else ''}
         openatlas.debug_model['div sql'] += 1
         return dates
 
     @staticmethod
+    def timestamp_to_astropy(string):
+        bc_prefix = '-' if 'bc' in string else '+'
+        string = string.split(' ')[0]  # remove bc/ad and time from string
+        string = bc_prefix + '0' + string  # transform to longdate format
+        astropy_date = Time(string, format='fits', out_subfmt='longdate')
+        astropy_date.format = 'iso'
+        return astropy_date
+
+    @staticmethod
+    def astropy_to_timestamp(date):
+        string = str(date).split(' ')[0]  # remove time and rest from string
+        bc = ' BC' if string.startswith('-') else ''
+        parts = string[1:].split('-')
+        string = parts[0].zfill(4) + '-' + parts[1] + '-' + parts[2] + bc
+        return string
+
+    @staticmethod
+    def form_to_astropy(form_date, postfix=''):
+        year = form_date['year' + postfix]
+        if year > 0:
+            year = '+' + format(year, '05d')
+        else:
+            year = format(year, '06d')
+        month = format(form_date['month' + postfix], '02d') if form_date[
+            'month' + postfix] else '01'
+        day = '01'
+        string = year + '-' + month + '-' + day
+        astropy_date = Time(string, format='fits', out_subfmt='longdate')
+        if form_date['day' + postfix]:  # add days to date to prevent errors for e.g. February 31
+            astropy_date += TimeDelta(form_date['day' + postfix] - 1, format='jd')
+        return astropy_date
+
+    @staticmethod
     def get_link_dates(link):
         sql = """
-            SELECT e.value_timestamp, e.description, e.system_type, lp.property_code
+            SELECT
+                COALESCE(to_char(e.value_timestamp, 'yyyy-mm-dd bc'), '') AS value_timestamp,
+                e.description,
+                e.system_type,
+                lp.property_code
             FROM model.link_property lp
             JOIN model.link l ON lp.domain_id = l.id AND lp.property_code IN ('OA5', 'OA6')
             JOIN model.entity e ON lp.range_id = e.id
@@ -46,7 +85,7 @@ class DateMapper(object):
             if row.property_code not in dates:
                 dates[row.property_code] = {}
             dates[row.property_code][row.system_type] = {
-                'timestamp': row.value_timestamp,
+                'date': DateMapper.timestamp_to_astropy(row.value_timestamp),
                 'info': row.description if row.description else ''}
         openatlas.debug_model['div sql'] += 1
         return dates
@@ -88,10 +127,9 @@ class DateMapper(object):
     @staticmethod
     def save_date(id_, form, name, code, link_mapper):
         from openatlas.models.entity import EntityMapper
-        from openatlas.util.util import create_date_from_form
 
         if not getattr(form, 'date_' + name + '_year').data:
-            return
+            return  # return because no year given
         description = getattr(form, 'date_' + name + '_info').data
 
         date = {}  # put date form values in a dictionary
@@ -99,24 +137,15 @@ class DateMapper(object):
             value = getattr(form, 'date_' + name + '_' + item).data
             date[item] = int(value) if value else ''
 
-        if not date['year2'] and date['month'] and date['year']:  # exact date
-            date_from = create_date_from_form(date)
-            exact_date = EntityMapper.insert('E61', '', 'exact date value', description, date_from)
+        if date['year2']:  # time span
+            date_from = DateMapper.form_to_astropy(date)
+            date_from = EntityMapper.insert('E61', '', 'from date value', description, date_from)
+            link_mapper.insert(id_, code, date_from)
+            date_to = DateMapper.form_to_astropy(date, '2')
+            date_to = EntityMapper.insert('E61', '', 'to date value', None, date_to)
+            link_mapper.insert(id_, code, date_to)
+        else:  # exact date
+            date = DateMapper.form_to_astropy(date)
+            exact_date = EntityMapper.insert('E61', '', 'exact date value', description, date)
             link_mapper.insert(id_, code, exact_date)
-            return
-
-        if date['year2']:
-            date_from = create_date_from_form(date)
-            date_to = create_date_from_form(date, '2')
-        else:  # try to guess time spans from incomplete "from date"
-            if date['month'] and not date['day']:
-                date_from = create_date_from_form(date)
-                date_to = (date_from + relativedelta(months=1)) - datetime.timedelta(days=1)
-            else:
-                date_from = create_date_from_form(date)
-                date_to = (date_from + relativedelta(years=1)) - datetime.timedelta(days=1)
-
-        date_from = EntityMapper.insert('E61', '', 'from date value', description, date_from)
-        link_mapper.insert(id_, code, date_from)
-        date_to = EntityMapper.insert('E61', '', 'to date value', None, date_to)
-        link_mapper.insert(id_, code, date_to)
+        return

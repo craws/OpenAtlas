@@ -223,4 +223,5 @@ def save(form, reference, code=None, origin=None):
         openatlas.get_cursor().execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
+        return
     return link_ if link_ else reference

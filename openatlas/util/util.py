@@ -2,11 +2,12 @@
 import re
 import smtplib
 from collections import OrderedDict
-from datetime import timedelta, date, datetime
+from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
 
+from astropy.time import Time
 from babel import dates
 from flask import abort, url_for, request, session, flash
 from flask_login import current_user
@@ -192,13 +193,13 @@ def get_entity_data(entity, location=None):
     for code, label in date_types.items():
         if code in entity.dates:
             if 'exact date value' in entity.dates[code]:
-                html = format_date(entity.dates[code]['exact date value']['timestamp'])
+                html = format_date(entity.dates[code]['exact date value']['date'])
                 html += ' ' + entity.dates[code]['exact date value']['info']
                 data.append((uc_first(label), html))
             else:
                 html = uc_first(_('between')) + ' '
-                html += format_date(entity.dates[code]['from date value']['timestamp'])
-                html += ' and ' + format_date(entity.dates[code]['to date value']['timestamp'])
+                html += format_date(entity.dates[code]['from date value']['date'])
+                html += ' and ' + format_date(entity.dates[code]['to date value']['date'])
                 html += ' ' + entity.dates[code]['from date value']['info']
                 data.append((uc_first(label), html))
 
@@ -315,7 +316,14 @@ def format_datetime(value, format_='medium'):
 
 
 def format_date(value, format_='medium'):
-    return dates.format_date(value, format=format_, locale=session['language']) if value else ''
+    if not value:
+        return ''
+    if isinstance(value, Time):
+        string = str(value).split(' ')[0]
+        if string.startswith('-'):
+            string = string[1:] + ' BC'
+        return string
+    return dates.format_date(value, format=format_, locale=session['language'])
 
 
 def link(entity):
@@ -352,7 +360,7 @@ def link(entity):
             if not entity.root:
                 url = url_for('node_index') + '#tab-' + str(entity.id)
         if entity.class_.code == 'E61':
-            return format_date(entity.timestamp)
+            return entity.name
         if not url:
             return entity.name + ' (' + entity.class_.name + ')'
         return '<a href="' + url + '">' + truncate_string(entity.name) + '</a>'
@@ -371,16 +379,6 @@ def truncate_string(string, length=40, span=True):
     if not span:
         return string[:length] + '..'
     return '<span title="' + string.replace('"', '') + '">' + string[:length] + '..' + '</span>'
-
-
-def create_date_from_form(form_date, postfix=''):
-    date_ = date(
-        form_date['year' + postfix],
-        form_date['month' + postfix] if form_date['month' + postfix] else 1,
-        1)
-    if form_date['day' + postfix]:  # add days to date to prevent errors for e.g. February 31
-        date_ += timedelta(days=form_date['day' + postfix]-1)
-    return date_
 
 
 def pager(table):

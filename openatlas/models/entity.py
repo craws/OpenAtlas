@@ -27,7 +27,6 @@ class Entity(object):
         self.root = None
         self.description = row.description if row.description else ''
         self.system_type = row.system_type
-        self.timestamp = row.value_timestamp if hasattr(row, 'value_timestamp') else None
         self.created = row.created
         self.modified = row.modified
         self.first = int(row.first) if hasattr(row, 'first') and row.first else None
@@ -93,7 +92,7 @@ class EntityMapper(object):
     # Todo: performance - use first and last only for get_by_codes?
     sql = """
         SELECT
-            e.id, e.class_code, e.name, e.description, e.created, e.modified, e.value_timestamp,
+            e.id, e.class_code, e.name, e.description, e.created, e.modified,
             e.value_integer, e.system_type,
             string_agg(CAST(t.range_id AS text), ',') AS types,
             min(date_part('year', d1.value_timestamp)) AS first,
@@ -139,11 +138,12 @@ class EntityMapper(object):
             VALUES (%(name)s, %(system_type)s, %(code)s, %(description)s, %(value_timestamp)s)
             RETURNING id;"""
         params = {
-            'name': date if date else name.strip(),
+            'name': str(date) if date else name.strip(),
             'code': code,
             'system_type': system_type.strip() if system_type else None,
             'description': description.strip() if description else None,
-            'value_timestamp': date}
+            'value_timestamp': DateMapper.astropy_to_timestamp(date) if date else None}
+        print()
         cursor = openatlas.get_cursor()
         cursor.execute(sql, params)
         return EntityMapper.get_by_id(cursor.fetchone()[0])

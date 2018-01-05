@@ -16,11 +16,20 @@ class RelationTests(TestBaseCase):
             # add relationship
             rv = self.app.get(url_for('relation_insert', origin_id=actor_id))
             assert b'Actor Actor Relation' in rv.data
-            data = {'actor': '[' + str(related_id) + ']', 'inverse': True}
+            data = {
+                'actor': '[' + str(related_id) + ']',
+                'inverse': True,
+                'date_begin_year': '-1949',
+                'date_begin_month': '10',
+                'date_begin_day': '8',
+                'date_begin_year2': '-1948',
+                'date_end_year': '2049',
+                'date_end_year2': '2050'}
             rv = self.app.post(
                 url_for('relation_insert', origin_id=actor_id), data=data, follow_redirects=True)
             assert b'The Kurgan' in rv.data
-            data = {'actor': '[' + str(related_id) + ']', 'continue_': 'yes'}
+            data['continue'] = 'yes'
+            data['inverse'] = ''
             rv = self.app.post(
                 url_for('relation_insert', origin_id=actor_id), data=data, follow_redirects=True)
             assert b'The Kurgan' in rv.data
