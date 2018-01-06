@@ -3,14 +3,13 @@ import ast
 
 from flask import flash, render_template, url_for, request
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app
-from openatlas.forms import DateForm, build_form, TableField, TableMultiField
+from openatlas.forms.forms import DateForm, build_form, TableField, TableMultiField
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper, Link
 from openatlas.util.util import (required_group, truncate_string, get_entity_data, uc_first,
@@ -36,7 +35,7 @@ class EventForm(DateForm):
     def validate(self, extra_validators=None):
         """Check if selected super event is allowed"""
         # Todo: also check if super is not a sub event of itself (recursively)
-        valid = Form.validate(self)
+        valid = DateForm.validate(self)
         if self.event.data:
             if str(self.event.data) == str(self.event_id.data):
                 self.event.errors.append(_('error node self as super'))

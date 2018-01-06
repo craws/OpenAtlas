@@ -3,13 +3,12 @@ import ast
 import time
 
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
-from wtforms import IntegerField, StringField, BooleanField, HiddenField
-from wtforms.validators import NumberRange, Optional
+from wtforms import HiddenField
 from wtforms.widgets import HiddenInput
 
 import openatlas
 from openatlas import Entity, app
+from openatlas.forms.date import DateForm
 from openatlas.util.util import uc_first, sanitize, truncate_string, pager, get_base_table_data
 
 
@@ -277,94 +276,3 @@ class TableMultiSelect(HiddenInput):
 
 class TableMultiField(HiddenField):
     widget = TableMultiSelect()
-
-
-class DateForm(Form):
-
-    @staticmethod
-    def format_date(date, part):
-        string = str(date).split(' ')[0]
-        bc = False
-        if string.startswith('-'):
-            bc = True
-            string = string[1:]
-        parts = string.split('-')
-        if part == 'year':
-            return '-' + parts[0] if bc else parts[0]
-        if part == 'month':
-            return parts[1]
-        return parts[2]
-
-    def populate_dates(self, entity):
-        # Todo: write comment, reflect that entity can be a link
-        for code, types in entity.dates.items():
-            if code in ['OA1', 'OA3', 'OA5']:
-                for type_, date in types.items():
-                    if type_ in ['exact date value', 'from date value']:
-                        self.date_begin_year.data = DateForm.format_date(date['date'], 'year')
-                        self.date_begin_month.data = DateForm.format_date(date['date'], 'month')
-                        self.date_begin_day.data = DateForm.format_date(date['date'], 'day')
-                        self.date_begin_info.data = date['info']
-                    else:
-                        self.date_begin_year2.data = DateForm.format_date(date['date'], 'year')
-                        self.date_begin_month2.data = DateForm.format_date(date['date'], 'month')
-                        self.date_begin_day2.data = DateForm.format_date(date['date'], 'day')
-            else:
-                for type_, date in types.items():
-                    if type_ in ['exact date value', 'from date value']:
-                        self.date_end_year.data = DateForm.format_date(date['date'], 'year')
-                        self.date_end_month.data = DateForm.format_date(date['date'], 'month')
-                        self.date_end_day.data = DateForm.format_date(date['date'], 'day')
-                        self.date_end_info.data = date['info']
-                    else:
-                        self.date_end_year2.data = DateForm.format_date(date['date'], 'year')
-                        self.date_end_month2.data = DateForm.format_date(date['date'], 'month')
-                        self.date_end_day2.data = DateForm.format_date(date['date'], 'day')
-            if code == 'OA3':
-                self.date_birth.data = True
-            if code == 'OA4':
-                self.date_death.data = True
-
-    date_birth = BooleanField(uc_first(_('birth')))
-    date_death = BooleanField(uc_first(_('death')))
-
-    date_begin_year = IntegerField(
-        uc_first(_('begin')),
-        render_kw={'placeholder': _('yyyy')},
-        validators=[Optional(), NumberRange(min=-4713)])
-    date_begin_month = IntegerField(
-        render_kw={'placeholder': _('mm')},
-        validators=[Optional(), NumberRange(min=1, max=12)])
-    date_begin_day = IntegerField(
-        render_kw={'placeholder': _('dd')},
-        validators=[Optional(), NumberRange(min=1, max=31)])
-    date_begin_year2 = IntegerField(
-        render_kw={'placeholder': _('yyyy')},
-        validators=[Optional(), NumberRange(min=-4713)])
-    date_begin_month2 = IntegerField(
-        render_kw={'placeholder': _('mm')},
-        validators=[Optional(), NumberRange(min=1, max=12)])
-    date_begin_day2 = IntegerField(
-        render_kw={'placeholder': _('dd')},
-        validators=[Optional(), NumberRange(min=1, max=31)])
-    date_begin_info = StringField(render_kw={'placeholder': _('comment')},)
-    date_end_year = IntegerField(
-        uc_first(_('end')),
-        render_kw={'placeholder': _('yyyy')},
-        validators=[Optional(), NumberRange(min=-4713)])
-    date_end_month = IntegerField(
-        render_kw={'placeholder': _('mm')},
-        validators=[Optional(), NumberRange(min=1, max=12)])
-    date_end_day = IntegerField(
-        render_kw={'placeholder': _('dd')},
-        validators=[Optional(), NumberRange(min=1, max=31)])
-    date_end_year2 = IntegerField(
-        render_kw={'placeholder': _('yyyy')},
-        validators=[Optional(), NumberRange(min=-4713)])
-    date_end_month2 = IntegerField(
-        render_kw={'placeholder': _('mm')},
-        validators=[Optional(), NumberRange(min=1, max=12)])
-    date_end_day2 = IntegerField(
-        render_kw={'placeholder': _('dd')},
-        validators=[Optional(), NumberRange(min=1, max=31)])
-    date_end_info = StringField(render_kw={'placeholder': _('comment')})

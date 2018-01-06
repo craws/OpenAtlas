@@ -8,7 +8,7 @@ from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app
-from openatlas.forms import build_form
+from openatlas.forms.forms import build_form
 from openatlas.models.entity import EntityMapper, Entity
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (link, truncate_string, required_group, get_entity_data, uc_first,

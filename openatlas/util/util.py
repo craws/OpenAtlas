@@ -221,6 +221,20 @@ def get_entity_data(entity, location=None):
 
 
 def add_dates_to_form(form, for_person=False):
+    errors = {}
+    valid_dates = True
+    for field_name in ['date_begin_year', 'date_begin_month', 'date_begin_day',
+                       'date_begin_year2', 'date_begin_month2', 'date_begin_day2',
+                       'date_end_year', 'date_end_month', 'date_end_day',
+                       'date_end_year2', 'date_end_month2', 'date_end_day2']:
+        errors[field_name] = ''
+        if getattr(form, field_name).errors:
+            valid_dates = False
+            errors[field_name] = '<label class="error">'
+            for error in getattr(form, field_name).errors:
+                errors[field_name] += uc_first(error)
+            errors[field_name] += ' </label>'
+    style = '' if valid_dates else ' style="display:table-row" '
     html = """
         <div class="table-row">
             <div>
@@ -230,33 +244,33 @@ def add_dates_to_form(form, for_person=False):
                 <span id="date-switcher" class="button">{show}</span>
             </div>
         </div>""".format(date=uc_first(_('date')), tip=_('tooltip date'), show=uc_first(_('show')))
-    html += '<div class="table-row date-switch">'
+    html += '<div class="table-row date-switch" ' + style + '>'
     html += '<div>' + str(form.date_begin_year.label) + '</div><div class="table-cell">'
-    html += str(form.date_begin_year(class_='year')) + ' '
-    html += str(form.date_begin_month(class_='month')) + ' '
-    html += str(form.date_begin_day(class_='day')) + ' '
+    html += str(form.date_begin_year(class_='year')) + ' ' + errors['date_begin_year'] + ' '
+    html += str(form.date_begin_month(class_='month')) + ' ' + errors['date_begin_month'] + ' '
+    html += str(form.date_begin_day(class_='day')) + ' ' + errors['date_begin_day'] + ' '
     html += str(form.date_begin_info())
     html += '</div></div>'
-    html += '<div class="table-row date-switch">'
+    html += '<div class="table-row date-switch" ' + style + '>'
     html += '<div></div><div class="table-cell">'
-    html += str(form.date_begin_year2(class_='year')) + ' '
-    html += str(form.date_begin_month2(class_='month')) + ' '
-    html += str(form.date_begin_day2(class_='day')) + ' '
+    html += str(form.date_begin_year2(class_='year')) + ' ' + errors['date_begin_year2'] + ' '
+    html += str(form.date_begin_month2(class_='month')) + ' ' + errors['date_begin_month2'] + ' '
+    html += str(form.date_begin_day2(class_='day')) + ' ' + errors['date_begin_day2'] + ' '
     if for_person:
         html += str(form.date_birth) + str(form.date_birth.label)
     html += '</div></div>'
-    html += '<div class="table-row date-switch">'
+    html += '<div class="table-row date-switch" ' + style + '>'
     html += '<div>' + str(form.date_end_year.label) + '</div><div class="table-cell">'
-    html += str(form.date_end_year(class_='year')) + ' '
-    html += str(form.date_end_month(class_='month')) + ' '
-    html += str(form.date_end_day(class_='day')) + ' '
+    html += str(form.date_end_year(class_='year')) + ' ' + errors['date_end_year'] + ' '
+    html += str(form.date_end_month(class_='month')) + ' ' + errors['date_end_month'] + ' '
+    html += str(form.date_end_day(class_='day')) + ' ' + errors['date_end_day'] + ' '
     html += str(form.date_end_info())
     html += '</div></div>'
-    html += '<div class="table-row date-switch">'
+    html += '<div class="table-row date-switch"' + style + '>'
     html += '<div></div><div class="table-cell">'
-    html += str(form.date_end_year2(class_='year')) + ' '
-    html += str(form.date_end_month2(class_='month')) + ' '
-    html += str(form.date_end_day2(class_='day')) + ' '
+    html += str(form.date_end_year2(class_='year')) + ' ' + errors['date_end_year2'] + ' '
+    html += str(form.date_end_month2(class_='month')) + ' ' + errors['date_end_month2'] + ' '
+    html += str(form.date_end_day2(class_='day')) + ' ' + errors['date_end_day2'] + ' '
     if for_person:
         html += str(form.date_death) + str(form.date_death.label)
     html += '</div></div>'

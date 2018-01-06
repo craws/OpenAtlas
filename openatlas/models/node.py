@@ -4,7 +4,7 @@ import ast
 import openatlas
 from collections import OrderedDict
 
-from openatlas.forms import TreeField, TreeMultiField
+from openatlas.forms.forms import TreeField, TreeMultiField
 from openatlas.models.linkProperty import LinkPropertyMapper
 from .entity import Entity, EntityMapper
 

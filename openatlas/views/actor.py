@@ -7,7 +7,7 @@ from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app
-from openatlas.forms import DateForm, build_form, TableField
+from openatlas.forms.forms import DateForm, build_form, TableField
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
 from openatlas.models.link import LinkMapper, Link

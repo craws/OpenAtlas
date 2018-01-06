@@ -133,6 +133,9 @@ class EntityMapper(object):
 
     @staticmethod
     def insert(code, name, system_type=None, description=None, date=None):
+        if not name and not date:  # pragma: no cover
+            openatlas.logger.log('error', 'database', 'Insert entity without name and date')
+            return  # something went wrong so don't insert
         sql = """
             INSERT INTO model.entity (name, system_type, class_code, description, value_timestamp)
             VALUES (%(name)s, %(system_type)s, %(code)s, %(description)s, %(value_timestamp)s)
@@ -142,8 +145,7 @@ class EntityMapper(object):
             'code': code,
             'system_type': system_type.strip() if system_type else None,
             'description': description.strip() if description else None,
-            'value_timestamp': DateMapper.astropy_to_timestamp(date) if date else None}
-        print()
+            'value_timestamp':  DateMapper.astropy_to_timestamp(date) if date else None}
         cursor = openatlas.get_cursor()
         cursor.execute(sql, params)
         return EntityMapper.get_by_id(cursor.fetchone()[0])

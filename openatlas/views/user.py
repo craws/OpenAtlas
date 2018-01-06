@@ -4,7 +4,7 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms.validators import Email, InputRequired, Length
+from wtforms.validators import Email, InputRequired
 from wtforms import (BooleanField, HiddenField, PasswordField, SelectField, StringField,
                      SubmitField, TextAreaField)
 
