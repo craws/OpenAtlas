@@ -5,7 +5,7 @@ import openatlas
 from openatlas import app
 
 
-class ContentMapper(object):
+class ContentMapper:
 
     @staticmethod
     def get_content():

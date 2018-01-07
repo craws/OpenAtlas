@@ -11,7 +11,7 @@ from openatlas.models.date import DateMapper
 from openatlas.models.link import LinkMapper
 
 
-class Entity(object):
+class Entity:
     def __init__(self, row):
         if not row:
             openatlas.logger.log('error', 'model', 'invalid id')
@@ -87,7 +87,7 @@ class Entity(object):
         return name_parts[0]
 
 
-class EntityMapper(object):
+class EntityMapper:
     # Todo: performance - refactor sub selects, get_by_class
     # Todo: performance - use first and last only for get_by_codes?
     sql = """

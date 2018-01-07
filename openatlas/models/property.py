@@ -4,7 +4,7 @@ import openatlas
 from openatlas import app
 
 
-class Property(object):
+class Property:
 
     def __init__(self, row):
         self._comment = ''
@@ -53,7 +53,7 @@ class Property(object):
                 return True
 
 
-class PropertyMapper(object):
+class PropertyMapper:
 
     @staticmethod
     def get_all():

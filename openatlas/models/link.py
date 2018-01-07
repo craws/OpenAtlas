@@ -6,7 +6,7 @@ import openatlas
 from openatlas import app
 
 
-class Link(object):
+class Link:
 
     def __init__(self, row):
         self.id = row.id
@@ -31,7 +31,7 @@ class Link(object):
         self.dates = DateMapper.get_link_dates(self)
 
 
-class LinkMapper(object):
+class LinkMapper:
 
     @staticmethod
     def insert(domain, property_code, range_, description=None):

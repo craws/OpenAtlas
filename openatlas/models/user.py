@@ -56,7 +56,7 @@ class User(UserMixin):
         return False
 
 
-class UserMapper(object):
+class UserMapper:
     sql = """
         SELECT u.id, u.username, u.password, u.active, u.real_name, u.info, u.created, u.modified,
             u.login_last_success, u.login_last_failure, u.login_failed_count, u.password_reset_code,

@@ -3,7 +3,7 @@ import openatlas
 from openatlas.util.util import truncate_string
 
 
-class Network(object):
+class Network:
 
     @staticmethod
     def diff(first, second):

@@ -6,7 +6,7 @@ import openatlas
 from openatlas.util.util import uc_first
 
 
-class GisMapper(object):
+class GisMapper:
 
     @staticmethod
     def get_all(object_ids=None):

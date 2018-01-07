@@ -2,7 +2,7 @@
 import openatlas
 
 
-class LinkPropertyMapper(object):
+class LinkPropertyMapper:
 
     @staticmethod
     def insert(link, property_code, range_):

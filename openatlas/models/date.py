@@ -6,7 +6,7 @@ from openatlas.models.linkProperty import LinkPropertyMapper
 from .link import LinkMapper
 
 
-class DateMapper(object):
+class DateMapper:
 
     @staticmethod
     def get_dates(entity):
