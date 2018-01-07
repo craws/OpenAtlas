@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2017-12-29 19:15+0100\n"
-"PO-Revision-Date: 2017-12-29 19:19+0100\n"
+"POT-Creation-Date: 2018-01-07 15:39+0100\n"
+"PO-Revision-Date: 2018-01-07 15:43+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: de\n"
 "Language-Team: de <LL@li.org>\n"
@@ -27,37 +27,49 @@ msgstr "Suchbegriff"
 msgid "search"
 msgstr "Suche"
 
-#: forms.py:314 util/util.py:184
+#: forms/date.py:66 util/util.py:188
 msgid "birth"
 msgstr "Geburt"
 
-#: forms.py:315 util/util.py:186
+#: forms/date.py:67 util/util.py:190
 msgid "death"
 msgstr "Tod"
 
-#: forms.py:318 util/util.py:187
+#: forms/date.py:70 util/util.py:191
 msgid "begin"
 msgstr "Beginn"
 
-#: forms.py:319 forms.py:328 forms.py:339 forms.py:348
+#: forms/date.py:71 forms/date.py:80 forms/date.py:91 forms/date.py:100
 msgid "yyyy"
 msgstr "jjjj"
 
-#: forms.py:322 forms.py:331 forms.py:342 forms.py:351
+#: forms/date.py:74 forms/date.py:83 forms/date.py:94 forms/date.py:103
 msgid "mm"
 msgstr "mm"
 
-#: forms.py:325 forms.py:334 forms.py:345 forms.py:354
+#: forms/date.py:77 forms/date.py:86 forms/date.py:97 forms/date.py:106
 msgid "dd"
 msgstr "tt"
 
-#: forms.py:336 forms.py:356
+#: forms/date.py:88 forms/date.py:108
 msgid "comment"
 msgstr "Beschreibung"
 
-#: forms.py:338 util/util.py:188
+#: forms/date.py:90 util/util.py:192
 msgid "end"
 msgstr "Ende"
+
+#: forms/date.py:130
+msgid "not a valid date"
+msgstr "Kein gültiges Datum."
+
+#: forms/date.py:141
+msgid "First date cannot be after second."
+msgstr "Erstes Datum kann nicht nach Zweitem liegen."
+
+#: forms/date.py:149 forms/date.py:155
+msgid "Begin dates cannot start after end dates."
+msgstr "Beginn Datums können nicht nach Enddatums liegen."
 
 #: models/link.py:64
 msgid "error link"
@@ -67,15 +79,15 @@ msgstr "Dieser Link ist ungültig"
 msgid "error multiple linked entities found"
 msgstr "Fehler: mehrere verlinkte Entitäten gefunden."
 
-#: models/user.py:211 util/util.py:278
+#: models/user.py:211 util/util.py:296
 msgid "bookmark remove"
 msgstr "Bookmark entfernen"
 
-#: models/user.py:216 util/util.py:276
+#: models/user.py:216 util/util.py:294
 msgid "bookmark"
 msgstr "Bookmark"
 
-#: templates/layout.html:32 util/util.py:228
+#: templates/layout.html:32 util/util.py:246
 msgid "show"
 msgstr "Anzeigen"
 
@@ -105,42 +117,46 @@ msgstr "Version"
 msgid "changelog"
 msgstr "Changelog"
 
-#: templates/layout.html:68 templates/model/class.html:3
+#: templates/layout.html:68 templates/model/network.html:12
+msgid "manual"
+msgstr "Manual"
+
+#: templates/layout.html:69 templates/model/class.html:3
 #: templates/model/class_view.html:3 templates/model/index.html:3
 #: templates/model/property.html:3 templates/model/property_view.html:3
 msgid "model"
 msgstr "Modell"
 
-#: templates/index/credits.html:4 templates/layout.html:69
+#: templates/index/credits.html:4 templates/layout.html:70
 msgid "credits"
 msgstr "Credits"
 
-#: templates/index/contact.html:4 templates/layout.html:70
+#: templates/index/contact.html:4 templates/layout.html:71
 msgid "contact"
 msgstr "Kontakt"
 
-#: templates/layout.html:74
+#: templates/layout.html:75
 msgid "hello"
 msgstr "Hallo"
 
-#: templates/layout.html:75 templates/profile/index.html:3
+#: templates/layout.html:76 templates/profile/index.html:3
 #: templates/profile/password.html:3 templates/profile/update.html:3
 msgid "profile"
 msgstr "Profil"
 
-#: templates/layout.html:80
+#: templates/layout.html:81
 msgid "zoom in"
 msgstr "Schrift vergrößernSchrift vergrößern"
 
-#: templates/layout.html:81
+#: templates/layout.html:82
 msgid "zoom out"
 msgstr "Schrift verkleinern"
 
-#: templates/layout.html:90
+#: templates/layout.html:91
 msgid "logout"
 msgstr "Abmelden"
 
-#: templates/layout.html:92 templates/login/index.html:4
+#: templates/layout.html:93 templates/login/index.html:4
 #: templates/login/reset_password.html:4 views/login.py:32
 msgid "login"
 msgstr "Anmelden"
@@ -167,8 +183,8 @@ msgstr "speichern"
 #: templates/types/index.html:41 templates/types/update.html:8
 #: templates/types/view.html:26 templates/user/update.html:6
 #: templates/user/view.html:10 views/actor.py:77 views/actor.py:107
-#: views/actor.py:131 views/actor.py:148 views/actor.py:166 views/event.py:162
-#: views/event.py:182 views/place.py:93 views/reference.py:131 views/source.py:99
+#: views/actor.py:131 views/actor.py:148 views/actor.py:166 views/event.py:161
+#: views/event.py:181 views/place.py:93 views/reference.py:131 views/source.py:99
 msgid "edit"
 msgstr "bearbeiten"
 
@@ -305,7 +321,7 @@ msgstr "Karte"
 #: templates/place/view.html:69 templates/reference/add.html:5
 #: templates/reference/view.html:32 templates/source/add.html:7
 #: templates/source/add2.html:5 templates/source/view.html:33
-#: templates/source/view.html:49 util/util.py:106
+#: templates/source/view.html:49 util/util.py:110
 msgid "add"
 msgstr "hinzufügen"
 
@@ -496,7 +512,7 @@ msgstr "Klassen"
 
 #: templates/model/class_view.html:26 templates/model/property_view.html:26
 #: templates/types/index.html:66 util/filters.py:121 views/actor.py:25
-#: views/event.py:26 views/hierarchy.py:27 views/index.py:24
+#: views/event.py:25 views/hierarchy.py:27 views/index.py:24
 #: views/involvement.py:23 views/member.py:23 views/reference.py:21
 #: views/relation.py:23 views/types.py:19
 msgid "description"
@@ -542,10 +558,6 @@ msgstr "Falsche Range"
 #: templates/model/index.html:57
 msgid "no check because whitelisted"
 msgstr "Keine Überprüfung da auf Whitelist."
-
-#: templates/model/network.html:13
-msgid "manual"
-msgstr "Manual"
 
 #: templates/place/index.html:3 templates/place/index.html:9
 #: templates/place/insert.html:9 templates/place/insert.html:11
@@ -593,7 +605,7 @@ msgstr "Custom Typen"
 msgid "places"
 msgstr "Orte"
 
-#: templates/types/index.html:34 util/util.py:409
+#: templates/types/index.html:34 util/util.py:424
 msgid "filter"
 msgstr "Filter"
 
@@ -638,85 +650,85 @@ msgstr "Die Auswahl kann im Menüpunkt Nodes bearbeitet werden."
 msgid "Delete %(name)s?"
 msgstr "%(name)s löschen?"
 
-#: util/util.py:49
+#: util/util.py:53
 msgid "error mail login"
 msgstr "Es konnte keine Verbindung zum E-Mail Server hergestellt werden."
 
-#: util/util.py:53 views/index.py:87
+#: util/util.py:57 views/index.py:87
 msgid "error mail send"
 msgstr "Die E-Mail konnte nicht verschickt werden."
 
-#: util/util.py:103 util/util.py:385
+#: util/util.py:107 util/util.py:400
 msgid "no entries"
 msgstr "Keine Einträge"
 
-#: util/util.py:113
+#: util/util.py:117
 #, python-format
 msgid "Remove %(name)s?"
 msgstr "%(name)s entfernen?"
 
-#: util/util.py:114
+#: util/util.py:118
 msgid "remove"
 msgstr "entfernen"
 
-#: util/util.py:144 util/util.py:179
+#: util/util.py:148 util/util.py:183
 msgid "alias"
 msgstr "Alias"
 
-#: util/util.py:150 views/event.py:23
+#: util/util.py:154 views/event.py:22
 msgid "sub event of"
 msgstr "Unter Ereignis von"
 
-#: util/util.py:153 views/event.py:24
+#: util/util.py:157 views/event.py:23
 msgid "location"
 msgstr "Ort"
 
-#: util/util.py:161
+#: util/util.py:165
 msgid "recipient"
 msgstr "Empfänger"
 
-#: util/util.py:167
+#: util/util.py:171
 msgid "donor"
 msgstr "Geber"
 
-#: util/util.py:173
+#: util/util.py:177
 msgid "given place"
 msgstr "Gegebener Ort"
 
-#: util/util.py:183 views/place.py:106
+#: util/util.py:187 views/place.py:106
 msgid "first"
 msgstr "Erstes"
 
-#: util/util.py:185 views/place.py:106
+#: util/util.py:189 views/place.py:106
 msgid "last"
 msgstr "Letztes"
 
-#: util/util.py:196
+#: util/util.py:200
 msgid "between"
 msgstr "zwischen"
 
-#: util/util.py:204 views/place.py:106 views/types.py:78
+#: util/util.py:208 views/place.py:106 views/types.py:78
 msgid "class"
 msgstr "Klasse"
 
-#: util/util.py:209
+#: util/util.py:213
 msgid "created"
 msgstr "erstellt"
 
-#: util/util.py:214
+#: util/util.py:218
 msgid "modified"
 msgstr "geändert"
 
-#: util/util.py:228
+#: util/util.py:246
 msgid "date"
 msgstr "Datum"
 
-#: util/util.py:228
+#: util/util.py:246
 msgid "tooltip date"
 msgstr ""
 "Es kann ein Beginn, ein Ende Datum oder Zeitspannen für jedes angegeben werden."
 
-#: views/actor.py:20 views/event.py:22 views/hierarchy.py:17 views/place.py:20
+#: views/actor.py:20 views/event.py:21 views/hierarchy.py:17 views/place.py:20
 #: views/profile.py:56 views/profile.py:69 views/reference.py:20
 #: views/source.py:20 views/translation.py:17 views/types.py:17 views/types.py:78
 #: views/types.py:98 views/user.py:26 views/user.py:60
@@ -739,7 +751,7 @@ msgstr "Erstes Erscheinen"
 msgid "appears last"
 msgstr "Letztes Erscheinen"
 
-#: views/actor.py:26 views/event.py:27 views/hierarchy.py:28
+#: views/actor.py:26 views/event.py:26 views/hierarchy.py:28
 #: views/involvement.py:24 views/member.py:24 views/place.py:23
 #: views/reference.py:22 views/reference.py:31 views/reference.py:37
 #: views/reference.py:43 views/reference.py:49 views/reference.py:55
@@ -748,50 +760,49 @@ msgstr "Letztes Erscheinen"
 msgid "insert"
 msgstr "Anlegen"
 
-#: views/actor.py:27 views/event.py:28 views/involvement.py:25 views/member.py:25
+#: views/actor.py:27 views/event.py:27 views/involvement.py:25 views/member.py:25
 #: views/place.py:24 views/reference.py:23 views/relation.py:25 views/source.py:23
 #: views/translation.py:20 views/user.py:30
 msgid "insert and continue"
 msgstr "Anlegen und weiter"
 
-#: views/actor.py:39 views/event.py:137 views/place.py:71 views/reference.py:118
+#: views/actor.py:39 views/event.py:136 views/place.py:71 views/reference.py:118
 #: views/source.py:69
 msgid "link removed"
 msgstr "Verbindung gelöscht."
 
-#: views/actor.py:195 views/event.py:71 views/hierarchy.py:40
+#: views/actor.py:195 views/event.py:70 views/hierarchy.py:40
 #: views/involvement.py:63 views/member.py:56 views/member.py:82 views/place.py:50
 #: views/reference.py:160 views/relation.py:54 views/source.py:50
 #: views/translation.py:31 views/types.py:46
 msgid "entity created"
 msgstr "Neuer Eintrag angelegt"
 
-#: views/actor.py:223 views/event.py:93 views/hierarchy.py:79 views/place.py:134
+#: views/actor.py:223 views/event.py:92 views/hierarchy.py:79 views/place.py:134
 #: views/reference.py:177 views/source.py:147 views/translation.py:57
 #: views/types.py:119
 msgid "entity deleted"
 msgstr "Der Eintrag wurde gelöscht."
 
-#: views/actor.py:227 views/actor.py:302 views/event.py:97 views/event.py:232
+#: views/actor.py:227 views/actor.py:302 views/event.py:96 views/event.py:231
 #: views/hierarchy.py:83 views/hierarchy.py:103 views/involvement.py:67
 #: views/involvement.py:102 views/member.py:60 views/member.py:86
-#: views/member.py:114 views/place.py:133 views/place.py:197 views/profile.py:87
+#: views/member.py:114 views/place.py:133 views/place.py:197 views/profile.py:88
 #: views/profile.py:122 views/reference.py:181 views/reference.py:225
 #: views/relation.py:58 views/relation.py:90 views/settings.py:114
 #: views/source.py:119 views/source.py:151 views/source.py:195
 #: views/translation.py:61 views/translation.py:99 views/types.py:123
 #: views/types.py:199
 msgid "error transaction"
-msgstr ""
-"Es gab einen Fehler bei einer Datenbank Transaktion. Bitte melde diesen Fehler."
+msgstr "Es gab einen Datenbank Transaktions Fehler.  Bitte melde diesen Fehler."
 
-#: views/actor.py:241 views/event.py:113 views/place.py:148 views/reference.py:193
+#: views/actor.py:241 views/event.py:112 views/place.py:148 views/reference.py:193
 #: views/source.py:163
 msgid "error modified"
 msgstr "Änderung fehlgeschlagen."
 
-#: views/actor.py:245 views/content.py:51 views/event.py:117 views/hierarchy.py:59
-#: views/place.py:153 views/profile.py:83 views/profile.py:118
+#: views/actor.py:245 views/content.py:51 views/event.py:116 views/hierarchy.py:59
+#: views/place.py:153 views/profile.py:84 views/profile.py:118
 #: views/reference.py:97 views/reference.py:198 views/relation.py:86
 #: views/settings.py:110 views/source.py:168 views/translation.py:73
 #: views/types.py:63 views/user.py:107
@@ -834,7 +845,7 @@ msgstr "Um den Newsletter abzubestellen benütze folgenden Link"
 msgid "Newsletter send"
 msgstr "Newsletter gesendet"
 
-#: views/event.py:42 views/types.py:180
+#: views/event.py:41 views/types.py:180
 msgid "error node self as super"
 msgstr "Der Eintrag kann nicht sich selber als Super wählen."
 
