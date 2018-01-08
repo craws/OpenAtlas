@@ -6,11 +6,7 @@ Replace database role "openatlas" if needed.
 
 ### 3.0.0 to 3.1.0
 
-Install astropy Python library:
-
-apt-get install python3-astropy
-
-Add "WSGIApplicationGroup %{GLOBAL}" to your OpenAtlas apache conf.
+apt-get install python3-numpy
 
 ### 2.4.1 to 3.0.0 Upgrade (PHP to Python upgrade)
 

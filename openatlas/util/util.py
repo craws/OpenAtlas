@@ -1,4 +1,5 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+import numpy
 import re
 import smtplib
 from collections import OrderedDict
@@ -7,7 +8,6 @@ from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
 
-from astropy.time import Time
 from babel import dates
 from flask import abort, url_for, request, session, flash
 from flask_login import current_user
@@ -332,7 +332,7 @@ def format_datetime(value, format_='medium'):
 def format_date(value, format_='medium'):
     if not value:
         return ''
-    if isinstance(value, Time):
+    if isinstance(value, numpy.datetime64):
         string = str(value).split(' ')[0]
         if string.startswith('-'):
             string = string[1:] + ' BC'

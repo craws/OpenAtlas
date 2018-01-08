@@ -120,7 +120,7 @@ class DateForm(Form):
         for name in ['begin', 'end']:
             for postfix in ['', '2']:
                 if fields[name + '_' + 'year' + postfix]:
-                    date = DateMapper.form_to_astropy(
+                    date = DateMapper.form_to_datetime64(
                         fields[name + '_' + 'year' + postfix],
                         fields[name + '_' + 'month' + postfix],
                         fields[name + '_' + 'day' + postfix]

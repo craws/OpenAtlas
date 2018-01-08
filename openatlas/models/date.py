@@ -1,5 +1,5 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from astropy.time import Time
+import numpy
 
 import openatlas
 from openatlas.models.linkProperty import LinkPropertyMapper
@@ -28,56 +28,54 @@ class DateMapper:
             if row.property_code not in dates:
                 dates[row.property_code] = {}
             dates[row.property_code][row.system_type] = {
-                'date': DateMapper.timestamp_to_astropy(row.value_timestamp),
+                'date': DateMapper.timestamp_to_datetime64(row.value_timestamp),
                 'info': row.description if row.description else ''}
         openatlas.debug_model['div sql'] += 1
         return dates
 
     @staticmethod
-    def timestamp_to_astropy(string):
-        """Converts a timestamp string to an astropy time
+    def timestamp_to_datetime64(string):
+        """Converts a timestamp string to a numpy.datetime64
 
         :param string: with the format "yyyy-mm-dd bc"
-        :return: astropy.Time
+        :return: numpy.datetime64
         """
-        bc_prefix = '-' if 'bc' in string else '+'
+        bc_prefix = '-' if 'bc' in string else ''
         string = string.split(' ')[0]  # remove bc/ad and time from string
-        string = bc_prefix + '0' + string  # transform to longdate format
-        astropy_date = Time(string, format='fits', out_subfmt='longdate')
-        astropy_date.format = 'iso'
-        return astropy_date
+        datetime = numpy.datetime64(bc_prefix + string)
+        return datetime
 
     @staticmethod
-    def astropy_to_timestamp(date):
-        """Converts an astropy time to a timestamp string
+    def datetime64_to_timestamp(date):
+        """Converts a numpy.datetime64 to a timestamp string
 
-        :param date: astropy.Time
+        :param date: numpy.datetime64
         :return: string with the format "yyyy-mm-dd bc"
         """
-        string = str(date).split(' ')[0]  # remove time and rest from string
-        bc = ' BC' if string.startswith('-') else ''
-        parts = string[1:].split('-')
-        string = parts[0].zfill(4) + '-' + parts[1] + '-' + parts[2] + bc
+        string = str(date)
+        if string.startswith('-'):
+            string = string[1:] + ' BC'
         return string
 
     @staticmethod
-    def form_to_astropy(year, month, day):
-        """Converts form fields (year, month, day) to an astropy time
+    def form_to_datetime64(year, month, day):
+        """Converts form fields (year, month, day) to a numpy.datetime64
 
         :param year: -4713 to 9999
         :param month: 1 to 12
         :param day: 1 to 31
-        :return: astropy.Time
+        :return: numpy.datetime64
         """
-        year = '+' + format(year, '05d') if year > 0 else format(year, '06d')
+        year = format(year, '03d') if year > 0 else format(year, '04d')
         month = format(month, '02d') if month else '01'
         day = format(day, '02d') if day else '01'
-        string = year + '-' + month + '-' + day
+        string = str(year) + '-' + str(month) + '-' + str(day)
         try:
-            astropy_date = Time(string, format='fits', out_subfmt='longdate')
+            datetime = numpy.datetime64(string)
         except ValueError:
+            print(string)
             return None
-        return astropy_date
+        return datetime
 
     @staticmethod
     def get_link_dates(link):
@@ -103,7 +101,7 @@ class DateMapper:
             if row.property_code not in dates:
                 dates[row.property_code] = {}
             dates[row.property_code][row.system_type] = {
-                'date': DateMapper.timestamp_to_astropy(row.value_timestamp),
+                'date': DateMapper.timestamp_to_datetime64(row.value_timestamp),
                 'info': row.description if row.description else ''}
         openatlas.debug_model['div sql'] += 1
         return dates
@@ -164,13 +162,13 @@ class DateMapper:
             date[item] = int(value) if value else ''
 
         if date['year2']:  # time span
-            date_from = DateMapper.form_to_astropy(date['year'], date['month'], date['day'])
+            date_from = DateMapper.form_to_datetime64(date['year'], date['month'], date['day'])
             date_from = EntityMapper.insert('E61', '', 'from date value', description, date_from)
             link_mapper.insert(id_, code, date_from)
-            date_to = DateMapper.form_to_astropy(date['year2'], date['month2'], date['day2'])
+            date_to = DateMapper.form_to_datetime64(date['year2'], date['month2'], date['day2'])
             date_to = EntityMapper.insert('E61', '', 'to date value', None, date_to)
             link_mapper.insert(id_, code, date_to)
         else:  # exact date
-            date = DateMapper.form_to_astropy(date['year'], date['month'], date['day'])
+            date = DateMapper.form_to_datetime64(date['year'], date['month'], date['day'])
             exact_date = EntityMapper.insert('E61', '', 'exact date value', description, date)
             link_mapper.insert(id_, code, exact_date)

@@ -145,7 +145,7 @@ class EntityMapper:
             'code': code,
             'system_type': system_type.strip() if system_type else None,
             'description': description.strip() if description else None,
-            'value_timestamp':  DateMapper.astropy_to_timestamp(date) if date else None}
+            'value_timestamp':  DateMapper.datetime64_to_timestamp(date) if date else None}
         cursor = openatlas.get_cursor()
         cursor.execute(sql, params)
         return EntityMapper.get_by_id(cursor.fetchone()[0])
