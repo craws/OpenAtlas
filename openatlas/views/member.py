@@ -9,7 +9,7 @@ from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app, NodeMapper
-from openatlas.forms import DateForm, TableMultiField, build_form
+from openatlas.forms.forms import DateForm, TableMultiField, build_form
 from openatlas.models.date import DateMapper
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper

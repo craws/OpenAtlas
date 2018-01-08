@@ -9,7 +9,7 @@ from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app, NodeMapper, EntityMapper
-from openatlas.forms import build_node_form
+from openatlas.forms.forms import build_node_form
 from openatlas.util.util import required_group, sanitize, link, truncate_string
 
 

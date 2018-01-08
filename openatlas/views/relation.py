@@ -4,12 +4,12 @@ import ast
 from flask import flash, render_template, url_for, request
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
-from wtforms import HiddenField, SubmitField, TextAreaField
+from wtforms import HiddenField, SubmitField, TextAreaField, BooleanField
 from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app, NodeMapper
-from openatlas.forms import DateForm, TableMultiField, build_form, BooleanField
+from openatlas.forms.forms import DateForm, TableMultiField, build_form
 from openatlas.models.date import DateMapper
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper

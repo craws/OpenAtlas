@@ -13,11 +13,11 @@ class DBHandler:
         priority = list(log_levels.keys())[list(log_levels.values()).index(priority)]
         if int(session['settings']['log_level']) < priority:
             return
-        info = 'path: {path}, method: {method}, agent: {agent}, info: {info}'.format(
+        info = 'path: {path}, method: {method}, agent: {agent}{info}'.format(
             path=request.path,
             method=request.method,
             agent=request.headers.get('User-Agent'),
-            info=info)
+            info='\n' + str(info) if info else '')
         sql = """
             INSERT INTO web.system_log (priority, type, message, user_id, ip, info)
             VALUES(%(priority)s, %(type)s, %(message)s, %(user_id)s, %(ip)s, %(info)s)
@@ -47,7 +47,7 @@ class DBHandler:
 
     @staticmethod
     def delete_all_system_logs():
-        openatlas.get_cursor().execute('TRUNCATE TABLE web.system_log RESTART IDENTITY CASCADE;')
+        openatlas.get_cursor().execute('TRUNCATE TABLE web.system_log RESTART IDENTITY;')
 
     @staticmethod
     def log_user(entity_id, action):

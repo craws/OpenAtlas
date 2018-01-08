@@ -6,7 +6,7 @@ from flask_login import current_user, login_required
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import BooleanField, PasswordField, SelectField, SubmitField, StringField
-from wtforms.validators import Email, InputRequired, Length
+from wtforms.validators import Email, InputRequired
 
 import openatlas
 from openatlas import app
@@ -80,12 +80,12 @@ def profile_index():
         try:
             user.update_settings()
             openatlas.get_cursor().execute('COMMIT')
+            session['language'] = form.language.data
             flash(_('info update'), 'info')
         except Exception as e:  # pragma: no cover
             openatlas.get_cursor().execute('ROLLBACK')
             openatlas.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        session['language'] = form.language.data
         return redirect(url_for('profile_index'))
 
     form.language.data = user.settings['language']

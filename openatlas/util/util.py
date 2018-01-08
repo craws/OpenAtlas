@@ -2,11 +2,12 @@
 import re
 import smtplib
 from collections import OrderedDict
-from datetime import timedelta, date, datetime
+from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
 
+from astropy.time import Time
 from babel import dates
 from flask import abort, url_for, request, session, flash
 from flask_login import current_user
@@ -192,13 +193,13 @@ def get_entity_data(entity, location=None):
     for code, label in date_types.items():
         if code in entity.dates:
             if 'exact date value' in entity.dates[code]:
-                html = format_date(entity.dates[code]['exact date value']['timestamp'])
+                html = format_date(entity.dates[code]['exact date value']['date'])
                 html += ' ' + entity.dates[code]['exact date value']['info']
                 data.append((uc_first(label), html))
             else:
                 html = uc_first(_('between')) + ' '
-                html += format_date(entity.dates[code]['from date value']['timestamp'])
-                html += ' and ' + format_date(entity.dates[code]['to date value']['timestamp'])
+                html += format_date(entity.dates[code]['from date value']['date'])
+                html += ' and ' + format_date(entity.dates[code]['to date value']['date'])
                 html += ' ' + entity.dates[code]['from date value']['info']
                 data.append((uc_first(label), html))
 
@@ -220,6 +221,20 @@ def get_entity_data(entity, location=None):
 
 
 def add_dates_to_form(form, for_person=False):
+    errors = {}
+    valid_dates = True
+    for field_name in ['date_begin_year', 'date_begin_month', 'date_begin_day',
+                       'date_begin_year2', 'date_begin_month2', 'date_begin_day2',
+                       'date_end_year', 'date_end_month', 'date_end_day',
+                       'date_end_year2', 'date_end_month2', 'date_end_day2']:
+        errors[field_name] = ''
+        if getattr(form, field_name).errors:
+            valid_dates = False
+            errors[field_name] = '<label class="error">'
+            for error in getattr(form, field_name).errors:
+                errors[field_name] += uc_first(error)
+            errors[field_name] += ' </label>'
+    style = '' if valid_dates else ' style="display:table-row" '
     html = """
         <div class="table-row">
             <div>
@@ -229,33 +244,33 @@ def add_dates_to_form(form, for_person=False):
                 <span id="date-switcher" class="button">{show}</span>
             </div>
         </div>""".format(date=uc_first(_('date')), tip=_('tooltip date'), show=uc_first(_('show')))
-    html += '<div class="table-row date-switch">'
+    html += '<div class="table-row date-switch" ' + style + '>'
     html += '<div>' + str(form.date_begin_year.label) + '</div><div class="table-cell">'
-    html += str(form.date_begin_year(class_='year')) + ' '
-    html += str(form.date_begin_month(class_='month')) + ' '
-    html += str(form.date_begin_day(class_='day')) + ' '
+    html += str(form.date_begin_year(class_='year')) + ' ' + errors['date_begin_year'] + ' '
+    html += str(form.date_begin_month(class_='month')) + ' ' + errors['date_begin_month'] + ' '
+    html += str(form.date_begin_day(class_='day')) + ' ' + errors['date_begin_day'] + ' '
     html += str(form.date_begin_info())
     html += '</div></div>'
-    html += '<div class="table-row date-switch">'
+    html += '<div class="table-row date-switch" ' + style + '>'
     html += '<div></div><div class="table-cell">'
-    html += str(form.date_begin_year2(class_='year')) + ' '
-    html += str(form.date_begin_month2(class_='month')) + ' '
-    html += str(form.date_begin_day2(class_='day')) + ' '
+    html += str(form.date_begin_year2(class_='year')) + ' ' + errors['date_begin_year2'] + ' '
+    html += str(form.date_begin_month2(class_='month')) + ' ' + errors['date_begin_month2'] + ' '
+    html += str(form.date_begin_day2(class_='day')) + ' ' + errors['date_begin_day2'] + ' '
     if for_person:
         html += str(form.date_birth) + str(form.date_birth.label)
     html += '</div></div>'
-    html += '<div class="table-row date-switch">'
+    html += '<div class="table-row date-switch" ' + style + '>'
     html += '<div>' + str(form.date_end_year.label) + '</div><div class="table-cell">'
-    html += str(form.date_end_year(class_='year')) + ' '
-    html += str(form.date_end_month(class_='month')) + ' '
-    html += str(form.date_end_day(class_='day')) + ' '
+    html += str(form.date_end_year(class_='year')) + ' ' + errors['date_end_year'] + ' '
+    html += str(form.date_end_month(class_='month')) + ' ' + errors['date_end_month'] + ' '
+    html += str(form.date_end_day(class_='day')) + ' ' + errors['date_end_day'] + ' '
     html += str(form.date_end_info())
     html += '</div></div>'
-    html += '<div class="table-row date-switch">'
+    html += '<div class="table-row date-switch"' + style + '>'
     html += '<div></div><div class="table-cell">'
-    html += str(form.date_end_year2(class_='year')) + ' '
-    html += str(form.date_end_month2(class_='month')) + ' '
-    html += str(form.date_end_day2(class_='day')) + ' '
+    html += str(form.date_end_year2(class_='year')) + ' ' + errors['date_end_year2'] + ' '
+    html += str(form.date_end_month2(class_='month')) + ' ' + errors['date_end_month2'] + ' '
+    html += str(form.date_end_day2(class_='day')) + ' ' + errors['date_end_day2'] + ' '
     if for_person:
         html += str(form.date_death) + str(form.date_death.label)
     html += '</div></div>'
@@ -315,7 +330,14 @@ def format_datetime(value, format_='medium'):
 
 
 def format_date(value, format_='medium'):
-    return dates.format_date(value, format=format_, locale=session['language']) if value else ''
+    if not value:
+        return ''
+    if isinstance(value, Time):
+        string = str(value).split(' ')[0]
+        if string.startswith('-'):
+            string = string[1:] + ' BC'
+        return string
+    return dates.format_date(value, format=format_, locale=session['language'])
 
 
 def link(entity):
@@ -352,7 +374,7 @@ def link(entity):
             if not entity.root:
                 url = url_for('node_index') + '#tab-' + str(entity.id)
         if entity.class_.code == 'E61':
-            return format_date(entity.timestamp)
+            return entity.name
         if not url:
             return entity.name + ' (' + entity.class_.name + ')'
         return '<a href="' + url + '">' + truncate_string(entity.name) + '</a>'
@@ -371,16 +393,6 @@ def truncate_string(string, length=40, span=True):
     if not span:
         return string[:length] + '..'
     return '<span title="' + string.replace('"', '') + '">' + string[:length] + '..' + '</span>'
-
-
-def create_date_from_form(form_date, postfix=''):
-    date_ = date(
-        form_date['year' + postfix],
-        form_date['month' + postfix] if form_date['month' + postfix] else 1,
-        1)
-    if form_date['day' + postfix]:  # add days to date to prevent errors for e.g. February 31
-        date_ += timedelta(days=form_date['day' + postfix]-1)
-    return date_
 
 
 def pager(table):
