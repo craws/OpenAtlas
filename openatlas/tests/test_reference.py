@@ -55,6 +55,14 @@ class ReferenceTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Test reference updated' in rv.data
 
+            # reference link update
+            rv = self.app.post(url_for(
+                'reference_link_update',
+                link_id=batman.get_links('P67', True)[0].id,
+                origin_id=bibliography_id), data={'page': '666'}, follow_redirects=True)
+            assert b'Changes have been saved' in rv.data
+
+            # reference unlink
             rv = self.app.get(url_for('reference_view', id_=bibliography_id, unlink_id=batman.id))
             assert b'removed'in rv.data
 
