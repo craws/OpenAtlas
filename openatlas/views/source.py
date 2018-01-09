@@ -47,6 +47,8 @@ def source_insert(origin_id=None):
         del form.insert_and_continue
     if form.validate_on_submit():
         result = save(form, None, origin)
+        if not result:  # pragma: no cover
+            return render_template('source/insert.html', form=form, origin=origin)
         flash(_('entity created'), 'info')
         if not isinstance(result, Entity):
             return redirect(url_for('reference_link_update', link_id=result, origin_id=origin_id))
@@ -164,8 +166,8 @@ def source_update(id_):
             modifier = openatlas.logger.get_log_for_advanced_view(source.id)['modifier_name']
             return render_template(
                 'source/update.html', form=form, source=source, modifier=modifier)
-        save(form, source)
-        flash(_('info update'), 'info')
+        if save(form, source):
+            flash(_('info update'), 'info')
         return redirect(url_for('source_view', id_=id_))
     return render_template('source/update.html', form=form, source=source)
 

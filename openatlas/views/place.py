@@ -47,6 +47,9 @@ def place_insert(origin_id=None):
         del form.insert_and_continue
     if form.validate_on_submit():
         result = save(form, None, None, origin)
+        if not result:  # pragma: no cover
+            gis_data = GisMapper.get_all()
+            return render_template('place/insert.html', form=form, origin=origin, gis_data=gis_data)
         flash(_('entity created'), 'info')
         if not isinstance(result, Entity):
             return redirect(url_for('reference_link_update', link_id=result, origin_id=origin_id))
@@ -149,8 +152,8 @@ def place_update(id_):
             modifier = openatlas.logger.get_log_for_advanced_view(object_.id)['modifier_name']
             return render_template(
                 'place/update.html', form=form, object_=object_, modifier=modifier)
-        save(form, object_, location)
-        flash(_('info update'), 'info')
+        if save(form, object_, location):
+            flash(_('info update'), 'info')
         return redirect(url_for('place_view', id_=id_))
     for alias in [x.name for x in object_.get_linked_entities('P1')]:
         form.alias.append_entry(alias)

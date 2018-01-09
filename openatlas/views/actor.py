@@ -192,6 +192,8 @@ def actor_insert(code, origin_id=None):
     form = build_form(ActorForm, uc_first(app.config['CODE_CLASS'][code]))
     if form.validate_on_submit():
         result = save(form, None, code, origin)
+        if not result:  # pragma: no cover
+            return render_template('actor/insert.html', form=form, code=code, origin=origin)
         flash(_('entity created'), 'info')
         if isinstance(result, Link) and result.property_code == 'P67':
             return redirect(url_for('reference_link_update', link_id=result, origin_id=origin_id))
@@ -241,8 +243,8 @@ def actor_update(id_):
             flash(_('error modified'), 'error')
             modifier = openatlas.logger.get_log_for_advanced_view(actor.id)['modifier_name']
             return render_template('actor/update.html', form=form, actor=actor, modifier=modifier)
-        save(form, actor)
-        flash(_('info update'), 'info')
+        if save(form, actor):
+            flash(_('info update'), 'info')
         return redirect(url_for('actor_view', id_=id_))
     residence = actor.get_linked_entity('P74')
     form.residence.data = residence.get_linked_entity('P53', True).id if residence else ''

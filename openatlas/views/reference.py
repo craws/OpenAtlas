@@ -157,6 +157,8 @@ def reference_insert(code, origin_id=None):
         del form.insert_and_continue
     if form.validate_on_submit():
         result = save(form, None, code, origin)
+        if not result:  # pragma: no cover
+            return render_template('reference/insert.html', form=form, code=code, origin=origin)
         flash(_('entity created'), 'info')
         if origin:
             return redirect(url_for('reference_link_update', link_id=result, origin_id=origin_id))
@@ -194,8 +196,8 @@ def reference_update(id_):
             modifier = openatlas.logger.get_log_for_advanced_view(reference.id)['modifier_name']
             return render_template(
                 'reference/update.html', form=form, reference=reference, modifier=modifier)
-        save(form, reference)
-        flash(_('info update'), 'info')
+        if save(form, reference):
+            flash(_('info update'), 'info')
         return redirect(url_for('reference_view', id_=id_))
     return render_template('reference/update.html', form=form, reference=reference)
 

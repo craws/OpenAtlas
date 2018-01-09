@@ -67,6 +67,8 @@ def event_insert(code, origin_id=None):
         del form.insert_and_continue
     if form.validate_on_submit():
         result = save(form, None, code, origin)
+        if not result:  # pragma: no cover
+            return render_template('event/insert.html', form=form, code=code, origin=origin)
         flash(_('entity created'), 'info')
         if isinstance(result, Link) and result.property_code == 'P67':
             return redirect(url_for('reference_link_update', link_id=result, origin_id=origin_id))
@@ -112,8 +114,8 @@ def event_update(id_):
             flash(_('error modified'), 'error')
             modifier = openatlas.logger.get_log_for_advanced_view(event.id)['modifier_name']
             return render_template('event/update.html', form=form, event=event, modifier=modifier)
-        save(form, event)
-        flash(_('info update'), 'info')
+        if save(form, event):
+            flash(_('info update'), 'info')
         return redirect(url_for('event_view', id_=id_))
     super_event = event.get_linked_entity('P117')
     form.event.data = super_event.id if super_event else ''
