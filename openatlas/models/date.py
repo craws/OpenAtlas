@@ -12,7 +12,7 @@ class DateMapper:
     def get_dates(entity):
         sql = """
             SELECT
-                COALESCE(to_char(e2.value_timestamp, 'yyyy-mm-dd bc'), '') AS value_timestamp,
+                COALESCE(to_char(e2.value_timestamp, 'yyyy-mm-dd BC'), '') AS value_timestamp,
                 e2.description,
                 e2.system_type,
                 l.property_code
@@ -37,12 +37,14 @@ class DateMapper:
     def timestamp_to_datetime64(string):
         """Converts a timestamp string to a numpy.datetime64
 
-        :param string: with the format "yyyy-mm-dd bc"
+
+        :param string: PostgreSQL timestamp
         :return: numpy.datetime64
         """
-        bc_prefix = '-' if 'bc' in string else ''
-        string = string.split(' ')[0]  # remove bc/ad and time from string
-        datetime = numpy.datetime64(bc_prefix + string)
+        if 'BC' in string:
+            parts = string.split(' ')[0].split('-')
+            string = '-' + str(int(parts[0]) - 1) + '-' + parts[1] + '-' + parts[2]
+        datetime = numpy.datetime64(string.split(' ')[0])
         return datetime
 
     @staticmethod
@@ -50,12 +52,19 @@ class DateMapper:
         """Converts a numpy.datetime64 to a timestamp string
 
         :param date: numpy.datetime64
-        :return: string with the format "yyyy-mm-dd bc"
+        :return: PostgreSQL timestamp
         """
         string = str(date)
-        if string.startswith('-'):
-            string = string[1:] + ' BC'
-        return string
+        postfix = ''
+        if string.startswith('-'):  #
+            string = string[1:]
+            postfix = ' BC'
+        parts = string.split('-')
+        year = int(parts[0]) + 1 if postfix else int(parts[0])
+        month = int(parts[1])
+        day = int(parts[2])
+        string = format(year, '04d') + '-' + format(month, '02d') + '-' + format(day, '02d')
+        return string + postfix
 
     @staticmethod
     def form_to_datetime64(year, month, day):
@@ -66,14 +75,13 @@ class DateMapper:
         :param day: 1 to 31
         :return: numpy.datetime64
         """
-        year = format(year, '03d') if year > 0 else format(year, '04d')
+        year = format(year, '03d') if year > 0 else format(year +1, '04d')
         month = format(month, '02d') if month else '01'
         day = format(day, '02d') if day else '01'
         string = str(year) + '-' + str(month) + '-' + str(day)
         try:
             datetime = numpy.datetime64(string)
         except ValueError:
-            print(string)
             return None
         return datetime
 
@@ -86,7 +94,7 @@ class DateMapper:
         """
         sql = """
             SELECT
-                COALESCE(to_char(e.value_timestamp, 'yyyy-mm-dd bc'), '') AS value_timestamp,
+                COALESCE(to_char(e.value_timestamp, 'yyyy-mm-dd BC'), '') AS value_timestamp,
                 e.description,
                 e.system_type,
                 lp.property_code

@@ -18,6 +18,7 @@ from werkzeug.utils import redirect
 import openatlas
 from openatlas import app
 from openatlas.models.classObject import ClassObject
+from openatlas.models.date import DateMapper
 from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.property import Property
 from openatlas.models.user import User
@@ -333,10 +334,7 @@ def format_date(value, format_='medium'):
     if not value:
         return ''
     if isinstance(value, numpy.datetime64):
-        string = str(value).split(' ')[0]
-        if string.startswith('-'):
-            string = string[1:] + ' BC'
-        return string
+        return DateMapper.datetime64_to_timestamp(value)
     return dates.format_date(value, format=format_, locale=session['language'])
 
 

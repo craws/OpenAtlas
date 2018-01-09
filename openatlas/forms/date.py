@@ -12,7 +12,7 @@ class DateForm(Form):
 
     @staticmethod
     def format_date(date, part):
-        """Formats a part of date for filling form fields
+        """If it's a negative year, add one year
 
         :param date: a date string
         :param part: year, month or day
@@ -25,7 +25,7 @@ class DateForm(Form):
             string = string[1:]
         parts = string.split('-')
         if part == 'year':
-            return '-' + parts[0] if bc else parts[0]
+            return '-' + str(int(parts[0]) + 1) if bc else parts[0]
         if part == 'month':
             return parts[1]
         return parts[2]
