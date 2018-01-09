@@ -2,7 +2,7 @@
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from wtforms import IntegerField, StringField, BooleanField
-from wtforms.validators import NumberRange, Optional
+from wtforms.validators import NumberRange, Optional, NoneOf
 
 from openatlas.models.date import DateMapper
 from openatlas.util.util import uc_first
@@ -20,7 +20,7 @@ class DateForm(Form):
         """
         string = str(date).split(' ')[0]
         bc = False
-        if string.startswith('-'):
+        if string.startswith('-') or string.startswith('0000'):
             bc = True
             string = string[1:]
         parts = string.split('-')
@@ -69,7 +69,7 @@ class DateForm(Form):
     date_begin_year = IntegerField(
         uc_first(_('begin')),
         render_kw={'placeholder': _('yyyy')},
-        validators=[Optional(), NumberRange(min=-4713, max=9999)])
+        validators=[Optional(), NumberRange(min=-4713, max=9999), NoneOf([0])])
     date_begin_month = IntegerField(
         render_kw={'placeholder': _('mm')},
         validators=[Optional(), NumberRange(min=1, max=12)])
@@ -78,7 +78,7 @@ class DateForm(Form):
         validators=[Optional(), NumberRange(min=1, max=31)])
     date_begin_year2 = IntegerField(
         render_kw={'placeholder': _('yyyy')},
-        validators=[Optional(), NumberRange(min=-4713, max=9999)])
+        validators=[Optional(), NumberRange(min=-4713, max=9999), NoneOf([0])])
     date_begin_month2 = IntegerField(
         render_kw={'placeholder': _('mm')},
         validators=[Optional(), NumberRange(min=1, max=12)])
@@ -89,7 +89,7 @@ class DateForm(Form):
     date_end_year = IntegerField(
         uc_first(_('end')),
         render_kw={'placeholder': _('yyyy')},
-        validators=[Optional(), NumberRange(min=-4713, max=9999)])
+        validators=[Optional(), NumberRange(min=-4713, max=9999), NoneOf([0])])
     date_end_month = IntegerField(
         render_kw={'placeholder': _('mm')},
         validators=[Optional(), NumberRange(min=1, max=12)])
@@ -98,7 +98,7 @@ class DateForm(Form):
         validators=[Optional(), NumberRange(min=1, max=31)])
     date_end_year2 = IntegerField(
         render_kw={'placeholder': _('yyyy')},
-        validators=[Optional(), NumberRange(min=-4713, max=9999)])
+        validators=[Optional(), NumberRange(min=-4713, max=9999), NoneOf([0])])
     date_end_month2 = IntegerField(
         render_kw={'placeholder': _('mm')},
         validators=[Optional(), NumberRange(min=1, max=12)])

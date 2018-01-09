@@ -47,8 +47,8 @@ $(document).ready(function () {
     });
     $.validator.addClassRules({
         year: {number: true, min: -4713, max: 9999},
-        month: {digits: true, max: 12},
-        day: {digits: true, max: 31}
+        month: {digits: true, min: 1, max: 12},
+        day: {digits: true, min: 1, max: 31}
     });
     $("form").each(function () {
         $(this).validate();

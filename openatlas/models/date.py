@@ -56,7 +56,7 @@ class DateMapper:
         """
         string = str(date)
         postfix = ''
-        if string.startswith('-'):  #
+        if string.startswith('-') or string.startswith('0000'):
             string = string[1:]
             postfix = ' BC'
         parts = string.split('-')
@@ -75,7 +75,7 @@ class DateMapper:
         :param day: 1 to 31
         :return: numpy.datetime64
         """
-        year = format(year, '03d') if year > 0 else format(year +1, '04d')
+        year = format(year, '03d') if year > 0 else format(year + 1, '04d')
         month = format(month, '02d') if month else '01'
         day = format(day, '02d') if day else '01'
         string = str(year) + '-' + str(month) + '-' + str(day)
