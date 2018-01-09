@@ -1,5 +1,5 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import flash, session
+from flask import abort, flash, session
 from flask_babel import lazy_gettext as _
 
 import openatlas
@@ -40,8 +40,6 @@ class LinkMapper:
         range_ = range_ if isinstance(range_, list) else [range_]
         result = None
         for range_ in range_:
-            if not range_:
-                continue
             domain_id = domain if isinstance(domain, int) else domain.id
             range_id = range_ if isinstance(range_, int) else range_.id
             if 'settings' in session and session['settings']['debug_mode']:  # pragma: no cover
@@ -171,8 +169,8 @@ class LinkMapper:
     @staticmethod
     def delete_by_id(id_):
         from openatlas.util.util import is_authorized
-        if not is_authorized('editor'):
-            return
+        if not is_authorized('editor'):  # pragma: no cover
+            abort(403)
         openatlas.get_cursor().execute("DELETE FROM model.link WHERE id = %(id)s;", {'id': id_})
 
     @staticmethod

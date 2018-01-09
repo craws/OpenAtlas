@@ -113,7 +113,7 @@ def reference_link_update(link_id, origin_id):
 @required_group('readonly')
 def reference_view(id_, unlink_id=None):
     reference = EntityMapper.get_by_id(id_)
-    if unlink_id and is_authorized('editor'):
+    if unlink_id:
         LinkMapper.delete_by_id(unlink_id)
         flash(_('link removed'), 'info')
     tables = {'info': get_entity_data(reference)}

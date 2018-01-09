@@ -133,7 +133,7 @@ def event_update(id_):
 @required_group('readonly')
 def event_view(id_, unlink_id=None):
     event = EntityMapper.get_by_id(id_)
-    if unlink_id and is_authorized('editor'):
+    if unlink_id:
         LinkMapper.delete_by_id(unlink_id)
         flash(_('link removed'), 'info')
     event.set_dates()

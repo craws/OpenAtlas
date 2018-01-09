@@ -66,7 +66,7 @@ def source_insert(origin_id=None):
 @required_group('readonly')
 def source_view(id_, unlink_id=None):
     source = EntityMapper.get_by_id(id_)
-    if unlink_id and is_authorized('editor'):
+    if unlink_id:
         LinkMapper.delete_by_id(unlink_id)
         flash(_('link removed'), 'info')
     tables = {
@@ -173,6 +173,7 @@ def source_update(id_):
 
 
 def save(form, source=None, origin=None):
+    link_ = None
     openatlas.get_cursor().execute('BEGIN')
     try:
         if source:
@@ -184,7 +185,6 @@ def save(form, source=None, origin=None):
         source.description = form.description.data
         source.update()
         source.save_nodes(form)
-        link_ = None
         if origin:
             if origin.class_.code in app.config['CLASS_CODES']['reference']:
                 link_ = origin.link('P67', source)

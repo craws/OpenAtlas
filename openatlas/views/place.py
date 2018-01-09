@@ -69,7 +69,7 @@ def place_insert(origin_id=None):
 @required_group('readonly')
 def place_view(id_, unlink_id=None):
     object_ = EntityMapper.get_by_id(id_)
-    if unlink_id and is_authorized('editor'):
+    if unlink_id:
         LinkMapper.delete_by_id(unlink_id)
         flash(_('link removed'), 'info')
     object_.set_dates()
