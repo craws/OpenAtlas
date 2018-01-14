@@ -8,18 +8,17 @@ class Changelog:
     """
     versions = OrderedDict()
     versions['3.1.0'] = {
-            'date': 'TBA',
+            'date': '2018-01-18',
             'data': OrderedDict(
                 feature=OrderedDict([
                     ('863', 'BC dates and date validation'),
-                    ('732', 'Documentation')]))}
+                    ('780', 'Color Schemes')]))}
     versions['3.0.0'] = {
         'date': '2017-12-31',
         'data': OrderedDict(
             feature=OrderedDict([
                 ('877', '''Python/Flask Port
-                <p>The OpenAtlas Python port includes many new features, fixes and changes.<br />
-                Some of them are listed below.</p>
+                <p>This version includes many new features and changes. Some are listed below.</p>
 
                 <p style="font-weight:bold">User Interface and Usability</p>
                 &#8226 Performance improvements<br />

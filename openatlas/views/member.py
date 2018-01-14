@@ -54,7 +54,7 @@ def membership_insert(origin_id):
                 NodeMapper.save_link_nodes(link_id, form)
             openatlas.get_cursor().execute('COMMIT')
             flash(_('entity created'), 'info')
-        except Exception as e:
+        except Exception as e:  # pragma: no cover
             openatlas.get_cursor().execute('ROLLBACK')
             openatlas.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')

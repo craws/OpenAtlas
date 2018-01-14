@@ -60,12 +60,6 @@ def data_table(self, data):
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def format_date(self, value):
-    return util.format_date(value)
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
 def bookmark_toggle(self, entity_id):
     return util.bookmark_toggle(entity_id)
 

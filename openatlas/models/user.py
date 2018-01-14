@@ -109,8 +109,6 @@ class UserMapper:
 
     @staticmethod
     def get_by_unsubscribe_code(code):
-        if not code:
-            return
         cursor = openatlas.get_cursor()
         cursor.execute(UserMapper.sql + ' WHERE u.unsubscribe_code = %(code)s;', {'code': code})
         return User(cursor.fetchone()) if cursor.rowcount == 1 else None

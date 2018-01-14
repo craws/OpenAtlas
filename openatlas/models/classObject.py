@@ -28,9 +28,10 @@ class ClassObject:
         locale_default = session['settings']['default_language']
         if locale_session in self.i18n and attribute in self.i18n[locale_session]:
             return self.i18n[locale_session][attribute]
-        elif locale_default in self.i18n and attribute in self.i18n[locale_default]:
-            return self.i18n[locale_default][attribute]
-        return getattr(self, '_' + attribute)
+        elif locale_default in self.i18n:  # pragma: no cover
+            if attribute in self.i18n[locale_default]:
+                return self.i18n[locale_default][attribute]
+        return getattr(self, '_' + attribute)  # pragma: no cover
 
 
 class ClassMapper:

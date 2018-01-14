@@ -189,7 +189,8 @@ def actor_index():
 @required_group('editor')
 def actor_insert(code, origin_id=None):
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
-    form = build_form(ActorForm, uc_first(app.config['CODE_CLASS'][code]))
+    code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
+    form = build_form(ActorForm, code_class[code])
     if form.validate_on_submit():
         result = save(form, None, code, origin)
         if not result:  # pragma: no cover
@@ -235,8 +236,8 @@ def actor_delete(id_):
 def actor_update(id_):
     actor = EntityMapper.get_by_id(id_)
     actor.set_dates()
-    forms = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
-    form = build_form(ActorForm, forms[actor.class_.code], actor, request)
+    code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
+    form = build_form(ActorForm, code_class[actor.class_.code], actor, request)
     if form.validate_on_submit():
         if was_modified(form, actor):  # pragma: no cover
             del form.save

@@ -14,9 +14,9 @@ class ProfileTests(TestBaseCase):
             # test profile update
             rv = self.app.get(url_for('profile_index'))
             assert b'alice@umbrella.net' in rv.data
-            data = {'language': 'en', 'table_rows': '100', 'layout': 'advanced'}
+            data = {'language': 'en', 'table_rows': '100', 'layout': 'advanced', 'theme': 'default'}
             rv = self.app.post(url_for('profile_index'), data=data, follow_redirects=True)
-            assert b'100' in rv.data
+            assert b'saved' in rv.data
             rv = self.app.get(url_for('profile_update'))
             assert b'Newsletter' in rv.data
             data = {
