@@ -19,7 +19,7 @@ from openatlas.util.util import (truncate_string, required_group, get_entity_dat
 class PlaceForm(DateForm):
     name = StringField(_('name'), [InputRequired()])
     alias = FieldList(StringField(''), description=_('tooltip alias'))
-    description = TextAreaField(_('content'))
+    description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
     gis_points = HiddenField()
