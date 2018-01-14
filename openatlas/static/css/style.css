@@ -4,6 +4,11 @@ html, body, input, select, textarea {
     font-family: helvetica, arial, sans-serif;
 }
 
+span.image-info {
+    font-size: 0.8em;
+    font-style: italic;
+}
+
 #map {
     float: left;
     height: 440px;
