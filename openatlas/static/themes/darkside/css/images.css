@@ -1,0 +1,20 @@
+@charset "UTF-8";
+
+div.pager div.navigation {
+    background-repeat: no-repeat;
+    width: 20px;
+    height: 21px;
+}
+
+div.pager div.first, div.pager div.first:hover {
+    background-image: url("/themes/darkside/images/icons/first.png");
+}
+div.pager div.prev, div.pager div.prev:hover {
+    background-image: url("/themes/darkside/images/icons/prev.png");
+}
+div.pager div.next, div.pager div.next:hover {
+    background-image: url("/themes/darkside/images/icons/next.png");
+}
+div.pager div.last, div.pager div.last:hover  {
+    background-image: url("/themes/darkside/images/icons/last.png");
+}
