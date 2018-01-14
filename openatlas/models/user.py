@@ -227,6 +227,8 @@ class UserMapper:
             settings[row.name] = row.value
         for item in ['newsletter', 'show_email']:
             settings[item] = True if item in settings and settings[item] == 'True' else False
+        if 'theme' not in settings:
+            settings['theme'] = 'default'
         if 'layout' not in settings:
             settings['layout'] = 'default'
         if 'language' not in settings:

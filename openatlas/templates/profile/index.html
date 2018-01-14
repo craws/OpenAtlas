@@ -18,8 +18,8 @@
         {{ form|display_form|safe }}
     </div>
     <script>
-        $('#display-form').change(function () {
-            $('#display-form').submit();
+        $('form').change(function (e) {
+            e.target.closest('form').submit();
         });
     </script>
 {% endblock %}

@@ -11,9 +11,15 @@
         <link rel="stylesheet" href="/css/reset.css?v={{ config['VERSION'] }}" />
         <link rel="stylesheet" href="/js/jquery/jquery-ui-1.12.1/jquery-ui.min.css" />
         <link rel="stylesheet" href="/js/jquery/jstree-3.3.4/themes/default/style.min.css" />
-        <link rel="stylesheet" href="/css/style.css?v={{ config['VERSION'] }}" />
-        <link rel="stylesheet" href="/css/color.css?v={{ config['VERSION'] }}" />
-        <link rel="stylesheet" href="/css/images.css?v={{ config['VERSION'] }}" />
+        {% for css_file in ['style.css', 'color.css', 'images.css']: %}
+            <link rel="stylesheet" href="/css/{{ css_file }}?v={{ config['VERSION'] }}" />
+            {% if current_user.is_authenticated: %}
+                {% set css_file_path = '/themes/' + current_user.settings['theme'] + '/css/' + css_file %}
+                {% if css_file_path|test_file %}
+                    <link rel="stylesheet" href="{{ css_file_path }}?v={{ config['VERSION'] }}" />
+                {% endif %}
+            {% endif %}
+        {% endfor %}
         <script src="/js/jquery/jquery-3.1.1.min.js"></script>
         <script src="/js/jquery/jquery-ui-1.12.1/jquery-ui.min.js"></script>
         <script src="/js/jquery/tablesorter-2.28.5/js/jquery.tablesorter.min.js"></script>

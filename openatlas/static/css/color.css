@@ -54,7 +54,7 @@ span.tooltip,
     color: #4088c3;
 }
 
-div.tabsContainer table a:hover,
+div.tabs-container table a:hover,
 table a:hover {
     color: #46779f;
 }
@@ -88,9 +88,9 @@ input[type="text"],
 .ui-tabs .ui-tabs-panel,
 .ui-widget-content .ui-state-active,
 .ui-widget-header .ui-state-active,
-div.tabsContainer .ui-widget-content,
-div.tabsContainer .ui-state-active.ui-state-hover,
-div.tabsContainer .ui-state-active,
+div.tabs-container .ui-widget-content,
+div.tabs-container .ui-state-active,
+div.tabs-container .ui-state-active.ui-state-hover,
 table.tablesorter tbody td {
     background-color: #ffffff;
 }
@@ -113,7 +113,7 @@ span.button,
 }
 
 input[type=submit]:hover,
-div.tabsContainer .ui-state-hover,
+div.tabs-container .ui-state-hover,
 a.button:hover,
 button:hover,
 .button-bar a:hover,
@@ -134,8 +134,7 @@ span.button:hover {
 textarea,
 input[type=text],
 input[type=password],
-select
-{
+select {
     border-color: #adadad;
 }
 

@@ -15,6 +15,11 @@ from openatlas.util.util import uc_first
 
 class DisplayForm(Form):
     language = SelectField(_('language'), choices=app.config['LANGUAGES'].items())
+    theme_choices = [
+        ('default', _('default')),
+        ('darkside', 'Darkside'),
+        ('omg_ponies', 'OMG Ponies!')]
+    theme = SelectField(_('color theme'), choices=theme_choices)
     table_rows = SelectField(
         _('table rows'),
         description=_('tooltip table rows'),
@@ -74,6 +79,7 @@ def profile_index():
     form = DisplayForm()
     if form.validate_on_submit():
         user.settings['language'] = form.language.data
+        user.settings['theme'] = form.theme.data
         user.settings['table_rows'] = form.table_rows.data
         user.settings['layout'] = form.layout.data
         openatlas.get_cursor().execute('BEGIN')
@@ -89,6 +95,7 @@ def profile_index():
         return redirect(url_for('profile_index'))
 
     form.language.data = user.settings['language']
+    form.theme.data = user.settings['theme']
     form.table_rows.data = user.settings['table_rows']
     form.layout.data = user.settings['layout']
     data['display'] = [
