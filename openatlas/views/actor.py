@@ -3,7 +3,7 @@ from flask import render_template, url_for, flash, request
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from wtforms import StringField, TextAreaField, HiddenField, SubmitField, FieldList
-from wtforms.validators import InputRequired
+from wtforms.validators import DataRequired
 
 import openatlas
 from openatlas import app
@@ -17,7 +17,7 @@ from openatlas.util.util import (truncate_string, required_group, get_entity_dat
 
 
 class ActorForm(DateForm):
-    name = StringField(_('name'), [InputRequired()])
+    name = StringField(_('name'), [DataRequired()])
     alias = FieldList(StringField(''), description=_('tooltip alias'))
     residence = TableField(_('residence'))
     appears_first = TableField(_('appears first'))

@@ -5,7 +5,7 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import Form
 from wtforms import SubmitField, TextAreaField, SelectField
-from wtforms.validators import InputRequired
+from wtforms.validators import DataRequired
 
 import openatlas
 from openatlas import app
@@ -21,7 +21,7 @@ from openatlas.util.util import (link, bookmark_toggle, uc_first, required_group
 
 class FeedbackForm(Form):
     subject = SelectField(_('subject'), choices=app.config['FEEDBACK_SUBJECTS'].items())
-    description = TextAreaField(_('description'), [InputRequired()])
+    description = TextAreaField(_('description'), [DataRequired()])
     send = SubmitField(_('send'))
 
 

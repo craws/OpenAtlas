@@ -127,7 +127,8 @@ class NodeMapper(EntityMapper):
         for id_ in param if isinstance(param, list) else [param]:
             item = openatlas.nodes[id_]
             selected = ",'state' : {'selected' : true}" if item.id in selected_ids else ''
-            string += "{'text':'" + item.name + "', 'id':'" + str(item.id) + "'" + selected
+            name = item.name.replace("'", "&apos;")
+            string += "{'text':'" + name + "', 'id':'" + str(item.id) + "'" + selected
             if item.subs:
                 string += ",'children' : ["
                 for sub in item.subs:

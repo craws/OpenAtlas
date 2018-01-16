@@ -13,7 +13,7 @@ tinymce.init({
 
 $(document).ready(function() {
 
-    // Offer a show/hide button for date input fields
+    // Show/hide function for date input fields
     $("#date-switcher").click(function () {
         $(".date-switch").toggleClass('display-none');
         $(this).text(function(i, text){
@@ -21,7 +21,7 @@ $(document).ready(function() {
         })
     });
 
-    // Function to show only limited characters (showChar) and offer a show more/less button
+    // Show more/less function for texts
     var showChar = 800;
     var ellipsesText = "...";
     $('.more').each(function() {
@@ -127,7 +127,7 @@ function ajaxBookmark(entityId) {
 
 function selectFromTree(name, id, text) {
     $('#' + name).val(id)
-    $('#' + name + '-button').val(text);
+    $('#' + name + '-button').val(text.replace(/&apos;/g, "'"));
     $('#' + name + '-dialog').dialog('close');
     $('#' + name + '-clear').show();
 }
@@ -146,7 +146,6 @@ function selectFromTreeMulti(name) {
         $("#" + name).val('');
     }
     $("#" + name).trigger('change');
-
 }
 
 function selectFromTable(element, table, id) {

@@ -3,7 +3,7 @@ from flask import render_template, flash, url_for, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms.validators import InputRequired
+from wtforms.validators import DataRequired
 from wtforms import SelectField, SubmitField, TextAreaField, StringField
 
 import openatlas
@@ -21,8 +21,8 @@ class LogForm(Form):
 
 
 class NewsLetterForm(Form):
-    subject = StringField('', [InputRequired()], render_kw={"placeholder": uc_first(_('subject'))})
-    body = TextAreaField('', [InputRequired()], render_kw={"placeholder": uc_first(_('content'))})
+    subject = StringField('', [DataRequired()], render_kw={"placeholder": uc_first(_('subject'))})
+    body = TextAreaField('', [DataRequired()], render_kw={"placeholder": uc_first(_('content'))})
     send = SubmitField(uc_first(_('send')))
 
 

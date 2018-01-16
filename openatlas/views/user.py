@@ -4,7 +4,7 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms.validators import Email, InputRequired
+from wtforms.validators import Email, DataRequired
 from wtforms import (BooleanField, HiddenField, PasswordField, SelectField, StringField,
                      SubmitField, TextAreaField)
 
@@ -17,11 +17,11 @@ from openatlas.util.util import (format_date, link, required_group, send_mail, u
 class UserForm(Form):
     user_id = None
     active = BooleanField(_('active'), default=True)
-    username = StringField(_('username'), [InputRequired()])
+    username = StringField(_('username'), [DataRequired()])
     group = SelectField(_('group'), choices=[])
-    email = StringField(_('email'), [InputRequired(), Email()])
-    password = PasswordField(_('password'), [InputRequired()])
-    password2 = PasswordField(_('repeat password'), [InputRequired()])
+    email = StringField(_('email'), [DataRequired(), Email()])
+    password = PasswordField(_('password'), [DataRequired()])
+    password2 = PasswordField(_('repeat password'), [DataRequired()])
     show_passwords = BooleanField(_('show passwords'))
     real_name = StringField(_('name'))
     description = TextAreaField(_('info'))

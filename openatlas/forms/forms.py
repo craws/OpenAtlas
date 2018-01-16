@@ -70,13 +70,12 @@ def build_node_form(form, node, request_origin=None):
     for item in delete_list:
         delattr(form_instance, item)
 
-    # Todo: is name parts and directional needed here?
     # Set field data if available and only if it's a GET request
     if node and request_origin and request_origin.method == 'GET':
         name_parts = node.name.split(' (')
-        form_instance.name.data = sanitize(name_parts[0], 'node')
+        form_instance.name.data = name_parts[0]
         if root.directional and len(name_parts) > 1:
-            form_instance.name_inverse.data = sanitize(name_parts[1], 'node')
+            form_instance.name_inverse.data = name_parts[1][:-1]  # remove the ")" from 2nd part
         form_instance.description.data = node.description
         if root:  # Set super if exists and is not same as root
             super_ = openatlas.nodes[node.root[0]]

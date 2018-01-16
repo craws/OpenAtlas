@@ -5,7 +5,7 @@ from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import StringField, SubmitField, TextAreaField, BooleanField, SelectMultipleField
 from wtforms import widgets
-from wtforms.validators import InputRequired
+from wtforms.validators import DataRequired
 
 import openatlas
 from openatlas import app, NodeMapper, EntityMapper
@@ -14,7 +14,7 @@ from openatlas.util.util import required_group, sanitize
 
 
 class HierarchyForm(Form):
-    name = StringField(_('name'), [InputRequired()])
+    name = StringField(_('name'), [DataRequired()])
     multiple = BooleanField(_('multiple'), description=_('tooltip hierarchy multiple'))
     forms = SelectMultipleField(
         _('forms'),

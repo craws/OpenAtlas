@@ -5,7 +5,7 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import StringField, SubmitField, TextAreaField
-from wtforms.validators import InputRequired
+from wtforms.validators import DataRequired
 
 import openatlas
 from openatlas import app, NodeMapper, EntityMapper
@@ -14,7 +14,7 @@ from openatlas.util.util import required_group, sanitize, link, truncate_string
 
 
 class NodeForm(Form):
-    name = StringField(_('name'), [InputRequired()])
+    name = StringField(_('name'), [DataRequired()])
     name_inverse = StringField(_('inverse'))
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
@@ -43,8 +43,9 @@ def node_insert(root_id):
         if hasattr(form, 'name_inverse') in form:
             name += ' (' + form.name_inverse.data + ')'
         node = save(form, None, root)
-        flash(_('entity created'), 'info')
-        return redirect(url_for('node_view', id_=node.id))
+        if node:
+            flash(_('entity created'), 'info')
+            return redirect(url_for('node_view', id_=node.id))
     if 'name_search' in request.form:
         form.name.data = request.form['name_search']
     return render_template('types/insert.html', form=form, root=root)
@@ -133,7 +134,7 @@ def walk_tree(param):
         item = openatlas.nodes[id_]
         count_subs = " (" + str(item.count_subs) + ")" if item.count_subs else ''
         text += "{href: '" + url_for('node_view', id_=item.id) + "',"
-        text += "text: '" + item.name + " " + str(item.count) + count_subs
+        text += "text: '" + item.name.replace("'", "&apos;") + " " + str(item.count) + count_subs
         text += "', 'id':'" + str(item.id) + "'"
         if item.subs:
             text += ",'children' : ["
@@ -178,13 +179,13 @@ def save(form, node=None, root=None):
         new_super = openatlas.nodes[int(new_super_id)] if new_super_id else openatlas.nodes[root.id]
         if new_super.id == node.id:
             flash(_('error node self as super'), 'error')
-            return False
+            return
         if new_super.root and node.id in new_super.root:
             flash(_('error node sub as super'), 'error')
-            return False
-        node.name = sanitize(form.name.data, 'node')
-        if root.directional and sanitize(form.name_inverse.data, 'node'):
-            node.name += ' (' + sanitize(form.name_inverse.data, 'node') + ')'
+            return
+        node.name = form.name.data
+        if root.directional and form.name_inverse.data.strip():
+            node.name += ' (' + form.name_inverse.data.strip() + ')'
         node.description = form.description.data
         node.update()
         # update super if changed and node is not a root node
@@ -197,4 +198,5 @@ def save(form, node=None, root=None):
         openatlas.get_cursor().execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
+        return
     return node
