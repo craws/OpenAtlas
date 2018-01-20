@@ -261,10 +261,17 @@ class EntityMapper:
 
     @staticmethod
     def delete_orphans(parameter):
+        from openatlas import app, NodeMapper
         if parameter == 'orphans':
             sql_where = EntityMapper.sql_orphan + " AND e.class_code NOT IN %(class_codes)s"
         elif parameter == 'unlinked':
             sql_where = EntityMapper.sql_orphan + " AND e.class_code IN %(class_codes)s"
+        elif parameter == 'types':
+            count = 0
+            for node in NodeMapper.get_orphans():
+                EntityMapper.delete(node)
+                count += 1
+            return count
         else:
             return 0
         sql = "DELETE FROM model.entity WHERE id IN (" + sql_where + ");"

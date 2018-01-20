@@ -23,6 +23,12 @@
         {{ tables['unlinked']|pager|safe }}
     </div>
     <div id="tab-nodes">
+        {% if tables['nodes']['data']|length > 0 %}
+            <div class="button-bar">
+                <a onclick="return confirm('{{_('delete types')|uc_first }}?')"
+                   href="{{ url_for('admin_orphans', delete='types') }}">{{ _('delete types')|uc_first }}</a>
+            </div>
+        {% endif %}
         {{ tables['nodes']|pager|safe }}
     </div>
 </div>
