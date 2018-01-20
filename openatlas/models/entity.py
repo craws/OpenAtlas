@@ -190,7 +190,7 @@ class EntityMapper:
 
     @staticmethod
     def delete(entity):
-        # Triggers function model.delete_entity_related() for deleting related entities
+        """ Triggers function model.delete_entity_related() for deleting related entities"""
         entity_id = entity if isinstance(entity, int) else entity.id
         sql = "DELETE FROM model.entity WHERE id = %(entity_id)s;"
         openatlas.get_cursor().execute(sql, {'entity_id': entity_id})
@@ -216,9 +216,7 @@ class EntityMapper:
 
     @staticmethod
     def get_page_ids(entity, codes):
-        """
-            Return ids for pager (first, previous, next, last) for entity and class codes arguments
-        """
+        """ Return ids for pager (first, previous, next, last)"""
         sql_where = " e.class_code IN ('{codes}')".format(codes="','".join(codes)) + " AND "
         sql_where += "e.system_type='source content'" if 'E33' in codes else "e.system_type IS NULL"
         sql_prev = "SELECT max(e.id) AS id FROM model.entity e WHERE e.id < %(id)s AND " + sql_where
@@ -234,9 +232,7 @@ class EntityMapper:
 
     @staticmethod
     def get_orphans():
-        """
-            Returns entities without links.
-        """
+        """ Returns entities without links. """
         entities = []
         cursor = openatlas.get_cursor()
         cursor.execute(EntityMapper.sql_orphan)
@@ -247,9 +243,7 @@ class EntityMapper:
 
     @staticmethod
     def get_latest(limit):
-        """
-            Returns the newest created entities
-        """
+        """ Returns the newest created entities"""
         codes = []
         for class_, class_codes in app.config['CLASS_CODES'].items():
             codes += class_codes
