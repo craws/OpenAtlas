@@ -140,12 +140,12 @@ def property_view(code):
     property_ = properties[code]
     classes = openatlas.classes
     tables = {
-        'info': {
+        'info': [
             ('code', property_.code),
             ('name', property_.name),
             ('inverse', property_.name_inverse),
             ('domain', link(classes[property_.domain_class_code]) + ' ' + classes[property_.domain_class_code].name),
-            ('range', link(classes[property_.range_class_code]) + ' ' + classes[property_.range_class_code].name)}}
+            ('range', link(classes[property_.range_class_code]) + ' ' + classes[property_.range_class_code].name)]}
     for table in ['super', 'sub']:
         tables[table] = {
             'name': table,
