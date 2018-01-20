@@ -75,10 +75,8 @@ def settings_index():
             (_('default language'), app.config['LANGUAGES'][settings['default_language']]),
             (_('default table rows'), settings['default_table_rows']),
             (_('log level'), app.config['LOG_LEVELS'][int(settings['log_level'])]),
-            (_('debug mode'), uc_first(_('on')) if settings['debug_mode'] else uc_first(_('off'))),
-            (_('maintenance'),
-                uc_first(_('on')) if settings['maintenance'] else uc_first(_('off'))),
-            (_('offline'), uc_first(_('on')) if settings['offline'] else uc_first(_('off')))])),
+            (_('debug mode'), uc_first(_('on')) if settings['debug_mode'] else uc_first(_('off')))
+        ])),
         ('mail', OrderedDict([
             (_('mail'), uc_first(_('on')) if settings['mail'] else uc_first(_('off'))),
             (_('mail transport username'), settings['mail_transport_username']),

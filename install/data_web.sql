@@ -20,7 +20,6 @@ INSERT INTO settings (name, value) VALUES
 ('failed_login_forget_minutes', '1'),
 ('failed_login_tries', '3'),
 ('log_level', '6'),
-('maintenance', ''),
 ('mail', ''),
 ('mail_transport_username', ''),
 ('mail_transport_port', ''),
@@ -30,7 +29,6 @@ INSERT INTO settings (name, value) VALUES
 ('mail_recipients_login', ''),
 ('mail_recipients_feedback', ''),
 ('minimum_password_length', '12'),
-('offline', ''),
 ('random_password_length', '16'),
 ('reset_confirm_hours', '24'),
 ('site_name', 'OpenAtlas');

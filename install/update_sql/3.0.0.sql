@@ -3,7 +3,7 @@
 BEGIN;
 
 -- Settings
-DELETE FROM web.settings WHERE name IN ('mail_transport_password', 'mail_transport_auth', 'mail_transport_ssl', 'mail_transport_type', 'notify_login');
+DELETE FROM web.settings WHERE name IN ('mail_transport_password', 'mail_transport_auth', 'mail_transport_ssl', 'mail_transport_type', 'notify_login', 'maintenance', 'offline');
 UPDATE web.settings SET name = 'site_name' WHERE name = 'sitename';
 UPDATE web.settings SET value = 'en' WHERE name = 'default_language';
 UPDATE web.settings SET value = '' WHERE value = 'false';
