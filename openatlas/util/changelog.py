@@ -3,10 +3,14 @@ from collections import OrderedDict
 
 
 class Changelog:
-    """
-        A big OrderedDict with changelog data, maybe not the best place and format to keep it.
-    """
+    """ A big OrderedDict with changelog data, maybe not the best place and format to keep it."""
     versions = OrderedDict()
+    versions['3.2.0'] = {
+            'date': 'TBA',
+            'data': OrderedDict(
+                feature=OrderedDict([
+                    ('732', 'Documentation and manual'),
+                    ('879', 'Demo with MEDCON data')]))}
     versions['3.1.0'] = {
             'date': '2018-01-18',
             'data': OrderedDict(
