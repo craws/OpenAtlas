@@ -78,7 +78,7 @@ def user_index():
             link(user),
             user.group,
             user.email,
-            user.settings['newsletter'],
+            _('yes') if user.settings['newsletter'] else '',
             format_date(user.created),
             format_date(user.login_last_success)])
     return render_template('user/index.html', tables=tables)
