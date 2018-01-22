@@ -75,7 +75,7 @@ def node_view(id_):
     root = openatlas.nodes[node.root[-1]] if node.root else None
     super_ = openatlas.nodes[node.root[0]] if node.root else None
     tables = {'entities': {
-        'name': 'entities',
+        'id': 'entities',
         'header': [_('name'), _('class'), _('info')],
         'data': []}}
     for entity in node.get_linked_entities(['P2', 'P89'], True):
@@ -87,7 +87,7 @@ def node_view(id_):
                 openatlas.classes[entity.class_.code].name,
                 truncate_string(entity.description)])
     tables['link_entities'] = {
-        'name': 'link_entities',
+        'id': 'link_entities',
         'header': [_('domain'), _('range')],
         'data': []}
     for row in LinkPropertyMapper.get_entities_by_node(node):
@@ -95,7 +95,7 @@ def node_view(id_):
             link(EntityMapper.get_by_id(row.domain_id)),
             link(EntityMapper.get_by_id(row.range_id))])
     tables['subs'] = {
-        'name': 'subs',
+        'id': 'subs',
         'header': [_('name'), _('count'), _('info')],
         'data': []}
     for sub_id in node.subs:

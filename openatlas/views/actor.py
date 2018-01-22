@@ -58,11 +58,11 @@ def actor_view(id_, unlink_id=None):
     tables = {
         'info': info,
         'source': {
-            'name': 'source',
+            'id': 'source',
             'header': app.config['TABLE_HEADERS']['source'] + ['description'],
             'data': []},
         'reference': {
-            'name': 'reference',
+            'id': 'reference',
             'header': app.config['TABLE_HEADERS']['reference'] + ['pages'],
             'data': []}}
     for link_ in actor.get_links('P67', True):
@@ -80,7 +80,7 @@ def actor_view(id_, unlink_id=None):
             data.append(build_remove_link(unlink_url, link_.domain.name))
         tables[name]['data'].append(data)
     tables['event'] = {
-        'name': 'event',
+        'id': 'event',
         'header': ['event', 'class', 'involvement', 'first', 'last', 'description'],
         'data': []}
     for link_ in actor.get_links(['P11', 'P14', 'P22', 'P23'], True):
@@ -108,7 +108,7 @@ def actor_view(id_, unlink_id=None):
             data.append(build_remove_link(unlink_url, link_.range.name))
         tables['event']['data'].append(data)
     tables['relation'] = {
-        'name': 'relation',
+        'id': 'relation',
         'sort': 'sortList:[[0,0]]',
         'header': ['relation', 'actor', 'first', 'last', 'description'],
         'data': []}
@@ -132,7 +132,7 @@ def actor_view(id_, unlink_id=None):
             data.append(build_remove_link(unlink_url, related.name))
         tables['relation']['data'].append(data)
     tables['member_of'] = {
-        'name': 'member_of',
+        'id': 'member_of',
         'header': ['member of', 'function', 'first', 'last', 'description'],
         'data': []}
     for link_ in actor.get_links('P107', True):
@@ -150,7 +150,7 @@ def actor_view(id_, unlink_id=None):
         tables['member_of']['data'].append(data)
     if actor.class_.code in app.config['CLASS_CODES']['group']:
         tables['member'] = {
-            'name': 'member',
+            'id': 'member',
             'header': ['member', 'function', 'first', 'last', 'description'],
             'data': []}
         for link_ in actor.get_links('P107'):
@@ -176,7 +176,7 @@ def actor_view(id_, unlink_id=None):
 @required_group('readonly')
 def actor_index():
     header = app.config['TABLE_HEADERS']['actor'] + ['description']
-    table = {'name': 'actor', 'header': header, 'data': []}
+    table = {'id': 'actor', 'header': header, 'data': []}
     for actor in EntityMapper.get_by_codes('actor'):
         data = get_base_table_data(actor)
         data.append(truncate_string(actor.description))

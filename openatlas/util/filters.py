@@ -74,7 +74,7 @@ def table_select_model(self, name, selected=None):
         entities = openatlas.properties
         sorter = 'sortList: [[0, 0]], headers: {0: { sorter: "property_code" }}'
     table = {
-        'name': name,
+        'id': name,
         'header': ['code', 'name'],
         'sort': sorter,
         'data': []}

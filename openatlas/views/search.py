@@ -43,7 +43,7 @@ def index_search():
 
 def build_search_table(form):
     table = {
-        'name': 'search',
+        'id': 'search',
         'header': ['name', 'class', 'first', 'last', 'description'],
         'data': []}
     codes = []

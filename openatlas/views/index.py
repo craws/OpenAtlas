@@ -29,13 +29,13 @@ class FeedbackForm(Form):
 @app.route('/overview')
 def index():
     tables = {
-        'counts': {'name': 'overview', 'header': [], 'data': []},
+        'counts': {'id': 'overview', 'header': [], 'data': []},
         'bookmarks': {
-            'name': 'bookmarks',
+            'id': 'bookmarks',
             'header': ['name', 'class', 'first', 'last'],
             'data': []},
         'latest': {
-            'name': 'latest',
+            'id': 'latest',
             'header': ['name', 'class', 'first', 'last', 'date', 'user'],
             'data': []}}
     if current_user.is_authenticated and hasattr(current_user, 'bookmarks'):

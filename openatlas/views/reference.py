@@ -119,7 +119,7 @@ def reference_view(id_, unlink_id=None):
     tables = {'info': get_entity_data(reference)}
     for name in ['source', 'event', 'actor', 'place']:
         header = app.config['TABLE_HEADERS'][name] + ['page']
-        tables[name] = {'name': name, 'header': header, 'data': []}
+        tables[name] = {'id': name, 'header': header, 'data': []}
     for link_ in reference.get_links('P67'):
         name = app.config['CODE_CLASS'][link_.range.class_.code]
         data = get_base_table_data(link_.range)
@@ -138,7 +138,7 @@ def reference_view(id_, unlink_id=None):
 @required_group('readonly')
 def reference_index():
     header = app.config['TABLE_HEADERS']['reference'] + ['description']
-    table = {'name': 'reference', 'header': header, 'data': []}
+    table = {'id': 'reference', 'header': header, 'data': []}
     for reference in EntityMapper.get_by_codes('reference'):
         data = get_base_table_data(reference)
         data.append(truncate_string(reference.description))

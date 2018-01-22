@@ -68,7 +68,7 @@ def model_index():
 @app.route('/overview/model/class')
 def class_index():
     table = {
-        'name': 'classes',
+        'id': 'classes',
         'header': ['code', 'name'],
         'data': [],
         'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'}
@@ -84,7 +84,7 @@ def property_index():
     classes = openatlas.classes
     properties = openatlas.properties
     table = {
-        'name': 'properties',
+        'id': 'properties',
         'header': ['code', 'name', 'inverse', 'domain', 'domain name', 'range', 'range name'],
         'data': [],
         'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }, '
@@ -108,19 +108,19 @@ def class_view(code):
     tables = OrderedDict()
     for table in ['super', 'sub']:
         tables[table] = {
-            'name': table,
+            'id': table,
             'header': ['code', 'name'],
             'data': [],
             'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'}
         for code in getattr(class_, table):
             tables[table]['data'].append([link(classes[code]), classes[code].name])
     tables['domains'] = {
-        'name': 'domains',
+        'id': 'domains',
         'header': ['code', 'name'],
         'data': [],
         'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'}
     tables['ranges'] = {
-        'name': 'ranges',
+        'id': 'ranges',
         'header': ['code', 'name'],
         'data': [],
         'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'}
@@ -148,7 +148,7 @@ def property_view(code):
             ('range', link(classes[property_.range_class_code]) + ' ' + classes[property_.range_class_code].name)]}
     for table in ['super', 'sub']:
         tables[table] = {
-            'name': table,
+            'id': table,
             'header': ['code', 'name'],
             'data': [],
             'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }}'}

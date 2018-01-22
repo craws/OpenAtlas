@@ -31,7 +31,7 @@ class PlaceForm(DateForm):
 @app.route('/place')
 @required_group('readonly')
 def place_index():
-    table = {'name': 'place', 'header': app.config['TABLE_HEADERS']['place'], 'data': []}
+    table = {'id': 'place', 'header': app.config['TABLE_HEADERS']['place'], 'data': []}
     for place in EntityMapper.get_by_codes('place'):
         table['data'].append(get_base_table_data(place))
     return render_template('place/index.html', table=table, gis_data=GisMapper.get_all())
@@ -77,11 +77,11 @@ def place_view(id_, unlink_id=None):
     tables = {
         'info': get_entity_data(object_, location),
         'source': {
-            'name': 'source',
+            'id': 'source',
             'header': app.config['TABLE_HEADERS']['source'] + ['description'],
             'data': []},
         'reference': {
-            'name': 'reference',
+            'id': 'reference',
             'header': app.config['TABLE_HEADERS']['reference'] + ['pages'],
             'data': []}}
     for link_ in object_.get_links('P67', True):
@@ -99,13 +99,13 @@ def place_view(id_, unlink_id=None):
             data.append(build_remove_link(unlink_url, link_.domain.name))
         tables[name]['data'].append(data)
     tables['event'] = {
-        'name': 'event',
+        'id': 'event',
         'header': app.config['TABLE_HEADERS']['event'],
         'data': []}
     for event in location.get_linked_entities(['P7', 'P24'], True):
         tables['event']['data'].append(get_base_table_data(event))
     tables['actor'] = {
-        'name': 'actor',
+        'id': 'actor',
         'header': [_('actor'), _('property'), _('class'), _('first'), _('last')],
         'data': []}
     for link_ in location.get_links(['P74', 'OA8', 'OA9'], True):

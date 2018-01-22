@@ -47,7 +47,7 @@ class EventForm(DateForm):
 @required_group('readonly')
 def event_index():
     header = app.config['TABLE_HEADERS']['event'] + ['description']
-    table = {'name': 'event', 'header': header, 'data': []}
+    table = {'id': 'event', 'header': header, 'data': []}
     for event in EntityMapper.get_by_codes('event'):
         data = get_base_table_data(event)
         data.append(truncate_string(event.description))
@@ -140,7 +140,7 @@ def event_view(id_, unlink_id=None):
     tables = {
         'info': get_entity_data(event),
         'actor': {
-            'name': 'actor',
+            'id': 'actor',
             'header': ['actor', 'class', 'involvement', 'first', 'last', 'description'],
             'data': []}}
     for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
@@ -164,11 +164,11 @@ def event_view(id_, unlink_id=None):
             data.append(build_remove_link(unlink_url, link_.range.name))
         tables['actor']['data'].append(data)
     tables['source'] = {
-        'name': 'source',
+        'id': 'source',
         'header': app.config['TABLE_HEADERS']['source'] + ['description'],
         'data': []}
     tables['reference'] = {
-        'name': 'reference',
+        'id': 'reference',
         'header': app.config['TABLE_HEADERS']['reference'] + ['pages'],
         'data': []}
     for link_ in event.get_links('P67', True):
@@ -186,7 +186,7 @@ def event_view(id_, unlink_id=None):
             data.append(build_remove_link(unlink_url, link_.domain.name))
         tables[name]['data'].append(data)
     tables['subs'] = {
-        'name': 'sub-event',
+        'id': 'sub-event',
         'header': app.config['TABLE_HEADERS']['event'],
         'data': []}
     for sub_event in event.get_linked_entities('P117', True):

@@ -69,7 +69,7 @@ def user_view(id_):
 @required_group('manager')
 def user_index():
     tables = {'user': {
-        'name': 'user',
+        'id': 'user',
         'sort': 'sortList: [[3, 1]]',
         'header': ['username', 'group', 'email', 'newsletter', 'created', 'last login'],
         'data': []}}

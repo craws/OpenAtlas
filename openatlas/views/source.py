@@ -29,7 +29,7 @@ class SourceForm(Form):
 @required_group('readonly')
 def source_index():
     header = app.config['TABLE_HEADERS']['source'] + ['description']
-    table = {'name': 'source', 'header': header, 'data': []}
+    table = {'id': 'source', 'header': header, 'data': []}
     for source in EntityMapper.get_by_codes('source'):
         data = get_base_table_data(source)
         data.append(truncate_string(source.description))
@@ -72,7 +72,7 @@ def source_view(id_, unlink_id=None):
     tables = {
         'info': get_entity_data(source),
         'translation': {
-            'name': 'translation',
+            'id': 'translation',
             'header': ['translations', 'type', 'text'],
             'data': []}}
     for translation in source.get_linked_entities('P73'):
@@ -82,7 +82,7 @@ def source_view(id_, unlink_id=None):
             truncate_string(translation.description)])
     for name in ['event', 'place', 'actor']:
         header = app.config['TABLE_HEADERS'][name]
-        tables[name] = {'name': name, 'header': header, 'data': []}
+        tables[name] = {'id': name, 'header': header, 'data': []}
     for link_ in source.get_links('P67'):
         data = get_base_table_data(link_.range)
         name = app.config['CODE_CLASS'][link_.range.class_.code]
@@ -91,7 +91,7 @@ def source_view(id_, unlink_id=None):
             data.append(build_remove_link(unlink_url, link_.range.name))
         tables[name]['data'].append(data)
     header = app.config['TABLE_HEADERS']['reference'] + ['page']
-    tables['reference'] = {'name': 'source', 'header': header, 'data': []}
+    tables['reference'] = {'id': 'source', 'header': header, 'data': []}
     for link_ in source.get_links('P67', True):
         data = get_base_table_data(link_.domain)
         data.append(link_.description)

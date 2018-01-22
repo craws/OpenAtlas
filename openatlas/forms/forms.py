@@ -191,7 +191,7 @@ class TableSelect(HiddenInput):
         if class_ in ['residence', 'appears_first', 'appears_last']:
             class_ = 'place'
         header = app.config['TABLE_HEADERS'][class_]
-        table = {'name': field.id, 'header': header, 'data': []}
+        table = {'id': field.id, 'header': header, 'data': []}
         for entity in EntityMapper.get_by_codes(class_):
             # Todo: don't show self e.g. at source
             if field.data and entity.id == int(field.data):
@@ -240,7 +240,7 @@ class TableMultiSelect(HiddenInput):
         if class_ in ['given_place']:
             class_ = 'place'
         table = {
-            'name': field.id,
+            'id': field.id,
             'header': app.config['TABLE_HEADERS'][class_],
             'data': []}
         # make checkbox column sortable and show selected on top

@@ -42,9 +42,9 @@ def admin_orphans(delete=None):
         return redirect(url_for('admin_orphans'))
     header = ['name', 'class', 'type', 'system type', 'created', 'updated', 'description']
     tables = {
-        'orphans': {'name': 'orphans', 'header': header, 'data': []},
-        'unlinked': {'name': 'unlinked', 'header': header, 'data': []},
-        'nodes': {'name': 'nodes', 'header': ['name', 'root'], 'data': []}}
+        'orphans': {'id': 'orphans', 'header': header, 'data': []},
+        'unlinked': {'id': 'unlinked', 'header': header, 'data': []},
+        'nodes': {'id': 'nodes', 'header': ['name', 'root'], 'data': []}}
     for entity in EntityMapper.get_orphans():
         name = 'unlinked' if entity.class_.code in app.config['CODE_CLASS'].keys() else 'orphans'
         tables[name]['data'].append([
@@ -65,7 +65,7 @@ def admin_orphans(delete=None):
 def admin_log():
     form = LogForm()
     table = {
-        'name': 'log',
+        'id': 'log',
         'header': ['date', 'priority', 'type', 'message', 'user', 'IP', 'info'],
         'data': []}
     logs = openatlas.logger.get_system_logs(form.limit.data, form.priority.data, form.user.data)
@@ -109,7 +109,7 @@ def admin_newsletter():
                     recipients += 1
         flash(_('Newsletter send') + ': ' + str(recipients), 'info')
         return redirect(url_for('admin_index'))
-    table = {'name': 'user', 'header': ['username', 'email', 'receiver'], 'data': []}
+    table = {'id': 'user', 'header': ['username', 'email', 'receiver'], 'data': []}
     for user in UserMapper.get_all():
         if user.settings['newsletter']:  # pragma: no cover
             checkbox = '<input value="' + str(user.id) + '" name="recipient"'

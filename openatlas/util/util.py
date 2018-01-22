@@ -97,7 +97,7 @@ def build_table_form(class_name, linked_entities):
     # Todo: add CSRF token
     form = '<form class="table" method="post">'
     header = app.config['TABLE_HEADERS'][class_name] + ['']
-    table = {'name': class_name, 'header': header, 'data': []}
+    table = {'id': class_name, 'header': header, 'data': []}
     linked_ids = [entity.id for entity in linked_entities]
     for entity in EntityMapper.get_by_codes(class_name):
         if entity.id in linked_ids:
@@ -407,7 +407,7 @@ def pager(table):
             options += '<option value="{amount}"{selected}>{amount}</option>'.format(
                 amount=amount, selected=' selected="selected"' if amount == table_rows else '')
         html += """
-            <div id="{name}-pager" class="pager">
+            <div id="{id}-pager" class="pager">
                 <div class="navigation first"></div>
                 <div class="navigation prev"></div>
                 <div class="pagedisplay">
@@ -416,11 +416,11 @@ def pager(table):
                 <div class="navigation next"></div>
                 <div class="navigation last"></div>
                 <div><select class="pagesize">{options}</select></div>
-                <input id="{name}-search" class="search" type="text" data-column="all"
+                <input id="{id}-search" class="search" type="text" data-column="all"
                     placeholder="{filter}">
             </div><div style="clear:both;"></div>
-            """.format(name=table['name'], filter=uc_first(_('filter')), options=options)
-    html += '<table id="{name}-table" class="tablesorter"><thead><tr>'.format(name=table['name'])
+            """.format(id=table['id'], filter=uc_first(_('filter')), options=options)
+    html += '<table id="{id}-table" class="tablesorter"><thead><tr>'.format(id=table['id'])
     for header in table['header']:
         style = '' if header else 'class=sorter-false '  # only show and sort headers with a title
         html += '<th ' + style + '>' + (_(header).capitalize() if header else '') + '</th>'
@@ -442,23 +442,23 @@ def pager(table):
     sort = '' if 'sort' not in table else table['sort'] + ','
     if show_pager:
         html += """
-            $("#{name}-table").tablesorter({{
+            $("#{id}-table").tablesorter({{
                 {headers}
                 {sort}
                 dateFormat: "ddmmyyyy",
                 widgets: [\'zebra\', \'filter\'],
                 widgetOptions: {{
-                    filter_external: \'#{name}-search\',
+                    filter_external: \'#{id}-search\',
                     filter_columnFilters: false
                 }}}})
-            .tablesorterPager({{positionFixed: false, container: $("#{name}-pager"), size:{size}}});
+            .tablesorterPager({{positionFixed: false, container: $("#{id}-pager"), size:{size}}});
         """.format(
-            name=table['name'],
+            id=table['id'],
             sort=sort,
             size=table_rows,
             headers='' if 'headers' not in table else table['headers'] + ',')
     else:
-        html += '$("#' + table['name'] + '-table").tablesorter({' + sort + 'widgets:[\'zebra\']});'
+        html += '$("#' + table['id'] + '-table").tablesorter({' + sort + 'widgets:[\'zebra\']});'
     html += '</script>'
     return html
 
