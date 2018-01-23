@@ -21,18 +21,16 @@
                     {% endif %}
                 </p>
             {% else %}
-                <p>
-                    {{ _('first login') }}
-                </p>
+                <p>{{ _('first login') }}</p>
             {% endif %}
         </div>
         <div style="clear:both;"></div>
         {% if tables['latest'].data %}
-            <h1>Latest</h1>
+            <h1>{{ _('latest')|uc_first }}</h1>
             {{ tables['latest']|pager|safe }}
         {% endif %}
         {% if tables['bookmarks'].data %}
-            <h1>Bookmarks</h1>
+            <h1>{{ _('bookmarks')|uc_first }}</h1>
             {{ tables['bookmarks']|pager|safe }}
         {% endif %}
     {% else %}

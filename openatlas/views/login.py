@@ -104,7 +104,7 @@ def reset_password():
             user.update()
             link = request.scheme + '://' + request.headers['Host']
             link += url_for('reset_confirm', code=code)
-            subject = _('Password reset request for %(sitename)s',
+            subject = _('Password reset request for %(site_name)s',
                         sitename=session['settings']['site_name'])
             body = _(
                 'We received a password reset request for %(username)s', username=user.username)

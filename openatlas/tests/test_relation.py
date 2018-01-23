@@ -1,6 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import url_for
-from openatlas import app, EntityMapper
+from openatlas import app, EntityMapper, NodeMapper
 from openatlas.models.link import LinkMapper
 from openatlas.test_base import TestBaseCase
 
@@ -16,8 +16,10 @@ class RelationTests(TestBaseCase):
             # add relationship
             rv = self.app.get(url_for('relation_insert', origin_id=actor_id))
             assert b'Actor Actor Relation' in rv.data
+            relation_id = NodeMapper.get_hierarchy_by_name('Actor Actor Relation').id
             data = {
                 'actor': '[' + str(related_id) + ']',
+                relation_id: relation_id,
                 'inverse': True,
                 'date_begin_year': '-1949',
                 'date_begin_month': '10',

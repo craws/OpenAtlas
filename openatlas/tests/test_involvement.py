@@ -17,7 +17,10 @@ class InvolvementTests(TestBaseCase):
             # add involvement
             rv = self.app.get(url_for('involvement_insert', origin_id=actor_id))
             assert b'Involvement' in rv.data
-            data = {'event': '[' + str(event_id) + ']', 'activity': 'P11', involvement_id: 8}
+            data = {
+                'event': '[' + str(event_id) + ']',
+                'activity': 'P11',
+                involvement_id: involvement_id}
             rv = self.app.post(
                 url_for('involvement_insert', origin_id=actor_id), data=data, follow_redirects=True)
             assert b'Event Horizon' in rv.data

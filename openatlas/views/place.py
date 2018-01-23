@@ -11,9 +11,8 @@ from openatlas.forms.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper, Entity
 from openatlas.models.gis import GisMapper
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import (truncate_string, required_group, get_entity_data, uc_first,
-                                 build_remove_link, get_base_table_data, link, is_authorized,
-                                 was_modified)
+from openatlas.util.util import (build_remove_link, required_group, get_entity_data, uc_first, link,
+                                 truncate_string, get_base_table_data, is_authorized, was_modified)
 
 
 class PlaceForm(DateForm):
@@ -77,12 +76,10 @@ def place_view(id_, unlink_id=None):
     tables = {
         'info': get_entity_data(object_, location),
         'source': {
-            'id': 'source',
-            'header': app.config['TABLE_HEADERS']['source'] + ['description'],
+            'id': 'source', 'header': app.config['TABLE_HEADERS']['source'] + ['description'],
             'data': []},
         'reference': {
-            'id': 'reference',
-            'header': app.config['TABLE_HEADERS']['reference'] + ['pages'],
+            'id': 'reference', 'header': app.config['TABLE_HEADERS']['reference'] + ['pages'],
             'data': []}}
     for link_ in object_.get_links('P67', True):
         name = app.config['CODE_CLASS'][link_.domain.class_.code]

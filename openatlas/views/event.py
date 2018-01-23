@@ -12,9 +12,8 @@ from openatlas import app
 from openatlas.forms.forms import DateForm, build_form, TableField, TableMultiField
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper, Link
-from openatlas.util.util import (required_group, truncate_string, get_entity_data, uc_first,
-                                 build_remove_link, get_base_table_data, link, is_authorized,
-                                 was_modified)
+from openatlas.util.util import (build_remove_link, get_base_table_data, get_entity_data, uc_first,
+                                 is_authorized, link, required_group, truncate_string, was_modified)
 
 
 class EventForm(DateForm):
@@ -27,7 +26,6 @@ class EventForm(DateForm):
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
     opened = HiddenField()
-    # acquisition
     recipient = TableMultiField()
     donor = TableMultiField()
     given_place = TableMultiField()
@@ -164,12 +162,10 @@ def event_view(id_, unlink_id=None):
             data.append(build_remove_link(unlink_url, link_.range.name))
         tables['actor']['data'].append(data)
     tables['source'] = {
-        'id': 'source',
-        'header': app.config['TABLE_HEADERS']['source'] + ['description'],
+        'id': 'source', 'header': app.config['TABLE_HEADERS']['source'] + ['description'],
         'data': []}
     tables['reference'] = {
-        'id': 'reference',
-        'header': app.config['TABLE_HEADERS']['reference'] + ['pages'],
+        'id': 'reference', 'header': app.config['TABLE_HEADERS']['reference'] + ['pages'],
         'data': []}
     for link_ in event.get_links('P67', True):
         name = app.config['CODE_CLASS'][link_.domain.class_.code]

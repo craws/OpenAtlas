@@ -43,9 +43,7 @@ def index_search():
 
 def build_search_table(form):
     table = {
-        'id': 'search',
-        'header': ['name', 'class', 'first', 'last', 'description'],
-        'data': []}
+        'id': 'search', 'header': ['name', 'class', 'first', 'last', 'description'], 'data': []}
     codes = []
     for name in form.classes.data:
         codes += app.config['CLASS_CODES'][name]

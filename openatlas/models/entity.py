@@ -79,7 +79,7 @@ class Entity:
         return ''
 
     def get_name_directed(self, inverse=False):
-        """Returns name part of a directed type e.g. Actor Actor Relation: Parent of (Child of)"""
+        """ Returns name part of a directed type e.g. Actor Actor Relation: Parent of (Child of)"""
         from openatlas.util.util import sanitize
         name_parts = self.name.split(' (')
         if inverse and len(name_parts) > 1:

@@ -58,12 +58,10 @@ def actor_view(id_, unlink_id=None):
     tables = {
         'info': info,
         'source': {
-            'id': 'source',
-            'header': app.config['TABLE_HEADERS']['source'] + ['description'],
+            'id': 'source', 'header': app.config['TABLE_HEADERS']['source'] + ['description'],
             'data': []},
         'reference': {
-            'id': 'reference',
-            'header': app.config['TABLE_HEADERS']['reference'] + ['pages'],
+            'id': 'reference', 'header': app.config['TABLE_HEADERS']['reference'] + ['pages'],
             'data': []}}
     for link_ in actor.get_links('P67', True):
         name = app.config['CODE_CLASS'][link_.domain.class_.code]
@@ -80,8 +78,7 @@ def actor_view(id_, unlink_id=None):
             data.append(build_remove_link(unlink_url, link_.domain.name))
         tables[name]['data'].append(data)
     tables['event'] = {
-        'id': 'event',
-        'header': ['event', 'class', 'involvement', 'first', 'last', 'description'],
+        'id': 'event', 'header': ['event', 'class', 'involvement', 'first', 'last', 'description'],
         'data': []}
     for link_ in actor.get_links(['P11', 'P14', 'P22', 'P23'], True):
         event = link_.domain
@@ -108,10 +105,8 @@ def actor_view(id_, unlink_id=None):
             data.append(build_remove_link(unlink_url, link_.range.name))
         tables['event']['data'].append(data)
     tables['relation'] = {
-        'id': 'relation',
-        'sort': 'sortList:[[0,0]]',
-        'header': ['relation', 'actor', 'first', 'last', 'description'],
-        'data': []}
+        'id': 'relation', 'header': ['relation', 'actor', 'first', 'last', 'description'],
+        'sort': 'sortList:[[0,0]]', 'data': []}
     for link_ in actor.get_links('OA7') + actor.get_links('OA7', True):
         if actor.id == link_.domain.id:
             type_ = link_.type.get_name_directed() if link_.type else ''
@@ -132,8 +127,7 @@ def actor_view(id_, unlink_id=None):
             data.append(build_remove_link(unlink_url, related.name))
         tables['relation']['data'].append(data)
     tables['member_of'] = {
-        'id': 'member_of',
-        'header': ['member of', 'function', 'first', 'last', 'description'],
+        'id': 'member_of', 'header': ['member of', 'function', 'first', 'last', 'description'],
         'data': []}
     for link_ in actor.get_links('P107', True):
         data = ([
@@ -150,8 +144,7 @@ def actor_view(id_, unlink_id=None):
         tables['member_of']['data'].append(data)
     if actor.class_.code in app.config['CLASS_CODES']['group']:
         tables['member'] = {
-            'id': 'member',
-            'header': ['member', 'function', 'first', 'last', 'description'],
+            'id': 'member', 'header': ['member', 'function', 'first', 'last', 'description'],
             'data': []}
         for link_ in actor.get_links('P107'):
             data = ([

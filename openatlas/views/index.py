@@ -30,13 +30,9 @@ class FeedbackForm(Form):
 def index():
     tables = {
         'counts': {'id': 'overview', 'header': [], 'data': []},
-        'bookmarks': {
-            'id': 'bookmarks',
-            'header': ['name', 'class', 'first', 'last'],
-            'data': []},
+        'bookmarks': {'id': 'bookmarks', 'header': ['name', 'class', 'first', 'last'], 'data': []},
         'latest': {
-            'id': 'latest',
-            'header': ['name', 'class', 'first', 'last', 'date', 'user'],
+            'id': 'latest', 'header': ['name', 'class', 'first', 'last', 'date', 'user'],
             'data': []}}
     if current_user.is_authenticated and hasattr(current_user, 'bookmarks'):
         for entity_id in current_user.bookmarks:

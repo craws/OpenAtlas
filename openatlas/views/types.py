@@ -75,9 +75,7 @@ def node_view(id_):
     root = openatlas.nodes[node.root[-1]] if node.root else None
     super_ = openatlas.nodes[node.root[0]] if node.root else None
     tables = {'entities': {
-        'id': 'entities',
-        'header': [_('name'), _('class'), _('info')],
-        'data': []}}
+        'id': 'entities', 'header': [_('name'), _('class'), _('info')], 'data': []}}
     for entity in node.get_linked_entities(['P2', 'P89'], True):
         # If it is a place location get the corresponding object
         entity = entity if node.class_.code == 'E55' else entity.get_linked_entity('P53', True)
@@ -87,23 +85,15 @@ def node_view(id_):
                 openatlas.classes[entity.class_.code].name,
                 truncate_string(entity.description)])
     tables['link_entities'] = {
-        'id': 'link_entities',
-        'header': [_('domain'), _('range')],
-        'data': []}
+        'id': 'link_entities', 'header': [_('domain'), _('range')], 'data': []}
     for row in LinkPropertyMapper.get_entities_by_node(node):
         tables['link_entities']['data'].append([
             link(EntityMapper.get_by_id(row.domain_id)),
             link(EntityMapper.get_by_id(row.range_id))])
-    tables['subs'] = {
-        'id': 'subs',
-        'header': [_('name'), _('count'), _('info')],
-        'data': []}
+    tables['subs'] = {'id': 'subs', 'header': [_('name'), _('count'), _('info')], 'data': []}
     for sub_id in node.subs:
         sub = openatlas.nodes[sub_id]
-        tables['subs']['data'].append([
-            link(sub),
-            sub.count,
-            truncate_string(sub.description)])
+        tables['subs']['data'].append([link(sub), sub.count, truncate_string(sub.description)])
     return render_template('types/view.html', node=node, super_=super_, tables=tables, root=root)
 
 

@@ -65,8 +65,7 @@ def admin_orphans(delete=None):
 def admin_log():
     form = LogForm()
     table = {
-        'id': 'log',
-        'header': ['date', 'priority', 'type', 'message', 'user', 'IP', 'info'],
+        'id': 'log', 'header': ['date', 'priority', 'type', 'message', 'user', 'IP', 'info'],
         'data': []}
     logs = openatlas.logger.get_system_logs(form.limit.data, form.priority.data, form.user.data)
     for row in logs:
