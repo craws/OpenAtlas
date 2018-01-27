@@ -14,9 +14,9 @@ from openatlas.util.util import (required_group, link, truncate_string, format_d
 
 
 class LogForm(Form):
-    limit = SelectField(_('limit'), choices=((0, 'all'), (100, 100), (500, 500)), default=100)
+    limit = SelectField(_('limit'), choices=((0, _('all')), (100, 100), (500, 500)), default=100)
     priority = SelectField(_('priority'), choices=(app.config['LOG_LEVELS'].items()), default=6)
-    user = SelectField(_('user'), choices=([(0, 'all')] + UserMapper.get_users()), default=0)
+    user = SelectField(_('user'), choices=([(0, _('all'))] + UserMapper.get_users()), default=0)
     apply = SubmitField(_('apply'))
 
 
@@ -27,7 +27,7 @@ class NewsLetterForm(Form):
 
 
 @app.route('/admin')
-@required_group('manager')
+@required_group('readonly')
 def admin_index():
     return render_template('admin/index.html')
 

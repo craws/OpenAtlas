@@ -8,7 +8,7 @@ from wtforms.validators import Email, DataRequired
 from wtforms import (BooleanField, HiddenField, PasswordField, SelectField, StringField,
                      SubmitField, TextAreaField)
 
-from openatlas import app
+from openatlas import app, EntityMapper
 from openatlas.models.user import User, UserMapper
 from openatlas.util.util import (format_date, link, required_group, send_mail, uc_first,
                                  is_authorized)
@@ -23,7 +23,7 @@ class UserForm(Form):
     password = PasswordField(_('password'), [DataRequired()])
     password2 = PasswordField(_('repeat password'), [DataRequired()])
     show_passwords = BooleanField(_('show passwords'))
-    real_name = StringField(_('name'))
+    real_name = StringField(_('name'), description=_('tooltip real name'))
     description = TextAreaField(_('info'))
     send_info = BooleanField(_('send account information'))
     save = SubmitField(_('save'))
@@ -50,37 +50,74 @@ class UserForm(Form):
         return valid
 
 
+class ActivityForm(Form):
+    action_choices = (
+        ('all', _('all')),
+        ('insert', _('insert')),
+        ('update', _('update')),
+        ('delete', _('delete')))
+    limit = SelectField(_('limit'), choices=((0, _('all')), (100, 100), (500, 500)), default=100, coerce=int)
+    user = SelectField(_('user'), choices=([(0, _('all'))] + UserMapper.get_users()), default=0, coerce=int)
+    action = SelectField(_('action'), choices=action_choices, default='all')
+    apply = SubmitField(_('apply'))
+
+
+@app.route('/admin/user/activity', methods=['POST', 'GET'])
+@app.route('/admin/user/activity/<int:user_id>', methods=['POST', 'GET'])
+@required_group('readonly')
+def user_activity(user_id=0):
+    form = ActivityForm()
+    table = {'id': 'activity', 'header': ['date', 'user', 'action', 'entity'], 'data': []}
+    if form.validate_on_submit():
+        activities = UserMapper.get_activities(form.limit.data, form.user.data, form.action.data)
+    elif user_id:
+        form.user.data = user_id
+        activities = UserMapper.get_activities(100, user_id, 'all')
+    else:
+        activities = UserMapper.get_activities(100, 0, 'all')
+    for row in activities:
+        entity = EntityMapper.get_by_id(row.entity_id, True)
+        user = UserMapper.get_by_id(row.user_id)
+        table['data'].append([
+            format_date(row.created),
+            link(user) if user else 'id ' + str(row.user_id),
+            _(row.action),
+            link(entity) if entity else 'id ' + str(row.entity_id)])
+    return render_template('user/activity.html', table=table, form=form)
+
+
 @app.route('/admin/user/view/<int:id_>')
-@required_group('manager')
+@required_group('readonly')
 def user_view(id_):
     user = UserMapper.get_by_id(id_)
     data = {'info': [
         (_('username'), link(user)),
         (_('group'), user.group),
         (_('name'), user.real_name),
-        (_('email'), user.email),
+        (_('email'), user.email if is_authorized('manager') or user.settings['show_email'] else ''),
         (_('language'), user.settings['language']),
         (_('last login'), format_date(user.login_last_success)),
-        (_('failed logins'), user.login_failed_count)]}
+        (_('failed logins'), user.login_failed_count if is_authorized('manager') else '')]}
     return render_template('user/view.html', user=user, data=data)
 
 
 @app.route('/admin/user')
-@required_group('manager')
+@required_group('readonly')
 def user_index():
     tables = {'user': {
         'id': 'user',
-        'sort': 'sortList: [[3, 1]]',
-        'header': ['username', 'group', 'email', 'newsletter', 'created', 'last login'],
+        'header': ['username', 'group', 'email', 'newsletter', 'created', 'last login', 'entities'],
         'data': []}}
     for user in UserMapper.get_all():
+        count = UserMapper.get_created_entites_count(user.id)
         tables['user']['data'].append([
             link(user),
             user.group,
-            user.email,
+            user.email if is_authorized('manager') or user.settings['show_email'] else '',
             _('yes') if user.settings['newsletter'] else '',
             format_date(user.created),
-            format_date(user.login_last_success)])
+            format_date(user.login_last_success),
+            count if count else ''])
     return render_template('user/index.html', tables=tables)
 
 

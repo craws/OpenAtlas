@@ -28,6 +28,7 @@
         {% if tables['latest'].data %}
             <h1>{{ _('latest')|uc_first }}</h1>
             {{ tables['latest']|pager|safe }}
+            <a href="{{ url_for('user_activity') }}">{{ _('Show all activity')|uc_first }}</a>
         {% endif %}
         {% if tables['bookmarks'].data %}
             <h1>{{ _('bookmarks')|uc_first }}</h1>

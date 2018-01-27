@@ -151,11 +151,14 @@ class EntityMapper:
         return EntityMapper.get_by_id(cursor.fetchone()[0])
 
     @staticmethod
-    def get_by_id(entity_id):
+    def get_by_id(entity_id, ignore_not_found=False):
         sql = EntityMapper.sql + ' WHERE e.id = %(id)s GROUP BY e.id ORDER BY e.name;'
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {'id': entity_id})
         openatlas.debug_model['by id'] += 1
+        # Return None in case it is excepted e.g. at logs, otherwise a 418 would be triggered
+        if cursor.rowcount < 1 and ignore_not_found:
+            return None
         return Entity(cursor.fetchone())
 
     @staticmethod

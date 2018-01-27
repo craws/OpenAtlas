@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
+    > <a href="{{ url_for('user_index') }}">{{ _('user')|uc_first }}</a>
+    > {{ _('activity')|uc_first }}
+{% endblock %}
+{% block content %}
+    {{ form|display_form|safe }}
+    {{ table|pager|safe }}
+{% endblock %}

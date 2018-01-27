@@ -6,17 +6,18 @@ class Changelog:
     """ A big OrderedDict with changelog data, maybe not the best place and format to keep it."""
     versions = OrderedDict()
     versions['3.2.0'] = {
-            'date': 'TBA',
-            'data': OrderedDict(
-                feature=OrderedDict([
-                    ('732', 'Documentation and manual'),
-                    ('879', 'Demo with MEDCON data')]))}
+        'date': 'TBA',
+        'data': OrderedDict(
+            feature=OrderedDict([
+                ('732', 'Documentation and manual'),
+                ('888', 'User and activity view'),
+                ('879', 'Demo with MEDCON data')]))}
     versions['3.1.0'] = {
-            'date': '2018-01-18',
-            'data': OrderedDict(
-                feature=OrderedDict([
-                    ('863', 'BC dates and date validation'),
-                    ('780', 'Color Schemes')]))}
+        'date': '2018-01-18',
+        'data': OrderedDict(
+            feature=OrderedDict([
+                ('863', 'BC dates and date validation'),
+                ('780', 'Color Schemes')]))}
     versions['3.0.0'] = {
         'date': '2017-12-31',
         'data': OrderedDict(

@@ -24,7 +24,7 @@ class UserTests(TestBaseCase):
             assert b'+ User' in rv.data
             rv = self.app.post(url_for('user_insert'), data=data)
             user_id = rv.location.split('/')[-1]
-            data['password2'] = 'same same, but different'
+            data['password'] = 'too short'
             rv = self.app.post(url_for('user_insert'), data=data)
             assert b'match' in rv.data
             rv = self.app.get(url_for('user_view', id_=user_id))
@@ -37,3 +37,14 @@ class UserTests(TestBaseCase):
             assert b'The warrant officer' in rv.data
             rv = self.app.get(url_for('user_delete', id_=user_id), follow_redirects=True)
             assert b'A user was deleted' in rv.data
+
+            # test activity log
+            data = {'name': 'test', 'description': 'test'}  # insert a reference to show something
+            self.app.post(url_for('reference_insert', code='bibliography'), data=data)
+            rv = self.app.get(url_for('user_activity'))
+            assert b'Activity' in rv.data
+            rv = self.app.get(url_for('user_activity', user_id=user_id))
+            assert b'Activity' in rv.data
+            data = {'limit': 'all', 'action': 'all', 'user': 'all'}
+            rv = self.app.post(url_for('user_activity', data=data))
+            assert b'Activity' in rv.data

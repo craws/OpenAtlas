@@ -230,7 +230,7 @@ def truncate_string(self, string):
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def build_delete_link(self, entity):
-    """Build a link to delete an entity with a JavaScript confirmation dialog."""
+    """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
     confirm = 'onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
     url = url_for(app.config['CODE_CLASS'][entity.class_.code] + '_delete', id_=entity.id)
@@ -240,13 +240,14 @@ def build_delete_link(self, entity):
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_menu(self, origin):
-    """Returns html with the menu and mark appropriate item as selected."""
+    """ Returns html with the menu and mark appropriate item as selected."""
     html = ''
     if current_user.is_authenticated:
         selected = ''
         if origin:
             selected = app.config['CODE_CLASS'][origin.class_.code]
-        for item in ['overview', 'source', 'event', 'actor', 'place', 'reference', 'types']:
+        items = ['overview', 'source', 'event', 'actor', 'place', 'reference', 'types', 'admin']
+        for item in items:
             if selected:
                 css = 'active' if item == selected else ''
             else:
@@ -254,17 +255,13 @@ def display_menu(self, origin):
                                   (item == 'overview' and request.path == '/') else ''
             html += '<div class="{css}"><a href="/{item}">{label}</a></div>'.format(
                 css=css, item=item, label=util.uc_first(_(item)))
-        if util.is_authorized('manager'):
-            css = 'active' if 'admin' in request.path else ''
-            html += '<div class="{css}"><a href="/admin">{label}</a></div>'.format(
-                css=css, label=util.uc_first(_('admin')))
     return html
 
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_debug_info(self, debug_model, form):
-    """Returns html with debug information about database queries and form errors."""
+    """ Returns html with debug information about database queries and form errors."""
     html = ''
     for name, value in debug_model.items():
         if name in ['current']:

@@ -5,15 +5,18 @@
     > {{ user.username }}
 {% endblock %}
 {% block content %}
-    <div class="button-bar">
-        {% if user.group != 'admin' or current_user.group == 'admin' %}
-            <a href="{{ url_for('user_update', id_=user.id) }}">{{ _('edit')|uc_first }}</a>
-        {% endif %}
-        {% if user.id != current_user.id and (user.group != 'admin' or current_user.group == 'admin') %}
-            <a onclick="return confirm('{{_('delete')|uc_first }} {{ user.username }}?')"
-               href="{{ url_for('user_delete', id_=user.id) }}">{{ _('delete')|uc_first }}</a>
-        {% endif %}
-    </div>
+    {% if 'manager'|is_authorized %}
+        <div class="button-bar">
+            {% if user.group != 'admin' or current_user.group == 'admin' %}
+                <a href="{{ url_for('user_update', id_=user.id) }}">{{ _('edit')|uc_first }}</a>
+            {% endif %}
+            {% if user.id != current_user.id and (user.group != 'admin' or current_user.group == 'admin') %}
+                <a onclick="return confirm('{{_('delete')|uc_first }} {{ user.username }}?')"
+                   href="{{ url_for('user_delete', id_=user.id) }}">{{ _('delete')|uc_first }}</a>
+            {% endif %}
+        </div>
+    {% endif %}
     {{ data['info']|data_table|safe }}
+    <a href="{{ url_for('user_activity', user_id=user.id) }}">{{ _('activity')|uc_first }}</a>
     {{ user|description|safe }}
 {% endblock %}

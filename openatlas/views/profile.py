@@ -58,7 +58,7 @@ class PasswordForm(Form):
 
 
 class ProfileForm(Form):
-    name = StringField(_('name'))
+    name = StringField(_('name'), description=_('tooltip real name'))
     email = StringField(_('email'), [InputRequired(), Email()], description=_('tooltip email'))
     show_email = BooleanField(_('show email'), description=_('tooltip show email'))
     newsletter = BooleanField(_('newsletter'), description=_('tooltip newsletter'))

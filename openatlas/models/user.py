@@ -53,7 +53,7 @@ class User(UserMixin):
         last_failure_date += datetime.timedelta(minutes=forget_minutes)
         if last_failure_date > datetime.datetime.now():
             return True
-        return False
+        return False  # pragma no cover - because not waiting in tests for forget_minutes to pass
 
 
 class UserMapper:
@@ -112,6 +112,25 @@ class UserMapper:
         cursor = openatlas.get_cursor()
         cursor.execute(UserMapper.sql + ' WHERE u.unsubscribe_code = %(code)s;', {'code': code})
         return User(cursor.fetchone()) if cursor.rowcount == 1 else None
+
+    @staticmethod
+    def get_activities(limit, user_id, action):
+        cursor = openatlas.get_cursor()
+        sql = """
+            SELECT id, user_id, entity_id, created, action, 'ignore' AS ignore
+            FROM web.user_log WHERE TRUE"""
+        sql += ' AND user_id = %(user_id)s' if int(user_id) else ''
+        sql += ' AND action = %(action)s' if action != 'all' else ''
+        sql += ' ORDER BY created DESC'
+        sql += ' LIMIT %(limit)s' if int(limit) else ''
+        cursor.execute(sql, {'limit': limit, 'user_id': user_id, 'action': action})
+        return cursor.fetchall()
+
+    def get_created_entites_count(user_id):
+        cursor = openatlas.get_cursor()
+        sql = "SELECT COUNT(*) FROM web.user_log WHERE user_id = %(user_id)s AND action = 'insert';"
+        cursor.execute(sql, {'user_id': user_id})
+        return cursor.fetchone()[0]
 
     @staticmethod
     def insert(form):
@@ -181,16 +200,6 @@ class UserMapper:
         openatlas.get_cursor().execute(sql, {'user_id': user_id})
 
     @staticmethod
-    def get_groups():
-        cursor = openatlas.get_cursor()
-        sql = 'SELECT name FROM web.group ORDER BY name;'
-        cursor.execute(sql)
-        groups = []
-        for row in cursor.fetchall():
-            groups.append((row.name, row.name))
-        return groups
-
-    @staticmethod
     def get_users():
         cursor = openatlas.get_cursor()
         sql = 'SELECT id, username FROM web.user ORDER BY username;'
@@ -238,7 +247,7 @@ class UserMapper:
         return settings
 
     @staticmethod
-    def generate_password(length=None):
+    def generate_password(length=None):  # pragma no cover - because only used in mail functions
         length = length if length else session['settings']['random_password_length']
         # with python 3.6 following can be used instead:
         # ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(length))
