@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-01-23 14:06+0100\n"
+"POT-Creation-Date: 2018-01-27 16:18+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -77,12 +77,32 @@ msgstr ""
 msgid "error multiple linked entities found"
 msgstr ""
 
-#: models/user.py:209 util/util.py:297
+#: models/user.py:218 util/util.py:297
 msgid "bookmark remove"
 msgstr ""
 
-#: models/user.py:214 util/util.py:295
+#: models/user.py:223 util/util.py:295
 msgid "bookmark"
+msgstr ""
+
+#: templates/403.html:11
+msgid "It seems you are not welcomed here."
+msgstr ""
+
+#: templates/403.html:14 templates/404.html:17
+msgid ""
+"Use the back button of your browser or click <a href=\"/\">here</a> to go"
+" to the main page."
+msgstr ""
+
+#: templates/404.html:11
+msgid "We are so sorry!"
+msgstr ""
+
+#: templates/404.html:14
+msgid ""
+"We searched a long time but this document does not exist. Maybe you "
+"mistyped or followed a broken link."
 msgstr ""
 
 #: templates/layout.html:38 util/util.py:247
@@ -179,7 +199,7 @@ msgstr ""
 #: templates/translation/update.html:6 templates/translation/view.html:11
 #: templates/types/index.html:41 templates/types/update.html:8
 #: templates/types/view.html:26 templates/user/update.html:6
-#: templates/user/view.html:10 views/actor.py:75 views/actor.py:104
+#: templates/user/view.html:11 views/actor.py:75 views/actor.py:104
 #: views/actor.py:126 views/actor.py:142 views/actor.py:159 views/event.py:161
 #: views/event.py:179 views/place.py:93 views/reference.py:131
 #: views/source.py:101
@@ -189,8 +209,8 @@ msgstr ""
 #: templates/map.html:11 templates/translation/view.html:13
 #: templates/translation/view.html:15 templates/types/index.html:43
 #: templates/types/index.html:44 templates/types/view.html:28
-#: templates/types/view.html:29 templates/user/view.html:13
-#: templates/user/view.html:14 util/filters.py:237
+#: templates/types/view.html:29 templates/user/view.html:14
+#: templates/user/view.html:15 util/filters.py:237 views/user.py:58
 msgid "delete"
 msgstr ""
 
@@ -331,45 +351,51 @@ msgstr ""
 #: templates/admin/newsletter.html:3 templates/admin/orphans.html:3
 #: templates/content/index.html:3 templates/content/update.html:3
 #: templates/content/view.html:3 templates/settings/index.html:3
-#: templates/settings/update.html:3 templates/user/index.html:3
-#: templates/user/insert.html:3 templates/user/update.html:3
-#: templates/user/view.html:3 util/filters.py:260
+#: templates/settings/update.html:3 templates/user/activity.html:3
+#: templates/user/index.html:3 templates/user/insert.html:3
+#: templates/user/update.html:3 templates/user/view.html:3
 msgid "admin"
 msgstr ""
 
-#: templates/admin/index.html:7 templates/user/index.html:4
+#: templates/admin/index.html:7 templates/admin/index.html:8
+#: templates/user/activity.html:4 templates/user/index.html:4
 #: templates/user/index.html:8 templates/user/insert.html:4
 #: templates/user/insert.html:5 templates/user/update.html:4
-#: templates/user/view.html:4 views/admin.py:19
+#: templates/user/view.html:4 views/admin.py:19 views/user.py:60
 msgid "user"
 msgstr ""
 
-#: templates/admin/index.html:8 templates/content/index.html:4
+#: templates/admin/index.html:9 templates/user/activity.html:5
+#: templates/user/view.html:20 views/involvement.py:22
+msgid "activity"
+msgstr ""
+
+#: templates/admin/index.html:11 templates/admin/newsletter.html:4
+#: views/profile.py:64 views/profile.py:77
+msgid "newsletter"
+msgstr ""
+
+#: templates/admin/index.html:14 templates/admin/index.html:18
+#: templates/settings/index.html:4 templates/settings/update.html:4
+msgid "settings"
+msgstr ""
+
+#: templates/admin/index.html:15 templates/content/index.html:4
 #: templates/content/update.html:4 templates/content/view.html:4
 #: views/admin.py:25 views/source.py:21 views/translation.py:18
 msgid "content"
 msgstr ""
 
-#: templates/admin/index.html:10 templates/settings/index.html:4
-#: templates/settings/update.html:4
-msgid "settings"
-msgstr ""
-
-#: templates/admin/index.html:11
+#: templates/admin/index.html:19
 msgid "orphaned entries"
 msgstr ""
 
-#: templates/admin/index.html:12
-msgid "log"
-msgstr ""
-
-#: templates/admin/index.html:14 templates/admin/newsletter.html:4
-#: views/profile.py:64 views/profile.py:77
-msgid "newsletter"
-msgstr ""
-
-#: templates/admin/log.html:4
+#: templates/admin/index.html:22 templates/admin/log.html:4
 msgid "logs"
+msgstr ""
+
+#: templates/admin/index.html:23
+msgid "system log"
 msgstr ""
 
 #: templates/admin/log.html:8
@@ -453,11 +479,11 @@ msgstr ""
 msgid "network"
 msgstr ""
 
-#: templates/index/index.html:18 views/user.py:63
+#: templates/index/index.html:18 views/user.py:99
 msgid "last login"
 msgstr ""
 
-#: templates/index/index.html:20 views/user.py:64
+#: templates/index/index.html:20 views/user.py:100
 msgid "failed logins"
 msgstr ""
 
@@ -469,11 +495,15 @@ msgstr ""
 msgid "latest"
 msgstr ""
 
-#: templates/index/index.html:33
+#: templates/index/index.html:31
+msgid "Show all activity"
+msgstr ""
+
+#: templates/index/index.html:34
 msgid "bookmarks"
 msgstr ""
 
-#: templates/index/index.html:39
+#: templates/index/index.html:40
 msgid "text_intro"
 msgstr ""
 
@@ -626,7 +656,7 @@ msgstr ""
 msgid "no"
 msgstr ""
 
-#: util/filters.py:54 views/user.py:81
+#: util/filters.py:54 views/user.py:117
 msgid "yes"
 msgstr ""
 
@@ -719,7 +749,7 @@ msgstr ""
 #: views/actor.py:20 views/event.py:20 views/hierarchy.py:17 views/place.py:19
 #: views/profile.py:61 views/profile.py:74 views/reference.py:20
 #: views/source.py:20 views/translation.py:17 views/types.py:17
-#: views/types.py:78 views/types.py:93 views/user.py:26 views/user.py:60
+#: views/types.py:78 views/types.py:93 views/user.py:26 views/user.py:96
 msgid "name"
 msgstr ""
 
@@ -744,7 +774,7 @@ msgstr ""
 #: views/reference.py:22 views/reference.py:31 views/reference.py:37
 #: views/reference.py:43 views/reference.py:49 views/reference.py:55
 #: views/relation.py:24 views/source.py:22 views/translation.py:19
-#: views/types.py:20
+#: views/types.py:20 views/user.py:56
 msgid "insert"
 msgstr ""
 
@@ -794,19 +824,24 @@ msgstr ""
 #: views/hierarchy.py:59 views/place.py:153 views/profile.py:90
 #: views/profile.py:125 views/reference.py:97 views/reference.py:200
 #: views/relation.py:86 views/settings.py:108 views/source.py:170
-#: views/translation.py:73 views/types.py:64 views/user.py:107
+#: views/translation.py:73 views/types.py:64 views/user.py:144
 msgid "info update"
 msgstr ""
 
-#: views/admin.py:17
+#: views/admin.py:17 views/user.py:59
 msgid "limit"
+msgstr ""
+
+#: views/admin.py:17 views/admin.py:19 views/user.py:55 views/user.py:59
+#: views/user.py:60
+msgid "all"
 msgstr ""
 
 #: views/admin.py:18
 msgid "priority"
 msgstr ""
 
-#: views/admin.py:20 views/model.py:154
+#: views/admin.py:20 views/model.py:154 views/user.py:62
 msgid "apply"
 msgstr ""
 
@@ -864,17 +899,13 @@ msgid ""
 "Profile."
 msgstr ""
 
-#: views/involvement.py:22
-msgid "activity"
-msgstr ""
-
 #: views/login.py:29 views/login.py:145 views/profile.py:73 views/user.py:20
-#: views/user.py:58 views/user.py:134
+#: views/user.py:94 views/user.py:171
 msgid "username"
 msgstr ""
 
 #: views/login.py:30 views/login.py:146 views/profile.py:34 views/user.py:23
-#: views/user.py:135
+#: views/user.py:172
 msgid "password"
 msgstr ""
 
@@ -883,7 +914,7 @@ msgid "show password"
 msgstr ""
 
 #: views/login.py:36 views/profile.py:62 views/profile.py:75 views/user.py:22
-#: views/user.py:61
+#: views/user.py:97
 msgid "email"
 msgstr ""
 
@@ -921,7 +952,7 @@ msgstr ""
 msgid "We received a password reset request for %(username)s"
 msgstr ""
 
-#: views/login.py:111 views/login.py:144 views/settings.py:65 views/user.py:133
+#: views/login.py:111 views/login.py:144 views/settings.py:65 views/user.py:170
 msgid "at"
 msgstr ""
 
@@ -983,7 +1014,7 @@ msgstr ""
 msgid "property"
 msgstr ""
 
-#: views/profile.py:17 views/user.py:62
+#: views/profile.py:17 views/user.py:98
 msgid "language"
 msgstr ""
 
@@ -1037,6 +1068,10 @@ msgstr ""
 
 #: views/profile.py:55 views/user.py:48
 msgid "error password too short"
+msgstr ""
+
+#: views/profile.py:61 views/user.py:26
+msgid "tooltip real name"
 msgstr ""
 
 #: views/profile.py:62
@@ -1201,7 +1236,7 @@ msgstr ""
 msgid "active"
 msgstr ""
 
-#: views/user.py:21 views/user.py:59
+#: views/user.py:21 views/user.py:95
 msgid "group"
 msgstr ""
 
@@ -1217,31 +1252,39 @@ msgstr ""
 msgid "error email exists"
 msgstr ""
 
-#: views/user.py:127
+#: views/user.py:57
+msgid "update"
+msgstr ""
+
+#: views/user.py:61
+msgid "action"
+msgstr ""
+
+#: views/user.py:164
 msgid "user created"
 msgstr ""
 
-#: views/user.py:129
+#: views/user.py:166
 #, python-format
 msgid "Your account information for %(sitename)s"
 msgstr ""
 
-#: views/user.py:132
+#: views/user.py:169
 #, python-format
 msgid "Account information for %(username)s"
 msgstr ""
 
-#: views/user.py:138
+#: views/user.py:175
 #, python-format
 msgid "Sent account information mail to %(email)s."
 msgstr ""
 
-#: views/user.py:141
+#: views/user.py:178
 #, python-format
 msgid "Failed to send account details to %(email)s."
 msgstr ""
 
-#: views/user.py:166
+#: views/user.py:203
 msgid "user deleted"
 msgstr ""
 
