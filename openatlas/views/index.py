@@ -54,7 +54,7 @@ def index():
                 entity.first,
                 entity.last,
                 format_date(entity.created),
-                openatlas.logger.get_log_for_advanced_view(entity.id)['creator_name']])
+                link(openatlas.logger.get_log_for_advanced_view(entity.id)['creator'])])
     intro = ContentMapper.get_translation('intro')
     return render_template('index/index.html', intro=intro, tables=tables)
 

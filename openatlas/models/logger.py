@@ -3,6 +3,7 @@ from flask import request, session
 from flask_login import current_user
 import openatlas
 from openatlas import app
+from openatlas.models.user import UserMapper
 
 
 class DBHandler:
@@ -71,10 +72,8 @@ class DBHandler:
         cursor.execute(sql, {'entity_id': entity_id, 'action': 'update'})
         row_update = cursor.fetchone()
         log = {
-            'creator_id': row_insert.user_id if row_insert else None,
-            'creator_name': row_insert.username if row_insert else None,
+            'creator': UserMapper.get_by_id(row_insert.user_id) if row_insert else None,
             'created': row_insert.created if row_insert else None,
-            'modifier_id': row_update.user_id if row_update else None,
-            'modifier_name': row_update.username if row_update else None,
+            'modifier': UserMapper.get_by_id(row_update.user_id) if row_update else None,
             'modified': row_update.created if row_update else None}
         return log

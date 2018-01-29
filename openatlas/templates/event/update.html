@@ -6,7 +6,7 @@
 {% endblock %}
 {% block content %}
     {% if modifier %}
-        <p class="error">{{ _('error modified by %(username)s', username=modifier) }}</p>
+        <p class="error">{{ _('error modified by %(username)s', username=modifier|safe) }}</p>
         <p><a class="button" href="{{ url_for('event_update', id_=event.id) }}">{{ _('reload')|uc_first }}</a></p>
     {% endif %}
     {{ form|display_form|safe }}

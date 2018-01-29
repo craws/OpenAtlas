@@ -13,7 +13,7 @@ from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (uc_first, truncate_string, required_group, get_entity_data,
                                  build_remove_link, get_base_table_data, is_authorized,
-                                 was_modified)
+                                 was_modified, link)
 
 
 class ReferenceForm(Form):
@@ -193,7 +193,7 @@ def reference_update(id_):
         if was_modified(form, reference):  # pragma: no cover
             del form.save
             flash(_('error modified'), 'error')
-            modifier = openatlas.logger.get_log_for_advanced_view(reference.id)['modifier_name']
+            modifier = link(openatlas.logger.get_log_for_advanced_view(reference.id)['modifier'])
             return render_template(
                 'reference/update.html', form=form, reference=reference, modifier=modifier)
         if save(form, reference):

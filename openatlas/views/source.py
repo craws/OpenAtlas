@@ -163,7 +163,7 @@ def source_update(id_):
         if was_modified(form, source):  # pragma: no cover
             del form.save
             flash(_('error modified'), 'error')
-            modifier = openatlas.logger.get_log_for_advanced_view(source.id)['modifier_name']
+            modifier = link(openatlas.logger.get_log_for_advanced_view(source.id)['modifier'])
             return render_template(
                 'source/update.html', form=form, source=source, modifier=modifier)
         if save(form, source):
