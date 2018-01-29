@@ -57,6 +57,7 @@ def actor_view(id_, unlink_id=None):
         info.append((uc_first(_('appears last')), link(object_)))
     tables = {
         'info': info,
+        'file': {'id': 'files', 'header': app.config['TABLE_HEADERS']['file'], 'data': []},
         'source': {
             'id': 'source', 'header': app.config['TABLE_HEADERS']['source'] + ['description'],
             'data': []},
@@ -69,6 +70,7 @@ def actor_view(id_, unlink_id=None):
         if name == 'source':
             data.append(truncate_string(link_.domain.description))
         else:
+
             data.append(truncate_string(link_.description))
             if is_authorized('editor'):
                 update_url = url_for('reference_link_update', link_id=link_.id, origin_id=actor.id)

@@ -1,4 +1,6 @@
 from collections import OrderedDict
+
+import os
 from flask_babel import lazy_gettext as _
 
 from openatlas.util.util import uc_first
@@ -18,6 +20,12 @@ DATABASE_PORT = 5432
 DATABASE_PASS = 'CHANGE ME'
 MAIL_PASSWORD = 'CHANGE ME'
 SECRET_KEY = 'CHANGE ME'
+
+UPLOAD_FOLDER = os.path.dirname(__file__) + '/../openatlas/uploads'
+
+# TODO: move to db
+MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB
+ALLOWED_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif', 'txt', 'bmp']
 
 # Whitelisted domains are ignored by the link checker
 WHITELISTED_DOMAINS = ['E61']
@@ -71,6 +79,7 @@ TABLE_HEADERS = {
     'actor': ['name', 'class', 'first', 'last'],
     'group': ['name', 'class', 'first', 'last'],
     'place': ['name', 'type', 'first', 'last'],
-    'reference': ['name', 'class', 'type']}
+    'reference': ['name', 'class', 'type'],
+    'file': ['name', 'size']}
 
 BASE_TYPES = ['Place', 'Information Carrier', 'Bibliography', 'Source', 'Edition', 'Event', 'Actor']

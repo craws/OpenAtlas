@@ -18,6 +18,7 @@
         {% if gis_data %}
             <li><a href="#tab-map" id="map-tab-id">{{ _('map')|uc_first }}</a></li>
         {% endif %}
+        <li><a href="#tab-file">{{ _('files')|uc_first }}  ({{ tables['file']['data']|length }})</a></li>
     </ul>
     <div id="tab-info">
         <div class="button-bar">
@@ -91,6 +92,15 @@
             </div>
         {% endif %}
         {{ tables['reference']|pager|safe }}
+    </div>
+    <div id="tab-file">
+        {% if 'editor'|is_authorized: %}
+            <div class="button-bar">
+                <a href="{{ url_for('file_add', origin_id=actor.id)}}">{{ _('add')|uc_first }}</a>
+                <a href="{{ url_for('file_insert', origin_id=actor.id) }}">+ {{ _('file')|uc_first }}</a>
+            </div>
+        {% endif %}
+        {{ tables['file']|pager|safe }}
     </div>
     {% if gis_data %}
         <div id="tab-map">

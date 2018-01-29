@@ -58,7 +58,7 @@ from openatlas.models.settings import SettingsMapper
 from openatlas.util import filters
 from openatlas.views import (actor, admin, ajax, content, event, hierarchy, index, login, types,
                              model, place, profile, reference, settings, source, translation, user,
-                             involvement, relation, member, search)
+                             involvement, relation, member, search, file)
 
 from openatlas.models.logger import DBHandler
 logger = DBHandler()

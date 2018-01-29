@@ -149,6 +149,7 @@ def get_class_name(self, code):
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_form(self, form, form_id=None, for_persons=False):
+    multipart = 'enctype="multipart/form-data"' if hasattr(form, 'file') else ''
     if hasattr(form, 'name') and form.name.data:  # if name.data exists it's an update
         if hasattr(form, 'save') and hasattr(form.save, 'label'):
             form.save.label.text = _('save')
@@ -202,7 +203,7 @@ def display_form(self, form, form_id=None, for_persons=False):
         html['main'] += '<div class="table-row"><div>' + str(field.label) + '</div>'
         html['main'] += '<div class="table-cell">' + str(field(class_=class_)).replace('> ', '>') + errors + '</div></div>'
 
-    html_all = '<form method="post"' + id_attribute + '>' + '<div class="data-table">'
+    html_all = '<form method="post"' + id_attribute + ' ' + multipart + '>' + '<div class="data-table">'
     html_all += html['header'] + html['types'] + html['main'] + html['footer'] + '</div></form>'
     return html_all
 
