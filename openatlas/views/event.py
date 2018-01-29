@@ -110,7 +110,7 @@ def event_update(id_):
         if was_modified(form, event):  # pragma: no cover
             del form.save
             flash(_('error modified'), 'error')
-            modifier = openatlas.logger.get_log_for_advanced_view(event.id)['modifier_name']
+            modifier = link(openatlas.logger.get_log_for_advanced_view(event.id)['modifier'])
             return render_template('event/update.html', form=form, event=event, modifier=modifier)
         if save(form, event):
             flash(_('info update'), 'info')

@@ -208,15 +208,10 @@ def get_entity_data(entity, location=None):
     if hasattr(current_user, 'settings') and current_user.settings['layout'] == 'advanced':
         data.append((uc_first(_('class')), link(entity.class_)))
         user_log = openatlas.logger.get_log_for_advanced_view(entity.id)
-        created = format_date(entity.created) if entity.modified else ''
-        if user_log['creator_id']:
-            created = format_date(user_log['created']) + ' ' + user_log['creator_name']
-        data.append((_('created'), created))
-        modified = format_date(entity.modified) if entity.modified else None
-        if user_log['modifier_id']:
-            modified = format_date(user_log['modified']) + ' ' + user_log['modifier_name']
-        if modified:
-            data.append((_('modified'), modified))
+        data.append((_('created'), format_date(entity.created) + ' ' + link(user_log['creator'])))
+        if user_log['modified']:
+            info = format_date(user_log['modified']) + ' ' + link(user_log['creator'])
+            data.append((_('modified'), info))
 
     return data
 
