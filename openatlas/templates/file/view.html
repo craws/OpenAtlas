@@ -4,4 +4,32 @@
     > {{ entity.name|truncate_string|safe }}
 {% endblock %}
 {% block content %}
+    <div id="tabs" class="tabs-container">
+    <ul>
+        <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
+        <li><a href="#tab-source">{{ _('source')|uc_first }} ({{ tables['source']['data']|length }})</a></li>
+        <li><a href="#tab-event">{{ _('event')|uc_first }} ({{ tables['event']['data']|length }})</a></li>
+        <li><a href="#tab-actor">{{ _('actor')|uc_first }} ({{ tables['actor']['data']|length }})</a></li>
+        <li><a href="#tab-place">{{ _('place')|uc_first }} ({{ tables['place']['data']|length }})</a></li>
+        <li><a href="#tab-reference">{{ _('reference')|uc_first }} ({{ tables['reference']['data']|length }})</a></li>
+    </ul>
+    <div id="tab-info">
+        <div class="button-bar">
+            {{ entity|page_buttons|safe }}
+            {% if 'editor'|is_authorized: %}
+                <a href="{{ url_for('file_update', id_=entity.id) }}">{{ _('edit')|uc_first }}</a>
+                {{ entity|build_delete_link|safe }}
+            {% endif %}
+            {{ entity.id|bookmark_toggle|safe }}
+        </div>
+        <h1>{{ entity.name }}</h1>
+        {{ tables['info']|data_table|safe }}
+        {{ entity|description|safe }}
+    </div>
+    {% for name in ['source', 'event', 'actor', 'place', 'reference']: %}
+        <div id="tab-{{name}}">
+            {{ tables[name]|pager|safe }}
+        </div>
+    {% endfor %}
+</div>
 {% endblock %}

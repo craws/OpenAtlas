@@ -4,7 +4,8 @@
 {% endblock %}
 {% block content %}
     <div class="button-bar">
-        <h1 style="margin-top:0;">{{ _('user')|uc_first }}</h1>
+        <a href="{{ url_for('file_index') }}">{{ _('files')|uc_first }}</a>
+        <h1 >{{ _('user')|uc_first }}</h1>
         <a href="{{ url_for('user_index') }}">{{ _('user')|uc_first }}</a>
         <a href="{{ url_for('user_activity') }}">{{ _('activity')|uc_first }}</a>
         {% if 'manager'|is_authorized and session['settings']['mail']: %}

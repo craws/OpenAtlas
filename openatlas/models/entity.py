@@ -72,6 +72,8 @@ class Entity:
         root_name = app.config['CODE_CLASS'][self.class_.code].title()
         if self.class_.code in app.config['CLASS_CODES']['reference']:
             root_name = self.system_type.title()
+        if self.system_type == 'file':
+            root_name = 'License'
         root_id = openatlas.NodeMapper.get_hierarchy_by_name(root_name).id
         for node in self.nodes:
             if node.root and node.root[-1] == root_id:
@@ -169,6 +171,17 @@ class EntityMapper:
         cursor = openatlas.get_cursor()
         cursor.execute(sql, {'ids': tuple(entity_ids)})
         openatlas.debug_model['by id'] += 1
+        entities = []
+        for row in cursor.fetchall():
+            entities.append(Entity(row))
+        return entities
+
+    @staticmethod
+    def get_by_system_type(system_type):
+        cursor = openatlas.get_cursor()
+        sql = EntityMapper.sql
+        sql += ' WHERE e.system_type = %(system_type)s GROUP BY e.id ORDER BY e.name;'
+        cursor.execute(sql, {'system_type': system_type})
         entities = []
         for row in cursor.fetchall():
             entities.append(Entity(row))

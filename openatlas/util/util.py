@@ -1,5 +1,9 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+import glob
+
 import numpy
+import math
+import os
 import re
 import smtplib
 from collections import OrderedDict
@@ -22,6 +26,19 @@ from openatlas.models.date import DateMapper
 from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.property import Property
 from openatlas.models.user import User
+
+
+def convert_size(size_bytes):
+    if size_bytes == 0:
+        return "0B"  # pragma: no cover
+    size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+    i = int(math.floor(math.log(size_bytes, 1024)))
+    return "%s %s" % (int(size_bytes / math.pow(1024, i)), size_name[i])
+
+
+def print_file_size(entity, name=None):
+    path = glob.glob(os.path.join(app.config['UPLOAD_FOLDER'], str(entity.id) + '.*'))[0]
+    return convert_size(os.path.getsize(path))
 
 
 def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
@@ -93,7 +110,7 @@ def sanitize(string, mode=None):
 
 
 def build_table_form(class_name, linked_entities):
-    """Returns a form with a list of entities with checkboxes"""
+    """ Returns a form with a list of entities with checkboxes"""
     # Todo: add CSRF token
     form = '<form class="table" method="post">'
     header = app.config['TABLE_HEADERS'][class_name] + ['']
@@ -113,7 +130,7 @@ def build_table_form(class_name, linked_entities):
 
 
 def build_remove_link(url, name):
-    """Build a link to remove a link with a JavaScript confirmation dialog"""
+    """ Build a link to remove a link with a JavaScript confirmation dialog"""
     name = name.replace('\'', '')
     confirm = 'onclick="return confirm(\'' + _('Remove %(name)s?', name=name) + '\')"'
     return '<a ' + confirm + ' href="' + url + '">' + uc_first(_('remove')) + '</a>'
@@ -212,7 +229,6 @@ def get_entity_data(entity, location=None):
         if user_log['modified']:
             info = format_date(user_log['modified']) + ' ' + link(user_log['creator'])
             data.append((_('modified'), info))
-
     return data
 
 
@@ -349,11 +365,12 @@ def link(entity):
         html = '<a href="' + url + '">' + entity.code + '</a>'
     elif isinstance(entity, Entity):
         url = ''
-        if entity.class_.code == 'E33':
-            if entity.system_type == 'source content':
-                url = url_for('source_view', id_=entity.id)
-            elif entity.system_type == 'source translation':
-                url = url_for('translation_view', id_=entity.id)
+        if entity.system_type == 'source content':
+            url = url_for('source_view', id_=entity.id)
+        elif entity.system_type == 'source translation':
+            url = url_for('translation_view', id_=entity.id)
+        elif entity.system_type == 'file':
+            url = url_for('file_view', id_=entity.id)
         elif entity.class_.code in ('E7', 'E8', 'E12', 'E6'):
             url = url_for('event_view', id_=entity.id)
         elif entity.class_.code in ('E21', 'E74', 'E40'):
@@ -459,7 +476,7 @@ def pager(table):
 
 
 def get_base_table_data(entity):
-    """Returns standard table data for an entity"""
+    """ Returns standard table data for an entity"""
     name = app.config['CODE_CLASS'][entity.class_.code]
     data = [link(entity)]
     if name in ['event', 'actor']:
@@ -475,7 +492,7 @@ def get_base_table_data(entity):
 
 
 def was_modified(form, entity):   # pragma: no cover
-    """Checks if an entity was modified after an update form was opened."""
+    """ Checks if an entity was modified after an update form was opened."""
     if not entity.modified or not form.opened.data:
         return False
     if entity.modified < datetime.fromtimestamp(float(form.opened.data)):
