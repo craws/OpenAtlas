@@ -1,5 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import session
+from flask import session, g
+
 import openatlas
 from openatlas import app
 
@@ -43,13 +44,13 @@ class Property:
         valid_domain_id = getattr(self, attr)
         if valid_domain_id == class_id:
             return True
-        return self.find_subs(attr, class_id, openatlas.classes[valid_domain_id].sub)
+        return self.find_subs(attr, class_id, g.classes[valid_domain_id].sub)
 
     def find_subs(self, attr, class_id, valid_subs):
         for sub_id in valid_subs:
             if sub_id == class_id:
                 return True
-            elif self.find_subs(attr, class_id, openatlas.classes[sub_id].sub):
+            elif self.find_subs(attr, class_id, g.classes[sub_id].sub):
                 return True
 
 
@@ -58,22 +59,21 @@ class PropertyMapper:
     @staticmethod
     def get_all():
         properties = {}
-        cursor = openatlas.get_cursor()
         sql = """
             SELECT id, code, domain_class_code, range_class_code, name, name_inverse
             FROM model.property;"""
-        cursor.execute(sql)
-        for row in cursor.fetchall():
+        g.cursor.execute(sql)
+        for row in g.cursor.fetchall():
             properties[row.code] = Property(row)
-        cursor.execute('SELECT super_code, sub_code FROM model.property_inheritance;')
-        for row in cursor.fetchall():
+        g.cursor.execute('SELECT super_code, sub_code FROM model.property_inheritance;')
+        for row in g.cursor.fetchall():
             properties[row.super_code].sub.append(row.sub_code)
             properties[row.sub_code].super.append(row.super_code)
         sql = """
             SELECT property_code, language_code, attribute, text FROM model.property_i18n
             WHERE language_code IN %(language_codes)s;"""
-        cursor.execute(sql, {'language_codes': tuple(app.config['LANGUAGES'].keys())})
-        for row in cursor.fetchall():
+        g.cursor.execute(sql, {'language_codes': tuple(app.config['LANGUAGES'].keys())})
+        for row in g.cursor.fetchall():
             property_ = properties[row.property_code]
             if row.language_code not in property_.i18n:
                 property_.i18n[row.language_code] = {}

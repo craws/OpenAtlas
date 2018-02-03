@@ -1,12 +1,12 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
-from flask import render_template
+
+from flask import render_template, g
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from wtforms import BooleanField, HiddenField, IntegerField, SubmitField
 from wtforms.validators import InputRequired
 
-import openatlas
 from openatlas import app
 from openatlas.models.network import Network
 from openatlas.util.util import link, required_group
@@ -22,19 +22,19 @@ class LinkCheckForm(Form):
 def model_index():
     form = LinkCheckForm()
     form_classes = OrderedDict()
-    for code, class_ in openatlas.classes.items():
+    for code, class_ in g.classes.items():
         form_classes[code] = code + ' ' + class_.name
     form.domain.choices = form_classes.items()
     form.range.choices = form_classes.items()
     form_properties = OrderedDict()
-    for code, property_ in openatlas.properties.items():
+    for code, property_ in g.properties.items():
         form_properties[code] = code + ' ' + property_.name
     form.property.choices = form_properties.items()
     test_result = None
     if form.validate_on_submit():
-        domain = openatlas.classes[form.domain.data]
-        range_ = openatlas.classes[form.range.data]
-        property_ = openatlas.properties[form.property.data]
+        domain = g.classes[form.domain.data]
+        range_ = g.classes[form.range.data]
+        property_ = g.properties[form.property.data]
         ignore = app.config['WHITELISTED_DOMAINS']
         domain_error = True
         if property_.find_object('domain_class_code', domain.code) or domain.code in ignore:
@@ -50,8 +50,8 @@ def model_index():
             'property': property_,
             'range': range_}
     else:
-        domain = openatlas.classes['E1']
-        property_ = openatlas.properties['P1']
+        domain = g.classes['E1']
+        property_ = g.properties['P1']
         range_ = domain
         form.domain.data = domain.code
         form.property.data = property_.code
@@ -70,15 +70,15 @@ def class_index():
     table = {
         'id': 'classes', 'header': ['code', 'name'], 'data': [],
         'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'}
-    for class_id, class_ in openatlas.classes.items():
+    for class_id, class_ in g.classes.items():
         table['data'].append([link(class_), class_.name])
     return render_template('model/class.html', table=table)
 
 
 @app.route('/overview/model/property')
 def property_index():
-    classes = openatlas.classes
-    properties = openatlas.properties
+    classes = g.classes
+    properties = g.properties
     table = {
         'id': 'properties', 'data': [],
         'header': ['code', 'name', 'inverse', 'domain', 'domain name', 'range', 'range name'],
@@ -98,7 +98,7 @@ def property_index():
 
 @app.route('/overview/model/class_view/<code>')
 def class_view(code):
-    classes = openatlas.classes
+    classes = g.classes
     class_ = classes[code]
     tables = OrderedDict()
     for table in ['super', 'sub']:
@@ -113,7 +113,7 @@ def class_view(code):
     tables['ranges'] = {
         'id': 'ranges', 'header': ['code', 'name'], 'data': [],
         'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'}
-    for key, property_ in openatlas.properties.items():
+    for key, property_ in g.properties.items():
         if code == property_.domain_class_code:
             tables['domains']['data'].append([link(property_), property_.name])
         elif code == property_.range_class_code:
@@ -124,9 +124,8 @@ def class_view(code):
 
 @app.route('/overview/model/property_view/<code>')
 def property_view(code):
-    properties = openatlas.properties
-    property_ = properties[code]
-    classes = openatlas.classes
+    property_ = g.properties[code]
+    classes = g.classes
     tables = {
         'info': [
             ('code', property_.code),
@@ -139,9 +138,7 @@ def property_view(code):
             'id': table, 'header': ['code', 'name'], 'data': [],
             'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }}'}
         for code in getattr(property_, table):
-            tables[table]['data'].append([
-                link(properties[code]),
-                properties[code].name])
+            tables[table]['data'].append([link(g.properties[code]), g.properties[code].name])
     return render_template('model/property_view.html', property=property_, tables=tables)
 
 

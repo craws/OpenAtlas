@@ -1,6 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
-from flask import flash, render_template, session, url_for, request
+
+from flask import flash, render_template, session, url_for, request, g
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import Form
@@ -100,14 +101,14 @@ def settings_index():
 def settings_update():
     form = SettingsForm()
     if form.validate_on_submit():
-        openatlas.get_cursor().execute('BEGIN')
+        g.cursor.execute('BEGIN')
         try:
             SettingsMapper.update(form)
             openatlas.logger.log('info', 'settings', 'Settings updated')
-            openatlas.get_cursor().execute('COMMIT')
+            g.cursor.execute('COMMIT')
             flash(_('info update'), 'info')
         except Exception as e:  # pragma: no cover
-            openatlas.get_cursor().execute('ROLLBACK')
+            g.cursor.execute('ROLLBACK')
             openatlas.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('settings_index'))

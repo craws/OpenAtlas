@@ -5,7 +5,7 @@ import re
 
 import os
 
-from flask import render_template_string, url_for, request
+from flask import render_template_string, url_for, request, g
 from flask_login import current_user
 from jinja2 import evalcontextfilter, escape
 from flask_babel import lazy_gettext as _
@@ -68,10 +68,10 @@ def bookmark_toggle(self, entity_id):
 @blueprint.app_template_filter()
 def table_select_model(self, name, selected=None):
     if name in ['domain', 'range']:
-        entities = openatlas.classes
+        entities = g.classes
         sorter = 'sortList: [[0, 0]], headers: {0: { sorter: "class_code" }}'
     else:
-        entities = openatlas.properties
+        entities = g.properties
         sorter = 'sortList: [[0, 0]], headers: {0: { sorter: "property_code" }}'
     table = {
         'id': name,
@@ -100,6 +100,12 @@ def table_select_model(self, name, selected=None):
 @blueprint.app_template_filter()
 def pager(self, table):
     return util.pager(table)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def get_class_name(self, code):
+    return g.classes[code].name
 
 
 @jinja2.contextfilter
@@ -142,12 +148,6 @@ def page_buttons(self, entity):
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def get_class_name(self, code):
-    return openatlas.classes[code].name
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
 def display_form(self, form, form_id=None, for_persons=False):
     if hasattr(form, 'name') and form.name.data:  # if name.data exists it's an update
         if hasattr(form, 'save') and hasattr(form.save, 'label'):
@@ -166,7 +166,7 @@ def display_form(self, form, form_id=None, for_persons=False):
                 hierarchy_id = int(field.id)
             except ValueError:
                 hierarchy_id = openatlas.NodeMapper.get_hierarchy_by_name(util.uc_first(field.id)).id
-            node = openatlas.nodes[hierarchy_id]
+            node = g.nodes[hierarchy_id]
             if node.name in app.config['BASE_TYPES']:
                 base_type = '<div class="table-row"><div><label>' + util.uc_first(_('type')) + '</label>'
                 base_type += ' <span class="tooltip" title="' + _('tooltip type') + '">i</span></div>'

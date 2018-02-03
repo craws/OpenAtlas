@@ -1,12 +1,13 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+import datetime
 import random
 import string
 
 import bcrypt
-import datetime
-from flask import session
+from flask import session, g
 from flask_babel import lazy_gettext as _
 from flask_login import UserMixin
+
 import openatlas
 
 
@@ -66,56 +67,50 @@ class UserMapper:
 
     @staticmethod
     def get_all():
-        cursor = openatlas.get_cursor()
-        cursor.execute(UserMapper.sql)
+        g.cursor.execute(UserMapper.sql)
         users = []
-        for row in cursor.fetchall():
+        for row in g.cursor.fetchall():
             users.append(User(row))
         openatlas.debug_model['user'] += 1
         return users
 
     @staticmethod
     def get_by_id(user_id, with_bookmarks=False):
-        cursor = openatlas.get_cursor()
         bookmarks = None
         if with_bookmarks:
             sql = 'SELECT entity_id FROM web.user_bookmarks WHERE user_id = %(user_id)s;'
-            cursor.execute(sql, {'user_id': user_id})
+            g.cursor.execute(sql, {'user_id': user_id})
             bookmarks = []
-            for row in cursor.fetchall():
+            for row in g.cursor.fetchall():
                 bookmarks.append(row.entity_id)
-        cursor.execute(UserMapper.sql + ' WHERE u.id = %(id)s;', {'id': user_id})
-        return User(cursor.fetchone(), bookmarks) if cursor.rowcount == 1 else None
+        g.cursor.execute(UserMapper.sql + ' WHERE u.id = %(id)s;', {'id': user_id})
+        return User(g.cursor.fetchone(), bookmarks) if g.cursor.rowcount == 1 else None
 
     @staticmethod
     def get_by_reset_code(code):
-        cursor = openatlas.get_cursor()
-        cursor.execute(UserMapper.sql + ' WHERE u.password_reset_code = %(code)s;', {'code': code})
-        return User(cursor.fetchone()) if cursor.rowcount == 1 else None
+        sql = UserMapper.sql + ' WHERE u.password_reset_code = %(code)s;'
+        g.cursor.execute(sql, {'code': code})
+        return User(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod
     def get_by_email(email):
         sql = UserMapper.sql + ' WHERE LOWER(u.email) = LOWER(%(email)s);'
-        cursor = openatlas.get_cursor()
-        cursor.execute(sql, {'email': email})
-        return User(cursor.fetchone()) if cursor.rowcount == 1 else None
+        g.cursor.execute(sql, {'email': email})
+        return User(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod
     def get_by_username(username):
         sql = UserMapper.sql + ' WHERE LOWER(u.username) = LOWER(%(username)s);'
-        cursor = openatlas.get_cursor()
-        cursor.execute(sql, {'username': username})
-        return User(cursor.fetchone()) if cursor.rowcount == 1 else None
+        g.cursor.execute(sql, {'username': username})
+        return User(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod
     def get_by_unsubscribe_code(code):
-        cursor = openatlas.get_cursor()
-        cursor.execute(UserMapper.sql + ' WHERE u.unsubscribe_code = %(code)s;', {'code': code})
-        return User(cursor.fetchone()) if cursor.rowcount == 1 else None
+        g.cursor.execute(UserMapper.sql + ' WHERE u.unsubscribe_code = %(code)s;', {'code': code})
+        return User(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod
     def get_activities(limit, user_id, action):
-        cursor = openatlas.get_cursor()
         sql = """
             SELECT id, user_id, entity_id, created, action, 'ignore' AS ignore
             FROM web.user_log WHERE TRUE"""
@@ -123,25 +118,24 @@ class UserMapper:
         sql += ' AND action = %(action)s' if action != 'all' else ''
         sql += ' ORDER BY created DESC'
         sql += ' LIMIT %(limit)s' if int(limit) else ''
-        cursor.execute(sql, {'limit': limit, 'user_id': user_id, 'action': action})
-        return cursor.fetchall()
+        g.cursor.execute(sql, {'limit': limit, 'user_id': user_id, 'action': action})
+        return g.cursor.fetchall()
 
-    def get_created_entites_count(user_id):
-        cursor = openatlas.get_cursor()
+    @staticmethod
+    def get_created_entities_count(user_id):
         sql = "SELECT COUNT(*) FROM web.user_log WHERE user_id = %(user_id)s AND action = 'insert';"
-        cursor.execute(sql, {'user_id': user_id})
-        return cursor.fetchone()[0]
+        g.cursor.execute(sql, {'user_id': user_id})
+        return g.cursor.fetchone()[0]
 
     @staticmethod
     def insert(form):
-        cursor = openatlas.get_cursor()
         sql = """
             INSERT INTO web.user (username, real_name, info, email, active, password, group_id)
             VALUES (%(username)s, %(real_name)s, %(info)s, %(email)s, %(active)s, %(password)s,
                 (SELECT id FROM web.group WHERE name LIKE %(group_name)s))
             RETURNING id;"""
         password = form.password.data.encode('utf-8')
-        cursor.execute(sql, {
+        g.cursor.execute(sql, {
             'username': form.username.data,
             'real_name': form.real_name.data,
             'info': form.description.data,
@@ -149,11 +143,10 @@ class UserMapper:
             'active': form.active.data,
             'group_name': form.group.data,
             'password': bcrypt.hashpw(password, bcrypt.gensalt()).decode('utf-8')})
-        return cursor.fetchone()[0]
+        return g.cursor.fetchone()[0]
 
     @staticmethod
     def update(user):
-        cursor = openatlas.get_cursor()
         sql = """
             UPDATE web.user SET (username, password, real_name, info, email, active,
                 login_last_success, login_last_failure, login_failed_count, group_id,
@@ -163,7 +156,7 @@ class UserMapper:
                 (SELECT id FROM web.group WHERE name LIKE %(group_name)s),
                 %(password_reset_code)s, %(password_reset_date)s, %(unsubscribe_code)s)
             WHERE id = %(id)s;"""
-        cursor.execute(sql, {
+        g.cursor.execute(sql, {
             'id': user.id,
             'username': user.username,
             'real_name': user.real_name,
@@ -182,7 +175,6 @@ class UserMapper:
 
     @staticmethod
     def update_settings(user):
-        cursor = openatlas.get_cursor()
         for name, value in user.settings.items():
             if name == 'newsletter':
                 value = 'True' if user.settings['newsletter'] else ''
@@ -192,26 +184,24 @@ class UserMapper:
                 INSERT INTO web.user_settings (user_id, "name", "value")
                 VALUES (%(user_id)s, %(name)s, %(value)s)
                 ON CONFLICT (user_id, name) DO UPDATE SET "value" = excluded.value;"""
-            cursor.execute(sql, {'user_id': user.id, 'name': name, 'value': value})
+            g.cursor.execute(sql, {'user_id': user.id, 'name': name, 'value': value})
 
     @staticmethod
     def delete(user_id):
         sql = 'DELETE FROM web."user" WHERE id = %(user_id)s;'
-        openatlas.get_cursor().execute(sql, {'user_id': user_id})
+        g.cursor.execute(sql, {'user_id': user_id})
 
     @staticmethod
     def get_users():
-        cursor = openatlas.get_cursor()
         sql = 'SELECT id, username FROM web.user ORDER BY username;'
-        cursor.execute(sql)
+        g.cursor.execute(sql)
         users = []
-        for row in cursor.fetchall():
+        for row in g.cursor.fetchall():
             users.append((row.id, row.username))
         return users
 
     @staticmethod
     def toggle_bookmark(entity_id, user):
-        cursor = openatlas.get_cursor()
         sql = """
             INSERT INTO web.user_bookmarks (user_id, entity_id)
             VALUES (%(user_id)s, %(entity_id)s);"""
@@ -221,16 +211,15 @@ class UserMapper:
                 DELETE FROM web.user_bookmarks
                 WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s;"""
             label = _('bookmark')
-        cursor.execute(sql, {'user_id': user.id, 'entity_id': entity_id})
+        g.cursor.execute(sql, {'user_id': user.id, 'entity_id': entity_id})
         return label
 
     @staticmethod
     def get_settings(user_id):
-        cursor = openatlas.get_cursor()
         sql = 'SELECT "name", value FROM web.user_settings WHERE user_id = %(user_id)s;'
-        cursor.execute(sql, {'user_id': user_id})
+        g.cursor.execute(sql, {'user_id': user_id})
         settings = {}
-        for row in cursor.fetchall():
+        for row in g.cursor.fetchall():
             settings[row.name] = row.value
         for item in ['newsletter', 'show_email']:
             settings[item] = True if item in settings and settings[item] == 'True' else False

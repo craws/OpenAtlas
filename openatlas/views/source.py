@@ -1,5 +1,5 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import render_template, url_for, flash, request
+from flask import render_template, url_for, flash, request, g
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
@@ -107,16 +107,16 @@ def source_view(id_, unlink_id=None):
 @app.route('/source/add/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('editor')
 def source_add(origin_id):
-    """Link an entity to source coming from the entity."""
+    """ Link an entity to source coming from the entity."""
     origin = EntityMapper.get_by_id(origin_id)
     if request.method == 'POST':
-        openatlas.get_cursor().execute('BEGIN')
+        g.cursor.execute('BEGIN')
         try:
             for value in request.form.getlist('values'):
                 LinkMapper.insert(int(value), 'P67', origin.id)
-            openatlas.get_cursor().execute('COMMIT')
+            g.cursor.execute('COMMIT')
         except Exception as e:  # pragma: no cover
-            openatlas.get_cursor().execute('ROLLBACK')
+            g.cursor.execute('ROLLBACK')
             openatlas.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         view_name = app.config['CODE_CLASS'][origin.class_.code]
@@ -128,7 +128,7 @@ def source_add(origin_id):
 @app.route('/source/add2/<int:id_>/<class_name>', methods=['POST', 'GET'])
 @required_group('editor')
 def source_add2(id_, class_name):
-    """Link an entity to source coming from the source."""
+    """ Link an entity to source coming from the source."""
     source = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
         for value in request.form.getlist('values'):
@@ -141,14 +141,14 @@ def source_add2(id_, class_name):
 @app.route('/source/delete/<int:id_>')
 @required_group('editor')
 def source_delete(id_):
-    openatlas.get_cursor().execute('BEGIN')
+    g.cursor.execute('BEGIN')
     try:
         EntityMapper.delete(id_)
         openatlas.logger.log_user(id_, 'delete')
-        openatlas.get_cursor().execute('COMMIT')
+        g.cursor.execute('COMMIT')
         flash(_('entity deleted'), 'info')
     except Exception as e:  # pragma: no cover
-        openatlas.get_cursor().execute('ROLLBACK')
+        g.cursor.execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
     return redirect(url_for('source_index'))
@@ -174,7 +174,7 @@ def source_update(id_):
 
 def save(form, source=None, origin=None):
     link_ = None
-    openatlas.get_cursor().execute('BEGIN')
+    g.cursor.execute('BEGIN')
     try:
         if source:
             openatlas.logger.log_user(source.id, 'update')
@@ -190,9 +190,9 @@ def save(form, source=None, origin=None):
                 link_ = origin.link('P67', source)
             else:
                 source.link('P67', origin)
-        openatlas.get_cursor().execute('COMMIT')
+        g.cursor.execute('COMMIT')
     except Exception as e:  # pragma: no cover
-        openatlas.get_cursor().execute('ROLLBACK')
+        g.cursor.execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
     return link_ if link_ else source

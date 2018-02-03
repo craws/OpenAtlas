@@ -1,5 +1,4 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-import numpy
 import re
 import smtplib
 from collections import OrderedDict
@@ -7,12 +6,13 @@ from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
-
-from babel import dates
-from flask import abort, url_for, request, session, flash
-from flask_login import current_user
-from flask_babel import lazy_gettext as _
 from html.parser import HTMLParser
+
+import numpy
+from babel import dates
+from flask import abort, url_for, request, session, flash, g
+from flask_babel import lazy_gettext as _
+from flask_login import current_user
 from werkzeug.utils import redirect
 
 import openatlas
@@ -93,7 +93,7 @@ def sanitize(string, mode=None):
 
 
 def build_table_form(class_name, linked_entities):
-    """Returns a form with a list of entities with checkboxes"""
+    """ Returns a form with a list of entities with checkboxes"""
     # Todo: add CSRF token
     form = '<form class="table" method="post">'
     header = app.config['TABLE_HEADERS'][class_name] + ['']
@@ -113,7 +113,7 @@ def build_table_form(class_name, linked_entities):
 
 
 def build_remove_link(url, name):
-    """Build a link to remove a link with a JavaScript confirmation dialog"""
+    """ Build a link to remove a link with a JavaScript confirmation dialog"""
     name = name.replace('\'', '')
     confirm = 'onclick="return confirm(\'' + _('Remove %(name)s?', name=name) + '\')"'
     return '<a ' + confirm + ' href="' + url + '">' + uc_first(_('remove')) + '</a>'
@@ -131,7 +131,7 @@ def get_entity_data(entity, location=None):
     for node in nodes:
         if not node.root:
             continue
-        root = openatlas.nodes[node.root[-1]]
+        root = g.nodes[node.root[-1]]
         name = 'type' if root.name in app.config['BASE_TYPES'] else root.name
         if root.name not in type_data:
             type_data[name] = []
@@ -468,7 +468,7 @@ def get_base_table_data(entity):
     name = app.config['CODE_CLASS'][entity.class_.code]
     data = [link(entity)]
     if name in ['event', 'actor']:
-        data.append(openatlas.classes[entity.class_.code].name)
+        data.append(g.classes[entity.class_.code].name)
     if name in ['reference']:
         data.append(uc_first(_(entity.system_type)))
     if name in ['event', 'place', 'source', 'reference']:

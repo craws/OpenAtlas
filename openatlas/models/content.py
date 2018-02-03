@@ -1,7 +1,8 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
-from flask import session
-import openatlas
+
+from flask import session, g
+
 from openatlas import app
 
 
@@ -14,9 +15,8 @@ class ContentMapper:
             content[name] = OrderedDict()
             for language in app.config['LANGUAGES'].keys():
                 content[name][language] = ''
-        cursor = openatlas.get_cursor()
-        cursor.execute("SELECT name, language, text FROM web.i18n;")
-        for row in cursor.fetchall():
+        g.cursor.execute("SELECT name, language, text FROM web.i18n;")
+        for row in g.cursor.fetchall():
             content[row.name][row.language] = row.text
         return content
 
@@ -31,16 +31,15 @@ class ContentMapper:
 
     @staticmethod
     def update_content(name, form):
-        cursor = openatlas.get_cursor()
-        cursor.execute('BEGIN')
+        g.cursor.execute('BEGIN')
         for language in app.config['LANGUAGES'].keys():
             sql = 'DELETE FROM web.i18n WHERE name = %(name)s AND language = %(language)s'
-            cursor.execute(sql, {'name': name, 'language': language})
+            g.cursor.execute(sql, {'name': name, 'language': language})
             sql = """
                 INSERT INTO web.i18n (name, language, text)
                 VALUES (%(name)s, %(language)s, %(text)s);"""
-            cursor.execute(sql, {
+            g.cursor.execute(sql, {
                 'name': name,
                 'language': language,
                 'text': form.__getattribute__(language).data.strip()})
-        cursor.execute('COMMIT')
+        g.cursor.execute('COMMIT')

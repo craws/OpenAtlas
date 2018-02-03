@@ -1,10 +1,10 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import render_template, flash, url_for, request
+from flask import render_template, flash, url_for, request, g
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms.validators import DataRequired
 from wtforms import SelectField, SubmitField, TextAreaField, StringField
+from wtforms.validators import DataRequired
 
 import openatlas
 from openatlas import app, EntityMapper, NodeMapper
@@ -16,7 +16,7 @@ from openatlas.util.util import (required_group, link, truncate_string, format_d
 class LogForm(Form):
     limit = SelectField(_('limit'), choices=((0, _('all')), (100, 100), (500, 500)), default=100)
     priority = SelectField(_('priority'), choices=(app.config['LOG_LEVELS'].items()), default=6)
-    user = SelectField(_('user'), choices=([(0, _('all'))] + UserMapper.get_users()), default=0)
+    user = SelectField(_('user'), choices=([(0, _('all'))]), default=0)
     apply = SubmitField(_('apply'))
 
 
@@ -56,7 +56,7 @@ def admin_orphans(delete=None):
             format_date(entity.modified),
             truncate_string(entity.description)])
     for node in NodeMapper.get_orphans():
-        tables['nodes']['data'].append([link(node), link(openatlas.nodes[node.root[-1]])])
+        tables['nodes']['data'].append([link(node), link(g.nodes[node.root[-1]])])
     return render_template('admin/orphans.html', tables=tables)
 
 
@@ -64,6 +64,7 @@ def admin_orphans(delete=None):
 @required_group('admin')
 def admin_log():
     form = LogForm()
+    form.user.choices = [(0, _('all'))] + UserMapper.get_users()
     table = {
         'id': 'log', 'header': ['date', 'priority', 'type', 'message', 'user', 'IP', 'info'],
         'data': []}

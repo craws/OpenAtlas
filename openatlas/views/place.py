@@ -1,5 +1,5 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import render_template, url_for, flash, request
+from flask import render_template, url_for, flash, request, g
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from wtforms import StringField, TextAreaField, HiddenField, SubmitField, FieldList
@@ -109,7 +109,7 @@ def place_view(id_, unlink_id=None):
         actor = EntityMapper.get_by_id(link_.domain.id)
         tables['actor']['data'].append([
             link(actor),
-            openatlas.properties[link_.property.code].name,
+            g.properties[link_.property.code].name,
             actor.class_.name,
             actor.first,
             actor.last])
@@ -122,13 +122,13 @@ def place_view(id_, unlink_id=None):
 @app.route('/place/delete/<int:id_>')
 @required_group('editor')
 def place_delete(id_):
-    openatlas.get_cursor().execute('BEGIN')
+    g.cursor.execute('BEGIN')
     try:
         EntityMapper.delete(id_)
         openatlas.logger.log_user(id_, 'delete')
-        openatlas.get_cursor().execute('COMMIT')
+        g.cursor.execute('COMMIT')
     except Exception as e:
-        openatlas.get_cursor().execute('ROLLBACK')
+        g.cursor.execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
     flash(_('entity deleted'), 'info')
@@ -160,7 +160,7 @@ def place_update(id_):
 
 
 def save(form, object_=None, location=None, origin=None):
-    openatlas.get_cursor().execute('BEGIN')
+    g.cursor.execute('BEGIN')
     try:
         if object_:
             for alias in object_.get_linked_entities('P1'):
@@ -190,9 +190,9 @@ def save(form, object_=None, location=None, origin=None):
             else:
                 origin.link('P67', object_)
         GisMapper.insert(location, form)
-        openatlas.get_cursor().execute('COMMIT')
+        g.cursor.execute('COMMIT')
     except Exception as e:  # pragma: no cover
-        openatlas.get_cursor().execute('ROLLBACK')
+        g.cursor.execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
         return

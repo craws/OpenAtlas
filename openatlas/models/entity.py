@@ -2,6 +2,7 @@
 import ast
 from collections import OrderedDict
 
+from flask import g
 from flask_login import current_user
 from werkzeug.exceptions import abort
 
@@ -22,7 +23,7 @@ class Entity:
             nodes_list = ast.literal_eval('[' + row.types + ']')
             # converting nodes_list to set, to list to avoid duplicates (from the sql statement)
             for node_id in list(set(nodes_list)):
-                self.nodes.append(openatlas.nodes[node_id])
+                self.nodes.append(g.nodes[node_id])
         self.name = row.name
         self.root = None
         self.description = row.description if row.description else ''
@@ -31,7 +32,7 @@ class Entity:
         self.modified = row.modified
         self.first = int(row.first) if hasattr(row, 'first') and row.first else None
         self.last = int(row.last) if hasattr(row, 'last') and row.last else None
-        self.class_ = openatlas.classes[row.class_code]
+        self.class_ = g.classes[row.class_code]
         self.dates = {}
 
     def get_linked_entity(self, code, inverse=False):
@@ -125,8 +126,7 @@ class EntityMapper:
         sql = """
             UPDATE model.entity SET (name, description) = (%(name)s, %(description)s)
             WHERE id = %(id)s;"""
-        cursor = openatlas.get_cursor()
-        cursor.execute(sql, {
+        g.cursor.execute(sql, {
             'id': entity.id,
             'name': entity.name,
             'description': sanitize(entity.description, 'description')})
@@ -146,37 +146,33 @@ class EntityMapper:
             'system_type': system_type.strip() if system_type else None,
             'description': description.strip() if description else None,
             'value_timestamp':  DateMapper.datetime64_to_timestamp(date) if date else None}
-        cursor = openatlas.get_cursor()
-        cursor.execute(sql, params)
-        return EntityMapper.get_by_id(cursor.fetchone()[0])
+        g.cursor.execute(sql, params)
+        return EntityMapper.get_by_id(g.cursor.fetchone()[0])
 
     @staticmethod
     def get_by_id(entity_id, ignore_not_found=False):
         sql = EntityMapper.sql + ' WHERE e.id = %(id)s GROUP BY e.id ORDER BY e.name;'
-        cursor = openatlas.get_cursor()
-        cursor.execute(sql, {'id': entity_id})
+        g.cursor.execute(sql, {'id': entity_id})
         openatlas.debug_model['by id'] += 1
         # Return None in case it is excepted e.g. at logs, otherwise a 418 would be triggered
-        if cursor.rowcount < 1 and ignore_not_found:
+        if g.cursor.rowcount < 1 and ignore_not_found:
             return None
-        return Entity(cursor.fetchone())
+        return Entity(g.cursor.fetchone())
 
     @staticmethod
     def get_by_ids(entity_ids):
         if not entity_ids:
             return []
         sql = EntityMapper.sql + ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name;'
-        cursor = openatlas.get_cursor()
-        cursor.execute(sql, {'ids': tuple(entity_ids)})
+        g.cursor.execute(sql, {'ids': tuple(entity_ids)})
         openatlas.debug_model['by id'] += 1
         entities = []
-        for row in cursor.fetchall():
+        for row in g.cursor.fetchall():
             entities.append(Entity(row))
         return entities
 
     @staticmethod
     def get_by_codes(class_name):
-        cursor = openatlas.get_cursor()
         if class_name == 'source':
             sql = EntityMapper.sql + """
                 WHERE e.class_code IN %(codes)s AND e.system_type ='source content'
@@ -184,10 +180,10 @@ class EntityMapper:
         else:
             sql = EntityMapper.sql + """
                 WHERE e.class_code IN %(codes)s GROUP BY e.id ORDER BY e.name;"""
-        cursor.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][class_name])})
+        g.cursor.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][class_name])})
         openatlas.debug_model['by codes'] += 1
         entities = []
-        for row in cursor.fetchall():
+        for row in g.cursor.fetchall():
             entities.append(Entity(row))
         return entities
 
@@ -196,7 +192,7 @@ class EntityMapper:
         """ Triggers function model.delete_entity_related() for deleting related entities"""
         entity_id = entity if isinstance(entity, int) else entity.id
         sql = "DELETE FROM model.entity WHERE id = %(entity_id)s;"
-        openatlas.get_cursor().execute(sql, {'entity_id': entity_id})
+        g.cursor.execute(sql, {'entity_id': entity_id})
 
     @staticmethod
     def get_overview_counts():
@@ -209,11 +205,10 @@ class EntityMapper:
             SUM(CASE WHEN class_code = 'E18' THEN 1 END) AS place,
             SUM(CASE WHEN class_code IN ('E31', 'E84') THEN 1 END) AS reference
             FROM model.entity;"""
-        cursor = openatlas.get_cursor()
-        cursor.execute(sql)
-        row = cursor.fetchone()
+        g.cursor.execute(sql)
+        row = g.cursor.fetchone()
         counts = OrderedDict()  # Todo: one liner to get a dict of record?
-        for idx, col in enumerate(cursor.description):
+        for idx, col in enumerate(g.cursor.description):
             counts[col[0]] = row[idx]
         return counts
 
@@ -229,18 +224,16 @@ class EntityMapper:
                 ({sql_next}) AS next_id, ({sql_prev}) AS previous_id
             FROM model.entity e WHERE """.format(
                 sql_next=sql_next, sql_prev=sql_prev) + sql_where
-        cursor = openatlas.get_cursor()
-        cursor.execute(sql, {'id': entity.id})
-        return cursor.fetchone()
+        g.cursor.execute(sql, {'id': entity.id})
+        return g.cursor.fetchone()
 
     @staticmethod
     def get_orphans():
         """ Returns entities without links. """
         entities = []
-        cursor = openatlas.get_cursor()
-        cursor.execute(EntityMapper.sql_orphan)
+        g.cursor.execute(EntityMapper.sql_orphan)
         openatlas.debug_model['div sql'] += 1
-        for row in cursor.fetchall():
+        for row in g.cursor.fetchall():
             entities.append(EntityMapper.get_by_id(row.id))
         return entities
 
@@ -254,11 +247,10 @@ class EntityMapper:
                 WHERE e.class_code IN %(codes)s
                 GROUP BY e.id
                 ORDER BY e.created DESC LIMIT %(limit)s;"""
-        cursor = openatlas.get_cursor()
-        cursor.execute(sql, {'codes': tuple(codes), 'limit': limit})
+        g.cursor.execute(sql, {'codes': tuple(codes), 'limit': limit})
         openatlas.debug_model['div sql'] += 1
         entities = []
-        for row in cursor.fetchall():
+        for row in g.cursor.fetchall():
             entities.append(Entity(row))
         return entities
 
@@ -278,9 +270,8 @@ class EntityMapper:
         else:
             return 0
         sql = "DELETE FROM model.entity WHERE id IN (" + sql_where + ");"
-        cursor = openatlas.get_cursor()
-        cursor.execute(sql, {'class_codes': tuple(app.config['CODE_CLASS'].keys())})
-        return cursor.rowcount
+        g.cursor.execute(sql, {'class_codes': tuple(app.config['CODE_CLASS'].keys())})
+        return g.cursor.rowcount
 
     @staticmethod
     def search(term, codes, description=False, own=False):
@@ -292,14 +283,13 @@ class EntityMapper:
         sql += " ul.user_id = %(user_id)s AND " if own else ''
         sql += " e.class_code IN %(codes)s"
         sql += " GROUP BY e.id ORDER BY e.name"
-        cursor = openatlas.get_cursor()
-        cursor.execute(sql, {
+        g.cursor.execute(sql, {
             'term': '%' + term + '%',
             'codes': tuple(codes),
             'user_id': current_user.id})
         openatlas.debug_model['div sql'] += 1
         entities = []
-        for row in cursor.fetchall():
+        for row in g.cursor.fetchall():
             if row.class_code == 'E82':  # if found in actor alias
                 entities.append(LinkMapper.get_linked_entity(row.id, 'P131', True))
             elif row.class_code == 'E41':  # if found in place alias

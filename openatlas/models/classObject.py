@@ -1,5 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import session
+from flask import session, g
+
 import openatlas
 from openatlas import app
 
@@ -39,19 +40,18 @@ class ClassMapper:
     @staticmethod
     def get_all():
         classes = {}
-        cursor = openatlas.get_cursor()
-        cursor.execute("SELECT id, code, name FROM model.class;")
-        for row in cursor.fetchall():
+        g.cursor.execute("SELECT id, code, name FROM model.class;")
+        for row in g.cursor.fetchall():
             classes[row.code] = ClassObject(row)
-        cursor.execute("SELECT super_code, sub_code FROM model.class_inheritance;")
-        for row in cursor.fetchall():
+        g.cursor.execute("SELECT super_code, sub_code FROM model.class_inheritance;")
+        for row in g.cursor.fetchall():
             classes[row.super_code].sub.append(row.sub_code)
             classes[row.sub_code].super.append(row.super_code)
         sql = """
             SELECT class_code, language_code, attribute, text FROM model.class_i18n
             WHERE language_code IN %(language_codes)s;"""
-        cursor.execute(sql, {'language_codes': tuple(app.config['LANGUAGES'].keys())})
-        for row in cursor.fetchall():
+        g.cursor.execute(sql, {'language_codes': tuple(app.config['LANGUAGES'].keys())})
+        for row in g.cursor.fetchall():
             class_ = classes[row.class_code]
             if row.language_code not in class_.i18n:
                 class_.i18n[row.language_code] = {}

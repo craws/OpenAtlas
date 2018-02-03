@@ -1,7 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
 
-from flask import flash, render_template, url_for, request
+from flask import flash, render_template, url_for, request, g
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from wtforms import HiddenField, SubmitField, TextAreaField
@@ -46,16 +46,16 @@ def membership_insert(origin_id):
     del form.actor
     form.origin_id.data = origin.id
     if form.validate_on_submit():
-        openatlas.get_cursor().execute('BEGIN')
+        g.cursor.execute('BEGIN')
         try:
             for actor_id in ast.literal_eval(form.group.data):
                 link_id = LinkMapper.insert(actor_id, 'P107', origin.id, form.description.data)
                 DateMapper.save_link_dates(link_id, form)
                 NodeMapper.save_link_nodes(link_id, form)
-            openatlas.get_cursor().execute('COMMIT')
+            g.cursor.execute('COMMIT')
             flash(_('entity created'), 'info')
         except Exception as e:  # pragma: no cover
-            openatlas.get_cursor().execute('ROLLBACK')
+            g.cursor.execute('ROLLBACK')
             openatlas.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         if form.continue_.data == 'yes':
@@ -72,16 +72,16 @@ def member_insert(origin_id):
     del form.group
     form.origin_id.data = origin.id
     if form.validate_on_submit():
-        openatlas.get_cursor().execute('BEGIN')
+        g.cursor.execute('BEGIN')
         try:
             for actor_id in ast.literal_eval(form.actor.data):
                 link_id = origin.link('P107', actor_id, form.description.data)
                 DateMapper.save_link_dates(link_id, form)
                 NodeMapper.save_link_nodes(link_id, form)
-            openatlas.get_cursor().execute('COMMIT')
+            g.cursor.execute('COMMIT')
             flash(_('entity created'), 'info')
         except Exception as e:  # pragma: no cover
-            openatlas.get_cursor().execute('ROLLBACK')
+            g.cursor.execute('ROLLBACK')
             openatlas.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         if form.continue_.data == 'yes':
@@ -101,15 +101,15 @@ def member_update(id_, origin_id):
     form = build_form(MemberForm, 'Member', link_, request)
     del form.actor, form.group, form.insert_and_continue
     if form.validate_on_submit():
-        openatlas.get_cursor().execute('BEGIN')
+        g.cursor.execute('BEGIN')
         try:
             link_.delete()
             link_id = domain.link('P107', range_, form.description.data)
             DateMapper.save_link_dates(link_id, form)
             NodeMapper.save_link_nodes(link_id, form)
-            openatlas.get_cursor().execute('COMMIT')
+            g.cursor.execute('COMMIT')
         except Exception as e:  # pragma: no cover
-            openatlas.get_cursor().execute('ROLLBACK')
+            g.cursor.execute('ROLLBACK')
             openatlas.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         tab = '#tab-member-of' if origin.id == range_.id else '#tab-member'

@@ -1,7 +1,8 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
 
-from flask import json
+from flask import json, g
+
 import openatlas
 from openatlas.util.util import uc_first
 
@@ -42,10 +43,9 @@ class GisMapper:
                 GROUP BY object.id, {shape}.id;""".format(
                         shape=shape,
                         polygon_point_sql=polygon_point_sql if shape == 'polygon' else '')
-            cursor = openatlas.get_cursor()
-            cursor.execute(sql)
+            g.cursor.execute(sql)
             place_type_root_id = openatlas.NodeMapper.get_hierarchy_by_name('Place').id
-            for row in cursor.fetchall():
+            for row in g.cursor.fetchall():
                 description = row.description.replace('"', '\"') if row.description else ''
                 object_desc = row.object_desc.replace('"', '\"') if row.object_desc else ''
                 item = {
@@ -64,7 +64,7 @@ class GisMapper:
                 if hasattr(row, 'types') and row.types:
                     nodes_list = ast.literal_eval('[' + row.types + ']')
                     for node_id in list(set(nodes_list)):
-                        node = openatlas.nodes[node_id]
+                        node = g.nodes[node_id]
                         if node.root and node.root[-1] == place_type_root_id:
                             item['properties']['siteType'] = node.name
                             break
@@ -89,7 +89,6 @@ class GisMapper:
 
     @staticmethod
     def insert(entity, form):
-        cursor = openatlas.get_cursor()
         for shape in ['point', 'polygon']:
             data = getattr(form, 'gis_' + shape + 's').data
             if not data:
@@ -104,7 +103,7 @@ class GisMapper:
                         %(type)s,
                         public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));
                     """.format(shape=shape)
-                cursor.execute(sql, {
+                g.cursor.execute(sql, {
                     'entity_id': entity.id,
                     'name': item['properties']['name'],
                     'description': item['properties']['description'],
@@ -113,8 +112,7 @@ class GisMapper:
 
     @staticmethod
     def delete_by_entity(entity):
-        cursor = openatlas.get_cursor()
         sql = 'DELETE FROM gis.point WHERE entity_id = %(entity_id)s;'
-        cursor.execute(sql, {'entity_id': entity.id})
+        g.cursor.execute(sql, {'entity_id': entity.id})
         sql = 'DELETE FROM gis.polygon WHERE entity_id = %(entity_id)s;'
-        cursor.execute(sql, {'entity_id': entity.id})
+        g.cursor.execute(sql, {'entity_id': entity.id})

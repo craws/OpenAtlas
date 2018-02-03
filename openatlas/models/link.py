@@ -1,5 +1,5 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import abort, flash, session
+from flask import abort, flash, session, g
 from flask_babel import lazy_gettext as _
 
 import openatlas
@@ -11,11 +11,11 @@ class Link:
     def __init__(self, row):
         self.id = row.id
         self.description = row.description
-        self.property = openatlas.properties[row.property_code]
+        self.property = g.properties[row.property_code]
         # Todo: performance - if it's a node don't call get_by_id
         self.domain = openatlas.EntityMapper.get_by_id(row.domain_id)
         self.range = openatlas.EntityMapper.get_by_id(row.range_id)
-        self.type = openatlas.nodes[row.type_id] if row.type_id else None
+        self.type = g.nodes[row.type_id] if row.type_id else None
         self.first = int(row.first) if hasattr(row, 'first') and row.first else None
         self.last = int(row.last) if hasattr(row, 'last') and row.last else None
         self.dates = {}
@@ -46,9 +46,9 @@ class LinkMapper:
                 from openatlas.models.entity import EntityMapper
                 domain = domain if not isinstance(domain, int) else EntityMapper.get_by_id(domain)
                 range_ = range_ if not isinstance(range_, int) else EntityMapper.get_by_id(range_)
-                domain_class = openatlas.classes[domain.class_.code]
-                range_class = openatlas.classes[range_.class_.code]
-                property_ = openatlas.properties[property_code]
+                domain_class = g.classes[domain.class_.code]
+                range_class = g.classes[range_.class_.code]
+                property_ = g.properties[property_code]
                 ignore = app.config['WHITELISTED_DOMAINS']
                 domain_error = True
                 range_error = True
@@ -69,14 +69,13 @@ class LinkMapper:
                 VALUES (%(property_code)s, %(domain_id)s, %(range_id)s, %(description)s)
                 RETURNING id;"""
             # Todo: build only sql and get execution out of loop
-            cursor = openatlas.get_cursor()
-            cursor.execute(sql, {
+            g.cursor.execute(sql, {
                 'property_code': property_code,
                 'domain_id': domain_id,
                 'range_id': range_id,
                 'description': description})
             openatlas.debug_model['div sql'] += 1
-            result = cursor.fetchone()[0]
+            result = g.cursor.fetchone()[0]
         return result
 
     @staticmethod
@@ -99,12 +98,11 @@ class LinkMapper:
             sql = """
                 SELECT domain_id AS result_id FROM model.link
                 WHERE range_id = %(entity_id)s AND property_code IN %(codes)s;"""
-        cursor = openatlas.get_cursor()
-        cursor.execute(sql, {
+        g.cursor.execute(sql, {
             'entity_id': entity if isinstance(entity, int) else entity.id,
             'codes': tuple(codes if isinstance(codes, list) else [codes])})
         openatlas.debug_model['div sql'] += 1
-        ids = [element for (element,) in cursor.fetchall()]
+        ids = [element for (element,) in g.cursor.fetchall()]
         return openatlas.EntityMapper.get_by_ids(ids)
 
     @staticmethod
@@ -127,13 +125,12 @@ class LinkMapper:
             LEFT JOIN model.entity d2 ON dl2.range_id = d2.id
             WHERE l.{first}_id = %(entity_id)s GROUP BY l.id, e.name ORDER BY e.name;""".format(
             first='range' if inverse else 'domain', second='domain' if inverse else 'range')
-        cursor = openatlas.get_cursor()
-        cursor.execute(sql, {
+        g.cursor.execute(sql, {
             'entity_id': entity if isinstance(entity, int) else entity.id,
             'codes': tuple(codes if isinstance(codes, list) else [codes])})
         openatlas.debug_model['div sql'] += 1
         links = []
-        for row in cursor.fetchall():
+        for row in g.cursor.fetchall():
             links.append(Link(row))
         return links
 
@@ -141,7 +138,7 @@ class LinkMapper:
     def delete_by_codes(entity, codes):
         codes = codes if isinstance(codes, list) else [codes]
         sql = "DELETE FROM model.link WHERE domain_id = %(id)s AND property_code IN %(codes)s;"
-        openatlas.get_cursor().execute(sql, {'id': entity.id, 'codes': tuple(codes)})
+        g.cursor.execute(sql, {'id': entity.id, 'codes': tuple(codes)})
 
     @staticmethod
     def get_by_id(id_):
@@ -161,23 +158,22 @@ class LinkMapper:
             LEFT JOIN model.link_property dl2 ON l.id = dl2.domain_id AND dl2.property_code = 'OA6'
             LEFT JOIN model.entity d2 ON dl2.range_id = d2.id
             WHERE l.id = %(id)s GROUP BY l.id;"""
-        cursor = openatlas.get_cursor()
-        cursor.execute(sql, {'id': id_})
+        g.cursor.execute(sql, {'id': id_})
         openatlas.debug_model['div sql'] += 1
-        return Link(cursor.fetchone())
+        return Link(g.cursor.fetchone())
 
     @staticmethod
     def delete_by_id(id_):
         from openatlas.util.util import is_authorized
         if not is_authorized('editor'):  # pragma: no cover
             abort(403)
-        openatlas.get_cursor().execute("DELETE FROM model.link WHERE id = %(id)s;", {'id': id_})
+        g.cursor.execute("DELETE FROM model.link WHERE id = %(id)s;", {'id': id_})
 
     @staticmethod
     def update(link):
         sql = """UPDATE model.link SET (property_code, domain_id, range_id, description) =
             (%(property_code)s, %(domain_id)s, %(range_id)s, %(description)s) WHERE id = %(id)s;"""
-        openatlas.get_cursor().execute(sql, {
+        g.cursor.execute(sql, {
             'id': link.id,
             'property_code': link.property.code,
             'domain_id': link.domain.id,

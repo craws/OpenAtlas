@@ -1,6 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
-from flask import abort, render_template, flash, url_for, request
+
+from flask import abort, render_template, flash, url_for, request, g
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
@@ -24,7 +25,7 @@ class NodeForm(Form):
 @required_group('readonly')
 def node_index():
     nodes = {'system': OrderedDict(), 'custom': OrderedDict(), 'places': OrderedDict()}
-    for id_, node in openatlas.nodes.items():
+    for id_, node in g.nodes.items():
         if not node.root:
             type_ = 'system' if node.system else 'custom'
             type_ = 'places' if node.class_.code == 'E53' else type_
@@ -35,7 +36,7 @@ def node_index():
 @app.route('/types/insert/<int:root_id>', methods=['POST'])
 @required_group('editor')
 def node_insert(root_id):
-    root = openatlas.nodes[root_id]
+    root = g.nodes[root_id]
     form = build_node_form(NodeForm, root)
     # check if form is valid and if it wasn't a submit of the search form
     if 'name_search' not in request.form and form.validate_on_submit():
@@ -54,11 +55,11 @@ def node_insert(root_id):
 @app.route('/types/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
 def node_update(id_):
-    node = openatlas.nodes[id_]
+    node = g.nodes[id_]
     if node.system:
         abort(403)
     form = build_node_form(NodeForm, node, request)
-    root = openatlas.nodes[node.root[-1]] if node.root else None
+    root = g.nodes[node.root[-1]] if node.root else None
     if form.validate_on_submit():
         if save(form, node):
             flash(_('info update'), 'info')
@@ -71,9 +72,9 @@ def node_update(id_):
 @required_group('readonly')
 def node_view(id_):
     from openatlas.models.linkProperty import LinkPropertyMapper
-    node = openatlas.nodes[id_]
-    root = openatlas.nodes[node.root[-1]] if node.root else None
-    super_ = openatlas.nodes[node.root[0]] if node.root else None
+    node = g.nodes[id_]
+    root = g.nodes[node.root[-1]] if node.root else None
+    super_ = g.nodes[node.root[0]] if node.root else None
     tables = {'entities': {
         'id': 'entities', 'header': [_('name'), _('class'), _('info')], 'data': []}}
     for entity in node.get_linked_entities(['P2', 'P89'], True):
@@ -82,7 +83,7 @@ def node_view(id_):
         if entity:  # If not entity it is a place node, so do not add
             tables['entities']['data'].append([
                 link(entity),
-                openatlas.classes[entity.class_.code].name,
+                g.classes[entity.class_.code].name,
                 truncate_string(entity.description)])
     tables['link_entities'] = {
         'id': 'link_entities', 'header': [_('domain'), _('range')], 'data': []}
@@ -92,7 +93,7 @@ def node_view(id_):
             link(EntityMapper.get_by_id(row.range_id))])
     tables['subs'] = {'id': 'subs', 'header': [_('name'), _('count'), _('info')], 'data': []}
     for sub_id in node.subs:
-        sub = openatlas.nodes[sub_id]
+        sub = g.nodes[sub_id]
         tables['subs']['data'].append([link(sub), sub.count, truncate_string(sub.description)])
     return render_template('types/view.html', node=node, super_=super_, tables=tables, root=root)
 
@@ -100,19 +101,19 @@ def node_view(id_):
 @app.route('/types/delete/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
 def node_delete(id_):
-    node = openatlas.nodes[id_]
+    node = g.nodes[id_]
     if node.system or node.subs or node.count:
         abort(403)
-    openatlas.get_cursor().execute('BEGIN')
+    g.cursor.execute('BEGIN')
     try:
         EntityMapper.delete(node.id)
-        openatlas.get_cursor().execute('COMMIT')
+        g.cursor.execute('COMMIT')
         flash(_('entity deleted'), 'info')
     except Exception as e:  # pragma: no cover
-        openatlas.get_cursor().execute('ROLLBACK')
+        g.cursor.execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
-    root = openatlas.nodes[node.root[-1]] if node.root else None
+    root = g.nodes[node.root[-1]] if node.root else None
     if root:
         return redirect(url_for('node_view', id_=root.id))
     return redirect(url_for('node_index'))
@@ -121,7 +122,7 @@ def node_delete(id_):
 def walk_tree(param):
     text = ''
     for id_ in param if isinstance(param, list) else [param]:
-        item = openatlas.nodes[id_]
+        item = g.nodes[id_]
         count_subs = " (" + str(item.count_subs) + ")" if item.count_subs else ''
         text += "{href: '" + url_for('node_view', id_=item.id) + "',"
         text += "text: '" + item.name.replace("'", "&apos;") + " " + str(item.count) + count_subs
@@ -157,16 +158,16 @@ def tree_select(name):
 
 
 def save(form, node=None, root=None):
-    openatlas.get_cursor().execute('BEGIN')
+    g.cursor.execute('BEGIN')
     try:
         if not node:
             node = NodeMapper.insert(root.class_.code, form.name.data)
             super_ = 'new'
         else:
-            root = openatlas.nodes[node.root[-1]] if node.root else None
-            super_ = openatlas.nodes[node.root[0]] if node.root else None
+            root = g.nodes[node.root[-1]] if node.root else None
+            super_ = g.nodes[node.root[0]] if node.root else None
         new_super_id = getattr(form, str(root.id)).data
-        new_super = openatlas.nodes[int(new_super_id)] if new_super_id else openatlas.nodes[root.id]
+        new_super = g.nodes[int(new_super_id)] if new_super_id else g.nodes[root.id]
         if new_super.id == node.id:
             flash(_('error node self as super'), 'error')
             return
@@ -183,9 +184,9 @@ def save(form, node=None, root=None):
             property_code = 'P127' if node.class_.code == 'E55' else 'P89'
             node.delete_links(property_code)
             node.link(property_code, new_super.id)
-        openatlas.get_cursor().execute('COMMIT')
+        g.cursor.execute('COMMIT')
     except Exception as e:  # pragma: no cover
-        openatlas.get_cursor().execute('ROLLBACK')
+        g.cursor.execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
         return

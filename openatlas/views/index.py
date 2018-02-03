@@ -1,20 +1,18 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import request, session, url_for, flash
-from flask import render_template
+from flask import render_template, request, session, url_for, flash, g
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import Form
+from werkzeug.utils import redirect
 from wtforms import SubmitField, TextAreaField, SelectField
 from wtforms.validators import DataRequired
 
 import openatlas
 from openatlas import app
 from openatlas.models.content import ContentMapper
+from openatlas.models.entity import EntityMapper
 from openatlas.models.user import UserMapper
 from openatlas.util.changelog import Changelog
-from werkzeug.utils import redirect
-
-from openatlas.models.entity import EntityMapper
 from openatlas.util.util import (link, bookmark_toggle, uc_first, required_group, send_mail,
                                  format_date)
 
@@ -39,7 +37,7 @@ def index():
             entity = EntityMapper.get_by_id(entity_id)
             tables['bookmarks']['data'].append([
                 link(entity),
-                openatlas.classes[entity.class_.code].name,
+                g.classes[entity.class_.code].name,
                 entity.first,
                 entity.last,
                 bookmark_toggle(entity.id, True)])
@@ -50,7 +48,7 @@ def index():
         for entity in EntityMapper.get_latest(8):
             tables['latest']['data'].append([
                 link(entity),
-                openatlas.classes[entity.class_.code].name,
+                g.classes[entity.class_.code].name,
                 entity.first,
                 entity.last,
                 format_date(entity.created),

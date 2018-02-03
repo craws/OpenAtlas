@@ -1,5 +1,5 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import render_template, url_for, flash, request
+from flask import render_template, url_for, flash, request, g
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from wtforms import StringField, TextAreaField, HiddenField, SubmitField, FieldList
@@ -93,7 +93,7 @@ def actor_view(id_, unlink_id=None):
             last = '<span class="inactive" style="float:right">' + str(event.last) + '</span>'
         data = ([
             link(event),
-            openatlas.classes[event.class_.code].name,
+            g.classes[event.class_.code].name,
             link_.type.name if link_.type else '',
             first,
             last,
@@ -211,14 +211,14 @@ def actor_insert(code, origin_id=None):
 @app.route('/actor/delete/<int:id_>')
 @required_group('editor')
 def actor_delete(id_):
-    openatlas.get_cursor().execute('BEGIN')
+    g.cursor.execute('BEGIN')
     try:
         EntityMapper.delete(id_)
         openatlas.logger.log_user(id_, 'delete')
-        openatlas.get_cursor().execute('COMMIT')
+        g.cursor.execute('COMMIT')
         flash(_('entity deleted'), 'info')
     except Exception as e:  # pragma: no cover
-        openatlas.get_cursor().execute('ROLLBACK')
+        g.cursor.execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
     return redirect(url_for('actor_index'))
@@ -253,7 +253,7 @@ def actor_update(id_):
 
 
 def save(form, actor=None, code=None, origin=None):
-    openatlas.get_cursor().execute('BEGIN')
+    g.cursor.execute('BEGIN')
     try:
         if actor:
             LinkMapper.delete_by_codes(actor, ['P74', 'OA8', 'OA9'])
@@ -291,9 +291,9 @@ def save(form, actor=None, code=None, origin=None):
                 link_ = origin.link('P11', actor)
             elif origin_class == 'actor':
                 link_ = origin.link('OA7', actor)
-        openatlas.get_cursor().execute('COMMIT')
+        g.cursor.execute('COMMIT')
     except Exception as e:  # pragma: no cover
-        openatlas.get_cursor().execute('ROLLBACK')
+        g.cursor.execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
         return

@@ -1,12 +1,24 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import os
 import unittest
-from openatlas import app, get_cursor
+
+import psycopg2
+from flask import url_for
+
+from openatlas import app, NodeMapper
 
 
 class TestBaseCase(unittest.TestCase):
     @staticmethod
     def setup_database():
+        app.testing = True
+        connection = psycopg2.connect(
+            database=app.config['DATABASE_NAME'],
+            user=app.config['DATABASE_USER'],
+            password=app.config['DATABASE_PASS'],
+            port=app.config['DATABASE_PORT'])
+        connection.autocommit = True
+        cursor = connection.cursor()
         for file_name in [
             'structure.sql',
             'data_web.sql',
@@ -15,9 +27,7 @@ class TestBaseCase(unittest.TestCase):
             'data_test.sql'
         ]:
             with open(os.path.dirname(__file__) + '/../install/' + file_name, 'r') as sqlFile:
-                sql = sqlFile.read()
-                cursor = get_cursor()
-                cursor.execute(sql)
+                cursor.execute(sqlFile.read())
 
     def setUp(self):
         app.config['SERVER_NAME'] = 'localhost'
@@ -30,3 +40,10 @@ class TestBaseCase(unittest.TestCase):
 
     def login(self):
         self.app.post('/login', data={'username': 'Alice', 'password': 'test'})
+
+    def insert(self, view, name):
+        data = {'name': name}
+        if view == 'event':
+            data['event'] = '[' + str(NodeMapper.get_nodes('event')[0]) + ']'
+        rv = self.app.post(url_for(view + '_insert'), data=data)
+        return rv.location.split('/')[-1]  # return the new id

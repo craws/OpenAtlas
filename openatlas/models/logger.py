@@ -1,7 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import request, session
+from flask import request, session, g
 from flask_login import current_user
-import openatlas
+
 from openatlas import app
 
 
@@ -29,8 +29,7 @@ class DBHandler:
             'user_id': current_user.id if hasattr(current_user, 'id') else None,
             'ip': request.remote_addr,
             'info': info}
-        cursor = openatlas.get_cursor()
-        cursor.execute(sql, params)
+        g.cursor.execute(sql, params)
 
     @staticmethod
     def get_system_logs(limit, priority, user_id):
@@ -41,35 +40,33 @@ class DBHandler:
         sql += ' AND user_id = %(user_id)s' if int(user_id) > 0 else ''
         sql += ' ORDER BY created DESC'
         sql += ' LIMIT %(limit)s' if int(limit) > 0 else ''
-        cursor = openatlas.get_cursor()
-        cursor.execute(sql, {'limit': limit, 'priority': priority, 'user_id': user_id})
-        return cursor.fetchall()
+        g.cursor.execute(sql, {'limit': limit, 'priority': priority, 'user_id': user_id})
+        return g.cursor.fetchall()
 
     @staticmethod
     def delete_all_system_logs():
-        openatlas.get_cursor().execute('TRUNCATE TABLE web.system_log RESTART IDENTITY;')
+        g.cursor.execute('TRUNCATE TABLE web.system_log RESTART IDENTITY;')
 
     @staticmethod
     def log_user(entity_id, action):
         sql = """
             INSERT INTO web.user_log (user_id, entity_id, action)
             VALUES (%(user_id)s, %(entity_id)s, %(action)s);"""
-        cursor = openatlas.get_cursor()
-        cursor.execute(sql, {'user_id': current_user.id, 'entity_id': entity_id, 'action': action})
+        g.cursor.execute(
+            sql, {'user_id': current_user.id, 'entity_id': entity_id, 'action': action})
 
     @staticmethod
     def get_log_for_advanced_view(entity_id):
-        cursor = openatlas.get_cursor()
         sql = """
             SELECT ul.created, ul.user_id, ul.entity_id, u.username
             FROM web.user_log ul
             JOIN web.user u ON ul.user_id = u.id
             WHERE ul.entity_id = %(entity_id)s AND ul.action = %(action)s
             ORDER BY ul.created DESC LIMIT 1;"""
-        cursor.execute(sql, {'entity_id': entity_id, 'action': 'insert'})
-        row_insert = cursor.fetchone()
-        cursor.execute(sql, {'entity_id': entity_id, 'action': 'update'})
-        row_update = cursor.fetchone()
+        g.cursor.execute(sql, {'entity_id': entity_id, 'action': 'insert'})
+        row_insert = g.cursor.fetchone()
+        g.cursor.execute(sql, {'entity_id': entity_id, 'action': 'update'})
+        row_update = g.cursor.fetchone()
         log = {
             'creator_id': row_insert.user_id if row_insert else None,
             'creator_name': row_insert.username if row_insert else None,
