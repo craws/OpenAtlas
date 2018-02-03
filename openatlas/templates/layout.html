@@ -3,33 +3,33 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="theme-color" content="#ffffff" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32" />
-        <link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16" />
-        <link rel="manifest" href="/manifest.json" />
-        <link rel="mask-icon" href="/safari-pinned-tab.svg" />
-        <link rel="stylesheet" href="/css/reset.css?v={{ config['VERSION'] }}" />
-        <link rel="stylesheet" href="/js/jquery/jquery-ui-1.12.1/jquery-ui.min.css" />
-        <link rel="stylesheet" href="/js/jquery/jstree-3.3.4/themes/default/style.min.css" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png" />
+        <link rel="icon" type="image/png" href="/static/favicon-32x32.png" sizes="32x32" />
+        <link rel="icon" type="image/png" href="/static/favicon-16x16.png" sizes="16x16" />
+        <link rel="manifest" href="/static/manifest.json" />
+        <link rel="mask-icon" href="/static/safari-pinned-tab.svg" />
+        <link rel="stylesheet" href="/static/css/reset.css?v={{ config['VERSION'] }}" />
+        <link rel="stylesheet" href="/static/js/jquery/jquery-ui-1.12.1/jquery-ui.min.css" />
+        <link rel="stylesheet" href="/static/js/jquery/jstree-3.3.4/themes/default/style.min.css" />
         {% for css_file in ['style.css', 'color.css', 'images.css']: %}
-            <link rel="stylesheet" href="/css/{{ css_file }}?v={{ config['VERSION'] }}" />
+            <link rel="stylesheet" href="/static/css/{{ css_file }}?v={{ config['VERSION'] }}" />
             {% if current_user.is_authenticated: %}
-                {% set css_file_path = '/themes/' + current_user.settings['theme'] + '/css/' + css_file %}
+                {% set css_file_path = '/themes/' + current_user.settings['theme'] + '/static/css/' + css_file %}
                 {% if css_file_path|test_file %}
                     <link rel="stylesheet" href="{{ css_file_path }}?v={{ config['VERSION'] }}" />
                 {% endif %}
             {% endif %}
         {% endfor %}
-        <script src="/js/jquery/jquery-3.1.1.min.js"></script>
-        <script src="/js/jquery/jquery-ui-1.12.1/jquery-ui.min.js"></script>
-        <script src="/js/jquery/tablesorter-2.28.5/js/jquery.tablesorter.min.js"></script>
-        <script src="/js/jquery/tablesorter-2.28.5/js/jquery.tablesorter.widgets.min.js"></script>
-        <script src="/js/jquery/tablesorter-2.28.5/js/extras/jquery.tablesorter.pager.min.js"></script>
-        <script src="/js/jquery/tablesorter-2.28.5/js/parsers/parser-input-select.min.js"></script>
-        <script src="/js/jquery/jquery-validation-1.15.0/jquery.validate.min.js"></script>
-        <script src="/js/jquery/jstree-3.3.4/jstree.min.js"></script>
-        <script src="/js/jquery/jstree-3.3.4/jstree.search.js"></script>
-        <script src="/js/tinymce/tinymce.min.js"></script>
+        <script src="/static/js/jquery/jquery-3.1.1.min.js"></script>
+        <script src="/static/js/jquery/jquery-ui-1.12.1/jquery-ui.min.js"></script>
+        <script src="/static/js/jquery/tablesorter-2.28.5/js/jquery.tablesorter.min.js"></script>
+        <script src="/static/js/jquery/tablesorter-2.28.5/js/jquery.tablesorter.widgets.min.js"></script>
+        <script src="/static/js/jquery/tablesorter-2.28.5/js/extras/jquery.tablesorter.pager.min.js"></script>
+        <script src="/static/js/jquery/tablesorter-2.28.5/js/parsers/parser-input-select.min.js"></script>
+        <script src="/static/js/jquery/jquery-validation-1.15.0/jquery.validate.min.js"></script>
+        <script src="/static/js/jquery/jstree-3.3.4/jstree.min.js"></script>
+        <script src="/static/js/jquery/jstree-3.3.4/jstree.search.js"></script>
+        <script src="/static/js/tinymce/tinymce.min.js"></script>
         {% if gis_data %}
             {% include "map.html" %}
         {% endif %}
@@ -40,9 +40,9 @@
             moreText = '{{ _('show more')|uc_first }}';
             lessText = '{{ _('show less')|uc_first }}';
         </script>
-        <script src="/js/functions.js"></script>
-        <script src="/js/forms.js"></script>
-        {% set js_translation_file = '/js/messages_' + session['language'] + '.js' %}
+        <script src="/static/js/functions.js"></script>
+        <script src="/static/js/forms.js"></script>
+        {% set js_translation_file = '/static/js/messages_' + session['language'] + '.js' %}
         {% if js_translation_file|test_file %}
             <script src="{{ js_translation_file }}"></script>
         {% endif %}
@@ -84,8 +84,8 @@
                     <div style="clear:both;"></div>
                 {% endif %}
                 <div id="language-menu">
-                    <img class="zoom" src="/images/icons/zoom-in.png" title="{{ _('zoom in') }}" onclick="resizeText(1)" alt="{{ _('zoom in') }}" />
-                    <img class="zoom" src="/images/icons/zoom-out.png" title="{{ _('zoom out') }}" onclick="resizeText(-1)" alt="{{ _('zoom out') }}" />
+                    <img class="zoom" src="/static/images/icons/zoom-in.png" title="{{ _('zoom in') }}" onclick="resizeText(1)" alt="{{ _('zoom in') }}" />
+                    <img class="zoom" src="/static/images/icons/zoom-out.png" title="{{ _('zoom out') }}" onclick="resizeText(-1)" alt="{{ _('zoom out') }}" />
                     {% for language in config['LANGUAGES'].keys()|sort: %}
                         {% if 'language' in session and session['language'] == language: %}
                             <span>{{ language|upper }}</span>

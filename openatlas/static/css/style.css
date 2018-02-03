@@ -11,6 +11,10 @@ html, body, input, select, textarea {
     margin-left: 1em;
 }
 
+#global-search, #global-term {
+    text-transform: capitalize;
+}
+
 #show_passwords, form div.table-row div label[for='show_passwords'] {
     display: none;
 }

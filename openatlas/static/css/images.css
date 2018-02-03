@@ -4,7 +4,7 @@
     float: left;
     width: 370px;
     height: 120px;
-    background-image: url('/images/layout/logo.png');
+    background-image: url('/static/images/layout/logo.png');
     background-repeat: no-repeat;
 }
 
@@ -14,30 +14,30 @@
 }
 
 table.tablesorter thead tr .tablesorter-header {
-    background-image: url("/images/icons/arrow_updown.png");
+    background-image: url("/static/images/icons/arrow_updown.png");
     background-position: right 0.4em top 0.4em;
     background-repeat: no-repeat;
     cursor: pointer;
 }
 
 table.tablesorter thead tr .tablesorter-header:hover {
-    background-image: url("/images/icons/arrow_updown_hover.png");
+    background-image: url("/static/images/icons/arrow_updown_hover.png");
 }
 
 table.tablesorter thead tr .tablesorter-headerDesc {
-    background-image: url("/images/icons/arrow_down.png");
+    background-image: url("/static/images/icons/arrow_down.png");
 }
 
 table.tablesorter thead tr .tablesorter-headerDesc:hover {
-    background-image: url("/images/icons/arrow_down_hover.png");
+    background-image: url("/static/images/icons/arrow_down_hover.png");
 }
 
 table.tablesorter thead tr .tablesorter-headerAsc {
-    background-image: url("/images/icons/arrow_up.png");
+    background-image: url("/static/images/icons/arrow_up.png");
 }
 
 table.tablesorter thead tr .tablesorter-headerAsc:hover {
-    background-image: url("/images/icons/arrow_up_hover.png");
+    background-image: url("/static/images/icons/arrow_up_hover.png");
 }
 
 table.tablesorter thead tr .sorter-false, table.tablesorter thead tr .sorter-false:hover {
@@ -45,28 +45,28 @@ table.tablesorter thead tr .sorter-false, table.tablesorter thead tr .sorter-fal
 }
 
 div.pager div.first {
-    background-image: url("/images/icons/first.png");
+    background-image: url("/static/images/icons/first.png");
 }
 div.pager div.first:hover {
-    background-image: url("/images/icons/first_hover.png");
+    background-image: url("/static/images/icons/first_hover.png");
 }
 div.pager div.prev {
-    background-image: url("/images/icons/prev.png");
+    background-image: url("/static/images/icons/prev.png");
 }
 div.pager div.prev:hover {
-    background-image: url("/images/icons/prev_hover.png");
+    background-image: url("/static/images/icons/prev_hover.png");
 }
 div.pager div.next {
-    background-image: url("/images/icons/next.png");
+    background-image: url("/static/images/icons/next.png");
 }
 div.pager div.next:hover {
-    background-image: url("/images/icons/next_hover.png");
+    background-image: url("/static/images/icons/next_hover.png");
 }
 div.pager div.last {
-    background-image: url("/images/icons/last.png");
+    background-image: url("/static/images/icons/last.png");
 }
 div.pager div.last:hover {
-    background-image: url("/images/icons/last_hover.png");
+    background-image: url("/static/images/icons/last_hover.png");
 }
 
 table.tablesorter thead tr .sorter-false, table.tablesorter thead tr .sorter-false:hover {

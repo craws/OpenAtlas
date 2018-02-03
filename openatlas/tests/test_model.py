@@ -1,5 +1,5 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import url_for, current_app
+from flask import url_for
 
 from openatlas import app, EntityMapper
 from openatlas.models.link import LinkMapper
@@ -18,8 +18,7 @@ class ModelTests(TestBaseCase):
             assert b'E2' in rv.data
             rv = self.app.get(url_for('property_index'))
             assert b'P1' in rv.data
-            rv = self.app.get(
-                url_for('property_view', code='P68'))
+            rv = self.app.get(url_for('property_view', code='P68'))
             assert b'P68' in rv.data
             data = {'domain': 'E1', 'range': 'E1', 'property': 'P1'}
             rv = self.app.post(url_for('model_index'), data=data)
@@ -29,7 +28,7 @@ class ModelTests(TestBaseCase):
             actor = EntityMapper.insert('E21', 'King Arthur')
             event = EntityMapper.insert('E7', 'Battle of Camlann')
             prop_object = EntityMapper.insert('E89', 'Propositional Object')
-            with current_app.test_request_context():
+            with app.test_request_context():
                 LinkMapper.insert(actor, 'P11', event)
                 LinkMapper.insert(actor, 'P67', prop_object)
             rv = self.app.get(url_for('model_network'))

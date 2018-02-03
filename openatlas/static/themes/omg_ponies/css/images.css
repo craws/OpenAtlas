@@ -3,7 +3,7 @@
 #logo {
     width: 370px;
     height: 120px;
-    background-image: url('/themes/omg_ponies/images/layout/logo.png');
+    background-image: url('/static/themes/omg_ponies/images/layout/logo.png');
 }
 
 div.pager div.navigation {
@@ -13,15 +13,15 @@ div.pager div.navigation {
 }
 
 div.pager div.first, div.pager div.first:hover {
-    background-image: url("/themes/omg_ponies/images/icons/first.png");
+    background-image: url("/static/themes/omg_ponies/images/icons/first.png");
 }
 div.pager div.prev, div.pager div.prev:hover {
-    background-image: url("/themes/omg_ponies/images/icons/prev.png");
+    background-image: url("/static/themes/omg_ponies/images/icons/prev.png");
 }
 div.pager div.next, div.pager div.next:hover {
-    background-image: url("/themes/omg_ponies/images/icons/next.png");
+    background-image: url("/static/themes/omg_ponies/images/icons/next.png");
 }
 div.pager div.last, div.pager div.last:hover {
-    background-image: url("/themes/omg_ponies/images/icons/last.png");
+    background-image: url("/static/themes/omg_ponies/images/icons/last.png");
 }
 

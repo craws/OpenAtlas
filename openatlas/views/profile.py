@@ -58,7 +58,7 @@ class PasswordForm(Form):
 
 
 class ProfileForm(Form):
-    name = StringField(_('name'), description=_('tooltip real name'))
+    name = StringField(_('full name'), description=_('tooltip full name'))
     email = StringField(_('email'), [InputRequired(), Email()], description=_('tooltip email'))
     show_email = BooleanField(_('show email'), description=_('tooltip show email'))
     newsletter = BooleanField(_('newsletter'), description=_('tooltip newsletter'))
@@ -71,7 +71,7 @@ def profile_index():
     user = current_user
     data = {'info': [
         (_('username'), user.username),
-        (_('name'), user.real_name),
+        (_('full name'), user.real_name),
         (_('email'), user.email),
         (_('show email'), uc_first(_('on')) if user.settings['show_email'] else uc_first(_('off'))),
         (_('newsletter'), uc_first(_('on')) if user.settings['newsletter'] else uc_first(_('off')))

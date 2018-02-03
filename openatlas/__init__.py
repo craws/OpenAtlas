@@ -5,7 +5,7 @@ import sys
 import time
 from collections import OrderedDict
 from flask import Flask, request, session
-from flask_babel import Babel, _
+from flask_babel import Babel, lazy_gettext as _
 from flask_wtf import Form
 from wtforms import StringField, SubmitField
 
@@ -14,11 +14,7 @@ try:
 except ImportError:
     mod_wsgi = None
 
-app = Flask(
-    __name__,
-    static_url_path='',
-    static_folder='static',
-    instance_relative_config=True)
+app = Flask(__name__, instance_relative_config=True)
 
 # use the test database if running tests
 instance_name = 'production' if 'test_runner.py' not in sys.argv[0] else 'testing'
@@ -73,41 +69,33 @@ def get_locale():
     return best_match if best_match else session['settings']['default_language']
 
 
-debug_model = OrderedDict()
-debug_model['current'] = time.time()
-debug_model['by id'] = 0
-debug_model['by ids'] = 0
-debug_model['by codes'] = 0
-debug_model['linked'] = 0
-debug_model['user'] = 0
-debug_model['current'] = time.time()
-
 classes = ClassMapper.get_all()
 properties = PropertyMapper.get_all()
-
-debug_model['model'] = time.time() - debug_model['current']
-debug_model['current'] = time.time()
-
 nodes = {}
+debug_model = OrderedDict()
 
 
 @app.before_request
 def before_request():
+    if request.path.startswith('/static'):
+        return  # only needed if not running with apache and static alias
     session['settings'] = SettingsMapper.get_settings()
     session['language'] = get_locale()
     openatlas.nodes = NodeMapper.get_all_nodes()
     debug_model['current'] = time.time()
+    debug_model['by codes'] = 0
     debug_model['by id'] = 0
     debug_model['by ids'] = 0
     debug_model['linked'] = 0
     debug_model['user'] = 0
     debug_model['div sql'] = 0
+    debug_model['model'] = time.time() - debug_model['current']
+    debug_model['current'] = time.time()
 
 
 class GlobalSearchForm(Form):
-    from openatlas.util.util import uc_first
-    term = StringField('', render_kw={"placeholder": uc_first(_('search term'))})
-    search = SubmitField(uc_first(_('search')))
+    term = StringField('', render_kw={"placeholder": _('search term')})
+    search = SubmitField(_('search'))
 
 
 @app.context_processor
