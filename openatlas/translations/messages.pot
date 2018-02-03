@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-01-27 16:18+0100\n"
+"POT-Creation-Date: 2018-02-03 18:05+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,11 +17,11 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.3.4\n"
 
-#: __init__.py:109 views/search.py:13
+#: __init__.py:97 views/search.py:13
 msgid "search term"
 msgstr ""
 
-#: __init__.py:110 templates/search/index.html:4
+#: __init__.py:98 templates/search/index.html:4
 msgid "search"
 msgstr ""
 
@@ -747,9 +747,8 @@ msgid "tooltip date"
 msgstr ""
 
 #: views/actor.py:20 views/event.py:20 views/hierarchy.py:17 views/place.py:19
-#: views/profile.py:61 views/profile.py:74 views/reference.py:20
-#: views/source.py:20 views/translation.py:17 views/types.py:17
-#: views/types.py:78 views/types.py:93 views/user.py:26 views/user.py:96
+#: views/reference.py:20 views/source.py:20 views/translation.py:17
+#: views/types.py:17 views/types.py:78 views/types.py:93
 msgid "name"
 msgstr ""
 
@@ -1070,8 +1069,12 @@ msgstr ""
 msgid "error password too short"
 msgstr ""
 
+#: views/profile.py:61 views/profile.py:74 views/user.py:26 views/user.py:96
+msgid "full name"
+msgstr ""
+
 #: views/profile.py:61 views/user.py:26
-msgid "tooltip real name"
+msgid "tooltip full name"
 msgstr ""
 
 #: views/profile.py:62
