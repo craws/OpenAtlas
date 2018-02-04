@@ -1,6 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import url_for
-from openatlas import app
+
+from openatlas import app, EntityMapper
 from openatlas.test_base import TestBaseCase
 
 
@@ -11,7 +12,11 @@ class ActorTests(TestBaseCase):
         with app.app_context():
             rv = self.app.get(url_for('actor_index'))
             assert b'No entries' in rv.data
-            residence_id = self.insert('place', 'Nostromos')
+
+            # create a residence for actor
+            rv = self.app.post(url_for('place_insert'), data={'name': 'Nostromos'})
+            residence_id = rv.location.split('/')[-1]
+
             # actor insert
             rv = self.app.get(url_for('actor_insert', code='E21'))
             assert b'+ Person' in rv.data
@@ -64,7 +69,6 @@ class ActorTests(TestBaseCase):
             rv = self.app.post(
                 url_for('ajax_bookmark'), data={'entity_id': actor_id}, follow_redirects=True)
             assert b'Bookmark' in rv.data
-
             rv = self.app.get(
                 url_for('actor_view', id_=actor_id, unlink_id=666), follow_redirects=True)
             assert b'removed'in rv.data
