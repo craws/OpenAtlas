@@ -13,7 +13,6 @@ openatlas/tests/.coverage
 openatlas/tests/cover
 
 # upload dicrectory
-
 openatlas/uploads/*
 
 # ide
