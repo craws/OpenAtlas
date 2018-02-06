@@ -11,11 +11,12 @@ class ContentTests(TestBaseCase):
         self.login()
         with app.app_context():
             self.app.post(url_for('actor_insert', code='E21'), data={'name': 'Oliver Twist'})
-            rv = self.app.get(url_for('admin_orphans'))
-            assert b'Oliver Twist' in rv.data
             with app.test_request_context():
                 app.preprocess_request()
                 EntityMapper.insert('E61', '2017-04-01')  # add orphaned date
+            rv = self.app.get(url_for('admin_orphans'))
+            assert b'Oliver Twist' in rv.data
+            assert b'2017-04-01' in rv.data
             rv = self.app.get(url_for('admin_orphans', delete='orphans'))
             assert b'2017-04-01' not in rv.data
             rv = self.app.get(url_for('admin_newsletter'))

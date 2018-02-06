@@ -16,7 +16,7 @@ class EventTest(TestBaseCase):
             residence_id = rv.location.split('/')[-1]
             with app.test_request_context():
                 app.preprocess_request()
-                actor_id = EntityMapper.insert('E21', 'Hansi').id
+                actor_id = EntityMapper.insert('E21', 'Game master').id
                 reference_id = EntityMapper.insert('E84', 'Ancient Books', 'information carrier').id
 
             # event insert
@@ -45,6 +45,8 @@ class EventTest(TestBaseCase):
                     'date_begin_month': '10',
                     'date_begin_day': '8'})
             event_id = rv.location.split('/')[-1]
+            rv = self.app.get(url_for('event_view', id_=event_id))
+            assert b'Game master' in rv.data
             rv = self.app.post(
                 url_for('event_insert', code='E8'),
                 data={'name': 'Test event', 'continue_': 'yes'},

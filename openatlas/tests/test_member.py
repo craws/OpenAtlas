@@ -1,5 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import url_for
+
 from openatlas import app, EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.test_base import TestBaseCase
@@ -10,8 +11,10 @@ class MemberTests(TestBaseCase):
     def test_member(self):
         self.login()
         with app.app_context():
-            actor_id = EntityMapper.insert('E21', 'Ripley').id
-            group_id = EntityMapper.insert('E74', 'Space Marines').id
+            with app.test_request_context():
+                app.preprocess_request()
+                actor_id = EntityMapper.insert('E21', 'Ripley').id
+                group_id = EntityMapper.insert('E74', 'Space Marines').id
 
             # add membership
             rv = self.app.get(url_for('member_insert', origin_id=group_id))
@@ -36,7 +39,9 @@ class MemberTests(TestBaseCase):
             assert b'Ripley' in rv.data
 
             # update member
-            link_id = LinkMapper.get_links(group_id, 'P107')[0].id
+            with app.test_request_context():
+                app.preprocess_request()
+                link_id = LinkMapper.get_links(group_id, 'P107')[0].id
             rv = self.app.get(url_for('member_update', id_=link_id, origin_id=group_id))
             assert b'Ripley' in rv.data
             rv = self.app.post(

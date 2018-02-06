@@ -37,7 +37,9 @@ class ReferenceTest(TestBaseCase):
             assert b'Test reference updated' in rv.data
 
             # reference link
-            batman = EntityMapper.insert('E21', 'Batman')
+            with app.test_request_context():
+                app.preprocess_request()
+                batman = EntityMapper.insert('E21', 'Batman')
             rv = self.app.get(url_for('reference_add', origin_id=batman.id))
             assert b'Batman' in rv.data
             rv = self.app.post(
@@ -56,9 +58,12 @@ class ReferenceTest(TestBaseCase):
             assert b'Test reference updated' in rv.data
 
             # reference link update
+            with app.test_request_context():
+                app.preprocess_request()
+                link_id = batman.get_links('P67', True)[0].id
             rv = self.app.post(url_for(
                 'reference_link_update',
-                link_id=batman.get_links('P67', True)[0].id,
+                link_id=link_id,
                 origin_id=bibliography_id), data={'page': '666'}, follow_redirects=True)
             assert b'Changes have been saved' in rv.data
 

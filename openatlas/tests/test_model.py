@@ -24,11 +24,13 @@ class ModelTests(TestBaseCase):
             rv = self.app.post(url_for('model_index'), data=data)
             assert b'Wrong' in rv.data
             self.login()
+
             # insert some data for network
-            actor = EntityMapper.insert('E21', 'King Arthur')
-            event = EntityMapper.insert('E7', 'Battle of Camlann')
-            prop_object = EntityMapper.insert('E89', 'Propositional Object')
             with app.test_request_context():
+                app.preprocess_request()
+                actor = EntityMapper.insert('E21', 'King Arthur')
+                event = EntityMapper.insert('E7', 'Battle of Camlann')
+                prop_object = EntityMapper.insert('E89', 'Propositional Object')
                 LinkMapper.insert(actor, 'P11', event)
                 LinkMapper.insert(actor, 'P67', prop_object)
             rv = self.app.get(url_for('model_network'))

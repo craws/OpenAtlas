@@ -154,9 +154,8 @@ class EntityMapper:
         sql = EntityMapper.sql + ' WHERE e.id = %(id)s GROUP BY e.id ORDER BY e.name;'
         g.cursor.execute(sql, {'id': entity_id})
         openatlas.debug_model['by id'] += 1
-        # Return None in case it is excepted e.g. at logs, otherwise a 418 would be triggered
         if g.cursor.rowcount < 1 and ignore_not_found:
-            return None
+            return None  # pragma: no cover, only used where expected to avoid a 418 e.g. at logs
         return Entity(g.cursor.fetchone())
 
     @staticmethod

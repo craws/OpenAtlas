@@ -10,7 +10,10 @@ class NodeTest(TestBaseCase):
     def test_node(self):
         self.login()
         with app.app_context():
-            actor_node = NodeMapper.get_hierarchy_by_name('Actor Actor Relation')
+            with app.test_request_context():
+                app.preprocess_request()
+                actor_node = NodeMapper.get_hierarchy_by_name('Actor Actor Relation')
+                sex_node = NodeMapper.get_hierarchy_by_name('Sex')
             rv = self.app.get(url_for('node_index'))
             assert b'Actor Actor Relation' in rv.data
             rv = self.app.post(
@@ -24,6 +27,7 @@ class NodeTest(TestBaseCase):
             node_id = rv.location.split('/')[-1].replace('node#tab-', '')
             rv = self.app.get(url_for('node_update', id_=node_id))
             assert b'My secret node' in rv.data
+            self.app.post(url_for('node_insert', root_id=sex_node.id), data=data)
             rv = self.app.post(
                 url_for('node_update', id_=node_id), data=data, follow_redirects=True)
             assert b'Changes have been saved.' in rv.data

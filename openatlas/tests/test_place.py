@@ -14,7 +14,11 @@ class PlaceTest(TestBaseCase):
             rv = self.app.get(url_for('place_insert'))
             assert b'+ Place' in rv.data
             data = {'name': 'Asgard', 'alias-0': 'Valhöll'}
-            reference_id = EntityMapper.insert('E84', 'Ancient Books', 'information carrier').id
+            with app.test_request_context():
+                app.preprocess_request()
+                reference_id = EntityMapper.insert('E84', 'Ancient Books', 'information carrier').id
+                place_node = NodeMapper.get_hierarchy_by_name('Place')
+                source_id = EntityMapper.insert('E33', 'Tha source').id
             rv = self.app.post(
                 url_for('place_insert', origin_id=reference_id),
                 data=data,
@@ -31,14 +35,13 @@ class PlaceTest(TestBaseCase):
                 "objectDescription":"","objectId":185,"shapeType":"Shape",
                 "siteType":"Settlement","title":""},"type":"Feature"}]"""
             data['gis_polygons'] = gis_polygons
-            place_node = NodeMapper.get_hierarchy_by_name('Place')
             data[place_node.id] = place_node.subs
             rv = self.app.post(
-                url_for('place_insert', origin_id=EntityMapper.insert('E33', 'Tha source').id),
-                data=data,
-                follow_redirects=True)
+                url_for('place_insert', origin_id=source_id), data=data, follow_redirects=True)
             assert b'Tha source' in rv.data
-            places = EntityMapper.get_by_codes('place')
+            with app.test_request_context():
+                app.preprocess_request()
+                places = EntityMapper.get_by_codes('place')
             place_id = places[0].id
             second_place_id = places[1].id
             data['continue_'] = 'yes'
@@ -53,9 +56,10 @@ class PlaceTest(TestBaseCase):
             rv = self.app.post(
                 url_for('place_update', id_=place_id), data=data, follow_redirects=True)
             assert b'Val-hall' in rv.data
-            event = EntityMapper.insert('E8', 'Valhalla rising')
-            location = LinkMapper.get_linked_entity(second_place_id, 'P53')
             with app.test_request_context():
+                app.preprocess_request()
+                event = EntityMapper.insert('E8', 'Valhalla rising')
+                location = LinkMapper.get_linked_entity(second_place_id, 'P53')
                 event.link('P7', location)
                 event.link('P24', location)
             rv = self.app.get(

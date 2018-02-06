@@ -23,6 +23,7 @@ class TestBaseCase(unittest.TestCase):
     def setup_database():
         connection = psycopg2.connect(
             database=app.config['DATABASE_NAME'],
+            host=app.config['DATABASE_HOST'],
             user=app.config['DATABASE_USER'],
             password=app.config['DATABASE_PASS'],
             port=app.config['DATABASE_PORT'])
@@ -37,5 +38,3 @@ class TestBaseCase(unittest.TestCase):
         ]:
             with open(os.path.dirname(__file__) + '/../install/' + file_name, 'r') as sqlFile:
                 cursor.execute(sqlFile.read())
-
-

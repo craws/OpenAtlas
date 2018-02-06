@@ -10,12 +10,16 @@ class TranslationTest(TestBaseCase):
     def test_source(self):
         self.login()
         with app.app_context():
-            source_id = EntityMapper.insert('E33', 'Necronomicon', 'source content').id
+            with app.test_request_context():
+                app.preprocess_request()
+                source_id = EntityMapper.insert('E33', 'Necronomicon', 'source content').id
             rv = self.app.get(url_for('translation_insert', source_id=source_id))
             assert b'+ Translation' in rv.data
             data = {'name': 'Test translation'}
             rv = self.app.post(url_for('translation_insert', source_id=source_id), data=data)
-            translation_id = rv.location.split('/')[-1]
+            with app.test_request_context():
+                app.preprocess_request()
+                translation_id = rv.location.split('/')[-1]
             self.app.get(url_for('translation_update', id_=translation_id, source_id=source_id))
             rv = self.app.post(
                 url_for('translation_update', id_=translation_id, source_id=source_id),

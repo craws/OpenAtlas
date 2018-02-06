@@ -66,7 +66,7 @@ def connect():
 
 @app.before_request
 def before_request():
-    if request.path.startswith('/static'):
+    if request.path.startswith('/static'):  # pragma: no cover
         return  # only needed if not running with apache and static alias
     debug_model['current'] = time.time()
     g.db = connect()
