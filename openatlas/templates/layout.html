@@ -71,7 +71,7 @@
                 <div>
                     {{ _('version')|uc_first }} {{ config['VERSION'] }} -
                     <a href="{{ url_for('index_changelog') }}">{{ _('changelog')|uc_first }}</a>
-                    - <a href="https://redmine.craws.net/projects/uni/wiki/Manual" target="_blank">{{ _('manual')|uc_first }}</a>
+                    - <a href="https://redmine.craws.net/projects/uni/wiki/Manual" target="_blank" rel="noopener">{{ _('manual')|uc_first }}</a>
                     - <a href="{{ url_for('model_index') }}">{{ _('model')|uc_first }}</a>
                     - <a href="{{ url_for('index_credits') }}">{{ _('credits')|uc_first }}</a>
                     - <a href="{{ url_for('index_contact') }}">{{ _('contact')|uc_first }}</a>
@@ -116,7 +116,7 @@
         <div id="breadcrumb">
             {% block breadcrumb %}{% endblock %}
         </div>
-        <div id="content">
+        <main role="main">
             <div style="float:left">{% block content %}{% endblock %}</div>
             {% if session['settings']['debug_mode'] and 'admin'|is_authorized %}
                 <div class="data-table" style="float:right;margin:1em;">
@@ -127,11 +127,11 @@
             {% if 'craws.net' in request['url_root'] %}
                 <div style="clear:both;"></div>
                 <div id="powered-by">
-                    Another <a target="_blank" href="http://openatlas.eu">OpenAtlas</a>
-                    project powered by <a target="_blank" href="https://craws.net">craws.net</a>
+                    Another <a target="_blank" rel="noopener" href="http://openatlas.eu">OpenAtlas</a>
+                    project powered by <a target="_blank" rel="noopener" href="https://craws.net">craws.net</a>
                 </div>
             {% endif %}
             <div style="clear:both"></div>
-        </div>
+        </main>
     </body>
 </html>

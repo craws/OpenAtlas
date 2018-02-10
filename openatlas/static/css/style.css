@@ -218,7 +218,7 @@ img.zoom {
     vertical-align: middle;
 }
 
-#content {
+main {
     margin: 1em;
     text-align: left;
     font-size: 0.9em;
@@ -444,7 +444,7 @@ input[type=submit] {
     width: 100%;
 }
 
-#content .ui-tabs-vertical .ui-tabs-nav li a {
+main .ui-tabs-vertical .ui-tabs-nav li a {
     float: none;
     display: block;
 }

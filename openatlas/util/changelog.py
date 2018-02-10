@@ -264,4 +264,4 @@ class Changelog:
         'data': OrderedDict(
             feature=OrderedDict([
                 ('', 'Initial version based on the "Zend Base" project from '
-                     '<a target="_blank" href="http://craws.net">craws.net</a>')]))}
+                     '<a target="_blank" rel="noopener" href="http://craws.net">craws.net</a>')]))}
