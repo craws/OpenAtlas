@@ -11,21 +11,26 @@ class EventTest(TestBaseCase):
         self.login()
         with app.app_context():
 
-            # create a residence for actor
-            self.app.post(url_for('place_insert'), data={'name': 'My house'})
-            residence_id = EntityMapper.get_by_codes('place')[0].id
+            # create entities for event
+            rv = self.app.post(url_for('place_insert'), data={'name': 'My house'})
+            residence_id = rv.location.split('/')[-1]
+            with app.test_request_context():
+                app.preprocess_request()
+                actor_id = EntityMapper.insert('E21', 'Game master').id
+                reference_id = EntityMapper.insert('E84', 'Ancient Books', 'information carrier').id
 
             # event insert
             rv = self.app.get(url_for('event_insert', code='E7'))
             assert b'+ Activity' in rv.data
-            actor_id = EntityMapper.insert('E21', 'Hansi').id
-            reference_id = EntityMapper.insert('E84', 'Ancient Books', 'information carrier').id
+
             rv = self.app.post(
                 url_for('event_insert', code='E7', origin_id=reference_id),
-                data={'name': '1. Whatever', 'place': residence_id},
+                data={'name': 'First event ever', 'place': residence_id},
                 follow_redirects=True)
-            assert b'An entry has been created' in rv.data
-            activity_id = EntityMapper.get_by_codes('event')[0].id
+            assert b'First event ever' in rv.data
+            with app.test_request_context():
+                app.preprocess_request()
+                activity_id = EntityMapper.get_by_codes('event')[0].id
 
             rv = self.app.post(
                 url_for('event_insert', code='E8'),
@@ -38,10 +43,10 @@ class EventTest(TestBaseCase):
                     'event': activity_id,
                     'date_begin_year': '1949',
                     'date_begin_month': '10',
-                    'date_begin_day': '8'},
-                follow_redirects=True)
-            assert b'An entry has been created' in rv.data
-            event_id = EntityMapper.get_by_codes('event')[1].id
+                    'date_begin_day': '8'})
+            event_id = rv.location.split('/')[-1]
+            rv = self.app.get(url_for('event_view', id_=event_id))
+            assert b'Game master' in rv.data
             rv = self.app.post(
                 url_for('event_insert', code='E8'),
                 data={'name': 'Test event', 'continue_': 'yes'},
@@ -58,7 +63,7 @@ class EventTest(TestBaseCase):
             rv = self.app.get(url_for('event_update', id_=activity_id))
             assert b'Test event' in rv.data
             rv = self.app.get(url_for('event_update', id_=event_id))
-            assert b'1. Whatever' in rv.data
+            assert b'First event ever' in rv.data
             data = {'name': 'Event updated'}
             rv = self.app.post(
                 url_for('event_update', id_=event_id), data=data, follow_redirects=True)

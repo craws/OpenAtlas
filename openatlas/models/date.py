@@ -1,5 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import numpy
+from flask import g
 
 import openatlas
 from openatlas.models.linkProperty import LinkPropertyMapper
@@ -21,10 +22,9 @@ class DateMapper:
                 AND l.property_code IN ('OA1', 'OA2', 'OA3', 'OA4', 'OA5', 'OA6')
             JOIN model.entity e2 ON l.range_id = e2.id
             WHERE e.id = %(id)s;"""
-        cursor = openatlas.get_cursor()
-        cursor.execute(sql, {'id': entity.id})
+        g.cursor.execute(sql, {'id': entity.id})
         dates = {}
-        for row in cursor.fetchall():
+        for row in g.cursor.fetchall():
             if row.property_code not in dates:
                 dates[row.property_code] = {}
             dates[row.property_code][row.system_type] = {
@@ -102,10 +102,9 @@ class DateMapper:
             JOIN model.link l ON lp.domain_id = l.id AND lp.property_code IN ('OA5', 'OA6')
             JOIN model.entity e ON lp.range_id = e.id
             WHERE l.id = %(id)s;"""
-        cursor = openatlas.get_cursor()
-        cursor.execute(sql, {'id': link.id})
+        g.cursor.execute(sql, {'id': link.id})
         dates = {}
-        for row in cursor.fetchall():
+        for row in g.cursor.fetchall():
             if row.property_code not in dates:
                 dates[row.property_code] = {}
             dates[row.property_code][row.system_type] = {
@@ -144,7 +143,7 @@ class DateMapper:
                 SELECT e.id FROM model.entity e
                 JOIN model.link l ON e.id = l.range_id AND l.domain_id = %(entity_id)s
                     AND l.property_code IN ('OA1', 'OA2', 'OA3', 'OA4', 'OA5', 'OA6'));"""
-        openatlas.get_cursor().execute(sql, {'entity_id': entity.id})
+        g.cursor.execute(sql, {'entity_id': entity.id})
         openatlas.debug_model['div sql'] += 1
 
     @staticmethod

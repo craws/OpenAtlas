@@ -23,7 +23,7 @@ class UserForm(Form):
     password = PasswordField(_('password'), [DataRequired()])
     password2 = PasswordField(_('repeat password'), [DataRequired()])
     show_passwords = BooleanField(_('show passwords'))
-    real_name = StringField(_('name'), description=_('tooltip real name'))
+    real_name = StringField(_('full name'), description=_('tooltip full name'))
     description = TextAreaField(_('info'))
     send_info = BooleanField(_('send account information'))
     save = SubmitField(_('save'))
@@ -56,8 +56,9 @@ class ActivityForm(Form):
         ('insert', _('insert')),
         ('update', _('update')),
         ('delete', _('delete')))
-    limit = SelectField(_('limit'), choices=((0, _('all')), (100, 100), (500, 500)), default=100, coerce=int)
-    user = SelectField(_('user'), choices=([(0, _('all'))] + UserMapper.get_users()), default=0, coerce=int)
+    limit = SelectField(_('limit'),
+                        choices=((0, _('all')), (100, 100), (500, 500)), default=100, coerce=int)
+    user = SelectField(_('user'), choices=([(0, _('all'))]), default=0, coerce=int)
     action = SelectField(_('action'), choices=action_choices, default='all')
     apply = SubmitField(_('apply'))
 
@@ -67,6 +68,7 @@ class ActivityForm(Form):
 @required_group('readonly')
 def user_activity(user_id=0):
     form = ActivityForm()
+    form.user.choices = [(0, _('all'))] + UserMapper.get_users()
     table = {'id': 'activity', 'header': ['date', 'user', 'action', 'entity'], 'data': []}
     if form.validate_on_submit():
         activities = UserMapper.get_activities(form.limit.data, form.user.data, form.action.data)
@@ -93,7 +95,7 @@ def user_view(id_):
     data = {'info': [
         (_('username'), link(user)),
         (_('group'), user.group),
-        (_('name'), user.real_name),
+        (_('full name'), user.real_name),
         (_('email'), user.email if is_authorized('manager') or user.settings['show_email'] else ''),
         (_('language'), user.settings['language']),
         (_('last login'), format_date(user.login_last_success)),
@@ -109,7 +111,7 @@ def user_index():
         'header': ['username', 'group', 'email', 'newsletter', 'created', 'last login', 'entities'],
         'data': []}}
     for user in UserMapper.get_all():
-        count = UserMapper.get_created_entites_count(user.id)
+        count = UserMapper.get_created_entities_count(user.id)
         tables['user']['data'].append([
             link(user),
             user.group,

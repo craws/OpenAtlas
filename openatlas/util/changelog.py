@@ -6,7 +6,7 @@ class Changelog:
     """ A big OrderedDict with changelog data, maybe not the best place and format to keep it."""
     versions = OrderedDict()
     versions['3.2.0'] = {
-        'date': 'TBA',
+        'date': '2018-02-10',
         'data': OrderedDict(
             feature=OrderedDict([
                 ('732', 'Documentation and manual'),
@@ -252,16 +252,9 @@ class Changelog:
                 ('318', 'CRM - properties'),
                 ('318', 'CRM - relations (super/sub classes, domains, ranges'),
                 ('318', 'OpenAtlas shortcuts')]))}
-    versions['0.0.2'] = {
-        'date': '2014-12-03',
-        'data': OrderedDict(
-            feature=OrderedDict([
-                ('306', 'CIDOC classes'),
-                ('308', 'Database design'),
-                ('314', 'Feedback form and translations')]))}
     versions['0.0.1'] = {
         'date': '2014-11-05',
         'data': OrderedDict(
             feature=OrderedDict([
                 ('', 'Initial version based on the "Zend Base" project from '
-                     '<a target="_blank" href="http://craws.net">craws.net</a>')]))}
+                     '<a target="_blank" rel="noopener" href="http://craws.net">craws.net</a>')]))}

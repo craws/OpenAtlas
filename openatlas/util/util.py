@@ -1,9 +1,4 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-import glob
-
-import numpy
-import math
-import os
 import re
 import smtplib
 from collections import OrderedDict
@@ -11,9 +6,12 @@ from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
+from html.parser import HTMLParser
 
+import numpy
 from babel import dates
-from flask import abort, url_for, request, session, flash
+from flask import abort, url_for, request, session, flash, g
+from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_babel import lazy_gettext as _
 from html.parser import HTMLParser
@@ -26,19 +24,6 @@ from openatlas.models.date import DateMapper
 from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.property import Property
 from openatlas.models.user import User
-
-
-def convert_size(size_bytes):
-    if size_bytes == 0:
-        return "0B"  # pragma: no cover
-    size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
-    i = int(math.floor(math.log(size_bytes, 1024)))
-    return "%s %s" % (int(size_bytes / math.pow(1024, i)), size_name[i])
-
-
-def print_file_size(entity, name=None):
-    path = glob.glob(os.path.join(app.config['UPLOAD_FOLDER'], str(entity.id) + '.*'))[0]
-    return convert_size(os.path.getsize(path))
 
 
 def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
@@ -148,7 +133,7 @@ def get_entity_data(entity, location=None):
     for node in nodes:
         if not node.root:
             continue
-        root = openatlas.nodes[node.root[-1]]
+        root = g.nodes[node.root[-1]]
         name = 'type' if root.name in app.config['BASE_TYPES'] else root.name
         if root.name not in type_data:
             type_data[name] = []
@@ -229,6 +214,7 @@ def get_entity_data(entity, location=None):
         if user_log['modified']:
             info = format_date(user_log['modified']) + ' ' + link(user_log['creator'])
             data.append((_('modified'), info))
+
     return data
 
 
@@ -365,12 +351,11 @@ def link(entity):
         html = '<a href="' + url + '">' + entity.code + '</a>'
     elif isinstance(entity, Entity):
         url = ''
-        if entity.system_type == 'source content':
-            url = url_for('source_view', id_=entity.id)
-        elif entity.system_type == 'source translation':
-            url = url_for('translation_view', id_=entity.id)
-        elif entity.system_type == 'file':
-            url = url_for('file_view', id_=entity.id)
+        if entity.class_.code == 'E33':
+            if entity.system_type == 'source content':
+                url = url_for('source_view', id_=entity.id)
+            elif entity.system_type == 'source translation':
+                url = url_for('translation_view', id_=entity.id)
         elif entity.class_.code in ('E7', 'E8', 'E12', 'E6'):
             url = url_for('event_view', id_=entity.id)
         elif entity.class_.code in ('E21', 'E74', 'E40'):
@@ -476,11 +461,11 @@ def pager(table):
 
 
 def get_base_table_data(entity):
-    """ Returns standard table data for an entity"""
+    """Returns standard table data for an entity"""
     name = app.config['CODE_CLASS'][entity.class_.code]
     data = [link(entity)]
     if name in ['event', 'actor']:
-        data.append(openatlas.classes[entity.class_.code].name)
+        data.append(g.classes[entity.class_.code].name)
     if name in ['reference']:
         data.append(uc_first(_(entity.system_type)))
     if name in ['event', 'place', 'source', 'reference']:
@@ -492,7 +477,7 @@ def get_base_table_data(entity):
 
 
 def was_modified(form, entity):   # pragma: no cover
-    """ Checks if an entity was modified after an update form was opened."""
+    """Checks if an entity was modified after an update form was opened."""
     if not entity.modified or not form.opened.data:
         return False
     if entity.modified < datetime.fromtimestamp(float(form.opened.data)):

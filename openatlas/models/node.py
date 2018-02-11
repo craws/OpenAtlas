@@ -1,19 +1,19 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
-
-import openatlas
 from collections import OrderedDict
 
+from flask import g
+
 from openatlas.forms.forms import TreeField, TreeMultiField
-from openatlas.models.linkProperty import LinkPropertyMapper
 from .entity import Entity, EntityMapper
+from .linkProperty import LinkPropertyMapper
 
 
 class NodeMapper(EntityMapper):
 
     @staticmethod
     def get_all_nodes():
-        """Get and return all type and place nodes"""
+        """ Get and return all type and place nodes"""
         sql = """
             SELECT
                 e.id,
@@ -40,11 +40,10 @@ class NodeMapper(EntityMapper):
                 AND (e.system_type IS NULL OR e.system_type != 'place location')
             GROUP BY e.id, es.id                        
             ORDER BY e.name;"""
-        cursor = openatlas.get_cursor()
-        cursor.execute(sql, {'class_code': 'E55', 'property_code': 'P127'})
-        types = cursor.fetchall()
-        cursor.execute(sql, {'class_code': 'E53', 'property_code': 'P89'})
-        places = cursor.fetchall()
+        g.cursor.execute(sql, {'class_code': 'E55', 'property_code': 'P127'})
+        types = g.cursor.fetchall()
+        g.cursor.execute(sql, {'class_code': 'E53', 'property_code': 'P89'})
+        places = g.cursor.fetchall()
         nodes = OrderedDict()
         for row in types + places:
             node = Entity(row)
@@ -59,9 +58,8 @@ class NodeMapper(EntityMapper):
     @staticmethod
     def populate_subs(nodes):
         forms = {}
-        cursor = openatlas.get_cursor()
-        cursor.execute("SELECT id, name, extendable FROM web.form ORDER BY name ASC;")
-        for row in cursor.fetchall():
+        g.cursor.execute("SELECT id, name, extendable FROM web.form ORDER BY name ASC;")
+        for row in g.cursor.fetchall():
             forms[row.id] = {'id': row.id, 'name': row.name, 'extendable': row.extendable}
         sql = """
             SELECT h.id, h.name, h.multiple, h.system, h.directional,
@@ -69,9 +67,9 @@ class NodeMapper(EntityMapper):
                     SELECT f.id FROM web.form f JOIN web.hierarchy_form hf ON f.id = hf.form_id
                     AND hf.hierarchy_id = h.id)) AS form_ids
             FROM web.hierarchy h;"""
-        cursor.execute(sql)
+        g.cursor.execute(sql)
         hierarchies = {}
-        for row in cursor.fetchall():
+        for row in g.cursor.fetchall():
             hierarchies[row.id] = row
         for id_, node in nodes.items():
             if node.root:
@@ -98,13 +96,13 @@ class NodeMapper(EntityMapper):
 
     @staticmethod
     def get_nodes(name):
-        for id_, node in openatlas.nodes.items():
+        for id_, node in g.nodes.items():
             if node.name == name and not node.root:
                 return node.subs
 
     @staticmethod
     def get_hierarchy_by_name(name):
-        for id_, node in openatlas.nodes.items():
+        for id_, node in g.nodes.items():
             if node.name == name and not node.root:
                 return node
 
@@ -114,18 +112,18 @@ class NodeMapper(EntityMapper):
             UPDATE model.link SET range_id = %(new_id)s
             WHERE range_id = %(old_id)s AND domain_id = ANY(%(entity_ids)s);"""
         params = {'old_id': old_id, 'new_id': new_id, 'entity_ids': list(map(int, entity_ids))}
-        openatlas.get_cursor().execute(sql, params)
+        g.cursor.execute(sql, params)
 
     @staticmethod
     def get_tree_data(node_id, selected_ids):
-        node = openatlas.nodes[node_id]
+        node = g.nodes[node_id]
         return NodeMapper.walk_tree(node.subs, selected_ids)
 
     @staticmethod
     def walk_tree(param, selected_ids):
         string = ''
         for id_ in param if isinstance(param, list) else [param]:
-            item = openatlas.nodes[id_]
+            item = g.nodes[id_]
             selected = ",'state' : {'selected' : true}" if item.id in selected_ids else ''
             name = item.name.replace("'", "&apos;")
             string += "{'text':'" + name + "', 'id':'" + str(item.id) + "'" + selected
@@ -144,20 +142,18 @@ class NodeMapper(EntityMapper):
             JOIN web.hierarchy_form hf ON h.id = hf.hierarchy_id
             JOIN web.form f ON hf.form_id = f.id AND f.name = %(form_name)s
             ORDER BY h.name;"""
-        cursor = openatlas.get_cursor()
-        cursor.execute(sql, {'form_name': form_id})
+        g.cursor.execute(sql, {'form_name': form_id})
         nodes = OrderedDict()
-        for row in cursor.fetchall():
-            nodes[row.id] = openatlas.nodes[row.id]
+        for row in g.cursor.fetchall():
+            nodes[row.id] = g.nodes[row.id]
         return nodes
 
     @staticmethod
     def get_form_choices():
         sql = "SELECT f.id, f.name FROM web.form f WHERE f.extendable = True ORDER BY name ASC;"
-        cursor = openatlas.get_cursor()
-        cursor.execute(sql)
+        g.cursor.execute(sql)
         forms = []
-        for row in cursor.fetchall():
+        for row in g.cursor.fetchall():
             forms.append((row.id, row.name))
         return forms
 
@@ -174,7 +170,7 @@ class NodeMapper(EntityMapper):
                     range_param = int(field.data)
                 except ValueError:
                     range_param = ast.literal_eval(field.data)
-                node = openatlas.nodes[int(field.id)]
+                node = g.nodes[int(field.id)]
                 if node.name in ['Administrative Unit', 'Historical Place']:
                     if entity.class_.code == 'E53':
                         entity.link('P89', range_param)
@@ -193,33 +189,28 @@ class NodeMapper(EntityMapper):
         sql = """
             INSERT INTO web.hierarchy (id, name, multiple)
             VALUES (%(id)s, %(name)s, %(multiple)s);"""
-        openatlas.get_cursor().execute(sql, {
-            'id': node.id,
-            'name': node.name,
-            'multiple': form.multiple.data})
+        g.cursor.execute(sql, {'id': node.id, 'name': node.name, 'multiple': form.multiple.data})
         NodeMapper.add_forms_to_hierarchy(node, form)
 
     @staticmethod
     def update_hierarchy(node, form):
         sql = "UPDATE web.hierarchy SET name = %(name)s, multiple = %(multiple)s WHERE id = %(id)s;"
         multiple = True if node.multiple or form.multiple.data else False
-        openatlas.get_cursor().execute(sql, {
-            'id': node.id, 'name': form.name.data, 'multiple': multiple})
+        g.cursor.execute(sql, {'id': node.id, 'name': form.name.data, 'multiple': multiple})
         NodeMapper.add_forms_to_hierarchy(node, form)
 
     @staticmethod
     def add_forms_to_hierarchy(node, form):
-        cursor = openatlas.get_cursor()
         for form_id in form.forms.data:
             sql = """
                 INSERT INTO web.hierarchy_form (hierarchy_id, form_id)
                 VALUES (%(node_id)s, %(form_id)s);"""
-            cursor.execute(sql, {'node_id': node.id, 'form_id': form_id})
+            g.cursor.execute(sql, {'node_id': node.id, 'form_id': form_id})
 
     @staticmethod
     def get_orphans():
         nodes = []
-        for key, node in openatlas.nodes.items():
+        for key, node in g.nodes.items():
             if node.root and node.count < 1 and not node.subs:
                 nodes.append(node)
         return nodes

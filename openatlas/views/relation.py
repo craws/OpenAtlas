@@ -1,7 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
 
-from flask import flash, render_template, url_for, request
+from flask import flash, render_template, url_for, request, g
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from wtforms import HiddenField, SubmitField, TextAreaField, BooleanField
@@ -41,7 +41,7 @@ def relation_insert(origin_id):
     form = build_form(RelationForm, 'Actor Actor Relation')
     form.origin_id.data = origin.id
     if form.validate_on_submit():
-        openatlas.get_cursor().execute('BEGIN')
+        g.cursor.execute('BEGIN')
         try:
             for actor_id in ast.literal_eval(form.actor.data):
                 if form.inverse.data:
@@ -50,10 +50,10 @@ def relation_insert(origin_id):
                     link_id = origin.link('OA7', actor_id, form.description.data)
                 DateMapper.save_link_dates(link_id, form)
                 NodeMapper.save_link_nodes(link_id, form)
-            openatlas.get_cursor().execute('COMMIT')
+            g.cursor.execute('COMMIT')
             flash(_('entity created'), 'info')
         except Exception as e:  # pragma: no cover
-            openatlas.get_cursor().execute('ROLLBACK')
+            g.cursor.execute('ROLLBACK')
             openatlas.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         if form.continue_.data == 'yes':
@@ -73,7 +73,7 @@ def relation_update(id_, origin_id):
     form = build_form(RelationForm, 'Actor Actor Relation', link_, request)
     del form.actor, form.insert_and_continue, form.origin_id
     if form.validate_on_submit():
-        openatlas.get_cursor().execute('BEGIN')
+        g.cursor.execute('BEGIN')
         try:
             link_.delete()
             if form.inverse.data:
@@ -82,10 +82,10 @@ def relation_update(id_, origin_id):
                 link_id = origin.link('OA7', related, form.description.data)
             DateMapper.save_link_dates(link_id, form)
             NodeMapper.save_link_nodes(link_id, form)
-            openatlas.get_cursor().execute('COMMIT')
+            g.cursor.execute('COMMIT')
             flash(_('info update'), 'info')
         except Exception as e:  # pragma: no cover
-            openatlas.get_cursor().execute('ROLLBACK')
+            g.cursor.execute('ROLLBACK')
             openatlas.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('actor_view', id_=origin.id) + '#tab-relation')

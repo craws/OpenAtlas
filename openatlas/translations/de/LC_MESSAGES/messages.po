@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-01-27 16:18+0100\n"
-"PO-Revision-Date: 2018-01-27 16:32+0100\n"
+"POT-Creation-Date: 2018-02-03 18:05+0100\n"
+"PO-Revision-Date: 2018-02-03 18:17+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: de\n"
 "Language-Team: de <LL@li.org>\n"
@@ -19,11 +19,11 @@ msgstr ""
 "Generated-By: Babel 2.3.4\n"
 "X-Generator: Poedit 1.8.11\n"
 
-#: __init__.py:109 views/search.py:13
+#: __init__.py:97 views/search.py:13
 msgid "search term"
 msgstr "Suchbegriff"
 
-#: __init__.py:110 templates/search/index.html:4
+#: __init__.py:98 templates/search/index.html:4
 msgid "search"
 msgstr "Suche"
 
@@ -775,9 +775,8 @@ msgstr ""
 "Es kann ein Beginn, ein Ende Datum oder Zeitspannen für jedes angegeben werden."
 
 #: views/actor.py:20 views/event.py:20 views/hierarchy.py:17 views/place.py:19
-#: views/profile.py:61 views/profile.py:74 views/reference.py:20
-#: views/source.py:20 views/translation.py:17 views/types.py:17 views/types.py:78
-#: views/types.py:93 views/user.py:26 views/user.py:96
+#: views/reference.py:20 views/source.py:20 views/translation.py:17
+#: views/types.py:17 views/types.py:78 views/types.py:93
 msgid "name"
 msgstr "Name"
 
@@ -1106,11 +1105,13 @@ msgstr "Das neue und alte Passwort sind gleich."
 msgid "error password too short"
 msgstr "Das Passwort ist zu kurz."
 
+#: views/profile.py:61 views/profile.py:74 views/user.py:26 views/user.py:96
+msgid "full name"
+msgstr "Voller Name"
+
 #: views/profile.py:61 views/user.py:26
-msgid "tooltip real name"
-msgstr ""
-"Du kannst deinen vollen Namen angeben, um es anderen Usern zu erleichtern dich "
-"zu erkennen."
+msgid "tooltip full name"
+msgstr "Optional, hilfreich für andere User die Identität zu erkennen."
 
 #: views/profile.py:62
 msgid "tooltip email"
@@ -1395,3 +1396,8 @@ msgstr "Der User wurde gelöscht."
 
 #~ msgid "log"
 #~ msgstr "Log"
+
+#~ msgid "tooltip real name"
+#~ msgstr ""
+#~ "Du kannst deinen vollen Namen angeben, um es anderen Usern zu erleichtern "
+#~ "dich zu erkennen."

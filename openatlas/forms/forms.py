@@ -2,6 +2,7 @@
 import ast
 import time
 
+from flask import g
 from flask_babel import lazy_gettext as _
 from wtforms import HiddenField
 from wtforms.widgets import HiddenInput
@@ -9,7 +10,7 @@ from wtforms.widgets import HiddenInput
 import openatlas
 from openatlas import Entity, app
 from openatlas.forms.date import DateForm
-from openatlas.util.util import uc_first, sanitize, truncate_string, pager, get_base_table_data
+from openatlas.util.util import uc_first, truncate_string, pager, get_base_table_data
 
 
 def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
@@ -41,7 +42,7 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
         else:
             nodes = [entity.type] if entity.type else []  # it's a link so use the link.type
         for node in nodes:
-            root = openatlas.nodes[node.root[-1]] if node.root else node
+            root = g.nodes[node.root[-1]] if node.root else node
             if root.id not in node_data:  # append only non root nodes
                 node_data[root.id] = []
             node_data[root.id].append(node.id)
@@ -56,7 +57,7 @@ def build_node_form(form, node, request_origin=None):
         root = node
         node = None
     else:
-        root = openatlas.nodes[node.root[-1]]
+        root = g.nodes[node.root[-1]]
     setattr(form, str(root.id), TreeField(str(root.id)))
     form_instance = form(obj=node)
     if not root.directional:
@@ -78,7 +79,7 @@ def build_node_form(form, node, request_origin=None):
             form_instance.name_inverse.data = name_parts[1][:-1]  # remove the ")" from 2nd part
         form_instance.description.data = node.description
         if root:  # Set super if exists and is not same as root
-            super_ = openatlas.nodes[node.root[0]]
+            super_ = g.nodes[node.root[0]]
             getattr(form_instance, str(root.id)).data = super_.id if super_.id != root.id else None
     return form_instance
 
@@ -90,8 +91,8 @@ class TreeSelect(HiddenInput):
         selected_ids = []
         if field.data:
             field.data = field.data[0] if isinstance(field.data, list) else field.data
-            selection = openatlas.nodes[int(field.data)].name
-            selected_ids.append(openatlas.nodes[int(field.data)].id)
+            selection = g.nodes[int(field.data)].name
+            selected_ids.append(g.nodes[int(field.data)].id)
         try:
             hierarchy_id = int(field.id)
         except ValueError:
@@ -126,7 +127,7 @@ class TreeSelect(HiddenInput):
             </script>
         """.format(
             name=field.id,
-            title=openatlas.nodes[hierarchy_id].name,
+            title=g.nodes[hierarchy_id].name,
             selection=selection,
             tree_data=openatlas.NodeMapper.get_tree_data(hierarchy_id, selected_ids),
             clear_style='' if selection else ' style="display: none;" ',
@@ -148,7 +149,7 @@ class TreeMultiSelect(HiddenInput):
                 field.data = ast.literal_eval(field.data)
             for entity_id in field.data:
                 selected_ids.append(entity_id)
-                selection += openatlas.nodes[entity_id].name + '<br />'
+                selection += g.nodes[entity_id].name + '<br />'
         html = """
             <span id="{name}-button" class="button">Change</span>
             <div id="{name}-selection" style="text-align:left;">{selection}</div>
@@ -172,7 +173,7 @@ class TreeMultiSelect(HiddenInput):
             </script>
         """.format(
             name=field.id,
-            title=openatlas.nodes[int(field.id)].name,
+            title=g.nodes[int(field.id)].name,
             selection=selection,
             tree_data=openatlas.NodeMapper.get_tree_data(int(field.id), selected_ids))
         return super(TreeMultiSelect, self).__call__(field, **kwargs) + html

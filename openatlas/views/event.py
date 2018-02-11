@@ -1,7 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
 
-from flask import flash, render_template, url_for, request
+from flask import flash, render_template, url_for, request, g
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
@@ -84,14 +84,14 @@ def event_insert(code, origin_id=None):
 @app.route('/event/delete/<int:id_>')
 @required_group('editor')
 def event_delete(id_):
-    openatlas.get_cursor().execute('BEGIN')
+    g.cursor.execute('BEGIN')
     try:
         EntityMapper.delete(id_)
         openatlas.logger.log_user(id_, 'delete')
-        openatlas.get_cursor().execute('COMMIT')
+        g.cursor.execute('COMMIT')
         flash(_('entity deleted'), 'info')
     except Exception as e:  # pragma: no cover
-        openatlas.get_cursor().execute('ROLLBACK')
+        g.cursor.execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
     return redirect(url_for('event_index'))
@@ -150,7 +150,7 @@ def event_view(id_, unlink_id=None):
             last = '<span class="inactive" style="float:right">' + str(event.last) + '</span>'
         data = ([
             link(link_.range),
-            openatlas.classes[link_.range.class_.code].name,
+            g.classes[link_.range.class_.code].name,
             link_.type.name if link_.type else '',
             first,
             last,
@@ -191,7 +191,7 @@ def event_view(id_, unlink_id=None):
 
 
 def save(form, event=None, code=None, origin=None):
-    openatlas.get_cursor().execute('BEGIN')
+    g.cursor.execute('BEGIN')
     try:
         if event:
             LinkMapper.delete_by_codes(event, ['P117', 'P7', 'P22', 'P23', 'P24'])
@@ -222,9 +222,9 @@ def save(form, event=None, code=None, origin=None):
                 origin.link('P67', event)
             elif origin.class_.code in app.config['CLASS_CODES']['actor']:
                 link_ = event.link('P11', origin)
-        openatlas.get_cursor().execute('COMMIT')
+        g.cursor.execute('COMMIT')
     except Exception as e:  # pragma: no cover
-        openatlas.get_cursor().execute('ROLLBACK')
+        g.cursor.execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
         return

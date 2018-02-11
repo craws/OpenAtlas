@@ -1,5 +1,5 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import render_template, url_for, flash, request
+from flask import render_template, url_for, flash, request, g
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
@@ -50,13 +50,13 @@ def translation_view(id_):
 @app.route('/source/translation/delete/<int:id_>/<int:source_id>')
 @required_group('editor')
 def translation_delete(id_, source_id):
-    openatlas.get_cursor().execute('BEGIN')
+    g.cursor.execute('BEGIN')
     try:
         EntityMapper.delete(id_)
-        openatlas.get_cursor().execute('COMMIT')
+        g.cursor.execute('COMMIT')
         flash(_('entity deleted'), 'info')
     except Exception as e:  # pragma: no cover
-        openatlas.get_cursor().execute('ROLLBACK')
+        g.cursor.execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
     return redirect(url_for('source_view', id_=source_id))
@@ -80,7 +80,7 @@ def translation_update(id_):
 
 
 def save(form, entity=None, source=None):
-    openatlas.get_cursor().execute('BEGIN')
+    g.cursor.execute('BEGIN')
     try:
         if entity:
             openatlas.logger.log_user(entity.id, 'update')
@@ -92,9 +92,9 @@ def save(form, entity=None, source=None):
         entity.description = form.description.data
         entity.update()
         entity.save_nodes(form)
-        openatlas.get_cursor().execute('COMMIT')
+        g.cursor.execute('COMMIT')
     except Exception as e:  # pragma: no cover
-        openatlas.get_cursor().execute('ROLLBACK')
+        g.cursor.execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
     return entity

@@ -1,11 +1,12 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import locale
-import psycopg2.extras
 import sys
 import time
 from collections import OrderedDict
-from flask import Flask, request, session
-from flask_babel import Babel, _
+
+import psycopg2.extras
+from flask import Flask, request, session, g
+from flask_babel import Babel, lazy_gettext as _
 from flask_wtf import Form
 from wtforms import StringField, SubmitField
 
@@ -14,38 +15,13 @@ try:
 except ImportError:
     mod_wsgi = None
 
-app = Flask(
-    __name__,
-    static_url_path='',
-    static_folder='static',
-    instance_relative_config=True)
+app = Flask(__name__, instance_relative_config=True)
 
 # use the test database if running tests
 instance_name = 'production' if 'test_runner.py' not in sys.argv[0] else 'testing'
+debug_model = OrderedDict()
 app.config.from_object('config.default')  # load config/INSTANCE_NAME.py
 app.config.from_pyfile(instance_name + '.py')  # load instance/INSTANCE_NAME.py
-
-
-def connect():
-    try:
-        connection_ = psycopg2.connect(
-            database=app.config['DATABASE_NAME'],
-            user=app.config['DATABASE_USER'],
-            password=app.config['DATABASE_PASS'],
-            port=app.config['DATABASE_PORT'],
-            host=app.config['DATABASE_HOST'])
-        connection_.autocommit = True
-        return connection_
-    except Exception as e:  # pragma: no cover
-        print("Database connection error.")
-        raise Exception(e)
-
-
-def get_cursor():
-    return connection.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
-
-
-connection = connect()
 locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 babel = Babel(app)
 
@@ -73,41 +49,52 @@ def get_locale():
     return best_match if best_match else session['settings']['default_language']
 
 
-debug_model = OrderedDict()
-debug_model['current'] = time.time()
-debug_model['by id'] = 0
-debug_model['by ids'] = 0
-debug_model['by codes'] = 0
-debug_model['linked'] = 0
-debug_model['user'] = 0
-debug_model['current'] = time.time()
-
-classes = ClassMapper.get_all()
-properties = PropertyMapper.get_all()
-
-debug_model['model'] = time.time() - debug_model['current']
-debug_model['current'] = time.time()
-
-nodes = {}
+def connect():
+    try:
+        connection_ = psycopg2.connect(
+            database=app.config['DATABASE_NAME'],
+            user=app.config['DATABASE_USER'],
+            password=app.config['DATABASE_PASS'],
+            port=app.config['DATABASE_PORT'],
+            host=app.config['DATABASE_HOST'])
+        connection_.autocommit = True
+        return connection_
+    except Exception as e:  # pragma: no cover
+        print("Database connection error.")
+        raise Exception(e)
 
 
 @app.before_request
 def before_request():
+    if request.path.startswith('/static'):  # pragma: no cover
+        return  # only needed if not running with apache and static alias
+    debug_model['current'] = time.time()
+    g.db = connect()
+    g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
+    g.classes = ClassMapper.get_all()
+    g.properties = PropertyMapper.get_all()
+    g.nodes = NodeMapper.get_all_nodes()
     session['settings'] = SettingsMapper.get_settings()
     session['language'] = get_locale()
-    openatlas.nodes = NodeMapper.get_all_nodes()
-    debug_model['current'] = time.time()
+    debug_model['by codes'] = 0
     debug_model['by id'] = 0
     debug_model['by ids'] = 0
     debug_model['linked'] = 0
     debug_model['user'] = 0
     debug_model['div sql'] = 0
+    debug_model['model'] = time.time() - debug_model['current']
+    debug_model['current'] = time.time()
+
+
+@app.teardown_request
+def teardown_request(exception):
+    if hasattr(g, 'db'):
+        g.db.close()
 
 
 class GlobalSearchForm(Form):
-    from openatlas.util.util import uc_first
-    term = StringField('', render_kw={"placeholder": uc_first(_('search term'))})
-    search = SubmitField(uc_first(_('search')))
+    term = StringField('', render_kw={"placeholder": _('search term')})
+    search = SubmitField(_('search'))
 
 
 @app.context_processor

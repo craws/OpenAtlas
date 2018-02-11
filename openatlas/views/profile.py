@@ -1,6 +1,6 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import bcrypt
-from flask import flash, render_template, session, url_for
+from flask import flash, render_template, session, url_for, g
 from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_required
 from flask_wtf import Form
@@ -58,7 +58,7 @@ class PasswordForm(Form):
 
 
 class ProfileForm(Form):
-    name = StringField(_('name'), description=_('tooltip real name'))
+    name = StringField(_('full name'), description=_('tooltip full name'))
     email = StringField(_('email'), [InputRequired(), Email()], description=_('tooltip email'))
     show_email = BooleanField(_('show email'), description=_('tooltip show email'))
     newsletter = BooleanField(_('newsletter'), description=_('tooltip newsletter'))
@@ -71,7 +71,7 @@ def profile_index():
     user = current_user
     data = {'info': [
         (_('username'), user.username),
-        (_('name'), user.real_name),
+        (_('full name'), user.real_name),
         (_('email'), user.email),
         (_('show email'), uc_first(_('on')) if user.settings['show_email'] else uc_first(_('off'))),
         (_('newsletter'), uc_first(_('on')) if user.settings['newsletter'] else uc_first(_('off')))
@@ -82,14 +82,14 @@ def profile_index():
         user.settings['theme'] = form.theme.data
         user.settings['table_rows'] = form.table_rows.data
         user.settings['layout'] = form.layout.data
-        openatlas.get_cursor().execute('BEGIN')
+        g.cursor.execute('BEGIN')
         try:
             user.update_settings()
-            openatlas.get_cursor().execute('COMMIT')
+            g.cursor.execute('COMMIT')
             session['language'] = form.language.data
             flash(_('info update'), 'info')
         except Exception as e:  # pragma: no cover
-            openatlas.get_cursor().execute('ROLLBACK')
+            g.cursor.execute('ROLLBACK')
             openatlas.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('profile_index'))
@@ -117,14 +117,14 @@ def profile_update():
         current_user.email = form.email.data
         current_user.settings['show_email'] = form.show_email.data
         current_user.settings['newsletter'] = form.newsletter.data
-        openatlas.get_cursor().execute('BEGIN')
+        g.cursor.execute('BEGIN')
         try:
             current_user.update()
             current_user.update_settings()
-            openatlas.get_cursor().execute('COMMIT')
+            g.cursor.execute('COMMIT')
             flash(_('info update'), 'info')
         except Exception as e:  # pragma: no cover
-            openatlas.get_cursor().execute('ROLLBACK')
+            g.cursor.execute('ROLLBACK')
             openatlas.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('profile_index'))

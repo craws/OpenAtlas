@@ -6,7 +6,13 @@ Replace database role "openatlas" if needed.
 
 ### 3.1.0 to 3.2.0
 
-Execute 3.2.0.sql after making backups.
+#### Database
+
+Execute install/upgrade/3.2.0.sql after making backups
+
+#### Apache
+
+Update Apache config for serving static files - see install/example_apache.conf
 
 ### 3.0.0 to 3.1.0
 
@@ -38,4 +44,4 @@ edition/bibliography subtypes have also subtypes you have to remove them or adap
 
 #### Database update
 
-Execute 3.0.0.sql after making backups.
+Execute install/upgrade/3.0.0.sql after making backups.

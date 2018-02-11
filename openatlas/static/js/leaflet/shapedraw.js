@@ -109,9 +109,9 @@ datainput.onAdd = function (map) {
 
 var mylayer;
 var myoldlayer;
-var editIcon = L.icon({iconUrl: "/js/leaflet/images/marker-icon_edit.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
-var editedIcon = L.icon({iconUrl: "/js/leaflet/images/marker-icon_edited.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
-var newIcon = L.icon({iconUrl: "/js/leaflet/images/marker-icon_new.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
+var editIcon = L.icon({iconUrl: "/static/js/leaflet/images/marker-icon_edit.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
+var editedIcon = L.icon({iconUrl: "/static/js/leaflet/images/marker-icon_edited.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
+var newIcon = L.icon({iconUrl: "/static/js/leaflet/images/marker-icon_new.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
 
 function editshape() {
     togglebtns();

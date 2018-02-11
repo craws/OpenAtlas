@@ -1,5 +1,5 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-import openatlas
+from flask import g
 
 
 class SettingsMapper:
@@ -27,9 +27,8 @@ class SettingsMapper:
     @staticmethod
     def get_settings():
         settings = {}
-        cursor = openatlas.get_cursor()
-        cursor.execute("SELECT name, value FROM web.settings;")
-        for row in cursor.fetchall():
+        g.cursor.execute("SELECT name, value FROM web.settings;")
+        for row in g.cursor.fetchall():
             settings[row.name] = row.value
             if row.name in [
                 'default_table_rows',
@@ -46,10 +45,9 @@ class SettingsMapper:
 
     @staticmethod
     def update(form):
-        cursor = openatlas.get_cursor()
         sql = 'UPDATE web.settings SET "value" = %(value)s WHERE "name" = %(name)s;'
         for field in SettingsMapper.fields:
             value = getattr(form, field).data
             if field in ['debug_mode', 'mail']:
                 value = 'True' if getattr(form, field).data else ''
-            cursor.execute(sql, {'name': field, 'value': value})
+            g.cursor.execute(sql, {'name': field, 'value': value})

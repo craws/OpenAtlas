@@ -1,7 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
 
-from flask import flash, render_template, url_for, request
+from flask import flash, render_template, url_for, request, g
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from wtforms import HiddenField, SubmitField, TextAreaField, SelectField
@@ -36,14 +36,14 @@ def involvement_insert(origin_id):
         del form.event
     else:
         del form.actor
-    form.activity.choices = [('P11', openatlas.properties['P11'].name)]
+    form.activity.choices = [('P11', g.properties['P11'].name)]
     if origin.class_.code in ['E7', 'E8', 'E12']:
-        form.activity.choices.append(('P14', openatlas.properties['P14'].name))
+        form.activity.choices.append(('P14', g.properties['P14'].name))
     if origin.class_.code == 'E8':
-        form.activity.choices.append(('P22', openatlas.properties['P22'].name))
-        form.activity.choices.append(('P23', openatlas.properties['P23'].name))
+        form.activity.choices.append(('P22', g.properties['P22'].name))
+        form.activity.choices.append(('P23', g.properties['P23'].name))
     if form.validate_on_submit():
-        openatlas.get_cursor().execute('BEGIN')
+        g.cursor.execute('BEGIN')
         try:
             if origin_class == 'event':
                 for actor_id in ast.literal_eval(form.actor.data):
@@ -59,10 +59,10 @@ def involvement_insert(origin_id):
                         form.description.data)
                     DateMapper.save_link_dates(link_id, form)
                     NodeMapper.save_link_nodes(link_id, form)
-            openatlas.get_cursor().execute('COMMIT')
+            g.cursor.execute('COMMIT')
             flash(_('entity created'), 'info')
         except Exception as e:  # pragma: no cover
-            openatlas.get_cursor().execute('ROLLBACK')
+            g.cursor.execute('ROLLBACK')
             openatlas.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         if form.continue_.data == 'yes':
@@ -82,22 +82,22 @@ def involvement_update(id_, origin_id):
     form = build_form(ActorForm, 'Involvement', link_, request)
     form.save.label.text = _('save')
     del form.actor, form.event, form.insert_and_continue
-    form.activity.choices = [('P11', openatlas.properties['P11'].name)]
+    form.activity.choices = [('P11', g.properties['P11'].name)]
     if event.class_.code in ['E7', 'E8', 'E12']:
-        form.activity.choices.append(('P14', openatlas.properties['P14'].name))
+        form.activity.choices.append(('P14', g.properties['P14'].name))
     if event.class_.code == 'E8':
-        form.activity.choices.append(('P22', openatlas.properties['P22'].name))
-        form.activity.choices.append(('P23', openatlas.properties['P23'].name))
+        form.activity.choices.append(('P22', g.properties['P22'].name))
+        form.activity.choices.append(('P23', g.properties['P23'].name))
     if form.validate_on_submit():
-        openatlas.get_cursor().execute('BEGIN')
+        g.cursor.execute('BEGIN')
         try:
             link_.delete()
             link_id = event.link(form.activity.data, actor, form.description.data)
             DateMapper.save_link_dates(link_id, form)
             NodeMapper.save_link_nodes(link_id, form)
-            openatlas.get_cursor().execute('COMMIT')
+            g.cursor.execute('COMMIT')
         except Exception as e:  # pragma: no cover
-            openatlas.get_cursor().execute('ROLLBACK')
+            g.cursor.execute('ROLLBACK')
             openatlas.logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         class_ = app.config['CODE_CLASS'][origin.class_.code]

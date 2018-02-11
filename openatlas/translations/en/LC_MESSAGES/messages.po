@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-01-27 16:18+0100\n"
-"PO-Revision-Date: 2018-01-27 16:25+0100\n"
+"POT-Creation-Date: 2018-02-03 18:05+0100\n"
+"PO-Revision-Date: 2018-02-03 18:14+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -19,11 +19,11 @@ msgstr ""
 "Generated-By: Babel 2.3.4\n"
 "X-Generator: Poedit 1.8.11\n"
 
-#: __init__.py:109 views/search.py:13
+#: __init__.py:97 views/search.py:13
 msgid "search term"
 msgstr "search term"
 
-#: __init__.py:110 templates/search/index.html:4
+#: __init__.py:98 templates/search/index.html:4
 msgid "search"
 msgstr "search"
 
@@ -773,9 +773,8 @@ msgid "tooltip date"
 msgstr "You can declare a begin date, an end date or timespans for each of them."
 
 #: views/actor.py:20 views/event.py:20 views/hierarchy.py:17 views/place.py:19
-#: views/profile.py:61 views/profile.py:74 views/reference.py:20
-#: views/source.py:20 views/translation.py:17 views/types.py:17 views/types.py:78
-#: views/types.py:93 views/user.py:26 views/user.py:96
+#: views/reference.py:20 views/source.py:20 views/translation.py:17
+#: views/types.py:17 views/types.py:78 views/types.py:93
 msgid "name"
 msgstr "name"
 
@@ -1100,11 +1099,13 @@ msgstr "New password is like old one."
 msgid "error password too short"
 msgstr "The password is too short."
 
+#: views/profile.py:61 views/profile.py:74 views/user.py:26 views/user.py:96
+msgid "full name"
+msgstr "full name"
+
 #: views/profile.py:61 views/user.py:26
-msgid "tooltip real name"
-msgstr ""
-"You can provide your full name to make it easier for other users to identify "
-"you."
+msgid "tooltip full name"
+msgstr "Optional, helps to be identified by other users."
 
 #: views/profile.py:62
 msgid "tooltip email"
@@ -1433,3 +1434,8 @@ msgstr "A user was deleted."
 
 #~ msgid "log"
 #~ msgstr "log"
+
+#~ msgid "tooltip real name"
+#~ msgstr ""
+#~ "You can provide your full name to make it easier for other users to "
+#~ "identify you."
