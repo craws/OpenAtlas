@@ -1,4 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+import glob
+import math
+import os
 import re
 import smtplib
 from collections import OrderedDict
@@ -13,8 +16,6 @@ from babel import dates
 from flask import abort, url_for, request, session, flash, g
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
-from flask_babel import lazy_gettext as _
-from html.parser import HTMLParser
 from werkzeug.utils import redirect
 
 import openatlas
@@ -24,6 +25,19 @@ from openatlas.models.date import DateMapper
 from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.property import Property
 from openatlas.models.user import User
+
+
+def convert_size(size_bytes):
+    if size_bytes == 0:
+        return "0B"  # pragma: no cover
+    size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
+    i = int(math.floor(math.log(size_bytes, 1024)))
+    return "%s %s" % (int(size_bytes / math.pow(1024, i)), size_name[i])
+
+
+def print_file_size(entity, name=None):
+    path = glob.glob(os.path.join(app.config['UPLOAD_FOLDER'], str(entity.id) + '.*'))[0]
+    return convert_size(os.path.getsize(path))
 
 
 def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
@@ -461,7 +475,7 @@ def pager(table):
 
 
 def get_base_table_data(entity):
-    """Returns standard table data for an entity"""
+    """ Returns standard table data for an entity"""
     name = app.config['CODE_CLASS'][entity.class_.code]
     data = [link(entity)]
     if name in ['event', 'actor']:
@@ -477,7 +491,7 @@ def get_base_table_data(entity):
 
 
 def was_modified(form, entity):   # pragma: no cover
-    """Checks if an entity was modified after an update form was opened."""
+    """ Checks if an entity was modified after an update form was opened."""
     if not entity.modified or not form.opened.data:
         return False
     if entity.modified < datetime.fromtimestamp(float(form.opened.data)):

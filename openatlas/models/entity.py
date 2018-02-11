@@ -174,12 +174,11 @@ class EntityMapper:
 
     @staticmethod
     def get_by_system_type(system_type):
-        cursor = openatlas.get_cursor()
         sql = EntityMapper.sql
         sql += ' WHERE e.system_type = %(system_type)s GROUP BY e.id ORDER BY e.name;'
-        cursor.execute(sql, {'system_type': system_type})
+        g.cursor.execute(sql, {'system_type': system_type})
         entities = []
-        for row in cursor.fetchall():
+        for row in g.cursor.fetchall():
             entities.append(Entity(row))
         return entities
 

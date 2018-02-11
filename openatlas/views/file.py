@@ -1,7 +1,8 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
 import os
-from flask import render_template, request, flash, url_for
+
+from flask import render_template, request, flash, url_for, g
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import secure_filename, redirect
@@ -92,7 +93,7 @@ def file_insert(origin_id):
 
 
 def save(form, entity=None):
-    openatlas.get_cursor().execute('BEGIN')
+    g.cursor.execute('BEGIN')
     try:
         if not entity:
             file_ = request.files['file']
@@ -116,9 +117,9 @@ def save(form, entity=None):
                 link_data = link_data + ast.literal_eval(data)
         if link_data:
             entity.link('P67', link_data)
-        openatlas.get_cursor().execute('COMMIT')
+            g.cursor.execute('COMMIT')
     except Exception as e:  # pragma: no cover
-        openatlas.get_cursor().execute('ROLLBACK')
+        g.cursor.execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
         return
