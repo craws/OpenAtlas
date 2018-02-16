@@ -13,7 +13,7 @@ tinymce.init({
 
 $(document).ready(function() {
 
-    // Show/hide function for date input fields
+    /* Show and hide function for date input fields */
     $("#date-switcher").click(function () {
         $(".date-switch").toggleClass('display-none');
         $(this).text(function(i, text){
@@ -21,7 +21,15 @@ $(document).ready(function() {
         })
     });
 
-    // Show more/less function for texts
+    /* When selecting a file for upload: if name is empty, fill with filename without extension */
+    $('#file').on("change", function() {
+        if ($('#name').val() == '') {
+            var filename = $('#file')[0].files.length ? $('#file')[0].files[0].name : '';
+            $('#name').val(filename.replace(/\.[^/.]+$/, ""));
+        }
+    });
+
+    /* Show more/less function for texts */
     var showChar = 800;
     var ellipsesText = "...";
     $('.more').each(function() {

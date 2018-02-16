@@ -17,7 +17,7 @@ from openatlas.util.util import (required_group, get_base_table_data, truncate_s
 
 
 class FileForm(Form):
-    file = FileField(_('name'), [InputRequired()])
+    file = FileField(_('file'), [InputRequired()])
     name = StringField(_('name'), [DataRequired()])
     source = TableMultiField(_('source'))
     event = TableMultiField(_('event'))

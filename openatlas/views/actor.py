@@ -13,7 +13,7 @@ from openatlas.models.gis import GisMapper
 from openatlas.models.link import LinkMapper, Link
 from openatlas.util.util import (truncate_string, required_group, get_entity_data, uc_first,
                                  build_remove_link, get_base_table_data, link, is_authorized,
-                                 was_modified)
+                                 was_modified, format_date, print_file_size)
 
 
 class ActorForm(DateForm):
@@ -57,20 +57,32 @@ def actor_view(id_, unlink_id=None):
         info.append((uc_first(_('appears last')), link(object_)))
     tables = {
         'info': info,
-        'file': {'id': 'files', 'header': app.config['TABLE_HEADERS']['file'], 'data': []},
-        'source': {
-            'id': 'source', 'header': app.config['TABLE_HEADERS']['source'] + ['description'],
-            'data': []},
+        'file': {'id': 'files', 'data': [], 'header': app.config['TABLE_HEADERS']['file']},
+        'source': {'id': 'source', 'data': [], 'header': app.config['TABLE_HEADERS']['source']},
         'reference': {
-            'id': 'reference', 'header': app.config['TABLE_HEADERS']['reference'] + ['pages'],
-            'data': []}}
+            'id': 'reference', 'data': [],
+            'header': app.config['TABLE_HEADERS']['reference'] + ['pages']},
+        'event': {
+            'id': 'event', 'data': [],
+            'header': ['event', 'class', 'involvement', 'first', 'last', 'description']},
+        'relation': {
+            'id': 'relation', 'data': [], 'sort': 'sortList:[[0,0]]',
+            'header': ['relation', 'actor', 'first', 'last', 'description']},
+        'member_of': {
+            'id': 'member_of', 'data': [],
+            'header': ['member of', 'function', 'first', 'last', 'description']}}
+    for file in actor.get_linked_entities('P67', True):
+        tables['file']['data'].append([
+            link(file),
+            uc_first(_('license')),
+            print_file_size(file),
+            truncate_string(file.description)])
     for link_ in actor.get_links('P67', True):
         name = app.config['CODE_CLASS'][link_.domain.class_.code]
         data = get_base_table_data(link_.domain)
         if name == 'source':
             data.append(truncate_string(link_.domain.description))
         else:
-
             data.append(truncate_string(link_.description))
             if is_authorized('editor'):
                 update_url = url_for('reference_link_update', link_id=link_.id, origin_id=actor.id)
@@ -79,9 +91,6 @@ def actor_view(id_, unlink_id=None):
             unlink_url = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab' + name
             data.append(build_remove_link(unlink_url, link_.domain.name))
         tables[name]['data'].append(data)
-    tables['event'] = {
-        'id': 'event', 'header': ['event', 'class', 'involvement', 'first', 'last', 'description'],
-        'data': []}
     for link_ in actor.get_links(['P11', 'P14', 'P22', 'P23'], True):
         event = link_.domain
         first = link_.first
@@ -106,9 +115,6 @@ def actor_view(id_, unlink_id=None):
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             data.append(build_remove_link(unlink_url, link_.range.name))
         tables['event']['data'].append(data)
-    tables['relation'] = {
-        'id': 'relation', 'header': ['relation', 'actor', 'first', 'last', 'description'],
-        'sort': 'sortList:[[0,0]]', 'data': []}
     for link_ in actor.get_links('OA7') + actor.get_links('OA7', True):
         if actor.id == link_.domain.id:
             type_ = link_.type.get_name_directed() if link_.type else ''
@@ -128,9 +134,6 @@ def actor_view(id_, unlink_id=None):
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             data.append(build_remove_link(unlink_url, related.name))
         tables['relation']['data'].append(data)
-    tables['member_of'] = {
-        'id': 'member_of', 'header': ['member of', 'function', 'first', 'last', 'description'],
-        'data': []}
     for link_ in actor.get_links('P107', True):
         data = ([
             link(link_.domain),

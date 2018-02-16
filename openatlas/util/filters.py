@@ -175,8 +175,9 @@ def display_form(self, form, form_id=None, for_persons=False):
                 html['types'] = base_type + html['types']
                 continue
             html['types'] += '<div class="table-row"><div><label>' + node.name + '</label>'
-            html['types'] += ' <span class="tooltip" title="' + _('tooltip type') + '">i</span></div>'
-            html['types'] += '<div class="table-cell">' + str(field(class_=class_)) + errors + '</div></div>'
+            html['types'] += ' <span class="tooltip" title="' + _('tooltip type') + '">i</span>'
+            html['types'] += '</div><div class="table-cell">'
+            html['types'] += str(field(class_=class_)) + errors + '</div></div>'
             continue
         if field.type in ['CSRFTokenField', 'HiddenField']:
             html['header'] += str(field)
@@ -184,7 +185,8 @@ def display_form(self, form, form_id=None, for_persons=False):
         field.label.text = util.uc_first(field.label.text)
         field.label.text += ' *' if field.flags.required and form_id != 'login-form' else ''
         if field.id == 'description':
-            html['footer'] += '<br />' + str(field.label) + '<br />' + str(field(class_=class_)) + '<br />'
+            html['footer'] += '<br />' + str(field.label) + '<br />' + str(field(class_=class_))
+            html['footer'] += '<br />'
             continue
         if field.type == 'SubmitField':
             html['footer'] += str(field)
@@ -196,14 +198,17 @@ def display_form(self, form, form_id=None, for_persons=False):
         if field.description:
             field.label.text += ' <span class="tooltip" title="' + field.description + '">i</span>'
         errors = ' <span class="error">' + errors + ' </span>' if errors else ''
-        if field.id == 'name':
+        if field.id in ('file', 'name'):
             html['header'] += '<div class="table-row"><div>' + str(field.label) + '</div>'
-            html['header'] += '<div class="table-cell">' + str(field(class_=class_)) + errors + '</div></div>'
+            html['header'] += '<div class="table-cell">' + str(field(class_=class_)) + errors
+            html['header'] += '</div></div>'
             continue
         html['main'] += '<div class="table-row"><div>' + str(field.label) + '</div>'
-        html['main'] += '<div class="table-cell">' + str(field(class_=class_)).replace('> ', '>') + errors + '</div></div>'
+        html['main'] += '<div class="table-cell">' + str(field(class_=class_)).replace('> ', '>')
+        html['main'] += errors + '</div></div>'
 
-    html_all = '<form method="post"' + id_attribute + ' ' + multipart + '>' + '<div class="data-table">'
+    html_all = '<form method="post"' + id_attribute + ' ' + multipart + '>'
+    html_all += '<div class="data-table">'
     html_all += html['header'] + html['types'] + html['main'] + html['footer'] + '</div></form>'
     return html_all
 

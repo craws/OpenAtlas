@@ -74,12 +74,12 @@ CLASS_CODES = {
 
 # Default table columns based on class
 TABLE_HEADERS = {
-    'source': ['name', 'type'],
+    'source': ['name', 'type', 'description'],
     'event': ['name', 'class', 'type', 'first', 'last'],
     'actor': ['name', 'class', 'first', 'last'],
     'group': ['name', 'class', 'first', 'last'],
     'place': ['name', 'type', 'first', 'last'],
     'reference': ['name', 'class', 'type'],
-    'file': ['name', 'size']}
+    'file': ['name', 'license', 'size', 'description']}
 
 BASE_TYPES = ['Place', 'Information Carrier', 'Bibliography', 'Source', 'Edition', 'Event', 'Actor']
