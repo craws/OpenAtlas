@@ -35,16 +35,12 @@ def model_index():
         domain = g.classes[form.domain.data]
         range_ = g.classes[form.range.data]
         property_ = g.properties[form.property.data]
+        domain_is_valid = property_.find_object('domain_class_code', domain.code)
+        range_is_valid = property_.find_object('range_class_code', range_.code)
         ignore = app.config['WHITELISTED_DOMAINS']
-        domain_error = True
-        if property_.find_object('domain_class_code', domain.code) or domain.code in ignore:
-            domain_error = False
-        range_error = True
-        if property_.find_object('range_class_code', range_.code):
-            range_error = False
         test_result = {
-            'domain_error': domain_error,
-            'range_error': range_error,
+            'domain_error': False if domain_is_valid or domain.code in ignore else True,
+            'range_error': False if range_is_valid else True,
             'domain_whitelisted': True if domain.code in ignore else False,
             'domain': domain,
             'property': property_,
@@ -125,14 +121,15 @@ def class_view(code):
 @app.route('/overview/model/property_view/<code>')
 def property_view(code):
     property_ = g.properties[code]
-    classes = g.classes
+    domain = g.classes[property_.domain_class_code]
+    range_ = g.classes[property_.range_class_code]
     tables = {
         'info': [
             ('code', property_.code),
             ('name', property_.name),
             ('inverse', property_.name_inverse),
-            ('domain', link(classes[property_.domain_class_code]) + ' ' + classes[property_.domain_class_code].name),
-            ('range', link(classes[property_.range_class_code]) + ' ' + classes[property_.range_class_code].name)]}
+            ('domain', link(domain) + ' ' + domain.name),
+            ('range', link(range_) + ' ' + range_.name)]}
     for table in ['super', 'sub']:
         tables[table] = {
             'id': table, 'header': ['code', 'name'], 'data': [],
@@ -191,9 +188,5 @@ def model_network():
         params['options']['height'] = form.height.data
         params['options']['charge'] = form.charge.data
         params['options']['distance'] = form.distance.data
-
-    return render_template(
-        'model/network.html',
-        form=form,
-        network_params=params,
-        json_data=Network.get_network_json(params))
+    data = Network.get_network_json(params)
+    return render_template('model/network.html', form=form, network_params=params, json_data=data)

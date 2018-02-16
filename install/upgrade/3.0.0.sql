@@ -39,8 +39,8 @@ ALTER TABLE web."user" ALTER COLUMN "active" SET DEFAULT FALSE;
 
 ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_user_id_name_value_key;
 ALTER TABLE ONLY web.user_settings ADD CONSTRAINT user_settings_user_id_name_key UNIQUE (user_id, name);
-UPDATE web.user_settings SET value = 'True' WHERE name IN ('newsletter', 'show_email') AND VALUE = '1';
-UPDATE web.user_settings SET value = '' WHERE name = IN ('newsletter', 'show_email') AND VALUE = '0';
+UPDATE web.user_settings SET value = 'True' WHERE name IN ('newsletter', 'show_email') AND value = '1';
+UPDATE web.user_settings SET value = '' WHERE name IN ('newsletter', 'show_email') AND value = '0';
 
 
 -- Types
