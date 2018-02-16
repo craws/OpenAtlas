@@ -14,18 +14,19 @@ class ModelTests(TestBaseCase):
             assert b'Browse' in rv.data
             rv = self.app.get(url_for('class_index'))
             assert b'E1' in rv.data
-            rv = self.app.get(url_for('class_view', code='E2'))
-            assert b'E2' in rv.data
+            rv = self.app.get(url_for('class_view', code='E4'))
+            assert b'Domains' in rv.data
             rv = self.app.get(url_for('property_index'))
             assert b'P1' in rv.data
             rv = self.app.get(url_for('property_view', code='P68'))
             assert b'P68' in rv.data
-            data = {'domain': 'E1', 'range': 'E1', 'property': 'P1'}
+            data = {'domain': 'E1', 'range': 'E1', 'property': 'P13'}
             rv = self.app.post(url_for('model_index'), data=data)
-            assert b'Wrong' in rv.data
+            assert b'Wrong domain' in rv.data
+
             self.login()
 
-            # insert some data for network
+            # Insert data to display in network view
             with app.test_request_context():
                 app.preprocess_request()
                 actor = EntityMapper.insert('E21', 'King Arthur')
