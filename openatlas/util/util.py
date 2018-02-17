@@ -210,7 +210,7 @@ def get_entity_data(entity, location=None):
         user_log = openatlas.logger.get_log_for_advanced_view(entity.id)
         data.append((_('created'), format_date(entity.created) + ' ' + link(user_log['creator'])))
         if user_log['modified']:
-            info = format_date(user_log['modified']) + ' ' + link(user_log['creator'])
+            info = format_date(user_log['modified']) + ' ' + link(user_log['modifier'])
             data.append((_('modified'), info))
 
     return data
