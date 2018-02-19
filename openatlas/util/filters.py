@@ -10,8 +10,8 @@ from flask_login import current_user
 from jinja2 import evalcontextfilter, escape
 from flask_babel import lazy_gettext as _
 
-import openatlas
-from openatlas import app, EntityMapper
+from openatlas import app
+from openatlas.models.entity import EntityMapper
 from . import util
 
 blueprint = flask.Blueprint('filters', __name__)

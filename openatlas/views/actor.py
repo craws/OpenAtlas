@@ -1,18 +1,17 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import render_template, url_for, flash, request, g
+from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
-from wtforms import StringField, TextAreaField, HiddenField, SubmitField, FieldList
+from wtforms import FieldList, HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired
 
-import openatlas
-from openatlas import app
-from openatlas.forms.forms import DateForm, build_form, TableField
+from openatlas import app, logger
+from openatlas.forms.forms import DateForm, TableField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
-from openatlas.models.link import LinkMapper, Link
-from openatlas.util.util import (truncate_string, required_group, get_entity_data, uc_first,
-                                 build_remove_link, get_base_table_data, link, is_authorized,
+from openatlas.models.link import Link, LinkMapper
+from openatlas.util.util import (build_remove_link, get_base_table_data, get_entity_data,
+                                 is_authorized, link, required_group, truncate_string, uc_first,
                                  was_modified)
 
 
@@ -214,12 +213,12 @@ def actor_delete(id_):
     g.cursor.execute('BEGIN')
     try:
         EntityMapper.delete(id_)
-        openatlas.logger.log_user(id_, 'delete')
+        logger.log_user(id_, 'delete')
         g.cursor.execute('COMMIT')
         flash(_('entity deleted'), 'info')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        openatlas.logger.log('error', 'database', 'transaction failed', e)
+        logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
     return redirect(url_for('actor_index'))
 
@@ -235,7 +234,7 @@ def actor_update(id_):
         if was_modified(form, actor):  # pragma: no cover
             del form.save
             flash(_('error modified'), 'error')
-            modifier = link(openatlas.logger.get_log_for_advanced_view(actor.id)['modifier'])
+            modifier = link(logger.get_log_for_advanced_view(actor.id)['modifier'])
             return render_template('actor/update.html', form=form, actor=actor, modifier=modifier)
         if save(form, actor):
             flash(_('info update'), 'info')
@@ -259,10 +258,10 @@ def save(form, actor=None, code=None, origin=None):
             LinkMapper.delete_by_codes(actor, ['P74', 'OA8', 'OA9'])
             for alias in actor.get_linked_entities('P131'):
                 alias.delete()
-            openatlas.logger.log_user(actor.id, 'update')
+            logger.log_user(actor.id, 'update')
         else:
             actor = EntityMapper.insert(code, form.name.data)
-            openatlas.logger.log_user(actor.id, 'insert')
+            logger.log_user(actor.id, 'insert')
         actor.name = form.name.data
         actor.description = form.description.data
         actor.update()
@@ -294,7 +293,7 @@ def save(form, actor=None, code=None, origin=None):
         g.cursor.execute('COMMIT')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        openatlas.logger.log('error', 'database', 'transaction failed', e)
+        logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
         return
     return link_ if link_ else actor

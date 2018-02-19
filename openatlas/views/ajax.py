@@ -4,7 +4,7 @@ from flask_login import current_user
 
 from openatlas import app
 from openatlas.models.user import UserMapper
-from openatlas.util.util import uc_first, required_group
+from openatlas.util.util import required_group, uc_first
 
 
 @app.route('/ajax/bookmark', methods=['POST'])

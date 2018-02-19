@@ -1,7 +1,8 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import url_for
 
-from openatlas import app, NodeMapper
+from openatlas import app
+from openatlas.models.node import NodeMapper
 from openatlas.test_base import TestBaseCase
 
 

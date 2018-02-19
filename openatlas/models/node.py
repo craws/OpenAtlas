@@ -5,8 +5,8 @@ from collections import OrderedDict
 from flask import g
 
 from openatlas.forms.forms import TreeField, TreeMultiField
-from .entity import Entity, EntityMapper
-from .linkProperty import LinkPropertyMapper
+from openatlas.models.entity import Entity, EntityMapper
+from openatlas.models.linkProperty import LinkPropertyMapper
 
 
 class NodeMapper(EntityMapper):

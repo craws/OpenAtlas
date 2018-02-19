@@ -3,8 +3,8 @@ import numpy
 from flask import g
 
 import openatlas
+from openatlas.models.link import LinkMapper
 from openatlas.models.linkProperty import LinkPropertyMapper
-from .link import LinkMapper
 
 
 class DateMapper:

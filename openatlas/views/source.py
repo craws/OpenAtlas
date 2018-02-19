@@ -1,19 +1,18 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import render_template, url_for, flash, request, g
+from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import StringField, TextAreaField, HiddenField, SubmitField
+from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired
 
-import openatlas
-from openatlas import app
+from openatlas import app, logger
 from openatlas.forms.forms import build_form
-from openatlas.models.entity import EntityMapper, Entity
+from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import (link, truncate_string, required_group, get_entity_data, uc_first,
-                                 build_table_form, build_remove_link, get_base_table_data,
-                                 is_authorized, was_modified)
+from openatlas.util.util import (build_remove_link, build_table_form, get_base_table_data,
+                                 get_entity_data, is_authorized, link, required_group,
+                                 truncate_string, uc_first, was_modified)
 
 
 class SourceForm(Form):
@@ -117,7 +116,7 @@ def source_add(origin_id):
             g.cursor.execute('COMMIT')
         except Exception as e:  # pragma: no cover
             g.cursor.execute('ROLLBACK')
-            openatlas.logger.log('error', 'database', 'transaction failed', e)
+            logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         view_name = app.config['CODE_CLASS'][origin.class_.code]
         return redirect(url_for(view_name + '_view', id_=origin.id) + '#tab-source')
@@ -144,12 +143,12 @@ def source_delete(id_):
     g.cursor.execute('BEGIN')
     try:
         EntityMapper.delete(id_)
-        openatlas.logger.log_user(id_, 'delete')
+        logger.log_user(id_, 'delete')
         g.cursor.execute('COMMIT')
         flash(_('entity deleted'), 'info')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        openatlas.logger.log('error', 'database', 'transaction failed', e)
+        logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
     return redirect(url_for('source_index'))
 
@@ -163,7 +162,7 @@ def source_update(id_):
         if was_modified(form, source):  # pragma: no cover
             del form.save
             flash(_('error modified'), 'error')
-            modifier = link(openatlas.logger.get_log_for_advanced_view(source.id)['modifier'])
+            modifier = link(logger.get_log_for_advanced_view(source.id)['modifier'])
             return render_template(
                 'source/update.html', form=form, source=source, modifier=modifier)
         if save(form, source):
@@ -177,10 +176,10 @@ def save(form, source=None, origin=None):
     g.cursor.execute('BEGIN')
     try:
         if source:
-            openatlas.logger.log_user(source.id, 'update')
+            logger.log_user(source.id, 'update')
         else:
             source = EntityMapper.insert('E33', form.name.data, 'source content')
-            openatlas.logger.log_user(source.id, 'insert')
+            logger.log_user(source.id, 'insert')
         source.name = form.name.data
         source.description = form.description.data
         source.update()
@@ -193,6 +192,6 @@ def save(form, source=None, origin=None):
         g.cursor.execute('COMMIT')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        openatlas.logger.log('error', 'database', 'transaction failed', e)
+        logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
     return link_ if link_ else source

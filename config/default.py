@@ -1,4 +1,5 @@
 from collections import OrderedDict
+
 from flask_babel import lazy_gettext as _
 
 from openatlas.util.util import uc_first

@@ -2,11 +2,12 @@
 from flask import render_template, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
-from wtforms import SubmitField, StringField, SelectMultipleField, widgets, BooleanField
+from wtforms import BooleanField, SelectMultipleField, StringField, SubmitField, widgets
 from wtforms.validators import InputRequired
 
-from openatlas import app, EntityMapper
-from openatlas.util.util import link, uc_first, truncate_string, required_group
+from openatlas import app
+from openatlas.models.entity import EntityMapper
+from openatlas.util.util import link, required_group, truncate_string, uc_first
 
 
 class SearchForm(Form):

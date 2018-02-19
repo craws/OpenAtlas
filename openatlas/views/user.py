@@ -1,17 +1,18 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import abort, flash, render_template, session, url_for, request
+from flask import abort, flash, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms.validators import Email, DataRequired
 from wtforms import (BooleanField, HiddenField, PasswordField, SelectField, StringField,
                      SubmitField, TextAreaField)
+from wtforms.validators import DataRequired, Email
 
-from openatlas import app, EntityMapper
+from openatlas import app
+from openatlas.models.entity import EntityMapper
 from openatlas.models.user import User, UserMapper
-from openatlas.util.util import (format_date, link, required_group, send_mail, uc_first,
-                                 is_authorized)
+from openatlas.util.util import (format_date, is_authorized, link, required_group, send_mail,
+                                 uc_first)
 
 
 class UserForm(Form):
