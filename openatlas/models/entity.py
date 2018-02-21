@@ -9,7 +9,6 @@ from werkzeug.exceptions import abort
 from openatlas import app, debug_model, logger
 from openatlas.models.date import DateMapper
 from openatlas.models.link import LinkMapper
-from openatlas.models.node import NodeMapper
 
 
 class Entity:
@@ -60,12 +59,14 @@ class Entity:
         DateMapper.save_dates(self, form)
 
     def save_nodes(self, form):
+        from openatlas.models.node import NodeMapper
         NodeMapper.save_entity_nodes(self, form)
 
     def set_dates(self):
         self.dates = DateMapper.get_dates(self)
 
     def print_base_type(self):
+        from openatlas.models.node import NodeMapper
         if self.class_.code not in app.config['CODE_CLASS']:
             return ''
         if self.class_.code in app.config['CLASS_CODES']['actor']:
@@ -255,7 +256,7 @@ class EntityMapper:
 
     @staticmethod
     def delete_orphans(parameter):
-        from openatlas import app
+        from openatlas.models.node import NodeMapper
         if parameter == 'orphans':
             sql_where = EntityMapper.sql_orphan + " AND e.class_code NOT IN %(class_codes)s"
         elif parameter == 'unlinked':

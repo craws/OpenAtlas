@@ -31,6 +31,11 @@ class GlobalSearchForm(Form):
 
 
 from openatlas.models.logger import DBHandler
+
+debug_model = OrderedDict()
+logger = DBHandler()
+
+
 from openatlas.util import filters
 from openatlas.views import (actor, admin, ajax, content, event, hierarchy, index, login, types,
                              model, place, profile, reference, settings, source, translation, user,
@@ -59,10 +64,6 @@ def connect():
     except Exception as e:  # pragma: no cover
         print("Database connection error.")
         raise Exception(e)
-
-
-logger = DBHandler()
-debug_model = OrderedDict()
 
 
 @app.before_request

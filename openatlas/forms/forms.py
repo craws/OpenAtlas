@@ -9,12 +9,12 @@ from wtforms.widgets import HiddenInput
 
 from openatlas import app
 from openatlas.forms.date import DateForm
-from openatlas.models.entity import Entity
+from openatlas.models.entity import Entity, EntityMapper
+from openatlas.models.node import NodeMapper
 from openatlas.util.util import get_base_table_data, pager, truncate_string, uc_first
 
 
 def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
-    from openatlas.models.node import NodeMapper
     # Todo: write comment, reflect that entity can be a link
     # Add custom fields
     custom_list = []
@@ -144,7 +144,6 @@ class TreeField(HiddenField):
 class TreeMultiSelect(HiddenInput):
 
     def __call__(self, field, **kwargs):
-        from openatlas.models.node import NodeMapper
         selection = ''
         selected_ids = []
         if field.data:
@@ -189,7 +188,6 @@ class TreeMultiField(HiddenField):
 class TableSelect(HiddenInput):
 
     def __call__(self, field, **kwargs):
-        from openatlas.models.entity import EntityMapper
         selection = ''
         class_ = field.id
         if class_ in ['residence', 'appears_first', 'appears_last']:
@@ -234,7 +232,6 @@ class TableMultiSelect(HiddenInput):
     """Table with checkboxes used in forms."""
 
     def __call__(self, field, **kwargs):
-        from openatlas.models.entity import EntityMapper
         if field.data and isinstance(field.data, str):
             field.data = ast.literal_eval(field.data)
         selection = ''

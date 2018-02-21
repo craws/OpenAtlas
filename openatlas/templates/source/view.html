@@ -11,7 +11,7 @@
         <li><a href="#tab-actor">{{ _('actor')|uc_first }} ({{ tables['actor']['data']|length }})</a></li>
         <li><a href="#tab-place">{{ _('place')|uc_first }} ({{ tables['place']['data']|length }})</a></li>
         <li><a href="#tab-reference">{{ _('reference')|uc_first }} ({{ tables['reference']['data']|length }})</a></li>
-        <li><a href="#tab-translations">{{ _('translations')|uc_first }} ({{ tables['translation']['data']|length }})</a></li>
+        <li><a href="#tab-text">{{ _('texts')|uc_first }} ({{ tables['text']['data']|length }})</a></li>
     </ul>
     <div id="tab-info">
         <div class="button-bar">
@@ -54,13 +54,13 @@
         {% endif %}
         {{ tables['reference']|pager|safe }}
     </div>
-    <div id="tab-translations">
+    <div id="tab-text">
         {% if 'editor'|is_authorized: %}
             <div class="button-bar">
-                <a href="{{ url_for('translation_insert', source_id=source.id) }}">+ {{ _('translation')|uc_first }}</a>
+                <a href="{{ url_for('translation_insert', source_id=source.id) }}">+ {{ _('text')|uc_first }}</a>
             </div>
         {% endif %}
-        {{ tables['translation']|pager|safe }}
+        {{ tables['text']|pager|safe }}
     </div>
 </div>
 {% endblock %}

@@ -70,12 +70,9 @@ def source_view(id_, unlink_id=None):
         flash(_('link removed'), 'info')
     tables = {
         'info': get_entity_data(source),
-        'translation': {
-            'id': 'translation',
-            'header': ['translations', 'type', 'text'],
-            'data': []}}
+        'text': {'id': 'translation', 'header': ['text', 'type', 'content'], 'data': []}}
     for translation in source.get_linked_entities('P73'):
-        tables['translation']['data'].append([
+        tables['text']['data'].append([
             link(translation),
             translation.nodes[0].name if translation.nodes else '',
             truncate_string(translation.description)])

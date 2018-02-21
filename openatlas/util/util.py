@@ -2,7 +2,6 @@
 import re
 import smtplib
 from collections import OrderedDict
-from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
@@ -10,7 +9,8 @@ from html.parser import HTMLParser
 
 import numpy
 from babel import dates
-from flask import abort, url_for, request, session, flash, g
+from datetime import datetime
+from flask import abort, flash, g, request, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from werkzeug.utils import redirect
@@ -19,7 +19,7 @@ import openatlas
 from openatlas import app
 from openatlas.models.classObject import ClassObject
 from openatlas.models.date import DateMapper
-from openatlas.models.entity import Entity, EntityMapper
+from openatlas.models.entity import Entity
 from openatlas.models.property import Property
 from openatlas.models.user import User
 
@@ -94,6 +94,7 @@ def sanitize(string, mode=None):
 
 def build_table_form(class_name, linked_entities):
     """ Returns a form with a list of entities with checkboxes"""
+    from openatlas.models.entity import EntityMapper
     # Todo: add CSRF token
     form = '<form class="table" method="post">'
     header = app.config['TABLE_HEADERS'][class_name] + ['']
@@ -241,7 +242,7 @@ def add_dates_to_form(form, for_person=False):
             </div>
         </div>""".format(date=uc_first(_('date')), tip=_('tooltip date'), show=uc_first(_('show')))
     html += '<div class="table-row date-switch" ' + style + '>'
-    html += '<div>' + str(form.date_begin_year.label) + '</div><div class="table-cell">'
+    html += '<div>' + str(form.date_begin_year.label).title() + '</div><div class="table-cell">'
     html += str(form.date_begin_year(class_='year')) + ' ' + errors['date_begin_year'] + ' '
     html += str(form.date_begin_month(class_='month')) + ' ' + errors['date_begin_month'] + ' '
     html += str(form.date_begin_day(class_='day')) + ' ' + errors['date_begin_day'] + ' '
@@ -256,7 +257,7 @@ def add_dates_to_form(form, for_person=False):
         html += str(form.date_birth) + str(form.date_birth.label)
     html += '</div></div>'
     html += '<div class="table-row date-switch" ' + style + '>'
-    html += '<div>' + str(form.date_end_year.label) + '</div><div class="table-cell">'
+    html += '<div>' + str(form.date_end_year.label).title() + '</div><div class="table-cell">'
     html += str(form.date_end_year(class_='year')) + ' ' + errors['date_end_year'] + ' '
     html += str(form.date_end_month(class_='month')) + ' ' + errors['date_end_month'] + ' '
     html += str(form.date_end_day(class_='day')) + ' ' + errors['date_end_day'] + ' '

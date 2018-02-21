@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 from flask import g
 
-from openatlas.forms.forms import TreeField, TreeMultiField
+
 from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.linkProperty import LinkPropertyMapper
 
@@ -159,6 +159,7 @@ class NodeMapper(EntityMapper):
 
     @staticmethod
     def save_entity_nodes(entity, form):
+        from openatlas.forms.forms import TreeField, TreeMultiField
         # Todo: don't delete/save if not changed
         # Todo: just delete node ids?
         if hasattr(entity, 'nodes'):
@@ -180,6 +181,7 @@ class NodeMapper(EntityMapper):
 
     @staticmethod
     def save_link_nodes(link_id, form):
+        from openatlas.forms.forms import TreeField
         for field in form:
             if isinstance(field, TreeField) and field.data:
                 LinkPropertyMapper.insert(link_id, 'P2', int(field.data))
