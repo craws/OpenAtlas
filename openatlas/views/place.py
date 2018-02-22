@@ -127,7 +127,7 @@ def place_delete(id_):
         EntityMapper.delete(id_)
         logger.log_user(id_, 'delete')
         g.cursor.execute('COMMIT')
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')

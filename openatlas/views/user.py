@@ -135,9 +135,7 @@ def user_update(id_):
     del form.password, form.password2, form.send_info, form.insert_and_continue, form.show_passwords
     form.group.choices = get_groups()
     if form.validate_on_submit():
-        user.active = form.active.data
-        if user.id == current_user.id:  # don't allow setting oneself as inactive
-            user.active = True
+        user.active = True if user.id == current_user.id else form.active.data  # no self deactivate
         user.real_name = form.real_name.data
         user.username = form.username.data
         user.email = form.email.data

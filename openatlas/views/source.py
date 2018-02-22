@@ -71,14 +71,13 @@ def source_view(id_, unlink_id=None):
     tables = {
         'info': get_entity_data(source),
         'text': {'id': 'translation', 'header': ['text', 'type', 'content'], 'data': []}}
-    for translation in source.get_linked_entities('P73'):
+    for text in source.get_linked_entities('P73'):
         tables['text']['data'].append([
-            link(translation),
-            translation.nodes[0].name if translation.nodes else '',
-            truncate_string(translation.description)])
+            link(text),
+            text.nodes[0].name if text.nodes else '',
+            truncate_string(text.description)])
     for name in ['event', 'place', 'actor']:
-        header = app.config['TABLE_HEADERS'][name]
-        tables[name] = {'id': name, 'header': header, 'data': []}
+        tables[name] = {'id': name, 'header': app.config['TABLE_HEADERS'][name], 'data': []}
     for link_ in source.get_links('P67'):
         data = get_base_table_data(link_.range)
         name = app.config['CODE_CLASS'][link_.range.class_.code]
