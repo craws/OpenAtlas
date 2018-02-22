@@ -1,4 +1,4 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import g
 
 from openatlas.util.util import truncate_string
