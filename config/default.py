@@ -2,7 +2,7 @@ from collections import OrderedDict
 
 from flask_babel import lazy_gettext as _
 
-VERSION = '3.2.0'
+VERSION = '3.2.1'
 DEBUG = False
 DEMO_MODE = False  # If in demo mode some options are disabled and the login form is pre filled
 

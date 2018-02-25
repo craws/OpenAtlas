@@ -145,7 +145,7 @@ if (gisPointAll != "") {
     sitesmarkers.on('layeradd', setSitesInfo); // trigger popup info creation when layer is added
     sitesmarkers.on('layeradd', function (e) {
         var marker = e.layer;
-        marker.setIcon(L.icon({iconUrl: "/static/js/leaflet/images/marker-icon_all.png", iconAnchor: [12, 41], popupAnchor: [0, -34]}));
+        marker.setIcon(L.icon({iconUrl: "/static/vendor/leaflet/images/marker-icon_all.png", iconAnchor: [12, 41], popupAnchor: [0, -34]}));
     });
     sitesmarkers.setGeoJSON(gisPointAll); //set layer content to geojson
     map.addLayer(sitesmarkers);
