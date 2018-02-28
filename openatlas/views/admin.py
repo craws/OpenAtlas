@@ -106,7 +106,7 @@ def admin_newsletter():
                 link_ = request.scheme + '://' + request.headers['Host']
                 link_ += url_for('index_unsubscribe', code=code)
                 unsubscribe = '\n\n' + _('To unsubscribe use the link below.') + '\n\n' + link_
-                if send_mail(form.subject.data + unsubscribe, form.body.data, user.email):
+                if send_mail(form.subject.data, form.body.data + unsubscribe, user.email):
                     recipients += 1
         flash(_('Newsletter send') + ': ' + str(recipients), 'info')
         return redirect(url_for('admin_index'))
