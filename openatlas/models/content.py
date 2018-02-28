@@ -1,9 +1,10 @@
 # Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
 
-from flask import g, session
+from flask import flash, g, session
+from flask_babel import lazy_gettext as _
 
-from openatlas import app
+from openatlas import app, logger
 
 
 class ContentMapper:
@@ -32,14 +33,19 @@ class ContentMapper:
     @staticmethod
     def update_content(name, form):
         g.cursor.execute('BEGIN')
-        for language in app.config['LANGUAGES'].keys():
-            sql = 'DELETE FROM web.i18n WHERE name = %(name)s AND language = %(language)s'
-            g.cursor.execute(sql, {'name': name, 'language': language})
-            sql = """
-                INSERT INTO web.i18n (name, language, text)
-                VALUES (%(name)s, %(language)s, %(text)s);"""
-            g.cursor.execute(sql, {
-                'name': name,
-                'language': language,
-                'text': form.__getattribute__(language).data.strip()})
-        g.cursor.execute('COMMIT')
+        try:
+            for language in app.config['LANGUAGES'].keys():
+                sql = 'DELETE FROM web.i18n WHERE name = %(name)s AND language = %(language)s'
+                g.cursor.execute(sql, {'name': name, 'language': language})
+                sql = """
+                    INSERT INTO web.i18n (name, language, text)
+                    VALUES (%(name)s, %(language)s, %(text)s);"""
+                g.cursor.execute(sql, {
+                    'name': name,
+                    'language': language,
+                    'text': form.__getattribute__(language).data.strip()})
+                g.cursor.execute('COMMIT')
+        except Exception as e:  # pragma: no cover
+            g.cursor.execute('ROLLBACK')
+            logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
