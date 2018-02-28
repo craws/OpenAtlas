@@ -1,18 +1,17 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
 
-from flask import flash, render_template, session, url_for, request, g
+from flask import flash, g, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import StringField, BooleanField, SelectField, SubmitField
+from wtforms import BooleanField, SelectField, StringField, SubmitField
 from wtforms.validators import Email, InputRequired
 
-import openatlas
-from openatlas import SettingsMapper
-from openatlas import app
-from openatlas.util.util import uc_first, required_group, send_mail
+from openatlas import app, logger
+from openatlas.models.settings import SettingsMapper
+from openatlas.util.util import required_group, send_mail, uc_first
 
 
 class TestMail(Form):
@@ -104,12 +103,12 @@ def settings_update():
         g.cursor.execute('BEGIN')
         try:
             SettingsMapper.update(form)
-            openatlas.logger.log('info', 'settings', 'Settings updated')
+            logger.log('info', 'settings', 'Settings updated')
             g.cursor.execute('COMMIT')
             flash(_('info update'), 'info')
         except Exception as e:  # pragma: no cover
             g.cursor.execute('ROLLBACK')
-            openatlas.logger.log('error', 'database', 'transaction failed', e)
+            logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('settings_index'))
     for field in SettingsMapper.fields:

@@ -1,11 +1,11 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import locale
 import sys
 import time
 from collections import OrderedDict
 
 import psycopg2.extras
-from flask import Flask, request, session, g
+from flask import Flask, g, request, session
 from flask_babel import Babel, lazy_gettext as _
 from flask_wtf import Form
 from wtforms import StringField, SubmitField
@@ -19,25 +19,27 @@ app = Flask(__name__, instance_relative_config=True)
 
 # use the test database if running tests
 instance_name = 'production' if 'test_runner.py' not in sys.argv[0] else 'testing'
-debug_model = OrderedDict()
 app.config.from_object('config.default')  # load config/INSTANCE_NAME.py
 app.config.from_pyfile(instance_name + '.py')  # load instance/INSTANCE_NAME.py
 locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 babel = Babel(app)
 
-import openatlas
-from openatlas.models.classObject import ClassMapper
-from openatlas.models.entity import Entity, EntityMapper
-from openatlas.models.node import NodeMapper
-from openatlas.models.property import PropertyMapper
-from openatlas.models.settings import SettingsMapper
+
+class GlobalSearchForm(Form):
+    term = StringField('', render_kw={"placeholder": _('search term')})
+    search = SubmitField(_('search'))
+
+
+from openatlas.models.logger import DBHandler
+
+debug_model = OrderedDict()
+logger = DBHandler()
+
+
 from openatlas.util import filters
 from openatlas.views import (actor, admin, ajax, content, event, hierarchy, index, login, types,
                              model, place, profile, reference, settings, source, translation, user,
                              involvement, relation, member, search, file)
-
-from openatlas.models.logger import DBHandler
-logger = DBHandler()
 
 
 @babel.localeselector
@@ -66,6 +68,10 @@ def connect():
 
 @app.before_request
 def before_request():
+    from openatlas.models.classObject import ClassMapper
+    from openatlas.models.node import NodeMapper
+    from openatlas.models.property import PropertyMapper
+    from openatlas.models.settings import SettingsMapper
     if request.path.startswith('/static'):  # pragma: no cover
         return  # only needed if not running with apache and static alias
     debug_model['current'] = time.time()
@@ -90,11 +96,6 @@ def before_request():
 def teardown_request(exception):
     if hasattr(g, 'db'):
         g.db.close()
-
-
-class GlobalSearchForm(Form):
-    term = StringField('', render_kw={"placeholder": _('search term')})
-    search = SubmitField(_('search'))
 
 
 @app.context_processor

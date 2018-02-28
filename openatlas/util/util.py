@@ -1,6 +1,5 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import glob
-import math
 import os
 import re
 import smtplib
@@ -13,16 +12,17 @@ from html.parser import HTMLParser
 
 import numpy
 from babel import dates
-from flask import abort, url_for, request, session, flash, g
+from flask import abort, flash, g, request, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
+from numpy import math
 from werkzeug.utils import redirect
 
 import openatlas
 from openatlas import app
 from openatlas.models.classObject import ClassObject
 from openatlas.models.date import DateMapper
-from openatlas.models.entity import Entity, EntityMapper
+from openatlas.models.entity import Entity
 from openatlas.models.property import Property
 from openatlas.models.user import User
 
@@ -35,9 +35,11 @@ def convert_size(size_bytes):
     return "%s %s" % (int(size_bytes / math.pow(1024, i)), size_name[i])
 
 
-def print_file_size(entity, name=None):
-    path = glob.glob(os.path.join(app.config['UPLOAD_FOLDER'], str(entity.id) + '.*'))[0]
-    return convert_size(os.path.getsize(path))
+def print_file_size(entity):
+    path = glob.glob(os.path.join(app.config['UPLOAD_FOLDER'], str(entity.id) + '.*'))
+    if path:
+        return convert_size(os.path.getsize(path))
+    return 'N/A'
 
 
 def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
@@ -110,6 +112,7 @@ def sanitize(string, mode=None):
 
 def build_table_form(class_name, linked_entities):
     """ Returns a form with a list of entities with checkboxes"""
+    from openatlas.models.entity import EntityMapper
     # Todo: add CSRF token
     form = '<form class="table" method="post">'
     header = app.config['TABLE_HEADERS'][class_name] + ['']
@@ -226,7 +229,7 @@ def get_entity_data(entity, location=None):
         user_log = openatlas.logger.get_log_for_advanced_view(entity.id)
         data.append((_('created'), format_date(entity.created) + ' ' + link(user_log['creator'])))
         if user_log['modified']:
-            info = format_date(user_log['modified']) + ' ' + link(user_log['creator'])
+            info = format_date(user_log['modified']) + ' ' + link(user_log['modifier'])
             data.append((_('modified'), info))
 
     return data
@@ -257,7 +260,7 @@ def add_dates_to_form(form, for_person=False):
             </div>
         </div>""".format(date=uc_first(_('date')), tip=_('tooltip date'), show=uc_first(_('show')))
     html += '<div class="table-row date-switch" ' + style + '>'
-    html += '<div>' + str(form.date_begin_year.label) + '</div><div class="table-cell">'
+    html += '<div>' + str(form.date_begin_year.label).title() + '</div><div class="table-cell">'
     html += str(form.date_begin_year(class_='year')) + ' ' + errors['date_begin_year'] + ' '
     html += str(form.date_begin_month(class_='month')) + ' ' + errors['date_begin_month'] + ' '
     html += str(form.date_begin_day(class_='day')) + ' ' + errors['date_begin_day'] + ' '
@@ -272,7 +275,7 @@ def add_dates_to_form(form, for_person=False):
         html += str(form.date_birth) + str(form.date_birth.label)
     html += '</div></div>'
     html += '<div class="table-row date-switch" ' + style + '>'
-    html += '<div>' + str(form.date_end_year.label) + '</div><div class="table-cell">'
+    html += '<div>' + str(form.date_end_year.label).title() + '</div><div class="table-cell">'
     html += str(form.date_end_year(class_='year')) + ' ' + errors['date_end_year'] + ' '
     html += str(form.date_end_month(class_='month')) + ' ' + errors['date_end_month'] + ' '
     html += str(form.date_end_day(class_='day')) + ' ' + errors['date_end_day'] + ' '
@@ -365,12 +368,13 @@ def link(entity):
         html = '<a href="' + url + '">' + entity.code + '</a>'
     elif isinstance(entity, Entity):
         url = ''
-        if entity.system_type == 'source content':
-            url = url_for('source_view', id_=entity.id)
+        if entity.class_.code == 'E33':
+            if entity.system_type == 'source content':
+                url = url_for('source_view', id_=entity.id)
+            elif entity.system_type == 'source translation':
+                url = url_for('translation_view', id_=entity.id)
         elif entity.system_type == 'file':
             url = url_for('file_view', id_=entity.id)
-        elif entity.system_type == 'source translation':
-            url = url_for('translation_view', id_=entity.id)
         elif entity.class_.code in ('E7', 'E8', 'E12', 'E6'):
             url = url_for('event_view', id_=entity.id)
         elif entity.class_.code in ('E21', 'E74', 'E40'):
@@ -476,7 +480,7 @@ def pager(table):
 
 
 def get_base_table_data(entity):
-    """ Returns standard table data for an entity"""
+    """Returns standard table data for an entity"""
     name = app.config['CODE_CLASS'][entity.class_.code]
     data = [link(entity)]
     if name in ['event', 'actor']:
@@ -492,7 +496,7 @@ def get_base_table_data(entity):
 
 
 def was_modified(form, entity):   # pragma: no cover
-    """ Checks if an entity was modified after an update form was opened."""
+    """Checks if an entity was modified after an update form was opened."""
     if not entity.modified or not form.opened.data:
         return False
     if entity.modified < datetime.fromtimestamp(float(form.opened.data)):

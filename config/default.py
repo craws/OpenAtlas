@@ -1,11 +1,9 @@
+import os
 from collections import OrderedDict
 
-import os
 from flask_babel import lazy_gettext as _
 
-from openatlas.util.util import uc_first
-
-VERSION = '3.2.0'
+VERSION = '3.2.1'
 DEBUG = False
 DEMO_MODE = False  # If in demo mode some options are disabled and the login form is pre filled
 
@@ -47,9 +45,9 @@ LOG_LEVELS[6] = 'info'
 LOG_LEVELS[7] = 'debug'
 
 FEEDBACK_SUBJECTS = OrderedDict()
-FEEDBACK_SUBJECTS[uc_first(_('suggestion'))] = uc_first(_('suggestion'))
-FEEDBACK_SUBJECTS[uc_first(_('question'))] = uc_first(_('question'))
-FEEDBACK_SUBJECTS[uc_first(_('problem'))] = uc_first(_('problem'))
+FEEDBACK_SUBJECTS[_('suggestion').title()] = _('suggestion').title()
+FEEDBACK_SUBJECTS[_('question').title()] = _('question').title()
+FEEDBACK_SUBJECTS[_('problem').title()] = _('problem').title()
 
 CODE_CLASS = {
     'E33': 'source',

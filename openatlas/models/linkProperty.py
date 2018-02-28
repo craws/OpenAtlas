@@ -1,7 +1,7 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import g
 
-import openatlas
+from openatlas import debug_model
 
 
 class LinkPropertyMapper:
@@ -15,7 +15,7 @@ class LinkPropertyMapper:
             'property_code': property_code,
             'domain_id': link if isinstance(link, int) else link.id,
             'range_id': range_ if isinstance(range_, int) else range_.id})
-        openatlas.debug_model['div sql'] += 1
+        debug_model['div sql'] += 1
 
     @staticmethod
     def get_entities_by_node(node):
@@ -24,5 +24,5 @@ class LinkPropertyMapper:
             FROM model.link l
             JOIN model.link_property lp ON l.id = lp.domain_id AND lp.range_id = %(node_id)s;"""
         g.cursor.execute(sql, {'node_id': node if isinstance(node, int) else node.id})
-        openatlas.debug_model['div sql'] += 1
+        debug_model['div sql'] += 1
         return g.cursor.fetchall()

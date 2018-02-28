@@ -1,20 +1,19 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import render_template, request, session, url_for, flash, g
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+from flask import flash, g, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import SubmitField, TextAreaField, SelectField
+from wtforms import SelectField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired
 
-import openatlas
-from openatlas import app
+from openatlas import app, logger
 from openatlas.models.content import ContentMapper
 from openatlas.models.entity import EntityMapper
 from openatlas.models.user import UserMapper
 from openatlas.util.changelog import Changelog
-from openatlas.util.util import (link, bookmark_toggle, uc_first, required_group, send_mail,
-                                 format_date)
+from openatlas.util.util import (bookmark_toggle, format_date, link, required_group, send_mail,
+                                 uc_first)
 
 
 class FeedbackForm(Form):
@@ -52,7 +51,7 @@ def index():
                 entity.first,
                 entity.last,
                 format_date(entity.created),
-                link(openatlas.logger.get_log_for_advanced_view(entity.id)['creator'])])
+                link(logger.get_log_for_advanced_view(entity.id)['creator'])])
     intro = ContentMapper.get_translation('intro')
     return render_template('index/index.html', intro=intro, tables=tables)
 

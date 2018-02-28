@@ -1,7 +1,7 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
 
-from flask import session, g
+from flask import g, session
 
 from openatlas import app
 

@@ -1,10 +1,10 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import datetime
 import random
 import string
 
 import bcrypt
-from flask import session, g
+from flask import g, session
 from flask_babel import lazy_gettext as _
 from flask_login import UserMixin
 
@@ -63,11 +63,11 @@ class UserMapper:
             u.login_last_success, u.login_last_failure, u.login_failed_count, u.password_reset_code,
             u.password_reset_date, u.email, r.name as group_name, u.unsubscribe_code
         FROM web."user" u
-        LEFT JOIN web.group r ON u.group_id = r.id"""
+        LEFT JOIN web.group r ON u.group_id = r.id """
 
     @staticmethod
     def get_all():
-        g.cursor.execute(UserMapper.sql)
+        g.cursor.execute(UserMapper.sql + ' ORDER BY username;')
         users = []
         for row in g.cursor.fetchall():
             users.append(User(row))
@@ -228,7 +228,7 @@ class UserMapper:
         if 'layout' not in settings:
             settings['layout'] = 'default'
         if 'language' not in settings:
-            settings['language'] = openatlas.get_locale()
+            settings['language'] = ''
         if 'table_rows' in settings:
             settings['table_rows'] = int(settings['table_rows'])
         else:

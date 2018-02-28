@@ -1,13 +1,13 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import flash, session, render_template, url_for
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+from flask import flash, render_template, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
-from openatlas import app
-from openatlas.models.content import ContentMapper
-from openatlas.util import util
 from werkzeug.utils import redirect
 from wtforms import TextAreaField
 
+from openatlas import app
+from openatlas.models.content import ContentMapper
+from openatlas.util import util
 from openatlas.util.util import required_group
 
 
@@ -24,7 +24,8 @@ def content_index():
     header.append('text')
     table_content = {'id': 'content', 'header': header, 'data': []}
     for item, languages in ContentMapper.get_content().items():
-        content = ['<a href="' + url_for('content_view', item=item) + '">' + util.uc_first(item) + '</a>']
+        url = url_for('content_view', item=item)
+        content = ['<a href="' + url + '">' + util.uc_first(item) + '</a>']
         html_ok = '<img src="/static/images/icons/dialog-apply.png" alt="ok" \>'
         for language in app.config['LANGUAGES'].keys():
             content.append(html_ok if languages[language] else '')

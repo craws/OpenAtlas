@@ -1,7 +1,7 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import url_for
 
-from openatlas import SettingsMapper, app
+from openatlas import app
+from openatlas.models.settings import SettingsMapper
 from openatlas.test_base import TestBaseCase
 
 

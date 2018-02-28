@@ -1,15 +1,14 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import bcrypt
-from flask import flash, render_template, session, url_for, g
+from flask import flash, g, render_template, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_required
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import BooleanField, PasswordField, SelectField, SubmitField, StringField
+from wtforms import BooleanField, PasswordField, SelectField, StringField, SubmitField
 from wtforms.validators import Email, InputRequired
 
-import openatlas
-from openatlas import app
+from openatlas import app, logger
 from openatlas.util.util import uc_first
 
 
@@ -90,7 +89,7 @@ def profile_index():
             flash(_('info update'), 'info')
         except Exception as e:  # pragma: no cover
             g.cursor.execute('ROLLBACK')
-            openatlas.logger.log('error', 'database', 'transaction failed', e)
+            logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('profile_index'))
 
@@ -125,7 +124,7 @@ def profile_update():
             flash(_('info update'), 'info')
         except Exception as e:  # pragma: no cover
             g.cursor.execute('ROLLBACK')
-            openatlas.logger.log('error', 'database', 'transaction failed', e)
+            logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('profile_index'))
     form.name.data = current_user.real_name

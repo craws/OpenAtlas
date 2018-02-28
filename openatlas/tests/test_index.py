@@ -1,4 +1,3 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import url_for
 
 from openatlas import app
@@ -31,11 +30,6 @@ class IndexTests(TestBaseCase):
             for i in range(4):
                 rv = self.app.post(url_for('login'), data={'username': 'inactive', 'password': '?'})
             assert b'Too many login attempts' in rv.data
-            self.login()
-            rv = self.app.get('/')
-            assert b'0' in rv.data
-            rv = self.app.get(url_for('index_feedback'))
-            assert b'Thank you' in rv.data
 
             # test reset password, unsubscribe
             rv = self.app.get(url_for('reset_password'))
@@ -44,6 +38,12 @@ class IndexTests(TestBaseCase):
             assert b'404' in rv.data
             rv = self.app.get(url_for('index_unsubscribe', code='1234'))
             assert b'invalid' in rv.data
+
+            self.login()
+            rv = self.app.get('/')
+            assert b'0' in rv.data
+            rv = self.app.get(url_for('index_feedback'))
+            assert b'Thank you' in rv.data
 
             # test redirection to overview if trying to login again
             rv = self.app.get(url_for('login'), follow_redirects=True)

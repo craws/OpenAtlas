@@ -1,4 +1,4 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
 from collections import OrderedDict
 
@@ -6,8 +6,7 @@ from flask import g
 from flask_login import current_user
 from werkzeug.exceptions import abort
 
-import openatlas
-from openatlas import app
+from openatlas import app, debug_model, logger
 from openatlas.models.date import DateMapper
 from openatlas.models.link import LinkMapper
 
@@ -15,7 +14,7 @@ from openatlas.models.link import LinkMapper
 class Entity:
     def __init__(self, row):
         if not row:
-            openatlas.logger.log('error', 'model', 'invalid id')
+            logger.log('error', 'model', 'invalid id')
             abort(418)
         self.id = row.id
         self.nodes = []
@@ -60,12 +59,14 @@ class Entity:
         DateMapper.save_dates(self, form)
 
     def save_nodes(self, form):
-        openatlas.NodeMapper.save_entity_nodes(self, form)
+        from openatlas.models.node import NodeMapper
+        NodeMapper.save_entity_nodes(self, form)
 
     def set_dates(self):
         self.dates = DateMapper.get_dates(self)
 
     def print_base_type(self):
+        from openatlas.models.node import NodeMapper
         if self.class_.code not in app.config['CODE_CLASS']:
             return ''
         if self.class_.code in app.config['CLASS_CODES']['actor']:
@@ -75,7 +76,7 @@ class Entity:
             root_name = self.system_type.title()
         if self.system_type == 'file':
             root_name = 'License'
-        root_id = openatlas.NodeMapper.get_hierarchy_by_name(root_name).id
+        root_id = NodeMapper.get_hierarchy_by_name(root_name).id
         for node in self.nodes:
             if node.root and node.root[-1] == root_id:
                 return node.name
@@ -136,7 +137,7 @@ class EntityMapper:
     @staticmethod
     def insert(code, name, system_type=None, description=None, date=None):
         if not name and not date:  # pragma: no cover
-            openatlas.logger.log('error', 'database', 'Insert entity without name and date')
+            logger.log('error', 'database', 'Insert entity without name and date')
             return  # something went wrong so don't insert
         sql = """
             INSERT INTO model.entity (name, system_type, class_code, description, value_timestamp)
@@ -155,7 +156,7 @@ class EntityMapper:
     def get_by_id(entity_id, ignore_not_found=False):
         sql = EntityMapper.sql + ' WHERE e.id = %(id)s GROUP BY e.id ORDER BY e.name;'
         g.cursor.execute(sql, {'id': entity_id})
-        openatlas.debug_model['by id'] += 1
+        debug_model['by id'] += 1
         if g.cursor.rowcount < 1 and ignore_not_found:
             return None  # pragma: no cover, only used where expected to avoid a 418 e.g. at logs
         return Entity(g.cursor.fetchone())
@@ -166,17 +167,7 @@ class EntityMapper:
             return []
         sql = EntityMapper.sql + ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name;'
         g.cursor.execute(sql, {'ids': tuple(entity_ids)})
-        openatlas.debug_model['by id'] += 1
-        entities = []
-        for row in g.cursor.fetchall():
-            entities.append(Entity(row))
-        return entities
-
-    @staticmethod
-    def get_by_system_type(system_type):
-        sql = EntityMapper.sql
-        sql += ' WHERE e.system_type = %(system_type)s GROUP BY e.id ORDER BY e.name;'
-        g.cursor.execute(sql, {'system_type': system_type})
+        debug_model['by id'] += 1
         entities = []
         for row in g.cursor.fetchall():
             entities.append(Entity(row))
@@ -192,7 +183,7 @@ class EntityMapper:
             sql = EntityMapper.sql + """
                 WHERE e.class_code IN %(codes)s GROUP BY e.id ORDER BY e.name;"""
         g.cursor.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][class_name])})
-        openatlas.debug_model['by codes'] += 1
+        debug_model['by codes'] += 1
         entities = []
         for row in g.cursor.fetchall():
             entities.append(Entity(row))
@@ -243,7 +234,7 @@ class EntityMapper:
         """ Returns entities without links. """
         entities = []
         g.cursor.execute(EntityMapper.sql_orphan)
-        openatlas.debug_model['div sql'] += 1
+        debug_model['div sql'] += 1
         for row in g.cursor.fetchall():
             entities.append(EntityMapper.get_by_id(row.id))
         return entities
@@ -259,7 +250,7 @@ class EntityMapper:
                 GROUP BY e.id
                 ORDER BY e.created DESC LIMIT %(limit)s;"""
         g.cursor.execute(sql, {'codes': tuple(codes), 'limit': limit})
-        openatlas.debug_model['div sql'] += 1
+        debug_model['div sql'] += 1
         entities = []
         for row in g.cursor.fetchall():
             entities.append(Entity(row))
@@ -267,7 +258,7 @@ class EntityMapper:
 
     @staticmethod
     def delete_orphans(parameter):
-        from openatlas import app, NodeMapper
+        from openatlas.models.node import NodeMapper
         if parameter == 'orphans':
             sql_where = EntityMapper.sql_orphan + " AND e.class_code NOT IN %(class_codes)s"
         elif parameter == 'unlinked':
@@ -298,7 +289,7 @@ class EntityMapper:
             'term': '%' + term + '%',
             'codes': tuple(codes),
             'user_id': current_user.id})
-        openatlas.debug_model['div sql'] += 1
+        debug_model['div sql'] += 1
         entities = []
         for row in g.cursor.fetchall():
             if row.class_code == 'E82':  # if found in actor alias

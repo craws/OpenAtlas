@@ -1,7 +1,7 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
 
-from flask import render_template, g
+from flask import g, render_template
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from wtforms import BooleanField, HiddenField, IntegerField, SubmitField

@@ -1,4 +1,4 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
 import time
 
@@ -7,17 +7,18 @@ from flask_babel import lazy_gettext as _
 from wtforms import HiddenField
 from wtforms.widgets import HiddenInput
 
-import openatlas
-from openatlas import Entity, app
+from openatlas import app
 from openatlas.forms.date import DateForm
-from openatlas.util.util import uc_first, truncate_string, pager, get_base_table_data
+from openatlas.models.entity import Entity, EntityMapper
+from openatlas.models.node import NodeMapper
+from openatlas.util.util import get_base_table_data, pager, truncate_string, uc_first
 
 
 def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
     # Todo: write comment, reflect that entity can be a link
     # Add custom fields
     custom_list = []
-    for id_, node in openatlas.NodeMapper.get_nodes_for_form(form_name).items():
+    for id_, node in NodeMapper.get_nodes_for_form(form_name).items():
         custom_list.append(id_)
         setattr(form, str(id_), TreeMultiField(str(id_)) if node.multiple else TreeField(str(id_)))
 
@@ -87,6 +88,7 @@ def build_node_form(form, node, request_origin=None):
 class TreeSelect(HiddenInput):
 
     def __call__(self, field, **kwargs):
+        from openatlas.models.node import NodeMapper
         selection = ''
         selected_ids = []
         if field.data:
@@ -96,7 +98,7 @@ class TreeSelect(HiddenInput):
         try:
             hierarchy_id = int(field.id)
         except ValueError:
-            hierarchy_id = openatlas.NodeMapper.get_hierarchy_by_name(uc_first(field.id)).id
+            hierarchy_id = NodeMapper.get_hierarchy_by_name(uc_first(field.id)).id
         html = """
             <input id="{name}-button" name="{name}-button" type="text"
                 class="table-select {required}" onfocus="this.blur()"
@@ -129,7 +131,7 @@ class TreeSelect(HiddenInput):
             name=field.id,
             title=g.nodes[hierarchy_id].name,
             selection=selection,
-            tree_data=openatlas.NodeMapper.get_tree_data(hierarchy_id, selected_ids),
+            tree_data=NodeMapper.get_tree_data(hierarchy_id, selected_ids),
             clear_style='' if selection else ' style="display: none;" ',
             required=' required' if field.flags.required else '')
         return super(TreeSelect, self).__call__(field, **kwargs) + html
@@ -175,7 +177,7 @@ class TreeMultiSelect(HiddenInput):
             name=field.id,
             title=g.nodes[int(field.id)].name,
             selection=selection,
-            tree_data=openatlas.NodeMapper.get_tree_data(int(field.id), selected_ids))
+            tree_data=NodeMapper.get_tree_data(int(field.id), selected_ids))
         return super(TreeMultiSelect, self).__call__(field, **kwargs) + html
 
 
@@ -186,7 +188,6 @@ class TreeMultiField(HiddenField):
 class TableSelect(HiddenInput):
 
     def __call__(self, field, **kwargs):
-        from openatlas.models.entity import EntityMapper
         selection = ''
         class_ = field.id
         if class_ in ['residence', 'appears_first', 'appears_last']:
@@ -231,7 +232,6 @@ class TableMultiSelect(HiddenInput):
     """Table with checkboxes used in forms."""
 
     def __call__(self, field, **kwargs):
-        from openatlas.models.entity import EntityMapper
         if field.data and isinstance(field.data, str):
             field.data = ast.literal_eval(field.data)
         selection = ''

@@ -1,25 +1,27 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import url_for
 
-from openatlas import app, EntityMapper
+from openatlas import app
+from openatlas.models.entity import EntityMapper
 from openatlas.test_base import TestBaseCase
 
 
 class TranslationTest(TestBaseCase):
 
     def test_source(self):
-        self.login()
         with app.app_context():
+            self.login()
             with app.test_request_context():
                 app.preprocess_request()
                 source_id = EntityMapper.insert('E33', 'Necronomicon', 'source content').id
             rv = self.app.get(url_for('translation_insert', source_id=source_id))
-            assert b'+ Translation' in rv.data
+            assert b'+ Text' in rv.data
             data = {'name': 'Test translation'}
             rv = self.app.post(url_for('translation_insert', source_id=source_id), data=data)
             with app.test_request_context():
                 app.preprocess_request()
                 translation_id = rv.location.split('/')[-1]
+            rv = self.app.get(url_for('source_view', id_=source_id))
+            assert b'Test translation' in rv.data
             self.app.get(url_for('translation_update', id_=translation_id, source_id=source_id))
             rv = self.app.post(
                 url_for('translation_update', id_=translation_id, source_id=source_id),

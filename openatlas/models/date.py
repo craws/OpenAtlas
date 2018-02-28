@@ -1,10 +1,10 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import numpy
 from flask import g
 
 import openatlas
+from openatlas.models.link import LinkMapper
 from openatlas.models.linkProperty import LinkPropertyMapper
-from .link import LinkMapper
 
 
 class DateMapper:

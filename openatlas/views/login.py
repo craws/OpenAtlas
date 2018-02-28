@@ -1,17 +1,17 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-import bcrypt
-from bcrypt import hashpw
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import datetime
 
-import openatlas
-from openatlas import app
-from flask import abort, render_template, request, flash, url_for, session
+import bcrypt
+from bcrypt import hashpw
+from flask import abort, flash, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
-from flask_login import current_user, LoginManager, login_required, login_user, logout_user
+from flask_login import LoginManager, current_user, login_required, login_user, logout_user
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import BooleanField, PasswordField, StringField, SubmitField
-from wtforms.validators import InputRequired, Email
+from wtforms.validators import Email, InputRequired
+
+from openatlas import app, logger
 from openatlas.models.user import UserMapper
 from openatlas.util.util import send_mail, uc_first
 
@@ -46,7 +46,7 @@ def login():
         user = UserMapper.get_by_username(request.form['username'])
         if user:
             if user.login_attempts_exceeded():
-                openatlas.logger.log('notice', 'auth', 'Login attempts exceeded: ' + user.username)
+                logger.log('notice', 'auth', 'Login attempts exceeded: ' + user.username)
                 flash(_('error login attempts exceeded'), 'error')
                 return render_template('login/index.html', form=form)
             hash_ = hashpw(request.form['password'].encode('utf-8'), user.password.encode('utf-8'))
@@ -58,20 +58,20 @@ def login():
                     user.login_last_success = datetime.datetime.now()
                     user.login_failed_count = 0
                     user.update()
-                    openatlas.logger.log('info', 'auth', 'Login of ' + user.username)
+                    logger.log('info', 'auth', 'Login of ' + user.username)
                     send_login_mail(user)
                     return redirect(request.args.get('next') or url_for('index'))
                 else:
-                    openatlas.logger.log('notice', 'auth', 'Inactive login try ' + user.username)
+                    logger.log('notice', 'auth', 'Inactive login try ' + user.username)
                     flash(_('error inactive'), 'error')
             else:
-                openatlas.logger.log('notice', 'auth', 'Wrong password: ' + user.username)
+                logger.log('notice', 'auth', 'Wrong password: ' + user.username)
                 user.login_failed_count += 1
                 user.login_last_failure = datetime.datetime.now()
                 user.update()
                 flash(_('error wrong password'), 'error')
         else:
-            openatlas.logger.log('notice', 'auth', 'Wrong username: ' + request.form['username'])
+            logger.log('notice', 'auth', 'Wrong username: ' + request.form['username'])
             flash(_('error username'), 'error')
         return render_template('login/index.html', form=form)
     return render_template('login/index.html', form=form)
@@ -90,12 +90,14 @@ def send_login_mail(user):  # pragma: no cover
 
 @app.route('/password_reset', methods=["GET", "POST"])
 def reset_password():
+    if current_user.is_authenticated:  # prevent password reset if already logged in
+        return redirect(url_for('index'))
     form = PasswordResetForm()
     if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
         user = UserMapper.get_by_email(form.email.data)
         if not user:
             message = 'Password reset for non existing ' + form.email.data
-            openatlas.logger.log('info', 'password', message)
+            logger.log('info', 'password', message)
             flash(_('error non existing email'), 'error')
         else:
             code = UserMapper.generate_password()
@@ -126,12 +128,12 @@ def reset_password():
 def reset_confirm(code):   # pragma: no cover
     user = UserMapper.get_by_reset_code(code)
     if not user:
-        openatlas.logger.log('info', 'auth', 'unknown reset code')
+        logger.log('info', 'auth', 'unknown reset code')
         flash(_('invalid password reset confirmation code'), 'error')
         abort(404)
     hours = session['settings']['reset_confirm_hours']
     if datetime.datetime.now() > user.password_reset_date + datetime.timedelta(hours=hours):
-        openatlas.logger.log('info', 'auth', 'reset code expired')
+        logger.log('info', 'auth', 'reset code expired')
         flash(_('This reset confirmation code has expired.'), 'error')
         abort(404)
     password = UserMapper.generate_password()
@@ -155,5 +157,5 @@ def reset_confirm(code):   # pragma: no cover
 @login_required
 def logout():
     logout_user()
-    openatlas.logger.log('info', 'auth', 'logout')
+    logger.log('info', 'auth', 'logout')
     return redirect(url_for('login'))

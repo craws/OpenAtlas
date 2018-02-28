@@ -1,18 +1,18 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import render_template, url_for, flash, request, g
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
-from wtforms import StringField, TextAreaField, HiddenField, SubmitField, FieldList
+from wtforms import FieldList, HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired
 
-import openatlas
-from openatlas import app
+from openatlas import app, logger
 from openatlas.forms.forms import DateForm, build_form
-from openatlas.models.entity import EntityMapper, Entity
+from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.gis import GisMapper
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import (build_remove_link, required_group, get_entity_data, uc_first, link,
-                                 truncate_string, get_base_table_data, is_authorized, was_modified)
+from openatlas.util.util import (build_remove_link, get_base_table_data, get_entity_data,
+                                 is_authorized, link, required_group, truncate_string, uc_first,
+                                 was_modified)
 
 
 class PlaceForm(DateForm):
@@ -125,11 +125,11 @@ def place_delete(id_):
     g.cursor.execute('BEGIN')
     try:
         EntityMapper.delete(id_)
-        openatlas.logger.log_user(id_, 'delete')
+        logger.log_user(id_, 'delete')
         g.cursor.execute('COMMIT')
-    except Exception as e:
+    except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        openatlas.logger.log('error', 'database', 'transaction failed', e)
+        logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
     flash(_('entity deleted'), 'info')
     return redirect(url_for('place_index'))
@@ -146,7 +146,7 @@ def place_update(id_):
         if was_modified(form, object_):  # pragma: no cover
             del form.save
             flash(_('error modified'), 'error')
-            modifier = link(openatlas.logger.get_log_for_advanced_view(object_.id)['modifier'])
+            modifier = link(logger.get_log_for_advanced_view(object_.id)['modifier'])
             return render_template(
                 'place/update.html', form=form, object_=object_, modifier=modifier)
         if save(form, object_, location):
@@ -166,12 +166,12 @@ def save(form, object_=None, location=None, origin=None):
             for alias in object_.get_linked_entities('P1'):
                 alias.delete()
             GisMapper.delete_by_entity(location)
-            openatlas.logger.log_user(object_.id, 'update')
+            logger.log_user(object_.id, 'update')
         else:
             object_ = EntityMapper.insert('E18', form.name.data)
             location = EntityMapper.insert('E53', 'Location of ' + form.name.data, 'place location')
             object_.link('P53', location)
-            openatlas.logger.log_user(object_.id, 'insert')
+            logger.log_user(object_.id, 'insert')
         object_.name = form.name.data
         object_.description = form.description.data
         object_.update()
@@ -193,7 +193,7 @@ def save(form, object_=None, location=None, origin=None):
         g.cursor.execute('COMMIT')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        openatlas.logger.log('error', 'database', 'transaction failed', e)
+        logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
         return
     return link_ if link_ else object_

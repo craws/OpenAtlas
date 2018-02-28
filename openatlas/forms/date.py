@@ -1,11 +1,10 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
-from wtforms import IntegerField, StringField, BooleanField
-from wtforms.validators import NumberRange, Optional, NoneOf
+from wtforms import BooleanField, IntegerField, StringField
+from wtforms.validators import NoneOf, NumberRange, Optional
 
 from openatlas.models.date import DateMapper
-from openatlas.util.util import uc_first
 
 
 class DateForm(Form):
@@ -63,11 +62,11 @@ class DateForm(Form):
             if code == 'OA4':
                 self.date_death.data = True
 
-    date_birth = BooleanField(uc_first(_('birth')))
-    date_death = BooleanField(uc_first(_('death')))
+    date_birth = BooleanField(_('birth'))
+    date_death = BooleanField(_('death'))
 
     date_begin_year = IntegerField(
-        uc_first(_('begin')),
+        _('begin'),
         render_kw={'placeholder': _('yyyy')},
         validators=[Optional(), NumberRange(min=-4713, max=9999), NoneOf([0])])
     date_begin_month = IntegerField(
@@ -87,7 +86,7 @@ class DateForm(Form):
         validators=[Optional(), NumberRange(min=1, max=31)])
     date_begin_info = StringField(render_kw={'placeholder': _('comment')},)
     date_end_year = IntegerField(
-        uc_first(_('end')),
+        _('end'),
         render_kw={'placeholder': _('yyyy')},
         validators=[Optional(), NumberRange(min=-4713, max=9999), NoneOf([0])])
     date_end_month = IntegerField(

@@ -1,19 +1,19 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
 
-from flask import flash, render_template, url_for, request, g
+from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired
 
-import openatlas
-from openatlas import app
-from openatlas.forms.forms import DateForm, build_form, TableField, TableMultiField
+from openatlas import app, logger
+from openatlas.forms.forms import DateForm, TableField, TableMultiField, build_form
 from openatlas.models.entity import EntityMapper
-from openatlas.models.link import LinkMapper, Link
-from openatlas.util.util import (build_remove_link, get_base_table_data, get_entity_data, uc_first,
-                                 is_authorized, link, required_group, truncate_string, was_modified)
+from openatlas.models.link import Link, LinkMapper
+from openatlas.util.util import (build_remove_link, get_base_table_data, get_entity_data,
+                                 is_authorized, link, required_group, truncate_string, uc_first,
+                                 was_modified)
 
 
 class EventForm(DateForm):
@@ -87,12 +87,12 @@ def event_delete(id_):
     g.cursor.execute('BEGIN')
     try:
         EntityMapper.delete(id_)
-        openatlas.logger.log_user(id_, 'delete')
+        logger.log_user(id_, 'delete')
         g.cursor.execute('COMMIT')
         flash(_('entity deleted'), 'info')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        openatlas.logger.log('error', 'database', 'transaction failed', e)
+        logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
     return redirect(url_for('event_index'))
 
@@ -110,7 +110,7 @@ def event_update(id_):
         if was_modified(form, event):  # pragma: no cover
             del form.save
             flash(_('error modified'), 'error')
-            modifier = link(openatlas.logger.get_log_for_advanced_view(event.id)['modifier'])
+            modifier = link(logger.get_log_for_advanced_view(event.id)['modifier'])
             return render_template('event/update.html', form=form, event=event, modifier=modifier)
         if save(form, event):
             flash(_('info update'), 'info')
@@ -195,10 +195,10 @@ def save(form, event=None, code=None, origin=None):
     try:
         if event:
             LinkMapper.delete_by_codes(event, ['P117', 'P7', 'P22', 'P23', 'P24'])
-            openatlas.logger.log_user(event.id, 'update')
+            logger.log_user(event.id, 'update')
         else:
             event = EntityMapper.insert(code, form.name.data)
-            openatlas.logger.log_user(event.id, 'insert')
+            logger.log_user(event.id, 'insert')
         event.name = form.name.data
         event.description = form.description.data
         event.update()
@@ -225,7 +225,7 @@ def save(form, event=None, code=None, origin=None):
         g.cursor.execute('COMMIT')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        openatlas.logger.log('error', 'database', 'transaction failed', e)
+        logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
         return
     return link_ if link_ else event

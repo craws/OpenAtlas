@@ -1,16 +1,17 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import render_template, flash, url_for, request, g
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import SelectField, SubmitField, TextAreaField, StringField
+from wtforms import SelectField, StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired
 
-import openatlas
-from openatlas import app, EntityMapper, NodeMapper
+from openatlas import app, logger
+from openatlas.models.entity import EntityMapper
+from openatlas.models.node import NodeMapper
 from openatlas.models.user import UserMapper
-from openatlas.util.util import (required_group, link, truncate_string, format_datetime, uc_first,
-                                 send_mail, format_date)
+from openatlas.util.util import (format_date, format_datetime, link, required_group, send_mail,
+                                 truncate_string, uc_first)
 
 
 class LogForm(Form):
@@ -68,7 +69,7 @@ def admin_log():
     table = {
         'id': 'log', 'header': ['date', 'priority', 'type', 'message', 'user', 'IP', 'info'],
         'data': []}
-    logs = openatlas.logger.get_system_logs(form.limit.data, form.priority.data, form.user.data)
+    logs = logger.get_system_logs(form.limit.data, form.priority.data, form.user.data)
     for row in logs:
         user = UserMapper.get_by_id(row.user_id) if row.user_id else None
         table['data'].append([
@@ -85,7 +86,7 @@ def admin_log():
 @app.route('/admin/log/delete')
 @required_group('admin')
 def admin_log_delete():
-    openatlas.logger.delete_all_system_logs()
+    logger.delete_all_system_logs()
     flash(_('Logs deleted'))
     return redirect(url_for('admin_log'))
 

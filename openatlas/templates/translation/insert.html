@@ -2,7 +2,7 @@
 {% block breadcrumb %}
     <a href="{{ url_for('source_index') }}">{{ _('source')|uc_first }}</a>
     > {{ source|link|safe }}
-    > + {{ _('translation')|uc_first }}
+    > + {{ _('text')|uc_first }}
 {% endblock %}
 {% block content %}
     {{ form|display_form|safe }}

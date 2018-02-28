@@ -2,18 +2,19 @@
 import ast
 import os
 
-from flask import render_template, request, flash, url_for, g
+from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
-from werkzeug.utils import secure_filename, redirect
-from wtforms import FileField, TextAreaField, SubmitField, StringField
-from wtforms.validators import InputRequired, DataRequired
+from werkzeug.utils import redirect, secure_filename
+from wtforms import FileField, StringField, SubmitField, TextAreaField
+from wtforms.validators import DataRequired, InputRequired
 
 import openatlas
-from openatlas import app, EntityMapper
+from openatlas import app
 from openatlas.forms.forms import TableMultiField
-from openatlas.util.util import (required_group, get_base_table_data, truncate_string, link,
-                                 uc_first, format_date, print_file_size, get_entity_data)
+from openatlas.models.entity import EntityMapper
+from openatlas.util.util import (format_date, get_base_table_data, get_entity_data, link,
+                                 print_file_size, required_group, truncate_string, uc_first)
 
 
 class FileForm(Form):

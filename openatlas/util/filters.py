@@ -1,18 +1,18 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-import jinja2
-import flask
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+import os
 import re
 
-import os
-
-from flask import render_template_string, url_for, request, g
-from flask_login import current_user
-from jinja2 import evalcontextfilter, escape
+import flask
+import jinja2
+from flask import g, render_template_string, request, url_for
 from flask_babel import lazy_gettext as _
+from flask_login import current_user
+from jinja2 import escape, evalcontextfilter
 
-import openatlas
-from openatlas import app, EntityMapper
-from . import util
+from openatlas import app
+from openatlas.models.entity import EntityMapper
+from openatlas.models.node import NodeMapper
+from openatlas.util import util
 
 blueprint = flask.Blueprint('filters', __name__)
 paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
@@ -125,25 +125,25 @@ def description(self, entity):
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def page_buttons(self, entity):
-        view = app.config['CODE_CLASS'][entity.class_.code]
-        codes = app.config['CLASS_CODES'][view]
-        html = ''
-        pager_ids = EntityMapper.get_page_ids(entity, codes)
-        if pager_ids.first_id and pager_ids.first_id != entity.id:
-            html += """
-                <a href="{url_first}"><div class="navigation first disabled"></div></a>
-                <a href="{url_prev}"><div class="navigation prev disabled"></div></a>""".format(
-                    url_first=url_for(view + '_view', id_=pager_ids.first_id),
-                    url_prev=url_for(view + '_view', id_=pager_ids.previous_id))
-        if pager_ids.last_id and pager_ids.last_id != entity.id:
-            html += """
-                <a href="{url_next}"><div class="navigation next"></div></a>
-                <a href="{url_last}"><div class="navigation last"></div></a>""".format(
-                    url_next=url_for(view + '_view', id_=pager_ids.next_id),
-                    url_last=url_for(view + '_view', id_=pager_ids.last_id))
-        if html:
-            html = '<div class="pager">' + html + '</div>'
-        return html
+    view = app.config['CODE_CLASS'][entity.class_.code]
+    codes = app.config['CLASS_CODES'][view]
+    html = ''
+    pager_ids = EntityMapper.get_page_ids(entity, codes)
+    if pager_ids.first_id and pager_ids.first_id != entity.id:
+        html += """
+            <a href="{url_first}"><div class="navigation first disabled"></div></a>
+            <a href="{url_prev}"><div class="navigation prev disabled"></div></a>""".format(
+                url_first=url_for(view + '_view', id_=pager_ids.first_id),
+                url_prev=url_for(view + '_view', id_=pager_ids.previous_id))
+    if pager_ids.last_id and pager_ids.last_id != entity.id:
+        html += """
+            <a href="{url_next}"><div class="navigation next"></div></a>
+            <a href="{url_last}"><div class="navigation last"></div></a>""".format(
+                url_next=url_for(view + '_view', id_=pager_ids.next_id),
+                url_last=url_for(view + '_view', id_=pager_ids.last_id))
+    if html:
+        html = '<div class="pager">' + html + '</div>'
+    return html
 
 
 @jinja2.contextfilter
@@ -166,7 +166,7 @@ def display_form(self, form, form_id=None, for_persons=False):
             try:
                 hierarchy_id = int(field.id)
             except ValueError:
-                hierarchy_id = openatlas.NodeMapper.get_hierarchy_by_name(util.uc_first(field.id)).id
+                hierarchy_id = NodeMapper.get_hierarchy_by_name(util.uc_first(field.id)).id
             node = g.nodes[hierarchy_id]
             if node.name in app.config['BASE_TYPES']:
                 base_type = '<div class="table-row"><div><label>' + util.uc_first(_('type')) + '</label>'

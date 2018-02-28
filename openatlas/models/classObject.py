@@ -1,5 +1,5 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import session, g
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+from flask import g, session
 
 import openatlas
 from openatlas import app

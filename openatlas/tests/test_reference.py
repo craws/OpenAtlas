@@ -1,7 +1,7 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import url_for
 
-from openatlas import app, EntityMapper
+from openatlas import app
+from openatlas.models.entity import EntityMapper
 from openatlas.test_base import TestBaseCase
 
 
@@ -11,7 +11,7 @@ class ReferenceTest(TestBaseCase):
         self.login()
         with app.app_context():
 
-            # reference insert
+            # Reference insert
             rv = self.app.get(url_for('reference_insert', code='bibliography'))
             assert b'+ Bibliography' in rv.data
             rv = self.app.get(url_for('reference_insert', code='edition'))

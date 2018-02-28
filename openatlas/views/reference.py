@@ -1,19 +1,19 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import render_template, url_for, flash, request, g
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import StringField, TextAreaField, HiddenField, SubmitField
+from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired
 
 import openatlas
-from openatlas import app
-from openatlas.forms.forms import build_form, TableField
+from openatlas import app, logger
+from openatlas.forms.forms import TableField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import (uc_first, truncate_string, required_group, get_entity_data,
-                                 build_remove_link, get_base_table_data, is_authorized,
-                                 was_modified, link)
+from openatlas.util.util import (build_remove_link, get_base_table_data, get_entity_data,
+                                 is_authorized, link, required_group, truncate_string, uc_first,
+                                 was_modified)
 
 
 class ReferenceForm(Form):
@@ -72,14 +72,14 @@ def reference_add(origin_id):
 @app.route('/reference/add2/<int:reference_id>/<class_name>', methods=['POST', 'GET'])
 @required_group('editor')
 def reference_add2(reference_id, class_name):
-    """Link an entity to reference coming from the reference."""
-    reference = EntityMapper.get_by_id(reference_id)
-    form = getattr(openatlas.reference, 'Add' + uc_first(class_name) + 'Form')()
+    """ Link an entity to reference coming from the reference."""
+    reference_ = EntityMapper.get_by_id(reference_id)
+    form = getattr(openatlas.views.reference, 'Add' + uc_first(class_name) + 'Form')()
     if form.validate_on_submit():
-        reference.link('P67', int(getattr(form, class_name).data), form.page.data)
-        return redirect(url_for('reference_view', id_=reference.id) + '#tab-' + class_name)
+        reference_.link('P67', int(getattr(form, class_name).data), form.page.data)
+        return redirect(url_for('reference_view', id_=reference_.id) + '#tab-' + class_name)
     return render_template(
-        'reference/add.html', origin=reference, form=form, class_name='reference')
+        'reference/add.html', origin=reference_, form=form, class_name='reference')
 
 
 @app.route('/reference/link-update/<int:link_id>/<int:origin_id>', methods=['POST', 'GET'])
@@ -174,12 +174,12 @@ def reference_delete(id_):
     g.cursor.execute('BEGIN')
     try:
         EntityMapper.delete(id_)
-        openatlas.logger.log_user(id_, 'delete')
+        logger.log_user(id_, 'delete')
         g.cursor.execute('COMMIT')
         flash(_('entity deleted'), 'info')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        openatlas.logger.log('error', 'database', 'transaction failed', e)
+        logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
     return redirect(url_for('reference_index'))
 
@@ -193,7 +193,7 @@ def reference_update(id_):
         if was_modified(form, reference):  # pragma: no cover
             del form.save
             flash(_('error modified'), 'error')
-            modifier = link(openatlas.logger.get_log_for_advanced_view(reference.id)['modifier'])
+            modifier = link(logger.get_log_for_advanced_view(reference.id)['modifier'])
             return render_template(
                 'reference/update.html', form=form, reference=reference, modifier=modifier)
         if save(form, reference):
@@ -206,7 +206,7 @@ def save(form, reference, code=None, origin=None):
     g.cursor.execute('BEGIN')
     try:
         if reference:
-            openatlas.logger.log_user(reference.id, 'update')
+            logger.log_user(reference.id, 'update')
         else:
             class_code = 'E31'
             system_type = code
@@ -214,7 +214,7 @@ def save(form, reference, code=None, origin=None):
                 class_code = 'E84'
                 system_type = 'information carrier'
             reference = EntityMapper.insert(class_code, form.name.data, system_type)
-            openatlas.logger.log_user(reference.id, 'insert')
+            logger.log_user(reference.id, 'insert')
         reference.name = form.name.data
         reference.description = form.description.data
         reference.update()
@@ -223,7 +223,7 @@ def save(form, reference, code=None, origin=None):
         g.cursor.execute('COMMIT')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        openatlas.logger.log('error', 'database', 'transaction failed', e)
+        logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
         return
     return link_ if link_ else reference

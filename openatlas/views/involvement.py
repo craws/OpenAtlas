@@ -1,18 +1,18 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
 
-from flask import flash, render_template, url_for, request, g
+from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
-from wtforms import HiddenField, SubmitField, TextAreaField, SelectField
+from wtforms import HiddenField, SelectField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
-import openatlas
-from openatlas import app, NodeMapper
+from openatlas import app, logger
 from openatlas.forms.forms import DateForm, TableMultiField, build_form
 from openatlas.models.date import DateMapper
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
+from openatlas.models.node import NodeMapper
 from openatlas.util.util import required_group
 
 
@@ -63,7 +63,7 @@ def involvement_insert(origin_id):
             flash(_('entity created'), 'info')
         except Exception as e:  # pragma: no cover
             g.cursor.execute('ROLLBACK')
-            openatlas.logger.log('error', 'database', 'transaction failed', e)
+            logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         if form.continue_.data == 'yes':
             return redirect(url_for('involvement_insert', origin_id=origin_id))
@@ -98,7 +98,7 @@ def involvement_update(id_, origin_id):
             g.cursor.execute('COMMIT')
         except Exception as e:  # pragma: no cover
             g.cursor.execute('ROLLBACK')
-            openatlas.logger.log('error', 'database', 'transaction failed', e)
+            logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         class_ = app.config['CODE_CLASS'][origin.class_.code]
         tab = 'actor' if class_ == 'event' else 'event'

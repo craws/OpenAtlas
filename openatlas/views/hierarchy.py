@@ -1,15 +1,16 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import abort, render_template, flash, url_for, g
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+from flask import abort, flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import StringField, SubmitField, TextAreaField, BooleanField, SelectMultipleField
-from wtforms import widgets
+from wtforms import (BooleanField, SelectMultipleField, StringField, SubmitField, TextAreaField,
+                     widgets)
 from wtforms.validators import DataRequired
 
-import openatlas
-from openatlas import app, NodeMapper, EntityMapper
+from openatlas import app, logger
 from openatlas.forms.forms import build_form
+from openatlas.models.entity import EntityMapper
+from openatlas.models.node import NodeMapper
 from openatlas.util.util import required_group, sanitize
 
 
@@ -81,7 +82,7 @@ def hierarchy_delete(id_):
         flash(_('entity deleted'), 'info')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        openatlas.logger.log('error', 'database', 'transaction failed', e)
+        logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
     return redirect(url_for('node_index'))
 
@@ -101,6 +102,6 @@ def save(form, node=None):
         g.cursor.execute('COMMIT')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        openatlas.logger.log('error', 'database', 'transaction failed', e)
+        logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
     return node

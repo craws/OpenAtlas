@@ -1,20 +1,20 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import abort, flash, session, g
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+from flask import abort, flash, g, session
 from flask_babel import lazy_gettext as _
 
-import openatlas
-from openatlas import app
+from openatlas import app, debug_model, logger
 
 
 class Link:
 
     def __init__(self, row):
+        from openatlas.models.entity import EntityMapper
         self.id = row.id
         self.description = row.description
         self.property = g.properties[row.property_code]
         # Todo: performance - if it's a node don't call get_by_id
-        self.domain = openatlas.EntityMapper.get_by_id(row.domain_id)
-        self.range = openatlas.EntityMapper.get_by_id(row.range_id)
+        self.domain = EntityMapper.get_by_id(row.domain_id)
+        self.range = EntityMapper.get_by_id(row.range_id)
         self.type = g.nodes[row.type_id] if row.type_id else None
         self.first = int(row.first) if hasattr(row, 'first') and row.first else None
         self.last = int(row.last) if hasattr(row, 'last') and row.last else None
@@ -61,7 +61,7 @@ class LinkMapper:
                 if domain_error or range_error:
                     text = _('error link') + ': ' + domain_class.name + ' > '
                     text += property_code + ' > ' + range_class.name
-                    openatlas.logger.log('error', 'model', text)
+                    logger.log('error', 'model', text)
                     flash(text, 'error')
                     continue
             sql = """
@@ -74,7 +74,7 @@ class LinkMapper:
                 'domain_id': domain_id,
                 'range_id': range_id,
                 'description': description})
-            openatlas.debug_model['div sql'] += 1
+            debug_model['div sql'] += 1
             result = g.cursor.fetchone()[0]
         return result
 
@@ -83,7 +83,7 @@ class LinkMapper:
         result = LinkMapper.get_linked_entities(entity_param, code, inverse)
         if len(result) > 1:  # pragma: no cover
             message = 'multiple linked entities found for ' + code
-            openatlas.logger.log('error', 'model', message)
+            logger.log('error', 'model', message)
             flash(_('error multiple linked entities found'), 'error')
             return result[0]  # return first one nevertheless
         if result:
@@ -91,6 +91,7 @@ class LinkMapper:
 
     @staticmethod
     def get_linked_entities(entity, codes, inverse=False):
+        from openatlas.models.entity import EntityMapper
         sql = """
             SELECT range_id AS result_id FROM model.link
             WHERE domain_id = %(entity_id)s AND property_code IN %(codes)s;"""
@@ -101,9 +102,9 @@ class LinkMapper:
         g.cursor.execute(sql, {
             'entity_id': entity if isinstance(entity, int) else entity.id,
             'codes': tuple(codes if isinstance(codes, list) else [codes])})
-        openatlas.debug_model['div sql'] += 1
+        debug_model['div sql'] += 1
         ids = [element for (element,) in g.cursor.fetchall()]
-        return openatlas.EntityMapper.get_by_ids(ids)
+        return EntityMapper.get_by_ids(ids)
 
     @staticmethod
     def get_links(entity, codes, inverse=False):
@@ -128,7 +129,7 @@ class LinkMapper:
         g.cursor.execute(sql, {
             'entity_id': entity if isinstance(entity, int) else entity.id,
             'codes': tuple(codes if isinstance(codes, list) else [codes])})
-        openatlas.debug_model['div sql'] += 1
+        debug_model['div sql'] += 1
         links = []
         for row in g.cursor.fetchall():
             links.append(Link(row))
@@ -159,7 +160,7 @@ class LinkMapper:
             LEFT JOIN model.entity d2 ON dl2.range_id = d2.id
             WHERE l.id = %(id)s GROUP BY l.id;"""
         g.cursor.execute(sql, {'id': id_})
-        openatlas.debug_model['div sql'] += 1
+        debug_model['div sql'] += 1
         return Link(g.cursor.fetchone())
 
     @staticmethod
@@ -179,4 +180,4 @@ class LinkMapper:
             'domain_id': link.domain.id,
             'range_id': link.range.id,
             'description': link.description})
-        openatlas.debug_model['div sql'] += 1
+        debug_model['div sql'] += 1

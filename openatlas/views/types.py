@@ -1,17 +1,18 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
 
-from flask import abort, render_template, flash, url_for, request, g
+from flask import abort, flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired
 
-import openatlas
-from openatlas import app, NodeMapper, EntityMapper
+from openatlas import app, logger
 from openatlas.forms.forms import build_node_form
-from openatlas.util.util import required_group, sanitize, link, truncate_string
+from openatlas.models.entity import EntityMapper
+from openatlas.models.node import NodeMapper
+from openatlas.util.util import link, required_group, sanitize, truncate_string
 
 
 class NodeForm(Form):
@@ -111,7 +112,7 @@ def node_delete(id_):
         flash(_('entity deleted'), 'info')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        openatlas.logger.log('error', 'database', 'transaction failed', e)
+        logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
     root = g.nodes[node.root[-1]] if node.root else None
     if root:
@@ -187,7 +188,7 @@ def save(form, node=None, root=None):
         g.cursor.execute('COMMIT')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        openatlas.logger.log('error', 'database', 'transaction failed', e)
+        logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
         return
     return node

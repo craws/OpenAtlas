@@ -1,9 +1,9 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
 
-from flask import json, g
+from flask import g, json
 
-import openatlas
+from openatlas.models.node import NodeMapper
 from openatlas.util.util import uc_first
 
 
@@ -44,7 +44,7 @@ class GisMapper:
                         shape=shape,
                         polygon_point_sql=polygon_point_sql if shape == 'polygon' else '')
             g.cursor.execute(sql)
-            place_type_root_id = openatlas.NodeMapper.get_hierarchy_by_name('Place').id
+            place_type_root_id = NodeMapper.get_hierarchy_by_name('Place').id
             for row in g.cursor.fetchall():
                 description = row.description.replace('"', '\"') if row.description else ''
                 object_desc = row.object_desc.replace('"', '\"') if row.object_desc else ''

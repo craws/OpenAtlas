@@ -1,16 +1,15 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import render_template, url_for, flash, request, g
+# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import StringField, TextAreaField, HiddenField, SubmitField
+from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired
 
-import openatlas
-from openatlas import app
+from openatlas import app, logger
 from openatlas.forms.forms import build_form
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import required_group, get_entity_data
+from openatlas.util.util import get_entity_data, required_group
 
 
 class TranslationForm(Form):
@@ -57,7 +56,7 @@ def translation_delete(id_, source_id):
         flash(_('entity deleted'), 'info')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        openatlas.logger.log('error', 'database', 'transaction failed', e)
+        logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
     return redirect(url_for('source_view', id_=source_id))
 
@@ -83,11 +82,11 @@ def save(form, entity=None, source=None):
     g.cursor.execute('BEGIN')
     try:
         if entity:
-            openatlas.logger.log_user(entity.id, 'update')
+            logger.log_user(entity.id, 'update')
         else:
             entity = EntityMapper.insert('E33', form.name.data, 'source translation')
             source.link('P73', entity)
-            openatlas.logger.log_user(entity.id, 'insert')
+            logger.log_user(entity.id, 'insert')
         entity.name = form.name.data
         entity.description = form.description.data
         entity.update()
@@ -95,6 +94,6 @@ def save(form, entity=None, source=None):
         g.cursor.execute('COMMIT')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        openatlas.logger.log('error', 'database', 'transaction failed', e)
+        logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
     return entity
