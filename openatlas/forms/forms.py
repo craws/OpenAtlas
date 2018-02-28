@@ -41,10 +41,10 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
             if hasattr(form, 'opened'):
                 form_instance.opened.data = time.time()
         else:
-            nodes = [entity.type] if entity.type else []  # it's a link so use the link.type
+            nodes = [entity.type] if entity.type else []  # It's a link so use the link.type
         for node in nodes:
             root = g.nodes[node.root[-1]] if node.root else node
-            if root.id not in node_data:  # append only non root nodes
+            if root.id not in node_data:  # Append only non root nodes
                 node_data[root.id] = []
             node_data[root.id].append(node.id)
         for root_id, nodes in node_data.items():

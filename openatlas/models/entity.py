@@ -135,6 +135,16 @@ class EntityMapper:
             'description': sanitize(entity.description, 'description')})
 
     @staticmethod
+    def get_by_system_type(system_type):
+        sql = EntityMapper.sql
+        sql += ' WHERE e.system_type = %(system_type)s GROUP BY e.id ORDER BY e.name;'
+        g.cursor.execute(sql, {'system_type': system_type})
+        entities = []
+        for row in g.cursor.fetchall():
+            entities.append(Entity(row))
+        return entities
+
+    @staticmethod
     def insert(code, name, system_type=None, description=None, date=None):
         if not name and not date:  # pragma: no cover
             logger.log('error', 'database', 'Insert entity without name and date')
@@ -177,7 +187,11 @@ class EntityMapper:
     def get_by_codes(class_name):
         if class_name == 'source':
             sql = EntityMapper.sql + """
-                WHERE e.class_code IN %(codes)s AND e.system_type ='source content'
+                WHERE e.class_code IN %(codes)s AND e.system_type = 'source content'
+                GROUP BY e.id ORDER BY e.name;"""
+        elif class_name == 'reference':
+            sql = EntityMapper.sql + """
+                WHERE e.class_code IN %(codes)s AND e.system_type != 'file'
                 GROUP BY e.id ORDER BY e.name;"""
         else:
             sql = EntityMapper.sql + """

@@ -38,7 +38,7 @@ def convert_size(size_bytes):
 def print_file_size(entity):
     path = glob.glob(os.path.join(app.config['UPLOAD_FOLDER'], str(entity.id) + '.*'))
     if path:
-        return convert_size(os.path.getsize(path))
+        return convert_size(os.path.getsize(path[0]))
     return 'N/A'
 
 
@@ -166,6 +166,10 @@ def get_entity_data(entity, location=None):
         aliases = entity.get_linked_entities('P1')
         if aliases:
             data.append((uc_first(_('alias')), '<br />'.join([x.name for x in aliases])))
+
+    # Info for files
+    if entity.system_type == 'file':
+        data.append((uc_first(_('size')), print_file_size(entity)))
 
     # Info for events
     if entity.class_.code in app.config['CLASS_CODES']['event']:
@@ -440,7 +444,7 @@ def pager(table):
     for header in table['header']:
         style = '' if header else 'class=sorter-false '  # only show and sort headers with a title
         html += '<th ' + style + '>' + (_(header).capitalize() if header else '') + '</th>'
-    # append missing headers
+    # Append missing headers
     html += '<th class=sorter-false></th>' * (len(table['data'][0]) - len(table['header']))
     html += '</tr></thead><tbody>'
     for row in table['data']:
@@ -480,15 +484,20 @@ def pager(table):
 
 
 def get_base_table_data(entity):
-    """Returns standard table data for an entity"""
+    """ Returns standard table data for an entity"""
+    data = []
+    if entity.system_type == 'file':
+        data.append(format_date(entity.created))
     name = app.config['CODE_CLASS'][entity.class_.code]
-    data = [link(entity)]
+    data.append(link(entity))
     if name in ['event', 'actor']:
         data.append(g.classes[entity.class_.code].name)
-    if name in ['reference']:
+    if name in ['reference'] and entity.system_type != 'file':
         data.append(uc_first(_(entity.system_type)))
-    if name in ['event', 'place', 'source', 'reference']:
+    if name in ['event', 'place', 'source', 'reference', 'file']:
         data.append(entity.print_base_type())
+    if entity.system_type == 'file':
+        data.append(print_file_size(entity))
     if name in ['event', 'actor', 'place']:
         data.append(format(entity.first))
         data.append(format(entity.last))
@@ -496,7 +505,7 @@ def get_base_table_data(entity):
 
 
 def was_modified(form, entity):   # pragma: no cover
-    """Checks if an entity was modified after an update form was opened."""
+    """ Checks if an entity was modified after an update form was opened."""
     if not entity.modified or not form.opened.data:
         return False
     if entity.modified < datetime.fromtimestamp(float(form.opened.data)):

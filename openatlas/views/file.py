@@ -6,15 +6,15 @@ from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect, secure_filename
-from wtforms import FileField, StringField, SubmitField, TextAreaField
+from wtforms import FileField, HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired, InputRequired
 
 import openatlas
-from openatlas import app
-from openatlas.forms.forms import TableMultiField
+from openatlas import app, logger
+from openatlas.forms.forms import TableMultiField, build_form
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import (format_date, get_base_table_data, get_entity_data, link,
-                                 print_file_size, required_group, truncate_string, uc_first)
+from openatlas.util.util import (get_base_table_data, get_entity_data, link,
+                                 required_group, truncate_string, was_modified)
 
 
 class FileForm(Form):
@@ -27,6 +27,7 @@ class FileForm(Form):
     reference = TableMultiField(_('reference'))
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
+    opened = HiddenField()
 
 
 def allowed_file(name):
@@ -39,12 +40,9 @@ def file_index():
     headers = ['date', 'name', 'license', 'size', 'description']
     table = {'id': 'files', 'header': headers, 'data': []}
     for file in EntityMapper.get_by_system_type('file'):
-        table['data'].append([
-            format_date(file.created),
-            link(file),
-            uc_first(_('license')),
-            print_file_size(file),
-            truncate_string(file.description)])
+        data = get_base_table_data(file)
+        data.append(truncate_string(file.description))
+        table['data'].append(data)
     return render_template('file/index.html', table=table)
 
 
@@ -71,17 +69,28 @@ def file_view(id_):
 
 
 @app.route('/file/update/<int:id_>', methods=['GET', 'POST'])
-@required_group('readonly')
+@required_group('editor')
 def file_update(id_):
-    form = FileForm()
-    return render_template('file/update.html', form=form)
+    file = EntityMapper.get_by_id(id_)
+    form = build_form(FileForm, 'File', file, request)
+    del form.file
+    if form.validate_on_submit():
+        if was_modified(form, file):  # pragma: no cover
+            del form.save
+            flash(_('error modified'), 'error')
+            modifier = link(logger.get_log_for_advanced_view(file.id)['modifier'])
+            return render_template('file/update.html', form=form, file=file, modifier=modifier)
+        if save(form, file):
+            flash(_('info update'), 'info')
+        return redirect(url_for('file_view', id_=id_))
+    return render_template('file/update.html', form=form, file=file)
 
 
 @app.route('/file/insert/<int:origin_id>', methods=['GET', 'POST'])
 @required_group('editor')
 def file_insert(origin_id):
     origin = EntityMapper.get_by_id(origin_id) if origin_id and origin_id != 0 else None
-    form = FileForm()
+    form = build_form(FileForm, 'File')
     if form.validate_on_submit():
         entity = save(form)
         if origin:
@@ -104,13 +113,16 @@ def save(form, entity=None):
                 new_name = str(entity.id) + '.' + filename.rsplit('.', 1)[1].lower()
                 full_path = os.path.join(app.config['UPLOAD_FOLDER'], new_name)
                 file_.save(full_path)
+                logger.log_user(file_.id, 'insert')
             else:
-                return 1 / 0
+                1/0  # Todo: give feedback if upload failed
         else:
             entity.delete_links('P67')
+            logger.log_user(entity.id, 'update')
         entity.name = form.name.data
         entity.description = form.description.data
         entity.update()
+        entity.save_nodes(form)
         link_data = []
         for name in ['source', 'event', 'actor', 'place', 'reference']:
             data = getattr(form, name).data
@@ -118,7 +130,7 @@ def save(form, entity=None):
                 link_data = link_data + ast.literal_eval(data)
         if link_data:
             entity.link('P67', link_data)
-            g.cursor.execute('COMMIT')
+        g.cursor.execute('COMMIT')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
