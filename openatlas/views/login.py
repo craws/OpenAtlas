@@ -89,6 +89,8 @@ def send_login_mail(user):  # pragma: no cover
 
 @app.route('/password_reset', methods=["GET", "POST"])
 def reset_password():
+    if current_user.is_authenticated:  # prevent password reset if already logged in
+        return redirect(url_for('index'))
     form = PasswordResetForm()
     if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
         user = UserMapper.get_by_email(form.email.data)
