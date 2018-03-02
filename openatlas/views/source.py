@@ -27,11 +27,9 @@ class SourceForm(Form):
 @app.route('/source')
 @required_group('readonly')
 def source_index():
-    header = app.config['TABLE_HEADERS']['source'] + ['description']
-    table = {'id': 'source', 'header': header, 'data': []}
+    table = {'id': 'source', 'header': app.config['TABLE_HEADERS']['source'], 'data': []}
     for source in EntityMapper.get_by_codes('source'):
         data = get_base_table_data(source)
-        data.append(truncate_string(source.description))
         table['data'].append(data)
     return render_template('source/index.html', table=table)
 
@@ -123,7 +121,7 @@ def source_add(origin_id):
 @app.route('/source/add2/<int:id_>/<class_name>', methods=['POST', 'GET'])
 @required_group('editor')
 def source_add2(id_, class_name):
-    """ Link an entity to source coming from the source."""
+    """ Link an entity to source coming from the source"""
     source = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
         for value in request.form.getlist('values'):

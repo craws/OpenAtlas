@@ -420,7 +420,7 @@ def pager(table):
     table_rows = session['settings']['default_table_rows']
     if hasattr(current_user, 'settings'):
         table_rows = current_user.settings['table_rows']
-    show_pager = False if len(table['data']) < table_rows else True
+    show_pager = False if table['id'] in ['overview', 'bookmarks', 'latest'] else True
     if show_pager:
         options = ''
         for amount in app.config['DEFAULT_TABLE_ROWS']:
@@ -476,9 +476,17 @@ def pager(table):
             id=table['id'],
             sort=sort,
             size=table_rows,
-            headers='' if 'headers' not in table else table['headers'] + ',')
+            headers=(table['headers'] + ',') if 'headers' in table else '')
     else:
-        html += '$("#' + table['id'] + '-table").tablesorter({' + sort + 'widgets:[\'zebra\']});'
+        html += """
+            $("#{id}-table").tablesorter({{
+                {sort}
+                widgets: [\'zebra\', \'filter\'],
+                widgetOptions: {{
+                    filter_external: \'#{id}-search\',
+                    filter_columnFilters: false
+                }}}});
+        """.format(id=table['id'], sort=sort, )
     html += '</script>'
     return html
 
@@ -501,6 +509,8 @@ def get_base_table_data(entity):
     if name in ['event', 'actor', 'place']:
         data.append(format(entity.first))
         data.append(format(entity.last))
+    if name in ['source']:
+        data.append(truncate_string(entity.description))
     return data
 
 

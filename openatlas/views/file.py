@@ -20,11 +20,6 @@ from openatlas.util.util import (get_base_table_data, get_entity_data, link,
 class FileForm(Form):
     file = FileField(_('file'), [InputRequired()])
     name = StringField(_('name'), [DataRequired()])
-    source = TableMultiField(_('source'))
-    event = TableMultiField(_('event'))
-    actor = TableMultiField(_('actor'))
-    place = TableMultiField(_('place'))
-    reference = TableMultiField(_('reference'))
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     opened = HiddenField()
@@ -58,12 +53,11 @@ def file_view(id_):
     entity = EntityMapper.get_by_id(id_)
     tables = {'info': get_entity_data(entity)}
     for name in ['source', 'event', 'actor', 'place', 'reference']:
-        header = app.config['TABLE_HEADERS'][name] + ['page']
+        header = app.config['TABLE_HEADERS'][name]
         tables[name] = {'id': name, 'header': header, 'data': []}
     for link_ in entity.get_links('P67'):
         name = app.config['CODE_CLASS'][link_.range.class_.code]
         data = get_base_table_data(link_.range)
-        data.append(truncate_string(link_.description))
         tables[name]['data'].append(data)
     return render_template('file/view.html', entity=entity, tables=tables)
 
@@ -92,20 +86,20 @@ def file_insert(origin_id):
     origin = EntityMapper.get_by_id(origin_id) if origin_id and origin_id != 0 else None
     form = build_form(FileForm, 'File')
     if form.validate_on_submit():
-        entity = save(form)
+        entity = save(form, origin_id)
         if origin:
             view = app.config['CODE_CLASS'][origin.class_.code]
             return redirect(url_for(view + '_view', id_=origin.id) + '#tab-file')
         return redirect(url_for('file_view', id_=entity.id))
-    if origin_id:
-        getattr(form, app.config['CODE_CLASS'][origin.class_.code]).data = [origin.id]
     return render_template('file/insert.html', form=form)
 
 
 def save(form, entity=None):
     g.cursor.execute('BEGIN')
     try:
-        if not entity:
+        if entity:
+            logger.log_user(entity.id, 'update')
+        else:
             file_ = request.files['file']
             if file_ and allowed_file(file_.filename):
                 entity = EntityMapper.insert('E31', form.name.data, 'file')
@@ -116,20 +110,10 @@ def save(form, entity=None):
                 logger.log_user(file_.id, 'insert')
             else:
                 1/0  # Todo: give feedback if upload failed
-        else:
-            entity.delete_links('P67')
-            logger.log_user(entity.id, 'update')
         entity.name = form.name.data
         entity.description = form.description.data
         entity.update()
         entity.save_nodes(form)
-        link_data = []
-        for name in ['source', 'event', 'actor', 'place', 'reference']:
-            data = getattr(form, name).data
-            if data:
-                link_data = link_data + ast.literal_eval(data)
-        if link_data:
-            entity.link('P67', link_data)
         g.cursor.execute('COMMIT')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
