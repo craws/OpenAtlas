@@ -99,7 +99,7 @@ def admin_newsletter():
         recipients = 0
         for user_id in (request.form.getlist('recipient')):
             user = UserMapper.get_by_id(user_id)
-            if user.settings['newsletter']:
+            if user.settings['newsletter'] and user.active:
                 code = UserMapper.generate_password()
                 user.unsubscribe_code = code
                 user.update()
@@ -112,7 +112,7 @@ def admin_newsletter():
         return redirect(url_for('admin_index'))
     table = {'id': 'user', 'header': ['username', 'email', 'receiver'], 'data': []}
     for user in UserMapper.get_all():
-        if user.settings['newsletter']:  # pragma: no cover
+        if user.settings['newsletter'] and user.active:  # pragma: no cover
             checkbox = '<input value="' + str(user.id) + '" name="recipient"'
             checkbox += ' type="checkbox" checked="checked">'
             table['data'].append([user.username, user.email, checkbox])
