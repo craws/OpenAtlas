@@ -118,7 +118,11 @@ def build_table_form(class_name, linked_entities):
     header = app.config['TABLE_HEADERS'][class_name] + ['']
     table = {'id': class_name, 'header': header, 'data': []}
     linked_ids = [entity.id for entity in linked_entities]
-    for entity in EntityMapper.get_by_codes(class_name):
+    if class_name == 'file':
+        entities = EntityMapper.get_by_system_type('file')
+    else:
+        entities = EntityMapper.get_by_codes(class_name)
+    for entity in entities:
         if entity.id in linked_ids:
             continue  # don't show already linked entries
         input_ = '<input id="{id}" name="values" type="checkbox" value="{id}">'.format(id=entity.id)
@@ -509,7 +513,7 @@ def get_base_table_data(entity):
     if name in ['event', 'actor', 'place']:
         data.append(format(entity.first))
         data.append(format(entity.last))
-    if name in ['source']:
+    if name in ['source'] or entity.system_type == 'file':
         data.append(truncate_string(entity.description))
     return data
 

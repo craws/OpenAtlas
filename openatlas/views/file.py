@@ -1,5 +1,4 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-import ast
 import os
 
 from flask import flash, g, render_template, request, url_for
@@ -11,10 +10,11 @@ from wtforms.validators import DataRequired, InputRequired
 
 import openatlas
 from openatlas import app, logger
-from openatlas.forms.forms import TableMultiField, build_form
+from openatlas.forms.forms import build_form
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import (get_base_table_data, get_entity_data, link,
-                                 required_group, truncate_string, was_modified)
+from openatlas.models.link import LinkMapper
+from openatlas.util.util import (build_table_form, get_base_table_data, get_entity_data, link,
+                                 required_group, was_modified)
 
 
 class FileForm(Form):
@@ -35,16 +35,29 @@ def file_index():
     headers = ['date', 'name', 'license', 'size', 'description']
     table = {'id': 'files', 'header': headers, 'data': []}
     for file in EntityMapper.get_by_system_type('file'):
-        data = get_base_table_data(file)
-        data.append(truncate_string(file.description))
-        table['data'].append(data)
+        table['data'].append(get_base_table_data(file))
     return render_template('file/index.html', table=table)
 
 
 @app.route('/file/add/<int:origin_id>', methods=['GET', 'POST'])
 @required_group('editor')
 def file_add(origin_id):
-    return render_template('file/add.html')
+    """ Link an entity to file coming from the entity."""
+    origin = EntityMapper.get_by_id(origin_id)
+    if request.method == 'POST':
+        g.cursor.execute('BEGIN')
+        try:
+            for value in request.form.getlist('values'):
+                LinkMapper.insert(int(value), 'P67', origin.id)
+            g.cursor.execute('COMMIT')
+        except Exception as e:  # pragma: no cover
+            g.cursor.execute('ROLLBACK')
+            logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
+        view_name = app.config['CODE_CLASS'][origin.class_.code]
+        return redirect(url_for(view_name + '_view', id_=origin.id) + '#tab-file')
+    form = build_table_form('file', origin.get_linked_entities('P67', True))
+    return render_template('file/add.html', origin=origin, form=form)
 
 
 @app.route('/file/view/<int:id_>')
@@ -82,19 +95,15 @@ def file_update(id_):
 
 @app.route('/file/insert/<int:origin_id>', methods=['GET', 'POST'])
 @required_group('editor')
-def file_insert(origin_id):
-    origin = EntityMapper.get_by_id(origin_id) if origin_id and origin_id != 0 else None
+def file_insert(origin_id=None):
+    origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(FileForm, 'File')
     if form.validate_on_submit():
-        entity = save(form, origin_id)
-        if origin:
-            view = app.config['CODE_CLASS'][origin.class_.code]
-            return redirect(url_for(view + '_view', id_=origin.id) + '#tab-file')
-        return redirect(url_for('file_view', id_=entity.id))
-    return render_template('file/insert.html', form=form)
+        return redirect(save(form, None, origin))
+    return render_template('file/insert.html', form=form, origin=origin)
 
 
-def save(form, entity=None):
+def save(form, entity=None, origin=None):
     g.cursor.execute('BEGIN')
     try:
         if entity:
@@ -107,17 +116,22 @@ def save(form, entity=None):
                 new_name = str(entity.id) + '.' + filename.rsplit('.', 1)[1].lower()
                 full_path = os.path.join(app.config['UPLOAD_FOLDER'], new_name)
                 file_.save(full_path)
-                logger.log_user(file_.id, 'insert')
+                logger.log_user(entity.id, 'insert')
             else:
                 1/0  # Todo: give feedback if upload failed
         entity.name = form.name.data
         entity.description = form.description.data
         entity.update()
         entity.save_nodes(form)
+        url = url_for('file_view', id_=entity.id)
+        if origin:
+            entity.link('P67', origin)
+            view = app.config['CODE_CLASS'][origin.class_.code]
+            url = url_for(view + '_view', id_=origin.id) + '#tab-file'
         g.cursor.execute('COMMIT')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
-        return
-    return entity
+        url = url_for('file_insert', origin_id=origin.id if origin else None)
+    return url

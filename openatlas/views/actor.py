@@ -11,7 +11,7 @@ from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
 from openatlas.models.link import Link, LinkMapper
 from openatlas.util.util import (build_remove_link, get_base_table_data, get_entity_data,
-                                 is_authorized, link, print_file_size, required_group,
+                                 is_authorized, link, required_group,
                                  truncate_string, uc_first, was_modified)
 
 
@@ -70,24 +70,18 @@ def actor_view(id_, unlink_id=None):
         'member_of': {
             'id': 'member_of', 'data': [],
             'header': ['member of', 'function', 'first', 'last', 'description']}}
-    for file in actor.get_linked_entities('P67', True):
-        tables['file']['data'].append([
-            link(file),
-            uc_first(_('license')),
-            print_file_size(file),
-            truncate_string(file.description)])
     for link_ in actor.get_links('P67', True):
-        name = app.config['CODE_CLASS'][link_.domain.class_.code]
         data = get_base_table_data(link_.domain)
-        if name == 'source':
-            data.append(truncate_string(link_.domain.description))
-        else:
+        name = 'file'
+        if link_.domain.system_type != 'file':
+            name = app.config['CODE_CLASS'][link_.domain.class_.code]
+        if name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
             if is_authorized('editor'):
                 update_url = url_for('reference_link_update', link_id=link_.id, origin_id=actor.id)
                 data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
         if is_authorized('editor'):
-            unlink_url = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab' + name
+            unlink_url = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab-' + name
             data.append(build_remove_link(unlink_url, link_.domain.name))
         tables[name]['data'].append(data)
     for link_ in actor.get_links(['P11', 'P14', 'P22', 'P23'], True):

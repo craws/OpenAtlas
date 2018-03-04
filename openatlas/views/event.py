@@ -137,10 +137,17 @@ def event_view(id_, unlink_id=None):
     event.set_dates()
     tables = {
         'info': get_entity_data(event),
+        'file': {'id': 'files', 'data': [], 'header': app.config['TABLE_HEADERS']['file']},
+        'subs': {'id': 'sub-event', 'data': [], 'header': app.config['TABLE_HEADERS']['event']},
         'actor': {
-            'id': 'actor',
-            'header': ['actor', 'class', 'involvement', 'first', 'last', 'description'],
-            'data': []}}
+            'id': 'actor', 'data': [],
+            'header': ['actor', 'class', 'involvement', 'first', 'last', 'description']},
+        'source': {
+            'id': 'source', 'data': [],
+            'header': app.config['TABLE_HEADERS']['source'] + ['description']},
+        'reference': {
+            'id': 'reference', 'data': [],
+            'header': app.config['TABLE_HEADERS']['reference'] + ['pages']}}
     for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
         first = link_.first
         if not link_.first and event.first:
@@ -161,18 +168,12 @@ def event_view(id_, unlink_id=None):
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             data.append(build_remove_link(unlink_url, link_.range.name))
         tables['actor']['data'].append(data)
-    tables['source'] = {
-        'id': 'source', 'header': app.config['TABLE_HEADERS']['source'] + ['description'],
-        'data': []}
-    tables['reference'] = {
-        'id': 'reference', 'header': app.config['TABLE_HEADERS']['reference'] + ['pages'],
-        'data': []}
     for link_ in event.get_links('P67', True):
-        name = app.config['CODE_CLASS'][link_.domain.class_.code]
         data = get_base_table_data(link_.domain)
-        if name == 'source':
-            data.append(truncate_string(link_.domain.description))
-        else:
+        name = 'file'
+        if link_.domain.system_type != 'file':
+            name = app.config['CODE_CLASS'][link_.domain.class_.code]
+        if name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
             if is_authorized('editor'):
                 update_url = url_for('reference_link_update', link_id=link_.id, origin_id=event.id)
@@ -181,10 +182,6 @@ def event_view(id_, unlink_id=None):
             unlink_url = url_for('event_view', id_=event.id, unlink_id=link_.id) + '#tab-' + name
             data.append(build_remove_link(unlink_url, link_.domain.name))
         tables[name]['data'].append(data)
-    tables['subs'] = {
-        'id': 'sub-event',
-        'header': app.config['TABLE_HEADERS']['event'],
-        'data': []}
     for sub_event in event.get_linked_entities('P117', True):
         tables['subs']['data'].append(get_base_table_data(sub_event))
     return render_template('event/view.html', event=event, tables=tables)

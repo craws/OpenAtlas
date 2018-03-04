@@ -1,7 +1,14 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('file_index') }}">{{ _('files')|uc_first }}</a>
-    > +
+    {% if origin %}
+        <a href="{{ url_for(config['CODE_CLASS'][origin.class_.code] + '_index') }}">
+            {{ _(config['CODE_CLASS'][origin.class_.code])|uc_first }}
+        </a>
+        > {{ origin|link|safe }}
+    {% else %}
+        <a href="{{ url_for('file_index') }}">{{ _('files')|uc_first }}</a>
+    {% endif %}
+    > + {{ _('file')|uc_first }}
 {% endblock %}
 {% block content %}
     {{ form|display_form|safe }}

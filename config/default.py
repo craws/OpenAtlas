@@ -78,6 +78,6 @@ TABLE_HEADERS = {
     'group': ['name', 'class', 'first', 'last'],
     'place': ['name', 'type', 'first', 'last'],
     'reference': ['name', 'class', 'type'],
-    'file': ['name', 'license', 'size', 'description']}
+    'file': ['date', 'name', 'license', 'size', 'description']}
 
 BASE_TYPES = ['Place', 'Information Carrier', 'Bibliography', 'Source', 'Edition', 'Event', 'Actor']

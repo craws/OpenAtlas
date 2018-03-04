@@ -75,18 +75,21 @@ def place_view(id_, unlink_id=None):
     location = object_.get_linked_entity('P53')
     tables = {
         'info': get_entity_data(object_, location),
-        'source': {
-            'id': 'source', 'header': app.config['TABLE_HEADERS']['source'] + ['description'],
-            'data': []},
+        'file': {'id': 'files', 'data': [], 'header': app.config['TABLE_HEADERS']['file']},
+        'source': {'id': 'source', 'data': [], 'header': app.config['TABLE_HEADERS']['source']},
+        'event': {'id': 'event', 'data': [], 'header': app.config['TABLE_HEADERS']['event']},
         'reference': {
-            'id': 'reference', 'header': app.config['TABLE_HEADERS']['reference'] + ['pages'],
-            'data': []}}
+            'id': 'reference', 'data': [],
+            'header': app.config['TABLE_HEADERS']['reference'] + ['pages']},
+        'actor': {
+            'id': 'actor', 'data': [],
+            'header': [_('actor'), _('property'), _('class'), _('first'), _('last')]}}
     for link_ in object_.get_links('P67', True):
-        name = app.config['CODE_CLASS'][link_.domain.class_.code]
         data = get_base_table_data(link_.domain)
-        if name == 'source':
-            data.append(truncate_string(link_.domain.description))
-        else:
+        name = 'file'
+        if link_.domain.system_type != 'file':
+            name = app.config['CODE_CLASS'][link_.domain.class_.code]
+        if name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
             if is_authorized('editor'):
                 url = url_for('reference_link_update', link_id=link_.id, origin_id=object_.id)
@@ -95,16 +98,9 @@ def place_view(id_, unlink_id=None):
             unlink_url = url_for('place_view', id_=object_.id, unlink_id=link_.id) + '#tab-' + name
             data.append(build_remove_link(unlink_url, link_.domain.name))
         tables[name]['data'].append(data)
-    tables['event'] = {
-        'id': 'event',
-        'header': app.config['TABLE_HEADERS']['event'],
-        'data': []}
+
     for event in location.get_linked_entities(['P7', 'P24'], True):
         tables['event']['data'].append(get_base_table_data(event))
-    tables['actor'] = {
-        'id': 'actor',
-        'header': [_('actor'), _('property'), _('class'), _('first'), _('last')],
-        'data': []}
     for link_ in location.get_links(['P74', 'OA8', 'OA9'], True):
         actor = EntityMapper.get_by_id(link_.domain.id)
         tables['actor']['data'].append([
