@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2018-02-21 16:57+0100\n"
-"PO-Revision-Date: 2018-02-21 16:57+0100\n"
+"PO-Revision-Date: 2018-03-06 20:00+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: de\n"
 "Language-Team: de <LL@li.org>\n"
@@ -1310,12 +1310,12 @@ msgstr "Der User wurde angelegt."
 #: views/user.py:169
 #, python-format
 msgid "Your account information for %(sitename)s"
-msgstr "eine Zugangsdaten für %(sitename)s"
+msgstr "Zugangsdaten für %(sitename)s"
 
 #: views/user.py:172
 #, python-format
 msgid "Account information for %(username)s"
-msgstr "Zugangs Information für %(username)s"
+msgstr "Zugangsdaten für %(username)s"
 
 #: views/user.py:178
 #, python-format
