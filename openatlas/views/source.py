@@ -68,7 +68,11 @@ def source_view(id_, unlink_id=None):
         flash(_('link removed'), 'info')
     tables = {
         'info': get_entity_data(source),
-        'text': {'id': 'translation', 'header': ['text', 'type', 'content'], 'data': []}}
+        'text': {'id': 'translation', 'data': [], 'header': ['text', 'type', 'content']},
+        'file': {'id': 'files', 'data': [], 'header': app.config['TABLE_HEADERS']['file']},
+        'reference': {
+            'id': 'source', 'data': [],
+            'header': app.config['TABLE_HEADERS']['reference'] + ['page']}}
     for text in source.get_linked_entities('P73'):
         tables['text']['data'].append([
             link(text),
@@ -83,17 +87,20 @@ def source_view(id_, unlink_id=None):
             unlink_url = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-' + name
             data.append(build_remove_link(unlink_url, link_.range.name))
         tables[name]['data'].append(data)
-    header = app.config['TABLE_HEADERS']['reference'] + ['page']
-    tables['reference'] = {'id': 'source', 'header': header, 'data': []}
     for link_ in source.get_links('P67', True):
         data = get_base_table_data(link_.domain)
-        data.append(link_.description)
+        name = 'file'
+        if link_.domain.system_type != 'file':
+            name = app.config['CODE_CLASS'][link_.domain.class_.code]
+        if name not in ['file']:
+            data.append(link_.description)
+            if is_authorized('editor'):
+                update_url = url_for('reference_link_update', link_id=link_.id, origin_id=source.id)
+                data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
         if is_authorized('editor'):
-            unlink = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-reference'
-            update_url = url_for('reference_link_update', link_id=link_.id, origin_id=source.id)
-            data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
+            unlink = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-' + name
             data.append(build_remove_link(unlink, link_.domain.name))
-        tables['reference']['data'].append(data)
+        tables[name]['data'].append(data)
     return render_template('source/view.html', source=source, tables=tables)
 
 

@@ -116,10 +116,18 @@ def reference_view(id_, unlink_id=None):
     if unlink_id:
         LinkMapper.delete_by_id(unlink_id)
         flash(_('link removed'), 'info')
-    tables = {'info': get_entity_data(reference)}
+    tables = {
+        'info': get_entity_data(reference),
+        'file': {'id': 'files', 'data': [], 'header': app.config['TABLE_HEADERS']['file']}}
     for name in ['source', 'event', 'actor', 'place']:
         header = app.config['TABLE_HEADERS'][name] + ['page']
         tables[name] = {'id': name, 'header': header, 'data': []}
+    for link_ in reference.get_links('P67', True):
+        data = get_base_table_data(link_.domain)
+        if is_authorized('editor'):
+            unlink_url = url_for('reference_view', id_=reference.id, unlink_id=link_.id) + '#tab-file'
+            data.append(build_remove_link(unlink_url, link_.domain.name))
+        tables['file']['data'].append(data)
     for link_ in reference.get_links('P67'):
         name = app.config['CODE_CLASS'][link_.range.class_.code]
         data = get_base_table_data(link_.range)
