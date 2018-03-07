@@ -10,7 +10,7 @@ from openatlas.forms.forms import DateForm, build_form
 from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.gis import GisMapper
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import (build_remove_link, get_base_table_data, get_entity_data,
+from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  is_authorized, link, required_group, truncate_string, uc_first,
                                  was_modified)
 
@@ -96,7 +96,7 @@ def place_view(id_, unlink_id=None):
                 data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
         if is_authorized('editor'):
             unlink_url = url_for('place_view', id_=object_.id, unlink_id=link_.id) + '#tab-' + name
-            data.append(build_remove_link(unlink_url, link_.domain.name))
+            data.append(display_remove_link(unlink_url, link_.domain.name))
         tables[name]['data'].append(data)
 
     for event in location.get_linked_entities(['P7', 'P24'], True):

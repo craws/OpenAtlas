@@ -4,7 +4,6 @@ import os
 import re
 import smtplib
 from collections import OrderedDict
-from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
@@ -12,6 +11,7 @@ from html.parser import HTMLParser
 
 import numpy
 from babel import dates
+from datetime import datetime
 from flask import abort, flash, g, request, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
@@ -101,6 +101,10 @@ class MLStripper(HTMLParser):
         return ''.join(self.fed)
 
 
+def get_view_name(entity):
+    return 'file' if entity.system_type == 'file' else app.config['CODE_CLASS'][entity.class_.code]
+
+
 def sanitize(string, mode=None):
     if not mode:
         """Remove all characters from a string except ASCII letters and numbers"""
@@ -139,7 +143,7 @@ def build_table_form(class_name, linked_entities):
     return form
 
 
-def build_remove_link(url, name):
+def display_remove_link(url, name):
     """ Build a link to remove a link with a JavaScript confirmation dialog"""
     name = name.replace('\'', '')
     confirm = 'onclick="return confirm(\'' + _('Remove %(name)s?', name=name) + '\')"'

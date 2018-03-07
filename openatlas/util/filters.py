@@ -235,6 +235,12 @@ def truncate_string(self, string):
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
+def get_view_name(self, entity):
+    return util.get_view_name(entity)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
 def display_delete_link(self, entity):
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')

@@ -26,10 +26,42 @@
         {{ tables['info']|data_table|safe }}
         {{ entity|description|safe }}
     </div>
-    {% for name in ['source', 'event', 'actor', 'place', 'reference']: %}
+    <div id="tab-source">
+        {% if 'editor'|is_authorized: %}
+            <div class="button-bar">
+                <a href="{{ url_for('file_add2', id_=entity.id, class_name='source')}}">{{ _('add')|uc_first }}</a>
+                <a href="{{ url_for('source_insert', origin_id=entity.id) }}">+ {{ _('source')|uc_first }}</a>
+            </div>
+        {% endif %}
+        {{ tables['source']|pager|safe }}
+    </div>
+    {% for name in ['event', 'actor', 'place']: %}
         <div id="tab-{{name}}">
+            {% if 'editor'|is_authorized: %}
+                <div class="button-bar">
+                    <a href="{{ url_for('file_add2', id_=entity.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
+                    {% if name == 'place' %}
+                        <a href="{{ url_for('place_insert', origin_id=entity.id) }}">+ {{ _('place')|uc_first }}</a>
+                    {% else %}
+                        {% for code in config['CLASS_CODES'][name]%}
+                            <a href="{{ url_for(name + '_insert', code=code, origin_id=entity.id) }}">+ {{ code|get_class_name }}</a>
+                        {% endfor %}
+                    {% endif %}
+                </div>
+            {% endif %}
             {{ tables[name]|pager|safe }}
         </div>
     {% endfor %}
+    <div id="tab-reference">
+        {% if 'editor'|is_authorized: %}
+            <div class="button-bar">
+                <a href="{{ url_for('file_add2', id_=entity.id, class_name='reference')}}">{{ _('add')|uc_first }}</a>
+                <a href="{{ url_for('reference_insert', code='bibliography', origin_id=entity.id) }}">+ {{ _('bibliography')|uc_first }}</a>
+                <a href="{{ url_for('reference_insert', code='edition', origin_id=entity.id) }}">+ {{ _('edition')|uc_first }}</a>
+                <a href="{{ url_for('reference_insert', code='carrier', origin_id=entity.id) }}">+ {{ 'E84'|get_class_name }}</a>
+            </div>
+        {% endif %}
+        {{ tables['reference']|pager|safe }}
+    </div>
 </div>
 {% endblock %}

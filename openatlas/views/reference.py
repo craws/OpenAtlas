@@ -11,7 +11,7 @@ from openatlas import app, logger
 from openatlas.forms.forms import TableField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import (build_remove_link, get_base_table_data, get_entity_data,
+from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  is_authorized, link, required_group, truncate_string, uc_first,
                                  was_modified)
 
@@ -126,7 +126,7 @@ def reference_view(id_, unlink_id=None):
         data = get_base_table_data(link_.domain)
         if is_authorized('editor'):
             unlink_url = url_for('reference_view', id_=reference.id, unlink_id=link_.id) + '#tab-file'
-            data.append(build_remove_link(unlink_url, link_.domain.name))
+            data.append(display_remove_link(unlink_url, link_.domain.name))
         tables['file']['data'].append(data)
     for link_ in reference.get_links('P67'):
         name = app.config['CODE_CLASS'][link_.range.class_.code]
@@ -137,7 +137,7 @@ def reference_view(id_, unlink_id=None):
             unlink_url = url_for(
                 'reference_view', id_=reference.id, unlink_id=link_.id) + '#tab-' + name
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
-            data.append(build_remove_link(unlink_url, link_.range.name))
+            data.append(display_remove_link(unlink_url, link_.range.name))
         tables[name]['data'].append(data)
     return render_template('reference/view.html', reference=reference, tables=tables)
 

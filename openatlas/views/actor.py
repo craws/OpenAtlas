@@ -10,7 +10,7 @@ from openatlas.forms.forms import DateForm, TableField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
 from openatlas.models.link import Link, LinkMapper
-from openatlas.util.util import (build_remove_link, get_base_table_data, get_entity_data,
+from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  is_authorized, link, required_group,
                                  truncate_string, uc_first, was_modified)
 
@@ -82,7 +82,7 @@ def actor_view(id_, unlink_id=None):
                 data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
         if is_authorized('editor'):
             unlink_url = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab-' + name
-            data.append(build_remove_link(unlink_url, link_.domain.name))
+            data.append(display_remove_link(unlink_url, link_.domain.name))
         tables[name]['data'].append(data)
     for link_ in actor.get_links(['P11', 'P14', 'P22', 'P23'], True):
         event = link_.domain
@@ -106,7 +106,7 @@ def actor_view(id_, unlink_id=None):
             update_url = url_for('involvement_update', id_=link_.id, origin_id=actor.id)
             unlink_url = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab-event'
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
-            data.append(build_remove_link(unlink_url, link_.range.name))
+            data.append(display_remove_link(unlink_url, link_.range.name))
         tables['event']['data'].append(data)
     for link_ in actor.get_links('OA7') + actor.get_links('OA7', True):
         if actor.id == link_.domain.id:
@@ -125,7 +125,7 @@ def actor_view(id_, unlink_id=None):
             update_url = url_for('relation_update', id_=link_.id, origin_id=actor.id)
             unlink_url = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab-relation'
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
-            data.append(build_remove_link(unlink_url, related.name))
+            data.append(display_remove_link(unlink_url, related.name))
         tables['relation']['data'].append(data)
     for link_ in actor.get_links('P107', True):
         data = ([
@@ -138,7 +138,7 @@ def actor_view(id_, unlink_id=None):
             update_url = url_for('member_update', id_=link_.id, origin_id=actor.id)
             unlink_url = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab-member-of'
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
-            data.append(build_remove_link(unlink_url, link_.domain.name))
+            data.append(display_remove_link(unlink_url, link_.domain.name))
         tables['member_of']['data'].append(data)
     if actor.class_.code in app.config['CLASS_CODES']['group']:
         tables['member'] = {
@@ -155,7 +155,7 @@ def actor_view(id_, unlink_id=None):
                 update_url = url_for('member_update', id_=link_.id, origin_id=actor.id)
                 unlink_url = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab-member'
                 data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
-                data.append(build_remove_link(unlink_url, link_.range.name))
+                data.append(display_remove_link(unlink_url, link_.range.name))
             tables['member']['data'].append(data)
     gis_data = GisMapper.get_all(object_ids) if object_ids else None
     if gis_data and gis_data['gisPointSelected'] == '[]':

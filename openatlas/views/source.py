@@ -8,11 +8,11 @@ from wtforms.validators import DataRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import build_form
-from openatlas.models.entity import Entity, EntityMapper
+from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import (build_remove_link, build_table_form, get_base_table_data,
-                                 get_entity_data, is_authorized, link, required_group,
-                                 truncate_string, uc_first, was_modified)
+from openatlas.util.util import (build_table_form, display_remove_link, get_base_table_data,
+                                 get_entity_data, get_view_name, is_authorized, link,
+                                 required_group, truncate_string, uc_first, was_modified)
 
 
 class SourceForm(Form):
@@ -43,18 +43,7 @@ def source_insert(origin_id=None):
     if origin:
         del form.insert_and_continue
     if form.validate_on_submit():
-        result = save(form, None, origin)
-        if not result:  # pragma: no cover
-            return render_template('source/insert.html', form=form, origin=origin)
-        flash(_('entity created'), 'info')
-        if not isinstance(result, Entity):
-            return redirect(url_for('reference_link_update', link_id=result, origin_id=origin_id))
-        if form.continue_.data == 'yes':
-            return redirect(url_for('source_insert', origin_id=origin_id))
-        if origin:
-            view = app.config['CODE_CLASS'][origin.class_.code]
-            return redirect(url_for(view + '_view', id_=origin.id) + '#tab-source')
-        return redirect(url_for('source_view', id_=result.id))
+        return redirect(save(form, origin=origin))
     return render_template('source/insert.html', form=form, origin=origin)
 
 
@@ -85,7 +74,7 @@ def source_view(id_, unlink_id=None):
         name = app.config['CODE_CLASS'][link_.range.class_.code]
         if is_authorized('editor'):
             unlink_url = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-' + name
-            data.append(build_remove_link(unlink_url, link_.range.name))
+            data.append(display_remove_link(unlink_url, link_.range.name))
         tables[name]['data'].append(data)
     for link_ in source.get_links('P67', True):
         data = get_base_table_data(link_.domain)
@@ -99,7 +88,7 @@ def source_view(id_, unlink_id=None):
                 data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
         if is_authorized('editor'):
             unlink = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-' + name
-            data.append(build_remove_link(unlink, link_.domain.name))
+            data.append(display_remove_link(unlink, link_.domain.name))
         tables[name]['data'].append(data)
     return render_template('source/view.html', source=source, tables=tables)
 
@@ -173,26 +162,34 @@ def source_update(id_):
 
 
 def save(form, source=None, origin=None):
-    link_ = None
     g.cursor.execute('BEGIN')
     try:
-        if source:
-            logger.log_user(source.id, 'update')
-        else:
+        log_action = 'update'
+        if not source:
             source = EntityMapper.insert('E33', form.name.data, 'source content')
-            logger.log_user(source.id, 'insert')
+            log_action = 'insert'
         source.name = form.name.data
         source.description = form.description.data
         source.update()
         source.save_nodes(form)
+        url = url_for('source_view', id_=source.id)
         if origin:
-            if origin.class_.code in app.config['CLASS_CODES']['reference']:
+            url = url_for(get_view_name(origin) + '_view', id_=origin.id) + '#tab-source'
+            if form.continue_.data == 'yes':
+                url = url_for('source_insert', origin_id=origin.id)
+            if get_view_name(origin) == 'reference':
                 link_ = origin.link('P67', source)
+                url = url_for('reference_link_update', link_id=link_, origin_id=origin)
+            elif get_view_name(origin) == 'file':
+                origin.link('P67', source)
             else:
                 source.link('P67', origin)
         g.cursor.execute('COMMIT')
+        logger.log_user(source.id, log_action)
+        flash(_('entity created'), 'info')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
-    return link_ if link_ else source
+        url = url_for('source_insert', origin_id=origin.id if origin else None)
+    return url

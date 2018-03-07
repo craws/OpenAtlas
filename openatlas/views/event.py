@@ -11,7 +11,7 @@ from openatlas import app, logger
 from openatlas.forms.forms import DateForm, TableField, TableMultiField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import Link, LinkMapper
-from openatlas.util.util import (build_remove_link, get_base_table_data, get_entity_data,
+from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  is_authorized, link, required_group, truncate_string, uc_first,
                                  was_modified)
 
@@ -166,7 +166,7 @@ def event_view(id_, unlink_id=None):
             unlink_url = url_for('event_view', id_=event.id, unlink_id=link_.id) + '#tab-actor'
             update_url = url_for('involvement_update', id_=link_.id, origin_id=event.id)
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
-            data.append(build_remove_link(unlink_url, link_.range.name))
+            data.append(display_remove_link(unlink_url, link_.range.name))
         tables['actor']['data'].append(data)
     for link_ in event.get_links('P67', True):
         data = get_base_table_data(link_.domain)
@@ -180,7 +180,7 @@ def event_view(id_, unlink_id=None):
                 data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
         if is_authorized('editor'):
             unlink_url = url_for('event_view', id_=event.id, unlink_id=link_.id) + '#tab-' + name
-            data.append(build_remove_link(unlink_url, link_.domain.name))
+            data.append(display_remove_link(unlink_url, link_.domain.name))
         tables[name]['data'].append(data)
     for sub_event in event.get_linked_entities('P117', True):
         tables['subs']['data'].append(get_base_table_data(sub_event))
