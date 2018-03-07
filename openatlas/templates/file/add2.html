@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('file_index') }}">{{ _('files')|uc_first }}</a>
+    > {{ entity|link|safe }}
+    > {{ _('add')|uc_first + ' ' + _(class_name)|uc_first }}
+{% endblock %}
+{% block content %}
+    {{ form|safe }}
+{% endblock %}
