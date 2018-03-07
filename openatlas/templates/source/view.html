@@ -19,7 +19,7 @@
             {{ source|page_buttons|safe }}
             {% if 'editor'|is_authorized: %}
                 <a href="{{ url_for('source_update', id_=source.id) }}">{{ _('edit')|uc_first }}</a>
-                {{ source|build_delete_link|safe }}
+                {{ source|display_delete_link|safe }}
             {% endif %}
             {{ source.id|bookmark_toggle|safe }}
         </div>

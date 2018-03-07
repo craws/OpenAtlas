@@ -13,8 +13,8 @@ from openatlas import app, logger
 from openatlas.forms.forms import build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import (build_table_form, get_base_table_data, get_entity_data, link,
-                                 required_group, was_modified)
+from openatlas.util.util import (build_table_form, get_base_table_data, get_entity_data,
+                                 get_file_path, link, required_group, was_modified)
 
 
 class FileForm(Form):
@@ -101,6 +101,29 @@ def file_insert(origin_id=None):
     if form.validate_on_submit():
         return redirect(save(form, None, origin))
     return render_template('file/insert.html', form=form, origin=origin)
+
+
+@app.route('/file/delete/<int:id_>')
+@required_group('editor')
+def file_delete(id_=None):
+    g.cursor.execute('BEGIN')
+    try:
+        EntityMapper.delete(id_)
+        logger.log_user(id_, 'delete')
+        g.cursor.execute('COMMIT')
+    except Exception as e:  # pragma: no cover
+        g.cursor.execute('ROLLBACK')
+        logger.log('error', 'database', 'transaction failed', e)
+        flash(_('error transaction'), 'error')
+    try:
+        path = get_file_path(id_)
+        if path:
+            os.remove(get_file_path(id_))
+    except Exception as e:  # pragma: no cover
+        logger.log('error', 'file', 'file deletion failed', e)
+        flash(_('error file delete'), 'error')
+    flash(_('entity deleted'), 'info')
+    return redirect(url_for('file_index'))
 
 
 def save(form, entity=None, origin=None):

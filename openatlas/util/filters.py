@@ -235,11 +235,12 @@ def truncate_string(self, string):
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def build_delete_link(self, entity):
+def display_delete_link(self, entity):
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
     confirm = 'onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
-    url = url_for(app.config['CODE_CLASS'][entity.class_.code] + '_delete', id_=entity.id)
+    view = app.config['CODE_CLASS'][entity.class_.code] if entity.system_type != 'file' else 'file'
+    url = url_for(view + '_delete', id_=entity.id)
     return '<a ' + confirm + ' href="' + url + '">' + util.uc_first(_('delete')) + '</a>'
 
 

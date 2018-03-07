@@ -25,7 +25,7 @@
             {{ object_|page_buttons|safe }}
             {% if 'editor'|is_authorized: %}
                 <a href="{{ url_for('place_update', id_=object_.id) }}">{{ _('edit')|uc_first }}</a>
-                {{ object_|build_delete_link|safe }}
+                {{ object_|display_delete_link|safe }}
             {% endif %}
             {{ object_.id|bookmark_toggle|safe }}
         </div>

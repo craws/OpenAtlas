@@ -25,7 +25,7 @@
             {{ actor|page_buttons|safe }}
             {% if 'editor'|is_authorized: %}
                 <a href="{{ url_for('actor_update', id_=actor.id) }}">{{ _('edit')|uc_first }}</a>
-                {{ actor|build_delete_link|safe }}
+                {{ actor|display_delete_link|safe }}
             {% endif %}
             {{ actor.id|bookmark_toggle|safe }}
         </div>

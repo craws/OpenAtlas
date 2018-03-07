@@ -35,11 +35,15 @@ def convert_size(size_bytes):
     return "%s %s" % (int(size_bytes / math.pow(1024, i)), size_name[i])
 
 
+def get_file_path(entity_id):
+    path = glob.glob(os.path.join(app.config['UPLOAD_FOLDER'], str(entity_id) + '.*'))
+    return path[0] if path else None
+
+
 def print_file_size(entity):
-    path = glob.glob(os.path.join(app.config['UPLOAD_FOLDER'], str(entity.id) + '.*'))
-    if path:
-        return convert_size(os.path.getsize(path[0]))
-    return 'N/A'
+    entity_id = entity if isinstance(entity, int) else entity.id
+    path = get_file_path(entity_id)
+    return convert_size(os.path.getsize(path)) if path else 'N/A'
 
 
 def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover

@@ -20,7 +20,7 @@
             {{ event|page_buttons|safe }}
             {% if 'editor'|is_authorized: %}
                 <a href="{{ url_for('event_update', id_=event.id) }}">{{ _('edit')|uc_first }}</a>
-                {{ event|build_delete_link|safe }}
+                {{ event|display_delete_link|safe }}
             {% endif %}
             {{ event.id|bookmark_toggle|safe }}
         </div>

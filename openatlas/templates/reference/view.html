@@ -18,7 +18,7 @@
             {{ reference|page_buttons|safe }}
             {% if 'editor'|is_authorized: %}
                 <a href="{{ url_for('reference_update', id_=reference.id) }}">{{ _('edit')|uc_first }}</a>
-                {{ reference|build_delete_link|safe }}
+                {{ reference|display_delete_link|safe }}
             {% endif %}
             {{ reference.id|bookmark_toggle|safe }}
         </div>
