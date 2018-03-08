@@ -253,14 +253,14 @@ def actor_update(id_):
 def save(form, actor=None, code=None, origin=None):
     g.cursor.execute('BEGIN')
     try:
+        log_action = 'update'
         if actor:
             LinkMapper.delete_by_codes(actor, ['P74', 'OA8', 'OA9'])
             for alias in actor.get_linked_entities('P131'):
                 alias.delete()
-            logger.log_user(actor.id, 'update')
         else:
             actor = EntityMapper.insert(code, form.name.data)
-            logger.log_user(actor.id, 'insert')
+            log_action = 'insert'
         actor.name = form.name.data
         actor.description = form.description.data
         actor.update()
@@ -290,6 +290,7 @@ def save(form, actor=None, code=None, origin=None):
             elif origin_class == 'actor':
                 link_ = origin.link('OA7', actor)
         g.cursor.execute('COMMIT')
+        logger.log_user(actor.id, log_action)
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'transaction failed', e)

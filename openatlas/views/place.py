@@ -98,7 +98,6 @@ def place_view(id_, unlink_id=None):
             unlink_url = url_for('place_view', id_=object_.id, unlink_id=link_.id) + '#tab-' + name
             data.append(display_remove_link(unlink_url, link_.domain.name))
         tables[name]['data'].append(data)
-
     for event in location.get_linked_entities(['P7', 'P24'], True):
         tables['event']['data'].append(get_base_table_data(event))
     for link_ in location.get_links(['P74', 'OA8', 'OA9'], True):

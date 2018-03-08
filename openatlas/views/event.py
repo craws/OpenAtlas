@@ -10,10 +10,10 @@ from wtforms.validators import DataRequired
 from openatlas import app, logger
 from openatlas.forms.forms import DateForm, TableField, TableMultiField, build_form
 from openatlas.models.entity import EntityMapper
-from openatlas.models.link import Link, LinkMapper
+from openatlas.models.link import LinkMapper
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 is_authorized, link, required_group, truncate_string, uc_first,
-                                 was_modified)
+                                 get_view_name, is_authorized, link, required_group,
+                                 truncate_string, uc_first, was_modified)
 
 
 class EventForm(DateForm):
@@ -64,20 +64,7 @@ def event_insert(code, origin_id=None):
     if origin:
         del form.insert_and_continue
     if form.validate_on_submit():
-        result = save(form, None, code, origin)
-        if not result:  # pragma: no cover
-            return render_template('event/insert.html', form=form, code=code, origin=origin)
-        flash(_('entity created'), 'info')
-        if isinstance(result, Link) and result.property_code == 'P67':
-            return redirect(url_for('reference_link_update', link_id=result, origin_id=origin_id))
-        if form.continue_.data == 'yes':
-            return redirect(url_for('event_insert', code=code, origin_id=origin_id))
-        if origin:
-            if origin.class_.code in app.config['CLASS_CODES']['actor']:
-                return redirect(url_for('involvement_update', id_=result, origin_id=origin_id))
-            view = app.config['CODE_CLASS'][origin.class_.code]
-            return redirect(url_for(view + '_view', id_=origin.id) + '#tab-event')
-        return redirect(url_for('event_view', id_=result.id))
+        return redirect(save(form, code=code, origin=origin))
     return render_template('event/insert.html', form=form, code=code, origin=origin)
 
 
@@ -190,39 +177,50 @@ def event_view(id_, unlink_id=None):
 def save(form, event=None, code=None, origin=None):
     g.cursor.execute('BEGIN')
     try:
+        log_action = 'update'
         if event:
             LinkMapper.delete_by_codes(event, ['P117', 'P7', 'P22', 'P23', 'P24'])
-            logger.log_user(event.id, 'update')
         else:
+            log_action = 'insert'
             event = EntityMapper.insert(code, form.name.data)
-            logger.log_user(event.id, 'insert')
         event.name = form.name.data
         event.description = form.description.data
         event.update()
         event.save_dates(form)
         event.save_nodes(form)
+        url = url_for('event_view', id_=event.id)
         if form.event.data:
             event.link('P117', int(form.event.data))
         if form.place.data:
             place = LinkMapper.get_linked_entity(int(form.place.data), 'P53')
             event.link('P7', place)
         if event.class_.code == 'E8':  # Links for acquisition
-            event.link('P22', ast.literal_eval(form.recipient.data) if form.recipient.data else None)
+            if form.recipient.data:
+                event.link('P22', ast.literal_eval(form.recipient.data))
             event.link('P23', ast.literal_eval(form.donor.data) if form.donor.data else None)
             if form.given_place.data:
                 event.link('P24', ast.literal_eval(form.given_place.data))
-        link_ = None
         if origin:
-            if origin.class_.code in app.config['CLASS_CODES']['reference']:
-                link_ = origin.link('P67', event)
-            elif origin.class_.code in app.config['CLASS_CODES']['source']:
+            view_name = get_view_name(origin)
+            url = url_for(view_name + '_view', id_=origin.id) + '#tab-event'
+            if view_name == 'reference':
+                link_id = origin.link('P67', event)
+                url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
+            elif view_name == 'source':
                 origin.link('P67', event)
-            elif origin.class_.code in app.config['CLASS_CODES']['actor']:
-                link_ = event.link('P11', origin)
+            elif view_name == 'actor':
+                link_id = event.link('P11', origin)
+                url = url_for('involvement_update', id_=link_id, origin_id=origin.id)
+            elif view_name == 'file':
+                origin.link('P67', event)
+        if form.continue_.data == 'yes':
+            url = url_for('event_insert', code=code, origin_id=origin.id if origin else None)
         g.cursor.execute('COMMIT')
+        logger.log_user(event.id, log_action)
+        flash(_('entity created'), 'info')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
-        return
-    return link_ if link_ else event
+        url = url_for('event_index')
+    return url

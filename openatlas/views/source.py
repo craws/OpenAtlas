@@ -175,8 +175,6 @@ def save(form, source=None, origin=None):
         url = url_for('source_view', id_=source.id)
         if origin:
             url = url_for(get_view_name(origin) + '_view', id_=origin.id) + '#tab-source'
-            if form.continue_.data == 'yes':
-                url = url_for('source_insert', origin_id=origin.id)
             if get_view_name(origin) == 'reference':
                 link_ = origin.link('P67', source)
                 url = url_for('reference_link_update', link_id=link_, origin_id=origin)
@@ -185,6 +183,8 @@ def save(form, source=None, origin=None):
             else:
                 source.link('P67', origin)
         g.cursor.execute('COMMIT')
+        if form.continue_.data == 'yes':
+            url = url_for('source_insert', origin_id=origin.id if origin else None)
         logger.log_user(source.id, log_action)
         flash(_('entity created'), 'info')
     except Exception as e:  # pragma: no cover
