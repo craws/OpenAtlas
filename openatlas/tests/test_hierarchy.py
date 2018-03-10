@@ -8,8 +8,8 @@ from openatlas.test_base import TestBaseCase
 class HierarchyTest(TestBaseCase):
 
     def test_hierarchy(self):
-        self.login()
         with app.app_context():
+            self.login()
             rv = self.app.get(url_for('hierarchy_insert'))
             assert b'+ Custom' in rv.data
             data = {'name': 'Geronimo', 'multiple': True, 'description': 'Very important!'}

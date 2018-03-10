@@ -8,8 +8,9 @@ from openatlas.test_base import TestBaseCase
 class ReferenceTest(TestBaseCase):
 
     def test_reference(self):
-        self.login()
+
         with app.app_context():
+            self.login()
 
             # Reference insert
             rv = self.app.get(url_for('reference_insert', code='bibliography'))

@@ -15,7 +15,6 @@
     </ul>
     <div id="tab-info">
         <div class="button-bar">
-            {{ entity|page_buttons|safe }}
             {% if 'editor'|is_authorized: %}
                 <a href="{{ url_for('file_update', id_=entity.id) }}">{{ _('edit')|uc_first }}</a>
                 {{ entity|display_delete_link|safe }}

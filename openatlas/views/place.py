@@ -7,12 +7,12 @@ from wtforms.validators import DataRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import DateForm, build_form
-from openatlas.models.entity import Entity, EntityMapper
+from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  is_authorized, link, required_group, truncate_string, uc_first,
-                                 was_modified)
+                                 was_modified, get_view_name)
 
 
 class PlaceForm(DateForm):
@@ -45,19 +45,7 @@ def place_insert(origin_id=None):
     if origin:
         del form.insert_and_continue
     if form.validate_on_submit():
-        result = save(form, None, None, origin)
-        if not result:  # pragma: no cover
-            gis_data = GisMapper.get_all()
-            return render_template('place/insert.html', form=form, origin=origin, gis_data=gis_data)
-        flash(_('entity created'), 'info')
-        if not isinstance(result, Entity):
-            return redirect(url_for('reference_link_update', link_id=result, origin_id=origin_id))
-        if form.continue_.data == 'yes':
-            return redirect(url_for('place_insert', origin_id=origin_id))
-        if origin:
-            view = app.config['CODE_CLASS'][origin.class_.code]
-            return redirect(url_for(view + '_view', id_=origin.id) + '#tab-place')
-        return redirect(url_for('place_view', id_=result.id))
+        return redirect(save(form, origin=origin))
     form.alias.append_entry('')
     gis_data = GisMapper.get_all()
     return render_template('place/insert.html', form=form, origin=origin, gis_data=gis_data)
@@ -86,18 +74,16 @@ def place_view(id_, unlink_id=None):
             'header': [_('actor'), _('property'), _('class'), _('first'), _('last')]}}
     for link_ in object_.get_links('P67', True):
         data = get_base_table_data(link_.domain)
-        name = 'file'
-        if link_.domain.system_type != 'file':
-            name = app.config['CODE_CLASS'][link_.domain.class_.code]
-        if name not in ['source', 'file']:
+        view_name = get_view_name(link_.domain)
+        if view_name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
             if is_authorized('editor'):
                 url = url_for('reference_link_update', link_id=link_.id, origin_id=object_.id)
                 data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
         if is_authorized('editor'):
-            unlink_url = url_for('place_view', id_=object_.id, unlink_id=link_.id) + '#tab-' + name
-            data.append(display_remove_link(unlink_url, link_.domain.name))
-        tables[name]['data'].append(data)
+            url = url_for('place_view', id_=object_.id, unlink_id=link_.id) + '#tab-' + view_name
+            data.append(display_remove_link(url, link_.domain.name))
+        tables[view_name]['data'].append(data)
     for event in location.get_linked_entities(['P7', 'P24'], True):
         tables['event']['data'].append(get_base_table_data(event))
     for link_ in location.get_links(['P74', 'OA8', 'OA9'], True):
@@ -144,8 +130,7 @@ def place_update(id_):
             modifier = link(logger.get_log_for_advanced_view(object_.id)['modifier'])
             return render_template(
                 'place/update.html', form=form, object_=object_, modifier=modifier)
-        if save(form, object_, location):
-            flash(_('info update'), 'info')
+        save(form, object_, location)
         return redirect(url_for('place_view', id_=id_))
     for alias in [x.name for x in object_.get_linked_entities('P1')]:
         form.alias.append_entry(alias)
@@ -157,16 +142,16 @@ def place_update(id_):
 def save(form, object_=None, location=None, origin=None):
     g.cursor.execute('BEGIN')
     try:
+        log_action = 'update'
         if object_:
             for alias in object_.get_linked_entities('P1'):
                 alias.delete()
             GisMapper.delete_by_entity(location)
-            logger.log_user(object_.id, 'update')
         else:
+            log_action = 'insert'
             object_ = EntityMapper.insert('E18', form.name.data)
             location = EntityMapper.insert('E53', 'Location of ' + form.name.data, 'place location')
             object_.link('P53', location)
-            logger.log_user(object_.id, 'insert')
         object_.name = form.name.data
         object_.description = form.description.data
         object_.update()
@@ -178,17 +163,24 @@ def save(form, object_=None, location=None, origin=None):
         for alias in form.alias.data:
             if alias.strip():  # check if it isn't empty
                 object_.link('P1', EntityMapper.insert('E41', alias))
-        link_ = None
+        url = url_for('place_view', id_=object_.id)
         if origin:
-            if origin.class_.code in app.config['CLASS_CODES']['reference']:
-                link_ = origin.link('P67', object_)
+            view_name = get_view_name(origin)
+            url = url_for(get_view_name(origin) + '_view', id_=origin.id) + '#tab-place'
+            if view_name == 'reference':
+                link_id = origin.link('P67', object_)
+                url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
             else:
                 origin.link('P67', object_)
         GisMapper.insert(location, form)
         g.cursor.execute('COMMIT')
+        if form.continue_.data == 'yes':
+            url = url_for('place_insert', origin_id=origin.id if origin else None)
+        logger.log_user(object_.id, log_action)
+        flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
-        return
-    return link_ if link_ else object_
+        url = url_for('place_index')
+    return url

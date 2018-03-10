@@ -12,7 +12,7 @@ from openatlas.models.gis import GisMapper
 from openatlas.models.link import Link, LinkMapper
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  is_authorized, link, required_group,
-                                 truncate_string, uc_first, was_modified)
+                                 truncate_string, uc_first, was_modified, get_view_name)
 
 
 class ActorForm(DateForm):
@@ -72,18 +72,16 @@ def actor_view(id_, unlink_id=None):
             'header': ['member of', 'function', 'first', 'last', 'description']}}
     for link_ in actor.get_links('P67', True):
         data = get_base_table_data(link_.domain)
-        name = 'file'
-        if link_.domain.system_type != 'file':
-            name = app.config['CODE_CLASS'][link_.domain.class_.code]
-        if name not in ['source', 'file']:
+        view_name = get_view_name(link_.domain)
+        if view_name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
             if is_authorized('editor'):
                 update_url = url_for('reference_link_update', link_id=link_.id, origin_id=actor.id)
                 data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
         if is_authorized('editor'):
-            unlink_url = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab-' + name
-            data.append(display_remove_link(unlink_url, link_.domain.name))
-        tables[name]['data'].append(data)
+            unlink = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab-' + view_name
+            data.append(display_remove_link(unlink, link_.domain.name))
+        tables[view_name]['data'].append(data)
     for link_ in actor.get_links(['P11', 'P14', 'P22', 'P23'], True):
         event = link_.domain
         first = link_.first
@@ -192,13 +190,12 @@ def actor_insert(code, origin_id=None):
         if form.continue_.data == 'yes':
             return redirect(url_for('actor_insert', code=code, origin_id=origin_id))
         if origin:
-            origin_class = app.config['CODE_CLASS'][origin.class_.code]
-            if origin_class == 'event':
+            view_name = get_view_name(origin)
+            if view_name == 'event':
                 return redirect(url_for('involvement_update', id_=result, origin_id=origin_id))
-            if origin_class == 'actor':
+            if view_name == 'actor':
                 return redirect(url_for('relation_update', id_=result, origin_id=origin_id))
-            view = app.config['CODE_CLASS'][origin.class_.code]
-            return redirect(url_for(view + '_view', id_=origin.id) + '#tab-actor')
+            return redirect(url_for(view_name + '_view', id_=origin.id) + '#tab-actor')
         return redirect(url_for('actor_view', id_=result.id))
     form.alias.append_entry('')
     if origin:
@@ -280,14 +277,14 @@ def save(form, actor=None, code=None, origin=None):
                 actor.link('P131', EntityMapper.insert('E82', alias))
         link_ = None
         if origin:
-            origin_class = app.config['CODE_CLASS'][origin.class_.code]
-            if origin_class == 'reference':
+            view_name = get_view_name(origin)
+            if view_name == 'reference':
                 link_ = origin.link('P67', actor)
-            elif origin_class == 'source':
+            elif view_name == 'source':
                 origin.link('P67', actor)
-            elif origin_class == 'event':
+            elif view_name == 'event':
                 link_ = origin.link('P11', actor)
-            elif origin_class == 'actor':
+            elif view_name == 'actor':
                 link_ = origin.link('OA7', actor)
         g.cursor.execute('COMMIT')
         logger.log_user(actor.id, log_action)

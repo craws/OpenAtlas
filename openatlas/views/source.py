@@ -71,25 +71,23 @@ def source_view(id_, unlink_id=None):
         tables[name] = {'id': name, 'header': app.config['TABLE_HEADERS'][name], 'data': []}
     for link_ in source.get_links('P67'):
         data = get_base_table_data(link_.range)
-        name = app.config['CODE_CLASS'][link_.range.class_.code]
+        view_name = get_view_name(link_.range)
         if is_authorized('editor'):
-            unlink_url = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-' + name
+            unlink_url = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-' + view_name
             data.append(display_remove_link(unlink_url, link_.range.name))
-        tables[name]['data'].append(data)
+        tables[view_name]['data'].append(data)
     for link_ in source.get_links('P67', True):
         data = get_base_table_data(link_.domain)
-        name = 'file'
-        if link_.domain.system_type != 'file':
-            name = app.config['CODE_CLASS'][link_.domain.class_.code]
-        if name not in ['file']:
+        view_name = get_view_name(link_.domain)
+        if view_name not in ['file']:
             data.append(link_.description)
             if is_authorized('editor'):
                 update_url = url_for('reference_link_update', link_id=link_.id, origin_id=source.id)
                 data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
         if is_authorized('editor'):
-            unlink = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-' + name
+            unlink = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-' + view_name
             data.append(display_remove_link(unlink, link_.domain.name))
-        tables[name]['data'].append(data)
+        tables[view_name]['data'].append(data)
     return render_template('source/view.html', source=source, tables=tables)
 
 
@@ -108,8 +106,7 @@ def source_add(origin_id):
             g.cursor.execute('ROLLBACK')
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        view_name = app.config['CODE_CLASS'][origin.class_.code]
-        return redirect(url_for(view_name + '_view', id_=origin.id) + '#tab-source')
+        return redirect(url_for(get_view_name(origin) + '_view', id_=origin.id) + '#tab-source')
     form = build_table_form('source', origin.get_linked_entities('P67', True))
     return render_template('source/add.html', origin=origin, form=form)
 

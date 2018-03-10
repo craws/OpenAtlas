@@ -99,8 +99,7 @@ def event_update(id_):
             flash(_('error modified'), 'error')
             modifier = link(logger.get_log_for_advanced_view(event.id)['modifier'])
             return render_template('event/update.html', form=form, event=event, modifier=modifier)
-        if save(form, event):
-            flash(_('info update'), 'info')
+        save(form, event)
         return redirect(url_for('event_view', id_=id_))
     super_event = event.get_linked_entity('P117')
     form.event.data = super_event.id if super_event else ''
@@ -157,18 +156,16 @@ def event_view(id_, unlink_id=None):
         tables['actor']['data'].append(data)
     for link_ in event.get_links('P67', True):
         data = get_base_table_data(link_.domain)
-        name = 'file'
-        if link_.domain.system_type != 'file':
-            name = app.config['CODE_CLASS'][link_.domain.class_.code]
-        if name not in ['source', 'file']:
+        view_name = get_view_name(link_.domain)
+        if view_name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
             if is_authorized('editor'):
                 update_url = url_for('reference_link_update', link_id=link_.id, origin_id=event.id)
                 data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
         if is_authorized('editor'):
-            unlink_url = url_for('event_view', id_=event.id, unlink_id=link_.id) + '#tab-' + name
-            data.append(display_remove_link(unlink_url, link_.domain.name))
-        tables[name]['data'].append(data)
+            unlink = url_for('event_view', id_=event.id, unlink_id=link_.id) + '#tab-' + view_name
+            data.append(display_remove_link(unlink, link_.domain.name))
+        tables[view_name]['data'].append(data)
     for sub_event in event.get_linked_entities('P117', True):
         tables['subs']['data'].append(get_base_table_data(sub_event))
     return render_template('event/view.html', event=event, tables=tables)
@@ -217,7 +214,7 @@ def save(form, event=None, code=None, origin=None):
             url = url_for('event_insert', code=code, origin_id=origin.id if origin else None)
         g.cursor.execute('COMMIT')
         logger.log_user(event.id, log_action)
-        flash(_('entity created'), 'info')
+        flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'transaction failed', e)

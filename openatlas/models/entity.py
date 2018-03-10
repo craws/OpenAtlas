@@ -9,6 +9,7 @@ from werkzeug.exceptions import abort
 from openatlas import app, debug_model, logger
 from openatlas.models.date import DateMapper
 from openatlas.models.link import LinkMapper
+from openatlas.util.util import get_view_name
 
 
 class Entity:
@@ -67,14 +68,13 @@ class Entity:
 
     def print_base_type(self):
         from openatlas.models.node import NodeMapper
-        if self.class_.code not in app.config['CODE_CLASS']:
+        view_name = get_view_name(self)
+        if not view_name or view_name == 'actor':  # actors have no base type
             return ''
-        if self.class_.code in app.config['CLASS_CODES']['actor']:
-            return ''  # actors have no base type
-        root_name = app.config['CODE_CLASS'][self.class_.code].title()
-        if self.class_.code in app.config['CLASS_CODES']['reference']:
+        root_name = view_name.title()
+        if view_name == 'reference':
             root_name = self.system_type.title()
-        if self.system_type == 'file':
+        elif view_name == 'file':
             root_name = 'License'
         root_id = NodeMapper.get_hierarchy_by_name(root_name).id
         for node in self.nodes:

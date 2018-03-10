@@ -7,8 +7,8 @@ from openatlas.test_base import TestBaseCase
 class ProfileTests(TestBaseCase):
 
     def test_profile(self):
-        self.login()
         with app.app_context():
+            self.login()
 
             # test profile update
             rv = self.app.get(url_for('profile_index'))

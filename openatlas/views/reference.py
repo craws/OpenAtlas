@@ -13,7 +13,7 @@ from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  is_authorized, link, required_group, truncate_string, uc_first,
-                                 was_modified)
+                                 was_modified, get_view_name)
 
 
 class ReferenceForm(Form):
@@ -60,13 +60,13 @@ class AddPlaceForm(Form):
 def reference_add(origin_id):
     """Link an entity to reference coming from the entity."""
     origin = EntityMapper.get_by_id(origin_id)
-    class_name = app.config['CODE_CLASS'][origin.class_.code]
+    view_name = get_view_name(origin)
     form = AddReferenceForm()
     if form.validate_on_submit():
         reference = EntityMapper.get_by_id(form.reference.data)
         reference.link('P67', origin.id, form.page.data)
-        return redirect(url_for(class_name + '_view', id_=origin.id) + '#tab-reference')
-    return render_template('reference/add.html', origin=origin, form=form, class_name=class_name)
+        return redirect(url_for(view_name + '_view', id_=origin.id) + '#tab-reference')
+    return render_template('reference/add.html', origin=origin, form=form, class_name=view_name)
 
 
 @app.route('/reference/add2/<int:reference_id>/<class_name>', methods=['POST', 'GET'])
@@ -87,7 +87,7 @@ def reference_add2(reference_id, class_name):
 def reference_link_update(link_id, origin_id):
     link_ = LinkMapper.get_by_id(link_id)
     origin = EntityMapper.get_by_id(origin_id)
-    class_name = app.config['CODE_CLASS'][origin.class_.code]
+    view_name = get_view_name(origin)
     form = AddReferenceForm()
     form.save.label.text = _('save')
     del form.reference
@@ -95,17 +95,15 @@ def reference_link_update(link_id, origin_id):
         link_.description = form.page.data
         link_.update()
         flash(_('info update'), 'info')
-        tab = '#tab-reference'
-        if class_name == 'reference':
-            tab = '#tab-' + app.config['CODE_CLASS'][link_.range.class_.code]
-        return redirect(url_for(class_name + '_view', id_=origin.id) + tab)
+        tab = '#tab-' + get_view_name(link_.range) if view_name == 'reference' else '#tab-reference'
+        return redirect(url_for(view_name + '_view', id_=origin.id) + tab)
     form.page.data = link_.description
     return render_template(
         'reference/link-update.html',
         origin=origin,
         linked_object=link_.domain if link_.domain.id != origin.id else link_.range,
         form=form,
-        class_name=class_name)
+        class_name=view_name)
 
 
 @app.route('/reference/view/<int:id_>')
@@ -129,16 +127,16 @@ def reference_view(id_, unlink_id=None):
             data.append(display_remove_link(unlink_url, link_.domain.name))
         tables['file']['data'].append(data)
     for link_ in reference.get_links('P67'):
-        name = app.config['CODE_CLASS'][link_.range.class_.code]
+        view_name = get_view_name(link_.range)
         data = get_base_table_data(link_.range)
         data.append(truncate_string(link_.description))
         if is_authorized('editor'):
             update_url = url_for('reference_link_update', link_id=link_.id, origin_id=reference.id)
             unlink_url = url_for(
-                'reference_view', id_=reference.id, unlink_id=link_.id) + '#tab-' + name
+                'reference_view', id_=reference.id, unlink_id=link_.id) + '#tab-' + view_name
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             data.append(display_remove_link(unlink_url, link_.range.name))
-        tables[name]['data'].append(data)
+        tables[view_name]['data'].append(data)
     return render_template('reference/view.html', reference=reference, tables=tables)
 
 

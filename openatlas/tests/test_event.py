@@ -8,8 +8,8 @@ from openatlas.test_base import TestBaseCase
 class EventTest(TestBaseCase):
 
     def test_event(self):
-        self.login()
         with app.app_context():
+            self.login()
 
             # create entities for event
             rv = self.app.post(url_for('place_insert'), data={'name': 'My house'})

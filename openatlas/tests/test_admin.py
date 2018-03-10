@@ -8,8 +8,8 @@ from openatlas.test_base import TestBaseCase
 class ContentTests(TestBaseCase):
 
     def test_content_and_newsletter(self):
-        self.login()
         with app.app_context():
+            self.login()
             self.app.post(url_for('actor_insert', code='E21'), data={'name': 'Oliver Twist'})
             with app.test_request_context():
                 app.preprocess_request()

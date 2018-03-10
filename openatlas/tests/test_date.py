@@ -7,8 +7,8 @@ from openatlas.test_base import TestBaseCase
 class DateTest(TestBaseCase):
 
     def test_date(self):
-        self.login()
         with app.app_context():
+            self.login()
 
             # dates insert
             data = {

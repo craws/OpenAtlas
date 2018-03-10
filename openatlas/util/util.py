@@ -22,7 +22,6 @@ import openatlas
 from openatlas import app
 from openatlas.models.classObject import ClassObject
 from openatlas.models.date import DateMapper
-from openatlas.models.entity import Entity
 from openatlas.models.property import Property
 from openatlas.models.user import User
 
@@ -102,7 +101,10 @@ class MLStripper(HTMLParser):
 
 
 def get_view_name(entity):
-    return 'file' if entity.system_type == 'file' else app.config['CODE_CLASS'][entity.class_.code]
+    if entity.system_type == 'file':
+        return 'file'
+    if entity.class_.code in app.config['CODE_CLASS']:
+        return app.config['CODE_CLASS'][entity.class_.code]
 
 
 def sanitize(string, mode=None):
@@ -369,6 +371,7 @@ def format_date(value, format_='medium'):
 
 
 def link(entity):
+    from openatlas.models.entity import Entity
     if not entity:
         return ''
     html = ''
@@ -508,20 +511,20 @@ def get_base_table_data(entity):
     data = []
     if entity.system_type == 'file':
         data.append(format_date(entity.created))
-    name = app.config['CODE_CLASS'][entity.class_.code]
+    view_name = get_view_name(entity)
     data.append(link(entity))
-    if name in ['event', 'actor']:
+    if view_name in ['event', 'actor']:
         data.append(g.classes[entity.class_.code].name)
-    if name in ['reference'] and entity.system_type != 'file':
+    if view_name in ['reference'] and entity.system_type != 'file':
         data.append(uc_first(_(entity.system_type)))
-    if name in ['event', 'place', 'source', 'reference', 'file']:
+    if view_name in ['event', 'place', 'source', 'reference', 'file']:
         data.append(entity.print_base_type())
     if entity.system_type == 'file':
         data.append(print_file_size(entity))
-    if name in ['event', 'actor', 'place']:
+    if view_name in ['event', 'actor', 'place']:
         data.append(format(entity.first))
         data.append(format(entity.last))
-    if name in ['source'] or entity.system_type == 'file':
+    if view_name in ['source'] or entity.system_type == 'file':
         data.append(truncate_string(entity.description))
     return data
 

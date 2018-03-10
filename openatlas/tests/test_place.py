@@ -10,8 +10,8 @@ from openatlas.test_base import TestBaseCase
 class PlaceTest(TestBaseCase):
 
     def test_place(self):
-        self.login()
         with app.app_context():
+            self.login()
             rv = self.app.get(url_for('place_insert'))
             assert b'+ Place' in rv.data
             data = {'name': 'Asgard', 'alias-0': 'Valhöll'}

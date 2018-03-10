@@ -1,9 +1,7 @@
 {% extends 'layout.html' %}
 {% block breadcrumb %}
     {% if origin %}
-        <a href="{{ url_for(config['CODE_CLASS'][origin.class_.code] + '_index') }}">
-            {{ _(config['CODE_CLASS'][origin.class_.code])|uc_first }}
-        </a>
+        <a href="{{ origin|get_view_name + '_index' }}">{{ _(origin|get_view_name)|uc_first }}</a>
         > {{ origin|link|safe }}
     {% else %}
         <a href="{{ url_for('event_index') }}">{{ _('event')|uc_first }}</a>

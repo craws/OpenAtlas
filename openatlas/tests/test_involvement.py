@@ -10,8 +10,8 @@ from openatlas.test_base import TestBaseCase
 class InvolvementTests(TestBaseCase):
 
     def test_involvement(self):
-        self.login()
         with app.app_context():
+            self.login()
             with app.test_request_context():
                 app.preprocess_request()
                 actor_id = EntityMapper.insert('E21', 'Captain Miller').id

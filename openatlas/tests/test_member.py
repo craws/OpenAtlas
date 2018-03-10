@@ -9,8 +9,8 @@ from openatlas.test_base import TestBaseCase
 class MemberTests(TestBaseCase):
 
     def test_member(self):
-        self.login()
         with app.app_context():
+            self.login()
             with app.test_request_context():
                 app.preprocess_request()
                 actor_id = EntityMapper.insert('E21', 'Ripley').id

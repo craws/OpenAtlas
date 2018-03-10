@@ -7,8 +7,8 @@ from openatlas.test_base import TestBaseCase
 class ActorTests(TestBaseCase):
 
     def test_actor(self):
-        self.login()
         with app.app_context():
+            self.login()
             rv = self.app.get(url_for('actor_index'))
             assert b'No entries' in rv.data
 

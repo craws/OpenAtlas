@@ -9,8 +9,8 @@ from openatlas.test_base import TestBaseCase
 class SourceTest(TestBaseCase):
 
     def test_source(self):
-        self.login()
         with app.app_context():
+            self.login()
 
             # source insert
             rv = self.app.get(url_for('source_insert'))

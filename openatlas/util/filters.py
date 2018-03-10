@@ -125,7 +125,7 @@ def description(self, entity):
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def page_buttons(self, entity):
-    view = app.config['CODE_CLASS'][entity.class_.code]
+    view = util.get_view_name(entity)
     codes = app.config['CLASS_CODES'][view]
     html = ''
     pager_ids = EntityMapper.get_page_ids(entity, codes)
@@ -245,8 +245,7 @@ def display_delete_link(self, entity):
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
     confirm = 'onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
-    view = app.config['CODE_CLASS'][entity.class_.code] if entity.system_type != 'file' else 'file'
-    url = url_for(view + '_delete', id_=entity.id)
+    url = url_for(util.get_view_name(entity) + '_delete', id_=entity.id)
     return '<a ' + confirm + ' href="' + url + '">' + util.uc_first(_('delete')) + '</a>'
 
 
@@ -256,9 +255,7 @@ def display_menu(self, origin):
     """ Returns html with the menu and mark appropriate item as selected."""
     html = ''
     if current_user.is_authenticated:
-        selected = ''
-        if origin:
-            selected = app.config['CODE_CLASS'][origin.class_.code]
+        selected = util.get_view_name(origin) if origin else ''
         items = ['overview', 'source', 'event', 'actor', 'place', 'reference', 'types', 'admin']
         for item in items:
             if selected:

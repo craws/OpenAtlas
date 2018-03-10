@@ -8,8 +8,8 @@ from openatlas.test_base import TestBaseCase
 class NodeTest(TestBaseCase):
 
     def test_node(self):
-        self.login()
         with app.app_context():
+            self.login()
             with app.test_request_context():
                 app.preprocess_request()
                 actor_node = NodeMapper.get_hierarchy_by_name('Actor Actor Relation')

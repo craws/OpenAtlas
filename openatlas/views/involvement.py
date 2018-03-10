@@ -13,7 +13,7 @@ from openatlas.models.date import DateMapper
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.models.node import NodeMapper
-from openatlas.util.util import required_group
+from openatlas.util.util import required_group, get_view_name
 
 
 class ActorForm(DateForm):
@@ -30,9 +30,9 @@ class ActorForm(DateForm):
 @required_group('editor')
 def involvement_insert(origin_id):
     origin = EntityMapper.get_by_id(origin_id)
-    origin_class = app.config['CODE_CLASS'][origin.class_.code]
+    view_name = get_view_name(origin)
     form = build_form(ActorForm, 'Involvement')
-    if origin_class == 'event':
+    if view_name == 'event':
         del form.event
     else:
         del form.actor
@@ -45,7 +45,7 @@ def involvement_insert(origin_id):
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
-            if origin_class == 'event':
+            if view_name == 'event':
                 for actor_id in ast.literal_eval(form.actor.data):
                     link_id = origin.link(form.activity.data, actor_id, form.description.data)
                     DateMapper.save_link_dates(link_id, form)
@@ -67,8 +67,8 @@ def involvement_insert(origin_id):
             flash(_('error transaction'), 'error')
         if form.continue_.data == 'yes':
             return redirect(url_for('involvement_insert', origin_id=origin_id))
-        tab = 'actor' if origin_class == 'event' else 'event'
-        return redirect(url_for(origin_class + '_view', id_=origin.id) + '#tab-' + tab)
+        tab = 'actor' if view_name == 'event' else 'event'
+        return redirect(url_for(view_name + '_view', id_=origin.id) + '#tab-' + tab)
     return render_template('involvement/insert.html', origin=origin, form=form)
 
 
@@ -100,9 +100,9 @@ def involvement_update(id_, origin_id):
             g.cursor.execute('ROLLBACK')
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        class_ = app.config['CODE_CLASS'][origin.class_.code]
-        tab = 'actor' if class_ == 'event' else 'event'
-        return redirect(url_for(class_ + '_view', id_=origin.id) + '#tab-' + tab)
+        view_name = get_view_name(origin)
+        tab = 'actor' if view_name == 'event' else 'event'
+        return redirect(url_for(view_name + '_view', id_=origin.id) + '#tab-' + tab)
     form.activity.data = link_.property.code
     form.description.data = link_.description
     link_.set_dates()

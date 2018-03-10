@@ -55,8 +55,7 @@ def file_add(origin_id):
             g.cursor.execute('ROLLBACK')
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        view_name = app.config['CODE_CLASS'][origin.class_.code]
-        return redirect(url_for(view_name + '_view', id_=origin.id) + '#tab-file')
+        return redirect(url_for(get_view_name(origin) + '_view', id_=origin.id) + '#tab-file')
     form = build_table_form('file', origin.get_linked_entities('P67', True))
     return render_template('file/add.html', origin=origin, form=form)
 
@@ -87,12 +86,11 @@ def file_view(id_, unlink_id=None):
         header = app.config['TABLE_HEADERS'][name]
         tables[name] = {'id': name, 'header': header, 'data': []}
     for link_ in entity.get_links('P67'):
-        name = app.config['CODE_CLASS'][link_.range.class_.code]
+        view_name = get_view_name(link_.range)
         data = get_base_table_data(link_.range)
-        view = app.config['CODE_CLASS'][link_.range.class_.code]
-        unlink_url = url_for('file_view', id_=entity.id, unlink_id=link_.id) + '#tab-' + view
+        unlink_url = url_for('file_view', id_=entity.id, unlink_id=link_.id) + '#tab-' + view_name
         data.append(display_remove_link(unlink_url, link_.range.name))
-        tables[name]['data'].append(data)
+        tables[view_name]['data'].append(data)
     return render_template('file/view.html', entity=entity, tables=tables)
 
 
