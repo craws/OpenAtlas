@@ -36,5 +36,5 @@ class TestBaseCase(unittest.TestCase):
             'data_node.sql',
             'data_test.sql'
         ]:
-            with open(os.path.dirname(__file__) + '/../install/' + file_name, 'r') as sqlFile:
+            with open(os.path.dirname(__file__) + '/../install/' + file_name) as sqlFile:
                 cursor.execute(sqlFile.read())

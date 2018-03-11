@@ -26,7 +26,7 @@ def translation_insert(source_id):
     source = EntityMapper.get_by_id(source_id)
     form = build_form(TranslationForm, 'Source translation')
     if form.validate_on_submit():
-        translation = save(form, None, source)
+        translation = save(form, source=source)
         flash(_('entity created'), 'info')
         if form.continue_.data == 'yes':
             return redirect(url_for('translation_insert', source_id=source.id))

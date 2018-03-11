@@ -12,7 +12,7 @@ class NodeMapper(EntityMapper):
 
     @staticmethod
     def get_all_nodes():
-        """ Get and return all type and place nodes"""
+        """Get and return all type and place nodes"""
         sql = """
             SELECT
                 e.id,
@@ -159,11 +159,8 @@ class NodeMapper(EntityMapper):
     @staticmethod
     def save_entity_nodes(entity, form):
         from openatlas.forms.forms import TreeField, TreeMultiField
-        # Todo: don't delete/save if not changed
-        # Todo: just delete node ids?
         if hasattr(entity, 'nodes'):
             entity.delete_links(['P2', 'P89'])
-
         for field in form:
             if isinstance(field, (TreeField, TreeMultiField)) and field.data:
                 try:

@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 
 class Changelog:
-    """ A big OrderedDict with changelog data, maybe not the best place and format to keep it."""
+    """A big OrderedDict with changelog data, maybe not the best place and format to keep it."""
     versions = OrderedDict()
     versions['3.2.0'] = {
         'date': '2018-02-10',

@@ -121,7 +121,7 @@ def sanitize(string, mode=None):
 
 
 def build_table_form(class_name, linked_entities):
-    """ Returns a form with a list of entities with checkboxes"""
+    """Returns a form with a list of entities with checkboxes"""
     from openatlas.models.entity import EntityMapper
     # Todo: add CSRF token
     form = '<form class="table" method="post">'
@@ -146,7 +146,7 @@ def build_table_form(class_name, linked_entities):
 
 
 def display_remove_link(url, name):
-    """ Build a link to remove a link with a JavaScript confirmation dialog"""
+    """Build a link to remove a link with a JavaScript confirmation dialog"""
     name = name.replace('\'', '')
     confirm = 'onclick="return confirm(\'' + _('Remove %(name)s?', name=name) + '\')"'
     return '<a ' + confirm + ' href="' + url + '">' + uc_first(_('remove')) + '</a>'
@@ -507,7 +507,7 @@ def pager(table):
 
 
 def get_base_table_data(entity):
-    """ Returns standard table data for an entity"""
+    """Returns standard table data for an entity"""
     data = []
     if entity.system_type == 'file':
         data.append(format_date(entity.created))
@@ -530,7 +530,7 @@ def get_base_table_data(entity):
 
 
 def was_modified(form, entity):   # pragma: no cover
-    """ Checks if an entity was modified after an update form was opened."""
+    """Checks if an entity was modified after an update form was opened."""
     if not entity.modified or not form.opened.data:
         return False
     if entity.modified < datetime.fromtimestamp(float(form.opened.data)):

@@ -43,7 +43,7 @@ def file_index():
 @app.route('/file/add/<int:origin_id>', methods=['GET', 'POST'])
 @required_group('editor')
 def file_add(origin_id):
-    """ Link an entity to file coming from the entity."""
+    """Link an entity to file coming from the entity."""
     origin = EntityMapper.get_by_id(origin_id)
     if request.method == 'POST':
         g.cursor.execute('BEGIN')
@@ -63,7 +63,7 @@ def file_add(origin_id):
 @app.route('/file/add2/<int:id_>/<class_name>', methods=['POST', 'GET'])
 @required_group('editor')
 def file_add2(id_, class_name):
-    """ Link an entity to file coming from the file"""
+    """Link an entity to file coming from the file"""
     entity = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
         for value in request.form.getlist('values'):
@@ -106,8 +106,7 @@ def file_update(id_):
             flash(_('error modified'), 'error')
             modifier = link(logger.get_log_for_advanced_view(file.id)['modifier'])
             return render_template('file/update.html', form=form, file=file, modifier=modifier)
-        if save(form, file):
-            flash(_('info update'), 'info')
+        save(form, file)
         return redirect(url_for('file_view', id_=id_))
     return render_template('file/update.html', form=form, file=file)
 
@@ -171,7 +170,7 @@ def save(form, entity=None, origin=None):
             url = url_for(get_view_name(origin) + '_view', id_=origin.id) + '#tab-file'
         g.cursor.execute('COMMIT')
         logger.log_user(entity.id, log_action)
-        flash(_('entity created'), 'info')
+        flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)

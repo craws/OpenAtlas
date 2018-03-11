@@ -242,7 +242,7 @@ def get_view_name(self, entity):
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_delete_link(self, entity):
-    """ Build a link to delete an entity with a JavaScript confirmation dialog."""
+    """Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
     confirm = 'onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
     url = url_for(util.get_view_name(entity) + '_delete', id_=entity.id)
@@ -252,7 +252,7 @@ def display_delete_link(self, entity):
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_menu(self, origin):
-    """ Returns html with the menu and mark appropriate item as selected."""
+    """Returns html with the menu and mark appropriate item as selected."""
     html = ''
     if current_user.is_authenticated:
         selected = util.get_view_name(origin) if origin else ''
@@ -271,7 +271,7 @@ def display_menu(self, origin):
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_debug_info(self, debug_model, form):
-    """ Returns html with debug information about database queries and form errors."""
+    """Returns html with debug information about database queries and form errors."""
     html = ''
     for name, value in debug_model.items():
         if name in ['current']:

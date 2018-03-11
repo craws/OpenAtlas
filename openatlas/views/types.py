@@ -44,7 +44,7 @@ def node_insert(root_id):
         name = form.name.data
         if hasattr(form, 'name_inverse') in form:
             name += ' (' + form.name_inverse.data + ')'
-        node = save(form, None, root)
+        node = save(form, root=root)
         if node:
             flash(_('entity created'), 'info')
             return redirect(url_for('node_view', id_=node.id))

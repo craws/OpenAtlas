@@ -115,7 +115,6 @@ class DateMapper:
 
     @staticmethod
     def save_dates(entity, form):
-        # Todo: refactor to not delete/save dates if not changed
         if entity.dates:
             DateMapper.delete_dates(entity)
         code_begin = 'OA1'
@@ -173,7 +172,7 @@ class DateMapper:
             date_from = EntityMapper.insert('E61', '', 'from date value', description, date_from)
             link_mapper.insert(id_, code, date_from)
             date_to = DateMapper.form_to_datetime64(date['year2'], date['month2'], date['day2'])
-            date_to = EntityMapper.insert('E61', '', 'to date value', None, date_to)
+            date_to = EntityMapper.insert('E61', '', system_type='to date value', date=date_to)
             link_mapper.insert(id_, code, date_to)
         else:  # exact date
             date = DateMapper.form_to_datetime64(date['year'], date['month'], date['day'])

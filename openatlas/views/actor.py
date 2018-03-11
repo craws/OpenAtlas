@@ -9,10 +9,10 @@ from openatlas import app, logger
 from openatlas.forms.forms import DateForm, TableField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
-from openatlas.models.link import Link, LinkMapper
+from openatlas.models.link import LinkMapper
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 is_authorized, link, required_group,
-                                 truncate_string, uc_first, was_modified, get_view_name)
+                                 get_view_name, is_authorized, link, required_group,
+                                 truncate_string, uc_first, was_modified)
 
 
 class ActorForm(DateForm):
@@ -181,22 +181,7 @@ def actor_insert(code, origin_id=None):
     code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
     form = build_form(ActorForm, code_class[code])
     if form.validate_on_submit():
-        result = save(form, None, code, origin)
-        if not result:  # pragma: no cover
-            return render_template('actor/insert.html', form=form, code=code, origin=origin)
-        flash(_('entity created'), 'info')
-        if isinstance(result, Link) and result.property_code == 'P67':
-            return redirect(url_for('reference_link_update', link_id=result, origin_id=origin_id))
-        if form.continue_.data == 'yes':
-            return redirect(url_for('actor_insert', code=code, origin_id=origin_id))
-        if origin:
-            view_name = get_view_name(origin)
-            if view_name == 'event':
-                return redirect(url_for('involvement_update', id_=result, origin_id=origin_id))
-            if view_name == 'actor':
-                return redirect(url_for('relation_update', id_=result, origin_id=origin_id))
-            return redirect(url_for(view_name + '_view', id_=origin.id) + '#tab-actor')
-        return redirect(url_for('actor_view', id_=result.id))
+        return redirect(save(form, code=code, origin=origin))
     form.alias.append_entry('')
     if origin:
         del form.insert_and_continue
@@ -232,8 +217,7 @@ def actor_update(id_):
             flash(_('error modified'), 'error')
             modifier = link(logger.get_log_for_advanced_view(actor.id)['modifier'])
             return render_template('actor/update.html', form=form, actor=actor, modifier=modifier)
-        if save(form, actor):
-            flash(_('info update'), 'info')
+        save(form, actor)
         return redirect(url_for('actor_view', id_=id_))
     residence = actor.get_linked_entity('P74')
     form.residence.data = residence.get_linked_entity('P53', True).id if residence else ''
@@ -263,6 +247,7 @@ def save(form, actor=None, code=None, origin=None):
         actor.update()
         actor.save_dates(form)
         actor.save_nodes(form)
+        url = url_for('actor_view', id_=actor.id)
         if form.residence.data:
             object_ = EntityMapper.get_by_id(form.residence.data)
             actor.link('P74', object_.get_linked_entity('P53'))
@@ -275,22 +260,28 @@ def save(form, actor=None, code=None, origin=None):
         for alias in form.alias.data:
             if alias.strip():  # check if it isn't empty
                 actor.link('P131', EntityMapper.insert('E82', alias))
-        link_ = None
         if origin:
             view_name = get_view_name(origin)
             if view_name == 'reference':
-                link_ = origin.link('P67', actor)
+                link_id = origin.link('P67', actor)
+                url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
             elif view_name == 'source':
                 origin.link('P67', actor)
+                url = url_for('source_view', id_=origin.id) + '#tab-actor'
             elif view_name == 'event':
-                link_ = origin.link('P11', actor)
+                link_id = origin.link('P11', actor)
+                url = url_for('involvement_update', id_=link_id, origin_id=origin.id)
             elif view_name == 'actor':
-                link_ = origin.link('OA7', actor)
+                link_id = origin.link('OA7', actor)
+                url = url_for('relation_update', id_=link_id, origin_id=origin.id)
+        if form.continue_.data == 'yes' and code:
+            url = url_for('actor_insert', code=code)
         g.cursor.execute('COMMIT')
         logger.log_user(actor.id, log_action)
+        flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
-        return
-    return link_ if link_ else actor
+        return redirect(url_for('actor_index'))
+    return url

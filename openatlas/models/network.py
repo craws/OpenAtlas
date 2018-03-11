@@ -13,7 +13,7 @@ class Network:
 
     @staticmethod
     def get_network_json(params):
-        """ Returns JavaScript data string for d3.js"""
+        """Returns JavaScript data string for d3.js"""
         classes = []
         for code, param in params['classes'].items():
             if param['active']:
@@ -41,7 +41,7 @@ class Network:
             if params['options']['orphans'] or row.id in entities:
                 name = row.name.replace("'", "").replace('Location of ', '')
                 entities_already.append(row.id)
-                nodes += "{'id':'" + str(row.id) + "', 'name':'" + truncate_string(name, 40, False)
+                nodes += "{'id':'" + str(row.id) + "', 'name':'" + truncate_string(name, span=False)
                 nodes += "', 'color':'" + params['classes'][row.class_code]['color'] + "'},"
 
         # Get elements of links which weren't present in class selection
@@ -54,6 +54,6 @@ class Network:
                 if row.class_code in params['classes']:
                     color = params['classes'][row.class_code]['color']
                 name = row.name.replace("'", "").replace('Location of ', '')
-                nodes += "{'id':'" + str(row.id) + "', 'name':'" + truncate_string(name, 40, False)
+                nodes += "{'id':'" + str(row.id) + "', 'name':'" + truncate_string(name, span=False)
                 nodes += "', 'color':'" + color + "'},"
         return "graph = {'nodes': [" + nodes + "], " + edges + "};"
