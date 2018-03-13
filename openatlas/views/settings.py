@@ -112,6 +112,8 @@ def settings_update():
             flash(_('error transaction'), 'error')
         return redirect(url_for('settings_index'))
     for field in SettingsMapper.fields:
+        if field.startswith('file_'):
+            continue
         if field in ['mail_recipients_login', 'mail_recipients_feedback']:
             getattr(form, field).data = ', '.join(session['settings'][field])
         elif field in ['default_table_rows', 'log_level']:

@@ -1,14 +1,15 @@
 # Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import flash, g, render_template, request, url_for
+from flask import flash, g, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import SelectField, StringField, SubmitField, TextAreaField
+from wtforms import IntegerField, SelectField, StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired
 
 from openatlas import app, logger
 from openatlas.models.entity import EntityMapper
 from openatlas.models.node import NodeMapper
+from openatlas.models.settings import SettingsMapper
 from openatlas.models.user import UserMapper
 from openatlas.util.util import (format_date, format_datetime, link, required_group, send_mail,
                                  truncate_string, uc_first)
@@ -22,15 +23,44 @@ class LogForm(Form):
 
 
 class NewsLetterForm(Form):
-    subject = StringField('', [DataRequired()], render_kw={"placeholder": uc_first(_('subject'))})
-    body = TextAreaField('', [DataRequired()], render_kw={"placeholder": uc_first(_('content'))})
+    subject = StringField('', [DataRequired()], render_kw={"placeholder": _('subject')})
+    body = TextAreaField('', [DataRequired()], render_kw={"placeholder": _('content')})
     send = SubmitField(uc_first(_('send')))
+
+
+class FileForm(Form):
+    file_upload_max_size = IntegerField(_('max file size'))
+    file_upload_allowed_extension = StringField('allowed file extensions')
+    file_upload_display_extension = StringField('extensions for display')
 
 
 @app.route('/admin')
 @required_group('readonly')
 def admin_index():
     return render_template('admin/index.html')
+
+
+@required_group('admin')
+@app.route('/admin/file', methods=['POST', 'GET'])
+def admin_file():
+    form = FileForm()
+    if form.validate_on_submit():
+        g.cursor.execute('BEGIN')
+        try:
+            SettingsMapper.update_file_settings(form)
+            logger.log('info', 'settings', 'Settings updated')
+            g.cursor.execute('COMMIT')
+            flash(_('info update'), 'info')
+        except Exception as e:  # pragma: no cover
+            g.cursor.execute('ROLLBACK')
+            logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
+        return redirect(url_for('admin_index'))
+    settings = session['settings']
+    form.file_upload_max_size.data = settings['file_upload_max_size']
+    form.file_upload_allowed_extension.data = settings['file_upload_allowed_extension']
+    form.file_upload_display_extension.data = settings['file_upload_display_extension']
+    return render_template('admin/file.html', form=form)
 
 
 @app.route('/admin/orphans')

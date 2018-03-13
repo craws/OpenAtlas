@@ -1,7 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import os
 
-from flask import flash, g, render_template, request, url_for
+from flask import flash, g, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect, secure_filename
@@ -27,7 +27,8 @@ class FileForm(Form):
 
 
 def allowed_file(name):
-    return '.' in name and name.rsplit('.', 1)[1].lower() in app.config['ALLOWED_EXTENSIONS']
+    allowed_extensions = session['settings']['file_upload_allowed_extension'].split()
+    return '.' in name and name.rsplit('.', 1)[1].lower() in allowed_extensions
 
 
 @app.route('/file/index')
@@ -118,7 +119,13 @@ def file_insert(origin_id=None):
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(FileForm, 'File')
     if form.validate_on_submit():
-        return redirect(save(form, origin=origin))
+        file_ = request.files['file']
+        if not file_:
+            flash(_('no file to upload'), 'error')
+        elif not allowed_file(file_.filename):
+            flash(_('file type not allowed'), 'error')
+        else:
+            return redirect(save(form, origin=origin))
     return render_template('file/insert.html', form=form, origin=origin)
 
 
@@ -152,14 +159,11 @@ def save(form, entity=None, origin=None):
         if not entity:
             log_action = 'insert'
             file_ = request.files['file']
-            if file_ and allowed_file(file_.filename):
-                entity = EntityMapper.insert('E31', form.name.data, 'file')
-                filename = secure_filename(file_.filename)
-                new_name = str(entity.id) + '.' + filename.rsplit('.', 1)[1].lower()
-                full_path = os.path.join(app.config['UPLOAD_FOLDER'], new_name)
-                file_.save(full_path)
-            else:
-                1/0  # Todo: give feedback if upload failed
+            entity = EntityMapper.insert('E31', form.name.data, 'file')
+            filename = secure_filename(file_.filename)
+            new_name = str(entity.id) + '.' + filename.rsplit('.', 1)[1].lower()
+            full_path = os.path.join(app.config['UPLOAD_FOLDER'], new_name)
+            file_.save(full_path)
         entity.name = form.name.data
         entity.description = form.description.data
         entity.update()
@@ -175,5 +179,5 @@ def save(form, entity=None, origin=None):
         g.cursor.execute('ROLLBACK')
         openatlas.logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
-        url = url_for('file_insert', origin_id=origin.id if origin else None)
+        url = url_for('file_index', origin_id=origin.id if origin else None)
     return url
