@@ -13,6 +13,14 @@
     height: 100px;
 }
 
+div.preview {
+    margin-left: 1em;
+}
+
+div.preview img {
+    max-width: 400px;
+}
+
 table.tablesorter thead tr .tablesorter-header {
     background-image: url("/static/images/icons/arrow_updown.png");
     background-position: right 0.4em top 0.4em;

@@ -1,7 +1,7 @@
 # Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
 import os
 
-from flask import flash, g, render_template, request, session, url_for
+from flask import flash, g, render_template, request, send_from_directory, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect, secure_filename
@@ -15,7 +15,7 @@ from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (build_table_form, display_remove_link, get_base_table_data,
                                  get_entity_data, get_file_path, get_view_name, link,
-                                 required_group, was_modified)
+                                 required_group, uc_first, was_modified)
 
 
 class FileForm(Form):
@@ -29,6 +29,25 @@ class FileForm(Form):
 def allowed_file(name):
     allowed_extensions = session['settings']['file_upload_allowed_extension'].split()
     return '.' in name and name.rsplit('.', 1)[1].lower() in allowed_extensions
+
+
+def preview_file(name):
+    displayed_extensions = session['settings']['file_upload_display_extension'].split()
+    return '.' in name and name.rsplit('.', 1)[1].lower() in displayed_extensions
+
+
+@app.route('/download/<path:filename>')
+@required_group('readonly')
+def download_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER_PATH'], filename, as_attachment=True)
+
+
+@app.route('/display/<path:filename>')
+@required_group('readonly')
+def display_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER_PATH'], filename)
+
+
 
 
 @app.route('/file/index')
@@ -82,6 +101,7 @@ def file_view(id_, unlink_id=None):
     if unlink_id:
         LinkMapper.delete_by_id(unlink_id)
         flash(_('link removed'), 'info')
+    path = get_file_path(entity.id)
     tables = {'info': get_entity_data(entity)}
     for name in ['source', 'event', 'actor', 'place', 'reference']:
         header = app.config['TABLE_HEADERS'][name]
@@ -92,7 +112,13 @@ def file_view(id_, unlink_id=None):
         unlink_url = url_for('file_view', id_=entity.id, unlink_id=link_.id) + '#tab-' + view_name
         data.append(display_remove_link(unlink_url, link_.range.name))
         tables[view_name]['data'].append(data)
-    return render_template('file/view.html', entity=entity, tables=tables)
+    return render_template(
+        'file/view.html',
+        missing_file=False if path else True,
+        entity=entity,
+        tables=tables,
+        preview=True if path and preview_file(path) else False,
+        filename=os.path.basename(path) if path else False)
 
 
 @app.route('/file/update/<int:id_>', methods=['GET', 'POST'])
@@ -162,7 +188,7 @@ def save(form, entity=None, origin=None):
             entity = EntityMapper.insert('E31', form.name.data, 'file')
             filename = secure_filename(file_.filename)
             new_name = str(entity.id) + '.' + filename.rsplit('.', 1)[1].lower()
-            full_path = os.path.join(app.config['UPLOAD_FOLDER'], new_name)
+            full_path = os.path.join(app.config['UPLOAD_FOLDER_PATH'], new_name)
             file_.save(full_path)
         entity.name = form.name.data
         entity.description = form.description.data

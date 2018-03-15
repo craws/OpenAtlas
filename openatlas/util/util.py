@@ -4,6 +4,7 @@ import os
 import re
 import smtplib
 from collections import OrderedDict
+from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
@@ -11,7 +12,6 @@ from html.parser import HTMLParser
 
 import numpy
 from babel import dates
-from datetime import datetime
 from flask import abort, flash, g, request, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
@@ -35,7 +35,7 @@ def convert_size(size_bytes):
 
 
 def get_file_path(entity_id):
-    path = glob.glob(os.path.join(app.config['UPLOAD_FOLDER'], str(entity_id) + '.*'))
+    path = glob.glob(os.path.join(app.config['UPLOAD_FOLDER_PATH'], str(entity_id) + '.*'))
     return path[0] if path else None
 
 
