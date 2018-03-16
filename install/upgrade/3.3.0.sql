@@ -2,9 +2,14 @@
 
 BEGIN;
 
--- License for file upload
-INSERT INTO model.entity (class_code, name, description) VALUES ('E55', 'License', 'Types for a file license');
+-- Settings for file upload
+INSERT INTO web.settings (name, value) VALUES
+('file_upload_max_size', '10'),
+('file_upload_allowed_extension', 'gif jpeg jpg pdf png txt zip'),
+('file_upload_display_extension', 'gif jpeg jpg png');
 
+-- License type for file upload
+INSERT INTO model.entity (class_code, name, description) VALUES ('E55', 'License', 'Types for a file license');
 INSERT INTO model.entity (class_code, name) VALUES
 ('E55', 'Proprietary license'),
 ('E55', 'Open license'),

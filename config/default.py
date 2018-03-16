@@ -19,11 +19,7 @@ DATABASE_PASS = 'CHANGE ME'
 MAIL_PASSWORD = 'CHANGE ME'
 SECRET_KEY = 'CHANGE ME'
 
-UPLOAD_FOLDER = os.path.dirname(__file__) + '/../openatlas/uploads'
-
-# TODO: move to db
-MAX_CONTENT_LENGTH = 16 * 1024 * 1024  # 16 MB
-ALLOWED_EXTENSIONS = ['png', 'jpg', 'jpeg', 'gif', 'txt', 'bmp']
+UPLOAD_FOLDER_PATH = os.path.dirname(__file__) + '/../openatlas/uploads'
 
 # Whitelisted domains are ignored by the link checker
 WHITELISTED_DOMAINS = ['E61']

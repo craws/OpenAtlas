@@ -1,0 +1,16 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
+    > {{ _('files')|uc_first }}
+{% endblock %}
+{% block content %}
+    <form id="file-form" name="file-form" method="post">
+        {{ form.csrf_token }}
+        <div style="float:left;">
+            {{ form.file_upload_max_size }} {{ form.file_upload_max_size.label }}<br />
+            {{ form.file_upload_allowed_extension }} {{ form.file_upload_allowed_extension.label }}<br />
+            {{ form.file_upload_display_extension }} {{ form.file_upload_display_extension.label }}<br />
+            <input type="submit" value="{{ _('save')|uc_first }}" />
+        </div>
+    </form>
+{% endblock %}
