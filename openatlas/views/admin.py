@@ -1,4 +1,8 @@
 # Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+import os
+from os.path import splitext, basename
+
+import datetime
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
@@ -12,7 +16,7 @@ from openatlas.models.node import NodeMapper
 from openatlas.models.settings import SettingsMapper
 from openatlas.models.user import UserMapper
 from openatlas.util.util import (format_date, format_datetime, link, required_group, send_mail,
-                                 truncate_string, uc_first)
+                                 truncate_string, uc_first, get_file_path, convert_size)
 
 
 class LogForm(Form):
@@ -56,10 +60,9 @@ def admin_file():
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('admin_index'))
-    settings = session['settings']
-    form.file_upload_max_size.data = settings['file_upload_max_size']
-    form.file_upload_allowed_extension.data = settings['file_upload_allowed_extension']
-    form.file_upload_display_extension.data = settings['file_upload_display_extension']
+    form.file_upload_max_size.data = session['settings']['file_upload_max_size']
+    form.file_upload_allowed_extension.data = session['settings']['file_upload_allowed_extension']
+    form.file_upload_display_extension.data = session['settings']['file_upload_display_extension']
     return render_template('admin/file.html', form=form)
 
 
@@ -75,8 +78,13 @@ def admin_orphans(delete=None):
     tables = {
         'orphans': {'id': 'orphans', 'header': header, 'data': []},
         'unlinked': {'id': 'unlinked', 'header': header, 'data': []},
-        'nodes': {'id': 'nodes', 'header': ['name', 'root'], 'data': []}}
+        'nodes': {'id': 'nodes', 'header': ['name', 'root'], 'data': []},
+        'missing_files': {'id': 'missing_files', 'header': header, 'data': []},
+        'orphaned_files': {'id': 'orphaned_files', 'data': [],
+                           'header': ['name', 'size', 'date', 'ext']}}
     for entity in EntityMapper.get_orphans():
+        if entity.class_.code == 'E55':
+            continue
         name = 'unlinked' if entity.class_.code in app.config['CODE_CLASS'].keys() else 'orphans'
         tables[name]['data'].append([
             link(entity),
@@ -88,6 +96,34 @@ def admin_orphans(delete=None):
             truncate_string(entity.description)])
     for node in NodeMapper.get_orphans():
         tables['nodes']['data'].append([link(node), link(g.nodes[node.root[-1]])])
+
+    file_ids = []
+    # Get orphaned file entities (no corresponding file)
+    for entity in EntityMapper.get_by_system_type('file'):
+        file_ids.append(str(entity.id))
+        if not get_file_path(entity):
+            tables['missing_files']['data'].append([
+                link(entity),
+                link(entity.class_),
+                entity.print_base_type(),
+                entity.system_type,
+                format_date(entity.created),
+                format_date(entity.modified),
+                truncate_string(entity.description)])
+
+    # Get orphaned files (no corresponding entity)
+    path = app.config['UPLOAD_FOLDER_PATH']
+    for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
+        name = basename(file)
+        file_path = path + '/' + name
+        if name != '.gitignore' and splitext(name)[0] not in file_ids:
+            tables['orphaned_files']['data'].append([
+                name,
+                convert_size(os.path.getsize(file_path)),
+                format_date(datetime.datetime.fromtimestamp(os.path.getmtime(file_path))),
+                splitext(name)[1],
+                '<a href="' + url_for('download_file', filename=name) + '">' + uc_first(
+                    _('download')) + '</a>'])
     return render_template('admin/orphans.html', tables=tables)
 
 

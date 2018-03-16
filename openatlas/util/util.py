@@ -34,7 +34,8 @@ def convert_size(size_bytes):
     return "%s %s" % (int(size_bytes / math.pow(1024, i)), size_name[i])
 
 
-def get_file_path(entity_id):
+def get_file_path(entity):
+    entity_id = entity if isinstance(entity, int) else entity.id
     path = glob.glob(os.path.join(app.config['UPLOAD_FOLDER_PATH'], str(entity_id) + '.*'))
     return path[0] if path else None
 
@@ -43,6 +44,12 @@ def print_file_size(entity):
     entity_id = entity if isinstance(entity, int) else entity.id
     path = get_file_path(entity_id)
     return convert_size(os.path.getsize(path)) if path else 'N/A'
+
+
+def print_file_extension(entity):
+    entity_id = entity if isinstance(entity, int) else entity.id
+    path = get_file_path(entity_id)
+    return os.path.splitext(path)[1] if path else 'N/A'
 
 
 def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
@@ -184,6 +191,7 @@ def get_entity_data(entity, location=None):
     # Info for files
     if entity.system_type == 'file':
         data.append((uc_first(_('size')), print_file_size(entity)))
+        data.append((uc_first(_('extension')), print_file_extension(entity)))
 
     # Info for events
     if entity.class_.code in app.config['CLASS_CODES']['event']:
@@ -509,8 +517,6 @@ def pager(table):
 def get_base_table_data(entity):
     """Returns standard table data for an entity"""
     data = []
-    if entity.system_type == 'file':
-        data.append(format_date(entity.created))
     view_name = get_view_name(entity)
     data.append(link(entity))
     if view_name in ['event', 'actor']:
@@ -521,6 +527,7 @@ def get_base_table_data(entity):
         data.append(entity.print_base_type())
     if entity.system_type == 'file':
         data.append(print_file_size(entity))
+        data.append(print_file_extension(entity))
     if view_name in ['event', 'actor', 'place']:
         data.append(format(entity.first))
         data.append(format(entity.last))

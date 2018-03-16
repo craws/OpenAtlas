@@ -15,7 +15,7 @@ from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (build_table_form, display_remove_link, get_base_table_data,
                                  get_entity_data, get_file_path, get_view_name, link,
-                                 required_group, uc_first, was_modified)
+                                 required_group, was_modified)
 
 
 class FileForm(Form):
@@ -48,13 +48,10 @@ def display_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER_PATH'], filename)
 
 
-
-
 @app.route('/file/index')
 @required_group('readonly')
 def file_index():
-    headers = ['date', 'name', 'license', 'size', 'description']
-    table = {'id': 'files', 'header': headers, 'data': []}
+    table = {'id': 'files', 'header': app.config['TABLE_HEADERS']['file'], 'data': []}
     for file in EntityMapper.get_by_system_type('file'):
         table['data'].append(get_base_table_data(file))
     return render_template('file/index.html', table=table)
@@ -104,8 +101,7 @@ def file_view(id_, unlink_id=None):
     path = get_file_path(entity.id)
     tables = {'info': get_entity_data(entity)}
     for name in ['source', 'event', 'actor', 'place', 'reference']:
-        header = app.config['TABLE_HEADERS'][name]
-        tables[name] = {'id': name, 'header': header, 'data': []}
+        tables[name] = {'id': name, 'header': app.config['TABLE_HEADERS'][name], 'data': []}
     for link_ in entity.get_links('P67'):
         view_name = get_view_name(link_.range)
         data = get_base_table_data(link_.range)

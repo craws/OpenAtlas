@@ -9,6 +9,8 @@
         <li><a href="#tab-orphan">{{ _('orphan')|uc_first }} ({{ tables['orphans']['data']|length }})</a></li>
         <li><a href="#tab-unlinked">{{ _('unlinked')|uc_first }} ({{ tables['unlinked']['data']|length }})</a></li>
         <li><a href="#tab-nodes">{{ _('type')|uc_first }} ({{ tables['nodes']['data']|length }})</a></li>
+        <li><a href="#tab-missing-files">{{ _('missing files')|uc_first }} ({{ tables['missing_files']['data']|length }})</a></li>
+        <li><a href="#tab-orphaned-files">{{ _('orphaned files')|uc_first }} ({{ tables['orphaned_files']['data']|length }})</a></li>
     </ul>
     <div id="tab-orphan">
         {% if tables['orphans']['data']|length > 0 %}
@@ -30,6 +32,12 @@
             </div>
         {% endif %}
         {{ tables['nodes']|pager|safe }}
+    </div>
+    <div id="tab-missing-files">
+        {{ tables['missing_files']|pager|safe }}
+    </div>
+    <div id="tab-orphaned-files">
+        {{ tables['orphaned_files']|pager|safe }}
     </div>
 </div>
 {% endblock %}
