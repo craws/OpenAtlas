@@ -24,7 +24,7 @@ class SearchForm(Form):
 
 
 @app.route('/overview/search', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('readonly')
 def index_search():
     classes = ['source', 'event', 'actor', 'place', 'reference']
     form = SearchForm()
