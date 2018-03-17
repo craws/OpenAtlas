@@ -66,6 +66,7 @@ def node_update(id_):
             flash(_('info update'), 'info')
             return redirect(url_for('node_view', id_=id_))
         return render_template('types/update.html', node=node, root=root, form=form)
+    getattr(form, str(root.id)).label.text = 'super'
     return render_template('types/update.html', node=node, root=root, form=form)
 
 

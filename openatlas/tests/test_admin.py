@@ -19,6 +19,9 @@ class ContentTests(TestBaseCase):
             assert b'2017-04-01' in rv.data
             rv = self.app.get(url_for('admin_orphans', delete='orphans'))
             assert b'2017-04-01' not in rv.data
+            self.app.get(url_for('admin_orphans', delete='unlinked'))
+            self.app.get(url_for('admin_orphans', delete='types'))
+            self.app.get(url_for('admin_orphans', delete='something completely different'))
             rv = self.app.get(url_for('admin_newsletter'))
             assert b'Newsletter' in rv.data
 

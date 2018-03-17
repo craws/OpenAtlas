@@ -126,8 +126,7 @@ class TreeSelect(HiddenInput):
                         $("#{name}-tree").jstree("search", $(this).val());
                     }});
                 }});
-            </script>
-        """.format(
+            </script>""".format(
             name=field.id,
             title=g.nodes[hierarchy_id].name,
             selection=selection,
@@ -172,8 +171,7 @@ class TreeMultiSelect(HiddenInput):
                 $("#{name}-tree-search").keyup(function(){{
                     $("#{name}-tree").jstree("search", $(this).val());
                 }});
-            </script>
-        """.format(
+            </script>""".format(
             name=field.id,
             title=g.nodes[int(field.id)].name,
             selection=selection,
@@ -203,7 +201,7 @@ class TableSelect(HiddenInput):
                         """.format(
                         name=field.id,
                         entity_id=entity.id,
-                        entity_name=truncate_string(entity.name, 40, False))
+                        entity_name=truncate_string(entity.name, span=False))
             table['data'].append(data)
         html = """
             <input id="{name}-button" name="{name}-button" class="table-select {required}"
@@ -265,8 +263,7 @@ class TableMultiSelect(HiddenInput):
             <div id="{name}-dialog" class="overlay-container">{pager}</div></div>
             <script>
                 $(document).ready(function () {{createOverlay("{name}", "{title}", true);}});
-            </script>
-            """.format(
+            </script>""".format(
                 name=field.id,
                 title=_(field.id.replace('_', ' ')),
                 selection=selection,

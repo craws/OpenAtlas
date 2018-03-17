@@ -19,6 +19,7 @@ class ActorTests(TestBaseCase):
             # actor insert
             rv = self.app.get(url_for('actor_insert', code='E21'))
             assert b'+ Person' in rv.data
+            self.app.get(url_for('actor_insert', code='E21', origin_id=residence_id))
             data = {
                 'name': 'Sigourney Weaver',
                 'alias-1': 'Ripley',
@@ -34,14 +35,14 @@ class ActorTests(TestBaseCase):
                 'date_end_year2': '2050',
                 'date_birth': True,
                 'date_death': True}
-            rv = self.app.post(url_for('actor_insert', code='E21'), data=data)
+            rv = self.app.post(
+                url_for('actor_insert', code='E21', origin_id=residence_id), data=data)
             actor_id = rv.location.split('/')[-1]
             rv = self.app.post(url_for('reference_insert', code='reference'), data={'name': 'Book'})
             reference_id = rv.location.split('/')[-1]
             rv = self.app.post(
                 url_for('actor_insert', code='E21', origin_id=reference_id),
-                data=data,
-                follow_redirects=True)
+                data=data, follow_redirects=True)
             assert b'An entry has been created' in rv.data
             data['continue_'] = 'yes'
             rv = self.app.post(

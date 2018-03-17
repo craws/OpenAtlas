@@ -40,7 +40,8 @@ def uc_first(self, string):
 @blueprint.app_template_filter()
 @evalcontextfilter
 def nl2br(self, value):
-    result = u'\n\n'.join(u'<p>%s</p>' % p.replace('\n', '<br>\n') for p in paragraph_re.split(escape(value)))
+    result = u'\n\n'.join(
+        u'<p>%s</p>' % p.replace('\n', '<br>\n') for p in paragraph_re.split(escape(value)))
     return result
 
 
@@ -168,16 +169,24 @@ def display_form(self, form, form_id=None, for_persons=False):
             except ValueError:
                 hierarchy_id = NodeMapper.get_hierarchy_by_name(util.uc_first(field.id)).id
             node = g.nodes[hierarchy_id]
-            if node.name in app.config['BASE_TYPES']:
-                base_type = '<div class="table-row"><div><label>' + util.uc_first(_('type')) + '</label>'
-                base_type += ' <span class="tooltip" title="' + _('tooltip type') + '">i</span></div>'
-                base_type += '<div class="table-cell">' + str(field(class_=class_)) + errors + '</div></div>'
-                html['types'] = base_type + html['types']
-                continue
-            html['types'] += '<div class="table-row"><div><label>' + node.name + '</label>'
-            html['types'] += ' <span class="tooltip" title="' + _('tooltip type') + '">i</span>'
-            html['types'] += '</div><div class="table-cell">'
-            html['types'] += str(field(class_=class_)) + errors + '</div></div>'
+            type_field = """
+                <div class="table-row">
+                    <div>
+                        <label>{label}</label>
+                        <span class="tooltip" title="{title}">i</span>
+                    </div>
+                    <div class="table-cell">
+                        {field}
+                    </div>
+                </div>
+            """.format(
+                label=util.uc_first(_('super')) if field.label.text == 'super' else node.name,
+                title=_('tooltip type'),
+                field=str(field(class_=class_)) + errors)
+            if node.name in app.config['BASE_TYPES']:  # base type should be above other fields
+                html['types'] = type_field + html['types']
+            else:
+                html['types'] += type_field
             continue
         if field.type in ['CSRFTokenField', 'HiddenField']:
             html['header'] += str(field)

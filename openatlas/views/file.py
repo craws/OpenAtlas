@@ -142,7 +142,7 @@ def file_insert(origin_id=None):
     form = build_form(FileForm, 'File')
     if form.validate_on_submit():
         file_ = request.files['file']
-        if not file_:
+        if not file_:   # pragma: no cover
             flash(_('no file to upload'), 'error')
         elif not allowed_file(file_.filename):
             flash(_('file type not allowed'), 'error')
