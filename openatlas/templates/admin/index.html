@@ -7,13 +7,13 @@
         <h1 >{{ _('user')|uc_first }}</h1>
         <a href="{{ url_for('user_index') }}">{{ _('user')|uc_first }}</a>
         <a href="{{ url_for('user_activity') }}">{{ _('activity')|uc_first }}</a>
+        {% if 'manager'|is_authorized and session['settings']['mail']: %}
+            <a href="{{ url_for('admin_newsletter') }}">{{ _('newsletter')|uc_first }}</a>
+        {% endif %}
         <h1 >{{ _('files')|uc_first }}</h1>
         <a href="{{ url_for('file_index') }}">{{ _('list')|uc_first }}</a>
         {% if 'manager'|is_authorized: %}
             <a href="{{ url_for('admin_file') }}">{{ _('settings')|uc_first }}</a>
-        {% endif %}
-        {% if 'manager'|is_authorized and session['settings']['mail']: %}
-            <a href="{{ url_for('admin_newsletter') }}">{{ _('newsletter')|uc_first }}</a>
         {% endif %}
         {% if 'manager'|is_authorized: %}
             <h1>{{ _('settings')|uc_first }}</h1>

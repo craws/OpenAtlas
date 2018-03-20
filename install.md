@@ -59,6 +59,12 @@ use install/example_apache.conf as template for a new vhost
     # apacha2ctl configtest
     # service apache2 restart
 
+## File Upload
+
+Make the openatlas/uploads directory writeable for apache e.g.
+
+    chown www-data /var/www/net/openatlas/openatlas/uploads/
+
 ## Finishing
 
 Login with username "OpenAtlas" and password "change_me_PLEASE!" and change the password in profile.
