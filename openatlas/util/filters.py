@@ -169,20 +169,24 @@ def display_form(self, form, form_id=None, for_persons=False):
             except ValueError:
                 hierarchy_id = NodeMapper.get_hierarchy_by_name(util.uc_first(field.id)).id
             node = g.nodes[hierarchy_id]
+            label = node.name
+            tooltip = '<span class="tooltip" title="' + _('tooltip type') + '">i</span>'
+            if node.name in app.config['BASE_TYPES']:
+                label = util.uc_first(_('type'))
+            if field.label.text == 'super':
+                label = util.uc_first(_('super'))
+                tooltip = ''
             type_field = """
                 <div class="table-row">
                     <div>
                         <label>{label}</label>
-                        <span class="tooltip" title="{title}">i</span>
+                        {tooltip}
                     </div>
                     <div class="table-cell">
                         {field}
                     </div>
                 </div>
-            """.format(
-                label=util.uc_first(_('super')) if field.label.text == 'super' else node.name,
-                title=_('tooltip type'),
-                field=str(field(class_=class_)) + errors)
+            """.format(label=label, tooltip=tooltip, field=str(field(class_=class_)) + errors)
             if node.name in app.config['BASE_TYPES']:  # base type should be above other fields
                 html['types'] = type_field + html['types']
             else:

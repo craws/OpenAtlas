@@ -6,6 +6,10 @@ Before executing SQL statements backup the database. Replace database role "open
 
 Execute install/upgrade/3.3.0.sql after making backups
 
+Change the owner of openatlas/uploads to apache user e.g.
+
+    chown www-data /var/www/net/openatlas/openatlas/uploads/
+
 ### 3.1.0 to 3.2.0
 
 #### Database
