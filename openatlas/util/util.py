@@ -443,7 +443,7 @@ def pager(table):
     table_rows = session['settings']['default_table_rows']
     if hasattr(current_user, 'settings'):
         table_rows = current_user.settings['table_rows']
-    show_pager = False if table['id'] in ['overview', 'bookmarks', 'latest'] else True
+    show_pager = table['show_pager'] if 'show_pager' in table else True
     if show_pager:
         options = ''
         for amount in app.config['DEFAULT_TABLE_ROWS']:

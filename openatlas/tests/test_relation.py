@@ -24,7 +24,7 @@ class RelationTests(TestBaseCase):
             data = {
                 'actor': '[' + str(related_id) + ']',
                 relation_id: relation_id,
-                'inverse': True,
+                'inverse': None,
                 'date_begin_year': '-1949',
                 'date_begin_month': '10',
                 'date_begin_day': '8',
@@ -34,22 +34,32 @@ class RelationTests(TestBaseCase):
             rv = self.app.post(
                 url_for('relation_insert', origin_id=actor_id), data=data, follow_redirects=True)
             assert b'The Kurgan' in rv.data
-            data['continue'] = 'yes'
-            data['inverse'] = ''
+            data['continue_'] = 'yes'
+            data['inverse'] = True
             rv = self.app.post(
                 url_for('relation_insert', origin_id=actor_id), data=data, follow_redirects=True)
             assert b'The Kurgan' in rv.data
             rv = self.app.get(url_for('actor_view', id_=actor_id))
             assert b'The Kurgan' in rv.data
 
+            rv = self.app.post(
+                url_for('relation_insert', origin_id=related_id), data=data, follow_redirects=True)
+            assert b"Can't link to itself." in rv.data
+
             # Update relationship
             with app.test_request_context():
                 app.preprocess_request()
                 link_id = LinkMapper.get_links(actor_id, 'OA7')[0].id
+                link_id2 = LinkMapper.get_links(actor_id, 'OA7', True)[0].id
             rv = self.app.get(url_for('relation_update', id_=link_id, origin_id=related_id))
             assert b'Connor' in rv.data
             rv = self.app.post(
                 url_for('relation_update', id_=link_id, origin_id=actor_id),
                 data={'description': 'There can be only one!', 'inverse': True},
+                follow_redirects=True)
+            assert b'only one' in rv.data
+            rv = self.app.post(
+                url_for('relation_update', id_=link_id2, origin_id=actor_id),
+                data={'description': 'There can be only one!', 'inverse': None},
                 follow_redirects=True)
             assert b'only one' in rv.data

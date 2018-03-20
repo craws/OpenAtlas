@@ -99,15 +99,15 @@ def class_view(code):
     tables = OrderedDict()
     for table in ['super', 'sub']:
         tables[table] = {
-            'id': table, 'header': ['code', 'name'], 'data': [],
+            'id': table, 'header': ['code', 'name'], 'data': [], 'show_pager': False,
             'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'}
         for code in getattr(class_, table):
             tables[table]['data'].append([link(classes[code]), classes[code].name])
     tables['domains'] = {
-        'id': 'domains', 'header': ['code', 'name'], 'data': [],
+        'id': 'domains', 'header': ['code', 'name'], 'data': [], 'show_pager': False,
         'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'}
     tables['ranges'] = {
-        'id': 'ranges', 'header': ['code', 'name'], 'data': [],
+        'id': 'ranges', 'header': ['code', 'name'], 'data': [], 'show_pager': False,
         'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'}
     for key, property_ in g.properties.items():
         if code == property_.domain_class_code:
@@ -132,7 +132,7 @@ def property_view(code):
             ('range', link(range_) + ' ' + range_.name)]}
     for table in ['super', 'sub']:
         tables[table] = {
-            'id': table, 'header': ['code', 'name'], 'data': [],
+            'id': table, 'header': ['code', 'name'], 'data': [], 'show_pager': False,
             'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }}'}
         for code in getattr(property_, table):
             tables[table]['data'].append([link(g.properties[code]), g.properties[code].name])
@@ -153,17 +153,17 @@ class NetworkForm(Form):
 def model_network():
     params = {
         'classes': {
-            'E21': {'active': True,  'color':  '#34B522'},   # Person
-            'E7':  {'active':  True,  'color':  '#E54A2A'},  # Activity
-            'E31': {'active': False, 'color':  '#FFA500'},   # Document
-            'E33': {'active': False, 'color':  '#FFA500'},   # Linguistic Object
-            'E40': {'active': True,  'color':  '#34623C'},   # Legal Body
-            'E74': {'active': True,  'color':  '#34623C'},   # Group
-            'E53': {'active': False, 'color':  '#00FF00'},   # Places
-            'E18': {'active': False, 'color':  '#FF0000'},   # Physical Object
-            'E8':  {'active':  True,  'color':  '#E54A2A'},  # Acquisition
-            'E12': {'active': True,  'color':  '#E54A2A'},   # Production
-            'E6':  {'active':  True,  'color':  '#E54A2A'},  # Destruction
+            'E21': {'active': True,  'color':  '#34B522'},  # Person
+            'E7':  {'active': True,  'color':  '#E54A2A'},  # Activity
+            'E31': {'active': False, 'color':  '#FFA500'},  # Document
+            'E33': {'active': False, 'color':  '#FFA500'},  # Linguistic Object
+            'E40': {'active': True,  'color':  '#34623C'},  # Legal Body
+            'E74': {'active': True,  'color':  '#34623C'},  # Group
+            'E53': {'active': False, 'color':  '#00FF00'},  # Places
+            'E18': {'active': False, 'color':  '#FF0000'},  # Physical Object
+            'E8':  {'active': True,  'color':  '#E54A2A'},  # Acquisition
+            'E12': {'active': True,  'color':  '#E54A2A'},  # Production
+            'E6':  {'active': True,  'color':  '#E54A2A'},  # Destruction
             'E84': {'active': False, 'color':  '#EE82EE'}},  # Information Carrier
         'properties': {
             'P107': {'active':  True},   # has current or former member

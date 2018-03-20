@@ -40,6 +40,8 @@ class IndexTests(TestBaseCase):
             assert b'invalid' in rv.data
 
             self.login()
+            rv = self.app.get(url_for('reset_password'))
+            assert b'Forgot your password?' not in rv.data
             rv = self.app.get('/')
             assert b'0' in rv.data
             rv = self.app.get(url_for('index_feedback'))

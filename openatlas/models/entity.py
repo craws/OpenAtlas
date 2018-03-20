@@ -255,7 +255,7 @@ class EntityMapper:
     def get_latest(limit):
         """Returns the newest created entities"""
         codes = []
-        for class_, class_codes in app.config['CLASS_CODES'].items():
+        for class_codes in app.config['CLASS_CODES'].values():
             codes += class_codes
         sql = EntityMapper.sql + """
                 WHERE e.class_code IN %(codes)s

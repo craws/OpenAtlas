@@ -11,21 +11,33 @@
         </p>
         {{ data['info']|data_table|safe }}
     </div>
-    {% for name, table in tables.items() %}
-        {% if table['data']|length > 0 %}
-            <div style="float:left;padding-right:2em;">
-                <p>
-                    <strong>{{ name|uc_first }}</strong>
-                </p>
-                {{ tables[name]|pager|safe }}
-            </div>
-        {% endif %}
-    {% endfor %}
+    {% if tables['super']['data']|length > 0 %}
+        <div style="float:left;padding-right:2em;">
+            <p><strong>{{ _('super')|uc_first }}</strong></p>
+            {{ tables['super']|pager|safe }}
+        </div>
+    {% endif %}
+    {% if tables['sub']['data']|length > 0 %}
+        <div style="float:left;padding-right:2em;">
+            <p><strong>{{ _('subs')|uc_first }}</strong></p>
+            {{ tables['sub']|pager|safe }}
+        </div>
+    {% endif %}
+    {% if tables['domains']['data']|length > 0 %}
+        <div style="float:left;padding-right:2em;">
+            <p><strong>{{ _('domain for')|uc_first }}</strong></p>
+            {{ tables['domains']|pager|safe }}
+        </div>
+    {% endif %}
+    {% if tables['ranges']['data']|length > 0 %}
+        <div style="float:left;padding-right:2em;">
+            <p><strong>{{ _('range for')|uc_first }}</strong></p>
+            {{ tables['ranges']|pager|safe }}
+        </div>
+    {% endif %}
     <div style="clear:both"></div>
     <div class="description">
         <strong>{{ _('description')|uc_first|safe }}</strong>
-        <p>
-            {{ class_.comment }}
-        </p>
+        <p>{{ class_.comment }}</p>
     </div>
 {% endblock %}

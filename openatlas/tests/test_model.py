@@ -15,7 +15,7 @@ class ModelTests(TestBaseCase):
             rv = self.app.get(url_for('class_index'))
             assert b'E1' in rv.data
             rv = self.app.get(url_for('class_view', code='E4'))
-            assert b'Domains' in rv.data
+            assert b'Domain for' in rv.data
             rv = self.app.get(url_for('property_index'))
             assert b'P1' in rv.data
             rv = self.app.get(url_for('property_view', code='P68'))
@@ -25,9 +25,7 @@ class ModelTests(TestBaseCase):
             assert b'Wrong domain' in rv.data
 
             self.login()
-
-            # Insert data to display in network view
-            with app.test_request_context():
+            with app.test_request_context():  # Insert data to display in network view
                 app.preprocess_request()
                 actor = EntityMapper.insert('E21', 'King Arthur')
                 event = EntityMapper.insert('E7', 'Battle of Camlann')
