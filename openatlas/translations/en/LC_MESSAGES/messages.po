@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-03-17 12:24+0100\n"
-"PO-Revision-Date: 2018-03-17 12:27+0100\n"
+"POT-Creation-Date: 2018-03-20 14:19+0100\n"
+"PO-Revision-Date: 2018-03-20 14:20+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -80,7 +80,7 @@ msgstr "Begin dates cannot start after end dates."
 #: views/reference.py:230 views/relation.py:58 views/relation.py:90
 #: views/settings.py:112 views/source.py:108 views/source.py:139
 #: views/source.py:189 views/translation.py:60 views/translation.py:98
-#: views/types.py:116 views/types.py:192
+#: views/types.py:117 views/types.py:193
 msgid "error transaction"
 msgstr "A transaction error occurred. Please report this."
 
@@ -199,7 +199,7 @@ msgid "login"
 msgstr "login"
 
 #: templates/admin/file.html:13 templates/content/update.html:16
-#: templates/map.html:9 templates/settings/update.html:10 util/filters.py:155
+#: templates/map.html:9 templates/settings/update.html:10 util/filters.py:156
 #: views/involvement.py:83 views/member.py:117 views/profile.py:36
 #: views/profile.py:64 views/reference.py:92 views/relation.py:94
 #: views/user.py:30
@@ -231,7 +231,7 @@ msgstr "edit"
 #: templates/translation/view.html:15 templates/types/index.html:43
 #: templates/types/index.html:44 templates/types/view.html:28
 #: templates/types/view.html:29 templates/user/view.html:14
-#: templates/user/view.html:15 util/filters.py:249 views/user.py:59
+#: templates/user/view.html:15 util/filters.py:258 views/user.py:59
 msgid "delete"
 msgstr "delete"
 
@@ -300,7 +300,7 @@ msgstr "reload"
 #: templates/file/view.html:9 templates/model/class_view.html:10
 #: templates/model/property_view.html:10 templates/place/view.html:9
 #: templates/reference/view.html:9 templates/source/view.html:9
-#: templates/types/view.html:12 views/types.py:80 views/types.py:95
+#: templates/types/view.html:12 views/types.py:81 views/types.py:96
 #: views/user.py:28
 msgid "info"
 msgstr "info"
@@ -476,7 +476,6 @@ msgid "unlinked"
 msgstr "Entities without links"
 
 #: templates/admin/orphans.html:11 templates/types/index.html:21
-#: util/filters.py:172
 msgid "type"
 msgstr "type"
 
@@ -643,8 +642,25 @@ msgstr ""
 msgid "classes"
 msgstr "classes"
 
-#: templates/model/class_view.html:26 templates/model/property_view.html:26
-#: templates/types/index.html:66 util/filters.py:121 views/actor.py:24
+#: templates/model/class_view.html:16 templates/types/view.html:35
+#: util/filters.py:183
+msgid "super"
+msgstr "super"
+
+#: templates/model/class_view.html:22 templates/types/view.html:14
+msgid "subs"
+msgstr "subs"
+
+#: templates/model/class_view.html:28
+msgid "domain for"
+msgstr "domain for"
+
+#: templates/model/class_view.html:34
+msgid "range for"
+msgstr "range for"
+
+#: templates/model/class_view.html:40 templates/model/property_view.html:26
+#: templates/types/index.html:66 util/filters.py:122 views/actor.py:24
 #: views/event.py:24 views/file.py:24 views/hierarchy.py:28 views/index.py:21
 #: views/involvement.py:23 views/member.py:23 views/place.py:21
 #: views/reference.py:21 views/relation.py:23 views/types.py:21
@@ -745,31 +761,23 @@ msgstr "single"
 msgid "forms"
 msgstr "forms"
 
-#: templates/types/view.html:14
-msgid "subs"
-msgstr "subs"
-
 #: templates/types/view.html:17 templates/types/view.html:20
 msgid "entities"
 msgstr "entities"
 
-#: templates/types/view.html:35
-msgid "super"
-msgstr "super"
-
-#: util/filters.py:53
+#: util/filters.py:54
 msgid "no"
 msgstr "no"
 
-#: util/filters.py:54 views/user.py:120
+#: util/filters.py:55 views/user.py:120
 msgid "yes"
 msgstr "yes"
 
-#: util/filters.py:173 util/filters.py:178
+#: util/filters.py:184
 msgid "tooltip type"
 msgstr "The options can be edited in types."
 
-#: util/filters.py:247
+#: util/filters.py:256
 #, python-format
 msgid "Delete %(name)s?"
 msgstr "Delete %(name)s?"
@@ -778,7 +786,7 @@ msgstr "Delete %(name)s?"
 msgid "error mail login"
 msgstr "Couldn't connect to the mail server."
 
-#: util/util.py:86 views/index.py:80
+#: util/util.py:86 views/index.py:81
 msgid "error mail send"
 msgstr "The mail couldn't be sent."
 
@@ -839,7 +847,7 @@ msgstr "last"
 msgid "between"
 msgstr "between"
 
-#: util/util.py:254 views/place.py:74 views/types.py:80
+#: util/util.py:254 views/place.py:74 views/types.py:81
 msgid "class"
 msgstr "class"
 
@@ -861,7 +869,7 @@ msgstr "You can declare a begin date, an end date or timespans for each of them.
 
 #: views/actor.py:19 views/event.py:20 views/file.py:23 views/hierarchy.py:18
 #: views/place.py:19 views/reference.py:20 views/source.py:19
-#: views/translation.py:16 views/types.py:19 views/types.py:80 views/types.py:95
+#: views/translation.py:16 views/types.py:19 views/types.py:81 views/types.py:96
 msgid "name"
 msgstr "name"
 
@@ -903,7 +911,7 @@ msgstr "link removed"
 
 #: views/actor.py:199 views/event.py:79 views/file.py:173 views/hierarchy.py:82
 #: views/place.py:115 views/reference.py:177 views/source.py:135
-#: views/translation.py:56 views/types.py:112
+#: views/translation.py:56 views/types.py:113
 msgid "entity deleted"
 msgstr "The entry has been deleted."
 
@@ -972,7 +980,7 @@ msgstr "To unsubscribe use the link below."
 msgid "Newsletter send"
 msgstr "Newsletter send"
 
-#: views/event.py:39 views/types.py:173
+#: views/event.py:39 views/types.py:174
 msgid "error node self as super"
 msgstr "Type can't have itself as super."
 
@@ -1000,17 +1008,17 @@ msgstr "Choose in which forms this type will be available."
 msgid "error name exists"
 msgstr "The name is already in use."
 
-#: views/index.py:78
+#: views/index.py:79
 msgid "info feedback thanks"
 msgstr "Thank you for your feedback."
 
-#: views/index.py:118
+#: views/index.py:119
 msgid "unsubscribe link not valid"
 msgstr ""
 "Sorry, but this link seems invalid, You can also unsubscribe from the "
 "newsletter in your profile."
 
-#: views/index.py:124
+#: views/index.py:125
 msgid ""
 "You have successfully unsubscribed. You can subscribe again in your Profile."
 msgstr ""
@@ -1343,19 +1351,19 @@ msgstr "This test mail was sent by %(username)s"
 msgid "A test mail was sent to %(email)s."
 msgstr "A test mail was sent to %(email)s."
 
-#: views/types.py:90
+#: views/types.py:91
 msgid "domain"
 msgstr "domain"
 
-#: views/types.py:90
+#: views/types.py:91
 msgid "range"
 msgstr "range"
 
-#: views/types.py:95
+#: views/types.py:96
 msgid "count"
 msgstr "count"
 
-#: views/types.py:176
+#: views/types.py:177
 msgid "error node sub as super"
 msgstr "Type can't have a sub as super."
 
