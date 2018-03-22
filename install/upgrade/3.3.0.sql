@@ -28,4 +28,8 @@ INSERT INTO web.hierarchy (id, name, multiple, system, directional) VALUES ((SEL
 INSERT INTO web.form (name, extendable) VALUES ('File', True);
 INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES ((SELECT id FROM web.hierarchy WHERE name LIKE 'License'),(SELECT id FROM web.form WHERE name LIKE 'File'));
 
+-- Clean up former language identifier
+UPDATE web.user_settings SET value = 'en' WHERE name = 'language' AND value = '1';
+UPDATE web.user_settings SET value = 'de' WHERE name = 'language' AND value = '2';
+
 COMMIT;

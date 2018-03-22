@@ -43,8 +43,11 @@ class PlaceTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()
                 places = EntityMapper.get_by_codes('place')
-            place_id = places[0].id
-            second_place_id = places[1].id
+                place_id = places[0].id
+                second_place_id = places[1].id
+                location = LinkMapper.get_linked_entity(second_place_id, 'P53')
+                actor_id = EntityMapper.insert('E21', 'Milla Jovovich').id
+                LinkMapper.insert(actor_id, 'P74', location.id)
             data['continue_'] = 'yes'
             rv = self.app.post(url_for('place_insert'), data=data, follow_redirects=True)
             assert b'An entry has been created' in rv.data
@@ -60,12 +63,11 @@ class PlaceTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()
                 event = EntityMapper.insert('E8', 'Valhalla rising')
-                location = LinkMapper.get_linked_entity(second_place_id, 'P53')
                 event.link('P7', location)
                 event.link('P24', location)
             rv = self.app.get(
                 url_for(
                     'place_view', id_=second_place_id, unlink_id=place_id), follow_redirects=True)
-            assert b'Link removed' in rv.data
+            assert b'Link removed' in rv.data and b'Milla Jovovich' in rv.data
             rv = self.app.get(url_for('place_delete', id_=place_id), follow_redirects=True)
             assert b'The entry has been deleted.' in rv.data

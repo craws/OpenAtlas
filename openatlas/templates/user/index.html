@@ -4,8 +4,10 @@
     > {{ _('user')|uc_first }}
 {% endblock %}
 {% block content %}
-    <div class="button-bar">
-        <a href="{{ url_for('user_insert') }}">+ {{ _('user')|uc_first }}</a>
-    </div>
+    {% if 'manager'|is_authorized %}
+        <div class="button-bar">
+            <a href="{{ url_for('user_insert') }}">+ {{ _('user')|uc_first }}</a>
+        </div>
+    {% endif %}
     {{ tables['user']|pager|safe }}
 {% endblock %}
