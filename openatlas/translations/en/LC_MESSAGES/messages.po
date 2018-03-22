@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-03-20 14:19+0100\n"
-"PO-Revision-Date: 2018-03-20 14:20+0100\n"
+"POT-Creation-Date: 2018-03-22 15:33+0100\n"
+"PO-Revision-Date: 2018-03-22 15:45+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -101,8 +101,8 @@ msgid "bookmark"
 msgstr "bookmark"
 
 #: templates/403.html:11
-msgid "It seems you are not welcomed here."
-msgstr "It seems you are not welcomed here."
+msgid "This page is restricted."
+msgstr "This page is restricted."
 
 #: templates/403.html:14 templates/404.html:17
 msgid ""
@@ -111,6 +111,15 @@ msgid ""
 msgstr ""
 "Use the back button of your browser or click <a href=\"/\">here</a> to go to "
 "the main page."
+
+#: templates/403.html:17
+msgid "Please let us know if you think it's a bug"
+msgstr "Please let us know if you think it's a bug"
+
+#: templates/403.html:17 templates/index/feedback.html:4
+#: templates/index/index.html:13
+msgid "feedback"
+msgstr "feedback"
 
 #: templates/404.html:11
 msgid "We are so sorry!"
@@ -231,7 +240,7 @@ msgstr "edit"
 #: templates/translation/view.html:15 templates/types/index.html:43
 #: templates/types/index.html:44 templates/types/view.html:28
 #: templates/types/view.html:29 templates/user/view.html:14
-#: templates/user/view.html:15 util/filters.py:258 views/user.py:59
+#: templates/user/view.html:15 util/filters.py:262 views/user.py:59
 msgid "delete"
 msgstr "delete"
 
@@ -298,7 +307,7 @@ msgstr "reload"
 
 #: templates/actor/view.html:9 templates/event/view.html:9
 #: templates/file/view.html:9 templates/model/class_view.html:10
-#: templates/model/property_view.html:10 templates/place/view.html:9
+#: templates/model/property_view.html:9 templates/place/view.html:9
 #: templates/reference/view.html:9 templates/source/view.html:9
 #: templates/types/view.html:12 views/types.py:81 views/types.py:96
 #: views/user.py:28
@@ -353,7 +362,7 @@ msgid "map"
 msgstr "map"
 
 #: templates/actor/view.html:21 templates/admin/file.html:4
-#: templates/admin/index.html:7 templates/event/view.html:16
+#: templates/admin/index.html:13 templates/event/view.html:16
 #: templates/file/add2.html:3 templates/file/index.html:3
 #: templates/file/insert.html:7 templates/file/update.html:3
 #: templates/file/view.html:3 templates/place/view.html:21
@@ -409,17 +418,7 @@ msgstr "file"
 msgid "admin"
 msgstr "admin"
 
-#: templates/admin/index.html:8
-msgid "list"
-msgstr "list"
-
-#: templates/admin/index.html:10 templates/admin/index.html:19
-#: templates/admin/index.html:23 templates/settings/index.html:4
-#: templates/settings/update.html:4
-msgid "settings"
-msgstr "settings"
-
-#: templates/admin/index.html:12 templates/admin/index.html:13
+#: templates/admin/index.html:7 templates/admin/index.html:8
 #: templates/user/activity.html:4 templates/user/index.html:4
 #: templates/user/index.html:8 templates/user/insert.html:4
 #: templates/user/insert.html:5 templates/user/update.html:4
@@ -427,15 +426,25 @@ msgstr "settings"
 msgid "user"
 msgstr "user"
 
-#: templates/admin/index.html:14 templates/user/activity.html:5
+#: templates/admin/index.html:9 templates/user/activity.html:5
 #: templates/user/view.html:20 views/involvement.py:22
 msgid "activity"
 msgstr "activity"
 
-#: templates/admin/index.html:16 templates/admin/newsletter.html:4
+#: templates/admin/index.html:11 templates/admin/newsletter.html:4
 #: views/profile.py:63 views/profile.py:76
 msgid "newsletter"
 msgstr "newsletter"
+
+#: templates/admin/index.html:14
+msgid "list"
+msgstr "list"
+
+#: templates/admin/index.html:16 templates/admin/index.html:19
+#: templates/admin/index.html:23 templates/settings/index.html:4
+#: templates/settings/update.html:4
+msgid "settings"
+msgstr "settings"
 
 #: templates/admin/index.html:20 templates/content/index.html:4
 #: templates/content/update.html:4 templates/content/view.html:4
@@ -476,6 +485,7 @@ msgid "unlinked"
 msgstr "Entities without links"
 
 #: templates/admin/orphans.html:11 templates/types/index.html:21
+#: util/filters.py:175
 msgid "type"
 msgstr "type"
 
@@ -548,10 +558,6 @@ msgstr "custom"
 #: templates/search/index.html:3
 msgid "overview"
 msgstr "overview"
-
-#: templates/index/feedback.html:4 templates/index/index.html:13
-msgid "feedback"
-msgstr "feedback"
 
 #: templates/index/feedback.html:8
 msgid "feedback intro"
@@ -642,12 +648,13 @@ msgstr ""
 msgid "classes"
 msgstr "classes"
 
-#: templates/model/class_view.html:16 templates/types/view.html:35
-#: util/filters.py:183
+#: templates/model/class_view.html:16 templates/model/property_view.html:14
+#: templates/types/view.html:35 util/filters.py:177
 msgid "super"
 msgstr "super"
 
-#: templates/model/class_view.html:22 templates/types/view.html:14
+#: templates/model/class_view.html:22 templates/model/property_view.html:20
+#: templates/types/view.html:14
 msgid "subs"
 msgstr "subs"
 
@@ -773,11 +780,11 @@ msgstr "no"
 msgid "yes"
 msgstr "yes"
 
-#: util/filters.py:184
+#: util/filters.py:173
 msgid "tooltip type"
 msgstr "The options can be edited in types."
 
-#: util/filters.py:256
+#: util/filters.py:260
 #, python-format
 msgid "Delete %(name)s?"
 msgstr "Delete %(name)s?"
@@ -1539,3 +1546,6 @@ msgstr "A user was deleted."
 
 #~ msgid "translation"
 #~ msgstr "translation"
+
+#~ msgid "It seems you are not welcomed here."
+#~ msgstr "It seems you are not welcomed here."
