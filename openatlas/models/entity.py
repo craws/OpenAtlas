@@ -117,9 +117,9 @@ class EntityMapper:
         LEFT JOIN model.link l2 on e.id = l2.range_id
         LEFT JOIN model.link_property lp2 on e.id = lp2.range_id
         WHERE
-            l1.domain_id IS NULL AND
-            l2.range_id IS NULL AND
-            lp2.range_id IS NULL """
+            l1.domain_id IS NULL
+            AND l2.range_id IS NULL
+            AND lp2.range_id IS NULL"""
 
     @staticmethod
     def update(entity):
@@ -271,9 +271,7 @@ class EntityMapper:
     @staticmethod
     def delete_orphans(parameter):
         from openatlas.models.node import NodeMapper
-        if parameter == 'orphans':
-            sql_where = EntityMapper.sql_orphan + " AND e.class_code NOT IN %(class_codes)s"
-        elif parameter == 'unlinked':
+        if parameter == 'unlinked':
             sql_where = EntityMapper.sql_orphan + " AND e.class_code IN %(class_codes)s"
         elif parameter == 'types':
             count = 0

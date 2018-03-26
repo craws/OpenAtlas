@@ -83,8 +83,6 @@ def admin_orphans(delete=None):
         'orphaned_files': {'id': 'orphaned_files', 'data': [],
                            'header': ['name', 'size', 'date', 'ext']}}
     for entity in EntityMapper.get_orphans():
-        if entity.class_.code == 'E55':
-            continue
         name = 'unlinked' if entity.class_.code in app.config['CODE_CLASS'].keys() else 'orphans'
         tables[name]['data'].append([
             link(entity),
