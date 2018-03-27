@@ -13,6 +13,12 @@
         <li><a href="#tab-orphaned-files">{{ _('orphaned files')|uc_first }} ({{ tables['orphaned_files']['data']|length }})</a></li>
     </ul>
     <div id="tab-orphan">
+        {% if tables['orphans']['data']|length > 0 %}
+            <div class="button-bar">
+                <a onclick="return confirm('{{_('delete orphans')|uc_first }}?')"
+                   href="{{ url_for('admin_orphans', delete='orphans') }}">{{ _('delete orphans')|uc_first }}</a>
+            </div>
+        {% endif %}
         {{ tables['orphans']|pager|safe }}
     </div>
     <div id="tab-unlinked">

@@ -2,6 +2,7 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
+from openatlas.models.link import LinkMapper
 from openatlas.test_base import TestBaseCase
 
 
@@ -62,6 +63,8 @@ class ReferenceTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()
                 link_id = batman.get_links('P67', True)[0].id
+                file_id = EntityMapper.insert('E31', 'The X-Files', 'file').id
+                LinkMapper.insert(file_id, 'P67', int(bibliography_id))
             rv = self.app.post(url_for(
                 'reference_link_update',
                 link_id=link_id,
@@ -70,7 +73,7 @@ class ReferenceTest(TestBaseCase):
 
             # reference unlink
             rv = self.app.get(url_for('reference_view', id_=bibliography_id, unlink_id=batman.id))
-            assert b'removed'in rv.data
+            assert b'removed'in rv.data and b'The X-Files' in rv.data
 
             # reference delete
             rv = self.app.get(
