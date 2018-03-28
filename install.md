@@ -47,16 +47,19 @@ Copy the files to /var/www/your_sitename
 
 ## Configuration
 
-Create the folder and file instance/production.py
+Copy instance/example_production.py to instance/production.py and add/change values as appropriate.
 
-Copy install/example_config.py to instance/production.py and add/change the values as appropriate.
+    $ cp  instance/example_production.py instance/production.py
 
 ## Apache
 
-use install/example_apache.conf as template for a new vhost
+As root copy and adapt install/example_apache.conf for a new vhost, activate the site:
 
     # a2ensite your_sitename
-    # apacha2ctl configtest
+
+Test Apache configuration and restart
+
+    # apache2ctl configtest
     # service apache2 restart
 
 ## File Upload

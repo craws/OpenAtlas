@@ -14,7 +14,7 @@ GitHub: https://github.com/craws/OpenAtlas-Python
 
 # Installation
 
-Please refer to install.md for requirements and installation.
+Please refer to [install.md](install.md) for requirements and installation.
 
 # Licensing
 

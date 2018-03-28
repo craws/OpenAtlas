@@ -1,5 +1,6 @@
-# sensitive data
+# sensitive data (except example files)
 instance/*
+!instance/example_production.py
 
 # cache
 __pycache__/*
@@ -16,4 +17,3 @@ openatlas/uploads/*
 
 # ide
 .idea
-
