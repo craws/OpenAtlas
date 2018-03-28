@@ -14,9 +14,9 @@ class ContentTests(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()
                 EntityMapper.insert('E61', '2017-04-01')  # add orphaned date
+                EntityMapper.insert('E31', 'One forsaken file entity', 'file')  # add orphaned file
             rv = self.app.get(url_for('admin_orphans'))
-            assert b'Oliver Twist' in rv.data
-            assert b'2017-04-01' in rv.data
+            assert all(x in rv.data for x in [b'Oliver Twist', b'2017-04-01', b'forsaken'])
             rv = self.app.get(url_for('admin_orphans', delete='orphans'))
             assert b'2017-04-01' not in rv.data
             self.app.get(url_for('admin_orphans', delete='unlinked'))

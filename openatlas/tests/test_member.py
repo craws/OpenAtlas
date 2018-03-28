@@ -16,7 +16,7 @@ class MemberTests(TestBaseCase):
                 actor_id = EntityMapper.insert('E21', 'Ripley').id
                 group_id = EntityMapper.insert('E74', 'Space Marines').id
 
-            # add membership
+            # Add membership
             rv = self.app.get(url_for('member_insert', origin_id=group_id))
             assert b'Actor Function' in rv.data
             data = {'group': '[' + str(group_id) + ']'}
@@ -28,7 +28,14 @@ class MemberTests(TestBaseCase):
                 url_for('membership_insert', origin_id=actor_id), data=data, follow_redirects=True)
             assert b'Space Marines' in rv.data
 
-            # add member to group
+            rv = self.app.post(
+                url_for('membership_insert', origin_id=group_id), data=data, follow_redirects=True)
+            assert b"Can't link to itself" in rv.data
+            rv = self.app.post(url_for('member_insert', origin_id=actor_id),
+                               data={'actor': '[' + str(actor_id) + ']'}, follow_redirects=True)
+            assert b"Can't link to itself" in rv.data
+
+            # Add member to group
             data = {'actor': '[' + str(actor_id) + ']'}
             rv = self.app.post(
                 url_for('member_insert', origin_id=group_id), data=data, follow_redirects=True)
@@ -38,7 +45,7 @@ class MemberTests(TestBaseCase):
                 url_for('member_insert', origin_id=group_id), data=data, follow_redirects=True)
             assert b'Ripley' in rv.data
 
-            # update member
+            # Update
             with app.test_request_context():
                 app.preprocess_request()
                 link_id = LinkMapper.get_links(group_id, 'P107')[0].id

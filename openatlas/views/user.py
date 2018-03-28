@@ -129,7 +129,7 @@ def user_index():
 def user_update(id_):
     user = UserMapper.get_by_id(id_)
     if user.group == 'admin' and current_user.group != 'admin':
-        abort(403)
+        abort(403)  # pragma: no cover
     form = UserForm()
     form.user_id = id_
     del form.password, form.password2, form.send_info, form.insert_and_continue, form.show_passwords
@@ -201,7 +201,7 @@ def get_groups():
 def user_delete(id_):
     user = UserMapper.get_by_id(id_)
     if (user.group == 'admin' and current_user.group != 'admin') and user.id != current_user.id:
-        abort(403)
+        abort(403)   # pragma: no cover
     UserMapper.delete(id_)
     flash(_('user deleted'), 'info')
     return redirect(url_for('user_index'))

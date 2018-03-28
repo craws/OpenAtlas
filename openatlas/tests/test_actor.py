@@ -1,6 +1,7 @@
 from flask import url_for
 
 from openatlas import app
+from openatlas.models.entity import EntityMapper
 from openatlas.test_base import TestBaseCase
 
 
@@ -12,9 +13,13 @@ class ActorTests(TestBaseCase):
             rv = self.app.get(url_for('actor_index'))
             assert b'No entries' in rv.data
 
-            # create a residence for actor
+            # create entities for actor
             rv = self.app.post(url_for('place_insert'), data={'name': 'Nostromos'})
             residence_id = rv.location.split('/')[-1]
+            with app.test_request_context():
+                app.preprocess_request()
+                event_id = EntityMapper.insert('E8', 'Event Horizon').id
+                source_id = EntityMapper.insert('E33', 'Tha source').id
 
             # actor insert
             rv = self.app.get(url_for('actor_insert', code='E21'))
@@ -37,6 +42,10 @@ class ActorTests(TestBaseCase):
                 'date_death': True}
             rv = self.app.post(
                 url_for('actor_insert', code='E21', origin_id=residence_id), data=data)
+            actor_id = rv.location.split('/')[-1]
+            self.app.post(url_for('actor_insert', code='E21', origin_id=actor_id), data=data)
+            self.app.post(url_for('actor_insert', code='E21', origin_id=event_id), data=data)
+            self.app.post(url_for('actor_insert', code='E21', origin_id=source_id), data=data)
             actor_id = rv.location.split('/')[-1]
             rv = self.app.post(url_for('reference_insert', code='reference'), data={'name': 'Book'})
             reference_id = rv.location.split('/')[-1]
