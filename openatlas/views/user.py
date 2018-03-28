@@ -160,10 +160,12 @@ def user_update(id_):
 def user_insert():
     form = UserForm()
     form.group.choices = get_groups()
+    if not session['settings']['mail']:
+        del form.send_info
     if form.validate_on_submit():
         user_id = UserMapper.insert(form)
         flash(_('user created'), 'info')
-        if form.send_info.data and session['settings']['mail']:  # pragma: no cover
+        if session['settings']['mail'] and form.send_info.data:  # pragma: no cover
             subject = _(
                 'Your account information for %(sitename)s',
                 sitename=session['settings']['site_name'])
