@@ -81,8 +81,10 @@ def table_select_model(self, name, selected=None):
         'data': []}
     for id_ in entities:
         table['data'].append([
-            '<a onclick="selectFromTable(this, \'' + name + '\', \'' + str(id_) + '\')">' + entities[id_].code + '</a>',
-            '<a onclick="selectFromTable(this, \'' + name + '\', \'' + str(id_) + '\')">' + entities[id_].name + '</a>'])
+            '<a onclick="selectFromTable(this, \'' + name + '\', \'' + str(id_) + '\')">' +
+            entities[id_].code + '</a>',
+            '<a onclick="selectFromTable(this, \'' + name + '\', \'' + str(id_) + '\')">' +
+            entities[id_].name + '</a>'])
     value = selected.code + ' ' + selected.name if selected else ''
     html = """
         <input id="{name}-button" value="{value}" class="table-select" type="text"
@@ -170,7 +172,8 @@ def display_form(self, form, form_id=None, for_persons=False):
                 hierarchy_id = NodeMapper.get_hierarchy_by_name(util.uc_first(field.id)).id
             node = g.nodes[hierarchy_id]
             label = node.name
-            tooltip = '<span class="tooltip" title="' + _('tooltip type') + '">i</span>'
+            tooltip = \
+                '<span class="tooltip" title="' + node.description.replace('"', "'") + '">i</span>'
             if node.name in app.config['BASE_TYPES']:
                 label = util.uc_first(_('type'))
             if field.label.text == 'super':
@@ -255,7 +258,7 @@ def get_view_name(self, entity):
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_delete_link(self, entity):
-    """Build a link to delete an entity with a JavaScript confirmation dialog."""
+    """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
     confirm = 'onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
     url = url_for(util.get_view_name(entity) + '_delete', id_=entity.id)
@@ -265,7 +268,7 @@ def display_delete_link(self, entity):
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_menu(self, origin):
-    """Returns html with the menu and mark appropriate item as selected."""
+    """ Returns html with the menu and mark appropriate item as selected."""
     html = ''
     if current_user.is_authenticated:
         selected = util.get_view_name(origin) if origin else ''
@@ -284,7 +287,7 @@ def display_menu(self, origin):
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_debug_info(self, debug_model, form):
-    """Returns html with debug information about database queries and form errors."""
+    """ Returns html with debug information about database queries and form errors."""
     html = ''
     for name, value in debug_model.items():
         if name in ['current']:
