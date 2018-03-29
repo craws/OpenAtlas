@@ -7,8 +7,8 @@ Installation with examples from a Debian 9 (Stretch) system.
 ### Python 3 and Flask
 
     # apt-get install python3 python3-bcrypt python3-dateutil python3-jinja2 python3-psycopg2
-    python3-flask python3-flask-babel python3-flask-login python3-flaskext.wtf python3-markdown
-    python3-numpy
+    # apt-get install python3-flask python3-flask-babel python3-flask-login python3-flaskext.wtf
+    # apt-get install python3-markdown python3-numpy
 
 ### Apache 2.4
 
@@ -48,7 +48,7 @@ Copy the files to /var/www/your_sitename or clone it from GitHub
 
 Copy instance/example_production.py to instance/production.py
 
-    $ cp  instance/example_production.py instance/production.py
+    $ cp instance/example_production.py instance/production.py
 
 Add/change values as appropriate.
 
