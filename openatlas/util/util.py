@@ -65,7 +65,7 @@ def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
     server.ehlo()
     server.starttls()
     try:
-        server.login(sender, app.config['MAIL_PASSWORD'])
+        server.login(session['settings']['mail_from_name'], app.config['MAIL_PASSWORD'])
         for recipient in recipients:
             msg = MIMEText(text, 'plain', 'utf-8')
             msg['From'] = from_
