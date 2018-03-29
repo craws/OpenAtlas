@@ -7,8 +7,8 @@ Installation with examples from a Debian 9 (Stretch) system.
 ### Python 3 and Flask
 
     # apt-get install python3 python3-bcrypt python3-dateutil python3-jinja2 python3-psycopg2
-    # apt-get install python3-flask python3-flask-babel python3-flask-login python3-flaskext.wtf
-    # apt-get install python3-markdown python3-numpy
+    python3-flask python3-flask-babel python3-flask-login python3-flaskext.wtf python3-markdown
+    python3-numpy
 
 ### Apache 2.4
 
@@ -31,25 +31,26 @@ Important!
 A user with username "OpenAtlas" and password "change_me_PLEASE!" is created.
 Change this account immediately!
 
+Uncomment "CREATE EXTENSION postgis;" in top off install/structure.sql
+
 As postgres
 
     $ createuser openatlas -P
     $ createdb openatlas -O openatlas
-
-Uncomment "CREATE EXTENSION postgis;" in top off install/structure.sql
-
     $ cd install
     $ cat structure.sql data_web.sql data_model.sql data_node.sql | psql -d openatlas -f -
 
 ### Files
 
-Copy the files to /var/www/your_sitename
+Copy the files to /var/www/your_sitename or clone it from GitHub
 
 ## Configuration
 
-Copy instance/example_production.py to instance/production.py and add/change values as appropriate.
+Copy instance/example_production.py to instance/production.py
 
     $ cp  instance/example_production.py instance/production.py
+
+Add/change values as appropriate.
 
 ## Apache
 
@@ -71,7 +72,6 @@ Make the openatlas/uploads directory writeable for apache e.g.
 ## Finishing
 
 Login with username "OpenAtlas" and password "change_me_PLEASE!" and change the password in profile.
-Remove the data/install directory on production systems
 
 ## Unit tests (optional)
 
