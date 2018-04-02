@@ -41,12 +41,18 @@ def place_index():
 @required_group('editor')
 def place_insert(origin_id=None):
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
+    system_type = 'place'
+    if origin and origin.system_type == 'place':
+        system_type = 'feature'
     form = build_form(PlaceForm, 'Place')
     if origin:
         del form.insert_and_continue
+        if system_type != 'place':
+            del form.alias
     if form.validate_on_submit():
         return redirect(save(form, origin=origin))
-    form.alias.append_entry('')
+    if system_type == 'place':
+        form.alias.append_entry('')
     gis_data = GisMapper.get_all()
     return render_template('place/insert.html', form=form, origin=origin, gis_data=gis_data)
 
@@ -66,6 +72,7 @@ def place_view(id_, unlink_id=None):
         'file': {'id': 'files', 'data': [], 'header': app.config['TABLE_HEADERS']['file']},
         'source': {'id': 'source', 'data': [], 'header': app.config['TABLE_HEADERS']['source']},
         'event': {'id': 'event', 'data': [], 'header': app.config['TABLE_HEADERS']['event']},
+        'feature': {'id': 'event', 'data': [], 'header': app.config['TABLE_HEADERS']['place']},
         'reference': {
             'id': 'reference', 'data': [],
             'header': app.config['TABLE_HEADERS']['reference'] + ['pages']},

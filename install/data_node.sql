@@ -177,6 +177,21 @@ INSERT INTO link (property_code, range_id, domain_id) VALUES
 ('P127', (SELECT id FROM entity WHERE name='Place'), (SELECT id FROM entity WHERE name='Boundary Mark')),
 ('P127', (SELECT id FROM entity WHERE name='Place'), (SELECT id FROM entity WHERE name='Topographical Entity'));
 
+-------------
+-- Feature --
+-------------
+INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Feature', '');
+
+---------------------------
+-- Stratigraphical Unit --
+---------------------------
+INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Stratigraphical Unit', '');
+
+-----------
+-- Find --
+-----------
+INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Find', '');
+
 -------------------------
 -- Administrative Unit --
 -------------------------
@@ -237,6 +252,9 @@ INSERT INTO web.hierarchy (id, name, multiple, system, directional) VALUES
 ((SELECT id FROM entity WHERE name='Involvement'), 'Involvement', False, True, False),
 ((SELECT id FROM entity WHERE name='Sex'), 'Sex', False, False, False),
 ((SELECT id FROM entity WHERE name='Place'), 'Place', False, True, False),
+((SELECT id FROM entity WHERE name='Feature'), 'Feature', False, True, False),
+((SELECT id FROM entity WHERE name='Stratigraphical Unit'), 'Stratigraphical Unit', False, True, False),
+((SELECT id FROM entity WHERE name='Find'), 'Find', False, True, False),
 ((SELECT id FROM entity WHERE name='Information Carrier'), 'Information Carrier', False, True, False),
 ((SELECT id FROM entity WHERE name='Bibliography'), 'Bibliography', False, True, False),
 ((SELECT id FROM entity WHERE name='Edition'), 'Edition', False, True, False),
@@ -252,6 +270,9 @@ INSERT INTO web.form (name, extendable) VALUES
 ('Group', True),
 ('Legal Body', True),
 ('Place', True),
+('Feature', True),
+('Stratigraphical Unit', True),
+('Find', True),
 ('Bibliography', True),
 ('Edition', True),
 ('Information Carrier', True),
@@ -268,6 +289,9 @@ INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Place'),(SELECT id FROM web.form WHERE name LIKE 'Place')),
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Administrative Unit'),(SELECT id FROM web.form WHERE name LIKE 'Place')),
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Historical Place'),(SELECT id FROM web.form WHERE name LIKE 'Place')),
+((SELECT id FROM web.hierarchy WHERE name LIKE 'Feature'),(SELECT id FROM web.form WHERE name LIKE 'Feature')),
+((SELECT id FROM web.hierarchy WHERE name LIKE 'Stratigraphical Unit'),(SELECT id FROM web.form WHERE name LIKE 'Stratigraphical Unit')),
+((SELECT id FROM web.hierarchy WHERE name LIKE 'Find'),(SELECT id FROM web.form WHERE name LIKE 'Find')),
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Bibliography'),(SELECT id FROM web.form WHERE name LIKE 'Bibliography')),
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Edition'),(SELECT id FROM web.form WHERE name LIKE 'Edition')),
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Information Carrier'),(SELECT id FROM web.form WHERE name LIKE 'Information Carrier')),
