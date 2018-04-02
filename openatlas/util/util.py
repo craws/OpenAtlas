@@ -53,36 +53,33 @@ def print_file_extension(entity):
 
 
 def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
+    """ Send one mail to every recipient, set log_body to False for sensitive data e.g. passwords"""
+    settings = session['settings']
     recipients = recipients if isinstance(recipients, list) else [recipients]
-    if not session['settings']['mail'] or len(recipients) < 1:
+    if not settings['mail'] or len(recipients) < 1:
         return
-    sender = session['settings']['mail_transport_username']
-    from_ = session['settings']['mail_from_name']
-    from_ += ' <' + session['settings']['mail_from_email'] + '>'
-    server = smtplib.SMTP(
-        session['settings']['mail_transport_host'],
-        session['settings']['mail_transport_port'])
+    mail_user = settings['mail_transport_username']
+    from_ = settings['mail_from_name'] + ' <' + settings['mail_from_email'] + '>'
+    server = smtplib.SMTP(settings['mail_transport_host'], settings['mail_transport_port'])
     server.ehlo()
     server.starttls()
     try:
-        server.login(session['settings']['mail_from_name'], app.config['MAIL_PASSWORD'])
+        server.login(mail_user, app.config['MAIL_PASSWORD'])
         for recipient in recipients:
-            msg = MIMEText(text, 'plain', 'utf-8')
+            msg = MIMEText(text, _charset='utf-8')
             msg['From'] = from_
             msg['To'] = recipient.strip()
             msg['Subject'] = Header(subject.encode('utf-8'), 'utf-8')
-            server.sendmail(sender, recipient, msg.as_string())
-        message = 'Mail send from for ' + from_ + ' to ' + ', '.join(recipients)
-        message += ' Subject: ' + subject
-        # Don't log sensitive data, e.g. passwords
-        message += ' Content: ' + text if log_body else ''
-        openatlas.logger.log('info', 'mail', 'Mail send from ' + sender, message)
+            server.sendmail(settings['mail_from_email'], recipient, msg.as_string())
+        log_text = 'Mail from ' + from_ + ' to ' + ', '.join(recipients) + ' Subject: ' + subject
+        log_text += ' Content: ' + text if log_body else ''
+        openatlas.logger.log('info', 'mail', 'Mail send from ' + from_, log_text)
     except smtplib.SMTPAuthenticationError as e:
-        openatlas.logger.log('error', 'mail', 'Error mail login for ' + sender, str(e))
+        openatlas.logger.log('error', 'mail', 'Error mail login for ' + mail_user, str(e))
         flash(_('error mail login'), 'error')
         return False
     except Exception as e:
-        openatlas.logger.log('error', 'mail', 'Error send mail for ' + sender, str(e))
+        openatlas.logger.log('error', 'mail', 'Error send mail for ' + mail_user, str(e))
         flash(_('error mail send'), 'error')
         return False
     return True
@@ -128,7 +125,7 @@ def sanitize(string, mode=None):
 
 
 def build_table_form(class_name, linked_entities):
-    """Returns a form with a list of entities with checkboxes"""
+    """ Returns a form with a list of entities with checkboxes"""
     from openatlas.models.entity import EntityMapper
     # Todo: add CSRF token
     form = '<form class="table" method="post">'
@@ -153,7 +150,7 @@ def build_table_form(class_name, linked_entities):
 
 
 def display_remove_link(url, name):
-    """Build a link to remove a link with a JavaScript confirmation dialog"""
+    """ Build a link to remove a link with a JavaScript confirmation dialog"""
     name = name.replace('\'', '')
     confirm = 'onclick="return confirm(\'' + _('Remove %(name)s?', name=name) + '\')"'
     return '<a ' + confirm + ' href="' + url + '">' + uc_first(_('remove')) + '</a>'

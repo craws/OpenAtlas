@@ -60,7 +60,7 @@ def settings_index():
     form = TestMail()
     if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
         user = current_user
-        subject = _('Test mail from %(site_name)s', sitename=session['settings']['site_name'])
+        subject = _('Test mail from %(site_name)s', site_name=session['settings']['site_name'])
         body = _('This test mail was sent by %(username)s', username=user.username)
         body += ' ' + _('at') + ' ' + request.headers['Host']
         if send_mail(subject, body, form.receiver.data):
