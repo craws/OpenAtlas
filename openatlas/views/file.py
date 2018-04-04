@@ -1,4 +1,4 @@
-# Copyright 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+# Created by Alexander Watzinger and others. Please see README.md for licensing information
 import os
 
 from flask import flash, g, render_template, request, send_from_directory, session, url_for
