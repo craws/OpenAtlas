@@ -3,9 +3,12 @@ $(document).ready(function () {
     $.validator.setDefaults({
         ignore: [], // enable validation for hidden fields
     });
-    $.validator.addMethod("notEqual", function(value, element, param) {
+    $.validator.addMethod('notEqual', function(value, element, param) {
         return this.optional(element) || value != $(param).val();
-    }, "This has to be different");
+    }, 'This has to be different');
+    $.validator.addMethod('fileSize', function (value, element, param) {
+        return this.optional(element) || element.files[0].size <= param;
+    }, 'This file it too large, allowed are ' + maxFileSize + ' MB');
 
     $('#tabs').tabs();
     $('#show_passwords').show();
@@ -44,6 +47,13 @@ $(document).ready(function () {
             password2: {equalTo: '#password'},
             email: {email: true}
         }
+    });
+    $('#file-form').validate({
+        rules: {
+            file: {
+                fileSize: maxFileSize  * 1024 * 1024,
+            }
+        },
     });
     $.validator.addClassRules({
         year: {number: true, min: -4713, max: 9999},
