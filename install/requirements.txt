@@ -1,12 +1,12 @@
 # You can use this file if you prefer a pip install (without database)
 
 bcrypt
-python-dateutil
-jinja2
-psycopg2-binary
 flask
 flask-babel
 flask-login
 Flask-WTF
+jinja2
 Markdown
 numpy
+psycopg2
+python-dateutil
