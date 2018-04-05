@@ -21,7 +21,6 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
     for id_, node in NodeMapper.get_nodes_for_form(form_name).items():
         custom_list.append(id_)
         setattr(form, str(id_), TreeMultiField(str(id_)) if node.multiple else TreeField(str(id_)))
-
     form_instance = form(obj=entity)
     # Delete custom fields except the ones specified for the form
     delete_list = []  # Can't delete fields in the loop so creating a list for later deletion

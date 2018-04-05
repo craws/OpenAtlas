@@ -23,7 +23,9 @@
     </ul>
     <div id="tab-info">
         <div class="button-bar">
-            {{ object_|page_buttons|safe }}
+            {% if system_type == 'place': %}
+                {{ object_|page_buttons|safe }}
+            {% endif %}
             {% if 'editor'|is_authorized: %}
                 <a href="{{ url_for('place_update', id_=object_.id) }}">{{ _('edit')|uc_first }}</a>
                 {{ object_|display_delete_link|safe }}

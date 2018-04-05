@@ -1,12 +1,12 @@
 {% extends 'layout.html' %}
 {% block breadcrumb %}
-    {% if origin %}
+    {% if origin and system_type not in ['place', 'feature'] %}
         <a href="{{ origin|get_view_name + '_index' }}">{{ _(origin|get_view_name)|uc_first }}</a>
         > {{ origin|link|safe }}
     {% else %}
         <a href="{{ url_for('place_index') }}">{{ _('place')|uc_first }}</a>
     {% endif %}
-    > + {{ _('place')|uc_first }}
+    > + {{ _(system_type)|uc_first }}
 {% endblock %}
 {% block content %}
     <div id='map-info-display' style="float:left;">

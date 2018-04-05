@@ -180,17 +180,29 @@ INSERT INTO link (property_code, range_id, domain_id) VALUES
 -------------
 -- Feature --
 -------------
-INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Feature', '');
+INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Feature', 'Classification of the archaeological feature e.g. grave, pit, ...');
+INSERT INTO entity (class_code, name) VALUES ('E55', 'Grave'), ('E55', 'Pit');
+INSERT INTO link (property_code, range_id, domain_id) VALUES
+('P127', (SELECT id FROM entity WHERE name='Feature'), (SELECT id FROM entity WHERE name='Grave')),
+('P127', (SELECT id FROM entity WHERE name='Feature'), (SELECT id FROM entity WHERE name='Pit'));
 
 ---------------------------
 -- Stratigraphical Unit --
 ---------------------------
-INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Stratigraphical Unit', '');
+INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Stratigraphical Unit', 'Classification of the archaeological SU e.g. burial, deposit, ...');
+INSERT INTO entity (class_code, name) VALUES ('E55', 'Burial'), ('E55', 'Deposit');
+INSERT INTO link (property_code, range_id, domain_id) VALUES
+('P127', (SELECT id FROM entity WHERE name='Stratigraphical Unit'), (SELECT id FROM entity WHERE name='Burial')),
+('P127', (SELECT id FROM entity WHERE name='Stratigraphical Unit'), (SELECT id FROM entity WHERE name='Deposit'));
 
 -----------
 -- Find --
 -----------
-INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Find', '');
+INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Find', 'Classification of the archaeological find e.g. weapon, jewellery ...');
+INSERT INTO entity (class_code, name) VALUES ('E55', 'Weapon'), ('E55', 'Jewellery');
+INSERT INTO link (property_code, range_id, domain_id) VALUES
+('P127', (SELECT id FROM entity WHERE name='Find'), (SELECT id FROM entity WHERE name='Weapon')),
+('P127', (SELECT id FROM entity WHERE name='Find'), (SELECT id FROM entity WHERE name='Jewellery'));
 
 -------------------------
 -- Administrative Unit --

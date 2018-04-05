@@ -27,6 +27,17 @@ class PlaceForm(DateForm):
     opened = HiddenField()
 
 
+class FeatureForm(DateForm):
+    name = StringField(_('name'), [DataRequired()])
+    description = TextAreaField(_('description'))
+    save = SubmitField(_('insert'))
+    gis_points = HiddenField()
+    gis_polygons = HiddenField()
+    insert_and_continue = SubmitField(_('insert and continue'))
+    continue_ = HiddenField()
+    opened = HiddenField()
+
+
 @app.route('/place')
 @required_group('readonly')
 def place_index():
@@ -44,17 +55,22 @@ def place_insert(origin_id=None):
     system_type = 'place'
     if origin and origin.system_type == 'place':
         system_type = 'feature'
-    form = build_form(PlaceForm, 'Place')
-    if origin:
+        form = build_form(FeatureForm, 'Feature')
+    else:
+        form = build_form(PlaceForm, 'Place')
+    if origin and hasattr(form, 'insert_and_continue'):
         del form.insert_and_continue
-        if system_type != 'place':
-            del form.alias
     if form.validate_on_submit():
         return redirect(save(form, origin=origin))
     if system_type == 'place':
         form.alias.append_entry('')
     gis_data = GisMapper.get_all()
-    return render_template('place/insert.html', form=form, origin=origin, gis_data=gis_data)
+    return render_template(
+        'place/insert.html',
+        form=form,
+        origin=origin,
+        gis_data=gis_data,
+        system_type=system_type)
 
 
 @app.route('/place/view/<int:id_>')
@@ -167,9 +183,10 @@ def save(form, object_=None, location=None, origin=None):
         location.name = 'Location of ' + form.name.data
         location.update()
         location.save_nodes(form)
-        for alias in form.alias.data:
-            if alias.strip():  # check if it isn't empty
-                object_.link('P1', EntityMapper.insert('E41', alias))
+        if hasattr(form, 'alias'):
+            for alias in form.alias.data:
+                if alias.strip():  # check if it isn't empty
+                    object_.link('P1', EntityMapper.insert('E41', alias))
         url = url_for('place_view', id_=object_.id)
         if origin:
             view_name = get_view_name(origin)
