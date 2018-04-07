@@ -1,4 +1,4 @@
-# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+# Created by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
 
 from flask import g, render_template

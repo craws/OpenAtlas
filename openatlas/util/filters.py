@@ -1,4 +1,4 @@
-# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+# Created by Alexander Watzinger and others. Please see README.md for licensing information
 import os
 import re
 
@@ -232,7 +232,7 @@ def display_form(self, form, form_id=None, for_persons=False):
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def test_file(self, file_name):
-    if os.path.isfile(app.root_path + '/static/' + file_name):
+    if os.path.isfile(app.root_path + '/' + file_name):
         return file_name
     return False
 

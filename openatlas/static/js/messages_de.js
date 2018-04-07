@@ -14,9 +14,9 @@
         number: "Bitte eine Nummer eingeben",
         digits: "Bitte nur Ziffern eingeben.",
         equalTo: "Bitte denselben Wert wiederholen.",
+        fileSize: "Diese Datei ist zu groß, erlaubt sind {0} MB",
         range: $.validator.format("Bitte einen Wert zwischen {0} und {1} eingeben."),
         max: $.validator.format("Bitte einen Wert kleiner oder gleich {0} eingeben."),
         min: $.validator.format("Bitte einen Wert größer oder gleich {0} eingeben."),
-        creditcard: "Bitte eine gültige Kreditkarten-Nummer eingeben."
     });
 }(jQuery));

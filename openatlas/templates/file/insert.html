@@ -18,5 +18,5 @@
         {{ _('allowed extensions')|uc_first }}:
         <span style="font-weight: bold;">{{ session['settings']['file_upload_allowed_extension'] }}</span>
     </p>
-    {{ form|display_form|safe }}
+    {{ form|display_form('file-form')|safe }}
 {% endblock %}

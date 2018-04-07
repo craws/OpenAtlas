@@ -1,4 +1,4 @@
-# Created 2017 by Alexander Watzinger and others. Please see README.md for licensing information
+# Created by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import abort, flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
