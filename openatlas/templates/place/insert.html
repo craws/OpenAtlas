@@ -2,11 +2,13 @@
 {% block breadcrumb %}
     {% if origin %}
         <a href="{{ origin|get_view_name + '_index' }}">{{ _(origin|get_view_name)|uc_first }}</a>
+        {{ '> ' + place|link|safe if place else '' }}
+        {{ '> ' + feature|link|safe if feature else '' }}
         > {{ origin|link|safe }}
     {% else %}
         <a href="{{ url_for('place_index') }}">{{ _('place')|uc_first }}</a>
     {% endif %}
-    > + {{ _(system_type)|uc_first }}
+    > + {{ _(title)|uc_first }}
 {% endblock %}
 {% block content %}
     <div id='map-info-display' style="float:left;">

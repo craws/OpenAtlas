@@ -14,11 +14,11 @@ INSERT INTO link (property_code, range_id, domain_id) VALUES
 ('P127', (SELECT id FROM entity WHERE name='Feature'), (SELECT id FROM entity WHERE name='Grave')),
 ('P127', (SELECT id FROM entity WHERE name='Feature'), (SELECT id FROM entity WHERE name='Pit'));
 
-INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Stratigraphical Unit', 'Classification of the archaeological SU e.g. burial, deposit, ...');
+INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Stratigraphic Unit', 'Classification of the archaeological stratigraphic unit e.g. burial, deposit, ...');
 INSERT INTO entity (class_code, name) VALUES ('E55', 'Burial'), ('E55', 'Deposit');
 INSERT INTO link (property_code, range_id, domain_id) VALUES
-('P127', (SELECT id FROM entity WHERE name='Stratigraphical Unit'), (SELECT id FROM entity WHERE name='Burial')),
-('P127', (SELECT id FROM entity WHERE name='Stratigraphical Unit'), (SELECT id FROM entity WHERE name='Deposit'));
+('P127', (SELECT id FROM entity WHERE name='Stratigraphic Unit'), (SELECT id FROM entity WHERE name='Burial')),
+('P127', (SELECT id FROM entity WHERE name='Stratigraphic Unit'), (SELECT id FROM entity WHERE name='Deposit'));
 
 INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Find', 'Classification of the archaeological find e.g. weapon, jewellery ...');
 INSERT INTO entity (class_code, name) VALUES ('E55', 'Weapon'), ('E55', 'Jewellery');
@@ -28,14 +28,14 @@ INSERT INTO link (property_code, range_id, domain_id) VALUES
 
 INSERT INTO web.hierarchy (id, name, multiple, system, directional) VALUES
 ((SELECT id FROM entity WHERE name='Feature'), 'Feature', False, True, False),
-((SELECT id FROM entity WHERE name='Stratigraphical Unit'), 'Stratigraphical Unit', False, True, False),
+((SELECT id FROM entity WHERE name='Stratigraphic Unit'), 'Stratigraphical Unit', False, True, False),
 ((SELECT id FROM entity WHERE name='Find'), 'Find', False, True, False);
 
-INSERT INTO web.form (name, extendable) VALUES ('Feature', True), ('Stratigraphical Unit', True), ('Find', True);
+INSERT INTO web.form (name, extendable) VALUES ('Feature', True), ('Stratigraphic Unit', True), ('Find', True);
 
 INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Feature'),(SELECT id FROM web.form WHERE name LIKE 'Feature')),
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Stratigraphical Unit'),(SELECT id FROM web.form WHERE name LIKE 'Stratigraphical Unit')),
+((SELECT id FROM web.hierarchy WHERE name LIKE 'Stratigraphic Unit'),(SELECT id FROM web.form WHERE name LIKE 'Stratigraphic Unit')),
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Find'),(SELECT id FROM web.form WHERE name LIKE 'Find'));
 
 COMMIT;
