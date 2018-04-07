@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 {% block breadcrumb %}
-    {% if origin and system_type not in ['place', 'feature'] %}
+    {% if origin %}
         <a href="{{ origin|get_view_name + '_index' }}">{{ _(origin|get_view_name)|uc_first }}</a>
         > {{ origin|link|safe }}
     {% else %}

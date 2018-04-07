@@ -9,7 +9,7 @@ from werkzeug.exceptions import abort
 from openatlas import app, debug_model, logger
 from openatlas.models.date import DateMapper
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import get_view_name
+from openatlas.util.util import get_view_name, uc_first
 
 
 class Entity:
@@ -76,6 +76,8 @@ class Entity:
             root_name = self.system_type.title()
         elif view_name == 'file':
             root_name = 'License'
+        elif view_name == 'place':
+            root_name = uc_first(self.system_type)
         root_id = NodeMapper.get_hierarchy_by_name(root_name).id
         for node in self.nodes:
             if node.root and node.root[-1] == root_id:

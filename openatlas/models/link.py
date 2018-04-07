@@ -59,8 +59,8 @@ class LinkMapper:
                 if property_.find_object('range_class_code', range_class.code):
                     range_error = False
                 if domain_error or range_error:
-                    text = _('error link') + ': ' + domain_class.name + ' > '
-                    text += property_code + ' > ' + range_class.name
+                    text = _('error link') + ': ' + domain_class.code + ' > '
+                    text += property_code + ' > ' + range_class.code
                     logger.log('error', 'model', text)
                     flash(text, 'error')
                     continue

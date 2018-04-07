@@ -42,7 +42,7 @@ class FeatureForm(DateForm):
 @required_group('readonly')
 def place_index():
     table = {'id': 'place', 'header': app.config['TABLE_HEADERS']['place'], 'data': []}
-    for place in EntityMapper.get_by_codes('place'):
+    for place in EntityMapper.get_by_system_type('place'):
         table['data'].append(get_base_table_data(place))
     return render_template('place/index.html', table=table, gis_data=GisMapper.get_all())
 
@@ -88,13 +88,15 @@ def place_view(id_, unlink_id=None):
         'file': {'id': 'files', 'data': [], 'header': app.config['TABLE_HEADERS']['file']},
         'source': {'id': 'source', 'data': [], 'header': app.config['TABLE_HEADERS']['source']},
         'event': {'id': 'event', 'data': [], 'header': app.config['TABLE_HEADERS']['event']},
-        'feature': {'id': 'event', 'data': [], 'header': app.config['TABLE_HEADERS']['place']},
         'reference': {
             'id': 'reference', 'data': [],
             'header': app.config['TABLE_HEADERS']['reference'] + ['pages']},
         'actor': {
             'id': 'actor', 'data': [],
             'header': [_('actor'), _('property'), _('class'), _('first'), _('last')]}}
+    if object_.system_type == 'place':
+        tables['feature'] = \
+            {'id': 'event', 'data': [], 'header': app.config['TABLE_HEADERS']['place']}
     for link_ in object_.get_links('P67', True):
         data = get_base_table_data(link_.domain)
         view_name = get_view_name(link_.domain)
@@ -109,6 +111,8 @@ def place_view(id_, unlink_id=None):
         tables[view_name]['data'].append(data)
     for event in location.get_linked_entities(['P7', 'P24'], True):
         tables['event']['data'].append(get_base_table_data(event))
+    for feature in object_.get_linked_entities('P46'):
+        tables['feature']['data'].append(get_base_table_data(feature))
     for link_ in location.get_links(['P74', 'OA8', 'OA9'], True):
         actor = EntityMapper.get_by_id(link_.domain.id)
         tables['actor']['data'].append([
@@ -172,7 +176,8 @@ def save(form, object_=None, location=None, origin=None):
             GisMapper.delete_by_entity(location)
         else:
             log_action = 'insert'
-            object_ = EntityMapper.insert('E18', form.name.data)
+            system_type = 'feature' if origin and origin.system_type == 'place' else 'place'
+            object_ = EntityMapper.insert('E18', form.name.data, system_type)
             location = EntityMapper.insert('E53', 'Location of ' + form.name.data, 'place location')
             object_.link('P53', location)
         object_.name = form.name.data
@@ -189,13 +194,14 @@ def save(form, object_=None, location=None, origin=None):
                     object_.link('P1', EntityMapper.insert('E41', alias))
         url = url_for('place_view', id_=object_.id)
         if origin:
-            view_name = get_view_name(origin)
             url = url_for(get_view_name(origin) + '_view', id_=origin.id) + '#tab-place'
-            if view_name == 'reference':
+            if origin.system_type == 'reference':
                 link_id = origin.link('P67', object_)
                 url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
-            else:
+            elif origin.system_type in ['bibliography', 'edition']:
                 origin.link('P67', object_)
+            elif origin.system_type in ['place', 'feature']:
+                origin.link('P46', object_)
         GisMapper.insert(location, form)
         g.cursor.execute('COMMIT')
         if form.continue_.data == 'yes':
