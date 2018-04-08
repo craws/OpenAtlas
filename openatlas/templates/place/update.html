@@ -1,6 +1,9 @@
 {% extends 'layout.html' %}
 {% block breadcrumb %}
     <a href="{{ url_for('place_index') }}">{{ _('place')|uc_first }}</a>
+    {{ '> ' + place|link|safe if place else '' }}
+    {{ '> ' + feature|link|safe if feature else '' }}
+    {{ '> ' + stratigraphic_unit|link|safe if stratigraphic_unit else '' }}
     > {{ object_|link|safe }}
     > {{ _('edit')|uc_first }}
 {% endblock %}

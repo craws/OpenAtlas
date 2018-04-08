@@ -3,6 +3,7 @@
     <a href="{{ url_for('place_index') }}">{{ _('place')|uc_first }}</a>
     {{ '> ' + place|link|safe if place else '' }}
     {{ '> ' + feature|link|safe if feature else '' }}
+    {{ '> ' + stratigraphic_unit|link|safe if stratigraphic_unit else '' }}
     > {{ object_.name|truncate_string|safe }}
 {% endblock %}
 {% block content %}
@@ -25,6 +26,8 @@
             <li><a href="#tab-feature">{{ _('feature')|uc_first }}  ({{ tables['feature']['data']|length }})</a></li>
         {% elif object_.system_type == 'feature' %}
             <li><a href="#tab-stratigraphic_unit">{{ _('stratigraphic unit')|uc_first }}  ({{ tables['stratigraphic_unit']['data']|length }})</a></li>
+        {% elif object_.system_type == 'stratigraphic_unit' %}
+            <li><a href="#tab-find">{{ _('find')|uc_first }}  ({{ tables['find']['data']|length }})</a></li>
         {% endif %}
     </ul>
     <div id="tab-info">
@@ -106,6 +109,13 @@
                 <a href="{{ url_for('place_insert', origin_id=object_.id)}}">+ {{ _('stratigraphic unit')|uc_first }}</a>
             </div>
             {{ tables['stratigraphic_unit']|pager|safe }}
+        </div>
+    {% elif object_.system_type == 'stratigraphic_unit' %}
+        <div id="tab-find">
+            <div class="button-bar">
+                <a href="{{ url_for('place_insert', origin_id=object_.id)}}">+ {{ _('find')|uc_first }}</a>
+            </div>
+            {{ tables['find']|pager|safe }}
         </div>
     {% endif %}
 </div>

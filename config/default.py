@@ -55,6 +55,7 @@ CODE_CLASS = {
     'E40': 'actor',
     'E74': 'actor',
     'E18': 'place',
+    'E22': 'place',
     'E31': 'reference',
     'E84': 'reference'}
 
@@ -63,7 +64,7 @@ CLASS_CODES = {
     'event': ['E7', 'E8', 'E12', 'E6'],
     'actor': ['E21', 'E74', 'E40'],
     'group': ['E40', 'E74'],
-    'place': ['E18'],
+    'place': ['E18', 'E22'],
     'reference': ['E31', 'E84']}
 
 # Default table columns based on class
@@ -76,4 +77,5 @@ TABLE_HEADERS = {
     'reference': ['name', 'class', 'type'],
     'file': ['name', 'license', 'size', 'extension', 'description']}
 
-BASE_TYPES = ['Place', 'Information Carrier', 'Bibliography', 'Source', 'Edition', 'Event', 'Actor']
+BASE_TYPES = ['Place', 'Information Carrier', 'Bibliography', 'Source', 'Edition', 'Event', 'Actor',
+              'Stratigraphic Unit', 'Feature', 'Find']

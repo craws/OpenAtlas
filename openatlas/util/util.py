@@ -403,7 +403,7 @@ def link(entity):
             url = url_for('event_view', id_=entity.id)
         elif entity.class_.code in ('E21', 'E74', 'E40'):
             url = url_for('actor_view', id_=entity.id)
-        elif entity.class_.code == 'E18':
+        elif entity.class_.code in ('E18', 'E22'):
             url = url_for('place_view', id_=entity.id)
         elif entity.class_.code in ('E31', 'E84'):
             url = url_for('reference_view', id_=entity.id)
