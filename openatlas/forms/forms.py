@@ -191,7 +191,11 @@ class TableSelect(HiddenInput):
             class_ = 'place'
         header = app.config['TABLE_HEADERS'][class_]
         table = {'id': field.id, 'header': header, 'data': []}
-        for entity in EntityMapper.get_by_codes(class_):
+        if class_ == 'place':
+            entities = EntityMapper.get_by_system_type('place')
+        else:
+            entities = EntityMapper.get_by_codes(class_)
+        for entity in entities:
             # Todo: don't show self e.g. at source
             if field.data and entity.id == int(field.data):
                 selection = entity.name
@@ -226,7 +230,7 @@ class TableField(HiddenField):
 
 
 class TableMultiSelect(HiddenInput):
-    """Table with checkboxes used in forms."""
+    """ Table with checkboxes used in forms."""
 
     def __call__(self, field, **kwargs):
         if field.data and isinstance(field.data, str):
@@ -241,10 +245,14 @@ class TableMultiSelect(HiddenInput):
             'id': field.id,
             'header': app.config['TABLE_HEADERS'][class_],
             'data': []}
-        # make checkbox column sortable and show selected on top
+        # Make checkbox column sortable and show selected on top
         table['headers'] = 'headers: { ' + str(len(table['header'])) + ': { sorter: "checkbox" } }'
         table['sort'] = 'sortList: [[' + str(len(table['header'])) + ',0],[0,0]]'
-        for entity in EntityMapper.get_by_codes(class_):
+        if class_ == 'place':
+            entities = EntityMapper.get_by_system_type('place')
+        else:
+            entities = EntityMapper.get_by_codes(class_)
+        for entity in entities:
             selection += entity.name + '<br/>' if field.data and entity.id in field.data else ''
             data = get_base_table_data(entity)
             data[0] = truncate_string(entity.name)  # replace entity link with entity name

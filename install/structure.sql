@@ -245,14 +245,14 @@ CREATE FUNCTION delete_entity_related() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
         BEGIN
-            -- If it is an event, place or actor delete dates (E61) and aliases (E41, E82)
-            IF OLD.class_code IN ('E6', 'E7', 'E8', 'E12', 'E21', 'E40', 'E74', 'E18') THEN
+            -- Delete dates (E61) and aliases (E41, E82)
+            IF OLD.class_code IN ('E6', 'E7', 'E8', 'E12', 'E21', 'E40', 'E74', 'E18', 'E22') THEN
                 DELETE FROM model.entity WHERE id IN (
                     SELECT range_id FROM model.link WHERE domain_id = OLD.id AND class_code IN ('E41', 'E61', 'E82'));
             END IF;
 
-            -- If it is a physical object (E18) delete the location (E53)
-            IF OLD.class_code = 'E18' THEN
+            -- Delete the location (E53)
+            IF OLD.class_code IN ('E18', 'E22') THEN
                 DELETE FROM model.entity WHERE id = (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code = 'P53');
             END IF;
 
@@ -263,7 +263,6 @@ CREATE FUNCTION delete_entity_related() RETURNS trigger
 
             RETURN OLD;
         END;
-
     $$;
 
 

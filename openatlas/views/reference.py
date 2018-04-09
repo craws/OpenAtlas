@@ -58,7 +58,7 @@ class AddPlaceForm(Form):
 @app.route('/reference/add/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('editor')
 def reference_add(origin_id):
-    """Link an entity to reference coming from the entity."""
+    """ Link an entity to reference coming from the entity."""
     origin = EntityMapper.get_by_id(origin_id)
     view_name = get_view_name(origin)
     form = AddReferenceForm()
@@ -72,14 +72,14 @@ def reference_add(origin_id):
 @app.route('/reference/add2/<int:reference_id>/<class_name>', methods=['POST', 'GET'])
 @required_group('editor')
 def reference_add2(reference_id, class_name):
-    """Link an entity to reference coming from the reference."""
+    """ Link an entity to reference coming from the reference."""
     reference_ = EntityMapper.get_by_id(reference_id)
     form = getattr(openatlas.views.reference, 'Add' + uc_first(class_name) + 'Form')()
     if form.validate_on_submit():
         reference_.link('P67', int(getattr(form, class_name).data), form.page.data)
         return redirect(url_for('reference_view', id_=reference_.id) + '#tab-' + class_name)
     return render_template(
-        'reference/add.html', origin=reference_, form=form, class_name='reference')
+        'reference/add2.html', reference=reference_, form=form, class_name=class_name)
 
 
 @app.route('/reference/link-update/<int:link_id>/<int:origin_id>', methods=['POST', 'GET'])

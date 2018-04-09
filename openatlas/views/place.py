@@ -64,7 +64,9 @@ def place_insert(origin_id=None):
     else:
         title = 'place'
         form = build_form(PlaceForm, 'Place')
-    if origin and hasattr(form, 'insert_and_continue'):
+    if origin \
+            and origin.system_type not in ['place', 'feature', 'stratigraphic_unit'] \
+            and hasattr(form, 'insert_and_continue'):
         del form.insert_and_continue
     if form.validate_on_submit():
         return redirect(save(form, origin=origin))
@@ -74,14 +76,14 @@ def place_insert(origin_id=None):
     place = None
     feature = None
     stratigraphic_unit = None
-    if origin.system_type == 'find':
+    if origin and origin.system_type == 'find':
         stratigraphic_unit = origin.get_linked_entity('P46', True)
         feature = origin.get_linked_entity('P46', True)
         place = feature.get_linked_entity('P46', True)
-    if origin.system_type == 'stratigraphic_unit':
+    if origin and origin.system_type == 'stratigraphic_unit':
         feature = origin.get_linked_entity('P46', True)
         place = feature.get_linked_entity('P46', True)
-    elif origin.system_type == 'feature':
+    elif origin and origin.system_type == 'feature':
         place = origin.get_linked_entity('P46', True)
     return render_template('place/insert.html', form=form, stratigraphic_unit=stratigraphic_unit,
                            title=title, place=place, gis_data=gis_data, feature=feature,
@@ -110,14 +112,15 @@ def place_view(id_, unlink_id=None):
             'id': 'actor', 'data': [],
             'header': [_('actor'), _('property'), _('class'), _('first'), _('last')]}}
     if object_.system_type == 'place':
-        tables['feature'] = \
-            {'id': 'feature', 'data': [], 'header': app.config['TABLE_HEADERS']['place']}
+        tables['feature'] = {'id': 'feature', 'data': [],
+                             'header': app.config['TABLE_HEADERS']['place'] + [_('description')]}
     if object_.system_type == 'feature':
-        tables['stratigraphic_unit'] = \
-            {'id': 'stratigraphic', 'data': [], 'header': app.config['TABLE_HEADERS']['place']}
+        tables['stratigraphic_unit'] = {
+            'id': 'stratigraphic', 'data': [], 'header':
+            app.config['TABLE_HEADERS']['place'] + [_('description')]}
     if object_.system_type == 'stratigraphic_unit':
-        tables['find'] = \
-            {'id': 'find', 'data': [], 'header': app.config['TABLE_HEADERS']['place']}
+        tables['find'] = {'id': 'find', 'data': [],
+                          'header': app.config['TABLE_HEADERS']['place'] + [_('description')]}
     for link_ in object_.get_links('P67', True):
         data = get_base_table_data(link_.domain)
         view_name = get_view_name(link_.domain)
@@ -133,7 +136,9 @@ def place_view(id_, unlink_id=None):
     for event in location.get_linked_entities(['P7', 'P24'], True):
         tables['event']['data'].append(get_base_table_data(event))
     for entity in object_.get_linked_entities('P46'):
-        tables[entity.system_type]['data'].append(get_base_table_data(entity))
+        data = get_base_table_data(entity)
+        data.append(truncate_string(entity.description))
+        tables[entity.system_type]['data'].append(data)
     for link_ in location.get_links(['P74', 'OA8', 'OA9'], True):
         actor = EntityMapper.get_by_id(link_.domain.id)
         tables['actor']['data'].append([
@@ -152,7 +157,6 @@ def place_view(id_, unlink_id=None):
         stratigraphic_unit = object_.get_linked_entity('P46', True)
         feature = stratigraphic_unit.get_linked_entity('P46', True)
         place = feature.get_linked_entity('P46', True)
-        print(place)
     elif object_.system_type == 'stratigraphic_unit':
         feature = object_.get_linked_entity('P46', True)
         place = feature.get_linked_entity('P46', True)
@@ -261,11 +265,11 @@ def save(form, object_=None, location=None, origin=None):
             if origin.system_type == 'reference':
                 link_id = origin.link('P67', object_)
                 url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
-            elif origin.system_type in ['bibliography', 'edition']:
-                origin.link('P67', object_)
             elif origin.system_type in ['place', 'feature', 'stratigraphic_unit']:
-                url = url_for('place_view', id_=origin.id) + '#tab-' + object_.system_type
+                url = url_for('place_view', id_=object_.id)
                 origin.link('P46', object_)
+            else:
+                origin.link('P67', object_)
         GisMapper.insert(location, form)
         g.cursor.execute('COMMIT')
         if form.continue_.data == 'yes':

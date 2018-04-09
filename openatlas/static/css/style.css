@@ -11,7 +11,7 @@ html, body, input, select, textarea {
     margin-left: 1em;
 }
 
-#global-search, #global-term {
+#global-search {
     text-transform: capitalize;
 }
 

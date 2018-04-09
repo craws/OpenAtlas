@@ -134,6 +134,8 @@ def build_table_form(class_name, linked_entities):
     linked_ids = [entity.id for entity in linked_entities]
     if class_name == 'file':
         entities = EntityMapper.get_by_system_type('file')
+    elif class_name == 'place':
+        entities = EntityMapper.get_by_system_type('place')
     else:
         entities = EntityMapper.get_by_codes(class_name)
     for entity in entities:

@@ -80,6 +80,7 @@ class Entity:
             root_name = uc_first(self.system_type)
             if self.system_type == 'stratigraphic_unit':
                 root_name = 'Stratigraphic Unit'
+
         root_id = NodeMapper.get_hierarchy_by_name(root_name).id
         for node in self.nodes:
             if node.root and node.root[-1] == root_id:
