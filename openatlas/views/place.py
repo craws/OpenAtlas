@@ -135,7 +135,9 @@ def place_view(id_, unlink_id=None):
         tables[view_name]['data'].append(data)
     for event in location.get_linked_entities(['P7', 'P24'], True):
         tables['event']['data'].append(get_base_table_data(event))
+    has_subunits = False
     for entity in object_.get_linked_entities('P46'):
+        has_subunits = True
         data = get_base_table_data(entity)
         data.append(truncate_string(entity.description))
         tables[entity.system_type]['data'].append(data)
@@ -163,12 +165,19 @@ def place_view(id_, unlink_id=None):
     elif object_.system_type == 'feature':
         place = object_.get_linked_entity('P46', True)
     return render_template('place/view.html', object_=object_, tables=tables, gis_data=gis_data,
-                           place=place, feature=feature, stratigraphic_unit=stratigraphic_unit)
+                           place=place, feature=feature, stratigraphic_unit=stratigraphic_unit,
+                           has_subunits=has_subunits)
 
 
 @app.route('/place/delete/<int:id_>')
 @required_group('editor')
 def place_delete(id_):
+    entity = EntityMapper.get_by_id(id_)
+    if entity.get_linked_entities('P46'):
+        flash(_('Deletion not possible if subunits exists'), 'error')
+        return redirect(url_for('place_view', id_=id_))
+    system_type = entity.system_type
+    parent = None if system_type == 'place' else LinkMapper.get_linked_entity(id_, 'P46', True)
     g.cursor.execute('BEGIN')
     try:
         EntityMapper.delete(id_)
@@ -179,7 +188,9 @@ def place_delete(id_):
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
     flash(_('entity deleted'), 'info')
-    return redirect(url_for('place_index'))
+    if system_type == 'place':
+        return redirect(url_for('place_index'))
+    return redirect(url_for('place_view', id_=parent.id) + '#tab-' + system_type)
 
 
 @app.route('/place/update/<int:id_>', methods=['POST', 'GET'])

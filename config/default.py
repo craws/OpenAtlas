@@ -20,6 +20,7 @@ MAIL_PASSWORD = 'CHANGE ME'
 SECRET_KEY = 'CHANGE ME'
 
 UPLOAD_FOLDER_PATH = os.path.dirname(__file__) + '/../openatlas/uploads'
+DISPLAY_FILE_EXTENSIONS = ['bmp', 'gif', 'ico', 'jpeg', 'jpg', 'png']
 
 # Whitelisted domains are ignored by the link checker
 WHITELISTED_DOMAINS = ['E61']

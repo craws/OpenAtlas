@@ -21,7 +21,6 @@ INSERT INTO settings (name, value) VALUES
 ('failed_login_tries', '3'),
 ('file_upload_max_size', '10'),
 ('file_upload_allowed_extension', 'gif jpeg jpg pdf png txt zip'),
-('file_upload_display_extension', 'gif jpeg jpg png'),
 ('log_level', '6'),
 ('mail', ''),
 ('mail_transport_username', ''),

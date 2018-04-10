@@ -3,6 +3,9 @@
 SET search_path = model;
 BEGIN;
 
+-- Remove display extension from settings because it moved to configuration file
+DELETE FROM web.settings WHERE name = 'file_upload_display_extension';
+
 -- Add system_type place to existing places
 UPDATE model.entity SET system_type = 'place' WHERE class_code = 'E18';
 

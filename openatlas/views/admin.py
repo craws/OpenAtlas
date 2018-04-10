@@ -35,7 +35,6 @@ class NewsLetterForm(Form):
 class FileForm(Form):
     file_upload_max_size = IntegerField(_('max file size'))
     file_upload_allowed_extension = StringField('allowed file extensions')
-    file_upload_display_extension = StringField('extensions for display')
 
 
 @app.route('/admin')
@@ -62,7 +61,6 @@ def admin_file():
         return redirect(url_for('admin_index'))
     form.file_upload_max_size.data = session['settings']['file_upload_max_size']
     form.file_upload_allowed_extension.data = session['settings']['file_upload_allowed_extension']
-    form.file_upload_display_extension.data = session['settings']['file_upload_display_extension']
     return render_template('admin/file.html', form=form)
 
 

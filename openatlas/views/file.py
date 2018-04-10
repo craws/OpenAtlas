@@ -32,8 +32,7 @@ def allowed_file(name):
 
 
 def preview_file(name):
-    displayed_extensions = session['settings']['file_upload_display_extension'].split()
-    return '.' in name and name.rsplit('.', 1)[1].lower() in displayed_extensions
+    return name.rsplit('.', 1)[1].lower() in app.config['DISPLAY_FILE_EXTENSIONS']
 
 
 @app.route('/download/<path:filename>')

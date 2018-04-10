@@ -12,7 +12,6 @@ class SettingsMapper:
         'failed_login_tries',
         'file_upload_max_size',
         'file_upload_allowed_extension',
-        'file_upload_display_extension',
         'log_level',
         'mail',
         'mail_transport_username',
