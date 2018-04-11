@@ -30,7 +30,7 @@ INSERT INTO link (property_code, range_id, domain_id) VALUES
 
 INSERT INTO web.hierarchy (id, name, multiple, system, directional) VALUES
 ((SELECT id FROM entity WHERE name='Feature'), 'Feature', False, True, False),
-((SELECT id FROM entity WHERE name='Stratigraphic Unit'), 'Stratigraphical Unit', False, True, False),
+((SELECT id FROM entity WHERE name='Stratigraphic Unit'), 'Stratigraphic Unit', False, True, False),
 ((SELECT id FROM entity WHERE name='Find'), 'Find', False, True, False);
 
 INSERT INTO web.form (name, extendable) VALUES ('Feature', True), ('Stratigraphic Unit', True), ('Find', True);

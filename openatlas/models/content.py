@@ -24,7 +24,7 @@ class ContentMapper:
     @staticmethod
     def get_translation(name):
         translations = ContentMapper.get_content()[name]
-        if translations[session['language']]:
+        if translations[session['language']]:  # pragma: no cover
             content = translations[session['language']]
         else:
             content = translations[session['settings']['default_language']]

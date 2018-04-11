@@ -187,13 +187,13 @@ INSERT INTO link (property_code, range_id, domain_id) VALUES
 ('P127', (SELECT id FROM entity WHERE name='Feature'), (SELECT id FROM entity WHERE name='Pit'));
 
 ---------------------------
--- Stratigraphical Unit --
+-- Stratigraphic Unit --
 ---------------------------
-INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Stratigraphical Unit', 'Classification of the archaeological SU e.g. burial, deposit, ...');
+INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Stratigraphic Unit', 'Classification of the archaeological SU e.g. burial, deposit, ...');
 INSERT INTO entity (class_code, name) VALUES ('E55', 'Burial'), ('E55', 'Deposit');
 INSERT INTO link (property_code, range_id, domain_id) VALUES
-('P127', (SELECT id FROM entity WHERE name='Stratigraphical Unit'), (SELECT id FROM entity WHERE name='Burial')),
-('P127', (SELECT id FROM entity WHERE name='Stratigraphical Unit'), (SELECT id FROM entity WHERE name='Deposit'));
+('P127', (SELECT id FROM entity WHERE name='Stratigraphic Unit'), (SELECT id FROM entity WHERE name='Burial')),
+('P127', (SELECT id FROM entity WHERE name='Stratigraphic Unit'), (SELECT id FROM entity WHERE name='Deposit'));
 
 -----------
 -- Find --
@@ -265,7 +265,7 @@ INSERT INTO web.hierarchy (id, name, multiple, system, directional) VALUES
 ((SELECT id FROM entity WHERE name='Sex'), 'Sex', False, False, False),
 ((SELECT id FROM entity WHERE name='Place'), 'Place', False, True, False),
 ((SELECT id FROM entity WHERE name='Feature'), 'Feature', False, True, False),
-((SELECT id FROM entity WHERE name='Stratigraphical Unit'), 'Stratigraphical Unit', False, True, False),
+((SELECT id FROM entity WHERE name='Stratigraphic Unit'), 'Stratigraphic Unit', False, True, False),
 ((SELECT id FROM entity WHERE name='Find'), 'Find', False, True, False),
 ((SELECT id FROM entity WHERE name='Information Carrier'), 'Information Carrier', False, True, False),
 ((SELECT id FROM entity WHERE name='Bibliography'), 'Bibliography', False, True, False),
@@ -283,7 +283,7 @@ INSERT INTO web.form (name, extendable) VALUES
 ('Legal Body', True),
 ('Place', True),
 ('Feature', True),
-('Stratigraphical Unit', True),
+('Stratigraphic Unit', True),
 ('Find', True),
 ('Bibliography', True),
 ('Edition', True),
@@ -302,7 +302,7 @@ INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Administrative Unit'),(SELECT id FROM web.form WHERE name LIKE 'Place')),
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Historical Place'),(SELECT id FROM web.form WHERE name LIKE 'Place')),
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Feature'),(SELECT id FROM web.form WHERE name LIKE 'Feature')),
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Stratigraphical Unit'),(SELECT id FROM web.form WHERE name LIKE 'Stratigraphical Unit')),
+((SELECT id FROM web.hierarchy WHERE name LIKE 'Stratigraphic Unit'),(SELECT id FROM web.form WHERE name LIKE 'Stratigraphic Unit')),
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Find'),(SELECT id FROM web.form WHERE name LIKE 'Find')),
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Bibliography'),(SELECT id FROM web.form WHERE name LIKE 'Bibliography')),
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Edition'),(SELECT id FROM web.form WHERE name LIKE 'Edition')),

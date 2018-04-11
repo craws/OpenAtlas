@@ -75,19 +75,13 @@ def place_insert(origin_id=None):
     gis_data = GisMapper.get_all()
     place = None
     feature = None
-    stratigraphic_unit = None
-    if origin and origin.system_type == 'find':
-        stratigraphic_unit = origin.get_linked_entity('P46', True)
-        feature = origin.get_linked_entity('P46', True)
-        place = feature.get_linked_entity('P46', True)
     if origin and origin.system_type == 'stratigraphic_unit':
         feature = origin.get_linked_entity('P46', True)
         place = feature.get_linked_entity('P46', True)
     elif origin and origin.system_type == 'feature':
         place = origin.get_linked_entity('P46', True)
-    return render_template('place/insert.html', form=form, stratigraphic_unit=stratigraphic_unit,
-                           title=title, place=place, gis_data=gis_data, feature=feature,
-                           origin=origin)
+    return render_template('place/insert.html', form=form, title=title, place=place,
+                           gis_data=gis_data, feature=feature, origin=origin)
 
 
 @app.route('/place/view/<int:id_>')
@@ -188,9 +182,10 @@ def place_delete(id_):
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
     flash(_('entity deleted'), 'info')
-    if system_type == 'place':
-        return redirect(url_for('place_index'))
-    return redirect(url_for('place_view', id_=parent.id) + '#tab-' + system_type)
+    url = url_for('place_index')
+    if parent:
+        url = url_for('place_view', id_=parent.id) + '#tab-' + system_type
+    return redirect(url)
 
 
 @app.route('/place/update/<int:id_>', methods=['POST', 'GET'])
@@ -273,7 +268,7 @@ def save(form, object_=None, location=None, origin=None):
         url = url_for('place_view', id_=object_.id)
         if origin:
             url = url_for(get_view_name(origin) + '_view', id_=origin.id) + '#tab-place'
-            if origin.system_type == 'reference':
+            if get_view_name(origin) == 'reference':
                 link_id = origin.link('P67', object_)
                 url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
             elif origin.system_type in ['place', 'feature', 'stratigraphic_unit']:

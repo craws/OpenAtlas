@@ -80,7 +80,6 @@ class Entity:
             root_name = uc_first(self.system_type)
             if self.system_type == 'stratigraphic_unit':
                 root_name = 'Stratigraphic Unit'
-
         root_id = NodeMapper.get_hierarchy_by_name(root_name).id
         for node in self.nodes:
             if node.root and node.root[-1] == root_id:
@@ -88,7 +87,7 @@ class Entity:
         return ''
 
     def get_name_directed(self, inverse=False):
-        """Returns name part of a directed type e.g. Actor Actor Relation: Parent of (Child of)"""
+        """ Returns name part of a directed type e.g. Actor Actor Relation: Parent of (Child of)"""
         from openatlas.util.util import sanitize
         name_parts = self.name.split(' (')
         if inverse and len(name_parts) > 1:
@@ -152,7 +151,7 @@ class EntityMapper:
     def insert(code, name, system_type=None, description=None, date=None):
         if not name and not date:  # pragma: no cover
             logger.log('error', 'database', 'Insert entity without name and date')
-            return  # something went wrong so don't insert
+            return  # Something went wrong so don't insert
         sql = """
             INSERT INTO model.entity (name, system_type, class_code, description, value_timestamp)
             VALUES (%(name)s, %(system_type)s, %(code)s, %(description)s, %(value_timestamp)s)
@@ -209,7 +208,7 @@ class EntityMapper:
 
     @staticmethod
     def delete(entity):
-        """Triggers function model.delete_entity_related() for deleting related entities"""
+        """ Triggers function model.delete_entity_related() for deleting related entities"""
         entity_id = entity if isinstance(entity, int) else entity.id
         sql = "DELETE FROM model.entity WHERE id = %(entity_id)s;"
         g.cursor.execute(sql, {'entity_id': entity_id})
@@ -234,7 +233,7 @@ class EntityMapper:
 
     @staticmethod
     def get_page_ids(entity, codes):
-        """Return ids for pager (first, previous, next, last)"""
+        """ Return ids for pager (first, previous, next, last)"""
         sql_where = " e.class_code IN ('{codes}')".format(codes="','".join(codes)) + " AND "
         sql_where += "e.system_type='source content'" if 'E33' in codes else "e.system_type IS NULL"
         sql_prev = "SELECT max(e.id) AS id FROM model.entity e WHERE e.id < %(id)s AND " + sql_where
@@ -249,7 +248,7 @@ class EntityMapper:
 
     @staticmethod
     def get_orphans():
-        """Returns entities without links. """
+        """ Returns entities without links. """
         entities = []
         g.cursor.execute(EntityMapper.sql_orphan)
         debug_model['div sql'] += 1
@@ -259,7 +258,7 @@ class EntityMapper:
 
     @staticmethod
     def get_latest(limit):
-        """Returns the newest created entities"""
+        """ Returns the newest created entities"""
         codes = []
         for class_codes in app.config['CLASS_CODES'].values():
             codes += class_codes
