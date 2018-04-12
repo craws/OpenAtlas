@@ -34,7 +34,13 @@ class ModelTests(TestBaseCase):
                 LinkMapper.insert(actor, 'P67', prop_object)
             rv = self.app.get(url_for('model_network'))
             assert b'Orphans' in rv.data
-            rv = self.app.post(
-                url_for('model_network'),
-                data={'orphans': True, 'width': 100, 'height': 40, 'distance': -666, 'charge': 500})
+            data = {'orphans': True, 'width': 100, 'height': 40, 'distance': -666, 'charge': 500}
+            rv = self.app.post(url_for('model_network'), data=data)
             assert b'666' in rv.data
+
+            # Translations
+            self.app.get('/index/setlocale/de')
+            rv = self.app.get(url_for('property_view', code='P68'))
+            assert b'verweist auf' in rv.data
+            rv = self.app.get(url_for('class_view', code='E4'))
+            assert b'Phase' in rv.data
