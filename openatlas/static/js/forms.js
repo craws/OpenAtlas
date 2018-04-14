@@ -26,9 +26,8 @@ $(document).ready(function () {
     });
     $("#password-form").validate({
         rules: {
-            password: {minlength: minimumPasswordLength},
+            password: {minlength: minimumPasswordLength, notEqual: "#password_old"},
             password2: {equalTo: "#password"},
-            password: {notEqual: "#password_old"}
         }
     });
     $("#password-reset").validate({
