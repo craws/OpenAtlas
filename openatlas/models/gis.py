@@ -29,6 +29,7 @@ class GisMapper:
                     public.ST_AsGeoJSON({shape}.geom) AS geojson, {polygon_point_sql}
                     object.name AS object_name,
                     object.description AS object_desc,
+                    object.system_type AS object_system_type,
                     string_agg(CAST(t.range_id AS text), ',') AS types,
                     (SELECT COUNT(*) FROM gis.point point2
                         WHERE {shape}.entity_id = point2.entity_id) AS point_count,
@@ -70,6 +71,8 @@ class GisMapper:
                             break
                 if row.object_id in object_ids:
                     selected[shape].append(item)
+                elif row.object_system_type != 'place':
+                    continue
                 else:
                     all_[shape].append(item)
                 if hasattr(row, 'polygon_point'):
@@ -77,6 +80,8 @@ class GisMapper:
                     polygon_point_item['geometry'] = json.loads(row.polygon_point)
                     if row.object_id in object_ids:
                         selected['polygon_point'].append(polygon_point_item)
+                    elif row.object_system_type != 'place':
+                        continue
                     else:
                         all_['point'].append(polygon_point_item)
         gis = {
