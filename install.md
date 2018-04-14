@@ -27,16 +27,14 @@ Installation with examples from a Debian 9 (Stretch) system.
 ## Database
 
 Important!
-
 A user with username "OpenAtlas" and password "change_me_PLEASE!" is created.
 Change this account immediately!
-
-Uncomment "CREATE EXTENSION postgis;" in top off install/structure.sql
 
 As postgres
 
     $ createuser openatlas -P
     $ createdb openatlas -O openatlas
+    $ psql openatlas -c "CREATE EXTENSION postgis;"
     $ cd install
     $ cat structure.sql data_web.sql data_model.sql data_node.sql | psql -d openatlas -f -
 
@@ -67,7 +65,7 @@ Test Apache configuration and restart
 
 Make the openatlas/uploads directory writeable for apache e.g.
 
-    chown www-data /var/www/net/openatlas/openatlas/uploads/
+    chown www-data openatlas/uploads
 
 ## Finishing
 
@@ -75,23 +73,27 @@ Login with username "OpenAtlas" and password "change_me_PLEASE!" and change the 
 
 ## Unit tests (optional)
 
-Install required packages:    
-    
+Install required packages:
+
     # apt-get install python3-coverage python3-nose
-    
+
 As postgres
 
     $ createdb openatlas_test -O openatlas
-    
-Uncomment "CREATE EXTENSION postgis;" in top off install/structure.sql
-
-    $ cd install    
+    $ psql openatlas_test -c "CREATE EXTENSION postgis;"
+    $ cd install
     $ cat structure.sql data_web.sql data_model.sql | psql -d openatlas_test -f -
 
 Comment "CREATE EXTENSION postgis;" again before running tests.
 
+Copy instance/example_testing.py to instance/testing.py
+
+    $ cp instance/example_testing.py instance/testing.py
+
+Add/change values as appropriate.
+
 Use these parameters for running with coverage and HTML report:
 
-    --with-coverage --cover-package openatlas --cover-html --cover-tests --cover-erase   
+    --with-coverage --cover-package openatlas --cover-html --cover-tests --cover-erase
 
 

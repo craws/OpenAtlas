@@ -1,0 +1,4 @@
+DATABASE_NAME = 'openatlas_test'
+DATABASE_PASS = 'CHANGE ME'
+DEBUG = True
+

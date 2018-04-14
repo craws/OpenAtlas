@@ -42,8 +42,7 @@ INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
 
 
 -- Add subunits to delete_entity_related trigger function
-DROP FUNCTION IF EXISTS model.delete_entity_related();
-DROP TRIGGER IF EXISTS on_delete_entity ON model.entity;
+DROP FUNCTION IF EXISTS model.delete_entity_related() CASCADE;
 CREATE FUNCTION delete_entity_related() RETURNS trigger
     LANGUAGE plpgsql
     AS $$

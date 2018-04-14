@@ -1,6 +1,6 @@
 # sensitive data (except example files)
 instance/*
-!instance/example_production.py
+!instance/example_*
 
 # cache
 __pycache__/*
