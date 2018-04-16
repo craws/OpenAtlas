@@ -26,9 +26,9 @@ class FeedbackForm(Form):
 @app.route('/overview')
 def index():
     tables = {
-        'counts': {'id': 'overview', 'header': [], 'data': [],'show_pager': False},
-        'bookmarks': {'id': 'bookmarks', 'header': ['name', 'class', 'first', 'last'], 'data': [],
-                      'show_pager': False},
+        'counts': {'id': 'overview', 'header': [], 'data': [], 'show_pager': False},
+        'bookmarks': {'id': 'bookmarks', 'data': [], 'show_pager': False,
+                      'header': ['name', 'class', 'first', 'last']},
         'latest': {
             'id': 'latest', 'header': ['name', 'class', 'first', 'last', 'date', 'user'],
             'data': [], 'show_pager': False}}
@@ -40,6 +40,7 @@ def index():
                 g.classes[entity.class_.code].name,
                 entity.first,
                 entity.last,
+
                 bookmark_toggle(entity.id, True)])
         for name, count in EntityMapper.get_overview_counts().items():
             count = count if count else 0

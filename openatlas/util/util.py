@@ -174,7 +174,7 @@ def get_entity_data(entity, location=None):
         name = 'type' if root.name in app.config['BASE_TYPES'] else root.name
         if root.name not in type_data:
             type_data[name] = []
-        type_data[name].append(node.name)
+        type_data[name].append(link(node))
     type_data = OrderedDict(sorted(type_data.items(), key=lambda t: t[0]))  # sort by name
     if 'type' in type_data:  # move the base type to the top
         type_data.move_to_end('type', last=False)

@@ -39,7 +39,7 @@ def node_index():
 def node_insert(root_id):
     root = g.nodes[root_id]
     form = build_node_form(NodeForm, root)
-    # check if form is valid and if it wasn't a submit of the search form
+    # Check if form is valid and if it wasn't a submit of the search form
     if 'name_search' not in request.form and form.validate_on_submit():
         name = form.name.data
         if hasattr(form, 'name_inverse') in form:
