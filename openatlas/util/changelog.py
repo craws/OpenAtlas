@@ -3,10 +3,10 @@ from collections import OrderedDict
 
 
 class Changelog:
-    """A big OrderedDict with changelog data, maybe not the best place and format to keep it."""
+    """ A big OrderedDict with changelog data, maybe not the best place and format to keep it."""
     versions = OrderedDict()
     versions['3.4.0'] = {
-        'date': 'TBA',
+        'date': '2018-04-17',
         'data': OrderedDict(
             feature=OrderedDict([
                 ('431', 'Sub-Units for Sites')]))}
@@ -34,7 +34,6 @@ class Changelog:
             feature=OrderedDict([
                 ('877', '''Python/Flask Port
                 <p>This version includes many new features and changes. Some are listed below.</p>
-
                 <p style="font-weight:bold">User Interface and Usability</p>
                 &#8226 Performance improvements<br />
                 &#8226 More possibilities to create and link entries in one go<br />
@@ -45,13 +44,11 @@ class Changelog:
                 &#8226 Restructured admin area<br />
                 &#8226 Admin functions to check and deal with orphaned data<br />
                 &#8226 Show more/less option for long descriptions
-
                 <p style="font-weight:bold">Software and Code</p>
                 &#8226 Switched main programming language to Python 3<br />
                 &#8226 Switched web application framework to Flask<br />
                 &#8226 Switched template engine to Jinja2<br />
                 &#8226 Update of third party JavaScript libraries
-
                 <p style="font-weight:bold">Security</p>
                 &#8226 bcrypt hash algorithm for sensitive data<br />
                 &#8226 CSRF protection for forms<br />
