@@ -48,6 +48,7 @@ def node_insert(root_id):
         if node:
             flash(_('entity created'), 'info')
             return redirect(url_for('node_view', id_=node.id))
+    getattr(form, str(root.id)).label.text = 'super'
     if 'name_search' in request.form:
         form.name.data = request.form['name_search']
     return render_template('types/insert.html', form=form, root=root)
