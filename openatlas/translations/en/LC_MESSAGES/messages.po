@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-04-18 15:20+0200\n"
-"PO-Revision-Date: 2018-04-18 15:21+0200\n"
+"POT-Creation-Date: 2018-04-18 23:06+0200\n"
+"PO-Revision-Date: 2018-04-18 23:07+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -70,6 +70,14 @@ msgstr "First date cannot be after second."
 #: forms/date.py:148 forms/date.py:154
 msgid "Begin dates cannot start after end dates."
 msgstr "Begin dates cannot start after end dates."
+
+#: forms/forms.py:131 forms/forms.py:179 forms/forms.py:224 forms/forms.py:280
+msgid "change"
+msgstr "change"
+
+#: forms/forms.py:132 forms/forms.py:225
+msgid "clear"
+msgstr "clear"
 
 #: models/content.py:51 views/actor.py:203 views/actor.py:285 views/admin.py:60
 #: views/event.py:83 views/event.py:221 views/file.py:73 views/file.py:164
@@ -839,15 +847,15 @@ msgstr "sub event of"
 msgid "location"
 msgstr "location"
 
-#: util/util.py:210
+#: util/util.py:210 views/event.py:29
 msgid "recipient"
 msgstr "recipient"
 
-#: util/util.py:216
+#: util/util.py:216 views/event.py:30
 msgid "donor"
 msgstr "donor"
 
-#: util/util.py:222
+#: util/util.py:222 views/event.py:31
 msgid "given place"
 msgstr "given place"
 

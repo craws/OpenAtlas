@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-04-18 15:20+0200\n"
+"POT-Creation-Date: 2018-04-18 23:06+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -67,6 +67,14 @@ msgstr ""
 
 #: forms/date.py:148 forms/date.py:154
 msgid "Begin dates cannot start after end dates."
+msgstr ""
+
+#: forms/forms.py:131 forms/forms.py:179 forms/forms.py:224 forms/forms.py:280
+msgid "change"
+msgstr ""
+
+#: forms/forms.py:132 forms/forms.py:225
+msgid "clear"
 msgstr ""
 
 #: models/content.py:51 views/actor.py:203 views/actor.py:285 views/admin.py:60
@@ -812,15 +820,15 @@ msgstr ""
 msgid "location"
 msgstr ""
 
-#: util/util.py:210
+#: util/util.py:210 views/event.py:29
 msgid "recipient"
 msgstr ""
 
-#: util/util.py:216
+#: util/util.py:216 views/event.py:30
 msgid "donor"
 msgstr ""
 
-#: util/util.py:222
+#: util/util.py:222 views/event.py:31
 msgid "given place"
 msgstr ""
 
