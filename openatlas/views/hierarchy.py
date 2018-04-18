@@ -29,19 +29,19 @@ class HierarchyForm(Form):
     save = SubmitField(_('insert'))
 
 
-@app.route('/hierarchy/insert', methods=['POST', 'GET'])
+@app.route('/hierarchy/insert/<param>', methods=['POST', 'GET'])
 @required_group('manager')
-def hierarchy_insert():
+def hierarchy_insert(param):
     form = build_form(HierarchyForm, 'hierarchy')
     form.forms.choices = NodeMapper.get_form_choices()
     if form.validate_on_submit():
         if NodeMapper.get_nodes(form.name.data):
             flash(_('error name exists'), 'error')
             return render_template('hierarchy/insert.html', form=form)
-        node = save(form)
+        node = save(form, value_type=True if param == 'value' else False)
         flash(_('entity created'), 'info')
         return redirect(url_for('node_index') + '#tab-' + str(node.id))
-    return render_template('hierarchy/insert.html', form=form)
+    return render_template('hierarchy/insert.html', form=form, param=param)
 
 
 @app.route('/hierarchy/update/<int:id_>', methods=['POST', 'GET'])
@@ -87,12 +87,12 @@ def hierarchy_delete(id_):
     return redirect(url_for('node_index'))
 
 
-def save(form, node=None):
+def save(form, node=None, value_type=False):
     g.cursor.execute('BEGIN')
     try:
         if not node:
             node = NodeMapper.insert('E55', sanitize(form.name.data, 'node'))
-            NodeMapper.insert_hierarchy(node, form)
+            NodeMapper.insert_hierarchy(node, form, value_type)
         else:
             node = g.nodes[node.id]
             NodeMapper.update_hierarchy(node, form)

@@ -183,11 +183,12 @@ class NodeMapper(EntityMapper):
                 LinkPropertyMapper.insert(link_id, 'P2', int(field.data))
 
     @staticmethod
-    def insert_hierarchy(node, form):
+    def insert_hierarchy(node, form, value_type):
         sql = """
-            INSERT INTO web.hierarchy (id, name, multiple)
-            VALUES (%(id)s, %(name)s, %(multiple)s);"""
-        g.cursor.execute(sql, {'id': node.id, 'name': node.name, 'multiple': form.multiple.data})
+            INSERT INTO web.hierarchy (id, name, multiple, value_type)
+            VALUES (%(id)s, %(name)s, %(multiple)s, %(value_type)s);"""
+        g.cursor.execute(sql, {'id': node.id, 'name': node.name, 'multiple': form.multiple.data,
+                               'value_type': value_type})
         NodeMapper.add_forms_to_hierarchy(node, form)
 
     @staticmethod

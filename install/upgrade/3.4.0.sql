@@ -1,4 +1,4 @@
--- Upgrade to 3.3.0, be sure to backup the database and read the update notes before executing this!
+-- Upgrade to 3.4.0, be sure to backup the database and read the update notes before executing this!
 
 SET search_path = model;
 BEGIN;

@@ -25,7 +25,9 @@ class NodeForm(Form):
 @app.route('/types')
 @required_group('readonly')
 def node_index():
-    nodes = {'system': OrderedDict(), 'custom': OrderedDict(), 'places': OrderedDict()}
+    nodes = {
+        'system': OrderedDict(), 'custom': OrderedDict(),
+        'places': OrderedDict(), 'value': OrderedDict()}
     for id_, node in g.nodes.items():
         if not node.root:
             type_ = 'system' if node.system else 'custom'

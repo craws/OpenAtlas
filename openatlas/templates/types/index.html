@@ -7,17 +7,18 @@
         <ul>
             <li><a href="#menu-tab-system">{{ _('system types')|uc_first }}</a></li>
             <li><a href="#menu-tab-custom">{{ _('custom types')|uc_first }}</a></li>
+            <li><a href="#menu-tab-value">{{ _('value types')|uc_first }}</a></li>
             <li><a href="#menu-tab-places">{{ _('places')|uc_first }}</a></li>
         </ul>
-        {% for type_ in ['system', 'custom', 'places'] %}
+        {% for type_ in ['system', 'custom', 'places', 'value'] %}
             <div id="menu-tab-{{ type_ }}" style="padding: 0;" class="tab-content">
                 <div id="tabs-{{ type_ }}" class="tabs-container">
                     <ul>
                         {% for node, tree in nodes[type_].items(): %}
                             <li><a href="#tab-{{ node.id }}">{{ node.name }}</a></li>
                         {% endfor %}
-                        {% if type_ == 'custom' and 'manager'|is_authorized %}
-                            <a class="button" href="{{ url_for('hierarchy_insert') }}" style="margin:1em;color:#ffffff;">
+                        {% if type_ in ['custom', 'value'] and 'manager'|is_authorized %}
+                            <a class="button" href="{{ url_for('hierarchy_insert', param=type_) }}" style="margin:1em;color:#ffffff;">
                                 + {{ _('type')|uc_first }}
                             </a>
                         {% endif %}
@@ -37,7 +38,7 @@
                                         <input type="hidden" name="mode" value="insert" />
                                         <button type="submit" value="insert" name="add-node-submit">+</button>
                                     </form>
-                                    {% if type_ == 'custom' and 'manager'|is_authorized %}
+                                    {% if type_ in ['custom', 'value'] and 'manager'|is_authorized %}
                                         <a href="{{ url_for('hierarchy_update', id_=node.id) }} ">{{ _('edit')|uc_first }}</a>
                                         {% if not node.system and node.count < 1 and not node.subs %}
                                             <a onclick="return confirm('{{ _('delete')|uc_first }} {{ node.name.replace('\'', '') }}?')"
