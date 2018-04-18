@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-03-22 15:33+0100\n"
-"PO-Revision-Date: 2018-03-22 15:45+0100\n"
+"POT-Creation-Date: 2018-04-18 15:20+0200\n"
+"PO-Revision-Date: 2018-04-18 15:21+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -27,15 +27,15 @@ msgstr "search term"
 msgid "search"
 msgstr "search"
 
-#: forms/date.py:65 util/util.py:234
+#: forms/date.py:65 util/util.py:233
 msgid "birth"
 msgstr "birth"
 
-#: forms/date.py:66 util/util.py:236
+#: forms/date.py:66 util/util.py:235
 msgid "death"
 msgstr "death"
 
-#: forms/date.py:69 util/util.py:237
+#: forms/date.py:69 util/util.py:236
 msgid "begin"
 msgstr "begin"
 
@@ -55,7 +55,7 @@ msgstr "dd"
 msgid "comment"
 msgstr "comment"
 
-#: forms/date.py:89 util/util.py:238
+#: forms/date.py:89 util/util.py:237
 msgid "end"
 msgstr "end"
 
@@ -71,16 +71,16 @@ msgstr "First date cannot be after second."
 msgid "Begin dates cannot start after end dates."
 msgstr "Begin dates cannot start after end dates."
 
-#: models/content.py:51 views/actor.py:203 views/actor.py:285 views/admin.py:61
-#: views/event.py:83 views/event.py:221 views/file.py:74 views/file.py:165
-#: views/file.py:203 views/hierarchy.py:86 views/hierarchy.py:106
+#: models/content.py:51 views/actor.py:203 views/actor.py:285 views/admin.py:60
+#: views/event.py:83 views/event.py:221 views/file.py:73 views/file.py:164
+#: views/file.py:202 views/hierarchy.py:86 views/hierarchy.py:106
 #: views/involvement.py:67 views/involvement.py:102 views/member.py:60
-#: views/member.py:86 views/member.py:114 views/place.py:114 views/place.py:184
+#: views/member.py:86 views/member.py:114 views/place.py:183 views/place.py:288
 #: views/profile.py:93 views/profile.py:128 views/reference.py:181
 #: views/reference.py:230 views/relation.py:58 views/relation.py:90
 #: views/settings.py:112 views/source.py:108 views/source.py:139
 #: views/source.py:189 views/translation.py:60 views/translation.py:98
-#: views/types.py:117 views/types.py:193
+#: views/types.py:118 views/types.py:194
 msgid "error transaction"
 msgstr "A transaction error occurred. Please report this."
 
@@ -92,11 +92,11 @@ msgstr "Invalid link for"
 msgid "error multiple linked entities found"
 msgstr "An multiple linked entities error occurred."
 
-#: models/user.py:208 util/util.py:337
+#: models/user.py:208 util/util.py:336
 msgid "bookmark remove"
 msgstr "remove bookmark"
 
-#: models/user.py:213 util/util.py:335
+#: models/user.py:213 util/util.py:334
 msgid "bookmark"
 msgstr "bookmark"
 
@@ -133,7 +133,7 @@ msgstr ""
 "We searched a long time but this document does not exist. Maybe you mistyped "
 "or followed a broken link."
 
-#: templates/layout.html:38 util/util.py:287
+#: templates/layout.html:38 util/util.py:286
 msgid "show"
 msgstr "show"
 
@@ -149,66 +149,66 @@ msgstr "show more"
 msgid "show less"
 msgstr "show less"
 
-#: templates/layout.html:60
+#: templates/layout.html:61
 msgid "warning no js"
 msgstr ""
 "JavaScript seems to be disabled. The functionality of this site will be "
 "limited."
 
-#: templates/index/changelog.html:9 templates/layout.html:72
+#: templates/index/changelog.html:9 templates/layout.html:73
 msgid "version"
 msgstr "version"
 
-#: templates/index/changelog.html:4 templates/layout.html:73
+#: templates/index/changelog.html:4 templates/layout.html:74
 msgid "changelog"
 msgstr "changelog"
 
-#: templates/layout.html:74 templates/model/network.html:12
+#: templates/layout.html:75 templates/model/network.html:12
 msgid "manual"
 msgstr "manual"
 
-#: templates/layout.html:75 templates/model/class.html:3
+#: templates/layout.html:76 templates/model/class.html:3
 #: templates/model/class_view.html:3 templates/model/index.html:3
 #: templates/model/property.html:3 templates/model/property_view.html:3
 msgid "model"
 msgstr "model"
 
-#: templates/index/credits.html:4 templates/layout.html:76
+#: templates/index/credits.html:4 templates/layout.html:77
 msgid "credits"
 msgstr "credits"
 
-#: templates/index/contact.html:4 templates/layout.html:77
+#: templates/index/contact.html:4 templates/layout.html:78
 msgid "contact"
 msgstr "contact"
 
-#: templates/layout.html:81
+#: templates/layout.html:82
 msgid "hello"
 msgstr "hello"
 
-#: templates/layout.html:82 templates/profile/index.html:3
+#: templates/layout.html:83 templates/profile/index.html:3
 #: templates/profile/password.html:3 templates/profile/update.html:3
 msgid "profile"
 msgstr "profile"
 
-#: templates/layout.html:87
+#: templates/layout.html:88
 msgid "zoom in"
 msgstr "Larger font size"
 
-#: templates/layout.html:88
+#: templates/layout.html:89
 msgid "zoom out"
 msgstr "Smaller font size"
 
-#: templates/layout.html:97
+#: templates/layout.html:98
 msgid "logout"
 msgstr "logout"
 
-#: templates/layout.html:99 templates/login/index.html:4
+#: templates/layout.html:100 templates/login/index.html:4
 #: templates/login/reset_password.html:4 views/login.py:32
 msgid "login"
 msgstr "login"
 
-#: templates/admin/file.html:13 templates/content/update.html:16
-#: templates/map.html:9 templates/settings/update.html:10 util/filters.py:156
+#: templates/admin/file.html:12 templates/content/update.html:16
+#: templates/map.html:9 templates/settings/update.html:10 util/filters.py:158
 #: views/involvement.py:83 views/member.py:117 views/profile.py:36
 #: views/profile.py:64 views/reference.py:92 views/relation.py:94
 #: views/user.py:30
@@ -221,7 +221,7 @@ msgstr "save"
 #: templates/file/update.html:5 templates/file/view.html:19
 #: templates/hierarchy/update.html:5 templates/involvement/update.html:6
 #: templates/map.html:10 templates/member/update.html:6
-#: templates/place/update.html:5 templates/place/view.html:27
+#: templates/place/update.html:8 templates/place/view.html:36
 #: templates/profile/index.html:8 templates/profile/update.html:4
 #: templates/reference/link-update.html:6 templates/reference/update.html:5
 #: templates/reference/view.html:20 templates/relation/update.html:6
@@ -232,7 +232,8 @@ msgstr "save"
 #: templates/types/view.html:26 templates/user/update.html:6
 #: templates/user/view.html:11 views/actor.py:80 views/actor.py:106
 #: views/actor.py:125 views/actor.py:138 views/actor.py:155 views/event.py:154
-#: views/event.py:164 views/place.py:82 views/reference.py:137 views/source.py:86
+#: views/event.py:164 views/place.py:125 views/reference.py:137
+#: views/source.py:86
 msgid "edit"
 msgstr "edit"
 
@@ -240,7 +241,7 @@ msgstr "edit"
 #: templates/translation/view.html:15 templates/types/index.html:43
 #: templates/types/index.html:44 templates/types/view.html:28
 #: templates/types/view.html:29 templates/user/view.html:14
-#: templates/user/view.html:15 util/filters.py:262 views/user.py:59
+#: templates/user/view.html:15 util/filters.py:265 views/user.py:59
 msgid "delete"
 msgstr "delete"
 
@@ -282,16 +283,16 @@ msgstr "Here you can enter a description."
 #: templates/actor/update.html:3 templates/actor/view.html:3
 #: templates/event/view.html:14 templates/file/view.html:12
 #: templates/member/insert.html:4 templates/member/update.html:3
-#: templates/place/view.html:18 templates/reference/view.html:12
+#: templates/place/view.html:21 templates/reference/view.html:12
 #: templates/relation/insert.html:4 templates/relation/update.html:3
 #: templates/source/view.html:11 views/involvement.py:20 views/member.py:20
-#: views/member.py:21 views/place.py:74 views/reference.py:47
+#: views/member.py:21 views/place.py:107 views/reference.py:47
 #: views/relation.py:21
 msgid "actor"
 msgstr "actor"
 
 #: templates/actor/update.html:9 templates/event/update.html:9
-#: templates/place/update.html:9 templates/reference/update.html:9
+#: templates/place/update.html:12 templates/reference/update.html:9
 #: templates/source/update.html:9
 #, python-format
 msgid "error modified by %(username)s"
@@ -300,16 +301,16 @@ msgstr ""
 "Please copy or remember your changes and press reload to try again."
 
 #: templates/actor/update.html:10 templates/event/update.html:10
-#: templates/place/update.html:10 templates/reference/update.html:10
+#: templates/place/update.html:13 templates/reference/update.html:10
 #: templates/source/update.html:10
 msgid "reload"
 msgstr "reload"
 
 #: templates/actor/view.html:9 templates/event/view.html:9
 #: templates/file/view.html:9 templates/model/class_view.html:10
-#: templates/model/property_view.html:9 templates/place/view.html:9
+#: templates/model/property_view.html:9 templates/place/view.html:12
 #: templates/reference/view.html:9 templates/source/view.html:9
-#: templates/types/view.html:12 views/types.py:81 views/types.py:96
+#: templates/types/view.html:12 views/types.py:82 views/types.py:97
 #: views/user.py:28
 msgid "info"
 msgstr "info"
@@ -317,7 +318,7 @@ msgstr "info"
 #: templates/actor/view.html:10 templates/actor/view.html:40
 #: templates/event/view.html:13 templates/event/view.html:40
 #: templates/file/view.html:10 templates/file/view.html:51
-#: templates/place/view.html:13 templates/place/view.html:52
+#: templates/place/view.html:16 templates/place/view.html:63
 #: templates/reference/view.html:10 templates/reference/view.html:37
 #: templates/source/add.html:5 templates/source/add2.html:3
 #: templates/source/index.html:3 templates/source/index.html:8
@@ -331,7 +332,7 @@ msgstr "source"
 #: templates/actor/view.html:11 templates/event/index.html:3
 #: templates/event/insert.html:7 templates/event/update.html:3
 #: templates/event/view.html:3 templates/file/view.html:11
-#: templates/place/view.html:15 templates/reference/view.html:11
+#: templates/place/view.html:18 templates/reference/view.html:11
 #: templates/source/view.html:10 views/involvement.py:21 views/reference.py:41
 msgid "event"
 msgstr "event"
@@ -349,15 +350,15 @@ msgid "member"
 msgstr "member"
 
 #: templates/actor/view.html:17 templates/event/view.html:15
-#: templates/file/view.html:14 templates/place/view.html:20
-#: templates/reference/add.html:5 templates/reference/index.html:3
-#: templates/reference/insert.html:7 templates/reference/update.html:3
-#: templates/reference/view.html:3 templates/source/view.html:13
-#: views/reference.py:29
+#: templates/file/view.html:14 templates/place/view.html:23
+#: templates/reference/add.html:5 templates/reference/add2.html:3
+#: templates/reference/index.html:3 templates/reference/insert.html:7
+#: templates/reference/update.html:3 templates/reference/view.html:3
+#: templates/source/view.html:13 views/reference.py:29
 msgid "reference"
 msgstr "reference"
 
-#: templates/actor/view.html:19 templates/place/view.html:11
+#: templates/actor/view.html:19 templates/place/view.html:14
 msgid "map"
 msgstr "map"
 
@@ -365,7 +366,7 @@ msgstr "map"
 #: templates/admin/index.html:13 templates/event/view.html:16
 #: templates/file/add2.html:3 templates/file/index.html:3
 #: templates/file/insert.html:7 templates/file/update.html:3
-#: templates/file/view.html:3 templates/place/view.html:21
+#: templates/file/view.html:3 templates/place/view.html:24
 #: templates/reference/view.html:14 templates/source/view.html:15
 msgid "files"
 msgstr "files"
@@ -378,30 +379,30 @@ msgstr "files"
 #: templates/event/view.html:70 templates/file/add.html:5
 #: templates/file/add2.html:5 templates/file/view.html:50
 #: templates/file/view.html:60 templates/file/view.html:76
-#: templates/place/view.html:51 templates/place/view.html:70
-#: templates/place/view.html:81 templates/reference/add.html:5
-#: templates/reference/view.html:33 templates/reference/view.html:51
-#: templates/source/add.html:5 templates/source/add2.html:5
-#: templates/source/view.html:34 templates/source/view.html:50
-#: templates/source/view.html:69 util/util.py:151
+#: templates/place/view.html:62 templates/place/view.html:81
+#: templates/place/view.html:92 templates/reference/add.html:5
+#: templates/reference/add2.html:5 templates/reference/view.html:33
+#: templates/reference/view.html:51 templates/source/add.html:5
+#: templates/source/add2.html:5 templates/source/view.html:34
+#: templates/source/view.html:50 templates/source/view.html:69 util/util.py:150
 msgid "add"
 msgstr "add"
 
 #: templates/actor/view.html:89 templates/event/view.html:60
-#: templates/file/view.html:77 templates/place/view.html:71
+#: templates/file/view.html:77 templates/place/view.html:82
 #: templates/reference/index.html:8 templates/source/view.html:51
 msgid "bibliography"
 msgstr "bibliography"
 
 #: templates/actor/view.html:90 templates/event/view.html:61
-#: templates/file/view.html:78 templates/place/view.html:72
+#: templates/file/view.html:78 templates/place/view.html:83
 #: templates/reference/index.html:9 templates/source/view.html:52
 msgid "edition"
 msgstr "edition"
 
 #: templates/actor/view.html:100 templates/event/view.html:71
 #: templates/file/add.html:5 templates/file/index.html:8
-#: templates/file/insert.html:9 templates/place/view.html:82
+#: templates/file/insert.html:9 templates/place/view.html:93
 #: templates/reference/view.html:52 templates/source/view.html:70
 #: views/file.py:22
 msgid "file"
@@ -420,7 +421,7 @@ msgstr "admin"
 
 #: templates/admin/index.html:7 templates/admin/index.html:8
 #: templates/user/activity.html:4 templates/user/index.html:4
-#: templates/user/index.html:8 templates/user/insert.html:4
+#: templates/user/index.html:9 templates/user/insert.html:4
 #: templates/user/insert.html:5 templates/user/update.html:4
 #: templates/user/view.html:4 views/admin.py:25 views/user.py:62
 msgid "user"
@@ -485,7 +486,7 @@ msgid "unlinked"
 msgstr "Entities without links"
 
 #: templates/admin/orphans.html:11 templates/types/index.html:21
-#: util/filters.py:175
+#: util/filters.py:178
 msgid "type"
 msgstr "type"
 
@@ -523,11 +524,10 @@ msgstr "allowed extensions"
 
 #: templates/file/view.html:13 templates/file/view.html:62
 #: templates/place/index.html:3 templates/place/index.html:9
-#: templates/place/insert.html:7 templates/place/insert.html:9
-#: templates/place/update.html:3 templates/place/view.html:3
-#: templates/reference/view.html:13 templates/reference/view.html:35
-#: templates/source/view.html:12 templates/source/view.html:36
-#: views/reference.py:53
+#: templates/place/insert.html:9 templates/place/update.html:3
+#: templates/place/view.html:3 templates/reference/view.html:13
+#: templates/reference/view.html:35 templates/source/view.html:12
+#: templates/source/view.html:36 views/reference.py:53
 msgid "place"
 msgstr "place"
 
@@ -535,7 +535,7 @@ msgstr "place"
 msgid "missing file"
 msgstr "missing file"
 
-#: templates/file/view.html:26 views/admin.py:126
+#: templates/file/view.html:26 views/admin.py:122
 msgid "download"
 msgstr "download"
 
@@ -649,7 +649,7 @@ msgid "classes"
 msgstr "classes"
 
 #: templates/model/class_view.html:16 templates/model/property_view.html:14
-#: templates/types/view.html:35 util/filters.py:177
+#: templates/types/view.html:35 util/filters.py:180
 msgid "super"
 msgstr "super"
 
@@ -667,10 +667,11 @@ msgid "range for"
 msgstr "range for"
 
 #: templates/model/class_view.html:40 templates/model/property_view.html:26
-#: templates/types/index.html:66 util/filters.py:122 views/actor.py:24
+#: templates/types/index.html:66 util/filters.py:124 views/actor.py:24
 #: views/event.py:24 views/file.py:24 views/hierarchy.py:28 views/index.py:21
-#: views/involvement.py:23 views/member.py:23 views/place.py:21
-#: views/reference.py:21 views/relation.py:23 views/types.py:21
+#: views/involvement.py:23 views/member.py:23 views/place.py:21 views/place.py:32
+#: views/place.py:110 views/place.py:114 views/place.py:117 views/reference.py:21
+#: views/relation.py:23 views/types.py:21
 msgid "description"
 msgstr "description"
 
@@ -715,6 +716,18 @@ msgstr "wrong range"
 msgid "no check because whitelisted"
 msgstr "not checked because whitelisted"
 
+#: templates/place/view.html:26 templates/place/view.html:101
+msgid "feature"
+msgstr "feature"
+
+#: templates/place/view.html:28 templates/place/view.html:108
+msgid "stratigraphic unit"
+msgstr "stratigraphic unit"
+
+#: templates/place/view.html:30 templates/place/view.html:115
+msgid "find"
+msgstr "find"
+
 #: templates/profile/index.html:9 templates/profile/password.html:4
 msgid "change password"
 msgstr "change password"
@@ -752,7 +765,7 @@ msgstr "custom types"
 msgid "places"
 msgstr "places"
 
-#: templates/types/index.html:34 util/util.py:465
+#: templates/types/index.html:34 util/util.py:464
 msgid "filter"
 msgstr "filter"
 
@@ -780,103 +793,99 @@ msgstr "no"
 msgid "yes"
 msgstr "yes"
 
-#: util/filters.py:173
-msgid "tooltip type"
-msgstr "The options can be edited in types."
-
-#: util/filters.py:260
+#: util/filters.py:263
 #, python-format
 msgid "Delete %(name)s?"
 msgstr "Delete %(name)s?"
 
-#: util/util.py:82
+#: util/util.py:79
 msgid "error mail login"
 msgstr "Couldn't connect to the mail server."
 
-#: util/util.py:86 views/index.py:81
+#: util/util.py:83 views/index.py:82
 msgid "error mail send"
 msgstr "The mail couldn't be sent."
 
-#: util/util.py:148 util/util.py:441
+#: util/util.py:147 util/util.py:440
 msgid "no entries"
 msgstr "no entries"
 
-#: util/util.py:158
+#: util/util.py:157
 #, python-format
 msgid "Remove %(name)s?"
 msgstr "Remove %(name)s?"
 
-#: util/util.py:159
+#: util/util.py:158
 msgid "remove"
 msgstr "remove"
 
-#: util/util.py:189 util/util.py:229
+#: util/util.py:188 util/util.py:228
 msgid "alias"
 msgstr "alias"
 
-#: util/util.py:193
+#: util/util.py:192
 msgid "size"
 msgstr "size"
 
-#: util/util.py:194
+#: util/util.py:193
 msgid "extension"
 msgstr "extension"
 
-#: util/util.py:200 views/event.py:21
+#: util/util.py:199 views/event.py:21
 msgid "sub event of"
 msgstr "sub event of"
 
-#: util/util.py:203 views/event.py:22
+#: util/util.py:202 views/event.py:22
 msgid "location"
 msgstr "location"
 
-#: util/util.py:211
+#: util/util.py:210
 msgid "recipient"
 msgstr "recipient"
 
-#: util/util.py:217
+#: util/util.py:216
 msgid "donor"
 msgstr "donor"
 
-#: util/util.py:223
+#: util/util.py:222
 msgid "given place"
 msgstr "given place"
 
-#: util/util.py:233 views/place.py:74
+#: util/util.py:232 views/place.py:107
 msgid "first"
 msgstr "first"
 
-#: util/util.py:235 views/place.py:74
+#: util/util.py:234 views/place.py:107
 msgid "last"
 msgstr "last"
 
-#: util/util.py:246
+#: util/util.py:245
 msgid "between"
 msgstr "between"
 
-#: util/util.py:254 views/place.py:74 views/types.py:81
+#: util/util.py:253 views/place.py:107 views/types.py:82
 msgid "class"
 msgstr "class"
 
-#: util/util.py:256
+#: util/util.py:255
 msgid "created"
 msgstr "created"
 
-#: util/util.py:259
+#: util/util.py:258
 msgid "modified"
 msgstr "modified"
 
-#: util/util.py:287
+#: util/util.py:286
 msgid "date"
 msgstr "date"
 
-#: util/util.py:287
+#: util/util.py:286
 msgid "tooltip date"
 msgstr "You can declare a begin date, an end date or timespans for each of them."
 
 #: views/actor.py:19 views/event.py:20 views/file.py:23 views/hierarchy.py:18
-#: views/place.py:19 views/reference.py:20 views/source.py:19
-#: views/translation.py:16 views/types.py:19 views/types.py:81 views/types.py:96
+#: views/place.py:19 views/place.py:31 views/reference.py:20 views/source.py:19
+#: views/translation.py:16 views/types.py:19 views/types.py:82 views/types.py:97
 msgid "name"
 msgstr "name"
 
@@ -897,7 +906,7 @@ msgid "appears last"
 msgstr "appears last"
 
 #: views/actor.py:25 views/event.py:25 views/file.py:25 views/hierarchy.py:29
-#: views/involvement.py:24 views/member.py:24 views/place.py:22
+#: views/involvement.py:24 views/member.py:24 views/place.py:22 views/place.py:33
 #: views/reference.py:22 views/reference.py:31 views/reference.py:37
 #: views/reference.py:43 views/reference.py:49 views/reference.py:55
 #: views/relation.py:24 views/source.py:21 views/translation.py:18
@@ -906,39 +915,39 @@ msgid "insert"
 msgstr "insert"
 
 #: views/actor.py:26 views/event.py:26 views/involvement.py:25 views/member.py:25
-#: views/place.py:23 views/reference.py:23 views/relation.py:25
+#: views/place.py:23 views/place.py:36 views/reference.py:23 views/relation.py:25
 #: views/source.py:22 views/translation.py:19 views/user.py:31
 msgid "insert and continue"
 msgstr "insert and continue"
 
-#: views/actor.py:38 views/event.py:122 views/file.py:100 views/place.py:61
+#: views/actor.py:38 views/event.py:122 views/file.py:99 views/place.py:94
 #: views/reference.py:116 views/source.py:57
 msgid "link removed"
 msgstr "link removed"
 
-#: views/actor.py:199 views/event.py:79 views/file.py:173 views/hierarchy.py:82
-#: views/place.py:115 views/reference.py:177 views/source.py:135
-#: views/translation.py:56 views/types.py:113
+#: views/actor.py:199 views/event.py:79 views/file.py:172 views/hierarchy.py:82
+#: views/place.py:184 views/reference.py:177 views/source.py:135
+#: views/translation.py:56 views/types.py:114
 msgid "entity deleted"
 msgstr "The entry has been deleted."
 
-#: views/actor.py:217 views/event.py:99 views/file.py:129 views/place.py:129
+#: views/actor.py:217 views/event.py:99 views/file.py:128 views/place.py:208
 #: views/reference.py:193 views/source.py:151
 msgid "error modified"
 msgstr "Update failed."
 
-#: views/actor.py:281 views/event.py:217 views/file.py:199 views/hierarchy.py:42
+#: views/actor.py:281 views/event.py:217 views/file.py:198 views/hierarchy.py:42
 #: views/involvement.py:63 views/member.py:56 views/member.py:82
-#: views/place.py:180 views/reference.py:226 views/relation.py:54
+#: views/place.py:284 views/reference.py:226 views/relation.py:54
 #: views/source.py:185 views/translation.py:30 views/types.py:49
 msgid "entity created"
 msgstr "An entry has been created."
 
-#: views/actor.py:281 views/admin.py:57 views/content.py:52 views/event.py:217
-#: views/file.py:199 views/hierarchy.py:62 views/place.py:180 views/profile.py:89
+#: views/actor.py:281 views/admin.py:56 views/content.py:52 views/event.py:217
+#: views/file.py:198 views/hierarchy.py:62 views/place.py:284 views/profile.py:89
 #: views/profile.py:124 views/reference.py:97 views/reference.py:226
 #: views/relation.py:86 views/settings.py:108 views/source.py:185
-#: views/translation.py:72 views/types.py:66 views/user.py:145
+#: views/translation.py:72 views/types.py:67 views/user.py:145
 msgid "info update"
 msgstr "Changes have been saved."
 
@@ -946,7 +955,7 @@ msgstr "Changes have been saved."
 msgid "limit"
 msgstr "limit"
 
-#: views/admin.py:23 views/admin.py:25 views/admin.py:134 views/user.py:56
+#: views/admin.py:23 views/admin.py:25 views/admin.py:130 views/user.py:56
 #: views/user.py:61 views/user.py:62 views/user.py:72
 msgid "all"
 msgstr "all"
@@ -971,35 +980,35 @@ msgstr "send"
 msgid "max file size"
 msgstr "max file size"
 
-#: views/admin.py:75
+#: views/admin.py:73
 msgid "info orphans deleted:"
 msgstr "Orphaned data deleted"
 
-#: views/admin.py:156
+#: views/admin.py:152
 msgid "Logs deleted"
 msgstr "Logs deleted"
 
-#: views/admin.py:174
+#: views/admin.py:170
 msgid "To unsubscribe use the link below."
 msgstr "To unsubscribe use the link below."
 
-#: views/admin.py:177
+#: views/admin.py:173
 msgid "Newsletter send"
 msgstr "Newsletter send"
 
-#: views/event.py:39 views/types.py:174
+#: views/event.py:39 views/types.py:175
 msgid "error node self as super"
 msgstr "Type can't have itself as super."
 
-#: views/file.py:146
+#: views/file.py:145
 msgid "no file to upload"
 msgstr "no file to upload"
 
-#: views/file.py:148
+#: views/file.py:147
 msgid "file type not allowed"
 msgstr "file type not allowed"
 
-#: views/file.py:172
+#: views/file.py:171
 msgid "error file delete"
 msgstr "An error occurred when trying to delete the file."
 
@@ -1015,29 +1024,29 @@ msgstr "Choose in which forms this type will be available."
 msgid "error name exists"
 msgstr "The name is already in use."
 
-#: views/index.py:79
+#: views/index.py:80
 msgid "info feedback thanks"
 msgstr "Thank you for your feedback."
 
-#: views/index.py:119
+#: views/index.py:120
 msgid "unsubscribe link not valid"
 msgstr ""
 "Sorry, but this link seems invalid, You can also unsubscribe from the "
 "newsletter in your profile."
 
-#: views/index.py:125
+#: views/index.py:126
 msgid ""
 "You have successfully unsubscribed. You can subscribe again in your Profile."
 msgstr ""
 "You have successfully unsubscribed. You can subscribe again in your Profile."
 
 #: views/login.py:29 views/login.py:147 views/profile.py:72 views/user.py:21
-#: views/user.py:97 views/user.py:172
+#: views/user.py:97 views/user.py:174
 msgid "username"
 msgstr "username"
 
 #: views/login.py:30 views/login.py:148 views/profile.py:33 views/user.py:24
-#: views/user.py:173
+#: views/user.py:175
 msgid "password"
 msgstr "password"
 
@@ -1084,7 +1093,7 @@ msgstr "Password reset request for %(site_name)s"
 msgid "We received a password reset request for %(username)s"
 msgstr "We received a password reset request for %(username)s"
 
-#: views/login.py:113 views/login.py:146 views/settings.py:65 views/user.py:171
+#: views/login.py:113 views/login.py:146 views/settings.py:65 views/user.py:173
 msgid "at"
 msgstr "at"
 
@@ -1142,9 +1151,13 @@ msgstr "Failed to send password mail to %(email)s."
 msgid "Can't link to itself."
 msgstr "Can't link to itself."
 
-#: views/place.py:74
+#: views/place.py:107
 msgid "property"
 msgstr "property"
+
+#: views/place.py:171
+msgid "Deletion not possible if subunits exists"
+msgstr "Deletion not possible if subunits exists"
 
 #: views/profile.py:16 views/user.py:101
 msgid "language"
@@ -1358,19 +1371,19 @@ msgstr "This test mail was sent by %(username)s"
 msgid "A test mail was sent to %(email)s."
 msgstr "A test mail was sent to %(email)s."
 
-#: views/types.py:91
+#: views/types.py:92
 msgid "domain"
 msgstr "domain"
 
-#: views/types.py:91
+#: views/types.py:92
 msgid "range"
 msgstr "range"
 
-#: views/types.py:96
+#: views/types.py:97
 msgid "count"
 msgstr "count"
 
-#: views/types.py:177
+#: views/types.py:178
 msgid "error node sub as super"
 msgstr "Type can't have a sub as super."
 
@@ -1402,31 +1415,31 @@ msgstr "update"
 msgid "action"
 msgstr "action"
 
-#: views/user.py:165
+#: views/user.py:167
 msgid "user created"
 msgstr "A user was created."
 
-#: views/user.py:167
+#: views/user.py:169
 #, python-format
 msgid "Your account information for %(sitename)s"
 msgstr "Your account information for %(sitename)s"
 
-#: views/user.py:170
+#: views/user.py:172
 #, python-format
 msgid "Account information for %(username)s"
 msgstr "Account information for %(username)s"
 
-#: views/user.py:176
+#: views/user.py:178
 #, python-format
 msgid "Sent account information mail to %(email)s."
 msgstr "Sent account information mail to %(email)s."
 
-#: views/user.py:179
+#: views/user.py:181
 #, python-format
 msgid "Failed to send account details to %(email)s."
 msgstr "Failed to send account details to %(email)s."
 
-#: views/user.py:204
+#: views/user.py:206
 msgid "user deleted"
 msgstr "A user was deleted."
 
@@ -1549,3 +1562,6 @@ msgstr "A user was deleted."
 
 #~ msgid "It seems you are not welcomed here."
 #~ msgstr "It seems you are not welcomed here."
+
+#~ msgid "tooltip type"
+#~ msgstr "The options can be edited in types."
