@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="{{ origin|get_view_name + '_index' }}">{{ _(origin|get_view_name)|uc_first }}</a>
+    <a href="{{ url_for(origin|get_view_name + '_index') }}">{{ _(origin|get_view_name)|uc_first }}</a>
     > {{ origin|link|safe }}
     > {{ _('add')|uc_first + ' ' + _('source')|uc_first }}
 {% endblock %}
