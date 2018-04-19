@@ -10,10 +10,10 @@ class HierarchyTest(TestBaseCase):
     def test_hierarchy(self):
         with app.app_context():
             self.login()
-            rv = self.app.get(url_for('hierarchy_insert'))
+            rv = self.app.get(url_for('hierarchy_insert', param='custom'))
             assert b'+ Custom' in rv.data
             data = {'name': 'Geronimo', 'multiple': True, 'description': 'Very important!'}
-            rv = self.app.post(url_for('hierarchy_insert'), data=data)
+            rv = self.app.post(url_for('hierarchy_insert', param='custom'), data=data)
             hierarchy_id = rv.location.split('/')[-1].replace('types#tab-', '')
             rv = self.app.get(url_for('hierarchy_update', id_=hierarchy_id))
             assert b'Geronimo' in rv.data
@@ -33,5 +33,5 @@ class HierarchyTest(TestBaseCase):
             assert b'Forbidden' in rv.data
             rv = self.app.get(url_for('hierarchy_delete', id_=actor_node.id), follow_redirects=True)
             assert b'Forbidden' in rv.data
-            rv = self.app.post(url_for('hierarchy_insert'), data=data)
+            rv = self.app.post(url_for('hierarchy_insert', param='custom'), data=data)
             assert b'The name is already in use' in rv.data

@@ -124,9 +124,8 @@ def node_delete(id_):
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
     root = g.nodes[node.root[-1]] if node.root else None
-    if root:
-        return redirect(url_for('node_view', id_=root.id))
-    return redirect(url_for('node_index'))
+    url = url_for('node_view', id_=root.id) if root else url_for('node_index')
+    return redirect(url)
 
 
 def walk_tree(param):

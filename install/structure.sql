@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.6.6
--- Dumped by pg_dump version 9.6.6
+-- Dumped from database version 9.6.7
+-- Dumped by pg_dump version 9.6.7
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -13,6 +13,7 @@ SET standard_conforming_strings = on;
 SET check_function_bodies = false;
 SET client_min_messages = warning;
 SET row_security = off;
+
 SET search_path = web, pg_catalog;
 
 ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_user_id_fkey;
@@ -84,6 +85,7 @@ ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_boo
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_pkey;
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS unsubscribe_code_key;
 ALTER TABLE IF EXISTS ONLY web.settings DROP CONSTRAINT IF EXISTS settings_pkey;
+ALTER TABLE IF EXISTS ONLY web.settings DROP CONSTRAINT IF EXISTS settings_name_key;
 ALTER TABLE IF EXISTS ONLY web.system_log DROP CONSTRAINT IF EXISTS log_pkey;
 ALTER TABLE IF EXISTS ONLY web.i18n DROP CONSTRAINT IF EXISTS i18n_pkey;
 ALTER TABLE IF EXISTS ONLY web.i18n DROP CONSTRAINT IF EXISTS i18n_name_language_key;
@@ -867,7 +869,8 @@ CREATE TABLE hierarchy (
     system boolean DEFAULT false NOT NULL,
     directional boolean DEFAULT false NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
+    modified timestamp without time zone,
+    value_type boolean DEFAULT false NOT NULL
 );
 
 
@@ -885,6 +888,13 @@ COMMENT ON COLUMN hierarchy.id IS 'same as model.entity.id';
 --
 
 COMMENT ON COLUMN hierarchy.name IS 'same as model.entity.name, to ensure unique root type names';
+
+
+--
+-- Name: COLUMN hierarchy.value_type; Type: COMMENT; Schema: web; Owner: openatlas
+--
+
+COMMENT ON COLUMN hierarchy.value_type IS 'If links to this type can have numeric values';
 
 
 --
@@ -1597,6 +1607,14 @@ ALTER TABLE ONLY i18n
 
 ALTER TABLE ONLY system_log
     ADD CONSTRAINT log_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: settings settings_name_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY settings
+    ADD CONSTRAINT settings_name_key UNIQUE (name);
 
 
 --
