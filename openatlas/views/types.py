@@ -30,8 +30,13 @@ def node_index():
         'places': OrderedDict(), 'value': OrderedDict()}
     for id_, node in g.nodes.items():
         if not node.root:
-            type_ = 'system' if node.system else 'custom'
-            type_ = 'places' if node.class_.code == 'E53' else type_
+            type_ = 'custom'
+            if node.system:
+                type_ = 'system'
+            elif node.class_.code == 'E53':
+                type_ = 'places'
+            elif node.value_type:
+                type_ = 'value'
             nodes[type_][node] = tree_select(node.name)
     return render_template('types/index.html', nodes=nodes)
 

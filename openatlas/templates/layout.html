@@ -117,7 +117,7 @@
         <div id="breadcrumb">
             {% block breadcrumb %}{% endblock %}
         </div>
-        <main role="main">
+        <main>
             <div id="content">
                 <div style="float:left">{% block content %}{% endblock %}</div>
                 {% if session['settings']['debug_mode'] and 'admin'|is_authorized %}
