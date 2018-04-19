@@ -26,9 +26,9 @@ class EventForm(DateForm):
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
     opened = HiddenField()
-    recipient = TableMultiField()
-    donor = TableMultiField()
-    given_place = TableMultiField()
+    recipient = TableMultiField(_('recipient'))
+    donor = TableMultiField(_('donor'))
+    given_place = TableMultiField(_('given place'))
 
     def validate(self, extra_validators=None):
         """Check if selected super event is allowed"""
