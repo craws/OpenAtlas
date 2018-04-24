@@ -60,6 +60,12 @@ form input[type="text"].year {
     width: 4em;
 }
 
+input[type="text"].value_input {
+    width: 8em;
+    margin-top: 0.5em;
+    text-align: right;
+}
+
 .faded {
     opacity: 0.5;
 }

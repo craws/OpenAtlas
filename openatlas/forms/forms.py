@@ -98,6 +98,7 @@ class TreeSelect(HiddenInput):
             hierarchy_id = int(field.id)
         except ValueError:
             hierarchy_id = NodeMapper.get_hierarchy_by_name(uc_first(field.id)).id
+        root = g.nodes[hierarchy_id]
         html = """
             <input id="{name}-button" name="{name}-button" type="text"
                 class="table-select {required}" onfocus="this.blur()"
@@ -112,9 +113,9 @@ class TreeSelect(HiddenInput):
             </div>
             <script>
                 $(document).ready(function () {{
-                    createOverlay("{name}","{title}");
+                    createOverlay("{name}","{title}",false,{value_type});
                     $("#{name}-tree").jstree({{
-                        "core" : {{"check_callback" : true, 'data':[{tree_data}] }},
+                        "core" : {{"check_callback" : true, 'data':[{tree_data}]}},
                         "search": {{"case_insensitive": true, "show_only_matches": true}},
                         "plugins" : ["search"],
                     }});
@@ -127,7 +128,8 @@ class TreeSelect(HiddenInput):
                 }});
             </script>""".format(
             name=field.id,
-            title=g.nodes[hierarchy_id].name,
+            title=root.name,
+            value_type='true' if root.value_type else 'false',
             change_label=uc_first(_('change')),
             clear_label=uc_first(_('clear')),
             selection=selection,
@@ -146,12 +148,29 @@ class TreeMultiSelect(HiddenInput):
     def __call__(self, field, **kwargs):
         selection = ''
         selected_ids = []
+        root = g.nodes[int(field.id)]
         if field.data:
             if isinstance(field.data, str):
                 field.data = ast.literal_eval(field.data)
             for entity_id in field.data:
                 selected_ids.append(entity_id)
-                selection += g.nodes[entity_id].name + '<br />'
+                if root.value_type:
+                    selection += """
+                    <script>$(document).ready(function () {{
+                        $('#{name}-button').after('<span> {label}</span>');
+                        $('#{name}-button').after(
+                            $('<input>').attr({{
+                                type: 'text',
+                                id: 'value-{name}',
+                                name: 'value-{name}',
+                                value: '20',
+                                class: 'value_input'
+                            }})
+                        );
+                        $('#{name}-button').after($('<br />'));
+                    }})</script>""".format(name=field.id, label=g.nodes[entity_id].name)
+                else:
+                    selection += g.nodes[entity_id].name + '<br />'
         html = """
             <span id="{name}-button" class="button">{change_label}</span>
             <div id="{name}-selection" style="text-align:left;">{selection}</div>
@@ -162,7 +181,7 @@ class TreeMultiSelect(HiddenInput):
                </div>
             </div>
             <script>
-                createOverlay("{name}", "{title}", true, "tree");
+                createOverlay("{name}", "{title}", true, "tree", {value_type});
                 $("#{name}-tree").jstree({{
                     "core" : {{ "check_callback" : true, 'data':[{tree_data}] }},
                     "search": {{"case_insensitive": true, "show_only_matches": true}},
@@ -174,7 +193,8 @@ class TreeMultiSelect(HiddenInput):
                 }});
             </script>""".format(
             name=field.id,
-            title=g.nodes[int(field.id)].name,
+            value_type='true' if root.value_type else 'false',
+            title=root.name,
             selection=selection,
             change_label=uc_first(_('change')),
             tree_data=NodeMapper.get_tree_data(int(field.id), selected_ids))

@@ -10,7 +10,7 @@
             <li><a href="#menu-tab-value">{{ _('value types')|uc_first }}</a></li>
             <li><a href="#menu-tab-places">{{ _('places')|uc_first }}</a></li>
         </ul>
-        {% for type_ in ['system', 'custom', 'places', 'value'] %}
+        {% for type_ in ['system', 'custom', 'value', 'places'] %}
             <div id="menu-tab-{{ type_ }}" style="padding: 0;" class="tab-content">
                 <div id="tabs-{{ type_ }}" class="tabs-container">
                     <ul>

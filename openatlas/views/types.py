@@ -31,10 +31,10 @@ def node_index():
     for id_, node in g.nodes.items():
         if not node.root:
             type_ = 'custom'
-            if node.system:
-                type_ = 'system'
-            elif node.class_.code == 'E53':
+            if node.class_.code == 'E53':
                 type_ = 'places'
+            elif node.system:
+                type_ = 'system'
             elif node.value_type:
                 type_ = 'value'
             nodes[type_][node] = tree_select(node.name)

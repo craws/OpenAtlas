@@ -89,7 +89,7 @@ function ucString(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-function createOverlay(name, title=false, multiple=false, type='table') {
+function createOverlay(name, title=false, multiple=false, type='table', value_type=false) {
     if (!title) {
         title = name;
     }
@@ -109,7 +109,7 @@ function createOverlay(name, title=false, multiple=false, type='table') {
             height: 'auto',
             close: function () {
                 if (multiple && type=='tree') {
-                    selectFromTreeMulti(name);
+                    selectFromTreeMulti(name, value_type);
                 }
                 if (multiple && type=='table') {
                     selectFromTableMulti(name);
@@ -140,12 +140,25 @@ function selectFromTree(name, id, text) {
     $('#' + name + '-clear').show();
 }
 
-function selectFromTreeMulti(name) {
+function selectFromTreeMulti(name, value_type=false) {
     var checkedNames = '';
     var ids = $('#' + name + '-tree').jstree('get_selected');
     ids.forEach(function (item, index, array) {
         var node = $('#' + name + '-tree').jstree().get_node(item);
-        checkedNames += node['text'] + "<br />";
+        if (value_type) {
+            $('#' + name + '-button').after('<span> ' + node['text'] + '</span>');
+            $('#' + name + '-button').after(
+                $('<input>').attr({
+                    type: 'text',
+                    id: 'value-' + name ,
+                    name: 'value-' + name,
+                    value: '20',
+                    class: 'value_input'
+            }));
+            $('#' + name + '-button').after($('<br />'));
+        } else {
+            checkedNames += node['text'] + "<br />";
+        }
     });
     $("#" + name + "-selection").html(checkedNames);
     if (ids.length > 0) {
