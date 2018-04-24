@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
     {% if origin %}
-        <a href="{{ origin|get_view_name + '_index' }}">{{ _(origin|get_view_name)|uc_first }}</a>
+        <a href="{{ url_for(origin|get_view_name + '_index') }}">{{ _(origin|get_view_name)|uc_first }}</a>
         > {{ origin|link|safe }}
     {% else %}
         <a href="{{ url_for('file_index') }}">{{ _('files')|uc_first }}</a>

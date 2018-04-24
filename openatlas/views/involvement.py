@@ -36,12 +36,12 @@ def involvement_insert(origin_id):
         del form.event
     else:
         del form.actor
-    form.activity.choices = [('P11', g.properties['P11'].name)]
+    form.activity.choices = [('P11', g.properties['P11'].name_inverse)]
     if origin.class_.code in ['E7', 'E8', 'E12']:
-        form.activity.choices.append(('P14', g.properties['P14'].name))
+        form.activity.choices.append(('P14', g.properties['P14'].name_inverse))
     if origin.class_.code == 'E8':
-        form.activity.choices.append(('P22', g.properties['P22'].name))
-        form.activity.choices.append(('P23', g.properties['P23'].name))
+        form.activity.choices.append(('P22', g.properties['P22'].name_inverse))
+        form.activity.choices.append(('P23', g.properties['P23'].name_inverse))
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
