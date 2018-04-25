@@ -153,7 +153,8 @@ class TreeMultiSelect(HiddenInput):
             if isinstance(field.data, str):
                 field.data = ast.literal_eval(field.data)
             for entity_id in field.data:
-                selected_ids.append(entity_id)
+                entity = g.nodes[entity_id]
+                selected_ids.append(entity.id)
                 if root.value_type:
                     selection += """
                     <script>$(document).ready(function () {{
@@ -161,14 +162,15 @@ class TreeMultiSelect(HiddenInput):
                         $('#{name}-button').after(
                             $('<input>').attr({{
                                 type: 'text',
-                                id: 'value-{name}',
-                                name: 'value-{name}',
-                                value: '20',
+                                id: 'value_list-{entity_id}',
+                                name: 'value_list-{entity_id}',
+                                value: '{value}',
                                 class: 'value_input'
                             }})
                         );
                         $('#{name}-button').after($('<br />'));
-                    }})</script>""".format(name=field.id, label=g.nodes[entity_id].name)
+                    }})</script>""".format(name=field.id, label=entity.name, entity_id=entity.id,
+                                           value='To do')
                 else:
                     selection += g.nodes[entity_id].name + '<br />'
         html = """

@@ -162,19 +162,27 @@ class NodeMapper(EntityMapper):
         from openatlas.forms.forms import TreeField, TreeMultiField
         if hasattr(entity, 'nodes'):
             entity.delete_links(['P2', 'P89'])
+
         for field in form:
-            if isinstance(field, (TreeField, TreeMultiField)) and field.data:
-                try:
-                    range_param = int(field.data)
-                except ValueError:
-                    range_param = ast.literal_eval(field.data)
-                node = g.nodes[int(field.id)]
-                if node.name in ['Administrative Unit', 'Historical Place']:
-                    if entity.class_.code == 'E53':
-                        entity.link('P89', range_param)
-                else:
-                    if entity.class_.code != 'E53':
-                        entity.link('P2', range_param)
+            if field.name == 'value_list':
+                print(form.value_list.data)
+                for subfield in form.value_list:
+                    print(subfield.name + ":" + subfield.data)
+                    node_id = int(subfield.name.replace('value_list-', ''))
+                    entity.link('P2', node_id, subfield.data)
+            elif isinstance(field, (TreeField, TreeMultiField)) and field.data:
+                root = g.nodes[int(field.id)]
+                if not root.value_type:
+                    try:
+                        range_param = [int(field.data)]
+                    except ValueError:
+                        range_param = ast.literal_eval(field.data)
+                    if root.name in ['Administrative Unit', 'Historical Place']:
+                        if entity.class_.code == 'E53':
+                            entity.link('P89', range_param)
+                    else:
+                        if entity.class_.code != 'E53':
+                            entity.link('P2', range_param)
 
     @staticmethod
     def save_link_nodes(link_id, form):
