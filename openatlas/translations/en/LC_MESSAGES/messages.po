@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-04-18 23:06+0200\n"
-"PO-Revision-Date: 2018-04-18 23:07+0200\n"
+"POT-Creation-Date: 2018-04-30 17:33+0200\n"
+"PO-Revision-Date: 2018-04-30 17:34+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -185,9 +185,9 @@ msgstr "model"
 msgid "credits"
 msgstr "credits"
 
-#: templates/index/contact.html:4 templates/layout.html:78
-msgid "contact"
-msgstr "contact"
+#: templates/index/legal.html:4 templates/layout.html:78
+msgid "legal notice"
+msgstr "Legal Notice"
 
 #: templates/layout.html:82
 msgid "hello"
@@ -559,9 +559,9 @@ msgstr "node"
 msgid "custom"
 msgstr "custom"
 
-#: templates/index/changelog.html:3 templates/index/contact.html:3
-#: templates/index/credits.html:3 templates/index/feedback.html:3
-#: templates/index/index.html:3 templates/index/unsubscribe.html:3
+#: templates/index/changelog.html:3 templates/index/credits.html:3
+#: templates/index/feedback.html:3 templates/index/index.html:3
+#: templates/index/legal.html:3 templates/index/unsubscribe.html:3
 #: templates/login/index.html:3 templates/login/reset_password.html:3
 #: templates/search/index.html:3
 msgid "overview"
@@ -1573,3 +1573,6 @@ msgstr "A user was deleted."
 
 #~ msgid "tooltip type"
 #~ msgstr "The options can be edited in types."
+
+#~ msgid "contact"
+#~ msgstr "contact"
