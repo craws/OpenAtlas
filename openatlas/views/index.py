@@ -84,9 +84,9 @@ def index_feedback():
     return render_template('index/feedback.html', form=form)
 
 
-@app.route('/overview/contact')
-def index_contact():
-    return render_template('index/contact.html', contact=ContentMapper.get_translation('contact'))
+@app.route('/overview/legal')
+def index_legal():
+    return render_template('index/legal.html', text=ContentMapper.get_translation('legal'))
 
 
 @app.route('/overview/credits')

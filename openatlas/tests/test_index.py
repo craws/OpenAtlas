@@ -14,7 +14,7 @@ class IndexTests(TestBaseCase):
             assert b'404' in rv.data
             rv = self.app.get(url_for('index_changelog'))
             assert b'2.0.0' in rv.data
-            rv = self.app.get(url_for('index_contact'))
+            rv = self.app.get(url_for('index_legal'))
             assert b'Contact' in rv.data
             rv = self.app.get(url_for('index_credits'))
             assert b'Stefan Eichert' in rv.data
