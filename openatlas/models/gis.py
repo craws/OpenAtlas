@@ -40,7 +40,9 @@ class GisMapper:
                 JOIN model.entity object ON l.domain_id = object.id
                 JOIN gis.{shape} {shape} ON place.id = {shape}.entity_id
                 LEFT JOIN model.link t ON object.id = t.domain_id AND t.property_code = 'P2'
-                WHERE place.class_code = 'E53' AND l.property_code = 'P53'
+                WHERE place.class_code = 'E53'
+                    AND l.property_code = 'P53'
+                    AND object.system_type = 'place'
                 GROUP BY object.id, {shape}.id;""".format(
                         shape=shape,
                         polygon_point_sql=polygon_point_sql if shape == 'polygon' else '')
