@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-04-30 17:33+0200\n"
+"POT-Creation-Date: 2018-05-02 15:53+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -177,38 +177,42 @@ msgstr ""
 msgid "credits"
 msgstr ""
 
-#: templates/index/legal.html:4 templates/layout.html:78
-msgid "legal notice"
+#: templates/layout.html:79
+msgid "contact"
 msgstr ""
 
 #: templates/layout.html:82
+msgid "legal_notice"
+msgstr ""
+
+#: templates/layout.html:87
 msgid "hello"
 msgstr ""
 
-#: templates/layout.html:83 templates/profile/index.html:3
+#: templates/layout.html:88 templates/profile/index.html:3
 #: templates/profile/password.html:3 templates/profile/update.html:3
 msgid "profile"
 msgstr ""
 
-#: templates/layout.html:88
+#: templates/layout.html:93
 msgid "zoom in"
 msgstr ""
 
-#: templates/layout.html:89
+#: templates/layout.html:94
 msgid "zoom out"
 msgstr ""
 
-#: templates/layout.html:98
+#: templates/layout.html:103
 msgid "logout"
 msgstr ""
 
-#: templates/layout.html:100 templates/login/index.html:4
+#: templates/layout.html:105 templates/login/index.html:4
 #: templates/login/reset_password.html:4 views/login.py:32
 msgid "login"
 msgstr ""
 
 #: templates/admin/file.html:12 templates/content/update.html:16
-#: templates/map.html:9 templates/settings/update.html:10 util/filters.py:158
+#: templates/map.html:9 templates/settings/update.html:10 util/filters.py:165
 #: views/involvement.py:83 views/member.py:117 views/profile.py:36
 #: views/profile.py:64 views/reference.py:92 views/relation.py:94
 #: views/user.py:30
@@ -241,7 +245,7 @@ msgstr ""
 #: templates/translation/view.html:15 templates/types/index.html:43
 #: templates/types/index.html:44 templates/types/view.html:28
 #: templates/types/view.html:29 templates/user/view.html:14
-#: templates/user/view.html:15 util/filters.py:265 views/user.py:59
+#: templates/user/view.html:15 util/filters.py:272 views/user.py:59
 msgid "delete"
 msgstr ""
 
@@ -482,7 +486,7 @@ msgid "unlinked"
 msgstr ""
 
 #: templates/admin/orphans.html:11 templates/types/index.html:21
-#: util/filters.py:178
+#: util/filters.py:185
 msgid "type"
 msgstr ""
 
@@ -547,9 +551,9 @@ msgstr ""
 msgid "custom"
 msgstr ""
 
-#: templates/index/changelog.html:3 templates/index/credits.html:3
-#: templates/index/feedback.html:3 templates/index/index.html:3
-#: templates/index/legal.html:3 templates/index/unsubscribe.html:3
+#: templates/index/changelog.html:3 templates/index/content.html:3
+#: templates/index/credits.html:3 templates/index/feedback.html:3
+#: templates/index/index.html:3 templates/index/unsubscribe.html:3
 #: templates/login/index.html:3 templates/login/reset_password.html:3
 #: templates/search/index.html:3
 msgid "overview"
@@ -630,7 +634,7 @@ msgid "classes"
 msgstr ""
 
 #: templates/model/class_view.html:16 templates/model/property_view.html:14
-#: templates/types/view.html:35 util/filters.py:180
+#: templates/types/view.html:35 util/filters.py:187
 msgid "super"
 msgstr ""
 
@@ -648,7 +652,7 @@ msgid "range for"
 msgstr ""
 
 #: templates/model/class_view.html:40 templates/model/property_view.html:26
-#: templates/types/index.html:66 util/filters.py:124 views/actor.py:24
+#: templates/types/index.html:66 util/filters.py:125 views/actor.py:24
 #: views/event.py:24 views/file.py:24 views/hierarchy.py:28 views/index.py:21
 #: views/involvement.py:23 views/member.py:23 views/place.py:21
 #: views/place.py:32 views/place.py:110 views/place.py:114 views/place.py:117
@@ -766,15 +770,15 @@ msgstr ""
 msgid "entities"
 msgstr ""
 
-#: util/filters.py:54
+#: util/filters.py:55
 msgid "no"
 msgstr ""
 
-#: util/filters.py:55 views/user.py:120
+#: util/filters.py:56 views/user.py:120
 msgid "yes"
 msgstr ""
 
-#: util/filters.py:263
+#: util/filters.py:270
 #, python-format
 msgid "Delete %(name)s?"
 msgstr ""
@@ -1013,11 +1017,11 @@ msgstr ""
 msgid "info feedback thanks"
 msgstr ""
 
-#: views/index.py:120
+#: views/index.py:121
 msgid "unsubscribe link not valid"
 msgstr ""
 
-#: views/index.py:126
+#: views/index.py:127
 msgid ""
 "You have successfully unsubscribed. You can subscribe again in your "
 "Profile."

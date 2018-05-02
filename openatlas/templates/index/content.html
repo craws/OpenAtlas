@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
     <a href="{{ url_for('index') }}">{{ _('overview')|uc_first }}</a>
-    > {{ title|safe }}
+    > {{ _(title)|safe }}
 {% endblock %}
 {% block content %}
     {{ text|safe }}

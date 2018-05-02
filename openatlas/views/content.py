@@ -25,7 +25,7 @@ def content_index():
     table_content = {'id': 'content', 'header': header, 'data': []}
     for item, languages in ContentMapper.get_content().items():
         url = url_for('content_view', item=item)
-        content = ['<a href="' + url + '">' + util.uc_first(item) + '</a>']
+        content = ['<a href="' + url + '">' + util.uc_first(_(item)) + '</a>']
         html_ok = '<img src="/static/images/icons/dialog-apply.png" alt="ok" \>'
         for language in app.config['LANGUAGES'].keys():
             content.append(html_ok if languages[language] else '')

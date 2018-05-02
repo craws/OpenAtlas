@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-04-30 17:33+0200\n"
-"PO-Revision-Date: 2018-04-30 17:34+0200\n"
+"POT-Creation-Date: 2018-05-02 15:53+0200\n"
+"PO-Revision-Date: 2018-05-02 16:01+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: de\n"
 "Language-Team: de <LL@li.org>\n"
@@ -185,38 +185,42 @@ msgstr "Modell"
 msgid "credits"
 msgstr "Credits"
 
-#: templates/index/legal.html:4 templates/layout.html:78
-msgid "legal notice"
-msgstr "Impressum"
+#: templates/layout.html:79
+msgid "contact"
+msgstr "Kontakt"
 
 #: templates/layout.html:82
+msgid "legal_notice"
+msgstr "Impressum"
+
+#: templates/layout.html:87
 msgid "hello"
 msgstr "Hallo"
 
-#: templates/layout.html:83 templates/profile/index.html:3
+#: templates/layout.html:88 templates/profile/index.html:3
 #: templates/profile/password.html:3 templates/profile/update.html:3
 msgid "profile"
 msgstr "Profil"
 
-#: templates/layout.html:88
+#: templates/layout.html:93
 msgid "zoom in"
 msgstr "Schrift vergrößernSchrift vergrößern"
 
-#: templates/layout.html:89
+#: templates/layout.html:94
 msgid "zoom out"
 msgstr "Schrift verkleinern"
 
-#: templates/layout.html:98
+#: templates/layout.html:103
 msgid "logout"
 msgstr "Abmelden"
 
-#: templates/layout.html:100 templates/login/index.html:4
+#: templates/layout.html:105 templates/login/index.html:4
 #: templates/login/reset_password.html:4 views/login.py:32
 msgid "login"
 msgstr "Anmelden"
 
 #: templates/admin/file.html:12 templates/content/update.html:16
-#: templates/map.html:9 templates/settings/update.html:10 util/filters.py:158
+#: templates/map.html:9 templates/settings/update.html:10 util/filters.py:165
 #: views/involvement.py:83 views/member.py:117 views/profile.py:36
 #: views/profile.py:64 views/reference.py:92 views/relation.py:94 views/user.py:30
 msgid "save"
@@ -247,7 +251,7 @@ msgstr "bearbeiten"
 #: templates/translation/view.html:15 templates/types/index.html:43
 #: templates/types/index.html:44 templates/types/view.html:28
 #: templates/types/view.html:29 templates/user/view.html:14
-#: templates/user/view.html:15 util/filters.py:265 views/user.py:59
+#: templates/user/view.html:15 util/filters.py:272 views/user.py:59
 msgid "delete"
 msgstr "löschen"
 
@@ -495,7 +499,7 @@ msgid "unlinked"
 msgstr "Instanzen die keine Verknüpfungen haben."
 
 #: templates/admin/orphans.html:11 templates/types/index.html:21
-#: util/filters.py:178
+#: util/filters.py:185
 msgid "type"
 msgstr "Typ"
 
@@ -560,9 +564,9 @@ msgstr "Node"
 msgid "custom"
 msgstr "Custom"
 
-#: templates/index/changelog.html:3 templates/index/credits.html:3
-#: templates/index/feedback.html:3 templates/index/index.html:3
-#: templates/index/legal.html:3 templates/index/unsubscribe.html:3
+#: templates/index/changelog.html:3 templates/index/content.html:3
+#: templates/index/credits.html:3 templates/index/feedback.html:3
+#: templates/index/index.html:3 templates/index/unsubscribe.html:3
 #: templates/login/index.html:3 templates/login/reset_password.html:3
 #: templates/search/index.html:3
 msgid "overview"
@@ -656,7 +660,7 @@ msgid "classes"
 msgstr "Klassen"
 
 #: templates/model/class_view.html:16 templates/model/property_view.html:14
-#: templates/types/view.html:35 util/filters.py:180
+#: templates/types/view.html:35 util/filters.py:187
 msgid "super"
 msgstr "Super"
 
@@ -674,7 +678,7 @@ msgid "range for"
 msgstr "Zielklasse für"
 
 #: templates/model/class_view.html:40 templates/model/property_view.html:26
-#: templates/types/index.html:66 util/filters.py:124 views/actor.py:24
+#: templates/types/index.html:66 util/filters.py:125 views/actor.py:24
 #: views/event.py:24 views/file.py:24 views/hierarchy.py:28 views/index.py:21
 #: views/involvement.py:23 views/member.py:23 views/place.py:21 views/place.py:32
 #: views/place.py:110 views/place.py:114 views/place.py:117 views/reference.py:21
@@ -792,15 +796,15 @@ msgstr "Formulare"
 msgid "entities"
 msgstr "Instanzen"
 
-#: util/filters.py:54
+#: util/filters.py:55
 msgid "no"
 msgstr "Nein"
 
-#: util/filters.py:55 views/user.py:120
+#: util/filters.py:56 views/user.py:120
 msgid "yes"
 msgstr "Ja"
 
-#: util/filters.py:263
+#: util/filters.py:270
 #, python-format
 msgid "Delete %(name)s?"
 msgstr "%(name)s löschen?"
@@ -1036,11 +1040,11 @@ msgstr "Dieser Name wird bereits verwendet."
 msgid "info feedback thanks"
 msgstr "Danke für das Feedback."
 
-#: views/index.py:120
+#: views/index.py:121
 msgid "unsubscribe link not valid"
 msgstr "Dieser Link ist nicht gültig."
 
-#: views/index.py:126
+#: views/index.py:127
 msgid ""
 "You have successfully unsubscribed. You can subscribe again in your Profile."
 msgstr ""
@@ -1455,84 +1459,3 @@ msgstr "Verschicken von Zugangsdaten an %(email)s ist fehlgeschlagen."
 #: views/user.py:206
 msgid "user deleted"
 msgstr "Der User wurde gelöscht."
-
-#~ msgid "failed logins since last login"
-#~ msgstr "Fehlerhafte Anmeldungen"
-
-#~ msgid "faq"
-#~ msgstr "FAQ"
-
-#~ msgid "hierarchy"
-#~ msgstr "Hierarchie"
-
-#~ msgid "entity updated"
-#~ msgstr "Die Änderungen wurden gespeichert."
-
-#~ msgid "mail transport type"
-#~ msgstr "Transport type"
-
-#~ msgid "mail transport ssl"
-#~ msgstr "SSL"
-
-#~ msgid "mail transport auth"
-#~ msgstr "Auth"
-
-#~ msgid "user updated"
-#~ msgstr "Der User wurde geändert."
-
-#~ msgid "email failed"
-#~ msgstr "Die E-Mail konnte nicht verschickt werden."
-
-#~ msgid "events"
-#~ msgstr "Ereignisse"
-
-#~ msgid "actors"
-#~ msgstr "Akteure"
-
-#~ msgid "references"
-#~ msgstr "Referenzen"
-
-#~ msgid "site"
-#~ msgstr "Seite"
-
-#~ msgid "send_test_mail"
-#~ msgstr "Test E-Mail verschicken"
-
-#~ msgid "confirm delete"
-#~ msgstr "%(name)s löschen?"
-
-#~ msgid "confirm remove"
-#~ msgstr "%(name)s entfernen?"
-
-#~ msgid "error forbidden"
-#~ msgstr "Zugriff verweigert"
-
-#~ msgid "Password reset request for %(sitename)s"
-#~ msgstr "Wir erhielten eine Passwort Zurücksetzungs Anfrage für %(sitename)s"
-
-#~ msgid "Test mail from %(sitename)s"
-#~ msgstr "Test E-Mail von %(sitename)s"
-
-#~ msgid "maintenance"
-#~ msgstr "Wartung"
-
-#~ msgid "offline"
-#~ msgstr "Offline"
-
-#~ msgid "log"
-#~ msgstr "Log"
-
-#~ msgid "translations"
-#~ msgstr "Übersetzungen"
-
-#~ msgid "translation"
-#~ msgstr "Übersetzung"
-
-#~ msgid "It seems you are not welcomed here."
-#~ msgstr "Es sieht so aus als wärst du hier nicht willkommen."
-
-#~ msgid "tooltip type"
-#~ msgstr "Die Auswahl kann im Menüpunkt Nodes bearbeitet werden."
-
-#~ msgid "contact"
-#~ msgstr "Kontakt"
