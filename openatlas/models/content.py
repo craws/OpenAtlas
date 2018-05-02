@@ -12,7 +12,7 @@ class ContentMapper:
     @staticmethod
     def get_content():
         content = OrderedDict()
-        for name in ['intro', 'legal']:
+        for name in ['intro', 'legal_notice', 'contact']:
             content[name] = OrderedDict()
             for language in app.config['LANGUAGES'].keys():
                 content[name][language] = ''

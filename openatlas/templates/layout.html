@@ -75,7 +75,12 @@
                     - <a href="https://redmine.craws.net/projects/uni/wiki/Manual" target="_blank" rel="noopener">{{ _('manual')|uc_first }}</a>
                     - <a href="{{ url_for('model_index') }}">{{ _('model')|uc_first }}</a>
                     - <a href="{{ url_for('index_credits') }}">{{ _('credits')|uc_first }}</a>
-                    - <a href="{{ url_for('index_legal') }}">{{ _('legal notice')|uc_first }}</a>
+                    {% if 'contact'|display_content_translation %}
+                        - <a href="{{ url_for('index_content', item='contact') }}">{{ _('contact')|uc_first }}</a>
+                    {% endif %}
+                    {% if 'legal_notice'|display_content_translation %}
+                        - <a href="{{ url_for('index_content', item='legal_notice') }}">{{ _('legal_notice')|uc_first }}</a>
+                    {% endif %}
                 </div>
                 {% if current_user.is_authenticated %}
                     <div id="greeting">

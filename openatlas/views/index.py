@@ -84,9 +84,10 @@ def index_feedback():
     return render_template('index/feedback.html', form=form)
 
 
-@app.route('/overview/legal')
-def index_legal():
-    return render_template('index/legal.html', text=ContentMapper.get_translation('legal'))
+@app.route('/overview/content/<item>')
+def index_content(item):
+    return render_template('index/content.html',
+                           text=ContentMapper.get_translation(item), title=item)
 
 
 @app.route('/overview/credits')
