@@ -14,7 +14,7 @@
         {% for css_file in ['style.css', 'color.css', 'images.css']: %}
             <link rel="stylesheet" href="/static/css/{{ css_file }}?v={{ config['VERSION'] }}" />
             {% if current_user.is_authenticated: %}
-                {% set css_file_path = '/themes/' + current_user.settings['theme'] + '/static/css/' + css_file %}
+                {% set css_file_path = '/static/themes/' + current_user.settings['theme'] + '/css/' + css_file %}
                 {% if css_file_path|test_file %}
                     <link rel="stylesheet" href="{{ css_file_path }}?v={{ config['VERSION'] }}" />
                 {% endif %}

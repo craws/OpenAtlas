@@ -8,5 +8,13 @@
             <a href="{{ url_for('file_insert') }}">+ {{ _('file')|uc_first }}</a>
         </div>
     {% endif %}
+    {{ _('total disk space')|uc_first }} <strong>{{ disk_space_values.total }}</strong> -
+    {{ _('free disk space')|uc_first }} <strong>{{ disk_space_values.free }}</strong>
+    <div id="disk_size"></div>
+    <script>
+        $( function() {
+            $("#disk_size").progressbar({value: {{ disk_space_values.percent }} });
+        });
+    </script>
     {{ table|pager|safe }}
 {% endblock %}

@@ -80,6 +80,7 @@ table.tablesorter tbody tr.odd td {
 }
 
 button,
+#disk_size .ui-widget-header,
 a.button,
 #breadcrumb,
 .date-switch,
@@ -103,7 +104,7 @@ span.button:hover {
     border-color: #ffffff;
 }
 
-#menu > div.active {
+#menu > div.active, #disk_size {
     border-color: #4f78bf;
 }
 
