@@ -1,5 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import glob
+import locale
 import os
 import re
 import smtplib

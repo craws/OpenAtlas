@@ -1,6 +1,8 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+import locale
+
 from flask import flash, g, render_template, request, session, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import lazy_gettext as _, format_number
 from flask_login import current_user
 from flask_wtf import Form
 from werkzeug.utils import redirect
@@ -40,12 +42,12 @@ def index():
                 g.classes[entity.class_.code].name,
                 entity.first,
                 entity.last,
-
                 bookmark_toggle(entity.id, True)])
         for name, count in EntityMapper.get_overview_counts().items():
-            count = count if count else 0
+            count = format_number(count) if count else ''
             tables['counts']['data'].append([
-                '<a href="' + url_for(name + '_index') + '">' + uc_first(_(name)) + '</a>', count])
+                '<a href="' + url_for(name + '_index') + '">' + uc_first(_(name)) + '</a>',
+                count])
         for entity in EntityMapper.get_latest(8):
             tables['latest']['data'].append([
                 link(entity),
