@@ -55,6 +55,7 @@ def print_file_extension(entity):
 
 def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
     """ Send one mail to every recipient, set log_body to False for sensitive data e.g. passwords"""
+    print('begin mail')
     settings = session['settings']
     recipients = recipients if isinstance(recipients, list) else [recipients]
     if not settings['mail'] or len(recipients) < 1:
@@ -64,8 +65,11 @@ def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
     server = smtplib.SMTP(settings['mail_transport_host'], settings['mail_transport_port'])
     server.ehlo()
     server.starttls()
+    print('try mail')
     try:
-        server.login(mail_user, app.config['MAIL_PASSWORD'])
+        if app.config['MAIL_PASSWORD']:
+            print('try to login')
+            server.login(mail_user, app.config['MAIL_PASSWORD'])
         for recipient in recipients:
             msg = MIMEText(text, _charset='utf-8')
             msg['From'] = from_
