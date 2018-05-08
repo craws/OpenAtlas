@@ -19,7 +19,6 @@ class SettingsMapper:
         'mail_transport_host',
         'mail_from_email',
         'mail_from_name',
-        'mail_recipients_login',
         'mail_recipients_feedback',
         'minimum_password_length',
         'random_password_length',
@@ -42,7 +41,7 @@ class SettingsMapper:
                 'reset_confirm_hours'
             ]:
                 settings[row.name] = int(row.value)
-            elif row.name in ['mail_recipients_login', 'mail_recipients_feedback']:
+            elif row.name in ['mail_recipients_feedback']:
                 settings[row.name] = row.value.split(';')
         return settings
 

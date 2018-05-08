@@ -59,7 +59,6 @@ def login():
                     user.login_failed_count = 0
                     user.update()
                     logger.log('info', 'auth', 'Login of ' + user.username)
-                    send_login_mail(user)
                     return redirect(request.args.get('next') or url_for('index'))
                 else:
                     logger.log('notice', 'auth', 'Inactive login try ' + user.username)
@@ -75,17 +74,6 @@ def login():
             flash(_('error username'), 'error')
         return render_template('login/index.html', form=form)
     return render_template('login/index.html', form=form)
-
-
-def send_login_mail(user):  # pragma: no cover
-    if 'local' in request.headers['Host'] or '127.0.0.1' in request.headers['Host']:
-        return
-    if not session['settings']['mail'] or not session['settings']['mail_recipients_login']:
-        return
-    subject = 'Login from ' + user.username + ' at ' + session['settings']['site_name']
-    body = subject + ' with user id ' + str(user.id) + ' at '
-    body += request.scheme + '://' + request.headers['Host']
-    send_mail(subject, body, session['settings']['mail_recipients_login'])
 
 
 @app.route('/password_reset', methods=["GET", "POST"])
