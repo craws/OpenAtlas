@@ -1,6 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import abort, flash, render_template, request, session, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import lazy_gettext as _, format_number
 from flask_login import current_user
 from flask_wtf import Form
 from werkzeug.utils import redirect
@@ -120,7 +120,7 @@ def user_index():
             _('yes') if user.settings['newsletter'] else '',
             format_date(user.created),
             format_date(user.login_last_success),
-            count if count else ''])
+            format_number(count) if count else ''])
     return render_template('user/index.html', tables=tables)
 
 

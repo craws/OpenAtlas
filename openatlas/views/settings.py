@@ -43,7 +43,6 @@ class SettingsForm(Form):
     mail_transport_port = StringField(uc_first(_('mail transport port')))
     mail_from_email = StringField(uc_first(_('mail from email')))
     mail_from_name = StringField(uc_first(_('mail from name')))
-    mail_recipients_login = StringField(uc_first(_('mail recipients login')))
     mail_recipients_feedback = StringField(uc_first(_('mail recipients feedback')))
 
     # Authentication
@@ -84,7 +83,6 @@ def settings_index():
             (_('mail transport port'), settings['mail_transport_port']),
             (_('mail from email'), settings['mail_from_email']),
             (_('mail from name'), settings['mail_from_name']),
-            (_('mail recipients login'), ';'.join(settings['mail_recipients_login'])),
             (_('mail recipients feedback'), ';'.join(settings['mail_recipients_feedback']))])),
         ('authentication', OrderedDict([
             (_('random password length'), settings['random_password_length']),
@@ -114,7 +112,7 @@ def settings_update():
     for field in SettingsMapper.fields:
         if field.startswith('file_'):
             continue
-        if field in ['mail_recipients_login', 'mail_recipients_feedback']:
+        if field in ['mail_recipients_feedback']:
             getattr(form, field).data = ';'.join(session['settings'][field])
         elif field in ['default_table_rows', 'log_level']:
             getattr(form, field).data = int(session['settings'][field])

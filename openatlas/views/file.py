@@ -62,9 +62,6 @@ def file_index():
         'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
         'percent': 100 - math.ceil(free_space / (disk_space / 100))
     }
-    print(free_space)
-    print(disk_space)
-    print(free_space / (disk_space / 100))
     return render_template('file/index.html', table=table, disk_space_values=disk_space_values)
 
 

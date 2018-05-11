@@ -28,7 +28,6 @@ INSERT INTO settings (name, value) VALUES
 ('mail_transport_host', ''),
 ('mail_from_email', ''),
 ('mail_from_name', ''),
-('mail_recipients_login', ''),
 ('mail_recipients_feedback', ''),
 ('minimum_password_length', '12'),
 ('random_password_length', '16'),
