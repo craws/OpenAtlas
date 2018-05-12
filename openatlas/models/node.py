@@ -106,14 +106,6 @@ class NodeMapper(EntityMapper):
                 return node
 
     @staticmethod
-    def move_entities(old_id, new_id, entity_ids):
-        sql = """
-            UPDATE model.link SET range_id = %(new_id)s
-            WHERE range_id = %(old_id)s AND domain_id = ANY(%(entity_ids)s);"""
-        params = {'old_id': old_id, 'new_id': new_id, 'entity_ids': list(map(int, entity_ids))}
-        g.cursor.execute(sql, params)
-
-    @staticmethod
     def get_tree_data(node_id, selected_ids):
         node = g.nodes[node_id]
         return NodeMapper.walk_tree(node.subs, selected_ids)

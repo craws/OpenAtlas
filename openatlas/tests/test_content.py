@@ -17,7 +17,7 @@ class ContentTests(TestBaseCase):
             rv = self.app.post(
                 url_for('content_update', item='legal_notice'), data=data, follow_redirects=True)
             assert b'Impressum' in rv.data
-            rv = self.app.get(url_for('index_content', item='legal_notice'))
+            rv = self.app.get(url_for('content_index', item='legal_notice'))
             assert b'Text' in rv.data
             self.app.get('/index/setlocale/de')
             rv = self.app.get('/', follow_redirects=True)
