@@ -3,6 +3,6 @@
 BEGIN;
 
 -- Login mails where removed, so also removing setting for it
-DELETE FROM settings WHERE NAME = 'mail_recipients_login';
+DELETE FROM web.settings WHERE NAME = 'mail_recipients_login';
 
 COMMIT;
