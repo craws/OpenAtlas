@@ -1,5 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import glob
+import locale
 import os
 import re
 import smtplib
@@ -63,8 +64,10 @@ def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
     server = smtplib.SMTP(settings['mail_transport_host'], settings['mail_transport_port'])
     server.ehlo()
     server.starttls()
+    print('try mail')
     try:
-        server.login(mail_user, app.config['MAIL_PASSWORD'])
+        if settings['mail_transport_username']:
+            server.login(mail_user, app.config['MAIL_PASSWORD'])
         for recipient in recipients:
             msg = MIMEText(text, _charset='utf-8')
             msg['From'] = from_

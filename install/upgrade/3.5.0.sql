@@ -2,12 +2,7 @@
 
 BEGIN;
 
--- Add value types
-
-ALTER TABLE web.hierarchy ADD COLUMN value_type boolean;
-COMMENT ON COLUMN web.hierarchy.value_type IS 'True if links to this type can have numeric values';
-ALTER TABLE web.hierarchy ALTER column value_type SET DEFAULT false;
-UPDATE web.hierarchy SET value_type = false;
-ALTER TABLE web.hierarchy ALTER column value_type SET NOT NULL;
+-- Login mails where removed, so also removing setting for it
+DELETE FROM web.settings WHERE NAME = 'mail_recipients_login';
 
 COMMIT;

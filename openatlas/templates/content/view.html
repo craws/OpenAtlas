@@ -2,7 +2,7 @@
 {% block breadcrumb %}
     <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
     > <a href="{{ url_for('content_index') }}">{{ _('content')|uc_first }}</a>
-    > {{ item|uc_first }}
+    > {{ _(item)|uc_first }}
 {% endblock %}
 {% block content %}
     <div class="button-bar">

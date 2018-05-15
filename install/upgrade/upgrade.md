@@ -2,6 +2,12 @@
 
 Before executing SQL statements backup the database. Replace database role "openatlas" if needed.
 
+### 3.4.x to 3.5.0
+
+Execute install/upgrade/3.5.0.sql after making backups
+
+After the upgrade you can add a legal notice text if you like at admin > content > legal notice
+
 ### 3.3.x to 3.4.0
 
 Execute install/upgrade/3.4.0.sql after making backups

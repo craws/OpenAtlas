@@ -12,6 +12,7 @@ from jinja2 import escape, evalcontextfilter
 from openatlas import app
 from openatlas.models.entity import EntityMapper
 from openatlas.models.node import NodeMapper
+from openatlas.models.content import ContentMapper
 from openatlas.util import util
 
 blueprint = flask.Blueprint('filters', __name__)
@@ -147,6 +148,12 @@ def page_buttons(self, entity):
     if html:
         html = '<div class="pager">' + html + '</div>'
     return html
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def display_content_translation(self, text):
+    return ContentMapper.get_translation(text)
 
 
 @jinja2.contextfilter

@@ -81,6 +81,7 @@ table.tablesorter tfoot tr th {
 }
 
 #header,
+#disk_size,
 .info,
 select,
 span.tooltip,
@@ -108,7 +109,8 @@ input[type=submit],
 span.button,
 .button-bar a,
 .ui-state-default,
-.changelog-version {
+.changelog-version,
+#disk_size .ui-widget-header {
     background-color: #4088c3;
 }
 
@@ -127,7 +129,7 @@ span.button:hover {
     border-color: #000000;
 }
 
-#menu > div.active {
+#menu > div.active, #disk_size {
     border-color: #4088c3;
 }
 

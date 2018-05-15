@@ -13,6 +13,13 @@ tinymce.init({
 
 $(document).ready(function() {
 
+    /* jQuery UI tabs init */
+    $("#tabs").tabs({
+        activate: function(event, ui) {
+            window.location.hash = ui.newPanel.attr('id');
+        }
+    });
+
     /* Show and hide function for date input fields */
     $("#date-switcher").click(function () {
         $(".date-switch").toggleClass('display-none');

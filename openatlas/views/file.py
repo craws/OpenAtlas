@@ -1,4 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+import math
 import os
 
 from flask import flash, g, render_template, request, send_from_directory, session, url_for
@@ -13,9 +14,9 @@ from openatlas import app, logger
 from openatlas.forms.forms import build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import (build_table_form, display_remove_link, get_base_table_data,
-                                 get_entity_data, get_file_path, get_view_name, link,
-                                 required_group, was_modified)
+from openatlas.util.util import (build_table_form, convert_size, display_remove_link,
+                                 get_base_table_data, get_entity_data, get_file_path,
+                                 get_view_name, link, required_group, was_modified)
 
 
 class FileForm(Form):
@@ -53,7 +54,15 @@ def file_index():
     table = {'id': 'files', 'header': app.config['TABLE_HEADERS']['file'], 'data': []}
     for file in EntityMapper.get_by_system_type('file'):
         table['data'].append(get_base_table_data(file))
-    return render_template('file/index.html', table=table)
+    statvfs = os.statvfs('/')
+    disk_space = statvfs.f_frsize * statvfs.f_blocks
+    free_space = statvfs.f_frsize * statvfs.f_bavail  # available space without reserved blocks
+    disk_space_values = {
+        'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
+        'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
+        'percent': 100 - math.ceil(free_space / (disk_space / 100))
+    }
+    return render_template('file/index.html', table=table, disk_space_values=disk_space_values)
 
 
 @app.route('/file/add/<int:origin_id>', methods=['GET', 'POST'])

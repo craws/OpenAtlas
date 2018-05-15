@@ -40,7 +40,8 @@ class Network:
         g.cursor.execute(sql, {'classes': tuple(classes)})
         for row in g.cursor.fetchall():
             if params['options']['orphans'] or row.id in entities:
-                name = row.name.replace("'", "").replace('Location of ', '')
+                name = row.name.replace("'", "").replace('Location of ', '').replace('\n', ' ')\
+                    .replace('\r', ' ')
                 entities_already.append(row.id)
                 nodes += "{'id':'" + str(row.id) + "', 'name':'" + truncate_string(name, span=False)
                 nodes += "', 'color':'" + params['classes'][row.class_code]['color'] + "'},"
@@ -54,7 +55,8 @@ class Network:
                 color = ''
                 if row.class_code in params['classes']:  # pragma: no cover
                     color = params['classes'][row.class_code]['color']
-                name = row.name.replace("'", "").replace('Location of ', '')
+                name = row.name.replace("'", "").replace('Location of ', '').replace('\n', ' ')\
+                    .replace('\r', ' ')
                 nodes += "{'id':'" + str(row.id) + "', 'name':'" + truncate_string(name, span=False)
                 nodes += "', 'color':'" + color + "'},"
         return "graph = {'nodes': [" + nodes + "], " + edges + "};"
