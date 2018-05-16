@@ -32,7 +32,7 @@ class EventForm(DateForm):
     given_place = TableMultiField(_('given place'))
 
     def validate(self, extra_validators=None):
-        """Check if selected super event is allowed"""
+        """ Check if selected super event is allowed"""
         # Todo: also check if super is not a sub event of itself (recursively)
         valid = DateForm.validate(self)
         if self.event.data:

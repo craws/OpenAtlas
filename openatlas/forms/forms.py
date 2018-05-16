@@ -43,6 +43,8 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
             nodes = [entity.type] if entity.type else []  # It's a link so use the link.type
         for node in nodes:
             root = g.nodes[node.root[-1]] if node.root else node
+            if root.value_type:
+                print('I am a value node: ' + node.name)
             if root.id not in node_data:  # Append only non root nodes
                 node_data[root.id] = []
             node_data[root.id].append(node.id)
