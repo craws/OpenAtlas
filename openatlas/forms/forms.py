@@ -32,19 +32,31 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
 
     # Set field data if available and only if it's a GET request
     if entity and request_origin and request_origin.method == 'GET':
+        for field in form_instance:
+            pass
+            # print(field.id)
         if isinstance(form_instance, DateForm):
             form_instance.populate_dates(entity)
         node_data = {}
         if isinstance(entity, Entity):
-            nodes = entity.nodes + (entity2.nodes if entity2 else [])
+            nodes = entity.nodes
+            if entity2:
+                nodes.update(entity2.nodes)
             if hasattr(form, 'opened'):
                 form_instance.opened.data = time.time()
         else:
             nodes = [entity.type] if entity.type else []  # It's a link so use the link.type
-        for node in nodes:
+        for node, node_value in nodes.items():
             root = g.nodes[node.root[-1]] if node.root else node
             if root.value_type:
-                print('I am a value node: ' + node.name)
+                # print('I am a value node: ' + node.name)
+                # print(node_value)
+                value_list_field = getattr(form_instance, 'value_list')
+                print(len(value_list_field))
+                for item in value_list_field:
+                    1/0
+                    print(item)
+                # + str(node.id)).data = node_value
             if root.id not in node_data:  # Append only non root nodes
                 node_data[root.id] = []
             node_data[root.id].append(node.id)
@@ -152,6 +164,7 @@ class TreeMultiSelect(HiddenInput):
         selected_ids = []
         root = g.nodes[int(field.id)]
         if field.data:
+            print('my data' + str(field.data))
             if isinstance(field.data, str):
                 field.data = ast.literal_eval(field.data)
             for entity_id in field.data:

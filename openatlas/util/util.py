@@ -64,7 +64,6 @@ def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
     server = smtplib.SMTP(settings['mail_transport_host'], settings['mail_transport_port'])
     server.ehlo()
     server.starttls()
-    print('try mail')
     try:
         if settings['mail_transport_username']:
             server.login(mail_user, app.config['MAIL_PASSWORD'])
@@ -169,15 +168,18 @@ def get_entity_data(entity, location=None):
     data = []
     # Nodes
     type_data = OrderedDict()
-    nodes = entity.nodes + (location.nodes if location else [])
-    for node in nodes:
+    nodes = entity.nodes
+    if location:
+        nodes.update(location.nodes)
+    for node, node_value in nodes.items():
         if not node.root:
             continue
         root = g.nodes[node.root[-1]]
         name = 'type' if root.name in app.config['BASE_TYPES'] else root.name
         if root.name not in type_data:
             type_data[name] = []
-        type_data[name].append(link(node))
+        html = link(node) + (': ' + node_value if root.value_type else '')
+        type_data[name].append(html)
     type_data = OrderedDict(sorted(type_data.items(), key=lambda t: t[0]))  # sort by name
     if 'type' in type_data:  # move the base type to the top
         type_data.move_to_end('type', last=False)

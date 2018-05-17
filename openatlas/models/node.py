@@ -157,9 +157,7 @@ class NodeMapper(EntityMapper):
 
         for field in form:
             if field.name == 'value_list':
-                print(form.value_list.data)
                 for subfield in form.value_list:
-                    print(subfield.name + ":" + subfield.data)
                     node_id = int(subfield.name.replace('value_list-', ''))
                     entity.link('P2', node_id, subfield.data)
             elif isinstance(field, (TreeField, TreeMultiField)) and field.data:

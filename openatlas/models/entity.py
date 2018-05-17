@@ -19,15 +19,13 @@ class Entity:
             logger.log('error', 'model', 'invalid id')
             abort(418)
         self.id = row.id
-        self.nodes = []
+        self.nodes = dict()
         if hasattr(row, 'types') and row.types:
-            nodes_list = row.types
-            # nodes_list = ast.literal_eval('[' + row.types + ']')
-            # converting nodes_list to set, to list to avoid duplicates (from the sql statement)
-            for node_id, desc in nodes_list:
-                print(node_id)
-                print(desc)
-                # self.nodes.append(g.nodes[node_id])
+            for node in row.types:
+                if not node['f1']:
+                    continue
+                self.nodes[g.nodes[node['f1']]] = node['f2']
+
         self.name = row.name
         self.root = None
         self.description = row.description if row.description else ''
