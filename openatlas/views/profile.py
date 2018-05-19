@@ -9,7 +9,7 @@ from wtforms import BooleanField, PasswordField, SelectField, StringField, Submi
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app, logger
-from openatlas.util.util import uc_first
+from openatlas.util.util import uc_first, display_tooltip
 
 
 class DisplayForm(Form):
@@ -100,10 +100,8 @@ def profile_index():
     data['display'] = [
         (form.language.label, form.language),
         (str(form.table_rows.label) +
-            ' <span class="tooltip" title="' + form.table_rows.description + '">i</span>',
-            form.table_rows),
-        (str(form.layout.label) +
-            ' <span class="tooltip" title="' + form.layout.description + '">i</span>', form.layout)]
+            display_tooltip(form.table_rows.description), form.table_rows),
+        (str(form.layout.label) + display_tooltip(form.layout.description), form.layout)]
     return render_template('profile/index.html', data=data, form=form)
 
 

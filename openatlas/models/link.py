@@ -16,6 +16,9 @@ class Link:
         self.domain = EntityMapper.get_by_id(row.domain_id)
         self.range = EntityMapper.get_by_id(row.range_id)
         self.type = g.nodes[row.type_id] if row.type_id else None
+        self.nodes = dict()
+        if hasattr(row, 'type_id') and row.type_id:
+            self.nodes[g.nodes[row.type_id]] = None
         self.first = int(row.first) if hasattr(row, 'first') and row.first else None
         self.last = int(row.last) if hasattr(row, 'last') and row.last else None
         self.dates = {}

@@ -154,12 +154,11 @@ class NodeMapper(EntityMapper):
         from openatlas.forms.forms import TreeField, TreeMultiField
         if hasattr(entity, 'nodes'):
             entity.delete_links(['P2', 'P89'])
-
         for field in form:
-            if field.name == 'value_list':
-                for subfield in form.value_list:
-                    node_id = int(subfield.name.replace('value_list-', ''))
-                    entity.link('P2', node_id, subfield.data)
+            if field.name.startswith('value_list-'):
+                if field.data:
+                    node_id = int(field.name.replace('value_list-', ''))
+                    entity.link('P2', node_id, field.data)
             elif isinstance(field, (TreeField, TreeMultiField)) and field.data:
                 root = g.nodes[int(field.id)]
                 if not root.value_type:

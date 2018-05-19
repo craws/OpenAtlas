@@ -1,6 +1,4 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-import ast
-import json
 from collections import OrderedDict
 
 from flask import g
@@ -25,7 +23,6 @@ class Entity:
                 if not node['f1']:
                     continue
                 self.nodes[g.nodes[node['f1']]] = node['f2']
-
         self.name = row.name
         self.root = None
         self.description = row.description if row.description else ''

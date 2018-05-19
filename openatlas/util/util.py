@@ -47,6 +47,12 @@ def print_file_size(entity):
     return convert_size(os.path.getsize(path)) if path else 'N/A'
 
 
+def display_tooltip(text):
+    if not text:
+        return ''
+    return '<span class="tooltip" title="{title}">i</span>'.format(title=text.replace('"', "'"))
+
+
 def print_file_extension(entity):
     entity_id = entity if isinstance(entity, int) else entity.id
     path = get_file_path(entity_id)
@@ -283,12 +289,15 @@ def add_dates_to_form(form, for_person=False):
     html = """
         <div class="table-row">
             <div>
-                <label>{date}</label> <span class="tooltip" title="{tip}">i</span>
+                <label>{date}</label> {tooltip}
             </div>
             <div class="table-cell date-switcher">
                 <span id="date-switcher" class="button">{show}</span>
             </div>
-        </div>""".format(date=uc_first(_('date')), tip=_('tooltip date'), show=uc_first(_('show')))
+        </div>""".format(
+            date=uc_first(_('date')),
+            tooltip=display_tooltip(_('tooltip date')),
+            show=uc_first(_('show')))
     html += '<div class="table-row date-switch" ' + style + '>'
     html += '<div>' + str(form.date_begin_year.label).title() + '</div><div class="table-cell">'
     html += str(form.date_begin_year(class_='year')) + ' ' + errors['date_begin_year'] + ' '

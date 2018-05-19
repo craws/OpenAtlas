@@ -14,6 +14,7 @@ from openatlas.models.entity import EntityMapper
 from openatlas.models.node import NodeMapper
 from openatlas.models.content import ContentMapper
 from openatlas.util import util
+from openatlas.util.util import display_tooltip
 
 blueprint = flask.Blueprint('filters', __name__)
 paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
@@ -167,7 +168,25 @@ def display_form(self, form, form_id=None, for_persons=False):
             del form.insert_and_continue
     id_attribute = ' id="' + form_id + '" ' if form_id else ''
     html = {'main': '', 'types': '', 'header': '', 'footer': ''}
+
+    def display_value_type_fields(subs, html_=''):
+        for sub_id in subs:
+            sub = g.nodes[sub_id]
+            html_ += """
+                <div class="table-row">
+                    <div><label>{label}</label> {tooltip}</div>
+                    <div class="table-cell">{field}</div>
+                </div>
+            """.format(
+                label=sub.name,
+                tooltip=display_tooltip(sub.description),
+                field=getattr(form, 'value_list-' + str(sub_id)))
+            html_ += display_value_type_fields(sub.subs)
+        return html_
+
     for field in form:
+        if field.id.startswith('value_list-'):
+            continue
         class_ = "required" if field.flags.required else ''
         errors = ''
         for error in field.errors:
@@ -179,24 +198,21 @@ def display_form(self, form, form_id=None, for_persons=False):
                 hierarchy_id = NodeMapper.get_hierarchy_by_name(util.uc_first(field.id)).id
             node = g.nodes[hierarchy_id]
             label = node.name
-            tooltip = \
-                '<span class="tooltip" title="' + node.description.replace('"', "'") + '">i</span>'
             if node.name in app.config['BASE_TYPES']:
                 label = util.uc_first(_('type'))
             if field.label.text == 'super':
                 label = util.uc_first(_('super'))
-                tooltip = ''
             type_field = """
                 <div class="table-row">
-                    <div>
-                        <label>{label}</label>
-                        {tooltip}
-                    </div>
-                    <div class="table-cell">
-                        {field}
-                    </div>
+                    <div><label>{label}</label> {tooltip}</div>
+                    <div class="table-cell">{field}</div>
                 </div>
-            """.format(label=label, tooltip=tooltip, field=str(field(class_=class_)) + errors)
+            """.format(
+                label=label,
+                tooltip='' if field.label.text == 'super' else display_tooltip(node.description),
+                field=str(field(class_=class_)) + errors)
+            if node.value_type and 'is_node_form' not in form:
+                type_field += display_value_type_fields(node.subs)
             if node.name in app.config['BASE_TYPES']:  # base type should be above other fields
                 html['types'] = type_field + html['types']
             else:
@@ -218,8 +234,7 @@ def display_form(self, form, form_id=None, for_persons=False):
             if field.id == 'date_begin_year':
                 html['footer'] += util.add_dates_to_form(form, for_persons)
             continue
-        if field.description:
-            field.label.text += ' <span class="tooltip" title="' + field.description + '">i</span>'
+        field.label.text += display_tooltip(field.description)
         errors = ' <span class="error">' + errors + ' </span>' if errors else ''
         if field.id in ('file', 'name'):
             html['header'] += '<div class="table-row"><div>' + str(field.label) + '</div>'

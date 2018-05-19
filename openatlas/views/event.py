@@ -4,7 +4,7 @@ import ast
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
-from wtforms import HiddenField, StringField, SubmitField, TextAreaField, FieldList
+from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import DataRequired
 
 from openatlas import app, logger
@@ -20,7 +20,6 @@ class EventForm(DateForm):
     name = StringField(_('name'), [DataRequired()])
     event = TableField(_('sub event of'))
     place = TableField(_('location'))
-    value_list = FieldList(StringField(''))
     event_id = HiddenField()
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))

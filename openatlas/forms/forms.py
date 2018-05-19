@@ -4,12 +4,12 @@ import time
 
 from flask import g
 from flask_babel import lazy_gettext as _
-from wtforms import HiddenField
+from wtforms import HiddenField, StringField
 from wtforms.widgets import HiddenInput
 
 from openatlas import app
 from openatlas.forms.date import DateForm
-from openatlas.models.entity import Entity, EntityMapper
+from openatlas.models.entity import EntityMapper
 from openatlas.models.node import NodeMapper
 from openatlas.util.util import get_base_table_data, pager, truncate_string, uc_first
 
@@ -18,10 +18,21 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
     # Todo: write comment, reflect that entity can be a link
     # Add custom fields
     custom_list = []
+
+    def add_value_type_fields(subs):
+        for sub_id in subs:
+            sub = g.nodes[sub_id]
+            setattr(form, 'value_list-' + str(sub.id), StringField(sub.name))
+            add_value_type_fields(sub.subs)
+
     for id_, node in NodeMapper.get_nodes_for_form(form_name).items():
         custom_list.append(id_)
         setattr(form, str(id_), TreeMultiField(str(id_)) if node.multiple else TreeField(str(id_)))
+        if node.value_type:
+            add_value_type_fields(node.subs)
+
     form_instance = form(obj=entity)
+
     # Delete custom fields except the ones specified for the form
     delete_list = []  # Can't delete fields in the loop so creating a list for later deletion
     for field in form_instance:
@@ -32,34 +43,21 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
 
     # Set field data if available and only if it's a GET request
     if entity and request_origin and request_origin.method == 'GET':
-        for field in form_instance:
-            pass
-            # print(field.id)
         if isinstance(form_instance, DateForm):
             form_instance.populate_dates(entity)
+        nodes = entity.nodes
+        if entity2:
+            nodes.update(entity2.nodes)
+        if hasattr(form, 'opened'):
+            form_instance.opened.data = time.time()
         node_data = {}
-        if isinstance(entity, Entity):
-            nodes = entity.nodes
-            if entity2:
-                nodes.update(entity2.nodes)
-            if hasattr(form, 'opened'):
-                form_instance.opened.data = time.time()
-        else:
-            nodes = [entity.type] if entity.type else []  # It's a link so use the link.type
         for node, node_value in nodes.items():
             root = g.nodes[node.root[-1]] if node.root else node
-            if root.value_type:
-                # print('I am a value node: ' + node.name)
-                # print(node_value)
-                value_list_field = getattr(form_instance, 'value_list')
-                print(len(value_list_field))
-                for item in value_list_field:
-                    1/0
-                    print(item)
-                # + str(node.id)).data = node_value
-            if root.id not in node_data:  # Append only non root nodes
+            if root.id not in node_data:
                 node_data[root.id] = []
             node_data[root.id].append(node.id)
+            if root.value_type:
+                getattr(form_instance, 'value_list-' + str(node.id)).data = node_value
         for root_id, nodes in node_data.items():
             if hasattr(form_instance, str(root_id)):
                 getattr(form_instance, str(root_id)).data = nodes
@@ -170,23 +168,7 @@ class TreeMultiSelect(HiddenInput):
             for entity_id in field.data:
                 entity = g.nodes[entity_id]
                 selected_ids.append(entity.id)
-                if root.value_type:
-                    selection += """
-                    <script>$(document).ready(function () {{
-                        $('#{name}-button').after('<span> {label}</span>');
-                        $('#{name}-button').after(
-                            $('<input>').attr({{
-                                type: 'text',
-                                id: 'value_list-{entity_id}',
-                                name: 'value_list-{entity_id}',
-                                value: '{value}',
-                                class: 'value_input'
-                            }})
-                        );
-                        $('#{name}-button').after($('<br />'));
-                    }})</script>""".format(name=field.id, label=entity.name, entity_id=entity.id,
-                                           value='To do')
-                else:
+                if not root.value_type:
                     selection += g.nodes[entity_id].name + '<br />'
         html = """
             <span id="{name}-button" class="button">{change_label}</span>
