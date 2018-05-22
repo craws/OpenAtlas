@@ -186,8 +186,12 @@ def get_entity_data(entity, location=None):
             type_data[name] = []
         html = link(node) + (': ' + node_value if root.value_type else '')
         type_data[name].append(html)
-    type_data = OrderedDict(sorted(type_data.items(), key=lambda t: t[0]))  # sort by name
-    if 'type' in type_data:  # move the base type to the top
+    # Sort by name
+    type_data = OrderedDict(sorted(type_data.items(), key=lambda t: t[0]))
+    for root_type in type_data:
+        type_data[root_type].sort()
+    # Move the base type to the top
+    if 'type' in type_data:
         type_data.move_to_end('type', last=False)
     for root_name, nodes in type_data.items():
         data.append((root_name, '<br />'.join(nodes)))

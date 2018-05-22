@@ -167,13 +167,13 @@ def display_form(self, form, form_id=None, for_persons=False):
         if hasattr(form, 'insert_and_continue'):
             del form.insert_and_continue
     id_attribute = ' id="' + form_id + '" ' if form_id else ''
-    html = {'main': '', 'types': '', 'header': '', 'footer': ''}
+    html = {'main': '', 'types': '', 'value_types': '', 'header': '', 'footer': ''}
 
     def display_value_type_fields(subs, html_=''):
         for sub_id in subs:
             sub = g.nodes[sub_id]
             html_ += """
-                <div class="table-row">
+                <div class="table-row value-type-switch">
                     <div><label>{label}</label> {tooltip}</div>
                     <div class="table-cell">{field}</div>
                 </div>
@@ -202,22 +202,32 @@ def display_form(self, form, form_id=None, for_persons=False):
                 label = util.uc_first(_('type'))
             if field.label.text == 'super':
                 label = util.uc_first(_('super'))
-            type_field = """
-                <div class="table-row">
-                    <div><label>{label}</label> {tooltip}</div>
-                    <div class="table-cell">{field}</div>
-                </div>
-            """.format(
-                label=label,
-                tooltip='' if field.label.text == 'super' else display_tooltip(node.description),
-                field=str(field(class_=class_)) + errors)
             if node.value_type and 'is_node_form' not in form:
-                type_field += display_value_type_fields(node.subs)
-            if node.name in app.config['BASE_TYPES']:  # base type should be above other fields
-                html['types'] = type_field + html['types']
+                html['value_types'] += """
+                        <div class="table-row value-type-switch">
+                            <div></div>
+                            <div class="table-cell"><label>{label}</label> {tooltip}</div>
+                        </div>
+                    """.format(
+                    label=label,
+                    tooltip='' if field.label.text == 'super' else display_tooltip(node.description))
+                html['value_types'] += display_value_type_fields(node.subs)
+                continue
             else:
-                html['types'] += type_field
-            continue
+                type_field = """
+                    <div class="table-row">
+                        <div><label>{label}</label> {tooltip}</div>
+                        <div class="table-cell">{field}</div>
+                    </div>
+                """.format(
+                    label=label,
+                    tooltip='' if field.label.text == 'super' else display_tooltip(node.description),
+                    field=str(field(class_=class_)) + errors)
+                if node.name in app.config['BASE_TYPES']:  # base type should be above other fields
+                    html['types'] = type_field + html['types']
+                else:
+                    html['types'] += type_field
+                continue
         if field.type in ['CSRFTokenField', 'HiddenField']:
             html['header'] += str(field)
             continue
@@ -247,7 +257,19 @@ def display_form(self, form, form_id=None, for_persons=False):
 
     html_all = '<form method="post"' + id_attribute + ' ' + multipart + '>'
     html_all += '<div class="data-table">'
-    html_all += html['header'] + html['types'] + html['main'] + html['footer'] + '</div></form>'
+    if html['value_types']:
+        html['value_types'] = """
+        <div class="table-row">
+            <div>
+                <label>{values}</label>
+            </div>
+            <div class="table-cell value-type-switcher">
+                <span id="value-type-switcher" class="button">{show}</span>
+            </div>
+        </div>""".format(values=util.uc_first(_('values')), show=util.uc_first(_('show'))) + html['value_types']
+
+    html_all += html['header'] + html['types'] + html['main'] + html['value_types'] + html['footer']
+    html_all += '</div></form>'
     return html_all
 
 

@@ -28,6 +28,14 @@ $(document).ready(function() {
         })
     });
 
+    /* Show and hide function for value type input fields */
+    $("#value-type-switcher").click(function () {
+        $(".value-type-switch").toggleClass('display-none');
+        $(this).text(function(i, text){
+            return text === show ? hide : show;
+        })
+    })
+
     /* When selecting a file for upload: if name is empty, fill with filename without extension */
     $('#file').on("change", function() {
         if ($('#name').val() == '') {

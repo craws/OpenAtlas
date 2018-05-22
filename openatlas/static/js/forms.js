@@ -12,6 +12,7 @@ $(document).ready(function () {
 
     $('#show_passwords').show();
     $(".date-switch").addClass('display-none');
+    $(".value-type-switch").addClass('display-none');
     $('label[for="show_passwords"]').css('display', 'block');
     $('#show_passwords').change(function() {
         $('#password')[0].type = this.checked ? 'text' : 'password';

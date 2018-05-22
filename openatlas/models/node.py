@@ -185,10 +185,13 @@ class NodeMapper(EntityMapper):
         sql = """
             INSERT INTO web.hierarchy (id, name, multiple, value_type)
             VALUES (%(id)s, %(name)s, %(multiple)s, %(value_type)s);"""
+        multiple = False
+        if hasattr(form, 'multiple') and form.multiple and form.multiple.data:
+            multiple = True
         g.cursor.execute(sql, {
             'id': node.id,
             'name': node.name,
-            'multiple': True if hasattr(form, 'multiple') and form.multiple.data else False,
+            'multiple': multiple,
             'value_type': value_type})
         NodeMapper.add_forms_to_hierarchy(node, form)
 
@@ -196,8 +199,6 @@ class NodeMapper(EntityMapper):
     def update_hierarchy(node, form):
         sql = "UPDATE web.hierarchy SET name = %(name)s, multiple = %(multiple)s WHERE id = %(id)s;"
         multiple = False
-        print(node)
-        print(form.multiple)
         if node.multiple or (hasattr(form, 'multiple') and form.multiple and form.multiple.data):
             multiple = True
         g.cursor.execute(sql, {'id': node.id, 'name': form.name.data, 'multiple': multiple})

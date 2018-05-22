@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('node_index') }}">{{ _('node')|uc_first }}</a>
+    <a href="{{ url_for('node_index') }}">{{ _('types')|uc_first }}</a>
     > {{ node|link|safe }}
     > {{ _('edit') }}
 {% endblock %}
