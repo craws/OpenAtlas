@@ -50,7 +50,7 @@ def print_file_size(entity):
 def display_tooltip(text):
     if not text:
         return ''
-    return '<span class="tooltip" title="{title}">i</span>'.format(title=text.replace('"', "'"))
+    return ' <span class="tooltip" title="{title}">i</span>'.format(title=text.replace('"', "'"))
 
 
 def print_file_extension(entity):

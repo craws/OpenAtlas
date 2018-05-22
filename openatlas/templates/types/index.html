@@ -50,10 +50,12 @@
                                 {{ tree|safe }}
                             </div>
                             <div style="float:left;">
-                                <p>
-                                    <strong>{{ _('selection'|uc_first) }}</strong>:
-                                    {{ _('multiple') if node.multiple else _('single') }}
-                                </p>
+                                {% if not node.value_type: %}
+                                    <p>
+                                        <strong>{{ _('selection'|uc_first) }}</strong>:
+                                        {{ _('multiple') if node.multiple else _('single') }}
+                                    </p>
+                                {% endif %}
                                 {% if node.forms: %}
                                     <p style="margin-top:0;">
                                         <strong>{{ _('forms')|uc_first }}</strong>:

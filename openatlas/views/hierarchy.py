@@ -34,6 +34,8 @@ class HierarchyForm(Form):
 def hierarchy_insert(param):
     form = build_form(HierarchyForm, 'hierarchy')
     form.forms.choices = NodeMapper.get_form_choices()
+    if param == 'value':
+        del form.multiple
     if form.validate_on_submit():
         if NodeMapper.get_nodes(form.name.data):
             flash(_('error name exists'), 'error')
@@ -52,7 +54,9 @@ def hierarchy_update(id_):
         abort(403)
     form = build_form(HierarchyForm, 'hierarchy', node)
     form.forms.choices = NodeMapper.get_form_choices()
-    if node.multiple:
+    if node.value_type:
+        del form.multiple
+    elif node.multiple:
         form.multiple.render_kw = {'disabled': 'disabled'}
     if form.validate_on_submit():
         if form.name.data != node.name and NodeMapper.get_nodes(form.name.data):
