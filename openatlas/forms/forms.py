@@ -162,7 +162,6 @@ class TreeMultiSelect(HiddenInput):
         selected_ids = []
         root = g.nodes[int(field.id)]
         if field.data:
-            print('my data' + str(field.data))
             if isinstance(field.data, str):
                 field.data = ast.literal_eval(field.data)
             for entity_id in field.data:
