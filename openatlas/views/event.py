@@ -174,8 +174,8 @@ def event_view(id_, unlink_id=None):
 def save(form, event=None, code=None, origin=None):
     g.cursor.execute('BEGIN')
     try:
-        log_action = 'update'
         if event:
+            log_action = 'update'
             LinkMapper.delete_by_codes(event, ['P117', 'P7', 'P22', 'P23', 'P24'])
         else:
             log_action = 'insert'
@@ -185,7 +185,6 @@ def save(form, event=None, code=None, origin=None):
         event.update()
         event.save_dates(form)
         event.save_nodes(form)
-        url = url_for('event_view', id_=event.id)
         if form.event.data:
             event.link('P117', int(form.event.data))
         if form.place.data:
@@ -197,6 +196,7 @@ def save(form, event=None, code=None, origin=None):
             event.link('P23', ast.literal_eval(form.donor.data) if form.donor.data else None)
             if form.given_place.data:
                 event.link('P24', ast.literal_eval(form.given_place.data))
+        url = url_for('event_view', id_=event.id)
         if origin:
             view_name = get_view_name(origin)
             url = url_for(view_name + '_view', id_=origin.id) + '#tab-event'

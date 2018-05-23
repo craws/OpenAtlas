@@ -161,7 +161,7 @@ def display_content_translation(self, text):
 @blueprint.app_template_filter()
 def display_form(self, form, form_id=None, for_persons=False):
     multipart = 'enctype="multipart/form-data"' if hasattr(form, 'file') else ''
-    if hasattr(form, 'name') and form.name.data:  # if name.data exists it's an update
+    if 'update' in request.path:
         if hasattr(form, 'save') and hasattr(form.save, 'label'):
             form.save.label.text = _('save')
         if hasattr(form, 'insert_and_continue'):
