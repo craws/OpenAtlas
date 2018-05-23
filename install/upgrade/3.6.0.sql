@@ -10,4 +10,8 @@ ALTER TABLE web.hierarchy ALTER column value_type SET DEFAULT false;
 UPDATE web.hierarchy SET value_type = false;
 ALTER TABLE web.hierarchy ALTER column value_type SET NOT NULL;
 
+-- Fix possible wrong type for "Source translation"
+
+UPDATE model.entity SET class_code = 'E55' WHERE class_code = 'E53' and name = 'Source translation';
+
 COMMIT;

@@ -245,7 +245,7 @@ INSERT INTO link (property_code, range_id, domain_id) VALUES
 ------------------------
 -- Source translation --
 ------------------------
-INSERT INTO entity (class_code, name, description) VALUES ('E53', 'Source translation', '');
+INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Source translation', '');
 INSERT INTO entity (class_code, name) VALUES ('E55', 'Original Text'), ('E55', 'Translation'), ('E55', 'Transliteration');
 INSERT INTO link (property_code, range_id, domain_id) VALUES
 ('P127', (SELECT id FROM entity WHERE name='Source translation'), (SELECT id FROM entity WHERE name='Original Text')),
