@@ -42,7 +42,7 @@ class SourceTest(TestBaseCase):
 
             # link source
             rv = self.app.post(
-                url_for('reference_insert', code='carrier', origin_id=source_id),
+                url_for('reference_insert', code='edition', origin_id=source_id),
                 data={'name': 'Test reference'},
                 follow_redirects=True)
             assert b'Test source' in rv.data

@@ -17,7 +17,7 @@ class PlaceTest(TestBaseCase):
             data = {'name': 'Asgard', 'alias-0': 'Valhöll'}
             with app.test_request_context():
                 app.preprocess_request()
-                reference_id = EntityMapper.insert('E84', 'Ancient Books', 'information carrier').id
+                reference_id = EntityMapper.insert('E31', 'Ancient Books', 'edition').id
                 place_node = NodeMapper.get_hierarchy_by_name('Place')
                 source_id = EntityMapper.insert('E33', 'Tha source').id
             rv = self.app.post(url_for('place_insert', origin_id=reference_id), data=data,

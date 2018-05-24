@@ -211,6 +211,8 @@ class TableSelect(HiddenInput):
         table = {'id': field.id, 'header': header, 'data': []}
         if class_ == 'place':
             entities = EntityMapper.get_by_system_type('place')
+        elif class_ == 'reference':
+            entities = EntityMapper.get_by_system_type('bibliography') + EntityMapper.get_by_system_type('edition')
         else:
             entities = EntityMapper.get_by_codes(class_)
         for entity in entities:

@@ -81,7 +81,6 @@
                 <a href="{{ url_for('reference_add', origin_id=object_.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='bibliography', origin_id=object_.id) }}">+ {{ _('bibliography')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='edition', origin_id=object_.id) }}">+ {{ _('edition')|uc_first }}</a>
-                <a href="{{ url_for('reference_insert', code='carrier', origin_id=object_.id) }}">+ {{ 'E84'|get_class_name }}</a>
             </div>
         {% endif %}
         {{ tables['reference']|pager|safe }}

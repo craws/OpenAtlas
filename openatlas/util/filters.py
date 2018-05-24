@@ -193,10 +193,7 @@ def display_form(self, form, form_id=None, for_persons=False):
         for error in field.errors:
             errors += util.uc_first(error)
         if field.type in ['TreeField', 'TreeMultiField']:
-            try:
-                hierarchy_id = int(field.id)
-            except ValueError:
-                hierarchy_id = NodeMapper.get_hierarchy_by_name(util.uc_first(field.id)).id
+            hierarchy_id = int(field.id)
             node = g.nodes[hierarchy_id]
             label = node.name
             if node.name in app.config['BASE_TYPES']:
