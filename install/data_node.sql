@@ -252,27 +252,38 @@ INSERT INTO link (property_code, range_id, domain_id) VALUES
 ('P127', (SELECT id FROM entity WHERE name='Source translation'), (SELECT id FROM entity WHERE name='Translation')),
 ('P127', (SELECT id FROM entity WHERE name='Source translation'), (SELECT id FROM entity WHERE name='Transliteration'));
 
+------------------------
+-- Value types --
+------------------------
+INSERT INTO model.entity (class_code, name, description) VALUES ('E55', 'Dimensions', 'Physical dimensions like weight and height.');
+INSERT INTO model.entity (class_code, name, description) VALUES ('E55', 'Height', 'In centimeters'), ('E55', 'Weight', 'In gram');
+INSERT INTO model.link (property_code, range_id, domain_id) VALUES
+('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Height')),
+('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Weight'));
+
+
 -------------------------------
 -- Web hierarchies and forms --
 -------------------------------
-INSERT INTO web.hierarchy (id, name, multiple, system, directional) VALUES
-((SELECT id FROM entity WHERE name='License'), 'License', False, True, False),
-((SELECT id FROM entity WHERE name='Source'), 'Source', False, True, False),
-((SELECT id FROM entity WHERE name='Event'), 'Event', False, True, False),
-((SELECT id FROM entity WHERE name='Actor Actor Relation'), 'Actor Actor Relation', False, True, True),
-((SELECT id FROM entity WHERE name='Actor Function'), 'Actor Function', False, True, False),
-((SELECT id FROM entity WHERE name='Involvement'), 'Involvement', False, True, False),
-((SELECT id FROM entity WHERE name='Sex'), 'Sex', False, False, False),
-((SELECT id FROM entity WHERE name='Place'), 'Place', False, True, False),
-((SELECT id FROM entity WHERE name='Feature'), 'Feature', False, True, False),
-((SELECT id FROM entity WHERE name='Stratigraphic Unit'), 'Stratigraphic Unit', False, True, False),
-((SELECT id FROM entity WHERE name='Find'), 'Find', False, True, False),
-((SELECT id FROM entity WHERE name='Information Carrier'), 'Information Carrier', False, True, False),
-((SELECT id FROM entity WHERE name='Bibliography'), 'Bibliography', False, True, False),
-((SELECT id FROM entity WHERE name='Edition'), 'Edition', False, True, False),
-((SELECT id FROM entity WHERE name='Source translation'), 'Source translation', False, False, False),
-((SELECT id FROM entity WHERE name='Administrative Unit'), 'Administrative Unit', True, True, False),
-((SELECT id FROM entity WHERE name='Historical Place'), 'Historical Place', True, True, False);
+INSERT INTO web.hierarchy (id, name, multiple, system, directional, value_type) VALUES
+((SELECT id FROM entity WHERE name='License'), 'License', False, True, False, False),
+((SELECT id FROM entity WHERE name='Source'), 'Source', False, True, False, False),
+((SELECT id FROM entity WHERE name='Event'), 'Event', False, True, False, False),
+((SELECT id FROM entity WHERE name='Actor Actor Relation'), 'Actor Actor Relation', False, True, True, False),
+((SELECT id FROM entity WHERE name='Actor Function'), 'Actor Function', False, True, False, False),
+((SELECT id FROM entity WHERE name='Involvement'), 'Involvement', False, True, False, False),
+((SELECT id FROM entity WHERE name='Sex'), 'Sex', False, False, False, False),
+((SELECT id FROM entity WHERE name='Place'), 'Place', False, True, False, False),
+((SELECT id FROM entity WHERE name='Feature'), 'Feature', False, True, False, False),
+((SELECT id FROM entity WHERE name='Stratigraphic Unit'), 'Stratigraphic Unit', False, True, False, False),
+((SELECT id FROM entity WHERE name='Find'), 'Find', False, True, False, False),
+((SELECT id FROM entity WHERE name='Information Carrier'), 'Information Carrier', False, True, False, False),
+((SELECT id FROM entity WHERE name='Bibliography'), 'Bibliography', False, True, False, False),
+((SELECT id FROM entity WHERE name='Edition'), 'Edition', False, True, False, False),
+((SELECT id FROM entity WHERE name='Source translation'), 'Source translation', False, False, False, False),
+((SELECT id FROM entity WHERE name='Administrative Unit'), 'Administrative Unit', True, True, False, False),
+((SELECT id FROM entity WHERE name='Historical Place'), 'Historical Place', True, True, False, False),
+((SELECT id FROM entity WHERE name='Dimensions'), 'Dimensions', False, False, False, True);
 
 INSERT INTO web.form (name, extendable) VALUES
 ('File', True),
@@ -310,4 +321,5 @@ INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Actor Actor Relation'),(SELECT id FROM web.form WHERE name LIKE 'Actor Actor Relation')),
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Involvement'),(SELECT id FROM web.form WHERE name LIKE 'Involvement')),
 ((SELECT id FROM web.hierarchy WHERE name LIKE 'Actor Function'),(SELECT id FROM web.form WHERE name LIKE 'Member')),
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Source translation'),(SELECT id FROM web.form WHERE name LIKE 'Source translation'));
+((SELECT id FROM web.hierarchy WHERE name LIKE 'Source translation'),(SELECT id FROM web.form WHERE name LIKE 'Source translation')),
+((SELECT id FROM web.hierarchy WHERE name LIKE 'Dimensions'),(SELECT id FROM web.form WHERE name LIKE 'Find'));
