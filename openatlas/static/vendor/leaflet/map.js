@@ -163,7 +163,7 @@ if (gisPointSelected != "") {
         mypoints.on('click', setObjectId);
         setTimeout(function () {
             console.log('fit1=nurpunkte');
-            map.fitBounds(mypoints, {maxZoom: 18});
+            map.fitBounds(mypoints, {maxZoom: 12});
         }, 1);
     } else {
         var mypoints = L.geoJson(gisPointSelected, {onEachFeature: setpopup2}).addTo(map);
@@ -173,7 +173,7 @@ if (gisPointSelected != "") {
         var myextend = L.featureGroup([mypoints, mysites]);
         setTimeout(function () {
             console.log('fit2=punkte und poylgone');
-            map.fitBounds(myextend.getBounds(), {maxZoom: 18});
+            map.fitBounds(myextend.getBounds(), {maxZoom: 12});
         }, 1);
     }
 }
@@ -184,13 +184,13 @@ if (gisPointSelected == "") {
         mysites.on('click', setObjectId);
         console.log('fit3 = nurpolygone');
         setTimeout(function () {
-            map.fitBounds(mysites.getBounds(), {maxZoom: 18});
+            map.fitBounds(mysites.getBounds(), {maxZoom: 12});
         }, 1);
     } else {
         if (gisPointAll != "") {
             console.log('fit4=nurpointsall');
             setTimeout(function () {
-                map.fitBounds(sitesmarkers, {maxZoom: 18});
+                map.fitBounds(sitesmarkers, {maxZoom: 12});
             }, 1);
         }
     }
