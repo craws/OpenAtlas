@@ -11,6 +11,11 @@ html, body, input, select, textarea {
     margin-left: 1em;
 }
 
+input[type="text"].value-type {
+    width: 4em;
+    text-align: right;
+}
+
 #global-search {
     text-transform: capitalize;
 }

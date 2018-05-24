@@ -4,7 +4,8 @@ import time
 
 from flask import g
 from flask_babel import lazy_gettext as _
-from wtforms import HiddenField, StringField
+from wtforms import HiddenField, FloatField
+from wtforms.validators import Optional
 from wtforms.widgets import HiddenInput
 
 from openatlas import app
@@ -22,7 +23,7 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
     def add_value_type_fields(subs):
         for sub_id in subs:
             sub = g.nodes[sub_id]
-            setattr(form, 'value_list-' + str(sub.id), StringField(sub.name))
+            setattr(form, 'value_list-' + str(sub.id), FloatField(sub.name, [Optional()]))
             add_value_type_fields(sub.subs)
 
     for id_, node in NodeMapper.get_nodes_for_form(form_name).items():
@@ -125,7 +126,7 @@ class TreeSelect(HiddenInput):
             </div>
             <script>
                 $(document).ready(function () {{
-                    createOverlay("{name}","{title}",false,{value_type});
+                    createOverlay("{name}","{title}",false,);
                     $("#{name}-tree").jstree({{
                         "core" : {{"check_callback" : true, 'data':[{tree_data}]}},
                         "search": {{"case_insensitive": true, "show_only_matches": true}},
@@ -141,7 +142,6 @@ class TreeSelect(HiddenInput):
             </script>""".format(
             name=field.id,
             title=root.name,
-            value_type='true' if root.value_type else 'false',
             change_label=uc_first(_('change')),
             clear_label=uc_first(_('clear')),
             selection=selection,
@@ -167,8 +167,6 @@ class TreeMultiSelect(HiddenInput):
             for entity_id in field.data:
                 entity = g.nodes[entity_id]
                 selected_ids.append(entity.id)
-                if not root.value_type:
-                    selection += g.nodes[entity_id].name + '<br />'
         html = """
             <span id="{name}-button" class="button">{change_label}</span>
             <div id="{name}-selection" style="text-align:left;">{selection}</div>
@@ -179,7 +177,7 @@ class TreeMultiSelect(HiddenInput):
                </div>
             </div>
             <script>
-                createOverlay("{name}", "{title}", true, "tree", {value_type});
+                createOverlay("{name}", "{title}", true, "tree");
                 $("#{name}-tree").jstree({{
                     "core" : {{ "check_callback" : true, 'data':[{tree_data}] }},
                     "search": {{"case_insensitive": true, "show_only_matches": true}},
@@ -191,7 +189,6 @@ class TreeMultiSelect(HiddenInput):
                 }});
             </script>""".format(
             name=field.id,
-            value_type='true' if root.value_type else 'false',
             title=root.name,
             selection=selection,
             change_label=uc_first(_('change')),

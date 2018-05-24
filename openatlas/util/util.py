@@ -1,6 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import glob
-import locale
 import os
 import re
 import smtplib
@@ -14,7 +13,7 @@ from html.parser import HTMLParser
 import numpy
 from babel import dates
 from flask import abort, flash, g, request, session, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import lazy_gettext as _, format_number
 from flask_login import current_user
 from numpy import math
 from werkzeug.utils import redirect
@@ -184,12 +183,14 @@ def get_entity_data(entity, location=None):
         name = 'type' if root.name in app.config['BASE_TYPES'] else root.name
         if root.name not in type_data:
             type_data[name] = []
-        html = link(node) + (': ' + node_value if root.value_type else '')
+        html = link(node) + (': ' + format_number(node_value) if root.value_type else '')
         type_data[name].append(html)
+
     # Sort by name
     type_data = OrderedDict(sorted(type_data.items(), key=lambda t: t[0]))
     for root_type in type_data:
         type_data[root_type].sort()
+
     # Move the base type to the top
     if 'type' in type_data:
         type_data.move_to_end('type', last=False)

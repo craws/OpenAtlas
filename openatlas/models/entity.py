@@ -310,9 +310,9 @@ class EntityMapper:
         debug_model['div sql'] += 1
         entities = []
         for row in g.cursor.fetchall():
-            if row.class_code == 'E82':  # if found in actor alias
+            if row.class_code == 'E82':  # If found in actor alias
                 entities.append(LinkMapper.get_linked_entity(row.id, 'P131', True))
-            elif row.class_code == 'E41':  # if found in place alias
+            elif row.class_code == 'E41':  # If found in place alias
                 entities.append(LinkMapper.get_linked_entity(row.id, 'P1', True))
             else:
                 entities.append(Entity(row))
