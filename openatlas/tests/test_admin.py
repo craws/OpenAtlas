@@ -32,3 +32,10 @@ class ContentTests(TestBaseCase):
             assert b'Login' in rv.data
             rv = self.app.get(url_for('admin_log_delete', follow_redirects=True))
             assert b'Login' not in rv.data
+
+    def test_links(self):
+        self.login()
+        with app.app_context():
+            rv = self.app.get(url_for('admin_check_links', check='check'))
+            assert b'No entries' in rv.data
+

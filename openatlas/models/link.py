@@ -185,3 +185,31 @@ class LinkMapper:
             'range_id': link.range.id,
             'description': link.description})
         debug_model['div sql'] += 1
+
+    @staticmethod
+    def check_links():
+        from openatlas.util.util import link
+        sql = """SELECT id, property_code, domain_id, range_id, description, created, modified
+                FROM model.link;"""
+        g.cursor.execute(sql)
+        # Todo: merge with link checker in model and links
+        invalid_links = []
+        for row in g.cursor.fetchall():
+            from openatlas.models.entity import EntityMapper
+            domain = EntityMapper.get_by_id(row.domain_id)
+            range_ = EntityMapper.get_by_id(row.range_id)
+            domain_class = g.classes[domain.class_.code]
+            range_class = g.classes[range_.class_.code]
+            property_ = g.properties[row.property_code]
+            domain_is_valid = property_.find_object('domain_class_code', domain_class.code)
+            range_is_valid = property_.find_object('range_class_code', range_class.code)
+            ignore = app.config['WHITELISTED_DOMAINS']
+            test_result = {
+                'domain_error': False if domain_is_valid or domain_class.code in ignore else True,
+                'range_error': False if range_is_valid else True}
+            if test_result['domain_error'] or test_result['range_error']:  # pragma: no cover
+                invalid_links.append({
+                    'domain': link(domain) + ' (' + domain.class_.code + ')',
+                    'property': link(property_),
+                    'range': link(range_) + ' (' + range_.class_.code + ')'})
+        return invalid_links

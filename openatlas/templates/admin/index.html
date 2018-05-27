@@ -22,6 +22,7 @@
         {% if 'admin'|is_authorized: %}
             <a href="{{ url_for('settings_index') }}">{{ _('settings')|uc_first }}</a>
             <a href="{{ url_for('admin_orphans') }}">{{ _('orphaned entries')|uc_first }}</a>
+            <a href="{{ url_for('admin_check_links') }}">{{ _('check links')|uc_first }}</a>
         {% endif  %}
         {% if 'admin'|is_authorized: %}
             <h1>{{ _('logs')|uc_first }}</h1>

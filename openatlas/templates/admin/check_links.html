@@ -1,0 +1,14 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
+    > {{ _('check links')|uc_first }}
+{% endblock %}
+{% block content %}
+    <p>
+        <a class="button" href="{{ url_for('admin_check_links', check='check')}}">{{ _('check links')|uc_first }}</a>
+        {{ _('this could take some time')|uc_first }}
+    </p>
+    {% if table: %}
+        {{ table|pager|safe }}
+    {% endif %}
+{% endblock %}

@@ -15,6 +15,7 @@ from openatlas.models.entity import EntityMapper
 from openatlas.models.node import NodeMapper
 from openatlas.models.settings import SettingsMapper
 from openatlas.models.user import UserMapper
+from openatlas.models.link import LinkMapper
 from openatlas.util.util import (format_date, format_datetime, link, required_group, send_mail,
                                  truncate_string, uc_first, get_file_path, convert_size)
 
@@ -41,6 +42,18 @@ class FileForm(Form):
 @required_group('readonly')
 def admin_index():
     return render_template('admin/index.html')
+
+
+@app.route('/admin/check_links')
+@app.route('/admin/check_links/<check>')
+@required_group('admin')
+def admin_check_links(check=None):
+    table = None
+    if check:
+        table = {'id': 'check', 'header': ['domain', 'property', 'range'], 'data': []}
+        for result in LinkMapper.check_links():  # pragma: no cover
+            table['data'].append([result['domain'], result['property'], result['range']])
+    return render_template('admin/check_links.html', table=table)
 
 
 @required_group('admin')
