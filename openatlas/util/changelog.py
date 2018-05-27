@@ -5,6 +5,13 @@ from collections import OrderedDict
 class Changelog:
     """ A big OrderedDict with changelog data, maybe not the best place and format to keep it."""
     versions = OrderedDict()
+    versions['3.6.0'] = {
+        'date': '2018-05-28',
+        'data': OrderedDict(
+            feature=OrderedDict([
+                ('710', 'Value Types'),
+                ('902', 'Insert and continue for types'),
+                ('903', 'Check existing links function')]))}
     versions['3.5.0'] = {
         'date': '2018-05-12',
         'data': OrderedDict(
