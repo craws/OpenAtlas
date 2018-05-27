@@ -76,7 +76,8 @@ def reference_add2(reference_id, class_name):
     reference_ = EntityMapper.get_by_id(reference_id)
     form = getattr(openatlas.views.reference, 'Add' + uc_first(class_name) + 'Form')()
     if form.validate_on_submit():
-        reference_.link('P67', int(getattr(form, class_name).data), form.page.data)
+        property_code = 'P128' if reference_.class_.code == 'E84' else 'P67'
+        reference_.link(property_code, int(getattr(form, class_name).data), form.page.data)
         return redirect(url_for('reference_view', id_=reference_.id) + '#tab-' + class_name)
     return render_template(
         'reference/add2.html', reference=reference_, form=form, class_name=class_name)
@@ -126,7 +127,7 @@ def reference_view(id_, unlink_id=None):
             unlink = url_for('reference_view', id_=reference.id, unlink_id=link_.id) + '#tab-file'
             data.append(display_remove_link(unlink, link_.domain.name))
         tables['file']['data'].append(data)
-    for link_ in reference.get_links('P67'):
+    for link_ in reference.get_links(['P67', 'P128']):
         view_name = get_view_name(link_.range)
         data = get_base_table_data(link_.range)
         data.append(truncate_string(link_.description))

@@ -7,9 +7,8 @@
 <div id="tabs" class="tabs-container">
     <ul>
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
-        {% if reference.system_type == 'information carrier' %}
-        {% else %}
-            <li><a href="#tab-source">{{ _('source')|uc_first }} ({{ tables['source']['data']|length }})</a></li>
+        <li><a href="#tab-source">{{ _('source')|uc_first }} ({{ tables['source']['data']|length }})</a></li>
+        {% if reference.system_type != 'information carrier' %}
             <li><a href="#tab-event">{{ _('event')|uc_first }} ({{ tables['event']['data']|length }})</a></li>
             <li><a href="#tab-actor">{{ _('actor')|uc_first }} ({{ tables['actor']['data']|length }})</a></li>
             <li><a href="#tab-place">{{ _('place')|uc_first }} ({{ tables['place']['data']|length }})</a></li>
@@ -30,6 +29,15 @@
         {{ reference|description|safe }}
     </div>
     {% if reference.system_type == 'information carrier' %}
+        <div id="tab-source">
+            {% if 'editor'|is_authorized: %}
+                <div class="button-bar">
+                    <a href="{{ url_for('reference_add2', reference_id=reference.id, class_name='source')}}">{{ _('add')|uc_first }}</a>
+                    <a href="{{ url_for('source_insert', origin_id=reference.id) }}">+ {{ _('source')|uc_first }}</a>
+                </div>
+            {% endif %}
+            {{ tables['source']|pager|safe }}
+        </div>
     {% else %}
         {% for name in ['source', 'event', 'actor', 'place']: %}
             <div id="tab-{{name}}">
