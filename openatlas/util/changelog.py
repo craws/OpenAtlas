@@ -6,7 +6,7 @@ class Changelog:
     """ A big OrderedDict with changelog data, maybe not the best place and format to keep it."""
     versions = OrderedDict()
     versions['3.6.0'] = {
-        'date': '2018-05-28',
+        'date': 'TBA',
         'data': OrderedDict(
             feature=OrderedDict([
                 ('710', 'Value Types'),
