@@ -2,7 +2,7 @@
 from collections import OrderedDict
 
 from flask import abort, flash, g, render_template, request, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import lazy_gettext as _, format_number
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import StringField, SubmitField, TextAreaField, HiddenField
@@ -133,9 +133,10 @@ def walk_tree(param):
     text = ''
     for id_ in param if isinstance(param, list) else [param]:
         item = g.nodes[id_]
-        count_subs = " (" + str(item.count_subs) + ")" if item.count_subs else ''
+        count_subs = ' (' + format_number(item.count_subs) + ')' if item.count_subs else ''
         text += "{href: '" + url_for('node_view', id_=item.id) + "',"
-        text += "text: '" + item.name.replace("'", "&apos;") + " " + str(item.count) + count_subs
+        text += "text: '" + item.name.replace("'", "&apos;") + " "
+        text += '<span style="font-weight:normal">' + format_number(item.count) + count_subs
         text += "', 'id':'" + str(item.id) + "'"
         if item.subs:
             text += ",'children' : ["
