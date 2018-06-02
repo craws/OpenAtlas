@@ -65,7 +65,7 @@ def source_view(id_, unlink_id=None):
     for text in source.get_linked_entities('P73'):
         tables['text']['data'].append([
             link(text),
-            text.nodes[0].name if text.nodes else '',
+            next(iter(text.nodes)).name if text.nodes else '',
             truncate_string(text.description)])
     for name in ['event', 'place', 'actor']:
         tables[name] = {'id': name, 'header': app.config['TABLE_HEADERS'][name], 'data': []}
