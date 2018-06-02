@@ -12,10 +12,11 @@ class FileTest(TestBaseCase):
         with app.app_context():
             self.login()
 
-            # Create entity for file
+            # Create entities for file
             with app.test_request_context():
                 app.preprocess_request()
                 actor_id = EntityMapper.insert('E21', 'File keeper').id
+                reference_id = EntityMapper.insert('E31', 'Ancient Books', 'edition').id
 
             # Insert
             rv = self.app.get(url_for('file_insert', origin_id=actor_id))
@@ -26,9 +27,16 @@ class FileTest(TestBaseCase):
                     url_for('file_insert', code='E7', origin_id=actor_id),
                     data={'name': 'OpenAtlas logo', 'file': img}, follow_redirects=True)
             assert b'An entry has been created' in rv.data
+            with open(os.path.dirname(__file__) + '/../static/images/layout/logo.png', 'rb') as img:
+                rv = self.app.post(
+                    url_for('file_insert', code='E7', origin_id=reference_id),
+                    data={'name': 'OpenAtlas logo', 'file': img}, follow_redirects=True)
+            assert b'An entry has been created' in rv.data
             with app.test_request_context():
                 app.preprocess_request()
-                file_id = EntityMapper.get_by_system_type('file')[0].id
+                files = EntityMapper.get_by_system_type('file')
+                file_id = files[0].id
+                file_id2 = files[1].id
 
             with open(os.path.dirname(__file__) + '/test_file.py', 'rb') as invalid_file:
                 rv = self.app.post(
@@ -43,6 +51,8 @@ class FileTest(TestBaseCase):
 
             # View
             rv = self.app.get(url_for('file_view', id_=file_id))
+            assert b'OpenAtlas logo' in rv.data
+            rv = self.app.get(url_for('file_view', id_=file_id2))
             assert b'OpenAtlas logo' in rv.data
 
             # Calling download, display urls with "with to prevent unclosed files warning

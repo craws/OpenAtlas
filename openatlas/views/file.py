@@ -60,21 +60,23 @@ def file_index():
     disk_space_values = {
         'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
         'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
-        'percent': 100 - math.ceil(free_space / (disk_space / 100))
-    }
+        'percent': 100 - math.ceil(free_space / (disk_space / 100))}
     return render_template('file/index.html', table=table, disk_space_values=disk_space_values)
 
 
 @app.route('/file/add/<int:origin_id>', methods=['GET', 'POST'])
 @required_group('editor')
 def file_add(origin_id):
-    """Link an entity to file coming from the entity."""
+    """ Link an entity to file coming from the entity."""
     origin = EntityMapper.get_by_id(origin_id)
     if request.method == 'POST':
         g.cursor.execute('BEGIN')
         try:
             for value in request.form.getlist('values'):
-                LinkMapper.insert(int(value), 'P67', origin.id)
+                if origin.system_type in ['edition', 'bibliography']:
+                    LinkMapper.insert(origin.id, 'P67', int(value))
+                else:
+                    LinkMapper.insert(int(value), 'P67', origin.id)
             g.cursor.execute('COMMIT')
         except Exception as e:  # pragma: no cover
             g.cursor.execute('ROLLBACK')
@@ -88,38 +90,46 @@ def file_add(origin_id):
 @app.route('/file/add2/<int:id_>/<class_name>', methods=['POST', 'GET'])
 @required_group('editor')
 def file_add2(id_, class_name):
-    """Link an entity to file coming from the file"""
-    entity = EntityMapper.get_by_id(id_)
+    """ Link an entity to file coming from the file"""
+    file = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
         for value in request.form.getlist('values'):
-            entity.link('P67', int(value))
-        return redirect(url_for('file_view', id_=entity.id) + '#tab-' + class_name)
-    form = build_table_form(class_name, entity.get_linked_entities('P67'))
-    return render_template('file/add2.html', entity=entity, class_name=class_name, form=form)
+            if class_name == 'reference':
+                LinkMapper.insert(int(value), 'P67', file)
+            else:
+                file.link('P67', int(value))
+        return redirect(url_for('file_view', id_=file.id) + '#tab-' + class_name)
+    form = build_table_form(class_name, file.get_linked_entities('P67'))
+    return render_template('file/add2.html', entity=file, class_name=class_name, form=form)
 
 
 @app.route('/file/view/<int:id_>')
 @app.route('/file/view/<int:id_>/<int:unlink_id>')
 @required_group('readonly')
 def file_view(id_, unlink_id=None):
-    entity = EntityMapper.get_by_id(id_)
+    file = EntityMapper.get_by_id(id_)
     if unlink_id:
         LinkMapper.delete_by_id(unlink_id)
         flash(_('link removed'), 'info')
-    path = get_file_path(entity.id)
-    tables = {'info': get_entity_data(entity)}
+    path = get_file_path(file.id)
+    tables = {'info': get_entity_data(file)}
     for name in ['source', 'event', 'actor', 'place', 'reference']:
         tables[name] = {'id': name, 'header': app.config['TABLE_HEADERS'][name], 'data': []}
-    for link_ in entity.get_links('P67'):
+    for link_ in file.get_links('P67'):
         view_name = get_view_name(link_.range)
         data = get_base_table_data(link_.range)
-        unlink_url = url_for('file_view', id_=entity.id, unlink_id=link_.id) + '#tab-' + view_name
+        unlink_url = url_for('file_view', id_=file.id, unlink_id=link_.id) + '#tab-' + view_name
         data.append(display_remove_link(unlink_url, link_.range.name))
         tables[view_name]['data'].append(data)
+    for link_ in file.get_links('P67', True):
+        data = get_base_table_data(link_.domain)
+        unlink_url = url_for('file_view', id_=file.id, unlink_id=link_.id) + '#tab-reference'
+        data.append(display_remove_link(unlink_url, link_.domain.name))
+        tables['reference']['data'].append(data)
     return render_template(
         'file/view.html',
         missing_file=False if path else True,
-        entity=entity,
+        entity=file,
         tables=tables,
         preview=True if path and preview_file(path) else False,
         filename=os.path.basename(path) if path else False)
@@ -150,7 +160,7 @@ def file_insert(origin_id=None):
     form = build_form(FileForm, 'File')
     if form.validate_on_submit():
         file_ = request.files['file']
-        if not file_:   # pragma: no cover
+        if not file_:  # pragma: no cover
             flash(_('no file to upload'), 'error')
         elif not allowed_file(file_.filename):
             flash(_('file type not allowed'), 'error')
@@ -182,28 +192,31 @@ def file_delete(id_=None):
     return redirect(url_for('file_index'))
 
 
-def save(form, entity=None, origin=None):
+def save(form, file=None, origin=None):
     g.cursor.execute('BEGIN')
     try:
         log_action = 'update'
-        if not entity:
+        if not file:
             log_action = 'insert'
             file_ = request.files['file']
-            entity = EntityMapper.insert('E31', form.name.data, 'file')
+            file = EntityMapper.insert('E31', form.name.data, 'file')
             filename = secure_filename(file_.filename)
-            new_name = str(entity.id) + '.' + filename.rsplit('.', 1)[1].lower()
+            new_name = str(file.id) + '.' + filename.rsplit('.', 1)[1].lower()
             full_path = os.path.join(app.config['UPLOAD_FOLDER_PATH'], new_name)
             file_.save(full_path)
-        entity.name = form.name.data
-        entity.description = form.description.data
-        entity.update()
-        entity.save_nodes(form)
-        url = url_for('file_view', id_=entity.id)
+        file.name = form.name.data
+        file.description = form.description.data
+        file.update()
+        file.save_nodes(form)
+        url = url_for('file_view', id_=file.id)
         if origin:
-            entity.link('P67', origin)
+            if origin.system_type in ['edition', 'bibliography']:
+                origin.link('P67', file)
+            else:
+                file.link('P67', origin)
             url = url_for(get_view_name(origin) + '_view', id_=origin.id) + '#tab-file'
         g.cursor.execute('COMMIT')
-        logger.log_user(entity.id, log_action)
+        logger.log_user(file.id, log_action)
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')

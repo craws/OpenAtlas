@@ -22,4 +22,12 @@ INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES ((SELECT id FROM w
 
 UPDATE model.entity SET class_code = 'E55' WHERE class_code = 'E53' and name = 'Source translation';
 
+-- Fix for possible file/reference links
+
+UPDATE model.links SET domain_id = range_id, range_id = domain_id WHERE id IN (
+    SELECT l.id FROM model.link l
+    JOIN model.entity d ON l.domain_id = d.id
+    JOIN model.entity r ON l.range_id = r.id
+    WHERE d.system_type = 'file' AND r.system_type IN ('edition', 'information carrier', 'bibliography') AND l.property_code = 'P67');
+
 COMMIT;
