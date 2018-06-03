@@ -16,7 +16,8 @@ from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (build_table_form, convert_size, display_remove_link,
                                  get_base_table_data, get_entity_data, get_file_path,
-                                 get_view_name, link, required_group, was_modified)
+                                 get_view_name, link, required_group, was_modified, is_authorized,
+                                 uc_first)
 
 
 class FileForm(Form):
@@ -73,10 +74,7 @@ def file_add(origin_id):
         g.cursor.execute('BEGIN')
         try:
             for value in request.form.getlist('values'):
-                if origin.system_type in ['edition', 'bibliography']:
-                    LinkMapper.insert(origin.id, 'P67', int(value))
-                else:
-                    LinkMapper.insert(int(value), 'P67', origin.id)
+                LinkMapper.insert(int(value), 'P67', origin.id)
             g.cursor.execute('COMMIT')
         except Exception as e:  # pragma: no cover
             g.cursor.execute('ROLLBACK')
@@ -94,10 +92,7 @@ def file_add2(id_, class_name):
     file = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
         for value in request.form.getlist('values'):
-            if class_name == 'reference':
-                LinkMapper.insert(int(value), 'P67', file)
-            else:
-                file.link('P67', int(value))
+            file.link('P67', int(value))
         return redirect(url_for('file_view', id_=file.id) + '#tab-' + class_name)
     form = build_table_form(class_name, file.get_linked_entities('P67'))
     return render_template('file/add2.html', entity=file, class_name=class_name, form=form)
@@ -114,17 +109,23 @@ def file_view(id_, unlink_id=None):
     path = get_file_path(file.id)
     tables = {'info': get_entity_data(file)}
     for name in ['source', 'event', 'actor', 'place', 'reference']:
-        tables[name] = {'id': name, 'header': app.config['TABLE_HEADERS'][name], 'data': []}
+        header = app.config['TABLE_HEADERS'][name] + (['page'] if name == 'reference' else [])
+        tables[name] = {'id': name, 'data': [], 'header': header}
     for link_ in file.get_links('P67'):
         view_name = get_view_name(link_.range)
         data = get_base_table_data(link_.range)
-        unlink_url = url_for('file_view', id_=file.id, unlink_id=link_.id) + '#tab-' + view_name
-        data.append(display_remove_link(unlink_url, link_.range.name))
+        if is_authorized('editor'):
+            unlink_url = url_for('file_view', id_=file.id, unlink_id=link_.id) + '#tab-' + view_name
+            data.append(display_remove_link(unlink_url, link_.range.name))
         tables[view_name]['data'].append(data)
     for link_ in file.get_links('P67', True):
         data = get_base_table_data(link_.domain)
-        unlink_url = url_for('file_view', id_=file.id, unlink_id=link_.id) + '#tab-reference'
-        data.append(display_remove_link(unlink_url, link_.domain.name))
+        data.append(link_.description)
+        if is_authorized('editor'):
+            update_url = url_for('reference_link_update', link_id=link_.id, origin_id=file.id)
+            data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
+            unlink_url = url_for('file_view', id_=file.id, unlink_id=link_.id) + '#tab-reference'
+            data.append(display_remove_link(unlink_url, link_.domain.name))
         tables['reference']['data'].append(data)
     return render_template(
         'file/view.html',
@@ -211,10 +212,11 @@ def save(form, file=None, origin=None):
         url = url_for('file_view', id_=file.id)
         if origin:
             if origin.system_type in ['edition', 'bibliography']:
-                origin.link('P67', file)
+                link_id = origin.link('P67', file)
+                url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
             else:
                 file.link('P67', origin)
-            url = url_for(get_view_name(origin) + '_view', id_=origin.id) + '#tab-file'
+                url = url_for(get_view_name(origin) + '_view', id_=origin.id) + '#tab-file'
         g.cursor.execute('COMMIT')
         logger.log_user(file.id, log_action)
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')

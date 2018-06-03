@@ -55,6 +55,12 @@ class AddPlaceForm(Form):
     save = SubmitField(_('insert'))
 
 
+class AddFileForm(Form):
+    file = TableField(_('file'))
+    page = StringField(_('page'))
+    save = SubmitField(_('insert'))
+
+
 @app.route('/reference/add/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('editor')
 def reference_add(origin_id):
@@ -134,9 +140,9 @@ def reference_view(id_, unlink_id=None):
         data.append(truncate_string(link_.description))
         if is_authorized('editor'):
             update_url = url_for('reference_link_update', link_id=link_.id, origin_id=reference.id)
+            data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             unlink_url = url_for(
                 'reference_view', id_=reference.id, unlink_id=link_.id) + '#tab-' + view_name
-            data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             data.append(display_remove_link(unlink_url, link_.range.name))
         tables[view_name]['data'].append(data)
     return render_template('reference/view.html', reference=reference, tables=tables)

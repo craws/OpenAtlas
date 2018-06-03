@@ -212,7 +212,10 @@ class TableSelect(HiddenInput):
         if class_ == 'place':
             entities = EntityMapper.get_by_system_type('place')
         elif class_ == 'reference':
-            entities = EntityMapper.get_by_system_type('bibliography') + EntityMapper.get_by_system_type('edition')
+            entities = EntityMapper.get_by_system_type('bibliography') + \
+                       EntityMapper.get_by_system_type('edition')
+        elif class_ == 'file':
+            entities = EntityMapper.get_by_system_type('file')
         else:
             entities = EntityMapper.get_by_codes(class_)
         for entity in entities:

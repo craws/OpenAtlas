@@ -39,7 +39,7 @@
             {{ tables['source']|pager|safe }}
         </div>
     {% else %}
-        {% for name in ['source', 'event', 'actor', 'place']: %}
+        {% for name in ['source', 'event', 'actor', 'place', 'file']: %}
             <div id="tab-{{name}}">
                 {% if 'editor'|is_authorized: %}
                     <div class="button-bar">
@@ -48,6 +48,8 @@
                             <a href="{{ url_for('place_insert', origin_id=reference.id) }}">+ {{ _('place')|uc_first }}</a>
                         {% elif name == 'source' %}
                             <a href="{{ url_for('source_insert', origin_id=reference.id) }}">+ {{ _('source')|uc_first }}</a>
+                        {% elif name == 'file' %}
+                            <a href="{{ url_for('file_insert', origin_id=reference.id) }}">+ {{ _('file')|uc_first }}</a>
                         {% else %}
                             {% for code in config['CLASS_CODES'][name]%}
                                 <a href="{{ url_for(name + '_insert', code=code, origin_id=reference.id) }}">+ {{ code|get_class_name }}</a>
@@ -59,14 +61,5 @@
             </div>
         {% endfor %}
     {% endif %}
-    <div id="tab-file">
-        {% if 'editor'|is_authorized: %}
-            <div class="button-bar">
-                <a href="{{ url_for('file_add', origin_id=reference.id)}}">{{ _('add')|uc_first }}</a>
-                <a href="{{ url_for('file_insert', origin_id=reference.id) }}">+ {{ _('file')|uc_first }}</a>
-            </div>
-        {% endif %}
-        {{ tables['file']|pager|safe }}
-    </div>
 </div>
 {% endblock %}

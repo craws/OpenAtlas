@@ -73,7 +73,7 @@
     <div id="tab-reference">
         {% if 'editor'|is_authorized: %}
             <div class="button-bar">
-                <a href="{{ url_for('file_add2', id_=entity.id, class_name='reference')}}">{{ _('add')|uc_first }}</a>
+                <a href="{{ url_for('reference_add', origin_id=entity.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='bibliography', origin_id=entity.id) }}">+ {{ _('bibliography')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='edition', origin_id=entity.id) }}">+ {{ _('edition')|uc_first }}</a>
             </div>
