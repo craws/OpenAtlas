@@ -117,7 +117,8 @@ def reference_view(id_, unlink_id=None):
         flash(_('link removed'), 'info')
     tables = {
         'info': get_entity_data(reference),
-        'file': {'id': 'files', 'data': [], 'header': app.config['TABLE_HEADERS']['file']}}
+        'file': {'id': 'files', 'data': [],
+                 'header': app.config['TABLE_HEADERS']['file'] + ['page']}}
     for name in ['source', 'event', 'actor', 'place']:
         header = app.config['TABLE_HEADERS'][name] + ['page']
         tables[name] = {'id': name, 'header': header, 'data': []}
