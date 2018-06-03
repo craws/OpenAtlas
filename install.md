@@ -24,7 +24,11 @@ Installation with examples from a Debian 9 (Stretch) system.
 
 ## Installation
 
-## Database
+### Files
+
+Copy the files to /var/www/your_sitename or clone it from GitHub
+
+### Database
 
 Important!
 A user with username "OpenAtlas" and password "change_me_PLEASE!" is created.
@@ -38,19 +42,15 @@ As postgres
     $ cd install
     $ cat structure.sql data_web.sql data_model.sql data_node.sql | psql -d openatlas -f -
 
-### Files
-
-Copy the files to /var/www/your_sitename or clone it from GitHub
-
-## Configuration
+### Configuration
 
 Copy instance/example_production.py to instance/production.py
 
     $ cp instance/example_production.py instance/production.py
 
-Add/change values as appropriate.
+Add/change values as appropriate. See config/default.py which settings are available.
 
-## Apache
+### Apache
 
 As root copy and adapt install/example_apache.conf for a new vhost, activate the site:
 
@@ -61,17 +61,17 @@ Test Apache configuration and restart
     # apache2ctl configtest
     # service apache2 restart
 
-## File Upload
+### File Upload
 
 Make the openatlas/uploads directory writeable for apache e.g.
 
-    chown www-data openatlas/uploads
+    # chown www-data openatlas/uploads
 
-## Finishing
+### Finishing
 
 Login with username "OpenAtlas" and password "change_me_PLEASE!" and change the password in profile.
 
-## Unit tests (optional)
+### Unit tests (optional)
 
 Install required packages:
 
@@ -95,5 +95,3 @@ Add/change values as appropriate.
 Use these parameters for running with coverage and HTML report:
 
     --with-coverage --cover-package openatlas --cover-html --cover-tests --cover-erase
-
-
