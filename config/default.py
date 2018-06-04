@@ -75,6 +75,9 @@ TABLE_HEADERS = {
     'actor': ['name', 'class', 'first', 'last'],
     'group': ['name', 'class', 'first', 'last'],
     'place': ['name', 'type', 'first', 'last'],
+    'feature': ['name', 'type', 'first', 'last'],
+    'stratigraphic-unit': ['name', 'type', 'first', 'last'],
+    'find': ['name', 'type', 'first', 'last'],
     'reference': ['name', 'class', 'type'],
     'file': ['name', 'license', 'size', 'extension', 'description']}
 

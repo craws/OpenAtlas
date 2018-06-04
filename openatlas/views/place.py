@@ -58,14 +58,14 @@ def place_insert(origin_id=None):
     elif origin and origin.system_type == 'feature':
         title = 'stratigraphic unit'
         form = build_form(FeatureForm, 'Stratigraphic Unit')
-    elif origin and origin.system_type == 'stratigraphic_unit':
+    elif origin and origin.system_type == 'stratigraphic unit':
         title = 'find'
         form = build_form(FeatureForm, 'Find')
     else:
         title = 'place'
         form = build_form(PlaceForm, 'Place')
     if origin \
-            and origin.system_type not in ['place', 'feature', 'stratigraphic_unit'] \
+            and origin.system_type not in ['place', 'feature', 'stratigraphic unit'] \
             and hasattr(form, 'insert_and_continue'):
         del form.insert_and_continue
     if form.validate_on_submit():
@@ -75,7 +75,7 @@ def place_insert(origin_id=None):
     gis_data = GisMapper.get_all()
     place = None
     feature = None
-    if origin and origin.system_type == 'stratigraphic_unit':
+    if origin and origin.system_type == 'stratigraphic unit':
         feature = origin.get_linked_entity('P46', True)
         place = feature.get_linked_entity('P46', True)
     elif origin and origin.system_type == 'feature':
@@ -109,10 +109,10 @@ def place_view(id_, unlink_id=None):
         tables['feature'] = {'id': 'feature', 'data': [],
                              'header': app.config['TABLE_HEADERS']['place'] + [_('description')]}
     if object_.system_type == 'feature':
-        tables['stratigraphic_unit'] = {
+        tables['stratigraphic-unit'] = {
             'id': 'stratigraphic', 'data': [], 'header':
             app.config['TABLE_HEADERS']['place'] + [_('description')]}
-    if object_.system_type == 'stratigraphic_unit':
+    if object_.system_type == 'stratigraphic unit':
         tables['find'] = {'id': 'find', 'data': [],
                           'header': app.config['TABLE_HEADERS']['place'] + [_('description')]}
     for link_ in object_.get_links('P67', True):
@@ -134,7 +134,7 @@ def place_view(id_, unlink_id=None):
         has_subunits = True
         data = get_base_table_data(entity)
         data.append(truncate_string(entity.description))
-        tables[entity.system_type]['data'].append(data)
+        tables[entity.system_type.replace(' ', '-')]['data'].append(data)
     for link_ in location.get_links(['P74', 'OA8', 'OA9'], True):
         actor = EntityMapper.get_by_id(link_.domain.id)
         tables['actor']['data'].append([
@@ -153,7 +153,7 @@ def place_view(id_, unlink_id=None):
         stratigraphic_unit = object_.get_linked_entity('P46', True)
         feature = stratigraphic_unit.get_linked_entity('P46', True)
         place = feature.get_linked_entity('P46', True)
-    elif object_.system_type == 'stratigraphic_unit':
+    elif object_.system_type == 'stratigraphic unit':
         feature = object_.get_linked_entity('P46', True)
         place = feature.get_linked_entity('P46', True)
     elif object_.system_type == 'feature':
@@ -196,7 +196,7 @@ def place_update(id_):
     location = object_.get_linked_entity('P53')
     if object_.system_type == 'feature':
         form = build_form(FeatureForm, 'Feature', object_, request, location)
-    elif object_.system_type == 'stratigraphic_unit':
+    elif object_.system_type == 'stratigraphic unit':
         form = build_form(FeatureForm, 'Stratigraphic Unit', object_, request, location)
     elif object_.system_type == 'find':
         form = build_form(FeatureForm, 'Find', object_, request, location)
@@ -223,7 +223,7 @@ def place_update(id_):
         stratigraphic_unit = object_.get_linked_entity('P46', True)
         feature = stratigraphic_unit.get_linked_entity('P46', True)
         place = feature.get_linked_entity('P46', True)
-    if object_.system_type == 'stratigraphic_unit':
+    if object_.system_type == 'stratigraphic unit':
         feature = object_.get_linked_entity('P46', True)
         place = feature.get_linked_entity('P46', True)
     elif object_.system_type == 'feature':
@@ -242,14 +242,14 @@ def save(form, object_=None, location=None, origin=None):
             GisMapper.delete_by_entity(location)
         else:
             log_action = 'insert'
-            if origin and origin.system_type == 'stratigraphic_unit':
+            if origin and origin.system_type == 'stratigraphic unit':
                 object_ = EntityMapper.insert('E22', form.name.data, 'find')
             else:
                 system_type = 'place'
                 if origin and origin.system_type == 'place':
                     system_type = 'feature'
                 elif origin and origin.system_type == 'feature':
-                    system_type = 'stratigraphic_unit'
+                    system_type = 'stratigraphic unit'
                 object_ = EntityMapper.insert('E18', form.name.data, system_type)
             location = EntityMapper.insert('E53', 'Location of ' + form.name.data, 'place location')
             object_.link('P53', location)
@@ -271,7 +271,7 @@ def save(form, object_=None, location=None, origin=None):
             if get_view_name(origin) == 'reference':
                 link_id = origin.link('P67', object_)
                 url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
-            elif origin.system_type in ['place', 'feature', 'stratigraphic_unit']:
+            elif origin.system_type in ['place', 'feature', 'stratigraphic unit']:
                 url = url_for('place_view', id_=object_.id)
                 origin.link('P46', object_)
             else:

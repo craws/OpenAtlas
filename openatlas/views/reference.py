@@ -125,7 +125,7 @@ def reference_view(id_, unlink_id=None):
         'info': get_entity_data(reference),
         'file': {'id': 'files', 'data': [],
                  'header': app.config['TABLE_HEADERS']['file'] + ['page']}}
-    for name in ['source', 'event', 'actor', 'place']:
+    for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find']:
         header = app.config['TABLE_HEADERS'][name] + ['page']
         tables[name] = {'id': name, 'header': header, 'data': []}
     for link_ in reference.get_links('P67', True):
@@ -136,6 +136,10 @@ def reference_view(id_, unlink_id=None):
         tables['file']['data'].append(data)
     for link_ in reference.get_links(['P67', 'P128']):
         view_name = get_view_name(link_.range)
+        table_name = view_name
+        if view_name == 'place':
+            print(link_.range.system_type)
+            table_name = link_.range.system_type.replace(' ', '-')
         data = get_base_table_data(link_.range)
         data.append(truncate_string(link_.description))
         if is_authorized('editor'):
@@ -144,7 +148,7 @@ def reference_view(id_, unlink_id=None):
             unlink_url = url_for(
                 'reference_view', id_=reference.id, unlink_id=link_.id) + '#tab-' + view_name
             data.append(display_remove_link(unlink_url, link_.range.name))
-        tables[view_name]['data'].append(data)
+        tables[table_name]['data'].append(data)
     return render_template('reference/view.html', reference=reference, tables=tables)
 
 

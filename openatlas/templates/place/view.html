@@ -25,8 +25,8 @@
         {% if object_.system_type == 'place' %}
             <li><a href="#tab-feature">{{ _('feature')|uc_first }}  ({{ tables['feature']['data']|length }})</a></li>
         {% elif object_.system_type == 'feature' %}
-            <li><a href="#tab-stratigraphic_unit">{{ _('stratigraphic unit')|uc_first }}  ({{ tables['stratigraphic_unit']['data']|length }})</a></li>
-        {% elif object_.system_type == 'stratigraphic_unit' %}
+            <li><a href="#tab-stratigraphic-unit">{{ _('stratigraphic unit')|uc_first }}  ({{ tables['stratigraphic-unit']['data']|length }})</a></li>
+        {% elif object_.system_type == 'stratigraphic unit' %}
             <li><a href="#tab-find">{{ _('find')|uc_first }}  ({{ tables['find']['data']|length }})</a></li>
         {% endif %}
     </ul>
@@ -102,13 +102,13 @@
             {{ tables['feature']|pager|safe }}
         </div>
     {% elif object_.system_type == 'feature' %}
-        <div id="tab-stratigraphic_unit">
+        <div id="tab-stratigraphic-unit">
             <div class="button-bar">
-                <a href="{{ url_for('place_insert', origin_id=object_.id)}}">+ {{ _('stratigraphic unit')|uc_first }}</a>
+                <a href="{{ url_for('place_insert', origin_id=object_.id)}}">+ {{ _('stratigraphic-unit')|uc_first }}</a>
             </div>
-            {{ tables['stratigraphic_unit']|pager|safe }}
+            {{ tables['stratigraphic-unit']|pager|safe }}
         </div>
-    {% elif object_.system_type == 'stratigraphic_unit' %}
+    {% elif object_.system_type == 'stratigraphic unit' %}
         <div id="tab-find">
             <div class="button-bar">
                 <a href="{{ url_for('place_insert', origin_id=object_.id)}}">+ {{ _('find')|uc_first }}</a>

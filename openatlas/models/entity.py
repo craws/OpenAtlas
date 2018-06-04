@@ -77,7 +77,7 @@ class Entity:
             root_name = 'License'
         elif view_name == 'place':
             root_name = uc_first(self.system_type)
-            if self.system_type == 'stratigraphic_unit':
+            if self.system_type == 'stratigraphic unit':
                 root_name = 'Stratigraphic Unit'
         root_id = NodeMapper.get_hierarchy_by_name(root_name).id
         for node in self.nodes:

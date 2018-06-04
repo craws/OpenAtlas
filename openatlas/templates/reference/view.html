@@ -12,6 +12,11 @@
             <li><a href="#tab-event">{{ _('event')|uc_first }} ({{ tables['event']['data']|length }})</a></li>
             <li><a href="#tab-actor">{{ _('actor')|uc_first }} ({{ tables['actor']['data']|length }})</a></li>
             <li><a href="#tab-place">{{ _('place')|uc_first }} ({{ tables['place']['data']|length }})</a></li>
+            {% for table_name in ['feature', 'stratigraphic-unit', 'find'] %}
+                {% if tables[table_name]['data']|length > 0 %}
+                    <li><a href="#tab-{{ table_name }}">{{ _(table_name)|uc_first }} ({{ tables[table_name]['data']|length }})</a></li>
+                {% endif %}
+            {% endfor %}
         {% endif %}
         <li><a href="#tab-file">{{ _('files')|uc_first }}  ({{ tables['file']['data']|length }})</a></li>
     </ul>
@@ -39,26 +44,28 @@
             {{ tables['source']|pager|safe }}
         </div>
     {% else %}
-        {% for name in ['source', 'event', 'actor', 'place', 'file']: %}
-            <div id="tab-{{name}}">
-                {% if 'editor'|is_authorized: %}
-                    <div class="button-bar">
-                        <a href="{{ url_for('reference_add2', reference_id=reference.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
-                        {% if name == 'place' %}
-                            <a href="{{ url_for('place_insert', origin_id=reference.id) }}">+ {{ _('place')|uc_first }}</a>
-                        {% elif name == 'source' %}
-                            <a href="{{ url_for('source_insert', origin_id=reference.id) }}">+ {{ _('source')|uc_first }}</a>
-                        {% elif name == 'file' %}
-                            <a href="{{ url_for('file_insert', origin_id=reference.id) }}">+ {{ _('file')|uc_first }}</a>
-                        {% else %}
-                            {% for code in config['CLASS_CODES'][name]%}
-                                <a href="{{ url_for(name + '_insert', code=code, origin_id=reference.id) }}">+ {{ code|get_class_name }}</a>
-                            {% endfor %}
-                        {% endif %}
-                    </div>
-                {% endif %}
-                {{ tables[name]|pager|safe }}
-            </div>
+        {% for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find', 'file']: %}
+            {% if name not in ['feature', 'stratigraphic-unit', 'find'] or tables[name]['data']|length > 0 %}
+                <div id="tab-{{name}}">
+                    {% if 'editor'|is_authorized: %}
+                        <div class="button-bar">
+                            <a href="{{ url_for('reference_add2', reference_id=reference.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
+                            {% if name == 'place' %}
+                                <a href="{{ url_for('place_insert', origin_id=reference.id) }}">+ {{ _('place')|uc_first }}</a>
+                            {% elif name == 'source' %}
+                                <a href="{{ url_for('source_insert', origin_id=reference.id) }}">+ {{ _('source')|uc_first }}</a>
+                            {% elif name == 'file' %}
+                                <a href="{{ url_for('file_insert', origin_id=reference.id) }}">+ {{ _('file')|uc_first }}</a>
+                            {% else %}
+                                {% for code in config['CLASS_CODES'][name]%}
+                                    <a href="{{ url_for(name + '_insert', code=code, origin_id=reference.id) }}">+ {{ code|get_class_name }}</a>
+                                {% endfor %}
+                            {% endif %}
+                        </div>
+                    {% endif %}
+                    {{ tables[name]|pager|safe }}
+                </div>
+            {% endif %}
         {% endfor %}
     {% endif %}
 </div>
