@@ -3,7 +3,7 @@
     {{ _('event')|uc_first }}
 {% endblock %}
 {% block content %}
-    {% if 'editor'|is_authorized: %}
+    {% if 'editor'|is_authorized %}
         <div class="button-bar">
             {% for code in config['CLASS_CODES']['event'] %}
                 <a href="{{ url_for('event_insert', code=code) }}">+ {{ code|get_class_name }}</a>

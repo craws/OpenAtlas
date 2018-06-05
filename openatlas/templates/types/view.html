@@ -21,7 +21,7 @@
         {% endif %}
     </ul>
     <div id="tab-info">
-        {% if 'editor'|is_authorized and node.root: %}
+        {% if 'editor'|is_authorized and node.root %}
             <div class="button-bar">
                 <a href="{{ url_for('node_update', id_=node.id) }}">{{ _('edit')|uc_first }}</a>
                 {% if not node.system and node.count < 1 and not node.subs %}

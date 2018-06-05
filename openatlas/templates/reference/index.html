@@ -3,7 +3,7 @@
     {{ _('reference')|uc_first }}
 {% endblock %}
 {% block content %}
-    {% if 'editor'|is_authorized: %}
+    {% if 'editor'|is_authorized %}
         <div class="button-bar">
             <a href="{{ url_for('reference_insert', code='bibliography') }}">+ {{ _('bibliography')|uc_first }}</a>
             <a href="{{ url_for('reference_insert', code='edition') }}">+ {{ _('edition')|uc_first }}</a>

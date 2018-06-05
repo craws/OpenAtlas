@@ -4,7 +4,7 @@
 {% endblock %}
 {% block content %}
     <div style="float:left;">
-        {% if 'editor'|is_authorized: %}
+        {% if 'editor'|is_authorized %}
             <div class="button-bar">
                 <a href="{{ url_for('place_insert') }}">+ {{ _('place')|uc_first }}</a>
             </div>

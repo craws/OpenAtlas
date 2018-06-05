@@ -9,11 +9,11 @@
     </div>
     <div id="tabs" class="tabs-container">
         <ul>
-            {% for group in groups: %}
+            {% for group in groups %}
                 <li><a href="#tab-{{ group }}">{{ group|uc_first }}</a></li>
             {% endfor %}
         </ul>
-        {% for group, items in groups.items(): %}
+        {% for group, items in groups.items() %}
             <div id="tab-{{ group }}">
                 <div class="data-table">
                     {% for name, value in items.items() %}

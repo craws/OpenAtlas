@@ -23,7 +23,7 @@
     <div id="tab-info">
         <div class="button-bar">
             {{ actor|page_buttons|safe }}
-            {% if 'editor'|is_authorized: %}
+            {% if 'editor'|is_authorized %}
                 <a href="{{ url_for('actor_update', id_=actor.id) }}">{{ _('edit')|uc_first }}</a>
                 {{ actor|display_delete_link|safe }}
             {% endif %}
@@ -34,7 +34,7 @@
         {{ actor|description|safe }}
     </div>
     <div id="tab-source">
-        {% if 'editor'|is_authorized: %}
+        {% if 'editor'|is_authorized %}
             <div class="button-bar">
                 <a href="{{ url_for('source_add', origin_id=actor.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('source_insert', origin_id=actor.id) }}">+ {{ _('source')|uc_first }}</a>
@@ -43,7 +43,7 @@
         {{ tables['source']|pager|safe }}
     </div>
     <div id="tab-event">
-        {% if 'editor'|is_authorized: %}
+        {% if 'editor'|is_authorized %}
             <div class="button-bar">
                 <a href="{{ url_for('involvement_insert', origin_id=actor.id)}}">{{ _('add')|uc_first }}</a>
                 {% for code in config['CLASS_CODES']['event'] %}
@@ -54,7 +54,7 @@
         {{ tables['event']|pager|safe }}
     </div>
     <div id="tab-relation">
-        {% if 'editor'|is_authorized: %}
+        {% if 'editor'|is_authorized %}
             <div class="button-bar">
                 <a href="{{ url_for('relation_insert', origin_id=actor.id)}}">{{ _('add')|uc_first }}</a>
                 {% for code in config['CLASS_CODES']['actor'] %}
@@ -65,7 +65,7 @@
         {{ tables['relation']|pager|safe }}
     </div>
     <div id="tab-member-of">
-        {% if 'editor'|is_authorized: %}
+        {% if 'editor'|is_authorized %}
             <div class="button-bar">
                 <a href="{{ url_for('membership_insert', origin_id=actor.id)}}">{{ _('add')|uc_first }}</a>
             </div>
@@ -74,7 +74,7 @@
     </div>
     {% if tables['member'] %}
         <div id="tab-member">
-            {% if 'editor'|is_authorized: %}
+            {% if 'editor'|is_authorized %}
                 <div class="button-bar">
                     <a href="{{ url_for('member_insert', origin_id=actor.id)}}">{{ _('add')|uc_first }}</a>
                 </div>
@@ -83,7 +83,7 @@
         </div>
     {% endif %}
     <div id="tab-reference">
-        {% if 'editor'|is_authorized: %}
+        {% if 'editor'|is_authorized %}
             <div class="button-bar">
                 <a href="{{ url_for('reference_add', origin_id=actor.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='bibliography', origin_id=actor.id) }}">+ {{ _('bibliography')|uc_first }}</a>
@@ -93,7 +93,7 @@
         {{ tables['reference']|pager|safe }}
     </div>
     <div id="tab-file">
-        {% if 'editor'|is_authorized: %}
+        {% if 'editor'|is_authorized %}
             <div class="button-bar">
                 <a href="{{ url_for('file_add', origin_id=actor.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('file_insert', origin_id=actor.id) }}">+ {{ _('file')|uc_first }}</a>

@@ -28,7 +28,7 @@
             {{ data|data_table|safe }}
             <input type="submit" value="{{ _('test')|uc_first }}" />
         </form>
-        {% if test_result: %}
+        {% if test_result %}
             <p style="margin-top:1em;">
                 {{ _('result for')|uc_first }}
                 {{ test_result['domain']|link|safe }} >
@@ -52,7 +52,7 @@
                     {{ test_result['property']|link|safe }}
                 </p>
             {% endif %}
-            {% if test_result['domain_whitelisted']: %}
+            {% if test_result['domain_whitelisted'] %}
                 <p>
                     {{ test_result['domain']|link|safe }} {{ _('no check because whitelisted') }}
                 </p>

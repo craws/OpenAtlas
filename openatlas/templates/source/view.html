@@ -22,7 +22,7 @@
     <div id="tab-info">
         <div class="button-bar">
             {{ source|page_buttons|safe }}
-            {% if 'editor'|is_authorized: %}
+            {% if 'editor'|is_authorized %}
                 <a href="{{ url_for('source_update', id_=source.id) }}">{{ _('edit')|uc_first }}</a>
                 {{ source|display_delete_link|safe }}
             {% endif %}
@@ -34,7 +34,7 @@
     </div>
     {% for name in ['event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find'] %}
         <div id="tab-{{ name }}">
-            {% if 'editor'|is_authorized and name not in ['feature', 'stratigraphic-unit', 'find']: %}
+            {% if 'editor'|is_authorized and name not in ['feature', 'stratigraphic-unit', 'find'] %}
                 <div class="button-bar">
                     <a href="{{ url_for('source_add2', id_=source.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
                     {% if name == 'place' %}
@@ -50,7 +50,7 @@
         </div>
     {% endfor %}
     <div id="tab-reference">
-        {% if 'editor'|is_authorized: %}
+        {% if 'editor'|is_authorized %}
             <div class="button-bar">
                 <a href="{{ url_for('reference_add', origin_id=source.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='bibliography', origin_id=source.id) }}">+ {{ _('bibliography')|uc_first }}</a>
@@ -60,7 +60,7 @@
         {{ tables['reference']|pager|safe }}
     </div>
     <div id="tab-text">
-        {% if 'editor'|is_authorized: %}
+        {% if 'editor'|is_authorized %}
             <div class="button-bar">
                 <a href="{{ url_for('translation_insert', source_id=source.id) }}">+ {{ _('text')|uc_first }}</a>
             </div>
@@ -68,7 +68,7 @@
         {{ tables['text']|pager|safe }}
     </div>
     <div id="tab-file">
-        {% if 'editor'|is_authorized: %}
+        {% if 'editor'|is_authorized %}
             <div class="button-bar">
                 <a href="{{ url_for('file_add', origin_id=source.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('file_insert', origin_id=source.id) }}">+ {{ _('file')|uc_first }}</a>

@@ -6,7 +6,7 @@
 {% endblock %}
 {% block content %}
 <div class="button-bar">
-    {% if 'editor'|is_authorized: %}
+    {% if 'editor'|is_authorized %}
         <a href="{{ url_for('translation_update', id_=translation.id) }}">
             {{ _('edit')|uc_first }}
         </a>

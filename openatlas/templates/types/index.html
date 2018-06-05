@@ -14,7 +14,7 @@
             <div id="menu-tab-{{ type_ }}" style="padding: 0;" class="tab-content">
                 <div id="tabs-{{ type_ }}" class="tabs-container">
                     <ul>
-                        {% for node, tree in nodes[type_].items(): %}
+                        {% for node, tree in nodes[type_].items() %}
                             <li><a href="#tab-{{ node.id }}">{{ node.name }}</a></li>
                         {% endfor %}
                         {% if type_ in ['custom', 'value'] and 'manager'|is_authorized %}
@@ -23,7 +23,7 @@
                             </a>
                         {% endif %}
                     </ul>
-                    {% for node, tree in nodes[type_].items(): %}
+                    {% for node, tree in nodes[type_].items() %}
                         <div id="tab-{{ node.id }}">
                             <p><strong>{{ node.name }}</strong></p>
                             <div style="float:left;margin-right:3em;">
@@ -50,16 +50,16 @@
                                 {{ tree|safe }}
                             </div>
                             <div style="float:left;">
-                                {% if not node.value_type: %}
+                                {% if not node.value_type %}
                                     <p>
                                         <strong>{{ _('selection'|uc_first) }}</strong>:
                                         {{ _('multiple') if node.multiple else _('single') }}
                                     </p>
                                 {% endif %}
-                                {% if node.forms: %}
+                                {% if node.forms %}
                                     <p style="margin-top:0;">
                                         <strong>{{ _('forms')|uc_first }}</strong>:
-                                        {% for id, form in node.forms.items(): %}
+                                        {% for id, form in node.forms.items() %}
                                             {{ form['name'] }}{{ "," if not loop.last }}
                                         {% endfor %}
                                     </p>

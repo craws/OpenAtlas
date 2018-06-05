@@ -13,14 +13,14 @@
             https://redmine.craws.net
         </a>
     </p>
-    {% if session['settings']['mail_recipients_feedback'][0]: %}
+    {% if session['settings']['mail_recipients_feedback'][0] %}
         <p>
             - {{ _('feedback mail') }}
             <a href="mailto:{{ session['settings']['mail_recipients_feedback'][0] }}">
                 {{ session['settings']['mail_recipients_feedback'][0] }}
             </a>
         </p>
-        {% if session['settings']['mail'] and session['settings']['mail_recipients_feedback']: %}
+        {% if session['settings']['mail'] and session['settings']['mail_recipients_feedback'] %}
             <p>- {{ _('feedback_form') }}:</p>
             {{ form|display_form('feedback-form')|safe }}
         {% endif %}
