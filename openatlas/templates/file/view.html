@@ -11,6 +11,11 @@
         <li><a href="#tab-event">{{ _('event')|uc_first }} ({{ tables['event']['data']|length }})</a></li>
         <li><a href="#tab-actor">{{ _('actor')|uc_first }} ({{ tables['actor']['data']|length }})</a></li>
         <li><a href="#tab-place">{{ _('place')|uc_first }} ({{ tables['place']['data']|length }})</a></li>
+        {% for table_name in ['feature', 'stratigraphic-unit', 'find'] %}
+            {% if tables[table_name]['data']|length > 0 %}
+                <li><a href="#tab-{{ table_name }}">{{ _(table_name)|uc_first }} ({{ tables[table_name]['data']|length }})</a></li>
+            {% endif %}
+        {% endfor %}
         <li><a href="#tab-reference">{{ _('reference')|uc_first }} ({{ tables['reference']['data']|length }})</a></li>
     </ul>
     <div id="tab-info">
@@ -53,22 +58,24 @@
         {% endif %}
         {{ tables['source']|pager|safe }}
     </div>
-    {% for name in ['event', 'actor', 'place']: %}
-        <div id="tab-{{name}}">
-            {% if 'editor'|is_authorized: %}
-                <div class="button-bar">
-                    <a href="{{ url_for('file_add2', id_=entity.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
-                    {% if name == 'place' %}
-                        <a href="{{ url_for('place_insert', origin_id=entity.id) }}">+ {{ _('place')|uc_first }}</a>
-                    {% else %}
-                        {% for code in config['CLASS_CODES'][name]%}
-                            <a href="{{ url_for(name + '_insert', code=code, origin_id=entity.id) }}">+ {{ code|get_class_name }}</a>
-                        {% endfor %}
-                    {% endif %}
-                </div>
-            {% endif %}
-            {{ tables[name]|pager|safe }}
-        </div>
+    {% for name in ['event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find'] %}
+        {% if name not in ['feature', 'stratigraphic-unit', 'find'] or tables[name]['data']|length > 0 %}
+            <div id="tab-{{name}}">
+                {% if 'editor'|is_authorized and name not in ['feature', 'stratigraphic-unit', 'find'] %}
+                    <div class="button-bar">
+                        <a href="{{ url_for('file_add2', id_=entity.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
+                        {% if name == 'place' %}
+                            <a href="{{ url_for('place_insert', origin_id=entity.id) }}">+ {{ _('place')|uc_first }}</a>
+                        {% else %}
+                            {% for code in config['CLASS_CODES'][name]%}
+                                <a href="{{ url_for(name + '_insert', code=code, origin_id=entity.id) }}">+ {{ code|get_class_name }}</a>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endif %}
+                {{ tables[name]|pager|safe }}
+            </div>
+        {% endif %}
     {% endfor %}
     <div id="tab-reference">
         {% if 'editor'|is_authorized: %}

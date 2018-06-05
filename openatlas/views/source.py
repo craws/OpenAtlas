@@ -67,15 +67,19 @@ def source_view(id_, unlink_id=None):
             link(text),
             next(iter(text.nodes)).name if text.nodes else '',
             truncate_string(text.description)])
-    for name in ['event', 'place', 'actor']:
+    for name in ['actor', 'event', 'place', 'feature', 'stratigraphic-unit', 'find']:
         tables[name] = {'id': name, 'header': app.config['TABLE_HEADERS'][name], 'data': []}
     for link_ in source.get_links('P67'):
         data = get_base_table_data(link_.range)
         view_name = get_view_name(link_.range)
+        table_name = view_name
+        if view_name == 'place':
+            table_name = link_.range.system_type.replace(' ', '-')
         if is_authorized('editor'):
-            unlink = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-' + view_name
+            unlink = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-' + \
+                     table_name
             data.append(display_remove_link(unlink, link_.range.name))
-        tables[view_name]['data'].append(data)
+        tables[table_name]['data'].append(data)
     for link_ in source.get_links(['P67', 'P128'], True):
         data = get_base_table_data(link_.domain)
         view_name = get_view_name(link_.domain)

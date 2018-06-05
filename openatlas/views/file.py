@@ -108,16 +108,20 @@ def file_view(id_, unlink_id=None):
         flash(_('link removed'), 'info')
     path = get_file_path(file.id)
     tables = {'info': get_entity_data(file)}
-    for name in ['source', 'event', 'actor', 'place', 'reference']:
+    for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find',
+                 'reference']:
         header = app.config['TABLE_HEADERS'][name] + (['page'] if name == 'reference' else [])
         tables[name] = {'id': name, 'data': [], 'header': header}
     for link_ in file.get_links('P67'):
         view_name = get_view_name(link_.range)
+        table_name = view_name
+        if view_name == 'place':
+            table_name = link_.range.system_type.replace(' ', '-')
         data = get_base_table_data(link_.range)
         if is_authorized('editor'):
-            unlink_url = url_for('file_view', id_=file.id, unlink_id=link_.id) + '#tab-' + view_name
+            unlink_url = url_for('file_view', id_=file.id, unlink_id=link_.id) + '#tab-' + table_name
             data.append(display_remove_link(unlink_url, link_.range.name))
-        tables[view_name]['data'].append(data)
+        tables[table_name]['data'].append(data)
     for link_ in file.get_links('P67', True):
         data = get_base_table_data(link_.domain)
         data.append(link_.description)

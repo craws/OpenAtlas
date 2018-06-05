@@ -138,7 +138,6 @@ def reference_view(id_, unlink_id=None):
         view_name = get_view_name(link_.range)
         table_name = view_name
         if view_name == 'place':
-            print(link_.range.system_type)
             table_name = link_.range.system_type.replace(' ', '-')
         data = get_base_table_data(link_.range)
         data.append(truncate_string(link_.description))
@@ -146,7 +145,7 @@ def reference_view(id_, unlink_id=None):
             update_url = url_for('reference_link_update', link_id=link_.id, origin_id=reference.id)
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             unlink_url = url_for(
-                'reference_view', id_=reference.id, unlink_id=link_.id) + '#tab-' + view_name
+                'reference_view', id_=reference.id, unlink_id=link_.id) + '#tab-' + table_name
             data.append(display_remove_link(unlink_url, link_.range.name))
         tables[table_name]['data'].append(data)
     return render_template('reference/view.html', reference=reference, tables=tables)

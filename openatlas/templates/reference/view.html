@@ -47,7 +47,7 @@
         {% for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find', 'file']: %}
             {% if name not in ['feature', 'stratigraphic-unit', 'find'] or tables[name]['data']|length > 0 %}
                 <div id="tab-{{name}}">
-                    {% if 'editor'|is_authorized: %}
+                    {% if 'editor'|is_authorized and name not in ['feature', 'stratigraphic-unit', 'find']: %}
                         <div class="button-bar">
                             <a href="{{ url_for('reference_add2', reference_id=reference.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
                             {% if name == 'place' %}
