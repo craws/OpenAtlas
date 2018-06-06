@@ -18,6 +18,10 @@ INSERT INTO model.link (property_code, range_id, domain_id) VALUES
 INSERT INTO web.hierarchy (id, name, value_type) VALUES ((SELECT id FROM model.entity WHERE name='Dimensions'), 'Dimensions', True);
 INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES ((SELECT id FROM web.hierarchy WHERE name LIKE 'Dimensions'),(SELECT id FROM web.form WHERE name LIKE 'Find'));
 
+-- Remove invalid links from information carrier
+DELETE FROM model.link WHERE id in (
+    SELECT l.id FROM model.link l JOIN model.entity e ON l.domain_id = e.id AND e.class_code = 'E84' AND l.property_code = 'P67');
+
 -- Fix inconsistent system type spelling
 
 UPDATE model.entity SET system_type = 'stratigraphic unit' WHERE system_type = 'stratigraphic_unit';
@@ -26,7 +30,7 @@ UPDATE model.entity SET system_type = 'stratigraphic unit' WHERE system_type = '
 
 UPDATE model.entity SET class_code = 'E55' WHERE class_code = 'E53' and name = 'Source translation';
 
--- Fix for possible file/reference links
+-- Fix for possible invalid file/reference links
 
 UPDATE model.link SET domain_id = range_id, range_id = domain_id WHERE id IN (
     SELECT l.id FROM model.link l

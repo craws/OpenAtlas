@@ -4,6 +4,10 @@ Before executing SQL statements backup the database. Replace database role "open
 
 ### 3.5.0 to 3.6.0
 
+Due to a bug it was possible to link information carriers to event, actor and place. These links are
+invalid and will be removed with the 3.6.0.sql update. You should check the information carriers for
+those invalid links which will be deleted before executing the SQL.
+
 Execute install/upgrade/3.6.0.sql after making backups
 
 ### 3.4.x to 3.5.0
