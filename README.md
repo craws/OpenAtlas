@@ -10,7 +10,7 @@ Wiki and issue tracker: https://redmine.craws.net/projects/uni/wiki
 
 Features: https://redmine.craws.net/projects/uni/wiki/Features
 
-GitHub: https://github.com/craws/OpenAtlas-Python
+Bitbucket: https://bitbucket.org/openatlas/openatlas
 
 # Installation
 

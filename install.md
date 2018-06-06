@@ -26,7 +26,7 @@ Installation with examples from a Debian 9 (Stretch) system.
 
 ### Files
 
-Copy the files to /var/www/your_sitename or clone it from GitHub
+Copy the files to /var/www/your_sitename or clone it from Bitbucket
 
 ### Database
 
