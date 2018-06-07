@@ -114,14 +114,12 @@ def file_view(id_, unlink_id=None):
         tables[name] = {'id': name, 'data': [], 'header': header}
     for link_ in file.get_links('P67'):
         view_name = get_view_name(link_.range)
-        table_name = view_name
-        if view_name == 'place':
-            table_name = link_.range.system_type.replace(' ', '-')
+        view_name = view_name if view_name != 'place' else link_.range.system_type.replace(' ', '-')
         data = get_base_table_data(link_.range)
         if is_authorized('editor'):
-            unlink_url = url_for('file_view', id_=file.id, unlink_id=link_.id) + '#tab-' + table_name
+            unlink_url = url_for('file_view', id_=file.id, unlink_id=link_.id) + '#tab-' + view_name
             data.append(display_remove_link(unlink_url, link_.range.name))
-        tables[table_name]['data'].append(data)
+        tables[view_name]['data'].append(data)
     for link_ in file.get_links('P67', True):
         data = get_base_table_data(link_.domain)
         data.append(link_.description)

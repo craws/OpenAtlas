@@ -89,7 +89,7 @@ class Entity:
         """ Returns name part of a directed type e.g. Actor Actor Relation: Parent of (Child of)"""
         from openatlas.util.util import sanitize
         name_parts = self.name.split(' (')
-        if inverse and len(name_parts) > 1:
+        if inverse and len(name_parts) > 1:  # pragma: no cover
             return sanitize(name_parts[1], 'node')
         return name_parts[0]
 
