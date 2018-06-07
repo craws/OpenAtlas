@@ -6,11 +6,9 @@ Website: http://openatlas.eu/website
 
 Demo: https://openatlas.craws.net
 
-Wiki and issue tracker: https://redmine.craws.net/projects/uni/wiki
+Documentation: [Wiki](https://redmine.craws.net/projects/uni/wiki),  [Issues](https://redmine.craws.net/projects/uni/issues), [Features]((https://redmine.craws.net/projects/uni/wiki/Features))
 
-Features: https://redmine.craws.net/projects/uni/wiki/Features
-
-Bitbucket: https://bitbucket.org/openatlas/openatlas
+Code: [Bitucket](https://bitbucket.org/openatlas/openatlas) or [GitHub](https://github.com/craws/OpenAtlas)
 
 # Installation
 
