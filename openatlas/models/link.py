@@ -53,12 +53,9 @@ class LinkMapper:
             domain_class = g.classes[domain.class_.code]
             range_class = g.classes[range_.class_.code]
             property_ = g.properties[property_code]
-            ignore = app.config['WHITELISTED_DOMAINS']
             domain_error = True
             range_error = True
             if property_.find_object('domain_class_code', domain_class.code):
-                domain_error = False
-            if domain_class.code in ignore:
                 domain_error = False
             if property_.find_object('range_class_code', range_class.code):
                 range_error = False
@@ -203,9 +200,8 @@ class LinkMapper:
             property_ = g.properties[row.property]
             domain_is_valid = property_.find_object('domain_class_code', row.domain)
             range_is_valid = property_.find_object('range_class_code', row.range)
-            ignore = app.config['WHITELISTED_DOMAINS']
             invalid_linking = []
-            if row.domain not in ignore and (not domain_is_valid or not range_is_valid):
+            if not domain_is_valid or not range_is_valid:
                 invalid_linking.append({
                     'property': row.property,
                     'domain': row.domain,

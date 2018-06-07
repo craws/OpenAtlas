@@ -33,21 +33,23 @@
         {{ source|description|safe }}
     </div>
     {% for name in ['event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find'] %}
-        <div id="tab-{{ name }}">
-            {% if 'editor'|is_authorized and name not in ['feature', 'stratigraphic-unit', 'find'] %}
-                <div class="button-bar">
-                    <a href="{{ url_for('source_add2', id_=source.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
-                    {% if name == 'place' %}
-                        <a href="{{ url_for('place_insert', origin_id=source.id) }}">+ {{ _('place')|uc_first }}</a>
-                    {% else %}
-                        {% for code in config['CLASS_CODES'][name]%}
-                            <a href="{{ url_for(name + '_insert', code=code, origin_id=source.id) }}">+ {{ code|get_class_name }}</a>
-                        {% endfor %}
-                    {% endif %}
-                </div>
-            {% endif %}
-            {{ tables[name]|pager|safe }}
-        </div>
+        {% if name not in ['feature', 'stratigraphic-unit', 'find'] or tables[name]['data']|length > 0 %}
+            <div id="tab-{{ name }}">
+                {% if 'editor'|is_authorized and name not in ['feature', 'stratigraphic-unit', 'find'] %}
+                    <div class="button-bar">
+                        <a href="{{ url_for('source_add2', id_=source.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
+                        {% if name == 'place' %}
+                            <a href="{{ url_for('place_insert', origin_id=source.id) }}">+ {{ _('place')|uc_first }}</a>
+                        {% else %}
+                            {% for code in config['CLASS_CODES'][name]%}
+                                <a href="{{ url_for(name + '_insert', code=code, origin_id=source.id) }}">+ {{ code|get_class_name }}</a>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endif %}
+                {{ tables[name]|pager|safe }}
+            </div>
+        {% endif %}
     {% endfor %}
     <div id="tab-reference">
         {% if 'editor'|is_authorized %}

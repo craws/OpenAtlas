@@ -52,11 +52,6 @@
                     {{ test_result['property']|link|safe }}
                 </p>
             {% endif %}
-            {% if test_result['domain_whitelisted'] %}
-                <p>
-                    {{ test_result['domain']|link|safe }} {{ _('no check because whitelisted') }}
-                </p>
-            {% endif %}
         {% endif %}
     </div>
 {% endblock %}

@@ -37,11 +37,9 @@ def model_index():
         property_ = g.properties[form.property.data]
         domain_is_valid = property_.find_object('domain_class_code', domain.code)
         range_is_valid = property_.find_object('range_class_code', range_.code)
-        ignore = app.config['WHITELISTED_DOMAINS']
         test_result = {
-            'domain_error': False if domain_is_valid or domain.code in ignore else True,
+            'domain_error': False if domain_is_valid else True,
             'range_error': False if range_is_valid else True,
-            'domain_whitelisted': True if domain.code in ignore else False,
             'domain': domain,
             'property': property_,
             'range': range_}
