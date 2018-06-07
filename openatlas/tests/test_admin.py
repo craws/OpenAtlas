@@ -37,5 +37,5 @@ class ContentTests(TestBaseCase):
         self.login()
         with app.app_context():
             rv = self.app.get(url_for('admin_check_links', check='check'))
-            assert b'No entries' in rv.data
+            assert b'Invalid linked entity' in rv.data
 

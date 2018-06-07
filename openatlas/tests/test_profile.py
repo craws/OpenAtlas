@@ -12,7 +12,7 @@ class ProfileTests(TestBaseCase):
 
             # test profile update
             rv = self.app.get(url_for('profile_index'))
-            assert b'alice@umbrella.net' in rv.data
+            assert b'alice@example.com' in rv.data
             data = {'language': 'en', 'table_rows': '100', 'layout': 'advanced', 'theme': 'default'}
             rv = self.app.post(url_for('profile_index'), data=data, follow_redirects=True)
             assert b'saved' in rv.data
