@@ -12,7 +12,7 @@ class SourceTest(TestBaseCase):
         with app.app_context():
             self.login()
 
-            # source insert
+            # Source insert
             rv = self.app.get(url_for('source_insert'))
             assert b'+ Source' in rv.data
             with app.test_request_context():
@@ -40,7 +40,7 @@ class SourceTest(TestBaseCase):
             rv = self.app.get(url_for('source_index'))
             assert b'Test source' in rv.data
 
-            # link source
+            # Link source
             rv = self.app.post(
                 url_for('reference_insert', code='edition', origin_id=source_id),
                 data={'name': 'Test reference'},
@@ -67,14 +67,16 @@ class SourceTest(TestBaseCase):
             rv = self.app.get(url_for('source_view', id_=source_id))
             assert b'Gillian Anderson' in rv.data
 
-            # update source
+            # Update source
             rv = self.app.get(url_for('source_update', id_=source_id))
             assert b'Test source' in rv.data
-            data = {'name': 'Source updated'}
+            data = {'name': 'Source updated', 'description': 'some description'}
             rv = self.app.post(
                 url_for('source_update', id_=source_id), data=data, follow_redirects=True)
             assert b'Source updated' in rv.data
+            rv = self.app.get(url_for('source_view', id_=source_id))
+            assert b'some description' in rv.data
 
-            # delete source
+            # Delete source
             rv = self.app.get(url_for('source_delete', id_=source_id), follow_redirects=True)
             assert b'The entry has been deleted.' in rv.data

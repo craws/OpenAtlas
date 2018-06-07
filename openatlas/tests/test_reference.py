@@ -29,7 +29,7 @@ class ReferenceTest(TestBaseCase):
             assert b'An entry has been created' in rv.data
             rv = self.app.get(url_for('reference_index'))
 
-            # reference update
+            # Reference update
             assert b'Test reference' in rv.data
             rv = self.app.get(url_for('reference_update', id_=bibliography_id))
             assert b'Test reference' in rv.data
@@ -38,7 +38,7 @@ class ReferenceTest(TestBaseCase):
                 url_for('reference_update', id_=bibliography_id), data=data, follow_redirects=True)
             assert b'Test reference updated' in rv.data
 
-            # reference link
+            # Reference link
             with app.test_request_context():
                 app.preprocess_request()
                 batman = EntityMapper.insert('E21', 'Batman')
@@ -59,7 +59,7 @@ class ReferenceTest(TestBaseCase):
                 follow_redirects=True)
             assert b'Test reference updated' in rv.data
 
-            # reference link update
+            # Reference link update
             with app.test_request_context():
                 app.preprocess_request()
                 link_id = batman.get_links('P67', True)[0].id
@@ -71,11 +71,11 @@ class ReferenceTest(TestBaseCase):
                 origin_id=bibliography_id), data={'page': '666'}, follow_redirects=True)
             assert b'Changes have been saved' in rv.data
 
-            # reference unlink
+            # Reference unlink
             rv = self.app.get(url_for('reference_view', id_=bibliography_id, unlink_id=batman.id))
             assert b'removed'in rv.data and b'The X-Files' in rv.data
 
-            # reference delete
+            # Reference delete
             rv = self.app.get(
                 url_for('reference_delete', id_=bibliography_id), follow_redirects=True)
             assert b'The entry has been deleted.' in rv.data

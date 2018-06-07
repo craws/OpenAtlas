@@ -119,11 +119,14 @@ def description(self, entity):
     if not entity.description:
         return ''
     text = entity.description.replace('\r\n', '<br />')
+    label = util.uc_first(_('description'))
+    if hasattr(entity, 'system_type') and entity.system_type == 'source content':
+        label = util.uc_first(_('content'))
     html = """
         <p class="description-title">{label}</p>
         <div class="description more">
             {description}
-        </div>""".format(label=util.uc_first(_('description')), description=text)
+        </div>""".format(label=label, description=text)
     return html
 
 
