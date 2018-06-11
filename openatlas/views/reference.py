@@ -17,7 +17,7 @@ from openatlas.util.util import (display_remove_link, get_base_table_data, get_e
 
 
 class ReferenceForm(Form):
-    name = StringField(_('name'), [DataRequired()])
+    name = StringField(_('name'), [DataRequired()], render_kw={'autofocus': True})
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))

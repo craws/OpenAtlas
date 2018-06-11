@@ -15,7 +15,7 @@ from openatlas.util.util import required_group, sanitize
 
 
 class HierarchyForm(Form):
-    name = StringField(_('name'), [DataRequired()])
+    name = StringField(_('name'), [DataRequired()], render_kw={'autofocus': True})
     multiple = BooleanField(_('multiple'), description=_('tooltip hierarchy multiple'))
     forms = SelectMultipleField(
         _('forms'),

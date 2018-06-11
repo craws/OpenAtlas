@@ -16,7 +16,7 @@ from openatlas.util.util import link, required_group, sanitize, truncate_string
 
 
 class NodeForm(Form):
-    name = StringField(_('name'), [DataRequired()])
+    name = StringField(_('name'), [DataRequired()], render_kw={'autofocus': True})
     name_inverse = StringField(_('inverse'))
     is_node_form = HiddenField()
     description = TextAreaField(_('description'))

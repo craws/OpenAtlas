@@ -17,7 +17,7 @@ from openatlas.util.util import (display_remove_link, get_base_table_data, get_e
 
 
 class EventForm(DateForm):
-    name = StringField(_('name'), [DataRequired()])
+    name = StringField(_('name'), [DataRequired()], render_kw={'autofocus': True})
     event = TableField(_('sub event of'))
     place = TableField(_('location'))
     event_id = HiddenField()

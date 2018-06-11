@@ -13,7 +13,7 @@ from openatlas.util.util import get_entity_data, required_group
 
 
 class TranslationForm(Form):
-    name = StringField(_('name'), [DataRequired()])
+    name = StringField(_('name'), [DataRequired()], render_kw={'autofocus': True})
     description = TextAreaField(_('content'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))

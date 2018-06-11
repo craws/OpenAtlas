@@ -13,13 +13,12 @@
             <a href="{{ url_for('reset_password') }}">{{ _('Forgot your password?') }}</a>
         </p>
     {% endif %}
-    <script>
-        $(function () {
-            $("#username").focus();
-            {% if config['DEMO_MODE'] %}
+    {% if config['DEMO_MODE'] %}
+        <script>
+            $(document).ready(function () {
                 $("#username").val('Demolina');
                 $("#password").val('Demolina');
-            {% endif %}
-        });
-    </script>
+            });
+        </script>
+    {% endif %}
 {% endblock %}

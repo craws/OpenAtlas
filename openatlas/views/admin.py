@@ -28,8 +28,9 @@ class LogForm(Form):
 
 
 class NewsLetterForm(Form):
-    subject = StringField('', [DataRequired()], render_kw={"placeholder": _('subject')})
-    body = TextAreaField('', [DataRequired()], render_kw={"placeholder": _('content')})
+    subject = StringField('', [DataRequired()],
+                          render_kw={'placeholder': _('subject'), 'autofocus': True})
+    body = TextAreaField('', [DataRequired()], render_kw={'placeholder': _('content')})
     send = SubmitField(uc_first(_('send')))
 
 

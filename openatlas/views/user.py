@@ -18,7 +18,7 @@ from openatlas.util.util import (format_date, is_authorized, link, required_grou
 class UserForm(Form):
     user_id = None
     active = BooleanField(_('active'), default=True)
-    username = StringField(_('username'), [DataRequired()])
+    username = StringField(_('username'), [DataRequired()], render_kw={'autofocus': True})
     group = SelectField(_('group'), choices=[])
     email = StringField(_('email'), [DataRequired(), Email()])
     password = PasswordField(_('password'), [DataRequired()])

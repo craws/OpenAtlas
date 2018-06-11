@@ -16,7 +16,7 @@ from openatlas.util.util import (display_remove_link, get_base_table_data, get_e
 
 
 class PlaceForm(DateForm):
-    name = StringField(_('name'), [DataRequired()])
+    name = StringField(_('name'), [DataRequired()], render_kw={'autofocus': True})
     alias = FieldList(StringField(''), description=_('tooltip alias'))
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))

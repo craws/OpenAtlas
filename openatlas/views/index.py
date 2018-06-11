@@ -1,6 +1,4 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-import locale
-
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _, format_number
 from flask_login import current_user
@@ -19,7 +17,8 @@ from openatlas.util.util import (bookmark_toggle, format_date, link, required_gr
 
 
 class FeedbackForm(Form):
-    subject = SelectField(_('subject'), choices=app.config['FEEDBACK_SUBJECTS'].items())
+    subject = SelectField(_('subject'), choices=app.config['FEEDBACK_SUBJECTS'].items(),
+                          render_kw={'autofocus': True})
     description = TextAreaField(_('description'), [DataRequired()])
     send = SubmitField(_('send'))
 
