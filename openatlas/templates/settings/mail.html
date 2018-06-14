@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
+    > {{ _('settings')|uc_first }}
+    > {{ _('mail')|uc_first }}
+{% endblock %}
+{% block content %}
+    <div class="button-bar">
+        <a href="{{ url_for('settings_update') }}">{{ _('edit')|uc_first }}</a>
+    </div>
+    <div class="data-table">
+        {% for name, value in mail_settings.items() %}
+            {% set style = 'class ="faded"' not settings['mail'] else '' %}
+            <div {{ style|safe }}>
+                <div>{{ name|uc_first }}</div>
+                <div>{{ value }}</div>
+            </div>
+        {% endfor %}
+    </div>
+    {% if settings['mail'] %}
+        {{ form|display_form|safe }}
+    {% endif %}
+{% endblock %}

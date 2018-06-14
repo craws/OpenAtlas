@@ -19,9 +19,7 @@ class TestMail(Form):
     send = SubmitField(_('send test mail'))
 
 
-class SettingsForm(Form):
-
-    # General
+class GeneralForm(Form):
     site_name = StringField(uc_first(_('site name')))
     default_language = SelectField(uc_first(
         _('default language')),
@@ -36,7 +34,8 @@ class SettingsForm(Form):
         coerce=int)
     debug_mode = BooleanField(uc_first(_('debug mode')))
 
-    # Mail
+
+class MailForm(Form):
     mail = BooleanField(uc_first(_('mail')))
     mail_transport_username = StringField(uc_first(_('mail transport username')))
     mail_transport_host = StringField(uc_first(_('mail transport host')))
@@ -45,7 +44,8 @@ class SettingsForm(Form):
     mail_from_name = StringField(uc_first(_('mail from name')))
     mail_recipients_feedback = StringField(uc_first(_('mail recipients feedback')))
 
-    # Authentication
+
+class AuthenticationForm(Form):
     random_password_length = StringField(uc_first(_('random password length')))
     minimum_password_length = StringField(uc_first(_('minimum password length')))
     reset_confirm_hours = StringField(uc_first(_('reset confirm hours')))
@@ -53,10 +53,11 @@ class SettingsForm(Form):
     failed_login_forget_minutes = StringField(uc_first(_('failed login forget minutes')))
 
 
-@app.route('/admin/settings', methods=["GET", "POST"])
+@app.route('/settings/mail', methods=["GET", "POST"])
 @required_group('admin')
-def settings_index():
+def settings_mail():
     form = TestMail()
+    settings = session['settings']
     if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
         user = current_user
         subject = _('Test mail from %(site_name)s', site_name=session['settings']['site_name'])
@@ -66,31 +67,41 @@ def settings_index():
             flash(_('A test mail was sent to %(email)s.', email=form.receiver.data))
     else:
         form.receiver.data = current_user.email
+    mail_settings = OrderedDict([
+        (_('mail'), uc_first(_('on')) if settings['mail'] else uc_first(_('off'))),
+        (_('mail transport username'), settings['mail_transport_username']),
+        (_('mail transport host'), settings['mail_transport_host']),
+        (_('mail transport port'), settings['mail_transport_port']),
+        (_('mail from email'), settings['mail_from_email']),
+        (_('mail from name'), settings['mail_from_name']),
+        (_('mail recipients feedback'), ';'.join(settings['mail_recipients_feedback']))])
+    return render_template('settings/mail.html', settings=settings, mail_settings=mail_settings, form=form)
 
+
+@app.route('/settings/general', methods=["GET", "POST"])
+@required_group('admin')
+def settings_general():
     settings = session['settings']
-    groups = OrderedDict([
-        ('general', OrderedDict([
-            (_('site name'), settings['site_name']),
-            (_('default language'), app.config['LANGUAGES'][settings['default_language']]),
-            (_('default table rows'), settings['default_table_rows']),
-            (_('log level'), app.config['LOG_LEVELS'][int(settings['log_level'])]),
-            (_('debug mode'), uc_first(_('on')) if settings['debug_mode'] else uc_first(_('off')))
-        ])),
-        ('mail', OrderedDict([
-            (_('mail'), uc_first(_('on')) if settings['mail'] else uc_first(_('off'))),
-            (_('mail transport username'), settings['mail_transport_username']),
-            (_('mail transport host'), settings['mail_transport_host']),
-            (_('mail transport port'), settings['mail_transport_port']),
-            (_('mail from email'), settings['mail_from_email']),
-            (_('mail from name'), settings['mail_from_name']),
-            (_('mail recipients feedback'), ';'.join(settings['mail_recipients_feedback']))])),
-        ('authentication', OrderedDict([
-            (_('random password length'), settings['random_password_length']),
-            (_('minimum password length'), settings['minimum_password_length']),
-            (_('reset confirm hours'), settings['reset_confirm_hours']),
-            (_('failed login tries'), settings['failed_login_tries']),
-            (_('failed login forget minutes'), settings['failed_login_forget_minutes'])]))])
-    return render_template('settings/index.html', groups=groups, settings=settings, form=form)
+    general_settings = OrderedDict([
+        (_('site name'), settings['site_name']),
+        (_('default language'), app.config['LANGUAGES'][settings['default_language']]),
+        (_('default table rows'), settings['default_table_rows']),
+        (_('log level'), app.config['LOG_LEVELS'][int(settings['log_level'])]),
+        (_('debug mode'), uc_first(_('on')) if settings['debug_mode'] else uc_first(_('off')))])
+    return render_template('settings/mail.html', settings=settings, general_settings=general_settings)
+
+
+@app.route('/settings/authentication', methods=["GET", "POST"])
+@required_group('admin')
+def settings_authentication():
+    settings = session['settings']
+    authentication_settings = OrderedDict([
+        (_('random password length'), settings['random_password_length']),
+        (_('minimum password length'), settings['minimum_password_length']),
+        (_('reset confirm hours'), settings['reset_confirm_hours']),
+        (_('failed login tries'), settings['failed_login_tries']),
+        (_('failed login forget minutes'), settings['failed_login_forget_minutes'])])
+    return render_template('settings/authentication.html', settings=settings, authentication_settings=authentication_settings)
 
 
 @app.route('/admin/settings/update', methods=["GET", "POST"])
