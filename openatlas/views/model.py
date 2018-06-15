@@ -164,15 +164,16 @@ def model_network():
             'E6':  {'active': True,  'color':  '#E54A2A'},  # Destruction
             'E84': {'active': False, 'color':  '#EE82EE'}},  # Information Carrier
         'properties': {
-            'P107': {'active':  True},   # has current or former member
-            'P11':  {'active':  True},   # had participant
-            'P14':  {'active':  True},   # carried out by
-            'P7':   {'active':  True},   # took place at
-            'P74':  {'active':  True},   # has current or former residence
-            'P67':  {'active':  True},   # refers to
-            'OA7':  {'active':  True},   # has relationship to
-            'OA8':  {'active':  True},   # appears for the first time in
-            'OA9':  {'active':  True}},  # appears for the last time in
+            'P107': {'active': True},   # has current or former member
+            'P24':  {'active': True},   # transferred title of
+            'P11':  {'active': True},   # had participant
+            'P14':  {'active': True},   # carried out by
+            'P7':   {'active': True},   # took place at
+            'P74':  {'active': True},   # has current or former residence
+            'P67':  {'active': True},   # refers to
+            'OA7':  {'active': True},   # has relationship to
+            'OA8':  {'active': True},   # appears for the first time in
+            'OA9':  {'active': True}},  # appears for the last time in
         'options': {
             'orphans': False,
             'width': 1200,
