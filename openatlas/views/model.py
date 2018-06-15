@@ -166,6 +166,7 @@ def model_network():
         'properties': {
             'P107': {'active': True},   # has current or former member
             'P24':  {'active': True},   # transferred title of
+            'P23':  {'active': True},   # transferred title to
             'P11':  {'active': True},   # had participant
             'P14':  {'active': True},   # carried out by
             'P7':   {'active': True},   # took place at
