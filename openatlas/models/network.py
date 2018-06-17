@@ -8,7 +8,6 @@ class Network:
 
     @staticmethod
     def diff(first, second):
-        second = set(second)
         return [item for item in first if item not in second]
 
     @staticmethod
@@ -24,25 +23,25 @@ class Network:
                 properties.append(code)
         sql = "SELECT domain_id, range_id FROM model.link WHERE property_code IN %(properties)s;"
         g.cursor.execute(sql, {'properties': tuple(properties)})
-        entities = []
+        entities = set()
         edges = ''
         for row in g.cursor.fetchall():  # pragma: no cover
             if row.domain_id == row.range_id:
                 continue  # Prevent circular dependencies
             edges += "{'source': '" + str(row.domain_id)
             edges += "', 'target': '" + str(row.range_id) + "' },"
-            entities.append(row.domain_id)
-            entities.append(row.range_id)
+            entities.add(row.domain_id)
+            entities.add(row.range_id)
         edges = " links: [" + edges + "]"
         nodes = ''
-        entities_already = []
+        entities_already = set()
         sql = "SELECT id, class_code, name FROM model.entity WHERE class_code IN %(classes)s;"
         g.cursor.execute(sql, {'classes': tuple(classes)})
         for row in g.cursor.fetchall():
             if params['options']['orphans'] or row.id in entities:
                 name = row.name.replace("'", "").replace('Location of ', '').replace('\n', ' ')\
                     .replace('\r', ' ')
-                entities_already.append(row.id)
+                entities_already.add(row.id)
                 nodes += "{'id':'" + str(row.id) + "', 'name':'" + truncate_string(name, span=False)
                 nodes += "', 'color':'" + params['classes'][row.class_code]['color'] + "'},"
 
@@ -51,7 +50,8 @@ class Network:
         if array_diff:
             sql = "SELECT id, class_code, name FROM model.entity WHERE id IN %(array_diff)s;"
             g.cursor.execute(sql, {'array_diff': tuple(array_diff)})
-            for row in g.cursor.fetchall():
+            result = g.cursor.fetchall()
+            for row in result:
                 color = ''
                 if row.class_code in params['classes']:  # pragma: no cover
                     color = params['classes'][row.class_code]['color']
