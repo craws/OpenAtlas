@@ -7,12 +7,8 @@ from openatlas.util.util import truncate_string
 class Network:
 
     @staticmethod
-    def diff(first, second):
-        return [item for item in first if item not in second]
-
-    @staticmethod
     def get_network_json(params):
-        """ Returns JavaScript data string for d3.js"""
+        """ Returns JSON data for d3.js"""
         classes = []
         for code, param in params['classes'].items():
             if param['active']:
@@ -46,7 +42,7 @@ class Network:
                 nodes += "', 'color':'" + params['classes'][row.class_code]['color'] + "'},"
 
         # Get elements of links which weren't present in class selection
-        array_diff = Network.diff(entities, entities_already)
+        array_diff = [item for item in entities if item not in entities_already]
         if array_diff:
             sql = "SELECT id, class_code, name FROM model.entity WHERE id IN %(array_diff)s;"
             g.cursor.execute(sql, {'array_diff': tuple(array_diff)})
