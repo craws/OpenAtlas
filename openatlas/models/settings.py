@@ -49,12 +49,11 @@ class SettingsMapper:
     def update(form):
         sql = 'UPDATE web.settings SET "value" = %(value)s WHERE "name" = %(name)s;'
         for field in SettingsMapper.fields:
-            if field.startswith('file_'):
-                continue
-            value = getattr(form, field).data
-            if field in ['debug_mode', 'mail']:
-                value = 'True' if getattr(form, field).data else ''
-            g.cursor.execute(sql, {'name': field, 'value': value})
+            if field in form:
+                value = getattr(form, field).data
+                if field in ['debug_mode', 'mail']:
+                    value = 'True' if getattr(form, field).data else ''
+                g.cursor.execute(sql, {'name': field, 'value': value})
 
     @staticmethod
     def update_file_settings(form):

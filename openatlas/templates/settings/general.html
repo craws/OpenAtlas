@@ -1,22 +1,18 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
     <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
-    > {{ _('mail')|uc_first }}
+    > {{ _('general')|uc_first }}
 {% endblock %}
 {% block content %}
     <div class="button-bar">
-        <a href="{{ url_for('settings_mail_update') }}">{{ _('edit')|uc_first }}</a>
+        <a href="{{ url_for('settings_general_update') }}">{{ _('edit')|uc_first }}</a>
     </div>
     <div class="data-table">
-        {% for name, value in mail_settings.items() %}
-            {% set style = 'class ="faded"' if not settings['mail'] else '' %}
-            <div {{ style|safe }}>
+        {% for name, value in general_settings.items() %}
+            <div>
                 <div>{{ name|uc_first }}</div>
                 <div>{{ value }}</div>
             </div>
         {% endfor %}
     </div>
-    {% if settings['mail'] %}
-        {{ form|display_form|safe }}
-    {% endif %}
 {% endblock %}

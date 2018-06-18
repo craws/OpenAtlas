@@ -12,9 +12,9 @@ class SettingsTests(TestBaseCase):
             self.login()
             rv = self.app.get(url_for('admin_index'))
             assert b'User' in rv.data
-            rv = self.app.get(url_for('settings_index'))
+            rv = self.app.get(url_for('settings_general'))
             assert b'Edit' in rv.data
-            rv = self.app.get(url_for('settings_update'))
+            rv = self.app.get(url_for('settings_general_update'))
             assert b'Save' in rv.data
             data = {}
             for name in SettingsMapper.fields:
@@ -28,7 +28,7 @@ class SettingsTests(TestBaseCase):
             data['reset_confirm_hours'] = '10'
             data['log_level'] = '0'
             data['site_name'] = 'Nostromo'
-            rv = self.app.post(url_for('settings_update'), data=data, follow_redirects=True)
+            rv = self.app.post(url_for('settings_general_update'), data=data, follow_redirects=True)
             assert b'Nostromo' in rv.data
 
             rv = self.app.get(url_for('admin_file'))
