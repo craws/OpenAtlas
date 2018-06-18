@@ -231,21 +231,6 @@ class EntityMapper:
         return counts
 
     @staticmethod
-    def get_page_ids(entity, codes):
-        """ Return ids for pager (first, previous, next, last)"""
-        sql_where = " e.class_code IN ('{codes}')".format(codes="','".join(codes)) + " AND "
-        sql_where += "e.system_type='source content'" if 'E33' in codes else "e.system_type IS NULL"
-        sql_prev = "SELECT max(e.id) AS id FROM model.entity e WHERE e.id < %(id)s AND " + sql_where
-        sql_next = "SELECT min(e.id) AS id FROM model.entity e WHERE e.id > %(id)s AND " + sql_where
-        sql = """
-            SELECT min(e.id) AS first_id, max(e.id) AS last_id,
-                ({sql_next}) AS next_id, ({sql_prev}) AS previous_id
-            FROM model.entity e WHERE """.format(
-                sql_next=sql_next, sql_prev=sql_prev) + sql_where
-        g.cursor.execute(sql, {'id': entity.id})
-        return g.cursor.fetchone()
-
-    @staticmethod
     def get_orphans():
         """ Returns entities without links. """
         entities = []
