@@ -17,7 +17,6 @@
     </ul>
     <div id="tab-info">
         <div class="button-bar">
-            {{ event|page_buttons|safe }}
             {% if 'editor'|is_authorized %}
                 <a href="{{ url_for('event_update', id_=event.id) }}">{{ _('edit')|uc_first }}</a>
                 {{ event|display_delete_link|safe }}

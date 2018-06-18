@@ -132,30 +132,6 @@ def description(self, entity):
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def page_buttons(self, entity):
-    view = util.get_view_name(entity)
-    codes = app.config['CLASS_CODES'][view]
-    html = ''
-    pager_ids = EntityMapper.get_page_ids(entity, codes)
-    if pager_ids.first_id and pager_ids.first_id != entity.id:
-        html += """
-            <a href="{url_first}"><div class="navigation first disabled"></div></a>
-            <a href="{url_prev}"><div class="navigation prev disabled"></div></a>""".format(
-                url_first=url_for(view + '_view', id_=pager_ids.first_id),
-                url_prev=url_for(view + '_view', id_=pager_ids.previous_id))
-    if pager_ids.last_id and pager_ids.last_id != entity.id:
-        html += """
-            <a href="{url_next}"><div class="navigation next"></div></a>
-            <a href="{url_last}"><div class="navigation last"></div></a>""".format(
-                url_next=url_for(view + '_view', id_=pager_ids.next_id),
-                url_last=url_for(view + '_view', id_=pager_ids.last_id))
-    if html:
-        html = '<div class="pager">' + html + '</div>'
-    return html
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
 def display_content_translation(self, text):
     return ContentMapper.get_translation(text)
 

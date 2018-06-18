@@ -21,7 +21,6 @@
     </ul>
     <div id="tab-info">
         <div class="button-bar">
-            {{ source|page_buttons|safe }}
             {% if 'editor'|is_authorized %}
                 <a href="{{ url_for('source_update', id_=source.id) }}">{{ _('edit')|uc_first }}</a>
                 {{ source|display_delete_link|safe }}

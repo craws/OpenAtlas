@@ -55,7 +55,7 @@ def file_index():
     table = {'id': 'files', 'header': app.config['TABLE_HEADERS']['file'], 'data': []}
     for file in EntityMapper.get_by_system_type('file'):
         table['data'].append(get_base_table_data(file))
-    statvfs = os.statvfs('/')
+    statvfs = os.statvfs(app.config['UPLOAD_FOLDER_PATH'])
     disk_space = statvfs.f_frsize * statvfs.f_blocks
     free_space = statvfs.f_frsize * statvfs.f_bavail  # available space without reserved blocks
     disk_space_values = {
