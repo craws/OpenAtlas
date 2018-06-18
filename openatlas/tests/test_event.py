@@ -41,8 +41,6 @@ class EventTest(TestBaseCase):
                 url_for('event_insert', code='E8'),
                 data={
                     'name': 'Test event',
-                    'recipient': '[' + str(actor_id) + ']',
-                    'donor': '[' + str(actor_id) + ']',
                     'given_place': '[' + str(residence_id) + ']',
                     'place': residence_id,
                     'event': activity_id,
@@ -52,7 +50,7 @@ class EventTest(TestBaseCase):
                     'date_end_year': '1951'})
             event_id = rv.location.split('/')[-1]
             rv = self.app.get(url_for('event_view', id_=event_id))
-            assert b'Game master' in rv.data
+            assert b'Test event' in rv.data
             rv = self.app.get(url_for('actor_view', id_=actor_id))
             assert b'Game master' in rv.data
             rv = self.app.post(

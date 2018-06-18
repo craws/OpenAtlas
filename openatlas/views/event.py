@@ -26,8 +26,6 @@ class EventForm(DateForm):
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
     opened = HiddenField()
-    recipient = TableMultiField(_('recipient'))
-    donor = TableMultiField(_('donor'))
     given_place = TableMultiField(_('given place'))
 
     def validate(self, extra_validators=None):
@@ -60,7 +58,7 @@ def event_insert(code, origin_id=None):
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(EventForm, 'Event')
     if code != 'E8':
-        del form.recipient, form.donor, form.given_place
+        del form.given_place
     if origin:
         del form.insert_and_continue
     if form.validate_on_submit():
@@ -91,7 +89,7 @@ def event_update(id_):
     event.set_dates()
     form = build_form(EventForm, 'Event', event, request)
     if event.class_.code != 'E8':
-        del form.recipient, form.donor, form.given_place
+        del form.given_place
     form.event_id.data = event.id
     if form.validate_on_submit():
         if was_modified(form, event):  # pragma: no cover
@@ -106,8 +104,6 @@ def event_update(id_):
     place = event.get_linked_entity('P7')
     form.place.data = place.get_linked_entity('P53', True).id if place else ''
     if event.class_.code == 'E8':  # Form data for acquisition
-        form.recipient.data = [entity.id for entity in event.get_linked_entities('P22')]
-        form.donor.data = [entity.id for entity in event.get_linked_entities('P23')]
         form.given_place.data = [entity.id for entity in event.get_linked_entities('P24')]
     return render_template('event/update.html', form=form, event=event)
 
@@ -176,7 +172,7 @@ def save(form, event=None, code=None, origin=None):
     try:
         if event:
             log_action = 'update'
-            LinkMapper.delete_by_codes(event, ['P117', 'P7', 'P22', 'P23', 'P24'])
+            LinkMapper.delete_by_codes(event, ['P117', 'P7', 'P24'])
         else:
             log_action = 'insert'
             event = EntityMapper.insert(code, form.name.data)
@@ -190,12 +186,8 @@ def save(form, event=None, code=None, origin=None):
         if form.place.data:
             place = LinkMapper.get_linked_entity(int(form.place.data), 'P53')
             event.link('P7', place)
-        if event.class_.code == 'E8':  # Links for acquisition
-            if form.recipient.data:
-                event.link('P22', ast.literal_eval(form.recipient.data))
-            event.link('P23', ast.literal_eval(form.donor.data) if form.donor.data else None)
-            if form.given_place.data:
-                event.link('P24', ast.literal_eval(form.given_place.data))
+        if event.class_.code == 'E8' and form.given_place.data:  # Link place for acquisition
+            event.link('P24', ast.literal_eval(form.given_place.data))
         url = url_for('event_view', id_=event.id)
         if origin:
             view_name = get_view_name(origin)
