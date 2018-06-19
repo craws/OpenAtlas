@@ -38,7 +38,7 @@ class LinkMapper:
 
     @staticmethod
     def insert(domain, property_code, range_, description=None):
-        if not domain or not range_:
+        if not domain or not range_:  # pragma: no cover
             return
         range_ = range_ if isinstance(range_, list) else [range_]
         result = None

@@ -94,7 +94,7 @@ def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
 
 class MLStripper(HTMLParser):
 
-    def error(self, message):
+    def error(self, message):  # pragma: no cover
         pass
 
     def __init__(self):
