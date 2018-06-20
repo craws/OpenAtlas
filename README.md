@@ -4,9 +4,9 @@ OpenAtlas is an open source application for archeological, historical and geospa
 
 Website: http://openatlas.eu/website
 
-Demo: https://openatlas.craws.net
+Demo: https://demo.openatlas.eu
 
-Documentation: [Wiki](https://redmine.craws.net/projects/uni/wiki),  [Issues](https://redmine.craws.net/projects/uni/issues), [Features]((https://redmine.craws.net/projects/uni/wiki/Features))
+Documentation: [Wiki](https://redmine.openatlas.eu/projects/uni/wiki),  [Issues](https://redmine.openatlas.eu/projects/uni/issues), [Features]((https://redmine.openatlas.eu/projects/uni/wiki/Features))
 
 Code: [Bitucket](https://bitbucket.org/openatlas/openatlas) or [GitHub](https://github.com/craws/OpenAtlas)
 
