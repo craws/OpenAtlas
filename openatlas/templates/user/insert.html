@@ -6,4 +6,11 @@
 {% endblock %}
 {% block content %}
     {{ form|display_form('user-form')|safe }}
+    <script>
+        $(document).ready(function () {
+            $("#show_passwords").after(function() {
+              return '<a id="generate-password" class="button">{{ _('generate password')|uc_first }}</a>';
+            });
+        });
+    </script>
 {% endblock %}
