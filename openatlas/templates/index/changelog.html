@@ -16,7 +16,7 @@
                 {% for issue_number, issue_text in issues.items() %}
                     {% if issue_number %}
                         &#8226 {{ issue_type|uc_first }}
-                        <a target="_blank" rel="noopener" href="https://redmine.craws.net/issues/{{ issue_number }}">
+                        <a target="_blank" rel="noopener" href="https://redmine.openatlas.eu/issues/{{ issue_number }}">
                             #{{ issue_number }}
                         </a> {{ issue_text|safe }}<br />
                     {% else %}
