@@ -4,12 +4,5 @@
     > {{ _('files')|uc_first }}
 {% endblock %}
 {% block content %}
-    <form id="file-form" name="file-form" method="post">
-        {{ form.csrf_token }}
-        <div style="float:left;">
-            {{ form.file_upload_max_size }} {{ form.file_upload_max_size.label }}<br />
-            {{ form.file_upload_allowed_extension }} {{ form.file_upload_allowed_extension.label }}<br />
-            <input type="submit" value="{{ _('save')|uc_first }}" />
-        </div>
-    </form>
+    {{ form|display_form|safe }}
 {% endblock %}

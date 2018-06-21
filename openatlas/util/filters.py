@@ -8,10 +8,10 @@ from flask import g, render_template_string, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from jinja2 import escape, evalcontextfilter
+from wtforms import IntegerField
+from wtforms.validators import Email
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
-from openatlas.models.node import NodeMapper
 from openatlas.models.content import ContentMapper
 from openatlas.util import util
 from openatlas.util.util import display_tooltip
@@ -167,7 +167,12 @@ def display_form(self, form, form_id=None, for_persons=False):
     for field in form:
         if field.id.startswith('value_list-'):
             continue
-        class_ = "required" if field.flags.required else ''
+        class_ = 'required' if field.flags.required else ''
+        class_ += ' integer' if isinstance(field, IntegerField) else ''
+        for validator in field.validators:
+
+            if isinstance(validator, Email):
+                class_ += ' email'
         errors = ''
         for error in field.errors:
             errors += util.uc_first(error)

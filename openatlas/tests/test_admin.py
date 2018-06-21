@@ -68,7 +68,7 @@ class ContentTests(TestBaseCase):
             rv = self.app.get(url_for('admin_mail_update'))
             assert b'Mail transport port' in rv.data
             rv = self.app.post(url_for('admin_mail_update'), data=data, follow_redirects=True)
-            assert b'Email from' in rv.data
+            assert b'Mail transport port' in rv.data
             rv = self.app.get(url_for('admin_file'))
             assert b'jpg' in rv.data
             rv = self.app.post(

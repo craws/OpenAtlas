@@ -5,25 +5,7 @@
     > {{ _('edit')|uc_first }}
 {% endblock %}
 {% block content %}
-    <form method="post">
-        <div class="button-bar">
-            <input type="submit" value="{{ _('save')|uc_first }}" />
-        </div>
-        {% set data = [
-            (form.site_name.label, form.site_name),
-            (form.default_language.label, form.default_language),
-            (form.default_table_rows.label, form.default_table_rows),
-            (form.log_level.label, form.log_level),
-            (form.debug_mode.label, form.debug_mode),
-            (form.random_password_length.label, form.random_password_length),
-            (form.minimum_password_length.label, form.minimum_password_length),
-            (form.reset_confirm_hours.label, form.reset_confirm_hours),
-            (form.failed_login_tries.label, form.failed_login_tries),
-            (form.failed_login_forget_minutes.label, form.failed_login_forget_minutes),
-        ] %}
-        {{ form.csrf_token }}
-        {{ data|data_table|safe }}
-    </form>
+    {{ form|display_form|safe }}
     {% for field, errors in form.errors.items() %}
         {{ form[field].label }}: {{ ', '.join(errors) }}
     {% endfor %}

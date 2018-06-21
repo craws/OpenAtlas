@@ -31,14 +31,15 @@ class LogForm(Form):
 
 class NewsLetterForm(Form):
     subject = StringField(
-        '', [InputRequired()], render_kw={'placeholder': uc_first(_('subject')), 'autofocus': True})
+        '', [InputRequired()], render_kw={'placeholder': _('subject'), 'autofocus': True})
     body = TextAreaField('', [InputRequired()], render_kw={'placeholder': _('content')})
     send = SubmitField(uc_first(_('send')))
 
 
 class FileForm(Form):
-    file_upload_max_size = IntegerField(_('max file size'))
+    file_upload_max_size = IntegerField(_('max file size in MB'))
     file_upload_allowed_extension = StringField('allowed file extensions')
+    save = SubmitField(uc_first(_('save')))
 
 
 class TestMail(Form):
@@ -60,11 +61,12 @@ class GeneralForm(Form):
         choices=app.config['LOG_LEVELS'].items(),
         coerce=int)
     debug_mode = BooleanField(uc_first(_('debug mode')))
-    random_password_length = StringField(uc_first(_('random password length')))
-    minimum_password_length = StringField(uc_first(_('minimum password length')))
-    reset_confirm_hours = StringField(uc_first(_('reset confirm hours')))
-    failed_login_tries = StringField(uc_first(_('failed login tries')))
-    failed_login_forget_minutes = StringField(uc_first(_('failed login forget minutes')))
+    random_password_length = IntegerField(uc_first(_('random password length')))
+    minimum_password_length = IntegerField(uc_first(_('minimum password length')))
+    reset_confirm_hours = IntegerField(uc_first(_('reset confirm hours')))
+    failed_login_tries = IntegerField(uc_first(_('failed login tries')))
+    failed_login_forget_minutes = IntegerField(uc_first(_('failed login forget minutes')))
+    save = SubmitField(uc_first(_('save')))
 
 
 class MailForm(Form):
@@ -72,9 +74,10 @@ class MailForm(Form):
     mail_transport_username = StringField(uc_first(_('mail transport username')))
     mail_transport_host = StringField(uc_first(_('mail transport host')))
     mail_transport_port = StringField(uc_first(_('mail transport port')))
-    mail_from_email = StringField(uc_first(_('mail from email')))
+    mail_from_email = StringField(uc_first(_('mail from email')), [Email()])
     mail_from_name = StringField(uc_first(_('mail from name')))
     mail_recipients_feedback = StringField(uc_first(_('mail recipients feedback')))
+    save = SubmitField(uc_first(_('save')))
 
 
 @app.route('/admin')
@@ -318,9 +321,10 @@ def admin_mail_update():
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('admin_mail'))
-    for field in SettingsMapper.fields:
-        if field in ['mail_recipients_feedback']:
-            getattr(form, field).data = ';'.join(session['settings'][field])
-        elif field in form:
-            getattr(form, field).data = session['settings'][field]
+    if request.method == 'GET':
+        for field in SettingsMapper.fields:
+            if field in ['mail_recipients_feedback']:
+                getattr(form, field).data = ';'.join(session['settings'][field])
+            elif field in form:
+                getattr(form, field).data = session['settings'][field]
     return render_template('admin/mail_update.html', form=form, settings=session['settings'])

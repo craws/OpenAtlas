@@ -48,23 +48,10 @@ $(document).ready(function () {
         }
     });
 
-    $("#password-reset").validate({
-        rules: {
-            email: {email: true}
-        }
-    });
-
-    $("#profile-form").validate({
-        rules: {
-            email: {email: true}
-        }
-    });
-
     $('#user-form').validate({
         rules: {
             password: {minlength: minimumPasswordLength},
-            password2: {equalTo: '#password'},
-            email: {email: true}
+            password2: {equalTo: '#password'}
         }
     });
 
@@ -73,13 +60,15 @@ $(document).ready(function () {
             file: {
                 fileSize: maxFileSize  * 1024 * 1024,
             }
-        },
+        }
     });
 
     $.validator.addClassRules({
         year: {number: true, min: -4713, max: 9999},
         month: {digits: true, min: 1, max: 12},
         day: {digits: true, min: 1, max: 31},
+        integer: {digits: true},
+        email: {email: true},
         "value-type": {number: true}
     });
 
