@@ -2,6 +2,7 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
+from openatlas.models.settings import SettingsMapper
 from openatlas.test_base import TestBaseCase
 
 
@@ -39,3 +40,32 @@ class ContentTests(TestBaseCase):
             rv = self.app.get(url_for('admin_check_links', check='check'))
             assert b'Invalid linked entity' in rv.data
 
+    def test_admin(self):
+        with app.app_context():
+            self.login()
+            rv = self.app.get(url_for('admin_index'))
+            assert b'User' in rv.data
+            rv = self.app.get(url_for('admin_general'))
+            assert b'Edit' in rv.data
+            rv = self.app.get(url_for('admin_general_update'))
+            assert b'Save' in rv.data
+            data = {}
+            for name in SettingsMapper.fields:
+                data[name] = ''
+            data['default_language'] = 'en'
+            data['default_table_rows'] = '10'
+            data['failed_login_forget_minutes'] = '10'
+            data['failed_login_tries'] = '10'
+            data['minimum_password_length'] = '10'
+            data['random_password_length'] = '10'
+            data['reset_confirm_hours'] = '10'
+            data['log_level'] = '0'
+            data['site_name'] = 'Nostromo'
+            rv = self.app.post(url_for('admin_general_update'), data=data, follow_redirects=True)
+            assert b'Nostromo' in rv.data
+
+            rv = self.app.get(url_for('admin_file'))
+            assert b'jpg' in rv.data
+            rv = self.app.post(
+                url_for('admin_file'), data={'file_upload_max_size': 20}, follow_redirects=True)
+            assert b'Changes have been saved.' in rv.data

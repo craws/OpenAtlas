@@ -5,7 +5,7 @@
 {% endblock %}
 {% block content %}
     <div class="button-bar">
-        <a href="{{ url_for('settings_mail_update') }}">{{ _('edit')|uc_first }}</a>
+        <a href="{{ url_for('admin_mail_update') }}">{{ _('edit')|uc_first }}</a>
     </div>
     <div class="data-table">
         {% for name, value in mail_settings.items() %}
