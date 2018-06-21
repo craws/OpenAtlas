@@ -5,7 +5,7 @@ from flask_login import current_user
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import SelectField, SubmitField, TextAreaField
-from wtforms.validators import DataRequired
+from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.models.content import ContentMapper
@@ -19,7 +19,7 @@ from openatlas.util.util import (bookmark_toggle, format_date, link, required_gr
 class FeedbackForm(Form):
     subject = SelectField(_('subject'), choices=app.config['FEEDBACK_SUBJECTS'].items(),
                           render_kw={'autofocus': True})
-    description = TextAreaField(_('description'), [DataRequired()])
+    description = TextAreaField(_('description'), [InputRequired()])
     send = SubmitField(_('send'))
 
 

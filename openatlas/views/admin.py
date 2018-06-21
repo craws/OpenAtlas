@@ -10,7 +10,7 @@ from flask_login import current_user
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import BooleanField, IntegerField, SelectField, StringField, SubmitField, TextAreaField
-from wtforms.validators import DataRequired, Email, InputRequired
+from wtforms.validators import Email, InputRequired
 
 from openatlas import app, logger
 from openatlas.models.entity import EntityMapper
@@ -30,9 +30,9 @@ class LogForm(Form):
 
 
 class NewsLetterForm(Form):
-    subject = StringField('', [DataRequired()],
-                          render_kw={'placeholder': _('subject'), 'autofocus': True})
-    body = TextAreaField('', [DataRequired()], render_kw={'placeholder': _('content')})
+    subject = StringField(
+        '', [InputRequired()], render_kw={'placeholder': uc_first(_('subject')), 'autofocus': True})
+    body = TextAreaField('', [InputRequired()], render_kw={'placeholder': _('content')})
     send = SubmitField(uc_first(_('send')))
 
 

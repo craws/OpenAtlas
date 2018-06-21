@@ -4,7 +4,7 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
-from wtforms.validators import DataRequired
+from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app, logger
@@ -17,7 +17,7 @@ from openatlas.util.util import (display_remove_link, get_base_table_data, get_e
 
 
 class ReferenceForm(Form):
-    name = StringField(_('name'), [DataRequired()], render_kw={'autofocus': True})
+    name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))

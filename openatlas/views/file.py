@@ -7,7 +7,7 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect, secure_filename
 from wtforms import FileField, HiddenField, StringField, SubmitField, TextAreaField
-from wtforms.validators import DataRequired, InputRequired
+from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app, logger
@@ -22,7 +22,7 @@ from openatlas.util.util import (build_table_form, convert_size, display_remove_
 
 class FileForm(Form):
     file = FileField(_('file'), [InputRequired()])
-    name = StringField(_('name'), [DataRequired()])
+    name = StringField(_('name'), [InputRequired()])
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     opened = HiddenField()

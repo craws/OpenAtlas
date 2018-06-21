@@ -6,7 +6,7 @@ from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import (BooleanField, HiddenField, PasswordField, SelectField, StringField,
                      SubmitField, TextAreaField)
-from wtforms.validators import DataRequired, Email
+from wtforms.validators import InputRequired, Email
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
@@ -18,11 +18,11 @@ from openatlas.util.util import (format_date, is_authorized, link, required_grou
 class UserForm(Form):
     user_id = None
     active = BooleanField(_('active'), default=True)
-    username = StringField(_('username'), [DataRequired()], render_kw={'autofocus': True})
+    username = StringField(_('username'), [InputRequired()], render_kw={'autofocus': True})
     group = SelectField(_('group'), choices=[])
-    email = StringField(_('email'), [DataRequired(), Email()])
-    password = PasswordField(_('password'), [DataRequired()])
-    password2 = PasswordField(_('repeat password'), [DataRequired()])
+    email = StringField(_('email'), [InputRequired(), Email()])
+    password = PasswordField(_('password'), [InputRequired()])
+    password2 = PasswordField(_('repeat password'), [InputRequired()])
     show_passwords = BooleanField(_('show passwords'))
     real_name = StringField(_('full name'), description=_('tooltip full name'))
     description = TextAreaField(_('info'))

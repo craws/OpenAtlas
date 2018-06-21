@@ -3,7 +3,7 @@ from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from wtforms import FieldList, HiddenField, StringField, SubmitField, TextAreaField
-from wtforms.validators import DataRequired
+from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import DateForm, build_form
@@ -16,7 +16,7 @@ from openatlas.util.util import (display_remove_link, get_base_table_data, get_e
 
 
 class PlaceForm(DateForm):
-    name = StringField(_('name'), [DataRequired()], render_kw={'autofocus': True})
+    name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     alias = FieldList(StringField(''), description=_('tooltip alias'))
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
@@ -28,7 +28,7 @@ class PlaceForm(DateForm):
 
 
 class FeatureForm(DateForm):
-    name = StringField(_('name'), [DataRequired()])
+    name = StringField(_('name'), [InputRequired()])
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     gis_points = HiddenField()

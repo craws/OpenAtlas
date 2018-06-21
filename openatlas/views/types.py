@@ -6,7 +6,7 @@ from flask_babel import lazy_gettext as _, format_number
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import StringField, SubmitField, TextAreaField, HiddenField
-from wtforms.validators import DataRequired
+from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import build_node_form
@@ -16,7 +16,7 @@ from openatlas.util.util import link, required_group, sanitize, truncate_string
 
 
 class NodeForm(Form):
-    name = StringField(_('name'), [DataRequired()], render_kw={'autofocus': True})
+    name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     name_inverse = StringField(_('inverse'))
     is_node_form = HiddenField()
     description = TextAreaField(_('description'))
