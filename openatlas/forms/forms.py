@@ -261,15 +261,8 @@ class TableMultiSelect(HiddenInput):
         if field.data and isinstance(field.data, str):
             field.data = ast.literal_eval(field.data)
         selection = ''
-        class_ = field.id
-        if class_ in ['donor', 'recipient']:
-            class_ = 'actor'
-        if class_ in ['given_place']:
-            class_ = 'place'
-        table = {
-            'id': field.id,
-            'header': app.config['TABLE_HEADERS'][class_],
-            'data': []}
+        class_ = field.id if field.id != 'given_place' else 'place'
+        table = {'id': field.id, 'header': app.config['TABLE_HEADERS'][class_], 'data': []}
         # Make checkbox column sortable and show selected on top
         table['headers'] = 'headers: { ' + str(len(table['header'])) + ': { sorter: "checkbox" } }'
         table['sort'] = 'sortList: [[' + str(len(table['header'])) + ',0],[0,0]]'
@@ -280,11 +273,10 @@ class TableMultiSelect(HiddenInput):
         for entity in entities:
             selection += entity.name + '<br/>' if field.data and entity.id in field.data else ''
             data = get_base_table_data(entity)
-            data[0] = truncate_string(entity.name)  # replace entity link with entity name
+            data[0] = truncate_string(entity.name)  # Replace entity link with entity name
             html = """<input type="checkbox" id="{id}" {checked} value="{name}"
                 class="multi-table-select">""".format(
-                    id=str(entity.id),
-                    name=entity.name,
+                    id=str(entity.id), name=entity.name,
                     checked='checked = "checked"' if field.data and entity.id in field.data else '')
             data.append(html)
             table['data'].append(data)
