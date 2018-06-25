@@ -168,14 +168,46 @@ def admin_orphans(delete=None):
         name = basename(file)
         file_path = path + '/' + name
         if name != '.gitignore' and splitext(name)[0] not in file_ids:
+            confirm = ' onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
             tables['orphaned_files']['data'].append([
                 name,
                 convert_size(os.path.getsize(file_path)),
                 format_date(datetime.datetime.fromtimestamp(os.path.getmtime(file_path))),
                 splitext(name)[1],
                 '<a href="' + url_for('download_file', filename=name) + '">' + uc_first(
-                    _('download')) + '</a>'])
+                    _('download')) + '</a>',
+                '<a href="' + url_for(
+                    'admin_file_delete', filename=name) + '" ' + confirm + '>Delete</a>'])
     return render_template('admin/orphans.html', tables=tables)
+
+
+@app.route('/admin/file/delete/<filename>')
+@required_group('admin')
+def admin_file_delete(filename):  # pragma: no cover
+    if filename != 'all':
+        try:
+            os.remove(app.config['UPLOAD_FOLDER_PATH'] + '/' + filename)
+            flash(filename + ' ' + _('was deleted'), 'info')
+        except Exception as e:
+            logger.log('error', 'file', 'deletion of ' + filename + ' failed', e)
+            flash(_('error file delete'), 'error')
+        return redirect(url_for('admin_orphans') + '#tab-orphaned-files')
+
+    # Get all files with entities
+    file_ids = []
+    for entity in EntityMapper.get_by_system_type('file'):
+        file_ids.append(str(entity.id))
+    # Get orphaned files (no corresponding entity)
+    path = app.config['UPLOAD_FOLDER_PATH']
+    for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
+        filename = basename(file)
+        if filename != '.gitignore' and splitext(filename)[0] not in file_ids:
+            try:
+                os.remove(app.config['UPLOAD_FOLDER_PATH'] + '/' + filename)
+            except Exception as e:
+                logger.log('error', 'file', 'deletion of ' + filename + ' failed', e)
+                flash(_('error file delete'), 'error')
+    return redirect(url_for('admin_orphans') + '#tab-orphaned-files')
 
 
 @app.route('/admin/log', methods=['POST', 'GET'])

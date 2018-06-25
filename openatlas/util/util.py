@@ -147,7 +147,7 @@ def build_table_form(class_name, linked_entities):
         entities = EntityMapper.get_by_codes(class_name)
     for entity in entities:
         if entity.id in linked_ids:
-            continue  # don't show already linked entries
+            continue  # Don't show already linked entries
         input_ = '<input id="{id}" name="values" type="checkbox" value="{id}">'.format(id=entity.id)
         table['data'].append(get_base_table_data(entity) + [input_])
     if not table['data']:
