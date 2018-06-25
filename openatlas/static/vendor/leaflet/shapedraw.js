@@ -344,7 +344,7 @@ function editsavetodb() {
 
         $('#gis_points').val(JSON.stringify(points)); // write array back to form field
         var point = '{"type":"Feature","geometry":{"type":"Point","coordinates":[' + $('#easting').val() + ',' + $('#northing').val() + ']},"properties":';
-        point += '{"name": "' + $('#shapename').val() + '","description": "' + $('#shapedescription').val() + '","marker-color": "#fc4353","siteType":"To do","shapeType": "centerpoint"}}';
+        point += '{"name": "' + $('#shapename').val().replace(/\"/g,'\\"') + '","description": "' + $('#shapedescription').val().replace(/\"/g,'\\"') + '","marker-color": "#fc4353","siteType":"To do","shapeType": "centerpoint"}}';
         var points = JSON.parse($('#gis_points').val());
         points.push(JSON.parse(point));
         $('#gis_points').val(JSON.stringify(points));
@@ -365,7 +365,7 @@ function editsavetodb() {
         });
         $('#gis_polygons').val(JSON.stringify(polygons));
         var polygon = '{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[' + geoJsonArray.join(',') + ']]},"properties":';
-        polygon += '{"name": "' + $('#shapename').val() + '","description": "' + $('#shapedescription').val() + '", "shapeType": "' + shapetype + '"}}';
+        polygon += '{"name": "' + $('#shapename').val().replace(/\"/g,'\\"') + '","description": "' + $('#shapedescription').val().replace(/\"/g,'\\"') + '", "shapeType": "' + shapetype + '"}}';
         var polygons = JSON.parse($('#gis_polygons').val());
         polygons.push(JSON.parse(polygon));
         $('#gis_polygons').val(JSON.stringify(polygons));
@@ -538,7 +538,7 @@ function saveMarker() {
     capture = false;
     document.getElementById('savebtn').style.display = 'none';
     var point = '{"type":"Feature","geometry":{"type":"Point","coordinates":[' + $('#easting').val() + ',' + $('#northing').val() + ']},"properties":';
-    point += '{"name": "' + $('#shapename').val() + '","description": "' + $('#shapedescription').val() + '", "shapeType": "centerpoint"}}';
+    point += '{"name": "' + $('#shapename').val().replace(/\"/g,'\\"') + '","description": "' + $('#shapedescription').val().replace(/\"/g,'\\"') + '", "shapeType": "centerpoint"}}';
     var points = JSON.parse($('#gis_points').val());
     points.push(JSON.parse(point));
     $('#gis_points').val(JSON.stringify(points));
@@ -563,7 +563,7 @@ function savetodb() {
     var dataString = '&shapename=' + shapename + '&shapetype=' + shapetype + '&shapedescription=' + shapedescription + '&shapecoords=' + shapecoords + '&geometrytype=' + geometrytype;
     $('#gisData').val($('#gisData').val() + dataString);
     var polygon = '{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[' + geoJsonArray.join(',') + ']]},"properties":';
-    polygon += '{"name": "' + $('#shapename').val() + '","description": "' + $('#shapedescription').val() + '", "shapeType": "' + shapetype + '"}}';
+    polygon += '{"name": "' + $('#shapename').val().replace(/\"/g,'\\"') + '","description": "' + $('#shapedescription').val().replace(/\"/g,'\\"') + '", "shapeType": "' + shapetype + '"}}';
     var polygons = JSON.parse($('#gis_polygons').val());
     polygons.push(JSON.parse(polygon));
     $('#gis_polygons').val(JSON.stringify(polygons));
