@@ -2,13 +2,17 @@
 
 OpenAtlas is an open source application for archeological, historical and geospatial data.
 
-Website: http://openatlas.eu/website
-
-Demo: https://demo.openatlas.eu
+[Project website](http://openatlas.eu/website)
 
 Documentation: [Wiki](https://redmine.openatlas.eu/projects/uni/wiki), [Issues](https://redmine.openatlas.eu/projects/uni/issues), [Features](https://redmine.openatlas.eu/projects/uni/wiki/Features)
 
 Code: [Bitucket](https://bitbucket.org/openatlas/openatlas) or [GitHub](https://github.com/craws/OpenAtlas)
+
+Demo versions:
+
+[Demo](https://demo.openatlas.eu) with data kindly provided by [MEDCON](https://oeaw.academia.edu/MappingMedievalConflict)
+
+[Development demo](https://demo-dev.openatlas.eu) with data kindly provided by [DPP](https://dpp.oeaw.ac.at/)
 
 # Installation
 
