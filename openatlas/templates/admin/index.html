@@ -16,9 +16,6 @@
         {% if 'manager'|is_authorized %}
             <a href="{{ url_for('admin_file') }}">{{ _('settings')|uc_first }}</a>
         {% endif %}
-        {% if not upload_dir_writeable %}
-            <span class="error">{{ _('Upload directory not writeable!') }}</span>
-        {% endif %}
 
         {% if 'manager'|is_authorized %}
             <h1>{{ _('settings')|uc_first }}</h1>

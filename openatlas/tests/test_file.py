@@ -44,6 +44,7 @@ class FileTest(TestBaseCase):
                     data={'name': 'Invalid file', 'file': invalid_file}, follow_redirects=True)
             assert b'File type not allowed' in rv.data
 
+            os.chmod(app.config['UPLOAD_FOLDER_PATH'], 0o000)  # Disable access rights
             rv = self.app.post(
                 url_for('file_insert', code='E7', origin_id=actor_id),
                 data={'name': 'This is not a file'}, follow_redirects=True)
@@ -93,5 +94,6 @@ class FileTest(TestBaseCase):
             assert b'File keeper' in rv.data
 
             # Delete
+            os.chmod(app.config['UPLOAD_FOLDER_PATH'], 0o000)  # Disable access rights
             rv = self.app.get(url_for('file_delete', id_=file_id), follow_redirects=True)
             assert b'The entry has been deleted' in rv.data

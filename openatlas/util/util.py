@@ -1,20 +1,20 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import glob
 import os
-import re
 import smtplib
 from collections import OrderedDict
-from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
-from functools import wraps
 from html.parser import HTMLParser
 
 import numpy
+import re
 from babel import dates
+from datetime import datetime
 from flask import abort, flash, g, request, session, url_for
-from flask_babel import lazy_gettext as _, format_number
+from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
+from functools import wraps
 from numpy import math
 from werkzeug.utils import redirect
 
@@ -163,6 +163,21 @@ def display_remove_link(url, name):
     name = name.replace('\'', '')
     confirm = 'onclick="return confirm(\'' + _('Remove %(name)s?', name=name) + '\')"'
     return '<a ' + confirm + ' href="' + url + '">' + uc_first(_('remove')) + '</a>'
+
+
+def make_upload_dir_writeable():
+    """ Make upload dir writeable (for owner if user is owner else for all)"""
+    import getpass
+    from os import stat
+    from pwd import getpwuid
+
+    this_user = getpass.getuser()
+    upload_dir_user = getpwuid(stat(app.config['UPLOAD_FOLDER_PATH']).st_uid).pw_name
+    if this_user == upload_dir_user:
+        os.chmod(app.config['UPLOAD_FOLDER_PATH'], 0o755)
+    else:  # pragma: no cover
+        os.chmod(app.config['UPLOAD_FOLDER_PATH'], 0o777)
+    return
 
 
 def get_entity_data(entity, location=None):

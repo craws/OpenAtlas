@@ -17,7 +17,7 @@ from openatlas.models.link import LinkMapper
 from openatlas.util.util import (build_table_form, convert_size, display_remove_link,
                                  get_base_table_data, get_entity_data, get_file_path,
                                  get_view_name, link, required_group, was_modified, is_authorized,
-                                 uc_first)
+                                 uc_first, make_upload_dir_writeable)
 
 
 class FileForm(Form):
@@ -185,6 +185,8 @@ def file_delete(id_=None):
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
     try:
+        if not os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK):
+            make_upload_dir_writeable()
         path = get_file_path(id_)
         if path:
             os.remove(get_file_path(id_))
@@ -198,6 +200,8 @@ def file_delete(id_=None):
 def save(form, file=None, origin=None):
     g.cursor.execute('BEGIN')
     try:
+        if not os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK):
+            make_upload_dir_writeable()
         log_action = 'update'
         if not file:
             log_action = 'insert'
