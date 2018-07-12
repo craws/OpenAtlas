@@ -101,6 +101,9 @@ class GisMapper:
             if not data:
                 continue
             for item in json.loads(data):
+                # Don't save geom if coordinates are empty
+                if not item['geometry']['coordinates'] or item['geometry']['coordinates'] == [[]]:
+                    continue  # pragma: no cover
                 sql = """
                     INSERT INTO gis.{shape} (entity_id, name, description, type, geom)
                     VALUES (

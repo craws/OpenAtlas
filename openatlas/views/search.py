@@ -33,7 +33,7 @@ def index_search():
     form.classes.process(request.form)
     table = {'data': []}
     if request.method == 'POST' and 'global-term' in request.form and request.form['global-term']:
-        # coming from global search
+        # Coming from global search
         form.term.data = request.form['global-term']
         form.classes.data = classes
         table = build_search_table(form)
