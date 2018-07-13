@@ -12,6 +12,11 @@ $(document).ready(function () {
         return this.optional(element) || element.files[0].size <= param;
     }, 'This file it too large, allowed are ' + maxFileSize + ' MB');
 
+    $.validator.addMethod("signedInteger", function(value, element) {
+        return /^-?\d+$/i.test(value);
+    }, 'Please enter a valid integer.');
+
+
     $('#show_passwords').show();
     $(".date-switch").addClass('display-none');
     $(".value-type-switch").addClass('display-none');
@@ -68,6 +73,7 @@ $(document).ready(function () {
         month: {digits: true, min: 1, max: 12},
         day: {digits: true, min: 1, max: 31},
         integer: {digits: true},
+        signed_integer: {signedInteger: true},
         email: {email: true},
         "value-type": {number: true}
     });

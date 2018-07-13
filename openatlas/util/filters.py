@@ -170,9 +170,10 @@ def display_form(self, form, form_id=None, for_persons=False):
         class_ = 'required' if field.flags.required else ''
         class_ += ' integer' if isinstance(field, IntegerField) else ''
         for validator in field.validators:
-
             if isinstance(validator, Email):
                 class_ += ' email'
+        if field.name == 'charge':
+            class_ += ' signed_integer'
         errors = ''
         for error in field.errors:
             errors += util.uc_first(error)

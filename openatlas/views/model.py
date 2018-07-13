@@ -4,7 +4,7 @@ from collections import OrderedDict
 from flask import g, render_template
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
-from wtforms import BooleanField, HiddenField, IntegerField, SubmitField
+from wtforms import BooleanField, HiddenField, IntegerField, StringField, SubmitField
 from wtforms.validators import InputRequired
 
 from openatlas import app
@@ -141,7 +141,7 @@ class NetworkForm(Form):
     orphans = BooleanField(default=False)
     width = IntegerField(default=1200, validators=[InputRequired()])
     height = IntegerField(default=600, validators=[InputRequired()])
-    charge = IntegerField(default=-800, validators=[InputRequired()])
+    charge = StringField(default=-800, validators=[InputRequired()])
     distance = IntegerField(default=80, validators=[InputRequired()])
     save = SubmitField(_('apply'))
 
