@@ -359,12 +359,17 @@ function editsavetodb() {
             var id = (JSON.stringify(value.properties.id));
             var index = ((JSON.stringify(key)));
             if (id == selectedshape) {
+                old_coordinates = value['geometry']['coordinates'];
                 polygons.splice(index, 1);
                 return false;
             }
         });
         $('#gis_polygons').val(JSON.stringify(polygons));
-        var polygon = '{"type":"Feature","geometry":{"type":"Polygon","coordinates":[[' + geoJsonArray.join(',') + ']]},"properties":';
+        coordinates = '[[' + geoJsonArray.join(',') + ']]'
+        if (geoJsonArray.length < 1) {
+            coordinates = JSON.stringify(old_coordinates);
+        }
+        var polygon = '{"type":"Feature","geometry":{"type":"Polygon","coordinates":' + coordinates + '},"properties":';
         polygon += '{"name": "' + $('#shapename').val().replace(/\"/g,'\\"') + '","description": "' + $('#shapedescription').val().replace(/\"/g,'\\"') + '", "shapeType": "' + shapetype + '"}}';
         var polygons = JSON.parse($('#gis_polygons').val());
         polygons.push(JSON.parse(polygon));
