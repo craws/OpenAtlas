@@ -83,7 +83,8 @@ class MailForm(Form):
 @app.route('/admin')
 @required_group('readonly')
 def admin_index():
-    return render_template('admin/index.html')
+    upload_dir_writeable = True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False
+    return render_template('admin/index.html', upload_dir_writeable=upload_dir_writeable)
 
 
 @app.route('/admin/check_links')

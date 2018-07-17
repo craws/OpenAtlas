@@ -165,21 +165,6 @@ def display_remove_link(url, name):
     return '<a ' + confirm + ' href="' + url + '">' + uc_first(_('remove')) + '</a>'
 
 
-def make_upload_dir_writeable():
-    """ Make upload dir writeable (for owner if user is owner else for all)"""
-    import getpass
-    from os import stat
-    from pwd import getpwuid
-
-    this_user = getpass.getuser()
-    upload_dir_user = getpwuid(stat(app.config['UPLOAD_FOLDER_PATH']).st_uid).pw_name
-    if this_user == upload_dir_user:
-        os.chmod(app.config['UPLOAD_FOLDER_PATH'], 0o755)
-    else:  # pragma: no cover
-        os.chmod(app.config['UPLOAD_FOLDER_PATH'], 0o777)
-    return
-
-
 def get_entity_data(entity, location=None):
     """
     Return related entity information for a table for view.
