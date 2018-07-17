@@ -63,3 +63,8 @@ class SettingsMapper:
                 continue
             value = getattr(form, field).data
             g.cursor.execute(sql, {'name': field, 'value': value})
+
+    @staticmethod
+    def set_logo(file_id):
+        sql = "UPDATE web.settings SET value = %(file_id)s WHERE name = 'logo_file_id';"
+        g.cursor.execute(sql, {'file_id': file_id})

@@ -23,6 +23,7 @@
         {% if 'manager'|is_authorized %}
             <h1>{{ _('settings')|uc_first }}</h1>
             <a href="{{ url_for('content_index') }}">{{ _('content')|uc_first }}</a>
+            <a href="{{ url_for('admin_logo') }}">{{ _('logo')|uc_first }}</a>
         {% endif %}
         {% if 'admin'|is_authorized %}
             <a href="{{ url_for('admin_general') }}">{{ _('general')|uc_first }}</a>

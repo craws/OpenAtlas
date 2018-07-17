@@ -32,4 +32,5 @@ INSERT INTO settings (name, value) VALUES
 ('minimum_password_length', '12'),
 ('random_password_length', '16'),
 ('reset_confirm_hours', '24'),
-('site_name', 'OpenAtlas');
+('site_name', 'OpenAtlas'),
+('logo_file_id', '');

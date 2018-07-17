@@ -54,7 +54,10 @@
     </head>
     <body>
         <div id="header">
-            <div id="logo"><a href="/"></a></div>
+            {{ get_file_path}}
+            <div id="logo">
+                <a href="/">{{ session['settings']['logo_file_id']|display_logo|safe }}</a>
+            </div>
             <div id="site-name">
                 {{ session['settings']['site_name'] }}
                 {% if 'local' in request['url_root'] %}local{% endif %}

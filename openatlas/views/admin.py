@@ -13,6 +13,7 @@ from wtforms import BooleanField, IntegerField, SelectField, StringField, Submit
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app, logger
+from openatlas.forms.forms import TableField
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.models.node import NodeMapper
@@ -40,6 +41,11 @@ class FileForm(Form):
     file_upload_max_size = IntegerField(_('max file size in MB'))
     file_upload_allowed_extension = StringField('allowed file extensions')
     save = SubmitField(uc_first(_('save')))
+
+
+class LogoForm(Form):
+    file = TableField(_('file'), [InputRequired()])
+    save = SubmitField(uc_first(_('change logo')))
 
 
 class TestMail(Form):
@@ -180,6 +186,15 @@ def admin_orphans(delete=None):
                 '<a href="' + url_for(
                     'admin_file_delete', filename=name) + '" ' + confirm + '>Delete</a>'])
     return render_template('admin/orphans.html', tables=tables)
+
+
+@app.route('/admin/logo', methods=['POST', 'GET'])
+@required_group('manager')
+def admin_logo():
+    form = LogoForm()
+    if form.validate_on_submit():
+        SettingsMapper.set_logo(form.file.data)
+    return render_template('admin/logo.html', form=form)
 
 
 @app.route('/admin/file/delete/<filename>')

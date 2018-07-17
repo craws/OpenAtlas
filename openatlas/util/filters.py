@@ -14,7 +14,7 @@ from wtforms.validators import Email
 from openatlas import app
 from openatlas.models.content import ContentMapper
 from openatlas.util import util
-from openatlas.util.util import display_tooltip
+from openatlas.util.util import display_tooltip, print_file_extension
 
 blueprint = flask.Blueprint('filters', __name__)
 paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
@@ -134,6 +134,17 @@ def description(self, entity):
 @blueprint.app_template_filter()
 def display_content_translation(self, text):
     return ContentMapper.get_translation(text)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def display_logo(self, file_id):
+    src = '/static/images/layout/logo.png'
+    if file_id:
+        extension = print_file_extension(int(file_id))
+        if extension != 'N/A':
+            src = url_for('display_file', filename=file_id + extension)
+    return '<img src="{src}" alt="Logo" />'.format(src=src)
 
 
 @jinja2.contextfilter
