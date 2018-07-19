@@ -67,8 +67,16 @@ class ContentTests(TestBaseCase):
             assert b'Nostromo' in rv.data
             rv = self.app.get(url_for('admin_mail_update'))
             assert b'Mail transport port' in rv.data
+            data = {
+                'mail': True,
+                'mail_transport_username': 'whatever',
+                'mail_transport_host': 'localhost',
+                'mail_transport_port': '23',
+                'mail_from_email': 'max@example.com',
+                'mail_from_name': 'Max Headroom',
+                'mail_recipients_feedback': 'headroom@example.com'}
             rv = self.app.post(url_for('admin_mail_update'), data=data, follow_redirects=True)
-            assert b'Mail transport port' in rv.data
+            assert b'Max Headroom' in rv.data
             rv = self.app.get(url_for('admin_file'))
             assert b'jpg' in rv.data
             rv = self.app.post(
