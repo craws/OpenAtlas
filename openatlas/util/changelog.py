@@ -9,7 +9,8 @@ class Changelog:
         'date': 'TBA',
         'data': OrderedDict(
             feature=OrderedDict([
-                ('878', 'Enhanced admin functionality')]))}
+                ('878', 'Enhanced admin functionality'),
+                ('913', 'Change logo function')]))}
     versions['3.6.0'] = {
         'date': '2018-06-09',
         'data': OrderedDict(

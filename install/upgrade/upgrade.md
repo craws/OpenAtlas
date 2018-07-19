@@ -2,6 +2,17 @@
 
 Before executing SQL statements backup the database. Replace database role "openatlas" if needed.
 
+### 3.6.0 to 3.7.0
+
+One major change is that it isn't needed anymore to have different branches for different projects.
+The master branch should be sufficient for all projects.
+
+Changes to look out for are:
+
+- Change logo function to customize the logo if you like to replace the default OpenAtlas logo
+- Configuration of database and the like should be done in instance/production.py
+
+
 ### 3.5.0 to 3.6.0
 
 Due to a bug it was possible to link information carriers to event, actor and place. These links are
