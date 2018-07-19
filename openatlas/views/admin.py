@@ -55,6 +55,7 @@ class TestMail(Form):
 
 class GeneralForm(Form):
     site_name = StringField(uc_first(_('site name')))
+    site_header = StringField(uc_first(_('site header')))
     default_language = SelectField(uc_first(
         _('default language')),
         choices=app.config['LANGUAGES'].items())
@@ -325,6 +326,7 @@ def admin_general():
     settings = session['settings']
     general_settings = OrderedDict([
         (_('site name'), settings['site_name']),
+        (_('site header'), settings['site_header']),
         (_('default language'), app.config['LANGUAGES'][settings['default_language']]),
         (_('default table rows'), settings['default_table_rows']),
         (_('log level'), app.config['LOG_LEVELS'][int(settings['log_level'])]),

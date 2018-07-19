@@ -2,7 +2,8 @@
 
 BEGIN;
 
--- Add setting for logo
+-- Add settings
 INSERT INTO web.settings (name, value) VALUES ('logo_file_id', '');
+INSERT INTO web.settings (name, value) VALUES ('site_header', '');
 
 COMMIT;

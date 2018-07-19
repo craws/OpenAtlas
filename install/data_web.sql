@@ -22,6 +22,7 @@ INSERT INTO settings (name, value) VALUES
 ('file_upload_max_size', '10'),
 ('file_upload_allowed_extension', 'gif jpeg jpg pdf png txt zip'),
 ('log_level', '6'),
+('logo_file_id', ''),
 ('mail', ''),
 ('mail_transport_username', ''),
 ('mail_transport_port', ''),
@@ -32,5 +33,5 @@ INSERT INTO settings (name, value) VALUES
 ('minimum_password_length', '12'),
 ('random_password_length', '16'),
 ('reset_confirm_hours', '24'),
-('site_name', 'OpenAtlas'),
-('logo_file_id', '');
+('site_header', ''),
+('site_name', 'OpenAtlas');

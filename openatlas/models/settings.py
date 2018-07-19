@@ -23,7 +23,8 @@ class SettingsMapper:
         'minimum_password_length',
         'random_password_length',
         'reset_confirm_hours',
-        'site_name'}
+        'site_name',
+        'site_header'}
 
     @staticmethod
     def get_settings():

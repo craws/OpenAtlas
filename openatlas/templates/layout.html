@@ -54,12 +54,12 @@
     </head>
     <body>
         <div id="header">
-            {{ get_file_path}}
+            {{ get_file_path }}
             <div id="logo">
                 <a href="/">{{ session['settings']['logo_file_id']|display_logo|safe }}</a>
             </div>
             <div id="site-name">
-                {{ session['settings']['site_name'] }}
+                {{ session['settings']['site_header'] }}
                 {% if 'local' in request['url_root'] %}local{% endif %}
                 <noscript><div class="error">{{ _('warning no js') }}</div></noscript>
                 <br /><br />
