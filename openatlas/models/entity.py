@@ -8,7 +8,7 @@ from werkzeug.exceptions import abort
 from openatlas import app, debug_model, logger
 from openatlas.models.date import DateMapper
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import get_view_name, uc_first
+from openatlas.util.util import get_view_name, uc_first, print_file_extension
 
 
 class Entity:
@@ -144,6 +144,16 @@ class EntityMapper:
         entities = []
         for row in g.cursor.fetchall():
             entities.append(Entity(row))
+        return entities
+
+    @staticmethod
+    def get_display_files():
+        sql = EntityMapper.sql + " WHERE e.system_type = 'file' GROUP BY e.id ORDER BY e.name;"
+        g.cursor.execute(sql)
+        entities = []
+        for row in g.cursor.fetchall():
+            if print_file_extension(row.id)[1:] in app.config['DISPLAY_FILE_EXTENSIONS']:
+                entities.append(Entity(row))
         return entities
 
     @staticmethod

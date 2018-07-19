@@ -49,6 +49,11 @@ def display_file(filename):
     return send_from_directory(app.config['UPLOAD_FOLDER_PATH'], filename)
 
 
+@app.route('/display_logo/<path:filename>')
+def display_logo(filename):  # extra file display function for public
+    return send_from_directory(app.config['UPLOAD_FOLDER_PATH'], filename)
+
+
 @app.route('/file/index')
 @required_group('readonly')
 def file_index():

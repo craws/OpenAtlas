@@ -215,7 +215,7 @@ class TableSelect(HiddenInput):
             entities = EntityMapper.get_by_system_type('bibliography') + \
                        EntityMapper.get_by_system_type('edition')
         elif class_ == 'file':
-            entities = EntityMapper.get_by_system_type('file')
+            entities = EntityMapper.get_display_files()
         else:
             entities = EntityMapper.get_by_codes(class_)
         for entity in entities:

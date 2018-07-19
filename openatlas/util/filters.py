@@ -143,7 +143,7 @@ def display_logo(self, file_id):
     if file_id:
         extension = print_file_extension(int(file_id))
         if extension != 'N/A':
-            src = url_for('display_file', filename=file_id + extension)
+            src = url_for('display_logo', filename=file_id + extension)
     return '<img src="{src}" alt="Logo" />'.format(src=src)
 
 

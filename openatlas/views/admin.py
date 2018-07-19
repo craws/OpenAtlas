@@ -188,12 +188,21 @@ def admin_orphans(delete=None):
     return render_template('admin/orphans.html', tables=tables)
 
 
-@app.route('/admin/logo', methods=['POST', 'GET'])
+@app.route('/admin/logo/', methods=['POST', 'GET'])
+@app.route('/admin/logo/<action>')
 @required_group('manager')
-def admin_logo():
+def admin_logo(action=None):
+    if action == 'remove':
+        SettingsMapper.set_logo('')
+        return redirect(url_for('admin_logo'))
+    if session['settings']['logo_file_id']:
+        path = get_file_path(int(session['settings']['logo_file_id']))
+        return render_template(
+            'admin/logo.html', filename=os.path.basename(path) if path else False)
     form = LogoForm()
     if form.validate_on_submit():
         SettingsMapper.set_logo(form.file.data)
+        return redirect(url_for('admin_logo'))
     return render_template('admin/logo.html', form=form)
 
 
