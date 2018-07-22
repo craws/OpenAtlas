@@ -3,11 +3,11 @@
 
 #logo {
     float: left;
-    margin-right: 3em;
+    height: 120px;
 }
 
 #logo img {
-    max-height: 110px;
+    max-height: 120px;
 }
 
 div.preview {

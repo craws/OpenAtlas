@@ -206,8 +206,7 @@ input.table-select {
 }
 
 #header {
-    padding: 0.5em 1em;
-    height: 7em;
+    height: 120px;
 }
 
 .button-bar {
@@ -231,6 +230,7 @@ noscript div {
     float: right;
     font-weight: bold;
     font-size: 0.9em;
+    padding: 0.5em 1em;
 }
 
 #language-menu a, #language-menu span {
@@ -260,10 +260,11 @@ img.zoom {
     font-size: 1.4em;
     font-weight: bold;
     float: left;
-    padding: 0.5em;
+    margin: 0.5em 0.5em 0.5em 2em;
 }
 
 #menu {
+    clear: both;
     height: 3em;
 }
 
@@ -306,11 +307,6 @@ img.zoom {
 
 #greeting {
     float: right;
-    margin-top: 1em;
-}
-
-#powered-by {
-    font-size: 0.8em;
     margin-top: 1em;
 }
 
