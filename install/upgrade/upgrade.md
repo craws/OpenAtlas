@@ -37,7 +37,7 @@ Execute install/upgrade/3.4.0.sql after making backups
 
 Execute install/upgrade/3.3.0.sql after making backups
 
-Make the openatlas/uploads directory writeable for apache e.g.
+Make the openatlas/uploads directory writable for apache e.g.
 
     chown www-data /var/www/net/openatlas/openatlas/uploads/
 

@@ -63,7 +63,7 @@ Test Apache configuration and restart
 
 ### File Upload
 
-Make the openatlas/uploads directory writeable for apache e.g.
+Make the openatlas/uploads directory writable for apache e.g.
 
     # chown www-data openatlas/uploads
 
