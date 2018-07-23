@@ -1,0 +1,82 @@
+@-moz-keyframes leaflet-usermarker-pulsate {
+    from {
+        -moz-transform: scale(0.5);
+        opacity: 1.0;
+    }
+    95% {
+        -moz-transform: scale(1.3);
+        opacity: 0;
+    }
+    to {
+        -moz-transform: scale(0.7);
+        opacity: 0;
+    }
+}
+@-webkit-keyframes leaflet-usermarker-pulsate {
+    from {
+        -webkit-transform: scale(0.5);
+        opacity: 1.0;
+    }
+    95% {
+        -webkit-transform: scale(1.3);
+        opacity: 0;
+    }
+    to {
+        -webkit-transform: scale(0.7);
+        opacity: 0;
+    }
+}
+@keyframes leaflet-usermarker-pulsate {
+    from {
+        transform: scale(0.5);
+        opacity: 1.0;
+    }
+    95% {
+        transform: scale(1.3);
+        opacity: 0;
+    }
+    to {
+        transform: scale(0.7);
+        opacity: 0;
+    }
+}
+
+.leaflet-usermarker,
+.leaflet-usermarker-small {
+    width: 34px;
+    height: 34px;
+    /*background: url(img/bluedot.png);*/
+    background-size: 100%;
+}
+.leaflet-usermarker-small {
+    width: 17px;
+    height: 17px;
+}
+
+.leaflet-usermarker i.pulse,
+.leaflet-usermarker-small i.pulse {
+    display: block;
+
+    -moz-animation: leaflet-usermarker-pulsate 1.5s ease-in-out infinite;
+    -webkit-animation: leaflet-usermarker-pulsate 1.5s ease-in-out infinite;
+    animation: leaflet-usermarker-pulsate 1.5s ease-in-out infinite;
+    border:1pt solid #fff;
+    /* make a circle */
+    -moz-border-radius:51px;
+    -webkit-border-radius:51px;
+    border-radius:51px;
+    /* multiply the shadows, inside and outside the circle */
+    -moz-box-shadow:inset 0 0 5px #06f, inset 0 0 5px #06f, inset 0 0 5px #06f, 0 0 5px #06f, 0 0 5px #06f, 0 0 5px #06f;
+    -webkit-box-shadow:inset 0 0 5px #06f, inset 0 0 5px #06f, inset 0 0 5px #06f, 0 0 5px #06f, 0 0 5px #06f, 0 0 5px #06f;
+    box-shadow:inset 0 0 5px #06f, inset 0 0 5px #06f, inset 0 0 5px #06f, 0 0 5px #06f, 0 0 5px #06f, 0 0 5px #06f;
+    /* set the ring's new dimension and re-center it */
+    height:61px!important;
+    margin:-14px 0 0 -14px;
+    width:61px!important;
+}
+
+.leaflet-usermarker-small i.pulse {
+    height: 31px !important;
+    width: 31px !important;
+    margin: -7px 0 0 -7px;
+}

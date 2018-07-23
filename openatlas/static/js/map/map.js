@@ -37,6 +37,18 @@ var geoSearchControl = L.control.geonames({
 });
 map.addControl(geoSearchControl);
 
+/**
+ * Interactions with the map
+ */
+
+// Init variables
+var coordCapture;
+var coordCaptureImg;
+
+
+/**
+ * Custom map functions
+ */
 
 /**
  * Function to display a marker's popop on the map
@@ -65,4 +77,56 @@ function setPopup(feature, layer, mode='display') {
     }
     // Bind to layer
     layer.bindPopup(popupHTML);
+}
+
+/*
+/**
+ * Function to set interactions off
+ */
+function interactionOff() {
+    capture = false;
+    map.dragging.disable();
+    map.touchZoom.disable();
+    map.doubleClickZoom.disable();
+    map.scrollWheelZoom.disable();
+    map.boxZoom.disable();
+    map.keyboard.disable();
+    if (map.tap) {
+        map.tap.disable();
+    }
+}
+
+/**
+ * Function to set interactions on
+ */
+function interactionOn() {
+    map.dragging.enable();
+    map.touchZoom.enable();
+    map.doubleClickZoom.enable();
+    map.scrollWheelZoom.enable();
+    map.boxZoom.enable();
+    map.keyboard.enable();
+    if (map.tap) {
+        map.tap.enable();
+    }
+    $('#map').css('cursor', '');
+    if (coordCapture) {
+        document.getElementById('map').style.cursor = 'crosshair';
+        capture = true;
+    }
+    if (coordCaptureImg) {
+        document.getElementById('map').style.cursor = 'crosshair';
+    }
+}
+
+/**
+ * Function to toggle interactions between on and off
+ * @param element - Interaction element.
+ */
+function interactionToggle(element) { // disable map dragging when cursor is e.g. in search input field.
+    $(element).hover(function () {
+        interactionOn();
+    }, function () {
+        interactionOff();
+    });
 }
