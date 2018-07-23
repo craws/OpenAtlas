@@ -1,14 +1,39 @@
-var map = L.map('map');
+/**
+ * @file 
+ * OpenAtlas' map init and options
+ *
+ * Asil Çetin
+ */
 
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-}).addTo(map);
+// Init map variable using the #map div with options
+var map = L.map('map', {
+    fullscreenControl: true
+});
 
+// Define base map layers
+var baseMaps = {
+    OpenStreetMap: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}),
+    GoogleSatellite: L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google Maps '}),
+};
+
+// Default base map init
+baseMaps.OpenStreetMap.addTo(map);
+
+// Add map layers control
+L.control.layers(baseMaps).addTo(map);
+
+// Define and add geo json layer for markers
 var geoJsonLayer = new L.GeoJSON(gisPointAll, {onEachFeature: setPopup});
 geoJsonLayer.addTo(map);
-
 map.fitBounds(geoJsonLayer.getBounds(), {maxZoom: 12});
 
+
+/**
+ * Function to display a marker's popop on the map
+ * @param feature - Markers object.
+ * @param layer - Map layer to bind.
+ * @param mode - 'display' for view only or 'update' for editing.
+ */
 function setPopup(feature, layer, mode='display') {
     // Base popup HTML content
     var popupHTML =
