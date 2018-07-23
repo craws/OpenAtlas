@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
+    > <a href="{{ url_for('admin_general') }}">{{ _('general')|uc_first }}</a>
+    > {{ _('edit')|uc_first }}
+{% endblock %}
+{% block content %}
+    {{ form|display_form|safe }}
+    {% for field, errors in form.errors.items() %}
+        {{ form[field].label }}: {{ ', '.join(errors) }}
+    {% endfor %}
+{% endblock %}

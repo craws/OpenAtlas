@@ -37,6 +37,12 @@
         {{ tables['missing_files']|pager|safe }}
     </div>
     <div id="tab-orphaned-files">
+        {% if tables['orphaned_files']['data']|length > 0 %}
+            <div class="button-bar">
+                <a onclick="return confirm('{{_('delete all files without corresponding entities?')|uc_first }}')"
+                   href="{{ url_for('admin_file_delete', filename='all') }}">{{ _('delete all files')|uc_first }}</a>
+            </div>
+        {% endif %}
         {{ tables['orphaned_files']|pager|safe }}
     </div>
 </div>

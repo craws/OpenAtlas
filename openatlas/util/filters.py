@@ -8,13 +8,13 @@ from flask import g, render_template_string, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from jinja2 import escape, evalcontextfilter
+from wtforms import IntegerField
+from wtforms.validators import Email
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
-from openatlas.models.node import NodeMapper
 from openatlas.models.content import ContentMapper
 from openatlas.util import util
-from openatlas.util.util import display_tooltip
+from openatlas.util.util import display_tooltip, print_file_extension
 
 blueprint = flask.Blueprint('filters', __name__)
 paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
@@ -138,6 +138,17 @@ def display_content_translation(self, text):
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
+def display_logo(self, file_id):
+    src = '/static/images/layout/logo.png'
+    if file_id:
+        extension = print_file_extension(int(file_id))
+        if extension != 'N/A':
+            src = url_for('display_logo', filename=file_id + extension)
+    return '<img src="{src}" alt="Logo" />'.format(src=src)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
 def display_form(self, form, form_id=None, for_persons=False):
     multipart = 'enctype="multipart/form-data"' if hasattr(form, 'file') else ''
     if 'update' in request.path:
@@ -167,7 +178,13 @@ def display_form(self, form, form_id=None, for_persons=False):
     for field in form:
         if field.id.startswith('value_list-'):
             continue
-        class_ = "required" if field.flags.required else ''
+        class_ = 'required' if field.flags.required else ''
+        class_ += ' integer' if isinstance(field, IntegerField) else ''
+        for validator in field.validators:
+            if isinstance(validator, Email):
+                class_ += ' email'
+        if field.name == 'charge':
+            class_ += ' signed_integer'
         errors = ''
         for error in field.errors:
             errors += util.uc_first(error)

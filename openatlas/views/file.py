@@ -7,7 +7,7 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect, secure_filename
 from wtforms import FileField, HiddenField, StringField, SubmitField, TextAreaField
-from wtforms.validators import DataRequired, InputRequired
+from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app, logger
@@ -22,7 +22,7 @@ from openatlas.util.util import (build_table_form, convert_size, display_remove_
 
 class FileForm(Form):
     file = FileField(_('file'), [InputRequired()])
-    name = StringField(_('name'), [DataRequired()])
+    name = StringField(_('name'), [InputRequired()])
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     opened = HiddenField()
@@ -46,6 +46,11 @@ def download_file(filename):
 @app.route('/display/<path:filename>')
 @required_group('readonly')
 def display_file(filename):
+    return send_from_directory(app.config['UPLOAD_FOLDER_PATH'], filename)
+
+
+@app.route('/display_logo/<path:filename>')
+def display_logo(filename):  # extra file display function for public
     return send_from_directory(app.config['UPLOAD_FOLDER_PATH'], filename)
 
 

@@ -15,9 +15,7 @@ from openatlas.util.util import uc_first, display_tooltip
 class DisplayForm(Form):
     language = SelectField(_('language'), choices=app.config['LANGUAGES'].items())
     theme_choices = [
-        ('default', _('default')),
-        ('darkside', 'Darkside'),
-        ('omg_ponies', 'OMG Ponies!')]
+        ('default', _('default')), ('darkside', 'Darkside'), ('omg_ponies', 'OMG Ponies!')]
     theme = SelectField(_('color theme'), choices=theme_choices)
     table_rows = SelectField(
         _('table rows'),

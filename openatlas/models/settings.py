@@ -23,7 +23,8 @@ class SettingsMapper:
         'minimum_password_length',
         'random_password_length',
         'reset_confirm_hours',
-        'site_name'}
+        'site_name',
+        'site_header'}
 
     @staticmethod
     def get_settings():
@@ -49,12 +50,11 @@ class SettingsMapper:
     def update(form):
         sql = 'UPDATE web.settings SET "value" = %(value)s WHERE "name" = %(name)s;'
         for field in SettingsMapper.fields:
-            if field.startswith('file_'):
-                continue
-            value = getattr(form, field).data
-            if field in ['debug_mode', 'mail']:
-                value = 'True' if getattr(form, field).data else ''
-            g.cursor.execute(sql, {'name': field, 'value': value})
+            if field in form:
+                value = getattr(form, field).data
+                if field in ['debug_mode', 'mail']:
+                    value = 'True' if getattr(form, field).data else ''
+                g.cursor.execute(sql, {'name': field, 'value': value})
 
     @staticmethod
     def update_file_settings(form):
@@ -64,3 +64,8 @@ class SettingsMapper:
                 continue
             value = getattr(form, field).data
             g.cursor.execute(sql, {'name': field, 'value': value})
+
+    @staticmethod
+    def set_logo(file_id):
+        sql = "UPDATE web.settings SET value = %(file_id)s WHERE name = 'logo_file_id';"
+        g.cursor.execute(sql, {'file_id': file_id})

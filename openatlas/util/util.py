@@ -1,20 +1,20 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import glob
 import os
-import re
 import smtplib
 from collections import OrderedDict
-from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
-from functools import wraps
 from html.parser import HTMLParser
 
 import numpy
+import re
 from babel import dates
+from datetime import datetime
 from flask import abort, flash, g, request, session, url_for
-from flask_babel import lazy_gettext as _, format_number
+from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
+from functools import wraps
 from numpy import math
 from werkzeug.utils import redirect
 
@@ -147,7 +147,7 @@ def build_table_form(class_name, linked_entities):
         entities = EntityMapper.get_by_codes(class_name)
     for entity in entities:
         if entity.id in linked_ids:
-            continue  # don't show already linked entries
+            continue  # Don't show already linked entries
         input_ = '<input id="{id}" name="values" type="checkbox" value="{id}">'.format(id=entity.id)
         table['data'].append(get_base_table_data(entity) + [input_])
     if not table['data']:

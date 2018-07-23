@@ -26,7 +26,7 @@ def load_user(user_id):
 
 
 class LoginForm(Form):
-    username = StringField(_('username'), [InputRequired()])
+    username = StringField(_('username'), [InputRequired()], render_kw={'autofocus': True})
     password = PasswordField(_('password'), [InputRequired()])
     show_passwords = BooleanField(_('show password'))
     save = SubmitField(_('login'))

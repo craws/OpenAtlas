@@ -4,29 +4,42 @@
 {% endblock %}
 {% block content %}
     <div class="button-bar">
+
         <h1 >{{ _('user')|uc_first }}</h1>
-        <a href="{{ url_for('user_index') }}">{{ _('user')|uc_first }}</a>
-        <a href="{{ url_for('user_activity') }}">{{ _('activity')|uc_first }}</a>
+        <a href="{{ url_for('user_index') }}">{{ _('list')|uc_first }}</a>
         {% if 'manager'|is_authorized and session['settings']['mail'] %}
             <a href="{{ url_for('admin_newsletter') }}">{{ _('newsletter')|uc_first }}</a>
         {% endif %}
+
         <h1 >{{ _('files')|uc_first }}</h1>
         <a href="{{ url_for('file_index') }}">{{ _('list')|uc_first }}</a>
         {% if 'manager'|is_authorized %}
             <a href="{{ url_for('admin_file') }}">{{ _('settings')|uc_first }}</a>
         {% endif %}
+        {% if not upload_dir_writable %}
+            <span class="error">{{ _('Upload directory not writable!') }}</span>
+        {% endif %}
+
         {% if 'manager'|is_authorized %}
             <h1>{{ _('settings')|uc_first }}</h1>
             <a href="{{ url_for('content_index') }}">{{ _('content')|uc_first }}</a>
+            <a href="{{ url_for('admin_logo') }}">{{ _('logo')|uc_first }}</a>
         {% endif %}
         {% if 'admin'|is_authorized %}
-            <a href="{{ url_for('settings_index') }}">{{ _('settings')|uc_first }}</a>
-            <a href="{{ url_for('admin_orphans') }}">{{ _('orphaned entries')|uc_first }}</a>
-            <a href="{{ url_for('admin_check_links') }}">{{ _('check links')|uc_first }}</a>
+            <a href="{{ url_for('admin_general') }}">{{ _('general')|uc_first }}</a>
+            <a href="{{ url_for('admin_mail') }}">{{ _('mail')|uc_first }}</a>
         {% endif  %}
+
+        <h1>{{ _('logs')|uc_first }}</h1>
+        <a href="{{ url_for('user_activity') }}">{{ _('activity')|uc_first }}</a>
         {% if 'admin'|is_authorized %}
-            <h1>{{ _('logs')|uc_first }}</h1>
             <a href="{{ url_for('admin_log') }}">{{ _('system log')|uc_first }}</a>
+        {% endif  %}
+
+        {% if 'admin'|is_authorized %}
+            <h1>{{ _('data integrity')|uc_first }}</h1>
+            <a href="{{ url_for('admin_orphans') }}">{{ _('orphans')|uc_first }}</a>
+            <a href="{{ url_for('admin_check_links') }}">{{ _('check links')|uc_first }}</a>
         {% endif  %}
     </div>
 {% endblock %}

@@ -11,7 +11,8 @@ from openatlas.util.util import link, required_group, truncate_string, uc_first
 
 
 class SearchForm(Form):
-    term = StringField('', [InputRequired()], render_kw={"placeholder": uc_first(_('search term'))})
+    term = StringField('', [InputRequired()],
+                       render_kw={'placeholder': uc_first(_('search term')), 'autofocus': True})
     own = BooleanField(_('Only entities edited by me'))
     desc = BooleanField(_('Also search in description'))
     classes = SelectMultipleField(

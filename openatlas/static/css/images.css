@@ -1,16 +1,13 @@
 @charset "UTF-8";
 
+
 #logo {
     float: left;
-    width: 370px;
     height: 120px;
-    background-image: url('/static/images/layout/logo.png');
-    background-repeat: no-repeat;
 }
 
-#logo a {
-    display: block;
-    height: 100px;
+#logo img {
+    max-height: 120px;
 }
 
 div.preview {
