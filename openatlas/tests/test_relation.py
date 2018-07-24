@@ -34,6 +34,8 @@ class RelationTests(TestBaseCase):
             rv = self.app.post(
                 url_for('relation_insert', origin_id=actor_id), data=data, follow_redirects=True)
             assert b'The Kurgan' in rv.data
+            rv = self.app.get(url_for('node_view', id_=relation_id))
+            assert b'Connor' in rv.data
             data['continue_'] = 'yes'
             data['inverse'] = True
             rv = self.app.post(

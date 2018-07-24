@@ -16,6 +16,8 @@ class NodeTest(TestBaseCase):
                 sex_node = NodeMapper.get_hierarchy_by_name('Sex')
             rv = self.app.get(url_for('node_index'))
             assert b'Actor Actor Relation' in rv.data
+            rv = self.app.get(url_for('node_insert', root_id=actor_node.id, super_id=actor_node.id))
+            assert b'Actor Actor Relation' in rv.data
             rv = self.app.post(
                 url_for('node_insert', root_id=actor_node.id), data={'name_search': 'new'})
             assert b'Inverse' in rv.data
@@ -32,6 +34,13 @@ class NodeTest(TestBaseCase):
                 url_for('node_update', id_=node_id), data=data, follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
 
+            # Test insert an continue
+            data['continue_'] = 'yes'
+            rv = self.app.post(
+                url_for('node_insert', root_id=actor_node.id), data=data, follow_redirects=True)
+            assert b'An entry has been created' in rv.data
+            data['continue_'] = ''
+
             # Test forbidden system node
             rv = self.app.post(
                 url_for('node_update', id_=actor_node.id), data=data, follow_redirects=True)
@@ -41,10 +50,18 @@ class NodeTest(TestBaseCase):
             data[str(actor_node.id)] = node_id
             rv = self.app.post(
                 url_for('node_update', id_=node_id), data=data, follow_redirects=True)
-            assert b'super' in rv.data
+            assert b'Type can&#39;t have itself as super.' in rv.data
+
+            # Test update with a child as root
+            rv = self.app.post(url_for('node_insert', root_id=actor_node.id), data=data)
+            child_node_id = rv.location.split('/')[-1].replace('node#tab-', '')
+            data[str(actor_node.id)] = child_node_id
+            rv = self.app.post(
+                url_for('node_update', id_=node_id), data=data, follow_redirects=True)
+            assert b'Type can&#39;t have a sub as super.' in rv.data
 
             # Test delete system node
             rv = self.app.get(url_for('node_delete', id_=actor_node.id), follow_redirects=True)
             assert b'Forbidden' in rv.data
-            rv = self.app.get(url_for('node_delete', id_=node_id), follow_redirects=True)
+            rv = self.app.get(url_for('node_delete', id_=child_node_id), follow_redirects=True)
             assert b'The entry has been deleted.' in rv.data

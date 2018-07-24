@@ -2,6 +2,7 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
+from openatlas.models.node import NodeMapper
 from openatlas.test_base import TestBaseCase
 
 
@@ -18,6 +19,7 @@ class ActorTests(TestBaseCase):
             residence_id = rv.location.split('/')[-1]
             with app.test_request_context():
                 app.preprocess_request()
+                sex_node = NodeMapper.get_hierarchy_by_name('Sex')
                 event_id = EntityMapper.insert('E8', 'Event Horizon').id
                 source_id = EntityMapper.insert('E33', 'Tha source').id
 
@@ -26,6 +28,7 @@ class ActorTests(TestBaseCase):
             assert b'+ Person' in rv.data
             self.app.get(url_for('actor_insert', code='E21', origin_id=residence_id))
             data = {
+                sex_node.id: sex_node.id,
                 'name': 'Sigourney Weaver',
                 'alias-1': 'Ripley',
                 'residence': residence_id,
@@ -43,10 +46,11 @@ class ActorTests(TestBaseCase):
             rv = self.app.post(
                 url_for('actor_insert', code='E21', origin_id=residence_id), data=data)
             actor_id = rv.location.split('/')[-1]
+            rv = self.app.get(url_for('node_view', id_=sex_node.id))
+            assert b'Susan' in rv.data
             self.app.post(url_for('actor_insert', code='E21', origin_id=actor_id), data=data)
             self.app.post(url_for('actor_insert', code='E21', origin_id=event_id), data=data)
             self.app.post(url_for('actor_insert', code='E21', origin_id=source_id), data=data)
-            actor_id = rv.location.split('/')[-1]
             rv = self.app.post(url_for('reference_insert', code='reference'), data={'name': 'Book'})
             reference_id = rv.location.split('/')[-1]
             rv = self.app.post(
