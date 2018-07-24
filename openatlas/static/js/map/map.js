@@ -29,7 +29,7 @@ map.fitBounds(geoJsonLayer.getBounds(), {maxZoom: 12});
 
 // Geoname search control init and add to map
 var geoSearchControl = L.control.geonames({
-    username: 'openatlas', // Geonames account username.  Must be provided
+    username: geoNamesUsername, // Geonames account username.  Must be provided
     zoomLevel: 12, // Max zoom level to zoom to for location.  If null, will use the map's max zoom level.
     maxresults: 8, // Maximum number of results to display per search
     className: 'fa fa-globe', // class for icon
