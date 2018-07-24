@@ -2,10 +2,10 @@
 from collections import OrderedDict
 
 from flask import abort, flash, g, render_template, request, url_for
-from flask_babel import lazy_gettext as _, format_number
+from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import StringField, SubmitField, TextAreaField, HiddenField
+from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
@@ -52,13 +52,10 @@ def node_insert(root_id, super_id=None):
     form = build_node_form(NodeForm, root)
     # Check if form is valid and if it wasn't a submit of the search form
     if 'name_search' not in request.form and form.validate_on_submit():
-        name = form.name.data
-        if hasattr(form, 'name_inverse') in form:
-            name += ' (' + form.name_inverse.data + ')'
         return redirect(save(form, root=root))
+    getattr(form, str(root.id)).label.text = 'super'
     if super_id:
         getattr(form, str(root.id)).data = super_id if super_id != root.id else None
-    getattr(form, str(root.id)).label.text = 'super'
     if 'name_search' in request.form:
         form.name.data = request.form['name_search']
     return render_template('types/insert.html', form=form, root=root)

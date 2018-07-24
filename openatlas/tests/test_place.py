@@ -14,12 +14,14 @@ class PlaceTest(TestBaseCase):
             self.login()
             rv = self.app.get(url_for('place_insert'))
             assert b'+ Place' in rv.data
-            data = {'name': 'Asgard', 'alias-0': 'Valhöll'}
             with app.test_request_context():
                 app.preprocess_request()
+                admin_unit_node = NodeMapper.get_hierarchy_by_name('Administrative Unit')
                 reference_id = EntityMapper.insert('E31', 'Ancient Books', 'edition').id
                 place_node = NodeMapper.get_hierarchy_by_name('Place')
                 source_id = EntityMapper.insert('E33', 'Tha source').id
+            data = {'name': 'Asgard', 'alias-0': 'Valhöll',
+                    admin_unit_node.id: '[' + str(admin_unit_node.id) + ']'}
             rv = self.app.post(url_for('place_insert', origin_id=reference_id), data=data,
                                follow_redirects=True)
             assert b'Asgard' in rv.data
@@ -82,11 +84,12 @@ class PlaceTest(TestBaseCase):
                 self.app.get(url_for('place_insert', origin_id=strat_id))
                 self.app.get(url_for('place_update', id_=strat_id))
                 self.app.post(url_for('place_update', id_=strat_id), data={'name': name})
-                name = "You never find me"
-                rv = self.app.post(url_for('place_insert', origin_id=strat_id), data={'name': name})
+                dimension_node_id = NodeMapper.get_hierarchy_by_name('Dimensions').subs[0]
+                data = {'name': 'You never find me', 'value_list-' + str(dimension_node_id): '50'}
+                rv = self.app.post(url_for('place_insert', origin_id=strat_id), data=data)
                 find_id = rv.location.split('/')[-1]
                 self.app.get(url_for('place_update', id_=find_id))
-                self.app.post(url_for('place_update', id_=find_id), data={'name': name})
+                self.app.post(url_for('place_update', id_=find_id), data=data)
             rv = self.app.get(url_for('place_view', id_=feat_id))
             assert b'not a bug' in rv.data
             rv = self.app.get(url_for('place_view', id_=strat_id))

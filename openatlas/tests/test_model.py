@@ -24,16 +24,17 @@ class ModelTests(TestBaseCase):
             rv = self.app.post(url_for('model_index'), data=data)
             assert b'Wrong domain' in rv.data
             data = {'domain': 'E1', 'range': 'E1', 'property': 'P67'}
-            rv = self.app.post(url_for('model_index'), data=data)
-            assert b'Wrong domain' in rv.data
+            self.app.post(url_for('model_index'), data=data)
 
             self.login()
             with app.test_request_context():  # Insert data to display in network view
                 app.preprocess_request()
                 actor = EntityMapper.insert('E21', 'King Arthur')
                 event = EntityMapper.insert('E7', 'Battle of Camlann')
+                source = EntityMapper.insert('E33', 'Tha source')
                 prop_object = EntityMapper.insert('E89', 'Propositional Object')
                 LinkMapper.insert(actor, 'P11', event)
+                LinkMapper.insert(source, 'P67', event)
                 LinkMapper.insert(actor, 'P67', prop_object)
             rv = self.app.get(url_for('model_network'))
             assert b'Orphans' in rv.data
