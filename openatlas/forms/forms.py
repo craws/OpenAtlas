@@ -107,11 +107,6 @@ class TreeSelect(HiddenInput):
             field.data = field.data[0] if isinstance(field.data, list) else field.data
             selection = g.nodes[int(field.data)].name
             selected_ids.append(g.nodes[int(field.data)].id)
-        try:
-            hierarchy_id = int(field.id)
-        except ValueError:
-            hierarchy_id = NodeMapper.get_hierarchy_by_name(uc_first(field.id)).id
-        root = g.nodes[hierarchy_id]
         html = """
             <input id="{name}-button" name="{name}-button" type="text"
                 class="table-select {required}" onfocus="this.blur()"
@@ -141,11 +136,11 @@ class TreeSelect(HiddenInput):
                 }});
             </script>""".format(
             name=field.id,
-            title=root.name,
+            title=g.nodes[int(field.id)].name,
             change_label=uc_first(_('change')),
             clear_label=uc_first(_('clear')),
             selection=selection,
-            tree_data=NodeMapper.get_tree_data(hierarchy_id, selected_ids),
+            tree_data=NodeMapper.get_tree_data(int(field.id), selected_ids),
             clear_style='' if selection else ' style="display: none;" ',
             required=' required' if field.flags.required else '')
         return super(TreeSelect, self).__call__(field, **kwargs) + html

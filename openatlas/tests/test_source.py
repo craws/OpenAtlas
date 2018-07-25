@@ -18,7 +18,7 @@ class SourceTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()
                 origin_id = EntityMapper.insert('E21', 'David Duchovny').id
-                actor_id = EntityMapper.insert('E21', 'Gillian Anderson').id
+                actor_id = EntityMapper.insert('E21', 'Gillian Anderson Gillian Anderson ').id
                 reference_id = EntityMapper.insert('E84', 'Ancient Books', 'information carrier').id
                 file_id = EntityMapper.insert('E31', 'The X-Files', 'file').id
 
@@ -66,6 +66,8 @@ class SourceTest(TestBaseCase):
             assert b'Gillian Anderson' in rv.data
             rv = self.app.get(url_for('source_view', id_=source_id))
             assert b'Gillian Anderson' in rv.data
+            rv = self.app.get(url_for('source_add2', id_=source_id, class_name='place'))
+            assert b'Add Place' in rv.data
 
             # Update source
             rv = self.app.get(url_for('source_update', id_=source_id))

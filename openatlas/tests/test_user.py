@@ -1,5 +1,4 @@
 from flask import url_for
-from flask_login import current_user
 
 from openatlas import app
 from openatlas.models.user import UserMapper
@@ -32,6 +31,12 @@ class UserTests(TestBaseCase):
             'send_info': ''}
 
         with app.app_context():
+            rv = self.app.get(url_for('user_insert'), follow_redirects=True)
+            assert b'Password' in rv.data
+            self.app.post('/login', data={'username': 'Editor', 'password': 'test'})
+            rv = self.app.get(url_for('user_insert'), follow_redirects=True)
+            assert b'403 - Forbidden' in rv.data
+            self.app.get(url_for('logout'), follow_redirects=True)
             self.login()
             with app.test_request_context():
                 app.preprocess_request()
@@ -44,7 +49,7 @@ class UserTests(TestBaseCase):
             rv = self.app.post(url_for('user_insert'), data=data)
             assert b'match' in rv.data
 
-            # test with insert with continue
+            # Test with insert with continue
             rv = self.app.post(url_for('user_insert'), follow_redirects=True, data=data2)
             assert b'Newt' not in rv.data
 
@@ -59,7 +64,7 @@ class UserTests(TestBaseCase):
             rv = self.app.get(url_for('user_delete', id_=user_id), follow_redirects=True)
             assert b'A user was deleted' in rv.data
 
-            # test activity log
+            # Test activity log
             data = {'name': 'test', 'description': 'test'}  # insert a reference to show something
             self.app.post(url_for('reference_insert', code='bibliography'), data=data)
             rv = self.app.get(url_for('user_activity'))

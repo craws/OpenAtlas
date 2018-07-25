@@ -12,13 +12,20 @@ class InvolvementTests(TestBaseCase):
     def test_involvement(self):
         with app.app_context():
             self.login()
+            rv = self.app.post(url_for('event_insert', code='E8'),
+                               data={
+                                    'name': 'Event Horizon',
+                                    'date_begin_year': '1949',
+                                    'date_begin_month': '10',
+                                    'date_begin_day': '8',
+                                    'date_end_year': '1951'})
+            event_id = int(rv.location.split('/')[-1])
             with app.test_request_context():
                 app.preprocess_request()
                 actor_id = EntityMapper.insert('E21', 'Captain Miller').id
-                event_id = EntityMapper.insert('E8', 'Event Horizon').id
                 involvement_id = NodeMapper.get_hierarchy_by_name('Involvement').id
 
-            # add involvement
+            # Add involvement
             rv = self.app.get(url_for('involvement_insert', origin_id=actor_id))
             assert b'Involvement' in rv.data
             data = {
@@ -34,7 +41,7 @@ class InvolvementTests(TestBaseCase):
             assert b'Event Horizon' in rv.data
             self.app.get(url_for('event_view', id_=event_id))
 
-            # update involvement
+            # Update involvement
             with app.test_request_context():
                 app.preprocess_request()
                 link_id = LinkMapper.get_links(event_id, 'P22')[0].id

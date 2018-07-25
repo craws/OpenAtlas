@@ -24,8 +24,9 @@ class EventTest(TestBaseCase):
             # Insert
             rv = self.app.get(url_for('event_insert', code='E7'))
             assert b'+ Activity' in rv.data
-            data = {'name': 'First event ever', 'place': residence_id}
-
+            data = {
+                'name': 'First event ever First event ever First event ever First event ever First',
+                'place': residence_id}
             rv = self.app.post(url_for('event_insert', code='E7', origin_id=reference_id),
                                data=data, follow_redirects=True)
             assert b'First event ever' in rv.data
