@@ -10,20 +10,57 @@ var map = L.map('map', {
     fullscreenControl: true
 });
 
+var grayMarker = L.icon({iconUrl: '/static/images/map/marker-icon-gray.png'});
+
 // Define base map layers
 var baseMaps = {
     OpenStreetMap: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}),
     GoogleSatellite: L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google Maps '}),
 };
 
-// Default base map init
-baseMaps.OpenStreetMap.addTo(map);
-
 // Add map layers control
 L.control.layers(baseMaps).addTo(map);
 
-// Define and add geo json layer for markers
-var geoJsonLayer = new L.GeoJSON(gisPointAll, {onEachFeature: setPopup});
+// Default base map init
+baseMaps.OpenStreetMap.addTo(map);
+
+// View for a single place entity
+if (gisPointSelected != "") {
+    // Set geo json layer for all points
+    var geoJsonLayer = new L.GeoJSON(gisPointAll, {
+      onEachFeature: setPopup,
+      pointToLayer: function(feature, latlng) {
+        return L.marker(latlng, {
+          icon: grayMarker
+        });
+      }
+    });
+    // If it's not a polygon
+    if (gisPolygonSelected == "") {
+        var gisPoints = L.geoJson(gisPointSelected, {onEachFeature: setPopup}).addTo(map);
+        gisPoints.on('click', setObjectId);
+        setTimeout(function () {
+            console.log('fit1=nurpunkte');
+            map.fitBounds(gisPoints.getBounds(), {maxZoom: 12});
+        }, 1);
+    } else {
+        // If it's a polygon
+        var gisPoints = L.geoJson(gisPointSelected, {onEachFeature: setPopup}).addTo(map);
+        gisPoints.on('click', setObjectId);
+        var gisSites = L.geoJson(gisPolygonSelected, {onEachFeature: setPopup}).addTo(map);
+        gisSites.on('click', setObjectId);
+        var gisExtend = L.featureGroup([gisPoints, gisSites]);
+        setTimeout(function () {
+            console.log('fit2=punkte und poylgone');
+            map.fitBounds(gisExtend.getBounds(), {maxZoom: 12});
+        }, 1);
+    }
+} else {
+  // Define and add geo json layer for markers for all places index
+  var geoJsonLayer = new L.GeoJSON(gisPointAll, {onEachFeature: setPopup});
+}
+
+// Add markers to the map
 geoJsonLayer.addTo(map);
 map.fitBounds(geoJsonLayer.getBounds(), {maxZoom: 12});
 
@@ -36,6 +73,44 @@ var geoSearchControl = L.control.geonames({
     workingClass: 'fa-spin', // class for search underway
 });
 map.addControl(geoSearchControl);
+
+function setObjectId(e) {
+    preventpopup();
+    if (editon === 0) {
+        var layer = e.layer;
+        var feature = layer.feature;
+        var objectId = feature.properties.objectId;
+        geometrytype = feature.geometry.type;
+        if (geometrytype == 'Point') {
+            position = (e.latlng);
+        }
+        selectedshape = feature.properties.id;
+        editlayer = e.layer;
+        editmarker = e.marker;
+        shapename = feature.properties.name;
+        count = feature.properties.count;
+        shapetype = feature.properties.shapeType;
+        shapedescription = feature.properties.description;
+        objectName = feature.properties.title;
+        helptext = translate['map_info_shape'];
+        headingtext = 'Shape';
+        if (shapetype == "area") {
+            helptext = translate['map_info_area'];
+            headingtext = 'Area';
+        }
+        if (geometrytype == "Point") {
+            helptext = translate['map_info_point'];
+            headingtext = 'Point';
+        }
+    }
+}
+
+function preventpopup(event) {
+    if (editon === 1) {
+        map.closePopup();
+    }
+}
+
 
 /**
  * Interactions with the map
