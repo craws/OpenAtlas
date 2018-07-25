@@ -122,7 +122,7 @@ class DateMapper:
         if entity.class_.code in ['E6', 'E7', 'E8', 'E12']:
             code_begin = 'OA5'
             code_end = 'OA6'
-        if entity.class_.name == 'E21':
+        if entity.class_.code == 'E21':
             if form.date_birth.data:
                 code_begin = 'OA3'
             if form.date_death.data:

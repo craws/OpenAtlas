@@ -10,9 +10,15 @@ class HierarchyTest(TestBaseCase):
     def test_hierarchy(self):
         with app.app_context():
             self.login()
+
+            # Custom types
             rv = self.app.get(url_for('hierarchy_insert', param='custom'))
             assert b'+ Custom' in rv.data
-            data = {'name': 'Geronimo', 'multiple': True, 'description': 'Very important!'}
+            data = {
+                'name': 'Geronimo',
+                'forms': [1],
+                'multiple': True,
+                'description': 'Very important!'}
             rv = self.app.post(url_for('hierarchy_insert', param='custom'), data=data)
             hierarchy_id = rv.location.split('/')[-1].replace('types#tab-', '')
             rv = self.app.get(url_for('hierarchy_update', id_=hierarchy_id))
@@ -26,6 +32,15 @@ class HierarchyTest(TestBaseCase):
             assert b'The name is already in use' in rv.data
             rv = self.app.post(url_for('hierarchy_delete', id_=hierarchy_id), follow_redirects=True)
             assert b'deleted' in rv.data
+
+            # Value types
+            rv = self.app.get(url_for('hierarchy_insert', param='value'))
+            assert b'+ Value' in rv.data
+            data2 = {'name': 'A valued value type', 'forms': [1], 'description': ''}
+            rv = self.app.post(url_for('hierarchy_insert', param='value'), data=data2)
+            custom_hierarchy_id = rv.location.split('/')[-1].replace('types#tab-', '')
+            rv = self.app.get(url_for('hierarchy_update', id_=custom_hierarchy_id))
+            assert b'valued' in rv.data
 
             # Test checks
             actor_node = NodeMapper.get_hierarchy_by_name('Actor Actor Relation')

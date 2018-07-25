@@ -300,9 +300,9 @@ def add_dates_to_form(form, for_person=False):
                 <span id="date-switcher" class="button">{show}</span>
             </div>
         </div>""".format(
-            date=uc_first(_('date')),
-            tooltip=display_tooltip(_('tooltip date')),
-            show=uc_first(_('show')))
+        date=uc_first(_('date')),
+        tooltip=display_tooltip(_('tooltip date')),
+        show=uc_first(_('show')))
     html += '<div class="table-row date-switch" ' + style + '>'
     html += '<div>' + str(form.date_begin_year.label).title() + '</div><div class="table-cell">'
     html += str(form.date_begin_year(class_='year')) + ' ' + errors['date_begin_year'] + ' '
@@ -345,7 +345,9 @@ def required_group(group):
             if not is_authorized(group):
                 abort(403)
             return f(*args, **kwargs)
+
         return wrapped
+
     return wrapper
 
 
@@ -365,17 +367,12 @@ def bookmark_toggle(entity_id, for_table=False):
 def is_authorized(group):
     if not current_user.is_authenticated or not hasattr(current_user, 'group'):
         return False
-    if group not in ['admin', 'manager', 'editor', 'readonly']:
-        return False
-    if group == 'admin' and current_user.group != 'admin':
-        return False
-    if group == 'manager' and current_user.group not in ['admin', 'manager']:
-        return False
-    if group == 'editor' and current_user.group not in ['admin', 'manager', 'editor']:
-        return False
-    if group == 'readonly' and current_user.group not in ['admin', 'manager', 'editor', 'readonly']:
-        return False
-    return True
+    if current_user.group == 'admin' or (
+            current_user.group == 'manager' and group in ['manager', 'editor', 'readonly']) or (
+            current_user.group == 'editor' and group in ['editor', 'readonly']) or (
+            current_user.group == 'readonly' and group == 'readonly'):
+        return True
+    return False
 
 
 def uc_first(string):
@@ -554,7 +551,7 @@ def get_base_table_data(entity):
     return data
 
 
-def was_modified(form, entity):   # pragma: no cover
+def was_modified(form, entity):  # pragma: no cover
     """Checks if an entity was modified after an update form was opened."""
     if not entity.modified or not form.opened.data:
         return False
