@@ -162,11 +162,9 @@ class TreeMultiSelect(HiddenInput):
         selected_ids = []
         root = g.nodes[int(field.id)]
         if field.data:
-            if isinstance(field.data, str):
-                field.data = ast.literal_eval(field.data)
             for entity_id in field.data:
-                entity = g.nodes[entity_id]
-                selected_ids.append(entity.id)
+                selected_ids.append(entity_id)
+                selection += g.nodes[entity_id].name + '<br />'
         html = """
             <span id="{name}-button" class="button">{change_label}</span>
             <div id="{name}-selection" style="text-align:left;">{selection}</div>
