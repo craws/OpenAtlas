@@ -55,6 +55,8 @@ def login():
                     login_user(user)
                     session['login_previous_success'] = user.login_last_success
                     session['login_previous_failures'] = user.login_failed_count
+                    if user.settings['language']:
+                        session['language'] = user.settings['language']
                     user.login_last_success = datetime.datetime.now()
                     user.login_failed_count = 0
                     user.update()
@@ -78,7 +80,7 @@ def login():
 
 @app.route('/password_reset', methods=["GET", "POST"])
 def reset_password():
-    if current_user.is_authenticated:  # prevent password reset if already logged in
+    if current_user.is_authenticated:  # Prevent password reset if already logged in
         return redirect(url_for('index'))
     form = PasswordResetForm()
     if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
