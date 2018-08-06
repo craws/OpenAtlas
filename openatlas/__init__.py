@@ -47,7 +47,7 @@ def get_locale():
     if 'language' in session:
         return session['language']
     best_match = request.accept_languages.best_match(app.config['LANGUAGES'].keys())
-    # check if best_match is set (in tests it isn't)
+    # Check if best_match is set (in tests it isn't)
     return best_match if best_match else session['settings']['default_language']
 
 
