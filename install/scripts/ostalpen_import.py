@@ -393,7 +393,7 @@ for e in entities:
             print('missing id for E031 type:' + str(e.entity_type))
             continue
         count['E31 document'] += 1
-    elif e.class_code in ['E018', 'E053', 'E055', 'E052', 'E004']:
+    elif e.class_code in ['E018', 'E053', 'E055', 'E052', 'E004', 'E058']:
         continue  # place will be added later in script
     else:
         missing_classes[e.class_code] = e.class_code
