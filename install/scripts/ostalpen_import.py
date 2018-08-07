@@ -1,5 +1,5 @@
 # This script is for merging data from the DPP and Ostalpen project
-
+import numpy
 import os
 import subprocess
 import sys
@@ -16,8 +16,8 @@ To do:
 
 dates:
 
-- fetch new ostalpen dump
 - BC dates
+- fetch new ostalpen dump
 - end dates
 - fix e33 dates
 
@@ -56,7 +56,8 @@ class Entity:
 
 def connect(database_name):
     db_pass = open('instance/password.txt').read().splitlines()[0]
-    connection = psycopg2.connect(database=database_name, user='openatlas', password=db_pass)
+    connection = psycopg2.connect(
+        database=database_name, user='openatlas', password=db_pass, host='localhost')
     connection.autocommit = True
     return connection
 
@@ -95,6 +96,25 @@ def link(property_code, domain_id, range_id, description=None):
     return cursor_dpp.fetchone()[0]
 
 
+def datetime64_to_timestamp(date):
+    """Converts a numpy.datetime64 to a timestamp string
+
+    :param date: numpy.datetime64
+    :return: PostgreSQL timestamp
+    """
+    string = str(date)
+    postfix = ''
+    if string.startswith('-') or string.startswith('0000'):
+        string = string[1:]
+        postfix = ' BC'
+    parts = string.split('-')
+    year = int(parts[0]) + 1 if postfix else int(parts[0])
+    month = int(parts[1])
+    day = int(parts[2])
+    string = format(year, '04d') + '-' + format(month, '02d') + '-' + format(day, '02d')
+    return string + postfix
+
+
 def insert_entity(entity, with_case_study=False):
     sql = """
         INSERT INTO model.entity (name, description, class_code, system_type, ostalpen_id, created)
@@ -104,10 +124,12 @@ def insert_entity(entity, with_case_study=False):
     description = entity.description
     dates_comment = ''
     if e.class_code == 'E33':
-        if e.start_time_text:
-            dates_comment = e.start_time_text
-        if e.start_time_abs:
-            dates_comment += ' ' + str(e.start_time_abs)
+        dates_comment += e.start_time_text if e.start_time_text else ''
+        dates_comment += (' ' + str(e.start_time_abs)) if e.start_time_abs else ''
+        if e.end_time_text or e.end_time_abs:
+            dates_comment += ' bis '
+            dates_comment += e.end_time_text if e.end_time_text else ''
+            dates_comment += (' ' + str(e.end_time_abs)) if e.end_time_abs else ''
         if description and dates_comment:
             description = dates_comment + ': ' + description
         elif dates_comment:
@@ -142,13 +164,17 @@ def insert_entity(entity, with_case_study=False):
 
     # Dates
     if e.class_code != 'E33':
-        if e.start_time_abs and e.start_time_abs > 0:
+        if e.start_time_abs:
+            year = e.start_time_abs
+            year = format(year, '03d') if year > 0 else format(year + 1, '04d')
+            from_date = datetime64_to_timestamp(numpy.datetime64(year + '-01-01'))
+            to_date = datetime64_to_timestamp(numpy.datetime64(year + '-12-31'))
             sql = """
                 INSERT INTO model.entity (name, value_timestamp, description, class_code, system_type)
                 VALUES (%(value_timestamp)s, %(value_timestamp)s, %(description)s, 'E61', 'from date value')
                     RETURNING id;"""
             cursor_dpp.execute(sql, {
-                'value_timestamp': format(e.start_time_abs, '04d') + '-01-01',
+                'value_timestamp': from_date,
                 'description': e.start_time_text if e.start_time_text else None})
             from_date_id = cursor_dpp.fetchone()[0]
             sql = """
@@ -162,13 +188,46 @@ def insert_entity(entity, with_case_study=False):
                 INSERT INTO model.entity (name, value_timestamp, class_code, system_type)
                 VALUES (%(value_timestamp)s, %(value_timestamp)s, 'E61', 'to date value')
                     RETURNING id;"""
-            cursor_dpp.execute(sql, {'value_timestamp': format(e.start_time_abs, '04d') + '-12-31'})
+            cursor_dpp.execute(sql, {'value_timestamp': to_date})
             to_date_id = cursor_dpp.fetchone()[0]
             sql = """
                 INSERT INTO model.link (property_code, domain_id, range_id)
                 VALUES (%(property_code)s, %(domain_id)s, %(range_id)s);"""
             cursor_dpp.execute(sql, {
                 'property_code': 'OA5' if e.class_code in ('E7', 'E8') else 'OA1',
+                'domain_id': entity.id,
+                'range_id': to_date_id})
+        if e.end_time_abs:
+            year = e.end_time_abs
+            year = format(year, '03d') if year > 0 else format(year + 1, '04d')
+            from_date = datetime64_to_timestamp(numpy.datetime64(year + '-01-01'))
+            to_date = datetime64_to_timestamp(numpy.datetime64(year + '-12-31'))
+            sql = """
+                INSERT INTO model.entity (name, value_timestamp, description, class_code, system_type)
+                VALUES (%(value_timestamp)s, %(value_timestamp)s, %(description)s, 'E61', 'from date value')
+                    RETURNING id;"""
+            cursor_dpp.execute(sql, {
+                'value_timestamp': from_date,
+                'description': e.end_time_text if e.end_time_text else None})
+            from_date_id = cursor_dpp.fetchone()[0]
+            sql = """
+                INSERT INTO model.link (property_code, domain_id, range_id)
+                VALUES (%(property_code)s, %(domain_id)s, %(range_id)s);"""
+            cursor_dpp.execute(sql, {
+                'property_code': 'OA6' if e.class_code in ('E7', 'E8') else 'OA2',
+                'domain_id': entity.id,
+                'range_id': from_date_id})
+            sql = """
+                INSERT INTO model.entity (name, value_timestamp, class_code, system_type)
+                VALUES (%(value_timestamp)s, %(value_timestamp)s, 'E61', 'to date value')
+                    RETURNING id;"""
+            cursor_dpp.execute(sql, {'value_timestamp': to_date})
+            to_date_id = cursor_dpp.fetchone()[0]
+            sql = """
+                INSERT INTO model.link (property_code, domain_id, range_id)
+                VALUES (%(property_code)s, %(domain_id)s, %(range_id)s);"""
+            cursor_dpp.execute(sql, {
+                'property_code': 'OA6' if e.class_code in ('E7', 'E8') else 'OA2',
                 'domain_id': entity.id,
                 'range_id': to_date_id})
 
@@ -268,6 +327,8 @@ for row in cursor_ostalpen.fetchall():
     e.class_code = row.cidoc_class_nr
     e.start_time_text = row.start_time_text
     e.start_time_abs = row.start_time_abs
+    e.end_time_text = row.end_time_text
+    e.end_time_abs = row.end_time_abs
     e.dim = {
         'Width': row.dim_width,
         'Length': row.dim_length,
@@ -348,6 +409,8 @@ for row in cursor_ostalpen.fetchall():
     e.description = row.entity_description
     e.start_time_text = row.start_time_text
     e.start_time_abs = row.start_time_abs
+    e.end_time_text = row.end_time_text
+    e.end_time_abs = row.end_time_abs
     e.srid_epsg = row.srid_epsg
     e.x = row.x_lon_easting
     e.y = row.y_lat_northing
@@ -381,7 +444,6 @@ for e in places:
         count['Gis point'] += 1
     count['E18 place'] += 1
 
-
 print('Features')
 sql_ = """
     SELECT
@@ -402,6 +464,8 @@ for row in cursor_ostalpen.fetchall():
     e.description = row.entity_description
     e.start_time_text = row.start_time_text
     e.start_time_abs = row.start_time_abs
+    e.end_time_text = row.end_time_text
+    e.end_time_abs = row.end_time_abs
     e.srid_epsg = row.srid_epsg
     e.x = row.x_lon_easting
     e.y = row.y_lat_northing
@@ -455,6 +519,8 @@ for row in cursor_ostalpen.fetchall():
     e.description = row.entity_description
     e.start_time_text = row.start_time_text
     e.start_time_abs = row.start_time_abs
+    e.end_time_text = row.end_time_text
+    e.end_time_abs = row.end_time_abs
     e.srid_epsg = row.srid_epsg
     e.x = row.x_lon_easting
     e.y = row.y_lat_northing
@@ -470,7 +536,7 @@ for row in cursor_ostalpen.fetchall():
 
 for e in strati:
     e.class_code = 'E18'
-    e.system_type = 'stratigraphic_unit'
+    e.system_type = 'stratigraphic unit'
     object_id = insert_entity(e, with_case_study=True)
     new_entities[e.ostalpen_id] = e
     p = copy.copy(e)
@@ -488,7 +554,6 @@ for e in strati:
         cursor_dpp.execute(sql, {'entity_id': location_id, 'created': e.created})
         count['Gis point'] += 1
     count['E18 place'] += 1
-
 
 print('Finds')
 sql_ = """
@@ -510,6 +575,8 @@ for row in cursor_ostalpen.fetchall():
     e.description = row.entity_description
     e.start_time_text = row.start_time_text
     e.start_time_abs = row.start_time_abs
+    e.end_time_text = row.end_time_text
+    e.end_time_abs = row.end_time_abs
     e.srid_epsg = row.srid_epsg
     e.x = row.x_lon_easting
     e.y = row.y_lat_northing
@@ -543,7 +610,6 @@ for e in finds:
         cursor_dpp.execute(sql, {'entity_id': location_id, 'created': e.created})
         count['Gis point'] += 1
     count['E18 place'] += 1
-
 
 print('Links')
 missing_properties = set()
@@ -610,7 +676,6 @@ for row in cursor_ostalpen.fetchall():
     else:
         missing_properties.add(row.links_cidoc_number_direction)
 
-
 for name, count in count.items():
     print(str(name) + ': ' + str(count))
 
@@ -619,4 +684,4 @@ print('Missing property ids:')
 print(missing_properties)
 connection_dpp.close()
 connection_ostalpen.close()
-print('Execution time: ' + str(int(time.time() - start)) + ' seconds')
+print('Execution time: ' + str(round((time.time()-start)/60, 2)) + ' minutes')

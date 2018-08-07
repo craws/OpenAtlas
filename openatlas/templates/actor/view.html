@@ -7,18 +7,18 @@
 <div id="tabs" class="tabs-container">
     <ul>
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
-        <li><a href="#tab-source">{{ _('source')|uc_first }} ({{ tables['source']['data']|length }})</a></li>
-        <li><a href="#tab-event">{{ _('event')|uc_first }} ({{ tables['event']['data']|length }})</a></li>
-        <li><a href="#tab-relation">{{ _('relation')|uc_first }} ({{ tables['relation']['data']|length }})</a></li>
-        <li><a href="#tab-member-of">{{ _('member of')|uc_first }} ({{ tables['member_of']['data']|length }})</a></li>
+        <li><a href="#tab-source">{{ _('source')|uc_first }} ({{ tables['source']['data']|length|format_number }})</a></li>
+        <li><a href="#tab-event">{{ _('event')|uc_first }} ({{ tables['event']['data']|length|format_number }})</a></li>
+        <li><a href="#tab-relation">{{ _('relation')|uc_first }} ({{ tables['relation']['data']|length|format_number }})</a></li>
+        <li><a href="#tab-member-of">{{ _('member of')|uc_first }} ({{ tables['member_of']['data']|length|format_number }})</a></li>
         {% if tables['member'] %}
-            <li><a href="#tab-member">{{ _('member')|uc_first }} ({{ tables['member']['data']|length }})</a></li>
+            <li><a href="#tab-member">{{ _('member')|uc_first }} ({{ tables['member']['data']|length|format_number }})</a></li>
         {% endif %}
-        <li><a href="#tab-reference">{{ _('reference')|uc_first }} ({{ tables['reference']['data']|length }})</a></li>
+        <li><a href="#tab-reference">{{ _('reference')|uc_first }} ({{ tables['reference']['data']|length|format_number }})</a></li>
         {% if gis_data %}
             <li><a href="#tab-map" id="map-tab-id">{{ _('map')|uc_first }}</a></li>
         {% endif %}
-        <li><a href="#tab-file">{{ _('files')|uc_first }}  ({{ tables['file']['data']|length }})</a></li>
+        <li><a href="#tab-file">{{ _('files')|uc_first }}  ({{ tables['file']['data']|length|format_number }})</a></li>
     </ul>
     <div id="tab-info">
         <div class="button-bar">
