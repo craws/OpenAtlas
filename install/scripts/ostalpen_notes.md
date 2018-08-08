@@ -2,7 +2,7 @@
 
 ## Run script after preparations below
 
-python3 install/ostalpen/import.py
+python3.5 install/scripts/ostalpen_import.py
 
 ## Create Ostalpen database from original dump
 

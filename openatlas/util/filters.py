@@ -5,7 +5,7 @@ import re
 import flask
 import jinja2
 from flask import g, render_template_string, request, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import lazy_gettext as _, format_number as babel_format_number
 from flask_login import current_user
 from jinja2 import escape, evalcontextfilter
 from wtforms import IntegerField
@@ -24,6 +24,12 @@ paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 @blueprint.app_template_filter()
 def link(self, entity):
     return util.link(entity)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def format_number(self, number):
+    return babel_format_number(number)
 
 
 @jinja2.contextfilter
