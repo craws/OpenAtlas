@@ -1,10 +1,3 @@
-/**
- * @file 
- * OpenAtlas' map init and options
- *
- * Asil Çetin
- */
-
 // Init map variable using the #map div with options
 var map = L.map('map', {
     fullscreenControl: true
@@ -40,7 +33,6 @@ if (gisPointSelected != "") {
         var gisPoints = L.geoJson(gisPointSelected, {onEachFeature: setPopup}).addTo(map);
         gisPoints.on('click', setObjectId);
         setTimeout(function () {
-            console.log('fit1=nurpunkte');
             map.fitBounds(gisPoints.getBounds(), {maxZoom: 12});
         }, 1);
     } else {
@@ -51,12 +43,11 @@ if (gisPointSelected != "") {
         gisSites.on('click', setObjectId);
         var gisExtend = L.featureGroup([gisPoints, gisSites]);
         setTimeout(function () {
-            console.log('fit2=punkte und poylgone');
             map.fitBounds(gisExtend.getBounds(), {maxZoom: 12});
         }, 1);
     }
 } else {
-  // Define and add geo json layer for markers for all places index
+  // Define and add geo JSON layer for markers for all places index
   var geoJsonLayer = new L.GeoJSON(gisPointAll, {onEachFeature: setPopup});
 }
 
@@ -75,7 +66,7 @@ var geoSearchControl = L.control.geonames({
 map.addControl(geoSearchControl);
 
 function setObjectId(e) {
-    preventpopup();
+    preventPopup();
     if (editon === 0) {
         var layer = e.layer;
         var feature = layer.feature;
@@ -105,12 +96,11 @@ function setObjectId(e) {
     }
 }
 
-function preventpopup(event) {
+function preventPopup(event) {
     if (editon === 1) {
         map.closePopup();
     }
 }
-
 
 /**
  * Interactions with the map
@@ -126,7 +116,7 @@ var coordCaptureImg;
  */
 
 /**
- * Function to display a marker's popop on the map
+ * Function to display a marker's popup on the map
  * @param feature - Markers object.
  * @param layer - Map layer to bind.
  * @param mode - 'display' for view only or 'update' for editing.
