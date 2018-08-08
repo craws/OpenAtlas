@@ -22,6 +22,7 @@ SECRET_KEY = 'CHANGE ME'
 
 # JavaScript credentials
 GEONAMES_USERNAME = 'openatlas'
+THUNDERFOREST_KEY = '7878b4fb224f4902ab42fc846e92b96a'
 
 UPLOAD_FOLDER_PATH = os.path.dirname(__file__) + '/../openatlas/uploads'
 DISPLAY_FILE_EXTENSIONS = ['bmp', 'gif', 'ico', 'jpeg', 'jpg', 'png']
