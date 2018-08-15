@@ -78,6 +78,34 @@ connection_ostalpen = connect('ostalpen')
 cursor_dpp = connection_dpp.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
 cursor_ostalpen = connection_ostalpen.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
 
+# Add comment to ostalpen_id
+sql_ = """
+    ALTER TABLE model.entity ADD COLUMN ostalpen_id integer;
+    COMMENT ON COLUMN model.entity.ostalpen_id IS 'uid of former Ostalpen table tbl_entities';"""
+cursor_dpp.execute(sql_)
+
+
+# Add value types
+sql = """
+INSERT INTO model.entity (class_code, name, description) VALUES 
+    ('E55', 'Width', 'In centimeters'),
+    ('E55', 'Length', 'In centimeters'),
+    ('E55', 'Thickness', 'In centimeters'),
+    ('E55', 'Diameter', 'In centimeters'),
+    ('E55', 'Degrees', '360° for full circle');
+INSERT INTO model.link (property_code, range_id, domain_id) VALUES
+('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Width')),
+('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Length')),
+('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Height')),
+('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Thickness')),
+('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Diameter')),
+('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Weight')),
+('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Degrees'));
+INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
+((SELECT id FROM web.hierarchy WHERE name LIKE 'Dimensions'),(SELECT id FROM web.form WHERE name LIKE 'Stratigraphic Unit')),
+((SELECT id FROM web.hierarchy WHERE name LIKE 'Dimensions'),(SELECT id FROM web.form WHERE name LIKE 'Feature'));"""
+cursor_dpp.execute(sql)
+
 
 def link(property_code, domain_id, range_id, description=None):
     sql = """
@@ -244,41 +272,7 @@ def insert_entity(e, with_case_study=False):
     return e.id
 
 
-# Add comment to ostalpen_id
-sql_ = """
-    ALTER TABLE model.entity ADD COLUMN ostalpen_id integer;
-    COMMENT ON COLUMN model.entity.ostalpen_id IS 'uid of former Ostalpen table tbl_entities';"""
-cursor_dpp.execute(sql_)
 
-# Add subunit types
-sql = """
-INSERT INTO model.entity (class_code, name, description) VALUES ('E55', 'Bibliography', 'Categories for bibliographical entries as used for example in BibTeX, e.g. Book, Inbook, Article etc.');
-INSERT INTO model.entity (class_code, name) VALUES ('E55', 'Inbook'), ('E55', 'Article'), ('E55', 'Book');
-INSERT INTO link (property_code, range_id, domain_id) VALUES
-('P127', (SELECT id FROM model.entity WHERE name='Bibliography'), (SELECT id FROM model.entity WHERE name='Inbook')),
-('P127', (SELECT id FROM model.entity WHERE name='Bibliography'), (SELECT id FROM model.entity WHERE name='Article')),
-('P127', (SELECT id FROM model.entity WHERE name='Bibliography'), (SELECT id FROM model.entity WHERE name='Book'));"""
-
-# Add value types
-sql = """
-
-INSERT INTO model.entity (class_code, name, description) VALUES 
-    ('E55', 'Width', 'In centimeters'),
-    ('E55', 'Length', 'In centimeters'),
-    ('E55', 'Thickness', 'In centimeters'),
-    ('E55', 'Diameter', 'In centimeters'),
-    ('E55', 'Degrees', '360° for full circle');
-INSERT INTO model.link (property_code, range_id, domain_id) VALUES
-('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Width')),
-('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Length')),
-('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Height')),
-('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Thickness')),
-('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Diameter')),
-('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Weight')),
-('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Degrees'));
-INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES ((SELECT id FROM web.hierarchy WHERE name LIKE 'Dimensions'),(SELECT id FROM web.form WHERE name LIKE 'Stratigraphic Unit'));
-"""
-cursor_dpp.execute(sql)
 
 # Set counters
 new_entities = {}
