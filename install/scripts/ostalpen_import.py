@@ -14,7 +14,10 @@ sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 """
 To do:
 
-Features needs value type dimension in form, too (Grabelsdorf -> A5)
+-- Place, Feature, Find, Stratigraphic unit type in entity table adaption
+
+archeological places are not shown because filtered in get all gis
+- show only itself + other items from super, zoom to features
 
 Types:
 - add translated arch types
@@ -272,8 +275,6 @@ def insert_entity(e, with_case_study=False):
     return e.id
 
 
-
-
 # Set counters
 new_entities = {}
 missing_classes = {}
@@ -307,6 +308,30 @@ for row in cursor_ostalpen.fetchall():
     if row.entity_name_uri in ostalpen_types:
         ostalpen_types_double[row.uid] = row.entity_name_uri
     ostalpen_types[row.uid] = row.entity_name_uri
+
+for archeo_super in ['Feature', 'Finds', 'Stratigraphical Unit']:
+    sql = """
+        SELECT uid, entity_name_uri FROM openatlas.tbl_entities e
+        JOIN tbl_links l ON
+            e.uid = l.links_entity_uid_from
+            AND l.links_cidoc_number_direction = 7
+            AND l.links_entity_uid_to = (SELECT uid FROM openatlas.tbl_entities WHERE entity_name_uri = '{archeo_super}');
+        """.format(archeo_super=archeo_super)
+    cursor_ostalpen.execute(sql)
+    for row in cursor_ostalpen.fetchall():
+        if archeo_super == 'Finds':
+            archeo_super = 'Find'
+        elif archeo_super == 'Stratigraphical Unit':
+            archeo_super = 'Stratigraphic Unit'
+        sql = "INSERT INTO model.entity (class_code, name, ostalpen_id) VALUES ('E55', '" + row.entity_name_uri + "', " + str(row.uid) + ") RETURNING id;"
+        if row.entity_name_uri in ostalpen_types:
+            ostalpen_types_double[row.uid] = row.entity_name_uri
+        ostalpen_types[row.uid] = row.entity_name_uri
+        cursor_dpp.execute(sql)
+        id_ = cursor_dpp.fetchone()[0]
+        sql = "INSERT INTO model.link(property_code, range_id, domain_id) VALUES ('P127', (SELECT id FROM model.entity WHERE name = '" + archeo_super + "' AND class_code = 'E55'), " + str(id_) + ");"
+        cursor_dpp.execute(sql)
+
 
 # Get ostalpen entities
 sql_ = """
@@ -409,6 +434,7 @@ for row in cursor_ostalpen.fetchall():
     if not row.entity_name_uri:
         continue
     e = Entity()
+    e.entity_type = row.entity_type
     e.created = row.timestamp_creation
     e.ostalpen_id = row.uid
     e.name = row.entity_name_uri.replace('\n', ' ').replace('\r', ' ')
@@ -465,6 +491,7 @@ for row in cursor_ostalpen.fetchall():
     if not row.entity_name_uri:
         continue
     e = Entity()
+    e.entity_type = row.entity_type
     e.created = row.timestamp_creation
     e.ostalpen_id = row.uid
     e.name = row.entity_name_uri.replace('\n', ' ').replace('\r', ' ')
@@ -490,6 +517,8 @@ for e in features:
     e.class_code = 'E18'
     e.system_type = 'feature'
     object_id = insert_entity(e, with_case_study=True)
+    if e.entity_type:
+        sql = "INSERT INTO model.link VALUES "
     new_entities[e.ostalpen_id] = e
     p = copy.copy(e)
     p.system_type = 'place location'
@@ -521,6 +550,7 @@ for row in cursor_ostalpen.fetchall():
     if not row.entity_name_uri:
         continue
     e = Entity()
+    e.entity_type = row.entity_type
     e.created = row.timestamp_creation
     e.ostalpen_id = row.uid
     e.name = row.entity_name_uri.replace('\n', ' ').replace('\r', ' ')
@@ -578,6 +608,7 @@ for row in cursor_ostalpen.fetchall():
     if not row.entity_name_uri:
         continue
     e = Entity()
+    e.entity_type = row.entity_type
     e.created = row.timestamp_creation
     e.ostalpen_id = row.uid
     e.name = row.entity_name_uri.replace('\n', ' ').replace('\r', ' ')
