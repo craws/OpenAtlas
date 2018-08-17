@@ -1,12 +1,12 @@
 # This script is for merging data from the DPP and Ostalpen project
-import numpy
+import copy
 import os
-import subprocess
 import sys
 import time
-import copy
 
+import numpy
 import psycopg2.extras
+from functions.scripts import connect, prepare_databases, reset_database, datetime64_to_timestamp
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
@@ -14,10 +14,7 @@ sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 """
 To do:
 
--- Place, Feature, Find, Stratigraphic unit type in entity table adaption
-
-archeological places are not shown because filtered in get all gis
-- show only itself + other items from super, zoom to features
+- missing archeological types
 
 Types:
 - add translated arch types
@@ -25,15 +22,7 @@ Types:
 - Right E030 to type licence
 - Measurement units E058 to value type
 
-value type import:
-- look out for dim_units (centimeter), dim_units_weight(gram)
-- other class except strati and finds using value types
-
-add time to printout
 e031 - check system type (not existing)
-
-e040 - legal body
-http://127.0.0.1:5000/place/view/25859
 
 Places:
 - links to sources
@@ -42,7 +31,6 @@ Places:
 Clean up:
 - if subunit has same gis as above delete gis of subunit
 - links between subunits have sometimes description texts which are not visible in new system (e.g. postion of find)
-- split case studies?
 - check CIDOC valid
 
 """
@@ -58,56 +46,18 @@ class Entity:
     system_type = None
 
 
-def connect(database_name):
-    db_pass = open('instance/password.txt').read().splitlines()[0]
-    connection = psycopg2.connect(
-        database=database_name, user='openatlas', password=db_pass, host='localhost')
-    connection.autocommit = True
-    return connection
-
-
-def reset_database():
-    subprocess.call('dropdb openatlas_dpp', shell=True)
-    subprocess.call('createdb openatlas_dpp -O openatlas', shell=True)
-    subprocess.call('psql openatlas_dpp < instance/dpp_origin.sql', shell=True)
-
-
 start = time.time()
 ostalpen_user_id = 38
 ostalpen_type_id = 11821
+
 reset_database()
+
 connection_dpp = connect('openatlas_dpp')
 connection_ostalpen = connect('ostalpen')
 cursor_dpp = connection_dpp.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
 cursor_ostalpen = connection_ostalpen.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
 
-# Add comment to ostalpen_id
-sql_ = """
-    ALTER TABLE model.entity ADD COLUMN ostalpen_id integer;
-    COMMENT ON COLUMN model.entity.ostalpen_id IS 'uid of former Ostalpen table tbl_entities';"""
-cursor_dpp.execute(sql_)
-
-
-# Add value types
-sql = """
-INSERT INTO model.entity (class_code, name, description) VALUES 
-    ('E55', 'Width', 'In centimeters'),
-    ('E55', 'Length', 'In centimeters'),
-    ('E55', 'Thickness', 'In centimeters'),
-    ('E55', 'Diameter', 'In centimeters'),
-    ('E55', 'Degrees', '360° for full circle');
-INSERT INTO model.link (property_code, range_id, domain_id) VALUES
-('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Width')),
-('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Length')),
-('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Height')),
-('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Thickness')),
-('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Diameter')),
-('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Weight')),
-('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Degrees'));
-INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Dimensions'),(SELECT id FROM web.form WHERE name LIKE 'Stratigraphic Unit')),
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Dimensions'),(SELECT id FROM web.form WHERE name LIKE 'Feature'));"""
-cursor_dpp.execute(sql)
+prepare_databases(cursor_dpp, cursor_ostalpen)
 
 
 def link(property_code, domain_id, range_id, description=None):
@@ -124,27 +74,7 @@ def link(property_code, domain_id, range_id, description=None):
         'domain_id': domain_id,
         'range_id': range_id,
         'description': description})
-    count['link'] += 1
     return cursor_dpp.fetchone()[0]
-
-
-def datetime64_to_timestamp(date):
-    """Converts a numpy.datetime64 to a timestamp string
-
-    :param date: numpy.datetime64
-    :return: PostgreSQL timestamp
-    """
-    string = str(date)
-    postfix = ''
-    if string.startswith('-') or string.startswith('0000'):
-        string = string[1:]
-        postfix = ' BC'
-    parts = string.split('-')
-    year = int(parts[0]) + 1 if postfix else int(parts[0])
-    month = int(parts[1])
-    day = int(parts[2])
-    string = format(year, '04d') + '-' + format(month, '02d') + '-' + format(day, '02d')
-    return string + postfix
 
 
 def insert_entity(e, with_case_study=False):
@@ -272,10 +202,22 @@ def insert_entity(e, with_case_study=False):
                 'domain_id': e.id,
                 'range_id': to_date_id})
 
+    # Types for places
+    if e.system_type in ('feature', 'stratigraphic unit', 'find', 'place'):
+        if not e.entity_type or e.entity_type in [1, 2, 3, 4]:
+            pass
+        elif e.entity_type not in ostalpen_place_types:
+            missing_ostalpen_place_types.add(e.entity_type)
+        else:
+            sql = """
+                INSERT INTO model.link (property_code, domain_id, range_id) VALUES 
+                ('P2', %(id)s, (SELECT id FROM model.entity WHERE ostalpen_id = %(type_id)s));"""
+            cursor_dpp.execute(sql, {'id': e.id, 'type_id': e.entity_type})
+
     return e.id
 
 
-# Set counters
+# Counters
 new_entities = {}
 missing_classes = {}
 count = {
@@ -286,10 +228,10 @@ count = {
     'E33 source': 0,
     'E33 translation': 0,
     'E33 original text': 0,
+    'E40 legal body': 0,
     'E74 group': 0,
     'E7 event': 0,
-    'E8 acquisition': 0,
-    'link': 0}
+    'E8 acquisition': 0}
 
 # Get DPP types
 types = {}
@@ -302,6 +244,8 @@ for row in cursor_dpp.fetchall():
 
 # Get Ostalpen types
 ostalpen_types = {}
+ostalpen_place_types = []
+missing_ostalpen_place_types = set()
 ostalpen_types_double = {}
 cursor_ostalpen.execute("SELECT uid, entity_name_uri FROM openatlas.tbl_entities WHERE classes_uid = 13;")
 for row in cursor_ostalpen.fetchall():
@@ -309,28 +253,55 @@ for row in cursor_ostalpen.fetchall():
         ostalpen_types_double[row.uid] = row.entity_name_uri
     ostalpen_types[row.uid] = row.entity_name_uri
 
-for archeo_super in ['Feature', 'Finds', 'Stratigraphical Unit']:
+
+def insert_type_subs(openatlas_id, ostalpen_id):
+    sql = """
+        SELECT uid, entity_name_uri FROM openatlas.tbl_entities e
+        JOIN openatlas.tbl_links l ON
+            e.uid = l.links_entity_uid_from
+            AND l.links_cidoc_number_direction = 7
+            AND l.links_entity_uid_to = {id};""".format(id=ostalpen_id)
+    cursor_ostalpen.execute(sql)
+    for row in cursor_ostalpen.fetchall():
+        sql = """
+            INSERT INTO model.entity (class_code, name, ostalpen_id) VALUES ('E55', '{name}', {uid}) 
+            RETURNING id;""".format(name=row.entity_name_uri, uid=row.uid)
+        cursor_dpp.execute(sql)
+        sub_id = cursor_dpp.fetchone()[0]
+        link('P127', sub_id, openatlas_id)
+        insert_type_subs(sub_id, row.uid)
+        ostalpen_place_types.append(row.uid)
+
+
+for root in ['Feature', 'Finds', 'Stratigraphical Unit']:
     sql = """
         SELECT uid, entity_name_uri FROM openatlas.tbl_entities e
         JOIN tbl_links l ON
             e.uid = l.links_entity_uid_from
             AND l.links_cidoc_number_direction = 7
-            AND l.links_entity_uid_to = (SELECT uid FROM openatlas.tbl_entities WHERE entity_name_uri = '{archeo_super}');
-        """.format(archeo_super=archeo_super)
+            AND l.links_entity_uid_to = 
+                (SELECT uid FROM openatlas.tbl_entities WHERE entity_name_uri = '{root}');
+        """.format(root=root)
     cursor_ostalpen.execute(sql)
     for row in cursor_ostalpen.fetchall():
-        if archeo_super == 'Finds':
-            archeo_super = 'Find'
-        elif archeo_super == 'Stratigraphical Unit':
-            archeo_super = 'Stratigraphic Unit'
-        sql = "INSERT INTO model.entity (class_code, name, ostalpen_id) VALUES ('E55', '" + row.entity_name_uri + "', " + str(row.uid) + ") RETURNING id;"
+        if root == 'Finds':
+            root = 'Find'
+        elif root == 'Stratigraphical Unit':
+            root = 'Stratigraphic Unit'
+        sql = """
+            INSERT INTO model.entity (class_code, name, ostalpen_id) VALUES ('E55', '{name}', {uid}) 
+            RETURNING id;""".format(name=row.entity_name_uri, uid=row.uid)
         if row.entity_name_uri in ostalpen_types:
             ostalpen_types_double[row.uid] = row.entity_name_uri
-        ostalpen_types[row.uid] = row.entity_name_uri
+        ostalpen_place_types.append(row.uid)
         cursor_dpp.execute(sql)
         id_ = cursor_dpp.fetchone()[0]
-        sql = "INSERT INTO model.link(property_code, range_id, domain_id) VALUES ('P127', (SELECT id FROM model.entity WHERE name = '" + archeo_super + "' AND class_code = 'E55'), " + str(id_) + ");"
+        sql = """
+            INSERT INTO model.link(property_code, range_id, domain_id) VALUES ('P127', 
+            (SELECT id FROM model.entity WHERE name = '{root}' AND class_code = 'E55'), {id});
+            """.format(root=root, id=id_)
         cursor_dpp.execute(sql)
+        insert_type_subs(id_, row.uid)
 
 
 # Get ostalpen entities
@@ -391,6 +362,9 @@ for e in entities:
     elif e.class_code == 'E074':  # Group
         e.class_code = 'E74'
         count['E74 group'] += 1
+    elif e.class_code == 'E040':  # Legal body
+        e.class_code = 'E40'
+        count['E40 legal body'] += 1
     elif e.class_code == 'E005':  # Event
         e.class_code = 'E7'
         count['E7 event'] += 1
@@ -403,8 +377,7 @@ for e in entities:
             e.system_type = 'bibliography'
         elif e.entity_type in [11232, 11179, 11180]:  # File (map, photo, drawing)
             if '.' not in e.name:
-                print('Skipping bogus file ' + e.name)
-                continue
+                continue  # there are two bogus files which are skipped
             e.system_type = 'file'
         elif e.entity_type == 12:  # these 23 have to be checked manually
             continue
@@ -667,36 +640,35 @@ for row in cursor_ostalpen.fetchall():
         if domain.id_name.startswith('tbl_2_quelle_original'):
             link('P73', range_.id, domain.id, row.links_annotation)
             link('P2', domain.id, types['Original text'])
-            count['link'] += 2
         elif domain.id_name.startswith('tbl_2_quelle_uebersetzung'):
             link('P73', range_.id, domain.id, row.links_annotation)
             link('P2', domain.id, types['Translation'])
-            count['link'] += 2
         else:
             print('Error missing translation type, id: ' + str(domain.id) + ', ' + domain.id_name)
     elif row.links_cidoc_number_direction == 4:  # documents
         # Todo: remove when all entities
         if row.links_entity_uid_to not in new_entities or \
                 row.links_entity_uid_from not in new_entities:
-                    # print('Missing source link for: ' + str(row.links_entity_uid_from))
+                    print('Missing source link for: ' + str(row.links_entity_uid_from))
                     continue
         domain = new_entities[row.links_entity_uid_to]
         range_ = new_entities[row.links_entity_uid_from]
         link('P67', domain.id, range_.id ,row.links_annotation)
-        count['link'] += 1
     elif row.links_cidoc_number_direction == 11:  # subunits
         if row.links_entity_uid_to not in new_entities:
-            # print('Missing subunit for a link (11, to) for: ' + str(row.links_entity_uid_to))
+            print('Missing subunit for a link (11, to) for: ' + str(row.links_entity_uid_to))
             continue
         if row.links_entity_uid_from not in new_entities:
-            # print('Missing subunit for a link (11, from) for: ' + str(row.links_entity_uid_from))
+            print('Missing subunit for a link (11, from) for: ' + str(row.links_entity_uid_from))
             continue
         domain = new_entities[row.links_entity_uid_to]
         range_ = new_entities[row.links_entity_uid_from]
         link('P46', range_.id, domain.id, row.links_annotation)
     elif row.links_cidoc_number_direction == 1:  # types
+        if row.links_entity_uid_to in ostalpen_place_types:
+            continue  # archeological types done with links are invalid
         if row.links_entity_uid_to not in ostalpen_types:
-            # print('Invalid type link to : ' + str(row.links_entity_uid_to))
+            print('Invalid type link to : ' + str(row.links_entity_uid_to))
             continue
         type_name = ostalpen_types[row.links_entity_uid_to]
         if row.links_entity_uid_to in ostalpen_types_double:
@@ -706,14 +678,13 @@ for row in cursor_ostalpen.fetchall():
             print('Use of DPP double type: ' + type_name)
             continue
         if type_name not in types:
-            # print('Missing DPP type: ' + type_name)
+            print('Missing DPP type: ' + type_name)
             continue
         if row.links_entity_uid_from not in new_entities:
             print('Missing entity for type with Ostalpen ID: ' + str(row.links_entity_uid_from))
             continue
         domain = new_entities[row.links_entity_uid_from]
         link('P2', domain.id, types[type_name])
-        count['link'] += 1
     else:
         missing_properties.add(row.links_cidoc_number_direction)
 
@@ -723,6 +694,8 @@ for name, count in count.items():
 print('Missing classes:' + ', '.join(missing_classes))
 print('Missing property ids:')
 print(missing_properties)
+print('Missing place types:')
+print(missing_ostalpen_place_types)
 connection_dpp.close()
 connection_ostalpen.close()
 print('Execution time: ' + str(round((time.time()-start)/60, 2)) + ' minutes')
