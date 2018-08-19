@@ -26,7 +26,7 @@ class SearchForm(Form):
 
 @app.route('/overview/search', methods=['POST', 'GET'])
 @required_group('readonly')
-def index_search():
+def search_index():
     classes = ['source', 'event', 'actor', 'place', 'reference']
     form = SearchForm()
     form.classes.choices = [(x, uc_first(_(x))) for x in classes]
