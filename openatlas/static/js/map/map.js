@@ -5,29 +5,30 @@ var map = L.map('map', {
 
 var grayMarker = L.icon({iconUrl: '/static/images/map/marker-icon-gray.png'});
 
-// Define base map layers
+// Define base layers
 var baseMaps = {
     Landscape: L.tileLayer('https://{s}.tile.thunderforest.com/landscape/{z}/{x}/{y}.png?apikey=' + thunderforestKey, {attribution: '&copy; <a href="http://www.thunderforest.com">Thunderforest Landscape '}),
     OpenStreetMap: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}),
     GoogleSatellite: L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google Maps '}),
 };
 
-// Add map layers control
-L.control.layers(baseMaps).addTo(map);
 
-// Default base map init
-baseMaps.Landscape.addTo(map);
-
-// View for a single place entity
-if (gisPointSelected != "") {
+if (gisPointSelected == "") {
+    // Define and add geo JSON layer for markers for all places index
+    var pointLayer = new L.GeoJSON(gisPointAll, {
+        onEachFeature: setPopup,
+        pointToLayer: function(feature, latlng) {
+            return L.marker(latlng, {icon: grayMarker});
+        }
+    });
+} else {
+    // View for a single place entity
     // Set geo json layer for all points
-    var geoJsonLayer = new L.GeoJSON(gisPointAll, {
-      onEachFeature: setPopup,
-      pointToLayer: function(feature, latlng) {
-        return L.marker(latlng, {
-          icon: grayMarker
-        });
-      }
+    var pointLayer = new L.GeoJSON(gisPointAll, {
+        onEachFeature: setPopup,
+        pointToLayer: function(feature, latlng) {
+            return L.marker(latlng, {icon: grayMarker});
+        }
     });
     // If it's not a polygon
     if (gisPolygonSelected == "") {
@@ -47,14 +48,18 @@ if (gisPointSelected != "") {
             map.fitBounds(gisExtend.getBounds(), {maxZoom: 12});
         }, 1);
     }
-} else {
-  // Define and add geo JSON layer for markers for all places index
-  var geoJsonLayer = new L.GeoJSON(gisPointAll, {onEachFeature: setPopup});
 }
 
 // Add markers to the map
-geoJsonLayer.addTo(map);
-map.fitBounds(geoJsonLayer.getBounds(), {maxZoom: 12});
+map.addLayer(pointLayer);
+map.fitBounds(pointLayer.getBounds(), {maxZoom: 12});
+
+var controls = {
+    Sites: pointLayer,
+}
+
+L.control.layers(baseMaps, controls).addTo(map);
+baseMaps.Landscape.addTo(map);
 
 // Geoname search control init and add to map
 var geoSearchControl = L.control.geonames({
@@ -68,12 +73,12 @@ map.addControl(geoSearchControl);
 
 function setObjectId(e) {
     preventPopup();
-    if (editon === 0) {
+    if (editOn === 0) {
         var layer = e.layer;
         var feature = layer.feature;
         var objectId = feature.properties.objectId;
-        geometrytype = feature.geometry.type;
-        if (geometrytype == 'Point') {
+        geometryType = feature.geometry.type;
+        if (geometryType == 'Point') {
             position = (e.latlng);
         }
         selectedshape = feature.properties.id;
@@ -90,7 +95,7 @@ function setObjectId(e) {
             helptext = translate['map_info_area'];
             headingtext = 'Area';
         }
-        if (geometrytype == "Point") {
+        if (geometryType == "Point") {
             helptext = translate['map_info_point'];
             headingtext = 'Point';
         }
@@ -98,7 +103,7 @@ function setObjectId(e) {
 }
 
 function preventPopup(event) {
-    if (editon === 1) {
+    if (editOn === 1) {
         map.closePopup();
     }
 }
