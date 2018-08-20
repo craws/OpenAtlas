@@ -112,14 +112,9 @@ function preventPopup(event) {
  * Interactions with the map
  */
 
-// Init variables
 var coordCapture;
 var coordCaptureImg;
 
-
-/**
- * Custom map functions
- */
 
 /**
  * Function to display a marker's popup on the map
@@ -149,6 +144,8 @@ function setPopup(feature, layer, mode='display') {
     // Bind to layer
     layer.bindPopup(popupHTML);
 }
+
+
 
 /*
 /**
