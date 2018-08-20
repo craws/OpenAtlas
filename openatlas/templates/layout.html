@@ -114,7 +114,7 @@
             {{ origin|display_menu|safe }}
             {% if current_user.is_authenticated %}
                 <div id="index-search">
-                    <form method="post" action="{{ url_for('index_search') }}">
+                    <form method="post" action="{{ url_for('search_index') }}">
                         {{ search_form.csrf_token }}
                         {{ search_form.term }}
                         {{ search_form.search}}
