@@ -81,23 +81,23 @@ function setObjectId(e) {
         if (geometryType == 'Point') {
             position = (e.latlng);
         }
-        selectedshape = feature.properties.id;
-        editlayer = e.layer;
-        editmarker = e.marker;
-        shapename = feature.properties.name;
+        selectedShape = feature.properties.id;
+        editLayer = e.layer;
+        editMarker = e.marker;
+        shapeName = feature.properties.name;
         count = feature.properties.count;
-        shapetype = feature.properties.shapeType;
-        shapedescription = feature.properties.description;
+        shapeType = feature.properties.shapeType;
+        shapeDescription = feature.properties.description;
         objectName = feature.properties.title;
-        helptext = translate['map_info_shape'];
-        headingtext = 'Shape';
-        if (shapetype == "area") {
-            helptext = translate['map_info_area'];
-            headingtext = 'Area';
+        helpText = translate['map_info_shape'];
+        headingText = 'Shape';
+        if (shapeType == "area") {
+            helpText = translate['map_info_area'];
+            headingText = 'Area';
         }
         if (geometryType == "Point") {
-            helptext = translate['map_info_point'];
-            headingtext = 'Point';
+            helpText = translate['map_info_point'];
+            headingText = 'Point';
         }
     }
 }
@@ -107,14 +107,6 @@ function preventPopup(event) {
         map.closePopup();
     }
 }
-
-/**
- * Interactions with the map
- */
-
-var coordCapture;
-var coordCaptureImg;
-
 
 /**
  * Function to display a marker's popup on the map
@@ -133,13 +125,12 @@ function setPopup(feature, layer, mode='display') {
     // While editing map content
     if (mode == 'update') {
         popupHTML +=
-          '<div id="btnBar" style="white-space:nowrap;">' +
-          '<button id="editBtn" onclick="editshape()"/>' + translate['edit'] + '</button> <button id="delBtn" onclick="deleteshape()"/>' + translate['delete'] + '</button></div>' +
+          '<div id="buttonBar" style="white-space:nowrap;">' +
+          '<button id="editButton" onclick="editShape()"/>' + translate['edit'] + '</button> <button id="deleteButton" onclick="deleteShape()"/>' + translate['delete'] + '</button></div>' +
           '</div>';
     } else {
         // While only displaying map content
-        popupHTML +=
-          '<a href="/place/view/' + feature.properties.objectId + '">' + translate['details'] + '</a>';
+        popupHTML += '<a href="/place/view/' + feature.properties.objectId + '">' + translate['details'] + '</a>';
     }
     // Bind to layer
     layer.bindPopup(popupHTML);

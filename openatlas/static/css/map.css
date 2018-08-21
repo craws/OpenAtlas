@@ -1,0 +1,118 @@
+#selectUnit {
+    position: absolute;
+    display: none;
+    right:0;
+    margin-top: 20px;
+    background: #ffffff;
+    padding: 5px;
+    margin: 8px;
+    border-radius: 6px;
+}
+
+#jstree {
+    display: block;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+}
+
+#demo_q {
+    margin-bottom: 8px;
+    border: 1px solid #ccc;
+    border-radius: 2px;
+}
+
+.shapeInput {
+    padding: 6px 8px;
+    background: white;
+    background: rgba(255,255,255,1);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+}
+
+#shapeForm {
+    width: 300px;
+    overflow: hidden;
+}
+
+#headingText, #headingTextAdm {
+    font-weight: bold;
+    font-style: normal;
+}
+
+#shapeForm input, select {
+    width: 200px;
+    float: right;
+    margin-left: 15px;
+}
+
+#nameField input, select {
+    width: 96%;
+    display: block;
+}
+
+#shapeForm textarea {
+    font: 10pt "Helvetica New", Arial, Helvetica, sans-serif;
+    float: right;
+    width: 96%;
+    resize:vertical
+}
+
+#shapeForm label {
+    float: left;
+    margin-top: 3px;
+    padding-top: 5px
+}
+
+#resetButton {
+    margin-top: 7px;
+    margin-right: 7px;
+    float: right;
+    display: none
+}
+
+#editCloseButton {
+    color: #ccc;
+    cursor: pointer;
+    float: right;
+    display: none
+}
+
+#markerCloseButton {
+    color: #ccc;
+    cursor: pointer;
+    float: right;
+    display: none
+}
+
+#closeButton {
+    color: #ccc;
+    cursor: pointer;
+    float: right
+}
+
+#saveAdmButton {
+    margin-top: 7px;
+    margin-right: 7px;
+    float: right;
+    display: block
+}
+
+#editResetButton, #saveButton, #editSaveButton, #markerSaveButton {
+    margin-top: 7px;
+    margin-right: 7px;
+    float: right;
+    display: none
+}
+
+#popup {
+    width: 120px
+}
+
+#popup input {
+    width: 50px;
+    margin: 3px
+}
+
+.jstree li > a > .jstree-icon {
+    display:none !important;
+}
