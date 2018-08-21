@@ -40,6 +40,8 @@
             <h1>{{ _('data integrity')|uc_first }}</h1>
             <a href="{{ url_for('admin_orphans') }}">{{ _('orphans')|uc_first }}</a>
             <a href="{{ url_for('admin_check_links') }}">{{ _('check links')|uc_first }}</a>
+            <h1>{{ _('export')|uc_first }}</h1>
+            <a href="{{ url_for('admin_export') }}">{{ _('export CSV')|uc_first }}</a>
         {% endif  %}
     </div>
 {% endblock %}

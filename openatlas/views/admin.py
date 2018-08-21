@@ -19,6 +19,7 @@ from openatlas.models.link import LinkMapper
 from openatlas.models.node import NodeMapper
 from openatlas.models.settings import SettingsMapper
 from openatlas.models.user import UserMapper
+from openatlas.models.export import Export
 from openatlas.util.util import (convert_size, format_date, format_datetime, get_file_path, link,
                                  required_group, send_mail, truncate_string, uc_first)
 
@@ -92,6 +93,21 @@ class MailForm(Form):
 def admin_index():
     upload_dir_writable = True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False
     return render_template('admin/index.html', upload_dir_writable=upload_dir_writable)
+
+
+class ExportForm(Form):
+    save = SubmitField(uc_first(_('export CSV')))
+
+
+@required_group('manager')
+@app.route('/admin/export', methods=['POST', 'GET'])
+def admin_export():
+    form = ExportForm()
+    if form.validate_on_submit():
+        Export.export_to_csv()
+        logger.log('info', 'database', 'CSV export')
+        flash(_('data was exported as CSV'), 'info')
+    return render_template('admin/export.html', form=form)
 
 
 @app.route('/admin/check_links')
