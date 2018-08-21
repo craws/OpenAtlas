@@ -1,6 +1,7 @@
 // Init map variable using the #map div with options
 var map = L.map('map', {
-    fullscreenControl: true
+    fullscreenControl: true,
+    drawControl: true
 });
 
 var grayMarker = L.icon({iconUrl: '/static/images/map/marker-icon-gray.png'});
@@ -115,77 +116,24 @@ function preventPopup(event) {
  * @param mode - 'display' for view only or 'update' for editing.
  */
 function setPopup(feature, layer, mode='display') {
-    // Base popup HTML content
-    var popupHTML =
-        '<div id="popup"><strong>' + feature.properties.title + '</strong><br/>' +
-        '<div id="popup"><i>' + feature.properties.siteType + '</i><br/>' +
-        '<div id="popup"><strong>' + feature.properties.name + '</strong><br/>' +
-        '<div style="max-height:140px; overflow-y: auto;">' + feature.properties.description + '<br/></div>' +
-        '<i>' + feature.properties.shapeType + '</i><br/><br/>';
-    // While editing map content
+    var popupHTML = `
+        <div id="popup">
+            <strong>` + feature.properties.title + `</strong>
+            <br />`+ feature.properties.siteType + `
+            <br /><strong>` + feature.properties.name + `</strong>
+            <div style="max-height:140px; overflow-y: auto;">` + feature.properties.description + `</div>` +
+            feature.properties.shapeType;
     if (mode == 'update') {
-        popupHTML +=
-          '<div id="buttonBar" style="white-space:nowrap;">' +
-          '<button id="editButton" onclick="editShape()"/>' + translate['edit'] + '</button> <button id="deleteButton" onclick="deleteShape()"/>' + translate['delete'] + '</button></div>' +
-          '</div>';
+        // While editing map content
+        popupHTML += `
+            <div id="buttonBar" style="white-space:nowrap;">
+                <button id="editButton" onclick="editShape()"/>` + translate['edit'] + `</button>
+                <button id="deleteButton" onclick="deleteShape()"/>` + translate['delete'] + `</button>
+            </div>`;
     } else {
         // While only displaying map content
-        popupHTML += '<a href="/place/view/' + feature.properties.objectId + '">' + translate['details'] + '</a>';
+        popupHTML += '<p><a href="/place/view/' + feature.properties.objectId + '">' + translate['details'] + '</a></p>';
     }
-    // Bind to layer
+    popupHTML += '</div>'
     layer.bindPopup(popupHTML);
-}
-
-
-
-/*
-/**
- * Function to set interactions off
- */
-function interactionOff() {
-    capture = false;
-    map.dragging.disable();
-    map.touchZoom.disable();
-    map.doubleClickZoom.disable();
-    map.scrollWheelZoom.disable();
-    map.boxZoom.disable();
-    map.keyboard.disable();
-    if (map.tap) {
-        map.tap.disable();
-    }
-}
-
-/**
- * Function to set interactions on
- */
-function interactionOn() {
-    map.dragging.enable();
-    map.touchZoom.enable();
-    map.doubleClickZoom.enable();
-    map.scrollWheelZoom.enable();
-    map.boxZoom.enable();
-    map.keyboard.enable();
-    if (map.tap) {
-        map.tap.enable();
-    }
-    $('#map').css('cursor', '');
-    if (coordCapture) {
-        document.getElementById('map').style.cursor = 'crosshair';
-        capture = true;
-    }
-    if (coordCaptureImg) {
-        document.getElementById('map').style.cursor = 'crosshair';
-    }
-}
-
-/**
- * Function to toggle interactions between on and off
- * @param element - Interaction element.
- */
-function interactionToggle(element) { // disable map dragging when cursor is e.g. in search input field.
-    $(element).hover(function () {
-        interactionOn();
-    }, function () {
-        interactionOff();
-    });
 }

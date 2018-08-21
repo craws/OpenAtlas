@@ -3,6 +3,7 @@ var capture = false; // var to store whether control is active or not
 var coordinateCapture;
 var coordinateCaptureImage;
 var objectName = '';
+var drawnPolygone = L.featureGroup();
 var newIcon = L.icon({iconUrl: "/static/images/map/marker-icon_new.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
 
 
@@ -37,7 +38,7 @@ polygonButton.intendedFunction =
         shapeType = "shape";
         helpText = translate['map_info_shape'];
         headingText = 'Shape';
-        // drawPolygon();
+        drawPolygon();
     }
 map.addControl(polygonButton);
 
@@ -50,7 +51,7 @@ areaButton.intendedFunction =
         shapeType = "area";
         helpText = translate['map_info_area'];
         headingText = 'Area';
-        // drawPolygon();
+        drawPolygon();
     }
 map.addControl(areaButton);
 
@@ -120,6 +121,22 @@ function drawMarker() {
     document.getElementById('markerSaveButton').style.display = 'block';
     document.getElementById('easting').style.display = 'block';
     document.getElementById('northing').style.display = 'block';
+}
+
+function drawPolygon() {
+    map.drawControl = true;
+    alert(map.drawControl);
+    drawLayer = new L.Draw.Polygon(map);
+    $('.leaflet-right .leaflet-bar').hide();
+    geometryType = "polygon";
+    capture = false;
+    map.addControl(inputForm);
+    // resetMyForm();
+    map.addLayer(drawnPolygone);
+    drawLayer.enable();
+    $("#shapeForm").on("input", function () {
+        document.getElementById('resetButton').disabled = false;
+    });
 }
 
 function closeMarkerFormX() {
