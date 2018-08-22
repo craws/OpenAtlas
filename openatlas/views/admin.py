@@ -95,19 +95,40 @@ def admin_index():
     return render_template('admin/index.html', upload_dir_writable=upload_dir_writable)
 
 
-class ExportForm(Form):
+class ExportSqlForm(Form):
+    save = SubmitField(uc_first(_('export SQL')))
+
+
+@required_group('manager')
+@app.route('/admin/export/sql', methods=['POST', 'GET'])
+def admin_export_sql():
+    form = ExportSqlForm()
+    if form.validate_on_submit():
+        if Export.export_sql():
+            logger.log('info', 'database', 'SQL export')
+            flash(_('data was exported as SQL'), 'info')
+        else:
+            logger.log('error', 'database', 'SQL export failed')
+            flash(_('SQL export failed'), 'error')
+    return render_template('admin/export_sql.html', form=form)
+
+
+class ExportCsvForm(Form):
     save = SubmitField(uc_first(_('export CSV')))
 
 
 @required_group('manager')
-@app.route('/admin/export', methods=['POST', 'GET'])
-def admin_export():
-    form = ExportForm()
+@app.route('/admin/export/csv', methods=['POST', 'GET'])
+def admin_export_csv():
+    form = ExportCsvForm()
     if form.validate_on_submit():
-        Export.export_to_csv()
-        logger.log('info', 'database', 'CSV export')
-        flash(_('data was exported as CSV'), 'info')
-    return render_template('admin/export.html', form=form)
+        if Export.export_to_csv():
+            logger.log('info', 'database', 'CSV export')
+            flash(_('data was exported as CSV'), 'info')
+        else:
+            logger.log('error', 'database', 'CSV export failed')
+            flash(_('CSV export failed'), 'error')
+    return render_template('admin/export_csv.html', form=form)
 
 
 @app.route('/admin/check_links')
