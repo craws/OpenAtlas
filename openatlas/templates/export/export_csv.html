@@ -4,5 +4,6 @@
     > {{ _('export CSV')|uc_first }}
 {% endblock %}
 {% block content %}
-    {{ form|display_form|safe }}
+    <div style="float:left;margin-right: 1em;">{{ form|display_form|safe }}</div>
+    <div style="float:left;">{{ table|pager|safe }}</div>
 {% endblock %}
