@@ -11,13 +11,11 @@ class Export:
     @staticmethod
     def export_csv(form):
         for name, value in form.data.items():
-            print(value)
             if value and name != 'save':
                 path = '{path}/csv/{date}_{name}.csv'.format(
                     path=app.config['EXPORT_FOLDER_PATH'],
                     date=DateMapper.current_date_for_filename(),
                     name=name)
-                print(path)
                 file = open(path, 'w')
                 sql = "COPY {table} TO STDOUT DELIMITER ',' CSV HEADER FORCE QUOTE *;".format(
                     table=name.replace('_', '.',1))

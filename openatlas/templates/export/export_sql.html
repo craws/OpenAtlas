@@ -4,6 +4,10 @@
     > {{ _('export SQL')|uc_first }}
 {% endblock %}
 {% block content %}
-    {{ form|display_form|safe }}
+    {% if writeable %}
+        {{ form|display_form|safe }}
+    {% else %}
+        <p><span class="error">{{ _('directory not writable')|uc_first }}: export/sql</span></p>
+    {% endif %}
     {{ table|pager|safe }}
 {% endblock %}

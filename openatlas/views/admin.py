@@ -90,8 +90,12 @@ class MailForm(Form):
 @app.route('/admin')
 @required_group('readonly')
 def admin_index():
-    upload_dir_writable = True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False
-    return render_template('admin/index.html', upload_dir_writable=upload_dir_writable)
+    export_path = app.config['EXPORT_FOLDER_PATH']
+    writeable_dirs = {
+        'upload': True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False,
+        'export/sql': True if os.access(export_path + '/sql', os.W_OK) else False,
+        'export/csv': True if os.access(export_path + '/csv', os.W_OK) else False}
+    return render_template('admin/index.html', writeable_dirs=writeable_dirs)
 
 
 @app.route('/admin/check_links')

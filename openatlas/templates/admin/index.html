@@ -4,6 +4,11 @@
 {% endblock %}
 {% block content %}
     <div id="admin_index">
+        {% for dir, value in writeable_dirs.items() %}
+            {% if not value %}
+                <span class="error">{{ _('directory not writable')|uc_first }}: {{ dir }}</span><br />
+            {% endif %}
+        {% endfor %}
         <h1>{{ _('user')|uc_first }}</h1>
         <a href="{{ url_for('user_index') }}">{{ _('list')|uc_first }}</a>
         {% if 'manager'|is_authorized and session['settings']['mail'] %}
@@ -15,10 +20,6 @@
         {% if 'manager'|is_authorized %}
             <a href="{{ url_for('admin_file') }}">{{ _('settings')|uc_first }}</a>
         {% endif %}
-        {% if not upload_dir_writable %}
-            <span class="error">{{ _('Upload directory not writable!') }}</span>
-        {% endif %}
-
         {% if 'manager'|is_authorized %}
             <h1>{{ _('settings')|uc_first }}</h1>
         {% endif %}

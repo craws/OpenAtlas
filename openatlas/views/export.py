@@ -35,6 +35,7 @@ class ExportCsvForm(Form):
 def admin_export_sql():
     table = {'id': 'sql', 'header': ['name', 'size'], 'data': []}
     path = app.config['EXPORT_FOLDER_PATH'] + '/sql'
+    writeable = True if os.access(path, os.W_OK) else False
     for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
         name = basename(file)
         file_path = path + '/' + name
@@ -44,14 +45,14 @@ def admin_export_sql():
             name, convert_size(os.path.getsize(file_path)),
             '<a href="' + url_for('download_sql', filename=name) + '">' + uc_first(
                 _('download')) + '</a>']
-        if is_authorized('admin'):
+        if is_authorized('admin') and writeable:
             confirm = ' onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
             delete = '<a href="' + url_for('delete_sql',
                                            filename=name) + '" ' + confirm + '>Delete</a>'
             data.append(delete)
         table['data'].append(data)
     form = ExportSqlForm()
-    if form.validate_on_submit():
+    if form.validate_on_submit() and writeable:
         if Export.export_sql():
             logger.log('info', 'database', 'SQL export')
             flash(_('data was exported as SQL'), 'info')
@@ -59,7 +60,7 @@ def admin_export_sql():
             logger.log('error', 'database', 'SQL export failed')
             flash(_('SQL export failed'), 'error')
         return redirect(url_for('admin_export_sql'))
-    return render_template('export/export_sql.html', form=form, table=table)
+    return render_template('export/export_sql.html', form=form, table=table, writeable=writeable)
 
 
 @app.route('/download/sql/<filename>')
@@ -94,6 +95,7 @@ def download_csv(filename):
 def admin_export_csv():
     table = {'id': 'sql', 'header': ['name', 'size'], 'data': []}
     path = app.config['EXPORT_FOLDER_PATH'] + '/csv'
+    writeable = True if os.access(path, os.W_OK) else False
     for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
         name = basename(file)
         file_path = path + '/' + name
@@ -103,19 +105,19 @@ def admin_export_csv():
             name, convert_size(os.path.getsize(file_path)),
             '<a href="' + url_for('download_csv', filename=name) + '">' + uc_first(
                 _('download')) + '</a>']
-        if is_authorized('admin'):
+        if is_authorized('admin') and writeable:
             confirm = ' onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
             delete = '<a href="' + url_for('delete_csv',
                                            filename=name) + '" ' + confirm + '>Delete</a>'
             data.append(delete)
         table['data'].append(data)
     form = ExportCsvForm()
-    if form.validate_on_submit():
+    if form.validate_on_submit() and writeable:
         Export.export_csv(form)
         logger.log('info', 'database', 'CSV export')
         flash(_('data was exported as CSV'), 'info')
         return redirect(url_for('admin_export_csv'))
-    return render_template('export/export_csv.html', form=form, table=table)
+    return render_template('export/export_csv.html', form=form, table=table, writeable=writeable)
 
 
 @app.route('/delete/csv/<filename>')

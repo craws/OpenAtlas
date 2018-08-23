@@ -4,6 +4,10 @@
     > {{ _('export CSV')|uc_first }}
 {% endblock %}
 {% block content %}
-    <div style="float:left;margin-right: 1em;">{{ form|display_form|safe }}</div>
+    {% if writeable %}
+        <div style="float:left;margin-right: 1em;">{{ form|display_form|safe }}</div>
+    {% else %}
+        <p><span class="error">{{ _('directory not writable')|uc_first }}: export/csv</span></p>
+    {% endif %}
     <div style="float:left;">{{ table|pager|safe }}</div>
 {% endblock %}
