@@ -39,11 +39,13 @@
             <a href="{{ url_for('admin_log') }}">{{ _('system log')|uc_first }}</a>
         {% endif  %}
 
-        {% if 'admin'|is_authorized %}
+        {% if 'manager'|is_authorized %}
             <h1>{{ _('export')|uc_first }}</h1>
             <a href="{{ url_for('admin_export_sql') }}">{{ _('SQL')|uc_first }}</a>
             <a href="{{ url_for('admin_export_csv') }}">{{ _('CSV')|uc_first }}</a>
+        {% endif  %}
 
+        {% if 'admin'|is_authorized %}
             <h1>{{ _('data integrity')|uc_first }}</h1>
             <a href="{{ url_for('admin_orphans') }}">{{ _('orphans')|uc_first }}</a>
             <a href="{{ url_for('admin_check_links') }}">{{ _('check links')|uc_first }}</a>

@@ -1,5 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import numpy
+from datetime import datetime
 from flask import g
 
 import openatlas
@@ -8,6 +9,14 @@ from openatlas.models.linkProperty import LinkPropertyMapper
 
 
 class DateMapper:
+
+    @staticmethod
+    def current_date_for_filename():
+        today = datetime.today()
+        return '{year}-{month}-{day}'.format(
+            year=today.year,
+            month=str(today.month).zfill(2),
+            day=str(today.day).zfill(2))
 
     @staticmethod
     def get_dates(entity):
@@ -35,22 +44,18 @@ class DateMapper:
 
     @staticmethod
     def timestamp_to_datetime64(string):
-        """Converts a timestamp string to a numpy.datetime64
-
-
+        """ Converts a timestamp string to a numpy.datetime64
         :param string: PostgreSQL timestamp
         :return: numpy.datetime64
         """
         if 'BC' in string:
             parts = string.split(' ')[0].split('-')
             string = '-' + str(int(parts[0]) - 1) + '-' + parts[1] + '-' + parts[2]
-        datetime = numpy.datetime64(string.split(' ')[0])
-        return datetime
+        return numpy.datetime64(string.split(' ')[0])
 
     @staticmethod
     def datetime64_to_timestamp(date):
-        """Converts a numpy.datetime64 to a timestamp string
-
+        """ Converts a numpy.datetime64 to a timestamp string
         :param date: numpy.datetime64
         :return: PostgreSQL timestamp
         """
@@ -68,8 +73,7 @@ class DateMapper:
 
     @staticmethod
     def form_to_datetime64(year, month, day):
-        """Converts form fields (year, month, day) to a numpy.datetime64
-
+        """ Converts form fields (year, month, day) to a numpy.datetime64
         :param year: -4713 to 9999
         :param month: 1 to 12
         :param day: 1 to 31
@@ -80,10 +84,10 @@ class DateMapper:
         day = format(day, '02d') if day else '01'
         string = str(year) + '-' + str(month) + '-' + str(day)
         try:
-            datetime = numpy.datetime64(string)
+            datetime_ = numpy.datetime64(string)
         except ValueError:
             return None
-        return datetime
+        return datetime_
 
     @staticmethod
     def get_link_dates(link):

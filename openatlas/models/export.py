@@ -1,10 +1,9 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from datetime import datetime
-
 import subprocess
 from flask import g
 
 from openatlas import app
+from openatlas.models.date import DateMapper
 
 
 class Export:
@@ -27,20 +26,20 @@ class Export:
 
     @staticmethod
     def export_sql():
-        today = datetime.today()
-        file_path = '{path}/sql/{year}-{month}-{day}_dump.sql'.format(
+        """ Creates a pg_dump file in the export/sql folder, filename begins with current date."""
+        # Todo: prevent exposing the database password to the process list
+        file_path = '{path}/sql/{date}_dump.sql'.format(
             path=app.config['EXPORT_FOLDER_PATH'],
-            year=today.year, month=today.month, day=today.day)
+            date=DateMapper.current_date_for_filename())
         command = '''pg_dump -h {host} -d {database} -U {user} -p {port} -f {file}'''.format(
-                host=app.config['DATABASE_HOST'],
-                database=app.config['DATABASE_NAME'],
-                port=app.config['DATABASE_PORT'],
-                user=app.config['DATABASE_USER'],
-                file=file_path)
+            host=app.config['DATABASE_HOST'],
+            database=app.config['DATABASE_NAME'],
+            port=app.config['DATABASE_PORT'],
+            user=app.config['DATABASE_USER'],
+            file=file_path)
         try:
-            process = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE,
-                                    env={'PGPASSWORD': app.config['DATABASE_PASS']})
-        except subprocess.TimeoutExpired:
-            process.kill()
+            subprocess.Popen(command, shell=True, stdin=subprocess.PIPE,
+                             env={'PGPASSWORD': app.config['DATABASE_PASS']}).wait()
+        except Exception:
             return False
         return True

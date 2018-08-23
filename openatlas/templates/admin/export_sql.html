@@ -5,4 +5,5 @@
 {% endblock %}
 {% block content %}
     {{ form|display_form|safe }}
+    {{ table|pager|safe }}
 {% endblock %}

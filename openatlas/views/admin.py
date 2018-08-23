@@ -4,7 +4,7 @@ from collections import OrderedDict
 from os.path import basename, splitext
 
 import datetime
-from flask import flash, g, render_template, request, session, url_for
+from flask import flash, g, render_template, request, session, url_for, send_from_directory
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import Form
@@ -21,7 +21,8 @@ from openatlas.models.settings import SettingsMapper
 from openatlas.models.user import UserMapper
 from openatlas.models.export import Export
 from openatlas.util.util import (convert_size, format_date, format_datetime, get_file_path, link,
-                                 required_group, send_mail, truncate_string, uc_first)
+                                 required_group, send_mail, truncate_string, uc_first,
+                                 is_authorized)
 
 
 class LogForm(Form):
@@ -99,9 +100,26 @@ class ExportSqlForm(Form):
     save = SubmitField(uc_first(_('export SQL')))
 
 
-@required_group('manager')
 @app.route('/admin/export/sql', methods=['POST', 'GET'])
+@required_group('manager')
 def admin_export_sql():
+    table = {'id': 'sql', 'header': ['name', 'size'], 'data': []}
+    path = app.config['EXPORT_FOLDER_PATH'] + '/sql'
+    for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
+        name = basename(file)
+        file_path = path + '/' + name
+        if name == '.gitignore':
+            continue
+        data = [
+            name, convert_size(os.path.getsize(file_path)),
+            '<a href="' + url_for('download_sql', filename=name) + '">' + uc_first(
+                _('download')) + '</a>']
+        if is_authorized('admin'):
+            confirm = ' onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
+            delete = '<a href="' + url_for('delete_sql',
+                                           filename=name) + '" ' + confirm + '>Delete</a>'
+            data.append(delete)
+        table['data'].append(data)
     form = ExportSqlForm()
     if form.validate_on_submit():
         if Export.export_sql():
@@ -110,15 +128,43 @@ def admin_export_sql():
         else:
             logger.log('error', 'database', 'SQL export failed')
             flash(_('SQL export failed'), 'error')
-    return render_template('admin/export_sql.html', form=form)
+        return redirect(url_for('admin_export_sql'))
+    return render_template('admin/export_sql.html', form=form, table=table)
+
+
+@app.route('/download/sql/<filename>')
+@required_group('manager')
+def download_sql(filename):
+    path = app.config['EXPORT_FOLDER_PATH'] + '/sql/'
+    return send_from_directory(path, filename, as_attachment=True)
+
+
+@app.route('/delete/sql/<filename>')
+@required_group('admin')
+def delete_sql(filename):
+    try:
+        os.remove(app.config['EXPORT_FOLDER_PATH'] + '/sql/' + filename)
+        logger.log('info', 'file', 'SQL file deleted')
+        flash(_('file deleted'), 'info')
+    except Exception as e:  # pragma: no cover
+        logger.log('error', 'file', 'file deletion failed', e)
+        flash(_('error file delete'), 'error')
+    return redirect(url_for('admin_export_sql'))
+
+
+@app.route('/download/csv/<filename>')
+@required_group('manager')
+def download_csv(filename):
+    path = app.config['EXPORT_FOLDER_PATH'] + '/csv/'
+    return send_from_directory(path, filename, as_attachment=True)
 
 
 class ExportCsvForm(Form):
     save = SubmitField(uc_first(_('export CSV')))
 
 
-@required_group('manager')
 @app.route('/admin/export/csv', methods=['POST', 'GET'])
+@required_group('manager')
 def admin_export_csv():
     form = ExportCsvForm()
     if form.validate_on_submit():
@@ -143,8 +189,8 @@ def admin_check_links(check=None):
     return render_template('admin/check_links.html', table=table)
 
 
-@required_group('admin')
 @app.route('/admin/file', methods=['POST', 'GET'])
+@required_group('admin')
 def admin_file():
     form = FileForm()
     if form.validate_on_submit():
