@@ -28,7 +28,7 @@ class Export:
     @staticmethod
     def export_sql():
         today = datetime.today()
-        file_path = '{path}/{year}-{month}-{day}_dump.sql'.format(
+        file_path = '{path}/sql/{year}-{month}-{day}_dump.sql'.format(
             path=app.config['EXPORT_FOLDER_PATH'],
             year=today.year, month=today.month, day=today.day)
         command = '''pg_dump -h {host} -d {database} -U {user} -p {port} -f {file}'''.format(
