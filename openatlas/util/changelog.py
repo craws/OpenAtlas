@@ -9,6 +9,8 @@ class Changelog:
         'date': 'TBA',
         'data': OrderedDict(
             feature=OrderedDict([
+                ('419', 'Export SQL'),
+                ('915', 'Export CSV')
                 ]))}
     versions['3.7.0'] = {
         'date': '2018-07-22',

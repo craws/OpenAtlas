@@ -2,6 +2,20 @@
 
 Before executing SQL statements backup the database. Replace database role "openatlas" if needed.
 
+### 3.7.0 to 3.8.0
+
+For the export functions you need to make these directories writeable for the Apache user:
+
+openatlas/export/csv
+
+openatlas/export/sql
+
+e.g.
+
+    # chown www-data openatlas/uploads
+
+You can check at /admin if there are warnings about non-writeable directories.
+
 ### 3.6.x to 3.7.0
 
 One major change is that it isn't needed anymore to have different branches for different projects.
