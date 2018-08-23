@@ -33,7 +33,8 @@ class ExportCsvForm(Form):
 @app.route('/admin/export/sql', methods=['POST', 'GET'])
 @required_group('manager')
 def admin_export_sql():
-    table = {'id': 'sql', 'header': ['name', 'size'], 'data': []}
+    table = {'id': 'sql', 'header': ['name', 'size'], 'data': [],
+             'sort': 'sortList: [[0, 1]],headers: {0: { sorter: "text" }}'}
     path = app.config['EXPORT_FOLDER_PATH'] + '/sql'
     writeable = True if os.access(path, os.W_OK) else False
     for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
@@ -93,7 +94,8 @@ def download_csv(filename):
 @app.route('/admin/export/csv', methods=['POST', 'GET'])
 @required_group('manager')
 def admin_export_csv():
-    table = {'id': 'sql', 'header': ['name', 'size'], 'data': []}
+    table = {'id': 'sql', 'header': ['name', 'size'], 'data': [],
+             'sort': 'sortList: [[0, 1]],headers: {0: { sorter: "text" }}'}
     path = app.config['EXPORT_FOLDER_PATH'] + '/csv'
     writeable = True if os.access(path, os.W_OK) else False
     for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
