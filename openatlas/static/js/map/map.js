@@ -1,7 +1,6 @@
 // Init map variable using the #map div with options
 var map = L.map('map', {
-    fullscreenControl: true,
-    drawControl: true
+    fullscreenControl: true
 });
 
 var grayMarker = L.icon({iconUrl: '/static/images/map/marker-icon-gray.png'});

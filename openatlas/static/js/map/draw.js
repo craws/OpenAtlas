@@ -3,8 +3,8 @@ var capture = false; // var to store whether control is active or not
 var coordinateCapture;
 var coordinateCaptureImage;
 var objectName = '';
-var drawnPolygone = L.featureGroup();
-var newIcon = L.icon({iconUrl: "/static/images/map/marker-icon_new.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
+var drawnPolygon = L.featureGroup();
+var newIcon = L.icon({iconUrl: '/static/images/map/marker-icon_new.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
 
 
 /* Controls with EasyButton */
@@ -35,7 +35,7 @@ polygonButton.options.intentedIcon = 'fa-pencil-square-o';
 polygonButton.options.title = translate['map_info_shape'];
 polygonButton.intendedFunction =
     function () {
-        shapeType = "shape";
+        shapeType = 'shape';
         helpText = translate['map_info_shape'];
         headingText = 'Shape';
         drawPolygon();
@@ -48,7 +48,7 @@ areaButton.options.intentedIcon = 'fa-circle-o-notch';
 areaButton.options.title = translate['map_info_area'];
 areaButton.intendedFunction =
     function () {
-        shapeType = "area";
+        shapeType = 'area';
         helpText = translate['map_info_area'];
         headingText = 'Area';
         drawPolygon();
@@ -61,7 +61,7 @@ pointButton.options.intentedIcon = 'fa-map-marker';
 pointButton.options.title = translate['map_info_point'];
 pointButton.intendedFunction =
     function () {
-        shapeType = "centerpoint";
+        shapeType = 'centerpoint';
         helpText = translate['map_info_point'];
         headingText = 'Point';
         capture = true;
@@ -82,21 +82,23 @@ inputForm.onAdd = function (map) {
                 <input type="hidden" id="shapeCoordinates" />
                 <input type="hidden" id="geometryType" />
                 <span id="headingText"></span>
-                <span id="closeButton" title="` + translate["map_info_close"] + `" onclick="closeMyFormX()" class="fa">X</span>
-                <span id="editCloseButton" title="` + translate["map_info_close"] + `" onclick="editCloseMyForm()" class="fa">X</span>
+                <span id="closeButton" title="` + translate["map_info_close"] + `" onclick="closeFormX()" class="fa">X</span>
+                <span id="editCloseButton" title="` + translate["map_info_close"] + `" onclick="editCloseForm()" class="fa">X</span>
                 <span id="markerCloseButton" title="` + translate["map_info_close"] + `" onclick="closeMarkerFormX()" class="fa">X</span>
                 <p id="p1"></p>
                 <div id="nameField" style="display: block">
                     <input type="text" id="shapeName" placeholder="Enter a name if desired" />
                 </div>
                 <textarea rows="3" cols="70" id="shapeDescription" placeholder="` + translate["map_info_description"] + `"/></textarea>
-                <div style="display:block;clear:both;">
-                    <label for='easting'>Easting</label>
-                    <input type="text" style="margin-top:0.5em;" oninput="check_coordinates_input()" id="easting" placeholder="decimal degrees" />
-                </div>
-                <div style="display:block;clear:both;">
-                    <label for='northing'>Northing</label>
-                    <input type="text" style="margin-top:0.5em;" oninput="check_coordinates_input()" id="northing" placeholder="decimal degrees" />
+                <div id="coordinatesDiv">
+                    <div style="display:block;clear:both;">
+                        <label for='easting'>Easting</label>
+                        <input type="text" style="margin-top:0.5em;" oninput="check_coordinates_input()" id="easting" placeholder="decimal degrees" />
+                    </div>
+                    <div style="display:block;clear:both;">
+                        <label for='northing'>Northing</label>
+                        <input type="text" style="margin-top:0.5em;" oninput="check_coordinates_input()" id="northing" placeholder="decimal degrees" />
+                    </div>
                 </div>
             </form>
             <input type="button" title="Reset values and shape" id="resetButton" disabled value="` + translate["map_clear"] + `" onclick="resetMyForm()"/>
@@ -107,34 +109,43 @@ inputForm.onAdd = function (map) {
     return div;
 };
 
+function closeFormX() {
+    inputForm.remove(map);
+    drawnPolygon.removeLayer(layer);
+    $('.leaflet-right .leaflet-bar').show();
+    drawLayer.disable();
+    var coordinateCapture = false;
+    interactionOn();
+}
+
 function drawMarker() {
     $('#map').css('cursor', 'crosshair');
     map.addControl(inputForm);
-    $('.leaflet-right .leaflet-bar').hide();
     // resetMyForm();
-    document.getElementById("p1").innerHTML = helpText;
-    document.getElementById("headingText").innerHTML = headingText;
-    document.getElementById('saveButton').style.display = 'none';
-    document.getElementById('resetButton').style.display = 'none';
-    document.getElementById('closeButton').style.display = 'none';
-    document.getElementById('markerCloseButton').style.display = 'block';
-    document.getElementById('markerSaveButton').style.display = 'block';
-    document.getElementById('easting').style.display = 'block';
-    document.getElementById('northing').style.display = 'block';
+    $('#p1').text(helpText);
+    $('#headingText').text(headingText);
+    $('.leaflet-right .leaflet-bar').hide();
+    $('#saveButton').hide();
+    $('#resetButton').hide();
+    $('#closeButton').hide();
+    $('#markerCloseButton').show();
+    $('#markerSaveButton').show();
+    $('#coordinatesDiv').show();
 }
 
 function drawPolygon() {
     drawLayer = new L.Draw.Polygon(map);
     $('.leaflet-right .leaflet-bar').hide();
-    geometryType = "polygon";
+    geometryType = 'polygon';
     capture = false;
     map.addControl(inputForm);
     // resetMyForm();
-    map.addLayer(drawnPolygone);
+    map.addLayer(drawnPolygon);
     drawLayer.enable();
-    $("#shapeForm").on("input", function () {
-        document.getElementById('resetButton').disabled = false;
+    $('#shapeForm').on('input', function () {
+        $('#resetButton').prop('disabled', false);
     });
+    $('#coordinatesDiv').hide();
 }
 
 function closeMarkerFormX() {
@@ -160,14 +171,7 @@ function interactionOn() {
     if (map.tap) {
         map.tap.enable();
     }
-    $('#map').css('cursor', '');
-    if (coordinateCapture) {
-        document.getElementById('map').style.cursor = 'crosshair';
-        capture = true;
-    }
-    if (coordinateCaptureImage) {
-        document.getElementById('map').style.cursor = 'crosshair';
-    }
+    $('#map').css( 'cursor', 'crosshair' );
 }
 
 function interactionOff() {
@@ -186,38 +190,38 @@ function interactionOff() {
 
 map.on('click', function(e) {
     if (capture) {
-        document.getElementById('markerSaveButton').disabled = false;
-        document.getElementById('geometryType').value = 'point';
+        $('#markerSaveButton').prop('disabled', false);
+        $('#geometryType').val('point');
         if (typeof(marker) !== 'object') {
             marker = new L.marker(e.latlng, {draggable: true, icon: newIcon});
             marker.addTo(map);
             var wgs84 = (marker.getLatLng());
-            document.getElementById('northing').value = wgs84.lat;
-            document.getElementById('easting').value = wgs84.lng;
+            $('#northing').val(wgs84.lat);
+            $('#easting').val(wgs84.lng);
         } else {
             marker.setLatLng(e.latlng);
             marker.on('dragend', function (event) {
                 var marker = event.target;
                 position = marker.getLatLng();
-                document.getElementById('northing').value = position.lat;
-                document.getElementById('easting').value = position.lng;
+                $('#northing').val(position.lat);
+                $('#easting').val(position.lng);
             });
         }
         var wgs84 = marker.getLatLng();
         marker.on('dragend', function (event) {
             var marker = event.target;
             position = marker.getLatLng();
-            document.getElementById('northing').value = position.lat;
-            document.getElementById('easting').value = position.lng;
+            $('#northing').val(position.lat);
+            $('#easting').val(position.lng);
         });
-        document.getElementById('northing').value = wgs84.lat;
-        document.getElementById('easting').value = wgs84.lng;
+        $('#northing').val(wgs84.lat);
+        $('#easting').val(wgs84.lng);
     }
 });
 
 function saveMarker() {
     capture = false;
-    document.getElementById('saveButton').style.display = 'none';
+    $('#saveButton').hide();
     var point = '{"type": "Feature","geometry": {"type": "Point","coordinates": [' + $('#easting').val() + ',' + $('#northing').val() + ']},"properties":';
     point += '{"name": "' + $('#shapeName').val().replace(/\"/g,'\\"') + '","description": "' + $('#shapeDescription').val().replace(/\"/g,'\\"') + '", "shapeType": "centerpoint"}}';
     var points = JSON.parse($('#gis_points').val());
@@ -242,6 +246,38 @@ function closeMarkerForm() {
     capture = false;
     interactionOn();
 }
+
+map.on('draw:created', function (e) {
+    $('#saveButton').prop('disabled', false);
+    $('#resetButton').prop('disabled', false);
+    drawnPolygon.addLayer(e.layer);
+    geometryType = e.layerType;
+    layer = e.layer;
+    var coordinates;
+    var vector = []; // Array to store coordinates as numbers
+    geoJsonArray = [];
+    if (geometryType != 'marker') {  // if other not point store array of coordinates as variable
+        coordinates = layer.getLatLngs();
+        for (i = 0; i < (coordinates.length); i++) {
+            vector.push(' ' + coordinates[i].lng + ' ' + coordinates[i].lat);
+            geoJsonArray.push('[' + coordinates[i].lng + ',' + coordinates[i].lat + ']');
+        }
+        if (geometryType === 'polygon') {
+            // If polygon add first xy again as last xy to close polygon
+            vector.push(' ' + coordinates[0].lng + ' ' + coordinates[0].lat);
+            geoJsonArray.push('[' + coordinates[0].lng + ',' + coordinates[0].lat + ']');
+            $('#shapeCoordinates').val('(' + vector + ')');
+        }
+        if (geometryType === 'polyline') {
+            $('#shapeCoordinates').val(vector);
+        }
+    }
+    if (geometryType === 'marker') {
+        coordinates = layer.getLatLng();
+        vector = (' ' + coordinates.lng + ' ' + coordinates.lat);
+        shapeSyntax = 'ST_GeomFromText(\'POINT(' + vector + ')\',4326);'
+    }
+});
 
 
 
