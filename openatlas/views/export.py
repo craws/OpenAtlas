@@ -2,7 +2,7 @@
 import os
 from os.path import basename
 
-from flask import flash, render_template, url_for, send_from_directory
+from flask import flash, render_template, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
@@ -10,7 +10,7 @@ from wtforms import BooleanField, SubmitField
 
 from openatlas import app, logger
 from openatlas.models.export import Export
-from openatlas.util.util import (convert_size, required_group, uc_first, is_authorized)
+from openatlas.util.util import (convert_size, is_authorized, required_group, uc_first)
 
 
 class ExportSqlForm(Form):
@@ -18,6 +18,7 @@ class ExportSqlForm(Form):
 
 
 class ExportCsvForm(Form):
+    zip = BooleanField(_('export as ZIP and add info file'), default=True)
     model_class = BooleanField('model.class', default=True)
     model_class_inheritance = BooleanField('model.class_inheritance', default=True)
     model_entity = BooleanField('model.entity', default=True)
@@ -33,10 +34,19 @@ class ExportCsvForm(Form):
 @app.route('/admin/export/sql', methods=['POST', 'GET'])
 @required_group('manager')
 def admin_export_sql():
-    table = {'id': 'sql', 'header': ['name', 'size'], 'data': [],
-             'sort': 'sortList: [[0, 1]],headers: {0: { sorter: "text" }}'}
     path = app.config['EXPORT_FOLDER_PATH'] + '/sql'
     writeable = True if os.access(path, os.W_OK) else False
+    form = ExportSqlForm()
+    if form.validate_on_submit() and writeable:
+        if Export.export_sql():
+            logger.log('info', 'database', 'SQL export')
+            flash(_('data was exported as SQL'), 'info')
+        else:
+            logger.log('error', 'database', 'SQL export failed')
+            flash(_('SQL export failed'), 'error')
+        return redirect(url_for('admin_export_sql'))
+    table = {'id': 'sql', 'header': ['name', 'size'], 'data': [],
+             'sort': 'sortList: [[0, 1]],headers: {0: { sorter: "text" }}'}
     for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
         name = basename(file)
         file_path = path + '/' + name
@@ -52,15 +62,6 @@ def admin_export_sql():
                                            filename=name) + '" ' + confirm + '>Delete</a>'
             data.append(delete)
         table['data'].append(data)
-    form = ExportSqlForm()
-    if form.validate_on_submit() and writeable:
-        if Export.export_sql():
-            logger.log('info', 'database', 'SQL export')
-            flash(_('data was exported as SQL'), 'info')
-        else:
-            logger.log('error', 'database', 'SQL export failed')
-            flash(_('SQL export failed'), 'error')
-        return redirect(url_for('admin_export_sql'))
     return render_template('export/export_sql.html', form=form, table=table, writeable=writeable)
 
 
@@ -94,10 +95,16 @@ def download_csv(filename):
 @app.route('/admin/export/csv', methods=['POST', 'GET'])
 @required_group('manager')
 def admin_export_csv():
-    table = {'id': 'sql', 'header': ['name', 'size'], 'data': [],
-             'sort': 'sortList: [[0, 1]],headers: {0: { sorter: "text" }}'}
     path = app.config['EXPORT_FOLDER_PATH'] + '/csv'
     writeable = True if os.access(path, os.W_OK) else False
+    form = ExportCsvForm()
+    if form.validate_on_submit() and writeable:
+        Export.export_csv(form)
+        logger.log('info', 'database', 'CSV export')
+        flash(_('data was exported as CSV'), 'info')
+        return redirect(url_for('admin_export_csv'))
+    table = {'id': 'sql', 'header': ['name', 'size'], 'data': [],
+             'sort': 'sortList: [[0, 1]],headers: {0: { sorter: "text" }}'}
     for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
         name = basename(file)
         file_path = path + '/' + name
@@ -113,12 +120,7 @@ def admin_export_csv():
                                            filename=name) + '" ' + confirm + '>Delete</a>'
             data.append(delete)
         table['data'].append(data)
-    form = ExportCsvForm()
-    if form.validate_on_submit() and writeable:
-        Export.export_csv(form)
-        logger.log('info', 'database', 'CSV export')
-        flash(_('data was exported as CSV'), 'info')
-        return redirect(url_for('admin_export_csv'))
+
     return render_template('export/export_csv.html', form=form, table=table, writeable=writeable)
 
 
