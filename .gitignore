@@ -12,8 +12,10 @@ __pycache__/*
 openatlas/tests/.coverage
 openatlas/tests/cover
 
-# upload dicrectory
+# created files 
 openatlas/uploads/*
+openatlas/export/csv/*
+openatlas/export/sql/*
 
 # ide
 .idea

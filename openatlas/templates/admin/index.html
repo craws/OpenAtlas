@@ -3,37 +3,47 @@
     {{ _('admin')|uc_first }}
 {% endblock %}
 {% block content %}
-    <div class="button-bar">
-
-        <h1 >{{ _('user')|uc_first }}</h1>
+    <div id="admin_index">
+        {% for dir, value in writeable_dirs.items() %}
+            {% if not value %}
+                <span class="error">{{ _('directory not writable')|uc_first }}: {{ dir }}</span><br />
+            {% endif %}
+        {% endfor %}
+        <h1>{{ _('user')|uc_first }}</h1>
         <a href="{{ url_for('user_index') }}">{{ _('list')|uc_first }}</a>
         {% if 'manager'|is_authorized and session['settings']['mail'] %}
             <a href="{{ url_for('admin_newsletter') }}">{{ _('newsletter')|uc_first }}</a>
         {% endif %}
 
-        <h1 >{{ _('files')|uc_first }}</h1>
+        <h1>{{ _('files')|uc_first }}</h1>
         <a href="{{ url_for('file_index') }}">{{ _('list')|uc_first }}</a>
         {% if 'manager'|is_authorized %}
             <a href="{{ url_for('admin_file') }}">{{ _('settings')|uc_first }}</a>
         {% endif %}
-        {% if not upload_dir_writable %}
-            <span class="error">{{ _('Upload directory not writable!') }}</span>
-        {% endif %}
-
         {% if 'manager'|is_authorized %}
             <h1>{{ _('settings')|uc_first }}</h1>
-            <a href="{{ url_for('content_index') }}">{{ _('content')|uc_first }}</a>
-            <a href="{{ url_for('admin_logo') }}">{{ _('logo')|uc_first }}</a>
         {% endif %}
+
         {% if 'admin'|is_authorized %}
             <a href="{{ url_for('admin_general') }}">{{ _('general')|uc_first }}</a>
             <a href="{{ url_for('admin_mail') }}">{{ _('mail')|uc_first }}</a>
         {% endif  %}
 
+        {% if 'manager'|is_authorized %}
+            <a href="{{ url_for('content_index') }}">{{ _('content')|uc_first }}</a>
+            <a href="{{ url_for('admin_logo') }}">{{ _('logo')|uc_first }}</a>
+        {% endif %}
+
         <h1>{{ _('logs')|uc_first }}</h1>
         <a href="{{ url_for('user_activity') }}">{{ _('activity')|uc_first }}</a>
         {% if 'admin'|is_authorized %}
             <a href="{{ url_for('admin_log') }}">{{ _('system log')|uc_first }}</a>
+        {% endif  %}
+
+        {% if 'manager'|is_authorized %}
+            <h1>{{ _('export')|uc_first }}</h1>
+            <a href="{{ url_for('admin_export_sql') }}">{{ _('SQL')|uc_first }}</a>
+            <a href="{{ url_for('admin_export_csv') }}">{{ _('CSV')|uc_first }}</a>
         {% endif  %}
 
         {% if 'admin'|is_authorized %}

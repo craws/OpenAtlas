@@ -4,6 +4,11 @@ html, body, input, select, textarea {
     font-family: helvetica, arial, sans-serif;
 }
 
+#admin_index a {
+    text-decoration: underline;
+    margin-right: 0.5em;
+}
+
 #map {
     float: left;
     height: 440px;
