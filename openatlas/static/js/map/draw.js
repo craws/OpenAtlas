@@ -124,8 +124,6 @@ function drawMarker() {
 }
 
 function drawPolygon() {
-    map.drawControl = true;
-    alert(map.drawControl);
     drawLayer = new L.Draw.Polygon(map);
     $('.leaflet-right .leaflet-bar').hide();
     geometryType = "polygon";
