@@ -150,6 +150,7 @@ function closeMarkerFormX() {
 
 function interactionOn() {
     // Enable interaction with map e.g. if cursor leaves form
+    capture = true;
     map.dragging.enable();
     map.touchZoom.enable();
     map.doubleClickZoom.enable();
