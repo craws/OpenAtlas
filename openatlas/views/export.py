@@ -41,7 +41,7 @@ def admin_export_sql():
         if Export.export_sql():
             logger.log('info', 'database', 'SQL export')
             flash(_('data was exported as SQL'), 'info')
-        else:
+        else:  # pragma: no cover
             logger.log('error', 'database', 'SQL export failed')
             flash(_('SQL export failed'), 'error')
         return redirect(url_for('admin_export_sql'))

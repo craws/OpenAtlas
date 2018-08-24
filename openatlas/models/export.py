@@ -13,11 +13,12 @@ class Export:
 
     @staticmethod
     def export_csv(form):
+        """ Creates CSV file(s) in the export/csv folder, filename begins with current date."""
         date_string = DateMapper.current_date_for_filename()
         if form.zip.data:
             path = '/tmp/' + date_string + '_openatlas_csv_export'
             if os.path.exists(path):
-                shutil.rmtree(path)
+                shutil.rmtree(path)  # pragma: no cover
             os.makedirs(path)
         else:
             path = app.config['EXPORT_FOLDER_PATH'] + '/csv/'
@@ -54,6 +55,6 @@ class Export:
         try:
             subprocess.Popen(command, shell=True, stdin=subprocess.PIPE,
                              env={'PGPASSWORD': app.config['DATABASE_PASS']}).wait()
-        except Exception:
+        except Exception:  # pragma: no cover
             return False
         return True

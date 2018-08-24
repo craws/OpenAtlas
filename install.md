@@ -1,6 +1,8 @@
 # Installation Notes
 
-Installation with examples from a Debian 9 (Stretch) system.
+This software was developed and tested on the Linux/Debian stable version. It may work on other Linux distributions but it won't work out of the box on other operating systems.
+
+Installation code examples are based on a Debian 9 (Stretch) system.
 
 ## Requirements
 
