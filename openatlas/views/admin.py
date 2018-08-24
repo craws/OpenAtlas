@@ -189,7 +189,8 @@ def admin_orphans(delete=None):
                 '<a href="' + url_for('download_file', filename=name) + '">' + uc_first(
                     _('download')) + '</a>',
                 '<a href="' + url_for(
-                    'admin_file_delete', filename=name) + '" ' + confirm + '>Delete</a>'])
+                    'admin_file_delete',
+                    filename=name) + '" ' + confirm + '>' + uc_first(_('delete')) + '</a>'])
     return render_template('admin/orphans.html', tables=tables)
 
 

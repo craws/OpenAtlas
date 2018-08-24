@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-07-22 20:47+0200\n"
-"PO-Revision-Date: 2018-07-22 20:53+0200\n"
+"POT-Creation-Date: 2018-08-24 14:09+0200\n"
+"PO-Revision-Date: 2018-08-24 14:18+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: de\n"
 "Language-Team: de <LL@li.org>\n"
@@ -71,16 +71,16 @@ msgstr "Erstes Datum kann nicht nach Zweitem liegen."
 msgid "Begin dates cannot start after end dates."
 msgstr "Beginn Datums können nicht nach Enddatums liegen."
 
-#: forms/forms.py:145 forms/forms.py:194 forms/forms.py:244 forms/forms.py:292
+#: forms/forms.py:140 forms/forms.py:187 forms/forms.py:237 forms/forms.py:285
 msgid "change"
 msgstr "ändern"
 
-#: forms/forms.py:146 forms/forms.py:245
+#: forms/forms.py:141 forms/forms.py:238
 msgid "clear"
 msgstr "entfernen"
 
-#: models/content.py:51 views/actor.py:203 views/actor.py:285 views/admin.py:123
-#: views/admin.py:357 views/admin.py:381 views/event.py:81 views/event.py:213
+#: models/content.py:51 views/actor.py:203 views/actor.py:285 views/admin.py:127
+#: views/admin.py:361 views/admin.py:385 views/event.py:81 views/event.py:213
 #: views/file.py:87 views/file.py:191 views/file.py:233 views/hierarchy.py:90
 #: views/hierarchy.py:110 views/involvement.py:67 views/involvement.py:102
 #: views/member.py:60 views/member.py:86 views/member.py:114 views/place.py:183
@@ -88,7 +88,7 @@ msgstr "entfernen"
 #: views/reference.py:190 views/reference.py:239 views/relation.py:58
 #: views/relation.py:90 views/source.py:109 views/source.py:140
 #: views/source.py:190 views/translation.py:60 views/translation.py:98
-#: views/types.py:126 views/types.py:210
+#: views/types.py:123 views/types.py:207
 msgid "error transaction"
 msgstr "Es gab einen Datenbank Transaktions Fehler.  Bitte melde diesen Fehler."
 
@@ -100,11 +100,11 @@ msgstr "Dieser Link ist ungültig"
 msgid "error multiple linked entities found"
 msgstr "Fehler: mehrere verlinkte Entitäten gefunden."
 
-#: models/user.py:208 util/util.py:355
+#: models/user.py:208 util/util.py:357
 msgid "bookmark remove"
 msgstr "Bookmark entfernen"
 
-#: models/user.py:213 util/util.py:353
+#: models/user.py:213 util/util.py:355
 msgid "bookmark"
 msgstr "Bookmark"
 
@@ -141,7 +141,7 @@ msgstr ""
 "Wir haben lange gesucht aber das Dokument existiert nicht. Vielleicht hast du "
 "dich verschrieben oder bist einem veralteten Link gefolgt."
 
-#: templates/layout.html:38 util/filters.py:266 util/util.py:305
+#: templates/layout.html:38 util/filters.py:269 util/util.py:305
 msgid "show"
 msgstr "Anzeigen"
 
@@ -219,7 +219,7 @@ msgstr "Abmelden"
 msgid "login"
 msgstr "Anmelden"
 
-#: templates/content/update.html:16 templates/map.html:9 util/filters.py:156
+#: templates/content/update.html:16 templates/map.html:9 util/filters.py:159
 #: views/admin.py:43 views/admin.py:76 views/admin.py:87 views/involvement.py:83
 #: views/member.py:117 views/profile.py:34 views/profile.py:62
 #: views/reference.py:99 views/relation.py:94 views/user.py:30
@@ -253,7 +253,7 @@ msgstr "bearbeiten"
 #: templates/translation/view.html:15 templates/types/index.html:44
 #: templates/types/index.html:45 templates/types/view.html:28
 #: templates/types/view.html:29 templates/user/view.html:14
-#: templates/user/view.html:15 util/filters.py:306 views/user.py:59
+#: templates/user/view.html:15 util/filters.py:309 views/user.py:59
 msgid "delete"
 msgstr "löschen"
 
@@ -326,7 +326,7 @@ msgstr "Neu laden"
 #: templates/file/view.html:9 templates/model/class_view.html:10
 #: templates/model/property_view.html:9 templates/place/view.html:12
 #: templates/reference/view.html:9 templates/source/view.html:9
-#: templates/types/view.html:12 views/types.py:90 views/types.py:105
+#: templates/types/view.html:12 views/types.py:87 views/types.py:102
 #: views/user.py:28
 msgid "info"
 msgstr "Info"
@@ -380,7 +380,7 @@ msgid "map"
 msgstr "Karte"
 
 #: templates/actor/view.html:21 templates/admin/file.html:4
-#: templates/admin/index.html:14 templates/event/view.html:16
+#: templates/admin/index.html:18 templates/event/view.html:16
 #: templates/file/add2.html:3 templates/file/index.html:3
 #: templates/file/insert.html:7 templates/file/update.html:3
 #: templates/file/view.html:3 templates/place/view.html:24
@@ -432,6 +432,7 @@ msgstr "Datei"
 #: templates/admin/mail_update.html:3 templates/admin/newsletter.html:3
 #: templates/admin/orphans.html:3 templates/content/index.html:3
 #: templates/content/update.html:3 templates/content/view.html:3
+#: templates/export/export_csv.html:3 templates/export/export_sql.html:3
 #: templates/user/activity.html:3 templates/user/index.html:3
 #: templates/user/insert.html:3 templates/user/update.html:3
 #: templates/user/view.html:3
@@ -439,7 +440,7 @@ msgid "admin"
 msgstr "admin"
 
 #: templates/admin/check_links.html:4 templates/admin/check_links.html:8
-#: templates/admin/index.html:42
+#: templates/admin/index.html:52
 msgid "check links"
 msgstr "Links prüfen"
 
@@ -448,11 +449,16 @@ msgid "this could take some time"
 msgstr "Es kann eine Weile dauern."
 
 #: templates/admin/general.html:4 templates/admin/general_update.html:4
-#: templates/admin/index.html:29
+#: templates/admin/index.html:28
 msgid "general"
 msgstr "Allgemein"
 
-#: templates/admin/index.html:8 templates/user/activity.html:4
+#: templates/admin/index.html:9 templates/export/export_csv.html:10
+#: templates/export/export_sql.html:10
+msgid "directory not writable"
+msgstr "Ordner nicht beschreibbar"
+
+#: templates/admin/index.html:12 templates/user/activity.html:4
 #: templates/user/index.html:4 templates/user/index.html:9
 #: templates/user/insert.html:4 templates/user/insert.html:5
 #: templates/user/update.html:4 templates/user/view.html:4 views/admin.py:29
@@ -460,57 +466,65 @@ msgstr "Allgemein"
 msgid "user"
 msgstr "User"
 
-#: templates/admin/index.html:9 templates/admin/index.html:15
+#: templates/admin/index.html:13 templates/admin/index.html:19
 msgid "list"
 msgstr "Liste"
 
-#: templates/admin/index.html:11 templates/admin/newsletter.html:4
+#: templates/admin/index.html:15 templates/admin/newsletter.html:4
 #: views/profile.py:61 views/profile.py:74
 msgid "newsletter"
 msgstr "Newsletter"
 
-#: templates/admin/index.html:17 templates/admin/index.html:24
+#: templates/admin/index.html:21 templates/admin/index.html:24
 msgid "settings"
 msgstr "Einstellungen"
 
-#: templates/admin/index.html:20
-msgid "Upload directory not writable!"
-msgstr "Upload Verzeichnis ist schreibgeschützt!"
+#: templates/admin/index.html:29 templates/admin/mail.html:4
+#: templates/admin/mail_update.html:4 views/admin.py:80 views/admin.py:316
+msgid "mail"
+msgstr "E-Mail"
 
-#: templates/admin/index.html:25 templates/content/index.html:4
+#: templates/admin/index.html:33 templates/content/index.html:4
 #: templates/content/update.html:4 templates/content/view.html:4
-#: util/filters.py:124 views/admin.py:36 views/source.py:20
+#: util/filters.py:130 views/admin.py:36 views/source.py:20
 #: views/translation.py:17
 msgid "content"
 msgstr "Inhalt"
 
-#: templates/admin/index.html:26 templates/admin/logo.html:4
+#: templates/admin/index.html:34 templates/admin/logo.html:4
 msgid "logo"
 msgstr "Logo"
 
-#: templates/admin/index.html:30 templates/admin/mail.html:4
-#: templates/admin/mail_update.html:4 views/admin.py:80 views/admin.py:312
-msgid "mail"
-msgstr "E-Mail"
-
-#: templates/admin/index.html:33 templates/admin/log.html:4
+#: templates/admin/index.html:37 templates/admin/log.html:4
 msgid "logs"
 msgstr "Logs"
 
-#: templates/admin/index.html:34 templates/user/activity.html:5
+#: templates/admin/index.html:38 templates/user/activity.html:5
 #: templates/user/view.html:20 views/involvement.py:22
 msgid "activity"
 msgstr "Aktivität"
 
-#: templates/admin/index.html:36
+#: templates/admin/index.html:40
 msgid "system log"
 msgstr "System Log"
 
-#: templates/admin/index.html:40
+#: templates/admin/index.html:44
+msgid "export"
+msgstr "Export"
+
+#: templates/admin/index.html:45
+msgid "SQL"
+msgstr "SQL"
+
+#: templates/admin/index.html:46
+msgid "CSV"
+msgstr "CSV"
+
+#: templates/admin/index.html:50
 msgid "data integrity"
 msgstr "Datenintegrität"
 
-#: templates/admin/index.html:41 templates/admin/orphans.html:4
+#: templates/admin/index.html:51 templates/admin/orphans.html:4
 msgid "orphans"
 msgstr "orphans"
 
@@ -535,7 +549,7 @@ msgid "unlinked"
 msgstr "Instanzen die keine Verknüpfungen haben."
 
 #: templates/admin/orphans.html:11 templates/types/index.html:22
-#: util/filters.py:196
+#: util/filters.py:199
 msgid "type"
 msgstr "Typ"
 
@@ -566,6 +580,14 @@ msgstr "Alle Dateien löschen."
 #: templates/event/view.html:11
 msgid "sub events"
 msgstr "Unter Ereignisse"
+
+#: templates/export/export_csv.html:4 views/export.py:31
+msgid "export CSV"
+msgstr "export CSV"
+
+#: templates/export/export_sql.html:4 views/export.py:17
+msgid "export SQL"
+msgstr "export SQL"
 
 #: templates/file/index.html:11
 msgid "total disk space"
@@ -600,7 +622,8 @@ msgstr "Ort"
 msgid "missing file"
 msgstr "Fehlende Datei"
 
-#: templates/file/view.html:31 views/admin.py:186
+#: templates/file/view.html:31 views/admin.py:190 views/export.py:58
+#: views/export.py:116
 msgid "download"
 msgstr "Download"
 
@@ -710,7 +733,7 @@ msgid "classes"
 msgstr "Klassen"
 
 #: templates/model/class_view.html:16 templates/model/property_view.html:14
-#: templates/types/view.html:35 util/filters.py:198
+#: templates/types/view.html:35 util/filters.py:201
 msgid "super"
 msgstr "Super"
 
@@ -728,7 +751,7 @@ msgid "range for"
 msgstr "Zielklasse für"
 
 #: templates/model/class_view.html:40 templates/model/property_view.html:26
-#: templates/types/index.html:69 util/filters.py:122 views/actor.py:24
+#: templates/types/index.html:69 util/filters.py:128 views/actor.py:24
 #: views/event.py:24 views/file.py:26 views/hierarchy.py:28 views/index.py:22
 #: views/involvement.py:23 views/member.py:23 views/place.py:21 views/place.py:32
 #: views/place.py:110 views/place.py:114 views/place.py:117 views/reference.py:21
@@ -825,7 +848,7 @@ msgstr "Wert Typen"
 msgid "places"
 msgstr "Orte"
 
-#: templates/types/index.html:35 util/util.py:483
+#: templates/types/index.html:35 util/util.py:480
 msgid "filter"
 msgstr "Filter"
 
@@ -845,19 +868,19 @@ msgstr "Formulare"
 msgid "entities"
 msgstr "Instanzen"
 
-#: util/filters.py:56
+#: util/filters.py:62
 msgid "no"
 msgstr "Nein"
 
-#: util/filters.py:57 views/user.py:120
+#: util/filters.py:63 views/user.py:120
 msgid "yes"
 msgstr "Ja"
 
-#: util/filters.py:266
+#: util/filters.py:269
 msgid "values"
 msgstr "Werte"
 
-#: util/filters.py:304 views/admin.py:179
+#: util/filters.py:307 views/admin.py:183 views/export.py:60 views/export.py:118
 #, python-format
 msgid "Delete %(name)s?"
 msgstr "%(name)s löschen?"
@@ -870,7 +893,7 @@ msgstr "Es konnte keine Verbindung zum E-Mail Server hergestellt werden."
 msgid "error mail send"
 msgstr "Die E-Mail konnte nicht verschickt werden."
 
-#: util/util.py:154 util/util.py:459
+#: util/util.py:154 util/util.py:456
 msgid "no entries"
 msgstr "Keine Einträge"
 
@@ -927,7 +950,7 @@ msgstr "Letztes"
 msgid "between"
 msgstr "zwischen"
 
-#: util/util.py:269 views/place.py:107 views/types.py:90
+#: util/util.py:269 views/place.py:107 views/types.py:87
 msgid "class"
 msgstr "Klasse"
 
@@ -950,7 +973,7 @@ msgstr ""
 
 #: views/actor.py:19 views/event.py:20 views/file.py:25 views/hierarchy.py:18
 #: views/place.py:19 views/place.py:31 views/reference.py:20 views/source.py:19
-#: views/translation.py:16 views/types.py:19 views/types.py:90 views/types.py:105
+#: views/translation.py:16 views/types.py:19 views/types.py:87 views/types.py:102
 msgid "name"
 msgstr "Name"
 
@@ -992,7 +1015,7 @@ msgstr "Verbindung gelöscht."
 
 #: views/actor.py:199 views/event.py:77 views/file.py:199 views/hierarchy.py:86
 #: views/place.py:184 views/reference.py:186 views/source.py:136
-#: views/translation.py:56 views/types.py:122
+#: views/translation.py:56 views/types.py:119
 msgid "entity deleted"
 msgstr "Der Eintrag wurde gelöscht."
 
@@ -1004,15 +1027,15 @@ msgstr "Änderung fehlgeschlagen."
 #: views/actor.py:281 views/event.py:209 views/file.py:229 views/hierarchy.py:44
 #: views/involvement.py:63 views/member.py:56 views/member.py:82
 #: views/place.py:284 views/reference.py:235 views/relation.py:54
-#: views/source.py:186 views/translation.py:30 views/types.py:206
+#: views/source.py:186 views/translation.py:30 views/types.py:203
 msgid "entity created"
 msgstr "Neuer Eintrag angelegt"
 
-#: views/actor.py:281 views/admin.py:119 views/admin.py:353 views/admin.py:377
+#: views/actor.py:281 views/admin.py:123 views/admin.py:357 views/admin.py:381
 #: views/content.py:52 views/event.py:209 views/file.py:229 views/hierarchy.py:66
 #: views/place.py:284 views/profile.py:87 views/profile.py:120
 #: views/reference.py:104 views/reference.py:235 views/relation.py:86
-#: views/source.py:186 views/translation.py:72 views/types.py:206
+#: views/source.py:186 views/translation.py:72 views/types.py:203
 #: views/user.py:145
 msgid "info update"
 msgstr "Die Änderungen wurden gespeichert."
@@ -1021,7 +1044,7 @@ msgstr "Die Änderungen wurden gespeichert."
 msgid "limit"
 msgstr "Limit"
 
-#: views/admin.py:27 views/admin.py:29 views/admin.py:243 views/user.py:56
+#: views/admin.py:27 views/admin.py:29 views/admin.py:247 views/user.py:56
 #: views/user.py:61 views/user.py:62 views/user.py:72
 msgid "all"
 msgstr "Alle"
@@ -1058,128 +1081,149 @@ msgstr "Test E-Mail Empfänger"
 msgid "send test mail"
 msgstr "Test E-Mail senden"
 
-#: views/admin.py:57 views/admin.py:328
+#: views/admin.py:57 views/admin.py:332
 msgid "site name"
 msgstr "Seitenname"
 
-#: views/admin.py:58 views/admin.py:329
+#: views/admin.py:58 views/admin.py:333
 msgid "site header"
 msgstr "Seitenüberschrift"
 
-#: views/admin.py:60 views/admin.py:330
+#: views/admin.py:60 views/admin.py:334
 msgid "default language"
 msgstr "Standardsprache"
 
-#: views/admin.py:63 views/admin.py:331
+#: views/admin.py:63 views/admin.py:335
 msgid "default table rows"
 msgstr "Standard Tabellenreihen"
 
-#: views/admin.py:67 views/admin.py:332
+#: views/admin.py:67 views/admin.py:336
 msgid "log level"
 msgstr "Log Level"
 
-#: views/admin.py:70 views/admin.py:333
+#: views/admin.py:70 views/admin.py:337
 msgid "debug mode"
 msgstr "Debug mode"
 
-#: views/admin.py:71 views/admin.py:334
+#: views/admin.py:71 views/admin.py:338
 msgid "random password length"
 msgstr "Länge des Zufallspassworts"
 
-#: views/admin.py:72 views/admin.py:335
+#: views/admin.py:72 views/admin.py:339
 msgid "minimum password length"
 msgstr "Mindestpasswortlänge"
 
-#: views/admin.py:73 views/admin.py:336
+#: views/admin.py:73 views/admin.py:340
 msgid "reset confirm hours"
 msgstr "Reset Stunden Limit"
 
-#: views/admin.py:74 views/admin.py:337
+#: views/admin.py:74 views/admin.py:341
 msgid "failed login tries"
 msgstr "Maximale Anmeldeversuche"
 
-#: views/admin.py:75 views/admin.py:338
+#: views/admin.py:75 views/admin.py:342
 msgid "failed login forget minutes"
 msgstr "Anmeldeversuche vergessen Minuten"
 
-#: views/admin.py:81 views/admin.py:313
+#: views/admin.py:81 views/admin.py:317
 msgid "mail transport username"
 msgstr "Username"
 
-#: views/admin.py:82 views/admin.py:314
+#: views/admin.py:82 views/admin.py:318
 msgid "mail transport host"
 msgstr "Host"
 
-#: views/admin.py:83 views/admin.py:315
+#: views/admin.py:83 views/admin.py:319
 msgid "mail transport port"
 msgstr "Port"
 
-#: views/admin.py:84 views/admin.py:316
+#: views/admin.py:84 views/admin.py:320
 msgid "mail from email"
 msgstr "E-Mail Sender"
 
-#: views/admin.py:85 views/admin.py:317
+#: views/admin.py:85 views/admin.py:321
 msgid "mail from name"
 msgstr "Name"
 
-#: views/admin.py:86 views/admin.py:318
+#: views/admin.py:86 views/admin.py:322
 msgid "mail recipients feedback"
 msgstr "Feedback Empfänger"
 
-#: views/admin.py:136
+#: views/admin.py:140
 msgid "info orphans deleted:"
 msgstr "Verwaiste Daten gelöscht"
 
-#: views/admin.py:216
+#: views/admin.py:220
 msgid "was deleted"
 msgstr "wurde gelöscht"
 
-#: views/admin.py:219 views/admin.py:235 views/file.py:198
+#: views/admin.py:223 views/admin.py:239 views/export.py:84 views/export.py:136
+#: views/file.py:198
 msgid "error file delete"
-msgstr "Fehler beim löschen der Datei"
+msgstr "Fehler beim Löschen der Datei"
 
-#: views/admin.py:265
+#: views/admin.py:269
 msgid "Logs deleted"
 msgstr "Logs wurden gelöscht."
 
-#: views/admin.py:283
+#: views/admin.py:287
 msgid "To unsubscribe use the link below."
 msgstr "Um den Newsletter abzubestellen benütze folgenden Link"
 
-#: views/admin.py:286
+#: views/admin.py:290
 msgid "Newsletter send"
 msgstr "Newsletter gesendet"
 
-#: views/admin.py:304
+#: views/admin.py:308
 #, python-format
 msgid "Test mail from %(site_name)s"
 msgstr "Test E-Mail von %(site_name)s"
 
-#: views/admin.py:305
+#: views/admin.py:309
 #, python-format
 msgid "This test mail was sent by %(username)s"
 msgstr "Dieses Test E-Mail wurde von %(username)s verschickt"
 
-#: views/admin.py:306 views/login.py:101 views/login.py:134 views/user.py:173
+#: views/admin.py:310 views/login.py:103 views/login.py:136 views/user.py:173
 msgid "at"
 msgstr "von"
 
-#: views/admin.py:308
+#: views/admin.py:312
 #, python-format
 msgid "A test mail was sent to %(email)s."
 msgstr "Ein Test E-Mail wurde an %(email)s geschickt."
 
-#: views/admin.py:312 views/admin.py:333 views/profile.py:73 views/profile.py:74
+#: views/admin.py:316 views/admin.py:337 views/profile.py:73 views/profile.py:74
 msgid "on"
 msgstr "An"
 
-#: views/admin.py:312 views/admin.py:333 views/profile.py:73 views/profile.py:74
+#: views/admin.py:316 views/admin.py:337 views/profile.py:73 views/profile.py:74
 msgid "off"
 msgstr "Aus"
 
-#: views/event.py:37 views/types.py:185
+#: views/event.py:37 views/types.py:182
 msgid "error node self as super"
 msgstr "Der Eintrag kann nicht sich selber als Super wählen."
+
+#: views/export.py:21
+msgid "export as ZIP and add info file"
+msgstr "export als ZIP mit einer Info Datei"
+
+#: views/export.py:43
+msgid "data was exported as SQL"
+msgstr "Daten wurden als SQL exportiert"
+
+#: views/export.py:46
+msgid "SQL export failed"
+msgstr "SQL Export fehlgeschlagen"
+
+#: views/export.py:81 views/export.py:133
+msgid "file deleted"
+msgstr "Datei wurde gelöscht"
+
+#: views/export.py:104
+msgid "data was exported as CSV"
+msgstr "Daten wurden als CSV exportiert"
 
 #: views/file.py:172
 msgid "no file to upload"
@@ -1216,12 +1260,12 @@ msgstr ""
 "Du hast den Newsletter erfolgreich abbestellt. In deinem Profil, kannst du ihn "
 "wieder anmelden."
 
-#: views/login.py:29 views/login.py:135 views/profile.py:70 views/user.py:21
+#: views/login.py:29 views/login.py:137 views/profile.py:70 views/user.py:21
 #: views/user.py:97 views/user.py:174
 msgid "username"
 msgstr "Username"
 
-#: views/login.py:30 views/login.py:136 views/profile.py:31 views/user.py:24
+#: views/login.py:30 views/login.py:138 views/profile.py:31 views/user.py:24
 #: views/user.py:175
 msgid "password"
 msgstr "Passwort"
@@ -1245,80 +1289,80 @@ msgstr ""
 "Zu viele Anmeldeversuche mit diesem User. Nach ein paar Minuten kannst du es "
 "wieder probieren."
 
-#: views/login.py:65
+#: views/login.py:67
 msgid "error inactive"
 msgstr "Dieser User ist nicht aktiviert."
 
-#: views/login.py:71 views/profile.py:42
+#: views/login.py:73 views/profile.py:42
 msgid "error wrong password"
 msgstr "Falsches Passwort"
 
-#: views/login.py:74
+#: views/login.py:76
 msgid "error username"
 msgstr "Es wurde kein User mit diesem Namen gefunden."
 
-#: views/login.py:89
+#: views/login.py:91
 msgid "error non existing email"
 msgstr "Diese E-Mail Adresse ist uns leider nicht bekannt."
 
-#: views/login.py:97
+#: views/login.py:99
 #, python-format
 msgid "Password reset request for %(site_name)s"
 msgstr "Passwort zurücksetzt Anfrage von %(site_name)s"
 
-#: views/login.py:99
+#: views/login.py:101
 #, python-format
 msgid "We received a password reset request for %(username)s"
 msgstr "Wir haben eine Passwort Zurücksetzungs Anfrage von %(username)s erhalten."
 
-#: views/login.py:102
+#: views/login.py:104
 msgid "reset password link"
 msgstr "Link zum Zurücksetzen des Passworts"
 
-#: views/login.py:103
+#: views/login.py:105
 msgid "The link is valid for"
 msgstr "Dieser Link ist gültig für"
 
-#: views/login.py:104
+#: views/login.py:106
 msgid "hours"
 msgstr "Stunden"
 
-#: views/login.py:106
+#: views/login.py:108
 #, python-format
 msgid "A password reset confirmation mail was send to %(email)s."
 msgstr "Eine Passwort Bestätigungs E-Mail wurde an %(email)s geschickt."
 
-#: views/login.py:109
+#: views/login.py:111
 #, python-format
 msgid "Failed to send password reset confirmation mail to %(email)s."
 msgstr ""
 "Das Verschicken eines Passwort Reset Bestätigungs E-Mails an %(email)s ist "
 "fehlgeschlagen."
 
-#: views/login.py:120
+#: views/login.py:122
 msgid "invalid password reset confirmation code"
 msgstr "Ungültige Anfrage"
 
-#: views/login.py:125
+#: views/login.py:127
 msgid "This reset confirmation code has expired."
 msgstr "Dieser Bestätigungscode ist nicht mehr gültig."
 
-#: views/login.py:132
+#: views/login.py:134
 #, python-format
 msgid "New password for %(sitename)s"
 msgstr "Neues Passwort für %(sitename)s"
 
-#: views/login.py:133
+#: views/login.py:135
 #, python-format
 msgid "New password for %(username)s"
 msgstr "Neues Passwort für %(username)s"
 
-#: views/login.py:138
+#: views/login.py:140
 #, python-format
 msgid "Send new password mail to %(email)s."
 msgstr "Ein Passwort E-Mail wurde an %(email)s verschickt."
 
-#: views/login.py:140
+#: views/login.py:142
 #, python-format
 msgid "Failed to send password mail to %(email)s."
 msgstr "Das Verschicken eines Passwort E-Mails an %(email)s ist fehlgeschlagen."
@@ -1444,19 +1488,19 @@ msgstr "Nur selbst bearbeitete Einträge"
 msgid "Also search in description"
 msgstr "Auch in Beschreibung suchen"
 
-#: views/types.py:100
+#: views/types.py:97
 msgid "domain"
 msgstr "Ausgangsklasse"
 
-#: views/types.py:100
+#: views/types.py:97
 msgid "range"
 msgstr "Zielklasse"
 
-#: views/types.py:105
+#: views/types.py:102
 msgid "count"
 msgstr "Anzahl"
 
-#: views/types.py:188
+#: views/types.py:185
 msgid "error node sub as super"
 msgstr "Der Eintrag kann nicht ein Sub als Super wählen."
 
@@ -1533,3 +1577,6 @@ msgstr "Der User wurde gelöscht."
 
 #~ msgid "max file size"
 #~ msgstr "Maximale Datei Größe"
+
+#~ msgid "Upload directory not writable!"
+#~ msgstr "Upload Verzeichnis ist schreibgeschützt!"

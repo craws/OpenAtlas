@@ -58,8 +58,8 @@ def admin_export_sql():
                 _('download')) + '</a>']
         if is_authorized('admin') and writeable:
             confirm = ' onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
-            delete = '<a href="' + url_for('delete_sql',
-                                           filename=name) + '" ' + confirm + '>Delete</a>'
+            delete = '<a href="' + url_for('delete_sql', filename=name)
+            delete += '" ' + confirm + '>' + uc_first(_('delete')) + '</a>'
             data.append(delete)
         table['data'].append(data)
     return render_template('export/export_sql.html', form=form, table=table, writeable=writeable)
@@ -116,8 +116,8 @@ def admin_export_csv():
                 _('download')) + '</a>']
         if is_authorized('admin') and writeable:
             confirm = ' onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
-            delete = '<a href="' + url_for('delete_csv',
-                                           filename=name) + '" ' + confirm + '>Delete</a>'
+            delete = '<a href="' + url_for('delete_sql', filename=name)
+            delete += '" ' + confirm + '>' + uc_first(_('delete')) + '</a>'
             data.append(delete)
         table['data'].append(data)
 
