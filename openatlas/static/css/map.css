@@ -34,7 +34,7 @@
     overflow: hidden;
 }
 
-#headingText, #headingTextAdm {
+#inputFormTitle, #headingTextAdm {
     font-weight: bold;
     font-style: normal;
 }
