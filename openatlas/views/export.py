@@ -103,7 +103,7 @@ def admin_export_csv():
         logger.log('info', 'database', 'CSV export')
         flash(_('data was exported as CSV'), 'info')
         return redirect(url_for('admin_export_csv'))
-    table = {'id': 'sql', 'header': ['name', 'size'], 'data': [],
+    table = {'id': 'csv', 'header': ['name', 'size'], 'data': [],
              'sort': 'sortList: [[0, 1]],headers: {0: { sorter: "text" }}'}
     for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
         name = basename(file)
@@ -116,7 +116,7 @@ def admin_export_csv():
                 _('download')) + '</a>']
         if is_authorized('admin') and writeable:
             confirm = ' onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
-            delete = '<a href="' + url_for('delete_sql', filename=name)
+            delete = '<a href="' + url_for('delete_csv', filename=name)
             delete += '" ' + confirm + '>' + uc_first(_('delete')) + '</a>'
             data.append(delete)
         table['data'].append(data)
