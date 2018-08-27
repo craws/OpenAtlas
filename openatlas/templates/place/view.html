@@ -13,21 +13,21 @@
         {% if gis_data %}
             <li><a href="#tab-map" id="map-tab-id">{{ _('map')|uc_first }}</a></li>
         {% endif %}
-        <li><a href="#tab-source">{{ _('source')|uc_first }} ({{ tables['source']['data']|length }})</a></li>
+        <li><a href="#tab-source">{{ _('source')|uc_first }} ({{ tables['source']['data']|length|format_number }})</a></li>
         {% if tables['event']['data']|length > 0 %}
-            <li><a href="#tab-event">{{ _('event')|uc_first }} ({{ tables['event']['data']|length }})</a></li>
+            <li><a href="#tab-event">{{ _('event')|uc_first }} ({{ tables['event']['data']|length|format_number }})</a></li>
         {% endif %}
         {% if tables['actor']['data']|length > 0 %}
-            <li><a href="#tab-actor">{{ _('actor')|uc_first }} ({{ tables['actor']['data']|length }})</a></li>
+            <li><a href="#tab-actor">{{ _('actor')|uc_first }} ({{ tables['actor']['data']|length|format_number }})</a></li>
         {% endif %}
-        <li><a href="#tab-reference">{{ _('reference')|uc_first }} ({{ tables['reference']['data']|length }})</a></li>
-        <li><a href="#tab-file">{{ _('files')|uc_first }}  ({{ tables['file']['data']|length }})</a></li>
+        <li><a href="#tab-reference">{{ _('reference')|uc_first }} ({{ tables['reference']['data']|length|format_number }})</a></li>
+        <li><a href="#tab-file">{{ _('files')|uc_first }}  ({{ tables['file']['data']|length|format_number }})</a></li>
         {% if object_.system_type == 'place' %}
-            <li><a href="#tab-feature">{{ _('feature')|uc_first }}  ({{ tables['feature']['data']|length }})</a></li>
+            <li><a href="#tab-feature">{{ _('feature')|uc_first }}  ({{ tables['feature']['data']|length|format_number }})</a></li>
         {% elif object_.system_type == 'feature' %}
             <li><a href="#tab-stratigraphic-unit">{{ _('stratigraphic unit')|uc_first }}  ({{ tables['stratigraphic-unit']['data']|length }})</a></li>
         {% elif object_.system_type == 'stratigraphic unit' %}
-            <li><a href="#tab-find">{{ _('find')|uc_first }}  ({{ tables['find']['data']|length }})</a></li>
+            <li><a href="#tab-find">{{ _('find')|uc_first }}  ({{ tables['find']['data']|length|format_number }})</a></li>
         {% endif %}
     </ul>
     <div id="tab-info">

@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
+    > {{ _('export SQL')|uc_first }}
+{% endblock %}
+{% block content %}
+    {% if writeable %}
+        {{ form|display_form|safe }}
+    {% else %}
+        <p><span class="error">{{ _('directory not writable')|uc_first }}: export/sql</span></p>
+    {% endif %}
+    {{ table|pager|safe }}
+{% endblock %}

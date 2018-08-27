@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
+    > {{ _('export CSV')|uc_first }}
+{% endblock %}
+{% block content %}
+    {% if writeable %}
+        <div style="float:left;margin-right: 1em;">{{ form|display_form|safe }}</div>
+    {% else %}
+        <p><span class="error">{{ _('directory not writable')|uc_first }}: export/csv</span></p>
+    {% endif %}
+    <div style="float:left;">{{ table|pager|safe }}</div>
+{% endblock %}

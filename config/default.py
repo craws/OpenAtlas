@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 from flask_babel import lazy_gettext as _
 
-VERSION = '3.8.0'
+VERSION = '3.9.0'
 DEMO_MODE = False  # If in demo mode some options are disabled and the login form is pre filled
 
 LANGUAGES = {'en': 'English', 'de': 'Deutsch'}
@@ -14,12 +14,11 @@ DATABASE_NAME = 'openatlas'
 DATABASE_USER = 'openatlas'
 DATABASE_HOST = 'localhost'
 DATABASE_PORT = 5432
-
-# Set these options in /instance/INSTANCE_NAME.py e.g. in /instance/production.py
 DATABASE_PASS = 'CHANGE ME'
 MAIL_PASSWORD = 'CHANGE ME'
 SECRET_KEY = 'CHANGE ME'
 
+EXPORT_FOLDER_PATH = os.path.dirname(__file__) + '/../openatlas/export'
 UPLOAD_FOLDER_PATH = os.path.dirname(__file__) + '/../openatlas/uploads'
 DISPLAY_FILE_EXTENSIONS = ['bmp', 'gif', 'ico', 'jpeg', 'jpg', 'png']
 

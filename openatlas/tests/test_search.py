@@ -22,10 +22,10 @@ class SearchTest(TestBaseCase):
                 EntityMapper.insert('E41', 'Waldorf alias'))
 
         with app.app_context():
-            rv = self.app.post(url_for('index_search'), data={'global-term': 'wal'})
+            rv = self.app.post(url_for('search_index'), data={'global-term': 'wal'})
             assert b'Waldo' in rv.data
-            rv = self.app.post(url_for('index_search'), data={'global-term': 'wal', 'own': True})
+            rv = self.app.post(url_for('search_index'), data={'global-term': 'wal', 'own': True})
             assert b'Waldo' not in rv.data
             data = {'term': 'do', 'classes': 'actor'}
-            rv = self.app.post(url_for('index_search'), data=data)
+            rv = self.app.post(url_for('search_index'), data=data)
             assert b'Waldo' in rv.data

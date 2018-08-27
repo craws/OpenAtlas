@@ -1,6 +1,8 @@
 # Installation Notes
 
-Installation with examples from a Debian 9 (Stretch) system.
+This software was developed and tested on the Linux/Debian stable version. It may work on other Linux distributions but it won't work out of the box on other operating systems.
+
+Installation code examples are based on a Debian 9 (Stretch) system.
 
 ## Requirements
 
@@ -61,9 +63,17 @@ Test Apache configuration and restart
     # apache2ctl configtest
     # service apache2 restart
 
-### File Upload
+### File Upload and Export
 
-Make the openatlas/uploads directory writable for apache e.g.
+Make the these directories writeable for the Apache user:
+
+openatlas/uploads
+
+openatlas/export/csv
+
+openatlas/export/sql
+
+e.g.
 
     # chown www-data openatlas/uploads
 
