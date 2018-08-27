@@ -12,24 +12,23 @@ var baseMaps = {
     GoogleSatellite: L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google Maps '}),
 };
 
+var controls = {}
+if (gisPointAll) {
+    var pointLayer = new L.GeoJSON(gisPointAll, {
+        onEachFeature: setPopup,
+        pointToLayer: function(feature, latlng) {
+            return L.marker(latlng, {icon: grayMarker});
+        }
+    });
+    controls.Points = pointLayer;
+}
+if (gisPolygonAll) {
+    var polygonLayer = new L.GeoJSON(gisPolygonAll, {onEachFeature: setPopup});
+    controls.Polygons = polygonLayer;
+}
 
-if (gisPointSelected == "") {
-    // Define and add geo JSON layer for markers for all places index
-    var pointLayer = new L.GeoJSON(gisPointAll, {
-        onEachFeature: setPopup,
-        pointToLayer: function(feature, latlng) {
-            return L.marker(latlng, {icon: grayMarker});
-        }
-    });
-} else {
-    // View for a single place entity
-    // Set geo json layer for all points
-    var pointLayer = new L.GeoJSON(gisPointAll, {
-        onEachFeature: setPopup,
-        pointToLayer: function(feature, latlng) {
-            return L.marker(latlng, {icon: grayMarker});
-        }
-    });
+if (gisPointSelected != '') {
+    // View for a single place, set geo json layer for all points
     // If it's not a polygon
     if (gisPolygonSelected == "") {
         var gisPoints = L.geoJson(gisPointSelected, {onEachFeature: setPopup}).addTo(map);
@@ -53,12 +52,8 @@ if (gisPointSelected == "") {
 // Add markers to the map
 map.addLayer(pointLayer);
 map.fitBounds(pointLayer.getBounds(), {maxZoom: 12});
-
-var controls = {
-    Sites: pointLayer,
-}
-
 L.control.layers(baseMaps, controls).addTo(map);
+
 baseMaps.Landscape.addTo(map);
 
 // Geoname search control init and add to map
