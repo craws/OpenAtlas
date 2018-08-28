@@ -5,9 +5,11 @@
 {% block content %}
 <link rel="stylesheet" href="/static/css/d3.css" />
 <script src="/static/vendor/d3/d3-5.5.0.min.js"></script>
-<svg width="1200" height="600"></svg>
+<svg></svg>
 <script>
-    var graph = {{ json_data|safe }}
+    var graph = {{ json_data|safe }};
+    var width = {{ network_params['options']['width'] }};
+    var height = {{ network_params['options']['height'] }};
 </script>
 <script src="/static/js/network.js"></script>
 <div style="float:left;margin-left:2em;">
