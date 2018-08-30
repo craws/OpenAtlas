@@ -113,7 +113,6 @@ function setPopup(feature, layer, mode='display') {
     var popupHTML = `
         <div id="popup">
             <strong>` + feature.properties.title + `</strong>
-            <br />`+ feature.properties.siteType + `
             <br /><strong>` + feature.properties.name + `</strong>
             <div style="max-height:140px; overflow-y: auto;">` + feature.properties.description + `</div>` +
             feature.properties.shapeType;
