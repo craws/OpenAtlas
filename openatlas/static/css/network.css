@@ -16,7 +16,7 @@ svg .nodes > text {
 }
 
 svg .links line {
-    stroke-width: 2px;
+    stroke-width: 0.5px;
     stroke: #999999;
     stroke-opacity: 0.6;
 }
