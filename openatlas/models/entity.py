@@ -19,7 +19,7 @@ class Entity:
         self.id = row.id
         self.nodes = dict()
         if hasattr(row, 'nodes') and row.nodes:
-            for node in row.types:
+            for node in row.nodes:
                 if not node['f1']:
                     continue
                 self.nodes[g.nodes[node['f1']]] = node['f2']
