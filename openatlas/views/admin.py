@@ -92,7 +92,7 @@ class MailForm(Form):
 def admin_index():
     export_path = app.config['EXPORT_FOLDER_PATH']
     writeable_dirs = {
-        'upload': True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False,
+        'uploads': True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False,
         'export/sql': True if os.access(export_path + '/sql', os.W_OK) else False,
         'export/csv': True if os.access(export_path + '/csv', os.W_OK) else False}
     return render_template('admin/index.html', writeable_dirs=writeable_dirs)
