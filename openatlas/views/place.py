@@ -127,7 +127,13 @@ def place_view(id_, unlink_id=None):
             url = url_for('place_view', id_=object_.id, unlink_id=link_.id) + '#tab-' + view_name
             data.append(display_remove_link(url, link_.domain.name))
         tables[view_name]['data'].append(data)
-    for event in location.get_linked_entities(['P7', 'P24'], True):
+    event_ids = []  # Keep track of already inserted events to prevent doubles
+    for event in location.get_linked_entities(['P7'], True):
+        tables['event']['data'].append(get_base_table_data(event))
+        event_ids.append(event.id)
+    for event in object_.get_linked_entities(['P24'], True):
+        if event.id in event_ids:  # Don't add again if already in table
+            continue
         tables['event']['data'].append(get_base_table_data(event))
     has_subunits = False
     for entity in object_.get_linked_entities('P46'):
