@@ -3,17 +3,19 @@
     {{ _('network')|uc_first }}
 {% endblock %}
 {% block content %}
-<link rel="stylesheet" href="/static/css/network.css" />
-<script src="/static/vendor/d3/d3-5.5.0.min.js"></script>
-<svg></svg>
-<script>
-    var graph = {{ json_data|safe }};
-    var width = {{ network_params['options']['width'] }};
-    var height = {{ network_params['options']['height'] }};
-    var charge = {{ network_params['options']['charge'] }};
-    var distance = {{ network_params['options']['distance'] }}
-</script>
-<script src="/static/js/network.js"></script>
+{% if json_data %}
+    <link rel="stylesheet" href="/static/css/network.css" />
+    <script src="/static/vendor/d3/d3-5.5.0.min.js"></script>
+    <svg></svg>
+    <script>
+        var graph = {{ json_data|safe }};
+        var width = {{ network_params['options']['width'] }};
+        var height = {{ network_params['options']['height'] }};
+        var charge = {{ network_params['options']['charge'] }};
+        var distance = {{ network_params['options']['distance'] }}
+    </script>
+    <script src="/static/js/network.js"></script>
+{% endif %}
 <div style="float:left;margin-left:2em;">
     {{ form|display_form|safe }}
     <p><a href="https://redmine.openatlas.eu/projects/uni/wiki/Network_visualization" rel="noopener" target="_blank">{{ _('manual')|uc_first }}</a></p>

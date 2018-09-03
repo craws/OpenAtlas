@@ -1,10 +1,11 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
 
-from flask import g, render_template
+from flask import g, render_template, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
-from wtforms import BooleanField, HiddenField, IntegerField, StringField, SubmitField
+from wtforms import (BooleanField, HiddenField, IntegerField, SelectMultipleField, StringField,
+                     SubmitField, widgets)
 from wtforms.validators import InputRequired
 
 from openatlas import app
@@ -143,26 +144,52 @@ class NetworkForm(Form):
     height = IntegerField(default=600, validators=[InputRequired()])
     charge = StringField(default=-800, validators=[InputRequired()])
     distance = IntegerField(default=80, validators=[InputRequired()])
+    classes = SelectMultipleField(
+        _('classes'),
+        [InputRequired()],
+        option_widget=widgets.CheckboxInput(),
+        widget=widgets.ListWidget(prefix_label=False),
+        default=['E21', 'E7', 'E40', 'E74', 'E8', 'E12', 'E6'],
+        choices=([
+            ('E21', 'Person'),  # #34B522
+            ('E7', 'Activity'),  # #E54A2A
+            ('E31', 'Document'),  # #FFA500
+            ('E33', 'Linguistic Object'),  # #FFA500
+            ('E40', 'Legal Body'),  # #34623C
+            ('E74', 'Group'),  # #34623C
+            ('E53', 'Places'),  # #00FF00
+            ('E18', 'Physical Object'),  # #FF0000
+            ('E8', 'Acquisition'),  # #E54A2A
+            ('E12', 'Production'),  # #E54A2A
+            ('E6', 'Destruction'),  # #E54A2A
+            ('E84', 'Information Carrier')]))  # #EE82EE
     save = SubmitField(_('apply'))
 
 
 @app.route('/overview/network/', methods=["GET", "POST"])
 @required_group('readonly')
 def model_network():
+    form = NetworkForm()
+    form.classes.process(request.form)
+    if not form.classes.data:
+        form.classes.data = []
+    print(form.classes.data)
+    # print(form.classes['E21'])
+    # print(form.classes['E7'])
     params = {
         'classes': {
-            'E21': {'active': True,  'color':  '#34B522'},  # Person
-            'E7':  {'active': True,  'color':  '#E54A2A'},  # Activity
-            'E31': {'active': False, 'color':  '#FFA500'},  # Document
-            'E33': {'active': False, 'color':  '#FFA500'},  # Linguistic Object
-            'E40': {'active': True,  'color':  '#34623C'},  # Legal Body
-            'E74': {'active': True,  'color':  '#34623C'},  # Group
-            'E53': {'active': False, 'color':  '#00FF00'},  # Places
-            'E18': {'active': False, 'color':  '#FF0000'},  # Physical Object
-            'E8':  {'active': True,  'color':  '#E54A2A'},  # Acquisition
-            'E12': {'active': True,  'color':  '#E54A2A'},  # Production
-            'E6':  {'active': True,  'color':  '#E54A2A'},  # Destruction
-            'E84': {'active': False, 'color':  '#EE82EE'}},  # Information Carrier
+            'E21': {'active': ('E21' in form.classes.data), 'color': '#34B522'},  # Person
+            'E7':  {'active': ('E7' in form.classes.data), 'color': '#E54A2A'},  # Activity
+            'E31': {'active': ('E31' in form.classes.data), 'color': '#FFA500'},  # Document
+            'E33': {'active': ('E33' in form.classes.data), 'color': '#FFA500'},  # Linguistic Obj
+            'E40': {'active': ('E40' in form.classes.data), 'color': '#34623C'},  # Legal Body
+            'E74': {'active': ('E74' in form.classes.data), 'color': '#34623C'},  # Group
+            'E53': {'active': ('E53' in form.classes.data), 'color': '#00FF00'},  # Places
+            'E18': {'active': ('E18' in form.classes.data), 'color': '#FF0000'},  # Physical Object
+            'E8':  {'active': ('E8' in form.classes.data), 'color': '#E54A2A'},  # Acquisition
+            'E12': {'active': ('E12' in form.classes.data), 'color': '#E54A2A'},  # Production
+            'E6':  {'active': ('E6' in form.classes.data), 'color': '#E54A2A'},  # Destruction
+            'E84': {'active': ('E84' in form.classes.data), 'color': '#EE82EE'}},  # Information Car
         'properties': {
             'P107': {'active': True},   # has current or former member
             'P24':  {'active': True},   # transferred title of
@@ -181,12 +208,12 @@ def model_network():
             'height': 600,
             'charge': -800,
             'distance': 80}}
-    form = NetworkForm()
+    data = None
     if form.validate_on_submit():
         params['options']['orphans'] = form.orphans.data
         params['options']['width'] = form.width.data
         params['options']['height'] = form.height.data
         params['options']['charge'] = form.charge.data
         params['options']['distance'] = form.distance.data
-    data = Network.get_network_json(params)
+        data = Network.get_network_json(params)
     return render_template('model/network.html', form=form, network_params=params, json_data=data)
