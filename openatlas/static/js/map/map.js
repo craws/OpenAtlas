@@ -26,27 +26,23 @@ if (gisPolygonAll) {
     var polygonLayer = new L.GeoJSON(gisPolygonAll, {onEachFeature: setPopup});
     controls.Polygons = polygonLayer;
 }
-
 if (gisPointSelected != '') {
     // View for a single place, set geo json layer for all points
-    // If it's not a polygon
-    if (gisPolygonSelected == "") {
-        var gisPoints = L.geoJson(gisPointSelected, {onEachFeature: setPopup}).addTo(map);
-        gisPoints.on('click', setObjectId);
-        setTimeout(function () {
-            map.fitBounds(gisPoints.getBounds(), {maxZoom: 12});
-        }, 1);
-    } else {
-        // If it's a polygon
-        var gisPoints = L.geoJson(gisPointSelected, {onEachFeature: setPopup}).addTo(map);
-        gisPoints.on('click', setObjectId);
-        var gisSites = L.geoJson(gisPolygonSelected, {onEachFeature: setPopup}).addTo(map);
-        gisSites.on('click', setObjectId);
-        var gisExtend = L.featureGroup([gisPoints, gisSites]);
-        setTimeout(function () {
-            map.fitBounds(gisExtend.getBounds(), {maxZoom: 12});
-        }, 1);
-    }
+    var gisPoints = L.geoJson(gisPointSelected, {onEachFeature: setPopup}).addTo(map);
+    gisPoints.on('click', setObjectId);
+    setTimeout(function () {
+        map.fitBounds(gisPoints.getBounds(), {maxZoom: 12});
+    }, 1);
+}
+if (gisPolygonSelected != '') {
+    var gisPoints = L.geoJson(gisPointSelected, {onEachFeature: setPopup}).addTo(map);
+    gisPoints.on('click', setObjectId);
+    var gisSites = L.geoJson(gisPolygonSelected, {onEachFeature: setPopup}).addTo(map);
+    gisSites.on('click', setObjectId);
+    var gisExtend = L.featureGroup([gisPoints, gisSites]);
+    setTimeout(function () {
+        map.fitBounds(gisExtend.getBounds(), {maxZoom: 12});
+    }, 1);
 }
 
 // Add markers to the map
@@ -67,39 +63,30 @@ var geoSearchControl = L.control.geonames({
 map.addControl(geoSearchControl);
 
 function setObjectId(e) {
-    preventPopup();
-    if (editOn === 0) {
-        var layer = e.layer;
-        var feature = layer.feature;
-        var objectId = feature.properties.objectId;
-        geometryType = feature.geometry.type;
-        if (geometryType == 'Point') {
-            position = (e.latlng);
-        }
-        selectedShape = feature.properties.id;
-        editLayer = e.layer;
-        editMarker = e.marker;
-        shapeName = feature.properties.name;
-        count = feature.properties.count;
-        shapeType = feature.properties.shapeType;
-        shapeDescription = feature.properties.description;
-        objectName = feature.properties.title;
-        helpText = translate['map_info_shape'];
-        headingText = 'Shape';
-        if (shapeType == "area") {
-            helpText = translate['map_info_area'];
-            headingText = 'Area';
-        }
-        if (geometryType == "Point") {
-            helpText = translate['map_info_point'];
-            headingText = 'Point';
-        }
+    var layer = e.layer;
+    var feature = layer.feature;
+    var objectId = feature.properties.objectId;
+    geometryType = feature.geometry.type;
+    if (geometryType == 'Point') {
+        position = (e.latlng);
     }
-}
-
-function preventPopup(event) {
-    if (editOn === 1) {
-        map.closePopup();
+    selectedShape = feature.properties.id;
+    editLayer = e.layer;
+    editMarker = e.marker;
+    shapeName = feature.properties.name;
+    count = feature.properties.count;
+    shapeType = feature.properties.shapeType;
+    shapeDescription = feature.properties.description;
+    objectName = feature.properties.title;
+    helpText = translate['map_info_shape'];
+    headingText = 'Shape';
+    if (shapeType == "area") {
+        helpText = translate['map_info_area'];
+        headingText = 'Area';
+    }
+    if (geometryType == "Point") {
+        helpText = translate['map_info_point'];
+        headingText = 'Point';
     }
 }
 
@@ -107,26 +94,40 @@ function preventPopup(event) {
  * Function to display a marker's popup on the map
  * @param feature - Markers object.
  * @param layer - Map layer to bind.
- * @param mode - 'display' for view only or 'update' for editing.
  */
-function setPopup(feature, layer, mode='display') {
-    var popupHTML = `
+function setPopup(feature, layer, mode) {
+    var selected = false;
+    var popupHtml = `
         <div id="popup">
             <strong>` + feature.properties.title + `</strong>
             <br /><strong>` + feature.properties.name + `</strong>
             <div style="max-height:140px; overflow-y: auto;">` + feature.properties.description + `</div>` +
             feature.properties.shapeType;
-    if (mode == 'update') {
-        // While editing map content
-        popupHTML += `
-            <div id="buttonBar" style="white-space:nowrap;">
-                <button id="editButton" onclick="editShape()"/>` + translate['edit'] + `</button>
-                <button id="deleteButton" onclick="deleteShape()"/>` + translate['delete'] + `</button>
-            </div>`;
-    } else {
-        // While only displaying map content
-        popupHTML += '<p><a href="/place/view/' + feature.properties.objectId + '">' + translate['details'] + '</a></p>';
+
+    // Check if this feature is selected
+    if (gisPointSelected) {
+        for (var pointSelected in gisPointSelected) {
+            if (gisPointSelected[pointSelected].properties.objectId == feature.properties.objectId) {
+                selected = true;
+            }
+        }
     }
-    popupHTML += '</div>'
-    layer.bindPopup(popupHTML);
+
+    // Add detail link if not selected
+    if (!selected) {
+        popupHtml += '<p><a href="/place/view/' + feature.properties.objectId + '">' + translate['details'] + '</a></p>';
+    }
+
+    // Add edit and delete button if selected and in update mode
+    if (map_update_mode && selected) {
+        popupHtml += `
+            <div id="buttonBar" style="white-space:nowrap;">
+                <p>
+                    <button id="editButton" onclick="editShape()"/>` + translate['edit'] + `</button>
+                    <button id="deleteButton" onclick="deleteShape()"/>` + translate['delete'] + `</button>
+                </p>
+            </div>`;
+    }
+    popupHtml += '</div>'
+    layer.bindPopup(popupHtml);
 }

@@ -8,6 +8,7 @@
     var gisPolygonPointSelected = {{ gis_data['gisPolygonPointSelected']|safe }};
     var jsonSearch = [];
     var translate = [];
+    var map_update_mode = false;  // enables e.g. edit buttons in popup ups if true
     translate['save'] = '{{ _('save')|uc_first|safe }}';
     translate['edit'] = '{{ _('edit')|uc_first|safe }}';
     translate['delete'] = '{{ _('delete')|uc_first|safe }}';
