@@ -173,9 +173,6 @@ def model_network():
     form.classes.process(request.form)
     if not form.classes.data:
         form.classes.data = []
-    print(form.classes.data)
-    # print(form.classes['E21'])
-    # print(form.classes['E7'])
     params = {
         'classes': {
             'E21': {'active': ('E21' in form.classes.data), 'color': '#34B522'},  # Person
@@ -208,12 +205,11 @@ def model_network():
             'height': 600,
             'charge': -800,
             'distance': 80}}
-    data = None
     if form.validate_on_submit():
         params['options']['orphans'] = form.orphans.data
         params['options']['width'] = form.width.data
         params['options']['height'] = form.height.data
         params['options']['charge'] = form.charge.data
         params['options']['distance'] = form.distance.data
-        data = Network.get_network_json(params)
+    data = Network.get_network_json(params)
     return render_template('model/network.html', form=form, network_params=params, json_data=data)

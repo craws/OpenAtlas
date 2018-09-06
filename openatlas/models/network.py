@@ -13,6 +13,8 @@ class Network:
         for code, param in params['classes'].items():
             if param['active']:
                 classes.append(code)
+        if not classes:
+            return None  # Return nothing if no classes are selected
         properties = []
         for code, param in params['properties'].items():
             if param['active']:
