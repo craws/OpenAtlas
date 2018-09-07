@@ -18,8 +18,8 @@ class Entity:
             abort(418)
         self.id = row.id
         self.nodes = dict()
-        if hasattr(row, 'types') and row.types:
-            for node in row.types:
+        if hasattr(row, 'nodes') and row.nodes:
+            for node in row.nodes:
                 if not node['f1']:
                     continue
                 self.nodes[g.nodes[node['f1']]] = node['f2']
@@ -99,7 +99,7 @@ class EntityMapper:
         SELECT
             e.id, e.class_code, e.name, e.description, e.created, e.modified,
             e.value_integer, e.system_type,
-            array_to_json(array_agg((t.range_id, t.description))) as types,
+            array_to_json(array_agg((t.range_id, t.description))) as nodes,
             min(date_part('year', d1.value_timestamp)) AS first,
             max(date_part('year', d2.value_timestamp)) AS last
 
