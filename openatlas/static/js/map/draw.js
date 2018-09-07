@@ -256,3 +256,27 @@ function saveForm() {
     }
     closeForm(false);
 }
+
+function deleteGeometry() {
+    // Remove layer of geometry, remove geometry from form field value
+    if (typeof(editLayer) == 'object') { map.removeLayer(editLayer); }
+    if (typeof(editMarker) == 'object') { map.removeLayer(editMarker); }
+    if (geometryType == 'Point') {
+        $.each(JSON.parse($('#gis_points').val()), function (key, value) {
+            if (value.properties.id == selectedObjectId) {
+                points.splice(index, 1);
+                return false;
+            }
+        });
+        $('#gis_points').val(JSON.stringify(points));
+    }
+    if (geometryType == 'Polygon') {
+        $.each(JSON.parse($('#gis_polygons').val()), function (key, value) {
+            if (value.properties.id == selectedGeometryId) {
+                polygons.splice(key, 1);
+                return false;
+            }
+        });
+        $('#gis_polygons').val(JSON.stringify(polygons)); // write array back to form field
+    }
+}

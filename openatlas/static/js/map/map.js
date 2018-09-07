@@ -22,18 +22,21 @@ if (gisPointAll) {
     });
     controls.Points = pointLayer;
 }
+
 if (gisPolygonAll) {
     var polygonLayer = new L.GeoJSON(gisPolygonAll, {onEachFeature: setPopup});
     controls.Polygons = polygonLayer;
 }
+
 if (gisPointSelected != '') {
-    // View for a single place, set geo json layer for all points
+    // View for a single place, set geoJson layer for all points
     var gisPoints = L.geoJson(gisPointSelected, {onEachFeature: setPopup}).addTo(map);
     gisPoints.on('click', setObjectId);
     setTimeout(function () {
         map.fitBounds(gisPoints.getBounds(), {maxZoom: 12});
     }, 1);
 }
+
 if (gisPolygonSelected != '') {
     var gisPoints = L.geoJson(gisPointSelected, {onEachFeature: setPopup}).addTo(map);
     gisPoints.on('click', setObjectId);
@@ -43,6 +46,11 @@ if (gisPolygonSelected != '') {
     setTimeout(function () {
         map.fitBounds(gisExtend.getBounds(), {maxZoom: 12});
     }, 1);
+}
+
+if (window.location.href.indexOf('update') >= 0) {
+    $('#gis_points').val(JSON.stringify(gisPointSelected));
+    $('#gis_polygons').val(JSON.stringify(gisPolygonSelected));
 }
 
 // Add markers to the map
@@ -70,7 +78,7 @@ function setObjectId(e) {
     if (geometryType == 'Point') {
         position = (e.latlng);
     }
-    selectedShape = feature.properties.id;
+    selectedGeometryId = feature.properties.id;
     editLayer = e.layer;
     editMarker = e.marker;
     shapeName = feature.properties.name;
@@ -78,16 +86,6 @@ function setObjectId(e) {
     shapeType = feature.properties.shapeType;
     shapeDescription = feature.properties.description;
     objectName = feature.properties.title;
-    helpText = translate['map_info_shape'];
-    headingText = 'Shape';
-    if (shapeType == "area") {
-        helpText = translate['map_info_area'];
-        headingText = 'Area';
-    }
-    if (geometryType == "Point") {
-        helpText = translate['map_info_point'];
-        headingText = 'Point';
-    }
 }
 
 /**
@@ -96,8 +94,8 @@ function setObjectId(e) {
  * @param layer - Map layer to bind.
  */
 function setPopup(feature, layer, mode) {
-    var selected = false;
-    var popupHtml = `
+    selected = false;
+    popupHtml = `
         <div id="popup">
             <strong>` + feature.properties.title + `</strong>
             <br /><strong>` + feature.properties.name + `</strong>
@@ -106,7 +104,7 @@ function setPopup(feature, layer, mode) {
 
     // Check if this feature is selected
     if (gisPointSelected) {
-        for (var pointSelected in gisPointSelected) {
+        for (pointSelected in gisPointSelected) {
             if (gisPointSelected[pointSelected].properties.objectId == feature.properties.objectId) {
                 selected = true;
             }
@@ -123,8 +121,8 @@ function setPopup(feature, layer, mode) {
         popupHtml += `
             <div id="buttonBar" style="white-space:nowrap;">
                 <p>
-                    <button id="editButton" onclick="editShape()"/>` + translate['edit'] + `</button>
-                    <button id="deleteButton" onclick="deleteShape()"/>` + translate['delete'] + `</button>
+                    <button id="editButton" onclick="editGeometry()"/>` + translate['edit'] + `</button>
+                    <button id="deleteButton" onclick="deleteGeometry()"/>` + translate['delete'] + `</button>
                 </p>
             </div>`;
     }
