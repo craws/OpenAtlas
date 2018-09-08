@@ -115,13 +115,12 @@ function setPopup(feature, layer, mode) {
     if (!selected) {
         popupHtml += '<p><a href="/place/view/' + feature.properties.objectId + '">' + translate['details'] + '</a></p>';
     }
-
     // Add edit and delete button if selected and in update mode
     if (map_update_mode && selected) {
         popupHtml += `
             <div id="buttonBar" style="white-space:nowrap;">
                 <p>
-                    <button id="editButton" onclick="editGeometry()"/>` + translate['edit'] + `</button>
+                    <button id="editButton" onclick="editGeometry('` + feature.properties.shapeType + `', '` + feature.geometry.type + `')"/>` + translate['edit'] + `</button>
                     <button id="deleteButton" onclick="deleteGeometry()"/>` + translate['delete'] + `</button>
                 </p>
             </div>`;

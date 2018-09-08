@@ -57,7 +57,7 @@ map.addControl(pointButton);
 /* Input form */
 var inputForm = L.control();
 inputForm.onAdd = function (map) {
-    var div = L.DomUtil.create('div', 'shapeInput');
+    div = L.DomUtil.create('div', 'shapeInput');
     div.innerHTML += `
         <div id="insertForm" style="display:block">
             <form id="shapeForm" onmouseover="interactionOff()" onmouseout="interactionOn()">
@@ -101,11 +101,11 @@ map.on('click', function(e) {
         } else {  // no marker exists so create it
             marker = new L.marker(e.latlng, {draggable: true, icon: newIcon});
             marker.addTo(map);
-            var wgs84 = (marker.getLatLng());
+            wgs84 = (marker.getLatLng());
             $('#northing').val(wgs84.lat);
             $('#easting').val(wgs84.lng);
         }
-        var wgs84 = marker.getLatLng();
+        wgs84 = marker.getLatLng();
         marker.on('dragend', function (event) {
             var marker = event.target;
             position = marker.getLatLng();
@@ -279,4 +279,129 @@ function deleteGeometry() {
         });
         $('#gis_polygons').val(JSON.stringify(polygons)); // write array back to form field
     }
+}
+
+function editGeometry(selectedType, geometryType) {
+    /*  Work in progress.
+        This former code looks like the whole layer with form, popup, ... is deleted and
+        reconstructed. Maybe there is a more efficient way to do that. */
+
+    if (selectedType == 'Centerpoint') {
+        selectedType = 'point';
+    }
+    shapeType = selectedType;
+    map.addControl(inputForm);
+    $('#inputFormTitle').text(shapeType.substr(0,1).toUpperCase() + shapeType.substr(1));
+    $('#inputFormInfo').text(translate['map_info_' + shapeType]);
+    $('.leaflet-right .leaflet-bar').hide();
+    map.closePopup();
+
+    if (geometryType === 'Point') {
+        newLayer = L.marker((editLayer.getLatLng()), {draggable: true, icon: editIcon}).addTo(map);
+        newLayer.bindPopup(
+            '<div id="popup"><strong>' + objectName + '</strong><br/>' +
+            '<div id="popup"><strong>' + shapename + '</strong><br/>' +
+            '<i>' + shapetype + '</i><br/><br/>' +
+            '<div style="max-height:140px; overflow-y: auto">' + shapedescription + '</div>'
+            );
+        if (typeof (originLayer) == 'object') {
+            map.removeLayer(originLayer);
+        }
+        originLayer = L.marker(editLayer.getLatLng());
+        originLayer.bindPopup(
+            '<div id="popup"><strong>' + objectName + '</strong><br/>' +
+            '<div id="popup"><strong>' + shapename + '</strong><br/>' +
+            '<i>' + shapetype + '</i> <br/> <br/>' +
+            '<div style="max-height:140px; overflow-y: auto">' + shapedescription + '<br/></div>' +
+            '<button onclick="editshape()"/>' + translate['edit'] + '</button> <button onclick="deleteshape()"/>' + translate['delete'] + '</button></div>'
+            );
+        map.removeLayer(editLayer);
+        document.getElementById('savebtn').style.display = 'none';
+        document.getElementById('resetbtn').style.display = 'none';
+        document.getElementById('closebtn').style.display = 'none';
+        document.getElementById('editclosebtn').style.display = 'block';
+        document.getElementById('editsavebtn').style.display = 'none';
+        document.getElementById('markerclosebtn').style.display = 'none';
+        document.getElementById('markersavebtn').style.display = 'none';
+        document.getElementById('editsavebtn').style.display = 'block';
+        document.getElementById('easting').style.display = 'block';
+        document.getElementById('northing').style.display = 'block';
+        document.getElementById('eastinglabel').style.display = 'block';
+        document.getElementById('northinglabel').style.display = 'block';
+        document.getElementById('northing').value = position.lat;
+        document.getElementById('easting').value = position.lng;
+        var wgs84 = newLayer.getLatLng();
+        newLayer.on('dragend', function (event) {
+            var marker = event.target;
+            position = marker.getLatLng();
+            document.getElementById('northing').value = position.lat;
+            document.getElementById('easting').value = position.lng;
+            document.getElementById('editsavebtn').disabled = false;
+        });
+    }
+
+    //$("#shapeform").on("input", function () {
+    //    document.getElementById('editsavebtn').disabled = false;
+    //});
+    if (geometryType === 'Polygon') {
+        newLayer = L.polygon(editLayer.getLatLngs()).addTo(map);
+        newLayer.bindPopup(
+            '<div id="popup"><strong>' + objectName + '</strong><br/>' +
+            '<div id="popup"><strong>' + shapename + '</strong><br/>' +
+            '<i>' + shapetype + '</i><br/><br/>' +
+            '<div style="max-height:140px; overflow-y: auto">' + shapedescription + '</div>'
+            );
+        map.removeLayer(editLayer);
+        if (typeof (originLayer) == 'object') {
+            map.removeLayer(originLayer);
+        }
+        originLayer = L.polygon(editLayer.getLatLngs());
+        originLayer.bindPopup(
+            '<div id="popup"><strong>' + objectName + '</strong><br/>' +
+            '<div id="popup"><strong>' + shapename + '</strong><br/>' +
+            '<i>' + shapetype + '</i><br/><br/>' +
+            '<div style="max-height:140px; overflow-y: auto">' + shapedescription + '</div>' +
+            '<button onclick="editshape()"/>' + translate['edit'] + '</button> <button onclick="deleteshape()"/>' + translate['delete'] + '</button></div>'
+            );
+        map.removeLayer(editLayer);
+    }
+
+
+    newLayer.options.editing || (newlayer.options.editing = {});
+    newLayer.editing.enable();
+    document.getElementById('geometryType').value = geometryType;
+    newLayer.on('edit', function () {
+        var latLngs = newLayer.getLatLngs();
+        var latLngs; // to store coordinates of vertices
+        var newvector = []; // array to store coordinates as numbers
+        geoJsonArray = [];
+        var type = geometryType.toLowerCase();
+        document.getElementById('editsavebtn').disabled = false;
+        if (type != 'marker') {  // if other type than point then store array of coordinates as variable
+            latLngs = mylayer.getLatLngs();
+            for (i = 0; i < (latLngs.length); i++) {
+                newvector.push(' ' + latLngs[i].lng + ' ' + latLngs[i].lat);
+                geoJsonArray.push('[' + latLngs[i].lng + ',' + latLngs[i].lat + ']');
+            }
+            if (type === 'polygon') {
+                // if polygon add first xy again as last xy to close polygon
+                newvector.push(' ' + latLngs[0].lng + ' ' + latLngs[0].lat);
+                shapesyntax = '(' + newvector + ')';
+                geoJsonArray.push('[' + latLngs[0].lng + ',' + latLngs[0].lat + ']');
+                returndata();
+
+            }
+            if (type === 'linestring') {
+                shapesyntax = newvector;
+                returndata();
+            }
+        }
+        if (type === 'point') {
+            latLngs = newLayer.getLatLng();
+            newvector = (' ' + latLngs.lng + ' ' + latLngs.lat);
+            shapesyntax = 'ST_GeomFromText(\'POINT(' + newvector + ')\',4326);'
+            document.getElementById('northing').value = latLngs.lat;
+            document.getElementById('easting').value = latLngs.lng;
+        }
+    });
 }
