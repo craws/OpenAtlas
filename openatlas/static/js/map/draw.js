@@ -214,13 +214,12 @@ function resetForm() {
 }
 
 function saveForm() {
-    shapeName = $('#shapeName').val().replace(/\"/g,'\\"');
+    name = $('#shapeName').val().replace(/\"/g,'\\"');
     description = $('#shapeDescription').val().replace(/\"/g,'\\"');
     popupHtml = `
         <div id="popup">
             <strong>` + objectName + `</strong>
-            <br /><strong>` + shapeName + `</strong> ` + shapeType + `
-            <br /><strong>` + name + `</strong>
+            <br /><strong>` + name + `</strong> ` + shapeType + `
             <div style="max-height:140px;overflow-y:auto">` + description + `</div>
             <p><i>` + translate['map_info_reedit'] + `</i></p>
         </div>`;
@@ -237,13 +236,6 @@ function saveForm() {
         marker = false;  // unset the marker
     } else {
         coordinates = $('#shapeCoordinates').val();
-        dataString =
-            `shapename=` + shapeName +
-            `&shapetype=` + shapeType +
-            `&shapedescription=` + description +
-            `&shapeCoordinates=` + coordinates +
-            `&geometryType=` + geometryType;
-        $('#gisData').val($('#gisData').val() + dataString);
         polygon =
             `{"type":"Feature","geometry":` +
             `{"type":"Polygon","coordinates":[[` + geoJsonArray.join(',') + `]]},"properties":` +
@@ -261,17 +253,20 @@ function deleteGeometry() {
     // Remove layer of geometry, remove geometry from form field value
     if (typeof(editLayer) == 'object') { map.removeLayer(editLayer); }
     if (typeof(editMarker) == 'object') { map.removeLayer(editMarker); }
+    console.log(geometryType);
     if (geometryType == 'Point') {
-        $.each(JSON.parse($('#gis_points').val()), function (key, value) {
-            if (value.properties.id == selectedObjectId) {
-                points.splice(index, 1);
+        points = JSON.parse($('#gis_points').val());
+        $.each(points, function (key, value) {
+            if (value.properties.id == selectedGeometryId) {
+                points.splice(key, 1);
                 return false;
             }
         });
         $('#gis_points').val(JSON.stringify(points));
     }
     if (geometryType == 'Polygon') {
-        $.each(JSON.parse($('#gis_polygons').val()), function (key, value) {
+        polygons = JSON.parse($('#gis_polygons').val());
+        $.each(polygons, function (key, value) {
             if (value.properties.id == selectedGeometryId) {
                 polygons.splice(key, 1);
                 return false;
@@ -286,17 +281,15 @@ function editGeometry(selectedType, geometryType) {
         This former code looks like the whole layer with form, popup, ... is deleted and
         reconstructed. Maybe there is a more efficient way to do that. */
 
-    if (selectedType == 'Centerpoint') {
-        selectedType = 'point';
-    }
-    shapeType = selectedType;
     map.addControl(inputForm);
     $('#inputFormTitle').text(shapeType.substr(0,1).toUpperCase() + shapeType.substr(1));
     $('#inputFormInfo').text(translate['map_info_' + shapeType]);
+    $('#shapeName').val(shapeName);
+    $('#shapeDescription').val(shapeDescription);
     $('.leaflet-right .leaflet-bar').hide();
     map.closePopup();
 
-    if (geometryType === 'Point') {
+    /*if (geometryType === 'Point') {
         newLayer = L.marker((editLayer.getLatLng()), {draggable: true, icon: editIcon}).addTo(map);
         newLayer.bindPopup(
             '<div id="popup"><strong>' + objectName + '</strong><br/>' +
@@ -403,5 +396,5 @@ function editGeometry(selectedType, geometryType) {
             document.getElementById('northing').value = latLngs.lat;
             document.getElementById('easting').value = latLngs.lng;
         }
-    });
+    });*/
 }

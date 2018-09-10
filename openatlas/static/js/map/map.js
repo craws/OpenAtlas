@@ -71,9 +71,9 @@ var geoSearchControl = L.control.geonames({
 map.addControl(geoSearchControl);
 
 function setObjectId(e) {
-    var layer = e.layer;
-    var feature = layer.feature;
-    var objectId = feature.properties.objectId;
+    layer = e.layer;
+    feature = layer.feature;
+    objectId = feature.properties.objectId;
     geometryType = feature.geometry.type;
     if (geometryType == 'Point') {
         position = (e.latlng);
