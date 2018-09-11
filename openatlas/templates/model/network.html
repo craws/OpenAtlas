@@ -5,7 +5,9 @@
 {% block content %}
 {% if json_data %}
     <link rel="stylesheet" href="/static/css/network.css" />
-    <script src="/static/vendor/d3/d3-5.5.0.min.js"></script>
+    <link rel="stylesheet" href="/static/vendor/huebee-2.0.0/huebee.min.css" />
+    <script src="/static/vendor/d3-5.5.0/d3-5.5.0.min.js"></script>
+    <script src="/static/vendor/huebee-2.0.0/huebee.pkgd.min.js"></script>
     <svg></svg>
     <script>
         var graph = {{ json_data|safe }};

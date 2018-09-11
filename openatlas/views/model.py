@@ -139,11 +139,11 @@ def property_view(code):
 
 
 class NetworkForm(Form):
-    orphans = BooleanField(default=False)
     width = IntegerField(default=1200, validators=[InputRequired()])
     height = IntegerField(default=600, validators=[InputRequired()])
     charge = StringField(default=-800, validators=[InputRequired()])
     distance = IntegerField(default=80, validators=[InputRequired()])
+    orphans = BooleanField(default=False)
     classes = SelectMultipleField(
         _('classes'),
         [InputRequired()],
@@ -151,20 +151,20 @@ class NetworkForm(Form):
         widget=widgets.ListWidget(prefix_label=False),
         default=['E21', 'E7', 'E40', 'E74', 'E8', 'E12', 'E6'],
         choices=([
-            ('E21', 'Person'),  # #34B522
-            ('E7', 'Activity'),  # #E54A2A
-            ('E31', 'Document'),  # #FFA500
-            ('E33', 'Linguistic Object'),  # #FFA500
-            ('E40', 'Legal Body'),  # #34623C
-            ('E74', 'Group'),  # #34623C
-            ('E53', 'Places'),  # #00FF00
-            ('E18', 'Physical Object'),  # #FF0000
-            ('E8', 'Acquisition'),  # #E54A2A
-            ('E12', 'Production'),  # #E54A2A
-            ('E6', 'Destruction'),  # #E54A2A
-            ('E84', 'Information Carrier')]))  # #EE82EE
+            ('E21', 'Person'),
+            ('E7', 'Activity'),
+            ('E31', 'Document'),
+            ('E33', 'Linguistic Object'),
+            ('E40', 'Legal Body'),
+            ('E74', 'Group'),
+            ('E53', 'Places'),
+            ('E18', 'Physical Object'),
+            ('E8', 'Acquisition'),
+            ('E12', 'Production'),
+            ('E6', 'Destruction'),
+            ('E84', 'Information Carrier')]))
     properties = SelectMultipleField(
-        _('classes'),
+        _('properties'),
         option_widget=widgets.CheckboxInput(),
         widget=widgets.ListWidget(prefix_label=False),
         default=['P107', 'P24', 'P23', 'P11', 'P14', 'P7', 'P74', 'P67', 'OA7', 'OA8', 'OA9'],
@@ -180,6 +180,18 @@ class NetworkForm(Form):
             ('OA7', 'has relationship to'),
             ('OA8', 'appears for the first time in'),
             ('OA9', 'appears for the last time in')]))
+    color_E21 = StringField('Person', default='#34B522', render_kw={'data-huebee': True})
+    color_E7 = StringField('Activity', default='#E54A2A', render_kw={'data-huebee': True})
+    color_E31 = StringField('Document', default='#FFA500', render_kw={'data-huebee': True})
+    color_E33 = StringField('Linguistic Object', default='#FFA500', render_kw={'data-huebee': True})
+    color_E40 = StringField('Legal Body', default='#34623C', render_kw={'data-huebee': True})
+    color_E74 = StringField('Group', default='#34623C', render_kw={'data-huebee': True})
+    color_E53 = StringField('Places', default='#00FF00', render_kw={'data-huebee': True})
+    color_E18 = StringField('Physical Object', default='#FF0000', render_kw={'data-huebee': True})
+    color_E8 = StringField('Acquisition', default='#E54A2A', render_kw={'data-huebee': True})
+    color_E12 = StringField('Production', default='#E54A2A', render_kw={'data-huebee': True})
+    color_E6 = StringField('Destruction', default='#E54A2A', render_kw={'data-huebee': True})
+    color_E84 = StringField('Information Carrier', default='#EE82EE', render_kw={'data-huebee': True})
     save = SubmitField(_('apply'))
 
 
@@ -192,18 +204,18 @@ def model_network():
         form.classes.data = []
     params = {
         'classes': {
-            'E21': {'active': ('E21' in form.classes.data), 'color': '#34B522'},  # Person
-            'E7':  {'active': ('E7' in form.classes.data), 'color': '#E54A2A'},  # Activity
-            'E31': {'active': ('E31' in form.classes.data), 'color': '#FFA500'},  # Document
-            'E33': {'active': ('E33' in form.classes.data), 'color': '#FFA500'},  # Linguistic Obj
-            'E40': {'active': ('E40' in form.classes.data), 'color': '#34623C'},  # Legal Body
-            'E74': {'active': ('E74' in form.classes.data), 'color': '#34623C'},  # Group
-            'E53': {'active': ('E53' in form.classes.data), 'color': '#00FF00'},  # Places
-            'E18': {'active': ('E18' in form.classes.data), 'color': '#FF0000'},  # Physical Object
-            'E8':  {'active': ('E8' in form.classes.data), 'color': '#E54A2A'},  # Acquisition
-            'E12': {'active': ('E12' in form.classes.data), 'color': '#E54A2A'},  # Production
-            'E6':  {'active': ('E6' in form.classes.data), 'color': '#E54A2A'},  # Destruction
-            'E84': {'active': ('E84' in form.classes.data), 'color': '#EE82EE'}},  # Information Car
+            'E21': {'active': ('E21' in form.classes.data), 'color': form.color_E21.data},
+            'E7':  {'active': ('E7' in form.classes.data), 'color': form.color_E7.data},
+            'E31': {'active': ('E31' in form.classes.data), 'color': form.color_E31.data},
+            'E33': {'active': ('E33' in form.classes.data), 'color': form.color_E33.data},
+            'E40': {'active': ('E40' in form.classes.data), 'color': form.color_E40.data},
+            'E74': {'active': ('E74' in form.classes.data), 'color': form.color_E74.data},
+            'E53': {'active': ('E53' in form.classes.data), 'color': form.color_E53.data},
+            'E18': {'active': ('E18' in form.classes.data), 'color': form.color_E18.data},
+            'E8':  {'active': ('E8' in form.classes.data), 'color': form.color_E8.data},
+            'E12': {'active': ('E12' in form.classes.data), 'color': form.color_E12.data},
+            'E6':  {'active': ('E6' in form.classes.data), 'color': form.color_E6.data},
+            'E84': {'active': ('E84' in form.classes.data), 'color': form.color_E84.data}},
         'properties': {
             'P107': {'active': ('P107' in form.properties.data)},
             'P24':  {'active': ('P24' in form.properties.data)},
