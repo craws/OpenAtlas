@@ -281,6 +281,10 @@ function editGeometry(selectedType, geometryType) {
         This former code looks like the whole layer with form, popup, ... is deleted and
         reconstructed. Maybe there is a more efficient way to do that. */
 
+    editIcon = L.icon({iconUrl: "/static/images/map/marker-icon_edit.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
+    editedIcon = L.icon({iconUrl: "/static/images/map/marker-icon_edited.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
+    newIcon = L.icon({iconUrl: "/static/images/map/images/marker-icon_new.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
+
     map.addControl(inputForm);
     $('#inputFormTitle').text(shapeType.substr(0,1).toUpperCase() + shapeType.substr(1));
     $('#inputFormInfo').text(translate['map_info_' + shapeType]);
@@ -289,53 +293,31 @@ function editGeometry(selectedType, geometryType) {
     $('.leaflet-right .leaflet-bar').hide();
     map.closePopup();
 
-    /*if (geometryType === 'Point') {
+    if (geometryType === 'Point') {
+        $('#resetButton').hide();
         newLayer = L.marker((editLayer.getLatLng()), {draggable: true, icon: editIcon}).addTo(map);
+        wgs84 = newLayer.getLatLng();
+        $('#northing').val(wgs84.lat);
+        $('#easting').val(wgs84.lng);
         newLayer.bindPopup(
             '<div id="popup"><strong>' + objectName + '</strong><br/>' +
-            '<div id="popup"><strong>' + shapename + '</strong><br/>' +
-            '<i>' + shapetype + '</i><br/><br/>' +
-            '<div style="max-height:140px; overflow-y: auto">' + shapedescription + '</div>'
-            );
-        if (typeof (originLayer) == 'object') {
-            map.removeLayer(originLayer);
-        }
-        originLayer = L.marker(editLayer.getLatLng());
-        originLayer.bindPopup(
-            '<div id="popup"><strong>' + objectName + '</strong><br/>' +
-            '<div id="popup"><strong>' + shapename + '</strong><br/>' +
-            '<i>' + shapetype + '</i> <br/> <br/>' +
-            '<div style="max-height:140px; overflow-y: auto">' + shapedescription + '<br/></div>' +
-            '<button onclick="editshape()"/>' + translate['edit'] + '</button> <button onclick="deleteshape()"/>' + translate['delete'] + '</button></div>'
-            );
-        map.removeLayer(editLayer);
-        document.getElementById('savebtn').style.display = 'none';
-        document.getElementById('resetbtn').style.display = 'none';
-        document.getElementById('closebtn').style.display = 'none';
-        document.getElementById('editclosebtn').style.display = 'block';
-        document.getElementById('editsavebtn').style.display = 'none';
-        document.getElementById('markerclosebtn').style.display = 'none';
-        document.getElementById('markersavebtn').style.display = 'none';
-        document.getElementById('editsavebtn').style.display = 'block';
-        document.getElementById('easting').style.display = 'block';
-        document.getElementById('northing').style.display = 'block';
-        document.getElementById('eastinglabel').style.display = 'block';
-        document.getElementById('northinglabel').style.display = 'block';
-        document.getElementById('northing').value = position.lat;
-        document.getElementById('easting').value = position.lng;
-        var wgs84 = newLayer.getLatLng();
+            '<div id="popup"><strong>' + shapeName + '</strong><br/>' +
+            '<i>' + shapeType + '</i><br/><br/>' +
+            '<div style="max-height:140px; overflow-y: auto">' + shapeDescription + '</div>'
+        );
         newLayer.on('dragend', function (event) {
-            var marker = event.target;
-            position = marker.getLatLng();
-            document.getElementById('northing').value = position.lat;
-            document.getElementById('easting').value = position.lng;
-            document.getElementById('editsavebtn').disabled = false;
+            newMarker = event.target;
+            position = newMarker.getLatLng();
+            $('#northing').val(position.lat);
+            $('#easting').val(position.lng);
+            $('#saveButton').prop('disabled', false);
         });
     }
 
     //$("#shapeform").on("input", function () {
     //    document.getElementById('editsavebtn').disabled = false;
     //});
+    /*
     if (geometryType === 'Polygon') {
         newLayer = L.polygon(editLayer.getLatLngs()).addTo(map);
         newLayer.bindPopup(
