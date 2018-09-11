@@ -19,17 +19,20 @@ class Network:
         for code, param in params['properties'].items():
             if param['active']:
                 properties.append(code)
-        sql = "SELECT domain_id, range_id FROM model.link WHERE property_code IN %(properties)s;"
-        g.cursor.execute(sql, {'properties': tuple(properties)})
         entities = set()
         edges = ''
-        for row in g.cursor.fetchall():  # pragma: no cover
-            if row.domain_id == row.range_id:
-                continue  # Prevent circular dependencies
-            edges += "{'source': '" + str(row.domain_id)
-            edges += "', 'target': '" + str(row.range_id) + "' },"
-            entities.add(row.domain_id)
-            entities.add(row.range_id)
+        if properties:
+            sql = """
+                SELECT domain_id, range_id FROM model.link
+                WHERE property_code IN %(properties)s;"""
+            g.cursor.execute(sql, {'properties': tuple(properties)})
+            for row in g.cursor.fetchall():
+                if row.domain_id == row.range_id:
+                    continue  # Prevent circular dependencies
+                edges += "{'source': '" + str(row.domain_id)
+                edges += "', 'target': '" + str(row.range_id) + "' },"
+                entities.add(row.domain_id)
+                entities.add(row.range_id)
         edges = " links: [" + edges + "]"
         nodes = ''
         entities_already = set()

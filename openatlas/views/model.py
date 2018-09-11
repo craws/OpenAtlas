@@ -163,6 +163,23 @@ class NetworkForm(Form):
             ('E12', 'Production'),  # #E54A2A
             ('E6', 'Destruction'),  # #E54A2A
             ('E84', 'Information Carrier')]))  # #EE82EE
+    properties = SelectMultipleField(
+        _('classes'),
+        option_widget=widgets.CheckboxInput(),
+        widget=widgets.ListWidget(prefix_label=False),
+        default=['P107', 'P24', 'P23', 'P11', 'P14', 'P7', 'P74', 'P67', 'OA7', 'OA8', 'OA9'],
+        choices=([
+            ('P107', 'has current or former member'),
+            ('P24', 'transferred title of'),
+            ('P23', 'transferred title to'),
+            ('P11', 'had participant'),
+            ('P14', 'carried out by'),
+            ('P7', 'took place at'),
+            ('P74', 'has current or former residence'),
+            ('P67', 'refers to'),
+            ('OA7', 'has relationship to'),
+            ('OA8', 'appears for the first time in'),
+            ('OA9', 'appears for the last time in')]))
     save = SubmitField(_('apply'))
 
 
@@ -188,17 +205,17 @@ def model_network():
             'E6':  {'active': ('E6' in form.classes.data), 'color': '#E54A2A'},  # Destruction
             'E84': {'active': ('E84' in form.classes.data), 'color': '#EE82EE'}},  # Information Car
         'properties': {
-            'P107': {'active': True},   # has current or former member
-            'P24':  {'active': True},   # transferred title of
-            'P23':  {'active': True},   # transferred title to
-            'P11':  {'active': True},   # had participant
-            'P14':  {'active': True},   # carried out by
-            'P7':   {'active': True},   # took place at
-            'P74':  {'active': True},   # has current or former residence
-            'P67':  {'active': True},   # refers to
-            'OA7':  {'active': True},   # has relationship to
-            'OA8':  {'active': True},   # appears for the first time in
-            'OA9':  {'active': True}},  # appears for the last time in
+            'P107': {'active': ('P107' in form.properties.data)},
+            'P24':  {'active': ('P24' in form.properties.data)},
+            'P23':  {'active': ('P23' in form.properties.data)},
+            'P11':  {'active': ('P11' in form.properties.data)},
+            'P14':  {'active': ('P14' in form.properties.data)},
+            'P7':   {'active': ('P7' in form.properties.data)},
+            'P74':  {'active': ('P74' in form.properties.data)},
+            'P67':  {'active': ('P67' in form.properties.data)},
+            'OA7':  {'active': ('OA7' in form.properties.data)},
+            'OA8':  {'active': ('OA8' in form.properties.data)},
+            'OA9':  {'active': ('OA9' in form.properties.data)}},
         'options': {
             'orphans': False,
             'width': 1200,

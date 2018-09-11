@@ -42,7 +42,6 @@ var labels = node.append('text')
 // Maybe use title (shows at mouseover label) if names are too long
 // node.append('title').text(function(d) { return 'd.name'; });
 
-
 // Add drag capabilities
 var drag_handler = d3.drag()
     .on('start', drag_start)
