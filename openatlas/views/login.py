@@ -130,6 +130,7 @@ def reset_confirm(code):   # pragma: no cover
     user.password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
     user.password_reset_code = None
     user.password_reset_date = None
+    user.login_failed_count = 0
     user.update()
     subject = _('New password for %(sitename)s', sitename=session['settings']['site_name'])
     body = _('New password for %(username)s', username=user.username) + ' '
