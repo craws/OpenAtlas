@@ -1,7 +1,9 @@
-var objectName; // name of the entry at update of an existing entry
-var shapeType; // point, shape or area
+var objectName; // Name of the entry at update of an existing entry
+
+// Variables for a selected shape
 var shapeName;
 var shapeDescription;
+var shapeType; // point, shape or area
 var geometryType; // point or polygon
 
 var captureCoordinates = false; // boolean if clicks on map should be captured as coordinates
