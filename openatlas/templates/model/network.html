@@ -17,6 +17,8 @@
             var distance = {{ network_params['options']['distance'] }}
         </script>
         <script src="/static/js/network.js"></script>
+        <script src="/static/js/saveSvgAsPng.js"></script>
+        <a class="button" onclick="svgToPng()">Download</a>
     {% else %}
         <h2 style="float:right;">{{ _('no data to display')|uc_first }}</h2>
     {% endif %}

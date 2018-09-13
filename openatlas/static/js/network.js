@@ -88,3 +88,15 @@ function tickActions() {
         return 'translate(' + d.x + ',' + d.y + ')';
     })
 }
+
+function svgToPng() {
+    console.log('png');
+    saveSvgAsPng(d3.select('svg').node(), 'chart.png');
+}
+
+function svgToSvg() {
+    console.log('svg');
+    svgAsDataUri(d3.select('svg').node(), {}, function(uri) {
+        console.log('uri', uri);
+    });
+}
