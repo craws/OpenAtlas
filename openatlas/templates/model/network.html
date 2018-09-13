@@ -18,8 +18,32 @@
     </script>
     <script src="/static/js/network.js"></script>
 {% endif %}
-<div style="float:left;margin-left:2em;">
-    {{ form|display_form|safe }}
-    <p><a href="https://redmine.openatlas.eu/projects/uni/wiki/Network_visualization" rel="noopener" target="_blank">{{ _('manual')|uc_first }}</a></p>
+<div style="float:left;">
+    <form method="post" id="network-form" style="margin-right:1em;">
+        {{ form.csrf_token }}
+        <h2>{{ _('classes')|uc_first }}</h2>
+        <div>
+            <div style="float:left">
+                {{ form.classes }}
+            </div>
+            <div style="float:left;margin-left:0.5em;">
+                {% for class_code in ['E21', 'E7', 'E31', 'E33', 'E40', 'E74', 'E53', 'E18', 'E8', 'E12', 'E6', 'E84'] %}
+                    {{ form['color_' + class_code] }}<br />
+                {% endfor %}
+            </div>
+        </div>
+        <div style="clear:both;"></div>
+        ---<br />
+        {{ form.orphans }} {{ _('show orphans')|uc_first }}
+        <h2>{{ _('properties')|uc_first }}</h2>
+        {{ form.properties }}
+        <h2>{{ _('network options')|uc_first }}</h2>
+        {{ form.width }} {{ form.width.label }}<br />
+        {{ form.height }} {{ form.height.label }}<br />
+        {{ form.charge }} {{ form.charge.label }}<br />
+        {{ form.distance }} {{ form.distance.label }}<br />
+        <input id="save" name="save" value="{{_('apply')|uc_first}}" type="submit">
+        <p><a href="https://redmine.openatlas.eu/projects/uni/wiki/Network_visualization" rel="noopener" target="_blank">{{ _('manual')|uc_first }}</a></p>
+    </form>
 </div>
 {% endblock %}

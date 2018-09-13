@@ -180,18 +180,19 @@ class NetworkForm(Form):
             ('OA7', 'has relationship to'),
             ('OA8', 'appears for the first time in'),
             ('OA9', 'appears for the last time in')]))
-    color_E21 = StringField('Person', default='#34B522', render_kw={'data-huebee': True})
-    color_E7 = StringField('Activity', default='#E54A2A', render_kw={'data-huebee': True})
-    color_E31 = StringField('Document', default='#FFA500', render_kw={'data-huebee': True})
-    color_E33 = StringField('Linguistic Object', default='#FFA500', render_kw={'data-huebee': True})
-    color_E40 = StringField('Legal Body', default='#34623C', render_kw={'data-huebee': True})
-    color_E74 = StringField('Group', default='#34623C', render_kw={'data-huebee': True})
-    color_E53 = StringField('Places', default='#00FF00', render_kw={'data-huebee': True})
-    color_E18 = StringField('Physical Object', default='#FF0000', render_kw={'data-huebee': True})
-    color_E8 = StringField('Acquisition', default='#E54A2A', render_kw={'data-huebee': True})
-    color_E12 = StringField('Production', default='#E54A2A', render_kw={'data-huebee': True})
-    color_E6 = StringField('Destruction', default='#E54A2A', render_kw={'data-huebee': True})
-    color_E84 = StringField('Information Carrier', default='#EE82EE', render_kw={'data-huebee': True})
+    kw_params = {'data-huebee': True, 'class': 'data-huebee'}
+    color_E21 = StringField('Person', default='#34B522', render_kw=kw_params)
+    color_E7 = StringField('Activity', default='#E54A2A', render_kw=kw_params)
+    color_E31 = StringField('Document', default='#FFA500', render_kw=kw_params)
+    color_E33 = StringField('Linguistic Object', default='#FFA500', render_kw=kw_params)
+    color_E40 = StringField('Legal Body', default='#34623C', render_kw=kw_params)
+    color_E74 = StringField('Group', default='#34623C', render_kw=kw_params)
+    color_E53 = StringField('Places', default='#00FF00', render_kw=kw_params)
+    color_E18 = StringField('Physical Object', default='#FF0000', render_kw=kw_params)
+    color_E8 = StringField('Acquisition', default='#E54A2A', render_kw=kw_params)
+    color_E12 = StringField('Production', default='#E54A2A', render_kw=kw_params)
+    color_E6 = StringField('Destruction', default='#E54A2A', render_kw=kw_params)
+    color_E84 = StringField('Information Carrier', default='#EE82EE', render_kw=kw_params)
     save = SubmitField(_('apply'))
 
 
