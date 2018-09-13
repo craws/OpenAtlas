@@ -60,4 +60,4 @@ class Network:
                     .replace('\r', ' ')
                 nodes += "{'id':'" + str(row.id) + "', 'name':'" + truncate_string(name, span=False)
                 nodes += "', 'color':'" + color + "'},"
-        return "graph = {'nodes': [" + nodes + "], " + edges + "};"
+        return "graph = {'nodes': [" + nodes + "], " + edges + "};" if nodes else None

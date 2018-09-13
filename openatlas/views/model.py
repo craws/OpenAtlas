@@ -146,100 +146,53 @@ class NetworkForm(Form):
     orphans = BooleanField(default=False)
     classes = SelectMultipleField(
         _('classes'),
-        [InputRequired()],
         option_widget=widgets.CheckboxInput(),
         widget=widgets.ListWidget(prefix_label=False),
-        default=['E21', 'E7', 'E40', 'E74', 'E8', 'E12', 'E6'],
-        choices=([
-            ('E21', 'Person'),
-            ('E7', 'Activity'),
-            ('E31', 'Document'),
-            ('E33', 'Linguistic Object'),
-            ('E40', 'Legal Body'),
-            ('E74', 'Group'),
-            ('E53', 'Places'),
-            ('E18', 'Physical Object'),
-            ('E8', 'Acquisition'),
-            ('E12', 'Production'),
-            ('E6', 'Destruction'),
-            ('E84', 'Information Carrier')]))
+        default=['E21', 'E7', 'E40', 'E74', 'E8', 'E12', 'E6'])
     properties = SelectMultipleField(
         _('properties'),
         option_widget=widgets.CheckboxInput(),
         widget=widgets.ListWidget(prefix_label=False),
-        default=['P107', 'P24', 'P23', 'P11', 'P14', 'P7', 'P74', 'P67', 'OA7', 'OA8', 'OA9'],
-        choices=([
-            ('P107', 'has current or former member'),
-            ('P24', 'transferred title of'),
-            ('P23', 'transferred title to'),
-            ('P11', 'had participant'),
-            ('P14', 'carried out by'),
-            ('P7', 'took place at'),
-            ('P74', 'has current or former residence'),
-            ('P67', 'refers to'),
-            ('OA7', 'has relationship to'),
-            ('OA8', 'appears for the first time in'),
-            ('OA9', 'appears for the last time in')]))
+        default=['P107', 'P24', 'P23', 'P11', 'P14', 'P7', 'P74', 'P67', 'OA7', 'OA8', 'OA9'])
     kw_params = {'data-huebee': True, 'class': 'data-huebee'}
-    color_E21 = StringField('Person', default='#34B522', render_kw=kw_params)
-    color_E7 = StringField('Activity', default='#E54A2A', render_kw=kw_params)
-    color_E31 = StringField('Document', default='#FFA500', render_kw=kw_params)
-    color_E33 = StringField('Linguistic Object', default='#FFA500', render_kw=kw_params)
-    color_E40 = StringField('Legal Body', default='#34623C', render_kw=kw_params)
-    color_E74 = StringField('Group', default='#34623C', render_kw=kw_params)
-    color_E53 = StringField('Places', default='#00FF00', render_kw=kw_params)
-    color_E18 = StringField('Physical Object', default='#FF0000', render_kw=kw_params)
-    color_E8 = StringField('Acquisition', default='#E54A2A', render_kw=kw_params)
-    color_E12 = StringField('Production', default='#E54A2A', render_kw=kw_params)
-    color_E6 = StringField('Destruction', default='#E54A2A', render_kw=kw_params)
-    color_E84 = StringField('Information Carrier', default='#EE82EE', render_kw=kw_params)
+    color_E21 = StringField(default='#34B522', render_kw=kw_params)
+    color_E7 = StringField(default='#E54A2A', render_kw=kw_params)
+    color_E31 = StringField(default='#FFA500', render_kw=kw_params)
+    color_E33 = StringField(default='#FFA500', render_kw=kw_params)
+    color_E40 = StringField(default='#34623C', render_kw=kw_params)
+    color_E74 = StringField(default='#34623C', render_kw=kw_params)
+    color_E53 = StringField(default='#00FF00', render_kw=kw_params)
+    color_E18 = StringField(default='#FF0000', render_kw=kw_params)
+    color_E8 = StringField(default='#E54A2A', render_kw=kw_params)
+    color_E12 = StringField(default='#E54A2A', render_kw=kw_params)
+    color_E6 = StringField(default='#E54A2A', render_kw=kw_params)
+    color_E84 = StringField(default='#EE82EE', render_kw=kw_params)
     save = SubmitField(_('apply'))
 
 
 @app.route('/overview/network/', methods=["GET", "POST"])
 @required_group('readonly')
 def model_network():
+    available_classes = ['E21', 'E7', 'E31', 'E33', 'E40', 'E74', 'E53', 'E18', 'E8', 'E12', 'E6',
+                         'E84']
+    available_properties = ['P107',  'P24',  'P23',  'P11',  'P14',  'P7',  'P74',  'P67',  'OA7',
+                            'OA8',  'OA9']
     form = NetworkForm()
-    form.classes.process(request.form)
-    if not form.classes.data:
-        form.classes.data = []
-    params = {
-        'classes': {
-            'E21': {'active': ('E21' in form.classes.data), 'color': form.color_E21.data},
-            'E7':  {'active': ('E7' in form.classes.data), 'color': form.color_E7.data},
-            'E31': {'active': ('E31' in form.classes.data), 'color': form.color_E31.data},
-            'E33': {'active': ('E33' in form.classes.data), 'color': form.color_E33.data},
-            'E40': {'active': ('E40' in form.classes.data), 'color': form.color_E40.data},
-            'E74': {'active': ('E74' in form.classes.data), 'color': form.color_E74.data},
-            'E53': {'active': ('E53' in form.classes.data), 'color': form.color_E53.data},
-            'E18': {'active': ('E18' in form.classes.data), 'color': form.color_E18.data},
-            'E8':  {'active': ('E8' in form.classes.data), 'color': form.color_E8.data},
-            'E12': {'active': ('E12' in form.classes.data), 'color': form.color_E12.data},
-            'E6':  {'active': ('E6' in form.classes.data), 'color': form.color_E6.data},
-            'E84': {'active': ('E84' in form.classes.data), 'color': form.color_E84.data}},
-        'properties': {
-            'P107': {'active': ('P107' in form.properties.data)},
-            'P24':  {'active': ('P24' in form.properties.data)},
-            'P23':  {'active': ('P23' in form.properties.data)},
-            'P11':  {'active': ('P11' in form.properties.data)},
-            'P14':  {'active': ('P14' in form.properties.data)},
-            'P7':   {'active': ('P7' in form.properties.data)},
-            'P74':  {'active': ('P74' in form.properties.data)},
-            'P67':  {'active': ('P67' in form.properties.data)},
-            'OA7':  {'active': ('OA7' in form.properties.data)},
-            'OA8':  {'active': ('OA8' in form.properties.data)},
-            'OA9':  {'active': ('OA9' in form.properties.data)}},
-        'options': {
-            'orphans': False,
-            'width': 1200,
-            'height': 600,
-            'charge': -800,
-            'distance': 80}}
-    if form.validate_on_submit():
-        params['options']['orphans'] = form.orphans.data
-        params['options']['width'] = form.width.data
-        params['options']['height'] = form.height.data
-        params['options']['charge'] = form.charge.data
-        params['options']['distance'] = form.distance.data
+    form.classes.choices = []
+    form.properties.choices = []
+    params = {'classes': {}, 'properties': {}, 'options': {
+        'orphans': form.orphans.data,
+        'width': form.width.data,
+        'height': form.height.data,
+        'charge': form.charge.data,
+        'distance': form.distance.data}}
+    for code in available_classes:
+        form.classes.choices.append((code, g.classes[code].name))
+        params['classes'][code] = {
+            'active': (code in form.classes.data), 'color': getattr(form, 'color_' + code).data}
+    for code in available_properties:
+        form.properties.choices.append((code, g.properties[code].name))
+        params['properties'][code] = {'active': (code in form.properties.data)}
     data = Network.get_network_json(params)
-    return render_template('model/network.html', form=form, network_params=params, json_data=data)
+    return render_template('model/network.html', form=form, network_params=params, json_data=data,
+                           available_classes=available_classes)
