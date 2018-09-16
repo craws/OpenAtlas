@@ -21,7 +21,6 @@ var node = g.append('g')
     .data(graph.nodes)
     .enter().append('g')
 
-// Draw lines for the links
 var link = g.append('g')
     .attr('class', 'links')
     .selectAll('line')
@@ -87,16 +86,4 @@ function tickActions() {
     node.attr('transform', function(d) {
         return 'translate(' + d.x + ',' + d.y + ')';
     })
-}
-
-function svgToPng() {
-    console.log('png');
-    saveSvgAsPng(d3.select('svg').node(), 'chart.png');
-}
-
-function svgToSvg() {
-    console.log('svg');
-    svgAsDataUri(d3.select('svg').node(), {}, function(uri) {
-        console.log('uri', uri);
-    });
 }

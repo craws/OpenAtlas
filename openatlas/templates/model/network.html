@@ -8,7 +8,10 @@
     {% if json_data %}
         <link rel="stylesheet" href="/static/css/network.css" />
         <script src="/static/vendor/d3-5.5.0/d3-5.5.0.min.js"></script>
-        <svg></svg>
+        <div style="float:right;">
+            <svg></svg>
+            <p><a class="button" onclick="saveSvgAsPng(d3.select('svg').node(), 'network.png')">{{ _('download')|uc_first }}</a></p>
+        </div>
         <script>
             var graph = {{ json_data|safe }};
             var width = {{ network_params['options']['width'] }};
@@ -18,7 +21,6 @@
         </script>
         <script src="/static/js/network.js"></script>
         <script src="/static/vendor/saveSvgAsPng-1.4.5/saveSvgAsPng.js"></script>
-        <a class="button" onclick="svgToPng()">Download</a>
     {% else %}
         <h2 style="float:right;">{{ _('no data to display')|uc_first }}</h2>
     {% endif %}
@@ -42,7 +44,7 @@
             {{ form.height }} {{ form.height.label }}<br />
             {{ form.charge }} {{ form.charge.label }}<br />
             {{ form.distance }} {{ form.distance.label }}<br />
-            <input id="save" name="save" value="{{_('apply')|uc_first}}" type="submit">
+            <input id="save" name="save" value="{{ _('apply')|uc_first }}" type="submit">
             <p><a href="https://redmine.openatlas.eu/projects/uni/wiki/Network_visualization" rel="noopener" target="_blank">{{ _('manual')|uc_first }}</a></p>
         </form>
     </div>
