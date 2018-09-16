@@ -28,17 +28,13 @@
             <h2>{{ _('classes')|uc_first }}</h2>
             <div>
                 <div style="float:left">
-                    {{ form.classes }}
-                </div>
-                <div style="float:left;margin-left:0.5em;">
-                    {% for class_code in available_classes %}
-                        {{ form['color_' + class_code] }}<br />
+                    {% for item in form.classes %}
+                        {{ form['color_' + item.data] }} {{ item }} {{ item.label }}<br />
                     {% endfor %}
                 </div>
             </div>
             <div style="clear:both;"></div>
-            ---<br />
-            {{ form.orphans }} {{ _('show orphans')|uc_first }}
+            <p>{{ form.orphans }} {{ _('show orphans')|uc_first }}</p>
             <h2>{{ _('links')|uc_first }}</h2>
             {{ form.properties }}
             <h2>{{ _('network options')|uc_first }}</h2>

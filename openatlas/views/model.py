@@ -173,10 +173,6 @@ class NetworkForm(Form):
 @app.route('/overview/network/', methods=["GET", "POST"])
 @required_group('readonly')
 def model_network():
-    available_classes = ['E21', 'E7', 'E31', 'E33', 'E40', 'E74', 'E53', 'E18', 'E8', 'E12', 'E6',
-                         'E84']
-    available_properties = ['P107',  'P24',  'P23',  'P11',  'P14',  'P7',  'P74',  'P67',  'OA7',
-                            'OA8',  'OA9']
     form = NetworkForm()
     form.classes.choices = []
     form.properties.choices = []
@@ -186,13 +182,13 @@ def model_network():
         'height': form.height.data,
         'charge': form.charge.data,
         'distance': form.distance.data}}
-    for code in available_classes:
+    for code in ['E21', 'E7', 'E31', 'E33', 'E40', 'E74', 'E53', 'E18', 'E8', 'E12', 'E6', 'E84']:
         form.classes.choices.append((code, g.classes[code].name))
         params['classes'][code] = {
             'active': (code in form.classes.data), 'color': getattr(form, 'color_' + code).data}
-    for code in available_properties:
+    for code in ['P107',  'P24',  'P23',  'P11',  'P14',  'P7',  'P74',  'P67',  'OA7', 'OA8',
+                 'OA9']:
         form.properties.choices.append((code, g.properties[code].name))
         params['properties'][code] = {'active': (code in form.properties.data)}
     data = Network.get_network_json(params)
-    return render_template('model/network.html', form=form, network_params=params, json_data=data,
-                           available_classes=available_classes)
+    return render_template('model/network.html', form=form, network_params=params, json_data=data)
