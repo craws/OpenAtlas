@@ -9,6 +9,7 @@ class Changelog:
         'date': 'TBA',
         'data': OrderedDict(
             feature=OrderedDict([
+                ('867', 'Network visualization advanced')
                 ]))}
     versions['3.8.0'] = {
         'date': '2018-08-26',
