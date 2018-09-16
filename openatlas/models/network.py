@@ -27,7 +27,7 @@ class Network:
                 WHERE property_code IN %(properties)s;"""
             g.cursor.execute(sql, {'properties': tuple(properties)})
             for row in g.cursor.fetchall():
-                if row.domain_id == row.range_id:
+                if row.domain_id == row.range_id:  # pragma no cover
                     continue  # Prevent circular dependencies
                 edges += "{'source': '" + str(row.domain_id)
                 edges += "', 'target': '" + str(row.range_id) + "' },"

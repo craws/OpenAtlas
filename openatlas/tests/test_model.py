@@ -37,7 +37,7 @@ class ModelTests(TestBaseCase):
                 LinkMapper.insert(source, 'P67', event)
                 LinkMapper.insert(actor, 'P67', prop_object)
             rv = self.app.get(url_for('model_network'))
-            assert b'Orphans' in rv.data
+            assert b'orphans' in rv.data
             data = {'orphans': True, 'width': 100, 'height': 40, 'distance': -666, 'charge': 500}
             rv = self.app.post(url_for('model_network'), data=data)
             assert b'666' in rv.data
