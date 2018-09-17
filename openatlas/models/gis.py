@@ -54,14 +54,14 @@ class GisMapper:
                     'type': 'Feature',
                     'geometry': json.loads(row.geojson),
                     'properties': {
-                        'title': row.object_name.replace('"', '\"'),
+                        'geometryId': row.id,
+                        'geometryType': row.type,
+                        'geometryName': row.name.replace('"', '\"'),
+                        'geometryDescription': description,
                         'objectId': row.object_id,
+                        'objectName': row.object_name.replace('"', '\"'),
                         'objectDescription': object_desc,
-                        'id': row.id,
-                        'name': row.name.replace('"', '\"'),
-                        'description': description,
                         'siteType': '',
-                        'shapeType': uc_first(row.type),
                         'count': row.point_count + row.polygon_count}}
                 if hasattr(row, 'types') and row.types:
                     nodes_list = ast.literal_eval('[' + row.types + ']')

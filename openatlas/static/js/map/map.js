@@ -72,21 +72,45 @@ map.addControl(geoSearchControl);
 
 function setObjectId(e) {
     layer = e.layer;
-    feature = layer.feature;
-    objectId = feature.properties.objectId;
-    geometryType = feature.geometry.type;
-    if (geometryType == 'Point') {
-        position = (e.latlng);
-    }
-    selectedGeometryId = feature.properties.id;
     editLayer = e.layer;
+    feature = layer.feature;
+    console.log(feature);
+    console.log(feature.properties.geometryType);
     editMarker = e.marker;
-    shapeName = feature.properties.name;
-    count = feature.properties.count;
-    shapeType = feature.properties.shapeType;
-    shapeDescription = feature.properties.description;
-    objectName = feature.properties.title;
+    //if (shapeType == 'point') {
+    //    position = (e.latlng);
+    //}
 }
+
+function buildPopup(feature, action='view', selected=False) {
+    console.log(action);
+    popupHtml = `
+        <div id="popup">
+            <strong>` + feature.properties.objectName + `</strong>
+            <br /><strong>` + feature.properties.geometryName + `</strong>
+            <div style="max-height:140px;overflow-y:auto">` + feature.properties.geometryDescription + `</div>
+            <i>` + feature.properties.geometryType + `</i>`
+    if (action == 'edit') {
+        popupHtml += '<p><i>' + translate['map_info_reedit'] + '</i></p>';
+    }
+    // Add detail link if not selected
+    if (!selected) {
+        popupHtml += '<p><a href="/place/view/' + feature.properties.objectId + '">' + translate['details'] + '</a></p>';
+    }
+    // Add edit and delete button if selected and in update mode
+    if (action == 'edit') {
+        popupHtml += `
+            <div id="buttonBar" style="white-space:nowrap;">
+                <p>
+                    <button id="editButton" onclick="editGeometry()"/>` + translate['edit'] + `</button>
+                    <button id="deleteButton" onclick="deleteGeometry()"/>` + translate['delete'] + `</button>
+                </p>
+            </div>`;
+    }
+    popupHtml += '</div>';
+    return popupHtml;
+}
+
 
 /**
  * Function to display a marker's popup on the map
@@ -95,13 +119,6 @@ function setObjectId(e) {
  */
 function setPopup(feature, layer, mode) {
     selected = false;
-    popupHtml = `
-        <div id="popup">
-            <strong>` + feature.properties.title + `</strong>
-            <br /><strong>` + feature.properties.name + `</strong>
-            <div style="max-height:140px; overflow-y: auto;">` + feature.properties.description + `</div>` +
-            feature.properties.shapeType;
-
     // Check if this feature is selected
     if (gisPointSelected) {
         for (pointSelected in gisPointSelected) {
@@ -110,21 +127,5 @@ function setPopup(feature, layer, mode) {
             }
         }
     }
-
-    // Add detail link if not selected
-    if (!selected) {
-        popupHtml += '<p><a href="/place/view/' + feature.properties.objectId + '">' + translate['details'] + '</a></p>';
-    }
-    // Add edit and delete button if selected and in update mode
-    if (map_update_mode && selected) {
-        popupHtml += `
-            <div id="buttonBar" style="white-space:nowrap;">
-                <p>
-                    <button id="editButton" onclick="editGeometry('` + feature.properties.shapeType + `', '` + feature.geometry.type + `')"/>` + translate['edit'] + `</button>
-                    <button id="deleteButton" onclick="deleteGeometry()"/>` + translate['delete'] + `</button>
-                </p>
-            </div>`;
-    }
-    popupHtml += '</div>'
-    layer.bindPopup(popupHtml);
+    layer.bindPopup(buildPopup(feature, 'view', selected));
 }
