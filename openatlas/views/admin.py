@@ -111,7 +111,7 @@ def admin_check_links(check=None):
 
 
 @app.route('/admin/file', methods=['POST', 'GET'])
-@required_group('admin')
+@required_group('manager')
 def admin_file():
     form = FileForm()
     if form.validate_on_submit():

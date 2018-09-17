@@ -4,7 +4,7 @@ import time
 
 from flask import g
 from flask_babel import lazy_gettext as _
-from wtforms import HiddenField, FloatField
+from wtforms import HiddenField, FloatField, SelectMultipleField
 from wtforms.validators import Optional
 from wtforms.widgets import HiddenInput
 

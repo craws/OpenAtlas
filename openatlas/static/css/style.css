@@ -21,6 +21,17 @@ input[type="text"].value-type {
     text-align: right;
 }
 
+input[type="text"].data-huebee {
+    width: 5em;
+    height: 1.1em;
+    font-size: 0.8em;
+    margin-top: 0.2em;
+}
+
+#network-form input[type="text"] {
+    width: 5em;
+}
+
 #global-search {
     text-transform: capitalize;
 }

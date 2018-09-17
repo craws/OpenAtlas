@@ -3,93 +3,49 @@
     {{ _('network')|uc_first }}
 {% endblock %}
 {% block content %}
-<link rel="stylesheet" href="/static/css/d3.css" />
-<script src="/static/vendor/d3/d3-3.5.17.min.js"></script>
-<svg style="float:left;"></svg>
-<div style="float:left;margin-left:2em;">
-    {{ form|display_form|safe }}
-    <p>
-        <a href="https://redmine.openatlas.eu/projects/uni/wiki/Network_visualization" rel="noopener" target="_blank">{{ _('manual')|uc_first }}</a>
-    </p>
-</div>
-<script>
-    function dragstarted(d) {
-        d3.event.sourceEvent.stopPropagation();
-        d3.select(this).classed("dragging", true);
-    }
-    function dragged(d) {
-        d3.select(this).attr("cx", d.x = d3.event.x).attr("cy", d.y = d3.event.y);
-    }
-    function dragended(d) {
-        d3.select(this).classed("dragging", false);
-    }
-    var drag, force, graph, height, l, links, n, nodes, svg, width, _i, _j, _len, _len2, _ref, _ref2;
-    width = {{ network_params['options']['width'] }};
-    height = {{ network_params['options']['height'] }};
-    var svg = d3.select('svg')
-        .attr('width', width)
-        .attr('height', height)
-        .call(d3.behavior.zoom().on("zoom", function () {
-            svg.attr("transform", "translate(" + d3.event.translate + ")" + " scale(" + d3.event.scale + ")")
-        })).append("g")
-    nodes = svg.selectAll('.node');
-    links = svg.selectAll('.link');
-    force = d3.layout.force()
-        .size([width, height])
-        .charge({{ network_params['options']['charge'] }})
-        .linkDistance({{ network_params['options']['distance'] }})
-        .on('tick', (function () {
-            nodes.attr('transform', function (d) {
-                return "translate(" + d.x + "," + d.y + ")";
-            });
-            return links.attr('x1', function (d) {
-                return d.source.x;
-            }).attr('y1', function (d) {
-                return d.source.y;
-            }).attr('x2', function (d) {
-                return d.target.x;
-            }).attr('y2', function (d) {
-                return d.target.y;
-            });
-        }));
-    var drag = force.drag()
-        .origin(function (d) {return d;})
-        .on("dragstart", dragstarted)
-        .on("drag", dragged)
-        .on("dragend", dragended);
-
-    {{ json_data|safe }}
-
-    _ref = graph.links;
-    for (_i = 0, _len = _ref.length; _i < _len; _i++) {
-        l = _ref[_i];
-        _ref2 = graph.nodes;
-        for (_j = 0, _len2 = _ref2.length; _j < _len2; _j++) {
-            n = _ref2[_j];
-            if (l.source === n.id) {
-                l.source = n;
-                continue;
-            }
-            if (l.target === n.id) {
-                l.target = n;
-                continue;
-            }
-        }
-    }
-    links = links.data(graph.links).enter().append('line').attr('class', 'link');
-    nodes = nodes.data(graph.nodes).enter().append('g').attr('class', 'node').call(drag);
-    nodes.append('circle')
-        .attr('r', 12).
-        style("fill", function (d) {
-            return d.color;
-        });
-    nodes.append("text")
-        .attr("x", 0)
-        .attr("y", 20)
-        .attr("dy", ".35em")
-        .text(function (d) {
-            return d.name;
-        });
-    force.nodes(graph.nodes).links(graph.links).start();
-</script>
+    <link rel="stylesheet" href="/static/vendor/huebee-2.0.0/huebee.min.css" />
+    <script src="/static/vendor/huebee-2.0.0/huebee.pkgd.min.js"></script>
+    {% if json_data %}
+        <link rel="stylesheet" href="/static/css/network.css" />
+        <script src="/static/vendor/d3-5.5.0/d3-5.5.0.min.js"></script>
+        <div style="float:right;">
+            <svg></svg>
+            <p><a class="button" onclick="saveSvgAsPng(d3.select('svg').node(), 'network.png')">{{ _('download')|uc_first }}</a></p>
+        </div>
+        <script>
+            var graph = {{ json_data|safe }};
+            var width = {{ network_params['options']['width'] }};
+            var height = {{ network_params['options']['height'] }};
+            var charge = {{ network_params['options']['charge'] }};
+            var distance = {{ network_params['options']['distance'] }}
+        </script>
+        <script src="/static/js/network.js"></script>
+        <script src="/static/vendor/saveSvgAsPng-1.4.5/saveSvgAsPng.js"></script>
+    {% else %}
+        <h2 style="float:right;">{{ _('no data to display')|uc_first }}</h2>
+    {% endif %}
+    <div style="float:left;">
+        <form method="post" id="network-form" style="margin-right:1em;">
+            {{ form.csrf_token }}
+            <h2>{{ _('classes')|uc_first }}</h2>
+            <div>
+                <div style="float:left">
+                    {% for item in form.classes %}
+                        {{ form['color_' + item.data] }} {{ item }} {{ item.label }}<br />
+                    {% endfor %}
+                </div>
+            </div>
+            <div style="clear:both;"></div>
+            <p>{{ form.orphans }} {{ _('show orphans')|uc_first }}</p>
+            <h2>{{ _('links')|uc_first }}</h2>
+            {{ form.properties }}
+            <h2>{{ _('network options')|uc_first }}</h2>
+            {{ form.width }} {{ form.width.label }}<br />
+            {{ form.height }} {{ form.height.label }}<br />
+            {{ form.charge }} {{ form.charge.label }}<br />
+            {{ form.distance }} {{ form.distance.label }}<br />
+            <input id="save" name="save" value="{{ _('apply')|uc_first }}" type="submit">
+            <p><a href="https://redmine.openatlas.eu/projects/uni/wiki/Network_visualization" rel="noopener" target="_blank">{{ _('manual')|uc_first }}</a></p>
+        </form>
+    </div>
 {% endblock %}

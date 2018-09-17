@@ -4,18 +4,19 @@ svg {
     background-color: white;
 }
 
-svg .node circle {
+svg .nodes circle {
     cursor: pointer;
+    stroke-width: 1.5px;
 }
 
-svg .node > text {
+svg .nodes > text {
     pointer-events: none;
     font-family: sans-serif;
     text-anchor: middle;
 }
 
-svg .link {
-    stroke-width: 2px;
-    stroke: lightgrey;
+svg .links line {
+    stroke-width: 0.5px;
+    stroke: #999999;
+    stroke-opacity: 0.6;
 }
-
