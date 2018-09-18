@@ -3,7 +3,7 @@ var objectName; // Name of the entry at update of an existing entry
 // Variables for a selected shape
 var shapeName;
 var shapeDescription;
-var shapeType; // centerpoint, shape or area
+var geometryType; // centerpoint, shape or area
 
 var captureCoordinates = false; // boolean if clicks on map should be captured as coordinates
 var marker = false; // temporary marker for point coordinate
@@ -60,44 +60,42 @@ var pointButton = new L.Control.EasyButtons({
     intentedIcon: 'fa-map-marker',
     title: translate['map_info_point']
 })
-pointButton.intendedFunction = function () {drawGeometry('point');}
+pointButton.intendedFunction = function () {drawGeometry('centerpoint');}
 map.addControl(pointButton);
 
 /* Input form */
 var inputForm = L.control();
 inputForm.onAdd = function (map) {
-    div = L.DomUtil.create('div', 'shapeInput');
-    div.innerHTML += `
-        <div id="insertForm" style="display:block">
-            <form id="shapeForm" onmouseover="interactionOff()" onmouseout="interactionOn()">
-                <input type="hidden" id="shapeParent" value="NULL" />
-                <input type="hidden" id="shapeCoordinates" />
-                <span id="inputFormTitle"></span>
-                <span id="closeButton" title="` + translate["map_info_close"] + `" onclick="closeForm()" class="fa">X</span>
-                <p id="inputFormInfo"></p>
-                <div id="nameField" style="display: block">
-                    <input type="text" id="shapeName" placeholder="Enter a name if desired" />
+    div = L.DomUtil.create('div', 'mapFormDiv');
+    div.innerHTML = `
+        <form id="geometryForm" onmouseover="interactionOff()" onmouseout="interactionOn()">
+            <input type="hidden" id="shapeParent" value="NULL" />
+            <input type="hidden" id="shapeCoordinates" />
+            <span id="inputFormTitle"></span>
+            <span id="closeButton" title="` + translate["map_info_close"] + `" onclick="closeForm()" class="fa">X</span>
+            <p id="inputFormInfo"></p>
+            <div id="nameField" style="display: block">
+                <input type="text" id="shapeName" placeholder="Enter a name if desired" />
+            </div>
+            <textarea rows="3" cols="70" id="shapeDescription" placeholder="` + translate["map_info_description"] + `"/></textarea>
+            <div id="coordinatesDiv">
+                <div style="display:block;clear:both;">
+                    <label for='easting'>Easting</label>
+                    <input type="text" style="margin-top:0.5em;" oninput="check_coordinates_input()" id="easting" placeholder="decimal degrees" />
                 </div>
-                <textarea rows="3" cols="70" id="shapeDescription" placeholder="` + translate["map_info_description"] + `"/></textarea>
-                <div id="coordinatesDiv">
-                    <div style="display:block;clear:both;">
-                        <label for='easting'>Easting</label>
-                        <input type="text" style="margin-top:0.5em;" oninput="check_coordinates_input()" id="easting" placeholder="decimal degrees" />
-                    </div>
-                    <div style="display:block;clear:both;">
-                        <label for='northing'>Northing</label>
-                        <input type="text" style="margin-top:0.5em;" oninput="check_coordinates_input()" id="northing" placeholder="decimal degrees" />
-                    </div>
+                <div style="display:block;clear:both;">
+                    <label for='northing'>Northing</label>
+                    <input type="text" style="margin-top:0.5em;" oninput="check_coordinates_input()" id="northing" placeholder="decimal degrees" />
                 </div>
-                <input type="button" title="Reset values and shape" id="resetButton" disabled value="` + translate["map_clear"] + `" onclick="resetForm()" />
-                <input type="button" title="` + translate["save"] + `" id="saveButton" disabled value="` + translate["save"] + `" onclick="saveForm()" />
-            </form>
-         </div>`;
+            </div>
+            <input type="button" title="Reset values and shape" id="resetButton" disabled value="` + translate["map_clear"] + `" onclick="resetForm()" />
+            <input type="button" title="` + translate["save"] + `" id="saveButton" disabled value="` + translate["save"] + `" onclick="saveForm()" />
+        </form>`;
     return div;
 };
 
 map.on('click', function(e) {
-    if (captureCoordinates && shapeType == 'point') {
+    if (captureCoordinates && geometryType == 'centerpoint') {
         $('#saveButton').prop('disabled', false);
         if (marker) {  // marker already exists so move it
             marker.setLatLng(e.latlng);
@@ -129,7 +127,7 @@ map.on('click', function(e) {
 map.on('draw:created', function (e) {
     drawnPolygon.addLayer(e.layer);
     layer = e.layer;
-    if (shapeType == 'point') {
+    if (geometryType == 'centerpoint') {
         coordinates = layer.getLatLng();
         shapeSyntax = 'ST_GeomFromText(\'POINT(' + (' ' + coordinates.lng + ' ' + coordinates.lat) + ')\',4326);'
     } else {  // It's a polygon
@@ -154,7 +152,7 @@ function closeForm(withoutSave = true) {
     $('.leaflet-right .leaflet-bar').show();
     interactionOn();
     $('#map').css('cursor', '');
-    if (shapeType != 'point' && withoutSave) {
+    if (geometryType != 'centerpoint' && withoutSave) {
         drawnPolygon.removeLayer(layer);
         drawLayer.disable();
     }
@@ -165,10 +163,9 @@ function closeForm(withoutSave = true) {
 }
 
 function drawGeometry(selectedType) {
-    console.log('why');
-    shapeType = selectedType;
+    geometryType = selectedType;
     map.addControl(inputForm);
-    if (shapeType == 'point') {
+    if (selectedType == 'centerpoint') {
         $('#resetButton').hide();
         $('#coordinatesDiv').show();
     } else {
@@ -178,8 +175,8 @@ function drawGeometry(selectedType) {
         drawLayer.enable();
         $('#coordinatesDiv').hide();
     }
-    $('#inputFormTitle').text(shapeType.substr(0,1).toUpperCase() + shapeType.substr(1));
-    $('#inputFormInfo').text(translate['map_info_' + shapeType]);
+    $('#inputFormTitle').text(selectedType.substr(0,1).toUpperCase() + selectedType.substr(1));
+    $('#inputFormInfo').text(translate['map_info_' + selectedType]);
     $('.leaflet-right .leaflet-bar').hide();
 }
 
@@ -234,7 +231,7 @@ function saveForm() {
 }
 
 function saveEditedGeometry() {
-    shapeType = $('#shapeType').val();
+    geometryType = $('#geometryType').val();
     shapeCoordinates = $('#shapeCoordinates').val();
     /*if (geometrytype == 'Polygon') {
         var myeditedlayer = L.polygon(mylayer.getLatLngs()).addTo(map);
@@ -243,7 +240,7 @@ function saveEditedGeometry() {
     }*/
 
     newLayer.bindPopup(buildPopup());
-    if (shapeType == 'centerpoint') {
+    if (geometryType == 'centerpoint') {
         points = JSON.parse($('#gis_points').val());
         // Remove former point
         $.each(points, function (key, value) {
@@ -256,7 +253,7 @@ function saveEditedGeometry() {
         point =
             `{"type": "Feature","geometry":` +
             `{"type": "Point","coordinates": [` + $('#easting').val() + `,` + $('#northing').val() + `]},` +
-            `"properties":{"name": "` + name + `","description": "` + description + `", "shapeType": "centerpoint"}}`;
+            `"properties":{"name": "` + name + `","description": "` + description + `", "geometryType": "centerpoint"}}`;
         points.push(JSON.parse(point));
         $('#gis_points').val(JSON.stringify(points));
     }
@@ -278,7 +275,7 @@ function saveEditedGeometry() {
             coordinates = JSON.stringify(old_coordinates);
         }
         var polygon = '{"type":"Feature","geometry":{"type":"Polygon","coordinates":' + coordinates + '},"properties":';
-        polygon += '{"name": "' + $('#shapename').val().replace(/\"/g,'\\"') + '","description": "' + $('#shapedescription').val().replace(/\"/g,'\\"') + '", "shapeType": "' + shapetype + '"}}';
+        polygon += '{"name": "' + $('#shapename').val().replace(/\"/g,'\\"') + '","description": "' + $('#shapedescription').val().replace(/\"/g,'\\"') + '", "geometryType": "' + geometryType + '"}}';
         var polygons = JSON.parse($('#gis_polygons').val());
         polygons.push(JSON.parse(polygon));
         $('#gis_polygons').val(JSON.stringify(polygons));
@@ -287,27 +284,27 @@ function saveEditedGeometry() {
 }
 
 function saveNewGeometry() {
-    if (shapeType == 'point') {
+    if (geometryType == 'centerpoint') {
         point =
             `{"type": "Feature","geometry":` +
             `{"type": "Point","coordinates": [` + $('#easting').val() + `,` + $('#northing').val() + `]},` +
-            `"properties":{"name": "` + name + `","description": "` + description + `", "shapeType": "centerpoint"}}`;
+            `"properties":{"name": "` + name + `","description": "` + description + `", "geometryType": "centerpoint"}}`;
         points = JSON.parse($('#gis_points').val());
         points.push(JSON.parse(point));
         $('#gis_points').val(JSON.stringify(points));
         var newMarker = L.marker(([$('#northing').val(), $('#easting').val()]), {icon: newIcon}).addTo(map);
-        newMarker.bindPopup(buildPopup());
+        newMarker.bindPopup(buildPopup(point));
         marker = false;  // unset the marker
     } else {
         coordinates = $('#shapeCoordinates').val();
         polygon =
             `{"type":"Feature","geometry":` +
             `{"type":"Polygon","coordinates":[[` + geoJsonArray.join(',') + `]]},"properties":` +
-            `{"name": "` + name + `","description": "` + description + `", "shapeType": "` + shapeType + `"}}`;
+            `{"name": "` + name + `","description": "` + description + `", "geometryType": "` + geometryType + `"}}`;
         polygons = JSON.parse($('#gis_polygons').val());
         polygons.push(JSON.parse(polygon));
         $('#gis_polygons').val(JSON.stringify(polygons));
-        layer.bindPopup(popupHtml);
+        layer.bindPopup(buildPopup());
         layer.addTo(map);
     }
     closeForm(false);
@@ -317,7 +314,7 @@ function deleteGeometry() {
     // Remove layer of geometry, remove geometry from form field value
     if (typeof(editLayer) == 'object') { map.removeLayer(editLayer); }
     if (typeof(editMarker) == 'object') { map.removeLayer(editMarker); }
-    if (shapeType == 'point') {
+    if (geometryType == 'centerpoint') {
         points = JSON.parse($('#gis_points').val());
         $.each(points, function (key, value) {
             if (value.properties.id == selectedGeometryId) {
@@ -339,7 +336,6 @@ function deleteGeometry() {
 }
 
 function editGeometry() {
-    console.log(feature.properties.geometryType);
     map.closePopup();
     map.addControl(inputForm);
     $('#inputFormTitle').text(feature.properties.geometryType.substr(0,1).toUpperCase() + feature.properties.geometryType.substr(1));
@@ -375,7 +371,7 @@ function editGeometry() {
         newLayer.bindPopup(
             '<div id="popup"><strong>' + objectName + '</strong><br/>' +
             '<div id="popup"><strong>' + shapename + '</strong><br/>' +
-            '<i>' + shapetype + '</i><br/><br/>' +
+            '<i>' + geometryType + '</i><br/><br/>' +
             '<div style="max-height:140px; overflow-y: auto">' + shapedescription + '</div>'
             );
         map.removeLayer(editLayer);
@@ -386,7 +382,7 @@ function editGeometry() {
         originLayer.bindPopup(
             '<div id="popup"><strong>' + objectName + '</strong><br/>' +
             '<div id="popup"><strong>' + shapename + '</strong><br/>' +
-            '<i>' + shapetype + '</i><br/><br/>' +
+            '<i>' + geometryType + '</i><br/><br/>' +
             '<div style="max-height:140px; overflow-y: auto">' + shapedescription + '</div>' +
             '<button onclick="editshape()"/>' + translate['edit'] + '</button> <button onclick="deleteshape()"/>' + translate['delete'] + '</button></div>'
             );

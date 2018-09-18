@@ -57,7 +57,6 @@ if (window.location.href.indexOf('update') >= 0) {
 map.addLayer(pointLayer);
 map.fitBounds(pointLayer.getBounds(), {maxZoom: 12});
 L.control.layers(baseMaps, controls).addTo(map);
-
 baseMaps.Landscape.addTo(map);
 
 // Geoname search control init and add to map
@@ -82,7 +81,8 @@ function setObjectId(e) {
     //}
 }
 
-function buildPopup(feature, action='view', selected=False) {
+function buildPopup(feature, action='view', selected=false) {
+    console.log(feature)
     console.log(action);
     popupHtml = `
         <div id="popup">
