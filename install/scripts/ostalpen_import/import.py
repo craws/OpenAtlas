@@ -14,21 +14,23 @@ sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 """
 To do:
 
-- missing archeological types
+files
+rights
 
 Types:
-- add translated arch types
+- missing archeological types
 - Material E019 to type material
+- temporal and cultural types
+
 - Right E030 to type licence
-- Measurement units E058 to value type
 
-e031 - check system type (not existing)
-
-Places:
-- links to sources
-- other links
+ostalpen - dpp
+Public Domain = Public domain
+Copyright protected = Bildzitat
+else = CC BY-SA
 
 Clean up:
+- Stefan add the 2 licenses for the cc by licences
 - if subunit has same gis as above delete gis of subunit
 - links between subunits have sometimes description texts which are not visible in new system (e.g. postion of find)
 - check CIDOC valid
