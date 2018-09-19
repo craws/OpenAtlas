@@ -43,6 +43,10 @@
     {% endif %}
     {% if tables['entities'].data %}
         <div id="tab-entities">
+            <div class="button-bar">
+                <a class="button" href="{{ url_for('node_move_entities', id_=node.id) }}">{{ _('move entities')|uc_first }}</a>
+                <a class="button" href="{{ url_for('node_remove_entities', id_=node.id) }}">{{ _('remove entities')|uc_first }}</a>
+            </div>
             {{ tables['entities']|pager|safe }}
         </div>
     {% endif %}
