@@ -293,7 +293,8 @@ function saveNewGeometry() {
         points.push(JSON.parse(point));
         $('#gis_points').val(JSON.stringify(points));
         var newMarker = L.marker(([$('#northing').val(), $('#easting').val()]), {icon: newIcon}).addTo(map);
-        newMarker.bindPopup(buildPopup(point));
+        console.log(point)
+        newMarker.bindPopup(buildPopup(JSON.parse(point)));
         marker = false;  // unset the marker
     } else {
         coordinates = $('#shapeCoordinates').val();
@@ -343,6 +344,7 @@ function editGeometry() {
     $('#shapeName').val(feature.properties.geometryName);
     $('#shapeDescription').val(feature.properties.geometryDescription);
     $('.leaflet-right .leaflet-bar').hide();
+    console.log(feature.properties.geometryType);
     if (feature.properties.geometryType == 'centerpoint') {
         $('#resetButton').hide();
         newLayer = L.marker(editLayer.getLatLng(), {draggable: true, icon: editIcon}).addTo(map);
@@ -357,6 +359,7 @@ function editGeometry() {
             $('#easting').val(position.lng);
             $('#saveButton').prop('disabled', false);
         });
+
         // editLayer.remove(editMarker);
     } else {
         $('#coordinatesDiv').hide();

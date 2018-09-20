@@ -96,6 +96,7 @@ class GisMapper:
             if not data:
                 continue
             for item in json.loads(data):
+                print(item)
                 # Don't save geom if coordinates are empty
                 if not item['geometry']['coordinates'] or item['geometry']['coordinates'] == [[]]:
                     continue  # pragma: no cover
@@ -112,7 +113,7 @@ class GisMapper:
                     'entity_id': entity.id,
                     'name': item['properties']['name'],
                     'description': item['properties']['description'],
-                    'type': item['properties']['shapeType'],
+                    'type': item['properties']['geometryType'],
                     'geojson': json.dumps(item['geometry'])})
 
     @staticmethod

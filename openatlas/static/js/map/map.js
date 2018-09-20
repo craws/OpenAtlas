@@ -73,8 +73,8 @@ function setObjectId(e) {
     layer = e.layer;
     editLayer = e.layer;
     feature = layer.feature;
-    console.log(feature);
-    console.log(feature.properties.geometryType);
+    //console.log(feature);
+    //console.log(feature.properties.geometryType);
     editMarker = e.marker;
     //if (shapeType == 'point') {
     //    position = (e.latlng);
@@ -83,22 +83,24 @@ function setObjectId(e) {
 
 function buildPopup(feature, action='view', selected=false) {
     console.log(feature)
-    console.log(action);
+    console.log(typeof(feature))
+    //console.log(action);
+    console.log(selected)
+    popupHtml = '<div id="popup">'
+    if (feature.properties.objectName) {
+        popupHtml += '<strong>' + feature.properties.objectName + '</strong><br />';
+    }
     popupHtml = `
-        <div id="popup">
-            <strong>` + feature.properties.objectName + `</strong>
-            <br /><strong>` + feature.properties.geometryName + `</strong>
+            <strong>` + feature.properties.geometryName + `</strong>
             <div style="max-height:140px;overflow-y:auto">` + feature.properties.geometryDescription + `</div>
             <i>` + feature.properties.geometryType + `</i>`
     if (action == 'edit') {
         popupHtml += '<p><i>' + translate['map_info_reedit'] + '</i></p>';
     }
-    // Add detail link if not selected
+    // Add detail link if not selected, add edit/delete button if selected and in update mode
     if (!selected) {
         popupHtml += '<p><a href="/place/view/' + feature.properties.objectId + '">' + translate['details'] + '</a></p>';
-    }
-    // Add edit and delete button if selected and in update mode
-    if (action == 'edit') {
+    } else if (window.location.href.indexOf('update') >= 0) {
         popupHtml += `
             <div id="buttonBar" style="white-space:nowrap;">
                 <p>
