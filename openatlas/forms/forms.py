@@ -248,7 +248,7 @@ class TableField(HiddenField):
 
 
 class TableMultiSelect(HiddenInput):
-    """ Table with checkboxes used in forms."""
+    """ Table with checkboxes used in a popup for forms."""
 
     def __call__(self, field, **kwargs):
         if field.data and isinstance(field.data, str):

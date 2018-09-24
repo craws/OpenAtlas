@@ -13,11 +13,12 @@
         {% if tables['subs'].data %}
             <li><a href="#tab-subs">{{ _('subs')|uc_first }} ({{ tables['subs']['data']|length|format_number|format_number }})</a></li>
         {% endif %}
-        {% if tables['entities'].data %}
-            <li><a href="#tab-entities">{{ _('entities')|uc_first }} ({{ tables['entities']['data']|length|format_number }})</a></li>
-        {% endif %}
-        {% if tables['link_entities'].data %}
-            <li><a href="#tab-link-entities">{{ _('entities')|uc_first }} ({{ tables['link_entities']['data']|length|format_number|format_number }})</a></li>
+        {% if tables['entities'].data or tables['link_entities'].data %}
+            <li>
+                <a href="#tab-entities">
+                    {{ _('entities')|uc_first }} ({{ (tables['entities']['data']|length + tables['link_entities']['data']|length)|format_number }})
+                </a>
+            </li>
         {% endif %}
     </ul>
     <div id="tab-info">
@@ -41,17 +42,13 @@
             {{ tables['subs']|pager|safe }}
         </div>
     {% endif %}
-    {% if tables['entities'].data %}
+    {% if tables['entities'].data or tables['link_entities'].data %}
         <div id="tab-entities">
             <div class="button-bar">
                 <a class="button" href="{{ url_for('node_move_entities', id_=node.id) }}">{{ _('move entities')|uc_first }}</a>
                 <a class="button" href="{{ url_for('node_remove_entities', id_=node.id) }}">{{ _('remove entities')|uc_first }}</a>
             </div>
             {{ tables['entities']|pager|safe }}
-        </div>
-    {% endif %}
-    {% if tables['link_entities'].data %}
-        <div id="tab-link-entities">
             {{ tables['link_entities']|pager|safe }}
         </div>
     {% endif %}
