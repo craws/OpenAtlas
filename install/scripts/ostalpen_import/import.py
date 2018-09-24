@@ -15,8 +15,6 @@ sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 """
 To do:
 
-- rights E030?
-
 Types:
 - missing types
 - Material E019 to type material
