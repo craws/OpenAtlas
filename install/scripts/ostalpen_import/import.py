@@ -6,7 +6,8 @@ import time
 
 import numpy
 import psycopg2.extras
-from functions.scripts import connect, prepare_databases, reset_database, datetime64_to_timestamp
+from functions.scripts import (connect, prepare_databases, reset_database, datetime64_to_timestamp,
+    import_files, add_licences)
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
@@ -14,25 +15,18 @@ sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 """
 To do:
 
-- missing archeological types
+- rights E030?
 
 Types:
-- add translated arch types
+- missing types
 - Material E019 to type material
-- Right E030 to type licence
-- Measurement units E058 to value type
-
-e031 - check system type (not existing)
-
-Places:
-- links to sources
-- other links
+- temporal and cultural types
 
 Clean up:
+- Stefan add the 2 licenses for the cc by licences
 - if subunit has same gis as above delete gis of subunit
 - links between subunits have sometimes description texts which are not visible in new system (e.g. postion of find)
 - check CIDOC valid
-
 """
 
 dict_units = {
@@ -57,7 +51,7 @@ connection_ostalpen = connect('ostalpen')
 cursor_dpp = connection_dpp.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
 cursor_ostalpen = connection_ostalpen.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
 
-prepare_databases(cursor_dpp, cursor_ostalpen)
+prepare_databases(cursor_dpp)
 
 
 def link(property_code, domain_id, range_id, description=None):
@@ -377,16 +371,16 @@ for e in entities:
             e.system_type = 'bibliography'
         elif e.entity_type in [11232, 11179, 11180]:  # File (map, photo, drawing)
             if '.' not in e.name:
-                continue  # there are two bogus files which are skipped
+                continue  # There are two bogus files which are skipped
             e.system_type = 'file'
-        elif e.entity_type == 12:  # these 23 have to be checked manually
+        elif e.entity_type == 12:  # These 23 have to be checked manually
             continue
         else:
             print('missing id for E031 type:' + str(e.entity_type))
             continue
         count['E31 document'] += 1
-    elif e.class_code in ['E018', 'E053', 'E055', 'E052', 'E004', 'E058']:
-        continue  # place will be added later in script
+    elif e.class_code in ['E018', 'E053', 'E055', 'E052', 'E004', 'E058', 'E030']:
+        continue  # Places and other stuff will be added later in script
     else:
         missing_classes[e.class_code] = e.class_code
         continue
@@ -627,6 +621,8 @@ for e in finds:
 
 print('Links')
 missing_properties = set()
+invalid_type_links = set()
+missing_dpp_types = set()
 sql_ = """
     SELECT links_uid, links_entity_uid_from, links_cidoc_number_direction, links_entity_uid_to,
         links_annotation, links_creator, links_timestamp_start, links_timestamp_end,
@@ -668,7 +664,7 @@ for row in cursor_ostalpen.fetchall():
         if row.links_entity_uid_to in ostalpen_place_types:
             continue  # archeological types done with links are invalid
         if row.links_entity_uid_to not in ostalpen_types:
-            print('Invalid type link to : ' + str(row.links_entity_uid_to))
+            invalid_type_links.add(row.links_entity_uid_to)
             continue
         type_name = ostalpen_types[row.links_entity_uid_to]
         if row.links_entity_uid_to in ostalpen_types_double:
@@ -678,7 +674,7 @@ for row in cursor_ostalpen.fetchall():
             print('Use of DPP double type: ' + type_name)
             continue
         if type_name not in types:
-            print('Missing DPP type: ' + type_name)
+            missing_dpp_types.add(type_name)
             continue
         if row.links_entity_uid_from not in new_entities:
             print('Missing entity for type with Ostalpen ID: ' + str(row.links_entity_uid_from))
@@ -688,6 +684,10 @@ for row in cursor_ostalpen.fetchall():
     else:
         missing_properties.add(row.links_cidoc_number_direction)
 
+# Files
+add_licences(cursor_dpp, cursor_ostalpen)
+import_files(cursor_dpp)
+
 for name, count in count.items():
     print(str(name) + ': ' + str(count))
 
@@ -696,6 +696,10 @@ print('Missing property ids:')
 print(missing_properties)
 print('Missing place types:')
 print(missing_ostalpen_place_types)
+print('Invalid type links:')
+print(invalid_type_links)
+print('Missing DPP types:')
+print(missing_dpp_types)
 connection_dpp.close()
 connection_ostalpen.close()
 print('Execution time: ' + str(round((time.time()-start)/60, 2)) + ' minutes')
