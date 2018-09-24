@@ -9,9 +9,4 @@ WHERE property_code = 'OA8' AND language_code = 'en' AND attribute = 'comment';
 Update model.property_i18n SET text = 'OA9 is used to link the end of a persistent item''s (E77) life span (or time of usage) with a certain place. E.g to document a person''s place of death. E77 Persistent Item linked with a E53 Place: E77 (Persistent Item) - P93i (was taken out of existence by) - E64 (End of Existence) - P7 (took place at) - E53 (Place) Example: [Albert Einstein (E21)] was taken out of by [Death of Albert Einstein (E12)] took place at [Princeton (E53)]'
 WHERE property_code = 'OA9' AND language_code = 'en' AND attribute = 'comment';
 
--- Add origin_id for imports
-ALTER TABLE model.entity ADD COLUMN origin_id text;
-COMMENT ON COLUMN model.entity.origin_id IS 'Can be used for e.g. imports from other projects like projectname_tablename_1234';
-ALTER TABLE ONLY model.entity ADD CONSTRAINT entity_origin_id_key UNIQUE (origin_id);
-
 COMMIT;
