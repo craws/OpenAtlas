@@ -5,11 +5,12 @@ from flask import abort, flash, g, render_template, request, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import HiddenField, StringField, SubmitField, TextAreaField
+from wtforms import (HiddenField, SelectMultipleField, StringField, SubmitField, TextAreaField,
+                     widgets)
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import build_node_form, TableMultiField
+from openatlas.forms.forms import build_move_form, build_node_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.node import NodeMapper
 from openatlas.util.util import link, required_group, sanitize, truncate_string
@@ -126,7 +127,11 @@ def node_delete(id_):
 
 
 class MoveForm(Form):
-    entity = TableMultiField(_('entity'), [InputRequired()])
+    selection = SelectMultipleField(
+        '',
+        option_widget=widgets.CheckboxInput(),
+        widget=widgets.ListWidget(prefix_label=False),
+        default=['E21', 'E7', 'E40', 'E74', 'E8', 'E12', 'E6'])
     save = SubmitField(_('move'))
 
 
@@ -135,28 +140,20 @@ class MoveForm(Form):
 def node_move_entities(id_):
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]]
-    form = MoveForm()
+    form = build_move_form(MoveForm, node)
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
-        # NodeMapper.move_entities(node.id, request.form[root.name], request.form.getlist("entities"))
+        NodeMapper.move_entities(node.id, request.form[root.name], request.form.getlist("entities"))
         g.cursor.execute('COMMIT')
-        flash('Entity updated', 'success')
+        flash('Entities where updated', 'success')
         return redirect(url_for('node_index') + '#tab-' + str(root.id))
 
-    # property_name = 'is located at' if node.class_.name == 'place' else 'has type'
-    property_code = 'P2'
-    table = {'id': 'node', 'header': ['', 'name', 'info'], 'data': []}
-    for entity in node.get_linked_entities(property_code, True):
-        table['data'].append([
-            '<input id="' + str(entity.id) + '" value="' + str(entity.id) +
-            '" class="multi-table-select" name="entities" type="checkbox" />',
-            link(entity)])
     return render_template('types/move.html', node=node, root=root, form=form)
 
 
 @app.route('/types/remove/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
-def node_remove_entities(id_):
+def node_remove_entities():
     return render_template('types/remove.html')
 
 

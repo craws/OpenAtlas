@@ -1,10 +1,10 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
-import time
 
+import time
 from flask import g
 from flask_babel import lazy_gettext as _
-from wtforms import HiddenField, FloatField, SelectMultipleField
+from wtforms import FloatField, HiddenField
 from wtforms.validators import Optional
 from wtforms.widgets import HiddenInput
 
@@ -62,6 +62,23 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
         for root_id, nodes in node_data.items():
             if hasattr(form_instance, str(root_id)):
                 getattr(form_instance, str(root_id)).data = nodes
+    return form_instance
+
+
+def build_move_form(form, node):
+    root = g.nodes[node.root[-1]]
+    setattr(form, str(root.id), TreeField(str(root.id)))
+    form_instance = form(obj=node)
+    choices = []
+    table = {'id': 'node_move', 'header': ['', 'name', 'info'], 'data': []}
+    for entity in node.get_linked_entities('P2', True):
+        choices.append((entity.id, entity.name))
+        table['data'].append([
+            '<input id="' + str(entity.id) + '" value="' + str(entity.id) +
+            '" class="multi-table-select" name="entities" type="checkbox" />',
+            entity.name,
+            truncate_string(entity.description)])
+    form_instance.selection.choices = choices
     return form_instance
 
 

@@ -219,3 +219,14 @@ class NodeMapper(EntityMapper):
             if node.root and node.count < 1 and not node.subs:
                 nodes.append(node)
         return nodes
+
+    @staticmethod
+    def move_entities(old_type_id, new_type_id, entity_ids):
+        sql = """
+            UPDATE model.link SET range_id = %(new_type_id)s
+            WHERE range_id = %(old_type_id)s AND domain_id IN (%(entity_ids)s);"""
+        params = {
+            'old_type_id': old_type_id,
+            'new_type_id': new_type_id,
+            'entity_ids': list(map(int, entity_ids))}
+        g.cursor.execute(sql, params)
