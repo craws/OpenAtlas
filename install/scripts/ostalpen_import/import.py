@@ -22,6 +22,8 @@ To do:
 - Material E019 to type material
 - Temporal and cultural types
 
+-- Missing files from backup
+
 Finishing:
 
 - Stefan: add 2 licenses for the cc by licences
