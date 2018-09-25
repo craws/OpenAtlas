@@ -15,16 +15,20 @@ sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 """
 To do:
 
-Types:
-- missing types
-- Material E019 to type material
-- temporal and cultural types
+- Missing classes
+- Missing properties (links)
+- Missing types
 
-Clean up:
-- Stefan add the 2 licenses for the cc by licences
-- if subunit has same gis as above delete gis of subunit
-- links between subunits have sometimes description texts which are not visible in new system (e.g. postion of find)
-- check CIDOC valid
+- Material E019 to type material
+- Temporal and cultural types
+
+Finishing:
+
+- Stefan: add 2 licenses for the cc by licences
+- If subunit has same gis as above delete gis of subunit
+- Links between subunits have sometimes description texts which are not visible in new system (e.g. position of find)
+- CIDOC valid check
+
 """
 
 dict_units = {
