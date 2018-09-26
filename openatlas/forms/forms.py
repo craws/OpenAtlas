@@ -11,8 +11,9 @@ from wtforms.widgets import HiddenInput
 from openatlas import app
 from openatlas.forms.date import DateForm
 from openatlas.models.entity import EntityMapper
+from openatlas.models.linkProperty import LinkPropertyMapper
 from openatlas.models.node import NodeMapper
-from openatlas.util.util import get_base_table_data, pager, truncate_string, uc_first
+from openatlas.util.util import get_base_table_data, pager, truncate_string, uc_first, link
 
 
 def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
@@ -69,15 +70,25 @@ def build_move_form(form, node):
     root = g.nodes[node.root[-1]]
     setattr(form, str(root.id), TreeField(str(root.id)))
     form_instance = form(obj=node)
+
+    # Delete custom fields except the ones specified for the form
+    delete_list = []  # Can't delete fields in the loop so creating a list for later deletion
+    for field in form_instance:
+        if isinstance(field, TreeField) and int(field.id) != root.id:
+            delete_list.append(field.id)
+    for item in delete_list:
+        delattr(form_instance, item)
     choices = []
-    table = {'id': 'node_move', 'header': ['', 'name', 'info'], 'data': []}
-    for entity in node.get_linked_entities('P2', True):
-        choices.append((entity.id, entity.name))
-        table['data'].append([
-            '<input id="' + str(entity.id) + '" value="' + str(entity.id) +
-            '" class="multi-table-select" name="entities" type="checkbox" />',
-            entity.name,
-            truncate_string(entity.description)])
+    if root.name in app.config['PROPERTY_TYPES']:
+        for row in LinkPropertyMapper.get_entities_by_node(node):
+            domain = EntityMapper.get_by_id(row.domain_id)
+            range_ = EntityMapper.get_by_id(row.range_id)
+            choices.append((row.id, domain.name + ' - ' + range_.name))
+    else:
+        for entity in node.get_linked_entities('P2', True):
+            choices.append((entity.id, entity.name))
+    print(root.name)
+
     form_instance.selection.choices = choices
     return form_instance
 

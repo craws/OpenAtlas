@@ -1,4 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+import ast
 from collections import OrderedDict
 
 from flask import abort, flash, g, render_template, request, url_for
@@ -129,6 +130,8 @@ def node_delete(id_):
 class MoveForm(Form):
     selection = SelectMultipleField(
         '',
+        [InputRequired()],
+        coerce=int,
         option_widget=widgets.CheckboxInput(),
         widget=widgets.ListWidget(prefix_label=False),
         default=['E21', 'E7', 'E40', 'E74', 'E8', 'E12', 'E6'])
@@ -143,11 +146,11 @@ def node_move_entities(id_):
     form = build_move_form(MoveForm, node)
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
-        NodeMapper.move_entities(node.id, request.form[root.name], request.form.getlist("entities"))
+        NodeMapper.move_entities(
+            node.id, getattr(form, str(root.id)).data, form.selection.data)
         g.cursor.execute('COMMIT')
         flash('Entities where updated', 'success')
         return redirect(url_for('node_index') + '#tab-' + str(root.id))
-
     return render_template('types/move.html', node=node, root=root, form=form)
 
 

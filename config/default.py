@@ -65,6 +65,8 @@ CLASS_CODES = {
     'place': ['E18', 'E22'],
     'reference': ['E31', 'E84']}
 
+PROPERTY_TYPES = ['Actor Actor Relation', 'Actor Function', 'Involvement']
+
 # Default table columns based on class
 TABLE_HEADERS = {
     'source': ['name', 'type', 'description'],
