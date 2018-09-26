@@ -15,17 +15,17 @@ simulation
 
 var g = svg.append('g').attr('class', 'everything'); // Add encompassing group for the zoom
 
-var node = g.append('g')
-    .attr('class', 'nodes')
-    .selectAll('g')
-    .data(graph.nodes)
-    .enter().append('g')
-
 var link = g.append('g')
     .attr('class', 'links')
     .selectAll('line')
     .data(links_data)
     .enter().append('line');
+
+var node = g.append('g')
+    .attr('class', 'nodes')
+    .selectAll('g')
+    .data(graph.nodes)
+    .enter().append('g')
 
 var circles = node.append('circle')
     .attr('r', 12)
