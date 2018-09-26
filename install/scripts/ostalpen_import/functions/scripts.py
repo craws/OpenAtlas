@@ -75,7 +75,7 @@ def import_files(cursor_dpp):
         If successful, the file will be moved into the upload folder.
     """
     import_path = os.path.dirname(__file__) + '/../../../../instance/finds'
-    upload_path = os.path.dirname(__file__) + '/../../../../openatlas/uploads'
+    upload_path = os.path.dirname(__file__) + '/../../../../instance/dpp_uploads'
     for file in [f for f in os.listdir(import_path) if os.path.isfile(os.path.join(import_path, f))]:
         name = basename(file)
         sql = "SELECT id FROM model.entity WHERE name = %(name)s AND class_code = 'E31';"
