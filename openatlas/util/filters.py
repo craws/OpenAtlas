@@ -231,8 +231,8 @@ def display_form(self, form, form_id=None, for_persons=False):
         field.label.text = util.uc_first(field.label.text)
         field.label.text += ' *' if field.flags.required and form_id != 'login-form' else ''
         if field.id == 'description':
-            html['footer'] += '<br />' + str(field.label) + '<br />' + str(field(class_=class_))
-            html['footer'] += '<br />'
+            html['footer'] += '<br />{label}<br />{text}<br />'.format(
+                label=field.label, text=field(class_=class_))
             continue
         if field.type == 'SubmitField':
             html['footer'] += str(field)
@@ -255,16 +255,16 @@ def display_form(self, form, form_id=None, for_persons=False):
     html_all = '<form method="post"' + id_attribute + ' ' + multipart + '>'
     html_all += '<div class="data-table">'
     if html['value_types']:
-        html['value_types'] = """
-        <div class="table-row">
-            <div>
-                <label>{values}</label>
-            </div>
-            <div class="table-cell value-type-switcher">
-                <span id="value-type-switcher" class="button">{show}</span>
-            </div>
-        </div>""".format(
-            values=util.uc_first(_('values')), show=util.uc_first(_('show'))) + html['value_types']
+        values_html = """
+            <div class="table-row">
+                <div>
+                    <label>{values}</label>
+                </div>
+                <div class="table-cell value-type-switcher">
+                    <span id="value-type-switcher" class="button">{show}</span>
+                </div>
+            </div>""".format(values=util.uc_first(_('values')), show=util.uc_first(_('show')))
+        html['value_types'] = values_html + html['value_types']
 
     html_all += html['header'] + html['types'] + html['main'] + html['value_types'] + html['footer']
     html_all += '</div></form>'

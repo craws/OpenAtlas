@@ -11,7 +11,7 @@ from openatlas.util.util import link, required_group, truncate_string, uc_first
 
 
 class SearchForm(Form):
-    term = StringField('', [InputRequired()],
+    term = StringField(_('search'), [InputRequired()],
                        render_kw={'placeholder': uc_first(_('search term')), 'autofocus': True})
     own = BooleanField(_('Only entities edited by me'))
     desc = BooleanField(_('Also search in description'))
@@ -21,7 +21,7 @@ class SearchForm(Form):
         choices=(),
         option_widget=widgets.CheckboxInput(),
         widget=widgets.ListWidget(prefix_label=False))
-    search = SubmitField('Search')
+    search = SubmitField(_('search'))
 
 
 @app.route('/overview/search', methods=['POST', 'GET'])

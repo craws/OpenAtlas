@@ -13,16 +13,16 @@
                 <a href="{{ url_for('index_feedback') }}">{{ _('feedback')|uc_first }}</a>
             </p>
             <a href="{{ url_for('model_network') }}">{{ _('network')|uc_first }}</a>
-            {% if session['login_previous_success'] %}
-                <p style="font-size:0.9em;">
+            <p style="font-size:0.9em;">
+                {% if session['login_previous_success'] %}
                     {{ _('last login')|uc_first }}: {{ session['login_previous_success'] }}
                     {% if session['login_previous_failures'] > 0 %}
                         - {{ _('failed logins')|uc_first }}: {{ session['login_previous_failures'] }}
                     {% endif %}
-                </p>
-            {% else %}
-                <p>{{ _('first login') }}</p>
-            {% endif %}
+                {% else %}
+                    {{ _('first login') }}
+                {% endif %}
+            </p>
         </div>
         <div style="clear:both;"></div>
         {% if tables['latest'].data %}
