@@ -13,7 +13,7 @@ from openatlas.forms.date import DateForm
 from openatlas.models.entity import EntityMapper
 from openatlas.models.linkProperty import LinkPropertyMapper
 from openatlas.models.node import NodeMapper
-from openatlas.util.util import get_base_table_data, pager, truncate_string, uc_first, link
+from openatlas.util.util import get_base_table_data, pager, truncate_string, uc_first
 
 
 def build_form(form, form_name, entity=None, request_origin=None, entity2=None):

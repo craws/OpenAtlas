@@ -4,6 +4,7 @@ from collections import OrderedDict
 
 from flask import g
 
+from openatlas import app
 from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.linkProperty import LinkPropertyMapper
 
@@ -221,12 +222,14 @@ class NodeMapper(EntityMapper):
         return nodes
 
     @staticmethod
-    def move_entities(old_type_id, new_type_id, entity_ids):
+    def move_entities(old_node, new_type_id, entity_ids):
+        root = g.nodes[old_node.root[-1]]
         sql = """
-            UPDATE model.link SET range_id = %(new_type_id)s
-            WHERE range_id = %(old_type_id)s AND domain_id IN %(entity_ids)s;"""
+            UPDATE model.{table} SET range_id = %(new_type_id)s
+            WHERE range_id = %(old_type_id)s AND domain_id IN %(entity_ids)s;""".format(
+            table='link_property' if root.name in app.config['PROPERTY_TYPES'] else 'link')
         params = {
-            'old_type_id': old_type_id,
+            'old_type_id': old_node.id,
             'new_type_id': new_type_id,
             'entity_ids': tuple(entity_ids)}
         g.cursor.execute(sql, params)
