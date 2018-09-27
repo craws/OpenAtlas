@@ -1,10 +1,10 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
-import time
 
+import time
 from flask import g
 from flask_babel import lazy_gettext as _
-from wtforms import HiddenField, FloatField, SelectMultipleField
+from wtforms import FloatField, HiddenField
 from wtforms.validators import Optional
 from wtforms.widgets import HiddenInput
 

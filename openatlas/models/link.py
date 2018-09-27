@@ -2,7 +2,7 @@
 from flask import abort, flash, g
 from flask_babel import lazy_gettext as _
 
-from openatlas import app, debug_model, logger
+from openatlas import debug_model, logger
 
 
 class Link:
