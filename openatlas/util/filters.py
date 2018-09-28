@@ -141,6 +141,16 @@ def display_content_translation(self, text):
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
+def manual_link(self, wiki_site):
+    # Creates a link to a manual page
+    wiki_url = 'https://redmine.openatlas.eu/projects/uni/wiki/'
+    wiki_link = '<a href="{url}" rel="noopener" target="_blank">{label}</a>'.format(
+        url=wiki_url + wiki_site, label=util.uc_first(_('manual')))
+    return wiki_link
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
 def display_logo(self, file_id):
     src = '/static/images/layout/logo.png'
     if file_id:
