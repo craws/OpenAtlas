@@ -224,10 +224,16 @@ class NodeMapper(EntityMapper):
     @staticmethod
     def move_entities(old_node, new_type_id, entity_ids):
         root = g.nodes[old_node.root[-1]]
-        sql = """
-            UPDATE model.{table} SET range_id = %(new_type_id)s
-            WHERE range_id = %(old_type_id)s AND domain_id IN %(entity_ids)s;""".format(
-            table='link_property' if root.name in app.config['PROPERTY_TYPES'] else 'link')
+        if new_type_id:
+            sql = """
+                UPDATE model.{table} SET range_id = %(new_type_id)s
+                WHERE range_id = %(old_type_id)s AND domain_id IN %(entity_ids)s;""".format(
+                table='link_property' if root.name in app.config['PROPERTY_TYPES'] else 'link')
+        else:
+            sql = """
+                DELETE FROM model.{table}
+                WHERE range_id = %(old_type_id)s AND domain_id IN %(entity_ids)s;""".format(
+                table='link_property' if root.name in app.config['PROPERTY_TYPES'] else 'link')
         params = {
             'old_type_id': old_node.id,
             'new_type_id': new_type_id,

@@ -149,13 +149,8 @@ def node_move_entities(id_):
         g.cursor.execute('COMMIT')
         flash('Entities where updated', 'success')
         return redirect(url_for('node_index') + '#tab-' + str(root.id))
+    getattr(form, str(root.id)).data = node.id
     return render_template('types/move.html', node=node, root=root, form=form)
-
-
-@app.route('/types/remove/<int:id_>', methods=['POST', 'GET'])
-@required_group('editor')
-def node_remove_entities():
-    return render_template('types/remove.html')
 
 
 def walk_tree(param):
