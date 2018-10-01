@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-09-16 15:17+0200\n"
-"PO-Revision-Date: 2018-09-16 15:21+0200\n"
+"POT-Creation-Date: 2018-09-27 11:28+0200\n"
+"PO-Revision-Date: 2018-09-27 11:54+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: de\n"
 "Language-Team: de <LL@li.org>\n"
@@ -527,7 +527,7 @@ msgstr "Datenintegrität"
 
 #: templates/admin/index.html:51 templates/admin/orphans.html:4
 msgid "orphans"
-msgstr "orphans"
+msgstr "Verwaiste Daten"
 
 #: templates/admin/log.html:8
 msgid "delete all logs?"
@@ -547,7 +547,7 @@ msgstr "orphan"
 
 #: templates/admin/orphans.html:10
 msgid "unlinked"
-msgstr "Instanzen die keine Verknüpfungen haben."
+msgstr "Instanzen ohne Verlinkung"
 
 #: templates/admin/orphans.html:11 templates/types/index.html:22
 #: util/filters.py:197
@@ -564,7 +564,7 @@ msgstr "Verwaiste Dateien"
 
 #: templates/admin/orphans.html:18 templates/admin/orphans.html:19
 msgid "delete orphans"
-msgstr "Verwaiste Daten löschen."
+msgstr "Verwaiste Daten löschen"
 
 #: templates/admin/orphans.html:30 templates/admin/orphans.html:31
 msgid "delete types"
@@ -861,7 +861,7 @@ msgstr "System Typen"
 
 #: templates/types/index.html:9
 msgid "custom types"
-msgstr "Custom Typen"
+msgstr "Benutzerdefinierte Typen"
 
 #: templates/types/index.html:10
 msgid "value types"
