@@ -127,6 +127,7 @@ def node_delete(id_):
 
 
 class MoveForm(Form):
+    is_node_form = HiddenField()
     selection = SelectMultipleField(
         '',
         [InputRequired()],

@@ -79,7 +79,12 @@ def build_move_form(form, node):
     for item in delete_list:
         delattr(form_instance, item)
     choices = []
-    if root.name in app.config['PROPERTY_TYPES']:
+    if root.class_.code == 'E53':
+        for entity in node.get_linked_entities('P89', True):
+            place = entity.get_linked_entity('P53', True)
+            if place:
+                choices.append((entity.id, place.name))
+    elif root.name in app.config['PROPERTY_TYPES']:
         for row in LinkPropertyMapper.get_entities_by_node(node):
             domain = EntityMapper.get_by_id(row.domain_id)
             range_ = EntityMapper.get_by_id(row.range_id)
@@ -87,7 +92,6 @@ def build_move_form(form, node):
     else:
         for entity in node.get_linked_entities('P2', True):
             choices.append((entity.id, entity.name))
-    print(root.name)
 
     form_instance.selection.choices = choices
     return form_instance
