@@ -15,14 +15,21 @@ sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 """
 To do:
 
-- Missing classes
-- Missing properties (links)
+- Missing files from backup
 - Missing types
 
-- Material E019 to type material
-- Temporal and cultural types
+- Material uid 19 (E057) to value type material (E55 with hierarchy) Root description: Material of physical object;
+    Children Description: weight percentage
+    Values: 100 for each existing link
+    Check if multiple links exist (100% would be wrong)
 
--- Missing files from backup
+- Missing properties (links):
+    36 current or former member
+    5, 15 link_property_uid_15 5 hierarchy for admin units (begin at bundesland),
+        link all link_property_uid_15 to admins, write "property parcel number numbers"
+        with location name for each link under the place description
+
+- Temporal and cultural types
 
 Finishing:
 
@@ -383,7 +390,7 @@ for e in entities:
             print('missing id for E031 type:' + str(e.entity_type))
             continue
         count['E31 document'] += 1
-    elif e.class_code in ['E018', 'E053', 'E055', 'E052', 'E004', 'E058', 'E030']:
+    elif e.class_code in ['E018', 'E053', 'E055', 'E052', 'E004', 'E058', 'E030', 'E019', 'E57']:
         continue  # Places and other stuff will be added later in script
     else:
         missing_classes[e.class_code] = e.class_code
@@ -649,7 +656,7 @@ for row in cursor_ostalpen.fetchall():
         # Todo: remove when all entities
         if row.links_entity_uid_to not in new_entities or \
                 row.links_entity_uid_from not in new_entities:
-                    print('Missing source link for: ' + str(row.links_entity_uid_from))
+                    print('Missing source link for: Quelle_uid:' + str(row.links_entity_uid_from)) + 'entity_uid' + str(row.links_entity_uid_to)
                     continue
         domain = new_entities[row.links_entity_uid_to]
         range_ = new_entities[row.links_entity_uid_from]
@@ -685,12 +692,19 @@ for row in cursor_ostalpen.fetchall():
             continue
         domain = new_entities[row.links_entity_uid_from]
         link('P2', domain.id, types[type_name])
+    elif row.links_cidoc_number_direction == 36:
+        # - 36 tbl_properties_uid is current or former member, in annotation is type ostalpen_uid
+        # check missing types like Bischof
+        pass
+    elif row.links_cidoc_number_direction in [2, ]:
+        pass  # Ignore obsolete links
+
     else:
         missing_properties.add(row.links_cidoc_number_direction)
 
 # Files
-add_licences(cursor_dpp, cursor_ostalpen)
-import_files(cursor_dpp)
+# add_licences(cursor_dpp, cursor_ostalpen)
+# import_files(cursor_dpp)
 
 for name, count in count.items():
     print(str(name) + ': ' + str(count))
