@@ -12,6 +12,7 @@ from wtforms import IntegerField
 from wtforms.validators import Email
 
 from openatlas import app
+from openatlas.forms.forms import ValueFloatField
 from openatlas.models.content import ContentMapper
 from openatlas.util import util
 from openatlas.util.util import display_tooltip, print_file_extension
@@ -175,7 +176,7 @@ def display_form(self, form, form_id=None, for_persons=False):
     def display_value_type_fields(subs, html_=''):
         for sub_id in subs:
             sub = g.nodes[sub_id]
-            field_ = getattr(form, 'value_list-' + str(sub_id))
+            field_ = getattr(form, str(sub_id))
             html_ += """
                 <div class="table-row value-type-switch">
                     <div><label>{label}</label> {tooltip}</div>
@@ -189,7 +190,7 @@ def display_form(self, form, form_id=None, for_persons=False):
         return html_
 
     for field in form:
-        if field.id.startswith('value_list-'):
+        if isinstance(field, ValueFloatField):
             continue
         class_ = 'required' if field.flags.required else ''
         class_ += ' integer' if isinstance(field, IntegerField) else ''

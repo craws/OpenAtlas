@@ -24,7 +24,7 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
     def add_value_type_fields(subs):
         for sub_id in subs:
             sub = g.nodes[sub_id]
-            setattr(form, 'value_list-' + str(sub.id), FloatField(sub.name, [Optional()]))
+            setattr(form, str(sub.id), ValueFloatField(sub.name, [Optional()]))
             add_value_type_fields(sub.subs)
 
     for id_, node in NodeMapper.get_nodes_for_form(form_name).items():
@@ -59,7 +59,7 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
                 node_data[root.id] = []
             node_data[root.id].append(node.id)
             if root.value_type:
-                getattr(form_instance, 'value_list-' + str(node.id)).data = node_value
+                getattr(form_instance, str(node.id)).data = node_value
         for root_id, nodes in node_data.items():
             if hasattr(form_instance, str(root_id)):
                 getattr(form_instance, str(root_id)).data = nodes
@@ -319,3 +319,7 @@ class TableMultiSelect(HiddenInput):
 
 class TableMultiField(HiddenField):
     widget = TableMultiSelect()
+
+
+class ValueFloatField(FloatField):
+    pass

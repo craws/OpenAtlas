@@ -85,7 +85,7 @@ class PlaceTest(TestBaseCase):
                 self.app.get(url_for('place_update', id_=strat_id))
                 self.app.post(url_for('place_update', id_=strat_id), data={'name': name})
                 dimension_node_id = NodeMapper.get_hierarchy_by_name('Dimensions').subs[0]
-                data = {'name': 'You never find me', 'value_list-' + str(dimension_node_id): '50'}
+                data = {'name': 'You never find me', str(dimension_node_id): '50'}
                 rv = self.app.post(url_for('place_insert', origin_id=strat_id), data=data)
                 find_id = rv.location.split('/')[-1]
                 self.app.get(url_for('place_update', id_=find_id))

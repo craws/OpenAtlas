@@ -152,27 +152,26 @@ class NodeMapper(EntityMapper):
 
     @staticmethod
     def save_entity_nodes(entity, form):
-        from openatlas.forms.forms import TreeField, TreeMultiField
+        from openatlas.forms.forms import TreeField, TreeMultiField, ValueFloatField
         if hasattr(entity, 'nodes'):
             entity.delete_links(['P2', 'P89'])
         for field in form:
-            if field.name.startswith('value_list-'):
-                if field.data:
-                    node_id = int(field.name.replace('value_list-', ''))
-                    entity.link('P2', node_id, field.data)
-            elif isinstance(field, (TreeField, TreeMultiField)) and field.data:
+            if not field.data:
+                continue
+            if isinstance(field, ValueFloatField):
+                entity.link('P2', int(field.name), field.data)
+            elif isinstance(field, (TreeField, TreeMultiField)):
                 root = g.nodes[int(field.id)]
-                if not root.value_type:
-                    try:
-                        range_param = [int(field.data)]
-                    except ValueError:
-                        range_param = ast.literal_eval(field.data)
-                    if root.name in ['Administrative Unit', 'Historical Place']:
-                        if entity.class_.code == 'E53':
-                            entity.link('P89', range_param)
-                    else:
-                        if entity.class_.code != 'E53':
-                            entity.link('P2', range_param)
+                try:
+                    range_param = [int(field.data)]
+                except ValueError:
+                    range_param = ast.literal_eval(field.data)
+                if root.name in ['Administrative Unit', 'Historical Place']:
+                    if entity.class_.code == 'E53':
+                        entity.link('P89', range_param)
+                else:
+                    if entity.class_.code != 'E53':
+                        entity.link('P2', range_param)
 
     @staticmethod
     def save_link_nodes(link_id, form):
