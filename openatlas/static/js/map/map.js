@@ -3,7 +3,11 @@ var map = L.map('map', {
     fullscreenControl: true
 });
 
-var grayMarker = L.icon({iconUrl: '/static/images/map/marker-icon-gray.png'});
+var grayMarker = L.icon({
+    iconUrl: '/static/images/map/marker-icon-gray.png',
+    iconAnchor: [12, 41],
+    popupAnchor: [0, -34]
+});
 
 // Define base layers
 var baseMaps = {
