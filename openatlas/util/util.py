@@ -481,7 +481,7 @@ def pager(table):
     html += '<table id="{id}-table" class="tablesorter"><thead><tr>'.format(id=table['id'])
     for header in table['header']:
         style = '' if header else 'class=sorter-false '  # only show and sort headers with a title
-        html += '<th ' + style + '>' + (_(header).capitalize() if header else '') + '</th>'
+        html += '<th ' + style + '>' + (uc_first(_(header)) if header else '') + '</th>'
     # Append missing headers
     html += '<th class=sorter-false></th>' * (len(table['data'][0]) - len(table['header']))
     html += '</tr></thead><tbody>'

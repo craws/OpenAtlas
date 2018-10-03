@@ -1,7 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
 
-from flask import g, render_template, request
+from flask import g, render_template
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from wtforms import (BooleanField, HiddenField, IntegerField, SelectMultipleField, StringField,

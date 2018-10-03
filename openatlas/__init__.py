@@ -17,10 +17,10 @@ except ImportError:
 
 app = Flask(__name__, instance_relative_config=True)
 
-# use the test database if running tests
+# Use the test database if running tests
 instance_name = 'production' if 'test_runner.py' not in sys.argv[0] else 'testing'
-app.config.from_object('config.default')  # load config/INSTANCE_NAME.py
-app.config.from_pyfile(instance_name + '.py')  # load instance/INSTANCE_NAME.py
+app.config.from_object('config.default')  # Load config/INSTANCE_NAME.py
+app.config.from_pyfile(instance_name + '.py')  # Load instance/INSTANCE_NAME.py
 locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 babel = Babel(app)
 

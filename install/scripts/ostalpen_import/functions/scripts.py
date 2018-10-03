@@ -1,3 +1,7 @@
+import os
+from os.path import basename
+from shutil import copyfile
+
 import subprocess
 import psycopg2.extras
 
@@ -16,12 +20,12 @@ def reset_database():
     subprocess.call('psql openatlas_dpp < instance/dpp_origin.sql', shell=True)
 
 
-def prepare_databases(cursor_dpp, cursor_ostalpen):
+def prepare_databases(cursor_dpp):
 
     # Add comment to ostalpen_id
     sql_ = """
         ALTER TABLE model.entity ADD COLUMN ostalpen_id integer;
-        COMMENT ON COLUMN model.entity.ostalpen_id IS 'uid of former Ostalpen table tbl_entities';"""
+        COMMENT ON COLUMN model.entity.ostalpen_id IS 'uid of former Ostalpen table tbl_entities'"""
     cursor_dpp.execute(sql_)
 
     # Add value types
@@ -63,3 +67,48 @@ def datetime64_to_timestamp(date):
     day = int(parts[2])
     string = format(year, '04d') + '-' + format(month, '02d') + '-' + format(day, '02d')
     return string + postfix
+
+
+def import_files(cursor_dpp):
+    """
+        Loops over files in a folder and tries to find the respective entity.
+        If successful, the file will be moved into the upload folder.
+    """
+    import_path = os.path.dirname(__file__) + '/../../../../instance/finds'
+    upload_path = os.path.dirname(__file__) + '/../../../../instance/dpp_uploads'
+    for file in [f for f in os.listdir(import_path) if os.path.isfile(os.path.join(import_path, f))]:
+        name = basename(file)
+        sql = "SELECT id FROM model.entity WHERE name = %(name)s AND class_code = 'E31';"
+        cursor_dpp.execute(sql, {'name': name})
+        if cursor_dpp.rowcount < 1:
+            print('No entity found for file: ' + name)
+        elif cursor_dpp.rowcount > 1:
+            print('Multiple entites found for file: ' + name)
+        else:
+            new_file_name = str(cursor_dpp.fetchone().id) + '.' + name.rsplit('.', 1)[1].lower()
+            copyfile(import_path + '/' + file, upload_path + '/' + new_file_name)
+    return
+
+
+def add_licences(cursor_dpp, cursor_ostalpen):
+    sql = """
+        SELECT l.links_entity_uid_from, e.entity_name_uri
+        FROM openatlas.tbl_links l
+        JOIN openatlas.tbl_entities e ON
+            l.links_entity_uid_to = e.uid AND
+            l.links_cidoc_number_direction = 17;"""
+    cursor_ostalpen.execute(sql)
+    for row in cursor_ostalpen.fetchall():
+        if row.entity_name_uri == 'Public Domain':
+            license_name = 'Public domain'
+        elif row.entity_name_uri == 'Copyright protected':
+            license_name = 'Bildzitat'
+        else:
+            license_name = 'CC BY-SA'
+        sql = """
+            INSERT INTO model.link (property_code, domain_id, range_id)
+            VALUES (
+                'P2',
+                (SELECT id FROM model.entity WHERE ostalpen_id = %(id)s),
+                (SELECT id FROM model.entity WHERE name = %(license_name)s));"""
+        cursor_dpp.execute(sql, {'id': row.links_entity_uid_from, 'license_name': license_name})

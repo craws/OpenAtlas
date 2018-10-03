@@ -32,7 +32,7 @@ input[type="text"].data-huebee {
     width: 5em;
 }
 
-#global-search {
+#global-search, #search {
     text-transform: capitalize;
 }
 

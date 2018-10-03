@@ -45,7 +45,7 @@
             {{ form.charge }} {{ form.charge.label }}<br />
             {{ form.distance }} {{ form.distance.label }}<br />
             <input id="save" name="save" value="{{ _('apply')|uc_first }}" type="submit">
-            <p><a href="https://redmine.openatlas.eu/projects/uni/wiki/Network_visualization" rel="noopener" target="_blank">{{ _('manual')|uc_first }}</a></p>
         </form>
+        <p>{{ 'Network_visualization'|manual_link|safe }}</p>
     </div>
 {% endblock %}

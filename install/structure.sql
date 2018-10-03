@@ -90,7 +90,6 @@ ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_cod
 ALTER TABLE IF EXISTS ONLY model.link_property DROP CONSTRAINT IF EXISTS link_property_pkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_pkey;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_pkey;
-ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_origin_id_key;
 ALTER TABLE IF EXISTS ONLY model.class DROP CONSTRAINT IF EXISTS class_pkey;
 ALTER TABLE IF EXISTS ONLY model.class DROP CONSTRAINT IF EXISTS class_name_key;
 ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_id_sub_id_key;
@@ -286,9 +285,9 @@ CREATE TABLE gis.linestring (
     name text,
     description text,
     type text,
+    geom public.geometry(LineString,4326),
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone,
-    geom public.geometry(LineString,4326)
+    modified timestamp without time zone
 );
 
 
@@ -325,9 +324,9 @@ CREATE TABLE gis.point (
     name text,
     description text,
     type text,
+    geom public.geometry(Point,4326),
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone,
-    geom public.geometry(Point,4326)
+    modified timestamp without time zone
 );
 
 
@@ -364,9 +363,10 @@ CREATE TABLE gis.polygon (
     name text,
     description text,
     type text,
+    geom public.geometry(Polygon,4326),
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone,
-    geom public.geometry(Polygon,4326)
+    modified timestamp without time zone
+
 );
 
 
@@ -524,25 +524,17 @@ ALTER SEQUENCE model.class_inheritance_id_seq OWNED BY model.class_inheritance.i
 CREATE TABLE model.entity (
     id integer NOT NULL,
     class_code text NOT NULL,
+    system_type text,
     name text NOT NULL,
     description text,
     value_integer integer,
     value_timestamp timestamp without time zone,
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone,
-    system_type text,
-    origin_id text
+    modified timestamp without time zone
 );
 
 
 ALTER TABLE model.entity OWNER TO openatlas;
-
---
--- Name: COLUMN entity.origin_id; Type: COMMENT; Schema: model; Owner: openatlas
---
-
-COMMENT ON COLUMN model.entity.origin_id IS 'Can be used for e.g. imports from other projects like projectname_tablename_1234';
-
 
 --
 -- Name: entity_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
@@ -838,9 +830,9 @@ CREATE TABLE web.hierarchy (
     multiple boolean DEFAULT false NOT NULL,
     system boolean DEFAULT false NOT NULL,
     directional boolean DEFAULT false NOT NULL,
+    value_type boolean DEFAULT false NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone,
-    value_type boolean DEFAULT false NOT NULL
+    modified timestamp without time zone
 );
 
 
@@ -1052,9 +1044,9 @@ CREATE TABLE web."user" (
     login_failed_count integer DEFAULT 0 NOT NULL,
     password_reset_code text,
     password_reset_date timestamp without time zone,
+    unsubscribe_code text,
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone,
-    unsubscribe_code text
+    modified timestamp without time zone
 );
 
 
@@ -1125,8 +1117,8 @@ CREATE TABLE web.user_log (
     id integer NOT NULL,
     user_id integer NOT NULL,
     entity_id integer NOT NULL,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    action text NOT NULL
+    action text NOT NULL,
+    created timestamp without time zone DEFAULT now() NOT NULL
 );
 
 
@@ -1429,14 +1421,6 @@ ALTER TABLE ONLY model.class
 
 ALTER TABLE ONLY model.class
     ADD CONSTRAINT class_pkey PRIMARY KEY (id);
-
-
---
--- Name: entity entity_origin_id_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
---
-
-ALTER TABLE ONLY model.entity
-    ADD CONSTRAINT entity_origin_id_key UNIQUE (origin_id);
 
 
 --
