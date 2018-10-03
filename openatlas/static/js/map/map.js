@@ -3,11 +3,11 @@ var map = L.map('map', {
     fullscreenControl: true
 });
 
-var grayMarker = L.icon({
-    iconUrl: '/static/images/map/marker-icon-gray.png',
-    iconAnchor: [12, 41],
-    popupAnchor: [0, -34]
-});
+// Icons
+var newIcon = L.icon({iconUrl: '/static/images/map/marker-icon_new.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
+var editIcon = L.icon({iconUrl: "/static/images/map/marker-icon_edit.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
+var editedIcon = L.icon({iconUrl: "/static/images/map/marker-icon_edited.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
+var grayMarker = L.icon({iconUrl: '/static/images/map/marker-icon-gray.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
 
 // Define base layers
 var baseMaps = {

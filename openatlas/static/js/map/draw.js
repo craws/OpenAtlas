@@ -12,11 +12,6 @@ var drawnPolygon = L.featureGroup();
 var layer;
 var newLayer = false;
 
-// Icons
-var newIcon = L.icon({iconUrl: '/static/images/map/marker-icon_new.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
-var editIcon = L.icon({iconUrl: "/static/images/map/marker-icon_edit.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
-var editedIcon = L.icon({iconUrl: "/static/images/map/marker-icon_edited.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
-
 /* Controls with EasyButton */
 L.Control.EasyButtons = L.Control.extend({
     onAdd: function () {
@@ -239,7 +234,8 @@ function saveEditedGeometry() {
         myeditedlayer.setStyle({color: '#686868'});
     }*/
 
-    newLayer.bindPopup(buildPopup());
+    // newLayer.bindPopup(buildPopup());
+    console.log(geometryType);
     if (geometryType == 'centerpoint') {
         points = JSON.parse($('#gis_points').val());
         // Remove former point
@@ -255,6 +251,7 @@ function saveEditedGeometry() {
             `{"type": "Point","coordinates": [` + $('#easting').val() + `,` + $('#northing').val() + `]},` +
             `"properties":{"name": "` + name + `","description": "` + description + `", "geometryType": "centerpoint"}}`;
         points.push(JSON.parse(point));
+        console.log(point);
         $('#gis_points').val(JSON.stringify(points));
     }
 
@@ -344,7 +341,6 @@ function editGeometry() {
     $('#shapeName').val(feature.properties.geometryName);
     $('#shapeDescription').val(feature.properties.geometryDescription);
     $('.leaflet-right .leaflet-bar').hide();
-    console.log(feature.properties.geometryType);
     if (feature.properties.geometryType == 'centerpoint') {
         $('#resetButton').hide();
         newLayer = L.marker(editLayer.getLatLng(), {draggable: true, icon: editIcon}).addTo(map);
@@ -360,7 +356,7 @@ function editGeometry() {
             $('#saveButton').prop('disabled', false);
         });
 
-        // editLayer.remove(editMarker);
+        layer.remove(marker);
     } else {
         $('#coordinatesDiv').hide();
     }
