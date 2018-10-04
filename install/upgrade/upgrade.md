@@ -2,6 +2,11 @@
 
 Before executing SQL statements backup the database. Replace database role "openatlas" if needed.
 
+
+### 3.9.0 to 3.10.0
+
+Execute install/upgrade/3.10.0.sql after making backups
+
 ### 3.8.0 to 3.9.0
 
 Execute install/upgrade/3.9.0.sql after making backups
