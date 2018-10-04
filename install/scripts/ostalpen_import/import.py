@@ -18,10 +18,10 @@ To do:
 - Missing files from backup
 - Missing types
 
-- Material uid 19 (E057) to value type material (E55 with hierarchy) Root description: Material of physical object;
-    Children Description: weight percentage
+- Material uid 19 (E057) to value type material (E55 with hierarchy)
+    Linking with entities doesn't work (look at bottom link_uid==1)
     Values: 100 for each existing link
-    Check if multiple links exist (100% would be wrong)
+    Check if multiple links exist (100% would be wrong) and other entities than finds
 
 - Missing properties (links):
     36 current or former member
@@ -39,6 +39,8 @@ Finishing:
 - CIDOC valid check
 
 """
+
+do_import_files = False
 
 dict_units = {
     24: 'Millimeter',
@@ -252,6 +254,7 @@ ostalpen_types = {}
 ostalpen_place_types = []
 missing_ostalpen_place_types = set()
 ostalpen_types_double = {}
+material_types = set()
 cursor_ostalpen.execute("SELECT uid, entity_name_uri FROM openatlas.tbl_entities WHERE classes_uid = 13;")
 for row in cursor_ostalpen.fetchall():
     if row.entity_name_uri in ostalpen_types:
@@ -259,7 +262,7 @@ for row in cursor_ostalpen.fetchall():
     ostalpen_types[row.uid] = row.entity_name_uri
 
 
-def insert_type_subs(openatlas_id, ostalpen_id):
+def insert_type_subs(openatlas_id, ostalpen_id, root):
     sql = """
         SELECT uid, entity_name_uri FROM openatlas.tbl_entities e
         JOIN openatlas.tbl_links l ON
@@ -274,11 +277,18 @@ def insert_type_subs(openatlas_id, ostalpen_id):
         cursor_dpp.execute(sql)
         sub_id = cursor_dpp.fetchone()[0]
         link('P127', sub_id, openatlas_id)
-        insert_type_subs(sub_id, row.uid)
-        ostalpen_place_types.append(row.uid)
+        if root == 'Material':
+            sql = """
+                UPDATE model.entity SET description = 'weight percentage'
+                WHERE id = {id};""".format(id=sub_id)
+            cursor_dpp.execute(sql)
+            material_types.add(row.uid)
+        else:
+            ostalpen_place_types.append(row.uid)
+        insert_type_subs(sub_id, row.uid, root)
 
 
-for root in ['Feature', 'Finds', 'Stratigraphical Unit']:
+for root in ['Feature', 'Finds', 'Stratigraphical Unit', 'Material']:
     sql = """
         SELECT uid, entity_name_uri FROM openatlas.tbl_entities e
         JOIN tbl_links l ON
@@ -306,8 +316,7 @@ for root in ['Feature', 'Finds', 'Stratigraphical Unit']:
             (SELECT id FROM model.entity WHERE name = '{root}' AND class_code = 'E55'), {id});
             """.format(root=root, id=id_)
         cursor_dpp.execute(sql)
-        insert_type_subs(id_, row.uid)
-
+        insert_type_subs(id_, row.uid, root)
 
 # Get ostalpen entities
 sql_ = """
@@ -390,7 +399,7 @@ for e in entities:
             print('missing id for E031 type:' + str(e.entity_type))
             continue
         count['E31 document'] += 1
-    elif e.class_code in ['E018', 'E053', 'E055', 'E052', 'E004', 'E058', 'E030', 'E019', 'E57']:
+    elif e.class_code in ['E018', 'E053', 'E055', 'E052', 'E004', 'E058', 'E030', 'E019', 'E057']:
         continue  # Places and other stuff will be added later in script
     else:
         missing_classes[e.class_code] = e.class_code
@@ -634,6 +643,7 @@ print('Links')
 missing_properties = set()
 invalid_type_links = set()
 missing_dpp_types = set()
+missing_source_link = set()
 sql_ = """
     SELECT links_uid, links_entity_uid_from, links_cidoc_number_direction, links_entity_uid_to,
         links_annotation, links_creator, links_timestamp_start, links_timestamp_end,
@@ -653,10 +663,9 @@ for row in cursor_ostalpen.fetchall():
         else:
             print('Error missing translation type, id: ' + str(domain.id) + ', ' + domain.id_name)
     elif row.links_cidoc_number_direction == 4:  # documents
-        # Todo: remove when all entities
         if row.links_entity_uid_to not in new_entities or \
                 row.links_entity_uid_from not in new_entities:
-                    print('Missing source link for: Quelle_uid:' + str(row.links_entity_uid_from)) + 'entity_uid' + str(row.links_entity_uid_to)
+                    missing_source_link.add(row.links_uid)
                     continue
         domain = new_entities[row.links_entity_uid_to]
         range_ = new_entities[row.links_entity_uid_from]
@@ -672,6 +681,11 @@ for row in cursor_ostalpen.fetchall():
         range_ = new_entities[row.links_entity_uid_from]
         link('P46', range_.id, domain.id, row.links_annotation)
     elif row.links_cidoc_number_direction == 1:  # types
+        if row.links_entity_uid_to in material_types:
+            type_name = ostalpen_types_double[row.links_entity_uid_to]
+            domain = new_entities[row.links_entity_uid_from]
+            link('P2', domain.id, types[type_name], '100')
+            continue
         if row.links_entity_uid_to in ostalpen_place_types:
             continue  # archeological types done with links are invalid
         if row.links_entity_uid_to not in ostalpen_types:
@@ -703,21 +717,31 @@ for row in cursor_ostalpen.fetchall():
         missing_properties.add(row.links_cidoc_number_direction)
 
 # Files
-# add_licences(cursor_dpp, cursor_ostalpen)
-# import_files(cursor_dpp)
+if do_import_files:
+    add_licences(cursor_dpp, cursor_ostalpen)
+    import_files(cursor_dpp)
+
+if missing_classes:
+    print('Missing classes:' + ', '.join(missing_classes))
+if missing_properties:
+    print('Missing property ids:')
+    print(missing_properties)
+if missing_ostalpen_place_types:
+    print('Missing place types:')
+    print(missing_ostalpen_place_types)
+if invalid_type_links:
+    print('Invalid type links:')
+    print(invalid_type_links)
+if missing_dpp_types:
+    print('Missing DPP types:')
+    print(missing_dpp_types)
+if missing_source_link:
+    print('Missing source links (links_uid):')
+    print(missing_source_link)
 
 for name, count in count.items():
     print(str(name) + ': ' + str(count))
 
-print('Missing classes:' + ', '.join(missing_classes))
-print('Missing property ids:')
-print(missing_properties)
-print('Missing place types:')
-print(missing_ostalpen_place_types)
-print('Invalid type links:')
-print(invalid_type_links)
-print('Missing DPP types:')
-print(missing_dpp_types)
 connection_dpp.close()
 connection_ostalpen.close()
 print('Execution time: ' + str(round((time.time()-start)/60, 2)) + ' minutes')
