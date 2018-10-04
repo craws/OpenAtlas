@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
+    > {{ _('import')|uc_first }}
+{% endblock %}
+{% block content %}
+    {% if 'admin'|is_authorized %}
+        <div class="button-bar">
+            <a href="{{ url_for('import_project_insert') }}">+ {{ _('project')|uc_first }}</a>
+        </div>
+    {% endif %}
+{% endblock %}

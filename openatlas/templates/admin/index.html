@@ -42,8 +42,10 @@
 
         {% if 'manager'|is_authorized %}
             <h1>{{ _('export')|uc_first }}</h1>
-            <a href="{{ url_for('admin_export_sql') }}">{{ _('SQL')|uc_first }}</a>
-            <a href="{{ url_for('admin_export_csv') }}">{{ _('CSV')|uc_first }}</a>
+            <a href="{{ url_for('export_sql') }}">{{ _('SQL')|uc_first }}</a>
+            <a href="{{ url_for('export_csv') }}">{{ _('CSV')|uc_first }}</a>
+            <h1>{{ _('import')|uc_first }}</h1>
+            <a href="{{ url_for('import_index') }}">{{ _('CSV')|uc_first }}</a>
         {% endif  %}
 
         {% if 'admin'|is_authorized %}
