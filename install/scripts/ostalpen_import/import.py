@@ -11,35 +11,6 @@ from functions.scripts import (connect, prepare_databases, reset_database, datet
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
-
-"""
-To do:
-
-- Missing files from backup
-- Missing types
-
-- Material uid 19 (E057) to value type material (E55 with hierarchy)
-    Linking with entities doesn't work (look at bottom link_uid==1)
-    Values: 100 for each existing link
-    Check if multiple links exist (100% would be wrong) and other entities than finds
-
-- Missing properties (links):
-    36 current or former member
-    5, 15 link_property_uid_15 5 hierarchy for admin units (begin at bundesland),
-        link all link_property_uid_15 to admins, write "property parcel number numbers"
-        with location name for each link under the place description
-
-- Temporal and cultural types
-
-Finishing:
-
-- Stefan: add 2 licenses for the cc by licences
-- If subunit has same gis as above delete gis of subunit
-- Links between subunits have sometimes description texts which are not visible in new system (e.g. position of find)
-- CIDOC valid check
-
-"""
-
 do_import_files = False
 
 dict_units = {
@@ -254,7 +225,7 @@ ostalpen_types = {}
 ostalpen_place_types = []
 missing_ostalpen_place_types = set()
 ostalpen_types_double = {}
-material_types = set()
+material_types = {}
 cursor_ostalpen.execute("SELECT uid, entity_name_uri FROM openatlas.tbl_entities WHERE classes_uid = 13;")
 for row in cursor_ostalpen.fetchall():
     if row.entity_name_uri in ostalpen_types:
@@ -282,7 +253,7 @@ def insert_type_subs(openatlas_id, ostalpen_id, root):
                 UPDATE model.entity SET description = 'weight percentage'
                 WHERE id = {id};""".format(id=sub_id)
             cursor_dpp.execute(sql)
-            material_types.add(row.uid)
+            material_types[row.uid] = sub_id
         else:
             ostalpen_place_types.append(row.uid)
         insert_type_subs(sub_id, row.uid, root)
@@ -682,9 +653,8 @@ for row in cursor_ostalpen.fetchall():
         link('P46', range_.id, domain.id, row.links_annotation)
     elif row.links_cidoc_number_direction == 1:  # types
         if row.links_entity_uid_to in material_types:
-            type_name = ostalpen_types_double[row.links_entity_uid_to]
             domain = new_entities[row.links_entity_uid_from]
-            link('P2', domain.id, types[type_name], '100')
+            link('P2', domain.id, material_types[row.links_entity_uid_to], '100')
             continue
         if row.links_entity_uid_to in ostalpen_place_types:
             continue  # archeological types done with links are invalid

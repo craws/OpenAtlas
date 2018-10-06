@@ -24,14 +24,6 @@ python3.5 install/scripts/ostalpen_import/import.py
 - change settings (mail!)
 - change content text
 
-## Create new current DPP database
-
-### Created new database
-
-    dropdb openatlas_dpp_origin
-    createdb openatlas_dpp_origin -O openatlas
-    psql openatlas_dpp_origin < dpp.sql
-
 ### Execute upgrades
 
     psql openatlas_dpp_origin < install/upgrade/3.6.0.sql
@@ -39,4 +31,4 @@ python3.5 install/scripts/ostalpen_import/import.py
 
 ### Make a new SQL dump
 
-    pg_dump openatlas_dpp_origin > instance/dpp_origin.sql
+    pg_dump openatlas_dpp > instance/dpp_origin.sql
