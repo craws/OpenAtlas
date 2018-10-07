@@ -221,20 +221,44 @@ class NodeMapper(EntityMapper):
         return nodes
 
     @staticmethod
+    def search_for_node_id_in_entity_nodes(new_type_id, entity):
+        # Possible to replace this function with a one liner (search for object id in dict keys)?
+        for node in entity.nodes:
+            if node.id == int(new_type_id):
+                return True
+        return False
+
+    @staticmethod
     def move_entities(old_node, new_type_id, entity_ids):
         root = g.nodes[old_node.root[-1]]
+        delete_ids = []
         if new_type_id:
+            # A new type was selected
+            if root.multiple and not root.value_type:
+                cleaned_entity_ids = []
+                for entity in EntityMapper.get_by_ids(entity_ids):
+                    if NodeMapper.search_for_node_id_in_entity_nodes(new_type_id, entity):
+                        # If already linked add to delete ids
+                        delete_ids.append(entity.id)
+                    else:
+                        cleaned_entity_ids.append(entity.id)
+                entity_ids = cleaned_entity_ids
             sql = """
                 UPDATE model.{table} SET range_id = %(new_type_id)s
                 WHERE range_id = %(old_type_id)s AND domain_id IN %(entity_ids)s;""".format(
                 table='link_property' if root.name in app.config['PROPERTY_TYPES'] else 'link')
+            params = {
+                'old_type_id': old_node.id,
+                'new_type_id': new_type_id,
+                'entity_ids': tuple(entity_ids)}
+            g.cursor.execute(sql, params)
         else:
+            # No new type was selected so delete all links
+            delete_ids = entity_ids
+
+        if delete_ids:
             sql = """
                 DELETE FROM model.{table}
-                WHERE range_id = %(old_type_id)s AND domain_id IN %(entity_ids)s;""".format(
+                WHERE range_id = %(old_type_id)s AND domain_id IN %(delete_ids)s;""".format(
                 table='link_property' if root.name in app.config['PROPERTY_TYPES'] else 'link')
-        params = {
-            'old_type_id': old_node.id,
-            'new_type_id': new_type_id,
-            'entity_ids': tuple(entity_ids)}
-        g.cursor.execute(sql, params)
+            g.cursor.execute(sql, {'old_type_id': old_node.id, 'delete_ids': tuple(delete_ids)})
