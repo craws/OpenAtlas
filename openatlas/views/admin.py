@@ -247,7 +247,7 @@ def admin_log():
     form = LogForm()
     form.user.choices = [(0, _('all'))] + UserMapper.get_users()
     table = {
-        'id': 'log', 'header': ['date', 'priority', 'type', 'message', 'user', 'IP', 'info'],
+        'id': 'log', 'header': ['date', 'priority', 'type', 'message', 'user', 'info'],
         'data': []}
     logs = logger.get_system_logs(form.limit.data, form.priority.data, form.user.data)
     for row in logs:
@@ -258,7 +258,6 @@ def admin_log():
             row.type,
             row.message,
             link(user) if user and user.id else row.user_id,
-            row.ip,
             row.info.replace('\n', '<br />')])
     return render_template('admin/log.html', table=table, form=form)
 
