@@ -86,10 +86,10 @@ function setObjectId(e) {
 }
 
 function buildPopup(feature, action='view', selected=false) {
-    console.log(feature)
-    console.log(typeof(feature))
+    //console.log(feature)
+    //console.log(typeof(feature))
     //console.log(action);
-    console.log(selected)
+    //console.log(selected)
     popupHtml = '<div id="popup">'
     if (feature.properties.objectName) {
         popupHtml += '<strong>' + feature.properties.objectName + '</strong><br />';

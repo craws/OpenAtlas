@@ -111,8 +111,8 @@ class GisMapper:
                     """.format(shape=shape)
                 g.cursor.execute(sql, {
                     'entity_id': entity.id,
-                    'name': item['properties']['name'],
-                    'description': item['properties']['description'],
+                    'name': item['properties']['geometryName'],
+                    'description': item['properties']['geometryDescription'],
                     'type': item['properties']['geometryType'],
                     'geojson': json.dumps(item['geometry'])})
 
