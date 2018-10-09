@@ -22,6 +22,7 @@ import openatlas
 from openatlas import app
 from openatlas.models.classObject import ClassObject
 from openatlas.models.date import DateMapper
+from openatlas.models.imports import Project
 from openatlas.models.property import Property
 from openatlas.models.user import User
 
@@ -398,7 +399,10 @@ def link(entity):
     if not entity:
         return ''
     html = ''
-    if isinstance(entity, User):
+    if isinstance(entity, Project):
+        url = url_for('import_project_view', id_=entity.id)
+        html = '<a href="' + url + '">' + entity.name + '</a>'
+    elif isinstance(entity, User):
         style = '' if entity.active else 'class="inactive"'
         url = url_for('user_view', id_=entity.id)
         html = '<a ' + style + ' href="' + url + '">' + entity.username + '</a>'
