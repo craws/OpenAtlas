@@ -2,6 +2,9 @@
 
 BEGIN;
 
+-- Remove IP logging
+ALTER TABLE web.system_log DROP COLUMN ip;
+
 -- Add some comments to the schemas
 COMMENT ON SCHEMA gis IS 'All geospatial information is stored here';
 COMMENT ON SCHEMA model IS 'The main schema, storing CIDOC CRM itself and model related project data';

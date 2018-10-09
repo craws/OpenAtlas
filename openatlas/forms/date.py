@@ -122,8 +122,7 @@ class DateForm(Form):
                     date = DateMapper.form_to_datetime64(
                         fields[name + '_' + 'year' + postfix],
                         fields[name + '_' + 'month' + postfix],
-                        fields[name + '_' + 'day' + postfix]
-                    )
+                        fields[name + '_' + 'day' + postfix])
                     if not date:
                         field = getattr(self, 'date_' + name + '_' + 'day' + postfix)
                         field.errors.append(_('not a valid date'))
