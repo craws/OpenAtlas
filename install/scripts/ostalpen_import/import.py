@@ -11,13 +11,8 @@ from functions.scripts import (connect, prepare_databases, reset_database, datet
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
-do_import_files = True
-
-dict_units = {
-    24: 'Millimeter',
-    22: 'Meter',
-    23: 'Centimeter'}
-
+do_import_files = False
+dict_units = {24: 'Millimeter', 22: 'Meter', 23: 'Centimeter'}
 
 class Entity:
     dim = {}
@@ -52,6 +47,18 @@ def link(property_code, domain_id, range_id, description=None):
         'domain_id': domain_id,
         'range_id': range_id,
         'description': description})
+    return cursor_dpp.fetchone()[0]
+
+
+def link_property(domain_id, type_name):
+    sql = """
+        INSERT INTO model.link_property (property_code, domain_id, range_id)
+        VALUES (
+            'P2',
+            %(domain_id)s,
+            (SELECT id FROM model.entities WHERE name = %(type_name)s)
+        ) RETURNING id;"""
+    cursor_dpp.execute(sql,{'domain_id': domain_id, 'type_name': type_name})
     return cursor_dpp.fetchone()[0]
 
 
@@ -112,7 +119,7 @@ def insert_entity(e, with_case_study=False):
                 cursor_dpp.execute(sql, {'domain_id': e.id, 'dim_label': dim_label, 'dim_value': dim_value})
 
     # Dates
-    if e.class_code != 'E33':
+    if e.class_code not in ['E33', 'E53']:
         if e.start_time_abs:
             year = e.start_time_abs
             year = format(year, '03d') if year > 0 else format(year + 1, '04d')
@@ -679,9 +686,25 @@ for row in cursor_ostalpen.fetchall():
         domain = new_entities[row.links_entity_uid_from]
         link('P2', domain.id, types[type_name])
     elif row.links_cidoc_number_direction == 36:
-        # - 36 tbl_properties_uid is current or former member, in annotation is type ostalpen_uid
-        # check missing types like Bischof
-        pass
+        if row.links_entity_uid_to not in new_entities or row.links_entity_uid_from not in new_entities:
+            print('Missing entity for member link id: ' + str(row.links_uid))
+            continue
+        domain = new_entities[row.links_entity_uid_to]
+        range_ = new_entities[row.links_entity_uid_from]
+        member_link_id = link('P107', domain.id, range_.id)
+        print(member_link_id)
+        type_id = None
+        if row.links_annotation:
+            try:
+                type_id = int(row.annotation)
+            except:
+                pass
+        if type_id:
+            if type_id not in ostalpen_types:
+                print('Missing type id for membership:' + str(type_id))
+            else:
+                type_name = ostalpen_types[type_id]
+                link_property(member_link_id, type_name)
     elif row.links_cidoc_number_direction in [2, 5, 7, 9, 13, 15, 17, 19]:
         pass  # Ignore obsolete links
     else:
