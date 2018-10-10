@@ -11,7 +11,7 @@ from functions.scripts import (connect, prepare_databases, reset_database, datet
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
-do_import_files = False
+do_import_files = True
 
 dict_units = {
     24: 'Millimeter',
@@ -250,7 +250,7 @@ def insert_type_subs(openatlas_id, ostalpen_id, root):
         link('P127', sub_id, openatlas_id)
         if root == 'Material':
             sql = """
-                UPDATE model.entity SET description = 'weight percentage'
+                UPDATE model.entity SET description = 'weight percentage (0 = unknown)'
                 WHERE id = {id};""".format(id=sub_id)
             cursor_dpp.execute(sql)
             material_types[row.uid] = sub_id
@@ -363,6 +363,8 @@ for e in entities:
         elif e.entity_type in [11232, 11179, 11180]:  # File (map, photo, drawing)
             if '.' not in e.name:
                 continue  # There are two bogus files which are skipped
+            (new_file_name, ext) = os.path.splitext(e.name)
+            e.name = new_file_name
             e.system_type = 'file'
         elif e.entity_type == 12:  # These 23 have to be checked manually
             continue
@@ -654,7 +656,7 @@ for row in cursor_ostalpen.fetchall():
     elif row.links_cidoc_number_direction == 1:  # types
         if row.links_entity_uid_to in material_types:
             domain = new_entities[row.links_entity_uid_from]
-            link('P2', domain.id, material_types[row.links_entity_uid_to], '100')
+            link('P2', domain.id, material_types[row.links_entity_uid_to], '0')
             continue
         if row.links_entity_uid_to in ostalpen_place_types:
             continue  # archeological types done with links are invalid
@@ -680,9 +682,8 @@ for row in cursor_ostalpen.fetchall():
         # - 36 tbl_properties_uid is current or former member, in annotation is type ostalpen_uid
         # check missing types like Bischof
         pass
-    elif row.links_cidoc_number_direction in [2, ]:
+    elif row.links_cidoc_number_direction in [2, 5, 7, 9, 13, 15, 17, 19]:
         pass  # Ignore obsolete links
-
     else:
         missing_properties.add(row.links_cidoc_number_direction)
 

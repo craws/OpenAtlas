@@ -77,15 +77,17 @@ def import_files(cursor_dpp):
     import_path = os.path.dirname(__file__) + '/../../../../instance/finds'
     upload_path = os.path.dirname(__file__) + '/../../../../instance/dpp_uploads'
     for file in [f for f in os.listdir(import_path) if os.path.isfile(os.path.join(import_path, f))]:
-        name = basename(file)
-        sql = "SELECT id FROM model.entity WHERE name = %(name)s AND class_code = 'E31';"
+        name = basename(file).replace('img_', '')
+        (new_file_name, ext) = os.path.splitext(name)
+        name = new_file_name
+        sql = "SELECT id FROM model.entity WHERE LOWER(name) = LOWER(%(name)s) AND class_code = 'E31';"
         cursor_dpp.execute(sql, {'name': name})
         if cursor_dpp.rowcount < 1:
             print('No entity found for file: ' + name)
         elif cursor_dpp.rowcount > 1:
             print('Multiple entites found for file: ' + name)
         else:
-            new_file_name = str(cursor_dpp.fetchone().id) + '.' + name.rsplit('.', 1)[1].lower()
+            new_file_name = str(cursor_dpp.fetchone().id) + ext.lower()
             copyfile(import_path + '/' + file, upload_path + '/' + new_file_name)
     return
 

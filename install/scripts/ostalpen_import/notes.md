@@ -12,7 +12,7 @@ python3.5 install/scripts/ostalpen_import/import.py
 
 ### Search and replace following strings in Ostalpen SQL
 
-    openatla; with openaltas;
+    openatla; with openatlas;
 
 ### Create new database
 
