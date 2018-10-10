@@ -156,7 +156,7 @@ class NodeMapper(EntityMapper):
             entity.delete_links(['P2', 'P89'])
         for field in form:
             if field.name.startswith('value_list-'):
-                if field.data:
+                if field.data is not None:
                     node_id = int(field.name.replace('value_list-', ''))
                     entity.link('P2', node_id, field.data)
             elif isinstance(field, (TreeField, TreeMultiField)) and field.data:
