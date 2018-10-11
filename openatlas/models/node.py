@@ -219,3 +219,36 @@ class NodeMapper(EntityMapper):
             if node.root and node.count < 1 and not node.subs:
                 nodes.append(node)
         return nodes
+
+    @staticmethod
+    def move_entities(old_node, new_type_id, entity_ids):
+        root = g.nodes[old_node.root[-1]]
+        delete_ids = []
+        if new_type_id:  # A new type was selected
+            if root.multiple and not root.value_type:
+                cleaned_entity_ids = []
+                for entity in EntityMapper.get_by_ids(entity_ids):
+                    if any(node.id == int(new_type_id) for node in entity.nodes):
+                        delete_ids.append(entity.id)  # If already linked add to delete ids
+                    else:
+                        cleaned_entity_ids.append(entity.id)
+                entity_ids = cleaned_entity_ids
+            if entity_ids:
+                sql = """
+                    UPDATE model.{table} SET range_id = %(new_type_id)s
+                    WHERE range_id = %(old_type_id)s AND domain_id IN %(entity_ids)s;""".format(
+                    table='link_property' if root.name in app.config['PROPERTY_TYPES'] else 'link')
+                params = {
+                    'old_type_id': old_node.id,
+                    'new_type_id': new_type_id,
+                    'entity_ids': tuple(entity_ids)}
+                g.cursor.execute(sql, params)
+        else:
+            delete_ids = entity_ids  # No new type was selected so delete all links
+
+        if delete_ids:
+            sql = """
+                DELETE FROM model.{table}
+                WHERE range_id = %(old_type_id)s AND domain_id IN %(delete_ids)s;""".format(
+                table='link_property' if root.name in app.config['PROPERTY_TYPES'] else 'link')
+            g.cursor.execute(sql, {'old_type_id': old_node.id, 'delete_ids': tuple(delete_ids)})
