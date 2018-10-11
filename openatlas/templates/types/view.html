@@ -15,9 +15,7 @@
         {% endif %}
         {% if tables['entities'].data or tables['link_entities'].data %}
             <li>
-                <a href="#tab-entities">
-                    {{ _('entities')|uc_first }} ({{ (tables['entities']['data']|length + tables['link_entities']['data']|length)|format_number }})
-                </a>
+                <a href="#tab-entities">{{ _('entities')|uc_first }} ({{ (tables['entities']['data']|length + tables['link_entities']['data']|length)|format_number }})</a>
             </li>
         {% endif %}
     </ul>
@@ -44,9 +42,11 @@
     {% endif %}
     {% if tables['entities'].data or tables['link_entities'].data %}
         <div id="tab-entities">
-            <div class="button-bar">
-                <a class="button" href="{{ url_for('node_move_entities', id_=node.id) }}">{{ _('move entities')|uc_first }}</a>
-            </div>
+            {% if 'editor'|is_authorized and not root.value_type %}
+                <div class="button-bar">
+                    <a class="button" href="{{ url_for('node_move_entities', id_=node.id) }}">{{ _('move entities')|uc_first }}</a>
+                </div>
+            {% endif %}
             {% if tables['entities'].data %}
                 {{ tables['entities']|pager|safe }}
             {% endif %}
