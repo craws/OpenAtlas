@@ -963,7 +963,6 @@ CREATE TABLE web.system_log (
     type text,
     message text NOT NULL,
     user_id integer,
-    ip text,
     info text,
     created timestamp without time zone DEFAULT now() NOT NULL
 );

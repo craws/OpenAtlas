@@ -14,29 +14,24 @@ class DBHandler:
         priority = list(log_levels.keys())[list(log_levels.values()).index(priority)]
         if int(session['settings']['log_level']) < priority:
             return
-        info = 'path: {path}, method: {method}, agent: {agent}{info}'.format(
-            path=request.path,
-            method=request.method,
-            agent=request.headers.get('User-Agent'),
-            info='\n' + str(info) if info else '')
+        info = '{method} {path}{info}'.format(
+            path=request.path, method=request.method, info='\n' + str(info) if info else '')
         sql = """
-            INSERT INTO web.system_log (priority, type, message, user_id, ip, info)
-            VALUES(%(priority)s, %(type)s, %(message)s, %(user_id)s, %(ip)s, %(info)s)
+            INSERT INTO web.system_log (priority, type, message, user_id, info)
+            VALUES(%(priority)s, %(type)s, %(message)s, %(user_id)s, %(info)s)
             RETURNING id;"""
         params = {
             'priority': priority,
             'type': type_,
             'message': message,
             'user_id': current_user.id if hasattr(current_user, 'id') else None,
-            'ip': request.remote_addr,
             'info': info}
         g.cursor.execute(sql, params)
 
     @staticmethod
     def get_system_logs(limit, priority, user_id):
         sql = """
-            SELECT id, priority, type, message, user_id, ip, info, created
-            FROM web.system_log
+            SELECT id, priority, type, message, user_id, info, created FROM web.system_log
             WHERE priority <= %(priority)s"""
         sql += ' AND user_id = %(user_id)s' if int(user_id) > 0 else ''
         sql += ' ORDER BY created DESC'
