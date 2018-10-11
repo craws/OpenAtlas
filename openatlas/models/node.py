@@ -225,7 +225,7 @@ class NodeMapper(EntityMapper):
         root = g.nodes[old_node.root[-1]]
         delete_ids = []
         if new_type_id:  # A new type was selected
-            if root.multiple and not root.value_type:
+            if root.multiple:
                 cleaned_entity_ids = []
                 for entity in EntityMapper.get_by_ids(entity_ids):
                     if any(node.id == int(new_type_id) for node in entity.nodes):

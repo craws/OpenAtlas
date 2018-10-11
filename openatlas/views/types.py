@@ -143,7 +143,7 @@ class MoveForm(Form):
 def node_move_entities(id_):
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]]
-    if root.value_type:
+    if root.value_type:  # pragma: no cover
         abort(403)
     form = build_move_form(MoveForm, node)
     if form.validate_on_submit():
