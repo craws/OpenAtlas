@@ -53,11 +53,8 @@ def link(property_code, domain_id, range_id, description=None):
 def link_property(domain_id, type_name):
     sql = """
         INSERT INTO model.link_property (property_code, domain_id, range_id)
-        VALUES (
-            'P2',
-            %(domain_id)s,
-            (SELECT id FROM model.entities WHERE name = %(type_name)s)
-        ) RETURNING id;"""
+        VALUES ('P2', %(domain_id)s, (SELECT id FROM model.entity WHERE name = %(type_name)s))
+        RETURNING id;"""
     cursor_dpp.execute(sql,{'domain_id': domain_id, 'type_name': type_name})
     return cursor_dpp.fetchone()[0]
 
@@ -624,6 +621,7 @@ missing_properties = set()
 invalid_type_links = set()
 missing_dpp_types = set()
 missing_source_link = set()
+missing_actor_function = set()
 sql_ = """
     SELECT links_uid, links_entity_uid_from, links_cidoc_number_direction, links_entity_uid_to,
         links_annotation, links_creator, links_timestamp_start, links_timestamp_end,
@@ -692,19 +690,21 @@ for row in cursor_ostalpen.fetchall():
         domain = new_entities[row.links_entity_uid_to]
         range_ = new_entities[row.links_entity_uid_from]
         member_link_id = link('P107', domain.id, range_.id)
-        print(member_link_id)
         type_id = None
         if row.links_annotation:
             try:
-                type_id = int(row.annotation)
+                type_id = int(row.links_annotation)
             except:
                 pass
         if type_id:
             if type_id not in ostalpen_types:
-                print('Missing type id for membership:' + str(type_id))
+                print('Missing type id for actor function:' + str(type_id))
             else:
                 type_name = ostalpen_types[type_id]
-                link_property(member_link_id, type_name)
+                if type_name not in types:
+                    missing_actor_function.add(type_name)
+                else:
+                    link_property(member_link_id, type_name)
     elif row.links_cidoc_number_direction in [2, 5, 7, 9, 13, 15, 17, 19]:
         pass  # Ignore obsolete links
     else:
@@ -723,6 +723,9 @@ if missing_properties:
 if missing_ostalpen_place_types:
     print('Missing place types:')
     print(missing_ostalpen_place_types)
+if missing_actor_function:
+    print('Missing actor function:')
+    print(missing_actor_function)
 if invalid_type_links:
     print('Invalid type links:')
     print(invalid_type_links)
