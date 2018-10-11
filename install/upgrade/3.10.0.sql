@@ -2,6 +2,9 @@
 
 BEGIN;
 
+-- Remove all property links to node roots because not needed anymore
+DELETE FROM model.link_property WHERE property_code = 'P2' AND range_id IN (SELECT id FROM web.hierarchy);
+
 -- Remove IP logging
 ALTER TABLE web.system_log DROP COLUMN ip;
 
