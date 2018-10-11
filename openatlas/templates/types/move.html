@@ -8,5 +8,20 @@
     > {{ _('move') }}
 {% endblock %}
 {% block content %}
-    {{ form|display_form|safe }}
+    <form class="table" method="post">
+        {{ form.csrf_token }}
+        {{ form|display_move_form(root.name)|safe }}
+        <input id="save" name="save" value="{{ _('move')|uc_first }}" type="submit">
+    </form>
+
+    <script>
+        $('#select-all').click(function() {
+            var checkboxes = $(this).closest('form').find(':checkbox');
+            checkboxes.prop('checked', true);
+        });
+        $('#select-none').click(function() {
+            var checkboxes = $(this).closest('form').find(':checkbox');
+            checkboxes.prop('checked', false);
+        });
+    </script>
 {% endblock %}
