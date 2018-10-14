@@ -1,6 +1,8 @@
 # About
 
-OpenAtlas is an open source application for archeological, historical and geospatial data.
+OpenAtlas is an open source, web based database system for complex archaeological, historical and geospatial data.
+
+The information is mapped as a network using classes and properties of the [CIDOC CRM](http://www.cidoc-crm.org/).
 
 [Project website](http://openatlas.eu/website)
 

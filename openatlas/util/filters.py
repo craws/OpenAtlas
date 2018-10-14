@@ -12,6 +12,7 @@ from wtforms import IntegerField
 from wtforms.validators import Email
 
 from openatlas import app
+from openatlas.forms.forms import ValueFloatField, TreeField
 from openatlas.models.content import ContentMapper
 from openatlas.util import util
 from openatlas.util.util import display_tooltip, print_file_extension
@@ -71,6 +72,21 @@ def data_table(self, data):
 @blueprint.app_template_filter()
 def bookmark_toggle(self, entity_id):
     return util.bookmark_toggle(entity_id)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def display_move_form(self, form, root_name):
+    html = ''
+    for field in form:
+        if isinstance(field, TreeField):
+            html += '<p>' + root_name + ' ' + str(field) + '</p>'
+    html += '<p><a class="button" id="select-all">' + util.uc_first(_('select all')) + '</a>'
+    html += '<a class="button" id="select-none">' + util.uc_first(_('deselect all')) + '</a></p>'
+    table = {'id': 'move', 'header': ['#', util.uc_first(_('selection'))], 'data': []}
+    for item in form.selection:
+        table['data'].append([item, item.label.text])
+    return html + util.pager(table)
 
 
 @jinja2.contextfilter
@@ -175,7 +191,7 @@ def display_form(self, form, form_id=None, for_persons=False):
     def display_value_type_fields(subs, html_=''):
         for sub_id in subs:
             sub = g.nodes[sub_id]
-            field_ = getattr(form, 'value_list-' + str(sub_id))
+            field_ = getattr(form, str(sub_id))
             html_ += """
                 <div class="table-row value-type-switch">
                     <div><label>{label}</label> {tooltip}</div>
@@ -189,7 +205,7 @@ def display_form(self, form, form_id=None, for_persons=False):
         return html_
 
     for field in form:
-        if field.id.startswith('value_list-'):
+        if isinstance(field, ValueFloatField):
             continue
         class_ = 'required' if field.flags.required else ''
         class_ += ' integer' if isinstance(field, IntegerField) else ''

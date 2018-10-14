@@ -14,11 +14,8 @@ class DBHandler:
         priority = list(log_levels.keys())[list(log_levels.values()).index(priority)]
         if int(session['settings']['log_level']) < priority:
             return
-        info = 'path: {path}, method: {method}, agent: {agent}{info}'.format(
-            path=request.path,
-            method=request.method,
-            agent=request.headers.get('User-Agent'),
-            info='\n' + str(info) if info else '')
+        info = '{method} {path}{info}'.format(
+            path=request.path, method=request.method, info='\n' + str(info) if info else '')
         sql = """
             INSERT INTO web.system_log (priority, type, message, user_id, info)
             VALUES(%(priority)s, %(type)s, %(message)s, %(user_id)s, %(info)s)

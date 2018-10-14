@@ -1,4 +1,4 @@
-from flask import url_for
+from flask import url_for, g
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
@@ -14,21 +14,23 @@ class ActorTests(TestBaseCase):
             rv = self.app.get(url_for('actor_index'))
             assert b'No entries' in rv.data
 
-            # create entities for actor
+            # Create entities for actor
             rv = self.app.post(url_for('place_insert'), data={'name': 'Nostromos'})
             residence_id = rv.location.split('/')[-1]
             with app.test_request_context():
                 app.preprocess_request()
                 sex_node = NodeMapper.get_hierarchy_by_name('Sex')
+                sex_node_sub_1 = g.nodes[sex_node.subs[0]]
+                sex_node_sub_2 = g.nodes[sex_node.subs[1]]
                 event_id = EntityMapper.insert('E8', 'Event Horizon').id
                 source_id = EntityMapper.insert('E33', 'Tha source').id
 
-            # actor insert
+            # Actor insert
             rv = self.app.get(url_for('actor_insert', code='E21'))
             assert b'+ Person' in rv.data
             self.app.get(url_for('actor_insert', code='E21', origin_id=residence_id))
             data = {
-                sex_node.id: sex_node.id,
+                sex_node.id: sex_node_sub_1.id,
                 'name': 'Sigourney Weaver',
                 'alias-1': 'Ripley',
                 'residence': residence_id,
@@ -46,8 +48,20 @@ class ActorTests(TestBaseCase):
             rv = self.app.post(
                 url_for('actor_insert', code='E21', origin_id=residence_id), data=data)
             actor_id = rv.location.split('/')[-1]
-            rv = self.app.get(url_for('node_view', id_=sex_node.id))
+
+            # Test actor nodes
+            rv = self.app.get(url_for('node_view', id_=sex_node_sub_1.id))
             assert b'Susan' in rv.data
+            rv = self.app.get(url_for('node_move_entities', id_=sex_node_sub_1.id))
+            assert b'Sigourney' in rv.data
+            rv = self.app.post(url_for('node_move_entities', id_=sex_node_sub_1.id),
+                               data={sex_node.id: sex_node_sub_2.id, 'selection': [actor_id]},
+                               follow_redirects=True)
+            assert b'Entities where updated' in rv.data
+            rv = self.app.post(url_for('node_move_entities', id_=sex_node_sub_2.id),
+                               data={sex_node.id: '', 'selection': [actor_id]},
+                               follow_redirects=True)
+            assert b'Entities where updated' in rv.data
             self.app.post(url_for('actor_insert', code='E21', origin_id=actor_id), data=data)
             self.app.post(url_for('actor_insert', code='E21', origin_id=event_id), data=data)
             self.app.post(url_for('actor_insert', code='E21', origin_id=source_id), data=data)
@@ -64,7 +78,7 @@ class ActorTests(TestBaseCase):
             rv = self.app.get(url_for('actor_index'))
             assert b'Sigourney Weaver' in rv.data
 
-            # actor update
+            # Actor update
             rv = self.app.get(url_for('actor_update', id_=actor_id))
             assert b'American actress' in rv.data
             data['name'] = 'Susan Alexandra Weaver'
@@ -86,6 +100,6 @@ class ActorTests(TestBaseCase):
                 url_for('actor_view', id_=actor_id, unlink_id=666), follow_redirects=True)
             assert b'removed'in rv.data
 
-            # actor delete
+            # Actor delete
             rv = self.app.get(url_for('actor_delete', id_=actor_id), follow_redirects=True)
             assert b'The entry has been deleted.' in rv.data

@@ -26,6 +26,7 @@ class HierarchyTest(TestBaseCase):
             rv = self.app.post(
                 url_for('hierarchy_update', id_=hierarchy_id), data=data, follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
+
             data['name'] = 'Actor Actor Relation'
             rv = self.app.post(
                 url_for('hierarchy_update', id_=hierarchy_id), data=data, follow_redirects=True)
