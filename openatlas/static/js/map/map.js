@@ -28,7 +28,10 @@ if (gisPointAll) {
 }
 
 if (gisPolygonAll) {
-    var polygonLayer = new L.GeoJSON(gisPolygonAll, {onEachFeature: setPopup});
+    var polygonLayer = new L.GeoJSON(gisPolygonAll, {
+        onEachFeature: setPopup,
+        style: {color: '#9A9A9A'}
+    });
     controls.Polygons = polygonLayer;
 }
 
@@ -47,9 +50,7 @@ if (gisPolygonSelected != '') {
     var gisSites = L.geoJson(gisPolygonSelected, {onEachFeature: setPopup}).addTo(map);
     gisSites.on('click', setObjectId);
     var gisExtend = L.featureGroup([gisPoints, gisSites]);
-    setTimeout(function () {
-        map.fitBounds(gisExtend.getBounds(), {maxZoom: 12});
-    }, 1);
+    setTimeout(function () {map.fitBounds(gisExtend.getBounds(), {maxZoom: 12});}, 1);
 }
 
 if (window.location.href.indexOf('update') >= 0) {
@@ -77,19 +78,10 @@ function setObjectId(e) {
     layer = e.layer;
     editLayer = e.layer;
     feature = layer.feature;
-    //console.log(feature);
-    //console.log(feature.properties.geometryType);
     editMarker = e.marker;
-    //if (shapeType == 'point') {
-    //    position = (e.latlng);
-    //}
 }
 
 function buildPopup(feature, action='view', selected=false) {
-    //console.log(feature)
-    //console.log(typeof(feature))
-    //console.log(action);
-    //console.log(selected)
     popupHtml = '<div id="popup">'
     if (feature.properties.objectName) {
         popupHtml += '<strong>' + feature.properties.objectName + '</strong><br />';
@@ -98,11 +90,9 @@ function buildPopup(feature, action='view', selected=false) {
             <strong>` + feature.properties.geometryName + `</strong>
             <div style="max-height:140px;overflow-y:auto">` + feature.properties.geometryDescription + `</div>
             <i>` + feature.properties.geometryType + `</i>`
-    if (action == 'edit') {
+    if (action == 'edited') {
         popupHtml += '<p><i>' + translate['map_info_reedit'] + '</i></p>';
-    }
-    // Add detail link if not selected, add edit/delete button if selected and in update mode
-    if (!selected) {
+    } else if (!selected) {
         popupHtml += '<p><a href="/place/view/' + feature.properties.objectId + '">' + translate['details'] + '</a></p>';
     } else if (window.location.href.indexOf('update') >= 0) {
         popupHtml += `
@@ -124,6 +114,7 @@ function buildPopup(feature, action='view', selected=false) {
  * @param layer - Map layer to bind.
  */
 function setPopup(feature, layer, mode) {
+    feature.color = 'red';
     selected = false;
     // Check if this feature is selected
     if (gisPointSelected) {

@@ -1,3 +1,4 @@
+// Todo: try to remove most of these global variables
 var objectName; // Name of the entry at update of an existing entry
 
 // Variables for a selected geometry
@@ -5,9 +6,9 @@ var geometryName;
 var geometryDescription;
 var geometryType; // centerpoint, shape or area
 
-var captureCoordinates = false; // boolean if clicks on map should be captured as coordinates
-var marker = false; // temporary marker for point coordinate
-var geoJsonArray = []; // polygon coordinates storage
+var captureCoordinates = false; // Boolean if clicks on map should be captured as coordinates
+var marker = false; // Temporary marker for point coordinate
+var geoJsonArray = []; // Polygon coordinates storage
 var drawnPolygon = L.featureGroup();
 var layer;
 var newLayer = false;
@@ -217,7 +218,6 @@ function resetForm() {
 function saveForm() {
     geometryName = $('#geometryName').val().replace(/\"/g,'\\"');
     geometryDescription = $('#geometryDescription').val().replace(/\"/g,'\\"');
-    console.log(typeof newLayer);
     if (typeof newLayer == 'object') {
         saveEditedGeometry();
         newLayer.remove(map);
@@ -229,16 +229,9 @@ function saveForm() {
 
 function saveEditedGeometry() {
     geometryCoordinates = $('#geometryCoordinates').val();
-    /*if (geometrytype == 'Polygon') {
-        var myeditedlayer = L.polygon(mylayer.getLatLngs()).addTo(map);
-        myeditedlayer.setStyle({fillColor: '#686868'});
-        myeditedlayer.setStyle({color: '#686868'});
-    }*/
-
-    // newLayer.bindPopup(buildPopup());
     if (feature.properties.geometryType == 'centerpoint') {
-        points = JSON.parse($('#gis_points').val());
         // Remove former point
+        points = JSON.parse($('#gis_points').val());
         $.each(points, function (key, value) {
             if (value.properties.id == feature.properties.id) {
                 points.splice(key, 1);
@@ -252,10 +245,16 @@ function saveEditedGeometry() {
             `"properties":{"geometryName": "` + geometryName + `", "geometryDescription": "` + geometryDescription + `", "geometryType": "centerpoint"}}`;
         points.push(JSON.parse(point));
         $('#gis_points').val(JSON.stringify(points));
-        editedLayer = L.marker((newLayer.getLatLng()), {icon: editedIcon}).addTo(map);
+        editedLayer = L.marker(newLayer.getLatLng(), {icon: editedIcon}).addTo(map);
+        editedLayer.bindPopup(buildPopup(JSON.parse(point), 'edited'));
     }
+    closeForm(false);
 
-
+    /*if (geometrytype == 'Polygon') {
+        var myeditedlayer = L.polygon(mylayer.getLatLngs()).addTo(map);
+        myeditedlayer.setStyle({fillColor: '#686868'});
+        myeditedlayer.setStyle({color: '#686868'});
+    }*/
     /*if (geometrytype == 'Polygon') {
         var polygons = JSON.parse($('#gis_polygons').val());
         $.each(polygons, function (key, value) {
@@ -278,12 +277,10 @@ function saveEditedGeometry() {
         polygons.push(JSON.parse(polygon));
         $('#gis_polygons').val(JSON.stringify(polygons));
     }*/
-    closeForm(false);
 }
 
 function saveNewGeometry() {
     if (geometryType == 'centerpoint') {
-
         point =
             `{"type": "Feature", "geometry":` +
             `{"type": "Point", "coordinates": [` + $('#easting').val() + `,` + $('#northing').val() + `]},` +
@@ -291,9 +288,8 @@ function saveNewGeometry() {
         points = JSON.parse($('#gis_points').val());
         points.push(JSON.parse(point));
         $('#gis_points').val(JSON.stringify(points));
-        newMarker = L.marker(([$('#northing').val(), $('#easting').val()]), {icon: newIcon}).addTo(map);
-        console.log(point)
-        newMarker.bindPopup(buildPopup(JSON.parse(point)));
+        newMarker = L.marker(([$('#northing').val(), $('#easting').val()]), {icon: editedIcon}).addTo(map);
+        newMarker.bindPopup(buildPopup(JSON.parse(point), 'edited'));
         marker = false;  // unset the marker
     } else {
         coordinates = $('#geometryCoordinates').val();
@@ -314,10 +310,10 @@ function deleteGeometry() {
     // Remove layer of geometry, remove geometry from form field value
     if (typeof(editLayer) == 'object') { map.removeLayer(editLayer); }
     if (typeof(editMarker) == 'object') { map.removeLayer(editMarker); }
-    if (geometryType == 'centerpoint') {
+    if (feature.properties.geometryType == 'centerpoint') {
         points = JSON.parse($('#gis_points').val());
         $.each(points, function (key, value) {
-            if (value.properties.id == selectedGeometryId) {
+            if (value.properties.id == feature.properties.id) {
                 points.splice(key, 1);
                 return false;
             }
