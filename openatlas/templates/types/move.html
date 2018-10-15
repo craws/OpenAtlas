@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('node_index') }}">{{ _('types')|uc_first }}</a>
+    {% if root %}
+        > {{ root|link|safe }}
+    {% endif %}
+    > {{ node|link|safe }}
+    > {{ _('move') }}
+{% endblock %}
+{% block content %}
+    <form class="table" method="post">
+        {{ form.csrf_token }}
+        {{ form|display_move_form(root.name)|safe }}
+        <input id="save" name="save" value="{{ _('move')|uc_first }}" type="submit">
+    </form>
+
+    <script>
+        $('#select-all').click(function() {
+            var checkboxes = $(this).closest('form').find(':checkbox');
+            checkboxes.prop('checked', true);
+        });
+        $('#select-none').click(function() {
+            var checkboxes = $(this).closest('form').find(':checkbox');
+            checkboxes.prop('checked', false);
+        });
+    </script>
+{% endblock %}

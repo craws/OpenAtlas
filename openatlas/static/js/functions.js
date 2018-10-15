@@ -165,8 +165,8 @@ function selectFromTreeMulti(name, value_type=false) {
             $('#' + name + '-button').after(
                 $('<input>').attr({
                     type: 'text',
-                    id: 'value_list-' + node.id ,
-                    name: 'value_list-' + node.id,
+                    id: node.id ,
+                    name: node.id,
                     value: '20',
                     class: 'value_input'
             }));

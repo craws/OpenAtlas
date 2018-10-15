@@ -174,12 +174,9 @@ def get_entity_data(entity, location=None):
     data = []
     # Nodes
     type_data = OrderedDict()
-    nodes = entity.nodes
     if location:
-        nodes.update(location.nodes)
-    for node, node_value in nodes.items():
-        if not node.root:
-            continue
+        entity.nodes.update(location.nodes)  # Add location types
+    for node, node_value in entity.nodes.items():
         root = g.nodes[node.root[-1]]
         name = 'type' if root.name in app.config['BASE_TYPES'] else root.name
         if root.name not in type_data:

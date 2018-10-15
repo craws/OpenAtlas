@@ -11,6 +11,7 @@ from wtforms.widgets import HiddenInput
 from openatlas import app
 from openatlas.forms.date import DateForm
 from openatlas.models.entity import EntityMapper
+from openatlas.models.linkProperty import LinkPropertyMapper
 from openatlas.models.node import NodeMapper
 from openatlas.util.util import get_base_table_data, pager, truncate_string, uc_first
 
@@ -23,7 +24,7 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
     def add_value_type_fields(subs):
         for sub_id in subs:
             sub = g.nodes[sub_id]
-            setattr(form, 'value_list-' + str(sub.id), FloatField(sub.name, [Optional()]))
+            setattr(form, str(sub.id), ValueFloatField(sub.name, [Optional()]))
             add_value_type_fields(sub.subs)
 
     for id_, node in NodeMapper.get_nodes_for_form(form_name).items():
@@ -58,10 +59,41 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
                 node_data[root.id] = []
             node_data[root.id].append(node.id)
             if root.value_type:
-                getattr(form_instance, 'value_list-' + str(node.id)).data = node_value
+                getattr(form_instance, str(node.id)).data = node_value
         for root_id, nodes in node_data.items():
             if hasattr(form_instance, str(root_id)):
                 getattr(form_instance, str(root_id)).data = nodes
+    return form_instance
+
+
+def build_move_form(form, node):
+    root = g.nodes[node.root[-1]]
+    setattr(form, str(root.id), TreeField(str(root.id)))
+    form_instance = form(obj=node)
+
+    # Delete custom fields except the ones specified for the form
+    delete_list = []  # Can't delete fields in the loop so creating a list for later deletion
+    for field in form_instance:
+        if isinstance(field, TreeField) and int(field.id) != root.id:
+            delete_list.append(field.id)
+    for item in delete_list:
+        delattr(form_instance, item)
+    choices = []
+    if root.class_.code == 'E53':
+        for entity in node.get_linked_entities('P89', True):
+            place = entity.get_linked_entity('P53', True)
+            if place:
+                choices.append((entity.id, place.name))
+    elif root.name in app.config['PROPERTY_TYPES']:
+        for row in LinkPropertyMapper.get_entities_by_node(node):
+            domain = EntityMapper.get_by_id(row.domain_id)
+            range_ = EntityMapper.get_by_id(row.range_id)
+            choices.append((row.id, domain.name + ' - ' + range_.name))
+    else:
+        for entity in node.get_linked_entities('P2', True):
+            choices.append((entity.id, entity.name))
+
+    form_instance.selection.choices = choices
     return form_instance
 
 
@@ -250,7 +282,7 @@ class TableField(HiddenField):
 
 
 class TableMultiSelect(HiddenInput):
-    """ Table with checkboxes used in forms."""
+    """ Table with checkboxes used in a popup for forms."""
 
     def __call__(self, field, **kwargs):
         if field.data and isinstance(field.data, str):
@@ -293,3 +325,7 @@ class TableMultiSelect(HiddenInput):
 
 class TableMultiField(HiddenField):
     widget = TableMultiSelect()
+
+
+class ValueFloatField(FloatField):
+    pass
