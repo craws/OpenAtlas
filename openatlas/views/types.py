@@ -5,11 +5,12 @@ from flask import abort, flash, g, render_template, request, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import HiddenField, StringField, SubmitField, TextAreaField
+from wtforms import (HiddenField, SelectMultipleField, StringField, SubmitField, TextAreaField,
+                     widgets)
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import build_node_form
+from openatlas.forms.forms import build_move_form, build_node_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.node import NodeMapper
 from openatlas.util.util import link, required_group, sanitize, truncate_string
@@ -93,8 +94,7 @@ def node_view(id_):
                 link(entity),
                 g.classes[entity.class_.code].name,
                 truncate_string(entity.description)])
-    tables['link_entities'] = {
-        'id': 'link_entities', 'header': [_('domain'), _('range')], 'data': []}
+    tables['link_entities'] = {'id': 'link_items', 'header': [_('domain'), _('range')], 'data': []}
     for row in LinkPropertyMapper.get_entities_by_node(node):
         tables['link_entities']['data'].append([
             link(EntityMapper.get_by_id(row.domain_id)),
@@ -124,6 +124,36 @@ def node_delete(id_):
     root = g.nodes[node.root[-1]] if node.root else None
     url = url_for('node_view', id_=root.id) if root else url_for('node_index')
     return redirect(url)
+
+
+class MoveForm(Form):
+    is_node_form = HiddenField()
+    selection = SelectMultipleField(
+        '',
+        [InputRequired()],
+        coerce=int,
+        option_widget=widgets.CheckboxInput(),
+        widget=widgets.ListWidget(prefix_label=False),
+        default=['E21', 'E7', 'E40', 'E74', 'E8', 'E12', 'E6'])
+    save = SubmitField(_('move'))
+
+
+@app.route('/types/move/<int:id_>', methods=['POST', 'GET'])
+@required_group('editor')
+def node_move_entities(id_):
+    node = g.nodes[id_]
+    root = g.nodes[node.root[-1]]
+    if root.value_type:  # pragma: no cover
+        abort(403)
+    form = build_move_form(MoveForm, node)
+    if form.validate_on_submit():
+        g.cursor.execute('BEGIN')
+        NodeMapper.move_entities(node, getattr(form, str(root.id)).data, form.selection.data)
+        g.cursor.execute('COMMIT')
+        flash('Entities where updated', 'success')
+        return redirect(url_for('node_index') + '#tab-' + str(root.id))
+    getattr(form, str(root.id)).data = node.id
+    return render_template('types/move.html', node=node, root=root, form=form)
 
 
 def walk_tree(param):

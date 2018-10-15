@@ -1,4 +1,4 @@
-from flask import url_for
+from flask import url_for, g
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
@@ -21,9 +21,10 @@ class RelationTests(TestBaseCase):
             rv = self.app.get(url_for('relation_insert', origin_id=actor_id))
             assert b'Actor Actor Relation' in rv.data
             relation_id = NodeMapper.get_hierarchy_by_name('Actor Actor Relation').id
+            relation_sub_id = g.nodes[relation_id].subs[0]
             data = {
                 'actor': '[' + str(related_id) + ']',
-                relation_id: relation_id,
+                relation_id: relation_sub_id,
                 'inverse': None,
                 'date_begin_year': '-1949',
                 'date_begin_month': '10',
@@ -34,7 +35,7 @@ class RelationTests(TestBaseCase):
             rv = self.app.post(
                 url_for('relation_insert', origin_id=actor_id), data=data, follow_redirects=True)
             assert b'The Kurgan' in rv.data
-            rv = self.app.get(url_for('node_view', id_=relation_id))
+            rv = self.app.get(url_for('node_view', id_=relation_sub_id))
             assert b'Connor' in rv.data
             data['continue_'] = 'yes'
             data['inverse'] = True
@@ -47,6 +48,10 @@ class RelationTests(TestBaseCase):
             rv = self.app.post(
                 url_for('relation_insert', origin_id=related_id), data=data, follow_redirects=True)
             assert b"Can't link to itself." in rv.data
+
+            # Relation types
+            rv = self.app.get(url_for('node_move_entities', id_=relation_sub_id))
+            assert b'The Kurgan' in rv.data
 
             # Update relationship
             with app.test_request_context():

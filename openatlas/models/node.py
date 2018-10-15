@@ -4,6 +4,7 @@ from collections import OrderedDict
 
 from flask import g
 
+from openatlas import app
 from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.linkProperty import LinkPropertyMapper
 
@@ -151,27 +152,26 @@ class NodeMapper(EntityMapper):
 
     @staticmethod
     def save_entity_nodes(entity, form):
-        from openatlas.forms.forms import TreeField, TreeMultiField
+        from openatlas.forms.forms import TreeField, TreeMultiField, ValueFloatField
         if hasattr(entity, 'nodes'):
             entity.delete_links(['P2', 'P89'])
         for field in form:
-            if field.name.startswith('value_list-'):
-                if field.data is not None:
-                    node_id = int(field.name.replace('value_list-', ''))
-                    entity.link('P2', node_id, field.data)
-            elif isinstance(field, (TreeField, TreeMultiField)) and field.data:
+            if not field.data:
+                continue
+            if isinstance(field, ValueFloatField):
+                entity.link('P2', int(field.name), field.data)
+            elif isinstance(field, (TreeField, TreeMultiField)):
                 root = g.nodes[int(field.id)]
-                if not root.value_type:
-                    try:
-                        range_param = [int(field.data)]
-                    except ValueError:
-                        range_param = ast.literal_eval(field.data)
-                    if root.name in ['Administrative Unit', 'Historical Place']:
-                        if entity.class_.code == 'E53':
-                            entity.link('P89', range_param)
-                    else:
-                        if entity.class_.code != 'E53':
-                            entity.link('P2', range_param)
+                try:
+                    range_param = [int(field.data)]
+                except ValueError:
+                    range_param = ast.literal_eval(field.data)
+                if root.name in ['Administrative Unit', 'Historical Place']:
+                    if entity.class_.code == 'E53':
+                        entity.link('P89', range_param)
+                else:
+                    if entity.class_.code != 'E53':
+                        entity.link('P2', range_param)
 
     @staticmethod
     def save_link_nodes(link_id, form):
@@ -219,3 +219,36 @@ class NodeMapper(EntityMapper):
             if node.root and node.count < 1 and not node.subs:
                 nodes.append(node)
         return nodes
+
+    @staticmethod
+    def move_entities(old_node, new_type_id, entity_ids):
+        root = g.nodes[old_node.root[-1]]
+        delete_ids = []
+        if new_type_id:  # A new type was selected
+            if root.multiple:
+                cleaned_entity_ids = []
+                for entity in EntityMapper.get_by_ids(entity_ids):
+                    if any(node.id == int(new_type_id) for node in entity.nodes):
+                        delete_ids.append(entity.id)  # If already linked add to delete ids
+                    else:
+                        cleaned_entity_ids.append(entity.id)
+                entity_ids = cleaned_entity_ids
+            if entity_ids:
+                sql = """
+                    UPDATE model.{table} SET range_id = %(new_type_id)s
+                    WHERE range_id = %(old_type_id)s AND domain_id IN %(entity_ids)s;""".format(
+                    table='link_property' if root.name in app.config['PROPERTY_TYPES'] else 'link')
+                params = {
+                    'old_type_id': old_node.id,
+                    'new_type_id': new_type_id,
+                    'entity_ids': tuple(entity_ids)}
+                g.cursor.execute(sql, params)
+        else:
+            delete_ids = entity_ids  # No new type was selected so delete all links
+
+        if delete_ids:
+            sql = """
+                DELETE FROM model.{table}
+                WHERE range_id = %(old_type_id)s AND domain_id IN %(delete_ids)s;""".format(
+                table='link_property' if root.name in app.config['PROPERTY_TYPES'] else 'link')
+            g.cursor.execute(sql, {'old_type_id': old_node.id, 'delete_ids': tuple(delete_ids)})
