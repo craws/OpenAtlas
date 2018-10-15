@@ -5,5 +5,14 @@
     > {{ project.name }}
 {% endblock %}
 {% block content %}
+    {% if 'manager'|is_authorized %}
+        <div class="button-bar">
+            <a href="{{ url_for('import_project_update', id_=project.id)}}">{{ _('edit')|uc_first }}</a>
+            <a href="{{ url_for('import_project_delete', id_=project.id) }}"
+                onclick="return confirm('{{ _('Delete %(name)s?', name=project.name|replace("'", "")) }}')">
+                {{ _('delete')|uc_first }}
+            </a>
+        </div>
+    {% endif %}
     {{ project|description|safe }}
 {% endblock %}

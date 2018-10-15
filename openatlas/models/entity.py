@@ -218,9 +218,8 @@ class EntityMapper:
     @staticmethod
     def delete(entity):
         """ Triggers function model.delete_entity_related() for deleting related entities"""
-        entity_id = entity if isinstance(entity, int) else entity.id
-        sql = "DELETE FROM model.entity WHERE id = %(entity_id)s;"
-        g.cursor.execute(sql, {'entity_id': entity_id})
+        id_ = entity if isinstance(entity, int) else entity.id
+        g.cursor.execute('DELETE FROM model.entity WHERE id = %(id_)s;', {'id_': id_})
 
     @staticmethod
     def get_overview_counts():
