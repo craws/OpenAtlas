@@ -32,7 +32,6 @@ cursor_ostalpen = connection_ostalpen.cursor(cursor_factory=psycopg2.extras.Name
 
 prepare_databases(cursor_dpp)
 
-
 def link(property_code, domain_id, range_id, description=None):
     sql = """
         INSERT INTO model.link (property_code, domain_id, range_id, description)
@@ -263,6 +262,7 @@ def insert_type_subs(openatlas_id, ostalpen_id, root):
         insert_type_subs(sub_id, row.uid, root)
 
 
+# Archeological Subunits
 for root in ['Feature', 'Finds', 'Stratigraphical Unit', 'Material']:
     sql = """
         SELECT uid, entity_name_uri FROM openatlas.tbl_entities e
@@ -292,6 +292,40 @@ for root in ['Feature', 'Finds', 'Stratigraphical Unit', 'Material']:
             """.format(root=root, id=id_)
         cursor_dpp.execute(sql)
         insert_type_subs(id_, row.uid, root)
+
+
+# Administrative Units
+def insert_place_subs(ostalpen_id, dpp_id):
+    sql = """
+    SELECT l.links_entity_uid_from, e.entity_name_uri AS name, e.entity_description, e.uid
+    FROM openatlas.tbl_links l
+    JOIN openatlas.tbl_entities e ON l.links_entity_uid_from = e.uid
+    WHERE l.links_entity_uid_to = %(ostalpen_id)s AND l.links_cidoc_number_direction = 5;"""
+    cursor_ostalpen.execute(sql, {'ostalpen_id': ostalpen_id})
+    for row in cursor_ostalpen.fetchall():
+        sql = """
+            INSERT INTO model.entity (class_code, name, description, ostalpen_id)
+            VALUES('E53', %(name)s, %(description)s, %(ostalpen_id)s) RETURNING id;"""
+        cursor_dpp.execute(sql, {'name': row.name, 'description': row.entity_description,
+                                 'ostalpen_id': row.uid})
+        new_dpp_id = cursor_dpp.fetchone()[0]
+        sql = """
+            INSERT INTO model.link (property_code, domain_id, range_id)
+            VALUES ('P89', %(new_dpp_id)s, %(dpp_id)s);"""
+        cursor_dpp.execute(sql, {'new_dpp_id': new_dpp_id, 'dpp_id': dpp_id})
+        insert_place_subs(row.links_entity_uid_from, new_dpp_id)
+
+for root in ['Burgenland', 'Kärnten', 'Niederösterreich', 'Oberösterreich', 'Salzburg',
+             'Steiermark', 'Tirol', 'Vorarlberg', 'Wien']:
+    sql = 'SELECT uid FROM openatlas.tbl_entities WHERE entity_name_uri = %(root)s;'
+    cursor_ostalpen.execute(sql, {'root': root})
+    uid = cursor_ostalpen.fetchone()[0]
+    sql = """
+        UPDATE model.entity SET ostalpen_id = %(ostalpen_id)s
+        WHERE name = %(name)s RETURNING id;"""
+    cursor_dpp.execute(sql, {'ostalpen_id': uid, 'name': root})
+    insert_place_subs(uid, cursor_dpp.fetchone()[0])
+
 
 # Get ostalpen entities
 sql_ = """
@@ -705,7 +739,20 @@ for row in cursor_ostalpen.fetchall():
                     missing_actor_function.add(type_name)
                 else:
                     link_property(member_link_id, type_name)
-    elif row.links_cidoc_number_direction in [2, 5, 7, 9, 13, 15, 17, 19]:
+    elif row.links_cidoc_number_direction == 15:
+        sql = """
+            INSERT INTO model.link (property_code, domain_id, range_id)
+            VALUES ('P89',
+                (SELECT id FROM model.entity WHERE ostalpen_id = %(domain_id)s AND system_type = 'place location'),
+                (SELECT id FROM model.entity WHERE ostalpen_id = %(range_id)s));"""
+        try:
+            cursor_dpp.execute(sql, {
+                'domain_id': row.links_entity_uid_from, 'range_id': row.links_entity_uid_to})
+        except:
+            print('Double or no ostalpen_id:')
+            print(row.links_entity_uid_from)
+            print(row.links_entity_uid_to)
+    elif row.links_cidoc_number_direction in [2, 5, 7, 9, 13, 17, 19]:
         pass  # Ignore obsolete links
     else:
         missing_properties.add(row.links_cidoc_number_direction)
