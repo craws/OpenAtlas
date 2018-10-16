@@ -746,13 +746,19 @@ for row in cursor_ostalpen.fetchall():
                 (SELECT id FROM model.entity WHERE ostalpen_id = %(domain_id)s AND system_type = 'place location'),
                 (SELECT id FROM model.entity WHERE ostalpen_id = %(range_id)s));"""
         try:
-            cursor_dpp.execute(sql, {
-                'domain_id': row.links_entity_uid_from, 'range_id': row.links_entity_uid_to})
+            id_to = row.links_entity_uid_to
+            if id_to == 416:
+                id_to = 100
+            elif id_to == 417:
+                id_to = 99
+            elif id_to == 414:
+                id_to = 101
+            elif id_to == 412:
+                id_to = 97
+            cursor_dpp.execute(sql, {'domain_id': row.links_entity_uid_from, 'range_id': id_to})
         except:
-            print('Double or no ostalpen_id:')
-            print(row.links_entity_uid_from)
-            print(row.links_entity_uid_to)
-    elif row.links_cidoc_number_direction in [2, 5, 7, 9, 13, 17, 19]:
+            pass
+    elif row.links_cidoc_number_direction in [2, 5, 7, 9, 13, 17, 19, 25]:
         pass  # Ignore obsolete links
     else:
         missing_properties.add(row.links_cidoc_number_direction)
