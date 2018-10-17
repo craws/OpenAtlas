@@ -85,8 +85,8 @@ inputForm.onAdd = function (map) {
                     <input type="text" style="margin-top:0.5em;" oninput="check_coordinates_input()" id="northing" placeholder="decimal degrees" />
                 </div>
             </div>
-            <input type="button" title="Reset values and shape" id="resetButton" disabled value="` + translate["map_clear"] + `" onclick="resetForm()" />
-            <input type="button" title="` + translate["save"] + `" id="saveButton" disabled value="` + translate["save"] + `" onclick="saveForm()" />
+            <div style="clear:both;"></div>
+            <input type="button" id="saveButton" disabled value="` + translate["save"] + `" onclick="saveForm()" />
         </form>`;
     return div;
 };
@@ -94,7 +94,10 @@ inputForm.onAdd = function (map) {
 map.on('click', function(e) {
     if (captureCoordinates && geometryType == 'centerpoint') {
         $('#saveButton').prop('disabled', false);
-        if (marker) {  // marker already exists so move it
+        console.log(marker)
+        if (marker) {  // Marker already exists so move it
+            console.log('here');
+            console.log(marker);
             marker.setLatLng(e.latlng);
             marker.on('dragend', function (event) {
                 var marker = event.target;
@@ -102,8 +105,8 @@ map.on('click', function(e) {
                 $('#northing').val(position.lat);
                 $('#easting').val(position.lng);
             });
-        } else {  // no marker exists so create it
-            marker = new L.marker(e.latlng, {draggable: true, icon: newIcon});
+        } else {  // No marker exists so create it
+            var marker = new L.marker(e.latlng, {draggable: true, icon: newIcon});
             marker.addTo(map);
             wgs84 = (marker.getLatLng());
             $('#northing').val(wgs84.lat);
@@ -118,6 +121,8 @@ map.on('click', function(e) {
         });
         $('#northing').val(wgs84.lat);
         $('#easting').val(wgs84.lng);
+    } else if (captureCoordinates) {
+        $('#saveButton').prop('disabled', false);
     }
 });
 
@@ -141,7 +146,6 @@ map.on('draw:created', function (e) {
         $('#geometryCoordinates').val('(' + vector + ')');
     }
     $('#saveButton').prop('disabled', false);
-    $('#resetButton').prop('disabled', false);
 });
 
 function closeForm(withoutSave = true) {
@@ -163,7 +167,6 @@ function drawGeometry(selectedType) {
     geometryType = selectedType;
     map.addControl(inputForm);
     if (selectedType == 'centerpoint') {
-        $('#resetButton').hide();
         $('#coordinatesDiv').show();
     } else {
         captureCoordinates = false;
@@ -204,15 +207,6 @@ function interactionOff() {
     if (map.tap) {
         map.tap.disable();
     }
-}
-
-function resetForm() {
-    captureCoordinates = false;
-    map.closePopup();
-    drawnPolygon.removeLayer(layer);
-    drawLayer.enable();
-    $('#saveButton').prop('disabled', true);
-    $('#resetButton').prop('disabled', true);
 }
 
 function saveForm() {
@@ -295,12 +289,12 @@ function saveNewGeometry() {
         coordinates = $('#geometryCoordinates').val();
         polygon =
             `{"type": "Feature", "geometry":` +
-            `{"type": "Polygon", "coordinates":[[` + geoJsonArray.join(',') + `]]}, "properties":` +
-            `{"name": "` + geometryName + `", "description": "` + geometryDescription + `", "geometryType": "` + geometryType + `"}}`;
+            `{"type": "Polygon", "coordinates":[[` + geoJsonArray.join(',') + `]]},
+            "properties":{"geometryName": "` + geometryName + `", "geometryDescription": "` + geometryDescription + `", "geometryType": "` + geometryType + `"}}`;
         polygons = JSON.parse($('#gis_polygons').val());
         polygons.push(JSON.parse(polygon));
         $('#gis_polygons').val(JSON.stringify(polygons));
-        layer.bindPopup(buildPopup());
+        layer.bindPopup(buildPopup(JSON.parse(polygon), 'edited'));
         layer.addTo(map);
     }
     closeForm(false);
@@ -340,7 +334,6 @@ function editGeometry() {
     $('#geometryDescription').val(feature.properties.geometryDescription);
     $('.leaflet-right .leaflet-bar').hide();
     if (feature.properties.geometryType == 'centerpoint') {
-        $('#resetButton').hide();
         newLayer = L.marker(editLayer.getLatLng(), {draggable: true, icon: editIcon}).addTo(map);
         wgs84 = newLayer.getLatLng();
         $('#northing').val(wgs84.lat);
@@ -353,38 +346,53 @@ function editGeometry() {
             $('#easting').val(position.lng);
             $('#saveButton').prop('disabled', false);
         });
-
         layer.remove(marker);
     } else {
         $('#coordinatesDiv').hide();
-    }
-
-    //$("#shapeform").on("input", function () {
-    //    document.getElementById('editsavebtn').disabled = false;
-    //});
-    /*
-    if (geometryType === 'Polygon') {
         newLayer = L.polygon(editLayer.getLatLngs()).addTo(map);
-        newLayer.bindPopup(
-            '<div id="popup"><strong>' + objectName + '</strong><br/>' +
-            '<div id="popup"><strong>' + geometryName + '</strong><br/>' +
-            '<i>' + geometryType + '</i><br/><br/>' +
-            '<div style="max-height:140px; overflow-y: auto">' + geometryDescription + '</div>'
-            );
-        map.removeLayer(editLayer);
-        if (typeof (originLayer) == 'object') {
-            map.removeLayer(originLayer);
-        }
-        originLayer = L.polygon(editLayer.getLatLngs());
-        originLayer.bindPopup(
-            '<div id="popup"><strong>' + objectName + '</strong><br/>' +
-            '<div id="popup"><strong>' + geometryName + '</strong><br/>' +
-            '<i>' + geometryType + '</i><br/><br/>' +
-            '<div style="max-height:140px; overflow-y: auto">' + geometryDescription + '</div>' +
-            '<button onclick="editshape()"/>' + translate['edit'] + '</button> <button onclick="deleteshape()"/>' + translate['delete'] + '</button></div>'
-            );
+
+        // Workaround for Leaflet draw bug: https://github.com/Leaflet/Leaflet.draw/issues/804
+        newLayer.options.editing || (newLayer.options.editing = {});
+
+        newLayer.editing.enable();
+        newLayer.bindPopup(feature, 'edit');
+        newLayer.on('edit', function () {
+            $('#saveButton').prop('disabled', false);
+
+            /*var latLngs = mylayer.getLatLngs();
+            var latLngs; // to store coordinates of vertices
+            var newvector = []; // array to store coordinates as numbers
+            geoJsonArray = [];
+            var type = geometrytype.toLowerCase();
+            document.getElementById('editsavebtn').disabled = false;
+            if (type != 'marker') {  // if other type than point then store array of coordinates as variable
+                latLngs = mylayer.getLatLngs();
+                for (i = 0; i < (latLngs.length); i++) {
+                    newvector.push(' ' + latLngs[i].lng + ' ' + latLngs[i].lat);
+                    geoJsonArray.push('[' + latLngs[i].lng + ',' + latLngs[i].lat + ']');
+                }
+                if (type === 'polygon') {
+                    // if polygon add first xy again as last xy to close polygon
+                    newvector.push(' ' + latLngs[0].lng + ' ' + latLngs[0].lat);
+                    shapesyntax = '(' + newvector + ')';
+                    geoJsonArray.push('[' + latLngs[0].lng + ',' + latLngs[0].lat + ']');
+                    returndata();
+
+                }
+                if (type === 'linestring') {
+                    shapesyntax = newvector;
+                    returndata();
+                }
+            }
+            if (type === 'point') {
+                latLngs = mylayer.getLatLng();
+                newvector = (' ' + latLngs.lng + ' ' + latLngs.lat);
+                shapesyntax = 'ST_GeomFromText(\'POINT(' + newvector + ')\',4326);'
+                document.getElementById('northing').value = latLngs.lat;
+                document.getElementById('easting').value = latLngs.lng;
+            };*/
+        })
         map.removeLayer(editLayer);
     }
-    */
 
 }

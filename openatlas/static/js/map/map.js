@@ -18,7 +18,7 @@ var baseMaps = {
 
 var controls = {}
 if (gisPointAll) {
-    var pointLayer = new L.GeoJSON(gisPointAll, {
+    pointLayer = new L.GeoJSON(gisPointAll, {
         onEachFeature: setPopup,
         pointToLayer: function(feature, latlng) {
             return L.marker(latlng, {icon: grayMarker});
@@ -28,7 +28,7 @@ if (gisPointAll) {
 }
 
 if (gisPolygonAll) {
-    var polygonLayer = new L.GeoJSON(gisPolygonAll, {
+    polygonLayer = new L.GeoJSON(gisPolygonAll, {
         onEachFeature: setPopup,
         style: {color: '#9A9A9A'}
     });
@@ -37,7 +37,7 @@ if (gisPolygonAll) {
 
 if (gisPointSelected != '') {
     // View for a single place, set geoJson layer for all points
-    var gisPoints = L.geoJson(gisPointSelected, {onEachFeature: setPopup}).addTo(map);
+    gisPoints = L.geoJson(gisPointSelected, {onEachFeature: setPopup}).addTo(map);
     gisPoints.on('click', setObjectId);
     setTimeout(function () {
         map.fitBounds(gisPoints.getBounds(), {maxZoom: 12});
@@ -45,11 +45,11 @@ if (gisPointSelected != '') {
 }
 
 if (gisPolygonSelected != '') {
-    var gisPoints = L.geoJson(gisPointSelected, {onEachFeature: setPopup}).addTo(map);
+    gisPoints = L.geoJson(gisPointSelected, {onEachFeature: setPopup}).addTo(map);
     gisPoints.on('click', setObjectId);
-    var gisSites = L.geoJson(gisPolygonSelected, {onEachFeature: setPopup}).addTo(map);
+    gisSites = L.geoJson(gisPolygonSelected, {onEachFeature: setPopup}).addTo(map);
     gisSites.on('click', setObjectId);
-    var gisExtend = L.featureGroup([gisPoints, gisSites]);
+    gisExtend = L.featureGroup([gisPoints, gisSites]);
     setTimeout(function () {map.fitBounds(gisExtend.getBounds(), {maxZoom: 12});}, 1);
 }
 
@@ -98,8 +98,8 @@ function buildPopup(feature, action='view', selected=false) {
         popupHtml += `
             <div id="buttonBar" style="white-space:nowrap;">
                 <p>
-                    <button id="editButton" onclick="editGeometry()"/>` + translate['edit'] + `</button>
-                    <button id="deleteButton" onclick="deleteGeometry()"/>` + translate['delete'] + `</button>
+                    <button id="editButton" onclick="editGeometry()">` + translate['edit'] + `</button>
+                    <button id="deleteButton" onclick="deleteGeometry()">` + translate['delete'] + `</button>
                 </p>
             </div>`;
     }
@@ -114,8 +114,8 @@ function buildPopup(feature, action='view', selected=false) {
  * @param layer - Map layer to bind.
  */
 function setPopup(feature, layer, mode) {
-    feature.color = 'red';
     selected = false;
+    feature.color = 'red';
     // Check if this feature is selected
     if (gisPointSelected) {
         for (pointSelected in gisPointSelected) {
@@ -124,5 +124,14 @@ function setPopup(feature, layer, mode) {
             }
         }
     }
+    if (gisPolygonSelected) {
+        for (polygonSelected in gisPolygonSelected) {
+            if (gisPolygonSelected[polygonSelected].properties.objectId == feature.properties.objectId) {
+                selected = true;
+            }
+        }
+    }
+
+
     layer.bindPopup(buildPopup(feature, 'view', selected));
 }
