@@ -1,9 +1,9 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import flash, render_template, url_for
+from flask import flash, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
-from werkzeug.utils import redirect
-from wtforms import StringField, SubmitField, TextAreaField
+from werkzeug.utils import redirect, secure_filename
+from wtforms import FileField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app
@@ -75,3 +75,30 @@ def import_project_delete(id_):
     ImportMapper.delete_project(id_)
     flash(_('Project deleted'), 'info')
     return redirect(url_for('import_index'))
+
+
+class PersonForm(Form):
+    file = FileField(_('file'), [InputRequired()])
+    save = SubmitField(_('import'))
+
+
+@app.route('/import/person/<int:project_id>', methods=['POST', 'GET'])
+@required_group('manager')
+def import_person(project_id):
+    project = ImportMapper.get_project_by_id(project_id)
+    form = PersonForm()
+    if form.validate_on_submit():
+        file_ = request.files['file']
+        if not file_:  # pragma: no cover
+            flash(_('no file to upload'), 'error')
+        elif not ('.' in file_.filename and file_.filename.rsplit('.', 1)[1].lower() == 'csv'):
+            flash(_('file type not allowed'), 'error')
+        else:
+            filename = secure_filename(file_.filename)
+            file_path = app.config['IMPORT_FOLDER_PATH'] + '/' + filename
+            file_.save(file_path)
+            import csv
+            with open(file_path, newline='') as csv_file:
+                data = list(csv.reader(csv_file))
+                print(data)
+    return render_template('import/person.html', project=project, form=form)

@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
+    > <a href="{{ url_for('import_index') }}">{{ _('import')|uc_first }}</a>
+    > {{ project|link|safe }}
+    > {{ _('persons')|uc_first }}
+{% endblock %}
+{% block content %}
+    {{ form|display_form|safe }}
+{% endblock %}
