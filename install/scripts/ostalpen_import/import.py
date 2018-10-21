@@ -717,6 +717,31 @@ for row in cursor_ostalpen.fetchall():
             continue
         domain = new_entities[row.links_entity_uid_from]
         link('P2', domain.id, types[type_name])
+    elif row.links_cidoc_number_direction == 21:  # Acquisition took place at
+        domain = new_entities[row.links_entity_uid_from]
+        range_ = new_entities[row.links_entity_uid_to]
+        link('P7', domain.id, range_.id)
+        continue
+    elif row.links_cidoc_number_direction == 24:  # Was present at event
+        domain = new_entities[row.links_entity_uid_to]
+        range_ = new_entities[row.links_entity_uid_from]
+        link('P11', domain.id, range_.id)
+        continue
+    elif row.links_cidoc_number_direction == 28:  # Acquisition transferred title to actor
+        domain = new_entities[row.links_entity_uid_to]
+        range_ = new_entities[row.links_entity_uid_from]
+        link('P22', domain.id, range_.id)
+        continue
+    elif row.links_cidoc_number_direction == 30:  # Acquisition transferred title from actor
+        domain = new_entities[row.links_entity_uid_to]
+        range_ = new_entities[row.links_entity_uid_from]
+        link('P23', domain.id, range_.id)
+        continue
+    elif row.links_cidoc_number_direction == 31:  # Acquisition transferred title of place
+        domain = new_entities[row.links_entity_uid_from]
+        range_ = new_entities[row.links_entity_uid_to]
+        link('P24', domain.id, range_.id)
+        continue
     elif row.links_cidoc_number_direction == 36:
         if row.links_entity_uid_to not in new_entities or row.links_entity_uid_from not in new_entities:
             print('Missing entity for member link id: ' + str(row.links_uid))
@@ -762,6 +787,24 @@ for row in cursor_ostalpen.fetchall():
         pass  # Ignore obsolete links
     else:
         missing_properties.add(row.links_cidoc_number_direction)
+
+# Add property parcel numbers
+sql = """
+        SELECT l.links_entity_uid_from, l.links_entity_uid_to, l.links_annotation, e.entity_name_uri
+        FROM openatlas.tbl_links l
+        JOIN openatlas.tbl_entities e ON l.links_entity_uid_from = e.uid
+        WHERE l.links_cidoc_number_direction = 15 AND l.links_annotation IS NOT NULL;"""
+
+cursor_ostalpen.execute(sql)
+for row in cursor_ostalpen.fetchall():
+    text_ = '\nProperty parcel numbers: ' + row.entity_name_uri + ': ' + row.links_annotation
+    sql = """
+        UPDATE model.entity SET description = concat(description,%(text)s)
+        WHERE ostalpen_id = %(ostalpen_id)s;"""
+    cursor_dpp.execute(sql, {'ostalpen_id': row.links_entity_uid_from, 'text': text_})
+    print(sql)
+    print(row.links_entity_uid_to)
+    print(text_)
 
 # Files
 if do_import_files:
