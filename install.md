@@ -28,7 +28,7 @@ Installation code examples are based on a Debian 9 (Stretch) system.
 
 ### Files
 
-Copy the files to /var/www/your_sitename or clone it from Bitbucket
+Copy the files to /var/www/your_sitename or clone OpenAtlas from GitHub or Bitbucket
 
 ### Database
 
