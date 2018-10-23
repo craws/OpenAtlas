@@ -24,11 +24,15 @@ class Export:
             path = app.config['EXPORT_FOLDER_PATH'] + '/csv/'
         for name, value in form.data.items():
             if value and name not in ['save', 'zip']:
+                import pandas.io.sql as psql
+                sql = "SELECT * FROM {table}".format(table=name.replace('_', '.', 1))
+                data_frame = psql.read_sql(sql, g.db)
                 file_path = path + '/{date}_{name}.csv'.format(date=date_string, name=name)
-                file = open(file_path, 'w')
-                sql = "COPY {table} TO STDOUT DELIMITER ',' CSV HEADER FORCE QUOTE *;".format(
-                    table=name.replace('_', '.', 1))
-                g.cursor.copy_expert(sql, file)
+                data_frame.to_csv(file_path, index=False)
+                #file = open(file_path, 'w')
+                #sql = "COPY {table} TO STDOUT DELIMITER ',' CSV HEADER FORCE QUOTE *;".format(
+                 #   table=name.replace('_', '.', 1))
+                #g.cursor.copy_expert(sql, file)
         if form.zip.data:
             info = 'CSV export from: {host}\n'. format(host=request.headers['Host'])
             info += 'Created: {date} by {user}\nOpenAtlas version: {version}'.format(
