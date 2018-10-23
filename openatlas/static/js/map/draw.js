@@ -94,10 +94,7 @@ inputForm.onAdd = function (map) {
 map.on('click', function(e) {
     if (captureCoordinates && geometryType == 'centerpoint') {
         $('#saveButton').prop('disabled', false);
-        console.log(marker)
         if (marker) {  // Marker already exists so move it
-            console.log('here');
-            console.log(marker);
             marker.setLatLng(e.latlng);
             marker.on('dragend', function (event) {
                 var marker = event.target;
@@ -134,9 +131,9 @@ map.on('draw:created', function (e) {
         shapeSyntax = 'ST_GeomFromText(\'POINT(' + (' ' + coordinates.lng + ' ' + coordinates.lat) + ')\',4326);'
     } else {  // It's a polygon
         vector = []; // Array to store coordinates as numbers
-        geoJsonArray = [];
+        var geoJsonArray = [];
         coordinates = layer.getLatLngs()[0];
-        for (i = 0; i < (coordinates.length); i++) {
+        for (i = 0; i < coordinates.length; i++) {
             vector.push(' ' + coordinates[i].lng + ' ' + coordinates[i].lat);
             geoJsonArray.push('[' + coordinates[i].lng + ',' + coordinates[i].lat + ']');
         }
@@ -241,36 +238,29 @@ function saveEditedGeometry() {
         $('#gis_points').val(JSON.stringify(points));
         editedLayer = L.marker(newLayer.getLatLng(), {icon: editedIcon}).addTo(map);
         editedLayer.bindPopup(buildPopup(JSON.parse(point), 'edited'));
-    }
-    closeForm(false);
-
-    /*if (geometrytype == 'Polygon') {
-        var myeditedlayer = L.polygon(mylayer.getLatLngs()).addTo(map);
-        myeditedlayer.setStyle({fillColor: '#686868'});
-        myeditedlayer.setStyle({color: '#686868'});
-    }*/
-    /*if (geometrytype == 'Polygon') {
-        var polygons = JSON.parse($('#gis_polygons').val());
+    } else {
+        editedLayer = L.polygon(layer.getLatLngs()).addTo(map);
+        editedLayer.setStyle({fillColor: '#686868'});
+        editedLayer.setStyle({color: '#686868'});
+        // Remove former polygon
+        polygons = JSON.parse($('#gis_polygons').val());
         $.each(polygons, function (key, value) {
-            var id = (JSON.stringify(value.properties.id));
-            var index = ((JSON.stringify(key)));
-            if (id == selectedshape) {
+            index = (JSON.stringify(key));
+            if (value.properties.id == feature.properties.id) {
                 old_coordinates = value['geometry']['coordinates'];
                 polygons.splice(index, 1);
                 return false;
             }
         });
-        $('#gis_polygons').val(JSON.stringify(polygons));
         coordinates = '[[' + geoJsonArray.join(',') + ']]'
-        if (geoJsonArray.length < 1) {
-            coordinates = JSON.stringify(old_coordinates);
-        }
-        var polygon = '{"type":"Feature","geometry":{"type":"Polygon","coordinates":' + coordinates + '},"properties":';
-        polygon += '{"name": "' + $('#geometryName').val().replace(/\"/g,'\\"') + '","description": "' + $('#geometryDescription').val().replace(/\"/g,'\\"') + '", "geometryType": "' + geometryType + '"}}';
-        var polygons = JSON.parse($('#gis_polygons').val());
+        polygon =
+            `{"type": "Feature", "geometry":` +
+            `{"type": "Polygon", "coordinates": ` + coordinates + `},` +
+            `"properties":{"geometryName": "` + geometryName + `", "geometryDescription": "` + geometryDescription + `", "geometryType": "` + geometryType + `"}}`;
         polygons.push(JSON.parse(polygon));
         $('#gis_polygons').val(JSON.stringify(polygons));
-    }*/
+    }
+    closeForm(false);
 }
 
 function saveNewGeometry() {
@@ -316,7 +306,7 @@ function deleteGeometry() {
     } else {
         polygons = JSON.parse($('#gis_polygons').val());
         $.each(polygons, function (key, value) {
-            if (value.properties.id == selectedGeometryId) {
+            if (value.properties.id == feature.properties.id) {
                 polygons.splice(key, 1);
                 return false;
             }
@@ -358,41 +348,19 @@ function editGeometry() {
         newLayer.bindPopup(feature, 'edit');
         newLayer.on('edit', function () {
             $('#saveButton').prop('disabled', false);
-
-            /*var latLngs = mylayer.getLatLngs();
-            var latLngs; // to store coordinates of vertices
-            var newvector = []; // array to store coordinates as numbers
+            newVector = []; // array to store coordinates as numbers
             geoJsonArray = [];
-            var type = geometrytype.toLowerCase();
-            document.getElementById('editsavebtn').disabled = false;
-            if (type != 'marker') {  // if other type than point then store array of coordinates as variable
-                latLngs = mylayer.getLatLngs();
-                for (i = 0; i < (latLngs.length); i++) {
-                    newvector.push(' ' + latLngs[i].lng + ' ' + latLngs[i].lat);
-                    geoJsonArray.push('[' + latLngs[i].lng + ',' + latLngs[i].lat + ']');
-                }
-                if (type === 'polygon') {
-                    // if polygon add first xy again as last xy to close polygon
-                    newvector.push(' ' + latLngs[0].lng + ' ' + latLngs[0].lat);
-                    shapesyntax = '(' + newvector + ')';
-                    geoJsonArray.push('[' + latLngs[0].lng + ',' + latLngs[0].lat + ']');
-                    returndata();
-
-                }
-                if (type === 'linestring') {
-                    shapesyntax = newvector;
-                    returndata();
-                }
+            coordinates = newLayer.getLatLngs()[0];
+            for (i = 0; i < coordinates.length; i++) {
+                newVector.push(' ' + coordinates[i].lng + ' ' + coordinates[i].lat);
+                geoJsonArray.push('[' + coordinates[i].lng + ',' + coordinates[i].lat + ']');
             }
-            if (type === 'point') {
-                latLngs = mylayer.getLatLng();
-                newvector = (' ' + latLngs.lng + ' ' + latLngs.lat);
-                shapesyntax = 'ST_GeomFromText(\'POINT(' + newvector + ')\',4326);'
-                document.getElementById('northing').value = latLngs.lat;
-                document.getElementById('easting').value = latLngs.lng;
-            };*/
-        })
-        map.removeLayer(editLayer);
+            // Add first xy again as last xy to close polygon
+            newVector.push(' ' + coordinates[0].lng + ' ' + coordinates[0].lat);
+            geoJsonArray.push('[' + coordinates[0].lng + ',' + coordinates[0].lat + ']');
+
+        });
+
     }
 
 }
