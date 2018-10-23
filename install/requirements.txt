@@ -1,4 +1,4 @@
-# You can use this file if you prefer a pip install (without database)
+# You can use this file if you prefer a pip install
 
 bcrypt
 flask
