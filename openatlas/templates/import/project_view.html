@@ -13,6 +13,8 @@
                 {{ _('delete')|uc_first }}
             </a>
         </div>
+        {{ _('import')|uc_first }}:
+        <a href="{{ url_for('import_person', project_id=project.id) }}">{{ _('persons')|uc_first }}</a>
     {% endif %}
     {{ project|description|safe }}
 {% endblock %}

@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
+    > <a href="{{ url_for('import_index') }}">{{ _('import')|uc_first }}</a>
+    > {{ project|link|safe }}
+    > {{ _('persons')|uc_first }}
+{% endblock %}
+{% block content %}
+    {{ form|display_form|safe }}
+    {% for invalid_item in columns['invalid'] %}
+        <span class="error">{{ _('invalid column')|uc_first }}: {{ invalid_item }}</span><br />
+    {% endfor %}
+    {% if table %}
+        <h2>
+            {% if imported %}
+                {{ _('imported')|uc_first }}
+            {% else %}
+                {{ _('preview')|uc_first }}
+            {% endif %}
+        </h2>
+        {{ table|pager|safe }}
+    {% endif %}
+{% endblock %}

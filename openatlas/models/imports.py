@@ -62,3 +62,13 @@ class ImportMapper:
             'id': project.id,
             'name': project.name,
             'description': sanitize(project.description, 'description')})
+
+    @staticmethod
+    def import_csv(class_name, data):
+        from openatlas.models.entity import EntityMapper
+        class_code = 'undefined'
+        if class_name == 'person':
+            class_code = 'E21'
+        for row in data:
+            description = row['description'] if 'description' in row else None
+            EntityMapper.insert(code=class_code, name=row['name'], description=description)

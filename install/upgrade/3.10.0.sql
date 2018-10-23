@@ -30,7 +30,7 @@ ALTER TABLE import.project OWNER TO openatlas;
 CREATE TABLE import.project_entity (
     id integer NOT NULL,
     project_id integer NOT NULL,
-    origin_id text NOT NULL,
+    origin_id text,
     entity_id integer NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL
 );
