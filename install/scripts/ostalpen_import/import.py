@@ -64,7 +64,7 @@ def insert_entity(e, with_case_study=False):
         VALUES (%(name)s, %(description)s, %(class_code)s, %(system_type)s, %(ostalpen_id)s,
             %(created)s)
         RETURNING id;"""
-    description = e.description
+    description = None if e.class_code == 'E53' else e.description
     dates_comment = ''
     if e.class_code == 'E33':
         dates_comment += e.start_time_text if e.start_time_text else ''
@@ -297,10 +297,10 @@ for root in ['Feature', 'Finds', 'Stratigraphical Unit', 'Material']:
 # Administrative Units
 def insert_place_subs(ostalpen_id, dpp_id):
     sql = """
-    SELECT l.links_entity_uid_from, e.entity_name_uri AS name, e.entity_description, e.uid
-    FROM openatlas.tbl_links l
-    JOIN openatlas.tbl_entities e ON l.links_entity_uid_from = e.uid
-    WHERE l.links_entity_uid_to = %(ostalpen_id)s AND l.links_cidoc_number_direction = 5;"""
+        SELECT l.links_entity_uid_from, e.entity_name_uri AS name, e.entity_description, e.uid
+        FROM openatlas.tbl_links l
+        JOIN openatlas.tbl_entities e ON l.links_entity_uid_from = e.uid
+        WHERE l.links_entity_uid_to = %(ostalpen_id)s AND l.links_cidoc_number_direction = 5;"""
     cursor_ostalpen.execute(sql, {'ostalpen_id': ostalpen_id})
     for row in cursor_ostalpen.fetchall():
         sql = """
@@ -772,14 +772,6 @@ for row in cursor_ostalpen.fetchall():
                 (SELECT id FROM model.entity WHERE ostalpen_id = %(range_id)s));"""
         try:
             id_to = row.links_entity_uid_to
-            if id_to == 416:
-                id_to = 100
-            elif id_to == 417:
-                id_to = 99
-            elif id_to == 414:
-                id_to = 101
-            elif id_to == 412:
-                id_to = 97
             cursor_dpp.execute(sql, {'domain_id': row.links_entity_uid_from, 'range_id': id_to})
         except:
             pass
@@ -790,21 +782,19 @@ for row in cursor_ostalpen.fetchall():
 
 # Add property parcel numbers
 sql = """
-        SELECT l.links_entity_uid_from, l.links_entity_uid_to, l.links_annotation, e.entity_name_uri
+        SELECT l.links_entity_uid_from, l.links_entity_uid_to, l.links_annotation, e2.entity_name_uri
         FROM openatlas.tbl_links l
         JOIN openatlas.tbl_entities e ON l.links_entity_uid_from = e.uid
+        JOIN openatlas.tbl_entities e2 ON l.links_entity_uid_to = e2.uid
         WHERE l.links_cidoc_number_direction = 15 AND l.links_annotation IS NOT NULL;"""
 
 cursor_ostalpen.execute(sql)
 for row in cursor_ostalpen.fetchall():
-    text_ = '\nProperty parcel numbers: ' + row.entity_name_uri + ': ' + row.links_annotation
+    text_ = '\r\nParcel numbers: ' + row.entity_name_uri + ' ' + row.links_annotation
     sql = """
         UPDATE model.entity SET description = concat(description,%(text)s)
         WHERE ostalpen_id = %(ostalpen_id)s;"""
     cursor_dpp.execute(sql, {'ostalpen_id': row.links_entity_uid_from, 'text': text_})
-    print(sql)
-    print(row.links_entity_uid_to)
-    print(text_)
 
 # Files
 if do_import_files:
