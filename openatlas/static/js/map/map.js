@@ -1,4 +1,4 @@
-// Init map variable using the #map div with options
+// Init map
 var map = L.map('map', {
     fullscreenControl: true
 });
@@ -87,9 +87,9 @@ function buildPopup(feature, action='view', selected=false) {
         popupHtml += '<strong>' + feature.properties.objectName + '</strong><br />';
     }
     popupHtml = `
-            <strong>` + feature.properties.geometryName + `</strong>
-            <div style="max-height:140px;overflow-y:auto">` + feature.properties.geometryDescription + `</div>
-            <i>` + feature.properties.geometryType + `</i>`
+        <strong>` + feature.properties.geometryName + `</strong>
+        <div style="max-height:140px;overflow-y:auto">` + feature.properties.geometryDescription + `</div>
+        <i>` + feature.properties.geometryType + `</i>`
     if (action == 'edited') {
         popupHtml += '<p><i>' + translate['map_info_reedit'] + '</i></p>';
     } else if (!selected) {
@@ -98,7 +98,7 @@ function buildPopup(feature, action='view', selected=false) {
         popupHtml += `
             <div id="buttonBar" style="white-space:nowrap;">
                 <p>
-                    <button id="editButton" onclick="editGeometry()">` + translate['edit'] + `</button>
+                    <button id="editButton" onclick="editGeometry('` + feature.properties.geometryType + `')">` + translate['edit'] + `</button>
                     <button id="deleteButton" onclick="deleteGeometry()">` + translate['delete'] + `</button>
                 </p>
             </div>`;
@@ -107,15 +107,8 @@ function buildPopup(feature, action='view', selected=false) {
     return popupHtml;
 }
 
-
-/**
- * Function to display a marker's popup on the map
- * @param feature - Markers object.
- * @param layer - Map layer to bind.
- */
 function setPopup(feature, layer, mode) {
     selected = false;
-    feature.color = 'red';
     // Check if this feature is selected
     if (gisPointSelected) {
         for (pointSelected in gisPointSelected) {
@@ -131,7 +124,5 @@ function setPopup(feature, layer, mode) {
             }
         }
     }
-
-
     layer.bindPopup(buildPopup(feature, 'view', selected));
 }

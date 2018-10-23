@@ -67,7 +67,6 @@ inputForm.onAdd = function (map) {
     div.innerHTML = `
         <form id="geometryForm" onmouseover="interactionOff()" onmouseout="interactionOn()">
             <input type="hidden" id="geometryParent" value="NULL" />
-            <input type="hidden" id="geometryCoordinates" />
             <span id="inputFormTitle"></span>
             <span id="closeButton" title="` + translate["map_info_close"] + `" onclick="closeForm()" class="fa">X</span>
             <p id="inputFormInfo"></p>
@@ -86,7 +85,7 @@ inputForm.onAdd = function (map) {
                 </div>
             </div>
             <div style="clear:both;"></div>
-            <input type="button" id="saveButton" disabled value="` + translate["save"] + `" onclick="saveForm()" />
+            <input type="button" id="saveButton" disabled value="` + translate["save"] + `" onclick="saveForm('` + geometryType + `')" />
         </form>`;
     return div;
 };
@@ -129,18 +128,13 @@ map.on('draw:created', function (e) {
     if (geometryType == 'centerpoint') {
         coordinates = layer.getLatLng();
         shapeSyntax = 'ST_GeomFromText(\'POINT(' + (' ' + coordinates.lng + ' ' + coordinates.lat) + ')\',4326);'
-    } else {  // It's a polygon
-        vector = []; // Array to store coordinates as numbers
-        var geoJsonArray = [];
+    } else {
+        geoJsonArray = [];
         coordinates = layer.getLatLngs()[0];
         for (i = 0; i < coordinates.length; i++) {
-            vector.push(' ' + coordinates[i].lng + ' ' + coordinates[i].lat);
             geoJsonArray.push('[' + coordinates[i].lng + ',' + coordinates[i].lat + ']');
         }
-        // Add first xy again as last xy to close polygon
-        vector.push(' ' + coordinates[0].lng + ' ' + coordinates[0].lat);
-        geoJsonArray.push('[' + coordinates[0].lng + ',' + coordinates[0].lat + ']');
-        $('#geometryCoordinates').val('(' + vector + ')');
+        geoJsonArray.push('[' + coordinates[0].lng + ',' + coordinates[0].lat + ']'); // Add first xy again as last xy to close polygon
     }
     $('#saveButton').prop('disabled', false);
 });
@@ -177,49 +171,19 @@ function drawGeometry(selectedType) {
     $('.leaflet-right .leaflet-bar').hide();
 }
 
-function interactionOn() {
-    // Enable interaction with map e.g. if cursor leaves form
-    captureCoordinates = true;
-    map.dragging.enable();
-    map.touchZoom.enable();
-    map.doubleClickZoom.enable();
-    map.scrollWheelZoom.enable();
-    map.boxZoom.enable();
-    map.keyboard.enable();
-    if (map.tap) {
-        map.tap.enable();
-    }
-    $('#map').css( 'cursor', 'crosshair');
-}
-
-function interactionOff() {
-    // Disable interaction with map e.g. if cursor is over a form
-    captureCoordinates = false;
-    map.dragging.disable();
-    map.touchZoom.disable();
-    map.doubleClickZoom.disable();
-    map.scrollWheelZoom.disable();
-    map.boxZoom.disable();
-    map.keyboard.disable();
-    if (map.tap) {
-        map.tap.disable();
-    }
-}
-
-function saveForm() {
+function saveForm(geometryType) {
     geometryName = $('#geometryName').val().replace(/\"/g,'\\"');
     geometryDescription = $('#geometryDescription').val().replace(/\"/g,'\\"');
     if (typeof newLayer == 'object') {
-        saveEditedGeometry();
+        saveEditedGeometry(geometryType);
         newLayer.remove(map);
         newLayer = false;
     } else {
-        saveNewGeometry();
+        saveNewGeometry(geometryType);
     }
 }
 
-function saveEditedGeometry() {
-    geometryCoordinates = $('#geometryCoordinates').val();
+function saveEditedGeometry(geometryType) {
     if (feature.properties.geometryType == 'centerpoint') {
         // Remove former point
         points = JSON.parse($('#gis_points').val());
@@ -239,16 +203,11 @@ function saveEditedGeometry() {
         editedLayer = L.marker(newLayer.getLatLng(), {icon: editedIcon}).addTo(map);
         editedLayer.bindPopup(buildPopup(JSON.parse(point), 'edited'));
     } else {
-        editedLayer = L.polygon(layer.getLatLngs()).addTo(map);
-        editedLayer.setStyle({fillColor: '#686868'});
-        editedLayer.setStyle({color: '#686868'});
         // Remove former polygon
         polygons = JSON.parse($('#gis_polygons').val());
         $.each(polygons, function (key, value) {
-            index = (JSON.stringify(key));
             if (value.properties.id == feature.properties.id) {
-                old_coordinates = value['geometry']['coordinates'];
-                polygons.splice(index, 1);
+                polygons.splice(key, 1);
                 return false;
             }
         });
@@ -259,11 +218,13 @@ function saveEditedGeometry() {
             `"properties":{"geometryName": "` + geometryName + `", "geometryDescription": "` + geometryDescription + `", "geometryType": "` + geometryType + `"}}`;
         polygons.push(JSON.parse(polygon));
         $('#gis_polygons').val(JSON.stringify(polygons));
+        editedLayer = L.polygon(newLayer.getLatLngs()).addTo(map);
+        editedLayer.setStyle({fillColor: '#686868', color: '#686868'});
     }
     closeForm(false);
 }
 
-function saveNewGeometry() {
+function saveNewGeometry(geometryType) {
     if (geometryType == 'centerpoint') {
         point =
             `{"type": "Feature", "geometry":` +
@@ -276,7 +237,6 @@ function saveNewGeometry() {
         newMarker.bindPopup(buildPopup(JSON.parse(point), 'edited'));
         marker = false;  // unset the marker
     } else {
-        coordinates = $('#geometryCoordinates').val();
         polygon =
             `{"type": "Feature", "geometry":` +
             `{"type": "Polygon", "coordinates":[[` + geoJsonArray.join(',') + `]]},
@@ -315,11 +275,13 @@ function deleteGeometry() {
     }
 }
 
+
 function editGeometry() {
+    geometryType = feature.properties.geometryType;
     map.closePopup();
     map.addControl(inputForm);
-    $('#inputFormTitle').text(feature.properties.geometryType.substr(0,1).toUpperCase() + feature.properties.geometryType.substr(1));
-    $('#inputFormInfo').text(translate['map_info_' + feature.properties.geometryType]);
+    $('#inputFormTitle').text(geometryType.substr(0,1).toUpperCase() + geometryType.substr(1));
+    $('#inputFormInfo').text(translate['map_info_' + geometryType]);
     $('#geometryName').val(feature.properties.geometryName);
     $('#geometryDescription').val(feature.properties.geometryDescription);
     $('.leaflet-right .leaflet-bar').hide();
@@ -340,27 +302,48 @@ function editGeometry() {
     } else {
         $('#coordinatesDiv').hide();
         newLayer = L.polygon(editLayer.getLatLngs()).addTo(map);
-
-        // Workaround for Leaflet draw bug: https://github.com/Leaflet/Leaflet.draw/issues/804
-        newLayer.options.editing || (newLayer.options.editing = {});
-
+        newLayer.options.editing || (newLayer.options.editing = {}); // Workaround for Leaflet draw bug: https://github.com/Leaflet/Leaflet.draw/issues/804
         newLayer.editing.enable();
         newLayer.bindPopup(feature, 'edit');
         newLayer.on('edit', function () {
             $('#saveButton').prop('disabled', false);
-            newVector = []; // array to store coordinates as numbers
             geoJsonArray = [];
             coordinates = newLayer.getLatLngs()[0];
             for (i = 0; i < coordinates.length; i++) {
-                newVector.push(' ' + coordinates[i].lng + ' ' + coordinates[i].lat);
                 geoJsonArray.push('[' + coordinates[i].lng + ',' + coordinates[i].lat + ']');
             }
             // Add first xy again as last xy to close polygon
-            newVector.push(' ' + coordinates[0].lng + ' ' + coordinates[0].lat);
             geoJsonArray.push('[' + coordinates[0].lng + ',' + coordinates[0].lat + ']');
-
+            layer.remove(feature);
         });
-
     }
+}
 
+function interactionOn() {
+    // Enable interaction with map e.g. if cursor leaves form
+    captureCoordinates = true;
+    map.dragging.enable();
+    map.touchZoom.enable();
+    map.doubleClickZoom.enable();
+    map.scrollWheelZoom.enable();
+    map.boxZoom.enable();
+    map.keyboard.enable();
+    if (map.tap) {
+        map.tap.enable();
+    }
+    $('#map').css( 'cursor', 'crosshair');
+}
+
+function interactionOff() {
+    // Disable interaction with map e.g. if cursor is over a form
+    captureCoordinates = false;
+    map.dragging.disable();
+    map.touchZoom.disable();
+    map.doubleClickZoom.disable();
+    map.scrollWheelZoom.disable();
+    map.boxZoom.disable();
+    map.keyboard.disable();
+    if (map.tap) {
+        map.tap.disable();
+    }
 }
