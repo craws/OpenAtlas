@@ -1,5 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import os
+
+import pandas.io.sql as psql
 import shutil
 import subprocess
 from flask import g, request
@@ -22,17 +24,24 @@ class Export:
             os.makedirs(path)
         else:
             path = app.config['EXPORT_FOLDER_PATH'] + '/csv/'
-        for name, value in form.data.items():
-            if value and name not in ['save', 'zip']:
-                import pandas.io.sql as psql
-                sql = "SELECT * FROM {table}".format(table=name.replace('_', '.', 1))
+        for table in ['model_class_inheritance', 'model_entity', 'model_link',
+                      'model_link_property', 'model_property_inheritance','model_property',
+                      'model_class','gis_point', 'gis_polygon']:
+            if getattr(form, table).data:
+                fields = ['id']
+                if table in ['model_entity']:
+                    fields.append('name')
+                    fields.append('description')
+                    fields.append('class_code')
+                    fields.append("COALESCE(to_char(value_timestamp, 'MM-DD-YYYY'), '') AS value_timestamp")
+                    fields.append('created')
+                    fields.append('modified')
+
+                sql = "SELECT {fields} FROM {table};".format(
+                    fields=','.join(fields), table=table.replace('_', '.', 1))
                 data_frame = psql.read_sql(sql, g.db)
-                file_path = path + '/{date}_{name}.csv'.format(date=date_string, name=name)
+                file_path = path + '/{date}_{name}.csv'.format(date=date_string, name=table)
                 data_frame.to_csv(file_path, index=False)
-                #file = open(file_path, 'w')
-                #sql = "COPY {table} TO STDOUT DELIMITER ',' CSV HEADER FORCE QUOTE *;".format(
-                 #   table=name.replace('_', '.', 1))
-                #g.cursor.copy_expert(sql, file)
         if form.zip.data:
             info = 'CSV export from: {host}\n'. format(host=request.headers['Host'])
             info += 'Created: {date} by {user}\nOpenAtlas version: {version}'.format(
