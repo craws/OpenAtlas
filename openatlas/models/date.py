@@ -13,10 +13,12 @@ class DateMapper:
     @staticmethod
     def current_date_for_filename():
         today = datetime.today()
-        return '{year}-{month}-{day}'.format(
+        return '{year}-{month}-{day}_{hour}_{minute}'.format(
             year=today.year,
             month=str(today.month).zfill(2),
-            day=str(today.day).zfill(2))
+            day=str(today.day).zfill(2),
+            hour=str(today.hour).zfill(2),
+            minute=str(today.minute).zfill(2))
 
     @staticmethod
     def get_dates(entity):
