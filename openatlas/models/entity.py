@@ -166,7 +166,7 @@ class EntityMapper:
             VALUES (%(name)s, %(system_type)s, %(code)s, %(description)s, %(value_timestamp)s)
             RETURNING id;"""
         params = {
-            'name': str(date) if date else name.strip(),
+            'name': name.strip(),
             'code': code,
             'system_type': system_type.strip() if system_type else None,
             'description': description.strip() if description else None,
