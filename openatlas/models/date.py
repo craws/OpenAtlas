@@ -13,7 +13,7 @@ class DateMapper:
     @staticmethod
     def current_date_for_filename():
         today = datetime.today()
-        return '{year}-{month}-{day}_{hour}_{minute}'.format(
+        return '{year}-{month}-{day}_{hour}{minute}'.format(
             year=today.year,
             month=str(today.month).zfill(2),
             day=str(today.day).zfill(2),

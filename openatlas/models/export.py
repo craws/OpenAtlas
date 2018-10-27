@@ -42,7 +42,7 @@ class Export:
                     fields.append('modified')
                 sql = "SELECT {fields} FROM {table};".format(
                     fields=','.join(fields), table=table.replace('_', '.', 1))
-                if table in ['gis_point', 'gis_polygon'] and form.gis.data == 'geojson':
+                if table in ['gis_point', 'gis_polygon'] and form.gis.data == 'wkt':
                     data_frame = gpd.read_postgis(sql, g.db)
                 else:
                     data_frame = psql.read_sql(sql, g.db)
