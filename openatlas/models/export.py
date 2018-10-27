@@ -2,6 +2,7 @@
 import os
 
 import pandas.io.sql as psql
+import geopandas as gpd
 import shutil
 import subprocess
 from flask import g, request
@@ -17,29 +18,34 @@ class Export:
     def export_csv(form):
         """ Creates CSV file(s) in the export/csv folder, filename begins with current date."""
         date_string = DateMapper.current_date_for_filename()
+        path = app.config['EXPORT_FOLDER_PATH'] + '/csv/'
         if form.zip.data:
             path = '/tmp/' + date_string + '_openatlas_csv_export'
             if os.path.exists(path):
                 shutil.rmtree(path)  # pragma: no cover
             os.makedirs(path)
-        else:
-            path = app.config['EXPORT_FOLDER_PATH'] + '/csv/'
-        for table in ['model_class_inheritance', 'model_entity', 'model_link',
-                      'model_link_property', 'model_property_inheritance','model_property',
-                      'model_class','gis_point', 'gis_polygon']:
+        tables = {
+            'model_class': ['id', 'name', 'code'],
+            'model_class_inheritance': ['id', 'super_code', 'sub_code'],
+            'model_entity': ['id', 'name', 'description', 'class_code'],
+            'model_link': ['id', 'property_code', 'domain_id', 'range_id', 'description'],
+            'model_link_property': ['id', 'property_code', 'domain_id', 'range_id'],
+            'model_property': ['id', 'code', 'range_class_code', 'domain_class_code', 'name',
+                               'name_inverse'],
+            'model_property_inheritance': ['id', 'super_code', 'sub_code'],
+            'gis_point': ['id', 'entity_id', 'name', 'description', 'type', 'geom'],
+            'gis_polygon': ['id', 'entity_id', 'name', 'description', 'type', 'geom']}
+        for table, fields in tables.items():
             if getattr(form, table).data:
-                fields = ['id']
-                if table in ['model_entity']:
-                    fields.append('name')
-                    fields.append('description')
-                    fields.append('class_code')
-                    fields.append("COALESCE(to_char(value_timestamp, 'MM-DD-YYYY'), '') AS value_timestamp")
+                if form.timestamps.data:
                     fields.append('created')
                     fields.append('modified')
-
                 sql = "SELECT {fields} FROM {table};".format(
                     fields=','.join(fields), table=table.replace('_', '.', 1))
-                data_frame = psql.read_sql(sql, g.db)
+                if table in ['gis_point', 'gis_polygon'] and form.gis.data == 'geojson':
+                    data_frame = gpd.read_postgis(sql, g.db)
+                else:
+                    data_frame = psql.read_sql(sql, g.db)
                 file_path = path + '/{date}_{name}.csv'.format(date=date_string, name=table)
                 data_frame.to_csv(file_path, index=False)
         if form.zip.data:
