@@ -64,7 +64,7 @@ class ImportMapper:
             'description': sanitize(project.description, 'description')})
 
     @staticmethod
-    def import_csv(class_name, data):
+    def import_data(class_name, data):
         from openatlas.models.entity import EntityMapper
         class_code = 'undefined'
         if class_name == 'person':

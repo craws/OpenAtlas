@@ -43,11 +43,11 @@ class Export:
                 sql = "SELECT {fields} FROM {table};".format(
                     fields=','.join(fields), table=table.replace('_', '.', 1))
                 if table in ['gis_point', 'gis_polygon'] and form.gis.data == 'wkt':
-                    data_frame = gpd.read_postgis(sql, g.db)
+                    df = gpd.read_postgis(sql, g.db)
                 else:
-                    data_frame = psql.read_sql(sql, g.db)
+                    df = psql.read_sql(sql, g.db)
                 file_path = path + '/{date}_{name}.csv'.format(date=date_string, name=table)
-                data_frame.to_csv(file_path, index=False)
+                df.to_csv(file_path, index=False)
         if form.zip.data:
             info = 'CSV export from: {host}\n'. format(host=request.headers['Host'])
             info += 'Created: {date} by {user}\nOpenAtlas version: {version}'.format(

@@ -1,5 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 
+import pandas as pd
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
@@ -101,40 +102,39 @@ def import_person(project_id):
         else:
             filename = secure_filename(file_.filename)
             file_path = app.config['IMPORT_FOLDER_PATH'] + '/' + filename
-            file_.save(file_path)
-            import csv
-            with open(file_path, newline='') as csv_file:
-                data = csv.DictReader(csv_file)
-                try:
-                    for item in data.fieldnames:
-                        if item in columns['allowed']:
-                            columns['valid'].append(item)
-                        else:
-                            columns['invalid'].append(item)
-                except Exception as e:  # pragma: no cover
-                    logger.log('error', 'import', "invalid CSV file", e)
-                    flash(_('error invalid csv file'), 'error')
-                    return render_template('import/person.html', project=project, form=form,
-                                           columns=columns)
-                checked_data = []
-                if 'name' not in columns['valid']:
+            try:
+                file_.save(file_path)
+                df = pd.read_csv(file_path)
+                headers = list(df.columns.values)
+                if 'name' not in headers:
                     flash(_('missing name column'), 'error')
-                else:
-                    table = {'id': 'import', 'header': columns['valid'], 'data': []}
-                    table_data = []
-                    for row in data:
-                        table_row = []
-                        checked_list = {}
-                        for item in columns['valid']:
-                            table_row.append(row[item])
-                            checked_list[item] = row[item]
-                        table_data.append(table_row)
-                        checked_data.append(checked_list)
-                    table['data'] = table_data
+                    raise Exception()
+                for item in headers:
+                    if item not in columns['allowed']:
+                        columns['invalid'].append(item)
+                        del df[item]
+                headers = list(df.columns.values)
+                table = {'id': 'import', 'header': headers, 'data': []}
+                table_data = []
+                checked_data = []
+                for index, row in df.iterrows():
+                    table_row = []
+                    checked_row = {}
+                    for item in headers:
+                        table_row.append(row[item])
+                        checked_row[item] = row[item]
+                    table_data.append(table_row)
+                    checked_data.append(checked_row)
+                table['data'] = table_data
+            except Exception as e:  # pragma: no cover
+                flash(_('error at import'), 'error')
+                return render_template('import/person.html', project=project, form=form,
+                                       columns=columns)
+
             if not form.preview.data and checked_data:
                 g.cursor.execute('BEGIN')
                 try:
-                    ImportMapper.import_csv('person', checked_data)
+                    ImportMapper.import_data('person', checked_data)
                     g.cursor.execute('COMMIT')
                     logger.log('info', 'import', 'CSV import: ' + str(len(checked_data)))
                     flash(_('csv import of') + ': ' + str(len(checked_data)), 'info')
