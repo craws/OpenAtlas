@@ -2,7 +2,10 @@
 
 BEGIN;
 
--- Remove all property links to node roots because not needed anymore
+-- Recalculate name for date entities (fix possible former or imported data, especially BC values)
+UPDATE model.entity SET name = value_timestamp::date WHERE class_code = 'E61';
+
+-- Remove property links to node roots because not needed anymore
 DELETE FROM model.link_property WHERE property_code = 'P2' AND range_id IN (SELECT id FROM web.hierarchy);
 
 -- Remove IP logging
