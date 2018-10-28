@@ -113,7 +113,7 @@ def import_person(project_id):
                     if item not in columns['allowed']:
                         columns['invalid'].append(item)
                         del df[item]
-                headers = list(df.columns.values)
+                headers = list(df.columns.values)  # read cleaned up headers again
                 table = {'id': 'import', 'header': headers, 'data': []}
                 table_data = []
                 checked_data = []
