@@ -16,12 +16,14 @@ class PlaceTest(TestBaseCase):
             assert b'+ Place' in rv.data
             with app.test_request_context():
                 app.preprocess_request()
-                admin_unit_node = NodeMapper.get_hierarchy_by_name('Administrative Unit')
-                admin_unit_sub = g.nodes[admin_unit_node.subs[0]]
+                unit_node = NodeMapper.get_hierarchy_by_name('Administrative Unit')
+                unit_sub1 = g.nodes[unit_node.subs[0]]
+                unit_sub2 = g.nodes[unit_node.subs[1]]
                 reference_id = EntityMapper.insert('E31', 'Ancient Books', 'edition').id
                 place_node = NodeMapper.get_hierarchy_by_name('Place')
                 source_id = EntityMapper.insert('E33', 'Tha source').id
-            data = {'name': 'Asgard', 'alias-0': 'Valhöll', admin_unit_node.id: [admin_unit_sub.id]}
+            data = {'name': 'Asgard', 'alias-0': 'Valhöll',
+                    unit_node.id: '[' + str(unit_sub1.id) + ',' + str(unit_sub2.id) + ']'}
             rv = self.app.post(url_for('place_insert', origin_id=reference_id), data=data,
                                follow_redirects=True)
             assert b'Asgard' in rv.data
@@ -70,8 +72,18 @@ class PlaceTest(TestBaseCase):
             assert b'Link removed' in rv.data and b'Milla Jovovich' in rv.data
 
             # Place types
-            rv = self.app.get(url_for('node_move_entities', id_=admin_unit_sub.id))
+            rv = self.app.get(url_for('node_move_entities', id_=unit_sub1.id))
             assert b'Asgard' in rv.data
+            # Test move entities of multiple node if link to new node exists
+            rv = self.app.post(url_for('node_move_entities', id_=unit_sub1.id),
+                               data={unit_node.id: unit_sub2.id, 'selection': location.id},
+                               follow_redirects=True)
+            assert b'Entities where updated' in rv.data
+            # Test move entities of multiple node if link to new node doesn't exists
+            rv = self.app.post(url_for('node_move_entities', id_=unit_sub2.id),
+                               data={unit_node.id: unit_sub1.id, 'selection': location.id},
+                               follow_redirects=True)
+            assert b'Entities where updated' in rv.data
 
             # Subunits
             with app.app_context():
@@ -84,19 +96,19 @@ class PlaceTest(TestBaseCase):
                 self.app.post(url_for('place_update', id_=feat_id), data={'name': name})
                 name = "I'm a stratigraphic unit"
                 rv = self.app.post(url_for('place_insert', origin_id=feat_id), data={'name': name})
-                strat_id = rv.location.split('/')[-1]
-                self.app.get(url_for('place_insert', origin_id=strat_id))
-                self.app.get(url_for('place_update', id_=strat_id))
-                self.app.post(url_for('place_update', id_=strat_id), data={'name': name})
+                stratigraphic_id = rv.location.split('/')[-1]
+                self.app.get(url_for('place_insert', origin_id=stratigraphic_id))
+                self.app.get(url_for('place_update', id_=stratigraphic_id))
+                self.app.post(url_for('place_update', id_=stratigraphic_id), data={'name': name})
                 dimension_node_id = NodeMapper.get_hierarchy_by_name('Dimensions').subs[0]
                 data = {'name': 'You never find me', str(dimension_node_id): '50'}
-                rv = self.app.post(url_for('place_insert', origin_id=strat_id), data=data)
+                rv = self.app.post(url_for('place_insert', origin_id=stratigraphic_id), data=data)
                 find_id = rv.location.split('/')[-1]
                 self.app.get(url_for('place_update', id_=find_id))
                 self.app.post(url_for('place_update', id_=find_id), data=data)
             rv = self.app.get(url_for('place_view', id_=feat_id))
             assert b'not a bug' in rv.data
-            rv = self.app.get(url_for('place_view', id_=strat_id))
+            rv = self.app.get(url_for('place_view', id_=stratigraphic_id))
             assert b'a stratigraphic unit' in rv.data
             rv = self.app.get(url_for('place_view', id_=find_id))
             assert b'You never' in rv.data
