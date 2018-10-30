@@ -13,7 +13,7 @@ class DateMapper:
     @staticmethod
     def current_date_for_filename():
         today = datetime.today()
-        return '{year}-{month}-{day}_{hour}_{minute}'.format(
+        return '{year}-{month}-{day}_{hour}{minute}'.format(
             year=today.year,
             month=str(today.month).zfill(2),
             day=str(today.day).zfill(2),
@@ -153,7 +153,7 @@ class DateMapper:
 
     @staticmethod
     def save_date(id_, form, name, code, link_mapper):
-        """Saves a date taken from a form and links it
+        """ Saves a date taken from a form and creates links to the entity
 
         :param id_: id of an entity of link
         :param form: a form with date fields
@@ -173,14 +173,17 @@ class DateMapper:
             value = getattr(form, 'date_' + name + '_' + item).data
             date[item] = int(value) if value else ''
 
-        if date['year2']:  # time span
+        if date['year2']:  # Time span
             date_from = DateMapper.form_to_datetime64(date['year'], date['month'], date['day'])
-            date_from = EntityMapper.insert('E61', '', 'from date value', description, date_from)
+            date_from = EntityMapper.insert('E61', DateMapper.datetime64_to_timestamp(date_from),
+                                            'from date value', description, date_from)
             link_mapper.insert(id_, code, date_from)
             date_to = DateMapper.form_to_datetime64(date['year2'], date['month2'], date['day2'])
-            date_to = EntityMapper.insert('E61', '', system_type='to date value', date=date_to)
+            date_to = EntityMapper.insert('E61', DateMapper.datetime64_to_timestamp(date_to),
+                                          system_type='to date value', date=date_to)
             link_mapper.insert(id_, code, date_to)
-        else:  # exact date
+        else:  # Exact date
             date = DateMapper.form_to_datetime64(date['year'], date['month'], date['day'])
-            exact_date = EntityMapper.insert('E61', '', 'exact date value', description, date)
+            exact_date = EntityMapper.insert('E61', DateMapper.datetime64_to_timestamp(date),
+                                             'exact date value', description, date)
             link_mapper.insert(id_, code, exact_date)

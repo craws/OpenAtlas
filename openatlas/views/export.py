@@ -6,7 +6,7 @@ from flask import flash, render_template, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import BooleanField, SubmitField
+from wtforms import BooleanField, SubmitField, SelectField
 
 from openatlas import app, logger
 from openatlas.models.export import Export
@@ -19,6 +19,8 @@ class ExportSqlForm(Form):
 
 class ExportCsvForm(Form):
     zip = BooleanField(_('export as ZIP and add info file'), default=True)
+    timestamps = BooleanField('created and modified dates', default=False)
+    gis = SelectField(_('GIS format'), choices=[('wkt', 'WKT'), ('postgis', 'PostGIS Geometry')])
     model_class = BooleanField('model.class', default=True)
     model_class_inheritance = BooleanField('model.class_inheritance', default=True)
     model_entity = BooleanField('model.entity', default=True)
@@ -49,13 +51,11 @@ def admin_export_sql():
              'sort': 'sortList: [[0, 1]],headers: {0: { sorter: "text" }}'}
     for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
         name = basename(file)
-        file_path = path + '/' + name
         if name == '.gitignore':
             continue
-        data = [
-            name, convert_size(os.path.getsize(file_path)),
-            '<a href="' + url_for('download_sql', filename=name) + '">' + uc_first(
-                _('download')) + '</a>']
+        url = url_for('download_sql', filename=name)
+        data = [name, convert_size(os.path.getsize(path + '/' + name)),
+                '<a href="' + url + '">' + uc_first(_('download')) + '</a>']
         if is_authorized('admin') and writeable:
             confirm = ' onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
             delete = '<a href="' + url_for('delete_sql', filename=name)
