@@ -12,7 +12,10 @@ from functions.scripts import (connect, prepare_databases, reset_database, datet
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
 do_import_files = False
+do_link_subunits_types = True
+
 dict_units = {24: 'Millimeter', 22: 'Meter', 23: 'Centimeter'}
+
 
 class Entity:
     dim = {}
@@ -31,6 +34,7 @@ cursor_dpp = connection_dpp.cursor(cursor_factory=psycopg2.extras.NamedTupleCurs
 cursor_ostalpen = connection_ostalpen.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
 
 prepare_databases(cursor_dpp)
+
 
 def link(property_code, domain_id, range_id, description=None):
     sql = """
@@ -674,7 +678,7 @@ for row in cursor_ostalpen.fetchall():
             link('P2', domain.id, types['Translation'])
         else:
             print('Error missing translation type, id: ' + str(domain.id) + ', ' + domain.id_name)
-    elif row.links_cidoc_number_direction == 4:  # documents
+    elif row.links_cidoc_number_direction == 4:  # Documents
         if row.links_entity_uid_to not in new_entities or \
                 row.links_entity_uid_from not in new_entities:
                     missing_source_link.add(row.links_uid)
@@ -682,7 +686,7 @@ for row in cursor_ostalpen.fetchall():
         domain = new_entities[row.links_entity_uid_to]
         range_ = new_entities[row.links_entity_uid_from]
         link('P67', domain.id, range_.id ,row.links_annotation)
-    elif row.links_cidoc_number_direction == 11:  # subunits
+    elif row.links_cidoc_number_direction == 11:  # Subunits
         if row.links_entity_uid_to not in new_entities:
             print('Missing subunit for a link (11, to) for: ' + str(row.links_entity_uid_to))
             continue
@@ -692,13 +696,13 @@ for row in cursor_ostalpen.fetchall():
         domain = new_entities[row.links_entity_uid_to]
         range_ = new_entities[row.links_entity_uid_from]
         link('P46', range_.id, domain.id, row.links_annotation)
-    elif row.links_cidoc_number_direction == 1:  # types
+    elif row.links_cidoc_number_direction == 1:  # Types
         if row.links_entity_uid_to in material_types:
             domain = new_entities[row.links_entity_uid_from]
             link('P2', domain.id, material_types[row.links_entity_uid_to], '0')
             continue
         if row.links_entity_uid_to in ostalpen_place_types:
-            continue  # archeological types done with links are invalid
+            continue  # Archeological types done with links are invalid
         if row.links_entity_uid_to not in ostalpen_types:
             invalid_type_links.add(row.links_entity_uid_to)
             continue
@@ -796,6 +800,24 @@ for row in cursor_ostalpen.fetchall():
         WHERE ostalpen_id = %(ostalpen_id)s;"""
     cursor_dpp.execute(sql, {'ostalpen_id': row.links_entity_uid_from, 'text': text_})
 
+missing_ostalpen_place_types2 = set()
+if do_link_subunits_types:
+    # Add types for subunits
+    print('Add types for subunits')
+    sql = """
+        SELECT e.uid, e2.entity_name_uri FROM openatlas.tbl_entities e
+        JOIN openatlas.tbl_entities e2 ON e.entity_type = e2.uid
+        WHERE e.classes_uid = 12 AND e.entity_type IS NOT NULL;"""
+    cursor_ostalpen.execute(sql)
+    for row in cursor_ostalpen.fetchall():
+        if row.entity_name_uri not in types:
+            missing_ostalpen_place_types2.add(row.entity_name_uri)
+            continue
+        if row.uid not in new_entities:
+            missing_ostalpen_place_types2.add(row.uid)
+            continue
+        link('P2', new_entities[row.uid].id, types[row.entity_name_uri])
+
 # Files
 if do_import_files:
     add_licences(cursor_dpp, cursor_ostalpen)
@@ -806,6 +828,9 @@ if missing_classes:
 if missing_properties:
     print('Missing property ids:')
     print(missing_properties)
+if missing_ostalpen_place_types2:
+    print('Missing place types2:')
+    print(missing_ostalpen_place_types2)
 if missing_ostalpen_place_types:
     print('Missing place types:')
     print(missing_ostalpen_place_types)
