@@ -845,7 +845,7 @@ if missing_dpp_types:
     print('Missing DPP types:')
     print(missing_dpp_types)
 if missing_source_link:
-    print('Missing source links (links_uid):')
+    print('Missing source links (links_uid) 23 have to be checked manually:')
     print(missing_source_link)
 
 for name, count in count.items():
