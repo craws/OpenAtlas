@@ -6,6 +6,10 @@ python3.5 install/scripts/ostalpen_import/import.py
 
 ## Create Ostalpen database from original dump
 
+### Fetch latest dump
+
+From cPanel: Datenbanken > PostgreSQL backups > latest openatla_main_db.sql.gz
+
 ### Add postgis extension to begin of Ostalpen SQL
 
     CREATE EXTENSION postgis;

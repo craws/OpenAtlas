@@ -217,6 +217,8 @@ def save(form, node=None, root=None):
         node.name = form.name.data
         if root.directional and form.name_inverse.data.strip():
             node.name += ' (' + form.name_inverse.data.strip() + ')'
+        if not root.directional:
+            node.name = node.name.replace('(', '').replace(')', '')
         node.description = form.description.data
         node.update()
         # Update super if changed and node is not a root node
