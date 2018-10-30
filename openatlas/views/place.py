@@ -149,7 +149,7 @@ def place_view(id_, unlink_id=None):
             actor.class_.name,
             actor.first,
             actor.last])
-    gis_data = GisMapper.get_all(object_.id) if location else None
+    gis_data = GisMapper.get_all(object_) if location else None
     if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]':
         gis_data = None
     place = None
@@ -221,7 +221,7 @@ def place_update(id_):
         form.alias.append_entry(alias)
     if object_.system_type == 'place':
         form.alias.append_entry('')
-    gis_data = GisMapper.get_all(object_.id)
+    gis_data = GisMapper.get_all(object_)
     place = None
     feature = None
     stratigraphic_unit = None
