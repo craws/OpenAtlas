@@ -198,7 +198,6 @@ def insert_entity(e, with_case_study=False):
                 INSERT INTO model.link (property_code, domain_id, range_id) VALUES 
                 ('P2', %(id)s, (SELECT id FROM model.entity WHERE ostalpen_id = %(type_id)s));"""
             cursor_dpp.execute(sql, {'id': e.id, 'type_id': e.entity_type})
-
     return e.id
 
 
@@ -786,11 +785,11 @@ for row in cursor_ostalpen.fetchall():
 
 # Add property parcel numbers
 sql = """
-        SELECT l.links_entity_uid_from, l.links_entity_uid_to, l.links_annotation, e2.entity_name_uri
-        FROM openatlas.tbl_links l
-        JOIN openatlas.tbl_entities e ON l.links_entity_uid_from = e.uid
-        JOIN openatlas.tbl_entities e2 ON l.links_entity_uid_to = e2.uid
-        WHERE l.links_cidoc_number_direction = 15 AND l.links_annotation IS NOT NULL;"""
+    SELECT l.links_entity_uid_from, l.links_entity_uid_to, l.links_annotation, e2.entity_name_uri
+    FROM openatlas.tbl_links l
+    JOIN openatlas.tbl_entities e ON l.links_entity_uid_from = e.uid
+    JOIN openatlas.tbl_entities e2 ON l.links_entity_uid_to = e2.uid
+    WHERE l.links_cidoc_number_direction = 15 AND l.links_annotation IS NOT NULL;"""
 
 cursor_ostalpen.execute(sql)
 for row in cursor_ostalpen.fetchall():
@@ -811,10 +810,12 @@ if do_link_subunits_types:
     cursor_ostalpen.execute(sql)
     for row in cursor_ostalpen.fetchall():
         if row.entity_name_uri not in types:
-            missing_ostalpen_place_types2.add(row.entity_name_uri)
+            # they were already added
+            # missing_ostalpen_place_types2.add(row.entity_name_uri)
             continue
         if row.uid not in new_entities:
-            missing_ostalpen_place_types2.add(row.uid)
+            # one entity wasn't created because name was NULL
+            # missing_ostalpen_place_types2.add(row.uid)
             continue
         link('P2', new_entities[row.uid].id, types[row.entity_name_uri])
 
