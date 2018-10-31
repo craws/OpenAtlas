@@ -37,22 +37,22 @@ def actor_view(id_, unlink_id=None):
         LinkMapper.delete_by_id(unlink_id)
         flash(_('link removed'), 'info')
     actor.set_dates()
-    object_ids = []
+    objects = []
     info = get_entity_data(actor)
     residence = actor.get_linked_entity('P74')
     if residence:
         object_ = residence.get_linked_entity('P53', True)
-        object_ids.append(object_.id)
+        objects.append(object_)
         info.append((uc_first(_('residence')), link(object_)))
     first = actor.get_linked_entity('OA8')
     if first:
         object_ = first.get_linked_entity('P53', True)
-        object_ids.append(object_.id)
+        objects.append(object_)
         info.append((uc_first(_('appears first')), link(object_)))
     last = actor.get_linked_entity('OA9')
     if last:
         object_ = last.get_linked_entity('P53', True)
-        object_ids.append(object_.id)
+        objects.append(object_)
         info.append((uc_first(_('appears last')), link(object_)))
     tables = {
         'info': info,
@@ -87,7 +87,7 @@ def actor_view(id_, unlink_id=None):
         first = link_.first
         place = event.get_linked_entity('P7')
         if place:
-            object_ids.append(place.get_linked_entity('P53', True).id)
+            objects.append(place.get_linked_entity('P53', True))
         if not link_.first and event.first:
             first = '<span class="inactive" style="float:right">' + str(event.first) + '</span>'
         last = link_.last
@@ -155,7 +155,7 @@ def actor_view(id_, unlink_id=None):
                 data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
                 data.append(display_remove_link(unlink_url, link_.range.name))
             tables['member']['data'].append(data)
-    gis_data = GisMapper.get_all(object_ids) if object_ids else None
+    gis_data = GisMapper.get_all(objects) if objects else None
     if gis_data and gis_data['gisPointSelected'] == '[]':
         gis_data = None
     return render_template('actor/view.html', actor=actor, tables=tables, gis_data=gis_data)

@@ -20,7 +20,8 @@ class ExportSqlForm(Form):
 class ExportCsvForm(Form):
     zip = BooleanField(_('export as ZIP and add info file'), default=True)
     timestamps = BooleanField('created and modified dates', default=False)
-    gis = SelectField(_('GIS format'), choices=[('wkt', 'WKT'), ('postgis', 'PostGIS Geometry')])
+    gis_format = SelectField(_('GIS format'), choices=[
+        ('coordinates', _('coordinates')), ('wkt', 'WKT'), ('postgis', 'PostGIS Geometry')])
     model_class = BooleanField('model.class', default=True)
     model_class_inheritance = BooleanField('model.class_inheritance', default=True)
     model_entity = BooleanField('model.entity', default=True)

@@ -33,21 +33,29 @@ class Export:
             'model_property': ['id', 'code', 'range_class_code', 'domain_class_code', 'name',
                                'name_inverse'],
             'model_property_inheritance': ['id', 'super_code', 'sub_code'],
-            'gis_point': ['id', 'entity_id', 'name', 'description', 'type', 'geom'],
-            'gis_polygon': ['id', 'entity_id', 'name', 'description', 'type', 'geom']}
+            'gis_point': ['id', 'entity_id', 'name', 'description', 'type'],
+            'gis_polygon': ['id', 'entity_id', 'name', 'description', 'type']}
         for table, fields in tables.items():
             if getattr(form, table).data:
                 if form.timestamps.data:
                     fields.append('created')
                     fields.append('modified')
+                if table in ['gis_point'] and form.gis_format.data == 'coordinates':
+                    fields.append("ST_X(geom) || ' ' || ST_Y(geom) AS coordinates")
+                if table in ['gis_polygon'] and form.gis_format.data == 'coordinates':
+                    fields.append("""
+                        ST_X(public.ST_PointOnSurface(geom)) || ' ' ||
+                        ST_Y(public.ST_PointOnSurface(geom)) AS polygon_center_point""")
+                elif table in ['gis_point', 'gis_polygon']:
+                    fields.append('geom')
                 sql = "SELECT {fields} FROM {table};".format(
                     fields=','.join(fields), table=table.replace('_', '.', 1))
-                if table in ['gis_point', 'gis_polygon'] and form.gis.data == 'wkt':
-                    df = gpd.read_postgis(sql, g.db)
+                if table in ['gis_point', 'gis_polygon'] and form.gis_format.data == 'wkt':
+                    data_frame = gpd.read_postgis(sql, g.db)
                 else:
-                    df = psql.read_sql(sql, g.db)
+                    data_frame = psql.read_sql(sql, g.db)
                 file_path = path + '/{date}_{name}.csv'.format(date=date_string, name=table)
-                df.to_csv(file_path, index=False)
+                data_frame.to_csv(file_path, index=False)
         if form.zip.data:
             info = 'CSV export from: {host}\n'. format(host=request.headers['Host'])
             info += 'Created: {date} by {user}\nOpenAtlas version: {version}'.format(

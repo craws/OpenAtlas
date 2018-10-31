@@ -167,7 +167,7 @@ class NodeMapper(EntityMapper):
                 root = g.nodes[int(field.id)]
                 try:
                     range_param = [int(field.data)]
-                except ValueError:
+                except ValueError:  # Form value was a string e.g. '[97,2798]'
                     range_param = ast.literal_eval(field.data)
                 if root.name in ['Administrative Unit', 'Historical Place']:
                     if entity.class_.code == 'E53':

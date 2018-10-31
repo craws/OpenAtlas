@@ -10,7 +10,7 @@ Installation code examples are based on a Debian 9 (Stretch) system.
 
     # apt-get install python3 python3-bcrypt python3-dateutil python3-jinja2 python3-psycopg2
     # apt-get install python3-flask python3-flask-babel python3-flask-login python3-flaskext.wtf
-    # apt-get install python3-markdown python3-numpy python3-pandas
+    # apt-get install python3-markdown python3-numpy python3-pandas python3-geopandas
 
 ### Apache 2.4
 
