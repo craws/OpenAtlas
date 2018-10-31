@@ -104,7 +104,7 @@ def import_person(project_id):
             file_path = app.config['IMPORT_FOLDER_PATH'] + '/' + filename
             try:
                 file_.save(file_path)
-                df = pd.read_csv(file_path)
+                df = pd.read_csv(file_path, keep_default_na=False)
                 headers = list(df.columns.values)
                 if 'name' not in headers:
                     flash(_('missing name column'), 'error')
@@ -134,7 +134,7 @@ def import_person(project_id):
             if not form.preview.data and checked_data:
                 g.cursor.execute('BEGIN')
                 try:
-                    ImportMapper.import_data('person', checked_data)
+                    ImportMapper.import_data(project, 'person', checked_data)
                     g.cursor.execute('COMMIT')
                     logger.log('info', 'import', 'CSV import: ' + str(len(checked_data)))
                     flash(_('csv import of') + ': ' + str(len(checked_data)), 'info')

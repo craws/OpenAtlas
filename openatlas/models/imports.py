@@ -64,11 +64,18 @@ class ImportMapper:
             'description': sanitize(project.description, 'description')})
 
     @staticmethod
-    def import_data(class_name, data):
+    def import_data(project, class_name, data):
         from openatlas.models.entity import EntityMapper
         class_code = 'undefined'
         if class_name == 'person':
             class_code = 'E21'
         for row in data:
-            description = row['description'] if 'description' in row else None
-            EntityMapper.insert(code=class_code, name=row['name'], description=description)
+            desc = row['description'] if 'description' in row and row['description'] else None
+            entity = EntityMapper.insert(code=class_code, name=row['name'], description=desc)
+            sql = """
+                INSERT INTO import.project_entity (project_id, origin_id, entity_id)
+                VALUES (%(project_id)s, %(origin_id)s, %(entity_id)s);"""
+            g.cursor.execute(sql, {
+                'project_id': project.id,
+                'origin_id': row['id'] if 'id' in row and row['id'] else None,
+                'entity_id': entity.id})
