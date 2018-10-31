@@ -27,11 +27,15 @@ class ExportTest(TestBaseCase):
             assert b'Export CSV' in rv.data
             rv = self.app.post(url_for('admin_export_csv'), follow_redirects=True,
                                data={'zip': True, 'model_class': True,
-                                     'gis_point': True, 'gis': 'wkt'})
+                                     'gis_point': True, 'gis_format': 'wkt'})
             assert b'Data was exported as CSV' in rv.data
             rv = self.app.post(url_for('admin_export_csv'), follow_redirects=True,
                                data={'model_class': True, 'timestamps': True,
-                                     'gis_polygon': True, 'gis': 'postgis'})
+                                     'gis_polygon': True, 'gis_format': 'postgis'})
+            assert b'Data was exported as CSV' in rv.data
+            rv = self.app.post(url_for('admin_export_csv'), follow_redirects=True,
+                               data={'model_class': True, 'timestamps': True, 'gis_point': True,
+                                     'gis_polygon': True, 'gis_format': 'coordinates'})
             assert b'Data was exported as CSV' in rv.data
             date_string = DateMapper.current_date_for_filename()
             self.app.get(url_for('download_csv', filename=date_string + '_csv.zip'))
