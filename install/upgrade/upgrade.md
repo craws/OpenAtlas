@@ -6,7 +6,7 @@ Before executing SQL statements backup the database. Replace database role "open
 
 Install pandas libraries (needed for export and import)
 
-    apt-get install python3-pandas
+    apt-get install python3-pandas python3-geopandas
 
 Execute install/upgrade/3.10.0.sql after making backups
 
