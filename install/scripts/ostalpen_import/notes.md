@@ -10,10 +10,6 @@ python3.5 install/scripts/ostalpen_import/import.py
 
 From cPanel: Datenbanken > PostgreSQL backups > latest openatla_main_db.sql.gz
 
-### Add postgis extension to begin of Ostalpen SQL
-
-    CREATE EXTENSION postgis;
-
 ### Search and replace following strings in Ostalpen SQL
 
     openatla; with openatlas;
@@ -22,17 +18,21 @@ From cPanel: Datenbanken > PostgreSQL backups > latest openatla_main_db.sql.gz
 
     dropdb ostalpen
     createdb ostalpen -O openatlas
+    psql ostalpen -c "CREATE EXTENSION postgis;"
+    psql ostalpen < ~/Desktop/openatla_main_db.sql
 
 ## Put new version online
 
-- change settings (mail!)
-- change content text
+    pgdump openatlas_dpp > ~/Desktop/dpp.sql
 
-### Execute upgrades
+make upgrades
 
-    psql openatlas_dpp_origin < install/upgrade/3.6.0.sql
-    deactivate mail in admin
+    git pull github dev
 
-### Make a new SQL dump
+upload and install db
 
-    pg_dump openatlas_dpp > instance/dpp_origin.sql
+upload images
+
+make Stefan manager
+
+change settings (mail!) and content text
