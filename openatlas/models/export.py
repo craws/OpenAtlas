@@ -1,8 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import os
 
-import pandas.io.sql as psql
-import geopandas as gpd
 import shutil
 import subprocess
 from flask import g, request
@@ -17,6 +15,8 @@ class Export:
     @staticmethod
     def export_csv(form):
         """ Creates CSV file(s) in the export/csv folder, filename begins with current date."""
+        import pandas.io.sql as psql
+        import geopandas as gpd
         date_string = DateMapper.current_date_for_filename()
         path = app.config['EXPORT_FOLDER_PATH'] + '/csv/'
         if form.zip.data:
