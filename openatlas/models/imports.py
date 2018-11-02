@@ -53,6 +53,17 @@ class ImportMapper:
         g.cursor.execute('DELETE FROM import.project WHERE id = %(id)s;', {'id': id_})
 
     @staticmethod
+    def check_origin_ids(project, origin_ids):
+        sql = """
+            SELECT origin_id FROM import.project_entity
+            WHERE project_id = %(project_id)s AND origin_id IN %(ids)s;"""
+        g.cursor.execute(sql, {'project_id': project.id, 'ids': tuple(origin_ids)})
+        existing = []
+        for row in g.cursor.fetchall():
+            existing.append(row.origin_id)
+        return existing
+
+    @staticmethod
     def update_project(project):
         from openatlas.util.util import sanitize
         sql = """

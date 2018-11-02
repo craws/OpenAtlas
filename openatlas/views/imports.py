@@ -1,5 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 
+import collections
+
 import pandas as pd
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -117,15 +119,32 @@ def import_person(project_id):
                 table = {'id': 'import', 'header': headers, 'data': []}
                 table_data = []
                 checked_data = []
+                origin_ids = []
                 for index, row in df.iterrows():
                     table_row = []
                     checked_row = {}
                     for item in headers:
                         table_row.append(row[item])
                         checked_row[item] = row[item]
+                        if item == 'id' and row[item]:
+                            origin_ids.append(str(row[item]))
                     table_data.append(table_row)
                     checked_data.append(checked_row)
                 table['data'] = table_data
+
+                # Check origin ids for doubles and already existing
+                if origin_ids:
+                    doubles = [
+                        item for item,
+                        count in collections.Counter(origin_ids).items() if count > 1]
+                    existing = ImportMapper.check_origin_ids(project, set(origin_ids))
+                    if doubles or existing:
+                        if doubles:
+                            flash(_('Double ids in import: ') + ', '.join(doubles), 'error')
+                        if existing:
+                            flash(_('ids already in database: ') + ', '.join(existing), 'error')
+                        raise Exception()
+
             except Exception as e:  # pragma: no cover
                 flash(_('error at import'), 'error')
                 return render_template('import/person.html', project=project, form=form,
