@@ -1,5 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import g
+from flask_login import current_user
 
 
 class Project:
@@ -18,8 +19,7 @@ class Project:
 
 
 class ImportMapper:
-    sql = """SELECT p.id, p.name, p.description, p.created, p.modified
-            FROM import.project p"""
+    sql = "SELECT p.id, p.name, p.description, p.created, p.modified FROM import.project p"
 
     @staticmethod
     def insert_project(name, description=None):
@@ -55,7 +55,7 @@ class ImportMapper:
     @staticmethod
     def check_origin_ids(project, origin_ids):
         sql = """
-            SELECT origin_id FROM import.project_entity
+            SELECT origin_id FROM import.entity
             WHERE project_id = %(project_id)s AND origin_id IN %(ids)s;"""
         g.cursor.execute(sql, {'project_id': project.id, 'ids': tuple(origin_ids)})
         existing = []
@@ -84,9 +84,10 @@ class ImportMapper:
             desc = row['description'] if 'description' in row and row['description'] else None
             entity = EntityMapper.insert(code=class_code, name=row['name'], description=desc)
             sql = """
-                INSERT INTO import.project_entity (project_id, origin_id, entity_id)
-                VALUES (%(project_id)s, %(origin_id)s, %(entity_id)s);"""
+                INSERT INTO import.entity (project_id, origin_id, entity_id, user_id)
+                VALUES (%(project_id)s, %(origin_id)s, %(entity_id)s, %(user_id)s);"""
             g.cursor.execute(sql, {
                 'project_id': project.id,
                 'origin_id': row['id'] if 'id' in row and row['id'] else None,
-                'entity_id': entity.id})
+                'entity_id': entity.id,
+                'user_id': current_user.id})

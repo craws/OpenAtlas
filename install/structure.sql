@@ -37,8 +37,9 @@ ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_class_c
 ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_fkey;
-ALTER TABLE IF EXISTS ONLY import.project_entity DROP CONSTRAINT IF EXISTS project_entity_project_id_fkey;
-ALTER TABLE IF EXISTS ONLY import.project_entity DROP CONSTRAINT IF EXISTS project_entity_entity_id_fkey;
+ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS project_entity_user_id_fkey;
+ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS project_entity_project_id_fkey;
+ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS project_entity_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY gis.polygon DROP CONSTRAINT IF EXISTS polygon_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY gis.point DROP CONSTRAINT IF EXISTS point_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY gis.linestring DROP CONSTRAINT IF EXISTS linestring_entity_id_fkey;
@@ -75,7 +76,6 @@ ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_boo
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_pkey;
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS unsubscribe_code_key;
 ALTER TABLE IF EXISTS ONLY web.settings DROP CONSTRAINT IF EXISTS settings_pkey;
-ALTER TABLE IF EXISTS ONLY web.settings DROP CONSTRAINT IF EXISTS settings_name_key;
 ALTER TABLE IF EXISTS ONLY web.system_log DROP CONSTRAINT IF EXISTS log_pkey;
 ALTER TABLE IF EXISTS ONLY web.i18n DROP CONSTRAINT IF EXISTS i18n_pkey;
 ALTER TABLE IF EXISTS ONLY web.i18n DROP CONSTRAINT IF EXISTS i18n_name_language_key;
@@ -102,8 +102,8 @@ ALTER TABLE IF EXISTS ONLY model.class_i18n DROP CONSTRAINT IF EXISTS class_i18n
 ALTER TABLE IF EXISTS ONLY model.class DROP CONSTRAINT IF EXISTS class_code_key;
 ALTER TABLE IF EXISTS ONLY import.project DROP CONSTRAINT IF EXISTS project_pkey;
 ALTER TABLE IF EXISTS ONLY import.project DROP CONSTRAINT IF EXISTS project_name_key;
-ALTER TABLE IF EXISTS ONLY import.project_entity DROP CONSTRAINT IF EXISTS project_entity_project_id_origin_id_key;
-ALTER TABLE IF EXISTS ONLY import.project_entity DROP CONSTRAINT IF EXISTS project_entity_pkey;
+ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS project_entity_project_id_origin_id_key;
+ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS project_entity_pkey;
 ALTER TABLE IF EXISTS ONLY gis.polygon DROP CONSTRAINT IF EXISTS polygon_pkey;
 ALTER TABLE IF EXISTS ONLY gis.point DROP CONSTRAINT IF EXISTS point_pkey;
 ALTER TABLE IF EXISTS ONLY gis.linestring DROP CONSTRAINT IF EXISTS linestring_pkey;
@@ -127,8 +127,8 @@ ALTER TABLE IF EXISTS model.entity ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.class_inheritance ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.class_i18n ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.class ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS import.project_entity ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS import.project ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS import.entity ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS gis.polygon ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS gis.point ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS gis.linestring ALTER COLUMN id DROP DEFAULT;
@@ -174,8 +174,8 @@ DROP TABLE IF EXISTS model.class_i18n;
 DROP TABLE IF EXISTS model.class;
 DROP SEQUENCE IF EXISTS import.project_id_seq;
 DROP SEQUENCE IF EXISTS import.project_entity_id_seq;
-DROP TABLE IF EXISTS import.project_entity;
 DROP TABLE IF EXISTS import.project;
+DROP TABLE IF EXISTS import.entity;
 DROP SEQUENCE IF EXISTS gis.polygon_id_seq;
 DROP TABLE IF EXISTS gis.polygon;
 DROP SEQUENCE IF EXISTS gis.point_id_seq;
@@ -336,9 +336,9 @@ CREATE TABLE gis.linestring (
     name text,
     description text,
     type text,
-    geom public.geometry(LineString,4326),
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
+    modified timestamp without time zone,
+    geom public.geometry(LineString,4326)
 );
 
 
@@ -375,9 +375,9 @@ CREATE TABLE gis.point (
     name text,
     description text,
     type text,
-    geom public.geometry(Point,4326),
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
+    modified timestamp without time zone,
+    geom public.geometry(Point,4326)
 );
 
 
@@ -414,9 +414,9 @@ CREATE TABLE gis.polygon (
     name text,
     description text,
     type text,
-    geom public.geometry(Polygon,4326),
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
+    modified timestamp without time zone,
+    geom public.geometry(Polygon,4326)
 );
 
 
@@ -444,6 +444,22 @@ ALTER SEQUENCE gis.polygon_id_seq OWNED BY gis.polygon.id;
 
 
 --
+-- Name: entity; Type: TABLE; Schema: import; Owner: openatlas
+--
+
+CREATE TABLE import.entity (
+    id integer NOT NULL,
+    project_id integer NOT NULL,
+    origin_id text,
+    entity_id integer NOT NULL,
+    created timestamp without time zone DEFAULT now() NOT NULL,
+    user_id integer
+);
+
+
+ALTER TABLE import.entity OWNER TO openatlas;
+
+--
 -- Name: project; Type: TABLE; Schema: import; Owner: openatlas
 --
 
@@ -457,21 +473,6 @@ CREATE TABLE import.project (
 
 
 ALTER TABLE import.project OWNER TO openatlas;
-
---
--- Name: project_entity; Type: TABLE; Schema: import; Owner: openatlas
---
-
-CREATE TABLE import.project_entity (
-    id integer NOT NULL,
-    project_id integer NOT NULL,
-    origin_id text NOT NULL,
-    entity_id integer NOT NULL,
-    created timestamp without time zone DEFAULT now() NOT NULL
-);
-
-
-ALTER TABLE import.project_entity OWNER TO openatlas;
 
 --
 -- Name: project_entity_id_seq; Type: SEQUENCE; Schema: import; Owner: openatlas
@@ -491,7 +492,7 @@ ALTER TABLE import.project_entity_id_seq OWNER TO openatlas;
 -- Name: project_entity_id_seq; Type: SEQUENCE OWNED BY; Schema: import; Owner: openatlas
 --
 
-ALTER SEQUENCE import.project_entity_id_seq OWNED BY import.project_entity.id;
+ALTER SEQUENCE import.project_entity_id_seq OWNED BY import.entity.id;
 
 
 --
@@ -646,13 +647,13 @@ ALTER SEQUENCE model.class_inheritance_id_seq OWNED BY model.class_inheritance.i
 CREATE TABLE model.entity (
     id integer NOT NULL,
     class_code text NOT NULL,
-    system_type text,
     name text NOT NULL,
     description text,
     value_integer integer,
     value_timestamp timestamp without time zone,
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
+    modified timestamp without time zone,
+    system_type text
 );
 
 
@@ -952,9 +953,9 @@ CREATE TABLE web.hierarchy (
     multiple boolean DEFAULT false NOT NULL,
     system boolean DEFAULT false NOT NULL,
     directional boolean DEFAULT false NOT NULL,
-    value_type boolean DEFAULT false NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
+    modified timestamp without time zone,
+    value_type boolean DEFAULT false NOT NULL
 );
 
 
@@ -978,7 +979,7 @@ COMMENT ON COLUMN web.hierarchy.name IS 'same as model.entity.name, to ensure un
 -- Name: COLUMN hierarchy.value_type; Type: COMMENT; Schema: web; Owner: openatlas
 --
 
-COMMENT ON COLUMN web.hierarchy.value_type IS 'If links to this type can have numeric values';
+COMMENT ON COLUMN web.hierarchy.value_type IS 'True if links to this type can have numeric values';
 
 
 --
@@ -1165,9 +1166,9 @@ CREATE TABLE web."user" (
     login_failed_count integer DEFAULT 0 NOT NULL,
     password_reset_code text,
     password_reset_date timestamp without time zone,
-    unsubscribe_code text,
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
+    modified timestamp without time zone,
+    unsubscribe_code text
 );
 
 
@@ -1238,8 +1239,8 @@ CREATE TABLE web.user_log (
     id integer NOT NULL,
     user_id integer NOT NULL,
     entity_id integer NOT NULL,
-    action text NOT NULL,
-    created timestamp without time zone DEFAULT now() NOT NULL
+    created timestamp without time zone DEFAULT now() NOT NULL,
+    action text NOT NULL
 );
 
 
@@ -1325,17 +1326,17 @@ ALTER TABLE ONLY gis.polygon ALTER COLUMN id SET DEFAULT nextval('gis.polygon_id
 
 
 --
+-- Name: entity id; Type: DEFAULT; Schema: import; Owner: openatlas
+--
+
+ALTER TABLE ONLY import.entity ALTER COLUMN id SET DEFAULT nextval('import.project_entity_id_seq'::regclass);
+
+
+--
 -- Name: project id; Type: DEFAULT; Schema: import; Owner: openatlas
 --
 
 ALTER TABLE ONLY import.project ALTER COLUMN id SET DEFAULT nextval('import.project_id_seq'::regclass);
-
-
---
--- Name: project_entity id; Type: DEFAULT; Schema: import; Owner: openatlas
---
-
-ALTER TABLE ONLY import.project_entity ALTER COLUMN id SET DEFAULT nextval('import.project_entity_id_seq'::regclass);
 
 
 --
@@ -1503,18 +1504,18 @@ ALTER TABLE ONLY gis.polygon
 
 
 --
--- Name: project_entity project_entity_pkey; Type: CONSTRAINT; Schema: import; Owner: openatlas
+-- Name: entity project_entity_pkey; Type: CONSTRAINT; Schema: import; Owner: openatlas
 --
 
-ALTER TABLE ONLY import.project_entity
+ALTER TABLE ONLY import.entity
     ADD CONSTRAINT project_entity_pkey PRIMARY KEY (id);
 
 
 --
--- Name: project_entity project_entity_project_id_origin_id_key; Type: CONSTRAINT; Schema: import; Owner: openatlas
+-- Name: entity project_entity_project_id_origin_id_key; Type: CONSTRAINT; Schema: import; Owner: openatlas
 --
 
-ALTER TABLE ONLY import.project_entity
+ALTER TABLE ONLY import.entity
     ADD CONSTRAINT project_entity_project_id_origin_id_key UNIQUE (project_id, origin_id);
 
 
@@ -1724,14 +1725,6 @@ ALTER TABLE ONLY web.i18n
 
 ALTER TABLE ONLY web.system_log
     ADD CONSTRAINT log_pkey PRIMARY KEY (id);
-
-
---
--- Name: settings settings_name_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
---
-
-ALTER TABLE ONLY web.settings
-    ADD CONSTRAINT settings_name_key UNIQUE (name);
 
 
 --
@@ -2000,19 +1993,27 @@ ALTER TABLE ONLY gis.polygon
 
 
 --
--- Name: project_entity project_entity_entity_id_fkey; Type: FK CONSTRAINT; Schema: import; Owner: openatlas
+-- Name: entity project_entity_entity_id_fkey; Type: FK CONSTRAINT; Schema: import; Owner: openatlas
 --
 
-ALTER TABLE ONLY import.project_entity
+ALTER TABLE ONLY import.entity
     ADD CONSTRAINT project_entity_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
--- Name: project_entity project_entity_project_id_fkey; Type: FK CONSTRAINT; Schema: import; Owner: openatlas
+-- Name: entity project_entity_project_id_fkey; Type: FK CONSTRAINT; Schema: import; Owner: openatlas
 --
 
-ALTER TABLE ONLY import.project_entity
+ALTER TABLE ONLY import.entity
     ADD CONSTRAINT project_entity_project_id_fkey FOREIGN KEY (project_id) REFERENCES import.project(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: entity project_entity_user_id_fkey; Type: FK CONSTRAINT; Schema: import; Owner: openatlas
+--
+
+ALTER TABLE ONLY import.entity
+    ADD CONSTRAINT project_entity_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user"(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
