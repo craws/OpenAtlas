@@ -5,16 +5,31 @@
     > {{ project.name }}
 {% endblock %}
 {% block content %}
-    {% if 'manager'|is_authorized %}
-        <div class="button-bar">
-            <a href="{{ url_for('import_project_update', id_=project.id)}}">{{ _('edit')|uc_first }}</a>
-            <a href="{{ url_for('import_project_delete', id_=project.id) }}"
-                onclick="return confirm('{{ _('Delete %(name)s?', name=project.name|replace("'", "")) }}')">
-                {{ _('delete')|uc_first }}
-            </a>
+<div id="tabs" class="tabs-container">
+    <ul>
+        <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
+        {% if table['data']|length > 0 %}
+            <li><a href="#tab-entity">{{ _('entities')|uc_first }} ({{ table['data']|length|format_number }})</a></li>
+        {% endif %}
+    </ul>
+    <div id="tab-info">
+        {% if 'manager'|is_authorized %}
+            <div class="button-bar">
+                <a href="{{ url_for('import_project_update', id_=project.id)}}">{{ _('edit')|uc_first }}</a>
+                <a href="{{ url_for('import_project_delete', id_=project.id) }}"
+                    onclick="return confirm('{{ _('Delete %(name)s?', name=project.name|replace("'", "")) }}')">
+                    {{ _('delete')|uc_first }}
+                </a>
+            </div>
+            {{ _('import')|uc_first }}:
+            <a href="{{ url_for('import_person', project_id=project.id) }}">{{ _('persons')|uc_first }}</a>
+        {% endif %}
+        {{ project|description|safe }}
+    </div>
+    {% if table['data']|length > 0 %}
+        <div id="tab-entity">
+            {{ table|pager|safe }}
         </div>
-        {{ _('import')|uc_first }}:
-        <a href="{{ url_for('import_person', project_id=project.id) }}">{{ _('persons')|uc_first }}</a>
     {% endif %}
-    {{ project|description|safe }}
+</div>
 {% endblock %}

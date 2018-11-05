@@ -11,15 +11,17 @@ class Project:
         if not row:
             return
         self.id = row.id
-        self.nodes = dict()
         self.name = row.name
+        self.count = row.count
         self.description = row.description if row.description else ''
         self.created = row.created
         self.modified = row.modified
 
 
 class ImportMapper:
-    sql = "SELECT p.id, p.name, p.description, p.created, p.modified FROM import.project p"
+    sql = """
+        SELECT p.id, p.name, p.description, p.created, p.modified, COUNT(e.id) AS count
+        FROM import.project p LEFT JOIN import.entity e ON p.id = e.project_id """
 
     @staticmethod
     def insert_project(name, description=None):
@@ -32,7 +34,7 @@ class ImportMapper:
 
     @staticmethod
     def get_all_projects():
-        g.cursor.execute(ImportMapper.sql + ' ORDER BY name;')
+        g.cursor.execute(ImportMapper.sql + ' GROUP by p.id ORDER BY name;')
         projects = []
         for row in g.cursor.fetchall():
             projects.append(Project(row))
@@ -40,12 +42,13 @@ class ImportMapper:
 
     @staticmethod
     def get_project_by_id(id_):
-        g.cursor.execute(ImportMapper.sql + ' WHERE p.id = %(id)s;', {'id': id_})
+        g.cursor.execute(ImportMapper.sql + ' WHERE p.id = %(id)s GROUP by p.id;', {'id': id_})
         return Project(g.cursor.fetchone())
 
     @staticmethod
     def get_project_by_name(name):
-        g.cursor.execute(ImportMapper.sql + ' WHERE p.name = %(name)s;', {'name': name})
+        sql = ImportMapper.sql + ' WHERE p.name = %(name)s GROUP by p.id;'
+        g.cursor.execute(sql, {'name': name})
         return Project(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod

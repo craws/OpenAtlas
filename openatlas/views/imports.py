@@ -1,7 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 
 import collections
-
 import pandas as pd
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -11,8 +10,9 @@ from wtforms import BooleanField, FileField, StringField, SubmitField, TextAreaF
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
+from openatlas.models.entity import EntityMapper
 from openatlas.models.imports import ImportMapper, Project
-from openatlas.util.util import link, required_group, truncate_string
+from openatlas.util.util import format_date, link, required_group, truncate_string
 
 
 class ProjectForm(Form):
@@ -33,10 +33,11 @@ class ProjectForm(Form):
 @app.route('/import/index')
 @required_group('editor')
 def import_index():
-    table = {'id': 'project', 'header': ['project', 'description'], 'data': []}
+    table = {'id': 'project', 'header': [_('project'), _('entities'), _('description')], 'data': []}
     for project in ImportMapper.get_all_projects():
         table['data'].append([
             link(project),
+            project.count,
             truncate_string(project.description)])
     return render_template('import/index.html', table=table)
 
@@ -56,7 +57,16 @@ def import_project_insert():
 @required_group('editor')
 def import_project_view(id_):
     project = ImportMapper.get_project_by_id(id_)
-    return render_template('import/project_view.html', project=project)
+    table = {'id': 'entities', 'data': [],
+             'header': [_('name'), _('class'), _('description'), _('origin id'), _('date')]}
+    for entity in EntityMapper.get_by_project_id(id_):
+        table['data'].append([
+            link(entity),
+            entity.class_.name,
+            truncate_string(entity.description),
+            entity.origin_id,
+            format_date(entity.created)])
+    return render_template('import/project_view.html', project=project, table=table)
 
 
 @app.route('/import/project/update/<int:id_>', methods=['POST', 'GET'])

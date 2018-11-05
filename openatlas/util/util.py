@@ -265,11 +265,17 @@ def get_entity_data(entity, location=None):
     # Additional info for advanced layout
     if hasattr(current_user, 'settings') and current_user.settings['layout'] == 'advanced':
         data.append((uc_first(_('class')), link(entity.class_)))
-        user_log = openatlas.logger.get_log_for_advanced_view(entity.id)
-        data.append((_('created'), format_date(entity.created) + ' ' + link(user_log['creator'])))
-        if user_log['modified']:
-            info = format_date(user_log['modified']) + ' ' + link(user_log['modifier'])
-            data.append((_('modified'), info))
+        info = openatlas.logger.get_log_for_advanced_view(entity.id)
+        data.append((_('created'), format_date(entity.created) + ' ' + link(info['creator'])))
+        if info['modified']:
+            html = format_date(info['modified']) + ' ' + link(info['modifier'])
+            data.append((_('modified'), html))
+        if info['import_project']:
+            data.append((_('imported from'), link(info['import_project'])))
+        if info['import_user']:
+            data.append((_('imported by'), link(info['import_user'])))
+        if info['import_origin_id']:
+            data.append((_('origin id'), info['import_origin_id']))
 
     return data
 

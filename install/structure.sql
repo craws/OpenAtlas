@@ -37,9 +37,9 @@ ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_class_c
 ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_fkey;
-ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS project_entity_user_id_fkey;
-ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS project_entity_project_id_fkey;
-ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS project_entity_entity_id_fkey;
+ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_user_id_fkey;
+ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_project_id_fkey;
+ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY gis.polygon DROP CONSTRAINT IF EXISTS polygon_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY gis.point DROP CONSTRAINT IF EXISTS point_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY gis.linestring DROP CONSTRAINT IF EXISTS linestring_entity_id_fkey;
@@ -102,8 +102,8 @@ ALTER TABLE IF EXISTS ONLY model.class_i18n DROP CONSTRAINT IF EXISTS class_i18n
 ALTER TABLE IF EXISTS ONLY model.class DROP CONSTRAINT IF EXISTS class_code_key;
 ALTER TABLE IF EXISTS ONLY import.project DROP CONSTRAINT IF EXISTS project_pkey;
 ALTER TABLE IF EXISTS ONLY import.project DROP CONSTRAINT IF EXISTS project_name_key;
-ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS project_entity_project_id_origin_id_key;
-ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS project_entity_pkey;
+ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_project_id_origin_id_key;
+ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_pkey;
 ALTER TABLE IF EXISTS ONLY gis.polygon DROP CONSTRAINT IF EXISTS polygon_pkey;
 ALTER TABLE IF EXISTS ONLY gis.point DROP CONSTRAINT IF EXISTS point_pkey;
 ALTER TABLE IF EXISTS ONLY gis.linestring DROP CONSTRAINT IF EXISTS linestring_pkey;
@@ -173,7 +173,7 @@ DROP SEQUENCE IF EXISTS model.class_i18n_id_seq;
 DROP TABLE IF EXISTS model.class_i18n;
 DROP TABLE IF EXISTS model.class;
 DROP SEQUENCE IF EXISTS import.project_id_seq;
-DROP SEQUENCE IF EXISTS import.project_entity_id_seq;
+DROP SEQUENCE IF EXISTS import.entity_id_seq;
 DROP TABLE IF EXISTS import.project;
 DROP TABLE IF EXISTS import.entity;
 DROP SEQUENCE IF EXISTS gis.polygon_id_seq;
@@ -475,10 +475,10 @@ CREATE TABLE import.project (
 ALTER TABLE import.project OWNER TO openatlas;
 
 --
--- Name: project_entity_id_seq; Type: SEQUENCE; Schema: import; Owner: openatlas
+-- Name: entity_id_seq; Type: SEQUENCE; Schema: import; Owner: openatlas
 --
 
-CREATE SEQUENCE import.project_entity_id_seq
+CREATE SEQUENCE import.entity_id_seq
     START WITH 1
     INCREMENT BY 1
     NO MINVALUE
@@ -486,13 +486,13 @@ CREATE SEQUENCE import.project_entity_id_seq
     CACHE 1;
 
 
-ALTER TABLE import.project_entity_id_seq OWNER TO openatlas;
+ALTER TABLE import.entity_id_seq OWNER TO openatlas;
 
 --
--- Name: project_entity_id_seq; Type: SEQUENCE OWNED BY; Schema: import; Owner: openatlas
+-- Name: entity_id_seq; Type: SEQUENCE OWNED BY; Schema: import; Owner: openatlas
 --
 
-ALTER SEQUENCE import.project_entity_id_seq OWNED BY import.entity.id;
+ALTER SEQUENCE import.entity_id_seq OWNED BY import.entity.id;
 
 
 --
@@ -1329,7 +1329,7 @@ ALTER TABLE ONLY gis.polygon ALTER COLUMN id SET DEFAULT nextval('gis.polygon_id
 -- Name: entity id; Type: DEFAULT; Schema: import; Owner: openatlas
 --
 
-ALTER TABLE ONLY import.entity ALTER COLUMN id SET DEFAULT nextval('import.project_entity_id_seq'::regclass);
+ALTER TABLE ONLY import.entity ALTER COLUMN id SET DEFAULT nextval('import.entity_id_seq'::regclass);
 
 
 --
@@ -1504,19 +1504,19 @@ ALTER TABLE ONLY gis.polygon
 
 
 --
--- Name: entity project_entity_pkey; Type: CONSTRAINT; Schema: import; Owner: openatlas
+-- Name: entity entity_pkey; Type: CONSTRAINT; Schema: import; Owner: openatlas
 --
 
 ALTER TABLE ONLY import.entity
-    ADD CONSTRAINT project_entity_pkey PRIMARY KEY (id);
+    ADD CONSTRAINT entity_pkey PRIMARY KEY (id);
 
 
 --
--- Name: entity project_entity_project_id_origin_id_key; Type: CONSTRAINT; Schema: import; Owner: openatlas
+-- Name: entity entity_project_id_origin_id_key; Type: CONSTRAINT; Schema: import; Owner: openatlas
 --
 
 ALTER TABLE ONLY import.entity
-    ADD CONSTRAINT project_entity_project_id_origin_id_key UNIQUE (project_id, origin_id);
+    ADD CONSTRAINT entity_project_id_origin_id_key UNIQUE (project_id, origin_id);
 
 
 --
@@ -1993,27 +1993,27 @@ ALTER TABLE ONLY gis.polygon
 
 
 --
--- Name: entity project_entity_entity_id_fkey; Type: FK CONSTRAINT; Schema: import; Owner: openatlas
+-- Name: entity entity_entity_id_fkey; Type: FK CONSTRAINT; Schema: import; Owner: openatlas
 --
 
 ALTER TABLE ONLY import.entity
-    ADD CONSTRAINT project_entity_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT entity_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
--- Name: entity project_entity_project_id_fkey; Type: FK CONSTRAINT; Schema: import; Owner: openatlas
---
-
-ALTER TABLE ONLY import.entity
-    ADD CONSTRAINT project_entity_project_id_fkey FOREIGN KEY (project_id) REFERENCES import.project(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: entity project_entity_user_id_fkey; Type: FK CONSTRAINT; Schema: import; Owner: openatlas
+-- Name: entity entity_project_id_fkey; Type: FK CONSTRAINT; Schema: import; Owner: openatlas
 --
 
 ALTER TABLE ONLY import.entity
-    ADD CONSTRAINT project_entity_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT entity_project_id_fkey FOREIGN KEY (project_id) REFERENCES import.project(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: entity entity_user_id_fkey; Type: FK CONSTRAINT; Schema: import; Owner: openatlas
+--
+
+ALTER TABLE ONLY import.entity
+    ADD CONSTRAINT entity_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user"(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
