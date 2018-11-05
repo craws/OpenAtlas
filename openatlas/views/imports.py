@@ -24,8 +24,6 @@ class ProjectForm(Form):
     def validate(self, extra_validators=None):
         valid = Form.validate(self)
         project = ImportMapper.get_project_by_id(self.project_id) if self.project_id else Project()
-        print(project.name)
-        print(self.name.data)
         if project.name != self.name.data and ImportMapper.get_project_by_name(self.name.data):
             self.name.errors.append(str(_('error name exists')))
             valid = False
@@ -110,16 +108,20 @@ def import_data(project_id, class_code):
     columns = {'allowed': ['name', 'id', 'description'], 'valid': [], 'invalid': []}
     if form.validate_on_submit():
         file_ = request.files['file']
+        extensions = ['csv', 'xls', 'xlsx']
         if not file_:  # pragma: no cover
             flash(_('no file to upload'), 'error')
-        elif not ('.' in file_.filename and file_.filename.rsplit('.', 1)[1].lower() == 'csv'):
+        elif not ('.' in file_.filename and file_.filename.rsplit('.', 1)[1].lower() in extensions):
             flash(_('file type not allowed'), 'error')
         else:
             filename = secure_filename(file_.filename)
             file_path = app.config['IMPORT_FOLDER_PATH'] + '/' + filename
             try:
                 file_.save(file_path)
-                df = pd.read_csv(file_path, keep_default_na=False)
+                if filename.rsplit('.', 1)[1].lower() in ['xls', 'xlsx']:
+                    df = pd.read_excel(file_path, keep_default_na=False)
+                else:
+                    df = pd.read_csv(file_path, keep_default_na=False)
                 headers = list(df.columns.values)
                 if 'name' not in headers:
                     flash(_('missing name column'), 'error')
@@ -128,7 +130,7 @@ def import_data(project_id, class_code):
                     if item not in columns['allowed']:
                         columns['invalid'].append(item)
                         del df[item]
-                headers = list(df.columns.values)  # read cleaned up headers again
+                headers = list(df.columns.values)  # Read cleaned headers again
                 table = {'id': 'import', 'header': headers, 'data': []}
                 table_data = []
                 checked_data = []
