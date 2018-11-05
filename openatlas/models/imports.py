@@ -78,14 +78,17 @@ class ImportMapper:
             'description': sanitize(project.description, 'description')})
 
     @staticmethod
-    def import_data(project, class_name, data):
+    def import_data(project, class_code, data):
         from openatlas.models.entity import EntityMapper
-        class_code = 'undefined'
-        if class_name == 'person':
-            class_code = 'E21'
         for row in data:
+            system_type = None
+            if class_code == 'E33':
+                system_type = 'source content'
+            elif class_code == 'E18':
+                system_type = 'place'
             desc = row['description'] if 'description' in row and row['description'] else None
-            entity = EntityMapper.insert(code=class_code, name=row['name'], description=desc)
+            entity = EntityMapper.insert(code=class_code, name=row['name'], description=desc,
+                                         system_type=system_type)
             sql = """
                 INSERT INTO import.entity (project_id, origin_id, entity_id, user_id)
                 VALUES (%(project_id)s, %(origin_id)s, %(entity_id)s, %(user_id)s);"""
@@ -94,3 +97,7 @@ class ImportMapper:
                 'origin_id': row['id'] if 'id' in row and row['id'] else None,
                 'entity_id': entity.id,
                 'user_id': current_user.id})
+            if class_code == 'E18':
+                location = EntityMapper.insert('E53', 'Location of ' + row['name'],
+                                               'place location')
+                entity.link('P53', location)

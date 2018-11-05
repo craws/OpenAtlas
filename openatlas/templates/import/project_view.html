@@ -21,8 +21,14 @@
                     {{ _('delete')|uc_first }}
                 </a>
             </div>
-            {{ _('import')|uc_first }}:
-            <a href="{{ url_for('import_person', project_id=project.id) }}">{{ _('persons')|uc_first }}</a>
+            <p>{{ _('new import')|uc_first }}:</p>
+            <div class="button-bar">
+                <a href="{{ url_for('import_data', project_id=project.id, class_code='E33') }}">{{ 'source'|uc_first }}</a>
+                {% for code in config['CLASS_CODES']['event'] + config['CLASS_CODES']['actor'] %}
+                    <a href="{{ url_for('import_data', project_id=project.id, class_code=code) }}">{{ code|get_class_name }}</a>
+                {% endfor %}
+                <a href="{{ url_for('import_data', project_id=project.id, class_code='E18') }}">{{ 'place'|uc_first }}</a>
+            </div>
         {% endif %}
         {{ project|description|safe }}
     </div>

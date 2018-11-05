@@ -24,6 +24,8 @@ class ProjectForm(Form):
     def validate(self, extra_validators=None):
         valid = Form.validate(self)
         project = ImportMapper.get_project_by_id(self.project_id) if self.project_id else Project()
+        print(project.name)
+        print(self.name.data)
         if project.name != self.name.data and ImportMapper.get_project_by_name(self.name.data):
             self.name.errors.append(str(_('error name exists')))
             valid = False
@@ -74,6 +76,7 @@ def import_project_view(id_):
 def import_project_update(id_):
     project = ImportMapper.get_project_by_id(id_)
     form = ProjectForm(obj=project)
+    form.project_id = id_
     if form.validate_on_submit():
         project.name = form.name.data
         project.description = form.description.data
@@ -91,17 +94,17 @@ def import_project_delete(id_):
     return redirect(url_for('import_index'))
 
 
-class PersonForm(Form):
+class ImportForm(Form):
     file = FileField(_('file'), [InputRequired()])
     preview = BooleanField(_('preview only'), default=True)
     save = SubmitField(_('import'))
 
 
-@app.route('/import/person/<int:project_id>', methods=['POST', 'GET'])
+@app.route('/import/data/<int:project_id>/<class_code>', methods=['POST', 'GET'])
 @required_group('manager')
-def import_person(project_id):
+def import_data(project_id, class_code):
     project = ImportMapper.get_project_by_id(project_id)
-    form = PersonForm()
+    form = ImportForm()
     imported = None
     table = None
     columns = {'allowed': ['name', 'id', 'description'], 'valid': [], 'invalid': []}
@@ -157,13 +160,13 @@ def import_person(project_id):
 
             except Exception as e:  # pragma: no cover
                 flash(_('error at import'), 'error')
-                return render_template('import/person.html', project=project, form=form,
-                                       columns=columns)
+                return render_template('import/import_data.html', project=project, form=form,
+                                       class_code=class_code, columns=columns)
 
             if not form.preview.data and checked_data:
                 g.cursor.execute('BEGIN')
                 try:
-                    ImportMapper.import_data(project, 'person', checked_data)
+                    ImportMapper.import_data(project, class_code, checked_data)
                     g.cursor.execute('COMMIT')
                     logger.log('info', 'import', 'CSV import: ' + str(len(checked_data)))
                     flash(_('csv import of') + ': ' + str(len(checked_data)), 'info')
@@ -172,5 +175,5 @@ def import_person(project_id):
                     g.cursor.execute('ROLLBACK')
                     logger.log('error', 'import', 'CSV import failed', e)
                     flash(_('error transaction'), 'error')
-    return render_template('import/person.html', project=project, form=form,
-                           table=table, columns=columns, imported=imported)
+    return render_template('import/import_data.html', project=project, form=form,
+                           class_code=class_code, table=table, columns=columns, imported=imported)

@@ -269,7 +269,7 @@ def save(form, object_=None, location=None, origin=None):
         location.save_nodes(form)
         if hasattr(form, 'alias'):
             for alias in form.alias.data:
-                if alias.strip():  # check if it isn't empty
+                if alias.strip():  # Check if it isn't empty
                     object_.link('P1', EntityMapper.insert('E41', alias))
         url = url_for('place_view', id_=object_.id)
         if origin:

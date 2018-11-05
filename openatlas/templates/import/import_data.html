@@ -3,7 +3,14 @@
     <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
     > <a href="{{ url_for('import_index') }}">{{ _('import')|uc_first }}</a>
     > {{ project|link|safe }}
-    > {{ _('persons')|uc_first }}
+    >
+    {% if class_code == 'E18' %}
+        {{ 'place'|uc_first }}
+    {% elif class_code == 'E33' %}
+        {{ 'source'|uc_first }}
+    {% else %}
+        {{ class_code|get_class_name }}
+    {% endif %}
 {% endblock %}
 {% block content %}
     {{ form|display_form|safe }}
