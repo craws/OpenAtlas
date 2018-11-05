@@ -17,6 +17,7 @@
     {% for invalid_item in columns['invalid'] %}
         <span class="error">{{ _('invalid column')|uc_first }}: {{ invalid_item }}</span><br />
     {% endfor %}
+    <p>{{ 'Import'|manual_link|safe }}</p>
     {% if table %}
         <h2>
             {% if imported %}

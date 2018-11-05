@@ -170,12 +170,12 @@ def import_data(project_id, class_code):
                 try:
                     ImportMapper.import_data(project, class_code, checked_data)
                     g.cursor.execute('COMMIT')
-                    logger.log('info', 'import', 'CSV import: ' + str(len(checked_data)))
-                    flash(_('csv import of') + ': ' + str(len(checked_data)), 'info')
+                    logger.log('info', 'import', 'import: ' + str(len(checked_data)))
+                    flash(_('Import of') + ': ' + str(len(checked_data)), 'info')
                     imported = True
                 except Exception as e:  # pragma: no cover
                     g.cursor.execute('ROLLBACK')
-                    logger.log('error', 'import', 'CSV import failed', e)
+                    logger.log('error', 'import', 'import failed', e)
                     flash(_('error transaction'), 'error')
     return render_template('import/import_data.html', project=project, form=form,
                            class_code=class_code, table=table, columns=columns, imported=imported)
