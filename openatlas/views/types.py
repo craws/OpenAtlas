@@ -84,16 +84,20 @@ def node_view(id_):
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]] if node.root else None
     super_ = g.nodes[node.root[0]] if node.root else None
-    tables = {'entities': {
-        'id': 'entities', 'header': [_('name'), _('class'), _('info')], 'data': []}}
+    header = [_('name'), _('class'), _('info')]
+    if root and root.value_type:  # pragma: no cover
+        header = [_('name'), _('value'), _('class'), _('info')]
+    tables = {'entities': {'id': 'entities', 'header': header, 'data': []}}
     for entity in node.get_linked_entities(['P2', 'P89'], True):
         # If it is a place location get the corresponding object
         entity = entity if node.class_.code == 'E55' else entity.get_linked_entity('P53', True)
         if entity:  # If not entity it is a place node, so do not add
-            tables['entities']['data'].append([
-                link(entity),
-                g.classes[entity.class_.code].name,
-                truncate_string(entity.description)])
+            data = [link(entity)]
+            if root and root.value_type:  # pragma: no cover
+                data.append(format_number(entity.nodes[node]))
+            data.append(g.classes[entity.class_.code].name)
+            data.append(truncate_string(entity.description))
+            tables['entities']['data'].append(data)
     tables['link_entities'] = {'id': 'link_items', 'header': [_('domain'), _('range')], 'data': []}
     for row in LinkPropertyMapper.get_entities_by_node(node):
         tables['link_entities']['data'].append([
