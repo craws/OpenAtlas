@@ -27,10 +27,18 @@ class FileForm(Form):
     save = SubmitField(_('insert'))
     opened = HiddenField()
 
-
-def allowed_file(name):
-    allowed_extensions = session['settings']['file_upload_allowed_extension'].split()
-    return '.' in name and name.rsplit('.', 1)[1].lower() in allowed_extensions
+    def validate(self, extra_validators=None):
+        valid = Form.validate(self)
+        if request.files:
+            file_ = request.files['file']
+            ext = session['settings']['file_upload_allowed_extension'].split()
+            if not file_:  # pragma: no cover
+                self.file.errors.append(_('no file to upload'))
+                valid = False
+            elif not ('.' in file_.filename and file_.filename.rsplit('.', 1)[1].lower() in ext):
+                self.file.errors.append(_('file type not allowed'))
+                valid = False
+        return valid
 
 
 def preview_file(name):
@@ -167,13 +175,7 @@ def file_insert(origin_id=None):
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(FileForm, 'File')
     if form.validate_on_submit():
-        file_ = request.files['file']
-        if not file_:  # pragma: no cover
-            flash(_('no file to upload'), 'error')
-        elif not allowed_file(file_.filename):
-            flash(_('file type not allowed'), 'error')
-        else:
-            return redirect(save(form, origin=origin))
+        return redirect(save(form, origin=origin))
     return render_template('file/insert.html', form=form, origin=origin)
 
 

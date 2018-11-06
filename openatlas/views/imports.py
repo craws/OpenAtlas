@@ -25,7 +25,7 @@ class ProjectForm(Form):
         valid = Form.validate(self)
         project = ImportMapper.get_project_by_id(self.project_id) if self.project_id else Project()
         if project.name != self.name.data and ImportMapper.get_project_by_name(self.name.data):
-            self.name.errors.append(str(_('error name exists')))
+            self.name.errors.append(_('error name exists'))
             valid = False
         return valid
 
@@ -98,6 +98,18 @@ class ImportForm(Form):
     duplicate = BooleanField(_('check for duplicates'), default=True)
     save = SubmitField(_('import'))
 
+    def validate(self, extra_validators=None):
+        valid = Form.validate(self)
+        file_ = request.files['file']
+        extensions = ['csv', 'xls', 'xlsx']
+        if not file_:  # pragma: no cover
+            self.file.errors.append(_('no file to upload'))
+            valid = False
+        elif not ('.' in file_.filename and file_.filename.rsplit('.', 1)[1].lower() in extensions):
+            self.file.errors.append(_('file type not allowed'))
+            valid = False
+        return valid
+
 
 @app.route('/import/data/<int:project_id>/<class_code>', methods=['POST', 'GET'])
 @required_group('manager')
@@ -109,83 +121,89 @@ def import_data(project_id, class_code):
     columns = {'allowed': ['name', 'id', 'description'], 'valid': [], 'invalid': []}
     if form.validate_on_submit():
         file_ = request.files['file']
-        extensions = ['csv', 'xls', 'xlsx']
-        if not file_:  # pragma: no cover
-            flash(_('no file to upload'), 'error')
-        elif not ('.' in file_.filename and file_.filename.rsplit('.', 1)[1].lower() in extensions):
-            flash(_('file type not allowed'), 'error')
-        else:
-            filename = secure_filename(file_.filename)
-            file_path = app.config['IMPORT_FOLDER_PATH'] + '/' + filename
-            try:
-                file_.save(file_path)
-                if filename.rsplit('.', 1)[1].lower() in ['xls', 'xlsx']:
-                    df = pd.read_excel(file_path, keep_default_na=False)
-                else:
-                    df = pd.read_csv(file_path, keep_default_na=False)
-                headers = list(df.columns.values)
-                if 'name' not in headers:
-                    flash(_('missing name column'), 'error')
-                    raise Exception()
+        filename = secure_filename(file_.filename)
+        file_path = app.config['IMPORT_FOLDER_PATH'] + '/' + filename
+        try:
+            file_.save(file_path)
+            if filename.rsplit('.', 1)[1].lower() in ['xls', 'xlsx']:
+                df = pd.read_excel(file_path, keep_default_na=False)
+            else:
+                df = pd.read_csv(file_path, keep_default_na=False)
+            headers = list(df.columns.values)
+            if 'name' not in headers:
+                flash(_('missing name column'), 'error')
+                raise Exception()
+            for item in headers:
+                if item not in columns['allowed']:
+                    columns['invalid'].append(item)
+                    del df[item]
+            headers = list(df.columns.values)  # Read cleaned headers again
+            table = {'id': 'import', 'header': headers, 'data': []}
+            table_data = []
+            checked_data = []
+            origin_ids = []
+            names = []
+            missing_name = False
+            missing_name_alert = False
+            for index, row in df.iterrows():
+                table_row = []
+                checked_row = {}
                 for item in headers:
-                    if item not in columns['allowed']:
-                        columns['invalid'].append(item)
-                        del df[item]
-                headers = list(df.columns.values)  # Read cleaned headers again
-                table = {'id': 'import', 'header': headers, 'data': []}
-                table_data = []
-                checked_data = []
-                origin_ids = []
-                names = []
-                for index, row in df.iterrows():
-                    table_row = []
-                    checked_row = {}
-                    for item in headers:
-                        table_row.append(row[item])
-                        checked_row[item] = row[item]
-                        if item == 'name' and form.duplicate.data:
+                    table_row.append(row[item])
+                    checked_row[item] = row[item]
+                    if item == 'name':
+                        if not row.name:
+                            missing_name = True
+                            missing_name_alert = True
+                            continue
+                        if form.duplicate.data:
                             names.append(row['name'].lower())
-                        if item == 'id' and row[item]:
-                            origin_ids.append(str(row['id']))
-                    table_data.append(table_row)
-                    checked_data.append(checked_row)
-                table['data'] = table_data
+                    if item == 'id' and row[item]:
+                        origin_ids.append(str(row['id']))
+                if missing_name:
+                    missing_name = False
+                    continue
+                table_data.append(table_row)
+                checked_data.append(checked_row)
+            table['data'] = table_data
+            if missing_name_alert:
+                flash(_('Some names seem to be empty.'), 'error')
 
-                # Check origin ids for doubles and already existing ids
-                if origin_ids:
-                    doubles = [
-                        item for item,
-                        count in collections.Counter(origin_ids).items() if count > 1]
-                    existing = ImportMapper.check_origin_ids(project, set(origin_ids))
-                    if doubles or existing:
-                        if doubles:
-                            flash(_('Double ids in import: ') + ', '.join(doubles), 'error')
-                        if existing:
-                            flash(_('ids already in database: ') + ', '.join(existing), 'error')
-                        raise Exception()
+            # Check origin ids for doubles and already existing ids
+            if origin_ids:
+                doubles = [
+                    item for item,
+                    count in collections.Counter(origin_ids).items() if count > 1]
+                existing = ImportMapper.check_origin_ids(project, set(origin_ids))
+                if doubles or existing:
+                    if doubles:
+                        flash(_('Double ids in import: ') + ', '.join(doubles), 'error')
+                    if existing:
+                        flash(_('ids already in database: ') + ', '.join(existing), 'error')
+                    raise Exception()
 
-                # Check for possible duplicates
-                if form.duplicate.data:
-                    duplicates = ImportMapper.check_duplicates(class_code, names)
-                    if duplicates:
-                        flash(_('possible duplicates: ') + ', '.join(duplicates), 'error')
+            # Check for possible duplicates
+            if form.duplicate.data:
+                duplicates = ImportMapper.check_duplicates(class_code, names)
+                if duplicates:
+                    flash(_('possible duplicates: ') + ', '.join(duplicates), 'error')
 
-            except Exception as e:  # pragma: no cover
-                flash(_('error at import'), 'error')
-                return render_template('import/import_data.html', project=project, form=form,
+        except Exception as e:  # pragma: no cover
+            flash(_('error at import'), 'error')
+            return render_template('import/import_data.html', project=project, form=form,
                                        class_code=class_code, columns=columns)
 
-            if not form.preview.data and checked_data:
-                g.cursor.execute('BEGIN')
-                try:
-                    ImportMapper.import_data(project, class_code, checked_data)
-                    g.cursor.execute('COMMIT')
-                    logger.log('info', 'import', 'import: ' + str(len(checked_data)))
-                    flash(_('Import of') + ': ' + str(len(checked_data)), 'info')
-                    imported = True
-                except Exception as e:  # pragma: no cover
-                    g.cursor.execute('ROLLBACK')
-                    logger.log('error', 'import', 'import failed', e)
-                    flash(_('error transaction'), 'error')
+        if not form.preview.data and checked_data:
+            g.cursor.execute('BEGIN')
+            try:
+                ImportMapper.import_data(project, class_code, checked_data)
+                g.cursor.execute('COMMIT')
+                logger.log('info', 'import', 'import: ' + str(len(checked_data)))
+                flash(_('Import of') + ': ' + str(len(checked_data)), 'info')
+                imported = True
+            except Exception as e:  # pragma: no cover
+                g.cursor.execute('ROLLBACK')
+                logger.log('error', 'import', 'import failed', e)
+                flash(_('error transaction'), 'error')
     return render_template('import/import_data.html', project=project, form=form,
                            class_code=class_code, table=table, columns=columns, imported=imported)
