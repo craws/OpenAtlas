@@ -90,7 +90,7 @@ class ImportMapper:
         from openatlas.models.entity import EntityMapper
         for row in data:
             system_type = None
-            if class_code == 'E33':
+            if class_code == 'E33':  # pragma: no cover
                 system_type = 'source content'
             elif class_code == 'E18':
                 system_type = 'place'
