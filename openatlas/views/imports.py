@@ -119,6 +119,7 @@ def import_data(project_id, class_code):
     imported = None
     table = None
     columns = {'allowed': ['name', 'id', 'description'], 'valid': [], 'invalid': []}
+    messages = {'error': [], 'warn': []}
     if form.validate_on_submit():
         file_ = request.files['file']
         filename = secure_filename(file_.filename)
@@ -131,12 +132,14 @@ def import_data(project_id, class_code):
                 df = pd.read_csv(file_path, keep_default_na=False)
             headers = list(df.columns.values)
             if 'name' not in headers:
-                flash(_('missing name column'), 'error')
+                messages['error'].append(_('missing name column'))
                 raise Exception()
             for item in headers:
                 if item not in columns['allowed']:
                     columns['invalid'].append(item)
                     del df[item]
+            if columns['invalid']:
+                messages['warn'].append(_('invalid columns') + ': ' + ','.join(columns['invalid']))
             headers = list(df.columns.values)  # Read cleaned headers again
             table = {'id': 'import', 'header': headers, 'data': []}
             table_data = []
@@ -144,7 +147,7 @@ def import_data(project_id, class_code):
             origin_ids = []
             names = []
             missing_name = False
-            missing_name_alert = False
+            missing_name_count = 0
             for index, row in df.iterrows():
                 table_row = []
                 checked_row = {}
@@ -154,7 +157,7 @@ def import_data(project_id, class_code):
                     if item == 'name':
                         if not row.name:
                             missing_name = True
-                            missing_name_alert = True
+                            missing_name_count += 1
                             continue
                         if form.duplicate.data:
                             names.append(row['name'].lower())
@@ -166,8 +169,8 @@ def import_data(project_id, class_code):
                 table_data.append(table_row)
                 checked_data.append(checked_row)
             table['data'] = table_data
-            if missing_name_alert:
-                flash(_('Some names seem to be empty.'), 'error')
+            if missing_name_count:
+                messages['warn'].append(_('empty names') + ': ' + str(missing_name_count))
 
             # Check origin ids for doubles and already existing ids
             if origin_ids:
@@ -177,21 +180,23 @@ def import_data(project_id, class_code):
                 existing = ImportMapper.check_origin_ids(project, set(origin_ids))
                 if doubles or existing:
                     if doubles:
-                        flash(_('Double ids in import: ') + ', '.join(doubles), 'error')
+                        messages['error'].append(
+                            _('double IDs in import') + ': ' + ', '.join(doubles))
                     if existing:
-                        flash(_('ids already in database: ') + ', '.join(existing), 'error')
+                        messages['error'].append(
+                            _('IDs already in database') + ': ' + ', '.join(existing))
                     raise Exception()
 
             # Check for possible duplicates
             if form.duplicate.data:
                 duplicates = ImportMapper.check_duplicates(class_code, names)
                 if duplicates:
-                    flash(_('possible duplicates: ') + ', '.join(duplicates), 'error')
+                    messages['warn'].append(_('possible duplicates: ') + ', '.join(duplicates))
 
         except Exception as e:  # pragma: no cover
             flash(_('error at import'), 'error')
             return render_template('import/import_data.html', project=project, form=form,
-                                       class_code=class_code, columns=columns)
+                                   class_code=class_code, messages=messages)
 
         if not form.preview.data and checked_data:
             g.cursor.execute('BEGIN')
@@ -206,4 +211,4 @@ def import_data(project_id, class_code):
                 logger.log('error', 'import', 'import failed', e)
                 flash(_('error transaction'), 'error')
     return render_template('import/import_data.html', project=project, form=form,
-                           class_code=class_code, table=table, columns=columns, imported=imported)
+                           class_code=class_code, table=table, imported=imported, messages=messages)
