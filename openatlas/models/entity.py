@@ -95,8 +95,7 @@ class Entity:
 class EntityMapper:
     sql = """
         SELECT
-            e.id, e.class_code, e.name, e.description, e.created, e.modified,
-            e.value_integer, e.system_type,
+            e.id, e.class_code, e.name, e.description, e.created, e.modified, e.system_type,
             array_to_json(
                 array_agg((t.range_id, t.description)) FILTER (WHERE t.range_id IS NOT NULL)
             ) as nodes,
@@ -184,6 +183,27 @@ class EntityMapper:
         return Entity(g.cursor.fetchone())
 
     @staticmethod
+    def get_by_project_id(project_id):
+        sql = """
+            SELECT e.id, ie.origin_id, e.class_code, e.name, e.description, e.created, e.modified,
+                e.system_type,
+            array_to_json(
+                array_agg((t.range_id, t.description)) FILTER (WHERE t.range_id IS NOT NULL)
+            ) as nodes
+            FROM model.entity e
+            LEFT JOIN model.link t ON e.id = t.domain_id AND t.property_code IN ('P2', 'P89')
+            JOIN import.entity ie ON e.id = ie.entity_id
+            WHERE ie.project_id = %(id)s GROUP BY e.id, ie.origin_id ORDER BY e.name;"""
+        g.cursor.execute(sql, {'id': project_id})
+        debug_model['by id'] += 1
+        entities = []
+        for row in g.cursor.fetchall():
+            entity = Entity(row)
+            entity.origin_id = row.origin_id
+            entities.append(entity)
+        return entities
+
+    @staticmethod
     def get_by_ids(entity_ids):
         if not entity_ids:
             return []
@@ -218,9 +238,8 @@ class EntityMapper:
     @staticmethod
     def delete(entity):
         """ Triggers function model.delete_entity_related() for deleting related entities"""
-        entity_id = entity if isinstance(entity, int) else entity.id
-        sql = "DELETE FROM model.entity WHERE id = %(entity_id)s;"
-        g.cursor.execute(sql, {'entity_id': entity_id})
+        id_ = entity if isinstance(entity, int) else entity.id
+        g.cursor.execute('DELETE FROM model.entity WHERE id = %(id_)s;', {'id_': id_})
 
     @staticmethod
     def get_overview_counts():

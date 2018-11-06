@@ -3,6 +3,7 @@ from flask import g, request, session
 from flask_login import current_user
 
 from openatlas import app
+from openatlas.models.imports import ImportMapper
 from openatlas.models.user import UserMapper
 
 
@@ -63,9 +64,16 @@ class DBHandler:
         row_insert = g.cursor.fetchone()
         g.cursor.execute(sql, {'entity_id': entity_id, 'action': 'update'})
         row_update = g.cursor.fetchone()
+        sql = 'SELECT project_id, origin_id, user_id FROM import.entity WHERE entity_id = %(id)s;'
+        g.cursor.execute(sql, {'id': entity_id})
+        row_import = g.cursor.fetchone()
+        project = ImportMapper.get_project_by_id(row_import.project_id) if row_import else None
         log = {
             'creator': UserMapper.get_by_id(row_insert.user_id) if row_insert else None,
             'created': row_insert.created if row_insert else None,
             'modifier': UserMapper.get_by_id(row_update.user_id) if row_update else None,
-            'modified': row_update.created if row_update else None}
+            'modified': row_update.created if row_update else None,
+            'import_project': project,
+            'import_user': UserMapper.get_by_id(row_import.user_id) if row_import else None,
+            'import_origin_id': row_import.origin_id if row_import else None}
         return log
