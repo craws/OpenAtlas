@@ -159,20 +159,20 @@ class NodeMapper(EntityMapper):
         if hasattr(entity, 'nodes'):
             entity.delete_links(['P2', 'P89'])
         for field in form:
-            if not field.data:
-                continue
             if isinstance(field, ValueFloatField) and entity.class_.code != 'E53':
-                entity.link('P2', int(field.name), field.data)
-            elif isinstance(field, (TreeField, TreeMultiField)):
+                if field.data is not None:  # Allow to save 0 but not empty
+                    entity.link('P2', int(field.name), field.data)
+            elif isinstance(field, (TreeField, TreeMultiField)) and field.data:
                 root = g.nodes[int(field.id)]
                 try:
                     range_param = [int(field.data)]
                 except ValueError:  # Form value was a string e.g. '[97,2798]'
                     range_param = ast.literal_eval(field.data)
-                if entity.class_.code != 'E53':
+                if root.name in ['Administrative Unit', 'Historical Place']:
+                    if entity.class_.code == 'E53':
+                        entity.link('P89', range_param)
+                elif entity.class_.code != 'E53':
                     entity.link('P2', range_param)
-                elif root.name in ['Administrative Unit', 'Historical Place']:
-                    entity.link('P89', range_param)
 
     @staticmethod
     def save_link_nodes(link_id, form):
