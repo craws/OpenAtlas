@@ -67,6 +67,14 @@ class ImportMapper:
         return existing
 
     @staticmethod
+    def check_duplicates(class_code, names):
+        sql = """
+            SELECT DISTINCT name FROM model.entity
+            WHERE class_code = %(class_code)s AND LOWER(name) IN %(names)s;"""
+        g.cursor.execute(sql, {'class_code': class_code, 'names': tuple(names)})
+        return [row.name for row in g.cursor.fetchall()]
+
+    @staticmethod
     def update_project(project):
         from openatlas.util.util import sanitize
         sql = """

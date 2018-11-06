@@ -95,6 +95,7 @@ def import_project_delete(id_):
 class ImportForm(Form):
     file = FileField(_('file'), [InputRequired()])
     preview = BooleanField(_('preview only'), default=True)
+    duplicate = BooleanField(_('check for duplicates'), default=True)
     save = SubmitField(_('import'))
 
 
@@ -135,19 +136,22 @@ def import_data(project_id, class_code):
                 table_data = []
                 checked_data = []
                 origin_ids = []
+                names = []
                 for index, row in df.iterrows():
                     table_row = []
                     checked_row = {}
                     for item in headers:
                         table_row.append(row[item])
                         checked_row[item] = row[item]
+                        if item == 'name' and form.duplicate.data:
+                            names.append(row['name'].lower())
                         if item == 'id' and row[item]:
-                            origin_ids.append(str(row[item]))
+                            origin_ids.append(str(row['id']))
                     table_data.append(table_row)
                     checked_data.append(checked_row)
                 table['data'] = table_data
 
-                # Check origin ids for doubles and already existing
+                # Check origin ids for doubles and already existing ids
                 if origin_ids:
                     doubles = [
                         item for item,
@@ -159,6 +163,12 @@ def import_data(project_id, class_code):
                         if existing:
                             flash(_('ids already in database: ') + ', '.join(existing), 'error')
                         raise Exception()
+
+                # Check for possible duplicates
+                if form.duplicate.data:
+                    duplicates = ImportMapper.check_duplicates(class_code, names)
+                    if duplicates:
+                        flash(_('possible duplicates: ') + ', '.join(duplicates), 'error')
 
             except Exception as e:  # pragma: no cover
                 flash(_('error at import'), 'error')
