@@ -1,0 +1,41 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
+    > <a href="{{ url_for('import_index') }}">{{ _('import')|uc_first }}</a>
+    > {{ project.name }}
+{% endblock %}
+{% block content %}
+<div id="tabs" class="tabs-container">
+    <ul>
+        <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
+        {% if table['data']|length > 0 %}
+            <li><a href="#tab-entity">{{ _('entities')|uc_first }} ({{ table['data']|length|format_number }})</a></li>
+        {% endif %}
+    </ul>
+    <div id="tab-info">
+        {% if 'manager'|is_authorized %}
+            <div class="button-bar">
+                <a href="{{ url_for('import_project_update', id_=project.id)}}">{{ _('edit')|uc_first }}</a>
+                <a href="{{ url_for('import_project_delete', id_=project.id) }}"
+                    onclick="return confirm('{{ _('Delete %(name)s?', name=project.name|replace("'", "")) }}')">
+                    {{ _('delete')|uc_first }}
+                </a>
+            </div>
+            <p>{{ _('new import')|uc_first }}:</p>
+            <div class="button-bar">
+                <a href="{{ url_for('import_data', project_id=project.id, class_code='E33') }}">{{ 'source'|uc_first }}</a>
+                {% for code in config['CLASS_CODES']['event'] + config['CLASS_CODES']['actor'] %}
+                    <a href="{{ url_for('import_data', project_id=project.id, class_code=code) }}">{{ code|get_class_name }}</a>
+                {% endfor %}
+                <a href="{{ url_for('import_data', project_id=project.id, class_code='E18') }}">{{ 'place'|uc_first }}</a>
+            </div>
+        {% endif %}
+        {{ project|description|safe }}
+    </div>
+    {% if table['data']|length > 0 %}
+        <div id="tab-entity">
+            {{ table|pager|safe }}
+        </div>
+    {% endif %}
+</div>
+{% endblock %}

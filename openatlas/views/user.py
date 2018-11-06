@@ -1,12 +1,12 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import abort, flash, render_template, request, session, url_for
-from flask_babel import lazy_gettext as _, format_number
+from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import (BooleanField, HiddenField, PasswordField, SelectField, StringField,
                      SubmitField, TextAreaField)
-from wtforms.validators import InputRequired, Email
+from wtforms.validators import Email, InputRequired
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
@@ -189,7 +189,7 @@ def user_insert():
 
 
 def get_groups():
-    """Returns groups, hardcoded because order is relevant (weakest permissions to strongest)"""
+    """ Returns groups, hardcoded because order is relevant (weakest permissions to strongest)"""
     choices = [('readonly', 'readonly'), ('editor', 'editor'), ('manager', 'manager')]
     if is_authorized('admin'):
         choices.append(('admin', 'admin'))  # admin group is only available for admins

@@ -34,9 +34,9 @@ class ExportCsvForm(Form):
     save = SubmitField(uc_first(_('export CSV')))
 
 
-@app.route('/admin/export/sql', methods=['POST', 'GET'])
+@app.route('/export/sql', methods=['POST', 'GET'])
 @required_group('manager')
-def admin_export_sql():
+def export_sql():
     path = app.config['EXPORT_FOLDER_PATH'] + '/sql'
     writeable = True if os.access(path, os.W_OK) else False
     form = ExportSqlForm()
@@ -47,7 +47,7 @@ def admin_export_sql():
         else:  # pragma: no cover
             logger.log('error', 'database', 'SQL export failed')
             flash(_('SQL export failed'), 'error')
-        return redirect(url_for('admin_export_sql'))
+        return redirect(url_for('export_sql'))
     table = {'id': 'sql', 'header': ['name', 'size'], 'data': [],
              'sort': 'sortList: [[0, 1]],headers: {0: { sorter: "text" }}'}
     for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
@@ -83,7 +83,7 @@ def delete_sql(filename):
     except Exception as e:  # pragma: no cover
         logger.log('error', 'file', 'SQL file deletion failed', e)
         flash(_('error file delete'), 'error')
-    return redirect(url_for('admin_export_sql'))
+    return redirect(url_for('export_sql'))
 
 
 @app.route('/download/csv/<filename>')
@@ -93,9 +93,9 @@ def download_csv(filename):
     return send_from_directory(path, filename, as_attachment=True)
 
 
-@app.route('/admin/export/csv', methods=['POST', 'GET'])
+@app.route('/export/csv', methods=['POST', 'GET'])
 @required_group('manager')
-def admin_export_csv():
+def export_csv():
     path = app.config['EXPORT_FOLDER_PATH'] + '/csv'
     writeable = True if os.access(path, os.W_OK) else False
     form = ExportCsvForm()
@@ -103,7 +103,7 @@ def admin_export_csv():
         Export.export_csv(form)
         logger.log('info', 'database', 'CSV export')
         flash(_('data was exported as CSV'), 'info')
-        return redirect(url_for('admin_export_csv'))
+        return redirect(url_for('export_csv'))
     table = {'id': 'csv', 'header': ['name', 'size'], 'data': [],
              'sort': 'sortList: [[0, 1]],headers: {0: { sorter: "text" }}'}
     for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
@@ -111,17 +111,15 @@ def admin_export_csv():
         file_path = path + '/' + name
         if name == '.gitignore':
             continue
-        data = [
-            name, convert_size(os.path.getsize(file_path)),
-            '<a href="' + url_for('download_csv', filename=name) + '">' + uc_first(
-                _('download')) + '</a>']
+        link = '<a href="{url}">{label}</a>'.format(url=url_for('download_csv', filename=name),
+                                                    label=uc_first(_('download')))
+        data = [name, convert_size(os.path.getsize(file_path)), link]
         if is_authorized('admin') and writeable:
             confirm = ' onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
             delete = '<a href="' + url_for('delete_csv', filename=name)
             delete += '" ' + confirm + '>' + uc_first(_('delete')) + '</a>'
             data.append(delete)
         table['data'].append(data)
-
     return render_template('export/export_csv.html', form=form, table=table, writeable=writeable)
 
 
@@ -135,4 +133,4 @@ def delete_csv(filename):
     except Exception as e:  # pragma: no cover
         logger.log('error', 'file', 'CSV deletion failed', e)
         flash(_('error file delete'), 'error')
-    return redirect(url_for('admin_export_csv'))
+    return redirect(url_for('export_csv'))

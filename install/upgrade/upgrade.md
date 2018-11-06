@@ -2,11 +2,12 @@
 
 Before executing SQL statements backup the database. Replace database role "openatlas" if needed.
 
+
 ### 3.9.0 to 3.10.0
 
 Install pandas libraries (needed for export and import)
 
-    apt-get install python3-pandas python3-geopandas
+    # apt-get install python3-pandas python3-geopandas python3-xlrd
 
 Execute install/upgrade/3.10.0.sql after making backups
 

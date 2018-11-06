@@ -38,8 +38,8 @@ logger = DBHandler()
 
 from openatlas.util import filters
 from openatlas.views import (actor, admin, ajax, content, event, export, hierarchy, index,
-                             involvement, login, types, model, place, profile, reference, source,
-                             translation, user, relation, member, search, file)
+                             involvement, imports, login, types, model, place, profile, reference,
+                             source, translation, user, relation, member, search, file)
 
 
 @babel.localeselector
