@@ -159,9 +159,13 @@ def display_content_translation(self, text):
 @blueprint.app_template_filter()
 def manual_link(self, wiki_site):
     # Creates a link to a manual page
+    wiki_icon = '<img style="height:14px;" src="/static/images/icons/book.png" alt='' /> '
     wiki_url = 'https://redmine.openatlas.eu/projects/uni/wiki/'
-    wiki_link = '<a href="{url}" rel="noopener" target="_blank">{label}</a>'.format(
-        url=wiki_url + wiki_site, label=util.uc_first(_('manual')))
+    wiki_link = """
+        <a class="manual" href="{url}" rel="noopener" target="_blank">
+            {icon} {label}
+        </a>""".format(
+        url=wiki_url + wiki_site, label=util.uc_first(_('manual')), icon=wiki_icon)
     return wiki_link
 
 

@@ -13,6 +13,7 @@
     {% endif %}
 {% endblock %}
 {% block content %}
+    <p>{{ 'Import'|manual_link|safe }}</p>
     <p>
         {{ _('max size')|uc_first }}:
         <span style="font-weight: bold;">{{ session['settings']['file_upload_max_size'] }} MB </span>
@@ -25,7 +26,6 @@
         <a href="/static/import/example.csv">example.csv</a>,
         <a href="/static/import/example.xlsx">example.xlsx</a>
     </p>
-    <p>{{ 'Import'|manual_link|safe }}</p>
     {{ form|display_form|safe }}
     {% for item in messages['error'] %}
         <span class="error">{{ _('error')|uc_first }} - {{ item }}</span><br />
