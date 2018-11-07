@@ -58,7 +58,7 @@ def import_project_insert():
 def import_project_view(id_):
     project = ImportMapper.get_project_by_id(id_)
     table = {'id': 'entities', 'data': [],
-             'header': [_('name'), _('class'), _('description'), _('origin id'), _('date')]}
+             'header': [_('name'), _('class'), _('description'), 'origin ID', _('date')]}
     for entity in EntityMapper.get_by_project_id(id_):
         table['data'].append([
             link(entity),
@@ -79,7 +79,7 @@ def import_project_update(id_):
         project.name = form.name.data
         project.description = form.description.data
         ImportMapper.update_project(project)
-        flash(_('Project updated'), 'info')
+        flash(_('project updated'), 'info')
         return redirect(url_for('import_project_view', id_=project.id))
     return render_template('import/project_update.html', project=project, form=form)
 
@@ -88,7 +88,7 @@ def import_project_update(id_):
 @required_group('manager')
 def import_project_delete(id_):
     ImportMapper.delete_project(id_)
-    flash(_('Project deleted'), 'info')
+    flash(_('project deleted'), 'info')
     return redirect(url_for('import_index'))
 
 
@@ -191,7 +191,7 @@ def import_data(project_id, class_code):
             if form.duplicate.data:
                 duplicates = ImportMapper.check_duplicates(class_code, names)
                 if duplicates:  # pragma: no cover
-                    messages['warn'].append(_('possible duplicates: ') + ', '.join(duplicates))
+                    messages['warn'].append(_('possible duplicates') + ': ' + ', '.join(duplicates))
 
         except Exception as e:  # pragma: no cover
             flash(_('error at import'), 'error')
@@ -204,7 +204,7 @@ def import_data(project_id, class_code):
                 ImportMapper.import_data(project, class_code, checked_data)
                 g.cursor.execute('COMMIT')
                 logger.log('info', 'import', 'import: ' + str(len(checked_data)))
-                flash(_('Import of') + ': ' + str(len(checked_data)), 'info')
+                flash(_('import of') + ': ' + str(len(checked_data)), 'info')
                 imported = True
             except Exception as e:  # pragma: no cover
                 g.cursor.execute('ROLLBACK')

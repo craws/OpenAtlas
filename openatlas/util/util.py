@@ -276,7 +276,7 @@ def get_entity_data(entity, location=None):
         if info['import_user']:
             data.append((_('imported by'), link(info['import_user'])))
         if info['import_origin_id']:
-            data.append((_('origin id'), info['import_origin_id']))
+            data.append(('origin ID', info['import_origin_id']))
 
     return data
 
