@@ -19,6 +19,7 @@ MAIL_PASSWORD = 'CHANGE ME'
 SECRET_KEY = 'CHANGE ME'
 
 IMPORT_FOLDER_PATH = '/tmp'  # Needed for processing of import files, any temp folder will do
+IMPORT_FILE_EXTENSIONS = ['csv', 'xls', 'xlsx']
 EXPORT_FOLDER_PATH = os.path.dirname(__file__) + '/../openatlas/export'
 UPLOAD_FOLDER_PATH = os.path.dirname(__file__) + '/../openatlas/uploads'
 DISPLAY_FILE_EXTENSIONS = ['bmp', 'gif', 'ico', 'jpeg', 'jpg', 'png']

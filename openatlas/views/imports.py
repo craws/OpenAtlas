@@ -101,7 +101,7 @@ class ImportForm(Form):
     def validate(self, extra_validators=None):
         valid = Form.validate(self)
         file_ = request.files['file']
-        extensions = ['csv', 'xls', 'xlsx']
+        extensions = app.config['IMPORT_FILE_EXTENSIONS']
         if not file_:  # pragma: no cover
             self.file.errors.append(_('no file to upload'))
             valid = False
