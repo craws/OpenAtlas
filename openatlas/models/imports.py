@@ -35,10 +35,7 @@ class ImportMapper:
     @staticmethod
     def get_all_projects():
         g.cursor.execute(ImportMapper.sql + ' GROUP by p.id ORDER BY name;')
-        projects = []
-        for row in g.cursor.fetchall():
-            projects.append(Project(row))
-        return projects
+        return [Project(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_project_by_id(id_):
@@ -61,10 +58,7 @@ class ImportMapper:
             SELECT origin_id FROM import.entity
             WHERE project_id = %(project_id)s AND origin_id IN %(ids)s;"""
         g.cursor.execute(sql, {'project_id': project.id, 'ids': tuple(origin_ids)})
-        existing = []
-        for row in g.cursor.fetchall():
-            existing.append(row.origin_id)
-        return existing
+        return [row.origin_id for row in g.cursor.fetchall()]
 
     @staticmethod
     def check_duplicates(class_code, names):

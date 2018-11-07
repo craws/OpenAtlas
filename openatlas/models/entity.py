@@ -140,10 +140,7 @@ class EntityMapper:
         sql = EntityMapper.sql
         sql += ' WHERE e.system_type = %(system_type)s GROUP BY e.id ORDER BY e.name;'
         g.cursor.execute(sql, {'system_type': system_type})
-        entities = []
-        for row in g.cursor.fetchall():
-            entities.append(Entity(row))
-        return entities
+        return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_display_files():
@@ -210,10 +207,7 @@ class EntityMapper:
         sql = EntityMapper.sql + ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name;'
         g.cursor.execute(sql, {'ids': tuple(entity_ids)})
         debug_model['by id'] += 1
-        entities = []
-        for row in g.cursor.fetchall():
-            entities.append(Entity(row))
-        return entities
+        return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_by_codes(class_name):
@@ -230,10 +224,7 @@ class EntityMapper:
                 WHERE e.class_code IN %(codes)s GROUP BY e.id ORDER BY e.name;"""
         g.cursor.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][class_name])})
         debug_model['by codes'] += 1
-        entities = []
-        for row in g.cursor.fetchall():
-            entities.append(Entity(row))
-        return entities
+        return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def delete(entity):
@@ -262,12 +253,9 @@ class EntityMapper:
     @staticmethod
     def get_orphans():
         """ Returns entities without links. """
-        entities = []
         g.cursor.execute(EntityMapper.sql_orphan)
         debug_model['div sql'] += 1
-        for row in g.cursor.fetchall():
-            entities.append(EntityMapper.get_by_id(row.id))
-        return entities
+        return [EntityMapper.get_by_id(row.id) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_latest(limit):
@@ -276,15 +264,11 @@ class EntityMapper:
         for class_codes in app.config['CLASS_CODES'].values():
             codes += class_codes
         sql = EntityMapper.sql + """
-                WHERE e.class_code IN %(codes)s
-                GROUP BY e.id
+                WHERE e.class_code IN %(codes)s GROUP BY e.id
                 ORDER BY e.created DESC LIMIT %(limit)s;"""
         g.cursor.execute(sql, {'codes': tuple(codes), 'limit': limit})
         debug_model['div sql'] += 1
-        entities = []
-        for row in g.cursor.fetchall():
-            entities.append(Entity(row))
-        return entities
+        return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def delete_orphans(parameter):

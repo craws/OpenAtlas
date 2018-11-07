@@ -148,10 +148,7 @@ class NodeMapper(EntityMapper):
     def get_form_choices():
         sql = "SELECT f.id, f.name FROM web.form f WHERE f.extendable = True ORDER BY name ASC;"
         g.cursor.execute(sql)
-        forms = []
-        for row in g.cursor.fetchall():
-            forms.append((row.id, row.name))
-        return forms
+        return [(row.id, row.name) for row in g.cursor.fetchall()]
 
     @staticmethod
     def save_entity_nodes(entity, form):

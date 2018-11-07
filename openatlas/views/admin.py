@@ -225,9 +225,7 @@ def admin_file_delete(filename):  # pragma: no cover
         return redirect(url_for('admin_orphans') + '#tab-orphaned-files')
 
     # Get all files with entities
-    file_ids = []
-    for entity in EntityMapper.get_by_system_type('file'):
-        file_ids.append(str(entity.id))
+    file_ids = [str(entity.id) for entity in EntityMapper.get_by_system_type('file')]
     # Get orphaned files (no corresponding entity)
     path = app.config['UPLOAD_FOLDER_PATH']
     for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:

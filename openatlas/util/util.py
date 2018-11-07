@@ -172,8 +172,9 @@ def get_entity_data(entity, location=None):
     The location parameter is for places which have a location attached.
     """
     data = []
-    # Nodes
     type_data = OrderedDict()
+
+    # Nodes
     if location:
         entity.nodes.update(location.nodes)  # Add location types
     for node, node_value in entity.nodes.items():
