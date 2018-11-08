@@ -9,8 +9,10 @@ class Changelog:
         'date': 'TBA',
         'data': OrderedDict(
             feature=OrderedDict([
+                ('934', 'Import'),
                 ('951', 'Export: additional options'),
-                ('538', 'Move/delete types for multiple entities')]))}
+                ('538', 'Move/delete types for multiple entities'),
+                ('954', 'Documentation and links in application')]))}
     versions['3.9.0'] = {
         'date': '2018-09-28',
         'data': OrderedDict(
