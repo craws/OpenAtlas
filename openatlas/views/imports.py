@@ -1,5 +1,4 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-
 import collections
 import pandas as pd
 from flask import flash, g, render_template, request, url_for
@@ -116,17 +115,16 @@ class ImportForm(Form):
 def import_data(project_id, class_code):
     project = ImportMapper.get_project_by_id(project_id)
     form = ImportForm()
-    imported = None
     table = None
-    columns = {'allowed': ['name', 'id', 'description'], 'valid': [], 'invalid': []}
+    imported = False
     messages = {'error': [], 'warn': []}
     if form.validate_on_submit():
         file_ = request.files['file']
-        filename = secure_filename(file_.filename)
-        file_path = app.config['IMPORT_FOLDER_PATH'] + '/' + filename
+        file_path = app.config['IMPORT_FOLDER_PATH'] + '/' + secure_filename(file_.filename)
+        columns = {'allowed': ['name', 'id', 'description'], 'valid': [], 'invalid': []}
         try:
             file_.save(file_path)
-            if filename.rsplit('.', 1)[1].lower() in ['xls', 'xlsx']:
+            if file_path.rsplit('.', 1)[1].lower() in ['xls', 'xlsx']:
                 df = pd.read_excel(file_path, keep_default_na=False)
             else:
                 df = pd.read_csv(file_path, keep_default_na=False)
@@ -141,58 +139,43 @@ def import_data(project_id, class_code):
             if columns['invalid']:  # pragma: no cover
                 messages['warn'].append(_('invalid columns') + ': ' + ','.join(columns['invalid']))
             headers = list(df.columns.values)  # Read cleaned headers again
-            table = {'id': 'import', 'header': headers, 'data': []}
             table_data = []
             checked_data = []
             origin_ids = []
             names = []
-            missing_name = False
             missing_name_count = 0
             for index, row in df.iterrows():
+                if not row['name']:  # pragma: no cover
+                    missing_name_count += 1
+                    continue
                 table_row = []
                 checked_row = {}
                 for item in headers:
                     table_row.append(row[item])
                     checked_row[item] = row[item]
-                    if item == 'name':
-                        if not row['name']:  # pragma: no cover
-                            missing_name = True
-                            missing_name_count += 1
-                            continue
-                        if form.duplicate.data:
-                            names.append(row['name'].lower())
+                    if item == 'name' and form.duplicate.data:
+                        names.append(row['name'].lower())
                     if item == 'id' and row[item]:
                         origin_ids.append(str(row['id']))
-                if missing_name:  # pragma: no cover
-                    missing_name = False
-                    continue
                 table_data.append(table_row)
                 checked_data.append(checked_row)
-            table['data'] = table_data
+            table = {'id': 'import', 'header': headers, 'data': table_data}
+
+            # Checking for data inconsistency
             if missing_name_count:  # pragma: no cover
                 messages['warn'].append(_('empty names') + ': ' + str(missing_name_count))
-
-            # Check origin ids for doubles and already existing ids
-            if origin_ids:
-                doubles = [
-                    item for item,
-                    count in collections.Counter(origin_ids).items() if count > 1]
-                existing = ImportMapper.check_origin_ids(project, set(origin_ids))
-                if doubles or existing:
-                    if doubles:  # pragma: no cover
-                        messages['error'].append(
-                            _('double IDs in import') + ': ' + ', '.join(doubles))
-                    if existing:
-                        messages['error'].append(
-                            _('IDs already in database') + ': ' + ', '.join(existing))
-                    raise Exception()
-
-            # Check for possible duplicates
-            if form.duplicate.data:
+            doubles = [item for item, count in collections.Counter(origin_ids).items() if count > 1]
+            if doubles:  # pragma: no cover
+                messages['error'].append(_('double IDs in import') + ': ' + ', '.join(doubles))
+            existing = ImportMapper.check_origin_ids(project, origin_ids) if origin_ids else None
+            if existing:
+                messages['error'].append(_('IDs already in database') + ': ' + ', '.join(existing))
+            if form.duplicate.data:  # Check for possible duplicates
                 duplicates = ImportMapper.check_duplicates(class_code, names)
                 if duplicates:  # pragma: no cover
                     messages['warn'].append(_('possible duplicates') + ': ' + ', '.join(duplicates))
-
+            if messages['error']:
+                raise Exception()
         except Exception as e:  # pragma: no cover
             flash(_('error at import'), 'error')
             return render_template('import/import_data.html', project=project, form=form,

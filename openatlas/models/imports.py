@@ -53,11 +53,11 @@ class ImportMapper:
         g.cursor.execute('DELETE FROM import.project WHERE id = %(id)s;', {'id': id_})
 
     @staticmethod
-    def check_origin_ids(project, origin_ids):
+    def check_origin_ids(project, origin_ids):  # Check if origin ids already in database
         sql = """
             SELECT origin_id FROM import.entity
             WHERE project_id = %(project_id)s AND origin_id IN %(ids)s;"""
-        g.cursor.execute(sql, {'project_id': project.id, 'ids': tuple(origin_ids)})
+        g.cursor.execute(sql, {'project_id': project.id, 'ids': tuple(set(origin_ids))})
         return [row.origin_id for row in g.cursor.fetchall()]
 
     @staticmethod
