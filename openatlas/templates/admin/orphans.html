@@ -4,7 +4,7 @@
     > {{ _('orphans')|uc_first }}
 {% endblock %}
 {% block content %}
-<p>{{ 'Orphans'|manual_link|safe }}</p>
+{{ 'Orphans'|manual_link|safe }}
 <div id="tabs" class="tabs-container">
     <ul>
         <li><a href="#tab-orphan">{{ _('orphans')|uc_first }} ({{ tables['orphans']['data']|length|format_number }})</a></li>

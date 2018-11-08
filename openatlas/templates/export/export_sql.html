@@ -4,7 +4,7 @@
     > {{ _('export SQL')|uc_first }}
 {% endblock %}
 {% block content %}
-    <p>{{ 'Export'|manual_link|safe }}</p>
+    {{ 'Export'|manual_link|safe }}
     {% if writeable %}
         {{ form|display_form|safe }}
     {% else %}

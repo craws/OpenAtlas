@@ -6,7 +6,7 @@
 {% block content %}
     {% if writeable %}
         <div style="float:left;margin-right: 1em;">
-            <p>{{ 'Export'|manual_link|safe }}</p>
+            {{ 'Export'|manual_link|safe }}
             {{ form|display_form|safe }}
         </div>
     {% else %}

@@ -4,6 +4,7 @@
     > {{ _('general')|uc_first }}
 {% endblock %}
 {% block content %}
+    {{ 'General'|manual_link|safe }}
     <div class="button-bar">
         <a href="{{ url_for('admin_general_update') }}">{{ _('edit')|uc_first }}</a>
     </div>

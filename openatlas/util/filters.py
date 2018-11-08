@@ -162,9 +162,9 @@ def manual_link(self, wiki_site):
     wiki_icon = '<img style="height:14px;" src="/static/images/icons/book.png" alt='' /> '
     wiki_url = 'https://redmine.openatlas.eu/projects/uni/wiki/'
     wiki_link = """
-        <a class="manual" href="{url}" rel="noopener" target="_blank">
+        <p class="manual"><a class="manual" href="{url}" rel="noopener" target="_blank">
             {icon} {label}
-        </a>""".format(
+        </a></p>""".format(
         url=wiki_url + wiki_site, label=util.uc_first(_('manual')), icon=wiki_icon)
     return wiki_link
 

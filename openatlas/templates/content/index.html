@@ -4,5 +4,6 @@
     > {{ _('content')|uc_first }}
 {% endblock %}
 {% block content %}
+    {{ 'Content'|manual_link|safe }}
     {{ table_content|pager|safe }}
 {% endblock %}

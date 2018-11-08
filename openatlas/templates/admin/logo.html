@@ -4,6 +4,7 @@
     > {{ _('logo')|uc_first }}
 {% endblock %}
 {% block content %}
+    {{ 'Logo'|manual_link|safe }}
     {% if form %}
         {{ form|display_form|safe }}
     {% else %}

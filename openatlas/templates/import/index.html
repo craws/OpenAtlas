@@ -4,7 +4,7 @@
     > {{ _('import')|uc_first }}
 {% endblock %}
 {% block content %}
-    <p>{{ 'Import'|manual_link|safe }}</p>
+    {{ 'Import'|manual_link|safe }}
     {% if 'admin'|is_authorized %}
         <div class="button-bar">
             <a href="{{ url_for('import_project_insert') }}">+ {{ _('project')|uc_first }}</a>
