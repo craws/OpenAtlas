@@ -9,7 +9,6 @@ from wtforms import BooleanField, FileField, StringField, SubmitField, TextAreaF
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.models.entity import EntityMapper
 from openatlas.models.imports import ImportMapper, Project
 from openatlas.util.util import format_date, link, required_group, truncate_string
 
@@ -55,6 +54,7 @@ def import_project_insert():
 @app.route('/import/project/view/<int:id_>')
 @required_group('editor')
 def import_project_view(id_):
+    from openatlas.models.entity import EntityMapper
     project = ImportMapper.get_project_by_id(id_)
     table = {'id': 'entities', 'data': [],
              'header': [_('name'), _('class'), _('description'), 'origin ID', _('date')]}
