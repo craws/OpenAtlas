@@ -9,7 +9,7 @@ from wtforms import BooleanField, FileField, StringField, SubmitField, TextAreaF
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.models.imports import ImportMapper, Project
+from openatlas.models.imports import ImportMapper
 from openatlas.util.util import format_date, link, required_group, truncate_string
 
 
@@ -20,6 +20,7 @@ class ProjectForm(Form):
     save = SubmitField(_('insert'))
 
     def validate(self, extra_validators=None):
+        from openatlas.models.imports import Project
         valid = Form.validate(self)
         project = ImportMapper.get_project_by_id(self.project_id) if self.project_id else Project()
         if project.name != self.name.data and ImportMapper.get_project_by_name(self.name.data):
