@@ -13,7 +13,7 @@ Install pandas libraries (needed for export and import)
     # apt-get install python3-pandas python3-geopandas python3-xlrd
 
 Add this line to your apache config right after the WSGIScriptAlias line.
-If you have an SSH config it has to be changed there too.
+If you have an additional HTTPS config file it has to be added there too.
 
     WSGIApplicationGroup %{GLOBAL}
 
