@@ -400,7 +400,7 @@ for e in entities:
         count['E8 acquisition'] += 1
     elif e.class_code == 'E031':
         e.class_code = 'E31'
-        if e.entity_type in [10, 11]:  # Scientific Literature, text
+        if e.entity_type in [10, 11, 42774]:  # Scientific Literature, text
             e.system_type = 'bibliography'
         elif e.entity_type in [11232, 11179, 11180]:  # File (map, photo, drawing)
             if '.' not in e.name:
@@ -408,8 +408,6 @@ for e in entities:
             (new_file_name, ext) = os.path.splitext(e.name)
             e.name = new_file_name
             e.system_type = 'file'
-        elif e.entity_type == 12:  # These 23 have to be checked manually
-            continue
         else:
             print('missing id for E031 type:' + str(e.entity_type))
             continue
