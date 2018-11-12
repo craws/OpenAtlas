@@ -4,6 +4,7 @@
     > {{ _('check links')|uc_first }}
 {% endblock %}
 {% block content %}
+    {{ 'Check_links'|manual_link|safe }}
     <p>
         <a class="button" href="{{ url_for('admin_check_links', check='check')}}">{{ _('check links')|uc_first }}</a>
         {{ _('this could take some time')|uc_first }}

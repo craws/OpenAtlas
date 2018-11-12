@@ -25,6 +25,7 @@
         <h2 style="float:right;">{{ _('no data to display')|uc_first }}</h2>
     {% endif %}
     <div style="float:left;">
+        {{ 'Network_visualization'|manual_link|safe }}
         <form method="post" id="network-form" style="margin-right:1em;">
             {{ form.csrf_token }}
             <h2>{{ _('classes')|uc_first }}</h2>
@@ -46,6 +47,5 @@
             {{ form.distance }} {{ form.distance.label }}<br />
             <input id="save" name="save" value="{{ _('apply')|uc_first }}" type="submit">
         </form>
-        <p>{{ 'Network_visualization'|manual_link|safe }}</p>
     </div>
 {% endblock %}

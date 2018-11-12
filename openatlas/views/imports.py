@@ -1,5 +1,4 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-
 import collections
 import pandas as pd
 from flask import flash, g, render_template, request, url_for
@@ -10,9 +9,9 @@ from wtforms import BooleanField, FileField, StringField, SubmitField, TextAreaF
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.models.entity import EntityMapper
 from openatlas.models.imports import ImportMapper, Project
 from openatlas.util.util import format_date, link, required_group, truncate_string
+from openatlas.models.entity import EntityMapper
 
 
 class ProjectForm(Form):
@@ -58,7 +57,7 @@ def import_project_insert():
 def import_project_view(id_):
     project = ImportMapper.get_project_by_id(id_)
     table = {'id': 'entities', 'data': [],
-             'header': [_('name'), _('class'), _('description'), _('origin id'), _('date')]}
+             'header': [_('name'), _('class'), _('description'), 'origin ID', _('date')]}
     for entity in EntityMapper.get_by_project_id(id_):
         table['data'].append([
             link(entity),
@@ -79,7 +78,7 @@ def import_project_update(id_):
         project.name = form.name.data
         project.description = form.description.data
         ImportMapper.update_project(project)
-        flash(_('Project updated'), 'info')
+        flash(_('project updated'), 'info')
         return redirect(url_for('import_project_view', id_=project.id))
     return render_template('import/project_update.html', project=project, form=form)
 
@@ -88,7 +87,7 @@ def import_project_update(id_):
 @required_group('manager')
 def import_project_delete(id_):
     ImportMapper.delete_project(id_)
-    flash(_('Project deleted'), 'info')
+    flash(_('project deleted'), 'info')
     return redirect(url_for('import_index'))
 
 
@@ -101,7 +100,7 @@ class ImportForm(Form):
     def validate(self, extra_validators=None):
         valid = Form.validate(self)
         file_ = request.files['file']
-        extensions = ['csv', 'xls', 'xlsx']
+        extensions = app.config['IMPORT_FILE_EXTENSIONS']
         if not file_:  # pragma: no cover
             self.file.errors.append(_('no file to upload'))
             valid = False
@@ -116,82 +115,71 @@ class ImportForm(Form):
 def import_data(project_id, class_code):
     project = ImportMapper.get_project_by_id(project_id)
     form = ImportForm()
-    imported = None
     table = None
-    columns = {'allowed': ['name', 'id', 'description'], 'valid': [], 'invalid': []}
+    imported = False
+    messages = {'error': [], 'warn': []}
     if form.validate_on_submit():
         file_ = request.files['file']
-        filename = secure_filename(file_.filename)
-        file_path = app.config['IMPORT_FOLDER_PATH'] + '/' + filename
+        file_path = app.config['IMPORT_FOLDER_PATH'] + '/' + secure_filename(file_.filename)
+        columns = {'allowed': ['name', 'id', 'description'], 'valid': [], 'invalid': []}
         try:
             file_.save(file_path)
-            if filename.rsplit('.', 1)[1].lower() in ['xls', 'xlsx']:
+            if file_path.rsplit('.', 1)[1].lower() in ['xls', 'xlsx']:
                 df = pd.read_excel(file_path, keep_default_na=False)
             else:
                 df = pd.read_csv(file_path, keep_default_na=False)
             headers = list(df.columns.values)
-            if 'name' not in headers:
-                flash(_('missing name column'), 'error')
+            if 'name' not in headers:  # pragma: no cover
+                messages['error'].append(_('missing name column'))
                 raise Exception()
-            for item in headers:
+            for item in headers:  # pragma: no cover
                 if item not in columns['allowed']:
                     columns['invalid'].append(item)
                     del df[item]
+            if columns['invalid']:  # pragma: no cover
+                messages['warn'].append(_('invalid columns') + ': ' + ','.join(columns['invalid']))
             headers = list(df.columns.values)  # Read cleaned headers again
-            table = {'id': 'import', 'header': headers, 'data': []}
             table_data = []
             checked_data = []
             origin_ids = []
             names = []
-            missing_name = False
-            missing_name_alert = False
+            missing_name_count = 0
             for index, row in df.iterrows():
+                if not row['name']:  # pragma: no cover
+                    missing_name_count += 1
+                    continue
                 table_row = []
                 checked_row = {}
                 for item in headers:
                     table_row.append(row[item])
                     checked_row[item] = row[item]
-                    if item == 'name':
-                        if not row.name:
-                            missing_name = True
-                            missing_name_alert = True
-                            continue
-                        if form.duplicate.data:
-                            names.append(row['name'].lower())
+                    if item == 'name' and form.duplicate.data:
+                        names.append(row['name'].lower())
                     if item == 'id' and row[item]:
                         origin_ids.append(str(row['id']))
-                if missing_name:
-                    missing_name = False
-                    continue
                 table_data.append(table_row)
                 checked_data.append(checked_row)
-            table['data'] = table_data
-            if missing_name_alert:
-                flash(_('Some names seem to be empty.'), 'error')
+            table = {'id': 'import', 'header': headers, 'data': table_data}
 
-            # Check origin ids for doubles and already existing ids
-            if origin_ids:
-                doubles = [
-                    item for item,
-                    count in collections.Counter(origin_ids).items() if count > 1]
-                existing = ImportMapper.check_origin_ids(project, set(origin_ids))
-                if doubles or existing:
-                    if doubles:
-                        flash(_('Double ids in import: ') + ', '.join(doubles), 'error')
-                    if existing:
-                        flash(_('ids already in database: ') + ', '.join(existing), 'error')
-                    raise Exception()
-
-            # Check for possible duplicates
-            if form.duplicate.data:
+            # Checking for data inconsistency
+            if missing_name_count:  # pragma: no cover
+                messages['warn'].append(_('empty names') + ': ' + str(missing_name_count))
+            doubles = [item for item, count in collections.Counter(origin_ids).items() if count > 1]
+            if doubles:  # pragma: no cover
+                messages['error'].append(_('double IDs in import') + ': ' + ', '.join(doubles))
+            existing = ImportMapper.check_origin_ids(project, origin_ids) if origin_ids else None
+            if existing:
+                messages['error'].append(_('IDs already in database') + ': ' + ', '.join(existing))
+            if form.duplicate.data:  # Check for possible duplicates
                 duplicates = ImportMapper.check_duplicates(class_code, names)
-                if duplicates:
-                    flash(_('possible duplicates: ') + ', '.join(duplicates), 'error')
-
+                if duplicates:  # pragma: no cover
+                    messages['warn'].append(_('possible duplicates') + ': ' + ', '.join(duplicates))
+            if messages['error']:
+                raise Exception()
         except Exception as e:  # pragma: no cover
             flash(_('error at import'), 'error')
             return render_template('import/import_data.html', project=project, form=form,
-                                       class_code=class_code, columns=columns)
+                                   class_code=class_code, messages=messages)
 
         if not form.preview.data and checked_data:
             g.cursor.execute('BEGIN')
@@ -199,11 +187,11 @@ def import_data(project_id, class_code):
                 ImportMapper.import_data(project, class_code, checked_data)
                 g.cursor.execute('COMMIT')
                 logger.log('info', 'import', 'import: ' + str(len(checked_data)))
-                flash(_('Import of') + ': ' + str(len(checked_data)), 'info')
+                flash(_('import of') + ': ' + str(len(checked_data)), 'info')
                 imported = True
             except Exception as e:  # pragma: no cover
                 g.cursor.execute('ROLLBACK')
                 logger.log('error', 'import', 'import failed', e)
                 flash(_('error transaction'), 'error')
     return render_template('import/import_data.html', project=project, form=form,
-                           class_code=class_code, table=table, columns=columns, imported=imported)
+                           class_code=class_code, table=table, imported=imported, messages=messages)

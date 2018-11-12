@@ -3,6 +3,7 @@
     {{ _('event')|uc_first }}
 {% endblock %}
 {% block content %}
+    {{ 'Event'|manual_link|safe }}
     {% if 'editor'|is_authorized %}
         <div class="button-bar">
             {% for code in config['CLASS_CODES']['event'] %}

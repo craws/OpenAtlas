@@ -3,6 +3,7 @@
     {{ _('types')|uc_first }}
 {% endblock %}
 {% block content %}
+    {{ 'Form_field_type'|manual_link|safe }}
     <div id="tabs-menu" class="tabs-container">
         <ul>
             <li><a href="#menu-tab-system">{{ _('system types')|uc_first }}</a></li>
@@ -77,7 +78,6 @@
             </div>
         {% endfor %}
     </div>
-    <p>{{ 'Form_field_type'|manual_link|safe }}</p>
     <script>
         $(document).ready(function () {
             $("#tabs-menu").tabs();

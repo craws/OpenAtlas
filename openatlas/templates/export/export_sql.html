@@ -4,9 +4,9 @@
     > {{ _('export SQL')|uc_first }}
 {% endblock %}
 {% block content %}
+    {{ 'Export'|manual_link|safe }}
     {% if writeable %}
         {{ form|display_form|safe }}
-        <p>{{ 'Export'|manual_link|safe }}</p>
     {% else %}
         <p><span class="error">{{ _('directory not writable')|uc_first }}: export/sql</span></p>
     {% endif %}

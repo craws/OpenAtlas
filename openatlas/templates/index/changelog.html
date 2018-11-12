@@ -20,7 +20,7 @@
                             #{{ issue_number }}
                         </a> {{ issue_text|safe }}<br />
                     {% else %}
-                        {{ issue_text|safe }}
+                        &#8226 {{ issue_text|safe }}
                     {% endif %}
                 {% endfor %}
             {% endfor %}

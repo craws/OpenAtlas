@@ -3,14 +3,16 @@ from collections import OrderedDict
 
 
 class Changelog:
-    """ A big OrderedDict with changelog data, maybe not the best place and format to keep it."""
+    """ A big OrderedDict with changelog data"""
     versions = OrderedDict()
     versions['3.10.0'] = {
-        'date': 'TBA',
+        'date': '2018-11-09',
         'data': OrderedDict(
             feature=OrderedDict([
+                ('934', 'Import'),
                 ('951', 'Export: additional options'),
-                ('538', 'Move/delete types for multiple entities')]))}
+                ('538', 'Move/delete types for multiple entities'),
+                ('954', 'Documentation and links in application')]))}
     versions['3.9.0'] = {
         'date': '2018-09-28',
         'data': OrderedDict(

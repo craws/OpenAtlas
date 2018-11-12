@@ -35,10 +35,7 @@ class ImportMapper:
     @staticmethod
     def get_all_projects():
         g.cursor.execute(ImportMapper.sql + ' GROUP by p.id ORDER BY name;')
-        projects = []
-        for row in g.cursor.fetchall():
-            projects.append(Project(row))
-        return projects
+        return [Project(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_project_by_id(id_):
@@ -56,15 +53,12 @@ class ImportMapper:
         g.cursor.execute('DELETE FROM import.project WHERE id = %(id)s;', {'id': id_})
 
     @staticmethod
-    def check_origin_ids(project, origin_ids):
+    def check_origin_ids(project, origin_ids):  # Check if origin ids already in database
         sql = """
             SELECT origin_id FROM import.entity
             WHERE project_id = %(project_id)s AND origin_id IN %(ids)s;"""
-        g.cursor.execute(sql, {'project_id': project.id, 'ids': tuple(origin_ids)})
-        existing = []
-        for row in g.cursor.fetchall():
-            existing.append(row.origin_id)
-        return existing
+        g.cursor.execute(sql, {'project_id': project.id, 'ids': tuple(set(origin_ids))})
+        return [row.origin_id for row in g.cursor.fetchall()]
 
     @staticmethod
     def check_duplicates(class_code, names):
@@ -90,7 +84,7 @@ class ImportMapper:
         from openatlas.models.entity import EntityMapper
         for row in data:
             system_type = None
-            if class_code == 'E33':
+            if class_code == 'E33':  # pragma: no cover
                 system_type = 'source content'
             elif class_code == 'E18':
                 system_type = 'place'
