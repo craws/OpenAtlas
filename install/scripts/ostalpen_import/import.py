@@ -192,7 +192,8 @@ def insert_entity(e, with_case_study=False):
         if not e.entity_type or e.entity_type in [1, 2, 3, 4]:
             pass
         elif e.entity_type not in ostalpen_place_types:
-            missing_ostalpen_place_types.add(e.entity_type)
+            pass
+            # missing_ostalpen_place_types.add(e.entity_type)
         else:
             sql = """
                 INSERT INTO model.link (property_code, domain_id, range_id) VALUES 
@@ -713,7 +714,8 @@ for row in cursor_ostalpen.fetchall():
             print('Use of DPP double type: ' + type_name)
             continue
         if type_name not in types:
-            missing_dpp_types.add(type_name)
+            if 'JB_' not in type_name:
+                missing_dpp_types.add(type_name)
             continue
         if row.links_entity_uid_from not in new_entities:
             print('Missing entity for type with Ostalpen ID: ' + str(row.links_entity_uid_from))
