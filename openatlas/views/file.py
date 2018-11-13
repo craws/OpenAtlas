@@ -1,7 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-import math
 import os
 
+import math
 from flask import flash, g, render_template, request, send_from_directory, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
@@ -15,9 +15,8 @@ from openatlas.forms.forms import build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (build_table_form, convert_size, display_remove_link,
-                                 get_base_table_data, get_entity_data, get_file_path,
-                                 get_view_name, link, required_group, was_modified, is_authorized,
-                                 uc_first)
+                                 get_base_table_data, get_entity_data, get_file_path, get_view_name,
+                                 is_authorized, link, required_group, uc_first, was_modified)
 
 
 class FileForm(Form):
@@ -65,9 +64,8 @@ def display_logo(filename):  # extra file display function for public
 @app.route('/file/index')
 @required_group('readonly')
 def file_index():
-    table = {'id': 'files', 'header': app.config['TABLE_HEADERS']['file'], 'data': []}
-    for file in EntityMapper.get_by_system_type('file'):
-        table['data'].append(get_base_table_data(file))
+    table = {'id': 'files', 'header': app.config['TABLE_HEADERS']['file'],
+             'data': [get_base_table_data(f) for f in EntityMapper.get_by_system_type('file')]}
     statvfs = os.statvfs(app.config['UPLOAD_FOLDER_PATH'])
     disk_space = statvfs.f_frsize * statvfs.f_blocks
     free_space = statvfs.f_frsize * statvfs.f_bavail  # available space without reserved blocks

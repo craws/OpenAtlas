@@ -512,12 +512,17 @@ def pager(table):
                 {headers}
                 {sort}
                 dateFormat: "ddmmyyyy",
-                widgets: [\'zebra\', \'filter\'],
+                widgets: ["filter"],
                 widgetOptions: {{
-                    filter_external: \'#{id}-search\',
+                    filter_external: "#{id}-search",
                     filter_columnFilters: false
                 }}}})
-            .tablesorterPager({{positionFixed: false, container: $("#{id}-pager"), size:{size}}});
+            .tablesorterPager({{
+                delayInit: true,
+                removeRows: true,
+                positionFixed: false,
+                container: $("#{id}-pager"),
+                size:{size}}});
         """.format(
             id=table['id'],
             sort=sort,
@@ -527,9 +532,9 @@ def pager(table):
         html += """
             $("#{id}-table").tablesorter({{
                 {sort}
-                widgets: [\'zebra\', \'filter\'],
+                widgets: ["filter"],
                 widgetOptions: {{
-                    filter_external: \'#{id}-search\',
+                    filter_external: "#{id}-search",
                     filter_columnFilters: false
                 }}}});
         """.format(id=table['id'], sort=sort, )

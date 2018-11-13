@@ -93,12 +93,12 @@ input[type="text"],
 div.tabs-container .ui-widget-content,
 div.tabs-container .ui-state-active,
 div.tabs-container .ui-state-active.ui-state-hover,
-table.tablesorter tbody td {
+table.tablesorter tbody tr:nth-child(even) {
     background-color: #ffffff;
 }
 
 #language-menu a,
-table.tablesorter tbody tr.odd td {
+table.tablesorter tbody tr:nth-child(odd) {
     background-color: #adadad;
 }
 
