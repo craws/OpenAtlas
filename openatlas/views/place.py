@@ -149,7 +149,7 @@ def place_view(id_, unlink_id=None):
             actor.class_.name,
             actor.first,
             actor.last])
-    gis_data = GisMapper.get_all(object_.id) if location else None
+    gis_data = GisMapper.get_all(object_) if location else None
     if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]':
         gis_data = None
     place = None
@@ -221,7 +221,7 @@ def place_update(id_):
         form.alias.append_entry(alias)
     if object_.system_type == 'place':
         form.alias.append_entry('')
-    gis_data = GisMapper.get_all(object_.id)
+    gis_data = GisMapper.get_all(object_)
     place = None
     feature = None
     stratigraphic_unit = None
@@ -269,7 +269,7 @@ def save(form, object_=None, location=None, origin=None):
         location.save_nodes(form)
         if hasattr(form, 'alias'):
             for alias in form.alias.data:
-                if alias.strip():  # check if it isn't empty
+                if alias.strip():  # Check if it isn't empty
                     object_.link('P1', EntityMapper.insert('E41', alias))
         url = url_for('place_view', id_=object_.id)
         if origin:

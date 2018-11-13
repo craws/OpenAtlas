@@ -4,6 +4,7 @@
     > {{ _('mail')|uc_first }}
 {% endblock %}
 {% block content %}
+    {{ 'Mail'|manual_link|safe }}
     <div class="button-bar">
         <a href="{{ url_for('admin_mail_update') }}">{{ _('edit')|uc_first }}</a>
     </div>

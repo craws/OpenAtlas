@@ -131,10 +131,7 @@ class LinkMapper:
             'entity_id': entity if isinstance(entity, int) else entity.id,
             'codes': tuple(codes if isinstance(codes, list) else [codes])})
         debug_model['div sql'] += 1
-        links = []
-        for row in g.cursor.fetchall():
-            links.append(Link(row))
-        return links
+        return [Link(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def delete_by_codes(entity, codes):

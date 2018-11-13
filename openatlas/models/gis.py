@@ -10,11 +10,19 @@ from openatlas.util.util import uc_first
 class GisMapper:
 
     @staticmethod
-    def get_all(object_ids=None):
+    def get_all(objects=None):
         all_ = {'point': [], 'polygon': []}
         selected = {'point': [], 'polygon': [], 'polygon_point': []}
-        object_ids = object_ids if object_ids else []
-        object_ids = object_ids if isinstance(object_ids, list) else [object_ids]
+        # Workaround to include GIS features of a subunit which would be otherwise omitted
+        subunit_selected_id = 0
+        if objects:
+            if not isinstance(objects, list):
+                if objects.system_type in ['feature', 'finds', 'stratigraphic unit']:
+                    subunit_selected_id = objects.id
+                objects = [objects]
+        else:
+            objects = []
+        object_ids = [x.id for x in objects]
         polygon_point_sql = """
             (SELECT public.ST_AsGeoJSON(public.ST_PointOnSurface(p.geom))
             FROM gis.polygon p WHERE id = polygon.id) AS polygon_point, """
@@ -41,9 +49,10 @@ class GisMapper:
                 LEFT JOIN model.link t ON object.id = t.domain_id AND t.property_code = 'P2'
                 WHERE place.class_code = 'E53'
                     AND l.property_code = 'P53'
-                    AND object.system_type = 'place'
+                    AND (object.system_type = 'place' OR object.id = {subunit_selected_id})
                 GROUP BY object.id, {shape}.id;""".format(
                         shape=shape,
+                        subunit_selected_id=subunit_selected_id,
                         polygon_point_sql=polygon_point_sql if shape == 'polygon' else '')
             g.cursor.execute(sql)
             place_type_root_id = NodeMapper.get_hierarchy_by_name('Place').id

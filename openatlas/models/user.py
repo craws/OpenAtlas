@@ -68,11 +68,8 @@ class UserMapper:
     @staticmethod
     def get_all():
         g.cursor.execute(UserMapper.sql + ' ORDER BY username;')
-        users = []
-        for row in g.cursor.fetchall():
-            users.append(User(row))
         openatlas.debug_model['user'] += 1
-        return users
+        return [User(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_by_id(user_id, with_bookmarks=False):
@@ -80,9 +77,7 @@ class UserMapper:
         if with_bookmarks:
             sql = 'SELECT entity_id FROM web.user_bookmarks WHERE user_id = %(user_id)s;'
             g.cursor.execute(sql, {'user_id': user_id})
-            bookmarks = []
-            for row in g.cursor.fetchall():
-                bookmarks.append(row.entity_id)
+            bookmarks = [row.entity_id for row in g.cursor.fetchall()]
         g.cursor.execute(UserMapper.sql + ' WHERE u.id = %(id)s;', {'id': user_id})
         return User(g.cursor.fetchone(), bookmarks) if g.cursor.rowcount == 1 else None
 
@@ -195,10 +190,7 @@ class UserMapper:
     def get_users():
         sql = 'SELECT id, username FROM web.user ORDER BY username;'
         g.cursor.execute(sql)
-        users = []
-        for row in g.cursor.fetchall():
-            users.append((row.id, row.username))
-        return users
+        return [(row.id, row.username) for row in g.cursor.fetchall()]
 
     @staticmethod
     def toggle_bookmark(entity_id, user):

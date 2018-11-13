@@ -16,6 +16,11 @@ html, body, input, select, textarea {
     margin-left: 1em;
 }
 
+p.manual {
+    margin: 0;
+    margin-bottom: 0.5em;
+}
+
 input[type="text"].value-type {
     width: 4em;
     text-align: right;
@@ -558,8 +563,8 @@ div.pager div.navigation {
 
 }
 
-select.pagesize {
-    width: 4em;
+select.pagesize, select#gis {
+    width: auto;
 }
 
 div.data-table div.display-none {

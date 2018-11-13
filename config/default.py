@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 from flask_babel import lazy_gettext as _
 
-VERSION = '3.10.0'
+VERSION = '3.11.0'
 DEMO_MODE = False  # If in demo mode some options are disabled and the login form is pre filled
 
 LANGUAGES = {'en': 'English', 'de': 'Deutsch'}
@@ -14,19 +14,19 @@ DATABASE_NAME = 'openatlas'
 DATABASE_USER = 'openatlas'
 DATABASE_HOST = 'localhost'
 DATABASE_PORT = 5432
-
-# Set these options in /instance/INSTANCE_NAME.py e.g. in /instance/production.py
 DATABASE_PASS = 'CHANGE ME'
 MAIL_PASSWORD = 'CHANGE ME'
 SECRET_KEY = 'CHANGE ME'
 
-# JavaScript credentials
-GEONAMES_USERNAME = 'openatlas'
-THUNDERFOREST_KEY = '7878b4fb224f4902ab42fc846e92b96a'
-
+IMPORT_FOLDER_PATH = '/tmp'  # Needed for processing of import files, any temp folder will do
+IMPORT_FILE_EXTENSIONS = ['csv', 'xls', 'xlsx']
 EXPORT_FOLDER_PATH = os.path.dirname(__file__) + '/../openatlas/export'
 UPLOAD_FOLDER_PATH = os.path.dirname(__file__) + '/../openatlas/uploads'
 DISPLAY_FILE_EXTENSIONS = ['bmp', 'gif', 'ico', 'jpeg', 'jpg', 'png']
+
+# JavaScript credentials
+GEONAMES_USERNAME = 'openatlas'
+THUNDERFOREST_KEY = '7878b4fb224f4902ab42fc846e92b96a'
 
 DEFAULT_TABLE_ROWS = OrderedDict()
 DEFAULT_TABLE_ROWS[10] = '10'

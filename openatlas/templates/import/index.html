@@ -1,14 +1,14 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
     <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
-    > {{ _('user')|uc_first }}
+    > {{ _('import')|uc_first }}
 {% endblock %}
 {% block content %}
-    {{ 'User'|manual_link|safe }}
-    {% if 'manager'|is_authorized %}
+    {{ 'Import'|manual_link|safe }}
+    {% if 'admin'|is_authorized %}
         <div class="button-bar">
-            <a href="{{ url_for('user_insert') }}">+ {{ _('user')|uc_first }}</a>
+            <a href="{{ url_for('import_project_insert') }}">+ {{ _('project')|uc_first }}</a>
         </div>
     {% endif %}
-    {{ tables['user']|pager|safe }}
+    {{ table|pager|safe }}
 {% endblock %}

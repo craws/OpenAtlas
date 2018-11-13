@@ -95,8 +95,7 @@ class Entity:
 class EntityMapper:
     sql = """
         SELECT
-            e.id, e.class_code, e.name, e.description, e.created, e.modified,
-            e.value_integer, e.system_type,
+            e.id, e.class_code, e.name, e.description, e.created, e.modified, e.system_type,
             array_to_json(
                 array_agg((t.range_id, t.description)) FILTER (WHERE t.range_id IS NOT NULL)
             ) as nodes,
@@ -141,10 +140,7 @@ class EntityMapper:
         sql = EntityMapper.sql
         sql += ' WHERE e.system_type = %(system_type)s GROUP BY e.id ORDER BY e.name;'
         g.cursor.execute(sql, {'system_type': system_type})
-        entities = []
-        for row in g.cursor.fetchall():
-            entities.append(Entity(row))
-        return entities
+        return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_display_files():
@@ -166,7 +162,7 @@ class EntityMapper:
             VALUES (%(name)s, %(system_type)s, %(code)s, %(description)s, %(value_timestamp)s)
             RETURNING id;"""
         params = {
-            'name': str(date) if date else name.strip(),
+            'name': name.strip(),
             'code': code,
             'system_type': system_type.strip() if system_type else None,
             'description': description.strip() if description else None,
@@ -184,16 +180,34 @@ class EntityMapper:
         return Entity(g.cursor.fetchone())
 
     @staticmethod
+    def get_by_project_id(project_id):
+        sql = """
+            SELECT e.id, ie.origin_id, e.class_code, e.name, e.description, e.created, e.modified,
+                e.system_type,
+            array_to_json(
+                array_agg((t.range_id, t.description)) FILTER (WHERE t.range_id IS NOT NULL)
+            ) as nodes
+            FROM model.entity e
+            LEFT JOIN model.link t ON e.id = t.domain_id AND t.property_code IN ('P2', 'P89')
+            JOIN import.entity ie ON e.id = ie.entity_id
+            WHERE ie.project_id = %(id)s GROUP BY e.id, ie.origin_id ORDER BY e.name;"""
+        g.cursor.execute(sql, {'id': project_id})
+        debug_model['by id'] += 1
+        entities = []
+        for row in g.cursor.fetchall():
+            entity = Entity(row)
+            entity.origin_id = row.origin_id
+            entities.append(entity)
+        return entities
+
+    @staticmethod
     def get_by_ids(entity_ids):
         if not entity_ids:
             return []
         sql = EntityMapper.sql + ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name;'
         g.cursor.execute(sql, {'ids': tuple(entity_ids)})
         debug_model['by id'] += 1
-        entities = []
-        for row in g.cursor.fetchall():
-            entities.append(Entity(row))
-        return entities
+        return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_by_codes(class_name):
@@ -210,17 +224,13 @@ class EntityMapper:
                 WHERE e.class_code IN %(codes)s GROUP BY e.id ORDER BY e.name;"""
         g.cursor.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][class_name])})
         debug_model['by codes'] += 1
-        entities = []
-        for row in g.cursor.fetchall():
-            entities.append(Entity(row))
-        return entities
+        return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def delete(entity):
         """ Triggers function model.delete_entity_related() for deleting related entities"""
-        entity_id = entity if isinstance(entity, int) else entity.id
-        sql = "DELETE FROM model.entity WHERE id = %(entity_id)s;"
-        g.cursor.execute(sql, {'entity_id': entity_id})
+        id_ = entity if isinstance(entity, int) else entity.id
+        g.cursor.execute('DELETE FROM model.entity WHERE id = %(id_)s;', {'id_': id_})
 
     @staticmethod
     def get_overview_counts():
@@ -231,7 +241,9 @@ class EntityMapper:
             SUM(CASE WHEN class_code IN ('E6', 'E7', 'E8', 'E12') THEN 1 END) AS event,
             SUM(CASE WHEN class_code IN ('E21', 'E74', 'E40') THEN 1 END) AS actor,
             SUM(CASE WHEN class_code = 'E18' THEN 1 END) AS place,
-            SUM(CASE WHEN class_code IN ('E31', 'E84') THEN 1 END) AS reference
+            SUM(CASE WHEN class_code IN ('E31', 'E84') AND system_type != 'file' THEN 1 END)
+                AS reference,
+            SUM(CASE WHEN class_code = 'E31' AND system_type = 'file' THEN 1 END) AS file
             FROM model.entity;"""
         g.cursor.execute(sql)
         row = g.cursor.fetchone()
@@ -243,12 +255,9 @@ class EntityMapper:
     @staticmethod
     def get_orphans():
         """ Returns entities without links. """
-        entities = []
         g.cursor.execute(EntityMapper.sql_orphan)
         debug_model['div sql'] += 1
-        for row in g.cursor.fetchall():
-            entities.append(EntityMapper.get_by_id(row.id))
-        return entities
+        return [EntityMapper.get_by_id(row.id) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_latest(limit):
@@ -257,15 +266,11 @@ class EntityMapper:
         for class_codes in app.config['CLASS_CODES'].values():
             codes += class_codes
         sql = EntityMapper.sql + """
-                WHERE e.class_code IN %(codes)s
-                GROUP BY e.id
+                WHERE e.class_code IN %(codes)s GROUP BY e.id
                 ORDER BY e.created DESC LIMIT %(limit)s;"""
         g.cursor.execute(sql, {'codes': tuple(codes), 'limit': limit})
         debug_model['div sql'] += 1
-        entities = []
-        for row in g.cursor.fetchall():
-            entities.append(Entity(row))
-        return entities
+        return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def delete_orphans(parameter):

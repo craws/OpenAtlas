@@ -22,6 +22,7 @@ import openatlas
 from openatlas import app
 from openatlas.models.classObject import ClassObject
 from openatlas.models.date import DateMapper
+from openatlas.models.imports import Project
 from openatlas.models.property import Property
 from openatlas.models.user import User
 
@@ -171,8 +172,9 @@ def get_entity_data(entity, location=None):
     The location parameter is for places which have a location attached.
     """
     data = []
-    # Nodes
     type_data = OrderedDict()
+
+    # Nodes
     if location:
         entity.nodes.update(location.nodes)  # Add location types
     for node, node_value in entity.nodes.items():
@@ -264,11 +266,17 @@ def get_entity_data(entity, location=None):
     # Additional info for advanced layout
     if hasattr(current_user, 'settings') and current_user.settings['layout'] == 'advanced':
         data.append((uc_first(_('class')), link(entity.class_)))
-        user_log = openatlas.logger.get_log_for_advanced_view(entity.id)
-        data.append((_('created'), format_date(entity.created) + ' ' + link(user_log['creator'])))
-        if user_log['modified']:
-            info = format_date(user_log['modified']) + ' ' + link(user_log['modifier'])
-            data.append((_('modified'), info))
+        info = openatlas.logger.get_log_for_advanced_view(entity.id)
+        data.append((_('created'), format_date(entity.created) + ' ' + link(info['creator'])))
+        if info['modified']:
+            html = format_date(info['modified']) + ' ' + link(info['modifier'])
+            data.append((_('modified'), html))
+        if info['import_project']:
+            data.append((_('imported from'), link(info['import_project'])))
+        if info['import_user']:
+            data.append((_('imported by'), link(info['import_user'])))
+        if info['import_origin_id']:
+            data.append(('origin ID', info['import_origin_id']))
 
     return data
 
@@ -395,7 +403,10 @@ def link(entity):
     if not entity:
         return ''
     html = ''
-    if isinstance(entity, User):
+    if isinstance(entity, Project):
+        url = url_for('import_project_view', id_=entity.id)
+        html = '<a href="' + url + '">' + entity.name + '</a>'
+    elif isinstance(entity, User):
         style = '' if entity.active else 'class="inactive"'
         url = url_for('user_view', id_=entity.id)
         html = '<a ' + style + ' href="' + url + '">' + entity.username + '</a>'
