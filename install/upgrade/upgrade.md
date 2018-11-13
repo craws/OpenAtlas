@@ -6,6 +6,20 @@ After following the instructions restart Apache and test if the application is w
 
     service apache2 restart
 
+
+### 3.10.0 to 3.11.0
+
+If you are using multiple OpenAtlas versions on the same server it is import to add something like
+
+    WSGIDaemonProcess openatlas processes=2 threads=15 display-name=%{GROUP}
+    WSGIProcessGroup openatlas
+
+And replace openatlas for every instance with a unique name.
+
+If you are using additional https configuration add there only
+
+    WSGIProcessGroup openatlas
+
 ### 3.9.0 to 3.10.0
 
 Install pandas libraries (needed for export and import)
