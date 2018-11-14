@@ -40,28 +40,23 @@ class LinkMapper:
     def insert(domain, property_code, range_, description=None):
         if not domain or not range_:  # pragma: no cover
             return
+        from openatlas.models.entity import EntityMapper
+        # Domain can be an entity or entity id, range_ can also be a list of entities or entity ids
+        property_ = g.properties[property_code]
+        domain = EntityMapper.get_by_id(domain) if isinstance(domain, int) else domain
         range_ = range_ if isinstance(range_, list) else [range_]
         result = None
         for range_ in range_:
-            domain_id = domain if isinstance(domain, int) else domain.id
-            range_id = range_ if isinstance(range_, int) else range_.id
-            # Commented if below because unsure if link testing in debug mode only is a good idea
-            # if 'settings' in session and session['settings']['debug_mode']:
-            from openatlas.models.entity import EntityMapper
-            domain = domain if not isinstance(domain, int) else EntityMapper.get_by_id(domain)
-            range_ = range_ if not isinstance(range_, int) else EntityMapper.get_by_id(range_)
-            domain_class = g.classes[domain.class_.code]
-            range_class = g.classes[range_.class_.code]
-            property_ = g.properties[property_code]
+            range_ = EntityMapper.get_by_id(range_) if isinstance(range_, int) else range_
             domain_error = True
             range_error = True
-            if property_.find_object('domain_class_code', domain_class.code):
+            if property_.find_object('domain_class_code', g.classes[domain.class_.code].code):
                 domain_error = False
-            if property_.find_object('range_class_code', range_class.code):
+            if property_.find_object('range_class_code', g.classes[range_.class_.code].code):
                 range_error = False
             if domain_error or range_error:
-                text = _('error link') + ': ' + domain_class.code + ' > '
-                text += property_code + ' > ' + range_class.code
+                text = _('error link') + ': ' + g.classes[domain.class_.code].code + ' > '
+                text += property_code + ' > ' + g.classes[range_.class_.code].code
                 logger.log('error', 'model', text)
                 flash(text, 'error')
                 continue
@@ -72,8 +67,8 @@ class LinkMapper:
             # Todo: build only sql and get execution out of loop
             g.cursor.execute(sql, {
                 'property_code': property_code,
-                'domain_id': domain_id,
-                'range_id': range_id,
+                'domain_id': domain.id,
+                'range_id': range_.id,
                 'description': description})
             debug_model['div sql'] += 1
             result = g.cursor.fetchone()[0]

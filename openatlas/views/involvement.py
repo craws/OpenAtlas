@@ -53,10 +53,7 @@ def involvement_insert(origin_id):
             else:
                 for event_id in ast.literal_eval(form.event.data):
                     link_id = LinkMapper.insert(
-                        event_id,
-                        form.activity.data,
-                        origin.id,
-                        form.description.data)
+                        event_id, form.activity.data, origin.id, form.description.data)
                     DateMapper.save_link_dates(link_id, form)
                     NodeMapper.save_link_nodes(link_id, form)
             g.cursor.execute('COMMIT')
