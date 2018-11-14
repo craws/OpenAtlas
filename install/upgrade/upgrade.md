@@ -5,6 +5,10 @@ Before executing SQL statements backup the database. Replace database role "open
 After following the instructions restart Apache and test if the application is working.
 
     service apache2 restart
+    
+If you are using git and want to update to the latest stable release you can fetch the master branch e.g.
+
+    git pull origin master
 
 
 ### 3.10.0 to 3.11.0
