@@ -25,6 +25,7 @@ class Entity:
 start = time.time()
 ostalpen_user_id = 38
 ostalpen_type_id = 11821
+ostalpen_project_id = 1
 
 reset_database()
 
@@ -60,6 +61,14 @@ def link_property(domain_id, type_name):
         RETURNING id;"""
     cursor_dpp.execute(sql,{'domain_id': domain_id, 'type_name': type_name})
     return cursor_dpp.fetchone()[0]
+
+
+def insert_import_ids():
+    sql = """
+        INSERT INTO import.entity (project_id, origin_id, entity_id, user_id)
+        SELECT %(project_id)s, ostalpen_id, id, %(user_id)s FROM model.entity
+        WHERE ostalpen_id IS NOT NULL AND name NOT IN ('Salzburg', 'Stainach');"""
+    cursor_dpp.execute(sql, {'project_id': ostalpen_project_id, 'user_id': ostalpen_user_id})
 
 
 def insert_entity(e, with_case_study=False):
@@ -331,7 +340,7 @@ for root in ['Burgenland', 'Kärnten', 'Niederösterreich', 'Oberösterreich', '
     insert_place_subs(uid, cursor_dpp.fetchone()[0])
 
 
-# Get ostalpen entities
+# Get Ostalpen entities
 sql_ = """
     SELECT
         uid, entity_name_uri, cidoc_class_nr, entity_type, entity_description, start_time_abs,
@@ -462,6 +471,7 @@ for e in places:
     object_id = insert_entity(e, with_case_study=True)
     new_entities[e.ostalpen_id] = e
     p = copy.copy(e)
+    p.ostalpen_id = None
     p.system_type = 'place location'
     p.class_code = 'E53'
     p.name = 'Location of ' + e.name
@@ -523,6 +533,7 @@ for e in features:
     p = copy.copy(e)
     p.system_type = 'place location'
     p.class_code = 'E53'
+    p.ostalpen_id = None
     p.name = 'Location of ' + p.name
     location_id = insert_entity(p)
     link('P53', object_id, location_id)
@@ -579,6 +590,7 @@ for e in strati:
     object_id = insert_entity(e, with_case_study=True)
     new_entities[e.ostalpen_id] = e
     p = copy.copy(e)
+    p.ostalpen_id = None
     p.system_type = 'place location'
     p.class_code = 'E53'
     p.name = 'Location of ' + e.name
@@ -637,6 +649,7 @@ for e in finds:
     object_id = insert_entity(e, with_case_study=True)
     new_entities[e.ostalpen_id] = e
     p = copy.copy(e)
+    p.ostalpen_id = None
     p.system_type = 'place location'
     p.class_code = 'E53'
     p.name = 'Location of ' + e.name
@@ -823,6 +836,8 @@ if do_link_subunits_types:
 if do_import_files:
     add_licences(cursor_dpp, cursor_ostalpen)
     import_files(cursor_dpp)
+
+insert_import_ids()
 
 if missing_classes:
     print('Missing classes:' + ', '.join(missing_classes))
