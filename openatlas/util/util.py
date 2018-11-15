@@ -512,7 +512,7 @@ def pager(table):
                 {headers}
                 {sort}
                 dateFormat: "ddmmyyyy",
-                widgets: ["filter"],
+                widgets: ["filter", "zebra"],
                 widgetOptions: {{
                     filter_external: "#{id}-search",
                     filter_columnFilters: false
@@ -532,7 +532,7 @@ def pager(table):
         html += """
             $("#{id}-table").tablesorter({{
                 {sort}
-                widgets: ["filter"],
+                widgets: ["filter", "zebra"],
                 widgetOptions: {{
                     filter_external: "#{id}-search",
                     filter_columnFilters: false
