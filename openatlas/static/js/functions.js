@@ -218,7 +218,6 @@ function clearSelect(name) {
 
 function openParentTab() {
     locationHash = location.hash.substring(1);
-    console.log(locationHash);
     if (locationHash) {
         var hash = $('#' + locationHash);
         if (hash.length) {
