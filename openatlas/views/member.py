@@ -48,8 +48,7 @@ def membership_insert(origin_id):
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
-            for actor_id in ast.literal_eval(form.group.data):
-                actor = EntityMapper.get_by_id(actor_id)
+            for actor in EntityMapper.get_by_ids(ast.literal_eval(form.group.data)):
                 link_id = actor.link('P107', origin, form.description.data)
                 DateMapper.save_link_dates(link_id, form)
                 NodeMapper.save_link_nodes(link_id, form)
@@ -75,8 +74,7 @@ def member_insert(origin_id):
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
-            for actor_id in ast.literal_eval(form.actor.data):
-                actor = EntityMapper.get_by_id(actor_id)
+            for actor in EntityMapper.get_by_ids(ast.literal_eval(form.actor.data)):
                 link_id = origin.link('P107', actor, form.description.data)
                 DateMapper.save_link_dates(link_id, form)
                 NodeMapper.save_link_nodes(link_id, form)

@@ -46,14 +46,12 @@ def involvement_insert(origin_id):
         g.cursor.execute('BEGIN')
         try:
             if view_name == 'event':
-                for actor_id in ast.literal_eval(form.actor.data):
-                    actor = EntityMapper.get_by_id(actor_id)
+                for actor in EntityMapper.get_by_ids(ast.literal_eval(form.actor.data)):
                     link_id = origin.link(form.activity.data, actor, form.description.data)
                     DateMapper.save_link_dates(link_id, form)
                     NodeMapper.save_link_nodes(link_id, form)
             else:
-                for event_id in ast.literal_eval(form.event.data):
-                    event = EntityMapper.get_by_id(event_id)
+                for event in EntityMapper.get_by_ids(ast.literal_eval(form.event.data)):
                     link_id = event.link(form.activity.data, origin, form.description.data)
                     DateMapper.save_link_dates(link_id, form)
                     NodeMapper.save_link_nodes(link_id, form)

@@ -43,8 +43,7 @@ def relation_insert(origin_id):
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
-            for actor_id in ast.literal_eval(form.actor.data):
-                actor = EntityMapper.get_by_id(actor_id)
+            for actor in EntityMapper.get_by_ids(ast.literal_eval(form.actor.data)):
                 if form.inverse.data:
                     link_id = actor.link('OA7', origin, form.description.data)
                 else:

@@ -1,7 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-import math
 import os
 
+import math
 from flask import flash, g, render_template, request, send_from_directory, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
@@ -84,8 +84,7 @@ def file_add(origin_id):
     if request.method == 'POST':
         g.cursor.execute('BEGIN')
         try:
-            for id_ in request.form.getlist('values'):
-                entity = EntityMapper.get_by_id(id_)
+            for entity in EntityMapper.get_by_ids(request.form.getlist('values')):
                 entity.link('P67', origin)
             g.cursor.execute('COMMIT')
         except Exception as e:  # pragma: no cover
@@ -103,8 +102,7 @@ def file_add2(id_, class_name):
     """ Link an entity to file coming from the file"""
     file = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
-        for entity_id in request.form.getlist('values'):
-            entity = EntityMapper.get_by_id(int(entity_id))
+        for entity in EntityMapper.get_by_ids(request.form.getlist('values')):
             file.link('P67', entity)
         return redirect(url_for('file_view', id_=file.id) + '#tab-' + class_name)
     form = build_table_form(class_name, file.get_linked_entities('P67'))

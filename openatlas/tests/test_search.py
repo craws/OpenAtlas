@@ -11,10 +11,10 @@ class SearchTest(TestBaseCase):
         self.login()
         with app.test_request_context():
             app.preprocess_request()
-            waldo = EntityMapper.insert('E21', 'Waldo')
-            waldo.link('P131', EntityMapper.insert('E82', 'Waldo alias'))
-            waldorf = EntityMapper.insert('E18', 'Waldorf')
-            waldorf.link('P1', EntityMapper.insert('E41', 'Waldorf alias'))
+            person = EntityMapper.insert('E21', 'Waldo')
+            person.link('P131', EntityMapper.insert('E82', 'Waldo alias'))
+            object_ = EntityMapper.insert('E18', 'Waldorf')
+            object_.link('P1', EntityMapper.insert('E41', 'Waldorf alias'))
         with app.app_context():
             rv = self.app.post(url_for('search_index'), data={'global-term': 'wal'})
             assert b'Waldo' in rv.data
