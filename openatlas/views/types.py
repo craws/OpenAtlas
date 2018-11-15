@@ -188,14 +188,17 @@ def tree_select(name):
                     "plugins" : ["core", "html_data", "search"],
                     "core":{{ "data":[{tree}] }}
                 }});
-                $("#{name}-tree-search").keyup(function() {{
-                    $("#{name}-tree").jstree("search", $(this).val());
-                }});
                 $("#{name}-tree").on("select_node.jstree", function (e, data) {{
                     document.location.href = data.node.original.href;
                 }});
+                $("#{name}-tree-search").keyup(function() {{
+                    if (this.value.length >= {min_chars}) {{
+                        $("#{name}-tree").jstree("search", $(this).val());
+                    }}
+                }});
             }});
-        </script>""".format(name=sanitize(name), tree=walk_tree(NodeMapper.get_nodes(name)))
+        </script>""".format(min_chars=app.config['MIN_CHARS_JSTREE_SEARCH'],
+                            name=sanitize(name), tree=walk_tree(NodeMapper.get_nodes(name)))
     return html
 
 
