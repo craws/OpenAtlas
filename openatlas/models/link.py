@@ -40,14 +40,11 @@ class LinkMapper:
     def insert(domain, property_code, range_, description=None):
         if not domain or not range_:  # pragma: no cover
             return
-        from openatlas.models.entity import EntityMapper
         # Domain can be an entity or entity id, range_ can also be a list of entities or entity ids
         property_ = g.properties[property_code]
-        domain = EntityMapper.get_by_id(domain) if isinstance(domain, int) else domain
         range_ = range_ if isinstance(range_, list) else [range_]
         result = None
         for range_ in range_:
-            range_ = EntityMapper.get_by_id(range_) if isinstance(range_, int) else range_
             domain_error = True
             range_error = True
             if property_.find_object('domain_class_code', g.classes[domain.class_.code].code):

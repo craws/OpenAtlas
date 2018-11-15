@@ -225,11 +225,12 @@ def save(form, node=None, root=None):
             node.name = node.name.replace('(', '').replace(')', '')
         node.description = form.description.data
         node.update()
+
         # Update super if changed and node is not a root node
         if super_ and (super_ == 'new' or super_.id != new_super_id):
             property_code = 'P127' if node.class_.code == 'E55' else 'P89'
             node.delete_links(property_code)
-            node.link(property_code, new_super.id)
+            node.link(property_code, new_super)
         g.cursor.execute('COMMIT')
         url = url_for('node_view', id_=node.id)
         if form.continue_.data == 'yes':

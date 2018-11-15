@@ -8,7 +8,7 @@ from werkzeug.exceptions import abort
 from openatlas import app, debug_model, logger
 from openatlas.models.date import DateMapper
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import get_view_name, uc_first, print_file_extension
+from openatlas.util.util import get_view_name, print_file_extension, uc_first
 
 
 class Entity:

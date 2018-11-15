@@ -44,10 +44,11 @@ def relation_insert(origin_id):
         g.cursor.execute('BEGIN')
         try:
             for actor_id in ast.literal_eval(form.actor.data):
+                actor = EntityMapper.get_by_id(actor_id)
                 if form.inverse.data:
-                    link_id = LinkMapper.insert(actor_id, 'OA7', origin.id, form.description.data)
+                    link_id = actor.link('OA7', origin, form.description.data)
                 else:
-                    link_id = origin.link('OA7', actor_id, form.description.data)
+                    link_id = origin.link('OA7', actor, form.description.data)
                 DateMapper.save_link_dates(link_id, form)
                 NodeMapper.save_link_nodes(link_id, form)
             g.cursor.execute('COMMIT')

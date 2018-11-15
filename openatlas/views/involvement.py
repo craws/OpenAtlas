@@ -13,7 +13,7 @@ from openatlas.models.date import DateMapper
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.models.node import NodeMapper
-from openatlas.util.util import required_group, get_view_name
+from openatlas.util.util import get_view_name, required_group
 
 
 class ActorForm(DateForm):
@@ -47,13 +47,14 @@ def involvement_insert(origin_id):
         try:
             if view_name == 'event':
                 for actor_id in ast.literal_eval(form.actor.data):
-                    link_id = origin.link(form.activity.data, actor_id, form.description.data)
+                    actor = EntityMapper.get_by_id(actor_id)
+                    link_id = origin.link(form.activity.data, actor, form.description.data)
                     DateMapper.save_link_dates(link_id, form)
                     NodeMapper.save_link_nodes(link_id, form)
             else:
                 for event_id in ast.literal_eval(form.event.data):
-                    link_id = LinkMapper.insert(
-                        event_id, form.activity.data, origin.id, form.description.data)
+                    event = EntityMapper.get_by_id(event_id)
+                    link_id = event.link(form.activity.data, origin, form.description.data)
                     DateMapper.save_link_dates(link_id, form)
                     NodeMapper.save_link_nodes(link_id, form)
             g.cursor.execute('COMMIT')

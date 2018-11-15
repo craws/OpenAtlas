@@ -54,15 +54,14 @@ class EventTest(TestBaseCase):
             assert b'Test event' in rv.data
             # Add another event and test if events are seen at place
             self.app.post(url_for('event_insert', code='E8'),
-                               data={'name': 'Dusk', 'given_place': '[' + str(residence_id) + ']'})
+                          data={'name': 'Dusk', 'given_place': '[' + str(residence_id) + ']'})
             rv = self.app.get(url_for('place_view', id_=residence_id))
             assert b'Test event' in rv.data
             rv = self.app.get(url_for('actor_view', id_=actor_id))
             assert b'Game master' in rv.data
             rv = self.app.post(
-                url_for('event_insert', code='E8'),
-                data={'name': 'Test event', 'continue_': 'yes'},
-                follow_redirects=True)
+                url_for('event_insert', code='E8'), follow_redirects=True,
+                data={'name': 'Test event', 'continue_': 'yes'})
             assert b'An entry has been created' in rv.data
             rv = self.app.get(url_for('event_index'))
             assert b'Test event' in rv.data
