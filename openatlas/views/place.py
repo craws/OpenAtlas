@@ -176,8 +176,6 @@ def place_delete(id_):
     if entity.get_linked_entities('P46'):
         flash(_('Deletion not possible if subunits exists'), 'error')
         return redirect(url_for('place_view', id_=id_))
-    system_type = entity.system_type
-    parent = None if system_type == 'place' else LinkMapper.get_linked_entity(id_, 'P46', True)
     g.cursor.execute('BEGIN')
     try:
         EntityMapper.delete(id_)
@@ -189,8 +187,9 @@ def place_delete(id_):
         flash(_('error transaction'), 'error')
     flash(_('entity deleted'), 'info')
     url = url_for('place_index')
-    if parent:
-        url = url_for('place_view', id_=parent.id) + '#tab-' + system_type
+    if entity.system_type != 'place':
+        parent = LinkMapper.get_linked_entity(id_, 'P46', True)
+        url = url_for('place_view', id_=parent.id) + '#tab-' + entity.system_type
     return redirect(url)
 
 
