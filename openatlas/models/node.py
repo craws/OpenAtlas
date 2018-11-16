@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 from flask import g
 
-from openatlas import app
+from openatlas import app, debug_model
 from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.linkProperty import LinkPropertyMapper
 
@@ -44,8 +44,10 @@ class NodeMapper(EntityMapper):
             GROUP BY e.id, es.id                        
             ORDER BY e.name;"""
         g.cursor.execute(sql, {'class_code': 'E55', 'property_code': 'P127'})
+        debug_model['div sql'] += 1
         types = g.cursor.fetchall()
         g.cursor.execute(sql, {'class_code': 'E53', 'property_code': 'P89'})
+        debug_model['div sql'] += 1
         places = g.cursor.fetchall()
         nodes = OrderedDict()
         for row in types + places:
@@ -62,6 +64,7 @@ class NodeMapper(EntityMapper):
     def populate_subs(nodes):
         forms = {}
         g.cursor.execute("SELECT id, name, extendable FROM web.form ORDER BY name ASC;")
+        debug_model['div sql'] += 1
         for row in g.cursor.fetchall():
             forms[row.id] = {'id': row.id, 'name': row.name, 'extendable': row.extendable}
         sql = """
@@ -71,6 +74,7 @@ class NodeMapper(EntityMapper):
                     AND hf.hierarchy_id = h.id)) AS form_ids
             FROM web.hierarchy h;"""
         g.cursor.execute(sql)
+        debug_model['div sql'] += 1
         hierarchies = {}
         for row in g.cursor.fetchall():
             hierarchies[row.id] = row
@@ -139,6 +143,7 @@ class NodeMapper(EntityMapper):
             JOIN web.form f ON hf.form_id = f.id AND f.name = %(form_name)s
             ORDER BY h.name;"""
         g.cursor.execute(sql, {'form_name': form_id})
+        debug_model['div sql'] += 1
         nodes = OrderedDict()
         for row in g.cursor.fetchall():
             nodes[row.id] = g.nodes[row.id]
@@ -148,6 +153,7 @@ class NodeMapper(EntityMapper):
     def get_form_choices():
         sql = "SELECT f.id, f.name FROM web.form f WHERE f.extendable = True ORDER BY name ASC;"
         g.cursor.execute(sql)
+        debug_model['div sql'] += 1
         return [(row.id, row.name) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -192,6 +198,7 @@ class NodeMapper(EntityMapper):
             'multiple': multiple,
             'value_type': value_type})
         NodeMapper.add_forms_to_hierarchy(node, form)
+        debug_model['div sql'] += 1
 
     @staticmethod
     def update_hierarchy(node, form):
@@ -200,6 +207,7 @@ class NodeMapper(EntityMapper):
         if node.multiple or (hasattr(form, 'multiple') and form.multiple and form.multiple.data):
             multiple = True
         g.cursor.execute(sql, {'id': node.id, 'name': form.name.data, 'multiple': multiple})
+        debug_model['div sql'] += 1
         NodeMapper.add_forms_to_hierarchy(node, form)
 
     @staticmethod
@@ -209,6 +217,7 @@ class NodeMapper(EntityMapper):
                 INSERT INTO web.hierarchy_form (hierarchy_id, form_id)
                 VALUES (%(node_id)s, %(form_id)s);"""
             g.cursor.execute(sql, {'node_id': node.id, 'form_id': form_id})
+            debug_model['div sql'] += 1
 
     @staticmethod
     def get_orphans():
@@ -241,6 +250,7 @@ class NodeMapper(EntityMapper):
                     'new_type_id': new_type_id,
                     'entity_ids': tuple(entity_ids)}
                 g.cursor.execute(sql, params)
+                debug_model['div sql'] += 1
         else:
             delete_ids = entity_ids  # No new type was selected so delete all links
 
@@ -250,3 +260,4 @@ class NodeMapper(EntityMapper):
                 WHERE range_id = %(old_type_id)s AND domain_id IN %(delete_ids)s;""".format(
                 table='link_property' if root.name in app.config['PROPERTY_TYPES'] else 'link')
             g.cursor.execute(sql, {'old_type_id': old_node.id, 'delete_ids': tuple(delete_ids)})
+            debug_model['div sql'] += 1

@@ -130,6 +130,7 @@ class LinkMapper:
         codes = codes if isinstance(codes, list) else [codes]
         sql = "DELETE FROM model.link WHERE domain_id = %(id)s AND property_code IN %(codes)s;"
         g.cursor.execute(sql, {'id': entity.id, 'codes': tuple(codes)})
+        debug_model['div sql'] += 1
 
     @staticmethod
     def get_by_id(id_):
@@ -159,6 +160,7 @@ class LinkMapper:
         if not is_authorized('editor'):  # pragma: no cover
             abort(403)
         g.cursor.execute("DELETE FROM model.link WHERE id = %(id)s;", {'id': id_})
+        debug_model['div sql'] += 1
 
     @staticmethod
     def update(link):
@@ -184,6 +186,7 @@ class LinkMapper:
             JOIN model.entity d ON l.domain_id = d.id
             JOIN model.entity r ON l.range_id = r.id;"""
         g.cursor.execute(sql)
+        debug_model['div sql'] += 1
         invalid_links = []
         for row in g.cursor.fetchall():
             property_ = g.properties[row.property]
@@ -210,6 +213,7 @@ class LinkMapper:
                     'property': item['property'],
                     'domain': item['domain'],
                     'range': item['range']})
+                debug_model['div sql'] += 1
                 for row2 in g.cursor.fetchall():
                     domain = EntityMapper.get_by_id(row2.domain_id)
                     range_ = EntityMapper.get_by_id(row2.range_id)

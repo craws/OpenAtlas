@@ -2,7 +2,7 @@
 from flask import g, session
 
 import openatlas
-from openatlas import app
+from openatlas import app, debug_model
 
 
 class Property:
@@ -64,9 +64,11 @@ class PropertyMapper:
             SELECT id, code, domain_class_code, range_class_code, name, name_inverse
             FROM model.property;"""
         g.cursor.execute(sql)
+        debug_model['div sql'] += 1
         for row in g.cursor.fetchall():
             properties[row.code] = Property(row)
         g.cursor.execute('SELECT super_code, sub_code FROM model.property_inheritance;')
+        debug_model['div sql'] += 1
         for row in g.cursor.fetchall():
             properties[row.super_code].sub.append(row.sub_code)
             properties[row.sub_code].super.append(row.super_code)
@@ -74,6 +76,7 @@ class PropertyMapper:
             SELECT property_code, language_code, attribute, text FROM model.property_i18n
             WHERE language_code IN %(language_codes)s;"""
         g.cursor.execute(sql, {'language_codes': tuple(app.config['LANGUAGES'].keys())})
+        debug_model['div sql'] += 1
         for row in g.cursor.fetchall():
             property_ = properties[row.property_code]
             if row.language_code not in property_.i18n:

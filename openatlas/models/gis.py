@@ -3,6 +3,7 @@ import ast
 
 from flask import g, json
 
+from openatlas import debug_model
 from openatlas.models.node import NodeMapper
 from openatlas.util.util import uc_first
 
@@ -50,6 +51,7 @@ class GisMapper:
                         subunit_selected_id=subunit_selected_id,
                         polygon_point_sql=polygon_point_sql if shape == 'polygon' else '')
             g.cursor.execute(sql)
+            debug_model['div sql'] += 1
             place_type_root_id = NodeMapper.get_hierarchy_by_name('Place').id
             for row in g.cursor.fetchall():
                 description = row.description.replace('"', '\"') if row.description else ''
@@ -117,10 +119,13 @@ class GisMapper:
                     'description': item['properties']['description'],
                     'type': item['properties']['shapeType'],
                     'geojson': json.dumps(item['geometry'])})
+                debug_model['div sql'] += 1
 
     @staticmethod
     def delete_by_entity(entity):
         sql = 'DELETE FROM gis.point WHERE entity_id = %(entity_id)s;'
         g.cursor.execute(sql, {'entity_id': entity.id})
+        debug_model['div sql'] += 1
         sql = 'DELETE FROM gis.polygon WHERE entity_id = %(entity_id)s;'
         g.cursor.execute(sql, {'entity_id': entity.id})
+        debug_model['div sql'] += 1
