@@ -13,7 +13,7 @@ from openatlas import app, logger
 from openatlas.forms.forms import build_move_form, build_node_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.node import NodeMapper
-from openatlas.util.util import link, required_group, sanitize, truncate_string
+from openatlas.util.util import get_entity_data, link, required_group, sanitize, truncate_string
 
 
 class NodeForm(Form):
@@ -84,10 +84,13 @@ def node_view(id_):
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]] if node.root else None
     super_ = g.nodes[node.root[0]] if node.root else None
+
     header = [_('name'), _('class'), _('info')]
     if root and root.value_type:  # pragma: no cover
         header = [_('name'), _('value'), _('class'), _('info')]
-    tables = {'entities': {'id': 'entities', 'header': header, 'data': []}}
+    tables = {'entities': {'id': 'entities', 'header': header, 'data': []},
+              'info': get_entity_data(node)}
+
     for entity in node.get_linked_entities(['P2', 'P89'], True):
         # If it is a place location get the corresponding object
         entity = entity if node.class_.code == 'E55' else entity.get_linked_entity('P53', True)

@@ -2,7 +2,7 @@
 import collections
 import pandas as pd
 from flask import flash, g, render_template, request, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect, secure_filename
 from wtforms import BooleanField, FileField, StringField, SubmitField, TextAreaField
@@ -36,7 +36,7 @@ def import_index():
     for project in ImportMapper.get_all_projects():
         table['data'].append([
             link(project),
-            project.count,
+            format_number(project.count),
             truncate_string(project.description)])
     return render_template('import/index.html', table=table)
 
