@@ -6,7 +6,7 @@ Installation code examples are based on a Debian 9 (Stretch) system.
 
 ## Requirements
 
-### Python 3 and Flask
+### Python 3.5 and Flask 0.12
 
     # apt-get install python3 python3-bcrypt python3-dateutil python3-jinja2 python3-psycopg2
     # apt-get install python3-flask python3-flask-babel python3-flask-login python3-flaskext.wtf
@@ -16,7 +16,7 @@ Installation code examples are based on a Debian 9 (Stretch) system.
 
     # apt-get install apache2 libapache2-mod-wsgi-py3
 
-### PostgreSQL 9.6
+### PostgreSQL 9.6 and PostGIS 2.3
 
     # apt-get install postgresql postgresql-9.6-postgis-2.3 postgresql-9.6-postgis-2.3-scripts
 
