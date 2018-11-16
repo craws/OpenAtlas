@@ -41,6 +41,7 @@ class Property:
         return getattr(self, '_' + attribute)
 
     def find_object(self, attr, class_id):
+        # Used to check if links are CIDOC CRM valid
         valid_domain_id = getattr(self, attr)
         if valid_domain_id == class_id:
             return True

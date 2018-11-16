@@ -2,7 +2,6 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
-from openatlas.models.link import LinkMapper
 from openatlas.test_base import TestBaseCase
 
 
@@ -32,10 +31,9 @@ class ModelTests(TestBaseCase):
                 actor = EntityMapper.insert('E21', 'King Arthur')
                 event = EntityMapper.insert('E7', 'Battle of Camlann')
                 source = EntityMapper.insert('E33', 'Tha source')
-                prop_object = EntityMapper.insert('E89', 'Propositional Object')
-                LinkMapper.insert(actor, 'P11', event)
-                LinkMapper.insert(source, 'P67', event)
-                LinkMapper.insert(actor, 'P67', prop_object)
+                actor.link('P11', event)
+                actor.link('P67', EntityMapper.insert('E89', 'Propositional Object'))
+                source.link('P67', event)
             rv = self.app.get(url_for('model_network'))
             assert b'orphans' in rv.data
             data = {'orphans': True, 'width': 100, 'height': 40, 'distance': -666, 'charge': 500}

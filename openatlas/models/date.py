@@ -1,6 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-import numpy
 from datetime import datetime
+
+import numpy
 from flask import g
 
 import openatlas
@@ -133,8 +134,8 @@ class DateMapper:
                 code_begin = 'OA3'
             if form.date_death.data:
                 code_end = 'OA4'
-        DateMapper.save_date(entity.id, form, 'begin', code_begin, LinkMapper)
-        DateMapper.save_date(entity.id, form, 'end', code_end, LinkMapper)
+        DateMapper.save_date(entity, form, 'begin', code_begin, LinkMapper)
+        DateMapper.save_date(entity, form, 'end', code_end, LinkMapper)
 
     @staticmethod
     def save_link_dates(link_id, form):

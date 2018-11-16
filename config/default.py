@@ -30,6 +30,11 @@ DEFAULT_TABLE_ROWS[20] = '20'
 DEFAULT_TABLE_ROWS[50] = '50'
 DEFAULT_TABLE_ROWS[100] = '100'
 
+# Minimum characters to trigger search for jsTree and tablesorter
+# Raise it (e.g. to 3) for huge data sets to prevent the website from getting unresponsive
+MIN_CHARS_TABLESORTER_SEARCH = 1
+MIN_CHARS_JSTREE_SEARCH = 1
+
 LOG_LEVELS = OrderedDict()
 LOG_LEVELS[0] = 'emergency'
 LOG_LEVELS[1] = 'alert'

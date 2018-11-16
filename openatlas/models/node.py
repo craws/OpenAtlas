@@ -158,18 +158,18 @@ class NodeMapper(EntityMapper):
         for field in form:
             if isinstance(field, ValueFloatField) and entity.class_.code != 'E53':
                 if field.data is not None:  # Allow to save 0 but not empty
-                    entity.link('P2', int(field.name), field.data)
+                    entity.link('P2', g.nodes[int(field.name)], field.data)
             elif isinstance(field, (TreeField, TreeMultiField)) and field.data:
                 root = g.nodes[int(field.id)]
                 try:
-                    range_param = [int(field.data)]
-                except ValueError:  # Form value was a string e.g. '[97,2798]'
-                    range_param = ast.literal_eval(field.data)
+                    range_ = [g.nodes[int(field.data)]]
+                except ValueError:  # Form value was a list string e.g. '[97,2798]'
+                    range_ = [g.nodes[int(range_id)] for range_id in ast.literal_eval(field.data)]
                 if root.name in ['Administrative Unit', 'Historical Place']:
                     if entity.class_.code == 'E53':
-                        entity.link('P89', range_param)
+                        entity.link('P89', range_)
                 elif entity.class_.code != 'E53':
-                    entity.link('P2', range_param)
+                    entity.link('P2', range_)
 
     @staticmethod
     def save_link_nodes(link_id, form):

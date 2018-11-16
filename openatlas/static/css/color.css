@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-/* font color */
+/* Font color */
 
 body,
 tabs-container .ui-state-active a,
@@ -64,7 +64,7 @@ table a:hover {
     color: #e60005;
 }
 
-/* background color */
+/* Background color */
 
 body, .ui-widget-content, .ui-dialog .ui-dialog-content {
     background-color: #efefef;
@@ -125,7 +125,7 @@ span.button:hover {
     background-color: #46779f;
 }
 
-/* border color */
+/* Border color */
 
 .text-preview {
     border-color: #000000;

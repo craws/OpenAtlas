@@ -23,9 +23,8 @@ class GisMapper:
         else:
             objects = []
         object_ids = [x.id for x in objects]
-        polygon_point_sql = """
-            (SELECT public.ST_AsGeoJSON(public.ST_PointOnSurface(p.geom))
-            FROM gis.polygon p WHERE id = polygon.id) AS polygon_point, """
+        polygon_point_sql = \
+            'public.ST_AsGeoJSON(public.ST_PointOnSurface(polygon.geom)) AS polygon_point, '
         for shape in ['point', 'polygon']:
             sql = """
                 SELECT
@@ -37,11 +36,7 @@ class GisMapper:
                     public.ST_AsGeoJSON({shape}.geom) AS geojson, {polygon_point_sql}
                     object.name AS object_name,
                     object.description AS object_desc,
-                    string_agg(CAST(t.range_id AS text), ',') AS types,
-                    (SELECT COUNT(*) FROM gis.point point2
-                        WHERE {shape}.entity_id = point2.entity_id) AS point_count,
-                    (SELECT COUNT(*) FROM gis.polygon polygon2
-                        WHERE {shape}.entity_id = polygon2.entity_id) AS polygon_count
+                    string_agg(CAST(t.range_id AS text), ',') AS types
                 FROM model.entity place
                 JOIN model.link l ON place.id = l.range_id
                 JOIN model.entity object ON l.domain_id = object.id
@@ -70,8 +65,7 @@ class GisMapper:
                         'name': row.name.replace('"', '\"'),
                         'description': description,
                         'siteType': '',
-                        'shapeType': uc_first(row.type),
-                        'count': row.point_count + row.polygon_count}}
+                        'shapeType': uc_first(row.type)}}
                 if hasattr(row, 'types') and row.types:
                     nodes_list = ast.literal_eval('[' + row.types + ']')
                     for node_id in list(set(nodes_list)):
