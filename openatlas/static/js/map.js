@@ -119,12 +119,18 @@ function setSitesInfo(e) { // set Popup Information of existing sites
 }
 
 L.mapbox.accessToken = 'pk.eyJ1Ijoib3BlbmF0bGFzbWFwYm94IiwiYSI6ImNpbHRlYzc3ZDAwMmR3MW02Z3FsYWxwNXcifQ.rwXGRavf1bh9ZW6zQn9cMg';
-var map = L.map('map', {fullscreenControl: true}, null).setView([48.61, 16.93], 2);
+var map = L.map('map', {maxZoom: 20, fullscreenControl: true}, null).setView([48.61, 16.93], 2);
 var baseMaps = {
     Landscape: L.tileLayer('https://{s}.tile.thunderforest.com/landscape/{z}/{x}/{y}.png?apikey=7878b4fb224f4902ab42fc846e92b96a', {attribution: '&copy; <a href="http://www.thunderforest.com">Thunderforest Landscape '}),
     Openstreetmap: L.tileLayer('http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap </a> '}),
     GoogleSatellite: L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google Maps '}),
 };
+
+var cluster = L.markerClusterGroup({
+    showCoverageOnHover: false,
+    maxClusterRadius: 50,
+    disableClusteringAtZoom: 12
+});
 
 var marker; // temporary marker for coordinate capture
 var capture = false; // var to store whether control is active or not
@@ -148,7 +154,8 @@ if (gisPointAll != "") {
         marker.setIcon(L.icon({iconUrl: "/static/vendor/leaflet/images/marker-icon_all.png", iconAnchor: [12, 41], popupAnchor: [0, -34]}));
     });
     sitesmarkers.setGeoJSON(gisPointAll); //set layer content to geojson
-    map.addLayer(sitesmarkers);
+    cluster.addLayer(sitesmarkers)
+    map.addLayer(cluster);
 }
 
 if (gisPolygonAll != "") {
