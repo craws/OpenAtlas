@@ -2,7 +2,7 @@
 
 Some knowledge about package installation, web server and database configuration will be needed.
 
-This software was developed and tested on Linux/Debian 9 and easiest would be to install on Debian 9 following these instructions.
+This software was developed and tested on Linux/Debian 9 and the easiest way to install would be on Debian 9 following these instructions.
 
 It may work on other Linux distributions or even non Linux systems but would need substantially more
 knowledge about server administration.
@@ -96,8 +96,6 @@ As postgres
     $ psql openatlas_test -c "CREATE EXTENSION postgis;"
     $ cd install
     $ cat structure.sql data_web.sql data_model.sql | psql -d openatlas_test -f -
-
-Comment "CREATE EXTENSION postgis;" again before running tests.
 
 Copy instance/example_testing.py to instance/testing.py
 
