@@ -46,7 +46,7 @@ class DBHandler:
     @staticmethod
     def delete_all_system_logs():
         g.cursor.execute('TRUNCATE TABLE web.system_log RESTART IDENTITY;')
-        debug_model['div sql'] += 1
+        openatlas.debug_model['div sql'] += 1
 
     @staticmethod
     def log_user(entity_id, action):
