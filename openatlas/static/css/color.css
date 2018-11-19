@@ -112,6 +112,7 @@ span.button,
 .button-bar a,
 .ui-state-default,
 .changelog-version,
+.marker-cluster-large div,
 #disk_size .ui-widget-header {
     background-color: #4088c3;
 }
@@ -123,6 +124,10 @@ button:hover,
 .button-bar a:hover,
 span.button:hover {
     background-color: #46779f;
+}
+
+.marker-cluster-large {
+    background-color: #729FCF
 }
 
 /* Border color */
