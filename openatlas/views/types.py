@@ -13,7 +13,7 @@ from openatlas import app, logger
 from openatlas.forms.forms import build_move_form, build_node_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.node import NodeMapper
-from openatlas.util.util import link, required_group, sanitize, truncate_string
+from openatlas.util.util import get_entity_data, link, required_group, sanitize, truncate_string
 
 
 class NodeForm(Form):
@@ -84,10 +84,13 @@ def node_view(id_):
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]] if node.root else None
     super_ = g.nodes[node.root[0]] if node.root else None
+
     header = [_('name'), _('class'), _('info')]
     if root and root.value_type:  # pragma: no cover
         header = [_('name'), _('value'), _('class'), _('info')]
-    tables = {'entities': {'id': 'entities', 'header': header, 'data': []}}
+    tables = {'entities': {'id': 'entities', 'header': header, 'data': []},
+              'info': get_entity_data(node)}
+
     for entity in node.get_linked_entities(['P2', 'P89'], True):
         # If it is a place location get the corresponding object
         entity = entity if node.class_.code == 'E55' else entity.get_linked_entity('P53', True)
@@ -188,14 +191,17 @@ def tree_select(name):
                     "plugins" : ["core", "html_data", "search"],
                     "core":{{ "data":[{tree}] }}
                 }});
-                $("#{name}-tree-search").keyup(function() {{
-                    $("#{name}-tree").jstree("search", $(this).val());
-                }});
                 $("#{name}-tree").on("select_node.jstree", function (e, data) {{
                     document.location.href = data.node.original.href;
                 }});
+                $("#{name}-tree-search").keyup(function() {{
+                    if (this.value.length >= {min_chars}) {{
+                        $("#{name}-tree").jstree("search", $(this).val());
+                    }}
+                }});
             }});
-        </script>""".format(name=sanitize(name), tree=walk_tree(NodeMapper.get_nodes(name)))
+        </script>""".format(min_chars=app.config['MIN_CHARS_JSTREE_SEARCH'],
+                            name=sanitize(name), tree=walk_tree(NodeMapper.get_nodes(name)))
     return html
 
 
@@ -225,11 +231,12 @@ def save(form, node=None, root=None):
             node.name = node.name.replace('(', '').replace(')', '')
         node.description = form.description.data
         node.update()
+
         # Update super if changed and node is not a root node
         if super_ and (super_ == 'new' or super_.id != new_super_id):
             property_code = 'P127' if node.class_.code == 'E55' else 'P89'
             node.delete_links(property_code)
-            node.link(property_code, new_super.id)
+            node.link(property_code, new_super)
         g.cursor.execute('COMMIT')
         url = url_for('node_view', id_=node.id)
         if form.continue_.data == 'yes':

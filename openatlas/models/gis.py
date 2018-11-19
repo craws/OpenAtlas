@@ -3,6 +3,7 @@ import ast
 
 from flask import g, json
 
+from openatlas import debug_model
 from openatlas.models.node import NodeMapper
 from openatlas.util.util import uc_first
 
@@ -23,9 +24,8 @@ class GisMapper:
         else:
             objects = []
         object_ids = [x.id for x in objects]
-        polygon_point_sql = """
-            (SELECT public.ST_AsGeoJSON(public.ST_PointOnSurface(p.geom))
-            FROM gis.polygon p WHERE id = polygon.id) AS polygon_point, """
+        polygon_point_sql = \
+            'public.ST_AsGeoJSON(public.ST_PointOnSurface(polygon.geom)) AS polygon_point, '
         for shape in ['point', 'polygon']:
             sql = """
                 SELECT
@@ -37,11 +37,7 @@ class GisMapper:
                     public.ST_AsGeoJSON({shape}.geom) AS geojson, {polygon_point_sql}
                     object.name AS object_name,
                     object.description AS object_desc,
-                    string_agg(CAST(t.range_id AS text), ',') AS types,
-                    (SELECT COUNT(*) FROM gis.point point2
-                        WHERE {shape}.entity_id = point2.entity_id) AS point_count,
-                    (SELECT COUNT(*) FROM gis.polygon polygon2
-                        WHERE {shape}.entity_id = polygon2.entity_id) AS polygon_count
+                    string_agg(CAST(t.range_id AS text), ',') AS types
                 FROM model.entity place
                 JOIN model.link l ON place.id = l.range_id
                 JOIN model.entity object ON l.domain_id = object.id
@@ -55,6 +51,7 @@ class GisMapper:
                         subunit_selected_id=subunit_selected_id,
                         polygon_point_sql=polygon_point_sql if shape == 'polygon' else '')
             g.cursor.execute(sql)
+            debug_model['div sql'] += 1
             place_type_root_id = NodeMapper.get_hierarchy_by_name('Place').id
             for row in g.cursor.fetchall():
                 description = row.description.replace('"', '\"') if row.description else ''
@@ -63,15 +60,14 @@ class GisMapper:
                     'type': 'Feature',
                     'geometry': json.loads(row.geojson),
                     'properties': {
-                        'geometryId': row.id,
-                        'geometryType': row.type,
-                        'geometryName': row.name.replace('"', '\"'),
-                        'geometryDescription': description,
+                        'title': row.object_name.replace('"', '\"'),
                         'objectId': row.object_id,
-                        'objectName': row.object_name.replace('"', '\"'),
                         'objectDescription': object_desc,
+                        'id': row.id,
+                        'name': row.name.replace('"', '\"'),
+                        'description': description,
                         'siteType': '',
-                        'count': row.point_count + row.polygon_count}}
+                        'shapeType': uc_first(row.type)}}
                 if hasattr(row, 'types') and row.types:
                     nodes_list = ast.literal_eval('[' + row.types + ']')
                     for node_id in list(set(nodes_list)):
@@ -105,7 +101,6 @@ class GisMapper:
             if not data:
                 continue
             for item in json.loads(data):
-                print(item)
                 # Don't save geom if coordinates are empty
                 if not item['geometry']['coordinates'] or item['geometry']['coordinates'] == [[]]:
                     continue  # pragma: no cover
@@ -120,14 +115,17 @@ class GisMapper:
                     """.format(shape=shape)
                 g.cursor.execute(sql, {
                     'entity_id': entity.id,
-                    'name': item['properties']['geometryName'],
-                    'description': item['properties']['geometryDescription'],
-                    'type': item['properties']['geometryType'],
+                    'name': item['properties']['name'],
+                    'description': item['properties']['description'],
+                    'type': item['properties']['shapeType'],
                     'geojson': json.dumps(item['geometry'])})
+                debug_model['div sql'] += 1
 
     @staticmethod
     def delete_by_entity(entity):
         sql = 'DELETE FROM gis.point WHERE entity_id = %(entity_id)s;'
         g.cursor.execute(sql, {'entity_id': entity.id})
+        debug_model['div sql'] += 1
         sql = 'DELETE FROM gis.polygon WHERE entity_id = %(entity_id)s;'
         g.cursor.execute(sql, {'entity_id': entity.id})
+        debug_model['div sql'] += 1

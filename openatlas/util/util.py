@@ -512,33 +512,42 @@ def pager(table):
                 {headers}
                 {sort}
                 dateFormat: "ddmmyyyy",
-                widgets: [\'zebra\', \'filter\'],
+                widgets: ["filter", "zebra"],
                 widgetOptions: {{
-                    filter_external: \'#{id}-search\',
+                    filter_liveSearch: {filter_liveSearch},
+                    filter_external: "#{id}-search",
                     filter_columnFilters: false
                 }}}})
-            .tablesorterPager({{positionFixed: false, container: $("#{id}-pager"), size:{size}}});
+            .tablesorterPager({{
+                delayInit: true,
+                removeRows: true,
+                positionFixed: false,
+                container: $("#{id}-pager"),
+                size:{size}}});
         """.format(
             id=table['id'],
             sort=sort,
             size=table_rows,
+            filter_liveSearch=app.config['MIN_CHARS_TABLESORTER_SEARCH'],
             headers=(table['headers'] + ',') if 'headers' in table else '')
     else:
         html += """
             $("#{id}-table").tablesorter({{
                 {sort}
-                widgets: [\'zebra\', \'filter\'],
+                widgets: ["filter", "zebra"],
                 widgetOptions: {{
-                    filter_external: \'#{id}-search\',
+                    filter_liveSearch: {filter_liveSearch},
+                    filter_external: "#{id}-search",
                     filter_columnFilters: false
                 }}}});
-        """.format(id=table['id'], sort=sort, )
+        """.format(
+            id=table['id'], sort=sort, filter_liveSearch=app.config['MIN_CHARS_JSTREE_SEARCH'])
     html += '</script>'
     return html
 
 
 def get_base_table_data(entity):
-    """Returns standard table data for an entity"""
+    """ Returns standard table data for an entity"""
     data = []
     view_name = get_view_name(entity)
     data.append(link(entity))

@@ -8,7 +8,7 @@ from werkzeug.exceptions import abort
 from openatlas import app, debug_model, logger
 from openatlas.models.date import DateMapper
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import get_view_name, uc_first, print_file_extension
+from openatlas.util.util import get_view_name, print_file_extension, uc_first
 
 
 class Entity:
@@ -134,18 +134,21 @@ class EntityMapper:
             'id': entity.id,
             'name': entity.name,
             'description': sanitize(entity.description, 'description')})
+        debug_model['div sql'] += 1
 
     @staticmethod
     def get_by_system_type(system_type):
         sql = EntityMapper.sql
         sql += ' WHERE e.system_type = %(system_type)s GROUP BY e.id ORDER BY e.name;'
         g.cursor.execute(sql, {'system_type': system_type})
+        debug_model['div sql'] += 1
         return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_display_files():
         sql = EntityMapper.sql + " WHERE e.system_type = 'file' GROUP BY e.id ORDER BY e.name;"
         g.cursor.execute(sql)
+        debug_model['div sql'] += 1
         entities = []
         for row in g.cursor.fetchall():
             if print_file_extension(row.id)[1:] in app.config['DISPLAY_FILE_EXTENSIONS']:
@@ -168,6 +171,7 @@ class EntityMapper:
             'description': description.strip() if description else None,
             'value_timestamp':  DateMapper.datetime64_to_timestamp(date) if date else None}
         g.cursor.execute(sql, params)
+        debug_model['div sql'] += 1
         return EntityMapper.get_by_id(g.cursor.fetchone()[0])
 
     @staticmethod
@@ -231,6 +235,7 @@ class EntityMapper:
         """ Triggers function model.delete_entity_related() for deleting related entities"""
         id_ = entity if isinstance(entity, int) else entity.id
         g.cursor.execute('DELETE FROM model.entity WHERE id = %(id_)s;', {'id_': id_})
+        debug_model['by id'] += 1
 
     @staticmethod
     def get_overview_counts():
@@ -246,6 +251,7 @@ class EntityMapper:
             SUM(CASE WHEN class_code = 'E31' AND system_type = 'file' THEN 1 END) AS file
             FROM model.entity;"""
         g.cursor.execute(sql)
+        debug_model['div sql'] += 1
         row = g.cursor.fetchone()
         counts = OrderedDict()
         for idx, col in enumerate(g.cursor.description):
@@ -291,6 +297,7 @@ class EntityMapper:
             return 0
         sql = "DELETE FROM model.entity WHERE id IN (" + sql_where + ");"
         g.cursor.execute(sql, {'class_codes': class_codes})
+        debug_model['div sql'] += 1
         return g.cursor.rowcount
 
     @staticmethod

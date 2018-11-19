@@ -1,6 +1,8 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import g
 
+from openatlas import debug_model
+
 
 class SettingsMapper:
 
@@ -30,6 +32,7 @@ class SettingsMapper:
     def get_settings():
         settings = {}
         g.cursor.execute("SELECT name, value FROM web.settings;")
+        debug_model['div sql'] += 1
         for row in g.cursor.fetchall():
             settings[row.name] = row.value
             if row.name in [
@@ -55,6 +58,7 @@ class SettingsMapper:
                 if field in ['debug_mode', 'mail']:
                     value = 'True' if getattr(form, field).data else ''
                 g.cursor.execute(sql, {'name': field, 'value': value})
+                debug_model['div sql'] += 1
 
     @staticmethod
     def update_file_settings(form):
@@ -64,8 +68,10 @@ class SettingsMapper:
                 continue
             value = getattr(form, field).data
             g.cursor.execute(sql, {'name': field, 'value': value})
+            debug_model['div sql'] += 1
 
     @staticmethod
     def set_logo(file_id):
         sql = "UPDATE web.settings SET value = %(file_id)s WHERE name = 'logo_file_id';"
         g.cursor.execute(sql, {'file_id': file_id})
+        debug_model['div sql'] += 1

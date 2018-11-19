@@ -31,8 +31,9 @@
         {% endif %}
         <h1>{{ node.name }}</h1>
         {% if super_ %}
-            {{_('super')|uc_first}}: {{ super_|link|safe }}
+            <p>{{_('super')|uc_first}}: {{ super_|link|safe }}</p>
         {% endif %}
+        {{ tables['info']|data_table|safe }}
         {{ node|description|safe }}
     </div>
     {% if tables['subs'].data %}

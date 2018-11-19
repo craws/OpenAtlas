@@ -276,8 +276,8 @@ def save(form, actor=None, code=None, origin=None):
                 url = url_for('relation_update', id_=link_id, origin_id=origin.id)
         if form.continue_.data == 'yes' and code:
             url = url_for('actor_insert', code=code)
-        g.cursor.execute('COMMIT')
         logger.log_user(actor.id, log_action)
+        g.cursor.execute('COMMIT')
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')

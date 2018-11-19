@@ -100,8 +100,8 @@ def source_add(origin_id):
     if request.method == 'POST':
         g.cursor.execute('BEGIN')
         try:
-            for value in request.form.getlist('values'):
-                LinkMapper.insert(int(value), 'P67', origin.id)
+            for entity in EntityMapper.get_by_ids(request.form.getlist('values')):
+                entity.link('P67', origin)
             g.cursor.execute('COMMIT')
         except Exception as e:  # pragma: no cover
             g.cursor.execute('ROLLBACK')
@@ -118,8 +118,8 @@ def source_add2(id_, class_name):
     """ Link an entity to source coming from the source"""
     source = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
-        for value in request.form.getlist('values'):
-            source.link('P67', int(value))
+        for entity in EntityMapper.get_by_ids(request.form.getlist('values')):
+            source.link('P67', entity)
         return redirect(url_for('source_view', id_=source.id) + '#tab-' + class_name)
     form = build_table_form(class_name, source.get_linked_entities('P67'))
     return render_template('source/add2.html', source=source, class_name=class_name, form=form)
