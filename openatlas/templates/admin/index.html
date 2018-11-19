@@ -30,6 +30,7 @@
         {% endif  %}
 
         {% if 'manager'|is_authorized %}
+            <a href="{{ url_for('admin_map') }}">{{ _('map')|uc_first }}</a>
             <a href="{{ url_for('content_index') }}">{{ _('content')|uc_first }}</a>
             <a href="{{ url_for('admin_logo') }}">{{ _('logo')|uc_first }}</a>
         {% endif %}

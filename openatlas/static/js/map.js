@@ -128,8 +128,8 @@ var baseMaps = {
 
 var cluster = L.markerClusterGroup({
     showCoverageOnHover: false,
-    maxClusterRadius: 50,
-    disableClusteringAtZoom: 12
+    maxClusterRadius: maxClusterRadius,
+    disableClusteringAtZoom: disableClusteringAtZoom
 });
 
 var marker; // temporary marker for coordinate capture
@@ -154,8 +154,12 @@ if (gisPointAll != "") {
         marker.setIcon(L.icon({iconUrl: "/static/vendor/leaflet/images/marker-icon_all.png", iconAnchor: [12, 41], popupAnchor: [0, -34]}));
     });
     sitesmarkers.setGeoJSON(gisPointAll); //set layer content to geojson
-    cluster.addLayer(sitesmarkers)
-    map.addLayer(cluster);
+    if (useCluster) {
+        cluster.addLayer(sitesmarkers)
+        map.addLayer(cluster);
+    } else {
+        map.addLayer(sitesmarkers);
+    }
 }
 
 if (gisPolygonAll != "") {

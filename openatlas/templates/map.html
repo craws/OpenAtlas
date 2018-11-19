@@ -6,6 +6,9 @@
     var gisPolygonPointSelected = {{ gis_data['gisPolygonPointSelected']|safe }};
     var jsonSearch = [];
     var translate = [];
+    var useCluster = {{ 'true' if session['settings']['map_cluster_enabled'] else 'false' }};
+    var maxClusterRadius = {{ session['settings']['map_cluster_max_radius'] }};
+    var disableClusteringAtZoom = {{ session['settings']['map_cluster_disable_at_zoom'] }};
     translate['save'] = '{{ _('save')|uc_first|safe }}';
     translate['edit'] = '{{ _('edit')|uc_first|safe }}';
     translate['delete'] = '{{ _('delete')|uc_first|safe }}';
