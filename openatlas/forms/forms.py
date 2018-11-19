@@ -163,10 +163,13 @@ class TreeSelect(HiddenInput):
                         selectFromTree("{name}", data.node.id, data.node.text);
                     }});
                     $("#{name}-tree-search").keyup(function() {{
-                        $("#{name}-tree").jstree("search", $(this).val());
+                        if (this.value.length >= {min_chars}) {{
+                            $("#{name}-tree").jstree("search", $(this).val());
+                        }}
                     }});
                 }});
             </script>""".format(
+            min_chars=app.config['MIN_CHARS_JSTREE_SEARCH'],
             name=field.id,
             title=g.nodes[int(field.id)].name,
             change_label=uc_first(_('change')),
@@ -212,9 +215,12 @@ class TreeMultiSelect(HiddenInput):
                     "checkbox": {{"three_state": false}}
                 }});
                 $("#{name}-tree-search").keyup(function(){{
-                    $("#{name}-tree").jstree("search", $(this).val());
+                    if (this.value.length >= {min_chars}) {{
+                        $("#{name}-tree").jstree("search", $(this).val());
+                    }}
                 }});
             </script>""".format(
+            min_chars=app.config['MIN_CHARS_JSTREE_SEARCH'],
             name=field.id,
             title=root.name,
             selection=selection,

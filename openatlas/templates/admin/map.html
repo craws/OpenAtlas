@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
+    > {{ _('map')|uc_first }}
+{% endblock %}
+{% block content %}
+    {{ 'Map'|manual_link|safe }}
+    {{ form|display_form|safe }}
+{% endblock %}

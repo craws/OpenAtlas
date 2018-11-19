@@ -191,14 +191,17 @@ def tree_select(name):
                     "plugins" : ["core", "html_data", "search"],
                     "core":{{ "data":[{tree}] }}
                 }});
-                $("#{name}-tree-search").keyup(function() {{
-                    $("#{name}-tree").jstree("search", $(this).val());
-                }});
                 $("#{name}-tree").on("select_node.jstree", function (e, data) {{
                     document.location.href = data.node.original.href;
                 }});
+                $("#{name}-tree-search").keyup(function() {{
+                    if (this.value.length >= {min_chars}) {{
+                        $("#{name}-tree").jstree("search", $(this).val());
+                    }}
+                }});
             }});
-        </script>""".format(name=sanitize(name), tree=walk_tree(NodeMapper.get_nodes(name)))
+        </script>""".format(min_chars=app.config['MIN_CHARS_JSTREE_SEARCH'],
+                            name=sanitize(name), tree=walk_tree(NodeMapper.get_nodes(name)))
     return html
 
 
@@ -228,11 +231,12 @@ def save(form, node=None, root=None):
             node.name = node.name.replace('(', '').replace(')', '')
         node.description = form.description.data
         node.update()
+
         # Update super if changed and node is not a root node
         if super_ and (super_ == 'new' or super_.id != new_super_id):
             property_code = 'P127' if node.class_.code == 'E55' else 'P89'
             node.delete_links(property_code)
-            node.link(property_code, new_super.id)
+            node.link(property_code, new_super)
         g.cursor.execute('COMMIT')
         url = url_for('node_view', id_=node.id)
         if form.continue_.data == 'yes':

@@ -77,31 +77,37 @@ class UserMapper:
         if with_bookmarks:
             sql = 'SELECT entity_id FROM web.user_bookmarks WHERE user_id = %(user_id)s;'
             g.cursor.execute(sql, {'user_id': user_id})
+            openatlas.debug_model['user'] += 1
             bookmarks = [row.entity_id for row in g.cursor.fetchall()]
         g.cursor.execute(UserMapper.sql + ' WHERE u.id = %(id)s;', {'id': user_id})
+        openatlas.debug_model['user'] += 1
         return User(g.cursor.fetchone(), bookmarks) if g.cursor.rowcount == 1 else None
 
     @staticmethod
     def get_by_reset_code(code):
         sql = UserMapper.sql + ' WHERE u.password_reset_code = %(code)s;'
         g.cursor.execute(sql, {'code': code})
+        openatlas.debug_model['user'] += 1
         return User(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod
     def get_by_email(email):
         sql = UserMapper.sql + ' WHERE LOWER(u.email) = LOWER(%(email)s);'
         g.cursor.execute(sql, {'email': email})
+        openatlas.debug_model['user'] += 1
         return User(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod
     def get_by_username(username):
         sql = UserMapper.sql + ' WHERE LOWER(u.username) = LOWER(%(username)s);'
         g.cursor.execute(sql, {'username': username})
+        openatlas.debug_model['user'] += 1
         return User(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod
     def get_by_unsubscribe_code(code):
         g.cursor.execute(UserMapper.sql + ' WHERE u.unsubscribe_code = %(code)s;', {'code': code})
+        openatlas.debug_model['user'] += 1
         return User(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod
@@ -114,12 +120,14 @@ class UserMapper:
         sql += ' ORDER BY created DESC'
         sql += ' LIMIT %(limit)s' if int(limit) else ''
         g.cursor.execute(sql, {'limit': limit, 'user_id': user_id, 'action': action})
+        openatlas.debug_model['user'] += 1
         return g.cursor.fetchall()
 
     @staticmethod
     def get_created_entities_count(user_id):
         sql = "SELECT COUNT(*) FROM web.user_log WHERE user_id = %(user_id)s AND action = 'insert';"
         g.cursor.execute(sql, {'user_id': user_id})
+        openatlas.debug_model['user'] += 1
         return g.cursor.fetchone()[0]
 
     @staticmethod
@@ -138,6 +146,7 @@ class UserMapper:
             'active': form.active.data,
             'group_name': form.group.data,
             'password': bcrypt.hashpw(password, bcrypt.gensalt()).decode('utf-8')})
+        openatlas.debug_model['user'] += 1
         return g.cursor.fetchone()[0]
 
     @staticmethod
@@ -166,6 +175,7 @@ class UserMapper:
             'unsubscribe_code': user.unsubscribe_code,
             'password_reset_code': user.password_reset_code,
             'password_reset_date': user.password_reset_date})
+        openatlas.debug_model['user'] += 1
         return
 
     @staticmethod
@@ -180,16 +190,19 @@ class UserMapper:
                 VALUES (%(user_id)s, %(name)s, %(value)s)
                 ON CONFLICT (user_id, name) DO UPDATE SET "value" = excluded.value;"""
             g.cursor.execute(sql, {'user_id': user.id, 'name': name, 'value': value})
+            openatlas.debug_model['user'] += 1
 
     @staticmethod
     def delete(user_id):
         sql = 'DELETE FROM web."user" WHERE id = %(user_id)s;'
         g.cursor.execute(sql, {'user_id': user_id})
+        openatlas.debug_model['user'] += 1
 
     @staticmethod
     def get_users():
         sql = 'SELECT id, username FROM web.user ORDER BY username;'
         g.cursor.execute(sql)
+        openatlas.debug_model['user'] += 1
         return [(row.id, row.username) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -204,12 +217,14 @@ class UserMapper:
                 WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s;"""
             label = _('bookmark')
         g.cursor.execute(sql, {'user_id': user.id, 'entity_id': entity_id})
+        openatlas.debug_model['user'] += 1
         return label
 
     @staticmethod
     def get_settings(user_id):
         sql = 'SELECT "name", value FROM web.user_settings WHERE user_id = %(user_id)s;'
         g.cursor.execute(sql, {'user_id': user_id})
+        openatlas.debug_model['user'] += 1
         settings = {}
         for row in g.cursor.fetchall():
             settings[row.name] = row.value

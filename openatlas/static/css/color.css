@@ -1,6 +1,6 @@
 @charset "UTF-8";
 
-/* font color */
+/* Font color */
 
 body,
 tabs-container .ui-state-active a,
@@ -64,7 +64,7 @@ table a:hover {
     color: #e60005;
 }
 
-/* background color */
+/* Background color */
 
 body, .ui-widget-content, .ui-dialog .ui-dialog-content {
     background-color: #efefef;
@@ -112,6 +112,7 @@ span.button,
 .button-bar a,
 .ui-state-default,
 .changelog-version,
+.marker-cluster-large div,
 #disk_size .ui-widget-header {
     background-color: #4088c3;
 }
@@ -125,7 +126,11 @@ span.button:hover {
     background-color: #46779f;
 }
 
-/* border color */
+.marker-cluster-large {
+    background-color: #729FCF
+}
+
+/* Border color */
 
 .text-preview {
     border-color: #000000;

@@ -1,6 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import g
 
+from openatlas import debug_model
 from openatlas.util.util import truncate_string
 
 
@@ -26,6 +27,7 @@ class Network:
                 SELECT domain_id, range_id FROM model.link
                 WHERE property_code IN %(properties)s;"""
             g.cursor.execute(sql, {'properties': tuple(properties)})
+            debug_model['div sql'] += 1
             for row in g.cursor.fetchall():
                 if row.domain_id == row.range_id:  # pragma no cover
                     continue  # Prevent circular dependencies
@@ -38,6 +40,7 @@ class Network:
         entities_already = set()
         sql = "SELECT id, class_code, name FROM model.entity WHERE class_code IN %(classes)s;"
         g.cursor.execute(sql, {'classes': tuple(classes)})
+        debug_model['div sql'] += 1
         for row in g.cursor.fetchall():
             if params['options']['orphans'] or row.id in entities:
                 name = row.name.replace("'", "").replace('Location of ', '').replace('\n', ' ')\
@@ -51,6 +54,7 @@ class Network:
         if array_diff:
             sql = "SELECT id, class_code, name FROM model.entity WHERE id IN %(array_diff)s;"
             g.cursor.execute(sql, {'array_diff': tuple(array_diff)})
+            debug_model['div sql'] += 1
             result = g.cursor.fetchall()
             for row in result:
                 color = ''

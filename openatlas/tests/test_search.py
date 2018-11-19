@@ -2,7 +2,6 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
-from openatlas.models.link import LinkMapper
 from openatlas.test_base import TestBaseCase
 
 
@@ -12,15 +11,10 @@ class SearchTest(TestBaseCase):
         self.login()
         with app.test_request_context():
             app.preprocess_request()
-            LinkMapper.insert(
-                EntityMapper.insert('E21', 'Waldo'),
-                'P131',
-                EntityMapper.insert('E82', 'Waldo alias'))
-            LinkMapper.insert(
-                EntityMapper.insert('E18', 'Waldorf'),
-                'P1',
-                EntityMapper.insert('E41', 'Waldorf alias'))
-
+            person = EntityMapper.insert('E21', 'Waldo')
+            person.link('P131', EntityMapper.insert('E82', 'Waldo alias'))
+            object_ = EntityMapper.insert('E18', 'Waldorf')
+            object_.link('P1', EntityMapper.insert('E41', 'Waldorf alias'))
         with app.app_context():
             rv = self.app.post(url_for('search_index'), data={'global-term': 'wal'})
             assert b'Waldo' in rv.data

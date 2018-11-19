@@ -4,7 +4,7 @@ from collections import OrderedDict
 from flask import flash, g, session
 from flask_babel import lazy_gettext as _
 
-from openatlas import app, logger
+from openatlas import app, debug_model, logger
 
 
 class ContentMapper:
@@ -17,6 +17,7 @@ class ContentMapper:
             for language in app.config['LANGUAGES'].keys():
                 content[name][language] = ''
         g.cursor.execute("SELECT name, language, text FROM web.i18n;")
+        debug_model['div sql'] += 1
         for row in g.cursor.fetchall():
             content[row.name][row.language] = row.text
         return content
@@ -37,6 +38,7 @@ class ContentMapper:
             for language in app.config['LANGUAGES'].keys():
                 sql = 'DELETE FROM web.i18n WHERE name = %(name)s AND language = %(language)s'
                 g.cursor.execute(sql, {'name': name, 'language': language})
+                debug_model['div sql'] += 1
                 sql = """
                     INSERT INTO web.i18n (name, language, text)
                     VALUES (%(name)s, %(language)s, %(text)s);"""
@@ -44,6 +46,7 @@ class ContentMapper:
                     'name': name,
                     'language': language,
                     'text': form.__getattribute__(language).data.strip()})
+                debug_model['div sql'] += 1
                 g.cursor.execute('COMMIT')
         except Exception as e:  # pragma: no cover
             g.cursor.execute('ROLLBACK')

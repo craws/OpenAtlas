@@ -68,6 +68,7 @@ def connect():
 
 @app.before_request
 def before_request():
+    debug_model['div sql'] = 0
     from openatlas.models.classObject import ClassMapper
     from openatlas.models.node import NodeMapper
     from openatlas.models.property import PropertyMapper
@@ -89,7 +90,6 @@ def before_request():
     debug_model['by ids'] = 0
     debug_model['linked'] = 0
     debug_model['user'] = 0
-    debug_model['div sql'] = 0
     debug_model['model'] = time.time() - debug_model['current']
     debug_model['current'] = time.time()
 

@@ -12,8 +12,8 @@ from openatlas.forms.forms import TableField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 is_authorized, link, required_group, truncate_string, uc_first,
-                                 was_modified, get_view_name)
+                                 get_view_name, is_authorized, link, required_group,
+                                 truncate_string, uc_first, was_modified)
 
 
 class ReferenceForm(Form):
@@ -69,8 +69,7 @@ def reference_add(origin_id):
     view_name = get_view_name(origin)
     form = AddReferenceForm()
     if form.validate_on_submit():
-        reference = EntityMapper.get_by_id(form.reference.data)
-        reference.link('P67', origin.id, form.page.data)
+        EntityMapper.get_by_id(form.reference.data).link('P67', origin, form.page.data)
         return redirect(url_for(view_name + '_view', id_=origin.id) + '#tab-reference')
     return render_template('reference/add.html', origin=origin, form=form, class_name=view_name)
 
@@ -83,7 +82,8 @@ def reference_add2(reference_id, class_name):
     form = getattr(openatlas.views.reference, 'Add' + uc_first(class_name) + 'Form')()
     if form.validate_on_submit():
         property_code = 'P128' if reference_.class_.code == 'E84' else 'P67'
-        reference_.link(property_code, int(getattr(form, class_name).data), form.page.data)
+        entity = EntityMapper.get_by_id(getattr(form, class_name).data)
+        reference_.link(property_code, entity, form.page.data)
         return redirect(url_for('reference_view', id_=reference_.id) + '#tab-' + class_name)
     return render_template(
         'reference/add2.html', reference=reference_, form=form, class_name=class_name)

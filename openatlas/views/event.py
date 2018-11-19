@@ -182,12 +182,14 @@ def save(form, event=None, code=None, origin=None):
         event.save_dates(form)
         event.save_nodes(form)
         if form.event.data:
-            event.link('P117', int(form.event.data))
+            entity = EntityMapper.get_by_id(form.event.data)
+            event.link('P117', entity)
         if form.place.data:
             place = LinkMapper.get_linked_entity(int(form.place.data), 'P53')
             event.link('P7', place)
         if event.class_.code == 'E8' and form.given_place.data:  # Link place for acquisition
-            event.link('P24', ast.literal_eval(form.given_place.data))
+            places = [EntityMapper.get_by_id(i) for i in ast.literal_eval(form.given_place.data)]
+            event.link('P24', places)
         url = url_for('event_view', id_=event.id)
         if origin:
             view_name = get_view_name(origin)

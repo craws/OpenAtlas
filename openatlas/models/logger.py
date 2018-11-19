@@ -2,6 +2,7 @@
 from flask import g, request, session
 from flask_login import current_user
 
+import openatlas
 from openatlas import app
 from openatlas.models.imports import ImportMapper
 from openatlas.models.user import UserMapper
@@ -28,6 +29,7 @@ class DBHandler:
             'user_id': current_user.id if hasattr(current_user, 'id') else None,
             'info': info}
         g.cursor.execute(sql, params)
+        openatlas.debug_model['div sql'] += 1
 
     @staticmethod
     def get_system_logs(limit, priority, user_id):
@@ -38,11 +40,13 @@ class DBHandler:
         sql += ' ORDER BY created DESC'
         sql += ' LIMIT %(limit)s' if int(limit) > 0 else ''
         g.cursor.execute(sql, {'limit': limit, 'priority': priority, 'user_id': user_id})
+        openatlas.debug_model['div sql'] += 1
         return g.cursor.fetchall()
 
     @staticmethod
     def delete_all_system_logs():
         g.cursor.execute('TRUNCATE TABLE web.system_log RESTART IDENTITY;')
+        debug_model['div sql'] += 1
 
     @staticmethod
     def log_user(entity_id, action):
@@ -51,6 +55,7 @@ class DBHandler:
             VALUES (%(user_id)s, %(entity_id)s, %(action)s);"""
         g.cursor.execute(
             sql, {'user_id': current_user.id, 'entity_id': entity_id, 'action': action})
+        openatlas.debug_model['div sql'] += 1
 
     @staticmethod
     def get_log_for_advanced_view(entity_id):
@@ -61,11 +66,14 @@ class DBHandler:
             WHERE ul.entity_id = %(entity_id)s AND ul.action = %(action)s
             ORDER BY ul.created DESC LIMIT 1;"""
         g.cursor.execute(sql, {'entity_id': entity_id, 'action': 'insert'})
+        openatlas.debug_model['div sql'] += 1
         row_insert = g.cursor.fetchone()
         g.cursor.execute(sql, {'entity_id': entity_id, 'action': 'update'})
+        openatlas.debug_model['div sql'] += 1
         row_update = g.cursor.fetchone()
         sql = 'SELECT project_id, origin_id, user_id FROM import.entity WHERE entity_id = %(id)s;'
         g.cursor.execute(sql, {'id': entity_id})
+        openatlas.debug_model['div sql'] += 1
         row_import = g.cursor.fetchone()
         project = ImportMapper.get_project_by_id(row_import.project_id) if row_import else None
         log = {
