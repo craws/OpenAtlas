@@ -832,6 +832,17 @@ if do_link_subunits_types:
             continue
         link('P2', new_entities[row.uid].id, types[row.entity_name_uri])
 
+
+# Fix wrong place links
+sql = """
+    UPDATE model.link l
+    SET range_id = (SELECT l2.range_id FROM model.link l2 WHERE l2.domain_id = l.range_id AND property_code = 'P53')
+    WHERE l.id IN (
+        SELECT l.id FROM model.link l
+        JOIN model.entity e ON l.range_id = e.id AND e.class_code = 'E18' AND l.property_code = 'P7'
+        WHERE l.property_code = 'P7');"""
+cursor_dpp.execute(sql)
+
 # Files
 if do_import_files:
     add_licences(cursor_dpp, cursor_ostalpen)
