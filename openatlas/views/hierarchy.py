@@ -49,26 +49,31 @@ def hierarchy_insert(param):
 @app.route('/hierarchy/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('manager')
 def hierarchy_update(id_):
-    node = g.nodes[id_]
-    if node.system:
+    root = g.nodes[id_]
+    if root.system:
         abort(403)
-    form = build_form(HierarchyForm, 'hierarchy', node)
+    form = build_form(HierarchyForm, 'hierarchy', root)
     form.forms.choices = NodeMapper.get_form_choices()
-    if node.value_type:
+    if root.value_type:
         del form.multiple
-    elif node.multiple:
+    elif root.multiple:
         form.multiple.render_kw = {'disabled': 'disabled'}
     if form.validate_on_submit():
-        if form.name.data != node.name and NodeMapper.get_nodes(form.name.data):
+        if form.name.data != root.name and NodeMapper.get_nodes(form.name.data):
             flash(_('error name exists'), 'error')
-            return redirect(url_for('node_index') + '#tab-' + str(node.id))
-        save(form, node)
+            return redirect(url_for('node_index') + '#tab-' + str(root.id))
+        save(form, root)
         flash(_('info update'), 'info')
-        return redirect(url_for('node_index') + '#tab-' + str(node.id))
-    form.multiple = node.multiple
+        return redirect(url_for('node_index') + '#tab-' + str(root.id))
+    form.multiple = root.multiple
+    subs_all = NodeMapper.get_all_sub_ids(root, [])
+    for field in form.forms:
+        if field.checked:
+            print(NodeMapper.get_links_by_nodes_and_form(subs_all, field.data))
+
     return render_template(
         'hierarchy/update.html',
-        node=node,
+        node=root,
         form=form,
         forms=[form.id for form in form.forms])
 

@@ -261,3 +261,61 @@ class NodeMapper(EntityMapper):
                 table='link_property' if root.name in app.config['PROPERTY_TYPES'] else 'link')
             g.cursor.execute(sql, {'old_type_id': old_node.id, 'delete_ids': tuple(delete_ids)})
             debug_model['div sql'] += 1
+
+    @staticmethod
+    def get_all_sub_ids(node, subs):
+        # Recursive function to return a list with all sub node ids
+        subs += node.subs
+        for sub_id in node.subs:
+            NodeMapper.get_all_sub_ids(g.nodes[sub_id], subs)
+        return subs
+
+    @staticmethod
+    def get_links_by_nodes_and_form(node_ids, form_id):
+        sql = "SELECT name FROM web.form WHERE id = %(form_id)s;"
+        g.cursor.execute(sql, {'form_id': form_id})
+        form_name = g.cursor.fetchone()[0]
+
+        system_type = ''
+        if form_name == 'Source':
+            system_type = 'source content'
+        elif form_name == 'Event':
+            class_code = ['E6', 'E7', 'E8', 'E12']
+        elif form_name == 'Person':
+            class_code = ['E21']
+        elif form_name == 'Group':
+            class_code = ['E74']
+        elif form_name == 'Legal Body':
+            class_code = ['E40']
+        elif form_name == 'Place':
+            system_type = 'place'
+        elif form_name == 'Bibliography':
+            system_class = ''
+        elif form_name == 'Edition':
+            system_class = ''
+        elif form_name == 'Information Carrier':
+            system_class = ''
+        elif form_name == 'Actor Actor Relation':
+            system_class = ''
+        elif form_name == 'Involvement':
+            system_class = ''
+        elif form_name == 'Member':
+            system_class = ''
+        elif form_name == 'Source translation':
+            system_class = ''
+        elif form_name == 'File':
+            system_class = ''
+        elif form_name == 'Feature':
+            system_class = ''
+        elif form_name == 'Find':
+            system_class = ''
+        elif form_name == 'Stratigraphic Unit':
+            system_class = ''
+
+        print(form_name)
+        sql = """
+            SELECT count(*) FROM model.link l
+            WHERE l.property_code = 'P2' AND l.range_id IN %(node_ids)s;"""
+        g.cursor.execute(sql, {'node_ids': tuple(node_ids)})
+        debug_model['div sql'] += 1
+        return g.cursor.fetchone()[0]
