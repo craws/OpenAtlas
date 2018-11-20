@@ -1,8 +1,11 @@
 # Installation Notes
 
-This software was developed and tested on the Linux/Debian stable version. It may work on other Linux distributions but it won't work out of the box on other operating systems.
+Some knowledge about package installation, web server and database configuration will be needed.
 
-Installation code examples are based on a Debian 9 (Stretch) system.
+This software was developed and tested on Linux/Debian 9 and the easiest way to install would be on Debian 9 following these instructions.
+
+It may work on other Linux distributions or even non Linux systems but would need substantially more
+knowledge about server administration.
 
 ## Requirements
 
@@ -28,12 +31,12 @@ Installation code examples are based on a Debian 9 (Stretch) system.
 
 ### Files
 
-Copy the files to /var/www/your_sitename or clone OpenAtlas from GitHub or Bitbucket
+Copy the files to /var/www/your_site_name or clone OpenAtlas from GitHub or Bitbucket
 
 ### Database
 
 Important!
-A user with username "OpenAtlas" and password "change_me_PLEASE!" is created.
+A user with user name "OpenAtlas" and password "change_me_PLEASE!" is created.
 Change this account immediately!
 
 As postgres
@@ -93,8 +96,6 @@ As postgres
     $ psql openatlas_test -c "CREATE EXTENSION postgis;"
     $ cd install
     $ cat structure.sql data_web.sql data_model.sql | psql -d openatlas_test -f -
-
-Comment "CREATE EXTENSION postgis;" again before running tests.
 
 Copy instance/example_testing.py to instance/testing.py
 

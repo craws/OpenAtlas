@@ -2,7 +2,7 @@
 from flask import g, session
 
 import openatlas
-from openatlas import app
+from openatlas import app, debug_model
 
 
 class ClassObject:
@@ -40,9 +40,11 @@ class ClassMapper:
     def get_all():
         classes = {}
         g.cursor.execute("SELECT id, code, name FROM model.class;")
+        openatlas.debug_model['div sql'] += 1
         for row in g.cursor.fetchall():
             classes[row.code] = ClassObject(row)
         g.cursor.execute("SELECT super_code, sub_code FROM model.class_inheritance;")
+        debug_model['div sql'] += 1
         for row in g.cursor.fetchall():
             classes[row.super_code].sub.append(row.sub_code)
             classes[row.sub_code].super.append(row.super_code)
@@ -50,6 +52,7 @@ class ClassMapper:
             SELECT class_code, language_code, attribute, text FROM model.class_i18n
             WHERE language_code IN %(language_codes)s;"""
         g.cursor.execute(sql, {'language_codes': tuple(app.config['LANGUAGES'].keys())})
+        debug_model['div sql'] += 1
         for row in g.cursor.fetchall():
             class_ = classes[row.class_code]
             if row.language_code not in class_.i18n:

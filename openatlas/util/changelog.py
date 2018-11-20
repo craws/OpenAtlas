@@ -8,7 +8,8 @@ class Changelog:
     versions['3.11.0'] = {
         'date': 'TBA',
         'data': OrderedDict(
-            feature=OrderedDict([]))}
+            feature=OrderedDict([
+                ('956', 'Clustering for maps')]))}
     versions['3.10.0'] = {
         'date': '2018-11-09',
         'data': OrderedDict(

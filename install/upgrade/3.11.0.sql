@@ -2,6 +2,11 @@
 
 BEGIN;
 
+-- Add settings
+INSERT INTO web.settings (name, value) VALUES ('map_cluster_enabled', 'True');
+INSERT INTO web.settings (name, value) VALUES ('map_cluster_max_radius', '50');
+INSERT INTO web.settings (name, value) VALUES ('map_cluster_disable_at_zoom', '12');
+
 -- Refactor delete_entity_related trigger function
 DROP FUNCTION IF EXISTS model.delete_entity_related() CASCADE;
 CREATE FUNCTION model.delete_entity_related() RETURNS trigger

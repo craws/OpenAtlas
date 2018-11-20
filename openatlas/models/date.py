@@ -4,7 +4,7 @@ from datetime import datetime
 import numpy
 from flask import g
 
-import openatlas
+from openatlas import debug_model
 from openatlas.models.link import LinkMapper
 from openatlas.models.linkProperty import LinkPropertyMapper
 
@@ -35,6 +35,7 @@ class DateMapper:
             JOIN model.entity e2 ON l.range_id = e2.id
             WHERE e.id = %(id)s;"""
         g.cursor.execute(sql, {'id': entity.id})
+        debug_model['div sql'] += 1
         dates = {}
         for row in g.cursor.fetchall():
             if row.property_code not in dates:
@@ -42,7 +43,7 @@ class DateMapper:
             dates[row.property_code][row.system_type] = {
                 'date': DateMapper.timestamp_to_datetime64(row.value_timestamp),
                 'info': row.description if row.description else ''}
-        openatlas.debug_model['div sql'] += 1
+        debug_model['div sql'] += 1
         return dates
 
     @staticmethod
@@ -110,6 +111,7 @@ class DateMapper:
             JOIN model.entity e ON lp.range_id = e.id
             WHERE l.id = %(id)s;"""
         g.cursor.execute(sql, {'id': link.id})
+        debug_model['div sql'] += 1
         dates = {}
         for row in g.cursor.fetchall():
             if row.property_code not in dates:
@@ -117,7 +119,7 @@ class DateMapper:
             dates[row.property_code][row.system_type] = {
                 'date': DateMapper.timestamp_to_datetime64(row.value_timestamp),
                 'info': row.description if row.description else ''}
-        openatlas.debug_model['div sql'] += 1
+        debug_model['div sql'] += 1
         return dates
 
     @staticmethod
@@ -150,7 +152,7 @@ class DateMapper:
                 JOIN model.link l ON e.id = l.range_id AND l.domain_id = %(entity_id)s
                     AND l.property_code IN ('OA1', 'OA2', 'OA3', 'OA4', 'OA5', 'OA6'));"""
         g.cursor.execute(sql, {'entity_id': entity.id})
-        openatlas.debug_model['div sql'] += 1
+        debug_model['div sql'] += 1
 
     @staticmethod
     def save_date(id_, form, name, code, link_mapper):

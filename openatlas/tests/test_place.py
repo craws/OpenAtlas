@@ -114,4 +114,5 @@ class PlaceTest(TestBaseCase):
             rv = self.app.get(url_for('place_delete', id_=place_id), follow_redirects=True)
             assert b'not possible if subunits' in rv.data
             rv = self.app.get(url_for('place_delete', id_=find_id), follow_redirects=True)
+
             assert b'The entry has been deleted.' in rv.data

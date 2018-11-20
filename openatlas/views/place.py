@@ -173,6 +173,7 @@ def place_view(id_, unlink_id=None):
 @required_group('editor')
 def place_delete(id_):
     entity = EntityMapper.get_by_id(id_)
+    parent = None if entity.system_type == 'place' else entity.get_linked_entity('P46', True)
     if entity.get_linked_entities('P46'):
         flash(_('Deletion not possible if subunits exists'), 'error')
         return redirect(url_for('place_view', id_=id_))
@@ -187,8 +188,7 @@ def place_delete(id_):
         flash(_('error transaction'), 'error')
     flash(_('entity deleted'), 'info')
     url = url_for('place_index')
-    if entity.system_type != 'place':
-        parent = LinkMapper.get_linked_entity(id_, 'P46', True)
+    if parent:
         url = url_for('place_view', id_=parent.id) + '#tab-' + entity.system_type
     return redirect(url)
 

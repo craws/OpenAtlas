@@ -6,6 +6,9 @@
     var gisPolygonPointSelected = {{ gis_data['gisPolygonPointSelected']|safe }};
     var jsonSearch = [];
     var translate = [];
+    var useCluster = {{ 'true' if session['settings']['map_cluster_enabled'] else 'false' }};
+    var maxClusterRadius = {{ session['settings']['map_cluster_max_radius'] }};
+    var disableClusteringAtZoom = {{ session['settings']['map_cluster_disable_at_zoom'] }};
     translate['save'] = '{{ _('save')|uc_first|safe }}';
     translate['edit'] = '{{ _('edit')|uc_first|safe }}';
     translate['delete'] = '{{ _('delete')|uc_first|safe }}';
@@ -21,6 +24,7 @@
 <script src="/static/vendor/leaflet/mapbox.js"></script>
 <script src="/static/vendor/leaflet/L.Control.Geonames.js"></script>
 <script src="/static/vendor/leaflet/leaflet.usermarker.js"></script>
+<script src="/static/vendor/leaflet/markercluster/leaflet.markercluster.js"></script>
 <script src="/static/vendor/leaflet/leaflet.fullscreen-master/Control.FullScreen.js"></script>
 <script src="/static/vendor/leaflet/easy-button.js"></script>
 <link rel="stylesheet" href="/static/vendor/leaflet/leaflet.fullscreen-master/Control.FullScreen.css" />
@@ -28,5 +32,6 @@
 <link rel="stylesheet" href="/static/vendor/leaflet/font-awesome/css/font-awesome.min.css" />
 <link rel="stylesheet" href="/static/vendor/leaflet/L.Control.Geonames.css" />
 <link rel="stylesheet" href="/static/vendor/leaflet/leaflet.usermarker.css" />
+<link rel="stylesheet" href="/static/vendor/leaflet/markercluster/MarkerCluster.css" />
 <link href="/static/vendor/leaflet/draw/leaflet.draw.css" rel="stylesheet" type="text/css"/>
 <link href="/static/vendor/leaflet/shapeedit.css" rel="stylesheet" type="text/css"/>
