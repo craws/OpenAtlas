@@ -13,6 +13,10 @@ class Link:
         self.description = row.description
         self.property = g.properties[row.property_code]
         # Todo: performance - if it's a node don't call get_by_id
+        # Not sure why below isn't working, somewhere the order is changed, maybe at SQL result?
+        # entities = EntityMapper.get_by_ids([row.domain_id, row.range_id])
+        # self.domain = entities[0]
+        # self.range = entities[1]
         self.domain = EntityMapper.get_by_id(row.domain_id)
         self.range = EntityMapper.get_by_id(row.range_id)
         self.type = g.nodes[row.type_id] if row.type_id else None
