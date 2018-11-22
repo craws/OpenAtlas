@@ -104,10 +104,10 @@ def class_view(code):
             tables[table]['data'].append([link(classes[code]), classes[code].name])
     tables['domains'] = {
         'id': 'domains', 'header': ['code', 'name'], 'data': [], 'show_pager': False,
-        'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'}
+        'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }}'}
     tables['ranges'] = {
         'id': 'ranges', 'header': ['code', 'name'], 'data': [], 'show_pager': False,
-        'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'}
+        'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }}'}
     for key, property_ in g.properties.items():
         if code == property_.domain_class_code:
             tables['domains']['data'].append([link(property_), property_.name])
