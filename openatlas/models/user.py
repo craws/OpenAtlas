@@ -225,9 +225,7 @@ class UserMapper:
         sql = 'SELECT "name", value FROM web.user_settings WHERE user_id = %(user_id)s;'
         g.cursor.execute(sql, {'user_id': user_id})
         openatlas.debug_model['user'] += 1
-        settings = {}
-        for row in g.cursor.fetchall():
-            settings[row.name] = row.value
+        settings = {row.name: row.value for row in g.cursor.fetchall()}
         for item in ['newsletter', 'show_email']:
             settings[item] = True if item in settings and settings[item] == 'True' else False
         if 'theme' not in settings:
