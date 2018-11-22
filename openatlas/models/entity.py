@@ -176,6 +176,8 @@ class EntityMapper:
 
     @staticmethod
     def get_by_id(entity_id, ignore_not_found=False):
+        if entity_id in g.nodes:  # pragma: no cover, just in case a node is requested
+            return g.nodes[entity_id]
         sql = EntityMapper.sql + ' WHERE e.id = %(id)s GROUP BY e.id ORDER BY e.name;'
         g.cursor.execute(sql, {'id': entity_id})
         debug_model['by id'] += 1
