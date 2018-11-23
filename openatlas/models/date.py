@@ -4,7 +4,7 @@ from datetime import datetime
 import numpy
 from flask import g
 
-from openatlas import debug_model
+from openatlas import app, debug_model
 from openatlas.models.link import LinkMapper
 from openatlas.models.linkProperty import LinkPropertyMapper
 
@@ -128,7 +128,7 @@ class DateMapper:
             DateMapper.delete_dates(entity)
         code_begin = 'OA1'
         code_end = 'OA2'
-        if entity.class_.code in ['E6', 'E7', 'E8', 'E12']:
+        if entity.class_.code in app.config['CLASS_CODES']['event']:
             code_begin = 'OA5'
             code_end = 'OA6'
         if entity.class_.code == 'E21':

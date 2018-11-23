@@ -66,16 +66,14 @@ def hierarchy_update(id_):
         flash(_('info update'), 'info')
         return redirect(url_for('node_index') + '#tab-' + str(root.id))
     form.multiple = root.multiple
-    subs_all = NodeMapper.get_all_sub_ids(root, [])
+    already_used_nodes = []
     for field in form.forms:
-        if field.checked:
-            print(NodeMapper.get_links_by_nodes_and_form(subs_all, field.data))
-
+        if field.checked and NodeMapper.get_links_by_nodes_and_form(root, field.data):
+            already_used_nodes.append(field.id)
     return render_template(
-        'hierarchy/update.html',
-        node=root,
-        form=form,
-        forms=[form.id for form in form.forms])
+        'hierarchy/update.html', node=root, form=form,
+        forms=[form.id for form in form.forms],
+        already_used_nodes=already_used_nodes)
 
 
 @app.route('/hierarchy/delete/<int:id_>', methods=['POST', 'GET'])

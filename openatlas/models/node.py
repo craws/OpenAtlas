@@ -267,51 +267,34 @@ class NodeMapper(EntityMapper):
         return subs
 
     @staticmethod
-    def get_links_by_nodes_and_form(node_ids, form_id):
-        sql = "SELECT name FROM web.form WHERE id = %(form_id)s;"
-        g.cursor.execute(sql, {'form_id': form_id})
+    def get_links_by_nodes_and_form(root_node, form_id):
+        # Check if nodes are already linked to entities before offering to remove a node from form
+        node_ids = NodeMapper.get_all_sub_ids(root_node, [])
+        if not node_ids:  # There are no sub nodes so skipping test
+            return
+        g.cursor.execute("SELECT name FROM web.form WHERE id = %(form_id)s;", {'form_id': form_id})
         form_name = g.cursor.fetchone()[0]
-
         system_type = ''
+        class_code = ''
         if form_name == 'Source':
             system_type = 'source content'
         elif form_name == 'Event':
-            class_code = ['E6', 'E7', 'E8', 'E12']
+            class_code = app.config['CLASS_CODES']['event']
         elif form_name == 'Person':
             class_code = ['E21']
         elif form_name == 'Group':
             class_code = ['E74']
         elif form_name == 'Legal Body':
             class_code = ['E40']
-        elif form_name == 'Place':
-            system_type = 'place'
-        elif form_name == 'Bibliography':
-            system_class = ''
-        elif form_name == 'Edition':
-            system_class = ''
-        elif form_name == 'Information Carrier':
-            system_class = ''
-        elif form_name == 'Actor Actor Relation':
-            system_class = ''
-        elif form_name == 'Involvement':
-            system_class = ''
-        elif form_name == 'Member':
-            system_class = ''
-        elif form_name == 'Source translation':
-            system_class = ''
-        elif form_name == 'File':
-            system_class = ''
-        elif form_name == 'Feature':
-            system_class = ''
-        elif form_name == 'Find':
-            system_class = ''
-        elif form_name == 'Stratigraphic Unit':
-            system_class = ''
-
-        print(form_name)
+        else:
+            system_type = form_name.lower()
         sql = """
             SELECT count(*) FROM model.link l
-            WHERE l.property_code = 'P2' AND l.range_id IN %(node_ids)s;"""
-        g.cursor.execute(sql, {'node_ids': tuple(node_ids)})
+            JOIN model.entity e ON l.domain_id = e.id AND l.range_id IN %(node_ids)s
+            WHERE l.property_code = 'P2' AND {sql_where} %(params)s;""".format(
+               sql_where='e.system_type =' if system_type else 'e.class_code IN')
+        g.cursor.execute(sql, {
+            'node_ids': tuple(node_ids),
+            'params': system_type if system_type else tuple(class_code)})
         debug_model['div sql'] += 1
         return g.cursor.fetchone()[0]
