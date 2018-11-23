@@ -62,9 +62,9 @@ class NodeMapper(EntityMapper):
 
     @staticmethod
     def populate_subs(nodes):
-        forms = {}
         g.cursor.execute("SELECT id, name, extendable FROM web.form ORDER BY name ASC;")
         debug_model['div sql'] += 1
+        forms = {}
         for row in g.cursor.fetchall():
             forms[row.id] = {'id': row.id, 'name': row.name, 'extendable': row.extendable}
         sql = """
@@ -75,9 +75,7 @@ class NodeMapper(EntityMapper):
             FROM web.hierarchy h;"""
         g.cursor.execute(sql)
         debug_model['div sql'] += 1
-        hierarchies = {}
-        for row in g.cursor.fetchall():
-            hierarchies[row.id] = row
+        hierarchies = {row.id: row for row in g.cursor.fetchall()}
         for id_, node in nodes.items():
             if node.root:
                 super_ = nodes[node.root[0]]
@@ -89,9 +87,7 @@ class NodeMapper(EntityMapper):
                 node.directional = hierarchies[node.id].directional
                 node.multiple = hierarchies[node.id].multiple
                 node.system = hierarchies[node.id].system
-                node.forms = {}
-                for form_id in hierarchies[node.id].form_ids:
-                    node.forms[form_id] = forms[form_id]
+                node.forms = {form_id: forms[form_id] for form_id in hierarchies[node.id].form_ids}
 
     @staticmethod
     def get_root_path(nodes, node, super_id, root):

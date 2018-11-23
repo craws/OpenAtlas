@@ -33,9 +33,9 @@ class SettingsMapper:
 
     @staticmethod
     def get_settings():
-        settings = {}
         g.cursor.execute("SELECT name, value FROM web.settings;")
         debug_model['div sql'] += 1
+        settings = {}
         for row in g.cursor.fetchall():
             settings[row.name] = row.value
             if row.name in [

@@ -7,14 +7,13 @@ from openatlas import debug_model, logger
 
 class Link:
 
-    def __init__(self, row):
+    def __init__(self, row, domain=None, range_=None):
         from openatlas.models.entity import EntityMapper
         self.id = row.id
         self.description = row.description
         self.property = g.properties[row.property_code]
-        # Todo: performance - if it's a node don't call get_by_id
-        self.domain = EntityMapper.get_by_id(row.domain_id)
-        self.range = EntityMapper.get_by_id(row.range_id)
+        self.domain = domain if domain else EntityMapper.get_by_id(row.domain_id)
+        self.range = range_ if range_ else EntityMapper.get_by_id(row.range_id)
         self.type = g.nodes[row.type_id] if row.type_id else None
         self.nodes = dict()
         if hasattr(row, 'type_id') and row.type_id:
@@ -67,7 +66,7 @@ class LinkMapper:
                 'domain_id': domain.id,
                 'range_id': range_.id,
                 'description': description})
-            debug_model['div sql'] += 1
+            debug_model['link sql'] += 1
             result = g.cursor.fetchone()[0]
         return result
 
@@ -95,12 +94,13 @@ class LinkMapper:
         g.cursor.execute(sql, {
             'entity_id': entity if isinstance(entity, int) else entity.id,
             'codes': tuple(codes if isinstance(codes, list) else [codes])})
-        debug_model['div sql'] += 1
+        debug_model['link sql'] += 1
         ids = [element for (element,) in g.cursor.fetchall()]
         return EntityMapper.get_by_ids(ids)
 
     @staticmethod
     def get_links(entity, codes, inverse=False):
+        from openatlas.models.entity import EntityMapper
         sql = """
             SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description, l.created,
                 l.modified, e.name,
@@ -122,15 +122,24 @@ class LinkMapper:
         g.cursor.execute(sql, {
             'entity_id': entity if isinstance(entity, int) else entity.id,
             'codes': tuple(codes if isinstance(codes, list) else [codes])})
-        debug_model['div sql'] += 1
-        return [Link(row) for row in g.cursor.fetchall()]
+        debug_model['link sql'] += 1
+        entity_ids = set()
+        result = g.cursor.fetchall()
+        for row in result:
+            entity_ids.add(row.domain_id)
+            entity_ids.add(row.range_id)
+        entities = {entity.id: entity for entity in EntityMapper.get_by_ids(entity_ids)}
+        links = []
+        for row in result:
+            links.append(Link(row, domain=entities[row.domain_id], range_=entities[row.range_id]))
+        return links
 
     @staticmethod
     def delete_by_codes(entity, codes):
         codes = codes if isinstance(codes, list) else [codes]
         sql = "DELETE FROM model.link WHERE domain_id = %(id)s AND property_code IN %(codes)s;"
         g.cursor.execute(sql, {'id': entity.id, 'codes': tuple(codes)})
-        debug_model['div sql'] += 1
+        debug_model['link sql'] += 1
 
     @staticmethod
     def get_by_id(id_):
@@ -151,7 +160,7 @@ class LinkMapper:
             LEFT JOIN model.entity d2 ON dl2.range_id = d2.id
             WHERE l.id = %(id)s GROUP BY l.id;"""
         g.cursor.execute(sql, {'id': id_})
-        debug_model['div sql'] += 1
+        debug_model['link sql'] += 1
         return Link(g.cursor.fetchone())
 
     @staticmethod
@@ -160,7 +169,7 @@ class LinkMapper:
         if not is_authorized('editor'):  # pragma: no cover
             abort(403)
         g.cursor.execute("DELETE FROM model.link WHERE id = %(id)s;", {'id': id_})
-        debug_model['div sql'] += 1
+        debug_model['link sql'] += 1
 
     @staticmethod
     def update(link):
@@ -172,7 +181,7 @@ class LinkMapper:
             'domain_id': link.domain.id,
             'range_id': link.range.id,
             'description': link.description})
-        debug_model['div sql'] += 1
+        debug_model['link sql'] += 1
 
     @staticmethod
     def check_links():
@@ -186,7 +195,7 @@ class LinkMapper:
             JOIN model.entity d ON l.domain_id = d.id
             JOIN model.entity r ON l.range_id = r.id;"""
         g.cursor.execute(sql)
-        debug_model['div sql'] += 1
+        debug_model['link sql'] += 1
         invalid_links = []
         for row in g.cursor.fetchall():
             property_ = g.properties[row.property]
@@ -213,7 +222,7 @@ class LinkMapper:
                     'property': item['property'],
                     'domain': item['domain'],
                     'range': item['range']})
-                debug_model['div sql'] += 1
+                debug_model['link sql'] += 1
                 for row2 in g.cursor.fetchall():
                     domain = EntityMapper.get_by_id(row2.domain_id)
                     range_ = EntityMapper.get_by_id(row2.range_id)
