@@ -68,10 +68,10 @@ def hierarchy_update(id_):
     form.multiple = root.multiple
     table = {'id': 'used_forms', 'header': ['form', 'count'], 'show_pager': False,
              'data': [], 'sort': 'sortList: [[0, 0]]'}
-    for id_, form_ in root.forms.items():
-        url = url_for('hierarchy_remove_form', id_=root.id, remove_id=id_)
+    for form_id, form_ in root.forms.items():
+        url = url_for('hierarchy_remove_form', id_=root.id, remove_id=form_id)
         link = '<a href="' + url + '">' + uc_first(_('remove')) + '</a>'
-        count = NodeMapper.get_form_count(root, id_)
+        count = NodeMapper.get_form_count(root, form_id)
         table['data'].append([form_['name'], format_number(count) if count else link])
     return render_template(
         'hierarchy/update.html', node=root, form=form, table=table,
@@ -80,10 +80,10 @@ def hierarchy_update(id_):
 
 @app.route('/hierarchy/remove_form/<int:id_>/<int:remove_id>')
 @required_group('manager')
-def hierarchy_remove_form(id_, remove_id=None):
+def hierarchy_remove_form(id_, remove_id):
     root = g.nodes[id_]
     if NodeMapper.get_form_count(root, remove_id):
-        abort(403)
+        abort(403)  # pragma: no cover
     g.cursor.execute('BEGIN')
     try:
         NodeMapper.remove_form_from_hierarchy(root, remove_id)
