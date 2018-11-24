@@ -1,6 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import abort, flash, g, render_template, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import lazy_gettext as _, format_number
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import (BooleanField, SelectMultipleField, StringField, SubmitField, TextAreaField,
@@ -11,7 +11,7 @@ from openatlas import app, logger
 from openatlas.forms.forms import build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.node import NodeMapper
-from openatlas.util.util import required_group, sanitize
+from openatlas.util.util import required_group, sanitize, uc_first
 
 
 class HierarchyForm(Form):
@@ -53,7 +53,7 @@ def hierarchy_update(id_):
     if root.system:
         abort(403)
     form = build_form(HierarchyForm, 'hierarchy', root)
-    form.forms.choices = NodeMapper.get_form_choices()
+    form.forms.choices = NodeMapper.get_form_choices(root)
     if root.value_type:
         del form.multiple
     elif root.multiple:
@@ -66,14 +66,34 @@ def hierarchy_update(id_):
         flash(_('info update'), 'info')
         return redirect(url_for('node_index') + '#tab-' + str(root.id))
     form.multiple = root.multiple
-    already_used_nodes = []
-    for field in form.forms:
-        if field.checked and NodeMapper.get_links_by_nodes_and_form(root, field.data):
-            already_used_nodes.append(field.id)
+    table = {'id': 'used_forms', 'header': ['form', 'count'], 'show_pager': False,
+             'data': [], 'sort': 'sortList: [[0, 0]]'}
+    for id_, form_ in root.forms.items():
+        url = url_for('hierarchy_remove_form', id_=root.id, remove_id=id_)
+        link = '<a href="' + url + '">' + uc_first(_('remove')) + '</a>'
+        count = NodeMapper.get_form_count(root, id_)
+        table['data'].append([form_['name'], format_number(count) if count else link])
     return render_template(
-        'hierarchy/update.html', node=root, form=form,
-        forms=[form.id for form in form.forms],
-        already_used_nodes=already_used_nodes)
+        'hierarchy/update.html', node=root, form=form, table=table,
+        forms=[form.id for form in form.forms])
+
+
+@app.route('/hierarchy/remove_form/<int:id_>/<int:remove_id>')
+@required_group('manager')
+def hierarchy_remove_form(id_, remove_id=None):
+    root = g.nodes[id_]
+    if NodeMapper.get_form_count(root, remove_id):
+        abort(403)
+    g.cursor.execute('BEGIN')
+    try:
+        NodeMapper.remove_form_from_hierarchy(root, remove_id)
+        g.cursor.execute('COMMIT')
+        flash(_('info update'), 'info')
+    except Exception as e:  # pragma: no cover
+        g.cursor.execute('ROLLBACK')
+        logger.log('error', 'database', 'remove form from hierarchy failed', e)
+        flash(_('error transaction'), 'error')
+    return redirect(url_for('hierarchy_update', id_=id_))
 
 
 @app.route('/hierarchy/delete/<int:id_>', methods=['POST', 'GET'])

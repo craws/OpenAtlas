@@ -5,13 +5,6 @@
     > {{ _('edit') }}
 {% endblock %}
 {% block content %}
+    {{ table|pager|safe }}
     {{ form|display_form|safe }}
-    <script>
-        $.each({{ forms|safe }}, function () {
-            used_nodes = {{ already_used_nodes|tojson }};
-            if (used_nodes.includes(String(this))) {
-                $('#' + this).attr('disabled', true);
-            }
-        });
-    </script>
 {% endblock %}

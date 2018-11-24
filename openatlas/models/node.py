@@ -146,11 +146,15 @@ class NodeMapper(EntityMapper):
         return nodes
 
     @staticmethod
-    def get_form_choices():
+    def get_form_choices(root=None):
         sql = "SELECT f.id, f.name FROM web.form f WHERE f.extendable = True ORDER BY name ASC;"
         g.cursor.execute(sql)
         debug_model['div sql'] += 1
-        return [(row.id, row.name) for row in g.cursor.fetchall()]
+        forms = []
+        for row in g.cursor.fetchall():
+            if not root or row.id not in root.forms:
+                forms.append((row.id, row.name))
+        return forms
 
     @staticmethod
     def save_entity_nodes(entity, form):
@@ -267,7 +271,7 @@ class NodeMapper(EntityMapper):
         return subs
 
     @staticmethod
-    def get_links_by_nodes_and_form(root_node, form_id):
+    def get_form_count(root_node, form_id):
         # Check if nodes are already linked to entities before offering to remove a node from form
         node_ids = NodeMapper.get_all_sub_ids(root_node, [])
         if not node_ids:  # There are no sub nodes so skipping test
@@ -298,3 +302,10 @@ class NodeMapper(EntityMapper):
             'params': system_type if system_type else tuple(class_code)})
         debug_model['div sql'] += 1
         return g.cursor.fetchone()[0]
+
+    @staticmethod
+    def remove_form_from_hierarchy(root_node, form_id):
+        sql = """
+            DELETE FROM web.hierarchy_form
+            WHERE hierarchy_id = %(hierarchy_id)s AND form_id = %(form_id)s;"""
+        g.cursor.execute(sql, {'hierarchy_id': root_node.id, 'form_id': form_id})
