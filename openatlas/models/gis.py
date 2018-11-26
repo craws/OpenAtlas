@@ -17,7 +17,7 @@ class GisMapper:
         # Workaround to include GIS features of a subunit which would be otherwise omitted
         subunit_selected_id = 0
         if objects:
-            if not isinstance(objects, list):
+            if type(objects) is not list:
                 if objects.system_type in ['feature', 'finds', 'stratigraphic unit']:
                     subunit_selected_id = objects.id
                 objects = [objects]

@@ -1,20 +1,20 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import glob
 import os
+import re
 import smtplib
 from collections import OrderedDict
+from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
+from functools import wraps
 from html.parser import HTMLParser
 
 import numpy
-import re
 from babel import dates
-from datetime import datetime
 from flask import abort, flash, g, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
-from functools import wraps
 from numpy import math
 from werkzeug.utils import redirect
 
@@ -36,14 +36,13 @@ def convert_size(size_bytes):
 
 
 def get_file_path(entity):
-    entity_id = entity if isinstance(entity, int) else entity.id
+    entity_id = entity if type(entity) is int else entity.id
     path = glob.glob(os.path.join(app.config['UPLOAD_FOLDER_PATH'], str(entity_id) + '.*'))
     return path[0] if path else None
 
 
 def print_file_size(entity):
-    entity_id = entity if isinstance(entity, int) else entity.id
-    path = get_file_path(entity_id)
+    path = get_file_path(entity if type(entity) is int else entity.id)
     return convert_size(os.path.getsize(path)) if path else 'N/A'
 
 
@@ -54,15 +53,14 @@ def display_tooltip(text):
 
 
 def print_file_extension(entity):
-    entity_id = entity if isinstance(entity, int) else entity.id
-    path = get_file_path(entity_id)
+    path = get_file_path(entity if type(entity) is int else entity.id)
     return os.path.splitext(path)[1] if path else 'N/A'
 
 
 def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
     """ Send one mail to every recipient, set log_body to False for sensitive data e.g. passwords"""
     settings = session['settings']
-    recipients = recipients if isinstance(recipients, list) else [recipients]
+    recipients = recipients if type(recipients) is list else [recipients]
     if not settings['mail'] or len(recipients) < 1:
         return
     mail_user = settings['mail_transport_username']
@@ -393,7 +391,7 @@ def format_datetime(value, format_='medium'):
 def format_date(value, format_='medium'):
     if not value:
         return ''
-    if isinstance(value, numpy.datetime64):
+    if type(value) is numpy.datetime64:
         return DateMapper.datetime64_to_timestamp(value)
     return dates.format_date(value, format=format_, locale=session['language'])
 
@@ -403,20 +401,20 @@ def link(entity):
     if not entity:
         return ''
     html = ''
-    if isinstance(entity, Project):
+    if type(entity) is Project:
         url = url_for('import_project_view', id_=entity.id)
         html = '<a href="' + url + '">' + entity.name + '</a>'
-    elif isinstance(entity, User):
+    elif type(entity) is User:
         style = '' if entity.active else 'class="inactive"'
         url = url_for('user_view', id_=entity.id)
         html = '<a ' + style + ' href="' + url + '">' + entity.username + '</a>'
-    elif isinstance(entity, ClassObject):
+    elif type(entity) is ClassObject:
         url = url_for('class_view', code=entity.code)
         html = '<a href="' + url + '">' + entity.code + '</a>'
-    elif isinstance(entity, Property):
+    elif type(entity) is Property:
         url = url_for('property_view', code=entity.code)
         html = '<a href="' + url + '">' + entity.code + '</a>'
-    elif isinstance(entity, Entity):
+    elif type(entity) is Entity:
         url = ''
         if entity.class_.code == 'E33':
             if entity.system_type == 'source content':

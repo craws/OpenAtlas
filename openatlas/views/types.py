@@ -165,7 +165,7 @@ def node_move_entities(id_):
 
 def walk_tree(param):
     text = ''
-    for id_ in param if isinstance(param, list) else [param]:
+    for id_ in param if type(param) is list else [param]:
         item = g.nodes[id_]
         count_subs = ' (' + format_number(item.count_subs) + ')' if item.count_subs else ''
         text += "{href: '" + url_for('node_view', id_=item.id) + "',"

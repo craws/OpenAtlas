@@ -118,7 +118,7 @@ class NodeMapper(EntityMapper):
     @staticmethod
     def walk_tree(param, selected_ids):
         string = ''
-        for id_ in param if isinstance(param, list) else [param]:
+        for id_ in param if type(param) is list else [param]:
             item = g.nodes[id_]
             selected = ",'state' : {'selected' : true}" if item.id in selected_ids else ''
             name = item.name.replace("'", "&apos;")
@@ -162,10 +162,10 @@ class NodeMapper(EntityMapper):
         if hasattr(entity, 'nodes'):
             entity.delete_links(['P2', 'P89'])
         for field in form:
-            if isinstance(field, ValueFloatField) and entity.class_.code != 'E53':
+            if type(field) is ValueFloatField and entity.class_.code != 'E53':
                 if field.data is not None:  # Allow to save 0 but not empty
                     entity.link('P2', g.nodes[int(field.name)], field.data)
-            elif isinstance(field, (TreeField, TreeMultiField)) and field.data:
+            elif type(field) in (TreeField, TreeMultiField) and field.data:
                 root = g.nodes[int(field.id)]
                 try:
                     range_ = [g.nodes[int(field.data)]]
@@ -181,7 +181,7 @@ class NodeMapper(EntityMapper):
     def save_link_nodes(link_id, form):
         from openatlas.forms.forms import TreeField
         for field in form:
-            if isinstance(field, TreeField) and field.data:
+            if type(field) is TreeField and field.data:
                 LinkPropertyMapper.insert(link_id, 'P2', int(field.data))
 
     @staticmethod

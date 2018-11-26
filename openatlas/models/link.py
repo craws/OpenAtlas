@@ -41,7 +41,7 @@ class LinkMapper:
             return
         # Domain can be an entity or entity id, range_ can also be a list of entities or entity ids
         property_ = g.properties[property_code]
-        range_ = range_ if isinstance(range_, list) else [range_]
+        range_ = range_ if type(range_) is list else [range_]
         result = None
         for range_ in range_:
             domain_error = True
@@ -92,8 +92,8 @@ class LinkMapper:
                 SELECT domain_id AS result_id FROM model.link
                 WHERE range_id = %(entity_id)s AND property_code IN %(codes)s;"""
         g.cursor.execute(sql, {
-            'entity_id': entity if isinstance(entity, int) else entity.id,
-            'codes': tuple(codes if isinstance(codes, list) else [codes])})
+            'entity_id': entity if type(entity) is int else entity.id,
+            'codes': tuple(codes if type(codes) is list else [codes])})
         debug_model['link sql'] += 1
         ids = [element for (element,) in g.cursor.fetchall()]
         return EntityMapper.get_by_ids(ids)
@@ -120,8 +120,8 @@ class LinkMapper:
             WHERE l.{first}_id = %(entity_id)s GROUP BY l.id, e.name ORDER BY e.name;""".format(
             first='range' if inverse else 'domain', second='domain' if inverse else 'range')
         g.cursor.execute(sql, {
-            'entity_id': entity if isinstance(entity, int) else entity.id,
-            'codes': tuple(codes if isinstance(codes, list) else [codes])})
+            'entity_id': entity if type(entity) is int else entity.id,
+            'codes': tuple(codes if type(codes) is list else [codes])})
         debug_model['link sql'] += 1
         entity_ids = set()
         result = g.cursor.fetchall()
@@ -136,7 +136,7 @@ class LinkMapper:
 
     @staticmethod
     def delete_by_codes(entity, codes):
-        codes = codes if isinstance(codes, list) else [codes]
+        codes = codes if type(codes) is list else [codes]
         sql = "DELETE FROM model.link WHERE domain_id = %(id)s AND property_code IN %(codes)s;"
         g.cursor.execute(sql, {'id': entity.id, 'codes': tuple(codes)})
         debug_model['link sql'] += 1

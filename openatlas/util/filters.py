@@ -5,14 +5,14 @@ import re
 import flask
 import jinja2
 from flask import g, render_template_string, request, url_for
-from flask_babel import lazy_gettext as _, format_number as babel_format_number
+from flask_babel import format_number as babel_format_number, lazy_gettext as _
 from flask_login import current_user
 from jinja2 import escape, evalcontextfilter
 from wtforms import IntegerField
 from wtforms.validators import Email
 
 from openatlas import app
-from openatlas.forms.forms import ValueFloatField, TreeField
+from openatlas.forms.forms import TreeField, ValueFloatField
 from openatlas.models.content import ContentMapper
 from openatlas.util import util
 from openatlas.util.util import display_tooltip, print_file_extension
@@ -79,7 +79,7 @@ def bookmark_toggle(self, entity_id):
 def display_move_form(self, form, root_name):
     html = ''
     for field in form:
-        if isinstance(field, TreeField):
+        if type(field) is TreeField:
             html += '<p>' + root_name + ' ' + str(field) + '</p>'
     html += '<p><a class="button" id="select-all">' + util.uc_first(_('select all')) + '</a>'
     html += '<a class="button" id="select-none">' + util.uc_first(_('deselect all')) + '</a></p>'
@@ -209,13 +209,12 @@ def display_form(self, form, form_id=None, for_persons=False):
         return html_
 
     for field in form:
-        if isinstance(field, ValueFloatField):
+        if type(field) is ValueFloatField:
             continue
         class_ = 'required' if field.flags.required else ''
-        class_ += ' integer' if isinstance(field, IntegerField) else ''
+        class_ += ' integer' if type(field) is IntegerField else ''
         for validator in field.validators:
-            if isinstance(validator, Email):
-                class_ += ' email'
+            class_ += ' email' if type(validator) is Email else ''
         errors = ''
         for error in field.errors:
             errors += util.uc_first(error)
