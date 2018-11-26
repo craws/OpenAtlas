@@ -505,7 +505,6 @@ def pager(table):
             html += '<td' + style + '>' + entry + '</td>'
         html += '</tr>'
     html += '</tbody></table><script>'
-    sort = '' if 'sort' not in table else table['sort'] + ','
     if show_pager:
         html += """
             $("#{id}-table").tablesorter({{
@@ -526,10 +525,10 @@ def pager(table):
                 size:{size}}});
         """.format(
             id=table['id'],
-            sort=sort,
             size=table_rows,
-            filter_liveSearch=app.config['MIN_CHARS_TABLESORTER_SEARCH'],
-            headers=(table['headers'] + ',') if 'headers' in table else '')
+            sort=table['sort'] + ',' if 'sort' in table else '',
+            headers=table['headers'] + ',' if 'headers' in table else '',
+            filter_liveSearch=app.config['MIN_CHARS_TABLESORTER_SEARCH'])
     else:
         html += """
             $("#{id}-table").tablesorter({{
@@ -541,7 +540,9 @@ def pager(table):
                     filter_columnFilters: false
                 }}}});
         """.format(
-            id=table['id'], sort=sort, filter_liveSearch=app.config['MIN_CHARS_JSTREE_SEARCH'])
+            id=table['id'],
+            sort=table['sort'] + ',' if 'sort' in table else '',
+            filter_liveSearch=app.config['MIN_CHARS_JSTREE_SEARCH'])
     html += '</script>'
     return html
 

@@ -6,11 +6,11 @@ from flask import flash, render_template, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import BooleanField, SubmitField, SelectField
+from wtforms import BooleanField, SelectField, SubmitField
 
 from openatlas import app, logger
 from openatlas.models.export import Export
-from openatlas.util.util import (convert_size, is_authorized, required_group, uc_first)
+from openatlas.util.util import convert_size, is_authorized, required_group, uc_first
 
 
 class ExportSqlForm(Form):

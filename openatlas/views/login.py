@@ -115,7 +115,7 @@ def reset_password():
 
 
 @app.route('/reset_confirm/<code>')
-def reset_confirm(code):   # pragma: no cover
+def reset_confirm(code):  # pragma: no cover
     user = UserMapper.get_by_reset_code(code)
     if not user:
         logger.log('info', 'auth', 'unknown reset code')

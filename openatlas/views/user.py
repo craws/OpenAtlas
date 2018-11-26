@@ -201,7 +201,7 @@ def get_groups():
 def user_delete(id_):
     user = UserMapper.get_by_id(id_)
     if (user.group == 'admin' and current_user.group != 'admin') and user.id != current_user.id:
-        abort(403)   # pragma: no cover
+        abort(403)  # pragma: no cover
     UserMapper.delete(id_)
     flash(_('user deleted'), 'info')
     return redirect(url_for('user_index'))
