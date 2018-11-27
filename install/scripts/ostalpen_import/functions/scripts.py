@@ -83,9 +83,11 @@ def import_files(cursor_dpp):
         sql = "SELECT id FROM model.entity WHERE LOWER(name) = LOWER(%(name)s) AND class_code = 'E31';"
         cursor_dpp.execute(sql, {'name': name})
         if cursor_dpp.rowcount < 1:
-            print('No entity found for file: ' + name)
+            pass
+            # print('No entity found for file: ' + name)
         elif cursor_dpp.rowcount > 1:
-            print('Multiple entites found for file: ' + name)
+            pass
+            # print('Multiple entites found for file: ' + name)
         else:
             new_file_name = str(cursor_dpp.fetchone().id) + ext.lower()
             copyfile(import_path + '/' + file, upload_path + '/' + new_file_name)

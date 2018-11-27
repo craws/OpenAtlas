@@ -25,14 +25,8 @@ From cPanel: Datenbanken > PostgreSQL backups > latest openatla_main_db.sql.gz
 
     pgdump openatlas_dpp > ~/Desktop/dpp.sql
 
-make upgrades
-
-    git pull github dev
-
 upload and install db
 
 upload images
 
 make Stefan manager
-
-change settings (mail!) and content text

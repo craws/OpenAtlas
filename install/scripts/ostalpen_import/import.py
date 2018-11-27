@@ -11,7 +11,7 @@ from functions.scripts import (connect, prepare_databases, reset_database, datet
 
 sys.path.append(os.path.dirname(os.path.realpath(__file__)))
 
-do_import_files = False
+do_import_files = True
 do_link_subunits_types = True
 
 dict_units = {24: 'Millimeter', 22: 'Meter', 23: 'Centimeter'}
@@ -67,7 +67,7 @@ def insert_import_ids():
     sql = """
         INSERT INTO import.entity (project_id, origin_id, entity_id, user_id)
         SELECT %(project_id)s, ostalpen_id, id, %(user_id)s FROM model.entity
-        WHERE ostalpen_id IS NOT NULL AND name NOT IN ('Salzburg', 'Stainach');"""
+        WHERE ostalpen_id IS NOT NULL AND name NOT IN ('Salzburg', 'Stainach') AND class_code != 'E53';"""
     cursor_dpp.execute(sql, {'project_id': ostalpen_project_id, 'user_id': ostalpen_user_id})
 
 
@@ -471,7 +471,6 @@ for e in places:
     object_id = insert_entity(e, with_case_study=True)
     new_entities[e.ostalpen_id] = e
     p = copy.copy(e)
-    p.ostalpen_id = None
     p.system_type = 'place location'
     p.class_code = 'E53'
     p.name = 'Location of ' + e.name
@@ -533,7 +532,6 @@ for e in features:
     p = copy.copy(e)
     p.system_type = 'place location'
     p.class_code = 'E53'
-    p.ostalpen_id = None
     p.name = 'Location of ' + p.name
     location_id = insert_entity(p)
     link('P53', object_id, location_id)
@@ -590,7 +588,6 @@ for e in strati:
     object_id = insert_entity(e, with_case_study=True)
     new_entities[e.ostalpen_id] = e
     p = copy.copy(e)
-    p.ostalpen_id = None
     p.system_type = 'place location'
     p.class_code = 'E53'
     p.name = 'Location of ' + e.name
@@ -649,7 +646,6 @@ for e in finds:
     object_id = insert_entity(e, with_case_study=True)
     new_entities[e.ostalpen_id] = e
     p = copy.copy(e)
-    p.ostalpen_id = None
     p.system_type = 'place location'
     p.class_code = 'E53'
     p.name = 'Location of ' + e.name
@@ -789,7 +785,7 @@ for row in cursor_ostalpen.fetchall():
         try:
             id_to = row.links_entity_uid_to
             cursor_dpp.execute(sql, {'domain_id': row.links_entity_uid_from, 'range_id': id_to})
-        except:
+        except Exception as e:
             pass
     elif row.links_cidoc_number_direction in [2, 5, 7, 9, 13, 17, 19, 25]:
         pass  # Ignore obsolete links
@@ -831,7 +827,6 @@ if do_link_subunits_types:
             # missing_ostalpen_place_types2.add(row.uid)
             continue
         link('P2', new_entities[row.uid].id, types[row.entity_name_uri])
-
 
 # Fix wrong place links
 sql = """
