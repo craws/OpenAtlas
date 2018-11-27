@@ -1,4 +1,5 @@
 {% extends 'layout.html' %}
+{% block title_name %}- {{ reference.name }}{% endblock %}
 {% block breadcrumb %}
     <a href="{{ url_for('reference_index') }}">{{ _('reference')|uc_first }}</a>
     > {{ reference|link|safe }}

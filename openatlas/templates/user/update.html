@@ -1,4 +1,5 @@
 {% extends 'layout.html' %}
+{% block title_name %}- {{ user.username }}{% endblock %}
 {% block breadcrumb %}
     <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
     > <a href="{{ url_for('user_index') }}">{{ _('user')|uc_first }}</a>

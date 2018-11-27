@@ -57,9 +57,7 @@ class ContentTests(TestBaseCase):
                 'map_cluster_enabled': True, 'map_cluster_max_radius': 2,
                 'map_cluster_disable_at_zoom': 5})
             assert b'Changes have been saved.' in rv.data
-            data = {}
-            for name in SettingsMapper.fields:
-                data[name] = ''
+            data = {name: '' for name in SettingsMapper.fields}
             data['default_language'] = 'en'
             data['default_table_rows'] = '10'
             data['failed_login_forget_minutes'] = '10'

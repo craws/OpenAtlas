@@ -74,7 +74,7 @@ def before_request():
     from openatlas.models.property import PropertyMapper
     from openatlas.models.settings import SettingsMapper
     if request.path.startswith('/static'):  # pragma: no cover
-        return  # only needed if not running with apache and static alias
+        return  # Only needed if not running with apache and static alias
     debug_model['current'] = time.time()
     g.db = connect()
     g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
@@ -87,8 +87,7 @@ def before_request():
     app.config['MAX_CONTENT_LENGTH'] = session['settings']['file_upload_max_size'] * 1024 * 1024
     debug_model['by codes'] = 0
     debug_model['by id'] = 0
-    debug_model['by ids'] = 0
-    debug_model['linked'] = 0
+    debug_model['link sql'] = 0
     debug_model['user'] = 0
     debug_model['model'] = time.time() - debug_model['current']
     debug_model['current'] = time.time()

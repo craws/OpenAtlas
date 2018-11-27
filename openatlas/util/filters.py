@@ -364,7 +364,7 @@ def display_debug_info(self, debug_model, form):
     for name, value in debug_model.items():
         if name in ['current']:
             continue  # Don't display current time counter
-        if name not in ['by codes', 'by id', 'by ids', 'linked', 'user', 'div sql']:
+        if name not in ['by codes', 'by id', 'link sql', 'user', 'div sql']:
             value = '{:10.2f}'.format(value)
         html += """
             <div>
