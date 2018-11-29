@@ -5,6 +5,10 @@ from collections import OrderedDict
 class Changelog:
     """ An OrderedDict with changelog data"""
     versions = OrderedDict()
+    versions['3.12.0'] = {
+        'date': 'TBA',
+        'data': OrderedDict(
+            feature=OrderedDict([]))}
     versions['3.11.0'] = {
         'date': '2018-11-24',
         'data': OrderedDict(
