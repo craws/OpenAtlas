@@ -109,27 +109,19 @@ def event_update(id_):
 
 
 @app.route('/event/view/<int:id_>')
-@app.route('/event/view/<int:id_>/<int:unlink_id>')
 @required_group('readonly')
-def event_view(id_, unlink_id=None):
+def event_view(id_):
     event = EntityMapper.get_by_id(id_)
-    if unlink_id:
-        LinkMapper.delete_by_id(unlink_id)
-        flash(_('link removed'), 'info')
     event.set_dates()
     tables = {
         'info': get_entity_data(event),
         'file': {'id': 'files', 'data': [], 'header': app.config['TABLE_HEADERS']['file']},
         'subs': {'id': 'sub-event', 'data': [], 'header': app.config['TABLE_HEADERS']['event']},
-        'actor': {
-            'id': 'actor', 'data': [],
-            'header': ['actor', 'class', 'involvement', 'first', 'last', 'description']},
-        'source': {
-            'id': 'source', 'data': [],
-            'header': app.config['TABLE_HEADERS']['source'] + ['description']},
-        'reference': {
-            'id': 'reference', 'data': [],
-            'header': app.config['TABLE_HEADERS']['reference'] + ['pages']}}
+        'source': {'id': 'source', 'data': [], 'header': app.config['TABLE_HEADERS']['source']},
+        'actor': {'id': 'actor', 'data': [],
+                  'header': ['actor', 'class', 'involvement', 'first', 'last', 'description']},
+        'reference': {'id': 'reference', 'data': [],
+                      'header': app.config['TABLE_HEADERS']['reference'] + ['pages']}}
     for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
         first = link_.first
         if not link_.first and event.first:
@@ -145,8 +137,8 @@ def event_view(id_, unlink_id=None):
             last,
             truncate_string(link_.description)])
         if is_authorized('editor'):
-            unlink_url = url_for('event_view', id_=event.id, unlink_id=link_.id) + '#tab-actor'
             update_url = url_for('involvement_update', id_=link_.id, origin_id=event.id)
+            unlink_url = url_for('link_delete', id_=link_.id, origin_id=event.id) + '#tab-actor'
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             data.append(display_remove_link(unlink_url, link_.range.name))
         tables['actor']['data'].append(data)
@@ -159,7 +151,7 @@ def event_view(id_, unlink_id=None):
                 update_url = url_for('reference_link_update', link_id=link_.id, origin_id=event.id)
                 data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
         if is_authorized('editor'):
-            unlink = url_for('event_view', id_=event.id, unlink_id=link_.id) + '#tab-' + view_name
+            unlink = url_for('link_delete', id_=link_.id, origin_id=event.id) + '#tab-' + view_name
             data.append(display_remove_link(unlink, link_.domain.name))
         tables[view_name]['data'].append(data)
     for sub_event in event.get_linked_entities('P117', True):
@@ -172,7 +164,7 @@ def save(form, event=None, code=None, origin=None):
     try:
         if event:
             log_action = 'update'
-            LinkMapper.delete_by_codes(event, ['P117', 'P7', 'P24'])
+            event.delete_links(['P117', 'P7', 'P24'])
         else:
             log_action = 'insert'
             event = EntityMapper.insert(code, form.name.data)

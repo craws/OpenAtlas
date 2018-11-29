@@ -1,10 +1,10 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import locale
 import sys
-import time
 from collections import OrderedDict
 
 import psycopg2.extras
+import time
 from flask import Flask, g, request, session
 from flask_babel import Babel, lazy_gettext as _
 from flask_wtf import Form
@@ -38,8 +38,8 @@ logger = DBHandler()
 
 from openatlas.util import filters
 from openatlas.views import (actor, admin, ajax, content, event, export, hierarchy, index,
-                             involvement, imports, login, types, model, place, profile, reference,
-                             source, translation, user, relation, member, search, file)
+                             involvement, imports, link, login, types, model, place, profile,
+                             reference, source, translation, user, relation, member, search, file)
 
 
 @babel.localeselector

@@ -73,7 +73,7 @@ class LinkMapper:
     @staticmethod
     def get_linked_entity(entity_param, code, inverse=False):
         result = LinkMapper.get_linked_entities(entity_param, code, inverse)
-        if len(result) > 1:  # pragma: no cover
+        if len(result) > 1:
             message = 'multiple linked entities found for ' + code
             logger.log('error', 'model', message)
             flash(_('error multiple linked entities found'), 'error')
@@ -137,7 +137,9 @@ class LinkMapper:
     @staticmethod
     def delete_by_codes(entity, codes):
         codes = codes if type(codes) is list else [codes]
-        sql = "DELETE FROM model.link WHERE domain_id = %(id)s AND property_code IN %(codes)s;"
+        sql = """
+            DELETE FROM model.link
+            WHERE property_code IN %(codes)s AND (domain_id = %(id)s OR range_id = %(id)s);"""
         g.cursor.execute(sql, {'id': entity.id, 'codes': tuple(codes)})
         debug_model['link sql'] += 1
 

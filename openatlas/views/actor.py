@@ -9,7 +9,6 @@ from openatlas import app, logger
 from openatlas.forms.forms import DateForm, TableField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
-from openatlas.models.link import LinkMapper
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  get_view_name, is_authorized, link, required_group,
                                  truncate_string, uc_first, was_modified)
@@ -29,13 +28,9 @@ class ActorForm(DateForm):
 
 
 @app.route('/actor/view/<int:id_>')
-@app.route('/actor/view/<int:id_>/<int:unlink_id>')
 @required_group('readonly')
-def actor_view(id_, unlink_id=None):
+def actor_view(id_):
     actor = EntityMapper.get_by_id(id_)
-    if unlink_id:
-        LinkMapper.delete_by_id(unlink_id)
-        flash(_('link removed'), 'info')
     actor.set_dates()
     objects = []
     info = get_entity_data(actor)
@@ -79,7 +74,7 @@ def actor_view(id_, unlink_id=None):
                 update_url = url_for('reference_link_update', link_id=link_.id, origin_id=actor.id)
                 data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
         if is_authorized('editor'):
-            unlink = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab-' + view_name
+            unlink = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-' + view_name
             data.append(display_remove_link(unlink, link_.domain.name))
         tables[view_name]['data'].append(data)
     for link_ in actor.get_links(['P11', 'P14', 'P22', 'P23'], True):
@@ -103,9 +98,9 @@ def actor_view(id_, unlink_id=None):
             truncate_string(link_.description)])
         if is_authorized('editor'):
             update_url = url_for('involvement_update', id_=link_.id, origin_id=actor.id)
-            unlink_url = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab-event'
+            unlink_url = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-event'
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
-            data.append(display_remove_link(unlink_url, link_.range.name))
+            data.append(display_remove_link(unlink_url, link_.domain.name))
         tables['event']['data'].append(data)
     for link_ in actor.get_links('OA7') + actor.get_links('OA7', True):
         if actor.id == link_.domain.id:
@@ -122,7 +117,8 @@ def actor_view(id_, unlink_id=None):
             truncate_string(link_.description)])
         if is_authorized('editor'):
             update_url = url_for('relation_update', id_=link_.id, origin_id=actor.id)
-            unlink_url = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab-relation'
+            unlink_url = \
+                url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-relation'
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             data.append(display_remove_link(unlink_url, related.name))
         tables['relation']['data'].append(data)
@@ -135,7 +131,7 @@ def actor_view(id_, unlink_id=None):
             truncate_string(link_.description)])
         if is_authorized('editor'):
             update_url = url_for('member_update', id_=link_.id, origin_id=actor.id)
-            unlink_url = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab-member-of'
+            unlink_url = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-member-of'
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             data.append(display_remove_link(unlink_url, link_.domain.name))
         tables['member_of']['data'].append(data)
@@ -152,7 +148,8 @@ def actor_view(id_, unlink_id=None):
                 truncate_string(link_.description)])
             if is_authorized('editor'):
                 update_url = url_for('member_update', id_=link_.id, origin_id=actor.id)
-                unlink_url = url_for('actor_view', id_=actor.id, unlink_id=link_.id) + '#tab-member'
+                unlink_url = url_for(
+                    'link_delete', id_=link_.id, origin_id_=actor.id, ) + '#tab-member'
                 data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
                 data.append(display_remove_link(unlink_url, link_.range.name))
             tables['member']['data'].append(data)
@@ -237,7 +234,7 @@ def save(form, actor=None, code=None, origin=None):
     try:
         log_action = 'update'
         if actor:
-            LinkMapper.delete_by_codes(actor, ['P74', 'OA8', 'OA9'])
+            actor.delete_links(['P74', 'OA8', 'OA9'])
             for alias in actor.get_linked_entities('P131'):
                 alias.delete()
         else:
