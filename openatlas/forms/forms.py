@@ -326,7 +326,7 @@ class TableMultiSelect(HiddenInput):
                 change_label=uc_first(_('change')),
                 title=_(field.id.replace('_', ' ')),
                 selection=selection,
-                pager=pager(table))
+                pager=pager(table, remove_rows=False))
         return super(TableMultiSelect, self).__call__(field, **kwargs) + html
 
 

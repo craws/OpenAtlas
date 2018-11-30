@@ -42,7 +42,8 @@ def get_file_path(entity):
 
 
 def print_file_size(entity):
-    path = get_file_path(entity if type(entity) is int else entity.id)
+    entity_id = entity if type(entity) is int else entity.id
+    path = get_file_path(entity_id)
     return convert_size(os.path.getsize(path)) if path else 'N/A'
 
 
@@ -53,7 +54,8 @@ def display_tooltip(text):
 
 
 def print_file_extension(entity):
-    path = get_file_path(entity if type(entity) is int else entity.id)
+    entity_id = entity if type(entity) is int else entity.id
+    path = get_file_path(entity_id)
     return os.path.splitext(path)[1] if path else 'N/A'
 
 
@@ -457,7 +459,7 @@ def truncate_string(string, length=40, span=True):
     return '<span title="' + string.replace('"', '') + '">' + string[:length] + '..' + '</span>'
 
 
-def pager(table):
+def pager(table, remove_rows=True):
     if not table['data']:
         return '<p>' + uc_first(_('no entries')) + '</p>'
     html = ''
@@ -503,6 +505,7 @@ def pager(table):
             html += '<td' + style + '>' + entry + '</td>'
         html += '</tr>'
     html += '</tbody></table><script>'
+    sort = '' if 'sort' not in table else table['sort'] + ','
     if show_pager:
         html += """
             $("#{id}-table").tablesorter({{
@@ -517,16 +520,17 @@ def pager(table):
                 }}}})
             .tablesorterPager({{
                 delayInit: true,
-                removeRows: true,
+                {remove_rows}
                 positionFixed: false,
                 container: $("#{id}-pager"),
                 size:{size}}});
         """.format(
             id=table['id'],
+            sort=sort,
+            remove_rows='removeRows: true,' if remove_rows else '',
             size=table_rows,
-            sort=table['sort'] + ',' if 'sort' in table else '',
-            headers=table['headers'] + ',' if 'headers' in table else '',
-            filter_liveSearch=app.config['MIN_CHARS_TABLESORTER_SEARCH'])
+            filter_liveSearch=app.config['MIN_CHARS_TABLESORTER_SEARCH'],
+            headers=(table['headers'] + ',') if 'headers' in table else '')
     else:
         html += """
             $("#{id}-table").tablesorter({{
@@ -538,9 +542,7 @@ def pager(table):
                     filter_columnFilters: false
                 }}}});
         """.format(
-            id=table['id'],
-            sort=table['sort'] + ',' if 'sort' in table else '',
-            filter_liveSearch=app.config['MIN_CHARS_JSTREE_SEARCH'])
+            id=table['id'], sort=sort, filter_liveSearch=app.config['MIN_CHARS_JSTREE_SEARCH'])
     html += '</script>'
     return html
 
