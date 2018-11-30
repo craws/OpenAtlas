@@ -36,13 +36,14 @@ def convert_size(size_bytes):
 
 
 def get_file_path(entity):
-    entity_id = entity if type(entity) is int else entity.id
+    entity_id = entity if isinstance(entity, int) else entity.id
     path = glob.glob(os.path.join(app.config['UPLOAD_FOLDER_PATH'], str(entity_id) + '.*'))
     return path[0] if path else None
 
 
 def print_file_size(entity):
-    path = get_file_path(entity if type(entity) is int else entity.id)
+    entity_id = entity if isinstance(entity, int) else entity.id
+    path = get_file_path(entity_id)
     return convert_size(os.path.getsize(path)) if path else 'N/A'
 
 
@@ -53,14 +54,15 @@ def display_tooltip(text):
 
 
 def print_file_extension(entity):
-    path = get_file_path(entity if type(entity) is int else entity.id)
+    entity_id = entity if isinstance(entity, int) else entity.id
+    path = get_file_path(entity_id)
     return os.path.splitext(path)[1] if path else 'N/A'
 
 
 def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
     """ Send one mail to every recipient, set log_body to False for sensitive data e.g. passwords"""
     settings = session['settings']
-    recipients = recipients if type(recipients) is list else [recipients]
+    recipients = recipients if isinstance(recipients, list) else [recipients]
     if not settings['mail'] or len(recipients) < 1:
         return
     mail_user = settings['mail_transport_username']
@@ -391,7 +393,7 @@ def format_datetime(value, format_='medium'):
 def format_date(value, format_='medium'):
     if not value:
         return ''
-    if type(value) is numpy.datetime64:
+    if isinstance(value, numpy.datetime64):
         return DateMapper.datetime64_to_timestamp(value)
     return dates.format_date(value, format=format_, locale=session['language'])
 
@@ -401,20 +403,20 @@ def link(entity):
     if not entity:
         return ''
     html = ''
-    if type(entity) is Project:
+    if isinstance(entity, Project):
         url = url_for('import_project_view', id_=entity.id)
         html = '<a href="' + url + '">' + entity.name + '</a>'
-    elif type(entity) is User:
+    elif isinstance(entity, User):
         style = '' if entity.active else 'class="inactive"'
         url = url_for('user_view', id_=entity.id)
         html = '<a ' + style + ' href="' + url + '">' + entity.username + '</a>'
-    elif type(entity) is ClassObject:
+    elif isinstance(entity, ClassObject):
         url = url_for('class_view', code=entity.code)
         html = '<a href="' + url + '">' + entity.code + '</a>'
-    elif type(entity) is Property:
+    elif isinstance(entity, Property):
         url = url_for('property_view', code=entity.code)
         html = '<a href="' + url + '">' + entity.code + '</a>'
-    elif type(entity) is Entity:
+    elif isinstance(entity, Entity):
         url = ''
         if entity.class_.code == 'E33':
             if entity.system_type == 'source content':
@@ -503,6 +505,7 @@ def pager(table):
             html += '<td' + style + '>' + entry + '</td>'
         html += '</tr>'
     html += '</tbody></table><script>'
+    sort = '' if 'sort' not in table else table['sort'] + ','
     if show_pager:
         html += """
             $("#{id}-table").tablesorter({{
@@ -523,10 +526,10 @@ def pager(table):
                 size:{size}}});
         """.format(
             id=table['id'],
+            sort=sort,
             size=table_rows,
-            sort=table['sort'] + ',' if 'sort' in table else '',
-            headers=table['headers'] + ',' if 'headers' in table else '',
-            filter_liveSearch=app.config['MIN_CHARS_TABLESORTER_SEARCH'])
+            filter_liveSearch=app.config['MIN_CHARS_TABLESORTER_SEARCH'],
+            headers=(table['headers'] + ',') if 'headers' in table else '')
     else:
         html += """
             $("#{id}-table").tablesorter({{
@@ -538,9 +541,7 @@ def pager(table):
                     filter_columnFilters: false
                 }}}});
         """.format(
-            id=table['id'],
-            sort=table['sort'] + ',' if 'sort' in table else '',
-            filter_liveSearch=app.config['MIN_CHARS_JSTREE_SEARCH'])
+            id=table['id'], sort=sort, filter_liveSearch=app.config['MIN_CHARS_JSTREE_SEARCH'])
     html += '</script>'
     return html
 
