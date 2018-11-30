@@ -459,7 +459,8 @@ def truncate_string(string, length=40, span=True):
     return '<span title="' + string.replace('"', '') + '">' + string[:length] + '..' + '</span>'
 
 
-def pager(table):
+def pager(table, remove_rows=True):
+    # The remove_rows option is for performance but don't use it in forms with checkboxes
     if not table['data']:
         return '<p>' + uc_first(_('no entries')) + '</p>'
     html = ''
@@ -519,8 +520,8 @@ def pager(table):
                     filter_columnFilters: false
                 }}}})
             .tablesorterPager({{
+                {remove_rows}
                 delayInit: true,
-                removeRows: true,
                 positionFixed: false,
                 container: $("#{id}-pager"),
                 size:{size}}});
@@ -528,6 +529,7 @@ def pager(table):
             id=table['id'],
             sort=sort,
             size=table_rows,
+            remove_rows='removeRows: true,' if remove_rows else '',
             filter_liveSearch=app.config['MIN_CHARS_TABLESORTER_SEARCH'],
             headers=(table['headers'] + ',') if 'headers' in table else '')
     else:
