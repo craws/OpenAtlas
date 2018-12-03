@@ -96,8 +96,8 @@ class ActorTests(TestBaseCase):
             rv = self.app.post(
                 url_for('ajax_bookmark'), data={'entity_id': actor_id}, follow_redirects=True)
             assert b'Bookmark' in rv.data
-            rv = self.app.get(
-                url_for('actor_view', id_=actor_id, unlink_id=666), follow_redirects=True)
+            rv = self.app.get(url_for('link_delete', origin_id=actor_id, id_=666),
+                              follow_redirects=True)
             assert b'removed'in rv.data
 
             # Actor delete

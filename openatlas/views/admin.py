@@ -23,22 +23,15 @@ from openatlas.util.util import (convert_size, format_date, format_datetime, get
                                  required_group, send_mail, truncate_string, uc_first)
 
 
-
-
 class GeneralForm(Form):
     site_name = StringField(uc_first(_('site name')))
     site_header = StringField(uc_first(_('site header')))
-    default_language = SelectField(uc_first(
-        _('default language')),
-        choices=app.config['LANGUAGES'].items())
-    default_table_rows = SelectField(
-        uc_first(_('default table rows')),
-        choices=app.config['DEFAULT_TABLE_ROWS'].items(),
-        coerce=int)
-    log_level = SelectField(
-        uc_first(_('log level')),
-        choices=app.config['LOG_LEVELS'].items(),
-        coerce=int)
+    default_language = SelectField(uc_first(_('default language')),
+                                   choices=app.config['LANGUAGES'].items())
+    default_table_rows = SelectField(uc_first(_('default table rows')), coerce=int,
+                                     choices=app.config['DEFAULT_TABLE_ROWS'].items())
+    log_level = SelectField(uc_first(_('log level')), coerce=int,
+                            choices=app.config['LOG_LEVELS'].items())
     debug_mode = BooleanField(uc_first(_('debug mode')))
     random_password_length = IntegerField(uc_first(_('random password length')))
     minimum_password_length = IntegerField(uc_first(_('minimum password length')))
@@ -127,14 +120,17 @@ def admin_file():
     return render_template('admin/file.html', form=form)
 
 
-@app.route('/admin/orphans')
-@app.route('/admin/orphans/<delete>')
+@app.route('/admin/orphans/delete/<parameter>')
 @required_group('admin')
-def admin_orphans(delete=None):
-    if delete:
-        count = EntityMapper.delete_orphans(delete)
-        flash(_('info orphans deleted:') + ' ' + str(count), 'info')
-        return redirect(url_for('admin_orphans'))
+def admin_orphans_delete(parameter):
+    count = EntityMapper.delete_orphans(parameter)
+    flash(_('info orphans deleted:') + ' ' + str(count), 'info')
+    return redirect(url_for('admin_orphans'))
+
+
+@app.route('/admin/orphans')
+@required_group('admin')
+def admin_orphans():
     header = ['name', 'class', 'type', 'system type', 'created', 'updated', 'description']
     tables = {
         'orphans': {'id': 'orphans', 'header': header, 'data': []},
@@ -156,8 +152,8 @@ def admin_orphans(delete=None):
     for node in NodeMapper.get_orphans():
         tables['nodes']['data'].append([link(node), link(g.nodes[node.root[-1]])])
 
-    file_ids = []
     # Get orphaned file entities (no corresponding file)
+    file_ids = []
     for entity in EntityMapper.get_by_system_type('file'):
         file_ids.append(str(entity.id))
         if not get_file_path(entity):
@@ -227,6 +223,7 @@ def admin_file_delete(filename):  # pragma: no cover
 
     # Get all files with entities
     file_ids = [str(entity.id) for entity in EntityMapper.get_by_system_type('file')]
+
     # Get orphaned files (no corresponding entity)
     path = app.config['UPLOAD_FOLDER_PATH']
     for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
@@ -252,9 +249,8 @@ class LogForm(Form):
 def admin_log():
     form = LogForm()
     form.user.choices = [(0, _('all'))] + UserMapper.get_users()
-    table = {
-        'id': 'log', 'header': ['date', 'priority', 'type', 'message', 'user', 'info'],
-        'data': []}
+    table = {'id': 'log', 'data': [],
+             'header': ['date', 'priority', 'type', 'message', 'user', 'info']}
     logs = logger.get_system_logs(form.limit.data, form.priority.data, form.user.data)
     for row in logs:
         user = UserMapper.get_by_id(row.user_id) if row.user_id else None

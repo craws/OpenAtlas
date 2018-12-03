@@ -73,11 +73,10 @@ class LinkMapper:
     @staticmethod
     def get_linked_entity(entity_param, code, inverse=False):
         result = LinkMapper.get_linked_entities(entity_param, code, inverse)
-        if len(result) > 1:
-            message = 'multiple linked entities found for ' + code
-            logger.log('error', 'model', message)
+        if len(result) > 1:  # pragma: no cover
+            logger.log('error', 'model', 'multiple linked entities found for ' + code)
             flash(_('error multiple linked entities found'), 'error')
-            return result[0]  # return first one nevertheless
+            return
         if result:
             return result[0]
 

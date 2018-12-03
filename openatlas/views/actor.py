@@ -53,18 +53,14 @@ def actor_view(id_):
         'info': info,
         'file': {'id': 'files', 'data': [], 'header': app.config['TABLE_HEADERS']['file']},
         'source': {'id': 'source', 'data': [], 'header': app.config['TABLE_HEADERS']['source']},
-        'reference': {
-            'id': 'reference', 'data': [],
-            'header': app.config['TABLE_HEADERS']['reference'] + ['pages']},
-        'event': {
-            'id': 'event', 'data': [],
-            'header': ['event', 'class', 'involvement', 'first', 'last', 'description']},
-        'relation': {
-            'id': 'relation', 'data': [], 'sort': 'sortList:[[0,0]]',
-            'header': ['relation', 'actor', 'first', 'last', 'description']},
-        'member_of': {
-            'id': 'member_of', 'data': [],
-            'header': ['member of', 'function', 'first', 'last', 'description']}}
+        'reference': {'id': 'reference', 'data': [],
+                      'header': app.config['TABLE_HEADERS']['reference'] + ['pages']},
+        'event': {'id': 'event', 'data': [],
+                  'header': ['event', 'class', 'involvement', 'first', 'last', 'description']},
+        'relation': {'id': 'relation', 'data': [], 'sort': 'sortList:[[0,0]]',
+                     'header': ['relation', 'actor', 'first', 'last', 'description']},
+        'member_of': {'id': 'member_of', 'data': [],
+                      'header': ['member of', 'function', 'first', 'last', 'description']}}
     for link_ in actor.get_links('P67', True):
         data = get_base_table_data(link_.domain)
         view_name = get_view_name(link_.domain)
@@ -136,9 +132,8 @@ def actor_view(id_):
             data.append(display_remove_link(unlink_url, link_.domain.name))
         tables['member_of']['data'].append(data)
     if actor.class_.code in app.config['CLASS_CODES']['group']:
-        tables['member'] = {
-            'id': 'member', 'header': ['member', 'function', 'first', 'last', 'description'],
-            'data': []}
+        tables['member'] = {'id': 'member', 'data': [],
+                            'header': ['member', 'function', 'first', 'last', 'description']}
         for link_ in actor.get_links('P107'):
             data = ([
                 link(link_.range),
@@ -148,8 +143,8 @@ def actor_view(id_):
                 truncate_string(link_.description)])
             if is_authorized('editor'):
                 update_url = url_for('member_update', id_=link_.id, origin_id=actor.id)
-                unlink_url = url_for(
-                    'link_delete', id_=link_.id, origin_id_=actor.id, ) + '#tab-member'
+                unlink_url = url_for('link_delete', id_=link_.id, origin_id=actor.id
+                                     ) + '#tab-member'
                 data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
                 data.append(display_remove_link(unlink_url, link_.range.name))
             tables['member']['data'].append(data)
@@ -189,15 +184,12 @@ def actor_insert(code, origin_id=None):
 @app.route('/actor/delete/<int:id_>')
 @required_group('editor')
 def actor_delete(id_):
-    g.cursor.execute('BEGIN')
     try:
         EntityMapper.delete(id_)
         logger.log_user(id_, 'delete')
-        g.cursor.execute('COMMIT')
         flash(_('entity deleted'), 'info')
     except Exception as e:  # pragma: no cover
-        g.cursor.execute('ROLLBACK')
-        logger.log('error', 'database', 'transaction failed', e)
+        logger.log('error', 'database', 'Delete failed', e)
         flash(_('error transaction'), 'error')
     return redirect(url_for('actor_index'))
 

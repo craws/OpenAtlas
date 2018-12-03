@@ -14,15 +14,15 @@ class ContentTests(TestBaseCase):
             self.app.post(url_for('actor_insert', code='E21'), data={'name': 'Oliver Twist'})
             with app.test_request_context():
                 app.preprocess_request()
-                EntityMapper.insert('E61', '2017-04-01')  # add orphaned date
-                EntityMapper.insert('E31', 'One forsaken file entity', 'file')  # add orphaned file
+                EntityMapper.insert('E61', '2017-04-01')  # Add orphaned date
+                EntityMapper.insert('E31', 'One forsaken file entity', 'file')  # Add orphaned file
             rv = self.app.get(url_for('admin_orphans'))
             assert all(x in rv.data for x in [b'Oliver Twist', b'2017-04-01', b'forsaken'])
-            rv = self.app.get(url_for('admin_orphans', delete='orphans'))
+            rv = self.app.get(url_for('admin_orphans_delete', parameter='orphans'))
             assert b'2017-04-01' not in rv.data
-            self.app.get(url_for('admin_orphans', delete='unlinked'))
-            self.app.get(url_for('admin_orphans', delete='types'))
-            self.app.get(url_for('admin_orphans', delete='something completely different'))
+            self.app.get(url_for('admin_orphans_delete', parameter='unlinked'))
+            self.app.get(url_for('admin_orphans_delete', parameter='types'))
+            self.app.get(url_for('admin_orphans_delete', parameter='whatever bogus string'))
             rv = self.app.get(url_for('admin_newsletter'))
             assert b'Newsletter' in rv.data
 

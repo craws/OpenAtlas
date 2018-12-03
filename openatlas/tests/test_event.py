@@ -66,9 +66,6 @@ class EventTest(TestBaseCase):
             rv = self.app.get(url_for('event_index'))
             assert b'Test event' in rv.data
             self.app.get(url_for('event_view', id_=activity_id))
-            rv = self.app.get(
-                url_for('event_view', id_=actor_id, unlink_id=666), follow_redirects=True)
-            assert b'removed' in rv.data
 
             # Update
             rv = self.app.get(url_for('event_update', id_=activity_id))
