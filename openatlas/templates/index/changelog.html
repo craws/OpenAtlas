@@ -9,10 +9,10 @@
             {{ _('version')|uc_first }} {{ version_name }}
         </div>
         <div class="changelog-date">
-            {{ version['date'] }}
+            {{ version[0] }}
         </div>
         <p>
-            {% for issue_type, issues in version['data'].items() %}
+            {% for issue_type, issues in version[1].items() %}
                 {% for issue_number, issue_text in issues.items() %}
                     {% if issue_number %}
                         &#8226 {{ issue_type|uc_first }}
