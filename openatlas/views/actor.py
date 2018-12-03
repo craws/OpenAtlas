@@ -190,7 +190,7 @@ def actor_delete(id_):
         flash(_('entity deleted'), 'info')
     except Exception as e:  # pragma: no cover
         logger.log('error', 'database', 'Delete failed', e)
-        flash(_('error transaction'), 'error')
+        flash(_('error database'), 'error')
     return redirect(url_for('actor_index'))
 
 

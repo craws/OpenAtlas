@@ -1,4 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+import ast
+
 from flask import abort, flash, g
 from flask_babel import lazy_gettext as _
 
@@ -36,14 +38,23 @@ class Link:
 class LinkMapper:
 
     @staticmethod
-    def insert(domain, property_code, range_, description=None):
-        if not domain or not range_:  # pragma: no cover
+    def insert(entity, property_code, linked_entities, description=None, inverse=False):
+        from openatlas.models.entity import Entity, EntityMapper
+        # linked_entities can be an entity, an entity id or a list of them
+        if not entity or not linked_entities:  # pragma: no cover
             return
-        # Domain can be an entity or entity id, range_ can also be a list of entities or entity ids
         property_ = g.properties[property_code]
-        range_ = range_ if type(range_) is list else [range_]
+        try:
+            linked_entities = ast.literal_eval(linked_entities)
+        except (SyntaxError, ValueError):
+            pass
+        linked_entities = linked_entities if type(linked_entities) is list else [linked_entities]
+        if type(linked_entities[0]) is not Entity:
+            linked_entities = EntityMapper.get_by_ids(linked_entities)
         result = None
-        for range_ in range_:
+        for linked_entity in linked_entities:
+            domain = linked_entity if inverse else entity
+            range_ = entity if inverse else linked_entity
             domain_error = True
             range_error = True
             if property_.find_object('domain_class_code', g.classes[domain.class_.code].code):

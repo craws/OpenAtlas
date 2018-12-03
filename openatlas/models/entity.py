@@ -38,8 +38,8 @@ class Entity:
     def get_linked_entities(self, code, inverse=False):
         return LinkMapper.get_linked_entities(self, code, inverse)
 
-    def link(self, code, range_, description=None):
-        return LinkMapper.insert(self, code, range_, description)
+    def link(self, code, range_, description=None, inverse=False):
+        return LinkMapper.insert(self, code, range_, description, inverse)
 
     def get_links(self, code, inverse=False):
         return LinkMapper.get_links(self, code, inverse)
