@@ -1,6 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import abort, flash, g, render_template, url_for
-from flask_babel import lazy_gettext as _, format_number
+from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import (BooleanField, SelectMultipleField, StringField, SubmitField, TextAreaField,
@@ -66,16 +66,15 @@ def hierarchy_update(id_):
         flash(_('info update'), 'info')
         return redirect(url_for('node_index') + '#tab-' + str(root.id))
     form.multiple = root.multiple
-    table = {'id': 'used_forms', 'header': ['form', 'count'], 'show_pager': False,
-             'data': [], 'sort': 'sortList: [[0, 0]]'}
+    table = {'id': 'used_forms', 'show_pager': False, 'data': [], 'sort': 'sortList: [[0, 0]]',
+             'header': ['form', 'count']}
     for form_id, form_ in root.forms.items():
         url = url_for('hierarchy_remove_form', id_=root.id, remove_id=form_id)
         link = '<a href="' + url + '">' + uc_first(_('remove')) + '</a>'
         count = NodeMapper.get_form_count(root, form_id)
         table['data'].append([form_['name'], format_number(count) if count else link])
-    return render_template(
-        'hierarchy/update.html', node=root, form=form, table=table,
-        forms=[form.id for form in form.forms])
+    return render_template('hierarchy/update.html', node=root, form=form, table=table,
+                           forms=[form.id for form in form.forms])
 
 
 @app.route('/hierarchy/remove_form/<int:id_>/<int:remove_id>')
@@ -84,15 +83,12 @@ def hierarchy_remove_form(id_, remove_id):
     root = g.nodes[id_]
     if NodeMapper.get_form_count(root, remove_id):
         abort(403)  # pragma: no cover
-    g.cursor.execute('BEGIN')
     try:
         NodeMapper.remove_form_from_hierarchy(root, remove_id)
-        g.cursor.execute('COMMIT')
         flash(_('info update'), 'info')
     except Exception as e:  # pragma: no cover
-        g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'remove form from hierarchy failed', e)
-        flash(_('error transaction'), 'error')
+        flash(_('error database'), 'error')
     return redirect(url_for('hierarchy_update', id_=id_))
 
 
@@ -102,15 +98,12 @@ def hierarchy_delete(id_):
     node = g.nodes[id_]
     if node.system or node.subs or node.count:
         abort(403)
-    g.cursor.execute('BEGIN')
     try:
         EntityMapper.delete(node.id)
-        g.cursor.execute('COMMIT')
         flash(_('entity deleted'), 'info')
     except Exception as e:  # pragma: no cover
-        g.cursor.execute('ROLLBACK')
-        logger.log('error', 'database', 'transaction failed', e)
-        flash(_('error transaction'), 'error')
+        logger.log('error', 'database', 'Deletion failed', e)
+        flash(_('error database'), 'error')
     return redirect(url_for('node_index'))
 
 

@@ -166,7 +166,7 @@ def file_delete(id_=None):
         EntityMapper.delete(id_)
         logger.log_user(id_, 'delete')
     except Exception as e:  # pragma: no cover
-        logger.log('error', 'database', 'transaction failed', e)
+        logger.log('error', 'database', 'Deletion failed', e)
         flash(_('error database'), 'error')
     try:
         path = get_file_path(id_)

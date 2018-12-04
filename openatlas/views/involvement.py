@@ -103,8 +103,5 @@ def involvement_update(id_, origin_id):
     form.description.data = link_.description
     link_.set_dates()
     form.populate_dates(link_)
-    return render_template(
-        'involvement/update.html',
-        origin=origin,
-        form=form,
-        linked_object=event if origin_id != event.id else actor)
+    return render_template('involvement/update.html', origin=origin, form=form,
+                           linked_object=event if origin_id != event.id else actor)
