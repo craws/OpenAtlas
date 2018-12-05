@@ -1,7 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-import datetime
-
 import bcrypt
+import datetime
 from bcrypt import hashpw
 from flask import abort, flash, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
@@ -74,7 +73,6 @@ def login():
         else:
             logger.log('notice', 'auth', 'Wrong username: ' + request.form['username'])
             flash(_('error username'), 'error')
-        return render_template('login/index.html', form=form)
     return render_template('login/index.html', form=form)
 
 
@@ -86,8 +84,7 @@ def reset_password():
     if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
         user = UserMapper.get_by_email(form.email.data)
         if not user:
-            message = 'Password reset for non existing ' + form.email.data
-            logger.log('info', 'password', message)
+            logger.log('info', 'password', 'Password reset for non existing ' + form.email.data)
             flash(_('error non existing email'), 'error')
         else:
             code = UserMapper.generate_password()
@@ -98,8 +95,8 @@ def reset_password():
             link += url_for('reset_confirm', code=code)
             subject = _('Password reset request for %(site_name)s',
                         site_name=session['settings']['site_name'])
-            body = _(
-                'We received a password reset request for %(username)s', username=user.username)
+            body = _('We received a password reset request for %(username)s',
+                     username=user.username)
             body += ' ' + _('at') + ' '
             body += request.headers['Host'] + '\n\n' + _('reset password link') + ':\n\n'
             body += link + '\n\n' + _('The link is valid for') + ' '

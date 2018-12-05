@@ -66,9 +66,8 @@ class PlaceTest(TestBaseCase):
                 event = EntityMapper.insert('E8', 'Valhalla rising')
                 event.link('P7', location)
                 event.link('P24', location)
-            rv = self.app.get(
-                url_for('place_view', id_=place2_id, unlink_id=place_id), follow_redirects=True)
-            assert b'Link removed' in rv.data and b'Milla Jovovich' in rv.data
+            rv = self.app.get(url_for('place_view', id_=place2_id))
+            assert rv.data and b'Valhalla rising' in rv.data
 
             # Place types
             rv = self.app.get(url_for('node_move_entities', id_=unit_sub1.id))
@@ -114,5 +113,6 @@ class PlaceTest(TestBaseCase):
             rv = self.app.get(url_for('place_delete', id_=place_id), follow_redirects=True)
             assert b'not possible if subunits' in rv.data
             rv = self.app.get(url_for('place_delete', id_=find_id), follow_redirects=True)
-
+            assert b'The entry has been deleted.' in rv.data
+            rv = self.app.get(url_for('place_delete', id_=place2_id), follow_redirects=True)
             assert b'The entry has been deleted.' in rv.data

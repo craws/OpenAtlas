@@ -97,7 +97,6 @@ def member_update(id_, origin_id):
     domain = EntityMapper.get_by_id(link_.domain.id)
     range_ = EntityMapper.get_by_id(link_.range.id)
     origin = range_ if origin_id == range_.id else domain
-    related = range_ if origin_id == domain.id else domain
     form = build_form(MemberForm, 'Member', link_, request)
     del form.actor, form.group, form.insert_and_continue
     if form.validate_on_submit():
@@ -117,4 +116,5 @@ def member_update(id_, origin_id):
     form.save.label.text = _('save')
     link_.set_dates()
     form.populate_dates(link_)
+    related = range_ if origin_id == domain.id else domain
     return render_template('member/update.html', origin=origin, form=form, related=related)
