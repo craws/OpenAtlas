@@ -2,7 +2,6 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
-from openatlas.models.link import LinkMapper
 from openatlas.models.node import NodeMapper
 from openatlas.test_base import TestBaseCase
 
@@ -47,8 +46,8 @@ class PlaceTest(TestBaseCase):
                 app.preprocess_request()
                 places = EntityMapper.get_by_codes('place')
                 place_id = places[0].id
-                place2_id = places[1].id
-                location = LinkMapper.get_linked_entity(place2_id, 'P53')
+                place2 = places[1]
+                location = place2.get_linked_entity('P53')
                 actor = EntityMapper.insert('E21', 'Milla Jovovich')
                 actor.link('P74', location)
             assert b'Tha source' in rv.data
@@ -66,7 +65,7 @@ class PlaceTest(TestBaseCase):
                 event = EntityMapper.insert('E8', 'Valhalla rising')
                 event.link('P7', location)
                 event.link('P24', location)
-            rv = self.app.get(url_for('place_view', id_=place2_id))
+            rv = self.app.get(url_for('place_view', id_=place2.id))
             assert rv.data and b'Valhalla rising' in rv.data
 
             # Place types
@@ -86,18 +85,20 @@ class PlaceTest(TestBaseCase):
             # Subunits
             with app.app_context():
                 self.app.get(url_for('place_insert', origin_id=place_id))
-                name = "It's not a bug, it's a feature!"
-                rv = self.app.post(url_for('place_insert', origin_id=place_id), data={'name': name})
+                rv = self.app.post(url_for('place_insert', origin_id=place_id),
+                                   data={'name': "It's not a bug, it's a feature!"})
                 feat_id = rv.location.split('/')[-1]
                 self.app.get(url_for('place_insert', origin_id=feat_id))
                 self.app.get(url_for('place_update', id_=feat_id))
-                self.app.post(url_for('place_update', id_=feat_id), data={'name': name})
-                name = "I'm a stratigraphic unit"
-                rv = self.app.post(url_for('place_insert', origin_id=feat_id), data={'name': name})
+                self.app.post(url_for('place_update', id_=feat_id),
+                              data={'name': "It's not a bug, it's a feature!"})
+                rv = self.app.post(url_for('place_insert', origin_id=feat_id),
+                                   data={'name':  "I'm a stratigraphic unit"})
                 stratigraphic_id = rv.location.split('/')[-1]
                 self.app.get(url_for('place_insert', origin_id=stratigraphic_id))
                 self.app.get(url_for('place_update', id_=stratigraphic_id))
-                self.app.post(url_for('place_update', id_=stratigraphic_id), data={'name': name})
+                self.app.post(url_for('place_update', id_=stratigraphic_id),
+                              data={'name': "I'm a stratigraphic unit"})
                 dimension_node_id = NodeMapper.get_hierarchy_by_name('Dimensions').subs[0]
                 data = {'name': 'You never find me', str(dimension_node_id): '50'}
                 rv = self.app.post(url_for('place_insert', origin_id=stratigraphic_id), data=data)
@@ -114,5 +115,5 @@ class PlaceTest(TestBaseCase):
             assert b'not possible if subunits' in rv.data
             rv = self.app.get(url_for('place_delete', id_=find_id), follow_redirects=True)
             assert b'The entry has been deleted.' in rv.data
-            rv = self.app.get(url_for('place_delete', id_=place2_id), follow_redirects=True)
+            rv = self.app.get(url_for('place_delete', id_=place2.id), follow_redirects=True)
             assert b'The entry has been deleted.' in rv.data
