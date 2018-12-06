@@ -10,8 +10,8 @@ from openatlas import app, logger
 from openatlas.forms.forms import build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.util.util import (build_table_form, display_remove_link, get_base_table_data,
-                                 get_entity_data, get_view_name, is_authorized, link,
-                                 required_group, truncate_string, uc_first, was_modified)
+                                 get_entity_data, is_authorized, link, required_group,
+                                 truncate_string, uc_first, was_modified)
 
 
 class SourceForm(Form):
@@ -64,25 +64,24 @@ def source_view(id_):
     for name in ['actor', 'event', 'place', 'feature', 'stratigraphic-unit', 'find']:
         tables[name] = {'id': name, 'header': app.config['TABLE_HEADERS'][name], 'data': []}
     for link_ in source.get_links('P67'):
-        data = get_base_table_data(link_.range)
-        view_name = get_view_name(link_.range)
-        view_name = view_name if view_name != 'place' else link_.range.system_type.replace(' ', '-')
+        range_ = link_.range
+        data = get_base_table_data(range_)
         if is_authorized('editor'):
-            url = url_for('link_delete', id_=link_.id, origin_id=source.id) + '#tab-' + view_name
-            data.append(display_remove_link(url, link_.range.name))
-        tables[view_name]['data'].append(data)
+            url = url_for('link_delete', id_=link_.id, origin_id=source.id)
+            data.append(display_remove_link(url + '#tab-' + range_.table_name, range_.name))
+        tables[range_.table_name]['data'].append(data)
     for link_ in source.get_links(['P67', 'P128'], True):
-        data = get_base_table_data(link_.domain)
-        view_name = get_view_name(link_.domain)
-        if view_name not in ['file']:
+        domain = link_.domain
+        data = get_base_table_data(domain)
+        if domain.view_name not in ['file']:
             data.append(link_.description)
             if is_authorized('editor'):
                 update_url = url_for('reference_link_update', link_id=link_.id, origin_id=source.id)
                 data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
         if is_authorized('editor'):
-            url = url_for('link_delete', id_=link_.id, origin_id=source.id) + '#tab-' + view_name
-            data.append(display_remove_link(url, link_.domain.name))
-        tables[view_name]['data'].append(data)
+            url = url_for('link_delete', id_=link_.id, origin_id=source.id)
+            data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
+        tables[domain.view_name]['data'].append(data)
     return render_template('source/view.html', source=source, tables=tables)
 
 
@@ -101,7 +100,7 @@ def source_add(origin_id):
             g.cursor.execute('ROLLBACK')
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(url_for(get_view_name(origin) + '_view', id_=origin.id) + '#tab-source')
+        return redirect(url_for(origin.view_name + '_view', id_=origin.id) + '#tab-source')
     form = build_table_form('source', origin.get_linked_entities('P67', True))
     return render_template('source/add.html', origin=origin, form=form)
 
@@ -158,11 +157,11 @@ def save(form, source=None, origin=None):
         source.save_nodes(form)
         url = url_for('source_view', id_=source.id)
         if origin:
-            url = url_for(get_view_name(origin) + '_view', id_=origin.id) + '#tab-source'
-            if get_view_name(origin) == 'reference':
+            url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-source'
+            if origin.view_name == 'reference':
                 link_ = origin.link('P67', source)
                 url = url_for('reference_link_update', link_id=link_, origin_id=origin)
-            elif get_view_name(origin) == 'file':
+            elif origin.view_name == 'file':
                 origin.link('P67', source)
             else:
                 source.link('P67', origin)

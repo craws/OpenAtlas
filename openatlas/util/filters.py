@@ -322,17 +322,11 @@ def truncate_string(self, string):
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def get_view_name(self, entity):
-    return util.get_view_name(entity)
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
 def display_delete_link(self, entity):
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
     confirm = 'onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
-    url = url_for(util.get_view_name(entity) + '_delete', id_=entity.id)
+    url = url_for(entity.view_name + '_delete', id_=entity.id)
     return '<a ' + confirm + ' href="' + url + '">' + util.uc_first(_('delete')) + '</a>'
 
 
@@ -342,7 +336,7 @@ def display_menu(self, origin):
     """ Returns html with the menu and mark appropriate item as selected."""
     html = ''
     if current_user.is_authenticated:
-        selected = util.get_view_name(origin) if origin else ''
+        selected = origin.view_name if origin else ''
         items = ['overview', 'source', 'event', 'actor', 'place', 'reference', 'types', 'admin']
         for item in items:
             if selected:

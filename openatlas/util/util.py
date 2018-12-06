@@ -112,13 +112,6 @@ class MLStripper(HTMLParser):
         return ''.join(self.fed)
 
 
-def get_view_name(entity):
-    if entity.system_type == 'file':
-        return 'file'
-    if entity.class_.code in app.config['CODE_CLASS']:
-        return app.config['CODE_CLASS'][entity.class_.code]
-
-
 def sanitize(string, mode=None):
     if not mode:
         """Remove all characters from a string except ASCII letters and numbers"""
@@ -549,22 +542,20 @@ def pager(table, remove_rows=True):
 
 def get_base_table_data(entity):
     """ Returns standard table data for an entity"""
-    data = []
-    view_name = get_view_name(entity)
-    data.append(link(entity))
-    if view_name in ['event', 'actor']:
+    data = [link(entity)]
+    if entity.view_name in ['event', 'actor']:
         data.append(g.classes[entity.class_.code].name)
-    if view_name in ['reference'] and entity.system_type != 'file':
+    if entity.view_name in ['reference'] and entity.system_type != 'file':
         data.append(uc_first(_(entity.system_type)))
-    if view_name in ['event', 'place', 'source', 'reference', 'file']:
+    if entity.view_name in ['event', 'place', 'source', 'reference', 'file']:
         data.append(entity.print_base_type())
     if entity.system_type == 'file':
         data.append(print_file_size(entity))
         data.append(print_file_extension(entity))
-    if view_name in ['event', 'actor', 'place']:
+    if entity.view_name in ['event', 'actor', 'place']:
         data.append(format(entity.first))
         data.append(format(entity.last))
-    if view_name in ['source'] or entity.system_type == 'file':
+    if entity.view_name in ['source'] or entity.system_type == 'file':
         data.append(truncate_string(entity.description))
     return data
 

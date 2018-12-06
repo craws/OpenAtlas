@@ -8,7 +8,7 @@ from werkzeug.exceptions import abort
 from openatlas import app, debug_model, logger
 from openatlas.models.date import DateMapper
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import get_view_name, print_file_extension, uc_first
+from openatlas.util.util import print_file_extension, uc_first
 
 
 class Entity:
@@ -31,6 +31,14 @@ class Entity:
         self.last = int(row.last) if hasattr(row, 'last') and row.last else None
         self.class_ = g.classes[row.class_code]
         self.dates = {}
+        self.view_name = None  # view_name is used to build urls
+        if self.system_type == 'file':
+            self.view_name = 'file'
+        elif self.class_.code in app.config['CODE_CLASS']:
+            self.view_name = app.config['CODE_CLASS'][self.class_.code]
+        self.table_name = self.view_name  # table_name is used to build tables
+        if self.view_name == 'place':
+            self.table_name = self.system_type.replace(' ', '-')
 
     def get_linked_entity(self, code, inverse=False):
         return LinkMapper.get_linked_entity(self, code, inverse)
@@ -65,15 +73,14 @@ class Entity:
 
     def print_base_type(self):
         from openatlas.models.node import NodeMapper
-        view_name = get_view_name(self)
-        if not view_name or view_name == 'actor':  # actors have no base type
+        if not self.view_name or self.view_name == 'actor':  # actors have no base type
             return ''
-        root_name = view_name.title()
-        if view_name == 'reference':
+        root_name = self.view_name.title()
+        if self.view_name == 'reference':
             root_name = self.system_type.title()
-        elif view_name == 'file':
+        elif self.view_name == 'file':
             root_name = 'License'
-        elif view_name == 'place':
+        elif self.view_name == 'place':
             root_name = uc_first(self.system_type)
             if self.system_type == 'stratigraphic unit':
                 root_name = 'Stratigraphic Unit'

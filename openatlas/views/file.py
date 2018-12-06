@@ -14,8 +14,8 @@ from openatlas import app, logger
 from openatlas.forms.forms import build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.util.util import (build_table_form, convert_size, display_remove_link,
-                                 get_base_table_data, get_entity_data, get_file_path, get_view_name,
-                                 is_authorized, link, required_group, uc_first, was_modified)
+                                 get_base_table_data, get_entity_data, get_file_path, is_authorized,
+                                 link, required_group, uc_first, was_modified)
 
 
 class FileForm(Form):
@@ -82,7 +82,7 @@ def file_add(origin_id):
     origin = EntityMapper.get_by_id(origin_id)
     if request.method == 'POST':
         origin.link('P67', request.form.getlist('values'), inverse=True)
-        return redirect(url_for(get_view_name(origin) + '_view', id_=origin.id) + '#tab-file')
+        return redirect(url_for(origin.view_name + '_view', id_=origin.id) + '#tab-file')
     form = build_table_form('file', origin.get_linked_entities('P67', True))
     return render_template('file/add.html', origin=origin, form=form)
 
@@ -110,12 +110,13 @@ def file_view(id_):
         header = app.config['TABLE_HEADERS'][name] + (['page'] if name == 'reference' else [])
         tables[name] = {'id': name, 'data': [], 'header': header}
     for link_ in file.get_links('P67'):
-        view_name = get_view_name(link_.range)
-        view_name = view_name if view_name != 'place' else link_.range.system_type.replace(' ', '-')
-        data = get_base_table_data(link_.range)
+        range_ = link_.range
+        data = get_base_table_data(range_)
+        view_name = range_.view_name
+        view_name = view_name if view_name != 'place' else range_.system_type.replace(' ', '-')
         if is_authorized('editor'):
-            unlink_url = url_for('link_delete', id_=link_.id, origin_id=file.id)
-            data.append(display_remove_link(unlink_url + '#tab-' + view_name, link_.range.name))
+            url = url_for('link_delete', id_=link_.id, origin_id=file.id)
+            data.append(display_remove_link(url + '#tab-' + view_name, range_.name))
         tables[view_name]['data'].append(data)
     for link_ in file.get_links('P67', True):
         data = get_base_table_data(link_.domain)
@@ -202,7 +203,7 @@ def save(form, file=None, origin=None):
                 url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
             else:
                 file.link('P67', origin)
-                url = url_for(get_view_name(origin) + '_view', id_=origin.id) + '#tab-file'
+                url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-file'
         g.cursor.execute('COMMIT')
         logger.log_user(file.id, log_action)
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')

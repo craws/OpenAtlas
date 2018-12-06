@@ -10,8 +10,8 @@ from openatlas.forms.forms import DateForm, TableField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 get_view_name, is_authorized, link, required_group,
-                                 truncate_string, uc_first, was_modified)
+                                 is_authorized, link, required_group, truncate_string, uc_first,
+                                 was_modified)
 
 
 class ActorForm(DateForm):
@@ -62,17 +62,17 @@ def actor_view(id_):
         'member_of': {'id': 'member_of', 'data': [],
                       'header': ['member of', 'function', 'first', 'last', 'description']}}
     for link_ in actor.get_links('P67', True):
-        data = get_base_table_data(link_.domain)
-        view_name = get_view_name(link_.domain)
-        if view_name not in ['source', 'file']:
+        domain = link_.domain
+        data = get_base_table_data(domain)
+        if domain.view_name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
             if is_authorized('editor'):
                 update_url = url_for('reference_link_update', link_id=link_.id, origin_id=actor.id)
                 data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
         if is_authorized('editor'):
-            unlink = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-' + view_name
-            data.append(display_remove_link(unlink, link_.domain.name))
-        tables[view_name]['data'].append(data)
+            url = url_for('link_delete', id_=link_.id, origin_id=actor.id)
+            data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
+        tables[domain.view_name]['data'].append(data)
     for link_ in actor.get_links(['P11', 'P14', 'P22', 'P23'], True):
         # Todo: Performance - getting every place of every object of every event is very costly
         event = link_.domain
@@ -244,20 +244,19 @@ def save(form, actor=None, code=None, origin=None):
             object_ = EntityMapper.get_by_id(form.appears_last.data)
             actor.link('OA9', object_.get_linked_entity('P53'))
         for alias in form.alias.data:
-            if alias.strip():  # check if it isn't empty
+            if alias.strip():  # Check if it isn't empty
                 actor.link('P131', EntityMapper.insert('E82', alias))
         if origin:
-            view_name = get_view_name(origin)
-            if view_name == 'reference':
+            if origin.view_name == 'reference':
                 link_id = origin.link('P67', actor)
                 url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
-            elif view_name == 'source':
+            elif origin.view_name == 'source':
                 origin.link('P67', actor)
                 url = url_for('source_view', id_=origin.id) + '#tab-actor'
-            elif view_name == 'event':
+            elif origin.view_name == 'event':
                 link_id = origin.link('P11', actor)
                 url = url_for('involvement_update', id_=link_id, origin_id=origin.id)
-            elif view_name == 'actor':
+            elif origin.view_name == 'actor':
                 link_id = origin.link('OA7', actor)
                 url = url_for('relation_update', id_=link_id, origin_id=origin.id)
         if form.continue_.data == 'yes' and code:

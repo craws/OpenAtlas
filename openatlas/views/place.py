@@ -10,8 +10,8 @@ from openatlas.forms.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 get_view_name, is_authorized, link, required_group,
-                                 truncate_string, uc_first, was_modified)
+                                 is_authorized, link, required_group, truncate_string, uc_first,
+                                 was_modified)
 
 
 class PlaceForm(DateForm):
@@ -109,17 +109,17 @@ def place_view(id_):
         tables['find'] = {'id': 'find', 'data': [],
                           'header': app.config['TABLE_HEADERS']['place'] + [_('description')]}
     for link_ in object_.get_links('P67', True):
-        data = get_base_table_data(link_.domain)
-        view_name = get_view_name(link_.domain)
-        if view_name not in ['source', 'file']:
+        domain = link_.domain
+        data = get_base_table_data(domain)
+        if domain.view_name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
             if is_authorized('editor'):
                 url = url_for('reference_link_update', link_id=link_.id, origin_id=object_.id)
                 data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
         if is_authorized('editor'):
-            url = url_for('link_delete', id_=link_.id, origin_id=object_.id) + '#tab-' + view_name
-            data.append(display_remove_link(url, link_.domain.name))
-        tables[view_name]['data'].append(data)
+            url = url_for('link_delete', id_=link_.id, origin_id=object_.id)
+            data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
+        tables[domain.view_name]['data'].append(data)
     event_ids = []  # Keep track of already inserted events to prevent doubles
     for event in location.get_linked_entities(['P7'], True):
         tables['event']['data'].append(get_base_table_data(event))
@@ -257,8 +257,8 @@ def save(form, object_=None, location=None, origin=None):
                     object_.link('P1', EntityMapper.insert('E41', alias))
         url = url_for('place_view', id_=object_.id)
         if origin:
-            url = url_for(get_view_name(origin) + '_view', id_=origin.id) + '#tab-place'
-            if get_view_name(origin) == 'reference':
+            url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-place'
+            if origin.view_name == 'reference':
                 link_id = origin.link('P67', object_)
                 url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
             elif origin.system_type in ['place', 'feature', 'stratigraphic unit']:

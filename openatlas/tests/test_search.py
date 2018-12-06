@@ -13,7 +13,7 @@ class SearchTest(TestBaseCase):
             app.preprocess_request()
             person = EntityMapper.insert('E21', 'Waldo')
             person.link('P131', EntityMapper.insert('E82', 'Waldo alias'))
-            object_ = EntityMapper.insert('E18', 'Waldorf')
+            object_ = EntityMapper.insert('E18', 'Waldorf', 'place')
             object_.link('P1', EntityMapper.insert('E41', 'Waldorf alias'))
         with app.app_context():
             rv = self.app.post(url_for('search_index'), data={'global-term': 'wal'})
