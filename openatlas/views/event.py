@@ -69,13 +69,9 @@ def event_insert(code, origin_id=None):
 @app.route('/event/delete/<int:id_>')
 @required_group('editor')
 def event_delete(id_):
-    try:
-        EntityMapper.delete(id_)
-        logger.log_user(id_, 'delete')
-        flash(_('entity deleted'), 'info')
-    except Exception as e:  # pragma: no cover
-        logger.log('error', 'database', 'Delete failed', e)
-        flash(_('error database'), 'error')
+    EntityMapper.delete(id_)
+    logger.log_user(id_, 'delete')
+    flash(_('entity deleted'), 'info')
     return redirect(url_for('event_index'))
 
 

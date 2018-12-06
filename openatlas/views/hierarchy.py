@@ -98,12 +98,8 @@ def hierarchy_delete(id_):
     node = g.nodes[id_]
     if node.system or node.subs or node.count:
         abort(403)
-    try:
-        EntityMapper.delete(node.id)
-        flash(_('entity deleted'), 'info')
-    except Exception as e:  # pragma: no cover
-        logger.log('error', 'database', 'Deletion failed', e)
-        flash(_('error database'), 'error')
+    EntityMapper.delete(node.id)
+    flash(_('entity deleted'), 'info')
     return redirect(url_for('node_index'))
 
 

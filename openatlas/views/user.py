@@ -52,13 +52,10 @@ class UserForm(Form):
 
 
 class ActivityForm(Form):
-    action_choices = (
-        ('all', _('all')),
-        ('insert', _('insert')),
-        ('update', _('update')),
-        ('delete', _('delete')))
-    limit = SelectField(_('limit'),
-                        choices=((0, _('all')), (100, 100), (500, 500)), default=100, coerce=int)
+    action_choices = (('all', _('all')), ('insert', _('insert')), ('update', _('update')),
+                      ('delete', _('delete')))
+    limit = SelectField(_('limit'), choices=((0, _('all')), (100, 100), (500, 500)),
+                        default=100, coerce=int)
     user = SelectField(_('user'), choices=([(0, _('all'))]), default=0, coerce=int)
     action = SelectField(_('action'), choices=action_choices, default='all')
     apply = SubmitField(_('apply'))
@@ -107,13 +104,11 @@ def user_view(id_):
 @app.route('/admin/user')
 @required_group('readonly')
 def user_index():
-    tables = {'user': {
-        'id': 'user',
-        'header': ['username', 'group', 'email', 'newsletter', 'created', 'last login', 'entities'],
-        'data': []}}
+    table = {'id': 'user', 'data': [], 'header': ['username', 'group', 'email', 'newsletter',
+                                                  'created', 'last login', 'entities']}
     for user in UserMapper.get_all():
         count = UserMapper.get_created_entities_count(user.id)
-        tables['user']['data'].append([
+        table['data'].append([
             link(user),
             user.group,
             user.email if is_authorized('manager') or user.settings['show_email'] else '',
@@ -121,7 +116,7 @@ def user_index():
             format_date(user.created),
             format_date(user.login_last_success),
             format_number(count) if count else ''])
-    return render_template('user/index.html', tables=tables)
+    return render_template('user/index.html', table=table)
 
 
 @app.route('/admin/user/update/<int:id_>', methods=['POST', 'GET'])
@@ -166,21 +161,18 @@ def user_insert():
         user_id = UserMapper.insert(form)
         flash(_('user created'), 'info')
         if session['settings']['mail'] and form.send_info.data:  # pragma: no cover
-            subject = _(
-                'Your account information for %(sitename)s',
-                sitename=session['settings']['site_name'])
+            subject = _('Your account information for %(sitename)s',
+                        sitename=session['settings']['site_name'])
             body = _('Account information for %(username)s', username=form.username.data) + ' '
             body += _('at') + ' ' + request.scheme + '://' + request.headers['Host'] + '\n\n'
             body += uc_first(_('username')) + ': ' + form.username.data + '\n'
             body += uc_first(_('password')) + ': ' + form.password.data + '\n'
             if send_mail(subject, body, form.email.data, False):
-                flash(
-                    _('Sent account information mail to %(email)s.', email=form.email.data), 'info')
+                flash(_('Sent account information mail to %(email)s.',
+                        email=form.email.data), 'info')
             else:
-                flash(
-                    _('Failed to send account details to %(email)s.',
-                      email=form.email.data),
-                    'error')
+                flash(_('Failed to send account details to %(email)s.',
+                        email=form.email.data), 'error')
             return redirect(url_for('user_index'))
         if form.continue_.data == 'yes':
             return redirect(url_for('user_insert'))

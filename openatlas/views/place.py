@@ -170,13 +170,9 @@ def place_delete(id_):
     if entity.get_linked_entities('P46'):
         flash(_('Deletion not possible if subunits exists'), 'error')
         return redirect(url_for('place_view', id_=id_))
-    try:
-        EntityMapper.delete(id_)
-        logger.log_user(id_, 'delete')
-        flash(_('entity deleted'), 'info')
-    except Exception as e:  # pragma: no cover
-        logger.log('error', 'database', 'Deletion failed', e)
-        flash(_('error database'), 'error')
+    EntityMapper.delete(id_)
+    logger.log_user(id_, 'delete')
+    flash(_('entity deleted'), 'info')
     if parent:
         return redirect(url_for('place_view', id_=parent.id) + '#tab-' + entity.system_type)
     return redirect(url_for('place_index'))

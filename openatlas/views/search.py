@@ -15,12 +15,9 @@ class SearchForm(Form):
                        render_kw={'placeholder': uc_first(_('search term')), 'autofocus': True})
     own = BooleanField(_('Only entities edited by me'))
     desc = BooleanField(_('Also search in description'))
-    classes = SelectMultipleField(
-        _('classes'),
-        [InputRequired()],
-        choices=(),
-        option_widget=widgets.CheckboxInput(),
-        widget=widgets.ListWidget(prefix_label=False))
+    classes = SelectMultipleField(_('classes'), [InputRequired()], choices=(),
+                                  option_widget=widgets.CheckboxInput(),
+                                  widget=widgets.ListWidget(prefix_label=False))
     search = SubmitField(_('search'))
 
 
@@ -44,8 +41,8 @@ def search_index():
 
 
 def build_search_table(form):
-    table = {
-        'id': 'search', 'header': ['name', 'class', 'first', 'last', 'description'], 'data': []}
+    table = {'id': 'search', 'data': [],
+             'header': ['name', 'class', 'first', 'last', 'description']}
     codes = []
     for name in form.classes.data:
         codes += app.config['CLASS_CODES'][name]

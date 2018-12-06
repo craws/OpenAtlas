@@ -25,8 +25,8 @@ class ReferenceTest(TestBaseCase):
                 app.preprocess_request()
                 bibliography = EntityMapper.get_by_id(rv.location.split('/')[-1])
             data['continue_'] = 'yes'
-            rv = self.app.post(
-                url_for('reference_insert', code='carrier'), data=data, follow_redirects=True)
+            rv = self.app.post(url_for('reference_insert', code='carrier'), data=data,
+                               follow_redirects=True)
             assert b'An entry has been created' in rv.data
             rv = self.app.get(url_for('reference_index'))
 
@@ -35,8 +35,8 @@ class ReferenceTest(TestBaseCase):
             rv = self.app.get(url_for('reference_update', id_=bibliography.id))
             assert b'Test reference' in rv.data
             data['name'] = 'Test reference updated'
-            rv = self.app.post(
-                url_for('reference_update', id_=bibliography.id), data=data, follow_redirects=True)
+            rv = self.app.post(url_for('reference_update', id_=bibliography.id), data=data,
+                               follow_redirects=True)
             assert b'Test reference updated' in rv.data
 
             # Reference link
@@ -45,10 +45,8 @@ class ReferenceTest(TestBaseCase):
                 batman = EntityMapper.insert('E21', 'Batman')
             rv = self.app.get(url_for('reference_add', origin_id=batman.id))
             assert b'Batman' in rv.data
-            rv = self.app.post(
-                url_for('reference_add', origin_id=batman.id),
-                data={'reference': bibliography.id},
-                follow_redirects=True)
+            rv = self.app.post(url_for('reference_add', origin_id=batman.id),
+                               data={'reference': bibliography.id}, follow_redirects=True)
             assert b'Test reference updated' in rv.data
 
             rv = self.app.get(
@@ -71,11 +69,7 @@ class ReferenceTest(TestBaseCase):
                 origin_id=bibliography.id), data={'page': '666'}, follow_redirects=True)
             assert b'Changes have been saved' in rv.data
 
-            # Reference unlink
-            rv = self.app.get(url_for('reference_view', id_=bibliography.id, unlink_id=batman.id))
-            assert b'removed'in rv.data and b'The X-Files' in rv.data
-
             # Reference delete
-            rv = self.app.get(
-                url_for('reference_delete', id_=bibliography.id), follow_redirects=True)
+            rv = self.app.get(url_for('reference_delete', id_=bibliography.id),
+                              follow_redirects=True)
             assert b'The entry has been deleted.' in rv.data
