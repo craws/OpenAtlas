@@ -39,7 +39,7 @@ class ClassMapper:
     @staticmethod
     def get_all():
         g.cursor.execute("SELECT id, code, name FROM model.class;")
-        openatlas.debug_model['div sql'] += 1
+        debug_model['div sql'] += 1
         classes = {row.code: ClassObject(row) for row in g.cursor.fetchall()}
         g.cursor.execute("SELECT super_code, sub_code FROM model.class_inheritance;")
         debug_model['div sql'] += 1

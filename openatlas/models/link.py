@@ -28,7 +28,7 @@ class Link:
         LinkMapper.update(self)
 
     def delete(self):
-        LinkMapper.delete_by_id(self.id)
+        LinkMapper.delete(self.id)
 
     def set_dates(self):
         from openatlas.models.date import DateMapper
@@ -176,7 +176,7 @@ class LinkMapper:
         return Link(g.cursor.fetchone())
 
     @staticmethod
-    def delete_by_id(id_):
+    def delete(id_):
         from openatlas.util.util import is_authorized
         if not is_authorized('editor'):  # pragma: no cover
             abort(403)

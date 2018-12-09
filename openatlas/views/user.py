@@ -125,7 +125,7 @@ def user_update(id_):
     user = UserMapper.get_by_id(id_)
     if user.group == 'admin' and current_user.group != 'admin':
         abort(403)  # pragma: no cover
-    form = UserForm()
+    form = UserForm(obj=user)
     form.user_id = id_
     del form.password, form.password2, form.send_info, form.insert_and_continue, form.show_passwords
     form.group.choices = get_groups()
@@ -139,12 +139,6 @@ def user_update(id_):
         user.update()
         flash(_('info update'), 'info')
         return redirect(url_for('user_view', id_=id_))
-    form.username.data = user.username
-    form.group.data = user.group
-    form.real_name.data = user.real_name
-    form.active.data = user.active
-    form.email.data = user.email
-    form.description.data = user.description
     if user.id == current_user.id:
         del form.active
     return render_template('user/update.html', form=form, user=user)

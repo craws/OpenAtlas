@@ -20,8 +20,7 @@ class LinkPropertyMapper:
     @staticmethod
     def get_entities_by_node(node):
         sql = """
-            SELECT l.id, l.domain_id, l.range_id
-            FROM model.link l
+            SELECT l.id, l.domain_id, l.range_id FROM model.link l
             JOIN model.link_property lp ON l.id = lp.domain_id AND lp.range_id = %(node_id)s;"""
         g.cursor.execute(sql, {'node_id': node if type(node) is int else node.id})
         debug_model['link sql'] += 1

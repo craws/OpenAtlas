@@ -23,6 +23,7 @@ app.config.from_object('config.default')  # Load config/INSTANCE_NAME.py
 app.config.from_pyfile(instance_name + '.py')  # Load instance/INSTANCE_NAME.py
 locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 babel = Babel(app)
+debug_model = OrderedDict()
 
 
 class GlobalSearchForm(Form):
@@ -31,10 +32,7 @@ class GlobalSearchForm(Form):
 
 
 from openatlas.models.logger import DBHandler
-
-debug_model = OrderedDict()
 logger = DBHandler()
-
 
 from openatlas.util import filters
 from openatlas.views import (actor, admin, ajax, content, event, export, hierarchy, index,

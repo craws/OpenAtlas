@@ -62,7 +62,7 @@ class MapForm(Form):
 @app.route('/admin/map', methods=['POST', 'GET'])
 @required_group('manager')
 def admin_map():
-    form = MapForm()
+    form = MapForm(obj=session['settings'])
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
