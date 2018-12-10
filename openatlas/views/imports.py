@@ -1,5 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import collections
+
 import pandas as pd
 from flask import flash, g, render_template, request, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -9,9 +10,9 @@ from wtforms import BooleanField, FileField, StringField, SubmitField, TextAreaF
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
+from openatlas.models.entity import EntityMapper
 from openatlas.models.imports import ImportMapper, Project
 from openatlas.util.util import format_date, link, required_group, truncate_string
-from openatlas.models.entity import EntityMapper
 
 
 class ProjectForm(Form):
@@ -55,7 +56,6 @@ def import_project_insert():
 @app.route('/import/project/view/<int:id_>')
 @required_group('editor')
 def import_project_view(id_):
-    project = ImportMapper.get_project_by_id(id_)
     table = {'id': 'entities', 'data': [],
              'header': [_('name'), _('class'), _('description'), 'origin ID', _('date')]}
     for entity in EntityMapper.get_by_project_id(id_):
@@ -65,6 +65,7 @@ def import_project_view(id_):
             truncate_string(entity.description),
             entity.origin_id,
             format_date(entity.created)])
+    project = ImportMapper.get_project_by_id(id_)
     return render_template('import/project_view.html', project=project, table=table)
 
 

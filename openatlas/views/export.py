@@ -6,11 +6,11 @@ from flask import flash, render_template, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import BooleanField, SubmitField, SelectField
+from wtforms import BooleanField, SelectField, SubmitField
 
 from openatlas import app, logger
 from openatlas.models.export import Export
-from openatlas.util.util import (convert_size, is_authorized, required_group, uc_first)
+from openatlas.util.util import convert_size, is_authorized, required_group, uc_first
 
 
 class ExportSqlForm(Form):
@@ -108,12 +108,11 @@ def export_csv():
              'sort': 'sortList: [[0, 1]],headers: {0: { sorter: "text" }}'}
     for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
         name = basename(file)
-        file_path = path + '/' + name
         if name == '.gitignore':
             continue
         link = '<a href="{url}">{label}</a>'.format(url=url_for('download_csv', filename=name),
                                                     label=uc_first(_('download')))
-        data = [name, convert_size(os.path.getsize(file_path)), link]
+        data = [name, convert_size(os.path.getsize(path + '/' + name)), link]
         if is_authorized('admin') and writeable:
             confirm = ' onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
             delete = '<a href="' + url_for('delete_csv', filename=name)

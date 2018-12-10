@@ -12,20 +12,30 @@ class HierarchyTest(TestBaseCase):
             self.login()
 
             # Custom types
-            rv = self.app.get(url_for('hierarchy_insert', param='custom'))
-            assert b'+ Custom' in rv.data
             data = {
                 'name': 'Geronimo',
-                'forms': [1],
+                'forms': [1, 2, 4, 5, 6],
                 'multiple': True,
                 'description': 'Very important!'}
             rv = self.app.post(url_for('hierarchy_insert', param='custom'), data=data)
             hierarchy_id = rv.location.split('/')[-1].replace('types#tab-', '')
             rv = self.app.get(url_for('hierarchy_update', id_=hierarchy_id))
             assert b'Geronimo' in rv.data
+            data['forms'] = [3]
             rv = self.app.post(
                 url_for('hierarchy_update', id_=hierarchy_id), data=data, follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
+
+            rv = self.app.get(url_for('hierarchy_insert', param='custom'))
+            assert b'+ Custom' in rv.data
+
+            data = {'name': 'My secret node', 'description': 'Very important!'}
+            rv = self.app.post(url_for('node_insert', root_id=hierarchy_id), data=data)
+            node_id = rv.location.split('/')[-1].replace('types#tab-', '')
+            rv = self.app.get(url_for('hierarchy_remove_form', id_=hierarchy_id, remove_id=2),
+                              follow_redirects=True)
+            assert b'Changes have been saved.' in rv.data
+            self.app.get(url_for('node_delete', id_=node_id))
 
             data['name'] = 'Actor Actor Relation'
             rv = self.app.post(

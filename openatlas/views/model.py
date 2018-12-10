@@ -38,12 +38,9 @@ def model_index():
         property_ = g.properties[form.property.data]
         domain_is_valid = property_.find_object('domain_class_code', domain.code)
         range_is_valid = property_.find_object('range_class_code', range_.code)
-        test_result = {
-            'domain_error': False if domain_is_valid else True,
-            'range_error': False if range_is_valid else True,
-            'domain': domain,
-            'property': property_,
-            'range': range_}
+        test_result = {'domain': domain, 'property': property_, 'range': range_,
+                       'domain_error': False if domain_is_valid else True,
+                       'range_error': False if range_is_valid else True}
     else:
         domain = g.classes['E1']
         property_ = g.properties['P1']
@@ -51,20 +48,14 @@ def model_index():
         form.domain.data = domain.code
         form.property.data = property_.code
         form.range.data = range_.code
-    return render_template(
-        'model/index.html',
-        form=form,
-        test_result=test_result,
-        domain=domain,
-        property=property_,
-        range=range_)
+    return render_template('model/index.html', form=form, test_result=test_result, domain=domain,
+                           property=property_, range=range_)
 
 
 @app.route('/overview/model/class')
 def class_index():
-    table = {
-        'id': 'classes', 'header': ['code', 'name'], 'data': [],
-        'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'}
+    table = {'id': 'classes', 'header': ['code', 'name'], 'data': [],
+             'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'}
     for class_id, class_ in g.classes.items():
         table['data'].append([link(class_), class_.name])
     return render_template('model/class.html', table=table)
@@ -74,11 +65,10 @@ def class_index():
 def property_index():
     classes = g.classes
     properties = g.properties
-    table = {
-        'id': 'properties', 'data': [],
-        'header': ['code', 'name', 'inverse', 'domain', 'domain name', 'range', 'range name'],
-        'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }, '
-                '3: { sorter: "class_code" }, 5: { sorter: "class_code" }}'}
+    table = {'id': 'properties', 'data': [],
+             'header': ['code', 'name', 'inverse', 'domain', 'domain name', 'range', 'range name'],
+             'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }, '
+                     '3: { sorter: "class_code" }, 5: { sorter: "class_code" }}'}
     for property_id, property_ in properties.items():
         table['data'].append([
             link(property_),
@@ -93,28 +83,26 @@ def property_index():
 
 @app.route('/overview/model/class_view/<code>')
 def class_view(code):
-    classes = g.classes
-    class_ = classes[code]
+    class_ = g.classes[code]
     tables = OrderedDict()
     for table in ['super', 'sub']:
-        tables[table] = {
-            'id': table, 'header': ['code', 'name'], 'data': [], 'show_pager': False,
-            'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'}
+        tables[table] = {'id': table, 'header': ['code', 'name'], 'data': [], 'show_pager': False,
+                         'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'}
         for code in getattr(class_, table):
-            tables[table]['data'].append([link(classes[code]), classes[code].name])
+            tables[table]['data'].append([link(g.classes[code]), g.classes[code].name])
     tables['domains'] = {
         'id': 'domains', 'header': ['code', 'name'], 'data': [], 'show_pager': False,
-        'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'}
+        'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }}'}
     tables['ranges'] = {
         'id': 'ranges', 'header': ['code', 'name'], 'data': [], 'show_pager': False,
-        'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'}
+        'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }}'}
     for key, property_ in g.properties.items():
         if code == property_.domain_class_code:
             tables['domains']['data'].append([link(property_), property_.name])
         elif code == property_.range_class_code:
             tables['ranges']['data'].append([link(property_), property_.name])
-    data = {'info': [('code', class_.code), ('name', class_.name)]}
-    return render_template('model/class_view.html', class_=class_, tables=tables, data=data)
+    return render_template('model/class_view.html', class_=class_, tables=tables,
+                           data={'info': [('code', class_.code), ('name', class_.name)]})
 
 
 @app.route('/overview/model/property_view/<code>')
@@ -130,9 +118,8 @@ def property_view(code):
             ('domain', link(domain) + ' ' + domain.name),
             ('range', link(range_) + ' ' + range_.name)]}
     for table in ['super', 'sub']:
-        tables[table] = {
-            'id': table, 'header': ['code', 'name'], 'data': [], 'show_pager': False,
-            'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }}'}
+        tables[table] = {'id': table, 'header': ['code', 'name'], 'data': [], 'show_pager': False,
+                         'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }}'}
         for code in getattr(property_, table):
             tables[table]['data'].append([link(g.properties[code]), g.properties[code].name])
     return render_template('model/property_view.html', property=property_, tables=tables)
@@ -184,8 +171,8 @@ def model_network():
         'distance': form.distance.data}}
     for code in ['E21', 'E7', 'E31', 'E33', 'E40', 'E74', 'E53', 'E18', 'E8', 'E12', 'E6', 'E84']:
         form.classes.choices.append((code, g.classes[code].name))
-        params['classes'][code] = {
-            'active': (code in form.classes.data), 'color': getattr(form, 'color_' + code).data}
+        params['classes'][code] = {'active': (code in form.classes.data),
+                                   'color': getattr(form, 'color_' + code).data}
     for code in ['P107',  'P24',  'P23',  'P11',  'P14',  'P7',  'P74',  'P67',  'OA7', 'OA8',
                  'OA9']:
         form.properties.choices.append((code, g.properties[code].name))

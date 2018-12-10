@@ -21,6 +21,9 @@ class SettingsMapper:
         'mail_transport_host',
         'mail_from_email',
         'mail_from_name',
+        'map_cluster_enabled',
+        'map_cluster_max_radius',
+        'map_cluster_disable_at_zoom',
         'mail_recipients_feedback',
         'minimum_password_length',
         'random_password_length',
@@ -30,9 +33,9 @@ class SettingsMapper:
 
     @staticmethod
     def get_settings():
-        settings = {}
         g.cursor.execute("SELECT name, value FROM web.settings;")
         debug_model['div sql'] += 1
+        settings = {}
         for row in g.cursor.fetchall():
             settings[row.name] = row.value
             if row.name in [
@@ -67,6 +70,18 @@ class SettingsMapper:
             if not field.startswith('file_'):
                 continue
             value = getattr(form, field).data
+            g.cursor.execute(sql, {'name': field, 'value': value})
+            debug_model['div sql'] += 1
+
+    @staticmethod
+    def update_map_settings(form):
+        sql = 'UPDATE web.settings SET "value" = %(value)s WHERE "name" = %(name)s;'
+        for field in SettingsMapper.fields:
+            if not field.startswith('map_'):
+                continue
+            value = getattr(form, field).data
+            if field == 'map_cluster_enabled':
+                value = 'True' if getattr(form, field).data else ''
             g.cursor.execute(sql, {'name': field, 'value': value})
             debug_model['div sql'] += 1
 

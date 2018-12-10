@@ -17,7 +17,7 @@
         {% if tables['orphans']['data']|length > 0 %}
             <div class="button-bar">
                 <a onclick="return confirm('{{_('delete orphans')|uc_first }}?')"
-                   href="{{ url_for('admin_orphans', delete='orphans') }}">{{ _('delete orphans')|uc_first }}</a>
+                   href="{{ url_for('admin_orphans_delete', parameter='orphans') }}">{{ _('delete orphans')|uc_first }}</a>
             </div>
         {% endif %}
         {{ tables['orphans']|pager|safe }}
@@ -29,7 +29,7 @@
         {% if tables['nodes']['data']|length > 0 %}
             <div class="button-bar">
                 <a onclick="return confirm('{{_('delete types')|uc_first }}?')"
-                   href="{{ url_for('admin_orphans', delete='types') }}">{{ _('delete types')|uc_first }}</a>
+                   href="{{ url_for('admin_orphans_delete', parameter='types') }}">{{ _('delete types')|uc_first }}</a>
             </div>
         {% endif %}
         {{ tables['nodes']|pager|safe }}

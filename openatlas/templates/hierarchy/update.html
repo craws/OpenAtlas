@@ -5,12 +5,6 @@
     > {{ _('edit') }}
 {% endblock %}
 {% block content %}
+    {{ table|pager|safe }}
     {{ form|display_form|safe }}
-    <script>
-        $.each({{ forms|safe }}, function () {
-            if ($('#' + this).is(':checked')) {
-                $('#' + this).attr('disabled', true);
-            }
-        });
-    </script>
 {% endblock %}

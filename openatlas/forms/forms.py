@@ -1,7 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
-
 import time
+
 from flask import g
 from flask_babel import lazy_gettext as _
 from wtforms import FloatField, HiddenField
@@ -38,13 +38,14 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
     # Delete custom fields except the ones specified for the form
     delete_list = []  # Can't delete fields in the loop so creating a list for later deletion
     for field in form_instance:
-        if isinstance(field, (TreeField, TreeMultiField)) and int(field.id) not in custom_list:
+        if type(field) in (TreeField, TreeMultiField) and int(field.id) not in custom_list:
             delete_list.append(field.id)
     for item in delete_list:
         delattr(form_instance, item)
 
     # Set field data if available and only if it's a GET request
     if entity and request_origin and request_origin.method == 'GET':
+        # Important to use isinstance instead type check, because can be a sub type (e.g. ActorForm)
         if isinstance(form_instance, DateForm):
             form_instance.populate_dates(entity)
         nodes = entity.nodes
@@ -74,7 +75,7 @@ def build_move_form(form, node):
     # Delete custom fields except the ones specified for the form
     delete_list = []  # Can't delete fields in the loop so creating a list for later deletion
     for field in form_instance:
-        if isinstance(field, TreeField) and int(field.id) != root.id:
+        if type(field) is TreeField and int(field.id) != root.id:
             delete_list.append(field.id)
     for item in delete_list:
         delattr(form_instance, item)
@@ -111,7 +112,7 @@ def build_node_form(form, node, request_origin=None):
     # Delete custom fields except the one specified for the form
     delete_list = []  # Can't delete fields in the loop so creating a list for later deletion
     for field in form_instance:
-        if isinstance(field, TreeField) and int(field.id) != root.id:
+        if type(field) is TreeField and int(field.id) != root.id:
             delete_list.append(field.id)
     for item in delete_list:
         delattr(form_instance, item)
@@ -136,7 +137,7 @@ class TreeSelect(HiddenInput):
         selection = ''
         selected_ids = []
         if field.data:
-            field.data = field.data[0] if isinstance(field.data, list) else field.data
+            field.data = field.data[0] if type(field.data) is list else field.data
             selection = g.nodes[int(field.data)].name
             selected_ids.append(g.nodes[int(field.data)].id)
         html = """
@@ -193,7 +194,7 @@ class TreeMultiSelect(HiddenInput):
         root = g.nodes[int(field.id)]
         if field.data:
             # Somehow field.data can be a string after a failed form validation, so fix that below
-            field.data = ast.literal_eval(field.data) if isinstance(field.data, str) else field.data
+            field.data = ast.literal_eval(field.data) if type(field.data) is str else field.data
             for entity_id in field.data:
                 selected_ids.append(entity_id)
                 selection += g.nodes[entity_id].name + '<br />'
@@ -291,7 +292,7 @@ class TableMultiSelect(HiddenInput):
     """ Table with checkboxes used in a popup for forms."""
 
     def __call__(self, field, **kwargs):
-        if field.data and isinstance(field.data, str):
+        if field.data and type(field.data) is str:
             field.data = ast.literal_eval(field.data)
         selection = ''
         class_ = field.id if field.id != 'given_place' else 'place'
@@ -325,7 +326,7 @@ class TableMultiSelect(HiddenInput):
                 change_label=uc_first(_('change')),
                 title=_(field.id.replace('_', ' ')),
                 selection=selection,
-                pager=pager(table))
+                pager=pager(table, remove_rows=False))
         return super(TableMultiSelect, self).__call__(field, **kwargs) + html
 
 

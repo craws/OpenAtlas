@@ -12,7 +12,7 @@ from openatlas.forms.forms import DateForm, TableField, TableMultiField, build_f
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 get_view_name, is_authorized, link, required_group,
+                                 is_authorized, link, required_group,
                                  truncate_string, uc_first, was_modified)
 
 
@@ -69,16 +69,9 @@ def event_insert(code, origin_id=None):
 @app.route('/event/delete/<int:id_>')
 @required_group('editor')
 def event_delete(id_):
-    g.cursor.execute('BEGIN')
-    try:
-        EntityMapper.delete(id_)
-        logger.log_user(id_, 'delete')
-        g.cursor.execute('COMMIT')
-        flash(_('entity deleted'), 'info')
-    except Exception as e:  # pragma: no cover
-        g.cursor.execute('ROLLBACK')
-        logger.log('error', 'database', 'transaction failed', e)
-        flash(_('error transaction'), 'error')
+    EntityMapper.delete(id_)
+    logger.log_user(id_, 'delete')
+    flash(_('entity deleted'), 'info')
     return redirect(url_for('event_index'))
 
 
@@ -109,27 +102,19 @@ def event_update(id_):
 
 
 @app.route('/event/view/<int:id_>')
-@app.route('/event/view/<int:id_>/<int:unlink_id>')
 @required_group('readonly')
-def event_view(id_, unlink_id=None):
+def event_view(id_):
     event = EntityMapper.get_by_id(id_)
-    if unlink_id:
-        LinkMapper.delete_by_id(unlink_id)
-        flash(_('link removed'), 'info')
     event.set_dates()
     tables = {
         'info': get_entity_data(event),
         'file': {'id': 'files', 'data': [], 'header': app.config['TABLE_HEADERS']['file']},
         'subs': {'id': 'sub-event', 'data': [], 'header': app.config['TABLE_HEADERS']['event']},
-        'actor': {
-            'id': 'actor', 'data': [],
-            'header': ['actor', 'class', 'involvement', 'first', 'last', 'description']},
-        'source': {
-            'id': 'source', 'data': [],
-            'header': app.config['TABLE_HEADERS']['source'] + ['description']},
-        'reference': {
-            'id': 'reference', 'data': [],
-            'header': app.config['TABLE_HEADERS']['reference'] + ['pages']}}
+        'source': {'id': 'source', 'data': [], 'header': app.config['TABLE_HEADERS']['source']},
+        'actor': {'id': 'actor', 'data': [],
+                  'header': ['actor', 'class', 'involvement', 'first', 'last', 'description']},
+        'reference': {'id': 'reference', 'data': [],
+                      'header': app.config['TABLE_HEADERS']['reference'] + ['pages']}}
     for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
         first = link_.first
         if not link_.first and event.first:
@@ -145,23 +130,23 @@ def event_view(id_, unlink_id=None):
             last,
             truncate_string(link_.description)])
         if is_authorized('editor'):
-            unlink_url = url_for('event_view', id_=event.id, unlink_id=link_.id) + '#tab-actor'
             update_url = url_for('involvement_update', id_=link_.id, origin_id=event.id)
+            unlink_url = url_for('link_delete', id_=link_.id, origin_id=event.id) + '#tab-actor'
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             data.append(display_remove_link(unlink_url, link_.range.name))
         tables['actor']['data'].append(data)
     for link_ in event.get_links('P67', True):
-        data = get_base_table_data(link_.domain)
-        view_name = get_view_name(link_.domain)
-        if view_name not in ['source', 'file']:
+        domain = link_.domain
+        data = get_base_table_data(domain)
+        if domain.view_name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
             if is_authorized('editor'):
                 update_url = url_for('reference_link_update', link_id=link_.id, origin_id=event.id)
                 data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
         if is_authorized('editor'):
-            unlink = url_for('event_view', id_=event.id, unlink_id=link_.id) + '#tab-' + view_name
-            data.append(display_remove_link(unlink, link_.domain.name))
-        tables[view_name]['data'].append(data)
+            url = url_for('link_delete', id_=link_.id, origin_id=event.id)
+            data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
+        tables[domain.view_name]['data'].append(data)
     for sub_event in event.get_linked_entities('P117', True):
         tables['subs']['data'].append(get_base_table_data(sub_event))
     return render_template('event/view.html', event=event, tables=tables)
@@ -172,7 +157,7 @@ def save(form, event=None, code=None, origin=None):
     try:
         if event:
             log_action = 'update'
-            LinkMapper.delete_by_codes(event, ['P117', 'P7', 'P24'])
+            event.delete_links(['P117', 'P7', 'P24'])
         else:
             log_action = 'insert'
             event = EntityMapper.insert(code, form.name.data)
@@ -192,17 +177,16 @@ def save(form, event=None, code=None, origin=None):
             event.link('P24', places)
         url = url_for('event_view', id_=event.id)
         if origin:
-            view_name = get_view_name(origin)
-            url = url_for(view_name + '_view', id_=origin.id) + '#tab-event'
-            if view_name == 'reference':
+            url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-event'
+            if origin.view_name == 'reference':
                 link_id = origin.link('P67', event)
                 url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
-            elif view_name == 'source':
+            elif origin.view_name == 'source':
                 origin.link('P67', event)
-            elif view_name == 'actor':
+            elif origin.view_name == 'actor':
                 link_id = event.link('P11', origin)
                 url = url_for('involvement_update', id_=link_id, origin_id=origin.id)
-            elif view_name == 'file':
+            elif origin.view_name == 'file':
                 origin.link('P67', event)
         if form.continue_.data == 'yes':
             url = url_for('event_insert', code=code, origin_id=origin.id if origin else None)

@@ -10,5 +10,5 @@
             <a href="{{ url_for('user_insert') }}">+ {{ _('user')|uc_first }}</a>
         </div>
     {% endif %}
-    {{ tables['user']|pager|safe }}
+    {{ table|pager|safe }}
 {% endblock %}

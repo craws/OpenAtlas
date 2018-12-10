@@ -29,19 +29,19 @@ class NodeForm(Form):
 @app.route('/types')
 @required_group('readonly')
 def node_index():
-    nodes = {
-        'system': OrderedDict(), 'custom': OrderedDict(),
-        'places': OrderedDict(), 'value': OrderedDict()}
+    nodes = {'system': OrderedDict(), 'custom': OrderedDict(),
+             'places': OrderedDict(), 'value': OrderedDict()}
     for id_, node in g.nodes.items():
-        if not node.root:
-            type_ = 'custom'
-            if node.class_.code == 'E53':
-                type_ = 'places'
-            elif node.system:
-                type_ = 'system'
-            elif node.value_type:
-                type_ = 'value'
-            nodes[type_][node] = tree_select(node.name)
+        if node.root:
+            continue
+        type_ = 'custom'
+        if node.class_.code == 'E53':
+            type_ = 'places'
+        elif node.system:
+            type_ = 'system'
+        elif node.value_type:
+            type_ = 'value'
+        nodes[type_][node] = tree_select(node.name)
     return render_template('types/index.html', nodes=nodes)
 
 
@@ -84,7 +84,6 @@ def node_view(id_):
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]] if node.root else None
     super_ = g.nodes[node.root[0]] if node.root else None
-
     header = [_('name'), _('class'), _('info')]
     if root and root.value_type:  # pragma: no cover
         header = [_('name'), _('value'), _('class'), _('info')]
@@ -103,9 +102,8 @@ def node_view(id_):
             tables['entities']['data'].append(data)
     tables['link_entities'] = {'id': 'link_items', 'header': [_('domain'), _('range')], 'data': []}
     for row in LinkPropertyMapper.get_entities_by_node(node):
-        tables['link_entities']['data'].append([
-            link(EntityMapper.get_by_id(row.domain_id)),
-            link(EntityMapper.get_by_id(row.range_id))])
+        tables['link_entities']['data'].append([link(EntityMapper.get_by_id(row.domain_id)),
+                                                link(EntityMapper.get_by_id(row.range_id))])
     tables['subs'] = {'id': 'subs', 'header': [_('name'), _('count'), _('info')], 'data': []}
     for sub_id in node.subs:
         sub = g.nodes[sub_id]
@@ -119,29 +117,18 @@ def node_delete(id_):
     node = g.nodes[id_]
     if node.system or node.subs or node.count:
         abort(403)
-    g.cursor.execute('BEGIN')
-    try:
-        EntityMapper.delete(node.id)
-        g.cursor.execute('COMMIT')
-        flash(_('entity deleted'), 'info')
-    except Exception as e:  # pragma: no cover
-        g.cursor.execute('ROLLBACK')
-        logger.log('error', 'database', 'transaction failed', e)
-        flash(_('error transaction'), 'error')
+    EntityMapper.delete(node.id)
+    flash(_('entity deleted'), 'info')
     root = g.nodes[node.root[-1]] if node.root else None
-    url = url_for('node_view', id_=root.id) if root else url_for('node_index')
-    return redirect(url)
+    return redirect(url_for('node_view', id_=root.id) if root else url_for('node_index'))
 
 
 class MoveForm(Form):
     is_node_form = HiddenField()
-    selection = SelectMultipleField(
-        '',
-        [InputRequired()],
-        coerce=int,
-        option_widget=widgets.CheckboxInput(),
-        widget=widgets.ListWidget(prefix_label=False),
-        default=['E21', 'E7', 'E40', 'E74', 'E8', 'E12', 'E6'])
+    selection = SelectMultipleField('', [InputRequired()], coerce=int,
+                                    option_widget=widgets.CheckboxInput(),
+                                    widget=widgets.ListWidget(prefix_label=False),
+                                    default=['E21', 'E7', 'E40', 'E74', 'E8', 'E12', 'E6'])
     save = SubmitField(_('move'))
 
 
@@ -165,7 +152,7 @@ def node_move_entities(id_):
 
 def walk_tree(param):
     text = ''
-    for id_ in param if isinstance(param, list) else [param]:
+    for id_ in param if type(param) is list else [param]:
         item = g.nodes[id_]
         count_subs = ' (' + format_number(item.count_subs) + ')' if item.count_subs else ''
         text += "{href: '" + url_for('node_view', id_=item.id) + "',"

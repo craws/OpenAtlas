@@ -1,20 +1,20 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import glob
 import os
+import re
 import smtplib
 from collections import OrderedDict
+from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
+from functools import wraps
 from html.parser import HTMLParser
 
 import numpy
-import re
 from babel import dates
-from datetime import datetime
 from flask import abort, flash, g, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
-from functools import wraps
 from numpy import math
 from werkzeug.utils import redirect
 
@@ -36,13 +36,13 @@ def convert_size(size_bytes):
 
 
 def get_file_path(entity):
-    entity_id = entity if isinstance(entity, int) else entity.id
+    entity_id = entity if type(entity) is int else entity.id
     path = glob.glob(os.path.join(app.config['UPLOAD_FOLDER_PATH'], str(entity_id) + '.*'))
     return path[0] if path else None
 
 
 def print_file_size(entity):
-    entity_id = entity if isinstance(entity, int) else entity.id
+    entity_id = entity if type(entity) is int else entity.id
     path = get_file_path(entity_id)
     return convert_size(os.path.getsize(path)) if path else 'N/A'
 
@@ -54,7 +54,7 @@ def display_tooltip(text):
 
 
 def print_file_extension(entity):
-    entity_id = entity if isinstance(entity, int) else entity.id
+    entity_id = entity if type(entity) is int else entity.id
     path = get_file_path(entity_id)
     return os.path.splitext(path)[1] if path else 'N/A'
 
@@ -62,7 +62,7 @@ def print_file_extension(entity):
 def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
     """ Send one mail to every recipient, set log_body to False for sensitive data e.g. passwords"""
     settings = session['settings']
-    recipients = recipients if isinstance(recipients, list) else [recipients]
+    recipients = recipients if type(recipients) is list else [recipients]
     if not settings['mail'] or len(recipients) < 1:
         return
     mail_user = settings['mail_transport_username']
@@ -110,13 +110,6 @@ class MLStripper(HTMLParser):
 
     def get_data(self):
         return ''.join(self.fed)
-
-
-def get_view_name(entity):
-    if entity.system_type == 'file':
-        return 'file'
-    if entity.class_.code in app.config['CODE_CLASS']:
-        return app.config['CODE_CLASS'][entity.class_.code]
 
 
 def sanitize(string, mode=None):
@@ -393,7 +386,7 @@ def format_datetime(value, format_='medium'):
 def format_date(value, format_='medium'):
     if not value:
         return ''
-    if isinstance(value, numpy.datetime64):
+    if type(value) is numpy.datetime64:
         return DateMapper.datetime64_to_timestamp(value)
     return dates.format_date(value, format=format_, locale=session['language'])
 
@@ -403,20 +396,20 @@ def link(entity):
     if not entity:
         return ''
     html = ''
-    if isinstance(entity, Project):
+    if type(entity) is Project:
         url = url_for('import_project_view', id_=entity.id)
         html = '<a href="' + url + '">' + entity.name + '</a>'
-    elif isinstance(entity, User):
+    elif type(entity) is User:
         style = '' if entity.active else 'class="inactive"'
         url = url_for('user_view', id_=entity.id)
         html = '<a ' + style + ' href="' + url + '">' + entity.username + '</a>'
-    elif isinstance(entity, ClassObject):
+    elif type(entity) is ClassObject:
         url = url_for('class_view', code=entity.code)
         html = '<a href="' + url + '">' + entity.code + '</a>'
-    elif isinstance(entity, Property):
+    elif type(entity) is Property:
         url = url_for('property_view', code=entity.code)
         html = '<a href="' + url + '">' + entity.code + '</a>'
-    elif isinstance(entity, Entity):
+    elif type(entity) is Entity:
         url = ''
         if entity.class_.code == 'E33':
             if entity.system_type == 'source content':
@@ -459,7 +452,7 @@ def truncate_string(string, length=40, span=True):
     return '<span title="' + string.replace('"', '') + '">' + string[:length] + '..' + '</span>'
 
 
-def pager(table):
+def pager(table, remove_rows=True):
     if not table['data']:
         return '<p>' + uc_first(_('no entries')) + '</p>'
     html = ''
@@ -520,13 +513,14 @@ def pager(table):
                 }}}})
             .tablesorterPager({{
                 delayInit: true,
-                removeRows: true,
+                {remove_rows}
                 positionFixed: false,
                 container: $("#{id}-pager"),
                 size:{size}}});
         """.format(
             id=table['id'],
             sort=sort,
+            remove_rows='removeRows: true,' if remove_rows else '',
             size=table_rows,
             filter_liveSearch=app.config['MIN_CHARS_TABLESORTER_SEARCH'],
             headers=(table['headers'] + ',') if 'headers' in table else '')
@@ -548,22 +542,20 @@ def pager(table):
 
 def get_base_table_data(entity):
     """ Returns standard table data for an entity"""
-    data = []
-    view_name = get_view_name(entity)
-    data.append(link(entity))
-    if view_name in ['event', 'actor']:
+    data = [link(entity)]
+    if entity.view_name in ['event', 'actor']:
         data.append(g.classes[entity.class_.code].name)
-    if view_name in ['reference'] and entity.system_type != 'file':
+    if entity.view_name in ['reference'] and entity.system_type != 'file':
         data.append(uc_first(_(entity.system_type)))
-    if view_name in ['event', 'place', 'source', 'reference', 'file']:
+    if entity.view_name in ['event', 'place', 'source', 'reference', 'file']:
         data.append(entity.print_base_type())
     if entity.system_type == 'file':
         data.append(print_file_size(entity))
         data.append(print_file_extension(entity))
-    if view_name in ['event', 'actor', 'place']:
+    if entity.view_name in ['event', 'actor', 'place']:
         data.append(format(entity.first))
         data.append(format(entity.last))
-    if view_name in ['source'] or entity.system_type == 'file':
+    if entity.view_name in ['source'] or entity.system_type == 'file':
         data.append(truncate_string(entity.description))
     return data
 

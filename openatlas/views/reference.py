@@ -12,8 +12,8 @@ from openatlas.forms.forms import TableField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 get_view_name, is_authorized, link, required_group,
-                                 truncate_string, uc_first, was_modified)
+                                 is_authorized, link, required_group, truncate_string, uc_first,
+                                 was_modified)
 
 
 class ReferenceForm(Form):
@@ -66,12 +66,11 @@ class AddFileForm(Form):
 def reference_add(origin_id):
     """ Link an entity to reference coming from the entity."""
     origin = EntityMapper.get_by_id(origin_id)
-    view_name = get_view_name(origin)
     form = AddReferenceForm()
     if form.validate_on_submit():
         EntityMapper.get_by_id(form.reference.data).link('P67', origin, form.page.data)
-        return redirect(url_for(view_name + '_view', id_=origin.id) + '#tab-reference')
-    return render_template('reference/add.html', origin=origin, form=form, class_name=view_name)
+        return redirect(url_for(origin.view_name + '_view', id_=origin.id) + '#tab-reference')
+    return render_template('reference/add.html', origin=origin, form=form)
 
 
 @app.route('/reference/add2/<int:reference_id>/<class_name>', methods=['POST', 'GET'])
@@ -85,8 +84,8 @@ def reference_add2(reference_id, class_name):
         entity = EntityMapper.get_by_id(getattr(form, class_name).data)
         reference_.link(property_code, entity, form.page.data)
         return redirect(url_for('reference_view', id_=reference_.id) + '#tab-' + class_name)
-    return render_template(
-        'reference/add2.html', reference=reference_, form=form, class_name=class_name)
+    return render_template('reference/add2.html', reference=reference_, form=form,
+                           class_name=class_name)
 
 
 @app.route('/reference/link-update/<int:link_id>/<int:origin_id>', methods=['POST', 'GET'])
@@ -94,7 +93,6 @@ def reference_add2(reference_id, class_name):
 def reference_link_update(link_id, origin_id):
     link_ = LinkMapper.get_by_id(link_id)
     origin = EntityMapper.get_by_id(origin_id)
-    view_name = get_view_name(origin)
     form = AddReferenceForm()
     form.save.label.text = _('save')
     del form.reference
@@ -102,25 +100,20 @@ def reference_link_update(link_id, origin_id):
         link_.description = form.page.data
         link_.update()
         flash(_('info update'), 'info')
-        tab = '#tab-' + get_view_name(link_.range) if view_name == 'reference' else '#tab-reference'
-        return redirect(url_for(view_name + '_view', id_=origin.id) + tab)
+        tab = '#tab-reference'
+        if origin.view_name == 'reference':
+            tab = '#tab-' + link_.range.view_name
+        return redirect(url_for(origin.view_name + '_view', id_=origin.id) + tab)
     form.page.data = link_.description
-    return render_template(
-        'reference/link-update.html',
-        origin=origin,
-        linked_object=link_.domain if link_.domain.id != origin.id else link_.range,
-        form=form,
-        class_name=view_name)
+    linked_object = link_.domain if link_.domain.id != origin.id else link_.range
+    return render_template('reference/link-update.html', origin=origin, form=form,
+                           linked_object=linked_object)
 
 
 @app.route('/reference/view/<int:id_>')
-@app.route('/reference/view/<int:id_>/<int:unlink_id>')
 @required_group('readonly')
-def reference_view(id_, unlink_id=None):
+def reference_view(id_):
     reference = EntityMapper.get_by_id(id_)
-    if unlink_id:
-        LinkMapper.delete_by_id(unlink_id)
-        flash(_('link removed'), 'info')
     tables = {
         'info': get_entity_data(reference),
         'file': {'id': 'files', 'data': [],
@@ -131,21 +124,19 @@ def reference_view(id_, unlink_id=None):
     for link_ in reference.get_links('P67', True):
         data = get_base_table_data(link_.domain)
         if is_authorized('editor'):
-            unlink = url_for('reference_view', id_=reference.id, unlink_id=link_.id) + '#tab-file'
-            data.append(display_remove_link(unlink, link_.domain.name))
+            url = url_for('link_delete', id_=link_.id, origin_id=reference.id) + '#tab-file'
+            data.append(display_remove_link(url, link_.domain.name))
         tables['file']['data'].append(data)
     for link_ in reference.get_links(['P67', 'P128']):
-        view_name = get_view_name(link_.range)
-        view_name = view_name if view_name != 'place' else link_.range.system_type.replace(' ', '-')
-        data = get_base_table_data(link_.range)
+        range_ = link_.range
+        data = get_base_table_data(range_)
         data.append(truncate_string(link_.description))
         if is_authorized('editor'):
-            update_url = url_for('reference_link_update', link_id=link_.id, origin_id=reference.id)
-            data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
-            unlink_url = url_for(
-                'reference_view', id_=reference.id, unlink_id=link_.id) + '#tab-' + view_name
-            data.append(display_remove_link(unlink_url, link_.range.name))
-        tables[view_name]['data'].append(data)
+            url = url_for('reference_link_update', link_id=link_.id, origin_id=reference.id)
+            data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
+            url = url_for('link_delete', id_=link_.id, origin_id=reference.id)
+            data.append(display_remove_link(url + '#tab-' + range_.table_name, range_.name))
+        tables[range_.table_name]['data'].append(data)
     return render_template('reference/view.html', reference=reference, tables=tables)
 
 
@@ -166,8 +157,7 @@ def reference_index():
 @required_group('editor')
 def reference_insert(code, origin_id=None):
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
-    form_code = 'Information Carrier' if code == 'carrier' else uc_first(code)
-    form = build_form(ReferenceForm, uc_first(form_code))
+    form = build_form(ReferenceForm, uc_first('Information Carrier' if code == 'carrier' else code))
     if origin:
         del form.insert_and_continue
     if form.validate_on_submit():
@@ -178,16 +168,9 @@ def reference_insert(code, origin_id=None):
 @app.route('/reference/delete/<int:id_>')
 @required_group('editor')
 def reference_delete(id_):
-    g.cursor.execute('BEGIN')
-    try:
-        EntityMapper.delete(id_)
-        logger.log_user(id_, 'delete')
-        g.cursor.execute('COMMIT')
-        flash(_('entity deleted'), 'info')
-    except Exception as e:  # pragma: no cover
-        g.cursor.execute('ROLLBACK')
-        logger.log('error', 'database', 'transaction failed', e)
-        flash(_('error transaction'), 'error')
+    EntityMapper.delete(id_)
+    logger.log_user(id_, 'delete')
+    flash(_('entity deleted'), 'info')
     return redirect(url_for('reference_index'))
 
 
@@ -210,15 +193,12 @@ def reference_update(id_):
 
 def save(form, reference=None, code=None, origin=None):
     g.cursor.execute('BEGIN')
+    log_action = 'update'
     try:
-        log_action = 'update'
         if not reference:
             log_action = 'insert'
-            class_code = 'E31'
-            system_type = code
-            if code == 'carrier':
-                class_code = 'E84'
-                system_type = 'information carrier'
+            class_code = 'E84' if code == 'carrier' else 'E31'
+            system_type = 'information carrier' if code == 'carrier' else code
             reference = EntityMapper.insert(class_code, form.name.data, system_type)
         reference.name = form.name.data
         reference.description = form.description.data

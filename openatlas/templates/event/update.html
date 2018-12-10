@@ -1,4 +1,5 @@
 {% extends 'layout.html' %}
+{% block title_name %}- {{ event.name }}{% endblock %}
 {% block breadcrumb %}
     <a href="{{ url_for('event_index') }}">{{ _('event')|uc_first }}</a>
     > {{ event|link|safe }}

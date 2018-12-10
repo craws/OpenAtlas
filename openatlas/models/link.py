@@ -1,4 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+import ast
+
 from flask import abort, flash, g
 from flask_babel import lazy_gettext as _
 
@@ -7,14 +9,13 @@ from openatlas import debug_model, logger
 
 class Link:
 
-    def __init__(self, row):
+    def __init__(self, row, domain=None, range_=None):
         from openatlas.models.entity import EntityMapper
         self.id = row.id
         self.description = row.description
         self.property = g.properties[row.property_code]
-        # Todo: performance - if it's a node don't call get_by_id
-        self.domain = EntityMapper.get_by_id(row.domain_id)
-        self.range = EntityMapper.get_by_id(row.range_id)
+        self.domain = domain if domain else EntityMapper.get_by_id(row.domain_id)
+        self.range = range_ if range_ else EntityMapper.get_by_id(row.range_id)
         self.type = g.nodes[row.type_id] if row.type_id else None
         self.nodes = dict()
         if hasattr(row, 'type_id') and row.type_id:
@@ -27,7 +28,7 @@ class Link:
         LinkMapper.update(self)
 
     def delete(self):
-        LinkMapper.delete_by_id(self.id)
+        LinkMapper.delete(self.id)
 
     def set_dates(self):
         from openatlas.models.date import DateMapper
@@ -37,14 +38,23 @@ class Link:
 class LinkMapper:
 
     @staticmethod
-    def insert(domain, property_code, range_, description=None):
-        if not domain or not range_:  # pragma: no cover
+    def insert(entity, property_code, linked_entities, description=None, inverse=False):
+        from openatlas.models.entity import Entity, EntityMapper
+        # linked_entities can be an entity, an entity id or a list of them
+        if not entity or not linked_entities:  # pragma: no cover
             return
-        # Domain can be an entity or entity id, range_ can also be a list of entities or entity ids
         property_ = g.properties[property_code]
-        range_ = range_ if isinstance(range_, list) else [range_]
+        try:
+            linked_entities = ast.literal_eval(linked_entities)
+        except (SyntaxError, ValueError):
+            pass
+        linked_entities = linked_entities if type(linked_entities) is list else [linked_entities]
+        if type(linked_entities[0]) is not Entity:
+            linked_entities = EntityMapper.get_by_ids(linked_entities)
         result = None
-        for range_ in range_:
+        for linked_entity in linked_entities:
+            domain = linked_entity if inverse else entity
+            range_ = entity if inverse else linked_entity
             domain_error = True
             range_error = True
             if property_.find_object('domain_class_code', g.classes[domain.class_.code].code):
@@ -67,7 +77,7 @@ class LinkMapper:
                 'domain_id': domain.id,
                 'range_id': range_.id,
                 'description': description})
-            debug_model['div sql'] += 1
+            debug_model['link sql'] += 1
             result = g.cursor.fetchone()[0]
         return result
 
@@ -75,10 +85,9 @@ class LinkMapper:
     def get_linked_entity(entity_param, code, inverse=False):
         result = LinkMapper.get_linked_entities(entity_param, code, inverse)
         if len(result) > 1:  # pragma: no cover
-            message = 'multiple linked entities found for ' + code
-            logger.log('error', 'model', message)
+            logger.log('error', 'model', 'multiple linked entities found for ' + code)
             flash(_('error multiple linked entities found'), 'error')
-            return result[0]  # return first one nevertheless
+            return
         if result:
             return result[0]
 
@@ -93,14 +102,15 @@ class LinkMapper:
                 SELECT domain_id AS result_id FROM model.link
                 WHERE range_id = %(entity_id)s AND property_code IN %(codes)s;"""
         g.cursor.execute(sql, {
-            'entity_id': entity if isinstance(entity, int) else entity.id,
-            'codes': tuple(codes if isinstance(codes, list) else [codes])})
-        debug_model['div sql'] += 1
+            'entity_id': entity if type(entity) is int else entity.id,
+            'codes': tuple(codes if type(codes) is list else [codes])})
+        debug_model['link sql'] += 1
         ids = [element for (element,) in g.cursor.fetchall()]
         return EntityMapper.get_by_ids(ids)
 
     @staticmethod
     def get_links(entity, codes, inverse=False):
+        from openatlas.models.entity import EntityMapper
         sql = """
             SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description, l.created,
                 l.modified, e.name,
@@ -120,17 +130,28 @@ class LinkMapper:
             WHERE l.{first}_id = %(entity_id)s GROUP BY l.id, e.name ORDER BY e.name;""".format(
             first='range' if inverse else 'domain', second='domain' if inverse else 'range')
         g.cursor.execute(sql, {
-            'entity_id': entity if isinstance(entity, int) else entity.id,
-            'codes': tuple(codes if isinstance(codes, list) else [codes])})
-        debug_model['div sql'] += 1
-        return [Link(row) for row in g.cursor.fetchall()]
+            'entity_id': entity if type(entity) is int else entity.id,
+            'codes': tuple(codes if type(codes) is list else [codes])})
+        debug_model['link sql'] += 1
+        entity_ids = set()
+        result = g.cursor.fetchall()
+        for row in result:
+            entity_ids.add(row.domain_id)
+            entity_ids.add(row.range_id)
+        entities = {entity.id: entity for entity in EntityMapper.get_by_ids(entity_ids)}
+        links = []
+        for row in result:
+            links.append(Link(row, domain=entities[row.domain_id], range_=entities[row.range_id]))
+        return links
 
     @staticmethod
     def delete_by_codes(entity, codes):
-        codes = codes if isinstance(codes, list) else [codes]
-        sql = "DELETE FROM model.link WHERE domain_id = %(id)s AND property_code IN %(codes)s;"
+        codes = codes if type(codes) is list else [codes]
+        sql = """
+            DELETE FROM model.link
+            WHERE property_code IN %(codes)s AND (domain_id = %(id)s OR range_id = %(id)s);"""
         g.cursor.execute(sql, {'id': entity.id, 'codes': tuple(codes)})
-        debug_model['div sql'] += 1
+        debug_model['link sql'] += 1
 
     @staticmethod
     def get_by_id(id_):
@@ -151,16 +172,16 @@ class LinkMapper:
             LEFT JOIN model.entity d2 ON dl2.range_id = d2.id
             WHERE l.id = %(id)s GROUP BY l.id;"""
         g.cursor.execute(sql, {'id': id_})
-        debug_model['div sql'] += 1
+        debug_model['link sql'] += 1
         return Link(g.cursor.fetchone())
 
     @staticmethod
-    def delete_by_id(id_):
+    def delete(id_):
         from openatlas.util.util import is_authorized
         if not is_authorized('editor'):  # pragma: no cover
             abort(403)
         g.cursor.execute("DELETE FROM model.link WHERE id = %(id)s;", {'id': id_})
-        debug_model['div sql'] += 1
+        debug_model['link sql'] += 1
 
     @staticmethod
     def update(link):
@@ -172,7 +193,7 @@ class LinkMapper:
             'domain_id': link.domain.id,
             'range_id': link.range.id,
             'description': link.description})
-        debug_model['div sql'] += 1
+        debug_model['link sql'] += 1
 
     @staticmethod
     def check_links():
@@ -186,7 +207,7 @@ class LinkMapper:
             JOIN model.entity d ON l.domain_id = d.id
             JOIN model.entity r ON l.range_id = r.id;"""
         g.cursor.execute(sql)
-        debug_model['div sql'] += 1
+        debug_model['link sql'] += 1
         invalid_links = []
         for row in g.cursor.fetchall():
             property_ = g.properties[row.property]
@@ -213,7 +234,7 @@ class LinkMapper:
                     'property': item['property'],
                     'domain': item['domain'],
                     'range': item['range']})
-                debug_model['div sql'] += 1
+                debug_model['link sql'] += 1
                 for row2 in g.cursor.fetchall():
                     domain = EntityMapper.get_by_id(row2.domain_id)
                     range_ = EntityMapper.get_by_id(row2.range_id)

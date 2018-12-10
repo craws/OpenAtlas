@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% block title_name %}- {{ object_.name }}{% endblock %}
 {% block breadcrumb %}
     <a href="{{ url_for('place_index') }}">{{ _('place')|uc_first }}</a>
     {{ '> ' + place|link|safe if place else '' }}

@@ -21,7 +21,7 @@ p.manual {
     margin-bottom: 0.5em;
 }
 
-input[type="text"].value-type {
+input[type="text"].value-type, input[type="text"].integer {
     width: 4em;
     text-align: right;
 }

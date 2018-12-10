@@ -53,9 +53,8 @@ class FileTest(TestBaseCase):
                     data={'name': 'Invalid file', 'file': invalid_file}, follow_redirects=True)
             assert b'File type not allowed' in rv.data
 
-            rv = self.app.post(
-                url_for('file_insert', code='E7', origin_id=actor_id),
-                data={'name': 'This is not a file'}, follow_redirects=True)
+            rv = self.app.post(url_for('file_insert', code='E7', origin_id=actor_id),
+                               data={'name': 'This is not a file'}, follow_redirects=True)
             assert b'This field is required' in rv.data
 
             # View
@@ -64,7 +63,7 @@ class FileTest(TestBaseCase):
             rv = self.app.get(url_for('file_view', id_=file_id2))
             assert b'OpenAtlas logo' in rv.data
 
-            # Calling download, display urls with "with to prevent unclosed files warning
+            # Calling download, display urls with "with" to prevent unclosed files warning
             with self.app.get(url_for('download_file', filename=str(file_id) + '.png')):
                 pass
             with self.app.get(url_for('display_file', filename=str(file_id) + '.png')):
@@ -77,28 +76,21 @@ class FileTest(TestBaseCase):
             # Add
             rv = self.app.get(url_for('file_add', origin_id=actor_id))
             assert b'Add File' in rv.data
-            rv = self.app.post(
-                url_for('file_add', origin_id=actor_id),
-                data={'values': file_id}, follow_redirects=True)
+            rv = self.app.post(url_for('file_add', origin_id=actor_id), data={'values': file_id},
+                               follow_redirects=True)
             assert b'OpenAtlas logo' in rv.data
 
             # Update
             rv = self.app.get(url_for('file_update', id_=file_id))
             assert b'OpenAtlas logo' in rv.data
-            rv = self.app.post(
-                url_for('file_update', id_=file_id), data={'name': 'Updated file'},
-                follow_redirects=True)
+            rv = self.app.post(url_for('file_update', id_=file_id), data={'name': 'Updated file'},
+                               follow_redirects=True)
             assert b'Changes have been saved' in rv.data and b'Updated file' in rv.data
-
-            # Unlink
-            rv = self.app.get(url_for('file_view', id_=file_id, unlink_id=actor_id))
-            assert b'Link removed' in rv.data
 
             rv = self.app.get(url_for('file_add2', id_=file_id, class_name='actor'))
             assert b'Add Actor' in rv.data
-            rv = self.app.post(
-                url_for('file_add2', id_=file_id, class_name='actor'),
-                data={'values': actor_id}, follow_redirects=True)
+            rv = self.app.post(url_for('file_add2', id_=file_id, class_name='actor'),
+                               data={'values': actor_id}, follow_redirects=True)
             assert b'File keeper' in rv.data
 
             # Delete

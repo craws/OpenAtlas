@@ -5,14 +5,14 @@ import re
 import flask
 import jinja2
 from flask import g, render_template_string, request, url_for
-from flask_babel import lazy_gettext as _, format_number as babel_format_number
+from flask_babel import format_number as babel_format_number, lazy_gettext as _
 from flask_login import current_user
 from jinja2 import escape, evalcontextfilter
 from wtforms import IntegerField
 from wtforms.validators import Email
 
 from openatlas import app
-from openatlas.forms.forms import ValueFloatField, TreeField
+from openatlas.forms.forms import TreeField, ValueFloatField
 from openatlas.models.content import ContentMapper
 from openatlas.util import util
 from openatlas.util.util import display_tooltip, print_file_extension
@@ -79,7 +79,7 @@ def bookmark_toggle(self, entity_id):
 def display_move_form(self, form, root_name):
     html = ''
     for field in form:
-        if isinstance(field, TreeField):
+        if type(field) is TreeField:
             html += '<p>' + root_name + ' ' + str(field) + '</p>'
     html += '<p><a class="button" id="select-all">' + util.uc_first(_('select all')) + '</a>'
     html += '<a class="button" id="select-none">' + util.uc_first(_('deselect all')) + '</a></p>'
@@ -209,13 +209,12 @@ def display_form(self, form, form_id=None, for_persons=False):
         return html_
 
     for field in form:
-        if isinstance(field, ValueFloatField):
+        if type(field) is ValueFloatField:
             continue
         class_ = 'required' if field.flags.required else ''
-        class_ += ' integer' if isinstance(field, IntegerField) else ''
+        class_ += ' integer' if type(field) is IntegerField else ''
         for validator in field.validators:
-            if isinstance(validator, Email):
-                class_ += ' email'
+            class_ += ' email' if type(validator) is Email else ''
         errors = ''
         for error in field.errors:
             errors += util.uc_first(error)
@@ -323,17 +322,11 @@ def truncate_string(self, string):
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def get_view_name(self, entity):
-    return util.get_view_name(entity)
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
 def display_delete_link(self, entity):
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
     confirm = 'onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
-    url = url_for(util.get_view_name(entity) + '_delete', id_=entity.id)
+    url = url_for(entity.view_name + '_delete', id_=entity.id)
     return '<a ' + confirm + ' href="' + url + '">' + util.uc_first(_('delete')) + '</a>'
 
 
@@ -343,7 +336,7 @@ def display_menu(self, origin):
     """ Returns html with the menu and mark appropriate item as selected."""
     html = ''
     if current_user.is_authenticated:
-        selected = util.get_view_name(origin) if origin else ''
+        selected = origin.view_name if origin else ''
         items = ['overview', 'source', 'event', 'actor', 'place', 'reference', 'types', 'admin']
         for item in items:
             if selected:
@@ -364,7 +357,7 @@ def display_debug_info(self, debug_model, form):
     for name, value in debug_model.items():
         if name in ['current']:
             continue  # Don't display current time counter
-        if name not in ['by codes', 'by id', 'by ids', 'linked', 'user', 'div sql']:
+        if name not in ['by codes', 'by id', 'link sql', 'user', 'div sql']:
             value = '{:10.2f}'.format(value)
         html += """
             <div>

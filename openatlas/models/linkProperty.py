@@ -13,16 +13,15 @@ class LinkPropertyMapper:
             VALUES (%(property_code)s, %(domain_id)s, %(range_id)s);"""
         g.cursor.execute(sql, {
             'property_code': property_code,
-            'domain_id': link if isinstance(link, int) else link.id,
-            'range_id': range_ if isinstance(range_, int) else range_.id})
-        debug_model['div sql'] += 1
+            'domain_id': link if type(link) is int else link.id,
+            'range_id': range_ if type(range_) is int else range_.id})
+        debug_model['link sql'] += 1
 
     @staticmethod
     def get_entities_by_node(node):
         sql = """
-            SELECT l.id, l.domain_id, l.range_id
-            FROM model.link l
+            SELECT l.id, l.domain_id, l.range_id FROM model.link l
             JOIN model.link_property lp ON l.id = lp.domain_id AND lp.range_id = %(node_id)s;"""
-        g.cursor.execute(sql, {'node_id': node if isinstance(node, int) else node.id})
-        debug_model['div sql'] += 1
+        g.cursor.execute(sql, {'node_id': node if type(node) is int else node.id})
+        debug_model['link sql'] += 1
         return g.cursor.fetchall()

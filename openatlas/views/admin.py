@@ -23,67 +23,21 @@ from openatlas.util.util import (convert_size, format_date, format_datetime, get
                                  required_group, send_mail, truncate_string, uc_first)
 
 
-class LogForm(Form):
-    limit = SelectField(_('limit'), choices=((0, _('all')), (100, 100), (500, 500)), default=100)
-    priority = SelectField(_('priority'), choices=(app.config['LOG_LEVELS'].items()), default=6)
-    user = SelectField(_('user'), choices=([(0, _('all'))]), default=0)
-    apply = SubmitField(_('apply'))
-
-
-class NewsLetterForm(Form):
-    subject = StringField(
-        '', [InputRequired()], render_kw={'placeholder': _('subject'), 'autofocus': True})
-    body = TextAreaField('', [InputRequired()], render_kw={'placeholder': _('content')})
-    send = SubmitField(uc_first(_('send')))
-
-
-class FileForm(Form):
-    file_upload_max_size = IntegerField(_('max file size in MB'))
-    file_upload_allowed_extension = StringField('allowed file extensions')
-    save = SubmitField(uc_first(_('save')))
-
-
-class LogoForm(Form):
-    file = TableField(_('file'), [InputRequired()])
-    save = SubmitField(uc_first(_('change logo')))
-
-
-class TestMail(Form):
-    receiver = StringField(_('test mail receiver'), [InputRequired(), Email()])
-    send = SubmitField(_('send test mail'))
-
-
 class GeneralForm(Form):
     site_name = StringField(uc_first(_('site name')))
     site_header = StringField(uc_first(_('site header')))
-    default_language = SelectField(uc_first(
-        _('default language')),
-        choices=app.config['LANGUAGES'].items())
-    default_table_rows = SelectField(
-        uc_first(_('default table rows')),
-        choices=app.config['DEFAULT_TABLE_ROWS'].items(),
-        coerce=int)
-    log_level = SelectField(
-        uc_first(_('log level')),
-        choices=app.config['LOG_LEVELS'].items(),
-        coerce=int)
+    default_language = SelectField(uc_first(_('default language')),
+                                   choices=app.config['LANGUAGES'].items())
+    default_table_rows = SelectField(uc_first(_('default table rows')), coerce=int,
+                                     choices=app.config['DEFAULT_TABLE_ROWS'].items())
+    log_level = SelectField(uc_first(_('log level')), coerce=int,
+                            choices=app.config['LOG_LEVELS'].items())
     debug_mode = BooleanField(uc_first(_('debug mode')))
     random_password_length = IntegerField(uc_first(_('random password length')))
     minimum_password_length = IntegerField(uc_first(_('minimum password length')))
     reset_confirm_hours = IntegerField(uc_first(_('reset confirm hours')))
     failed_login_tries = IntegerField(uc_first(_('failed login tries')))
     failed_login_forget_minutes = IntegerField(uc_first(_('failed login forget minutes')))
-    save = SubmitField(uc_first(_('save')))
-
-
-class MailForm(Form):
-    mail = BooleanField(uc_first(_('mail')))
-    mail_transport_username = StringField(uc_first(_('mail transport username')))
-    mail_transport_host = StringField(uc_first(_('mail transport host')))
-    mail_transport_port = StringField(uc_first(_('mail transport port')))
-    mail_from_email = StringField(uc_first(_('mail from email')), [Email()])
-    mail_from_name = StringField(uc_first(_('mail from name')))
-    mail_recipients_feedback = StringField(uc_first(_('mail recipients feedback')))
     save = SubmitField(uc_first(_('save')))
 
 
@@ -98,6 +52,35 @@ def admin_index():
     return render_template('admin/index.html', writeable_dirs=writeable_dirs)
 
 
+class MapForm(Form):
+    map_cluster_enabled = BooleanField(uc_first(_('use cluster')))
+    map_cluster_max_radius = IntegerField('maxClusterRadius')
+    map_cluster_disable_at_zoom = IntegerField('disableClusteringAtZoom')
+    save = SubmitField(uc_first(_('save')))
+
+
+@app.route('/admin/map', methods=['POST', 'GET'])
+@required_group('manager')
+def admin_map():
+    form = MapForm(obj=session['settings'])
+    if form.validate_on_submit():
+        g.cursor.execute('BEGIN')
+        try:
+            SettingsMapper.update_map_settings(form)
+            logger.log('info', 'settings', 'Settings updated')
+            g.cursor.execute('COMMIT')
+            flash(_('info update'), 'info')
+        except Exception as e:  # pragma: no cover
+            g.cursor.execute('ROLLBACK')
+            logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
+        return redirect(url_for('admin_index'))
+    form.map_cluster_enabled.data = session['settings']['map_cluster_enabled']
+    form.map_cluster_max_radius.data = session['settings']['map_cluster_max_radius']
+    form.map_cluster_disable_at_zoom.data = session['settings']['map_cluster_disable_at_zoom']
+    return render_template('admin/map.html', form=form)
+
+
 @app.route('/admin/check_links')
 @app.route('/admin/check_links/<check>')
 @required_group('admin')
@@ -108,6 +91,12 @@ def admin_check_links(check=None):
         for result in LinkMapper.check_links():  # pragma: no cover
             table['data'].append([result['domain'], result['property'], result['range']])
     return render_template('admin/check_links.html', table=table)
+
+
+class FileForm(Form):
+    file_upload_max_size = IntegerField(_('max file size in MB'))
+    file_upload_allowed_extension = StringField('allowed file extensions')
+    save = SubmitField(uc_first(_('save')))
 
 
 @app.route('/admin/file', methods=['POST', 'GET'])
@@ -131,14 +120,17 @@ def admin_file():
     return render_template('admin/file.html', form=form)
 
 
-@app.route('/admin/orphans')
-@app.route('/admin/orphans/<delete>')
+@app.route('/admin/orphans/delete/<parameter>')
 @required_group('admin')
-def admin_orphans(delete=None):
-    if delete:
-        count = EntityMapper.delete_orphans(delete)
-        flash(_('info orphans deleted:') + ' ' + str(count), 'info')
-        return redirect(url_for('admin_orphans'))
+def admin_orphans_delete(parameter):
+    count = EntityMapper.delete_orphans(parameter)
+    flash(_('info orphans deleted:') + ' ' + str(count), 'info')
+    return redirect(url_for('admin_orphans'))
+
+
+@app.route('/admin/orphans')
+@required_group('admin')
+def admin_orphans():
     header = ['name', 'class', 'type', 'system type', 'created', 'updated', 'description']
     tables = {
         'orphans': {'id': 'orphans', 'header': header, 'data': []},
@@ -160,8 +152,8 @@ def admin_orphans(delete=None):
     for node in NodeMapper.get_orphans():
         tables['nodes']['data'].append([link(node), link(g.nodes[node.root[-1]])])
 
-    file_ids = []
     # Get orphaned file entities (no corresponding file)
+    file_ids = []
     for entity in EntityMapper.get_by_system_type('file'):
         file_ids.append(str(entity.id))
         if not get_file_path(entity):
@@ -192,6 +184,11 @@ def admin_orphans(delete=None):
                     'admin_file_delete',
                     filename=name) + '" ' + confirm + '>' + uc_first(_('delete')) + '</a>'])
     return render_template('admin/orphans.html', tables=tables)
+
+
+class LogoForm(Form):
+    file = TableField(_('file'), [InputRequired()])
+    save = SubmitField(uc_first(_('change logo')))
 
 
 @app.route('/admin/logo/', methods=['POST', 'GET'])
@@ -226,6 +223,7 @@ def admin_file_delete(filename):  # pragma: no cover
 
     # Get all files with entities
     file_ids = [str(entity.id) for entity in EntityMapper.get_by_system_type('file')]
+
     # Get orphaned files (no corresponding entity)
     path = app.config['UPLOAD_FOLDER_PATH']
     for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
@@ -239,14 +237,20 @@ def admin_file_delete(filename):  # pragma: no cover
     return redirect(url_for('admin_orphans') + '#tab-orphaned-files')
 
 
+class LogForm(Form):
+    limit = SelectField(_('limit'), choices=((0, _('all')), (100, 100), (500, 500)), default=100)
+    priority = SelectField(_('priority'), choices=(app.config['LOG_LEVELS'].items()), default=6)
+    user = SelectField(_('user'), choices=([(0, _('all'))]), default=0)
+    apply = SubmitField(_('apply'))
+
+
 @app.route('/admin/log', methods=['POST', 'GET'])
 @required_group('admin')
 def admin_log():
     form = LogForm()
     form.user.choices = [(0, _('all'))] + UserMapper.get_users()
-    table = {
-        'id': 'log', 'header': ['date', 'priority', 'type', 'message', 'user', 'info'],
-        'data': []}
+    table = {'id': 'log', 'data': [],
+             'header': ['date', 'priority', 'type', 'message', 'user', 'info']}
     logs = logger.get_system_logs(form.limit.data, form.priority.data, form.user.data)
     for row in logs:
         user = UserMapper.get_by_id(row.user_id) if row.user_id else None
@@ -266,6 +270,13 @@ def admin_log_delete():
     logger.delete_all_system_logs()
     flash(_('Logs deleted'))
     return redirect(url_for('admin_log'))
+
+
+class NewsLetterForm(Form):
+    subject = StringField(
+        '', [InputRequired()], render_kw={'placeholder': _('subject'), 'autofocus': True})
+    body = TextAreaField('', [InputRequired()], render_kw={'placeholder': _('content')})
+    send = SubmitField(uc_first(_('send')))
 
 
 @app.route('/admin/newsletter', methods=['POST', 'GET'])
@@ -296,10 +307,15 @@ def admin_newsletter():
     return render_template('admin/newsletter.html', form=form, table=table)
 
 
+class TestMailForm(Form):
+    receiver = StringField(_('test mail receiver'), [InputRequired(), Email()])
+    send = SubmitField(_('send test mail'))
+
+
 @app.route('/admin/mail', methods=["GET", "POST"])
 @required_group('admin')
 def admin_mail():
-    form = TestMail()
+    form = TestMailForm()
     settings = session['settings']
     if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
         user = current_user
@@ -364,6 +380,17 @@ def admin_general_update():
         elif field in form:
             getattr(form, field).data = session['settings'][field]
     return render_template('admin/general_update.html', form=form, settings=session['settings'])
+
+
+class MailForm(Form):
+    mail = BooleanField(uc_first(_('mail')))
+    mail_transport_username = StringField(uc_first(_('mail transport username')))
+    mail_transport_host = StringField(uc_first(_('mail transport host')))
+    mail_transport_port = StringField(uc_first(_('mail transport port')))
+    mail_from_email = StringField(uc_first(_('mail from email')), [Email()])
+    mail_from_name = StringField(uc_first(_('mail from name')))
+    mail_recipients_feedback = StringField(uc_first(_('mail recipients feedback')))
+    save = SubmitField(uc_first(_('save')))
 
 
 @app.route('/admin/mail/update', methods=["GET", "POST"])

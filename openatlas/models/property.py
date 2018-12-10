@@ -59,14 +59,12 @@ class PropertyMapper:
 
     @staticmethod
     def get_all():
-        properties = {}
         sql = """
             SELECT id, code, domain_class_code, range_class_code, name, name_inverse
             FROM model.property;"""
         g.cursor.execute(sql)
         debug_model['div sql'] += 1
-        for row in g.cursor.fetchall():
-            properties[row.code] = Property(row)
+        properties = {row.code: Property(row) for row in g.cursor.fetchall()}
         g.cursor.execute('SELECT super_code, sub_code FROM model.property_inheritance;')
         debug_model['div sql'] += 1
         for row in g.cursor.fetchall():

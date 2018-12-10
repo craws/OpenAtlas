@@ -10,7 +10,8 @@
         <link rel="mask-icon" href="/static/safari-pinned-tab.svg" />
         <link rel="stylesheet" href="/static/css/reset.css?v={{ config['VERSION'] }}" />
         <link rel="stylesheet" href="/static/vendor/jquery/jquery-ui-1.12.1/jquery-ui.min.css" />
-        <link rel="stylesheet" href="/static/vendor/jquery/jstree-3.3.4/themes/default/style.min.css" />
+        <link rel="stylesheet" href="/static/vendor/jquery/jstree-3.3.7/themes/default/style.min.css" />
+        <link rel="stylesheet" href="/static/vendor/leaflet/markercluster/MarkerCluster.Default.css" />
         {% for css_file in ['style.css', 'color.css', 'images.css'] %}
             <link rel="stylesheet" href="/static/css/{{ css_file }}?v={{ config['VERSION'] }}" />
             {% if current_user.is_authenticated %}
@@ -27,8 +28,8 @@
         <script src="/static/vendor/jquery/tablesorter-2.31.0/js/extras/jquery.tablesorter.pager.min.js"></script>
         <script src="/static/vendor/jquery/tablesorter-2.31.0/js/parsers/parser-input-select.min.js"></script>
         <script src="/static/vendor/jquery/jquery-validation-1.15.0/jquery.validate.min.js"></script>
-        <script src="/static/vendor/jquery/jstree-3.3.4/jstree.min.js"></script>
-        <script src="/static/vendor/jquery/jstree-3.3.4/jstree.search.js"></script>
+        <script src="/static/vendor/jquery/jstree-3.3.7/jstree.min.js"></script>
+        <script src="/static/vendor/jquery/jstree-3.3.7/jstree.search.js"></script>
         <script src="/static/vendor/tinymce/tinymce.min.js"></script>
         {% if gis_data %}
             {% include "map.html" %}
@@ -50,6 +51,7 @@
         <title>
             {{ session['settings']['site_name'] }}
             {{ ' - ' + request.path.split('/')[1]|uc_first if request.path.split('/')[1] else '' }}
+            {% block title_name %}{% endblock %}
         </title>
     </head>
     <body>

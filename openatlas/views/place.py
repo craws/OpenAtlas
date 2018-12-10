@@ -9,10 +9,9 @@ from openatlas import app, logger
 from openatlas.forms.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
-from openatlas.models.link import LinkMapper
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  is_authorized, link, required_group, truncate_string, uc_first,
-                                 was_modified, get_view_name)
+                                 was_modified)
 
 
 class PlaceForm(DateForm):
@@ -85,13 +84,9 @@ def place_insert(origin_id=None):
 
 
 @app.route('/place/view/<int:id_>')
-@app.route('/place/view/<int:id_>/<int:unlink_id>')
 @required_group('readonly')
-def place_view(id_, unlink_id=None):
+def place_view(id_):
     object_ = EntityMapper.get_by_id(id_)
-    if unlink_id:
-        LinkMapper.delete_by_id(unlink_id)
-        flash(_('link removed'), 'info')
     object_.set_dates()
     location = object_.get_linked_entity('P53')
     tables = {
@@ -99,34 +94,32 @@ def place_view(id_, unlink_id=None):
         'file': {'id': 'files', 'data': [], 'header': app.config['TABLE_HEADERS']['file']},
         'source': {'id': 'source', 'data': [], 'header': app.config['TABLE_HEADERS']['source']},
         'event': {'id': 'event', 'data': [], 'header': app.config['TABLE_HEADERS']['event']},
-        'reference': {
-            'id': 'reference', 'data': [],
-            'header': app.config['TABLE_HEADERS']['reference'] + ['pages']},
-        'actor': {
-            'id': 'actor', 'data': [],
-            'header': [_('actor'), _('property'), _('class'), _('first'), _('last')]}}
+        'reference': {'id': 'reference', 'data': [],
+                      'header': app.config['TABLE_HEADERS']['reference'] + ['pages']},
+        'actor': {'id': 'actor', 'data': [],
+                  'header': [_('actor'), _('property'), _('class'), _('first'), _('last')]}}
     if object_.system_type == 'place':
         tables['feature'] = {'id': 'feature', 'data': [],
                              'header': app.config['TABLE_HEADERS']['place'] + [_('description')]}
     if object_.system_type == 'feature':
         tables['stratigraphic-unit'] = {
-            'id': 'stratigraphic', 'data': [], 'header':
-            app.config['TABLE_HEADERS']['place'] + [_('description')]}
+            'id': 'stratigraphic', 'data': [],
+            'header': app.config['TABLE_HEADERS']['place'] + [_('description')]}
     if object_.system_type == 'stratigraphic unit':
         tables['find'] = {'id': 'find', 'data': [],
                           'header': app.config['TABLE_HEADERS']['place'] + [_('description')]}
     for link_ in object_.get_links('P67', True):
-        data = get_base_table_data(link_.domain)
-        view_name = get_view_name(link_.domain)
-        if view_name not in ['source', 'file']:
+        domain = link_.domain
+        data = get_base_table_data(domain)
+        if domain.view_name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
             if is_authorized('editor'):
                 url = url_for('reference_link_update', link_id=link_.id, origin_id=object_.id)
                 data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
         if is_authorized('editor'):
-            url = url_for('place_view', id_=object_.id, unlink_id=link_.id) + '#tab-' + view_name
-            data.append(display_remove_link(url, link_.domain.name))
-        tables[view_name]['data'].append(data)
+            url = url_for('link_delete', id_=link_.id, origin_id=object_.id)
+            data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
+        tables[domain.view_name]['data'].append(data)
     event_ids = []  # Keep track of already inserted events to prevent doubles
     for event in location.get_linked_entities(['P7'], True):
         tables['event']['data'].append(get_base_table_data(event))
@@ -173,24 +166,16 @@ def place_view(id_, unlink_id=None):
 @required_group('editor')
 def place_delete(id_):
     entity = EntityMapper.get_by_id(id_)
+    parent = None if entity.system_type == 'place' else entity.get_linked_entity('P46', True)
     if entity.get_linked_entities('P46'):
         flash(_('Deletion not possible if subunits exists'), 'error')
         return redirect(url_for('place_view', id_=id_))
-    g.cursor.execute('BEGIN')
-    try:
-        EntityMapper.delete(id_)
-        logger.log_user(id_, 'delete')
-        g.cursor.execute('COMMIT')
-    except Exception as e:  # pragma: no cover
-        g.cursor.execute('ROLLBACK')
-        logger.log('error', 'database', 'transaction failed', e)
-        flash(_('error transaction'), 'error')
+    EntityMapper.delete(id_)
+    logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
-    url = url_for('place_index')
-    if entity.system_type != 'place':
-        parent = LinkMapper.get_linked_entity(id_, 'P46', True)
-        url = url_for('place_view', id_=parent.id) + '#tab-' + entity.system_type
-    return redirect(url)
+    if parent:
+        return redirect(url_for('place_view', id_=parent.id) + '#tab-' + entity.system_type)
+    return redirect(url_for('place_index'))
 
 
 @app.route('/place/update/<int:id_>', methods=['POST', 'GET'])
@@ -216,9 +201,9 @@ def place_update(id_):
                 'place/update.html', form=form, object_=object_, modifier=modifier)
         save(form, object_, location)
         return redirect(url_for('place_view', id_=id_))
-    for alias in [x.name for x in object_.get_linked_entities('P1')]:
-        form.alias.append_entry(alias)
     if object_.system_type == 'place':
+        for alias in [x.name for x in object_.get_linked_entities('P1')]:
+            form.alias.append_entry(alias)
         form.alias.append_entry('')
     gis_data = GisMapper.get_all(object_)
     place = None
@@ -272,8 +257,8 @@ def save(form, object_=None, location=None, origin=None):
                     object_.link('P1', EntityMapper.insert('E41', alias))
         url = url_for('place_view', id_=object_.id)
         if origin:
-            url = url_for(get_view_name(origin) + '_view', id_=origin.id) + '#tab-place'
-            if get_view_name(origin) == 'reference':
+            url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-place'
+            if origin.view_name == 'reference':
                 link_id = origin.link('P67', object_)
                 url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
             elif origin.system_type in ['place', 'feature', 'stratigraphic unit']:

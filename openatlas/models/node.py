@@ -62,9 +62,9 @@ class NodeMapper(EntityMapper):
 
     @staticmethod
     def populate_subs(nodes):
-        forms = {}
         g.cursor.execute("SELECT id, name, extendable FROM web.form ORDER BY name ASC;")
         debug_model['div sql'] += 1
+        forms = {}
         for row in g.cursor.fetchall():
             forms[row.id] = {'id': row.id, 'name': row.name, 'extendable': row.extendable}
         sql = """
@@ -75,9 +75,7 @@ class NodeMapper(EntityMapper):
             FROM web.hierarchy h;"""
         g.cursor.execute(sql)
         debug_model['div sql'] += 1
-        hierarchies = {}
-        for row in g.cursor.fetchall():
-            hierarchies[row.id] = row
+        hierarchies = {row.id: row for row in g.cursor.fetchall()}
         for id_, node in nodes.items():
             if node.root:
                 super_ = nodes[node.root[0]]
@@ -89,9 +87,7 @@ class NodeMapper(EntityMapper):
                 node.directional = hierarchies[node.id].directional
                 node.multiple = hierarchies[node.id].multiple
                 node.system = hierarchies[node.id].system
-                node.forms = {}
-                for form_id in hierarchies[node.id].form_ids:
-                    node.forms[form_id] = forms[form_id]
+                node.forms = {form_id: forms[form_id] for form_id in hierarchies[node.id].form_ids}
 
     @staticmethod
     def get_root_path(nodes, node, super_id, root):
@@ -122,7 +118,7 @@ class NodeMapper(EntityMapper):
     @staticmethod
     def walk_tree(param, selected_ids):
         string = ''
-        for id_ in param if isinstance(param, list) else [param]:
+        for id_ in param if type(param) is list else [param]:
             item = g.nodes[id_]
             selected = ",'state' : {'selected' : true}" if item.id in selected_ids else ''
             name = item.name.replace("'", "&apos;")
@@ -150,11 +146,15 @@ class NodeMapper(EntityMapper):
         return nodes
 
     @staticmethod
-    def get_form_choices():
+    def get_form_choices(root=None):
         sql = "SELECT f.id, f.name FROM web.form f WHERE f.extendable = True ORDER BY name ASC;"
         g.cursor.execute(sql)
         debug_model['div sql'] += 1
-        return [(row.id, row.name) for row in g.cursor.fetchall()]
+        forms = []
+        for row in g.cursor.fetchall():
+            if not root or row.id not in root.forms:
+                forms.append((row.id, row.name))
+        return forms
 
     @staticmethod
     def save_entity_nodes(entity, form):
@@ -162,10 +162,10 @@ class NodeMapper(EntityMapper):
         if hasattr(entity, 'nodes'):
             entity.delete_links(['P2', 'P89'])
         for field in form:
-            if isinstance(field, ValueFloatField) and entity.class_.code != 'E53':
+            if type(field) is ValueFloatField and entity.class_.code != 'E53':
                 if field.data is not None:  # Allow to save 0 but not empty
                     entity.link('P2', g.nodes[int(field.name)], field.data)
-            elif isinstance(field, (TreeField, TreeMultiField)) and field.data:
+            elif type(field) in (TreeField, TreeMultiField) and field.data:
                 root = g.nodes[int(field.id)]
                 try:
                     range_ = [g.nodes[int(field.data)]]
@@ -181,7 +181,7 @@ class NodeMapper(EntityMapper):
     def save_link_nodes(link_id, form):
         from openatlas.forms.forms import TreeField
         for field in form:
-            if isinstance(field, TreeField) and field.data:
+            if type(field) is TreeField and field.data:
                 LinkPropertyMapper.insert(link_id, 'P2', int(field.data))
 
     @staticmethod
@@ -261,3 +261,51 @@ class NodeMapper(EntityMapper):
                 table='link_property' if root.name in app.config['PROPERTY_TYPES'] else 'link')
             g.cursor.execute(sql, {'old_type_id': old_node.id, 'delete_ids': tuple(delete_ids)})
             debug_model['div sql'] += 1
+
+    @staticmethod
+    def get_all_sub_ids(node, subs):
+        # Recursive function to return a list with all sub node ids
+        subs += node.subs
+        for sub_id in node.subs:
+            NodeMapper.get_all_sub_ids(g.nodes[sub_id], subs)
+        return subs
+
+    @staticmethod
+    def get_form_count(root_node, form_id):
+        # Check if nodes are already linked to entities before offering to remove a node from form
+        node_ids = NodeMapper.get_all_sub_ids(root_node, [])
+        if not node_ids:  # There are no sub nodes so skipping test
+            return
+        g.cursor.execute("SELECT name FROM web.form WHERE id = %(form_id)s;", {'form_id': form_id})
+        form_name = g.cursor.fetchone()[0]
+        system_type = ''
+        class_code = ''
+        if form_name == 'Source':
+            system_type = 'source content'
+        elif form_name == 'Event':
+            class_code = app.config['CLASS_CODES']['event']
+        elif form_name == 'Person':
+            class_code = ['E21']
+        elif form_name == 'Group':
+            class_code = ['E74']
+        elif form_name == 'Legal Body':
+            class_code = ['E40']
+        else:
+            system_type = form_name.lower()
+        sql = """
+            SELECT count(*) FROM model.link l
+            JOIN model.entity e ON l.domain_id = e.id AND l.range_id IN %(node_ids)s
+            WHERE l.property_code = 'P2' AND {sql_where} %(params)s;""".format(
+               sql_where='e.system_type =' if system_type else 'e.class_code IN')
+        g.cursor.execute(sql, {
+            'node_ids': tuple(node_ids),
+            'params': system_type if system_type else tuple(class_code)})
+        debug_model['div sql'] += 1
+        return g.cursor.fetchone()[0]
+
+    @staticmethod
+    def remove_form_from_hierarchy(root_node, form_id):
+        sql = """
+            DELETE FROM web.hierarchy_form
+            WHERE hierarchy_id = %(hierarchy_id)s AND form_id = %(form_id)s;"""
+        g.cursor.execute(sql, {'hierarchy_id': root_node.id, 'form_id': form_id})
