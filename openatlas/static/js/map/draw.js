@@ -4,7 +4,7 @@ var objectName; // Name of the entry at update of an existing entry
 // Variables for a selected geometry
 var geometryName;
 var geometryDescription;
-var geometryType; // centerpoint, shape or area
+var shapeType; // centerpoint, shape or area
 
 var captureCoordinates = false; // Boolean if clicks on map should be captured as coordinates
 var marker = false; // Temporary marker for point coordinate
@@ -85,13 +85,13 @@ inputForm.onAdd = function (map) {
                 </div>
             </div>
             <div style="clear:both;"></div>
-            <input type="button" id="saveButton" disabled value="` + translate["save"] + `" onclick="saveForm('` + geometryType + `')" />
+            <input type="button" id="saveButton" disabled value="` + translate["save"] + `" onclick="saveForm('` + shapeType + `')" />
         </form>`;
     return div;
 };
 
 map.on('click', function(e) {
-    if (captureCoordinates && geometryType == 'centerpoint') {
+    if (captureCoordinates && shapeType == 'centerpoint') {
         $('#saveButton').prop('disabled', false);
         if (marker) {  // Marker already exists so move it
             marker.setLatLng(e.latlng);
@@ -125,7 +125,7 @@ map.on('click', function(e) {
 map.on('draw:created', function (e) {
     drawnPolygon.addLayer(e.layer);
     layer = e.layer;
-    if (geometryType == 'centerpoint') {
+    if (shapeType == 'centerpoint') {
         coordinates = layer.getLatLng();
         shapeSyntax = 'ST_GeomFromText(\'POINT(' + (' ' + coordinates.lng + ' ' + coordinates.lat) + ')\',4326);'
     } else {
@@ -144,7 +144,7 @@ function closeForm(withoutSave = true) {
     $('.leaflet-right .leaflet-bar').show();
     interactionOn();
     $('#map').css('cursor', '');
-    if (geometryType != 'centerpoint' && withoutSave) {
+    if (shapeType != 'centerpoint' && withoutSave) {
         drawnPolygon.removeLayer(layer);
         drawLayer.disable();
     }
@@ -155,7 +155,7 @@ function closeForm(withoutSave = true) {
 }
 
 function drawGeometry(selectedType) {
-    geometryType = selectedType;
+    shapeType = selectedType;
     map.addControl(inputForm);
     if (selectedType == 'centerpoint') {
         $('#coordinatesDiv').show();
@@ -171,20 +171,20 @@ function drawGeometry(selectedType) {
     $('.leaflet-right .leaflet-bar').hide();
 }
 
-function saveForm(geometryType) {
+function saveForm(shapeType) {
     geometryName = $('#geometryName').val().replace(/\"/g,'\\"');
     geometryDescription = $('#geometryDescription').val().replace(/\"/g,'\\"');
     if (typeof newLayer == 'object') {
-        saveEditedGeometry(geometryType);
+        saveEditedGeometry(shapeType);
         newLayer.remove(map);
         newLayer = false;
     } else {
-        saveNewGeometry(geometryType);
+        saveNewGeometry(shapeType);
     }
 }
 
-function saveEditedGeometry(geometryType) {
-    if (feature.properties.geometryType == 'centerpoint') {
+function saveEditedGeometry(shapeType) {
+    if (feature.properties.shapeType == 'centerpoint') {
         // Remove former point
         points = JSON.parse($('#gis_points').val());
         $.each(points, function (key, value) {
@@ -197,7 +197,7 @@ function saveEditedGeometry(geometryType) {
         point =
             `{"type": "Feature", "geometry":` +
             `{"type": "Point", "coordinates": [` + $('#easting').val() + `,` + $('#northing').val() + `]},` +
-            `"properties":{"geometryName": "` + geometryName + `", "geometryDescription": "` + geometryDescription + `", "geometryType": "centerpoint"}}`;
+            `"properties":{"geometryName": "` + geometryName + `", "geometryDescription": "` + geometryDescription + `", "shapeType": "centerpoint"}}`;
         points.push(JSON.parse(point));
         $('#gis_points').val(JSON.stringify(points));
         editedLayer = L.marker(newLayer.getLatLng(), {icon: editedIcon}).addTo(map);
@@ -215,7 +215,7 @@ function saveEditedGeometry(geometryType) {
         polygon =
             `{"type": "Feature", "geometry":` +
             `{"type": "Polygon", "coordinates": ` + coordinates + `},` +
-            `"properties":{"geometryName": "` + geometryName + `", "geometryDescription": "` + geometryDescription + `", "geometryType": "` + geometryType + `"}}`;
+            `"properties":{"geometryName": "` + geometryName + `", "geometryDescription": "` + geometryDescription + `", "shapeType": "` + shapeType + `"}}`;
         polygons.push(JSON.parse(polygon));
         $('#gis_polygons').val(JSON.stringify(polygons));
         editedLayer = L.polygon(newLayer.getLatLngs()).addTo(map);
@@ -224,12 +224,12 @@ function saveEditedGeometry(geometryType) {
     closeForm(false);
 }
 
-function saveNewGeometry(geometryType) {
-    if (geometryType == 'centerpoint') {
+function saveNewGeometry(shapeType) {
+    if (shapeType == 'centerpoint') {
         point =
             `{"type": "Feature", "geometry":` +
             `{"type": "Point", "coordinates": [` + $('#easting').val() + `,` + $('#northing').val() + `]},` +
-            `"properties":{"geometryName": "` + geometryName + `", "geometryDescription": "` + geometryDescription + `", "geometryType": "centerpoint"}}`;
+            `"properties":{"geometryName": "` + geometryName + `", "geometryDescription": "` + geometryDescription + `", "shapeType": "centerpoint"}}`;
         points = JSON.parse($('#gis_points').val());
         points.push(JSON.parse(point));
         $('#gis_points').val(JSON.stringify(points));
@@ -240,7 +240,7 @@ function saveNewGeometry(geometryType) {
         polygon =
             `{"type": "Feature", "geometry":` +
             `{"type": "Polygon", "coordinates":[[` + geoJsonArray.join(',') + `]]},
-            "properties":{"geometryName": "` + geometryName + `", "geometryDescription": "` + geometryDescription + `", "geometryType": "` + geometryType + `"}}`;
+            "properties":{"geometryName": "` + geometryName + `", "geometryDescription": "` + geometryDescription + `", "shapeType": "` + shapeType + `"}}`;
         polygons = JSON.parse($('#gis_polygons').val());
         polygons.push(JSON.parse(polygon));
         $('#gis_polygons').val(JSON.stringify(polygons));
@@ -252,9 +252,9 @@ function saveNewGeometry(geometryType) {
 
 function deleteGeometry() {
     // Remove layer of geometry, remove geometry from form field value
-    if (typeof(editLayer) == 'object') { map.removeLayer(editLayer); }
-    if (typeof(editMarker) == 'object') { map.removeLayer(editMarker); }
-    if (feature.properties.geometryType == 'centerpoint') {
+    if (typeof(editLayer) == 'object') {map.removeLayer(editLayer);}
+    if (typeof(editMarker) == 'object') {map.removeLayer(editMarker);}
+    if (feature.properties.shapeType == 'centerpoint') {
         points = JSON.parse($('#gis_points').val());
         $.each(points, function (key, value) {
             if (value.properties.id == feature.properties.id) {
@@ -277,15 +277,15 @@ function deleteGeometry() {
 
 
 function editGeometry() {
-    geometryType = feature.properties.geometryType;
+    shapeType = feature.properties.shapeType;
     map.closePopup();
     map.addControl(inputForm);
-    $('#inputFormTitle').text(geometryType.substr(0,1).toUpperCase() + geometryType.substr(1));
-    $('#inputFormInfo').text(translate['map_info_' + geometryType]);
+    $('#inputFormTitle').text(shapeType.substr(0,1).toUpperCase() + shapeType.substr(1));
+    $('#inputFormInfo').text(translate['map_info_' + shapeType]);
     $('#geometryName').val(feature.properties.geometryName);
     $('#geometryDescription').val(feature.properties.geometryDescription);
     $('.leaflet-right .leaflet-bar').hide();
-    if (feature.properties.geometryType == 'centerpoint') {
+    if (feature.properties.shapeType == 'centerpoint') {
         newLayer = L.marker(editLayer.getLatLng(), {draggable: true, icon: editIcon}).addTo(map);
         wgs84 = newLayer.getLatLng();
         $('#northing').val(wgs84.lat);
@@ -302,7 +302,8 @@ function editGeometry() {
     } else {
         $('#coordinatesDiv').hide();
         newLayer = L.polygon(editLayer.getLatLngs()).addTo(map);
-        newLayer.options.editing || (newLayer.options.editing = {}); // Workaround for Leaflet draw bug: https://github.com/Leaflet/Leaflet.draw/issues/804
+        // Workaround for Leaflet draw bug: https://github.com/Leaflet/Leaflet.draw/issues/804
+        newLayer.options.editing || (newLayer.options.editing = {});
         newLayer.editing.enable();
         newLayer.bindPopup(feature, 'edit');
         newLayer.on('edit', function () {

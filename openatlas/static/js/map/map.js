@@ -28,6 +28,14 @@ if (gisPointAll) {
             return L.marker(latlng, {icon: grayMarker});
         }
     });
+}
+
+if (useCluster) {
+    cluster.addLayer(pointLayer)
+    map.addLayer(cluster);
+    controls.Points = cluster;
+} else {
+    map.addLayer(pointLayer);
     controls.Points = pointLayer;
 }
 
@@ -40,21 +48,13 @@ if (gisPolygonAll) {
 }
 
 if (gisPointSelected != '') {
-    // View for a single place, set geoJson layer for all points
     gisPoints = L.geoJson(gisPointSelected, {onEachFeature: setPopup}).addTo(map);
     gisPoints.on('click', setObjectId);
-    setTimeout(function () {
-        map.fitBounds(gisPoints.getBounds(), {maxZoom: 12});
-    }, 1);
 }
 
 if (gisPolygonSelected != '') {
-    gisPoints = L.geoJson(gisPointSelected, {onEachFeature: setPopup}).addTo(map);
-    gisPoints.on('click', setObjectId);
-    gisSites = L.geoJson(gisPolygonSelected, {onEachFeature: setPopup}).addTo(map);
-    gisSites.on('click', setObjectId);
-    gisExtend = L.featureGroup([gisPoints, gisSites]);
-    setTimeout(function () {map.fitBounds(gisExtend.getBounds(), {maxZoom: 12});}, 1);
+    gisPolygons = L.geoJson(gisPolygonSelected, {onEachFeature: setPopup}).addTo(map);
+    gisPolygons.on('click', setObjectId);
 }
 
 if (window.location.href.indexOf('update') >= 0) {
@@ -62,17 +62,21 @@ if (window.location.href.indexOf('update') >= 0) {
     $('#gis_polygons').val(JSON.stringify(gisPolygonSelected));
 }
 
-// Add markers to the map
-if (useCluster) {
-    cluster.addLayer(pointLayer)
-    map.addLayer(cluster);
+
+
+// Set zoom level depending on getbounds of selected points/polygons
+if (gisPointSelected != '' && gisPolygonSelected != '') {
+    map.fitBounds(L.featureGroup([gisPoints, gisPolygons]).getBounds(), {maxZoom: 12});
+} else if (gisPointSelected != '') {
+    map.fitBounds(gisPoints.getBounds(), {maxZoom: 12});
+} else if (gisPolygonSelected != '') {
+    map.fitBounds(gisPolygons.getBounds(), {maxZoom: 12});
 } else {
-    map.addLayer(pointLayer);
+    map.fitBounds(pointLayer.getBounds(), {maxZoom: 12});
 }
-map.fitBounds(pointLayer.getBounds(), {maxZoom: 12});
+
 L.control.layers(baseMaps, controls).addTo(map);
 baseMaps.Landscape.addTo(map);
-
 
 // Geoname search control init and add to map
 var geoSearchControl = L.control.geonames({
@@ -97,9 +101,9 @@ function buildPopup(feature, action='view', selected=false) {
         popupHtml += '<strong>' + feature.properties.objectName + '</strong><br />';
     }
     popupHtml = `
-        <strong>` + feature.properties.geometryName + `</strong>
-        <div style="max-height:140px;overflow-y:auto">` + feature.properties.geometryDescription + `</div>
-        <i>` + feature.properties.geometryType + `</i>`
+        <strong>` + feature.properties.name + `</strong>
+        <div style="max-height:140px;overflow-y:auto">` + feature.properties.description + `</div>
+        <i>` + feature.properties.shapeType + `</i>`
     if (action == 'edited') {
         popupHtml += '<p><i>' + translate['map_info_reedit'] + '</i></p>';
     } else if (!selected) {
@@ -113,8 +117,7 @@ function buildPopup(feature, action='view', selected=false) {
                 </p>
             </div>`;
     }
-    popupHtml += '</div>';
-    return popupHtml;
+    return popupHtml + '</div>';
 }
 
 function setPopup(feature, layer, mode) {
