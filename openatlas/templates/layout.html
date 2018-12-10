@@ -11,7 +11,6 @@
         <link rel="stylesheet" href="/static/css/reset.css?v={{ config['VERSION'] }}" />
         <link rel="stylesheet" href="/static/vendor/jquery/jquery-ui-1.12.1/jquery-ui.min.css" />
         <link rel="stylesheet" href="/static/vendor/jquery/jstree-3.3.7/themes/default/style.min.css" />
-        <link rel="stylesheet" href="/static/vendor/leaflet/markercluster/MarkerCluster.Default.css" />
         {% for css_file in ['style.css', 'color.css', 'images.css'] %}
             <link rel="stylesheet" href="/static/css/{{ css_file }}?v={{ config['VERSION'] }}" />
             {% if current_user.is_authenticated %}

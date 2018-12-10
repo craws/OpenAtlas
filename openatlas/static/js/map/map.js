@@ -1,7 +1,5 @@
 // Init map
-var map = L.map('map', {
-    fullscreenControl: true
-});
+var map = L.map('map', {maxZoom: 18, fullscreenControl: true});
 
 // Icons
 var newIcon = L.icon({iconUrl: '/static/images/map/marker-icon_new.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
@@ -15,6 +13,12 @@ var baseMaps = {
     OpenStreetMap: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}),
     GoogleSatellite: L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google Maps '}),
 };
+
+var cluster = L.markerClusterGroup({
+    showCoverageOnHover: false,
+    maxClusterRadius: maxClusterRadius,
+    disableClusteringAtZoom: disableClusteringAtZoom
+});
 
 var controls = {}
 if (gisPointAll) {
@@ -59,10 +63,16 @@ if (window.location.href.indexOf('update') >= 0) {
 }
 
 // Add markers to the map
-map.addLayer(pointLayer);
+if (useCluster) {
+    cluster.addLayer(pointLayer)
+    map.addLayer(cluster);
+} else {
+    map.addLayer(pointLayer);
+}
 map.fitBounds(pointLayer.getBounds(), {maxZoom: 12});
 L.control.layers(baseMaps, controls).addTo(map);
 baseMaps.Landscape.addTo(map);
+
 
 // Geoname search control init and add to map
 var geoSearchControl = L.control.geonames({
