@@ -11,12 +11,5 @@
     > + {{ _(title)|uc_first }}
 {% endblock %}
 {% block content %}
-    <div id='map-info-display' style="float:left;">
-        {{ form|display_form|safe }}
-    </div>
-    <div id="map" class="map"></div>
-    <script src="/static/js/map.js"></script>
-    <script src="/static/vendor/leaflet/draw/leaflet.draw.js"></script>
-    <script src="/static/vendor/leaflet/shapedraw.js"></script>
-    <script src="/static/vendor/leaflet/draw/edithandler.js"></script>
+    {% include "place/map_draw.html" %}
 {% endblock %}

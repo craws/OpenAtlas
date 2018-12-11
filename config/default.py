@@ -24,6 +24,10 @@ EXPORT_FOLDER_PATH = os.path.dirname(__file__) + '/../openatlas/export'
 UPLOAD_FOLDER_PATH = os.path.dirname(__file__) + '/../openatlas/uploads'
 DISPLAY_FILE_EXTENSIONS = ['bmp', 'gif', 'ico', 'jpeg', 'jpg', 'png']
 
+# JavaScript credentials
+GEONAMES_USERNAME = 'openatlas'
+THUNDERFOREST_KEY = '7878b4fb224f4902ab42fc846e92b96a'
+
 DEFAULT_TABLE_ROWS = OrderedDict()
 DEFAULT_TABLE_ROWS[10] = '10'
 DEFAULT_TABLE_ROWS[20] = '20'

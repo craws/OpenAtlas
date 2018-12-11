@@ -13,12 +13,8 @@
         <p class="error">{{ _('error modified by %(username)s', username=modifier|safe) }}</p>
         <p><a class="button" href="{{ url_for('place_update', id_=object_.id) }}">{{ _('reload')|uc_first }}</a></p>
     {% endif %}
-    <div id='map-info-display' style="float:left;">
-        {{ form|display_form|safe }}
-    </div>
-    <div id="map" class="map"></div>
-    <script src="/static/js/map.js"></script>
-    <script src="/static/vendor/leaflet/draw/leaflet.draw.js"></script>
-    <script src="/static/vendor/leaflet/shapedraw.js"></script>
-    <script src="/static/vendor/leaflet/draw/edithandler.js"></script>
+    <script>
+        map_update_mode = true;
+    </script>
+    {% include "place/map_draw.html" %}
 {% endblock %}

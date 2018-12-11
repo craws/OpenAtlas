@@ -1,0 +1,61 @@
+.mapFormDiv {
+    padding: 6px 8px;
+    background: white;
+    background: rgba(255,255,255,1);
+    box-shadow: 0 0 15px rgba(0,0,0,0.2);
+    border-radius: 5px;
+}
+
+#geometryForm {
+    width: 300px;
+    overflow: hidden;
+}
+
+#geometryForm textarea {
+    font: 10pt "Helvetica New", Arial, Helvetica, sans-serif;
+    float: right;
+    width: 96%;
+    resize: vertical;
+}
+
+#geometryForm label {
+    float: left;
+    margin-top: 3px;
+    padding-top: 5px
+}
+
+#geometryForm input {
+    float: right;
+    margin-left: 15px;
+}
+
+#inputFormTitle {
+    font-weight: bold;
+    font-style: normal;
+}
+
+#nameField, select {
+    width: 96%;
+    display: block;
+}
+
+#saveButton {
+    float: right;
+    margin-top: 1em;
+    margin-left: 1em;
+}
+
+#closeButton {
+    color: #ccc;
+    cursor: pointer;
+    float: right;
+}
+
+#popup {
+    width: 120px;
+}
+
+#popup input {
+    width: 50px;
+    margin: 3px;
+}

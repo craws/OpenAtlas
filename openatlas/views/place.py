@@ -20,8 +20,8 @@ class PlaceForm(DateForm):
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
-    gis_points = HiddenField()
-    gis_polygons = HiddenField()
+    gis_points = HiddenField(default='[]')
+    gis_polygons = HiddenField(default='[]')
     continue_ = HiddenField()
     opened = HiddenField()
 

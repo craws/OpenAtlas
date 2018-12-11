@@ -1,4 +1,6 @@
 <script>
+    var geoNamesUsername = '{{ config['GEONAMES_USERNAME'] }}';
+    var thunderforestKey = '{{ config['THUNDERFOREST_KEY'] }}';
     var gisPointAll = {{ gis_data['gisPointAll']|safe }};
     var gisPointSelected = {{ gis_data['gisPointSelected']|safe }};
     var gisPolygonAll = {{ gis_data['gisPolygonAll']|safe }};
@@ -6,6 +8,7 @@
     var gisPolygonPointSelected = {{ gis_data['gisPolygonPointSelected']|safe }};
     var jsonSearch = [];
     var translate = [];
+    var map_update_mode = false;  // enables e.g. edit buttons in popup ups if true
     var useCluster = {{ 'true' if session['settings']['map_cluster_enabled'] else 'false' }};
     var maxClusterRadius = {{ session['settings']['map_cluster_max_radius'] }};
     var disableClusteringAtZoom = {{ session['settings']['map_cluster_disable_at_zoom'] }};
@@ -17,21 +20,22 @@
     translate['map_info_reedit'] = '{{ _('map_info_reedit')|uc_first|safe }}';
     translate['map_info_shape'] = '{{ _('map_info_shape')|uc_first|safe }}';
     translate['map_info_area'] = '{{ _('map_info_area')|uc_first|safe }}';
-    translate['map_info_point'] = '{{ _('map_info_point')|uc_first|safe }}';
+    translate['map_info_centerpoint'] = '{{ _('map_info_point')|uc_first|safe }}';
     translate['map_info_close'] = '{{ _('map_info_close')|uc_first|safe }}';
     translate['map_info_description'] = '{{ _('map_info_description')|safe }}';
 </script>
-<script src="/static/vendor/leaflet/mapbox.js"></script>
-<script src="/static/vendor/leaflet/L.Control.Geonames.js"></script>
-<script src="/static/vendor/leaflet/leaflet.usermarker.js"></script>
-<script src="/static/vendor/leaflet/markercluster/leaflet.markercluster.js"></script>
-<script src="/static/vendor/leaflet/leaflet.fullscreen-master/Control.FullScreen.js"></script>
-<script src="/static/vendor/leaflet/easy-button.js"></script>
-<link rel="stylesheet" href="/static/vendor/leaflet/leaflet.fullscreen-master/Control.FullScreen.css" />
-<link rel="stylesheet" href="/static/vendor/leaflet/leaflet.css" />
-<link rel="stylesheet" href="/static/vendor/leaflet/font-awesome/css/font-awesome.min.css" />
-<link rel="stylesheet" href="/static/vendor/leaflet/L.Control.Geonames.css" />
-<link rel="stylesheet" href="/static/vendor/leaflet/leaflet.usermarker.css" />
-<link rel="stylesheet" href="/static/vendor/leaflet/markercluster/MarkerCluster.css" />
-<link href="/static/vendor/leaflet/draw/leaflet.draw.css" rel="stylesheet" type="text/css"/>
-<link href="/static/vendor/leaflet/shapeedit.css" rel="stylesheet" type="text/css"/>
+
+<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/leaflet.css" />
+<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/fullscreen/leaflet.fullscreen.css" />
+<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/geonames/L.Control.Geonames.css" />
+<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/usermarker-1.0/leaflet.usermarker.css" />
+<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/font-awesome-4.3.0/css/font-awesome.min.css" />
+<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/markercluster-1.4.1/MarkerCluster.css" />
+<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/markercluster-1.4.1/MarkerCluster.Default.css" />
+<link rel="stylesheet" href="/static/css/map.css" />
+
+<script src="/static/vendor/leaflet-1.3.4/leaflet.js"></script>
+<script src="/static/vendor/leaflet-1.3.4/fullscreen/Leaflet.fullscreen.min.js"></script>
+<script src="/static/vendor/leaflet-1.3.4/geonames/L.Control.Geonames.js"></script>
+<script src="/static/vendor/leaflet-1.3.4/markercluster-1.4.1/leaflet.markercluster.js"></script>
+<script src="/static/vendor/leaflet-1.3.4/usermarker-1.0/leaflet.usermarker.js"></script>
