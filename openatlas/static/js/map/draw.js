@@ -9,11 +9,15 @@ var objectName; // Name of the entry at update of an existing entry
 
 var captureCoordinates = false; // Boolean if clicks on map should be captured as coordinates
 var marker = false; // Temporary marker for point coordinate
+var newMarker = false; // Temporary marker for point update coordinate
+var layer = false;
+var newLayer = false; // Temporary marker to update a point coordinate
+var editLayer = false;
+var editPointLayer = false;
 var geoJsonArray = []; // Polygon coordinates storage
 var drawnPolygon = L.featureGroup();
-var layer;
-var newLayer = false;
 var editedLayer = false;
+var drawLayer = false;
 
 /* Controls with EasyButton */
 L.Control.EasyButtons = L.Control.extend({
@@ -99,7 +103,7 @@ map.on('click', function(e) {
                 $('#easting').val(position.lng);
             });
         } else {  // No marker exists so create it
-            var marker = new L.marker(e.latlng, {draggable: true, icon: newIcon});
+            marker = new L.marker(e.latlng, {draggable: true, icon: newIcon});
             marker.addTo(map);
             wgs84 = (marker.getLatLng());
             $('#northing').val(wgs84.lat);
@@ -143,10 +147,21 @@ function closeForm(withoutSave = true) {
     $('#map').css('cursor', '');
     if (shapeType != 'centerpoint' && withoutSave) {
         drawnPolygon.removeLayer(layer);
-        drawLayer.disable();
     }
-    if (marker) {
+    if (editPointLayer) {
+        map.removeLayer(editPointLayer);
+        if (withoutSave) {
+            layer.addTo(map);
+        }
+    } else if (marker) {
         map.removeLayer(marker);
+        marker = false;
+    } else if (newLayer) {
+        map.removeLayer(newLayer);
+        newLayer = false;
+        if (marker) {
+            marker.addTo(map);
+        }
     }
     captureCoordinates = false; // Important that this is the last statement
 }
@@ -169,13 +184,10 @@ function drawGeometry(selectedType) {
 }
 
 function saveForm(shapeType) {
-
     name = $('#nameField').val().replace(/\"/g,'\\"');
     description = $('#descriptionField').val().replace(/\"/g,'\\"');
-    if (typeof newLayer == 'object') {
+    if (editPointLayer) {
         saveEditedGeometry(shapeType);
-        newLayer.remove(map);
-        newLayer = false;
     } else {
         saveNewGeometry(shapeType);
     }
@@ -198,7 +210,7 @@ function saveEditedGeometry(shapeType) {
             `"properties":{"name": "` + name + `", "description": "` + description + `", "shapeType": "centerpoint"}}`;
         points.push(JSON.parse(point));
         $('#gis_points').val(JSON.stringify(points));
-        editedLayer = L.marker(newLayer.getLatLng(), {icon: editedIcon}).addTo(map);
+        editedLayer = L.marker(editPointLayer.getLatLng(), {icon: editedIcon}).addTo(map);
         editedLayer.bindPopup(buildPopup(JSON.parse(point), 'edited'));
     } else {
         // Remove former polygon
@@ -283,19 +295,19 @@ function editGeometry() {
     $('#descriptionField').val(feature.properties.description);
     $('.leaflet-right .leaflet-bar').hide();
     if (feature.properties.shapeType == 'centerpoint') {
-        newLayer = L.marker(editLayer.getLatLng(), {draggable: true, icon: editIcon}).addTo(map);
-        wgs84 = newLayer.getLatLng();
+        editPointLayer = L.marker(editLayer.getLatLng(), {draggable: true, icon: editIcon}).addTo(map);
+        wgs84 = editLayer.getLatLng();
         $('#northing').val(wgs84.lat);
         $('#easting').val(wgs84.lng);
-        newLayer.bindPopup(feature, 'edit');
-        newLayer.on('dragend', function (event) {
+        editPointLayer.bindPopup(feature, 'edit');
+        editPointLayer.on('dragend', function (event) {
             newMarker = event.target;
             position = newMarker.getLatLng();
             $('#northing').val(position.lat);
             $('#easting').val(position.lng);
             $('#saveButton').prop('disabled', false);
         });
-        layer.remove(marker);
+        layer.remove();
     } else {
         $('#coordinatesDiv').hide();
         newLayer = L.polygon(editLayer.getLatLngs()).addTo(map);

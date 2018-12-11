@@ -223,58 +223,58 @@ def place_update(id_):
 
 
 def save(form, object_=None, location=None, origin=None):
-    # g.cursor.execute('BEGIN')
-    # try:
-    log_action = 'update'
-    if object_:
-        for alias in object_.get_linked_entities('P1'):
-            alias.delete()
-        GisMapper.delete_by_entity(location)
-    else:
-        log_action = 'insert'
-        if origin and origin.system_type == 'stratigraphic unit':
-            object_ = EntityMapper.insert('E22', form.name.data, 'find')
+    g.cursor.execute('BEGIN')
+    try:
+        log_action = 'update'
+        if object_:
+            for alias in object_.get_linked_entities('P1'):
+                alias.delete()
+            GisMapper.delete_by_entity(location)
         else:
-            system_type = 'place'
-            if origin and origin.system_type == 'place':
-                system_type = 'feature'
-            elif origin and origin.system_type == 'feature':
-                system_type = 'stratigraphic unit'
-            object_ = EntityMapper.insert('E18', form.name.data, system_type)
-        location = EntityMapper.insert('E53', 'Location of ' + form.name.data, 'place location')
-        object_.link('P53', location)
-    object_.name = form.name.data
-    object_.description = form.description.data
-    object_.update()
-    object_.save_dates(form)
-    object_.save_nodes(form)
-    location.name = 'Location of ' + form.name.data
-    location.update()
-    location.save_nodes(form)
-    if hasattr(form, 'alias'):
-        for alias in form.alias.data:
-            if alias.strip():  # Check if it isn't empty
-                object_.link('P1', EntityMapper.insert('E41', alias))
-    url = url_for('place_view', id_=object_.id)
-    if origin:
-        url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-place'
-        if origin.view_name == 'reference':
-            link_id = origin.link('P67', object_)
-            url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
-        elif origin.system_type in ['place', 'feature', 'stratigraphic unit']:
-            url = url_for('place_view', id_=object_.id)
-            origin.link('P46', object_)
-        else:
-            origin.link('P67', object_)
-    GisMapper.insert(location, form)
-    g.cursor.execute('COMMIT')
-    if form.continue_.data == 'yes':
-        url = url_for('place_insert', origin_id=origin.id if origin else None)
-    logger.log_user(object_.id, log_action)
-    flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
-    # except Exception as e:  # pragma: no cover
-     #   g.cursor.execute('ROLLBACK')
-     #   logger.log('error', 'database', 'transaction failed', e)
-     #   flash(_('error transaction'), 'error')
-     #   url = url_for('place_index')
+            log_action = 'insert'
+            if origin and origin.system_type == 'stratigraphic unit':
+                object_ = EntityMapper.insert('E22', form.name.data, 'find')
+            else:
+                system_type = 'place'
+                if origin and origin.system_type == 'place':
+                    system_type = 'feature'
+                elif origin and origin.system_type == 'feature':
+                    system_type = 'stratigraphic unit'
+                object_ = EntityMapper.insert('E18', form.name.data, system_type)
+            location = EntityMapper.insert('E53', 'Location of ' + form.name.data, 'place location')
+            object_.link('P53', location)
+        object_.name = form.name.data
+        object_.description = form.description.data
+        object_.update()
+        object_.save_dates(form)
+        object_.save_nodes(form)
+        location.name = 'Location of ' + form.name.data
+        location.update()
+        location.save_nodes(form)
+        if hasattr(form, 'alias'):
+            for alias in form.alias.data:
+                if alias.strip():  # Check if it isn't empty
+                    object_.link('P1', EntityMapper.insert('E41', alias))
+        url = url_for('place_view', id_=object_.id)
+        if origin:
+            url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-place'
+            if origin.view_name == 'reference':
+                link_id = origin.link('P67', object_)
+                url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
+            elif origin.system_type in ['place', 'feature', 'stratigraphic unit']:
+                url = url_for('place_view', id_=object_.id)
+                origin.link('P46', object_)
+            else:
+                origin.link('P67', object_)
+        GisMapper.insert(location, form)
+        g.cursor.execute('COMMIT')
+        if form.continue_.data == 'yes':
+            url = url_for('place_insert', origin_id=origin.id if origin else None)
+        logger.log_user(object_.id, log_action)
+        flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
+    except Exception as e:  # pragma: no cover
+        g.cursor.execute('ROLLBACK')
+        logger.log('error', 'database', 'transaction failed', e)
+        flash(_('error transaction'), 'error')
+        url = url_for('place_index')
     return url

@@ -31,7 +31,7 @@ if (gisPointAll) {
 }
 
 if (useCluster) {
-    cluster.addLayer(pointLayer)
+    cluster.addLayer(pointLayer);
     map.addLayer(cluster);
     controls.Points = cluster;
 } else {
@@ -62,6 +62,7 @@ if (window.location.href.indexOf('update') >= 0) {
     $('#gis_polygons').val(JSON.stringify(gisPolygonSelected));
 }
 
+
 // Set zoom level depending on getbounds of selected points/polygons
 if (gisPointSelected != '' && gisPolygonSelected != '') {
     map.fitBounds(L.featureGroup([gisPoints, gisPolygons]).getBounds(), {maxZoom: 12});
@@ -69,8 +70,10 @@ if (gisPointSelected != '' && gisPolygonSelected != '') {
     map.fitBounds(gisPoints.getBounds(), {maxZoom: 12});
 } else if (gisPolygonSelected != '') {
     map.fitBounds(gisPolygons.getBounds(), {maxZoom: 12});
-} else {
+} else if (gisPointAll != '') {
     map.fitBounds(pointLayer.getBounds(), {maxZoom: 12});
+} else {
+    map.setView([30, 340], 2);
 }
 
 L.control.layers(baseMaps, controls).addTo(map);
@@ -97,11 +100,13 @@ function buildPopup(feature, action='view', selected=false) {
     popupHtml = '<div id="popup">'
     if (feature.properties.objectName) {
         popupHtml += '<strong>' + feature.properties.objectName + '</strong><br />';
+        if (feature.properties.objectType) {
+            popupHtml += '<i>' + feature.properties.objectType + '</i><br />'
+        }
     }
-    popupHtml = `
+    popupHtml += `
         <strong>` + feature.properties.name + `</strong>
-        <div style="max-height:140px;overflow-y:auto">` + feature.properties.description + `</div>
-        <i>` + feature.properties.shapeType + `</i>`
+        <div style="max-height:140px;overflow-y:auto">` + feature.properties.description + `</div>`
     if (action == 'edited') {
         popupHtml += '<p><i>' + translate['map_info_reedit'] + '</i></p>';
     } else if (!selected) {
