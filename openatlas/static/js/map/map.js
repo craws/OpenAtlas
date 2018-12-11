@@ -1,26 +1,26 @@
 // Init map
-var map = L.map('map', {maxZoom: 18, fullscreenControl: true});
+map = L.map('map', {maxZoom: 18, fullscreenControl: true});
 
 // Icons
-var newIcon = L.icon({iconUrl: '/static/images/map/marker-icon_new.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
-var editIcon = L.icon({iconUrl: "/static/images/map/marker-icon_edit.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
-var editedIcon = L.icon({iconUrl: "/static/images/map/marker-icon_edited.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
-var grayMarker = L.icon({iconUrl: '/static/images/map/marker-icon-gray.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
+newIcon = L.icon({iconUrl: '/static/images/map/marker-icon_new.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
+editIcon = L.icon({iconUrl: "/static/images/map/marker-icon_edit.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
+editedIcon = L.icon({iconUrl: "/static/images/map/marker-icon_edited.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
+grayMarker = L.icon({iconUrl: '/static/images/map/marker-icon-gray.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
 
 // Define base layers
-var baseMaps = {
+baseMaps = {
     Landscape: L.tileLayer('https://{s}.tile.thunderforest.com/landscape/{z}/{x}/{y}.png?apikey=' + thunderforestKey, {attribution: '&copy; <a href="http://www.thunderforest.com">Thunderforest Landscape '}),
     OpenStreetMap: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}),
     GoogleSatellite: L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google Maps '}),
 };
 
-var cluster = L.markerClusterGroup({
+cluster = L.markerClusterGroup({
     showCoverageOnHover: false,
     maxClusterRadius: maxClusterRadius,
     disableClusteringAtZoom: disableClusteringAtZoom
 });
 
-var controls = {}
+controls = {}
 if (gisPointAll) {
     pointLayer = new L.GeoJSON(gisPointAll, {
         onEachFeature: setPopup,
@@ -62,8 +62,6 @@ if (window.location.href.indexOf('update') >= 0) {
     $('#gis_polygons').val(JSON.stringify(gisPolygonSelected));
 }
 
-
-
 // Set zoom level depending on getbounds of selected points/polygons
 if (gisPointSelected != '' && gisPolygonSelected != '') {
     map.fitBounds(L.featureGroup([gisPoints, gisPolygons]).getBounds(), {maxZoom: 12});
@@ -79,7 +77,7 @@ L.control.layers(baseMaps, controls).addTo(map);
 baseMaps.Landscape.addTo(map);
 
 // Geoname search control init and add to map
-var geoSearchControl = L.control.geonames({
+geoSearchControl = L.control.geonames({
     username: geoNamesUsername, // Geonames account username.  Must be provided
     zoomLevel: 12, // Max zoom level to zoom to for location.  If null, will use the map's max zoom level.
     maxresults: 8, // Maximum number of results to display per search

@@ -34,7 +34,7 @@
     font-style: normal;
 }
 
-#nameField input, select {
+#nameField, select {
     width: 96%;
     display: block;
 }

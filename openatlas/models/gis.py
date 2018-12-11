@@ -5,7 +5,6 @@ from flask import g, json
 
 from openatlas import debug_model
 from openatlas.models.node import NodeMapper
-from openatlas.util.util import uc_first
 
 
 class GisMapper:
@@ -67,7 +66,7 @@ class GisMapper:
                         'name': row.name.replace('"', '\"'),
                         'description': description,
                         'siteType': '',
-                        'shapeType': uc_first(row.type)}}
+                        'shapeType': row.type}}
                 if hasattr(row, 'types') and row.types:
                     nodes_list = ast.literal_eval('[' + row.types + ']')
                     for node_id in list(set(nodes_list)):

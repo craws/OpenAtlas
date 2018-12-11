@@ -1,10 +1,11 @@
 // Todo: try to remove most of these global variables
-var objectName; // Name of the entry at update of an existing entry
 
 // Variables for a selected geometry
-var geometryName;
-var geometryDescription;
+var name;
+var description;
 var shapeType; // centerpoint, shape or area
+var objectName; // Name of the entry at update of an existing entry
+
 
 var captureCoordinates = false; // Boolean if clicks on map should be captured as coordinates
 var marker = false; // Temporary marker for point coordinate
@@ -36,7 +37,7 @@ L.Control.EasyButtons = L.Control.extend({
     }
 });
 
-var polygonButton = new L.Control.EasyButtons({
+polygonButton = new L.Control.EasyButtons({
     position: 'topright',
     intentedIcon: 'fa-pencil-square-o',
     title: translate['map_info_shape']
@@ -44,7 +45,7 @@ var polygonButton = new L.Control.EasyButtons({
 polygonButton.intendedFunction = function() {drawGeometry('shape');}
 map.addControl(polygonButton);
 
-var areaButton = new L.Control.EasyButtons({
+areaButton = new L.Control.EasyButtons({
     position: 'topright',
     intentedIcon: 'fa-circle-o-notch',
     title: translate['map_info_area']
@@ -52,7 +53,7 @@ var areaButton = new L.Control.EasyButtons({
 areaButton.intendedFunction = function() {drawGeometry('area');}
 map.addControl(areaButton);
 
-var pointButton = new L.Control.EasyButtons({
+pointButton = new L.Control.EasyButtons({
     position: 'topright',
     intentedIcon: 'fa-map-marker',
     title: translate['map_info_point']
@@ -60,20 +61,16 @@ var pointButton = new L.Control.EasyButtons({
 pointButton.intendedFunction = function () {drawGeometry('centerpoint');}
 map.addControl(pointButton);
 
-/* Input form */
-var inputForm = L.control();
+inputForm = L.control();
 inputForm.onAdd = function (map) {
     div = L.DomUtil.create('div', 'mapFormDiv');
     div.innerHTML = `
         <form id="geometryForm" onmouseover="interactionOff()" onmouseout="interactionOn()">
-            <input type="hidden" id="geometryParent" value="NULL" />
-            <span id="inputFormTitle"></span>
             <span id="closeButton" title="` + translate["map_info_close"] + `" onclick="closeForm()" class="fa">X</span>
+            <span id="inputFormTitle"></span>
             <p id="inputFormInfo"></p>
-            <div id="nameField" style="display: block">
-                <input type="text" id="geometryName" placeholder="Enter a name if desired" />
-            </div>
-            <textarea rows="3" cols="70" id="geometryDescription" placeholder="` + translate["map_info_description"] + `"/></textarea>
+            <input type="text" id="nameField" placeholder="Enter a name if desired" />
+            <textarea rows="3" cols="70" id="descriptionField" placeholder="` + translate["map_info_description"] + `"/></textarea>
             <div id="coordinatesDiv">
                 <div style="display:block;clear:both;">
                     <label for='easting'>Easting</label>
@@ -172,8 +169,9 @@ function drawGeometry(selectedType) {
 }
 
 function saveForm(shapeType) {
-    geometryName = $('#geometryName').val().replace(/\"/g,'\\"');
-    geometryDescription = $('#geometryDescription').val().replace(/\"/g,'\\"');
+
+    name = $('#nameField').val().replace(/\"/g,'\\"');
+    description = $('#descriptionField').val().replace(/\"/g,'\\"');
     if (typeof newLayer == 'object') {
         saveEditedGeometry(shapeType);
         newLayer.remove(map);
@@ -197,7 +195,7 @@ function saveEditedGeometry(shapeType) {
         point =
             `{"type": "Feature", "geometry":` +
             `{"type": "Point", "coordinates": [` + $('#easting').val() + `,` + $('#northing').val() + `]},` +
-            `"properties":{"geometryName": "` + geometryName + `", "geometryDescription": "` + geometryDescription + `", "shapeType": "centerpoint"}}`;
+            `"properties":{"name": "` + name + `", "description": "` + description + `", "shapeType": "centerpoint"}}`;
         points.push(JSON.parse(point));
         $('#gis_points').val(JSON.stringify(points));
         editedLayer = L.marker(newLayer.getLatLng(), {icon: editedIcon}).addTo(map);
@@ -215,7 +213,7 @@ function saveEditedGeometry(shapeType) {
         polygon =
             `{"type": "Feature", "geometry":` +
             `{"type": "Polygon", "coordinates": ` + coordinates + `},` +
-            `"properties":{"geometryName": "` + geometryName + `", "geometryDescription": "` + geometryDescription + `", "shapeType": "` + shapeType + `"}}`;
+            `"properties":{"name": "` + name + `", "description": "` + description + `", "shapeType": "` + shapeType + `"}}`;
         polygons.push(JSON.parse(polygon));
         $('#gis_polygons').val(JSON.stringify(polygons));
         editedLayer = L.polygon(newLayer.getLatLngs()).addTo(map);
@@ -229,7 +227,7 @@ function saveNewGeometry(shapeType) {
         point =
             `{"type": "Feature", "geometry":` +
             `{"type": "Point", "coordinates": [` + $('#easting').val() + `,` + $('#northing').val() + `]},` +
-            `"properties":{"geometryName": "` + geometryName + `", "geometryDescription": "` + geometryDescription + `", "shapeType": "centerpoint"}}`;
+            `"properties":{"name": "` + name + `", "description": "` + description + `", "shapeType": "centerpoint"}}`;
         points = JSON.parse($('#gis_points').val());
         points.push(JSON.parse(point));
         $('#gis_points').val(JSON.stringify(points));
@@ -240,7 +238,7 @@ function saveNewGeometry(shapeType) {
         polygon =
             `{"type": "Feature", "geometry":` +
             `{"type": "Polygon", "coordinates":[[` + geoJsonArray.join(',') + `]]},
-            "properties":{"geometryName": "` + geometryName + `", "geometryDescription": "` + geometryDescription + `", "shapeType": "` + shapeType + `"}}`;
+            "properties":{"name": "` + name + `", "description": "` + description + `", "shapeType": "` + shapeType + `"}}`;
         polygons = JSON.parse($('#gis_polygons').val());
         polygons.push(JSON.parse(polygon));
         $('#gis_polygons').val(JSON.stringify(polygons));
@@ -275,15 +273,14 @@ function deleteGeometry() {
     }
 }
 
-
 function editGeometry() {
     shapeType = feature.properties.shapeType;
     map.closePopup();
     map.addControl(inputForm);
     $('#inputFormTitle').text(shapeType.substr(0,1).toUpperCase() + shapeType.substr(1));
     $('#inputFormInfo').text(translate['map_info_' + shapeType]);
-    $('#geometryName').val(feature.properties.geometryName);
-    $('#geometryDescription').val(feature.properties.geometryDescription);
+    $('#nameField').val(feature.properties.name);
+    $('#descriptionField').val(feature.properties.description);
     $('.leaflet-right .leaflet-bar').hide();
     if (feature.properties.shapeType == 'centerpoint') {
         newLayer = L.marker(editLayer.getLatLng(), {draggable: true, icon: editIcon}).addTo(map);

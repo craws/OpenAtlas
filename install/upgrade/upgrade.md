@@ -2,13 +2,17 @@
 
 Before executing SQL statements backup the database. Replace database role "openatlas" if needed.
 
+If you are using git and want to update to the latest stable release you can fetch the master branch e.g.
+
+    git pull origin master
+
 After following the instructions restart Apache and test if the application is working.
 
     service apache2 restart
 
-If you are using git and want to update to the latest stable release you can fetch the master branch e.g.
+### 3.11.0 to 3.12.0
 
-    git pull origin master
+Execute install/upgrade/3.12.0.sql after making backups
 
 ### 3.10.0 to 3.11.0
 
