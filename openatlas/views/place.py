@@ -8,7 +8,7 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.forms.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper
-from openatlas.models.gis import GisMapper
+from openatlas.models.gis import GisMapper, InvalidGeomException
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  is_authorized, link, required_group, truncate_string, uc_first,
                                  was_modified)
@@ -224,8 +224,8 @@ def place_update(id_):
 
 def save(form, object_=None, location=None, origin=None):
     g.cursor.execute('BEGIN')
+    log_action = 'update'
     try:
-        log_action = 'update'
         if object_:
             for alias in object_.get_linked_entities('P1'):
                 alias.delete()
@@ -272,9 +272,16 @@ def save(form, object_=None, location=None, origin=None):
             url = url_for('place_insert', origin_id=origin.id if origin else None)
         logger.log_user(object_.id, log_action)
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
+    except InvalidGeomException as e:  # pragma: no cover
+        g.cursor.execute('ROLLBACK')
+        logger.log('error', 'database', 'transaction failed because of invalid geom', e)
+        flash(_('Invalid geom entered'), 'error')
+        url = url_for('place_index') if log_action == 'insert' else url_for('place_view',
+                                                                            id_=object_.id)
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
-        url = url_for('place_index')
+        url = url_for('place_index') if log_action == 'insert' else url_for('place_view',
+                                                                            id_=object_.id)
     return url

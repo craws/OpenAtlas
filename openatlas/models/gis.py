@@ -7,6 +7,10 @@ from openatlas import debug_model
 from openatlas.models.node import NodeMapper
 
 
+class InvalidGeomException(Exception):
+    pass
+
+
 class GisMapper:
 
     @staticmethod
@@ -101,6 +105,14 @@ class GisMapper:
                 # Don't save geom if coordinates are empty
                 if not item['geometry']['coordinates'] or item['geometry']['coordinates'] == [[]]:
                     continue  # pragma: no cover
+                if item['properties']['shapeType'] != 'centerpoint':
+                    # Test for valid geom
+                    sql = """
+                        SELECT st_isvalid(
+                            public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));"""
+                    g.cursor.execute(sql, {'geojson': json.dumps(item['geometry'])})
+                    if not g.cursor.fetchone()[0]:
+                        raise InvalidGeomException
                 sql = """
                     INSERT INTO gis.{shape} (entity_id, name, description, type, geom)
                     VALUES (

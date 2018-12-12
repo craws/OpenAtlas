@@ -13,11 +13,11 @@ var newMarker = false; // Temporary marker for point update coordinate
 var layer = false;
 var newLayer = false; // Temporary marker to update a point coordinate
 var editLayer = false;
-var editPointLayer = false;
-var geoJsonArray = []; // Polygon coordinates storage
-var drawnPolygon = L.featureGroup();
+var editLayer = false;
 var editedLayer = false;
 var drawLayer = false;
+var drawnPolygon = L.featureGroup();
+var geoJsonArray = []; // Polygon coordinates storage
 
 /* Controls with EasyButton */
 L.Control.EasyButtons = L.Control.extend({
@@ -126,17 +126,13 @@ map.on('click', function(e) {
 map.on('draw:created', function (e) {
     drawnPolygon.addLayer(e.layer);
     layer = e.layer;
-    if (shapeType == 'centerpoint') {
-        coordinates = layer.getLatLng();
-        shapeSyntax = 'ST_GeomFromText(\'POINT(' + (' ' + coordinates.lng + ' ' + coordinates.lat) + ')\',4326);'
-    } else {
-        geoJsonArray = [];
-        coordinates = layer.getLatLngs()[0];
-        for (i = 0; i < coordinates.length; i++) {
-            geoJsonArray.push('[' + coordinates[i].lng + ',' + coordinates[i].lat + ']');
-        }
-        geoJsonArray.push('[' + coordinates[0].lng + ',' + coordinates[0].lat + ']'); // Add first xy again as last xy to close polygon
+    geoJsonArray = [];
+    coordinates = layer.getLatLngs()[0];
+    for (i = 0; i < coordinates.length; i++) {
+        geoJsonArray.push('[' + coordinates[i].lng + ',' + coordinates[i].lat + ']');
     }
+     // Add first xy again as last xy to close polygon
+    geoJsonArray.push('[' + coordinates[0].lng + ',' + coordinates[0].lat + ']');
     $('#saveButton').prop('disabled', false);
 });
 
@@ -145,22 +141,55 @@ function closeForm(withoutSave = true) {
     $('.leaflet-right .leaflet-bar').show();
     interactionOn();
     $('#map').css('cursor', '');
-    if (shapeType != 'centerpoint' && withoutSave) {
-        drawnPolygon.removeLayer(layer);
-    }
-    if (editPointLayer) {
-        map.removeLayer(editPointLayer);
-        if (withoutSave) {
-            layer.addTo(map);
+    if (withoutSave) {
+        if (shapeType == 'centerpoint') {
+            if (editLayer) {
+                map.removeLayer(editLayer);
+                layer.addTo(map);
+            } else if (marker) {
+                map.removeLayer(marker);
+                marker = false;
+            }
+        } else {
+            drawnPolygon.removeLayer(layer);
+            if (drawLayer) {
+                drawLayer.disable();
+            }
+            if (newLayer) {
+                map.removeLayer(newLayer);
+                newLayer = false;
+                map.addLayer(layer);
+            }
+            if (editLayer) {
+                map.removeLayer(editLayer);
+                editLayer = false;
+                map.addLayer(layer);
+            }
         }
-    } else if (marker) {
-        map.removeLayer(marker);
-        marker = false;
-    } else if (newLayer) {
-        map.removeLayer(newLayer);
-        newLayer = false;
-        if (marker) {
-            marker.addTo(map);
+    } else {
+        if (shapeType == 'centerpoint') {
+            if (editLayer) {
+                map.removeLayer(editLayer);
+            }
+            if (newLayer) {
+                map.removeLayer(newLayer);
+                newLayer = false;
+                if (marker) {
+                    marker.addTo(map);
+                }
+            }
+        } else {
+            if (editLayer) {
+                map.removeLayer(editLayer);
+                editLayer = false;
+            }
+            if (newLayer) {
+                map.removeLayer(newLayer);
+                newLayer = false;
+                if (editedLayer) {
+                    map.addLayer(editedLayer);
+                }
+            }
         }
     }
     captureCoordinates = false; // Important that this is the last statement
@@ -176,6 +205,7 @@ function drawGeometry(selectedType) {
         drawLayer = new L.Draw.Polygon(map);
         map.addLayer(drawnPolygon);
         drawLayer.enable();
+        drawLayer.setStyle({fillColor: '#DA9DC8', color: '#E861C0'});
         $('#coordinatesDiv').hide();
     }
     $('#inputFormTitle').text(selectedType.substr(0,1).toUpperCase() + selectedType.substr(1));
@@ -186,11 +216,12 @@ function drawGeometry(selectedType) {
 function saveForm(shapeType) {
     name = $('#nameField').val().replace(/\"/g,'\\"');
     description = $('#descriptionField').val().replace(/\"/g,'\\"');
-    if (editPointLayer) {
+    if (editLayer || editedLayer) {
         saveEditedGeometry(shapeType);
     } else {
         saveNewGeometry(shapeType);
     }
+    closeForm(false);
 }
 
 function saveEditedGeometry(shapeType) {
@@ -210,7 +241,7 @@ function saveEditedGeometry(shapeType) {
             `"properties":{"name": "` + name + `", "description": "` + description + `", "shapeType": "centerpoint"}}`;
         points.push(JSON.parse(point));
         $('#gis_points').val(JSON.stringify(points));
-        editedLayer = L.marker(editPointLayer.getLatLng(), {icon: editedIcon}).addTo(map);
+        editedLayer = L.marker(editLayer.getLatLng(), {icon: editedIcon}).addTo(map);
         editedLayer.bindPopup(buildPopup(JSON.parse(point), 'edited'));
     } else {
         // Remove former polygon
@@ -222,16 +253,16 @@ function saveEditedGeometry(shapeType) {
             }
         });
         coordinates = '[[' + geoJsonArray.join(',') + ']]'
+        // Insert new polygon
         polygon =
             `{"type": "Feature", "geometry":` +
             `{"type": "Polygon", "coordinates": ` + coordinates + `},` +
             `"properties":{"name": "` + name + `", "description": "` + description + `", "shapeType": "` + shapeType + `"}}`;
         polygons.push(JSON.parse(polygon));
         $('#gis_polygons').val(JSON.stringify(polygons));
-        editedLayer = L.polygon(newLayer.getLatLngs()).addTo(map);
+        editedLayer = L.polygon(editLayer.getLatLngs()).addTo(map);
         editedLayer.setStyle({fillColor: '#686868', color: '#686868'});
     }
-    closeForm(false);
 }
 
 function saveNewGeometry(shapeType) {
@@ -256,8 +287,8 @@ function saveNewGeometry(shapeType) {
         $('#gis_polygons').val(JSON.stringify(polygons));
         layer.bindPopup(buildPopup(JSON.parse(polygon), 'edited'));
         layer.addTo(map);
+        layer.setStyle({fillColor: '#DA9DC8', color: '#E861C0'});
     }
-    closeForm(false);
 }
 
 function deleteGeometry() {
@@ -289,36 +320,35 @@ function editGeometry() {
     shapeType = feature.properties.shapeType;
     map.closePopup();
     map.addControl(inputForm);
+    $('#saveButton').prop('disabled', false);
     $('#inputFormTitle').text(shapeType.substr(0,1).toUpperCase() + shapeType.substr(1));
     $('#inputFormInfo').text(translate['map_info_' + shapeType]);
     $('#nameField').val(feature.properties.name);
     $('#descriptionField').val(feature.properties.description);
     $('.leaflet-right .leaflet-bar').hide();
     if (feature.properties.shapeType == 'centerpoint') {
-        editPointLayer = L.marker(editLayer.getLatLng(), {draggable: true, icon: editIcon}).addTo(map);
+        editLayer = L.marker(editLayer.getLatLng(), {draggable: true, icon: editIcon}).addTo(map);
         wgs84 = editLayer.getLatLng();
         $('#northing').val(wgs84.lat);
         $('#easting').val(wgs84.lng);
-        editPointLayer.bindPopup(feature, 'edit');
-        editPointLayer.on('dragend', function (event) {
+        editLayer.bindPopup(feature, 'edit');
+        editLayer.on('dragend', function (event) {
             newMarker = event.target;
             position = newMarker.getLatLng();
             $('#northing').val(position.lat);
             $('#easting').val(position.lng);
-            $('#saveButton').prop('disabled', false);
         });
         layer.remove();
     } else {
         $('#coordinatesDiv').hide();
-        newLayer = L.polygon(editLayer.getLatLngs()).addTo(map);
+        editLayer = L.polygon(editLayer.getLatLngs()).addTo(map);
         // Workaround for Leaflet draw bug: https://github.com/Leaflet/Leaflet.draw/issues/804
-        newLayer.options.editing || (newLayer.options.editing = {});
-        newLayer.editing.enable();
-        newLayer.bindPopup(feature, 'edit');
-        newLayer.on('edit', function () {
-            $('#saveButton').prop('disabled', false);
+        editLayer.options.editing || (editLayer.options.editing = {});
+        editLayer.editing.enable();
+        editLayer.bindPopup(feature, 'edit');
+        editLayer.on('edit', function () {
             geoJsonArray = [];
-            coordinates = newLayer.getLatLngs()[0];
+            coordinates = editLayer.getLatLngs()[0];
             for (i = 0; i < coordinates.length; i++) {
                 geoJsonArray.push('[' + coordinates[i].lng + ',' + coordinates[i].lat + ']');
             }

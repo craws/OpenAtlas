@@ -29,19 +29,19 @@ class PlaceTest(TestBaseCase):
             gis_points = """[{"type":"Feature", "geometry":{"type":"Point", "coordinates":[9,17]},
                     "properties":{"name":"Valhalla","description":"","shapeType":"centerpoint"}}]"""
             data['gis_points'] = gis_points
-            gis_polygons = """[{"geometry":{
+            data['gis_polygons'] = """[{"geometry":{
                 "coordinates":[[[9.75307425847859,17.8111792731339],
                 [9.75315472474904,17.8110005175436],[9.75333711496205,17.8110873417098],
                 [9.75307425847859,17.8111792731339]]],"type":"Polygon"},
                 "properties":{"count":4,"description":"","id":8,"name":"",
                 "objectDescription":"","objectId":185,"shapeType":"Shape",
                 "siteType":"Settlement","title":""},"type":"Feature"}]"""
-            data['gis_polygons'] = gis_polygons
             data[place_node.id] = place_node.subs
             data['continue_'] = 'yes'
             rv = self.app.post(
                 url_for('place_insert', origin_id=source_id), data=data, follow_redirects=True)
             assert b'Tha source' in rv.data
+
             with app.test_request_context():
                 app.preprocess_request()
                 places = EntityMapper.get_by_codes('place')
@@ -67,6 +67,17 @@ class PlaceTest(TestBaseCase):
                 event.link('P24', location)
             rv = self.app.get(url_for('place_view', id_=place2.id))
             assert rv.data and b'Valhalla rising' in rv.data
+
+            # Test invalid geom
+            data['gis_polygons'] = """[{"type": "Feature", "geometry":
+                {"type": "Polygon", "coordinates": [
+                [[298.9893436362036, -5.888919049309554], [299.00444983737543, -5.9138487869408545],
+                 [299.00650977389887, -5.893358673645309], [298.9848804404028, -5.9070188333813585],
+                 [298.9893436362036, -5.888919049309554]]]},
+                "properties": {"name": "", "description": "", "shapeType": "shape"}}]"""
+            rv = self.app.post(
+                url_for('place_insert', origin_id=source_id), data=data, follow_redirects=True)
+            assert b'Invalid geom entered' in rv.data
 
             # Place types
             rv = self.app.get(url_for('node_move_entities', id_=unit_sub1.id))
