@@ -25,6 +25,9 @@ if (gisPointAll) {
     pointLayer = new L.GeoJSON(gisPointAll, {
         onEachFeature: setPopup,
         pointToLayer: function(feature, latlng) {
+            if (window.location.pathname == '/place') {
+                return L.marker(latlng);
+            }
             return L.marker(latlng, {icon: grayMarker});
         }
     });
