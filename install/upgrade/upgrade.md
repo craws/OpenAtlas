@@ -14,6 +14,8 @@ After following the instructions restart Apache and test if the application is w
 
 Execute install/upgrade/3.12.0.sql after making backups
 
+After the update minimum character search for tables and jstree can be configured in general settings (instead of the config file). The default value is 1 and has to be adjusted if needed. Former entries (MIN_CHARS_TABLESORTER_SEARCH and MIN_CHARS_JSTREE_SEARCH) in your instance config (e.g. production.py) can be removed.
+
 ### 3.10.0 to 3.11.0
 
 Execute install/upgrade/3.11.0.sql after making backups

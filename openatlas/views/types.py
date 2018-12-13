@@ -1,7 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
 
-from flask import abort, flash, g, render_template, request, url_for
+from flask import abort, flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
@@ -187,7 +187,7 @@ def tree_select(name):
                     }}
                 }});
             }});
-        </script>""".format(min_chars=app.config['MIN_CHARS_JSTREE_SEARCH'],
+        </script>""".format(min_chars=session['settings']['minimum_jstree_search'],
                             name=sanitize(name), tree=walk_tree(NodeMapper.get_nodes(name)))
     return html
 

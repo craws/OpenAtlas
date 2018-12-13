@@ -38,6 +38,8 @@ class GeneralForm(Form):
     reset_confirm_hours = IntegerField(uc_first(_('reset confirm hours')))
     failed_login_tries = IntegerField(uc_first(_('failed login tries')))
     failed_login_forget_minutes = IntegerField(uc_first(_('failed login forget minutes')))
+    minimum_jstree_search = IntegerField(uc_first(_('minimum jstree search')))
+    minimum_tablesorter_search = IntegerField(uc_first(_('minimum tablesorter search')))
     save = SubmitField(uc_first(_('save')))
 
 
@@ -353,7 +355,9 @@ def admin_general():
         (_('minimum password length'), settings['minimum_password_length']),
         (_('reset confirm hours'), settings['reset_confirm_hours']),
         (_('failed login tries'), settings['failed_login_tries']),
-        (_('failed login forget minutes'), settings['failed_login_forget_minutes'])])
+        (_('failed login forget minutes'), settings['failed_login_forget_minutes']),
+        (_('minimum jstree search'), settings['minimum_jstree_search']),
+        (_('minimum tablesorter search'), settings['minimum_tablesorter_search'])])
     return render_template(
         'admin/general.html', settings=settings, general_settings=general_settings)
 

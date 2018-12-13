@@ -26,6 +26,8 @@ class SettingsMapper:
         'map_cluster_disable_at_zoom',
         'mail_recipients_feedback',
         'minimum_password_length',
+        'minimum_jstree_search',
+        'minimum_tablesorter_search',
         'random_password_length',
         'reset_confirm_hours',
         'site_name',

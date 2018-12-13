@@ -1,20 +1,20 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import glob
 import os
-import re
 import smtplib
 from collections import OrderedDict
-from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
-from functools import wraps
 from html.parser import HTMLParser
 
 import numpy
+import re
 from babel import dates
+from datetime import datetime
 from flask import abort, flash, g, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
+from functools import wraps
 from numpy import math
 from werkzeug.utils import redirect
 
@@ -465,6 +465,10 @@ def pager(table, remove_rows=True):
         for amount in app.config['DEFAULT_TABLE_ROWS']:
             options += '<option value="{amount}"{selected}>{amount}</option>'.format(
                 amount=amount, selected=' selected="selected"' if amount == table_rows else '')
+        placeholder = uc_first(_('type so search'))
+        if int(session['settings']['minimum_tablesorter_search']) > 1:
+            placeholder += ' (' + _('min chars: ') + \
+                           session['settings']['minimum_tablesorter_search'] + ')'
         html += """
             <div id="{id}-pager" class="pager">
                 <div class="navigation first"></div>
@@ -476,9 +480,9 @@ def pager(table, remove_rows=True):
                 <div class="navigation last"></div>
                 <div><select class="pagesize">{options}</select></div>
                 <input id="{id}-search" class="search" type="text" data-column="all"
-                    placeholder="{filter}">
+                    placeholder="{placeholder}">
             </div><div style="clear:both;"></div>
-            """.format(id=table['id'], filter=uc_first(_('filter')), options=options)
+            """.format(id=table['id'], options=options, placeholder=placeholder)
     html += '<table id="{id}-table" class="tablesorter"><thead><tr>'.format(id=table['id'])
     for header in table['header']:
         style = '' if header else 'class=sorter-false '  # only show and sort headers with a title
@@ -522,7 +526,7 @@ def pager(table, remove_rows=True):
             sort=sort,
             remove_rows='removeRows: true,' if remove_rows else '',
             size=table_rows,
-            filter_liveSearch=app.config['MIN_CHARS_TABLESORTER_SEARCH'],
+            filter_liveSearch=session['settings']['minimum_tablesorter_search'],
             headers=(table['headers'] + ',') if 'headers' in table else '')
     else:
         html += """
@@ -534,8 +538,8 @@ def pager(table, remove_rows=True):
                     filter_external: "#{id}-search",
                     filter_columnFilters: false
                 }}}});
-        """.format(
-            id=table['id'], sort=sort, filter_liveSearch=app.config['MIN_CHARS_JSTREE_SEARCH'])
+        """.format(id=table['id'], sort=sort,
+                   filter_liveSearch=session['settings']['minimum_jstree_search'])
     html += '</script>'
     return html
 

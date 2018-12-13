@@ -1,8 +1,8 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
-import time
 
-from flask import g
+import time
+from flask import g, session
 from flask_babel import lazy_gettext as _
 from wtforms import FloatField, HiddenField
 from wtforms.validators import Optional
@@ -170,7 +170,7 @@ class TreeSelect(HiddenInput):
                     }});
                 }});
             </script>""".format(
-            min_chars=app.config['MIN_CHARS_JSTREE_SEARCH'],
+            min_chars=session['settings']['minimum_jstree_search'],
             name=field.id,
             title=g.nodes[int(field.id)].name,
             change_label=uc_first(_('change')),
@@ -221,7 +221,7 @@ class TreeMultiSelect(HiddenInput):
                     }}
                 }});
             </script>""".format(
-            min_chars=app.config['MIN_CHARS_JSTREE_SEARCH'],
+            min_chars=session['settings']['minimum_jstree_search'],
             name=field.id,
             title=root.name,
             selection=selection,
