@@ -190,6 +190,9 @@ function closeForm(withoutSave = true) {
                     map.addLayer(editedLayer);
                 }
             }
+            if (editedLayer) {
+                editedLayer = false;
+            }
         }
     }
     captureCoordinates = false; // Important that this is the last statement
