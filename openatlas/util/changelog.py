@@ -5,7 +5,9 @@ from collections import OrderedDict
 class Changelog:
     versions = OrderedDict()
     versions['3.12.0'] = ['TBA', OrderedDict([
-        ('feature', OrderedDict([]))])]
+        ('feature', OrderedDict([
+            ('652', 'Maps: update and rewrite'),
+        ]))])]
     versions['3.11.1'] = ['2018-11-30', OrderedDict([
         ('fix', OrderedDict([
             ('964', 'Forms: tables with pager ignoring selection after changing page')]))])]
