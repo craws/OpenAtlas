@@ -202,7 +202,7 @@ function drawGeometry(selectedType) {
         $('#coordinatesDiv').show();
     } else {
         captureCoordinates = false;
-        drawLayer = new L.Draw.Polygon(map);
+        drawLayer = new L.Draw.Polygon(map, {allowIntersection: false});
         map.addLayer(drawnPolygon);
         drawLayer.enable();
         drawLayer.setStyle({fillColor: '#DA9DC8', color: '#E861C0'});
