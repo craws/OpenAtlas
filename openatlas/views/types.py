@@ -42,7 +42,7 @@ def node_index():
         elif node.value_type:
             type_ = 'value'
         nodes[type_][node] = tree_select(node.name)
-    return render_template('types/index.html', nodes=nodes)
+    return render_template('types/index.html', nodes=nodes, placeholder=_('type to search'))
 
 
 @app.route('/types/insert/<int:root_id>', methods=['GET', 'POST'])

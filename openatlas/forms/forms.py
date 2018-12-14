@@ -148,7 +148,7 @@ class TreeSelect(HiddenInput):
                 onclick="clearSelect('{name}');">{clear_label}</a>
             <div id="{name}-overlay" class="overlay">
                 <div id="{name}-dialog" class="overlay-container">
-                    <input class="tree-filter" id="{name}-tree-search" placeholder="Filter" />
+                    <input class="tree-filter" id="{name}-tree-search" placeholder="{filter}" />
                     <div id="{name}-tree"></div>
                 </div>
             </div>
@@ -170,6 +170,7 @@ class TreeSelect(HiddenInput):
                     }});
                 }});
             </script>""".format(
+            filter=uc_first(_('type to search')),
             min_chars=session['settings']['minimum_jstree_search'],
             name=field.id,
             title=g.nodes[int(field.id)].name,
@@ -203,7 +204,7 @@ class TreeMultiSelect(HiddenInput):
             <div id="{name}-selection" style="text-align:left;">{selection}</div>
             <div id="{name}-overlay" class="overlay">
                <div id="{name}-dialog" class="overlay-container">
-                   <input class="tree-filter" id="{name}-tree-search" placeholder="Filter" />
+                   <input class="tree-filter" id="{name}-tree-search" placeholder="{filter}" />
                    <div id="{name}-tree"></div>
                </div>
             </div>
@@ -221,6 +222,7 @@ class TreeMultiSelect(HiddenInput):
                     }}
                 }});
             </script>""".format(
+            filter=uc_first(_('type to search')),
             min_chars=session['settings']['minimum_jstree_search'],
             name=field.id,
             title=root.name,

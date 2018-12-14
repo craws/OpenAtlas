@@ -465,10 +465,10 @@ def pager(table, remove_rows=True):
         for amount in app.config['DEFAULT_TABLE_ROWS']:
             options += '<option value="{amount}"{selected}>{amount}</option>'.format(
                 amount=amount, selected=' selected="selected"' if amount == table_rows else '')
-        placeholder = uc_first(_('type so search'))
+        placeholder = uc_first(_('type to search'))
         if int(session['settings']['minimum_tablesorter_search']) > 1:
-            placeholder += ' (' + _('min chars: ') + \
-                           session['settings']['minimum_tablesorter_search'] + ')'
+            placeholder += ' (' + _('min %(limit)s chars',
+                                    limit=session['settings']['minimum_tablesorter_search']) + ')'
         html += """
             <div id="{id}-pager" class="pager">
                 <div class="navigation first"></div>
