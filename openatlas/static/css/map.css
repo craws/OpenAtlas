@@ -1,3 +1,11 @@
+#map {
+    z-index: 0;
+    float: left;
+    height: 440px;
+    width: 600px;
+    margin-left: 1em;
+}
+
 .mapFormDiv {
     padding: 6px 8px;
     background: white;

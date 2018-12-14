@@ -9,14 +9,6 @@ html, body, input, select, textarea {
     margin-right: 0.5em;
 }
 
-#map {
-    z-index: 0;
-    float: left;
-    height: 440px;
-    width: 600px;
-    margin-left: 1em;
-}
-
 p.manual {
     margin: 0;
     margin-bottom: 0.5em;

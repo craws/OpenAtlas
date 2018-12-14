@@ -466,7 +466,7 @@ def pager(table, remove_rows=True):
             options += '<option value="{amount}"{selected}>{amount}</option>'.format(
                 amount=amount, selected=' selected="selected"' if amount == table_rows else '')
         placeholder = uc_first(_('type to search'))
-        if int(session['settings']['minimum_tablesorter_search']) > 1:
+        if int(session['settings']['minimum_tablesorter_search']) > 1:  # pragma: no cover
             placeholder += ' (' + _('min %(limit)s chars',
                                     limit=session['settings']['minimum_tablesorter_search']) + ')'
         html += """

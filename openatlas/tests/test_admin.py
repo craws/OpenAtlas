@@ -67,6 +67,8 @@ class ContentTests(TestBaseCase):
             data['reset_confirm_hours'] = '10'
             data['log_level'] = '0'
             data['site_name'] = 'Nostromo'
+            data['minimum_jstree_search'] = 3
+            data['minimum_tablesorter_search'] = 4
             rv = self.app.post(url_for('admin_general_update'), data=data, follow_redirects=True)
             assert b'Nostromo' in rv.data
             rv = self.app.get(url_for('admin_mail_update'))
