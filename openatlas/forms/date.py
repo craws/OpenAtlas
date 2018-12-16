@@ -11,8 +11,7 @@ class DateForm(Form):
 
     @staticmethod
     def format_date(date, part):
-        """If it's a negative year, add one year
-
+        """
         :param date: a date string
         :param part: year, month or day
         :return: string presentation of the date part for the form
@@ -23,14 +22,14 @@ class DateForm(Form):
             bc = True
             string = string[1:]
         parts = string.split('-')
-        if part == 'year':
+        if part == 'year':  # If it's a negative year, add one year
             return '-' + str(int(parts[0]) + 1) if bc else parts[0]
         if part == 'month':
             return parts[1]
         return parts[2]
 
     def populate_dates(self, param):
-        """Populates the date form fields with date values of an entity or link
+        """ Populates the date form fields with date values of an entity or link
 
         :param param: an entity or a link
         """
@@ -64,46 +63,35 @@ class DateForm(Form):
 
     date_birth = BooleanField(_('birth'))
     date_death = BooleanField(_('death'))
-
     date_begin_year = IntegerField(
-        _('begin'),
-        render_kw={'placeholder': _('yyyy')},
+        _('begin'), render_kw={'placeholder': _('yyyy')},
         validators=[Optional(), NumberRange(min=-4713, max=9999), NoneOf([0])])
-    date_begin_month = IntegerField(
-        render_kw={'placeholder': _('mm')},
-        validators=[Optional(), NumberRange(min=1, max=12)])
-    date_begin_day = IntegerField(
-        render_kw={'placeholder': _('dd')},
-        validators=[Optional(), NumberRange(min=1, max=31)])
+    date_begin_month = IntegerField(render_kw={'placeholder': _('mm')},
+                                    validators=[Optional(), NumberRange(min=1, max=12)])
+    date_begin_day = IntegerField(render_kw={'placeholder': _('dd')},
+                                  validators=[Optional(), NumberRange(min=1, max=31)])
     date_begin_year2 = IntegerField(
         render_kw={'placeholder': _('yyyy')},
         validators=[Optional(), NumberRange(min=-4713, max=9999), NoneOf([0])])
-    date_begin_month2 = IntegerField(
-        render_kw={'placeholder': _('mm')},
-        validators=[Optional(), NumberRange(min=1, max=12)])
-    date_begin_day2 = IntegerField(
-        render_kw={'placeholder': _('dd')},
-        validators=[Optional(), NumberRange(min=1, max=31)])
+    date_begin_month2 = IntegerField(render_kw={'placeholder': _('mm')},
+                                     validators=[Optional(), NumberRange(min=1, max=12)])
+    date_begin_day2 = IntegerField(render_kw={'placeholder': _('dd')},
+                                   validators=[Optional(), NumberRange(min=1, max=31)])
     date_begin_info = StringField(render_kw={'placeholder': _('comment')},)
     date_end_year = IntegerField(
-        _('end'),
-        render_kw={'placeholder': _('yyyy')},
+        _('end'), render_kw={'placeholder': _('yyyy')},
         validators=[Optional(), NumberRange(min=-4713, max=9999), NoneOf([0])])
-    date_end_month = IntegerField(
-        render_kw={'placeholder': _('mm')},
-        validators=[Optional(), NumberRange(min=1, max=12)])
-    date_end_day = IntegerField(
-        render_kw={'placeholder': _('dd')},
-        validators=[Optional(), NumberRange(min=1, max=31)])
+    date_end_month = IntegerField(render_kw={'placeholder': _('mm')},
+                                  validators=[Optional(), NumberRange(min=1, max=12)])
+    date_end_day = IntegerField(render_kw={'placeholder': _('dd')},
+                                validators=[Optional(), NumberRange(min=1, max=31)])
     date_end_year2 = IntegerField(
         render_kw={'placeholder': _('yyyy')},
         validators=[Optional(), NumberRange(min=-4713, max=9999), NoneOf([0])])
-    date_end_month2 = IntegerField(
-        render_kw={'placeholder': _('mm')},
-        validators=[Optional(), NumberRange(min=1, max=12)])
-    date_end_day2 = IntegerField(
-        render_kw={'placeholder': _('dd')},
-        validators=[Optional(), NumberRange(min=1, max=31)])
+    date_end_month2 = IntegerField(render_kw={'placeholder': _('mm')},
+                                   validators=[Optional(), NumberRange(min=1, max=12)])
+    date_end_day2 = IntegerField(render_kw={'placeholder': _('dd')},
+                                 validators=[Optional(), NumberRange(min=1, max=31)])
     date_end_info = StringField(render_kw={'placeholder': _('comment')})
 
     def validate(self, extra_validators=None):
@@ -114,7 +102,7 @@ class DateForm(Form):
                 value = getattr(self, 'date_' + name + '_' + item).data
                 fields[name + '_' + item] = int(value) if value else ''
 
-        # check if dates have a valid format
+        # Check date format, if valid put dates into a dictionary
         dates = {}
         for name in ['begin', 'end']:
             for postfix in ['', '2']:
@@ -128,9 +116,9 @@ class DateForm(Form):
                         field.errors.append(_('not a valid date'))
                         valid = False
                     else:
-                        dates[name + postfix] = date  # put dates into a dictionary
+                        dates[name + postfix] = date
 
-        # check if date spans are in itself valid
+        # Check for valid date combination e.g. begin not after end
         if valid:
             for name in ['begin', 'end']:
                 if name in dates and name + '2' in dates:
@@ -138,11 +126,9 @@ class DateForm(Form):
                         field = getattr(self, 'date_' + name + '_day')
                         field.errors.append(_('First date cannot be after second.'))
                         valid = False
-
-        # check if begin dates are before ends dates
         if valid and 'begin' in dates and 'end' in dates:
             field = getattr(self, 'date_begin_day')
-            if len(dates) == 4:  # all dates are used
+            if len(dates) == 4:  # All dates are used
                 if dates['begin'] > dates['end'] or dates['begin2'] > dates['end2']:
                     field.errors.append(_('Begin dates cannot start after end dates.'))
                     valid = False

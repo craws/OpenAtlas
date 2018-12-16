@@ -195,13 +195,7 @@ class DateMapper:
     def get_invalid_dates():
         """ Searches for entities with invalid combinations of dates, e.g. begin after end"""
         """
-        SELECT e.id,
-            max(b1.value_timestamp) AS begin_1,
-            max(b2.value_timestamp) AS begin_2,
-            max(e1.value_timestamp) AS end_1,
-            max(e2.value_timestamp) AS end_2
-
-        FROM model.entity e
+        SELECT e.id FROM model.entity e
 
         LEFT JOIN model.link bl1 ON e.id = bl1.domain_id
             AND bl1.property_code IN ('OA1', 'OA3', 'OA5')
@@ -213,16 +207,20 @@ class DateMapper:
         LEFT JOIN model.entity b2 ON bl2.range_id = b2.id AND b2.system_type = 'to date value'
 
         LEFT JOIN model.link el1 ON e.id = el1.domain_id
-            AND el1.property_code IN ('OA1', 'OA3', 'OA5')
+            AND el1.property_code IN ('OA2', 'OA4', 'OA6')
         LEFT JOIN model.entity e1 ON el1.range_id = e1.id
             AND e1.system_type IN ('from date value', 'exact date value')
 
         LEFT JOIN model.link el2 ON e.id = el2.domain_id
-            AND el2.property_code IN ('OA1', 'OA3', 'OA5')
+            AND el2.property_code IN ('OA2', 'OA4', 'OA6')
         LEFT JOIN model.entity e2 ON el2.range_id = e2.id AND e2.system_type = 'to date value'
 
-
-        WHERE e.class_code IN ('E6', 'E7', 'E8', 'E12', 'E18', 'E21', 'E22', 'E40', 'E74')
         GROUP BY e.id
 
-        ;"""
+        HAVING e.class_code IN ('E6', 'E7', 'E8', 'E12', 'E18', 'E21', 'E22', 'E40', 'E74')
+            AND (max(b1.value_timestamp) > max(b2.value_timestamp)
+                OR max(e1.value_timestamp) > max(e2.value_timestamp)
+                OR (max(b1.value_timestamp) IS NOT NULL AND max(e1.value_timestamp) IS NOT NULL
+                    AND max(b1.value_timestamp) > max(e1.value_timestamp))
+                OR (max(b2.value_timestamp) IS NOT NULL AND max(e2.value_timestamp) IS NOT NULL
+                    AND max(b2.value_timestamp) > max(e2.value_timestamp)));"""
