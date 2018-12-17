@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2018-12-14 14:28+0100\n"
-"PO-Revision-Date: 2018-12-14 15:03+0100\n"
+"POT-Creation-Date: 2018-12-17 12:35+0100\n"
+"PO-Revision-Date: 2018-12-17 12:38+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.3.4\n"
+"Generated-By: Babel 2.6.0\n"
 "X-Generator: Poedit 1.8.11\n"
 
 #: __init__.py:30 views/search.py:15
@@ -28,47 +28,47 @@ msgstr "search term"
 msgid "search"
 msgstr "search"
 
-#: forms/date.py:65 util/util.py:241
+#: forms/date.py:64 util/util.py:241
 msgid "birth"
 msgstr "birth"
 
-#: forms/date.py:66 util/util.py:243
+#: forms/date.py:65 util/util.py:243
 msgid "death"
 msgstr "death"
 
-#: forms/date.py:69 util/util.py:244
+#: forms/date.py:67 util/util.py:244
 msgid "begin"
 msgstr "begin"
 
-#: forms/date.py:70 forms/date.py:79 forms/date.py:90 forms/date.py:99
+#: forms/date.py:67 forms/date.py:74 forms/date.py:82 forms/date.py:89
 msgid "yyyy"
 msgstr "yyyy"
 
-#: forms/date.py:73 forms/date.py:82 forms/date.py:93 forms/date.py:102
+#: forms/date.py:69 forms/date.py:76 forms/date.py:84 forms/date.py:91
 msgid "mm"
 msgstr "mm"
 
-#: forms/date.py:76 forms/date.py:85 forms/date.py:96 forms/date.py:105
+#: forms/date.py:71 forms/date.py:78 forms/date.py:86 forms/date.py:93
 msgid "dd"
 msgstr "dd"
 
-#: forms/date.py:87 forms/date.py:107
+#: forms/date.py:80 forms/date.py:95
 msgid "comment"
 msgstr "comment"
 
-#: forms/date.py:89 util/util.py:245
+#: forms/date.py:82 util/util.py:245
 msgid "end"
 msgstr "end"
 
-#: forms/date.py:128
+#: forms/date.py:116
 msgid "not a valid date"
 msgstr "Not a valid date."
 
-#: forms/date.py:139
+#: forms/date.py:127
 msgid "First date cannot be after second."
 msgstr "First date cannot be after second."
 
-#: forms/date.py:147 forms/date.py:153
+#: forms/date.py:133 forms/date.py:139
 msgid "Begin dates cannot start after end dates."
 msgstr "Begin dates cannot start after end dates."
 
@@ -748,9 +748,8 @@ msgstr ""
 "%(link_openatlas)s is a database application that enables you to manage "
 "complex historical, archeological  and geospatial data.\n"
 "\n"
-"OpenAtlas is Open Source and available on %(link_bitbucket)s and "
-"%(link_github)s. It uses open source technology like Apache, PostgreSQL, "
-"PostGIS, Python 3, Flask and Leaflet.\n"
+"OpenAtlas is Open Source and available on %(link_github)s. It uses open source "
+"technology like Apache, PostgreSQL, PostGIS, Python 3, Flask and Leaflet.\n"
 "\n"
 "The data model is based on classes and properties of the %(link_cidoc)s which "
 "is an internationally established standard for historical documentation.\n"
