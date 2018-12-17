@@ -49,7 +49,7 @@
                 <a href="{{ url_for('export_sql') }}">{{ _('export')|uc_first }} SQL</a>
             {% endif  %}
         {% endif  %}
-        {% if 'admin'|is_authorized %}
+        {% if 'manager'|is_authorized %}
             <h1>{{ _('data integrity')|uc_first }}</h1>
             <a href="{{ url_for('admin_orphans') }}">{{ _('orphans')|uc_first }}</a>
             <a href="{{ url_for('admin_check_links') }}">{{ _('check links')|uc_first }}</a>
