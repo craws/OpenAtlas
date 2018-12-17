@@ -1,7 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from datetime import datetime
-
 import numpy
+from datetime import datetime
 from flask import g
 
 from openatlas import app, debug_model
@@ -193,8 +192,9 @@ class DateMapper:
 
     @staticmethod
     def get_invalid_dates():
-        """ Searches for entities with invalid combinations of dates, e.g. begin after end"""
-        """
+        """ Search for entities with invalid date combinations, e.g. begin after end"""
+        from openatlas.models.entity import EntityMapper
+        sql = """
         SELECT e.id FROM model.entity e
 
         LEFT JOIN model.link bl1 ON e.id = bl1.domain_id
@@ -216,7 +216,6 @@ class DateMapper:
         LEFT JOIN model.entity e2 ON el2.range_id = e2.id AND e2.system_type = 'to date value'
 
         GROUP BY e.id
-
         HAVING e.class_code IN ('E6', 'E7', 'E8', 'E12', 'E18', 'E21', 'E22', 'E40', 'E74')
             AND (max(b1.value_timestamp) > max(b2.value_timestamp)
                 OR max(e1.value_timestamp) > max(e2.value_timestamp)
@@ -224,3 +223,42 @@ class DateMapper:
                     AND max(b1.value_timestamp) > max(e1.value_timestamp))
                 OR (max(b2.value_timestamp) IS NOT NULL AND max(e2.value_timestamp) IS NOT NULL
                     AND max(b2.value_timestamp) > max(e2.value_timestamp)));"""
+        g.cursor.execute(sql)
+        debug_model['div sql'] += 1
+        return [EntityMapper.get_by_id(row.id)for row in g.cursor.fetchall()]
+
+    @staticmethod
+    def get_invalid_link_dates():
+        """ Search for links with invalid date combinations, e.g. begin after end"""
+        sql = """
+        SELECT l.id FROM model.link l
+
+        LEFT JOIN model.link_property bl1 ON l.id = bl1.domain_id
+            AND bl1.property_code IN ('OA1', 'OA3', 'OA5')
+        LEFT JOIN model.entity b1 ON bl1.range_id = b1.id
+            AND b1.system_type IN ('from date value', 'exact date value')
+
+        LEFT JOIN model.link_property bl2 ON l.id = bl2.domain_id
+            AND bl2.property_code IN ('OA1', 'OA3', 'OA5')
+        LEFT JOIN model.entity b2 ON bl2.range_id = b2.id AND b2.system_type = 'to date value'
+
+        LEFT JOIN model.link_property el1 ON l.id = el1.domain_id
+            AND el1.property_code IN ('OA2', 'OA4', 'OA6')
+        LEFT JOIN model.entity e1 ON el1.range_id = e1.id
+            AND e1.system_type IN ('from date value', 'exact date value')
+
+        LEFT JOIN model.link_property el2 ON l.id = el2.domain_id
+            AND el2.property_code IN ('OA2', 'OA4', 'OA6')
+        LEFT JOIN model.entity e2 ON el2.range_id = e2.id AND e2.system_type = 'to date value'
+
+        GROUP BY l.id
+        HAVING l.property_code IN ('OA7', 'P107', 'P11', 'P14', 'P22', 'P23')
+                AND (max(b1.value_timestamp) > max(b2.value_timestamp)
+                OR max(e1.value_timestamp) > max(e2.value_timestamp)
+                OR (max(b1.value_timestamp) IS NOT NULL AND max(e1.value_timestamp) IS NOT NULL
+                    AND max(b1.value_timestamp) > max(e1.value_timestamp))
+                OR (max(b2.value_timestamp) IS NOT NULL AND max(e2.value_timestamp) IS NOT NULL
+                    AND max(b2.value_timestamp) > max(e2.value_timestamp)));"""
+        g.cursor.execute(sql)
+        debug_model['div sql'] += 1
+        return [LinkMapper.get_by_id(row.id) for row in g.cursor.fetchall()]

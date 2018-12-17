@@ -14,6 +14,7 @@ from wtforms.validators import Email, InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import TableField
+from openatlas.models.date import DateMapper
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.models.node import NodeMapper
@@ -130,6 +131,40 @@ def admin_orphans_delete(parameter):
     return redirect(url_for('admin_orphans'))
 
 
+@app.route('/admin/check/dates')
+@required_group('admin')
+def admin_check_dates():
+    # Get invalid date combinations (e.g. begin after end)
+    tables = {
+        'invalid_dates': {'id': 'invalid_dates', 'data': [],
+                          'header': ['name', 'class', 'type', 'system type', 'created',
+                                     'updated', 'description']},
+        'invalid_link_dates': {'id': 'invalid_link_dates', 'data': [],
+                               'header': ['link', 'domain', 'range']}}
+    for entity in DateMapper.get_invalid_dates():
+        tables['invalid_dates']['data'].append([
+            link(entity),
+            link(entity.class_),
+            entity.print_base_type(),
+            entity.system_type,
+            format_date(entity.created),
+            format_date(entity.modified),
+            truncate_string(entity.description)])
+    for link_ in DateMapper.get_invalid_link_dates():
+        label = ''
+        if link_.property.code == 'OA7':
+            label = _('relation')
+        elif link_.property.code == 'P107':
+            label = _('member')
+        elif link_.property.code in ['P11', 'P14', 'P22', 'P23']:
+            label = _('involvement')
+        url = url_for(label + '_update', id_=link_.id, origin_id=link_.domain.id)
+        tables['invalid_link_dates']['data'].append([
+            '<a href="' + url + '">' + uc_first(_(label)) + '</a>',
+            link(link_.domain), link(link_.range)])
+    return render_template('admin/check_dates.html', tables=tables)
+
+
 @app.route('/admin/orphans')
 @required_group('admin')
 def admin_orphans():
@@ -202,8 +237,8 @@ def admin_logo(action=None):
         return redirect(url_for('admin_logo'))
     if session['settings']['logo_file_id']:
         path = get_file_path(int(session['settings']['logo_file_id']))
-        return render_template(
-            'admin/logo.html', filename=os.path.basename(path) if path else False)
+        return render_template('admin/logo.html',
+                               filename=os.path.basename(path) if path else False)
     form = LogoForm()
     if form.validate_on_submit():
         SettingsMapper.set_logo(form.file.data)
@@ -275,8 +310,8 @@ def admin_log_delete():
 
 
 class NewsLetterForm(Form):
-    subject = StringField(
-        '', [InputRequired()], render_kw={'placeholder': _('subject'), 'autofocus': True})
+    subject = StringField('', [InputRequired()], render_kw={'placeholder': _('subject'),
+                                                            'autofocus': True})
     body = TextAreaField('', [InputRequired()], render_kw={'placeholder': _('content')})
     send = SubmitField(uc_first(_('send')))
 
@@ -336,8 +371,8 @@ def admin_mail():
         (_('mail from email'), settings['mail_from_email']),
         (_('mail from name'), settings['mail_from_name']),
         (_('mail recipients feedback'), ';'.join(settings['mail_recipients_feedback']))])
-    return render_template(
-        'admin/mail.html', settings=settings, mail_settings=mail_settings, form=form)
+    return render_template('admin/mail.html', settings=settings, mail_settings=mail_settings,
+                           form=form)
 
 
 @app.route('/admin/general', methods=["GET", "POST"])
@@ -358,8 +393,8 @@ def admin_general():
         (_('failed login forget minutes'), settings['failed_login_forget_minutes']),
         (_('minimum jstree search'), settings['minimum_jstree_search']),
         (_('minimum tablesorter search'), settings['minimum_tablesorter_search'])])
-    return render_template(
-        'admin/general.html', settings=settings, general_settings=general_settings)
+    return render_template('admin/general.html', settings=settings,
+                           general_settings=general_settings)
 
 
 @app.route('/admin/general/update', methods=["GET", "POST"])

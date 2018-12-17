@@ -4,6 +4,11 @@ html, body, input, select, textarea {
     font-family: helvetica, arial, sans-serif;
 }
 
+
+.date-switch label.error {
+    padding: 0.2em;
+}
+
 #admin_index a {
     text-decoration: underline;
     margin-right: 0.5em;

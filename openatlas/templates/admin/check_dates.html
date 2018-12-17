@@ -1,0 +1,19 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
+    > {{ _('check dates')|uc_first }}
+{% endblock %}
+{% block content %}
+<div id="tabs" class="tabs-container">
+    <ul>
+        <li><a href="#tab-invalid-dates">{{ _('invalid dates')|uc_first }} ({{ tables['invalid_dates']['data']|length|format_number }})</a></li>
+        <li><a href="#tab-invalid-link-dates">{{ _('invalid link dates')|uc_first }} ({{ tables['invalid_link_dates']['data']|length|format_number }})</a></li>
+    </ul>
+    <div id="tab-invalid-dates">
+        {{ tables['invalid_dates']|pager|safe }}
+    </div>
+    <div id="tab-invalid-link-dates">
+        {{ tables['invalid_link_dates']|pager|safe }}
+    </div>
+</div>
+{% endblock %}
