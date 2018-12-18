@@ -204,22 +204,23 @@ def admin_orphans():
                 truncate_string(entity.description)])
 
     # Get orphaned files (no corresponding entity)
-    path = app.config['UPLOAD_FOLDER_PATH']
-    for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
-        name = basename(file)
-        file_path = path + '/' + name
-        if name != '.gitignore' and splitext(name)[0] not in file_ids:
+
+    # When python3.6 change to:
+    # with os.scandir(app.config['UPLOAD_FOLDER_PATH']) as it:
+    #     for file in it:
+    for file in os.scandir(app.config['UPLOAD_FOLDER_PATH']):
+        name = file.name
+        if name != '.gitignore' and splitext(file.name)[0] not in file_ids:
             confirm = ' onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
             tables['orphaned_files']['data'].append([
                 name,
-                convert_size(os.path.getsize(file_path)),
-                format_date(datetime.datetime.fromtimestamp(os.path.getmtime(file_path))),
+                convert_size(file.stat().st_size),
+                format_date(datetime.datetime.utcfromtimestamp(file.stat().st_ctime)),
                 splitext(name)[1],
                 '<a href="' + url_for('download_file', filename=name) + '">' + uc_first(
                     _('download')) + '</a>',
-                '<a href="' + url_for(
-                    'admin_file_delete',
-                    filename=name) + '" ' + confirm + '>' + uc_first(_('delete')) + '</a>'])
+                '<a href="' + url_for('admin_file_delete', filename=name) + '" ' +
+                confirm + '>' + uc_first(_('delete')) + '</a>'])
     return render_template('admin/orphans.html', tables=tables)
 
 

@@ -1,6 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import os
 
+import datetime
 import math
 from flask import flash, g, render_template, request, send_from_directory, session, url_for
 from flask_babel import lazy_gettext as _
@@ -13,9 +14,9 @@ import openatlas
 from openatlas import app, logger
 from openatlas.forms.forms import build_form
 from openatlas.models.entity import EntityMapper
-from openatlas.util.util import (build_table_form, convert_size, display_remove_link,
+from openatlas.util.util import (build_table_form, convert_size, display_remove_link, format_date,
                                  get_base_table_data, get_entity_data, get_file_path, is_authorized,
-                                 link, required_group, uc_first, was_modified)
+                                 link, required_group, truncate_string, uc_first, was_modified)
 
 
 class FileForm(Form):
@@ -63,11 +64,37 @@ def display_logo(filename):  # File display function for public
 @app.route('/file/index')
 @required_group('readonly')
 def file_index():
-    table = {'id': 'files', 'header': app.config['TABLE_HEADERS']['file'],
-             'data': [get_base_table_data(f) for f in EntityMapper.get_by_system_type('file')]}
-    statvfs = os.statvfs(app.config['UPLOAD_FOLDER_PATH'])
+    table = {'id': 'files', 'header': ['date'] + app.config['TABLE_HEADERS']['file'], 'data': []}
+    path = app.config['UPLOAD_FOLDER_PATH']
+    files_in_dir = {}
+    # Build a dict with file ids and stats from existing files in directory
+    # It's much faster to do this in one call instead for every file
+
+    # When python3.6 change to:
+    # with os.scandir(app.config['UPLOAD_FOLDER_PATH']) as it:
+    #     for file in it:
+    for file in os.scandir(app.config['UPLOAD_FOLDER_PATH']):
+        split_name = os.path.splitext(file.name)
+        if len(split_name) > 1 and split_name[0].isdigit():
+            files_in_dir[int(split_name[0])] = {
+                'ext': split_name[1],
+                'size': file.stat().st_size,
+                'date': file.stat().st_ctime}
+    for entity in EntityMapper.get_by_system_type('file'):
+        date = 'N/A'
+        if entity.id in files_in_dir:
+            date = format_date(datetime.datetime.utcfromtimestamp(files_in_dir[entity.id]['date']))
+        table['data'].append([
+            date,
+            link(entity),
+            entity.print_base_type(),
+            convert_size(files_in_dir[entity.id]['size']) if entity.id in files_in_dir else 'N/A',
+            files_in_dir[entity.id]['ext'] if entity.id in files_in_dir else 'N/A',
+            truncate_string(entity.description)])
+
+    statvfs = os.statvfs(path)
     disk_space = statvfs.f_frsize * statvfs.f_blocks
-    free_space = statvfs.f_frsize * statvfs.f_bavail  # available space without reserved blocks
+    free_space = statvfs.f_frsize * statvfs.f_bavail  # Available space without reserved blocks
     disk_space_values = {
         'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
         'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
