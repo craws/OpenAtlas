@@ -4,7 +4,7 @@
     > {{ _('orphans')|uc_first }}
 {% endblock %}
 {% block content %}
-{{ 'Orphans'|manual_link|safe }}
+{{ 'Data_integrity'|manual_link|safe }}
 <div id="tabs" class="tabs-container">
     <ul>
         <li><a href="#tab-orphan">{{ _('orphans')|uc_first }} ({{ tables['orphans']['data']|length|format_number }})</a></li>
@@ -14,7 +14,7 @@
         <li><a href="#tab-orphaned-files">{{ _('orphaned files')|uc_first }} ({{ tables['orphaned_files']['data']|length|format_number }})</a></li>
     </ul>
     <div id="tab-orphan">
-        {% if tables['orphans']['data']|length > 0 and 'admin'|is_authorized %}%}
+        {% if tables['orphans']['data']|length > 0 and 'admin'|is_authorized %}
             <div class="button-bar">
                 <a onclick="return confirm('{{_('delete orphans')|uc_first }}?')"
                    href="{{ url_for('admin_orphans_delete', parameter='orphans') }}">{{ _('delete orphans')|uc_first }}</a>

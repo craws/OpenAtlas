@@ -4,6 +4,7 @@
     > {{ _('check dates')|uc_first }}
 {% endblock %}
 {% block content %}
+{{ 'Data_integrity'|manual_link|safe }}
 <div id="tabs" class="tabs-container">
     <ul>
         <li><a href="#tab-invalid-dates">{{ _('invalid dates')|uc_first }} ({{ tables['invalid_dates']['data']|length|format_number }})</a></li>
