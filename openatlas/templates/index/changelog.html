@@ -4,6 +4,7 @@
     > {{ _('changelog')|uc_first }}
 {% endblock %}
 {% block content %}
+    {{ 'Features_Versioning_and_Roadmap'|manual_link|safe }}
     {% for version_name, version in versions.items() %}
         <div class="changelog-version">
             {{ _('version')|uc_first }} {{ version_name }}
