@@ -154,9 +154,9 @@ def admin_check_dates():
         label = ''
         if link_.property.code == 'OA7':
             label = _('relation')
-        elif link_.property.code == 'P107':
+        elif link_.property.code == 'P107':  # pragma: no cover
             label = _('member')
-        elif link_.property.code in ['P11', 'P14', 'P22', 'P23']:
+        elif link_.property.code in ['P11', 'P14', 'P22', 'P23']:  # pragma: no cover
             label = _('involvement')
         url = url_for(label + '_update', id_=link_.id, origin_id=link_.domain.id)
         tables['invalid_link_dates']['data'].append([
