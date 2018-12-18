@@ -86,7 +86,7 @@ def admin_map():
 
 @app.route('/admin/check_links')
 @app.route('/admin/check_links/<check>')
-@required_group('manager')
+@required_group('editor')
 def admin_check_links(check=None):
     table = None
     if check:
@@ -132,7 +132,7 @@ def admin_orphans_delete(parameter):
 
 
 @app.route('/admin/check/dates')
-@required_group('manager')
+@required_group('editor')
 def admin_check_dates():
     # Get invalid date combinations (e.g. begin after end)
     tables = {
@@ -166,7 +166,7 @@ def admin_check_dates():
 
 
 @app.route('/admin/orphans')
-@required_group('manager')
+@required_group('editor')
 def admin_orphans():
     header = ['name', 'class', 'type', 'system type', 'created', 'updated', 'description']
     tables = {

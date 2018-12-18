@@ -39,7 +39,7 @@
         <a href="{{ url_for('user_activity') }}">{{ _('activity')|uc_first }}</a>
         {% if 'admin'|is_authorized %}
             <a href="{{ url_for('admin_log') }}">{{ _('system log')|uc_first }}</a>
-        {% endif  %}
+        {% endif %}
 
          {% if 'editor'|is_authorized %}
             <h1>{{ _('data transfer')|uc_first }}</h1>
@@ -47,13 +47,13 @@
             {% if 'manager'|is_authorized %}
                 <a href="{{ url_for('export_csv') }}">{{ _('export')|uc_first }} CSV</a>
                 <a href="{{ url_for('export_sql') }}">{{ _('export')|uc_first }} SQL</a>
-            {% endif  %}
+            {% endif %}
         {% endif  %}
-        {% if 'manager'|is_authorized %}
+        {% if 'editor'|is_authorized %}
             <h1>{{ _('data integrity')|uc_first }}</h1>
             <a href="{{ url_for('admin_orphans') }}">{{ _('orphans')|uc_first }}</a>
             <a href="{{ url_for('admin_check_links') }}">{{ _('check links')|uc_first }}</a>
             <a href="{{ url_for('admin_check_dates') }}">{{ _('check dates')|uc_first }}</a>
-        {% endif  %}
+        {% endif %}
     </div>
 {% endblock %}
