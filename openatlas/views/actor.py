@@ -85,13 +85,12 @@ def actor_view(id_):
         last = link_.last
         if not link_.last and event.last:
             last = '<span class="inactive" style="float:right">' + str(event.last) + '</span>'
-        data = ([
-            link(event),
-            g.classes[event.class_.code].name,
-            link_.type.name if link_.type else '',
-            first,
-            last,
-            truncate_string(link_.description)])
+        data = ([link(event),
+                 g.classes[event.class_.code].name,
+                 link_.type.name if link_.type else '',
+                 first,
+                 last,
+                 truncate_string(link_.description)])
         if is_authorized('editor'):
             update_url = url_for('involvement_update', id_=link_.id, origin_id=actor.id)
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-event'
@@ -105,26 +104,19 @@ def actor_view(id_):
         else:
             type_ = link_.type.get_name_directed(True) if link_.type else ''
             related = link_.domain
-        data = ([
-            type_,
-            link(related),
-            link_.first,
-            link_.last,
-            truncate_string(link_.description)])
+        data = ([type_, link(related), link_.first, link_.last, truncate_string(link_.description)])
         if is_authorized('editor'):
             update_url = url_for('relation_update', id_=link_.id, origin_id=actor.id)
-            unlink_url = \
-                url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-relation'
+            unlink_url = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-relation'
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             data.append(display_remove_link(unlink_url, related.name))
         tables['relation']['data'].append(data)
     for link_ in actor.get_links('P107', True):
-        data = ([
-            link(link_.domain),
-            link_.type.name if link_.type else '',
-            link_.first,
-            link_.last,
-            truncate_string(link_.description)])
+        data = ([link(link_.domain),
+                 link_.type.name if link_.type else '',
+                 link_.first,
+                 link_.last,
+                 truncate_string(link_.description)])
         if is_authorized('editor'):
             update_url = url_for('member_update', id_=link_.id, origin_id=actor.id)
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-member-of'
@@ -135,16 +127,15 @@ def actor_view(id_):
         tables['member'] = {'id': 'member', 'data': [],
                             'header': ['member', 'function', 'first', 'last', 'description']}
         for link_ in actor.get_links('P107'):
-            data = ([
-                link(link_.range),
-                link_.type.name if link_.type else '',
-                link_.first,
-                link_.last,
-                truncate_string(link_.description)])
+            data = ([link(link_.range),
+                     link_.type.name if link_.type else '',
+                     link_.first,
+                     link_.last,
+                     truncate_string(link_.description)])
             if is_authorized('editor'):
                 update_url = url_for('member_update', id_=link_.id, origin_id=actor.id)
-                unlink_url = url_for('link_delete', id_=link_.id, origin_id=actor.id
-                                     ) + '#tab-member'
+                unlink_url = url_for('link_delete', id_=link_.id,
+                                     origin_id=actor.id) + '#tab-member'
                 data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
                 data.append(display_remove_link(unlink_url, link_.range.name))
             tables['member']['data'].append(data)

@@ -155,11 +155,11 @@ def event_view(id_):
 def save(form, event=None, code=None, origin=None):
     g.cursor.execute('BEGIN')
     try:
+        log_action = 'insert'
         if event:
             log_action = 'update'
-            event.delete_links(['P117', 'P7', 'P24'])
+            event.delete_links(['P117', 'P7', 'P24'], 'domain')
         else:
-            log_action = 'insert'
             event = EntityMapper.insert(code, form.name.data)
         event.name = form.name.data
         event.description = form.description.data
