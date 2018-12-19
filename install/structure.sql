@@ -22,6 +22,8 @@ ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_boo
 ALTER TABLE IF EXISTS ONLY web.hierarchy DROP CONSTRAINT IF EXISTS hierarchy_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.hierarchy_form DROP CONSTRAINT IF EXISTS hierarchy_form_hierarchy_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.hierarchy_form DROP CONSTRAINT IF EXISTS hierarchy_form_form_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_image_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_range_class_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_super_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_sub_code_fkey;
@@ -85,6 +87,8 @@ ALTER TABLE IF EXISTS ONLY web.hierarchy_form DROP CONSTRAINT IF EXISTS hierarch
 ALTER TABLE IF EXISTS ONLY web."group" DROP CONSTRAINT IF EXISTS group_pkey;
 ALTER TABLE IF EXISTS ONLY web.form DROP CONSTRAINT IF EXISTS form_pkey;
 ALTER TABLE IF EXISTS ONLY web.form DROP CONSTRAINT IF EXISTS form_name_key;
+ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_pkey;
+ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_entity_id_image_id_key;
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_pkey;
 ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_pkey;
 ALTER TABLE IF EXISTS ONLY model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property_code_language_code_attribute_key;
@@ -118,6 +122,7 @@ ALTER TABLE IF EXISTS web.hierarchy_form ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.hierarchy ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web."group" ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.form ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS web.entity_profile_image ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.property_inheritance ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.property_i18n ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.property ALTER COLUMN id DROP DEFAULT;
@@ -154,6 +159,8 @@ DROP SEQUENCE IF EXISTS web.group_id_seq;
 DROP TABLE IF EXISTS web."group";
 DROP SEQUENCE IF EXISTS web.form_id_seq;
 DROP TABLE IF EXISTS web.form;
+DROP SEQUENCE IF EXISTS web.entity_profile_image_id_seq;
+DROP TABLE IF EXISTS web.entity_profile_image;
 DROP SEQUENCE IF EXISTS model.property_inheritance_id_seq;
 DROP TABLE IF EXISTS model.property_inheritance;
 DROP SEQUENCE IF EXISTS model.property_id_seq;
@@ -873,6 +880,41 @@ ALTER SEQUENCE model.property_inheritance_id_seq OWNED BY model.property_inherit
 SET default_with_oids = false;
 
 --
+-- Name: entity_profile_image; Type: TABLE; Schema: web; Owner: openatlas
+--
+
+CREATE TABLE web.entity_profile_image (
+    id integer NOT NULL,
+    entity_id integer NOT NULL,
+    image_id integer NOT NULL,
+    created timestamp without time zone DEFAULT now() NOT NULL
+);
+
+
+ALTER TABLE web.entity_profile_image OWNER TO openatlas;
+
+--
+-- Name: entity_profile_image_id_seq; Type: SEQUENCE; Schema: web; Owner: openatlas
+--
+
+CREATE SEQUENCE web.entity_profile_image_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE web.entity_profile_image_id_seq OWNER TO openatlas;
+
+--
+-- Name: entity_profile_image_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
+--
+
+ALTER SEQUENCE web.entity_profile_image_id_seq OWNED BY web.entity_profile_image.id;
+
+
+--
 -- Name: form; Type: TABLE; Schema: web; Owner: openatlas
 --
 
@@ -1403,6 +1445,13 @@ ALTER TABLE ONLY model.property_inheritance ALTER COLUMN id SET DEFAULT nextval(
 
 
 --
+-- Name: entity_profile_image id; Type: DEFAULT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.entity_profile_image ALTER COLUMN id SET DEFAULT nextval('web.entity_profile_image_id_seq'::regclass);
+
+
+--
 -- Name: form id; Type: DEFAULT; Schema: web; Owner: openatlas
 --
 
@@ -1653,6 +1702,22 @@ ALTER TABLE ONLY model.property_inheritance
 
 ALTER TABLE ONLY model.property
     ADD CONSTRAINT property_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: entity_profile_image entity_profile_image_entity_id_image_id_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.entity_profile_image
+    ADD CONSTRAINT entity_profile_image_entity_id_image_id_key UNIQUE (entity_id, image_id);
+
+
+--
+-- Name: entity_profile_image entity_profile_image_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.entity_profile_image
+    ADD CONSTRAINT entity_profile_image_pkey PRIMARY KEY (id);
 
 
 --
@@ -2134,6 +2199,22 @@ ALTER TABLE ONLY model.property_inheritance
 
 ALTER TABLE ONLY model.property
     ADD CONSTRAINT property_range_class_code_fkey FOREIGN KEY (range_class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: entity_profile_image entity_profile_image_entity_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.entity_profile_image
+    ADD CONSTRAINT entity_profile_image_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: entity_profile_image entity_profile_image_image_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.entity_profile_image
+    ADD CONSTRAINT entity_profile_image_image_id_fkey FOREIGN KEY (image_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
