@@ -4,7 +4,7 @@ import re
 
 import flask
 import jinja2
-from flask import g, render_template_string, request, url_for
+from flask import g, render_template_string, request, url_for, session
 from flask_babel import format_number as babel_format_number, lazy_gettext as _
 from flask_login import current_user
 from jinja2 import escape, evalcontextfilter
@@ -15,7 +15,7 @@ from openatlas import app
 from openatlas.forms.forms import TreeField, ValueFloatField
 from openatlas.models.content import ContentMapper
 from openatlas.util import util
-from openatlas.util.util import display_tooltip, print_file_extension
+from openatlas.util.util import display_tooltip, print_file_extension, get_file_path
 
 blueprint = flask.Blueprint('filters', __name__)
 paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
@@ -147,6 +147,20 @@ def description(self, entity):
     html = """<p class="description-title">{label}</p>
         <div class="description more">{description}</div>""".format(label=label, description=text)
     return html
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def display_profile_image(self, image_id):
+    if not image_id:
+        return ''
+    src = url_for('display_file', filename=os.path.basename(get_file_path(image_id)))
+    return """
+        <div id="profile_image_div">
+            <a href="/file/view/{id}">
+                <img style="width:{width}px;" alt="profile image" src="{src}" />
+            </a>
+        </div>""".format(id=image_id, src=src, width=session['settings']['profile_image_width'])
 
 
 @jinja2.contextfilter

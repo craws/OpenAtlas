@@ -61,6 +61,20 @@ def display_logo(filename):  # File display function for public
     return send_from_directory(app.config['UPLOAD_FOLDER_PATH'], filename)
 
 
+@app.route('/file/set_as_profile_image/<int:id_>/<int:origin_id>')
+def file_set_as_profile_image(id_, origin_id):
+    EntityMapper.set_profile_image(id_, origin_id)
+    origin = EntityMapper.get_by_id(origin_id)
+    return redirect(url_for(app.config['CODE_CLASS'][origin.class_.code] + '_view', id_=origin.id))
+
+
+@app.route('/file/set_as_profile_image/<int:entity_id>')
+def file_remove_profile_image(entity_id):
+    entity = EntityMapper.get_by_id(entity_id)
+    entity.remove_profile_image()
+    return redirect(url_for(app.config['CODE_CLASS'][entity.class_.code] + '_view', id_=entity.id))
+
+
 @app.route('/file/index')
 @required_group('readonly')
 def file_index():

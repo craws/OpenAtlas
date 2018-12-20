@@ -28,8 +28,14 @@
             {{ source.id|bookmark_toggle|safe }}
         </div>
         <h1>{{ source.name }}</h1>
-        {{ tables['info']|data_table|safe }}
-        {{ source|description|safe }}
+        <div>
+            {{ profile_image_id|display_profile_image|safe }}
+            <div style="float:left;">
+                {{ tables['info']|data_table|safe }}
+                {{ source|description|safe }}
+            </div>
+            <div style="clear:both;"></div>
+        </div>
     </div>
     {% for name in ['event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find'] %}
         {% if name not in ['feature', 'stratigraphic-unit', 'find'] or tables[name]['data']|length > 0 %}

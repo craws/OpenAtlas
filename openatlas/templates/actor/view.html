@@ -30,8 +30,14 @@
             {{ actor.id|bookmark_toggle|safe }}
         </div>
         <h1>{{ actor.name }}</h1>
-        {{ tables['info']|data_table|safe }}
-        {{ actor|description|safe }}
+        <div>
+            {{ profile_image_id|display_profile_image|safe }}
+            <div style="float:left;">
+                {{ tables['info']|data_table|safe }}
+                {{ actor|description|safe }}
+            </div>
+            <div style="clear:both;"></div>
+        </div>
     </div>
     <div id="tab-source">
         {% if 'editor'|is_authorized %}

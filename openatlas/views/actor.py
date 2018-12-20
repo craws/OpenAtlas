@@ -1,4 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
@@ -10,8 +11,8 @@ from openatlas.forms.forms import DateForm, TableField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 is_authorized, link, required_group, truncate_string, uc_first,
-                                 was_modified)
+                                 get_profile_image_table_link, is_authorized, link, required_group,
+                                 truncate_string, uc_first, was_modified)
 
 
 class ActorForm(DateForm):
@@ -51,7 +52,8 @@ def actor_view(id_):
         info.append((uc_first(_('appears last')), link(object_)))
     tables = {
         'info': info,
-        'file': {'id': 'files', 'data': [], 'header': app.config['TABLE_HEADERS']['file']},
+        'file': {'id': 'files', 'data': [],
+                 'header': app.config['TABLE_HEADERS']['file'] + [_('profile image')]},
         'source': {'id': 'source', 'data': [], 'header': app.config['TABLE_HEADERS']['source']},
         'reference': {'id': 'reference', 'data': [],
                       'header': app.config['TABLE_HEADERS']['reference'] + ['pages']},
@@ -61,9 +63,12 @@ def actor_view(id_):
                      'header': ['relation', 'actor', 'first', 'last', 'description']},
         'member_of': {'id': 'member_of', 'data': [],
                       'header': ['member of', 'function', 'first', 'last', 'description']}}
+    profile_image_id = actor.get_profile_image_id()
     for link_ in actor.get_links('P67', True):
         domain = link_.domain
         data = get_base_table_data(domain)
+        if domain.view_name == 'file':
+            data.append(get_profile_image_table_link(domain, actor, data[3], profile_image_id))
         if domain.view_name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
             if is_authorized('editor'):
@@ -73,8 +78,9 @@ def actor_view(id_):
             url = url_for('link_delete', id_=link_.id, origin_id=actor.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
         tables[domain.view_name]['data'].append(data)
+
+    # Todo: Performance - getting every place of every object of every event is very costly
     for link_ in actor.get_links(['P11', 'P14', 'P22', 'P23'], True):
-        # Todo: Performance - getting every place of every object of every event is very costly
         event = link_.domain
         first = link_.first
         place = event.get_linked_entity('P7')
@@ -142,7 +148,8 @@ def actor_view(id_):
     gis_data = GisMapper.get_all(objects) if objects else None
     if gis_data and gis_data['gisPointSelected'] == '[]':
         gis_data = None
-    return render_template('actor/view.html', actor=actor, tables=tables, gis_data=gis_data)
+    return render_template('actor/view.html', actor=actor, tables=tables, gis_data=gis_data,
+                           profile_image_id=profile_image_id)
 
 
 @app.route('/actor')

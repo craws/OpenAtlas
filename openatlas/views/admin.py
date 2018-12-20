@@ -99,6 +99,7 @@ def admin_check_links(check=None):
 class FileForm(Form):
     file_upload_max_size = IntegerField(_('max file size in MB'))
     file_upload_allowed_extension = StringField('allowed file extensions')
+    profile_image_width = IntegerField(_('profile image width in pixel'))
     save = SubmitField(uc_first(_('save')))
 
 
@@ -120,6 +121,7 @@ def admin_file():
         return redirect(url_for('admin_index'))
     form.file_upload_max_size.data = session['settings']['file_upload_max_size']
     form.file_upload_allowed_extension.data = session['settings']['file_upload_allowed_extension']
+    form.profile_image_width.data = session['settings']['profile_image_width']
     return render_template('admin/file.html', form=form)
 
 

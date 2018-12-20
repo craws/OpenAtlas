@@ -13,7 +13,8 @@ from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  is_authorized, link, required_group,
-                                 truncate_string, uc_first, was_modified)
+                                 truncate_string, uc_first, was_modified,
+                                 get_profile_image_table_link)
 
 
 class EventForm(DateForm):
@@ -108,7 +109,8 @@ def event_view(id_):
     event.set_dates()
     tables = {
         'info': get_entity_data(event),
-        'file': {'id': 'files', 'data': [], 'header': app.config['TABLE_HEADERS']['file']},
+        'file': {'id': 'files', 'data': [], 'header': app.config['TABLE_HEADERS']['file'] +
+                                                      [_('profile image')]},
         'subs': {'id': 'sub-event', 'data': [], 'header': app.config['TABLE_HEADERS']['event']},
         'source': {'id': 'source', 'data': [], 'header': app.config['TABLE_HEADERS']['source']},
         'actor': {'id': 'actor', 'data': [],
@@ -135,9 +137,12 @@ def event_view(id_):
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             data.append(display_remove_link(unlink_url, link_.range.name))
         tables['actor']['data'].append(data)
+    profile_image_id = event.get_profile_image_id()
     for link_ in event.get_links('P67', True):
         domain = link_.domain
         data = get_base_table_data(domain)
+        if domain.view_name == 'file':
+            data.append(get_profile_image_table_link(domain, event, data[3], profile_image_id))
         if domain.view_name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
             if is_authorized('editor'):
@@ -149,7 +154,8 @@ def event_view(id_):
         tables[domain.view_name]['data'].append(data)
     for sub_event in event.get_linked_entities('P117', True):
         tables['subs']['data'].append(get_base_table_data(sub_event))
-    return render_template('event/view.html', event=event, tables=tables)
+    return render_template('event/view.html', event=event, tables=tables,
+                           profile_image_id=profile_image_id)
 
 
 def save(form, event=None, code=None, origin=None):

@@ -13,7 +13,7 @@ from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  is_authorized, link, required_group, truncate_string, uc_first,
-                                 was_modified)
+                                 was_modified, get_profile_image_table_link)
 
 
 class ReferenceForm(Form):
@@ -117,27 +117,32 @@ def reference_view(id_):
     tables = {
         'info': get_entity_data(reference),
         'file': {'id': 'files', 'data': [],
-                 'header': app.config['TABLE_HEADERS']['file'] + ['page']}}
+                 'header': app.config['TABLE_HEADERS']['file'] + ['page'] + [_('profile image')]}}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find']:
         header = app.config['TABLE_HEADERS'][name] + ['page']
         tables[name] = {'id': name, 'header': header, 'data': []}
     for link_ in reference.get_links('P67', True):
-        data = get_base_table_data(link_.domain)
+        domain = link_.domain
+        data = get_base_table_data(domain)
         if is_authorized('editor'):
             url = url_for('link_delete', id_=link_.id, origin_id=reference.id) + '#tab-file'
-            data.append(display_remove_link(url, link_.domain.name))
+            data.append(display_remove_link(url, domain.name))
         tables['file']['data'].append(data)
+    profile_image_id = reference.get_profile_image_id()
     for link_ in reference.get_links(['P67', 'P128']):
         range_ = link_.range
         data = get_base_table_data(range_)
         data.append(truncate_string(link_.description))
+        if range_.view_name == 'file':
+            data.append(get_profile_image_table_link(range_, reference, data[3], profile_image_id))
         if is_authorized('editor'):
             url = url_for('reference_link_update', link_id=link_.id, origin_id=reference.id)
             data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
             url = url_for('link_delete', id_=link_.id, origin_id=reference.id)
             data.append(display_remove_link(url + '#tab-' + range_.table_name, range_.name))
         tables[range_.table_name]['data'].append(data)
-    return render_template('reference/view.html', reference=reference, tables=tables)
+    return render_template('reference/view.html', reference=reference, tables=tables,
+                           profile_image_id=profile_image_id)
 
 
 @app.route('/reference')

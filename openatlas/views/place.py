@@ -11,7 +11,7 @@ from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper, InvalidGeomException
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  is_authorized, link, required_group, truncate_string, uc_first,
-                                 was_modified)
+                                 was_modified, get_profile_image_table_link)
 
 
 class PlaceForm(DateForm):
@@ -91,7 +91,8 @@ def place_view(id_):
     location = object_.get_linked_entity('P53')
     tables = {
         'info': get_entity_data(object_, location),
-        'file': {'id': 'files', 'data': [], 'header': app.config['TABLE_HEADERS']['file']},
+        'file': {'id': 'files', 'data': [], 'header': app.config['TABLE_HEADERS']['file'] +
+                                                      [_('profile image')]},
         'source': {'id': 'source', 'data': [], 'header': app.config['TABLE_HEADERS']['source']},
         'event': {'id': 'event', 'data': [], 'header': app.config['TABLE_HEADERS']['event']},
         'reference': {'id': 'reference', 'data': [],
@@ -108,9 +109,12 @@ def place_view(id_):
     if object_.system_type == 'stratigraphic unit':
         tables['find'] = {'id': 'find', 'data': [],
                           'header': app.config['TABLE_HEADERS']['place'] + [_('description')]}
+    profile_image_id = object_.get_profile_image_id()
     for link_ in object_.get_links('P67', True):
         domain = link_.domain
         data = get_base_table_data(domain)
+        if domain.view_name == 'file':
+            data.append(get_profile_image_table_link(domain, object_, data[3], profile_image_id))
         if domain.view_name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
             if is_authorized('editor'):
@@ -125,9 +129,8 @@ def place_view(id_):
         tables['event']['data'].append(get_base_table_data(event))
         event_ids.append(event.id)
     for event in object_.get_linked_entities(['P24'], True):
-        if event.id in event_ids:  # Don't add again if already in table
-            continue
-        tables['event']['data'].append(get_base_table_data(event))
+        if event.id not in event_ids:  # Don't add again if already in table
+            tables['event']['data'].append(get_base_table_data(event))
     has_subunits = False
     for entity in object_.get_linked_entities('P46'):
         has_subunits = True
@@ -159,7 +162,7 @@ def place_view(id_):
         place = object_.get_linked_entity('P46', True)
     return render_template('place/view.html', object_=object_, tables=tables, gis_data=gis_data,
                            place=place, feature=feature, stratigraphic_unit=stratigraphic_unit,
-                           has_subunits=has_subunits)
+                           has_subunits=has_subunits, profile_image_id=profile_image_id)
 
 
 @app.route('/place/delete/<int:id_>')

@@ -1,6 +1,5 @@
 @charset "UTF-8";
 
-
 #logo {
     float: left;
     height: 120px;
@@ -16,6 +15,11 @@ div.preview {
 
 div.preview img {
     max-width: 400px;
+}
+
+#profile_image_div {
+     float: left;
+     margin-right: 1em;
 }
 
 table.tablesorter thead tr .tablesorter-header {

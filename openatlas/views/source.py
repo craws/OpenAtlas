@@ -11,7 +11,8 @@ from openatlas.forms.forms import build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.util.util import (build_table_form, display_remove_link, get_base_table_data,
                                  get_entity_data, is_authorized, link, required_group,
-                                 truncate_string, uc_first, was_modified)
+                                 truncate_string, uc_first, was_modified,
+                                 get_profile_image_table_link)
 
 
 class SourceForm(Form):
@@ -53,7 +54,8 @@ def source_view(id_):
     tables = {
         'info': get_entity_data(source),
         'text': {'id': 'translation', 'data': [], 'header': ['text', 'type', 'content']},
-        'file': {'id': 'files', 'data': [], 'header': app.config['TABLE_HEADERS']['file']},
+        'file': {'id': 'files', 'data': [], 'header': app.config['TABLE_HEADERS']['file'] +
+                                                      [_('profile image')]},
         'reference': {'id': 'source', 'data': [],
                       'header': app.config['TABLE_HEADERS']['reference'] + ['page']}}
     for text in source.get_linked_entities('P73'):
@@ -70,9 +72,12 @@ def source_view(id_):
             url = url_for('link_delete', id_=link_.id, origin_id=source.id)
             data.append(display_remove_link(url + '#tab-' + range_.table_name, range_.name))
         tables[range_.table_name]['data'].append(data)
+    profile_image_id = source.get_profile_image_id()
     for link_ in source.get_links(['P67', 'P128'], True):
         domain = link_.domain
         data = get_base_table_data(domain)
+        if domain.view_name == 'file':
+            data.append(get_profile_image_table_link(domain, source, data[3], profile_image_id))
         if domain.view_name not in ['file']:
             data.append(link_.description)
             if is_authorized('editor'):
@@ -82,7 +87,8 @@ def source_view(id_):
             url = url_for('link_delete', id_=link_.id, origin_id=source.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
         tables[domain.view_name]['data'].append(data)
-    return render_template('source/view.html', source=source, tables=tables)
+    return render_template('source/view.html', source=source, tables=tables,
+                           profile_image_id=profile_image_id)
 
 
 @app.route('/source/add/<int:origin_id>', methods=['POST', 'GET'])

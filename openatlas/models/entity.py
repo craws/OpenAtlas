@@ -71,6 +71,12 @@ class Entity:
     def set_dates(self):
         self.dates = DateMapper.get_dates(self)
 
+    def get_profile_image_id(self):
+        return EntityMapper.get_profile_image_id(self.id)
+
+    def remove_profile_image(self):
+        return EntityMapper.remove_profile_image(self.id)
+
     def print_base_type(self):
         from openatlas.models.node import NodeMapper
         if not self.view_name or self.view_name == 'actor':  # actors have no base type
@@ -304,7 +310,7 @@ class EntityMapper:
             return count
         else:
             return 0
-        sql = "DELETE FROM model.entity WHERE id IN (" + sql_where + ");"
+        sql = 'DELETE FROM model.entity WHERE id IN (' + sql_where + ');'
         g.cursor.execute(sql, {'class_codes': class_codes})
         debug_model['div sql'] += 1
         return g.cursor.rowcount
@@ -319,10 +325,8 @@ class EntityMapper:
         sql += " ul.user_id = %(user_id)s AND " if own else ''
         sql += " e.class_code IN %(codes)s"
         sql += " GROUP BY e.id ORDER BY e.name"
-        g.cursor.execute(sql, {
-            'term': '%' + term + '%',
-            'codes': tuple(codes),
-            'user_id': current_user.id})
+        g.cursor.execute(sql, {'term': '%' + term + '%', 'codes': tuple(codes),
+                               'user_id': current_user.id})
         debug_model['div sql'] += 1
         entities = []
         for row in g.cursor.fetchall():
@@ -333,3 +337,23 @@ class EntityMapper:
             else:
                 entities.append(Entity(row))
         return entities
+
+    @staticmethod
+    def set_profile_image(id_, origin_id):
+        sql = """
+            INSERT INTO web.entity_profile_image (entity_id, image_id)
+            VALUES (%(entity_id)s, %(image_id)s)
+            ON CONFLICT (entity_id) DO UPDATE SET image_id=%(image_id)s;"""
+        g.cursor.execute(sql, {'entity_id': origin_id, 'image_id': id_})
+
+    @staticmethod
+    def get_profile_image_id(id_):
+        sql = 'SELECT image_id FROM web.entity_profile_image WHERE entity_id = %(entity_id)s;'
+        g.cursor.execute(sql, {'entity_id': id_})
+        if g.cursor.rowcount:
+            return g.cursor.fetchone()[0]
+
+    @staticmethod
+    def remove_profile_image(entity_id):
+        sql = 'DELETE FROM web.entity_profile_image WHERE entity_id = %(entity_id)s;'
+        g.cursor.execute(sql, {'entity_id': entity_id})
