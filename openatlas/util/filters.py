@@ -158,7 +158,7 @@ def display_profile_image(self, image_id):
     return """
         <div id="profile_image_div">
             <a href="/file/view/{id}">
-                <img style="width:{width}px;" alt="profile image" src="{src}" />
+                <img style="max-width:{width}px;" alt="profile image" src="{src}" />
             </a>
         </div>""".format(id=image_id, src=src, width=session['settings']['profile_image_width'])
 
