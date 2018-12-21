@@ -31,7 +31,9 @@ knowledge about server administration.
 
 ### Files
 
-Copy the files to /var/www/your_site_name or clone OpenAtlas from GitHub or Bitbucket
+Copy the files to /var/www/your_site_name or clone OpenAtlas from GitHub
+
+    $ git clone https://github.com/craws/OpenAtlas.git
 
 ### Database
 
