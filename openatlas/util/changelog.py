@@ -7,10 +7,10 @@ class Changelog:
     versions['3.12.0'] = ['TBA', OrderedDict([
         ('feature', OrderedDict([
             ('652', 'Maps update and rewrite'),
+            ('891', 'Profile images'),
             ('961', 'Date check functions'),
             ('959', 'Performance'),
-            ('962', 'Configurable character limit for live searches'),
-        ]))])]
+            ('962', 'Configurable character limit for live searches')]))])]
     versions['3.11.1'] = ['2018-11-30', OrderedDict([
         ('fix', OrderedDict([
             ('964', 'Forms: tables with pager ignoring selection after changing page')]))])]
