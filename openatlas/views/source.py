@@ -54,8 +54,8 @@ def source_view(id_):
     tables = {
         'info': get_entity_data(source),
         'text': {'id': 'translation', 'data': [], 'header': ['text', 'type', 'content']},
-        'file': {'id': 'files', 'data': [], 'header': app.config['TABLE_HEADERS']['file'] +
-                                                      [_('profile image')]},
+        'file': {'id': 'files', 'data': [],
+                 'header': app.config['TABLE_HEADERS']['file'] + [_('main image')]},
         'reference': {'id': 'source', 'data': [],
                       'header': app.config['TABLE_HEADERS']['reference'] + ['page']}}
     for text in source.get_linked_entities('P73'):
@@ -77,7 +77,10 @@ def source_view(id_):
         domain = link_.domain
         data = get_base_table_data(domain)
         if domain.view_name == 'file':
-            data.append(get_profile_image_table_link(domain, source, data[3], profile_image_id))
+            extension = data[3].replace('.', '')
+            data.append(get_profile_image_table_link(domain, source, extension, profile_image_id))
+            if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+                profile_image_id = domain.id
         if domain.view_name not in ['file']:
             data.append(link_.description)
             if is_authorized('editor'):

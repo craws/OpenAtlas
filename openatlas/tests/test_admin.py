@@ -108,5 +108,6 @@ class ContentTests(TestBaseCase):
             rv = self.app.get(url_for('admin_file'))
             assert b'jpg' in rv.data
             rv = self.app.post(
-                url_for('admin_file'), data={'file_upload_max_size': 20}, follow_redirects=True)
+                url_for('admin_file'), data={'file_upload_max_size': 20, 'profile_image_width': 20},
+                follow_redirects=True)
             assert b'Changes have been saved.' in rv.data

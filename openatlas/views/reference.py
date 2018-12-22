@@ -117,7 +117,7 @@ def reference_view(id_):
     tables = {
         'info': get_entity_data(reference),
         'file': {'id': 'files', 'data': [],
-                 'header': app.config['TABLE_HEADERS']['file'] + ['page'] + [_('profile image')]}}
+                 'header': app.config['TABLE_HEADERS']['file'] + ['page'] + [_('main image')]}}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find']:
         header = app.config['TABLE_HEADERS'][name] + ['page']
         tables[name] = {'id': name, 'header': header, 'data': []}
@@ -134,7 +134,10 @@ def reference_view(id_):
         data = get_base_table_data(range_)
         data.append(truncate_string(link_.description))
         if range_.view_name == 'file':
-            data.append(get_profile_image_table_link(range_, reference, data[3], profile_image_id))
+            ext = data[3].replace('.', '')
+            data.append(get_profile_image_table_link(range_, reference, ext, profile_image_id))
+            if not profile_image_id and ext in app.config['DISPLAY_FILE_EXTENSIONS']:
+                profile_image_id = range_.id
         if is_authorized('editor'):
             url = url_for('reference_link_update', link_id=link_.id, origin_id=reference.id)
             data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')

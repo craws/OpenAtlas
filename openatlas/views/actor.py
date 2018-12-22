@@ -53,7 +53,7 @@ def actor_view(id_):
     tables = {
         'info': info,
         'file': {'id': 'files', 'data': [],
-                 'header': app.config['TABLE_HEADERS']['file'] + [_('profile image')]},
+                 'header': app.config['TABLE_HEADERS']['file'] + [_('main image')]},
         'source': {'id': 'source', 'data': [], 'header': app.config['TABLE_HEADERS']['source']},
         'reference': {'id': 'reference', 'data': [],
                       'header': app.config['TABLE_HEADERS']['reference'] + ['pages']},
@@ -68,7 +68,10 @@ def actor_view(id_):
         domain = link_.domain
         data = get_base_table_data(domain)
         if domain.view_name == 'file':
-            data.append(get_profile_image_table_link(domain, actor, data[3], profile_image_id))
+            extension = data[3].replace('.', '')
+            data.append(get_profile_image_table_link(domain, actor, extension, profile_image_id))
+            if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+                profile_image_id = domain.id
         if domain.view_name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
             if is_authorized('editor'):

@@ -91,8 +91,8 @@ def place_view(id_):
     location = object_.get_linked_entity('P53')
     tables = {
         'info': get_entity_data(object_, location),
-        'file': {'id': 'files', 'data': [], 'header': app.config['TABLE_HEADERS']['file'] +
-                                                      [_('profile image')]},
+        'file': {'id': 'files', 'data': [],
+                 'header': app.config['TABLE_HEADERS']['file'] + [_('main image')]},
         'source': {'id': 'source', 'data': [], 'header': app.config['TABLE_HEADERS']['source']},
         'event': {'id': 'event', 'data': [], 'header': app.config['TABLE_HEADERS']['event']},
         'reference': {'id': 'reference', 'data': [],
@@ -114,7 +114,10 @@ def place_view(id_):
         domain = link_.domain
         data = get_base_table_data(domain)
         if domain.view_name == 'file':
-            data.append(get_profile_image_table_link(domain, object_, data[3], profile_image_id))
+            extension = data[3].replace('.', '')
+            data.append(get_profile_image_table_link(domain, object_, extension, profile_image_id))
+            if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+                profile_image_id = domain.id
         if domain.view_name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
             if is_authorized('editor'):

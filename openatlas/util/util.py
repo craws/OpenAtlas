@@ -394,8 +394,8 @@ def format_date(value, format_='medium'):
 def get_profile_image_table_link(file, entity, extension, profile_image_id):
     if file.id == profile_image_id:
         url = url_for('file_remove_profile_image', entity_id=entity.id)
-        return '<a href="' + url + '">' + uc_first(_('remove')) + '</a>'
-    elif extension.replace('.', '') in app.config['DISPLAY_FILE_EXTENSIONS']:
+        return '<a href="' + url + '">' + uc_first(_('unset')) + '</a>'
+    elif extension in app.config['DISPLAY_FILE_EXTENSIONS']:
         url = url_for('file_set_as_profile_image', id_=file.id, origin_id=entity.id)
         return '<a href="' + url + '">' + uc_first(_('set')) + '</a>'
     return ''
