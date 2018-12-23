@@ -1,20 +1,20 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import glob
 import os
+import re
 import smtplib
 from collections import OrderedDict
+from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
+from functools import wraps
 from html.parser import HTMLParser
 
 import numpy
-import re
 from babel import dates
-from datetime import datetime
 from flask import abort, flash, g, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
-from functools import wraps
 from numpy import math
 from werkzeug.utils import redirect
 
@@ -114,10 +114,10 @@ class MLStripper(HTMLParser):
 
 def sanitize(string, mode=None):
     if not mode:
-        """Remove all characters from a string except ASCII letters and numbers"""
+        # Remove all characters from a string except ASCII letters and numbers
         return re.sub('[^A-Za-z0-9]+', '', string)
     if mode == 'node':
-        """Remove all characters from a string except letters, numbers and spaces"""
+        # Remove all characters from a string except letters, numbers and spaces
         return re.sub(r'([^\s\w]|_)+', '', string).strip()
     if mode == 'description':
         s = MLStripper()
@@ -136,28 +136,25 @@ def get_file_stats(path=app.config['UPLOAD_FOLDER_PATH']):
     for file in os.scandir(path):
         split_name = os.path.splitext(file.name)
         if len(split_name) > 1 and split_name[0].isdigit():
-            file_stats[int(split_name[0])] = {
-                'ext': split_name[1],
-                'size': file.stat().st_size,
-                'date': file.stat().st_ctime}
+            file_stats[int(split_name[0])] = {'ext': split_name[1],
+                                              'size': file.stat().st_size,
+                                              'date': file.stat().st_ctime}
     return file_stats
 
 
 def build_table_form(class_name, linked_entities):
     """ Returns a form with a list of entities with checkboxes"""
     from openatlas.models.entity import EntityMapper
-    # Todo: add CSRF token
-    form = '<form class="table" method="post">'
     header = app.config['TABLE_HEADERS'][class_name] + ['']
     table = {'id': class_name, 'header': header, 'data': []}
     linked_ids = [entity.id for entity in linked_entities]
+    file_stats = get_file_stats() if class_name == 'file' else None
     if class_name == 'file':
         entities = EntityMapper.get_by_system_type('file')
     elif class_name == 'place':
         entities = EntityMapper.get_by_system_type('place')
     else:
         entities = EntityMapper.get_by_codes(class_name)
-    file_stats = get_file_stats() if class_name == 'file' else None
     for entity in entities:
         if entity.id in linked_ids:
             continue  # Don't show already linked entries
@@ -165,10 +162,10 @@ def build_table_form(class_name, linked_entities):
         table['data'].append(get_base_table_data(entity, file_stats) + [input_])
     if not table['data']:
         return uc_first(_('no entries'))
-    form += pager(table)
-    form += '<button name="form-submit" id="form-submit" type="submit">'
-    form += uc_first(_('add')) + '</button></form>'
-    return form
+    # Todo: add CSRF token
+    return """<form class="table" method="post">
+                {pager} <button name="form-submit" id="form-submit" type="submit">{add}</button>
+              </form>""".format(add=uc_first(_('add')), pager=pager(table))
 
 
 def display_remove_link(url, name):
@@ -229,24 +226,12 @@ def get_entity_data(entity, location=None):
             data.append((uc_first(_('location')), link(place.get_linked_entity('P53', True))))
         # Info for acquisitions
         if entity.class_.code == 'E8':
-            recipients = entity.get_linked_entities('P22')
-            if recipients:
-                html = ''
-                for recipient in recipients:
-                    html += link(recipient) + '<br />'
-                data.append((uc_first(_('recipient')), html))
-            donors = entity.get_linked_entities('P23')
-            if donors:
-                html = ''
-                for donor in donors:
-                    html += link(donor) + '<br />'
-                data.append((uc_first(_('donor')), html))
-            given_places = entity.get_linked_entities('P24')
-            if given_places:
-                html = ''
-                for given_place in given_places:
-                    html += link(given_place) + '<br />'
-                data.append((uc_first(_('given place')), html))
+            data.append((uc_first(_('recipient')), '<br />'.join(
+                [link(recipient) for recipient in entity.get_linked_entities('P22')])))
+            data.append((uc_first(_('donor')), '<br />'.join(
+                [link(donor) for donor in entity.get_linked_entities('P23')])))
+            data.append((uc_first(_('given place')), '<br />'.join(
+                [link(place) for place in entity.get_linked_entities('P24')])))
 
     # Info for actors
     if entity.class_.code in app.config['CLASS_CODES']['actor']:
@@ -311,10 +296,8 @@ def add_dates_to_form(form, for_person=False):
             <div class="table-cell date-switcher">
                 <span id="date-switcher" class="button">{show}</span>
             </div>
-        </div>""".format(
-        date=uc_first(_('date')),
-        tooltip=display_tooltip(_('tooltip date')),
-        show=uc_first(_('show')))
+        </div>""".format(date=uc_first(_('date')), tooltip=display_tooltip(_('tooltip date')),
+                         show=uc_first(_('show')))
     html += '<div class="table-row date-switch" ' + style + '>'
     html += '<div>' + str(form.date_begin_year.label).title() + '</div><div class="table-cell">'
     html += str(form.date_begin_year(class_='year')) + ' ' + errors['date_begin_year'] + ' '
@@ -327,8 +310,7 @@ def add_dates_to_form(form, for_person=False):
     html += str(form.date_begin_year2(class_='year')) + ' ' + errors['date_begin_year2'] + ' '
     html += str(form.date_begin_month2(class_='month')) + ' ' + errors['date_begin_month2'] + ' '
     html += str(form.date_begin_day2(class_='day')) + ' ' + errors['date_begin_day2'] + ' '
-    if for_person:
-        html += str(form.date_birth) + str(form.date_birth.label)
+    html += str(form.date_birth) + str(form.date_birth.label) if for_person else ''
     html += '</div></div>'
     html += '<div class="table-row date-switch" ' + style + '>'
     html += '<div>' + str(form.date_end_year.label).title() + '</div><div class="table-cell">'
@@ -342,8 +324,7 @@ def add_dates_to_form(form, for_person=False):
     html += str(form.date_end_year2(class_='year')) + ' ' + errors['date_end_year2'] + ' '
     html += str(form.date_end_month2(class_='month')) + ' ' + errors['date_end_month2'] + ' '
     html += str(form.date_end_day2(class_='day')) + ' ' + errors['date_end_day2'] + ' '
-    if for_person:
-        html += str(form.date_death) + str(form.date_death.label)
+    html += (str(form.date_death) + str(form.date_death.label)) if for_person else ''
     html += '</div></div>'
     return html
 
@@ -546,13 +527,10 @@ def pager(table, remove_rows=True):
                 positionFixed: false,
                 container: $("#{id}-pager"),
                 size:{size}}});
-        """.format(
-            id=table['id'],
-            sort=sort,
-            remove_rows='removeRows: true,' if remove_rows else '',
-            size=table_rows,
-            filter_liveSearch=session['settings']['minimum_tablesorter_search'],
-            headers=(table['headers'] + ',') if 'headers' in table else '')
+        """.format(id=table['id'], sort=sort, size=table_rows,
+                   remove_rows='removeRows: true,' if remove_rows else '',
+                   filter_liveSearch=session['settings']['minimum_tablesorter_search'],
+                   headers=(table['headers'] + ',') if 'headers' in table else '')
     else:
         html += """
             $("#{id}-table").tablesorter({{

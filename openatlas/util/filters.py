@@ -4,7 +4,7 @@ import re
 
 import flask
 import jinja2
-from flask import g, render_template_string, request, url_for, session
+from flask import g, render_template_string, request, session, url_for
 from flask_babel import format_number as babel_format_number, lazy_gettext as _
 from flask_login import current_user
 from jinja2 import escape, evalcontextfilter
@@ -15,7 +15,7 @@ from openatlas import app
 from openatlas.forms.forms import TreeField, ValueFloatField
 from openatlas.models.content import ContentMapper
 from openatlas.util import util
-from openatlas.util.util import display_tooltip, print_file_extension, get_file_path
+from openatlas.util.util import display_tooltip, get_file_path, print_file_extension
 
 blueprint = flask.Blueprint('filters', __name__)
 paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
@@ -98,11 +98,7 @@ def table_select_model(self, name, selected=None):
     else:
         entities = g.properties
         sorter = 'sortList: [[0, 0]], headers: {0: { sorter: "property_code" }}'
-    table = {
-        'id': name,
-        'header': ['code', 'name'],
-        'sort': sorter,
-        'data': []}
+    table = {'id': name, 'header': ['code', 'name'], 'sort': sorter, 'data': []}
     for id_ in entities:
         table['data'].append([
             '<a onclick="selectFromTable(this, \'' + name + '\', \'' + str(id_) + '\')">' +
@@ -173,14 +169,15 @@ def display_content_translation(self, text):
 @blueprint.app_template_filter()
 def manual_link(self, wiki_site):
     # Creates a link to a manual page
-    wiki_icon = '<img style="height:14px;" src="/static/images/icons/book.png" alt='' /> '
-    wiki_url = 'https://redmine.openatlas.eu/projects/uni/wiki/'
-    wiki_link = """
-        <p class="manual"><a class="manual" href="{url}" rel="noopener" target="_blank">
-            {icon} {label}
-        </a></p>""".format(
-        url=wiki_url + wiki_site, label=util.uc_first(_('manual')), icon=wiki_icon)
-    return wiki_link
+    html = """
+        <p class="manual">
+            <a class="manual" href="{url}" rel="noopener" target="_blank">
+                <img style="height:14px;" src="/static/images/icons/book.png" alt='' /> 
+                {label}
+            </a>
+        </p>""".format(url='https://redmine.openatlas.eu/projects/uni/wiki/' + wiki_site,
+                       label=util.uc_first(_('manual')))
+    return html
 
 
 @jinja2.contextfilter
@@ -215,10 +212,8 @@ def display_form(self, form, form_id=None, for_persons=False):
                     <div><label>{label}</label> {tooltip}</div>
                     <div class="table-cell">{field}</div>
                 </div>
-            """.format(
-                label=sub.name,
-                tooltip=display_tooltip(sub.description),
-                field=field_(class_='value-type'))
+            """.format(label=sub.name, tooltip=display_tooltip(sub.description),
+                       field=field_(class_='value-type'))
             html_ += display_value_type_fields(sub.subs)
         return html_
 
@@ -248,21 +243,17 @@ def display_form(self, form, form_id=None, for_persons=False):
                                 <label style="font-weight:bold;">{label}</label> {tooltip}
                             </div>
                         </div>
-                    """.format(
-                    label=label,
-                    tooltip=display_tooltip(node.description))
+                    """.format(label=label, tooltip=display_tooltip(node.description))
                 html['value_types'] += display_value_type_fields(node.subs)
                 continue
             else:
                 type_field = """
                     <div class="table-row">
-                        <div><label>{label}</label> {tooltip}</div>
+                        <div><label>{label}</label> {info}</div>
                         <div class="table-cell">{field}</div>
                     </div>
-                """.format(
-                    label=label,
-                    tooltip='' if 'is_node_form' in form else display_tooltip(node.description),
-                    field=str(field(class_=class_)) + errors)
+                """.format(label=label, field=str(field(class_=class_)) + errors,
+                           info='' if 'is_node_form' in form else display_tooltip(node.description))
                 if node.name in app.config['BASE_TYPES']:  # base type should be above other fields
                     html['types'] = type_field + html['types']
                 else:
@@ -308,7 +299,6 @@ def display_form(self, form, form_id=None, for_persons=False):
                 </div>
             </div>""".format(values=util.uc_first(_('values')), show=util.uc_first(_('show')))
         html['value_types'] = values_html + html['value_types']
-
     html_all += html['header'] + html['types'] + html['main'] + html['value_types'] + html['footer']
     html_all += '</div></form>'
     return html_all
