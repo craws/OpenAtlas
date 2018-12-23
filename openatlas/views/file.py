@@ -16,7 +16,8 @@ from openatlas.forms.forms import build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.util.util import (build_table_form, convert_size, display_remove_link, format_date,
                                  get_base_table_data, get_entity_data, get_file_path, is_authorized,
-                                 link, required_group, truncate_string, uc_first, was_modified)
+                                 link, required_group, truncate_string, uc_first, was_modified,
+                                 get_file_stats)
 
 
 class FileForm(Form):
@@ -79,34 +80,17 @@ def file_remove_profile_image(entity_id):
 @required_group('readonly')
 def file_index():
     table = {'id': 'files', 'header': ['date'] + app.config['TABLE_HEADERS']['file'], 'data': []}
-    path = app.config['UPLOAD_FOLDER_PATH']
-    files_in_dir = {}
-    # Build a dict with file ids and stats from existing files in directory
-    # It's much faster to do this in one call instead for every file
-
-    # When python3.6 change to:
-    # with os.scandir(app.config['UPLOAD_FOLDER_PATH']) as it:
-    #     for file in it:
-    for file in os.scandir(app.config['UPLOAD_FOLDER_PATH']):
-        split_name = os.path.splitext(file.name)
-        if len(split_name) > 1 and split_name[0].isdigit():
-            files_in_dir[int(split_name[0])] = {
-                'ext': split_name[1],
-                'size': file.stat().st_size,
-                'date': file.stat().st_ctime}
+    file_stats = get_file_stats()
     for entity in EntityMapper.get_by_system_type('file'):
         date = 'N/A'
-        if entity.id in files_in_dir:
-            date = format_date(datetime.datetime.utcfromtimestamp(files_in_dir[entity.id]['date']))
+        if entity.id in file_stats:
+            date = format_date(datetime.datetime.utcfromtimestamp(file_stats[entity.id]['date']))
         table['data'].append([
-            date,
-            link(entity),
-            entity.print_base_type(),
-            convert_size(files_in_dir[entity.id]['size']) if entity.id in files_in_dir else 'N/A',
-            files_in_dir[entity.id]['ext'] if entity.id in files_in_dir else 'N/A',
+            date, link(entity), entity.print_base_type(),
+            convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
+            file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
             truncate_string(entity.description)])
-
-    statvfs = os.statvfs(path)
+    statvfs = os.statvfs(app.config['UPLOAD_FOLDER_PATH'])
     disk_space = statvfs.f_frsize * statvfs.f_blocks
     free_space = statvfs.f_frsize * statvfs.f_bavail  # Available space without reserved blocks
     disk_space_values = {

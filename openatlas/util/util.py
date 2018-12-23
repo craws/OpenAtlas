@@ -125,6 +125,24 @@ def sanitize(string, mode=None):
         return s.get_data()
 
 
+def get_file_stats(path=app.config['UPLOAD_FOLDER_PATH']):
+    # Build a dict with file ids and stats from existing files in directory
+    # It's much faster to do this in one call instead for every file
+
+    # With Python 3.6 change to:
+    # with os.scandir(app.config['UPLOAD_FOLDER_PATH']) as it:
+    #     for file in it:
+    file_stats = {}
+    for file in os.scandir(path):
+        split_name = os.path.splitext(file.name)
+        if len(split_name) > 1 and split_name[0].isdigit():
+            file_stats[int(split_name[0])] = {
+                'ext': split_name[1],
+                'size': file.stat().st_size,
+                'date': file.stat().st_ctime}
+    return file_stats
+
+
 def build_table_form(class_name, linked_entities):
     """ Returns a form with a list of entities with checkboxes"""
     from openatlas.models.entity import EntityMapper
@@ -139,11 +157,12 @@ def build_table_form(class_name, linked_entities):
         entities = EntityMapper.get_by_system_type('place')
     else:
         entities = EntityMapper.get_by_codes(class_name)
+    file_stats = get_file_stats() if class_name == 'file' else None
     for entity in entities:
         if entity.id in linked_ids:
             continue  # Don't show already linked entries
         input_ = '<input id="{id}" name="values" type="checkbox" value="{id}">'.format(id=entity.id)
-        table['data'].append(get_base_table_data(entity) + [input_])
+        table['data'].append(get_base_table_data(entity, file_stats) + [input_])
     if not table['data']:
         return uc_first(_('no entries'))
     form += pager(table)
@@ -236,13 +255,8 @@ def get_entity_data(entity, location=None):
             data.append((uc_first(_('alias')), '<br />'.join([x.name for x in aliases])))
 
     # Dates
-    date_types = OrderedDict([
-        ('OA1', _('first')),
-        ('OA3', _('birth')),
-        ('OA2', _('last')),
-        ('OA4', _('death')),
-        ('OA5', _('begin')),
-        ('OA6', _('end'))])
+    date_types = OrderedDict([('OA1', _('first')), ('OA3', _('birth')), ('OA2', _('last')),
+                              ('OA4', _('death')), ('OA5', _('begin')), ('OA6', _('end'))])
     for code, label in date_types.items():
         if code in entity.dates:
             if 'exact date value' in entity.dates[code]:
@@ -402,6 +416,7 @@ def get_profile_image_table_link(file, entity, extension, profile_image_id):
 
 
 def link(entity):
+    # Builds an html link to entity view for display
     from openatlas.models.entity import Entity
     if not entity:
         return ''
@@ -554,7 +569,7 @@ def pager(table, remove_rows=True):
     return html
 
 
-def get_base_table_data(entity):
+def get_base_table_data(entity, file_stats=None):
     """ Returns standard table data for an entity"""
     data = [link(entity)]
     if entity.view_name in ['event', 'actor']:
@@ -564,8 +579,14 @@ def get_base_table_data(entity):
     if entity.view_name in ['event', 'place', 'source', 'reference', 'file']:
         data.append(entity.print_base_type())
     if entity.system_type == 'file':
-        data.append(print_file_size(entity))
-        data.append(print_file_extension(entity))
+        if file_stats:
+            data.append(convert_size(
+                file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A')
+            data.append(
+                file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A')
+        else:
+            data.append(print_file_size(entity))
+            data.append(print_file_extension(entity))
     if entity.view_name in ['event', 'actor', 'place']:
         data.append(format(entity.first))
         data.append(format(entity.last))
@@ -575,7 +596,7 @@ def get_base_table_data(entity):
 
 
 def was_modified(form, entity):  # pragma: no cover
-    """Checks if an entity was modified after an update form was opened."""
+    """ Checks if an entity was modified after an update form was opened."""
     if not entity.modified or not form.opened.data:
         return False
     if entity.modified < datetime.fromtimestamp(float(form.opened.data)):
