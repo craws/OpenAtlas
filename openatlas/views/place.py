@@ -113,7 +113,7 @@ def place_view(id_):
     for link_ in object_.get_links('P67', True):
         domain = link_.domain
         data = get_base_table_data(domain)
-        if domain.view_name == 'file':
+        if domain.view_name == 'file':  # pragma: no cover
             extension = data[3].replace('.', '')
             data.append(get_profile_image_table_link(domain, object_, extension, profile_image_id))
             if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:

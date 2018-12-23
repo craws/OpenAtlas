@@ -412,7 +412,7 @@ def get_profile_image_table_link(file, entity, extension, profile_image_id):
     elif extension in app.config['DISPLAY_FILE_EXTENSIONS']:
         url = url_for('file_set_as_profile_image', id_=file.id, origin_id=entity.id)
         return '<a href="' + url + '">' + uc_first(_('set')) + '</a>'
-    return ''
+    return ''  # pragma: no cover - only happens for non image files
 
 
 def link(entity):

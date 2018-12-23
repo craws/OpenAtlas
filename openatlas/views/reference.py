@@ -133,7 +133,7 @@ def reference_view(id_):
         range_ = link_.range
         data = get_base_table_data(range_)
         data.append(truncate_string(link_.description))
-        if range_.view_name == 'file':
+        if range_.view_name == 'file':  # pragma: no cover
             ext = data[3].replace('.', '')
             data.append(get_profile_image_table_link(range_, reference, ext, profile_image_id))
             if not profile_image_id and ext in app.config['DISPLAY_FILE_EXTENSIONS']:
