@@ -144,6 +144,7 @@ def get_file_stats(path=app.config['UPLOAD_FOLDER_PATH']):
 
 def build_table_form(class_name, linked_entities):
     """ Returns a form with a list of entities with checkboxes"""
+    from flask_wtf.csrf import generate_csrf
     from openatlas.models.entity import EntityMapper
     header = app.config['TABLE_HEADERS'][class_name] + ['']
     table = {'id': class_name, 'header': header, 'data': []}
@@ -162,10 +163,10 @@ def build_table_form(class_name, linked_entities):
         table['data'].append(get_base_table_data(entity, file_stats) + [input_])
     if not table['data']:
         return uc_first(_('no entries'))
-    # Todo: add CSRF token
     return """<form class="table" method="post">
+                <input id="csrf_token" name="csrf_token" type="hidden" value="{token}">
                 {pager} <button name="form-submit" id="form-submit" type="submit">{add}</button>
-              </form>""".format(add=uc_first(_('add')), pager=pager(table))
+              </form>""".format(add=uc_first(_('add')), pager=pager(table), token=generate_csrf())
 
 
 def display_remove_link(url, name):

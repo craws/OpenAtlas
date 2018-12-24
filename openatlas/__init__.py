@@ -9,7 +9,7 @@ from flask import Flask, g, request, session
 from flask_babel import Babel, lazy_gettext as _
 from flask_wtf import Form
 from wtforms import StringField, SubmitField
-# from flask_wtf.csrf import CsrfProtect
+from flask_wtf.csrf import CsrfProtect
 
 try:
     import mod_wsgi
@@ -17,7 +17,7 @@ except ImportError:
     mod_wsgi = None
 
 app = Flask(__name__, instance_relative_config=True)
-# csrf = CsrfProtect(app)
+csrf = CsrfProtect(app)  # Make sure all forms are CSRF protected
 
 # Use the test database if running tests
 instance_name = 'production' if 'test_runner.py' not in sys.argv[0] else 'testing'
