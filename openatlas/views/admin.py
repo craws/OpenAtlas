@@ -176,8 +176,10 @@ def admin_orphans():
         'unlinked': {'id': 'unlinked', 'header': header, 'data': []},
         'nodes': {'id': 'nodes', 'header': ['name', 'root'], 'data': []},
         'missing_files': {'id': 'missing_files', 'header': header, 'data': []},
+        'circular': {'id': 'circular', 'header': ['entity'], 'data': []},
         'orphaned_files': {'id': 'orphaned_files', 'data': [],
                            'header': ['name', 'size', 'date', 'ext']}}
+    tables['circular']['data'] = [[link(entity)] for entity in EntityMapper.get_circular()]
     for entity in EntityMapper.get_orphans():
         name = 'unlinked' if entity.class_.code in app.config['CODE_CLASS'].keys() else 'orphans'
         tables[name]['data'].append([

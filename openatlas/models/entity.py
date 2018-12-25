@@ -143,10 +143,8 @@ class EntityMapper:
         sql = """
             UPDATE model.entity SET (name, description) = (%(name)s, %(description)s)
             WHERE id = %(id)s;"""
-        g.cursor.execute(sql, {
-            'id': entity.id,
-            'name': entity.name,
-            'description': sanitize(entity.description, 'description')})
+        g.cursor.execute(sql, {'id': entity.id, 'name': entity.name,
+                               'description': sanitize(entity.description, 'description')})
         debug_model['div sql'] += 1
 
     @staticmethod
@@ -345,15 +343,24 @@ class EntityMapper:
             VALUES (%(entity_id)s, %(image_id)s)
             ON CONFLICT (entity_id) DO UPDATE SET image_id=%(image_id)s;"""
         g.cursor.execute(sql, {'entity_id': origin_id, 'image_id': id_})
+        debug_model['div sql'] += 1
 
     @staticmethod
     def get_profile_image_id(id_):
         sql = 'SELECT image_id FROM web.entity_profile_image WHERE entity_id = %(entity_id)s;'
         g.cursor.execute(sql, {'entity_id': id_})
-        if g.cursor.rowcount:
-            return g.cursor.fetchone()[0]
+        debug_model['div sql'] += 1
+        return g.cursor.fetchone()[0] if g.cursor.rowcount else None
 
     @staticmethod
     def remove_profile_image(entity_id):
         sql = 'DELETE FROM web.entity_profile_image WHERE entity_id = %(entity_id)s;'
         g.cursor.execute(sql, {'entity_id': entity_id})
+        debug_model['div sql'] += 1
+
+    @staticmethod
+    def get_circular():
+        # Get entities that are linked to itself
+        g.cursor.execute('SELECT domain_id FROM model.link WHERE domain_id = range_id;')
+        debug_model['div sql'] += 1
+        return [EntityMapper.get_by_id(row.domain_id) for row in g.cursor.fetchall()]

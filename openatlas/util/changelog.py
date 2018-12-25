@@ -8,8 +8,8 @@ class Changelog:
         ('feature', OrderedDict([
             ('652', 'Maps update and rewrite'),
             ('891', 'Profile images'),
-            ('961', 'Date check functions'),
             ('959', 'Performance'),
+            ('961', 'Check function for dates and circular dependencies'),
             ('962', 'Configurable character limit for live searches')]))])]
     versions['3.11.1'] = ['2018-11-30', OrderedDict([
         ('fix', OrderedDict([
