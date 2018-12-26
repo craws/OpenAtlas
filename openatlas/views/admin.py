@@ -1,9 +1,9 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+import datetime
 import os
 from collections import OrderedDict
 from os.path import basename, splitext
 
-import datetime
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
@@ -20,8 +20,9 @@ from openatlas.models.link import LinkMapper
 from openatlas.models.node import NodeMapper
 from openatlas.models.settings import SettingsMapper
 from openatlas.models.user import UserMapper
-from openatlas.util.util import (convert_size, format_date, format_datetime, get_file_path, link,
-                                 required_group, send_mail, truncate_string, uc_first)
+from openatlas.util.util import (convert_size, format_date, format_datetime, get_file_path,
+                                 is_authorized, link, required_group, send_mail, truncate_string,
+                                 uc_first)
 
 
 class GeneralForm(Form):
@@ -263,19 +264,20 @@ def admin_file_delete(filename):  # pragma: no cover
             flash(_('error file delete'), 'error')
         return redirect(url_for('admin_orphans') + '#tab-orphaned-files')
 
-    # Get all files with entities
-    file_ids = [str(entity.id) for entity in EntityMapper.get_by_system_type('file')]
+    if is_authorized('admin'):
+        # Get all files with entities
+        file_ids = [str(entity.id) for entity in EntityMapper.get_by_system_type('file')]
 
-    # Get orphaned files (no corresponding entity)
-    path = app.config['UPLOAD_FOLDER_PATH']
-    for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
-        filename = basename(file)
-        if filename != '.gitignore' and splitext(filename)[0] not in file_ids:
-            try:
-                os.remove(app.config['UPLOAD_FOLDER_PATH'] + '/' + filename)
-            except Exception as e:
-                logger.log('error', 'file', 'deletion of ' + filename + ' failed', e)
-                flash(_('error file delete'), 'error')
+        # Get orphaned files (no corresponding entity)
+        path = app.config['UPLOAD_FOLDER_PATH']
+        for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
+            filename = basename(file)
+            if filename != '.gitignore' and splitext(filename)[0] not in file_ids:
+                try:
+                    os.remove(app.config['UPLOAD_FOLDER_PATH'] + '/' + filename)
+                except Exception as e:
+                    logger.log('error', 'file', 'deletion of ' + filename + ' failed', e)
+                    flash(_('error file delete'), 'error')
     return redirect(url_for('admin_orphans') + '#tab-orphaned-files')
 
 
