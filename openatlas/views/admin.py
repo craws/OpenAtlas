@@ -155,11 +155,11 @@ def admin_check_dates():
     for link_ in DateMapper.get_invalid_link_dates():
         label = ''
         if link_.property.code == 'OA7':
-            label = _('relation')
+            label = 'relation'
         elif link_.property.code == 'P107':  # pragma: no cover
-            label = _('member')
+            label = 'member'
         elif link_.property.code in ['P11', 'P14', 'P22', 'P23']:  # pragma: no cover
-            label = _('involvement')
+            label = 'involvement'
         url = url_for(label + '_update', id_=link_.id, origin_id=link_.domain.id)
         tables['invalid_link_dates']['data'].append([
             '<a href="' + url + '">' + uc_first(_(label)) + '</a>',

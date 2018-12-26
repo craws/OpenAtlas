@@ -88,7 +88,7 @@ Login with username "OpenAtlas" and password "change_me_PLEASE!" and change the 
 
 ### Upgrade
 
-If you later like to upgrade the application be sure to read and follow the [instructions](install/upgrade/upgrade.md).
+If you later like to upgrade the application be sure to read and follow the [upgrade instructions](install/upgrade/upgrade.md).
 
 ### Unit tests (optional)
 
