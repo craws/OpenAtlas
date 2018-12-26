@@ -9,13 +9,12 @@
         </div>
         <div style="float:left;">
             <p>
-                {{ _('feedback teaser') }}:
-                <a href="{{ url_for('index_feedback') }}">{{ _('feedback')|uc_first }}</a>
+                {{ _('feedback teaser') }} <a href="{{ url_for('index_feedback') }}">{{ _('feedback')|uc_first }}</a>.
             </p>
             {% if session['settings']['mail'] and not current_user.settings['newsletter'] %}
                 <p>
                     {{ _('Want to receive updates? Activate the newsletter in your ') }}
-                    <a href="{{ url_for('profile_index') }}">{{ _('profile')|uc_first }}</a>
+                    <a href="{{ url_for('profile_index') }}">{{ _('profile')|uc_first }}</a>.
                 </p>
             {% endif %}
             <a href="{{ url_for('model_network') }}">{{ _('network')|uc_first }}</a>
