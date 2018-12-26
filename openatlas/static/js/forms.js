@@ -43,7 +43,6 @@ $(document).ready(function () {
     $('#insert_and_continue').click(function() {
         $('#continue_').val('yes');
         $('form').submit();
-        return false;
     });
 
     $("#password-form").validate({

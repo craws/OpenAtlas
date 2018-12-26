@@ -10,7 +10,10 @@ class Changelog:
             ('891', 'Profile images'),
             ('959', 'Performance'),
             ('961', 'Check function for dates and circular dependencies'),
-            ('962', 'Configurable character limit for live searches')]))])]
+            ('962', 'Configurable character limit for live searches')])),
+        ('fix', OrderedDict([
+            ('970', "Insert and Continue doesn't work with place in Chrome")]))])]
+
     versions['3.11.1'] = ['2018-11-30', OrderedDict([
         ('fix', OrderedDict([
             ('964', 'Forms: tables with pager ignoring selection after changing page')]))])]
