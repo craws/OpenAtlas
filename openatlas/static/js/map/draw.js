@@ -1,4 +1,4 @@
-// Todo: try to remove most of these global variables
+// Todo: try to remove global variables
 
 // Variables for a selected geometry
 var name;

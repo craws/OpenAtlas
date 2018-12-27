@@ -82,7 +82,7 @@ def actor_view(id_):
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
         tables[domain.view_name]['data'].append(data)
 
-    # Todo: Performance - getting every place of every object of every event is very costly
+    # Todo: Performance - getting every place of every object for every event is very costly
     for link_ in actor.get_links(['P11', 'P14', 'P22', 'P23'], True):
         event = link_.domain
         first = link_.first

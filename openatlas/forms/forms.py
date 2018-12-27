@@ -17,7 +17,7 @@ from openatlas.util.util import get_base_table_data, pager, truncate_string, uc_
 
 
 def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
-    # Todo: write comment, reflect that entity can be a link
+    """ The entity parameter can also be a link."""
     # Add custom fields
     custom_list = []
 
@@ -260,10 +260,8 @@ class TableSelect(HiddenInput):
                 selection = entity.name
             data = get_base_table_data(entity)
             data[0] = """<a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
-                        """.format(
-                        name=field.id,
-                        entity_id=entity.id,
-                        entity_name=truncate_string(entity.name, span=False))
+                        """.format(name=field.id, entity_id=entity.id,
+                                   entity_name=truncate_string(entity.name, span=False))
             table['data'].append(data)
         html = """
             <input id="{name}-button" name="{name}-button" class="table-select {required}"

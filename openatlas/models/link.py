@@ -71,12 +71,11 @@ class LinkMapper:
                 INSERT INTO model.link (property_code, domain_id, range_id, description)
                 VALUES (%(property_code)s, %(domain_id)s, %(range_id)s, %(description)s)
                 RETURNING id;"""
-            # Todo: build only sql and get execution out of loop
-            g.cursor.execute(sql, {
-                'property_code': property_code,
-                'domain_id': domain.id,
-                'range_id': range_.id,
-                'description': description})
+            # Todo: build only one sql and get execution out of loop
+            g.cursor.execute(sql, {'property_code': property_code,
+                                   'domain_id': domain.id,
+                                   'range_id': range_.id,
+                                   'description': description})
             debug_model['link sql'] += 1
             result = g.cursor.fetchone()[0]
         return result
