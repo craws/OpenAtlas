@@ -30,6 +30,7 @@
                             <div style="float:left;margin-right:3em;">
                                 <div class="button-bar">
                                     <form style="float:left" method="post" action="{{ url_for('node_insert', root_id=node.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                         <input
                                             class="tree-filter"
                                             id="{{ node.name|sanitize }}-tree-search"
