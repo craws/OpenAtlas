@@ -128,10 +128,6 @@ def sanitize(string, mode=None):
 def get_file_stats(path=app.config['UPLOAD_FOLDER_PATH']):
     # Build a dict with file ids and stats from existing files in directory
     # It's much faster to do this in one call instead for every file
-
-    # With Python 3.6 change to:
-    # with os.scandir(app.config['UPLOAD_FOLDER_PATH']) as it:
-    #     for file in it:
     file_stats = {}
     for file in os.scandir(path):
         split_name = os.path.splitext(file.name)

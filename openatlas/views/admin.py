@@ -209,10 +209,6 @@ def admin_orphans():
                 truncate_string(entity.description)])
 
     # Get orphaned files (no corresponding entity)
-
-    # When python3.6 change to:
-    # with os.scandir(app.config['UPLOAD_FOLDER_PATH']) as it:
-    #     for file in it:
     for file in os.scandir(app.config['UPLOAD_FOLDER_PATH']):
         name = file.name
         if name != '.gitignore' and splitext(file.name)[0] not in file_ids:

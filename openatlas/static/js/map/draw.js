@@ -136,6 +136,14 @@ map.on('draw:created', function (e) {
     $('#saveButton').prop('disabled', false);
 });
 
+function check_coordinates_input() {
+    if ($('#easting').val() && $('#northing').val()) {
+         $('#saveButton').prop('disabled', false);
+    } else {
+         $('#saveButton').prop('disabled', true);
+    }
+}
+
 function closeForm(withoutSave = true) {
     inputForm.remove(map);
     $('.leaflet-right .leaflet-bar').show();

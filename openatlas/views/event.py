@@ -124,13 +124,11 @@ def event_view(id_):
         last = link_.last
         if not link_.last and event.last:
             last = '<span class="inactive" style="float:right">' + str(event.last) + '</span>'
-        data = ([
-            link(link_.range),
-            g.classes[link_.range.class_.code].name,
-            link_.type.name if link_.type else '',
-            first,
-            last,
-            truncate_string(link_.description)])
+        data = ([link(link_.range),
+                 g.classes[link_.range.class_.code].name,
+                 link_.type.name if link_.type else '',
+                 first, last,
+                 truncate_string(link_.description)])
         if is_authorized('editor'):
             update_url = url_for('involvement_update', id_=link_.id, origin_id=event.id)
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=event.id) + '#tab-actor'
