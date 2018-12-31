@@ -55,8 +55,8 @@ class Entity:
     def delete(self):
         EntityMapper.delete(self.id)
 
-    def delete_links(self, codes, role=None):
-        LinkMapper.delete_by_codes(self, codes, role)
+    def delete_links(self, codes):
+        LinkMapper.delete_by_codes(self, codes)
 
     def update(self):
         EntityMapper.update(self)

@@ -43,10 +43,7 @@ if (useCluster) {
 }
 
 if (gisPolygonAll) {
-    polygonLayer = new L.GeoJSON(gisPolygonAll, {
-        onEachFeature: setPopup,
-        style: {color: '#9A9A9A'}
-    });
+    polygonLayer = new L.GeoJSON(gisPolygonAll, {onEachFeature: setPopup, style: {color: '#9A9A9A'}});
     controls.Polygons = polygonLayer;
 }
 
@@ -64,7 +61,6 @@ if (window.location.href.indexOf('update') >= 0) {
     $('#gis_points').val(JSON.stringify(gisPointSelected));
     $('#gis_polygons').val(JSON.stringify(gisPolygonSelected));
 }
-
 
 // Set zoom level depending on getbounds of selected points/polygons
 if (gisPointSelected != '' && gisPolygonSelected != '') {

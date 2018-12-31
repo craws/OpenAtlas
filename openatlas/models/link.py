@@ -144,11 +144,9 @@ class LinkMapper:
         return links
 
     @staticmethod
-    def delete_by_codes(entity, codes, role=None):
-        # Delete in both directions except if role of entity is specified (domain or range)
+    def delete_by_codes(entity, codes):
         codes = codes if type(codes) is list else [codes]
-        sql = 'DELETE FROM model.link WHERE property_code IN %(codes)s AND '
-        sql += role + '_id = %(id)s;' if role else ' (domain_id = %(id)s OR range_id = %(id)s);'
+        sql = 'DELETE FROM model.link WHERE property_code IN %(codes)s AND domain_id = %(id)s;'
         g.cursor.execute(sql, {'id': entity.id, 'codes': tuple(codes)})
         debug_model['link sql'] += 1
 

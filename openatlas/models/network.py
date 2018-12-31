@@ -42,7 +42,7 @@ class Network:
             if params['options']['orphans'] or row.id in entities:
                 entities_already.add(row.id)
                 nodes += """{{'id':'{id}','name':'{name}','color':'{color}'}},""".format(
-                    id=row.id, name=truncate_string(row.name, span=False),
+                    id=row.id, name=truncate_string(row.name.replace("'", ""), span=False),
                     color=params['classes'][row.class_code]['color'])
 
         # Get entities of links which weren't present in class selection
@@ -57,6 +57,7 @@ class Network:
                 if row.class_code in params['classes']:  # pragma: no cover
                     color = params['classes'][row.class_code]['color']
                 nodes += """{{'id':'{id}','name':'{name}','color':'{color}'}},""".format(
-                    id=row.id, name=truncate_string(row.name, span=False), color=color)
+                    id=row.id, color=color,
+                    name=truncate_string(row.name.replace("'", ""), span=False))
 
         return "graph = {'nodes': [" + nodes + "],  links: [" + edges + "]};" if nodes else None

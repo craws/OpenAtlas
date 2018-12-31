@@ -165,7 +165,7 @@ def save(form, event=None, code=None, origin=None):
         log_action = 'insert'
         if event:
             log_action = 'update'
-            event.delete_links(['P117', 'P7', 'P24'], 'domain')
+            event.delete_links(['P117', 'P7', 'P24'])
         else:
             event = EntityMapper.insert(code, form.name.data)
         event.name = form.name.data
