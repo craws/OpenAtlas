@@ -249,7 +249,7 @@ def admin_logo(action=None):
 
 
 @app.route('/admin/file/delete/<filename>')
-@required_group('manager')
+@required_group('editor')
 def admin_file_delete(filename):  # pragma: no cover
     if filename != 'all':
         try:
