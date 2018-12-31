@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 class Changelog:
     versions = OrderedDict()
-    versions['3.12.0'] = ['TBA', OrderedDict([
+    versions['3.12.0'] = ['2018-12-31', OrderedDict([
         ('feature', OrderedDict([
             ('652', 'Maps update and rewrite'),
             ('891', 'Profile images'),
