@@ -314,17 +314,37 @@ class EntityMapper:
         return g.cursor.rowcount
 
     @staticmethod
-    def search(term, codes, description=False, own=False):
+    def search(form):
         sql = EntityMapper.sql
-        if own:
+        if form.own.data:
             sql += " LEFT JOIN web.user_log ul ON e.id = ul.entity_id "
         sql += " WHERE LOWER(e.name) LIKE LOWER(%(term)s)"
-        sql += " OR lower(e.description) LIKE lower(%(term)s) AND " if description else " AND "
-        sql += " ul.user_id = %(user_id)s AND " if own else ''
-        sql += " e.class_code IN %(codes)s"
-        sql += " GROUP BY e.id ORDER BY e.name"
-        g.cursor.execute(sql, {'term': '%' + term + '%', 'codes': tuple(codes),
-                               'user_id': current_user.id})
+        sql += " OR lower(e.description) LIKE lower(%(term)s) AND " if form.desc.data else " AND "
+        sql += " ul.user_id = %(user_id)s AND " if form.own.data else ''
+        sql += "("
+        sql_where = []
+        for name in form.classes.data:
+            if name == 'source':
+                codes = app.config['CLASS_CODES'][name]
+                sql_where.append(" e.class_code IN ({codes})".format(codes=str(codes)[1:-1]))
+            elif name == 'event':
+                codes = app.config['CLASS_CODES'][name]
+                sql_where.append(" e.class_code IN ({codes})".format(codes=str(codes)[1:-1]))
+            elif name == 'actor':
+                codes = app.config['CLASS_CODES'][name]
+                codes.append('E82')
+                sql_where.append(" e.class_code IN ({codes})".format(codes=str(codes)[1:-1]))
+            elif name == 'place':
+                codes = app.config['CLASS_CODES'][name]
+                codes.append('E41')
+                sql_where.append(" e.class_code IN ({codes})".format(codes=str(codes)[1:-1]))
+            elif name == 'reference':
+                sql_where.append(" e.class_code IN ({codes}) AND e.system_type != 'file'".format(
+                    codes=str(app.config['CLASS_CODES'][name])[1:-1]))
+            elif name == 'file':
+                sql_where.append(" e.system_type = 'file'")
+        sql += ' OR '.join(sql_where) + ") GROUP BY e.id ORDER BY e.name;"
+        g.cursor.execute(sql, {'term': '%' + form.term.data + '%', 'user_id': current_user.id})
         debug_model['div sql'] += 1
         entities = []
         for row in g.cursor.fetchall():

@@ -24,16 +24,16 @@ class SearchForm(Form):
 @app.route('/overview/search', methods=['POST', 'GET'])
 @required_group('readonly')
 def search_index():
-    classes = ['source', 'event', 'actor', 'place', 'reference']
+    choices = ['source', 'event', 'actor', 'place', 'reference', 'file']
     form = SearchForm()
-    form.classes.choices = [(x, uc_first(_(x))) for x in classes]
-    form.classes.default = classes
+    form.classes.choices = [(x, uc_first(_(x))) for x in choices]
+    form.classes.default = choices
     form.classes.process(request.form)
     table = {'data': []}
     if request.method == 'POST' and 'global-term' in request.form and request.form['global-term']:
         # Coming from global search
         form.term.data = request.form['global-term']
-        form.classes.data = classes
+        form.classes.data = choices
         table = build_search_table(form)
     if form.validate_on_submit():
         table = build_search_table(form)
@@ -43,18 +43,7 @@ def search_index():
 def build_search_table(form):
     table = {'id': 'search', 'data': [],
              'header': ['name', 'class', 'first', 'last', 'description']}
-    codes = []
-    for name in form.classes.data:
-        codes += app.config['CLASS_CODES'][name]
-        if name == 'actor':
-            codes.append('E82')
-        if name == 'place':
-            codes.append('E41')
-    for entity in EntityMapper.search(form.term.data, codes, form.desc.data, form.own.data):
-        table['data'].append([
-            link(entity),
-            entity.class_.name,
-            entity.first,
-            entity.last,
-            truncate_string(entity.description)])
+    for entity in EntityMapper.search(form):
+        table['data'].append([link(entity), entity.class_.name, entity.first, entity.last,
+                              truncate_string(entity.description)])
     return table
