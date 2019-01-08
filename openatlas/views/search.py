@@ -24,7 +24,8 @@ class SearchForm(Form):
 @app.route('/overview/search', methods=['POST', 'GET'])
 @required_group('readonly')
 def search_index():
-    choices = ['source', 'event', 'actor', 'place', 'reference', 'file']
+    choices = ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic unit', 'find',
+               'reference', 'file']
     form = SearchForm()
     form.classes.choices = [(x, uc_first(_(x))) for x in choices]
     form.classes.default = choices
@@ -35,7 +36,7 @@ def search_index():
         form.term.data = request.form['global-term']
         form.classes.data = choices
         table = build_search_table(form)
-    if form.validate_on_submit():
+    elif form.validate_on_submit():
         table = build_search_table(form)
     return render_template('search/index.html', form=form, table=table)
 

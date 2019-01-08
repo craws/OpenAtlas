@@ -324,23 +324,19 @@ class EntityMapper:
         sql += "("
         sql_where = []
         for name in form.classes.data:
-            if name == 'source':
-                codes = app.config['CLASS_CODES'][name]
-                sql_where.append(" e.class_code IN ({codes})".format(codes=str(codes)[1:-1]))
-            elif name == 'event':
-                codes = app.config['CLASS_CODES'][name]
-                sql_where.append(" e.class_code IN ({codes})".format(codes=str(codes)[1:-1]))
+            if name in ['source', 'event']:
+                sql_where.append(" e.class_code IN ({codes})".format(
+                    codes=str(app.config['CLASS_CODES'][name])[1:-1]))
+            elif name == 'find':
+                sql_where.append(" e.class_code = 'E22'")
             elif name == 'actor':
-                codes = app.config['CLASS_CODES'][name]
-                codes.append('E82')
+                codes = app.config['CLASS_CODES'][name] + ['E82']  # Add alias
                 sql_where.append(" e.class_code IN ({codes})".format(codes=str(codes)[1:-1]))
-            elif name == 'place':
-                codes = app.config['CLASS_CODES'][name]
-                codes.append('E41')
-                sql_where.append(" e.class_code IN ({codes})".format(codes=str(codes)[1:-1]))
+            elif name in ['place', 'feature', 'stratigraphic unit']:
+                sql_where.append(" e.class_code IN ('E18', 'E41')")
             elif name == 'reference':
                 sql_where.append(" e.class_code IN ({codes}) AND e.system_type != 'file'".format(
-                    codes=str(app.config['CLASS_CODES'][name])[1:-1]))
+                    codes=str(app.config['CLASS_CODES']['reference'])[1:-1]))
             elif name == 'file':
                 sql_where.append(" e.system_type = 'file'")
         sql += ' OR '.join(sql_where) + ") GROUP BY e.id ORDER BY e.name;"
@@ -351,7 +347,11 @@ class EntityMapper:
             if row.class_code == 'E82':  # If found in actor alias
                 entities.append(LinkMapper.get_linked_entity(row.id, 'P131', True))
             elif row.class_code == 'E41':  # If found in place alias
-                entities.append(LinkMapper.get_linked_entity(row.id, 'P1', True))
+                if 'place' in form.classes.data:  # Only places have alias
+                    entities.append(LinkMapper.get_linked_entity(row.id, 'P1', True))
+            elif row.class_code == 'E18':
+                if row.system_type in form.classes.data:
+                    entities.append(Entity(row))
             else:
                 entities.append(Entity(row))
         return entities
