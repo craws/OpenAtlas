@@ -10,7 +10,8 @@
             {{ form.term }}<br /><br />
             {{ form.own }} {{ form.own.label }}<br />
             {{ form.desc }} {{ form.desc.label }}<br /><br />
-            <span style="font-weight:bold;">{{ _('classes')|uc_first }}</span><br />
+            <span style="font-weight:bold;">{{ _('classes')|uc_first }}</span>
+            <p id="select_all" style="text-decoration: underline;margin-bottom: 0.5em;">{{ _('deselect all')|uc_first }}</p>
             {{ form.classes }}
             {{ form.search }}
         </form>
@@ -18,4 +19,22 @@
     <div style="float:left;margin-left: 1em;">
         {{ table|pager|safe }}
     </div>
+    <script>
+        $("#select_all").click(function() {
+            if ($("#classes :checkbox").length == $("#classes :checkbox:checked").length) {
+                $("#classes :checkbox").each(function(){this.checked = false;});
+                $("#select_all").html('{{ _('select all')|uc_first }}');
+            } else {
+                $("#classes :checkbox").each(function(){this.checked = true;});
+                $("#select_all").html('{{ _('deselect all')|uc_first }}');
+            }
+        })
+        $("#classes :checkbox").change(function() {
+            if ($("#classes :checkbox").length == $("#classes :checkbox:checked").length) {
+                $("#select_all").html('{{ _('deselect all')|uc_first }}');
+            } else {
+                $("#select_all").html('{{ _('select all')|uc_first }}');
+            }
+        });
+    </script>
 {% endblock %}
