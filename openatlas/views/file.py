@@ -182,7 +182,8 @@ def file_insert(origin_id=None):
     form = build_form(FileForm, 'File')
     if form.validate_on_submit():
         return redirect(save(form, origin=origin))
-    return render_template('file/insert.html', form=form, origin=origin)
+    writeable = True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False
+    return render_template('file/insert.html', form=form, origin=origin, writeable=writeable)
 
 
 @app.route('/file/delete/<int:id_>')
