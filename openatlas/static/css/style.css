@@ -4,9 +4,14 @@ html, body, input, select, textarea {
     font-family: helvetica, arial, sans-serif;
 }
 
-
 .date-switch label.error {
     padding: 0.2em;
+}
+
+.select_all {
+    text-decoration: underline;
+    margin-bottom: 0.5em;
+    margin-top: 0;
 }
 
 #admin_index a {

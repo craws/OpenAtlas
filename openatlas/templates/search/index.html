@@ -9,9 +9,9 @@
             {{ form.csrf_token }}
             {{ form.term }}<br /><br />
             {{ form.own }} {{ form.own.label }}<br />
-            {{ form.desc }} {{ form.desc.label }}<br /><br />
-            <span style="font-weight:bold;">{{ _('classes')|uc_first }}</span>
-            <p id="select_all" style="text-decoration: underline;margin-bottom: 0.5em;">{{ _('deselect all')|uc_first }}</p>
+            {{ form.desc }} {{ form.desc.label }}<br />
+            <h2>{{ _('classes')|uc_first }}</h2>
+            <p id="select_all" class="select_all">{{ _('deselect all')|uc_first }}</p>
             {{ form.classes }}
             {{ form.search }}
         </form>
