@@ -188,8 +188,11 @@ def get_entity_data(entity, location=None):
         name = 'type' if root.name in app.config['BASE_TYPES'] else root.name
         if root.name not in type_data:
             type_data[name] = []
-        html = link(node) + (': ' + format_number(node_value) if root.value_type else '')
-        type_data[name].append(html)
+        text = ''
+        if root.value_type:  # Text for value types
+            text = ': {value} <span style="font-style:italic;">{description}</span>'.format(
+                value=format_number(node_value), description=node.description)
+        type_data[name].append(link(node) + text)
 
     # Sort by name
     type_data = OrderedDict(sorted(type_data.items(), key=lambda t: t[0]))

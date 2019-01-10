@@ -10,6 +10,15 @@ After following the instructions restart Apache and test if the application is w
 
     service apache2 restart
 
+### 3.12.0 to 3.13.0
+
+#### Value type label (description)
+
+After this update the descriptions of value types is shown at entity views.
+e.g. if the value type "height" has "centimeter" in its description and a find has it with the value 5 it will displayed as:
+Height: 5 centimeter
+So you might want to check the value type descriptions and e.g. change "In centimeter" to "centimeter"
+
 ### 3.11.0 to 3.12.0
 
 Execute install/upgrade/3.12.0.sql after making backups
