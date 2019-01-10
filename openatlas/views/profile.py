@@ -87,8 +87,8 @@ def profile_index():
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('profile_index'))
-
-    form.language.data = user.settings['language']
+    language = user.settings['language'] if user.settings['language'] else session['language']
+    form.language.data = language
     form.theme.data = user.settings['theme']
     form.table_rows.data = user.settings['table_rows']
     form.layout.data = user.settings['layout']
