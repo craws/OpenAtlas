@@ -256,7 +256,7 @@ INSERT INTO link (property_code, range_id, domain_id) VALUES
 -- Value types --
 ------------------------
 INSERT INTO model.entity (class_code, name, description) VALUES ('E55', 'Dimensions', 'Physical dimensions like weight and height.');
-INSERT INTO model.entity (class_code, name, description) VALUES ('E55', 'Height', 'In centimeters'), ('E55', 'Weight', 'In gram');
+INSERT INTO model.entity (class_code, name, description) VALUES ('E55', 'Height', 'centimeter'), ('E55', 'Weight', 'gram');
 INSERT INTO model.link (property_code, range_id, domain_id) VALUES
 ('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Height')),
 ('P127', (SELECT id FROM model.entity WHERE name='Dimensions'), (SELECT id FROM model.entity WHERE name='Weight'));
