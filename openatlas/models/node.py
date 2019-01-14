@@ -13,26 +13,17 @@ class NodeMapper(EntityMapper):
 
     @staticmethod
     def get_all_nodes():
-        """Get and return all type and place nodes"""
+        """ Get and return all type and place nodes"""
         sql = """
-            SELECT
-                e.id,
-                e.name,
-                e.class_code,
-                e.description,
-                e.system_type,
-                e.created,
-                e.modified,
-                es.id AS super_id,
-                COUNT(e2.id) AS count,
-                COUNT(lp.id) AS count_property
+            SELECT e.id, e.name, e.class_code, e.description, e.system_type, e.created, e.modified,
+                es.id AS super_id, COUNT(e2.id) AS count, COUNT(lp.id) AS count_property
             FROM model.entity e                
 
-            -- get super
+            -- Get super
             LEFT JOIN model.link l ON e.id = l.domain_id AND l.property_code = %(property_code)s
             LEFT JOIN model.entity es ON l.range_id = es.id
 
-            -- get count
+            -- Get count
             LEFT JOIN model.link l2 ON e.id = l2.range_id
             LEFT JOIN model.entity e2 ON l2.domain_id = e2.id AND
                 (l2.property_code = 'P2' OR

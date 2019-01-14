@@ -12,6 +12,8 @@ After following the instructions restart Apache and test if the application is w
 
 ### 3.12.0 to 3.13.0
 
+Execute install/upgrade/3.13.0.sql after making backups
+
 #### Value type label (description)
 
 After this update the descriptions of value types is shown at entity views.
