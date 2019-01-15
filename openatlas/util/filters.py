@@ -209,11 +209,10 @@ def display_form(self, form, form_id=None, for_persons=False):
             field_ = getattr(form, str(sub_id))
             html_ += """
                 <div class="table-row value-type-switch">
-                    <div><label>{label}</label> {tooltip}</div>
-                    <div class="table-cell">{field}</div>
+                    <div><label>{label}</label></div>
+                    <div class="table-cell">{field} {unit}</div>
                 </div>
-            """.format(label=sub.name, tooltip=display_tooltip(sub.description),
-                       field=field_(class_='value-type'))
+            """.format(label=sub.name, unit=sub.description, field=field_(class_='value-type'))
             html_ += display_value_type_fields(sub.subs)
         return html_
 

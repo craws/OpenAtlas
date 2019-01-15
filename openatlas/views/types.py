@@ -20,6 +20,7 @@ class NodeForm(Form):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     name_inverse = StringField(_('inverse'))
     is_node_form = HiddenField()
+    unit = StringField(_('unit'))
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
@@ -89,7 +90,6 @@ def node_view(id_):
         header = [_('name'), _('value'), _('class'), _('info')]
     tables = {'entities': {'id': 'entities', 'header': header, 'data': []},
               'info': get_entity_data(node)}
-
     for entity in node.get_linked_entities(['P2', 'P89'], True):
         # If it is a place location get the corresponding object
         entity = entity if node.class_.code == 'E55' else entity.get_linked_entity('P53', True)
@@ -216,7 +216,7 @@ def save(form, node=None, root=None):
             node.name += ' (' + form.name_inverse.data.strip() + ')'
         if not root.directional:
             node.name = node.name.replace('(', '').replace(')', '')
-        node.description = form.description.data
+        node.description = form.description.data if form.description else form.unit.data
         node.update()
 
         # Update super if changed and node is not a root node

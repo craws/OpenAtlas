@@ -108,6 +108,10 @@ def build_node_form(form, node, request_origin=None):
     form_instance = form(obj=node)
     if not root.directional:
         del form_instance.name_inverse
+    if root.value_type:
+        del form_instance.description
+    else:
+        del form_instance.unit
 
     # Delete custom fields except the one specified for the form
     delete_list = []  # Can't delete fields in the loop so creating a list for later deletion
@@ -123,7 +127,10 @@ def build_node_form(form, node, request_origin=None):
         form_instance.name.data = name_parts[0]
         if root.directional and len(name_parts) > 1:
             form_instance.name_inverse.data = name_parts[1][:-1]  # remove the ")" from 2nd part
-        form_instance.description.data = node.description
+        if root.value_type:
+            form_instance.unit.data = node.description
+        else:
+            form_instance.description.data = node.description
         if root:  # Set super if exists and is not same as root
             super_ = g.nodes[node.root[0]]
             getattr(form_instance, str(root.id)).data = super_.id if super_.id != root.id else None

@@ -656,7 +656,6 @@ CREATE TABLE model.entity (
     class_code text NOT NULL,
     name text NOT NULL,
     description text,
-    value_integer integer,
     value_timestamp timestamp without time zone,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone,

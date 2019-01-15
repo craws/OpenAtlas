@@ -38,8 +38,8 @@ class PlaceTest(TestBaseCase):
                 "siteType":"Settlement","title":""},"type":"Feature"}]"""
             data[place_node.id] = place_node.subs
             data['continue_'] = 'yes'
-            rv = self.app.post(
-                url_for('place_insert', origin_id=source_id), data=data, follow_redirects=True)
+            rv = self.app.post(url_for('place_insert', origin_id=source_id), data=data,
+                               follow_redirects=True)
             assert b'Tha source' in rv.data
 
             with app.test_request_context():
@@ -57,8 +57,8 @@ class PlaceTest(TestBaseCase):
             assert b'Valhalla' in rv.data
             data['continue_'] = ''
             data['alias-1'] = 'Val-hall'
-            rv = self.app.post(
-                url_for('place_update', id_=place_id), data=data, follow_redirects=True)
+            rv = self.app.post(url_for('place_update', id_=place_id), data=data,
+                               follow_redirects=True)
             assert b'Val-hall' in rv.data
             with app.test_request_context():
                 app.preprocess_request()
@@ -75,8 +75,8 @@ class PlaceTest(TestBaseCase):
                  [299.00650977389887, -5.893358673645309], [298.9848804404028, -5.9070188333813585],
                  [298.9893436362036, -5.888919049309554]]]},
                 "properties": {"name": "", "description": "", "shapeType": "shape"}}]"""
-            rv = self.app.post(
-                url_for('place_insert', origin_id=source_id), data=data, follow_redirects=True)
+            rv = self.app.post(url_for('place_insert', origin_id=source_id), data=data,
+                               follow_redirects=True)
             assert b'An invalid geometry was entered' in rv.data
 
             # Place types

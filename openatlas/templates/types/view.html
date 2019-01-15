@@ -34,7 +34,11 @@
             <p>{{_('super')|uc_first}}: {{ super_|link|safe }}</p>
         {% endif %}
         {{ tables['info']|data_table|safe }}
-        {{ node|description|safe }}
+        {% if root.value_type %}
+            <p>{{_('unit')|uc_first}}: {{node.description}}</p>
+        {% else %}
+            {{ node|description|safe }}
+        {% endif %}
     </div>
     {% if tables['subs'].data %}
         <div id="tab-subs">
