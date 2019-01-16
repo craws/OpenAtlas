@@ -47,12 +47,10 @@ def involvement_insert(origin_id):
             if origin.view_name == 'event':
                 for actor in EntityMapper.get_by_ids(ast.literal_eval(form.actor.data)):
                     link_id = origin.link(form.activity.data, actor, form.description.data)
-                    DateMapper.save_link_dates(link_id, form)
                     NodeMapper.save_link_nodes(link_id, form)
             else:
                 for event in EntityMapper.get_by_ids(ast.literal_eval(form.event.data)):
                     link_id = event.link(form.activity.data, origin, form.description.data)
-                    DateMapper.save_link_dates(link_id, form)
                     NodeMapper.save_link_nodes(link_id, form)
             g.cursor.execute('COMMIT')
             flash(_('entity created'), 'info')
@@ -88,7 +86,6 @@ def involvement_update(id_, origin_id):
         try:
             link_.delete()
             link_id = event.link(form.activity.data, actor, form.description.data)
-            DateMapper.save_link_dates(link_id, form)
             NodeMapper.save_link_nodes(link_id, form)
             g.cursor.execute('COMMIT')
         except Exception as e:  # pragma: no cover

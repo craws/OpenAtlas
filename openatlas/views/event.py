@@ -158,49 +158,49 @@ def event_view(id_):
 
 
 def save(form, event=None, code=None, origin=None):
-    g.cursor.execute('BEGIN')
-    try:
-        log_action = 'insert'
-        if event:
-            log_action = 'update'
-            event.delete_links(['P117', 'P7', 'P24'])
-        else:
-            event = EntityMapper.insert(code, form.name.data)
-        event.name = form.name.data
-        event.description = form.description.data
-        event.update()
-        event.save_dates(form)
-        event.save_nodes(form)
-        if form.event.data:
-            entity = EntityMapper.get_by_id(form.event.data)
-            event.link('P117', entity)
-        if form.place.data:
-            place = LinkMapper.get_linked_entity(int(form.place.data), 'P53')
-            event.link('P7', place)
-        if event.class_.code == 'E8' and form.given_place.data:  # Link place for acquisition
-            places = [EntityMapper.get_by_id(i) for i in ast.literal_eval(form.given_place.data)]
-            event.link('P24', places)
-        url = url_for('event_view', id_=event.id)
-        if origin:
-            url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-event'
-            if origin.view_name == 'reference':
-                link_id = origin.link('P67', event)
-                url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
-            elif origin.view_name == 'source':
-                origin.link('P67', event)
-            elif origin.view_name == 'actor':
-                link_id = event.link('P11', origin)
-                url = url_for('involvement_update', id_=link_id, origin_id=origin.id)
-            elif origin.view_name == 'file':
-                origin.link('P67', event)
-        if form.continue_.data == 'yes':
-            url = url_for('event_insert', code=code, origin_id=origin.id if origin else None)
-        g.cursor.execute('COMMIT')
-        logger.log_user(event.id, log_action)
-        flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
-    except Exception as e:  # pragma: no cover
-        g.cursor.execute('ROLLBACK')
-        logger.log('error', 'database', 'transaction failed', e)
-        flash(_('error transaction'), 'error')
-        url = url_for('event_index')
+    # g.cursor.execute('BEGIN')
+    # try:
+    log_action = 'insert'
+    if event:
+        log_action = 'update'
+        event.delete_links(['P117', 'P7', 'P24'])
+    else:
+        event = EntityMapper.insert(code, form.name.data)
+    event.name = form.name.data
+    event.description = form.description.data
+    event.set_dates(form)
+    event.update()
+    event.save_nodes(form)
+    if form.event.data:
+        entity = EntityMapper.get_by_id(form.event.data)
+        event.link('P117', entity)
+    if form.place.data:
+        place = LinkMapper.get_linked_entity(int(form.place.data), 'P53')
+        event.link('P7', place)
+    if event.class_.code == 'E8' and form.given_place.data:  # Link place for acquisition
+        places = [EntityMapper.get_by_id(i) for i in ast.literal_eval(form.given_place.data)]
+        event.link('P24', places)
+    url = url_for('event_view', id_=event.id)
+    if origin:
+        url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-event'
+        if origin.view_name == 'reference':
+            link_id = origin.link('P67', event)
+            url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
+        elif origin.view_name == 'source':
+            origin.link('P67', event)
+        elif origin.view_name == 'actor':
+            link_id = event.link('P11', origin)
+            url = url_for('involvement_update', id_=link_id, origin_id=origin.id)
+        elif origin.view_name == 'file':
+            origin.link('P67', event)
+    if form.continue_.data == 'yes':
+        url = url_for('event_insert', code=code, origin_id=origin.id if origin else None)
+    g.cursor.execute('COMMIT')
+    logger.log_user(event.id, log_action)
+    flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
+    # except Exception as e:  # pragma: no cover
+    #    g.cursor.execute('ROLLBACK')
+    #    logger.log('error', 'database', 'transaction failed', e)
+    #    flash(_('error transaction'), 'error')
+    #    url = url_for('event_index')
     return url

@@ -270,8 +270,8 @@ def display_form(self, form, form_id=None, for_persons=False):
         if field.type == 'SubmitField':
             html['footer'] += str(field)
             continue
-        if field.id.split('_', 1)[0] == 'date':  # if it's a date field use a function to add dates
-            if field.id == 'date_begin_year':
+        if field.id.split('_', 1)[0] in ('begin', 'end'):  # If it's a date field use a function to add dates
+            if field.id == 'begin_year_from':
                 html['footer'] += util.add_dates_to_form(form, for_persons)
             continue
         field.label.text += display_tooltip(field.description)

@@ -278,10 +278,10 @@ def get_entity_data(entity, location=None):
 def add_dates_to_form(form, for_person=False):
     errors = {}
     valid_dates = True
-    for field_name in ['date_begin_year', 'date_begin_month', 'date_begin_day',
-                       'date_begin_year2', 'date_begin_month2', 'date_begin_day2',
-                       'date_end_year', 'date_end_month', 'date_end_day',
-                       'date_end_year2', 'date_end_month2', 'date_end_day2']:
+    for field_name in ['begin_year_from', 'begin_month_from', 'begin_day_from',
+                       'begin_year_to', 'begin_month_to', 'begin_day_to',
+                       'end_year_from', 'end_month_from', 'end_day_from',
+                       'end_year_to', 'end_month_to', 'end_day_to']:
         errors[field_name] = ''
         if getattr(form, field_name).errors:
             valid_dates = False
@@ -301,32 +301,32 @@ def add_dates_to_form(form, for_person=False):
         </div>""".format(date=uc_first(_('date')), tooltip=display_tooltip(_('tooltip date')),
                          show=uc_first(_('show')))
     html += '<div class="table-row date-switch" ' + style + '>'
-    html += '<div>' + str(form.date_begin_year.label).title() + '</div><div class="table-cell">'
-    html += str(form.date_begin_year(class_='year')) + ' ' + errors['date_begin_year'] + ' '
-    html += str(form.date_begin_month(class_='month')) + ' ' + errors['date_begin_month'] + ' '
-    html += str(form.date_begin_day(class_='day')) + ' ' + errors['date_begin_day'] + ' '
-    html += str(form.date_begin_info())
+    html += '<div>' + uc_first(_('birth') if for_person else _('begin')) + '</div>'
+    html += '<div class="table-cell">'
+    html += str(form.begin_year_from(class_='year')) + ' ' + errors['begin_year_from'] + ' '
+    html += str(form.begin_month_from(class_='month')) + ' ' + errors['begin_month_from'] + ' '
+    html += str(form.begin_day_from(class_='day')) + ' ' + errors['begin_day_from'] + ' '
+    html += str(form.begin_comment)
     html += '</div></div>'
     html += '<div class="table-row date-switch" ' + style + '>'
     html += '<div></div><div class="table-cell">'
-    html += str(form.date_begin_year2(class_='year')) + ' ' + errors['date_begin_year2'] + ' '
-    html += str(form.date_begin_month2(class_='month')) + ' ' + errors['date_begin_month2'] + ' '
-    html += str(form.date_begin_day2(class_='day')) + ' ' + errors['date_begin_day2'] + ' '
-    html += str(form.date_birth) + str(form.date_birth.label) if for_person else ''
+    html += str(form.begin_year_to(class_='year')) + ' ' + errors['begin_year_to'] + ' '
+    html += str(form.begin_month_to(class_='month')) + ' ' + errors['begin_month_to'] + ' '
+    html += str(form.begin_day_to(class_='day')) + ' ' + errors['begin_day_to'] + ' '
     html += '</div></div>'
     html += '<div class="table-row date-switch" ' + style + '>'
-    html += '<div>' + str(form.date_end_year.label).title() + '</div><div class="table-cell">'
-    html += str(form.date_end_year(class_='year')) + ' ' + errors['date_end_year'] + ' '
-    html += str(form.date_end_month(class_='month')) + ' ' + errors['date_end_month'] + ' '
-    html += str(form.date_end_day(class_='day')) + ' ' + errors['date_end_day'] + ' '
-    html += str(form.date_end_info())
+    html += '<div>' + uc_first(_('death') if for_person else _('end')) + '</div>'
+    html += '<div class="table-cell">'
+    html += str(form.end_year_from(class_='year')) + ' ' + errors['end_year_from'] + ' '
+    html += str(form.end_month_from(class_='month')) + ' ' + errors['end_month_from'] + ' '
+    html += str(form.end_day_from(class_='day')) + ' ' + errors['end_day_from'] + ' '
+    html += str(form.end_comment)
     html += '</div></div>'
     html += '<div class="table-row date-switch"' + style + '>'
     html += '<div></div><div class="table-cell">'
-    html += str(form.date_end_year2(class_='year')) + ' ' + errors['date_end_year2'] + ' '
-    html += str(form.date_end_month2(class_='month')) + ' ' + errors['date_end_month2'] + ' '
-    html += str(form.date_end_day2(class_='day')) + ' ' + errors['date_end_day2'] + ' '
-    html += (str(form.date_death) + str(form.date_death.label)) if for_person else ''
+    html += str(form.end_year_to(class_='year')) + ' ' + errors['end_year_to'] + ' '
+    html += str(form.end_month_to(class_='month')) + ' ' + errors['end_month_to'] + ' '
+    html += str(form.end_day_to(class_='day')) + ' ' + errors['end_day_to'] + ' '
     html += '</div></div>'
     return html
 

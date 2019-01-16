@@ -50,7 +50,6 @@ def membership_insert(origin_id):
         try:
             for actor in EntityMapper.get_by_ids(ast.literal_eval(form.group.data)):
                 link_id = actor.link('P107', origin, form.description.data)
-                DateMapper.save_link_dates(link_id, form)
                 NodeMapper.save_link_nodes(link_id, form)
             g.cursor.execute('COMMIT')
             flash(_('entity created'), 'info')
@@ -76,7 +75,6 @@ def member_insert(origin_id):
         try:
             for actor in EntityMapper.get_by_ids(ast.literal_eval(form.actor.data)):
                 link_id = origin.link('P107', actor, form.description.data)
-                DateMapper.save_link_dates(link_id, form)
                 NodeMapper.save_link_nodes(link_id, form)
             g.cursor.execute('COMMIT')
             flash(_('entity created'), 'info')
@@ -104,7 +102,6 @@ def member_update(id_, origin_id):
         try:
             link_.delete()
             link_id = domain.link('P107', range_, form.description.data)
-            DateMapper.save_link_dates(link_id, form)
             NodeMapper.save_link_nodes(link_id, form)
             g.cursor.execute('COMMIT')
         except Exception as e:  # pragma: no cover

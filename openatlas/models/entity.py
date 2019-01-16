@@ -71,6 +71,18 @@ class Entity:
         from openatlas.models.node import NodeMapper
         NodeMapper.save_entity_nodes(self, form)
 
+    def set_dates(self, form):
+        self.begin_from = DateMapper.form_to_datetime64(
+            form.begin_year_from.data, form.begin_month_from.data, form.begin_day_from.data)
+        self.begin_to = DateMapper.form_to_datetime64(
+            form.begin_year_to.data, form.begin_month_to.data, form.begin_day_to.data)
+        self.end_from = DateMapper.form_to_datetime64(
+            form.end_year_from.data, form.end_month_from.data, form.end_day_from.data)
+        self.end_to = DateMapper.form_to_datetime64(
+            form.end_year_to.data, form.end_month_to.data, form.end_day_to.data)
+        self.begin_comment = form.begin_comment.data
+        self.end_comment = form.end_comment.data
+
     def get_profile_image_id(self):
         return EntityMapper.get_profile_image_id(self.id)
 
@@ -130,11 +142,24 @@ class EntityMapper:
     @staticmethod
     def update(entity):
         from openatlas.util.util import sanitize
+        print(DateMapper.datetime64_to_timestamp(entity.begin_from))
+        print(DateMapper.datetime64_to_timestamp(entity.begin_to))
+        print(DateMapper.datetime64_to_timestamp(entity.end_to))
+        print(DateMapper.datetime64_to_timestamp(entity.end_to))
         sql = """
-            UPDATE model.entity SET (name, description) = (%(name)s, %(description)s)
+            UPDATE model.entity SET
+            (name, description, begin_from, begin_to, begin_comment, end_from, end_to, end_comment) 
+                = (%(name)s, %(description)s, %(begin_from)s, %(begin_to)s, %(begin_comment)s, 
+                %(end_from)s, %(end_to)s, %(end_comment)s)
             WHERE id = %(id)s;"""
-        g.cursor.execute(sql, {'id': entity.id, 'name': entity.name,
-                               'description': sanitize(entity.description, 'description')})
+        g.cursor.execute(sql, {
+            'id': entity.id, 'name': entity.name,
+            'begin_from': DateMapper.datetime64_to_timestamp(entity.begin_from),
+            'begin_to': DateMapper.datetime64_to_timestamp(entity.begin_to),
+            'end_from': DateMapper.datetime64_to_timestamp(entity.end_from),
+            'end_to': DateMapper.datetime64_to_timestamp(entity.end_to),
+            'begin_comment': entity.begin_comment, 'end_comment': entity.end_comment,
+            'description': sanitize(entity.description, 'description')})
         debug_model['div sql'] += 1
 
     @staticmethod

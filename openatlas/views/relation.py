@@ -48,7 +48,6 @@ def relation_insert(origin_id):
                     link_id = actor.link('OA7', origin, form.description.data)
                 else:
                     link_id = origin.link('OA7', actor, form.description.data)
-                DateMapper.save_link_dates(link_id, form)
                 NodeMapper.save_link_nodes(link_id, form)
             g.cursor.execute('COMMIT')
             flash(_('entity created'), 'info')
@@ -80,7 +79,6 @@ def relation_update(id_, origin_id):
                 link_id = related.link('OA7', origin, form.description.data)
             else:
                 link_id = origin.link('OA7', related, form.description.data)
-            DateMapper.save_link_dates(link_id, form)
             NodeMapper.save_link_nodes(link_id, form)
             g.cursor.execute('COMMIT')
             flash(_('info update'), 'info')

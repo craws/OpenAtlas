@@ -229,8 +229,8 @@ def save(form, actor=None, code=None, origin=None):
             log_action = 'insert'
         actor.name = form.name.data
         actor.description = form.description.data
+        actor.set_dates(form)
         actor.update()
-        actor.save_dates(form)
         actor.save_nodes(form)
         url = url_for('actor_view', id_=actor.id)
         if form.residence.data:

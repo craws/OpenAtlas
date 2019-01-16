@@ -250,7 +250,6 @@ def save(form, object_=None, location=None, origin=None):
         object_.name = form.name.data
         object_.description = form.description.data
         object_.update()
-        object_.save_dates(form)
         object_.save_nodes(form)
         location.name = 'Location of ' + form.name.data
         location.update()

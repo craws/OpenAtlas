@@ -9,14 +9,14 @@ ALTER TABLE model.entity ADD COLUMN begin_to timestamp without time zone;
 ALTER TABLE model.entity ADD COLUMN begin_comment timestamp without time zone;
 ALTER TABLE model.entity ADD COLUMN end_from timestamp without time zone;
 ALTER TABLE model.entity ADD COLUMN end_to timestamp without time zone;
-ALTER TABLE model.entity ADD COLUMN end_comment timestamp without time zone;
+ALTER TABLE model.entity ADD COLUMN end_comment text;
 
 ALTER TABLE model.link ADD COLUMN begin_from timestamp without time zone;
 ALTER TABLE model.link ADD COLUMN begin_to timestamp without time zone;
 ALTER TABLE model.link ADD COLUMN begin_comment timestamp without time zone;
 ALTER TABLE model.link ADD COLUMN nd_from timestamp without time zone;
 ALTER TABLE model.link ADD COLUMN end_to timestamp without time zone;
-ALTER TABLE model.link ADD COLUMN end_comment timestamp without time zone;
+ALTER TABLE model.link ADD COLUMN end_comment text;
 
 DROP FUNCTION IF EXISTS model.delete_entity_related();
 CREATE FUNCTION model.delete_entity_related() RETURNS trigger
