@@ -240,20 +240,22 @@ def get_entity_data(entity, location=None):
             data.append((uc_first(_('alias')), '<br />'.join([x.name for x in aliases])))
 
     # Dates
-    date_types = OrderedDict([('OA1', _('first')), ('OA3', _('birth')), ('OA2', _('last')),
-                              ('OA4', _('death')), ('OA5', _('begin')), ('OA6', _('end'))])
-    for code, label in date_types.items():
-        if code in entity.dates:
-            if 'exact date value' in entity.dates[code]:
-                html = format_date(entity.dates[code]['exact date value']['date'])
-                html += ' ' + entity.dates[code]['exact date value']['info']
-                data.append((uc_first(label), html))
-            else:
-                html = uc_first(_('between')) + ' '
-                html += format_date(entity.dates[code]['from date value']['date'])
-                html += ' and ' + format_date(entity.dates[code]['to date value']['date'])
-                html += ' ' + entity.dates[code]['from date value']['info']
-                data.append((uc_first(label), html))
+    html = ''
+    if entity.begin_from:
+        html += format_date(entity.begin_from)
+    if entity.begin_to:
+        html += ' ' + uc_first(_('between')) + ' ' + format_date(entity.begin_from)
+    html += ' ' + entity.begin_comment if entity.begin_comment else ''
+    if html:
+        data.append((uc_first('begin'), html))
+    html = ''
+    if entity.end_from:
+        html += format_date(entity.end_from)
+    if entity.end_to:
+        html += ' ' + uc_first(_('between')) + ' ' + format_date(entity.end_from)
+    html += ' ' + entity.end_comment if entity.end_comment else ''
+    if html:
+        data.append((uc_first('end'), html))
 
     # Additional info for advanced layout
     if hasattr(current_user, 'settings') and current_user.settings['layout'] == 'advanced':

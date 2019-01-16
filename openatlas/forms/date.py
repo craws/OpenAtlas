@@ -1,7 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
-from wtforms import BooleanField, IntegerField, StringField
+from wtforms import IntegerField, StringField
 from wtforms.validators import NoneOf, NumberRange, Optional
 
 from openatlas.models.date import DateMapper
@@ -28,78 +28,53 @@ class DateForm(Form):
             return parts[1]
         return parts[2]
 
-    def populate_dates(self, param):
-        """ Populates the date form fields with date values of an entity or link
+    def populate_dates(self, item):
+        """ Populates date form fields with date values of an entity or link."""
+        self.begin_year.data = DateForm.format_date(item.begin_from, 'year')
+        self.begin_month.data = DateForm.format_date(item.begin_from, 'month')
+        self.begin_day.data = DateForm.format_date(item.begin_from, 'day')
+        self.begin_info.data = item.begin_from_comment
 
-        :param param: an entity or a link
-        """
-        for code, types in param.dates.items():
-            if code in ['OA1', 'OA3', 'OA5']:
-                for type_, date in types.items():
-                    if type_ in ['exact date value', 'from date value']:
-                        self.date_begin_year.data = DateForm.format_date(date['date'], 'year')
-                        self.date_begin_month.data = DateForm.format_date(date['date'], 'month')
-                        self.date_begin_day.data = DateForm.format_date(date['date'], 'day')
-                        self.date_begin_info.data = date['info']
-                    else:
-                        self.date_begin_year2.data = DateForm.format_date(date['date'], 'year')
-                        self.date_begin_month2.data = DateForm.format_date(date['date'], 'month')
-                        self.date_begin_day2.data = DateForm.format_date(date['date'], 'day')
-            else:
-                for type_, date in types.items():
-                    if type_ in ['exact date value', 'from date value']:
-                        self.date_end_year.data = DateForm.format_date(date['date'], 'year')
-                        self.date_end_month.data = DateForm.format_date(date['date'], 'month')
-                        self.date_end_day.data = DateForm.format_date(date['date'], 'day')
-                        self.date_end_info.data = date['info']
-                    else:
-                        self.date_end_year2.data = DateForm.format_date(date['date'], 'year')
-                        self.date_end_month2.data = DateForm.format_date(date['date'], 'month')
-                        self.date_end_day2.data = DateForm.format_date(date['date'], 'day')
-            if code == 'OA3':
-                self.date_birth.data = True
-            if code == 'OA4':
-                self.date_death.data = True
+        self.begin_year2.data = DateForm.format_date(item.begin_to, 'year')
+        self.begin_month2.data = DateForm.format_date(item.begin_to, 'month')
+        self.begin_day2.data = DateForm.format_date(item.begin_to, 'day')
 
-    date_birth = BooleanField(_('birth'))
-    date_death = BooleanField(_('death'))
-    date_begin_year = IntegerField(
-        _('begin'), render_kw={'placeholder': _('yyyy')},
-        validators=[Optional(), NumberRange(min=-4713, max=9999), NoneOf([0])])
-    date_begin_month = IntegerField(render_kw={'placeholder': _('mm')},
-                                    validators=[Optional(), NumberRange(min=1, max=12)])
-    date_begin_day = IntegerField(render_kw={'placeholder': _('dd')},
-                                  validators=[Optional(), NumberRange(min=1, max=31)])
-    date_begin_year2 = IntegerField(
-        render_kw={'placeholder': _('yyyy')},
-        validators=[Optional(), NumberRange(min=-4713, max=9999), NoneOf([0])])
-    date_begin_month2 = IntegerField(render_kw={'placeholder': _('mm')},
-                                     validators=[Optional(), NumberRange(min=1, max=12)])
-    date_begin_day2 = IntegerField(render_kw={'placeholder': _('dd')},
-                                   validators=[Optional(), NumberRange(min=1, max=31)])
-    date_begin_info = StringField(render_kw={'placeholder': _('comment')},)
-    date_end_year = IntegerField(
-        _('end'), render_kw={'placeholder': _('yyyy')},
-        validators=[Optional(), NumberRange(min=-4713, max=9999), NoneOf([0])])
-    date_end_month = IntegerField(render_kw={'placeholder': _('mm')},
-                                  validators=[Optional(), NumberRange(min=1, max=12)])
-    date_end_day = IntegerField(render_kw={'placeholder': _('dd')},
-                                validators=[Optional(), NumberRange(min=1, max=31)])
-    date_end_year2 = IntegerField(
-        render_kw={'placeholder': _('yyyy')},
-        validators=[Optional(), NumberRange(min=-4713, max=9999), NoneOf([0])])
-    date_end_month2 = IntegerField(render_kw={'placeholder': _('mm')},
-                                   validators=[Optional(), NumberRange(min=1, max=12)])
-    date_end_day2 = IntegerField(render_kw={'placeholder': _('dd')},
-                                 validators=[Optional(), NumberRange(min=1, max=31)])
-    date_end_info = StringField(render_kw={'placeholder': _('comment')})
+        self.end_year.data = DateForm.format_date(item.end_to, 'year')
+        self.end_month.data = DateForm.format_date(item.end_to, 'month')
+        self.end_day.data = DateForm.format_date(item.end_to, 'day')
+        self.end_info.data = item.end_comment
+
+        self.end_year2.data = DateForm.format_date(item.end_from, 'year')
+        self.end_month2.data = DateForm.format_date(item.end_from, 'month')
+        self.end_day2.data = DateForm.format_date(item.end_from, 'day')
+
+    validator_day = [Optional(), NumberRange(min=1, max=31)]
+    validator_month = [Optional(), NumberRange(min=1, max=12)]
+    validator_year = [Optional(), NumberRange(min=-4713, max=9999), NoneOf([0])]
+
+    begin_year = IntegerField(_('begin'), render_kw={'placeholder': _('yyyy')},
+                              validators=validator_year)
+    begin_month = IntegerField(render_kw={'placeholder': _('mm')}, validators=validator_month)
+    begin_day = IntegerField(render_kw={'placeholder': _('dd')}, validators=validator_day)
+    begin_year2 = IntegerField(render_kw={'placeholder': _('yyyy')}, validators=validator_year)
+    begin_month2 = IntegerField(render_kw={'placeholder': _('mm')}, validators=validator_month)
+    begin_day2 = IntegerField(render_kw={'placeholder': _('dd')}, validators=validator_day)
+    begin_info = StringField(render_kw={'placeholder': _('comment')},)
+    end_year = IntegerField(_('end'), render_kw={'placeholder': _('yyyy')},
+                            validators=validator_year)
+    end_month = IntegerField(render_kw={'placeholder': _('mm')}, validators=validator_month)
+    end_day = IntegerField(render_kw={'placeholder': _('dd')}, validators=validator_day)
+    end_year2 = IntegerField(render_kw={'placeholder': _('yyyy')}, validators=validator_year)
+    end_month2 = IntegerField(render_kw={'placeholder': _('mm')}, validators=validator_month)
+    end_day2 = IntegerField(render_kw={'placeholder': _('dd')}, validators=validator_day)
+    end_info = StringField(render_kw={'placeholder': _('comment')})
 
     def validate(self, extra_validators=None):
         valid = Form.validate(self)
         fields = {}  # put date form values in a dictionary
         for name in ['begin', 'end']:
             for item in ['year', 'month', 'day', 'year2', 'month2', 'day2']:
-                value = getattr(self, 'date_' + name + '_' + item).data
+                value = getattr(self, name + '_' + item).data
                 fields[name + '_' + item] = int(value) if value else ''
 
         # Check date format, if valid put dates into a dictionary
@@ -112,7 +87,7 @@ class DateForm(Form):
                         fields[name + '_' + 'month' + postfix],
                         fields[name + '_' + 'day' + postfix])
                     if not date:
-                        field = getattr(self, 'date_' + name + '_' + 'day' + postfix)
+                        field = getattr(self, name + '_' + 'day' + postfix)
                         field.errors.append(_('not a valid date'))
                         valid = False
                     else:
@@ -123,11 +98,11 @@ class DateForm(Form):
             for name in ['begin', 'end']:
                 if name in dates and name + '2' in dates:
                     if dates[name] > dates[name + '2']:
-                        field = getattr(self, 'date_' + name + '_day')
+                        field = getattr(self, name + '_day')
                         field.errors.append(_('First date cannot be after second.'))
                         valid = False
         if valid and 'begin' in dates and 'end' in dates:
-            field = getattr(self, 'date_begin_day')
+            field = getattr(self, 'begin_day')
             if len(dates) == 4:  # All dates are used
                 if dates['begin'] > dates['end'] or dates['begin2'] > dates['end2']:
                     field.errors.append(_('Begin dates cannot start after end dates.'))

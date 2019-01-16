@@ -92,6 +92,5 @@ def relation_update(id_, origin_id):
     if origin.id == range_.id:
         form.inverse.data = True
     form.save.label.text = _('save')
-    link_.set_dates()
     form.populate_dates(link_)
     return render_template('relation/update.html', origin=origin, form=form, related=related)

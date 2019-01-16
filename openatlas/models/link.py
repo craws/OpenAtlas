@@ -20,19 +20,21 @@ class Link:
         self.nodes = dict()
         if hasattr(row, 'type_id') and row.type_id:
             self.nodes[g.nodes[row.type_id]] = None
-        self.first = int(row.first) if hasattr(row, 'first') and row.first else None
-        self.last = int(row.last) if hasattr(row, 'last') and row.last else None
-        self.dates = {}
+        if hasattr(row, 'begin_from'):
+            self.begin_from = row.begin_from
+            self.begin_to = row.begin_to
+            self.begin_comment = row.begin_comment
+            self.end_from = row.end_from
+            self.end_to = row.end_to
+            self.end_comment = row.end_comment
+            self.first = row.begin_from
+            self.last = row.end_to if row.end_to else row.end_from
 
     def update(self):
         LinkMapper.update(self)
 
     def delete(self):
         LinkMapper.delete(self.id)
-
-    def set_dates(self):
-        from openatlas.models.date import DateMapper
-        self.dates = DateMapper.get_link_dates(self)
 
 
 class LinkMapper:
@@ -112,9 +114,8 @@ class LinkMapper:
         from openatlas.models.entity import EntityMapper
         sql = """
             SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description, l.created,
+                l.begin_from, l.begin_to, l.begin_comment, l.end_from, l.end_to, l.end_comment,
                 l.modified, e.name,
-                min(date_part('year', d1.value_timestamp)) AS first,
-                max(date_part('year', d2.value_timestamp)) AS last,
                 (SELECT t.id FROM model.entity t
                     JOIN model.link_property lp ON t.id = lp.range_id
                         AND lp.domain_id = l.id
@@ -122,10 +123,6 @@ class LinkMapper:
                 ) AS type_id
             FROM model.link l
             JOIN model.entity e ON l.{second}_id = e.id AND l.property_code IN %(codes)s
-            LEFT JOIN model.link_property dl1 ON l.id = dl1.domain_id AND dl1.property_code = 'OA5'
-            LEFT JOIN model.entity d1 ON dl1.range_id = d1.id
-            LEFT JOIN model.link_property dl2 ON l.id = dl2.domain_id AND dl2.property_code = 'OA6'
-            LEFT JOIN model.entity d2 ON dl2.range_id = d2.id
             WHERE l.{first}_id = %(entity_id)s GROUP BY l.id, e.name ORDER BY e.name;""".format(
             first='range' if inverse else 'domain', second='domain' if inverse else 'range')
         g.cursor.execute(sql, {
@@ -154,20 +151,15 @@ class LinkMapper:
     def get_by_id(id_):
         sql = """
             SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description, l.created,
+                l.begin_from, l.begin_to, l.begin_comment, l.end_from, l.end_to, l.end_comment,
                 l.modified,
-                min(date_part('year', d1.value_timestamp)) AS first,
-                max(date_part('year', d2.value_timestamp)) AS last,
                 (SELECT t.id FROM model.entity t
                     JOIN model.link_property lp ON t.id = lp.range_id
                         AND lp.domain_id = l.id
                         And lp.property_code = 'P2'
                 ) AS type_id
             FROM model.link l
-            LEFT JOIN model.link_property dl1 ON l.id = dl1.domain_id AND dl1.property_code = 'OA5'
-            LEFT JOIN model.entity d1 ON dl1.range_id = d1.id
-            LEFT JOIN model.link_property dl2 ON l.id = dl2.domain_id AND dl2.property_code = 'OA6'
-            LEFT JOIN model.entity d2 ON dl2.range_id = d2.id
-            WHERE l.id = %(id)s GROUP BY l.id;"""
+            WHERE l.id = %(id)s;"""
         g.cursor.execute(sql, {'id': id_})
         debug_model['link sql'] += 1
         return Link(g.cursor.fetchone())

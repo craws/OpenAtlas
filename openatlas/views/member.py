@@ -114,7 +114,6 @@ def member_update(id_, origin_id):
         tab = '#tab-member-of' if origin.id == range_.id else '#tab-member'
         return redirect(url_for('actor_view', id_=origin.id) + tab)
     form.save.label.text = _('save')
-    link_.set_dates()
     form.populate_dates(link_)
     related = range_ if origin_id == domain.id else domain
     return render_template('member/update.html', origin=origin, form=form, related=related)

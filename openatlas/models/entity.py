@@ -27,10 +27,16 @@ class Entity:
         self.system_type = row.system_type
         self.created = row.created
         self.modified = row.modified
-        self.first = int(row.first) if hasattr(row, 'first') and row.first else None
-        self.last = int(row.last) if hasattr(row, 'last') and row.last else None
+        if hasattr(row, 'begin_from'):
+            self.begin_from = row.begin_from
+            self.begin_to = row.begin_to
+            self.begin_comment = row.begin_comment
+            self.end_from = row.end_from
+            self.end_to = row.end_to
+            self.end_comment = row.end_comment
+            self.first = row.begin_from
+            self.last = row.end_to if row.end_to else row.end_from
         self.class_ = g.classes[row.class_code]
-        self.dates = {}
         self.view_name = None  # view_name is used to build urls
         if self.system_type == 'file':
             self.view_name = 'file'
@@ -61,15 +67,9 @@ class Entity:
     def update(self):
         EntityMapper.update(self)
 
-    def save_dates(self, form):
-        DateMapper.save_dates(self, form)
-
     def save_nodes(self, form):
         from openatlas.models.node import NodeMapper
         NodeMapper.save_entity_nodes(self, form)
-
-    def set_dates(self):
-        self.dates = DateMapper.get_dates(self)
 
     def get_profile_image_id(self):
         return EntityMapper.get_profile_image_id(self.id)
@@ -109,22 +109,12 @@ class EntityMapper:
     sql = """
         SELECT
             e.id, e.class_code, e.name, e.description, e.created, e.modified, e.system_type,
+            e.begin_from, e.begin_to, e.begin_comment, e.end_from, e.end_to, e.end_comment,
             array_to_json(
                 array_agg((t.range_id, t.description)) FILTER (WHERE t.range_id IS NOT NULL)
-            ) as nodes,
-            min(date_part('year', d1.value_timestamp)) AS first,
-            max(date_part('year', d2.value_timestamp)) AS last
-
+            ) as nodes
         FROM model.entity e
-        LEFT JOIN model.link t ON e.id = t.domain_id AND t.property_code IN ('P2', 'P89')
-
-        LEFT JOIN model.link dl1 ON e.id = dl1.domain_id
-            AND dl1.property_code IN ('OA1', 'OA3', 'OA5')
-        LEFT JOIN model.entity d1 ON dl1.range_id = d1.id
-
-        LEFT JOIN model.link dl2 ON e.id = dl2.domain_id
-            AND dl2.property_code IN ('OA2', 'OA4', 'OA6')
-        LEFT JOIN model.entity d2 ON dl2.range_id = d2.id"""
+        LEFT JOIN model.link t ON e.id = t.domain_id AND t.property_code IN ('P2', 'P89')"""
 
     sql_orphan = """
         SELECT e.id FROM model.entity e

@@ -99,7 +99,6 @@ def involvement_update(id_, origin_id):
         return redirect(url_for(origin.view_name + '_view', id_=origin.id) + '#tab-' + tab)
     form.activity.data = link_.property.code
     form.description.data = link_.description
-    link_.set_dates()
     form.populate_dates(link_)
     return render_template('involvement/update.html', origin=origin, form=form,
                            linked_object=event if origin_id != event.id else actor)

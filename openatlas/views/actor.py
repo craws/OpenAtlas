@@ -32,7 +32,6 @@ class ActorForm(DateForm):
 @required_group('readonly')
 def actor_view(id_):
     actor = EntityMapper.get_by_id(id_)
-    actor.set_dates()
     objects = []
     info = get_entity_data(actor)
     residence = actor.get_linked_entity('P74')
@@ -195,7 +194,6 @@ def actor_delete(id_):
 @required_group('editor')
 def actor_update(id_):
     actor = EntityMapper.get_by_id(id_)
-    actor.set_dates()
     code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
     form = build_form(ActorForm, code_class[actor.class_.code], actor, request)
     if form.validate_on_submit():

@@ -80,7 +80,6 @@ def event_delete(id_):
 @required_group('editor')
 def event_update(id_):
     event = EntityMapper.get_by_id(id_)
-    event.set_dates()
     form = build_form(EventForm, 'Event', event, request)
     if event.class_.code != 'E8':
         del form.given_place
@@ -106,7 +105,6 @@ def event_update(id_):
 @required_group('readonly')
 def event_view(id_):
     event = EntityMapper.get_by_id(id_)
-    event.set_dates()
     tables = {
         'info': get_entity_data(event),
         'file': {'id': 'files', 'data': [],

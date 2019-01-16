@@ -21,31 +21,6 @@ class DateMapper:
             minute=str(today.minute).zfill(2))
 
     @staticmethod
-    def get_dates(entity):
-        sql = """
-            SELECT
-                COALESCE(to_char(e2.value_timestamp, 'yyyy-mm-dd BC'), '') AS value_timestamp,
-                e2.description,
-                e2.system_type,
-                l.property_code
-            FROM model.entity e
-            JOIN model.link l ON e.id = l.domain_id
-                AND l.property_code IN ('OA1', 'OA2', 'OA3', 'OA4', 'OA5', 'OA6')
-            JOIN model.entity e2 ON l.range_id = e2.id
-            WHERE e.id = %(id)s;"""
-        g.cursor.execute(sql, {'id': entity.id})
-        debug_model['div sql'] += 1
-        dates = {}
-        for row in g.cursor.fetchall():
-            if row.property_code not in dates:
-                dates[row.property_code] = {}
-            dates[row.property_code][row.system_type] = {
-                'date': DateMapper.timestamp_to_datetime64(row.value_timestamp),
-                'info': row.description if row.description else ''}
-        debug_model['div sql'] += 1
-        return dates
-
-    @staticmethod
     def timestamp_to_datetime64(string):
         """ Converts a timestamp string to a numpy.datetime64
         :param string: PostgreSQL timestamp
@@ -122,36 +97,9 @@ class DateMapper:
         return dates
 
     @staticmethod
-    def save_dates(entity, form):
-        if entity.dates:
-            DateMapper.delete_dates(entity)
-        code_begin = 'OA1'
-        code_end = 'OA2'
-        if entity.class_.code in app.config['CLASS_CODES']['event']:
-            code_begin = 'OA5'
-            code_end = 'OA6'
-        if entity.class_.code == 'E21':
-            if form.date_birth.data:
-                code_begin = 'OA3'
-            if form.date_death.data:
-                code_end = 'OA4'
-        DateMapper.save_date(entity, form, 'begin', code_begin, LinkMapper)
-        DateMapper.save_date(entity, form, 'end', code_end, LinkMapper)
-
-    @staticmethod
     def save_link_dates(link_id, form):
         DateMapper.save_date(link_id, form, 'begin', 'OA5', LinkPropertyMapper)
         DateMapper.save_date(link_id, form, 'end', 'OA6', LinkPropertyMapper)
-
-    @staticmethod
-    def delete_dates(entity):
-        sql = """
-            DELETE FROM model.entity WHERE id in (
-                SELECT e.id FROM model.entity e
-                JOIN model.link l ON e.id = l.range_id AND l.domain_id = %(entity_id)s
-                    AND l.property_code IN ('OA1', 'OA2', 'OA3', 'OA4', 'OA5', 'OA6'));"""
-        g.cursor.execute(sql, {'entity_id': entity.id})
-        debug_model['div sql'] += 1
 
     @staticmethod
     def save_date(id_, form, name, code, link_mapper):
@@ -192,6 +140,7 @@ class DateMapper:
 
     @staticmethod
     def get_invalid_dates():
+        return []
         """ Search for entities with invalid date combinations, e.g. begin after end"""
         from openatlas.models.entity import EntityMapper
         sql = """
