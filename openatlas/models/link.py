@@ -5,6 +5,7 @@ from flask import abort, flash, g
 from flask_babel import lazy_gettext as _
 
 from openatlas import debug_model, logger
+from openatlas.models.date import DateMapper
 
 
 class Link:
@@ -35,6 +36,18 @@ class Link:
 
     def delete(self):
         LinkMapper.delete(self.id)
+
+    def set_dates(self, form):
+        self.begin_from = DateMapper.form_to_datetime64(
+            form.begin_year_from.data, form.begin_month_from.data, form.begin_day_from.data)
+        self.begin_to = DateMapper.form_to_datetime64(
+            form.begin_year_to.data, form.begin_month_to.data, form.begin_day_to.data)
+        self.end_from = DateMapper.form_to_datetime64(
+            form.end_year_from.data, form.end_month_from.data, form.end_day_from.data)
+        self.end_to = DateMapper.form_to_datetime64(
+            form.end_year_to.data, form.end_month_to.data, form.end_day_to.data)
+        self.begin_comment = form.begin_comment.data
+        self.end_comment = form.end_comment.data
 
 
 class LinkMapper:
@@ -74,10 +87,8 @@ class LinkMapper:
                 VALUES (%(property_code)s, %(domain_id)s, %(range_id)s, %(description)s)
                 RETURNING id;"""
             # Todo: build only one sql and get execution out of loop
-            g.cursor.execute(sql, {'property_code': property_code,
-                                   'domain_id': domain.id,
-                                   'range_id': range_.id,
-                                   'description': description})
+            g.cursor.execute(sql, {'property_code': property_code, 'domain_id': domain.id,
+                                   'range_id': range_.id, 'description': description})
             debug_model['link sql'] += 1
             result = g.cursor.fetchone()[0]
         return result
@@ -174,14 +185,24 @@ class LinkMapper:
 
     @staticmethod
     def update(link):
-        sql = """UPDATE model.link SET (property_code, domain_id, range_id, description) =
-            (%(property_code)s, %(domain_id)s, %(range_id)s, %(description)s) WHERE id = %(id)s;"""
+        sql = """
+            UPDATE model.link SET (property_code, domain_id, range_id, description,
+                begin_from, begin_to, begin_comment, end_from, end_to, end_comment) =
+                (%(property_code)s, %(domain_id)s, %(range_id)s, %(description)s, %(begin_from)s,
+                %(begin_to)s, %(begin_comment)s, %(end_from)s, %(end_to)s, %(end_comment)s)
+            WHERE id = %(id)s;"""
         g.cursor.execute(sql, {
             'id': link.id,
             'property_code': link.property.code,
             'domain_id': link.domain.id,
             'range_id': link.range.id,
-            'description': link.description})
+            'description': link.description,
+            'begin_from': DateMapper.datetime64_to_timestamp(link.begin_from),
+            'begin_to': DateMapper.datetime64_to_timestamp(link.begin_to),
+            'begin_comment': link.begin_comment,
+            'end_from':  DateMapper.datetime64_to_timestamp(link.end_from),
+            'end_to':  DateMapper.datetime64_to_timestamp(link.end_to),
+            'end_comment':  link.end_comment})
         debug_model['link sql'] += 1
 
     @staticmethod

@@ -6,14 +6,14 @@ BEGIN;
 
 ALTER TABLE model.entity ADD COLUMN begin_from timestamp without time zone;
 ALTER TABLE model.entity ADD COLUMN begin_to timestamp without time zone;
-ALTER TABLE model.entity ADD COLUMN begin_comment timestamp without time zone;
+ALTER TABLE model.entity ADD COLUMN begin_comment text;
 ALTER TABLE model.entity ADD COLUMN end_from timestamp without time zone;
 ALTER TABLE model.entity ADD COLUMN end_to timestamp without time zone;
 ALTER TABLE model.entity ADD COLUMN end_comment text;
 
 ALTER TABLE model.link ADD COLUMN begin_from timestamp without time zone;
 ALTER TABLE model.link ADD COLUMN begin_to timestamp without time zone;
-ALTER TABLE model.link ADD COLUMN begin_comment timestamp without time zone;
+ALTER TABLE model.link ADD COLUMN begin_comment text;
 ALTER TABLE model.link ADD COLUMN nd_from timestamp without time zone;
 ALTER TABLE model.link ADD COLUMN end_to timestamp without time zone;
 ALTER TABLE model.link ADD COLUMN end_comment text;

@@ -12,7 +12,7 @@ from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  get_profile_image_table_link, is_authorized, link, required_group,
-                                 truncate_string, uc_first, was_modified)
+                                 truncate_string, uc_first, was_modified, format_date)
 
 
 class ActorForm(DateForm):
@@ -84,20 +84,19 @@ def actor_view(id_):
     # Todo: Performance - getting every place of every object for every event is very costly
     for link_ in actor.get_links(['P11', 'P14', 'P22', 'P23'], True):
         event = link_.domain
-        first = link_.first
+        first = format_date(link_.first)
         place = event.get_linked_entity('P7')
         if place:
             objects.append(place.get_linked_entity('P53', True))
         if not link_.first and event.first:
-            first = '<span class="inactive" style="float:right">' + str(event.first) + '</span>'
-        last = link_.last
+            first = '<span class="inactive" style="float:right">' + format_date(event.first) + \
+                    '</span>'
+        last = format_date(link_.last)
         if not link_.last and event.last:
-            last = '<span class="inactive" style="float:right">' + str(event.last) + '</span>'
-        data = ([link(event),
-                 g.classes[event.class_.code].name,
-                 link_.type.name if link_.type else '',
-                 first,
-                 last,
+            last = '<span class="inactive" style="float:right">' + format_date(event.last) + \
+                   '</span>'
+        data = ([link(event), g.classes[event.class_.code].name,
+                 link_.type.name if link_.type else '', first, last,
                  truncate_string(link_.description)])
         if is_authorized('editor'):
             update_url = url_for('involvement_update', id_=link_.id, origin_id=actor.id)
@@ -112,7 +111,8 @@ def actor_view(id_):
         else:
             type_ = link_.type.get_name_directed(True) if link_.type else ''
             related = link_.domain
-        data = ([type_, link(related), link_.first, link_.last, truncate_string(link_.description)])
+        data = ([type_, link(related), format_date(link_.first), format_date(link_.last),
+                 truncate_string(link_.description)])
         if is_authorized('editor'):
             update_url = url_for('relation_update', id_=link_.id, origin_id=actor.id)
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-relation'
