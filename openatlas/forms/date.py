@@ -49,7 +49,6 @@ class DateForm(Form):
 
     def populate_dates(self, item):
         """ Populates date form fields with date values of an entity or link."""
-        print(item.begin_from)
         if item.begin_from:
             self.begin_year_from.data = DateForm.format_date(item.begin_from, 'year')
             self.begin_month_from.data = DateForm.format_date(item.begin_from, 'month')
@@ -71,37 +70,31 @@ class DateForm(Form):
 
     def validate(self, extra_validators=None):
         valid = Form.validate(self)
-        fields = {}  # put date form values in a dictionary
-        for name in ['begin', 'end']:
-            for item in ['year_from', 'month_from', 'day_from', 'year_to', 'month_to', 'day_to']:
-                value = getattr(self, name + '_' + item).data
-                fields[name + '_' + item] = int(value) if value else ''
 
-        # Check date format, if valid put dates into a dictionary
+        # Check date format, if valid put dates into a list called "dates"
         dates = {}
-        for name in ['begin_', 'end_']:
+        for prefix in ['begin_', 'end_']:
             for postfix in ['_from', '_to']:
-                if fields[name + 'year' + postfix]:
+                if getattr(self, prefix + 'year' + postfix).data:
                     date = DateMapper.form_to_datetime64(
-                        fields[name + 'year' + postfix],
-                        fields[name + 'month' + postfix],
-                        fields[name + 'day' + postfix])
+                        getattr(self, prefix + 'year' + postfix).data,
+                        getattr(self, prefix + 'month' + postfix).data,
+                        getattr(self, prefix + 'day' + postfix).data)
                     if not date:
-                        field = getattr(self, name + 'day' + postfix)
-                        field.errors.append(_('not a valid date'))
+                        getattr(self, prefix + 'day' + postfix).errors.append(_('not a valid date'))
                         valid = False
                     else:
-                        dates[name + postfix] = date
+                        dates[prefix + postfix.replace('_', '')] = date
 
         # Check for valid date combination e.g. begin not after end
         if valid:
-            for name in ['begin', 'end']:
-                if name + '_from' in dates and name + '_to' in dates:
-                    if dates[name] > dates[name + '_to']:
-                        field = getattr(self, name + '_day')
+            for prefix in ['begin', 'end']:
+                if prefix + '_from' in dates and prefix + '_to' in dates:
+                    if dates[prefix + '_from'] > dates[prefix + '_to']:
+                        field = getattr(self,  prefix + '_day_from')
                         field.errors.append(_('First date cannot be after second.'))
                         valid = False
-        if valid and 'begin' in dates and 'end' in dates:
+        if valid and 'begin_from' in dates and 'end_from' in dates:
             field = getattr(self, 'begin_day_from')
             if len(dates) == 4:  # All dates are used
                 if dates['begin_from'] > dates['end_from'] or dates['begin_to'] > dates['end_to']:

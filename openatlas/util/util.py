@@ -244,7 +244,7 @@ def get_entity_data(entity, location=None):
     if entity.begin_from:
         html += format_date(entity.begin_from)
     if entity.begin_to:
-        html += ' ' + uc_first(_('between')) + ' ' + format_date(entity.begin_from)
+        html += ' ' + uc_first(_('between')) + ' ' + format_date(entity.begin_to)
     html += ' ' + entity.begin_comment if entity.begin_comment else ''
     if html:
         data.append((uc_first('begin'), html))
@@ -252,7 +252,7 @@ def get_entity_data(entity, location=None):
     if entity.end_from:
         html += format_date(entity.end_from)
     if entity.end_to:
-        html += ' ' + uc_first(_('between')) + ' ' + format_date(entity.end_from)
+        html += ' ' + uc_first(_('between')) + ' ' + format_date(entity.end_to)
     html += ' ' + entity.end_comment if entity.end_comment else ''
     if html:
         data.append((uc_first('end'), html))
@@ -568,8 +568,8 @@ def get_base_table_data(entity, file_stats=None):
             data.append(print_file_size(entity))
             data.append(print_file_extension(entity))
     if entity.view_name in ['event', 'actor', 'place']:
-        data.append(format(entity.first))
-        data.append(format(entity.last))
+        data.append(format_date(entity.first))
+        data.append(format_date(entity.last))
     if entity.view_name in ['source'] or entity.system_type == 'file':
         data.append(truncate_string(entity.description))
     return data

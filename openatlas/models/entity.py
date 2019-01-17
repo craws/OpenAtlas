@@ -142,10 +142,6 @@ class EntityMapper:
     @staticmethod
     def update(entity):
         from openatlas.util.util import sanitize
-        print(DateMapper.datetime64_to_timestamp(entity.begin_from))
-        print(DateMapper.datetime64_to_timestamp(entity.begin_to))
-        print(DateMapper.datetime64_to_timestamp(entity.end_to))
-        print(DateMapper.datetime64_to_timestamp(entity.end_to))
         sql = """
             UPDATE model.entity SET
             (name, description, begin_from, begin_to, begin_comment, end_from, end_to, end_comment) 
