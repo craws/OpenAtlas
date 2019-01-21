@@ -30,12 +30,7 @@ class TestBaseCase(unittest.TestCase):
             port=app.config['DATABASE_PORT'])
         connection.autocommit = True
         cursor = connection.cursor()
-        for file_name in [
-            'structure.sql',
-            'data_web.sql',
-            'data_model.sql',
-            'data_node.sql',
-            'data_test.sql'
-        ]:
+        for file_name in ['1_structure.sql', '2_data_web.sql', '3_data_model.sql',
+                          '4_data_node.sql', 'data_test.sql']:
             with open(os.path.dirname(__file__) + '/../install/' + file_name) as sqlFile:
                 cursor.execute(sqlFile.read())

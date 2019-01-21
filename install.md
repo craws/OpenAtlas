@@ -37,17 +37,28 @@ Copy the files to /var/www/your_site_name or clone OpenAtlas from GitHub
 
 ### Database
 
-Important!
-A user with user name "OpenAtlas" and password "change_me_PLEASE!" is created.
-Change this account immediately!
+The commands below have to be executed as postgres.
 
-As postgres
+Create an openatlas database user
 
     $ createuser openatlas -P
+
+Create an openatlas database, make openatlas the owner of it
+
     $ createdb openatlas -O openatlas
+
+Add the postgis extension to the database
+
     $ psql openatlas -c "CREATE EXTENSION postgis;"
+
+Import the scripts: 1_structure.sql,  2_data_web.sql,  3_data_model.sql, 4_data_node.sql
+
     $ cd install
-    $ cat structure.sql data_web.sql data_model.sql data_node.sql | psql -d openatlas -f -
+    $ cat 1_structure.sql 2_data_web.sql 3_data_model.sql 4_data_node.sql | psql -d openatlas -f -
+
+**Important!** A user with user name "OpenAtlas" and password "change_me_PLEASE!" is created.
+
+**Change this account immediately!**
 
 ### Configuration
 
