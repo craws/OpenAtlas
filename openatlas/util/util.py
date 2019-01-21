@@ -126,14 +126,13 @@ def sanitize(string, mode=None):
 
 
 def get_file_stats(path=app.config['UPLOAD_FOLDER_PATH']):
-    # Build a dict with file ids and stats from existing files in directory
-    # It's much faster to do this in one call instead for every file
+    """ Build a dict with file ids and stats from files in given directory.
+        It's much faster to do this in one call for every file."""
     file_stats = {}
     for file in os.scandir(path):
         split_name = os.path.splitext(file.name)
         if len(split_name) > 1 and split_name[0].isdigit():
-            file_stats[int(split_name[0])] = {'ext': split_name[1],
-                                              'size': file.stat().st_size,
+            file_stats[int(split_name[0])] = {'ext': split_name[1], 'size': file.stat().st_size,
                                               'date': file.stat().st_ctime}
     return file_stats
 
