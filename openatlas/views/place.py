@@ -1,6 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import flash, g, render_template, request, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import format_date, lazy_gettext as _
 from werkzeug.utils import redirect
 from wtforms import FieldList, HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
@@ -10,8 +10,8 @@ from openatlas.forms.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper, InvalidGeomException
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 is_authorized, link, required_group, truncate_string, uc_first,
-                                 was_modified, get_profile_image_table_link)
+                                 get_profile_image_table_link, is_authorized, link, required_group,
+                                 truncate_string, uc_first, was_modified)
 
 
 class PlaceForm(DateForm):
@@ -145,8 +145,8 @@ def place_view(id_):
             link(actor),
             g.properties[link_.property.code].name,
             actor.class_.name,
-            actor.first,
-            actor.last])
+            format_date(actor.first),
+            format_date(actor.last)])
     gis_data = GisMapper.get_all(object_) if location else None
     if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]':
         gis_data = None

@@ -10,9 +10,9 @@ from openatlas import app, logger
 from openatlas.forms.forms import DateForm, TableField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
-from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 get_profile_image_table_link, is_authorized, link, required_group,
-                                 truncate_string, uc_first, was_modified, format_date)
+from openatlas.util.util import (display_remove_link, format_date, get_base_table_data,
+                                 get_entity_data, get_profile_image_table_link, is_authorized, link,
+                                 required_group, truncate_string, uc_first, was_modified)
 
 
 class ActorForm(DateForm):
@@ -122,8 +122,8 @@ def actor_view(id_):
     for link_ in actor.get_links('P107', True):
         data = ([link(link_.domain),
                  link_.type.name if link_.type else '',
-                 link_.first,
-                 link_.last,
+                 format_date(link_.first),
+                 format_date(link_.last),
                  truncate_string(link_.description)])
         if is_authorized('editor'):
             update_url = url_for('member_update', id_=link_.id, origin_id=actor.id)
@@ -137,8 +137,8 @@ def actor_view(id_):
         for link_ in actor.get_links('P107'):
             data = ([link(link_.range),
                      link_.type.name if link_.type else '',
-                     link_.first,
-                     link_.last,
+                     format_date(link_.first),
+                     format_date(link_.last),
                      truncate_string(link_.description)])
             if is_authorized('editor'):
                 update_url = url_for('member_update', id_=link_.id, origin_id=actor.id)

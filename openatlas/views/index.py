@@ -38,8 +38,8 @@ def index():
             tables['bookmarks']['data'].append([
                 link(entity),
                 g.classes[entity.class_.code].name,
-                entity.first,
-                entity.last,
+                format_date(entity.first),
+                format_date(entity.last),
                 bookmark_toggle(entity.id, True)])
         for name, count in EntityMapper.get_overview_counts().items():
             count = format_number(count) if count else ''
@@ -49,8 +49,8 @@ def index():
             tables['latest']['data'].append([
                 link(entity),
                 g.classes[entity.class_.code].name,
-                entity.first,
-                entity.last,
+                format_date(entity.first),
+                format_date(entity.last),
                 format_date(entity.created),
                 link(logger.get_log_for_advanced_view(entity.id)['creator'])])
     intro = ContentMapper.get_translation('intro')

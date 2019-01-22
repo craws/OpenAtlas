@@ -11,10 +11,9 @@ from openatlas import app, logger
 from openatlas.forms.forms import DateForm, TableField, TableMultiField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 is_authorized, link, required_group,
-                                 truncate_string, uc_first, was_modified,
-                                 get_profile_image_table_link)
+from openatlas.util.util import (display_remove_link, format_date, get_base_table_data,
+                                 get_entity_data, get_profile_image_table_link, is_authorized, link,
+                                 required_group, truncate_string, uc_first, was_modified)
 
 
 class EventForm(DateForm):
@@ -116,12 +115,14 @@ def event_view(id_):
         'reference': {'id': 'reference', 'data': [],
                       'header': app.config['TABLE_HEADERS']['reference'] + ['pages']}}
     for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
-        first = link_.first
+        first = format_date(link_.first)
         if not link_.first and event.first:
-            first = '<span class="inactive" style="float:right">' + str(event.first) + '</span>'
+            first = '<span class="inactive" style="float:right">' + format_date(event.first) + \
+                    '</span>'
         last = link_.last
         if not link_.last and event.last:
-            last = '<span class="inactive" style="float:right">' + str(event.last) + '</span>'
+            last = '<span class="inactive" style="float:right">' + format_date(event.last) + \
+                   '</span>'
         data = ([link(link_.range),
                  g.classes[link_.range.class_.code].name,
                  link_.type.name if link_.type else '',
@@ -158,49 +159,49 @@ def event_view(id_):
 
 
 def save(form, event=None, code=None, origin=None):
-    # g.cursor.execute('BEGIN')
-    # try:
-    log_action = 'insert'
-    if event:
-        log_action = 'update'
-        event.delete_links(['P117', 'P7', 'P24'])
-    else:
-        event = EntityMapper.insert(code, form.name.data)
-    event.name = form.name.data
-    event.description = form.description.data
-    event.set_dates(form)
-    event.update()
-    event.save_nodes(form)
-    if form.event.data:
-        entity = EntityMapper.get_by_id(form.event.data)
-        event.link('P117', entity)
-    if form.place.data:
-        place = LinkMapper.get_linked_entity(int(form.place.data), 'P53')
-        event.link('P7', place)
-    if event.class_.code == 'E8' and form.given_place.data:  # Link place for acquisition
-        places = [EntityMapper.get_by_id(i) for i in ast.literal_eval(form.given_place.data)]
-        event.link('P24', places)
-    url = url_for('event_view', id_=event.id)
-    if origin:
-        url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-event'
-        if origin.view_name == 'reference':
-            link_id = origin.link('P67', event)
-            url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
-        elif origin.view_name == 'source':
-            origin.link('P67', event)
-        elif origin.view_name == 'actor':
-            link_id = event.link('P11', origin)
-            url = url_for('involvement_update', id_=link_id, origin_id=origin.id)
-        elif origin.view_name == 'file':
-            origin.link('P67', event)
-    if form.continue_.data == 'yes':
-        url = url_for('event_insert', code=code, origin_id=origin.id if origin else None)
-    g.cursor.execute('COMMIT')
-    logger.log_user(event.id, log_action)
-    flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
-    # except Exception as e:  # pragma: no cover
-    #    g.cursor.execute('ROLLBACK')
-    #    logger.log('error', 'database', 'transaction failed', e)
-    #    flash(_('error transaction'), 'error')
-    #    url = url_for('event_index')
+    g.cursor.execute('BEGIN')
+    try:
+        log_action = 'insert'
+        if event:
+            log_action = 'update'
+            event.delete_links(['P117', 'P7', 'P24'])
+        else:
+            event = EntityMapper.insert(code, form.name.data)
+        event.name = form.name.data
+        event.description = form.description.data
+        event.set_dates(form)
+        event.update()
+        event.save_nodes(form)
+        if form.event.data:
+            entity = EntityMapper.get_by_id(form.event.data)
+            event.link('P117', entity)
+        if form.place.data:
+            place = LinkMapper.get_linked_entity(int(form.place.data), 'P53')
+            event.link('P7', place)
+        if event.class_.code == 'E8' and form.given_place.data:  # Link place for acquisition
+            places = [EntityMapper.get_by_id(i) for i in ast.literal_eval(form.given_place.data)]
+            event.link('P24', places)
+        url = url_for('event_view', id_=event.id)
+        if origin:
+            url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-event'
+            if origin.view_name == 'reference':
+                link_id = origin.link('P67', event)
+                url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
+            elif origin.view_name == 'source':
+                origin.link('P67', event)
+            elif origin.view_name == 'actor':
+                link_id = event.link('P11', origin)
+                url = url_for('involvement_update', id_=link_id, origin_id=origin.id)
+            elif origin.view_name == 'file':
+                origin.link('P67', event)
+        if form.continue_.data == 'yes':
+            url = url_for('event_insert', code=code, origin_id=origin.id if origin else None)
+        g.cursor.execute('COMMIT')
+        logger.log_user(event.id, log_action)
+        flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
+    except Exception as e:  # pragma: no cover
+        g.cursor.execute('ROLLBACK')
+        logger.log('error', 'database', 'transaction failed', e)
+        flash(_('error transaction'), 'error')
+        url = url_for('event_index')
     return url

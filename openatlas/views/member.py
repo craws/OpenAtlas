@@ -9,7 +9,6 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import DateForm, TableMultiField, build_form
-from openatlas.models.date import DateMapper
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.models.node import NodeMapper
@@ -74,8 +73,11 @@ def member_insert(origin_id):
         g.cursor.execute('BEGIN')
         try:
             for actor in EntityMapper.get_by_ids(ast.literal_eval(form.actor.data)):
-                link_id = origin.link('P107', actor, form.description.data)
-                NodeMapper.save_link_nodes(link_id, form)
+                link_ = LinkMapper.get_by_id(
+                    origin.link('P107', actor, form.description.data))
+                link_.set_dates(form)
+                link_.update()
+                NodeMapper.save_link_nodes(link_, form)
             g.cursor.execute('COMMIT')
             flash(_('entity created'), 'info')
         except Exception as e:  # pragma: no cover
@@ -101,8 +103,11 @@ def member_update(id_, origin_id):
         g.cursor.execute('BEGIN')
         try:
             link_.delete()
-            link_id = domain.link('P107', range_, form.description.data)
-            NodeMapper.save_link_nodes(link_id, form)
+            link_ = LinkMapper.get_by_id(
+                domain.link('P107', range_, form.description.data))
+            link_.set_dates(form)
+            link_.update()
+            NodeMapper.save_link_nodes(link_, form)
             g.cursor.execute('COMMIT')
         except Exception as e:  # pragma: no cover
             g.cursor.execute('ROLLBACK')

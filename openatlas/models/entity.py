@@ -72,16 +72,24 @@ class Entity:
         NodeMapper.save_entity_nodes(self, form)
 
     def set_dates(self, form):
-        self.begin_from = DateMapper.form_to_datetime64(
-            form.begin_year_from.data, form.begin_month_from.data, form.begin_day_from.data)
-        self.begin_to = DateMapper.form_to_datetime64(
-            form.begin_year_to.data, form.begin_month_to.data, form.begin_day_to.data)
-        self.end_from = DateMapper.form_to_datetime64(
-            form.end_year_from.data, form.end_month_from.data, form.end_day_from.data)
-        self.end_to = DateMapper.form_to_datetime64(
-            form.end_year_to.data, form.end_month_to.data, form.end_day_to.data)
-        self.begin_comment = form.begin_comment.data
-        self.end_comment = form.end_comment.data
+        self.begin_from = None
+        self.begin_to = None
+        self.begin_comment = None
+        self.end_from = None
+        self.end_to = None
+        self.end_comment = None
+        if form.begin_year_from.data:  # Only if begin year is set create a begin date or time span
+            self.begin_from = DateMapper.form_to_datetime64(
+                form.begin_year_from.data, form.begin_month_from.data, form.begin_day_from.data)
+            self.begin_to = DateMapper.form_to_datetime64(
+                form.begin_year_to.data, form.begin_month_to.data, form.begin_day_to.data)
+            self.begin_comment = form.begin_comment.data
+        if form.end_year_from.data:  # Only if end year is set create a year date or time span
+            self.end_from = DateMapper.form_to_datetime64(
+                form.end_year_from.data, form.end_month_from.data, form.end_day_from.data)
+            self.end_to = DateMapper.form_to_datetime64(
+                form.end_year_to.data, form.end_month_to.data, form.end_day_to.data)
+            self.end_comment = form.end_comment.data
 
     def get_profile_image_id(self):
         return EntityMapper.get_profile_image_id(self.id)
