@@ -19,8 +19,8 @@ class ActorForm(DateForm):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     alias = FieldList(StringField(''), description=_('tooltip alias'))
     residence = TableField(_('residence'))
-    appears_first = TableField(_('appears first'))
-    appears_last = TableField(_('appears last'))
+    appears_first = TableField(_('appears first at'))
+    appears_last = TableField(_('appears last at'))
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
@@ -178,6 +178,9 @@ def actor_insert(code, origin_id=None):
     form.alias.append_entry('')
     if origin:
         del form.insert_and_continue
+    if code == 'E21':
+        form.appears_first.label.text = _('born in')
+        form.appears_last.label.text = _('died in')
     return render_template('actor/insert.html', form=form, code=code, origin=origin)
 
 
@@ -213,6 +216,9 @@ def actor_update(id_):
     for alias in [x.name for x in actor.get_linked_entities('P131')]:
         form.alias.append_entry(alias)
     form.alias.append_entry('')
+    if actor.class_.code == 'E21':
+        form.appears_first.label.text = _('born in')
+        form.appears_last.label.text = _('died in')
     return render_template('actor/update.html', form=form, actor=actor)
 
 
