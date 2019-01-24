@@ -268,10 +268,10 @@ CREATE FUNCTION model.delete_entity_related() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
         BEGIN
-            -- Delete dates (OA1, OA2, OA3, OA4, OA5, OA6) and aliases (P1, P131)
-            IF OLD.class_code IN ('E6', 'E7', 'E8', 'E12', 'E18', 'E21', 'E22', 'E40', 'E74') THEN
+            -- Delete aliases (P1, P131)
+            IF OLD.class_code IN ('E18', 'E21', 'E40', 'E74') THEN
                 DELETE FROM model.entity WHERE id IN (
-                    SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code IN ('OA1', 'OA2', 'OA3', 'OA4', 'OA5', 'OA6', 'P1', 'P131'));
+                    SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code IN ('P1', 'P131'));
             END IF;
 
             -- Delete location (E53) if it was a place or find
@@ -656,10 +656,15 @@ CREATE TABLE model.entity (
     class_code text NOT NULL,
     name text NOT NULL,
     description text,
-    value_timestamp timestamp without time zone,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone,
-    system_type text
+    system_type text,
+    begin_from timestamp without time zone,
+    begin_comment text,
+    end_from timestamp without time zone,
+    end_to timestamp without time zone,
+    end_comment text,
+    begin_to timestamp without time zone
 );
 
 
@@ -697,7 +702,13 @@ CREATE TABLE model.link (
     range_id integer NOT NULL,
     description text,
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
+    modified timestamp without time zone,
+    begin_from timestamp without time zone,
+    begin_to timestamp without time zone,
+    begin_comment text,
+    end_from timestamp without time zone,
+    end_to timestamp without time zone,
+    end_comment text
 );
 
 
