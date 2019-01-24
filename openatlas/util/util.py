@@ -242,16 +242,16 @@ def get_entity_data(entity, location=None):
     html = ''
     if entity.begin_from:
         html += format_date(entity.begin_from)
-    if entity.begin_to:
-        html += ' ' + uc_first(_('between')) + ' ' + format_date(entity.begin_to)
+        if entity.begin_to:
+            html += ' ' + uc_first(_('between')) + ' ' + format_date(entity.begin_to)
     html += ' ' + entity.begin_comment if entity.begin_comment else ''
     if html:
         data.append((uc_first('begin'), html))
     html = ''
     if entity.end_from:
         html += format_date(entity.end_from)
-    if entity.end_to:
-        html += ' ' + uc_first(_('between')) + ' ' + format_date(entity.end_to)
+        if entity.end_to:
+            html += ' ' + uc_first(_('between')) + ' ' + format_date(entity.end_to)
     html += ' ' + entity.end_comment if entity.end_comment else ''
     if html:
         data.append((uc_first('end'), html))
@@ -380,6 +380,7 @@ def format_datetime(value, format_='medium'):
 
 
 def format_date(value, format_='medium'):
+    # Todo: handle NaT values
     if not value:
         return ''
     if type(value) is numpy.datetime64:

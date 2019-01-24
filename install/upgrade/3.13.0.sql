@@ -24,7 +24,7 @@ CREATE FUNCTION model.delete_entity_related() RETURNS trigger
     AS $$
         BEGIN
             -- Delete aliases (P1, P131)
-            IF OLD.class_code IN ('E6', 'E7', 'E8', 'E12', 'E18', 'E21', 'E22', 'E40', 'E74') THEN
+            IF OLD.class_code IN ('E18', 'E21', 'E40', 'E74') THEN
                 DELETE FROM model.entity WHERE id IN (
                     SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code IN ('P1', 'P131'));
             END IF;

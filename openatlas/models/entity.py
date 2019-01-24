@@ -27,12 +27,18 @@ class Entity:
         self.system_type = row.system_type
         self.created = row.created
         self.modified = row.modified
+        self.begin_from = None
+        self.begin_to = None
+        self.begin_comment = None
+        self.end_from = None
+        self.end_to = None
+        self.end_comment = None
         if hasattr(row, 'begin_from'):
-            self.begin_from = row.begin_from
-            self.begin_to = row.begin_to
+            self.begin_from = DateMapper.timestamp_to_datetime64(row.begin_from)
+            self.begin_to = DateMapper.timestamp_to_datetime64(row.begin_to)
             self.begin_comment = row.begin_comment
-            self.end_from = row.end_from
-            self.end_to = row.end_to
+            self.end_from = DateMapper.timestamp_to_datetime64(row.end_from)
+            self.end_to = DateMapper.timestamp_to_datetime64(row.end_to)
             self.end_comment = row.end_comment
             self.first = row.begin_from
             self.last = row.end_to if row.end_to else row.end_from
@@ -129,7 +135,10 @@ class EntityMapper:
     sql = """
         SELECT
             e.id, e.class_code, e.name, e.description, e.created, e.modified, e.system_type,
-            e.begin_from, e.begin_to, e.begin_comment, e.end_from, e.end_to, e.end_comment,
+            COALESCE(to_char(e.begin_from, 'yyyy-mm-dd BC'), '') AS begin_from, e.begin_comment,
+            COALESCE(to_char(e.begin_to, 'yyyy-mm-dd BC'), '') AS begin_to,
+            COALESCE(to_char(e.end_from, 'yyyy-mm-dd BC'), '') AS end_from, e.end_comment,
+            COALESCE(to_char(e.end_to, 'yyyy-mm-dd BC'), '') AS end_to,
             array_to_json(
                 array_agg((t.range_id, t.description)) FILTER (WHERE t.range_id IS NOT NULL)
             ) as nodes
@@ -186,20 +195,17 @@ class EntityMapper:
         return entities
 
     @staticmethod
-    def insert(code, name, system_type=None, description=None, date=None):
-        if not name and not date:  # pragma: no cover
+    def insert(code, name, system_type=None, description=None):
+        if not name:  # pragma: no cover
             logger.log('error', 'database', 'Insert entity without name and date')
-            return  # Something went wrong so don't insert
+            return
         sql = """
-            INSERT INTO model.entity (name, system_type, class_code, description, value_timestamp)
-            VALUES (%(name)s, %(system_type)s, %(code)s, %(description)s, %(value_timestamp)s)
+            INSERT INTO model.entity (name, system_type, class_code, description)
+            VALUES (%(name)s, %(system_type)s, %(code)s, %(description)s)
             RETURNING id;"""
-        params = {
-            'name': name.strip(),
-            'code': code,
-            'system_type': system_type.strip() if system_type else None,
-            'description': description.strip() if description else None,
-            'value_timestamp':  DateMapper.datetime64_to_timestamp(date) if date else None}
+        params = {'name': name.strip(), 'code': code,
+                  'system_type': system_type.strip() if system_type else None,
+                  'description': description.strip() if description else None}
         g.cursor.execute(sql, params)
         debug_model['div sql'] += 1
         return EntityMapper.get_by_id(g.cursor.fetchone()[0])

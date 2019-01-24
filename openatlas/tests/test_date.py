@@ -10,33 +10,29 @@ class DateTest(TestBaseCase):
         with app.app_context():
             self.login()
 
-            # dates insert
-            data = {
-                'name': 'Date place',
-                'date_begin_year': -1949,
-                'date_begin_month': 2,
-                'date_begin_day': 8,
-                'date_begin_year2': -1948,
-                'date_end_year': 2040,
-                'date_end_year2': 2050,
-                'date_birth': True,
-                'date_death': True}
+            # Dates insert
+            data = {'name': 'Date place',
+                    'begin_year_from': -1949, 'begin_month_from': 2, 'begin_day_from': 8,
+                    'begin_year_to': -1948, 'end_year_from': 2040, 'end_year_to': 2050}
             rv = self.app.post(url_for('place_insert'), data=data, follow_redirects=True)
             assert b'Date place' in rv.data
 
-            data['date_begin_day'] = 31  # test invalid dates
+            # Invalid dates
+            data['begin_day_from'] = 31
             rv = self.app.post(url_for('place_insert'), data=data, follow_redirects=True)
             assert b'Not a valid date' in rv.data
 
-            data['date_begin_day'] = 5
-            data['date_begin_year'] = 20  # test invalid time span (first after second date)
+            # Invalid time span (first after second date)
+            data['begin_day_from'] = 5
+            data['begin_year_from'] = 20
             rv = self.app.post(url_for('place_insert'), data=data, follow_redirects=True)
             assert b'First date cannot be after second' in rv.data
 
-            data['date_begin_year'] = -1949
-            data['date_end_year'] = -2000  # test invalid begin dates which are after end dates
+            # Invalid begin dates which are after end dates
+            data['begin_year_from'] = -1949
+            data['end_year_to'] = -2000
             rv = self.app.post(url_for('place_insert'), data=data, follow_redirects=True)
             assert b'Begin dates cannot start after end dates' in rv.data
-            data['date_end_year2'] = ''
+            data['end_year_to'] = ''
             rv = self.app.post(url_for('place_insert'), data=data, follow_redirects=True)
             assert b'Begin dates cannot start after end dates' in rv.data
