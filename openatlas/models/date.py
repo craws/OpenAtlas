@@ -21,6 +21,8 @@ class DateMapper:
         :param string: PostgreSQL timestamp
         :return: numpy.datetime64
         """
+        if not string:
+            return None
         if 'BC' in string:
             parts = string.split(' ')[0].split('-')
             string = '-' + str(int(parts[0]) - 1) + '-' + parts[1] + '-' + parts[2]

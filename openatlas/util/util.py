@@ -380,7 +380,6 @@ def format_datetime(value, format_='medium'):
 
 
 def format_date(value, format_='medium'):
-    # Todo: handle NaT values
     if not value:
         return ''
     if type(value) is numpy.datetime64:

@@ -1,6 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import flash, g, render_template, request, url_for
-from flask_babel import format_date, lazy_gettext as _
+from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
 from wtforms import FieldList, HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
@@ -9,9 +9,9 @@ from openatlas import app, logger
 from openatlas.forms.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper, InvalidGeomException
-from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 get_profile_image_table_link, is_authorized, link, required_group,
-                                 truncate_string, uc_first, was_modified)
+from openatlas.util.util import (display_remove_link, format_date, get_base_table_data,
+                                 get_entity_data, get_profile_image_table_link, is_authorized, link,
+                                 required_group, truncate_string, uc_first, was_modified)
 
 
 class PlaceForm(DateForm):

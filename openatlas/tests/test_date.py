@@ -30,7 +30,7 @@ class DateTest(TestBaseCase):
 
             # Invalid begin dates which are after end dates
             data['begin_year_from'] = -1949
-            data['end_year_to'] = -2000
+            data['end_year_from'] = -2000
             rv = self.app.post(url_for('place_insert'), data=data, follow_redirects=True)
             assert b'Begin dates cannot start after end dates' in rv.data
             data['end_year_to'] = ''
