@@ -1,6 +1,8 @@
 // Init map
 map = L.map('map', {maxZoom: 18, fullscreenControl: true});
 
+L.control.scale().addTo(map);
+
 // Icons
 newIcon = L.icon({iconUrl: '/static/images/map/marker-icon_new.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
 editIcon = L.icon({iconUrl: "/static/images/map/marker-icon_edit.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
