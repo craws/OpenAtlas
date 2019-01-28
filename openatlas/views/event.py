@@ -11,9 +11,9 @@ from openatlas import app, logger
 from openatlas.forms.forms import DateForm, TableField, TableMultiField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import (display_remove_link, format_date, get_base_table_data,
-                                 get_entity_data, get_profile_image_table_link, is_authorized, link,
-                                 required_group, truncate_string, uc_first, was_modified)
+from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
+                                 get_profile_image_table_link, is_authorized, link, required_group,
+                                 truncate_string, uc_first, was_modified)
 
 
 class EventForm(DateForm):
@@ -115,14 +115,12 @@ def event_view(id_):
         'reference': {'id': 'reference', 'data': [],
                       'header': app.config['TABLE_HEADERS']['reference'] + ['pages']}}
     for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
-        first = format_date(link_.first)
+        first = link_.first
         if not link_.first and event.first:
-            first = '<span class="inactive" style="float:right">' + format_date(event.first) + \
-                    '</span>'
+            first = '<span class="inactive" style="float:right;">' + event.first + '</span>'
         last = link_.last
         if not link_.last and event.last:
-            last = '<span class="inactive" style="float:right">' + format_date(event.last) + \
-                   '</span>'
+            last = '<span class="inactive" style="float:right;">' + event.last + '</span>'
         data = ([link(link_.range),
                  g.classes[link_.range.class_.code].name,
                  link_.type.name if link_.type else '',

@@ -9,6 +9,7 @@ from openatlas import app, debug_model, logger
 from openatlas.models.date import DateMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import print_file_extension, uc_first
+from openatlas.forms.date import DateForm
 
 
 class Entity:
@@ -40,8 +41,9 @@ class Entity:
             self.end_from = DateMapper.timestamp_to_datetime64(row.end_from)
             self.end_to = DateMapper.timestamp_to_datetime64(row.end_to)
             self.end_comment = row.end_comment
-            self.first = row.begin_from
-            self.last = row.end_to if row.end_to else row.end_from
+            self.first = DateForm.format_date(self.begin_from, 'year') if self.begin_from else None
+            self.last = DateForm.format_date(self.end_from, 'year') if self.end_from else None
+            self.last = DateForm.format_date(self.end_to, 'year') if self.end_to else self.last
         self.class_ = g.classes[row.class_code]
         self.view_name = None  # view_name is used to build urls
         if self.system_type == 'file':

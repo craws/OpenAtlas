@@ -42,7 +42,7 @@ class DateForm(Form):
             string = string[1:]
         parts = string.split('-')
         if part == 'year':  # If it's a negative year, add one year
-            return '-' + str(int(parts[0]) + 1) if bc else parts[0]
+            return '-' + str(int(parts[0]) + 1) if bc else str(int(parts[0]))
         if part == 'month':
             return parts[1]
         return parts[2]

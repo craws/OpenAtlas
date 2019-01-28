@@ -370,9 +370,7 @@ def is_authorized(group):
 
 
 def uc_first(string):
-    if not string:
-        return ''
-    return str(string)[0].upper() + str(string)[1:]
+    return str(string)[0].upper() + str(string)[1:] if string else ''
 
 
 def format_datetime(value, format_='medium'):
@@ -437,8 +435,6 @@ def link(entity):
             url = url_for('node_view', id_=entity.id)
             if not entity.root:
                 url = url_for('node_index') + '#tab-' + str(entity.id)
-        if entity.class_.code == 'E61':
-            return entity.name
         if not url:
             return entity.name + ' (' + entity.class_.name + ')'
         return '<a href="' + url + '">' + truncate_string(entity.name) + '</a>'
@@ -567,8 +563,8 @@ def get_base_table_data(entity, file_stats=None):
             data.append(print_file_size(entity))
             data.append(print_file_extension(entity))
     if entity.view_name in ['event', 'actor', 'place']:
-        data.append(format_date(entity.first))
-        data.append(format_date(entity.last))
+        data.append(entity.first)
+        data.append(entity.last)
     if entity.view_name in ['source'] or entity.system_type == 'file':
         data.append(truncate_string(entity.description))
     return data

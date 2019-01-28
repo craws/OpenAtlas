@@ -22,16 +22,15 @@ class RelationTests(TestBaseCase):
             assert b'Actor Actor Relation' in rv.data
             relation_id = NodeMapper.get_hierarchy_by_name('Actor Actor Relation').id
             relation_sub_id = g.nodes[relation_id].subs[0]
-            data = {
-                'actor': '[' + str(related_id) + ']',
-                relation_id: relation_sub_id,
-                'inverse': None,
-                'date_begin_year': '-1949',
-                'date_begin_month': '10',
-                'date_begin_day': '8',
-                'date_begin_year2': '-1948',
-                'date_end_year': '2049',
-                'date_end_year2': '2050'}
+            data = {'actor': '[' + str(related_id) + ']',
+                    relation_id: relation_sub_id,
+                    'inverse': None,
+                    'begin_year_from': '-1949',
+                    'begin_month_from': '10',
+                    'begin_day_from': '8',
+                    'begin_year_to': '-1948',
+                    'end_year_from': '2049',
+                    'end_year_to': '2050'}
             rv = self.app.post(
                 url_for('relation_insert', origin_id=actor_id), data=data, follow_redirects=True)
             assert b'The Kurgan' in rv.data

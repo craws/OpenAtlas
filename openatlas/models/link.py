@@ -5,6 +5,7 @@ from flask import abort, flash, g
 from flask_babel import lazy_gettext as _
 
 from openatlas import debug_model, logger
+from openatlas.forms.date import DateForm
 from openatlas.models.date import DateMapper
 
 
@@ -22,14 +23,15 @@ class Link:
         if hasattr(row, 'type_id') and row.type_id:
             self.nodes[g.nodes[row.type_id]] = None
         if hasattr(row, 'begin_from'):
-            self.begin_from = row.begin_from
-            self.begin_to = row.begin_to
+            self.begin_from = DateMapper.timestamp_to_datetime64(row.begin_from)
+            self.begin_to = DateMapper.timestamp_to_datetime64(row.begin_to)
             self.begin_comment = row.begin_comment
-            self.end_from = row.end_from
-            self.end_to = row.end_to
+            self.end_from = DateMapper.timestamp_to_datetime64(row.end_from)
+            self.end_to = DateMapper.timestamp_to_datetime64(row.end_to)
             self.end_comment = row.end_comment
-            self.first = row.begin_from
-            self.last = row.end_to if row.end_to else row.end_from
+            self.first = DateForm.format_date(self.begin_from, 'year') if self.begin_from else None
+            self.last = DateForm.format_date(self.end_from, 'year') if self.end_from else None
+            self.last = DateForm.format_date(self.end_to, 'year') if self.end_to else self.last
 
     def update(self):
         LinkMapper.update(self)
@@ -133,7 +135,10 @@ class LinkMapper:
         from openatlas.models.entity import EntityMapper
         sql = """
             SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description, l.created,
-                l.begin_from, l.begin_to, l.begin_comment, l.end_from, l.end_to, l.end_comment,
+                COALESCE(to_char(l.begin_from, 'yyyy-mm-dd BC'), '') AS begin_from, l.begin_comment,
+                COALESCE(to_char(l.begin_to, 'yyyy-mm-dd BC'), '') AS begin_to,
+                COALESCE(to_char(l.end_from, 'yyyy-mm-dd BC'), '') AS end_from, l.end_comment,
+                COALESCE(to_char(l.end_to, 'yyyy-mm-dd BC'), '') AS end_to,
                 l.modified, e.name,
                 (SELECT t.id FROM model.entity t
                     JOIN model.link_property lp ON t.id = lp.range_id
@@ -170,7 +175,10 @@ class LinkMapper:
     def get_by_id(id_):
         sql = """
             SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description, l.created,
-                l.begin_from, l.begin_to, l.begin_comment, l.end_from, l.end_to, l.end_comment,
+                COALESCE(to_char(l.begin_from, 'yyyy-mm-dd BC'), '') AS begin_from, l.begin_comment,
+                COALESCE(to_char(l.begin_to, 'yyyy-mm-dd BC'), '') AS begin_to,
+                COALESCE(to_char(l.end_from, 'yyyy-mm-dd BC'), '') AS end_from, l.end_comment,
+                COALESCE(to_char(l.end_to, 'yyyy-mm-dd BC'), '') AS end_to,
                 l.modified,
                 (SELECT t.id FROM model.entity t
                     JOIN model.link_property lp ON t.id = lp.range_id
@@ -199,18 +207,17 @@ class LinkMapper:
                 (%(property_code)s, %(domain_id)s, %(range_id)s, %(description)s, %(begin_from)s,
                 %(begin_to)s, %(begin_comment)s, %(end_from)s, %(end_to)s, %(end_comment)s)
             WHERE id = %(id)s;"""
-        g.cursor.execute(sql, {
-            'id': link.id,
-            'property_code': link.property.code,
-            'domain_id': link.domain.id,
-            'range_id': link.range.id,
-            'description': link.description,
-            'begin_from': DateMapper.datetime64_to_timestamp(link.begin_from),
-            'begin_to': DateMapper.datetime64_to_timestamp(link.begin_to),
-            'begin_comment': link.begin_comment,
-            'end_from':  DateMapper.datetime64_to_timestamp(link.end_from),
-            'end_to':  DateMapper.datetime64_to_timestamp(link.end_to),
-            'end_comment':  link.end_comment})
+        g.cursor.execute(sql, {'id': link.id,
+                               'property_code': link.property.code,
+                               'domain_id': link.domain.id,
+                               'range_id': link.range.id,
+                               'description': link.description,
+                               'begin_from': DateMapper.datetime64_to_timestamp(link.begin_from),
+                               'begin_to': DateMapper.datetime64_to_timestamp(link.begin_to),
+                               'begin_comment': link.begin_comment,
+                               'end_from':  DateMapper.datetime64_to_timestamp(link.end_from),
+                               'end_to':  DateMapper.datetime64_to_timestamp(link.end_to),
+                               'end_comment':  link.end_comment})
         debug_model['link sql'] += 1
 
     @staticmethod
@@ -248,16 +255,13 @@ class LinkMapper:
                         l.property_code = %(property)s AND
                         d.class_code = %(domain)s AND
                         r.class_code = %(range)s;"""
-                g.cursor.execute(sql, {
-                    'property': item['property'],
-                    'domain': item['domain'],
-                    'range': item['range']})
+                g.cursor.execute(sql, {'property': item['property'], 'domain': item['domain'],
+                                       'range': item['range']})
                 debug_model['link sql'] += 1
                 for row2 in g.cursor.fetchall():
                     domain = EntityMapper.get_by_id(row2.domain_id)
                     range_ = EntityMapper.get_by_id(row2.range_id)
-                    invalid_links.append({
-                        'domain': link(domain) + ' (' + domain.class_.code + ')',
-                        'property': link(g.properties[row2.property_code]),
-                        'range': link(range_) + ' (' + range_.class_.code + ')'})
+                    invalid_links.append({'domain': link(domain) + ' (' + domain.class_.code + ')',
+                                          'property': link(g.properties[row2.property_code]),
+                                          'range': link(range_) + ' (' + range_.class_.code + ')'})
         return invalid_links
