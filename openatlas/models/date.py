@@ -1,6 +1,9 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import numpy
 from datetime import datetime
+from flask import g
+
+from openatlas import debug_model
 
 
 class DateMapper:
@@ -71,9 +74,25 @@ class DateMapper:
     @staticmethod
     def get_invalid_dates():
         """ Search for entities with invalid date combinations, e.g. begin after end"""
-        return []
+        from openatlas.models.entity import EntityMapper
+        sql = """
+                SELECT id FROM model.entity WHERE
+                    begin_from > begin_to OR end_from > end_to
+                    OR (begin_from IS NOT NULL AND end_from IS NOT NULL AND begin_from > end_from)
+                    OR (begin_to IS NOT NULL AND end_to IS NOT NULL AND begin_to > end_to)"""
+        g.cursor.execute(sql)
+        debug_model['div sql'] += 1
+        return [EntityMapper.get_by_id(row.id) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_invalid_link_dates():
         """ Search for links with invalid date combinations, e.g. begin after end"""
-        return []
+        from openatlas.models.link import LinkMapper
+        sql = """
+                SELECT id FROM model.link WHERE
+                    begin_from > begin_to OR end_from > end_to
+                    OR (begin_from IS NOT NULL AND end_from IS NOT NULL AND begin_from > end_from)
+                    OR (begin_to IS NOT NULL AND end_to IS NOT NULL AND begin_to > end_to)"""
+        g.cursor.execute(sql)
+        debug_model['div sql'] += 1
+        return [LinkMapper.get_by_id(row.id) for row in g.cursor.fetchall()]

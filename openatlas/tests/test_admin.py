@@ -2,6 +2,7 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
+from openatlas.models.link import LinkMapper
 from openatlas.models.settings import SettingsMapper
 from openatlas.test_base import TestBaseCase
 
@@ -44,10 +45,19 @@ class ContentTests(TestBaseCase):
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()
-                # Create invalid date links
+                # Create invalid dates for an actor and a relation link
+                person_a = EntityMapper.insert('E21', 'Person A')
+                person_b = EntityMapper.insert('E21', 'Person B')
+                person_a.begin_from = '2018-01-31'
+                person_a.begin_to = '2018-01-01'
+                person_a.update()
+                relation = LinkMapper.get_by_id(person_a.link('OA7', person_b))
+                relation.begin_from = '2018-01-31'
+                relation.begin_to = '2018-01-01'
+                relation.update()
             rv = self.app.get(url_for('admin_check_dates'))
-            #assert b'Invalid dates (1)' in rv.data
-            #assert b'Invalid link dates (1)' in rv.data
+            assert b'Invalid dates (1)' in rv.data
+            assert b'Invalid link dates (1)' in rv.data
 
     def test_admin(self):
         with app.app_context():
