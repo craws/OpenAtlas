@@ -46,18 +46,20 @@ class ContentTests(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()
                 # Create invalid dates for an actor and a relation link
-                person_a = EntityMapper.insert('E21', 'Person A')
-                person_b = EntityMapper.insert('E21', 'Person B')
-                person_a.begin_from = '2018-01-31'
-                person_a.begin_to = '2018-01-01'
-                person_a.update()
-                relation = LinkMapper.get_by_id(person_a.link('OA7', person_b))
-                relation.begin_from = '2018-01-31'
-                relation.begin_to = '2018-01-01'
-                relation.update()
+                person = EntityMapper.insert('E21', 'Person')
+                event = EntityMapper.insert('E6', 'Event')
+                person.begin_from = '2018-01-31'
+                person.begin_to = '2018-01-01'
+                person.update()
+                involvement = LinkMapper.get_by_id(event.link('P11', person))
+                involvement.begin_from = '2017-01-31'
+                involvement.begin_to = '2017-01-01'
+                involvement.end_from = '2017-01-01'
+                involvement.update()
             rv = self.app.get(url_for('admin_check_dates'))
             assert b'Invalid dates (1)' in rv.data
             assert b'Invalid link dates (1)' in rv.data
+            assert b'Invalid involvement dates (1)' in rv.data
 
     def test_admin(self):
         with app.app_context():

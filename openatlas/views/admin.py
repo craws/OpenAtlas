@@ -139,32 +139,35 @@ def admin_orphans_delete(parameter):
 def admin_check_dates():
     # Get invalid date combinations (e.g. begin after end)
     tables = {
-        'invalid_dates': {'id': 'invalid_dates', 'data': [],
-                          'header': ['name', 'class', 'type', 'system type', 'created',
-                                     'updated', 'description']},
-        'invalid_link_dates': {'id': 'invalid_link_dates', 'data': [],
-                               'header': ['link', 'domain', 'range']}}
+        'dates': {'id': 'dates', 'data': [], 'header': ['name', 'class', 'type', 'system type',
+                                                        'created', 'updated', 'description']},
+        'link_dates': {'id': 'link_dates', 'data': [], 'header': ['link', 'domain', 'range']},
+        'involvement_dates': {'id': 'involvement_dates', 'data': [],
+                              'header': ['actor', 'event', 'class', 'involvement', 'description']}}
     for entity in DateMapper.get_invalid_dates():
-        tables['invalid_dates']['data'].append([
-            link(entity),
-            link(entity.class_),
-            entity.print_base_type(),
-            entity.system_type,
-            format_date(entity.created),
-            format_date(entity.modified),
-            truncate_string(entity.description)])
+        tables['dates']['data'].append([link(entity), link(entity.class_), entity.print_base_type(),
+                                        entity.system_type, format_date(entity.created),
+                                        format_date(entity.modified),
+                                        truncate_string(entity.description)])
     for link_ in DateMapper.get_invalid_link_dates():
         label = ''
-        if link_.property.code == 'OA7':
+        if link_.property.code == 'OA7':  # pragma: no cover
             label = 'relation'
         elif link_.property.code == 'P107':  # pragma: no cover
             label = 'member'
-        elif link_.property.code in ['P11', 'P14', 'P22', 'P23']:  # pragma: no cover
+        elif link_.property.code in ['P11', 'P14', 'P22', 'P23']:
             label = 'involvement'
         url = url_for(label + '_update', id_=link_.id, origin_id=link_.domain.id)
-        tables['invalid_link_dates']['data'].append([
-            '<a href="' + url + '">' + uc_first(_(label)) + '</a>',
-            link(link_.domain), link(link_.range)])
+        tables['link_dates']['data'].append(['<a href="' + url + '">' + uc_first(_(label)) + '</a>',
+                                             link(link_.domain), link(link_.range)])
+    for link_ in DateMapper.invalid_involvement_dates():
+        event = link_.domain
+        actor = link_.range
+        update_url = url_for('involvement_update', id_=link_.id, origin_id=actor.id)
+        data = ([link(actor), link(event), g.classes[event.class_.code].name,
+                 link_.type.name if link_.type else '', truncate_string(link_.description),
+                 '<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>'])
+        tables['involvement_dates']['data'].append(data)
     return render_template('admin/check_dates.html', tables=tables)
 
 

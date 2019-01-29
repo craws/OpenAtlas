@@ -72,6 +72,30 @@ class DateMapper:
         return datetime_
 
     @staticmethod
+    def invalid_involvement_dates():
+        """ Search invalid event participation dates and return the actors
+            e.g. attending person was born after the event ended
+        """
+        from openatlas.models.link import LinkMapper
+        sql = """
+            SELECT l.id FROM model.entity actor
+            JOIN model.link l ON actor.id = l.range_id
+                AND l.property_code IN ('P11', 'P14', 'P22', 'P23')
+            JOIN model.entity event ON l.domain_id = event.id
+            WHERE
+                (actor.begin_from IS NOT NULL AND l.end_from IS NOT NULL
+                    AND actor.begin_from > l.end_from)
+                OR (actor.begin_to IS NOT NULL AND l.end_to IS NOT NULL
+                    AND actor.begin_to > l.end_to)
+                OR (actor.begin_from IS NOT NULL AND event.end_from IS NOT NULL
+                    AND actor.begin_from > event.end_from)
+                OR (actor.begin_to IS NOT NULL AND event.end_to IS NOT NULL
+                    AND actor.begin_to > event.end_to);"""
+        g.cursor.execute(sql)
+        debug_model['div sql'] += 1
+        return [LinkMapper.get_by_id(row.id) for row in g.cursor.fetchall()]
+
+    @staticmethod
     def get_invalid_dates():
         """ Search for entities with invalid date combinations, e.g. begin after end"""
         from openatlas.models.entity import EntityMapper
@@ -79,7 +103,7 @@ class DateMapper:
                 SELECT id FROM model.entity WHERE
                     begin_from > begin_to OR end_from > end_to
                     OR (begin_from IS NOT NULL AND end_from IS NOT NULL AND begin_from > end_from)
-                    OR (begin_to IS NOT NULL AND end_to IS NOT NULL AND begin_to > end_to)"""
+                    OR (begin_to IS NOT NULL AND end_to IS NOT NULL AND begin_to > end_to);"""
         g.cursor.execute(sql)
         debug_model['div sql'] += 1
         return [EntityMapper.get_by_id(row.id) for row in g.cursor.fetchall()]
@@ -92,7 +116,7 @@ class DateMapper:
                 SELECT id FROM model.link WHERE
                     begin_from > begin_to OR end_from > end_to
                     OR (begin_from IS NOT NULL AND end_from IS NOT NULL AND begin_from > end_from)
-                    OR (begin_to IS NOT NULL AND end_to IS NOT NULL AND begin_to > end_to)"""
+                    OR (begin_to IS NOT NULL AND end_to IS NOT NULL AND begin_to > end_to);"""
         g.cursor.execute(sql)
         debug_model['div sql'] += 1
         return [LinkMapper.get_by_id(row.id) for row in g.cursor.fetchall()]
