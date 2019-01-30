@@ -19,8 +19,8 @@ class ActorForm(DateForm):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     alias = FieldList(StringField(''), description=_('tooltip alias'))
     residence = TableField(_('residence'))
-    appears_first = TableField(_('appears first at'))
-    appears_last = TableField(_('appears last at'))
+    appears_first = TableField()
+    appears_last = TableField()
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
@@ -39,16 +39,22 @@ def actor_view(id_):
         object_ = residence.get_linked_entity('P53', True)
         objects.append(object_)
         info.append((uc_first(_('residence')), link(object_)))
+
     first = actor.get_linked_entity('OA8')
     if first:
         object_ = first.get_linked_entity('P53', True)
         objects.append(object_)
-        info.append((uc_first(_('appears first')), link(object_)))
+        info.append((
+            uc_first(_('born at') if actor.class_.code == 'E21' else _('begins at')),
+            link(object_)))
     last = actor.get_linked_entity('OA9')
+
     if last:
         object_ = last.get_linked_entity('P53', True)
         objects.append(object_)
-        info.append((uc_first(_('appears last')), link(object_)))
+        info.append((
+            uc_first(_('date of death') if actor.class_.code == 'E21' else _('ends at')),
+            link(object_)))
     tables = {
         'info': info,
         'file': {'id': 'files', 'data': [],
@@ -82,12 +88,25 @@ def actor_view(id_):
         tables[domain.view_name]['data'].append(data)
 
     # Todo: Performance - getting every place of every object for every event is very costly
+    appears_first = None
+    appears_last = None
     for link_ in actor.get_links(['P11', 'P14', 'P22', 'P23'], True):
         event = link_.domain
-        first = link_.first
+        if not actor.first:
+            if event.first and (not appears_first or int(event.first) < int(appears_first)):
+                print(event.first)
+                appears_first = event.first
+            if link_.first and (not appears_first or int(link_.first) < int(appears_first)):
+                appears_first = link_.first
+        if not actor.last:
+            if event.last and (not appears_last or int(event.last) > int(appears_last)):
+                appears_last = event.last
+            if link_.last and (not appears_last or int(link_.last) > int(appears_last)):
+                appears_last = link_.last
         place = event.get_linked_entity('P7')
         if place:
             objects.append(place.get_linked_entity('P53', True))
+        first = link_.first
         if not link_.first and event.first:
             first = '<span class="inactive" style="float:right;">' + event.first + '</span>'
         last = link_.last
@@ -102,6 +121,8 @@ def actor_view(id_):
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             data.append(display_remove_link(unlink_url, link_.domain.name))
         tables['event']['data'].append(data)
+    info.append((_('appears first'), appears_first))
+    info.append((_('appears last'), appears_last))
     for link_ in actor.get_links('OA7') + actor.get_links('OA7', True):
         if actor.id == link_.domain.id:
             type_ = link_.type.get_name_directed() if link_.type else ''

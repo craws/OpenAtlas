@@ -246,7 +246,7 @@ def get_entity_data(entity, location=None):
             html += ' ' + uc_first(_('between')) + ' ' + format_date(entity.begin_to)
     html += ' ' + entity.begin_comment if entity.begin_comment else ''
     if html:
-        data.append((uc_first('begin'), html))
+        data.append((uc_first('born' if entity.class_.code == 'E21' else 'begin'), html))
     html = ''
     if entity.end_from:
         html += format_date(entity.end_from)
@@ -254,7 +254,7 @@ def get_entity_data(entity, location=None):
             html += ' ' + uc_first(_('between')) + ' ' + format_date(entity.end_to)
     html += ' ' + entity.end_comment if entity.end_comment else ''
     if html:
-        data.append((uc_first('end'), html))
+        data.append((uc_first('died' if entity.class_.code == 'E21' else 'end'), html))
 
     # Additional info for advanced layout
     if hasattr(current_user, 'settings') and current_user.settings['layout'] == 'advanced':
