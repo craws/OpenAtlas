@@ -10,9 +10,9 @@ from openatlas import app, logger
 from openatlas.forms.forms import DateForm, TableField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
-from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 get_profile_image_table_link, is_authorized, link, required_group,
-                                 truncate_string, uc_first, was_modified)
+from openatlas.util.util import (display_remove_link, get_appearance, get_base_table_data,
+                                 get_entity_data, get_profile_image_table_link, is_authorized, link,
+                                 required_group, truncate_string, uc_first, was_modified)
 
 
 class ActorForm(DateForm):
@@ -44,17 +44,14 @@ def actor_view(id_):
     if first:
         object_ = first.get_linked_entity('P53', True)
         objects.append(object_)
-        info.append((
-            uc_first(_('born at') if actor.class_.code == 'E21' else _('begins at')),
-            link(object_)))
+        info.append((uc_first(_('born at' if actor.class_.code == 'E21' else 'begins at')),
+                     link(object_)))
     last = actor.get_linked_entity('OA9')
-
     if last:
         object_ = last.get_linked_entity('P53', True)
         objects.append(object_)
-        info.append((
-            uc_first(_('date of death') if actor.class_.code == 'E21' else _('ends at')),
-            link(object_)))
+        info.append((uc_first(_('died at' if actor.class_.code == 'E21' else 'ends at')),
+                     link(object_)))
     tables = {
         'info': info,
         'file': {'id': 'files', 'data': [],
@@ -88,21 +85,10 @@ def actor_view(id_):
         tables[domain.view_name]['data'].append(data)
 
     # Todo: Performance - getting every place of every object for every event is very costly
-    appears_first = None
-    appears_last = None
-    for link_ in actor.get_links(['P11', 'P14', 'P22', 'P23'], True):
+    event_links = actor.get_links(['P11', 'P14', 'P22', 'P23'], True)
+
+    for link_ in event_links:
         event = link_.domain
-        if not actor.first:
-            if event.first and (not appears_first or int(event.first) < int(appears_first)):
-                print(event.first)
-                appears_first = event.first
-            if link_.first and (not appears_first or int(link_.first) < int(appears_first)):
-                appears_first = link_.first
-        if not actor.last:
-            if event.last and (not appears_last or int(event.last) > int(appears_last)):
-                appears_last = event.last
-            if link_.last and (not appears_last or int(link_.last) > int(appears_last)):
-                appears_last = link_.last
         place = event.get_linked_entity('P7')
         if place:
             objects.append(place.get_linked_entity('P53', True))
@@ -121,6 +107,7 @@ def actor_view(id_):
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             data.append(display_remove_link(unlink_url, link_.domain.name))
         tables['event']['data'].append(data)
+    appears_first, appears_last = get_appearance(event_links)
     info.append((_('appears first'), appears_first))
     info.append((_('appears last'), appears_last))
     for link_ in actor.get_links('OA7') + actor.get_links('OA7', True):

@@ -239,22 +239,10 @@ def get_entity_data(entity, location=None):
             data.append((uc_first(_('alias')), '<br />'.join([x.name for x in aliases])))
 
     # Dates
-    html = ''
-    if entity.begin_from:
-        html += format_date(entity.begin_from)
-        if entity.begin_to:
-            html += ' ' + uc_first(_('between')) + ' ' + format_date(entity.begin_to)
-    html += ' ' + entity.begin_comment if entity.begin_comment else ''
-    if html:
-        data.append((uc_first('born' if entity.class_.code == 'E21' else 'begin'), html))
-    html = ''
-    if entity.end_from:
-        html += format_date(entity.end_from)
-        if entity.end_to:
-            html += ' ' + uc_first(_('between')) + ' ' + format_date(entity.end_to)
-    html += ' ' + entity.end_comment if entity.end_comment else ''
-    if html:
-        data.append((uc_first('died' if entity.class_.code == 'E21' else 'end'), html))
+    label = uc_first(_('born' if entity.class_.code == 'E21' else 'begin'))
+    data.append((label, format_entry_begin(entity)))
+    label = uc_first(_('died' if entity.class_.code == 'E21' else 'end'))
+    data.append((label, format_entry_end(entity)))
 
     # Additional info for advanced layout
     if hasattr(current_user, 'settings') and current_user.settings['layout'] == 'advanced':
@@ -578,3 +566,53 @@ def was_modified(form, entity):  # pragma: no cover
         return False
     openatlas.logger.log('info', 'multi user', 'Multi user overwrite prevented.')
     return True
+
+
+def format_entry_begin(entry):
+    html = ''
+    if entry.begin_from:
+        html = format_date(entry.begin_from)
+        if entry.begin_to:
+            html = _('between %(begin)s and %(end)s',
+                     begin=format_date(entry.begin_from), end=format_date(entry.begin_to))
+    html += ' ' + entry.begin_comment if entry.begin_comment else ''
+    return html
+
+
+def format_entry_end(entry):
+    html = ''
+    if entry.end_from:
+        html = format_date(entry.end_from)
+        if entry.end_to:
+            html = _('between %(begin)s and %(end)s',
+                     begin=format_date(entry.end_from), end=format_date(entry.end_to))
+    html += ' ' + entry.end_comment if entry.end_comment else ''
+    return html
+
+
+def get_appearance(event_links):
+    # Get first/last appearance from events for actors without begin/end
+    first_year = None
+    last_year = None
+    first_string = None
+    last_string = None
+    for link_ in event_links:
+        event = link_.domain
+        entity = link_.range
+        event_link = '<a href="{url}">{label}</a> '.format(
+            url=url_for('event_view', id_=event.id), label=uc_first(_('event')))
+        if not entity.first:
+            if event.first and (not first_year or int(event.first) < int(first_year)):
+                first_year = event.first
+                first_string = _('at an ') + event_link + format_entry_begin(event)
+            if link_.first and (not first_year or int(link_.first) < int(first_year)):
+                first_year = link_.first
+                first_string = _('at an ') + event_link + format_entry_begin(link_)
+        if not entity.last:
+            if event.last and (not last_year or int(event.last) > int(last_year)):
+                last_year = event.last
+                last_string = _('at an ') + event_link + format_entry_end(event)
+            if link_.last and (not last_year or int(link_.last) > int(last_year)):
+                last_year = link_.last
+                last_string = _('at an ') + event_link + format_entry_end(event)
+    return first_string, last_string
