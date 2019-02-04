@@ -193,7 +193,7 @@ def get_entity_data(entity, location=None):
                 value=format_number(node_value), description=node.description)
         type_data[name].append(link(node) + text)
 
-    # Sort by name
+    # Sort types by name
     type_data = OrderedDict(sorted(type_data.items(), key=lambda t: t[0]))
     for root_type in type_data:
         type_data[root_type].sort()
