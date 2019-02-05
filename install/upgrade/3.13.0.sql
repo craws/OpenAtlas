@@ -22,7 +22,33 @@ ALTER TABLE model.link ADD COLUMN end_comment text;
 -- Drop delete trigger, an adapted version will be recreated later
 DROP FUNCTION IF EXISTS model.delete_entity_related() CASCADE;
 
+-------------------------------
+-- Below is work in progress --
+-------------------------------
+
+-- Persons, Groups appears first with place (578)
+SELECT t.value_timestamp, e.id, pl.id
+FROM model.entity t
+JOIN model.link tl ON t.id = tl.range_id AND tl.property_code = 'OA1' AND t.system_type IN ('exact date value', 'from date value')
+JOIN model.entity e ON tl.domain_id = e.id AND e.class_code IN ('E21', 'E74')
+JOIN model.link pl ON e.id = pl.domain_id AND pl.property_code = 'OA8'
+
+-- Persons, Groups appears first without place (718)
+WITH actors AS (
+	SELECT DISTINCT(t1.value_timestamp) AS timestamp1, t1.description, t2.value_timestamp AS timestamp2, e.id, e.name
+	FROM model.entity t1
+	JOIN model.link t1l ON t1.id = t1l.range_id AND t1l.property_code = 'OA1' AND t1.system_type IN ('exact date value', 'from date value')
+	JOIN model.entity e ON t1l.domain_id = e.id AND e.class_code IN ('E21', 'E74')
+	LEFT JOIN model.link pl ON e.id = pl.domain_id AND pl.property_code = 'OA8'
+	LEFT JOIN model.link tl2 ON e.id = tl2.domain_id AND tl2.property_code = 'OA1'
+	LEFT JOIN model.entity t2 ON tl2.range_id = t2.id AND t2.system_type = 'to date value'
+	WHERE pl.id IS NULL
+)
+INSERT INTO model.entity (name, begin_from, begin_comment) VALUES
+('Appearance of ' || (SELECT name FROM actors),  (SELECT timestamp1 FROM actors), (SELECT description FROM actors))
+
 -- Update event dates
+-- To do: descriptions
 UPDATE model.entity e SET begin_from = (
     SELECT value_timestamp FROM model.entity t JOIN model.link l ON l.range_id = t.id AND l.property_code = 'OA5' AND domain_id = e.id AND t.system_type IN ('exact date value', 'from date value')
 ) WHERE e.class_code IN ('E6', 'E7', 'E8', 'E12');
@@ -37,6 +63,7 @@ UPDATE model.entity e SET end_to = (
 ) WHERE e.class_code IN ('E6', 'E7', 'E8', 'E12');
 
 -- Update involvement dates
+-- To do: descriptions
 UPDATE model.link el SET begin_from = (
     SELECT value_timestamp FROM model.entity t JOIN model.link_property l ON l.range_id = t.id AND l.property_code = 'OA5' AND domain_id = el.id AND t.system_type IN ('exact date value', 'from date value')
 ) WHERE el.property_code IN ('P11', 'P14', 'P22', 'P23');
@@ -49,6 +76,8 @@ UPDATE model.link el SET end_from = (
 UPDATE model.link el SET end_to = (
     SELECT value_timestamp FROM model.entity t JOIN model.link_property l ON l.range_id = t.id AND l.property_code = 'OA6' AND domain_id = el.id AND t.system_type = 'to date value'
 ) WHERE el.property_code IN ('P11', 'P14', 'P22', 'P23');
+
+
 
 -- Drop obsolete fields
 ALTER TABLE model.entity DROP COLUMN value_integer;
