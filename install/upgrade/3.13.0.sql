@@ -34,18 +34,25 @@ JOIN model.entity e ON tl.domain_id = e.id AND e.class_code IN ('E21', 'E74')
 JOIN model.link pl ON e.id = pl.domain_id AND pl.property_code = 'OA8'
 
 -- Persons, Groups appears first without place (718)
-WITH actors AS (
-	SELECT DISTINCT(t1.value_timestamp) AS timestamp1, t1.description, t2.value_timestamp AS timestamp2, e.id, e.name
-	FROM model.entity t1
-	JOIN model.link t1l ON t1.id = t1l.range_id AND t1l.property_code = 'OA1' AND t1.system_type IN ('exact date value', 'from date value')
-	JOIN model.entity e ON t1l.domain_id = e.id AND e.class_code IN ('E21', 'E74')
-	LEFT JOIN model.link pl ON e.id = pl.domain_id AND pl.property_code = 'OA8'
-	LEFT JOIN model.link tl2 ON e.id = tl2.domain_id AND tl2.property_code = 'OA1'
-	LEFT JOIN model.entity t2 ON tl2.range_id = t2.id AND t2.system_type = 'to date value'
-	WHERE pl.id IS NULL
-)
-INSERT INTO model.entity (name, begin_from, begin_comment) VALUES
-('Appearance of ' || (SELECT name FROM actors),  (SELECT timestamp1 FROM actors), (SELECT description FROM actors))
+CREATE FUNCTION model.update_actors() RETURNS integer
+    LANGUAGE plpgsql
+    AS $$DECLARE
+    actor RECORD;
+    date RECORD;
+    link_id int;
+BEGIN
+RAISE NOTICE 'Begin Loop';
+FOR actor IN SELECT id, name FROM model.entity WHERE class_code IN ('E21', 'E40', 'E74') LOOP
+    RAISE NOTICE 'In loop';
+    BEGIN
+        SELECT l.id INTO link_id FROM model.link l
+        JOIN model.entity t ON l.range_id = t.id AND t.system_type IN ('exact date value', 'from date value')
+        WHERE l.domain_id = actor.id AND l.property_code = 'OA1';
+        RAISE NOTICE 'Link id: (%)', link_id;
+    END;
+END LOOP;
+END;$$;
+ALTER FUNCTION model.update_actors() OWNER TO openatlas;
 
 -- Update event dates
 -- To do: descriptions
