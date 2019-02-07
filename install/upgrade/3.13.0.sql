@@ -49,13 +49,46 @@ CREATE FUNCTION model.update_actors() RETURNS integer
 BEGIN
 RAISE NOTICE 'Begin Loop';
 FOR actor IN SELECT id, name FROM model.entity WHERE class_code IN ('E21', 'E40', 'E74') LOOP
-    BEGIN
-        SELECT l.range_id, l.property_code INTO begin_from_id, begin_property FROM model.link l
-        JOIN model.entity t ON l.range_id = t.id AND t.system_type IN ('exact date value', 'from date value')
-        WHERE l.domain_id = actor.id;
-        RAISE NOTICE 'begin_from_id: (%) begin_property: (%)', begin_from_id, begin_property;
-    END;
+
+    -- begin from
+    SELECT l.range_id, l.property_code INTO begin_from_id, begin_property FROM model.link l
+    JOIN model.entity e ON l.range_id = e.id AND l.property_code IN ('OA1', 'OA3') AND e.system_type IN ('exact date value', 'from date value')
+    WHERE l.domain_id = actor.id;
+
+    -- begin to
+    IF begin_from_id IS NOT NULL THEN
+        SELECT l.range_id INTO begin_to_id FROM model.link l
+        JOIN model.entity e ON l.domain_id = actor.id AND l.range_id = e.id AND l.property_code IN ('OA1', 'OA3') AND e.system_type = 'to date value';
+    END IF;
+
+    -- begin place
+    SELECT l.range_id INTO begin_place_id FROM model.link l
+    JOIN model.entity e ON l.range_id = e.id AND l.property_code = 'OA8' AND l.domain_id = actor.id
+    WHERE l.domain_id = actor.id;
+
+    -- end from
+    SELECT l.range_id, l.property_code INTO end_from_id, end_property FROM model.link l
+    JOIN model.entity e ON l.range_id = e.id AND l.property_code IN ('OA2', 'OA4') AND e.system_type IN ('exact date value', 'from date value')
+    WHERE l.domain_id = actor.id;
+
+    -- end to
+    IF end_from_id IS NOT NULL THEN
+        SELECT l.range_id INTO end_to_id FROM model.link l
+        JOIN model.entity e ON l.domain_id = actor.id AND l.range_id = e.id AND l.property_code IN ('OA2', 'OA4') AND e.system_type = 'to date value';
+    END IF;
+
+    -- end place
+    SELECT l.range_id INTO end_place_id FROM model.link l
+    JOIN model.entity e ON l.range_id = e.id AND l.property_code = 'OA9' AND l.domain_id = actor.id
+    WHERE l.domain_id = actor.id;
+
+    IF begin_from_id IS NOT NULL AND begin_to_id IS NOT NULL AND begin_place_id IS NOT NULL THEN
+        RAISE NOTICE 'actor.id: (%)', actor.id;
+        RAISE NOTICE 'begin_from: (%) begin_property: (%), begin_to: (%), begin_place_id (%)', begin_from_id, begin_property, begin_to_id, begin_place_id;
+        RAISE NOTICE 'end_from: (%) end_property: (%), end_to: (%), end_place_id (%)', end_from_id, end_property, end_to_id, end_place_id;
+    END IF;
 END LOOP;
+RETURN 1;
 END;$$;
 ALTER FUNCTION model.update_actors() OWNER TO openatlas;
 
