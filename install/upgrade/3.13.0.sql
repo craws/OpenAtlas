@@ -38,17 +38,22 @@ CREATE FUNCTION model.update_actors() RETURNS integer
     LANGUAGE plpgsql
     AS $$DECLARE
     actor RECORD;
-    date RECORD;
-    link_id int;
+    begin_from_id int;
+    begin_to_id int;
+    begin_property text;
+    begin_place_id int;
+    end_from_id int;
+    end_to_id int;
+    end_property text;
+    end_place_id int;
 BEGIN
 RAISE NOTICE 'Begin Loop';
 FOR actor IN SELECT id, name FROM model.entity WHERE class_code IN ('E21', 'E40', 'E74') LOOP
-    RAISE NOTICE 'In loop';
     BEGIN
-        SELECT l.id INTO link_id FROM model.link l
+        SELECT l.range_id, l.property_code INTO begin_from_id, begin_property FROM model.link l
         JOIN model.entity t ON l.range_id = t.id AND t.system_type IN ('exact date value', 'from date value')
-        WHERE l.domain_id = actor.id AND l.property_code = 'OA1';
-        RAISE NOTICE 'Link id: (%)', link_id;
+        WHERE l.domain_id = actor.id;
+        RAISE NOTICE 'begin_from_id: (%) begin_property: (%)', begin_from_id, begin_property;
     END;
 END LOOP;
 END;$$;
