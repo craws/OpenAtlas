@@ -38,55 +38,85 @@ CREATE FUNCTION model.update_actors() RETURNS integer
     LANGUAGE plpgsql
     AS $$DECLARE
     actor RECORD;
+
     begin_from_id int;
+    begin_from_date timestamp;
     begin_to_id int;
+    begin_to_date timestamp;
     begin_property text;
+    begin_desc text;
     begin_place_id int;
+
     end_from_id int;
+    end_from_date timestamp;
     end_to_id int;
+    end_to_date timestamp;
     end_property text;
+    end_desc text;
     end_place_id int;
+
+    new_event_id int;
 BEGIN
 RAISE NOTICE 'Begin Loop';
 FOR actor IN SELECT id, name FROM model.entity WHERE class_code IN ('E21', 'E40', 'E74') LOOP
 
-    -- begin from
-    SELECT l.range_id, l.property_code INTO begin_from_id, begin_property FROM model.link l
-    JOIN model.entity e ON l.range_id = e.id AND l.property_code IN ('OA1', 'OA3') AND e.system_type IN ('exact date value', 'from date value')
-    WHERE l.domain_id = actor.id;
+    -- Begin from
+    SELECT t.id, t.value_timestamp, t.description, l.property_code INTO begin_from_id, begin_from_date, begin_desc, begin_property FROM model.link l
+    JOIN model.entity e ON l.domain_id = actor.id AND l.range_id = e.id AND l.property_code IN ('OA1', 'OA3') AND e.system_type IN ('exact date value', 'from date value')
+    JOIN model.entity t ON l.range_id = t.id;
 
-    -- begin to
-    IF begin_from_id IS NOT NULL THEN
-        SELECT l.range_id INTO begin_to_id FROM model.link l
-        JOIN model.entity e ON l.domain_id = actor.id AND l.range_id = e.id AND l.property_code IN ('OA1', 'OA3') AND e.system_type = 'to date value';
+    -- Begin to
+    IF begin_from_date IS NOT NULL THEN
+        SELECT t.id, t.value_timestamp INTO begin_to_id, begin_to_date FROM model.link l
+        JOIN model.entity e ON l.domain_id = actor.id AND l.range_id = e.id AND l.property_code IN ('OA1', 'OA3') AND e.system_type = 'to date value'
+        JOIN model.entity t ON l.range_id = t.id;
     END IF;
 
-    -- begin place
+    -- Begin place
     SELECT l.range_id INTO begin_place_id FROM model.link l
-    JOIN model.entity e ON l.range_id = e.id AND l.property_code = 'OA8' AND l.domain_id = actor.id
-    WHERE l.domain_id = actor.id;
+    JOIN model.entity e ON l.domain_id = actor.id AND l.range_id = e.id AND l.property_code = 'OA8' AND l.domain_id = actor.id;
 
-    -- end from
-    SELECT l.range_id, l.property_code INTO end_from_id, end_property FROM model.link l
-    JOIN model.entity e ON l.range_id = e.id AND l.property_code IN ('OA2', 'OA4') AND e.system_type IN ('exact date value', 'from date value')
-    WHERE l.domain_id = actor.id;
+    -- End from
+    SELECT t.id, t.value_timestamp, t.description, l.property_code INTO end_from_id, end_from_date, end_desc, end_property FROM model.link l
+    JOIN model.entity e ON l.domain_id = actor.id AND l.range_id = e.id AND l.property_code IN ('OA2', 'OA4') AND e.system_type IN ('exact date value', 'from date value')
+    JOIN model.entity t ON l.range_id = t.id;
 
-    -- end to
-    IF end_from_id IS NOT NULL THEN
-        SELECT l.range_id INTO end_to_id FROM model.link l
-        JOIN model.entity e ON l.domain_id = actor.id AND l.range_id = e.id AND l.property_code IN ('OA2', 'OA4') AND e.system_type = 'to date value';
+    -- End to
+    IF end_from_date IS NOT NULL THEN
+        SELECT t.id, t.value_timestamp INTO end_to_id, end_to_date FROM model.link l
+        JOIN model.entity e ON l.domain_id = actor.id AND l.range_id = e.id AND l.property_code IN ('OA2', 'OA4') AND e.system_type = 'to date value'
+        JOIN model.entity t ON l.range_id = t.id;
     END IF;
 
-    -- end place
+    -- End place
     SELECT l.range_id INTO end_place_id FROM model.link l
-    JOIN model.entity e ON l.range_id = e.id AND l.property_code = 'OA9' AND l.domain_id = actor.id
-    WHERE l.domain_id = actor.id;
+    JOIN model.entity e ON l.domain_id = actor.id AND l.range_id = e.id AND l.property_code = 'OA9' AND l.domain_id = actor.id;
 
-    IF begin_from_id IS NOT NULL AND begin_to_id IS NOT NULL AND begin_place_id IS NOT NULL THEN
+    IF begin_from_date IS NOT NULL AND begin_to_date IS NOT NULL AND begin_place_id IS NOT NULL THEN
         RAISE NOTICE 'actor.id: (%)', actor.id;
-        RAISE NOTICE 'begin_from: (%) begin_property: (%), begin_to: (%), begin_place_id (%)', begin_from_id, begin_property, begin_to_id, begin_place_id;
-        RAISE NOTICE 'end_from: (%) end_property: (%), end_to: (%), end_place_id (%)', end_from_id, end_property, end_to_id, end_place_id;
+        RAISE NOTICE 'begin_from: (%) begin_property: (%), begin_to: (%), begin_place_id (%), desc: (%)', begin_from_date, begin_property, begin_to_date, begin_place_id, begin_desc;
+        RAISE NOTICE 'end_from: (%), end_property: (%), end_to: (%), end_place_id (%), desc: (%)', end_from_date, end_property, end_to_date, end_place_id, end_desc;
     END IF;
+
+    IF begin_property = 'OA3' THEN
+        -- IF birth: move dates to entities and move appears first place (if available) to an event
+        UPDATE model.entity SET begin_from = begin_from_date, begin_to = begin_to_date, begin_comment = begin_desc WHERE id = actor.id;
+        IF begin_place_id IS NOT NULL THEN
+            -- If place move place to an event
+            INSERT INTO model.entity (class_code, name) VALUES ('E7', 'Appearance of ' || actor.name) RETURNING id INTO new_event_id;
+            INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P7', begin_place_id);
+            INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P11', actor.id);
+            RETURN 1;
+        END IF;
+    ELSEIF begin_from_id IS NOT NULL AND begin_place_id IS NOT NULL THEN
+        -- IF first appearance date and place create an event with both
+    ELSEIF begin_from_id IS NOT NULL THEN
+        -- IF begin_from create an event for for it
+    ELSEIF begin_place_id IS NOT NULL THEN
+        -- IF begin place create an event for it
+    END IF;
+
+
 END LOOP;
 RETURN 1;
 END;$$;
