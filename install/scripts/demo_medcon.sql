@@ -1,6 +1,7 @@
 -- SQL to filter data from the MEDCON project for the OpenAtlas demo version
 
 -- To do: add SQL like in DPP demo SQL (settings, user, ...)
+-- Stift Zwettl is missing (id 1866) at actor view /actor/view/341
 
 BEGIN;
 
