@@ -1,4 +1,4 @@
-# Don't edit this file. To overriding settings please use instance/production.py
+# Don't edit this file. To override settings please use instance/production.py
 import os
 from collections import OrderedDict
 
