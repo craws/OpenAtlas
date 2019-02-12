@@ -8,6 +8,9 @@ BEGIN;
 
 -- Complete rebuild of date implementation
 
+-- Disable all triggers
+SET session_replication_role = replica;
+
 -- Add new date fields
 ALTER TABLE model.entity ADD COLUMN begin_from timestamp without time zone;
 ALTER TABLE model.entity ADD COLUMN begin_to timestamp without time zone;
@@ -27,17 +30,17 @@ ALTER TABLE model.link ADD COLUMN end_comment text;
 DROP FUNCTION IF EXISTS model.delete_entity_related() CASCADE;
 
 -- Update event and place object dates
-UPDATE model.entity e SET (begin_from, begin_to, begin_comment, end_to, end_from, end_comment) = (
+UPDATE model.entity e SET (begin_from, begin_to, begin_comment, end_from, end_to, end_comment) = (
     (SELECT t.value_timestamp FROM model.entity t JOIN model.link l ON l.range_id = t.id AND l.property_code IN ('OA1', 'OA5') AND domain_id = e.id AND t.system_type IN ('exact date value', 'from date value')),
     (SELECT t.value_timestamp FROM model.entity t JOIN model.link l ON l.range_id = t.id AND l.property_code IN ('OA1', 'OA5') AND domain_id = e.id AND t.system_type = 'to date value'),
     (SELECT t.description FROM model.entity t JOIN model.link l ON l.range_id = t.id AND l.property_code IN ('OA1', 'OA5') AND domain_id = e.id AND t.system_type IN ('exact date value', 'from date value')),
     (SELECT t.value_timestamp FROM model.entity t JOIN model.link l ON l.range_id = t.id AND l.property_code IN ('OA2', 'OA6') AND domain_id = e.id AND t.system_type IN ('exact date value', 'from date value')),
     (SELECT t.value_timestamp FROM model.entity t JOIN model.link l ON l.range_id = t.id AND l.property_code IN ('OA2', 'OA6') AND domain_id = e.id AND t.system_type = 'to date value'),
     (SELECT t.description FROM model.entity t JOIN model.link l ON l.range_id = t.id AND l.property_code IN ('OA2', 'OA6') AND domain_id = e.id AND t.system_type IN ('exact date value', 'from date value'))
-) WHERE e.class_code IN ('E6', 'E7', 'E8', 'E12', 'E18');
+) WHERE e.class_code IN ('E6', 'E7', 'E8', 'E12', 'E18', 'E22');
 
 -- Update involvement, membership and relation dates
-UPDATE model.link el SET (begin_from, begin_to, begin_comment, end_to, end_from, end_comment) = (
+UPDATE model.link el SET (begin_from, begin_to, begin_comment, end_from, end_to, end_comment) = (
     (SELECT t.value_timestamp FROM model.entity t JOIN model.link_property l ON l.range_id = t.id AND l.property_code = 'OA5' AND domain_id = el.id AND t.system_type IN ('exact date value', 'from date value')),
     (SELECT t.value_timestamp FROM model.entity t JOIN model.link_property l ON l.range_id = t.id AND l.property_code = 'OA5' AND domain_id = el.id AND t.system_type = 'to date value'),
     (SELECT t.description FROM model.entity t JOIN model.link_property l ON l.range_id = t.id AND l.property_code = 'OA5' AND domain_id = el.id AND t.system_type IN ('exact date value', 'from date value')),
@@ -249,5 +252,8 @@ CREATE FUNCTION model.delete_entity_related() RETURNS trigger
     $$;
 ALTER FUNCTION model.delete_entity_related() OWNER TO openatlas;
 CREATE TRIGGER on_delete_entity BEFORE DELETE ON model.entity FOR EACH ROW EXECUTE PROCEDURE model.delete_entity_related();
+
+-- Re-enable all triggers
+SET session_replication_role = DEFAULT;
 
 COMMIT;
