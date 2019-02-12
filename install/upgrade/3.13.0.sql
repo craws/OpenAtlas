@@ -2,7 +2,7 @@
 
 -- Since this is a massive upgrade it can take a while it maybe would be be better to export your database,
 -- run the script locally and upload the database again
--- You can execute "SET client_min_messages TO NOTICE;" before to see the results
+-- SET client_min_messages TO NOTICE;
 
 BEGIN;
 
@@ -26,11 +26,27 @@ ALTER TABLE model.link ADD COLUMN end_comment text;
 -- Drop delete trigger, an adapted version will be recreated later
 DROP FUNCTION IF EXISTS model.delete_entity_related() CASCADE;
 
--------------------------------
--- Below is work in progress --
--------------------------------
+-- Update event and place object dates
+UPDATE model.entity e SET (begin_from, begin_to, begin_comment, end_to, end_from, end_comment) = (
+    (SELECT t.value_timestamp FROM model.entity t JOIN model.link l ON l.range_id = t.id AND l.property_code IN ('OA1', 'OA5') AND domain_id = e.id AND t.system_type IN ('exact date value', 'from date value')),
+    (SELECT t.value_timestamp FROM model.entity t JOIN model.link l ON l.range_id = t.id AND l.property_code IN ('OA1', 'OA5') AND domain_id = e.id AND t.system_type = 'to date value'),
+    (SELECT t.description FROM model.entity t JOIN model.link l ON l.range_id = t.id AND l.property_code IN ('OA1', 'OA5') AND domain_id = e.id AND t.system_type IN ('exact date value', 'from date value')),
+    (SELECT t.value_timestamp FROM model.entity t JOIN model.link l ON l.range_id = t.id AND l.property_code IN ('OA2', 'OA6') AND domain_id = e.id AND t.system_type IN ('exact date value', 'from date value')),
+    (SELECT t.value_timestamp FROM model.entity t JOIN model.link l ON l.range_id = t.id AND l.property_code IN ('OA2', 'OA6') AND domain_id = e.id AND t.system_type = 'to date value'),
+    (SELECT t.description FROM model.entity t JOIN model.link l ON l.range_id = t.id AND l.property_code IN ('OA2', 'OA6') AND domain_id = e.id AND t.system_type IN ('exact date value', 'from date value'))
+) WHERE e.class_code IN ('E6', 'E7', 'E8', 'E12', 'E18');
 
--- Persons, Groups appears first without place (718)
+-- Update involvement, membership and relation dates
+UPDATE model.link el SET (begin_from, begin_to, begin_comment, end_to, end_from, end_comment) = (
+    (SELECT t.value_timestamp FROM model.entity t JOIN model.link_property l ON l.range_id = t.id AND l.property_code = 'OA5' AND domain_id = el.id AND t.system_type IN ('exact date value', 'from date value')),
+    (SELECT t.value_timestamp FROM model.entity t JOIN model.link_property l ON l.range_id = t.id AND l.property_code = 'OA5' AND domain_id = el.id AND t.system_type = 'to date value'),
+    (SELECT t.description FROM model.entity t JOIN model.link_property l ON l.range_id = t.id AND l.property_code = 'OA5' AND domain_id = el.id AND t.system_type IN ('exact date value', 'from date value')),
+    (SELECT t.value_timestamp FROM model.entity t JOIN model.link_property l ON l.range_id = t.id AND l.property_code = 'OA6' AND domain_id = el.id AND t.system_type IN ('exact date value', 'from date value')),
+    (SELECT t.value_timestamp FROM model.entity t JOIN model.link_property l ON l.range_id = t.id AND l.property_code = 'OA6' AND domain_id = el.id AND t.system_type = 'to date value'),
+    (SELECT t.description FROM model.entity t JOIN model.link_property l ON l.range_id = t.id AND l.property_code = 'OA6' AND domain_id = el.id AND t.system_type IN ('exact date value', 'from date value'))
+) WHERE el.property_code IN ('P11', 'P14', 'P22', 'P23', 'OA7', 'P107');
+
+-- Update actors dates and places of appearance
 CREATE FUNCTION model.update_actors() RETURNS void
     LANGUAGE plpgsql
     AS $$DECLARE
@@ -83,7 +99,7 @@ count_actor_end = 0;
 count_actor_end_place = 0;
 count_actor_no_end_data_or_place = 0;
 
-RAISE NOTICE 'Begin Loop';
+RAISE NOTICE 'Begin actor update loop';
 FOR actor IN SELECT id, name FROM model.entity WHERE class_code IN ('E21', 'E40', 'E74') LOOP
 
     -- Begin from
@@ -193,35 +209,9 @@ RAISE NOTICE 'Runtime minutes=%', delta;
 END;$$;
 ALTER FUNCTION model.update_actors() OWNER TO openatlas;
 
--- Update event dates
--- To do: descriptions
-UPDATE model.entity e SET begin_from = (
-    SELECT value_timestamp FROM model.entity t JOIN model.link l ON l.range_id = t.id AND l.property_code = 'OA5' AND domain_id = e.id AND t.system_type IN ('exact date value', 'from date value')
-) WHERE e.class_code IN ('E6', 'E7', 'E8', 'E12');
-UPDATE model.entity e SET begin_to = (
-    SELECT value_timestamp FROM model.entity t JOIN model.link l ON l.range_id = t.id AND l.property_code = 'OA5' AND domain_id = e.id AND t.system_type = 'to date value'
-) WHERE e.class_code IN ('E6', 'E7', 'E8', 'E12');
-UPDATE model.entity e SET end_from = (
-    SELECT value_timestamp FROM model.entity t JOIN model.link l ON l.range_id = t.id AND l.property_code = 'OA6' AND domain_id = e.id AND t.system_type IN ('exact date value', 'from date value')
-) WHERE e.class_code IN ('E6', 'E7', 'E8', 'E12');
-UPDATE model.entity e SET end_to = (
-    SELECT value_timestamp FROM model.entity t JOIN model.link l ON l.range_id = t.id AND l.property_code = 'OA6' AND domain_id = e.id AND t.system_type = 'to date value')
-) WHERE e.class_code IN ('E6', 'E7', 'E8', 'E12');
-
--- Update involvement dates
--- To do: descriptions
-UPDATE model.link el SET begin_from = (
-    SELECT value_timestamp FROM model.entity t JOIN model.link_property l ON l.range_id = t.id AND l.property_code = 'OA5' AND domain_id = el.id AND t.system_type IN ('exact date value', 'from date value')
-) WHERE el.property_code IN ('P11', 'P14', 'P22', 'P23');
-UPDATE model.link el SET begin_to = (
-    SELECT value_timestamp FROM model.entity t JOIN model.link_property l ON l.range_id = t.id AND l.property_code = 'OA5' AND domain_id = el.id AND t.system_type = 'to date value'
-) WHERE el.property_code IN ('P11', 'P14', 'P22', 'P23');
-UPDATE model.link el SET end_from = (
-    SELECT value_timestamp FROM model.entity t JOIN model.link_property l ON l.range_id = t.id AND l.property_code = 'OA6' AND domain_id = el.id AND t.system_type IN ('exact date value', 'from date value')
-) WHERE el.property_code IN ('P11', 'P14', 'P22', 'P23');
-UPDATE model.link el SET end_to = (
-    SELECT value_timestamp FROM model.entity t JOIN model.link_property l ON l.range_id = t.id AND l.property_code = 'OA6' AND domain_id = el.id AND t.system_type = 'to date value'
-) WHERE el.property_code IN ('P11', 'P14', 'P22', 'P23');
+-- Execute actor update function, remove afterwards
+SELECT model.update_actors();
+DROP FUNCTION model.update_actors() CASCADE;
 
 -- Drop obsolete fields
 ALTER TABLE model.entity DROP COLUMN value_integer;
