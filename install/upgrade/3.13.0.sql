@@ -30,7 +30,6 @@ DROP FUNCTION IF EXISTS model.delete_entity_related() CASCADE;
 -- Below is work in progress --
 -------------------------------
 
-
 -- Persons, Groups appears first without place (718)
 CREATE FUNCTION model.update_actors() RETURNS void
     LANGUAGE plpgsql
@@ -131,18 +130,18 @@ FOR actor IN SELECT id, name FROM model.entity WHERE class_code IN ('E21', 'E40'
         END IF;
         count_actor_birth := count_actor_birth + 1;
     ELSEIF begin_from_id IS NOT NULL AND begin_place_id IS NOT NULL THEN
-        -- IF first appearance date and place create an event with both
+        -- If first appearance date and place create an event with both
         INSERT INTO model.entity (class_code, name, begin_from, begin_to, begin_comment) VALUES ('E7', 'Appearance of ' || actor.name, begin_from_date, begin_to_date, begin_desc) RETURNING id INTO new_event_id;
         INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P7', begin_place_id);
         INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P11', actor.id);
         count_actor_begin_and_place := count_actor_begin_and_place + 1;
     ELSEIF begin_from_id IS NOT NULL THEN
-        -- IF begin_from create an event for for it
+        -- If begin_from create an event for for it
         INSERT INTO model.entity (class_code, name, begin_from, begin_to, begin_comment) VALUES ('E7', 'Appearance of ' || actor.name, begin_from_date, begin_to_date, begin_desc) RETURNING id INTO new_event_id;
         INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P11', actor.id);
         count_actor_begin := count_actor_begin + 1;
     ELSEIF begin_place_id IS NOT NULL THEN
-        -- IF begin_place create an event for it
+        -- If begin_place create an event for it
         INSERT INTO model.entity (class_code, name) VALUES ('E7', 'Appearance of ' || actor.name) RETURNING id INTO new_event_id;
         INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P7', begin_place_id);
         INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P11', actor.id);
@@ -187,10 +186,9 @@ END LOOP;
 
 RAISE NOTICE 'Actor: % birth, % begin date and place, % begin date, % begin place, % no begin date or place', count_actor_birth, count_actor_begin_and_place, count_actor_begin, count_actor_begin_place, count_actor_no_begin_data_or_place;
 RAISE NOTICE 'Actor: % death, % end date and place, % end date, % end place, % no end date or place', count_actor_death, count_actor_end_and_place, count_actor_end, count_actor_end_place, count_actor_no_end_data_or_place;
-
 end_time := clock_timestamp();
-delta := extract(epoch from end_time) - extract(epoch from start_time);
-RAISE NOTICE 'Runtime seconds=%', delta;
+delta := (extract(epoch from end_time) - extract(epoch from start_time)) / 60;
+RAISE NOTICE 'Runtime minutes=%', delta;
 
 END;$$;
 ALTER FUNCTION model.update_actors() OWNER TO openatlas;
