@@ -207,7 +207,7 @@ RAISE NOTICE 'Actor: % birth, % begin date and place, % begin date, % begin plac
 RAISE NOTICE 'Actor: % death, % end date and place, % end date, % end place, % no end date or place', count_actor_death, count_actor_end_and_place, count_actor_end, count_actor_end_place, count_actor_no_end_data_or_place;
 end_time := clock_timestamp();
 delta := (extract(epoch from end_time) - extract(epoch from start_time)) / 60;
-RAISE NOTICE 'Runtime minutes=%', delta;
+RAISE NOTICE 'Runtime: %', delta;
 
 END;$$;
 ALTER FUNCTION model.update_actors() OWNER TO openatlas;
@@ -220,8 +220,12 @@ DROP FUNCTION model.update_actors() CASCADE;
 ALTER TABLE model.entity DROP COLUMN value_integer;
 ALTER TABLE model.entity DROP COLUMN value_timestamp;
 
--- Delete obsolete OA classes
+-- Delete date entities
+DELETE FROM model.entity WHERE class_code = 'E61';
+
+-- Delete obsolete OA properties
 DELETE FROM model.property WHERE code IN ('OA1', 'OA2', 'OA3', 'OA4', 'OA5', 'OA6');
+DELETE FROM model.property_i18n WHERE property_code IN ('OA1', 'OA2', 'OA3', 'OA4', 'OA5', 'OA6');
 
 -- Delete former place links
 DELETE FROM model.link WHERE link.property_code IN ('OA8', 'OA9');
@@ -233,8 +237,7 @@ CREATE FUNCTION model.delete_entity_related() RETURNS trigger
         BEGIN
             -- Delete aliases (P1, P131)
             IF OLD.class_code IN ('E18', 'E21', 'E40', 'E74') THEN
-                DELETE FROM model.entity WHERE id IN (
-                    SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code IN ('P1', 'P131'));
+                DELETE FROM model.entity WHERE id IN (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code IN ('P1', 'P131'));
             END IF;
 
             -- Delete location (E53) if it was a place or find
