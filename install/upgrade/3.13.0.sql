@@ -28,6 +28,7 @@ ALTER TABLE model.link ADD COLUMN end_comment text;
 
 -- Drop delete trigger, an adapted version will be recreated later
 DROP FUNCTION IF EXISTS model.delete_entity_related() CASCADE;
+DROP FUNCTION IF EXISTS model.delete_link_dates() CASCADE;
 
 -- Update event and place object dates
 UPDATE model.entity e SET (begin_from, begin_to, begin_comment, end_from, end_to, end_comment) = (
