@@ -248,7 +248,7 @@ class TableSelect(HiddenInput):
     def __call__(self, field, **kwargs):
         selection = ''
         class_ = field.id
-        if class_ in ['residence', 'appears_first', 'appears_last']:
+        if class_ in ['residence', 'begins_in', 'ends_in']:
             class_ = 'place'
         header = app.config['TABLE_HEADERS'][class_]
         table = {'id': field.id, 'header': header, 'data': []}

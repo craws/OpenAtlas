@@ -19,8 +19,8 @@ class ActorForm(DateForm):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     alias = FieldList(StringField(''), description=_('tooltip alias'))
     residence = TableField(_('residence'))
-    appears_first = TableField()
-    appears_last = TableField()
+    begins_in = TableField()
+    ends_in = TableField()
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
@@ -178,8 +178,8 @@ def actor_insert(code, origin_id=None):
     if origin:
         del form.insert_and_continue
     if code == 'E21':
-        form.appears_first.label.text = _('born in')
-        form.appears_last.label.text = _('died in')
+        form.begins_in.label.text = _('born in')
+        form.ends_in.label.text = _('died in')
     return render_template('actor/insert.html', form=form, code=code, origin=origin)
 
 
@@ -209,15 +209,15 @@ def actor_update(id_):
     residence = actor.get_linked_entity('P74')
     form.residence.data = residence.get_linked_entity('P53', True).id if residence else ''
     first = actor.get_linked_entity('OA8')
-    form.appears_first.data = first.get_linked_entity('P53', True).id if first else ''
+    form.begins_in.data = first.get_linked_entity('P53', True).id if first else ''
     last = actor.get_linked_entity('OA9')
-    form.appears_last.data = last.get_linked_entity('P53', True).id if last else ''
+    form.ends_in.data = last.get_linked_entity('P53', True).id if last else ''
     for alias in [x.name for x in actor.get_linked_entities('P131')]:
         form.alias.append_entry(alias)
     form.alias.append_entry('')
     if actor.class_.code == 'E21':
-        form.appears_first.label.text = _('born in')
-        form.appears_last.label.text = _('died in')
+        form.begins_in.label.text = _('born in')
+        form.ends_in.label.text = _('died in')
     return render_template('actor/update.html', form=form, actor=actor)
 
 
@@ -241,11 +241,11 @@ def save(form, actor=None, code=None, origin=None):
         if form.residence.data:
             object_ = EntityMapper.get_by_id(form.residence.data)
             actor.link('P74', object_.get_linked_entity('P53'))
-        if form.appears_first.data:
-            object_ = EntityMapper.get_by_id(form.appears_first.data)
+        if form.begins_in.data:
+            object_ = EntityMapper.get_by_id(form.begins_in.data)
             actor.link('OA8', object_.get_linked_entity('P53'))
-        if form.appears_last.data:
-            object_ = EntityMapper.get_by_id(form.appears_last.data)
+        if form.ends_in.data:
+            object_ = EntityMapper.get_by_id(form.ends_in.data)
             actor.link('OA9', object_.get_linked_entity('P53'))
         for alias in form.alias.data:
             if alias.strip():  # Check if it isn't empty
