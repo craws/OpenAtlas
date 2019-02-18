@@ -29,11 +29,11 @@ class GeneralForm(Form):
     site_name = StringField(uc_first(_('site name')))
     site_header = StringField(uc_first(_('site header')))
     default_language = SelectField(uc_first(_('default language')),
-                                   choices=app.config['LANGUAGES'].items())
+                                   choices=list(app.config['LANGUAGES'].items()))
     default_table_rows = SelectField(uc_first(_('default table rows')), coerce=int,
-                                     choices=app.config['DEFAULT_TABLE_ROWS'].items())
+                                     choices=list(app.config['DEFAULT_TABLE_ROWS'].items()))
     log_level = SelectField(uc_first(_('log level')), coerce=int,
-                            choices=app.config['LOG_LEVELS'].items())
+                            choices=list(app.config['LOG_LEVELS'].items()))
     debug_mode = BooleanField(uc_first(_('debug mode')))
     random_password_length = IntegerField(uc_first(_('random password length')))
     minimum_password_length = IntegerField(uc_first(_('minimum password length')))
