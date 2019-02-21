@@ -231,6 +231,14 @@ DELETE FROM model.property_i18n WHERE property_code IN ('OA1', 'OA2', 'OA3', 'OA
 -- Delete former place links
 DELETE FROM model.link WHERE link.property_code IN ('OA8', 'OA9');
 
+-- Update OA8 and OA9 specification
+UPDATE model.property SET name = 'begins in' WHERE code = 'OA8';
+UPDATE model.property SET name = 'ends in' WHERE code = 'OA9';
+UPDATE model.property_i18n SET text = 'begins in' WHERE attribute = 'name' AND property_code = 'OA8' AND language_code = 'en';
+UPDATE model.property_i18n SET text = 'beginnt in' WHERE attribute = 'name' AND property_code = 'OA8' AND language_code = 'de';
+UPDATE model.property_i18n SET text = 'ends in' WHERE attribute = 'name' AND property_code = 'OA9' AND language_code = 'en';
+UPDATE model.property_i18n SET text = 'endet in' WHERE attribute = 'name' AND property_code = 'OA9' AND language_code = 'de';
+
 -- Recreate delete trigger
 CREATE FUNCTION model.delete_entity_related() RETURNS trigger
     LANGUAGE plpgsql
