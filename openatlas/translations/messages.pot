@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-01-31 14:35+0100\n"
+"POT-Creation-Date: 2019-02-22 13:58+0100\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -54,7 +54,7 @@ msgstr ""
 msgid "Begin dates cannot start after end dates."
 msgstr ""
 
-#: forms/forms.py:180 forms/forms.py:232 util/util.py:471 views/types.py:46
+#: forms/forms.py:180 forms/forms.py:232 util/util.py:459 views/types.py:46
 msgid "type to search"
 msgstr ""
 
@@ -66,7 +66,7 @@ msgstr ""
 msgid "clear"
 msgstr ""
 
-#: models/content.py:54 views/actor.py:277 views/admin.py:80 views/admin.py:121
+#: models/content.py:54 views/actor.py:274 views/admin.py:80 views/admin.py:121
 #: views/admin.py:420 views/admin.py:455 views/event.py:203 views/file.py:239
 #: views/hierarchy.py:122 views/imports.py:196 views/involvement.py:65
 #: views/involvement.py:102 views/member.py:58 views/member.py:86
@@ -85,11 +85,11 @@ msgstr ""
 msgid "error multiple linked entities found"
 msgstr ""
 
-#: models/user.py:212 util/util.py:351
+#: models/user.py:212 util/util.py:339
 msgid "bookmark remove"
 msgstr ""
 
-#: models/user.py:217 util/util.py:349
+#: models/user.py:217 util/util.py:337
 msgid "bookmark"
 msgstr ""
 
@@ -122,7 +122,7 @@ msgid ""
 "mistyped or followed a broken link."
 msgstr ""
 
-#: templates/layout.html:38 util/filters.py:299 util/util.py:301
+#: templates/layout.html:38 util/filters.py:299 util/util.py:289
 msgid "show"
 msgstr ""
 
@@ -224,8 +224,8 @@ msgstr ""
 #: templates/translation/update.html:6 templates/translation/view.html:11
 #: templates/types/index.html:44 templates/types/update.html:8
 #: templates/types/view.html:25 templates/user/update.html:7
-#: templates/user/view.html:12 views/actor.py:84 views/actor.py:110
-#: views/actor.py:127 views/actor.py:136 views/actor.py:149 views/admin.py:169
+#: templates/user/view.html:12 views/actor.py:81 views/actor.py:107
+#: views/actor.py:124 views/actor.py:133 views/actor.py:146 views/admin.py:169
 #: views/event.py:132 views/event.py:148 views/file.py:151 views/place.py:124
 #: views/reference.py:143 views/source.py:88
 msgid "edit"
@@ -325,7 +325,7 @@ msgstr ""
 #: templates/event/insert.html:7 templates/event/update.html:4
 #: templates/event/view.html:4 templates/file/view.html:11
 #: templates/place/view.html:19 templates/reference/view.html:13
-#: templates/source/view.html:10 util/util.py:619 views/involvement.py:20
+#: templates/source/view.html:10 util/util.py:603 views/involvement.py:20
 #: views/reference.py:41
 msgid "event"
 msgstr ""
@@ -967,7 +967,7 @@ msgstr ""
 msgid "error mail send"
 msgstr ""
 
-#: util/util.py:160 util/util.py:460
+#: util/util.py:160 util/util.py:448
 msgid "no entries"
 msgstr ""
 
@@ -1012,74 +1012,78 @@ msgstr ""
 msgid "given place"
 msgstr ""
 
-#: util/util.py:246 util/util.py:254
-msgid "between"
+#: util/util.py:242
+msgid "born"
 msgstr ""
 
-#: util/util.py:261 views/imports.py:60 views/place.py:100 views/types.py:88
+#: util/util.py:242 util/util.py:291
+msgid "begin"
+msgstr ""
+
+#: util/util.py:244
+msgid "died"
+msgstr ""
+
+#: util/util.py:244 util/util.py:305
+msgid "end"
+msgstr ""
+
+#: util/util.py:249 views/imports.py:60 views/place.py:100 views/types.py:88
 #: views/types.py:90
 msgid "class"
 msgstr ""
 
-#: util/util.py:263
+#: util/util.py:251
 msgid "created"
 msgstr ""
 
-#: util/util.py:266
+#: util/util.py:254
 msgid "modified"
 msgstr ""
 
-#: util/util.py:268
+#: util/util.py:256
 msgid "imported from"
 msgstr ""
 
-#: util/util.py:270
+#: util/util.py:258
 msgid "imported by"
 msgstr ""
 
-#: util/util.py:300 views/imports.py:60
+#: util/util.py:288 views/imports.py:60
 msgid "date"
 msgstr ""
 
-#: util/util.py:300
+#: util/util.py:288
 msgid "tooltip date"
 msgstr ""
 
-#: util/util.py:303
+#: util/util.py:291
 msgid "birth"
 msgstr ""
 
-#: util/util.py:303
-msgid "begin"
-msgstr ""
-
-#: util/util.py:317
+#: util/util.py:305
 msgid "death"
 msgstr ""
 
-#: util/util.py:317
-msgid "end"
-msgstr ""
-
-#: util/util.py:391
+#: util/util.py:379
 msgid "unset"
 msgstr ""
 
-#: util/util.py:394
+#: util/util.py:382
 msgid "set"
 msgstr ""
 
-#: util/util.py:473
+#: util/util.py:461
 #, python-format
 msgid "min %(limit)s chars"
 msgstr ""
 
-#: util/util.py:589 util/util.py:600
+#: util/util.py:577 util/util.py:588
 #, python-format
 msgid "between %(begin)s and %(end)s"
 msgstr ""
 
-#: util/util.py:617
+#: util/util.py:607 util/util.py:610 util/util.py:614 util/util.py:617
 msgid "at an"
 msgstr ""
 
@@ -1115,55 +1119,47 @@ msgstr ""
 msgid "insert and continue"
 msgstr ""
 
-#: views/actor.py:48
-msgid "born at"
+#: views/actor.py:47 views/actor.py:181 views/actor.py:219
+msgid "born in"
 msgstr ""
 
-#: views/actor.py:48
-msgid "begins at"
+#: views/actor.py:47
+msgid "begins in"
 msgstr ""
 
-#: views/actor.py:56
-msgid "date of death"
+#: views/actor.py:53 views/actor.py:182 views/actor.py:220
+msgid "died in"
 msgstr ""
 
-#: views/actor.py:56
+#: views/actor.py:53
 msgid "ends at"
 msgstr ""
 
-#: views/actor.py:61 views/event.py:110 views/place.py:94
+#: views/actor.py:58 views/event.py:110 views/place.py:94
 #: views/reference.py:120 views/source.py:58
 msgid "main image"
 msgstr ""
 
-#: views/actor.py:114
+#: views/actor.py:111
 msgid "appears first"
 msgstr ""
 
-#: views/actor.py:115
+#: views/actor.py:112
 msgid "appears last"
 msgstr ""
 
-#: views/actor.py:184 views/actor.py:222
-msgid "born in"
-msgstr ""
-
-#: views/actor.py:185 views/actor.py:223
-msgid "died in"
-msgstr ""
-
-#: views/actor.py:194 views/event.py:74 views/file.py:205
+#: views/actor.py:191 views/event.py:74 views/file.py:205
 #: views/hierarchy.py:102 views/place.py:180 views/reference.py:181
 #: views/source.py:135 views/translation.py:50 views/types.py:121
 msgid "entity deleted"
 msgstr ""
 
-#: views/actor.py:207 views/event.py:89 views/file.py:169 views/place.py:202
+#: views/actor.py:204 views/event.py:89 views/file.py:169 views/place.py:202
 #: views/reference.py:193 views/source.py:147
 msgid "error modified"
 msgstr ""
 
-#: views/actor.py:273 views/event.py:199 views/file.py:235
+#: views/actor.py:270 views/event.py:199 views/file.py:235
 #: views/hierarchy.py:44 views/involvement.py:61 views/member.py:54
 #: views/member.py:82 views/place.py:278 views/reference.py:223
 #: views/relation.py:54 views/source.py:181 views/translation.py:30
@@ -1171,7 +1167,7 @@ msgstr ""
 msgid "entity created"
 msgstr ""
 
-#: views/actor.py:273 views/admin.py:76 views/admin.py:117 views/admin.py:416
+#: views/actor.py:270 views/admin.py:76 views/admin.py:117 views/admin.py:416
 #: views/admin.py:451 views/content.py:52 views/event.py:199 views/file.py:235
 #: views/hierarchy.py:66 views/hierarchy.py:88 views/place.py:278
 #: views/profile.py:84 views/profile.py:117 views/reference.py:102

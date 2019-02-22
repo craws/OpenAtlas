@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-01-31 14:35+0100\n"
-"PO-Revision-Date: 2018-12-26 15:31+0100\n"
+"POT-Creation-Date: 2019-02-22 13:58+0100\n"
+"PO-Revision-Date: 2019-02-22 13:57+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: de\n"
 "Language-Team: de <LL@li.org>\n"
@@ -29,15 +29,15 @@ msgstr "Suche"
 
 #: forms/date.py:16 forms/date.py:19 forms/date.py:23 forms/date.py:26
 msgid "YYYY"
-msgstr ""
+msgstr "YYYYY"
 
 #: forms/date.py:17 forms/date.py:20 forms/date.py:24 forms/date.py:27
 msgid "MM"
-msgstr ""
+msgstr "MM"
 
 #: forms/date.py:18 forms/date.py:21 forms/date.py:25 forms/date.py:28
 msgid "DD"
-msgstr ""
+msgstr "DD"
 
 #: forms/date.py:22 forms/date.py:29
 msgid "comment"
@@ -55,7 +55,7 @@ msgstr "Erstes Datum kann nicht nach Zweitem liegen."
 msgid "Begin dates cannot start after end dates."
 msgstr "Beginn Datums können nicht nach Enddatums liegen."
 
-#: forms/forms.py:180 forms/forms.py:232 util/util.py:471 views/types.py:46
+#: forms/forms.py:180 forms/forms.py:232 util/util.py:459 views/types.py:46
 msgid "type to search"
 msgstr "Tippe um zu suchen"
 
@@ -67,7 +67,7 @@ msgstr "ändern"
 msgid "clear"
 msgstr "entfernen"
 
-#: models/content.py:54 views/actor.py:277 views/admin.py:80 views/admin.py:121
+#: models/content.py:54 views/actor.py:274 views/admin.py:80 views/admin.py:121
 #: views/admin.py:420 views/admin.py:455 views/event.py:203 views/file.py:239
 #: views/hierarchy.py:122 views/imports.py:196 views/involvement.py:65
 #: views/involvement.py:102 views/member.py:58 views/member.py:86
@@ -86,11 +86,11 @@ msgstr "Dieser Link ist ungültig"
 msgid "error multiple linked entities found"
 msgstr "Fehler: mehrere verlinkte Entitäten gefunden."
 
-#: models/user.py:212 util/util.py:351
+#: models/user.py:212 util/util.py:339
 msgid "bookmark remove"
 msgstr "Bookmark entfernen"
 
-#: models/user.py:217 util/util.py:349
+#: models/user.py:217 util/util.py:337
 msgid "bookmark"
 msgstr "Bookmark"
 
@@ -127,7 +127,7 @@ msgstr ""
 "Wir haben lange gesucht aber das Dokument existiert nicht. Vielleicht "
 "hast du dich verschrieben oder bist einem veralteten Link gefolgt."
 
-#: templates/layout.html:38 util/filters.py:299 util/util.py:301
+#: templates/layout.html:38 util/filters.py:299 util/util.py:289
 msgid "show"
 msgstr "Anzeigen"
 
@@ -231,8 +231,8 @@ msgstr "speichern"
 #: templates/translation/update.html:6 templates/translation/view.html:11
 #: templates/types/index.html:44 templates/types/update.html:8
 #: templates/types/view.html:25 templates/user/update.html:7
-#: templates/user/view.html:12 views/actor.py:84 views/actor.py:110
-#: views/actor.py:127 views/actor.py:136 views/actor.py:149 views/admin.py:169
+#: templates/user/view.html:12 views/actor.py:81 views/actor.py:107
+#: views/actor.py:124 views/actor.py:133 views/actor.py:146 views/admin.py:169
 #: views/event.py:132 views/event.py:148 views/file.py:151 views/place.py:124
 #: views/reference.py:143 views/source.py:88
 msgid "edit"
@@ -342,7 +342,7 @@ msgstr "Quelle"
 #: templates/event/insert.html:7 templates/event/update.html:4
 #: templates/event/view.html:4 templates/file/view.html:11
 #: templates/place/view.html:19 templates/reference/view.html:13
-#: templates/source/view.html:10 util/util.py:619 views/involvement.py:20
+#: templates/source/view.html:10 util/util.py:603 views/involvement.py:20
 #: views/reference.py:41
 msgid "event"
 msgstr "Ereignis"
@@ -452,7 +452,7 @@ msgstr "Ungültige Link Datumswerte"
 
 #: templates/admin/check_dates.html:12
 msgid "invalid involvement dates"
-msgstr ""
+msgstr "ungültige Involvierungs Datumswerte"
 
 #: templates/admin/check_links.html:4 templates/admin/check_links.html:9
 #: templates/admin/index.html:55
@@ -969,7 +969,7 @@ msgstr "verschieben"
 
 #: templates/types/view.html:38 views/types.py:23
 msgid "unit"
-msgstr ""
+msgstr "Einheit"
 
 #: templates/types/view.html:52
 msgid "move entities"
@@ -999,7 +999,7 @@ msgstr "Es konnte keine Verbindung zum E-Mail Server hergestellt werden."
 msgid "error mail send"
 msgstr "Die E-Mail konnte nicht verschickt werden."
 
-#: util/util.py:160 util/util.py:460
+#: util/util.py:160 util/util.py:448
 msgid "no entries"
 msgstr "Keine Einträge"
 
@@ -1044,78 +1044,82 @@ msgstr "Geber"
 msgid "given place"
 msgstr "Gegebener Ort"
 
-#: util/util.py:246 util/util.py:254
-msgid "between"
-msgstr "zwischen"
+#: util/util.py:242
+msgid "born"
+msgstr "geboren"
 
-#: util/util.py:261 views/imports.py:60 views/place.py:100 views/types.py:88
+#: util/util.py:242 util/util.py:291
+msgid "begin"
+msgstr "Beginn"
+
+#: util/util.py:244
+msgid "died"
+msgstr "gestorben"
+
+#: util/util.py:244 util/util.py:305
+msgid "end"
+msgstr "Ende"
+
+#: util/util.py:249 views/imports.py:60 views/place.py:100 views/types.py:88
 #: views/types.py:90
 msgid "class"
 msgstr "Klasse"
 
-#: util/util.py:263
+#: util/util.py:251
 msgid "created"
 msgstr "erstellt"
 
-#: util/util.py:266
+#: util/util.py:254
 msgid "modified"
 msgstr "geändert"
 
-#: util/util.py:268
+#: util/util.py:256
 msgid "imported from"
 msgstr "importiert von"
 
-#: util/util.py:270
+#: util/util.py:258
 msgid "imported by"
 msgstr "importiert von"
 
-#: util/util.py:300 views/imports.py:60
+#: util/util.py:288 views/imports.py:60
 msgid "date"
 msgstr "Datum"
 
-#: util/util.py:300
+#: util/util.py:288
 msgid "tooltip date"
 msgstr ""
 "Es kann ein Beginn, ein Ende Datum oder Zeitspannen für jedes angegeben "
 "werden."
 
-#: util/util.py:303
+#: util/util.py:291
 msgid "birth"
 msgstr "Geburt"
 
-#: util/util.py:303
-msgid "begin"
-msgstr "Beginn"
-
-#: util/util.py:317
+#: util/util.py:305
 msgid "death"
 msgstr "Tod"
 
-#: util/util.py:317
-msgid "end"
-msgstr "Ende"
-
-#: util/util.py:391
+#: util/util.py:379
 msgid "unset"
 msgstr "abwählen"
 
-#: util/util.py:394
+#: util/util.py:382
 msgid "set"
 msgstr "auswählen"
 
-#: util/util.py:473
+#: util/util.py:461
 #, python-format
 msgid "min %(limit)s chars"
 msgstr "min %(limit)s Zeichen"
 
-#: util/util.py:589 util/util.py:600
+#: util/util.py:577 util/util.py:588
 #, python-format
 msgid "between %(begin)s and %(end)s"
-msgstr ""
+msgstr "zwischen %(begin)s und %(end)s"
 
-#: util/util.py:617
+#: util/util.py:607 util/util.py:610 util/util.py:614 util/util.py:617
 msgid "at an"
-msgstr ""
+msgstr "bei einem"
 
 #: views/actor.py:19 views/event.py:20 views/file.py:25 views/hierarchy.py:18
 #: views/imports.py:20 views/imports.py:60 views/place.py:18 views/place.py:30
@@ -1149,55 +1153,47 @@ msgstr "anlegen"
 msgid "insert and continue"
 msgstr "Anlegen und weiter"
 
-#: views/actor.py:48
-msgid "born at"
+#: views/actor.py:47 views/actor.py:181 views/actor.py:219
+msgid "born in"
+msgstr "geboren in"
+
+#: views/actor.py:47
+msgid "begins in"
 msgstr ""
 
-#: views/actor.py:48
-msgid "begins at"
-msgstr ""
+#: views/actor.py:53 views/actor.py:182 views/actor.py:220
+msgid "died in"
+msgstr "gestorben in"
 
-#: views/actor.py:56
-msgid "date of death"
-msgstr ""
-
-#: views/actor.py:56
+#: views/actor.py:53
 msgid "ends at"
-msgstr ""
+msgstr "endet in"
 
-#: views/actor.py:61 views/event.py:110 views/place.py:94
+#: views/actor.py:58 views/event.py:110 views/place.py:94
 #: views/reference.py:120 views/source.py:58
 msgid "main image"
 msgstr "Angezeigtes Bild"
 
-#: views/actor.py:114
+#: views/actor.py:111
 msgid "appears first"
 msgstr "Erstes Erscheinen"
 
-#: views/actor.py:115
+#: views/actor.py:112
 msgid "appears last"
 msgstr "Letztes Erscheinen"
 
-#: views/actor.py:184 views/actor.py:222
-msgid "born in"
-msgstr ""
-
-#: views/actor.py:185 views/actor.py:223
-msgid "died in"
-msgstr ""
-
-#: views/actor.py:194 views/event.py:74 views/file.py:205
+#: views/actor.py:191 views/event.py:74 views/file.py:205
 #: views/hierarchy.py:102 views/place.py:180 views/reference.py:181
 #: views/source.py:135 views/translation.py:50 views/types.py:121
 msgid "entity deleted"
 msgstr "Der Eintrag wurde gelöscht."
 
-#: views/actor.py:207 views/event.py:89 views/file.py:169 views/place.py:202
+#: views/actor.py:204 views/event.py:89 views/file.py:169 views/place.py:202
 #: views/reference.py:193 views/source.py:147
 msgid "error modified"
 msgstr "Änderung fehlgeschlagen."
 
-#: views/actor.py:273 views/event.py:199 views/file.py:235
+#: views/actor.py:270 views/event.py:199 views/file.py:235
 #: views/hierarchy.py:44 views/involvement.py:61 views/member.py:54
 #: views/member.py:82 views/place.py:278 views/reference.py:223
 #: views/relation.py:54 views/source.py:181 views/translation.py:30
@@ -1205,7 +1201,7 @@ msgstr "Änderung fehlgeschlagen."
 msgid "entity created"
 msgstr "Neuer Eintrag angelegt"
 
-#: views/actor.py:273 views/admin.py:76 views/admin.py:117 views/admin.py:416
+#: views/actor.py:270 views/admin.py:76 views/admin.py:117 views/admin.py:416
 #: views/admin.py:451 views/content.py:52 views/event.py:199 views/file.py:235
 #: views/hierarchy.py:66 views/hierarchy.py:88 views/place.py:278
 #: views/profile.py:84 views/profile.py:117 views/reference.py:102
@@ -1833,48 +1829,12 @@ msgstr "Verschicken von Zugangsdaten an %(email)s ist fehlgeschlagen."
 msgid "user deleted"
 msgstr "Der User wurde gelöscht."
 
-#~ msgid "mail recipients login"
-#~ msgstr "Login Empfänger"
+#~ msgid "born at"
+#~ msgstr "geboren in"
 
-#~ msgid "node"
-#~ msgstr "Node"
+#~ msgid "begins at"
+#~ msgstr "beginnt in"
 
-#~ msgid "custom"
-#~ msgstr "Custom"
-
-#~ msgid "no check because whitelisted"
-#~ msgstr "Keine Überprüfung da auf Whitelist."
-
-#~ msgid "orphaned entries"
-#~ msgstr "Verwaiste Einträge"
-
-#~ msgid "max file size"
-#~ msgstr "Maximale Datei Größe"
-
-#~ msgid "Upload directory not writable!"
-#~ msgstr "Upload Verzeichnis ist schreibgeschützt!"
-
-#~ msgid "orphan"
-#~ msgstr "orphan"
-
-#~ msgid "CSV"
-#~ msgstr "CSV"
-
-#~ msgid "SQL"
-#~ msgstr "SQL"
-
-#~ msgid "projects"
-#~ msgstr "Projekte"
-
-#~ msgid "filter"
-#~ msgstr "Filter"
-
-#~ msgid "yyyy"
-#~ msgstr "jjjj"
-
-#~ msgid "mm"
-#~ msgstr "mm"
-
-#~ msgid "dd"
-#~ msgstr "tt"
+#~ msgid "died at"
+#~ msgstr "gestorben in"
 

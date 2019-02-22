@@ -44,13 +44,13 @@ def actor_view(id_):
     if first:
         object_ = first.get_linked_entity('P53', True)
         objects.append(object_)
-        info.append((uc_first(_('born at' if actor.class_.code == 'E21' else 'begins at')),
+        info.append((uc_first(_('born in') if actor.class_.code == 'E21' else _('begins in')),
                      link(object_)))
     last = actor.get_linked_entity('OA9')
     if last:
         object_ = last.get_linked_entity('P53', True)
         objects.append(object_)
-        info.append((uc_first(_('died at' if actor.class_.code == 'E21' else 'ends at')),
+        info.append((uc_first(_('died in') if actor.class_.code == 'E21' else _('ends at')),
                      link(object_)))
     tables = {
         'info': info,

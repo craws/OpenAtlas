@@ -239,9 +239,9 @@ def get_entity_data(entity, location=None):
             data.append((uc_first(_('alias')), '<br />'.join([x.name for x in aliases])))
 
     # Dates
-    label = uc_first(_('born' if entity.class_.code == 'E21' else 'begin'))
+    label = uc_first(_('born') if entity.class_.code == 'E21' else _('begin'))
     data.append((label, format_entry_begin(entity)))
-    label = uc_first(_('died' if entity.class_.code == 'E21' else 'end'))
+    label = uc_first(_('died') if entity.class_.code == 'E21' else _('end'))
     data.append((label, format_entry_end(entity)))
 
     # Additional info for advanced layout
@@ -604,15 +604,15 @@ def get_appearance(event_links):
         if not entity.first:
             if event.first and (not first_year or int(event.first) < int(first_year)):
                 first_year = event.first
-                first_string = _('at an ') + event_link + format_entry_begin(event)
+                first_string = _('at an') + ' ' + event_link + format_entry_begin(event)
             if link_.first and (not first_year or int(link_.first) < int(first_year)):
                 first_year = link_.first
-                first_string = _('at an ') + event_link + format_entry_begin(link_)
+                first_string = _('at an') + ' ' + event_link + format_entry_begin(link_)
         if not entity.last:
             if event.last and (not last_year or int(event.last) > int(last_year)):
                 last_year = event.last
-                last_string = _('at an ') + event_link + format_entry_end(event)
+                last_string = _('at an') + ' ' + event_link + format_entry_end(event)
             if link_.last and (not last_year or int(link_.last) > int(last_year)):
                 last_year = link_.last
-                last_string = _('at an ') + event_link + format_entry_end(event)
+                last_string = _('at an') + ' ' + event_link + format_entry_end(event)
     return first_string, last_string
