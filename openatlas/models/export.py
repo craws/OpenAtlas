@@ -29,7 +29,6 @@ class Export:
             'model_class_inheritance': ['id', 'super_code', 'sub_code'],
             'model_entity': ['id', 'name', 'description', 'class_code'],
             'model_link': ['id', 'property_code', 'domain_id', 'range_id', 'description'],
-            'model_link_property': ['id', 'property_code', 'domain_id', 'range_id'],
             'model_property': ['id', 'code', 'range_class_code', 'domain_class_code', 'name',
                                'name_inverse'],
             'model_property_inheritance': ['id', 'super_code', 'sub_code'],

@@ -11,7 +11,6 @@ from openatlas import app, logger
 from openatlas.forms.forms import DateForm, TableMultiField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
-from openatlas.models.node import NodeMapper
 from openatlas.util.util import required_group
 
 
@@ -48,8 +47,8 @@ def relation_insert(origin_id):
                 else:
                     link_ = LinkMapper.get_by_id(origin.link('OA7', actor, form.description.data))
                 link_.set_dates(form)
+                link_.set_type(form)
                 link_.update()
-                NodeMapper.save_link_nodes(link_, form)
             g.cursor.execute('COMMIT')
             flash(_('entity created'), 'info')
         except Exception as e:  # pragma: no cover
@@ -81,8 +80,8 @@ def relation_update(id_, origin_id):
             else:
                 link_ = LinkMapper.get_by_id(origin.link('OA7', related, form.description.data))
             link_.set_dates(form)
+            link_.set_type(form)
             link_.update()
-            NodeMapper.save_link_nodes(link_, form)
             g.cursor.execute('COMMIT')
             flash(_('info update'), 'info')
         except Exception as e:  # pragma: no cover

@@ -6,7 +6,6 @@ from flask import g
 
 from openatlas import app, debug_model
 from openatlas.models.entity import Entity, EntityMapper
-from openatlas.models.linkProperty import LinkPropertyMapper
 
 
 class NodeMapper(EntityMapper):
@@ -16,7 +15,7 @@ class NodeMapper(EntityMapper):
         """ Get and return all type and place nodes"""
         sql = """
             SELECT e.id, e.name, e.class_code, e.description, e.system_type, e.created, e.modified,
-                es.id AS super_id, COUNT(e2.id) AS count, COUNT(lp.id) AS count_property
+                es.id AS super_id, COUNT(e2.id) AS count, COUNT(l3.id) AS count_property
             FROM model.entity e                
 
             -- Get super
@@ -28,7 +27,7 @@ class NodeMapper(EntityMapper):
             LEFT JOIN model.entity e2 ON l2.domain_id = e2.id AND
                 (l2.property_code = 'P2' OR
                     (l2.property_code = 'P89' AND e2.system_type = 'place location'))
-            LEFT JOIN model.link_property lp ON e.id = lp.range_id AND lp.property_code = 'P2'
+            LEFT JOIN model.link l3 ON l3.type_id = e.id
             
             WHERE e.class_code = %(class_code)s
                 AND (e.system_type IS NULL OR e.system_type != 'place location')
@@ -169,13 +168,6 @@ class NodeMapper(EntityMapper):
                     entity.link('P2', range_)
 
     @staticmethod
-    def save_link_nodes(link_id, form):
-        from openatlas.forms.forms import TreeField
-        for field in form:
-            if type(field) is TreeField and field.data:
-                LinkPropertyMapper.insert(link_id, 'P2', int(field.data))
-
-    @staticmethod
     def insert_hierarchy(node, form, value_type):
         sql = """
             INSERT INTO web.hierarchy (id, name, multiple, value_type)
@@ -232,24 +224,31 @@ class NodeMapper(EntityMapper):
                         cleaned_entity_ids.append(entity.id)
                 entity_ids = cleaned_entity_ids
             if entity_ids:
-                sql = """
-                    UPDATE model.{table} SET range_id = %(new_type_id)s
-                    WHERE range_id = %(old_type_id)s AND domain_id IN %(entity_ids)s;""".format(
-                    table='link_property' if root.name in app.config['PROPERTY_TYPES'] else 'link')
-                params = {
-                    'old_type_id': old_node.id,
-                    'new_type_id': new_type_id,
-                    'entity_ids': tuple(entity_ids)}
+                if root.name in app.config['PROPERTY_TYPES']:
+                    sql = """
+                        UPDATE model.link SET type_id = %(new_type_id)s
+                        WHERE type_id = %(old_type_id)s AND id IN %(entity_ids)s;"""
+                else:
+                    sql = """
+                        UPDATE model.link SET range_id = %(new_type_id)s
+                        WHERE range_id = %(old_type_id)s AND domain_id IN %(entity_ids)s;"""
+                params = {'old_type_id': old_node.id,
+                          'new_type_id': new_type_id,
+                          'entity_ids': tuple(entity_ids)}
                 g.cursor.execute(sql, params)
                 debug_model['div sql'] += 1
         else:
             delete_ids = entity_ids  # No new type was selected so delete all links
 
         if delete_ids:
-            sql = """
-                DELETE FROM model.{table}
-                WHERE range_id = %(old_type_id)s AND domain_id IN %(delete_ids)s;""".format(
-                table='link_property' if root.name in app.config['PROPERTY_TYPES'] else 'link')
+            if root.name in app.config['PROPERTY_TYPES']:
+                sql = """
+                    Update model.link SET type_id = NULL
+                    WHERE type_id = %(old_type_id)s AND id IN %(delete_ids)s;"""
+            else:
+                sql = """
+                    DELETE FROM model.link
+                    WHERE range_id = %(old_type_id)s AND domain_id IN %(delete_ids)s;"""
             g.cursor.execute(sql, {'old_type_id': old_node.id, 'delete_ids': tuple(delete_ids)})
             debug_model['div sql'] += 1
 

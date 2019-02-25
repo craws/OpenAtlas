@@ -59,6 +59,14 @@ class Link:
                 form.end_year_to.data, form.end_month_to.data, form.end_day_to.data)
             self.end_comment = form.end_comment.data
 
+    def set_type(self, form):
+        from openatlas.forms.forms import TreeField
+        self.type = None
+        for field in form:
+            if type(field) is TreeField and field.data:
+                self.type = g.nodes[field.data]
+                return
+
 
 class LinkMapper:
 
@@ -135,16 +143,11 @@ class LinkMapper:
         from openatlas.models.entity import EntityMapper
         sql = """
             SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description, l.created,
+                l.modified, e.name, l.type_id,
                 COALESCE(to_char(l.begin_from, 'yyyy-mm-dd BC'), '') AS begin_from, l.begin_comment,
                 COALESCE(to_char(l.begin_to, 'yyyy-mm-dd BC'), '') AS begin_to,
                 COALESCE(to_char(l.end_from, 'yyyy-mm-dd BC'), '') AS end_from, l.end_comment,
-                COALESCE(to_char(l.end_to, 'yyyy-mm-dd BC'), '') AS end_to,
-                l.modified, e.name,
-                (SELECT t.id FROM model.entity t
-                    JOIN model.link_property lp ON t.id = lp.range_id
-                        AND lp.domain_id = l.id
-                        And lp.property_code = 'P2'
-                ) AS type_id
+                COALESCE(to_char(l.end_to, 'yyyy-mm-dd BC'), '') AS end_to
             FROM model.link l
             JOIN model.entity e ON l.{second}_id = e.id AND l.property_code IN %(codes)s
             WHERE l.{first}_id = %(entity_id)s GROUP BY l.id, e.name ORDER BY e.name;""".format(
@@ -175,21 +178,22 @@ class LinkMapper:
     def get_by_id(id_):
         sql = """
             SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description, l.created,
+                l.modified, l.type_id,
                 COALESCE(to_char(l.begin_from, 'yyyy-mm-dd BC'), '') AS begin_from, l.begin_comment,
                 COALESCE(to_char(l.begin_to, 'yyyy-mm-dd BC'), '') AS begin_to,
                 COALESCE(to_char(l.end_from, 'yyyy-mm-dd BC'), '') AS end_from, l.end_comment,
-                COALESCE(to_char(l.end_to, 'yyyy-mm-dd BC'), '') AS end_to,
-                l.modified,
-                (SELECT t.id FROM model.entity t
-                    JOIN model.link_property lp ON t.id = lp.range_id
-                        AND lp.domain_id = l.id
-                        And lp.property_code = 'P2'
-                ) AS type_id
+                COALESCE(to_char(l.end_to, 'yyyy-mm-dd BC'), '') AS end_to
             FROM model.link l
             WHERE l.id = %(id)s;"""
         g.cursor.execute(sql, {'id': id_})
         debug_model['link sql'] += 1
         return Link(g.cursor.fetchone())
+
+    @staticmethod
+    def get_entities_by_node(node):
+        sql = "SELECT id, domain_id, range_id from model.link WHERE type_id = %(node_id)s;"
+        g.cursor.execute(sql, {'node_id': node.id})
+        return g.cursor.fetchall()
 
     @staticmethod
     def delete(id_):
@@ -211,6 +215,7 @@ class LinkMapper:
                                'property_code': link.property.code,
                                'domain_id': link.domain.id,
                                'range_id': link.range.id,
+                               'type_id': link.type.id if link.type else None,
                                'description': link.description,
                                'begin_from': DateMapper.datetime64_to_timestamp(link.begin_from),
                                'begin_to': DateMapper.datetime64_to_timestamp(link.begin_to),

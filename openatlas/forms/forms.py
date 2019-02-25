@@ -11,7 +11,7 @@ from wtforms.widgets import HiddenInput
 from openatlas import app
 from openatlas.forms.date import DateForm
 from openatlas.models.entity import EntityMapper
-from openatlas.models.linkProperty import LinkPropertyMapper
+from openatlas.models.link import LinkMapper
 from openatlas.models.node import NodeMapper
 from openatlas.util.util import get_base_table_data, pager, truncate_string, uc_first
 
@@ -86,7 +86,7 @@ def build_move_form(form, node):
             if place:
                 choices.append((entity.id, place.name))
     elif root.name in app.config['PROPERTY_TYPES']:
-        for row in LinkPropertyMapper.get_entities_by_node(node):
+        for row in LinkMapper.get_entities_by_node(node):
             domain = EntityMapper.get_by_id(row.domain_id)
             range_ = EntityMapper.get_by_id(row.range_id)
             choices.append((row.id, domain.name + ' - ' + range_.name))
