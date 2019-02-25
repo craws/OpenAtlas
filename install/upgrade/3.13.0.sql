@@ -11,6 +11,11 @@ BEGIN;
 -- Disable all triggers
 SET session_replication_role = replica;
 
+-- Move type links from model.link_property to model.link
+ALTER TABLE model.link ADD COLUMN type_id integer;
+ALTER TABLE ONLY model.link ADD CONSTRAINT link_type_id_fkey FOREIGN KEY (type_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+UPDATE model.link l SET type_id = (SELECT lp.range_id FROM model.link_property lp WHERE lp.property_code = 'P2' and lp.domain_id = l.id);
+
 -- Add new date fields
 ALTER TABLE model.entity ADD COLUMN begin_from timestamp without time zone;
 ALTER TABLE model.entity ADD COLUMN begin_to timestamp without time zone;
@@ -238,6 +243,9 @@ UPDATE model.property_i18n SET text = 'begins in' WHERE attribute = 'name' AND p
 UPDATE model.property_i18n SET text = 'beginnt in' WHERE attribute = 'name' AND property_code = 'OA8' AND language_code = 'de';
 UPDATE model.property_i18n SET text = 'ends in' WHERE attribute = 'name' AND property_code = 'OA9' AND language_code = 'en';
 UPDATE model.property_i18n SET text = 'endet in' WHERE attribute = 'name' AND property_code = 'OA9' AND language_code = 'de';
+
+-- Drop obsolete model.link_property table
+DROP TABLE model.link_property;
 
 -- Recreate delete trigger
 CREATE FUNCTION model.delete_entity_related() RETURNS trigger
