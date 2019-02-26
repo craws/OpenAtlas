@@ -59,14 +59,6 @@ class Link:
                 form.end_year_to.data, form.end_month_to.data, form.end_day_to.data)
             self.end_comment = form.end_comment.data
 
-    def set_type(self, form):
-        from openatlas.forms.forms import TreeField
-        self.type = None
-        for field in form:
-            if type(field) is TreeField and field.data:
-                self.type = g.nodes[field.data]
-                return
-
 
 class LinkMapper:
 
@@ -193,6 +185,7 @@ class LinkMapper:
     def get_entities_by_node(node):
         sql = "SELECT id, domain_id, range_id from model.link WHERE type_id = %(node_id)s;"
         g.cursor.execute(sql, {'node_id': node.id})
+        debug_model['link sql'] += 1
         return g.cursor.fetchall()
 
     @staticmethod
@@ -206,10 +199,11 @@ class LinkMapper:
     @staticmethod
     def update(link):
         sql = """
-            UPDATE model.link SET (property_code, domain_id, range_id, description,
+            UPDATE model.link SET (property_code, domain_id, range_id, description, type_id,
                 begin_from, begin_to, begin_comment, end_from, end_to, end_comment) =
-                (%(property_code)s, %(domain_id)s, %(range_id)s, %(description)s, %(begin_from)s,
-                %(begin_to)s, %(begin_comment)s, %(end_from)s, %(end_to)s, %(end_comment)s)
+                (%(property_code)s, %(domain_id)s, %(range_id)s, %(description)s, %(type_id)s,
+                 %(begin_from)s, %(begin_to)s, %(begin_comment)s, %(end_from)s, %(end_to)s,
+                 %(end_comment)s)
             WHERE id = %(id)s;"""
         g.cursor.execute(sql, {'id': link.id,
                                'property_code': link.property.code,

@@ -598,21 +598,21 @@ def get_appearance(event_links):
     last_string = None
     for link_ in event_links:
         event = link_.domain
-        entity = link_.range
-        event_link = '<a href="{url}">{label}</a> '.format(
-            url=url_for('event_view', id_=event.id), label=uc_first(_('event')))
-        if not entity.first:
-            if event.first and (not first_year or int(event.first) < int(first_year)):
-                first_year = event.first
-                first_string = _('at an') + ' ' + event_link + format_entry_begin(event)
+        actor = link_.range
+        event_link = '<a href="{url}">{label}</a> '.format(label=uc_first(_('event')),
+                                                           url=url_for('event_view', id_=event.id))
+        if not actor.first:
             if link_.first and (not first_year or int(link_.first) < int(first_year)):
                 first_year = link_.first
                 first_string = _('at an') + ' ' + event_link + format_entry_begin(link_)
-        if not entity.last:
-            if event.last and (not last_year or int(event.last) > int(last_year)):
-                last_year = event.last
-                last_string = _('at an') + ' ' + event_link + format_entry_end(event)
+            elif event.first and (not first_year or int(event.first) < int(first_year)):
+                first_year = event.first
+                first_string = _('at an') + ' ' + event_link + format_entry_begin(event)
+        if not actor.last:
             if link_.last and (not last_year or int(link_.last) > int(last_year)):
                 last_year = link_.last
+                last_string = _('at an') + ' ' + event_link + format_entry_end(event)
+            elif event.last and (not last_year or int(event.last) > int(last_year)):
+                last_year = event.last
                 last_string = _('at an') + ' ' + event_link + format_entry_end(event)
     return first_string, last_string

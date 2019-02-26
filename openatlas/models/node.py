@@ -27,7 +27,7 @@ class NodeMapper(EntityMapper):
             LEFT JOIN model.entity e2 ON l2.domain_id = e2.id AND
                 (l2.property_code = 'P2' OR
                     (l2.property_code = 'P89' AND e2.system_type = 'place location'))
-            LEFT JOIN model.link l3 ON l3.type_id = e.id
+            LEFT JOIN model.link l3 ON e.id = l3.type_id
             
             WHERE e.class_code = %(class_code)s
                 AND (e.system_type IS NULL OR e.system_type != 'place location')
@@ -175,11 +175,10 @@ class NodeMapper(EntityMapper):
         multiple = False
         if hasattr(form, 'multiple') and form.multiple and form.multiple.data:
             multiple = True
-        g.cursor.execute(sql, {
-            'id': node.id,
-            'name': node.name,
-            'multiple': multiple,
-            'value_type': value_type})
+        g.cursor.execute(sql, {'id': node.id,
+                               'name': node.name,
+                               'multiple': multiple,
+                               'value_type': value_type})
         NodeMapper.add_forms_to_hierarchy(node, form)
         debug_model['div sql'] += 1
 

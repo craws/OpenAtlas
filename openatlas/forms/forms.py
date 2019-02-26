@@ -1,7 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
-
 import time
+
 from flask import g, session
 from flask_babel import lazy_gettext as _
 from wtforms import FloatField, HiddenField
@@ -14,6 +14,14 @@ from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.models.node import NodeMapper
 from openatlas.util.util import get_base_table_data, pager, truncate_string, uc_first
+
+
+def get_link_type(form):
+    """ Returns the link type provided by a form."""
+    for field in form:
+        if type(field) is TreeField and field.data:
+            return g.nodes[int(field.data)]
+    return None
 
 
 def build_form(form, form_name, entity=None, request_origin=None, entity2=None):

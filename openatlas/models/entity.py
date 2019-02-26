@@ -6,10 +6,10 @@ from flask_login import current_user
 from werkzeug.exceptions import abort
 
 from openatlas import app, debug_model, logger
+from openatlas.forms.date import DateForm
 from openatlas.models.date import DateMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import print_file_extension, uc_first
-from openatlas.forms.date import DateForm
 
 
 class Entity:

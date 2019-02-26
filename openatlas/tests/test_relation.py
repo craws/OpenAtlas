@@ -22,6 +22,7 @@ class RelationTests(TestBaseCase):
             assert b'Actor Actor Relation' in rv.data
             relation_id = NodeMapper.get_hierarchy_by_name('Actor Actor Relation').id
             relation_sub_id = g.nodes[relation_id].subs[0]
+            relation_sub_id2 = g.nodes[relation_id].subs[1]
             data = {'actor': '[' + str(related_id) + ']',
                     relation_id: relation_sub_id,
                     'inverse': None,
@@ -44,8 +45,8 @@ class RelationTests(TestBaseCase):
             rv = self.app.get(url_for('actor_view', id_=actor_id))
             assert b'The Kurgan' in rv.data
 
-            rv = self.app.post(
-                url_for('relation_insert', origin_id=related_id), data=data, follow_redirects=True)
+            rv = self.app.post(url_for('relation_insert', origin_id=related_id),
+                               data=data, follow_redirects=True)
             assert b"Can't link to itself." in rv.data
 
             # Relation types
@@ -57,6 +58,16 @@ class RelationTests(TestBaseCase):
                 app.preprocess_request()
                 link_id = LinkMapper.get_links(actor_id, 'OA7')[0].id
                 link_id2 = LinkMapper.get_links(actor_id, 'OA7', True)[0].id
+
+            rv = self.app.post(url_for('node_move_entities', id_=relation_sub_id),
+                               data={relation_id: relation_sub_id2, 'selection': [link_id]},
+                               follow_redirects=True)
+            assert b'Entities where updated' in rv.data
+            rv = self.app.post(url_for('node_move_entities', id_=relation_sub_id2),
+                               data={relation_id: '', 'selection': [link_id]},
+                               follow_redirects=True)
+            assert b'Entities where updated' in rv.data
+
             rv = self.app.get(url_for('relation_update', id_=link_id, origin_id=related_id))
             assert b'Connor' in rv.data
             rv = self.app.post(

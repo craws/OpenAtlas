@@ -8,7 +8,7 @@ from wtforms import HiddenField, SelectField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import DateForm, TableMultiField, build_form
+from openatlas.forms.forms import DateForm, TableMultiField, build_form, get_link_type
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import required_group
@@ -47,14 +47,14 @@ def involvement_insert(origin_id):
                     link_ = LinkMapper.get_by_id(
                         origin.link(form.activity.data, actor, form.description.data))
                     link_.set_dates(form)
-                    link_.set_type(form)
+                    link_.type = get_link_type(form)
                     link_.update()
             else:
                 for event in EntityMapper.get_by_ids(ast.literal_eval(form.event.data)):
                     link_ = LinkMapper.get_by_id(
                         event.link(form.activity.data, origin, form.description.data))
                     link_.set_dates(form)
-                    link_.set_type(form)
+                    link_.type = get_link_type(form)
                     link_.update()
             g.cursor.execute('COMMIT')
             flash(_('entity created'), 'info')
@@ -92,7 +92,7 @@ def involvement_update(id_, origin_id):
             link_ = LinkMapper.get_by_id(
                 event.link(form.activity.data, actor, form.description.data))
             link_.set_dates(form)
-            link_.set_type(form)
+            link_.type = get_link_type(form)
             link_.update()
             g.cursor.execute('COMMIT')
         except Exception as e:  # pragma: no cover

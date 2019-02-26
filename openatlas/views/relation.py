@@ -8,7 +8,7 @@ from wtforms import BooleanField, HiddenField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import DateForm, TableMultiField, build_form
+from openatlas.forms.forms import DateForm, TableMultiField, build_form, get_link_type
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import required_group
@@ -47,7 +47,7 @@ def relation_insert(origin_id):
                 else:
                     link_ = LinkMapper.get_by_id(origin.link('OA7', actor, form.description.data))
                 link_.set_dates(form)
-                link_.set_type(form)
+                link_.type = get_link_type(form)
                 link_.update()
             g.cursor.execute('COMMIT')
             flash(_('entity created'), 'info')
@@ -80,7 +80,7 @@ def relation_update(id_, origin_id):
             else:
                 link_ = LinkMapper.get_by_id(origin.link('OA7', related, form.description.data))
             link_.set_dates(form)
-            link_.set_type(form)
+            link_.type = get_link_type(form)
             link_.update()
             g.cursor.execute('COMMIT')
             flash(_('info update'), 'info')
