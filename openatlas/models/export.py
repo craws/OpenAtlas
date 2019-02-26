@@ -27,8 +27,11 @@ class Export:
         tables = {
             'model_class': ['id', 'name', 'code'],
             'model_class_inheritance': ['id', 'super_code', 'sub_code'],
-            'model_entity': ['id', 'name', 'description', 'class_code'],
-            'model_link': ['id', 'property_code', 'domain_id', 'range_id', 'description'],
+            'model_entity': ['id', 'name', 'description', 'class_code', 'begin_from', 'begin_to',
+                             'begin_comment', 'end_from', 'end_to', 'end_comment'],
+            'model_link': ['id', 'property_code', 'domain_id', 'range_id', 'type_id', 'description',
+                           'begin_from', 'begin_to', 'begin_comment', 'end_from', 'end_to',
+                           'end_comment'],
             'model_property': ['id', 'code', 'range_class_code', 'domain_class_code', 'name',
                                'name_inverse'],
             'model_property_inheritance': ['id', 'super_code', 'sub_code'],
