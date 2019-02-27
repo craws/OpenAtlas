@@ -250,7 +250,7 @@ def get_entity_data(entity, location=None):
         info = openatlas.logger.get_log_for_advanced_view(entity.id)
         data.append((_('created'), format_date(entity.created) + ' ' + link(info['creator'])))
         if info['modified']:
-            html = format_date(info['modified']) + ' ' + link(info['modifier'])
+            html = format_date(info['modified']) + ' *' + link(info['modifier'])
             data.append((_('modified'), html))
         if info['import_project']:
             data.append((_('imported from'), link(info['import_project'])))

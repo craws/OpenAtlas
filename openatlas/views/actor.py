@@ -39,7 +39,6 @@ def actor_view(id_):
         object_ = residence.get_linked_entity('P53', True)
         objects.append(object_)
         info.append((uc_first(_('residence')), link(object_)))
-
     first = actor.get_linked_entity('OA8')
     if first:
         object_ = first.get_linked_entity('P53', True)
