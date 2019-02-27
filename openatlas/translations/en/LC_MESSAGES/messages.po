@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-02-22 13:58+0100\n"
-"PO-Revision-Date: 2019-02-22 13:58+0100\n"
+"POT-Creation-Date: 2019-02-27 18:42+0100\n"
+"PO-Revision-Date: 2019-02-27 18:43+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.6.0\n"
+"Generated-By: Babel 2.3.4\n"
 "X-Generator: Poedit 1.8.11\n"
 
 #: __init__.py:32 views/search.py:15
@@ -56,25 +56,25 @@ msgstr "First date cannot be after second."
 msgid "Begin dates cannot start after end dates."
 msgstr "Begin dates cannot start after end dates."
 
-#: forms/forms.py:180 forms/forms.py:232 util/util.py:459 views/types.py:46
+#: forms/forms.py:188 forms/forms.py:240 util/util.py:459 views/types.py:46
 msgid "type to search"
 msgstr "Type to search"
 
-#: forms/forms.py:184 forms/forms.py:237 forms/forms.py:285 forms/forms.py:333
+#: forms/forms.py:192 forms/forms.py:245 forms/forms.py:293 forms/forms.py:341
 msgid "change"
 msgstr "change"
 
-#: forms/forms.py:185 forms/forms.py:286
+#: forms/forms.py:193 forms/forms.py:294
 msgid "clear"
 msgstr "clear"
 
-#: models/content.py:54 views/actor.py:274 views/admin.py:80 views/admin.py:121
+#: models/content.py:54 views/actor.py:273 views/admin.py:80 views/admin.py:121
 #: views/admin.py:420 views/admin.py:455 views/event.py:203 views/file.py:239
-#: views/hierarchy.py:122 views/imports.py:196 views/involvement.py:65
-#: views/involvement.py:102 views/member.py:58 views/member.py:86
-#: views/member.py:115 views/place.py:288 views/profile.py:88
-#: views/profile.py:121 views/reference.py:227 views/relation.py:58
-#: views/relation.py:91 views/source.py:111 views/source.py:185
+#: views/hierarchy.py:122 views/imports.py:196 views/involvement.py:64
+#: views/involvement.py:101 views/member.py:59 views/member.py:87
+#: views/member.py:116 views/place.py:288 views/profile.py:88
+#: views/profile.py:121 views/reference.py:227 views/relation.py:57
+#: views/relation.py:90 views/source.py:111 views/source.py:185
 #: views/translation.py:85 views/types.py:237
 msgid "error transaction"
 msgstr "A transaction error occurred. Please report this."
@@ -209,8 +209,8 @@ msgstr "login"
 
 #: templates/content/update.html:16 templates/map.html:15 util/filters.py:200
 #: views/admin.py:45 views/admin.py:63 views/admin.py:104 views/admin.py:438
-#: views/involvement.py:81 views/member.py:118 views/profile.py:31
-#: views/profile.py:59 views/reference.py:97 views/relation.py:95
+#: views/involvement.py:80 views/member.py:119 views/profile.py:31
+#: views/profile.py:59 views/reference.py:97 views/relation.py:94
 #: views/user.py:30
 msgid "save"
 msgstr "save"
@@ -232,8 +232,8 @@ msgstr "save"
 #: templates/translation/update.html:6 templates/translation/view.html:11
 #: templates/types/index.html:44 templates/types/update.html:8
 #: templates/types/view.html:25 templates/user/update.html:7
-#: templates/user/view.html:12 views/actor.py:81 views/actor.py:107
-#: views/actor.py:124 views/actor.py:133 views/actor.py:146 views/admin.py:169
+#: templates/user/view.html:12 views/actor.py:80 views/actor.py:106
+#: views/actor.py:123 views/actor.py:132 views/actor.py:145 views/admin.py:169
 #: views/event.py:132 views/event.py:148 views/file.py:151 views/place.py:124
 #: views/reference.py:143 views/source.py:88
 msgid "edit"
@@ -244,7 +244,7 @@ msgstr "edit"
 #: templates/types/index.html:46 templates/types/index.html:47
 #: templates/types/view.html:27 templates/types/view.html:28
 #: templates/user/view.html:15 templates/user/view.html:16 util/filters.py:333
-#: views/admin.py:227 views/export.py:63 views/export.py:119 views/user.py:56
+#: views/admin.py:227 views/export.py:62 views/export.py:118 views/user.py:56
 msgid "delete"
 msgstr "delete"
 
@@ -288,9 +288,9 @@ msgstr "Here you can enter a description."
 #: templates/member/insert.html:4 templates/member/update.html:3
 #: templates/place/view.html:22 templates/reference/view.html:14
 #: templates/relation/insert.html:4 templates/relation/update.html:3
-#: templates/source/view.html:11 views/involvement.py:19 views/member.py:19
-#: views/member.py:20 views/place.py:100 views/reference.py:47
-#: views/relation.py:20
+#: templates/source/view.html:11 views/involvement.py:18 views/member.py:18
+#: views/member.py:19 views/place.py:100 views/reference.py:47
+#: views/relation.py:19
 msgid "actor"
 msgstr "actor"
 
@@ -337,7 +337,7 @@ msgstr "source"
 #: templates/event/insert.html:7 templates/event/update.html:4
 #: templates/event/view.html:4 templates/file/view.html:11
 #: templates/place/view.html:19 templates/reference/view.html:13
-#: templates/source/view.html:10 util/util.py:603 views/involvement.py:20
+#: templates/source/view.html:10 util/util.py:602 views/involvement.py:19
 #: views/reference.py:41
 msgid "event"
 msgstr "event"
@@ -508,7 +508,7 @@ msgid "logs"
 msgstr "logs"
 
 #: templates/admin/index.html:39 templates/user/activity.html:5
-#: templates/user/view.html:21 views/involvement.py:21
+#: templates/user/view.html:21 views/involvement.py:20
 msgid "activity"
 msgstr "activity"
 
@@ -593,7 +593,7 @@ msgstr "delete all files"
 msgid "sub events"
 msgstr "sub events"
 
-#: templates/export/export_csv.html:4 views/export.py:34
+#: templates/export/export_csv.html:4 views/export.py:33
 msgid "export CSV"
 msgstr "export CSV"
 
@@ -635,7 +635,7 @@ msgid "missing file"
 msgstr "missing file"
 
 #: templates/file/view.html:31 templates/model/network.html:13 views/admin.py:225
-#: views/export.py:59 views/export.py:114
+#: views/export.py:58 views/export.py:113
 msgid "download"
 msgstr "download"
 
@@ -681,7 +681,7 @@ msgid "entities"
 msgstr "entities"
 
 #: templates/import/project_view.html:20 util/filters.py:331 views/admin.py:218
-#: views/export.py:61 views/export.py:117
+#: views/export.py:60 views/export.py:116
 #, python-format
 msgid "Delete %(name)s?"
 msgstr "Delete %(name)s?"
@@ -813,9 +813,9 @@ msgstr "range for"
 #: templates/types/index.html:71 util/filters.py:140 views/actor.py:24
 #: views/event.py:24 views/file.py:26 views/hierarchy.py:28 views/imports.py:21
 #: views/imports.py:36 views/imports.py:60 views/index.py:22
-#: views/involvement.py:22 views/member.py:22 views/place.py:20 views/place.py:31
+#: views/involvement.py:21 views/member.py:21 views/place.py:20 views/place.py:31
 #: views/place.py:103 views/place.py:107 views/place.py:110 views/reference.py:21
-#: views/relation.py:22 views/types.py:24
+#: views/relation.py:21 views/types.py:24
 msgid "description"
 msgstr "description"
 
@@ -1128,73 +1128,73 @@ msgid "residence"
 msgstr "residence"
 
 #: views/actor.py:25 views/event.py:25 views/file.py:27 views/hierarchy.py:29
-#: views/imports.py:22 views/involvement.py:23 views/member.py:23
+#: views/imports.py:22 views/involvement.py:22 views/member.py:22
 #: views/place.py:21 views/place.py:32 views/reference.py:22
 #: views/reference.py:31 views/reference.py:37 views/reference.py:43
 #: views/reference.py:49 views/reference.py:55 views/reference.py:61
-#: views/relation.py:23 views/source.py:21 views/translation.py:18
+#: views/relation.py:22 views/source.py:21 views/translation.py:18
 #: views/types.py:25 views/user.py:55
 msgid "insert"
 msgstr "insert"
 
-#: views/actor.py:26 views/event.py:26 views/involvement.py:24 views/member.py:24
-#: views/place.py:22 views/place.py:35 views/reference.py:23 views/relation.py:24
+#: views/actor.py:26 views/event.py:26 views/involvement.py:23 views/member.py:23
+#: views/place.py:22 views/place.py:35 views/reference.py:23 views/relation.py:23
 #: views/source.py:22 views/translation.py:19 views/types.py:26 views/user.py:31
 msgid "insert and continue"
 msgstr "insert and continue"
 
-#: views/actor.py:47 views/actor.py:181 views/actor.py:219
+#: views/actor.py:46 views/actor.py:180 views/actor.py:218
 msgid "born in"
 msgstr "born in"
 
-#: views/actor.py:47
+#: views/actor.py:46
 msgid "begins in"
-msgstr ""
+msgstr "begins in"
 
-#: views/actor.py:53 views/actor.py:182 views/actor.py:220
+#: views/actor.py:52 views/actor.py:181 views/actor.py:219
 msgid "died in"
 msgstr "died in"
 
-#: views/actor.py:53
+#: views/actor.py:52
 msgid "ends at"
 msgstr "ends at"
 
-#: views/actor.py:58 views/event.py:110 views/place.py:94 views/reference.py:120
+#: views/actor.py:57 views/event.py:110 views/place.py:94 views/reference.py:120
 #: views/source.py:58
 msgid "main image"
 msgstr "main image"
 
-#: views/actor.py:111
+#: views/actor.py:110
 msgid "appears first"
 msgstr "appears first"
 
-#: views/actor.py:112
+#: views/actor.py:111
 msgid "appears last"
 msgstr "appears last"
 
-#: views/actor.py:191 views/event.py:74 views/file.py:205 views/hierarchy.py:102
+#: views/actor.py:190 views/event.py:74 views/file.py:205 views/hierarchy.py:102
 #: views/place.py:180 views/reference.py:181 views/source.py:135
 #: views/translation.py:50 views/types.py:121
 msgid "entity deleted"
 msgstr "The entry has been deleted."
 
-#: views/actor.py:204 views/event.py:89 views/file.py:169 views/place.py:202
+#: views/actor.py:203 views/event.py:89 views/file.py:169 views/place.py:202
 #: views/reference.py:193 views/source.py:147
 msgid "error modified"
 msgstr "Update failed."
 
-#: views/actor.py:270 views/event.py:199 views/file.py:235 views/hierarchy.py:44
-#: views/involvement.py:61 views/member.py:54 views/member.py:82
-#: views/place.py:278 views/reference.py:223 views/relation.py:54
+#: views/actor.py:269 views/event.py:199 views/file.py:235 views/hierarchy.py:44
+#: views/involvement.py:60 views/member.py:55 views/member.py:83
+#: views/place.py:278 views/reference.py:223 views/relation.py:53
 #: views/source.py:181 views/translation.py:30 views/types.py:233
 msgid "entity created"
 msgstr "An entry has been created."
 
-#: views/actor.py:270 views/admin.py:76 views/admin.py:117 views/admin.py:416
+#: views/actor.py:269 views/admin.py:76 views/admin.py:117 views/admin.py:416
 #: views/admin.py:451 views/content.py:52 views/event.py:199 views/file.py:235
 #: views/hierarchy.py:66 views/hierarchy.py:88 views/place.py:278
 #: views/profile.py:84 views/profile.py:117 views/reference.py:102
-#: views/reference.py:223 views/relation.py:87 views/source.py:181
+#: views/reference.py:223 views/relation.py:86 views/source.py:181
 #: views/translation.py:62 views/types.py:233 views/user.py:140
 msgid "info update"
 msgstr "Changes have been saved."
@@ -1275,7 +1275,7 @@ msgstr "change logo"
 msgid "was deleted"
 msgstr "was deleted"
 
-#: views/admin.py:263 views/admin.py:279 views/export.py:85 views/export.py:134
+#: views/admin.py:263 views/admin.py:279 views/export.py:84 views/export.py:133
 #: views/file.py:204
 msgid "error file delete"
 msgstr "An error occurred when trying to delete the file."
@@ -1388,19 +1388,19 @@ msgstr "GIS format"
 msgid "coordinates"
 msgstr "coordinates"
 
-#: views/export.py:46
+#: views/export.py:45
 msgid "data was exported as SQL"
 msgstr "data was exported as SQL"
 
-#: views/export.py:49
+#: views/export.py:48
 msgid "SQL export failed"
 msgstr "SQL export failed"
 
-#: views/export.py:82 views/export.py:131
+#: views/export.py:81 views/export.py:130
 msgid "file deleted"
 msgstr "file deleted"
 
-#: views/export.py:105
+#: views/export.py:104
 msgid "data was exported as CSV"
 msgstr "data was exported as CSV"
 
@@ -1603,7 +1603,7 @@ msgstr "Send new password mail to %(email)s."
 msgid "Failed to send password mail to %(email)s."
 msgstr "Failed to send password mail to %(email)s."
 
-#: views/member.py:31 views/member.py:35 views/relation.py:31
+#: views/member.py:30 views/member.py:34 views/relation.py:30
 msgid "Can't link to itself."
 msgstr "Can't link to itself."
 
@@ -1722,7 +1722,7 @@ msgstr "Your password has been updated."
 msgid "page"
 msgstr "Page"
 
-#: views/relation.py:19 views/types.py:21
+#: views/relation.py:18 views/types.py:21
 msgid "inverse"
 msgstr "inverse"
 
