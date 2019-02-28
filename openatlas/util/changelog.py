@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 class Changelog:
     versions = OrderedDict()
-    versions['3.13.0'] = ['TBA', OrderedDict([
+    versions['3.13.0'] = ['2019-02-28', OrderedDict([
         ('feature', OrderedDict([
             ('590', 'Search - advanced features'),
             ('975', 'Unit labels for value types'),
