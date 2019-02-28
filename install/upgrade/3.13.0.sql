@@ -35,7 +35,7 @@ ALTER TABLE model.link ADD COLUMN end_comment text;
 DROP FUNCTION IF EXISTS model.delete_entity_related() CASCADE;
 DROP FUNCTION IF EXISTS model.delete_link_dates() CASCADE;
 
--- Update event and place object dates
+-- Update event, place object, group and legal body dates
 UPDATE model.entity e SET (begin_from, begin_to, begin_comment, end_from, end_to, end_comment) = (
     (SELECT t.value_timestamp FROM model.entity t JOIN model.link l ON l.range_id = t.id AND l.property_code IN ('OA1', 'OA5') AND domain_id = e.id AND t.system_type IN ('exact date value', 'from date value')),
     (SELECT t.value_timestamp FROM model.entity t JOIN model.link l ON l.range_id = t.id AND l.property_code IN ('OA1', 'OA5') AND domain_id = e.id AND t.system_type = 'to date value'),
@@ -43,7 +43,7 @@ UPDATE model.entity e SET (begin_from, begin_to, begin_comment, end_from, end_to
     (SELECT t.value_timestamp FROM model.entity t JOIN model.link l ON l.range_id = t.id AND l.property_code IN ('OA2', 'OA6') AND domain_id = e.id AND t.system_type IN ('exact date value', 'from date value')),
     (SELECT t.value_timestamp FROM model.entity t JOIN model.link l ON l.range_id = t.id AND l.property_code IN ('OA2', 'OA6') AND domain_id = e.id AND t.system_type = 'to date value'),
     (SELECT t.description FROM model.entity t JOIN model.link l ON l.range_id = t.id AND l.property_code IN ('OA2', 'OA6') AND domain_id = e.id AND t.system_type IN ('exact date value', 'from date value'))
-) WHERE e.class_code IN ('E6', 'E7', 'E8', 'E12', 'E18', 'E22');
+) WHERE e.class_code IN ('E6', 'E7', 'E8', 'E12', 'E18', 'E22', 'E40', 'E74');
 
 -- Update involvement, membership and relation dates
 UPDATE model.link el SET (begin_from, begin_to, begin_comment, end_from, end_to, end_comment) = (
@@ -55,14 +55,10 @@ UPDATE model.link el SET (begin_from, begin_to, begin_comment, end_from, end_to,
     (SELECT t.description FROM model.entity t JOIN model.link_property l ON l.range_id = t.id AND l.property_code = 'OA6' AND domain_id = el.id AND t.system_type IN ('exact date value', 'from date value'))
 ) WHERE el.property_code IN ('P11', 'P14', 'P22', 'P23', 'OA7', 'P107');
 
--- Update actors dates and places of appearance
+-- Update actor dates and places of appearance
 CREATE FUNCTION model.update_actors() RETURNS void
     LANGUAGE plpgsql
     AS $$DECLARE
-
-    start_time timestamp;
-    end_time timestamp;
-    delta double precision;
 
     actor RECORD;
     new_event_id int;
@@ -94,9 +90,11 @@ CREATE FUNCTION model.update_actors() RETURNS void
     count_actor_end_place int;
     count_actor_no_end_data_or_place int;
 
+    count_group_legal_begin_place int;
+    count_group_legal_end_place int;
+
 BEGIN
 
-start_time := clock_timestamp();
 count_actor_birth = 0;
 count_actor_begin_and_place = 0;
 count_actor_begin = 0;
@@ -107,9 +105,42 @@ count_actor_end_and_place = 0;
 count_actor_end = 0;
 count_actor_end_place = 0;
 count_actor_no_end_data_or_place = 0;
+count_group_legal_begin_place = 0;
+count_group_legal_end_place = 0;
+
+
+RAISE NOTICE 'Begin group and legal body update loop';
+FOR actor IN SELECT id, name FROM model.entity WHERE class_code IN ('E40', 'E74') LOOP
+
+    -- Begin place
+    SELECT l.range_id INTO begin_place_id FROM model.link l
+    JOIN model.entity e ON l.domain_id = actor.id AND l.range_id = e.id AND l.property_code = 'OA8' AND l.domain_id = actor.id;
+
+    IF begin_place_id IS NOT NULL THEN
+        -- If begin_place create an event for it
+        INSERT INTO model.entity (class_code, name) VALUES ('E7', 'First appearance of ' || actor.name) RETURNING id INTO new_event_id;
+        INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P7', begin_place_id);
+        INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P11', actor.id);
+        count_actor_begin_place := count_group_legal_begin_place + 1;
+    END IF;
+
+    -- End place
+    SELECT l.range_id INTO end_place_id FROM model.link l
+    JOIN model.entity e ON l.domain_id = actor.id AND l.range_id = e.id AND l.property_code = 'OA9' AND l.domain_id = actor.id;
+
+    IF end_place_id IS NOT NULL THEN
+        -- IF end_place create an event for it
+        INSERT INTO model.entity (class_code, name) VALUES ('E7', 'Last appearance of ' || actor.name) RETURNING id INTO new_event_id;
+        INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P7', end_place_id);
+        INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P11', actor.id);
+        count_actor_end_place := count_group_legal_end_place + 1;
+    END IF;
+
+END LOOP;
+
 
 RAISE NOTICE 'Begin actor update loop';
-FOR actor IN SELECT id, name FROM model.entity WHERE class_code IN ('E21', 'E40', 'E74') LOOP
+FOR actor IN SELECT id, name FROM model.entity WHERE class_code = 'E21' LOOP
 
     -- Begin from
     SELECT t.id, t.value_timestamp, t.description, l.property_code INTO begin_from_id, begin_from_date, begin_desc, begin_property FROM model.link l
@@ -149,25 +180,25 @@ FOR actor IN SELECT id, name FROM model.entity WHERE class_code IN ('E21', 'E40'
         UPDATE model.entity SET begin_from = begin_from_date, begin_to = begin_to_date, begin_comment = begin_desc WHERE id = actor.id;
         IF begin_place_id IS NOT NULL THEN
             -- If place move place to an event
-            INSERT INTO model.entity (class_code, name) VALUES ('E7', 'Appearance of ' || actor.name) RETURNING id INTO new_event_id;
+            INSERT INTO model.entity (class_code, name) VALUES ('E7', 'First appearance of ' || actor.name) RETURNING id INTO new_event_id;
             INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P7', begin_place_id);
             INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P11', actor.id);
         END IF;
         count_actor_birth := count_actor_birth + 1;
     ELSEIF begin_from_id IS NOT NULL AND begin_place_id IS NOT NULL THEN
         -- If first appearance date and place create an event with both
-        INSERT INTO model.entity (class_code, name, begin_from, begin_to, begin_comment) VALUES ('E7', 'Appearance of ' || actor.name, begin_from_date, begin_to_date, begin_desc) RETURNING id INTO new_event_id;
+        INSERT INTO model.entity (class_code, name, begin_from, begin_to, begin_comment) VALUES ('E7', 'First appearance of ' || actor.name, begin_from_date, begin_to_date, begin_desc) RETURNING id INTO new_event_id;
         INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P7', begin_place_id);
         INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P11', actor.id);
         count_actor_begin_and_place := count_actor_begin_and_place + 1;
     ELSEIF begin_from_id IS NOT NULL THEN
         -- If begin_from create an event for for it
-        INSERT INTO model.entity (class_code, name, begin_from, begin_to, begin_comment) VALUES ('E7', 'Appearance of ' || actor.name, begin_from_date, begin_to_date, begin_desc) RETURNING id INTO new_event_id;
+        INSERT INTO model.entity (class_code, name, begin_from, begin_to, begin_comment) VALUES ('E7', 'First appearance of ' || actor.name, begin_from_date, begin_to_date, begin_desc) RETURNING id INTO new_event_id;
         INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P11', actor.id);
         count_actor_begin := count_actor_begin + 1;
     ELSEIF begin_place_id IS NOT NULL THEN
         -- If begin_place create an event for it
-        INSERT INTO model.entity (class_code, name) VALUES ('E7', 'Appearance of ' || actor.name) RETURNING id INTO new_event_id;
+        INSERT INTO model.entity (class_code, name) VALUES ('E7', 'First appearance of ' || actor.name) RETURNING id INTO new_event_id;
         INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P7', begin_place_id);
         INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P11', actor.id);
         count_actor_begin_place := count_actor_begin_place + 1;
@@ -181,25 +212,25 @@ FOR actor IN SELECT id, name FROM model.entity WHERE class_code IN ('E21', 'E40'
         UPDATE model.entity SET end_from = end_from_date, end_to = end_to_date, end_comment = end_desc WHERE id = actor.id;
         IF end_place_id IS NOT NULL THEN
             -- If place move place to an event
-            INSERT INTO model.entity (class_code, name) VALUES ('E7', 'Appearance of ' || actor.name) RETURNING id INTO new_event_id;
+            INSERT INTO model.entity (class_code, name) VALUES ('E7', 'Last appearance of ' || actor.name) RETURNING id INTO new_event_id;
             INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P7', end_place_id);
             INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P11', actor.id);
         END IF;
         count_actor_death := count_actor_death + 1;
     ELSEIF end_from_id IS NOT NULL AND end_place_id IS NOT NULL THEN
         -- IF first appearance date and place create an event with both
-        INSERT INTO model.entity (class_code, name, end_from, end_to, end_comment) VALUES ('E7', 'Appearance of ' || actor.name, end_from_date, end_to_date, end_desc) RETURNING id INTO new_event_id;
+        INSERT INTO model.entity (class_code, name, end_from, end_to, end_comment) VALUES ('E7', 'Last appearance of ' || actor.name, end_from_date, end_to_date, end_desc) RETURNING id INTO new_event_id;
         INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P7', end_place_id);
         INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P11', actor.id);
         count_actor_end_and_place := count_actor_end_and_place + 1;
     ELSEIF end_from_id IS NOT NULL THEN
         -- IF end_from create an event for for it
-        INSERT INTO model.entity (class_code, name, end_from, end_to, end_comment) VALUES ('E7', 'Appearance of ' || actor.name, end_from_date, end_to_date, end_desc) RETURNING id INTO new_event_id;
+        INSERT INTO model.entity (class_code, name, end_from, end_to, end_comment) VALUES ('E7', 'Last appearance of ' || actor.name, end_from_date, end_to_date, end_desc) RETURNING id INTO new_event_id;
         INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P11', actor.id);
         count_actor_end := count_actor_end + 1;
     ELSEIF end_place_id IS NOT NULL THEN
         -- IF end_place create an event for it
-        INSERT INTO model.entity (class_code, name) VALUES ('E7', 'Appearance of ' || actor.name) RETURNING id INTO new_event_id;
+        INSERT INTO model.entity (class_code, name) VALUES ('E7', 'Last appearance of ' || actor.name) RETURNING id INTO new_event_id;
         INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P7', end_place_id);
         INSERT INTO model.link (domain_id, property_code, range_id) VALUES (new_event_id, 'P11', actor.id);
         count_actor_end_place := count_actor_end_place + 1;
@@ -209,11 +240,9 @@ FOR actor IN SELECT id, name FROM model.entity WHERE class_code IN ('E21', 'E40'
 
 END LOOP;
 
-RAISE NOTICE 'Actor: % birth, % begin date and place, % begin date, % begin place, % no begin date or place', count_actor_birth, count_actor_begin_and_place, count_actor_begin, count_actor_begin_place, count_actor_no_begin_data_or_place;
-RAISE NOTICE 'Actor: % death, % end date and place, % end date, % end place, % no end date or place', count_actor_death, count_actor_end_and_place, count_actor_end, count_actor_end_place, count_actor_no_end_data_or_place;
-end_time := clock_timestamp();
-delta := (extract(epoch from end_time) - extract(epoch from start_time)) / 60;
-RAISE NOTICE 'Runtime: %', delta;
+RAISE NOTICE 'Person: % birth, % begin date and place, % begin date, % begin place, % no begin date or place', count_actor_birth, count_actor_begin_and_place, count_actor_begin, count_actor_begin_place, count_actor_no_begin_data_or_place;
+RAISE NOTICE 'Person: % death, % end date and place, % end date, % end place, % no end date or place', count_actor_death, count_actor_end_and_place, count_actor_end, count_actor_end_place, count_actor_no_end_data_or_place;
+RAISE NOTICE 'Group or legal body: % begin place, % end place', count_group_legal_begin_place, count_group_legal_end_place;
 
 END;$$;
 ALTER FUNCTION model.update_actors() OWNER TO openatlas;
