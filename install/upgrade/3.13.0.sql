@@ -262,8 +262,8 @@ DELETE FROM model.entity WHERE class_code = 'E61';
 DELETE FROM model.property WHERE code IN ('OA1', 'OA2', 'OA3', 'OA4', 'OA5', 'OA6');
 DELETE FROM model.property_i18n WHERE property_code IN ('OA1', 'OA2', 'OA3', 'OA4', 'OA5', 'OA6');
 
--- Delete former place links
-DELETE FROM model.link WHERE link.property_code IN ('OA8', 'OA9');
+-- Delete former place and date links
+DELETE FROM model.link WHERE link.property_code IN ('OA1', 'OA2', 'OA3', 'OA4', 'OA5', 'OA6', 'OA8', 'OA9');
 
 -- Update OA8 and OA9 specification
 UPDATE model.property SET name = 'begins in' WHERE code = 'OA8';
