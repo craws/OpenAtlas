@@ -14,6 +14,15 @@ After following the instructions restart Apache and test if the application is w
 
 Execute install/upgrade/3.13.0.sql after making backups
 
+The database structure changed significantly regarding how dates are mapped.
+
+Also some inconsistency in the actor forms were resolved. In the former version there were form fields for appears first/last at a place and begin/end dates.
+Since these date and place information weren't connected we changed it to begin and end fields for places and dates to e.g. enter a birthplace.
+
+Since we couldn't assume that the information entered before was related this update creates events for first/last appearances which are named "First/Last Appearance of actor_name".
+
+After the update you can check the new created entries going to the event overview and filter for "appearance of".
+
 #### Value type label (description)
 
 After this update the descriptions of value types is shown at entity views.
