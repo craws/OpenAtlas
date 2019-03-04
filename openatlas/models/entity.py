@@ -337,6 +337,8 @@ class EntityMapper:
 
     @staticmethod
     def search(form):
+        if not form.term.data:
+            return []
         sql = EntityMapper.sql
         if form.own.data:
             sql += " LEFT JOIN web.user_log ul ON e.id = ul.entity_id "

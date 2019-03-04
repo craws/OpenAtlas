@@ -16,6 +16,7 @@ class SearchTest(TestBaseCase):
             object_ = EntityMapper.insert('E18', 'Waldorf', 'place')
             object_.link('P1', EntityMapper.insert('E41', 'Waldorf alias'))
         with app.app_context():
+            rv = self.app.post(url_for('search_index'), data={'global-term': ''})
             rv = self.app.post(url_for('search_index'), data={'global-term': 'wal'})
             assert b'Waldo' in rv.data
             rv = self.app.post(url_for('search_index'), data={'global-term': 'wal', 'own': True})
