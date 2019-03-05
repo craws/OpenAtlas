@@ -13,12 +13,12 @@ from openatlas.util.util import display_tooltip, uc_first
 
 
 class DisplayForm(Form):
-    language = SelectField(_('language'), choices=app.config['LANGUAGES'].items())
+    language = SelectField(_('language'), choices=list(app.config['LANGUAGES'].items()))
     theme_choices = [('default', _('default')), ('darkside', 'Darkside'),
                      ('omg_ponies', 'OMG Ponies!')]
     theme = SelectField(_('color theme'), choices=theme_choices)
     table_rows = SelectField(_('table rows'), description=_('tooltip table rows'),
-                             choices=app.config['DEFAULT_TABLE_ROWS'].items(), coerce=int)
+                             choices=list(app.config['DEFAULT_TABLE_ROWS'].items()), coerce=int)
     layout_choices = [('default', _('default')), ('advanced', _('advanced'))]
     layout = SelectField(_('layout'), description=_('tooltip layout'), choices=layout_choices)
 

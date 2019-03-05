@@ -23,7 +23,7 @@ csrf = CsrfProtect(app)  # Make sure all forms are CSRF protected
 instance_name = 'production' if 'test_runner.py' not in sys.argv[0] else 'testing'
 app.config.from_object('config.default')  # Load config/INSTANCE_NAME.py
 app.config.from_pyfile(instance_name + '.py')  # Load instance/INSTANCE_NAME.py
-locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
+#locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 babel = Babel(app)
 debug_model = OrderedDict()
 
