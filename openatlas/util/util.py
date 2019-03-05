@@ -193,7 +193,7 @@ def get_entity_data(entity, location=None):
                 value=format_number(node_value), description=node.description)
         type_data[name].append(link(node) + text)
 
-    # Sort by name
+    # Sort types by name
     type_data = OrderedDict(sorted(type_data.items(), key=lambda t: t[0]))
     for root_type in type_data:
         type_data[root_type].sort()
@@ -239,20 +239,10 @@ def get_entity_data(entity, location=None):
             data.append((uc_first(_('alias')), '<br />'.join([x.name for x in aliases])))
 
     # Dates
-    date_types = OrderedDict([('OA1', _('first')), ('OA3', _('birth')), ('OA2', _('last')),
-                              ('OA4', _('death')), ('OA5', _('begin')), ('OA6', _('end'))])
-    for code, label in date_types.items():
-        if code in entity.dates:
-            if 'exact date value' in entity.dates[code]:
-                html = format_date(entity.dates[code]['exact date value']['date'])
-                html += ' ' + entity.dates[code]['exact date value']['info']
-                data.append((uc_first(label), html))
-            else:
-                html = uc_first(_('between')) + ' '
-                html += format_date(entity.dates[code]['from date value']['date'])
-                html += ' and ' + format_date(entity.dates[code]['to date value']['date'])
-                html += ' ' + entity.dates[code]['from date value']['info']
-                data.append((uc_first(label), html))
+    label = uc_first(_('born') if entity.class_.code == 'E21' else _('begin'))
+    data.append((label, format_entry_begin(entity)))
+    label = uc_first(_('died') if entity.class_.code == 'E21' else _('end'))
+    data.append((label, format_entry_end(entity)))
 
     # Additional info for advanced layout
     if hasattr(current_user, 'settings') and current_user.settings['layout'] == 'advanced':
@@ -275,10 +265,10 @@ def get_entity_data(entity, location=None):
 def add_dates_to_form(form, for_person=False):
     errors = {}
     valid_dates = True
-    for field_name in ['date_begin_year', 'date_begin_month', 'date_begin_day',
-                       'date_begin_year2', 'date_begin_month2', 'date_begin_day2',
-                       'date_end_year', 'date_end_month', 'date_end_day',
-                       'date_end_year2', 'date_end_month2', 'date_end_day2']:
+    for field_name in ['begin_year_from', 'begin_month_from', 'begin_day_from',
+                       'begin_year_to', 'begin_month_to', 'begin_day_to',
+                       'end_year_from', 'end_month_from', 'end_day_from',
+                       'end_year_to', 'end_month_to', 'end_day_to']:
         errors[field_name] = ''
         if getattr(form, field_name).errors:
             valid_dates = False
@@ -298,32 +288,32 @@ def add_dates_to_form(form, for_person=False):
         </div>""".format(date=uc_first(_('date')), tooltip=display_tooltip(_('tooltip date')),
                          show=uc_first(_('show')))
     html += '<div class="table-row date-switch" ' + style + '>'
-    html += '<div>' + str(form.date_begin_year.label).title() + '</div><div class="table-cell">'
-    html += str(form.date_begin_year(class_='year')) + ' ' + errors['date_begin_year'] + ' '
-    html += str(form.date_begin_month(class_='month')) + ' ' + errors['date_begin_month'] + ' '
-    html += str(form.date_begin_day(class_='day')) + ' ' + errors['date_begin_day'] + ' '
-    html += str(form.date_begin_info())
+    html += '<div>' + uc_first(_('birth') if for_person else _('begin')) + '</div>'
+    html += '<div class="table-cell">'
+    html += str(form.begin_year_from(class_='year')) + ' ' + errors['begin_year_from'] + ' '
+    html += str(form.begin_month_from(class_='month')) + ' ' + errors['begin_month_from'] + ' '
+    html += str(form.begin_day_from(class_='day')) + ' ' + errors['begin_day_from'] + ' '
+    html += str(form.begin_comment)
     html += '</div></div>'
     html += '<div class="table-row date-switch" ' + style + '>'
     html += '<div></div><div class="table-cell">'
-    html += str(form.date_begin_year2(class_='year')) + ' ' + errors['date_begin_year2'] + ' '
-    html += str(form.date_begin_month2(class_='month')) + ' ' + errors['date_begin_month2'] + ' '
-    html += str(form.date_begin_day2(class_='day')) + ' ' + errors['date_begin_day2'] + ' '
-    html += str(form.date_birth) + str(form.date_birth.label) if for_person else ''
+    html += str(form.begin_year_to(class_='year')) + ' ' + errors['begin_year_to'] + ' '
+    html += str(form.begin_month_to(class_='month')) + ' ' + errors['begin_month_to'] + ' '
+    html += str(form.begin_day_to(class_='day')) + ' ' + errors['begin_day_to'] + ' '
     html += '</div></div>'
     html += '<div class="table-row date-switch" ' + style + '>'
-    html += '<div>' + str(form.date_end_year.label).title() + '</div><div class="table-cell">'
-    html += str(form.date_end_year(class_='year')) + ' ' + errors['date_end_year'] + ' '
-    html += str(form.date_end_month(class_='month')) + ' ' + errors['date_end_month'] + ' '
-    html += str(form.date_end_day(class_='day')) + ' ' + errors['date_end_day'] + ' '
-    html += str(form.date_end_info())
+    html += '<div>' + uc_first(_('death') if for_person else _('end')) + '</div>'
+    html += '<div class="table-cell">'
+    html += str(form.end_year_from(class_='year')) + ' ' + errors['end_year_from'] + ' '
+    html += str(form.end_month_from(class_='month')) + ' ' + errors['end_month_from'] + ' '
+    html += str(form.end_day_from(class_='day')) + ' ' + errors['end_day_from'] + ' '
+    html += str(form.end_comment)
     html += '</div></div>'
     html += '<div class="table-row date-switch"' + style + '>'
     html += '<div></div><div class="table-cell">'
-    html += str(form.date_end_year2(class_='year')) + ' ' + errors['date_end_year2'] + ' '
-    html += str(form.date_end_month2(class_='month')) + ' ' + errors['date_end_month2'] + ' '
-    html += str(form.date_end_day2(class_='day')) + ' ' + errors['date_end_day2'] + ' '
-    html += (str(form.date_death) + str(form.date_death.label)) if for_person else ''
+    html += str(form.end_year_to(class_='year')) + ' ' + errors['end_year_to'] + ' '
+    html += str(form.end_month_to(class_='month')) + ' ' + errors['end_month_to'] + ' '
+    html += str(form.end_day_to(class_='day')) + ' ' + errors['end_day_to'] + ' '
     html += '</div></div>'
     return html
 
@@ -368,9 +358,7 @@ def is_authorized(group):
 
 
 def uc_first(string):
-    if not string:
-        return ''
-    return str(string)[0].upper() + str(string)[1:]
+    return str(string)[0].upper() + str(string)[1:] if string else ''
 
 
 def format_datetime(value, format_='medium'):
@@ -435,8 +423,6 @@ def link(entity):
             url = url_for('node_view', id_=entity.id)
             if not entity.root:
                 url = url_for('node_index') + '#tab-' + str(entity.id)
-        if entity.class_.code == 'E61':
-            return entity.name
         if not url:
             return entity.name + ' (' + entity.class_.name + ')'
         return '<a href="' + url + '">' + truncate_string(entity.name) + '</a>'
@@ -565,8 +551,8 @@ def get_base_table_data(entity, file_stats=None):
             data.append(print_file_size(entity))
             data.append(print_file_extension(entity))
     if entity.view_name in ['event', 'actor', 'place']:
-        data.append(format(entity.first))
-        data.append(format(entity.last))
+        data.append(entity.first)
+        data.append(entity.last)
     if entity.view_name in ['source'] or entity.system_type == 'file':
         data.append(truncate_string(entity.description))
     return data
@@ -580,3 +566,53 @@ def was_modified(form, entity):  # pragma: no cover
         return False
     openatlas.logger.log('info', 'multi user', 'Multi user overwrite prevented.')
     return True
+
+
+def format_entry_begin(entry):
+    html = ''
+    if entry.begin_from:
+        html = format_date(entry.begin_from)
+        if entry.begin_to:
+            html = _('between %(begin)s and %(end)s',
+                     begin=format_date(entry.begin_from), end=format_date(entry.begin_to))
+    html += ' ' + entry.begin_comment if entry.begin_comment else ''
+    return html
+
+
+def format_entry_end(entry):
+    html = ''
+    if entry.end_from:
+        html = format_date(entry.end_from)
+        if entry.end_to:
+            html = _('between %(begin)s and %(end)s',
+                     begin=format_date(entry.end_from), end=format_date(entry.end_to))
+    html += ' ' + entry.end_comment if entry.end_comment else ''
+    return html
+
+
+def get_appearance(event_links):
+    # Get first/last appearance from events for actors without begin/end
+    first_year = None
+    last_year = None
+    first_string = None
+    last_string = None
+    for link_ in event_links:
+        event = link_.domain
+        actor = link_.range
+        event_link = '<a href="{url}">{label}</a> '.format(label=uc_first(_('event')),
+                                                           url=url_for('event_view', id_=event.id))
+        if not actor.first:
+            if link_.first and (not first_year or int(link_.first) < int(first_year)):
+                first_year = link_.first
+                first_string = _('at an') + ' ' + event_link + format_entry_begin(link_)
+            elif event.first and (not first_year or int(event.first) < int(first_year)):
+                first_year = event.first
+                first_string = _('at an') + ' ' + event_link + format_entry_begin(event)
+        if not actor.last:
+            if link_.last and (not last_year or int(link_.last) > int(last_year)):
+                last_year = link_.last
+                last_string = _('at an') + ' ' + event_link + format_entry_end(event)
+            elif event.last and (not last_year or int(event.last) > int(last_year)):
+                last_year = event.last
+                last_string = _('at an') + ' ' + event_link + format_entry_end(event)
+    return first_string, last_string

@@ -4,8 +4,13 @@ from collections import OrderedDict
 
 class Changelog:
     versions = OrderedDict()
-    versions['3.13.0'] = ['TBA', OrderedDict([
-        ('feature', OrderedDict([('590', 'Search - advanced features')]))])]
+    versions['3.13.0'] = ['2019-02-28', OrderedDict([
+        ('feature', OrderedDict([
+            ('590', 'Search - advanced features'),
+            ('975', 'Unit labels for value types'),
+            ('985', 'Check for invalid dates at actor/event participations'),
+            ('936', 'Refactor dates'),
+            ('993', 'Refactor links')]))])]
     versions['3.12.0'] = ['2018-12-31', OrderedDict([
         ('feature', OrderedDict([
             ('652', 'Maps update and rewrite'),
@@ -15,7 +20,6 @@ class Changelog:
             ('962', 'Configurable character limit for live searches')])),
         ('fix', OrderedDict([
             ('970', "Insert and Continue doesn't work with place in Chrome")]))])]
-
     versions['3.11.1'] = ['2018-11-30', OrderedDict([
         ('fix', OrderedDict([
             ('964', 'Forms: tables with pager ignoring selection after changing page')]))])]

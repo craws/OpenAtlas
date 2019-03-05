@@ -10,17 +10,17 @@ from openatlas import app, logger
 from openatlas.forms.forms import DateForm, TableField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
-from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 get_profile_image_table_link, is_authorized, link, required_group,
-                                 truncate_string, uc_first, was_modified)
+from openatlas.util.util import (display_remove_link, get_appearance, get_base_table_data,
+                                 get_entity_data, get_profile_image_table_link, is_authorized, link,
+                                 required_group, truncate_string, uc_first, was_modified)
 
 
 class ActorForm(DateForm):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     alias = FieldList(StringField(''), description=_('tooltip alias'))
     residence = TableField(_('residence'))
-    appears_first = TableField(_('appears first'))
-    appears_last = TableField(_('appears last'))
+    begins_in = TableField()
+    ends_in = TableField()
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
@@ -32,7 +32,6 @@ class ActorForm(DateForm):
 @required_group('readonly')
 def actor_view(id_):
     actor = EntityMapper.get_by_id(id_)
-    actor.set_dates()
     objects = []
     info = get_entity_data(actor)
     residence = actor.get_linked_entity('P74')
@@ -44,12 +43,14 @@ def actor_view(id_):
     if first:
         object_ = first.get_linked_entity('P53', True)
         objects.append(object_)
-        info.append((uc_first(_('appears first')), link(object_)))
+        info.append((uc_first(_('born in') if actor.class_.code == 'E21' else _('begins in')),
+                     link(object_)))
     last = actor.get_linked_entity('OA9')
     if last:
         object_ = last.get_linked_entity('P53', True)
         objects.append(object_)
-        info.append((uc_first(_('appears last')), link(object_)))
+        info.append((uc_first(_('died in') if actor.class_.code == 'E21' else _('ends at')),
+                     link(object_)))
     tables = {
         'info': info,
         'file': {'id': 'files', 'data': [],
@@ -83,22 +84,21 @@ def actor_view(id_):
         tables[domain.view_name]['data'].append(data)
 
     # Todo: Performance - getting every place of every object for every event is very costly
-    for link_ in actor.get_links(['P11', 'P14', 'P22', 'P23'], True):
+    event_links = actor.get_links(['P11', 'P14', 'P22', 'P23'], True)
+
+    for link_ in event_links:
         event = link_.domain
-        first = link_.first
         place = event.get_linked_entity('P7')
         if place:
             objects.append(place.get_linked_entity('P53', True))
+        first = link_.first
         if not link_.first and event.first:
-            first = '<span class="inactive" style="float:right">' + str(event.first) + '</span>'
+            first = '<span class="inactive" style="float:right;">' + event.first + '</span>'
         last = link_.last
         if not link_.last and event.last:
-            last = '<span class="inactive" style="float:right">' + str(event.last) + '</span>'
-        data = ([link(event),
-                 g.classes[event.class_.code].name,
-                 link_.type.name if link_.type else '',
-                 first,
-                 last,
+            last = '<span class="inactive" style="float:right;">' + event.last + '</span>'
+        data = ([link(event), g.classes[event.class_.code].name,
+                 link_.type.name if link_.type else '', first, last,
                  truncate_string(link_.description)])
         if is_authorized('editor'):
             update_url = url_for('involvement_update', id_=link_.id, origin_id=actor.id)
@@ -106,6 +106,9 @@ def actor_view(id_):
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             data.append(display_remove_link(unlink_url, link_.domain.name))
         tables['event']['data'].append(data)
+    appears_first, appears_last = get_appearance(event_links)
+    info.append((_('appears first'), appears_first))
+    info.append((_('appears last'), appears_last))
     for link_ in actor.get_links('OA7') + actor.get_links('OA7', True):
         if actor.id == link_.domain.id:
             type_ = link_.type.get_name_directed() if link_.type else ''
@@ -121,11 +124,8 @@ def actor_view(id_):
             data.append(display_remove_link(unlink_url, related.name))
         tables['relation']['data'].append(data)
     for link_ in actor.get_links('P107', True):
-        data = ([link(link_.domain),
-                 link_.type.name if link_.type else '',
-                 link_.first,
-                 link_.last,
-                 truncate_string(link_.description)])
+        data = ([link(link_.domain), link_.type.name if link_.type else '',
+                 link_.first, link_.last, truncate_string(link_.description)])
         if is_authorized('editor'):
             update_url = url_for('member_update', id_=link_.id, origin_id=actor.id)
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-member-of'
@@ -136,11 +136,8 @@ def actor_view(id_):
         tables['member'] = {'id': 'member', 'data': [],
                             'header': ['member', 'function', 'first', 'last', 'description']}
         for link_ in actor.get_links('P107'):
-            data = ([link(link_.range),
-                     link_.type.name if link_.type else '',
-                     link_.first,
-                     link_.last,
-                     truncate_string(link_.description)])
+            data = ([link(link_.range), link_.type.name if link_.type else '',
+                     link_.first, link_.last, truncate_string(link_.description)])
             if is_authorized('editor'):
                 update_url = url_for('member_update', id_=link_.id, origin_id=actor.id)
                 unlink_url = url_for('link_delete', id_=link_.id,
@@ -179,6 +176,9 @@ def actor_insert(code, origin_id=None):
     form.alias.append_entry('')
     if origin:
         del form.insert_and_continue
+    if code == 'E21':
+        form.begins_in.label.text = _('born in')
+        form.ends_in.label.text = _('died in')
     return render_template('actor/insert.html', form=form, code=code, origin=origin)
 
 
@@ -195,7 +195,6 @@ def actor_delete(id_):
 @required_group('editor')
 def actor_update(id_):
     actor = EntityMapper.get_by_id(id_)
-    actor.set_dates()
     code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
     form = build_form(ActorForm, code_class[actor.class_.code], actor, request)
     if form.validate_on_submit():
@@ -209,12 +208,15 @@ def actor_update(id_):
     residence = actor.get_linked_entity('P74')
     form.residence.data = residence.get_linked_entity('P53', True).id if residence else ''
     first = actor.get_linked_entity('OA8')
-    form.appears_first.data = first.get_linked_entity('P53', True).id if first else ''
+    form.begins_in.data = first.get_linked_entity('P53', True).id if first else ''
     last = actor.get_linked_entity('OA9')
-    form.appears_last.data = last.get_linked_entity('P53', True).id if last else ''
+    form.ends_in.data = last.get_linked_entity('P53', True).id if last else ''
     for alias in [x.name for x in actor.get_linked_entities('P131')]:
         form.alias.append_entry(alias)
     form.alias.append_entry('')
+    if actor.class_.code == 'E21':
+        form.begins_in.label.text = _('born in')
+        form.ends_in.label.text = _('died in')
     return render_template('actor/update.html', form=form, actor=actor)
 
 
@@ -231,18 +233,18 @@ def save(form, actor=None, code=None, origin=None):
             log_action = 'insert'
         actor.name = form.name.data
         actor.description = form.description.data
+        actor.set_dates(form)
         actor.update()
-        actor.save_dates(form)
         actor.save_nodes(form)
         url = url_for('actor_view', id_=actor.id)
         if form.residence.data:
             object_ = EntityMapper.get_by_id(form.residence.data)
             actor.link('P74', object_.get_linked_entity('P53'))
-        if form.appears_first.data:
-            object_ = EntityMapper.get_by_id(form.appears_first.data)
+        if form.begins_in.data:
+            object_ = EntityMapper.get_by_id(form.begins_in.data)
             actor.link('OA8', object_.get_linked_entity('P53'))
-        if form.appears_last.data:
-            object_ = EntityMapper.get_by_id(form.appears_last.data)
+        if form.ends_in.data:
+            object_ = EntityMapper.get_by_id(form.ends_in.data)
             actor.link('OA9', object_.get_linked_entity('P53'))
         for alias in form.alias.data:
             if alias.strip():  # Check if it isn't empty

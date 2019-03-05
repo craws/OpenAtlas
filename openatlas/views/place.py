@@ -9,9 +9,9 @@ from openatlas import app, logger
 from openatlas.forms.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper, InvalidGeomException
-from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 is_authorized, link, required_group, truncate_string, uc_first,
-                                 was_modified, get_profile_image_table_link)
+from openatlas.util.util import (display_remove_link, format_date, get_base_table_data,
+                                 get_entity_data, get_profile_image_table_link, is_authorized, link,
+                                 required_group, truncate_string, uc_first, was_modified)
 
 
 class PlaceForm(DateForm):
@@ -87,7 +87,6 @@ def place_insert(origin_id=None):
 @required_group('readonly')
 def place_view(id_):
     object_ = EntityMapper.get_by_id(id_)
-    object_.set_dates()
     location = object_.get_linked_entity('P53')
     tables = {
         'info': get_entity_data(object_, location),
@@ -146,8 +145,8 @@ def place_view(id_):
             link(actor),
             g.properties[link_.property.code].name,
             actor.class_.name,
-            actor.first,
-            actor.last])
+            format_date(actor.first),
+            format_date(actor.last)])
     gis_data = GisMapper.get_all(object_) if location else None
     if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]':
         gis_data = None
@@ -188,7 +187,6 @@ def place_delete(id_):
 @required_group('editor')
 def place_update(id_):
     object_ = EntityMapper.get_by_id(id_)
-    object_.set_dates()
     location = object_.get_linked_entity('P53')
     if object_.system_type == 'feature':
         form = build_form(FeatureForm, 'Feature', object_, request, location)
@@ -251,8 +249,8 @@ def save(form, object_=None, location=None, origin=None):
             object_.link('P53', location)
         object_.name = form.name.data
         object_.description = form.description.data
+        object_.set_dates(form)
         object_.update()
-        object_.save_dates(form)
         object_.save_nodes(form)
         location.name = 'Location of ' + form.name.data
         location.update()

@@ -5,6 +5,8 @@ from flask import abort, flash, g
 from flask_babel import lazy_gettext as _
 
 from openatlas import debug_model, logger
+from openatlas.forms.date import DateForm
+from openatlas.models.date import DateMapper
 
 
 class Link:
@@ -20,9 +22,16 @@ class Link:
         self.nodes = dict()
         if hasattr(row, 'type_id') and row.type_id:
             self.nodes[g.nodes[row.type_id]] = None
-        self.first = int(row.first) if hasattr(row, 'first') and row.first else None
-        self.last = int(row.last) if hasattr(row, 'last') and row.last else None
-        self.dates = {}
+        if hasattr(row, 'begin_from'):
+            self.begin_from = DateMapper.timestamp_to_datetime64(row.begin_from)
+            self.begin_to = DateMapper.timestamp_to_datetime64(row.begin_to)
+            self.begin_comment = row.begin_comment
+            self.end_from = DateMapper.timestamp_to_datetime64(row.end_from)
+            self.end_to = DateMapper.timestamp_to_datetime64(row.end_to)
+            self.end_comment = row.end_comment
+            self.first = DateForm.format_date(self.begin_from, 'year') if self.begin_from else None
+            self.last = DateForm.format_date(self.end_from, 'year') if self.end_from else None
+            self.last = DateForm.format_date(self.end_to, 'year') if self.end_to else self.last
 
     def update(self):
         LinkMapper.update(self)
@@ -30,9 +39,25 @@ class Link:
     def delete(self):
         LinkMapper.delete(self.id)
 
-    def set_dates(self):
-        from openatlas.models.date import DateMapper
-        self.dates = DateMapper.get_link_dates(self)
+    def set_dates(self, form):
+        self.begin_from = None
+        self.begin_to = None
+        self.begin_comment = None
+        self.end_from = None
+        self.end_to = None
+        self.end_comment = None
+        if form.begin_year_from.data:  # Only if begin year is set create a begin date or time span
+            self.begin_from = DateMapper.form_to_datetime64(
+                form.begin_year_from.data, form.begin_month_from.data, form.begin_day_from.data)
+            self.begin_to = DateMapper.form_to_datetime64(
+                form.begin_year_to.data, form.begin_month_to.data, form.begin_day_to.data)
+            self.begin_comment = form.begin_comment.data
+        if form.end_year_from.data:  # Only if end year is set create a year date or time span
+            self.end_from = DateMapper.form_to_datetime64(
+                form.end_year_from.data, form.end_month_from.data, form.end_day_from.data)
+            self.end_to = DateMapper.form_to_datetime64(
+                form.end_year_to.data, form.end_month_to.data, form.end_day_to.data)
+            self.end_comment = form.end_comment.data
 
 
 class LinkMapper:
@@ -72,10 +97,8 @@ class LinkMapper:
                 VALUES (%(property_code)s, %(domain_id)s, %(range_id)s, %(description)s)
                 RETURNING id;"""
             # Todo: build only one sql and get execution out of loop
-            g.cursor.execute(sql, {'property_code': property_code,
-                                   'domain_id': domain.id,
-                                   'range_id': range_.id,
-                                   'description': description})
+            g.cursor.execute(sql, {'property_code': property_code, 'domain_id': domain.id,
+                                   'range_id': range_.id, 'description': description})
             debug_model['link sql'] += 1
             result = g.cursor.fetchone()[0]
         return result
@@ -112,20 +135,13 @@ class LinkMapper:
         from openatlas.models.entity import EntityMapper
         sql = """
             SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description, l.created,
-                l.modified, e.name,
-                min(date_part('year', d1.value_timestamp)) AS first,
-                max(date_part('year', d2.value_timestamp)) AS last,
-                (SELECT t.id FROM model.entity t
-                    JOIN model.link_property lp ON t.id = lp.range_id
-                        AND lp.domain_id = l.id
-                        And lp.property_code = 'P2'
-                ) AS type_id
+                l.modified, e.name, l.type_id,
+                COALESCE(to_char(l.begin_from, 'yyyy-mm-dd BC'), '') AS begin_from, l.begin_comment,
+                COALESCE(to_char(l.begin_to, 'yyyy-mm-dd BC'), '') AS begin_to,
+                COALESCE(to_char(l.end_from, 'yyyy-mm-dd BC'), '') AS end_from, l.end_comment,
+                COALESCE(to_char(l.end_to, 'yyyy-mm-dd BC'), '') AS end_to
             FROM model.link l
             JOIN model.entity e ON l.{second}_id = e.id AND l.property_code IN %(codes)s
-            LEFT JOIN model.link_property dl1 ON l.id = dl1.domain_id AND dl1.property_code = 'OA5'
-            LEFT JOIN model.entity d1 ON dl1.range_id = d1.id
-            LEFT JOIN model.link_property dl2 ON l.id = dl2.domain_id AND dl2.property_code = 'OA6'
-            LEFT JOIN model.entity d2 ON dl2.range_id = d2.id
             WHERE l.{first}_id = %(entity_id)s GROUP BY l.id, e.name ORDER BY e.name;""".format(
             first='range' if inverse else 'domain', second='domain' if inverse else 'range')
         g.cursor.execute(sql, {
@@ -154,23 +170,23 @@ class LinkMapper:
     def get_by_id(id_):
         sql = """
             SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description, l.created,
-                l.modified,
-                min(date_part('year', d1.value_timestamp)) AS first,
-                max(date_part('year', d2.value_timestamp)) AS last,
-                (SELECT t.id FROM model.entity t
-                    JOIN model.link_property lp ON t.id = lp.range_id
-                        AND lp.domain_id = l.id
-                        And lp.property_code = 'P2'
-                ) AS type_id
+                l.modified, l.type_id,
+                COALESCE(to_char(l.begin_from, 'yyyy-mm-dd BC'), '') AS begin_from, l.begin_comment,
+                COALESCE(to_char(l.begin_to, 'yyyy-mm-dd BC'), '') AS begin_to,
+                COALESCE(to_char(l.end_from, 'yyyy-mm-dd BC'), '') AS end_from, l.end_comment,
+                COALESCE(to_char(l.end_to, 'yyyy-mm-dd BC'), '') AS end_to
             FROM model.link l
-            LEFT JOIN model.link_property dl1 ON l.id = dl1.domain_id AND dl1.property_code = 'OA5'
-            LEFT JOIN model.entity d1 ON dl1.range_id = d1.id
-            LEFT JOIN model.link_property dl2 ON l.id = dl2.domain_id AND dl2.property_code = 'OA6'
-            LEFT JOIN model.entity d2 ON dl2.range_id = d2.id
-            WHERE l.id = %(id)s GROUP BY l.id;"""
+            WHERE l.id = %(id)s;"""
         g.cursor.execute(sql, {'id': id_})
         debug_model['link sql'] += 1
         return Link(g.cursor.fetchone())
+
+    @staticmethod
+    def get_entities_by_node(node):
+        sql = "SELECT id, domain_id, range_id from model.link WHERE type_id = %(node_id)s;"
+        g.cursor.execute(sql, {'node_id': node.id})
+        debug_model['link sql'] += 1
+        return g.cursor.fetchall()
 
     @staticmethod
     def delete(id_):
@@ -182,14 +198,25 @@ class LinkMapper:
 
     @staticmethod
     def update(link):
-        sql = """UPDATE model.link SET (property_code, domain_id, range_id, description) =
-            (%(property_code)s, %(domain_id)s, %(range_id)s, %(description)s) WHERE id = %(id)s;"""
-        g.cursor.execute(sql, {
-            'id': link.id,
-            'property_code': link.property.code,
-            'domain_id': link.domain.id,
-            'range_id': link.range.id,
-            'description': link.description})
+        sql = """
+            UPDATE model.link SET (property_code, domain_id, range_id, description, type_id,
+                begin_from, begin_to, begin_comment, end_from, end_to, end_comment) =
+                (%(property_code)s, %(domain_id)s, %(range_id)s, %(description)s, %(type_id)s,
+                 %(begin_from)s, %(begin_to)s, %(begin_comment)s, %(end_from)s, %(end_to)s,
+                 %(end_comment)s)
+            WHERE id = %(id)s;"""
+        g.cursor.execute(sql, {'id': link.id,
+                               'property_code': link.property.code,
+                               'domain_id': link.domain.id,
+                               'range_id': link.range.id,
+                               'type_id': link.type.id if link.type else None,
+                               'description': link.description,
+                               'begin_from': DateMapper.datetime64_to_timestamp(link.begin_from),
+                               'begin_to': DateMapper.datetime64_to_timestamp(link.begin_to),
+                               'begin_comment': link.begin_comment,
+                               'end_from':  DateMapper.datetime64_to_timestamp(link.end_from),
+                               'end_to':  DateMapper.datetime64_to_timestamp(link.end_to),
+                               'end_comment':  link.end_comment})
         debug_model['link sql'] += 1
 
     @staticmethod
@@ -227,16 +254,13 @@ class LinkMapper:
                         l.property_code = %(property)s AND
                         d.class_code = %(domain)s AND
                         r.class_code = %(range)s;"""
-                g.cursor.execute(sql, {
-                    'property': item['property'],
-                    'domain': item['domain'],
-                    'range': item['range']})
+                g.cursor.execute(sql, {'property': item['property'], 'domain': item['domain'],
+                                       'range': item['range']})
                 debug_model['link sql'] += 1
                 for row2 in g.cursor.fetchall():
                     domain = EntityMapper.get_by_id(row2.domain_id)
                     range_ = EntityMapper.get_by_id(row2.range_id)
-                    invalid_links.append({
-                        'domain': link(domain) + ' (' + domain.class_.code + ')',
-                        'property': link(g.properties[row2.property_code]),
-                        'range': link(range_) + ' (' + range_.class_.code + ')'})
+                    invalid_links.append({'domain': link(domain) + ' (' + domain.class_.code + ')',
+                                          'property': link(g.properties[row2.property_code]),
+                                          'range': link(range_) + ' (' + range_.class_.code + ')'})
         return invalid_links

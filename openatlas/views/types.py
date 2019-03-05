@@ -81,7 +81,7 @@ def node_update(id_):
 @app.route('/types/view/<int:id_>')
 @required_group('readonly')
 def node_view(id_):
-    from openatlas.models.linkProperty import LinkPropertyMapper
+    from openatlas.models.link import LinkMapper
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]] if node.root else None
     super_ = g.nodes[node.root[0]] if node.root else None
@@ -101,7 +101,7 @@ def node_view(id_):
             data.append(truncate_string(entity.description))
             tables['entities']['data'].append(data)
     tables['link_entities'] = {'id': 'link_items', 'header': [_('domain'), _('range')], 'data': []}
-    for row in LinkPropertyMapper.get_entities_by_node(node):
+    for row in LinkMapper.get_entities_by_node(node):
         tables['link_entities']['data'].append([link(EntityMapper.get_by_id(row.domain_id)),
                                                 link(EntityMapper.get_by_id(row.range_id))])
     tables['subs'] = {'id': 'subs', 'header': [_('name'), _('count'), _('info')], 'data': []}

@@ -35,23 +35,17 @@ def index():
     if current_user.is_authenticated and hasattr(current_user, 'bookmarks'):
         for entity_id in current_user.bookmarks:
             entity = EntityMapper.get_by_id(entity_id)
-            tables['bookmarks']['data'].append([
-                link(entity),
-                g.classes[entity.class_.code].name,
-                entity.first,
-                entity.last,
-                bookmark_toggle(entity.id, True)])
+            tables['bookmarks']['data'].append([link(entity), g.classes[entity.class_.code].name,
+                                                entity.first, entity.last,
+                                                bookmark_toggle(entity.id, True)])
         for name, count in EntityMapper.get_overview_counts().items():
             count = format_number(count) if count else ''
             tables['counts']['data'].append([
                 '<a href="' + url_for(name + '_index') + '">' + uc_first(_(name)) + '</a>', count])
         for entity in EntityMapper.get_latest(8):
             tables['latest']['data'].append([
-                link(entity),
-                g.classes[entity.class_.code].name,
-                entity.first,
-                entity.last,
-                format_date(entity.created),
+                link(entity), g.classes[entity.class_.code].name,
+                entity.first, entity.last, format_date(entity.created),
                 link(logger.get_log_for_advanced_view(entity.id)['creator'])])
     intro = ContentMapper.get_translation('intro')
     return render_template('index/index.html', intro=intro, tables=tables)

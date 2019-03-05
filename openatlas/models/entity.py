@@ -6,6 +6,7 @@ from flask_login import current_user
 from werkzeug.exceptions import abort
 
 from openatlas import app, debug_model, logger
+from openatlas.forms.date import DateForm
 from openatlas.models.date import DateMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import print_file_extension, uc_first
@@ -27,10 +28,23 @@ class Entity:
         self.system_type = row.system_type
         self.created = row.created
         self.modified = row.modified
-        self.first = int(row.first) if hasattr(row, 'first') and row.first else None
-        self.last = int(row.last) if hasattr(row, 'last') and row.last else None
+        self.begin_from = None
+        self.begin_to = None
+        self.begin_comment = None
+        self.end_from = None
+        self.end_to = None
+        self.end_comment = None
+        if hasattr(row, 'begin_from'):
+            self.begin_from = DateMapper.timestamp_to_datetime64(row.begin_from)
+            self.begin_to = DateMapper.timestamp_to_datetime64(row.begin_to)
+            self.begin_comment = row.begin_comment
+            self.end_from = DateMapper.timestamp_to_datetime64(row.end_from)
+            self.end_to = DateMapper.timestamp_to_datetime64(row.end_to)
+            self.end_comment = row.end_comment
+            self.first = DateForm.format_date(self.begin_from, 'year') if self.begin_from else None
+            self.last = DateForm.format_date(self.end_from, 'year') if self.end_from else None
+            self.last = DateForm.format_date(self.end_to, 'year') if self.end_to else self.last
         self.class_ = g.classes[row.class_code]
-        self.dates = {}
         self.view_name = None  # view_name is used to build urls
         if self.system_type == 'file':
             self.view_name = 'file'
@@ -61,15 +75,29 @@ class Entity:
     def update(self):
         EntityMapper.update(self)
 
-    def save_dates(self, form):
-        DateMapper.save_dates(self, form)
-
     def save_nodes(self, form):
         from openatlas.models.node import NodeMapper
         NodeMapper.save_entity_nodes(self, form)
 
-    def set_dates(self):
-        self.dates = DateMapper.get_dates(self)
+    def set_dates(self, form):
+        self.begin_from = None
+        self.begin_to = None
+        self.begin_comment = None
+        self.end_from = None
+        self.end_to = None
+        self.end_comment = None
+        if form.begin_year_from.data:  # Only if begin year is set create a begin date or time span
+            self.begin_from = DateMapper.form_to_datetime64(
+                form.begin_year_from.data, form.begin_month_from.data, form.begin_day_from.data)
+            self.begin_to = DateMapper.form_to_datetime64(
+                form.begin_year_to.data, form.begin_month_to.data, form.begin_day_to.data)
+            self.begin_comment = form.begin_comment.data
+        if form.end_year_from.data:  # Only if end year is set create a year date or time span
+            self.end_from = DateMapper.form_to_datetime64(
+                form.end_year_from.data, form.end_month_from.data, form.end_day_from.data)
+            self.end_to = DateMapper.form_to_datetime64(
+                form.end_year_to.data, form.end_month_to.data, form.end_day_to.data)
+            self.end_comment = form.end_comment.data
 
     def get_profile_image_id(self):
         return EntityMapper.get_profile_image_id(self.id)
@@ -109,42 +137,39 @@ class EntityMapper:
     sql = """
         SELECT
             e.id, e.class_code, e.name, e.description, e.created, e.modified, e.system_type,
+            COALESCE(to_char(e.begin_from, 'yyyy-mm-dd BC'), '') AS begin_from, e.begin_comment,
+            COALESCE(to_char(e.begin_to, 'yyyy-mm-dd BC'), '') AS begin_to,
+            COALESCE(to_char(e.end_from, 'yyyy-mm-dd BC'), '') AS end_from, e.end_comment,
+            COALESCE(to_char(e.end_to, 'yyyy-mm-dd BC'), '') AS end_to,
             array_to_json(
                 array_agg((t.range_id, t.description)) FILTER (WHERE t.range_id IS NOT NULL)
-            ) as nodes,
-            min(date_part('year', d1.value_timestamp)) AS first,
-            max(date_part('year', d2.value_timestamp)) AS last
-
+            ) as nodes
         FROM model.entity e
-        LEFT JOIN model.link t ON e.id = t.domain_id AND t.property_code IN ('P2', 'P89')
-
-        LEFT JOIN model.link dl1 ON e.id = dl1.domain_id
-            AND dl1.property_code IN ('OA1', 'OA3', 'OA5')
-        LEFT JOIN model.entity d1 ON dl1.range_id = d1.id
-
-        LEFT JOIN model.link dl2 ON e.id = dl2.domain_id
-            AND dl2.property_code IN ('OA2', 'OA4', 'OA6')
-        LEFT JOIN model.entity d2 ON dl2.range_id = d2.id"""
+        LEFT JOIN model.link t ON e.id = t.domain_id AND t.property_code IN ('P2', 'P89')"""
 
     sql_orphan = """
         SELECT e.id FROM model.entity e
         LEFT JOIN model.link l1 on e.id = l1.domain_id
         LEFT JOIN model.link l2 on e.id = l2.range_id
-        LEFT JOIN model.link_property lp2 on e.id = lp2.range_id
-        WHERE
-            l1.domain_id IS NULL
-            AND l2.range_id IS NULL
-            AND lp2.range_id IS NULL
-            AND e.class_code != 'E55'"""
+        WHERE l1.domain_id IS NULL AND l2.range_id IS NULL AND e.class_code != 'E55'"""
 
     @staticmethod
     def update(entity):
         from openatlas.util.util import sanitize
         sql = """
-            UPDATE model.entity SET (name, description) = (%(name)s, %(description)s)
+            UPDATE model.entity SET
+            (name, description, begin_from, begin_to, begin_comment, end_from, end_to, end_comment) 
+                = (%(name)s, %(description)s, %(begin_from)s, %(begin_to)s, %(begin_comment)s, 
+                %(end_from)s, %(end_to)s, %(end_comment)s)
             WHERE id = %(id)s;"""
-        g.cursor.execute(sql, {'id': entity.id, 'name': entity.name,
-                               'description': sanitize(entity.description, 'description')})
+        g.cursor.execute(sql, {
+            'id': entity.id, 'name': entity.name,
+            'begin_from': DateMapper.datetime64_to_timestamp(entity.begin_from),
+            'begin_to': DateMapper.datetime64_to_timestamp(entity.begin_to),
+            'end_from': DateMapper.datetime64_to_timestamp(entity.end_from),
+            'end_to': DateMapper.datetime64_to_timestamp(entity.end_to),
+            'begin_comment': entity.begin_comment, 'end_comment': entity.end_comment,
+            'description': sanitize(entity.description, 'description')})
         debug_model['div sql'] += 1
 
     @staticmethod
@@ -167,20 +192,17 @@ class EntityMapper:
         return entities
 
     @staticmethod
-    def insert(code, name, system_type=None, description=None, date=None):
-        if not name and not date:  # pragma: no cover
+    def insert(code, name, system_type=None, description=None):
+        if not name:  # pragma: no cover
             logger.log('error', 'database', 'Insert entity without name and date')
-            return  # Something went wrong so don't insert
+            return
         sql = """
-            INSERT INTO model.entity (name, system_type, class_code, description, value_timestamp)
-            VALUES (%(name)s, %(system_type)s, %(code)s, %(description)s, %(value_timestamp)s)
+            INSERT INTO model.entity (name, system_type, class_code, description)
+            VALUES (%(name)s, %(system_type)s, %(code)s, %(description)s)
             RETURNING id;"""
-        params = {
-            'name': name.strip(),
-            'code': code,
-            'system_type': system_type.strip() if system_type else None,
-            'description': description.strip() if description else None,
-            'value_timestamp':  DateMapper.datetime64_to_timestamp(date) if date else None}
+        params = {'name': name.strip(), 'code': code,
+                  'system_type': system_type.strip() if system_type else None,
+                  'description': description.strip() if description else None}
         g.cursor.execute(sql, params)
         debug_model['div sql'] += 1
         return EntityMapper.get_by_id(g.cursor.fetchone()[0])
@@ -315,6 +337,8 @@ class EntityMapper:
 
     @staticmethod
     def search(form):
+        if not form.term.data:
+            return []
         sql = EntityMapper.sql
         if form.own.data:
             sql += " LEFT JOIN web.user_log ul ON e.id = ul.entity_id "

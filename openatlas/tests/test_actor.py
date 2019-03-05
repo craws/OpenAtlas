@@ -22,31 +22,28 @@ class ActorTests(TestBaseCase):
                 sex_node = NodeMapper.get_hierarchy_by_name('Sex')
                 sex_node_sub_1 = g.nodes[sex_node.subs[0]]
                 sex_node_sub_2 = g.nodes[sex_node.subs[1]]
-                event_id = EntityMapper.insert('E8', 'Event Horizon').id
-                source_id = EntityMapper.insert('E33', 'Tha source').id
+                event = EntityMapper.insert('E8', 'Event Horizon')
+                source = EntityMapper.insert('E33', 'Tha source')
 
             # Actor insert
             rv = self.app.get(url_for('actor_insert', code='E21'))
             assert b'+ Person' in rv.data
             self.app.get(url_for('actor_insert', code='E21', origin_id=residence_id))
-            data = {
-                sex_node.id: sex_node_sub_1.id,
-                'name': 'Sigourney Weaver',
-                'alias-1': 'Ripley',
-                'residence': residence_id,
-                'appears_first': residence_id,
-                'appears_last': residence_id,
-                'description': 'Susan Alexandra Weaver is an American actress.',
-                'date_begin_year': '-1949',
-                'date_begin_month': '10',
-                'date_begin_day': '8',
-                'date_begin_year2': '-1948',
-                'date_end_year': '2049',
-                'date_end_year2': '2050',
-                'date_birth': True,
-                'date_death': True}
-            rv = self.app.post(
-                url_for('actor_insert', code='E21', origin_id=residence_id), data=data)
+            data = {sex_node.id: sex_node_sub_1.id,
+                    'name': 'Sigourney Weaver',
+                    'alias-1': 'Ripley',
+                    'residence': residence_id,
+                    'begins_in': residence_id,
+                    'ends_in': residence_id,
+                    'description': 'Susan Alexandra Weaver is an American actress.',
+                    'begin_year_from': '-1949',
+                    'begin_month_from': '10',
+                    'begin_day_from': '8',
+                    'begin_year_to': '-1948',
+                    'end_year_from': '2049',
+                    'end_year_to': '2050'}
+            rv = self.app.post(url_for('actor_insert', code='E21', origin_id=residence_id),
+                               data=data)
             actor_id = rv.location.split('/')[-1]
 
             # Test actor nodes
@@ -63,17 +60,16 @@ class ActorTests(TestBaseCase):
                                follow_redirects=True)
             assert b'Entities where updated' in rv.data
             self.app.post(url_for('actor_insert', code='E21', origin_id=actor_id), data=data)
-            self.app.post(url_for('actor_insert', code='E21', origin_id=event_id), data=data)
-            self.app.post(url_for('actor_insert', code='E21', origin_id=source_id), data=data)
+            self.app.post(url_for('actor_insert', code='E21', origin_id=event.id), data=data)
+            self.app.post(url_for('actor_insert', code='E21', origin_id=source.id), data=data)
             rv = self.app.post(url_for('reference_insert', code='reference'), data={'name': 'Book'})
             reference_id = rv.location.split('/')[-1]
-            rv = self.app.post(
-                url_for('actor_insert', code='E21', origin_id=reference_id),
-                data=data, follow_redirects=True)
+            rv = self.app.post(url_for('actor_insert', code='E21', origin_id=reference_id),
+                               data=data, follow_redirects=True)
             assert b'An entry has been created' in rv.data
             data['continue_'] = 'yes'
-            rv = self.app.post(
-                url_for('actor_insert', code='E21'), data=data, follow_redirects=True)
+            rv = self.app.post(url_for('actor_insert', code='E21'), data=data,
+                               follow_redirects=True)
             assert b'An entry has been created' in rv.data
             rv = self.app.get(url_for('actor_index'))
             assert b'Sigourney Weaver' in rv.data
@@ -82,19 +78,19 @@ class ActorTests(TestBaseCase):
             rv = self.app.get(url_for('actor_update', id_=actor_id))
             assert b'American actress' in rv.data
             data['name'] = 'Susan Alexandra Weaver'
-            data['date_end_year'] = ''
-            data['date_begin_year2'] = '1950'
-            data['date_begin_day'] = ''
-            rv = self.app.post(
-                url_for('actor_update', id_=actor_id), data=data, follow_redirects=True)
+            data['end_year_from'] = ''
+            data['begin_year_to'] = '1950'
+            data['begin_day_from'] = ''
+            rv = self.app.post(url_for('actor_update', id_=actor_id), data=data,
+                               follow_redirects=True)
             assert b'Susan Alexandra Weaver' in rv.data
-            rv = self.app.post(
-                url_for('ajax_bookmark'), data={'entity_id': actor_id}, follow_redirects=True)
+            rv = self.app.post(url_for('ajax_bookmark'), data={'entity_id': actor_id},
+                               follow_redirects=True)
             assert b'Remove bookmark' in rv.data
             rv = self.app.get('/')
             assert b'Weaver' in rv.data
-            rv = self.app.post(
-                url_for('ajax_bookmark'), data={'entity_id': actor_id}, follow_redirects=True)
+            rv = self.app.post(url_for('ajax_bookmark'), data={'entity_id': actor_id},
+                               follow_redirects=True)
             assert b'Bookmark' in rv.data
             rv = self.app.get(url_for('link_delete', origin_id=actor_id, id_=666),
                               follow_redirects=True)

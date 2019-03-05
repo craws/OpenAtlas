@@ -168,8 +168,8 @@ def save(form, source=None, origin=None):
         if origin:
             url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-source'
             if origin.view_name == 'reference':
-                link_ = origin.link('P67', source)
-                url = url_for('reference_link_update', link_id=link_, origin_id=origin)
+                link_id = origin.link('P67', source)
+                url = url_for('reference_link_update', link_id=link_id, origin_id=origin)
             elif origin.view_name == 'file':
                 origin.link('P67', source)
             else:

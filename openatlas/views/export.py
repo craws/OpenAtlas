@@ -26,7 +26,6 @@ class ExportCsvForm(Form):
     model_class_inheritance = BooleanField('model.class_inheritance', default=True)
     model_entity = BooleanField('model.entity', default=True)
     model_link = BooleanField('model.link', default=True)
-    model_link_property = BooleanField('model.link_property', default=True)
     model_property = BooleanField('model.property', default=True)
     model_property_inheritance = BooleanField('model.property_inheritance', default=True)
     gis_point = BooleanField('gis.point', default=True)

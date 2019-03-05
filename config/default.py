@@ -1,4 +1,4 @@
-# Don't edit this file. To overriding settings please use instance/production.py
+# Don't edit this file. To override settings please use instance/production.py
 import os
 from collections import OrderedDict
 
@@ -78,13 +78,13 @@ PROPERTY_TYPES = ['Actor Actor Relation', 'Actor Function', 'Involvement']
 # Default table columns based on class
 TABLE_HEADERS = {
     'source': ['name', 'type', 'description'],
-    'event': ['name', 'class', 'type', 'first', 'last'],
-    'actor': ['name', 'class', 'first', 'last'],
-    'group': ['name', 'class', 'first', 'last'],
-    'place': ['name', 'type', 'first', 'last'],
-    'feature': ['name', 'type', 'first', 'last'],
-    'stratigraphic-unit': ['name', 'type', 'first', 'last'],
-    'find': ['name', 'type', 'first', 'last'],
+    'event': ['name', 'class', 'type', 'begin', 'end'],
+    'actor': ['name', 'class', 'begin', 'end'],
+    'group': ['name', 'class', 'begin', 'end'],
+    'place': ['name', 'type', 'begin', 'end'],
+    'feature': ['name', 'type', 'begin', 'end'],
+    'stratigraphic-unit': ['name', 'type', 'begin', 'end'],
+    'find': ['name', 'type', 'begin', 'end'],
     'reference': ['name', 'class', 'type'],
     'file': ['name', 'license', 'size', 'extension', 'description']}
 

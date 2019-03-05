@@ -31,7 +31,7 @@ def search_index():
     form.classes.default = choices
     form.classes.process(request.form)
     table = {'data': []}
-    if request.method == 'POST' and 'global-term' in request.form and request.form['global-term']:
+    if request.method == 'POST' and 'global-term' in request.form:
         # Coming from global search
         form.term.data = request.form['global-term']
         form.classes.data = choices

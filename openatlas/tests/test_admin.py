@@ -2,7 +2,7 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
-from openatlas.models.linkProperty import LinkPropertyMapper
+from openatlas.models.link import LinkMapper
 from openatlas.models.settings import SettingsMapper
 from openatlas.test_base import TestBaseCase
 
@@ -15,12 +15,11 @@ class ContentTests(TestBaseCase):
             self.app.post(url_for('actor_insert', code='E21'), data={'name': 'Oliver Twist'})
             with app.test_request_context():
                 app.preprocess_request()
-                EntityMapper.insert('E61', '2017-04-01')  # Add orphaned date
                 EntityMapper.insert('E31', 'One forsaken file entity', 'file')  # Add orphaned file
             rv = self.app.get(url_for('admin_orphans'))
-            assert all(x in rv.data for x in [b'Oliver Twist', b'2017-04-01', b'forsaken'])
+            assert all(x in rv.data for x in [b'Oliver Twist', b'forsaken'])
             rv = self.app.get(url_for('admin_orphans_delete', parameter='orphans'))
-            assert b'2017-04-01' not in rv.data
+            assert b'Oliver Twist' not in rv.data
             self.app.get(url_for('admin_orphans_delete', parameter='unlinked'))
             self.app.get(url_for('admin_orphans_delete', parameter='types'))
             self.app.get(url_for('admin_orphans_delete', parameter='whatever bogus string'))
@@ -46,21 +45,21 @@ class ContentTests(TestBaseCase):
         with app.app_context():
             with app.test_request_context():
                 app.preprocess_request()
-                # Create invalid date links
-                person_a = EntityMapper.insert('E21', 'Person A')
-                person_b = EntityMapper.insert('E21', 'Person B')
-                begin_date = EntityMapper.insert('E61', 'Begin date', 'exact date value',
-                                                 date='2018-01-31')
-                end_date = EntityMapper.insert('E61', 'End date', 'exact date value',
-                                               date='2018-01-01')
-                person_a.link('OA1', begin_date)
-                person_a.link('OA2', end_date)
-                relation_id = person_a.link('OA7', person_b)
-                LinkPropertyMapper.insert(relation_id, 'OA1', begin_date)
-                LinkPropertyMapper.insert(relation_id, 'OA2', end_date)
+                # Create invalid dates for an actor and a relation link
+                person = EntityMapper.insert('E21', 'Person')
+                event = EntityMapper.insert('E6', 'Event')
+                person.begin_from = '2018-01-31'
+                person.begin_to = '2018-01-01'
+                person.update()
+                involvement = LinkMapper.get_by_id(event.link('P11', person))
+                involvement.begin_from = '2017-01-31'
+                involvement.begin_to = '2017-01-01'
+                involvement.end_from = '2017-01-01'
+                involvement.update()
             rv = self.app.get(url_for('admin_check_dates'))
             assert b'Invalid dates (1)' in rv.data
             assert b'Invalid link dates (1)' in rv.data
+            assert b'Invalid involvement dates (1)' in rv.data
 
     def test_admin(self):
         with app.app_context():

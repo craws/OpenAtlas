@@ -8,11 +8,9 @@ from wtforms import BooleanField, HiddenField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import DateForm, TableMultiField, build_form
-from openatlas.models.date import DateMapper
+from openatlas.forms.forms import DateForm, TableMultiField, build_form, get_link_type
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
-from openatlas.models.node import NodeMapper
 from openatlas.util.util import required_group
 
 
@@ -45,11 +43,12 @@ def relation_insert(origin_id):
         try:
             for actor in EntityMapper.get_by_ids(ast.literal_eval(form.actor.data)):
                 if form.inverse.data:
-                    link_id = actor.link('OA7', origin, form.description.data)
+                    link_ = LinkMapper.get_by_id(actor.link('OA7', origin, form.description.data))
                 else:
-                    link_id = origin.link('OA7', actor, form.description.data)
-                DateMapper.save_link_dates(link_id, form)
-                NodeMapper.save_link_nodes(link_id, form)
+                    link_ = LinkMapper.get_by_id(origin.link('OA7', actor, form.description.data))
+                link_.set_dates(form)
+                link_.type = get_link_type(form)
+                link_.update()
             g.cursor.execute('COMMIT')
             flash(_('entity created'), 'info')
         except Exception as e:  # pragma: no cover
@@ -77,11 +76,12 @@ def relation_update(id_, origin_id):
         try:
             link_.delete()
             if form.inverse.data:
-                link_id = related.link('OA7', origin, form.description.data)
+                link_ = LinkMapper.get_by_id(related.link('OA7', origin, form.description.data))
             else:
-                link_id = origin.link('OA7', related, form.description.data)
-            DateMapper.save_link_dates(link_id, form)
-            NodeMapper.save_link_nodes(link_id, form)
+                link_ = LinkMapper.get_by_id(origin.link('OA7', related, form.description.data))
+            link_.set_dates(form)
+            link_.type = get_link_type(form)
+            link_.update()
             g.cursor.execute('COMMIT')
             flash(_('info update'), 'info')
         except Exception as e:  # pragma: no cover
@@ -92,6 +92,5 @@ def relation_update(id_, origin_id):
     if origin.id == range_.id:
         form.inverse.data = True
     form.save.label.text = _('save')
-    link_.set_dates()
     form.populate_dates(link_)
     return render_template('relation/update.html', origin=origin, form=form, related=related)

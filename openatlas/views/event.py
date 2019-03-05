@@ -12,9 +12,8 @@ from openatlas.forms.forms import DateForm, TableField, TableMultiField, build_f
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 is_authorized, link, required_group,
-                                 truncate_string, uc_first, was_modified,
-                                 get_profile_image_table_link)
+                                 get_profile_image_table_link, is_authorized, link, required_group,
+                                 truncate_string, uc_first, was_modified)
 
 
 class EventForm(DateForm):
@@ -80,7 +79,6 @@ def event_delete(id_):
 @required_group('editor')
 def event_update(id_):
     event = EntityMapper.get_by_id(id_)
-    event.set_dates()
     form = build_form(EventForm, 'Event', event, request)
     if event.class_.code != 'E8':
         del form.given_place
@@ -106,7 +104,6 @@ def event_update(id_):
 @required_group('readonly')
 def event_view(id_):
     event = EntityMapper.get_by_id(id_)
-    event.set_dates()
     tables = {
         'info': get_entity_data(event),
         'file': {'id': 'files', 'data': [],
@@ -120,10 +117,10 @@ def event_view(id_):
     for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
         first = link_.first
         if not link_.first and event.first:
-            first = '<span class="inactive" style="float:right">' + str(event.first) + '</span>'
+            first = '<span class="inactive" style="float:right;">' + event.first + '</span>'
         last = link_.last
         if not link_.last and event.last:
-            last = '<span class="inactive" style="float:right">' + str(event.last) + '</span>'
+            last = '<span class="inactive" style="float:right;">' + event.last + '</span>'
         data = ([link(link_.range),
                  g.classes[link_.range.class_.code].name,
                  link_.type.name if link_.type else '',
@@ -170,8 +167,8 @@ def save(form, event=None, code=None, origin=None):
             event = EntityMapper.insert(code, form.name.data)
         event.name = form.name.data
         event.description = form.description.data
+        event.set_dates(form)
         event.update()
-        event.save_dates(form)
         event.save_nodes(form)
         if form.event.data:
             entity = EntityMapper.get_by_id(form.event.data)

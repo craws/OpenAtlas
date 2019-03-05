@@ -29,10 +29,8 @@ ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS 
 ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_sub_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_domain_class_code_fkey;
+ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_type_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_range_id_fkey;
-ALTER TABLE IF EXISTS ONLY model.link_property DROP CONSTRAINT IF EXISTS link_property_range_id_fkey;
-ALTER TABLE IF EXISTS ONLY model.link_property DROP CONSTRAINT IF EXISTS link_property_property_code_fkey;
-ALTER TABLE IF EXISTS ONLY model.link_property DROP CONSTRAINT IF EXISTS link_property_domain_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_property_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_domain_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_class_code_fkey;
@@ -55,14 +53,12 @@ DROP TRIGGER IF EXISTS update_modified ON web."group";
 DROP TRIGGER IF EXISTS update_modified ON web."user";
 DROP TRIGGER IF EXISTS update_modified ON model.property_i18n;
 DROP TRIGGER IF EXISTS update_modified ON model.class_i18n;
-DROP TRIGGER IF EXISTS update_modified ON model.link_property;
 DROP TRIGGER IF EXISTS update_modified ON model.property_inheritance;
 DROP TRIGGER IF EXISTS update_modified ON model.link;
 DROP TRIGGER IF EXISTS update_modified ON model.entity;
 DROP TRIGGER IF EXISTS update_modified ON model.property;
 DROP TRIGGER IF EXISTS update_modified ON model.class_inheritance;
 DROP TRIGGER IF EXISTS update_modified ON model.class;
-DROP TRIGGER IF EXISTS on_delete_link_property ON model.link_property;
 DROP TRIGGER IF EXISTS on_delete_entity ON model.entity;
 DROP TRIGGER IF EXISTS update_modified ON import.project;
 DROP TRIGGER IF EXISTS update_modified ON gis.polygon;
@@ -94,7 +90,6 @@ ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS 
 ALTER TABLE IF EXISTS ONLY model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property_code_language_code_attribute_key;
 ALTER TABLE IF EXISTS ONLY model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_pkey;
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_code_key;
-ALTER TABLE IF EXISTS ONLY model.link_property DROP CONSTRAINT IF EXISTS link_property_pkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_pkey;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_pkey;
 ALTER TABLE IF EXISTS ONLY model.class DROP CONSTRAINT IF EXISTS class_pkey;
@@ -126,7 +121,6 @@ ALTER TABLE IF EXISTS web.entity_profile_image ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.property_inheritance ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.property_i18n ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.property ALTER COLUMN id DROP DEFAULT;
-ALTER TABLE IF EXISTS model.link_property ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.link ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.entity ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS model.class_inheritance ALTER COLUMN id DROP DEFAULT;
@@ -167,8 +161,6 @@ DROP SEQUENCE IF EXISTS model.property_id_seq;
 DROP SEQUENCE IF EXISTS model.property_i18n_id_seq;
 DROP TABLE IF EXISTS model.property_i18n;
 DROP TABLE IF EXISTS model.property;
-DROP SEQUENCE IF EXISTS model.link_property_id_seq;
-DROP TABLE IF EXISTS model.link_property;
 DROP SEQUENCE IF EXISTS model.link_id_seq;
 DROP TABLE IF EXISTS model.link;
 DROP SEQUENCE IF EXISTS model.entity_id_seq;
@@ -268,10 +260,10 @@ CREATE FUNCTION model.delete_entity_related() RETURNS trigger
     LANGUAGE plpgsql
     AS $$
         BEGIN
-            -- Delete dates (OA1, OA2, OA3, OA4, OA5, OA6) and aliases (P1, P131)
-            IF OLD.class_code IN ('E6', 'E7', 'E8', 'E12', 'E18', 'E21', 'E22', 'E40', 'E74') THEN
+            -- Delete aliases (P1, P131)
+            IF OLD.class_code IN ('E18', 'E21', 'E40', 'E74') THEN
                 DELETE FROM model.entity WHERE id IN (
-                    SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code IN ('OA1', 'OA2', 'OA3', 'OA4', 'OA5', 'OA6', 'P1', 'P131'));
+                    SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code IN ('P1', 'P131'));
             END IF;
 
             -- Delete location (E53) if it was a place or find
@@ -656,10 +648,15 @@ CREATE TABLE model.entity (
     class_code text NOT NULL,
     name text NOT NULL,
     description text,
-    value_timestamp timestamp without time zone,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone,
-    system_type text
+    system_type text,
+    begin_from timestamp without time zone,
+    begin_to timestamp without time zone,
+    begin_comment text,
+    end_from timestamp without time zone,
+    end_to timestamp without time zone,
+    end_comment text
 );
 
 
@@ -697,7 +694,14 @@ CREATE TABLE model.link (
     range_id integer NOT NULL,
     description text,
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
+    modified timestamp without time zone,
+    begin_from timestamp without time zone,
+    begin_to timestamp without time zone,
+    begin_comment text,
+    end_from timestamp without time zone,
+    end_to timestamp without time zone,
+    end_comment text,
+    type_id integer
 );
 
 
@@ -722,43 +726,6 @@ ALTER TABLE model.link_id_seq OWNER TO openatlas;
 --
 
 ALTER SEQUENCE model.link_id_seq OWNED BY model.link.id;
-
-
---
--- Name: link_property; Type: TABLE; Schema: model; Owner: openatlas
---
-
-CREATE TABLE model.link_property (
-    id integer NOT NULL,
-    property_code text NOT NULL,
-    domain_id integer NOT NULL,
-    range_id integer NOT NULL,
-    created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
-);
-
-
-ALTER TABLE model.link_property OWNER TO openatlas;
-
---
--- Name: link_property_id_seq; Type: SEQUENCE; Schema: model; Owner: openatlas
---
-
-CREATE SEQUENCE model.link_property_id_seq
-    START WITH 1
-    INCREMENT BY 1
-    NO MINVALUE
-    NO MAXVALUE
-    CACHE 1;
-
-
-ALTER TABLE model.link_property_id_seq OWNER TO openatlas;
-
---
--- Name: link_property_id_seq; Type: SEQUENCE OWNED BY; Schema: model; Owner: openatlas
---
-
-ALTER SEQUENCE model.link_property_id_seq OWNED BY model.link_property.id;
 
 
 --
@@ -1416,13 +1383,6 @@ ALTER TABLE ONLY model.link ALTER COLUMN id SET DEFAULT nextval('model.link_id_s
 
 
 --
--- Name: link_property id; Type: DEFAULT; Schema: model; Owner: openatlas
---
-
-ALTER TABLE ONLY model.link_property ALTER COLUMN id SET DEFAULT nextval('model.link_property_id_seq'::regclass);
-
-
---
 -- Name: property id; Type: DEFAULT; Schema: model; Owner: openatlas
 --
 
@@ -1653,14 +1613,6 @@ ALTER TABLE ONLY model.entity
 
 ALTER TABLE ONLY model.link
     ADD CONSTRAINT link_pkey PRIMARY KEY (id);
-
-
---
--- Name: link_property link_property_pkey; Type: CONSTRAINT; Schema: model; Owner: openatlas
---
-
-ALTER TABLE ONLY model.link_property
-    ADD CONSTRAINT link_property_pkey PRIMARY KEY (id);
 
 
 --
@@ -1907,13 +1859,6 @@ CREATE TRIGGER on_delete_entity BEFORE DELETE ON model.entity FOR EACH ROW EXECU
 
 
 --
--- Name: link_property on_delete_link_property; Type: TRIGGER; Schema: model; Owner: openatlas
---
-
-CREATE TRIGGER on_delete_link_property AFTER DELETE ON model.link_property FOR EACH ROW EXECUTE PROCEDURE model.delete_link_dates();
-
-
---
 -- Name: class update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
@@ -1953,13 +1898,6 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON model.link FOR EACH ROW EXECUTE 
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON model.property_inheritance FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
-
-
---
--- Name: link_property update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON model.link_property FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
@@ -2129,35 +2067,19 @@ ALTER TABLE ONLY model.link
 
 
 --
--- Name: link_property link_property_domain_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
---
-
-ALTER TABLE ONLY model.link_property
-    ADD CONSTRAINT link_property_domain_id_fkey FOREIGN KEY (domain_id) REFERENCES model.link(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: link_property link_property_property_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
---
-
-ALTER TABLE ONLY model.link_property
-    ADD CONSTRAINT link_property_property_code_fkey FOREIGN KEY (property_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: link_property link_property_range_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
---
-
-ALTER TABLE ONLY model.link_property
-    ADD CONSTRAINT link_property_range_id_fkey FOREIGN KEY (range_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
 -- Name: link link_range_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY model.link
     ADD CONSTRAINT link_range_id_fkey FOREIGN KEY (range_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: link link_type_id_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.link
+    ADD CONSTRAINT link_type_id_fkey FOREIGN KEY (type_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

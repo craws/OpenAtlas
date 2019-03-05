@@ -1,7 +1,7 @@
 
 $(document).ready(function () {
     $.validator.setDefaults({
-        ignore: [], // enable validation for hidden fields
+        ignore: [], // Enable validation for hidden fields
     });
 
     $.validator.addMethod('notEqual', function(value, element, param) {
@@ -61,9 +61,7 @@ $(document).ready(function () {
 
     $('#file-form').validate({
         rules: {
-            file: {
-                fileSize: maxFileSize  * 1024 * 1024,
-            }
+            file: {fileSize: maxFileSize  * 1024 * 1024}
         }
     });
 

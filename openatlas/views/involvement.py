@@ -8,11 +8,9 @@ from wtforms import HiddenField, SelectField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import DateForm, TableMultiField, build_form
-from openatlas.models.date import DateMapper
+from openatlas.forms.forms import DateForm, TableMultiField, build_form, get_link_type
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
-from openatlas.models.node import NodeMapper
 from openatlas.util.util import required_group
 
 
@@ -46,14 +44,18 @@ def involvement_insert(origin_id):
         try:
             if origin.view_name == 'event':
                 for actor in EntityMapper.get_by_ids(ast.literal_eval(form.actor.data)):
-                    link_id = origin.link(form.activity.data, actor, form.description.data)
-                    DateMapper.save_link_dates(link_id, form)
-                    NodeMapper.save_link_nodes(link_id, form)
+                    link_ = LinkMapper.get_by_id(
+                        origin.link(form.activity.data, actor, form.description.data))
+                    link_.set_dates(form)
+                    link_.type = get_link_type(form)
+                    link_.update()
             else:
                 for event in EntityMapper.get_by_ids(ast.literal_eval(form.event.data)):
-                    link_id = event.link(form.activity.data, origin, form.description.data)
-                    DateMapper.save_link_dates(link_id, form)
-                    NodeMapper.save_link_nodes(link_id, form)
+                    link_ = LinkMapper.get_by_id(
+                        event.link(form.activity.data, origin, form.description.data))
+                    link_.set_dates(form)
+                    link_.type = get_link_type(form)
+                    link_.update()
             g.cursor.execute('COMMIT')
             flash(_('entity created'), 'info')
         except Exception as e:  # pragma: no cover
@@ -87,9 +89,11 @@ def involvement_update(id_, origin_id):
         g.cursor.execute('BEGIN')
         try:
             link_.delete()
-            link_id = event.link(form.activity.data, actor, form.description.data)
-            DateMapper.save_link_dates(link_id, form)
-            NodeMapper.save_link_nodes(link_id, form)
+            link_ = LinkMapper.get_by_id(
+                event.link(form.activity.data, actor, form.description.data))
+            link_.set_dates(form)
+            link_.type = get_link_type(form)
+            link_.update()
             g.cursor.execute('COMMIT')
         except Exception as e:  # pragma: no cover
             g.cursor.execute('ROLLBACK')
@@ -99,7 +103,6 @@ def involvement_update(id_, origin_id):
         return redirect(url_for(origin.view_name + '_view', id_=origin.id) + '#tab-' + tab)
     form.activity.data = link_.property.code
     form.description.data = link_.description
-    link_.set_dates()
     form.populate_dates(link_)
     return render_template('involvement/update.html', origin=origin, form=form,
                            linked_object=event if origin_id != event.id else actor)

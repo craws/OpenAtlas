@@ -209,19 +209,19 @@ function closeForm(withoutSave = true) {
 function drawGeometry(selectedType) {
     shapeType = selectedType;
     map.addControl(inputForm);
+    $('#inputFormTitle').text(selectedType.substr(0,1).toUpperCase() + selectedType.substr(1));
+    $('#inputFormInfo').text(translate['map_info_' + selectedType]);
+    $('.leaflet-right .leaflet-bar').hide();
     if (selectedType == 'centerpoint') {
         $('#coordinatesDiv').show();
     } else {
+        $('#coordinatesDiv').hide();
         captureCoordinates = false;
         drawLayer = new L.Draw.Polygon(map, {allowIntersection: false});
         map.addLayer(drawnPolygon);
         drawLayer.enable();
         drawLayer.setStyle({fillColor: '#DA9DC8', color: '#E861C0'});
-        $('#coordinatesDiv').hide();
     }
-    $('#inputFormTitle').text(selectedType.substr(0,1).toUpperCase() + selectedType.substr(1));
-    $('#inputFormInfo').text(translate['map_info_' + selectedType]);
-    $('.leaflet-right .leaflet-bar').hide();
 }
 
 function saveForm(shapeType) {
