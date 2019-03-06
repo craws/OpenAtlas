@@ -12,7 +12,7 @@ from openatlas.util.util import link, required_group, truncate_string, uc_first
 
 class SearchForm(Form):
     term = StringField(_('search'), [InputRequired()],
-                       render_kw={'placeholder': uc_first(_('search term')), 'autofocus': True})
+                       render_kw={'placeholder': _('search term'), 'autofocus': True})
     own = BooleanField(_('Only entities edited by me'))
     desc = BooleanField(_('Also search in description'))
     classes = SelectMultipleField(_('classes'), [InputRequired()], choices=(),
@@ -42,7 +42,7 @@ def search_index():
 
 
 def build_search_table(form):
-    table = {'id': 'search', 'data': [],
+    table = {'id': 'search', 'data': [], 'sort': 'sortList: [[0, 0]]',
              'header': ['name', 'class', 'first', 'last', 'description']}
     for entity in EntityMapper.search(form):
         table['data'].append([link(entity), entity.class_.name, entity.first, entity.last,

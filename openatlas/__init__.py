@@ -33,6 +33,7 @@ debug_model = OrderedDict()
 
 
 class GlobalSearchForm(Form):
+    from openatlas.util.util import uc_first
     term = StringField('', render_kw={"placeholder": _('search term')})
     search = SubmitField(_('search'))
 

@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2019-02-27 18:42+0100\n"
-"PO-Revision-Date: 2019-02-27 18:43+0100\n"
+"PO-Revision-Date: 2019-03-06 17:12+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -21,7 +21,7 @@ msgstr ""
 
 #: __init__.py:32 views/search.py:15
 msgid "search term"
-msgstr "search term"
+msgstr "Search term"
 
 #: __init__.py:33 templates/search/index.html:4 views/search.py:14
 #: views/search.py:21

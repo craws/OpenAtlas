@@ -339,13 +339,14 @@ class EntityMapper:
     def search(form):
         if not form.term.data:
             return []
-        sql = EntityMapper.sql
-        if form.own.data:
-            sql += " LEFT JOIN web.user_log ul ON e.id = ul.entity_id "
-        sql += " WHERE LOWER(e.name) LIKE LOWER(%(term)s)"
-        sql += " OR lower(e.description) LIKE lower(%(term)s) AND " if form.desc.data else " AND "
-        sql += " ul.user_id = %(user_id)s AND " if form.own.data else ''
-        sql += "("
+        sql = EntityMapper.sql + '''
+            {user_clause} WHERE (LOWER(e.name) LIKE LOWER(%(term)s) {description_clause})
+            AND {user_clause2} ('''.format(
+            user_clause=
+            ' LEFT JOIN web.user_log ul ON e.id = ul.entity_id ' if form.own.data else '',
+            description_clause=
+            ' OR lower(e.description) LIKE lower(%(term)s)' if form.desc.data else '',
+            user_clause2=' ul.user_id = %(user_id)s AND ' if form.own.data else '')
         sql_where = []
         for name in form.classes.data:
             if name in ['source', 'event']:
@@ -378,7 +379,7 @@ class EntityMapper:
                     entities.append(Entity(row))
             else:
                 entities.append(Entity(row))
-        return entities
+        return {d.id: d for d in entities}.values()  # Remove duplicates before returning
 
     @staticmethod
     def set_profile_image(id_, origin_id):

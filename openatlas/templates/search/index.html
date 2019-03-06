@@ -4,6 +4,7 @@
     > {{ _('search')|uc_first }}
 {% endblock %}
 {% block content %}
+    {{ 'Search'|manual_link|safe }}
     <div style="float:left;">
         <form method="post">
             {{ form.csrf_token }}
