@@ -25,7 +25,7 @@ instance_name = 'production' if 'test_runner.py' not in sys.argv[0] else 'testin
 app.config.from_object('config.default')  # Load config/INSTANCE_NAME.py
 app.config.from_pyfile(instance_name + '.py')  # Load instance/INSTANCE_NAME.py
 
-if os.name == "posix":  # With other operating system e.g. Windows, we would need adaptions here
+if os.name == "posix":  # With other operating systems e.g. Windows, we would need adaptions here
     locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
 
 babel = Babel(app)
