@@ -9,6 +9,7 @@ import time
 from flask import Flask, g, request, session
 from flask_babel import Babel, lazy_gettext as _
 from flask_wtf import Form
+from flask_login import current_user
 from wtforms import StringField, SubmitField
 from flask_wtf.csrf import CsrfProtect
 
@@ -96,6 +97,12 @@ def before_request():
     debug_model['user'] = 0
     debug_model['model'] = time.time() - debug_model['current']
     debug_model['current'] = time.time()
+
+    # Workaround overlay maps for Stefan until #978 is implemented
+    session['settings']['overlay_hack'] = False
+    if hasattr(current_user, 'id') and current_user.id in [3,4] and \
+            session['settings']['site_name'] == 'DPP':
+        session['settings']['overlay_hack'] = True  # pragma: no cover
 
 
 @app.teardown_request

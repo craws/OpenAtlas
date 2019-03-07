@@ -23,6 +23,12 @@
     translate['map_info_centerpoint'] = '{{ _('map_info_point')|uc_first|safe }}';
     translate['map_info_close'] = '{{ _('map_info_close')|uc_first|safe }}';
     translate['map_info_description'] = '{{ _('map_info_description')|safe }}';
+
+    overlayHack = false;
+    {% if session['settings']['overlay_hack'] %}
+        overlayHack = true;
+    {% endif %}
+
 </script>
 
 <link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/leaflet.css" />
