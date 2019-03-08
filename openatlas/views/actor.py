@@ -12,7 +12,9 @@ from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
 from openatlas.util.util import (display_remove_link, get_appearance, get_base_table_data,
                                  get_entity_data, get_profile_image_table_link, is_authorized, link,
-                                 required_group, truncate_string, uc_first, was_modified)
+                                 required_group, truncate_string, uc_first, was_modified,
+                                 add_type_data, add_system_data, format_entry_begin,
+                                 format_entry_end)
 
 
 class ActorForm(DateForm):
@@ -32,8 +34,12 @@ class ActorForm(DateForm):
 @required_group('readonly')
 def actor_view(id_):
     actor = EntityMapper.get_by_id(id_)
+    info = []
+    aliases = actor.get_linked_entities('P131')
+    if aliases:
+        info.append((uc_first(_('alias')), '<br />'.join([x.name for x in aliases])))
+    add_type_data(actor, info)
     objects = []
-    info = get_entity_data(actor)
     residence = actor.get_linked_entity('P74')
     if residence:
         object_ = residence.get_linked_entity('P53', True)
@@ -51,6 +57,11 @@ def actor_view(id_):
         objects.append(object_)
         info.append((uc_first(_('died in') if actor.class_.code == 'E21' else _('ends at')),
                      link(object_)))
+    # Dates
+    label = uc_first(_('born') if actor.class_.code == 'E21' else _('begin'))
+    info.append((label, format_entry_begin(actor)))
+    label = uc_first(_('died') if actor.class_.code == 'E21' else _('end'))
+    info.append((label, format_entry_end(actor)))
     tables = {
         'info': info,
         'file': {'id': 'files', 'data': [],
@@ -109,6 +120,7 @@ def actor_view(id_):
     appears_first, appears_last = get_appearance(event_links)
     info.append((_('appears first'), appears_first))
     info.append((_('appears last'), appears_last))
+    add_system_data(actor, info)
     for link_ in actor.get_links('OA7') + actor.get_links('OA7', True):
         if actor.id == link_.domain.id:
             type_ = link_.type.get_name_directed() if link_.type else ''

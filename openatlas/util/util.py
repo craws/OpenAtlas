@@ -171,14 +171,8 @@ def display_remove_link(url, name):
     return '<a ' + confirm + ' href="' + url + '">' + uc_first(_('remove')) + '</a>'
 
 
-def get_entity_data(entity, location=None):
-    """
-    Return related entity information for a table for view.
-    The location parameter is for places which have a location attached.
-    """
-    data = []
+def add_type_data(entity, data, location=None):
     type_data = OrderedDict()
-
     # Nodes
     if location:
         entity.nodes.update(location.nodes)  # Add location types
@@ -203,6 +197,33 @@ def get_entity_data(entity, location=None):
         type_data.move_to_end('type', last=False)
     for root_name, nodes in type_data.items():
         data.append((root_name, '<br />'.join(nodes)))
+    return data
+
+
+def add_system_data(entity, data):
+    # Additional info for advanced layout
+    if hasattr(current_user, 'settings') and current_user.settings['layout'] == 'advanced':
+        data.append((uc_first(_('class')), link(entity.class_)))
+        info = openatlas.logger.get_log_for_advanced_view(entity.id)
+        data.append((_('created'), format_date(entity.created) + ' ' + link(info['creator'])))
+        if info['modified']:
+            html = format_date(info['modified']) + ' ' + link(info['modifier'])
+            data.append((_('modified'), html))
+        if info['import_project']:
+            data.append((_('imported from'), link(info['import_project'])))
+        if info['import_user']:
+            data.append((_('imported by'), link(info['import_user'])))
+        if info['import_origin_id']:
+            data.append(('origin ID', info['import_origin_id']))
+    return data
+
+
+def get_entity_data(entity, location=None):
+    """
+    Return related entity information for a table for view.
+    The location parameter is for places which have a location attached.
+    """
+    data = add_type_data(entity, [], location=location)
 
     # Info for places
     if entity.class_.code in app.config['CLASS_CODES']['place']:
@@ -223,6 +244,7 @@ def get_entity_data(entity, location=None):
         place = entity.get_linked_entity('P7')
         if place:
             data.append((uc_first(_('location')), link(place.get_linked_entity('P53', True))))
+
         # Info for acquisitions
         if entity.class_.code == 'E8':
             data.append((uc_first(_('recipient')), '<br />'.join(
@@ -232,34 +254,10 @@ def get_entity_data(entity, location=None):
             data.append((uc_first(_('given place')), '<br />'.join(
                 [link(place) for place in entity.get_linked_entities('P24')])))
 
-    # Info for actors
-    if entity.class_.code in app.config['CLASS_CODES']['actor']:
-        aliases = entity.get_linked_entities('P131')
-        if aliases:
-            data.append((uc_first(_('alias')), '<br />'.join([x.name for x in aliases])))
-
     # Dates
-    label = uc_first(_('born') if entity.class_.code == 'E21' else _('begin'))
-    data.append((label, format_entry_begin(entity)))
-    label = uc_first(_('died') if entity.class_.code == 'E21' else _('end'))
-    data.append((label, format_entry_end(entity)))
-
-    # Additional info for advanced layout
-    if hasattr(current_user, 'settings') and current_user.settings['layout'] == 'advanced':
-        data.append((uc_first(_('class')), link(entity.class_)))
-        info = openatlas.logger.get_log_for_advanced_view(entity.id)
-        data.append((_('created'), format_date(entity.created) + ' ' + link(info['creator'])))
-        if info['modified']:
-            html = format_date(info['modified']) + ' ' + link(info['modifier'])
-            data.append((_('modified'), html))
-        if info['import_project']:
-            data.append((_('imported from'), link(info['import_project'])))
-        if info['import_user']:
-            data.append((_('imported by'), link(info['import_user'])))
-        if info['import_origin_id']:
-            data.append(('origin ID', info['import_origin_id']))
-
-    return data
+    data.append((uc_first(_('begin')), format_entry_begin(entity)))
+    data.append((uc_first(_('end')), format_entry_end(entity)))
+    return add_system_data(entity, data)
 
 
 def add_dates_to_form(form, for_person=False):
