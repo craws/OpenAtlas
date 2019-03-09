@@ -6,7 +6,8 @@ class Changelog:
     versions = OrderedDict()
     versions['3.13.1'] = ['TBA', OrderedDict([
         ('feature', OrderedDict([
-            ('981', 'Documentation for dates in model')])),
+            ('981', 'Documentation for dates in model'),
+            ('996', 'Better structured info tabs')])),
          ('fix', OrderedDict([
             ('995', 'Double Search Results')]))])]
     versions['3.13.0'] = ['2019-02-28', OrderedDict([
