@@ -566,25 +566,29 @@ def was_modified(form, entity):  # pragma: no cover
     return True
 
 
-def format_entry_begin(entry):
-    html = ''
+def format_entry_begin(entry, object_=None):
+    html = link(object_)
     if entry.begin_from:
-        html = format_date(entry.begin_from)
+        html += ', ' if html else ''
         if entry.begin_to:
-            html = _('between %(begin)s and %(end)s',
-                     begin=format_date(entry.begin_from), end=format_date(entry.begin_to))
-    html += ' ' + entry.begin_comment if entry.begin_comment else ''
+            html += _('between %(begin)s and %(end)s',
+                      begin=format_date(entry.begin_from), end=format_date(entry.begin_to))
+        else:
+            html += format_date(entry.begin_from)
+    html += (' (' + entry.begin_comment + ')') if entry.begin_comment else ''
     return html
 
 
-def format_entry_end(entry):
-    html = ''
+def format_entry_end(entry, object_=None):
+    html = link(object_)
     if entry.end_from:
-        html = format_date(entry.end_from)
+        html += ', ' if html else ''
         if entry.end_to:
-            html = _('between %(begin)s and %(end)s',
-                     begin=format_date(entry.end_from), end=format_date(entry.end_to))
-    html += ' ' + entry.end_comment if entry.end_comment else ''
+            html += _('between %(begin)s and %(end)s',
+                      begin=format_date(entry.end_from), end=format_date(entry.end_to))
+        else:
+            html += format_date(entry.end_from)
+    html += (' (' + entry.end_comment + ')') if entry.end_comment else ''
     return html
 
 

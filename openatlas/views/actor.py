@@ -38,30 +38,6 @@ def actor_view(id_):
     aliases = actor.get_linked_entities('P131')
     if aliases:
         info.append((uc_first(_('alias')), '<br />'.join([x.name for x in aliases])))
-    add_type_data(actor, info)
-    objects = []
-    residence = actor.get_linked_entity('P74')
-    if residence:
-        object_ = residence.get_linked_entity('P53', True)
-        objects.append(object_)
-        info.append((uc_first(_('residence')), link(object_)))
-    first = actor.get_linked_entity('OA8')
-    if first:
-        object_ = first.get_linked_entity('P53', True)
-        objects.append(object_)
-        info.append((uc_first(_('born in') if actor.class_.code == 'E21' else _('begins in')),
-                     link(object_)))
-    last = actor.get_linked_entity('OA9')
-    if last:
-        object_ = last.get_linked_entity('P53', True)
-        objects.append(object_)
-        info.append((uc_first(_('died in') if actor.class_.code == 'E21' else _('ends at')),
-                     link(object_)))
-    # Dates
-    label = uc_first(_('born') if actor.class_.code == 'E21' else _('begin'))
-    info.append((label, format_entry_begin(actor)))
-    label = uc_first(_('died') if actor.class_.code == 'E21' else _('end'))
-    info.append((label, format_entry_end(actor)))
     tables = {
         'info': info,
         'file': {'id': 'files', 'data': [],
@@ -97,6 +73,7 @@ def actor_view(id_):
     # Todo: Performance - getting every place of every object for every event is very costly
     event_links = actor.get_links(['P11', 'P14', 'P22', 'P23'], True)
 
+    objects = []
     for link_ in event_links:
         event = link_.domain
         place = event.get_linked_entity('P7')
@@ -117,10 +94,34 @@ def actor_view(id_):
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             data.append(display_remove_link(unlink_url, link_.domain.name))
         tables['event']['data'].append(data)
+
+    # Add info of dates and places
+    begin_place = actor.get_linked_entity('OA8')
+    begin_object = None
+    if begin_place:
+        begin_object = begin_place.get_linked_entity('P53', True)
+        objects.append(begin_object)
+    end_place = actor.get_linked_entity('OA9')
+    end_object = None
+    if end_place:
+        end_object = end_place.get_linked_entity('P53', True)
+        objects.append(end_object)
+    label = uc_first(_('born') if actor.class_.code == 'E21' else _('begin'))
+    info.append((label, format_entry_begin(actor, begin_object)))
+    label = uc_first(_('died') if actor.class_.code == 'E21' else _('end'))
+    info.append((label, format_entry_end(actor, end_object)))
     appears_first, appears_last = get_appearance(event_links)
     info.append((_('appears first'), appears_first))
     info.append((_('appears last'), appears_last))
+
+    residence_place = actor.get_linked_entity('P74')
+    if residence_place:
+        residence_object = residence_place.get_linked_entity('P53', True)
+        objects.append(residence_object)
+        info.append((uc_first(_('residence')), link(residence_object)))
+    add_type_data(actor, info)
     add_system_data(actor, info)
+
     for link_ in actor.get_links('OA7') + actor.get_links('OA7', True):
         if actor.id == link_.domain.id:
             type_ = link_.type.get_name_directed() if link_.type else ''
