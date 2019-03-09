@@ -223,13 +223,20 @@ def get_entity_data(entity, location=None):
     Return related entity information for a table for view.
     The location parameter is for places which have a location attached.
     """
-    data = add_type_data(entity, [], location=location)
+    data = []
 
-    # Info for places
+    # Alias for places
     if entity.class_.code in app.config['CLASS_CODES']['place']:
         aliases = entity.get_linked_entities('P1')
         if aliases:
             data.append((uc_first(_('alias')), '<br />'.join([x.name for x in aliases])))
+
+    # Dates
+    data.append((uc_first(_('begin')), format_entry_begin(entity)))
+    data.append((uc_first(_('end')), format_entry_end(entity)))
+
+    # Types
+    add_type_data(entity, data, location=location)
 
     # Info for files
     if entity.system_type == 'file':
@@ -254,9 +261,6 @@ def get_entity_data(entity, location=None):
             data.append((uc_first(_('given place')), '<br />'.join(
                 [link(place) for place in entity.get_linked_entities('P24')])))
 
-    # Dates
-    data.append((uc_first(_('begin')), format_entry_begin(entity)))
-    data.append((uc_first(_('end')), format_entry_end(entity)))
     return add_system_data(entity, data)
 
 
