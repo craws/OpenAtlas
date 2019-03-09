@@ -2,8 +2,9 @@
 from flask import render_template, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
-from wtforms import BooleanField, SelectMultipleField, StringField, SubmitField, widgets
-from wtforms.validators import InputRequired
+from wtforms import (BooleanField, IntegerField, SelectMultipleField, StringField, SubmitField,
+                     widgets)
+from wtforms.validators import InputRequired, NoneOf, NumberRange, Optional
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
@@ -11,6 +12,17 @@ from openatlas.util.util import link, required_group, truncate_string, uc_first
 
 
 class SearchForm(Form):
+    validator_day = [Optional(), NumberRange(min=1, max=31)]
+    validator_month = [Optional(), NumberRange(min=1, max=12)]
+    validator_year = [Optional(), NumberRange(min=-4713, max=9999), NoneOf([0])]
+
+    begin_year = IntegerField(render_kw={'placeholder': _('YYYY')}, validators=validator_year)
+    begin_month = IntegerField(render_kw={'placeholder': _('1')}, validators=validator_month)
+    begin_day = IntegerField(render_kw={'placeholder': _('1')}, validators=validator_day)
+    end_year = IntegerField(render_kw={'placeholder': _('YYYY')}, validators=validator_year)
+    end_month = IntegerField(render_kw={'placeholder': _('12')}, validators=validator_month)
+    end_day = IntegerField(render_kw={'placeholder': _('31')}, validators=validator_day)
+
     term = StringField(_('search'), [InputRequired()],
                        render_kw={'placeholder': _('search term'), 'autofocus': True})
     own = BooleanField(_('Only entities edited by me'))

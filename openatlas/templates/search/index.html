@@ -11,6 +11,9 @@
             {{ form.term }}<br /><br />
             {{ form.own }} {{ form.own.label }}<br />
             {{ form.desc }} {{ form.desc.label }}<br />
+            <h2>{{ _('date')|uc_first }}</h2>
+            {{ form.begin_year(class_='year') }} {{ form.begin_month(class_='month') }} {{ form.begin_day(class_='day') }} {{ _('from')|uc_first }}<br />
+            {{ form.end_year(class_='year') }} {{ form.end_month(class_='month') }} {{ form.end_day(class_='day') }} {{ _('to')|uc_first }}
             <h2>{{ _('classes')|uc_first }}</h2>
             <p id="select_all" class="select_all">{{ _('deselect all')|uc_first }}</p>
             {{ form.classes }}
