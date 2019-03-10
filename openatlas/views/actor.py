@@ -10,11 +10,10 @@ from openatlas import app, logger
 from openatlas.forms.forms import DateForm, TableField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
-from openatlas.util.util import (display_remove_link, get_appearance, get_base_table_data,
-                                 get_entity_data, get_profile_image_table_link, is_authorized, link,
-                                 required_group, truncate_string, uc_first, was_modified,
-                                 add_type_data, add_system_data, format_entry_begin,
-                                 format_entry_end)
+from openatlas.util.util import (add_system_data, add_type_data, display_remove_link,
+                                 format_entry_begin, format_entry_end, get_appearance,
+                                 get_base_table_data, get_profile_image_table_link, is_authorized,
+                                 link, required_group, truncate_string, uc_first, was_modified)
 
 
 class ActorForm(DateForm):
@@ -77,8 +76,11 @@ def actor_view(id_):
     for link_ in event_links:
         event = link_.domain
         place = event.get_linked_entity('P7')
+        link_.object_ = None
         if place:
-            objects.append(place.get_linked_entity('P53', True))
+            object_ = place.get_linked_entity('P53', True)
+            objects.append(object_)
+            link_.object_ = object_  # May be used later for first/last appearance info
         first = link_.first
         if not link_.first and event.first:
             first = '<span class="inactive" style="float:right;">' + event.first + '</span>'
