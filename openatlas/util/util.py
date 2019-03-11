@@ -610,15 +610,19 @@ def get_appearance(event_links):
         if not actor.first:
             if link_.first and (not first_year or int(link_.first) < int(first_year)):
                 first_year = link_.first
-                first_string = _('at an') + ' ' + event_link + format_entry_begin(link_)
+                first_string = format_entry_begin(link_) + ' ' + _('at an') + ' ' + event_link
+                first_string += (' ' + _('in') + ' ' + link(link_.object_)) if link_.object_ else ''
             elif event.first and (not first_year or int(event.first) < int(first_year)):
                 first_year = event.first
-                first_string = _('at an') + ' ' + event_link + format_entry_begin(event)
+                first_string = format_entry_begin(event) + ' ' + _('at an') + ' ' + event_link
+                first_string += (' ' + _('in') + ' ' + link(link_.object_)) if link_.object_ else ''
         if not actor.last:
             if link_.last and (not last_year or int(link_.last) > int(last_year)):
                 last_year = link_.last
-                last_string = _('at an') + ' ' + event_link + format_entry_end(event)
+                last_string = format_entry_end(event) + ' ' + _('at an') + ' ' + event_link
+                last_string += (' ' + _('in') + ' ' + link(link_.object_)) if link_.object_ else ''
             elif event.last and (not last_year or int(event.last) > int(last_year)):
                 last_year = event.last
-                last_string = _('at an') + ' ' + event_link + format_entry_end(event)
+                last_string = format_entry_end(event) + ' ' + _('at an') + ' ' + event_link
+                last_string += (' ' + _('in') + ' ' + link(link_.object_)) if link_.object_ else ''
     return first_string, last_string
