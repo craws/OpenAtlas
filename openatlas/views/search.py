@@ -23,6 +23,8 @@ class SearchForm(Form):
     end_month = IntegerField(render_kw={'placeholder': _('12')}, validators=validator_month)
     end_day = IntegerField(render_kw={'placeholder': _('31')}, validators=validator_day)
 
+    exclude_entities_without_dates = BooleanField(_('Exclude entities without dates'), default=True)
+
     term = StringField(_('search'), [InputRequired()],
                        render_kw={'placeholder': _('search term'), 'autofocus': True})
     own = BooleanField(_('Only entities edited by me'))
