@@ -7,24 +7,12 @@ from wtforms import (BooleanField, IntegerField, SelectMultipleField, StringFiel
 from wtforms.validators import InputRequired, NoneOf, NumberRange, Optional
 
 from openatlas import app
+from openatlas.models.date import DateMapper
 from openatlas.models.entity import EntityMapper
 from openatlas.util.util import link, required_group, truncate_string, uc_first
 
 
 class SearchForm(Form):
-    validator_day = [Optional(), NumberRange(min=1, max=31)]
-    validator_month = [Optional(), NumberRange(min=1, max=12)]
-    validator_year = [Optional(), NumberRange(min=-4713, max=9999), NoneOf([0])]
-
-    begin_year = IntegerField(render_kw={'placeholder': _('YYYY')}, validators=validator_year)
-    begin_month = IntegerField(render_kw={'placeholder': _('1')}, validators=validator_month)
-    begin_day = IntegerField(render_kw={'placeholder': _('1')}, validators=validator_day)
-    end_year = IntegerField(render_kw={'placeholder': _('YYYY')}, validators=validator_year)
-    end_month = IntegerField(render_kw={'placeholder': _('12')}, validators=validator_month)
-    end_day = IntegerField(render_kw={'placeholder': _('31')}, validators=validator_day)
-
-    exclude_entities_without_dates = BooleanField(_('Exclude entities without dates'), default=True)
-
     term = StringField(_('search'), [InputRequired()],
                        render_kw={'placeholder': _('search term'), 'autofocus': True})
     own = BooleanField(_('Only entities edited by me'))
@@ -33,6 +21,39 @@ class SearchForm(Form):
                                   option_widget=widgets.CheckboxInput(),
                                   widget=widgets.ListWidget(prefix_label=False))
     search = SubmitField(_('search'))
+
+    # Date fields
+    validator_day = [Optional(), NumberRange(min=1, max=31)]
+    validator_month = [Optional(), NumberRange(min=1, max=12)]
+    validator_year = [Optional(), NumberRange(min=-4713, max=9999), NoneOf([0])]
+    begin_year = IntegerField(render_kw={'placeholder': _('YYYY')}, validators=validator_year)
+    begin_month = IntegerField(render_kw={'placeholder': 1}, validators=validator_month)
+    begin_day = IntegerField(render_kw={'placeholder': 1}, validators=validator_day)
+    end_year = IntegerField(render_kw={'placeholder': _('YYYY')}, validators=validator_year)
+    end_month = IntegerField(render_kw={'placeholder': 12}, validators=validator_month)
+    end_day = IntegerField(render_kw={'placeholder': 31}, validators=validator_day)
+    exclude_entities_without_dates = BooleanField(_('Exclude entities without dates'), default=True)
+
+    def validate(self, extra_validators=None):
+        valid = Form.validate(self)
+        from_date = None
+        to_date = None
+        if self.begin_year.data:
+            if not self.end_month.data or not self.end_day.data:
+                self.end_month.data = 1
+                self.end_day.data = 1
+            from_date = DateMapper.form_to_datetime64(self.begin_year.data, self.begin_month.data,
+                                                      self.begin_day.data)
+        if self.end_year.data:
+            if not self.end_month.data or not self.end_day.data:
+                self.end_month.data = 12
+                self.end_day.data = 31
+            to_date = DateMapper.form_to_datetime64(self.end_year.data, self.end_month.data,
+                                                    self.end_day.data)
+        if from_date and to_date and from_date > to_date:
+            self.begin_year.errors.append(_('Begin dates cannot start after end dates.'))
+            valid = False
+        return valid
 
 
 @app.route('/overview/search', methods=['POST', 'GET'])

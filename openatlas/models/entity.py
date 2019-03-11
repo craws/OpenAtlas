@@ -367,18 +367,64 @@ class EntityMapper:
         sql += ' OR '.join(sql_where) + ") GROUP BY e.id ORDER BY e.name;"
         g.cursor.execute(sql, {'term': '%' + form.term.data + '%', 'user_id': current_user.id})
         debug_model['div sql'] += 1
+
+        # Prepare dates filter
+        from_date = None
+        if form.begin_year.data:
+            from_date = DateMapper.form_to_datetime64(form.begin_year.data, form.begin_month.data,
+                                                      form.begin_day.data)
+        to_date = None
+        if form.end_year.data:
+            to_date = DateMapper.form_to_datetime64(form.end_year.data, form.end_month.data,
+                                                    form.end_day.data)
         entities = []
         for row in g.cursor.fetchall():
+            entity = None
             if row.class_code == 'E82':  # If found in actor alias
-                entities.append(LinkMapper.get_linked_entity(row.id, 'P131', True))
+                entity = LinkMapper.get_linked_entity(row.id, 'P131', True)
             elif row.class_code == 'E41':  # If found in place alias
-                if 'place' in form.classes.data:  # Only places have alias
-                    entities.append(LinkMapper.get_linked_entity(row.id, 'P1', True))
+                entity = LinkMapper.get_linked_entity(row.id, 'P1', True)
             elif row.class_code == 'E18':
                 if row.system_type in form.classes.data:
-                    entities.append(Entity(row))
+                    entity = Entity(row)
             else:
-                entities.append(Entity(row))
+                entity = Entity(row)
+
+            if not entity:
+                continue
+
+            if not from_date and not to_date:
+                entities.append(entity)
+                continue
+
+            # Date criteria present but entity has no dates
+            if not entity.begin_from and not entity.begin_to and not entity.end_from \
+                    and not entity.end_to:
+                if not form.exclude_entities_without_dates.data:  # Include it anyway
+                    entities.append(entity)
+                continue
+
+            # Check date criteria
+            dates = [entity.begin_from, entity.begin_to, entity.end_from, entity.end_to]
+            begin_check_ok = False
+            if not from_date:
+                begin_check_ok = True
+            else:
+                for date in dates:
+                    if date and date >= from_date:
+                        begin_check_ok = True
+
+            end_check_ok = False
+            if not to_date:
+                end_check_ok = True
+            else:
+                for date in dates:
+                    if date and date <= to_date:
+                        end_check_ok = True
+
+            if begin_check_ok and end_check_ok:
+                entities.append(entity)
+
         return {d.id: d for d in entities}.values()  # Remove duplicates before returning
 
     @staticmethod

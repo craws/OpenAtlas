@@ -12,7 +12,11 @@
             {{ form.own }} {{ form.own.label }}<br />
             {{ form.desc }} {{ form.desc.label }}<br />
             <h2>{{ _('date')|uc_first }}</h2>
-            {{ form.begin_year(class_='year') }} {{ form.begin_month(class_='month') }} {{ form.begin_day(class_='day') }} {{ _('from')|uc_first }}<br />
+            {{ form.begin_year(class_='year') }} {{ form.begin_month(class_='month') }} {{ form.begin_day(class_='day') }} {{ _('from')|uc_first }}
+            {% if form.errors['begin_year'] %}
+                <span class="error">{{ form.errors['begin_year'][0]|safe }}</span>
+            {% endif %}
+            <br />
             {{ form.end_year(class_='year') }} {{ form.end_month(class_='month') }} {{ form.end_day(class_='day') }} {{ _('to')|uc_first }}<br />
             {{ form.exclude_entities_without_dates }} {{ form.exclude_entities_without_dates.label }}
             <h2>{{ _('classes')|uc_first }}</h2>
