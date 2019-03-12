@@ -32,7 +32,7 @@ class SearchForm(Form):
     end_year = IntegerField(render_kw={'placeholder': _('YYYY')}, validators=validator_year)
     end_month = IntegerField(render_kw={'placeholder': 12}, validators=validator_month)
     end_day = IntegerField(render_kw={'placeholder': 31}, validators=validator_day)
-    exclude_entities_without_dates = BooleanField(_('Exclude entities without dates'), default=True)
+    include_dateless = BooleanField(_('Include dateless entities'))
 
     def validate(self, extra_validators=None):
         valid = Form.validate(self)
@@ -80,6 +80,9 @@ def build_search_table(form):
     table = {'id': 'search', 'data': [], 'sort': 'sortList: [[0, 0]]',
              'header': ['name', 'class', 'first', 'last', 'description']}
     for entity in EntityMapper.search(form):
-        table['data'].append([link(entity), entity.class_.name, entity.first, entity.last,
+        table['data'].append([link(entity),
+                              entity.class_.name,
+                              entity.first,
+                              entity.last,
                               truncate_string(entity.description)])
     return table

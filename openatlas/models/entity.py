@@ -368,7 +368,7 @@ class EntityMapper:
         g.cursor.execute(sql, {'term': '%' + form.term.data + '%', 'user_id': current_user.id})
         debug_model['div sql'] += 1
 
-        # Prepare dates filter
+        # Prepare date filter
         from_date = None
         if form.begin_year.data:
             from_date = DateMapper.form_to_datetime64(form.begin_year.data, form.begin_month.data,
@@ -400,7 +400,7 @@ class EntityMapper:
             # Date criteria present but entity has no dates
             if not entity.begin_from and not entity.begin_to and not entity.end_from \
                     and not entity.end_to:
-                if not form.exclude_entities_without_dates.data:  # Include it anyway
+                if form.include_dateless.data:  # Include dateless entities
                     entities.append(entity)
                 continue
 
