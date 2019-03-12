@@ -39,13 +39,10 @@ class SearchForm(Form):
         from_date = None
         to_date = None
         if self.begin_year.data:
-            if not self.end_month.data or not self.end_day.data:
-                self.end_month.data = 1
-                self.end_day.data = 1
             from_date = DateMapper.form_to_datetime64(self.begin_year.data, self.begin_month.data,
                                                       self.begin_day.data)
         if self.end_year.data:
-            if not self.end_month.data or not self.end_day.data:
+            if not self.end_month.data or not self.end_day.data:  # Instead first day we want last
                 self.end_month.data = 12
                 self.end_day.data = 31
             to_date = DateMapper.form_to_datetime64(self.end_year.data, self.end_month.data,

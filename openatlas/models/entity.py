@@ -390,7 +390,7 @@ class EntityMapper:
             else:
                 entity = Entity(row)
 
-            if not entity:
+            if not entity:  # pragma: no cover
                 continue
 
             if not from_date and not to_date:
@@ -408,7 +408,7 @@ class EntityMapper:
             dates = [entity.begin_from, entity.begin_to, entity.end_from, entity.end_to]
             begin_check_ok = False
             if not from_date:
-                begin_check_ok = True
+                begin_check_ok = True  # pragma: no cover
             else:
                 for date in dates:
                     if date and date >= from_date:
@@ -416,7 +416,7 @@ class EntityMapper:
 
             end_check_ok = False
             if not to_date:
-                end_check_ok = True
+                end_check_ok = True  # pragma: no cover
             else:
                 for date in dates:
                     if date and date <= to_date:
