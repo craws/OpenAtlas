@@ -15,6 +15,7 @@ from babel import dates
 from flask import abort, flash, g, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
+from flask_wtf.csrf import generate_csrf
 from numpy import math
 from werkzeug.utils import redirect
 
@@ -139,7 +140,6 @@ def get_file_stats(path=app.config['UPLOAD_FOLDER_PATH']):
 
 def build_table_form(class_name, linked_entities):
     """ Returns a form with a list of entities with checkboxes"""
-    from flask_wtf.csrf import generate_csrf
     from openatlas.models.entity import EntityMapper
     header = app.config['TABLE_HEADERS'][class_name] + ['']
     table = {'id': class_name, 'header': header, 'data': []}
@@ -337,13 +337,24 @@ def required_group(group):
 
 def bookmark_toggle(entity_id, for_table=False):
     label = uc_first(_('bookmark'))
+    html = """
+        <script>
+            var csrf_token = '{csrfToken}';
+            $.ajaxSetup({{
+                beforeSend: function(xhr, settings) {{
+                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {{
+                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                    }}
+                }}
+            }});
+        </script>""".format(csrfToken=generate_csrf())
     if entity_id in current_user.bookmarks:
         label = uc_first(_('bookmark remove'))
     if for_table:
-        html = """<a id="bookmark{entity_id}" onclick="ajaxBookmark('{entity_id}');"
+        html += """<a id="bookmark{entity_id}" onclick="ajaxBookmark('{entity_id}');"
             style="cursor:pointer;">{label}</a>""".format(entity_id=entity_id, label=label)
     else:
-        html = """<button id="bookmark{entity_id}" onclick="ajaxBookmark('{entity_id}');"
+        html += """<button id="bookmark{entity_id}" onclick="ajaxBookmark('{entity_id}');"
             type="button">{label}</button>""".format(entity_id=entity_id, label=label)
     return html
 
