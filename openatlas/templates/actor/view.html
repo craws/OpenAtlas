@@ -94,6 +94,7 @@
                 <a href="{{ url_for('reference_add', origin_id=actor.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='bibliography', origin_id=actor.id) }}">+ {{ _('bibliography')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='edition', origin_id=actor.id) }}">+ {{ _('edition')|uc_first }}</a>
+                <a href="{{ url_for('reference_insert', code='external_reference', origin_id=actor.id) }}">+ {{ _('external reference')|uc_first }}</a>
             </div>
         {% endif %}
         {{ tables['reference']|pager|safe }}

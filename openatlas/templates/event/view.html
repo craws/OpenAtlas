@@ -25,7 +25,6 @@
             {{ event.id|bookmark_toggle|safe }}
         </div>
         <h1>{{ event.name }}</h1>
-
         <div>
             {{ profile_image_id|display_profile_image|safe }}
             <div style="float:left;">
@@ -66,6 +65,7 @@
                 <a href="{{ url_for('reference_add', origin_id=event.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='bibliography', origin_id=event.id) }}">+ {{ _('bibliography')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='edition', origin_id=event.id) }}">+ {{ _('edition')|uc_first }}</a>
+                <a href="{{ url_for('reference_insert', code='external_reference', origin_id=event.id) }}">+ {{ _('external reference')|uc_first }}</a>
             </div>
         {% endif %}
         {{ tables['reference']|pager|safe }}

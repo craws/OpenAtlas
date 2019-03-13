@@ -206,7 +206,7 @@ def save(form, reference=None, code=None, origin=None):
         if not reference:
             log_action = 'insert'
             class_code = 'E84' if code == 'carrier' else 'E31'
-            system_type = 'information carrier' if code == 'carrier' else code
+            system_type = 'information carrier' if code == 'carrier' else code.replace('_', ' ')
             reference = EntityMapper.insert(class_code, form.name.data, system_type)
         reference.name = form.name.data
         reference.description = form.description.data
