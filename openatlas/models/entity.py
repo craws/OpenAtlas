@@ -87,17 +87,18 @@ class Entity:
         self.end_to = None
         self.end_comment = None
         if form.begin_year_from.data:  # Only if begin year is set create a begin date or time span
+            self.begin_comment = form.begin_comment.data
             self.begin_from = DateMapper.form_to_datetime64(
                 form.begin_year_from.data, form.begin_month_from.data, form.begin_day_from.data)
             self.begin_to = DateMapper.form_to_datetime64(
-                form.begin_year_to.data, form.begin_month_to.data, form.begin_day_to.data)
-            self.begin_comment = form.begin_comment.data
+                form.begin_year_to.data, form.begin_month_to.data, form.begin_day_to.data, True)
+
         if form.end_year_from.data:  # Only if end year is set create a year date or time span
+            self.end_comment = form.end_comment.data
             self.end_from = DateMapper.form_to_datetime64(
                 form.end_year_from.data, form.end_month_from.data, form.end_day_from.data)
             self.end_to = DateMapper.form_to_datetime64(
-                form.end_year_to.data, form.end_month_to.data, form.end_day_to.data)
-            self.end_comment = form.end_comment.data
+                form.end_year_to.data, form.end_month_to.data, form.end_day_to.data, True)
 
     def get_profile_image_id(self):
         return EntityMapper.get_profile_image_id(self.id)
@@ -369,14 +370,32 @@ class EntityMapper:
         debug_model['div sql'] += 1
 
         # Prepare date filter
-        from_date = None
-        if form.begin_year.data:
-            from_date = DateMapper.form_to_datetime64(form.begin_year.data, form.begin_month.data,
-                                                      form.begin_day.data)
-        to_date = None
-        if form.end_year.data:
-            to_date = DateMapper.form_to_datetime64(form.end_year.data, form.end_month.data,
-                                                    form.end_day.data)
+        from_date = DateMapper.form_to_datetime64(form.begin_year.data, form.begin_month.data,
+                                                  form.begin_day.data)
+        to_date = DateMapper.form_to_datetime64(form.end_year.data, form.end_month.data,
+                                                form.end_day.data, True)
+
+        # Refill form in case dates were completed
+        if from_date:
+            string = str(from_date)
+            if string.startswith('-') or string.startswith('0000'):
+                string = string[1:]
+            parts = string.split('-')
+            form.begin_month.raw_data = None
+            form.begin_day.raw_data = None
+            form.begin_month.data = int(parts[1])
+            form.begin_day.data = int(parts[2])
+
+        if to_date:
+            string = str(to_date)
+            if string.startswith('-') or string.startswith('0000'):
+                string = string[1:]   # pragma: no cover
+            parts = string.split('-')
+            form.end_month.raw_data = None
+            form.end_day.raw_data = None
+            form.end_month.data = int(parts[1])
+            form.end_day.data = int(parts[2])
+
         entities = []
         for row in g.cursor.fetchall():
             entity = None
