@@ -282,7 +282,7 @@ def admin_file_delete(filename):  # pragma: no cover
 
 class LogForm(Form):
     limit = SelectField(_('limit'), choices=((0, _('all')), (100, 100), (500, 500)), default=100)
-    priority = SelectField(_('priority'), choices=(app.config['LOG_LEVELS'].items()), default=6)
+    priority = SelectField(_('priority'), choices=(list(app.config['LOG_LEVELS'].items())), default=6)
     user = SelectField(_('user'), choices=([(0, _('all'))]), default=0)
     apply = SubmitField(_('apply'))
 
