@@ -4,6 +4,12 @@ from collections import OrderedDict
 
 class Changelog:
     versions = OrderedDict()
+    versions['3.14.1'] = ['2019-03-14', OrderedDict([
+        ('feature', OrderedDict([
+            ('997', 'Advanced date completion')])),
+        ('fix', OrderedDict([
+            ('1000', 'Bookmarks not working'),
+            ('987', 'Open Type in new Tab or Window')]))])]
     versions['3.14.0'] = ['2019-03-12', OrderedDict([
         ('feature', OrderedDict([
             ('988', 'Search with date filter'),
