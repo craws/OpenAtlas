@@ -10,6 +10,10 @@ After following the instructions restart Apache and test if the application is w
 
     service apache2 restart
 
+### 3.13.0 to 3.14.0
+
+A code base update (e.g. with git pull) and an Apache restart should be sufficient
+
 ### 3.12.0 to 3.13.0
 
 Execute install/upgrade/3.13.0.sql after making backups

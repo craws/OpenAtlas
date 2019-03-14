@@ -4,11 +4,18 @@ from collections import OrderedDict
 
 class Changelog:
     versions = OrderedDict()
+    versions['3.14.0'] = ['2019-03-12', OrderedDict([
+        ('feature', OrderedDict([
+            ('988', 'Search with date filter'),
+            ('996', 'Better structured info tabs'),
+            ('981', 'Documentation for dates in model')])),
+        ('fix', OrderedDict([
+            ('995', 'Double Search Results')]))])]
     versions['3.13.0'] = ['2019-02-28', OrderedDict([
         ('feature', OrderedDict([
             ('590', 'Search - advanced features'),
             ('975', 'Unit labels for value types'),
-            ('985', 'Check for invalid dates at actor/event participations'),
+            ('985', 'Check for invalid dates at actor/event participation'),
             ('936', 'Refactor dates'),
             ('993', 'Refactor links')]))])]
     versions['3.12.0'] = ['2018-12-31', OrderedDict([

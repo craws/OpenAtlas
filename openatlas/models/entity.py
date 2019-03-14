@@ -87,17 +87,18 @@ class Entity:
         self.end_to = None
         self.end_comment = None
         if form.begin_year_from.data:  # Only if begin year is set create a begin date or time span
+            self.begin_comment = form.begin_comment.data
             self.begin_from = DateMapper.form_to_datetime64(
                 form.begin_year_from.data, form.begin_month_from.data, form.begin_day_from.data)
             self.begin_to = DateMapper.form_to_datetime64(
-                form.begin_year_to.data, form.begin_month_to.data, form.begin_day_to.data)
-            self.begin_comment = form.begin_comment.data
+                form.begin_year_to.data, form.begin_month_to.data, form.begin_day_to.data, True)
+
         if form.end_year_from.data:  # Only if end year is set create a year date or time span
+            self.end_comment = form.end_comment.data
             self.end_from = DateMapper.form_to_datetime64(
                 form.end_year_from.data, form.end_month_from.data, form.end_day_from.data)
             self.end_to = DateMapper.form_to_datetime64(
-                form.end_year_to.data, form.end_month_to.data, form.end_day_to.data)
-            self.end_comment = form.end_comment.data
+                form.end_year_to.data, form.end_month_to.data, form.end_day_to.data, True)
 
     def get_profile_image_id(self):
         return EntityMapper.get_profile_image_id(self.id)
@@ -339,13 +340,14 @@ class EntityMapper:
     def search(form):
         if not form.term.data:
             return []
-        sql = EntityMapper.sql
-        if form.own.data:
-            sql += " LEFT JOIN web.user_log ul ON e.id = ul.entity_id "
-        sql += " WHERE LOWER(e.name) LIKE LOWER(%(term)s)"
-        sql += " OR lower(e.description) LIKE lower(%(term)s) AND " if form.desc.data else " AND "
-        sql += " ul.user_id = %(user_id)s AND " if form.own.data else ''
-        sql += "("
+        sql = EntityMapper.sql + '''
+            {user_clause} WHERE (LOWER(e.name) LIKE LOWER(%(term)s) {description_clause})
+            AND {user_clause2} ('''.format(
+            user_clause=
+            ' LEFT JOIN web.user_log ul ON e.id = ul.entity_id ' if form.own.data else '',
+            description_clause=
+            ' OR lower(e.description) LIKE lower(%(term)s)' if form.desc.data else '',
+            user_clause2=' ul.user_id = %(user_id)s AND ' if form.own.data else '')
         sql_where = []
         for name in form.classes.data:
             if name in ['source', 'event']:
@@ -366,19 +368,83 @@ class EntityMapper:
         sql += ' OR '.join(sql_where) + ") GROUP BY e.id ORDER BY e.name;"
         g.cursor.execute(sql, {'term': '%' + form.term.data + '%', 'user_id': current_user.id})
         debug_model['div sql'] += 1
+
+        # Prepare date filter
+        from_date = DateMapper.form_to_datetime64(form.begin_year.data, form.begin_month.data,
+                                                  form.begin_day.data)
+        to_date = DateMapper.form_to_datetime64(form.end_year.data, form.end_month.data,
+                                                form.end_day.data, True)
+
+        # Refill form in case dates were completed
+        if from_date:
+            string = str(from_date)
+            if string.startswith('-') or string.startswith('0000'):
+                string = string[1:]
+            parts = string.split('-')
+            form.begin_month.raw_data = None
+            form.begin_day.raw_data = None
+            form.begin_month.data = int(parts[1])
+            form.begin_day.data = int(parts[2])
+
+        if to_date:
+            string = str(to_date)
+            if string.startswith('-') or string.startswith('0000'):
+                string = string[1:]   # pragma: no cover
+            parts = string.split('-')
+            form.end_month.raw_data = None
+            form.end_day.raw_data = None
+            form.end_month.data = int(parts[1])
+            form.end_day.data = int(parts[2])
+
         entities = []
         for row in g.cursor.fetchall():
+            entity = None
             if row.class_code == 'E82':  # If found in actor alias
-                entities.append(LinkMapper.get_linked_entity(row.id, 'P131', True))
+                entity = LinkMapper.get_linked_entity(row.id, 'P131', True)
             elif row.class_code == 'E41':  # If found in place alias
-                if 'place' in form.classes.data:  # Only places have alias
-                    entities.append(LinkMapper.get_linked_entity(row.id, 'P1', True))
+                entity = LinkMapper.get_linked_entity(row.id, 'P1', True)
             elif row.class_code == 'E18':
                 if row.system_type in form.classes.data:
-                    entities.append(Entity(row))
+                    entity = Entity(row)
             else:
-                entities.append(Entity(row))
-        return entities
+                entity = Entity(row)
+
+            if not entity:  # pragma: no cover
+                continue
+
+            if not from_date and not to_date:
+                entities.append(entity)
+                continue
+
+            # Date criteria present but entity has no dates
+            if not entity.begin_from and not entity.begin_to and not entity.end_from \
+                    and not entity.end_to:
+                if form.include_dateless.data:  # Include dateless entities
+                    entities.append(entity)
+                continue
+
+            # Check date criteria
+            dates = [entity.begin_from, entity.begin_to, entity.end_from, entity.end_to]
+            begin_check_ok = False
+            if not from_date:
+                begin_check_ok = True  # pragma: no cover
+            else:
+                for date in dates:
+                    if date and date >= from_date:
+                        begin_check_ok = True
+
+            end_check_ok = False
+            if not to_date:
+                end_check_ok = True  # pragma: no cover
+            else:
+                for date in dates:
+                    if date and date <= to_date:
+                        end_check_ok = True
+
+            if begin_check_ok and end_check_ok:
+                entities.append(entity)
+
+        return {d.id: d for d in entities}.values()  # Remove duplicates before returning
 
     @staticmethod
     def set_profile_image(id_, origin_id):

@@ -52,21 +52,54 @@ class DateMapper:
         return string + postfix
 
     @staticmethod
-    def form_to_datetime64(year, month, day):
+    def form_to_datetime64(year, month, day, to_date=False):
         """ Converts form fields (year, month, day) to a numpy.datetime64
         :param year: -4713 to 9999
         :param month: 1 to 12
         :param day: 1 to 31
+        :param to_date: if true missing month or date will be filled to max (otherwise 1)
         :return: numpy.datetime64
         """
         if not year:
             return None
         year = format(year, '03d') if year > 0 else format(year + 1, '04d')
-        month = format(month, '02d') if month else '01'
-        day = format(day, '02d') if day else '01'
-        string = str(year) + '-' + str(month) + '-' + str(day)
+
+        def is_leap_year(year_):  # pragma: no cover
+            if year_ % 400 == 0:  # e.g. 2000
+                return True
+
+            if year_ % 100 == 0:  # e.g. 1000
+                return False
+
+            if year_ % 4 == 0:  # e.g. 1996
+                return True
+
+            return False
+
+        def get_last_day_of_month(year_, month_):
+            months_days = {1: 31, 2: 28, 3: 31, 4: 30, 5: 31, 6: 30, 7: 31, 8: 31, 9: 30, 10: 31,
+                           11: 30, 12: 31}
+            months_days_leap = {1: 31, 2: 29, 3: 31, 4: 30, 5: 31, 6: 30, 7: 31, 8: 31, 9: 30,
+                                10: 31, 11: 30, 12: 31}
+            date_lookup = months_days_leap if is_leap_year(year_) else months_days
+            return date_lookup.get(month_)
+
+        if month:
+            month = format(month, '02d')
+        elif to_date:
+            month = '12'
+        else:
+            month = '01'
+
+        if day:
+            day = format(day, '02d')
+        elif to_date:
+            day = format(get_last_day_of_month(int(year), int(month)), '02d')
+        else:
+            day = '01'
+
         try:
-            datetime_ = numpy.datetime64(string)
+            datetime_ = numpy.datetime64(str(year) + '-' + str(month) + '-' + str(day))
         except ValueError:
             return None
         return datetime_

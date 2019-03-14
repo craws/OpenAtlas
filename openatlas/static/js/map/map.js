@@ -59,6 +59,13 @@ if (gisPolygonSelected != '') {
     gisPolygons.on('click', setObjectId);
 }
 
+// Workaround overlay maps for Stefan until #978 is implemented
+if (overlayHack) {
+    controls.Stara = L.imageOverlay('/display/112757.png', [[49.99800, 14.99246], [49.99747, 14.99328]]);
+    controls.Thunau = L.imageOverlay('/display/112760.png', [[48.58709, 15.64294], [48.58653, 15.64356]]);
+    map.options.maxZoom = 30;
+}
+
 if (window.location.href.indexOf('update') >= 0) {
     $('#gis_points').val(JSON.stringify(gisPointSelected));
     $('#gis_polygons').val(JSON.stringify(gisPolygonSelected));

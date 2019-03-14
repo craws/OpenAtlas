@@ -4,6 +4,10 @@ html, body, input, select, textarea {
     font-family: helvetica, arial, sans-serif;
 }
 
+#select_all, #select_all_links {
+    cursor: pointer;
+}
+
 .date-switch label.error {
     padding: 0.2em;
 }

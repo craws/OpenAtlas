@@ -145,8 +145,8 @@ def place_view(id_):
             link(actor),
             g.properties[link_.property.code].name,
             actor.class_.name,
-            format_date(actor.first),
-            format_date(actor.last)])
+            actor.first,
+            actor.last])
     gis_data = GisMapper.get_all(object_) if location else None
     if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]':
         gis_data = None
