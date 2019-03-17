@@ -9,5 +9,5 @@
     > + {{ _(code)|uc_first }}
 {% endblock %}
 {% block content %}
-    {{ form|display_form|safe }}
+    {{ form|display_form(code)|safe }}
 {% endblock %}

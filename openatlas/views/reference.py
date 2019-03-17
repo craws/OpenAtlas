@@ -4,7 +4,7 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
-from wtforms.validators import InputRequired
+from wtforms.validators import InputRequired, URL
 
 import openatlas
 from openatlas import app, logger
@@ -17,7 +17,7 @@ from openatlas.util.util import (display_remove_link, get_base_table_data, get_e
 
 
 class ReferenceForm(Form):
-    name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
+    name = StringField(_('name'), render_kw={'autofocus': True})
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
@@ -165,7 +165,17 @@ def reference_index():
 @required_group('editor')
 def reference_insert(code, origin_id=None):
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
-    form = build_form(ReferenceForm, uc_first('Information Carrier' if code == 'carrier' else code))
+    type_name = code
+    if code == 'carrier':
+        type_name = 'Information Carrier'
+    elif code == 'external_reference':
+        type_name = 'External Reference'
+    form = build_form(ReferenceForm, type_name)
+    if code == 'external_reference':
+        form.name.validators = [InputRequired(), URL()]
+        form.name.label.text = 'URL'
+    else:
+        form.name.validators = [InputRequired()]
     if origin:
         del form.insert_and_continue
     if form.validate_on_submit():
@@ -187,6 +197,11 @@ def reference_delete(id_):
 def reference_update(id_):
     reference = EntityMapper.get_by_id(id_)
     form = build_form(ReferenceForm, reference.system_type.title(), reference, request)
+    if reference.system_type == 'external reference':
+        form.name.validators = [InputRequired(), URL()]
+        form.name.label.text = 'URL'
+    else:
+        form.name.validators = [InputRequired()]
     if form.validate_on_submit():
         if was_modified(form, reference):  # pragma: no cover
             del form.save

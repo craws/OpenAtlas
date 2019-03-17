@@ -8,6 +8,10 @@ html, body, input, select, textarea {
     cursor: pointer;
 }
 
+#external_reference #name {
+    width: 36em;
+}
+
 .date-switch label.error {
     padding: 0.2em;
 }
