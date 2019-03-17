@@ -36,17 +36,10 @@ class SearchForm(Form):
 
     def validate(self, extra_validators=None):
         valid = Form.validate(self)
-        from_date = None
-        to_date = None
-        if self.begin_year.data:
-            from_date = DateMapper.form_to_datetime64(self.begin_year.data, self.begin_month.data,
-                                                      self.begin_day.data)
-        if self.end_year.data:
-            if not self.end_month.data or not self.end_day.data:  # Instead first day we want last
-                self.end_month.data = 12
-                self.end_day.data = 31
-            to_date = DateMapper.form_to_datetime64(self.end_year.data, self.end_month.data,
-                                                    self.end_day.data)
+        from_date = DateMapper.form_to_datetime64(self.begin_year.data, self.begin_month.data,
+                                                  self.begin_day.data)
+        to_date = DateMapper.form_to_datetime64(self.end_year.data, self.end_month.data,
+                                                self.end_day.data, True)
         if from_date and to_date and from_date > to_date:
             self.begin_year.errors.append(_('Begin dates cannot start after end dates.'))
             valid = False

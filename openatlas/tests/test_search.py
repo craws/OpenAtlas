@@ -22,7 +22,7 @@ class SearchTest(TestBaseCase):
             self.app.post(url_for('search_index'), data={'global-term': ''})
             rv = self.app.post(url_for('search_index'), data={'global-term': 'wal',
                                                               'include_dateless': True,
-                                                              'begin_year': 100, 'end_year': 3000})
+                                                              'begin_year': -100, 'end_year': 3000})
             assert b'Waldo' in rv.data
             rv = self.app.post(url_for('search_index'), data={'term': 'wal', 'own': True})
             assert b'Waldo' not in rv.data
@@ -30,5 +30,5 @@ class SearchTest(TestBaseCase):
             rv = self.app.post(url_for('search_index'), data=data)
             assert b'Waldo' in rv.data
             rv = self.app.post(url_for('search_index'), follow_redirects=True,
-                               data={'term': 'x', 'begin_year': 2, 'end_year': 1})
+                               data={'term': 'x', 'begin_year': 2, 'end_year': -1})
             assert b'cannot start after' in rv.data

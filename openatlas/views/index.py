@@ -17,7 +17,7 @@ from openatlas.util.util import (bookmark_toggle, format_date, link, required_gr
 
 
 class FeedbackForm(Form):
-    subject = SelectField(_('subject'), choices=app.config['FEEDBACK_SUBJECTS'].items(),
+    subject = SelectField(_('subject'), choices=list(app.config['FEEDBACK_SUBJECTS'].items()),
                           render_kw={'autofocus': True})
     description = TextAreaField(_('description'), [InputRequired()])
     send = SubmitField(_('send'))

@@ -29,11 +29,11 @@ class GeneralForm(Form):
     site_name = StringField(uc_first(_('site name')))
     site_header = StringField(uc_first(_('site header')))
     default_language = SelectField(uc_first(_('default language')),
-                                   choices=app.config['LANGUAGES'].items())
+                                   choices=list(app.config['LANGUAGES'].items()))
     default_table_rows = SelectField(uc_first(_('default table rows')), coerce=int,
-                                     choices=app.config['DEFAULT_TABLE_ROWS'].items())
+                                     choices=list(app.config['DEFAULT_TABLE_ROWS'].items()))
     log_level = SelectField(uc_first(_('log level')), coerce=int,
-                            choices=app.config['LOG_LEVELS'].items())
+                            choices=list(app.config['LOG_LEVELS'].items()))
     debug_mode = BooleanField(uc_first(_('debug mode')))
     random_password_length = IntegerField(uc_first(_('random password length')))
     minimum_password_length = IntegerField(uc_first(_('minimum password length')))
@@ -282,7 +282,7 @@ def admin_file_delete(filename):  # pragma: no cover
 
 class LogForm(Form):
     limit = SelectField(_('limit'), choices=((0, _('all')), (100, 100), (500, 500)), default=100)
-    priority = SelectField(_('priority'), choices=(app.config['LOG_LEVELS'].items()), default=6)
+    priority = SelectField(_('priority'), choices=(list(app.config['LOG_LEVELS'].items())), default=6)
     user = SelectField(_('user'), choices=([(0, _('all'))]), default=0)
     apply = SubmitField(_('apply'))
 

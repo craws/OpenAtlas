@@ -50,13 +50,13 @@ class Link:
             self.begin_from = DateMapper.form_to_datetime64(
                 form.begin_year_from.data, form.begin_month_from.data, form.begin_day_from.data)
             self.begin_to = DateMapper.form_to_datetime64(
-                form.begin_year_to.data, form.begin_month_to.data, form.begin_day_to.data)
+                form.begin_year_to.data, form.begin_month_to.data, form.begin_day_to.data, True)
             self.begin_comment = form.begin_comment.data
         if form.end_year_from.data:  # Only if end year is set create a year date or time span
             self.end_from = DateMapper.form_to_datetime64(
                 form.end_year_from.data, form.end_month_from.data, form.end_day_from.data)
             self.end_to = DateMapper.form_to_datetime64(
-                form.end_year_to.data, form.end_month_to.data, form.end_day_to.data)
+                form.end_year_to.data, form.end_month_to.data, form.end_day_to.data, True)
             self.end_comment = form.end_comment.data
 
 
