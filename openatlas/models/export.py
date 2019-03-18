@@ -73,6 +73,8 @@ class Export:
     def export_sql():
         """ Creates a pg_dump file in the export/sql folder, filename begins with current date."""
         # Todo: prevent exposing the database password to the process list
+        if os.name != "posix":  # pragma: no cover
+            return False  # For other operating systems e.g. Windows, we would need adaptions here
         path = '{path}/sql/{date}_dump.sql'.format(path=app.config['EXPORT_FOLDER_PATH'],
                                                    date=DateMapper.current_date_for_filename())
         command = '''pg_dump -h {host} -d {database} -U {user} -p {port} -f {file}'''.format(
