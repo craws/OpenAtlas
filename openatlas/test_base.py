@@ -32,5 +32,5 @@ class TestBaseCase(unittest.TestCase):
         cursor = connection.cursor()
         for file_name in ['1_structure.sql', '2_data_web.sql', '3_data_model.sql',
                           '4_data_node.sql', 'data_test.sql']:
-            with open(os.path.dirname(__file__) + '/../install/' + file_name) as sqlFile:
+            with open(os.path.dirname(__file__) + '/../install/' + file_name, encoding='utf8') as sqlFile:
                 cursor.execute(sqlFile.read())

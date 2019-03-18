@@ -90,6 +90,8 @@ def file_index():
             convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
             file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
             truncate_string(entity.description)])
+    if os.name != "posix":  # With other operating systems e.g. Windows, we would need adaptions here
+        return render_template('file/index.html', table=table, disk_space_values={})
     statvfs = os.statvfs(app.config['UPLOAD_FOLDER_PATH'])
     disk_space = statvfs.f_frsize * statvfs.f_blocks
     free_space = statvfs.f_frsize * statvfs.f_bavail  # Available space without reserved blocks
