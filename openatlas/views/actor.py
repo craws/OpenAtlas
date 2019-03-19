@@ -62,8 +62,11 @@ def actor_view(id_):
         if domain.view_name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
             if is_authorized('editor'):
-                update_url = url_for('reference_link_update', link_id=link_.id, origin_id=actor.id)
-                data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
+                if domain.system_type != 'external reference':
+                    update_url = url_for('reference_link_update', link_id=link_.id, origin_id=actor.id)
+                    data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
+                else:
+                    data.append(' ')
         if is_authorized('editor'):
             url = url_for('link_delete', id_=link_.id, origin_id=actor.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))

@@ -231,6 +231,8 @@ def save(form, reference=None, code=None, origin=None):
         if origin:
             link_id = reference.link('P67', origin)
             url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
+            if code == 'external_reference':
+                url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-reference'
         if form.continue_.data == 'yes' and code:
             url = url_for('reference_insert', code=code)
         g.cursor.execute('COMMIT')
