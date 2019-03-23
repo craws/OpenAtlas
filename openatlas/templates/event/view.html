@@ -29,6 +29,7 @@
             {{ profile_image_id|display_profile_image|safe }}
             <div style="float:left;">
                 {{ tables['info']|data_table|safe }}
+                {{ event|display_external_references|safe }}
                 {{ event|description|safe }}
             </div>
             <div style="clear:both;"></div>
