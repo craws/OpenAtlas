@@ -26,37 +26,37 @@ class ReferenceForm(Form):
 
 
 class AddReferenceForm(Form):
-    reference = TableField(_('reference'))
+    reference = TableField(_('reference'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
 
 class AddSourceForm(Form):
-    source = TableField(_('source'))
+    source = TableField(_('source'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
 
 class AddEventForm(Form):
-    event = TableField(_('event'))
+    event = TableField(_('event'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
 
 class AddActorForm(Form):
-    actor = TableField(_('actor'))
+    actor = TableField(_('actor'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
 
 class AddPlaceForm(Form):
-    place = TableField(_('place'))
+    place = TableField(_('place'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
 
 class AddFileForm(Form):
-    file = TableField(_('file'))
+    file = TableField(_('file'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
