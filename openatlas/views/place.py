@@ -9,8 +9,8 @@ from openatlas import app, logger
 from openatlas.forms.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper, InvalidGeomException
-from openatlas.util.util import (display_remove_link, format_date, get_base_table_data,
-                                 get_entity_data, get_profile_image_table_link, is_authorized, link,
+from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
+                                 get_profile_image_table_link, is_authorized, link,
                                  required_group, truncate_string, uc_first, was_modified)
 
 
@@ -21,6 +21,14 @@ class PlaceForm(DateForm):
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
     gis_points = HiddenField(default='[]')
+    # Todo: remove default when line strings are implemented
+    gis_linestrings = HiddenField(default='''[{
+                "type":"Feature",
+                "geometry":{
+                    "type":"LineString",
+                    "coordinates":[[9.75307425847859,17.8111792731339],
+                    [9.75315472474904,17.8110005175436],[9.75333711496205,17.8110873417098]]},
+                "properties":{"name":"","description":"","shapeType":"line"}}]''')
     gis_polygons = HiddenField(default='[]')
     continue_ = HiddenField()
     opened = HiddenField()
@@ -31,6 +39,7 @@ class FeatureForm(DateForm):
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     gis_points = HiddenField()
+    gis_linestrings = HiddenField()
     gis_polygons = HiddenField()
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
@@ -64,8 +73,8 @@ def place_insert(origin_id=None):
         title = 'place'
         form = build_form(PlaceForm, 'Place')
     if origin \
-            and origin.system_type not in ['place', 'feature', 'stratigraphic unit'] \
-            and hasattr(form, 'insert_and_continue'):
+        and origin.system_type not in ['place', 'feature', 'stratigraphic unit'] \
+        and hasattr(form, 'insert_and_continue'):
         del form.insert_and_continue
     if form.validate_on_submit():
         return redirect(save(form, origin=origin))
@@ -148,7 +157,8 @@ def place_view(id_):
             actor.first,
             actor.last])
     gis_data = GisMapper.get_all(object_) if location else None
-    if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]':
+    if gis_data['gisPointSelected'] == '[]' and gis_data['gisLinestringSelected'] == '[]' \
+        and gis_data['gisPolygonSelected'] == '[]':
         gis_data = None
     place = None
     feature = None

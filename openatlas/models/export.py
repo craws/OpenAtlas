@@ -36,6 +36,7 @@ class Export:
                                'name_inverse'],
             'model_property_inheritance': ['id', 'super_code', 'sub_code'],
             'gis_point': ['id', 'entity_id', 'name', 'description', 'type'],
+            'gis_linestring': ['id', 'entity_id', 'name', 'description', 'type'],
             'gis_polygon': ['id', 'entity_id', 'name', 'description', 'type']}
         for table, fields in tables.items():
             if getattr(form, table).data:
@@ -48,11 +49,12 @@ class Export:
                     fields.append("""
                         ST_X(public.ST_PointOnSurface(geom)) || ' ' ||
                         ST_Y(public.ST_PointOnSurface(geom)) AS polygon_center_point""")
-                elif table in ['gis_point', 'gis_polygon']:
+                elif table in ['gis_point', 'gis_linestring', 'gis_polygon']:
                     fields.append('geom')
                 sql = "SELECT {fields} FROM {table};".format(
                     fields=','.join(fields), table=table.replace('_', '.', 1))
-                if table in ['gis_point', 'gis_polygon'] and form.gis_format.data == 'wkt':
+                if table in ['gis_point', 'gis_linestring', 'gis_polygon'] \
+                    and form.gis_format.data == 'wkt':
                     data_frame = gpd.read_postgis(sql, g.db)
                 else:
                     data_frame = psql.read_sql(sql, g.db)
@@ -77,7 +79,7 @@ class Export:
             return False  # For other operating systems e.g. Windows, we would need adaptions here
         path = '{path}/sql/{date}_dump.sql'.format(path=app.config['EXPORT_FOLDER_PATH'],
                                                    date=DateMapper.current_date_for_filename())
-        command = '''pg_dump -h {host} -d {database} -U {user} -p {port} -f {file}'''.format(
+        command = """pg_dump -h {host} -d {database} -U {user} -p {port} -f {file}""".format(
             host=app.config['DATABASE_HOST'],
             database=app.config['DATABASE_NAME'],
             port=app.config['DATABASE_PORT'],

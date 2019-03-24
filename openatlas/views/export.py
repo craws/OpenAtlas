@@ -29,6 +29,7 @@ class ExportCsvForm(Form):
     model_property = BooleanField('model.property', default=True)
     model_property_inheritance = BooleanField('model.property_inheritance', default=True)
     gis_point = BooleanField('gis.point', default=True)
+    gis_linestring = BooleanField('gis.linestring', default=True)
     gis_polygon = BooleanField('gis.polygon', default=True)
     save = SubmitField(uc_first(_('export CSV')))
 

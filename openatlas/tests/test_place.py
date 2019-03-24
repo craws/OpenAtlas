@@ -26,22 +26,30 @@ class PlaceTest(TestBaseCase):
             rv = self.app.post(url_for('place_insert', origin_id=reference_id), data=data,
                                follow_redirects=True)
             assert b'Asgard' in rv.data
-            gis_points = """[{"type":"Feature", "geometry":{"type":"Point", "coordinates":[9,17]},
-                    "properties":{"name":"Valhalla","description":"","shapeType":"centerpoint"}}]"""
-            data['gis_points'] = gis_points
-            data['gis_polygons'] = """[{"geometry":{
-                "coordinates":[[[9.75307425847859,17.8111792731339],
-                [9.75315472474904,17.8110005175436],[9.75333711496205,17.8110873417098],
-                [9.75307425847859,17.8111792731339]]],"type":"Polygon"},
-                "properties":{"count":4,"description":"","id":8,"name":"",
-                "objectDescription":"","objectId":185,"shapeType":"Shape",
-                "siteType":"Settlement","title":""},"type":"Feature"}]"""
+            data['gis_points'] = """[{
+                "type":"Feature",
+                "geometry":{"type":"Point","coordinates":[9,17]},
+                "properties":{"name":"Valhalla","description":"","shapeType":"centerpoint"}}]"""
+            data['gis_linestrings'] = """[{
+                "type":"Feature",
+                "geometry":{
+                    "type":"LineString",
+                    "coordinates":[[9.75307425847859,17.8111792731339],
+                    [9.75315472474904,17.8110005175436],[9.75333711496205,17.8110873417098]]},
+                "properties":{"name":"","description":"","shapeType":"line"}}]"""
+            data['gis_polygons'] = """[{
+                "type":"Feature",
+                "geometry":{
+                    "type":"Polygon",
+                    "coordinates":[[[9.75307425847859,17.8111792731339],
+                    [9.75315472474904,17.8110005175436],[9.75333711496205,17.8110873417098],
+                    [9.75307425847859,17.8111792731339]]]},
+                "properties":{"name":"","description":"","shapeType":"shape"}}]"""
             data[place_node.id] = place_node.subs
             data['continue_'] = 'yes'
             rv = self.app.post(url_for('place_insert', origin_id=source_id), data=data,
                                follow_redirects=True)
             assert b'Tha source' in rv.data
-
             with app.test_request_context():
                 app.preprocess_request()
                 places = EntityMapper.get_by_codes('place')

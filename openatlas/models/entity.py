@@ -340,9 +340,9 @@ class EntityMapper:
     def search(form):
         if not form.term.data:
             return []
-        sql = EntityMapper.sql + '''
+        sql = EntityMapper.sql + """
             {user_clause} WHERE (LOWER(e.name) LIKE LOWER(%(term)s) {description_clause})
-            AND {user_clause2} ('''.format(
+            AND {user_clause2} (""".format(
             user_clause=
             ' LEFT JOIN web.user_log ul ON e.id = ul.entity_id ' if form.own.data else '',
             description_clause=

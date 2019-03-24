@@ -94,7 +94,7 @@ class Changelog:
             ('780', 'Color Schemes')]))])]
     versions['3.0.0'] = ['2017-12-31', OrderedDict([
         ('feature', OrderedDict([
-            ('877', '''Python/Flask Port
+            ('877', """Python/Flask Port
                 <p>This version includes many new features and changes. Some are listed below.</p>
                 <p style="font-weight:bold">User Interface and Usability</p>
                 &#8226 Performance improvements<br />
@@ -115,7 +115,7 @@ class Changelog:
                 &#8226 bcrypt hash algorithm for sensitive data<br />
                 &#8226 CSRF protection for forms<br />
                 &#8226 Adaptions for using HTTPS<br />
-                &#8226 A show password option at forms''')]))])]
+                &#8226 A show password option at forms""")]))])]
     versions['2.4.0'] = ['2017-03-27', OrderedDict([
         ('feature', OrderedDict([
             ('539', 'Network graph visualisation'),

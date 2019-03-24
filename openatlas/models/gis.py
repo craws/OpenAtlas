@@ -15,8 +15,8 @@ class GisMapper:
 
     @staticmethod
     def get_all(objects=None):
-        all_ = {'point': [], 'polygon': []}
-        selected = {'point': [], 'polygon': [], 'polygon_point': []}
+        all_ = {'point': [], 'linestring': [], 'polygon': []}
+        selected = {'point': [], 'linestring': [], 'polygon': [], 'polygon_point': []}
         # Workaround to include GIS features of a subunit which would be otherwise omitted
         subunit_selected_id = 0
         if objects:
@@ -29,7 +29,7 @@ class GisMapper:
         object_ids = [x.id for x in objects]
         polygon_point_sql = \
             'public.ST_AsGeoJSON(public.ST_PointOnSurface(polygon.geom)) AS polygon_point, '
-        for shape in ['point', 'polygon']:
+        for shape in ['point', 'polygon', 'linestring']:
             sql = """
                 SELECT
                     object.id AS object_id,
@@ -50,25 +50,24 @@ class GisMapper:
                     AND l.property_code = 'P53'
                     AND (object.system_type = 'place' OR object.id = {subunit_selected_id})
                 GROUP BY object.id, {shape}.id;""".format(
-                        shape=shape, subunit_selected_id=subunit_selected_id,
-                        polygon_point_sql=polygon_point_sql if shape == 'polygon' else '')
+                shape=shape, subunit_selected_id=subunit_selected_id,
+                polygon_point_sql=polygon_point_sql if shape == 'polygon' else '')
             g.cursor.execute(sql)
             debug_model['div sql'] += 1
             place_type_root_id = NodeMapper.get_hierarchy_by_name('Place').id
             for row in g.cursor.fetchall():
                 description = row.description.replace('"', '\"') if row.description else ''
                 object_desc = row.object_desc.replace('"', '\"') if row.object_desc else ''
-                item = {
-                    'type': 'Feature',
-                    'geometry': json.loads(row.geojson),
-                    'properties': {
-                        'objectId': row.object_id,
-                        'objectName': row.object_name.replace('"', '\"'),
-                        'objectDescription': object_desc,
-                        'id': row.id,
-                        'name': row.name.replace('"', '\"') if row.name else '',
-                        'description': description,
-                        'shapeType': row.type}}
+                item = {'type': 'Feature',
+                        'geometry': json.loads(row.geojson),
+                        'properties': {
+                            'objectId': row.object_id,
+                            'objectName': row.object_name.replace('"', '\"'),
+                            'objectDescription': object_desc,
+                            'id': row.id,
+                            'name': row.name.replace('"', '\"') if row.name else '',
+                            'description': description,
+                            'shapeType': row.type}}
                 if hasattr(row, 'types') and row.types:
                     nodes_list = ast.literal_eval('[' + row.types + ']')
                     for node_id in list(set(nodes_list)):
@@ -87,17 +86,17 @@ class GisMapper:
                         selected['polygon_point'].append(polygon_point_item)
                     else:
                         all_['point'].append(polygon_point_item)
-        gis = {
-            'gisPointAll': json.dumps(all_['point']),
-            'gisPointSelected': json.dumps(selected['point']),
-            'gisPolygonAll': json.dumps(all_['polygon']),
-            'gisPolygonSelected': json.dumps(selected['polygon']),
-            'gisPolygonPointSelected': json.dumps(selected['polygon_point'])}
-        return gis
+        return {'gisPointAll': json.dumps(all_['point']),
+                'gisPointSelected': json.dumps(selected['point']),
+                'gisLinestringAll': json.dumps(all_['linestring']),
+                'gisLinestringSelected': json.dumps(selected['linestring']),
+                'gisPolygonAll': json.dumps(all_['polygon']),
+                'gisPolygonSelected': json.dumps(selected['polygon']),
+                'gisPolygonPointSelected': json.dumps(selected['polygon_point'])}
 
     @staticmethod
     def insert(entity, form):
-        for shape in ['point', 'polygon']:
+        for shape in ['point', 'linestring', 'polygon']:
             data = getattr(form, 'gis_' + shape + 's').data
             if not data:
                 continue
@@ -114,27 +113,23 @@ class GisMapper:
                     if not g.cursor.fetchone()[0]:
                         raise InvalidGeomException
                 sql = """
-                    INSERT INTO gis.{shape} (entity_id, name, description, type, geom)
-                    VALUES (
+                    INSERT INTO gis.{shape} (entity_id, name, description, type, geom) VALUES (
                         %(entity_id)s,
                         %(name)s,
                         %(description)s,
                         %(type)s,
                         public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));
                     """.format(shape=shape)
-                g.cursor.execute(sql, {
-                    'entity_id': entity.id,
-                    'name': item['properties']['name'],
-                    'description': item['properties']['description'],
-                    'type': item['properties']['shapeType'],
-                    'geojson': json.dumps(item['geometry'])})
+                g.cursor.execute(sql, {'entity_id': entity.id,
+                                       'name': item['properties']['name'],
+                                       'description': item['properties']['description'],
+                                       'type': item['properties']['shapeType'],
+                                       'geojson': json.dumps(item['geometry'])})
                 debug_model['div sql'] += 1
 
     @staticmethod
     def delete_by_entity(entity):
-        sql = 'DELETE FROM gis.point WHERE entity_id = %(entity_id)s;'
-        g.cursor.execute(sql, {'entity_id': entity.id})
-        debug_model['div sql'] += 1
-        sql = 'DELETE FROM gis.polygon WHERE entity_id = %(entity_id)s;'
-        g.cursor.execute(sql, {'entity_id': entity.id})
-        debug_model['div sql'] += 1
+        g.cursor.execute('DELETE FROM gis.point WHERE entity_id = %(id)s;', {'id': entity.id})
+        g.cursor.execute('DELETE FROM gis.linestring WHERE entity_id = %(id)s;', {'id': entity.id})
+        g.cursor.execute('DELETE FROM gis.polygon WHERE entity_id = %(id)s;', {'id': entity.id})
+        debug_model['div sql'] += 3
