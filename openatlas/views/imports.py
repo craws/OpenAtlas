@@ -1,5 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import collections
+import os
 
 import pandas as pd
 from flask import flash, g, render_template, request, url_for
@@ -121,7 +122,9 @@ def import_data(project_id, class_code):
     messages = {'error': [], 'warn': []}
     if form.validate_on_submit():
         file_ = request.files['file']
-        file_path = app.config['IMPORT_FOLDER_PATH'] + '/' + secure_filename(file_.filename)
+        # TODO fix windows separator
+        separator = '/' if os.name == "posix" else '\\'
+        file_path = app.config['IMPORT_FOLDER_PATH'] + separator + secure_filename(file_.filename)
         columns = {'allowed': ['name', 'id', 'description'], 'valid': [], 'invalid': []}
         try:
             file_.save(file_path)
