@@ -65,10 +65,10 @@ def actor_view(id_):
                 actor.external_references.append(domain.name)
             if is_authorized('editor'):
                 if domain.system_type != 'external reference':
-                    update_url = url_for('reference_link_update', link_id=link_.id, origin_id=actor.id)
-                    data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
+                    url = url_for('reference_link_update', link_id=link_.id, origin_id=actor.id)
+                    data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
                 else:
-                    data.append(' ')
+                    data.append('')
         if is_authorized('editor'):
             url = url_for('link_delete', id_=link_.id, origin_id=actor.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))

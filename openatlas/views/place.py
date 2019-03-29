@@ -9,9 +9,9 @@ from openatlas import app, logger
 from openatlas.forms.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper, InvalidGeomException
-from openatlas.util.util import (display_remove_link, format_date, get_base_table_data,
-                                 get_entity_data, get_profile_image_table_link, is_authorized, link,
-                                 required_group, truncate_string, uc_first, was_modified)
+from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
+                                 get_profile_image_table_link, is_authorized, link, required_group,
+                                 truncate_string, uc_first, was_modified)
 
 
 class PlaceForm(DateForm):
@@ -122,8 +122,11 @@ def place_view(id_):
             if domain.system_type == 'external reference':
                 object_.external_references.append(domain.name)
             if is_authorized('editor'):
-                url = url_for('reference_link_update', link_id=link_.id, origin_id=object_.id)
-                data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
+                if domain.system_type != 'external reference':
+                    url = url_for('reference_link_update', link_id=link_.id, origin_id=object_.id)
+                    data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
+                else:
+                    data.append('')
         if is_authorized('editor'):
             url = url_for('link_delete', id_=link_.id, origin_id=object_.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
