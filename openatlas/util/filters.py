@@ -140,7 +140,7 @@ def description(self, entity):
     label = util.uc_first(_('description'))
     if hasattr(entity, 'system_type') and entity.system_type == 'source content':
         label = util.uc_first(_('content'))
-    html = """<p class="description-title">{label}</p>
+    html = """<h2>{label}</h2>
         <div class="description more">{description}</div>""".format(label=label, description=text)
     return html
 
@@ -156,7 +156,8 @@ def display_profile_image(self, image_id):
             <a href="/file/view/{id}">
                 <img style="max-width:{width}px;" alt="profile image" src="{src}" />
             </a>
-        </div>""".format(id=image_id, src=src, width=session['settings']['profile_image_width'])
+        </div>
+        """.format(id=image_id, src=src, width=session['settings']['profile_image_width'])
 
 
 @jinja2.contextfilter
@@ -175,7 +176,8 @@ def manual_link(self, wiki_site):
                 <img style="height:14px;" src="/static/images/icons/book.png" alt='' /> 
                 {label}
             </a>
-        </p>""".format(url='https://redmine.openatlas.eu/projects/uni/wiki/' + wiki_site,
+        </p>
+        """.format(url='https://redmine.openatlas.eu/projects/uni/wiki/' + wiki_site,
                        label=util.uc_first(_('manual')))
     return html
 
@@ -270,7 +272,7 @@ def display_form(self, form, form_id=None, for_persons=False):
         if field.type == 'SubmitField':
             html['footer'] += str(field)
             continue
-        if field.id.split('_', 1)[0] in ('begin', 'end'):  # If it's a date field use a function to add dates
+        if field.id.split('_', 1)[0] in ('begin', 'end'):  # If it's a date field use a function
             if field.id == 'begin_year_from':
                 html['footer'] += util.add_dates_to_form(form, for_persons)
             continue
@@ -296,7 +298,8 @@ def display_form(self, form, form_id=None, for_persons=False):
                 <div class="table-cell value-type-switcher">
                     <span id="value-type-switcher" class="button">{show}</span>
                 </div>
-            </div>""".format(values=util.uc_first(_('values')), show=util.uc_first(_('show')))
+            </div>
+            """.format(values=util.uc_first(_('values')), show=util.uc_first(_('show')))
         html['value_types'] = values_html + html['value_types']
     html_all += html['header'] + html['types'] + html['main'] + html['value_types'] + html['footer']
     html_all += '</div></form>'
@@ -373,3 +376,17 @@ def display_debug_info(self, debug_model, form):
         for fieldName, errorMessages in form.errors.items():
             html += fieldName + ' - ' + errorMessages[0] + '<br />'
     return html
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def display_external_references(self, entity):
+    """ Formats external references for display."""
+    html = ''
+    for link_ in entity.external_references:
+        url = link_.domain.name
+        name = util.truncate_string(url.replace('http://', '').replace('https://', ''), span=False)
+        if link_.description:
+            name = link_.description
+        html += '<a target="_blank" href="{url}">{name}</a><br />'.format(url=url, name=name)
+    return '<h2>' + util.uc_first(_('external references')) + '</h2>' + html if html else ''

@@ -142,10 +142,12 @@ def event_view(id_):
             if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                 profile_image_id = domain.id
         if domain.view_name not in ['source', 'file']:
+            if domain.system_type == 'external reference':
+                event.external_references.append(link_)
             data.append(truncate_string(link_.description))
             if is_authorized('editor'):
-                update_url = url_for('reference_link_update', link_id=link_.id, origin_id=event.id)
-                data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
+                url = url_for('reference_link_update', link_id=link_.id, origin_id=event.id)
+                data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
         if is_authorized('editor'):
             url = url_for('link_delete', id_=link_.id, origin_id=event.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))

@@ -264,7 +264,8 @@ class TableSelect(HiddenInput):
             entities = EntityMapper.get_by_system_type('place')
         elif class_ == 'reference':
             entities = EntityMapper.get_by_system_type('bibliography') + \
-                       EntityMapper.get_by_system_type('edition')
+                       EntityMapper.get_by_system_type('edition') + \
+                       EntityMapper.get_by_system_type('external reference')
         elif class_ == 'file':
             entities = EntityMapper.get_display_files()
         else:

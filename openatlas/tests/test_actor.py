@@ -62,7 +62,8 @@ class ActorTests(TestBaseCase):
             self.app.post(url_for('actor_insert', code='E21', origin_id=actor_id), data=data)
             self.app.post(url_for('actor_insert', code='E21', origin_id=event.id), data=data)
             self.app.post(url_for('actor_insert', code='E21', origin_id=source.id), data=data)
-            rv = self.app.post(url_for('reference_insert', code='reference'), data={'name': 'Book'})
+            rv = self.app.post(url_for('reference_insert', code='external_reference'),
+                               data={'name': 'http://openatlas.eu'})
             reference_id = rv.location.split('/')[-1]
             rv = self.app.post(url_for('actor_insert', code='E21', origin_id=reference_id),
                                data=data, follow_redirects=True)
