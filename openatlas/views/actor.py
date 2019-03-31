@@ -62,7 +62,7 @@ def actor_view(id_):
         if domain.view_name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
             if domain.system_type == 'external reference':
-                actor.external_references.append(domain.name)
+                actor.external_references.append(link_)
             if is_authorized('editor'):
                 url = url_for('reference_link_update', link_id=link_.id, origin_id=actor.id)
                 data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')

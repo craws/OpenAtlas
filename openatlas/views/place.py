@@ -120,7 +120,7 @@ def place_view(id_):
         if domain.view_name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
             if domain.system_type == 'external reference':
-                object_.external_references.append(domain.name)
+                object_.external_references.append(link_)
             if is_authorized('editor'):
                 url = url_for('reference_link_update', link_id=link_.id, origin_id=object_.id)
                 data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')

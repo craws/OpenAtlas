@@ -143,7 +143,7 @@ def event_view(id_):
                 profile_image_id = domain.id
         if domain.view_name not in ['source', 'file']:
             if domain.system_type == 'external reference':
-                event.external_references.append(domain.name)
+                event.external_references.append(link_)
             data.append(truncate_string(link_.description))
             if is_authorized('editor'):
                 url = url_for('reference_link_update', link_id=link_.id, origin_id=event.id)

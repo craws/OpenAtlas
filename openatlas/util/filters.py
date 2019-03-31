@@ -383,7 +383,10 @@ def display_debug_info(self, debug_model, form):
 def display_external_references(self, entity):
     """ Formats external references for display."""
     html = ''
-    for url in entity.external_references:
+    for link_ in entity.external_references:
+        url = link_.domain.name
         name = util.truncate_string(url.replace('http://', '').replace('https://', ''), span=False)
+        if link_.description:
+            name = link_.description
         html += '<a target="_blank" href="{url}">{name}</a><br />'.format(url=url, name=name)
     return '<h2>' + util.uc_first(_('external references')) + '</h2>' + html if html else ''
