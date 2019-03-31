@@ -86,11 +86,8 @@ def source_view(id_):
             if domain.system_type == 'external reference':
                 source.external_references.append(domain.name)
             if is_authorized('editor'):
-                if domain.system_type != 'external reference':
-                    url = url_for('reference_link_update', link_id=link_.id, origin_id=source.id)
-                    data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
-                else:
-                    data.append('')
+                url = url_for('reference_link_update', link_id=link_.id, origin_id=source.id)
+                data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
         if is_authorized('editor'):
             url = url_for('link_delete', id_=link_.id, origin_id=source.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
