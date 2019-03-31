@@ -200,7 +200,7 @@ def reference_update(id_):
     if reference.system_type == 'external reference':
         form.name.validators = [InputRequired(), URL()]
         form.name.label.text = 'URL'
-    else:
+    else:  # pragma: no cover
         form.name.validators = [InputRequired()]
     if form.validate_on_submit():
         if was_modified(form, reference):  # pragma: no cover
