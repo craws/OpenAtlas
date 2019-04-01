@@ -41,6 +41,14 @@ L.Control.EasyButtons = L.Control.extend({
     }
 });
 
+polylineButton = new L.Control.EasyButtons({
+    position: 'topright',
+    intentedIcon: 'fa-road',
+    title: translate['map_info_linestring']
+})
+polylineButton.intendedFunction = function() {drawGeometry('polyline');}
+map.addControl(polylineButton);
+
 polygonButton = new L.Control.EasyButtons({
     position: 'topright',
     intentedIcon: 'fa-pencil-square-o',
@@ -60,7 +68,7 @@ map.addControl(areaButton);
 pointButton = new L.Control.EasyButtons({
     position: 'topright',
     intentedIcon: 'fa-map-marker',
-    title: translate['map_info_point']
+    title: translate['map_info_centerpoint']
 })
 pointButton.intendedFunction = function () {drawGeometry('centerpoint');}
 map.addControl(pointButton);
@@ -118,6 +126,8 @@ map.on('click', function(e) {
         });
         $('#northing').val(wgs84.lat);
         $('#easting').val(wgs84.lng);
+    } else if (captureCoordinates && shapeType == 'polyline') {
+        $('#saveButton').prop('disabled', false);
     } else if (captureCoordinates) {
         $('#saveButton').prop('disabled', false);
     }
@@ -214,6 +224,13 @@ function drawGeometry(selectedType) {
     $('.leaflet-right .leaflet-bar').hide();
     if (selectedType == 'centerpoint') {
         $('#coordinatesDiv').show();
+    } else if (selectedType == 'polyline') {
+        $('#coordinatesDiv').hide();
+        captureCoordinates = false;
+        drawLayer = new L.Draw.Polyline(map);
+        map.addLayer(drawnPolygon);
+        drawLayer.enable();
+
     } else {
         $('#coordinatesDiv').hide();
         captureCoordinates = false;
@@ -288,6 +305,16 @@ function saveNewGeometry(shapeType) {
         newMarker = L.marker(([$('#northing').val(), $('#easting').val()]), {icon: editedIcon}).addTo(map);
         newMarker.bindPopup(buildPopup(JSON.parse(point), 'edited'));
         marker = false;  // unset the marker
+    } else if (shapeType == 'polyline') {
+        linestring =
+            `{"type": "Feature", "geometry":` +
+            `{"type": "LineString", "coordinates":[[` + geoJsonArray.join(',') + `]]},
+            "properties":{"name": "` + name + `", "description": "` + description + `", "shapeType": "` + shapeType + `"}}`;
+        linestrings = JSON.parse($('#gis_linestrings').val());
+        linestrings.push(JSON.parse(linestring));
+        $('#gis_linestrings').val(JSON.stringify(linestrings));
+        layer.bindPopup(buildPopup(JSON.parse(linestring), 'edited'));
+        layer.addTo(map);
     } else {
         polygon =
             `{"type": "Feature", "geometry":` +
