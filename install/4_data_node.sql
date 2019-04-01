@@ -9,9 +9,9 @@ INSERT INTO link (property_code, range_id, domain_id) VALUES
 ('P127', (SELECT id FROM entity WHERE name='Information Carrier'), (SELECT id FROM entity WHERE name='Original Document')),
 ('P127', (SELECT id FROM entity WHERE name='Information Carrier'), (SELECT id FROM entity WHERE name='Copy of Document'));
 
----------------
--- Bibliography
----------------
+------------------
+-- Bibliography --
+------------------
 INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Bibliography', 'Categories for bibliographical entries as used for example in BibTeX, e.g. Book, Inbook, Article etc.');
 INSERT INTO entity (class_code, name) VALUES ('E55', 'Inbook'), ('E55', 'Article'), ('E55', 'Book');
 INSERT INTO link (property_code, range_id, domain_id) VALUES
@@ -19,9 +19,9 @@ INSERT INTO link (property_code, range_id, domain_id) VALUES
 ('P127', (SELECT id FROM entity WHERE name='Bibliography'), (SELECT id FROM entity WHERE name='Article')),
 ('P127', (SELECT id FROM entity WHERE name='Bibliography'), (SELECT id FROM entity WHERE name='Book'));
 
-----------
--- Edition
-----------
+-------------
+-- Edition --
+-------------
 INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Edition', 'Categories for the classification of written sources'' editions like charter editions, chronicle edition etc.');
 INSERT INTO entity (class_code, name) VALUES ('E55', 'Charter Edition'), ('E55', 'Letter Edition'), ('E55', 'Chronicle Edition');
 INSERT INTO link (property_code, range_id, domain_id) VALUES
@@ -29,9 +29,17 @@ INSERT INTO link (property_code, range_id, domain_id) VALUES
 ('P127', (SELECT id FROM entity WHERE name='Edition'), (SELECT id FROM entity WHERE name='Letter Edition')),
 ('P127', (SELECT id FROM entity WHERE name='Edition'), (SELECT id FROM entity WHERE name='Chronicle Edition'));
 
------------------
--- Actor Function
------------------
+------------------------
+-- External Reference --
+------------------------
+INSERT INTO entity (class_code, name, description) VALUES ('E55', 'External Reference', 'Categories for the classification of external references like a link to Wikipedia');
+INSERT INTO entity (class_code, name) VALUES ('E55', 'Link');
+INSERT INTO link (property_code, range_id, domain_id) VALUES
+('P127', (SELECT id FROM entity WHERE name='External Reference'), (SELECT id FROM entity WHERE name='Link'));
+
+--------------------
+-- Actor Function --
+--------------------
 INSERT INTO entity (class_code, name, description) VALUES ('E55', 'Actor Function', 'Definitions of an actor''s function within a group or legal body. An actor can for example be member of a legal body and this membership is defined by a certain function during a certain period of time. E.g. actor "Charlemagne" is member of the legal body "Frankish Reign" from 768 to 814 in the function of "King" and he is member of the legal body "Roman Empire" from 800 to 814 in the function "Emperor".');
 INSERT INTO entity (class_code, name) VALUES
 ('E55', 'Bishop'),
@@ -283,7 +291,8 @@ INSERT INTO web.hierarchy (id, name, multiple, system, directional, value_type) 
 ((SELECT id FROM entity WHERE name='Source translation'), 'Source translation', False, False, False, False),
 ((SELECT id FROM entity WHERE name='Administrative Unit'), 'Administrative Unit', True, True, False, False),
 ((SELECT id FROM entity WHERE name='Historical Place'), 'Historical Place', True, True, False, False),
-((SELECT id FROM entity WHERE name='Dimensions'), 'Dimensions', False, False, False, True);
+((SELECT id FROM entity WHERE name='Dimensions'), 'Dimensions', False, False, False, True),
+((SELECT id FROM entity WHERE name='External Reference'), 'External Reference', False, True, False, False);
 
 INSERT INTO web.form (name, extendable) VALUES
 ('File', True),
@@ -302,24 +311,26 @@ INSERT INTO web.form (name, extendable) VALUES
 ('Actor Actor Relation', False),
 ('Involvement', False),
 ('Member', False),
-('Source translation', False);
+('Source translation', False),
+('External Reference', True);
 
 INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES
-((SELECT id FROM web.hierarchy WHERE name LIKE 'License'),(SELECT id FROM web.form WHERE name LIKE 'File')),
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Sex'),(SELECT id FROM web.form WHERE name LIKE 'Person')),
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Source'),(SELECT id FROM web.form WHERE name LIKE 'Source')),
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Event'),(SELECT id FROM web.form WHERE name LIKE 'Event')),
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Place'),(SELECT id FROM web.form WHERE name LIKE 'Place')),
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Administrative Unit'),(SELECT id FROM web.form WHERE name LIKE 'Place')),
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Historical Place'),(SELECT id FROM web.form WHERE name LIKE 'Place')),
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Feature'),(SELECT id FROM web.form WHERE name LIKE 'Feature')),
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Stratigraphic Unit'),(SELECT id FROM web.form WHERE name LIKE 'Stratigraphic Unit')),
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Find'),(SELECT id FROM web.form WHERE name LIKE 'Find')),
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Bibliography'),(SELECT id FROM web.form WHERE name LIKE 'Bibliography')),
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Edition'),(SELECT id FROM web.form WHERE name LIKE 'Edition')),
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Information Carrier'),(SELECT id FROM web.form WHERE name LIKE 'Information Carrier')),
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Actor Actor Relation'),(SELECT id FROM web.form WHERE name LIKE 'Actor Actor Relation')),
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Involvement'),(SELECT id FROM web.form WHERE name LIKE 'Involvement')),
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Actor Function'),(SELECT id FROM web.form WHERE name LIKE 'Member')),
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Source translation'),(SELECT id FROM web.form WHERE name LIKE 'Source translation')),
-((SELECT id FROM web.hierarchy WHERE name LIKE 'Dimensions'),(SELECT id FROM web.form WHERE name LIKE 'Find'));
+((SELECT id FROM web.hierarchy WHERE name='License'),(SELECT id FROM web.form WHERE name='File')),
+((SELECT id FROM web.hierarchy WHERE name='Sex'),(SELECT id FROM web.form WHERE name='Person')),
+((SELECT id FROM web.hierarchy WHERE name='Source'),(SELECT id FROM web.form WHERE name='Source')),
+((SELECT id FROM web.hierarchy WHERE name='Event'),(SELECT id FROM web.form WHERE name='Event')),
+((SELECT id FROM web.hierarchy WHERE name='Place'),(SELECT id FROM web.form WHERE name='Place')),
+((SELECT id FROM web.hierarchy WHERE name='Administrative Unit'),(SELECT id FROM web.form WHERE name='Place')),
+((SELECT id FROM web.hierarchy WHERE name='Historical Place'),(SELECT id FROM web.form WHERE name='Place')),
+((SELECT id FROM web.hierarchy WHERE name='Feature'),(SELECT id FROM web.form WHERE name='Feature')),
+((SELECT id FROM web.hierarchy WHERE name='Stratigraphic Unit'),(SELECT id FROM web.form WHERE name='Stratigraphic Unit')),
+((SELECT id FROM web.hierarchy WHERE name='Find'),(SELECT id FROM web.form WHERE name='Find')),
+((SELECT id FROM web.hierarchy WHERE name='Bibliography'),(SELECT id FROM web.form WHERE name='Bibliography')),
+((SELECT id FROM web.hierarchy WHERE name='Edition'),(SELECT id FROM web.form WHERE name='Edition')),
+((SELECT id FROM web.hierarchy WHERE name='Information Carrier'),(SELECT id FROM web.form WHERE name='Information Carrier')),
+((SELECT id FROM web.hierarchy WHERE name='Actor Actor Relation'),(SELECT id FROM web.form WHERE name='Actor Actor Relation')),
+((SELECT id FROM web.hierarchy WHERE name='Involvement'),(SELECT id FROM web.form WHERE name='Involvement')),
+((SELECT id FROM web.hierarchy WHERE name='Actor Function'),(SELECT id FROM web.form WHERE name='Member')),
+((SELECT id FROM web.hierarchy WHERE name='Source translation'),(SELECT id FROM web.form WHERE name='Source translation')),
+((SELECT id FROM web.hierarchy WHERE name='Dimensions'),(SELECT id FROM web.form WHERE name='Find')),
+((SELECT id FROM web.hierarchy WHERE name='External Reference'),(SELECT id FROM web.form WHERE name='External Reference'));

@@ -18,7 +18,8 @@ class PlaceTest(TestBaseCase):
                 unit_node = NodeMapper.get_hierarchy_by_name('Administrative Unit')
                 unit_sub1 = g.nodes[unit_node.subs[0]]
                 unit_sub2 = g.nodes[unit_node.subs[1]]
-                reference_id = EntityMapper.insert('E31', 'Ancient Books', 'edition').id
+                reference_id = EntityMapper.insert('E31',
+                                                   'http://openatlas.eu', 'external reference').id
                 place_node = NodeMapper.get_hierarchy_by_name('Place')
                 source_id = EntityMapper.insert('E33', 'Tha source').id
             data = {'name': 'Asgard', 'alias-0': 'Valhöll',
