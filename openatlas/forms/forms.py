@@ -1,7 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
-import time
 
+import time
 from flask import g, session
 from flask_babel import lazy_gettext as _
 from wtforms import FloatField, HiddenField
@@ -13,7 +13,8 @@ from openatlas.forms.date import DateForm
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.models.node import NodeMapper
-from openatlas.util.util import get_base_table_data, pager, truncate_string, uc_first
+from openatlas.util.util import (get_base_table_data, get_file_stats, pager, truncate_string,
+                                 uc_first)
 
 
 def get_link_type(form):
@@ -184,17 +185,16 @@ class TreeSelect(HiddenInput):
                         }}
                     }});
                 }});
-            </script>""".format(
-            filter=uc_first(_('type to search')),
-            min_chars=session['settings']['minimum_jstree_search'],
-            name=field.id,
-            title=g.nodes[int(field.id)].name,
-            change_label=uc_first(_('change')),
-            clear_label=uc_first(_('clear')),
-            selection=selection,
-            tree_data=NodeMapper.get_tree_data(int(field.id), selected_ids),
-            clear_style='' if selection else ' style="display: none;" ',
-            required=' required' if field.flags.required else '')
+            </script>""".format(filter=uc_first(_('type to search')),
+                                min_chars=session['settings']['minimum_jstree_search'],
+                                name=field.id,
+                                title=g.nodes[int(field.id)].name,
+                                change_label=uc_first(_('change')),
+                                clear_label=uc_first(_('clear')),
+                                selection=selection,
+                                tree_data=NodeMapper.get_tree_data(int(field.id), selected_ids),
+                                clear_style='' if selection else ' style="display: none;" ',
+                                required=' required' if field.flags.required else '')
         return super(TreeSelect, self).__call__(field, **kwargs) + html
 
 
@@ -236,14 +236,13 @@ class TreeMultiSelect(HiddenInput):
                         $("#{name}-tree").jstree("search", $(this).val());
                     }}
                 }});
-            </script>""".format(
-            filter=uc_first(_('type to search')),
-            min_chars=session['settings']['minimum_jstree_search'],
-            name=field.id,
-            title=root.name,
-            selection=selection,
-            change_label=uc_first(_('change')),
-            tree_data=NodeMapper.get_tree_data(int(field.id), selected_ids))
+            </script>""".format(filter=uc_first(_('type to search')),
+                                min_chars=session['settings']['minimum_jstree_search'],
+                                name=field.id,
+                                title=root.name,
+                                selection=selection,
+                                change_label=uc_first(_('change')),
+                                tree_data=NodeMapper.get_tree_data(int(field.id), selected_ids))
         return super(TreeMultiSelect, self).__call__(field, **kwargs) + html
 
 
@@ -260,6 +259,7 @@ class TableSelect(HiddenInput):
             class_ = 'place'
         header = app.config['TABLE_HEADERS'][class_]
         table = {'id': field.id, 'header': header, 'data': []}
+        file_stats = None
         if class_ == 'place':
             entities = EntityMapper.get_by_system_type('place')
         elif class_ == 'reference':
@@ -268,13 +268,14 @@ class TableSelect(HiddenInput):
                        EntityMapper.get_by_system_type('external reference')
         elif class_ == 'file':
             entities = EntityMapper.get_display_files()
+            file_stats = get_file_stats()
         else:
             entities = EntityMapper.get_by_codes(class_)
         for entity in entities:
             # Todo: don't show self e.g. at source
             if field.data and entity.id == int(field.data):
                 selection = entity.name
-            data = get_base_table_data(entity)
+            data = get_base_table_data(entity, file_stats)
             data[0] = """<a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
                         """.format(name=field.id, entity_id=entity.id,
                                    entity_name=truncate_string(entity.name, span=False))
@@ -288,15 +289,14 @@ class TableSelect(HiddenInput):
             <div id="{name}-overlay" class="overlay">
             <div id="{name}-dialog" class="overlay-container">{pager}</div></div>
             <script>$(document).ready(function () {{createOverlay("{name}", "{title}");}});</script>
-            """.format(
-                name=field.id,
-                title=_(field.id.replace('_', ' ')),
-                change_label=uc_first(_('change')),
-                clear_label=uc_first(_('clear')),
-                pager=pager(table),
-                selection=selection,
-                clear_style='' if selection else ' style="display: none;" ',
-                required=' required' if field.flags.required else '')
+            """.format(name=field.id,
+                       title=_(field.id.replace('_', ' ')),
+                       change_label=uc_first(_('change')),
+                       clear_label=uc_first(_('clear')),
+                       pager=pager(table),
+                       selection=selection,
+                       clear_style='' if selection else ' style="display: none;" ',
+                       required=' required' if field.flags.required else '')
         return super(TableSelect, self).__call__(field, **kwargs) + html
 
 
@@ -324,11 +324,11 @@ class TableMultiSelect(HiddenInput):
             selection += entity.name + '<br/>' if field.data and entity.id in field.data else ''
             data = get_base_table_data(entity)
             data[0] = truncate_string(entity.name)  # Replace entity link with entity name
-            html = """<input type="checkbox" id="{id}" {checked} value="{name}"
+            data.append("""<input type="checkbox" id="{id}" {checked} value="{name}"
                 class="multi-table-select">""".format(
-                    id=str(entity.id), name=entity.name,
-                    checked='checked = "checked"' if field.data and entity.id in field.data else '')
-            data.append(html)
+                id=str(entity.id),
+                name=entity.name,
+                checked='checked = "checked"' if field.data and entity.id in field.data else ''))
             table['data'].append(data)
         html = """
             <span id="{name}-button" class="button">{change_label}</span><br />
@@ -337,12 +337,11 @@ class TableMultiSelect(HiddenInput):
             <div id="{name}-dialog" class="overlay-container">{pager}</div></div>
             <script>
                 $(document).ready(function () {{createOverlay("{name}", "{title}", true);}});
-            </script>""".format(
-                name=field.id,
-                change_label=uc_first(_('change')),
-                title=_(field.id.replace('_', ' ')),
-                selection=selection,
-                pager=pager(table, remove_rows=False))
+            </script>""".format(name=field.id,
+                                change_label=uc_first(_('change')),
+                                title=_(field.id.replace('_', ' ')),
+                                selection=selection,
+                                pager=pager(table, remove_rows=False))
         return super(TableMultiSelect, self).__call__(field, **kwargs) + html
 
 

@@ -96,10 +96,9 @@ def file_index():
     statvfs = os.statvfs(app.config['UPLOAD_FOLDER_PATH'])
     disk_space = statvfs.f_frsize * statvfs.f_blocks
     free_space = statvfs.f_frsize * statvfs.f_bavail  # Available space without reserved blocks
-    disk_space_values = {
-        'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
-        'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
-        'percent': 100 - math.ceil(free_space / (disk_space / 100))}
+    disk_space_values = {'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
+                         'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
+                         'percent': 100 - math.ceil(free_space / (disk_space / 100))}
     return render_template('file/index.html', table=table, disk_space_values=disk_space_values)
 
 
