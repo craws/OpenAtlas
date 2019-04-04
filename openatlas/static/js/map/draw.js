@@ -60,7 +60,7 @@ map.addControl(areaButton);
 pointButton = new L.Control.EasyButtons({
     position: 'topright',
     intentedIcon: 'fa-map-marker',
-    title: translate['map_info_point']
+    title: translate['map_info_centerpoint']
 })
 pointButton.intendedFunction = function () {drawGeometry('centerpoint');}
 map.addControl(pointButton);
