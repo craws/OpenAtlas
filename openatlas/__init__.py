@@ -1,14 +1,17 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import locale
+import os
 import sys
-import time
 from collections import OrderedDict
 
 import psycopg2.extras
+import time
 from flask import Flask, g, request, session
 from flask_babel import Babel, lazy_gettext as _
 from flask_wtf import Form
+from flask_login import current_user
 from wtforms import StringField, SubmitField
+from flask_wtf.csrf import CsrfProtect
 
 try:
     import mod_wsgi
@@ -16,13 +19,18 @@ except ImportError:
     mod_wsgi = None
 
 app = Flask(__name__, instance_relative_config=True)
+csrf = CsrfProtect(app)  # Make sure all forms are CSRF protected
 
 # Use the test database if running tests
 instance_name = 'production' if 'test_runner.py' not in sys.argv[0] else 'testing'
 app.config.from_object('config.default')  # Load config/INSTANCE_NAME.py
 app.config.from_pyfile(instance_name + '.py')  # Load instance/INSTANCE_NAME.py
-locale.setlocale(locale.LC_ALL, 'en_US.utf-8')
+
+if os.name == "posix":  # For other operating systems e.g. Windows, we would need adaptions here
+    locale.setlocale(locale.LC_ALL, 'en_US.utf-8')  # pragma: no cover
+
 babel = Babel(app)
+debug_model = OrderedDict()
 
 
 class GlobalSearchForm(Form):
@@ -31,15 +39,12 @@ class GlobalSearchForm(Form):
 
 
 from openatlas.models.logger import DBHandler
-
-debug_model = OrderedDict()
 logger = DBHandler()
-
 
 from openatlas.util import filters
 from openatlas.views import (actor, admin, ajax, content, event, export, hierarchy, index,
-                             involvement, imports, login, types, model, place, profile, reference,
-                             source, translation, user, relation, member, search, file)
+                             involvement, imports, link, login, types, model, place, profile,
+                             reference, source, translation, user, relation, member, search, file)
 
 
 @babel.localeselector
@@ -91,6 +96,12 @@ def before_request():
     debug_model['user'] = 0
     debug_model['model'] = time.time() - debug_model['current']
     debug_model['current'] = time.time()
+
+    # Workaround overlay maps for Stefan until #978 is implemented
+    session['settings']['overlay_hack'] = False
+    if hasattr(current_user, 'id') and current_user.id in [3,4] and \
+            session['settings']['site_name'] == 'DPP':
+        session['settings']['overlay_hack'] = True  # pragma: no cover
 
 
 @app.teardown_request

@@ -27,9 +27,11 @@ class Export:
         tables = {
             'model_class': ['id', 'name', 'code'],
             'model_class_inheritance': ['id', 'super_code', 'sub_code'],
-            'model_entity': ['id', 'name', 'description', 'class_code'],
-            'model_link': ['id', 'property_code', 'domain_id', 'range_id', 'description'],
-            'model_link_property': ['id', 'property_code', 'domain_id', 'range_id'],
+            'model_entity': ['id', 'name', 'description', 'class_code', 'begin_from', 'begin_to',
+                             'begin_comment', 'end_from', 'end_to', 'end_comment'],
+            'model_link': ['id', 'property_code', 'domain_id', 'range_id', 'type_id', 'description',
+                           'begin_from', 'begin_to', 'begin_comment', 'end_from', 'end_to',
+                           'end_comment'],
             'model_property': ['id', 'code', 'range_class_code', 'domain_class_code', 'name',
                                'name_inverse'],
             'model_property_inheritance': ['id', 'super_code', 'sub_code'],
@@ -71,6 +73,8 @@ class Export:
     def export_sql():
         """ Creates a pg_dump file in the export/sql folder, filename begins with current date."""
         # Todo: prevent exposing the database password to the process list
+        if os.name != "posix":  # pragma: no cover
+            return False  # For other operating systems e.g. Windows, we would need adaptions here
         path = '{path}/sql/{date}_dump.sql'.format(path=app.config['EXPORT_FOLDER_PATH'],
                                                    date=DateMapper.current_date_for_filename())
         command = '''pg_dump -h {host} -d {database} -U {user} -p {port} -f {file}'''.format(

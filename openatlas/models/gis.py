@@ -5,7 +5,10 @@ from flask import g, json
 
 from openatlas import debug_model
 from openatlas.models.node import NodeMapper
-from openatlas.util.util import uc_first
+
+
+class InvalidGeomException(Exception):
+    pass
 
 
 class GisMapper:
@@ -17,7 +20,7 @@ class GisMapper:
         # Workaround to include GIS features of a subunit which would be otherwise omitted
         subunit_selected_id = 0
         if objects:
-            if not isinstance(objects, list):
+            if type(objects) is not list:
                 if objects.system_type in ['feature', 'finds', 'stratigraphic unit']:
                     subunit_selected_id = objects.id
                 objects = [objects]
@@ -47,8 +50,7 @@ class GisMapper:
                     AND l.property_code = 'P53'
                     AND (object.system_type = 'place' OR object.id = {subunit_selected_id})
                 GROUP BY object.id, {shape}.id;""".format(
-                        shape=shape,
-                        subunit_selected_id=subunit_selected_id,
+                        shape=shape, subunit_selected_id=subunit_selected_id,
                         polygon_point_sql=polygon_point_sql if shape == 'polygon' else '')
             g.cursor.execute(sql)
             debug_model['div sql'] += 1
@@ -60,20 +62,19 @@ class GisMapper:
                     'type': 'Feature',
                     'geometry': json.loads(row.geojson),
                     'properties': {
-                        'title': row.object_name.replace('"', '\"'),
                         'objectId': row.object_id,
+                        'objectName': row.object_name.replace('"', '\"'),
                         'objectDescription': object_desc,
                         'id': row.id,
-                        'name': row.name.replace('"', '\"'),
+                        'name': row.name.replace('"', '\"') if row.name else '',
                         'description': description,
-                        'siteType': '',
-                        'shapeType': uc_first(row.type)}}
+                        'shapeType': row.type}}
                 if hasattr(row, 'types') and row.types:
                     nodes_list = ast.literal_eval('[' + row.types + ']')
                     for node_id in list(set(nodes_list)):
                         node = g.nodes[node_id]
                         if node.root and node.root[-1] == place_type_root_id:
-                            item['properties']['siteType'] = node.name
+                            item['properties']['objectType'] = node.name.replace('"', '\"')
                             break
                 if row.object_id in object_ids:
                     selected[shape].append(item)
@@ -104,6 +105,14 @@ class GisMapper:
                 # Don't save geom if coordinates are empty
                 if not item['geometry']['coordinates'] or item['geometry']['coordinates'] == [[]]:
                     continue  # pragma: no cover
+                if item['properties']['shapeType'] != 'centerpoint':
+                    # Test for valid geom
+                    sql = """
+                        SELECT st_isvalid(
+                            public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));"""
+                    g.cursor.execute(sql, {'geojson': json.dumps(item['geometry'])})
+                    if not g.cursor.fetchone()[0]:
+                        raise InvalidGeomException
                 sql = """
                     INSERT INTO gis.{shape} (entity_id, name, description, type, geom)
                     VALUES (

@@ -30,10 +30,11 @@
                             <div style="float:left;margin-right:3em;">
                                 <div class="button-bar">
                                     <form style="float:left" method="post" action="{{ url_for('node_insert', root_id=node.id) }}">
+                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                                         <input
                                             class="tree-filter"
                                             id="{{ node.name|sanitize }}-tree-search"
-                                            placeholder="{{ _('filter')|uc_first }}"
+                                            placeholder="{{ placeholder|uc_first }}"
                                             name="name_search"
                                             style="width:8em;"/>
                                         <input type="hidden" name="mode" value="insert" />
@@ -53,7 +54,7 @@
                             <div style="float:left;">
                                 {% if not node.value_type %}
                                     <p>
-                                        <strong>{{ _('selection'|uc_first) }}</strong>:
+                                        <strong>{{ _('selection')|uc_first }}</strong>:
                                         {{ _('multiple') if node.multiple else _('single') }}
                                     </p>
                                 {% endif %}
@@ -67,7 +68,7 @@
                                 {% endif %}
                                 {% if node.description %}
                                     <div class="description">
-                                        <p class="description-title">{{ _('description')|uc_first }}</p>
+                                        <h2>{{ _('description')|uc_first }}</h2>
                                         <p style="width:40em;">{{ node.description|safe }}</p>
                                     </div>
                                 {% endif %}

@@ -9,19 +9,16 @@ from wtforms import BooleanField, PasswordField, SelectField, StringField, Submi
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app, logger
-from openatlas.util.util import uc_first, display_tooltip
+from openatlas.util.util import display_tooltip, uc_first
 
 
 class DisplayForm(Form):
-    language = SelectField(_('language'), choices=app.config['LANGUAGES'].items())
-    theme_choices = [
-        ('default', _('default')), ('darkside', 'Darkside'), ('omg_ponies', 'OMG Ponies!')]
+    language = SelectField(_('language'), choices=list(app.config['LANGUAGES'].items()))
+    theme_choices = [('default', _('default')), ('darkside', 'Darkside'),
+                     ('omg_ponies', 'OMG Ponies!')]
     theme = SelectField(_('color theme'), choices=theme_choices)
-    table_rows = SelectField(
-        _('table rows'),
-        description=_('tooltip table rows'),
-        choices=app.config['DEFAULT_TABLE_ROWS'].items(),
-        coerce=int)
+    table_rows = SelectField(_('table rows'), description=_('tooltip table rows'),
+                             choices=list(app.config['DEFAULT_TABLE_ROWS'].items()), coerce=int)
     layout_choices = [('default', _('default')), ('advanced', _('advanced'))]
     layout = SelectField(_('layout'), description=_('tooltip layout'), choices=layout_choices)
 
@@ -90,8 +87,8 @@ def profile_index():
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('profile_index'))
-
-    form.language.data = user.settings['language']
+    language = user.settings['language'] if user.settings['language'] else session['language']
+    form.language.data = language
     form.theme.data = user.settings['theme']
     form.table_rows.data = user.settings['table_rows']
     form.layout.data = user.settings['layout']
@@ -135,9 +132,8 @@ def profile_update():
 def profile_password():
     form = PasswordForm()
     if form.validate_on_submit():
-        current_user.password = bcrypt.hashpw(
-            form.password.data.encode('utf-8'),
-            bcrypt.gensalt()).decode('utf-8')
+        current_user.password = bcrypt.hashpw(form.password.data.encode('utf-8'),
+                                              bcrypt.gensalt()).decode('utf-8')
         current_user.update()
         flash(_('info password updated'), 'info')
         return redirect(url_for('profile_index'))

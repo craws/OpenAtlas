@@ -4,18 +4,18 @@ import re
 
 import flask
 import jinja2
-from flask import g, render_template_string, request, url_for
-from flask_babel import lazy_gettext as _, format_number as babel_format_number
+from flask import g, render_template_string, request, session, url_for
+from flask_babel import format_number as babel_format_number, lazy_gettext as _
 from flask_login import current_user
 from jinja2 import escape, evalcontextfilter
 from wtforms import IntegerField
 from wtforms.validators import Email
 
 from openatlas import app
-from openatlas.forms.forms import ValueFloatField, TreeField
+from openatlas.forms.forms import TreeField, ValueFloatField
 from openatlas.models.content import ContentMapper
 from openatlas.util import util
-from openatlas.util.util import display_tooltip, print_file_extension
+from openatlas.util.util import display_tooltip, get_file_path, print_file_extension
 
 blueprint = flask.Blueprint('filters', __name__)
 paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
@@ -79,7 +79,7 @@ def bookmark_toggle(self, entity_id):
 def display_move_form(self, form, root_name):
     html = ''
     for field in form:
-        if isinstance(field, TreeField):
+        if type(field) is TreeField:
             html += '<p>' + root_name + ' ' + str(field) + '</p>'
     html += '<p><a class="button" id="select-all">' + util.uc_first(_('select all')) + '</a>'
     html += '<a class="button" id="select-none">' + util.uc_first(_('deselect all')) + '</a></p>'
@@ -98,11 +98,7 @@ def table_select_model(self, name, selected=None):
     else:
         entities = g.properties
         sorter = 'sortList: [[0, 0]], headers: {0: { sorter: "property_code" }}'
-    table = {
-        'id': name,
-        'header': ['code', 'name'],
-        'sort': sorter,
-        'data': []}
+    table = {'id': name, 'header': ['code', 'name'], 'sort': sorter, 'data': []}
     for id_ in entities:
         table['data'].append([
             '<a onclick="selectFromTable(this, \'' + name + '\', \'' + str(id_) + '\')">' +
@@ -144,9 +140,24 @@ def description(self, entity):
     label = util.uc_first(_('description'))
     if hasattr(entity, 'system_type') and entity.system_type == 'source content':
         label = util.uc_first(_('content'))
-    html = """<p class="description-title">{label}</p>
+    html = """<h2>{label}</h2>
         <div class="description more">{description}</div>""".format(label=label, description=text)
     return html
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def display_profile_image(self, image_id):
+    if not image_id:
+        return ''
+    src = url_for('display_file', filename=os.path.basename(get_file_path(image_id)))
+    return """
+        <div id="profile_image_div">
+            <a href="/file/view/{id}">
+                <img style="max-width:{width}px;" alt="profile image" src="{src}" />
+            </a>
+        </div>
+        """.format(id=image_id, src=src, width=session['settings']['profile_image_width'])
 
 
 @jinja2.contextfilter
@@ -159,14 +170,16 @@ def display_content_translation(self, text):
 @blueprint.app_template_filter()
 def manual_link(self, wiki_site):
     # Creates a link to a manual page
-    wiki_icon = '<img style="height:14px;" src="/static/images/icons/book.png" alt='' /> '
-    wiki_url = 'https://redmine.openatlas.eu/projects/uni/wiki/'
-    wiki_link = """
-        <p class="manual"><a class="manual" href="{url}" rel="noopener" target="_blank">
-            {icon} {label}
-        </a></p>""".format(
-        url=wiki_url + wiki_site, label=util.uc_first(_('manual')), icon=wiki_icon)
-    return wiki_link
+    html = """
+        <p class="manual">
+            <a class="manual" href="{url}" rel="noopener" target="_blank">
+                <img style="height:14px;" src="/static/images/icons/book.png" alt='' /> 
+                {label}
+            </a>
+        </p>
+        """.format(url='https://redmine.openatlas.eu/projects/uni/wiki/' + wiki_site,
+                       label=util.uc_first(_('manual')))
+    return html
 
 
 @jinja2.contextfilter
@@ -198,24 +211,20 @@ def display_form(self, form, form_id=None, for_persons=False):
             field_ = getattr(form, str(sub_id))
             html_ += """
                 <div class="table-row value-type-switch">
-                    <div><label>{label}</label> {tooltip}</div>
-                    <div class="table-cell">{field}</div>
+                    <div><label>{label}</label></div>
+                    <div class="table-cell">{field} {unit}</div>
                 </div>
-            """.format(
-                label=sub.name,
-                tooltip=display_tooltip(sub.description),
-                field=field_(class_='value-type'))
+            """.format(label=sub.name, unit=sub.description, field=field_(class_='value-type'))
             html_ += display_value_type_fields(sub.subs)
         return html_
 
     for field in form:
-        if isinstance(field, ValueFloatField):
+        if type(field) is ValueFloatField:
             continue
         class_ = 'required' if field.flags.required else ''
-        class_ += ' integer' if isinstance(field, IntegerField) else ''
+        class_ += ' integer' if type(field) is IntegerField else ''
         for validator in field.validators:
-            if isinstance(validator, Email):
-                class_ += ' email'
+            class_ += ' email' if type(validator) is Email else ''
         errors = ''
         for error in field.errors:
             errors += util.uc_first(error)
@@ -235,21 +244,17 @@ def display_form(self, form, form_id=None, for_persons=False):
                                 <label style="font-weight:bold;">{label}</label> {tooltip}
                             </div>
                         </div>
-                    """.format(
-                    label=label,
-                    tooltip=display_tooltip(node.description))
+                    """.format(label=label, tooltip=display_tooltip(node.description))
                 html['value_types'] += display_value_type_fields(node.subs)
                 continue
             else:
                 type_field = """
                     <div class="table-row">
-                        <div><label>{label}</label> {tooltip}</div>
+                        <div><label>{label}</label> {info}</div>
                         <div class="table-cell">{field}</div>
                     </div>
-                """.format(
-                    label=label,
-                    tooltip='' if 'is_node_form' in form else display_tooltip(node.description),
-                    field=str(field(class_=class_)) + errors)
+                """.format(label=label, field=str(field(class_=class_)) + errors,
+                           info='' if 'is_node_form' in form else display_tooltip(node.description))
                 if node.name in app.config['BASE_TYPES']:  # base type should be above other fields
                     html['types'] = type_field + html['types']
                 else:
@@ -267,8 +272,8 @@ def display_form(self, form, form_id=None, for_persons=False):
         if field.type == 'SubmitField':
             html['footer'] += str(field)
             continue
-        if field.id.split('_', 1)[0] == 'date':  # if it's a date field use a function to add dates
-            if field.id == 'date_begin_year':
+        if field.id.split('_', 1)[0] in ('begin', 'end'):  # If it's a date field use a function
+            if field.id == 'begin_year_from':
                 html['footer'] += util.add_dates_to_form(form, for_persons)
             continue
         field.label.text += display_tooltip(field.description)
@@ -293,9 +298,9 @@ def display_form(self, form, form_id=None, for_persons=False):
                 <div class="table-cell value-type-switcher">
                     <span id="value-type-switcher" class="button">{show}</span>
                 </div>
-            </div>""".format(values=util.uc_first(_('values')), show=util.uc_first(_('show')))
+            </div>
+            """.format(values=util.uc_first(_('values')), show=util.uc_first(_('show')))
         html['value_types'] = values_html + html['value_types']
-
     html_all += html['header'] + html['types'] + html['main'] + html['value_types'] + html['footer']
     html_all += '</div></form>'
     return html_all
@@ -323,17 +328,11 @@ def truncate_string(self, string):
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def get_view_name(self, entity):
-    return util.get_view_name(entity)
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
 def display_delete_link(self, entity):
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
     confirm = 'onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
-    url = url_for(util.get_view_name(entity) + '_delete', id_=entity.id)
+    url = url_for(entity.view_name + '_delete', id_=entity.id)
     return '<a ' + confirm + ' href="' + url + '">' + util.uc_first(_('delete')) + '</a>'
 
 
@@ -343,7 +342,7 @@ def display_menu(self, origin):
     """ Returns html with the menu and mark appropriate item as selected."""
     html = ''
     if current_user.is_authenticated:
-        selected = util.get_view_name(origin) if origin else ''
+        selected = origin.view_name if origin else ''
         items = ['overview', 'source', 'event', 'actor', 'place', 'reference', 'types', 'admin']
         for item in items:
             if selected:
@@ -377,3 +376,17 @@ def display_debug_info(self, debug_model, form):
         for fieldName, errorMessages in form.errors.items():
             html += fieldName + ' - ' + errorMessages[0] + '<br />'
     return html
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def display_external_references(self, entity):
+    """ Formats external references for display."""
+    html = ''
+    for link_ in entity.external_references:
+        url = link_.domain.name
+        name = util.truncate_string(url.replace('http://', '').replace('https://', ''), span=False)
+        if link_.description:
+            name = link_.description
+        html += '<a target="_blank" href="{url}">{name}</a><br />'.format(url=url, name=name)
+    return '<h2>' + util.uc_first(_('external references')) + '</h2>' + html if html else ''

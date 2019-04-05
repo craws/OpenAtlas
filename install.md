@@ -31,21 +31,34 @@ knowledge about server administration.
 
 ### Files
 
-Copy the files to /var/www/your_site_name or clone OpenAtlas from GitHub or Bitbucket
+Copy the files to /var/www/your_site_name or clone OpenAtlas from GitHub
+
+    $ git clone https://github.com/craws/OpenAtlas.git
 
 ### Database
 
-Important!
-A user with user name "OpenAtlas" and password "change_me_PLEASE!" is created.
-Change this account immediately!
+The commands below have to be executed as postgres.
 
-As postgres
+Create an openatlas database user
 
     $ createuser openatlas -P
+
+Create an openatlas database, make openatlas the owner of it
+
     $ createdb openatlas -O openatlas
+
+Add the postgis extension to the database
+
     $ psql openatlas -c "CREATE EXTENSION postgis;"
+
+Import the scripts: 1_structure.sql,  2_data_web.sql,  3_data_model.sql, 4_data_node.sql
+
     $ cd install
-    $ cat structure.sql data_web.sql data_model.sql data_node.sql | psql -d openatlas -f -
+    $ cat 1_structure.sql 2_data_web.sql 3_data_model.sql 4_data_node.sql | psql -d openatlas -f -
+
+**Important!** A user with user name "OpenAtlas" and password "change_me_PLEASE!" is created.
+
+**Change this account immediately!**
 
 ### Configuration
 
@@ -68,7 +81,7 @@ Test Apache configuration and restart
 
 ### File Upload and Export
 
-Make the these directories writeable for the Apache user:
+Make these directories writeable for the Apache user:
 
 openatlas/uploads
 
@@ -83,6 +96,10 @@ e.g.
 ### Finishing
 
 Login with username "OpenAtlas" and password "change_me_PLEASE!" and change the password in profile.
+
+### Upgrade
+
+If you later like to upgrade the application be sure to read and follow the [upgrade instructions](install/upgrade/upgrade.md).
 
 ### Unit tests (optional)
 

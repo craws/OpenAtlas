@@ -4,16 +4,27 @@ html, body, input, select, textarea {
     font-family: helvetica, arial, sans-serif;
 }
 
+#select_all, #select_all_links {
+    cursor: pointer;
+}
+
+#external_reference #name {
+    width: 36em;
+}
+
+.date-switch label.error {
+    padding: 0.2em;
+}
+
+.select_all {
+    text-decoration: underline;
+    margin-bottom: 0.5em;
+    margin-top: 0;
+}
+
 #admin_index a {
     text-decoration: underline;
     margin-right: 0.5em;
-}
-
-#map {
-    float: left;
-    height: 440px;
-    width: 600px;
-    margin-left: 1em;
 }
 
 p.manual {
@@ -162,18 +173,14 @@ form input[type="text"].month, form input[type="text"].day {
     width: 40em;
 }
 
-#map-info-display #description {
-    height: 8em;
-    width: 25em;
-}
-
 .description {
     margin-top: 1em;
     max-width: 80em;
 }
 
-.description-title {
-    font-weight: bold;
+#map-info-display #description {
+    height: 8em;
+    width: 25em;
 }
 
 .ui-dialog,

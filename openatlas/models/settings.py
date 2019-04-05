@@ -26,6 +26,9 @@ class SettingsMapper:
         'map_cluster_disable_at_zoom',
         'mail_recipients_feedback',
         'minimum_password_length',
+        'minimum_jstree_search',
+        'minimum_tablesorter_search',
+        'profile_image_width',
         'random_password_length',
         'reset_confirm_hours',
         'site_name',
@@ -67,11 +70,10 @@ class SettingsMapper:
     def update_file_settings(form):
         sql = 'UPDATE web.settings SET "value" = %(value)s WHERE "name" = %(name)s;'
         for field in SettingsMapper.fields:
-            if not field.startswith('file_'):
-                continue
-            value = getattr(form, field).data
-            g.cursor.execute(sql, {'name': field, 'value': value})
-            debug_model['div sql'] += 1
+            if field.startswith('file_') or field == 'profile_image_width':
+                value = getattr(form, field).data
+                g.cursor.execute(sql, {'name': field, 'value': value})
+                debug_model['div sql'] += 1
 
     @staticmethod
     def update_map_settings(form):

@@ -9,10 +9,10 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.forms.forms import build_form
 from openatlas.models.entity import EntityMapper
-from openatlas.models.link import LinkMapper
 from openatlas.util.util import (build_table_form, display_remove_link, get_base_table_data,
-                                 get_entity_data, get_view_name, is_authorized, link,
-                                 required_group, truncate_string, uc_first, was_modified)
+                                 get_entity_data, is_authorized, link, required_group,
+                                 truncate_string, uc_first, was_modified,
+                                 get_profile_image_table_link)
 
 
 class SourceForm(Form):
@@ -47,21 +47,17 @@ def source_insert(origin_id=None):
     return render_template('source/insert.html', form=form, origin=origin)
 
 
-@app.route('/source/view/<int:id_>/<int:unlink_id>')
 @app.route('/source/view/<int:id_>')
 @required_group('readonly')
-def source_view(id_, unlink_id=None):
+def source_view(id_):
     source = EntityMapper.get_by_id(id_)
-    if unlink_id:
-        LinkMapper.delete_by_id(unlink_id)
-        flash(_('link removed'), 'info')
     tables = {
         'info': get_entity_data(source),
         'text': {'id': 'translation', 'data': [], 'header': ['text', 'type', 'content']},
-        'file': {'id': 'files', 'data': [], 'header': app.config['TABLE_HEADERS']['file']},
-        'reference': {
-            'id': 'source', 'data': [],
-            'header': app.config['TABLE_HEADERS']['reference'] + ['page']}}
+        'file': {'id': 'files', 'data': [],
+                 'header': app.config['TABLE_HEADERS']['file'] + [_('main image')]},
+        'reference': {'id': 'source', 'data': [],
+                      'header': app.config['TABLE_HEADERS']['reference'] + ['page']}}
     for text in source.get_linked_entities('P73'):
         tables['text']['data'].append([
             link(text),
@@ -70,26 +66,34 @@ def source_view(id_, unlink_id=None):
     for name in ['actor', 'event', 'place', 'feature', 'stratigraphic-unit', 'find']:
         tables[name] = {'id': name, 'header': app.config['TABLE_HEADERS'][name], 'data': []}
     for link_ in source.get_links('P67'):
-        data = get_base_table_data(link_.range)
-        view_name = get_view_name(link_.range)
-        view_name = view_name if view_name != 'place' else link_.range.system_type.replace(' ', '-')
+        range_ = link_.range
+        data = get_base_table_data(range_)
         if is_authorized('editor'):
-            unlink = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-' + view_name
-            data.append(display_remove_link(unlink, link_.range.name))
-        tables[view_name]['data'].append(data)
+            url = url_for('link_delete', id_=link_.id, origin_id=source.id)
+            data.append(display_remove_link(url + '#tab-' + range_.table_name, range_.name))
+        tables[range_.table_name]['data'].append(data)
+    profile_image_id = source.get_profile_image_id()
     for link_ in source.get_links(['P67', 'P128'], True):
-        data = get_base_table_data(link_.domain)
-        view_name = get_view_name(link_.domain)
-        if view_name not in ['file']:
+        domain = link_.domain
+        data = get_base_table_data(domain)
+        if domain.view_name == 'file':  # pragma: no cover
+            extension = data[3].replace('.', '')
+            data.append(get_profile_image_table_link(domain, source, extension, profile_image_id))
+            if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+                profile_image_id = domain.id
+        if domain.view_name not in ['file']:
             data.append(link_.description)
+            if domain.system_type == 'external reference':
+                source.external_references.append(link_)
             if is_authorized('editor'):
-                update_url = url_for('reference_link_update', link_id=link_.id, origin_id=source.id)
-                data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
+                url = url_for('reference_link_update', link_id=link_.id, origin_id=source.id)
+                data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
         if is_authorized('editor'):
-            unlink = url_for('source_view', id_=source.id, unlink_id=link_.id) + '#tab-' + view_name
-            data.append(display_remove_link(unlink, link_.domain.name))
-        tables[view_name]['data'].append(data)
-    return render_template('source/view.html', source=source, tables=tables)
+            url = url_for('link_delete', id_=link_.id, origin_id=source.id)
+            data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
+        tables[domain.view_name]['data'].append(data)
+    return render_template('source/view.html', source=source, tables=tables,
+                           profile_image_id=profile_image_id)
 
 
 @app.route('/source/add/<int:origin_id>', methods=['POST', 'GET'])
@@ -107,7 +111,7 @@ def source_add(origin_id):
             g.cursor.execute('ROLLBACK')
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(url_for(get_view_name(origin) + '_view', id_=origin.id) + '#tab-source')
+        return redirect(url_for(origin.view_name + '_view', id_=origin.id) + '#tab-source')
     form = build_table_form('source', origin.get_linked_entities('P67', True))
     return render_template('source/add.html', origin=origin, form=form)
 
@@ -128,16 +132,9 @@ def source_add2(id_, class_name):
 @app.route('/source/delete/<int:id_>')
 @required_group('editor')
 def source_delete(id_):
-    g.cursor.execute('BEGIN')
-    try:
-        EntityMapper.delete(id_)
-        logger.log_user(id_, 'delete')
-        g.cursor.execute('COMMIT')
-        flash(_('entity deleted'), 'info')
-    except Exception as e:  # pragma: no cover
-        g.cursor.execute('ROLLBACK')
-        logger.log('error', 'database', 'transaction failed', e)
-        flash(_('error transaction'), 'error')
+    EntityMapper.delete(id_)
+    logger.log_user(id_, 'delete')
+    flash(_('entity deleted'), 'info')
     return redirect(url_for('source_index'))
 
 
@@ -151,8 +148,8 @@ def source_update(id_):
             del form.save
             flash(_('error modified'), 'error')
             modifier = link(logger.get_log_for_advanced_view(source.id)['modifier'])
-            return render_template(
-                'source/update.html', form=form, source=source, modifier=modifier)
+            return render_template('source/update.html', form=form, source=source,
+                                   modifier=modifier)
         save(form, source)
         return redirect(url_for('source_view', id_=id_))
     return render_template('source/update.html', form=form, source=source)
@@ -160,8 +157,8 @@ def source_update(id_):
 
 def save(form, source=None, origin=None):
     g.cursor.execute('BEGIN')
+    log_action = 'update'
     try:
-        log_action = 'update'
         if not source:
             source = EntityMapper.insert('E33', form.name.data, 'source content')
             log_action = 'insert'
@@ -171,11 +168,11 @@ def save(form, source=None, origin=None):
         source.save_nodes(form)
         url = url_for('source_view', id_=source.id)
         if origin:
-            url = url_for(get_view_name(origin) + '_view', id_=origin.id) + '#tab-source'
-            if get_view_name(origin) == 'reference':
-                link_ = origin.link('P67', source)
-                url = url_for('reference_link_update', link_id=link_, origin_id=origin)
-            elif get_view_name(origin) == 'file':
+            url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-source'
+            if origin.view_name == 'reference':
+                link_id = origin.link('P67', source)
+                url = url_for('reference_link_update', link_id=link_id, origin_id=origin)
+            elif origin.view_name == 'file':
                 origin.link('P67', source)
             else:
                 source.link('P67', origin)

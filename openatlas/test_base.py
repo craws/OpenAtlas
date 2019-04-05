@@ -13,6 +13,7 @@ class TestBaseCase(unittest.TestCase):
         app.testing = True
         app.config['SERVER_NAME'] = 'localhost'
         app.config['WTF_CSRF_ENABLED'] = False
+        app.config['WTF_CSRF_METHODS'] = []  # This is the magic to disable CSRF for tests
         self.setup_database()
         self.app = app.test_client()
 
@@ -21,20 +22,15 @@ class TestBaseCase(unittest.TestCase):
 
     @staticmethod
     def setup_database():
-        connection = psycopg2.connect(
-            database=app.config['DATABASE_NAME'],
-            host=app.config['DATABASE_HOST'],
-            user=app.config['DATABASE_USER'],
-            password=app.config['DATABASE_PASS'],
-            port=app.config['DATABASE_PORT'])
+        connection = psycopg2.connect(database=app.config['DATABASE_NAME'],
+                                      host=app.config['DATABASE_HOST'],
+                                      user=app.config['DATABASE_USER'],
+                                      password=app.config['DATABASE_PASS'],
+                                      port=app.config['DATABASE_PORT'])
         connection.autocommit = True
         cursor = connection.cursor()
-        for file_name in [
-            'structure.sql',
-            'data_web.sql',
-            'data_model.sql',
-            'data_node.sql',
-            'data_test.sql'
-        ]:
-            with open(os.path.dirname(__file__) + '/../install/' + file_name) as sqlFile:
+        for file_name in ['1_structure.sql', '2_data_web.sql', '3_data_model.sql',
+                          '4_data_node.sql', 'data_test.sql']:
+            path = os.path.dirname(__file__) + '/../install/' + file_name
+            with open(path, encoding='utf8') as sqlFile:
                 cursor.execute(sqlFile.read())

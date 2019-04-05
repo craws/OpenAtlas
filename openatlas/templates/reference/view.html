@@ -30,8 +30,14 @@
             {{ reference.id|bookmark_toggle|safe }}
         </div>
         <h1>{{ reference.name }}</h1>
-        {{ tables['info']|data_table|safe }}
-        {{ reference|description|safe }}
+        <div>
+            {{ profile_image_id|display_profile_image|safe }}
+            <div style="float:left;">
+                {{ tables['info']|data_table|safe }}
+                {{ reference|description|safe }}
+            </div>
+            <div style="clear:both;"></div>
+        </div>
     </div>
     {% if reference.system_type == 'information carrier' %}
         <div id="tab-source">

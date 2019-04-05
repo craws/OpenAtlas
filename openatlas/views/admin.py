@@ -1,9 +1,9 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+import datetime
 import os
 from collections import OrderedDict
 from os.path import basename, splitext
 
-import datetime
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
@@ -14,37 +14,34 @@ from wtforms.validators import Email, InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import TableField
+from openatlas.models.date import DateMapper
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.models.node import NodeMapper
 from openatlas.models.settings import SettingsMapper
 from openatlas.models.user import UserMapper
-from openatlas.util.util import (convert_size, format_date, format_datetime, get_file_path, link,
-                                 required_group, send_mail, truncate_string, uc_first)
-
-
+from openatlas.util.util import (convert_size, format_date, format_datetime, get_file_path,
+                                 is_authorized, link, required_group, send_mail, truncate_string,
+                                 uc_first)
 
 
 class GeneralForm(Form):
     site_name = StringField(uc_first(_('site name')))
     site_header = StringField(uc_first(_('site header')))
-    default_language = SelectField(uc_first(
-        _('default language')),
-        choices=app.config['LANGUAGES'].items())
-    default_table_rows = SelectField(
-        uc_first(_('default table rows')),
-        choices=app.config['DEFAULT_TABLE_ROWS'].items(),
-        coerce=int)
-    log_level = SelectField(
-        uc_first(_('log level')),
-        choices=app.config['LOG_LEVELS'].items(),
-        coerce=int)
+    default_language = SelectField(uc_first(_('default language')),
+                                   choices=list(app.config['LANGUAGES'].items()))
+    default_table_rows = SelectField(uc_first(_('default table rows')), coerce=int,
+                                     choices=list(app.config['DEFAULT_TABLE_ROWS'].items()))
+    log_level = SelectField(uc_first(_('log level')), coerce=int,
+                            choices=list(app.config['LOG_LEVELS'].items()))
     debug_mode = BooleanField(uc_first(_('debug mode')))
     random_password_length = IntegerField(uc_first(_('random password length')))
     minimum_password_length = IntegerField(uc_first(_('minimum password length')))
     reset_confirm_hours = IntegerField(uc_first(_('reset confirm hours')))
     failed_login_tries = IntegerField(uc_first(_('failed login tries')))
     failed_login_forget_minutes = IntegerField(uc_first(_('failed login forget minutes')))
+    minimum_jstree_search = IntegerField(uc_first(_('minimum jstree search')))
+    minimum_tablesorter_search = IntegerField(uc_first(_('minimum tablesorter search')))
     save = SubmitField(uc_first(_('save')))
 
 
@@ -69,7 +66,7 @@ class MapForm(Form):
 @app.route('/admin/map', methods=['POST', 'GET'])
 @required_group('manager')
 def admin_map():
-    form = MapForm()
+    form = MapForm(obj=session['settings'])
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
@@ -90,7 +87,7 @@ def admin_map():
 
 @app.route('/admin/check_links')
 @app.route('/admin/check_links/<check>')
-@required_group('admin')
+@required_group('editor')
 def admin_check_links(check=None):
     table = None
     if check:
@@ -103,6 +100,7 @@ def admin_check_links(check=None):
 class FileForm(Form):
     file_upload_max_size = IntegerField(_('max file size in MB'))
     file_upload_allowed_extension = StringField('allowed file extensions')
+    profile_image_width = IntegerField(_('profile image width in pixel'))
     save = SubmitField(uc_first(_('save')))
 
 
@@ -124,69 +122,106 @@ def admin_file():
         return redirect(url_for('admin_index'))
     form.file_upload_max_size.data = session['settings']['file_upload_max_size']
     form.file_upload_allowed_extension.data = session['settings']['file_upload_allowed_extension']
+    form.profile_image_width.data = session['settings']['profile_image_width']
     return render_template('admin/file.html', form=form)
 
 
-@app.route('/admin/orphans')
-@app.route('/admin/orphans/<delete>')
+@app.route('/admin/orphans/delete/<parameter>')
 @required_group('admin')
-def admin_orphans(delete=None):
-    if delete:
-        count = EntityMapper.delete_orphans(delete)
-        flash(_('info orphans deleted:') + ' ' + str(count), 'info')
-        return redirect(url_for('admin_orphans'))
-    header = ['name', 'class', 'type', 'system type', 'created', 'updated', 'description']
+def admin_orphans_delete(parameter):
+    count = EntityMapper.delete_orphans(parameter)
+    flash(_('info orphans deleted:') + ' ' + str(count), 'info')
+    return redirect(url_for('admin_orphans'))
+
+
+@app.route('/admin/check/dates')
+@required_group('editor')
+def admin_check_dates():
+    # Get invalid date combinations (e.g. begin after end)
     tables = {
-        'orphans': {'id': 'orphans', 'header': header, 'data': []},
-        'unlinked': {'id': 'unlinked', 'header': header, 'data': []},
-        'nodes': {'id': 'nodes', 'header': ['name', 'root'], 'data': []},
-        'missing_files': {'id': 'missing_files', 'header': header, 'data': []},
-        'orphaned_files': {'id': 'orphaned_files', 'data': [],
-                           'header': ['name', 'size', 'date', 'ext']}}
+        'dates': {'id': 'dates', 'data': [], 'header': ['name', 'class', 'type', 'system type',
+                                                        'created', 'updated', 'description']},
+        'link_dates': {'id': 'link_dates', 'data': [], 'header': ['link', 'domain', 'range']},
+        'involvement_dates': {'id': 'involvement_dates', 'data': [],
+                              'header': ['actor', 'event', 'class', 'involvement', 'description']}}
+    for entity in DateMapper.get_invalid_dates():
+        tables['dates']['data'].append([link(entity), link(entity.class_), entity.print_base_type(),
+                                        entity.system_type, format_date(entity.created),
+                                        format_date(entity.modified),
+                                        truncate_string(entity.description)])
+    for link_ in DateMapper.get_invalid_link_dates():
+        label = ''
+        if link_.property.code == 'OA7':  # pragma: no cover
+            label = 'relation'
+        elif link_.property.code == 'P107':  # pragma: no cover
+            label = 'member'
+        elif link_.property.code in ['P11', 'P14', 'P22', 'P23']:
+            label = 'involvement'
+        url = url_for(label + '_update', id_=link_.id, origin_id=link_.domain.id)
+        tables['link_dates']['data'].append(['<a href="' + url + '">' + uc_first(_(label)) + '</a>',
+                                             link(link_.domain), link(link_.range)])
+    for link_ in DateMapper.invalid_involvement_dates():
+        event = link_.domain
+        actor = link_.range
+        update_url = url_for('involvement_update', id_=link_.id, origin_id=actor.id)
+        data = ([link(actor), link(event), g.classes[event.class_.code].name,
+                 link_.type.name if link_.type else '', truncate_string(link_.description),
+                 '<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>'])
+        tables['involvement_dates']['data'].append(data)
+    return render_template('admin/check_dates.html', tables=tables)
+
+
+@app.route('/admin/orphans')
+@required_group('editor')
+def admin_orphans():
+    header = ['name', 'class', 'type', 'system type', 'created', 'updated', 'description']
+    tables = {'orphans': {'id': 'orphans', 'header': header, 'data': []},
+              'unlinked': {'id': 'unlinked', 'header': header, 'data': []},
+              'nodes': {'id': 'nodes', 'header': ['name', 'root'], 'data': []},
+              'missing_files': {'id': 'missing_files', 'header': header, 'data': []},
+              'circular': {'id': 'circular', 'header': ['entity'], 'data': []},
+              'orphaned_files': {'id': 'orphaned_files', 'data': [],
+                                 'header': ['name', 'size', 'date', 'ext']}}
+    tables['circular']['data'] = [[link(entity)] for entity in EntityMapper.get_circular()]
     for entity in EntityMapper.get_orphans():
         name = 'unlinked' if entity.class_.code in app.config['CODE_CLASS'].keys() else 'orphans'
-        tables[name]['data'].append([
-            link(entity),
-            link(entity.class_),
-            entity.print_base_type(),
-            entity.system_type,
-            format_date(entity.created),
-            format_date(entity.modified),
-            truncate_string(entity.description)])
+        tables[name]['data'].append([link(entity),
+                                     link(entity.class_),
+                                     entity.print_base_type(),
+                                     entity.system_type,
+                                     format_date(entity.created),
+                                     format_date(entity.modified),
+                                     truncate_string(entity.description)])
     for node in NodeMapper.get_orphans():
         tables['nodes']['data'].append([link(node), link(g.nodes[node.root[-1]])])
 
-    file_ids = []
     # Get orphaned file entities (no corresponding file)
+    file_ids = []
     for entity in EntityMapper.get_by_system_type('file'):
         file_ids.append(str(entity.id))
         if not get_file_path(entity):
-            tables['missing_files']['data'].append([
-                link(entity),
-                link(entity.class_),
-                entity.print_base_type(),
-                entity.system_type,
-                format_date(entity.created),
-                format_date(entity.modified),
-                truncate_string(entity.description)])
+            tables['missing_files']['data'].append([link(entity),
+                                                    link(entity.class_),
+                                                    entity.print_base_type(),
+                                                    entity.system_type,
+                                                    format_date(entity.created),
+                                                    format_date(entity.modified),
+                                                    truncate_string(entity.description)])
 
     # Get orphaned files (no corresponding entity)
-    path = app.config['UPLOAD_FOLDER_PATH']
-    for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
-        name = basename(file)
-        file_path = path + '/' + name
-        if name != '.gitignore' and splitext(name)[0] not in file_ids:
+    for file in os.scandir(app.config['UPLOAD_FOLDER_PATH']):
+        name = file.name
+        if name != '.gitignore' and splitext(file.name)[0] not in file_ids:
             confirm = ' onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
             tables['orphaned_files']['data'].append([
                 name,
-                convert_size(os.path.getsize(file_path)),
-                format_date(datetime.datetime.fromtimestamp(os.path.getmtime(file_path))),
+                convert_size(file.stat().st_size),
+                format_date(datetime.datetime.utcfromtimestamp(file.stat().st_ctime)),
                 splitext(name)[1],
                 '<a href="' + url_for('download_file', filename=name) + '">' + uc_first(
                     _('download')) + '</a>',
-                '<a href="' + url_for(
-                    'admin_file_delete',
-                    filename=name) + '" ' + confirm + '>' + uc_first(_('delete')) + '</a>'])
+                '<a href="' + url_for('admin_file_delete', filename=name) + '" ' +
+                confirm + '>' + uc_first(_('delete')) + '</a>'])
     return render_template('admin/orphans.html', tables=tables)
 
 
@@ -204,8 +239,8 @@ def admin_logo(action=None):
         return redirect(url_for('admin_logo'))
     if session['settings']['logo_file_id']:
         path = get_file_path(int(session['settings']['logo_file_id']))
-        return render_template(
-            'admin/logo.html', filename=os.path.basename(path) if path else False)
+        return render_template('admin/logo.html',
+                               filename=os.path.basename(path) if path else False)
     form = LogoForm()
     if form.validate_on_submit():
         SettingsMapper.set_logo(form.file.data)
@@ -214,7 +249,7 @@ def admin_logo(action=None):
 
 
 @app.route('/admin/file/delete/<filename>')
-@required_group('admin')
+@required_group('editor')
 def admin_file_delete(filename):  # pragma: no cover
     if filename != 'all':
         try:
@@ -225,24 +260,27 @@ def admin_file_delete(filename):  # pragma: no cover
             flash(_('error file delete'), 'error')
         return redirect(url_for('admin_orphans') + '#tab-orphaned-files')
 
-    # Get all files with entities
-    file_ids = [str(entity.id) for entity in EntityMapper.get_by_system_type('file')]
-    # Get orphaned files (no corresponding entity)
-    path = app.config['UPLOAD_FOLDER_PATH']
-    for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
-        filename = basename(file)
-        if filename != '.gitignore' and splitext(filename)[0] not in file_ids:
-            try:
-                os.remove(app.config['UPLOAD_FOLDER_PATH'] + '/' + filename)
-            except Exception as e:
-                logger.log('error', 'file', 'deletion of ' + filename + ' failed', e)
-                flash(_('error file delete'), 'error')
+    if is_authorized('admin'):
+        # Get all files with entities
+        file_ids = [str(entity.id) for entity in EntityMapper.get_by_system_type('file')]
+
+        # Get orphaned files (no corresponding entity)
+        path = app.config['UPLOAD_FOLDER_PATH']
+        for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
+            filename = basename(file)
+            if filename != '.gitignore' and splitext(filename)[0] not in file_ids:
+                try:
+                    os.remove(app.config['UPLOAD_FOLDER_PATH'] + '/' + filename)
+                except Exception as e:
+                    logger.log('error', 'file', 'deletion of ' + filename + ' failed', e)
+                    flash(_('error file delete'), 'error')
     return redirect(url_for('admin_orphans') + '#tab-orphaned-files')
 
 
 class LogForm(Form):
     limit = SelectField(_('limit'), choices=((0, _('all')), (100, 100), (500, 500)), default=100)
-    priority = SelectField(_('priority'), choices=(app.config['LOG_LEVELS'].items()), default=6)
+    priority = SelectField(_('priority'), choices=(list(app.config['LOG_LEVELS'].items())),
+                           default=6)
     user = SelectField(_('user'), choices=([(0, _('all'))]), default=0)
     apply = SubmitField(_('apply'))
 
@@ -252,19 +290,17 @@ class LogForm(Form):
 def admin_log():
     form = LogForm()
     form.user.choices = [(0, _('all'))] + UserMapper.get_users()
-    table = {
-        'id': 'log', 'header': ['date', 'priority', 'type', 'message', 'user', 'info'],
-        'data': []}
+    table = {'id': 'log', 'data': [],
+             'header': ['date', 'priority', 'type', 'message', 'user', 'info']}
     logs = logger.get_system_logs(form.limit.data, form.priority.data, form.user.data)
     for row in logs:
         user = UserMapper.get_by_id(row.user_id) if row.user_id else None
-        table['data'].append([
-            format_datetime(row.created),
-            str(row.priority) + ' ' + app.config['LOG_LEVELS'][row.priority],
-            row.type,
-            row.message,
-            link(user) if user and user.id else row.user_id,
-            row.info.replace('\n', '<br />')])
+        table['data'].append([format_datetime(row.created),
+                              str(row.priority) + ' ' + app.config['LOG_LEVELS'][row.priority],
+                              row.type,
+                              row.message,
+                              link(user) if user and user.id else row.user_id,
+                              row.info.replace('\n', '<br />')])
     return render_template('admin/log.html', table=table, form=form)
 
 
@@ -277,8 +313,8 @@ def admin_log_delete():
 
 
 class NewsLetterForm(Form):
-    subject = StringField(
-        '', [InputRequired()], render_kw={'placeholder': _('subject'), 'autofocus': True})
+    subject = StringField('', [InputRequired()], render_kw={'placeholder': _('subject'),
+                                                            'autofocus': True})
     body = TextAreaField('', [InputRequired()], render_kw={'placeholder': _('content')})
     send = SubmitField(uc_first(_('send')))
 
@@ -338,8 +374,8 @@ def admin_mail():
         (_('mail from email'), settings['mail_from_email']),
         (_('mail from name'), settings['mail_from_name']),
         (_('mail recipients feedback'), ';'.join(settings['mail_recipients_feedback']))])
-    return render_template(
-        'admin/mail.html', settings=settings, mail_settings=mail_settings, form=form)
+    return render_template('admin/mail.html', settings=settings, mail_settings=mail_settings,
+                           form=form)
 
 
 @app.route('/admin/general', methods=["GET", "POST"])
@@ -357,9 +393,11 @@ def admin_general():
         (_('minimum password length'), settings['minimum_password_length']),
         (_('reset confirm hours'), settings['reset_confirm_hours']),
         (_('failed login tries'), settings['failed_login_tries']),
-        (_('failed login forget minutes'), settings['failed_login_forget_minutes'])])
-    return render_template(
-        'admin/general.html', settings=settings, general_settings=general_settings)
+        (_('failed login forget minutes'), settings['failed_login_forget_minutes']),
+        (_('minimum jstree search'), settings['minimum_jstree_search']),
+        (_('minimum tablesorter search'), settings['minimum_tablesorter_search'])])
+    return render_template('admin/general.html', settings=settings,
+                           general_settings=general_settings)
 
 
 @app.route('/admin/general/update', methods=["GET", "POST"])

@@ -2,13 +2,47 @@
 
 Before executing SQL statements backup the database. Replace database role "openatlas" if needed.
 
+If you are using git and want to update to the latest stable release you can fetch the master branch e.g.
+
+    git pull origin master
+
 After following the instructions restart Apache and test if the application is working.
 
     service apache2 restart
 
-If you are using git and want to update to the latest stable release you can fetch the master branch e.g.
+### 3.14.0 to 3.15.0
 
-    git pull origin master
+Execute install/upgrade/3.15.0.sql after making backups
+
+### 3.13.0 to 3.14.0
+
+A code base update (e.g. with git pull) and an Apache restart should be sufficient
+
+### 3.12.0 to 3.13.0
+
+Execute install/upgrade/3.13.0.sql after making backups
+
+The database structure changed significantly regarding how dates are mapped.
+
+Also some inconsistency in the actor forms were resolved. In the former version there were form fields for appears first/last at a place and begin/end dates.
+Since these date and place information weren't connected we changed it to begin and end fields for places and dates to e.g. enter a birthplace.
+
+Since we couldn't assume that the information entered before was related this update creates events for first/last appearances which are named "First/Last Appearance of actor_name".
+
+After the update you can check the new created entries going to the event overview and filter for "appearance of".
+
+#### Value type label (description)
+
+After this update the descriptions of value types is shown at entity views.
+e.g. if the value type "height" has "centimeter" in its description and a find has it with the value 5 it will displayed as:
+Height: 5 centimeter
+So you might want to check the value type descriptions and e.g. change "In centimeter" to "centimeter"
+
+### 3.11.0 to 3.12.0
+
+Execute install/upgrade/3.12.0.sql after making backups
+
+After the update minimum character search for tables and jstree can be configured in general settings (instead of the config file). The default value is 1 and has to be adjusted if needed. Former entries (MIN_CHARS_TABLESORTER_SEARCH and MIN_CHARS_JSTREE_SEARCH) in your instance config (e.g. production.py) can be removed.
 
 ### 3.10.0 to 3.11.0
 

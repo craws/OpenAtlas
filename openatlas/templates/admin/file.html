@@ -4,5 +4,6 @@
     > {{ _('files')|uc_first }}
 {% endblock %}
 {% block content %}
+    {{ 'Files'|manual_link|safe }}
     {{ form|display_form|safe }}
 {% endblock %}

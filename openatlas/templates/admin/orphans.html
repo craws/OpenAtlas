@@ -4,7 +4,7 @@
     > {{ _('orphans')|uc_first }}
 {% endblock %}
 {% block content %}
-{{ 'Orphans'|manual_link|safe }}
+{{ 'Data_integrity'|manual_link|safe }}
 <div id="tabs" class="tabs-container">
     <ul>
         <li><a href="#tab-orphan">{{ _('orphans')|uc_first }} ({{ tables['orphans']['data']|length|format_number }})</a></li>
@@ -12,12 +12,13 @@
         <li><a href="#tab-nodes">{{ _('type')|uc_first }} ({{ tables['nodes']['data']|length|format_number }})</a></li>
         <li><a href="#tab-missing-files">{{ _('missing files')|uc_first }} ({{ tables['missing_files']['data']|length|format_number }})</a></li>
         <li><a href="#tab-orphaned-files">{{ _('orphaned files')|uc_first }} ({{ tables['orphaned_files']['data']|length|format_number }})</a></li>
+        <li><a href="#tab-circular">{{ _('circular dependencies')|uc_first }} ({{ tables['circular']['data']|length|format_number }})</a></li>
     </ul>
     <div id="tab-orphan">
-        {% if tables['orphans']['data']|length > 0 %}
+        {% if tables['orphans']['data']|length > 0 and 'admin'|is_authorized %}
             <div class="button-bar">
                 <a onclick="return confirm('{{_('delete orphans')|uc_first }}?')"
-                   href="{{ url_for('admin_orphans', delete='orphans') }}">{{ _('delete orphans')|uc_first }}</a>
+                   href="{{ url_for('admin_orphans_delete', parameter='orphans') }}">{{ _('delete orphans')|uc_first }}</a>
             </div>
         {% endif %}
         {{ tables['orphans']|pager|safe }}
@@ -26,10 +27,10 @@
         {{ tables['unlinked']|pager|safe }}
     </div>
     <div id="tab-nodes">
-        {% if tables['nodes']['data']|length > 0 %}
+        {% if tables['nodes']['data']|length > 0 and 'admin'|is_authorized %}
             <div class="button-bar">
                 <a onclick="return confirm('{{_('delete types')|uc_first }}?')"
-                   href="{{ url_for('admin_orphans', delete='types') }}">{{ _('delete types')|uc_first }}</a>
+                   href="{{ url_for('admin_orphans_delete', parameter='types') }}">{{ _('delete types')|uc_first }}</a>
             </div>
         {% endif %}
         {{ tables['nodes']|pager|safe }}
@@ -38,13 +39,16 @@
         {{ tables['missing_files']|pager|safe }}
     </div>
     <div id="tab-orphaned-files">
-        {% if tables['orphaned_files']['data']|length > 0 %}
+        {% if tables['orphaned_files']['data']|length > 0 and 'admin'|is_authorized %}
             <div class="button-bar">
                 <a onclick="return confirm('{{_('delete all files without corresponding entities?')|uc_first }}')"
                    href="{{ url_for('admin_file_delete', filename='all') }}">{{ _('delete all files')|uc_first }}</a>
             </div>
         {% endif %}
         {{ tables['orphaned_files']|pager|safe }}
+    </div>
+    <div id="circular">
+        {{ tables['circular']|pager|safe }}
     </div>
 </div>
 {% endblock %}

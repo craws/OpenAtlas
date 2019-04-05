@@ -6,11 +6,11 @@ from flask import flash, render_template, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
-from wtforms import BooleanField, SubmitField, SelectField
+from wtforms import BooleanField, SelectField, SubmitField
 
 from openatlas import app, logger
 from openatlas.models.export import Export
-from openatlas.util.util import (convert_size, is_authorized, required_group, uc_first)
+from openatlas.util.util import convert_size, is_authorized, required_group, uc_first
 
 
 class ExportSqlForm(Form):
@@ -26,7 +26,6 @@ class ExportCsvForm(Form):
     model_class_inheritance = BooleanField('model.class_inheritance', default=True)
     model_entity = BooleanField('model.entity', default=True)
     model_link = BooleanField('model.link', default=True)
-    model_link_property = BooleanField('model.link_property', default=True)
     model_property = BooleanField('model.property', default=True)
     model_property_inheritance = BooleanField('model.property_inheritance', default=True)
     gis_point = BooleanField('gis.point', default=True)
@@ -108,12 +107,11 @@ def export_csv():
              'sort': 'sortList: [[0, 1]],headers: {0: { sorter: "text" }}'}
     for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
         name = basename(file)
-        file_path = path + '/' + name
         if name == '.gitignore':
             continue
         link = '<a href="{url}">{label}</a>'.format(url=url_for('download_csv', filename=name),
                                                     label=uc_first(_('download')))
-        data = [name, convert_size(os.path.getsize(file_path)), link]
+        data = [name, convert_size(os.path.getsize(path + '/' + name)), link]
         if is_authorized('admin') and writeable:
             confirm = ' onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
             delete = '<a href="' + url_for('delete_csv', filename=name)

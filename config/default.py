@@ -1,10 +1,10 @@
-# Don't edit this file. To overriding settings please use instance/production.py
+# Don't edit this file. To override settings please use instance/production.py
 import os
 from collections import OrderedDict
 
 from flask_babel import lazy_gettext as _
 
-VERSION = '3.11.0'
+VERSION = '3.15.0'
 DEMO_MODE = False  # If in demo mode some options are disabled and the login form is pre filled
 
 LANGUAGES = {'en': 'English', 'de': 'Deutsch'}
@@ -22,7 +22,11 @@ IMPORT_FOLDER_PATH = '/tmp'  # Needed for processing of import files, any temp f
 IMPORT_FILE_EXTENSIONS = ['csv', 'xls', 'xlsx']
 EXPORT_FOLDER_PATH = os.path.dirname(__file__) + '/../openatlas/export'
 UPLOAD_FOLDER_PATH = os.path.dirname(__file__) + '/../openatlas/uploads'
-DISPLAY_FILE_EXTENSIONS = ['bmp', 'gif', 'ico', 'jpeg', 'jpg', 'png']
+DISPLAY_FILE_EXTENSIONS = ['bmp', 'gif', 'ico', 'jpeg', 'jpg', 'png', 'svg']
+
+# JavaScript credentials
+GEONAMES_USERNAME = 'openatlas'
+THUNDERFOREST_KEY = '7878b4fb224f4902ab42fc846e92b96a'
 
 DEFAULT_TABLE_ROWS = OrderedDict()
 DEFAULT_TABLE_ROWS[10] = '10'
@@ -30,9 +34,6 @@ DEFAULT_TABLE_ROWS[20] = '20'
 DEFAULT_TABLE_ROWS[50] = '50'
 DEFAULT_TABLE_ROWS[100] = '100'
 
-# Minimum characters to trigger search for jsTree and tablesorter
-# Raise it (e.g. to 3) for huge data sets to prevent the website from getting unresponsive
-MIN_CHARS_TABLESORTER_SEARCH = 1
 MIN_CHARS_JSTREE_SEARCH = 1
 
 LOG_LEVELS = OrderedDict()
@@ -77,13 +78,13 @@ PROPERTY_TYPES = ['Actor Actor Relation', 'Actor Function', 'Involvement']
 # Default table columns based on class
 TABLE_HEADERS = {
     'source': ['name', 'type', 'description'],
-    'event': ['name', 'class', 'type', 'first', 'last'],
-    'actor': ['name', 'class', 'first', 'last'],
-    'group': ['name', 'class', 'first', 'last'],
-    'place': ['name', 'type', 'first', 'last'],
-    'feature': ['name', 'type', 'first', 'last'],
-    'stratigraphic-unit': ['name', 'type', 'first', 'last'],
-    'find': ['name', 'type', 'first', 'last'],
+    'event': ['name', 'class', 'type', 'begin', 'end'],
+    'actor': ['name', 'class', 'begin', 'end'],
+    'group': ['name', 'class', 'begin', 'end'],
+    'place': ['name', 'type', 'begin', 'end'],
+    'feature': ['name', 'type', 'begin', 'end'],
+    'stratigraphic-unit': ['name', 'type', 'begin', 'end'],
+    'find': ['name', 'type', 'begin', 'end'],
     'reference': ['name', 'class', 'type'],
     'file': ['name', 'license', 'size', 'extension', 'description']}
 

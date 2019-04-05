@@ -11,6 +11,8 @@ __pycache__/*
 # unit tests
 openatlas/tests/.coverage
 openatlas/tests/cover
+.coverage
+cover
 
 # created files 
 openatlas/uploads/*

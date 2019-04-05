@@ -1,6 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import os
 
+import datetime
 import math
 from flask import flash, g, render_template, request, send_from_directory, session, url_for
 from flask_babel import lazy_gettext as _
@@ -13,10 +14,10 @@ import openatlas
 from openatlas import app, logger
 from openatlas.forms.forms import build_form
 from openatlas.models.entity import EntityMapper
-from openatlas.models.link import LinkMapper
-from openatlas.util.util import (build_table_form, convert_size, display_remove_link,
-                                 get_base_table_data, get_entity_data, get_file_path, get_view_name,
-                                 is_authorized, link, required_group, uc_first, was_modified)
+from openatlas.util.util import (build_table_form, convert_size, display_remove_link, format_date,
+                                 get_base_table_data, get_entity_data, get_file_path, is_authorized,
+                                 link, required_group, truncate_string, uc_first, was_modified,
+                                 get_file_stats)
 
 
 class FileForm(Form):
@@ -57,22 +58,47 @@ def display_file(filename):
 
 
 @app.route('/display_logo/<path:filename>')
-def display_logo(filename):  # extra file display function for public
+def display_logo(filename):  # File display function for public
     return send_from_directory(app.config['UPLOAD_FOLDER_PATH'], filename)
+
+
+@app.route('/file/set_as_profile_image/<int:id_>/<int:origin_id>')
+def file_set_as_profile_image(id_, origin_id):
+    EntityMapper.set_profile_image(id_, origin_id)
+    origin = EntityMapper.get_by_id(origin_id)
+    return redirect(url_for(app.config['CODE_CLASS'][origin.class_.code] + '_view', id_=origin.id))
+
+
+@app.route('/file/set_as_profile_image/<int:entity_id>')
+def file_remove_profile_image(entity_id):
+    entity = EntityMapper.get_by_id(entity_id)
+    entity.remove_profile_image()
+    return redirect(url_for(app.config['CODE_CLASS'][entity.class_.code] + '_view', id_=entity.id))
 
 
 @app.route('/file/index')
 @required_group('readonly')
 def file_index():
-    table = {'id': 'files', 'header': app.config['TABLE_HEADERS']['file'],
-             'data': [get_base_table_data(f) for f in EntityMapper.get_by_system_type('file')]}
+    table = {'id': 'files', 'header': ['date'] + app.config['TABLE_HEADERS']['file'], 'data': []}
+    file_stats = get_file_stats()
+    for entity in EntityMapper.get_by_system_type('file'):
+        date = 'N/A'
+        if entity.id in file_stats:
+            date = format_date(datetime.datetime.utcfromtimestamp(file_stats[entity.id]['date']))
+        table['data'].append([
+            date, link(entity), entity.print_base_type(),
+            convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
+            file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
+            truncate_string(entity.description)])
+    if os.name != "posix":   # pragma: no cover
+        # For other operating systems e.g. Windows, we would need adaptions here
+        return render_template('file/index.html', table=table, disk_space_values={})
     statvfs = os.statvfs(app.config['UPLOAD_FOLDER_PATH'])
     disk_space = statvfs.f_frsize * statvfs.f_blocks
-    free_space = statvfs.f_frsize * statvfs.f_bavail  # available space without reserved blocks
-    disk_space_values = {
-        'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
-        'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
-        'percent': 100 - math.ceil(free_space / (disk_space / 100))}
+    free_space = statvfs.f_frsize * statvfs.f_bavail  # Available space without reserved blocks
+    disk_space_values = {'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
+                         'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
+                         'percent': 100 - math.ceil(free_space / (disk_space / 100))}
     return render_template('file/index.html', table=table, disk_space_values=disk_space_values)
 
 
@@ -82,16 +108,8 @@ def file_add(origin_id):
     """ Link an entity to file coming from the entity."""
     origin = EntityMapper.get_by_id(origin_id)
     if request.method == 'POST':
-        g.cursor.execute('BEGIN')
-        try:
-            for entity in EntityMapper.get_by_ids(request.form.getlist('values')):
-                entity.link('P67', origin)
-            g.cursor.execute('COMMIT')
-        except Exception as e:  # pragma: no cover
-            g.cursor.execute('ROLLBACK')
-            logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
-        return redirect(url_for(get_view_name(origin) + '_view', id_=origin.id) + '#tab-file')
+        origin.link('P67', request.form.getlist('values'), inverse=True)
+        return redirect(url_for(origin.view_name + '_view', id_=origin.id) + '#tab-file')
     form = build_table_form('file', origin.get_linked_entities('P67', True))
     return render_template('file/add.html', origin=origin, form=form)
 
@@ -102,21 +120,16 @@ def file_add2(id_, class_name):
     """ Link an entity to file coming from the file"""
     file = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
-        for entity in EntityMapper.get_by_ids(request.form.getlist('values')):
-            file.link('P67', entity)
+        file.link('P67', request.form.getlist('values'))
         return redirect(url_for('file_view', id_=file.id) + '#tab-' + class_name)
     form = build_table_form(class_name, file.get_linked_entities('P67'))
     return render_template('file/add2.html', entity=file, class_name=class_name, form=form)
 
 
 @app.route('/file/view/<int:id_>')
-@app.route('/file/view/<int:id_>/<int:unlink_id>')
 @required_group('readonly')
-def file_view(id_, unlink_id=None):
+def file_view(id_):
     file = EntityMapper.get_by_id(id_)
-    if unlink_id:
-        LinkMapper.delete_by_id(unlink_id)
-        flash(_('link removed'), 'info')
     path = get_file_path(file.id)
     tables = {'info': get_entity_data(file)}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find',
@@ -124,12 +137,13 @@ def file_view(id_, unlink_id=None):
         header = app.config['TABLE_HEADERS'][name] + (['page'] if name == 'reference' else [])
         tables[name] = {'id': name, 'data': [], 'header': header}
     for link_ in file.get_links('P67'):
-        view_name = get_view_name(link_.range)
-        view_name = view_name if view_name != 'place' else link_.range.system_type.replace(' ', '-')
-        data = get_base_table_data(link_.range)
+        range_ = link_.range
+        data = get_base_table_data(range_)
+        view_name = range_.view_name
+        view_name = view_name if view_name != 'place' else range_.system_type.replace(' ', '-')
         if is_authorized('editor'):
-            unlink_url = url_for('file_view', id_=file.id, unlink_id=link_.id) + '#tab-' + view_name
-            data.append(display_remove_link(unlink_url, link_.range.name))
+            url = url_for('link_delete', id_=link_.id, origin_id=file.id)
+            data.append(display_remove_link(url + '#tab-' + view_name, range_.name))
         tables[view_name]['data'].append(data)
     for link_ in file.get_links('P67', True):
         data = get_base_table_data(link_.domain)
@@ -137,16 +151,12 @@ def file_view(id_, unlink_id=None):
         if is_authorized('editor'):
             update_url = url_for('reference_link_update', link_id=link_.id, origin_id=file.id)
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
-            unlink_url = url_for('file_view', id_=file.id, unlink_id=link_.id) + '#tab-reference'
-            data.append(display_remove_link(unlink_url, link_.domain.name))
+            unlink_url = url_for('link_delete', id_=link_.id, origin_id=file.id)
+            data.append(display_remove_link(unlink_url + '#tab-reference', link_.domain.name))
         tables['reference']['data'].append(data)
-    return render_template(
-        'file/view.html',
-        missing_file=False if path else True,
-        entity=file,
-        tables=tables,
-        preview=True if path and preview_file(path) else False,
-        filename=os.path.basename(path) if path else False)
+    return render_template('file/view.html', missing_file=False if path else True, entity=file,
+                           tables=tables, preview=True if path and preview_file(path) else False,
+                           filename=os.path.basename(path) if path else False)
 
 
 @app.route('/file/update/<int:id_>', methods=['GET', 'POST'])
@@ -174,25 +184,23 @@ def file_insert(origin_id=None):
     form = build_form(FileForm, 'File')
     if form.validate_on_submit():
         return redirect(save(form, origin=origin))
-    return render_template('file/insert.html', form=form, origin=origin)
+    writeable = True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False
+    return render_template('file/insert.html', form=form, origin=origin, writeable=writeable)
 
 
 @app.route('/file/delete/<int:id_>')
 @required_group('editor')
 def file_delete(id_=None):
-    g.cursor.execute('BEGIN')
     try:
         EntityMapper.delete(id_)
         logger.log_user(id_, 'delete')
-        g.cursor.execute('COMMIT')
     except Exception as e:  # pragma: no cover
-        g.cursor.execute('ROLLBACK')
-        logger.log('error', 'database', 'transaction failed', e)
-        flash(_('error transaction'), 'error')
+        logger.log('error', 'database', 'Deletion failed', e)
+        flash(_('error database'), 'error')
     try:
         path = get_file_path(id_)
         if path:
-            os.remove(get_file_path(id_))
+            os.remove(path)
     except Exception as e:  # pragma: no cover
         logger.log('error', 'file', 'file deletion failed', e)
         flash(_('error file delete'), 'error')
@@ -223,7 +231,7 @@ def save(form, file=None, origin=None):
                 url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
             else:
                 file.link('P67', origin)
-                url = url_for(get_view_name(origin) + '_view', id_=origin.id) + '#tab-file'
+                url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-file'
         g.cursor.execute('COMMIT')
         logger.log_user(file.id, log_action)
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')

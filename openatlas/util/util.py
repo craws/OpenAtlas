@@ -1,20 +1,21 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import glob
 import os
+import re
 import smtplib
 from collections import OrderedDict
+from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
+from functools import wraps
 from html.parser import HTMLParser
 
 import numpy
-import re
 from babel import dates
-from datetime import datetime
 from flask import abort, flash, g, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
-from functools import wraps
+from flask_wtf.csrf import generate_csrf
 from numpy import math
 from werkzeug.utils import redirect
 
@@ -36,13 +37,13 @@ def convert_size(size_bytes):
 
 
 def get_file_path(entity):
-    entity_id = entity if isinstance(entity, int) else entity.id
+    entity_id = entity if type(entity) is int else entity.id
     path = glob.glob(os.path.join(app.config['UPLOAD_FOLDER_PATH'], str(entity_id) + '.*'))
     return path[0] if path else None
 
 
 def print_file_size(entity):
-    entity_id = entity if isinstance(entity, int) else entity.id
+    entity_id = entity if type(entity) is int else entity.id
     path = get_file_path(entity_id)
     return convert_size(os.path.getsize(path)) if path else 'N/A'
 
@@ -54,7 +55,7 @@ def display_tooltip(text):
 
 
 def print_file_extension(entity):
-    entity_id = entity if isinstance(entity, int) else entity.id
+    entity_id = entity if type(entity) is int else entity.id
     path = get_file_path(entity_id)
     return os.path.splitext(path)[1] if path else 'N/A'
 
@@ -62,7 +63,7 @@ def print_file_extension(entity):
 def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
     """ Send one mail to every recipient, set log_body to False for sensitive data e.g. passwords"""
     settings = session['settings']
-    recipients = recipients if isinstance(recipients, list) else [recipients]
+    recipients = recipients if type(recipients) is list else [recipients]
     if not settings['mail'] or len(recipients) < 1:
         return
     mail_user = settings['mail_transport_username']
@@ -112,19 +113,12 @@ class MLStripper(HTMLParser):
         return ''.join(self.fed)
 
 
-def get_view_name(entity):
-    if entity.system_type == 'file':
-        return 'file'
-    if entity.class_.code in app.config['CODE_CLASS']:
-        return app.config['CODE_CLASS'][entity.class_.code]
-
-
 def sanitize(string, mode=None):
     if not mode:
-        """Remove all characters from a string except ASCII letters and numbers"""
+        # Remove all characters from a string except ASCII letters and numbers
         return re.sub('[^A-Za-z0-9]+', '', string)
     if mode == 'node':
-        """Remove all characters from a string except letters, numbers and spaces"""
+        # Remove all characters from a string except letters, numbers and spaces
         return re.sub(r'([^\s\w]|_)+', '', string).strip()
     if mode == 'description':
         s = MLStripper()
@@ -132,14 +126,25 @@ def sanitize(string, mode=None):
         return s.get_data()
 
 
+def get_file_stats(path=app.config['UPLOAD_FOLDER_PATH']):
+    """ Build a dict with file ids and stats from files in given directory.
+        It's much faster to do this in one call for every file."""
+    file_stats = {}
+    for file in os.scandir(path):
+        split_name = os.path.splitext(file.name)
+        if len(split_name) > 1 and split_name[0].isdigit():
+            file_stats[int(split_name[0])] = {'ext': split_name[1], 'size': file.stat().st_size,
+                                              'date': file.stat().st_ctime}
+    return file_stats
+
+
 def build_table_form(class_name, linked_entities):
     """ Returns a form with a list of entities with checkboxes"""
     from openatlas.models.entity import EntityMapper
-    # Todo: add CSRF token
-    form = '<form class="table" method="post">'
     header = app.config['TABLE_HEADERS'][class_name] + ['']
     table = {'id': class_name, 'header': header, 'data': []}
     linked_ids = [entity.id for entity in linked_entities]
+    file_stats = get_file_stats() if class_name == 'file' else None
     if class_name == 'file':
         entities = EntityMapper.get_by_system_type('file')
     elif class_name == 'place':
@@ -150,13 +155,13 @@ def build_table_form(class_name, linked_entities):
         if entity.id in linked_ids:
             continue  # Don't show already linked entries
         input_ = '<input id="{id}" name="values" type="checkbox" value="{id}">'.format(id=entity.id)
-        table['data'].append(get_base_table_data(entity) + [input_])
+        table['data'].append(get_base_table_data(entity, file_stats) + [input_])
     if not table['data']:
         return uc_first(_('no entries'))
-    form += pager(table)
-    form += '<button name="form-submit" id="form-submit" type="submit">'
-    form += uc_first(_('add')) + '</button></form>'
-    return form
+    return """<form class="table" method="post">
+                <input id="csrf_token" name="csrf_token" type="hidden" value="{token}">
+                {pager} <button name="form-submit" id="form-submit" type="submit">{add}</button>
+              </form>""".format(add=uc_first(_('add')), pager=pager(table), token=generate_csrf())
 
 
 def display_remove_link(url, name):
@@ -166,14 +171,8 @@ def display_remove_link(url, name):
     return '<a ' + confirm + ' href="' + url + '">' + uc_first(_('remove')) + '</a>'
 
 
-def get_entity_data(entity, location=None):
-    """
-    Return related entity information for a table for view.
-    The location parameter is for places which have a location attached.
-    """
-    data = []
+def add_type_data(entity, data, location=None):
     type_data = OrderedDict()
-
     # Nodes
     if location:
         entity.nodes.update(location.nodes)  # Add location types
@@ -182,10 +181,13 @@ def get_entity_data(entity, location=None):
         name = 'type' if root.name in app.config['BASE_TYPES'] else root.name
         if root.name not in type_data:
             type_data[name] = []
-        html = link(node) + (': ' + format_number(node_value) if root.value_type else '')
-        type_data[name].append(html)
+        text = ''
+        if root.value_type:  # Text for value types
+            text = ': {value} <span style="font-style:italic;">{description}</span>'.format(
+                value=format_number(node_value), description=node.description)
+        type_data[name].append(link(node) + text)
 
-    # Sort by name
+    # Sort types by name
     type_data = OrderedDict(sorted(type_data.items(), key=lambda t: t[0]))
     for root_type in type_data:
         type_data[root_type].sort()
@@ -195,74 +197,10 @@ def get_entity_data(entity, location=None):
         type_data.move_to_end('type', last=False)
     for root_name, nodes in type_data.items():
         data.append((root_name, '<br />'.join(nodes)))
+    return data
 
-    # Info for places
-    if entity.class_.code in app.config['CLASS_CODES']['place']:
-        aliases = entity.get_linked_entities('P1')
-        if aliases:
-            data.append((uc_first(_('alias')), '<br />'.join([x.name for x in aliases])))
 
-    # Info for files
-    if entity.system_type == 'file':
-        data.append((uc_first(_('size')), print_file_size(entity)))
-        data.append((uc_first(_('extension')), print_file_extension(entity)))
-
-    # Info for events
-    if entity.class_.code in app.config['CLASS_CODES']['event']:
-        super_event = entity.get_linked_entity('P117')
-        if super_event:
-            data.append((uc_first(_('sub event of')), link(super_event)))
-        place = entity.get_linked_entity('P7')
-        if place:
-            data.append((uc_first(_('location')), link(place.get_linked_entity('P53', True))))
-        # Info for acquisitions
-        if entity.class_.code == 'E8':
-            recipients = entity.get_linked_entities('P22')
-            if recipients:
-                html = ''
-                for recipient in recipients:
-                    html += link(recipient) + '<br />'
-                data.append((uc_first(_('recipient')), html))
-            donors = entity.get_linked_entities('P23')
-            if donors:
-                html = ''
-                for donor in donors:
-                    html += link(donor) + '<br />'
-                data.append((uc_first(_('donor')), html))
-            given_places = entity.get_linked_entities('P24')
-            if given_places:
-                html = ''
-                for given_place in given_places:
-                    html += link(given_place) + '<br />'
-                data.append((uc_first(_('given place')), html))
-
-    # Info for actors
-    if entity.class_.code in app.config['CLASS_CODES']['actor']:
-        aliases = entity.get_linked_entities('P131')
-        if aliases:
-            data.append((uc_first(_('alias')), '<br />'.join([x.name for x in aliases])))
-
-    # Dates
-    date_types = OrderedDict([
-        ('OA1', _('first')),
-        ('OA3', _('birth')),
-        ('OA2', _('last')),
-        ('OA4', _('death')),
-        ('OA5', _('begin')),
-        ('OA6', _('end'))])
-    for code, label in date_types.items():
-        if code in entity.dates:
-            if 'exact date value' in entity.dates[code]:
-                html = format_date(entity.dates[code]['exact date value']['date'])
-                html += ' ' + entity.dates[code]['exact date value']['info']
-                data.append((uc_first(label), html))
-            else:
-                html = uc_first(_('between')) + ' '
-                html += format_date(entity.dates[code]['from date value']['date'])
-                html += ' and ' + format_date(entity.dates[code]['to date value']['date'])
-                html += ' ' + entity.dates[code]['from date value']['info']
-                data.append((uc_first(label), html))
-
+def add_system_data(entity, data):
     # Additional info for advanced layout
     if hasattr(current_user, 'settings') and current_user.settings['layout'] == 'advanced':
         data.append((uc_first(_('class')), link(entity.class_)))
@@ -277,17 +215,62 @@ def get_entity_data(entity, location=None):
             data.append((_('imported by'), link(info['import_user'])))
         if info['import_origin_id']:
             data.append(('origin ID', info['import_origin_id']))
-
     return data
+
+
+def get_entity_data(entity, location=None):
+    """
+    Return related entity information for a table for view.
+    The location parameter is for places which have a location attached.
+    """
+    data = []
+
+    # Alias for places
+    if entity.class_.code in app.config['CLASS_CODES']['place']:
+        aliases = entity.get_linked_entities('P1')
+        if aliases:
+            data.append((uc_first(_('alias')), '<br />'.join([x.name for x in aliases])))
+
+    # Dates
+    data.append((uc_first(_('begin')), format_entry_begin(entity)))
+    data.append((uc_first(_('end')), format_entry_end(entity)))
+
+    # Types
+    add_type_data(entity, data, location=location)
+
+    # Info for files
+    if entity.system_type == 'file':
+        data.append((uc_first(_('size')), print_file_size(entity)))
+        data.append((uc_first(_('extension')), print_file_extension(entity)))
+
+    # Info for events
+    if entity.class_.code in app.config['CLASS_CODES']['event']:
+        super_event = entity.get_linked_entity('P117')
+        if super_event:
+            data.append((uc_first(_('sub event of')), link(super_event)))
+        place = entity.get_linked_entity('P7')
+        if place:
+            data.append((uc_first(_('location')), link(place.get_linked_entity('P53', True))))
+
+        # Info for acquisitions
+        if entity.class_.code == 'E8':
+            data.append((uc_first(_('recipient')), '<br />'.join(
+                [link(recipient) for recipient in entity.get_linked_entities('P22')])))
+            data.append((uc_first(_('donor')), '<br />'.join(
+                [link(donor) for donor in entity.get_linked_entities('P23')])))
+            data.append((uc_first(_('given place')), '<br />'.join(
+                [link(place) for place in entity.get_linked_entities('P24')])))
+
+    return add_system_data(entity, data)
 
 
 def add_dates_to_form(form, for_person=False):
     errors = {}
     valid_dates = True
-    for field_name in ['date_begin_year', 'date_begin_month', 'date_begin_day',
-                       'date_begin_year2', 'date_begin_month2', 'date_begin_day2',
-                       'date_end_year', 'date_end_month', 'date_end_day',
-                       'date_end_year2', 'date_end_month2', 'date_end_day2']:
+    for field_name in ['begin_year_from', 'begin_month_from', 'begin_day_from',
+                       'begin_year_to', 'begin_month_to', 'begin_day_to',
+                       'end_year_from', 'end_month_from', 'end_day_from',
+                       'end_year_to', 'end_month_to', 'end_day_to']:
         errors[field_name] = ''
         if getattr(form, field_name).errors:
             valid_dates = False
@@ -304,39 +287,35 @@ def add_dates_to_form(form, for_person=False):
             <div class="table-cell date-switcher">
                 <span id="date-switcher" class="button">{show}</span>
             </div>
-        </div>""".format(
-        date=uc_first(_('date')),
-        tooltip=display_tooltip(_('tooltip date')),
-        show=uc_first(_('show')))
+        </div>""".format(date=uc_first(_('date')), tooltip=display_tooltip(_('tooltip date')),
+                         show=uc_first(_('show')))
     html += '<div class="table-row date-switch" ' + style + '>'
-    html += '<div>' + str(form.date_begin_year.label).title() + '</div><div class="table-cell">'
-    html += str(form.date_begin_year(class_='year')) + ' ' + errors['date_begin_year'] + ' '
-    html += str(form.date_begin_month(class_='month')) + ' ' + errors['date_begin_month'] + ' '
-    html += str(form.date_begin_day(class_='day')) + ' ' + errors['date_begin_day'] + ' '
-    html += str(form.date_begin_info())
+    html += '<div>' + uc_first(_('birth') if for_person else _('begin')) + '</div>'
+    html += '<div class="table-cell">'
+    html += str(form.begin_year_from(class_='year')) + ' ' + errors['begin_year_from'] + ' '
+    html += str(form.begin_month_from(class_='month')) + ' ' + errors['begin_month_from'] + ' '
+    html += str(form.begin_day_from(class_='day')) + ' ' + errors['begin_day_from'] + ' '
+    html += str(form.begin_comment)
     html += '</div></div>'
     html += '<div class="table-row date-switch" ' + style + '>'
     html += '<div></div><div class="table-cell">'
-    html += str(form.date_begin_year2(class_='year')) + ' ' + errors['date_begin_year2'] + ' '
-    html += str(form.date_begin_month2(class_='month')) + ' ' + errors['date_begin_month2'] + ' '
-    html += str(form.date_begin_day2(class_='day')) + ' ' + errors['date_begin_day2'] + ' '
-    if for_person:
-        html += str(form.date_birth) + str(form.date_birth.label)
+    html += str(form.begin_year_to(class_='year')) + ' ' + errors['begin_year_to'] + ' '
+    html += str(form.begin_month_to(class_='month')) + ' ' + errors['begin_month_to'] + ' '
+    html += str(form.begin_day_to(class_='day')) + ' ' + errors['begin_day_to'] + ' '
     html += '</div></div>'
     html += '<div class="table-row date-switch" ' + style + '>'
-    html += '<div>' + str(form.date_end_year.label).title() + '</div><div class="table-cell">'
-    html += str(form.date_end_year(class_='year')) + ' ' + errors['date_end_year'] + ' '
-    html += str(form.date_end_month(class_='month')) + ' ' + errors['date_end_month'] + ' '
-    html += str(form.date_end_day(class_='day')) + ' ' + errors['date_end_day'] + ' '
-    html += str(form.date_end_info())
+    html += '<div>' + uc_first(_('death') if for_person else _('end')) + '</div>'
+    html += '<div class="table-cell">'
+    html += str(form.end_year_from(class_='year')) + ' ' + errors['end_year_from'] + ' '
+    html += str(form.end_month_from(class_='month')) + ' ' + errors['end_month_from'] + ' '
+    html += str(form.end_day_from(class_='day')) + ' ' + errors['end_day_from'] + ' '
+    html += str(form.end_comment)
     html += '</div></div>'
     html += '<div class="table-row date-switch"' + style + '>'
     html += '<div></div><div class="table-cell">'
-    html += str(form.date_end_year2(class_='year')) + ' ' + errors['date_end_year2'] + ' '
-    html += str(form.date_end_month2(class_='month')) + ' ' + errors['date_end_month2'] + ' '
-    html += str(form.date_end_day2(class_='day')) + ' ' + errors['date_end_day2'] + ' '
-    if for_person:
-        html += str(form.date_death) + str(form.date_death.label)
+    html += str(form.end_year_to(class_='year')) + ' ' + errors['end_year_to'] + ' '
+    html += str(form.end_month_to(class_='month')) + ' ' + errors['end_month_to'] + ' '
+    html += str(form.end_day_to(class_='day')) + ' ' + errors['end_day_to'] + ' '
     html += '</div></div>'
     return html
 
@@ -358,13 +337,24 @@ def required_group(group):
 
 def bookmark_toggle(entity_id, for_table=False):
     label = uc_first(_('bookmark'))
+    html = """
+        <script>
+            var csrf_token = '{csrfToken}';
+            $.ajaxSetup({{
+                beforeSend: function(xhr, settings) {{
+                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {{
+                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
+                    }}
+                }}
+            }});
+        </script>""".format(csrfToken=generate_csrf())
     if entity_id in current_user.bookmarks:
         label = uc_first(_('bookmark remove'))
     if for_table:
-        html = """<a id="bookmark{entity_id}" onclick="ajaxBookmark('{entity_id}');"
+        html += """<a id="bookmark{entity_id}" onclick="ajaxBookmark('{entity_id}');"
             style="cursor:pointer;">{label}</a>""".format(entity_id=entity_id, label=label)
     else:
-        html = """<button id="bookmark{entity_id}" onclick="ajaxBookmark('{entity_id}');"
+        html += """<button id="bookmark{entity_id}" onclick="ajaxBookmark('{entity_id}');"
             type="button">{label}</button>""".format(entity_id=entity_id, label=label)
     return html
 
@@ -381,9 +371,7 @@ def is_authorized(group):
 
 
 def uc_first(string):
-    if not string:
-        return ''
-    return str(string)[0].upper() + str(string)[1:]
+    return str(string)[0].upper() + str(string)[1:] if string else ''
 
 
 def format_datetime(value, format_='medium'):
@@ -393,30 +381,41 @@ def format_datetime(value, format_='medium'):
 def format_date(value, format_='medium'):
     if not value:
         return ''
-    if isinstance(value, numpy.datetime64):
+    if type(value) is numpy.datetime64:
         return DateMapper.datetime64_to_timestamp(value)
     return dates.format_date(value, format=format_, locale=session['language'])
 
 
+def get_profile_image_table_link(file, entity, extension, profile_image_id):
+    if file.id == profile_image_id:
+        url = url_for('file_remove_profile_image', entity_id=entity.id)
+        return '<a href="' + url + '">' + uc_first(_('unset')) + '</a>'
+    elif extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+        url = url_for('file_set_as_profile_image', id_=file.id, origin_id=entity.id)
+        return '<a href="' + url + '">' + uc_first(_('set')) + '</a>'
+    return ''  # pragma: no cover - only happens for non image files
+
+
 def link(entity):
+    # Builds an html link to entity view for display
     from openatlas.models.entity import Entity
     if not entity:
         return ''
     html = ''
-    if isinstance(entity, Project):
+    if type(entity) is Project:
         url = url_for('import_project_view', id_=entity.id)
         html = '<a href="' + url + '">' + entity.name + '</a>'
-    elif isinstance(entity, User):
+    elif type(entity) is User:
         style = '' if entity.active else 'class="inactive"'
         url = url_for('user_view', id_=entity.id)
         html = '<a ' + style + ' href="' + url + '">' + entity.username + '</a>'
-    elif isinstance(entity, ClassObject):
+    elif type(entity) is ClassObject:
         url = url_for('class_view', code=entity.code)
         html = '<a href="' + url + '">' + entity.code + '</a>'
-    elif isinstance(entity, Property):
+    elif type(entity) is Property:
         url = url_for('property_view', code=entity.code)
         html = '<a href="' + url + '">' + entity.code + '</a>'
-    elif isinstance(entity, Entity):
+    elif type(entity) is Entity:
         url = ''
         if entity.class_.code == 'E33':
             if entity.system_type == 'source content':
@@ -437,8 +436,6 @@ def link(entity):
             url = url_for('node_view', id_=entity.id)
             if not entity.root:
                 url = url_for('node_index') + '#tab-' + str(entity.id)
-        if entity.class_.code == 'E61':
-            return entity.name
         if not url:
             return entity.name + ' (' + entity.class_.name + ')'
         return '<a href="' + url + '">' + truncate_string(entity.name) + '</a>'
@@ -459,7 +456,7 @@ def truncate_string(string, length=40, span=True):
     return '<span title="' + string.replace('"', '') + '">' + string[:length] + '..' + '</span>'
 
 
-def pager(table):
+def pager(table, remove_rows=True):
     if not table['data']:
         return '<p>' + uc_first(_('no entries')) + '</p>'
     html = ''
@@ -472,6 +469,10 @@ def pager(table):
         for amount in app.config['DEFAULT_TABLE_ROWS']:
             options += '<option value="{amount}"{selected}>{amount}</option>'.format(
                 amount=amount, selected=' selected="selected"' if amount == table_rows else '')
+        placeholder = uc_first(_('type to search'))
+        if int(session['settings']['minimum_tablesorter_search']) > 1:  # pragma: no cover
+            placeholder += ' (' + _('min %(limit)s chars',
+                                    limit=session['settings']['minimum_tablesorter_search']) + ')'
         html += """
             <div id="{id}-pager" class="pager">
                 <div class="navigation first"></div>
@@ -483,9 +484,9 @@ def pager(table):
                 <div class="navigation last"></div>
                 <div><select class="pagesize">{options}</select></div>
                 <input id="{id}-search" class="search" type="text" data-column="all"
-                    placeholder="{filter}">
+                    placeholder="{placeholder}">
             </div><div style="clear:both;"></div>
-            """.format(id=table['id'], filter=uc_first(_('filter')), options=options)
+            """.format(id=table['id'], options=options, placeholder=placeholder)
     html += '<table id="{id}-table" class="tablesorter"><thead><tr>'.format(id=table['id'])
     for header in table['header']:
         style = '' if header else 'class=sorter-false '  # only show and sort headers with a title
@@ -520,16 +521,14 @@ def pager(table):
                 }}}})
             .tablesorterPager({{
                 delayInit: true,
-                removeRows: true,
+                {remove_rows}
                 positionFixed: false,
                 container: $("#{id}-pager"),
                 size:{size}}});
-        """.format(
-            id=table['id'],
-            sort=sort,
-            size=table_rows,
-            filter_liveSearch=app.config['MIN_CHARS_TABLESORTER_SEARCH'],
-            headers=(table['headers'] + ',') if 'headers' in table else '')
+        """.format(id=table['id'], sort=sort, size=table_rows,
+                   remove_rows='removeRows: true,' if remove_rows else '',
+                   filter_liveSearch=session['settings']['minimum_tablesorter_search'],
+                   headers=(table['headers'] + ',') if 'headers' in table else '')
     else:
         html += """
             $("#{id}-table").tablesorter({{
@@ -540,39 +539,101 @@ def pager(table):
                     filter_external: "#{id}-search",
                     filter_columnFilters: false
                 }}}});
-        """.format(
-            id=table['id'], sort=sort, filter_liveSearch=app.config['MIN_CHARS_JSTREE_SEARCH'])
+        """.format(id=table['id'], sort=sort,
+                   filter_liveSearch=session['settings']['minimum_jstree_search'])
     html += '</script>'
     return html
 
 
-def get_base_table_data(entity):
+def get_base_table_data(entity, file_stats=None):
     """ Returns standard table data for an entity"""
-    data = []
-    view_name = get_view_name(entity)
-    data.append(link(entity))
-    if view_name in ['event', 'actor']:
+    data = [link(entity)]
+    if entity.view_name in ['event', 'actor']:
         data.append(g.classes[entity.class_.code].name)
-    if view_name in ['reference'] and entity.system_type != 'file':
+    if entity.view_name in ['reference'] and entity.system_type != 'file':
         data.append(uc_first(_(entity.system_type)))
-    if view_name in ['event', 'place', 'source', 'reference', 'file']:
+    if entity.view_name in ['event', 'place', 'source', 'reference', 'file']:
         data.append(entity.print_base_type())
     if entity.system_type == 'file':
-        data.append(print_file_size(entity))
-        data.append(print_file_extension(entity))
-    if view_name in ['event', 'actor', 'place']:
-        data.append(format(entity.first))
-        data.append(format(entity.last))
-    if view_name in ['source'] or entity.system_type == 'file':
+        if file_stats:
+            data.append(convert_size(
+                file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A')
+            data.append(
+                file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A')
+        else:
+            data.append(print_file_size(entity))
+            data.append(print_file_extension(entity))
+    if entity.view_name in ['event', 'actor', 'place']:
+        data.append(entity.first)
+        data.append(entity.last)
+    if entity.view_name in ['source'] or entity.system_type == 'file':
         data.append(truncate_string(entity.description))
     return data
 
 
 def was_modified(form, entity):  # pragma: no cover
-    """Checks if an entity was modified after an update form was opened."""
+    """ Checks if an entity was modified after an update form was opened."""
     if not entity.modified or not form.opened.data:
         return False
     if entity.modified < datetime.fromtimestamp(float(form.opened.data)):
         return False
     openatlas.logger.log('info', 'multi user', 'Multi user overwrite prevented.')
     return True
+
+
+def format_entry_begin(entry, object_=None):
+    html = link(object_)
+    if entry.begin_from:
+        html += ', ' if html else ''
+        if entry.begin_to:
+            html += _('between %(begin)s and %(end)s',
+                      begin=format_date(entry.begin_from), end=format_date(entry.begin_to))
+        else:
+            html += format_date(entry.begin_from)
+    html += (' (' + entry.begin_comment + ')') if entry.begin_comment else ''
+    return html
+
+
+def format_entry_end(entry, object_=None):
+    html = link(object_)
+    if entry.end_from:
+        html += ', ' if html else ''
+        if entry.end_to:
+            html += _('between %(begin)s and %(end)s',
+                      begin=format_date(entry.end_from), end=format_date(entry.end_to))
+        else:
+            html += format_date(entry.end_from)
+    html += (' (' + entry.end_comment + ')') if entry.end_comment else ''
+    return html
+
+
+def get_appearance(event_links):
+    # Get first/last appearance from events for actors without begin/end
+    first_year = None
+    last_year = None
+    first_string = None
+    last_string = None
+    for link_ in event_links:
+        event = link_.domain
+        actor = link_.range
+        event_link = '<a href="{url}">{label}</a> '.format(label=uc_first(_('event')),
+                                                           url=url_for('event_view', id_=event.id))
+        if not actor.first:
+            if link_.first and (not first_year or int(link_.first) < int(first_year)):
+                first_year = link_.first
+                first_string = format_entry_begin(link_) + ' ' + _('at an') + ' ' + event_link
+                first_string += (' ' + _('in') + ' ' + link(link_.object_)) if link_.object_ else ''
+            elif event.first and (not first_year or int(event.first) < int(first_year)):
+                first_year = event.first
+                first_string = format_entry_begin(event) + ' ' + _('at an') + ' ' + event_link
+                first_string += (' ' + _('in') + ' ' + link(link_.object_)) if link_.object_ else ''
+        if not actor.last:
+            if link_.last and (not last_year or int(link_.last) > int(last_year)):
+                last_year = link_.last
+                last_string = format_entry_end(event) + ' ' + _('at an') + ' ' + event_link
+                last_string += (' ' + _('in') + ' ' + link(link_.object_)) if link_.object_ else ''
+            elif event.last and (not last_year or int(event.last) > int(last_year)):
+                last_year = event.last
+                last_string = format_entry_end(event) + ' ' + _('at an') + ' ' + event_link
+                last_string += (' ' + _('in') + ' ' + link(link_.object_)) if link_.object_ else ''
+    return first_string, last_string

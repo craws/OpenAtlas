@@ -2,6 +2,7 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
+from openatlas.models.link import LinkMapper
 from openatlas.models.settings import SettingsMapper
 from openatlas.test_base import TestBaseCase
 
@@ -14,15 +15,14 @@ class ContentTests(TestBaseCase):
             self.app.post(url_for('actor_insert', code='E21'), data={'name': 'Oliver Twist'})
             with app.test_request_context():
                 app.preprocess_request()
-                EntityMapper.insert('E61', '2017-04-01')  # add orphaned date
-                EntityMapper.insert('E31', 'One forsaken file entity', 'file')  # add orphaned file
+                EntityMapper.insert('E31', 'One forsaken file entity', 'file')  # Add orphaned file
             rv = self.app.get(url_for('admin_orphans'))
-            assert all(x in rv.data for x in [b'Oliver Twist', b'2017-04-01', b'forsaken'])
-            rv = self.app.get(url_for('admin_orphans', delete='orphans'))
-            assert b'2017-04-01' not in rv.data
-            self.app.get(url_for('admin_orphans', delete='unlinked'))
-            self.app.get(url_for('admin_orphans', delete='types'))
-            self.app.get(url_for('admin_orphans', delete='something completely different'))
+            assert all(x in rv.data for x in [b'Oliver Twist', b'forsaken'])
+            rv = self.app.get(url_for('admin_orphans_delete', parameter='orphans'))
+            assert b'Oliver Twist' not in rv.data
+            self.app.get(url_for('admin_orphans_delete', parameter='unlinked'))
+            self.app.get(url_for('admin_orphans_delete', parameter='types'))
+            self.app.get(url_for('admin_orphans_delete', parameter='whatever bogus string'))
             rv = self.app.get(url_for('admin_newsletter'))
             assert b'Newsletter' in rv.data
 
@@ -39,6 +39,27 @@ class ContentTests(TestBaseCase):
         with app.app_context():
             rv = self.app.get(url_for('admin_check_links', check='check'))
             assert b'Invalid linked entity' in rv.data
+
+    def test_dates(self):
+        self.login()
+        with app.app_context():
+            with app.test_request_context():
+                app.preprocess_request()
+                # Create invalid dates for an actor and a relation link
+                person = EntityMapper.insert('E21', 'Person')
+                event = EntityMapper.insert('E6', 'Event')
+                person.begin_from = '2018-01-31'
+                person.begin_to = '2018-01-01'
+                person.update()
+                involvement = LinkMapper.get_by_id(event.link('P11', person))
+                involvement.begin_from = '2017-01-31'
+                involvement.begin_to = '2017-01-01'
+                involvement.end_from = '2017-01-01'
+                involvement.update()
+            rv = self.app.get(url_for('admin_check_dates'))
+            assert b'Invalid dates (1)' in rv.data
+            assert b'Invalid link dates (1)' in rv.data
+            assert b'Invalid involvement dates (1)' in rv.data
 
     def test_admin(self):
         with app.app_context():
@@ -67,22 +88,24 @@ class ContentTests(TestBaseCase):
             data['reset_confirm_hours'] = '10'
             data['log_level'] = '0'
             data['site_name'] = 'Nostromo'
+            data['minimum_jstree_search'] = 3
+            data['minimum_tablesorter_search'] = 4
             rv = self.app.post(url_for('admin_general_update'), data=data, follow_redirects=True)
             assert b'Nostromo' in rv.data
             rv = self.app.get(url_for('admin_mail_update'))
             assert b'Mail transport port' in rv.data
-            data = {
-                'mail': True,
-                'mail_transport_username': 'whatever',
-                'mail_transport_host': 'localhost',
-                'mail_transport_port': '23',
-                'mail_from_email': 'max@example.com',
-                'mail_from_name': 'Max Headroom',
-                'mail_recipients_feedback': 'headroom@example.com'}
+            data = {'mail': True,
+                    'mail_transport_username': 'whatever',
+                    'mail_transport_host': 'localhost',
+                    'mail_transport_port': '23',
+                    'mail_from_email': 'max@example.com',
+                    'mail_from_name': 'Max Headroom',
+                    'mail_recipients_feedback': 'headroom@example.com'}
             rv = self.app.post(url_for('admin_mail_update'), data=data, follow_redirects=True)
             assert b'Max Headroom' in rv.data
             rv = self.app.get(url_for('admin_file'))
             assert b'jpg' in rv.data
-            rv = self.app.post(
-                url_for('admin_file'), data={'file_upload_max_size': 20}, follow_redirects=True)
+            rv = self.app.post(url_for('admin_file'),
+                               data={'file_upload_max_size': 20, 'profile_image_width': 20},
+                               follow_redirects=True)
             assert b'Changes have been saved.' in rv.data

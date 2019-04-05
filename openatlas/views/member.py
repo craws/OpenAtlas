@@ -8,11 +8,9 @@ from wtforms import HiddenField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import DateForm, TableMultiField, build_form
-from openatlas.models.date import DateMapper
+from openatlas.forms.forms import DateForm, TableMultiField, build_form, get_link_type
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
-from openatlas.models.node import NodeMapper
 from openatlas.util.util import required_group
 
 
@@ -49,9 +47,10 @@ def membership_insert(origin_id):
         g.cursor.execute('BEGIN')
         try:
             for actor in EntityMapper.get_by_ids(ast.literal_eval(form.group.data)):
-                link_id = actor.link('P107', origin, form.description.data)
-                DateMapper.save_link_dates(link_id, form)
-                NodeMapper.save_link_nodes(link_id, form)
+                link_ = LinkMapper.get_by_id(actor.link('P107', origin, form.description.data))
+                link_.set_dates(form)
+                link_.type = get_link_type(form)
+                link_.update()
             g.cursor.execute('COMMIT')
             flash(_('entity created'), 'info')
         except Exception as e:  # pragma: no cover
@@ -75,9 +74,11 @@ def member_insert(origin_id):
         g.cursor.execute('BEGIN')
         try:
             for actor in EntityMapper.get_by_ids(ast.literal_eval(form.actor.data)):
-                link_id = origin.link('P107', actor, form.description.data)
-                DateMapper.save_link_dates(link_id, form)
-                NodeMapper.save_link_nodes(link_id, form)
+                link_ = LinkMapper.get_by_id(
+                    origin.link('P107', actor, form.description.data))
+                link_.set_dates(form)
+                link_.type = get_link_type(form)
+                link_.update()
             g.cursor.execute('COMMIT')
             flash(_('entity created'), 'info')
         except Exception as e:  # pragma: no cover
@@ -97,16 +98,17 @@ def member_update(id_, origin_id):
     domain = EntityMapper.get_by_id(link_.domain.id)
     range_ = EntityMapper.get_by_id(link_.range.id)
     origin = range_ if origin_id == range_.id else domain
-    related = range_ if origin_id == domain.id else domain
     form = build_form(MemberForm, 'Member', link_, request)
     del form.actor, form.group, form.insert_and_continue
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
             link_.delete()
-            link_id = domain.link('P107', range_, form.description.data)
-            DateMapper.save_link_dates(link_id, form)
-            NodeMapper.save_link_nodes(link_id, form)
+            link_ = LinkMapper.get_by_id(
+                domain.link('P107', range_, form.description.data))
+            link_.set_dates(form)
+            link_.type = get_link_type(form)
+            link_.update()
             g.cursor.execute('COMMIT')
         except Exception as e:  # pragma: no cover
             g.cursor.execute('ROLLBACK')
@@ -115,6 +117,6 @@ def member_update(id_, origin_id):
         tab = '#tab-member-of' if origin.id == range_.id else '#tab-member'
         return redirect(url_for('actor_view', id_=origin.id) + tab)
     form.save.label.text = _('save')
-    link_.set_dates()
     form.populate_dates(link_)
+    related = range_ if origin_id == domain.id else domain
     return render_template('member/update.html', origin=origin, form=form, related=related)

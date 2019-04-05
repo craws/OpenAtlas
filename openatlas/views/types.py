@@ -1,7 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
 
-from flask import abort, flash, g, render_template, request, url_for
+from flask import abort, flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
@@ -20,6 +20,7 @@ class NodeForm(Form):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     name_inverse = StringField(_('inverse'))
     is_node_form = HiddenField()
+    unit = StringField(_('unit'))
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
@@ -29,20 +30,20 @@ class NodeForm(Form):
 @app.route('/types')
 @required_group('readonly')
 def node_index():
-    nodes = {
-        'system': OrderedDict(), 'custom': OrderedDict(),
-        'places': OrderedDict(), 'value': OrderedDict()}
+    nodes = {'system': OrderedDict(), 'custom': OrderedDict(),
+             'places': OrderedDict(), 'value': OrderedDict()}
     for id_, node in g.nodes.items():
-        if not node.root:
-            type_ = 'custom'
-            if node.class_.code == 'E53':
-                type_ = 'places'
-            elif node.system:
-                type_ = 'system'
-            elif node.value_type:
-                type_ = 'value'
-            nodes[type_][node] = tree_select(node.name)
-    return render_template('types/index.html', nodes=nodes)
+        if node.root:
+            continue
+        type_ = 'custom'
+        if node.class_.code == 'E53':
+            type_ = 'places'
+        elif node.system:
+            type_ = 'system'
+        elif node.value_type:
+            type_ = 'value'
+        nodes[type_][node] = tree_select(node.name)
+    return render_template('types/index.html', nodes=nodes, placeholder=_('type to search'))
 
 
 @app.route('/types/insert/<int:root_id>', methods=['GET', 'POST'])
@@ -80,17 +81,15 @@ def node_update(id_):
 @app.route('/types/view/<int:id_>')
 @required_group('readonly')
 def node_view(id_):
-    from openatlas.models.linkProperty import LinkPropertyMapper
+    from openatlas.models.link import LinkMapper
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]] if node.root else None
     super_ = g.nodes[node.root[0]] if node.root else None
-
     header = [_('name'), _('class'), _('info')]
     if root and root.value_type:  # pragma: no cover
         header = [_('name'), _('value'), _('class'), _('info')]
     tables = {'entities': {'id': 'entities', 'header': header, 'data': []},
               'info': get_entity_data(node)}
-
     for entity in node.get_linked_entities(['P2', 'P89'], True):
         # If it is a place location get the corresponding object
         entity = entity if node.class_.code == 'E55' else entity.get_linked_entity('P53', True)
@@ -102,10 +101,9 @@ def node_view(id_):
             data.append(truncate_string(entity.description))
             tables['entities']['data'].append(data)
     tables['link_entities'] = {'id': 'link_items', 'header': [_('domain'), _('range')], 'data': []}
-    for row in LinkPropertyMapper.get_entities_by_node(node):
-        tables['link_entities']['data'].append([
-            link(EntityMapper.get_by_id(row.domain_id)),
-            link(EntityMapper.get_by_id(row.range_id))])
+    for row in LinkMapper.get_entities_by_node(node):
+        tables['link_entities']['data'].append([link(EntityMapper.get_by_id(row.domain_id)),
+                                                link(EntityMapper.get_by_id(row.range_id))])
     tables['subs'] = {'id': 'subs', 'header': [_('name'), _('count'), _('info')], 'data': []}
     for sub_id in node.subs:
         sub = g.nodes[sub_id]
@@ -119,29 +117,18 @@ def node_delete(id_):
     node = g.nodes[id_]
     if node.system or node.subs or node.count:
         abort(403)
-    g.cursor.execute('BEGIN')
-    try:
-        EntityMapper.delete(node.id)
-        g.cursor.execute('COMMIT')
-        flash(_('entity deleted'), 'info')
-    except Exception as e:  # pragma: no cover
-        g.cursor.execute('ROLLBACK')
-        logger.log('error', 'database', 'transaction failed', e)
-        flash(_('error transaction'), 'error')
+    EntityMapper.delete(node.id)
+    flash(_('entity deleted'), 'info')
     root = g.nodes[node.root[-1]] if node.root else None
-    url = url_for('node_view', id_=root.id) if root else url_for('node_index')
-    return redirect(url)
+    return redirect(url_for('node_view', id_=root.id) if root else url_for('node_index'))
 
 
 class MoveForm(Form):
     is_node_form = HiddenField()
-    selection = SelectMultipleField(
-        '',
-        [InputRequired()],
-        coerce=int,
-        option_widget=widgets.CheckboxInput(),
-        widget=widgets.ListWidget(prefix_label=False),
-        default=['E21', 'E7', 'E40', 'E74', 'E8', 'E12', 'E6'])
+    selection = SelectMultipleField('', [InputRequired()], coerce=int,
+                                    option_widget=widgets.CheckboxInput(),
+                                    widget=widgets.ListWidget(prefix_label=False),
+                                    default=['E21', 'E7', 'E40', 'E74', 'E8', 'E12', 'E6'])
     save = SubmitField(_('move'))
 
 
@@ -164,11 +151,13 @@ def node_move_entities(id_):
 
 
 def walk_tree(param):
+    """Builds JSON for jsTree"""
     text = ''
-    for id_ in param if isinstance(param, list) else [param]:
+    for id_ in param if type(param) is list else [param]:
         item = g.nodes[id_]
         count_subs = ' (' + format_number(item.count_subs) + ')' if item.count_subs else ''
         text += "{href: '" + url_for('node_view', id_=item.id) + "',"
+        text += "a_attr: { href: '" + url_for('node_view', id_=item.id) + "'}, "
         text += "text: '" + item.name.replace("'", "&apos;") + " "
         text += '<span style="font-weight:normal">' + format_number(item.count) + count_subs
         text += "', 'id':'" + str(item.id) + "'"
@@ -200,7 +189,7 @@ def tree_select(name):
                     }}
                 }});
             }});
-        </script>""".format(min_chars=app.config['MIN_CHARS_JSTREE_SEARCH'],
+        </script>""".format(min_chars=session['settings']['minimum_jstree_search'],
                             name=sanitize(name), tree=walk_tree(NodeMapper.get_nodes(name)))
     return html
 
@@ -229,7 +218,7 @@ def save(form, node=None, root=None):
             node.name += ' (' + form.name_inverse.data.strip() + ')'
         if not root.directional:
             node.name = node.name.replace('(', '').replace(')', '')
-        node.description = form.description.data
+        node.description = form.description.data if form.description else form.unit.data
         node.update()
 
         # Update super if changed and node is not a root node

@@ -1,6 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import flash, g, render_template, request, session, url_for
-from flask_babel import lazy_gettext as _, format_number
+from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import Form
 from werkzeug.utils import redirect
@@ -17,7 +17,7 @@ from openatlas.util.util import (bookmark_toggle, format_date, link, required_gr
 
 
 class FeedbackForm(Form):
-    subject = SelectField(_('subject'), choices=app.config['FEEDBACK_SUBJECTS'].items(),
+    subject = SelectField(_('subject'), choices=list(app.config['FEEDBACK_SUBJECTS'].items()),
                           render_kw={'autofocus': True})
     description = TextAreaField(_('description'), [InputRequired()])
     send = SubmitField(_('send'))
@@ -30,30 +30,22 @@ def index():
         'counts': {'id': 'overview', 'header': [], 'data': [], 'show_pager': False},
         'bookmarks': {'id': 'bookmarks', 'data': [], 'show_pager': False,
                       'header': ['name', 'class', 'first', 'last']},
-        'latest': {
-            'id': 'latest', 'header': ['name', 'class', 'first', 'last', 'date', 'user'],
-            'data': [], 'show_pager': False}}
+        'latest': {'id': 'latest', 'data': [], 'show_pager': False,
+                   'header': ['name', 'class', 'first', 'last', 'date', 'user']}}
     if current_user.is_authenticated and hasattr(current_user, 'bookmarks'):
         for entity_id in current_user.bookmarks:
             entity = EntityMapper.get_by_id(entity_id)
-            tables['bookmarks']['data'].append([
-                link(entity),
-                g.classes[entity.class_.code].name,
-                entity.first,
-                entity.last,
-                bookmark_toggle(entity.id, True)])
+            tables['bookmarks']['data'].append([link(entity), g.classes[entity.class_.code].name,
+                                                entity.first, entity.last,
+                                                bookmark_toggle(entity.id, True)])
         for name, count in EntityMapper.get_overview_counts().items():
             count = format_number(count) if count else ''
             tables['counts']['data'].append([
-                '<a href="' + url_for(name + '_index') + '">' + uc_first(_(name)) + '</a>',
-                count])
+                '<a href="' + url_for(name + '_index') + '">' + uc_first(_(name)) + '</a>', count])
         for entity in EntityMapper.get_latest(8):
             tables['latest']['data'].append([
-                link(entity),
-                g.classes[entity.class_.code].name,
-                entity.first,
-                entity.last,
-                format_date(entity.created),
+                link(entity), g.classes[entity.class_.code].name,
+                entity.first, entity.last, format_date(entity.created),
                 link(logger.get_log_for_advanced_view(entity.id)['creator'])])
     intro = ContentMapper.get_translation('intro')
     return render_template('index/index.html', intro=intro, tables=tables)
@@ -87,8 +79,8 @@ def index_feedback():
 
 @app.route('/overview/content/<item>')
 def index_content(item):
-    return render_template('index/content.html',
-                           text=ContentMapper.get_translation(item), title=item)
+    return render_template('index/content.html', text=ContentMapper.get_translation(item),
+                           title=item)
 
 
 @app.route('/overview/credits')

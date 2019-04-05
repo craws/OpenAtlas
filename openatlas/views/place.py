@@ -8,11 +8,10 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.forms.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper
-from openatlas.models.gis import GisMapper
-from openatlas.models.link import LinkMapper
+from openatlas.models.gis import GisMapper, InvalidGeomException
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 is_authorized, link, required_group, truncate_string, uc_first,
-                                 was_modified, get_view_name)
+                                 get_profile_image_table_link, is_authorized, link, required_group,
+                                 truncate_string, uc_first, was_modified)
 
 
 class PlaceForm(DateForm):
@@ -21,8 +20,8 @@ class PlaceForm(DateForm):
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
-    gis_points = HiddenField()
-    gis_polygons = HiddenField()
+    gis_points = HiddenField(default='[]')
+    gis_polygons = HiddenField(default='[]')
     continue_ = HiddenField()
     opened = HiddenField()
 
@@ -85,56 +84,57 @@ def place_insert(origin_id=None):
 
 
 @app.route('/place/view/<int:id_>')
-@app.route('/place/view/<int:id_>/<int:unlink_id>')
 @required_group('readonly')
-def place_view(id_, unlink_id=None):
+def place_view(id_):
     object_ = EntityMapper.get_by_id(id_)
-    if unlink_id:
-        LinkMapper.delete_by_id(unlink_id)
-        flash(_('link removed'), 'info')
-    object_.set_dates()
     location = object_.get_linked_entity('P53')
     tables = {
         'info': get_entity_data(object_, location),
-        'file': {'id': 'files', 'data': [], 'header': app.config['TABLE_HEADERS']['file']},
+        'file': {'id': 'files', 'data': [],
+                 'header': app.config['TABLE_HEADERS']['file'] + [_('main image')]},
         'source': {'id': 'source', 'data': [], 'header': app.config['TABLE_HEADERS']['source']},
         'event': {'id': 'event', 'data': [], 'header': app.config['TABLE_HEADERS']['event']},
-        'reference': {
-            'id': 'reference', 'data': [],
-            'header': app.config['TABLE_HEADERS']['reference'] + ['pages']},
-        'actor': {
-            'id': 'actor', 'data': [],
-            'header': [_('actor'), _('property'), _('class'), _('first'), _('last')]}}
+        'reference': {'id': 'reference', 'data': [],
+                      'header': app.config['TABLE_HEADERS']['reference'] + ['pages']},
+        'actor': {'id': 'actor', 'data': [],
+                  'header': [_('actor'), _('property'), _('class'), _('first'), _('last')]}}
     if object_.system_type == 'place':
         tables['feature'] = {'id': 'feature', 'data': [],
                              'header': app.config['TABLE_HEADERS']['place'] + [_('description')]}
     if object_.system_type == 'feature':
         tables['stratigraphic-unit'] = {
-            'id': 'stratigraphic', 'data': [], 'header':
-            app.config['TABLE_HEADERS']['place'] + [_('description')]}
+            'id': 'stratigraphic', 'data': [],
+            'header': app.config['TABLE_HEADERS']['place'] + [_('description')]}
     if object_.system_type == 'stratigraphic unit':
         tables['find'] = {'id': 'find', 'data': [],
                           'header': app.config['TABLE_HEADERS']['place'] + [_('description')]}
+    profile_image_id = object_.get_profile_image_id()
     for link_ in object_.get_links('P67', True):
-        data = get_base_table_data(link_.domain)
-        view_name = get_view_name(link_.domain)
-        if view_name not in ['source', 'file']:
+        domain = link_.domain
+        data = get_base_table_data(domain)
+        if domain.view_name == 'file':  # pragma: no cover
+            extension = data[3].replace('.', '')
+            data.append(get_profile_image_table_link(domain, object_, extension, profile_image_id))
+            if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+                profile_image_id = domain.id
+        if domain.view_name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
+            if domain.system_type == 'external reference':
+                object_.external_references.append(link_)
             if is_authorized('editor'):
                 url = url_for('reference_link_update', link_id=link_.id, origin_id=object_.id)
                 data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
         if is_authorized('editor'):
-            url = url_for('place_view', id_=object_.id, unlink_id=link_.id) + '#tab-' + view_name
-            data.append(display_remove_link(url, link_.domain.name))
-        tables[view_name]['data'].append(data)
+            url = url_for('link_delete', id_=link_.id, origin_id=object_.id)
+            data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
+        tables[domain.view_name]['data'].append(data)
     event_ids = []  # Keep track of already inserted events to prevent doubles
     for event in location.get_linked_entities(['P7'], True):
         tables['event']['data'].append(get_base_table_data(event))
         event_ids.append(event.id)
     for event in object_.get_linked_entities(['P24'], True):
-        if event.id in event_ids:  # Don't add again if already in table
-            continue
-        tables['event']['data'].append(get_base_table_data(event))
+        if event.id not in event_ids:  # Don't add again if already in table
+            tables['event']['data'].append(get_base_table_data(event))
     has_subunits = False
     for entity in object_.get_linked_entities('P46'):
         has_subunits = True
@@ -166,7 +166,7 @@ def place_view(id_, unlink_id=None):
         place = object_.get_linked_entity('P46', True)
     return render_template('place/view.html', object_=object_, tables=tables, gis_data=gis_data,
                            place=place, feature=feature, stratigraphic_unit=stratigraphic_unit,
-                           has_subunits=has_subunits)
+                           has_subunits=has_subunits, profile_image_id=profile_image_id)
 
 
 @app.route('/place/delete/<int:id_>')
@@ -177,27 +177,18 @@ def place_delete(id_):
     if entity.get_linked_entities('P46'):
         flash(_('Deletion not possible if subunits exists'), 'error')
         return redirect(url_for('place_view', id_=id_))
-    g.cursor.execute('BEGIN')
-    try:
-        EntityMapper.delete(id_)
-        logger.log_user(id_, 'delete')
-        g.cursor.execute('COMMIT')
-    except Exception as e:  # pragma: no cover
-        g.cursor.execute('ROLLBACK')
-        logger.log('error', 'database', 'transaction failed', e)
-        flash(_('error transaction'), 'error')
+    EntityMapper.delete(id_)
+    logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
-    url = url_for('place_index')
     if parent:
-        url = url_for('place_view', id_=parent.id) + '#tab-' + entity.system_type
-    return redirect(url)
+        return redirect(url_for('place_view', id_=parent.id) + '#tab-' + entity.system_type)
+    return redirect(url_for('place_index'))
 
 
 @app.route('/place/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
 def place_update(id_):
     object_ = EntityMapper.get_by_id(id_)
-    object_.set_dates()
     location = object_.get_linked_entity('P53')
     if object_.system_type == 'feature':
         form = build_form(FeatureForm, 'Feature', object_, request, location)
@@ -216,9 +207,9 @@ def place_update(id_):
                 'place/update.html', form=form, object_=object_, modifier=modifier)
         save(form, object_, location)
         return redirect(url_for('place_view', id_=id_))
-    for alias in [x.name for x in object_.get_linked_entities('P1')]:
-        form.alias.append_entry(alias)
     if object_.system_type == 'place':
+        for alias in [x.name for x in object_.get_linked_entities('P1')]:
+            form.alias.append_entry(alias)
         form.alias.append_entry('')
     gis_data = GisMapper.get_all(object_)
     place = None
@@ -239,8 +230,8 @@ def place_update(id_):
 
 def save(form, object_=None, location=None, origin=None):
     g.cursor.execute('BEGIN')
+    log_action = 'update'
     try:
-        log_action = 'update'
         if object_:
             for alias in object_.get_linked_entities('P1'):
                 alias.delete()
@@ -260,8 +251,8 @@ def save(form, object_=None, location=None, origin=None):
             object_.link('P53', location)
         object_.name = form.name.data
         object_.description = form.description.data
+        object_.set_dates(form)
         object_.update()
-        object_.save_dates(form)
         object_.save_nodes(form)
         location.name = 'Location of ' + form.name.data
         location.update()
@@ -272,8 +263,8 @@ def save(form, object_=None, location=None, origin=None):
                     object_.link('P1', EntityMapper.insert('E41', alias))
         url = url_for('place_view', id_=object_.id)
         if origin:
-            url = url_for(get_view_name(origin) + '_view', id_=origin.id) + '#tab-place'
-            if get_view_name(origin) == 'reference':
+            url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-place'
+            if origin.view_name == 'reference':
                 link_id = origin.link('P67', object_)
                 url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
             elif origin.system_type in ['place', 'feature', 'stratigraphic unit']:
@@ -287,9 +278,16 @@ def save(form, object_=None, location=None, origin=None):
             url = url_for('place_insert', origin_id=origin.id if origin else None)
         logger.log_user(object_.id, log_action)
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
+    except InvalidGeomException as e:  # pragma: no cover
+        g.cursor.execute('ROLLBACK')
+        logger.log('error', 'database', 'transaction failed because of invalid geom', e)
+        flash(_('Invalid geom entered'), 'error')
+        url = url_for('place_index') if log_action == 'insert' else url_for('place_view',
+                                                                            id_=object_.id)
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
-        url = url_for('place_index')
+        url = url_for('place_index') if log_action == 'insert' else url_for('place_view',
+                                                                            id_=object_.id)
     return url

@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
     {% if origin %}
-        <a href="{{ url_for(origin|get_view_name + '_index') }}">{{ _(origin|get_view_name)|uc_first }}</a>
+        <a href="{{ url_for(origin.view_name + '_index') }}">{{ _(origin.view_name)|uc_first }}</a>
         > {{ origin|link|safe }}
     {% else %}
         <a href="{{ url_for('file_index') }}">{{ _('files')|uc_first }}</a>
@@ -11,12 +11,16 @@
 {% block content %}
     <p>
         {{ _('max size')|uc_first }}:
-        <span style="font-weight: bold;">{{ session['settings']['file_upload_max_size'] }} MB </span>
+        <span style="font-weight: bold;">{{ session['settings']['file_upload_max_size'] }} MB</span>
         - {{ _('if exceeded you will receive a connection error')|uc_first }}.
     </p>
     <p>
         {{ _('allowed extensions')|uc_first }}:
         <span style="font-weight: bold;">{{ session['settings']['file_upload_allowed_extension'] }}</span>
     </p>
-    {{ form|display_form('file-form')|safe }}
+    {% if writeable %}
+        {{ form|display_form('file-form')|safe }}
+    {% else %}
+        <span class="error">{{ _('directory not writable')|uc_first }}</span>
+    {% endif %}
 {% endblock %}

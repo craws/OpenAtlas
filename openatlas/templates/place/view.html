@@ -42,14 +42,21 @@
             {{ object_.id|bookmark_toggle|safe }}
         </div>
         <h1>{{ object_.name }}</h1>
-        {{ tables['info']|data_table|safe }}
-        {{ object_|description|safe }}
+        <div>
+            {{ profile_image_id|display_profile_image|safe }}
+            <div style="float:left;">
+                {{ tables['info']|data_table|safe }}
+                {{ object_|display_external_references|safe }}
+                {{ object_|description|safe }}
+            </div>
+            <div style="clear:both;"></div>
+        </div>
     </div>
     {% if gis_data %}
         <div id="tab-map">
             <div id="map" class="map" style="float:none;margin:0;width:70em;"></div>
         </div>
-        <script src="/static/js/map.js"></script>
+        <script src="/static/js/map/map.js"></script>
         <script>
             /* workaround for leaflet bug when map not in the first tab */
             $("body").on('click','#map-tab-id', function() {
@@ -82,6 +89,7 @@
                 <a href="{{ url_for('reference_add', origin_id=object_.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='bibliography', origin_id=object_.id) }}">+ {{ _('bibliography')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='edition', origin_id=object_.id) }}">+ {{ _('edition')|uc_first }}</a>
+                <a href="{{ url_for('reference_insert', code='external_reference', origin_id=object_.id) }}">+ {{ _('external reference')|uc_first }}</a>
             </div>
         {% endif %}
         {{ tables['reference']|pager|safe }}

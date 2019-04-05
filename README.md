@@ -4,17 +4,17 @@ OpenAtlas is an open source, web based database system for complex archaeologica
 
 The information is mapped as a network using classes and properties of the [CIDOC CRM](http://www.cidoc-crm.org/).
 
-[Project website](http://openatlas.eu/website)
-
 Documentation: [Wiki](https://redmine.openatlas.eu/projects/uni/wiki), [Issues](https://redmine.openatlas.eu/projects/uni/issues), [Features](https://redmine.openatlas.eu/projects/uni/wiki/Features)
 
-Code: [Bitucket](https://bitbucket.org/openatlas/openatlas) or [GitHub](https://github.com/craws/OpenAtlas)
+Source code on: [GitHub](https://github.com/craws/OpenAtlas)
 
-Demo versions:
+Project website: [OpenAtlas](http://openatlas.eu/website)
 
-[Demo](https://demo.openatlas.eu) with data kindly provided by [MEDCON](https://oeaw.academia.edu/MappingMedievalConflict)
+# Demo versions
 
-[Development demo](https://demo-dev.openatlas.eu) with data kindly provided by [DPP](https://dpp.oeaw.ac.at/)
+[Demo](https://demo.openatlas.eu) with data kindly provided by the [MEDCON](https://oeaw.academia.edu/MappingMedievalConflict) project.
+
+[Development demo](https://demo-dev.openatlas.eu) with data kindly provided by the [DPP](https://dpp.oeaw.ac.at/) project.
 
 # Installation
 

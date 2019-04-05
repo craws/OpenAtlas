@@ -39,25 +39,15 @@ def translation_insert(source_id):
 def translation_view(id_):
     translation = EntityMapper.get_by_id(id_)
     source = translation.get_linked_entity('P73', True)
-    return render_template(
-        'translation/view.html',
-        source=source,
-        translation=translation,
-        tables={'info': get_entity_data(translation)})
+    return render_template('translation/view.html', source=source, translation=translation,
+                           tables={'info': get_entity_data(translation)})
 
 
 @app.route('/source/translation/delete/<int:id_>/<int:source_id>')
 @required_group('editor')
 def translation_delete(id_, source_id):
-    g.cursor.execute('BEGIN')
-    try:
-        EntityMapper.delete(id_)
-        g.cursor.execute('COMMIT')
-        flash(_('entity deleted'), 'info')
-    except Exception as e:  # pragma: no cover
-        g.cursor.execute('ROLLBACK')
-        logger.log('error', 'database', 'transaction failed', e)
-        flash(_('error transaction'), 'error')
+    EntityMapper.delete(id_)
+    flash(_('entity deleted'), 'info')
     return redirect(url_for('source_view', id_=source_id))
 
 
@@ -71,11 +61,8 @@ def translation_update(id_):
         save(form, translation)
         flash(_('info update'), 'info')
         return redirect(url_for('translation_view', id_=translation.id))
-    return render_template(
-        'translation/update.html',
-        translation=translation,
-        source=source,
-        form=form)
+    return render_template('translation/update.html', translation=translation, source=source,
+                           form=form)
 
 
 def save(form, entity=None, source=None):

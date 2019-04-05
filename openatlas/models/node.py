@@ -6,38 +6,28 @@ from flask import g
 
 from openatlas import app, debug_model
 from openatlas.models.entity import Entity, EntityMapper
-from openatlas.models.linkProperty import LinkPropertyMapper
 
 
 class NodeMapper(EntityMapper):
 
     @staticmethod
     def get_all_nodes():
-        """Get and return all type and place nodes"""
+        """ Get and return all type and place nodes"""
         sql = """
-            SELECT
-                e.id,
-                e.name,
-                e.class_code,
-                e.description,
-                e.system_type,
-                e.created,
-                e.modified,
-                es.id AS super_id,
-                COUNT(e2.id) AS count,
-                COUNT(lp.id) AS count_property
+            SELECT e.id, e.name, e.class_code, e.description, e.system_type, e.created, e.modified,
+                es.id AS super_id, COUNT(e2.id) AS count, COUNT(l3.id) AS count_property
             FROM model.entity e                
 
-            -- get super
+            -- Get super
             LEFT JOIN model.link l ON e.id = l.domain_id AND l.property_code = %(property_code)s
             LEFT JOIN model.entity es ON l.range_id = es.id
 
-            -- get count
+            -- Get count
             LEFT JOIN model.link l2 ON e.id = l2.range_id
             LEFT JOIN model.entity e2 ON l2.domain_id = e2.id AND
                 (l2.property_code = 'P2' OR
                     (l2.property_code = 'P89' AND e2.system_type = 'place location'))
-            LEFT JOIN model.link_property lp ON e.id = lp.range_id AND lp.property_code = 'P2'
+            LEFT JOIN model.link l3 ON e.id = l3.type_id
             
             WHERE e.class_code = %(class_code)s
                 AND (e.system_type IS NULL OR e.system_type != 'place location')
@@ -118,7 +108,7 @@ class NodeMapper(EntityMapper):
     @staticmethod
     def walk_tree(param, selected_ids):
         string = ''
-        for id_ in param if isinstance(param, list) else [param]:
+        for id_ in param if type(param) is list else [param]:
             item = g.nodes[id_]
             selected = ",'state' : {'selected' : true}" if item.id in selected_ids else ''
             name = item.name.replace("'", "&apos;")
@@ -162,10 +152,10 @@ class NodeMapper(EntityMapper):
         if hasattr(entity, 'nodes'):
             entity.delete_links(['P2', 'P89'])
         for field in form:
-            if isinstance(field, ValueFloatField) and entity.class_.code != 'E53':
+            if type(field) is ValueFloatField and entity.class_.code != 'E53':
                 if field.data is not None:  # Allow to save 0 but not empty
                     entity.link('P2', g.nodes[int(field.name)], field.data)
-            elif isinstance(field, (TreeField, TreeMultiField)) and field.data:
+            elif type(field) in (TreeField, TreeMultiField) and field.data:
                 root = g.nodes[int(field.id)]
                 try:
                     range_ = [g.nodes[int(field.data)]]
@@ -178,13 +168,6 @@ class NodeMapper(EntityMapper):
                     entity.link('P2', range_)
 
     @staticmethod
-    def save_link_nodes(link_id, form):
-        from openatlas.forms.forms import TreeField
-        for field in form:
-            if isinstance(field, TreeField) and field.data:
-                LinkPropertyMapper.insert(link_id, 'P2', int(field.data))
-
-    @staticmethod
     def insert_hierarchy(node, form, value_type):
         sql = """
             INSERT INTO web.hierarchy (id, name, multiple, value_type)
@@ -192,11 +175,10 @@ class NodeMapper(EntityMapper):
         multiple = False
         if hasattr(form, 'multiple') and form.multiple and form.multiple.data:
             multiple = True
-        g.cursor.execute(sql, {
-            'id': node.id,
-            'name': node.name,
-            'multiple': multiple,
-            'value_type': value_type})
+        g.cursor.execute(sql, {'id': node.id,
+                               'name': node.name,
+                               'multiple': multiple,
+                               'value_type': value_type})
         NodeMapper.add_forms_to_hierarchy(node, form)
         debug_model['div sql'] += 1
 
@@ -241,24 +223,31 @@ class NodeMapper(EntityMapper):
                         cleaned_entity_ids.append(entity.id)
                 entity_ids = cleaned_entity_ids
             if entity_ids:
-                sql = """
-                    UPDATE model.{table} SET range_id = %(new_type_id)s
-                    WHERE range_id = %(old_type_id)s AND domain_id IN %(entity_ids)s;""".format(
-                    table='link_property' if root.name in app.config['PROPERTY_TYPES'] else 'link')
-                params = {
-                    'old_type_id': old_node.id,
-                    'new_type_id': new_type_id,
-                    'entity_ids': tuple(entity_ids)}
+                if root.name in app.config['PROPERTY_TYPES']:
+                    sql = """
+                        UPDATE model.link SET type_id = %(new_type_id)s
+                        WHERE type_id = %(old_type_id)s AND id IN %(entity_ids)s;"""
+                else:
+                    sql = """
+                        UPDATE model.link SET range_id = %(new_type_id)s
+                        WHERE range_id = %(old_type_id)s AND domain_id IN %(entity_ids)s;"""
+                params = {'old_type_id': old_node.id,
+                          'new_type_id': new_type_id,
+                          'entity_ids': tuple(entity_ids)}
                 g.cursor.execute(sql, params)
                 debug_model['div sql'] += 1
         else:
             delete_ids = entity_ids  # No new type was selected so delete all links
 
         if delete_ids:
-            sql = """
-                DELETE FROM model.{table}
-                WHERE range_id = %(old_type_id)s AND domain_id IN %(delete_ids)s;""".format(
-                table='link_property' if root.name in app.config['PROPERTY_TYPES'] else 'link')
+            if root.name in app.config['PROPERTY_TYPES']:
+                sql = """
+                    Update model.link SET type_id = NULL
+                    WHERE type_id = %(old_type_id)s AND id IN %(delete_ids)s;"""
+            else:
+                sql = """
+                    DELETE FROM model.link
+                    WHERE range_id = %(old_type_id)s AND domain_id IN %(delete_ids)s;"""
             g.cursor.execute(sql, {'old_type_id': old_node.id, 'delete_ids': tuple(delete_ids)})
             debug_model['div sql'] += 1
 
