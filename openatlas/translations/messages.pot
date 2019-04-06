@@ -8,14 +8,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-04-04 09:46+0200\n"
+"POT-Creation-Date: 2019-04-06 18:50+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.6.0\n"
+"Generated-By: Babel 2.3.4\n"
 
 #: __init__.py:37 views/search.py:17
 msgid "search term"
@@ -72,7 +72,7 @@ msgstr ""
 #: views/hierarchy.py:122 views/imports.py:196 views/involvement.py:64
 #: views/involvement.py:101 views/member.py:59 views/member.py:87
 #: views/member.py:116 views/place.py:290 views/profile.py:88
-#: views/profile.py:121 views/reference.py:242 views/relation.py:57
+#: views/profile.py:121 views/reference.py:247 views/relation.py:57
 #: views/relation.py:90 views/source.py:113 views/source.py:187
 #: views/translation.py:85 views/types.py:239
 msgid "error transaction"
@@ -203,7 +203,7 @@ msgstr ""
 #: templates/content/update.html:16 templates/map.html:15 util/filters.py:202
 #: views/admin.py:45 views/admin.py:63 views/admin.py:104 views/admin.py:435
 #: views/involvement.py:80 views/member.py:119 views/profile.py:31
-#: views/profile.py:59 views/reference.py:97 views/relation.py:94
+#: views/profile.py:59 views/reference.py:109 views/relation.py:94
 #: views/user.py:30
 msgid "save"
 msgstr ""
@@ -228,7 +228,7 @@ msgstr ""
 #: templates/user/view.html:12 views/actor.py:68 views/actor.py:98
 #: views/actor.py:140 views/actor.py:149 views/actor.py:162 views/admin.py:169
 #: views/event.py:132 views/event.py:150 views/file.py:153 views/place.py:126
-#: views/reference.py:143 views/source.py:90
+#: views/reference.py:148 views/source.py:90
 msgid "edit"
 msgstr ""
 
@@ -1135,7 +1135,7 @@ msgid "insert and continue"
 msgstr ""
 
 #: views/actor.py:43 views/event.py:110 views/place.py:94
-#: views/reference.py:120 views/source.py:58
+#: views/reference.py:125 views/source.py:58
 msgid "main image"
 msgstr ""
 
@@ -1164,19 +1164,19 @@ msgid "died in"
 msgstr ""
 
 #: views/actor.py:207 views/event.py:74 views/file.py:207
-#: views/hierarchy.py:102 views/place.py:182 views/reference.py:191
+#: views/hierarchy.py:102 views/place.py:182 views/reference.py:196
 #: views/source.py:137 views/translation.py:50 views/types.py:121
 msgid "entity deleted"
 msgstr ""
 
 #: views/actor.py:220 views/event.py:89 views/file.py:171 views/place.py:204
-#: views/reference.py:208 views/source.py:149
+#: views/reference.py:213 views/source.py:149
 msgid "error modified"
 msgstr ""
 
 #: views/actor.py:286 views/event.py:201 views/file.py:237
 #: views/hierarchy.py:44 views/involvement.py:60 views/member.py:55
-#: views/member.py:83 views/place.py:280 views/reference.py:238
+#: views/member.py:83 views/place.py:280 views/reference.py:243
 #: views/relation.py:53 views/source.py:183 views/translation.py:30
 #: views/types.py:235
 msgid "entity created"
@@ -1185,8 +1185,8 @@ msgstr ""
 #: views/actor.py:286 views/admin.py:76 views/admin.py:117 views/admin.py:413
 #: views/admin.py:448 views/content.py:52 views/event.py:201 views/file.py:237
 #: views/hierarchy.py:66 views/hierarchy.py:88 views/place.py:280
-#: views/profile.py:84 views/profile.py:117 views/reference.py:102
-#: views/reference.py:238 views/relation.py:86 views/source.py:183
+#: views/profile.py:84 views/profile.py:117 views/reference.py:104
+#: views/reference.py:243 views/relation.py:86 views/source.py:183
 #: views/translation.py:62 views/types.py:235 views/user.py:140
 msgid "info update"
 msgstr ""
@@ -1706,6 +1706,14 @@ msgstr ""
 #: views/reference.py:30 views/reference.py:36 views/reference.py:42
 #: views/reference.py:48 views/reference.py:54 views/reference.py:60
 msgid "page"
+msgstr ""
+
+#: views/reference.py:73
+msgid "page / link text"
+msgstr ""
+
+#: views/reference.py:89 views/reference.py:112
+msgid "link text"
 msgstr ""
 
 #: views/relation.py:18 views/types.py:21
