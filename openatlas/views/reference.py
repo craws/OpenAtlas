@@ -124,7 +124,8 @@ def reference_view(id_):
         'file': {'id': 'files', 'data': [],
                  'header': app.config['TABLE_HEADERS']['file'] + ['page'] + [_('main image')]}}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find']:
-        header = app.config['TABLE_HEADERS'][name] + ['page']
+        header_label = 'link text' if reference.system_type == 'external reference' else 'page'
+        header = app.config['TABLE_HEADERS'][name] + [header_label]
         tables[name] = {'id': name, 'header': header, 'data': []}
     for link_ in reference.get_links('P67', True):
         domain = link_.domain
