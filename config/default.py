@@ -26,6 +26,7 @@ DISPLAY_FILE_EXTENSIONS = ['bmp', 'gif', 'ico', 'jpeg', 'jpg', 'png', 'svg']
 
 # Security
 SESSION_COOKIE_SECURE = True
+REMEMBER_COOKIE_SECURE = True
 
 # JavaScript credentials
 GEONAMES_USERNAME = 'openatlas'
