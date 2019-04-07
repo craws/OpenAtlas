@@ -10,6 +10,10 @@ After following the instructions restart Apache and test if the application is w
 
     service apache2 restart
 
+### 3.16.0
+
+If you are running a productive system take a look at install.md section HTTPS for instructions how to improve server side security.
+
 ### 3.14.0 to 3.15.0
 
 Execute install/upgrade/3.15.0.sql after making backups

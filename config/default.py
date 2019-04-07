@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 from flask_babel import lazy_gettext as _
 
-VERSION = '3.15.0'
+VERSION = '3.16.0'
 DEMO_MODE = False  # If in demo mode some options are disabled and the login form is pre filled
 
 LANGUAGES = {'en': 'English', 'de': 'Deutsch'}
@@ -27,6 +27,7 @@ DISPLAY_FILE_EXTENSIONS = ['bmp', 'gif', 'ico', 'jpeg', 'jpg', 'png', 'svg']
 # Security
 SESSION_COOKIE_SECURE = True
 REMEMBER_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = 'Lax'
 
 # JavaScript credentials
 GEONAMES_USERNAME = 'openatlas'
