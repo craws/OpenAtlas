@@ -12,7 +12,7 @@ After following the instructions restart Apache and test if the application is w
 
 ### 3.16.0
 
-If you are running a productive system take a look at install.md section HTTPS for instructions how to improve server side security.
+If you are running a productive online system take a look at install.md section "Additional security" for instructions to improve server side security.
 
 ### 3.14.0 to 3.15.0
 

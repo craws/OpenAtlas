@@ -101,24 +101,15 @@ Login with username "OpenAtlas" and password "change_me_PLEASE!" and change the 
 
 If you later like to upgrade the application be sure to read and follow the [upgrade instructions](install/upgrade/upgrade.md).
 
-### Using HTTPS (optional)
+### Additional security (optional)
+
+You don't need this to run the application but it will improve server side security if running an online productive instance.
 
 Use certbot to create a https vhost.
 
-#### Additional security options (Apache)
+When configured Apache to use HTTPS only, add this line to instance/production.py:
 
-You don't need it to run the application but it will improve server side security.
-
-Enable apache headers module.
-
-    # a2enmod headers
-
-Add into your https vhost configuration the lines below:
-
-    Header always set Strict-Transport-Security "max-age=63072000;"
-    Header set X-Content-Type-Options nosniff
-    Header set X-Frame-Options "deny"
-    Header set X-XSS-Protection "1; mode=block"
+    SESSION_COOKIE_SECURE = True
 
 ### Unit tests (optional)
 

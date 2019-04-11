@@ -103,6 +103,18 @@ def before_request():
         session['settings']['overlay_hack'] = True  # pragma: no cover
 
 
+@app.after_request
+def apply_caching(response):
+    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+
+    # Todo: activate Content-Security-Policy after removal of every inline CSS and JavaScript
+    # response.headers['Content-Security-Policy'] = "default-src 'self'"
+    return response
+
+
 @app.teardown_request
 def teardown_request(exception):
     if hasattr(g, 'db'):

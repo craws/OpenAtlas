@@ -25,7 +25,7 @@ UPLOAD_FOLDER_PATH = os.path.dirname(__file__) + '/../openatlas/uploads'
 DISPLAY_FILE_EXTENSIONS = ['bmp', 'gif', 'ico', 'jpeg', 'jpg', 'png', 'svg']
 
 # Security
-SESSION_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = False  # Should be set to True in production.py if using HTTPS only
 REMEMBER_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
