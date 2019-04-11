@@ -97,10 +97,9 @@ def before_request():
     debug_model['model'] = time.time() - debug_model['current']
     debug_model['current'] = time.time()
 
-    # Workaround overlay maps for Stefan until #978 is implemented
+    # Workaround overlay maps for Thanados until #978 is implemented
     session['settings']['overlay_hack'] = False
-    if hasattr(current_user, 'id') and current_user.id in [3,4] and \
-            session['settings']['site_name'] == 'DPP':
+    if session['settings']['site_name'] == 'Thanados':
         session['settings']['overlay_hack'] = True  # pragma: no cover
 
 

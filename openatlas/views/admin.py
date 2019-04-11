@@ -320,7 +320,7 @@ class NewsLetterForm(Form):
 
 
 @app.route('/admin/newsletter', methods=['POST', 'GET'])
-@required_group('admin')
+@required_group('manager')
 def admin_newsletter():
     form = NewsLetterForm()
     if form.validate_on_submit():  # pragma: no cover
