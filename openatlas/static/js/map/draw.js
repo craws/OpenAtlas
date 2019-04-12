@@ -1,9 +1,8 @@
 // Todo: try to remove global variables
-
 // Variables for a selected geometry
 var name;
 var description;
-var shapeType; // centerpoint, shape or area
+var shapeType; // centerpoint, polyline, shape or area
 var objectName; // Name of the entry at update of an existing entry
 
 
@@ -13,11 +12,10 @@ var newMarker = false; // Temporary marker for point update coordinate
 var layer = false;
 var newLayer = false; // Temporary marker to update a point coordinate
 var editLayer = false;
-var editLayer = false;
 var editedLayer = false;
 var drawLayer = false;
 var drawnPolygon = L.featureGroup();
-var geoJsonArray = []; // Polygon coordinates storage
+var geoJsonArray = []; // Polygon/Polyline coordinates storage
 
 /* Controls with EasyButton */
 L.Control.EasyButtons = L.Control.extend({
@@ -137,12 +135,13 @@ map.on('draw:created', function (e) {
     drawnPolygon.addLayer(e.layer);
     layer = e.layer;
     geoJsonArray = [];
-    coordinates = layer.getLatLngs()[0];
+    if(Array.isArray(layer.getLatLngs()[0])) coordinates = layer.getLatLngs()[0];
+    else coordinates = layer.getLatLngs();
     for (i = 0; i < coordinates.length; i++) {
         geoJsonArray.push('[' + coordinates[i].lng + ',' + coordinates[i].lat + ']');
     }
      // Add first xy again as last xy to close polygon
-    geoJsonArray.push('[' + coordinates[0].lng + ',' + coordinates[0].lat + ']');
+    if(Array.isArray(layer.getLatLngs()[0])) geoJsonArray.push('[' + coordinates[0].lng + ',' + coordinates[0].lat + ']');
     $('#saveButton').prop('disabled', false);
 });
 
@@ -230,16 +229,17 @@ function drawGeometry(selectedType) {
         drawLayer = new L.Draw.Polyline(map);
         map.addLayer(drawnPolygon);
         drawLayer.enable();
-
+        drawnPolygon.setStyle({fillColor: '#DA9DC8', color: '#E861C0'});
     } else {
         $('#coordinatesDiv').hide();
         captureCoordinates = false;
         drawLayer = new L.Draw.Polygon(map, {allowIntersection: false});
         map.addLayer(drawnPolygon);
         drawLayer.enable();
-        drawLayer.setStyle({fillColor: '#DA9DC8', color: '#E861C0'});
+        drawnPolygon.setStyle({fillColor: '#DA9DC8', color: '#E861C0'});
     }
 }
+
 
 function saveForm(shapeType) {
     name = $('#nameField').val().replace(/\"/g,'\\"');
@@ -271,6 +271,25 @@ function saveEditedGeometry(shapeType) {
         $('#gis_points').val(JSON.stringify(points));
         editedLayer = L.marker(editLayer.getLatLng(), {icon: editedIcon}).addTo(map);
         editedLayer.bindPopup(buildPopup(JSON.parse(point), 'edited'));
+    } else if (feature.properties.shapeType == 'polyline') {
+        // Remove former polygon
+        polygons = JSON.parse($('#gis_linestrings').val());
+        $.each(polygons, function (key, value) {
+            if (value.properties.id == feature.properties.id) {
+                polygons.splice(key, 1);
+                return false;
+            }
+        });
+        coordinates = '[' + geoJsonArray.join(',') + ']'
+        // Insert new polygon
+        polygon =
+            `{"type": "Feature", "geometry":` +
+            `{"type": "LineString", "coordinates": ` + coordinates + `},` +
+            `"properties":{"name": "` + name + `", "description": "` + description + `", "shapeType": "` + shapeType + `"}}`;
+        polygons.push(JSON.parse(polygon));
+        $('#gis_linestrings').val(JSON.stringify(polygons));
+        editedLayer = L.polyline(editLayer.getLatLngs()).addTo(map);
+        editedLayer.setStyle({fillColor: '#686868', color: '#686868'});
     } else {
         // Remove former polygon
         polygons = JSON.parse($('#gis_polygons').val());
@@ -308,7 +327,7 @@ function saveNewGeometry(shapeType) {
     } else if (shapeType == 'polyline') {
         linestring =
             `{"type": "Feature", "geometry":` +
-            `{"type": "LineString", "coordinates":[[` + geoJsonArray.join(',') + `]]},
+            `{"type": "LineString", "coordinates":[` + geoJsonArray.join(',') + `]},
             "properties":{"name": "` + name + `", "description": "` + description + `", "shapeType": "` + shapeType + `"}}`;
         linestrings = JSON.parse($('#gis_linestrings').val());
         linestrings.push(JSON.parse(linestring));
@@ -342,6 +361,15 @@ function deleteGeometry() {
             }
         });
         $('#gis_points').val(JSON.stringify(points));
+    } else if (feature.properties.shapeType == 'polyline') {
+        polygons = JSON.parse($('#gis_linestrings').val());
+        $.each(polygons, function (key, value) {
+            if (value.properties.id == feature.properties.id) {
+                polygons.splice(key, 1);
+                return false;
+            }
+        });
+        $('#gis_linestrings').val(JSON.stringify(polygons)); // write array back to form field
     } else {
         polygons = JSON.parse($('#gis_polygons').val());
         $.each(polygons, function (key, value) {
@@ -377,6 +405,21 @@ function editGeometry() {
             $('#easting').val(position.lng);
         });
         layer.remove();
+    } else if (feature.properties.shapeType == 'polyline') {
+        $('#coordinatesDiv').hide();
+        editLayer = L.polyline(editLayer.getLatLngs()).addTo(map);
+        // Workaround for Leaflet draw bug: https://github.com/Leaflet/Leaflet.draw/issues/804
+        editLayer.options.editing || (editLayer.options.editing = {});
+        editLayer.editing.enable();
+        editLayer.bindPopup(feature, 'edit');
+        editLayer.on('edit', function () {
+            geoJsonArray = [];
+            coordinates = editLayer.getLatLngs();
+            for (i = 0; i < coordinates.length; i++) {
+                geoJsonArray.push('[' + coordinates[i].lng + ',' + coordinates[i].lat + ']');
+            }
+            layer.remove(feature);
+        });
     } else {
         $('#coordinatesDiv').hide();
         editLayer = L.polygon(editLayer.getLatLngs()).addTo(map);

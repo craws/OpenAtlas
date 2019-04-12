@@ -49,6 +49,11 @@ if (gisPolygonAll) {
     controls.Polygons = polygonLayer;
 }
 
+if (gisLinestringAll) {
+    linestringLayer = new L.GeoJSON(gisLinestringAll, {onEachFeature: setPopup, style: {color: '#9A9A9A'}});
+    controls.Linestrings = linestringLayer;
+}
+
 if (gisPointSelected != '') {
     gisPoints = L.geoJson(gisPointSelected, {onEachFeature: setPopup}).addTo(map);
     gisPoints.on('click', setObjectId);
@@ -57,6 +62,11 @@ if (gisPointSelected != '') {
 if (gisPolygonSelected != '') {
     gisPolygons = L.geoJson(gisPolygonSelected, {onEachFeature: setPopup}).addTo(map);
     gisPolygons.on('click', setObjectId);
+}
+
+if (gisLinestringSelected != '') {
+    gisLinestrings = L.geoJson(gisLinestringSelected, {onEachFeature: setPopup}).addTo(map);
+    gisLinestrings.on('click', setObjectId);
 }
 
 // Workaround overlay maps for Stefan until #978 is implemented
@@ -69,6 +79,7 @@ if (overlayHack) {
 if (window.location.href.indexOf('update') >= 0) {
     $('#gis_points').val(JSON.stringify(gisPointSelected));
     $('#gis_polygons').val(JSON.stringify(gisPolygonSelected));
+    $('#gis_linestrings').val(JSON.stringify(gisLinestringSelected));
 }
 
 // Set zoom level depending on getbounds of selected points/polygons
