@@ -83,17 +83,13 @@ if (window.location.href.indexOf('update') >= 0) {
 }
 
 // Set zoom level depending on getbounds of selected points/polygons
-if (gisPointSelected != '' && gisPolygonSelected != '') {
-    map.fitBounds(L.featureGroup([gisPoints, gisPolygons]).getBounds(), {maxZoom: 12});
-} else if (gisPointSelected != '') {
-    map.fitBounds(gisPoints.getBounds(), {maxZoom: 12});
-} else if (gisPolygonSelected != '') {
-    map.fitBounds(gisPolygons.getBounds(), {maxZoom: 12});
-} else if (gisPointAll != '') {
-    map.fitBounds(pointLayer.getBounds(), {maxZoom: 12});
-} else {
-    map.setView([30, 340], 2);
-}
+let allSelected = [];
+if (gisLinestringSelected != '') allSelected.push(gisLinestrings);
+if (gisPolygonSelected != '') allSelected.push(gisPolygons);
+if (gisPointSelected != '') allSelected.push(gisPoints);
+if (allSelected.length > 0) map.fitBounds(L.featureGroup(allSelected).getBounds(), {maxZoom: 12});
+else if(gisPointAll) map.fitBounds(pointLayer.getBounds(), {maxZoom: 12});
+else map.setView([30, 340], 2);
 
 L.control.layers(baseMaps, controls).addTo(map);
 baseMaps.Landscape.addTo(map);
