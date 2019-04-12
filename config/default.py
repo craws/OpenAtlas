@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 from flask_babel import lazy_gettext as _
 
-VERSION = '3.15.0'
+VERSION = '3.16.0'
 DEMO_MODE = False  # If in demo mode some options are disabled and the login form is pre filled
 
 LANGUAGES = {'en': 'English', 'de': 'Deutsch'}
@@ -23,6 +23,11 @@ IMPORT_FILE_EXTENSIONS = ['csv', 'xls', 'xlsx']
 EXPORT_FOLDER_PATH = os.path.dirname(__file__) + '/../openatlas/export'
 UPLOAD_FOLDER_PATH = os.path.dirname(__file__) + '/../openatlas/uploads'
 DISPLAY_FILE_EXTENSIONS = ['bmp', 'gif', 'ico', 'jpeg', 'jpg', 'png', 'svg']
+
+# Security
+SESSION_COOKIE_SECURE = False  # Should be set to True in production.py if using HTTPS only
+REMEMBER_COOKIE_SECURE = True
+SESSION_COOKIE_SAMESITE = 'Lax'
 
 # JavaScript credentials
 GEONAMES_USERNAME = 'openatlas'

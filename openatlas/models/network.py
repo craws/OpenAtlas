@@ -20,8 +20,7 @@ class Network:
         edges = ''
         if properties:
             sql = """
-                SELECT l.domain_id, l.range_id
-                FROM model.link l
+                SELECT l.domain_id, l.range_id FROM model.link l
                 JOIN model.entity e ON l.domain_id = e.id
                 WHERE property_code IN %(properties)s
                     AND (e.system_type IS NULL OR e.system_type != 'file');"""

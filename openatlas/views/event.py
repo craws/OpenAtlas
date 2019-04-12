@@ -113,7 +113,7 @@ def event_view(id_):
         'actor': {'id': 'actor', 'data': [],
                   'header': ['actor', 'class', 'involvement', 'first', 'last', 'description']},
         'reference': {'id': 'reference', 'data': [],
-                      'header': app.config['TABLE_HEADERS']['reference'] + ['pages']}}
+                      'header': app.config['TABLE_HEADERS']['reference'] + ['page / link text']}}
     for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
         first = link_.first
         if not link_.first and event.first:

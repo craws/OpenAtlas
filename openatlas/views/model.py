@@ -110,13 +110,11 @@ def property_view(code):
     property_ = g.properties[code]
     domain = g.classes[property_.domain_class_code]
     range_ = g.classes[property_.range_class_code]
-    tables = {
-        'info': [
-            ('code', property_.code),
-            ('name', property_.name),
-            ('inverse', property_.name_inverse),
-            ('domain', link(domain) + ' ' + domain.name),
-            ('range', link(range_) + ' ' + range_.name)]}
+    tables = {'info': [('code', property_.code),
+                       ('name', property_.name),
+                       ('inverse', property_.name_inverse),
+                       ('domain', link(domain) + ' ' + domain.name),
+                       ('range', link(range_) + ' ' + range_.name)]}
     for table in ['super', 'sub']:
         tables[table] = {'id': table, 'header': ['code', 'name'], 'data': [], 'show_pager': False,
                          'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }}'}
@@ -131,11 +129,10 @@ class NetworkForm(Form):
     charge = StringField(default=-800, validators=[InputRequired()])
     distance = IntegerField(default=80, validators=[InputRequired()])
     orphans = BooleanField(default=False)
-    classes = SelectMultipleField(
-        _('classes'),
-        option_widget=widgets.CheckboxInput(),
-        widget=widgets.ListWidget(prefix_label=False),
-        default=['E21', 'E7', 'E40', 'E74', 'E8', 'E12', 'E6'])
+    classes = SelectMultipleField(_('classes'),
+                                  option_widget=widgets.CheckboxInput(),
+                                  widget=widgets.ListWidget(prefix_label=False),
+                                  default=['E21', 'E7', 'E40', 'E74', 'E8', 'E12', 'E6'])
     properties = SelectMultipleField(
         _('properties'),
         option_widget=widgets.CheckboxInput(),
@@ -163,19 +160,17 @@ def model_network():
     form = NetworkForm()
     form.classes.choices = []
     form.properties.choices = []
-    params = {'classes': {}, 'properties': {}, 'options': {
-        'orphans': form.orphans.data,
-        'width': form.width.data,
-        'height': form.height.data,
-        'charge': form.charge.data,
-        'distance': form.distance.data}}
+    params = {'classes': {}, 'properties': {}, 'options': {'orphans': form.orphans.data,
+                                                           'width': form.width.data,
+                                                           'height': form.height.data,
+                                                           'charge': form.charge.data,
+                                                           'distance': form.distance.data}}
     for code in ['E21', 'E7', 'E31', 'E33', 'E40', 'E74', 'E53', 'E18', 'E8', 'E12', 'E6', 'E84']:
         form.classes.choices.append((code, g.classes[code].name))
         params['classes'][code] = {'active': (code in form.classes.data),
                                    'color': getattr(form, 'color_' + code).data}
-    for code in ['P107',  'P24',  'P23',  'P11',  'P14',  'P7',  'P74',  'P67',  'OA7', 'OA8',
-                 'OA9']:
+    for code in ['P107', 'P24', 'P23', 'P11', 'P14', 'P7', 'P74', 'P67', 'OA7', 'OA8', 'OA9']:
         form.properties.choices.append((code, g.properties[code].name))
         params['properties'][code] = {'active': (code in form.properties.data)}
-    data = Network.get_network_json(params)
-    return render_template('model/network.html', form=form, network_params=params, json_data=data)
+    return render_template('model/network.html', form=form, network_params=params,
+                           json_data=Network.get_network_json(params))

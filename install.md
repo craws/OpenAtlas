@@ -101,6 +101,16 @@ Login with username "OpenAtlas" and password "change_me_PLEASE!" and change the 
 
 If you later like to upgrade the application be sure to read and follow the [upgrade instructions](install/upgrade/upgrade.md).
 
+### Additional security (optional)
+
+You don't need this to run the application but it will improve server side security if running an online productive instance.
+
+Use certbot to create a https vhost.
+
+When configured Apache to use HTTPS only, add this line to instance/production.py:
+
+    SESSION_COOKIE_SECURE = True
+
 ### Unit tests (optional)
 
 Install required packages:

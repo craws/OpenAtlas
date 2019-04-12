@@ -175,25 +175,23 @@ def admin_check_dates():
 @required_group('editor')
 def admin_orphans():
     header = ['name', 'class', 'type', 'system type', 'created', 'updated', 'description']
-    tables = {
-        'orphans': {'id': 'orphans', 'header': header, 'data': []},
-        'unlinked': {'id': 'unlinked', 'header': header, 'data': []},
-        'nodes': {'id': 'nodes', 'header': ['name', 'root'], 'data': []},
-        'missing_files': {'id': 'missing_files', 'header': header, 'data': []},
-        'circular': {'id': 'circular', 'header': ['entity'], 'data': []},
-        'orphaned_files': {'id': 'orphaned_files', 'data': [],
-                           'header': ['name', 'size', 'date', 'ext']}}
+    tables = {'orphans': {'id': 'orphans', 'header': header, 'data': []},
+              'unlinked': {'id': 'unlinked', 'header': header, 'data': []},
+              'nodes': {'id': 'nodes', 'header': ['name', 'root'], 'data': []},
+              'missing_files': {'id': 'missing_files', 'header': header, 'data': []},
+              'circular': {'id': 'circular', 'header': ['entity'], 'data': []},
+              'orphaned_files': {'id': 'orphaned_files', 'data': [],
+                                 'header': ['name', 'size', 'date', 'ext']}}
     tables['circular']['data'] = [[link(entity)] for entity in EntityMapper.get_circular()]
     for entity in EntityMapper.get_orphans():
         name = 'unlinked' if entity.class_.code in app.config['CODE_CLASS'].keys() else 'orphans'
-        tables[name]['data'].append([
-            link(entity),
-            link(entity.class_),
-            entity.print_base_type(),
-            entity.system_type,
-            format_date(entity.created),
-            format_date(entity.modified),
-            truncate_string(entity.description)])
+        tables[name]['data'].append([link(entity),
+                                     link(entity.class_),
+                                     entity.print_base_type(),
+                                     entity.system_type,
+                                     format_date(entity.created),
+                                     format_date(entity.modified),
+                                     truncate_string(entity.description)])
     for node in NodeMapper.get_orphans():
         tables['nodes']['data'].append([link(node), link(g.nodes[node.root[-1]])])
 
@@ -202,14 +200,13 @@ def admin_orphans():
     for entity in EntityMapper.get_by_system_type('file'):
         file_ids.append(str(entity.id))
         if not get_file_path(entity):
-            tables['missing_files']['data'].append([
-                link(entity),
-                link(entity.class_),
-                entity.print_base_type(),
-                entity.system_type,
-                format_date(entity.created),
-                format_date(entity.modified),
-                truncate_string(entity.description)])
+            tables['missing_files']['data'].append([link(entity),
+                                                    link(entity.class_),
+                                                    entity.print_base_type(),
+                                                    entity.system_type,
+                                                    format_date(entity.created),
+                                                    format_date(entity.modified),
+                                                    truncate_string(entity.description)])
 
     # Get orphaned files (no corresponding entity)
     for file in os.scandir(app.config['UPLOAD_FOLDER_PATH']):
@@ -282,7 +279,8 @@ def admin_file_delete(filename):  # pragma: no cover
 
 class LogForm(Form):
     limit = SelectField(_('limit'), choices=((0, _('all')), (100, 100), (500, 500)), default=100)
-    priority = SelectField(_('priority'), choices=(list(app.config['LOG_LEVELS'].items())), default=6)
+    priority = SelectField(_('priority'), choices=(list(app.config['LOG_LEVELS'].items())),
+                           default=6)
     user = SelectField(_('user'), choices=([(0, _('all'))]), default=0)
     apply = SubmitField(_('apply'))
 
@@ -297,13 +295,12 @@ def admin_log():
     logs = logger.get_system_logs(form.limit.data, form.priority.data, form.user.data)
     for row in logs:
         user = UserMapper.get_by_id(row.user_id) if row.user_id else None
-        table['data'].append([
-            format_datetime(row.created),
-            str(row.priority) + ' ' + app.config['LOG_LEVELS'][row.priority],
-            row.type,
-            row.message,
-            link(user) if user and user.id else row.user_id,
-            row.info.replace('\n', '<br />')])
+        table['data'].append([format_datetime(row.created),
+                              str(row.priority) + ' ' + app.config['LOG_LEVELS'][row.priority],
+                              row.type,
+                              row.message,
+                              link(user) if user and user.id else row.user_id,
+                              row.info.replace('\n', '<br />')])
     return render_template('admin/log.html', table=table, form=form)
 
 
@@ -323,7 +320,7 @@ class NewsLetterForm(Form):
 
 
 @app.route('/admin/newsletter', methods=['POST', 'GET'])
-@required_group('admin')
+@required_group('manager')
 def admin_newsletter():
     form = NewsLetterForm()
     if form.validate_on_submit():  # pragma: no cover

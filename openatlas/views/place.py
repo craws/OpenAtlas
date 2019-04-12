@@ -97,7 +97,7 @@ def place_view(id_):
         'source': {'id': 'source', 'data': [], 'header': app.config['TABLE_HEADERS']['source']},
         'event': {'id': 'event', 'data': [], 'header': app.config['TABLE_HEADERS']['event']},
         'reference': {'id': 'reference', 'data': [],
-                      'header': app.config['TABLE_HEADERS']['reference'] + ['pages']},
+                      'header': app.config['TABLE_HEADERS']['reference'] + ['page / link text']},
         'actor': {'id': 'actor', 'data': [],
                   'header': [_('actor'), _('property'), _('class'), _('first'), _('last')]}}
     if object_.system_type == 'place':

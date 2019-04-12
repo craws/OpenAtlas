@@ -43,7 +43,7 @@ def actor_view(id_):
                  'header': app.config['TABLE_HEADERS']['file'] + [_('main image')]},
         'source': {'id': 'source', 'data': [], 'header': app.config['TABLE_HEADERS']['source']},
         'reference': {'id': 'reference', 'data': [],
-                      'header': app.config['TABLE_HEADERS']['reference'] + ['pages']},
+                      'header': app.config['TABLE_HEADERS']['reference'] + ['page / link text']},
         'event': {'id': 'event', 'data': [],
                   'header': ['event', 'class', 'involvement', 'first', 'last', 'description']},
         'relation': {'id': 'relation', 'data': [], 'sort': 'sortList:[[0,0]]',

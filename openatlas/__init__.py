@@ -97,11 +97,22 @@ def before_request():
     debug_model['model'] = time.time() - debug_model['current']
     debug_model['current'] = time.time()
 
-    # Workaround overlay maps for Stefan until #978 is implemented
+    # Workaround overlay maps for Thanados until #978 is implemented
     session['settings']['overlay_hack'] = False
-    if hasattr(current_user, 'id') and current_user.id in [3,4] and \
-            session['settings']['site_name'] == 'DPP':
+    if session['settings']['site_name'] == 'Thanados':
         session['settings']['overlay_hack'] = True  # pragma: no cover
+
+
+@app.after_request
+def apply_caching(response):
+    response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
+    response.headers['X-Content-Type-Options'] = 'nosniff'
+    response.headers['X-Frame-Options'] = 'SAMEORIGIN'
+    response.headers['X-XSS-Protection'] = '1; mode=block'
+
+    # Todo: activate Content-Security-Policy after removal of every inline CSS and JavaScript
+    # response.headers['Content-Security-Policy'] = "default-src 'self'"
+    return response
 
 
 @app.teardown_request

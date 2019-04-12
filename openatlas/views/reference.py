@@ -70,6 +70,7 @@ def reference_add(origin_id):
     if form.validate_on_submit():
         EntityMapper.get_by_id(form.reference.data).link('P67', origin, form.page.data)
         return redirect(url_for(origin.view_name + '_view', id_=origin.id) + '#tab-reference')
+    form.page.label.text = uc_first(_('page / link text'))
     return render_template('reference/add.html', origin=origin, form=form)
 
 
@@ -77,14 +78,16 @@ def reference_add(origin_id):
 @required_group('editor')
 def reference_add2(reference_id, class_name):
     """ Link an entity to reference coming from the reference."""
-    reference_ = EntityMapper.get_by_id(reference_id)
+    reference = EntityMapper.get_by_id(reference_id)
     form = getattr(openatlas.views.reference, 'Add' + uc_first(class_name) + 'Form')()
     if form.validate_on_submit():
-        property_code = 'P128' if reference_.class_.code == 'E84' else 'P67'
+        property_code = 'P128' if reference.class_.code == 'E84' else 'P67'
         entity = EntityMapper.get_by_id(getattr(form, class_name).data)
-        reference_.link(property_code, entity, form.page.data)
-        return redirect(url_for('reference_view', id_=reference_.id) + '#tab-' + class_name)
-    return render_template('reference/add2.html', reference=reference_, form=form,
+        reference.link(property_code, entity, form.page.data)
+        return redirect(url_for('reference_view', id_=reference.id) + '#tab-' + class_name)
+    if reference.system_type == 'external reference':
+        form.page.label.text = uc_first(_('link text'))
+    return render_template('reference/add2.html', reference=reference, form=form,
                            class_name=class_name)
 
 
@@ -94,7 +97,6 @@ def reference_link_update(link_id, origin_id):
     link_ = LinkMapper.get_by_id(link_id)
     origin = EntityMapper.get_by_id(origin_id)
     form = AddReferenceForm()
-    form.save.label.text = _('save')
     del form.reference
     if form.validate_on_submit():
         link_.description = form.page.data
@@ -104,7 +106,10 @@ def reference_link_update(link_id, origin_id):
         if origin.view_name == 'reference':
             tab = '#tab-' + link_.range.view_name
         return redirect(url_for(origin.view_name + '_view', id_=origin.id) + tab)
+    form.save.label.text = _('save')
     form.page.data = link_.description
+    if link_.domain.system_type == 'external reference':
+        form.page.label.text = uc_first(_('link text'))
     linked_object = link_.domain if link_.domain.id != origin.id else link_.range
     return render_template('reference/link-update.html', origin=origin, form=form,
                            linked_object=linked_object)
@@ -119,7 +124,8 @@ def reference_view(id_):
         'file': {'id': 'files', 'data': [],
                  'header': app.config['TABLE_HEADERS']['file'] + ['page'] + [_('main image')]}}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find']:
-        header = app.config['TABLE_HEADERS'][name] + ['page']
+        header_label = 'link text' if reference.system_type == 'external reference' else 'page'
+        header = app.config['TABLE_HEADERS'][name] + [header_label]
         tables[name] = {'id': name, 'header': header, 'data': []}
     for link_ in reference.get_links('P67', True):
         domain = link_.domain

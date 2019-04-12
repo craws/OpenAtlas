@@ -4,9 +4,15 @@ from collections import OrderedDict
 
 class Changelog:
     versions = OrderedDict()
-    versions['3.15.0'] = ['TBA', OrderedDict([
+    versions['3.16.0'] = ['TBA', OrderedDict([
         ('feature', OrderedDict([
-            ('983', 'External References')]))])]
+            ('1011', 'Additional security features'),
+            ]))])]
+    versions['3.15.0'] = ['2019-04-04', OrderedDict([
+        ('feature', OrderedDict([
+            ('983', 'External References')])),
+        ('fix', OrderedDict([
+            ('1010', 'Missing or misspelled map feature descriptions')]))])]
     versions['3.14.1'] = ['2019-03-14', OrderedDict([
         ('feature', OrderedDict([
             ('997', 'Advanced date completion')])),
