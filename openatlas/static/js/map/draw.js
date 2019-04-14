@@ -5,7 +5,6 @@ var description;
 var shapeType; // centerpoint, polyline, shape or area
 var objectName; // Name of the entry at update of an existing entry
 
-
 var captureCoordinates = false; // Boolean if clicks on map should be captured as coordinates
 var marker = false; // Temporary marker for point coordinate
 var newMarker = false; // Temporary marker for point update coordinate
@@ -220,6 +219,9 @@ function drawGeometry(selectedType) {
     map.addControl(inputForm);
     $('#inputFormTitle').text(selectedType.substr(0,1).toUpperCase() + selectedType.substr(1));
     $('#inputFormInfo').text(translate['map_info_' + selectedType]);
+    if (selectedType == 'polyline') {
+        $('#inputFormInfo').text(translate['map_info_linestring']);
+    }
     $('.leaflet-right .leaflet-bar').hide();
     if (selectedType == 'centerpoint') {
         $('#coordinatesDiv').show();
