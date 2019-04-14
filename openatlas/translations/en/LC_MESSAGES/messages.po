@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2019-04-14 11:08+0200\n"
-"PO-Revision-Date: 2019-04-14 11:14+0200\n"
+"PO-Revision-Date: 2019-04-14 11:47+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -278,7 +278,7 @@ msgstr "Set a marker/point at the position where the physical thing is located."
 #: templates/map.html:26
 msgid "map_info_linestring"
 msgstr ""
-"Draw a line connected to a physical object's spatial characteristics (e.g. the "
+"Draw a line connected to a physical objects spatial characteristics (e.g. the "
 "course of a river or road)"
 
 #: templates/map.html:27
