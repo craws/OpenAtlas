@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-04-06 18:50+0200\n"
-"PO-Revision-Date: 2019-04-06 18:53+0200\n"
+"POT-Creation-Date: 2019-04-14 11:08+0200\n"
+"PO-Revision-Date: 2019-04-14 11:13+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: de\n"
 "Language-Team: de <LL@li.org>\n"
@@ -71,10 +71,10 @@ msgstr "entfernen"
 
 #: models/content.py:54 views/actor.py:290 views/admin.py:80 views/admin.py:121
 #: views/admin.py:417 views/admin.py:452 views/event.py:205 views/file.py:241
-#: views/hierarchy.py:122 views/imports.py:196 views/involvement.py:64
+#: views/hierarchy.py:122 views/imports.py:199 views/involvement.py:64
 #: views/involvement.py:101 views/member.py:59 views/member.py:87
-#: views/member.py:116 views/place.py:290 views/profile.py:88 views/profile.py:121
-#: views/reference.py:247 views/relation.py:57 views/relation.py:90
+#: views/member.py:116 views/place.py:292 views/profile.py:88 views/profile.py:121
+#: views/reference.py:248 views/relation.py:57 views/relation.py:90
 #: views/source.py:113 views/source.py:187 views/translation.py:85
 #: views/types.py:239
 msgid "error transaction"
@@ -208,7 +208,7 @@ msgstr "Abmelden"
 msgid "login"
 msgstr "Anmelden"
 
-#: templates/content/update.html:16 templates/map.html:15 util/filters.py:202
+#: templates/content/update.html:16 templates/map.html:17 util/filters.py:202
 #: views/admin.py:45 views/admin.py:63 views/admin.py:104 views/admin.py:435
 #: views/involvement.py:80 views/member.py:119 views/profile.py:31
 #: views/profile.py:59 views/reference.py:109 views/relation.py:94
@@ -224,7 +224,7 @@ msgstr "speichern"
 #: templates/file/update.html:5 templates/file/view.html:24
 #: templates/hierarchy/update.html:5 templates/import/project_update.html:6
 #: templates/import/project_view.html:18 templates/involvement/update.html:6
-#: templates/map.html:16 templates/member/update.html:6
+#: templates/map.html:18 templates/member/update.html:6
 #: templates/place/update.html:9 templates/place/view.html:37
 #: templates/profile/index.html:9 templates/profile/update.html:4
 #: templates/reference/link-update.html:6 templates/reference/update.html:6
@@ -235,55 +235,61 @@ msgstr "speichern"
 #: templates/types/view.html:25 templates/user/update.html:7
 #: templates/user/view.html:12 views/actor.py:68 views/actor.py:98
 #: views/actor.py:140 views/actor.py:149 views/actor.py:162 views/admin.py:169
-#: views/event.py:132 views/event.py:150 views/file.py:153 views/place.py:126
-#: views/reference.py:148 views/source.py:90
+#: views/event.py:132 views/event.py:150 views/file.py:153 views/place.py:128
+#: views/reference.py:149 views/source.py:90
 msgid "edit"
 msgstr "bearbeiten"
 
-#: templates/import/project_view.html:21 templates/map.html:17
+#: templates/import/project_view.html:21 templates/map.html:19
 #: templates/translation/view.html:13 templates/translation/view.html:15
 #: templates/types/index.html:46 templates/types/index.html:47
 #: templates/types/view.html:27 templates/types/view.html:28
 #: templates/user/view.html:15 templates/user/view.html:16 util/filters.py:336
-#: views/admin.py:224 views/export.py:62 views/export.py:118 views/user.py:56
+#: views/admin.py:224 views/export.py:63 views/export.py:119 views/user.py:56
 msgid "delete"
 msgstr "löschen"
 
-#: templates/map.html:18
+#: templates/map.html:20
 msgid "details"
 msgstr "Details"
 
-#: templates/map.html:19
+#: templates/map.html:21
 msgid "map_clear"
 msgstr "clear"
 
-#: templates/map.html:20
+#: templates/map.html:22
 msgid "map_info_reedit"
 msgstr "Für erneutes Bearbeiten bitte speichern oder neu laden."
 
-#: templates/map.html:21
+#: templates/map.html:23
 msgid "map_info_shape"
 msgstr ""
 "Zeichne den Umriss eines physischen Objekts dessen genaue Ausdehnung bekannt "
 "ist."
 
-#: templates/map.html:22
+#: templates/map.html:24
 msgid "map_info_area"
 msgstr ""
 "Zeichne die Fläche in dem sich das physikalische Objekt befindet. Z.B. wenn der "
 "genaue Umriss nicht bekannt ist, aber es sich innerhalb eines bestimmten Gebiet "
 "befindet."
 
-#: templates/map.html:23
+#: templates/map.html:25
 msgid "map_info_point"
 msgstr ""
 "Setze einen Marker an die Position wo sich das physikalische Objekt befindet."
 
-#: templates/map.html:24
+#: templates/map.html:26
+msgid "map_info_linestring"
+msgstr ""
+"Zeichne eine Linie für die räumliche Eigenschaften eines Objektes (z.B. der "
+"Verlauf eines Flusses oder Straße)"
+
+#: templates/map.html:27
 msgid "map_info_close"
 msgstr "Schließen ohne zu Speichern"
 
-#: templates/map.html:25
+#: templates/map.html:28
 msgid "map_info_description"
 msgstr "Hier kann eine Beschreibung eingeben werden."
 
@@ -294,7 +300,7 @@ msgstr "Hier kann eine Beschreibung eingeben werden."
 #: templates/place/view.html:22 templates/reference/view.html:14
 #: templates/relation/insert.html:4 templates/relation/update.html:3
 #: templates/source/view.html:11 views/involvement.py:18 views/member.py:18
-#: views/member.py:19 views/place.py:100 views/reference.py:47
+#: views/member.py:19 views/place.py:102 views/reference.py:47
 #: views/relation.py:19
 msgid "actor"
 msgstr "Akteur"
@@ -421,7 +427,7 @@ msgstr "Externe Referenz"
 #: templates/file/add.html:5 templates/file/index.html:8
 #: templates/file/insert.html:9 templates/place/view.html:101
 #: templates/reference/view.html:64 templates/source/view.html:83
-#: views/admin.py:229 views/file.py:24 views/imports.py:96 views/reference.py:59
+#: views/admin.py:229 views/file.py:24 views/imports.py:97 views/reference.py:59
 msgid "file"
 msgstr "Datei"
 
@@ -534,7 +540,7 @@ msgstr "Daten Transfer"
 #: templates/admin/index.html:46 templates/import/import_data.html:4
 #: templates/import/index.html:4 templates/import/project_insert.html:4
 #: templates/import/project_update.html:4 templates/import/project_view.html:4
-#: views/imports.py:99
+#: views/imports.py:100
 msgid "import"
 msgstr "Import"
 
@@ -604,7 +610,7 @@ msgstr "Alle Dateien löschen."
 msgid "sub events"
 msgstr "Unter Ereignisse"
 
-#: templates/export/export_csv.html:4 views/export.py:33
+#: templates/export/export_csv.html:4 views/export.py:34
 msgid "export CSV"
 msgstr "export CSV"
 
@@ -646,7 +652,7 @@ msgid "missing file"
 msgstr "Fehlende Datei"
 
 #: templates/file/view.html:31 templates/model/network.html:13 views/admin.py:222
-#: views/export.py:58 views/export.py:113
+#: views/export.py:59 views/export.py:114
 msgid "download"
 msgstr "Download"
 
@@ -682,17 +688,17 @@ msgid "preview"
 msgstr "Vorschau"
 
 #: templates/import/index.html:10 templates/import/project_insert.html:5
-#: views/imports.py:36
+#: views/imports.py:37
 msgid "project"
 msgstr "Projekt"
 
 #: templates/import/project_view.html:12 templates/types/view.html:18
-#: views/imports.py:36
+#: views/imports.py:37
 msgid "entities"
 msgstr "Instanzen"
 
 #: templates/import/project_view.html:20 util/filters.py:334 views/admin.py:215
-#: views/export.py:60 views/export.py:116
+#: views/export.py:61 views/export.py:117
 #, python-format
 msgid "Delete %(name)s?"
 msgstr "%(name)s löschen?"
@@ -821,10 +827,10 @@ msgstr "Zielklasse für"
 
 #: templates/model/class_view.html:40 templates/model/property_view.html:26
 #: templates/types/index.html:71 util/filters.py:140 views/actor.py:25
-#: views/event.py:24 views/file.py:26 views/hierarchy.py:28 views/imports.py:21
-#: views/imports.py:36 views/imports.py:60 views/index.py:22
-#: views/involvement.py:21 views/member.py:21 views/place.py:20 views/place.py:31
-#: views/place.py:103 views/place.py:107 views/place.py:110 views/reference.py:21
+#: views/event.py:24 views/file.py:26 views/hierarchy.py:28 views/imports.py:22
+#: views/imports.py:37 views/imports.py:61 views/index.py:22
+#: views/involvement.py:21 views/member.py:21 views/place.py:20 views/place.py:32
+#: views/place.py:105 views/place.py:109 views/place.py:112 views/reference.py:21
 #: views/relation.py:21 views/types.py:24
 msgid "description"
 msgstr "Beschreibung"
@@ -930,7 +936,7 @@ msgstr "Anzeige"
 msgid "generate password"
 msgstr "Passwort generieren"
 
-#: templates/search/index.html:14 util/util.py:290 views/imports.py:60
+#: templates/search/index.html:14 util/util.py:290 views/imports.py:61
 msgid "date"
 msgstr "Datum"
 
@@ -1031,7 +1037,7 @@ msgstr "%(name)s entfernen?"
 msgid "remove"
 msgstr "entfernen"
 
-#: util/util.py:206 views/imports.py:60 views/place.py:100 views/types.py:88
+#: util/util.py:206 views/imports.py:61 views/place.py:102 views/types.py:88
 #: views/types.py:90
 msgid "class"
 msgstr "Klasse"
@@ -1132,7 +1138,7 @@ msgid "in"
 msgstr "in"
 
 #: views/actor.py:20 views/event.py:20 views/file.py:25 views/hierarchy.py:18
-#: views/imports.py:20 views/imports.py:60 views/place.py:18 views/place.py:30
+#: views/imports.py:21 views/imports.py:61 views/place.py:18 views/place.py:31
 #: views/reference.py:20 views/source.py:19 views/translation.py:16
 #: views/types.py:20 views/types.py:88 views/types.py:90 views/types.py:107
 msgid "name"
@@ -1147,8 +1153,8 @@ msgid "residence"
 msgstr "Residenz"
 
 #: views/actor.py:26 views/event.py:25 views/file.py:27 views/hierarchy.py:29
-#: views/imports.py:22 views/involvement.py:22 views/member.py:22
-#: views/place.py:21 views/place.py:32 views/reference.py:22 views/reference.py:31
+#: views/imports.py:23 views/involvement.py:22 views/member.py:22
+#: views/place.py:21 views/place.py:33 views/reference.py:22 views/reference.py:31
 #: views/reference.py:37 views/reference.py:43 views/reference.py:49
 #: views/reference.py:55 views/reference.py:61 views/relation.py:22
 #: views/source.py:21 views/translation.py:18 views/types.py:25 views/user.py:55
@@ -1156,12 +1162,12 @@ msgid "insert"
 msgstr "anlegen"
 
 #: views/actor.py:27 views/event.py:26 views/involvement.py:23 views/member.py:23
-#: views/place.py:22 views/place.py:35 views/reference.py:23 views/relation.py:23
+#: views/place.py:22 views/place.py:37 views/reference.py:23 views/relation.py:23
 #: views/source.py:22 views/translation.py:19 views/types.py:26 views/user.py:31
 msgid "insert and continue"
 msgstr "Anlegen und weiter"
 
-#: views/actor.py:43 views/event.py:110 views/place.py:94 views/reference.py:125
+#: views/actor.py:43 views/event.py:110 views/place.py:96 views/reference.py:125
 #: views/source.py:58
 msgid "main image"
 msgstr "Angezeigtes Bild"
@@ -1191,28 +1197,28 @@ msgid "died in"
 msgstr "gestorben in"
 
 #: views/actor.py:207 views/event.py:74 views/file.py:207 views/hierarchy.py:102
-#: views/place.py:182 views/reference.py:196 views/source.py:137
+#: views/place.py:184 views/reference.py:197 views/source.py:137
 #: views/translation.py:50 views/types.py:121
 msgid "entity deleted"
 msgstr "Der Eintrag wurde gelöscht."
 
-#: views/actor.py:220 views/event.py:89 views/file.py:171 views/place.py:204
-#: views/reference.py:213 views/source.py:149
+#: views/actor.py:220 views/event.py:89 views/file.py:171 views/place.py:206
+#: views/reference.py:214 views/source.py:149
 msgid "error modified"
 msgstr "Änderung fehlgeschlagen."
 
 #: views/actor.py:286 views/event.py:201 views/file.py:237 views/hierarchy.py:44
 #: views/involvement.py:60 views/member.py:55 views/member.py:83
-#: views/place.py:280 views/reference.py:243 views/relation.py:53
+#: views/place.py:282 views/reference.py:244 views/relation.py:53
 #: views/source.py:183 views/translation.py:30 views/types.py:235
 msgid "entity created"
 msgstr "Neuer Eintrag angelegt"
 
 #: views/actor.py:286 views/admin.py:76 views/admin.py:117 views/admin.py:413
 #: views/admin.py:448 views/content.py:52 views/event.py:201 views/file.py:237
-#: views/hierarchy.py:66 views/hierarchy.py:88 views/place.py:280
+#: views/hierarchy.py:66 views/hierarchy.py:88 views/place.py:282
 #: views/profile.py:84 views/profile.py:117 views/reference.py:104
-#: views/reference.py:243 views/relation.py:86 views/source.py:183
+#: views/reference.py:244 views/relation.py:86 views/source.py:183
 #: views/translation.py:62 views/types.py:235 views/user.py:140
 msgid "info update"
 msgstr "Die Änderungen wurden gespeichert."
@@ -1293,7 +1299,7 @@ msgstr "Logo ändern"
 msgid "was deleted"
 msgstr "wurde gelöscht"
 
-#: views/admin.py:260 views/admin.py:276 views/export.py:84 views/export.py:133
+#: views/admin.py:260 views/admin.py:276 views/export.py:85 views/export.py:134
 #: views/file.py:206
 msgid "error file delete"
 msgstr "Fehler beim Löschen der Datei"
@@ -1406,27 +1412,27 @@ msgstr "GIS Format"
 msgid "coordinates"
 msgstr "Koordinaten"
 
-#: views/export.py:45
+#: views/export.py:46
 msgid "data was exported as SQL"
 msgstr "Daten wurden als SQL exportiert"
 
-#: views/export.py:48
+#: views/export.py:49
 msgid "SQL export failed"
 msgstr "SQL Export fehlgeschlagen"
 
-#: views/export.py:81 views/export.py:130
+#: views/export.py:82 views/export.py:131
 msgid "file deleted"
 msgstr "Datei wurde gelöscht"
 
-#: views/export.py:104
+#: views/export.py:105
 msgid "data was exported as CSV"
 msgstr "Daten wurden als CSV exportiert"
 
-#: views/file.py:36 views/imports.py:106
+#: views/file.py:36 views/imports.py:107
 msgid "no file to upload"
 msgstr "Keine Datei"
 
-#: views/file.py:39 views/imports.py:109
+#: views/file.py:39 views/imports.py:110
 msgid "file type not allowed"
 msgstr "Dateityp nicht erlaubt."
 
@@ -1442,59 +1448,59 @@ msgstr "Aktivieren wenn mehrfach Verwendung für ein Objekt möglich sein soll."
 msgid "tooltip hierarchy forms"
 msgstr "Auswahl für Formulare in denen dieser Typ verwendet werden kann."
 
-#: views/hierarchy.py:41 views/hierarchy.py:63 views/imports.py:28
+#: views/hierarchy.py:41 views/hierarchy.py:63 views/imports.py:29
 msgid "error name exists"
 msgstr "Dieser Name wird bereits verwendet."
 
-#: views/imports.py:51
+#: views/imports.py:52
 msgid "project inserted"
 msgstr "Projekt angelegt"
 
-#: views/imports.py:82
+#: views/imports.py:83
 msgid "project updated"
 msgstr "Projekt gespeichert"
 
-#: views/imports.py:91
+#: views/imports.py:92
 msgid "project deleted"
 msgstr "Projekt wurde gelöscht"
 
-#: views/imports.py:97
+#: views/imports.py:98
 msgid "preview only"
 msgstr "Nur Vorschau"
 
-#: views/imports.py:98
+#: views/imports.py:99
 msgid "check for duplicates"
 msgstr "Duplikate prüfen"
 
-#: views/imports.py:134
+#: views/imports.py:137
 msgid "missing name column"
 msgstr "Name Spalte fehlt"
 
-#: views/imports.py:141
+#: views/imports.py:144
 msgid "invalid columns"
 msgstr "Ungültige Spalten"
 
-#: views/imports.py:167
+#: views/imports.py:170
 msgid "empty names"
 msgstr "leere Namen"
 
-#: views/imports.py:170
+#: views/imports.py:173
 msgid "double IDs in import"
 msgstr "doppelte IDs im Import"
 
-#: views/imports.py:173
+#: views/imports.py:176
 msgid "IDs already in database"
 msgstr "IDs bereits in Datenbank"
 
-#: views/imports.py:177
+#: views/imports.py:180
 msgid "possible duplicates"
 msgstr "mögliche Duplikate"
 
-#: views/imports.py:181
+#: views/imports.py:184
 msgid "error at import"
 msgstr "Fehler beim Import"
 
-#: views/imports.py:191
+#: views/imports.py:194
 msgid "import of"
 msgstr "Import von"
 
@@ -1628,23 +1634,23 @@ msgstr "Das Verschicken eines Passwort E-Mails an %(email)s ist fehlgeschlagen."
 msgid "Can't link to itself."
 msgstr "Kann sich nicht mit sich selbst verknüpfen."
 
-#: views/place.py:100
+#: views/place.py:102
 msgid "property"
 msgstr "Eigenschaft"
 
-#: views/place.py:100
+#: views/place.py:102
 msgid "first"
 msgstr "Erstes"
 
-#: views/place.py:100
+#: views/place.py:102
 msgid "last"
 msgstr "Letztes"
 
-#: views/place.py:178
+#: views/place.py:180
 msgid "Deletion not possible if subunits exists"
 msgstr "Löschung nicht möglich solange subunits existieren."
 
-#: views/place.py:284
+#: views/place.py:286
 msgid "Invalid geom entered"
 msgstr "Eine ungültige Geometrie wurde eingegeben"
 
