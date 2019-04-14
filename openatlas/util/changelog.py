@@ -6,6 +6,7 @@ class Changelog:
     versions = OrderedDict()
     versions['3.16.0'] = ['TBA', OrderedDict([
         ('feature', OrderedDict([
+            ('994', 'Line drawing in map'),
             ('1011', 'Additional security features'),
             ]))])]
     versions['3.15.0'] = ['2019-04-04', OrderedDict([
