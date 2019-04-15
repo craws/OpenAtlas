@@ -33,14 +33,21 @@ L.Control.EasyButtons = L.Control.extend({
         this.intendedFunction();
     },
     _addImage: function () {
-        var extraClasses = this.options.intentedIcon.lastIndexOf('fa', 0) === 0 ? ' fa fa-lg' : ' glyphicon';
-        L.DomUtil.create('i', this.options.intentedIcon + extraClasses, this.link);
+        L.DomUtil.create('i', this.options.intentedIcon, this.link);
     }
 });
 
+pointButton = new L.Control.EasyButtons({
+    position: 'topright',
+    intentedIcon: 'fa-map-marker-alt fa',
+    title: translate['map_info_centerpoint']
+})
+pointButton.intendedFunction = function () {drawGeometry('centerpoint');}
+map.addControl(pointButton);
+
 polylineButton = new L.Control.EasyButtons({
     position: 'topright',
-    intentedIcon: 'fa-road',
+    intentedIcon: 'fa-project-diagram fa',
     title: translate['map_info_linestring']
 })
 polylineButton.intendedFunction = function() {drawGeometry('polyline');}
@@ -48,7 +55,7 @@ map.addControl(polylineButton);
 
 polygonButton = new L.Control.EasyButtons({
     position: 'topright',
-    intentedIcon: 'fa-pencil-square-o',
+    intentedIcon: 'fa-vector-square fa',
     title: translate['map_info_shape']
 })
 polygonButton.intendedFunction = function() {drawGeometry('shape');}
@@ -56,19 +63,12 @@ map.addControl(polygonButton);
 
 areaButton = new L.Control.EasyButtons({
     position: 'topright',
-    intentedIcon: 'fa-circle-o-notch',
+    intentedIcon: 'fa-draw-polygon fa',
     title: translate['map_info_area']
 })
 areaButton.intendedFunction = function() {drawGeometry('area');}
 map.addControl(areaButton);
 
-pointButton = new L.Control.EasyButtons({
-    position: 'topright',
-    intentedIcon: 'fa-map-marker',
-    title: translate['map_info_centerpoint']
-})
-pointButton.intendedFunction = function () {drawGeometry('centerpoint');}
-map.addControl(pointButton);
 
 inputForm = L.control();
 inputForm.onAdd = function (map) {

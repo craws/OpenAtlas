@@ -99,8 +99,8 @@ geoSearchControl = L.control.geonames({
     username: geoNamesUsername, // Geonames account username.  Must be provided
     zoomLevel: 12, // Max zoom level to zoom to for location.  If null, will use the map's max zoom level.
     maxresults: 8, // Maximum number of results to display per search
-    className: 'fa fa-globe', // class for icon
-    workingClass: 'fa-spin', // class for search underway
+    className: 'fa-globe-europe fas', // class for icon
+    //workingClass: 'fa-globe-europe fas', // class for search underway
 });
 map.addControl(geoSearchControl);
 
