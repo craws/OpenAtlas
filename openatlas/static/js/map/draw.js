@@ -371,7 +371,7 @@ function deleteGeometry() {
                 return false;
             }
         });
-        $('#gis_lines').val(JSON.stringify(polygons)); // write array back to form field
+        $('#gis_lines').val(JSON.stringify(polygons)); // Write array back to form field
     } else {
         polygons = JSON.parse($('#gis_polygons').val());
         $.each(polygons, function (key, value) {
@@ -380,7 +380,7 @@ function deleteGeometry() {
                 return false;
             }
         });
-        $('#gis_polygons').val(JSON.stringify(polygons)); // write array back to form field
+        $('#gis_polygons').val(JSON.stringify(polygons)); // Write array back to form field
     }
 }
 

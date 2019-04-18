@@ -22,7 +22,7 @@ class PlaceForm(DateForm):
     insert_and_continue = SubmitField(_('insert and continue'))
     gis_points = HiddenField(default='[]')
     gis_polygons = HiddenField(default='[]')
-    gis_linestrings = HiddenField(default='[]')
+    gis_lines = HiddenField(default='[]')
     continue_ = HiddenField()
     opened = HiddenField()
 
@@ -33,7 +33,7 @@ class FeatureForm(DateForm):
     save = SubmitField(_('insert'))
     gis_points = HiddenField()
     gis_polygons = HiddenField()
-    gis_linestrings = HiddenField()
+    gis_lines = HiddenField()
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
     opened = HiddenField()
@@ -153,7 +153,7 @@ def place_view(id_):
             actor.last])
     gis_data = GisMapper.get_all(object_) if location else None
     if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]'\
-            and gis_data['gisPolygonSelected'] == "":
+            and gis_data['gisLineSelected'] == '[]':
         gis_data = None
     place = None
     feature = None

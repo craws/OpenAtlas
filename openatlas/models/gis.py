@@ -96,7 +96,7 @@ class GisMapper:
 
     @staticmethod
     def insert(entity, form):
-        for shape in ['point', 'linestring', 'polygon']:
+        for shape in ['point', 'line', 'polygon']:
             data = getattr(form, 'gis_' + shape + 's').data
             if not data:
                 continue
@@ -119,7 +119,7 @@ class GisMapper:
                         %(description)s,
                         %(type)s,
                         public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));
-                    """.format(shape=shape)
+                    """.format(shape=shape if shape != 'line' else 'linestring')
                 g.cursor.execute(sql, {'entity_id': entity.id,
                                        'name': item['properties']['name'],
                                        'description': item['properties']['description'],
