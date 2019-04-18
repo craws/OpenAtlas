@@ -1,14 +1,13 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
 
-
 class Changelog:
     versions = OrderedDict()
     versions['3.16.0'] = ['TBA', OrderedDict([
         ('feature', OrderedDict([
             ('994', 'Line drawing in map'),
             ('1011', 'Additional security features'),
-            ]))])]
+            ('1012', 'Update Geonames search for map')]))])]
     versions['3.15.0'] = ['2019-04-04', OrderedDict([
         ('feature', OrderedDict([
             ('983', 'External References')])),
