@@ -8,14 +8,14 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-04-14 11:08+0200\n"
+"POT-Creation-Date: 2019-04-18 14:28+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.3.4\n"
+"Generated-By: Babel 2.6.0\n"
 
 #: __init__.py:37 views/search.py:17
 msgid "search term"
@@ -71,7 +71,7 @@ msgstr ""
 #: views/admin.py:417 views/admin.py:452 views/event.py:205 views/file.py:241
 #: views/hierarchy.py:122 views/imports.py:199 views/involvement.py:64
 #: views/involvement.py:101 views/member.py:59 views/member.py:87
-#: views/member.py:116 views/place.py:292 views/profile.py:88
+#: views/member.py:116 views/place.py:293 views/profile.py:88
 #: views/profile.py:121 views/reference.py:248 views/relation.py:57
 #: views/relation.py:90 views/source.py:113 views/source.py:187
 #: views/translation.py:85 views/types.py:239
@@ -275,6 +275,14 @@ msgstr ""
 
 #: templates/map.html:28
 msgid "map_info_description"
+msgstr ""
+
+#: templates/map.html:29
+msgid "Search by location name or postcode"
+msgstr ""
+
+#: templates/map.html:30
+msgid "Enter a location name"
 msgstr ""
 
 #: templates/actor/index.html:3 templates/actor/insert.html:7
@@ -1168,19 +1176,19 @@ msgid "died in"
 msgstr ""
 
 #: views/actor.py:207 views/event.py:74 views/file.py:207
-#: views/hierarchy.py:102 views/place.py:184 views/reference.py:197
+#: views/hierarchy.py:102 views/place.py:185 views/reference.py:197
 #: views/source.py:137 views/translation.py:50 views/types.py:121
 msgid "entity deleted"
 msgstr ""
 
-#: views/actor.py:220 views/event.py:89 views/file.py:171 views/place.py:206
+#: views/actor.py:220 views/event.py:89 views/file.py:171 views/place.py:207
 #: views/reference.py:214 views/source.py:149
 msgid "error modified"
 msgstr ""
 
 #: views/actor.py:286 views/event.py:201 views/file.py:237
 #: views/hierarchy.py:44 views/involvement.py:60 views/member.py:55
-#: views/member.py:83 views/place.py:282 views/reference.py:244
+#: views/member.py:83 views/place.py:283 views/reference.py:244
 #: views/relation.py:53 views/source.py:183 views/translation.py:30
 #: views/types.py:235
 msgid "entity created"
@@ -1188,7 +1196,7 @@ msgstr ""
 
 #: views/actor.py:286 views/admin.py:76 views/admin.py:117 views/admin.py:413
 #: views/admin.py:448 views/content.py:52 views/event.py:201 views/file.py:237
-#: views/hierarchy.py:66 views/hierarchy.py:88 views/place.py:282
+#: views/hierarchy.py:66 views/hierarchy.py:88 views/place.py:283
 #: views/profile.py:84 views/profile.py:117 views/reference.py:104
 #: views/reference.py:244 views/relation.py:86 views/source.py:183
 #: views/translation.py:62 views/types.py:235 views/user.py:140
@@ -1615,11 +1623,11 @@ msgstr ""
 msgid "last"
 msgstr ""
 
-#: views/place.py:180
+#: views/place.py:181
 msgid "Deletion not possible if subunits exists"
 msgstr ""
 
-#: views/place.py:286
+#: views/place.py:287
 msgid "Invalid geom entered"
 msgstr ""
 
