@@ -106,7 +106,7 @@ var geoSearchControl = L.control.geonames({
     workingClass: 'leaflet-geonames-icon-working', // Class for search underway.
     featureClasses: ['A', 'H', 'L', 'P', 'R', 'T', 'U', 'V'], // Feature classes to search against.  See: http://www.geonames.org/export/codes.html.
     baseQuery: 'isNameRequired=true', // The core query sent to GeoNames, later combined with other parameters above.
-    showMarker: true, // Show a marker at the location the selected location.
+    showMarker: false, // Show a marker at the location the selected location.
     showPopup: true, // Show a tooltip at the selected location.
     adminCodes: {}, // Filter results by the specified admin codes mentioned in `ADMIN_CODES`. Each code can be a string or a function returning a string. `country` can be a comma-separated list of countries.
     bbox: {}, // An object in form of {east:..., west:..., north:..., south:...}, specifying the bounding box to limit the results to.
