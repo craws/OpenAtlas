@@ -88,8 +88,8 @@ class GisMapper:
                         all_['point'].append(polygon_point_item)
         return {'gisPointAll': json.dumps(all_['point']),
                 'gisPointSelected': json.dumps(selected['point']),
-                'gisLinestringAll': json.dumps(all_['linestring']),
-                'gisLinestringSelected': json.dumps(selected['linestring']),
+                'gisLineAll': json.dumps(all_['linestring']),
+                'gisLineSelected': json.dumps(selected['linestring']),
                 'gisPolygonAll': json.dumps(all_['polygon']),
                 'gisPolygonSelected': json.dumps(selected['polygon']),
                 'gisPolygonPointSelected': json.dumps(selected['polygon_point'])}

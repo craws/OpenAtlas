@@ -49,8 +49,8 @@ if (gisPolygonAll) {
     controls.Polygons = polygonLayer;
 }
 
-if (gisLinestringAll) {
-    linestringLayer = new L.GeoJSON(gisLinestringAll, {onEachFeature: setPopup, style: {color: '#9A9A9A'}});
+if (gisLineAll) {
+    linestringLayer = new L.GeoJSON(gisLineAll, {onEachFeature: setPopup, style: {color: '#9A9A9A'}});
     controls.Linestrings = linestringLayer;
 }
 
@@ -64,12 +64,12 @@ if (gisPolygonSelected != '') {
     gisPolygons.on('click', setObjectId);
 }
 
-if (gisLinestringSelected != '') {
-    gisLinestrings = L.geoJson(gisLinestringSelected, {onEachFeature: setPopup}).addTo(map);
-    gisLinestrings.on('click', setObjectId);
+if (gisLineSelected != '') {
+    gisLines = L.geoJson(gisLineSelected, {onEachFeature: setPopup}).addTo(map);
+    gisLines.on('click', setObjectId);
 }
 
-// Workaround overlay maps for Stefan until #978 is implemented
+// Workaround overlay maps for MedCem until #978 is implemented
 if (overlayHack) {
     controls.Stara = L.imageOverlay('/display/112757.png', [[49.99800, 14.99246], [49.99747, 14.99328]]);
     controls.Thunau = L.imageOverlay('/display/112760.png', [[48.58709, 15.64294], [48.58653, 15.64356]]);
@@ -79,12 +79,12 @@ if (overlayHack) {
 if (window.location.href.indexOf('update') >= 0) {
     $('#gis_points').val(JSON.stringify(gisPointSelected));
     $('#gis_polygons').val(JSON.stringify(gisPolygonSelected));
-    $('#gis_linestrings').val(JSON.stringify(gisLinestringSelected));
+    $('#gis_lines').val(JSON.stringify(gisLineSelected));
 }
 
-// Set zoom level depending on getbounds of selected points/polygons
+// Set zoom level depending on getBounds of selected points/polygons
 let allSelected = [];
-if (gisLinestringSelected != '') allSelected.push(gisLinestrings);
+if (gisLineSelected != '') allSelected.push(gisLines);
 if (gisPolygonSelected != '') allSelected.push(gisPolygons);
 if (gisPointSelected != '') allSelected.push(gisPoints);
 if (allSelected.length > 0) map.fitBounds(L.featureGroup(allSelected).getBounds(), {maxZoom: 12});

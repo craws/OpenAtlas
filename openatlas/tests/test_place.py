@@ -31,7 +31,7 @@ class PlaceTest(TestBaseCase):
                 "type":"Feature",
                 "geometry":{"type":"Point","coordinates":[9,17]},
                 "properties":{"name":"Valhalla","description":"","shapeType":"centerpoint"}}]"""
-            data['gis_linestrings'] = """[{
+            data['gis_lines'] = """[{
                 "type":"Feature",
                 "geometry":{
                     "type":"LineString",

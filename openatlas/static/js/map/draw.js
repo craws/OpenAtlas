@@ -75,7 +75,7 @@ inputForm.onAdd = function (map) {
     div = L.DomUtil.create('div', 'mapFormDiv');
     div.innerHTML = `
         <form id="geometryForm" onmouseover="interactionOff()" onmouseout="interactionOn()">
-            <span id="closeButton" title="` + translate["map_info_close"] + `" onclick="closeForm()" class="fa">X</span>
+            <span id="closeButton" title="` + translate["map_info_close"] + `" onclick="closeForm()" class="fad">X</span>
             <span id="inputFormTitle"></span>
             <p id="inputFormInfo"></p>
             <input type="text" id="nameField" placeholder="Enter a name if desired" />
@@ -275,7 +275,7 @@ function saveEditedGeometry(shapeType) {
         editedLayer.bindPopup(buildPopup(JSON.parse(point), 'edited'));
     } else if (feature.properties.shapeType == 'polyline') {
         // Remove former polygon
-        polygons = JSON.parse($('#gis_linestrings').val());
+        polygons = JSON.parse($('#gis_lines').val());
         $.each(polygons, function (key, value) {
             if (value.properties.id == feature.properties.id) {
                 polygons.splice(key, 1);
@@ -289,7 +289,7 @@ function saveEditedGeometry(shapeType) {
             `{"type": "LineString", "coordinates": ` + coordinates + `},` +
             `"properties":{"name": "` + name + `", "description": "` + description + `", "shapeType": "` + shapeType + `"}}`;
         polygons.push(JSON.parse(polygon));
-        $('#gis_linestrings').val(JSON.stringify(polygons));
+        $('#gis_lines').val(JSON.stringify(polygons));
         editedLayer = L.polyline(editLayer.getLatLngs()).addTo(map);
         editedLayer.setStyle({fillColor: '#686868', color: '#686868'});
     } else {
@@ -331,9 +331,9 @@ function saveNewGeometry(shapeType) {
             `{"type": "Feature", "geometry":` +
             `{"type": "LineString", "coordinates":[` + geoJsonArray.join(',') + `]},
             "properties":{"name": "` + name + `", "description": "` + description + `", "shapeType": "` + shapeType + `"}}`;
-        linestrings = JSON.parse($('#gis_linestrings').val());
+        linestrings = JSON.parse($('#gis_lines').val());
         linestrings.push(JSON.parse(linestring));
-        $('#gis_linestrings').val(JSON.stringify(linestrings));
+        $('#gis_lines').val(JSON.stringify(linestrings));
         layer.bindPopup(buildPopup(JSON.parse(linestring), 'edited'));
         layer.addTo(map);
     } else {
@@ -364,14 +364,14 @@ function deleteGeometry() {
         });
         $('#gis_points').val(JSON.stringify(points));
     } else if (feature.properties.shapeType == 'polyline') {
-        polygons = JSON.parse($('#gis_linestrings').val());
+        polygons = JSON.parse($('#gis_lines').val());
         $.each(polygons, function (key, value) {
             if (value.properties.id == feature.properties.id) {
                 polygons.splice(key, 1);
                 return false;
             }
         });
-        $('#gis_linestrings').val(JSON.stringify(polygons)); // write array back to form field
+        $('#gis_lines').val(JSON.stringify(polygons)); // write array back to form field
     } else {
         polygons = JSON.parse($('#gis_polygons').val());
         $.each(polygons, function (key, value) {

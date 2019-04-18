@@ -152,7 +152,8 @@ def place_view(id_):
             actor.first,
             actor.last])
     gis_data = GisMapper.get_all(object_) if location else None
-    if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]':
+    if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]'\
+            and gis_data['gisPolygonSelected'] == "":
         gis_data = None
     place = None
     feature = None
