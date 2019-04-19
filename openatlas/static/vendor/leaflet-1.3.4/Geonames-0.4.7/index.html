@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html>
+<head lang="en">
+    <meta charset="UTF-8">
+    <title>Leaflet Geonames Search Control</title>
+    <script src="https://cdn.rawgit.com/showdownjs/showdown/1.4.2/dist/showdown.min.js"></script>
+
+    <style>
+        body {
+            margin: 0;
+        }
+
+        #content {
+            padding: 50px;
+        }
+
+        .small {
+            font-size: smaller;
+        }
+
+        .right {
+            float: right;
+        }
+        
+        #footer {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height:28px;
+            color: white;
+            background: #646D5A;
+            border-top: 2px solid #333;
+        }
+        #footer > ul {
+            list-style: none;
+            margin: 4px 4px 0;
+            padding: 0;
+        }
+        #footer > ul > li {
+            display: inline-block;
+            padding-left: 16px;
+        }
+
+        #footer > ul > li:first-child {
+            padding-left: 8px;
+        }
+        #footer a {
+            color: white !important;
+        }
+    </style>
+</head>
+<body>
+<div id="content"></div>
+
+<div id="footer">
+    <ul>
+        <li class="small right">
+            Created by the
+            <a href="http://consbio.org" target="_blank">Conservation Biology Institute</a>
+            <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABgAAAAYCAMAAADXqc3KAAAC+lBMVEXZwyZ0g2eWhhwEBgoEBgwCAwcBAQAICQ4PzQPNuCUGtQQIvQP+7zL+5zComB23ubeoqadoamORghkKrQcLuAUC1QT//v8IDKIHBpaQkIsECHXcxizjziiunR+fjhogVQkvMQkMoQcEwwMT5gIR3QIFzQIF0AHc39u9vrqipKSVlox4eXtiZmEIR141PlVJSEhBRkMGLkMBAjk9XTW9qSrCsCj96ieyoCO5rCK1oyG9qR+aixwQERh7bxY5jhWGeRVcVg8uRQ8Rgw0oYAgOwgYTZQUL2QMbHgMIiwIV8AEC7AAB4QDX8NPR0tHGx8S727WztbGvsK2u4qMIAqKdnpmYl5WlpJIHAIyV3oeSkoB4kHZyrnAEA28uDWkJFGgDCFySjFkEGVUEB1RcblJruFAJWFBrw06dmE57dkpMUkcsM0KRiDwGezL33zA0UTB+dy774y2OgixLcCvq0CrTvyk9dyjGsifOvSSllSIFjh8tVR9Inh6nkx4kqRwcfBmGhhiMfRc4XxUYLxUKDBUKsRRtYhENqBAPFRAnTg8TlAxKRAwtJgsUjQpAOQccSQYHxgUSmwQQ7AMEnQMDogEA5gAE4gAC2gD1/PXu+O7o7enp7OnJ2cixvLCw4Ky+vaewsqCeoKCpqpyj1pqahJe0sI+d7IqHhIkJGYeLs4aXmIS6toOKioMJC4OUzoCgn399cn6Fhn18hHoJH3qGlniHhnZucHB4o21IX2t5fWpycmpukmd6emV+2llaX1dphVQWNVGTjlCsp05RYE43JU4EUE1v0UxRv0zRvUxOeUhqp0YHIkMUZ0BJYD0ELj1ZuTwyWTpDRjpUpzgeUTg2UjcaPzcKYjY4ODayqDSfkjRMhjQ+QzSwoTJoYzJd1jEAADAuZisxSyrg0SnGtCcoaCYfLSUNnCRFQCSdjSITfCEiIyFc2iC8rCDo0B1SzB1zch2JfBorfBoNXRlVfBMObRMGyhJDsRI0bhJPXww6TQkKfQgA3QIU0wEc+QADGwAs/J1AAAAAA3RSTlP+/v6VFoksAAACYklEQVQozw3JY6zkYACF4W+3nbZj8451bdu2bdu2baxt27Zt27aTnZwfJ3kfAOE0c3BAcTgIMktL/XT56oGkJF5iItAEiVPGPJqxxgW8ApXKn81mZ3LXAghxGsrYHhPAMUDh5KMTctZXInvKv4ALIPfWthjqpmXBs41xgg4/1cjkH0zJ9l8BINe6uncBcxeHzYhET6vUfgQZhnkphg01IDU/f2/v7pmz4tpTf09ho71qlhLzrQXw9/5up0vBy7XDHqKm8gkvIsGHpWT5dgFIUt/jeipQf12ZA2xKkCsUo2rPYeLfMwCGK19/O7byZNlTCE0wnMQ8iB7MX4RrPIDCuKL6rKzKKyiECsJr/XwVXmrCuWgugCEYB7ejbd2aS+BGjzE9MGVmuCANGBntMDJJN8jLS98y7b6Z2ZEvL003Gz7jJYP8PSk371hokUgkoS2CSDv7ncUicQ2FAVYH6W4tLhVXk0nOdghi60KhiKY7Mxgt4ODOXZH6Ofmlbz43WCJ9eHsXqae7p0T6HNgtiNqot5Cec/efDUAo5RKfnuONROwWHwizV/Ej+HT6be9mu0Ebd9lI68fGcdlhbaBltXS+3hoD+j7zZgbjx4B83GeMwJTlcoAW+W2UDlVXL/asBV70c4joNkDsIDzYoKMBsnD9otiU7AuUckdvk14mk9XlZhzKB3hySWHJoxvF5occhX2wSdGTJremXBrtOrC3tKh4XPV+/wmrwk7vbdpz4uPjlkRQLzoCG0tr65qWKpIVmQQQXQ5HhxoSQnuFuABr0YsGCh6Pr8ZXiBH9wCAqLZQ++MHe9j8EDbmzE7WrVgAAAABJRU5ErkJggg==" style="margin-left: 6px; height:20px;box-shadow:1px 1px 3px #000;" align="right">
+        </li>
+    </ul>
+</div>
+
+<script>
+    var converter = new showdown.Converter();
+    var readme = new XMLHttpRequest();
+
+    readme.open("GET", 'README.md', true);
+    readme.send();
+    readme.onreadystatechange = function () {
+        if (readme.readyState == 4 && readme.status == 200) {
+            document.getElementById('content').innerHTML = converter.makeHtml(readme.responseText);
+        }
+    };
+</script>
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+    "name": "leaflet-geonames",
+    "version": "0.4.7",
+    "description": "Geonames Geocoding Search Control for Leaflet",
+    "homepage": "http://github.com/consbio/Leaflet.Geonames",
+    "main": "L.Control.Geonames.min.js",
+    "author": {
+        "name": "Brendan Ward",
+        "email": "bcward@consbio.org"
+    },
+    "devDependencies": {
+        "jake": "^8.0.18",
+        "node-minify": "^3.5.0"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git://github.com/consbio/Leaflet.Geonames"
+    },
+    "keywords": [
+        "leaflet"
+    ]
+}
