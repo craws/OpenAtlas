@@ -18,10 +18,14 @@ class Entity:
             logger.log('error', 'model', 'invalid id')
             abort(418)
         self.id = row.id
-        self.nodes = dict()
+        self.nodes = {}
         if hasattr(row, 'nodes') and row.nodes:
             for node in row.nodes:
                 self.nodes[g.nodes[node['f1']]] = node['f2']  # f1 = node id, f2 = value
+        self.aliases = {}
+        if hasattr(row, 'aliases') and row.aliases:
+            for alias in row.aliases:
+                self.aliases[alias['f1']] = alias['f2']  # f1 = alias id, f2 = alias name
         self.name = row.name
         self.root = None
         self.description = row.description if row.description else ''
@@ -156,6 +160,36 @@ class EntityMapper:
         WHERE l1.domain_id IS NULL AND l2.range_id IS NULL AND e.class_code != 'E55'"""
 
     @staticmethod
+    def build_sql(nodes=False, aliases=False):
+        sql = """
+            SELECT
+                e.id, e.class_code, e.name, e.description, e.created, e.modified, e.system_type,
+                COALESCE(to_char(e.begin_from, 'yyyy-mm-dd BC'), '') AS begin_from, e.begin_comment,
+                COALESCE(to_char(e.begin_to, 'yyyy-mm-dd BC'), '') AS begin_to,
+                COALESCE(to_char(e.end_from, 'yyyy-mm-dd BC'), '') AS end_from, e.end_comment,
+                COALESCE(to_char(e.end_to, 'yyyy-mm-dd BC'), '') AS end_to"""
+        if nodes:
+            sql += """
+                ,array_to_json(
+                    array_agg((t.range_id, t.description)) FILTER (WHERE t.range_id IS NOT NULL)
+                ) AS nodes"""
+        if aliases:
+            sql += """
+                ,array_to_json(
+                    array_agg((alias.id, alias.name)) FILTER (WHERE alias.name IS NOT NULL)
+                ) AS aliases"""
+        sql += " FROM model.entity e "
+        if nodes:
+            sql += """ LEFT JOIN model.link t
+                ON e.id = t.domain_id AND t.property_code IN ('P2', 'P89') """
+        if aliases:
+            sql += """
+                LEFT JOIN model.link la 
+                    ON e.id = la.domain_id AND la.property_code IN ('P1', 'P131')
+                LEFT JOIN model.entity alias ON la.range_id = alias.id """
+        return sql
+
+    @staticmethod
     def update(entity):
         from openatlas.util.util import sanitize
         sql = """
@@ -252,16 +286,19 @@ class EntityMapper:
 
     @staticmethod
     def get_by_codes(class_name):
+        # Possible class names: actor, event, place, reference, source
         if class_name == 'source':
-            sql = EntityMapper.sql + """
+            sql = EntityMapper.build_sql(nodes=True) + """
                 WHERE e.class_code IN %(codes)s AND e.system_type = 'source content'
                 GROUP BY e.id ORDER BY e.name;"""
         elif class_name == 'reference':
-            sql = EntityMapper.sql + """
+            sql = EntityMapper.build_sql(nodes=True) + """
                 WHERE e.class_code IN %(codes)s AND e.system_type != 'file'
                 GROUP BY e.id ORDER BY e.name;"""
         else:
-            sql = EntityMapper.sql + """
+            sql = EntityMapper.build_sql(
+                nodes=True if class_name in ('event', 'place') else False,
+                aliases=True if class_name in ('actor', 'place') else False) + """
                 WHERE e.class_code IN %(codes)s GROUP BY e.id ORDER BY e.name;"""
         g.cursor.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][class_name])})
         debug_model['by codes'] += 1
@@ -344,10 +381,10 @@ class EntityMapper:
         sql = EntityMapper.sql + """
             {user_clause} WHERE (LOWER(e.name) LIKE LOWER(%(term)s) {description_clause})
             AND {user_clause2} (""".format(
-            user_clause=
-            ' LEFT JOIN web.user_log ul ON e.id = ul.entity_id ' if form.own.data else '',
-            description_clause=
-            ' OR lower(e.description) LIKE lower(%(term)s)' if form.desc.data else '',
+            user_clause="""
+                LEFT JOIN web.user_log ul ON e.id = ul.entity_id """ if form.own.data else '',
+            description_clause="""
+                OR lower(e.description) LIKE lower(%(term)s) """ if form.desc.data else '',
             user_clause2=' ul.user_id = %(user_id)s AND ' if form.own.data else '')
         sql_where = []
         for name in form.classes.data:
@@ -390,7 +427,7 @@ class EntityMapper:
         if to_date:
             string = str(to_date)
             if string.startswith('-') or string.startswith('0000'):
-                string = string[1:]   # pragma: no cover
+                string = string[1:]  # pragma: no cover
             parts = string.split('-')
             form.end_month.raw_data = None
             form.end_day.raw_data = None

@@ -547,7 +547,7 @@ def pager(table, remove_rows=True):
 
 def get_base_table_data(entity, file_stats=None):
     """ Returns standard table data for an entity"""
-    data = [link(entity)]
+    data = ['<br />'.join([link(entity)] + [alias for id_, alias in entity.aliases.items()])]
     if entity.view_name in ['event', 'actor']:
         data.append(g.classes[entity.class_.code].name)
     if entity.view_name in ['reference'] and entity.system_type != 'file':
