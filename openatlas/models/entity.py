@@ -161,6 +161,7 @@ class EntityMapper:
 
     @staticmethod
     def build_sql(nodes=False, aliases=False):
+        # Performance: only join nodes and/or aliases if requested
         sql = """
             SELECT
                 e.id, e.class_code, e.name, e.description, e.created, e.modified, e.system_type,
@@ -172,19 +173,19 @@ class EntityMapper:
             sql += """
                 ,array_to_json(
                     array_agg((t.range_id, t.description)) FILTER (WHERE t.range_id IS NOT NULL)
-                ) AS nodes"""
+                ) AS nodes """
         if aliases:
             sql += """
                 ,array_to_json(
                     array_agg((alias.id, alias.name)) FILTER (WHERE alias.name IS NOT NULL)
-                ) AS aliases"""
+                ) AS aliases """
         sql += " FROM model.entity e "
         if nodes:
             sql += """ LEFT JOIN model.link t
                 ON e.id = t.domain_id AND t.property_code IN ('P2', 'P89') """
         if aliases:
             sql += """
-                LEFT JOIN model.link la 
+                LEFT JOIN model.link la
                     ON e.id = la.domain_id AND la.property_code IN ('P1', 'P131')
                 LEFT JOIN model.entity alias ON la.range_id = alias.id """
         return sql
@@ -218,8 +219,8 @@ class EntityMapper:
 
     @staticmethod
     def get_display_files():
-        sql = EntityMapper.sql + " WHERE e.system_type = 'file' GROUP BY e.id ORDER BY e.name;"
-        g.cursor.execute(sql)
+        sql_clause = " WHERE e.system_type = 'file' GROUP BY e.id ORDER BY e.name;"
+        g.cursor.execute(EntityMapper.build_sql(nodes=True) + sql_clause)
         debug_model['div sql'] += 1
         entities = []
         for row in g.cursor.fetchall():
@@ -345,7 +346,7 @@ class EntityMapper:
         codes = []
         for class_codes in app.config['CLASS_CODES'].values():
             codes += class_codes
-        sql = EntityMapper.sql + """
+        sql = EntityMapper.build_sql() + """
                 WHERE e.class_code IN %(codes)s GROUP BY e.id
                 ORDER BY e.created DESC LIMIT %(limit)s;"""
         g.cursor.execute(sql, {'codes': tuple(codes), 'limit': limit})
@@ -378,7 +379,7 @@ class EntityMapper:
     def search(form):
         if not form.term.data:
             return []
-        sql = EntityMapper.sql + """
+        sql = EntityMapper.build_sql() + """
             {user_clause} WHERE (LOWER(e.name) LIKE LOWER(%(term)s) {description_clause})
             AND {user_clause2} (""".format(
             user_clause="""
