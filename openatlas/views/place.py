@@ -43,7 +43,7 @@ class FeatureForm(DateForm):
 @required_group('readonly')
 def place_index():
     table = {'id': 'place', 'header': app.config['TABLE_HEADERS']['place'], 'data': []}
-    for place in EntityMapper.get_by_system_type('place'):
+    for place in EntityMapper.get_by_system_type('place', nodes=True, aliases=True):
         table['data'].append(get_base_table_data(place))
     return render_template('place/index.html', table=table, gis_data=GisMapper.get_all())
 

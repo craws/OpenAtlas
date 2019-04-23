@@ -81,7 +81,7 @@ def file_remove_profile_image(entity_id):
 def file_index():
     table = {'id': 'files', 'header': ['date'] + app.config['TABLE_HEADERS']['file'], 'data': []}
     file_stats = get_file_stats()
-    for entity in EntityMapper.get_by_system_type('file'):
+    for entity in EntityMapper.get_by_system_type('file', nodes=True):
         date = 'N/A'
         if entity.id in file_stats:
             date = format_date(datetime.datetime.utcfromtimestamp(file_stats[entity.id]['date']))

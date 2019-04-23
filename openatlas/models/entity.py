@@ -210,8 +210,8 @@ class EntityMapper:
         debug_model['div sql'] += 1
 
     @staticmethod
-    def get_by_system_type(system_type):
-        sql = EntityMapper.sql
+    def get_by_system_type(system_type, nodes=False, aliases=False):
+        sql = EntityMapper.build_sql(nodes, aliases)
         sql += ' WHERE e.system_type = %(system_type)s GROUP BY e.id ORDER BY e.name;'
         g.cursor.execute(sql, {'system_type': system_type})
         debug_model['div sql'] += 1

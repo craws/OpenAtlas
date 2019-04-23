@@ -1,6 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
 
+import re
 import time
 from flask import g, session
 from flask_babel import lazy_gettext as _
@@ -261,7 +262,7 @@ class TableSelect(HiddenInput):
         table = {'id': field.id, 'header': header, 'data': []}
         file_stats = None
         if class_ == 'place':
-            entities = EntityMapper.get_by_system_type('place')
+            entities = EntityMapper.get_by_system_type('place', nodes=True, aliases=True)
         elif class_ == 'reference':
             entities = EntityMapper.get_by_system_type('bibliography') + \
                        EntityMapper.get_by_system_type('edition') + \
@@ -279,6 +280,8 @@ class TableSelect(HiddenInput):
             data[0] = """<a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
                         """.format(name=field.id, entity_id=entity.id,
                                    entity_name=truncate_string(entity.name, span=False))
+            data[0] = '<br />'.join([data[0]] + [
+                truncate_string(alias) for id_, alias in entity.aliases.items()])
             table['data'].append(data)
         html = """
             <input id="{name}-button" name="{name}-button" class="table-select {required}"
@@ -317,13 +320,13 @@ class TableMultiSelect(HiddenInput):
         table['headers'] = 'headers: { ' + str(len(table['header'])) + ': { sorter: "checkbox" } }'
         table['sort'] = 'sortList: [[' + str(len(table['header'])) + ',0],[0,0]]'
         if class_ == 'place':
-            entities = EntityMapper.get_by_system_type('place')
+            entities = EntityMapper.get_by_system_type('place', nodes=True, aliases=True)
         else:
             entities = EntityMapper.get_by_codes(class_)
         for entity in entities:
             selection += entity.name + '<br/>' if field.data and entity.id in field.data else ''
             data = get_base_table_data(entity)
-            data[0] = truncate_string(entity.name)  # Replace entity link with entity name
+            data[0] = re.sub(re.compile('<a.*?>'), '', data[0])  # Remove links
             data.append("""<input type="checkbox" id="{id}" {checked} value="{name}"
                 class="multi-table-select">""".format(
                 id=str(entity.id),

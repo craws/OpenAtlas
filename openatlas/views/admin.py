@@ -197,7 +197,7 @@ def admin_orphans():
 
     # Get orphaned file entities (no corresponding file)
     file_ids = []
-    for entity in EntityMapper.get_by_system_type('file'):
+    for entity in EntityMapper.get_by_system_type('file', nodes=True):
         file_ids.append(str(entity.id))
         if not get_file_path(entity):
             tables['missing_files']['data'].append([link(entity),

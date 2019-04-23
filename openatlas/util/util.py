@@ -146,9 +146,9 @@ def build_table_form(class_name, linked_entities):
     linked_ids = [entity.id for entity in linked_entities]
     file_stats = get_file_stats() if class_name == 'file' else None
     if class_name == 'file':
-        entities = EntityMapper.get_by_system_type('file')
+        entities = EntityMapper.get_by_system_type('file', nodes=True)
     elif class_name == 'place':
-        entities = EntityMapper.get_by_system_type('place')
+        entities = EntityMapper.get_by_system_type('place', nodes=True, aliases=True)
     else:
         entities = EntityMapper.get_by_codes(class_name)
     for entity in entities:
@@ -547,7 +547,8 @@ def pager(table, remove_rows=True):
 
 def get_base_table_data(entity, file_stats=None):
     """ Returns standard table data for an entity"""
-    data = ['<br />'.join([link(entity)] + [alias for id_, alias in entity.aliases.items()])]
+    data = ['<br />'.join([link(entity)] + [
+        truncate_string(alias) for id_, alias in entity.aliases.items()])]
     if entity.view_name in ['event', 'actor']:
         data.append(g.classes[entity.class_.code].name)
     if entity.view_name in ['reference'] and entity.system_type != 'file':
