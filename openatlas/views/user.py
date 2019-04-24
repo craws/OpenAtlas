@@ -76,7 +76,7 @@ def user_activity(user_id=0):
     else:
         activities = UserMapper.get_activities(100, 0, 'all')
     for row in activities:
-        entity = EntityMapper.get_by_id(row.entity_id, True)
+        entity = EntityMapper.get_by_id(row.entity_id, ignore_not_found=True)
         user = UserMapper.get_by_id(row.user_id)
         table['data'].append([
             format_date(row.created),

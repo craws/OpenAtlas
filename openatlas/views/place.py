@@ -88,7 +88,7 @@ def place_insert(origin_id=None):
 @app.route('/place/view/<int:id_>')
 @required_group('readonly')
 def place_view(id_):
-    object_ = EntityMapper.get_by_id(id_)
+    object_ = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
     location = object_.get_linked_entity('P53')
     tables = {
         'info': get_entity_data(object_, location),
@@ -145,12 +145,11 @@ def place_view(id_):
         tables[entity.system_type.replace(' ', '-')]['data'].append(data)
     for link_ in location.get_links(['P74', 'OA8', 'OA9'], True):
         actor = EntityMapper.get_by_id(link_.domain.id)
-        tables['actor']['data'].append([
-            link(actor),
-            g.properties[link_.property.code].name,
-            actor.class_.name,
-            actor.first,
-            actor.last])
+        tables['actor']['data'].append([link(actor),
+                                        g.properties[link_.property.code].name,
+                                        actor.class_.name,
+                                        actor.first,
+                                        actor.last])
     gis_data = GisMapper.get_all(object_) if location else None
     if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]'\
             and gis_data['gisLineSelected'] == '[]':
@@ -180,7 +179,7 @@ def place_delete(id_):
     if entity.get_linked_entities('P46'):
         flash(_('Deletion not possible if subunits exists'), 'error')
         return redirect(url_for('place_view', id_=id_))
-    EntityMapper.delete(id_)
+    entity.delete()
     logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
     if parent:
@@ -191,7 +190,7 @@ def place_delete(id_):
 @app.route('/place/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
 def place_update(id_):
-    object_ = EntityMapper.get_by_id(id_)
+    object_ = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
     location = object_.get_linked_entity('P53')
     if object_.system_type == 'feature':
         form = build_form(FeatureForm, 'Feature', object_, request, location)
@@ -211,7 +210,7 @@ def place_update(id_):
         save(form, object_, location)
         return redirect(url_for('place_view', id_=id_))
     if object_.system_type == 'place':
-        for alias in [x.name for x in object_.get_linked_entities('P1')]:
+        for alias in object_.aliases.values():
             form.alias.append_entry(alias)
         form.alias.append_entry('')
     gis_data = GisMapper.get_all(object_)

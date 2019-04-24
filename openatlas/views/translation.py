@@ -37,7 +37,7 @@ def translation_insert(source_id):
 @app.route('/source/translation/view/<int:id_>')
 @required_group('readonly')
 def translation_view(id_):
-    translation = EntityMapper.get_by_id(id_)
+    translation = EntityMapper.get_by_id(id_, nodes=True)
     source = translation.get_linked_entity('P73', True)
     return render_template('translation/view.html', source=source, translation=translation,
                            tables={'info': get_entity_data(translation)})
@@ -54,7 +54,7 @@ def translation_delete(id_, source_id):
 @app.route('/source/translation/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
 def translation_update(id_):
-    translation = EntityMapper.get_by_id(id_)
+    translation = EntityMapper.get_by_id(id_, nodes=True)
     source = translation.get_linked_entity('P73', True)
     form = build_form(TranslationForm, 'Source translation', translation, request)
     if form.validate_on_submit():

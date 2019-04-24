@@ -129,7 +129,7 @@ def file_add2(id_, class_name):
 @app.route('/file/view/<int:id_>')
 @required_group('readonly')
 def file_view(id_):
-    file = EntityMapper.get_by_id(id_)
+    file = EntityMapper.get_by_id(id_, nodes=True)
     path = get_file_path(file.id)
     tables = {'info': get_entity_data(file)}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find',
@@ -162,7 +162,7 @@ def file_view(id_):
 @app.route('/file/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('editor')
 def file_update(id_):
-    file = EntityMapper.get_by_id(id_)
+    file = EntityMapper.get_by_id(id_, nodes=True)
     form = build_form(FileForm, 'File', file, request)
     del form.file
     if form.validate_on_submit():

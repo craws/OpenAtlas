@@ -50,7 +50,7 @@ def source_insert(origin_id=None):
 @app.route('/source/view/<int:id_>')
 @required_group('readonly')
 def source_view(id_):
-    source = EntityMapper.get_by_id(id_)
+    source = EntityMapper.get_by_id(id_, nodes=True)
     tables = {
         'info': get_entity_data(source),
         'text': {'id': 'translation', 'data': [], 'header': ['text', 'type', 'content']},
@@ -141,7 +141,7 @@ def source_delete(id_):
 @app.route('/source/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
 def source_update(id_):
-    source = EntityMapper.get_by_id(id_)
+    source = EntityMapper.get_by_id(id_, nodes=True)
     form = build_form(SourceForm, 'Source', source, request)
     if form.validate_on_submit():
         if was_modified(form, source):  # pragma: no cover

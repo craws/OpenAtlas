@@ -245,15 +245,24 @@ class EntityMapper:
         return EntityMapper.get_by_id(g.cursor.fetchone()[0])
 
     @staticmethod
-    def get_by_id(entity_id, ignore_not_found=False):
+    def get_by_id(entity_id, nodes=False, aliases=False, ignore_not_found=False):
         if entity_id in g.nodes:  # pragma: no cover, just in case a node is requested
             return g.nodes[entity_id]
-        sql = EntityMapper.sql + ' WHERE e.id = %(id)s GROUP BY e.id ORDER BY e.name;'
+        sql = EntityMapper.build_sql(nodes, aliases) + ' WHERE e.id = %(id)s GROUP BY e.id;'
         g.cursor.execute(sql, {'id': entity_id})
         debug_model['by id'] += 1
         if g.cursor.rowcount < 1 and ignore_not_found:
             return None  # pragma: no cover, only used where expected to avoid a 418 e.g. at logs
         return Entity(g.cursor.fetchone())
+
+    @staticmethod
+    def get_by_ids(entity_ids):
+        if not entity_ids:
+            return []
+        sql = EntityMapper.sql + ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name;'
+        g.cursor.execute(sql, {'ids': tuple(entity_ids)})
+        debug_model['by id'] += 1
+        return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_by_project_id(project_id):
@@ -275,15 +284,6 @@ class EntityMapper:
             entity.origin_id = row.origin_id
             entities.append(entity)
         return entities
-
-    @staticmethod
-    def get_by_ids(entity_ids):
-        if not entity_ids:
-            return []
-        sql = EntityMapper.sql + ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name;'
-        g.cursor.execute(sql, {'ids': tuple(entity_ids)})
-        debug_model['by id'] += 1
-        return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_by_codes(class_name):

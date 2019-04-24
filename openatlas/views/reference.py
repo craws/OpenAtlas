@@ -118,7 +118,7 @@ def reference_link_update(link_id, origin_id):
 @app.route('/reference/view/<int:id_>')
 @required_group('readonly')
 def reference_view(id_):
-    reference = EntityMapper.get_by_id(id_)
+    reference = EntityMapper.get_by_id(id_, nodes=True)
     tables = {
         'info': get_entity_data(reference),
         'file': {'id': 'files', 'data': [],
@@ -201,7 +201,7 @@ def reference_delete(id_):
 @app.route('/reference/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
 def reference_update(id_):
-    reference = EntityMapper.get_by_id(id_)
+    reference = EntityMapper.get_by_id(id_, nodes=True)
     form = build_form(ReferenceForm, reference.system_type.title(), reference, request)
     if reference.system_type == 'external reference':
         form.name.validators = [InputRequired(), URL()]

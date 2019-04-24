@@ -139,7 +139,7 @@ class DateMapper:
                 OR (begin_to IS NOT NULL AND end_to IS NOT NULL AND begin_to > end_to);"""
         g.cursor.execute(sql)
         debug_model['div sql'] += 1
-        return [EntityMapper.get_by_id(row.id) for row in g.cursor.fetchall()]
+        return [EntityMapper.get_by_id(row.id, nodes=True) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_invalid_link_dates():

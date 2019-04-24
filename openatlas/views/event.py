@@ -78,7 +78,7 @@ def event_delete(id_):
 @app.route('/event/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
 def event_update(id_):
-    event = EntityMapper.get_by_id(id_)
+    event = EntityMapper.get_by_id(id_, nodes=True)
     form = build_form(EventForm, 'Event', event, request)
     if event.class_.code != 'E8':
         del form.given_place
@@ -103,7 +103,7 @@ def event_update(id_):
 @app.route('/event/view/<int:id_>')
 @required_group('readonly')
 def event_view(id_):
-    event = EntityMapper.get_by_id(id_)
+    event = EntityMapper.get_by_id(id_, nodes=True)
     tables = {
         'info': get_entity_data(event),
         'file': {'id': 'files', 'data': [],

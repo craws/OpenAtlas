@@ -225,11 +225,9 @@ def get_entity_data(entity, location=None):
     """
     data = []
 
-    # Alias for places
-    if entity.class_.code in app.config['CLASS_CODES']['place']:
-        aliases = entity.get_linked_entities('P1')
-        if aliases:
-            data.append((uc_first(_('alias')), '<br />'.join([x.name for x in aliases])))
+    # Aliases
+    if entity.aliases:
+        data.append((uc_first(_('alias')), '<br />'.join(entity.aliases.values())))
 
     # Dates
     data.append((uc_first(_('begin')), format_entry_begin(entity)))
@@ -548,7 +546,7 @@ def pager(table, remove_rows=True):
 def get_base_table_data(entity, file_stats=None):
     """ Returns standard table data for an entity"""
     data = ['<br />'.join([link(entity)] + [
-        truncate_string(alias) for id_, alias in entity.aliases.items()])]
+        truncate_string(alias) for alias in entity.aliases.values()])]
     if entity.view_name in ['event', 'actor']:
         data.append(g.classes[entity.class_.code].name)
     if entity.view_name in ['reference'] and entity.system_type != 'file':

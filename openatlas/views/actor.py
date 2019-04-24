@@ -32,11 +32,10 @@ class ActorForm(DateForm):
 @app.route('/actor/view/<int:id_>')
 @required_group('readonly')
 def actor_view(id_):
-    actor = EntityMapper.get_by_id(id_)
+    actor = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
     info = []
-    aliases = actor.get_linked_entities('P131')
-    if aliases:
-        info.append((uc_first(_('alias')), '<br />'.join([x.name for x in aliases])))
+    if actor.aliases:
+        info.append((uc_first(_('alias')), '<br />'.join(actor.aliases.values())))
     tables = {
         'info': info,
         'file': {'id': 'files', 'data': [],
@@ -211,7 +210,7 @@ def actor_delete(id_):
 @app.route('/actor/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
 def actor_update(id_):
-    actor = EntityMapper.get_by_id(id_)
+    actor = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
     code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
     form = build_form(ActorForm, code_class[actor.class_.code], actor, request)
     if form.validate_on_submit():
@@ -228,7 +227,7 @@ def actor_update(id_):
     form.begins_in.data = first.get_linked_entity('P53', True).id if first else ''
     last = actor.get_linked_entity('OA9')
     form.ends_in.data = last.get_linked_entity('P53', True).id if last else ''
-    for alias in [x.name for x in actor.get_linked_entities('P131')]:
+    for alias in actor.aliases.values():
         form.alias.append_entry(alias)
     form.alias.append_entry('')
     if actor.class_.code == 'E21':

@@ -89,8 +89,10 @@ class ImportMapper:
             elif class_code == 'E18':
                 system_type = 'place'
             desc = row['description'] if 'description' in row and row['description'] else None
-            entity = EntityMapper.insert(
-                code=class_code, name=row['name'], description=desc, system_type=system_type)
+            entity = EntityMapper.insert(code=class_code,
+                                         name=row['name'],
+                                         description=desc,
+                                         system_type=system_type)
             sql = """
                 INSERT INTO import.entity (project_id, origin_id, entity_id, user_id)
                 VALUES (%(project_id)s, %(origin_id)s, %(entity_id)s, %(user_id)s);"""
