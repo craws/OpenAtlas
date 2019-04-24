@@ -89,7 +89,7 @@ def place_insert(origin_id=None):
 @required_group('readonly')
 def place_view(id_):
     object_ = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
-    location = object_.get_linked_entity('P53')
+    location = object_.get_linked_entity('P53', nodes=True)
     tables = {
         'info': get_entity_data(object_, location),
         'file': {'id': 'files', 'data': [],
@@ -131,19 +131,19 @@ def place_view(id_):
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
         tables[domain.view_name]['data'].append(data)
     event_ids = []  # Keep track of already inserted events to prevent doubles
-    for event in location.get_linked_entities(['P7'], True):
+    for event in location.get_linked_entities(['P7'], inverse=True):
         tables['event']['data'].append(get_base_table_data(event))
         event_ids.append(event.id)
-    for event in object_.get_linked_entities(['P24'], True):
+    for event in object_.get_linked_entities(['P24'], inverse=True):
         if event.id not in event_ids:  # Don't add again if already in table
             tables['event']['data'].append(get_base_table_data(event))
     has_subunits = False
-    for entity in object_.get_linked_entities('P46'):
+    for entity in object_.get_linked_entities('P46', nodes=True):
         has_subunits = True
         data = get_base_table_data(entity)
         data.append(truncate_string(entity.description))
         tables[entity.system_type.replace(' ', '-')]['data'].append(data)
-    for link_ in location.get_links(['P74', 'OA8', 'OA9'], True):
+    for link_ in location.get_links(['P74', 'OA8', 'OA9'], inverse=True):
         actor = EntityMapper.get_by_id(link_.domain.id)
         tables['actor']['data'].append([link(actor),
                                         g.properties[link_.property.code].name,
@@ -191,7 +191,7 @@ def place_delete(id_):
 @required_group('editor')
 def place_update(id_):
     object_ = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
-    location = object_.get_linked_entity('P53')
+    location = object_.get_linked_entity('P53', nodes=True)
     if object_.system_type == 'feature':
         form = build_form(FeatureForm, 'Feature', object_, request, location)
     elif object_.system_type == 'stratigraphic unit':

@@ -90,7 +90,7 @@ def node_view(id_):
         header = [_('name'), _('value'), _('class'), _('info')]
     tables = {'entities': {'id': 'entities', 'header': header, 'data': []},
               'info': get_entity_data(node)}
-    for entity in node.get_linked_entities(['P2', 'P89'], True):
+    for entity in node.get_linked_entities(['P2', 'P89'], inverse=True, nodes=True):
         # If it is a place location get the corresponding object
         entity = entity if node.class_.code == 'E55' else entity.get_linked_entity('P53', True)
         if entity:  # If not entity it is a place node, so do not add

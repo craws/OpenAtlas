@@ -152,7 +152,7 @@ def event_view(id_):
             url = url_for('link_delete', id_=link_.id, origin_id=event.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
         tables[domain.view_name]['data'].append(data)
-    for sub_event in event.get_linked_entities('P117', True):
+    for sub_event in event.get_linked_entities('P117', inverse=True, nodes=True):
         tables['subs']['data'].append(get_base_table_data(sub_event))
     return render_template('event/view.html', event=event, tables=tables,
                            profile_image_id=profile_image_id)

@@ -216,7 +216,7 @@ class NodeMapper(EntityMapper):
         if new_type_id:  # A new type was selected
             if root.multiple:
                 cleaned_entity_ids = []
-                for entity in EntityMapper.get_by_ids(entity_ids):
+                for entity in EntityMapper.get_by_ids(entity_ids, nodes=True):
                     if any(node.id == int(new_type_id) for node in entity.nodes):
                         delete_ids.append(entity.id)  # If already linked add to delete ids
                     else:

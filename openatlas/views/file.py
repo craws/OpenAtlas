@@ -110,7 +110,7 @@ def file_add(origin_id):
     if request.method == 'POST':
         origin.link('P67', request.form.getlist('values'), inverse=True)
         return redirect(url_for(origin.view_name + '_view', id_=origin.id) + '#tab-file')
-    form = build_table_form('file', origin.get_linked_entities('P67', True))
+    form = build_table_form('file', origin.get_linked_entities('P67', inverse=True))
     return render_template('file/add.html', origin=origin, form=form)
 
 

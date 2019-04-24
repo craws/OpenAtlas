@@ -59,11 +59,11 @@ class Entity:
         if self.view_name == 'place':
             self.table_name = self.system_type.replace(' ', '-')
 
-    def get_linked_entity(self, code, inverse=False):
-        return LinkMapper.get_linked_entity(self, code, inverse)
+    def get_linked_entity(self, code, inverse=False, nodes=False):
+        return LinkMapper.get_linked_entity(self, code, inverse=inverse, nodes=nodes)
 
-    def get_linked_entities(self, code, inverse=False):
-        return LinkMapper.get_linked_entities(self, code, inverse)
+    def get_linked_entities(self, code, inverse=False, nodes=False):
+        return LinkMapper.get_linked_entities(self, code, inverse=inverse, nodes=nodes)
 
     def link(self, code, range_, description=None, inverse=False):
         return LinkMapper.insert(self, code, range_, description, inverse)
@@ -140,18 +140,6 @@ class Entity:
 
 
 class EntityMapper:
-    sql = """
-        SELECT
-            e.id, e.class_code, e.name, e.description, e.created, e.modified, e.system_type,
-            COALESCE(to_char(e.begin_from, 'yyyy-mm-dd BC'), '') AS begin_from, e.begin_comment,
-            COALESCE(to_char(e.begin_to, 'yyyy-mm-dd BC'), '') AS begin_to,
-            COALESCE(to_char(e.end_from, 'yyyy-mm-dd BC'), '') AS end_from, e.end_comment,
-            COALESCE(to_char(e.end_to, 'yyyy-mm-dd BC'), '') AS end_to,
-            array_to_json(
-                array_agg((t.range_id, t.description)) FILTER (WHERE t.range_id IS NOT NULL)
-            ) as nodes
-        FROM model.entity e
-        LEFT JOIN model.link t ON e.id = t.domain_id AND t.property_code IN ('P2', 'P89')"""
 
     sql_orphan = """
         SELECT e.id FROM model.entity e
@@ -256,10 +244,10 @@ class EntityMapper:
         return Entity(g.cursor.fetchone())
 
     @staticmethod
-    def get_by_ids(entity_ids):
+    def get_by_ids(entity_ids, nodes=False):
         if not entity_ids:
             return []
-        sql = EntityMapper.sql + ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name;'
+        sql = EntityMapper.build_sql(nodes) + ' WHERE e.id IN %(ids)s GROUP BY e.id;'
         g.cursor.execute(sql, {'ids': tuple(entity_ids)})
         debug_model['by id'] += 1
         return [Entity(row) for row in g.cursor.fetchall()]
@@ -390,15 +378,19 @@ class EntityMapper:
         sql_where = []
         for name in form.classes.data:
             if name in ['source', 'event']:
-                sql_where.append(" e.class_code IN ({codes})".format(
+                sql_where.append("e.class_code IN ({codes})".format(
                     codes=str(app.config['CLASS_CODES'][name])[1:-1]))
-            elif name == 'find':
-                sql_where.append(" e.class_code = 'E22'")
             elif name == 'actor':
                 codes = app.config['CLASS_CODES'][name] + ['E82']  # Add alias
                 sql_where.append(" e.class_code IN ({codes})".format(codes=str(codes)[1:-1]))
-            elif name in ['place', 'feature', 'stratigraphic unit']:
-                sql_where.append(" e.class_code IN ('E18', 'E41')")
+            elif name == 'place':
+                sql_where.append("(e.class_code = 'E41' OR e.system_type = 'place')")
+            elif name == 'feature':
+                sql_where.append("e.system_type = 'feature'")
+            elif name == 'stratigraphic unit':
+                sql_where.append("e.system_type = 'stratigraphic unit'")
+            elif name == 'find':
+                sql_where.append("e.class_code = 'E22'")
             elif name == 'reference':
                 sql_where.append(" e.class_code IN ({codes}) AND e.system_type != 'file'".format(
                     codes=str(app.config['CLASS_CODES']['reference'])[1:-1]))

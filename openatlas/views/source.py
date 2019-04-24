@@ -58,7 +58,7 @@ def source_view(id_):
                  'header': app.config['TABLE_HEADERS']['file'] + [_('main image')]},
         'reference': {'id': 'source', 'data': [],
                       'header': app.config['TABLE_HEADERS']['reference'] + ['page']}}
-    for text in source.get_linked_entities('P73'):
+    for text in source.get_linked_entities('P73', nodes=True):
         tables['text']['data'].append([
             link(text),
             next(iter(text.nodes)).name if text.nodes else '',

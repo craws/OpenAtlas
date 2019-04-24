@@ -104,8 +104,8 @@ class LinkMapper:
         return result
 
     @staticmethod
-    def get_linked_entity(entity_param, code, inverse=False):
-        result = LinkMapper.get_linked_entities(entity_param, code, inverse)
+    def get_linked_entity(entity_param, code, inverse=False, nodes=False):
+        result = LinkMapper.get_linked_entities(entity_param, code, inverse=inverse, nodes=nodes)
         if len(result) > 1:  # pragma: no cover
             logger.log('error', 'model', 'multiple linked entities found for ' + code)
             flash(_('error multiple linked entities found'), 'error')
@@ -114,7 +114,7 @@ class LinkMapper:
             return result[0]
 
     @staticmethod
-    def get_linked_entities(entity, codes, inverse=False):
+    def get_linked_entities(entity, codes, inverse=False, nodes=False):
         from openatlas.models.entity import EntityMapper
         sql = """
             SELECT range_id AS result_id FROM model.link
@@ -128,7 +128,7 @@ class LinkMapper:
             'codes': tuple(codes if type(codes) is list else [codes])})
         debug_model['link sql'] += 1
         ids = [element for (element,) in g.cursor.fetchall()]
-        return EntityMapper.get_by_ids(ids)
+        return EntityMapper.get_by_ids(ids, nodes=nodes)
 
     @staticmethod
     def get_links(entity, codes, inverse=False):
