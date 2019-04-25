@@ -10,6 +10,10 @@ After following the instructions restart Apache and test if the application is w
 
     service apache2 restart
 
+### 3.16.0 to 3.17.0
+
+A code base update (e.g. with git pull) and an Apache restart should be sufficient
+
 ### 3.15.0 to 3.16.0
 
 If you are running a productive online system take a look at install.md section "Additional security" for instructions to improve server side security.

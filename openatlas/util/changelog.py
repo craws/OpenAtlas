@@ -3,6 +3,10 @@ from collections import OrderedDict
 
 class Changelog:
     versions = OrderedDict()
+    versions['3.17.0'] = ['TBA', OrderedDict([
+        ('feature', OrderedDict([
+            ('597',  'Option to display aliases in tables'),
+            ]))])]
     versions['3.16.0'] = ['2019-04-19', OrderedDict([
         ('feature', OrderedDict([
             ('994', 'Line drawing in map'),
