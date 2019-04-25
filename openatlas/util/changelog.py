@@ -11,7 +11,7 @@ class Changelog:
         ('feature', OrderedDict([
             ('994', 'Line drawing in map'),
             ('1011', 'Additional security features'),
-            ('1012', 'Update Geonames search for map')]))])]
+            ('1012', 'Update GeoNames search for map')]))])]
     versions['3.15.0'] = ['2019-04-04', OrderedDict([
         ('feature', OrderedDict([
             ('983', 'External References')])),
