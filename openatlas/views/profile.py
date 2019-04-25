@@ -19,6 +19,9 @@ class DisplayForm(Form):
     theme = SelectField(_('color theme'), choices=theme_choices)
     table_rows = SelectField(_('table rows'), description=_('tooltip table rows'),
                              choices=list(app.config['DEFAULT_TABLE_ROWS'].items()), coerce=int)
+    table_show_aliases = SelectField(_('show aliases in tables'),
+                                     description=_('tooltip show aliases in tables'),
+                                     choices=[('off', _('off')), ('on', _('on'))])
     layout_choices = [('default', _('default')), ('advanced', _('advanced'))]
     layout = SelectField(_('layout'), description=_('tooltip layout'), choices=layout_choices)
 
@@ -75,6 +78,8 @@ def profile_index():
         user.settings['language'] = form.language.data
         user.settings['theme'] = form.theme.data
         user.settings['table_rows'] = form.table_rows.data
+        user.settings[
+            'table_show_aliases'] = 'True' if form.table_show_aliases.data == 'on' else 'False'
         user.settings['layout'] = form.layout.data
         g.cursor.execute('BEGIN')
         try:
@@ -91,11 +96,12 @@ def profile_index():
     form.language.data = language
     form.theme.data = user.settings['theme']
     form.table_rows.data = user.settings['table_rows']
+    form.table_show_aliases.data = 'on' if user.settings['table_show_aliases'] else 'off'
     form.layout.data = user.settings['layout']
     data['display'] = [
         (form.language.label, form.language),
         (str(form.table_rows.label) +
-            display_tooltip(form.table_rows.description), form.table_rows),
+         display_tooltip(form.table_rows.description), form.table_rows),
         (str(form.layout.label) + display_tooltip(form.layout.description), form.layout)]
     return render_template('profile/index.html', data=data, form=form)
 

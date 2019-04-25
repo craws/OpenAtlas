@@ -10,23 +10,26 @@ class ProfileTests(TestBaseCase):
         with app.app_context():
             self.login()
 
-            # test profile update
+            # Profile update
             rv = self.app.get(url_for('profile_index'))
             assert b'alice@example.com' in rv.data
-            data = {'language': 'en', 'table_rows': '100', 'layout': 'advanced', 'theme': 'default'}
+            data = {'language': 'en',
+                    'table_rows': '100',
+                    'table_show_aliases': 'off',
+                    'layout': 'advanced',
+                    'theme': 'default'}
             rv = self.app.post(url_for('profile_index'), data=data, follow_redirects=True)
             assert b'saved' in rv.data
             rv = self.app.get(url_for('profile_update'))
             assert b'Newsletter' in rv.data
-            data = {
-                'name': 'Alice Abernathy',
-                'email': 'alice@umbrella.net',
-                'show_email': '',
-                'newsletter': ''}
+            data = {'name': 'Alice Abernathy',
+                    'email': 'alice@umbrella.net',
+                    'show_email': '',
+                    'newsletter': ''}
             rv = self.app.post(url_for('profile_update'), data=data, follow_redirects=True)
             assert b'Alice Abernathy' in rv.data
 
-            # test change password
+            # Change password
             rv = self.app.get(url_for('profile_password'))
             assert b'Old password' in rv.data
             new_pass = 'you_never_guess_this'

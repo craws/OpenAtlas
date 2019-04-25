@@ -5,6 +5,7 @@ import re
 import time
 from flask import g, session
 from flask_babel import lazy_gettext as _
+from flask_login import current_user
 from wtforms import FloatField, HiddenField
 from wtforms.validators import Optional
 from wtforms.widgets import HiddenInput
@@ -262,7 +263,8 @@ class TableSelect(HiddenInput):
         table = {'id': field.id, 'header': header, 'data': []}
         file_stats = None
         if class_ == 'place':
-            entities = EntityMapper.get_by_system_type('place', nodes=True, aliases=True)
+            aliases = current_user.settings['table_show_aliases']
+            entities = EntityMapper.get_by_system_type('place', nodes=True, aliases=aliases)
         elif class_ == 'reference':
             entities = EntityMapper.get_by_system_type('bibliography') + \
                        EntityMapper.get_by_system_type('edition') + \
@@ -320,7 +322,8 @@ class TableMultiSelect(HiddenInput):
         table['headers'] = 'headers: { ' + str(len(table['header'])) + ': { sorter: "checkbox" } }'
         table['sort'] = 'sortList: [[' + str(len(table['header'])) + ',0],[0,0]]'
         if class_ == 'place':
-            entities = EntityMapper.get_by_system_type('place', nodes=True, aliases=True)
+            aliases = current_user.settings['table_show_aliases']
+            entities = EntityMapper.get_by_system_type('place', nodes=True, aliases=aliases)
         else:
             entities = EntityMapper.get_by_codes(class_)
         for entity in entities:

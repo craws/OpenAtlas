@@ -160,21 +160,20 @@ class UserMapper:
                 (SELECT id FROM web.group WHERE name LIKE %(group_name)s),
                 %(password_reset_code)s, %(password_reset_date)s, %(unsubscribe_code)s)
             WHERE id = %(id)s;"""
-        g.cursor.execute(sql, {
-            'id': user.id,
-            'username': user.username,
-            'real_name': user.real_name,
-            'password': user.password,
-            'info': user.description,
-            'email': user.email,
-            'active': user.active,
-            'group_name': user.group,
-            'login_last_success': user.login_last_success,
-            'login_last_failure': user.login_last_failure,
-            'login_failed_count': user.login_failed_count,
-            'unsubscribe_code': user.unsubscribe_code,
-            'password_reset_code': user.password_reset_code,
-            'password_reset_date': user.password_reset_date})
+        g.cursor.execute(sql, {'id': user.id,
+                               'username': user.username,
+                               'real_name': user.real_name,
+                               'password': user.password,
+                               'info': user.description,
+                               'email': user.email,
+                               'active': user.active,
+                               'group_name': user.group,
+                               'login_last_success': user.login_last_success,
+                               'login_last_failure': user.login_last_failure,
+                               'login_failed_count': user.login_failed_count,
+                               'unsubscribe_code': user.unsubscribe_code,
+                               'password_reset_code': user.password_reset_code,
+                               'password_reset_date': user.password_reset_date})
         debug_model['user'] += 1
 
     @staticmethod
@@ -227,6 +226,10 @@ class UserMapper:
         settings = {row.name: row.value for row in g.cursor.fetchall()}
         for item in ['newsletter', 'show_email']:
             settings[item] = True if item in settings and settings[item] == 'True' else False
+        if 'table_show_aliases' in settings and settings['table_show_aliases'] == 'False':
+            settings['table_show_aliases'] = False
+        else:
+            settings['table_show_aliases'] = True
         if 'theme' not in settings:
             settings['theme'] = 'default'
         if 'layout' not in settings:

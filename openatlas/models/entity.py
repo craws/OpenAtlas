@@ -158,7 +158,6 @@ class Entity:
 
 
 class EntityMapper:
-
     sql_orphan = """
         SELECT e.id FROM model.entity e
         LEFT JOIN model.link l1 on e.id = l1.domain_id
@@ -217,7 +216,7 @@ class EntityMapper:
 
     @staticmethod
     def get_by_system_type(system_type, nodes=False, aliases=False):
-        sql = EntityMapper.build_sql(nodes, aliases)
+        sql = EntityMapper.build_sql(nodes=nodes, aliases=aliases)
         sql += ' WHERE e.system_type = %(system_type)s GROUP BY e.id ORDER BY e.name;'
         g.cursor.execute(sql, {'system_type': system_type})
         debug_model['div sql'] += 1
@@ -303,9 +302,10 @@ class EntityMapper:
                 WHERE e.class_code IN %(codes)s AND e.system_type != 'file'
                 GROUP BY e.id ORDER BY e.name;"""
         else:
-            sql = EntityMapper.build_sql(
-                nodes=True if class_name in ('event', 'place') else False,
-                aliases=True if class_name in ('actor', 'place') else False) + """
+            aliases = True if class_name == 'actor' and current_user.settings[
+                'table_show_aliases'] else False
+            sql = EntityMapper.build_sql(nodes=True if class_name == 'event' else False,
+                                         aliases=aliases) + """
                 WHERE e.class_code IN %(codes)s GROUP BY e.id ORDER BY e.name;"""
         g.cursor.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][class_name])})
         debug_model['by codes'] += 1

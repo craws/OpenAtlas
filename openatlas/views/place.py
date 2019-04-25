@@ -1,6 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
+from flask_login import current_user
 from werkzeug.utils import redirect
 from wtforms import FieldList, HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
@@ -43,7 +44,9 @@ class FeatureForm(DateForm):
 @required_group('readonly')
 def place_index():
     table = {'id': 'place', 'header': app.config['TABLE_HEADERS']['place'], 'data': []}
-    for place in EntityMapper.get_by_system_type('place', nodes=True, aliases=True):
+    for place in EntityMapper.get_by_system_type('place', nodes=True,
+                                                 aliases=current_user.settings[
+                                                     'table_show_aliases']):
         table['data'].append(get_base_table_data(place))
     return render_template('place/index.html', table=table, gis_data=GisMapper.get_all())
 
@@ -151,7 +154,7 @@ def place_view(id_):
                                         actor.first,
                                         actor.last])
     gis_data = GisMapper.get_all(object_) if location else None
-    if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]'\
+    if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]' \
             and gis_data['gisLineSelected'] == '[]':
         gis_data = None
     place = None

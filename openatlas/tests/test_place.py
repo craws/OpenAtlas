@@ -53,7 +53,7 @@ class PlaceTest(TestBaseCase):
             assert b'Tha source' in rv.data
             with app.test_request_context():
                 app.preprocess_request()
-                places = EntityMapper.get_by_codes('place')
+                places = EntityMapper.get_by_system_type('place')
                 place_id = places[0].id
                 place2 = places[1]
                 location = place2.get_linked_entity('P53')
