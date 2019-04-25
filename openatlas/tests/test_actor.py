@@ -79,6 +79,7 @@ class ActorTests(TestBaseCase):
             rv = self.app.get(url_for('actor_update', id_=actor_id))
             assert b'American actress' in rv.data
             data['name'] = 'Susan Alexandra Weaver'
+            data['alias-1'] = 'Ripley1'
             data['end_year_from'] = ''
             data['begin_year_to'] = '1950'
             data['begin_day_from'] = ''

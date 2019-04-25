@@ -26,6 +26,7 @@ class Entity:
         if hasattr(row, 'aliases') and row.aliases:
             for alias in row.aliases:
                 self.aliases[alias['f1']] = alias['f2']  # f1 = alias id, f2 = alias name
+            self.aliases = OrderedDict(sorted(self.aliases.items(), key=lambda kv: (kv[1], kv[0])))
         self.name = row.name
         self.root = None
         self.description = row.description if row.description else ''
@@ -79,6 +80,23 @@ class Entity:
 
     def update(self):
         EntityMapper.update(self)
+
+    def update_aliases(self, form):
+        old_aliases = self.aliases
+        new_aliases = form.alias.data
+        delete_ids = []
+        for id_, alias in old_aliases.items():  # Compare old aliases with form values
+            if alias in new_aliases:
+                new_aliases.remove(alias)
+            else:
+                delete_ids.append(id_)
+        for id_ in delete_ids:  # Delete obsolete aliases
+            EntityMapper.delete(id_)
+        for alias in new_aliases:  # Insert new aliases if not empty
+            if alias.strip() and self.class_.code == 'E18':
+                self.link('P1', EntityMapper.insert('E41', alias))
+            elif alias.strip():
+                self.link('P131', EntityMapper.insert('E82', alias))
 
     def save_nodes(self, form):
         from openatlas.models.node import NodeMapper

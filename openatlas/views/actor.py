@@ -242,8 +242,6 @@ def save(form, actor=None, code=None, origin=None):
         log_action = 'update'
         if actor:
             actor.delete_links(['P74', 'OA8', 'OA9'])
-            for alias in actor.get_linked_entities('P131'):
-                alias.delete()
         else:
             actor = EntityMapper.insert(code, form.name.data)
             log_action = 'insert'
@@ -251,6 +249,7 @@ def save(form, actor=None, code=None, origin=None):
         actor.description = form.description.data
         actor.set_dates(form)
         actor.update()
+        actor.update_aliases(form)
         actor.save_nodes(form)
         url = url_for('actor_view', id_=actor.id)
         if form.residence.data:
@@ -262,9 +261,7 @@ def save(form, actor=None, code=None, origin=None):
         if form.ends_in.data:
             object_ = EntityMapper.get_by_id(form.ends_in.data)
             actor.link('OA9', object_.get_linked_entity('P53'))
-        for alias in form.alias.data:
-            if alias.strip():  # Check if it isn't empty
-                actor.link('P131', EntityMapper.insert('E82', alias))
+
         if origin:
             if origin.view_name == 'reference':
                 link_id = origin.link('P67', actor)

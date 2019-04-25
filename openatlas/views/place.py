@@ -235,8 +235,6 @@ def save(form, object_=None, location=None, origin=None):
     log_action = 'update'
     try:
         if object_:
-            for alias in object_.get_linked_entities('P1'):
-                alias.delete()
             GisMapper.delete_by_entity(location)
         else:
             log_action = 'insert'
@@ -256,13 +254,11 @@ def save(form, object_=None, location=None, origin=None):
         object_.set_dates(form)
         object_.update()
         object_.save_nodes(form)
+        if object_.system_type == 'place':
+            object_.update_aliases(form)
         location.name = 'Location of ' + form.name.data
         location.update()
         location.save_nodes(form)
-        if hasattr(form, 'alias'):
-            for alias in form.alias.data:
-                if alias.strip():  # Check if it isn't empty
-                    object_.link('P1', EntityMapper.insert('E41', alias))
         url = url_for('place_view', id_=object_.id)
         if origin:
             url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-place'
