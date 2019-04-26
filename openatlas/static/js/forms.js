@@ -16,7 +16,6 @@ $(document).ready(function () {
         return /^-?\d+$/i.test(value);
     }, 'Please enter a valid integer.');
 
-
     $('#show_passwords').show();
     $(".date-switch").addClass('display-none');
     $(".value-type-switch").addClass('display-none');

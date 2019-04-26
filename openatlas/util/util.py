@@ -161,7 +161,9 @@ def build_table_form(class_name, linked_entities):
     return """<form class="table" method="post">
                 <input id="csrf_token" name="csrf_token" type="hidden" value="{token}">
                 {pager} <button name="form-submit" id="form-submit" type="submit">{add}</button>
-              </form>""".format(add=uc_first(_('add')), pager=pager(table), token=generate_csrf())
+              </form>""".format(add=uc_first(_('add')),
+                                pager=pager(table, remove_rows=False),
+                                token=generate_csrf())
 
 
 def display_remove_link(url, name):
