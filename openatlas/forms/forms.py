@@ -280,7 +280,8 @@ class TableSelect(HiddenInput):
                 selection = entity.name
             data = get_base_table_data(entity, file_stats)
             data[0] = """<a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
-                        """.format(name=field.id, entity_id=entity.id,
+                        """.format(name=field.id,
+                                   entity_id=entity.id,
                                    entity_name=truncate_string(entity.name, span=False))
             data[0] = '<br />'.join([data[0]] + [
                 truncate_string(alias) for id_, alias in entity.aliases.items()])
