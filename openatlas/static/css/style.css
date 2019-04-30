@@ -12,6 +12,10 @@ html, body, input, select, textarea {
     width: 36em;
 }
 
+#geonames_id {
+    width: 5em;
+}
+
 .date-switch label.error {
     padding: 0.2em;
 }

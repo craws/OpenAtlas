@@ -3,8 +3,9 @@ from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from werkzeug.utils import redirect
-from wtforms import FieldList, HiddenField, StringField, SubmitField, TextAreaField
-from wtforms.validators import InputRequired
+from wtforms import (FieldList, HiddenField, StringField, SubmitField, TextAreaField, IntegerField,
+                     BooleanField)
+from wtforms.validators import InputRequired, Optional
 
 from openatlas import app, logger
 from openatlas.forms.forms import DateForm, build_form
@@ -17,6 +18,8 @@ from openatlas.util.util import (display_remove_link, get_base_table_data, get_e
 
 class PlaceForm(DateForm):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
+    geonames_id = IntegerField('GeoNames Id', [Optional()])
+    geonames_precision = BooleanField(_('exact match'))
     alias = FieldList(StringField(''), description=_('tooltip alias'))
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
