@@ -94,7 +94,35 @@ def admin_check_links(check=None):
         table = {'id': 'check', 'header': ['domain', 'property', 'range'], 'data': []}
         for result in LinkMapper.check_links():  # pragma: no cover
             table['data'].append([result['domain'], result['property'], result['range']])
-    return render_template('admin/check_links.html', table=table)
+    return render_template('admin/check_links.html', table=table, check=check)
+
+
+@app.route('/admin/check_link_duplicates')
+@app.route('/admin/check_link_duplicates/<delete>')
+@required_group('editor')
+def admin_check_link_duplicates(delete=None):
+    if delete:
+        delete_count = str(LinkMapper.delete_link_duplicates())
+        logger.log('info', 'admin', 'Deleted duplicate links: ' + delete_count)
+        flash(_('deleted links: ' + delete_count), 'info')
+    table = {'id': 'check', 'data': [],
+             'header': ['domain', 'range', 'property_code', 'description', 'type_id',
+                        'begin_from', 'begin_to', 'begin_comment', 'end_from', 'end_to',
+                        'end_comment', 'count']}
+    for result in LinkMapper.check_link_duplicates():
+        table['data'].append([link(EntityMapper.get_by_id(result.domain_id)),
+                              link(EntityMapper.get_by_id(result.range_id)),
+                              link(g.properties[result.property_code]),
+                              truncate_string(result.description),
+                              link(g.nodes[result.type_id]) if result.type_id else '',
+                              format_date(result.begin_from),
+                              format_date(result.begin_to),
+                              truncate_string(result.begin_comment),
+                              format_date(result.end_from),
+                              format_date(result.end_to),
+                              truncate_string(result.end_comment),
+                              result.count])
+    return render_template('admin/check_link_duplicates.html', table=table)
 
 
 class FileForm(Form):
