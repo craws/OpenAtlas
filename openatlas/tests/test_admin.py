@@ -78,6 +78,19 @@ class ContentTests(TestBaseCase):
                 'map_cluster_enabled': True, 'map_cluster_max_radius': 2,
                 'map_cluster_disable_at_zoom': 5})
             assert b'Changes have been saved.' in rv.data
+
+            # Check link duplicates
+            with app.test_request_context():
+                app.preprocess_request()
+                event = EntityMapper.insert('E8', 'Event Horizon')
+                source = EntityMapper.insert('E33', 'Tha source')
+                source.link('P67', event)
+                source.link('P67', event)
+            rv = self.app.get(url_for('admin_check_link_duplicates'))
+            assert b'Event Horizon' in rv.data
+            rv = self.app.get(url_for('admin_check_link_duplicates', delete='delete'))
+            assert b'Congratulations, everything looks fine!' in rv.data
+
             data = {name: '' for name in SettingsMapper.fields}
             data['default_language'] = 'en'
             data['default_table_rows'] = '10'

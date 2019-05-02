@@ -250,10 +250,9 @@ class LinkMapper:
                     FROM model.link l
                     JOIN model.entity d ON l.domain_id = d.id
                     JOIN model.entity r ON l.range_id = r.id
-                    WHERE
-                        l.property_code = %(property)s AND
-                        d.class_code = %(domain)s AND
-                        r.class_code = %(range)s;"""
+                    WHERE l.property_code = %(property)s
+                        AND d.class_code = %(domain)s
+                        AND r.class_code = %(range)s;"""
                 g.cursor.execute(sql, {'property': item['property'], 'domain': item['domain'],
                                        'range': item['range']})
                 debug_model['link sql'] += 1
@@ -264,3 +263,30 @@ class LinkMapper:
                                           'property': link(g.properties[row2.property_code]),
                                           'range': link(range_) + ' (' + range_.class_.code + ')'})
         return invalid_links
+
+    @staticmethod
+    def check_link_duplicates():
+        # Find links with the same data (except id, created, modified)
+        sql = """
+            SELECT COUNT(*) AS count, domain_id, range_id, property_code, description, type_id,
+                begin_from, begin_to, begin_comment, end_from, end_to, end_comment
+            FROM model.link GROUP BY
+                domain_id, range_id, property_code, description, type_id,
+                begin_from, begin_to, begin_comment, end_from, end_to, end_comment
+            HAVING COUNT(*) > 1"""
+        g.cursor.execute(sql)
+        debug_model['link sql'] += 1
+        return g.cursor.fetchall()
+
+    @staticmethod
+    def delete_link_duplicates():
+        # Delete duplicate links which may be artifacts from imports
+        sql = """
+        DELETE FROM model.link l WHERE l.id NOT IN (
+            SELECT id FROM (
+                SELECT DISTINCT ON (domain_id, range_id, property_code, description, type_id,
+                    begin_from, begin_to, begin_comment, end_from, end_to, end_comment) *
+                FROM model.link) AS temp_table);"""
+        g.cursor.execute(sql)
+        debug_model['link sql'] += 1
+        return g.cursor.rowcount

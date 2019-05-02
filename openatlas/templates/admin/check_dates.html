@@ -12,13 +12,26 @@
         <li><a href="#tab-involvement-dates">{{ _('invalid involvement dates')|uc_first }} ({{ tables['involvement_dates']['data']|length|format_number }})</a></li>
     </ul>
     <div id="tab-dates">
+    {% if tables['dates']['data'] %}
         {{ tables['dates']|pager|safe }}
+    {% else %}
+        {{ _('Congratulations, everything looks fine!') }}
+    {% endif %}
     </div>
     <div id="tab-link-dates">
-        {{ tables['link_dates']|pager|safe }}
+    {% if tables['link_dates']['data'] %}
+       {{ tables['link_dates']|pager|safe }}
+    {% else %}
+        {{ _('Congratulations, everything looks fine!') }}
+    {% endif %}
+
     </div>
     <div id="tab-involvement-dates">
-        {{ tables['involvement_dates']|pager|safe }}
+        {% if tables['involvement_dates']['data'] %}
+            {{ tables['involvement_dates']|pager|safe }}
+        {% else %}
+            {{ _('Congratulations, everything looks fine!') }}
+        {% endif %}
     </div>
 </div>
 {% endblock %}

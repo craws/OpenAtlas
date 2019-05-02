@@ -21,10 +21,18 @@
                    href="{{ url_for('admin_orphans_delete', parameter='orphans') }}">{{ _('delete orphans')|uc_first }}</a>
             </div>
         {% endif %}
-        {{ tables['orphans']|pager|safe }}
+        {% if tables['orphans']['data'] %}
+            {{ tables['orphans']|pager|safe }}
+        {% else %}
+            {{ _('Congratulations, everything looks fine!') }}
+        {% endif %}
     </div>
     <div id="tab-unlinked">
-        {{ tables['unlinked']|pager|safe }}
+        {% if tables['unlinked']['data'] %}
+            {{ tables['unlinked']|pager|safe }}
+        {% else %}
+            {{ _('Congratulations, everything looks fine!') }}
+        {% endif %}
     </div>
     <div id="tab-nodes">
         {% if tables['nodes']['data']|length > 0 and 'admin'|is_authorized %}
@@ -33,10 +41,18 @@
                    href="{{ url_for('admin_orphans_delete', parameter='types') }}">{{ _('delete types')|uc_first }}</a>
             </div>
         {% endif %}
-        {{ tables['nodes']|pager|safe }}
+        {% if tables['nodes']['data'] %}
+            {{ tables['nodes']|pager|safe }}
+        {% else %}
+            {{ _('Congratulations, everything looks fine!') }}
+        {% endif %}
     </div>
     <div id="tab-missing-files">
-        {{ tables['missing_files']|pager|safe }}
+        {% if tables['missing_files']['data'] %}
+            {{ tables['missing_files']|pager|safe }}
+        {% else %}
+            {{ _('Congratulations, everything looks fine!') }}
+        {% endif %}
     </div>
     <div id="tab-orphaned-files">
         {% if tables['orphaned_files']['data']|length > 0 and 'admin'|is_authorized %}
@@ -45,10 +61,18 @@
                    href="{{ url_for('admin_file_delete', filename='all') }}">{{ _('delete all files')|uc_first }}</a>
             </div>
         {% endif %}
-        {{ tables['orphaned_files']|pager|safe }}
+        {% if tables['orphaned_files']['data'] %}
+            {{ tables['orphaned_files']|pager|safe }}
+        {% else %}
+            {{ _('Congratulations, everything looks fine!') }}
+        {% endif %}
     </div>
     <div id="tab-circular">
-        {{ tables['circular']|pager|safe }}
+        {% if tables['circular']['data'] %}
+            {{ tables['circular']|pager|safe }}
+        {% else %}
+            {{ _('Congratulations, everything looks fine!') }}
+        {% endif %}
     </div>
 </div>
 {% endblock %}

@@ -9,7 +9,6 @@
                 <span class="error">{{ _('directory not writable')|uc_first }}: {{ dir }}</span><br />
             {% endif %}
         {% endfor %}
-
         <h1>{{ _('user')|uc_first }}</h1>
         <a href="{{ url_for('user_index') }}">{{ _('list')|uc_first }}</a>
         {% if 'manager'|is_authorized and session['settings']['mail'] %}
@@ -41,7 +40,7 @@
             <a href="{{ url_for('admin_log') }}">{{ _('system log')|uc_first }}</a>
         {% endif %}
 
-         {% if 'editor'|is_authorized %}
+        {% if 'editor'|is_authorized %}
             <h1>{{ _('data transfer')|uc_first }}</h1>
             <a href="{{ url_for('import_index') }}">{{ _('import')|uc_first }}</a>
             {% if 'manager'|is_authorized %}
@@ -54,6 +53,7 @@
             <a href="{{ url_for('admin_orphans') }}">{{ _('orphans')|uc_first }}</a>
             <a href="{{ url_for('admin_check_links') }}">{{ _('check links')|uc_first }}</a>
             <a href="{{ url_for('admin_check_dates') }}">{{ _('check dates')|uc_first }}</a>
+            <a href="{{ url_for('admin_check_link_duplicates')}}">{{ _('check link duplicates')|uc_first }}</a>
         {% endif %}
     </div>
 {% endblock %}
