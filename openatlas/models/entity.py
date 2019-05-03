@@ -250,7 +250,7 @@ class EntityMapper:
         return EntityMapper.get_by_id(g.cursor.fetchone()[0])
 
     @staticmethod
-    def get_by_id(entity_id, nodes=False, aliases=False, ignore_not_found=False):
+    def get_by_id(entity_id: int, nodes=False, aliases=False, ignore_not_found=False):
         if entity_id in g.nodes:  # pragma: no cover, just in case a node is requested
             return g.nodes[entity_id]
         sql = EntityMapper.build_sql(nodes, aliases) + ' WHERE e.id = %(id)s GROUP BY e.id;'
