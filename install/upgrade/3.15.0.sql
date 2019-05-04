@@ -1,4 +1,5 @@
--- Upgrade to 3.14.0 to 3.15.0, be sure to backup the database and read the update notes before executing this!
+-- Upgrade 3.14.0 to 3.15.0
+-- Be sure to backup the database and read the update notes before executing this!
 
 BEGIN;
 
