@@ -1,38 +1,39 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
-
 import re
 import time
+from typing import Optional as Optional_Type
+
 from flask import g, session
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
+from flask_wtf import Form
 from wtforms import FloatField, HiddenField
 from wtforms.validators import Optional
 from wtforms.widgets import HiddenInput
 
 from openatlas import app
 from openatlas.forms.date import DateForm
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.models.node import NodeMapper
 from openatlas.util.util import (get_base_table_data, get_file_stats, pager, truncate_string,
                                  uc_first)
 
 
-def get_link_type(form):
-    """ Returns the link type provided by a form."""
+def get_link_type(form) -> Optional_Type[Entity]:
+    """ Returns the link type provided by a link form, e.g. involvement between actor and event."""
     for field in form:
         if type(field) is TreeField and field.data:
             return g.nodes[int(field.data)]
-    return None
 
 
-def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
+def build_form(form, form_name, entity=None, request_origin=None, entity2=None) -> None:
     """ The entity parameter can also be a link."""
     # Add custom fields
     custom_list = []
 
-    def add_value_type_fields(subs):
+    def add_value_type_fields(subs) -> None:
         for sub_id in subs:
             sub = g.nodes[sub_id]
             setattr(form, str(sub.id), ValueFloatField(sub.name, [Optional()]))
@@ -78,7 +79,7 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
     return form_instance
 
 
-def build_move_form(form, node):
+def build_move_form(form, node) -> Form:
     root = g.nodes[node.root[-1]]
     setattr(form, str(root.id), TreeField(str(root.id)))
     form_instance = form(obj=node)

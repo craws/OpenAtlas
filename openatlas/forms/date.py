@@ -42,7 +42,7 @@ class DateForm(Form):
             return parts[1]
         return parts[2]
 
-    def populate_dates(self, item):
+    def populate_dates(self, item) -> None:
         """ Populates date form fields with date values of an entity or link."""
         if item.begin_from:
             self.begin_year_from.data = DateForm.format_date(item.begin_from, 'year')
