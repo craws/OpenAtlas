@@ -125,6 +125,15 @@ def admin_check_link_duplicates(delete=None):
     return render_template('admin/check_link_duplicates.html', table=table)
 
 
+@app.route('/admin/check_single_type_duplicates')
+@required_group('editor')
+def admin_check_single_type_duplicates():
+    table = {'id': 'check', 'data': [], 'header': ['entity', 'count']}
+    for result in LinkMapper.check_single_type_duplicates():
+        table['data'].append([link(EntityMapper.get_by_id(result.domain_id)), result.count])
+    return render_template('admin/check_single_type_duplicates.html', table=table)
+
+
 class FileForm(Form):
     file_upload_max_size = IntegerField(_('max file size in MB'))
     file_upload_allowed_extension = StringField('allowed file extensions')

@@ -290,3 +290,22 @@ class LinkMapper:
         g.cursor.execute(sql)
         debug_model['link sql'] += 1
         return g.cursor.rowcount
+
+    @staticmethod
+    def check_single_type_duplicates():
+        # Find entities with multiple types attached which should be single
+        single_node_ids = []
+        for id_, node in g.nodes.items():
+            if not node.root:
+                continue
+            root = g.nodes[node.root[0]]
+            if hasattr(root, 'multiple') and not root.multiple:
+                single_node_ids.append(id_)
+        sql = """
+            SELECT COUNT(*) AS count, domain_id, range_id, type_id FROM model.link
+            WHERE property_code = 'P2' AND (range_id IN %(node_ids)s OR type_id IN %(node_ids)s)
+            GROUP BY domain_id, range_id, type_id
+            HAVING COUNT(*) > 1"""
+        g.cursor.execute(sql,{'node_ids': tuple(single_node_ids)})
+        debug_model['link sql'] += 1
+        return g.cursor.fetchall()

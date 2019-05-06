@@ -1,0 +1,12 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
+    > {{ _('check single type duplicates')|uc_first }}
+{% endblock %}
+{% block content %}
+    {% if table['data'] %}
+        {{ table|pager|safe }}
+    {% else %}
+        {{ _('Congratulations, everything looks fine!') }}
+    {% endif %}
+{% endblock %}
