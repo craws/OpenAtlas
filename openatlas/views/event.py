@@ -3,6 +3,7 @@ import ast
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
+from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
@@ -158,7 +159,7 @@ def event_view(id_):
                            profile_image_id=profile_image_id)
 
 
-def save(form, event=None, code=None, origin=None):
+def save(form: Form, event=None, code=None, origin=None) -> str:
     g.cursor.execute('BEGIN')
     try:
         log_action = 'insert'

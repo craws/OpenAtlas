@@ -128,10 +128,17 @@ def admin_check_link_duplicates(delete=None):
 @app.route('/admin/check_single_type_duplicates')
 @required_group('editor')
 def admin_check_single_type_duplicates():
-    table = {'id': 'check', 'data': [], 'header': ['entity', 'count']}
-    for result in LinkMapper.check_single_type_duplicates():
-        table['data'].append([link(EntityMapper.get_by_id(result.domain_id)), result.count])
+    table = {'id': 'check', 'data': LinkMapper.check_single_type_duplicates(),
+             'header': ['entity', 'class', 'type', 'count']}
     return render_template('admin/check_single_type_duplicates.html', table=table)
+
+
+@app.route('/admin/delete_single_type_duplicate/<int:entity_id>/<int:node_id>')
+@required_group('editor')
+def admin_delete_single_type_duplicate(entity_id: int, node_id: int):
+    NodeMapper.remove_by_entity_and_node(entity_id, node_id)
+    flash(_('link removed'), 'info')
+    return redirect(url_for('admin_check_single_type_duplicates'))
 
 
 class FileForm(Form):

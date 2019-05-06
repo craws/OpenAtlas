@@ -28,7 +28,7 @@ def get_link_type(form) -> Optional_Type[Entity]:
             return g.nodes[int(field.data)]
 
 
-def build_form(form, form_name, entity=None, request_origin=None, entity2=None) -> None:
+def build_form(form, form_name, entity=None, request_origin=None, entity2=None) -> Form:
     """ The entity parameter can also be a link."""
     # Add custom fields
     custom_list = []

@@ -261,7 +261,7 @@ class EntityMapper:
         return Entity(g.cursor.fetchone())
 
     @staticmethod
-    def get_by_ids(entity_ids, nodes=False):
+    def get_by_ids(entity_ids: iter, nodes=False) -> list:
         if not entity_ids:
             return []
         sql = EntityMapper.build_sql(nodes) + ' WHERE e.id IN %(ids)s GROUP BY e.id;'
@@ -270,7 +270,7 @@ class EntityMapper:
         return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_by_project_id(project_id):
+    def get_by_project_id(project_id: int) -> list:
         sql = """
             SELECT e.id, ie.origin_id, e.class_code, e.name, e.description, e.created, e.modified,
                 e.system_type,
@@ -291,7 +291,7 @@ class EntityMapper:
         return entities
 
     @staticmethod
-    def get_by_codes(class_name):
+    def get_by_codes(class_name: str) -> list:
         # Possible class names: actor, event, place, reference, source
         if class_name == 'source':
             sql = EntityMapper.build_sql(nodes=True) + """
@@ -312,14 +312,14 @@ class EntityMapper:
         return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def delete(entity):
+    def delete(entity) -> None:
         """ Triggers function model.delete_entity_related() for deleting related entities"""
         id_ = entity if type(entity) is int else entity.id
         g.cursor.execute('DELETE FROM model.entity WHERE id = %(id_)s;', {'id_': id_})
         debug_model['by id'] += 1
 
     @staticmethod
-    def get_overview_counts():
+    def get_overview_counts() -> OrderedDict:
         sql = """
             SELECT
             SUM(CASE WHEN
@@ -340,14 +340,14 @@ class EntityMapper:
         return counts
 
     @staticmethod
-    def get_orphans():
+    def get_orphans() -> list:
         """ Returns entities without links. """
         g.cursor.execute(EntityMapper.sql_orphan)
         debug_model['div sql'] += 1
         return [EntityMapper.get_by_id(row.id) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_latest(limit):
+    def get_latest(limit: int) -> list:
         """ Returns the newest created entities"""
         codes = []
         for class_codes in app.config['CLASS_CODES'].values():
@@ -360,7 +360,7 @@ class EntityMapper:
         return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def delete_orphans(parameter):
+    def delete_orphans(parameter) -> int:
         from openatlas.models.node import NodeMapper
         class_codes = tuple(app.config['CODE_CLASS'].keys())
         if parameter == 'orphans':
@@ -496,7 +496,7 @@ class EntityMapper:
         return {d.id: d for d in entities}.values()  # Remove duplicates before returning
 
     @staticmethod
-    def set_profile_image(id_, origin_id):
+    def set_profile_image(id_: int, origin_id: int) -> None:
         sql = """
             INSERT INTO web.entity_profile_image (entity_id, image_id)
             VALUES (%(entity_id)s, %(image_id)s)
@@ -505,20 +505,20 @@ class EntityMapper:
         debug_model['div sql'] += 1
 
     @staticmethod
-    def get_profile_image_id(id_):
+    def get_profile_image_id(id_: int):
         sql = 'SELECT image_id FROM web.entity_profile_image WHERE entity_id = %(entity_id)s;'
         g.cursor.execute(sql, {'entity_id': id_})
         debug_model['div sql'] += 1
         return g.cursor.fetchone()[0] if g.cursor.rowcount else None
 
     @staticmethod
-    def remove_profile_image(entity_id):
+    def remove_profile_image(entity_id: int) -> None:
         sql = 'DELETE FROM web.entity_profile_image WHERE entity_id = %(entity_id)s;'
         g.cursor.execute(sql, {'entity_id': entity_id})
         debug_model['div sql'] += 1
 
     @staticmethod
-    def get_circular():
+    def get_circular() -> list:
         # Get entities that are linked to itself
         g.cursor.execute('SELECT domain_id FROM model.link WHERE domain_id = range_id;')
         debug_model['div sql'] += 1

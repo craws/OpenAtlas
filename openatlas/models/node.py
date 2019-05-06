@@ -1,6 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
 from collections import OrderedDict
+from typing import Optional
 
 from flask import g
 
@@ -101,12 +102,11 @@ class NodeMapper(EntityMapper):
                 return node
 
     @staticmethod
-    def get_tree_data(node_id, selected_ids):
-        node = g.nodes[node_id]
-        return NodeMapper.walk_tree(node.subs, selected_ids)
+    def get_tree_data(node_id: int, selected_ids: list):
+        return NodeMapper.walk_tree(g.nodes[node_id].subs, selected_ids)
 
     @staticmethod
-    def walk_tree(param, selected_ids):
+    def walk_tree(param, selected_ids: list) -> str:
         string = ''
         for id_ in param if type(param) is list else [param]:
             item = g.nodes[id_]
@@ -252,8 +252,9 @@ class NodeMapper(EntityMapper):
             debug_model['div sql'] += 1
 
     @staticmethod
-    def get_all_sub_ids(node, subs):
+    def get_all_sub_ids(node, subs: Optional[list] = None) -> list:
         # Recursive function to return a list with all sub node ids
+        subs = subs if subs else []
         subs += node.subs
         for sub_id in node.subs:
             NodeMapper.get_all_sub_ids(g.nodes[sub_id], subs)
@@ -262,7 +263,7 @@ class NodeMapper(EntityMapper):
     @staticmethod
     def get_form_count(root_node, form_id):
         # Check if nodes are already linked to entities before offering to remove a node from form
-        node_ids = NodeMapper.get_all_sub_ids(root_node, [])
+        node_ids = NodeMapper.get_all_sub_ids(root_node)
         if not node_ids:  # There are no sub nodes so skipping test
             return
         g.cursor.execute("SELECT name FROM web.form WHERE id = %(form_id)s;", {'form_id': form_id})
@@ -293,8 +294,15 @@ class NodeMapper(EntityMapper):
         return g.cursor.fetchone()[0]
 
     @staticmethod
-    def remove_form_from_hierarchy(root_node, form_id):
+    def remove_form_from_hierarchy(root_node: Entity, form_id: int) -> None:
         sql = """
             DELETE FROM web.hierarchy_form
             WHERE hierarchy_id = %(hierarchy_id)s AND form_id = %(form_id)s;"""
         g.cursor.execute(sql, {'hierarchy_id': root_node.id, 'form_id': form_id})
+
+    @staticmethod
+    def remove_by_entity_and_node(entity_id: int, node_id: int) -> None:
+        sql = """
+            DELETE FROM model.link
+            WHERE domain_id = %(entity_id)s AND range_id = %(node_id)s AND property_code = 'P2';"""
+        g.cursor.execute(sql, {'entity_id': entity_id, 'node_id': node_id})
