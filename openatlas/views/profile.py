@@ -20,7 +20,6 @@ class DisplayForm(Form):
     table_rows = SelectField(_('table rows'), description=_('tooltip table rows'),
                              choices=list(app.config['DEFAULT_TABLE_ROWS'].items()), coerce=int)
     table_show_aliases = SelectField(_('show aliases in tables'),
-                                     description=_('tooltip show aliases in tables'),
                                      choices=[('off', _('off')), ('on', _('on'))])
     layout_choices = [('default', _('default')), ('advanced', _('advanced'))]
     layout = SelectField(_('layout'), description=_('tooltip layout'), choices=layout_choices)

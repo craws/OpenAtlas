@@ -291,7 +291,7 @@ INSERT INTO web.hierarchy (id, name, multiple, system, directional, value_type) 
 ((SELECT id FROM entity WHERE name='Source translation'), 'Source translation', False, False, False, False),
 ((SELECT id FROM entity WHERE name='Administrative Unit'), 'Administrative Unit', True, True, False, False),
 ((SELECT id FROM entity WHERE name='Historical Place'), 'Historical Place', True, True, False, False),
-((SELECT id FROM entity WHERE name='Dimensions'), 'Dimensions', False, False, False, True),
+((SELECT id FROM entity WHERE name='Dimensions'), 'Dimensions', True, False, False, True),
 ((SELECT id FROM entity WHERE name='External Reference'), 'External Reference', False, True, False, False);
 
 INSERT INTO web.form (name, extendable) VALUES

@@ -12,7 +12,7 @@ After following the instructions restart Apache and test if the application is w
 
 ### 3.16.0 to 3.17.0
 
-A code base update (e.g. with git pull) and an Apache restart should be sufficient
+Execute install/upgrade/3.17.0.sql after making backups
 
 ### 3.15.0 to 3.16.0
 

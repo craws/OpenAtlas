@@ -29,12 +29,7 @@ class DateForm(Form):
     end_comment = StringField(render_kw={'placeholder': _('comment')})
 
     @staticmethod
-    def format_date(date, part):
-        """
-        :param date: a date string
-        :param part: year, month or day
-        :return: string presentation of the date part for the form
-        """
+    def format_date(date: str, part: str) -> str:
         string = str(date).split(' ')[0]
         bc = False
         if string.startswith('-') or string.startswith('0000'):
@@ -47,7 +42,7 @@ class DateForm(Form):
             return parts[1]
         return parts[2]
 
-    def populate_dates(self, item):
+    def populate_dates(self, item) -> None:
         """ Populates date form fields with date values of an entity or link."""
         if item.begin_from:
             self.begin_year_from.data = DateForm.format_date(item.begin_from, 'year')
@@ -68,7 +63,7 @@ class DateForm(Form):
                 self.end_month_to.data = DateForm.format_date(item.end_to, 'month')
                 self.end_day_to.data = DateForm.format_date(item.end_to, 'day')
 
-    def validate(self, extra_validators=None):
+    def validate(self, extra_validators: bool = None) -> bool:
         valid = Form.validate(self)
 
         # Check date format, if valid put dates into a list called "dates"
