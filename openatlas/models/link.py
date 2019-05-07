@@ -1,8 +1,11 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
+from collections import namedtuple
+from typing import Optional
 
 from flask import abort, flash, g, url_for
 from flask_babel import lazy_gettext as _
+from flask_wtf import Form
 
 from openatlas import debug_model, logger
 from openatlas.forms.date import DateForm
@@ -12,7 +15,7 @@ from openatlas.util.util import link, uc_first
 
 class Link:
 
-    def __init__(self, row, domain: bool = None, range_: bool = None) -> None:
+    def __init__(self, row: namedtuple, domain: bool = None, range_: bool = None) -> None:
         from openatlas.models.entity import EntityMapper
         self.id = row.id
         self.description = row.description
@@ -40,7 +43,7 @@ class Link:
     def delete(self) -> None:
         LinkMapper.delete(self.id)
 
-    def set_dates(self, form) -> None:
+    def set_dates(self, form: Form) -> None:
         self.begin_from = None
         self.begin_to = None
         self.begin_comment = None
@@ -64,8 +67,11 @@ class Link:
 class LinkMapper:
 
     @staticmethod
-    def insert(entity, property_code, linked_entities,
-               description: bool = None, inverse: bool = False):
+    def insert(entity,
+               property_code: str,
+               linked_entities,
+               description: Optional[str] = None,
+               inverse: Optional[bool] = False) -> Optional[int]:
         from openatlas.models.entity import Entity, EntityMapper
         # linked_entities can be an entity, an entity id or a list of them
         if not entity or not linked_entities:  # pragma: no cover
@@ -106,7 +112,10 @@ class LinkMapper:
         return result
 
     @staticmethod
-    def get_linked_entity(entity_param, code, inverse: bool = False, nodes: bool = False):
+    def get_linked_entity(entity_param,
+                          code: str,
+                          inverse: Optional[bool] = False,
+                          nodes: Optional[bool] = False) -> Optional[namedtuple]:
         result = LinkMapper.get_linked_entities(entity_param, code, inverse=inverse, nodes=nodes)
         if len(result) > 1:  # pragma: no cover
             logger.log('error', 'model', 'multiple linked entities found for ' + code)
@@ -116,7 +125,9 @@ class LinkMapper:
             return result[0]
 
     @staticmethod
-    def get_linked_entities(entity, codes, inverse: bool = False, nodes: bool = False) -> list:
+    def get_linked_entities(entity, codes,
+                            inverse: Optional[bool] = False,
+                            nodes: Optional[bool] = False) -> list:
         from openatlas.models.entity import EntityMapper
         sql = """
             SELECT range_id AS result_id FROM model.link
@@ -162,7 +173,7 @@ class LinkMapper:
         return links
 
     @staticmethod
-    def delete_by_codes(entity, codes):
+    def delete_by_codes(entity, codes: iter) -> None:
         codes = codes if type(codes) is list else [codes]
         sql = 'DELETE FROM model.link WHERE property_code IN %(codes)s AND domain_id = %(id)s;'
         g.cursor.execute(sql, {'id': entity.id, 'codes': tuple(codes)})
@@ -184,7 +195,7 @@ class LinkMapper:
         return Link(g.cursor.fetchone())
 
     @staticmethod
-    def get_entities_by_node(node):
+    def get_entities_by_node(node) -> iter:
         sql = "SELECT id, domain_id, range_id from model.link WHERE type_id = %(node_id)s;"
         g.cursor.execute(sql, {'node_id': node.id})
         debug_model['link sql'] += 1
@@ -266,7 +277,7 @@ class LinkMapper:
         return invalid_links
 
     @staticmethod
-    def check_link_duplicates():
+    def check_link_duplicates() -> list:
         # Find links with the same data (except id, created, modified)
         sql = """
             SELECT COUNT(*) AS count, domain_id, range_id, property_code, description, type_id,
@@ -280,7 +291,7 @@ class LinkMapper:
         return g.cursor.fetchall()
 
     @staticmethod
-    def delete_link_duplicates():
+    def delete_link_duplicates() -> int:
         # Delete duplicate links which may be artifacts from imports
         sql = """
         DELETE FROM model.link l WHERE l.id NOT IN (
@@ -303,11 +314,9 @@ class LinkMapper:
                 node_ids = NodeMapper.get_all_sub_ids(node)
                 if node_ids:
                     sql = """
-                        SELECT domain_id, type_id FROM model.link
-                        WHERE property_code = 'P2'
-                            AND (range_id IN %(node_ids)s OR type_id IN %(node_ids)s)
-                        GROUP BY domain_id, type_id
-                        HAVING COUNT(*) > 1;"""
+                        SELECT domain_id FROM model.link
+                        WHERE property_code = 'P2' AND range_id IN %(node_ids)s
+                        GROUP BY domain_id HAVING COUNT(*) > 1;"""
                     g.cursor.execute(sql, {'node_ids': tuple(node_ids)})
                     debug_model['link sql'] += 1
                     for row in g.cursor.fetchall():
@@ -320,8 +329,6 @@ class LinkMapper:
                                 offending_nodes.append(
                                     '<a href="' + url + '">' + uc_first(_('remove')) + '</a> ' +
                                     entity_node.name)
-                        data.append([link(entity),
-                                     entity.class_.name,
-                                     link(g.nodes[id_]),
-                                     '<br />'.join(offending_nodes)])
+                        data.append([link(entity), entity.class_.name,
+                                     link(g.nodes[id_]), '<br />'.join(offending_nodes)])
         return data
