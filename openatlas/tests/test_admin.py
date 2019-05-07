@@ -3,13 +3,14 @@ from flask import url_for
 from openatlas import app
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
+from openatlas.models.node import NodeMapper
 from openatlas.models.settings import SettingsMapper
 from openatlas.test_base import TestBaseCase
 
 
 class ContentTests(TestBaseCase):
 
-    def test_content_and_newsletter(self):
+    def test_content_and_newsletter(self) -> None:
         with app.app_context():
             self.login()
             self.app.post(url_for('actor_insert', code='E21'), data={'name': 'Oliver Twist'})
@@ -26,7 +27,7 @@ class ContentTests(TestBaseCase):
             rv = self.app.get(url_for('admin_newsletter'))
             assert b'Newsletter' in rv.data
 
-    def test_logs(self):
+    def test_logs(self) -> None:
         self.login()
         with app.app_context():
             rv = self.app.get(url_for('admin_log'))
@@ -34,13 +35,13 @@ class ContentTests(TestBaseCase):
             rv = self.app.get(url_for('admin_log_delete', follow_redirects=True))
             assert b'Login' not in rv.data
 
-    def test_links(self):
+    def test_links(self) -> None:
         self.login()
         with app.app_context():
             rv = self.app.get(url_for('admin_check_links', check='check'))
             assert b'Invalid linked entity' in rv.data
 
-    def test_dates(self):
+    def test_dates(self) -> None:
         self.login()
         with app.app_context():
             with app.test_request_context():
@@ -61,7 +62,7 @@ class ContentTests(TestBaseCase):
             assert b'Invalid link dates (1)' in rv.data
             assert b'Invalid involvement dates (1)' in rv.data
 
-    def test_admin(self):
+    def test_admin(self) -> None:
         with app.app_context():
             self.login()
             rv = self.app.get(url_for('admin_mail'))
@@ -86,9 +87,16 @@ class ContentTests(TestBaseCase):
                 source = EntityMapper.insert('E33', 'Tha source')
                 source.link('P67', event)
                 source.link('P67', event)
+                source_node = NodeMapper.get_hierarchy_by_name('Source')
+                source.link('P2', source_node.subs[0])
+                source.link('P2', source_node.subs[1])
             rv = self.app.get(url_for('admin_check_link_duplicates'))
             assert b'Event Horizon' in rv.data
-            rv = self.app.get(url_for('admin_check_link_duplicates', delete='delete'))
+            rv = self.app.get(url_for('admin_check_link_duplicates', delete='delete'),
+                              follow_redirects=True)
+            assert b'Remove' in rv.data
+            rv = self.app.get(url_for('admin_delete_single_type_duplicate', entity_id=source.id,
+                                      node_id=source_node.subs[0]), follow_redirects=True)
             assert b'Congratulations, everything looks fine!' in rv.data
 
             data = {name: '' for name in SettingsMapper.fields}

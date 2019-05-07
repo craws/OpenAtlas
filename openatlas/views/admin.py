@@ -3,6 +3,7 @@ import datetime
 import os
 from collections import OrderedDict
 from os.path import basename, splitext
+from typing import Optional
 
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
@@ -47,7 +48,7 @@ class GeneralForm(Form):
 
 @app.route('/admin')
 @required_group('readonly')
-def admin_index():
+def admin_index() -> str:
     export_path = app.config['EXPORT_FOLDER_PATH']
     writeable_dirs = {
         'uploads': True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False,
@@ -65,7 +66,7 @@ class MapForm(Form):
 
 @app.route('/admin/map', methods=['POST', 'GET'])
 @required_group('manager')
-def admin_map():
+def admin_map() -> str:
     form = MapForm(obj=session['settings'])
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
@@ -88,7 +89,7 @@ def admin_map():
 @app.route('/admin/check_links')
 @app.route('/admin/check_links/<check>')
 @required_group('editor')
-def admin_check_links(check=None):
+def admin_check_links(check: Optional[str] = None) -> str:
     table = None
     if check:
         table = {'id': 'check', 'header': ['domain', 'property', 'range'], 'data': []}
@@ -100,12 +101,13 @@ def admin_check_links(check=None):
 @app.route('/admin/check_link_duplicates')
 @app.route('/admin/check_link_duplicates/<delete>')
 @required_group('editor')
-def admin_check_link_duplicates(delete=None):
+def admin_check_link_duplicates(delete: Optional[str] = None) -> str:
     if delete:
         delete_count = str(LinkMapper.delete_link_duplicates())
         logger.log('info', 'admin', 'Deleted duplicate links: ' + delete_count)
         flash(_('deleted links: ' + delete_count), 'info')
-    table = {'id': 'check', 'data': [],
+        return redirect(url_for('admin_check_link_duplicates'))
+    table = {'id': 'check_duplicates', 'data': [],
              'header': ['domain', 'range', 'property_code', 'description', 'type_id',
                         'begin_from', 'begin_to', 'begin_comment', 'end_from', 'end_to',
                         'end_comment', 'count']}
@@ -122,15 +124,10 @@ def admin_check_link_duplicates(delete=None):
                               format_date(result.end_to),
                               truncate_string(result.end_comment),
                               result.count])
+    if not table['data']:  # No duplicates where found so check if single types really used single
+        table = {'id': 'check_single', 'data': LinkMapper.check_single_type_duplicates(),
+                 'header': ['entity', 'class', 'base type', 'incorrect multiple types']}
     return render_template('admin/check_link_duplicates.html', table=table)
-
-
-@app.route('/admin/check_single_type_duplicates')
-@required_group('editor')
-def admin_check_single_type_duplicates():
-    table = {'id': 'check', 'data': LinkMapper.check_single_type_duplicates(),
-             'header': ['entity', 'class', 'type', 'count']}
-    return render_template('admin/check_single_type_duplicates.html', table=table)
 
 
 @app.route('/admin/delete_single_type_duplicate/<int:entity_id>/<int:node_id>')
@@ -138,7 +135,7 @@ def admin_check_single_type_duplicates():
 def admin_delete_single_type_duplicate(entity_id: int, node_id: int):
     NodeMapper.remove_by_entity_and_node(entity_id, node_id)
     flash(_('link removed'), 'info')
-    return redirect(url_for('admin_check_single_type_duplicates'))
+    return redirect(url_for('admin_check_link_duplicates'))
 
 
 class FileForm(Form):
@@ -172,7 +169,7 @@ def admin_file():
 
 @app.route('/admin/orphans/delete/<parameter>')
 @required_group('admin')
-def admin_orphans_delete(parameter):
+def admin_orphans_delete(parameter: str):
     count = EntityMapper.delete_orphans(parameter)
     flash(_('info orphans deleted:') + ' ' + str(count), 'info')
     return redirect(url_for('admin_orphans'))
@@ -180,7 +177,7 @@ def admin_orphans_delete(parameter):
 
 @app.route('/admin/check/dates')
 @required_group('editor')
-def admin_check_dates():
+def admin_check_dates() -> str:
     # Get invalid date combinations (e.g. begin after end)
     tables = {
         'dates': {'id': 'dates', 'data': [], 'header': ['name', 'class', 'type', 'system type',
@@ -217,7 +214,7 @@ def admin_check_dates():
 
 @app.route('/admin/orphans')
 @required_group('editor')
-def admin_orphans():
+def admin_orphans() -> str:
     header = ['name', 'class', 'type', 'system type', 'created', 'updated', 'description']
     tables = {'orphans': {'id': 'orphans', 'header': header, 'data': []},
               'unlinked': {'id': 'unlinked', 'header': header, 'data': []},
@@ -277,7 +274,7 @@ class LogoForm(Form):
 @app.route('/admin/logo/', methods=['POST', 'GET'])
 @app.route('/admin/logo/<action>')
 @required_group('manager')
-def admin_logo(action=None):
+def admin_logo(action: Optional[str] = None):
     if action == 'remove':
         SettingsMapper.set_logo('')
         return redirect(url_for('admin_logo'))
@@ -294,7 +291,7 @@ def admin_logo(action=None):
 
 @app.route('/admin/file/delete/<filename>')
 @required_group('editor')
-def admin_file_delete(filename):  # pragma: no cover
+def admin_file_delete(filename: str):  # pragma: no cover
     if filename != 'all':
         try:
             os.remove(app.config['UPLOAD_FOLDER_PATH'] + '/' + filename)
@@ -331,7 +328,7 @@ class LogForm(Form):
 
 @app.route('/admin/log', methods=['POST', 'GET'])
 @required_group('admin')
-def admin_log():
+def admin_log() -> str:
     form = LogForm()
     form.user.choices = [(0, _('all'))] + UserMapper.get_users()
     table = {'id': 'log', 'data': [],
@@ -398,7 +395,7 @@ class TestMailForm(Form):
 
 @app.route('/admin/mail', methods=["GET", "POST"])
 @required_group('admin')
-def admin_mail():
+def admin_mail() -> str:
     form = TestMailForm()
     settings = session['settings']
     if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
@@ -424,7 +421,7 @@ def admin_mail():
 
 @app.route('/admin/general', methods=["GET", "POST"])
 @required_group('admin')
-def admin_general():
+def admin_general() -> str:
     settings = session['settings']
     general_settings = OrderedDict([
         (_('site name'), settings['site_name']),

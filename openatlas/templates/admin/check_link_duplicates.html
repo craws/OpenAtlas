@@ -4,10 +4,13 @@
     > {{ _('check link duplicates')|uc_first }}
 {% endblock %}
 {% block content %}
-    {% if table['data'] %}
+    {{ 'Data_integrity'|manual_link|safe }}
+    {% if table['data'] and table['id'] == 'check_duplicates' %}
         <div class="button-bar">
         <a href="{{ url_for('admin_check_link_duplicates', delete='delete') }}">{{ _('delete link duplicates')|uc_first }}</a>
         </div>
+        {{ table|pager|safe }}
+    {% elif table['data'] %}
         {{ table|pager|safe }}
     {% else %}
         {{ _('Congratulations, everything looks fine!') }}

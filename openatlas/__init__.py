@@ -9,7 +9,6 @@ import time
 from flask import Flask, g, request, session
 from flask_babel import Babel, lazy_gettext as _
 from flask_wtf import Form
-from flask_login import current_user
 from wtforms import StringField, SubmitField
 from flask_wtf.csrf import CsrfProtect
 
