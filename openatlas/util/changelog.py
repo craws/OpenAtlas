@@ -1,8 +1,9 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
 
+
 class Changelog:
-    versions = OrderedDict()
+    versions = OrderedDict()  # type: OrderedDict
     versions['3.17.0'] = ['TBA', OrderedDict([
         ('feature', OrderedDict([
             ('597', 'Option to display aliases in tables'),
