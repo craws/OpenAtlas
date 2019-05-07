@@ -105,7 +105,7 @@ def admin_check_link_duplicates(delete: Optional[str] = None) -> str:
     if delete:
         delete_count = str(LinkMapper.delete_link_duplicates())
         logger.log('info', 'admin', 'Deleted duplicate links: ' + delete_count)
-        flash(_('deleted links: ' + delete_count), 'info')
+        flash(_('deleted links') + ': ' + delete_count, 'info')
         return redirect(url_for('admin_check_link_duplicates'))
     table = {'id': 'check_duplicates', 'data': [],
              'header': ['domain', 'range', 'property_code', 'description', 'type_id',

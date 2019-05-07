@@ -80,7 +80,7 @@ class ContentTests(TestBaseCase):
                 'map_cluster_disable_at_zoom': 5})
             assert b'Changes have been saved.' in rv.data
 
-            # Check link duplicates
+            # Check link duplicates and multi use of single nodes
             with app.test_request_context():
                 app.preprocess_request()
                 event = EntityMapper.insert('E8', 'Event Horizon')
