@@ -1,7 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
-from collections import namedtuple
-from typing import Optional
+from typing import Iterator, Optional
 
 from flask import abort, flash, g, url_for
 from flask_babel import lazy_gettext as _
@@ -15,7 +14,7 @@ from openatlas.util.util import link, uc_first
 
 class Link:
 
-    def __init__(self, row: namedtuple, domain: bool = None, range_: bool = None) -> None:
+    def __init__(self, row, domain: bool = None, range_: bool = None) -> None:
         from openatlas.models.entity import EntityMapper
         self.id = row.id
         self.description = row.description
@@ -71,7 +70,7 @@ class LinkMapper:
                property_code: str,
                linked_entities,
                description: Optional[str] = None,
-               inverse: Optional[bool] = False) -> Optional[int]:
+               inverse: Optional[bool] = False):
         from openatlas.models.entity import Entity, EntityMapper
         # linked_entities can be an entity, an entity id or a list of them
         if not entity or not linked_entities:  # pragma: no cover
@@ -115,7 +114,7 @@ class LinkMapper:
     def get_linked_entity(entity_param,
                           code: str,
                           inverse: Optional[bool] = False,
-                          nodes: Optional[bool] = False) -> Optional[namedtuple]:
+                          nodes: Optional[bool] = False):
         result = LinkMapper.get_linked_entities(entity_param, code, inverse=inverse, nodes=nodes)
         if len(result) > 1:  # pragma: no cover
             logger.log('error', 'model', 'multiple linked entities found for ' + code)
@@ -173,7 +172,7 @@ class LinkMapper:
         return links
 
     @staticmethod
-    def delete_by_codes(entity, codes: iter) -> None:
+    def delete_by_codes(entity, codes) -> None:
         codes = codes if type(codes) is list else [codes]
         sql = 'DELETE FROM model.link WHERE property_code IN %(codes)s AND domain_id = %(id)s;'
         g.cursor.execute(sql, {'id': entity.id, 'codes': tuple(codes)})
@@ -195,7 +194,7 @@ class LinkMapper:
         return Link(g.cursor.fetchone())
 
     @staticmethod
-    def get_entities_by_node(node) -> iter:
+    def get_entities_by_node(node) -> Iterator:
         sql = "SELECT id, domain_id, range_id from model.link WHERE type_id = %(node_id)s;"
         g.cursor.execute(sql, {'node_id': node.id})
         debug_model['link sql'] += 1

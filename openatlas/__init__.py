@@ -2,15 +2,15 @@
 import locale
 import os
 import sys
+import time
 from collections import OrderedDict
 
 import psycopg2.extras
-import time
 from flask import Flask, g, request, session
 from flask_babel import Babel, lazy_gettext as _
 from flask_wtf import Form
-from wtforms import StringField, SubmitField
 from flask_wtf.csrf import CsrfProtect
+from wtforms import StringField, SubmitField
 
 try:
     import mod_wsgi
@@ -29,7 +29,7 @@ if os.name == "posix":  # For other operating systems e.g. Windows, we would nee
     locale.setlocale(locale.LC_ALL, 'en_US.utf-8')  # pragma: no cover
 
 babel = Babel(app)
-debug_model = OrderedDict()
+debug_model = OrderedDict()  # type: OrderedDict
 
 
 class GlobalSearchForm(Form):
