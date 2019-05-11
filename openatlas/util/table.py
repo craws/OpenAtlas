@@ -13,8 +13,8 @@ class Table:
     def __init__(self,
                  header: Optional[list] = None,  # A list of column header labels
                  headers: Optional[str] = None,  # Extra headers information for tablesorter
-                 sort: Optional[str] = None,     # Column sort option for tablesorter
-                 pager: Optional[bool] = True,   # Whether to show pager and search
+                 sort: Optional[str] = None,  # Column sort option for tablesorter
+                 pager: Optional[bool] = True,  # Whether to show pager and search
                  rows: Optional[list] = None) -> None:
         self.header = header if header else []
         self.headers = 'headers:' + headers + ',' if headers else ''
@@ -42,19 +42,20 @@ class Table:
                                         limit=session['settings'][
                                             'minimum_tablesorter_search']) + ')'
             html += """
-                    <div id="{name}-pager" class="pager">
-                        <div class="navigation first"></div>
-                        <div class="navigation prev"></div>
-                        <div class="pagedisplay">
-                            <input class="pagedisplay" type="text" disabled="disabled">
-                        </div>
-                        <div class="navigation next"></div>
-                        <div class="navigation last"></div>
-                        <div><select class="pagesize">{options}</select></div>
-                        <input id="{name}-search" class="search" type="text" data-column="all"
-                            placeholder="{placeholder}">
-                    </div><div style="clear:both;"></div>
-                    """.format(name=name, options=options, placeholder=placeholder)
+                <div id="{name}-pager" class="pager">
+                    <div class="navigation first"></div>
+                    <div class="navigation prev"></div>
+                    <div class="pagedisplay">
+                        <input class="pagedisplay" type="text" disabled="disabled">
+                    </div>
+                    <div class="navigation next"></div>
+                    <div class="navigation last"></div>
+                    <div><select class="pagesize">{options}</select></div>
+                    <input id="{name}-search" class="search" type="text" data-column="all"
+                        placeholder="{placeholder}">
+                </div>
+                <div style="clear:both;"></div>
+                """.format(name=name, options=options, placeholder=placeholder)
         html += '<table id="{name}-table" class="tablesorter"><thead><tr>'.format(name=name)
 
         for header in self.header:
