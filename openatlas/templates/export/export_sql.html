@@ -10,5 +10,5 @@
     {% else %}
         <p><span class="error">{{ _('directory not writable')|uc_first }}: export/sql</span></p>
     {% endif %}
-    {{ table|pager|safe }}
+    {{ table.display()|safe }}
 {% endblock %}

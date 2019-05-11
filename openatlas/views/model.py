@@ -10,6 +10,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.models.network import Network
+from openatlas.util.table import Table
 from openatlas.util.util import link, required_group
 
 
@@ -54,10 +55,9 @@ def model_index():
 
 @app.route('/overview/model/class')
 def class_index():
-    table = {'id': 'classes', 'header': ['code', 'name'], 'data': [],
-             'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'}
+    table = Table(['code', 'name'], sort='[[0, 0]]', headers='{0:{sorter:"class_code"}}')
     for class_id, class_ in g.classes.items():
-        table['data'].append([link(class_), class_.name])
+        table.rows.append([link(class_), class_.name])
     return render_template('model/class.html', table=table)
 
 
@@ -65,19 +65,18 @@ def class_index():
 def property_index():
     classes = g.classes
     properties = g.properties
-    table = {'id': 'properties', 'data': [],
-             'header': ['code', 'name', 'inverse', 'domain', 'domain name', 'range', 'range name'],
-             'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }, '
-                     '3: { sorter: "class_code" }, 5: { sorter: "class_code" }}'}
+    table = Table(
+        ['code', 'name', 'inverse', 'domain', 'domain name', 'range', 'range name'],
+        sort='[[0, 0]]',
+        headers='{0:{sorter:"property_code"},3:{sorter:"class_code"},5:{sorter:"class_code"}}')
     for property_id, property_ in properties.items():
-        table['data'].append([
-            link(property_),
-            property_.name,
-            property_.name_inverse,
-            link(classes[property_.domain_class_code]),
-            classes[property_.domain_class_code].name,
-            link(classes[property_.range_class_code]),
-            classes[property_.range_class_code].name])
+        table.rows.append([link(property_),
+                           property_.name,
+                           property_.name_inverse,
+                           link(classes[property_.domain_class_code]),
+                           classes[property_.domain_class_code].name,
+                           link(classes[property_.range_class_code]),
+                           classes[property_.range_class_code].name])
     return render_template('model/property.html', table=table)
 
 
@@ -86,21 +85,19 @@ def class_view(code):
     class_ = g.classes[code]
     tables = OrderedDict()
     for table in ['super', 'sub']:
-        tables[table] = {'id': table, 'header': ['code', 'name'], 'data': [], 'show_pager': False,
-                         'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "class_code" }}'}
+        tables[table] = Table(['code', 'name'], pager=False, sort='sortList: [[0, 0]]',
+                              headers='{0:{sorter:"class_code"}}')
         for code in getattr(class_, table):
-            tables[table]['data'].append([link(g.classes[code]), g.classes[code].name])
-    tables['domains'] = {
-        'id': 'domains', 'header': ['code', 'name'], 'data': [], 'show_pager': False,
-        'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }}'}
-    tables['ranges'] = {
-        'id': 'ranges', 'header': ['code', 'name'], 'data': [], 'show_pager': False,
-        'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }}'}
+            tables[table].rows.append([link(g.classes[code]), g.classes[code].name])
+    tables['domains'] = Table(['code', 'name'], pager=False, sort='[[0, 0]]',
+                              headers='{0:{sorter:"property_code"}}')
+    tables['ranges'] = Table(['code', 'name'], pager=False, sort='[[0, 0]]',
+                             headers='{0:{sorter:"property_code"}}')
     for key, property_ in g.properties.items():
         if code == property_.domain_class_code:
-            tables['domains']['data'].append([link(property_), property_.name])
+            tables['domains'].rows.append([link(property_), property_.name])
         elif code == property_.range_class_code:
-            tables['ranges']['data'].append([link(property_), property_.name])
+            tables['ranges'].rows.append([link(property_), property_.name])
     return render_template('model/class_view.html', class_=class_, tables=tables,
                            data={'info': [('code', class_.code), ('name', class_.name)]})
 
@@ -116,10 +113,10 @@ def property_view(code):
                        ('domain', link(domain) + ' ' + domain.name),
                        ('range', link(range_) + ' ' + range_.name)]}
     for table in ['super', 'sub']:
-        tables[table] = {'id': table, 'header': ['code', 'name'], 'data': [], 'show_pager': False,
-                         'sort': 'sortList: [[0, 0]],headers: {0: { sorter: "property_code" }}'}
+        tables[table] = Table(['code', 'name'], pager=False, sort='[[0, 0]]',
+                              headers='{0:{sorter:"property_code"}}')
         for code in getattr(property_, table):
-            tables[table]['data'].append([link(g.properties[code]), g.properties[code].name])
+            tables[table].rows.append([link(g.properties[code]), g.properties[code].name])
     return render_template('model/property_view.html', property=property_, tables=tables)
 
 

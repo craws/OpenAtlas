@@ -12,5 +12,5 @@
     {% else %}
         <p><span class="error">{{ _('directory not writable')|uc_first }}: export/csv</span></p>
     {% endif %}
-    <div style="float:left;">{{ table|pager|safe }}</div>
+    <div style="float:left;">{{ table.display()|safe }}</div>
 {% endblock %}

@@ -8,8 +8,8 @@
 <div id="tabs" class="tabs-container">
     <ul>
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
-        {% if table['data']|length > 0 %}
-            <li><a href="#tab-entity">{{ _('entities')|uc_first }} ({{ table['data']|length|format_number }})</a></li>
+        {% if table.rows|length > 0 %}
+            <li><a href="#tab-entity">{{ _('entities')|uc_first }} ({{ table.rows|length|format_number }})</a></li>
         {% endif %}
     </ul>
     <div id="tab-info">
@@ -32,9 +32,9 @@
         {% endif %}
         {{ project|description|safe }}
     </div>
-    {% if table['data']|length > 0 %}
+    {% if table.rows|length > 0 %}
         <div id="tab-entity">
-            {{ table|pager|safe }}
+            {{ table.display()|safe }}
         </div>
     {% endif %}
 </div>

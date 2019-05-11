@@ -17,8 +17,8 @@ from openatlas.forms.date import DateForm
 from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.models.node import NodeMapper
-from openatlas.util.util import (get_base_table_data, get_file_stats, pager, truncate_string,
-                                 uc_first)
+from openatlas.util.table import Table
+from openatlas.util.util import get_base_table_data, get_file_stats, truncate_string, uc_first
 
 
 def get_link_type(form) -> Optional_Type[Entity]:
@@ -256,13 +256,8 @@ class TreeMultiField(HiddenField):
 class TableSelect(HiddenInput):
 
     def __call__(self, field, **kwargs):
-        selection = ''
-        class_ = field.id
-        if class_ in ['residence', 'begins_in', 'ends_in']:
-            class_ = 'place'
-        header = app.config['TABLE_HEADERS'][class_]
-        table = {'id': field.id, 'header': header, 'data': []}
         file_stats = None
+        class_ = 'place' if field.id in ['residence', 'begins_in', 'ends_in'] else field.id
         if class_ == 'place':
             aliases = current_user.settings['table_show_aliases']
             entities = EntityMapper.get_by_system_type('place', nodes=True, aliases=aliases)
@@ -275,6 +270,8 @@ class TableSelect(HiddenInput):
             file_stats = get_file_stats()
         else:
             entities = EntityMapper.get_by_codes(class_)
+        selection = ''
+        table = Table(app.config['TABLE_HEADERS'][class_])
         for entity in entities:
             # Todo: don't show self e.g. at source
             if field.data and entity.id == int(field.data):
@@ -286,7 +283,7 @@ class TableSelect(HiddenInput):
                                    entity_name=truncate_string(entity.name, span=False))
             data[0] = '<br />'.join([data[0]] + [
                 truncate_string(alias) for id_, alias in entity.aliases.items()])
-            table['data'].append(data)
+            table.rows.append(data)
         html = """
             <input id="{name}-button" name="{name}-button" class="table-select {required}"
                 type="text" placeholder="{change_label}" onfocus="this.blur()" readonly="readonly"
@@ -294,13 +291,13 @@ class TableSelect(HiddenInput):
             <a id="{name}-clear" class="button" {clear_style}
                 onclick="clearSelect('{name}');">{clear_label}</a>
             <div id="{name}-overlay" class="overlay">
-            <div id="{name}-dialog" class="overlay-container">{pager}</div></div>
+            <div id="{name}-dialog" class="overlay-container">{table}</div></div>
             <script>$(document).ready(function () {{createOverlay("{name}", "{title}");}});</script>
             """.format(name=field.id,
                        title=_(field.id.replace('_', ' ')),
                        change_label=uc_first(_('change')),
                        clear_label=uc_first(_('clear')),
-                       pager=pager(table),
+                       table=table.display(field.id),
                        selection=selection,
                        clear_style='' if selection else ' style="display: none;" ',
                        required=' required' if field.flags.required else '')
@@ -319,10 +316,10 @@ class TableMultiSelect(HiddenInput):
             field.data = ast.literal_eval(field.data)
         selection = ''
         class_ = field.id if field.id != 'given_place' else 'place'
-        table = {'id': field.id, 'header': app.config['TABLE_HEADERS'][class_], 'data': []}
+        table = Table(app.config['TABLE_HEADERS'][class_])
         # Make checkbox column sortable and show selected on top
-        table['headers'] = 'headers: { ' + str(len(table['header'])) + ': { sorter: "checkbox" } }'
-        table['sort'] = 'sortList: [[' + str(len(table['header'])) + ',0],[0,0]]'
+        table.headers = 'headers:{' + str(len(table.header)) + ':{sorter:"checkbox"}},'
+        table.sort = 'sortList:[[' + str(len(table.header)) + ', 0],[0, 0]],'
         if class_ == 'place':
             aliases = current_user.settings['table_show_aliases']
             entities = EntityMapper.get_by_system_type('place', nodes=True, aliases=aliases)
@@ -337,19 +334,19 @@ class TableMultiSelect(HiddenInput):
                 id=str(entity.id),
                 name=entity.name,
                 checked='checked = "checked"' if field.data and entity.id in field.data else ''))
-            table['data'].append(data)
+            table.rows.append(data)
         html = """
             <span id="{name}-button" class="button">{change_label}</span><br />
             <div id="{name}-selection" class="selection" style="text-align:left;">{selection}</div>
             <div id="{name}-overlay" class="overlay">
-            <div id="{name}-dialog" class="overlay-container">{pager}</div></div>
+            <div id="{name}-dialog" class="overlay-container">{table}</div></div>
             <script>
                 $(document).ready(function () {{createOverlay("{name}", "{title}", true);}});
             </script>""".format(name=field.id,
                                 change_label=uc_first(_('change')),
                                 title=_(field.id.replace('_', ' ')),
                                 selection=selection,
-                                pager=pager(table, remove_rows=False))
+                                table=table.display(field.id, remove_rows=False))
         return super(TableMultiSelect, self).__call__(field, **kwargs) + html
 
 

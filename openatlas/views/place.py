@@ -10,6 +10,7 @@ from openatlas import app, logger
 from openatlas.forms.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper, InvalidGeomException
+from openatlas.util.table import Table
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  get_profile_image_table_link, is_authorized, link, required_group,
                                  truncate_string, uc_first, was_modified)
@@ -43,11 +44,10 @@ class FeatureForm(DateForm):
 @app.route('/place')
 @required_group('readonly')
 def place_index():
-    table = {'id': 'place', 'header': app.config['TABLE_HEADERS']['place'], 'data': []}
-    for place in EntityMapper.get_by_system_type('place', nodes=True,
-                                                 aliases=current_user.settings[
-                                                     'table_show_aliases']):
-        table['data'].append(get_base_table_data(place))
+    table = Table(app.config['TABLE_HEADERS']['place'])
+    for place in EntityMapper.get_by_system_type(
+            'place', nodes=True, aliases=current_user.settings['table_show_aliases']):
+        table.rows.append(get_base_table_data(place))
     return render_template('place/index.html', table=table, gis_data=GisMapper.get_all())
 
 
@@ -68,8 +68,7 @@ def place_insert(origin_id=None):
     else:
         title = 'place'
         form = build_form(PlaceForm, 'Place')
-    if origin \
-            and origin.system_type not in ['place', 'feature', 'stratigraphic unit'] \
+    if origin and origin.system_type not in ['place', 'feature', 'stratigraphic unit'] \
             and hasattr(form, 'insert_and_continue'):
         del form.insert_and_continue
     if form.validate_on_submit():
@@ -93,26 +92,19 @@ def place_insert(origin_id=None):
 def place_view(id_):
     object_ = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
     location = object_.get_linked_entity('P53', nodes=True)
-    tables = {
-        'info': get_entity_data(object_, location),
-        'file': {'id': 'files', 'data': [],
-                 'header': app.config['TABLE_HEADERS']['file'] + [_('main image')]},
-        'source': {'id': 'source', 'data': [], 'header': app.config['TABLE_HEADERS']['source']},
-        'event': {'id': 'event', 'data': [], 'header': app.config['TABLE_HEADERS']['event']},
-        'reference': {'id': 'reference', 'data': [],
-                      'header': app.config['TABLE_HEADERS']['reference'] + ['page / link text']},
-        'actor': {'id': 'actor', 'data': [],
-                  'header': [_('actor'), _('property'), _('class'), _('first'), _('last')]}}
+    tables = {'info': get_entity_data(object_, location),
+              'file': Table(app.config['TABLE_HEADERS']['file'] + [_('main image')]),
+              'source': Table(app.config['TABLE_HEADERS']['source']),
+              'event': Table(app.config['TABLE_HEADERS']['event']),
+              'reference': Table(app.config['TABLE_HEADERS']['reference'] + ['page / link text']),
+              'actor': Table([_('actor'), _('property'), _('class'), _('first'), _('last')])}
     if object_.system_type == 'place':
-        tables['feature'] = {'id': 'feature', 'data': [],
-                             'header': app.config['TABLE_HEADERS']['place'] + [_('description')]}
+        tables['feature'] = Table(app.config['TABLE_HEADERS']['place'] + [_('description')])
     if object_.system_type == 'feature':
-        tables['stratigraphic-unit'] = {
-            'id': 'stratigraphic', 'data': [],
-            'header': app.config['TABLE_HEADERS']['place'] + [_('description')]}
+        tables['stratigraphic-unit'] = Table(
+            app.config['TABLE_HEADERS']['place'] + [_('description')])
     if object_.system_type == 'stratigraphic unit':
-        tables['find'] = {'id': 'find', 'data': [],
-                          'header': app.config['TABLE_HEADERS']['place'] + [_('description')]}
+        tables['find'] = Table(app.config['TABLE_HEADERS']['place'] + [_('description')])
     profile_image_id = object_.get_profile_image_id()
     for link_ in object_.get_links('P67', True):
         domain = link_.domain
@@ -132,27 +124,27 @@ def place_view(id_):
         if is_authorized('editor'):
             url = url_for('link_delete', id_=link_.id, origin_id=object_.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
-        tables[domain.view_name]['data'].append(data)
+        tables[domain.view_name].rows.append(data)
     event_ids = []  # Keep track of already inserted events to prevent doubles
     for event in location.get_linked_entities(['P7'], inverse=True):
-        tables['event']['data'].append(get_base_table_data(event))
+        tables['event'].rows.append(get_base_table_data(event))
         event_ids.append(event.id)
     for event in object_.get_linked_entities(['P24'], inverse=True):
         if event.id not in event_ids:  # Don't add again if already in table
-            tables['event']['data'].append(get_base_table_data(event))
+            tables['event'].rows.append(get_base_table_data(event))
     has_subunits = False
     for entity in object_.get_linked_entities('P46', nodes=True):
         has_subunits = True
         data = get_base_table_data(entity)
         data.append(truncate_string(entity.description))
-        tables[entity.system_type.replace(' ', '-')]['data'].append(data)
+        tables[entity.system_type.replace(' ', '-')].rows.append(data)
     for link_ in location.get_links(['P74', 'OA8', 'OA9'], inverse=True):
         actor = EntityMapper.get_by_id(link_.domain.id)
-        tables['actor']['data'].append([link(actor),
-                                        g.properties[link_.property.code].name,
-                                        actor.class_.name,
-                                        actor.first,
-                                        actor.last])
+        tables['actor'].rows.append([link(actor),
+                                     g.properties[link_.property.code].name,
+                                     actor.class_.name,
+                                     actor.first,
+                                     actor.last])
     gis_data = GisMapper.get_all(object_) if location else None
     if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]' \
             and gis_data['gisLineSelected'] == '[]':

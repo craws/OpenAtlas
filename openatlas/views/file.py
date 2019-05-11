@@ -14,6 +14,7 @@ import openatlas
 from openatlas import app, logger
 from openatlas.forms.forms import build_form
 from openatlas.models.entity import EntityMapper
+from openatlas.util.table import Table
 from openatlas.util.util import (build_table_form, convert_size, display_remove_link, format_date,
                                  get_base_table_data, get_entity_data, get_file_path, is_authorized,
                                  link, required_group, truncate_string, uc_first, was_modified,
@@ -79,13 +80,13 @@ def file_remove_profile_image(entity_id):
 @app.route('/file/index')
 @required_group('readonly')
 def file_index():
-    table = {'id': 'files', 'header': ['date'] + app.config['TABLE_HEADERS']['file'], 'data': []}
+    table = Table(['date'] + app.config['TABLE_HEADERS']['file'])
     file_stats = get_file_stats()
     for entity in EntityMapper.get_by_system_type('file', nodes=True):
         date = 'N/A'
         if entity.id in file_stats:
             date = format_date(datetime.datetime.utcfromtimestamp(file_stats[entity.id]['date']))
-        table['data'].append([
+        table.rows.append([
             date, link(entity), entity.print_base_type(),
             convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
             file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
@@ -135,7 +136,7 @@ def file_view(id_):
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find',
                  'reference']:
         header = app.config['TABLE_HEADERS'][name] + (['page'] if name == 'reference' else [])
-        tables[name] = {'id': name, 'data': [], 'header': header}
+        tables[name] = Table(header)
     for link_ in file.get_links('P67'):
         range_ = link_.range
         data = get_base_table_data(range_)
@@ -144,7 +145,7 @@ def file_view(id_):
         if is_authorized('editor'):
             url = url_for('link_delete', id_=link_.id, origin_id=file.id)
             data.append(display_remove_link(url + '#tab-' + view_name, range_.name))
-        tables[view_name]['data'].append(data)
+        tables[view_name].rows.append(data)
     for link_ in file.get_links('P67', True):
         data = get_base_table_data(link_.domain)
         data.append(link_.description)
@@ -153,7 +154,7 @@ def file_view(id_):
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=file.id)
             data.append(display_remove_link(unlink_url + '#tab-reference', link_.domain.name))
-        tables['reference']['data'].append(data)
+        tables['reference'].rows.append(data)
     return render_template('file/view.html', missing_file=False if path else True, entity=file,
                            tables=tables, preview=True if path and preview_file(path) else False,
                            filename=os.path.basename(path) if path else False)

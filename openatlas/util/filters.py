@@ -4,7 +4,7 @@ import re
 
 import flask
 import jinja2
-from flask import g, render_template_string, request, session, url_for
+from flask import g, request, session, url_for
 from flask_babel import format_number as babel_format_number, lazy_gettext as _
 from flask_login import current_user
 from jinja2 import escape, evalcontextfilter
@@ -15,6 +15,7 @@ from openatlas import app
 from openatlas.forms.forms import TreeField, ValueFloatField
 from openatlas.models.content import ContentMapper
 from openatlas.util import util
+from openatlas.util.table import Table
 from openatlas.util.util import display_tooltip, get_file_path, print_file_extension
 
 blueprint = flask.Blueprint('filters', __name__)
@@ -83,10 +84,10 @@ def display_move_form(self, form, root_name):
             html += '<p>' + root_name + ' ' + str(field) + '</p>'
     html += '<p><a class="button" id="select-all">' + util.uc_first(_('select all')) + '</a>'
     html += '<a class="button" id="select-none">' + util.uc_first(_('deselect all')) + '</a></p>'
-    table = {'id': 'move', 'header': ['#', util.uc_first(_('selection'))], 'data': []}
+    table = Table(['#', util.uc_first(_('selection'))])
     for item in form.selection:
-        table['data'].append([item, item.label.text])
-    return html + util.pager(table)
+        table.rows.append([item, item.label.text])
+    return html + table.display('move')
 
 
 @jinja2.contextfilter
@@ -94,13 +95,13 @@ def display_move_form(self, form, root_name):
 def table_select_model(self, name, selected=None):
     if name in ['domain', 'range']:
         entities = g.classes
-        sorter = 'sortList: [[0, 0]], headers: {0: { sorter: "class_code" }}'
+        headers = '{0:{sorter:"class_code" }}'
     else:
         entities = g.properties
-        sorter = 'sortList: [[0, 0]], headers: {0: { sorter: "property_code" }}'
-    table = {'id': name, 'header': ['code', 'name'], 'sort': sorter, 'data': []}
+        headers = '{0:{sorter:"property_code"}}'
+    table = Table(['code', 'name'], sort='[[0, 0]]', headers=headers)
     for id_ in entities:
-        table['data'].append([
+        table.rows.append([
             '<a onclick="selectFromTable(this, \'' + name + '\', \'' + str(id_) + '\')">' +
             entities[id_].code + '</a>',
             '<a onclick="selectFromTable(this, \'' + name + '\', \'' + str(id_) + '\')">' +
@@ -111,18 +112,12 @@ def table_select_model(self, name, selected=None):
             onfocus="this.blur()" readonly="readonly" />
         <div id="{name}-overlay" class="overlay">
             <div id="{name}-dialog" class="overlay-container">
-                {pager}
+                {table}
             </div>
         </div>
         <script>$(document).ready(function () {{createOverlay("{name}");}});</script>
-    """.format(name=name, value=value, pager=render_template_string(pager(None, table)))
+    """.format(name=name, value=value, table=table.display(name))
     return html
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
-def pager(self, table):
-    return util.pager(table)
 
 
 @jinja2.contextfilter

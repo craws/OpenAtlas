@@ -10,6 +10,7 @@ from wtforms import BooleanField, SelectField, SubmitField
 
 from openatlas import app, logger
 from openatlas.models.export import Export
+from openatlas.util.table import Table
 from openatlas.util.util import convert_size, is_authorized, required_group, uc_first
 
 
@@ -48,8 +49,7 @@ def export_sql():
             logger.log('error', 'database', 'SQL export failed')
             flash(_('SQL export failed'), 'error')
         return redirect(url_for('export_sql'))
-    table = {'id': 'sql', 'header': ['name', 'size'], 'data': [],
-             'sort': 'sortList: [[0, 1]],headers: {0: { sorter: "text" }}'}
+    table = Table(['name', 'size'], sort='[[0, 1]]', headers='{0:{sorter:"text"}}')
     for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
         name = basename(file)
         if name == '.gitignore':
@@ -62,7 +62,7 @@ def export_sql():
             delete = '<a href="' + url_for('delete_sql', filename=name)
             delete += '" ' + confirm + '>' + uc_first(_('delete')) + '</a>'
             data.append(delete)
-        table['data'].append(data)
+        table.rows.append(data)
     return render_template('export/export_sql.html', form=form, table=table, writeable=writeable)
 
 
@@ -104,8 +104,7 @@ def export_csv():
         logger.log('info', 'database', 'CSV export')
         flash(_('data was exported as CSV'), 'info')
         return redirect(url_for('export_csv'))
-    table = {'id': 'csv', 'header': ['name', 'size'], 'data': [],
-             'sort': 'sortList: [[0, 1]],headers: {0: { sorter: "text" }}'}
+    table = Table(['name', 'size'], sort='[[0, 1]]', headers='{0:{sorter:"text"}}')
     for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
         name = basename(file)
         if name == '.gitignore':
@@ -118,7 +117,7 @@ def export_csv():
             delete = '<a href="' + url_for('delete_csv', filename=name)
             delete += '" ' + confirm + '>' + uc_first(_('delete')) + '</a>'
             data.append(delete)
-        table['data'].append(data)
+        table.rows.append(data)
     return render_template('export/export_csv.html', form=form, table=table, writeable=writeable)
 
 

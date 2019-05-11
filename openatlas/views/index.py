@@ -12,6 +12,7 @@ from openatlas.models.content import ContentMapper
 from openatlas.models.entity import EntityMapper
 from openatlas.models.user import UserMapper
 from openatlas.util.changelog import Changelog
+from openatlas.util.table import Table
 from openatlas.util.util import (bookmark_toggle, format_date, link, required_group, send_mail,
                                  uc_first)
 
@@ -26,24 +27,21 @@ class FeedbackForm(Form):
 @app.route('/')
 @app.route('/overview')
 def index():
-    tables = {
-        'counts': {'id': 'overview', 'header': [], 'data': [], 'show_pager': False},
-        'bookmarks': {'id': 'bookmarks', 'data': [], 'show_pager': False,
-                      'header': ['name', 'class', 'first', 'last']},
-        'latest': {'id': 'latest', 'data': [], 'show_pager': False,
-                   'header': ['name', 'class', 'first', 'last', 'date', 'user']}}
+    tables = {'overview': Table(pager=False),
+              'bookmarks': Table(['name', 'class', 'first', 'last'], pager=False),
+              'latest': Table(['name', 'class', 'first', 'last', 'date', 'user'], pager=False)}
     if current_user.is_authenticated and hasattr(current_user, 'bookmarks'):
         for entity_id in current_user.bookmarks:
             entity = EntityMapper.get_by_id(entity_id)
-            tables['bookmarks']['data'].append([link(entity), g.classes[entity.class_.code].name,
-                                                entity.first, entity.last,
-                                                bookmark_toggle(entity.id, True)])
+            tables['bookmarks'].rows.append([link(entity), g.classes[entity.class_.code].name,
+                                             entity.first, entity.last,
+                                             bookmark_toggle(entity.id, True)])
         for name, count in EntityMapper.get_overview_counts().items():
             count = format_number(count) if count else ''
-            tables['counts']['data'].append([
+            tables['overview'].rows.append([
                 '<a href="' + url_for(name + '_index') + '">' + uc_first(_(name)) + '</a>', count])
         for entity in EntityMapper.get_latest(8):
-            tables['latest']['data'].append([
+            tables['latest'].rows.append([
                 link(entity), g.classes[entity.class_.code].name,
                 entity.first, entity.last, format_date(entity.created),
                 link(logger.get_log_for_advanced_view(entity.id)['creator'])])

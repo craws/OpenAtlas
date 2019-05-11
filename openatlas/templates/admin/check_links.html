@@ -9,8 +9,8 @@
         <a class="button" href="{{ url_for('admin_check_links', check='check')}}">{{ _('check links')|uc_first }}</a>
         {{ _('this could take some time')|uc_first }}
     </p>
-    {% if table['data'] %}
-        {{ table|pager|safe }}
+    {% if table.rows %}
+        {{ table.display()|safe }}
     {% elif check %}
         {{ _('Congratulations, everything looks fine!') }}
     {% endif %}

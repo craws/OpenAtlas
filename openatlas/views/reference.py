@@ -11,6 +11,7 @@ from openatlas import app, logger
 from openatlas.forms.forms import TableField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
+from openatlas.util.table import Table
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  is_authorized, link, required_group, truncate_string, uc_first,
                                  was_modified, get_profile_image_table_link)
@@ -119,21 +120,18 @@ def reference_link_update(link_id, origin_id):
 @required_group('readonly')
 def reference_view(id_):
     reference = EntityMapper.get_by_id(id_, nodes=True)
-    tables = {
-        'info': get_entity_data(reference),
-        'file': {'id': 'files', 'data': [],
-                 'header': app.config['TABLE_HEADERS']['file'] + ['page'] + [_('main image')]}}
+    tables = {'info': get_entity_data(reference),
+              'file': Table(app.config['TABLE_HEADERS']['file'] + ['page'] + [_('main image')])}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find']:
         header_label = 'link text' if reference.system_type == 'external reference' else 'page'
-        header = app.config['TABLE_HEADERS'][name] + [header_label]
-        tables[name] = {'id': name, 'header': header, 'data': []}
+        tables[name] = Table(app.config['TABLE_HEADERS'][name] + [header_label])
     for link_ in reference.get_links('P67', True):
         domain = link_.domain
         data = get_base_table_data(domain)
         if is_authorized('editor'):
             url = url_for('link_delete', id_=link_.id, origin_id=reference.id) + '#tab-file'
             data.append(display_remove_link(url, domain.name))
-        tables['file']['data'].append(data)
+        tables['file'].rows.append(data)
     profile_image_id = reference.get_profile_image_id()
     for link_ in reference.get_links(['P67', 'P128']):
         range_ = link_.range
@@ -149,7 +147,7 @@ def reference_view(id_):
             data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
             url = url_for('link_delete', id_=link_.id, origin_id=reference.id)
             data.append(display_remove_link(url + '#tab-' + range_.table_name, range_.name))
-        tables[range_.table_name]['data'].append(data)
+        tables[range_.table_name].rows.append(data)
     return render_template('reference/view.html', reference=reference, tables=tables,
                            profile_image_id=profile_image_id)
 
@@ -157,12 +155,11 @@ def reference_view(id_):
 @app.route('/reference')
 @required_group('readonly')
 def reference_index():
-    header = app.config['TABLE_HEADERS']['reference'] + ['description']
-    table = {'id': 'reference', 'header': header, 'data': []}
+    table = Table(app.config['TABLE_HEADERS']['reference'] + ['description'])
     for reference in EntityMapper.get_by_codes('reference'):
         data = get_base_table_data(reference)
         data.append(truncate_string(reference.description))
-        table['data'].append(data)
+        table.rows.append(data)
     return render_template('reference/index.html', table=table)
 
 

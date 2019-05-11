@@ -26,6 +26,7 @@ from openatlas.models.date import DateMapper
 from openatlas.models.imports import Project
 from openatlas.models.property import Property
 from openatlas.models.user import User
+from openatlas.util.table import Table
 
 
 def convert_size(size_bytes):
@@ -141,8 +142,7 @@ def get_file_stats(path=app.config['UPLOAD_FOLDER_PATH']):
 def build_table_form(class_name, linked_entities):
     """ Returns a form with a list of entities with checkboxes"""
     from openatlas.models.entity import EntityMapper
-    header = app.config['TABLE_HEADERS'][class_name] + ['']
-    table = {'id': class_name, 'header': header, 'data': []}
+    table = Table(app.config['TABLE_HEADERS'][class_name] + [''])
     linked_ids = [entity.id for entity in linked_entities]
     file_stats = get_file_stats() if class_name == 'file' else None
     if class_name == 'file':
@@ -155,15 +155,15 @@ def build_table_form(class_name, linked_entities):
         if entity.id in linked_ids:
             continue  # Don't show already linked entries
         input_ = '<input id="{id}" name="values" type="checkbox" value="{id}">'.format(id=entity.id)
-        table['data'].append(get_base_table_data(entity, file_stats) + [input_])
-    if not table['data']:
+        table.rows.append(get_base_table_data(entity, file_stats) + [input_])
+    if not table.rows:
         return uc_first(_('no entries'))
-    return """<form class="table" method="post">
-                <input id="csrf_token" name="csrf_token" type="hidden" value="{token}">
-                {pager} <button name="form-submit" id="form-submit" type="submit">{add}</button>
-              </form>""".format(add=uc_first(_('add')),
-                                pager=pager(table, remove_rows=False),
-                                token=generate_csrf())
+    return """
+        <form class="table" method="post">
+            <input id="csrf_token" name="csrf_token" type="hidden" value="{token}">
+            {table} <button name="form-submit" id="form-submit" type="submit">{add}</button>
+        </form>""".format(add=uc_first(_('add')), token=generate_csrf(),
+                          table=table.display(class_name, remove_rows=False))
 
 
 def display_remove_link(url, name):
@@ -454,95 +454,6 @@ def truncate_string(string, length=40, span=True):
     if not span:
         return string[:length] + '..'
     return '<span title="' + string.replace('"', '') + '">' + string[:length] + '..' + '</span>'
-
-
-def pager(table, remove_rows=True):
-    if not table['data']:
-        return '<p>' + uc_first(_('no entries')) + '</p>'
-    html = ''
-    table_rows = session['settings']['default_table_rows']
-    if hasattr(current_user, 'settings'):
-        table_rows = current_user.settings['table_rows']
-    show_pager = table['show_pager'] if 'show_pager' in table else True
-    if show_pager:
-        options = ''
-        for amount in app.config['DEFAULT_TABLE_ROWS']:
-            options += '<option value="{amount}"{selected}>{amount}</option>'.format(
-                amount=amount, selected=' selected="selected"' if amount == table_rows else '')
-        placeholder = uc_first(_('type to search'))
-        if int(session['settings']['minimum_tablesorter_search']) > 1:  # pragma: no cover
-            placeholder += ' (' + _('min %(limit)s chars',
-                                    limit=session['settings']['minimum_tablesorter_search']) + ')'
-        html += """
-            <div id="{id}-pager" class="pager">
-                <div class="navigation first"></div>
-                <div class="navigation prev"></div>
-                <div class="pagedisplay">
-                    <input class="pagedisplay" type="text" disabled="disabled">
-                </div>
-                <div class="navigation next"></div>
-                <div class="navigation last"></div>
-                <div><select class="pagesize">{options}</select></div>
-                <input id="{id}-search" class="search" type="text" data-column="all"
-                    placeholder="{placeholder}">
-            </div><div style="clear:both;"></div>
-            """.format(id=table['id'], options=options, placeholder=placeholder)
-    html += '<table id="{id}-table" class="tablesorter"><thead><tr>'.format(id=table['id'])
-    for header in table['header']:
-        style = '' if header else 'class=sorter-false '  # only show and sort headers with a title
-        html += '<th ' + style + '>' + (uc_first(_(header)) if header else '') + '</th>'
-    # Append missing headers
-    html += '<th class=sorter-false></th>' * (len(table['data'][0]) - len(table['header']))
-    html += '</tr></thead><tbody>'
-    for row in table['data']:
-        html += '<tr>'
-        for entry in row:
-            entry = str(entry) if (entry and entry != 'None') or entry == 0 else ''
-            try:
-                float(entry.replace(',', ''))
-                style = ' style="text-align:right;"'  # pragma: no cover
-            except ValueError:
-                style = ''
-            html += '<td' + style + '>' + entry + '</td>'
-        html += '</tr>'
-    html += '</tbody></table><script>'
-    sort = '' if 'sort' not in table else table['sort'] + ','
-    if show_pager:
-        html += """
-            $("#{id}-table").tablesorter({{
-                {headers}
-                {sort}
-                dateFormat: "ddmmyyyy",
-                widgets: ["filter", "zebra"],
-                widgetOptions: {{
-                    filter_liveSearch: {filter_liveSearch},
-                    filter_external: "#{id}-search",
-                    filter_columnFilters: false
-                }}}})
-            .tablesorterPager({{
-                delayInit: true,
-                {remove_rows}
-                positionFixed: false,
-                container: $("#{id}-pager"),
-                size:{size}}});
-        """.format(id=table['id'], sort=sort, size=table_rows,
-                   remove_rows='removeRows: true,' if remove_rows else '',
-                   filter_liveSearch=session['settings']['minimum_tablesorter_search'],
-                   headers=(table['headers'] + ',') if 'headers' in table else '')
-    else:
-        html += """
-            $("#{id}-table").tablesorter({{
-                {sort}
-                widgets: ["filter", "zebra"],
-                widgetOptions: {{
-                    filter_liveSearch: {filter_liveSearch},
-                    filter_external: "#{id}-search",
-                    filter_columnFilters: false
-                }}}});
-        """.format(id=table['id'], sort=sort,
-                   filter_liveSearch=session['settings']['minimum_jstree_search'])
-    html += '</script>'
-    return html
 
 
 def get_base_table_data(entity, file_stats=None):

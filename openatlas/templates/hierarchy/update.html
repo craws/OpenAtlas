@@ -5,6 +5,6 @@
     > {{ _('edit') }}
 {% endblock %}
 {% block content %}
-    {{ table|pager|safe }}
+    {{ table.display()|safe }}
     {{ form|display_form|safe }}
 {% endblock %}

@@ -14,21 +14,21 @@
         {% if gis_data %}
             <li><a href="#tab-map" id="map-tab-id">{{ _('map')|uc_first }}</a></li>
         {% endif %}
-        <li><a href="#tab-source">{{ _('source')|uc_first }} ({{ tables['source']['data']|length|format_number }})</a></li>
-        {% if tables['event']['data']|length > 0 %}
-            <li><a href="#tab-event">{{ _('event')|uc_first }} ({{ tables['event']['data']|length|format_number }})</a></li>
+        <li><a href="#tab-source">{{ _('source')|uc_first }} ({{ tables['source'].rows|length|format_number }})</a></li>
+        {% if tables['event'].rows|length > 0 %}
+            <li><a href="#tab-event">{{ _('event')|uc_first }} ({{ tables['event'].rows|length|format_number }})</a></li>
         {% endif %}
-        {% if tables['actor']['data']|length > 0 %}
-            <li><a href="#tab-actor">{{ _('actor')|uc_first }} ({{ tables['actor']['data']|length|format_number }})</a></li>
+        {% if tables['actor'].rows|length > 0 %}
+            <li><a href="#tab-actor">{{ _('actor')|uc_first }} ({{ tables['actor'].rows|length|format_number }})</a></li>
         {% endif %}
-        <li><a href="#tab-reference">{{ _('reference')|uc_first }} ({{ tables['reference']['data']|length|format_number }})</a></li>
-        <li><a href="#tab-file">{{ _('files')|uc_first }}  ({{ tables['file']['data']|length|format_number }})</a></li>
+        <li><a href="#tab-reference">{{ _('reference')|uc_first }} ({{ tables['reference'].rows|length|format_number }})</a></li>
+        <li><a href="#tab-file">{{ _('files')|uc_first }}  ({{ tables['file'].rows|length|format_number }})</a></li>
         {% if object_.system_type == 'place' %}
-            <li><a href="#tab-feature">{{ _('feature')|uc_first }}  ({{ tables['feature']['data']|length|format_number }})</a></li>
+            <li><a href="#tab-feature">{{ _('feature')|uc_first }}  ({{ tables['feature'].rows|length|format_number }})</a></li>
         {% elif object_.system_type == 'feature' %}
-            <li><a href="#tab-stratigraphic-unit">{{ _('stratigraphic unit')|uc_first }}  ({{ tables['stratigraphic-unit']['data']|length }})</a></li>
+            <li><a href="#tab-stratigraphic-unit">{{ _('stratigraphic unit')|uc_first }}  ({{ tables['stratigraphic-unit'].rows|length }})</a></li>
         {% elif object_.system_type == 'stratigraphic unit' %}
-            <li><a href="#tab-find">{{ _('find')|uc_first }}  ({{ tables['find']['data']|length|format_number }})</a></li>
+            <li><a href="#tab-find">{{ _('find')|uc_first }}  ({{ tables['find'].rows|length|format_number }})</a></li>
         {% endif %}
     </ul>
     <div id="tab-info">
@@ -71,16 +71,16 @@
                 <a href="{{ url_for('source_insert', origin_id=object_.id) }}">+ {{ _('source')|uc_first }}</a>
             </div>
         {% endif %}
-        {{ tables['source']|pager|safe }}
+        {{ tables['source'].display('source')|safe }}
     </div>
-    {% if tables['event']['data']|length > 0 %}
+    {% if tables['event'].rows|length > 0 %}
         <div id="tab-event">
-            {{ tables['event']|pager|safe }}
+            {{ tables['event'].display('event')|safe }}
         </div>
     {% endif %}
-    {% if tables['actor']['data']|length > 0 %}
+    {% if tables['actor'].rows|length > 0 %}
         <div id="tab-actor">
-            {{ tables['actor']|pager|safe }}
+            {{ tables['actor'].display('actor')|safe }}
         </div>
     {% endif %}
     <div id="tab-reference">
@@ -92,7 +92,7 @@
                 <a href="{{ url_for('reference_insert', code='external_reference', origin_id=object_.id) }}">+ {{ _('external reference')|uc_first }}</a>
             </div>
         {% endif %}
-        {{ tables['reference']|pager|safe }}
+        {{ tables['reference'].display('reference')|safe }}
     </div>
     <div id="tab-file">
         {% if 'editor'|is_authorized %}
@@ -101,28 +101,28 @@
                 <a href="{{ url_for('file_insert', origin_id=object_.id) }}">+ {{ _('file')|uc_first }}</a>
             </div>
         {% endif %}
-        {{ tables['file']|pager|safe }}
+        {{ tables['file'].display('file')|safe }}
     </div>
     {% if object_.system_type == 'place' %}
         <div id="tab-feature">
             <div class="button-bar">
                 <a href="{{ url_for('place_insert', origin_id=object_.id)}}">+ {{ _('feature')|uc_first }}</a>
             </div>
-            {{ tables['feature']|pager|safe }}
+            {{ tables['feature'].display('feature')|safe }}
         </div>
     {% elif object_.system_type == 'feature' %}
         <div id="tab-stratigraphic-unit">
             <div class="button-bar">
                 <a href="{{ url_for('place_insert', origin_id=object_.id)}}">+ {{ _('stratigraphic unit')|uc_first }}</a>
             </div>
-            {{ tables['stratigraphic-unit']|pager|safe }}
+            {{ tables['stratigraphic-unit'].display('stratigraphic-unit')|safe }}
         </div>
     {% elif object_.system_type == 'stratigraphic unit' %}
         <div id="tab-find">
             <div class="button-bar">
                 <a href="{{ url_for('place_insert', origin_id=object_.id)}}">+ {{ _('find')|uc_first }}</a>
             </div>
-            {{ tables['find']|pager|safe }}
+            {{ tables['find'].display('find')|safe }}
         </div>
     {% endif %}
 </div>
