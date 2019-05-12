@@ -15,10 +15,10 @@
             <li><a href="#tab-map" id="map-tab-id">{{ _('map')|uc_first }}</a></li>
         {% endif %}
         <li><a href="#tab-source">{{ _('source')|uc_first }} ({{ tables['source'].rows|length|format_number }})</a></li>
-        {% if tables['event'].rows|length > 0 %}
+        {% if tables['event'].rows %}
             <li><a href="#tab-event">{{ _('event')|uc_first }} ({{ tables['event'].rows|length|format_number }})</a></li>
         {% endif %}
-        {% if tables['actor'].rows|length > 0 %}
+        {% if tables['actor'].rows %}
             <li><a href="#tab-actor">{{ _('actor')|uc_first }} ({{ tables['actor'].rows|length|format_number }})</a></li>
         {% endif %}
         <li><a href="#tab-reference">{{ _('reference')|uc_first }} ({{ tables['reference'].rows|length|format_number }})</a></li>
@@ -73,12 +73,12 @@
         {% endif %}
         {{ tables['source'].display('source')|safe }}
     </div>
-    {% if tables['event'].rows|length > 0 %}
+    {% if tables['event'].rows %}
         <div id="tab-event">
             {{ tables['event'].display('event')|safe }}
         </div>
     {% endif %}
-    {% if tables['actor'].rows|length > 0 %}
+    {% if tables['actor'].rows %}
         <div id="tab-actor">
             {{ tables['actor'].display('actor')|safe }}
         </div>

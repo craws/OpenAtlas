@@ -15,7 +15,7 @@
         <li><a href="#tab-circular">{{ _('circular dependencies')|uc_first }} ({{ tables['circular'].rows|length|format_number }})</a></li>
     </ul>
     <div id="tab-orphan">
-        {% if tables['orphans'].rows|length > 0 and 'admin'|is_authorized %}
+        {% if tables['orphans'].rows and 'admin'|is_authorized %}
             <div class="button-bar">
                 <a onclick="return confirm('{{_('delete orphans')|uc_first }}?')"
                    href="{{ url_for('admin_orphans_delete', parameter='orphans') }}">{{ _('delete orphans')|uc_first }}</a>
@@ -35,7 +35,7 @@
         {% endif %}
     </div>
     <div id="tab-nodes">
-        {% if tables['nodes'].rows|length > 0 and 'admin'|is_authorized %}
+        {% if tables['nodes'].rows and 'admin'|is_authorized %}
             <div class="button-bar">
                 <a onclick="return confirm('{{_('delete types')|uc_first }}?')"
                    href="{{ url_for('admin_orphans_delete', parameter='types') }}">{{ _('delete types')|uc_first }}</a>
@@ -55,7 +55,7 @@
         {% endif %}
     </div>
     <div id="tab-orphaned-files">
-        {% if tables['orphaned_files'].rows|length > 0 and 'admin'|is_authorized %}
+        {% if tables['orphaned_files'].rows and 'admin'|is_authorized %}
             <div class="button-bar">
                 <a onclick="return confirm('{{_('delete all files without corresponding entities?')|uc_first }}')"
                    href="{{ url_for('admin_file_delete', filename='all') }}">{{ _('delete all files')|uc_first }}</a>

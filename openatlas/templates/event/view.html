@@ -8,7 +8,7 @@
 <div id="tabs" class="tabs-container">
     <ul>
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
-        {% if tables['subs'].rows|length > 0 %}
+        {% if tables['subs'].rows %}
             <li><a href="#tab-subs">{{ _('sub events')|uc_first }} ({{ tables['subs'].rows|length|format_number }})</a></li>
         {% endif %}
         <li><a href="#tab-source">{{ _('source')|uc_first }} ({{ tables['source'].rows|length|format_number }})</a></li>
@@ -35,7 +35,7 @@
             <div style="clear:both;"></div>
         </div>
     </div>
-    {% if tables['subs'].rows|length > 0 %}
+    {% if tables['subs'].rows %}
         <div id="tab-subs">
             {{ tables['subs'].display('subs')|safe }}
         </div>

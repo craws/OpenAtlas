@@ -85,7 +85,7 @@ def class_view(code):
     class_ = g.classes[code]
     tables = OrderedDict()
     for table in ['super', 'sub']:
-        tables[table] = Table(['code', 'name'], pager=False, sort='sortList: [[0, 0]]',
+        tables[table] = Table(['code', 'name'], pager=False, sort='[[0, 0]]',
                               headers='{0:{sorter:"class_code"}}')
         for code in getattr(class_, table):
             tables[table].rows.append([link(g.classes[code]), g.classes[code].name])

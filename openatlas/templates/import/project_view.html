@@ -8,7 +8,7 @@
 <div id="tabs" class="tabs-container">
     <ul>
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
-        {% if table.rows|length > 0 %}
+        {% if table.rows %}
             <li><a href="#tab-entity">{{ _('entities')|uc_first }} ({{ table.rows|length|format_number }})</a></li>
         {% endif %}
     </ul>
@@ -32,7 +32,7 @@
         {% endif %}
         {{ project|description|safe }}
     </div>
-    {% if table.rows|length > 0 %}
+    {% if table.rows %}
         <div id="tab-entity">
             {{ table.display()|safe }}
         </div>

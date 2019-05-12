@@ -11,7 +11,7 @@
         <li><a href="#tab-actor">{{ _('actor')|uc_first }} ({{ tables['actor'].rows|length|format_number }})</a></li>
         <li><a href="#tab-place">{{ _('place')|uc_first }} ({{ tables['place'].rows|length|format_number }})</a></li>
         {% for table_name in ['feature', 'stratigraphic-unit', 'find'] %}
-            {% if tables[table_name].rows|length > 0 %}
+            {% if tables[table_name].rows %}
                 <li><a href="#tab-{{ table_name }}">{{ _(table_name)|uc_first }} ({{ tables[table_name].rows|length|format_number }})</a></li>
             {% endif %}
         {% endfor %}
@@ -39,7 +39,7 @@
         </div>
     </div>
     {% for name in ['event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find'] %}
-        {% if name not in ['feature', 'stratigraphic-unit', 'find'] or tables[name].rows|length > 0 %}
+        {% if name not in ['feature', 'stratigraphic-unit', 'find'] or tables[name].rows %}
             <div id="tab-{{ name }}">
                 {% if 'editor'|is_authorized and name not in ['feature', 'stratigraphic-unit', 'find'] %}
                     <div class="button-bar">
