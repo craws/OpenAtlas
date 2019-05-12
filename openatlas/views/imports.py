@@ -18,12 +18,12 @@ from openatlas.util.util import format_date, link, required_group, truncate_stri
 
 
 class ProjectForm(Form):
-    project_id = None
+    project_id = None  # type: int
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
 
-    def validate(self, extra_validators=None):
+    def validate(self) -> bool:
         valid = Form.validate(self)
         project = ImportMapper.get_project_by_id(self.project_id) if self.project_id else Project()
         if project.name != self.name.data and ImportMapper.get_project_by_name(self.name.data):
@@ -97,7 +97,7 @@ class ImportForm(Form):
     duplicate = BooleanField(_('check for duplicates'), default=True)
     save = SubmitField(_('import'))
 
-    def validate(self, extra_validators=None):
+    def validate(self) -> bool:
         valid = Form.validate(self)
         file_ = request.files['file']
         extensions = app.config['IMPORT_FILE_EXTENSIONS']

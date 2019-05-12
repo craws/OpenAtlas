@@ -65,7 +65,7 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None) 
             nodes.update(entity2.nodes)
         if hasattr(form, 'opened'):
             form_instance.opened.data = time.time()
-        node_data = {}
+        node_data = {}  # type: dict
         for node, node_value in nodes.items():
             root = g.nodes[node.root[-1]] if node.root else node
             if root.id not in node_data:

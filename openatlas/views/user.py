@@ -17,7 +17,7 @@ from openatlas.util.util import (format_date, is_authorized, link, required_grou
 
 
 class UserForm(Form):
-    user_id = None
+    user_id = None  # type: int
     active = BooleanField(_('active'), default=True)
     username = StringField(_('username'), [InputRequired()], render_kw={'autofocus': True})
     group = SelectField(_('group'), choices=[])
@@ -32,7 +32,7 @@ class UserForm(Form):
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
 
-    def validate(self, extra_validators=None):
+    def validate(self) -> bool:
         valid = Form.validate(self)
         user = UserMapper.get_by_id(self.user_id) if self.user_id else User()
         if user.username != self.username.data and UserMapper.get_by_username(self.username.data):

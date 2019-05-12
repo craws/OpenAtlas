@@ -35,7 +35,7 @@ class SearchForm(Form):
     end_day = IntegerField(render_kw={'placeholder': 31}, validators=validator_day)
     include_dateless = BooleanField(_('Include dateless entities'))
 
-    def validate(self, extra_validators=None):
+    def validate(self) -> bool:
         valid = Form.validate(self)
         from_date = DateMapper.form_to_datetime64(self.begin_year.data, self.begin_month.data,
                                                   self.begin_day.data)

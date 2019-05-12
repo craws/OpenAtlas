@@ -23,7 +23,7 @@ class RelationForm(DateForm):
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
 
-    def validate(self, extra_validators=None):
+    def validate(self) -> bool:
         valid = DateForm.validate(self)
         if hasattr(self, 'origin_id') and self.origin_id is not None:
             if self.origin_id.data in ast.literal_eval(self.actor.data):

@@ -1,8 +1,9 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-import os
-
 import datetime
 import math
+import os
+from typing import Optional
+
 from flask import flash, g, render_template, request, send_from_directory, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
@@ -13,12 +14,12 @@ from wtforms.validators import InputRequired
 import openatlas
 from openatlas import app, logger
 from openatlas.forms.forms import build_form
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity, EntityMapper
 from openatlas.util.table import Table
 from openatlas.util.util import (build_table_form, convert_size, display_remove_link, format_date,
-                                 get_base_table_data, get_entity_data, get_file_path, is_authorized,
-                                 link, required_group, truncate_string, uc_first, was_modified,
-                                 get_file_stats)
+                                 get_base_table_data, get_entity_data, get_file_path,
+                                 get_file_stats, is_authorized, link, required_group,
+                                 truncate_string, uc_first, was_modified)
 
 
 class FileForm(Form):
@@ -28,7 +29,7 @@ class FileForm(Form):
     save = SubmitField(_('insert'))
     opened = HiddenField()
 
-    def validate(self, extra_validators=None):
+    def validate(self) -> bool:
         valid = Form.validate(self)
         if request.files:
             file_ = request.files['file']
@@ -42,36 +43,36 @@ class FileForm(Form):
         return valid
 
 
-def preview_file(name):
+def preview_file(name: str):
     return name.rsplit('.', 1)[1].lower() in app.config['DISPLAY_FILE_EXTENSIONS']
 
 
 @app.route('/download/<path:filename>')
 @required_group('readonly')
-def download_file(filename):
+def download_file(filename: str):
     return send_from_directory(app.config['UPLOAD_FOLDER_PATH'], filename, as_attachment=True)
 
 
 @app.route('/display/<path:filename>')
 @required_group('readonly')
-def display_file(filename):
+def display_file(filename: str):
     return send_from_directory(app.config['UPLOAD_FOLDER_PATH'], filename)
 
 
 @app.route('/display_logo/<path:filename>')
-def display_logo(filename):  # File display function for public
+def display_logo(filename: str):  # File display function for public
     return send_from_directory(app.config['UPLOAD_FOLDER_PATH'], filename)
 
 
 @app.route('/file/set_as_profile_image/<int:id_>/<int:origin_id>')
-def file_set_as_profile_image(id_, origin_id):
+def file_set_as_profile_image(id_: int, origin_id: int):
     EntityMapper.set_profile_image(id_, origin_id)
     origin = EntityMapper.get_by_id(origin_id)
     return redirect(url_for(app.config['CODE_CLASS'][origin.class_.code] + '_view', id_=origin.id))
 
 
 @app.route('/file/set_as_profile_image/<int:entity_id>')
-def file_remove_profile_image(entity_id):
+def file_remove_profile_image(entity_id: int):
     entity = EntityMapper.get_by_id(entity_id)
     entity.remove_profile_image()
     return redirect(url_for(app.config['CODE_CLASS'][entity.class_.code] + '_view', id_=entity.id))
@@ -105,7 +106,7 @@ def file_index():
 
 @app.route('/file/add/<int:origin_id>', methods=['GET', 'POST'])
 @required_group('editor')
-def file_add(origin_id):
+def file_add(origin_id: int):
     """ Link an entity to file coming from the entity."""
     origin = EntityMapper.get_by_id(origin_id)
     if request.method == 'POST':
@@ -117,7 +118,7 @@ def file_add(origin_id):
 
 @app.route('/file/add2/<int:id_>/<class_name>', methods=['POST', 'GET'])
 @required_group('editor')
-def file_add2(id_, class_name):
+def file_add2(id_: int, class_name: str):
     """ Link an entity to file coming from the file"""
     file = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
@@ -129,14 +130,13 @@ def file_add2(id_, class_name):
 
 @app.route('/file/view/<int:id_>')
 @required_group('readonly')
-def file_view(id_):
+def file_view(id_: int):
     file = EntityMapper.get_by_id(id_, nodes=True)
     path = get_file_path(file.id)
     tables = {'info': get_entity_data(file)}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find',
                  'reference']:
-        header = Table.HEADERS[name] + (['page'] if name == 'reference' else [])
-        tables[name] = Table(header)
+        tables[name] = Table(Table.HEADERS[name] + (['page'] if name == 'reference' else []))
     for link_ in file.get_links('P67'):
         range_ = link_.range
         data = get_base_table_data(range_)
@@ -162,7 +162,7 @@ def file_view(id_):
 
 @app.route('/file/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('editor')
-def file_update(id_):
+def file_update(id_: int):
     file = EntityMapper.get_by_id(id_, nodes=True)
     form = build_form(FileForm, 'File', file, request)
     del form.file
@@ -180,7 +180,7 @@ def file_update(id_):
 @app.route('/file/insert', methods=['GET', 'POST'])
 @app.route('/file/insert/<int:origin_id>', methods=['GET', 'POST'])
 @required_group('editor')
-def file_insert(origin_id=None):
+def file_insert(origin_id: Optional[int] = None):
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(FileForm, 'File')
     if form.validate_on_submit():
@@ -191,7 +191,7 @@ def file_insert(origin_id=None):
 
 @app.route('/file/delete/<int:id_>')
 @required_group('editor')
-def file_delete(id_=None):
+def file_delete(id_: Optional[int] = None):
     try:
         EntityMapper.delete(id_)
         logger.log_user(id_, 'delete')
@@ -209,7 +209,7 @@ def file_delete(id_=None):
     return redirect(url_for('file_index'))
 
 
-def save(form, file=None, origin=None):
+def save(form: FileForm, file: Optional[Entity] = None, origin: Optional[Entity] = None):
     g.cursor.execute('BEGIN')
     try:
         log_action = 'update'
