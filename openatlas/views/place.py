@@ -44,7 +44,7 @@ class FeatureForm(DateForm):
 @app.route('/place')
 @required_group('readonly')
 def place_index():
-    table = Table(app.config['TABLE_HEADERS']['place'])
+    table = Table(Table.HEADERS['place'])
     for place in EntityMapper.get_by_system_type(
             'place', nodes=True, aliases=current_user.settings['table_show_aliases']):
         table.rows.append(get_base_table_data(place))
@@ -93,18 +93,17 @@ def place_view(id_):
     object_ = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
     location = object_.get_linked_entity('P53', nodes=True)
     tables = {'info': get_entity_data(object_, location),
-              'file': Table(app.config['TABLE_HEADERS']['file'] + [_('main image')]),
-              'source': Table(app.config['TABLE_HEADERS']['source']),
-              'event': Table(app.config['TABLE_HEADERS']['event']),
-              'reference': Table(app.config['TABLE_HEADERS']['reference'] + ['page / link text']),
+              'file': Table(Table.HEADERS['file'] + [_('main image')]),
+              'source': Table(Table.HEADERS['source']),
+              'event': Table(Table.HEADERS['event']),
+              'reference': Table(Table.HEADERS['reference'] + ['page / link text']),
               'actor': Table([_('actor'), _('property'), _('class'), _('first'), _('last')])}
     if object_.system_type == 'place':
-        tables['feature'] = Table(app.config['TABLE_HEADERS']['place'] + [_('description')])
+        tables['feature'] = Table(Table.HEADERS['place'] + [_('description')])
     if object_.system_type == 'feature':
-        tables['stratigraphic-unit'] = Table(
-            app.config['TABLE_HEADERS']['place'] + [_('description')])
+        tables['stratigraphic-unit'] = Table(Table.HEADERS['place'] + [_('description')])
     if object_.system_type == 'stratigraphic unit':
-        tables['find'] = Table(app.config['TABLE_HEADERS']['place'] + [_('description')])
+        tables['find'] = Table(Table.HEADERS['place'] + [_('description')])
     profile_image_id = object_.get_profile_image_id()
     for link_ in object_.get_links('P67', True):
         domain = link_.domain

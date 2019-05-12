@@ -39,9 +39,9 @@ def actor_view(id_):
         info.append((uc_first(_('alias')), '<br />'.join(actor.aliases.values())))
     tables = {
         'info': info,
-        'file': Table(app.config['TABLE_HEADERS']['file'] + [_('main image')]),
-        'source': Table(app.config['TABLE_HEADERS']['source']),
-        'reference': Table(app.config['TABLE_HEADERS']['reference'] + ['page / link text']),
+        'file': Table(Table.HEADERS['file'] + [_('main image')]),
+        'source': Table(Table.HEADERS['source']),
+        'reference': Table(Table.HEADERS['reference'] + ['page / link text']),
         'event': Table(['event', 'class', 'involvement', 'first', 'last', 'description']),
         'relation': Table(['relation', 'actor', 'first', 'last', 'description'], sort='[[0,0]]'),
         'member_of': Table(['member of', 'function', 'first', 'last', 'description'])}
@@ -166,7 +166,7 @@ def actor_view(id_):
 @app.route('/actor')
 @required_group('readonly')
 def actor_index():
-    table = Table(app.config['TABLE_HEADERS']['actor'] + ['description'])
+    table = Table(Table.HEADERS['actor'] + ['description'])
     for actor in EntityMapper.get_by_codes('actor'):
         data = get_base_table_data(actor)
         data.append(truncate_string(actor.description))

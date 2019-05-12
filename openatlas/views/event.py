@@ -44,7 +44,7 @@ class EventForm(DateForm):
 @app.route('/event')
 @required_group('readonly')
 def event_index():
-    table = Table(app.config['TABLE_HEADERS']['event'] + ['description'])
+    table = Table(Table.HEADERS['event'] + ['description'])
     for event in EntityMapper.get_by_codes('event'):
         data = get_base_table_data(event)
         data.append(truncate_string(event.description))
@@ -107,11 +107,11 @@ def event_view(id_):
     event = EntityMapper.get_by_id(id_, nodes=True)
     tables = {
         'info': get_entity_data(event),
-        'file': Table(app.config['TABLE_HEADERS']['file'] + [_('main image')]),
-        'subs': Table(app.config['TABLE_HEADERS']['event']),
-        'source': Table(app.config['TABLE_HEADERS']['source']),
+        'file': Table(Table.HEADERS['file'] + [_('main image')]),
+        'subs': Table(Table.HEADERS['event']),
+        'source': Table(Table.HEADERS['source']),
         'actor': Table(['actor', 'class', 'involvement', 'first', 'last', 'description']),
-        'reference': Table(app.config['TABLE_HEADERS']['reference'] + ['page / link text'])}
+        'reference': Table(Table.HEADERS['reference'] + ['page / link text'])}
     for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
         first = link_.first
         if not link_.first and event.first:

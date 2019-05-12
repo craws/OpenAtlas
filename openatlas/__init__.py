@@ -38,6 +38,7 @@ class GlobalSearchForm(Form):
 
 
 from openatlas.models.logger import DBHandler
+
 logger = DBHandler()
 
 from openatlas.util import filters
@@ -57,12 +58,11 @@ def get_locale():
 
 def connect():
     try:
-        connection_ = psycopg2.connect(
-            database=app.config['DATABASE_NAME'],
-            user=app.config['DATABASE_USER'],
-            password=app.config['DATABASE_PASS'],
-            port=app.config['DATABASE_PORT'],
-            host=app.config['DATABASE_HOST'])
+        connection_ = psycopg2.connect(database=app.config['DATABASE_NAME'],
+                                       user=app.config['DATABASE_USER'],
+                                       password=app.config['DATABASE_PASS'],
+                                       port=app.config['DATABASE_PORT'],
+                                       host=app.config['DATABASE_HOST'])
         connection_.autocommit = True
         return connection_
     except Exception as e:  # pragma: no cover

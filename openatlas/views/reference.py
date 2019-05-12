@@ -121,10 +121,10 @@ def reference_link_update(link_id, origin_id):
 def reference_view(id_):
     reference = EntityMapper.get_by_id(id_, nodes=True)
     tables = {'info': get_entity_data(reference),
-              'file': Table(app.config['TABLE_HEADERS']['file'] + ['page'] + [_('main image')])}
+              'file': Table(Table.HEADERS['file'] + ['page', _('main image')])}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find']:
         header_label = 'link text' if reference.system_type == 'external reference' else 'page'
-        tables[name] = Table(app.config['TABLE_HEADERS'][name] + [header_label])
+        tables[name] = Table(Table.HEADERS[name] + [header_label])
     for link_ in reference.get_links('P67', True):
         domain = link_.domain
         data = get_base_table_data(domain)
@@ -155,7 +155,7 @@ def reference_view(id_):
 @app.route('/reference')
 @required_group('readonly')
 def reference_index():
-    table = Table(app.config['TABLE_HEADERS']['reference'] + ['description'])
+    table = Table(Table.HEADERS['reference'] + ['description'])
     for reference in EntityMapper.get_by_codes('reference'):
         data = get_base_table_data(reference)
         data.append(truncate_string(reference.description))

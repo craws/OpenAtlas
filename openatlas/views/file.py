@@ -80,7 +80,7 @@ def file_remove_profile_image(entity_id):
 @app.route('/file/index')
 @required_group('readonly')
 def file_index():
-    table = Table(['date'] + app.config['TABLE_HEADERS']['file'])
+    table = Table(['date'] + Table.HEADERS['file'])
     file_stats = get_file_stats()
     for entity in EntityMapper.get_by_system_type('file', nodes=True):
         date = 'N/A'
@@ -135,7 +135,7 @@ def file_view(id_):
     tables = {'info': get_entity_data(file)}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find',
                  'reference']:
-        header = app.config['TABLE_HEADERS'][name] + (['page'] if name == 'reference' else [])
+        header = Table.HEADERS[name] + (['page'] if name == 'reference' else [])
         tables[name] = Table(header)
     for link_ in file.get_links('P67'):
         range_ = link_.range

@@ -28,7 +28,7 @@ class SourceForm(Form):
 @app.route('/source')
 @required_group('readonly')
 def source_index():
-    table = Table(app.config['TABLE_HEADERS']['source'])
+    table = Table(Table.HEADERS['source'])
     for source in EntityMapper.get_by_codes('source'):
         data = get_base_table_data(source)
         table.rows.append(data)
@@ -54,14 +54,14 @@ def source_view(id_):
     source = EntityMapper.get_by_id(id_, nodes=True)
     tables = {'info': get_entity_data(source),
               'text': Table(['text', 'type', 'content']),
-              'file': Table(app.config['TABLE_HEADERS']['file'] + [_('main image')]),
-              'reference': Table(app.config['TABLE_HEADERS']['reference'] + ['page'])}
+              'file': Table(Table.HEADERS['file'] + [_('main image')]),
+              'reference': Table(Table.HEADERS['reference'] + ['page'])}
     for text in source.get_linked_entities('P73', nodes=True):
         tables['text'].rows.append([link(text),
                                     next(iter(text.nodes)).name if text.nodes else '',
                                     truncate_string(text.description)])
     for name in ['actor', 'event', 'place', 'feature', 'stratigraphic-unit', 'find']:
-        tables[name] = Table(app.config['TABLE_HEADERS'][name])
+        tables[name] = Table(Table.HEADERS[name])
     for link_ in source.get_links('P67'):
         range_ = link_.range
         data = get_base_table_data(range_)

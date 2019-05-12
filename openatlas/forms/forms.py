@@ -271,7 +271,7 @@ class TableSelect(HiddenInput):
         else:
             entities = EntityMapper.get_by_codes(class_)
         selection = ''
-        table = Table(app.config['TABLE_HEADERS'][class_])
+        table = Table(Table.HEADERS[class_])
         for entity in entities:
             # Todo: don't show self e.g. at source
             if field.data and entity.id == int(field.data):
@@ -316,7 +316,7 @@ class TableMultiSelect(HiddenInput):
             field.data = ast.literal_eval(field.data)
         selection = ''
         class_ = field.id if field.id != 'given_place' else 'place'
-        table = Table(app.config['TABLE_HEADERS'][class_])
+        table = Table(Table.HEADERS[class_])
         # Make checkbox column sortable and show selected on top
         table.headers = 'headers:{' + str(len(table.header)) + ':{sorter:"checkbox"}},'
         table.sort = 'sortList:[[' + str(len(table.header)) + ', 0],[0, 0]],'

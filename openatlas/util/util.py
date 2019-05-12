@@ -142,7 +142,7 @@ def get_file_stats(path=app.config['UPLOAD_FOLDER_PATH']):
 def build_table_form(class_name, linked_entities):
     """ Returns a form with a list of entities with checkboxes"""
     from openatlas.models.entity import EntityMapper
-    table = Table(app.config['TABLE_HEADERS'][class_name] + [''])
+    table = Table(Table.HEADERS[class_name] + [''])
     linked_ids = [entity.id for entity in linked_entities]
     file_stats = get_file_stats() if class_name == 'file' else None
     if class_name == 'file':
