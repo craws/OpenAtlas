@@ -1,6 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
-from typing import Iterator
+from typing import Iterator, Set, Union, Optional, Dict
 
 from flask import g
 from flask_login import current_user
@@ -14,22 +14,22 @@ from openatlas.util.util import print_file_extension, uc_first
 
 
 class Entity:
-    def __init__(self, row):
+    def __init__(self, row) -> None:
         if not row:
             logger.log('error', 'model', 'invalid id')
             abort(418)
         self.id = row.id
-        self.nodes = {}
+        self.nodes = {}  # type: Dict
         if hasattr(row, 'nodes') and row.nodes:
             for node in row.nodes:
                 self.nodes[g.nodes[node['f1']]] = node['f2']  # f1 = node id, f2 = value
-        self.aliases = {}
+        self.aliases = {}  # type: Dict
         if hasattr(row, 'aliases') and row.aliases:
             for alias in row.aliases:
                 self.aliases[alias['f1']] = alias['f2']  # f1 = alias id, f2 = alias name
             self.aliases = OrderedDict(sorted(self.aliases.items(), key=lambda kv: (kv[1], kv[0])))
         self.name = row.name
-        self.root = None
+        self.root = None  # type: Optional[list]
         self.description = row.description if row.description else ''
         self.system_type = row.system_type
         self.created = row.created
@@ -40,6 +40,7 @@ class Entity:
         self.end_from = None
         self.end_to = None
         self.end_comment = None
+        self.origin_id = None  # type: Optional[int]
         if hasattr(row, 'begin_from'):
             self.begin_from = DateMapper.timestamp_to_datetime64(row.begin_from)
             self.begin_to = DateMapper.timestamp_to_datetime64(row.begin_to)
@@ -52,7 +53,7 @@ class Entity:
             self.last = DateForm.format_date(self.end_to, 'year') if self.end_to else self.last
         self.class_ = g.classes[row.class_code]
         self.view_name = None  # view_name is used to build urls
-        self.external_references = []  # Used in view info tab for display
+        self.external_references = []  # type: list
         if self.system_type == 'file':
             self.view_name = 'file'
         elif self.class_.code in app.config['CODE_CLASS']:
@@ -61,22 +62,27 @@ class Entity:
         if self.view_name == 'place':
             self.table_name = self.system_type.replace(' ', '-')
 
-    def get_linked_entity(self, code, inverse=False, nodes=False):
+    def get_linked_entity(self, code,
+                          inverse: Optional[bool] = False,
+                          nodes: Optional[bool] = False):
         return LinkMapper.get_linked_entity(self, code, inverse=inverse, nodes=nodes)
 
-    def get_linked_entities(self, code, inverse=False, nodes=False):
+    def get_linked_entities(self, code,
+                            inverse: Optional[bool] = False,
+                            nodes: Optional[bool] = False):
         return LinkMapper.get_linked_entities(self, code, inverse=inverse, nodes=nodes)
 
-    def link(self, code, range_, description=None, inverse=False):
+    def link(self, code, range_, description: Optional[str] = None,
+             inverse: Optional[bool] = False):
         return LinkMapper.insert(self, code, range_, description, inverse)
 
-    def get_links(self, code, inverse=False):
+    def get_links(self, code, inverse: Optional[bool] = False):
         return LinkMapper.get_links(self, code, inverse)
 
-    def delete(self):
+    def delete(self) -> None:
         EntityMapper.delete(self.id)
 
-    def delete_links(self, codes):
+    def delete_links(self, codes) -> None:
         LinkMapper.delete_by_codes(self, codes)
 
     def update(self):
@@ -197,7 +203,7 @@ class EntityMapper:
         return sql
 
     @staticmethod
-    def update(entity):
+    def update(entity: Entity) -> None:
         from openatlas.util.util import sanitize
         sql = """
             UPDATE model.entity SET
@@ -262,7 +268,7 @@ class EntityMapper:
         return Entity(g.cursor.fetchone())
 
     @staticmethod
-    def get_by_ids(entity_ids: Iterator, nodes=False) -> list:
+    def get_by_ids(entity_ids: Union[Iterator, Set], nodes=False) -> list:
         if not entity_ids:
             return []
         sql = EntityMapper.build_sql(nodes) + ' WHERE e.id IN %(ids)s GROUP BY e.id;'
