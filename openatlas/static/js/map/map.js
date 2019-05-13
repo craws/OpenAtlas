@@ -83,7 +83,6 @@ if (window.location.href.indexOf('update') >= 0) {
 }
 
 // Set zoom level depending on getBounds of selected points/polygons
-console.log(gisPointAll);
 let allSelected = [];
 if (gisLineSelected != '') allSelected.push(gisLines);
 if (gisPolygonSelected != '') allSelected.push(gisPolygons);

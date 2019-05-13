@@ -97,7 +97,6 @@ inputForm.onAdd = function (map) {
 };
 
 map.on('click', function(e) {
-    console.log(e);
     if (captureCoordinates && shapeType == 'centerpoint') {
         $('#saveButton').prop('disabled', false);
         if (marker) {  // Marker already exists so move it
