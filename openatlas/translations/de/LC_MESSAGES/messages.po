@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
 "POT-Creation-Date: 2019-05-07 16:09+0200\n"
-"PO-Revision-Date: 2019-05-07 16:27+0200\n"
+"PO-Revision-Date: 2019-05-13 22:41+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: de\n"
 "Language-Team: de <LL@li.org>\n"
@@ -485,7 +485,7 @@ msgstr "ungültige Involvierungs Datumswerte"
 #: templates/admin/orphans.html:54 templates/admin/orphans.html:67
 #: templates/admin/orphans.html:74
 msgid "Congratulations, everything looks fine!"
-msgstr "Glückwunsch, alles wird gut!"
+msgstr "Glückwunsch, alles ist gut!"
 
 #: templates/admin/check_link_duplicates.html:4 templates/admin/index.html:56
 msgid "check link duplicates"
