@@ -32,7 +32,7 @@ class HierarchyForm(Form):
 @app.route('/hierarchy/insert/<param>', methods=['POST', 'GET'])
 @required_group('manager')
 def hierarchy_insert(param):
-    form = build_form(HierarchyForm, 'hierarchy')
+    form = build_form(HierarchyForm, 'hierarchy')  # type: HierarchyForm
     form.forms.choices = NodeMapper.get_form_choices()
     if param == 'value':
         del form.multiple
@@ -52,7 +52,7 @@ def hierarchy_update(id_):
     root = g.nodes[id_]
     if root.system:
         abort(403)
-    form = build_form(HierarchyForm, 'hierarchy', root)
+    form = build_form(HierarchyForm, 'hierarchy', root)  # type: HierarchyForm
     form.forms.choices = NodeMapper.get_form_choices(root)
     if root.value_type:
         del form.multiple
