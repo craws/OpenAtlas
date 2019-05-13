@@ -23,7 +23,7 @@ class MemberForm(DateForm):
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
 
-    def validate(self, extra_validators=None):
+    def validate(self) -> bool:
         valid = DateForm.validate(self)
         if hasattr(self, 'actor') and self.actor is not None:
             if self.origin_id.data in ast.literal_eval(self.actor.data):

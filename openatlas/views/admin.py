@@ -21,6 +21,7 @@ from openatlas.models.link import LinkMapper
 from openatlas.models.node import NodeMapper
 from openatlas.models.settings import SettingsMapper
 from openatlas.models.user import UserMapper
+from openatlas.util.table import Table
 from openatlas.util.util import (convert_size, format_date, format_datetime, get_file_path,
                                  is_authorized, link, required_group, send_mail, truncate_string,
                                  uc_first)
@@ -92,9 +93,9 @@ def admin_map() -> str:
 def admin_check_links(check: Optional[str] = None) -> str:
     table = None
     if check:
-        table = {'id': 'check', 'header': ['domain', 'property', 'range'], 'data': []}
+        table = Table(['domain', 'property', 'range'])
         for result in LinkMapper.check_links():  # pragma: no cover
-            table['data'].append([result['domain'], result['property'], result['range']])
+            table.rows.append([result['domain'], result['property'], result['range']])
     return render_template('admin/check_links.html', table=table, check=check)
 
 
@@ -107,26 +108,24 @@ def admin_check_link_duplicates(delete: Optional[str] = None) -> str:
         logger.log('info', 'admin', 'Deleted duplicate links: ' + delete_count)
         flash(_('deleted links') + ': ' + delete_count, 'info')
         return redirect(url_for('admin_check_link_duplicates'))
-    table = {'id': 'check_duplicates', 'data': [],
-             'header': ['domain', 'range', 'property_code', 'description', 'type_id',
-                        'begin_from', 'begin_to', 'begin_comment', 'end_from', 'end_to',
-                        'end_comment', 'count']}
+    table = Table(['domain', 'range', 'property_code', 'description', 'type_id', 'begin_from',
+                   'begin_to', 'begin_comment', 'end_from', 'end_to', 'end_comment', 'count'])
     for result in LinkMapper.check_link_duplicates():
-        table['data'].append([link(EntityMapper.get_by_id(result.domain_id)),
-                              link(EntityMapper.get_by_id(result.range_id)),
-                              link(g.properties[result.property_code]),
-                              truncate_string(result.description),
-                              link(g.nodes[result.type_id]) if result.type_id else '',
-                              format_date(result.begin_from),
-                              format_date(result.begin_to),
-                              truncate_string(result.begin_comment),
-                              format_date(result.end_from),
-                              format_date(result.end_to),
-                              truncate_string(result.end_comment),
-                              result.count])
-    if not table['data']:  # No duplicates where found so check if single types really used single
-        table = {'id': 'check_single', 'data': LinkMapper.check_single_type_duplicates(),
-                 'header': ['entity', 'class', 'base type', 'incorrect multiple types']}
+        table.rows.append([link(EntityMapper.get_by_id(result.domain_id)),
+                           link(EntityMapper.get_by_id(result.range_id)),
+                           link(g.properties[result.property_code]),
+                           truncate_string(result.description),
+                           link(g.nodes[result.type_id]) if result.type_id else '',
+                           format_date(result.begin_from),
+                           format_date(result.begin_to),
+                           truncate_string(result.begin_comment),
+                           format_date(result.end_from),
+                           format_date(result.end_to),
+                           truncate_string(result.end_comment),
+                           result.count])
+    if not table.rows:  # No duplicates where found so check if single types really used single
+        table = Table(['entity', 'class', 'base type', 'incorrect multiple types'],
+                      rows=LinkMapper.check_single_type_duplicates())
     return render_template('admin/check_link_duplicates.html', table=table)
 
 
@@ -179,17 +178,15 @@ def admin_orphans_delete(parameter: str):
 @required_group('editor')
 def admin_check_dates() -> str:
     # Get invalid date combinations (e.g. begin after end)
-    tables = {
-        'dates': {'id': 'dates', 'data': [], 'header': ['name', 'class', 'type', 'system type',
-                                                        'created', 'updated', 'description']},
-        'link_dates': {'id': 'link_dates', 'data': [], 'header': ['link', 'domain', 'range']},
-        'involvement_dates': {'id': 'involvement_dates', 'data': [],
-                              'header': ['actor', 'event', 'class', 'involvement', 'description']}}
+    tables = {'link_dates': Table(['link', 'domain', 'range']),
+              'involvement_dates': Table(['actor', 'event', 'class', 'involvement', 'description']),
+              'dates': Table(['name', 'class', 'type', 'system type', 'created', 'updated',
+                              'description'])}
     for entity in DateMapper.get_invalid_dates():
-        tables['dates']['data'].append([link(entity), link(entity.class_), entity.print_base_type(),
-                                        entity.system_type, format_date(entity.created),
-                                        format_date(entity.modified),
-                                        truncate_string(entity.description)])
+        tables['dates'].rows.append([link(entity), link(entity.class_), entity.print_base_type(),
+                                     entity.system_type, format_date(entity.created),
+                                     format_date(entity.modified),
+                                     truncate_string(entity.description)])
     for link_ in DateMapper.get_invalid_link_dates():
         label = ''
         if link_.property.code == 'OA7':  # pragma: no cover
@@ -199,8 +196,8 @@ def admin_check_dates() -> str:
         elif link_.property.code in ['P11', 'P14', 'P22', 'P23']:
             label = 'involvement'
         url = url_for(label + '_update', id_=link_.id, origin_id=link_.domain.id)
-        tables['link_dates']['data'].append(['<a href="' + url + '">' + uc_first(_(label)) + '</a>',
-                                             link(link_.domain), link(link_.range)])
+        tables['link_dates'].rows.append(['<a href="' + url + '">' + uc_first(_(label)) + '</a>',
+                                          link(link_.domain), link(link_.range)])
     for link_ in DateMapper.invalid_involvement_dates():
         event = link_.domain
         actor = link_.range
@@ -208,7 +205,7 @@ def admin_check_dates() -> str:
         data = ([link(actor), link(event), g.classes[event.class_.code].name,
                  link_.type.name if link_.type else '', truncate_string(link_.description),
                  '<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>'])
-        tables['involvement_dates']['data'].append(data)
+        tables['involvement_dates'].rows.append(data)
     return render_template('admin/check_dates.html', tables=tables)
 
 
@@ -216,45 +213,44 @@ def admin_check_dates() -> str:
 @required_group('editor')
 def admin_orphans() -> str:
     header = ['name', 'class', 'type', 'system type', 'created', 'updated', 'description']
-    tables = {'orphans': {'id': 'orphans', 'header': header, 'data': []},
-              'unlinked': {'id': 'unlinked', 'header': header, 'data': []},
-              'nodes': {'id': 'nodes', 'header': ['name', 'root'], 'data': []},
-              'missing_files': {'id': 'missing_files', 'header': header, 'data': []},
-              'circular': {'id': 'circular', 'header': ['entity'], 'data': []},
-              'orphaned_files': {'id': 'orphaned_files', 'data': [],
-                                 'header': ['name', 'size', 'date', 'ext']}}
-    tables['circular']['data'] = [[link(entity)] for entity in EntityMapper.get_circular()]
+    tables = {'orphans': Table(header),
+              'unlinked': Table(header),
+              'missing_files': Table(header),
+              'circular': Table(['entity']),
+              'nodes': Table(['name', 'root']),
+              'orphaned_files': Table(['name', 'size', 'date', 'ext'])}
+    tables['circular'].rows = [[link(entity)] for entity in EntityMapper.get_circular()]
     for entity in EntityMapper.get_orphans():
         name = 'unlinked' if entity.class_.code in app.config['CODE_CLASS'].keys() else 'orphans'
-        tables[name]['data'].append([link(entity),
-                                     link(entity.class_),
-                                     entity.print_base_type(),
-                                     entity.system_type,
-                                     format_date(entity.created),
-                                     format_date(entity.modified),
-                                     truncate_string(entity.description)])
+        tables[name].rows.append([link(entity),
+                                  link(entity.class_),
+                                  entity.print_base_type(),
+                                  entity.system_type,
+                                  format_date(entity.created),
+                                  format_date(entity.modified),
+                                  truncate_string(entity.description)])
     for node in NodeMapper.get_orphans():
-        tables['nodes']['data'].append([link(node), link(g.nodes[node.root[-1]])])
+        tables['nodes'].rows.append([link(node), link(g.nodes[node.root[-1]])])
 
     # Get orphaned file entities (no corresponding file)
     file_ids = []
     for entity in EntityMapper.get_by_system_type('file', nodes=True):
         file_ids.append(str(entity.id))
         if not get_file_path(entity):
-            tables['missing_files']['data'].append([link(entity),
-                                                    link(entity.class_),
-                                                    entity.print_base_type(),
-                                                    entity.system_type,
-                                                    format_date(entity.created),
-                                                    format_date(entity.modified),
-                                                    truncate_string(entity.description)])
+            tables['missing_files'].rows.append([link(entity),
+                                                 link(entity.class_),
+                                                 entity.print_base_type(),
+                                                 entity.system_type,
+                                                 format_date(entity.created),
+                                                 format_date(entity.modified),
+                                                 truncate_string(entity.description)])
 
     # Get orphaned files (no corresponding entity)
     for file in os.scandir(app.config['UPLOAD_FOLDER_PATH']):
         name = file.name
         if name != '.gitignore' and splitext(file.name)[0] not in file_ids:
             confirm = ' onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
-            tables['orphaned_files']['data'].append([
+            tables['orphaned_files'].rows.append([
                 name,
                 convert_size(file.stat().st_size),
                 format_date(datetime.datetime.utcfromtimestamp(file.stat().st_ctime)),
@@ -331,17 +327,16 @@ class LogForm(Form):
 def admin_log() -> str:
     form = LogForm()
     form.user.choices = [(0, _('all'))] + UserMapper.get_users()
-    table = {'id': 'log', 'data': [],
-             'header': ['date', 'priority', 'type', 'message', 'user', 'info']}
+    table = Table(['date', 'priority', 'type', 'message', 'user', 'info'])
     logs = logger.get_system_logs(form.limit.data, form.priority.data, form.user.data)
     for row in logs:
         user = UserMapper.get_by_id(row.user_id) if row.user_id else None
-        table['data'].append([format_datetime(row.created),
-                              str(row.priority) + ' ' + app.config['LOG_LEVELS'][row.priority],
-                              row.type,
-                              row.message,
-                              link(user) if user and user.id else row.user_id,
-                              row.info.replace('\n', '<br />')])
+        table.rows.append([format_datetime(row.created),
+                           str(row.priority) + ' ' + app.config['LOG_LEVELS'][row.priority],
+                           row.type,
+                           row.message,
+                           link(user) if user and user.id else row.user_id,
+                           row.info.replace('\n', '<br />')])
     return render_template('admin/log.html', table=table, form=form)
 
 
@@ -379,12 +374,12 @@ def admin_newsletter():
                     recipients += 1
         flash(_('Newsletter send') + ': ' + str(recipients), 'info')
         return redirect(url_for('admin_index'))
-    table = {'id': 'user', 'header': ['username', 'email', 'receiver'], 'data': []}
+    table = Table(['username', 'email', 'receiver'])
     for user in UserMapper.get_all():
         if user.settings['newsletter'] and user.active:  # pragma: no cover
             checkbox = '<input value="' + str(user.id) + '" name="recipient"'
             checkbox += ' type="checkbox" checked="checked">'
-            table['data'].append([user.username, user.email, checkbox])
+            table.rows.append([user.username, user.email, checkbox])
     return render_template('admin/newsletter.html', form=form, table=table)
 
 

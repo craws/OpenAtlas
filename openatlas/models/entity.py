@@ -1,5 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
+from typing import Iterator
 
 from flask import g
 from flask_login import current_user
@@ -261,7 +262,7 @@ class EntityMapper:
         return Entity(g.cursor.fetchone())
 
     @staticmethod
-    def get_by_ids(entity_ids: iter, nodes=False) -> list:
+    def get_by_ids(entity_ids: Iterator, nodes=False) -> list:
         if not entity_ids:
             return []
         sql = EntityMapper.build_sql(nodes) + ' WHERE e.id IN %(ids)s GROUP BY e.id;'
@@ -334,7 +335,7 @@ class EntityMapper:
         g.cursor.execute(sql)
         debug_model['div sql'] += 1
         row = g.cursor.fetchone()
-        counts = OrderedDict()
+        counts = OrderedDict()  # type: OrderedDict
         for idx, col in enumerate(g.cursor.description):
             counts[col[0]] = row[idx]
         return counts
@@ -349,7 +350,7 @@ class EntityMapper:
     @staticmethod
     def get_latest(limit: int) -> list:
         """ Returns the newest created entities"""
-        codes = []
+        codes = []  # type: list
         for class_codes in app.config['CLASS_CODES'].values():
             codes += class_codes
         sql = EntityMapper.build_sql() + """

@@ -10,5 +10,5 @@
             <a href="{{ url_for('import_project_insert') }}">+ {{ _('project')|uc_first }}</a>
         </div>
     {% endif %}
-    {{ table|pager|safe }}
+    {{ table.display()|safe }}
 {% endblock %}

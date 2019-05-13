@@ -33,7 +33,7 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 GEONAMES_USERNAME = 'openatlas'
 THUNDERFOREST_KEY = '7878b4fb224f4902ab42fc846e92b96a'
 
-DEFAULT_TABLE_ROWS = OrderedDict()
+DEFAULT_TABLE_ROWS = OrderedDict()  # type: OrderedDict
 DEFAULT_TABLE_ROWS[10] = '10'
 DEFAULT_TABLE_ROWS[20] = '20'
 DEFAULT_TABLE_ROWS[50] = '50'
@@ -41,7 +41,7 @@ DEFAULT_TABLE_ROWS[100] = '100'
 
 MIN_CHARS_JSTREE_SEARCH = 1
 
-LOG_LEVELS = OrderedDict()
+LOG_LEVELS = OrderedDict()  # type: OrderedDict
 LOG_LEVELS[0] = 'emergency'
 LOG_LEVELS[1] = 'alert'
 LOG_LEVELS[2] = 'critical'
@@ -51,7 +51,7 @@ LOG_LEVELS[5] = 'notice'
 LOG_LEVELS[6] = 'info'
 LOG_LEVELS[7] = 'debug'
 
-FEEDBACK_SUBJECTS = OrderedDict()
+FEEDBACK_SUBJECTS = OrderedDict()  # type: OrderedDict
 FEEDBACK_SUBJECTS[_('suggestion').title()] = _('suggestion').title()
 FEEDBACK_SUBJECTS[_('question').title()] = _('question').title()
 FEEDBACK_SUBJECTS[_('problem').title()] = _('problem').title()
@@ -79,19 +79,6 @@ CLASS_CODES = {
     'reference': ['E31', 'E84']}
 
 PROPERTY_TYPES = ['Actor Actor Relation', 'Actor Function', 'Involvement']
-
-# Default table columns based on class
-TABLE_HEADERS = {
-    'source': ['name', 'type', 'description'],
-    'event': ['name', 'class', 'type', 'begin', 'end'],
-    'actor': ['name', 'class', 'begin', 'end'],
-    'group': ['name', 'class', 'begin', 'end'],
-    'place': ['name', 'type', 'begin', 'end'],
-    'feature': ['name', 'type', 'begin', 'end'],
-    'stratigraphic-unit': ['name', 'type', 'begin', 'end'],
-    'find': ['name', 'type', 'begin', 'end'],
-    'reference': ['name', 'class', 'type'],
-    'file': ['name', 'license', 'size', 'extension', 'description']}
 
 BASE_TYPES = ['Place', 'Information Carrier', 'Bibliography', 'Source', 'Edition', 'Event', 'Actor',
               'Stratigraphic Unit', 'Feature', 'Find']

@@ -7,28 +7,28 @@
 {{ 'Data_integrity'|manual_link|safe }}
 <div id="tabs" class="tabs-container">
     <ul>
-        <li><a href="#tab-dates">{{ _('invalid dates')|uc_first }} ({{ tables['dates']['data']|length|format_number }})</a></li>
-        <li><a href="#tab-link-dates">{{ _('invalid link dates')|uc_first }} ({{ tables['link_dates']['data']|length|format_number }})</a></li>
-        <li><a href="#tab-involvement-dates">{{ _('invalid involvement dates')|uc_first }} ({{ tables['involvement_dates']['data']|length|format_number }})</a></li>
+        <li><a href="#tab-dates">{{ _('invalid dates')|uc_first }} ({{ tables['dates'].rows|length|format_number }})</a></li>
+        <li><a href="#tab-link-dates">{{ _('invalid link dates')|uc_first }} ({{ tables['link_dates'].rows|length|format_number }})</a></li>
+        <li><a href="#tab-involvement-dates">{{ _('invalid involvement dates')|uc_first }} ({{ tables['involvement_dates'].rows|length|format_number }})</a></li>
     </ul>
     <div id="tab-dates">
-    {% if tables['dates']['data'] %}
-        {{ tables['dates']|pager|safe }}
+    {% if tables['dates'].rows %}
+        {{ tables['dates'].display('dates')|safe }}
     {% else %}
         {{ _('Congratulations, everything looks fine!') }}
     {% endif %}
     </div>
     <div id="tab-link-dates">
-    {% if tables['link_dates']['data'] %}
-       {{ tables['link_dates']|pager|safe }}
+    {% if tables['link_dates'].rows %}
+       {{ tables['link_dates'].display('link_dates')|safe }}
     {% else %}
         {{ _('Congratulations, everything looks fine!') }}
     {% endif %}
 
     </div>
     <div id="tab-involvement-dates">
-        {% if tables['involvement_dates']['data'] %}
-            {{ tables['involvement_dates']|pager|safe }}
+        {% if tables['involvement_dates'].rows %}
+            {{ tables['involvement_dates'].display('involvement_dates')|safe }}
         {% else %}
             {{ _('Congratulations, everything looks fine!') }}
         {% endif %}

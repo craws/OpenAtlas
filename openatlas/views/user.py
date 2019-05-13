@@ -11,12 +11,13 @@ from wtforms.validators import Email, InputRequired
 from openatlas import app
 from openatlas.models.entity import EntityMapper
 from openatlas.models.user import User, UserMapper
+from openatlas.util.table import Table
 from openatlas.util.util import (format_date, is_authorized, link, required_group, send_mail,
                                  uc_first)
 
 
 class UserForm(Form):
-    user_id = None
+    user_id = None  # type: int
     active = BooleanField(_('active'), default=True)
     username = StringField(_('username'), [InputRequired()], render_kw={'autofocus': True})
     group = SelectField(_('group'), choices=[])
@@ -31,7 +32,7 @@ class UserForm(Form):
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
 
-    def validate(self, extra_validators=None):
+    def validate(self) -> bool:
         valid = Form.validate(self)
         user = UserMapper.get_by_id(self.user_id) if self.user_id else User()
         if user.username != self.username.data and UserMapper.get_by_username(self.username.data):
@@ -67,7 +68,6 @@ class ActivityForm(Form):
 def user_activity(user_id=0):
     form = ActivityForm()
     form.user.choices = [(0, _('all'))] + UserMapper.get_users()
-    table = {'id': 'activity', 'header': ['date', 'user', 'action', 'entity'], 'data': []}
     if form.validate_on_submit():
         activities = UserMapper.get_activities(form.limit.data, form.user.data, form.action.data)
     elif user_id:
@@ -75,14 +75,14 @@ def user_activity(user_id=0):
         activities = UserMapper.get_activities(100, user_id, 'all')
     else:
         activities = UserMapper.get_activities(100, 0, 'all')
+    table = Table(['date', 'user', 'action', 'entity'])
     for row in activities:
         entity = EntityMapper.get_by_id(row.entity_id, ignore_not_found=True)
         user = UserMapper.get_by_id(row.user_id)
-        table['data'].append([
-            format_date(row.created),
-            link(user) if user else 'id ' + str(row.user_id),
-            _(row.action),
-            link(entity) if entity else 'id ' + str(row.entity_id)])
+        table.rows.append([format_date(row.created),
+                           link(user) if user else 'id ' + str(row.user_id),
+                           _(row.action),
+                           link(entity) if entity else 'id ' + str(row.entity_id)])
     return render_template('user/activity.html', table=table, form=form)
 
 
@@ -104,11 +104,10 @@ def user_view(id_):
 @app.route('/admin/user')
 @required_group('readonly')
 def user_index():
-    table = {'id': 'user', 'data': [], 'header': ['username', 'group', 'email', 'newsletter',
-                                                  'created', 'last login', 'entities']}
+    table = Table(['username', 'group', 'email', 'newsletter', 'created', 'last login', 'entities'])
     for user in UserMapper.get_all():
         count = UserMapper.get_created_entities_count(user.id)
-        table['data'].append([
+        table.rows.append([
             link(user),
             user.group,
             user.email if is_authorized('manager') or user.settings['show_email'] else '',

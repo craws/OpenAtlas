@@ -16,5 +16,5 @@
             $("#disk_size").progressbar({value: {{ disk_space_values.percent }} });
         });
     </script>
-    {{ table|pager|safe }}
+    {{ table.display()|safe }}
 {% endblock %}

@@ -7,17 +7,17 @@
 <div id="tabs" class="tabs-container">
     <ul>
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
-        <li><a href="#tab-event">{{ _('event')|uc_first }} ({{ tables['event']['data']|length|format_number }})</a></li>
-        <li><a href="#tab-actor">{{ _('actor')|uc_first }} ({{ tables['actor']['data']|length|format_number }})</a></li>
-        <li><a href="#tab-place">{{ _('place')|uc_first }} ({{ tables['place']['data']|length|format_number }})</a></li>
+        <li><a href="#tab-event">{{ _('event')|uc_first }} ({{ tables['event'].rows|length|format_number }})</a></li>
+        <li><a href="#tab-actor">{{ _('actor')|uc_first }} ({{ tables['actor'].rows|length|format_number }})</a></li>
+        <li><a href="#tab-place">{{ _('place')|uc_first }} ({{ tables['place'].rows|length|format_number }})</a></li>
         {% for table_name in ['feature', 'stratigraphic-unit', 'find'] %}
-            {% if tables[table_name]['data']|length > 0 %}
-                <li><a href="#tab-{{ table_name }}">{{ _(table_name)|uc_first }} ({{ tables[table_name]['data']|length|format_number }})</a></li>
+            {% if tables[table_name].rows %}
+                <li><a href="#tab-{{ table_name }}">{{ _(table_name)|uc_first }} ({{ tables[table_name].rows|length|format_number }})</a></li>
             {% endif %}
         {% endfor %}
-        <li><a href="#tab-reference">{{ _('reference')|uc_first }} ({{ tables['reference']['data']|length|format_number }})</a></li>
-        <li><a href="#tab-text">{{ _('texts')|uc_first }} ({{ tables['text']['data']|length|format_number }})</a></li>
-        <li><a href="#tab-file">{{ _('files')|uc_first }}  ({{ tables['file']['data']|length|format_number }})</a></li>
+        <li><a href="#tab-reference">{{ _('reference')|uc_first }} ({{ tables['reference'].rows|length|format_number }})</a></li>
+        <li><a href="#tab-text">{{ _('texts')|uc_first }} ({{ tables['text'].rows|length|format_number }})</a></li>
+        <li><a href="#tab-file">{{ _('files')|uc_first }}  ({{ tables['file'].rows|length|format_number }})</a></li>
     </ul>
     <div id="tab-info">
         <div class="button-bar">
@@ -39,7 +39,7 @@
         </div>
     </div>
     {% for name in ['event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find'] %}
-        {% if name not in ['feature', 'stratigraphic-unit', 'find'] or tables[name]['data']|length > 0 %}
+        {% if name not in ['feature', 'stratigraphic-unit', 'find'] or tables[name].rows %}
             <div id="tab-{{ name }}">
                 {% if 'editor'|is_authorized and name not in ['feature', 'stratigraphic-unit', 'find'] %}
                     <div class="button-bar">
@@ -53,7 +53,7 @@
                         {% endif %}
                     </div>
                 {% endif %}
-                {{ tables[name]|pager|safe }}
+                {{ tables[name].display(name)|safe }}
             </div>
         {% endif %}
     {% endfor %}
@@ -66,7 +66,7 @@
                 <a href="{{ url_for('reference_insert', code='external_reference', origin_id=source.id) }}">+ {{ _('external reference')|uc_first }}</a>
             </div>
         {% endif %}
-        {{ tables['reference']|pager|safe }}
+        {{ tables['reference'].display('reference')|safe }}
     </div>
     <div id="tab-text">
         {% if 'editor'|is_authorized %}
@@ -74,7 +74,7 @@
                 <a href="{{ url_for('translation_insert', source_id=source.id) }}">+ {{ _('text')|uc_first }}</a>
             </div>
         {% endif %}
-        {{ tables['text']|pager|safe }}
+        {{ tables['text'].display('text')|safe }}
     </div>
     <div id="tab-file">
         {% if 'editor'|is_authorized %}
@@ -83,7 +83,7 @@
                 <a href="{{ url_for('file_insert', origin_id=source.id) }}">+ {{ _('file')|uc_first }}</a>
             </div>
         {% endif %}
-        {{ tables['file']|pager|safe }}
+        {{ tables['file'].display('file')|safe }}
     </div>
 </div>
 {% endblock %}

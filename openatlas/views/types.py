@@ -13,6 +13,7 @@ from openatlas import app, logger
 from openatlas.forms.forms import build_move_form, build_node_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.node import NodeMapper
+from openatlas.util.table import Table
 from openatlas.util.util import get_entity_data, link, required_group, sanitize, truncate_string
 
 
@@ -88,8 +89,7 @@ def node_view(id_):
     header = [_('name'), _('class'), _('info')]
     if root and root.value_type:  # pragma: no cover
         header = [_('name'), _('value'), _('class'), _('info')]
-    tables = {'entities': {'id': 'entities', 'header': header, 'data': []},
-              'info': get_entity_data(node)}
+    tables = {'info': get_entity_data(node), 'entities': Table(header)}
     for entity in node.get_linked_entities(['P2', 'P89'], inverse=True, nodes=True):
         # If it is a place location get the corresponding object
         entity = entity if node.class_.code == 'E55' else entity.get_linked_entity('P53', True)
@@ -99,15 +99,15 @@ def node_view(id_):
                 data.append(format_number(entity.nodes[node]))
             data.append(g.classes[entity.class_.code].name)
             data.append(truncate_string(entity.description))
-            tables['entities']['data'].append(data)
-    tables['link_entities'] = {'id': 'link_items', 'header': [_('domain'), _('range')], 'data': []}
+            tables['entities'].rows.append(data)
+    tables['link_entities'] = Table([_('domain'), _('range')])
     for row in LinkMapper.get_entities_by_node(node):
-        tables['link_entities']['data'].append([link(EntityMapper.get_by_id(row.domain_id)),
-                                                link(EntityMapper.get_by_id(row.range_id))])
-    tables['subs'] = {'id': 'subs', 'header': [_('name'), _('count'), _('info')], 'data': []}
+        tables['link_entities'].rows.append([link(EntityMapper.get_by_id(row.domain_id)),
+                                             link(EntityMapper.get_by_id(row.range_id))])
+    tables['subs'] = Table([_('name'), _('count'), _('info')])
     for sub_id in node.subs:
         sub = g.nodes[sub_id]
-        tables['subs']['data'].append([link(sub), sub.count, truncate_string(sub.description)])
+        tables['subs'].rows.append([link(sub), sub.count, truncate_string(sub.description)])
     return render_template('types/view.html', node=node, super_=super_, tables=tables, root=root)
 
 
@@ -151,7 +151,7 @@ def node_move_entities(id_):
 
 
 def walk_tree(param):
-    """Builds JSON for jsTree"""
+    """ Builds JSON for jsTree"""
     text = ''
     for id_ in param if type(param) is list else [param]:
         item = g.nodes[id_]

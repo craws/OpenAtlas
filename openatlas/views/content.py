@@ -8,6 +8,7 @@ from wtforms import TextAreaField
 from openatlas import app
 from openatlas.models.content import ContentMapper
 from openatlas.util import util
+from openatlas.util.table import Table
 from openatlas.util.util import required_group
 
 
@@ -18,20 +19,16 @@ class ContentForm(Form):
 @app.route('/admin/content')
 @required_group('manager')
 def content_index():
-    header = ['name']
-    for language in app.config['LANGUAGES'].keys():
-        header.append(language)
-    header.append('text')
-    table_content = {'id': 'content', 'header': header, 'data': []}
+    table = Table(['name'] + [language for language in app.config['LANGUAGES'].keys()] + ['text'])
     for item, languages in ContentMapper.get_content().items():
         url = url_for('content_view', item=item)
         content = ['<a href="' + url + '">' + util.uc_first(_(item)) + '</a>']
-        html_ok = '<img src="/static/images/icons/dialog-apply.png" alt="ok" \>'
+        html_ok = '<img src="/static/images/icons/dialog-apply.png" alt="ok" />'
         for language in app.config['LANGUAGES'].keys():
             content.append(html_ok if languages[language] else '')
         content.append(languages[session['language']])
-        table_content['data'].append(content)
-    return render_template('content/index.html', table_content=table_content)
+        table.rows.append(content)
+    return render_template('content/index.html', table=table)
 
 
 @app.route('/admin/content/view/<string:item>')

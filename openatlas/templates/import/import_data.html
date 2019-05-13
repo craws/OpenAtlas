@@ -36,6 +36,6 @@
                 {{ _('preview')|uc_first }}
             {% endif %}
         </h2>
-        {{ table|pager|safe }}
+        {{ table.display()|safe }}
     {% endif %}
 {% endblock %}

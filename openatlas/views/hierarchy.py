@@ -11,20 +11,20 @@ from openatlas import app, logger
 from openatlas.forms.forms import build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.node import NodeMapper
+from openatlas.util.table import Table
 from openatlas.util.util import required_group, sanitize, uc_first
 
 
 class HierarchyForm(Form):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     multiple = BooleanField(_('multiple'), description=_('tooltip hierarchy multiple'))
-    forms = SelectMultipleField(
-        _('forms'),
-        render_kw={'disabled': True},
-        description=_('tooltip hierarchy forms'),
-        choices=[],
-        option_widget=widgets.CheckboxInput(),
-        widget=widgets.ListWidget(prefix_label=False),
-        coerce=int)
+    forms = SelectMultipleField(_('forms'),
+                                render_kw={'disabled': True},
+                                description=_('tooltip hierarchy forms'),
+                                choices=[],
+                                option_widget=widgets.CheckboxInput(),
+                                widget=widgets.ListWidget(prefix_label=False),
+                                coerce=int)
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
 
@@ -66,13 +66,12 @@ def hierarchy_update(id_):
         flash(_('info update'), 'info')
         return redirect(url_for('node_index') + '#tab-' + str(root.id))
     form.multiple = root.multiple
-    table = {'id': 'used_forms', 'show_pager': False, 'data': [], 'sort': 'sortList: [[0, 0]]',
-             'header': ['form', 'count']}
+    table = Table(['form', 'count'], pager=False, sort='[[0, 0]]')
     for form_id, form_ in root.forms.items():
         url = url_for('hierarchy_remove_form', id_=root.id, remove_id=form_id)
         link = '<a href="' + url + '">' + uc_first(_('remove')) + '</a>'
         count = NodeMapper.get_form_count(root, form_id)
-        table['data'].append([form_['name'], format_number(count) if count else link])
+        table.rows.append([form_['name'], format_number(count) if count else link])
     return render_template('hierarchy/update.html', node=root, form=form, table=table,
                            forms=[form.id for form in form.forms])
 
