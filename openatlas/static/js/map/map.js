@@ -83,12 +83,13 @@ if (window.location.href.indexOf('update') >= 0) {
 }
 
 // Set zoom level depending on getBounds of selected points/polygons
+console.log(gisPointAll);
 let allSelected = [];
 if (gisLineSelected != '') allSelected.push(gisLines);
 if (gisPolygonSelected != '') allSelected.push(gisPolygons);
 if (gisPointSelected != '') allSelected.push(gisPoints);
 if (allSelected.length > 0) map.fitBounds(L.featureGroup(allSelected).getBounds(), {maxZoom: 12});
-else if(gisPointAll) map.fitBounds(pointLayer.getBounds(), {maxZoom: 12});
+else if(gisPointAll.length > 0) map.fitBounds(pointLayer.getBounds(), {maxZoom: 12});
 else map.setView([30, 340], 2);
 
 L.control.layers(baseMaps, controls).addTo(map);
@@ -146,7 +147,7 @@ function buildPopup(feature, action='view', selected=false) {
         popupHtml += `
             <div id="buttonBar" style="white-space:nowrap;">
                 <p>
-                    <button id="editButton" onclick="editGeometry('` + feature.properties.geometryType + `')">` + translate['edit'] + `</button>
+                    <button id="editButton" onclick="editGeometry()">` + translate['edit'] + `</button>
                     <button id="deleteButton" onclick="deleteGeometry()">` + translate['delete'] + `</button>
                 </p>
             </div>`;
@@ -167,6 +168,13 @@ function setPopup(feature, layer, mode) {
     if (gisPolygonSelected) {
         for (polygonSelected in gisPolygonSelected) {
             if (gisPolygonSelected[polygonSelected].properties.objectId == feature.properties.objectId) {
+                selected = true;
+            }
+        }
+    }
+    if (gisLineSelected) {
+        for (lineSelected in gisLineSelected) {
+            if (gisLineSelected[lineSelected].properties.objectId == feature.properties.objectId) {
                 selected = true;
             }
         }

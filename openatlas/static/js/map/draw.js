@@ -97,6 +97,7 @@ inputForm.onAdd = function (map) {
 };
 
 map.on('click', function(e) {
+    console.log(e);
     if (captureCoordinates && shapeType == 'centerpoint') {
         $('#saveButton').prop('disabled', false);
         if (marker) {  // Marker already exists so move it
@@ -273,8 +274,8 @@ function saveEditedGeometry(shapeType) {
         $('#gis_points').val(JSON.stringify(points));
         editedLayer = L.marker(editLayer.getLatLng(), {icon: editedIcon}).addTo(map);
         editedLayer.bindPopup(buildPopup(JSON.parse(point), 'edited'));
-    } else if (feature.properties.shapeType == 'polyline') {
-        // Remove former polygon
+    } else if (feature.properties.shapeType == 'polyline' && geoJsonArray.length > 0) {
+        // Remove former polyline
         polygons = JSON.parse($('#gis_lines').val());
         $.each(polygons, function (key, value) {
             if (value.properties.id == feature.properties.id) {
@@ -283,7 +284,7 @@ function saveEditedGeometry(shapeType) {
             }
         });
         coordinates = '[' + geoJsonArray.join(',') + ']'
-        // Insert new polygon
+        // Insert new polyline
         polygon =
             `{"type": "Feature", "geometry":` +
             `{"type": "LineString", "coordinates": ` + coordinates + `},` +
@@ -292,7 +293,7 @@ function saveEditedGeometry(shapeType) {
         $('#gis_lines').val(JSON.stringify(polygons));
         editedLayer = L.polyline(editLayer.getLatLngs()).addTo(map);
         editedLayer.setStyle({fillColor: '#686868', color: '#686868'});
-    } else {
+    } else if (geoJsonArray.length > 0) {
         // Remove former polygon
         polygons = JSON.parse($('#gis_polygons').val());
         $.each(polygons, function (key, value) {
@@ -336,6 +337,7 @@ function saveNewGeometry(shapeType) {
         $('#gis_lines').val(JSON.stringify(linestrings));
         layer.bindPopup(buildPopup(JSON.parse(linestring), 'edited'));
         layer.addTo(map);
+        layer.setStyle({fillColor: '#DA9DC8', color: '#E861C0'});
     } else {
         polygon =
             `{"type": "Feature", "geometry":` +
