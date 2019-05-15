@@ -110,6 +110,7 @@ def admin_check_link_duplicates(delete: Optional[str] = None) -> str:
         return redirect(url_for('admin_check_link_duplicates'))
     table = Table(['domain', 'range', 'property_code', 'description', 'type_id', 'begin_from',
                    'begin_to', 'begin_comment', 'end_from', 'end_to', 'end_comment', 'count'])
+
     for result in LinkMapper.check_link_duplicates():
         table.rows.append([link(EntityMapper.get_by_id(result.domain_id)),
                            link(EntityMapper.get_by_id(result.range_id)),
@@ -123,10 +124,13 @@ def admin_check_link_duplicates(delete: Optional[str] = None) -> str:
                            format_date(result.end_to),
                            truncate_string(result.end_comment),
                            result.count])
-    if not table.rows:  # No duplicates where found so check if single types really used single
+    duplicates = False
+    if table.rows:
+        duplicates = True
+    else:  # If no exact duplicates where found check if single types are used multiple times
         table = Table(['entity', 'class', 'base type', 'incorrect multiple types'],
                       rows=LinkMapper.check_single_type_duplicates())
-    return render_template('admin/check_link_duplicates.html', table=table)
+    return render_template('admin/check_link_duplicates.html', table=table, duplicates=duplicates)
 
 
 @app.route('/admin/delete_single_type_duplicate/<int:entity_id>/<int:node_id>')

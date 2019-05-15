@@ -307,7 +307,7 @@ class LinkMapper:
         from openatlas.models.entity import EntityMapper
         data = []
         for id_, node in g.nodes.items():
-            if not node.root and not node.multiple:
+            if not node.root and not node.multiple and not node.value_type:
                 node_ids = NodeMapper.get_all_sub_ids(node)
                 if node_ids:
                     sql = """
