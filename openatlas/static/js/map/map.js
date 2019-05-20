@@ -117,6 +117,20 @@ var geoSearchControl = L.control.geonames({
     title: translate['map_geonames_title'], // Search input title value.
     placeholder: translate['map_geonames_placeholder'] // Search input placeholder text.
 });
+
+geoSearchControl.on('select', function(e){
+    console.log(e.geoname)
+    $('#geonames_id').val(e.geoname.geonameId);
+    points = JSON.parse($('#gis_points').val());
+    // Add new point
+    point =
+        `{"type": "Feature", "geometry":` +
+        `{"type": "Point", "coordinates": [` + e.geoname.lng + `,` + e.geoname.lat + `]},` +
+        `"properties":{"name": "` + e.geoname.name + `", "description": "` + description + `", "shapeType": "centerpoint"}}`;
+    points.push(JSON.parse(point));
+    $('#gis_points').val(JSON.stringify(points));
+});
+
 map.addControl(geoSearchControl);
 
 
