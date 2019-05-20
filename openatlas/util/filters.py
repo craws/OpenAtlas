@@ -274,13 +274,29 @@ def display_form(self, form, form_id=None, for_persons=False):
         field.label.text += display_tooltip(field.description)
         errors = ' <span class="error">' + errors + ' </span>' if errors else ''
         if field.id in ('file', 'name'):
-            html['header'] += '<div class="table-row"><div>' + str(field.label) + '</div>'
-            html['header'] += '<div class="table-cell">' + str(field(class_=class_)) + errors
-            html['header'] += '</div></div>'
+            html['header'] += '''
+                <div class="table-row">
+                    <div>{label}</div>
+                    <div class="table-cell">{field} {errors}</div>
+                </div>'''.format(label=field.label, errors=errors, field=field(class_=class_))
             continue
-        html['main'] += '<div class="table-row"><div>' + str(field.label) + '</div>'
-        html['main'] += '<div class="table-cell">' + str(field(class_=class_)).replace('> ', '>')
-        html['main'] += errors + '</div></div>'
+        if field.id == 'geonames_id':
+            precision_field = getattr(form, 'geonames_precision')
+            html['main'] += '''
+            <div class="table-row">
+                <div>{label}</div>
+                <div class="table-cell">{field}{precision_field}{precision_label} {errors}</div>
+            </div>'''.format(label=field.label, errors=errors, field=field(class_=class_),
+                             precision_field=precision_field, precision_label=precision_field.label)
+            continue
+        if field.id == 'geonames_precision':
+            continue  # Is already added with geonames_id field
+        html['main'] += '''
+            <div class="table-row">
+                <div>{label}</div>
+                <div class="table-cell">{field} {errors}</div>
+            </div>'''.format(label=field.label, errors=errors,
+                             field=field(class_=class_).replace('> ', '>'))
 
     html_all = '<form method="post"' + id_attribute + ' ' + multipart + '>'
     html_all += '<div class="data-table">'

@@ -168,12 +168,12 @@ class NodeMapper(EntityMapper):
                     entity.link('P2', range_)
 
     @staticmethod
-    def insert_hierarchy(node, form, value_type):
+    def insert_hierarchy(node: Entity, form, value_type: bool) -> None:
         sql = """
             INSERT INTO web.hierarchy (id, name, multiple, value_type)
             VALUES (%(id)s, %(name)s, %(multiple)s, %(value_type)s);"""
         multiple = False
-        if hasattr(form, 'multiple') and form.multiple and form.multiple.data:
+        if value_type or (hasattr(form, 'multiple') and form.multiple and form.multiple.data):
             multiple = True
         g.cursor.execute(sql, {'id': node.id,
                                'name': node.name,
