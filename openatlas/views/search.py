@@ -9,6 +9,7 @@ from wtforms.validators import InputRequired, NoneOf, NumberRange, Optional
 from openatlas import app
 from openatlas.models.date import DateMapper
 from openatlas.models.entity import EntityMapper
+from openatlas.util.table import Table
 from openatlas.util.util import link, required_group, truncate_string, uc_first
 
 
@@ -34,7 +35,7 @@ class SearchForm(Form):
     end_day = IntegerField(render_kw={'placeholder': 31}, validators=validator_day)
     include_dateless = BooleanField(_('Include dateless entities'))
 
-    def validate(self, extra_validators=None):
+    def validate(self) -> bool:
         valid = Form.validate(self)
         from_date = DateMapper.form_to_datetime64(self.begin_year.data, self.begin_month.data,
                                                   self.begin_day.data)
@@ -55,7 +56,7 @@ def search_index():
     form.classes.choices = [(x, uc_first(_(x))) for x in choices]
     form.classes.default = choices
     form.classes.process(request.form)
-    table = {'data': []}
+    table = Table()
     if request.method == 'POST' and 'global-term' in request.form:
         # Coming from global search
         form.term.data = request.form['global-term']
@@ -67,12 +68,11 @@ def search_index():
 
 
 def build_search_table(form):
-    table = {'id': 'search', 'data': [], 'sort': 'sortList: [[0, 0]]',
-             'header': ['name', 'class', 'first', 'last', 'description']}
+    table = Table(['name', 'class', 'first', 'last', 'description'], sort='[[0, 0]]')
     for entity in EntityMapper.search(form):
-        table['data'].append([link(entity),
-                              entity.class_.name,
-                              entity.first,
-                              entity.last,
-                              truncate_string(entity.description)])
+        table.rows.append([link(entity),
+                           entity.class_.name,
+                           entity.first,
+                           entity.last,
+                           truncate_string(entity.description)])
     return table

@@ -1,13 +1,20 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
 
+
 class Changelog:
-    versions = OrderedDict()
-    versions['3.17.0'] = ['TBA', OrderedDict([
+    versions = OrderedDict()  # type: OrderedDict
+    versions['3.18.0'] = ['TBA', OrderedDict([
+        ('feature', OrderedDict([])),
+        ('fix', OrderedDict([]))])]
+    versions['3.17.0'] = ['2019-05-13', OrderedDict([
         ('feature', OrderedDict([
             ('597', 'Option to display aliases in tables'),
-            ('1026', 'Check function for duplicate links'),
-            ]))])]
+            ('1026', 'Check function for duplicate links')])),
+        ('fix', OrderedDict([
+            ('1015', "Multiple Place Add in Entity doesn't work correct"),
+            ('1016', 'Lines cannot be deleted or edited'),
+            ('1017', 'Lines, Areas and Shapes get sometimes deleted')]))])]
     versions['3.16.0'] = ['2019-04-19', OrderedDict([
         ('feature', OrderedDict([
             ('994', 'Line drawing in map'),

@@ -9,5 +9,5 @@
             <a href="{{ url_for('source_insert') }}">+ {{ _('source')|uc_first }}</a>
         </div>
     {% endif %}
-    {{ table|pager|safe }}
+    {{ table.display()|safe }}
 {% endblock %}

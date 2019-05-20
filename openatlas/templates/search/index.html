@@ -28,7 +28,7 @@
         </form>
     </div>
     <div style="float:left;margin-left: 1em;">
-        {{ table|pager|safe }}
+        {{ table.display()|safe }}
     </div>
     <script>
         $("#select_all").click(function() {

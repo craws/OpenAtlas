@@ -11,5 +11,5 @@
             {% endfor %}
         </div>
     {% endif %}
-    {{ table|pager|safe }}
+    {{ table.display()|safe }}
 {% endblock %}

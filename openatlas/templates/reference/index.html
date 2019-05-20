@@ -12,5 +12,5 @@
             <a href="{{ url_for('reference_insert', code='carrier') }}">+ {{ 'E84'|get_class_name }}</a>
         </div>
     {% endif %}
-    {{ table|pager|safe }}
+    {{ table.display()|safe }}
 {% endblock %}

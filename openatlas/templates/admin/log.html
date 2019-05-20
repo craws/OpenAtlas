@@ -9,5 +9,5 @@
                href="{{ url_for('admin_log_delete') }}">{{ _('delete all')|uc_first }}</a>
     </div>
     {{ form|display_form|safe }}
-    {{ table|pager|safe }}
+    {{ table.display()|safe }}
 {% endblock %}

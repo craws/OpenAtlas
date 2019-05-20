@@ -1,7 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
-from collections import namedtuple
-from typing import Optional
+from typing import Iterator, Optional, Dict
 
 from flask import abort, flash, g, url_for
 from flask_babel import lazy_gettext as _
@@ -15,7 +14,7 @@ from openatlas.util.util import link, uc_first
 
 class Link:
 
-    def __init__(self, row: namedtuple, domain: bool = None, range_: bool = None) -> None:
+    def __init__(self, row, domain: bool = None, range_: bool = None) -> None:
         from openatlas.models.entity import EntityMapper
         self.id = row.id
         self.description = row.description
@@ -23,7 +22,7 @@ class Link:
         self.domain = domain if domain else EntityMapper.get_by_id(row.domain_id)
         self.range = range_ if range_ else EntityMapper.get_by_id(row.range_id)
         self.type = g.nodes[row.type_id] if row.type_id else None
-        self.nodes = dict()
+        self.nodes = dict()  # type: Dict
         if hasattr(row, 'type_id') and row.type_id:
             self.nodes[g.nodes[row.type_id]] = None
         if hasattr(row, 'begin_from'):
@@ -71,7 +70,7 @@ class LinkMapper:
                property_code: str,
                linked_entities,
                description: Optional[str] = None,
-               inverse: Optional[bool] = False) -> Optional[int]:
+               inverse: Optional[bool] = False):
         from openatlas.models.entity import Entity, EntityMapper
         # linked_entities can be an entity, an entity id or a list of them
         if not entity or not linked_entities:  # pragma: no cover
@@ -115,7 +114,7 @@ class LinkMapper:
     def get_linked_entity(entity_param,
                           code: str,
                           inverse: Optional[bool] = False,
-                          nodes: Optional[bool] = False) -> Optional[namedtuple]:
+                          nodes: Optional[bool] = False):
         result = LinkMapper.get_linked_entities(entity_param, code, inverse=inverse, nodes=nodes)
         if len(result) > 1:  # pragma: no cover
             logger.log('error', 'model', 'multiple linked entities found for ' + code)
@@ -136,9 +135,8 @@ class LinkMapper:
             sql = """
                 SELECT domain_id AS result_id FROM model.link
                 WHERE range_id = %(entity_id)s AND property_code IN %(codes)s;"""
-        g.cursor.execute(sql, {
-            'entity_id': entity if type(entity) is int else entity.id,
-            'codes': tuple(codes if type(codes) is list else [codes])})
+        g.cursor.execute(sql, {'entity_id': entity if type(entity) is int else entity.id,
+                               'codes': tuple(codes if type(codes) is list else [codes])})
         debug_model['link sql'] += 1
         ids = [element for (element,) in g.cursor.fetchall()]
         return EntityMapper.get_by_ids(ids, nodes=nodes)
@@ -157,9 +155,8 @@ class LinkMapper:
             JOIN model.entity e ON l.{second}_id = e.id AND l.property_code IN %(codes)s
             WHERE l.{first}_id = %(entity_id)s GROUP BY l.id, e.name ORDER BY e.name;""".format(
             first='range' if inverse else 'domain', second='domain' if inverse else 'range')
-        g.cursor.execute(sql, {
-            'entity_id': entity if type(entity) is int else entity.id,
-            'codes': tuple(codes if type(codes) is list else [codes])})
+        g.cursor.execute(sql, {'entity_id': entity if type(entity) is int else entity.id,
+                               'codes': tuple(codes if type(codes) is list else [codes])})
         debug_model['link sql'] += 1
         entity_ids = set()
         result = g.cursor.fetchall()
@@ -173,7 +170,7 @@ class LinkMapper:
         return links
 
     @staticmethod
-    def delete_by_codes(entity, codes: iter) -> None:
+    def delete_by_codes(entity, codes) -> None:
         codes = codes if type(codes) is list else [codes]
         sql = 'DELETE FROM model.link WHERE property_code IN %(codes)s AND domain_id = %(id)s;'
         g.cursor.execute(sql, {'id': entity.id, 'codes': tuple(codes)})
@@ -195,7 +192,7 @@ class LinkMapper:
         return Link(g.cursor.fetchone())
 
     @staticmethod
-    def get_entities_by_node(node) -> iter:
+    def get_entities_by_node(node) -> Iterator:
         sql = "SELECT id, domain_id, range_id from model.link WHERE type_id = %(node_id)s;"
         g.cursor.execute(sql, {'node_id': node.id})
         debug_model['link sql'] += 1
@@ -210,7 +207,7 @@ class LinkMapper:
         debug_model['link sql'] += 1
 
     @staticmethod
-    def update(link_) -> None:
+    def update(link_: Link) -> None:
         sql = """
             UPDATE model.link SET (property_code, domain_id, range_id, description, type_id,
                 begin_from, begin_to, begin_comment, end_from, end_to, end_comment) =
@@ -310,7 +307,7 @@ class LinkMapper:
         from openatlas.models.entity import EntityMapper
         data = []
         for id_, node in g.nodes.items():
-            if not node.root and not node.multiple:
+            if not node.root and not node.multiple and not node.value_type:
                 node_ids = NodeMapper.get_all_sub_ids(node)
                 if node_ids:
                     sql = """

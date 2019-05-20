@@ -63,7 +63,7 @@ class DateForm(Form):
                 self.end_month_to.data = DateForm.format_date(item.end_to, 'month')
                 self.end_day_to.data = DateForm.format_date(item.end_to, 'day')
 
-    def validate(self, extra_validators: bool = None) -> bool:
+    def validate(self) -> bool:
         valid = Form.validate(self)
 
         # Check date format, if valid put dates into a list called "dates"

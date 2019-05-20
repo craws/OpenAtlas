@@ -32,7 +32,7 @@ class PasswordForm(Form):
     show_passwords = BooleanField(_('show passwords'))
     save = SubmitField(_('save'))
 
-    def validate(self, extra_validators=None):
+    def validate(self) -> bool:
         valid = Form.validate(self)
         hash_ = bcrypt.hashpw(
             self.password_old.data.encode('utf-8'),

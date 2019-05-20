@@ -10,7 +10,7 @@
                 <a href="{{ url_for('place_insert') }}">+ {{ _('place')|uc_first }}</a>
             </div>
         {% endif %}
-        {{ table|pager|safe }}
+        {{ table.display()|safe }}
     </div>
     {% if gis_data %}
         <div id="map" class="map"></div>

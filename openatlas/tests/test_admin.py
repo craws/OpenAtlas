@@ -1,3 +1,5 @@
+from typing import Union, Dict
+
 from flask import url_for
 
 from openatlas import app
@@ -99,7 +101,7 @@ class ContentTests(TestBaseCase):
                                       node_id=source_node.subs[0]), follow_redirects=True)
             assert b'Congratulations, everything looks fine!' in rv.data
 
-            data = {name: '' for name in SettingsMapper.fields}
+            data = {name: '' for name in SettingsMapper.fields}  # type: Dict[str, Union[str, int]]
             data['default_language'] = 'en'
             data['default_table_rows'] = '10'
             data['failed_login_forget_minutes'] = '10'

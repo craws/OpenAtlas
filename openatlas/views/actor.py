@@ -10,6 +10,7 @@ from openatlas import app, logger
 from openatlas.forms.forms import DateForm, TableField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
+from openatlas.util.table import Table
 from openatlas.util.util import (add_system_data, add_type_data, display_remove_link,
                                  format_entry_begin, format_entry_end, get_appearance,
                                  get_base_table_data, get_profile_image_table_link, is_authorized,
@@ -38,17 +39,12 @@ def actor_view(id_):
         info.append((uc_first(_('alias')), '<br />'.join(actor.aliases.values())))
     tables = {
         'info': info,
-        'file': {'id': 'files', 'data': [],
-                 'header': app.config['TABLE_HEADERS']['file'] + [_('main image')]},
-        'source': {'id': 'source', 'data': [], 'header': app.config['TABLE_HEADERS']['source']},
-        'reference': {'id': 'reference', 'data': [],
-                      'header': app.config['TABLE_HEADERS']['reference'] + ['page / link text']},
-        'event': {'id': 'event', 'data': [],
-                  'header': ['event', 'class', 'involvement', 'first', 'last', 'description']},
-        'relation': {'id': 'relation', 'data': [], 'sort': 'sortList:[[0,0]]',
-                     'header': ['relation', 'actor', 'first', 'last', 'description']},
-        'member_of': {'id': 'member_of', 'data': [],
-                      'header': ['member of', 'function', 'first', 'last', 'description']}}
+        'file': Table(Table.HEADERS['file'] + [_('main image')]),
+        'source': Table(Table.HEADERS['source']),
+        'reference': Table(Table.HEADERS['reference'] + ['page / link text']),
+        'event': Table(['event', 'class', 'involvement', 'first', 'last', 'description']),
+        'relation': Table(['relation', 'actor', 'first', 'last', 'description'], sort='[[0,0]]'),
+        'member_of': Table(['member of', 'function', 'first', 'last', 'description'])}
     profile_image_id = actor.get_profile_image_id()
     for link_ in actor.get_links('P67', True):
         domain = link_.domain
@@ -68,7 +64,7 @@ def actor_view(id_):
         if is_authorized('editor'):
             url = url_for('link_delete', id_=link_.id, origin_id=actor.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
-        tables[domain.view_name]['data'].append(data)
+        tables[domain.view_name].rows.append(data)
 
     # Todo: Performance - getting every place of every object for every event is very costly
     event_links = actor.get_links(['P11', 'P14', 'P22', 'P23'], True)
@@ -96,7 +92,7 @@ def actor_view(id_):
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-event'
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             data.append(display_remove_link(unlink_url, link_.domain.name))
-        tables['event']['data'].append(data)
+        tables['event'].rows.append(data)
 
     # Add info of dates and places
     begin_place = actor.get_linked_entity('OA8')
@@ -138,7 +134,7 @@ def actor_view(id_):
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-relation'
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             data.append(display_remove_link(unlink_url, related.name))
-        tables['relation']['data'].append(data)
+        tables['relation'].rows.append(data)
     for link_ in actor.get_links('P107', True):
         data = ([link(link_.domain), link_.type.name if link_.type else '',
                  link_.first, link_.last, truncate_string(link_.description)])
@@ -147,10 +143,9 @@ def actor_view(id_):
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-member-of'
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             data.append(display_remove_link(unlink_url, link_.domain.name))
-        tables['member_of']['data'].append(data)
+        tables['member_of'].rows.append(data)
     if actor.class_.code in app.config['CLASS_CODES']['group']:
-        tables['member'] = {'id': 'member', 'data': [],
-                            'header': ['member', 'function', 'first', 'last', 'description']}
+        tables['member'] = Table(['member', 'function', 'first', 'last', 'description'])
         for link_ in actor.get_links('P107'):
             data = ([link(link_.range), link_.type.name if link_.type else '',
                      link_.first, link_.last, truncate_string(link_.description)])
@@ -160,7 +155,7 @@ def actor_view(id_):
                                      origin_id=actor.id) + '#tab-member'
                 data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
                 data.append(display_remove_link(unlink_url, link_.range.name))
-            tables['member']['data'].append(data)
+            tables['member'].rows.append(data)
     gis_data = GisMapper.get_all(objects) if objects else None
     if gis_data and gis_data['gisPointSelected'] == '[]':
         gis_data = None
@@ -171,12 +166,11 @@ def actor_view(id_):
 @app.route('/actor')
 @required_group('readonly')
 def actor_index():
-    header = app.config['TABLE_HEADERS']['actor'] + ['description']
-    table = {'id': 'actor', 'header': header, 'data': []}
+    table = Table(Table.HEADERS['actor'] + ['description'])
     for actor in EntityMapper.get_by_codes('actor'):
         data = get_base_table_data(actor)
         data.append(truncate_string(actor.description))
-        table['data'].append(data)
+        table.rows.append(data)
     return render_template('actor/index.html', table=table)
 
 

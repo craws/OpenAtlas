@@ -5,5 +5,5 @@
 {% endblock %}
 {% block content %}
     {{ 'Content'|manual_link|safe }}
-    {{ table_content|pager|safe }}
+    {{ table.display()|safe }}
 {% endblock %}

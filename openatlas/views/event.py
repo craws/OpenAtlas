@@ -12,6 +12,7 @@ from openatlas import app, logger
 from openatlas.forms.forms import DateForm, TableField, TableMultiField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
+from openatlas.util.table import Table
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  get_profile_image_table_link, is_authorized, link, required_group,
                                  truncate_string, uc_first, was_modified)
@@ -29,7 +30,7 @@ class EventForm(DateForm):
     opened = HiddenField()
     given_place = TableMultiField(_('given place'))
 
-    def validate(self, extra_validators=None):
+    def validate(self) -> bool:
         """ Check if selected super event is allowed."""
         # Todo: also check if super is not a sub event of itself (recursively)
         valid = DateForm.validate(self)
@@ -43,12 +44,11 @@ class EventForm(DateForm):
 @app.route('/event')
 @required_group('readonly')
 def event_index():
-    header = app.config['TABLE_HEADERS']['event'] + ['description']
-    table = {'id': 'event', 'header': header, 'data': []}
+    table = Table(Table.HEADERS['event'] + ['description'])
     for event in EntityMapper.get_by_codes('event'):
         data = get_base_table_data(event)
         data.append(truncate_string(event.description))
-        table['data'].append(data)
+        table.rows.append(data)
     return render_template('event/index.html', table=table)
 
 
@@ -107,14 +107,11 @@ def event_view(id_):
     event = EntityMapper.get_by_id(id_, nodes=True)
     tables = {
         'info': get_entity_data(event),
-        'file': {'id': 'files', 'data': [],
-                 'header': app.config['TABLE_HEADERS']['file'] + [_('main image')]},
-        'subs': {'id': 'sub-event', 'data': [], 'header': app.config['TABLE_HEADERS']['event']},
-        'source': {'id': 'source', 'data': [], 'header': app.config['TABLE_HEADERS']['source']},
-        'actor': {'id': 'actor', 'data': [],
-                  'header': ['actor', 'class', 'involvement', 'first', 'last', 'description']},
-        'reference': {'id': 'reference', 'data': [],
-                      'header': app.config['TABLE_HEADERS']['reference'] + ['page / link text']}}
+        'file': Table(Table.HEADERS['file'] + [_('main image')]),
+        'subs': Table(Table.HEADERS['event']),
+        'source': Table(Table.HEADERS['source']),
+        'actor': Table(['actor', 'class', 'involvement', 'first', 'last', 'description']),
+        'reference': Table(Table.HEADERS['reference'] + ['page / link text'])}
     for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
         first = link_.first
         if not link_.first and event.first:
@@ -132,7 +129,7 @@ def event_view(id_):
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=event.id) + '#tab-actor'
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             data.append(display_remove_link(unlink_url, link_.range.name))
-        tables['actor']['data'].append(data)
+        tables['actor'].rows.append(data)
     profile_image_id = event.get_profile_image_id()
     for link_ in event.get_links('P67', True):
         domain = link_.domain
@@ -152,9 +149,9 @@ def event_view(id_):
         if is_authorized('editor'):
             url = url_for('link_delete', id_=link_.id, origin_id=event.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
-        tables[domain.view_name]['data'].append(data)
+        tables[domain.view_name].rows.append(data)
     for sub_event in event.get_linked_entities('P117', inverse=True, nodes=True):
-        tables['subs']['data'].append(get_base_table_data(sub_event))
+        tables['subs'].rows.append(get_base_table_data(sub_event))
     return render_template('event/view.html', event=event, tables=tables,
                            profile_image_id=profile_image_id)
 

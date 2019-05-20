@@ -13,16 +13,17 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.models.entity import EntityMapper
 from openatlas.models.imports import ImportMapper, Project
+from openatlas.util.table import Table
 from openatlas.util.util import format_date, link, required_group, truncate_string
 
 
 class ProjectForm(Form):
-    project_id = None
+    project_id = None  # type: int
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
 
-    def validate(self, extra_validators=None):
+    def validate(self) -> bool:
         valid = Form.validate(self)
         project = ImportMapper.get_project_by_id(self.project_id) if self.project_id else Project()
         if project.name != self.name.data and ImportMapper.get_project_by_name(self.name.data):
@@ -34,12 +35,11 @@ class ProjectForm(Form):
 @app.route('/import/index')
 @required_group('editor')
 def import_index():
-    table = {'id': 'project', 'header': [_('project'), _('entities'), _('description')], 'data': []}
+    table = Table([_('project'), _('entities'), _('description')])
     for project in ImportMapper.get_all_projects():
-        table['data'].append([
-            link(project),
-            format_number(project.count),
-            truncate_string(project.description)])
+        table.rows.append([link(project),
+                           format_number(project.count),
+                           truncate_string(project.description)])
     return render_template('import/index.html', table=table)
 
 
@@ -57,15 +57,13 @@ def import_project_insert():
 @app.route('/import/project/view/<int:id_>')
 @required_group('editor')
 def import_project_view(id_):
-    table = {'id': 'entities', 'data': [],
-             'header': [_('name'), _('class'), _('description'), 'origin ID', _('date')]}
+    table = Table([_('name'), _('class'), _('description'), 'origin ID', _('date')])
     for entity in EntityMapper.get_by_project_id(id_):
-        table['data'].append([
-            link(entity),
-            entity.class_.name,
-            truncate_string(entity.description),
-            entity.origin_id,
-            format_date(entity.created)])
+        table.rows.append([link(entity),
+                           entity.class_.name,
+                           truncate_string(entity.description),
+                           entity.origin_id,
+                           format_date(entity.created)])
     project = ImportMapper.get_project_by_id(id_)
     return render_template('import/project_view.html', project=project, table=table)
 
@@ -99,7 +97,7 @@ class ImportForm(Form):
     duplicate = BooleanField(_('check for duplicates'), default=True)
     save = SubmitField(_('import'))
 
-    def validate(self, extra_validators=None):
+    def validate(self) -> bool:
         valid = Form.validate(self)
         file_ = request.files['file']
         extensions = app.config['IMPORT_FILE_EXTENSIONS']
@@ -163,7 +161,7 @@ def import_data(project_id, class_code):
                         origin_ids.append(str(row['id']))
                 table_data.append(table_row)
                 checked_data.append(checked_row)
-            table = {'id': 'import', 'header': headers, 'data': table_data}
+            table = Table(headers, rows=table_data)
 
             # Checking for data inconsistency
             if missing_name_count:  # pragma: no cover

@@ -8,18 +8,18 @@
 <div id="tabs" class="tabs-container">
     <ul>
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
-        <li><a href="#tab-source">{{ _('source')|uc_first }} ({{ tables['source']['data']|length|format_number }})</a></li>
-        <li><a href="#tab-event">{{ _('event')|uc_first }} ({{ tables['event']['data']|length|format_number }})</a></li>
-        <li><a href="#tab-relation">{{ _('relation')|uc_first }} ({{ tables['relation']['data']|length|format_number }})</a></li>
-        <li><a href="#tab-member-of">{{ _('member of')|uc_first }} ({{ tables['member_of']['data']|length|format_number }})</a></li>
+        <li><a href="#tab-source">{{ _('source')|uc_first }} ({{ tables['source'].rows|length|format_number }})</a></li>
+        <li><a href="#tab-event">{{ _('event')|uc_first }} ({{ tables['event'].rows|length|format_number }})</a></li>
+        <li><a href="#tab-relation">{{ _('relation')|uc_first }} ({{ tables['relation'].rows|length|format_number }})</a></li>
+        <li><a href="#tab-member-of">{{ _('member of')|uc_first }} ({{ tables['member_of'].rows|length|format_number }})</a></li>
         {% if tables['member'] %}
-            <li><a href="#tab-member">{{ _('member')|uc_first }} ({{ tables['member']['data']|length|format_number }})</a></li>
+            <li><a href="#tab-member">{{ _('member')|uc_first }} ({{ tables['member'].rows|length|format_number }})</a></li>
         {% endif %}
-        <li><a href="#tab-reference">{{ _('reference')|uc_first }} ({{ tables['reference']['data']|length|format_number }})</a></li>
+        <li><a href="#tab-reference">{{ _('reference')|uc_first }} ({{ tables['reference'].rows|length|format_number }})</a></li>
         {% if gis_data %}
             <li><a href="#tab-map" id="map-tab-id">{{ _('map')|uc_first }}</a></li>
         {% endif %}
-        <li><a href="#tab-file">{{ _('files')|uc_first }}  ({{ tables['file']['data']|length|format_number }})</a></li>
+        <li><a href="#tab-file">{{ _('files')|uc_first }}  ({{ tables['file'].rows|length|format_number }})</a></li>
     </ul>
     <div id="tab-info">
         <div class="button-bar">
@@ -47,7 +47,7 @@
                 <a href="{{ url_for('source_insert', origin_id=actor.id) }}">+ {{ _('source')|uc_first }}</a>
             </div>
         {% endif %}
-        {{ tables['source']|pager|safe }}
+        {{ tables['source'].display('source')|safe }}
     </div>
     <div id="tab-event">
         {% if 'editor'|is_authorized %}
@@ -58,7 +58,7 @@
                 {% endfor %}
             </div>
         {% endif %}
-        {{ tables['event']|pager|safe }}
+        {{ tables['event'].display('event')|safe }}
     </div>
     <div id="tab-relation">
         {% if 'editor'|is_authorized %}
@@ -69,7 +69,7 @@
                 {% endfor %}
             </div>
         {% endif %}
-        {{ tables['relation']|pager|safe }}
+        {{ tables['relation'].display('relation')|safe }}
     </div>
     <div id="tab-member-of">
         {% if 'editor'|is_authorized %}
@@ -77,7 +77,7 @@
                 <a href="{{ url_for('membership_insert', origin_id=actor.id)}}">{{ _('add')|uc_first }}</a>
             </div>
         {% endif %}
-        {{ tables['member_of']|pager|safe }}
+        {{ tables['member_of'].display('member_of')|safe }}
     </div>
     {% if tables['member'] %}
         <div id="tab-member">
@@ -86,7 +86,7 @@
                     <a href="{{ url_for('member_insert', origin_id=actor.id)}}">{{ _('add')|uc_first }}</a>
                 </div>
             {% endif %}
-            {{ tables['member']|pager|safe }}
+            {{ tables['member'].display('member')|safe }}
         </div>
     {% endif %}
     <div id="tab-reference">
@@ -98,7 +98,7 @@
                 <a href="{{ url_for('reference_insert', code='external_reference', origin_id=actor.id) }}">+ {{ _('external reference')|uc_first }}</a>
             </div>
         {% endif %}
-        {{ tables['reference']|pager|safe }}
+        {{ tables['reference'].display('reference')|safe }}
     </div>
     <div id="tab-file">
         {% if 'editor'|is_authorized %}
@@ -107,7 +107,7 @@
                 <a href="{{ url_for('file_insert', origin_id=actor.id) }}">+ {{ _('file')|uc_first }}</a>
             </div>
         {% endif %}
-        {{ tables['file']|pager|safe }}
+        {{ tables['file'].display('file')|safe }}
     </div>
     {% if gis_data %}
         <div id="tab-map">
