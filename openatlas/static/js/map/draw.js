@@ -273,41 +273,59 @@ function saveEditedGeometry(shapeType) {
         $('#gis_points').val(JSON.stringify(points));
         editedLayer = L.marker(editLayer.getLatLng(), {icon: editedIcon}).addTo(map);
         editedLayer.bindPopup(buildPopup(JSON.parse(point), 'edited'));
-    } else if (feature.properties.shapeType == 'polyline' && geoJsonArray.length > 0) {
+    } else if (feature.properties.shapeType == 'polyline') {
         // Remove former polyline
-        polygons = JSON.parse($('#gis_lines').val());
-        $.each(polygons, function (key, value) {
+        lines = JSON.parse($('#gis_lines').val());
+        $.each(lines, function (key, value) {
             if (value.properties.id == feature.properties.id) {
-                polygons.splice(key, 1);
+                removed = lines.splice(key, 1)[0];
                 return false;
             }
         });
-        coordinates = '[' + geoJsonArray.join(',') + ']'
         // Insert new polyline
-        polygon =
-            `{"type": "Feature", "geometry":` +
-            `{"type": "LineString", "coordinates": ` + coordinates + `},` +
-            `"properties":{"name": "` + name + `", "description": "` + description + `", "shapeType": "` + shapeType + `"}}`;
-        polygons.push(JSON.parse(polygon));
-        $('#gis_lines').val(JSON.stringify(polygons));
+        // if geometry edited
+        if(geoJsonArray.length > 0) {
+            coordinates = '[' + geoJsonArray.join(',') + ']'
+            line =
+                `{"type": "Feature", "geometry":` +
+                `{"type": "LineString", "coordinates": ` + coordinates + `},` +
+                `"properties":{"name": "` + name + `", "description": "` + description + `", "shapeType": "` + shapeType + `"}}`;
+            lines.push(JSON.parse(line));
+        }
+        // if geometry unchanged just change labels
+        else if(geoJsonArray.length === 0) {
+            removed.properties.name = name;
+            removed.properties.description = description;
+            lines.push(removed);
+        }
+        $('#gis_lines').val(JSON.stringify(lines));
         editedLayer = L.polyline(editLayer.getLatLngs()).addTo(map);
         editedLayer.setStyle({fillColor: '#686868', color: '#686868'});
-    } else if (geoJsonArray.length > 0) {
+    } else if (feature.properties.shapeType == 'area' || feature.properties.shapeType == 'shape') {
         // Remove former polygon
         polygons = JSON.parse($('#gis_polygons').val());
         $.each(polygons, function (key, value) {
             if (value.properties.id == feature.properties.id) {
-                polygons.splice(key, 1);
+                removed = polygons.splice(key, 1)[0];
                 return false;
             }
         });
-        coordinates = '[[' + geoJsonArray.join(',') + ']]'
         // Insert new polygon
-        polygon =
-            `{"type": "Feature", "geometry":` +
-            `{"type": "Polygon", "coordinates": ` + coordinates + `},` +
-            `"properties":{"name": "` + name + `", "description": "` + description + `", "shapeType": "` + shapeType + `"}}`;
-        polygons.push(JSON.parse(polygon));
+        // if geometry edited
+        if(geoJsonArray.length > 0) {
+            coordinates = '[[' + geoJsonArray.join(',') + ']]'
+            polygon =
+                `{"type": "Feature", "geometry":` +
+                `{"type": "Polygon", "coordinates": ` + coordinates + `},` +
+                `"properties":{"name": "` + name + `", "description": "` + description + `", "shapeType": "` + shapeType + `"}}`;
+            polygons.push(JSON.parse(polygon));
+        }
+        // if geometry unchanged just change labels
+        else if(geoJsonArray.length === 0) {
+            removed.properties.name = name;
+            removed.properties.description = description;
+            polygons.push(removed);
+        }
         $('#gis_polygons').val(JSON.stringify(polygons));
         editedLayer = L.polygon(editLayer.getLatLngs()).addTo(map);
         editedLayer.setStyle({fillColor: '#686868', color: '#686868'});
