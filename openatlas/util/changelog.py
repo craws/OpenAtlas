@@ -7,6 +7,9 @@ class Changelog:
     versions['3.18.0'] = ['TBA', OrderedDict([
         ('feature', OrderedDict([])),
         ('fix', OrderedDict([]))])]
+    versions['3.17.1'] = ['2019-05-21', OrderedDict([
+        ('fix', OrderedDict([
+            ('1033', 'Map editing breaks upon save w/o edit')]))])]
     versions['3.17.0'] = ['2019-05-13', OrderedDict([
         ('feature', OrderedDict([
             ('597', 'Option to display aliases in tables'),
