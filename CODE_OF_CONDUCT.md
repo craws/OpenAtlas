@@ -8,4 +8,4 @@ We would like develop in a positive environment so please try to:
 
 We'll hope that this small guideline in combination with common sense will suffice.
 
-If you have questions feel free to contact us at: <info@openatlas.eu>
+If you have questions feel free to contact us at <info@openatlas.eu>
