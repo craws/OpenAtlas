@@ -1,6 +1,6 @@
 # Contributor Code of Conduct
 
-We would like develop in a positive environment so please try to:
+We would like to develop in a positive environment so please try to:
 
 * be nice and respectful
 * give constructive criticism and take it gracefully if given
