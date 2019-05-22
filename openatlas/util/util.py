@@ -9,6 +9,7 @@ from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
 from html.parser import HTMLParser
+from typing import Optional
 
 import numpy
 from babel import dates
@@ -335,7 +336,7 @@ def required_group(group):
     return wrapper
 
 
-def bookmark_toggle(entity_id, for_table=False):
+def bookmark_toggle(entity_id: int, for_table: Optional[bool] = False) -> str:
     label = uc_first(_('bookmark'))
     html = """
         <script>
@@ -359,9 +360,7 @@ def bookmark_toggle(entity_id, for_table=False):
     return html
 
 
-def is_authorized(group):
-    if not current_user.is_authenticated or not hasattr(current_user, 'group'):
-        return False
+def is_authorized(group: str) -> bool:
     if current_user.group == 'admin' or (
             current_user.group == 'manager' and group in ['manager', 'editor', 'readonly']) or (
             current_user.group == 'editor' and group in ['editor', 'readonly']) or (
@@ -370,7 +369,7 @@ def is_authorized(group):
     return False
 
 
-def uc_first(string):
+def uc_first(string: str) -> str:
     return str(string)[0].upper() + str(string)[1:] if string else ''
 
 
@@ -396,7 +395,7 @@ def get_profile_image_table_link(file, entity, extension, profile_image_id):
     return ''  # pragma: no cover - only happens for non image files
 
 
-def link(entity):
+def link(entity) -> str:
     # Builds an html link to entity view for display
     from openatlas.models.entity import Entity
     if not entity:
