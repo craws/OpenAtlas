@@ -1,5 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
+from typing import Dict
 
 from flask import flash, g, session
 from flask_babel import lazy_gettext as _
@@ -10,8 +11,8 @@ from openatlas import app, debug_model, logger
 class ContentMapper:
 
     @staticmethod
-    def get_content():
-        content = OrderedDict()
+    def get_content() -> Dict:
+        content = OrderedDict()  # type: Dict
         for name in ['intro', 'legal_notice', 'contact']:
             content[name] = OrderedDict()
             for language in app.config['LANGUAGES'].keys():
@@ -23,16 +24,14 @@ class ContentMapper:
         return content
 
     @staticmethod
-    def get_translation(name):
+    def get_translation(name: str) -> str:
         translations = ContentMapper.get_content()[name]
         if translations[session['language']]:  # pragma: no cover
-            content = translations[session['language']]
-        else:
-            content = translations[session['settings']['default_language']]
-        return content
+            return translations[session['language']]
+        return translations[session['settings']['default_language']]
 
     @staticmethod
-    def update_content(name, form):
+    def update_content(name: str, form) -> None:
         g.cursor.execute('BEGIN')
         try:
             for language in app.config['LANGUAGES'].keys():

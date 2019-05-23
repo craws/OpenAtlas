@@ -1,7 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import os
 import re
-from typing import Iterator
+from typing import Iterator, Optional, Dict
 
 import flask
 import jinja2
@@ -92,7 +92,7 @@ def display_move_form(form, root_name: str) -> str:
 
 
 @blueprint.app_template_filter()
-def table_select_model(name, selected=None):
+def table_select_model(name: str, selected=None) -> str:
     if name in ['domain', 'range']:
         entities = g.classes
         headers = '{0:{sorter:"class_code" }}'
@@ -121,12 +121,12 @@ def table_select_model(name, selected=None):
 
 
 @blueprint.app_template_filter()
-def get_class_name(code):
+def get_class_name(code: str) -> str:
     return g.classes[code].name
 
 
 @blueprint.app_template_filter()
-def description(entity):
+def description(entity) -> str:
     if not entity.description:
         return ''
     text = entity.description.replace('\r\n', '<br />')
@@ -139,7 +139,7 @@ def description(entity):
 
 
 @blueprint.app_template_filter()
-def display_profile_image(image_id):
+def display_profile_image(image_id: int) -> str:
     if not image_id:
         return ''
     src = url_for('display_file', filename=os.path.basename(get_file_path(image_id)))
@@ -154,7 +154,7 @@ def display_profile_image(image_id):
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_content_translation(self, text):
+def display_content_translation(self, text: str) -> str:
     return ContentMapper.get_translation(text)
 
 
@@ -174,7 +174,7 @@ def manual_link(wiki_site):
 
 
 @blueprint.app_template_filter()
-def display_logo(file_id):
+def display_logo(file_id: str) -> str:
     src = '/static/images/layout/logo.png'
     if file_id:
         extension = print_file_extension(int(file_id))
@@ -184,7 +184,7 @@ def display_logo(file_id):
 
 
 @blueprint.app_template_filter()
-def display_form(form, form_id=None, for_persons=False):
+def display_form(form, form_id: Optional[str] = None, for_persons: Optional[bool] = False) -> str:
     multipart = 'enctype="multipart/form-data"' if hasattr(form, 'file') else ''
     if 'update' in request.path:
         if hasattr(form, 'save') and hasattr(form.save, 'label'):
@@ -312,24 +312,23 @@ def display_form(form, form_id=None, for_persons=False):
 
 
 @blueprint.app_template_filter()
-def test_file(file_name):
+def test_file(file_name: str) -> Optional[str]:
     if os.path.isfile(app.root_path + '/' + file_name):
         return file_name
-    return False
 
 
 @blueprint.app_template_filter()
-def sanitize(string):
+def sanitize(string: str) -> str:
     return util.sanitize(string)
 
 
 @blueprint.app_template_filter()
-def truncate_string(string):
+def truncate_string(string: str) -> str:
     return util.truncate_string(string)
 
 
 @blueprint.app_template_filter()
-def display_delete_link(entity):
+def display_delete_link(entity) -> str:
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
     confirm = 'onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
@@ -338,7 +337,7 @@ def display_delete_link(entity):
 
 
 @blueprint.app_template_filter()
-def display_menu(origin):
+def display_menu(origin) -> str:
     """ Returns html with the menu and mark appropriate item as selected."""
     html = ''
     if current_user.is_authenticated:
@@ -356,7 +355,7 @@ def display_menu(origin):
 
 
 @blueprint.app_template_filter()
-def display_debug_info(debug_model, form):
+def display_debug_info(debug_model: Dict, form) -> str:
     """ Returns html with debug information about database queries and form errors."""
     html = ''
     for name, value in debug_model.items():
@@ -378,7 +377,7 @@ def display_debug_info(debug_model, form):
 
 
 @blueprint.app_template_filter()
-def display_external_references(entity):
+def display_external_references(entity) -> str:
     """ Formats external references for display."""
     html = ''
     for link_ in entity.external_references:
