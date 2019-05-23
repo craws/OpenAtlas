@@ -118,7 +118,7 @@ def place_view(id_):
                 profile_image_id = domain.id
         if domain.view_name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
-            if domain.system_type == 'external reference':
+            if domain.system_type.startswith('external reference'):
                 object_.external_references.append(link_)
             if is_authorized('editor'):
                 url = url_for('reference_link_update', link_id=link_.id, origin_id=object_.id)
@@ -227,7 +227,7 @@ def place_update(id_):
                            place=place, feature=feature, stratigraphic_unit=stratigraphic_unit)
 
 
-def save(form, object_=None, location=None, origin=None):
+def save(form: DateForm, object_=None, location=None, origin=None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
     try:
@@ -256,6 +256,13 @@ def save(form, object_=None, location=None, origin=None):
         location.name = 'Location of ' + form.name.data
         location.update()
         location.save_nodes(form)
+        if hasattr(form, 'geonames') and form.geonames_id.data:
+            id_ = EntityMapper.insert('E31', form.geonames_id.data, 'external reference geonames')
+            object_.link('P67', id_, inverse=True)
+            pass
+        else:
+            # remove possible geoname link
+            pass
         url = url_for('place_view', id_=object_.id)
         if origin:
             url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-place'

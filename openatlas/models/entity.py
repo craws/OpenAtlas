@@ -72,8 +72,9 @@ class Entity:
                             nodes: Optional[bool] = False):
         return LinkMapper.get_linked_entities(self, code, inverse=inverse, nodes=nodes)
 
-    def link(self, code, range_, description: Optional[str] = None,
-             inverse: Optional[bool] = False):
+    def link(self, code: str, range_,
+             description: Optional[str] = None,
+             inverse: Optional[bool] = False) -> Union[int, None]:
         return LinkMapper.insert(self, code, range_, description, inverse)
 
     def get_links(self, code, inverse: Optional[bool] = False):
@@ -143,6 +144,8 @@ class Entity:
         root_name = self.view_name.title()
         if self.view_name == 'reference':
             root_name = self.system_type.title()
+            if root_name == 'External Reference Geonames':
+                root_name = 'External Reference'
         elif self.view_name == 'file':
             root_name = 'License'
         elif self.view_name == 'place':
@@ -249,7 +252,7 @@ class EntityMapper:
             INSERT INTO model.entity (name, system_type, class_code, description)
             VALUES (%(name)s, %(system_type)s, %(code)s, %(description)s)
             RETURNING id;"""
-        params = {'name': name.strip(), 'code': code,
+        params = {'name': str(name).strip(), 'code': code,
                   'system_type': system_type.strip() if system_type else None,
                   'description': description.strip() if description else None}
         g.cursor.execute(sql, params)

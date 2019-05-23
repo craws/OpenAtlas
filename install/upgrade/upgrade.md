@@ -10,6 +10,10 @@ After following the instructions restart Apache and test if the application is w
 
     service apache2 restart
 
+### 3.17.x to 3.18.0
+
+Execute install/upgrade/3.18.0.sql after making backups
+
 ### 3.16.0 to 3.17.0
 
 Execute install/upgrade/3.17.0.sql after making backups

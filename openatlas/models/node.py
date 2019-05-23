@@ -1,7 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
 from collections import OrderedDict
-from typing import Optional
+from typing import Optional, Dict
 
 from flask import g
 
@@ -52,7 +52,7 @@ class NodeMapper(EntityMapper):
         return nodes
 
     @staticmethod
-    def populate_subs(nodes):
+    def populate_subs(nodes: Dict) -> None:
         g.cursor.execute("SELECT id, name, extendable FROM web.form ORDER BY name ASC;")
         debug_model['div sql'] += 1
         forms = {}

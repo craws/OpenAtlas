@@ -1,6 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
-from typing import Iterator, Optional, Dict
+from typing import Iterator, Optional, Dict, Union
 
 from flask import abort, flash, g, url_for
 from flask_babel import lazy_gettext as _
@@ -70,11 +70,11 @@ class LinkMapper:
                property_code: str,
                linked_entities,
                description: Optional[str] = None,
-               inverse: Optional[bool] = False):
+               inverse: Optional[bool] = False) -> Union[int, None]:
         from openatlas.models.entity import Entity, EntityMapper
         # linked_entities can be an entity, an entity id or a list of them
         if not entity or not linked_entities:  # pragma: no cover
-            return
+            return None
         property_ = g.properties[property_code]
         try:
             linked_entities = ast.literal_eval(linked_entities)
