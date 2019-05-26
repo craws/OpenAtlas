@@ -24,26 +24,31 @@ blueprint = flask.Blueprint('filters', __name__)
 paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 
 
+@jinja2.contextfilter
 @blueprint.app_template_filter()
-def link(entity: Entity) -> str:
+def link(self, entity: Entity) -> str:
     return util.link(entity)
 
 
+@jinja2.contextfilter
 @blueprint.app_template_filter()
-def format_number(number: int) -> str:
+def format_number(self, number: int) -> str:
     return babel_format_number(number)
 
 
+@jinja2.contextfilter
 @blueprint.app_template_filter()
-def is_authorized(group: str) -> bool:
+def is_authorized(self, group: str) -> bool:
     return util.is_authorized(group)
 
 
+@jinja2.contextfilter
 @blueprint.app_template_filter()
-def uc_first(string: str) -> str:
+def uc_first(self, string: str) -> str:
     return util.uc_first(string)
 
 
+@jinja2.contextfilter
 @evalcontextfilter
 @blueprint.app_template_filter()
 def nl2br(self, value: str) -> str:
@@ -52,8 +57,9 @@ def nl2br(self, value: str) -> str:
     return result
 
 
+@jinja2.contextfilter
 @blueprint.app_template_filter()
-def data_table(data: Iterator) -> str:
+def data_table(self, data: Iterator) -> str:
     html = '<div class="data-table">'
     for key, value in data:
         if value or value == 0:
@@ -68,13 +74,15 @@ def data_table(data: Iterator) -> str:
     return html
 
 
+@jinja2.contextfilter
 @blueprint.app_template_filter()
-def bookmark_toggle(entity_id: int) -> str:
+def bookmark_toggle(self, entity_id: int) -> str:
     return util.bookmark_toggle(entity_id)
 
 
+@jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_move_form(form, root_name: str) -> str:
+def display_move_form(self, form, root_name: str) -> str:
     html = ''
     for field in form:
         if type(field) is TreeField:
@@ -91,8 +99,9 @@ def display_move_form(form, root_name: str) -> str:
     return html + table.display('move', remove_rows=False)
 
 
+@jinja2.contextfilter
 @blueprint.app_template_filter()
-def table_select_model(name: str, selected=None) -> str:
+def table_select_model(self, name: str, selected=None) -> str:
     if name in ['domain', 'range']:
         entities = g.classes
         headers = '{0:{sorter:"class_code" }}'
@@ -120,13 +129,15 @@ def table_select_model(name: str, selected=None) -> str:
     return html
 
 
+@jinja2.contextfilter
 @blueprint.app_template_filter()
-def get_class_name(code: str) -> str:
+def get_class_name(self, code: str) -> str:
     return g.classes[code].name
 
 
+@jinja2.contextfilter
 @blueprint.app_template_filter()
-def description(entity) -> str:
+def description(self, entity) -> str:
     if not entity.description:
         return ''
     text = entity.description.replace('\r\n', '<br />')
@@ -138,8 +149,9 @@ def description(entity) -> str:
     return html
 
 
+@jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_profile_image(image_id: int) -> str:
+def display_profile_image(self, image_id: int) -> str:
     if not image_id:
         return ''
     src = url_for('display_file', filename=os.path.basename(get_file_path(image_id)))
@@ -158,8 +170,9 @@ def display_content_translation(self, text: str) -> str:
     return ContentMapper.get_translation(text)
 
 
+@jinja2.contextfilter
 @blueprint.app_template_filter()
-def manual_link(wiki_site):
+def manual_link(self, wiki_site):
     # Creates a link to a manual page
     html = """
         <p class="manual">
@@ -173,8 +186,9 @@ def manual_link(wiki_site):
     return html
 
 
+@jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_logo(file_id: str) -> str:
+def display_logo(self, file_id: str) -> str:
     src = '/static/images/layout/logo.png'
     if file_id:
         extension = print_file_extension(int(file_id))
@@ -183,8 +197,9 @@ def display_logo(file_id: str) -> str:
     return '<img src="{src}" alt="Logo" />'.format(src=src)
 
 
+@jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_form(form, form_id: Optional[str] = None, for_persons: Optional[bool] = False) -> str:
+def display_form(self, form, form_id: Optional[str] = None, for_persons: Optional[bool] = False) -> str:
     multipart = 'enctype="multipart/form-data"' if hasattr(form, 'file') else ''
     if 'update' in request.path:
         if hasattr(form, 'save') and hasattr(form.save, 'label'):
@@ -311,24 +326,28 @@ def display_form(form, form_id: Optional[str] = None, for_persons: Optional[bool
     return html_all
 
 
+@jinja2.contextfilter
 @blueprint.app_template_filter()
-def test_file(file_name: str) -> Optional[str]:
+def test_file(self, file_name: str) -> Optional[str]:
     if os.path.isfile(app.root_path + '/' + file_name):
         return file_name
 
 
+@jinja2.contextfilter
 @blueprint.app_template_filter()
-def sanitize(string: str) -> str:
+def sanitize(self, string: str) -> str:
     return util.sanitize(string)
 
 
+@jinja2.contextfilter
 @blueprint.app_template_filter()
-def truncate_string(string: str) -> str:
+def truncate_string(self, string: str) -> str:
     return util.truncate_string(string)
 
 
+@jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_delete_link(entity) -> str:
+def display_delete_link(self, entity) -> str:
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
     confirm = 'onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
@@ -336,8 +355,9 @@ def display_delete_link(entity) -> str:
     return '<a ' + confirm + ' href="' + url + '">' + util.uc_first(_('delete')) + '</a>'
 
 
+@jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_menu(origin) -> str:
+def display_menu(self, origin) -> str:
     """ Returns html with the menu and mark appropriate item as selected."""
     html = ''
     if current_user.is_authenticated:
@@ -354,8 +374,9 @@ def display_menu(origin) -> str:
     return html
 
 
+@jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_debug_info(debug_model: Dict, form) -> str:
+def display_debug_info(self, debug_model: Dict, form) -> str:
     """ Returns html with debug information about database queries and form errors."""
     html = ''
     for name, value in debug_model.items():
@@ -376,8 +397,9 @@ def display_debug_info(debug_model: Dict, form) -> str:
     return html
 
 
+@jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_external_references(entity) -> str:
+def display_external_references(self, entity) -> str:
     """ Formats external references for display."""
     html = ''
     for link_ in entity.external_references:
