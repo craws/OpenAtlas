@@ -170,7 +170,7 @@ class EntityMapper:
         LEFT JOIN model.link l1 on e.id = l1.domain_id AND l1.range_id NOT IN
             (SELECT id FROM model.entity WHERE class_code = 'E55')
         LEFT JOIN model.link l2 on e.id = l2.range_id
-        WHERE l1.domain_id IS NULL AND l2.range_id IS NULL AND e.class_code != 'E55';"""
+        WHERE l1.domain_id IS NULL AND l2.range_id IS NULL AND e.class_code != 'E55'"""
 
     @staticmethod
     def build_sql(nodes=False, aliases=False):
