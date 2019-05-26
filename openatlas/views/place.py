@@ -211,6 +211,10 @@ def place_update(id_):
             form.alias.append_entry(alias)
         form.alias.append_entry('')
     gis_data = GisMapper.get_all(object_)
+    if hasattr(form, 'geonames_id'):
+        geonames_entity = get_geonames_entity(object_)
+        print(geonames_entity)
+        form.geonames_id.data = geonames_entity.name if geonames_entity else ''
     place = None
     feature = None
     stratigraphic_unit = None
@@ -256,13 +260,24 @@ def save(form: DateForm, object_=None, location=None, origin=None) -> str:
         location.name = 'Location of ' + form.name.data
         location.update()
         location.save_nodes(form)
-        if hasattr(form, 'geonames') and form.geonames_id.data:
-            id_ = EntityMapper.insert('E31', form.geonames_id.data, 'external reference geonames')
-            object_.link('P67', id_, inverse=True)
-            pass
-        else:
-            # remove possible geoname link
-            pass
+        if hasattr(form, 'geonames_id'):
+            geonames_entity = get_geonames_entity(object_)
+            if not form.geonames_id.data and not geonames_entity:
+                pass
+            elif not form.geonames_id.data and geonames_entity:
+                geonames_entity.delete()
+            elif form.geonames_id.data and not geonames_entity:
+                id_ = EntityMapper.insert('E31', form.geonames_id.data,
+                                          'external reference geonames')
+                object_.link('P67', id_, inverse=True)
+            else:
+                if form.geonames_id.data == geonames_entity:
+                    pass
+                else:
+                    geonames_entity.delete()
+                    id_ = EntityMapper.insert('E31', form.geonames_id.data,
+                                              'external reference geonames')
+                    object_.link('P67', id_, inverse=True)
         url = url_for('place_view', id_=object_.id)
         if origin:
             url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-place'
@@ -293,3 +308,10 @@ def save(form: DateForm, object_=None, location=None, origin=None) -> str:
         url = url_for('place_index') if log_action == 'insert' else url_for('place_view',
                                                                             id_=object_.id)
     return url
+
+
+def get_geonames_entity(object_):
+    for entity in object_.get_linked_entities('P67', inverse=True):
+        if entity.system_type == 'external reference geonames':
+            return entity
+    return
