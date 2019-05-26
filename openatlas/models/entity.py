@@ -1,6 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
-from typing import Iterator, Set, Union, Optional, Dict
+from typing import Iterator, Set, Union, Optional, Dict, List
 
 from flask import g
 from flask_login import current_user
@@ -269,7 +269,7 @@ class EntityMapper:
         return Entity(g.cursor.fetchone())
 
     @staticmethod
-    def get_by_ids(entity_ids: Union[Iterator, Set], nodes=False) -> list:
+    def get_by_ids(entity_ids: Union[Iterator, Set, List], nodes=False) -> list:
         if not entity_ids:
             return []
         sql = EntityMapper.build_sql(nodes) + ' WHERE e.id IN %(ids)s GROUP BY e.id;'
