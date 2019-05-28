@@ -29,18 +29,22 @@ SESSION_COOKIE_SECURE = False  # Should be set to True in production.py if using
 REMEMBER_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
-# JavaScript credentials
+# Map
 GEONAMES_USERNAME = 'openatlas'
+GEONAMES_VIEW_URL = 'http://www.geonames.org/'
 THUNDERFOREST_KEY = '7878b4fb224f4902ab42fc846e92b96a'
 
+# Table rows options
 DEFAULT_TABLE_ROWS = OrderedDict()  # type: OrderedDict
 DEFAULT_TABLE_ROWS[10] = '10'
 DEFAULT_TABLE_ROWS[20] = '20'
 DEFAULT_TABLE_ROWS[50] = '50'
 DEFAULT_TABLE_ROWS[100] = '100'
 
+# Minimum required characters for table filters
 MIN_CHARS_JSTREE_SEARCH = 1
 
+# Log levels
 LOG_LEVELS = OrderedDict()  # type: OrderedDict
 LOG_LEVELS[0] = 'emergency'
 LOG_LEVELS[1] = 'alert'
@@ -51,11 +55,13 @@ LOG_LEVELS[5] = 'notice'
 LOG_LEVELS[6] = 'info'
 LOG_LEVELS[7] = 'debug'
 
+# Feedback
 FEEDBACK_SUBJECTS = OrderedDict()  # type: OrderedDict
 FEEDBACK_SUBJECTS[_('suggestion').title()] = _('suggestion').title()
 FEEDBACK_SUBJECTS[_('question').title()] = _('question').title()
 FEEDBACK_SUBJECTS[_('problem').title()] = _('problem').title()
 
+# Mappings between model and user interface
 CODE_CLASS = {
     'E33': 'source',
     'E6': 'event',

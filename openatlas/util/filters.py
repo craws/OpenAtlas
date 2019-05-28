@@ -407,5 +407,8 @@ def display_external_references(self, entity) -> str:
         name = util.truncate_string(url.replace('http://', '').replace('https://', ''), span=False)
         if link_.description:
             name = link_.description
+        if link_.domain.system_type == 'external reference geonames':
+            name = 'GeoNames (' + link_.domain.name + ')'
+            url = app.config['GEONAMES_VIEW_URL'] + link_.domain.name
         html += '<a target="_blank" href="{url}">{name}</a><br />'.format(url=url, name=name)
     return '<h2>' + util.uc_first(_('external references')) + '</h2>' + html if html else ''
