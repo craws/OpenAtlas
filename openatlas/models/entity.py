@@ -1,6 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
-from typing import Iterator, Set, Union, Optional, Dict
+from typing import Iterator, Set, Union, Optional, Dict, List
 
 from flask import g
 from flask_login import current_user
@@ -72,9 +72,11 @@ class Entity:
                             nodes: Optional[bool] = False):
         return LinkMapper.get_linked_entities(self, code, inverse=inverse, nodes=nodes)
 
-    def link(self, code, range_, description: Optional[str] = None,
-             inverse: Optional[bool] = False):
-        return LinkMapper.insert(self, code, range_, description, inverse)
+    def link(self, code: str, range_,
+             description: Optional[str] = None,
+             inverse: Optional[bool] = False,
+             type_id: Optional[int] = None) -> Union[int, None]:
+        return LinkMapper.insert(self, code, range_, description, inverse, type_id)
 
     def get_links(self, code, inverse: Optional[bool] = False):
         return LinkMapper.get_links(self, code, inverse)
@@ -143,6 +145,8 @@ class Entity:
         root_name = self.view_name.title()
         if self.view_name == 'reference':
             root_name = self.system_type.title()
+            if root_name == 'External Reference Geonames':
+                root_name = 'External Reference'
         elif self.view_name == 'file':
             root_name = 'License'
         elif self.view_name == 'place':
@@ -167,7 +171,8 @@ class Entity:
 class EntityMapper:
     sql_orphan = """
         SELECT e.id FROM model.entity e
-        LEFT JOIN model.link l1 on e.id = l1.domain_id
+        LEFT JOIN model.link l1 on e.id = l1.domain_id AND l1.range_id NOT IN
+            (SELECT id FROM model.entity WHERE class_code = 'E55')
         LEFT JOIN model.link l2 on e.id = l2.range_id
         WHERE l1.domain_id IS NULL AND l2.range_id IS NULL AND e.class_code != 'E55'"""
 
@@ -249,7 +254,7 @@ class EntityMapper:
             INSERT INTO model.entity (name, system_type, class_code, description)
             VALUES (%(name)s, %(system_type)s, %(code)s, %(description)s)
             RETURNING id;"""
-        params = {'name': name.strip(), 'code': code,
+        params = {'name': str(name).strip(), 'code': code,
                   'system_type': system_type.strip() if system_type else None,
                   'description': description.strip() if description else None}
         g.cursor.execute(sql, params)
@@ -268,7 +273,7 @@ class EntityMapper:
         return Entity(g.cursor.fetchone())
 
     @staticmethod
-    def get_by_ids(entity_ids: Union[Iterator, Set], nodes=False) -> list:
+    def get_by_ids(entity_ids: Union[Iterator, Set, List], nodes=False) -> list:
         if not entity_ids:
             return []
         sql = EntityMapper.build_sql(nodes) + ' WHERE e.id IN %(ids)s GROUP BY e.id;'

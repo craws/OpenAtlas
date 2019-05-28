@@ -1,6 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
-from typing import Iterator, Optional, Dict
+from typing import Iterator, Optional, Dict, Union
 
 from flask import abort, flash, g, url_for
 from flask_babel import lazy_gettext as _
@@ -70,11 +70,12 @@ class LinkMapper:
                property_code: str,
                linked_entities,
                description: Optional[str] = None,
-               inverse: Optional[bool] = False):
+               inverse: Optional[bool] = False,
+               type_id: Optional[int] = None) -> Union[int, None]:
         from openatlas.models.entity import Entity, EntityMapper
-        # linked_entities can be an entity, an entity id or a list of them
+        # Linked_entities can be an entity, an entity id or a list of them
         if not entity or not linked_entities:  # pragma: no cover
-            return
+            return None
         property_ = g.properties[property_code]
         try:
             linked_entities = ast.literal_eval(linked_entities)
@@ -100,12 +101,17 @@ class LinkMapper:
                 flash(text, 'error')
                 continue
             sql = """
-                INSERT INTO model.link (property_code, domain_id, range_id, description)
-                VALUES (%(property_code)s, %(domain_id)s, %(range_id)s, %(description)s)
+                INSERT INTO model.link
+                    (property_code, domain_id, range_id, description, type_id)
+                VALUES
+                    (%(property_code)s, %(domain_id)s, %(range_id)s, %(description)s, %(type_id)s)
                 RETURNING id;"""
             # Todo: build only one sql and get execution out of loop
-            g.cursor.execute(sql, {'property_code': property_code, 'domain_id': domain.id,
-                                   'range_id': range_.id, 'description': description})
+            g.cursor.execute(sql, {'property_code': property_code,
+                                   'domain_id': domain.id,
+                                   'range_id': range_.id,
+                                   'description': description,
+                                   'type_id': type_id})
             debug_model['link sql'] += 1
             result = g.cursor.fetchone()[0]
         return result

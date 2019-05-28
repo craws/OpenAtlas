@@ -11,6 +11,7 @@ from openatlas import app, logger
 from openatlas.forms.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper, InvalidGeomException
+from openatlas.models.node import NodeMapper
 from openatlas.util.table import Table
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  get_profile_image_table_link, is_authorized, link, required_group,
@@ -118,7 +119,7 @@ def place_view(id_):
                 profile_image_id = domain.id
         if domain.view_name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
-            if domain.system_type == 'external reference':
+            if domain.system_type.startswith('external reference'):
                 object_.external_references.append(link_)
             if is_authorized('editor'):
                 url = url_for('reference_link_update', link_id=link_.id, origin_id=object_.id)
@@ -211,6 +212,13 @@ def place_update(id_):
             form.alias.append_entry(alias)
         form.alias.append_entry('')
     gis_data = GisMapper.get_all(object_)
+    if hasattr(form, 'geonames_id'):
+        geonames_link = get_geonames_link(object_)
+        if geonames_link:
+            geonames_entity = geonames_link.domain
+            form.geonames_id.data = geonames_entity.name if geonames_entity else ''
+            exact_match = True if g.nodes[geonames_link.type.id].name == 'exact match' else False
+            form.geonames_precision.data = exact_match
     place = None
     feature = None
     stratigraphic_unit = None
@@ -227,7 +235,7 @@ def place_update(id_):
                            place=place, feature=feature, stratigraphic_unit=stratigraphic_unit)
 
 
-def save(form, object_=None, location=None, origin=None):
+def save(form: DateForm, object_=None, location=None, origin=None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
     try:
@@ -256,6 +264,8 @@ def save(form, object_=None, location=None, origin=None):
         location.name = 'Location of ' + form.name.data
         location.update()
         location.save_nodes(form)
+        if hasattr(form, 'geonames_id'):
+            update_geonames(form, object_)
         url = url_for('place_view', id_=object_.id)
         if origin:
             url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-place'
@@ -286,3 +296,44 @@ def save(form, object_=None, location=None, origin=None):
         url = url_for('place_index') if log_action == 'insert' else url_for('place_view',
                                                                             id_=object_.id)
     return url
+
+
+def get_geonames_entity(object_):
+    for entity in object_.get_linked_entities('P67', inverse=True):
+        if entity.system_type == 'external reference geonames':
+            return entity
+    return
+
+
+def get_geonames_link(object_):
+    for link_ in object_.get_links('P67', inverse=True):
+        if link_.domain.system_type == 'external reference geonames':
+            return link_
+    return
+
+
+def update_geonames(form: PlaceForm, object_) -> None:
+    geonames_link = get_geonames_link(object_)
+    geonames_entity = geonames_link.domain if geonames_link else None
+    if not form.geonames_id.data:
+        if geonames_entity:
+            geonames_entity.delete()
+        return
+    match_id = None
+    for node_id in NodeMapper.get_hierarchy_by_name('External reference match').subs:
+        if g.nodes[node_id].name == 'exact match' and form.geonames_precision.data:
+            match_id = node_id
+            break
+        if g.nodes[node_id].name == 'close match' and not form.geonames_precision.data:
+            match_id = node_id
+            break
+    if not geonames_entity:
+        id_ = EntityMapper.insert('E31', form.geonames_id.data, 'external reference geonames')
+        object_.link('P67', id_, inverse=True, type_id=match_id)
+        return
+    if form.geonames_id.data == geonames_entity and match_id == g.nodes[geonames_link.type.id]:
+        return
+
+    geonames_entity.delete()
+    id_ = EntityMapper.insert('E31', form.geonames_id.data, 'external reference geonames')
+    object_.link('P67', id_, inverse=True, type_id=match_id)

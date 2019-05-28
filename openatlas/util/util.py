@@ -9,6 +9,7 @@ from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
 from html.parser import HTMLParser
+from typing import Optional, Iterator
 
 import numpy
 from babel import dates
@@ -37,25 +38,25 @@ def convert_size(size_bytes):
     return "%s %s" % (int(size_bytes / math.pow(1024, i)), size_name[i])
 
 
-def get_file_path(entity):
+def get_file_path(entity) -> str:
     entity_id = entity if type(entity) is int else entity.id
     path = glob.glob(os.path.join(app.config['UPLOAD_FOLDER_PATH'], str(entity_id) + '.*'))
     return path[0] if path else None
 
 
-def print_file_size(entity):
+def print_file_size(entity) -> str:
     entity_id = entity if type(entity) is int else entity.id
     path = get_file_path(entity_id)
     return convert_size(os.path.getsize(path)) if path else 'N/A'
 
 
-def display_tooltip(text):
+def display_tooltip(text: str) -> str:
     if not text:
         return ''
     return ' <span class="tooltip" title="{title}">i</span>'.format(title=text.replace('"', "'"))
 
 
-def print_file_extension(entity):
+def print_file_extension(entity) -> str:
     entity_id = entity if type(entity) is int else entity.id
     path = get_file_path(entity_id)
     return os.path.splitext(path)[1] if path else 'N/A'
@@ -66,7 +67,7 @@ def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
     settings = session['settings']
     recipients = recipients if type(recipients) is list else [recipients]
     if not settings['mail'] or len(recipients) < 1:
-        return
+        return False
     mail_user = settings['mail_transport_username']
     from_ = settings['mail_from_name'] + ' <' + settings['mail_from_email'] + '>'
     server = smtplib.SMTP(settings['mail_transport_host'], settings['mail_transport_port'])
@@ -114,7 +115,7 @@ class MLStripper(HTMLParser):
         return ''.join(self.fed)
 
 
-def sanitize(string, mode=None):
+def sanitize(string: str, mode: Optional[str] = None) -> str:
     if not mode:
         # Remove all characters from a string except ASCII letters and numbers
         return re.sub('[^A-Za-z0-9]+', '', string)
@@ -127,7 +128,7 @@ def sanitize(string, mode=None):
         return s.get_data()
 
 
-def get_file_stats(path=app.config['UPLOAD_FOLDER_PATH']):
+def get_file_stats(path: Optional[str] = app.config['UPLOAD_FOLDER_PATH']) -> dict:
     """ Build a dict with file ids and stats from files in given directory.
         It's much faster to do this in one call for every file."""
     file_stats = {}
@@ -139,7 +140,7 @@ def get_file_stats(path=app.config['UPLOAD_FOLDER_PATH']):
     return file_stats
 
 
-def build_table_form(class_name, linked_entities):
+def build_table_form(class_name: str, linked_entities: Iterator) -> str:
     """ Returns a form with a list of entities with checkboxes"""
     from openatlas.models.entity import EntityMapper
     table = Table(Table.HEADERS[class_name] + [''])
@@ -166,7 +167,7 @@ def build_table_form(class_name, linked_entities):
                           table=table.display(class_name, remove_rows=False))
 
 
-def display_remove_link(url, name):
+def display_remove_link(url: str, name: str) -> str:
     """ Build a link to remove a link with a JavaScript confirmation dialog"""
     name = name.replace('\'', '')
     confirm = 'onclick="return confirm(\'' + _('Remove %(name)s?', name=name) + '\')"'
@@ -335,7 +336,7 @@ def required_group(group):
     return wrapper
 
 
-def bookmark_toggle(entity_id, for_table=False):
+def bookmark_toggle(entity_id: int, for_table: Optional[bool] = False) -> str:
     label = uc_first(_('bookmark'))
     html = """
         <script>
@@ -359,9 +360,9 @@ def bookmark_toggle(entity_id, for_table=False):
     return html
 
 
-def is_authorized(group):
+def is_authorized(group: str) -> bool:
     if not current_user.is_authenticated or not hasattr(current_user, 'group'):
-        return False
+        return False   # pragma: no cover - needed because AnonymousUserMixin has no group
     if current_user.group == 'admin' or (
             current_user.group == 'manager' and group in ['manager', 'editor', 'readonly']) or (
             current_user.group == 'editor' and group in ['editor', 'readonly']) or (
@@ -370,7 +371,7 @@ def is_authorized(group):
     return False
 
 
-def uc_first(string):
+def uc_first(string: str) -> str:
     return str(string)[0].upper() + str(string)[1:] if string else ''
 
 
@@ -396,7 +397,7 @@ def get_profile_image_table_link(file, entity, extension, profile_image_id):
     return ''  # pragma: no cover - only happens for non image files
 
 
-def link(entity):
+def link(entity) -> str:
     # Builds an html link to entity view for display
     from openatlas.models.entity import Entity
     if not entity:
@@ -442,7 +443,7 @@ def link(entity):
     return html
 
 
-def truncate_string(string, length=40, span=True):
+def truncate_string(string: str, length: Optional[int] = 40, span: Optional[bool] = True) -> str:
     """
     Returns a truncates string with '..' at the end if it was longer than length
     Also adds a span title (for mouse over) with the original string if parameter "span" is True
