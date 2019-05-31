@@ -74,8 +74,9 @@ class Entity:
 
     def link(self, code: str, range_,
              description: Optional[str] = None,
-             inverse: Optional[bool] = False) -> Union[int, None]:
-        return LinkMapper.insert(self, code, range_, description, inverse)
+             inverse: Optional[bool] = False,
+             type_id: Optional[int] = None) -> Union[int, None]:
+        return LinkMapper.insert(self, code, range_, description, inverse, type_id)
 
     def get_links(self, code, inverse: Optional[bool] = False):
         return LinkMapper.get_links(self, code, inverse)

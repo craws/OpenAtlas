@@ -107,7 +107,7 @@ var geoSearchControl = L.control.geonames({
     featureClasses: ['A', 'H', 'L', 'P', 'R', 'T', 'U', 'V'], // Feature classes to search against.  See: http://www.geonames.org/export/codes.html.
     baseQuery: 'isNameRequired=true', // The core query sent to GeoNames, later combined with other parameters above.
     showMarker: false, // Show a marker at the location the selected location.
-    showPopup: true, // Show a tooltip at the selected location.
+    showPopup: false, // Show a tooltip at the selected location.
     adminCodes: {}, // Filter results by the specified admin codes mentioned in `ADMIN_CODES`. Each code can be a string or a function returning a string. `country` can be a comma-separated list of countries.
     bbox: {}, // An object in form of {east:..., west:..., north:..., south:...}, specifying the bounding box to limit the results to.
     lang: 'en', // Locale of results.
@@ -117,6 +117,42 @@ var geoSearchControl = L.control.geonames({
     title: translate['map_geonames_title'], // Search input title value.
     placeholder: translate['map_geonames_placeholder'] // Search input placeholder text.
 });
+
+geoSearchControl.on('select', function(e){
+    console.log(e.geoname);
+    var name = e.geoname.name;
+    var lat = parseFloat(e.geoname.lat);
+    var lon = parseFloat(e.geoname.lng);
+    popupHtml = '<div id="popup">'
+    popupHtml += `
+        <strong>` + name + `</strong>
+        <div style="max-height:140px;overflow-y:auto">` + e.geoname.geonameId + `</div>`
+    popupHtml += '<p><a target="_blank" href="http://www.geonames.org/' + e.geoname.geonameId + '">' + translate['details'] + '</a></p>';
+    popupHtml += `
+        <div id="buttonBar" style="white-space:nowrap;">
+            <p>
+                <button id="importButton" onclick="importGeonames('` + e.geoname.geonameId + `', '` + name + `', ` + e.geoname.lat + `,` + e.geoname.lng + ` )">` + translate['import'] + `</button>
+            </p>
+        </div>`;
+    popupHtml += '</div>';
+    popup = L.popup()
+        .setLatLng([lat, lon])
+        .setContent(popupHtml)
+        .openOn(map)
+});
+
+function importGeonames(id, name, lat, lng) {
+    $('#geonames_id').val(id);
+    points = JSON.parse($('#gis_points').val());
+    // Add new point<<<<<<<<<<<<<<<<
+    point =
+        `{"type": "Feature", "geometry":` +
+        `{"type": "Point", "coordinates": [` + lng + `00000001` + `,` + lat + `00000001` + `]},` +
+        `"properties":{"name": "` + name + `", "description": "imported from Geonames", "shapeType": "centerpoint"}}`;
+    points.push(JSON.parse(point));
+    $('#gis_points').val(JSON.stringify(points));
+}
+
 map.addControl(geoSearchControl);
 
 
