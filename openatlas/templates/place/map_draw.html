@@ -3,12 +3,10 @@
 
 <script>
     $(document).ready(function() {
-        var gisDataAll = gisPointSelected.concat(gisLineSelected, gisPolygonSelected);
-        console.log(gisDataAll);
         //init interface elements
         $( "#tabs" ).tabs();
         $( "#georefs" ).DataTable( {
-           data: gisDataAll,
+           data: gisAllSelected,
            columns: [
                { title: "Type", "data":"properties.shapeType" },
                { title: "Name", "data":"properties.name" },
@@ -21,7 +19,7 @@
 
 
 <div id='map-info-display' style="float:left;">
-    <div id="tabs">
+    <div id="tabs" class="tabs-container">
       <ul>
         <li><a href="#properties">Place Properties</a></li>
         <li><a href="#features">Features</a></li>
