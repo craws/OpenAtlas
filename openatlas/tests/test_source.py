@@ -18,7 +18,7 @@ class SourceTest(TestBaseCase):
                 app.preprocess_request()
                 origin_id = EntityMapper.insert('E21', 'David Duchovny').id
                 actor_id = EntityMapper.insert('E21', 'Gillian Anderson Gillian Anderson ').id
-                reference_id = EntityMapper.insert('E84', 'http://openatlas.eu',
+                reference_id = EntityMapper.insert('E84', 'https://openatlas.eu',
                                                    'external reference').id
                 file_id = EntityMapper.insert('E31', 'The X-Files', 'file').id
 
@@ -30,7 +30,7 @@ class SourceTest(TestBaseCase):
                 source_id = EntityMapper.get_by_codes('source')[0].id
             rv = self.app.post(url_for('source_insert', origin_id=reference_id),
                                data={'name': 'Test source'}, follow_redirects=True)
-            assert b'http://openatlas.eu' in rv.data
+            assert b'https://openatlas.eu' in rv.data
             rv = self.app.post(url_for('source_insert', origin_id=file_id),
                                data={'name': 'Test source'}, follow_redirects=True)
             assert b'An entry has been created' in rv.data and b'The X-Files' in rv.data
@@ -43,7 +43,7 @@ class SourceTest(TestBaseCase):
             # Link source
             rv = self.app.post(url_for('reference_insert', code='external reference',
                                        origin_id=source_id),
-                               data={'name': 'http://openatlas.eu'},
+                               data={'name': 'https://openatlas.eu'},
                                follow_redirects=True)
             assert b'Test source' in rv.data
             self.app.get(url_for('source_add', origin_id=actor_id))
