@@ -22,8 +22,8 @@ div.preview img {
      margin-right: 1em;
 }
 
-div#credits img {
-    max-height: 50px;
+#institutes img, #projects img {
+    height: 60px;
     margin-right: 1em;
     background-color: white;
 }
