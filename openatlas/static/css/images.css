@@ -25,6 +25,7 @@ div.preview img {
 #institutes img, #projects img {
     height: 60px;
     margin-right: 1em;
+    background-color: white;
 }
 
 table.tablesorter thead tr .tablesorter-header {
