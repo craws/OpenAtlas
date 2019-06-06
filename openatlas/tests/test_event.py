@@ -19,7 +19,7 @@ class EventTest(TestBaseCase):
                 actor_id = EntityMapper.insert('E21', 'Game master').id
                 file_id = EntityMapper.insert('E31', 'One forsaken file entity', 'file').id
                 source_id = EntityMapper.insert('E33', 'Necronomicon', 'source content').id
-                reference_id = EntityMapper.insert('E31', 'http://openatlas.eu',
+                reference_id = EntityMapper.insert('E31', 'https://openatlas.eu',
                                                    'external reference').id
 
             # Insert

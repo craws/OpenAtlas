@@ -12,11 +12,6 @@ from flask_wtf import Form
 from flask_wtf.csrf import CsrfProtect
 from wtforms import StringField, SubmitField
 
-try:
-    import mod_wsgi
-except ImportError:
-    mod_wsgi = None
-
 app = Flask(__name__, instance_relative_config=True)
 csrf = CsrfProtect(app)  # Make sure all forms are CSRF protected
 
