@@ -1,9 +1,10 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
-from typing import Iterator, Set, Union, Optional, Dict, List
+from typing import Dict, Iterator, List, Optional, Set, Union
 
 from flask import g
 from flask_login import current_user
+from fuzzywuzzy import fuzz
 from werkzeug.exceptions import abort
 
 from openatlas import app, debug_model, logger
@@ -325,6 +326,24 @@ class EntityMapper:
         id_ = entity if type(entity) is int else entity.id
         g.cursor.execute('DELETE FROM model.entity WHERE id = %(id_)s;', {'id_': id_})
         debug_model['by id'] += 1
+
+    @staticmethod
+    def get_similar_named(form) -> dict:
+        entities = EntityMapper.get_by_codes(form.class_.data)
+        similar = {}  # type: dict
+        already_added = set()  # type: set
+        for sample in entities:
+            if sample.id in already_added:
+                continue
+            similar[sample.id] = {'entity': sample, 'entities': []}
+            for entity in entities:
+                if sample.id == entity.id:
+                    continue
+                if fuzz.ratio(sample.name, entity.name) >= form.ratio.data:
+                    already_added.add(sample.id)
+                    already_added.add(entity.id)
+                    similar[sample.id]['entities'].append(entity)
+        return {similar: data for similar, data in similar.items() if data['entities']}
 
     @staticmethod
     def get_overview_counts() -> OrderedDict:

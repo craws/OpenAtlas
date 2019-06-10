@@ -1,0 +1,21 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
+    > {{ _('check similar names')|uc_first }}
+{% endblock %}
+{% block content %}
+{{ 'Check_similar_names'|manual_link|safe }}
+{{ form|display_form|safe }}
+{% if similar == 'none found' %}
+    <p>None found</p>
+{% else %}
+    {% for sample_id, sample in similar.items() %}
+        <p>
+            {{ sample['entity']|link|safe }}
+            {% for entity in sample['entities'] %}
+                <br/>{{ entity|link|safe }}
+            {% endfor %}
+        </p>
+    {% endfor %}
+{% endif %}
+{% endblock %}

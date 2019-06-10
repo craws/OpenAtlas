@@ -170,6 +170,27 @@ def admin_file():
     return render_template('admin/file.html', form=form)
 
 
+class SimilarForm(Form):
+    ratio = IntegerField(default=100)
+    class_ = SelectField('Class', choices=[('source', uc_first(_('source'))),
+                                           ('event', uc_first(_('event'))),
+                                           ('actor', uc_first(_('actor'))),
+                                           ('place', uc_first(_('place'))),
+                                           ('reference', uc_first(_('reference')))])
+    apply = SubmitField(uc_first(_('search')))
+
+
+@app.route('/admin/similar', methods=['POST', 'GET'])
+@required_group('editor')
+def admin_check_similar():
+    form = SimilarForm()
+    similar = {}
+    if form.validate_on_submit():
+        similar = EntityMapper.get_similar_named(form)
+        similar = similar if similar else 'none found'
+    return render_template('admin/check_similar.html', similar=similar, form=form)
+
+
 @app.route('/admin/orphans/delete/<parameter>')
 @required_group('admin')
 def admin_orphans_delete(parameter: str):
