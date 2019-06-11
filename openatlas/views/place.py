@@ -109,7 +109,7 @@ def place_view(id_):
     if object_.system_type == 'stratigraphic unit':
         tables['find'] = Table(Table.HEADERS['place'] + [_('description')])
     profile_image_id = object_.get_profile_image_id()
-    for link_ in object_.get_links('P67', True):
+    for link_ in object_.get_links('P67', inverse=True):
         domain = link_.domain
         data = get_base_table_data(domain)
         if domain.view_name == 'file':  # pragma: no cover
@@ -313,12 +313,19 @@ def get_geonames_link(object_):
 
 
 def update_geonames(form: PlaceForm, object_) -> None:
+    new_geonames_id = form.geonames_id.data
     geonames_link = get_geonames_link(object_)
     geonames_entity = geonames_link.domain if geonames_link else None
-    if not form.geonames_id.data:
+
+    if not new_geonames_id:
         if geonames_entity:
-            geonames_entity.delete()
+            if len(geonames_entity.get_links('P67')) > 1:
+                geonames_link.delete()  # There are more linked so only remove this link
+            else:
+                geonames_entity.delete()  # Nothing else is linked to the reference so delete it
         return
+
+    # Get id of the match type
     match_id = None
     for node_id in NodeMapper.get_hierarchy_by_name('External reference match').subs:
         if g.nodes[node_id].name == 'exact match' and form.geonames_precision.data:
@@ -327,13 +334,33 @@ def update_geonames(form: PlaceForm, object_) -> None:
         if g.nodes[node_id].name == 'close match' and not form.geonames_precision.data:
             match_id = node_id
             break
+
+    # There wasn't one linked before
     if not geonames_entity:
-        id_ = EntityMapper.insert('E31', form.geonames_id.data, 'external reference geonames')
-        object_.link('P67', id_, inverse=True, type_id=match_id)
-        return
-    if form.geonames_id.data == geonames_entity and match_id == g.nodes[geonames_link.type.id]:
+        reference = EntityMapper.get_by_name_and_system_type(new_geonames_id,
+                                                             'external reference geonames')
+        if not reference:  # The selected reference doesn't exist so create it
+            reference = EntityMapper.insert('E31', new_geonames_id, 'external reference geonames')
+        object_.link('P67', reference, inverse=True, type_id=match_id)
         return
 
-    geonames_entity.delete()
-    id_ = EntityMapper.insert('E31', form.geonames_id.data, 'external reference geonames')
-    object_.link('P67', id_, inverse=True, type_id=match_id)
+    if new_geonames_id == geonames_entity.id and match_id == g.nodes[geonames_link.type.id]:
+        return  # It's the same link so do nothing
+
+    # Only the match type change so delete and recreate the link
+    if new_geonames_id == geonames_entity.id:
+        geonames_link.delete()
+        object_.link('P67', geonames_entity, inverse=True, type_id=match_id)
+        return
+
+    # Its linked to a different geonames reference
+    if len(geonames_entity.get_links('P67')) > 1:
+        geonames_link.delete()  # There are more linked so only remove this link
+    else:
+        geonames_entity.delete()  # Nothing else is linked to the reference so delete it
+    reference = EntityMapper.get_by_name_and_system_type(new_geonames_id,
+                                                         'external reference geonames')
+
+    if not reference:  # The selected reference doesn't exist so create it
+        reference = EntityMapper.insert('E31', new_geonames_id, 'external reference geonames')
+    object_.link('P67', reference, inverse=True, type_id=match_id)
