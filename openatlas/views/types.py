@@ -68,10 +68,10 @@ def node_insert(root_id, super_id=None):
 @required_group('editor')
 def node_update(id_):
     node = g.nodes[id_]
-    if node.system:
+    root = g.nodes[node.root[-1]] if node.root else None
+    if node.system or (root and root.locked):
         abort(403)
     form = build_node_form(NodeForm, node, request)
-    root = g.nodes[node.root[-1]] if node.root else None
     if form.validate_on_submit():
         save(form, node)
         return redirect(url_for('node_view', id_=id_))
@@ -115,11 +115,11 @@ def node_view(id_):
 @required_group('editor')
 def node_delete(id_):
     node = g.nodes[id_]
-    if node.system or node.subs or node.count:
+    root = g.nodes[node.root[-1]] if node.root else None
+    if node.system or node.subs or node.count or (root and root.locked):
         abort(403)
     EntityMapper.delete(node.id)
     flash(_('entity deleted'), 'info')
-    root = g.nodes[node.root[-1]] if node.root else None
     return redirect(url_for('node_view', id_=root.id) if root else url_for('node_index'))
 
 
