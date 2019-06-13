@@ -4,5 +4,82 @@
     > {{ _('edit')|uc_first }}
 {% endblock %}
 {% block content %}
-    {{ form|display_form('profile-form')|safe }}
+    {{ 'Profile'|manual_link|safe }}
+    <form method="post">
+        {{ form.csrf_token }}
+        <div style="float:left;margin-right:2em;">
+            <h1>{{ _('general')|uc_first }}</h1>
+            <div class="data-table">
+                <div class="table-row">
+                    <div>{{ form.name.label|safe }} {{ form.name.description|display_tooltip|safe }}</div>
+                    <div class="table-cell">{{ form.name }}</div>
+                </div>
+                <div class="table-row">
+                    <div>{{ form.email.label|safe }}  {{ form.email.description|display_tooltip|safe }}</div>
+                    <div class="table-cell">{{ form.email }}</div>
+                </div>
+                <div class="table-row">
+                    <div>{{ form.show_email.label|safe }}  {{ form.show_email.description|display_tooltip|safe }}</div>
+                    <div class="table-cell">{{ form.show_email }}</div>
+                </div>
+                <div class="table-row">
+                    <div>{{ form.newsletter.label|safe }}  {{ form.newsletter.description|display_tooltip|safe }}</div>
+                    <div class="table-cell">{{ form.newsletter }}</div>
+                </div>
+            </div>
+        </div>
+        <div style="float:left;margin-right:2em;">
+            <h1>{{ _('display')|uc_first }}</h1>
+            <div class="data-table">
+                <div class="table-row">
+                    <div>{{ form.language.label|safe }} {{ form.language.description|display_tooltip|safe }}</div>
+                    <div class="table-cell">{{ form.language }}</div>
+                </div>
+                <div class="table-row">
+                    <div>{{ form.theme.label|safe }}  {{ form.theme.description|display_tooltip|safe }}</div>
+                    <div class="table-cell">{{ form.theme }}</div>
+                </div>
+                <div class="table-row">
+                    <div>{{ form.table_rows.label|safe }}  {{ form.table_rows.description|display_tooltip|safe }}</div>
+                    <div class="table-cell">{{ form.table_rows }}</div>
+                </div>
+                <div class="table-row">
+                    <div>{{ form.table_show_aliases.label|safe }}  {{ form.table_show_aliases.description|display_tooltip|safe }}</div>
+                    <div class="table-cell">{{ form.table_show_aliases }}</div>
+                </div>
+                <div class="table-row">
+                    <div>{{ form.layout.label|safe }}  {{ form.layout.description|display_tooltip|safe }}</div>
+                    <div class="table-cell">{{ form.layout }}</div>
+                </div>
+            </div>
+        </div>
+        <div style="float:left;">
+            <h1>{{ _('map')|uc_first }}</h1>
+            <div class="data-table">
+                <div class="table-row">
+                    <div>{{ form.max_zoom.label|safe }} {{ form.max_zoom.description|display_tooltip|safe }}</div>
+                    <div class="table-cell">{{ form.max_zoom(class_='integer') }}</div>
+                </div>
+                <div class="table-row">
+                    <div>{{ form.geonames.label|safe }}  {{ form.geonames.description|display_tooltip|safe }}</div>
+                    <div class="table-cell">{{ form.geonames }}</div>
+                </div>
+            </div>
+        </div>
+        <div style="clear:both"></div>
+        {{ form.save}}
+    </form>
+
 {% endblock %}
+
+    form.language.data = language
+    form.language.label.text = uc_first(_('language'))
+    form.theme.data = user.settings['theme']
+    form.theme.label.text = uc_first(_('theme'))
+    form.table_rows.data = user.settings['table_rows']
+    form.table_rows.label.text = uc_first(_('table rows'))
+    form.table_show_aliases.data = 'on' if user.settings['table_show_aliases'] else 'off'
+    form.table_show_aliases.label.text = uc_first(_('show aliases in tables'))
+    form.layout.data = user.settings['layout']
+    form.layout.label.text = uc_first(_('layout'))
+    form.save.label.text = uc_first(_('save'))
