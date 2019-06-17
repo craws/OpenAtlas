@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.6.10
--- Dumped by pg_dump version 9.6.10
+-- Dumped from database version 9.6.12
+-- Dumped by pg_dump version 9.6.12
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -31,7 +31,6 @@ ALTER TABLE IF EXISTS ONLY model.property_i18n DROP CONSTRAINT IF EXISTS propert
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_domain_class_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_type_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_range_id_fkey;
-ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_property_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_domain_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_class_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
@@ -182,7 +181,6 @@ DROP TABLE IF EXISTS gis.point;
 DROP SEQUENCE IF EXISTS gis.linestring_id_seq;
 DROP TABLE IF EXISTS gis.linestring;
 DROP FUNCTION IF EXISTS model.update_modified();
-DROP FUNCTION IF EXISTS model.delete_link_dates();
 DROP FUNCTION IF EXISTS model.delete_entity_related();
 DROP SCHEMA IF EXISTS web;
 DROP SCHEMA IF EXISTS model;
@@ -262,8 +260,7 @@ CREATE FUNCTION model.delete_entity_related() RETURNS trigger
         BEGIN
             -- Delete aliases (P1, P131)
             IF OLD.class_code IN ('E18', 'E21', 'E40', 'E74') THEN
-                DELETE FROM model.entity WHERE id IN (
-                    SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code IN ('P1', 'P131'));
+                DELETE FROM model.entity WHERE id IN (SELECT range_id FROM model.link WHERE domain_id = OLD.id AND property_code IN ('P1', 'P131'));
             END IF;
 
             -- Delete location (E53) if it was a place or find
@@ -282,24 +279,6 @@ CREATE FUNCTION model.delete_entity_related() RETURNS trigger
 
 
 ALTER FUNCTION model.delete_entity_related() OWNER TO openatlas;
-
---
--- Name: delete_link_dates(); Type: FUNCTION; Schema: model; Owner: openatlas
---
-
-CREATE FUNCTION model.delete_link_dates() RETURNS trigger
-    LANGUAGE plpgsql
-    AS $$
-        BEGIN
-            IF OLD.property_code IN ('OA5', 'OA6') THEN
-                DELETE FROM model.entity WHERE id = OLD.range_id AND class_code = 'E61';
-            END IF;
-            RETURN OLD;
-        END;
-    $$;
-
-
-ALTER FUNCTION model.delete_link_dates() OWNER TO openatlas;
 
 --
 -- Name: update_modified(); Type: FUNCTION; Schema: model; Owner: openatlas
@@ -695,13 +674,13 @@ CREATE TABLE model.link (
     description text,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone,
+    type_id integer,
     begin_from timestamp without time zone,
     begin_to timestamp without time zone,
     begin_comment text,
     end_from timestamp without time zone,
     end_to timestamp without time zone,
-    end_comment text,
-    type_id integer
+    end_comment text
 );
 
 
@@ -963,7 +942,8 @@ CREATE TABLE web.hierarchy (
     directional boolean DEFAULT false NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone,
-    value_type boolean DEFAULT false NOT NULL
+    value_type boolean DEFAULT false NOT NULL,
+    locked boolean DEFAULT false NOT NULL
 );
 
 
@@ -988,6 +968,13 @@ COMMENT ON COLUMN web.hierarchy.name IS 'same as model.entity.name, to ensure un
 --
 
 COMMENT ON COLUMN web.hierarchy.value_type IS 'True if links to this type can have numeric values';
+
+
+--
+-- Name: COLUMN hierarchy.locked; Type: COMMENT; Schema: web; Owner: openatlas
+--
+
+COMMENT ON COLUMN web.hierarchy.locked IS 'True if these types are not editable';
 
 
 --
@@ -2056,14 +2043,6 @@ ALTER TABLE ONLY model.entity
 
 ALTER TABLE ONLY model.link
     ADD CONSTRAINT link_domain_id_fkey FOREIGN KEY (domain_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
-
-
---
--- Name: link link_property_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
---
-
-ALTER TABLE ONLY model.link
-    ADD CONSTRAINT link_property_code_fkey FOREIGN KEY (property_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

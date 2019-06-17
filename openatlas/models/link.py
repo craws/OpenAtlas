@@ -169,7 +169,7 @@ class LinkMapper:
         for row in result:
             entity_ids.add(row.domain_id)
             entity_ids.add(row.range_id)
-        entities = {entity.id: entity for entity in EntityMapper.get_by_ids(entity_ids)}
+        entities = {entity.id: entity for entity in EntityMapper.get_by_ids(entity_ids, nodes=True)}
         links = []
         for row in result:
             links.append(Link(row, domain=entities[row.domain_id], range_=entities[row.range_id]))

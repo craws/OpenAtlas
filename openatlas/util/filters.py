@@ -18,7 +18,7 @@ from openatlas.models.content import ContentMapper
 from openatlas.models.entity import Entity
 from openatlas.util import util
 from openatlas.util.table import Table
-from openatlas.util.util import display_tooltip, get_file_path, print_file_extension
+from openatlas.util.util import get_file_path, print_file_extension
 
 blueprint = flask.Blueprint('filters', __name__)
 paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
@@ -280,7 +280,7 @@ def display_form(self, form, form_id: Optional[str] = None, for_persons: Optiona
             if field.id == 'begin_year_from':
                 html['footer'] += util.add_dates_to_form(form, for_persons)
             continue
-        field.label.text += display_tooltip(field.description)
+        field.label.text += util.display_tooltip(field.description)
         errors = ' <span class="error">' + errors + ' </span>' if errors else ''
         if field.id in ('file', 'name'):
             html['header'] += '''
@@ -331,6 +331,12 @@ def display_form(self, form, form_id: Optional[str] = None, for_persons: Optiona
 def test_file(self, file_name: str) -> Optional[str]:
     if os.path.isfile(app.root_path + '/' + file_name):
         return file_name
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def display_tooltip(self, text: str) -> str:
+    return util.display_tooltip(text)
 
 
 @jinja2.contextfilter

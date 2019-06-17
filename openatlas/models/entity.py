@@ -324,6 +324,13 @@ class EntityMapper:
         return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
+    def get_by_name_and_system_type(name: Union[str, int], system_type: str):
+        sql = "SELECT id FROM model.entity WHERE name = %(name)s AND system_type = %(system_type)s;"
+        g.cursor.execute(sql, {'name': str(name), 'system_type': system_type})
+        if g.cursor.rowcount:
+            return EntityMapper.get_by_id(g.cursor.fetchone()[0])
+
+    @staticmethod
     def delete(entity) -> None:
         """ Triggers function model.delete_entity_related() for deleting related entities"""
         id_ = entity if type(entity) is int else entity.id

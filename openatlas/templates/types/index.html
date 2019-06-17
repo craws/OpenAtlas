@@ -29,17 +29,29 @@
                             <p><strong>{{ node.name }}</strong></p>
                             <div style="float:left;margin-right:3em;">
                                 <div class="button-bar">
-                                    <form style="float:left" method="post" action="{{ url_for('node_insert', root_id=node.id) }}">
-                                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                    {% if node.locked %}
                                         <input
                                             class="tree-filter"
                                             id="{{ node.name|sanitize }}-tree-search"
                                             placeholder="{{ placeholder|uc_first }}"
                                             name="name_search"
                                             style="width:8em;"/>
-                                        <input type="hidden" name="mode" value="insert" />
-                                        <button type="submit" value="insert" name="add-node-submit">+</button>
-                                    </form>
+                                    {% else %}
+                                        <form style="float:left" method="post" action="{{ url_for('node_insert', root_id=node.id) }}">
+                                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                                            <input
+                                                class="tree-filter"
+                                                id="{{ node.name|sanitize }}-tree-search"
+                                                placeholder="{{ placeholder|uc_first }}"
+                                                name="name_search"
+                                                style="width:8em;"/>
+                                            {% if not node.locked %}
+                                                <input type="hidden" name="mode" value="insert" />
+                                                <button type="submit" value="insert" name="add-node-submit">+</button>
+                                            {% endif %}
+                                        </form>
+                                    {% endif %}
+
                                     {% if type_ in ['custom', 'value'] and 'manager'|is_authorized %}
                                         <a href="{{ url_for('hierarchy_update', id_=node.id) }} ">{{ _('edit')|uc_first }}</a>
                                         {% if not node.system and node.count < 1 and not node.subs %}

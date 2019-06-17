@@ -22,10 +22,14 @@ div.preview img {
      margin-right: 1em;
 }
 
-div#credits img {
-    max-height: 50px;
-    margin-right: 1em;
+#institutes img, #projects img {
+    height: 60px;
+    margin-right: 0.5em;
     background-color: white;
+}
+
+#projects img {
+    height: 50px;
 }
 
 table.tablesorter thead tr .tablesorter-header {
