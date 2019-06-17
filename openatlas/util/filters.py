@@ -258,7 +258,7 @@ def display_form(self, form, form_id: Optional[str] = None, for_persons: Optiona
                         <div class="table-cell">{field}</div>
                     </div>
                 """.format(label=label, field=str(field(class_=class_)) + errors,
-                           info='' if 'is_node_form' in form else display_tooltip(node.description))
+                           info='' if 'is_node_form' in form else util.display_tooltip(node.description))
                 if node.name in app.config['BASE_TYPES']:  # base type should be above other fields
                     html['types'] = type_field + html['types']
                 else:
