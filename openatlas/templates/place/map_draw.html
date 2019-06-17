@@ -5,7 +5,7 @@
     $(document).ready(function() {
         //init interface elements
         $( "#tabs" ).tabs();
-        $( "#georefs" ).DataTable( {
+        var datatable = $( "#georefs" ).DataTable( {
            data: gisAllSelected,
            columns: [
                { title: "Type", "data":"properties.shapeType" },
@@ -13,7 +13,7 @@
                { title: "Description", "data":"properties.description" },
 
             ]
-        } );
+        });
     });
 </script>
 
