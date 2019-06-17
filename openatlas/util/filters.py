@@ -252,13 +252,13 @@ def display_form(self, form, form_id: Optional[str] = None, for_persons: Optiona
                 html['value_types'] += display_value_type_fields(node.subs)
                 continue
             else:
+                info = '' if 'is_node_form' in form else util.display_tooltip(node.description)
                 type_field = """
                     <div class="table-row">
                         <div><label>{label}</label> {info}</div>
                         <div class="table-cell">{field}</div>
                     </div>
-                """.format(label=label, field=str(field(class_=class_)) + errors,
-                           info='' if 'is_node_form' in form else display_tooltip(node.description))
+                """.format(label=label, field=str(field(class_=class_)) + errors, info=info)
                 if node.name in app.config['BASE_TYPES']:  # base type should be above other fields
                     html['types'] = type_field + html['types']
                 else:
