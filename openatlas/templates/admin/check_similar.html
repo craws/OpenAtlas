@@ -6,16 +6,9 @@
 {% block content %}
 {{ 'Check_similar_names'|manual_link|safe }}
 {{ form|display_form|safe }}
-{% if similar == 'none found' %}
+{% if table == 'none found' %}
     <p>None found</p>
 {% else %}
-    {% for sample_id, sample in similar.items() %}
-        <p>
-            {{ sample['entity']|link|safe }}
-            {% for entity in sample['entities'] %}
-                <br/>{{ entity|link|safe }}
-            {% endfor %}
-        </p>
-    {% endfor %}
+    {{ table.display()|safe }}
 {% endif %}
 {% endblock %}

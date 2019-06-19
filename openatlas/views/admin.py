@@ -184,11 +184,15 @@ class SimilarForm(Form):
 @required_group('editor')
 def admin_check_similar():
     form = SimilarForm()
-    similar = {}
+    table = Table(['name'])
     if form.validate_on_submit():
-        similar = EntityMapper.get_similar_named(form)
-        similar = similar if similar else 'none found'
-    return render_template('admin/check_similar.html', similar=similar, form=form)
+        for sample_id, sample in EntityMapper.get_similar_named(form).items():
+            html = link(sample['entity'])
+            for entity in sample['entities']:
+                html += '<br/>' + link(entity)
+            table.rows.append([html])
+        table = table if table.rows else 'none found'
+    return render_template('admin/check_similar.html', table=table, form=form)
 
 
 @app.route('/admin/orphans/delete/<parameter>')
