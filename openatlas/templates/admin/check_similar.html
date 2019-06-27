@@ -7,7 +7,7 @@
     {{ 'Data_integrity'|manual_link|safe }}
     {{ form|display_form|safe }}
     {% if table == 'none found' %}
-        <p>None found</p>
+        <p>{{ _('no entries')|uc_first }}</p>
     {% elif table.rows %}
         {{ table.display()|safe }}
     {% endif %}

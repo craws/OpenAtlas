@@ -101,6 +101,18 @@ class ContentTests(TestBaseCase):
                                       node_id=source_node.subs[0]), follow_redirects=True)
             assert b'Congratulations, everything looks fine!' in rv.data
 
+            # Check similar names
+            with app.test_request_context():
+                app.preprocess_request()
+                EntityMapper.insert('E21', 'I have the same name!')
+                EntityMapper.insert('E21', 'I have the same name!')
+            rv = self.app.post(url_for('admin_check_similar'), follow_redirects=True,
+                               data={'classes': 'actor', 'ratio': 100})
+            assert b'I have the same name!' in rv.data
+            rv = self.app.post(url_for('admin_check_similar'), follow_redirects=True,
+                               data={'classes': 'file', 'ratio': 100})
+            assert b'No entries' in rv.data
+
             data = {name: '' for name in SettingsMapper.fields}  # type: Dict[str, Union[str, int]]
             data['default_language'] = 'en'
             data['default_table_rows'] = '10'
