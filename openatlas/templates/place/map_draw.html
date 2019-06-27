@@ -1,9 +1,43 @@
+<script src="/static/vendor/DataTables/datatables.js"></script>
+<link rel="stylesheet" href="/static/vendor/DataTables/datatables.css" />
+
+<script>
+    $(document).ready(function() {
+        //init interface elements
+        $( "#tabs" ).tabs();
+        $( "#georefs" ).DataTable( {
+           data: gisAllSelected,
+           columns: [
+               { title: "Type", "data":"properties.shapeType" },
+               { title: "Name", "data":"properties.name" },
+               { title: "Description", "data":"properties.description" },
+
+            ]
+        } );
+    });
+</script>
+
+
 <div id='map-info-display' style="float:left;">
-    {{ form|display_form|safe }}
+    <div id="tabs" class="tabs-container">
+      <ul>
+        <li><a href="#properties">Place Properties</a></li>
+        <li><a href="#features">Features</a></li>
+      </ul>
+      <div id="properties" style="width: 440px;">
+        {{ form|display_form|safe }}
+      </div>
+      <div id="features" style="width: 440px;">
+        <table id="georefs" class="display" width="100%"></table>
+      </div>
+    </div>
 </div>
 <div id="map" class="map"></div>
 <link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/Leaflet.draw-1.0.2.css" />
+
 <script src="/static/vendor/leaflet-1.3.4/EasyButton-2.3.0/src/easy-button.js"></script>
 <script src="/static/vendor/leaflet-1.3.4/Leaflet.draw-1.0.2.js"></script>
+
+
 <script src="/static/js/map/map.js"></script>
 <script src="/static/js/map/draw.js"></script>

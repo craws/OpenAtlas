@@ -92,7 +92,8 @@ class GisMapper:
                 'gisLineSelected': json.dumps(selected['linestring']),
                 'gisPolygonAll': json.dumps(all_['polygon']),
                 'gisPolygonSelected': json.dumps(selected['polygon']),
-                'gisPolygonPointSelected': json.dumps(selected['polygon_point'])}
+                'gisPolygonPointSelected': json.dumps(selected['polygon_point']),
+                'gisAllSelected': json.dumps(selected['polygon'] + selected['linestring'] + selected['polygon_point'])}
 
     @staticmethod
     def insert(entity, form):
