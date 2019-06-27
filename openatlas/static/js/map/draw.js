@@ -69,7 +69,6 @@ areaButton = new L.Control.EasyButtons({
 areaButton.intendedFunction = function() {drawGeometry('area');}
 map.addControl(areaButton);
 
-
 inputForm = L.control();
 inputForm.onAdd = function (map) {
     div = L.DomUtil.create('div', 'mapFormDiv');
@@ -331,6 +330,7 @@ function saveEditedGeometry(shapeType) {
         editedLayer.setStyle({fillColor: '#686868', color: '#686868'});
     }
     geoJsonArray = [];
+    updateAllSelected();
 }
 
 function saveNewGeometry(shapeType) {
@@ -368,6 +368,7 @@ function saveNewGeometry(shapeType) {
         layer.addTo(map);
         layer.setStyle({fillColor: '#DA9DC8', color: '#E861C0'});
     }
+    updateAllSelected();
 }
 
 function deleteGeometry() {
@@ -402,6 +403,7 @@ function deleteGeometry() {
         });
         $('#gis_polygons').val(JSON.stringify(polygons)); // Write array back to form field
     }
+    updateAllSelected();
 }
 
 function editGeometry() {
@@ -491,4 +493,13 @@ function interactionOff() {
     if (map.tap) {
         map.tap.disable();
     }
+}
+
+function updateAllSelected() {
+    var datatable = $( "#georefs" ).DataTable();
+    gisAllSelected = JSON.parse($('#gis_points').val()).concat(JSON.parse($('#gis_lines').val()), JSON.parse($('#gis_polygons').val()));
+    console.log(gisAllSelected);
+    datatable.clear();
+    datatable.rows.add(gisAllSelected);
+    datatable.draw();
 }

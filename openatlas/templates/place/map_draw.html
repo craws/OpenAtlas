@@ -5,15 +5,15 @@
     $(document).ready(function() {
         //init interface elements
         $( "#tabs" ).tabs();
-        $( "#georefs" ).DataTable( {
+        var datatable = $( "#georefs" ).DataTable( {
            data: gisAllSelected,
            columns: [
-               { title: "Type", "data":"properties.shapeType" },
-               { title: "Name", "data":"properties.name" },
-               { title: "Description", "data":"properties.description" },
+               { title: "{{ _('Type')|safe }}", "data":"properties.shapeType" },
+               { title: "{{ _('Name')|safe }}", "data":"properties.name" },
+               { title: "{{ _('Description')|safe }}", "data":"properties.description" },
 
             ]
-        } );
+        });
     });
 </script>
 
@@ -21,8 +21,8 @@
 <div id='map-info-display' style="float:left;">
     <div id="tabs" class="tabs-container">
       <ul>
-        <li><a href="#properties">Place Properties</a></li>
-        <li><a href="#features">Features</a></li>
+        <li><a href="#properties">{{ _('Place Properties')|safe }}</a></li>
+        <li><a href="#features">{{ _('Place Features')|safe }}</a></li>
       </ul>
       <div id="properties" style="width: 440px;">
         {{ form|display_form|safe }}
