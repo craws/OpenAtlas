@@ -6,7 +6,9 @@ class Changelog:
     versions = OrderedDict()  # type: OrderedDict
     versions['3.18.0'] = ['TBA', OrderedDict([
         ('feature', OrderedDict([
+            ('1036', 'Search for similar names'),
             ('1034', 'Advanced data integrity check functions'),
+            ('1025', 'New OpenAtlas project site')
         ])),
         ('fix', OrderedDict([]))])]
     versions['3.17.1'] = ['2019-05-21', OrderedDict([

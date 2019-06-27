@@ -4,11 +4,11 @@
     > {{ _('check similar names')|uc_first }}
 {% endblock %}
 {% block content %}
-{{ 'Check_similar_names'|manual_link|safe }}
-{{ form|display_form|safe }}
-{% if table == 'none found' %}
-    <p>None found</p>
-{% else %}
-    {{ table.display()|safe }}
-{% endif %}
+    {{ 'Data_integrity'|manual_link|safe }}
+    {{ form|display_form|safe }}
+    {% if table == 'none found' %}
+        <p>None found</p>
+    {% elif table.rows %}
+        {{ table.display()|safe }}
+    {% endif %}
 {% endblock %}

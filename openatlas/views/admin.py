@@ -171,26 +171,25 @@ def admin_file():
 
 
 class SimilarForm(Form):
+    classes = SelectField(_('class'), choices=[])
     ratio = IntegerField(default=100)
-    class_ = SelectField('Class', choices=[('source', uc_first(_('source'))),
-                                           ('event', uc_first(_('event'))),
-                                           ('actor', uc_first(_('actor'))),
-                                           ('place', uc_first(_('place'))),
-                                           ('reference', uc_first(_('reference')))])
-    apply = SubmitField(uc_first(_('search')))
+    apply = SubmitField(_('search'))
 
 
 @app.route('/admin/similar', methods=['POST', 'GET'])
 @required_group('editor')
 def admin_check_similar():
     form = SimilarForm()
-    table = Table(['name'])
+    choices = ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic unit', 'find',
+               'reference', 'file']
+    form.classes.choices = [(x, uc_first(_(x))) for x in choices]
+    table = Table(['name', uc_first(_('count'))])
     if form.validate_on_submit():
         for sample_id, sample in EntityMapper.get_similar_named(form).items():
             html = link(sample['entity'])
             for entity in sample['entities']:
                 html += '<br/>' + link(entity)
-            table.rows.append([html])
+            table.rows.append([html, len(sample['entities']) + 1])
         table = table if table.rows else 'none found'
     return render_template('admin/check_similar.html', table=table, form=form)
 

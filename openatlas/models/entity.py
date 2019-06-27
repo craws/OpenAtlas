@@ -329,7 +329,11 @@ class EntityMapper:
 
     @staticmethod
     def get_similar_named(form) -> dict:
-        entities = EntityMapper.get_by_codes(form.class_.data)
+        class_ = form.classes.data
+        if class_ in ['source', 'event', 'actor']:
+            entities = EntityMapper.get_by_codes(class_)
+        else:
+            entities = EntityMapper.get_by_system_type(class_)
         similar = {}  # type: dict
         already_added = set()  # type: set
         for sample in entities:
