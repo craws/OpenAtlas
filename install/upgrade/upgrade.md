@@ -10,6 +10,12 @@ After following the instructions restart Apache and test if the application is w
 
     service apache2 restart
 
+### 3.17.x to 3.18.0
+
+For the function to check similar names the library fuzzywuzzy is needed. On Debian it can be installed with:
+
+    # apt-get install python3-fuzzywuzzy
+
 ### 3.16.0 to 3.17.0
 
 Execute install/upgrade/3.17.0.sql after making backups
@@ -153,7 +159,7 @@ Update Apache config for serving static files - see install/example_apache.conf
 
 ### 3.0.0 to 3.1.0
 
-apt-get install python3-numpy
+    apt-get install python3-numpy
 
 ### 2.4.1 to 3.0.0 Upgrade (PHP to Python upgrade)
 
