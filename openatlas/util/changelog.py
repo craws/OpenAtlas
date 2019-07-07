@@ -4,13 +4,11 @@ from collections import OrderedDict
 
 class Changelog:
     versions = OrderedDict()  # type: OrderedDict
-    versions['3.18.0'] = ['TBA', OrderedDict([
+    versions['3.18.0'] = ['2019-07-07', OrderedDict([
         ('feature', OrderedDict([
             ('1036', 'Search for similar names'),
             ('1034', 'Advanced data integrity check functions'),
-            ('1025', 'New OpenAtlas project site')
-        ])),
-        ('fix', OrderedDict([]))])]
+            ('1025', 'New OpenAtlas project site')]))])]
     versions['3.17.1'] = ['2019-05-21', OrderedDict([
         ('fix', OrderedDict([
             ('1033', 'Map editing breaks upon save w/o edit')]))])]
