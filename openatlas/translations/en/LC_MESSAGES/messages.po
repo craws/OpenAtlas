@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2019-06-27 16:27+0200\n"
-"PO-Revision-Date: 2019-06-27 16:27+0200\n"
+"POT-Creation-Date: 2019-07-07 14:41+0200\n"
+"PO-Revision-Date: 2019-07-07 14:41+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -16,7 +16,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.6.0\n"
+"Generated-By: Babel 2.3.4\n"
 "X-Generator: Poedit 1.8.11\n"
 
 #: __init__.py:31 views/search.py:18
@@ -133,7 +133,7 @@ msgstr ""
 "We searched a long time but this document does not exist. Maybe you mistyped "
 "or followed a broken link."
 
-#: templates/layout.html:40 util/filters.py:306 util/util.py:292
+#: templates/layout.html:40 util/filters.py:308 util/util.py:292
 msgid "show"
 msgstr "show"
 
@@ -163,7 +163,7 @@ msgstr "version"
 msgid "changelog"
 msgstr "changelog"
 
-#: templates/layout.html:81 util/filters.py:185
+#: templates/layout.html:81 util/filters.py:187
 msgid "manual"
 msgstr "manual"
 
@@ -212,7 +212,7 @@ msgstr "logout"
 msgid "login"
 msgstr "login"
 
-#: templates/content/update.html:16 templates/map.html:17 util/filters.py:206
+#: templates/content/update.html:16 templates/map.html:17 util/filters.py:208
 #: views/admin.py:47 views/admin.py:65 views/admin.py:148 views/admin.py:499
 #: views/involvement.py:80 views/member.py:119 views/profile.py:33
 #: views/profile.py:61 views/reference.py:110 views/relation.py:94
@@ -248,7 +248,7 @@ msgstr "edit"
 #: templates/translation/view.html:13 templates/translation/view.html:15
 #: templates/types/index.html:46 templates/types/index.html:47
 #: templates/types/view.html:27 templates/types/view.html:28
-#: templates/user/view.html:15 templates/user/view.html:16 util/filters.py:339
+#: templates/user/view.html:15 templates/user/view.html:16 util/filters.py:341
 #: views/admin.py:289 views/export.py:63 views/export.py:118 views/user.py:57
 msgid "delete"
 msgstr "delete"
@@ -503,7 +503,7 @@ msgstr "this could take some time"
 
 #: templates/admin/check_similar.html:4 templates/admin/index.html:57
 msgid "check similar names"
-msgstr ""
+msgstr "check similar names"
 
 #: templates/admin/check_similar.html:10 util/table.py:39 util/util.py:161
 msgid "no entries"
@@ -547,7 +547,7 @@ msgstr "email"
 
 #: templates/admin/index.html:33 templates/content/index.html:4
 #: templates/content/update.html:4 templates/content/view.html:4
-#: util/filters.py:146 views/admin.py:382 views/source.py:21
+#: util/filters.py:148 views/admin.py:382 views/source.py:21
 #: views/translation.py:17
 msgid "content"
 msgstr "content"
@@ -610,7 +610,7 @@ msgid "unlinked"
 msgstr "Entities without links"
 
 #: templates/admin/orphans.html:12 templates/types/index.html:23
-#: util/filters.py:240
+#: util/filters.py:242
 msgid "type"
 msgstr "type"
 
@@ -733,7 +733,7 @@ msgstr "project"
 msgid "entities"
 msgstr "entities"
 
-#: templates/import/project_view.html:20 util/filters.py:337 views/admin.py:280
+#: templates/import/project_view.html:20 util/filters.py:339 views/admin.py:280
 #: views/export.py:61 views/export.py:116
 #, python-format
 msgid "Delete %(name)s?"
@@ -845,7 +845,7 @@ msgid "classes"
 msgstr "classes"
 
 #: templates/model/class_view.html:16 templates/model/property_view.html:14
-#: templates/types/view.html:34 util/filters.py:242
+#: templates/types/view.html:34 util/filters.py:244
 msgid "super"
 msgstr "super"
 
@@ -863,7 +863,7 @@ msgid "range for"
 msgstr "range for"
 
 #: templates/model/class_view.html:40 templates/model/property_view.html:26
-#: templates/types/index.html:71 util/filters.py:144 views/actor.py:26
+#: templates/types/index.html:71 util/filters.py:146 views/actor.py:26
 #: views/event.py:26 views/file.py:28 views/hierarchy.py:28 views/imports.py:23
 #: views/imports.py:38 views/imports.py:60 views/index.py:23
 #: views/involvement.py:21 views/member.py:21 views/place.py:22 views/place.py:34
@@ -916,7 +916,7 @@ msgstr "No data to display"
 #: templates/model/network.html:34 templates/model/network.html:60
 #: templates/model/network.html:70 templates/model/network.html:76
 #: templates/model/network.html:86 templates/search/index.html:37
-#: templates/search/index.html:47 util/filters.py:94
+#: templates/search/index.html:47 util/filters.py:96
 msgid "select all"
 msgstr "select all"
 
@@ -932,7 +932,7 @@ msgstr "links"
 #: templates/model/network.html:68 templates/model/network.html:79
 #: templates/model/network.html:84 templates/search/index.html:25
 #: templates/search/index.html:40 templates/search/index.html:45
-#: util/filters.py:95
+#: util/filters.py:97
 msgid "deselect all"
 msgstr "deselect all"
 
@@ -1009,7 +1009,7 @@ msgstr "value types"
 msgid "places"
 msgstr "places"
 
-#: templates/types/index.html:57 util/filters.py:96
+#: templates/types/index.html:57 util/filters.py:98
 msgid "selection"
 msgstr "selection"
 
@@ -1037,19 +1037,19 @@ msgstr "unit"
 msgid "move entities"
 msgstr "move entities"
 
-#: util/filters.py:66
+#: util/filters.py:68
 msgid "no"
 msgstr "no"
 
-#: util/filters.py:67 views/user.py:114
+#: util/filters.py:69 views/user.py:114
 msgid "yes"
 msgstr "yes"
 
-#: util/filters.py:306
+#: util/filters.py:308
 msgid "values"
 msgstr "values"
 
-#: util/filters.py:395
+#: util/filters.py:397
 msgid "external references"
 msgstr "External references"
 
