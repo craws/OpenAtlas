@@ -7,12 +7,12 @@
 {{ 'Data_integrity'|manual_link|safe }}
 <div id="tabs" class="tabs-container">
     <ul>
-        <li><a href="#tab-orphan">{{ _('orphans')|uc_first }} ({{ tables['orphans'].rows|length|format_number }})</a></li>
-        <li><a href="#tab-unlinked">{{ _('unlinked')|uc_first }} ({{ tables['unlinked'].rows|length|format_number }})</a></li>
-        <li><a href="#tab-nodes">{{ _('type')|uc_first }} ({{ tables['nodes'].rows|length|format_number }})</a></li>
-        <li><a href="#tab-missing-files">{{ _('missing files')|uc_first }} ({{ tables['missing_files'].rows|length|format_number }})</a></li>
-        <li><a href="#tab-orphaned-files">{{ _('orphaned files')|uc_first }} ({{ tables['orphaned_files'].rows|length|format_number }})</a></li>
-        <li><a href="#tab-circular">{{ _('circular dependencies')|uc_first }} ({{ tables['circular'].rows|length|format_number }})</a></li>
+        <li><a href="#tab-orphan">{{ _('orphans')|uc_first }} {{ tables['orphans']|format_tab_number|safe }}</a></li>
+        <li><a href="#tab-unlinked">{{ _('unlinked')|uc_first }} {{ tables['unlinked']|format_tab_number|safe }}</a></li>
+        <li><a href="#tab-nodes">{{ _('type')|uc_first }} {{ tables['nodes']|format_tab_number|safe }}</a></li>
+        <li><a href="#tab-missing-files">{{ _('missing files')|uc_first }} {{ tables['missing_files']|format_tab_number|safe }}</a></li>
+        <li><a href="#tab-orphaned-files">{{ _('orphaned files')|uc_first }} {{ tables['orphaned_files']|format_tab_number|safe }}</a></li>
+        <li><a href="#tab-circular">{{ _('circular dependencies')|uc_first }} {{ tables['circular']|format_tab_number|safe }}</a></li>
     </ul>
     <div id="tab-orphan">
         {% if tables['orphans'].rows and 'admin'|is_authorized %}
