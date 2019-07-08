@@ -9,12 +9,12 @@
     <ul>
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
         {% if tables['subs'].rows %}
-            <li><a href="#tab-subs">{{ _('sub events')|uc_first }} ({{ tables['subs'].rows|length|format_number }})</a></li>
+            <li><a href="#tab-subs">{{ _('sub events')|uc_first }} {{ tables['subs']|format_tab_number|safe }}</a></li>
         {% endif %}
-        <li><a href="#tab-source">{{ _('source')|uc_first }} ({{ tables['source'].rows|length|format_number }})</a></li>
-        <li><a href="#tab-actor">{{ _('actor')|uc_first }} ({{ tables['actor'].rows|length|format_number }})</a></li>
-        <li><a href="#tab-reference">{{ _('reference')|uc_first }} ({{ tables['reference'].rows|length|format_number }})</a></li>
-        <li><a href="#tab-file">{{ _('files')|uc_first }}  ({{ tables['file'].rows|length|format_number }})</a></li>
+        <li><a href="#tab-source">{{ _('source')|uc_first }} {{ tables['source']|format_tab_number|safe }}</a></li>
+        <li><a href="#tab-actor">{{ _('actor')|uc_first }} {{ tables['actor']|format_tab_number|safe }}</a></li>
+        <li><a href="#tab-reference">{{ _('reference')|uc_first }} {{ tables['reference']|format_tab_number|safe }}</a></li>
+        <li><a href="#tab-file">{{ _('files')|uc_first }} {{ tables['file']|format_tab_number|safe }}</a></li>
     </ul>
     <div id="tab-info">
         <div class="button-bar">

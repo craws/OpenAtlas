@@ -60,9 +60,9 @@ class ContentTests(TestBaseCase):
                 involvement.end_from = '2017-01-01'
                 involvement.update()
             rv = self.app.get(url_for('admin_check_dates'))
-            assert b'Invalid dates (1)' in rv.data
-            assert b'Invalid link dates (1)' in rv.data
-            assert b'Invalid involvement dates (1)' in rv.data
+            assert b'Invalid dates <span class="tab-counter">1' in rv.data
+            assert b'Invalid link dates <span class="tab-counter">1' in rv.data
+            assert b'Invalid involvement dates <span class="tab-counter">1' in rv.data
 
     def test_admin(self) -> None:
         with app.app_context():
@@ -100,6 +100,18 @@ class ContentTests(TestBaseCase):
             rv = self.app.get(url_for('admin_delete_single_type_duplicate', entity_id=source.id,
                                       node_id=source_node.subs[0]), follow_redirects=True)
             assert b'Congratulations, everything looks fine!' in rv.data
+
+            # Check similar names
+            with app.test_request_context():
+                app.preprocess_request()
+                EntityMapper.insert('E21', 'I have the same name!')
+                EntityMapper.insert('E21', 'I have the same name!')
+            rv = self.app.post(url_for('admin_check_similar'), follow_redirects=True,
+                               data={'classes': 'actor', 'ratio': 100})
+            assert b'I have the same name!' in rv.data
+            rv = self.app.post(url_for('admin_check_similar'), follow_redirects=True,
+                               data={'classes': 'file', 'ratio': 100})
+            assert b'No entries' in rv.data
 
             data = {name: '' for name in SettingsMapper.fields}  # type: Dict[str, Union[str, int]]
             data['default_language'] = 'en'

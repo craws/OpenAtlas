@@ -32,8 +32,10 @@ def link(self, entity: Entity) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def format_number(self, number: int) -> str:
-    return babel_format_number(number)
+def format_tab_number(self, param) -> str:
+    if hasattr(param, 'rows'):  # In case param was a table return the row count
+        param = len(param.rows)
+    return '<span class="tab-counter">' + babel_format_number(param) + '</span>'
 
 
 @jinja2.contextfilter
