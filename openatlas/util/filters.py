@@ -250,7 +250,7 @@ def display_form(self, form, form_id: Optional[str] = None, for_persons: Optiona
                                 <label style="font-weight:bold;">{label}</label> {tooltip}
                             </div>
                         </div>
-                    """.format(label=label, tooltip=display_tooltip(node.description))
+                    """.format(label=label, tooltip=util.display_tooltip(node.description))
                 html['value_types'] += display_value_type_fields(node.subs)
                 continue
             else:
