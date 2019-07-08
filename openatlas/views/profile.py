@@ -21,9 +21,8 @@ class PasswordForm(Form):
 
     def validate(self) -> bool:
         valid = Form.validate(self)
-        hash_ = bcrypt.hashpw(
-            self.password_old.data.encode('utf-8'),
-            current_user.password.encode('utf-8'))
+        hash_ = bcrypt.hashpw(self.password_old.data.encode('utf-8'),
+                              current_user.password.encode('utf-8'))
         if hash_ != current_user.password.encode('utf-8'):
             self.password_old.errors.append(_('error wrong password'))
             valid = False
@@ -94,6 +93,8 @@ def profile_update():
         user.settings['language'] = form.language.data
         user.settings['theme'] = form.theme.data
         user.settings['table_rows'] = form.table_rows.data
+        user.settings['module_geonames'] = form.geonames.data
+        user.settings['max_zoom'] = form.max_zoom.data
         user.settings[
             'table_show_aliases'] = 'True' if form.table_show_aliases.data == 'on' else 'False'
         user.settings['layout'] = form.layout.data
@@ -130,7 +131,7 @@ def profile_update():
     form.layout.label.text = uc_first(_('layout'))
     form.max_zoom.data = user.settings['max_zoom']
     form.max_zoom.label.text = uc_first(_('max zoom'))
-    form.geonames.data  = user.settings['module_geonames']
+    form.geonames.data = user.settings['module_geonames']
     form.geonames.label.text = 'GeoNames'
     form.save.label.text = uc_first(_('save'))
     return render_template('profile/update.html', form=form)

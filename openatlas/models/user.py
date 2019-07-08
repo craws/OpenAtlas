@@ -183,6 +183,8 @@ class UserMapper:
                 value = 'True' if user.settings['newsletter'] else ''
             if name == 'show_email':
                 value = 'True' if user.settings['show_email'] else ''
+            if name == 'module_geonames':
+                value = 'True' if user.settings['module_geonames'] else ''
             sql = """
                     INSERT INTO web.user_settings (user_id, "name", "value")
                     VALUES (%(user_id)s, %(name)s, %(value)s)
