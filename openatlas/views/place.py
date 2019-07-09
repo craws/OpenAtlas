@@ -75,6 +75,8 @@ def place_insert(origin_id=None):
     if origin and origin.system_type not in ['place', 'feature', 'stratigraphic unit'] \
             and hasattr(form, 'insert_and_continue'):
         del form.insert_and_continue
+    if hasattr(form, 'geonames_id') and not current_user.settings['module_geonames']:
+        del form.geonames_id, form.geonames_precision
     if form.validate_on_submit():
         return redirect(save(form, origin=origin))
     if title == 'place':
@@ -198,6 +200,8 @@ def place_update(id_):
         form = build_form(FeatureForm, 'Find', object_, request, location)
     else:
         form = build_form(PlaceForm, 'Place', object_, request, location)
+    if hasattr(form, 'geonames_id') and not current_user.settings['module_geonames']:
+        del form.geonames_id, form.geonames_precision
     if form.validate_on_submit():
         if was_modified(form, object_):  # pragma: no cover
             del form.save
@@ -212,7 +216,7 @@ def place_update(id_):
             form.alias.append_entry(alias)
         form.alias.append_entry('')
     gis_data = GisMapper.get_all(object_)
-    if hasattr(form, 'geonames_id'):
+    if hasattr(form, 'geonames_id') and current_user.settings['module_geonames']:
         geonames_link = get_geonames_link(object_)
         if geonames_link:
             geonames_entity = geonames_link.domain
@@ -264,7 +268,7 @@ def save(form: DateForm, object_=None, location=None, origin=None) -> str:
         location.name = 'Location of ' + form.name.data
         location.update()
         location.save_nodes(form)
-        if hasattr(form, 'geonames_id'):
+        if hasattr(form, 'geonames_id') and current_user.settings['module_geonames']:
             update_geonames(form, object_)
         url = url_for('place_view', id_=object_.id)
         if origin:
