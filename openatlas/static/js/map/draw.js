@@ -1,5 +1,4 @@
-// Todo: try to remove global variables
-// Variables for a selected geometry
+/* Variables for a selected geometry */
 var name;
 var description;
 var shapeType; // centerpoint, polyline, shape or area
