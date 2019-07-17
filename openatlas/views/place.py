@@ -302,13 +302,6 @@ def save(form: DateForm, object_=None, location=None, origin=None) -> str:
     return url
 
 
-def get_geonames_entity(object_):
-    for entity in object_.get_linked_entities('P67', inverse=True):
-        if entity.system_type == 'external reference geonames':
-            return entity
-    return
-
-
 def get_geonames_link(object_):
     for link_ in object_.get_links('P67', inverse=True):
         if link_.domain.system_type == 'external reference geonames':

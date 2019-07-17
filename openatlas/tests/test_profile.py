@@ -17,6 +17,8 @@ class ProfileTests(TestBaseCase):
             assert b'Newsletter' in rv.data
             data = {'name': 'Alice Abernathy',
                     'email': 'alice@umbrella.net',
+                    'max_zoom': 20,
+                    'geonames': '',
                     'show_email': '',
                     'newsletter': '',
                     'language': 'en',
@@ -25,7 +27,6 @@ class ProfileTests(TestBaseCase):
                     'layout': 'advanced',
                     'theme': 'default'}
             rv = self.app.post(url_for('profile_update'), data=data, follow_redirects=True)
-            print(rv.data)
             assert b'saved' in rv.data
             assert b'Alice Abernathy' in rv.data
 
