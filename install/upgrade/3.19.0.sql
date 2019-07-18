@@ -3,6 +3,9 @@
 
 BEGIN;
 
+-- Remove settings for obsolete color themes
+DELETE FROM web.user_settings WHERE name = 'theme';
+
 -- Insert additional boolean field "locked" to web.hierarchy
 ALTER TABLE web.hierarchy ADD COLUMN locked boolean;
 COMMENT ON COLUMN web.hierarchy.locked IS 'True if these types are not editable';

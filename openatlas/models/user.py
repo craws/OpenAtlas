@@ -233,8 +233,6 @@ class UserMapper:
             settings['table_show_aliases'] = False
         else:
             settings['table_show_aliases'] = True
-        if 'theme' not in settings:
-            settings['theme'] = 'default'
         if 'layout' not in settings:
             settings['layout'] = 'default'
         if 'language' not in settings:

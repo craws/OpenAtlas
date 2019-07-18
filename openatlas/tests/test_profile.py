@@ -24,8 +24,7 @@ class ProfileTests(TestBaseCase):
                     'language': 'en',
                     'table_rows': '100',
                     'table_show_aliases': 'off',
-                    'layout': 'advanced',
-                    'theme': 'default'}
+                    'layout': 'advanced'}
             rv = self.app.post(url_for('profile_update'), data=data, follow_redirects=True)
             assert b'saved' in rv.data
             assert b'Alice Abernathy' in rv.data

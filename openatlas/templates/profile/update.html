@@ -36,10 +36,6 @@
                     <div class="table-cell">{{ form.language }}</div>
                 </div>
                 <div class="table-row">
-                    <div>{{ form.theme.label|safe }}  {{ form.theme.description|display_tooltip|safe }}</div>
-                    <div class="table-cell">{{ form.theme }}</div>
-                </div>
-                <div class="table-row">
                     <div>{{ form.table_rows.label|safe }}  {{ form.table_rows.description|display_tooltip|safe }}</div>
                     <div class="table-cell">{{ form.table_rows }}</div>
                 </div>
@@ -71,15 +67,3 @@
     </form>
 
 {% endblock %}
-
-    form.language.data = language
-    form.language.label.text = uc_first(_('language'))
-    form.theme.data = user.settings['theme']
-    form.theme.label.text = uc_first(_('theme'))
-    form.table_rows.data = user.settings['table_rows']
-    form.table_rows.label.text = uc_first(_('table rows'))
-    form.table_show_aliases.data = 'on' if user.settings['table_show_aliases'] else 'off'
-    form.table_show_aliases.label.text = uc_first(_('show aliases in tables'))
-    form.layout.data = user.settings['layout']
-    form.layout.label.text = uc_first(_('layout'))
-    form.save.label.text = uc_first(_('save'))

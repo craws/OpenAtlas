@@ -45,9 +45,6 @@ class ProfileForm(Form):
     show_email = BooleanField(description=_('tooltip show email'))
     newsletter = BooleanField(description=_('tooltip newsletter'))
     language = SelectField(choices=list(app.config['LANGUAGES'].items()))
-    theme_choices = [('default', _('default')), ('darkside', 'Darkside'),
-                     ('omg_ponies', 'OMG Ponies!')]
-    theme = SelectField(choices=theme_choices)
     table_rows = SelectField(description=_('tooltip table rows'),
                              choices=list(app.config['DEFAULT_TABLE_ROWS'].items()),
                              coerce=int)
@@ -71,7 +68,6 @@ def profile_index() -> str:
                      (_('newsletter'),
                       uc_first(_('on')) if user.settings['newsletter'] else uc_first(_('off')))],
             'display': [(_('language'), user.settings['language']),
-                        (_('theme'), user.settings['theme']),
                         (_('table rows'), user.settings['table_rows']),
                         (_('show aliases in tables'), user.settings['table_show_aliases']),
                         (_('layout'), user.settings['layout'])],
@@ -91,7 +87,6 @@ def profile_update():
         user.settings['show_email'] = form.show_email.data
         user.settings['newsletter'] = form.newsletter.data
         user.settings['language'] = form.language.data
-        user.settings['theme'] = form.theme.data
         user.settings['table_rows'] = form.table_rows.data
         user.settings['module_geonames'] = form.geonames.data
         user.settings['max_zoom'] = form.max_zoom.data
@@ -121,8 +116,6 @@ def profile_update():
     language = user.settings['language'] if user.settings['language'] else session['language']
     form.language.data = language
     form.language.label.text = uc_first(_('language'))
-    form.theme.data = user.settings['theme']
-    form.theme.label.text = uc_first(_('theme'))
     form.table_rows.data = user.settings['table_rows']
     form.table_rows.label.text = uc_first(_('table rows'))
     form.table_show_aliases.data = 'on' if user.settings['table_show_aliases'] else 'off'
