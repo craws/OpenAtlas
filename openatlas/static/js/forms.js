@@ -17,8 +17,14 @@ $(document).ready(function () {
     }, 'Please enter a valid integer.');
 
     $('#show_passwords').show();
-    $(".date-switch").addClass('display-none');
-    $(".value-type-switch").addClass('display-none');
+
+    // Hide date fields if there are any and if they are empty
+    if ($('#begin_year_from').length &
+        $('#begin_year_from').val() == '' & $('#end_year_from').val() == '') {
+        $('.date-switch').addClass('display-none');
+    }
+
+    $('.value-type-switch').addClass('display-none');
     $('label[for="show_passwords"]').css('display', 'block');
     $('#show_passwords').change(function() {
         $('#password')[0].type = this.checked ? 'text' : 'password';
