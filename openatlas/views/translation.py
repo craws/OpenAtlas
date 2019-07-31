@@ -21,7 +21,7 @@ class TranslationForm(Form):
 
 
 @app.route('/source/translation/insert/<int:source_id>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def translation_insert(source_id):
     source = EntityMapper.get_by_id(source_id)
     form = build_form(TranslationForm, 'Source translation')
@@ -44,7 +44,7 @@ def translation_view(id_):
 
 
 @app.route('/source/translation/delete/<int:id_>/<int:source_id>')
-@required_group('editor')
+@required_group('contributor')
 def translation_delete(id_, source_id):
     EntityMapper.delete(id_)
     flash(_('entity deleted'), 'info')
@@ -52,7 +52,7 @@ def translation_delete(id_, source_id):
 
 
 @app.route('/source/translation/update/<int:id_>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def translation_update(id_):
     translation = EntityMapper.get_by_id(id_, nodes=True)
     source = translation.get_linked_entity('P73', True)

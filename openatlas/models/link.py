@@ -201,7 +201,7 @@ class LinkMapper:
     @staticmethod
     def delete(id_: int) -> None:
         from openatlas.util.util import is_authorized
-        if not is_authorized('editor'):  # pragma: no cover
+        if not is_authorized('contributor'):  # pragma: no cover
             abort(403)
         g.cursor.execute("DELETE FROM model.link WHERE id = %(id)s;", {'id': id_})
         debug_model['link sql'] += 1

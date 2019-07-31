@@ -175,7 +175,7 @@ def user_insert():
 
 def get_groups():
     """ Returns groups, hardcoded because order is relevant (weakest permissions to strongest)"""
-    choices = [('readonly', 'readonly'), ('editor', 'editor'), ('manager', 'manager')]
+    choices = [(name, name) for name in ['readonly', 'contributor', 'editor', 'manager']]
     if is_authorized('admin'):
         choices.append(('admin', 'admin'))  # admin group is only available for admins
     return choices

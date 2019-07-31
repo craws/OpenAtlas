@@ -54,7 +54,7 @@ def event_index():
 
 @app.route('/event/insert/<code>', methods=['POST', 'GET'])
 @app.route('/event/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def event_insert(code, origin_id=None):
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(EventForm, 'Event')
@@ -68,7 +68,7 @@ def event_insert(code, origin_id=None):
 
 
 @app.route('/event/delete/<int:id_>')
-@required_group('editor')
+@required_group('contributor')
 def event_delete(id_):
     EntityMapper.delete(id_)
     logger.log_user(id_, 'delete')
@@ -77,7 +77,7 @@ def event_delete(id_):
 
 
 @app.route('/event/update/<int:id_>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def event_update(id_):
     event = EntityMapper.get_by_id(id_, nodes=True)
     form = build_form(EventForm, 'Event', event, request)
@@ -124,7 +124,7 @@ def event_view(id_):
                  link_.type.name if link_.type else '',
                  first, last,
                  truncate_string(link_.description)])
-        if is_authorized('editor'):
+        if is_authorized('contributor'):
             update_url = url_for('involvement_update', id_=link_.id, origin_id=event.id)
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=event.id) + '#tab-actor'
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
@@ -143,10 +143,10 @@ def event_view(id_):
             if domain.system_type == 'external reference':
                 event.external_references.append(link_)
             data.append(truncate_string(link_.description))
-            if is_authorized('editor'):
+            if is_authorized('contributor'):
                 url = url_for('reference_link_update', link_id=link_.id, origin_id=event.id)
                 data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
-        if is_authorized('editor'):
+        if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=event.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
         tables[domain.view_name].rows.append(data)

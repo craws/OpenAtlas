@@ -23,7 +23,7 @@
     </ul>
     <div id="tab-info">
         <div class="button-bar">
-            {% if 'editor'|is_authorized %}
+            {% if 'contributor'|is_authorized %}
                 <a href="{{ url_for('reference_update', id_=reference.id) }}">{{ _('edit')|uc_first }}</a>
                 {{ reference|display_delete_link|safe }}
             {% endif %}
@@ -41,7 +41,7 @@
     </div>
     {% if reference.system_type == 'information carrier' %}
         <div id="tab-source">
-            {% if 'editor'|is_authorized %}
+            {% if 'contributor'|is_authorized %}
                 <div class="button-bar">
                     <a href="{{ url_for('reference_add2', reference_id=reference.id, class_name='source')}}">{{ _('add')|uc_first }}</a>
                     <a href="{{ url_for('source_insert', origin_id=reference.id) }}">+ {{ _('source')|uc_first }}</a>
@@ -53,7 +53,7 @@
         {% for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find', 'file'] %}
             {% if name not in ['feature', 'stratigraphic-unit', 'find'] or tables[name].rows %}
                 <div id="tab-{{name}}">
-                    {% if 'editor'|is_authorized and name not in ['feature', 'stratigraphic-unit', 'find'] %}
+                    {% if 'contributor'|is_authorized and name not in ['feature', 'stratigraphic-unit', 'find'] %}
                         <div class="button-bar">
                             <a href="{{ url_for('reference_add2', reference_id=reference.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
                             {% if name == 'place' %}

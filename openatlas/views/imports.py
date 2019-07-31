@@ -33,7 +33,7 @@ class ProjectForm(Form):
 
 
 @app.route('/import/index')
-@required_group('editor')
+@required_group('contributor')
 def import_index():
     table = Table([_('project'), _('entities'), _('description')])
     for project in ImportMapper.get_all_projects():
@@ -55,7 +55,7 @@ def import_project_insert():
 
 
 @app.route('/import/project/view/<int:id_>')
-@required_group('editor')
+@required_group('contributor')
 def import_project_view(id_):
     table = Table([_('name'), _('class'), _('description'), 'origin ID', _('date')])
     for entity in EntityMapper.get_by_project_id(id_):
