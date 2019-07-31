@@ -1,36 +1,5 @@
-<script src="/static/vendor/DataTables/datatables.js"></script>
-<link rel="stylesheet" href="/static/vendor/DataTables/datatables.css" />
-
-<script>
-    $(document).ready(function() {
-        //init interface elements
-        $( "#tabs" ).tabs();
-        var datatable = $( "#georefs" ).DataTable( {
-           data: gisAllSelected,
-           columns: [
-               { title: "{{ _('Type')|safe }}", "data":"properties.shapeType" },
-               { title: "{{ _('Name')|safe }}", "data":"properties.name" },
-               { title: "{{ _('Description')|safe }}", "data":"properties.description" },
-
-            ]
-        });
-    });
-</script>
-
-
 <div id='map-info-display' style="float:left;">
-    <div id="tabs" class="tabs-container">
-      <ul>
-        <li><a href="#properties">{{ _('Place Properties')|safe }}</a></li>
-        <li><a href="#features">{{ _('Place Features')|safe }}</a></li>
-      </ul>
-      <div id="properties" style="width: 440px;">
-        {{ form|display_form|safe }}
-      </div>
-      <div id="features" style="width: 440px;">
-        <table id="georefs" class="display" width="100%"></table>
-      </div>
-    </div>
+    {{ form|display_form|safe }}
 </div>
 <div id="map" class="map"></div>
 <link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/Leaflet.draw-1.0.2.css" />
