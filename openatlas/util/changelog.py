@@ -6,6 +6,7 @@ class Changelog:
     versions = OrderedDict()  # type: OrderedDict
     versions['3.19.0'] = ['TBA', OrderedDict([
         ('feature', OrderedDict([
+            ('1040', 'New user group: Contributor'),
             ('1044', 'Hide date form fields only if there are empty'),
             ('1041', 'Removing color themes'),
         ]))
