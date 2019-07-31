@@ -57,7 +57,7 @@ def place_index():
 
 @app.route('/place/insert', methods=['POST', 'GET'])
 @app.route('/place/insert/<int:origin_id>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def place_insert(origin_id=None):
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     if origin and origin.system_type == 'place':
@@ -75,6 +75,8 @@ def place_insert(origin_id=None):
     if origin and origin.system_type not in ['place', 'feature', 'stratigraphic unit'] \
             and hasattr(form, 'insert_and_continue'):
         del form.insert_and_continue
+    if hasattr(form, 'geonames_id') and not current_user.settings['module_geonames']:
+        del form.geonames_id, form.geonames_precision
     if form.validate_on_submit():
         return redirect(save(form, origin=origin))
     if title == 'place':
@@ -121,10 +123,10 @@ def place_view(id_):
             data.append(truncate_string(link_.description))
             if domain.system_type.startswith('external reference'):
                 object_.external_references.append(link_)
-            if is_authorized('editor'):
+            if is_authorized('contributor'):
                 url = url_for('reference_link_update', link_id=link_.id, origin_id=object_.id)
                 data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
-        if is_authorized('editor'):
+        if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=object_.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
         tables[domain.view_name].rows.append(data)
@@ -170,7 +172,7 @@ def place_view(id_):
 
 
 @app.route('/place/delete/<int:id_>')
-@required_group('editor')
+@required_group('contributor')
 def place_delete(id_):
     entity = EntityMapper.get_by_id(id_)
     parent = None if entity.system_type == 'place' else entity.get_linked_entity('P46', True)
@@ -186,7 +188,7 @@ def place_delete(id_):
 
 
 @app.route('/place/update/<int:id_>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def place_update(id_):
     object_ = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
     location = object_.get_linked_entity('P53', nodes=True)
@@ -198,6 +200,8 @@ def place_update(id_):
         form = build_form(FeatureForm, 'Find', object_, request, location)
     else:
         form = build_form(PlaceForm, 'Place', object_, request, location)
+    if hasattr(form, 'geonames_id') and not current_user.settings['module_geonames']:
+        del form.geonames_id, form.geonames_precision
     if form.validate_on_submit():
         if was_modified(form, object_):  # pragma: no cover
             del form.save
@@ -212,7 +216,7 @@ def place_update(id_):
             form.alias.append_entry(alias)
         form.alias.append_entry('')
     gis_data = GisMapper.get_all(object_)
-    if hasattr(form, 'geonames_id'):
+    if hasattr(form, 'geonames_id') and current_user.settings['module_geonames']:
         geonames_link = get_geonames_link(object_)
         if geonames_link:
             geonames_entity = geonames_link.domain
@@ -264,7 +268,7 @@ def save(form: DateForm, object_=None, location=None, origin=None) -> str:
         location.name = 'Location of ' + form.name.data
         location.update()
         location.save_nodes(form)
-        if hasattr(form, 'geonames_id'):
+        if hasattr(form, 'geonames_id') and current_user.settings['module_geonames']:
             update_geonames(form, object_)
         url = url_for('place_view', id_=object_.id)
         if origin:
@@ -296,13 +300,6 @@ def save(form: DateForm, object_=None, location=None, origin=None) -> str:
         url = url_for('place_index') if log_action == 'insert' else url_for('place_view',
                                                                             id_=object_.id)
     return url
-
-
-def get_geonames_entity(object_):
-    for entity in object_.get_linked_entities('P67', inverse=True):
-        if entity.system_type == 'external reference geonames':
-            return entity
-    return
 
 
 def get_geonames_link(object_):

@@ -33,7 +33,7 @@ class RelationForm(DateForm):
 
 
 @app.route('/relation/insert/<int:origin_id>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def relation_insert(origin_id):
     origin = EntityMapper.get_by_id(origin_id)
     form = build_form(RelationForm, 'Actor Actor Relation')
@@ -62,7 +62,7 @@ def relation_insert(origin_id):
 
 
 @app.route('/relation/update/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def relation_update(id_, origin_id):
     link_ = LinkMapper.get_by_id(id_)
     domain = EntityMapper.get_by_id(link_.domain.id)

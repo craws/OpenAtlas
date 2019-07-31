@@ -7,21 +7,21 @@
 <div id="tabs" class="tabs-container">
     <ul>
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
-        <li><a href="#tab-event">{{ _('event')|uc_first }} ({{ tables['event'].rows|length|format_number }})</a></li>
-        <li><a href="#tab-actor">{{ _('actor')|uc_first }} ({{ tables['actor'].rows|length|format_number }})</a></li>
-        <li><a href="#tab-place">{{ _('place')|uc_first }} ({{ tables['place'].rows|length|format_number }})</a></li>
+        <li><a href="#tab-event">{{ _('event')|uc_first }} {{ tables['event']|format_tab_number|safe }}</a></li>
+        <li><a href="#tab-actor">{{ _('actor')|uc_first }} {{ tables['actor']|format_tab_number|safe }}</a></li>
+        <li><a href="#tab-place">{{ _('place')|uc_first }} {{ tables['place']|format_tab_number|safe }}</a></li>
         {% for table_name in ['feature', 'stratigraphic-unit', 'find'] %}
             {% if tables[table_name].rows %}
-                <li><a href="#tab-{{ table_name }}">{{ _(table_name)|uc_first }} ({{ tables[table_name].rows|length|format_number }})</a></li>
+                <li><a href="#tab-{{ table_name }}">{{ _(table_name)|uc_first }} {{ tables[table_name]|format_tab_number|safe }}</a></li>
             {% endif %}
         {% endfor %}
-        <li><a href="#tab-reference">{{ _('reference')|uc_first }} ({{ tables['reference'].rows|length|format_number }})</a></li>
-        <li><a href="#tab-text">{{ _('texts')|uc_first }} ({{ tables['text'].rows|length|format_number }})</a></li>
-        <li><a href="#tab-file">{{ _('files')|uc_first }}  ({{ tables['file'].rows|length|format_number }})</a></li>
+        <li><a href="#tab-reference">{{ _('reference')|uc_first }} {{ tables['reference']|format_tab_number|safe }}</a></li>
+        <li><a href="#tab-text">{{ _('texts')|uc_first }} {{ tables['text']|format_tab_number|safe }}</a></li>
+        <li><a href="#tab-file">{{ _('files')|uc_first }} {{ tables['file']|format_tab_number|safe }}</a></li>
     </ul>
     <div id="tab-info">
         <div class="button-bar">
-            {% if 'editor'|is_authorized %}
+            {% if 'contributor'|is_authorized %}
                 <a href="{{ url_for('source_update', id_=source.id) }}">{{ _('edit')|uc_first }}</a>
                 {{ source|display_delete_link|safe }}
             {% endif %}
@@ -41,7 +41,7 @@
     {% for name in ['event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find'] %}
         {% if name not in ['feature', 'stratigraphic-unit', 'find'] or tables[name].rows %}
             <div id="tab-{{ name }}">
-                {% if 'editor'|is_authorized and name not in ['feature', 'stratigraphic-unit', 'find'] %}
+                {% if 'contributor'|is_authorized and name not in ['feature', 'stratigraphic-unit', 'find'] %}
                     <div class="button-bar">
                         <a href="{{ url_for('source_add2', id_=source.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
                         {% if name == 'place' %}
@@ -58,7 +58,7 @@
         {% endif %}
     {% endfor %}
     <div id="tab-reference">
-        {% if 'editor'|is_authorized %}
+        {% if 'contributor'|is_authorized %}
             <div class="button-bar">
                 <a href="{{ url_for('reference_add', origin_id=source.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='bibliography', origin_id=source.id) }}">+ {{ _('bibliography')|uc_first }}</a>
@@ -69,7 +69,7 @@
         {{ tables['reference'].display('reference')|safe }}
     </div>
     <div id="tab-text">
-        {% if 'editor'|is_authorized %}
+        {% if 'contributor'|is_authorized %}
             <div class="button-bar">
                 <a href="{{ url_for('translation_insert', source_id=source.id) }}">+ {{ _('text')|uc_first }}</a>
             </div>
@@ -77,7 +77,7 @@
         {{ tables['text'].display('text')|safe }}
     </div>
     <div id="tab-file">
-        {% if 'editor'|is_authorized %}
+        {% if 'contributor'|is_authorized %}
             <div class="button-bar">
                 <a href="{{ url_for('file_add', origin_id=source.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('file_insert', origin_id=source.id) }}">+ {{ _('file')|uc_first }}</a>

@@ -32,8 +32,10 @@ def link(self, entity: Entity) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def format_number(self, number: int) -> str:
-    return babel_format_number(number)
+def format_tab_number(self, param) -> str:
+    if hasattr(param, 'rows'):  # In case param was a table return the row count
+        param = len(param.rows)
+    return '<span class="tab-counter">' + babel_format_number(param) + '</span>'
 
 
 @jinja2.contextfilter
@@ -248,17 +250,17 @@ def display_form(self, form, form_id: Optional[str] = None, for_persons: Optiona
                                 <label style="font-weight:bold;">{label}</label> {tooltip}
                             </div>
                         </div>
-                    """.format(label=label, tooltip=display_tooltip(node.description))
+                    """.format(label=label, tooltip=util.display_tooltip(node.description))
                 html['value_types'] += display_value_type_fields(node.subs)
                 continue
             else:
+                info = '' if 'is_node_form' in form else util.display_tooltip(node.description)
                 type_field = """
                     <div class="table-row">
                         <div><label>{label}</label> {info}</div>
                         <div class="table-cell">{field}</div>
                     </div>
-                """.format(label=label, field=str(field(class_=class_)) + errors,
-                           info='' if 'is_node_form' in form else util.display_tooltip(node.description))
+                """.format(label=label, field=str(field(class_=class_)) + errors, info=info)
                 if node.name in app.config['BASE_TYPES']:  # base type should be above other fields
                     html['types'] = type_field + html['types']
                 else:

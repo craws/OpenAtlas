@@ -58,10 +58,10 @@ def actor_view(id_):
             data.append(truncate_string(link_.description))
             if domain.system_type == 'external reference':
                 actor.external_references.append(link_)
-            if is_authorized('editor'):
+            if is_authorized('contributor'):
                 url = url_for('reference_link_update', link_id=link_.id, origin_id=actor.id)
                 data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
-        if is_authorized('editor'):
+        if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=actor.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
         tables[domain.view_name].rows.append(data)
@@ -87,7 +87,7 @@ def actor_view(id_):
         data = ([link(event), g.classes[event.class_.code].name,
                  link_.type.name if link_.type else '', first, last,
                  truncate_string(link_.description)])
-        if is_authorized('editor'):
+        if is_authorized('contributor'):
             update_url = url_for('involvement_update', id_=link_.id, origin_id=actor.id)
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-event'
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
@@ -129,7 +129,7 @@ def actor_view(id_):
             type_ = link_.type.get_name_directed(True) if link_.type else ''
             related = link_.domain
         data = ([type_, link(related), link_.first, link_.last, truncate_string(link_.description)])
-        if is_authorized('editor'):
+        if is_authorized('contributor'):
             update_url = url_for('relation_update', id_=link_.id, origin_id=actor.id)
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-relation'
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
@@ -138,7 +138,7 @@ def actor_view(id_):
     for link_ in actor.get_links('P107', True):
         data = ([link(link_.domain), link_.type.name if link_.type else '',
                  link_.first, link_.last, truncate_string(link_.description)])
-        if is_authorized('editor'):
+        if is_authorized('contributor'):
             update_url = url_for('member_update', id_=link_.id, origin_id=actor.id)
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-member-of'
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
@@ -149,7 +149,7 @@ def actor_view(id_):
         for link_ in actor.get_links('P107'):
             data = ([link(link_.range), link_.type.name if link_.type else '',
                      link_.first, link_.last, truncate_string(link_.description)])
-            if is_authorized('editor'):
+            if is_authorized('contributor'):
                 update_url = url_for('member_update', id_=link_.id, origin_id=actor.id)
                 unlink_url = url_for('link_delete', id_=link_.id,
                                      origin_id=actor.id) + '#tab-member'
@@ -176,7 +176,7 @@ def actor_index():
 
 @app.route('/actor/insert/<code>', methods=['POST', 'GET'])
 @app.route('/actor/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def actor_insert(code, origin_id=None):
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
@@ -193,7 +193,7 @@ def actor_insert(code, origin_id=None):
 
 
 @app.route('/actor/delete/<int:id_>')
-@required_group('editor')
+@required_group('contributor')
 def actor_delete(id_):
     EntityMapper.delete(id_)
     logger.log_user(id_, 'delete')
@@ -202,7 +202,7 @@ def actor_delete(id_):
 
 
 @app.route('/actor/update/<int:id_>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def actor_update(id_):
     actor = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
     code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}

@@ -1,5 +1,5 @@
 // Init map
-map = L.map('map', {maxZoom: 18, fullscreenControl: true});
+map = L.map('map', {maxZoom: mapMaxZoom, fullscreenControl: true});
 L.control.scale().addTo(map);
 
 // Icons

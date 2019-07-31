@@ -105,7 +105,7 @@ def file_index():
 
 
 @app.route('/file/add/<int:origin_id>', methods=['GET', 'POST'])
-@required_group('editor')
+@required_group('contributor')
 def file_add(origin_id: int):
     """ Link an entity to file coming from the entity."""
     origin = EntityMapper.get_by_id(origin_id)
@@ -117,7 +117,7 @@ def file_add(origin_id: int):
 
 
 @app.route('/file/add2/<int:id_>/<class_name>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def file_add2(id_: int, class_name: str):
     """ Link an entity to file coming from the file"""
     file = EntityMapper.get_by_id(id_)
@@ -142,14 +142,14 @@ def file_view(id_: int):
         data = get_base_table_data(range_)
         view_name = range_.view_name
         view_name = view_name if view_name != 'place' else range_.system_type.replace(' ', '-')
-        if is_authorized('editor'):
+        if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=file.id)
             data.append(display_remove_link(url + '#tab-' + view_name, range_.name))
         tables[view_name].rows.append(data)
     for link_ in file.get_links('P67', True):
         data = get_base_table_data(link_.domain)
         data.append(link_.description)
-        if is_authorized('editor'):
+        if is_authorized('contributor'):
             update_url = url_for('reference_link_update', link_id=link_.id, origin_id=file.id)
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=file.id)
@@ -161,7 +161,7 @@ def file_view(id_: int):
 
 
 @app.route('/file/update/<int:id_>', methods=['GET', 'POST'])
-@required_group('editor')
+@required_group('contributor')
 def file_update(id_: int):
     file = EntityMapper.get_by_id(id_, nodes=True)
     form = build_form(FileForm, 'File', file, request)
@@ -179,7 +179,7 @@ def file_update(id_: int):
 
 @app.route('/file/insert', methods=['GET', 'POST'])
 @app.route('/file/insert/<int:origin_id>', methods=['GET', 'POST'])
-@required_group('editor')
+@required_group('contributor')
 def file_insert(origin_id: Optional[int] = None):
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(FileForm, 'File')
@@ -190,7 +190,7 @@ def file_insert(origin_id: Optional[int] = None):
 
 
 @app.route('/file/delete/<int:id_>')
-@required_group('editor')
+@required_group('contributor')
 def file_delete(id_: Optional[int] = None):
     try:
         EntityMapper.delete(id_)

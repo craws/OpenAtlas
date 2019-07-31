@@ -37,7 +37,7 @@ def source_index():
 
 @app.route('/source/insert/<int:origin_id>', methods=['POST', 'GET'])
 @app.route('/source/insert', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def source_insert(origin_id=None):
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(SourceForm, 'Source')
@@ -65,7 +65,7 @@ def source_view(id_):
     for link_ in source.get_links('P67'):
         range_ = link_.range
         data = get_base_table_data(range_)
-        if is_authorized('editor'):
+        if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=source.id)
             data.append(display_remove_link(url + '#tab-' + range_.table_name, range_.name))
         tables[range_.table_name].rows.append(data)
@@ -82,10 +82,10 @@ def source_view(id_):
             data.append(link_.description)
             if domain.system_type == 'external reference':
                 source.external_references.append(link_)
-            if is_authorized('editor'):
+            if is_authorized('contributor'):
                 url = url_for('reference_link_update', link_id=link_.id, origin_id=source.id)
                 data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
-        if is_authorized('editor'):
+        if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=source.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
         tables[domain.view_name].rows.append(data)
@@ -94,7 +94,7 @@ def source_view(id_):
 
 
 @app.route('/source/add/<int:origin_id>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def source_add(origin_id):
     """ Link an entity to source coming from the entity."""
     origin = EntityMapper.get_by_id(origin_id)
@@ -114,7 +114,7 @@ def source_add(origin_id):
 
 
 @app.route('/source/add2/<int:id_>/<class_name>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def source_add2(id_, class_name):
     """ Link an entity to source coming from the source"""
     source = EntityMapper.get_by_id(id_)
@@ -127,7 +127,7 @@ def source_add2(id_, class_name):
 
 
 @app.route('/source/delete/<int:id_>')
-@required_group('editor')
+@required_group('contributor')
 def source_delete(id_):
     EntityMapper.delete(id_)
     logger.log_user(id_, 'delete')
@@ -136,7 +136,7 @@ def source_delete(id_):
 
 
 @app.route('/source/update/<int:id_>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def source_update(id_):
     source = EntityMapper.get_by_id(id_, nodes=True)
     form = build_form(SourceForm, 'Source', source, request)

@@ -13,20 +13,20 @@ class ProfileTests(TestBaseCase):
             # Profile update
             rv = self.app.get(url_for('profile_index'))
             assert b'alice@example.com' in rv.data
-            data = {'language': 'en',
-                    'table_rows': '100',
-                    'table_show_aliases': 'off',
-                    'layout': 'advanced',
-                    'theme': 'default'}
-            rv = self.app.post(url_for('profile_index'), data=data, follow_redirects=True)
-            assert b'saved' in rv.data
             rv = self.app.get(url_for('profile_update'))
             assert b'Newsletter' in rv.data
             data = {'name': 'Alice Abernathy',
                     'email': 'alice@umbrella.net',
+                    'max_zoom': 20,
+                    'geonames': '',
                     'show_email': '',
-                    'newsletter': ''}
+                    'newsletter': '',
+                    'language': 'en',
+                    'table_rows': '100',
+                    'table_show_aliases': 'off',
+                    'layout': 'advanced'}
             rv = self.app.post(url_for('profile_update'), data=data, follow_redirects=True)
+            assert b'saved' in rv.data
             assert b'Alice Abernathy' in rv.data
 
             # Change password

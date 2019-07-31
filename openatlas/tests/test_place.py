@@ -22,7 +22,10 @@ class PlaceTest(TestBaseCase):
                                                    'https://openatlas.eu', 'external reference').id
                 place_node = NodeMapper.get_hierarchy_by_name('Place')
                 source_id = EntityMapper.insert('E33', 'Tha source').id
-            data = {'name': 'Asgard', 'alias-0': 'Valhöll',
+            data = {'name': 'Asgard',
+                    'alias-0': 'Valhöll',
+                    'geonames_id': '123',
+                    'geonames_precision': True,
                     unit_node.id: '[' + str(unit_sub1.id) + ',' + str(unit_sub2.id) + ']'}
             rv = self.app.post(url_for('place_insert', origin_id=reference_id), data=data,
                                follow_redirects=True)
@@ -66,6 +69,7 @@ class PlaceTest(TestBaseCase):
             assert b'Valhalla' in rv.data
             data['continue_'] = ''
             data['alias-1'] = 'Val-hall'
+            data['geonames_id'] = '321'
             rv = self.app.post(url_for('place_update', id_=place_id), data=data,
                                follow_redirects=True)
             assert b'Val-hall' in rv.data

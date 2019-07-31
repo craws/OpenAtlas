@@ -362,10 +362,13 @@ def bookmark_toggle(entity_id: int, for_table: Optional[bool] = False) -> str:
 
 def is_authorized(group: str) -> bool:
     if not current_user.is_authenticated or not hasattr(current_user, 'group'):
-        return False   # pragma: no cover - needed because AnonymousUserMixin has no group
+        return False  # pragma: no cover - needed because AnonymousUserMixin has no group
+
     if current_user.group == 'admin' or (
-            current_user.group == 'manager' and group in ['manager', 'editor', 'readonly']) or (
-            current_user.group == 'editor' and group in ['editor', 'readonly']) or (
+            current_user.group == 'manager' and group in
+            ['manager', 'editor', 'contributor', 'readonly']) or (
+            current_user.group == 'editor' and group in ['editor', 'contributor', 'readonly']) or (
+            current_user.group == 'contributor' and group in ['contributor', 'readonly']) or (
             current_user.group == 'readonly' and group == 'readonly'):
         return True
     return False

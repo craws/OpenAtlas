@@ -11,11 +11,11 @@
     <ul>
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
         {% if tables['subs'].rows %}
-            <li><a href="#tab-subs">{{ _('subs')|uc_first }} ({{ tables['subs'].rows|length|format_number|format_number }})</a></li>
+            <li><a href="#tab-subs">{{ _('subs')|uc_first }} {{ tables['subs']|format_tab_number|safe }}</a></li>
         {% endif %}
         {% if tables['entities'].rows or tables['link_entities'].rows %}
             <li>
-                <a href="#tab-entities">{{ _('entities')|uc_first }} ({{ (tables['entities'].rows|length + tables['link_entities'].rows|length)|format_number }})</a>
+                <a href="#tab-entities">{{ _('entities')|uc_first }} {{ (tables['entities'].rows|length + tables['link_entities'].rows|length)|format_tab_number|safe }}</a>
             </li>
         {% endif %}
     </ul>
