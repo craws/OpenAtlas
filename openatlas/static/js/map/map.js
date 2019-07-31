@@ -119,7 +119,7 @@ var geoSearchControl = L.control.geonames({
 
 geoSearchControl.on('select', function(e){
     console.log(e.geoname)
-    $('#geonames_id').val(e.geoname.geonameId);
+/*    $('#geonames_id').val(e.geoname.geonameId);
     points = JSON.parse($('#gis_points').val());
     // Add new point
     point =
@@ -127,7 +127,7 @@ geoSearchControl.on('select', function(e){
         `{"type": "Point", "coordinates": [` + e.geoname.lng + `,` + e.geoname.lat + `]},` +
         `"properties":{"name": "` + e.geoname.name + `", "description": "` + description + `", "shapeType": "centerpoint"}}`;
     points.push(JSON.parse(point));
-    $('#gis_points').val(JSON.stringify(points));
+    $('#gis_points').val(JSON.stringify(points));*/
 });
 
 map.addControl(geoSearchControl);
