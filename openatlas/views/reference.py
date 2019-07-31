@@ -63,7 +63,7 @@ class AddFileForm(Form):
 
 
 @app.route('/reference/add/<int:origin_id>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def reference_add(origin_id):
     """ Link an entity to reference coming from the entity."""
     origin = EntityMapper.get_by_id(origin_id)
@@ -76,7 +76,7 @@ def reference_add(origin_id):
 
 
 @app.route('/reference/add2/<int:reference_id>/<class_name>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def reference_add2(reference_id, class_name):
     """ Link an entity to reference coming from the reference."""
     reference = EntityMapper.get_by_id(reference_id)
@@ -93,7 +93,7 @@ def reference_add2(reference_id, class_name):
 
 
 @app.route('/reference/link-update/<int:link_id>/<int:origin_id>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def reference_link_update(link_id, origin_id):
     link_ = LinkMapper.get_by_id(link_id)
     origin = EntityMapper.get_by_id(origin_id)
@@ -128,7 +128,7 @@ def reference_view(id_):
     for link_ in reference.get_links('P67', True):
         domain = link_.domain
         data = get_base_table_data(domain)
-        if is_authorized('editor'):
+        if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=reference.id) + '#tab-file'
             data.append(display_remove_link(url, domain.name))
         tables['file'].rows.append(data)
@@ -142,7 +142,7 @@ def reference_view(id_):
             data.append(get_profile_image_table_link(range_, reference, ext, profile_image_id))
             if not profile_image_id and ext in app.config['DISPLAY_FILE_EXTENSIONS']:
                 profile_image_id = range_.id
-        if is_authorized('editor'):
+        if is_authorized('contributor'):
             url = url_for('reference_link_update', link_id=link_.id, origin_id=reference.id)
             data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
             url = url_for('link_delete', id_=link_.id, origin_id=reference.id)
@@ -165,7 +165,7 @@ def reference_index():
 
 @app.route('/reference/insert/<code>', methods=['POST', 'GET'])
 @app.route('/reference/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def reference_insert(code, origin_id=None):
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     type_name = code
@@ -187,7 +187,7 @@ def reference_insert(code, origin_id=None):
 
 
 @app.route('/reference/delete/<int:id_>')
-@required_group('editor')
+@required_group('contributor')
 def reference_delete(id_):
     EntityMapper.delete(id_)
     logger.log_user(id_, 'delete')
@@ -196,7 +196,7 @@ def reference_delete(id_):
 
 
 @app.route('/reference/update/<int:id_>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def reference_update(id_):
     reference = EntityMapper.get_by_id(id_, nodes=True)
     form = build_form(ReferenceForm, reference.system_type.title(), reference, request)

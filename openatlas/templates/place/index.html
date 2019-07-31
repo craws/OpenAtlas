@@ -5,7 +5,7 @@
 {% block content %}
     <div style="float:left;">
         {{ 'Place'|manual_link|safe }}
-        {% if 'editor'|is_authorized %}
+        {% if 'contributor'|is_authorized %}
             <div class="button-bar">
                 <a href="{{ url_for('place_insert') }}">+ {{ _('place')|uc_first }}</a>
             </div>

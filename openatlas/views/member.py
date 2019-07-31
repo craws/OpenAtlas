@@ -37,7 +37,7 @@ class MemberForm(DateForm):
 
 
 @app.route('/membership/insert/<int:origin_id>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def membership_insert(origin_id):
     origin = EntityMapper.get_by_id(origin_id)
     form = build_form(MemberForm, 'Member')
@@ -64,7 +64,7 @@ def membership_insert(origin_id):
 
 
 @app.route('/member/insert/<int:origin_id>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def member_insert(origin_id):
     origin = EntityMapper.get_by_id(origin_id)
     form = build_form(MemberForm, 'Member')
@@ -92,7 +92,7 @@ def member_insert(origin_id):
 
 
 @app.route('/member/update/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def member_update(id_, origin_id):
     link_ = LinkMapper.get_by_id(id_)
     domain = EntityMapper.get_by_id(link_.domain.id)

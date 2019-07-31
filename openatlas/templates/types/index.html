@@ -29,7 +29,7 @@
                             <p><strong>{{ node.name }}</strong></p>
                             <div style="float:left;margin-right:3em;">
                                 <div class="button-bar">
-                                    {% if node.locked %}
+                                    {% if node.locked or not 'editor'|is_authorized %}
                                         <input
                                             class="tree-filter"
                                             id="{{ node.name|sanitize }}-tree-search"

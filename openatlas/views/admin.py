@@ -89,7 +89,7 @@ def admin_map() -> str:
 
 @app.route('/admin/check_links')
 @app.route('/admin/check_links/<check>')
-@required_group('editor')
+@required_group('contributor')
 def admin_check_links(check: Optional[str] = None) -> str:
     table = None
     if check:
@@ -101,7 +101,7 @@ def admin_check_links(check: Optional[str] = None) -> str:
 
 @app.route('/admin/check_link_duplicates')
 @app.route('/admin/check_link_duplicates/<delete>')
-@required_group('editor')
+@required_group('contributor')
 def admin_check_link_duplicates(delete: Optional[str] = None) -> str:
     if delete:
         delete_count = str(LinkMapper.delete_link_duplicates())
@@ -134,7 +134,7 @@ def admin_check_link_duplicates(delete: Optional[str] = None) -> str:
 
 
 @app.route('/admin/delete_single_type_duplicate/<int:entity_id>/<int:node_id>')
-@required_group('editor')
+@required_group('contributor')
 def admin_delete_single_type_duplicate(entity_id: int, node_id: int):
     NodeMapper.remove_by_entity_and_node(entity_id, node_id)
     flash(_('link removed'), 'info')
@@ -177,7 +177,7 @@ class SimilarForm(Form):
 
 
 @app.route('/admin/similar', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def admin_check_similar():
     form = SimilarForm()
     choices = ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic unit', 'find',
@@ -203,7 +203,7 @@ def admin_orphans_delete(parameter: str):
 
 
 @app.route('/admin/check/dates')
-@required_group('editor')
+@required_group('contributor')
 def admin_check_dates() -> str:
     # Get invalid date combinations (e.g. begin after end)
     tables = {'link_dates': Table(['link', 'domain', 'range']),
@@ -238,7 +238,7 @@ def admin_check_dates() -> str:
 
 
 @app.route('/admin/orphans')
-@required_group('editor')
+@required_group('contributor')
 def admin_orphans() -> str:
     header = ['name', 'class', 'type', 'system type', 'created', 'updated', 'description']
     tables = {'orphans': Table(header),
@@ -314,7 +314,7 @@ def admin_logo(action: Optional[str] = None):
 
 
 @app.route('/admin/file/delete/<filename>')
-@required_group('editor')
+@required_group('contributor')
 def admin_file_delete(filename: str):  # pragma: no cover
     if filename != 'all':
         try:

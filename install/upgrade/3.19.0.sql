@@ -1,7 +1,10 @@
--- Upgrade 3.17.x to 3.18.0
+-- Upgrade 3.17.x to 3.19.0
 -- Be sure to backup the database and read the update notes before executing this!
 
 BEGIN;
+
+-- Add new user group contributer
+INSERT INTO web.group (name) VALUES ('contributor');
 
 -- Remove settings for obsolete color themes
 DELETE FROM web.user_settings WHERE name = 'theme';

@@ -18,7 +18,7 @@
     </ul>
     <div id="tab-info">
         <div class="button-bar">
-            {% if 'editor'|is_authorized %}
+            {% if 'contributor'|is_authorized %}
                 <a href="{{ url_for('event_update', id_=event.id) }}">{{ _('edit')|uc_first }}</a>
                 {{ event|display_delete_link|safe }}
             {% endif %}
@@ -41,7 +41,7 @@
         </div>
     {% endif %}
     <div id="tab-source">
-        {% if 'editor'|is_authorized %}
+        {% if 'contributor'|is_authorized %}
             <div class="button-bar">
                 <a href="{{ url_for('source_add', origin_id=event.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('source_insert', origin_id=event.id) }}">+ {{ _('source')|uc_first }}</a>
@@ -50,7 +50,7 @@
         {{ tables['source'].display('source')|safe }}
     </div>
     <div id="tab-actor">
-        {% if 'editor'|is_authorized %}
+        {% if 'contributor'|is_authorized %}
             <div class="button-bar">
                 <a href="{{ url_for('involvement_insert', origin_id=event.id)}}">{{ _('add')|uc_first }}</a>
                 {% for code in config['CLASS_CODES']['actor'] %}
@@ -61,7 +61,7 @@
         {{ tables['actor'].display('actor')|safe }}
     </div>
     <div id="tab-reference">
-        {% if 'editor'|is_authorized %}
+        {% if 'contributor'|is_authorized %}
             <div class="button-bar">
                 <a href="{{ url_for('reference_add', origin_id=event.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='bibliography', origin_id=event.id) }}">+ {{ _('bibliography')|uc_first }}</a>
@@ -72,7 +72,7 @@
         {{ tables['reference'].display('reference')|safe }}
     </div>
     <div id="tab-file">
-        {% if 'editor'|is_authorized %}
+        {% if 'contributor'|is_authorized %}
             <div class="button-bar">
                 <a href="{{ url_for('file_add', origin_id=event.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('file_insert', origin_id=event.id) }}">+ {{ _('file')|uc_first }}</a>

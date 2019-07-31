@@ -57,7 +57,7 @@ def place_index():
 
 @app.route('/place/insert', methods=['POST', 'GET'])
 @app.route('/place/insert/<int:origin_id>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def place_insert(origin_id=None):
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     if origin and origin.system_type == 'place':
@@ -123,10 +123,10 @@ def place_view(id_):
             data.append(truncate_string(link_.description))
             if domain.system_type.startswith('external reference'):
                 object_.external_references.append(link_)
-            if is_authorized('editor'):
+            if is_authorized('contributor'):
                 url = url_for('reference_link_update', link_id=link_.id, origin_id=object_.id)
                 data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
-        if is_authorized('editor'):
+        if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=object_.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
         tables[domain.view_name].rows.append(data)
@@ -172,7 +172,7 @@ def place_view(id_):
 
 
 @app.route('/place/delete/<int:id_>')
-@required_group('editor')
+@required_group('contributor')
 def place_delete(id_):
     entity = EntityMapper.get_by_id(id_)
     parent = None if entity.system_type == 'place' else entity.get_linked_entity('P46', True)
@@ -188,7 +188,7 @@ def place_delete(id_):
 
 
 @app.route('/place/update/<int:id_>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def place_update(id_):
     object_ = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
     location = object_.get_linked_entity('P53', nodes=True)

@@ -10,7 +10,7 @@ from openatlas.util.util import required_group
 
 
 @app.route('/link/delete/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])
-@required_group('editor')
+@required_group('contributor')
 def link_delete(id_: int, origin_id: int):
     LinkMapper.delete(id_)
     flash(_('link removed'), 'info')
