@@ -25,4 +25,31 @@ INSERT INTO model.link (property_code, range_id, domain_id) VALUES
     ('P127', (SELECT id FROM model.entity WHERE name='External Reference Match'), (SELECT id FROM model.entity WHERE name='close match'));
 INSERT INTO web.hierarchy (id, name, multiple, system, directional, value_type, locked) VALUES ((SELECT id FROM model.entity WHERE name='External Reference Match'), 'External Reference Match', False, True, False, False, True);
 
+-- Add user private notes
+CREATE TABLE web.user_note (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    entity_id integer NOT NULL,
+    text text NOT NULL,
+    created timestamp without time zone NOT NULL,
+    modified timestamp without time zone
+);
+ALTER TABLE web.user_note OWNER TO openatlas;
+
+CREATE SEQUENCE web.user_note_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+ALTER TABLE web.user_note_id_seq OWNER TO openatlas;
+ALTER SEQUENCE web.user_note_id_seq OWNED BY web.user_note.id;
+ALTER TABLE ONLY web.user_note ALTER COLUMN id SET DEFAULT nextval('web.user_note_id_seq'::regclass);
+ALTER TABLE ONLY web.user_note ADD CONSTRAINT user_note_pkey PRIMARY KEY (id);
+ALTER TABLE ONLY web.user_note ADD CONSTRAINT user_note_user_id_entity_id_key UNIQUE (user_id, entity_id);
+ALTER TABLE ONLY web.user_note ADD CONSTRAINT user_note_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY web.user_note ADD CONSTRAINT user_note_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+CREATE TRIGGER update_modified BEFORE UPDATE ON web.user_note FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+
 COMMIT;
