@@ -4,6 +4,7 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import (SubmitField, TextAreaField)
+from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import build_form
@@ -13,7 +14,7 @@ from openatlas.util.util import (required_group)
 
 
 class NoteForm(Form):
-    description = TextAreaField(_('note'))
+    description = TextAreaField(_('note'), [InputRequired()])
     save = SubmitField(_('insert'))
 
 
