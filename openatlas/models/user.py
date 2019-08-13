@@ -179,12 +179,8 @@ class UserMapper:
     @staticmethod
     def update_settings(user):
         for name, value in user.settings.items():
-            if name == 'newsletter':
-                value = 'True' if user.settings['newsletter'] else ''
-            if name == 'show_email':
-                value = 'True' if user.settings['show_email'] else ''
-            if name == 'module_geonames':
-                value = 'True' if user.settings['module_geonames'] else ''
+            if name in ['newsletter', 'show_email', 'module_geonames', 'module_notes']:
+                value = 'True' if user.settings[name] else ''
             sql = """
                     INSERT INTO web.user_settings (user_id, "name", "value")
                     VALUES (%(user_id)s, %(name)s, %(value)s)
@@ -226,9 +222,8 @@ class UserMapper:
         g.cursor.execute(sql, {'user_id': user_id})
         debug_model['user'] += 1
         settings = {row.name: row.value for row in g.cursor.fetchall()}
-        for item in ['newsletter', 'show_email']:
+        for item in ['newsletter', 'show_email', 'module_notes', 'module_geonames']:
             settings[item] = True if item in settings and settings[item] == 'True' else False
-        settings['module_geonames'] = True if not 'moduele_geonames' in settings or settings['module_geonames'] != 'True' else False
         if 'table_show_aliases' in settings and settings['table_show_aliases'] == 'False':
             settings['table_show_aliases'] = False
         else:

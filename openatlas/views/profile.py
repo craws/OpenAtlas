@@ -52,7 +52,8 @@ class ProfileForm(Form):
     layout_choices = [('default', _('default')), ('advanced', _('advanced'))]
     layout = SelectField(_('layout'), description=_('tooltip layout'), choices=layout_choices)
     max_zoom = IntegerField(description=_('tooltip max zoom'))
-    geonames = BooleanField(description=_('tooltip geonames'))
+    module_geonames = BooleanField(description=_('tooltip geonames'))
+    module_notes = BooleanField(description=_('tooltip notes'))
     save = SubmitField(_('save'))
 
 
@@ -70,9 +71,10 @@ def profile_index() -> str:
             'display': [(_('language'), user.settings['language']),
                         (_('table rows'), user.settings['table_rows']),
                         (_('show aliases in tables'), user.settings['table_show_aliases']),
-                        (_('layout'), user.settings['layout'])],
-            'map': [(_('max zoom'), user.settings['max_zoom']),
-                    (_('GeoNames'), user.settings['module_geonames'])]}
+                        (_('layout'), user.settings['layout']),
+                        (_('max zoom'), user.settings['max_zoom'])],
+            'modules': [(_('GeoNames'), user.settings['module_geonames']),
+                        (_('Notes'), user.settings['module_notes'])]}
     return render_template('profile/index.html', data=data)
 
 
@@ -88,7 +90,8 @@ def profile_update():
         user.settings['newsletter'] = form.newsletter.data
         user.settings['language'] = form.language.data
         user.settings['table_rows'] = form.table_rows.data
-        user.settings['module_geonames'] = form.geonames.data
+        user.settings['module_geonames'] = form.module_geonames.data
+        user.settings['module_notes'] = form.module_notes.data
         user.settings['max_zoom'] = form.max_zoom.data
         user.settings[
             'table_show_aliases'] = 'True' if form.table_show_aliases.data == 'on' else 'False'
@@ -123,9 +126,11 @@ def profile_update():
     form.layout.data = user.settings['layout']
     form.layout.label.text = uc_first(_('layout'))
     form.max_zoom.data = user.settings['max_zoom']
-    form.max_zoom.label.text = uc_first(_('max zoom'))
-    form.geonames.data = user.settings['module_geonames']
-    form.geonames.label.text = 'GeoNames'
+    form.max_zoom.label.text = uc_first(_('max map zoom'))
+    form.module_geonames.data = user.settings['module_geonames']
+    form.module_geonames.label.text = 'GeoNames'
+    form.module_notes.data = user.settings['module_notes']
+    form.module_notes.label.text = uc_first(_('notes'))
     form.save.label.text = uc_first(_('save'))
     return render_template('profile/update.html', form=form)
 
