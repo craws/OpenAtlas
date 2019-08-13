@@ -314,10 +314,12 @@ L.Control.Geonames = L.Control.extend({
             var li;
             jsonResponse.forEach(function (geoname) {
                 li = L.DomUtil.create('li', '', this._resultsList);
+                console.log(geoname);
                 var nameParts = this._getNameParts(geoname);
                 var primaryName = nameParts.slice(0, 2).join(', ');
                 var countryName = (nameParts.length > 2) ? '<br/><em>' + nameParts[2] + '</em>' : '';
-                li.innerHTML = primaryName + countryName;
+                var geoInfo = '<br/><em>' + geoname.fcodeName + ' - ' + geoname.geonameId + '</em>';
+                li.innerHTML = primaryName + countryName + geoInfo;
 
                 L.DomEvent.addListener(li, 'click', function () {
                     //The user picks a location and it changes the search text to be that location

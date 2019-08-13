@@ -130,6 +130,10 @@ geoSearchControl.on('select', function(e){
     $('#gis_points').val(JSON.stringify(points));*/
 });
 
+geoSearchControl.on('search', function(e){
+    console.log(e);
+});
+
 map.addControl(geoSearchControl);
 
 
