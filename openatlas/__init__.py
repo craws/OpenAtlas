@@ -38,7 +38,7 @@ logger = DBHandler()
 
 from openatlas.util import filters
 from openatlas.views import (actor, admin, ajax, content, event, export, hierarchy, index,
-                             involvement, imports, link, login, types, model, place, profile,
+                             involvement, imports, link, login, types, model, place, profile, note,
                              reference, source, translation, user, relation, member, search, file)
 
 

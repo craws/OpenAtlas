@@ -1288,7 +1288,7 @@ CREATE TABLE web.user_note (
     user_id integer NOT NULL,
     entity_id integer NOT NULL,
     text text NOT NULL,
-    created timestamp without time zone NOT NULL,
+    created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone
 );
 

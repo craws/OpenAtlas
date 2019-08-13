@@ -23,6 +23,9 @@
                 {{ event|display_delete_link|safe }}
             {% endif %}
             {{ event.id|bookmark_toggle|safe }}
+            {% if current_user.settings['module_notes'] and 'contributor'|is_authorized %}
+                <a href="{{ url_for('note_insert', entity_id=event.id) }}">+ {{ _('note')|uc_first }}</a>
+            {% endif %}
         </div>
         <h1>{{ event.name }}</h1>
         <div>

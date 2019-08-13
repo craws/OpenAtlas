@@ -6,7 +6,7 @@ import string
 import bcrypt
 from flask import g, session
 from flask_babel import lazy_gettext as _
-from flask_login import UserMixin
+from flask_login import UserMixin, current_user
 
 from openatlas import debug_model, app
 
@@ -250,3 +250,12 @@ class UserMapper:
         password = ''.join(random.SystemRandom().choice(
             string.ascii_uppercase + string.digits) for _ in range(length))
         return password
+
+    @staticmethod
+    def insert_note(entity, note):
+        sql = """
+            INSERT INTO web.user_notes (user_id, entity_id, text)
+            VALUES (%(user_id)s, %(entity_id)s, %(text)s);"""
+        g.cursor.execute(sql, {'user_id': current_user.id, 'entity_id': entity.id, 'text': note})
+        debug_model['user'] += 1
+        return

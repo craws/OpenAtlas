@@ -31,7 +31,7 @@ CREATE TABLE web.user_notes (
     user_id integer NOT NULL,
     entity_id integer NOT NULL,
     text text NOT NULL,
-    created timestamp without time zone NOT NULL,
+    created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone
 );
 ALTER TABLE web.user_notes OWNER TO openatlas;
