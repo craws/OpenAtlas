@@ -17,6 +17,8 @@ SET client_min_messages = warning;
 SET row_security = off;
 
 ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_user_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.user_notes DROP CONSTRAINT IF EXISTS user_notes_user_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.user_notes DROP CONSTRAINT IF EXISTS user_notes_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_note DROP CONSTRAINT IF EXISTS user_note_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_note DROP CONSTRAINT IF EXISTS user_note_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_group_id_fkey;
@@ -45,6 +47,7 @@ ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_entity
 ALTER TABLE IF EXISTS ONLY gis.polygon DROP CONSTRAINT IF EXISTS polygon_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY gis.point DROP CONSTRAINT IF EXISTS point_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY gis.linestring DROP CONSTRAINT IF EXISTS linestring_entity_id_fkey;
+DROP TRIGGER IF EXISTS update_modified ON web.user_notes;
 DROP TRIGGER IF EXISTS update_modified ON web.user_note;
 DROP TRIGGER IF EXISTS update_modified ON web.i18n;
 DROP TRIGGER IF EXISTS update_modified ON web.hierarchy_form;
@@ -71,6 +74,8 @@ ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_username_ke
 ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_user_id_name_key;
 ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_pkey;
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_pkey;
+ALTER TABLE IF EXISTS ONLY web.user_notes DROP CONSTRAINT IF EXISTS user_notes_user_id_entity_id_key;
+ALTER TABLE IF EXISTS ONLY web.user_notes DROP CONSTRAINT IF EXISTS user_notes_pkey;
 ALTER TABLE IF EXISTS ONLY web.user_note DROP CONSTRAINT IF EXISTS user_note_user_id_entity_id_key;
 ALTER TABLE IF EXISTS ONLY web.user_note DROP CONSTRAINT IF EXISTS user_note_pkey;
 ALTER TABLE IF EXISTS ONLY web.user_log DROP CONSTRAINT IF EXISTS user_log_pkey;
@@ -112,6 +117,7 @@ ALTER TABLE IF EXISTS ONLY gis.polygon DROP CONSTRAINT IF EXISTS polygon_pkey;
 ALTER TABLE IF EXISTS ONLY gis.point DROP CONSTRAINT IF EXISTS point_pkey;
 ALTER TABLE IF EXISTS ONLY gis.linestring DROP CONSTRAINT IF EXISTS linestring_pkey;
 ALTER TABLE IF EXISTS web.user_settings ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS web.user_notes ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.user_note ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.user_log ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.user_bookmarks ALTER COLUMN id DROP DEFAULT;
@@ -139,6 +145,8 @@ ALTER TABLE IF EXISTS gis.point ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS gis.linestring ALTER COLUMN id DROP DEFAULT;
 DROP SEQUENCE IF EXISTS web.user_settings_id_seq;
 DROP TABLE IF EXISTS web.user_settings;
+DROP SEQUENCE IF EXISTS web.user_notes_id_seq;
+DROP TABLE IF EXISTS web.user_notes;
 DROP SEQUENCE IF EXISTS web.user_note_id_seq;
 DROP TABLE IF EXISTS web.user_note;
 DROP SEQUENCE IF EXISTS web.user_log_id_seq;
@@ -1309,6 +1317,43 @@ ALTER SEQUENCE web.user_note_id_seq OWNED BY web.user_note.id;
 
 
 --
+-- Name: user_notes; Type: TABLE; Schema: web; Owner: openatlas
+--
+
+CREATE TABLE web.user_notes (
+    id integer NOT NULL,
+    user_id integer NOT NULL,
+    entity_id integer NOT NULL,
+    text text NOT NULL,
+    created timestamp without time zone NOT NULL,
+    modified timestamp without time zone
+);
+
+
+ALTER TABLE web.user_notes OWNER TO openatlas;
+
+--
+-- Name: user_notes_id_seq; Type: SEQUENCE; Schema: web; Owner: openatlas
+--
+
+CREATE SEQUENCE web.user_notes_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE web.user_notes_id_seq OWNER TO openatlas;
+
+--
+-- Name: user_notes_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
+--
+
+ALTER SEQUENCE web.user_notes_id_seq OWNED BY web.user_notes.id;
+
+
+--
 -- Name: user_settings; Type: TABLE; Schema: web; Owner: openatlas
 --
 
@@ -1518,6 +1563,13 @@ ALTER TABLE ONLY web.user_log ALTER COLUMN id SET DEFAULT nextval('web.user_log_
 --
 
 ALTER TABLE ONLY web.user_note ALTER COLUMN id SET DEFAULT nextval('web.user_note_id_seq'::regclass);
+
+
+--
+-- Name: user_notes id; Type: DEFAULT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.user_notes ALTER COLUMN id SET DEFAULT nextval('web.user_notes_id_seq'::regclass);
 
 
 --
@@ -1848,6 +1900,22 @@ ALTER TABLE ONLY web.user_note
 
 
 --
+-- Name: user_notes user_notes_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.user_notes
+    ADD CONSTRAINT user_notes_pkey PRIMARY KEY (id);
+
+
+--
+-- Name: user_notes user_notes_user_id_entity_id_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.user_notes
+    ADD CONSTRAINT user_notes_user_id_entity_id_key UNIQUE (user_id, entity_id);
+
+
+--
 -- Name: user user_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
@@ -2031,6 +2099,13 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON web.i18n FOR EACH ROW EXECUTE PR
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON web.user_note FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+
+
+--
+-- Name: user_notes update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON web.user_notes FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
@@ -2255,6 +2330,22 @@ ALTER TABLE ONLY web.user_note
 
 ALTER TABLE ONLY web.user_note
     ADD CONSTRAINT user_note_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user"(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: user_notes user_notes_entity_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.user_notes
+    ADD CONSTRAINT user_notes_entity_id_fkey FOREIGN KEY (entity_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: user_notes user_notes_user_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.user_notes
+    ADD CONSTRAINT user_notes_user_id_fkey FOREIGN KEY (user_id) REFERENCES web."user"(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
