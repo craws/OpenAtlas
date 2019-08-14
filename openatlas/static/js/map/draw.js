@@ -336,7 +336,7 @@ function importNewPoint(geo, popup) {
     point =
         `{"type": "Feature", "geometry":
          {"type": "Point", "coordinates": [${geo.lng},${geo.lat}]},
-         "properties":{"name": "${geo.name}", "description": "Imported from <a href='https://www.geonames.org/${geo.geonameId}' target='_blank'>Geonames</a>", "shapeType": "centerpoint"}}`;
+         "properties":{"name": "${geo.name}", "description": "${geo.name} (${geo.geonameId}), imported from GeoNames", "shapeType": "centerpoint"}}`;
     points = JSON.parse($('#gis_points').val());
     points.push(JSON.parse(point));
     $('#gis_points').val(JSON.stringify(points));
