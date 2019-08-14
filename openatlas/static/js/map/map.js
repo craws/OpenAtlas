@@ -11,8 +11,8 @@ grayMarker = L.icon({iconUrl: '/static/images/map/marker-icon-gray.png', iconAnc
 // Define base layers
 baseMaps = {
     Landscape: L.tileLayer('https://{s}.tile.thunderforest.com/landscape/{z}/{x}/{y}.png?apikey=' + thunderforestKey, {attribution: '&copy; <a href="http://www.thunderforest.com">Thunderforest Landscape '}),
-    OpenStreetMap: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}),
-    GoogleSatellite: L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google Maps '}),
+    OpenStreetMap: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors', noWrap: true}),
+    GoogleSatellite: L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google Maps ', noWrap: true}),
 };
 
 cluster = L.markerClusterGroup({
@@ -88,7 +88,7 @@ if (gisPolygonSelected != '') allSelected.push(gisPolygons);
 if (gisPointSelected != '') allSelected.push(gisPoints);
 if (allSelected.length > 0) map.fitBounds(L.featureGroup(allSelected).getBounds(), {maxZoom: 12});
 else if(gisPointAll.length > 0) map.fitBounds(pointLayer.getBounds(), {maxZoom: 12});
-else map.setView([30, 340], 2);
+else map.setView([30, 0], 2);
 
 L.control.layers(baseMaps, controls).addTo(map);
 baseMaps.Landscape.addTo(map);
@@ -118,16 +118,21 @@ var geoSearchControl = L.control.geonames({
 });
 
 geoSearchControl.on('select', function(e){
-    console.log(e.geoname)
-/*    $('#geonames_id').val(e.geoname.geonameId);
-    points = JSON.parse($('#gis_points').val());
-    // Add new point
-    point =
-        `{"type": "Feature", "geometry":` +
-        `{"type": "Point", "coordinates": [` + e.geoname.lng + `,` + e.geoname.lat + `]},` +
-        `"properties":{"name": "` + e.geoname.name + `", "description": "` + description + `", "shapeType": "centerpoint"}}`;
-    points.push(JSON.parse(point));
-    $('#gis_points').val(JSON.stringify(points));*/
+    var popup = `<div>
+                  <a href='https://www.geonames.org/${e.geoname.geonameId}' target='_blank'>${e.geoname.name}</a><br>
+                  <div id="buttonBar" style="white-space:nowrap;">
+                    <p>
+                        <button id="ImportGeonamesID">Import ID</button>
+                        <button id="ImportCoordinates">Import Coordinates</button>
+                    </p>
+                </div>
+            </div>`;
+    e.target._map.on('opengeopopup', p => {
+        p.popup.setContent(popup);
+        p.popup.update();
+        $('#ImportCoordinates').click(() => importNewPoint(e.geoname, p.popup));
+        $('#ImportGeonamesID').click(() => importGeonamesID(e.geoname, p.popup));
+    });
 });
 
 map.addControl(geoSearchControl);

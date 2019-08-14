@@ -130,7 +130,10 @@ L.Control.Geonames = L.Control.extend({
 
             if (this.options.showPopup) {
                 this._marker.bindPopup(name);
-                this._marker.openPopup()
+                this._marker.openPopup();
+                this._map.fire('opengeopopup', {
+                    popup: this._popup
+                });
                 this._marker.on('popupclose', function() {
                     that._onPopupClosed()
                 });
@@ -143,6 +146,9 @@ L.Control.Geonames = L.Control.extend({
                 .on('remove', function() {
                     that._onPopupClosed()
                 });
+            this._map.fire('opengeopopup', {
+                popup: this._popup
+            });
         }
     },
     show: function () {

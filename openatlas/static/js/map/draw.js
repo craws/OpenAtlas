@@ -329,7 +329,25 @@ function saveEditedGeometry(shapeType) {
         editedLayer.setStyle({fillColor: '#686868', color: '#686868'});
     }
     geoJsonArray = [];
-    updateAllSelected();
+}
+
+function importNewPoint(geo, popup) {
+    popup._close();
+    point =
+        `{"type": "Feature", "geometry":
+         {"type": "Point", "coordinates": [${geo.lng},${geo.lat}]},
+         "properties":{"name": "${geo.name}", "description": "Imported from <a href='https://www.geonames.org/${geo.geonameId}' target='_blank'>Geonames</a>", "shapeType": "centerpoint"}}`;
+    points = JSON.parse($('#gis_points').val());
+    points.push(JSON.parse(point));
+    $('#gis_points').val(JSON.stringify(points));
+    var newMarker = L.marker(([geo.lat, geo.lng]), {icon: editedIcon}).addTo(map);
+    newMarker.bindPopup(buildPopup(JSON.parse(point), 'edited'));
+    marker = false;  // unset the marker
+}
+
+function importGeonamesID(geo, popup) {
+    $('#geonames_id').val(geo.geonameId);
+    popup._close();
 }
 
 function saveNewGeometry(shapeType) {
@@ -367,7 +385,6 @@ function saveNewGeometry(shapeType) {
         layer.addTo(map);
         layer.setStyle({fillColor: '#DA9DC8', color: '#E861C0'});
     }
-    updateAllSelected();
 }
 
 function deleteGeometry() {
@@ -402,7 +419,6 @@ function deleteGeometry() {
         });
         $('#gis_polygons').val(JSON.stringify(polygons)); // Write array back to form field
     }
-    updateAllSelected();
 }
 
 function editGeometry() {
@@ -492,13 +508,4 @@ function interactionOff() {
     if (map.tap) {
         map.tap.disable();
     }
-}
-
-function updateAllSelected() {
-    var datatable = $( "#georefs" ).DataTable();
-    gisAllSelected = JSON.parse($('#gis_points').val()).concat(JSON.parse($('#gis_lines').val()), JSON.parse($('#gis_polygons').val()));
-    console.log(gisAllSelected);
-    datatable.clear();
-    datatable.rows.add(gisAllSelected);
-    datatable.draw();
 }
