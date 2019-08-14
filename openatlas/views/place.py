@@ -20,7 +20,7 @@ from openatlas.util.util import (display_remove_link, get_base_table_data, get_e
 
 class PlaceForm(DateForm):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
-    geonames_id = IntegerField('GeoNames Id', [Optional()])
+    geonames_id = IntegerField('GeoNames Id', [Optional()], description=_('tooltip geonames'))
     geonames_precision = BooleanField(_('exact match'))
     alias = FieldList(StringField(''), description=_('tooltip alias'))
     description = TextAreaField(_('description'))
