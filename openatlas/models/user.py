@@ -202,17 +202,17 @@ class UserMapper:
         return [(row.id, row.username) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def toggle_bookmark(entity_id, user):
+    def toggle_bookmark(entity_id):
         sql = """
                 INSERT INTO web.user_bookmarks (user_id, entity_id)
                 VALUES (%(user_id)s, %(entity_id)s);"""
         label = _('bookmark remove')
-        if int(entity_id) in user.bookmarks:
+        if int(entity_id) in current_user.bookmarks:
             sql = """
                     DELETE FROM web.user_bookmarks
                     WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s;"""
             label = _('bookmark')
-        g.cursor.execute(sql, {'user_id': user.id, 'entity_id': entity_id})
+        g.cursor.execute(sql, {'user_id': current_user.id, 'entity_id': entity_id})
         debug_model['user'] += 1
         return label
 
