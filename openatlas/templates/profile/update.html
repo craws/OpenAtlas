@@ -47,18 +47,22 @@
                     <div>{{ form.layout.label|safe }}  {{ form.layout.description|display_tooltip|safe }}</div>
                     <div class="table-cell">{{ form.layout }}</div>
                 </div>
-            </div>
-        </div>
-        <div style="float:left;">
-            <h1>{{ _('map')|uc_first }}</h1>
-            <div class="data-table">
                 <div class="table-row">
                     <div>{{ form.max_zoom.label|safe }} {{ form.max_zoom.description|display_tooltip|safe }}</div>
                     <div class="table-cell">{{ form.max_zoom(class_='integer') }}</div>
                 </div>
+            </div>
+        </div>
+        <div style="float:left;">
+            <h1>{{ _('modules')|uc_first }}</h1>
+            <div class="data-table">
                 <div class="table-row">
-                    <div>{{ form.geonames.label|safe }}  {{ form.geonames.description|display_tooltip|safe }}</div>
-                    <div class="table-cell">{{ form.geonames }}</div>
+                    <div>{{ form.module_geonames.label|safe }}  {{ form.module_geonames.description|display_tooltip|safe }}</div>
+                    <div class="table-cell">{{ form.module_geonames }}</div>
+                </div>
+                <div class="table-row">
+                    <div>{{ form.module_notes.label|safe }}  {{ form.module_notes.description|display_tooltip|safe }}</div>
+                    <div class="table-cell">{{ form.module_notes }}</div>
                 </div>
             </div>
         </div>
