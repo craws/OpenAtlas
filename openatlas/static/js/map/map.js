@@ -118,7 +118,8 @@ var geoSearchControl = L.control.geonames({
 });
 
 geoSearchControl.on('select', function(e){
-    var popup = `<div>
+    if(geoNamesModule === 'True') {
+        var popup = `<div>
                   <a href='https://www.geonames.org/${e.geoname.geonameId}' target='_blank'>${e.geoname.name}</a><br>
                   <div id="buttonBar" style="white-space:nowrap;">
                     <p>
@@ -127,12 +128,13 @@ geoSearchControl.on('select', function(e){
                     </p>
                 </div>
             </div>`;
-    e.target._map.on('opengeopopup', p => {
-        p.popup.setContent(popup);
-        p.popup.update();
-        $('#ImportCoordinates').click(() => importNewPoint(e.geoname, p.popup));
-        $('#ImportGeonamesID').click(() => importGeonamesID(e.geoname, p.popup));
-    });
+        e.target._map.on('opengeopopup', p => {
+            p.popup.setContent(popup);
+            p.popup.update();
+            $('#ImportCoordinates').click(() => importNewPoint(e.geoname, p.popup));
+            $('#ImportGeonamesID').click(() => importGeonamesID(e.geoname, p.popup));
+        });
+    }
 });
 
 map.addControl(geoSearchControl);
