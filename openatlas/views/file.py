@@ -217,7 +217,7 @@ def save(form: FileForm, file: Optional[Entity] = None, origin: Optional[Entity]
             log_action = 'insert'
             file_ = request.files['file']
             file = EntityMapper.insert('E31', form.name.data, 'file')
-            filename = secure_filename(file_.filename)
+            filename = secure_filename('a' + file_.filename)  # Add an 'a' to prevent emtpy filename
             new_name = str(file.id) + '.' + filename.rsplit('.', 1)[1].lower()
             full_path = os.path.join(app.config['UPLOAD_FOLDER_PATH'], new_name)
             file_.save(full_path)
