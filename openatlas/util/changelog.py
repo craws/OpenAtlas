@@ -11,6 +11,9 @@ class Changelog:
             ('1041', 'Removing color themes'),
         ]))
     ])]
+    versions['3.18.1'] = ['2019-08-20', OrderedDict([
+        ('fix', OrderedDict([
+            ('1053', 'Bug at file upload with special characters')]))])]
     versions['3.18.0'] = ['2019-07-07', OrderedDict([
         ('feature', OrderedDict([
             ('1036', 'Search for similar names'),
