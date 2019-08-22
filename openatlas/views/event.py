@@ -12,6 +12,7 @@ from openatlas import app, logger
 from openatlas.forms.forms import DateForm, TableField, TableMultiField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
+from openatlas.models.user import UserMapper
 from openatlas.util.table import Table
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  get_profile_image_table_link, is_authorized, link, required_group,
@@ -105,6 +106,7 @@ def event_update(id_):
 @required_group('readonly')
 def event_view(id_):
     event = EntityMapper.get_by_id(id_, nodes=True)
+    event.note = UserMapper.get_note(event)
     tables = {
         'info': get_entity_data(event),
         'file': Table(Table.HEADERS['file'] + [_('main image')]),

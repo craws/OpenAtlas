@@ -1,7 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import os
 import re
-from typing import Iterator, Optional, Dict
+from typing import Dict, Iterator, Optional
 
 import flask
 import jinja2
@@ -28,6 +28,14 @@ paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 @blueprint.app_template_filter()
 def link(self, entity: Entity) -> str:
     return util.link(entity)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def note(self, entity: Entity) -> str:
+    if not entity.note:
+        return ''
+    return '<h2>' + util.uc_first(_('note')) + '</h2><p>' + entity.note + '</p>'
 
 
 @jinja2.contextfilter

@@ -41,6 +41,7 @@ class Entity:
         self.end_from = None
         self.end_to = None
         self.end_comment = None
+        self.note = None  # type: Optional[str]  # private, user specific note for an entity
         self.origin_id = None  # type: Optional[int]
         if hasattr(row, 'begin_from'):
             self.begin_from = DateMapper.timestamp_to_datetime64(row.begin_from)

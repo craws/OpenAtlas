@@ -24,7 +24,11 @@
             {% endif %}
             {{ event.id|bookmark_toggle|safe }}
             {% if current_user.settings['module_notes'] and 'contributor'|is_authorized %}
-                <a href="{{ url_for('note_insert', entity_id=event.id) }}">+ {{ _('note')|uc_first }}</a>
+                {% if event.note %}
+                    <a href="">{{ _('edit note')|uc_first }}</a>
+                {% else %}
+                    <a href="{{ url_for('note_insert', entity_id=event.id) }}">+ {{ _('note')|uc_first }}</a>
+                {% endif %}
             {% endif %}
         </div>
         <h1>{{ event.name }}</h1>
@@ -33,6 +37,7 @@
             <div style="float:left;">
                 {{ tables['info']|data_table|safe }}
                 {{ event|display_external_references|safe }}
+                {{ event|note|safe }}
                 {{ event|description|safe }}
             </div>
             <div style="clear:both;"></div>

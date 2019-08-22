@@ -259,3 +259,14 @@ class UserMapper:
         g.cursor.execute(sql, {'user_id': current_user.id, 'entity_id': entity.id, 'text': note})
         debug_model['user'] += 1
         return
+
+    @staticmethod
+    def get_note(entity):
+        if not current_user.settings['module_notes']:
+            return None
+        sql = """
+            SELECT text FROM web.user_notes
+            WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s;"""
+        g.cursor.execute(sql, {'user_id': current_user.id, 'entity_id': entity.id})
+        debug_model['user'] += 1
+        return g.cursor.fetchone()[0] if g.cursor.rowcount == 1 else None
