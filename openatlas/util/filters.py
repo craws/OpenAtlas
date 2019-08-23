@@ -33,9 +33,15 @@ def link(self, entity: Entity) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def note(self, entity: Entity) -> str:
-    if not entity.note:
+    if not current_user.settings['module_notes'] or not util.is_authorized('contributor'):
         return ''
-    return '<h2>' + util.uc_first(_('note')) + '</h2><p>' + entity.note + '</p>'
+    if not entity.note:
+        url = url_for('note_insert', entity_id=entity.id)
+        return '<a href="' + url  + '">+ ' + util.uc_first(_('note')) + '</a>'
+    url = url_for('note_update', entity_id=entity.id)
+    html = '<h2>' + util.uc_first(_('note')) + '</h2><p>' + entity.note + '</p>'
+    html += '<a href="' + url + '">' + util.uc_first(_('edit note')) + '</a>'
+    return  html
 
 
 @jinja2.contextfilter

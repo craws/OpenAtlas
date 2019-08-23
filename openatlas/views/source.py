@@ -9,11 +9,11 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.forms.forms import build_form
 from openatlas.models.entity import EntityMapper
+from openatlas.models.user import UserMapper
 from openatlas.util.table import Table
 from openatlas.util.util import (build_table_form, display_remove_link, get_base_table_data,
-                                 get_entity_data, is_authorized, link, required_group,
-                                 truncate_string, uc_first, was_modified,
-                                 get_profile_image_table_link)
+                                 get_entity_data, get_profile_image_table_link, is_authorized, link,
+                                 required_group, truncate_string, uc_first, was_modified)
 
 
 class SourceForm(Form):
@@ -52,6 +52,7 @@ def source_insert(origin_id=None):
 @required_group('readonly')
 def source_view(id_):
     source = EntityMapper.get_by_id(id_, nodes=True)
+    source.note = UserMapper.get_note(source)
     tables = {'info': get_entity_data(source),
               'text': Table(['text', 'type', 'content']),
               'file': Table(Table.HEADERS['file'] + [_('main image')]),

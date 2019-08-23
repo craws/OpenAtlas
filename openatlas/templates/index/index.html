@@ -39,6 +39,10 @@
             <h1>{{ _('bookmarks')|uc_first }}</h1>
             {{ tables['bookmarks'].display('bookmarks')|safe }}
         {% endif %}
+        {% if tables['notes'].rows %}
+            <h1>{{ _('notes')|uc_first }}</h1>
+            {{ tables['notes'].display('notes')|safe }}
+        {% endif %}
     {% else %}
         <div>{{ intro|safe }}</div>
         <div>

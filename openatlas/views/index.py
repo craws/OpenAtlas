@@ -14,7 +14,7 @@ from openatlas.models.user import UserMapper
 from openatlas.util.changelog import Changelog
 from openatlas.util.table import Table
 from openatlas.util.util import (bookmark_toggle, format_date, link, required_group, send_mail,
-                                 uc_first)
+                                 truncate_string, uc_first)
 
 
 class FeedbackForm(Form):
@@ -28,7 +28,8 @@ class FeedbackForm(Form):
 @app.route('/overview')
 def index():
     tables = {'overview': Table(pager=False),
-              'bookmarks': Table(['name', 'class', 'first', 'last'], pager=False),
+              'bookmarks': Table(['name', 'class', 'first', 'last']),
+              'notes': Table(['name', 'class', 'first', 'last', _('note')]),
               'latest': Table(['name', 'class', 'first', 'last', 'date', 'user'], pager=False)}
     if current_user.is_authenticated and hasattr(current_user, 'bookmarks'):
         for entity_id in current_user.bookmarks:
@@ -36,6 +37,10 @@ def index():
             tables['bookmarks'].rows.append([link(entity), g.classes[entity.class_.code].name,
                                              entity.first, entity.last,
                                              bookmark_toggle(entity.id, True)])
+        for entity_id, text in UserMapper.get_notes().items():
+            entity = EntityMapper.get_by_id(entity_id)
+            tables['notes'].rows.append([link(entity), g.classes[entity.class_.code].name,
+                                        entity.first, entity.last, truncate_string(text)])
         for name, count in EntityMapper.get_overview_counts().items():
             count = format_number(count) if count else ''
             tables['overview'].rows.append([

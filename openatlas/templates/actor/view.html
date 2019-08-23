@@ -35,6 +35,7 @@
             <div style="float:left;">
                 {{ tables['info']|data_table|safe }}
                 {{ actor|display_external_references|safe }}
+                {{ actor|note|safe }}
                 {{ actor|description|safe }}
             </div>
             <div style="clear:both;"></div>

@@ -11,6 +11,7 @@ from openatlas import app, logger
 from openatlas.forms.forms import TableField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
+from openatlas.models.user import UserMapper
 from openatlas.util.table import Table
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  is_authorized, link, required_group, truncate_string, uc_first,
@@ -120,6 +121,7 @@ def reference_link_update(link_id, origin_id):
 @required_group('readonly')
 def reference_view(id_):
     reference = EntityMapper.get_by_id(id_, nodes=True)
+    reference.note = UserMapper.get_note(reference)
     tables = {'info': get_entity_data(reference),
               'file': Table(Table.HEADERS['file'] + ['page', _('main image')])}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find']:

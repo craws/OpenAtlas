@@ -3,8 +3,8 @@ from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from werkzeug.utils import redirect
-from wtforms import (FieldList, HiddenField, StringField, SubmitField, TextAreaField, IntegerField,
-                     BooleanField)
+from wtforms import (BooleanField, FieldList, HiddenField, IntegerField, StringField, SubmitField,
+                     TextAreaField)
 from wtforms.validators import InputRequired, Optional
 
 from openatlas import app, logger
@@ -12,6 +12,7 @@ from openatlas.forms.forms import DateForm, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper, InvalidGeomException
 from openatlas.models.node import NodeMapper
+from openatlas.models.user import UserMapper
 from openatlas.util.table import Table
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  get_profile_image_table_link, is_authorized, link, required_group,
@@ -97,6 +98,7 @@ def place_insert(origin_id=None):
 @required_group('readonly')
 def place_view(id_):
     object_ = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
+    object_.note = UserMapper.get_note(object_)
     location = object_.get_linked_entity('P53', nodes=True)
     tables = {'info': get_entity_data(object_, location),
               'file': Table(Table.HEADERS['file'] + [_('main image')]),

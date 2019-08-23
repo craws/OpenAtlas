@@ -10,6 +10,7 @@ from openatlas import app, logger
 from openatlas.forms.forms import DateForm, TableField, build_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
+from openatlas.models.user import UserMapper
 from openatlas.util.table import Table
 from openatlas.util.util import (add_system_data, add_type_data, display_remove_link,
                                  format_entry_begin, format_entry_end, get_appearance,
@@ -34,6 +35,7 @@ class ActorForm(DateForm):
 @required_group('readonly')
 def actor_view(id_):
     actor = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
+    actor.note = UserMapper.get_note(actor)
     info = []
     if actor.aliases:
         info.append((uc_first(_('alias')), '<br />'.join(actor.aliases.values())))

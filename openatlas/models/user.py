@@ -258,7 +258,6 @@ class UserMapper:
             VALUES (%(user_id)s, %(entity_id)s, %(text)s);"""
         g.cursor.execute(sql, {'user_id': current_user.id, 'entity_id': entity.id, 'text': note})
         debug_model['user'] += 1
-        return
 
     @staticmethod
     def update_note(entity, note):
@@ -267,7 +266,6 @@ class UserMapper:
             WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s;"""
         g.cursor.execute(sql, {'user_id': current_user.id, 'entity_id': entity.id, 'text': note})
         debug_model['user'] += 1
-        return
 
     @staticmethod
     def get_note(entity):
@@ -279,6 +277,15 @@ class UserMapper:
         g.cursor.execute(sql, {'user_id': current_user.id, 'entity_id': entity.id})
         debug_model['user'] += 1
         return g.cursor.fetchone()[0] if g.cursor.rowcount == 1 else None
+
+    @staticmethod
+    def get_notes():
+        if not current_user.settings['module_notes']:
+            return {}
+        sql = "SELECT entity_id, text FROM web.user_notes WHERE user_id = %(user_id)s;"
+        g.cursor.execute(sql, {'user_id': current_user.id})
+        debug_model['user'] += 1
+        return {row.entity_id: row.text for row in g.cursor.fetchall()}
 
     @staticmethod
     def delete_note(entity):

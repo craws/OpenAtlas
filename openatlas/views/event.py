@@ -107,13 +107,12 @@ def event_update(id_):
 def event_view(id_):
     event = EntityMapper.get_by_id(id_, nodes=True)
     event.note = UserMapper.get_note(event)
-    tables = {
-        'info': get_entity_data(event),
-        'file': Table(Table.HEADERS['file'] + [_('main image')]),
-        'subs': Table(Table.HEADERS['event']),
-        'source': Table(Table.HEADERS['source']),
-        'actor': Table(['actor', 'class', 'involvement', 'first', 'last', 'description']),
-        'reference': Table(Table.HEADERS['reference'] + ['page / link text'])}
+    tables = {'info': get_entity_data(event),
+              'file': Table(Table.HEADERS['file'] + [_('main image')]),
+              'subs': Table(Table.HEADERS['event']),
+              'source': Table(Table.HEADERS['source']),
+              'actor': Table(['actor', 'class', 'involvement', 'first', 'last', 'description']),
+              'reference': Table(Table.HEADERS['reference'] + ['page / link text'])}
     for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
         first = link_.first
         if not link_.first and event.first:

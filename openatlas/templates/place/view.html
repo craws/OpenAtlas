@@ -47,6 +47,7 @@
             <div style="float:left;">
                 {{ tables['info']|data_table|safe }}
                 {{ object_|display_external_references|safe }}
+                {{ object_|note|safe }}
                 {{ object_|description|safe }}
             </div>
             <div style="clear:both;"></div>
