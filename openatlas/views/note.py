@@ -21,7 +21,7 @@ class NoteForm(Form):
 @app.route('/note/insert/<int:entity_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def note_insert(entity_id=None):
-    entity = EntityMapper.get_by_id(entity_id) if entity_id else None
+    entity = EntityMapper.get_by_id(entity_id)
     form = build_form(NoteForm, 'note-form')
     if form.validate_on_submit():
         save(form, entity=entity)
@@ -29,18 +29,37 @@ def note_insert(entity_id=None):
     return render_template('note/insert.html', form=form, entity=entity)
 
 
-def save(form, entity, note=None):
+@app.route('/note/update/<int:entity_id>', methods=['POST', 'GET'])
+@required_group('contributor')
+def note_update(entity_id):
+    entity = EntityMapper.get_by_id(entity_id)
+    form = build_form(NoteForm, 'note-form')
+    if form.validate_on_submit():
+        save(form, entity=entity, insert=False)
+        return redirect(url_for(entity.view_name + '_view', id_=entity.id))
+    form.description.data = UserMapper.get_note(entity)
+    return render_template('note/update.html', form=form, entity=entity)
+
+
+def save(form, entity, insert=True):
     g.cursor.execute('BEGIN')
-    log_action = 'update'
     try:
-        if not note:
+        if insert:
             UserMapper.insert_note(entity, form.description.data)
-            log_action = 'insert'
         else:
             UserMapper.update_note(entity, form.description.data)
         g.cursor.execute('COMMIT')
-        flash(_('note added') if log_action == 'insert' else _('note update'), 'info')
+        flash(_('note added') if insert else _('note updated'), 'info')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
+
+
+@app.route('/note/delete/<int:entity_id>', methods=['POST', 'GET'])
+@required_group('contributor')
+def note_delete(entity_id):
+    entity = EntityMapper.get_by_id(entity_id)
+    UserMapper.delete_note(entity)
+    flash(_('note deleted'), 'info')
+    return redirect(url_for(entity.view_name + '_view', id_=entity.id))

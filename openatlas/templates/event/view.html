@@ -25,7 +25,7 @@
             {{ event.id|bookmark_toggle|safe }}
             {% if current_user.settings['module_notes'] and 'contributor'|is_authorized %}
                 {% if event.note %}
-                    <a href="">{{ _('edit note')|uc_first }}</a>
+                    <a href="{{ url_for('note_update', entity_id=event.id) }}">{{ _('edit note')|uc_first }}</a>
                 {% else %}
                     <a href="{{ url_for('note_insert', entity_id=event.id) }}">+ {{ _('note')|uc_first }}</a>
                 {% endif %}
