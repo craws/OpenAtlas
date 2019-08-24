@@ -53,19 +53,21 @@
                 </div>
             </div>
         </div>
-        <div style="float:left;">
-            <h1>{{ _('modules')|uc_first }}</h1>
-            <div class="data-table">
-                <div class="table-row">
-                    <div>{{ form.module_geonames.label|safe }}  {{ form.module_geonames.description|display_tooltip|safe }}</div>
-                    <div class="table-cell">{{ form.module_geonames }}</div>
-                </div>
-                <div class="table-row">
-                    <div>{{ form.module_notes.label|safe }}  {{ form.module_notes.description|display_tooltip|safe }}</div>
-                    <div class="table-cell">{{ form.module_notes }}</div>
+        {% if 'contributer'|is_authorized %}
+            <div style="float:left;">
+                <h1>{{ _('modules')|uc_first }}</h1>
+                <div class="data-table">
+                    <div class="table-row">
+                        <div>{{ form.module_geonames.label|safe }}  {{ form.module_geonames.description|display_tooltip|safe }}</div>
+                        <div class="table-cell">{{ form.module_geonames }}</div>
+                    </div>
+                    <div class="table-row">
+                        <div>{{ form.module_notes.label|safe }}  {{ form.module_notes.description|display_tooltip|safe }}</div>
+                        <div class="table-cell">{{ form.module_notes }}</div>
+                    </div>
                 </div>
             </div>
-        </div>
+        {% endif %}
         <div style="clear:both"></div>
         {{ form.save}}
     </form>

@@ -253,18 +253,22 @@ class UserMapper:
 
     @staticmethod
     def insert_note(entity, note):
+        from openatlas.util.util import sanitize
         sql = """
             INSERT INTO web.user_notes (user_id, entity_id, text)
             VALUES (%(user_id)s, %(entity_id)s, %(text)s);"""
-        g.cursor.execute(sql, {'user_id': current_user.id, 'entity_id': entity.id, 'text': note})
+        g.cursor.execute(sql, {'user_id': current_user.id, 'entity_id': entity.id,
+                               'text': sanitize(note, 'description') })
         debug_model['user'] += 1
 
     @staticmethod
     def update_note(entity, note):
+        from openatlas.util.util import sanitize
         sql = """
             UPDATE web.user_notes SET text = %(text)s
             WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s;"""
-        g.cursor.execute(sql, {'user_id': current_user.id, 'entity_id': entity.id, 'text': note})
+        g.cursor.execute(sql, {'user_id': current_user.id, 'entity_id': entity.id,
+                               'text': sanitize(note, 'description')})
         debug_model['user'] += 1
 
     @staticmethod

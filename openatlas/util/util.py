@@ -118,14 +118,14 @@ class MLStripper(HTMLParser):
 def sanitize(string: str, mode: Optional[str] = None) -> str:
     if not mode:
         # Remove all characters from a string except ASCII letters and numbers
-        return re.sub('[^A-Za-z0-9]+', '', string)
+        return re.sub('[^A-Za-z0-9]+', '', string).strip()
     if mode == 'node':
         # Remove all characters from a string except letters, numbers and spaces
         return re.sub(r'([^\s\w]|_)+', '', string).strip()
     if mode == 'description':
         s = MLStripper()
         s.feed(string)
-        return s.get_data()
+        return s.get_data().strip()
 
 
 def get_file_stats(path: Optional[str] = app.config['UPLOAD_FOLDER_PATH']) -> dict:

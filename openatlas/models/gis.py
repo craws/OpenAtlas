@@ -5,6 +5,7 @@ from flask import g, json
 
 from openatlas import debug_model
 from openatlas.models.node import NodeMapper
+from openatlas.util.util import sanitize
 
 
 class InvalidGeomException(Exception):
@@ -93,7 +94,8 @@ class GisMapper:
                 'gisPolygonAll': json.dumps(all_['polygon']),
                 'gisPolygonSelected': json.dumps(selected['polygon']),
                 'gisPolygonPointSelected': json.dumps(selected['polygon_point']),
-                'gisAllSelected': json.dumps(selected['polygon'] + selected['linestring'] + selected['point'])}
+                'gisAllSelected': json.dumps(selected['polygon'] +
+                                             selected['linestring'] + selected['point'])}
 
     @staticmethod
     def insert(entity, form):
@@ -121,11 +123,12 @@ class GisMapper:
                         %(type)s,
                         public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));
                     """.format(shape=shape if shape != 'line' else 'linestring')
-                g.cursor.execute(sql, {'entity_id': entity.id,
-                                       'name': item['properties']['name'],
-                                       'description': item['properties']['description'],
-                                       'type': item['properties']['shapeType'],
-                                       'geojson': json.dumps(item['geometry'])})
+                g.cursor.execute(sql, {
+                    'entity_id': entity.id,
+                    'name': sanitize(item['properties']['name'], 'description'),
+                    'description': sanitize(item['properties']['description'], 'description'),
+                    'type': item['properties']['shapeType'],
+                    'geojson': json.dumps(item['geometry'])})
                 debug_model['div sql'] += 1
 
     @staticmethod

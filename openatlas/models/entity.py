@@ -249,6 +249,7 @@ class EntityMapper:
 
     @staticmethod
     def insert(code, name, system_type=None, description=None):
+        from openatlas.util.util import sanitize
         if not name:  # pragma: no cover
             logger.log('error', 'database', 'Insert entity without name and date')
             return
@@ -258,7 +259,7 @@ class EntityMapper:
             RETURNING id;"""
         params = {'name': str(name).strip(), 'code': code,
                   'system_type': system_type.strip() if system_type else None,
-                  'description': description.strip() if description else None}
+                  'description': sanitize(description, 'description') if description else None}
         g.cursor.execute(sql, params)
         debug_model['div sql'] += 1
         return EntityMapper.get_by_id(g.cursor.fetchone()[0])
