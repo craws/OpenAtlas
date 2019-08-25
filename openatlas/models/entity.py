@@ -373,6 +373,7 @@ class EntityMapper:
             SUM(CASE WHEN class_code = 'E18' THEN 1 END) AS place,
             SUM(CASE WHEN class_code IN ('E31', 'E84') AND system_type != 'file' THEN 1 END)
                 AS reference,
+            SUM(CASE WHEN class_code = 'E22' THEN 1 END) AS find,
             SUM(CASE WHEN class_code = 'E31' AND system_type = 'file' THEN 1 END) AS file
             FROM model.entity;"""
         g.cursor.execute(sql)

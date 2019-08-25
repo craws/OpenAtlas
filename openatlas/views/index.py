@@ -43,8 +43,9 @@ def index():
                                         entity.first, entity.last, truncate_string(text)])
         for name, count in EntityMapper.get_overview_counts().items():
             count = format_number(count) if count else ''
+            url = url_for(name + '_index') if name != 'find' else url_for('place_index')
             tables['overview'].rows.append([
-                '<a href="' + url_for(name + '_index') + '">' + uc_first(_(name)) + '</a>', count])
+                '<a href="' + url + '">' + uc_first(_(name)) + '</a>', count])
         for entity in EntityMapper.get_latest(8):
             tables['latest'].rows.append([
                 link(entity), g.classes[entity.class_.code].name,
