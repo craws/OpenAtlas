@@ -65,10 +65,8 @@ FEEDBACK_SUBJECTS[_('problem').title()] = _('problem').title()
 # Mappings between model and user interface
 CODE_CLASS = {
     'E33': 'source',
-    'E6': 'event',
     'E7': 'event',
     'E8': 'event',
-    'E12': 'event',
     'E21': 'actor',
     'E40': 'actor',
     'E74': 'actor',
@@ -79,7 +77,7 @@ CODE_CLASS = {
 
 CLASS_CODES = {
     'source': ['E33'],
-    'event': ['E7', 'E8', 'E12', 'E6'],
+    'event': ['E7', 'E8'],
     'actor': ['E21', 'E74', 'E40'],
     'group': ['E40', 'E74'],
     'place': ['E18', 'E22'],

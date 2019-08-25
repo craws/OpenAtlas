@@ -129,7 +129,7 @@ class NetworkForm(Form):
     classes = SelectMultipleField(_('classes'),
                                   option_widget=widgets.CheckboxInput(),
                                   widget=widgets.ListWidget(prefix_label=False),
-                                  default=['E21', 'E7', 'E40', 'E74', 'E8', 'E12', 'E6'])
+                                  default=['E21', 'E7', 'E40', 'E74', 'E8'])
     properties = SelectMultipleField(
         _('properties'),
         option_widget=widgets.CheckboxInput(),
@@ -145,8 +145,6 @@ class NetworkForm(Form):
     color_E53 = StringField(default='#00FF00', render_kw=kw_params)
     color_E18 = StringField(default='#FF0000', render_kw=kw_params)
     color_E8 = StringField(default='#E54A2A', render_kw=kw_params)
-    color_E12 = StringField(default='#E54A2A', render_kw=kw_params)
-    color_E6 = StringField(default='#E54A2A', render_kw=kw_params)
     color_E84 = StringField(default='#EE82EE', render_kw=kw_params)
     save = SubmitField(_('apply'))
 
@@ -162,7 +160,7 @@ def model_network():
                                                            'height': form.height.data,
                                                            'charge': form.charge.data,
                                                            'distance': form.distance.data}}
-    for code in ['E21', 'E7', 'E31', 'E33', 'E40', 'E74', 'E53', 'E18', 'E8', 'E12', 'E6', 'E84']:
+    for code in ['E21', 'E7', 'E31', 'E33', 'E40', 'E74', 'E53', 'E18', 'E8', 'E84']:
         form.classes.choices.append((code, g.classes[code].name))
         params['classes'][code] = {'active': (code in form.classes.data),
                                    'color': getattr(form, 'color_' + code).data}

@@ -428,7 +428,7 @@ def link(entity) -> str:
                 url = url_for('translation_view', id_=entity.id)
         elif entity.system_type == 'file':
             url = url_for('file_view', id_=entity.id)
-        elif entity.class_.code in ('E7', 'E8', 'E12', 'E6'):
+        elif entity.class_.code in ('E7', 'E8'):
             url = url_for('event_view', id_=entity.id)
         elif entity.class_.code in ('E21', 'E74', 'E40'):
             url = url_for('actor_view', id_=entity.id)

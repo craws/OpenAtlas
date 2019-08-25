@@ -128,7 +128,7 @@ class MoveForm(Form):
     selection = SelectMultipleField('', [InputRequired()], coerce=int,
                                     option_widget=widgets.CheckboxInput(),
                                     widget=widgets.ListWidget(prefix_label=False),
-                                    default=['E21', 'E7', 'E40', 'E74', 'E8', 'E12', 'E6'])
+                                    default=['E21', 'E7', 'E40', 'E74', 'E8'])
     save = SubmitField(_('move'))
 
 

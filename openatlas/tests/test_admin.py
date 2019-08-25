@@ -50,7 +50,7 @@ class ContentTests(TestBaseCase):
                 app.preprocess_request()
                 # Create invalid dates for an actor and a relation link
                 person = EntityMapper.insert('E21', 'Person')
-                event = EntityMapper.insert('E6', 'Event')
+                event = EntityMapper.insert('E7', 'Event')
                 person.begin_from = '2018-01-31'
                 person.begin_to = '2018-01-01'
                 person.update()

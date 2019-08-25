@@ -34,7 +34,7 @@ def involvement_insert(origin_id):
     else:
         del form.actor
     form.activity.choices = [('P11', g.properties['P11'].name_inverse)]
-    if origin.class_.code in ['E7', 'E8', 'E12']:
+    if origin.class_.code in ['E7', 'E8']:
         form.activity.choices.append(('P14', g.properties['P14'].name_inverse))
     if origin.class_.code == 'E8':
         form.activity.choices.append(('P22', g.properties['P22'].name_inverse))
@@ -80,7 +80,7 @@ def involvement_update(id_, origin_id):
     form.save.label.text = _('save')
     del form.actor, form.event, form.insert_and_continue
     form.activity.choices = [('P11', g.properties['P11'].name)]
-    if event.class_.code in ['E7', 'E8', 'E12']:
+    if event.class_.code in ['E7', 'E8']:
         form.activity.choices.append(('P14', g.properties['P14'].name))
     if event.class_.code == 'E8':
         form.activity.choices.append(('P22', g.properties['P22'].name))
