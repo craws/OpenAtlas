@@ -12,6 +12,9 @@ After following the instructions restart Apache and test if the application is w
 
 ### 3.18.0 to 3.19.0
 
+In preparation of other new features the color themes were removed and
+the classes Production (E12) and Destruction (E6) were remapped to Activity (E7) - check issue #1054 if your project was tested and is affected.
+
 Execute install/upgrade/3.19.0.sql after making backups
 
 ### 3.17.x to 3.18.0
