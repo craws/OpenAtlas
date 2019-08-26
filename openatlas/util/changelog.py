@@ -4,11 +4,15 @@ from collections import OrderedDict
 
 class Changelog:
     versions = OrderedDict()  # type: OrderedDict
-    versions['3.19.0'] = ['TBA', OrderedDict([
+    versions['3.19.0'] = ['2019-08-26', OrderedDict([
         ('feature', OrderedDict([
+            ('928', 'GeoNames links for places'),
+            ('1042', 'Personal notes for entities'),
             ('1040', 'New user group: Contributor'),
+            ('1055', 'Add finds to overview count'),
             ('1044', 'Hide date form fields only if there are empty'),
-            ('1041', 'Removing color themes'),
+            ('1041', 'Remove color themes'),
+            ('1054', 'Remove Production and Destruction'),
         ]))
     ])]
     versions['3.18.1'] = ['2019-08-20', OrderedDict([
