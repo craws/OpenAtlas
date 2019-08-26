@@ -273,7 +273,7 @@ class UserMapper:
 
     @staticmethod
     def get_note(entity):
-        if not current_user.settings['module_notes']:
+        if not current_user.settings['module_notes']:  # pragma no cover
             return None
         sql = """
             SELECT text FROM web.user_notes
@@ -284,7 +284,7 @@ class UserMapper:
 
     @staticmethod
     def get_notes():
-        if not current_user.settings['module_notes']:
+        if not current_user.settings['module_notes']:  # pragma no cover
             return {}
         sql = "SELECT entity_id, text FROM web.user_notes WHERE user_id = %(user_id)s;"
         g.cursor.execute(sql, {'user_id': current_user.id})

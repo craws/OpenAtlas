@@ -34,7 +34,7 @@ def link(self, entity: Entity) -> str:
 @blueprint.app_template_filter()
 def note(self, entity: Entity) -> str:
     if not current_user.settings['module_notes'] or not util.is_authorized('contributor'):
-        return ''
+        return ''  # pragma no cover
     if not entity.note:
         url = url_for('note_insert', entity_id=entity.id)
         return '<a href="' + url  + '">+ ' + util.uc_first(_('note')) + '</a>'

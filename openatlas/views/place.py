@@ -77,7 +77,7 @@ def place_insert(origin_id=None):
             and hasattr(form, 'insert_and_continue'):
         del form.insert_and_continue
     if hasattr(form, 'geonames_id') and not current_user.settings['module_geonames']:
-        del form.geonames_id, form.geonames_precision
+        del form.geonames_id, form.geonames_precision  # pragma: no cover
     if form.validate_on_submit():
         return redirect(save(form, origin=origin))
     if title == 'place':
@@ -203,7 +203,7 @@ def place_update(id_):
     else:
         form = build_form(PlaceForm, 'Place', object_, request, location)
     if hasattr(form, 'geonames_id') and not current_user.settings['module_geonames']:
-        del form.geonames_id, form.geonames_precision
+        del form.geonames_id, form.geonames_precision  # pragma: no cover
     if form.validate_on_submit():
         if was_modified(form, object_):  # pragma: no cover
             del form.save
@@ -318,7 +318,7 @@ def update_geonames(form: PlaceForm, object_) -> None:
 
     if not new_geonames_id:
         if geonames_entity:
-            if len(geonames_entity.get_links('P67')) > 1:
+            if len(geonames_entity.get_links('P67')) > 1:  # pragma: no cover
                 geonames_link.delete()  # There are more linked so only remove this link
             else:
                 geonames_entity.delete()  # Nothing else is linked to the reference so delete it
@@ -343,11 +343,11 @@ def update_geonames(form: PlaceForm, object_) -> None:
         object_.link('P67', reference, inverse=True, type_id=match_id)
         return
 
-    if new_geonames_id == geonames_entity.id and match_id == g.nodes[geonames_link.type.id]:
+    if int(new_geonames_id) == int(geonames_entity.name) and match_id == geonames_link.type.id:
         return  # It's the same link so do nothing
 
     # Only the match type change so delete and recreate the link
-    if new_geonames_id == geonames_entity.id:
+    if int(new_geonames_id) == int(geonames_entity.name):
         geonames_link.delete()
         object_.link('P67', geonames_entity, inverse=True, type_id=match_id)
         return
@@ -355,7 +355,7 @@ def update_geonames(form: PlaceForm, object_) -> None:
     # Its linked to a different geonames reference
     if len(geonames_entity.get_links('P67')) > 1:
         geonames_link.delete()  # There are more linked so only remove this link
-    else:
+    else:  # pragma: no cover
         geonames_entity.delete()  # Nothing else is linked to the reference so delete it
     reference = EntityMapper.get_by_name_and_system_type(new_geonames_id,
                                                          'external reference geonames')

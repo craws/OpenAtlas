@@ -73,6 +73,24 @@ class PlaceTest(TestBaseCase):
             rv = self.app.post(url_for('place_update', id_=place_id), data=data,
                                follow_redirects=True)
             assert b'Val-hall' in rv.data
+
+            # Test with same GeoNames id
+            rv = self.app.post(url_for('place_update', id_=place_id), data=data,
+                               follow_redirects=True)
+            assert b'Val-hall' in rv.data
+
+            # Test with same GeoNames id but different precision
+            data['geonames_precision'] = ''
+            rv = self.app.post(url_for('place_update', id_=place_id), data=data,
+                               follow_redirects=True)
+            assert b'Val-hall' in rv.data
+
+            # Test update without the previous GeoNames id
+            data['geonames_id'] = ''
+            rv = self.app.post(url_for('place_update', id_=place_id), data=data,
+                               follow_redirects=True)
+            assert b'Val-hall' in rv.data
+
             with app.test_request_context():
                 app.preprocess_request()
                 event = EntityMapper.insert('E8', 'Valhalla rising')
