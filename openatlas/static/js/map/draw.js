@@ -350,6 +350,21 @@ function importGeonamesID(geo, popup) {
     popup._close();
 }
 
+function importAll(geo, popup) {
+    $('#geonames_id').val(geo.geonameId);
+    popup._close();
+    point =
+        `{"type": "Feature", "geometry":
+         {"type": "Point", "coordinates": [${geo.lng},${geo.lat}]},
+         "properties":{"name": "${geo.name}", "description": "${geo.name} (${geo.geonameId}), imported from GeoNames", "shapeType": "centerpoint"}}`;
+    points = JSON.parse($('#gis_points').val());
+    points.push(JSON.parse(point));
+    $('#gis_points').val(JSON.stringify(points));
+    var newMarker = L.marker(([geo.lat, geo.lng]), {icon: editedIcon}).addTo(map);
+    newMarker.bindPopup(buildPopup(JSON.parse(point), 'edited'));
+    marker = false;  // unset the marker
+}
+
 function saveNewGeometry(shapeType) {
     if (shapeType == 'centerpoint') {
         point =

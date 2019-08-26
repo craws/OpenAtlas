@@ -124,7 +124,8 @@ geoSearchControl.on('select', function(e){
                   <div id="buttonBar" style="white-space:nowrap;">
                     <p>
                         <button id="ImportGeonamesID">Import ID</button>
-                        <button id="ImportCoordinates">Import Coordinates</button>
+                        <button id="ImportCoordinates">Import Coordinates</button><br><br>
+                        <button id="ImportAll">Import ID and Coordinates</button>
                     </p>
                 </div>
             </div>`;
@@ -133,6 +134,7 @@ geoSearchControl.on('select', function(e){
             p.popup.update();
             $('#ImportCoordinates').click(() => importNewPoint(e.geoname, p.popup));
             $('#ImportGeonamesID').click(() => importGeonamesID(e.geoname, p.popup));
+            $('#ImportAll').click(() => importAll(e.geoname, p.popup));
         });
     }
 });
