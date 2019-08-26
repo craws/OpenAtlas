@@ -18,7 +18,7 @@
         <h1>{{ _('display')|uc_first }}</h1>
         {{ data['display']|data_table|safe }}
     </div>
-    {% if 'contributer'|is_authorized %}
+    {% if 'contributor'|is_authorized %}
         <div style="float:left;margin-left:2em;">
             <h1>{{ _('modules')|uc_first }}</h1>
             {{ data['modules']|data_table|safe }}
