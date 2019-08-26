@@ -10,7 +10,7 @@ class Changelog:
             ('1042', 'Personal notes for entities'),
             ('1040', 'New user group: Contributor'),
             ('1055', 'Add finds to overview count'),
-            ('1044', 'Hide date form fields only if there are empty'),
+            ('1044', 'Hide date form fields only if they are empty'),
             ('1041', 'Remove color themes'),
             ('1054', 'Remove Production and Destruction'),
         ]))
