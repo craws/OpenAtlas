@@ -72,9 +72,9 @@ def profile_index() -> str:
                         (_('table rows'), user.settings['table_rows']),
                         (_('show aliases in tables'), user.settings['table_show_aliases']),
                         (_('layout'), user.settings['layout']),
-                        (_('max zoom'), user.settings['max_zoom'])],
+                        (_('max map zoom'), user.settings['max_zoom'])],
             'modules': [(_('GeoNames'), user.settings['module_geonames']),
-                        (_('Notes'), user.settings['module_notes'])]}
+                        (_('notes'), user.settings['module_notes'])]}
     return render_template('profile/index.html', data=data)
 
 
