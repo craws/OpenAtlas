@@ -125,9 +125,11 @@ def place_view(id_):
             data.append(truncate_string(link_.description))
             if domain.system_type.startswith('external reference'):
                 object_.external_references.append(link_)
-            if is_authorized('contributor'):
+            if is_authorized('contributor') and domain.system_type != 'external reference geonames':
                 url = url_for('reference_link_update', link_id=link_.id, origin_id=object_.id)
                 data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
+            else:
+                data.append('')
         if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=object_.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
@@ -339,7 +341,8 @@ def update_geonames(form: PlaceForm, object_) -> None:
         reference = EntityMapper.get_by_name_and_system_type(new_geonames_id,
                                                              'external reference geonames')
         if not reference:  # The selected reference doesn't exist so create it
-            reference = EntityMapper.insert('E31', new_geonames_id, 'external reference geonames')
+            reference = EntityMapper.insert('E31', new_geonames_id, 'external reference geonames',
+                                            description='GeoNames ID')
         object_.link('P67', reference, inverse=True, type_id=match_id)
         return
 
@@ -361,5 +364,6 @@ def update_geonames(form: PlaceForm, object_) -> None:
                                                          'external reference geonames')
 
     if not reference:  # The selected reference doesn't exist so create it
-        reference = EntityMapper.insert('E31', new_geonames_id, 'external reference geonames')
+        reference = EntityMapper.insert('E31', new_geonames_id, 'external reference geonames',
+                                        description='GeoNames ID')
     object_.link('P67', reference, inverse=True, type_id=match_id)
