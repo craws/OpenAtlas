@@ -1,0 +1,38 @@
+
+table.dataTable.stripe tbody tr.odd, table.dataTable.display tbody tr.odd {
+    background-color: #adadad;
+}
+
+table.dataTable th {
+    color: #ffffff;
+    background-color: #000000;
+}
+
+table.dataTable.no-footer {
+    border-bottom: none;
+}
+
+table.dataTable.compact tbody th, table.dataTable.compact tbody td {
+    padding: 5px;
+}
+
+table.dataTable {
+    margin-bottom: 1em;
+}
+
+.dataTables_wrapper .ui-widget-header {
+    background-color: inherit;
+    color: #000000;
+}
+
+.dataTables_wrapper .dataTables_length select {
+    width: auto;
+}
+
+.dataTables_paginate .ui-widget-header, .ui-widget-header .ui-state-default {
+    background-color: inherit;
+}
+
+.dataTables_wrapper .ui-toolbar {
+    padding: 0;
+}

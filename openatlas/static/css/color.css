@@ -4,7 +4,6 @@
 
 body,
 tabs-container .ui-state-active a,
-table.tablesorter tbody td,
 .ui-widget-content,
 .ui-tabs .ui-tabs-panel,
 div.tabs-container .ui-state-active a,
@@ -37,9 +36,7 @@ a.button,
 .ui-widget-header,
 .ui-widget-content .button-bar a,
 .ui-state-default a:link,
-.ui-state-default a:visited,
-table.tablesorter thead tr th,
-table.tablesorter tfoot tr th {
+.ui-state-default a:visited{
     color: #ffffff;
 }
 
@@ -74,9 +71,7 @@ body, .ui-widget-content, .ui-dialog .ui-dialog-content {
 .overlay,
 .inverse-heading,
 .ui-widget-header,
-.ui-widget-header .ui-state-default,
-table.tablesorter thead tr th,
-table.tablesorter tfoot tr th {
+.ui-widget-header .ui-state-default {
     background-color: #000000;
 }
 
@@ -92,13 +87,11 @@ input[type="text"],
 .ui-widget-header .ui-state-active,
 div.tabs-container .ui-widget-content,
 div.tabs-container .ui-state-active,
-div.tabs-container .ui-state-active.ui-state-hover,
-table.tablesorter tbody td {
+div.tabs-container .ui-state-active.ui-state-hover {
     background-color: #ffffff;
 }
 
-#language-menu a,
-table.tablesorter tbody tr.odd td {
+#language-menu a {
     background-color: #adadad;
 }
 

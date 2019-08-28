@@ -27,10 +27,10 @@ class FeedbackForm(Form):
 @app.route('/')
 @app.route('/overview')
 def index():
-    tables = {'overview': Table(pager=False),
+    tables = {'overview': Table(paging=False),
               'bookmarks': Table(['name', 'class', 'first', 'last']),
               'notes': Table(['name', 'class', 'first', 'last', _('note')]),
-              'latest': Table(['name', 'class', 'first', 'last', 'date', 'user'], pager=False)}
+              'latest': Table(['name', 'class', 'first', 'last', 'date', 'user'], paging=False)}
     if current_user.is_authenticated and hasattr(current_user, 'bookmarks'):
         for entity_id in current_user.bookmarks:
             entity = EntityMapper.get_by_id(entity_id)

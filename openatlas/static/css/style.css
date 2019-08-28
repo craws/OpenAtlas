@@ -140,10 +140,6 @@ input[type="text"].value_input {
     padding: 0.1em 0.4em 0.1em 0.4em;
 }
 
-#overview-table thead {
-    display: none;
-}
-
 list-style-type: none;
 #global-search {
     font-size: 0.8em;
@@ -373,31 +369,6 @@ h2 {
 table {
     border-collapse: inherit;
     border-spacing: 0.2em;
-}
-
-table.tablesorter {
-    text-align: left;
-    margin-bottom: 0.5em;
-}
-
-table.tablesorter thead tr th, table.tablesorter tfoot tr th {
-    font-weight: bold;
-    padding: 0.4em 2em 0.4em 0.4em;
-}
-
-table.tablesorter tbody td {
-    padding: 0.3em;
-    vertical-align: top;
-}
-
-table.tablesorter thead tr th.sorter-false {
-    background-color: inherit;
-    border: none;
-    cursor: default;
-}
-
-.tablesorter .filtered {
-    display: none;
 }
 
 div.data-table, textarea {
