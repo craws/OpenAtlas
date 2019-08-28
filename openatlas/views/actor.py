@@ -45,7 +45,7 @@ def actor_view(id_):
         'source': Table(Table.HEADERS['source']),
         'reference': Table(Table.HEADERS['reference'] + ['page / link text']),
         'event': Table(['event', 'class', 'involvement', 'first', 'last', 'description']),
-        'relation': Table(['relation', 'actor', 'first', 'last', 'description'], sort='[[0,0]]'),
+        'relation': Table(['relation', 'actor', 'first', 'last', 'description']),
         'member_of': Table(['member of', 'function', 'first', 'last', 'description'])}
     profile_image_id = actor.get_profile_image_id()
     for link_ in actor.get_links('P67', True):

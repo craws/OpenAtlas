@@ -66,7 +66,7 @@ def hierarchy_update(id_):
         flash(_('info update'), 'info')
         return redirect(url_for('node_index') + '#tab-' + str(root.id))
     form.multiple = root.multiple
-    table = Table(['form', 'count'], pager=False, sort='[[0, 0]]')
+    table = Table(['form', 'count'], paging=False)
     for form_id, form_ in root.forms.items():
         url = url_for('hierarchy_remove_form', id_=root.id, remove_id=form_id)
         link = '<a href="' + url + '">' + uc_first(_('remove')) + '</a>'

@@ -346,7 +346,7 @@ class TableMultiSelect(HiddenInput):
                                 change_label=uc_first(_('change')),
                                 title=_(field.id.replace('_', ' ')),
                                 selection=selection,
-                                table=table.display(field.id, remove_rows=False))
+                                table=table.display(field.id))
         return super(TableMultiSelect, self).__call__(field, **kwargs) + html
 
 

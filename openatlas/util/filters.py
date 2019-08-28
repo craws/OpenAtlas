@@ -112,19 +112,18 @@ def display_move_form(self, form, root_name: str) -> str:
     table = Table(['#', util.uc_first(_('selection'))])
     for item in form.selection:
         table.rows.append([item, item.label.text])
-    return html + table.display('move', remove_rows=False)
+    return html + table.display('move')
 
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def table_select_model(self, name: str, selected=None) -> str:
+    # Todo: extra sortfunction for class and property code e.g. E69
     if name in ['domain', 'range']:
         entities = g.classes
-        headers = '{0:{sorter:"class_code" }}'
     else:
         entities = g.properties
-        headers = '{0:{sorter:"property_code"}}'
-    table = Table(['code', 'name'], sort='[[0, 0]]', headers=headers)
+    table = Table(['code', 'name'])
     for id_ in entities:
         table.rows.append([
             '<a onclick="selectFromTable(this, \'' + name + '\', \'' + str(id_) + '\')">' +
