@@ -231,14 +231,14 @@ class EntityMapper:
     @staticmethod
     def get_by_system_type(system_type, nodes=False, aliases=False):
         sql = EntityMapper.build_sql(nodes=nodes, aliases=aliases)
-        sql += ' WHERE e.system_type = %(system_type)s GROUP BY e.id ORDER BY e.name;'
+        sql += ' WHERE e.system_type = %(system_type)s GROUP BY e.id;'
         g.cursor.execute(sql, {'system_type': system_type})
         debug_model['div sql'] += 1
         return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_display_files():
-        sql_clause = " WHERE e.system_type = 'file' GROUP BY e.id ORDER BY e.name;"
+        sql_clause = " WHERE e.system_type = 'file' GROUP BY e.id;"
         g.cursor.execute(EntityMapper.build_sql(nodes=True) + sql_clause)
         debug_model['div sql'] += 1
         entities = []
@@ -295,7 +295,7 @@ class EntityMapper:
             FROM model.entity e
             LEFT JOIN model.link t ON e.id = t.domain_id AND t.property_code IN ('P2', 'P89')
             JOIN import.entity ie ON e.id = ie.entity_id
-            WHERE ie.project_id = %(id)s GROUP BY e.id, ie.origin_id ORDER BY e.name;"""
+            WHERE ie.project_id = %(id)s GROUP BY e.id, ie.origin_id;"""
         g.cursor.execute(sql, {'id': project_id})
         debug_model['by id'] += 1
         entities = []
@@ -311,17 +311,16 @@ class EntityMapper:
         if class_name == 'source':
             sql = EntityMapper.build_sql(nodes=True) + """
                 WHERE e.class_code IN %(codes)s AND e.system_type = 'source content'
-                GROUP BY e.id ORDER BY e.name;"""
+                GROUP BY e.id;"""
         elif class_name == 'reference':
             sql = EntityMapper.build_sql(nodes=True) + """
-                WHERE e.class_code IN %(codes)s AND e.system_type != 'file'
-                GROUP BY e.id ORDER BY e.name;"""
+                WHERE e.class_code IN %(codes)s AND e.system_type != 'file' GROUP BY e.id;"""
         else:
             aliases = True if class_name == 'actor' and current_user.settings[
                 'table_show_aliases'] else False
             sql = EntityMapper.build_sql(nodes=True if class_name == 'event' else False,
                                          aliases=aliases) + """
-                WHERE e.class_code IN %(codes)s GROUP BY e.id ORDER BY e.name;"""
+                WHERE e.class_code IN %(codes)s GROUP BY e.id;"""
         g.cursor.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][class_name])})
         debug_model['by codes'] += 1
         return [Entity(row) for row in g.cursor.fetchall()]
