@@ -35,7 +35,7 @@ table.dataTable {
     width: auto;
 }
 
-.dataTables_paginate, .ui-widget-header .ui-state-default {
+.dataTables_paginate .ui-state-default {
     background-color: inherit;
 }
 

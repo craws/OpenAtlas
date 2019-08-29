@@ -5,7 +5,6 @@ from openatlas import debug_model
 
 
 class SettingsMapper:
-
     fields = {
         'debug_mode',
         'default_language',
@@ -41,15 +40,14 @@ class SettingsMapper:
         settings = {}
         for row in g.cursor.fetchall():
             settings[row.name] = row.value
-            if row.name in [
-                'default_table_rows',
-                'failed_login_forget_minutes',
-                'failed_login_tries',
-                'file_upload_max_size',
-                'minimum_password_length',
-                'random_password_length',
-                'reset_confirm_hours'
-            ]:
+            if row.name in ['default_table_rows',
+                            'failed_login_forget_minutes',
+                            'failed_login_tries',
+                            'file_upload_max_size',
+                            'minimum_password_length',
+                            'random_password_length',
+                            'reset_confirm_hours'
+                            ]:
                 settings[row.name] = int(row.value)
             elif row.name in ['mail_recipients_feedback']:
                 settings[row.name] = row.value.split(';')

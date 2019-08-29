@@ -1,8 +1,8 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Optional
-
-from flask import json
+from flask import json, session
 from flask_babel import lazy_gettext as _
+from flask_login import current_user
+from typing import Optional
 
 
 class Table:
@@ -38,24 +38,27 @@ class Table:
         for item in self.header:
             columns += "{title:'" + item.capitalize() + "'},"
         columns += "{title:''}," * (len(self.rows[0]) - len(self.header))  # Add emtpy headers
-
+        table_rows = session['settings']['default_table_rows']
+        if hasattr(current_user, 'settings'):
+            table_rows = current_user.settings['table_rows']
         html = """
             <table id="{name}_table" class="compact stripe cell-border hover" width="100%"></table>
             <script>
                 $(document).ready(function() {{
                     $('#{name}_table').DataTable( {{
                         data: {data},
-                        stateSave: true,
+                        // stateSave: true,
                         columns: [{columns}],
                         {order}
                         {defs}
                         paging: {paging},
-                        pageLength: 25,
+                        pageLength: {table_rows},
                         autoWidth: false,
                     }});
                 }});
             </script>""".format(name=name,
                                 data=json.dumps(self.rows),
+                                table_rows=table_rows,
                                 columns=columns,
                                 order='order: ' + self.order + ',' if self.order else '',
                                 defs='columnDefs: ' + self.defs + ',' if self.defs else '',

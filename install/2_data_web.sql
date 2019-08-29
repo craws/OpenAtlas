@@ -17,7 +17,7 @@ INSERT INTO web.user (username, password, active, email, group_id) VALUES (
 INSERT INTO settings (name, value) VALUES
     ('debug_mode', ''),
     ('default_language', 'en'),
-    ('default_table_rows', '20'),
+    ('default_table_rows', '25'),
     ('failed_login_forget_minutes', '1'),
     ('failed_login_tries', '3'),
     ('file_upload_max_size', '10'),

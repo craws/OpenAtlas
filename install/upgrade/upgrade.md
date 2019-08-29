@@ -10,6 +10,10 @@ After following the instructions restart Apache and test if the application is w
 
     service apache2 restart
 
+### 3.19.x to 3.20.0
+
+Execute install/upgrade/3.20.0.sql after making backups
+
 ### 3.18.0 to 3.19.0
 
 In preparation of other new features the color themes were removed and

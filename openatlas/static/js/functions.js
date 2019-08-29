@@ -111,21 +111,6 @@ $(document).ready(function() {
 
 $.jstree.defaults.core.themes.dots = false;
 
-$.tablesorter.addParser({
-    id: 'class_code',
-    is: function (string) {return false;},
-    format: function (string) {return string.replace(/E/,'');},
-    type: 'numeric'
-});
-
-$.tablesorter.addParser({
-    id: 'property_code',
-    is: function (string) {return false;},
-    format: function(string) {return string.replace(/P/,'');},
-    type: 'numeric'
-});
-
-
 function resizeText(multiplier) {
     if (document.body.style.fontSize === '') {
         document.body.style.fontSize = '1.0em';

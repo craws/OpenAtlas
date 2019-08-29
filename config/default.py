@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 from flask_babel import lazy_gettext as _
 
-VERSION = '3.19.0'
+VERSION = '3.20.0'
 DEMO_MODE = False  # If in demo mode some options are disabled and the login form is pre filled
 
 LANGUAGES = {'en': 'English', 'de': 'Deutsch'}
@@ -38,7 +38,7 @@ THUNDERFOREST_KEY = '7878b4fb224f4902ab42fc846e92b96a'
 # Table rows options
 DEFAULT_TABLE_ROWS = OrderedDict()  # type: OrderedDict
 DEFAULT_TABLE_ROWS[10] = '10'
-DEFAULT_TABLE_ROWS[20] = '20'
+DEFAULT_TABLE_ROWS[25] = '25'
 DEFAULT_TABLE_ROWS[50] = '50'
 DEFAULT_TABLE_ROWS[100] = '100'
 
