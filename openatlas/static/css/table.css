@@ -1,9 +1,12 @@
 
-table.dataTable.stripe tbody tr.odd, table.dataTable.display tbody tr.odd {
+table.dataTable.stripe tbody tr.odd,
+table.dataTable.display tbody tr.odd {
     background-color: #adadad;
 }
 
-.tabs-container table.dataTable th, table.dataTable th {
+table.dataTable th,
+.tabs-container table.dataTable th,
+.overlay-container table.dataTable th {
     color: #ffffff;
     background-color: #000000;
     font-weight: bold;
@@ -14,7 +17,8 @@ table.dataTable.no-footer {
     border-bottom: none;
 }
 
-table.dataTable.compact tbody th, table.dataTable.compact tbody td {
+table.dataTable.compact tbody th,
+table.dataTable.compact tbody td {
     padding: 5px;
 }
 
@@ -31,7 +35,7 @@ table.dataTable {
     width: auto;
 }
 
-.dataTables_paginate .ui-widget-header .ui-state-default {
+.dataTables_paginate, .ui-widget-header .ui-state-default {
     background-color: inherit;
 }
 
