@@ -94,7 +94,7 @@ L.control.layers(baseMaps, controls).addTo(map);
 baseMaps.Landscape.addTo(map);
 
 var geoSearchControl = L.control.geonames({
-    //position: 'topcenter', // In addition to standard 4 corner Leaflet control layout, this will position and size from top center.
+    // position: 'topcenter', // In addition to standard 4 corner Leaflet control layout, this will position and size from top center.
     position: 'topleft',
     geonamesSearch: 'https://secure.geonames.org/searchJSON', // Override this if using a proxy to get connection to geonames.
     geonamesPostalCodesSearch: 'https://secure.geonames.org/postalCodeSearchJSON', // Override this if using a proxy to get connection to geonames.
@@ -103,7 +103,7 @@ var geoSearchControl = L.control.geonames({
     zoomLevel: 12, // Max zoom level to zoom to for location. If null, will use the map's max zoom level.
     className: 'leaflet-geonames-icon', // Class for icon.
     workingClass: 'leaflet-geonames-icon-working', // Class for search underway.
-    featureClasses: ['A', 'H', 'L', 'P', 'R', 'T', 'U', 'V'], // Feature classes to search against.  See: http://www.geonames.org/export/codes.html.
+    featureClasses: ['A', 'H', 'L', 'P', 'R', 'T', 'U', 'V', 'S'], // Feature classes to search against.  See: http://www.geonames.org/export/codes.html.
     baseQuery: 'isNameRequired=true', // The core query sent to GeoNames, later combined with other parameters above.
     showMarker: false, // Show a marker at the location the selected location.
     showPopup: true, // Show a tooltip at the selected location.
