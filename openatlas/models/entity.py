@@ -279,7 +279,7 @@ class EntityMapper:
     def get_by_ids(entity_ids: Union[Iterator, Set, List], nodes=False) -> list:
         if not entity_ids:
             return []
-        sql = EntityMapper.build_sql(nodes) + ' WHERE e.id IN %(ids)s GROUP BY e.id;'
+        sql = EntityMapper.build_sql(nodes) + ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name'
         g.cursor.execute(sql, {'ids': tuple(entity_ids)})
         debug_model['by id'] += 1
         return [Entity(row) for row in g.cursor.fetchall()]

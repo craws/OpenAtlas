@@ -316,10 +316,12 @@ class TableMultiSelect(HiddenInput):
             field.data = ast.literal_eval(field.data)
         selection = ''
         class_ = field.id if field.id != 'given_place' else 'place'
-        table = Table(Table.HEADERS[class_])
+        headers_len = str(len(Table.HEADERS[class_]))
+
         # Make checkbox column sortable and show selected on top
-        table.headers = 'headers:{' + str(len(table.header)) + ':{sorter:"checkbox"}},'
-        table.sort = 'sortList:[[' + str(len(table.header)) + ', 0],[0, 0]],'
+        table = Table(Table.HEADERS[class_], order='[[' + headers_len + ', 0], [0, 0]]',
+                      defs='[{"orderDataType": "dom-checkbox", "targets":' + headers_len + '}]')
+
         if class_ == 'place':
             aliases = current_user.settings['table_show_aliases']
             entities = EntityMapper.get_by_system_type('place', nodes=True, aliases=aliases)

@@ -217,18 +217,15 @@ function selectFromTable(element, table, id) {
 function selectFromTableMulti(name) {
     var checkedNames = '';
     var ids = [];
-    $("#" + name + "-table .multi-table-select").each(function () {
-        if ($(this).is(':checked')) {
-            checkedNames += $(this).val() + "<br />";
-            ids.push($(this).attr('id'));
-        }
-    });
-    if (ids.length > 0) {
-        $("#" + name).val('[' + ids + ']');
-    } else {
-        $("#" + name).val('');
-    }
-    $("#" + name + "-selection").html(checkedNames);
+    $('#' + name + '_table').DataTable().rows().nodes().to$().find('input[type="checkbox"]').each(
+        function() {
+            if ($(this).is(':checked')) {
+                checkedNames += $(this).val() + '<br />';
+                ids.push($(this).attr('id'));
+            }
+        });
+    $('#' + name + '-selection').html(checkedNames);
+    $('#' + name).val(ids.length > 0 ? '[' + ids+ ']' : '').trigger('change');
 }
 
 function clearSelect(name) {
