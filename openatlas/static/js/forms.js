@@ -1,5 +1,15 @@
 
 $(document).ready(function () {
+
+    // Needed for ajax bookmark functionality
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", bookmark_csrf_token);
+            }
+        }
+    });
+
     $.validator.setDefaults({
         ignore: [], // Enable validation for hidden fields
     });

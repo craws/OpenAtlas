@@ -29,6 +29,7 @@
             {% include "map.html" %}
         {% endif %}
         <script>
+            bookmark_csrf_token = '{{ csrf_token() }}';
             minimumPasswordLength = {{ session['settings']['minimum_password_length'] }};
             show = '{{ _('show')|uc_first }}';
             hide = '{{ _('hide')|uc_first }}';

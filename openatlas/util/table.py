@@ -30,6 +30,7 @@ class Table:
         self.defs = defs if defs else ''
 
     def display(self, name: Optional[str] = 'table') -> str:
+        # Todo: reactivate "stateSave: true" - maybe make a debug switch
         from openatlas.util.util import uc_first
         if not self.rows:
             return '<p>' + uc_first(_('no entries')) + '</p>'
@@ -47,7 +48,7 @@ class Table:
                 $(document).ready(function() {{
                     $('#{name}_table').DataTable( {{
                         data: {data},
-                        // stateSave: true,
+                        stateSave: false,
                         columns: [{columns}],
                         {order}
                         {defs}

@@ -337,27 +337,12 @@ def required_group(group):
 
 
 def bookmark_toggle(entity_id: int, for_table: Optional[bool] = False) -> str:
-    label = uc_first(_('bookmark'))
-    html = """
-        <script>
-            var csrf_token = '{csrfToken}';
-            $.ajaxSetup({{
-                beforeSend: function(xhr, settings) {{
-                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {{
-                        xhr.setRequestHeader("X-CSRFToken", csrf_token);
-                    }}
-                }}
-            }});
-        </script>""".format(csrfToken=generate_csrf())
-    if entity_id in current_user.bookmarks:
-        label = uc_first(_('bookmark remove'))
+    label = uc_first(_('bookmark remove') if entity_id in current_user.bookmarks else _('bookmark'))
     if for_table:
-        html += """<a id="bookmark{entity_id}" onclick="ajaxBookmark('{entity_id}');"
-            style="cursor:pointer;">{label}</a>""".format(entity_id=entity_id, label=label)
-    else:
-        html += """<button id="bookmark{entity_id}" onclick="ajaxBookmark('{entity_id}');"
-            type="button">{label}</button>""".format(entity_id=entity_id, label=label)
-    return html
+        return """<a id="bookmark{entity_id}" onclick="ajaxBookmark('{entity_id}');"
+                style="cursor:pointer;">{label}</a>""".format(entity_id=entity_id, label=label)
+    return """<button id="bookmark{entity_id}" onclick="ajaxBookmark('{entity_id}');"
+                type="button">{label}</button>""".format(entity_id=entity_id, label=label)
 
 
 def is_authorized(group: str) -> bool:
