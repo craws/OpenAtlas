@@ -11,6 +11,7 @@ table.dataTable th,
     background-color: #000000;
     font-weight: bold;
     border-right: 1px solid #ddd;
+    cursor: pointer;
 }
 
 table.dataTable.no-footer {
