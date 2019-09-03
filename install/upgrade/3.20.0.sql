@@ -27,5 +27,8 @@ ALTER TABLE web.map_overlay_id_seq OWNER TO openatlas;
 ALTER SEQUENCE web.map_overlay_id_seq OWNED BY web.map_overlay.id;
 ALTER TABLE ONLY web.map_overlay ALTER COLUMN id SET DEFAULT nextval('web.map_overlay_id_seq'::regclass);
 ALTER TABLE ONLY web.map_overlay ADD CONSTRAINT map_overlay_pkey PRIMARY KEY (id);
+CREATE TRIGGER update_modified BEFORE UPDATE ON web.map_overlay FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+ALTER TABLE ONLY web.map_overlay ADD CONSTRAINT map_overlay_image_id_fkey FOREIGN KEY (image_id) REFERENCES import.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY web.map_overlay ADD CONSTRAINT map_overlay_place_id_fkey FOREIGN KEY (place_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 COMMIT;
