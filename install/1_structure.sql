@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.6.13
--- Dumped by pg_dump version 9.6.13
+-- Dumped from database version 9.6.15
+-- Dumped by pg_dump version 9.6.15
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -22,6 +22,8 @@ ALTER TABLE IF EXISTS ONLY web.user_notes DROP CONSTRAINT IF EXISTS user_notes_e
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_group_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_entity_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_place_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_image_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.hierarchy DROP CONSTRAINT IF EXISTS hierarchy_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.hierarchy_form DROP CONSTRAINT IF EXISTS hierarchy_form_hierarchy_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.hierarchy_form DROP CONSTRAINT IF EXISTS hierarchy_form_form_id_fkey;
@@ -45,6 +47,7 @@ ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_entity
 ALTER TABLE IF EXISTS ONLY gis.polygon DROP CONSTRAINT IF EXISTS polygon_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY gis.point DROP CONSTRAINT IF EXISTS point_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY gis.linestring DROP CONSTRAINT IF EXISTS linestring_entity_id_fkey;
+DROP TRIGGER IF EXISTS update_modified ON web.map_overlay;
 DROP TRIGGER IF EXISTS update_modified ON web.user_notes;
 DROP TRIGGER IF EXISTS update_modified ON web.i18n;
 DROP TRIGGER IF EXISTS update_modified ON web.hierarchy_form;
@@ -79,6 +82,7 @@ ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_boo
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_pkey;
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS unsubscribe_code_key;
 ALTER TABLE IF EXISTS ONLY web.settings DROP CONSTRAINT IF EXISTS settings_pkey;
+ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_pkey;
 ALTER TABLE IF EXISTS ONLY web.system_log DROP CONSTRAINT IF EXISTS log_pkey;
 ALTER TABLE IF EXISTS ONLY web.i18n DROP CONSTRAINT IF EXISTS i18n_pkey;
 ALTER TABLE IF EXISTS ONLY web.i18n DROP CONSTRAINT IF EXISTS i18n_name_language_key;
@@ -118,6 +122,7 @@ ALTER TABLE IF EXISTS web.user_bookmarks ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web."user" ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.system_log ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.settings ALTER COLUMN id DROP DEFAULT;
+ALTER TABLE IF EXISTS web.map_overlay ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.i18n ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.hierarchy_form ALTER COLUMN id DROP DEFAULT;
 ALTER TABLE IF EXISTS web.hierarchy ALTER COLUMN id DROP DEFAULT;
@@ -149,6 +154,8 @@ DROP TABLE IF EXISTS web.user_bookmarks;
 DROP TABLE IF EXISTS web."user";
 DROP SEQUENCE IF EXISTS web.settings_id_seq;
 DROP TABLE IF EXISTS web.settings;
+DROP SEQUENCE IF EXISTS web.map_overlay_id_seq;
+DROP TABLE IF EXISTS web.map_overlay;
 DROP SEQUENCE IF EXISTS web.log_id_seq;
 DROP TABLE IF EXISTS web.system_log;
 DROP SEQUENCE IF EXISTS web.i18n_id_seq;
@@ -1119,6 +1126,43 @@ ALTER SEQUENCE web.log_id_seq OWNED BY web.system_log.id;
 
 
 --
+-- Name: map_overlay; Type: TABLE; Schema: web; Owner: openatlas
+--
+
+CREATE TABLE web.map_overlay (
+    id integer NOT NULL,
+    image_id integer NOT NULL,
+    place_id integer NOT NULL,
+    bounding_box text NOT NULL,
+    created timestamp without time zone DEFAULT now() NOT NULL,
+    modified timestamp without time zone
+);
+
+
+ALTER TABLE web.map_overlay OWNER TO openatlas;
+
+--
+-- Name: map_overlay_id_seq; Type: SEQUENCE; Schema: web; Owner: openatlas
+--
+
+CREATE SEQUENCE web.map_overlay_id_seq
+    START WITH 1
+    INCREMENT BY 1
+    NO MINVALUE
+    NO MAXVALUE
+    CACHE 1;
+
+
+ALTER TABLE web.map_overlay_id_seq OWNER TO openatlas;
+
+--
+-- Name: map_overlay_id_seq; Type: SEQUENCE OWNED BY; Schema: web; Owner: openatlas
+--
+
+ALTER SEQUENCE web.map_overlay_id_seq OWNED BY web.map_overlay.id;
+
+
+--
 -- Name: settings; Type: TABLE; Schema: web; Owner: openatlas
 --
 
@@ -1479,6 +1523,13 @@ ALTER TABLE ONLY web.i18n ALTER COLUMN id SET DEFAULT nextval('web.i18n_id_seq':
 
 
 --
+-- Name: map_overlay id; Type: DEFAULT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.map_overlay ALTER COLUMN id SET DEFAULT nextval('web.map_overlay_id_seq'::regclass);
+
+
+--
 -- Name: settings id; Type: DEFAULT; Schema: web; Owner: openatlas
 --
 
@@ -1784,6 +1835,14 @@ ALTER TABLE ONLY web.system_log
 
 
 --
+-- Name: map_overlay map_overlay_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.map_overlay
+    ADD CONSTRAINT map_overlay_pkey PRIMARY KEY (id);
+
+
+--
 -- Name: settings settings_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
@@ -2034,6 +2093,13 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON web.user_notes FOR EACH ROW EXEC
 
 
 --
+-- Name: map_overlay update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON web.map_overlay FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+
+
+--
 -- Name: linestring linestring_entity_id_fkey; Type: FK CONSTRAINT; Schema: gis; Owner: openatlas
 --
 
@@ -2215,6 +2281,22 @@ ALTER TABLE ONLY web.hierarchy_form
 
 ALTER TABLE ONLY web.hierarchy
     ADD CONSTRAINT hierarchy_id_fkey FOREIGN KEY (id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: map_overlay map_overlay_image_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.map_overlay
+    ADD CONSTRAINT map_overlay_image_id_fkey FOREIGN KEY (image_id) REFERENCES import.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: map_overlay map_overlay_place_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.map_overlay
+    ADD CONSTRAINT map_overlay_place_id_fkey FOREIGN KEY (place_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --
