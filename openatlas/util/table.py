@@ -30,7 +30,6 @@ class Table:
         self.defs = defs if defs else ''
 
     def display(self, name: Optional[str] = 'table') -> str:
-        # Todo: reactivate "stateSave: true" - maybe make a debug switch
         from openatlas.util.util import uc_first
         if not self.rows:
             return '<p>' + uc_first(_('no entries')) + '</p>'
@@ -43,12 +42,12 @@ class Table:
         if hasattr(current_user, 'settings'):
             table_rows = current_user.settings['table_rows']
         html = """
-            <table id="{name}_table" class="compact stripe cell-border hover" width="100%"></table>
+            <table id="{name}_table" class="compact stripe cell-border hover"></table>
             <script>
                 $(document).ready(function() {{
                     $('#{name}_table').DataTable( {{
                         data: {data},
-                        stateSave: false,
+                        stateSave: {stateSave},
                         columns: [{columns}],
                         {order}
                         {defs}
@@ -59,6 +58,7 @@ class Table:
                 }});
             </script>""".format(name=name,
                                 data=json.dumps(self.rows),
+                                stateSave='false' if session['settings']['debug_mode'] else 'true',
                                 table_rows=table_rows,
                                 columns=columns,
                                 order='order: ' + self.order + ',' if self.order else '',
