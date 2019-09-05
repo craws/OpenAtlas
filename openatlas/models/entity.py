@@ -7,7 +7,7 @@ from flask_login import current_user
 from fuzzywuzzy import fuzz
 from werkzeug.exceptions import abort
 
-from openatlas import app, debug_model, logger
+from openatlas import app, logger
 from openatlas.forms.date import DateForm
 from openatlas.models.date import DateMapper
 from openatlas.models.link import LinkMapper
@@ -64,12 +64,11 @@ class Entity:
         if self.view_name == 'place':
             self.table_name = self.system_type.replace(' ', '-')
 
-    def get_linked_entity(self, code,
-                          inverse: Optional[bool] = False,
+    def get_linked_entity(self, code: str, inverse: Optional[bool] = False,
                           nodes: Optional[bool] = False):
         return LinkMapper.get_linked_entity(self, code, inverse=inverse, nodes=nodes)
 
-    def get_linked_entities(self, code,
+    def get_linked_entities(self, code: str,
                             inverse: Optional[bool] = False,
                             nodes: Optional[bool] = False):
         return LinkMapper.get_linked_entities(self, code, inverse=inverse, nodes=nodes)
@@ -80,7 +79,7 @@ class Entity:
              type_id: Optional[int] = None) -> Union[int, None]:
         return LinkMapper.insert(self, code, range_, description, inverse, type_id)
 
-    def get_links(self, code, inverse: Optional[bool] = False):
+    def get_links(self, code: str, inverse: Optional[bool] = False) -> list:
         return LinkMapper.get_links(self, code, inverse)
 
     def delete(self) -> None:
@@ -89,10 +88,10 @@ class Entity:
     def delete_links(self, codes) -> None:
         LinkMapper.delete_by_codes(self, codes)
 
-    def update(self):
+    def update(self) -> None:
         EntityMapper.update(self)
 
-    def update_aliases(self, form):
+    def update_aliases(self, form) -> None:
         old_aliases = self.aliases
         new_aliases = form.alias.data
         delete_ids = []
@@ -109,11 +108,11 @@ class Entity:
             elif alias.strip():
                 self.link('P131', EntityMapper.insert('E82', alias))
 
-    def save_nodes(self, form):
+    def save_nodes(self, form) -> None:
         from openatlas.models.node import NodeMapper
         NodeMapper.save_entity_nodes(self, form)
 
-    def set_dates(self, form):
+    def set_dates(self, form) -> None:
         self.begin_from = None
         self.begin_to = None
         self.begin_comment = None
@@ -218,7 +217,7 @@ class EntityMapper:
                 = (%(name)s, %(description)s, %(begin_from)s, %(begin_to)s, %(begin_comment)s, 
                 %(end_from)s, %(end_to)s, %(end_comment)s)
             WHERE id = %(id)s;"""
-        g.cursor.execute(sql, {
+        g.execute(sql, {
             'id': entity.id, 'name': entity.name,
             'begin_from': DateMapper.datetime64_to_timestamp(entity.begin_from),
             'begin_to': DateMapper.datetime64_to_timestamp(entity.begin_to),
@@ -226,21 +225,18 @@ class EntityMapper:
             'end_to': DateMapper.datetime64_to_timestamp(entity.end_to),
             'begin_comment': entity.begin_comment, 'end_comment': entity.end_comment,
             'description': sanitize(entity.description, 'description')})
-        debug_model['div sql'] += 1
 
     @staticmethod
     def get_by_system_type(system_type, nodes=False, aliases=False):
         sql = EntityMapper.build_sql(nodes=nodes, aliases=aliases)
         sql += ' WHERE e.system_type = %(system_type)s GROUP BY e.id;'
-        g.cursor.execute(sql, {'system_type': system_type})
-        debug_model['div sql'] += 1
+        g.execute(sql, {'system_type': system_type})
         return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_display_files():
         sql_clause = " WHERE e.system_type = 'file' GROUP BY e.id;"
-        g.cursor.execute(EntityMapper.build_sql(nodes=True) + sql_clause)
-        debug_model['div sql'] += 1
+        g.execute(EntityMapper.build_sql(nodes=True) + sql_clause)
         entities = []
         for row in g.cursor.fetchall():
             if print_file_extension(row.id)[1:] in app.config['DISPLAY_FILE_EXTENSIONS']:
@@ -260,8 +256,7 @@ class EntityMapper:
         params = {'name': str(name).strip(), 'code': code,
                   'system_type': system_type.strip() if system_type else None,
                   'description': sanitize(description, 'description') if description else None}
-        g.cursor.execute(sql, params)
-        debug_model['div sql'] += 1
+        g.execute(sql, params)
         return EntityMapper.get_by_id(g.cursor.fetchone()[0])
 
     @staticmethod
@@ -269,8 +264,7 @@ class EntityMapper:
         if entity_id in g.nodes:  # pragma: no cover, just in case a node is requested
             return g.nodes[entity_id]
         sql = EntityMapper.build_sql(nodes, aliases) + ' WHERE e.id = %(id)s GROUP BY e.id;'
-        g.cursor.execute(sql, {'id': entity_id})
-        debug_model['by id'] += 1
+        g.execute(sql, {'id': entity_id})
         if g.cursor.rowcount < 1 and ignore_not_found:
             return None  # pragma: no cover, only used where expected to avoid a 418 e.g. at logs
         return Entity(g.cursor.fetchone())
@@ -280,8 +274,7 @@ class EntityMapper:
         if not entity_ids:
             return []
         sql = EntityMapper.build_sql(nodes) + ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name'
-        g.cursor.execute(sql, {'ids': tuple(entity_ids)})
-        debug_model['by id'] += 1
+        g.execute(sql, {'ids': tuple(entity_ids)})
         return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -296,8 +289,7 @@ class EntityMapper:
             LEFT JOIN model.link t ON e.id = t.domain_id AND t.property_code IN ('P2', 'P89')
             JOIN import.entity ie ON e.id = ie.entity_id
             WHERE ie.project_id = %(id)s GROUP BY e.id, ie.origin_id;"""
-        g.cursor.execute(sql, {'id': project_id})
-        debug_model['by id'] += 1
+        g.execute(sql, {'id': project_id})
         entities = []
         for row in g.cursor.fetchall():
             entity = Entity(row)
@@ -321,14 +313,13 @@ class EntityMapper:
             sql = EntityMapper.build_sql(nodes=True if class_name == 'event' else False,
                                          aliases=aliases) + """
                 WHERE e.class_code IN %(codes)s GROUP BY e.id;"""
-        g.cursor.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][class_name])})
-        debug_model['by codes'] += 1
+        g.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][class_name])})
         return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_by_name_and_system_type(name: Union[str, int], system_type: str):
         sql = "SELECT id FROM model.entity WHERE name = %(name)s AND system_type = %(system_type)s;"
-        g.cursor.execute(sql, {'name': str(name), 'system_type': system_type})
+        g.execute(sql, {'name': str(name), 'system_type': system_type})
         if g.cursor.rowcount:
             return EntityMapper.get_by_id(g.cursor.fetchone()[0])
 
@@ -336,8 +327,7 @@ class EntityMapper:
     def delete(entity) -> None:
         """ Triggers function model.delete_entity_related() for deleting related entities"""
         id_ = entity if type(entity) is int else entity.id
-        g.cursor.execute('DELETE FROM model.entity WHERE id = %(id_)s;', {'id_': id_})
-        debug_model['by id'] += 1
+        g.execute('DELETE FROM model.entity WHERE id = %(id_)s;', {'id_': id_})
 
     @staticmethod
     def get_similar_named(form) -> dict:
@@ -375,8 +365,7 @@ class EntityMapper:
             SUM(CASE WHEN class_code = 'E22' THEN 1 END) AS find,
             SUM(CASE WHEN class_code = 'E31' AND system_type = 'file' THEN 1 END) AS file
             FROM model.entity;"""
-        g.cursor.execute(sql)
-        debug_model['div sql'] += 1
+        g.execute(sql)
         row = g.cursor.fetchone()
         counts = OrderedDict()  # type: OrderedDict
         for idx, col in enumerate(g.cursor.description):
@@ -386,8 +375,7 @@ class EntityMapper:
     @staticmethod
     def get_orphans() -> list:
         """ Returns entities without links. """
-        g.cursor.execute(EntityMapper.sql_orphan)
-        debug_model['div sql'] += 1
+        g.execute(EntityMapper.sql_orphan)
         return [EntityMapper.get_by_id(row.id) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -399,8 +387,7 @@ class EntityMapper:
         sql = EntityMapper.build_sql() + """
                 WHERE e.class_code IN %(codes)s GROUP BY e.id
                 ORDER BY e.created DESC LIMIT %(limit)s;"""
-        g.cursor.execute(sql, {'codes': tuple(codes), 'limit': limit})
-        debug_model['div sql'] += 1
+        g.execute(sql, {'codes': tuple(codes), 'limit': limit})
         return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -421,8 +408,7 @@ class EntityMapper:
         else:
             return 0
         sql = 'DELETE FROM model.entity WHERE id IN (' + sql_where + ');'
-        g.cursor.execute(sql, {'class_codes': class_codes})
-        debug_model['div sql'] += 1
+        g.execute(sql, {'class_codes': class_codes})
         return g.cursor.rowcount
 
     @staticmethod
@@ -459,8 +445,7 @@ class EntityMapper:
             elif name == 'file':
                 sql_where.append(" e.system_type = 'file'")
         sql += ' OR '.join(sql_where) + ") GROUP BY e.id ORDER BY e.name;"
-        g.cursor.execute(sql, {'term': '%' + form.term.data + '%', 'user_id': current_user.id})
-        debug_model['div sql'] += 1
+        g.execute(sql, {'term': '%' + form.term.data + '%', 'user_id': current_user.id})
 
         # Prepare date filter
         from_date = DateMapper.form_to_datetime64(form.begin_year.data, form.begin_month.data,
@@ -545,25 +530,21 @@ class EntityMapper:
             INSERT INTO web.entity_profile_image (entity_id, image_id)
             VALUES (%(entity_id)s, %(image_id)s)
             ON CONFLICT (entity_id) DO UPDATE SET image_id=%(image_id)s;"""
-        g.cursor.execute(sql, {'entity_id': origin_id, 'image_id': id_})
-        debug_model['div sql'] += 1
+        g.execute(sql, {'entity_id': origin_id, 'image_id': id_})
 
     @staticmethod
     def get_profile_image_id(id_: int):
         sql = 'SELECT image_id FROM web.entity_profile_image WHERE entity_id = %(entity_id)s;'
-        g.cursor.execute(sql, {'entity_id': id_})
-        debug_model['div sql'] += 1
+        g.execute(sql, {'entity_id': id_})
         return g.cursor.fetchone()[0] if g.cursor.rowcount else None
 
     @staticmethod
     def remove_profile_image(entity_id: int) -> None:
         sql = 'DELETE FROM web.entity_profile_image WHERE entity_id = %(entity_id)s;'
-        g.cursor.execute(sql, {'entity_id': entity_id})
-        debug_model['div sql'] += 1
+        g.execute(sql, {'entity_id': entity_id})
 
     @staticmethod
     def get_circular() -> list:
-        # Get entities that are linked to itself
-        g.cursor.execute('SELECT domain_id FROM model.link WHERE domain_id = range_id;')
-        debug_model['div sql'] += 1
+        """ Get entities that are linked to itself"""
+        g.execute('SELECT domain_id FROM model.link WHERE domain_id = range_id;')
         return [EntityMapper.get_by_id(row.domain_id) for row in g.cursor.fetchall()]

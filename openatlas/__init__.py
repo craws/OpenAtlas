@@ -4,6 +4,7 @@ import os
 import sys
 import time
 from collections import OrderedDict
+from typing import Dict, Optional
 
 import psycopg2.extras
 from flask import Flask, g, request, session
@@ -43,7 +44,7 @@ from openatlas.views import (actor, admin, ajax, content, event, export, hierarc
 
 
 @babel.localeselector
-def get_locale():
+def get_locale() -> str:
     if 'language' in session:
         return session['language']
     best_match = request.accept_languages.best_match(app.config['LANGUAGES'].keys())
@@ -65,31 +66,34 @@ def connect():
         raise Exception(e)
 
 
+def execute(query, vars_: Optional[list] = None) -> None:
+    debug_model['sql'] += 1
+    return g.cursor.execute(query, vars_)
+
+
 @app.before_request
-def before_request():
-    debug_model['div sql'] = 0
+def before_request() -> None:
     from openatlas.models.classObject import ClassMapper
     from openatlas.models.node import NodeMapper
     from openatlas.models.property import PropertyMapper
     from openatlas.models.settings import SettingsMapper
     if request.path.startswith('/static'):  # pragma: no cover
         return  # Only needed if not running with apache and static alias
+    debug_model['sql'] = 0
     debug_model['current'] = time.time()
     g.db = connect()
     g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
+    g.execute = execute  # Add wrapper for g.cursor.execute to count SQL statements per request
     g.classes = ClassMapper.get_all()
     g.properties = PropertyMapper.get_all()
     g.nodes = NodeMapper.get_all_nodes()
     session['settings'] = SettingsMapper.get_settings()
     session['language'] = get_locale()
-    # Set max file upload in MB
-    app.config['MAX_CONTENT_LENGTH'] = session['settings']['file_upload_max_size'] * 1024 * 1024
-    debug_model['by codes'] = 0
-    debug_model['by id'] = 0
-    debug_model['link sql'] = 0
-    debug_model['user'] = 0
     debug_model['model'] = time.time() - debug_model['current']
     debug_model['current'] = time.time()
+
+    # Set max file upload in MB
+    app.config['MAX_CONTENT_LENGTH'] = session['settings']['file_upload_max_size'] * 1024 * 1024
 
     # Workaround overlay maps for Thanados until #978 is implemented
     session['settings']['overlay_hack'] = False
@@ -110,13 +114,13 @@ def apply_caching(response):
 
 
 @app.teardown_request
-def teardown_request(exception):
+def teardown_request(exception) -> None:
     if hasattr(g, 'db'):
         g.db.close()
 
 
 @app.context_processor
-def inject_search_form():
+def inject_search_form() -> Dict:
     return dict(search_form=GlobalSearchForm(prefix="global"))
 
 
@@ -125,7 +129,7 @@ app.add_template_global(debug_model, 'debug_model')
 
 
 @app.context_processor
-def inject_debug():
+def inject_debug() -> Dict:
     return dict(debug=app.debug)
 
 

@@ -1,4 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+import numpy
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from wtforms import IntegerField, StringField
@@ -29,7 +30,7 @@ class DateForm(Form):
     end_comment = StringField(render_kw={'placeholder': _('comment')})
 
     @staticmethod
-    def format_date(date: str, part: str) -> str:
+    def format_date(date: numpy.datetime64, part: str) -> str:
         string = str(date).split(' ')[0]
         bc = False
         if string.startswith('-') or string.startswith('0000'):

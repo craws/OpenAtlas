@@ -4,6 +4,11 @@ table.dataTable.display tbody tr.odd {
     background-color: #adadad;
 }
 
+.dataTables_length select {
+    white-space: nowrap;
+    display: inline;
+}
+
 table.dataTable th,
 .tabs-container table.dataTable th,
 .overlay-container table.dataTable th {
