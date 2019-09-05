@@ -121,6 +121,12 @@ def place_view(id_):
             data.append(get_profile_image_table_link(domain, object_, extension, profile_image_id))
             if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                 profile_image_id = domain.id
+            if is_authorized('editor') and current_user.settings['module_map_overlay']:
+                if extension == 'png':
+                    url = url_for('overlay_insert', file_id=domain.id, place_id=object_.id)
+                    data.append('<a href="' + url + '">' + uc_first(_('add as overlay')) + '</a>')
+                else:
+                    data.append('')
         if domain.view_name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
             if domain.system_type.startswith('external reference'):

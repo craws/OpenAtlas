@@ -134,3 +134,16 @@ class GisMapper:
         g.execute('DELETE FROM gis.point WHERE entity_id = %(id)s;', {'id': entity.id})
         g.execute('DELETE FROM gis.linestring WHERE entity_id = %(id)s;', {'id': entity.id})
         g.execute('DELETE FROM gis.polygon WHERE entity_id = %(id)s;', {'id': entity.id})
+
+    @staticmethod
+    def insert_overlay(form, file, place) -> None:
+        sql = """
+            INSERT INTO web.map_overlay (image_id, place_id, bounding_box)
+            VALUES (%(image_id)s, %(place_id)s, %(bounding_box)s);"""
+        bounding_box = '[[{top_left_latitude},{top_left_longitude}],' \
+                       '[{bottom_right_latitude},{bottom_right_longitude}]]'.format(
+                            top_left_latitude=form.top_left_latitude.data,
+                            top_left_longitude=form.top_left_longitude.data,
+                            bottom_right_latitude=form.bottom_right_latitude.data,
+                            bottom_right_longitude=form.bottom_right_longitude.data)
+        g.execute(sql, {'image_id': file.id, 'place_id': place.id, 'bounding_box': bounding_box})

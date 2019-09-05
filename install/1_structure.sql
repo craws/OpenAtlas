@@ -2288,7 +2288,7 @@ ALTER TABLE ONLY web.hierarchy
 --
 
 ALTER TABLE ONLY web.map_overlay
-    ADD CONSTRAINT map_overlay_image_id_fkey FOREIGN KEY (image_id) REFERENCES import.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+    ADD CONSTRAINT map_overlay_image_id_fkey FOREIGN KEY (image_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

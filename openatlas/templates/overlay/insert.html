@@ -1,0 +1,10 @@
+{% extends 'layout.html' %}
+{% block breadcrumb %}
+    <a href="{{ url_for('place_index') }}">{{ _('place')|uc_first }}</a>
+    > {{ place|link|safe }}
+    > {{ file|link|safe }}
+    > + {{ _('overlay')|uc_first }}
+{% endblock %}
+{% block content %}
+    {{ form|display_form()|safe }}
+{% endblock %}
