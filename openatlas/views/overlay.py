@@ -13,10 +13,10 @@ from openatlas.util.util import (required_group)
 
 
 class OverlayForm(Form):
-    top_left_latitude = FloatField('top left latitude', [InputRequired()], render_kw={'autofocus': True})
-    top_left_longitude = FloatField('top left longitude', [InputRequired()])
-    bottom_right_latitude = FloatField('bottom right latitude', [InputRequired()])
-    bottom_right_longitude = FloatField('bottom right longitude', [InputRequired()])
+    top_left_easting = FloatField('', [InputRequired()], render_kw={'autofocus': True})
+    top_left_northing = FloatField('', [InputRequired()])
+    bottom_right_easting = FloatField('', [InputRequired()])
+    bottom_right_northing = FloatField('', [InputRequired()])
     save = SubmitField(_('insert'))
 
 

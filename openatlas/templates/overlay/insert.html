@@ -6,5 +6,25 @@
     > + {{ _('overlay')|uc_first }}
 {% endblock %}
 {% block content %}
-    {{ form|display_form()|safe }}
+    <form method="post" action="{{ url_for('search_index') }}">
+        {{ form.csrf_token }}
+        <div class="data-table">
+            <div class="table-row">
+                <div></div>
+                <div class="table-cell">{{ _('easting')|uc_first }}</div>
+                <div class="table-cell">{{ _('northing')|uc_first }}</div>
+            </div>
+            <div class="table-row">
+                <div>{{ _('top left')|uc_first }}</div>
+                <div class="table-cell">{{ form.top_left_easting }}</div>
+                <div class="table-cell">{{ form.top_left_northing }}</div>
+            </div>
+            <div class="table-row">
+                <div>{{ _('bottom right')|uc_first }}</div>
+                <div class="table-cell">{{ form.bottom_right_easting }}</div>
+                <div class="table-cell">{{ form.bottom_right_northing }}</div>
+            </div>
+        </div>
+        {{ form.send }}
+    </form>
 {% endblock %}
