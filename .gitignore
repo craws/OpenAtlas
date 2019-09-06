@@ -21,3 +21,4 @@ openatlas/export/sql/*
 
 # ide
 .idea
+.ftpconfig
