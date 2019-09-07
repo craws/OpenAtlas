@@ -6,7 +6,7 @@
     > + {{ _('overlay')|uc_first }}
 {% endblock %}
 {% block content %}
-    <form method="post" action="{{ url_for('search_index') }}">
+    <form method="post">
         {{ form.csrf_token }}
         <div class="data-table">
             <div class="table-row">
@@ -25,6 +25,6 @@
                 <div class="table-cell">{{ form.bottom_right_northing }}</div>
             </div>
         </div>
-        {{ form.send }}
+        {{ form.save }}
     </form>
 {% endblock %}

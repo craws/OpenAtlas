@@ -122,7 +122,7 @@ def place_view(id_):
             if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                 profile_image_id = domain.id
             if is_authorized('editor') and current_user.settings['module_map_overlay']:
-                if extension == 'png':
+                if extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                     url = url_for('overlay_insert', file_id=domain.id, place_id=object_.id)
                     data.append('<a href="' + url + '">' + uc_first(_('add as overlay')) + '</a>')
                 else:
