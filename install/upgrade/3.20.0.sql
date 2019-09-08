@@ -30,5 +30,6 @@ ALTER TABLE ONLY web.map_overlay ADD CONSTRAINT map_overlay_pkey PRIMARY KEY (id
 CREATE TRIGGER update_modified BEFORE UPDATE ON web.map_overlay FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 ALTER TABLE ONLY web.map_overlay ADD CONSTRAINT map_overlay_image_id_fkey FOREIGN KEY (image_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
 ALTER TABLE ONLY web.map_overlay ADD CONSTRAINT map_overlay_place_id_fkey FOREIGN KEY (place_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+ALTER TABLE ONLY web.map_overlay ADD CONSTRAINT map_overlay_image_id_place_id_key UNIQUE (image_id, place_id);
 
 COMMIT;
