@@ -113,6 +113,11 @@ def place_view(id_):
     if object_.system_type == 'stratigraphic unit':
         tables['find'] = Table(Table.HEADERS['place'] + [_('description')])
     profile_image_id = object_.get_profile_image_id()
+    overlay_ids = None
+    if is_authorized('editor') and current_user.settings['module_map_overlay']:
+        overlay_ids = GisMapper.get_overlays_by_place_id(object_)
+        tables['file'].header.append(uc_first(_('overlay')))
+
     for link_ in object_.get_links('P67', inverse=True):
         domain = link_.domain
         data = get_base_table_data(domain)
@@ -123,8 +128,12 @@ def place_view(id_):
                 profile_image_id = domain.id
             if is_authorized('editor') and current_user.settings['module_map_overlay']:
                 if extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-                    url = url_for('overlay_insert', file_id=domain.id, place_id=object_.id)
-                    data.append('<a href="' + url + '">' + uc_first(_('add as overlay')) + '</a>')
+                    if domain.id in overlay_ids:
+                        url = url_for('overlay_update', id_=overlay_ids[domain.id])
+                        data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
+                    else:
+                        url = url_for('overlay_insert', image_id=domain.id, place_id=object_.id)
+                        data.append('<a href="' + url + '">' + uc_first(_('add')) + '</a>')
                 else:
                     data.append('')
         if domain.view_name not in ['source', 'file']:

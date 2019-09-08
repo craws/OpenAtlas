@@ -20,17 +20,29 @@ class OverlayForm(Form):
     save = SubmitField()
 
 
-@app.route('/overlay/insert/<int:file_id>/<int:place_id>', methods=['POST', 'GET'])
+@app.route('/overlay/insert/<int:image_id>/<int:place_id>', methods=['POST', 'GET'])
 @required_group('editor')
-def overlay_insert(file_id: int, place_id: int) -> str:
+def overlay_insert(image_id: int, place_id: int) -> str:
     place = EntityMapper.get_by_id(place_id)
-    file = EntityMapper.get_by_id(file_id)
+    image = EntityMapper.get_by_id(image_id)
     form = OverlayForm()
     if form.validate_on_submit():
-        GisMapper.insert_overlay(form=form, file=file, place=place)
+        GisMapper.insert_overlay(form=form, image=image, place=place)
         return redirect(url_for('place_view', id_=place.id) + '#tab-file')
     form.save.label.text = uc_first(_('insert'))
-    return render_template('overlay/insert.html', form=form, place=place, file=file)
+    return render_template('overlay/insert.html', form=form, place=place, image=image)
+
+
+@app.route('/overlay/update/<int:id_>', methods=['POST', 'GET'])
+@required_group('editor')
+def overlay_update(id_: int) -> str:
+    overlay = GisMapper.get_overlay_by_id(id_)
+    form = OverlayForm()
+    if form.validate_on_submit():
+        return redirect(url_for('place_view', id_=overlay.place_id) + '#tab-file')
+    place = EntityMapper.get_by_id(overlay.place_id)
+    file = EntityMapper.get_by_id(overlay.image_id)
+    return render_template('overlay/update.html', form=form, place=place, file=file)
 
 
 def save(form, file, place) -> str:

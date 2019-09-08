@@ -136,7 +136,7 @@ class GisMapper:
         g.execute('DELETE FROM gis.polygon WHERE entity_id = %(id)s;', {'id': entity.id})
 
     @staticmethod
-    def insert_overlay(form, file, place) -> None:
+    def insert_overlay(form, image, place) -> None:
         sql = """
             INSERT INTO web.map_overlay (image_id, place_id, bounding_box)
             VALUES (%(image_id)s, %(place_id)s, %(bounding_box)s);"""
@@ -146,4 +146,17 @@ class GisMapper:
                             top_left_northing=form.top_left_northing.data,
                             bottom_right_easting=form.bottom_right_easting.data,
                             bottom_right_northing=form.bottom_right_northing.data)
-        g.execute(sql, {'image_id': file.id, 'place_id': place.id, 'bounding_box': bounding_box})
+        g.execute(sql, {'image_id': image.id, 'place_id': place.id, 'bounding_box': bounding_box})
+
+    @staticmethod
+    def get_overlays_by_place_id(object_) -> dict:
+        sql = 'SELECT id, image_id FROM web.map_overlay WHERE place_id = %(place_id)s;'
+        g.execute(sql, {'place_id': object_.id})
+        return {row.image_id: row.id for row in g.cursor.fetchall()}
+
+
+    @staticmethod
+    def get_overlay_by_id(id_: int):
+        sql = 'SELECT place_id, image_id, bounding_box FROM web.map_overlay WHERE id = %(id)s;'
+        g.execute(sql, {'id': id_})
+        return g.cursor.fetchone()
