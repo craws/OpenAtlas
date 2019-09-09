@@ -44,15 +44,14 @@ def overlay_update(id_: int) -> str:
         GisMapper.update_overlay(form=form, image_id=overlay.image_id, place_id=overlay.place_id)
         flash(_('info update'), 'info')
         return redirect(url_for('place_view', id_=overlay.place_id) + '#tab-file')
-    place = EntityMapper.get_by_id(overlay.place_id)
-    file = EntityMapper.get_by_id(overlay.image_id)
     bounding = ast.literal_eval(overlay.bounding_box)
     form.top_left_easting.data = bounding[0][0]
     form.top_left_northing.data = bounding[0][1]
     form.bottom_right_easting.data = bounding[1][0]
     form.bottom_right_northing.data = bounding[1][1]
-    return render_template('overlay/update.html', form=form, place=place, file=file,
-                           overlay=overlay)
+    return render_template('overlay/update.html', form=form, overlay=overlay,
+                           place=EntityMapper.get_by_id(overlay.place_id),
+                           image=EntityMapper.get_by_id(overlay.image_id))
 
 
 @app.route('/overlay/remove/<int:id_>/<int:place_id>')
@@ -60,7 +59,3 @@ def overlay_update(id_: int) -> str:
 def overlay_remove(id_: int, place_id: int):
     GisMapper.remove_overlay(id_)
     return redirect(url_for('place_view', id_=place_id) + '#tab-file')
-
-
-def save(form, file, place) -> str:
-    pass
