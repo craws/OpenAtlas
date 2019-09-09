@@ -42,7 +42,15 @@ def overlay_update(id_: int) -> str:
         return redirect(url_for('place_view', id_=overlay.place_id) + '#tab-file')
     place = EntityMapper.get_by_id(overlay.place_id)
     file = EntityMapper.get_by_id(overlay.image_id)
-    return render_template('overlay/update.html', form=form, place=place, file=file)
+    return render_template('overlay/update.html', form=form, place=place, file=file,
+                           overlay=overlay)
+
+
+@app.route('/overlay/remove/<int:id_>/<int:place_id>')
+@required_group('editor')
+def overlay_remove(id_: int, place_id: int):
+    GisMapper.remove_overlay(id_)
+    return redirect(url_for('place_view', id_=place_id) + '#tab-file')
 
 
 def save(form, file, place) -> str:

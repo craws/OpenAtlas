@@ -6,5 +6,10 @@
     > {{ _('update')|uc_first }} {{ _('overlay')|uc_first }}
 {% endblock %}
 {% block content %}
+    <div class="button-bar">
+        <a href="{{ url_for('overlay_remove', id_=overlay.id, place_id=place.id) }}" onclick="return confirm('{{ _('remove')|uc_first }}?');">
+            {{ _('remove')|uc_first }}
+        </a>
+    </div>
     {{ form|display_form()|safe }}
 {% endblock %}

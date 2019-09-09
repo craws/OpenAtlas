@@ -154,9 +154,13 @@ class GisMapper:
         g.execute(sql, {'place_id': object_.id})
         return {row.image_id: row.id for row in g.cursor.fetchall()}
 
-
     @staticmethod
     def get_overlay_by_id(id_: int):
-        sql = 'SELECT place_id, image_id, bounding_box FROM web.map_overlay WHERE id = %(id)s;'
+        sql = 'SELECT id, place_id, image_id, bounding_box FROM web.map_overlay WHERE id = %(id)s;'
         g.execute(sql, {'id': id_})
         return g.cursor.fetchone()
+
+    @staticmethod
+    def remove_overlay(id_: int):
+        sql = 'DELETE FROM web.map_overlay WHERE id = %(id)s;'
+        g.execute(sql, {'id': id_})
