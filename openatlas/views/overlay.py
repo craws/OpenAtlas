@@ -1,5 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from flask import render_template, url_for
+import ast
+
+from flask import render_template, url_for, flash
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
@@ -39,9 +41,16 @@ def overlay_update(id_: int) -> str:
     overlay = GisMapper.get_overlay_by_id(id_)
     form = OverlayForm()
     if form.validate_on_submit():
+        GisMapper.update_overlay(form=form, image_id=overlay.image_id, place_id=overlay.place_id)
+        flash(_('info update'), 'info')
         return redirect(url_for('place_view', id_=overlay.place_id) + '#tab-file')
     place = EntityMapper.get_by_id(overlay.place_id)
     file = EntityMapper.get_by_id(overlay.image_id)
+    bounding = ast.literal_eval(overlay.bounding_box)
+    form.top_left_easting.data = bounding[0][0]
+    form.top_left_northing.data = bounding[0][1]
+    form.bottom_right_easting.data = bounding[1][0]
+    form.bottom_right_northing.data = bounding[1][1]
     return render_template('overlay/update.html', form=form, place=place, file=file,
                            overlay=overlay)
 

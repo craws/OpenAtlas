@@ -149,6 +149,19 @@ class GisMapper:
         g.execute(sql, {'image_id': image.id, 'place_id': place.id, 'bounding_box': bounding_box})
 
     @staticmethod
+    def update_overlay(form, image_id, place_id) -> None:
+        sql = """
+            UPDATE web.map_overlay SET bounding_box = %(bounding_box)s
+            WHERE image_id = %(image_id)s AND place_id = %(place_id)s;"""
+        bounding_box = '[[{top_left_easting},{top_left_northing}],' \
+                       '[{bottom_right_easting},{bottom_right_northing}]]'.format(
+                            top_left_easting=form.top_left_easting.data,
+                            top_left_northing=form.top_left_northing.data,
+                            bottom_right_easting=form.bottom_right_easting.data,
+                            bottom_right_northing=form.bottom_right_northing.data)
+        g.execute(sql, {'image_id': image_id, 'place_id': place_id, 'bounding_box': bounding_box})
+
+    @staticmethod
     def get_overlays_by_place_id(object_) -> dict:
         sql = 'SELECT id, image_id FROM web.map_overlay WHERE place_id = %(place_id)s;'
         g.execute(sql, {'place_id': object_.id})
