@@ -20,6 +20,15 @@ $(document).ready(function() {
         });
     };
 
+    // DataTables - sort for date columns
+    $.fn.dataTable.ext.order['iso-date'] = function(settings, col) {
+        return this.api().column(col, {order:'index'}).nodes().map( function (td, i) {
+            const d = td.innerText.split('.');
+            if (d.length === 3) return Date.parse(`${d[2]}-${d[1]}-${d[0]}`);
+            return Date.parse(td.innerText);
+        });
+    };
+
     // DataTables - ignore special characters for search
     (function(){
         function removeAccents ( data ) {
