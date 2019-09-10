@@ -103,15 +103,15 @@ def place_view(id_):
     tables = {'info': get_entity_data(object_, location),
               'file': Table(Table.HEADERS['file'] + [_('main image')]),
               'source': Table(Table.HEADERS['source']),
-              'event': Table(Table.HEADERS['event']),
+              'event': Table(Table.HEADERS['event'], defs='[{"orderDataType": "iso-date", "targets":[3,4]}]'),
               'reference': Table(Table.HEADERS['reference'] + ['page / link text']),
-              'actor': Table([_('actor'), _('property'), _('class'), _('first'), _('last')])}
+              'actor': Table([_('actor'), _('property'), _('class'), _('first'), _('last')], defs='[{"orderDataType": "iso-date", "targets":[3,4]}]')}
     if object_.system_type == 'place':
-        tables['feature'] = Table(Table.HEADERS['place'] + [_('description')])
+        tables['feature'] = Table(Table.HEADERS['place'] + [_('description')], defs='[{"orderDataType": "iso-date", "targets":[2,3]}]')
     if object_.system_type == 'feature':
-        tables['stratigraphic-unit'] = Table(Table.HEADERS['place'] + [_('description')])
+        tables['stratigraphic-unit'] = Table(Table.HEADERS['place'] + [_('description')], defs='[{"orderDataType": "iso-date", "targets":[2,3]}]')
     if object_.system_type == 'stratigraphic unit':
-        tables['find'] = Table(Table.HEADERS['place'] + [_('description')])
+        tables['find'] = Table(Table.HEADERS['place'] + [_('description')], defs='[{"orderDataType": "iso-date", "targets":[2,3]}]')
     profile_image_id = object_.get_profile_image_id()
     overlay_ids = None
     if is_authorized('editor') and current_user.settings['module_map_overlay']:

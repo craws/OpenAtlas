@@ -68,7 +68,7 @@ def search_index():
 
 
 def build_search_table(form):
-    table = Table(['name', 'class', 'first', 'last', 'description'])
+    table = Table(['name', 'class', 'first', 'last', 'description'], defs='[{"orderDataType": "iso-date", "targets":[2,3]}]')
     for entity in EntityMapper.search(form):
         table.rows.append([link(entity),
                            entity.class_.name,
