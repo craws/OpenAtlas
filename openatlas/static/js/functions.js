@@ -224,7 +224,6 @@ function selectFromTable(element, table, id) {
 }
 
 function selectFromTableMulti(name) {
-    console.log(name);
     var checkedNames = '';
     var ids = [];
     $('#' + name + '_table').DataTable().rows().nodes().to$().find('input[type="checkbox"]').each(
