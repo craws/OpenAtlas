@@ -33,9 +33,17 @@
     translate['map_geonames_title'] = '{{ _('Search by location name or postcode')|safe }}';
     translate['map_geonames_placeholder'] = '{{ _('Enter a location name')|safe }}';
 
-    overlayHack = false;
-    {% if session['settings']['overlay_hack'] %}
-        overlayHack = true;
+    overlays = [];
+    {% if current_user.settings['module_geonames'] and overlays is defined and overlays|length %}
+        overlays = [
+            {% for overlay in overlays %}
+                {
+                    name: '{{ overlay.name }}',
+                    image: '{{ overlay.name }}.png',
+                    bounding: {{ overlay.name }}
+                },
+            {% endfor %}
+        ];
     {% endif %}
 </script>
 

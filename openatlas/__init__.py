@@ -96,11 +96,6 @@ def before_request() -> None:
     # Set max file upload in MB
     app.config['MAX_CONTENT_LENGTH'] = session['settings']['file_upload_max_size'] * 1024 * 1024
 
-    # Workaround overlay maps for Thanados until #978 is implemented
-    session['settings']['overlay_hack'] = False
-    if session['settings']['site_name'] == 'Thanados':
-        session['settings']['overlay_hack'] = True  # pragma: no cover
-
 
 @app.after_request
 def apply_caching(response):

@@ -68,11 +68,9 @@ if (gisLineSelected != '') {
     gisLines.on('click', setObjectId);
 }
 
-// Workaround overlay maps for MedCem until #978 is implemented
-if (overlayHack) {
-    controls.Stara = L.imageOverlay('/display/112757.png', [[49.99800, 14.99246], [49.99747, 14.99328]]);
-    controls.Thunau = L.imageOverlay('/display/112760.png', [[48.58709, 15.64294], [48.58653, 15.64356]]);
-    map.options.maxZoom = 30;
+// Overlay maps
+for (i=0; i < overlays.length; i++) {
+    controls[overlays[i].name] = L.imageOverlay('/display/' + overlays[i].image, overlays[i].boundingBox);
 }
 
 if (window.location.href.indexOf('update') >= 0) {
