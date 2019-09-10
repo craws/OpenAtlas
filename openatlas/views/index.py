@@ -31,7 +31,7 @@ def index():
               'bookmarks': Table(['name', 'class', 'first', 'last'], defs='[{"orderDataType": "iso-date", "targets":[2,3]}]'),
               'notes': Table(['name', 'class', 'first', 'last', _('note')], defs='[{"orderDataType": "iso-date", "targets":[2,3]}]'),
               'latest': Table(['name', 'class', 'first', 'last', 'date', 'user'],
-                              order='[[4,"desc"]]', defs='[{"orderDataType": "iso-date", "targets":[2,3]}]')}
+                              order='[[4,"desc"]]', defs='[{"orderDataType": "iso-date", "targets":[2,3,4]}]')}
     if current_user.is_authenticated and hasattr(current_user, 'bookmarks'):
         for entity_id in current_user.bookmarks:
             entity = EntityMapper.get_by_id(entity_id)
