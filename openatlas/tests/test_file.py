@@ -76,8 +76,8 @@ class FileTest(TestBaseCase):
             # Add
             rv = self.app.get(url_for('file_add', origin_id=actor_id))
             assert b'Add File' in rv.data
-            rv = self.app.post(url_for('file_add', origin_id=actor_id), data={'values': file_id},
-                               follow_redirects=True)
+            rv = self.app.post(url_for('file_add', origin_id=actor_id),
+                               data={'checkbox_values': [file_id]}, follow_redirects=True)
             assert b'OpenAtlas logo' in rv.data
 
             # Set and unset as main image
@@ -95,7 +95,7 @@ class FileTest(TestBaseCase):
             rv = self.app.get(url_for('file_add2', id_=file_id, class_name='actor'))
             assert b'Add Actor' in rv.data
             rv = self.app.post(url_for('file_add2', id_=file_id, class_name='actor'),
-                               data={'values': actor_id}, follow_redirects=True)
+                               data={'checkbox_values': [actor_id]}, follow_redirects=True)
             assert b'File keeper' in rv.data
 
             # Delete
