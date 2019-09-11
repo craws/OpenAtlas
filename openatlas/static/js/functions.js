@@ -29,6 +29,16 @@ $(document).ready(function() {
         });
     };
 
+    // DataTables - sort for CIDOC model
+    $.fn.dataTable.ext.order['cidoc-model'] = function(settings, col) {
+        return this.api().column(col, {order:'index'}).nodes().map( function (td, i) {
+            const d = td.firstChild.innerText
+                .replace('OA', '100')
+                .replace(/[\D]*/,'');
+            return parseInt(d, 10);
+        });
+    };
+
     // DataTables - ignore special characters for search
     (function(){
         function removeAccents ( data ) {

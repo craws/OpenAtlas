@@ -55,7 +55,9 @@ def model_index():
 
 @app.route('/overview/model/class')
 def class_index():
-    table = Table(['code', 'name'])
+    table = Table(['code', 'name'],
+                  defs='''[{"orderDataType": "cidoc-model", "targets":[0]},
+                                    { "sType": "numeric", "targets": [0]}]''')
     for class_id, class_ in g.classes.items():
         table.rows.append([link(class_), class_.name])
     return render_template('model/class.html', table=table)
@@ -65,7 +67,9 @@ def class_index():
 def property_index():
     classes = g.classes
     properties = g.properties
-    table = Table(['code', 'name', 'inverse', 'domain', 'domain name', 'range', 'range name'])
+    table = Table(['code', 'name', 'inverse', 'domain', 'domain name', 'range', 'range name'],
+                  defs='''[{"orderDataType": "cidoc-model", "targets":[0, 3, 5]},
+                  { "sType": "numeric", "targets": [0, 3, 5] }]''')
     for property_id, property_ in properties.items():
         table.rows.append([link(property_),
                            property_.name,
