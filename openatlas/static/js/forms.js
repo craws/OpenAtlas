@@ -1,6 +1,20 @@
 
 $(document).ready(function () {
 
+    //write selected table checkboxes to hidden input
+    $('#checkbox-form').submit((a) => {
+       console.log(a);
+        var ids = [];
+        $('#source_table').DataTable().rows().nodes().to$().find('input[type="checkbox"]').each(
+            function() {
+                if ($(this).is(':checked')) {
+                    ids.push($(this).attr('id'));
+                }
+            });
+        $('#checkbox_values').val(ids.length > 0 ? '[' + ids+ ']' : '');
+        alert($('#checkbox_values').val());
+    });
+
     // Needed for ajax bookmark functionality
     $.ajaxSetup({
         beforeSend: function(xhr, settings) {
