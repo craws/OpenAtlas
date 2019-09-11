@@ -37,11 +37,11 @@ def note(self, entity: Entity) -> str:
         return ''  # pragma no cover
     if not entity.note:
         url = url_for('note_insert', entity_id=entity.id)
-        return '<a href="' + url  + '">+ ' + util.uc_first(_('note')) + '</a>'
+        return '<a href="' + url + '">+ ' + util.uc_first(_('note')) + '</a>'
     url = url_for('note_update', entity_id=entity.id)
     html = '<h2>' + util.uc_first(_('note')) + '</h2><p>' + entity.note + '</p>'
     html += '<a href="' + url + '">' + util.uc_first(_('edit note')) + '</a>'
-    return  html
+    return html
 
 
 @jinja2.contextfilter
@@ -123,7 +123,8 @@ def table_select_model(self, name: str, selected=None) -> str:
         entities = g.classes
     else:
         entities = g.properties
-    table = Table(['code', 'name'])
+    table = Table(['code', 'name'], defs='''[{"orderDataType": "cidoc-model", "targets":[0]},
+                                            {"sType": "numeric", "targets": [0]}]''')
     for id_ in entities:
         table.rows.append([
             '<a onclick="selectFromTable(this, \'' + name + '\', \'' + str(id_) + '\')">' +
@@ -214,7 +215,9 @@ def display_logo(self, file_id: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_form(self, form, form_id: Optional[str] = None, for_persons: Optional[bool] = False) -> str:
+def display_form(self, form,
+                 form_id: Optional[str] = None,
+                 for_persons: Optional[bool] = False) -> str:
     multipart = 'enctype="multipart/form-data"' if hasattr(form, 'file') else ''
     if 'update' in request.path:
         if hasattr(form, 'save') and hasattr(form.save, 'label'):
