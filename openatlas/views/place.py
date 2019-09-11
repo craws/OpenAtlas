@@ -103,15 +103,15 @@ def place_view(id_):
     tables = {'info': get_entity_data(object_, location),
               'file': Table(Table.HEADERS['file'] + [_('main image')]),
               'source': Table(Table.HEADERS['source']),
-              'event': Table(Table.HEADERS['event'], defs='[{"orderDataType": "iso-date", "targets":[3,4]}]'),
+              'event': Table(Table.HEADERS['event']),
               'reference': Table(Table.HEADERS['reference'] + ['page / link text']),
-              'actor': Table([_('actor'), _('property'), _('class'), _('first'), _('last')], defs='[{"orderDataType": "iso-date", "targets":[3,4]}]')}
+              'actor': Table([_('actor'), _('property'), _('class'), _('first'), _('last')])}
     if object_.system_type == 'place':
-        tables['feature'] = Table(Table.HEADERS['place'] + [_('description')], defs='[{"orderDataType": "iso-date", "targets":[2,3]}]')
+        tables['feature'] = Table(Table.HEADERS['place'] + [_('description')])
     if object_.system_type == 'feature':
-        tables['stratigraphic-unit'] = Table(Table.HEADERS['place'] + [_('description')], defs='[{"orderDataType": "iso-date", "targets":[2,3]}]')
+        tables['stratigraphic-unit'] = Table(Table.HEADERS['place'] + [_('description')])
     if object_.system_type == 'stratigraphic unit':
-        tables['find'] = Table(Table.HEADERS['place'] + [_('description')], defs='[{"orderDataType": "iso-date", "targets":[2,3]}]')
+        tables['find'] = Table(Table.HEADERS['place'] + [_('description')])
     profile_image_id = object_.get_profile_image_id()
     for link_ in object_.get_links('P67', inverse=True):
         domain = link_.domain
@@ -293,13 +293,13 @@ def save(form: DateForm, object_=None, location=None, origin=None) -> str:
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
     except InvalidGeomException as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        logger.log('error', 'database', 'transaction failed because of invalid geom', e)
+        logger.log('error', 'database', 'transaction failed because of invalid geom', str(e))
         flash(_('Invalid geom entered'), 'error')
         url = url_for('place_index') if log_action == 'insert' else url_for('place_view',
                                                                             id_=object_.id)
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        logger.log('error', 'database', 'transaction failed', e)
+        logger.log('error', 'database', 'transaction failed', str(e))
         flash(_('error transaction'), 'error')
         url = url_for('place_index') if log_action == 'insert' else url_for('place_view',
                                                                             id_=object_.id)

@@ -1,5 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Dict
+from typing import Dict, Optional
 
 from flask import g
 
@@ -80,6 +80,6 @@ class SettingsMapper:
             g.execute(sql, {'name': field, 'value': value})
 
     @staticmethod
-    def set_logo(file_id: int) -> None:
+    def set_logo(file_id: Optional[int] = None) -> None:
         sql = "UPDATE web.settings SET value = %(file_id)s WHERE name = 'logo_file_id';"
-        g.execute(sql, {'file_id': file_id})
+        g.execute(sql, {'file_id': file_id if file_id else ''})

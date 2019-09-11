@@ -2,7 +2,7 @@
 import datetime
 import random
 import string
-from typing import Optional
+from typing import Optional, Union
 
 import bcrypt
 from flask import g, session
@@ -101,7 +101,7 @@ class UserMapper:
         return User(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod
-    def get_activities(limit: str, user_id: str, action: str):
+    def get_activities(limit: Union[int, str], user_id: Union[int, str], action: str):
         sql = """
             SELECT id, user_id, entity_id, created, action, 'ignore' AS ignore
             FROM web.user_log WHERE TRUE"""

@@ -26,7 +26,7 @@ class ActorForm(DateForm):
 
 @app.route('/involvement/insert/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def involvement_insert(origin_id):
+def involvement_insert(origin_id: int):
     origin = EntityMapper.get_by_id(origin_id)
     form = build_form(ActorForm, 'Involvement')
     if origin.view_name == 'event':
@@ -71,7 +71,7 @@ def involvement_insert(origin_id):
 
 @app.route('/involvement/update/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def involvement_update(id_, origin_id):
+def involvement_update(id_: int, origin_id: int):
     link_ = LinkMapper.get_by_id(id_)
     event = EntityMapper.get_by_id(link_.domain.id)
     actor = EntityMapper.get_by_id(link_.range.id)

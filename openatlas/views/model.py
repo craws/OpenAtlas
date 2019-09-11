@@ -21,7 +21,7 @@ class LinkCheckForm(Form):
 
 
 @app.route('/overview/model', methods=["GET", "POST"])
-def model_index():
+def model_index() -> str:
     form = LinkCheckForm()
     form_classes = OrderedDict()
     for code, class_ in g.classes.items():
@@ -54,7 +54,7 @@ def model_index():
 
 
 @app.route('/overview/model/class')
-def class_index():
+def class_index() -> str:
     table = Table(['code', 'name'],
                   defs='''[{"orderDataType": "cidoc-model", "targets":[0]},
                                     { "sType": "numeric", "targets": [0]}]''')
@@ -64,7 +64,7 @@ def class_index():
 
 
 @app.route('/overview/model/property')
-def property_index():
+def property_index() -> str:
     classes = g.classes
     properties = g.properties
     table = Table(['code', 'name', 'inverse', 'domain', 'domain name', 'range', 'range name'],
@@ -82,9 +82,9 @@ def property_index():
 
 
 @app.route('/overview/model/class_view/<code>')
-def class_view(code):
+def class_view(code: str) -> str:
     class_ = g.classes[code]
-    tables = OrderedDict()
+    tables = OrderedDict()  # type: dict
     for table in ['super', 'sub']:
         tables[table] = Table(['code', 'name'], paging=False)
         for code in getattr(class_, table):
@@ -101,7 +101,7 @@ def class_view(code):
 
 
 @app.route('/overview/model/property_view/<code>')
-def property_view(code):
+def property_view(code: str) -> str:
     property_ = g.properties[code]
     domain = g.classes[property_.domain_class_code]
     range_ = g.classes[property_.range_class_code]
@@ -148,7 +148,7 @@ class NetworkForm(Form):
 
 @app.route('/overview/network/', methods=["GET", "POST"])
 @required_group('readonly')
-def model_network():
+def model_network() -> str:
     form = NetworkForm()
     form.classes.choices = []
     form.properties.choices = []
