@@ -44,8 +44,8 @@ class EventForm(DateForm):
 
 @app.route('/event')
 @required_group('readonly')
-def event_index():
-    table = Table(Table.HEADERS['event'] + ['description'], defs='[{"orderDataType": "iso-date", "targets":[3,4]}]')
+def event_index() -> str:
+    table = Table(Table.HEADERS['event'] + ['description'])
     for event in EntityMapper.get_by_codes('event'):
         data = get_base_table_data(event)
         data.append(truncate_string(event.description))
@@ -56,7 +56,7 @@ def event_index():
 @app.route('/event/insert/<code>', methods=['POST', 'GET'])
 @app.route('/event/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def event_insert(code, origin_id=None):
+def event_insert(code=str, origin_id=None) -> str:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(EventForm, 'Event')
     if code != 'E8':
@@ -70,7 +70,7 @@ def event_insert(code, origin_id=None):
 
 @app.route('/event/delete/<int:id_>')
 @required_group('contributor')
-def event_delete(id_):
+def event_delete(id_: int):
     EntityMapper.delete(id_)
     logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
@@ -79,7 +79,7 @@ def event_delete(id_):
 
 @app.route('/event/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def event_update(id_):
+def event_update(id_: int):
     event = EntityMapper.get_by_id(id_, nodes=True)
     form = build_form(EventForm, 'Event', event, request)
     if event.class_.code != 'E8':
@@ -104,14 +104,14 @@ def event_update(id_):
 
 @app.route('/event/view/<int:id_>')
 @required_group('readonly')
-def event_view(id_):
+def event_view(id_: int) -> str:
     event = EntityMapper.get_by_id(id_, nodes=True)
     event.note = UserMapper.get_note(event)
     tables = {'info': get_entity_data(event),
               'file': Table(Table.HEADERS['file'] + [_('main image')]),
-              'subs': Table(Table.HEADERS['event'], defs='[{"orderDataType": "iso-date", "targets":[3,4]}]'),
+              'subs': Table(Table.HEADERS['event']),
               'source': Table(Table.HEADERS['source']),
-              'actor': Table(['actor', 'class', 'involvement', 'first', 'last', 'description'], defs='[{"orderDataType": "iso-date", "targets":[3,4]}]'),
+              'actor': Table(['actor', 'class', 'involvement', 'first', 'last', 'description']),
               'reference': Table(Table.HEADERS['reference'] + ['page / link text'])}
     for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
         first = link_.first
@@ -200,7 +200,7 @@ def save(form: Form, event=None, code=None, origin=None) -> str:
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        logger.log('error', 'database', 'transaction failed', e)
+        logger.log('error', 'database', 'transaction failed', str(e))
         flash(_('error transaction'), 'error')
         url = url_for('event_index')
     return url

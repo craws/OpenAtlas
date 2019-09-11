@@ -68,14 +68,14 @@ def export_sql():
 
 @app.route('/download/sql/<filename>')
 @required_group('manager')
-def download_sql(filename):
+def download_sql(filename: str):
     path = app.config['EXPORT_FOLDER_PATH'] + '/sql/'
     return send_from_directory(path, filename, as_attachment=True)
 
 
 @app.route('/delete/sql/<filename>')
 @required_group('admin')
-def delete_sql(filename):
+def delete_sql(filename: str):
     try:
         os.remove(app.config['EXPORT_FOLDER_PATH'] + '/sql/' + filename)
         logger.log('info', 'file', 'SQL file deleted')
@@ -88,7 +88,7 @@ def delete_sql(filename):
 
 @app.route('/download/csv/<filename>')
 @required_group('manager')
-def download_csv(filename):
+def download_csv(filename: str):
     path = app.config['EXPORT_FOLDER_PATH'] + '/csv/'
     return send_from_directory(path, filename, as_attachment=True)
 
@@ -123,7 +123,7 @@ def export_csv():
 
 @app.route('/delete/csv/<filename>')
 @required_group('admin')
-def delete_csv(filename):
+def delete_csv(filename: str):
     try:
         os.remove(app.config['EXPORT_FOLDER_PATH'] + '/csv/' + filename)
         logger.log('info', 'file', 'CSV file deleted')

@@ -70,5 +70,5 @@ class Table:
         css_toolbar = '#{name}_table_wrapper .fg-toolbar {{ display:none; }}'.format(name=name)
         html += '<style type="text/css">{header} {toolbar}</style>'.format(
             header=css_header if not self.header else '',
-            toolbar=css_toolbar if len(self.rows) < 26 else '')
+            toolbar=css_toolbar if len(self.rows) <= table_rows else '')
         return html

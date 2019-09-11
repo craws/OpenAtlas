@@ -178,7 +178,7 @@ class LinkMapper:
         g.execute(sql, {'id': entity.id, 'codes': tuple(codes)})
 
     @staticmethod
-    def get_by_id(id_: str) -> Link:
+    def get_by_id(id_: int) -> Link:
         sql = """
             SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description, l.created,
                 l.modified, l.type_id,
