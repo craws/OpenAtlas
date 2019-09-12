@@ -13,6 +13,7 @@ from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper, InvalidGeomException
 from openatlas.models.node import NodeMapper
 from openatlas.models.user import UserMapper
+from openatlas.models.overlay import OverlayMapper
 from openatlas.util.table import Table
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  get_profile_image_table_link, is_authorized, link, required_group,
@@ -113,9 +114,9 @@ def place_view(id_):
     if object_.system_type == 'stratigraphic unit':
         tables['find'] = Table(Table.HEADERS['place'] + [_('description')])
     profile_image_id = object_.get_profile_image_id()
-    overlay_ids = None
+    overlays = None
     if is_authorized('editor') and current_user.settings['module_map_overlay']:
-        overlay_ids = GisMapper.get_overlays_by_place_id(object_)
+        overlays = OverlayMapper.get_by_object(object_)
         tables['file'].header.append(uc_first(_('overlay')))
 
     for link_ in object_.get_links('P67', inverse=True):
@@ -128,8 +129,8 @@ def place_view(id_):
                 profile_image_id = domain.id
             if is_authorized('editor') and current_user.settings['module_map_overlay']:
                 if extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-                    if domain.id in overlay_ids:
-                        url = url_for('overlay_update', id_=overlay_ids[domain.id])
+                    if domain.id in overlays:
+                        url = url_for('overlay_update', id_=overlays[domain.id].id)
                         data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
                     else:
                         url = url_for('overlay_insert', image_id=domain.id, place_id=object_.id)
@@ -187,7 +188,8 @@ def place_view(id_):
         place = object_.get_linked_entity('P46', True)
     return render_template('place/view.html', object_=object_, tables=tables, gis_data=gis_data,
                            place=place, feature=feature, stratigraphic_unit=stratigraphic_unit,
-                           has_subunits=has_subunits, profile_image_id=profile_image_id)
+                           has_subunits=has_subunits, profile_image_id=profile_image_id,
+                           overlays=overlays)
 
 
 @app.route('/place/delete/<int:id_>')
@@ -254,8 +256,10 @@ def place_update(id_):
         place = feature.get_linked_entity('P46', True)
     elif object_.system_type == 'feature':
         place = object_.get_linked_entity('P46', True)
+
     return render_template('place/update.html', form=form, object_=object_, gis_data=gis_data,
-                           place=place, feature=feature, stratigraphic_unit=stratigraphic_unit)
+                           place=place, feature=feature, stratigraphic_unit=stratigraphic_unit,
+                           overlays=OverlayMapper.get_by_object(object_))
 
 
 def save(form: DateForm, object_=None, location=None, origin=None) -> str:

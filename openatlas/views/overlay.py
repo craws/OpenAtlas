@@ -1,7 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
 
-from flask import render_template, url_for, flash
+from flask import flash, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
@@ -10,7 +10,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
-from openatlas.models.gis import GisMapper
+from openatlas.models.overlay import OverlayMapper
 from openatlas.util.util import required_group, uc_first
 
 
@@ -29,7 +29,7 @@ def overlay_insert(image_id: int, place_id: int) -> str:
     image = EntityMapper.get_by_id(image_id)
     form = OverlayForm()
     if form.validate_on_submit():
-        GisMapper.insert_overlay(form=form, image=image, place=place)
+        OverlayMapper.insert(form=form, image=image, place=place)
         return redirect(url_for('place_view', id_=place.id) + '#tab-file')
     form.save.label.text = uc_first(_('insert'))
     return render_template('overlay/insert.html', form=form, place=place, image=image)
@@ -38,10 +38,10 @@ def overlay_insert(image_id: int, place_id: int) -> str:
 @app.route('/overlay/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
 def overlay_update(id_: int) -> str:
-    overlay = GisMapper.get_overlay_by_id(id_)
+    overlay = OverlayMapper.get_by_id(id_)
     form = OverlayForm()
     if form.validate_on_submit():
-        GisMapper.update_overlay(form=form, image_id=overlay.image_id, place_id=overlay.place_id)
+        OverlayMapper.update(form=form, image_id=overlay.image_id, place_id=overlay.place_id)
         flash(_('info update'), 'info')
         return redirect(url_for('place_view', id_=overlay.place_id) + '#tab-file')
     bounding = ast.literal_eval(overlay.bounding_box)
@@ -57,5 +57,5 @@ def overlay_update(id_: int) -> str:
 @app.route('/overlay/remove/<int:id_>/<int:place_id>')
 @required_group('editor')
 def overlay_remove(id_: int, place_id: int):
-    GisMapper.remove_overlay(id_)
+    OverlayMapper.remove(id_)
     return redirect(url_for('place_view', id_=place_id) + '#tab-file')

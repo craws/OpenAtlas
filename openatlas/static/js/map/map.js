@@ -70,7 +70,9 @@ if (gisLineSelected != '') {
 
 // Overlay maps
 for (i=0; i < overlays.length; i++) {
-    controls[overlays[i].name] = L.imageOverlay('/display/' + overlays[i].image, overlays[i].boundingBox);
+    overlay = L.imageOverlay('/display/' + overlays[i].image, overlays[i].boundingBox)
+    controls[overlays[i].name] = overlay;
+    overlay.addTo(map)
 }
 
 if (window.location.href.indexOf('update') >= 0) {

@@ -36,17 +36,16 @@
     overlays = [];
     {% if current_user.settings['module_geonames'] and overlays is defined and overlays|length %}
         overlays = [
-            {% for overlay in overlays %}
+            {% for image_id, overlay in overlays.items() %}
                 {
                     name: '{{ overlay.name }}',
-                    image: '{{ overlay.name }}.png',
-                    bounding: {{ overlay.name }}
+                    image: '{{ overlay.image_name }}',
+                    boundingBox: {{ overlay.bounding_box }}
                 },
             {% endfor %}
         ];
     {% endif %}
 </script>
-
 <link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/leaflet.css" />
 <link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/fullscreen/leaflet.fullscreen.css" />
 <link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/Geonames-0.4.7/L.Control.Geonames.css" />

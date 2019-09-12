@@ -22,7 +22,7 @@ class GisMapper:
         subunit_selected_id = 0
         if objects:
             if type(objects) is not list:
-                if objects.system_type in ['feature', 'finds', 'stratigraphic unit']:
+                if objects.system_type in ['feature', 'find', 'stratigraphic unit']:
                     subunit_selected_id = objects.id
                 objects = [objects]
         else:
@@ -134,46 +134,3 @@ class GisMapper:
         g.execute('DELETE FROM gis.point WHERE entity_id = %(id)s;', {'id': entity.id})
         g.execute('DELETE FROM gis.linestring WHERE entity_id = %(id)s;', {'id': entity.id})
         g.execute('DELETE FROM gis.polygon WHERE entity_id = %(id)s;', {'id': entity.id})
-
-    @staticmethod
-    def insert_overlay(form, image, place) -> None:
-        sql = """
-            INSERT INTO web.map_overlay (image_id, place_id, bounding_box)
-            VALUES (%(image_id)s, %(place_id)s, %(bounding_box)s);"""
-        bounding_box = '[[{top_left_easting},{top_left_northing}],' \
-                       '[{bottom_right_easting},{bottom_right_northing}]]'.format(
-                            top_left_easting=form.top_left_easting.data,
-                            top_left_northing=form.top_left_northing.data,
-                            bottom_right_easting=form.bottom_right_easting.data,
-                            bottom_right_northing=form.bottom_right_northing.data)
-        g.execute(sql, {'image_id': image.id, 'place_id': place.id, 'bounding_box': bounding_box})
-
-    @staticmethod
-    def update_overlay(form, image_id, place_id) -> None:
-        sql = """
-            UPDATE web.map_overlay SET bounding_box = %(bounding_box)s
-            WHERE image_id = %(image_id)s AND place_id = %(place_id)s;"""
-        bounding_box = '[[{top_left_easting},{top_left_northing}],' \
-                       '[{bottom_right_easting},{bottom_right_northing}]]'.format(
-                            top_left_easting=form.top_left_easting.data,
-                            top_left_northing=form.top_left_northing.data,
-                            bottom_right_easting=form.bottom_right_easting.data,
-                            bottom_right_northing=form.bottom_right_northing.data)
-        g.execute(sql, {'image_id': image_id, 'place_id': place_id, 'bounding_box': bounding_box})
-
-    @staticmethod
-    def get_overlays_by_place_id(object_) -> dict:
-        sql = 'SELECT id, image_id FROM web.map_overlay WHERE place_id = %(place_id)s;'
-        g.execute(sql, {'place_id': object_.id})
-        return {row.image_id: row.id for row in g.cursor.fetchall()}
-
-    @staticmethod
-    def get_overlay_by_id(id_: int):
-        sql = 'SELECT id, place_id, image_id, bounding_box FROM web.map_overlay WHERE id = %(id)s;'
-        g.execute(sql, {'id': id_})
-        return g.cursor.fetchone()
-
-    @staticmethod
-    def remove_overlay(id_: int):
-        sql = 'DELETE FROM web.map_overlay WHERE id = %(id)s;'
-        g.execute(sql, {'id': id_})
