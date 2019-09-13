@@ -9,6 +9,7 @@ INSERT INTO web.user (group_id, username, password, active, email) VALUES
 INSERT INTO web.user_settings (user_id, name, value) VALUES
     ((SELECT id FROM web.user WHERE username = 'Alice'), 'layout', 'advanced'),
     ((SELECT id FROM web.user WHERE username = 'Alice'), 'module_notes', 'True'),
+    ((SELECT id FROM web.user WHERE username = 'Alice'), 'module_map_overlay', 'True'),
     ((SELECT id FROM web.user WHERE username = 'Alice'), 'module_geonames', 'True');
 
 -- Activate debug mode

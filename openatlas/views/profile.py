@@ -93,7 +93,7 @@ def profile_update():
         user.settings['language'] = form.language.data
         user.settings['table_rows'] = form.table_rows.data
         user.settings['module_geonames'] = form.module_geonames.data
-        user.settings['module_map_overlay'] = form.module_geonames.data
+        user.settings['module_map_overlay'] = form.module_map_overlay.data
         user.settings['module_notes'] = form.module_notes.data
         user.settings['max_zoom'] = form.max_zoom.data
         user.settings[

@@ -1,8 +1,12 @@
+import os
+
 from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
+from openatlas.models.link import LinkMapper
 from openatlas.models.node import NodeMapper
+from openatlas.models.overlay import OverlayMapper
 from openatlas.test_base import TestBaseCase
 
 
@@ -57,7 +61,7 @@ class PlaceTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()
                 places = EntityMapper.get_by_system_type('place')
-                place_id = places[0].id
+                place = places[0]
                 place2 = places[1]
                 location = place2.get_linked_entity('P53')
                 actor = EntityMapper.insert('E21', 'Milla Jovovich')
@@ -65,29 +69,29 @@ class PlaceTest(TestBaseCase):
             assert b'Tha source' in rv.data
             rv = self.app.get(url_for('place_index'))
             assert b'Asgard' in rv.data
-            rv = self.app.get(url_for('place_update', id_=place_id))
+            rv = self.app.get(url_for('place_update', id_=place.id))
             assert b'Valhalla' in rv.data
             data['continue_'] = ''
             data['alias-1'] = 'Val-hall'
             data['geonames_id'] = '321'
-            rv = self.app.post(url_for('place_update', id_=place_id), data=data,
+            rv = self.app.post(url_for('place_update', id_=place.id), data=data,
                                follow_redirects=True)
             assert b'Val-hall' in rv.data
 
             # Test with same GeoNames id
-            rv = self.app.post(url_for('place_update', id_=place_id), data=data,
+            rv = self.app.post(url_for('place_update', id_=place.id), data=data,
                                follow_redirects=True)
             assert b'Val-hall' in rv.data
 
             # Test with same GeoNames id but different precision
             data['geonames_precision'] = ''
-            rv = self.app.post(url_for('place_update', id_=place_id), data=data,
+            rv = self.app.post(url_for('place_update', id_=place.id), data=data,
                                follow_redirects=True)
             assert b'Val-hall' in rv.data
 
             # Test update without the previous GeoNames id
             data['geonames_id'] = ''
-            rv = self.app.post(url_for('place_update', id_=place_id), data=data,
+            rv = self.app.post(url_for('place_update', id_=place.id), data=data,
                                follow_redirects=True)
             assert b'Val-hall' in rv.data
 
@@ -110,6 +114,35 @@ class PlaceTest(TestBaseCase):
                                follow_redirects=True)
             assert b'An invalid geometry was entered' in rv.data
 
+            # Test Overlays
+            with open(os.path.dirname(__file__) + '/../static/images/layout/logo.png', 'rb') as img:
+                rv = self.app.post(
+                    url_for('file_insert', origin_id=place.id),
+                    data={'name': 'OpenAtlas logo', 'file': img}, follow_redirects=True)
+            assert b'An entry has been created' in rv.data
+            with app.test_request_context():
+                app.preprocess_request()
+                file = EntityMapper.get_by_system_type('file')[0]
+                link_id = LinkMapper.insert(file, 'P67', place.id)
+            rv = self.app.get(url_for('overlay_insert', image_id=file.id, place_id=place.id,
+                                      link_id=link_id))
+            assert b'OpenAtlas logo' in rv.data
+            data = {'top_left_easting': 42,
+                    'top_left_northing': 12,
+                    'bottom_right_easting': 43,
+                    'bottom_right_northing': 13}
+            rv = self.app.post(url_for('overlay_insert', image_id=file.id, place_id=place.id,
+                                       link_id=link_id), data=data, follow_redirects=True)
+            assert b'Edit' in rv.data
+
+            # To do: finish test - its and authentication problem (is_authorized('editor'))
+            #with app.test_request_context():
+            #    app.preprocess_request()
+            #    overlay = OverlayMapper.get_by_object(place)
+
+            #rv = self.app.get(url_for('overlay_update', id_=overlay.id))
+            #assert b'42' in rv.data
+
             # Place types
             rv = self.app.get(url_for('node_move_entities', id_=unit_sub1.id))
             assert b'Asgard' in rv.data
@@ -128,8 +161,8 @@ class PlaceTest(TestBaseCase):
 
             # Subunits
             with app.app_context():
-                self.app.get(url_for('place_insert', origin_id=place_id))
-                rv = self.app.post(url_for('place_insert', origin_id=place_id),
+                self.app.get(url_for('place_insert', origin_id=place.id))
+                rv = self.app.post(url_for('place_insert', origin_id=place.id),
                                    data={'name': "It's not a bug, it's a feature!"})
                 feat_id = rv.location.split('/')[-1]
                 self.app.get(url_for('place_insert', origin_id=feat_id))
@@ -155,7 +188,7 @@ class PlaceTest(TestBaseCase):
             assert b'a stratigraphic unit' in rv.data
             rv = self.app.get(url_for('place_view', id_=find_id))
             assert b'You never' in rv.data
-            rv = self.app.get(url_for('place_delete', id_=place_id), follow_redirects=True)
+            rv = self.app.get(url_for('place_delete', id_=place.id), follow_redirects=True)
             assert b'not possible if subunits' in rv.data
             rv = self.app.get(url_for('place_delete', id_=find_id), follow_redirects=True)
             assert b'The entry has been deleted.' in rv.data
