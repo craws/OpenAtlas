@@ -34,7 +34,7 @@
     translate['map_geonames_placeholder'] = '{{ _('Enter a location name')|safe }}';
 
     overlays = [];
-    {% if current_user.settings['module_geonames'] and overlays is defined and overlays|length %}
+    {% if current_user.settings['module_geonames'] and overlays is defined and overlays and overlays|length %}
         overlays = [
             {% for image_id, overlay in overlays.items() %}
                 {

@@ -23,17 +23,18 @@ class Overlay:
 class OverlayMapper:
 
     @staticmethod
-    def insert(form, image, place) -> None:
+    def insert(form, image_id: int, place_id: int, link_id: int) -> None:
         sql = """
-            INSERT INTO web.map_overlay (image_id, place_id, bounding_box)
-            VALUES (%(image_id)s, %(place_id)s, %(bounding_box)s);"""
+            INSERT INTO web.map_overlay (image_id, place_id, link_id, bounding_box)
+            VALUES (%(image_id)s, %(place_id)s, %(link_id)s, %(bounding_box)s);"""
         bounding_box = '[[{top_left_easting},{top_left_northing}],' \
                        '[{bottom_right_easting},{bottom_right_northing}]]'.format(
                         top_left_easting=form.top_left_easting.data,
                         top_left_northing=form.top_left_northing.data,
                         bottom_right_easting=form.bottom_right_easting.data,
                         bottom_right_northing=form.bottom_right_northing.data)
-        g.execute(sql, {'image_id': image.id, 'place_id': place.id, 'bounding_box': bounding_box})
+        g.execute(sql, {'image_id': image_id, 'place_id': place_id, 'link_id': link_id,
+                        'bounding_box': bounding_box})
 
     @staticmethod
     def update(form, image_id: int, place_id: int) -> None:

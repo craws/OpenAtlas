@@ -22,16 +22,16 @@ class OverlayForm(Form):
     save = SubmitField()
 
 
-@app.route('/overlay/insert/<int:image_id>/<int:place_id>', methods=['POST', 'GET'])
+@app.route('/overlay/insert/<int:image_id>/<int:place_id>/<int:link_id>', methods=['POST', 'GET'])
 @required_group('editor')
-def overlay_insert(image_id: int, place_id: int) -> str:
-    place = EntityMapper.get_by_id(place_id)
-    image = EntityMapper.get_by_id(image_id)
+def overlay_insert(image_id: int, place_id: int, link_id: int) -> str:
     form = OverlayForm()
     if form.validate_on_submit():
-        OverlayMapper.insert(form=form, image=image, place=place)
-        return redirect(url_for('place_view', id_=place.id) + '#tab-file')
+        OverlayMapper.insert(form=form, image_id=image_id, place_id=place_id, link_id=link_id)
+        return redirect(url_for('place_view', id_=place_id) + '#tab-file')
     form.save.label.text = uc_first(_('insert'))
+    place = EntityMapper.get_by_id(place_id)
+    image = EntityMapper.get_by_id(image_id)
     return render_template('overlay/insert.html', form=form, place=place, image=image)
 
 

@@ -23,6 +23,7 @@ ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_group_id_fk
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_user_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_place_id_fkey;
+ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_link_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_image_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.hierarchy DROP CONSTRAINT IF EXISTS hierarchy_id_fkey;
 ALTER TABLE IF EXISTS ONLY web.hierarchy_form DROP CONSTRAINT IF EXISTS hierarchy_form_hierarchy_id_fkey;
@@ -1134,6 +1135,7 @@ CREATE TABLE web.map_overlay (
     id integer NOT NULL,
     image_id integer NOT NULL,
     place_id integer NOT NULL,
+    link_id integer NOT NULL,
     bounding_box text NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone
@@ -1141,6 +1143,13 @@ CREATE TABLE web.map_overlay (
 
 
 ALTER TABLE web.map_overlay OWNER TO openatlas;
+
+--
+-- Name: COLUMN map_overlay.link_id; Type: COMMENT; Schema: web; Owner: openatlas
+--
+
+COMMENT ON COLUMN web.map_overlay.link_id IS 'Used to remove overlay entry if link is removed';
+
 
 --
 -- Name: map_overlay_id_seq; Type: SEQUENCE; Schema: web; Owner: openatlas
@@ -2298,6 +2307,14 @@ ALTER TABLE ONLY web.hierarchy
 
 ALTER TABLE ONLY web.map_overlay
     ADD CONSTRAINT map_overlay_image_id_fkey FOREIGN KEY (image_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: map_overlay map_overlay_link_id_fkey; Type: FK CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.map_overlay
+    ADD CONSTRAINT map_overlay_link_id_fkey FOREIGN KEY (link_id) REFERENCES model.link(id) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

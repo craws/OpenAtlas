@@ -133,7 +133,8 @@ def place_view(id_):
                         url = url_for('overlay_update', id_=overlays[domain.id].id)
                         data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
                     else:
-                        url = url_for('overlay_insert', image_id=domain.id, place_id=object_.id)
+                        url = url_for('overlay_insert', image_id=domain.id, place_id=object_.id,
+                                      link_id=link_.id)
                         data.append('<a href="' + url + '">' + uc_first(_('add')) + '</a>')
                 else:
                     data.append('')
