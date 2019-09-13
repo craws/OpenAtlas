@@ -115,9 +115,11 @@ def place_view(id_):
         tables['find'] = Table(Table.HEADERS['place'] + [_('description')])
     profile_image_id = object_.get_profile_image_id()
     overlays = None
-    if is_authorized('editor') and current_user.settings['module_map_overlay']:
+    if current_user.settings['module_map_overlay']:
         overlays = OverlayMapper.get_by_object(object_)
-        tables['file'].header.append(uc_first(_('overlay')))
+        print(overlays)
+        if is_authorized('editor'):
+            tables['file'].header.append(uc_first(_('overlay')))
 
     for link_ in object_.get_links('P67', inverse=True):
         domain = link_.domain

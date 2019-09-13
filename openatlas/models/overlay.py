@@ -51,7 +51,7 @@ class OverlayMapper:
 
     @staticmethod
     def get_by_object(object_) -> Union[None, dict]:
-        if not is_authorized('editor') or not current_user.settings['module_map_overlay']:
+        if not current_user.settings['module_map_overlay']:
             return None
         ids = [object_.id]
 
