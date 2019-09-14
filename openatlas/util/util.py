@@ -368,12 +368,12 @@ def format_datetime(value, format_='medium'):
     return dates.format_datetime(value, format=format_, locale=session['language']) if value else ''
 
 
-def format_date(value, format_='medium'):
+def format_date(value):
     if not value:
         return ''
     if type(value) is numpy.datetime64:
         return DateMapper.datetime64_to_timestamp(value)
-    return dates.format_date(value, format=format_, locale=session['language'])
+    return value.date().isoformat()
 
 
 def get_profile_image_table_link(file, entity, extension, profile_image_id):

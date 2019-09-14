@@ -57,8 +57,7 @@ def import_project_insert():
 @app.route('/import/project/view/<int:id_>')
 @required_group('contributor')
 def import_project_view(id_: int):
-    table = Table([_('name'), _('class'), _('description'), 'origin ID', _('date')],
-                  defs='[{"orderDataType": "iso-date", "targets":[4]}]')
+    table = Table([_('name'), _('class'), _('description'), 'origin ID', _('date')])
     for entity in EntityMapper.get_by_project_id(id_):
         table.rows.append([link(entity),
                            entity.class_.name,

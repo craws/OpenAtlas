@@ -75,8 +75,7 @@ def user_activity(user_id=0):
         activities = UserMapper.get_activities(100, user_id, 'all')
     else:
         activities = UserMapper.get_activities(100, 0, 'all')
-    table = Table(['date', 'user', 'action', 'entity'],
-                  defs='[{"orderDataType": "iso-date", "targets":[0]}]')
+    table = Table(['date', 'user', 'action', 'entity'])
     for row in activities:
         entity = EntityMapper.get_by_id(row.entity_id, ignore_not_found=True)
         user = UserMapper.get_by_id(row.user_id)
@@ -105,8 +104,7 @@ def user_view(id_):
 @app.route('/admin/user')
 @required_group('readonly')
 def user_index():
-    table = Table(['username', 'group', 'email', 'newsletter', 'created', 'last login', 'entities'],
-                  defs='[{"orderDataType": "iso-date", "targets":[4, 5]}]')
+    table = Table(['username', 'group', 'email', 'newsletter', 'created', 'last login', 'entities'])
     for user in UserMapper.get_all():
         count = UserMapper.get_created_entities_count(user.id)
         table.rows.append([

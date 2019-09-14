@@ -109,8 +109,7 @@ def admin_check_link_duplicates(delete: Optional[str] = None) -> str:
         flash(_('deleted links') + ': ' + delete_count, 'info')
         return redirect(url_for('admin_check_link_duplicates'))
     table = Table(['domain', 'range', 'property_code', 'description', 'type_id', 'begin_from',
-                   'begin_to', 'begin_comment', 'end_from', 'end_to', 'end_comment', 'count'],
-                  defs='[{"orderDataType": "iso-date", "targets":[5,6,8,9]}]')
+                   'begin_to', 'begin_comment', 'end_from', 'end_to', 'end_comment', 'count'])
 
     for result in LinkMapper.check_link_duplicates():
         table.rows.append([link(EntityMapper.get_by_id(result.domain_id)),
@@ -210,8 +209,7 @@ def admin_check_dates() -> str:
     tables = {'link_dates': Table(['link', 'domain', 'range']),
               'involvement_dates': Table(['actor', 'event', 'class', 'involvement', 'description']),
               'dates': Table(['name', 'class', 'type', 'system type', 'created', 'updated',
-                              'description'],
-                             defs='[{"orderDataType": "iso-date", "targets":[4,5]}]')}
+                              'description'])}
     for entity in DateMapper.get_invalid_dates():
         tables['dates'].rows.append([link(entity), link(entity.class_), entity.print_base_type(),
                                      entity.system_type, format_date(entity.created),
@@ -243,13 +241,12 @@ def admin_check_dates() -> str:
 @required_group('contributor')
 def admin_orphans() -> str:
     header = ['name', 'class', 'type', 'system type', 'created', 'updated', 'description']
-    tables = {'orphans': Table(header, defs='[{"orderDataType": "iso-date", "targets":[4,5]}]'),
-              'unlinked': Table(header, defs='[{"orderDataType": "iso-date", "targets":[4,5]}]'),
-              'missing_files': Table(header, defs='[{"orderDataType":"iso-date","targets":[4,5]}]'),
+    tables = {'orphans': Table(header),
+              'unlinked': Table(header),
+              'missing_files': Table(header),
               'circular': Table(['entity']),
               'nodes': Table(['name', 'root']),
-              'orphaned_files': Table(['name', 'size', 'date', 'ext'],
-                                      defs='[{"orderDataType": "iso-date", "targets":[2]}]')}
+              'orphaned_files': Table(['name', 'size', 'date', 'ext'])}
     tables['circular'].rows = [[link(entity)] for entity in EntityMapper.get_circular()]
     for entity in EntityMapper.get_orphans():
         name = 'unlinked' if entity.class_.code in app.config['CODE_CLASS'].keys() else 'orphans'
@@ -358,8 +355,7 @@ class LogForm(Form):
 def admin_log() -> str:
     form = LogForm()
     form.user.choices = [(0, _('all'))] + UserMapper.get_users()
-    table = Table(['date', 'priority', 'type', 'message', 'user', 'info'],
-                  defs='[{"orderDataType": "iso-date", "targets":[1]}]')
+    table = Table(['date', 'priority', 'type', 'message', 'user', 'info'])
     logs = logger.get_system_logs(form.limit.data, form.priority.data, form.user.data)
     for row in logs:
         user = UserMapper.get_by_id(row.user_id) if row.user_id else None

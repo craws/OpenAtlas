@@ -1,4 +1,10 @@
 
+table.dataTable {
+    width: auto;
+    margin: 0;
+    margin-bottom: 1em;
+}
+
 table.dataTable.stripe tbody tr.odd,
 table.dataTable.display tbody tr.odd {
     background-color: #adadad;
@@ -26,10 +32,6 @@ table.dataTable.no-footer {
 table.dataTable.compact tbody th,
 table.dataTable.compact tbody td {
     padding: 5px;
-}
-
-table.dataTable {
-    margin-bottom: 1em;
 }
 
 .dataTables_wrapper .ui-widget-header {

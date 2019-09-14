@@ -82,8 +82,7 @@ def file_remove_profile_image(entity_id: int):
 @app.route('/file/index')
 @required_group('readonly')
 def file_index():
-    table = Table(['date'] + Table.HEADERS['file'],
-                  defs='[{"orderDataType": "iso-date", "targets":[0]}]')
+    table = Table(['date'] + Table.HEADERS['file'])
     file_stats = get_file_stats()
     for entity in EntityMapper.get_by_system_type('file', nodes=True):
         date = 'N/A'

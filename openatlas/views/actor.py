@@ -146,8 +146,7 @@ def actor_view(id_):
             data.append(display_remove_link(unlink_url, link_.domain.name))
         tables['member_of'].rows.append(data)
     if actor.class_.code in app.config['CLASS_CODES']['group']:
-        tables['member'] = Table(['member', 'function', 'first', 'last', 'description'],
-                                 defs='[{"orderDataType": "iso-date", "targets":[2,3]}]')
+        tables['member'] = Table(['member', 'function', 'first', 'last', 'description'])
         for link_ in actor.get_links('P107'):
             data = ([link(link_.range), link_.type.name if link_.type else '',
                      link_.first, link_.last, truncate_string(link_.description)])
@@ -168,8 +167,7 @@ def actor_view(id_):
 @app.route('/actor')
 @required_group('readonly')
 def actor_index():
-    table = Table(Table.HEADERS['actor'] + ['description'],
-                  defs='[{"orderDataType": "iso-date", "targets":[2,3]}]')
+    table = Table(Table.HEADERS['actor'] + ['description'])
     for actor in EntityMapper.get_by_codes('actor'):
         data = get_base_table_data(actor)
         data.append(truncate_string(actor.description))
