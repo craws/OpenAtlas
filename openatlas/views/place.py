@@ -62,6 +62,7 @@ def place_index():
 @required_group('contributor')
 def place_insert(origin_id=None):
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
+    geonames_buttons = False
     if origin and origin.system_type == 'place':
         title = 'feature'
         form = build_form(FeatureForm, 'Feature')
@@ -74,6 +75,7 @@ def place_insert(origin_id=None):
     else:
         title = 'place'
         form = build_form(PlaceForm, 'Place')
+        geonames_buttons = True if current_user.settings['module_geonames'] else False
     if origin and origin.system_type not in ['place', 'feature', 'stratigraphic unit'] \
             and hasattr(form, 'insert_and_continue'):
         del form.insert_and_continue
@@ -91,8 +93,8 @@ def place_insert(origin_id=None):
         place = feature.get_linked_entity('P46', True)
     elif origin and origin.system_type == 'feature':
         place = origin.get_linked_entity('P46', True)
-    return render_template('place/insert.html', form=form, title=title, place=place,
-                           gis_data=gis_data, feature=feature, origin=origin)
+    return render_template('place/insert.html', form=form, title=title, place=place, origin=origin,
+                           gis_data=gis_data, feature=feature, geonames_buttons=geonames_buttons)
 
 
 @app.route('/place/view/<int:id_>')
@@ -217,6 +219,7 @@ def place_delete(id_):
 def place_update(id_):
     object_ = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
     location = object_.get_linked_entity('P53', nodes=True)
+    geonames_buttons = False
     if object_.system_type == 'feature':
         form = build_form(FeatureForm, 'Feature', object_, request, location)
     elif object_.system_type == 'stratigraphic unit':
@@ -224,6 +227,7 @@ def place_update(id_):
     elif object_.system_type == 'find':
         form = build_form(FeatureForm, 'Find', object_, request, location)
     else:
+        geonames_buttons = True if current_user.settings['module_geonames'] else False
         form = build_form(PlaceForm, 'Place', object_, request, location)
     if hasattr(form, 'geonames_id') and not current_user.settings['module_geonames']:
         del form.geonames_id, form.geonames_precision  # pragma: no cover
@@ -263,7 +267,8 @@ def place_update(id_):
 
     return render_template('place/update.html', form=form, object_=object_, gis_data=gis_data,
                            place=place, feature=feature, stratigraphic_unit=stratigraphic_unit,
-                           overlays=OverlayMapper.get_by_object(object_))
+                           overlays=OverlayMapper.get_by_object(object_),
+                           geonames_buttons=geonames_buttons)
 
 
 def save(form: DateForm, object_=None, location=None, origin=None) -> str:

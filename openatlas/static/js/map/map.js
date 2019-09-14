@@ -118,7 +118,7 @@ var geoSearchControl = L.control.geonames({
 });
 
 geoSearchControl.on('select', function(e){
-    if(geoNamesModule === 'True') {
+    if (geoNamesModule) {
         var popup = `<div>
                   <a href='https://www.geonames.org/${e.geoname.geonameId}' target='_blank'>${e.geoname.name}</a><br>
                   <div id="buttonBar" style="white-space:nowrap;">
