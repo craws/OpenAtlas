@@ -43,9 +43,12 @@ def actor_view(id_):
               'file': Table(Table.HEADERS['file'] + [_('main image')]),
               'source': Table(Table.HEADERS['source']),
               'reference': Table(Table.HEADERS['reference'] + ['page / link text']),
-              'event': Table(['event', 'class', 'involvement', 'first', 'last', 'description']),
-              'relation': Table(['relation', 'actor', 'first', 'last', 'description']),
-              'member_of': Table(['member of', 'function', 'first', 'last', 'description'])}
+              'event': Table(['event', 'class', 'involvement', 'first', 'last', 'description'],
+                             defs='[{className: "dt-body-right", targets: [3,4]}]'),
+              'relation': Table(['relation', 'actor', 'first', 'last', 'description'],
+                                defs='[{className: "dt-body-right", targets: [2,3]}]'),
+              'member_of': Table(['member of', 'function', 'first', 'last', 'description'],
+                                 defs='[{className: "dt-body-right", targets: [2,3]}]')}
     profile_image_id = actor.get_profile_image_id()
     for link_ in actor.get_links('P67', True):
         domain = link_.domain
@@ -146,7 +149,8 @@ def actor_view(id_):
             data.append(display_remove_link(unlink_url, link_.domain.name))
         tables['member_of'].rows.append(data)
     if actor.class_.code in app.config['CLASS_CODES']['group']:
-        tables['member'] = Table(['member', 'function', 'first', 'last', 'description'])
+        tables['member'] = Table(['member', 'function', 'first', 'last', 'description'],
+                                 defs='[{className: "dt-body-right", targets: [2,3]}]')
         for link_ in actor.get_links('P107'):
             data = ([link(link_.range), link_.type.name if link_.type else '',
                      link_.first, link_.last, truncate_string(link_.description)])
@@ -167,7 +171,8 @@ def actor_view(id_):
 @app.route('/actor')
 @required_group('readonly')
 def actor_index():
-    table = Table(Table.HEADERS['actor'] + ['description'])
+    table = Table(Table.HEADERS['actor'] + ['description'],
+                  defs='[{className: "dt-body-right", targets: [2,3]}]')
     for actor in EntityMapper.get_by_codes('actor'):
         data = get_base_table_data(actor)
         data.append(truncate_string(actor.description))

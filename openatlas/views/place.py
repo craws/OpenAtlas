@@ -50,7 +50,7 @@ class FeatureForm(DateForm):
 @app.route('/place')
 @required_group('readonly')
 def place_index():
-    table = Table(Table.HEADERS['place'])
+    table = Table(Table.HEADERS['place'], defs='[{className: "dt-body-right", targets: [2,3]}]')
     for place in EntityMapper.get_by_system_type(
             'place', nodes=True, aliases=current_user.settings['table_show_aliases']):
         table.rows.append(get_base_table_data(place))
@@ -104,7 +104,8 @@ def place_view(id_):
     tables = {'info': get_entity_data(object_, location),
               'file': Table(Table.HEADERS['file'] + [_('main image')]),
               'source': Table(Table.HEADERS['source']),
-              'event': Table(Table.HEADERS['event']),
+              'event': Table(Table.HEADERS['event'],
+                             defs='[{className: "dt-body-right", targets: [3,4]}]'),
               'reference': Table(Table.HEADERS['reference'] + ['page / link text']),
               'actor': Table([_('actor'), _('property'), _('class'), _('first'), _('last')])}
     if object_.system_type == 'place':

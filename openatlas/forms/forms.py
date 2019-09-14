@@ -272,6 +272,13 @@ class TableSelect(HiddenInput):
             entities = EntityMapper.get_by_codes(class_)
         selection = ''
         table = Table(Table.HEADERS[class_])
+
+        # Table definitions (aligning)
+        if class_ == 'event':
+            table.defs += '[{className: "dt-body-right", targets: [3,4]}]'
+        elif class_ in ['actor', 'group', 'feature', 'place']:
+            table.defs += '[{className: "dt-body-right", targets: [2,3]}]'
+
         for entity in entities:
             # Todo: don't show self e.g. at source
             if field.data and entity.id == int(field.data):
@@ -319,8 +326,15 @@ class TableMultiSelect(HiddenInput):
         headers_len = str(len(Table.HEADERS[class_]))
 
         # Make checkbox column sortable and show selected on top
-        table = Table(Table.HEADERS[class_], order='[[' + headers_len + ', "asc"], [0, "asc"]]',
-                      defs='[{"orderDataType": "dom-checkbox", "targets":' + headers_len + '}]')
+        table = Table(Table.HEADERS[class_], order='[[' + headers_len + ', "asc"], [0, "asc"]]')
+
+        # Table definitions (ordering and aligning)
+        defs = '{"orderDataType": "dom-checkbox", "targets":' + headers_len + '}'
+        if class_ == 'event':
+            defs += ',{className: "dt-body-right", targets: [3,4]}'
+        elif class_ in ['actor', 'group', 'feature', 'place']:
+            defs += ',{className: "dt-body-right", targets: [2,3]}'
+        table.defs = '[' + defs + ']'
 
         if class_ == 'place':
             aliases = current_user.settings['table_show_aliases']
