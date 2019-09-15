@@ -23,12 +23,12 @@ class LinkCheckForm(Form):
 @app.route('/overview/model', methods=["GET", "POST"])
 def model_index() -> str:
     form = LinkCheckForm()
-    form_classes = OrderedDict()
+    form_classes = OrderedDict()  # type: dict
     for code, class_ in g.classes.items():
         form_classes[code] = code + ' ' + class_.name
     form.domain.choices = form_classes.items()
     form.range.choices = form_classes.items()
-    form_properties = OrderedDict()
+    form_properties = OrderedDict()  # type: dict
     for code, property_ in g.properties.items():
         form_properties[code] = code + ' ' + property_.name
     form.property.choices = form_properties.items()
