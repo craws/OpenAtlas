@@ -326,7 +326,7 @@ class TableMultiSelect(HiddenInput):
         headers_len = str(len(Table.HEADERS[class_]))
 
         # Make checkbox column sortable and show selected on top
-        table = Table(Table.HEADERS[class_], order='[[' + headers_len + ', "asc"], [0, "asc"]]')
+        table = Table(Table.HEADERS[class_], order='[[' + headers_len + ', "desc"], [0, "asc"]]')
 
         # Table definitions (ordering and aligning)
         defs = '{"orderDataType": "dom-checkbox", "targets":' + headers_len + '}'
