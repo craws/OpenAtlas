@@ -271,10 +271,12 @@ def place_update(id_):
     elif object_.system_type == 'feature':
         place = object_.get_linked_entity('P46', True)
 
+    overlays = OverlayMapper.get_by_object(object_) if current_user.settings['module_map_overlay'] \
+        else None
+
     return render_template('place/update.html', form=form, object_=object_, gis_data=gis_data,
                            place=place, feature=feature, stratigraphic_unit=stratigraphic_unit,
-                           overlays=OverlayMapper.get_by_object(object_),
-                           geonames_buttons=geonames_buttons)
+                           overlays=overlays, geonames_buttons=geonames_buttons)
 
 
 def save(form: DateForm, object_=None, location=None, origin=None) -> str:

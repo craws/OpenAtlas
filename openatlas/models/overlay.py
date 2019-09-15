@@ -51,8 +51,6 @@ class OverlayMapper:
 
     @staticmethod
     def get_by_object(object_) -> Union[None, dict]:
-        if not current_user.settings['module_map_overlay']:
-            return None
         ids = [object_.id]
 
         # Get overlays of parents

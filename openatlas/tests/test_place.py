@@ -127,21 +127,24 @@ class PlaceTest(TestBaseCase):
             rv = self.app.get(url_for('overlay_insert', image_id=file.id, place_id=place.id,
                                       link_id=link_id))
             assert b'OpenAtlas logo' in rv.data
-            data = {'top_left_easting': 42,
-                    'top_left_northing': 12,
-                    'bottom_right_easting': 43,
-                    'bottom_right_northing': 13}
+            data = {'top_left_easting': 42, 'top_left_northing': 12,
+                    'bottom_right_easting': 43, 'bottom_right_northing': 13}
             rv = self.app.post(url_for('overlay_insert', image_id=file.id, place_id=place.id,
                                        link_id=link_id), data=data, follow_redirects=True)
             assert b'Edit' in rv.data
 
-            # To do: finish test - its and authentication problem (is_authorized('editor'))
-            #with app.test_request_context():
-            #    app.preprocess_request()
-            #    overlay = OverlayMapper.get_by_object(place)
-
-            #rv = self.app.get(url_for('overlay_update', id_=overlay.id))
-            #assert b'42' in rv.data
+            with app.test_request_context():
+                app.preprocess_request()
+                overlay = OverlayMapper.get_by_object(place)
+                overlay_id = overlay[list(overlay.keys())[0]].id
+            rv = self.app.get(url_for('overlay_update', id_=overlay_id, place_id=place.id,
+                                      link_id=link_id))
+            assert b'42' in rv.data
+            rv = self.app.post(url_for('overlay_update', id_=overlay_id, place_id=place.id,
+                                       link_id=link_id), data=data, follow_redirects=True)
+            assert b'Changes have been saved' in rv.data
+            self.app.get(url_for('overlay_remove', id_=overlay_id, place_id=place.id),
+                         follow_redirects=True)
 
             # Place types
             rv = self.app.get(url_for('node_move_entities', id_=unit_sub1.id))
