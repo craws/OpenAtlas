@@ -16,13 +16,13 @@
             </div>
             <div class="table-row">
                 <div>{{ _('top left')|uc_first }}</div>
-                <div class="table-cell">{{ form.top_left_easting }}</div>
-                <div class="table-cell">{{ form.top_left_northing }}</div>
+                <div class="table-cell">{{ form.top_left_easting(class_='number') }}</div>
+                <div class="table-cell">{{ form.top_left_northing(class_='number') }}</div>
             </div>
             <div class="table-row">
                 <div>{{ _('bottom right')|uc_first }}</div>
-                <div class="table-cell">{{ form.bottom_right_easting }}</div>
-                <div class="table-cell">{{ form.bottom_right_northing }}</div>
+                <div class="table-cell">{{ form.bottom_right_easting(class_='number') }}</div>
+                <div class="table-cell">{{ form.bottom_right_northing(class_='number') }}</div>
             </div>
         </div>
         {{ form.save }}
