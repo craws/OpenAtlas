@@ -83,6 +83,7 @@ def place_insert(origin_id=None):
         del form.geonames_id, form.geonames_precision  # pragma: no cover
     if form.validate_on_submit():
         return redirect(save(form, origin=origin))
+
     if title == 'place':
         form.alias.append_entry('')
     gis_data = GisMapper.get_all()
@@ -93,8 +94,14 @@ def place_insert(origin_id=None):
         place = feature.get_linked_entity('P46', True)
     elif origin and origin.system_type == 'feature':
         place = origin.get_linked_entity('P46', True)
+
+    overlays = None
+    if origin and origin.class_.code == 'E18' and current_user.settings['module_map_overlay']:
+        overlays = OverlayMapper.get_by_object(origin)
+
     return render_template('place/insert.html', form=form, title=title, place=place, origin=origin,
-                           gis_data=gis_data, feature=feature, geonames_buttons=geonames_buttons)
+                           gis_data=gis_data, feature=feature, geonames_buttons=geonames_buttons,
+                           overlays=overlays)
 
 
 @app.route('/place/view/<int:id_>')
@@ -120,7 +127,6 @@ def place_view(id_):
     overlays = None
     if current_user.settings['module_map_overlay']:
         overlays = OverlayMapper.get_by_object(object_)
-        print(overlays)
         if is_authorized('editor'):
             tables['file'].header.append(uc_first(_('overlay')))
 
