@@ -355,7 +355,7 @@ class LogForm(Form):
 def admin_log() -> str:
     form = LogForm()
     form.user.choices = [(0, _('all'))] + UserMapper.get_users()
-    table = Table(['date', 'priority', 'type', 'message', 'user', 'info'])
+    table = Table(['date', 'priority', 'type', 'message', 'user', 'info'], order='[[0, "desc"]]')
     logs = logger.get_system_logs(form.limit.data, form.priority.data, form.user.data)
     for row in logs:
         user = UserMapper.get_by_id(row.user_id) if row.user_id else None

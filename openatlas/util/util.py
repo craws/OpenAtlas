@@ -9,10 +9,9 @@ from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
 from html.parser import HTMLParser
-from typing import Optional, Iterator
+from typing import Iterator, Optional
 
 import numpy
-from babel import dates
 from flask import abort, flash, g, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
@@ -364,16 +363,14 @@ def uc_first(string: str) -> str:
     return str(string)[0].upper() + str(string)[1:] if string else ''
 
 
-def format_datetime(value, format_='medium'):
-    return dates.format_datetime(value, format=format_, locale=session['language']) if value else ''
-
-
 def format_date(value):
-    if not value:
-        return ''
     if type(value) is numpy.datetime64:
         return DateMapper.datetime64_to_timestamp(value)
-    return value.date().isoformat()
+    return value.date().isoformat() if value else ''
+
+
+def format_datetime(value):
+    return value.replace(microsecond=0).isoformat() if value else ''
 
 
 def get_profile_image_table_link(file, entity, extension, profile_image_id):
