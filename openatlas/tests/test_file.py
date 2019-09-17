@@ -1,4 +1,5 @@
 import os
+
 from flask import url_for
 
 from openatlas import app
@@ -23,14 +24,14 @@ class FileTest(TestBaseCase):
             assert b'+ File' in rv.data
 
             with open(os.path.dirname(__file__) + '/../static/images/layout/logo.png', 'rb') as img:
-                rv = self.app.post(
-                    url_for('file_insert', code='E7', origin_id=actor_id),
-                    data={'name': 'OpenAtlas logo', 'file': img}, follow_redirects=True)
+                rv = self.app.post(url_for('file_insert', origin_id=actor_id),
+                                   data={'name': 'OpenAtlas logo', 'file': img},
+                                   follow_redirects=True)
             assert b'An entry has been created' in rv.data
             with open(os.path.dirname(__file__) + '/../static/images/layout/logo.png', 'rb') as img:
-                rv = self.app.post(
-                    url_for('file_insert', code='E7', origin_id=reference_id),
-                    data={'name': 'OpenAtlas logo', 'file': img}, follow_redirects=True)
+                rv = self.app.post(url_for('file_insert', origin_id=reference_id),
+                                   data={'name': 'OpenAtlas logo', 'file': img},
+                                   follow_redirects=True)
             assert b'An entry has been created' in rv.data
             with app.test_request_context():
                 app.preprocess_request()
@@ -49,13 +50,13 @@ class FileTest(TestBaseCase):
             assert b'Change logo' in rv.data
 
             with open(os.path.dirname(__file__) + '/test_file.py', 'rb') as invalid_file:
-                rv = self.app.post(
-                    url_for('file_insert', code='E7', origin_id=actor_id),
-                    data={'name': 'Invalid file', 'file': invalid_file}, follow_redirects=True)
+                rv = self.app.post(url_for('file_insert', origin_id=actor_id),
+                                   data={'name': 'Invalid file', 'file': invalid_file},
+                                   follow_redirects=True)
             assert b'File type not allowed' in rv.data
 
-            rv = self.app.post(url_for('file_insert', code='E7', origin_id=actor_id),
-                               data={'name': 'This is not a file'}, follow_redirects=True)
+            rv = self.app.post(url_for('file_insert', origin_id=actor_id), follow_redirects=True,
+                               data={'name': 'This is not a file'})
             assert b'This field is required' in rv.data
 
             # View
@@ -76,8 +77,8 @@ class FileTest(TestBaseCase):
             # Add
             rv = self.app.get(url_for('file_add', origin_id=actor_id))
             assert b'Add File' in rv.data
-            rv = self.app.post(url_for('file_add', origin_id=actor_id), data={'values': file_id},
-                               follow_redirects=True)
+            rv = self.app.post(url_for('file_add', origin_id=actor_id), follow_redirects=True,
+                               data={'checkbox_values': [file_id]})
             assert b'OpenAtlas logo' in rv.data
 
             # Set and unset as main image
@@ -95,7 +96,7 @@ class FileTest(TestBaseCase):
             rv = self.app.get(url_for('file_add2', id_=file_id, class_name='actor'))
             assert b'Add Actor' in rv.data
             rv = self.app.post(url_for('file_add2', id_=file_id, class_name='actor'),
-                               data={'values': actor_id}, follow_redirects=True)
+                               data={'checkbox_values': [actor_id]}, follow_redirects=True)
             assert b'File keeper' in rv.data
 
             # Delete

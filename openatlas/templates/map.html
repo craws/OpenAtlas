@@ -1,5 +1,5 @@
 <script>
-    var geoNamesModule = '{{ current_user.settings['module_geonames'] }}';
+    var geoNamesModule = {{ 'true' if geonames_buttons else 'false' }};
     var geoNamesUsername = '{{ config['GEONAMES_USERNAME'] }}';
     var thunderforestKey = '{{ config['THUNDERFOREST_KEY'] }}';
     var gisPointAll = {{ gis_data['gisPointAll']|safe }};
@@ -33,12 +33,19 @@
     translate['map_geonames_title'] = '{{ _('Search by location name or postcode')|safe }}';
     translate['map_geonames_placeholder'] = '{{ _('Enter a location name')|safe }}';
 
-    overlayHack = false;
-    {% if session['settings']['overlay_hack'] %}
-        overlayHack = true;
+    overlays = [];
+    {% if current_user.settings['module_geonames'] and overlays is defined and overlays and overlays|length %}
+        overlays = [
+            {% for image_id, overlay in overlays.items() %}
+                {
+                    name: '{{ overlay.name }}',
+                    image: '{{ overlay.image_name }}',
+                    boundingBox: {{ overlay.bounding_box }}
+                },
+            {% endfor %}
+        ];
     {% endif %}
 </script>
-
 <link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/leaflet.css" />
 <link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/fullscreen/leaflet.fullscreen.css" />
 <link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/Geonames-0.4.7/L.Control.Geonames.css" />

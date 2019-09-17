@@ -22,7 +22,7 @@ class GisMapper:
         subunit_selected_id = 0
         if objects:
             if type(objects) is not list:
-                if objects.system_type in ['feature', 'finds', 'stratigraphic unit']:
+                if objects.system_type in ['feature', 'find', 'stratigraphic unit']:
                     subunit_selected_id = objects.id
                 objects = [objects]
         else:

@@ -56,8 +56,8 @@ def import_project_insert():
 
 @app.route('/import/project/view/<int:id_>')
 @required_group('contributor')
-def import_project_view(id_):
-    table = Table([_('name'), _('class'), _('description'), 'origin ID', _('date')], defs='[{"orderDataType": "iso-date", "targets":[4]}]')
+def import_project_view(id_: int):
+    table = Table([_('name'), _('class'), _('description'), 'origin ID', _('date')])
     for entity in EntityMapper.get_by_project_id(id_):
         table.rows.append([link(entity),
                            entity.class_.name,
@@ -70,7 +70,7 @@ def import_project_view(id_):
 
 @app.route('/import/project/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('manager')
-def import_project_update(id_):
+def import_project_update(id_: int):
     project = ImportMapper.get_project_by_id(id_)
     form = ProjectForm(obj=project)
     form.project_id = id_
@@ -85,7 +85,7 @@ def import_project_update(id_):
 
 @app.route('/import/project/delete/<int:id_>')
 @required_group('manager')
-def import_project_delete(id_):
+def import_project_delete(id_: int):
     ImportMapper.delete_project(id_)
     flash(_('project deleted'), 'info')
     return redirect(url_for('import_index'))
@@ -112,7 +112,7 @@ class ImportForm(Form):
 
 @app.route('/import/data/<int:project_id>/<class_code>', methods=['POST', 'GET'])
 @required_group('manager')
-def import_data(project_id, class_code):
+def import_data(project_id: int, class_code: str):
     project = ImportMapper.get_project_by_id(project_id)
     form = ImportForm()
     table = None

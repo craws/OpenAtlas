@@ -20,12 +20,13 @@ $(document).ready(function() {
         });
     };
 
-    // DataTables - sort for date columns
-    $.fn.dataTable.ext.order['iso-date'] = function(settings, col) {
+    // DataTables - sort for CIDOC model
+    $.fn.dataTable.ext.order['cidoc-model'] = function(settings, col) {
         return this.api().column(col, {order:'index'}).nodes().map( function (td, i) {
-            const d = td.innerText.split('.');
-            if (d.length === 3) return Date.parse(`${d[2]}-${d[1]}-${d[0]}`);
-            return Date.parse(td.innerText);
+            const d = td.firstChild.innerText
+                .replace('OA', '100')
+                .replace(/[\D]*/,'');
+            return parseInt(d, 10);
         });
     };
 
@@ -33,7 +34,7 @@ $(document).ready(function() {
     (function(){
         function removeAccents ( data ) {
             if ( data.normalize ) {
-                // Use I18n API if avaiable to split characters and accents, then remove
+                // Use I18n API if available to split characters and accents, then remove
                 // the accents wholesale. Note that we use the original data as well as
                 // the new to allow for searching of either form.
                 return data +' '+ data

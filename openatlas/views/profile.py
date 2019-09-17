@@ -53,6 +53,7 @@ class ProfileForm(Form):
     layout = SelectField(_('layout'), description=_('tooltip layout'), choices=layout_choices)
     max_zoom = IntegerField(description=_('tooltip max zoom'))
     module_geonames = BooleanField(description=_('tooltip geonames'))
+    module_map_overlay = BooleanField(description=_('tooltip map overlay'))
     module_notes = BooleanField(description=_('tooltip notes'))
     save = SubmitField(_('save'))
 
@@ -74,6 +75,7 @@ def profile_index() -> str:
                         (_('layout'), user.settings['layout']),
                         (_('max map zoom'), user.settings['max_zoom'])],
             'modules': [(_('GeoNames'), user.settings['module_geonames']),
+                        (_('map overlay'), user.settings['module_map_overlay']),
                         (_('notes'), user.settings['module_notes'])]}
     return render_template('profile/index.html', data=data)
 
@@ -91,6 +93,7 @@ def profile_update():
         user.settings['language'] = form.language.data
         user.settings['table_rows'] = form.table_rows.data
         user.settings['module_geonames'] = form.module_geonames.data
+        user.settings['module_map_overlay'] = form.module_map_overlay.data
         user.settings['module_notes'] = form.module_notes.data
         user.settings['max_zoom'] = form.max_zoom.data
         user.settings[
@@ -129,6 +132,8 @@ def profile_update():
     form.max_zoom.label.text = uc_first(_('max map zoom'))
     form.module_geonames.data = user.settings['module_geonames']
     form.module_geonames.label.text = 'GeoNames'
+    form.module_map_overlay.data = user.settings['module_map_overlay']
+    form.module_map_overlay.label.text = uc_first(_('map overlay'))
     form.module_notes.data = user.settings['module_notes']
     form.module_notes.label.text = uc_first(_('notes'))
     form.save.label.text = uc_first(_('save'))

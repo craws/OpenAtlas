@@ -13,7 +13,7 @@ from flask_wtf import Form
 from flask_wtf.csrf import CsrfProtect
 from wtforms import StringField, SubmitField
 
-app = Flask(__name__, instance_relative_config=True)
+app = Flask(__name__, instance_relative_config=True)  # type: Flask
 csrf = CsrfProtect(app)  # Make sure all forms are CSRF protected
 
 # Use the test database if running tests
@@ -40,7 +40,8 @@ logger = DBHandler()
 from openatlas.util import filters
 from openatlas.views import (actor, admin, ajax, content, event, export, hierarchy, index,
                              involvement, imports, link, login, types, model, place, profile, note,
-                             reference, source, translation, user, relation, member, search, file)
+                             overlay, reference, source, translation, user, relation, member,
+                             search, file)
 
 
 @babel.localeselector
@@ -94,11 +95,6 @@ def before_request() -> None:
 
     # Set max file upload in MB
     app.config['MAX_CONTENT_LENGTH'] = session['settings']['file_upload_max_size'] * 1024 * 1024
-
-    # Workaround overlay maps for Thanados until #978 is implemented
-    session['settings']['overlay_hack'] = False
-    if session['settings']['site_name'] == 'Thanados':
-        session['settings']['overlay_hack'] = True  # pragma: no cover
 
 
 @app.after_request

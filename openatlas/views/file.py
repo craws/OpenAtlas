@@ -1,4 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+import ast
 import datetime
 import math
 import os
@@ -81,7 +82,7 @@ def file_remove_profile_image(entity_id: int):
 @app.route('/file/index')
 @required_group('readonly')
 def file_index():
-    table = Table(['date'] + Table.HEADERS['file'], defs='[{"orderDataType": "iso-date", "targets":[0]}]')
+    table = Table(['date'] + Table.HEADERS['file'])
     file_stats = get_file_stats()
     for entity in EntityMapper.get_by_system_type('file', nodes=True):
         date = 'N/A'
@@ -110,7 +111,8 @@ def file_add(origin_id: int):
     """ Link an entity to file coming from the entity."""
     origin = EntityMapper.get_by_id(origin_id)
     if request.method == 'POST':
-        origin.link('P67', request.form.getlist('values'), inverse=True)
+        if request.form['checkbox_values']:
+            origin.link('P67', ast.literal_eval(request.form['checkbox_values']), inverse=True)
         return redirect(url_for(origin.view_name + '_view', id_=origin.id) + '#tab-file')
     form = build_table_form('file', origin.get_linked_entities('P67', inverse=True))
     return render_template('file/add.html', origin=origin, form=form)
@@ -122,7 +124,8 @@ def file_add2(id_: int, class_name: str):
     """ Link an entity to file coming from the file"""
     file = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
-        file.link('P67', request.form.getlist('values'))
+        if request.form['checkbox_values']:
+            file.link('P67', ast.literal_eval(request.form['checkbox_values']))
         return redirect(url_for('file_view', id_=file.id) + '#tab-' + class_name)
     form = build_table_form(class_name, file.get_linked_entities('P67'))
     return render_template('file/add2.html', entity=file, class_name=class_name, form=form)

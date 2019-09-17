@@ -2,7 +2,7 @@
 import datetime
 import random
 import string
-from typing import Optional
+from typing import Optional, Union
 
 import bcrypt
 from flask import g, session
@@ -101,7 +101,7 @@ class UserMapper:
         return User(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod
-    def get_activities(limit: str, user_id: str, action: str):
+    def get_activities(limit: Union[int, str], user_id: Union[int, str], action: str):
         sql = """
             SELECT id, user_id, entity_id, created, action, 'ignore' AS ignore
             FROM web.user_log WHERE TRUE"""
@@ -165,7 +165,8 @@ class UserMapper:
     @staticmethod
     def update_settings(user):
         for name, value in user.settings.items():
-            if name in ['newsletter', 'show_email', 'module_geonames', 'module_notes']:
+            if name in ['newsletter', 'show_email',
+                        'module_geonames', 'module_map_overlay', 'module_notes']:
                 value = 'True' if user.settings[name] else ''
             sql = """
                     INSERT INTO web.user_settings (user_id, "name", "value")
@@ -203,7 +204,8 @@ class UserMapper:
         sql = 'SELECT "name", value FROM web.user_settings WHERE user_id = %(user_id)s;'
         g.execute(sql, {'user_id': user_id})
         settings = {row.name: row.value for row in g.cursor.fetchall()}
-        for item in ['newsletter', 'show_email', 'module_notes', 'module_geonames']:
+        for item in ['newsletter', 'show_email',
+                     'module_notes', 'module_geonames', 'module_map_overlay']:
             settings[item] = True if item in settings and settings[item] == 'True' else False
         if 'table_show_aliases' in settings and settings['table_show_aliases'] == 'False':
             settings['table_show_aliases'] = False

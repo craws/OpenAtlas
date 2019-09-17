@@ -1,4 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+import ast
+
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
@@ -63,6 +65,9 @@ def source_view(id_):
                                     truncate_string(text.description)])
     for name in ['actor', 'event', 'place', 'feature', 'stratigraphic-unit', 'find']:
         tables[name] = Table(Table.HEADERS[name])
+    tables['actor'].defs = '[{className: "dt-body-right", targets: [2,3]}]'
+    tables['event'].defs = '[{className: "dt-body-right", targets: [3,4]}]'
+    tables['place'].defs = '[{className: "dt-body-right", targets: [2,3]}]'
     for link_ in source.get_links('P67'):
         range_ = link_.range
         data = get_base_table_data(range_)
@@ -100,15 +105,8 @@ def source_add(origin_id):
     """ Link an entity to source coming from the entity."""
     origin = EntityMapper.get_by_id(origin_id)
     if request.method == 'POST':
-        g.cursor.execute('BEGIN')
-        try:
-            for entity in EntityMapper.get_by_ids(request.form.getlist('values')):
-                entity.link('P67', origin)
-            g.cursor.execute('COMMIT')
-        except Exception as e:  # pragma: no cover
-            g.cursor.execute('ROLLBACK')
-            logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
+        if request.form['checkbox_values']:
+            origin.link('P67', ast.literal_eval(request.form['checkbox_values']), inverse=True)
         return redirect(url_for(origin.view_name + '_view', id_=origin.id) + '#tab-source')
     form = build_table_form('source', origin.get_linked_entities('P67', True))
     return render_template('source/add.html', origin=origin, form=form)
@@ -120,8 +118,8 @@ def source_add2(id_, class_name):
     """ Link an entity to source coming from the source"""
     source = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
-        for entity in EntityMapper.get_by_ids(request.form.getlist('values')):
-            source.link('P67', entity)
+        if request.form['checkbox_values']:
+            source.link('P67', ast.literal_eval(request.form['checkbox_values']))
         return redirect(url_for('source_view', id_=source.id) + '#tab-' + class_name)
     form = build_table_form(class_name, source.get_linked_entities('P67'))
     return render_template('source/add2.html', source=source, class_name=class_name, form=form)

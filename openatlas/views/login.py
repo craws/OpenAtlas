@@ -20,7 +20,7 @@ login_manager.login_view = 'login'
 
 
 @login_manager.user_loader
-def load_user(user_id):
+def load_user(user_id: int):
     return UserMapper.get_by_id(user_id, True)
 
 
@@ -112,7 +112,7 @@ def reset_password():
 
 
 @app.route('/reset_confirm/<code>')
-def reset_confirm(code):  # pragma: no cover
+def reset_confirm(code: str):  # pragma: no cover
     user = UserMapper.get_by_reset_code(code)
     if not user:
         logger.log('info', 'auth', 'unknown reset code')

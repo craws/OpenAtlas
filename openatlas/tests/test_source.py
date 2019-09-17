@@ -47,15 +47,14 @@ class SourceTest(TestBaseCase):
                                follow_redirects=True)
             assert b'Test source' in rv.data
             self.app.get(url_for('source_add', origin_id=actor_id))
-            data = {'values': source_id}
-            rv = self.app.post(url_for('source_add', origin_id=actor_id), data=data,
-                               follow_redirects=True)
+            rv = self.app.post(url_for('source_add', origin_id=actor_id),
+                               data={'checkbox_values': [source_id]}, follow_redirects=True)
             assert b'Gillian Anderson' in rv.data
 
             self.app.get(url_for('source_add2', origin_id=actor_id, id_=source_id,
                                  class_name='actor'))
             rv = self.app.post(url_for('source_add2', id_=source_id, class_name='actor'),
-                               data={'values': actor_id}, follow_redirects=True)
+                               data={'checkbox_values': [actor_id]}, follow_redirects=True)
             assert b'Gillian Anderson' in rv.data
             rv = self.app.get(url_for('source_view', id_=source_id))
             assert b'Gillian Anderson' in rv.data

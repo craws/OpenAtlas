@@ -18,7 +18,8 @@ from openatlas.util.util import (bookmark_toggle, format_date, link, required_gr
 
 
 class FeedbackForm(Form):
-    subject = SelectField(_('subject'), choices=list(app.config['FEEDBACK_SUBJECTS'].items()),
+    subject = SelectField(_('subject'),
+                          choices=list(app.config['FEEDBACK_SUBJECTS'].items()),
                           render_kw={'autofocus': True})
     description = TextAreaField(_('description'), [InputRequired()])
     send = SubmitField(_('send'))
@@ -26,12 +27,15 @@ class FeedbackForm(Form):
 
 @app.route('/')
 @app.route('/overview')
-def index():
-    tables = {'overview': Table(paging=False),
-              'bookmarks': Table(['name', 'class', 'first', 'last'], defs='[{"orderDataType": "iso-date", "targets":[2,3]}]'),
-              'notes': Table(['name', 'class', 'first', 'last', _('note')], defs='[{"orderDataType": "iso-date", "targets":[2,3]}]'),
+def index() -> str:
+    tables = {'overview': Table(paging=False, defs='[{className: "dt-body-right", targets: 1}]'),
+              'bookmarks': Table(['name', 'class', 'first', 'last'],
+                                 defs='[{className: "dt-body-right", targets: [2,3]}]'),
+              'notes': Table(['name', 'class', 'first', 'last', _('note')],
+                             defs='[{className: "dt-body-right", targets: [2,3]}]'),
               'latest': Table(['name', 'class', 'first', 'last', 'date', 'user'],
-                              order='[[4,"desc"]]', defs='[{"orderDataType": "iso-date", "targets":[2,3,4]}]')}
+                              order='[[4, "desc"]]',
+                              defs='[{className: "dt-body-right", targets: [2,3]}]')}
     if current_user.is_authenticated and hasattr(current_user, 'bookmarks'):
         for entity_id in current_user.bookmarks:
             entity = EntityMapper.get_by_id(entity_id)
@@ -58,7 +62,7 @@ def index():
 
 
 @app.route('/index/setlocale/<language>')
-def set_locale(language):
+def set_locale(language: str):
     session['language'] = language
     if hasattr(current_user, 'id') and current_user.id:
         current_user.settings['language'] = language
@@ -84,13 +88,13 @@ def index_feedback():
 
 
 @app.route('/overview/content/<item>')
-def index_content(item):
+def index_content(item: str) -> str:
     return render_template('index/content.html', text=ContentMapper.get_translation(item),
                            title=item)
 
 
 @app.route('/overview/credits')
-def index_credits():
+def index_credits() -> str:
     return render_template('index/credits.html')
 
 
@@ -110,12 +114,12 @@ def invalid_id(e):
 
 
 @app.route('/overview/changelog')
-def index_changelog():
+def index_changelog() -> str:
     return render_template('index/changelog.html', versions=Changelog.versions)
 
 
 @app.route('/unsubscribe/<code>')
-def index_unsubscribe(code):
+def index_unsubscribe(code: str) -> str:
     user = UserMapper.get_by_unsubscribe_code(code)
     text = _('unsubscribe link not valid')
     if user:  # pragma: no cover
