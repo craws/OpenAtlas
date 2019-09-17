@@ -257,7 +257,8 @@ class TableSelect(HiddenInput):
 
     def __call__(self, field, **kwargs):
         file_stats = None
-        class_ = 'place' if field.id in ['residence', 'begins_in', 'ends_in'] else field.id
+        place_fields = ['residence', 'begins_in', 'ends_in', 'place_to', 'place_from']
+        class_ = 'place' if field.id in place_fields else field.id
         if class_ == 'place':
             aliases = current_user.settings['table_show_aliases']
             entities = EntityMapper.get_by_system_type('place', nodes=True, aliases=aliases)

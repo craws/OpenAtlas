@@ -23,6 +23,8 @@ class EventForm(DateForm):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     event = TableField(_('sub event of'))
     place = TableField(_('location'))
+    place_from = TableField(_('start point'))
+    place_to = TableField(_('end point'))
     event_id = HiddenField()
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
@@ -62,6 +64,11 @@ def event_insert(code=str, origin_id=None) -> str:
     form = build_form(EventForm, 'Event')
     if code != 'E8':
         del form.given_place
+    if code == 'E9':
+        del form.place
+    else:
+        del form.place_from
+        del form.place_to
     if origin:
         del form.insert_and_continue
     if form.validate_on_submit():
@@ -85,6 +92,11 @@ def event_update(id_: int):
     form = build_form(EventForm, 'Event', event, request)
     if event.class_.code != 'E8':
         del form.given_place
+    if event.class_.code == 'E9':
+        del form.place
+    else:
+        del form.place_from
+        del form.place_to
     form.event_id.data = event.id
     if form.validate_on_submit():
         if was_modified(form, event):  # pragma: no cover
@@ -96,8 +108,9 @@ def event_update(id_: int):
         return redirect(url_for('event_view', id_=id_))
     super_event = event.get_linked_entity('P117')
     form.event.data = super_event.id if super_event else ''
-    place = event.get_linked_entity('P7')
-    form.place.data = place.get_linked_entity('P53', True).id if place else ''
+    if event.class_.code != 'E9':
+        place = event.get_linked_entity('P7')
+        form.place.data = place.get_linked_entity('P53', True).id if place else ''
     if event.class_.code == 'E8':  # Form data for acquisition
         form.given_place.data = [entity.id for entity in event.get_linked_entities('P24')]
     return render_template('event/update.html', form=form, event=event)
@@ -176,7 +189,7 @@ def save(form: Form, event=None, code=None, origin=None) -> str:
         if form.event.data:
             entity = EntityMapper.get_by_id(form.event.data)
             event.link('P117', entity)
-        if form.place.data:
+        if form.place and form.place.data:
             place = LinkMapper.get_linked_entity(int(form.place.data), 'P53')
             event.link('P7', place)
         if event.class_.code == 'E8' and form.given_place.data:  # Link place for acquisition

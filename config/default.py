@@ -67,7 +67,7 @@ CODE_CLASS = {
     'E33': 'source',
     'E7': 'event',
     'E8': 'event',
-    'E9': 'move',
+    'E9': 'event',
     'E21': 'actor',
     'E40': 'actor',
     'E74': 'actor',
