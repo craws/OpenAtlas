@@ -60,14 +60,13 @@ class GisMapper:
                 object_desc = row.object_desc.replace('"', '\"') if row.object_desc else ''
                 item = {'type': 'Feature',
                         'geometry': json.loads(row.geojson),
-                        'properties': {
-                            'objectId': row.object_id,
-                            'objectName': row.object_name.replace('"', '\"'),
-                            'objectDescription': object_desc,
-                            'id': row.id,
-                            'name': row.name.replace('"', '\"') if row.name else '',
-                            'description': description,
-                            'shapeType': row.type}}
+                        'properties': {'objectId': row.object_id,
+                                       'objectName': row.object_name.replace('"', '\"'),
+                                       'objectDescription': object_desc,
+                                       'id': row.id,
+                                       'name': row.name.replace('"', '\"') if row.name else '',
+                                       'description': description,
+                                       'shapeType': row.type}}
                 if hasattr(row, 'types') and row.types:
                     nodes_list = ast.literal_eval('[' + row.types + ']')
                     for node_id in list(set(nodes_list)):
