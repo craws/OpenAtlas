@@ -232,9 +232,18 @@ def get_entity_data(entity, location=None):
     if entity.aliases:
         data.append((uc_first(_('alias')), '<br />'.join(entity.aliases.values())))
 
-    # Dates
-    data.append((uc_first(_('begin')), format_entry_begin(entity)))
-    data.append((uc_first(_('end')), format_entry_end(entity)))
+    # Dates (and places if move)
+    from_link = ''
+    to_link = ''
+    if entity.class_.code == 'E9':
+        place_from = entity.get_linked_entity('P27')
+        if place_from:
+            from_link = link(place_from.get_linked_entity('P53', True)) + ' '
+        place_to = entity.get_linked_entity('P26')
+        if place_to:
+            to_link = link(place_to.get_linked_entity('P53', True)) + ' '
+    data.append((uc_first(_('begin')), (from_link if from_link else '') + format_entry_begin(entity)))
+    data.append((uc_first(_('end')), (to_link if to_link else '') + format_entry_end(entity)))
 
     # Types
     add_type_data(entity, data, location=location)
@@ -250,14 +259,8 @@ def get_entity_data(entity, location=None):
         if super_event:
             data.append((uc_first(_('sub event of')), link(super_event)))
 
-        if entity.class_.code == 'E9':
-            place_from = entity.get_linked_entity('P27')
-            if place_from:
-                data.append((uc_first(_('from')), link(place_from.get_linked_entity('P53', True))))
-            place_to = entity.get_linked_entity('P26')
-            if place_to:
-                data.append((uc_first(_('to')), link(place_to.get_linked_entity('P53', True))))
-        else:
+
+        if not entity.class_.code == 'E9':
             place = entity.get_linked_entity('P7')
             if place:
                 data.append((uc_first(_('location')), link(place.get_linked_entity('P53', True))))
