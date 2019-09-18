@@ -249,9 +249,18 @@ def get_entity_data(entity, location=None):
         super_event = entity.get_linked_entity('P117')
         if super_event:
             data.append((uc_first(_('sub event of')), link(super_event)))
-        place = entity.get_linked_entity('P7')
-        if place:
-            data.append((uc_first(_('location')), link(place.get_linked_entity('P53', True))))
+
+        if entity.class_.code == 'E9':
+            place_from = entity.get_linked_entity('P27')
+            if place_from:
+                data.append((uc_first(_('from')), link(place_from.get_linked_entity('P53', True))))
+            place_to = entity.get_linked_entity('P26')
+            if place_to:
+                data.append((uc_first(_('to')), link(place_to.get_linked_entity('P53', True))))
+        else:
+            place = entity.get_linked_entity('P7')
+            if place:
+                data.append((uc_first(_('location')), link(place.get_linked_entity('P53', True))))
 
         # Info for acquisitions
         if entity.class_.code == 'E8':
@@ -411,13 +420,13 @@ def link(entity) -> str:
                 url = url_for('translation_view', id_=entity.id)
         elif entity.system_type == 'file':
             url = url_for('file_view', id_=entity.id)
-        elif entity.class_.code in ('E7', 'E8'):
+        elif entity.class_.code in (app.config['CLASS_CODES']['event']):
             url = url_for('event_view', id_=entity.id)
-        elif entity.class_.code in ('E21', 'E74', 'E40'):
+        elif entity.class_.code in (app.config['CLASS_CODES']['actor']):
             url = url_for('actor_view', id_=entity.id)
-        elif entity.class_.code in ('E18', 'E22'):
+        elif entity.class_.code in (app.config['CLASS_CODES']['place']):
             url = url_for('place_view', id_=entity.id)
-        elif entity.class_.code in ('E31', 'E84'):
+        elif entity.class_.code in (app.config['CLASS_CODES']['reference']):
             url = url_for('reference_view', id_=entity.id)
         elif entity.class_.code in ['E55', 'E53']:
             url = url_for('node_view', id_=entity.id)

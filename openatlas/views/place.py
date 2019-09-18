@@ -163,7 +163,7 @@ def place_view(id_):
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
         tables[domain.view_name].rows.append(data)
     event_ids = []  # Keep track of already inserted events to prevent doubles
-    for event in location.get_linked_entities(['P7'], inverse=True):
+    for event in location.get_linked_entities(['P7', 'P26', 'P27'], inverse=True):
         tables['event'].rows.append(get_base_table_data(event))
         event_ids.append(event.id)
     for event in object_.get_linked_entities(['P24'], inverse=True):

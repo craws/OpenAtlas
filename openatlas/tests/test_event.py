@@ -36,6 +36,8 @@ class EventTest(TestBaseCase):
             self.app.post(url_for('event_insert', code='E7', origin_id=actor_id), data=data)
             self.app.post(url_for('event_insert', code='E7', origin_id=file_id), data=data)
             self.app.post(url_for('event_insert', code='E7', origin_id=source_id), data=data)
+
+            # Acquisition
             rv = self.app.post(url_for('event_insert', code='E8'),
                                data={'name': 'Test event',
                                      'given_place': '[' + str(residence_id) + ']',
@@ -48,6 +50,17 @@ class EventTest(TestBaseCase):
             event_id = rv.location.split('/')[-1]
             rv = self.app.get(url_for('event_view', id_=event_id))
             assert b'Test event' in rv.data
+
+            # Move
+            rv = self.app.post(url_for('event_insert', code='E9'),
+                               data={'name': 'Keep it moving', 'place_to': residence_id,
+                                     'place_from': residence_id})
+            move_id = rv.location.split('/')[-1]
+            rv = self.app.get(url_for('event_view', id_=move_id))
+            assert b'Keep it moving' in rv.data
+            rv = self.app.get(url_for('event_update', id_=move_id))
+            assert b'Keep it moving' in rv.data
+
             # Add another event and test if events are seen at place
             self.app.post(url_for('event_insert', code='E8'),
                           data={'name': 'Dusk', 'given_place': '[' + str(residence_id) + ']'})
@@ -55,9 +68,8 @@ class EventTest(TestBaseCase):
             assert b'Test event' in rv.data
             rv = self.app.get(url_for('actor_view', id_=actor_id))
             assert b'Game master' in rv.data
-            rv = self.app.post(
-                url_for('event_insert', code='E8'), follow_redirects=True,
-                data={'name': 'Test event', 'continue_': 'yes'})
+            rv = self.app.post(url_for('event_insert', code='E8'), follow_redirects=True,
+                               data={'name': 'Test event', 'continue_': 'yes'})
             assert b'An entry has been created' in rv.data
             rv = self.app.get(url_for('event_index'))
             assert b'Test event' in rv.data
