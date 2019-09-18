@@ -232,17 +232,18 @@ def get_entity_data(entity, location=None):
     if entity.aliases:
         data.append((uc_first(_('alias')), '<br />'.join(entity.aliases.values())))
 
-    # Dates (and places if move)
+    # Dates
     from_link = ''
     to_link = ''
-    if entity.class_.code == 'E9':
+    if entity.class_.code == 'E9':  # Add places to dates if it's a move
         place_from = entity.get_linked_entity('P27')
         if place_from:
             from_link = link(place_from.get_linked_entity('P53', True)) + ' '
         place_to = entity.get_linked_entity('P26')
         if place_to:
             to_link = link(place_to.get_linked_entity('P53', True)) + ' '
-    data.append((uc_first(_('begin')), (from_link if from_link else '') + format_entry_begin(entity)))
+    data.append((uc_first(_('begin')), (from_link if from_link else '') +
+                 format_entry_begin(entity)))
     data.append((uc_first(_('end')), (to_link if to_link else '') + format_entry_end(entity)))
 
     # Types
@@ -258,7 +259,6 @@ def get_entity_data(entity, location=None):
         super_event = entity.get_linked_entity('P117')
         if super_event:
             data.append((uc_first(_('sub event of')), link(super_event)))
-
 
         if not entity.class_.code == 'E9':
             place = entity.get_linked_entity('P7')
