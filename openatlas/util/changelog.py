@@ -6,6 +6,7 @@ class Changelog:
     versions = OrderedDict()  # type: OrderedDict
     versions['3.20.0'] = ['TBA', OrderedDict([
         ('feature', OrderedDict([
+            ('1038', 'Move events'),
             ('978', 'Image overlays for maps'),
             ('1043', 'DataTables'),
             ('1056', 'Add more codes to GeoNames search'),
