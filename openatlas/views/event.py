@@ -11,6 +11,7 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.forms.forms import DateForm, TableField, TableMultiField, build_form
 from openatlas.models.entity import EntityMapper
+from openatlas.models.gis import GisMapper
 from openatlas.models.link import LinkMapper
 from openatlas.models.user import UserMapper
 from openatlas.util.table import Table
@@ -173,8 +174,12 @@ def event_view(id_: int) -> str:
         tables[domain.view_name].rows.append(data)
     for sub_event in event.get_linked_entities('P117', inverse=True, nodes=True):
         tables['subs'].rows.append(get_base_table_data(sub_event))
+    objects = []
+    for location in event.get_linked_entities(['P7', 'P26', 'P27']):
+        objects.append(location.get_linked_entity('P53', True))
     return render_template('event/view.html', event=event, tables=tables,
-                           profile_image_id=profile_image_id)
+                           profile_image_id=profile_image_id,
+                           gis_data=GisMapper.get_all(objects) if objects else None)
 
 
 def save(form: Form, event=None, code=None, origin=None) -> str:
