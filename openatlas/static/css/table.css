@@ -3,6 +3,7 @@ table.dataTable {
     width: auto;
     margin: 0;
     margin-bottom: 1em;
+    text-align: left;
 }
 
 table.dataTable.stripe tbody tr.odd,
@@ -49,8 +50,4 @@ table.dataTable.compact tbody td {
 
 .dataTables_wrapper .ui-toolbar {
     padding: 0;
-}
-
-.DataTables_sort_icon {
-    display: none;
 }

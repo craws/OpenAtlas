@@ -250,6 +250,7 @@ input.table-select {
     display: inline-block;
     margin-right: 1em;
     padding: 0.3em 0.5em;
+    padding-top: 0.4em;
 }
 
 noscript div {
