@@ -26,6 +26,7 @@ class EventForm(DateForm):
     place = TableField(_('location'))
     place_from = TableField(_('from'))
     place_to = TableField(_('to'))
+    information_carrier = TableMultiField()
     event_id = HiddenField()
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
