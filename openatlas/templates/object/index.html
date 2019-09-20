@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    {{ _('object')|uc_first }}
+{% endblock %}
+{% block content %}
+    {{ 'Object'|manual_link|safe }}
+    {% if 'contributor'|is_authorized %}
+        <div class="button-bar">
+            <a href="{{ url_for('object_insert', code='carrier') }}">+ {{ 'E84'|get_class_name }}</a>
+        </div>
+    {% endif %}
+    {{ table.display()|safe }}
+{% endblock %}

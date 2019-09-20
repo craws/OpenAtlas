@@ -1,0 +1,108 @@
+# Created by Alexander Watzinger and others. Please see README.md for licensing information
+from typing import Optional
+
+from flask import flash, g, render_template, request, url_for
+from flask_babel import lazy_gettext as _
+from flask_wtf import Form
+from werkzeug.utils import redirect
+from wtforms import HiddenField, StringField, SubmitField, TextAreaField
+from wtforms.validators import InputRequired, URL
+
+import openatlas
+from openatlas import app, logger
+from openatlas.forms.forms import TableField, build_form
+from openatlas.models.entity import EntityMapper
+from openatlas.models.link import LinkMapper
+from openatlas.models.user import UserMapper
+from openatlas.util.table import Table
+from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
+                                 is_authorized, link, required_group, truncate_string, uc_first,
+                                 was_modified, get_profile_image_table_link)
+
+
+class InformationCarrierForm(Form):
+    name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
+    description = TextAreaField(_('description'))
+    save = SubmitField(_('insert'))
+    insert_and_continue = SubmitField(_('insert and continue'))
+    continue_ = HiddenField()
+    opened = HiddenField()
+
+
+@app.route('/object')
+@required_group('readonly')
+def object_index():
+    table = Table(Table.HEADERS['object'] + ['description'])
+    for object_ in EntityMapper.get_by_codes('object'):
+        data = get_base_table_data(object_)
+        data.append(truncate_string(object_.description))
+        table.rows.append(data)
+    return render_template('object/index.html', table=table)
+
+
+@app.route('/object/view/<int:id_>')
+@required_group('readonly')
+def object_view(id_):
+    object_ = EntityMapper.get_by_id(id_, nodes=True)
+    object_.note = UserMapper.get_note(object_)
+    tables = {'info': get_entity_data(object_), 'source': Table(Table.HEADERS['source'])}
+    return render_template('object/view.html', object_=object_, tables=tables)
+
+
+@app.route('/object/insert')
+def object_insert():
+    return render_template('object/insert.html')
+
+
+@app.route('/object/update/<int:id_>', methods=['POST', 'GET'])
+@required_group('contributor')
+def object_update(id_: int):
+    object_ = EntityMapper.get_by_id(id_, nodes=True)
+    form = build_form(InformationCarrierForm, object_.system_type.title(), object_, request)
+    if form.validate_on_submit():
+        if was_modified(form, object_):  # pragma: no cover
+            del form.save
+            flash(_('error modified'), 'error')
+            modifier = link(logger.get_log_for_advanced_view(object_.id)['modifier'])
+            return render_template('object/update.html', form=form, object_=object_,
+                                   modifier=modifier)
+        save(form, object_)
+        return redirect(url_for('object_view', id_=id_))
+    return render_template('object/update.html', form=form, object_=object_)
+
+
+def save(form, object_=None, origin=None):
+    g.cursor.execute('BEGIN')
+    log_action = 'update'
+    try:
+        if not object_:
+            log_action = 'insert'
+            object_ = EntityMapper.insert('E84', form.name.data, 'information carrier')
+        object_.name = form.name.data
+        object_.description = form.description.data
+        object_.update()
+        object_.save_nodes(form)
+        url = url_for('object_view', id_=object_.id)
+        if origin:
+            link_id = object_.link('P67', origin)
+            url = url_for('object_link_update', link_id=link_id, origin_id=origin.id)
+        if form.continue_.data == 'yes':
+            url = url_for('object_insert')
+        g.cursor.execute('COMMIT')
+        logger.log_user(object_.id, log_action)
+        flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
+    except Exception as e:  # pragma: no cover
+        g.cursor.execute('ROLLBACK')
+        logger.log('error', 'database', 'transaction failed', e)
+        flash(_('error transaction'), 'error')
+        url = url_for('object_index')
+    return url
+
+
+@app.route('/object/delete/<int:id_>')
+@required_group('contributor')
+def object_delete(id_):
+    EntityMapper.delete(id_)
+    logger.log_user(id_, 'delete')
+    flash(_('entity deleted'), 'info')
+    return redirect(url_for('object_index'))
