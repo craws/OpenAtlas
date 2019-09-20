@@ -154,6 +154,8 @@ class Entity:
             root_name = uc_first(self.system_type)
             if self.system_type == 'stratigraphic unit':
                 root_name = 'Stratigraphic Unit'
+        elif self.class_.code == 'E84':
+            root_name = 'Information Carrier'
         root_id = NodeMapper.get_hierarchy_by_name(root_name).id
         for node in self.nodes:
             if node.root and node.root[-1] == root_id:

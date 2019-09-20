@@ -429,9 +429,10 @@ def link(entity) -> str:
             url = url_for('actor_view', id_=entity.id)
         elif entity.class_.code in (app.config['CLASS_CODES']['place']):
             url = url_for('place_view', id_=entity.id)
-        elif entity.class_.code in (app.config['CLASS_CODES']['reference'] +
-                                    app.config['CLASS_CODES']['information_carrier']):
+        elif entity.class_.code in (app.config['CLASS_CODES']['reference']):
             url = url_for('reference_view', id_=entity.id)
+        elif entity.class_.code in (app.config['CLASS_CODES']['object']):
+            url = url_for('object_view', id_=entity.id)
         elif entity.class_.code in ['E55', 'E53']:
             url = url_for('node_view', id_=entity.id)
             if not entity.root:
@@ -462,9 +463,9 @@ def get_base_table_data(entity, file_stats=None):
         truncate_string(alias) for alias in entity.aliases.values()])]
     if entity.view_name in ['event', 'actor']:
         data.append(g.classes[entity.class_.code].name)
-    if entity.view_name in ['reference', 'information_carrier'] and entity.system_type != 'file':
+    if entity.view_name in ['reference'] and entity.system_type != 'file':
         data.append(uc_first(_(entity.system_type)))
-    if entity.view_name in ['event', 'place', 'source', 'reference', 'file', 'information_carrier']:
+    if entity.view_name in ['event', 'place', 'source', 'reference', 'file', 'object']:
         data.append(entity.print_base_type())
     if entity.system_type == 'file':
         if file_stats:

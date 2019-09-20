@@ -386,7 +386,8 @@ def display_menu(self, origin) -> str:
     html = ''
     if current_user.is_authenticated:
         selected = origin.view_name if origin else ''
-        items = ['overview', 'source', 'event', 'actor', 'place', 'reference', 'types', 'admin']
+        items = ['overview', 'source', 'event', 'actor', 'place', 'reference', 'object', 'types',
+                 'admin']
         for item in items:
             if selected:
                 css = 'active' if item == selected else ''

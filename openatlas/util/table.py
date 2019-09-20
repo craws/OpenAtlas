@@ -15,7 +15,7 @@ class Table:
                'stratigraphic-unit': ['name', 'type', 'begin', 'end'],
                'find': ['name', 'type', 'begin', 'end'],
                'reference': ['name', 'class', 'type'],
-               'information_carrier': ['name', 'class', 'type'],
+               'object': ['name', 'type'],
                'file': ['name', 'license', 'size', 'extension', 'description']}
 
     def __init__(self,

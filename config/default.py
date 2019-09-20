@@ -74,7 +74,7 @@ CODE_CLASS = {
     'E18': 'place',
     'E22': 'place',
     'E31': 'reference',
-    'E84': 'information_carrier'}
+    'E84': 'object'}
 
 CLASS_CODES = {
     'source': ['E33'],
@@ -83,7 +83,7 @@ CLASS_CODES = {
     'group': ['E40', 'E74'],
     'place': ['E18', 'E22'],
     'reference': ['E31'],
-    'information_carrier': ['E84']}
+    'object': ['E84']}
 
 PROPERTY_TYPES = ['Actor Actor Relation', 'Actor Function', 'Involvement']
 
