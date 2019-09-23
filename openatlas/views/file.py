@@ -14,10 +14,10 @@ from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app, logger
-from openatlas.forms.forms import build_form
+from openatlas.forms.forms import build_form, build_table_form
 from openatlas.models.entity import Entity, EntityMapper
 from openatlas.util.table import Table
-from openatlas.util.util import (build_table_form, convert_size, display_remove_link, format_date,
+from openatlas.util.util import (convert_size, display_remove_link, format_date,
                                  get_base_table_data, get_entity_data, get_file_path,
                                  get_file_stats, is_authorized, link, required_group,
                                  truncate_string, uc_first, was_modified)

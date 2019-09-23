@@ -127,8 +127,7 @@ class MoveForm(Form):
     is_node_form = HiddenField()
     selection = SelectMultipleField('', [InputRequired()], coerce=int,
                                     option_widget=widgets.CheckboxInput(),
-                                    widget=widgets.ListWidget(prefix_label=False),
-                                    default=['E21', 'E7', 'E40', 'E74', 'E8'])
+                                    widget=widgets.ListWidget(prefix_label=False))
     save = SubmitField(_('move'))
 
 

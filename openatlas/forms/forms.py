@@ -2,12 +2,13 @@
 import ast
 import re
 import time
-from typing import Optional as Optional_Type
+from typing import Optional as Optional_Type, Iterator
 
 from flask import g, session
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import Form
+from flask_wtf.csrf import generate_csrf
 from wtforms import FloatField, HiddenField
 from wtforms.validators import Optional
 from wtforms.widgets import HiddenInput
@@ -373,3 +374,31 @@ class TableMultiField(HiddenField):
 
 class ValueFloatField(FloatField):
     pass
+
+
+def build_table_form(class_name: str, linked_entities: Iterator) -> str:
+    """ Returns a form with a list of entities with checkboxes"""
+    from openatlas.models.entity import EntityMapper
+    table = Table(Table.HEADERS[class_name] + [''])
+    linked_ids = [entity.id for entity in linked_entities]
+    file_stats = get_file_stats() if class_name == 'file' else None
+    if class_name == 'file':
+        entities = EntityMapper.get_by_system_type('file', nodes=True)
+    elif class_name == 'place':
+        entities = EntityMapper.get_by_system_type('place', nodes=True, aliases=True)
+    else:
+        entities = EntityMapper.get_by_codes(class_name)
+    for entity in entities:
+        if entity.id in linked_ids:
+            continue  # Don't show already linked entries
+        input_ = '<input id="{id}" name="values" type="checkbox" value="{id}">'.format(id=entity.id)
+        table.rows.append(get_base_table_data(entity, file_stats) + [input_])
+    if not table.rows:
+        return uc_first(_('no entries'))
+    return """
+        <form class="table" id="checkbox-form" method="post">
+            <input id="csrf_token" name="csrf_token" type="hidden" value="{token}">
+            <input id="checkbox_values" name="checkbox_values" type="hidden">
+            {table} <button name="form-submit" id="form-submit" type="submit">{add}</button>
+        </form>""".format(add=uc_first(_('add')), token=generate_csrf(),
+                          table=table.display(class_name))
