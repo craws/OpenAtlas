@@ -80,37 +80,6 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None) 
     return form_instance
 
 
-def build_move_form(form, node) -> Form:
-    root = g.nodes[node.root[-1]]
-    setattr(form, str(root.id), TreeField(str(root.id)))
-    form_instance = form(obj=node)
-
-    # Delete custom fields except the ones specified for the form
-    delete_list = []  # Can't delete fields in the loop so creating a list for later deletion
-    for field in form_instance:
-        if type(field) is TreeField and int(field.id) != root.id:
-            delete_list.append(field.id)
-    for item in delete_list:
-        delattr(form_instance, item)
-    choices = []
-    if root.class_.code == 'E53':
-        for entity in node.get_linked_entities('P89', True):
-            place = entity.get_linked_entity('P53', True)
-            if place:
-                choices.append((entity.id, place.name))
-    elif root.name in app.config['PROPERTY_TYPES']:
-        for row in LinkMapper.get_entities_by_node(node):
-            domain = EntityMapper.get_by_id(row.domain_id)
-            range_ = EntityMapper.get_by_id(row.range_id)
-            choices.append((row.id, domain.name + ' - ' + range_.name))
-    else:
-        for entity in node.get_linked_entities('P2', True):
-            choices.append((entity.id, entity.name))
-
-    form_instance.selection.choices = choices
-    return form_instance
-
-
 def build_node_form(form, node, request_origin=None):
     if not request_origin:
         root = node
@@ -376,6 +345,38 @@ class ValueFloatField(FloatField):
     pass
 
 
+def build_move_form(form, node) -> Form:
+    root = g.nodes[node.root[-1]]
+    setattr(form, str(root.id), TreeField(str(root.id)))
+    form_instance = form(obj=node)
+
+    # Delete custom fields except the ones specified for the form
+    delete_list = []  # Can't delete fields in the loop so creating a list for later deletion
+    for field in form_instance:
+        if type(field) is TreeField and int(field.id) != root.id:
+            delete_list.append(field.id)
+    for item in delete_list:
+        delattr(form_instance, item)
+
+    choices = []
+    if root.class_.code == 'E53':
+        for entity in node.get_linked_entities('P89', True):
+            place = entity.get_linked_entity('P53', True)
+            if place:
+                choices.append((entity.id, place.name))
+    elif root.name in app.config['PROPERTY_TYPES']:
+        for row in LinkMapper.get_entities_by_node(node):
+            domain = EntityMapper.get_by_id(row.domain_id)
+            range_ = EntityMapper.get_by_id(row.range_id)
+            choices.append((row.id, domain.name + ' - ' + range_.name))
+    else:
+        for entity in node.get_linked_entities('P2', True):
+            choices.append((entity.id, entity.name))
+
+    form_instance.selection.choices = choices
+    return form_instance
+
+
 def build_table_form(class_name: str, linked_entities: Iterator) -> str:
     """ Returns a form with a list of entities with checkboxes"""
     from openatlas.models.entity import EntityMapper
@@ -391,7 +392,8 @@ def build_table_form(class_name: str, linked_entities: Iterator) -> str:
     for entity in entities:
         if entity.id in linked_ids:
             continue  # Don't show already linked entries
-        input_ = '<input id="{id}" name="values" type="checkbox" value="{id}">'.format(id=entity.id)
+        input_ = '<input id="selection-{id}" name="values" type="checkbox" value="{id}">'.format(
+            id=entity.id)
         table.rows.append(get_base_table_data(entity, file_stats) + [input_])
     if not table.rows:
         return uc_first(_('no entries'))

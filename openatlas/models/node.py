@@ -204,8 +204,9 @@ class NodeMapper(EntityMapper):
         return nodes
 
     @staticmethod
-    def move_entities(old_node, new_type_id: int, entity_ids: list) -> None:
+    def move_entities(old_node, new_type_id: int, checkbox_values: str) -> None:
         root = g.nodes[old_node.root[-1]]
+        entity_ids = ast.literal_eval(checkbox_values)
         delete_ids = []
         if new_type_id:  # A new type was selected
             if root.multiple:

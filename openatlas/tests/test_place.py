@@ -152,13 +152,15 @@ class PlaceTest(TestBaseCase):
 
             # Test move entities of multiple node if link to new node exists
             rv = self.app.post(url_for('node_move_entities', id_=unit_sub1.id),
-                               data={unit_node.id: unit_sub2.id, 'selection': location.id},
+                               data={unit_node.id: unit_sub2.id, 'selection': location.id,
+                                     'checkbox_values': '[' + str(location.id) + ']'},
                                follow_redirects=True)
             assert b'Entities where updated' in rv.data
 
             # Test move entities of multiple node if link to new node doesn't exists
             rv = self.app.post(url_for('node_move_entities', id_=unit_sub2.id),
-                               data={unit_node.id: unit_sub1.id, 'selection': location.id},
+                               data={unit_node.id: unit_sub1.id, 'selection': location.id,
+                                     'checkbox_values': '[' + str(location.id) + ']'},
                                follow_redirects=True)
             assert b'Entities where updated' in rv.data
 
