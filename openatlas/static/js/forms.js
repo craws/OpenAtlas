@@ -7,7 +7,7 @@ $(document).ready(function () {
         $('#checkbox-form .dataTable').DataTable().rows().nodes().to$().find('input[type="checkbox"]').each(
             function() {
                 if ($(this).is(':checked')) {
-                    ids.push($(this).attr('id'));
+                    ids.push($(this).attr('value'));
                 }
             });
         $('#checkbox_values').val(ids.length > 0 ? '[' + ids+ ']' : '');

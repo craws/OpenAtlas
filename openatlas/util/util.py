@@ -9,13 +9,12 @@ from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
 from html.parser import HTMLParser
-from typing import Iterator, Optional
+from typing import Optional
 
 import numpy
 from flask import abort, flash, g, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
-from flask_wtf.csrf import generate_csrf
 from numpy import math
 from werkzeug.utils import redirect
 
@@ -26,7 +25,6 @@ from openatlas.models.date import DateMapper
 from openatlas.models.imports import Project
 from openatlas.models.property import Property
 from openatlas.models.user import User
-from openatlas.util.table import Table
 
 
 def convert_size(size_bytes):
@@ -137,34 +135,6 @@ def get_file_stats(path: Optional[str] = app.config['UPLOAD_FOLDER_PATH']) -> di
             file_stats[int(split_name[0])] = {'ext': split_name[1], 'size': file.stat().st_size,
                                               'date': file.stat().st_ctime}
     return file_stats
-
-
-def build_table_form(class_name: str, linked_entities: Iterator) -> str:
-    """ Returns a form with a list of entities with checkboxes"""
-    from openatlas.models.entity import EntityMapper
-    table = Table(Table.HEADERS[class_name] + [''])
-    linked_ids = [entity.id for entity in linked_entities]
-    file_stats = get_file_stats() if class_name == 'file' else None
-    if class_name == 'file':
-        entities = EntityMapper.get_by_system_type('file', nodes=True)
-    elif class_name == 'place':
-        entities = EntityMapper.get_by_system_type('place', nodes=True, aliases=True)
-    else:
-        entities = EntityMapper.get_by_codes(class_name)
-    for entity in entities:
-        if entity.id in linked_ids:
-            continue  # Don't show already linked entries
-        input_ = '<input id="{id}" name="values" type="checkbox" value="{id}">'.format(id=entity.id)
-        table.rows.append(get_base_table_data(entity, file_stats) + [input_])
-    if not table.rows:
-        return uc_first(_('no entries'))
-    return """
-        <form class="table" id="checkbox-form" method="post">
-            <input id="csrf_token" name="csrf_token" type="hidden" value="{token}">
-            <input id="checkbox_values" name="checkbox_values" type="hidden">
-            {table} <button name="form-submit" id="form-submit" type="submit">{add}</button>
-        </form>""".format(add=uc_first(_('add')), token=generate_csrf(),
-                          table=table.display(class_name))
 
 
 def display_remove_link(url: str, name: str) -> str:

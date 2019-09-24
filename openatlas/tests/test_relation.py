@@ -60,11 +60,13 @@ class RelationTests(TestBaseCase):
                 link_id2 = LinkMapper.get_links(actor_id, 'OA7', True)[0].id
 
             rv = self.app.post(url_for('node_move_entities', id_=relation_sub_id),
-                               data={relation_id: relation_sub_id2, 'selection': [link_id]},
+                               data={relation_id: relation_sub_id2, 'selection': [link_id],
+                                     'checkbox_values': '[' + str(link_id) + ']'},
                                follow_redirects=True)
             assert b'Entities where updated' in rv.data
             rv = self.app.post(url_for('node_move_entities', id_=relation_sub_id2),
-                               data={relation_id: '', 'selection': [link_id]},
+                               data={relation_id: '', 'selection': [link_id],
+                                     'checkbox_values': '[' + str(link_id) + ']'},
                                follow_redirects=True)
             assert b'Entities where updated' in rv.data
 
