@@ -19,7 +19,7 @@ from openatlas.util.util import (display_remove_link, get_base_table_data, get_e
 
 
 class ReferenceForm(Form):
-    name = StringField(_('name'), render_kw={'autofocus': True})
+    name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
@@ -170,17 +170,10 @@ def reference_index():
 @required_group('contributor')
 def reference_insert(code, origin_id=None):
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
-    type_name = code
-    if code == 'carrier':
-        type_name = 'Information Carrier'
-    elif code == 'external_reference':
-        type_name = 'External Reference'
-    form = build_form(ReferenceForm, type_name)
+    form = build_form(ReferenceForm, 'External Reference' if code == 'external_reference' else code)
     if code == 'external_reference':
         form.name.validators = [InputRequired(), URL()]
         form.name.label.text = 'URL'
-    else:
-        form.name.validators = [InputRequired()]
     if origin:
         del form.insert_and_continue
     if form.validate_on_submit():
@@ -205,8 +198,6 @@ def reference_update(id_):
     if reference.system_type == 'external reference':
         form.name.validators = [InputRequired(), URL()]
         form.name.label.text = 'URL'
-    else:  # pragma: no cover
-        form.name.validators = [InputRequired()]
     if form.validate_on_submit():
         if was_modified(form, reference):  # pragma: no cover
             del form.save
@@ -225,9 +216,8 @@ def save(form, reference=None, code=None, origin=None):
     try:
         if not reference:
             log_action = 'insert'
-            class_code = 'E84' if code == 'carrier' else 'E31'
-            system_type = 'information carrier' if code == 'carrier' else code.replace('_', ' ')
-            reference = EntityMapper.insert(class_code, form.name.data, system_type)
+            system_type = code.replace('_', ' ')
+            reference = EntityMapper.insert('E31', form.name.data, system_type)
         reference.name = form.name.data
         reference.description = form.description.data
         reference.update()

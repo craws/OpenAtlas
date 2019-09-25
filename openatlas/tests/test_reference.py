@@ -17,17 +17,12 @@ class ReferenceTest(TestBaseCase):
             assert b'+ Bibliography' in rv.data
             rv = self.app.get(url_for('reference_insert', code='edition'))
             assert b'+ Edition' in rv.data
-            rv = self.app.get(url_for('reference_insert', code='carrier'))
-            assert b'+ Carrier' in rv.data
             data = {'name': 'https://openatlas.eu', 'description': 'Reference description'}
             rv = self.app.post(url_for('reference_insert', code='external_reference'), data=data)
             with app.test_request_context():
                 app.preprocess_request()
                 reference = EntityMapper.get_by_id(rv.location.split('/')[-1])
             data['continue_'] = 'yes'
-            rv = self.app.post(url_for('reference_insert', code='carrier'), data=data,
-                               follow_redirects=True)
-            assert b'An entry has been created' in rv.data
             rv = self.app.get(url_for('reference_index'))
             assert b'https://openatlas.eu' in rv.data
 

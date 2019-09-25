@@ -1,23 +1,19 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Optional
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
-from wtforms.validators import InputRequired, URL
+from wtforms.validators import InputRequired
 
-import openatlas
 from openatlas import app, logger
-from openatlas.forms.forms import TableField, build_form
+from openatlas.forms.forms import build_form
 from openatlas.models.entity import EntityMapper
-from openatlas.models.link import LinkMapper
 from openatlas.models.user import UserMapper
 from openatlas.util.table import Table
-from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 is_authorized, link, required_group, truncate_string, uc_first,
-                                 was_modified, get_profile_image_table_link)
+from openatlas.util.util import (get_base_table_data, get_entity_data,
+                                 link, required_group, truncate_string, was_modified)
 
 
 class InformationCarrierForm(Form):
@@ -49,9 +45,13 @@ def object_view(id_):
     return render_template('object/view.html', object_=object_, tables=tables)
 
 
-@app.route('/object/insert')
+@app.route('/object/insert', methods=['POST', 'GET'])
+@required_group('contributor')
 def object_insert():
-    return render_template('object/insert.html')
+    form = build_form(InformationCarrierForm, 'Information Carrier')
+    if form.validate_on_submit():
+        return redirect(save(form))
+    return render_template('object/insert.html', form=form)
 
 
 @app.route('/object/update/<int:id_>', methods=['POST', 'GET'])
