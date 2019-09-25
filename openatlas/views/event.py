@@ -26,7 +26,7 @@ class EventForm(DateForm):
     place = TableField(_('location'))
     place_from = TableField(_('from'))
     place_to = TableField(_('to'))
-    information_carrier = TableMultiField()
+    object = TableMultiField()
     event_id = HiddenField()
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
@@ -71,6 +71,7 @@ def event_insert(code=str, origin_id=None) -> str:
     else:
         del form.place_from
         del form.place_to
+        del form.object
     if origin:
         del form.insert_and_continue
     if form.validate_on_submit():
@@ -99,6 +100,7 @@ def event_update(id_: int):
     else:
         del form.place_from
         del form.place_to
+        del form.object
     form.event_id.data = event.id
     if form.validate_on_submit():
         if was_modified(form, event):  # pragma: no cover
@@ -115,6 +117,7 @@ def event_update(id_: int):
         form.place_from.data = place_from.get_linked_entity('P53', True).id if place_from else ''
         place_to = event.get_linked_entity('P26')
         form.place_to.data = place_to.get_linked_entity('P53', True).id if place_to else ''
+        form.object.data = [entity.id for entity in event.get_linked_entities('P25')]
     else:
         place = event.get_linked_entity('P7')
         form.place.data = place.get_linked_entity('P53', True).id if place else ''
@@ -198,12 +201,13 @@ def save(form: Form, event=None, code=None, origin=None) -> str:
         event.update()
         event.save_nodes(form)
         if form.event.data:
-            event.link('P117', EntityMapper.get_by_id(form.event.data))
+            event.link('P117', int(form.event.data))
         if form.place and form.place.data:
             event.link('P7', LinkMapper.get_linked_entity(int(form.place.data), 'P53'))
+        if event.class_.code == 'E9' and form.object.data:
+            event.link('P25', ast.literal_eval(form.object.data))
         if event.class_.code == 'E8' and form.given_place.data:  # Link place for acquisition
-            places = [EntityMapper.get_by_id(i) for i in ast.literal_eval(form.given_place.data)]
-            event.link('P24', places)
+            event.link('P24', ast.literal_eval(form.given_place.data))
         if event.class_.code == 'E9' and form.place_from.data:  # Link place for move from
             event.link('P27', LinkMapper.get_linked_entity(int(form.place_from.data), 'P53'))
         if event.class_.code == 'E9' and form.place_to.data:  # Link place for move to

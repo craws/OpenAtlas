@@ -244,6 +244,11 @@ def get_entity_data(entity, location=None):
             data.append((uc_first(_('given place')), '<br />'.join(
                 [link(place) for place in entity.get_linked_entities('P24')])))
 
+        # Info for moves
+        if entity.class_.code == 'E9':
+            data.append((uc_first(_('object')), '<br />'.join(
+                [link(object_) for object_ in entity.get_linked_entities('P25')])))
+
     return add_system_data(entity, data)
 
 
