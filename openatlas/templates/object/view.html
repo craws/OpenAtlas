@@ -8,7 +8,9 @@
 <div id="tabs" class="tabs-container">
     <ul>
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
-        <li><a href="#tab-source">{{ _('source')|uc_first }} {{ tables['source']|format_tab_number|safe }}</a></li>
+        {% if tables['event'].rows %}
+            <li><a href="#tab-event">{{ _('event')|uc_first }} {{ tables['event']|format_tab_number|safe }}</a></li>
+        {% endif %}
     </ul>
     <div id="tab-info">
         <div class="button-bar">
@@ -28,13 +30,10 @@
             <div style="clear:both;"></div>
         </div>
     </div>
-    <div id="tab-source">
-        {% if 'contributor'|is_authorized %}
-            <div class="button-bar">
-                <a href="{{ url_for('source_insert', origin_id=object_.id) }}">+ {{ _('source')|uc_first }}</a>
-            </div>
-        {% endif %}
-        {{ tables['source'].display('source')|safe }}
-    </div>
+    {% if tables['event'].rows %}
+        <div id="tab-event">
+            {{ tables['event'].display('source')|safe }}
+        </div>
+    {% endif %}
 </div>
 {% endblock %}

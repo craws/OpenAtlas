@@ -76,7 +76,7 @@ def source_view(id_):
             data.append(display_remove_link(url + '#tab-' + range_.table_name, range_.name))
         tables[range_.table_name].rows.append(data)
     profile_image_id = source.get_profile_image_id()
-    for link_ in source.get_links(['P67', 'P128'], True):
+    for link_ in source.get_links(['P67'], True):
         domain = link_.domain
         data = get_base_table_data(domain)
         if domain.view_name == 'file':  # pragma: no cover
@@ -163,6 +163,7 @@ def save(form, source=None, origin=None):
         source.update()
         source.save_nodes(form)
         url = url_for('source_view', id_=source.id)
+
         if origin:
             url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-source'
             if origin.view_name == 'reference':
@@ -170,6 +171,8 @@ def save(form, source=None, origin=None):
                 url = url_for('reference_link_update', link_id=link_id, origin_id=origin)
             elif origin.view_name == 'file':
                 origin.link('P67', source)
+            elif origin.view_name == 'object':
+                origin.link('P128', source)
             else:
                 source.link('P67', origin)
         g.cursor.execute('COMMIT')

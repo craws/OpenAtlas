@@ -13,7 +13,8 @@ from openatlas.models.entity import EntityMapper
 from openatlas.models.user import UserMapper
 from openatlas.util.table import Table
 from openatlas.util.util import (get_base_table_data, get_entity_data,
-                                 link, required_group, truncate_string, was_modified)
+                                 link, required_group, truncate_string, was_modified, is_authorized,
+                                 display_remove_link)
 
 
 class InformationCarrierForm(Form):
@@ -41,7 +42,15 @@ def object_index():
 def object_view(id_):
     object_ = EntityMapper.get_by_id(id_, nodes=True)
     object_.note = UserMapper.get_note(object_)
-    tables = {'info': get_entity_data(object_), 'source': Table(Table.HEADERS['source'])}
+    tables = {'info': get_entity_data(object_),
+              'event': Table(Table.HEADERS['event'])}
+    for link_ in object_.get_links('P25', inverse=True):
+        data = get_base_table_data(link_.domain)
+        if is_authorized('contributor'):
+            url = url_for('link_delete', id_=link_.id, origin_id=object_.id)
+            data.append(
+                display_remove_link(url + '#tab-' + link_.range.table_name, link_.range.name))
+        tables['event'].rows.append(data)
     return render_template('object/view.html', object_=object_, tables=tables)
 
 
