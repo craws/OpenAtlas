@@ -71,7 +71,7 @@ def actor_view(id_):
         tables[domain.view_name].rows.append(data)
 
     # Todo: Performance - getting every place of every object for every event is very costly
-    event_links = actor.get_links(['P11', 'P14', 'P22', 'P23'], True)
+    event_links = actor.get_links(['P11', 'P14', 'P22', 'P23', 'P25'], True)
 
     objects = []
     for link_ in event_links:
@@ -94,7 +94,10 @@ def actor_view(id_):
         if is_authorized('contributor'):
             update_url = url_for('involvement_update', id_=link_.id, origin_id=actor.id)
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-event'
-            data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
+            if link_.domain.class_.code != 'E9':
+                data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
+            else:
+                data.append('')
             data.append(display_remove_link(unlink_url, link_.domain.name))
         tables['event'].rows.append(data)
 

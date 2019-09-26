@@ -246,8 +246,19 @@ def get_entity_data(entity, location=None):
 
         # Info for moves
         if entity.class_.code == 'E9':
-            data.append((uc_first(_('object')), '<br />'.join(
-                [link(object_) for object_ in entity.get_linked_entities('P25')])))
+            person_data = []
+            object_data = []
+            for entity in entity.get_linked_entities('P25'):
+                if entity.class_.code == 'E21':
+                    person_data.append(entity)
+                elif entity.class_.code == 'E84':
+                    object_data.append(entity)
+            if person_data:
+                data.append((uc_first(_('person')), '<br />'.join(
+                    [link(object_) for object_ in person_data])))
+            if object_data:
+                data.append((uc_first(_('object')), '<br />'.join(
+                    [link(object_) for object_ in object_data])))
 
     return add_system_data(entity, data)
 

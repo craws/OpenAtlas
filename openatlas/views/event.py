@@ -1,5 +1,4 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-import ast
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -27,6 +26,7 @@ class EventForm(DateForm):
     place_from = TableField(_('from'))
     place_to = TableField(_('to'))
     object = TableMultiField()
+    person = TableMultiField()
     event_id = HiddenField()
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
@@ -72,6 +72,7 @@ def event_insert(code=str, origin_id=None) -> str:
         del form.place_from
         del form.place_to
         del form.object
+        del form.person
     if origin:
         del form.insert_and_continue
     if form.validate_on_submit():
@@ -101,6 +102,7 @@ def event_update(id_: int):
         del form.place_from
         del form.place_to
         del form.object
+        del form.person
     form.event_id.data = event.id
     if form.validate_on_submit():
         if was_modified(form, event):  # pragma: no cover
@@ -117,7 +119,16 @@ def event_update(id_: int):
         form.place_from.data = place_from.get_linked_entity('P53', True).id if place_from else ''
         place_to = event.get_linked_entity('P26')
         form.place_to.data = place_to.get_linked_entity('P53', True).id if place_to else ''
-        form.object.data = [entity.id for entity in event.get_linked_entities('P25')]
+        person_data = []
+        object_data = []
+        for entity in event.get_linked_entities('P25'):
+            if entity.class_.code == 'E21':
+                person_data.append(entity.id)
+            elif entity.class_.code == 'E84':
+                object_data.append(entity.id)
+        form.person.data = person_data
+        form.object.data = object_data
+
     else:
         place = event.get_linked_entity('P7')
         form.place.data = place.get_linked_entity('P53', True).id if place else ''
@@ -204,14 +215,17 @@ def save(form: Form, event=None, code=None, origin=None) -> str:
             event.link('P117', int(form.event.data))
         if form.place and form.place.data:
             event.link('P7', LinkMapper.get_linked_entity(int(form.place.data), 'P53'))
-        if event.class_.code == 'E9' and form.object.data:
-            event.link('P25', ast.literal_eval(form.object.data))
         if event.class_.code == 'E8' and form.given_place.data:  # Link place for acquisition
-            event.link('P24', ast.literal_eval(form.given_place.data))
-        if event.class_.code == 'E9' and form.place_from.data:  # Link place for move from
-            event.link('P27', LinkMapper.get_linked_entity(int(form.place_from.data), 'P53'))
-        if event.class_.code == 'E9' and form.place_to.data:  # Link place for move to
-            event.link('P26', LinkMapper.get_linked_entity(int(form.place_to.data), 'P53'))
+            event.link('P24', form.given_place.data)
+        if event.class_.code == 'E9':  # Move
+            if form.object.data:  # Moved objects
+                event.link('P25', form.object.data)
+            if form.person.data:  # Moved persons
+                event.link('P25', form.person.data)
+            if form.place_from.data:  # Link place for move from
+                event.link('P27', LinkMapper.get_linked_entity(int(form.place_from.data), 'P53'))
+            if form.place_to.data:  # Link place for move to
+                event.link('P26', LinkMapper.get_linked_entity(int(form.place_to.data), 'P53'))
         url = url_for('event_view', id_=event.id)
         if origin:
             url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-event'

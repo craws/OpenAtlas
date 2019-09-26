@@ -13,6 +13,7 @@ class Table:
                'file': ['name', 'license', 'size', 'extension', 'description'],
                'group': ['name', 'class', 'begin', 'end'],
                'object': ['name', 'type'],
+               'person': ['name', 'class', 'begin', 'end'],
                'place': ['name', 'type', 'begin', 'end'],
                'reference': ['name', 'class', 'type'],
                'source': ['name', 'type', 'description'],

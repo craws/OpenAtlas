@@ -77,13 +77,14 @@ CODE_CLASS = {
     'E84': 'object'}
 
 CLASS_CODES = {
-    'source': ['E33'],
-    'event': ['E7', 'E8', 'E9'],
     'actor': ['E21', 'E74', 'E40'],
+    'event': ['E7', 'E8', 'E9'],
     'group': ['E40', 'E74'],
+    'object': ['E84'],
+    'person': ['E21'],
     'place': ['E18', 'E22'],
     'reference': ['E31'],
-    'object': ['E84']}
+    'source': ['E33']}
 
 PROPERTY_TYPES = ['Actor Actor Relation', 'Actor Function', 'Involvement']
 
