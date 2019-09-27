@@ -304,6 +304,7 @@ def add_dates_to_form(form, for_person=False):
 
 
 def required_group(group):
+    # type: (object) -> object
     def wrapper(f):
         @wraps(f)
         def wrapped(*args, **kwargs):

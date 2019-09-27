@@ -41,7 +41,7 @@ from openatlas.util import filters
 from openatlas.views import (actor, admin, ajax, content, event, export, hierarchy, index,
                              involvement, imports, link, login, types, model, place, profile, note,
                              overlay, reference, source, translation, user, relation, member,
-                             search, file)
+                             search, file, api)
 
 
 @babel.localeselector
