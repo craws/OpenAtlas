@@ -88,7 +88,7 @@ def object_update(id_: int) -> str:
     return render_template('object/update.html', form=form, object_=object_)
 
 
-def save(form, object_=None, origin=None) -> str:
+def save(form, object_=None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
     try:
@@ -100,11 +100,7 @@ def save(form, object_=None, origin=None) -> str:
         object_.update()
         object_.save_nodes(form)
         url = url_for('object_view', id_=object_.id)
-        if origin:
-            link_id = object_.link('P67', origin)
-            url = url_for('object_link_update', link_id=link_id, origin_id=origin.id)
-        if form.continue_.data == 'yes':
-            url = url_for('object_insert')
+        url = url_for('object_insert') if form.continue_.data == 'yes' else url
         g.cursor.execute('COMMIT')
         logger.log_user(object_.id, log_action)
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')

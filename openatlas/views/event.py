@@ -77,8 +77,8 @@ def event_insert(code=str, origin_id=None) -> str:
         del form.insert_and_continue
     if form.validate_on_submit():
         return redirect(save(form, code=code, origin=origin))
-    if origin.class_.code == 'E84':
-        form.object.data = [origin_id]
+    if origin and origin.class_.code == 'E84':
+        form.object.data = [origin.id]
     return render_template('event/insert.html', form=form, code=code, origin=origin)
 
 

@@ -1,5 +1,4 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-import ast
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -48,7 +47,7 @@ def source_insert(origin_id=None):
         del form.insert_and_continue
     if form.validate_on_submit():
         return redirect(save(form, origin=origin))
-    if origin.class_.code == 'E84':
+    if origin and origin.class_.code == 'E84':
         form.information_carrier.data = [origin_id]
     return render_template('source/insert.html', form=form, origin=origin)
 
