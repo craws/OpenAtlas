@@ -12,6 +12,7 @@ class Table:
                'find': ['name', 'type', 'begin', 'end'],
                'file': ['name', 'license', 'size', 'extension', 'description'],
                'group': ['name', 'class', 'begin', 'end'],
+               'information_carrier': ['name', 'type'],
                'object': ['name', 'type'],
                'person': ['name', 'class', 'begin', 'end'],
                'place': ['name', 'type', 'begin', 'end'],

@@ -9,7 +9,7 @@ from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import build_form, build_table_form
+from openatlas.forms.forms import TableMultiField, build_form, build_table_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.user import UserMapper
 from openatlas.util.table import Table
@@ -20,6 +20,7 @@ from openatlas.util.util import (display_remove_link, get_base_table_data,
 
 class SourceForm(Form):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
+    information_carrier = TableMultiField()
     description = TextAreaField(_('content'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
@@ -47,6 +48,8 @@ def source_insert(origin_id=None):
         del form.insert_and_continue
     if form.validate_on_submit():
         return redirect(save(form, origin=origin))
+    if origin.class_.code == 'E84':
+        form.information_carrier.data = [origin_id]
     return render_template('source/insert.html', form=form, origin=origin)
 
 
@@ -104,11 +107,13 @@ def source_view(id_):
 def source_add(origin_id):
     """ Link an entity to source coming from the entity."""
     origin = EntityMapper.get_by_id(origin_id)
+    property_code = 'P128' if origin.class_.code == 'E84' else 'P67'
+    inverse = False if origin.class_.code == 'E84' else True
     if request.method == 'POST':
         if request.form['checkbox_values']:
-            origin.link('P67', ast.literal_eval(request.form['checkbox_values']), inverse=True)
+            origin.link(property_code, request.form['checkbox_values'], inverse)
         return redirect(url_for(origin.view_name + '_view', id_=origin.id) + '#tab-source')
-    form = build_table_form('source', origin.get_linked_entities('P67', True))
+    form = build_table_form('source', origin.get_linked_entities(property_code, inverse))
     return render_template('source/add.html', origin=origin, form=form)
 
 
@@ -119,7 +124,7 @@ def source_add2(id_, class_name):
     source = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:
-            source.link('P67', ast.literal_eval(request.form['checkbox_values']))
+            source.link('P67', request.form['checkbox_values'])
         return redirect(url_for('source_view', id_=source.id) + '#tab-' + class_name)
     form = build_table_form(class_name, source.get_linked_entities('P67'))
     return render_template('source/add2.html', source=source, class_name=class_name, form=form)
@@ -136,7 +141,7 @@ def source_delete(id_):
 
 @app.route('/source/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def source_update(id_):
+def source_update(id_: int) -> str:
     source = EntityMapper.get_by_id(id_, nodes=True)
     form = build_form(SourceForm, 'Source', source, request)
     if form.validate_on_submit():
@@ -148,21 +153,28 @@ def source_update(id_):
                                    modifier=modifier)
         save(form, source)
         return redirect(url_for('source_view', id_=id_))
+    form.information_carrier.data = [entity.id for entity in
+                                     source.get_linked_entities('P128', inverse=True)]
     return render_template('source/update.html', form=form, source=source)
 
 
-def save(form, source=None, origin=None):
+def save(form, source=None, origin=None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
     try:
         if not source:
             source = EntityMapper.insert('E33', form.name.data, 'source content')
             log_action = 'insert'
+        url = url_for('source_view', id_=source.id)
         source.name = form.name.data
         source.description = form.description.data
         source.update()
         source.save_nodes(form)
-        url = url_for('source_view', id_=source.id)
+
+        # Information carrier
+        source.delete_links(['P128'], inverse=True)
+        if form.information_carrier.data:
+            source.link('P128', form.information_carrier.data, inverse=True)
 
         if origin:
             url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-source'

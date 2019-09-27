@@ -77,12 +77,14 @@ def event_insert(code=str, origin_id=None) -> str:
         del form.insert_and_continue
     if form.validate_on_submit():
         return redirect(save(form, code=code, origin=origin))
+    if origin.class_.code == 'E84':
+        form.object.data = [origin_id]
     return render_template('event/insert.html', form=form, code=code, origin=origin)
 
 
 @app.route('/event/delete/<int:id_>')
 @required_group('contributor')
-def event_delete(id_: int):
+def event_delete(id_: int) -> str:
     EntityMapper.delete(id_)
     logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
@@ -91,7 +93,7 @@ def event_delete(id_: int):
 
 @app.route('/event/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def event_update(id_: int):
+def event_update(id_: int) -> str:
     event = EntityMapper.get_by_id(id_, nodes=True)
     form = build_form(EventForm, 'Event', event, request)
     if event.class_.code != 'E8':
@@ -203,7 +205,7 @@ def save(form: Form, event=None, code=None, origin=None) -> str:
         log_action = 'insert'
         if event:
             log_action = 'update'
-            event.delete_links(['P117', 'P7', 'P24', 'P25', 'P26', 'P27'])
+            event.delete_links(['P7', 'P24', 'P25', 'P26', 'P27', 'P117'])
         else:
             event = EntityMapper.insert(code, form.name.data)
         event.name = form.name.data

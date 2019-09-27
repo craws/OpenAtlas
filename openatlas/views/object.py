@@ -28,7 +28,7 @@ class InformationCarrierForm(Form):
 
 @app.route('/object')
 @required_group('readonly')
-def object_index():
+def object_index() -> str:
     table = Table(Table.HEADERS['object'] + ['description'])
     for object_ in EntityMapper.get_by_codes('object'):
         data = get_base_table_data(object_)
@@ -39,11 +39,19 @@ def object_index():
 
 @app.route('/object/view/<int:id_>')
 @required_group('readonly')
-def object_view(id_):
+def object_view(id_: int) -> str:
     object_ = EntityMapper.get_by_id(id_, nodes=True)
     object_.note = UserMapper.get_note(object_)
     tables = {'info': get_entity_data(object_),
+              'source': Table(Table.HEADERS['source']),
               'event': Table(Table.HEADERS['event'])}
+    for link_ in object_.get_links('P128'):
+        data = get_base_table_data(link_.range)
+        if is_authorized('contributor'):
+            url = url_for('link_delete', id_=link_.id, origin_id=object_.id)
+            data.append(
+                display_remove_link(url + '#tab-' + link_.range.table_name, link_.range.name))
+        tables['source'].rows.append(data)
     for link_ in object_.get_links('P25', inverse=True):
         data = get_base_table_data(link_.domain)
         if is_authorized('contributor'):
@@ -56,7 +64,7 @@ def object_view(id_):
 
 @app.route('/object/insert', methods=['POST', 'GET'])
 @required_group('contributor')
-def object_insert():
+def object_insert() -> str:
     form = build_form(InformationCarrierForm, 'Information Carrier')
     if form.validate_on_submit():
         return redirect(save(form))
@@ -65,7 +73,7 @@ def object_insert():
 
 @app.route('/object/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def object_update(id_: int):
+def object_update(id_: int) -> str:
     object_ = EntityMapper.get_by_id(id_, nodes=True)
     form = build_form(InformationCarrierForm, object_.system_type.title(), object_, request)
     if form.validate_on_submit():
@@ -80,7 +88,7 @@ def object_update(id_: int):
     return render_template('object/update.html', form=form, object_=object_)
 
 
-def save(form, object_=None, origin=None):
+def save(form, object_=None, origin=None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
     try:

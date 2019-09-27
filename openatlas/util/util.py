@@ -224,6 +224,11 @@ def get_entity_data(entity, location=None):
         data.append((uc_first(_('size')), print_file_size(entity)))
         data.append((uc_first(_('extension')), print_file_extension(entity)))
 
+    # Info for source
+    if entity.system_type == 'source content':
+        data.append((uc_first(_('information carrier')), '<br />'.join(
+            [link(recipient) for recipient in entity.get_linked_entities('P128', inverse=True)])))
+
     # Info for events
     if entity.class_.code in app.config['CLASS_CODES']['event']:
         super_event = entity.get_linked_entity('P117')

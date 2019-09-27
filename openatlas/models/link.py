@@ -172,9 +172,12 @@ class LinkMapper:
         return links
 
     @staticmethod
-    def delete_by_codes(entity, codes: list) -> None:
+    def delete_by_codes(entity, codes, inverse: bool = False) -> None:
         codes = codes if type(codes) is list else [codes]
-        sql = 'DELETE FROM model.link WHERE property_code IN %(codes)s AND domain_id = %(id)s;'
+        sql = """
+            DELETE FROM model.link
+            WHERE property_code IN %(codes)s AND {field} = %(id)s;""".format(
+                field='range_id' if inverse else 'domain_id')
         g.execute(sql, {'id': entity.id, 'codes': tuple(codes)})
 
     @staticmethod
