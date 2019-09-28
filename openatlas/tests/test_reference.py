@@ -23,6 +23,9 @@ class ReferenceTest(TestBaseCase):
                 app.preprocess_request()
                 reference = EntityMapper.get_by_id(rv.location.split('/')[-1])
             data['continue_'] = 'yes'
+            rv = self.app.post(url_for('reference_insert', code='external_reference'),
+                               data=data, follow_redirects=True)
+            assert b'An entry has been created' in rv.data
             rv = self.app.get(url_for('reference_index'))
             assert b'https://openatlas.eu' in rv.data
 

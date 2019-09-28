@@ -182,8 +182,6 @@ def save(form, source=None, origin=None) -> str:
                 url = url_for('reference_link_update', link_id=link_id, origin_id=origin)
             elif origin.view_name == 'file':
                 origin.link('P67', source)
-            elif origin.view_name == 'object':
-                origin.link('P128', source)
             else:
                 source.link('P67', origin)
         g.cursor.execute('COMMIT')

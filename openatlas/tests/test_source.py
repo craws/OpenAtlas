@@ -18,7 +18,7 @@ class SourceTest(TestBaseCase):
                 app.preprocess_request()
                 origin_id = EntityMapper.insert('E21', 'David Duchovny').id
                 actor_id = EntityMapper.insert('E21', 'Gillian Anderson Gillian Anderson ').id
-                reference_id = EntityMapper.insert('E84', 'https://openatlas.eu',
+                reference_id = EntityMapper.insert('E31', 'https://openatlas.eu',
                                                    'external reference').id
                 file_id = EntityMapper.insert('E31', 'The X-Files', 'file').id
 
