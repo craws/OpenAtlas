@@ -19,11 +19,11 @@ class MemberTests(TestBaseCase):
             # Add membership
             rv = self.app.get(url_for('member_insert', origin_id=group_id))
             assert b'Actor Function' in rv.data
-            data = {'group': '[' + str(group_id) + ']'}
+            data = {'group': str([group_id])}
             rv = self.app.post(
                 url_for('membership_insert', origin_id=actor_id), data=data, follow_redirects=True)
             assert b'Space Marines' in rv.data
-            data = {'group': '[' + str(group_id) + ']', 'continue_': 'yes'}
+            data = {'group': str([group_id]), 'continue_': 'yes'}
             rv = self.app.post(
                 url_for('membership_insert', origin_id=actor_id), data=data, follow_redirects=True)
             assert b'Space Marines' in rv.data
@@ -32,11 +32,11 @@ class MemberTests(TestBaseCase):
                 url_for('membership_insert', origin_id=group_id), data=data, follow_redirects=True)
             assert b"Can't link to itself" in rv.data
             rv = self.app.post(url_for('member_insert', origin_id=actor_id),
-                               data={'actor': '[' + str(actor_id) + ']'}, follow_redirects=True)
+                               data={'actor': str([actor_id])}, follow_redirects=True)
             assert b"Can't link to itself" in rv.data
 
             # Add member to group
-            data = {'actor': '[' + str(actor_id) + ']'}
+            data = {'actor': str([actor_id])}
             rv = self.app.post(
                 url_for('member_insert', origin_id=group_id), data=data, follow_redirects=True)
             assert b'Ripley' in rv.data

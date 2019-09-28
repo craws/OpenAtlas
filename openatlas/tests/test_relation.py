@@ -23,7 +23,7 @@ class RelationTests(TestBaseCase):
             relation_id = NodeMapper.get_hierarchy_by_name('Actor Actor Relation').id
             relation_sub_id = g.nodes[relation_id].subs[0]
             relation_sub_id2 = g.nodes[relation_id].subs[1]
-            data = {'actor': '[' + str(related_id) + ']',
+            data = {'actor': str([related_id]),
                     relation_id: relation_sub_id,
                     'inverse': None,
                     'begin_year_from': '-1949',
@@ -61,12 +61,12 @@ class RelationTests(TestBaseCase):
 
             rv = self.app.post(url_for('node_move_entities', id_=relation_sub_id),
                                data={relation_id: relation_sub_id2, 'selection': [link_id],
-                                     'checkbox_values': '[' + str(link_id) + ']'},
+                                     'checkbox_values': str([link_id])},
                                follow_redirects=True)
             assert b'Entities where updated' in rv.data
             rv = self.app.post(url_for('node_move_entities', id_=relation_sub_id2),
                                data={relation_id: '', 'selection': [link_id],
-                                     'checkbox_values': '[' + str(link_id) + ']'},
+                                     'checkbox_values': str([link_id])},
                                follow_redirects=True)
             assert b'Entities where updated' in rv.data
 

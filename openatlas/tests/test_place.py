@@ -30,7 +30,7 @@ class PlaceTest(TestBaseCase):
                     'alias-0': 'Valhöll',
                     'geonames_id': '123',
                     'geonames_precision': True,
-                    unit_node.id: '[' + str(unit_sub1.id) + ',' + str(unit_sub2.id) + ']'}
+                    unit_node.id: str([unit_sub1.id, unit_sub2.id])}
             rv = self.app.post(url_for('place_insert', origin_id=reference_id), data=data,
                                follow_redirects=True)
             assert b'Asgard' in rv.data
@@ -153,14 +153,14 @@ class PlaceTest(TestBaseCase):
             # Test move entities of multiple node if link to new node exists
             rv = self.app.post(url_for('node_move_entities', id_=unit_sub1.id),
                                data={unit_node.id: unit_sub2.id, 'selection': location.id,
-                                     'checkbox_values': '[' + str(location.id) + ']'},
+                                     'checkbox_values': str([location.id])},
                                follow_redirects=True)
             assert b'Entities where updated' in rv.data
 
             # Test move entities of multiple node if link to new node doesn't exists
             rv = self.app.post(url_for('node_move_entities', id_=unit_sub2.id),
                                data={unit_node.id: unit_sub1.id, 'selection': location.id,
-                                     'checkbox_values': '[' + str(location.id) + ']'},
+                                     'checkbox_values': str([location.id])},
                                follow_redirects=True)
             assert b'Entities where updated' in rv.data
 

@@ -25,12 +25,12 @@ class InvolvementTests(TestBaseCase):
             # Add involvement
             rv = self.app.get(url_for('involvement_insert', origin_id=actor_id))
             assert b'Involvement' in rv.data
-            data = {'event': '[' + str(event_id) + ']', 'activity': 'P11', 'begin_year_from': '950',
+            data = {'event': str([event_id]), 'activity': 'P11', 'begin_year_from': '950',
                     'end_year_from': '1950', involvement_id: involvement_id}
             rv = self.app.post(url_for('involvement_insert', origin_id=actor_id), data=data,
                                follow_redirects=True)
             assert b'Event Horizon' in rv.data
-            data = {'actor': '[' + str(actor_id) + ']', 'continue_': 'yes', 'activity': 'P22'}
+            data = {'actor': str([actor_id]), 'continue_': 'yes', 'activity': 'P22'}
             rv = self.app.post(url_for('involvement_insert', origin_id=event_id), data=data,
                                follow_redirects=True)
             assert b'Event Horizon' in rv.data

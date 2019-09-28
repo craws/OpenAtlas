@@ -40,7 +40,7 @@ class EventTest(TestBaseCase):
             # Acquisition
             rv = self.app.post(url_for('event_insert', code='E8'),
                                data={'name': 'Test event',
-                                     'given_place': '[' + str(residence_id) + ']',
+                                     'given_place': [residence_id],
                                      'place': residence_id,
                                      'event': activity_id,
                                      'begin_year_from': '1949',
