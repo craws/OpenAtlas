@@ -1,5 +1,4 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-import ast
 import datetime
 import math
 import os
@@ -112,7 +111,7 @@ def file_add(origin_id: int) -> str:
     origin = EntityMapper.get_by_id(origin_id)
     if request.method == 'POST':
         if request.form['checkbox_values']:
-            origin.link('P67', ast.literal_eval(request.form['checkbox_values']), inverse=True)
+            origin.link('P67', request.form['checkbox_values'], inverse=True)
         return redirect(url_for(origin.view_name + '_view', id_=origin.id) + '#tab-file')
     form = build_table_form('file', origin.get_linked_entities('P67', inverse=True))
     return render_template('file/add.html', origin=origin, form=form)
@@ -125,7 +124,7 @@ def file_add2(id_: int, class_name: str) -> str:
     file = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:
-            file.link('P67', ast.literal_eval(request.form['checkbox_values']))
+            file.link('P67', request.form['checkbox_values'])
         return redirect(url_for('file_view', id_=file.id) + '#tab-' + class_name)
     form = build_table_form(class_name, file.get_linked_entities('P67'))
     return render_template('file/add2.html', entity=file, class_name=class_name, form=form)
