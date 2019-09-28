@@ -1,4 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+from typing import Optional
+
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
@@ -65,7 +67,7 @@ class AddFileForm(Form):
 
 @app.route('/reference/add/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def reference_add(origin_id):
+def reference_add(origin_id: int) -> str:
     """ Link an entity to reference coming from the entity."""
     origin = EntityMapper.get_by_id(origin_id)
     form = AddReferenceForm()
@@ -78,7 +80,7 @@ def reference_add(origin_id):
 
 @app.route('/reference/add2/<int:reference_id>/<class_name>', methods=['POST', 'GET'])
 @required_group('contributor')
-def reference_add2(reference_id, class_name):
+def reference_add2(reference_id: int, class_name: str) -> str:
     """ Link an entity to reference coming from the reference."""
     reference = EntityMapper.get_by_id(reference_id)
     form = getattr(openatlas.views.reference, 'Add' + uc_first(class_name) + 'Form')()
@@ -95,7 +97,7 @@ def reference_add2(reference_id, class_name):
 
 @app.route('/reference/link-update/<int:link_id>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def reference_link_update(link_id, origin_id):
+def reference_link_update(link_id: int, origin_id: int) -> str:
     link_ = LinkMapper.get_by_id(link_id)
     origin = EntityMapper.get_by_id(origin_id)
     form = AddReferenceForm()
@@ -104,9 +106,7 @@ def reference_link_update(link_id, origin_id):
         link_.description = form.page.data
         link_.update()
         flash(_('info update'), 'info')
-        tab = '#tab-reference'
-        if origin.view_name == 'reference':
-            tab = '#tab-' + link_.range.view_name
+        tab = '#tab-' + (link_.range.view_name if origin.view_name == 'reference' else 'reference')
         return redirect(url_for(origin.view_name + '_view', id_=origin.id) + tab)
     form.save.label.text = _('save')
     form.page.data = link_.description
@@ -119,7 +119,7 @@ def reference_link_update(link_id, origin_id):
 
 @app.route('/reference/view/<int:id_>')
 @required_group('readonly')
-def reference_view(id_):
+def reference_view(id_: int) -> str:
     reference = EntityMapper.get_by_id(id_, nodes=True)
     reference.note = UserMapper.get_note(reference)
     tables = {'info': get_entity_data(reference),
@@ -156,7 +156,7 @@ def reference_view(id_):
 
 @app.route('/reference')
 @required_group('readonly')
-def reference_index():
+def reference_index() -> str:
     table = Table(Table.HEADERS['reference'] + ['description'])
     for reference in EntityMapper.get_by_codes('reference'):
         data = get_base_table_data(reference)
@@ -168,7 +168,7 @@ def reference_index():
 @app.route('/reference/insert/<code>', methods=['POST', 'GET'])
 @app.route('/reference/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def reference_insert(code, origin_id=None):
+def reference_insert(code: str, origin_id: Optional[int] = None) -> str:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(ReferenceForm, 'External Reference' if code == 'external_reference' else code)
     if code == 'external_reference':
@@ -183,7 +183,7 @@ def reference_insert(code, origin_id=None):
 
 @app.route('/reference/delete/<int:id_>')
 @required_group('contributor')
-def reference_delete(id_):
+def reference_delete(id_: int) -> str:
     EntityMapper.delete(id_)
     logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
@@ -192,7 +192,7 @@ def reference_delete(id_):
 
 @app.route('/reference/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def reference_update(id_):
+def reference_update(id_: int) -> str:
     reference = EntityMapper.get_by_id(id_, nodes=True)
     form = build_form(ReferenceForm, reference.system_type.title(), reference, request)
     if reference.system_type == 'external reference':
@@ -210,7 +210,7 @@ def reference_update(id_):
     return render_template('reference/update.html', form=form, reference=reference)
 
 
-def save(form, reference=None, code=None, origin=None):
+def save(form, reference=None, code: Optional[str] = None, origin=None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
     try:

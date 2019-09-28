@@ -1,4 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+from typing import Optional
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -199,7 +200,7 @@ def event_view(id_: int) -> str:
                            gis_data=GisMapper.get_all(objects) if objects else None)
 
 
-def save(form: Form, event=None, code=None, origin=None) -> str:
+def save(form: Form, event=None, code: Optional[str] = None, origin=None) -> str:
     g.cursor.execute('BEGIN')
     try:
         log_action = 'insert'
@@ -248,7 +249,7 @@ def save(form: Form, event=None, code=None, origin=None) -> str:
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        logger.log('error', 'database', 'transaction failed', str(e))
+        logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
         url = url_for('event_index')
     return url

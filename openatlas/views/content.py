@@ -18,7 +18,7 @@ class ContentForm(Form):
 
 @app.route('/admin/content')
 @required_group('manager')
-def content_index():
+def content_index() -> str:
     table = Table(['name'] + [language for language in app.config['LANGUAGES'].keys()] + ['text'])
     for item, languages in ContentMapper.get_content().items():
         url = url_for('content_view', item=item)
@@ -33,13 +33,13 @@ def content_index():
 
 @app.route('/admin/content/view/<string:item>')
 @required_group('manager')
-def content_view(item):
+def content_view(item) -> str:
     return render_template('content/view.html', item=item, content=ContentMapper.get_content())
 
 
 @app.route('/admin/content/update/<string:item>', methods=["GET", "POST"])
 @required_group('manager')
-def content_update(item):
+def content_update(item: str) -> str:
     languages = app.config['LANGUAGES'].keys()
     for language in languages:
         setattr(ContentForm, language, TextAreaField())

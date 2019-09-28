@@ -49,7 +49,7 @@ class SearchForm(Form):
 
 @app.route('/overview/search', methods=['POST', 'GET'])
 @required_group('readonly')
-def search_index():
+def search_index() -> str:
     choices = ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic unit', 'find',
                'reference', 'file']
     form = SearchForm()
@@ -67,7 +67,7 @@ def search_index():
     return render_template('search/index.html', form=form, table=table)
 
 
-def build_search_table(form):
+def build_search_table(form) -> Table:
     table = Table(['name', 'class', 'first', 'last', 'description'],
                   defs='[{className: "dt-body-right", targets: [2,3]}]')
     for entity in EntityMapper.search(form):

@@ -27,7 +27,7 @@ from openatlas.models.property import Property
 from openatlas.models.user import User
 
 
-def convert_size(size_bytes):
+def convert_size(size_bytes: int) -> str:
     if size_bytes == 0:
         return "0B"  # pragma: no cover
     size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
@@ -59,7 +59,7 @@ def print_file_extension(entity) -> str:
     return os.path.splitext(path)[1] if path else 'N/A'
 
 
-def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
+def send_mail(subject: str, text: str, recipients, log_body=True) -> bool:  # pragma: no cover
     """ Send one mail to every recipient, set log_body to False for sensitive data e.g. passwords"""
     settings = session['settings']
     recipients = recipients if type(recipients) is list else [recipients]
@@ -83,11 +83,11 @@ def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
         log_text += ' Content: ' + text if log_body else ''
         openatlas.logger.log('info', 'mail', 'Mail send from ' + from_, log_text)
     except smtplib.SMTPAuthenticationError as e:
-        openatlas.logger.log('error', 'mail', 'Error mail login for ' + mail_user, str(e))
+        openatlas.logger.log('error', 'mail', 'Error mail login for ' + mail_user, e)
         flash(_('error mail login'), 'error')
         return False
     except Exception as e:
-        openatlas.logger.log('error', 'mail', 'Error send mail for ' + mail_user, str(e))
+        openatlas.logger.log('error', 'mail', 'Error send mail for ' + mail_user, e)
         flash(_('error mail send'), 'error')
         return False
     return True
@@ -95,20 +95,20 @@ def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
 
 class MLStripper(HTMLParser):
 
-    def error(self, message):  # pragma: no cover
+    def error(self, message) -> None:  # pragma: no cover
         pass
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.reset()
         self.strict = False
         self.convert_charrefs = True
-        self.fed = []
+        self.fed = []  # type: list
 
     def handle_data(self, d):
         self.fed.append(d)
 
-    def get_data(self):
+    def get_data(self) -> str:
         return ''.join(self.fed)
 
 

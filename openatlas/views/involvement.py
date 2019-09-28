@@ -26,7 +26,7 @@ class ActorForm(DateForm):
 
 @app.route('/involvement/insert/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def involvement_insert(origin_id: int):
+def involvement_insert(origin_id: int) -> str:
     origin = EntityMapper.get_by_id(origin_id)
     form = build_form(ActorForm, 'Involvement')
     if origin.view_name == 'event':
@@ -71,7 +71,7 @@ def involvement_insert(origin_id: int):
 
 @app.route('/involvement/update/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def involvement_update(id_: int, origin_id: int):
+def involvement_update(id_: int, origin_id: int) -> str:
     link_ = LinkMapper.get_by_id(id_)
     event = EntityMapper.get_by_id(link_.domain.id)
     actor = EntityMapper.get_by_id(link_.range.id)
@@ -89,8 +89,8 @@ def involvement_update(id_: int, origin_id: int):
         g.cursor.execute('BEGIN')
         try:
             link_.delete()
-            link_ = LinkMapper.get_by_id(
-                event.link(form.activity.data, actor, form.description.data))
+            link_ = LinkMapper.get_by_id(event.link(form.activity.data, actor,
+                                                    form.description.data))
             link_.set_dates(form)
             link_.type = get_link_type(form)
             link_.update()

@@ -262,7 +262,7 @@ class NodeMapper(EntityMapper):
         g.execute("SELECT name FROM web.form WHERE id = %(form_id)s;", {'form_id': form_id})
         form_name = g.cursor.fetchone()[0]
         system_type = ''
-        class_code = ''
+        class_code = []  # type: list
         if form_name == 'Source':
             system_type = 'source content'
         elif form_name == 'Event':

@@ -1,4 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+from typing import Optional
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -33,7 +34,7 @@ class ActorForm(DateForm):
 
 @app.route('/actor/view/<int:id_>')
 @required_group('readonly')
-def actor_view(id_):
+def actor_view(id_: int) -> str:
     actor = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
     actor.note = UserMapper.get_note(actor)
     info = []
@@ -173,7 +174,7 @@ def actor_view(id_):
 
 @app.route('/actor')
 @required_group('readonly')
-def actor_index():
+def actor_index() -> str:
     table = Table(Table.HEADERS['actor'] + ['description'],
                   defs='[{className: "dt-body-right", targets: [2,3]}]')
     for actor in EntityMapper.get_by_codes('actor'):
@@ -186,7 +187,7 @@ def actor_index():
 @app.route('/actor/insert/<code>', methods=['POST', 'GET'])
 @app.route('/actor/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def actor_insert(code, origin_id=None):
+def actor_insert(code: str, origin_id: Optional[int] = None):
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
     form = build_form(ActorForm, code_class[code])
@@ -203,7 +204,7 @@ def actor_insert(code, origin_id=None):
 
 @app.route('/actor/delete/<int:id_>')
 @required_group('contributor')
-def actor_delete(id_):
+def actor_delete(id_: int) -> str:
     EntityMapper.delete(id_)
     logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
@@ -212,7 +213,7 @@ def actor_delete(id_):
 
 @app.route('/actor/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def actor_update(id_):
+def actor_update(id_: int) -> str:
     actor = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
     code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
     form = build_form(ActorForm, code_class[actor.class_.code], actor, request)
@@ -239,7 +240,7 @@ def actor_update(id_):
     return render_template('actor/update.html', form=form, actor=actor)
 
 
-def save(form, actor=None, code=None, origin=None):
+def save(form, actor=None, code: Optional[str] = None, origin=None) -> str:
     g.cursor.execute('BEGIN')
     try:
         log_action = 'update'

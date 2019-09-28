@@ -44,7 +44,7 @@ class FileForm(Form):
         return valid
 
 
-def preview_file(name: str):
+def preview_file(name: str) -> bool:
     return name.rsplit('.', 1)[1].lower() in app.config['DISPLAY_FILE_EXTENSIONS']
 
 
@@ -66,14 +66,14 @@ def display_logo(filename: str):  # File display function for public
 
 
 @app.route('/file/set_as_profile_image/<int:id_>/<int:origin_id>')
-def file_set_as_profile_image(id_: int, origin_id: int):
+def file_set_as_profile_image(id_: int, origin_id: int) -> str:
     EntityMapper.set_profile_image(id_, origin_id)
     origin = EntityMapper.get_by_id(origin_id)
     return redirect(url_for(app.config['CODE_CLASS'][origin.class_.code] + '_view', id_=origin.id))
 
 
 @app.route('/file/set_as_profile_image/<int:entity_id>')
-def file_remove_profile_image(entity_id: int):
+def file_remove_profile_image(entity_id: int) -> str:
     entity = EntityMapper.get_by_id(entity_id)
     entity.remove_profile_image()
     return redirect(url_for(app.config['CODE_CLASS'][entity.class_.code] + '_view', id_=entity.id))
@@ -81,7 +81,7 @@ def file_remove_profile_image(entity_id: int):
 
 @app.route('/file/index')
 @required_group('readonly')
-def file_index():
+def file_index() -> str:
     table = Table(['date'] + Table.HEADERS['file'])
     file_stats = get_file_stats()
     for entity in EntityMapper.get_by_system_type('file', nodes=True):
@@ -107,7 +107,7 @@ def file_index():
 
 @app.route('/file/add/<int:origin_id>', methods=['GET', 'POST'])
 @required_group('contributor')
-def file_add(origin_id: int):
+def file_add(origin_id: int) -> str:
     """ Link an entity to file coming from the entity."""
     origin = EntityMapper.get_by_id(origin_id)
     if request.method == 'POST':
@@ -120,7 +120,7 @@ def file_add(origin_id: int):
 
 @app.route('/file/add2/<int:id_>/<class_name>', methods=['POST', 'GET'])
 @required_group('contributor')
-def file_add2(id_: int, class_name: str):
+def file_add2(id_: int, class_name: str) -> str:
     """ Link an entity to file coming from the file"""
     file = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
@@ -133,7 +133,7 @@ def file_add2(id_: int, class_name: str):
 
 @app.route('/file/view/<int:id_>')
 @required_group('readonly')
-def file_view(id_: int):
+def file_view(id_: int) -> str:
     file = EntityMapper.get_by_id(id_, nodes=True)
     path = get_file_path(file.id)
     tables = {'info': get_entity_data(file)}
@@ -165,7 +165,7 @@ def file_view(id_: int):
 
 @app.route('/file/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
-def file_update(id_: int):
+def file_update(id_: int) -> str:
     file = EntityMapper.get_by_id(id_, nodes=True)
     form = build_form(FileForm, 'File', file, request)
     del form.file
@@ -183,7 +183,7 @@ def file_update(id_: int):
 @app.route('/file/insert', methods=['GET', 'POST'])
 @app.route('/file/insert/<int:origin_id>', methods=['GET', 'POST'])
 @required_group('contributor')
-def file_insert(origin_id: Optional[int] = None):
+def file_insert(origin_id: Optional[int] = None) -> str:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(FileForm, 'File')
     if form.validate_on_submit():
@@ -194,7 +194,7 @@ def file_insert(origin_id: Optional[int] = None):
 
 @app.route('/file/delete/<int:id_>')
 @required_group('contributor')
-def file_delete(id_: Optional[int] = None):
+def file_delete(id_: Optional[int] = None) -> str:
     try:
         EntityMapper.delete(id_)
         logger.log_user(id_, 'delete')
@@ -212,7 +212,7 @@ def file_delete(id_: Optional[int] = None):
     return redirect(url_for('file_index'))
 
 
-def save(form: FileForm, file: Optional[Entity] = None, origin: Optional[Entity] = None):
+def save(form: FileForm, file: Optional[Entity] = None, origin: Optional[Entity] = None) -> str:
     g.cursor.execute('BEGIN')
     try:
         log_action = 'update'

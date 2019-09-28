@@ -38,7 +38,7 @@ class MemberForm(DateForm):
 
 @app.route('/membership/insert/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def membership_insert(origin_id):
+def membership_insert(origin_id: int) -> str:
     origin = EntityMapper.get_by_id(origin_id)
     form = build_form(MemberForm, 'Member')
     del form.actor
@@ -65,7 +65,7 @@ def membership_insert(origin_id):
 
 @app.route('/member/insert/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def member_insert(origin_id):
+def member_insert(origin_id: int) -> str:
     origin = EntityMapper.get_by_id(origin_id)
     form = build_form(MemberForm, 'Member')
     del form.group
@@ -93,7 +93,7 @@ def member_insert(origin_id):
 
 @app.route('/member/update/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def member_update(id_, origin_id):
+def member_update(id_: int, origin_id: int) -> str:
     link_ = LinkMapper.get_by_id(id_)
     domain = EntityMapper.get_by_id(link_.domain.id)
     range_ = EntityMapper.get_by_id(link_.range.id)
@@ -104,8 +104,7 @@ def member_update(id_, origin_id):
         g.cursor.execute('BEGIN')
         try:
             link_.delete()
-            link_ = LinkMapper.get_by_id(
-                domain.link('P107', range_, form.description.data))
+            link_ = LinkMapper.get_by_id(domain.link('P107', range_, form.description.data))
             link_.set_dates(form)
             link_.type = get_link_type(form)
             link_.update()

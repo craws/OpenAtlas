@@ -1,4 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+from typing import Optional
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -29,7 +30,7 @@ class SourceForm(Form):
 
 @app.route('/source')
 @required_group('readonly')
-def source_index():
+def source_index() -> str:
     table = Table(Table.HEADERS['source'])
     for source in EntityMapper.get_by_codes('source'):
         data = get_base_table_data(source)
@@ -40,7 +41,7 @@ def source_index():
 @app.route('/source/insert/<int:origin_id>', methods=['POST', 'GET'])
 @app.route('/source/insert', methods=['POST', 'GET'])
 @required_group('contributor')
-def source_insert(origin_id=None):
+def source_insert(origin_id: Optional[int] = None) -> str:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(SourceForm, 'Source')
     if origin:
@@ -54,7 +55,7 @@ def source_insert(origin_id=None):
 
 @app.route('/source/view/<int:id_>')
 @required_group('readonly')
-def source_view(id_):
+def source_view(id_: int) -> str:
     source = EntityMapper.get_by_id(id_, nodes=True)
     source.note = UserMapper.get_note(source)
     tables = {'info': get_entity_data(source),
@@ -103,7 +104,7 @@ def source_view(id_):
 
 @app.route('/source/add/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def source_add(origin_id):
+def source_add(origin_id: int) -> str:
     """ Link an entity to source coming from the entity."""
     origin = EntityMapper.get_by_id(origin_id)
     property_code = 'P128' if origin.class_.code == 'E84' else 'P67'
@@ -118,7 +119,7 @@ def source_add(origin_id):
 
 @app.route('/source/add2/<int:id_>/<class_name>', methods=['POST', 'GET'])
 @required_group('contributor')
-def source_add2(id_, class_name):
+def source_add2(id_: int, class_name: str) -> str:
     """ Link an entity to source coming from the source"""
     source = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
@@ -131,7 +132,7 @@ def source_add2(id_, class_name):
 
 @app.route('/source/delete/<int:id_>')
 @required_group('contributor')
-def source_delete(id_):
+def source_delete(id_: int) -> str:
     EntityMapper.delete(id_)
     logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
@@ -182,7 +183,7 @@ def save(form, source=None, origin=None) -> str:
                 url = url_for('reference_link_update', link_id=link_id, origin_id=origin)
             elif origin.view_name == 'file':
                 origin.link('P67', source)
-            else:
+            elif origin.class_.code != 'E84':
                 source.link('P67', origin)
         g.cursor.execute('COMMIT')
         if form.continue_.data == 'yes':

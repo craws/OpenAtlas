@@ -1,11 +1,13 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+from typing import Optional
+
 from flask import abort, flash, g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import Form
 from werkzeug.utils import redirect
 from wtforms import (BooleanField, SelectMultipleField, StringField, SubmitField, TextAreaField,
                      widgets)
-from wtforms.validators import InputRequired
+from wtforms.validators import InputRequired, optional
 
 from openatlas import app, logger
 from openatlas.forms.forms import build_form
@@ -31,7 +33,7 @@ class HierarchyForm(Form):
 
 @app.route('/hierarchy/insert/<param>', methods=['POST', 'GET'])
 @required_group('manager')
-def hierarchy_insert(param):
+def hierarchy_insert(param: str) -> str:
     form = build_form(HierarchyForm, 'hierarchy')  # type: HierarchyForm
     form.forms.choices = NodeMapper.get_form_choices()
     if param == 'value':
@@ -48,7 +50,7 @@ def hierarchy_insert(param):
 
 @app.route('/hierarchy/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('manager')
-def hierarchy_update(id_):
+def hierarchy_update(id_: int) -> str:
     root = g.nodes[id_]
     if root.system:
         abort(403)
@@ -78,7 +80,7 @@ def hierarchy_update(id_):
 
 @app.route('/hierarchy/remove_form/<int:id_>/<int:remove_id>')
 @required_group('manager')
-def hierarchy_remove_form(id_, remove_id):
+def hierarchy_remove_form(id_: int, remove_id: int) -> str:
     root = g.nodes[id_]
     if NodeMapper.get_form_count(root, remove_id):
         abort(403)  # pragma: no cover
@@ -93,7 +95,7 @@ def hierarchy_remove_form(id_, remove_id):
 
 @app.route('/hierarchy/delete/<int:id_>', methods=['POST', 'GET'])
 @required_group('manager')
-def hierarchy_delete(id_):
+def hierarchy_delete(id_: int) -> str:
     node = g.nodes[id_]
     if node.system or node.subs or node.count:
         abort(403)
@@ -102,7 +104,7 @@ def hierarchy_delete(id_):
     return redirect(url_for('node_index'))
 
 
-def save(form, node=None, value_type=False):
+def save(form, node=None, value_type: Optional[bool] = False):
     g.cursor.execute('BEGIN')
     try:
         if not node:

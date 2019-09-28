@@ -1,4 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+from typing import Tuple
+
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
@@ -62,7 +64,7 @@ def index() -> str:
 
 
 @app.route('/index/setlocale/<language>')
-def set_locale(language: str):
+def set_locale(language: str) -> str:
     session['language'] = language
     if hasattr(current_user, 'id') and current_user.id:
         current_user.settings['language'] = language
@@ -72,7 +74,7 @@ def set_locale(language: str):
 
 @app.route('/overview/feedback', methods=['POST', 'GET'])
 @required_group('readonly')
-def index_feedback():
+def index_feedback() -> str:
     form = FeedbackForm()
     if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
         subject = form.subject.data + ' from ' + session['settings']['site_name']
@@ -99,17 +101,17 @@ def index_credits() -> str:
 
 
 @app.errorhandler(403)
-def forbidden(e):
+def forbidden(e) -> Tuple[str, int]:
     return render_template('403.html', e=e), 403
 
 
 @app.errorhandler(404)
-def page_not_found(e):
+def page_not_found(e) -> Tuple[str, int]:
     return render_template('404.html', e=e), 404
 
 
 @app.errorhandler(418)
-def invalid_id(e):
+def invalid_id(e) -> Tuple[str, int]:
     return render_template('418.html', e=e), 418
 
 

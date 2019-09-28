@@ -114,7 +114,7 @@ def save(form, object_=None) -> str:
 
 @app.route('/object/delete/<int:id_>')
 @required_group('contributor')
-def object_delete(id_):
+def object_delete(id_: int) -> str:
     EntityMapper.delete(id_)
     logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')

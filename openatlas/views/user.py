@@ -1,4 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+from typing import Optional
+
 from flask import abort, flash, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
@@ -65,7 +67,7 @@ class ActivityForm(Form):
 @app.route('/admin/user/activity', methods=['POST', 'GET'])
 @app.route('/admin/user/activity/<int:user_id>', methods=['POST', 'GET'])
 @required_group('readonly')
-def user_activity(user_id=0):
+def user_activity(user_id: Optional[int] = 0) -> str:
     form = ActivityForm()
     form.user.choices = [(0, _('all'))] + UserMapper.get_users()
     if form.validate_on_submit():
@@ -88,7 +90,7 @@ def user_activity(user_id=0):
 
 @app.route('/admin/user/view/<int:id_>')
 @required_group('readonly')
-def user_view(id_):
+def user_view(id_: int) -> str:
     user = UserMapper.get_by_id(id_)
     data = {'info': [
         (_('username'), link(user)),
@@ -103,7 +105,7 @@ def user_view(id_):
 
 @app.route('/admin/user')
 @required_group('readonly')
-def user_index():
+def user_index() -> str:
     table = Table(['username', 'group', 'email', 'newsletter', 'created', 'last login', 'entities'])
     for user in UserMapper.get_all():
         count = UserMapper.get_created_entities_count(user.id)
@@ -120,7 +122,7 @@ def user_index():
 
 @app.route('/admin/user/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('manager')
-def user_update(id_):
+def user_update(id_: int) -> str:
     user = UserMapper.get_by_id(id_)
     if user.group == 'admin' and current_user.group != 'admin':
         abort(403)  # pragma: no cover
@@ -145,7 +147,7 @@ def user_update(id_):
 
 @app.route('/admin/user/insert', methods=['POST', 'GET'])
 @required_group('manager')
-def user_insert():
+def user_insert() -> str:
     form = UserForm()
     form.group.choices = get_groups()
     if not session['settings']['mail']:
@@ -173,7 +175,7 @@ def user_insert():
     return render_template('user/insert.html', form=form)
 
 
-def get_groups():
+def get_groups() -> list:
     """ Returns groups, hardcoded because order is relevant (weakest permissions to strongest)"""
     choices = [(name, name) for name in ['readonly', 'contributor', 'editor', 'manager']]
     if is_authorized('admin'):
@@ -183,7 +185,7 @@ def get_groups():
 
 @app.route('/admin/user/delete/<int:id_>')
 @required_group('manager')
-def user_delete(id_):
+def user_delete(id_: int) -> str:
     user = UserMapper.get_by_id(id_)
     if (user.group == 'admin' and current_user.group != 'admin') and user.id != current_user.id:
         abort(403)  # pragma: no cover

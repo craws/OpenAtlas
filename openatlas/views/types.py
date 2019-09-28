@@ -1,5 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
+from typing import Optional, Union
 
 from flask import abort, flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -31,9 +32,9 @@ class NodeForm(Form):
 
 @app.route('/types')
 @required_group('readonly')
-def node_index():
+def node_index() -> str:
     nodes = {'system': OrderedDict(), 'custom': OrderedDict(),
-             'places': OrderedDict(), 'value': OrderedDict()}
+             'places': OrderedDict(), 'value': OrderedDict()}  # type: dict
     for id_, node in g.nodes.items():
         if node.root:
             continue
@@ -51,7 +52,7 @@ def node_index():
 @app.route('/types/insert/<int:root_id>', methods=['GET', 'POST'])
 @app.route('/types/insert/<int:root_id>/<int:super_id>', methods=['GET', 'POST'])
 @required_group('editor')
-def node_insert(root_id, super_id=None):
+def node_insert(root_id: int, super_id: Optional[bool] = None):
     root = g.nodes[root_id]
     form = build_node_form(NodeForm, root)
     # Check if form is valid and if it wasn't a submit of the search form
@@ -67,7 +68,7 @@ def node_insert(root_id, super_id=None):
 
 @app.route('/types/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
-def node_update(id_):
+def node_update(id_: int) -> str:
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]] if node.root else None
     if node.system or (root and root.locked):
@@ -82,7 +83,7 @@ def node_update(id_):
 
 @app.route('/types/view/<int:id_>')
 @required_group('readonly')
-def node_view(id_):
+def node_view(id_: int) -> str:
     from openatlas.models.link import LinkMapper
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]] if node.root else None
@@ -114,7 +115,7 @@ def node_view(id_):
 
 @app.route('/types/delete/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
-def node_delete(id_):
+def node_delete(id_: int) -> str:
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]] if node.root else None
     if node.system or node.subs or node.count or (root and root.locked):
@@ -135,7 +136,7 @@ class MoveForm(Form):
 
 @app.route('/types/move/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
-def node_move_entities(id_):
+def node_move_entities(id_: int) -> str:
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]]
     if root.value_type:  # pragma: no cover
@@ -152,7 +153,7 @@ def node_move_entities(id_):
     return render_template('types/move.html', node=node, root=root, form=form)
 
 
-def walk_tree(param):
+def walk_tree(param: Union[int, list]) -> str:
     """ Builds JSON for jsTree"""
     text = ''
     for id_ in param if type(param) is list else [param]:
@@ -172,7 +173,7 @@ def walk_tree(param):
     return text
 
 
-def tree_select(name):
+def tree_select(name: str) -> str:
     html = """
         <div id="{name}-tree"></div>
         <script>

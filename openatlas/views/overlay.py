@@ -56,6 +56,6 @@ def overlay_update(id_: int) -> str:
 
 @app.route('/overlay/remove/<int:id_>/<int:place_id>')
 @required_group('editor')
-def overlay_remove(id_: int, place_id: int):
+def overlay_remove(id_: int, place_id: int) -> str:
     OverlayMapper.remove(id_)
     return redirect(url_for('place_view', id_=place_id) + '#tab-file')

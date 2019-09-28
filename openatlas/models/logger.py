@@ -1,5 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Optional
+from typing import Union
 
 from flask import g, request, session
 from flask_login import current_user
@@ -12,7 +12,8 @@ from openatlas.models.user import UserMapper
 class DBHandler:
 
     @staticmethod
-    def log(priority_: str, type_: str, message: str, info: Optional[str] = None) -> None:
+    def log(priority_: str, type_: str, message: str,
+            info: Union[str, Exception, None] = None) -> None:
         log_levels = app.config['LOG_LEVELS']
         priority = list(log_levels.keys())[list(log_levels.values()).index(priority_)]
         if int(session['settings']['log_level']) < priority:

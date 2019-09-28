@@ -37,7 +37,7 @@ class ExportCsvForm(Form):
 
 @app.route('/export/sql', methods=['POST', 'GET'])
 @required_group('manager')
-def export_sql():
+def export_sql() -> str:
     path = app.config['EXPORT_FOLDER_PATH'] + '/sql'
     writeable = True if os.access(path, os.W_OK) else False
     form = ExportSqlForm()
@@ -75,7 +75,7 @@ def download_sql(filename: str):
 
 @app.route('/delete/sql/<filename>')
 @required_group('admin')
-def delete_sql(filename: str):
+def delete_sql(filename: str) -> str:
     try:
         os.remove(app.config['EXPORT_FOLDER_PATH'] + '/sql/' + filename)
         logger.log('info', 'file', 'SQL file deleted')
@@ -95,7 +95,7 @@ def download_csv(filename: str):
 
 @app.route('/export/csv', methods=['POST', 'GET'])
 @required_group('manager')
-def export_csv():
+def export_csv() -> str:
     path = app.config['EXPORT_FOLDER_PATH'] + '/csv'
     writeable = True if os.access(path, os.W_OK) else False
     form = ExportCsvForm()
@@ -123,7 +123,7 @@ def export_csv():
 
 @app.route('/delete/csv/<filename>')
 @required_group('admin')
-def delete_csv(filename: str):
+def delete_csv(filename: str) -> str:
     try:
         os.remove(app.config['EXPORT_FOLDER_PATH'] + '/csv/' + filename)
         logger.log('info', 'file', 'CSV file deleted')

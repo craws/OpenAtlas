@@ -3,6 +3,7 @@ from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from werkzeug.utils import redirect
+from typing import Optional as OptionalTyping
 from wtforms import (BooleanField, FieldList, HiddenField, IntegerField, StringField, SubmitField,
                      TextAreaField)
 from wtforms.validators import InputRequired, Optional
@@ -49,7 +50,7 @@ class FeatureForm(DateForm):
 
 @app.route('/place')
 @required_group('readonly')
-def place_index():
+def place_index() -> str:
     table = Table(Table.HEADERS['place'], defs='[{className: "dt-body-right", targets: [2,3]}]')
     for place in EntityMapper.get_by_system_type(
             'place', nodes=True, aliases=current_user.settings['table_show_aliases']):
@@ -60,7 +61,7 @@ def place_index():
 @app.route('/place/insert', methods=['POST', 'GET'])
 @app.route('/place/insert/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def place_insert(origin_id=None):
+def place_insert(origin_id: OptionalTyping[int] = None) -> str:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     geonames_buttons = False
     if origin and origin.system_type == 'place':
@@ -106,7 +107,7 @@ def place_insert(origin_id=None):
 
 @app.route('/place/view/<int:id_>')
 @required_group('readonly')
-def place_view(id_):
+def place_view(id_: int) -> str:
     object_ = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
     object_.note = UserMapper.get_note(object_)
     location = object_.get_linked_entity('P53', nodes=True)
@@ -206,7 +207,7 @@ def place_view(id_):
 
 @app.route('/place/delete/<int:id_>')
 @required_group('contributor')
-def place_delete(id_):
+def place_delete(id_: int) -> str:
     entity = EntityMapper.get_by_id(id_)
     parent = None if entity.system_type == 'place' else entity.get_linked_entity('P46', True)
     if entity.get_linked_entities('P46'):
@@ -222,7 +223,7 @@ def place_delete(id_):
 
 @app.route('/place/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def place_update(id_):
+def place_update(id_: int) -> str:
     object_ = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
     location = object_.get_linked_entity('P53', nodes=True)
     geonames_buttons = False
@@ -329,13 +330,13 @@ def save(form: DateForm, object_=None, location=None, origin=None) -> str:
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
     except InvalidGeomException as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        logger.log('error', 'database', 'transaction failed because of invalid geom', str(e))
+        logger.log('error', 'database', 'transaction failed because of invalid geom', e)
         flash(_('Invalid geom entered'), 'error')
         url = url_for('place_index') if log_action == 'insert' else url_for('place_view',
                                                                             id_=object_.id)
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        logger.log('error', 'database', 'transaction failed', str(e))
+        logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
         url = url_for('place_index') if log_action == 'insert' else url_for('place_view',
                                                                             id_=object_.id)
