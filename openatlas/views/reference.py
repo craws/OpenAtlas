@@ -65,24 +65,10 @@ class AddFileForm(Form):
     save = SubmitField(_('insert'))
 
 
-@app.route('/reference/add/<int:origin_id>', methods=['POST', 'GET'])
+@app.route('/reference/add/<int:id_>/<class_name>', methods=['POST', 'GET'])
 @required_group('contributor')
-def reference_add(origin_id: int) -> str:
-    """ Link an entity to reference coming from the entity."""
-    origin = EntityMapper.get_by_id(origin_id)
-    form = AddReferenceForm()
-    if form.validate_on_submit():
-        EntityMapper.get_by_id(form.reference.data).link('P67', origin, form.page.data)
-        return redirect(url_for(origin.view_name + '_view', id_=origin.id) + '#tab-reference')
-    form.page.label.text = uc_first(_('page / link text'))
-    return render_template('reference/add.html', origin=origin, form=form)
-
-
-@app.route('/reference/add2/<int:reference_id>/<class_name>', methods=['POST', 'GET'])
-@required_group('contributor')
-def reference_add2(reference_id: int, class_name: str) -> str:
-    """ Link an entity to reference coming from the reference."""
-    reference = EntityMapper.get_by_id(reference_id)
+def reference_add(id_: int, class_name: str) -> str:
+    reference = EntityMapper.get_by_id(id_)
     form = getattr(openatlas.views.reference, 'Add' + uc_first(class_name) + 'Form')()
     if form.validate_on_submit():
         property_code = 'P128' if reference.class_.code == 'E84' else 'P67'
@@ -91,7 +77,7 @@ def reference_add2(reference_id: int, class_name: str) -> str:
         return redirect(url_for('reference_view', id_=reference.id) + '#tab-' + class_name)
     if reference.system_type == 'external reference':
         form.page.label.text = uc_first(_('link text'))
-    return render_template('reference/add2.html', reference=reference, form=form,
+    return render_template('reference/add.html', reference=reference, form=form,
                            class_name=class_name)
 
 

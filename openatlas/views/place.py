@@ -9,7 +9,7 @@ from wtforms import (BooleanField, FieldList, HiddenField, IntegerField, StringF
 from wtforms.validators import InputRequired, Optional
 
 from openatlas import app, logger
-from openatlas.forms.forms import DateForm, build_form
+from openatlas.forms.forms import DateForm, build_form, build_table_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper, InvalidGeomException
 from openatlas.models.geonames import GeonamesMapper
@@ -19,6 +19,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  get_profile_image_table_link, is_authorized, link, required_group,
                                  truncate_string, uc_first, was_modified)
+from openatlas.views.reference import AddReferenceForm
 
 
 class PlaceForm(DateForm):
@@ -134,7 +135,7 @@ def place_view(id_: int) -> str:
     for link_ in object_.get_links('P67', inverse=True):
         domain = link_.domain
         data = get_base_table_data(domain)
-        if domain.view_name == 'file':  # pragma: no cover
+        if domain.view_name == 'file':
             extension = data[3].replace('.', '')
             data.append(get_profile_image_table_link(domain, object_, extension, profile_image_id))
             if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
@@ -148,7 +149,7 @@ def place_view(id_: int) -> str:
                         url = url_for('overlay_insert', image_id=domain.id, place_id=object_.id,
                                       link_id=link_.id)
                         data.append('<a href="' + url + '">' + uc_first(_('add')) + '</a>')
-                else:
+                else:  # pragma: no cover
                     data.append('')
         if domain.view_name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
@@ -219,6 +220,42 @@ def place_delete(id_: int) -> str:
     if parent:
         return redirect(url_for('place_view', id_=parent.id) + '#tab-' + entity.system_type)
     return redirect(url_for('place_index'))
+
+
+@app.route('/place/add/source/<int:id_>', methods=['POST', 'GET'])
+@required_group('contributor')
+def place_add_source(id_: int) -> str:
+    object_ = EntityMapper.get_by_id(id_)
+    if request.method == 'POST':
+        if request.form['checkbox_values']:
+            object_.link('P67', request.form['checkbox_values'], inverse=True)
+        return redirect(url_for('place_view', id_=id_) + '#tab-source')
+    form = build_table_form('source', object_.get_linked_entities('P67', inverse=True))
+    return render_template('add_source.html', entity=object_, form=form)
+
+
+@app.route('/place/add/reference/<int:id_>', methods=['POST', 'GET'])
+@required_group('contributor')
+def place_add_reference(id_: int) -> str:
+    object_ = EntityMapper.get_by_id(id_)
+    form = AddReferenceForm()
+    if form.validate_on_submit():
+        object_.link('P67', form.reference.data, description=form.page.data, inverse=True)
+        return redirect(url_for('place_view', id_=id_) + '#tab-reference')
+    form.page.label.text = uc_first(_('page / link text'))
+    return render_template('add_reference.html', entity=object_, form=form)
+
+
+@app.route('/place/add/file/<int:id_>', methods=['GET', 'POST'])
+@required_group('contributor')
+def place_add_file(id_: int) -> str:
+    object_ = EntityMapper.get_by_id(id_)
+    if request.method == 'POST':
+        if request.form['checkbox_values']:
+            object_.link('P67', request.form['checkbox_values'], inverse=True)
+        return redirect(url_for('place_view', id_=id_) + '#tab-file')
+    form = build_table_form('file', object_.get_linked_entities('P67', inverse=True))
+    return render_template('add_file.html', entity=object_, form=form)
 
 
 @app.route('/place/update/<int:id_>', methods=['POST', 'GET'])

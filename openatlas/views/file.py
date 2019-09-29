@@ -20,6 +20,7 @@ from openatlas.util.util import (convert_size, display_remove_link, format_date,
                                  get_base_table_data, get_entity_data, get_file_path,
                                  get_file_stats, is_authorized, link, required_group,
                                  truncate_string, uc_first, was_modified)
+from openatlas.views.reference import AddReferenceForm
 
 
 class FileForm(Form):
@@ -104,30 +105,28 @@ def file_index() -> str:
     return render_template('file/index.html', table=table, disk_space_values=disk_space_values)
 
 
-@app.route('/file/add/<int:origin_id>', methods=['GET', 'POST'])
+@app.route('/file/add/<int:id_>/<class_name>', methods=['POST', 'GET'])
 @required_group('contributor')
-def file_add(origin_id: int) -> str:
-    """ Link an entity to file coming from the entity."""
-    origin = EntityMapper.get_by_id(origin_id)
-    if request.method == 'POST':
-        if request.form['checkbox_values']:
-            origin.link('P67', request.form['checkbox_values'], inverse=True)
-        return redirect(url_for(origin.view_name + '_view', id_=origin.id) + '#tab-file')
-    form = build_table_form('file', origin.get_linked_entities('P67', inverse=True))
-    return render_template('file/add.html', origin=origin, form=form)
-
-
-@app.route('/file/add2/<int:id_>/<class_name>', methods=['POST', 'GET'])
-@required_group('contributor')
-def file_add2(id_: int, class_name: str) -> str:
-    """ Link an entity to file coming from the file"""
+def file_add(id_: int, class_name: str) -> str:
     file = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:
             file.link('P67', request.form['checkbox_values'])
         return redirect(url_for('file_view', id_=file.id) + '#tab-' + class_name)
     form = build_table_form(class_name, file.get_linked_entities('P67'))
-    return render_template('file/add2.html', entity=file, class_name=class_name, form=form)
+    return render_template('file/add.html', entity=file, class_name=class_name, form=form)
+
+
+@app.route('/file/add/reference/<int:id_>', methods=['POST', 'GET'])
+@required_group('contributor')
+def file_add_reference(id_: int) -> str:
+    file = EntityMapper.get_by_id(id_)
+    form = AddReferenceForm()
+    if form.validate_on_submit():
+        file.link('P67', form.reference.data, description=form.page.data, inverse=True)
+        return redirect(url_for('file_view', id_=id_) + '#tab-reference')
+    form.page.label.text = uc_first(_('page / link text'))
+    return render_template('add_reference.html', entity=file, form=form)
 
 
 @app.route('/file/view/<int:id_>')

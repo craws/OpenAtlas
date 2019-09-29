@@ -16,6 +16,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import (display_remove_link, get_base_table_data,
                                  get_entity_data, get_profile_image_table_link, is_authorized, link,
                                  required_group, truncate_string, uc_first, was_modified)
+from openatlas.views.reference import AddReferenceForm
 
 
 class SourceForm(Form):
@@ -102,32 +103,40 @@ def source_view(id_: int) -> str:
                            profile_image_id=profile_image_id)
 
 
-@app.route('/source/add/<int:origin_id>', methods=['POST', 'GET'])
+@app.route('/source/add/<int:id_>/<class_name>', methods=['POST', 'GET'])
 @required_group('contributor')
-def source_add(origin_id: int) -> str:
-    """ Link an entity to source coming from the entity."""
-    origin = EntityMapper.get_by_id(origin_id)
-    property_code = 'P128' if origin.class_.code == 'E84' else 'P67'
-    inverse = False if origin.class_.code == 'E84' else True
-    if request.method == 'POST':
-        if request.form['checkbox_values']:
-            origin.link(property_code, request.form['checkbox_values'], inverse)
-        return redirect(url_for(origin.view_name + '_view', id_=origin.id) + '#tab-source')
-    form = build_table_form('source', origin.get_linked_entities(property_code, inverse))
-    return render_template('source/add.html', origin=origin, form=form)
-
-
-@app.route('/source/add2/<int:id_>/<class_name>', methods=['POST', 'GET'])
-@required_group('contributor')
-def source_add2(id_: int, class_name: str) -> str:
-    """ Link an entity to source coming from the source"""
+def source_add(id_: int, class_name: str) -> str:
     source = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:
             source.link('P67', request.form['checkbox_values'])
         return redirect(url_for('source_view', id_=source.id) + '#tab-' + class_name)
     form = build_table_form(class_name, source.get_linked_entities('P67'))
-    return render_template('source/add2.html', source=source, class_name=class_name, form=form)
+    return render_template('source/add.html', source=source, class_name=class_name, form=form)
+
+
+@app.route('/source/add/reference/<int:id_>', methods=['POST', 'GET'])
+@required_group('contributor')
+def source_add_reference(id_: int) -> str:
+    source = EntityMapper.get_by_id(id_)
+    form = AddReferenceForm()
+    if form.validate_on_submit():
+        source.link('P67', form.reference.data, description=form.page.data, inverse=True)
+        return redirect(url_for('source_view', id_=id_) + '#tab-reference')
+    form.page.label.text = uc_first(_('page / link text'))
+    return render_template('add_reference.html', entity=source, form=form)
+
+
+@app.route('/source/add/file/<int:id_>', methods=['GET', 'POST'])
+@required_group('contributor')
+def source_add_file(id_: int) -> str:
+    source = EntityMapper.get_by_id(id_)
+    if request.method == 'POST':
+        if request.form['checkbox_values']:
+            source.link('P67', request.form['checkbox_values'], inverse=True)
+        return redirect(url_for('source_view', id_=id_) + '#tab-file')
+    form = build_table_form('file', source.get_linked_entities('P67', inverse=True))
+    return render_template('add_file.html', entity=source, form=form)
 
 
 @app.route('/source/delete/<int:id_>')

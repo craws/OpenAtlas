@@ -8,27 +8,25 @@ from openatlas.test_base import TestBaseCase
 class UserTests(TestBaseCase):
 
     def test_user(self):
-        data = {
-            'active': '',
-            'username': 'Ripley',
-            'email': 'ripley@nostromo.org',
-            'password': 'you_never_guess_this',
-            'password2': 'you_never_guess_this',
-            'group': 'admin',
-            'name': 'Ripley Weaver',
-            'description': '',
-            'send_info': ''}
+        data = {'active': '',
+                'username': 'Ripley',
+                'email': 'ripley@nostromo.org',
+                'password': 'you_never_guess_this',
+                'password2': 'you_never_guess_this',
+                'group': 'admin',
+                'name': 'Ripley Weaver',
+                'description': '',
+                'send_info': ''}
 
-        data2 = {
-            'active': '',
-            'username': 'Newt',
-            'email': 'newt@nostromo.org',
-            'password': 'you_never_guess_this',
-            'password2': 'you_never_guess_this',
-            'group': 'admin',
-            'name': 'Newt',
-            'continue_': 'yes',
-            'send_info': ''}
+        data2 = {'active': '',
+                 'username': 'Newt',
+                 'email': 'newt@nostromo.org',
+                 'password': 'you_never_guess_this',
+                 'password2': 'you_never_guess_this',
+                 'group': 'admin',
+                 'name': 'Newt',
+                 'continue_': 'yes',
+                 'send_info': ''}
 
         with app.app_context():
             rv = self.app.get(url_for('user_insert'), follow_redirects=True)
@@ -40,7 +38,7 @@ class UserTests(TestBaseCase):
             self.login()
             with app.test_request_context():
                 app.preprocess_request()
-                logged_in_user_id = UserMapper.get_by_username('Alice').id
+                logged_in_user = UserMapper.get_by_username('Alice')
             rv = self.app.get(url_for('user_insert'))
             assert b'+ User' in rv.data
             rv = self.app.post(url_for('user_insert'), data=data)
@@ -55,7 +53,7 @@ class UserTests(TestBaseCase):
 
             rv = self.app.get(url_for('user_view', id_=user_id))
             assert b'Ripley' in rv.data
-            rv = self.app.get(url_for('user_update', id_=logged_in_user_id))
+            rv = self.app.get(url_for('user_update', id_=logged_in_user.id))
             assert b'Alice' in rv.data
             data['description'] = 'The warrant officer'
             rv = self.app.post(url_for('user_update', id_=user_id),

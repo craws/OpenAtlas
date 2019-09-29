@@ -79,6 +79,8 @@ class LinkMapper:
         property_ = g.properties[property_code]
         try:
             linked_entities = ast.literal_eval(linked_entities)
+            if not linked_entities:  # pragma: no cover
+                return None
         except (SyntaxError, ValueError):
             pass
         linked_entities = linked_entities if type(linked_entities) is list else [linked_entities]

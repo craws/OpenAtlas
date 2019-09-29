@@ -9,7 +9,8 @@ from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import DateForm, TableField, TableMultiField, build_form
+from openatlas.forms.forms import DateForm, TableField, TableMultiField, build_form, \
+    build_table_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
 from openatlas.models.link import LinkMapper
@@ -18,6 +19,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  get_profile_image_table_link, is_authorized, link, required_group,
                                  truncate_string, uc_first, was_modified)
+from openatlas.views.reference import AddReferenceForm
 
 
 class EventForm(DateForm):
@@ -174,7 +176,7 @@ def event_view(id_: int) -> str:
     for link_ in event.get_links('P67', True):
         domain = link_.domain
         data = get_base_table_data(domain)
-        if domain.view_name == 'file':  # pragma: no cover
+        if domain.view_name == 'file':
             extension = data[3].replace('.', '')
             data.append(get_profile_image_table_link(domain, event, extension, profile_image_id))
             if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
@@ -198,6 +200,42 @@ def event_view(id_: int) -> str:
     return render_template('event/view.html', event=event, tables=tables,
                            profile_image_id=profile_image_id,
                            gis_data=GisMapper.get_all(objects) if objects else None)
+
+
+@app.route('/event/add/source/<int:id_>', methods=['POST', 'GET'])
+@required_group('contributor')
+def event_add_source(id_: int) -> str:
+    event = EntityMapper.get_by_id(id_)
+    if request.method == 'POST':
+        if request.form['checkbox_values']:
+            event.link('P67', request.form['checkbox_values'], inverse=True)
+        return redirect(url_for('event_view', id_=id_) + '#tab-source')
+    form = build_table_form('source', event.get_linked_entities('P67', inverse=True))
+    return render_template('add_source.html', entity=event, form=form)
+
+
+@app.route('/event/add/reference/<int:id_>', methods=['POST', 'GET'])
+@required_group('contributor')
+def event_add_reference(id_: int) -> str:
+    event = EntityMapper.get_by_id(id_)
+    form = AddReferenceForm()
+    if form.validate_on_submit():
+        event.link('P67', form.reference.data, description=form.page.data, inverse=True)
+        return redirect(url_for('event_view', id_=id_) + '#tab-reference')
+    form.page.label.text = uc_first(_('page / link text'))
+    return render_template('add_reference.html', entity=event, form=form)
+
+
+@app.route('/event/add/file/<int:id_>', methods=['GET', 'POST'])
+@required_group('contributor')
+def event_add_file(id_: int) -> str:
+    event = EntityMapper.get_by_id(id_)
+    if request.method == 'POST':
+        if request.form['checkbox_values']:
+            event.link('P67', request.form['checkbox_values'], inverse=True)
+        return redirect(url_for('event_view', id_=id_) + '#tab-file')
+    form = build_table_form('file', event.get_linked_entities('P67', inverse=True))
+    return render_template('add_file.html', entity=event, form=form)
 
 
 def save(form: Form, event=None, code: Optional[str] = None, origin=None) -> str:

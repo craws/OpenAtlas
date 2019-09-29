@@ -17,7 +17,7 @@ class EventTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()
                 actor = EntityMapper.insert('E21', 'Game master')
-                file = EntityMapper.insert('E31', 'One forsaken file entity', 'file')
+                file = EntityMapper.insert('E31', 'X-Files', 'file')
                 source = EntityMapper.insert('E33', 'Necronomicon', 'source content')
                 carrier = EntityMapper.insert('E84', 'I care for you', 'information carrier')
                 reference = EntityMapper.insert('E31', 'https://openatlas.eu', 'external reference')
@@ -56,8 +56,8 @@ class EventTest(TestBaseCase):
                                data={'name': 'Keep it moving',
                                      'place_to': residence_id,
                                      'place_from': residence_id,
-                                     'object': actor.id,
-                                     'person': carrier.id})
+                                     'object': carrier.id,
+                                     'person': actor.id})
             move_id = rv.location.split('/')[-1]
             rv = self.app.get(url_for('event_view', id_=move_id))
             assert b'Keep it moving' in rv.data
@@ -77,6 +77,26 @@ class EventTest(TestBaseCase):
             rv = self.app.get(url_for('event_index'))
             assert b'Test event' in rv.data
             self.app.get(url_for('event_view', id_=activity_id))
+
+            # Add to event
+            rv = self.app.get(url_for('event_add_file', id_=event_id))
+            assert b'Add File' in rv.data
+            rv = self.app.post(url_for('event_add_file', id_=event_id),
+                               data={'checkbox_values': str([file.id])}, follow_redirects=True)
+            assert b'X-Files' in rv.data
+
+            rv = self.app.get(url_for('event_add_source', id_=event_id))
+            assert b'Add Source' in rv.data
+            rv = self.app.post(url_for('event_add_source', id_=event_id),
+                               data={'checkbox_values': str([source.id])}, follow_redirects=True)
+            assert b'Necronomicon' in rv.data
+
+            rv = self.app.get(url_for('event_add_reference', id_=event_id))
+            assert b'Add Reference' in rv.data
+            rv = self.app.post(url_for('event_add_reference', id_=event_id),
+                               data={'reference': reference.id, 'page': '777'},
+                               follow_redirects=True)
+            assert b'777' in rv.data
 
             # Update
             rv = self.app.get(url_for('event_update', id_=activity_id))

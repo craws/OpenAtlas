@@ -8,7 +8,7 @@ from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import build_form
+from openatlas.forms.forms import build_form, build_table_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.user import UserMapper
 from openatlas.util.table import Table
@@ -60,6 +60,18 @@ def object_view(id_: int) -> str:
                 display_remove_link(url + '#tab-' + link_.range.table_name, link_.range.name))
         tables['event'].rows.append(data)
     return render_template('object/view.html', object_=object_, tables=tables)
+
+
+@app.route('/object/add/source/<int:id_>', methods=['POST', 'GET'])
+@required_group('contributor')
+def object_add_source(id_: int) -> str:
+    object_ = EntityMapper.get_by_id(id_)
+    if request.method == 'POST':
+        if request.form['checkbox_values']:
+            object_.link('P128', request.form['checkbox_values'])
+        return redirect(url_for('object_view', id_=id_) + '#tab-source')
+    form = build_table_form('source', object_.get_linked_entities('P128'))
+    return render_template('add_source.html', entity=object_, form=form)
 
 
 @app.route('/object/insert', methods=['POST', 'GET'])

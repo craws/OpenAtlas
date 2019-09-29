@@ -8,7 +8,7 @@ from wtforms import FieldList, HiddenField, StringField, SubmitField, TextAreaFi
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import DateForm, TableField, build_form
+from openatlas.forms.forms import DateForm, TableField, build_form, build_table_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
 from openatlas.models.user import UserMapper
@@ -17,6 +17,7 @@ from openatlas.util.util import (add_system_data, add_type_data, display_remove_
                                  format_entry_begin, format_entry_end, get_appearance,
                                  get_base_table_data, get_profile_image_table_link, is_authorized,
                                  link, required_group, truncate_string, uc_first, was_modified)
+from openatlas.views.reference import AddReferenceForm
 
 
 class ActorForm(DateForm):
@@ -238,6 +239,42 @@ def actor_update(id_: int) -> str:
         form.begins_in.label.text = _('born in')
         form.ends_in.label.text = _('died in')
     return render_template('actor/update.html', form=form, actor=actor)
+
+
+@app.route('/actor/add/source/<int:id_>', methods=['POST', 'GET'])
+@required_group('contributor')
+def actor_add_source(id_: int) -> str:
+    actor = EntityMapper.get_by_id(id_)
+    if request.method == 'POST':
+        if request.form['checkbox_values']:
+            actor.link('P67', request.form['checkbox_values'], inverse=True)
+        return redirect(url_for('actor_view', id_=id_) + '#tab-source')
+    form = build_table_form('source', actor.get_linked_entities('P67', inverse=True))
+    return render_template('add_source.html', entity=actor, form=form)
+
+
+@app.route('/actor/add/reference/<int:id_>', methods=['POST', 'GET'])
+@required_group('contributor')
+def actor_add_reference(id_: int) -> str:
+    actor = EntityMapper.get_by_id(id_)
+    form = AddReferenceForm()
+    if form.validate_on_submit():
+        actor.link('P67', form.reference.data, description=form.page.data, inverse=True)
+        return redirect(url_for('actor_view', id_=id_) + '#tab-reference')
+    form.page.label.text = uc_first(_('page / link text'))
+    return render_template('add_reference.html', entity=actor, form=form)
+
+
+@app.route('/actor/add/file/<int:id_>', methods=['GET', 'POST'])
+@required_group('contributor')
+def actor_add_file(id_: int) -> str:
+    actor = EntityMapper.get_by_id(id_)
+    if request.method == 'POST':
+        if request.form['checkbox_values']:
+            actor.link('P67', request.form['checkbox_values'], inverse=True)
+        return redirect(url_for('actor_view', id_=id_) + '#tab-file')
+    form = build_table_form('file', actor.get_linked_entities('P67', inverse=True))
+    return render_template('add_file.html', entity=actor, form=form)
 
 
 def save(form, actor=None, code: Optional[str] = None, origin=None) -> str:

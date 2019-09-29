@@ -32,7 +32,7 @@
     <div id="tab-source">
         {% if 'contributor'|is_authorized %}
             <div class="button-bar">
-                <a href="{{ url_for('source_add', origin_id=object_.id)}}">{{ _('add')|uc_first }}</a>
+                <a href="{{ url_for('object_add_source', id_=object_.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('source_insert', origin_id=object_.id) }}">+ {{ _('source')|uc_first }}</a>
             </div>
         {% endif %}

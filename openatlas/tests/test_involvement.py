@@ -19,24 +19,24 @@ class InvolvementTests(TestBaseCase):
             event_id = int(rv.location.split('/')[-1])
             with app.test_request_context():
                 app.preprocess_request()
-                actor_id = EntityMapper.insert('E21', 'Captain Miller').id
-                involvement_id = NodeMapper.get_hierarchy_by_name('Involvement').id
+                actor = EntityMapper.insert('E21', 'Captain Miller')
+                involvement = NodeMapper.get_hierarchy_by_name('Involvement')
 
             # Add involvement
-            rv = self.app.get(url_for('involvement_insert', origin_id=actor_id))
+            rv = self.app.get(url_for('involvement_insert', origin_id=actor.id))
             assert b'Involvement' in rv.data
             data = {'event': str([event_id]), 'activity': 'P11', 'begin_year_from': '950',
-                    'end_year_from': '1950', involvement_id: involvement_id}
-            rv = self.app.post(url_for('involvement_insert', origin_id=actor_id), data=data,
+                    'end_year_from': '1950', involvement.id: involvement.id}
+            rv = self.app.post(url_for('involvement_insert', origin_id=actor.id), data=data,
                                follow_redirects=True)
             assert b'Event Horizon' in rv.data
-            data = {'actor': str([actor_id]), 'continue_': 'yes', 'activity': 'P22'}
+            data = {'actor': str([actor.id]), 'continue_': 'yes', 'activity': 'P22'}
             rv = self.app.post(url_for('involvement_insert', origin_id=event_id), data=data,
                                follow_redirects=True)
             assert b'Event Horizon' in rv.data
             rv = self.app.get(url_for('event_view', id_=event_id))
             assert b'Event Horizon' in rv.data
-            rv = self.app.get(url_for('actor_view', id_=actor_id))
+            rv = self.app.get(url_for('actor_view', id_=actor.id))
             assert b'Appears first' in rv.data
 
             # Update involvement
@@ -46,11 +46,11 @@ class InvolvementTests(TestBaseCase):
             rv = self.app.get(url_for('involvement_update', id_=link_id, origin_id=event_id))
             assert b'Captain' in rv.data
             rv = self.app.post(
-                url_for('involvement_update', id_=link_id, origin_id=actor_id),
+                url_for('involvement_update', id_=link_id, origin_id=actor.id),
                 data={'description': 'Infinite Space - Infinite Terror', 'activity': 'P23'},
                 follow_redirects=True)
             assert b'Infinite Space - Infinite Terror' in rv.data
-            rv = self.app.get(url_for('actor_view', id_=actor_id))
+            rv = self.app.get(url_for('actor_view', id_=actor.id))
             assert b'Appears first' in rv.data
             rv = self.app.get(url_for('event_view', id_=event_id))
             assert b'Infinite Space - Infinite Terror' in rv.data

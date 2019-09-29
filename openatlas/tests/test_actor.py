@@ -23,7 +23,8 @@ class ActorTests(TestBaseCase):
                 sex_node_sub_1 = g.nodes[sex_node.subs[0]]
                 sex_node_sub_2 = g.nodes[sex_node.subs[1]]
                 event = EntityMapper.insert('E8', 'Event Horizon')
-                source = EntityMapper.insert('E33', 'Tha source')
+                source = EntityMapper.insert('E33', 'Necronomicon')
+                file = EntityMapper.insert('E31', 'X-Files', 'file')
 
             # Actor insert
             rv = self.app.get(url_for('actor_insert', code='E21'))
@@ -76,6 +77,26 @@ class ActorTests(TestBaseCase):
             assert b'An entry has been created' in rv.data
             rv = self.app.get(url_for('actor_index'))
             assert b'Sigourney Weaver' in rv.data
+
+            # Add to actor
+            rv = self.app.get(url_for('actor_add_file', id_=actor_id))
+            assert b'Add File' in rv.data
+            rv = self.app.post(url_for('actor_add_file', id_=actor_id),
+                               data={'checkbox_values': str([file.id])}, follow_redirects=True)
+            assert b'X-Files' in rv.data
+
+            rv = self.app.get(url_for('actor_add_source', id_=actor_id))
+            assert b'Add Source' in rv.data
+            rv = self.app.post(url_for('actor_add_source', id_=actor_id),
+                               data={'checkbox_values': str([source.id])}, follow_redirects=True)
+            assert b'Necronomicon' in rv.data
+
+            rv = self.app.get(url_for('actor_add_reference', id_=actor_id))
+            assert b'Add Reference' in rv.data
+            rv = self.app.post(url_for('actor_add_reference', id_=actor_id),
+                               data={'reference': reference_id, 'page': '777'},
+                               follow_redirects=True)
+            assert b'777' in rv.data
 
             # Actor update
             rv = self.app.get(url_for('actor_update', id_=actor_id))
