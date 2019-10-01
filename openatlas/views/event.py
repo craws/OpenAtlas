@@ -61,12 +61,7 @@ def event_index() -> str:
     return render_template('event/index.html', table=table)
 
 
-@app.route('/event/insert/<code>', methods=['POST', 'GET'])
-@app.route('/event/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
-@required_group('contributor')
-def event_insert(code=str, origin_id=None) -> str:
-    origin = EntityMapper.get_by_id(origin_id) if origin_id else None
-    form = build_form(EventForm, 'Event')
+def prepare_form(form: EventForm, code: str):
     if code != 'E8':
         del form.given_place
     if code == 'E9':
@@ -76,12 +71,27 @@ def event_insert(code=str, origin_id=None) -> str:
         del form.place_to
         del form.object
         del form.person
+    return form
+
+
+@app.route('/event/insert/<code>', methods=['POST', 'GET'])
+@app.route('/event/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
+@required_group('contributor')
+def event_insert(code: str, origin_id=None) -> str:
+    origin = EntityMapper.get_by_id(origin_id) if origin_id else None
+    form = prepare_form(build_form(EventForm, 'Event'), code)
     if origin:
         del form.insert_and_continue
     if form.validate_on_submit():
         return redirect(save(form, code=code, origin=origin))
-    if origin and origin.class_.code == 'E84':
-        form.object.data = [origin.id]
+    if origin:
+        if origin.class_.code == 'E84':
+            form.object.data = [origin.id]
+        elif origin.class_.code == 'E18':
+            if code == 'E9':
+                form.place_from.data = origin.id
+            else:
+                form.place.data = origin.id
     return render_template('event/insert.html', form=form, code=code, origin=origin)
 
 
@@ -98,16 +108,7 @@ def event_delete(id_: int) -> str:
 @required_group('contributor')
 def event_update(id_: int) -> str:
     event = EntityMapper.get_by_id(id_, nodes=True)
-    form = build_form(EventForm, 'Event', event, request)
-    if event.class_.code != 'E8':
-        del form.given_place
-    if event.class_.code == 'E9':
-        del form.place
-    else:
-        del form.place_from
-        del form.place_to
-        del form.object
-        del form.person
+    form = prepare_form(build_form(EventForm, 'Event', event, request), event.class_.code)
     form.event_id.data = event.id
     if form.validate_on_submit():
         if was_modified(form, event):  # pragma: no cover
@@ -133,7 +134,6 @@ def event_update(id_: int) -> str:
                 object_data.append(entity.id)
         form.person.data = person_data
         form.object.data = object_data
-
     else:
         place = event.get_linked_entity('P7')
         form.place.data = place.get_linked_entity('P53', True).id if place else ''

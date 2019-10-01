@@ -36,6 +36,10 @@ class EventTest(TestBaseCase):
             self.app.post(url_for('event_insert', code='E7', origin_id=actor.id), data=data)
             self.app.post(url_for('event_insert', code='E7', origin_id=file.id), data=data)
             self.app.post(url_for('event_insert', code='E7', origin_id=source.id), data=data)
+            rv = self.app.get(url_for('event_insert', code='E7', origin_id=residence_id))
+            assert b'Location' in rv.data
+            rv = self.app.get(url_for('event_insert', code='E9', origin_id=residence_id))
+            assert b'Location' not in rv.data
 
             # Acquisition
             rv = self.app.post(url_for('event_insert', code='E8'),
