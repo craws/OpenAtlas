@@ -15,9 +15,7 @@
             <li><a href="#tab-map" id="map-tab-id">{{ _('map')|uc_first }}</a></li>
         {% endif %}
         <li><a href="#tab-source">{{ _('source')|uc_first }} {{ tables['source']|format_tab_number|safe }}</a></li>
-        {% if tables['event'].rows %}
-            <li><a href="#tab-event">{{ _('event')|uc_first }} {{ tables['event']|format_tab_number|safe }}</a></li>
-        {% endif %}
+        <li><a href="#tab-event">{{ _('event')|uc_first }} {{ tables['event']|format_tab_number|safe }}</a></li>
         {% if tables['actor'].rows %}
             <li><a href="#tab-actor">{{ _('actor')|uc_first }} {{ tables['actor']|format_tab_number|safe }}</a></li>
         {% endif %}
@@ -74,11 +72,16 @@
         {% endif %}
         {{ tables['source'].display('source')|safe }}
     </div>
-    {% if tables['event'].rows %}
-        <div id="tab-event">
-            {{ tables['event'].display('event')|safe }}
-        </div>
-    {% endif %}
+    <div id="tab-event">
+        {% if 'contributor'|is_authorized %}
+            <div class="button-bar">
+                {% for code in config['CLASS_CODES']['event'] %}
+                    <a href="{{ url_for('event_insert', code=code, origin_id=object_.id) }}">+ {{ code|get_class_name }}</a>
+                {% endfor %}
+            </div>
+        {% endif %}
+        {{ tables['event'].display('event')|safe }}
+    </div>
     {% if tables['actor'].rows %}
         <div id="tab-actor">
             {{ tables['actor'].display('actor')|safe }}
