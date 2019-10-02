@@ -37,7 +37,7 @@ def note(self, entity: Entity) -> str:
         return ''  # pragma no cover
     if not entity.note:
         url = url_for('note_insert', entity_id=entity.id)
-        return '<a href="' + url + '">+ ' + util.uc_first(_('note')) + '</a>'
+        return '<p><a href="' + url + '">+ ' + util.uc_first(_('note')) + '</a></p>'
     url = url_for('note_update', entity_id=entity.id)
     html = '<h2>' + util.uc_first(_('note')) + '</h2><p>' + entity.note + '</p>'
     html += '<a href="' + url + '">' + util.uc_first(_('edit note')) + '</a>'
