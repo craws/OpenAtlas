@@ -32,11 +32,11 @@ def sql_execute() -> str:
             response = '<p>Rows affected: {count}</p>'.format(count=g.cursor.rowcount)
             try:
                 response += '<p>{rows}</p>'.format(rows=g.cursor.fetchall())
-            except:
+            except:  # pragma: no cover
                 pass  # Assuming it was no SELECT statement so returning just the rowcount
             g.execute('COMMIT')
             flash(_('SQL executed'), 'info')
-        except Exception as e:  # pragma: no cover
+        except Exception as e:
             g.cursor.execute('ROLLBACK')
             logger.log('error', 'database', 'transaction failed', e)
             response = e
