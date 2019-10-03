@@ -4,6 +4,11 @@ html, body, input, select, textarea {
     font-family: helvetica, arial, sans-serif;
 }
 
+textarea#statement {
+    width: 80em;
+    height: 30em;
+}
+
 span.tab-counter {
     font-style: italic;
 }

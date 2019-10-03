@@ -5,4 +5,8 @@
     > {{ _('execute')|uc_first }}
 {% endblock %}
 {% block content %}
+    {{ form|display_form|safe }}
+    <p>
+        {{ response|safe }}
+    </p>
 {% endblock %}

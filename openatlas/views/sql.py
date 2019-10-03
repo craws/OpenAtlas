@@ -1,8 +1,11 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+from flask import flash, g, render_template
+from flask_babel import lazy_gettext as _
+from flask_wtf import Form
+from wtforms import (SubmitField, TextAreaField)
+from wtforms.validators import InputRequired
 
-from flask import render_template
-
-from openatlas import app
+from openatlas import app, logger
 from openatlas.util.util import (required_group)
 
 
@@ -12,7 +15,30 @@ def sql_index() -> str:
     return render_template('sql/index.html')
 
 
-@app.route('/sql/execute')
+class SqlForm(Form):
+    statement = TextAreaField(_('statement'), [InputRequired()])
+    save = SubmitField(_('execute'))
+
+
+@app.route('/sql/execute', methods=['POST', 'GET'])
 @required_group('admin')
 def sql_execute() -> str:
-    return render_template('sql/execute.html')
+    response = ''
+    form = SqlForm()
+    if form.validate_on_submit():
+        try:
+            g.execute('BEGIN')
+            g.execute(form.statement.data)
+            response = '<p>Rows affected: {count}</p>'.format(count=g.cursor.rowcount)
+            try:
+                response += '<p>{rows}</p>'.format(rows=g.cursor.fetchall())
+            except:
+                pass
+            g.execute('COMMIT')
+            flash(_('SQL executed'), 'info')
+        except Exception as e:  # pragma: no cover
+            g.cursor.execute('ROLLBACK')
+            logger.log('error', 'database', 'transaction failed', e)
+            response = e
+            flash(_('error transaction'), 'error')
+    return render_template('sql/execute.html', form=form, response=response)
