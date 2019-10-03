@@ -26,14 +26,14 @@ def sql_execute() -> str:
     response = ''
     form = SqlForm()
     if form.validate_on_submit():
+        g.execute('BEGIN')
         try:
-            g.execute('BEGIN')
             g.execute(form.statement.data)
             response = '<p>Rows affected: {count}</p>'.format(count=g.cursor.rowcount)
             try:
                 response += '<p>{rows}</p>'.format(rows=g.cursor.fetchall())
             except:
-                pass
+                pass  # Assuming it was no SELECT statement so returning just the rowcount
             g.execute('COMMIT')
             flash(_('SQL executed'), 'info')
         except Exception as e:  # pragma: no cover

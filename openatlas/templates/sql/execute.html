@@ -5,6 +5,7 @@
     > {{ _('execute')|uc_first }}
 {% endblock %}
 {% block content %}
+    {{ 'SQL'|manual_link|safe }}
     {{ form|display_form|safe }}
     <p>
         {{ response|safe }}
