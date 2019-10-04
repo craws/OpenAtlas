@@ -14,7 +14,7 @@
     {% endif %}
     {% if file_data['backup_to_old'] %}
         <p>
-            {{ _('There seemed to be no recent backup, please make one') }}
+            {{ _('There seems to be no recent backup, please make one') }}
             <a href="{{ url_for('export_sql') }}">{{ _('here') }}</a>.
         </p>
     {% else %}
