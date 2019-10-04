@@ -10,6 +10,7 @@ class Changelog:
             ('1038', 'Move events'),
             ('1060', 'New menu item "Object"'),
             ('1061', 'More options to link entries'),
+            ('1058', 'SQL interface'),
             ('1043', 'DataTables'),
             ('1056', 'Additional codes for GeoNames search'),
         ]))])]
