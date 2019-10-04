@@ -21,6 +21,18 @@ class ExportTest(TestBaseCase):
                 assert b'Data was exported as SQL' in rv.data
             date_string = DateMapper.current_date_for_filename()
             self.app.get(url_for('download_sql', filename=date_string + '_dump.sql'))
+
+            # SQL execute (located here because a recent dump is needed to work
+            rv = self.app.get(url_for('sql_index'))
+            assert b'Warning' in rv.data
+            rv = self.app.get(url_for('sql_execute'))
+            assert b'Execute' in rv.data
+            rv = self.app.post(url_for('sql_execute'), data={'statement': 'SELECT * FROM web.user'})
+            assert b'Alice' in rv.data
+            rv = self.app.post(url_for('sql_execute'), data={'statement': 'SELECT * FROM fail;'})
+            assert b'relation "fail" does not exist' in rv.data
+
+            # Delete SQL dump
             rv = self.app.get(url_for('delete_sql', filename=date_string + '_dump.sql'),
                               follow_redirects=True)
             assert b'File deleted' in rv.data
