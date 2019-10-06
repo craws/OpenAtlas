@@ -20,7 +20,7 @@ login_manager.login_view = 'login'
 
 
 @login_manager.user_loader
-def load_user(user_id):
+def load_user(user_id: int):
     return UserMapper.get_by_id(user_id, True)
 
 
@@ -37,7 +37,7 @@ class PasswordResetForm(Form):
 
 
 @app.route('/login', methods=["GET", "POST"])
-def login():
+def login() -> str:
     if current_user.is_authenticated:
         return redirect('/')
     form = LoginForm()
@@ -77,7 +77,7 @@ def login():
 
 
 @app.route('/password_reset', methods=["GET", "POST"])
-def reset_password():
+def reset_password() -> str:
     if current_user.is_authenticated:  # Prevent password reset if already logged in
         return redirect(url_for('index'))
     form = PasswordResetForm()
@@ -112,7 +112,7 @@ def reset_password():
 
 
 @app.route('/reset_confirm/<code>')
-def reset_confirm(code):  # pragma: no cover
+def reset_confirm(code: str) -> str:  # pragma: no cover
     user = UserMapper.get_by_reset_code(code)
     if not user:
         logger.log('info', 'auth', 'unknown reset code')
@@ -143,7 +143,7 @@ def reset_confirm(code):  # pragma: no cover
 
 @app.route('/logout')
 @login_required
-def logout():
+def logout() -> str:
     logout_user()
     logger.log('info', 'auth', 'logout')
     return redirect(url_for('login'))

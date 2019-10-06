@@ -1,5 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from collections import OrderedDict
+from typing import Optional, Union
 
 from flask import abort, flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -14,7 +15,8 @@ from openatlas.forms.forms import build_move_form, build_node_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.node import NodeMapper
 from openatlas.util.table import Table
-from openatlas.util.util import get_entity_data, link, required_group, sanitize, truncate_string
+from openatlas.util.util import (get_entity_data, link, required_group, sanitize, truncate_string,
+                                 uc_first)
 
 
 class NodeForm(Form):
@@ -30,9 +32,9 @@ class NodeForm(Form):
 
 @app.route('/types')
 @required_group('readonly')
-def node_index():
+def node_index() -> str:
     nodes = {'system': OrderedDict(), 'custom': OrderedDict(),
-             'places': OrderedDict(), 'value': OrderedDict()}
+             'places': OrderedDict(), 'value': OrderedDict()}  # type: dict
     for id_, node in g.nodes.items():
         if node.root:
             continue
@@ -50,7 +52,7 @@ def node_index():
 @app.route('/types/insert/<int:root_id>', methods=['GET', 'POST'])
 @app.route('/types/insert/<int:root_id>/<int:super_id>', methods=['GET', 'POST'])
 @required_group('editor')
-def node_insert(root_id, super_id=None):
+def node_insert(root_id: int, super_id: Optional[bool] = None):
     root = g.nodes[root_id]
     form = build_node_form(NodeForm, root)
     # Check if form is valid and if it wasn't a submit of the search form
@@ -66,7 +68,7 @@ def node_insert(root_id, super_id=None):
 
 @app.route('/types/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
-def node_update(id_):
+def node_update(id_: int) -> str:
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]] if node.root else None
     if node.system or (root and root.locked):
@@ -81,7 +83,7 @@ def node_update(id_):
 
 @app.route('/types/view/<int:id_>')
 @required_group('readonly')
-def node_view(id_):
+def node_view(id_: int) -> str:
     from openatlas.models.link import LinkMapper
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]] if node.root else None
@@ -113,7 +115,7 @@ def node_view(id_):
 
 @app.route('/types/delete/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
-def node_delete(id_):
+def node_delete(id_: int) -> str:
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]] if node.root else None
     if node.system or node.subs or node.count or (root and root.locked):
@@ -125,16 +127,16 @@ def node_delete(id_):
 
 class MoveForm(Form):
     is_node_form = HiddenField()
+    checkbox_values = HiddenField()
     selection = SelectMultipleField('', [InputRequired()], coerce=int,
                                     option_widget=widgets.CheckboxInput(),
-                                    widget=widgets.ListWidget(prefix_label=False),
-                                    default=['E21', 'E7', 'E40', 'E74', 'E8'])
-    save = SubmitField(_('move'))
+                                    widget=widgets.ListWidget(prefix_label=False))
+    save = SubmitField()
 
 
 @app.route('/types/move/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
-def node_move_entities(id_):
+def node_move_entities(id_: int) -> str:
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]]
     if root.value_type:  # pragma: no cover
@@ -142,15 +144,16 @@ def node_move_entities(id_):
     form = build_move_form(MoveForm, node)
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
-        NodeMapper.move_entities(node, getattr(form, str(root.id)).data, form.selection.data)
+        NodeMapper.move_entities(node, getattr(form, str(root.id)).data, form.checkbox_values.data)
         g.cursor.execute('COMMIT')
         flash('Entities where updated', 'success')
         return redirect(url_for('node_index') + '#tab-' + str(root.id))
+    form.save.label.text = uc_first(_('move'))
     getattr(form, str(root.id)).data = node.id
     return render_template('types/move.html', node=node, root=root, form=form)
 
 
-def walk_tree(param):
+def walk_tree(param: Union[int, list]) -> str:
     """ Builds JSON for jsTree"""
     text = ''
     for id_ in param if type(param) is list else [param]:
@@ -170,7 +173,7 @@ def walk_tree(param):
     return text
 
 
-def tree_select(name):
+def tree_select(name: str) -> str:
     html = """
         <div id="{name}-tree"></div>
         <script>

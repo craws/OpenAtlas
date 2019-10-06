@@ -2,12 +2,13 @@
 import ast
 import re
 import time
-from typing import Optional as Optional_Type
+from typing import Optional as Optional_Type, Iterator
 
 from flask import g, session
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import Form
+from flask_wtf.csrf import generate_csrf
 from wtforms import FloatField, HiddenField
 from wtforms.validators import Optional
 from wtforms.widgets import HiddenInput
@@ -28,7 +29,7 @@ def get_link_type(form) -> Optional_Type[Entity]:
             return g.nodes[int(field.data)]
 
 
-def build_form(form, form_name, entity=None, request_origin=None, entity2=None) -> Form:
+def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
     """ The entity parameter can also be a link."""
     # Add custom fields
     custom_list = []
@@ -76,37 +77,6 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None) 
         for root_id, nodes in node_data.items():
             if hasattr(form_instance, str(root_id)):
                 getattr(form_instance, str(root_id)).data = nodes
-    return form_instance
-
-
-def build_move_form(form, node) -> Form:
-    root = g.nodes[node.root[-1]]
-    setattr(form, str(root.id), TreeField(str(root.id)))
-    form_instance = form(obj=node)
-
-    # Delete custom fields except the ones specified for the form
-    delete_list = []  # Can't delete fields in the loop so creating a list for later deletion
-    for field in form_instance:
-        if type(field) is TreeField and int(field.id) != root.id:
-            delete_list.append(field.id)
-    for item in delete_list:
-        delattr(form_instance, item)
-    choices = []
-    if root.class_.code == 'E53':
-        for entity in node.get_linked_entities('P89', True):
-            place = entity.get_linked_entity('P53', True)
-            if place:
-                choices.append((entity.id, place.name))
-    elif root.name in app.config['PROPERTY_TYPES']:
-        for row in LinkMapper.get_entities_by_node(node):
-            domain = EntityMapper.get_by_id(row.domain_id)
-            range_ = EntityMapper.get_by_id(row.range_id)
-            choices.append((row.id, domain.name + ' - ' + range_.name))
-    else:
-        for entity in node.get_linked_entities('P2', True):
-            choices.append((entity.id, entity.name))
-
-    form_instance.selection.choices = choices
     return form_instance
 
 
@@ -257,7 +227,8 @@ class TableSelect(HiddenInput):
 
     def __call__(self, field, **kwargs):
         file_stats = None
-        class_ = 'place' if field.id in ['residence', 'begins_in', 'ends_in'] else field.id
+        place_fields = ['residence', 'begins_in', 'ends_in', 'place_to', 'place_from']
+        class_ = 'place' if field.id in place_fields else field.id
         if class_ == 'place':
             aliases = current_user.settings['table_show_aliases']
             entities = EntityMapper.get_by_system_type('place', nodes=True, aliases=aliases)
@@ -272,6 +243,13 @@ class TableSelect(HiddenInput):
             entities = EntityMapper.get_by_codes(class_)
         selection = ''
         table = Table(Table.HEADERS[class_])
+
+        # Table definitions (aligning)
+        if class_ == 'event':
+            table.defs += '[{className: "dt-body-right", targets: [3,4]}]'
+        elif class_ in ['actor', 'group', 'feature', 'place']:
+            table.defs += '[{className: "dt-body-right", targets: [2,3]}]'
+
         for entity in entities:
             # Todo: don't show self e.g. at source
             if field.data and entity.id == int(field.data):
@@ -316,10 +294,19 @@ class TableMultiSelect(HiddenInput):
             field.data = ast.literal_eval(field.data)
         selection = ''
         class_ = field.id if field.id != 'given_place' else 'place'
-        table = Table(Table.HEADERS[class_])
+        headers_len = str(len(Table.HEADERS[class_]))
+
         # Make checkbox column sortable and show selected on top
-        table.headers = 'headers:{' + str(len(table.header)) + ':{sorter:"checkbox"}},'
-        table.sort = 'sortList:[[' + str(len(table.header)) + ', 0],[0, 0]],'
+        table = Table(Table.HEADERS[class_], order='[[' + headers_len + ', "desc"], [0, "asc"]]')
+
+        # Table definitions (ordering and aligning)
+        defs = '{"orderDataType": "dom-checkbox", "targets":' + headers_len + '}'
+        if class_ == 'event':
+            defs += ',{className: "dt-body-right", targets: [3,4]}'
+        elif class_ in ['actor', 'group', 'feature', 'place']:
+            defs += ',{className: "dt-body-right", targets: [2,3]}'
+        table.defs = '[' + defs + ']'
+
         if class_ == 'place':
             aliases = current_user.settings['table_show_aliases']
             entities = EntityMapper.get_by_system_type('place', nodes=True, aliases=aliases)
@@ -346,7 +333,7 @@ class TableMultiSelect(HiddenInput):
                                 change_label=uc_first(_('change')),
                                 title=_(field.id.replace('_', ' ')),
                                 selection=selection,
-                                table=table.display(field.id, remove_rows=False))
+                                table=table.display(field.id))
         return super(TableMultiSelect, self).__call__(field, **kwargs) + html
 
 
@@ -356,3 +343,64 @@ class TableMultiField(HiddenField):
 
 class ValueFloatField(FloatField):
     pass
+
+
+def build_move_form(form, node) -> Form:
+    root = g.nodes[node.root[-1]]
+    setattr(form, str(root.id), TreeField(str(root.id)))
+    form_instance = form(obj=node)
+
+    # Delete custom fields except the ones specified for the form
+    delete_list = []  # Can't delete fields in the loop so creating a list for later deletion
+    for field in form_instance:
+        if type(field) is TreeField and int(field.id) != root.id:
+            delete_list.append(field.id)
+    for item in delete_list:
+        delattr(form_instance, item)
+
+    choices = []
+    if root.class_.code == 'E53':
+        for entity in node.get_linked_entities('P89', True):
+            place = entity.get_linked_entity('P53', True)
+            if place:
+                choices.append((entity.id, place.name))
+    elif root.name in app.config['PROPERTY_TYPES']:
+        for row in LinkMapper.get_entities_by_node(node):
+            domain = EntityMapper.get_by_id(row.domain_id)
+            range_ = EntityMapper.get_by_id(row.range_id)
+            choices.append((row.id, domain.name + ' - ' + range_.name))
+    else:
+        for entity in node.get_linked_entities('P2', True):
+            choices.append((entity.id, entity.name))
+
+    form_instance.selection.choices = choices
+    return form_instance
+
+
+def build_table_form(class_name: str, linked_entities: Iterator) -> str:
+    """ Returns a form with a list of entities with checkboxes"""
+    from openatlas.models.entity import EntityMapper
+    table = Table(Table.HEADERS[class_name] + [''])
+    linked_ids = [entity.id for entity in linked_entities]
+    file_stats = get_file_stats() if class_name == 'file' else None
+    if class_name == 'file':
+        entities = EntityMapper.get_by_system_type('file', nodes=True)
+    elif class_name == 'place':
+        entities = EntityMapper.get_by_system_type('place', nodes=True, aliases=True)
+    else:
+        entities = EntityMapper.get_by_codes(class_name)
+    for entity in entities:
+        if entity.id in linked_ids:
+            continue  # Don't show already linked entries
+        input_ = '<input id="selection-{id}" name="values" type="checkbox" value="{id}">'.format(
+            id=entity.id)
+        table.rows.append(get_base_table_data(entity, file_stats) + [input_])
+    if not table.rows:
+        return uc_first(_('no entries'))
+    return """
+        <form class="table" id="checkbox-form" method="post">
+            <input id="csrf_token" name="csrf_token" type="hidden" value="{token}">
+            <input id="checkbox_values" name="checkbox_values" type="hidden">
+            {table} <button name="form-submit" id="form-submit" type="submit">{add}</button>
+        </form>""".format(add=uc_first(_('add')), token=generate_csrf(),
+                          table=table.display(class_name))

@@ -21,14 +21,14 @@ class LinkCheckForm(Form):
 
 
 @app.route('/overview/model', methods=["GET", "POST"])
-def model_index():
+def model_index() -> str:
     form = LinkCheckForm()
-    form_classes = OrderedDict()
+    form_classes = OrderedDict()  # type: dict
     for code, class_ in g.classes.items():
         form_classes[code] = code + ' ' + class_.name
     form.domain.choices = form_classes.items()
     form.range.choices = form_classes.items()
-    form_properties = OrderedDict()
+    form_properties = OrderedDict()  # type: dict
     for code, property_ in g.properties.items():
         form_properties[code] = code + ' ' + property_.name
     form.property.choices = form_properties.items()
@@ -54,21 +54,22 @@ def model_index():
 
 
 @app.route('/overview/model/class')
-def class_index():
-    table = Table(['code', 'name'], sort='[[0, 0]]', headers='{0:{sorter:"class_code"}}')
+def class_index() -> str:
+    table = Table(['code', 'name'],
+                  defs='''[{"orderDataType": "cidoc-model", "targets":[0]},
+                            {"sType": "numeric", "targets": [0]}]''')
     for class_id, class_ in g.classes.items():
         table.rows.append([link(class_), class_.name])
     return render_template('model/class.html', table=table)
 
 
 @app.route('/overview/model/property')
-def property_index():
+def property_index() -> str:
     classes = g.classes
     properties = g.properties
-    table = Table(
-        ['code', 'name', 'inverse', 'domain', 'domain name', 'range', 'range name'],
-        sort='[[0, 0]]',
-        headers='{0:{sorter:"property_code"},3:{sorter:"class_code"},5:{sorter:"class_code"}}')
+    table = Table(['code', 'name', 'inverse', 'domain', 'domain name', 'range', 'range name'],
+                  defs='''[{"orderDataType": "cidoc-model", "targets":[0, 3, 5]},
+                            {"sType": "numeric", "targets": [0, 3, 5]}]''')
     for property_id, property_ in properties.items():
         table.rows.append([link(property_),
                            property_.name,
@@ -81,18 +82,15 @@ def property_index():
 
 
 @app.route('/overview/model/class_view/<code>')
-def class_view(code):
+def class_view(code: str) -> str:
     class_ = g.classes[code]
-    tables = OrderedDict()
+    tables = OrderedDict()  # type: dict
     for table in ['super', 'sub']:
-        tables[table] = Table(['code', 'name'], pager=False, sort='[[0, 0]]',
-                              headers='{0:{sorter:"class_code"}}')
+        tables[table] = Table(['code', 'name'], paging=False)
         for code in getattr(class_, table):
             tables[table].rows.append([link(g.classes[code]), g.classes[code].name])
-    tables['domains'] = Table(['code', 'name'], pager=False, sort='[[0, 0]]',
-                              headers='{0:{sorter:"property_code"}}')
-    tables['ranges'] = Table(['code', 'name'], pager=False, sort='[[0, 0]]',
-                             headers='{0:{sorter:"property_code"}}')
+    tables['domains'] = Table(['code', 'name'], paging=False)
+    tables['ranges'] = Table(['code', 'name'], paging=False)
     for key, property_ in g.properties.items():
         if code == property_.domain_class_code:
             tables['domains'].rows.append([link(property_), property_.name])
@@ -103,7 +101,7 @@ def class_view(code):
 
 
 @app.route('/overview/model/property_view/<code>')
-def property_view(code):
+def property_view(code: str) -> str:
     property_ = g.properties[code]
     domain = g.classes[property_.domain_class_code]
     range_ = g.classes[property_.range_class_code]
@@ -113,8 +111,7 @@ def property_view(code):
                        ('domain', link(domain) + ' ' + domain.name),
                        ('range', link(range_) + ' ' + range_.name)]}
     for table in ['super', 'sub']:
-        tables[table] = Table(['code', 'name'], pager=False, sort='[[0, 0]]',
-                              headers='{0:{sorter:"property_code"}}')
+        tables[table] = Table(['code', 'name'], paging=False)
         for code in getattr(property_, table):
             tables[table].rows.append([link(g.properties[code]), g.properties[code].name])
     return render_template('model/property_view.html', property=property_, tables=tables)
@@ -151,7 +148,7 @@ class NetworkForm(Form):
 
 @app.route('/overview/network/', methods=["GET", "POST"])
 @required_group('readonly')
-def model_network():
+def model_network() -> str:
     form = NetworkForm()
     form.classes.choices = []
     form.properties.choices = []

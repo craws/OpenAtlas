@@ -1,0 +1,30 @@
+{% extends 'layout.html' %}
+{% block breadcrumb %}
+    <a href="{{ url_for('place_index') }}">{{ _('place')|uc_first }}</a>
+    > {{ place|link|safe }}
+    > {{ image|link|safe }}
+    > + {{ _('overlay')|uc_first }}
+{% endblock %}
+{% block content %}
+    <form method="post">
+        {{ form.csrf_token }}
+        <div class="data-table">
+            <div class="table-row">
+                <div></div>
+                <div class="table-cell">{{ _('easting')|uc_first }}</div>
+                <div class="table-cell">{{ _('northing')|uc_first }}</div>
+            </div>
+            <div class="table-row">
+                <div>{{ _('top left')|uc_first }}</div>
+                <div class="table-cell">{{ form.top_left_easting(class_='number') }}</div>
+                <div class="table-cell">{{ form.top_left_northing(class_='number') }}</div>
+            </div>
+            <div class="table-row">
+                <div>{{ _('bottom right')|uc_first }}</div>
+                <div class="table-cell">{{ form.bottom_right_easting(class_='number') }}</div>
+                <div class="table-cell">{{ form.bottom_right_northing(class_='number') }}</div>
+            </div>
+        </div>
+        {{ form.save }}
+    </form>
+{% endblock %}

@@ -135,7 +135,7 @@ def admin_check_link_duplicates(delete: Optional[str] = None) -> str:
 
 @app.route('/admin/delete_single_type_duplicate/<int:entity_id>/<int:node_id>')
 @required_group('contributor')
-def admin_delete_single_type_duplicate(entity_id: int, node_id: int):
+def admin_delete_single_type_duplicate(entity_id: int, node_id: int) -> str:
     NodeMapper.remove_by_entity_and_node(entity_id, node_id)
     flash(_('link removed'), 'info')
     return redirect(url_for('admin_check_link_duplicates'))
@@ -150,7 +150,7 @@ class FileForm(Form):
 
 @app.route('/admin/file', methods=['POST', 'GET'])
 @required_group('manager')
-def admin_file():
+def admin_file() -> str:
     form = FileForm()
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
@@ -178,7 +178,7 @@ class SimilarForm(Form):
 
 @app.route('/admin/similar', methods=['POST', 'GET'])
 @required_group('contributor')
-def admin_check_similar():
+def admin_check_similar() -> str:
     form = SimilarForm()
     choices = ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic unit', 'find',
                'reference', 'file']
@@ -196,7 +196,7 @@ def admin_check_similar():
 
 @app.route('/admin/orphans/delete/<parameter>')
 @required_group('admin')
-def admin_orphans_delete(parameter: str):
+def admin_orphans_delete(parameter: str) -> str:
     count = EntityMapper.delete_orphans(parameter)
     flash(_('info orphans deleted:') + ' ' + str(count), 'info')
     return redirect(url_for('admin_orphans'))
@@ -298,9 +298,9 @@ class LogoForm(Form):
 @app.route('/admin/logo/', methods=['POST', 'GET'])
 @app.route('/admin/logo/<action>')
 @required_group('manager')
-def admin_logo(action: Optional[str] = None):
+def admin_logo(action: Optional[str] = None) -> str:
     if action == 'remove':
-        SettingsMapper.set_logo('')
+        SettingsMapper.set_logo()
         return redirect(url_for('admin_logo'))
     if session['settings']['logo_file_id']:
         path = get_file_path(int(session['settings']['logo_file_id']))
@@ -315,7 +315,7 @@ def admin_logo(action: Optional[str] = None):
 
 @app.route('/admin/file/delete/<filename>')
 @required_group('contributor')
-def admin_file_delete(filename: str):  # pragma: no cover
+def admin_file_delete(filename: str) -> str:  # pragma: no cover
     if filename != 'all':
         try:
             os.remove(app.config['UPLOAD_FOLDER_PATH'] + '/' + filename)
@@ -355,7 +355,7 @@ class LogForm(Form):
 def admin_log() -> str:
     form = LogForm()
     form.user.choices = [(0, _('all'))] + UserMapper.get_users()
-    table = Table(['date', 'priority', 'type', 'message', 'user', 'info'])
+    table = Table(['date', 'priority', 'type', 'message', 'user', 'info'], order='[[0, "desc"]]')
     logs = logger.get_system_logs(form.limit.data, form.priority.data, form.user.data)
     for row in logs:
         user = UserMapper.get_by_id(row.user_id) if row.user_id else None
@@ -385,7 +385,7 @@ class NewsLetterForm(Form):
 
 @app.route('/admin/newsletter', methods=['POST', 'GET'])
 @required_group('manager')
-def admin_newsletter():
+def admin_newsletter() -> str:
     form = NewsLetterForm()
     if form.validate_on_submit():  # pragma: no cover
         recipients = 0
@@ -466,7 +466,7 @@ def admin_general() -> str:
 
 @app.route('/admin/general/update', methods=["GET", "POST"])
 @required_group('admin')
-def admin_general_update():
+def admin_general_update() -> str:
     form = GeneralForm()
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
@@ -501,7 +501,7 @@ class MailForm(Form):
 
 @app.route('/admin/mail/update', methods=["GET", "POST"])
 @required_group('admin')
-def admin_mail_update():
+def admin_mail_update() -> str:
     form = MailForm()
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')

@@ -34,7 +34,7 @@ class ProjectForm(Form):
 
 @app.route('/import/index')
 @required_group('contributor')
-def import_index():
+def import_index() -> str:
     table = Table([_('project'), _('entities'), _('description')])
     for project in ImportMapper.get_all_projects():
         table.rows.append([link(project),
@@ -45,7 +45,7 @@ def import_index():
 
 @app.route('/import/project/insert', methods=['POST', 'GET'])
 @required_group('manager')
-def import_project_insert():
+def import_project_insert() -> str:
     form = ProjectForm()
     if form.validate_on_submit():
         id_ = ImportMapper.insert_project(form.name.data, form.description.data)
@@ -56,7 +56,7 @@ def import_project_insert():
 
 @app.route('/import/project/view/<int:id_>')
 @required_group('contributor')
-def import_project_view(id_):
+def import_project_view(id_: int) -> str:
     table = Table([_('name'), _('class'), _('description'), 'origin ID', _('date')])
     for entity in EntityMapper.get_by_project_id(id_):
         table.rows.append([link(entity),
@@ -70,7 +70,7 @@ def import_project_view(id_):
 
 @app.route('/import/project/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('manager')
-def import_project_update(id_):
+def import_project_update(id_: int) -> str:
     project = ImportMapper.get_project_by_id(id_)
     form = ProjectForm(obj=project)
     form.project_id = id_
@@ -85,7 +85,7 @@ def import_project_update(id_):
 
 @app.route('/import/project/delete/<int:id_>')
 @required_group('manager')
-def import_project_delete(id_):
+def import_project_delete(id_: int) -> str:
     ImportMapper.delete_project(id_)
     flash(_('project deleted'), 'info')
     return redirect(url_for('import_index'))
@@ -112,12 +112,12 @@ class ImportForm(Form):
 
 @app.route('/import/data/<int:project_id>/<class_code>', methods=['POST', 'GET'])
 @required_group('manager')
-def import_data(project_id, class_code):
+def import_data(project_id: int, class_code: str) -> str:
     project = ImportMapper.get_project_by_id(project_id)
     form = ImportForm()
     table = None
     imported = False
-    messages = {'error': [], 'warn': []}
+    messages = {'error': [], 'warn': []}  # type: dict
     if form.validate_on_submit():
         file_ = request.files['file']
         # TODO fix windows separator

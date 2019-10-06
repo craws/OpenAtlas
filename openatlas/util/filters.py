@@ -37,11 +37,11 @@ def note(self, entity: Entity) -> str:
         return ''  # pragma no cover
     if not entity.note:
         url = url_for('note_insert', entity_id=entity.id)
-        return '<a href="' + url  + '">+ ' + util.uc_first(_('note')) + '</a>'
+        return '<p><a href="' + url + '">+ ' + util.uc_first(_('note')) + '</a></p>'
     url = url_for('note_update', entity_id=entity.id)
     html = '<h2>' + util.uc_first(_('note')) + '</h2><p>' + entity.note + '</p>'
     html += '<a href="' + url + '">' + util.uc_first(_('edit note')) + '</a>'
-    return  html
+    return html
 
 
 @jinja2.contextfilter
@@ -112,19 +112,19 @@ def display_move_form(self, form, root_name: str) -> str:
     table = Table(['#', util.uc_first(_('selection'))])
     for item in form.selection:
         table.rows.append([item, item.label.text])
-    return html + table.display('move', remove_rows=False)
+    return html + table.display('move')
 
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def table_select_model(self, name: str, selected=None) -> str:
+    # Todo: extra sortfunction for class and property code e.g. E69
     if name in ['domain', 'range']:
         entities = g.classes
-        headers = '{0:{sorter:"class_code" }}'
     else:
         entities = g.properties
-        headers = '{0:{sorter:"property_code"}}'
-    table = Table(['code', 'name'], sort='[[0, 0]]', headers=headers)
+    table = Table(['code', 'name'], defs='''[{"orderDataType": "cidoc-model", "targets":[0]},
+                                            {"sType": "numeric", "targets": [0]}]''')
     for id_ in entities:
         table.rows.append([
             '<a onclick="selectFromTable(this, \'' + name + '\', \'' + str(id_) + '\')">' +
@@ -215,7 +215,9 @@ def display_logo(self, file_id: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_form(self, form, form_id: Optional[str] = None, for_persons: Optional[bool] = False) -> str:
+def display_form(self, form,
+                 form_id: Optional[str] = None,
+                 for_persons: Optional[bool] = False) -> str:
     multipart = 'enctype="multipart/form-data"' if hasattr(form, 'file') else ''
     if 'update' in request.path:
         if hasattr(form, 'save') and hasattr(form.save, 'label'):
@@ -384,7 +386,8 @@ def display_menu(self, origin) -> str:
     html = ''
     if current_user.is_authenticated:
         selected = origin.view_name if origin else ''
-        items = ['overview', 'source', 'event', 'actor', 'place', 'reference', 'types', 'admin']
+        items = ['overview', 'source', 'event', 'actor', 'place', 'reference', 'object', 'types',
+                 'admin']
         for item in items:
             if selected:
                 css = 'active' if item == selected else ''
@@ -404,7 +407,7 @@ def display_debug_info(self, debug_model: Dict, form) -> str:
     for name, value in debug_model.items():
         if name in ['current']:
             continue  # Don't display current time counter
-        if name not in ['by codes', 'by id', 'link sql', 'user', 'div sql']:
+        if name not in ['sql']:
             value = '{:10.2f}'.format(value)
         html += """
             <div>

@@ -1,4 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+from typing import Tuple
+
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
@@ -18,7 +20,8 @@ from openatlas.util.util import (bookmark_toggle, format_date, link, required_gr
 
 
 class FeedbackForm(Form):
-    subject = SelectField(_('subject'), choices=list(app.config['FEEDBACK_SUBJECTS'].items()),
+    subject = SelectField(_('subject'),
+                          choices=list(app.config['FEEDBACK_SUBJECTS'].items()),
                           render_kw={'autofocus': True})
     description = TextAreaField(_('description'), [InputRequired()])
     send = SubmitField(_('send'))
@@ -26,11 +29,15 @@ class FeedbackForm(Form):
 
 @app.route('/')
 @app.route('/overview')
-def index():
-    tables = {'overview': Table(pager=False),
-              'bookmarks': Table(['name', 'class', 'first', 'last']),
-              'notes': Table(['name', 'class', 'first', 'last', _('note')]),
-              'latest': Table(['name', 'class', 'first', 'last', 'date', 'user'], pager=False)}
+def index() -> str:
+    tables = {'overview': Table(paging=False, defs='[{className: "dt-body-right", targets: 1}]'),
+              'bookmarks': Table(['name', 'class', 'first', 'last'],
+                                 defs='[{className: "dt-body-right", targets: [2,3]}]'),
+              'notes': Table(['name', 'class', 'first', 'last', _('note')],
+                             defs='[{className: "dt-body-right", targets: [2,3]}]'),
+              'latest': Table(['name', 'class', 'first', 'last', 'date', 'user'],
+                              order='[[4, "desc"]]',
+                              defs='[{className: "dt-body-right", targets: [2,3]}]')}
     if current_user.is_authenticated and hasattr(current_user, 'bookmarks'):
         for entity_id in current_user.bookmarks:
             entity = EntityMapper.get_by_id(entity_id)
@@ -57,7 +64,7 @@ def index():
 
 
 @app.route('/index/setlocale/<language>')
-def set_locale(language):
+def set_locale(language: str) -> str:
     session['language'] = language
     if hasattr(current_user, 'id') and current_user.id:
         current_user.settings['language'] = language
@@ -67,7 +74,7 @@ def set_locale(language):
 
 @app.route('/overview/feedback', methods=['POST', 'GET'])
 @required_group('readonly')
-def index_feedback():
+def index_feedback() -> str:
     form = FeedbackForm()
     if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
         subject = form.subject.data + ' from ' + session['settings']['site_name']
@@ -83,38 +90,38 @@ def index_feedback():
 
 
 @app.route('/overview/content/<item>')
-def index_content(item):
+def index_content(item: str) -> str:
     return render_template('index/content.html', text=ContentMapper.get_translation(item),
                            title=item)
 
 
 @app.route('/overview/credits')
-def index_credits():
+def index_credits() -> str:
     return render_template('index/credits.html')
 
 
 @app.errorhandler(403)
-def forbidden(e):
+def forbidden(e) -> Tuple[str, int]:
     return render_template('403.html', e=e), 403
 
 
 @app.errorhandler(404)
-def page_not_found(e):
+def page_not_found(e) -> Tuple[str, int]:
     return render_template('404.html', e=e), 404
 
 
 @app.errorhandler(418)
-def invalid_id(e):
+def invalid_id(e) -> Tuple[str, int]:
     return render_template('418.html', e=e), 418
 
 
 @app.route('/overview/changelog')
-def index_changelog():
+def index_changelog() -> str:
     return render_template('index/changelog.html', versions=Changelog.versions)
 
 
 @app.route('/unsubscribe/<code>')
-def index_unsubscribe(code):
+def index_unsubscribe(code: str) -> str:
     user = UserMapper.get_by_unsubscribe_code(code)
     text = _('unsubscribe link not valid')
     if user:  # pragma: no cover

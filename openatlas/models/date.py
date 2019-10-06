@@ -1,29 +1,25 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-import numpy
 from datetime import datetime
-from flask import g
+from typing import Optional
 
-from openatlas import debug_model
+import numpy
+from flask import g
 
 
 class DateMapper:
 
     @staticmethod
-    def current_date_for_filename():
+    def current_date_for_filename() -> str:
         today = datetime.today()
-        return '{year}-{month}-{day}_{hour}{minute}'.format(
-            year=today.year,
-            month=str(today.month).zfill(2),
-            day=str(today.day).zfill(2),
-            hour=str(today.hour).zfill(2),
-            minute=str(today.minute).zfill(2))
+        return '{year}-{month}-{day}_{hour}{minute}'.format(year=today.year,
+                                                            month=str(today.month).zfill(2),
+                                                            day=str(today.day).zfill(2),
+                                                            hour=str(today.hour).zfill(2),
+                                                            minute=str(today.minute).zfill(2))
 
     @staticmethod
-    def timestamp_to_datetime64(string):
-        """ Converts a timestamp string to a numpy.datetime64
-        :param string: PostgreSQL timestamp
-        :return: numpy.datetime64
-        """
+    def timestamp_to_datetime64(string: str) -> Optional[numpy.datetime64]:
+        """ Converts a timestamp string to a numpy.datetime64"""
         if not string:
             return None
         if 'BC' in string:
@@ -32,11 +28,8 @@ class DateMapper:
         return numpy.datetime64(string.split(' ')[0])
 
     @staticmethod
-    def datetime64_to_timestamp(date):
-        """ Converts a numpy.datetime64 to a timestamp string
-        :param date: numpy.datetime64
-        :return: PostgreSQL timestamp
-        """
+    def datetime64_to_timestamp(date: numpy.datetime64) -> Optional[str]:
+        """ Converts a numpy.datetime64 to a timestamp string"""
         if not date:
             return None
         string = str(date)
@@ -52,14 +45,8 @@ class DateMapper:
         return string + postfix
 
     @staticmethod
-    def form_to_datetime64(year, month, day, to_date=False):
-        """ Converts form fields (year, month, day) to a numpy.datetime64
-        :param year: -4713 to 9999
-        :param month: 1 to 12
-        :param day: 1 to 31
-        :param to_date: if true missing month or date will be filled to max (otherwise 1)
-        :return: numpy.datetime64
-        """
+    def form_to_datetime64(year, month, day, to_date=False) -> Optional[numpy.datetime64]:
+        """ Converts form fields (year, month, day) to a numpy.datetime64"""
         if not year:
             return None
         year = format(year, '03d') if year > 0 else format(year + 1, '04d')
@@ -105,10 +92,9 @@ class DateMapper:
         return datetime_
 
     @staticmethod
-    def invalid_involvement_dates():
+    def invalid_involvement_dates() -> list:
         """ Search invalid event participation dates and return the actors
-            e.g. attending person was born after the event ended
-        """
+            e.g. attending person was born after the event ended"""
         from openatlas.models.link import LinkMapper
         sql = """
             SELECT l.id FROM model.entity actor
@@ -124,12 +110,11 @@ class DateMapper:
                     AND actor.begin_from > event.end_from)
                 OR (actor.begin_to IS NOT NULL AND event.end_to IS NOT NULL
                     AND actor.begin_to > event.end_to);"""
-        g.cursor.execute(sql)
-        debug_model['div sql'] += 1
+        g.execute(sql)
         return [LinkMapper.get_by_id(row.id) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_invalid_dates():
+    def get_invalid_dates() -> list:
         """ Search for entities with invalid date combinations, e.g. begin after end"""
         from openatlas.models.entity import EntityMapper
         sql = """
@@ -137,12 +122,11 @@ class DateMapper:
                 begin_from > begin_to OR end_from > end_to
                 OR (begin_from IS NOT NULL AND end_from IS NOT NULL AND begin_from > end_from)
                 OR (begin_to IS NOT NULL AND end_to IS NOT NULL AND begin_to > end_to);"""
-        g.cursor.execute(sql)
-        debug_model['div sql'] += 1
+        g.execute(sql)
         return [EntityMapper.get_by_id(row.id, nodes=True) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_invalid_link_dates():
+    def get_invalid_link_dates() -> list:
         """ Search for links with invalid date combinations, e.g. begin after end"""
         from openatlas.models.link import LinkMapper
         sql = """
@@ -150,6 +134,5 @@ class DateMapper:
                 begin_from > begin_to OR end_from > end_to
                 OR (begin_from IS NOT NULL AND end_from IS NOT NULL AND begin_from > end_from)
                 OR (begin_to IS NOT NULL AND end_to IS NOT NULL AND begin_to > end_to);"""
-        g.cursor.execute(sql)
-        debug_model['div sql'] += 1
+        g.execute(sql)
         return [LinkMapper.get_by_id(row.id) for row in g.cursor.fetchall()]

@@ -68,11 +68,11 @@ if (gisLineSelected != '') {
     gisLines.on('click', setObjectId);
 }
 
-// Workaround overlay maps for MedCem until #978 is implemented
-if (overlayHack) {
-    controls.Stara = L.imageOverlay('/display/112757.png', [[49.99800, 14.99246], [49.99747, 14.99328]]);
-    controls.Thunau = L.imageOverlay('/display/112760.png', [[48.58709, 15.64294], [48.58653, 15.64356]]);
-    map.options.maxZoom = 30;
+// Overlay maps
+for (i=0; i < overlays.length; i++) {
+    overlay = L.imageOverlay('/display/' + overlays[i].image, overlays[i].boundingBox)
+    controls[overlays[i].name] = overlay;
+    overlay.addTo(map)
 }
 
 if (window.location.href.indexOf('update') >= 0) {
@@ -118,7 +118,7 @@ var geoSearchControl = L.control.geonames({
 });
 
 geoSearchControl.on('select', function(e){
-    if(geoNamesModule === 'True') {
+    if (geoNamesModule) {
         var popup = `<div>
                   <a href='https://www.geonames.org/${e.geoname.geonameId}' target='_blank'>${e.geoname.name}</a><br>
                   <div id="buttonBar" style="white-space:nowrap;">

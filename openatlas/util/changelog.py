@@ -4,6 +4,16 @@ from collections import OrderedDict
 
 class Changelog:
     versions = OrderedDict()  # type: OrderedDict
+    versions['3.20.0'] = ['2019-10-06', OrderedDict([
+        ('feature', OrderedDict([
+            ('978', 'Image overlays for maps'),
+            ('1038', 'Move events'),
+            ('1060', 'New menu item "Object"'),
+            ('1061', 'More options to link entries'),
+            ('1058', 'SQL interface'),
+            ('1043', 'DataTables'),
+            ('1056', 'Additional codes for GeoNames search'),
+        ]))])]
     versions['3.19.0'] = ['2019-08-26', OrderedDict([
         ('feature', OrderedDict([
             ('928', 'GeoNames links for places'),
@@ -12,9 +22,7 @@ class Changelog:
             ('1055', 'Add finds to overview count'),
             ('1044', 'Hide date form fields only if they are empty'),
             ('1041', 'Remove color themes'),
-            ('1054', 'Remove Production and Destruction'),
-        ]))
-    ])]
+            ('1054', 'Remove Production and Destruction')]))])]
     versions['3.18.1'] = ['2019-08-20', OrderedDict([
         ('fix', OrderedDict([
             ('1053', 'Bug at file upload with special characters')]))])]

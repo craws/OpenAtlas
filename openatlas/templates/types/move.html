@@ -8,10 +8,11 @@
     > {{ _('move') }}
 {% endblock %}
 {% block content %}
-    <form class="table" method="post">
+    <form class="table" id="checkbox-form" method="post">
         {{ form.csrf_token }}
+        {{ form.checkbox_values }}
         {{ form|display_move_form(root.name)|safe }}
-        <input id="save" name="save" value="{{ _('move')|uc_first }}" type="submit">
+        {{ form.save }}
     </form>
 
     <script>

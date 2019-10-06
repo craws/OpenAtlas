@@ -37,7 +37,7 @@ class ExportCsvForm(Form):
 
 @app.route('/export/sql', methods=['POST', 'GET'])
 @required_group('manager')
-def export_sql():
+def export_sql() -> str:
     path = app.config['EXPORT_FOLDER_PATH'] + '/sql'
     writeable = True if os.access(path, os.W_OK) else False
     form = ExportSqlForm()
@@ -49,7 +49,7 @@ def export_sql():
             logger.log('error', 'database', 'SQL export failed')
             flash(_('SQL export failed'), 'error')
         return redirect(url_for('export_sql'))
-    table = Table(['name', 'size'], sort='[[0, 1]]', headers='{0:{sorter:"text"}}')
+    table = Table(['name', 'size'], order='[[0, "desc"]]')
     for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
         name = basename(file)
         if name == '.gitignore':
@@ -68,14 +68,14 @@ def export_sql():
 
 @app.route('/download/sql/<filename>')
 @required_group('manager')
-def download_sql(filename):
+def download_sql(filename: str):
     path = app.config['EXPORT_FOLDER_PATH'] + '/sql/'
     return send_from_directory(path, filename, as_attachment=True)
 
 
 @app.route('/delete/sql/<filename>')
 @required_group('admin')
-def delete_sql(filename):
+def delete_sql(filename: str) -> str:
     try:
         os.remove(app.config['EXPORT_FOLDER_PATH'] + '/sql/' + filename)
         logger.log('info', 'file', 'SQL file deleted')
@@ -88,14 +88,14 @@ def delete_sql(filename):
 
 @app.route('/download/csv/<filename>')
 @required_group('manager')
-def download_csv(filename):
+def download_csv(filename: str):
     path = app.config['EXPORT_FOLDER_PATH'] + '/csv/'
     return send_from_directory(path, filename, as_attachment=True)
 
 
 @app.route('/export/csv', methods=['POST', 'GET'])
 @required_group('manager')
-def export_csv():
+def export_csv() -> str:
     path = app.config['EXPORT_FOLDER_PATH'] + '/csv'
     writeable = True if os.access(path, os.W_OK) else False
     form = ExportCsvForm()
@@ -104,7 +104,7 @@ def export_csv():
         logger.log('info', 'database', 'CSV export')
         flash(_('data was exported as CSV'), 'info')
         return redirect(url_for('export_csv'))
-    table = Table(['name', 'size'], sort='[[0, 1]]', headers='{0:{sorter:"text"}}')
+    table = Table(['name', 'size'], order='[[0, "desc"]]')
     for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
         name = basename(file)
         if name == '.gitignore':
@@ -123,7 +123,7 @@ def export_csv():
 
 @app.route('/delete/csv/<filename>')
 @required_group('admin')
-def delete_csv(filename):
+def delete_csv(filename: str) -> str:
     try:
         os.remove(app.config['EXPORT_FOLDER_PATH'] + '/csv/' + filename)
         logger.log('info', 'file', 'CSV file deleted')

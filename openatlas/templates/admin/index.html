@@ -47,6 +47,9 @@
                 <a href="{{ url_for('export_csv') }}">{{ _('export')|uc_first }} CSV</a>
                 <a href="{{ url_for('export_sql') }}">{{ _('export')|uc_first }} SQL</a>
             {% endif %}
+            {% if 'admin'|is_authorized %}
+                <a href="{{ url_for('sql_index') }}">SQL</a>
+            {% endif %}
         {% endif  %}
         {% if 'contributor'|is_authorized %}
             <h1>{{ _('data integrity')|uc_first }}</h1>

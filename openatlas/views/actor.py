@@ -1,4 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+from typing import Optional
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -7,7 +8,7 @@ from wtforms import FieldList, HiddenField, StringField, SubmitField, TextAreaFi
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import DateForm, TableField, build_form
+from openatlas.forms.forms import DateForm, TableField, build_form, build_table_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
 from openatlas.models.user import UserMapper
@@ -16,6 +17,7 @@ from openatlas.util.util import (add_system_data, add_type_data, display_remove_
                                  format_entry_begin, format_entry_end, get_appearance,
                                  get_base_table_data, get_profile_image_table_link, is_authorized,
                                  link, required_group, truncate_string, uc_first, was_modified)
+from openatlas.views.reference import AddReferenceForm
 
 
 class ActorForm(DateForm):
@@ -33,20 +35,22 @@ class ActorForm(DateForm):
 
 @app.route('/actor/view/<int:id_>')
 @required_group('readonly')
-def actor_view(id_):
+def actor_view(id_: int) -> str:
     actor = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
     actor.note = UserMapper.get_note(actor)
     info = []
     if actor.aliases:
         info.append((uc_first(_('alias')), '<br />'.join(actor.aliases.values())))
-    tables = {
-        'info': info,
-        'file': Table(Table.HEADERS['file'] + [_('main image')]),
-        'source': Table(Table.HEADERS['source']),
-        'reference': Table(Table.HEADERS['reference'] + ['page / link text']),
-        'event': Table(['event', 'class', 'involvement', 'first', 'last', 'description']),
-        'relation': Table(['relation', 'actor', 'first', 'last', 'description'], sort='[[0,0]]'),
-        'member_of': Table(['member of', 'function', 'first', 'last', 'description'])}
+    tables = {'info': info,
+              'file': Table(Table.HEADERS['file'] + [_('main image')]),
+              'source': Table(Table.HEADERS['source']),
+              'reference': Table(Table.HEADERS['reference'] + ['page / link text']),
+              'event': Table(['event', 'class', 'involvement', 'first', 'last', 'description'],
+                             defs='[{className: "dt-body-right", targets: [3,4]}]'),
+              'relation': Table(['relation', 'actor', 'first', 'last', 'description'],
+                                defs='[{className: "dt-body-right", targets: [2,3]}]'),
+              'member_of': Table(['member of', 'function', 'first', 'last', 'description'],
+                                 defs='[{className: "dt-body-right", targets: [2,3]}]')}
     profile_image_id = actor.get_profile_image_id()
     for link_ in actor.get_links('P67', True):
         domain = link_.domain
@@ -69,7 +73,7 @@ def actor_view(id_):
         tables[domain.view_name].rows.append(data)
 
     # Todo: Performance - getting every place of every object for every event is very costly
-    event_links = actor.get_links(['P11', 'P14', 'P22', 'P23'], True)
+    event_links = actor.get_links(['P11', 'P14', 'P22', 'P23', 'P25'], True)
 
     objects = []
     for link_ in event_links:
@@ -92,7 +96,10 @@ def actor_view(id_):
         if is_authorized('contributor'):
             update_url = url_for('involvement_update', id_=link_.id, origin_id=actor.id)
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-event'
-            data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
+            if link_.domain.class_.code != 'E9':
+                data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
+            else:
+                data.append('')
             data.append(display_remove_link(unlink_url, link_.domain.name))
         tables['event'].rows.append(data)
 
@@ -147,7 +154,8 @@ def actor_view(id_):
             data.append(display_remove_link(unlink_url, link_.domain.name))
         tables['member_of'].rows.append(data)
     if actor.class_.code in app.config['CLASS_CODES']['group']:
-        tables['member'] = Table(['member', 'function', 'first', 'last', 'description'])
+        tables['member'] = Table(['member', 'function', 'first', 'last', 'description'],
+                                 defs='[{className: "dt-body-right", targets: [2,3]}]')
         for link_ in actor.get_links('P107'):
             data = ([link(link_.range), link_.type.name if link_.type else '',
                      link_.first, link_.last, truncate_string(link_.description)])
@@ -167,8 +175,9 @@ def actor_view(id_):
 
 @app.route('/actor')
 @required_group('readonly')
-def actor_index():
-    table = Table(Table.HEADERS['actor'] + ['description'])
+def actor_index() -> str:
+    table = Table(Table.HEADERS['actor'] + ['description'],
+                  defs='[{className: "dt-body-right", targets: [2,3]}]')
     for actor in EntityMapper.get_by_codes('actor'):
         data = get_base_table_data(actor)
         data.append(truncate_string(actor.description))
@@ -179,7 +188,7 @@ def actor_index():
 @app.route('/actor/insert/<code>', methods=['POST', 'GET'])
 @app.route('/actor/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def actor_insert(code, origin_id=None):
+def actor_insert(code: str, origin_id: Optional[int] = None):
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
     form = build_form(ActorForm, code_class[code])
@@ -196,7 +205,7 @@ def actor_insert(code, origin_id=None):
 
 @app.route('/actor/delete/<int:id_>')
 @required_group('contributor')
-def actor_delete(id_):
+def actor_delete(id_: int) -> str:
     EntityMapper.delete(id_)
     logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
@@ -205,7 +214,7 @@ def actor_delete(id_):
 
 @app.route('/actor/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def actor_update(id_):
+def actor_update(id_: int) -> str:
     actor = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
     code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
     form = build_form(ActorForm, code_class[actor.class_.code], actor, request)
@@ -232,7 +241,43 @@ def actor_update(id_):
     return render_template('actor/update.html', form=form, actor=actor)
 
 
-def save(form, actor=None, code=None, origin=None):
+@app.route('/actor/add/source/<int:id_>', methods=['POST', 'GET'])
+@required_group('contributor')
+def actor_add_source(id_: int) -> str:
+    actor = EntityMapper.get_by_id(id_)
+    if request.method == 'POST':
+        if request.form['checkbox_values']:
+            actor.link('P67', request.form['checkbox_values'], inverse=True)
+        return redirect(url_for('actor_view', id_=id_) + '#tab-source')
+    form = build_table_form('source', actor.get_linked_entities('P67', inverse=True))
+    return render_template('add_source.html', entity=actor, form=form)
+
+
+@app.route('/actor/add/reference/<int:id_>', methods=['POST', 'GET'])
+@required_group('contributor')
+def actor_add_reference(id_: int) -> str:
+    actor = EntityMapper.get_by_id(id_)
+    form = AddReferenceForm()
+    if form.validate_on_submit():
+        actor.link('P67', form.reference.data, description=form.page.data, inverse=True)
+        return redirect(url_for('actor_view', id_=id_) + '#tab-reference')
+    form.page.label.text = uc_first(_('page / link text'))
+    return render_template('add_reference.html', entity=actor, form=form)
+
+
+@app.route('/actor/add/file/<int:id_>', methods=['GET', 'POST'])
+@required_group('contributor')
+def actor_add_file(id_: int) -> str:
+    actor = EntityMapper.get_by_id(id_)
+    if request.method == 'POST':
+        if request.form['checkbox_values']:
+            actor.link('P67', request.form['checkbox_values'], inverse=True)
+        return redirect(url_for('actor_view', id_=id_) + '#tab-file')
+    form = build_table_form('file', actor.get_linked_entities('P67', inverse=True))
+    return render_template('add_file.html', entity=actor, form=form)
+
+
+def save(form, actor=None, code: Optional[str] = None, origin=None) -> str:
     g.cursor.execute('BEGIN')
     try:
         log_action = 'update'

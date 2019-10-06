@@ -1,9 +1,9 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
+from typing import Dict
 
 from flask import g, json
 
-from openatlas import debug_model
 from openatlas.models.node import NodeMapper
 from openatlas.util.util import sanitize
 
@@ -15,14 +15,14 @@ class InvalidGeomException(Exception):
 class GisMapper:
 
     @staticmethod
-    def get_all(objects=None):
-        all_ = {'point': [], 'linestring': [], 'polygon': []}
-        selected = {'point': [], 'linestring': [], 'polygon': [], 'polygon_point': []}
+    def get_all(objects=None) -> dict:
+        all_ = {'point': [], 'linestring': [], 'polygon': []}  # type: Dict
+        selected = {'point': [], 'linestring': [], 'polygon': [], 'polygon_point': []}  # type: Dict
         # Workaround to include GIS features of a subunit which would be otherwise omitted
         subunit_selected_id = 0
         if objects:
             if type(objects) is not list:
-                if objects.system_type in ['feature', 'finds', 'stratigraphic unit']:
+                if objects.system_type in ['feature', 'find', 'stratigraphic unit']:
                     subunit_selected_id = objects.id
                 objects = [objects]
         else:
@@ -53,22 +53,20 @@ class GisMapper:
                 GROUP BY object.id, {shape}.id;""".format(
                 shape=shape, subunit_selected_id=subunit_selected_id,
                 polygon_point_sql=polygon_point_sql if shape == 'polygon' else '')
-            g.cursor.execute(sql)
-            debug_model['div sql'] += 1
+            g.execute(sql)
             place_type_root_id = NodeMapper.get_hierarchy_by_name('Place').id
             for row in g.cursor.fetchall():
                 description = row.description.replace('"', '\"') if row.description else ''
                 object_desc = row.object_desc.replace('"', '\"') if row.object_desc else ''
                 item = {'type': 'Feature',
                         'geometry': json.loads(row.geojson),
-                        'properties': {
-                            'objectId': row.object_id,
-                            'objectName': row.object_name.replace('"', '\"'),
-                            'objectDescription': object_desc,
-                            'id': row.id,
-                            'name': row.name.replace('"', '\"') if row.name else '',
-                            'description': description,
-                            'shapeType': row.type}}
+                        'properties': {'objectId': row.object_id,
+                                       'objectName': row.object_name.replace('"', '\"'),
+                                       'objectDescription': object_desc,
+                                       'id': row.id,
+                                       'name': row.name.replace('"', '\"') if row.name else '',
+                                       'description': description,
+                                       'shapeType': row.type}}
                 if hasattr(row, 'types') and row.types:
                     nodes_list = ast.literal_eval('[' + row.types + ']')
                     for node_id in list(set(nodes_list)):
@@ -98,7 +96,7 @@ class GisMapper:
                                              selected['linestring'] + selected['point'])}
 
     @staticmethod
-    def insert(entity, form):
+    def insert(entity, form) -> None:
         for shape in ['point', 'line', 'polygon']:
             data = getattr(form, 'gis_' + shape + 's').data
             if not data:
@@ -112,7 +110,7 @@ class GisMapper:
                     sql = """
                         SELECT st_isvalid(
                             public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));"""
-                    g.cursor.execute(sql, {'geojson': json.dumps(item['geometry'])})
+                    g.execute(sql, {'geojson': json.dumps(item['geometry'])})
                     if not g.cursor.fetchone()[0]:
                         raise InvalidGeomException
                 sql = """
@@ -123,17 +121,15 @@ class GisMapper:
                         %(type)s,
                         public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));
                     """.format(shape=shape if shape != 'line' else 'linestring')
-                g.cursor.execute(sql, {
+                g.execute(sql, {
                     'entity_id': entity.id,
                     'name': sanitize(item['properties']['name'], 'description'),
                     'description': sanitize(item['properties']['description'], 'description'),
                     'type': item['properties']['shapeType'],
                     'geojson': json.dumps(item['geometry'])})
-                debug_model['div sql'] += 1
 
     @staticmethod
-    def delete_by_entity(entity):
-        g.cursor.execute('DELETE FROM gis.point WHERE entity_id = %(id)s;', {'id': entity.id})
-        g.cursor.execute('DELETE FROM gis.linestring WHERE entity_id = %(id)s;', {'id': entity.id})
-        g.cursor.execute('DELETE FROM gis.polygon WHERE entity_id = %(id)s;', {'id': entity.id})
-        debug_model['div sql'] += 3
+    def delete_by_entity(entity) -> None:
+        g.execute('DELETE FROM gis.point WHERE entity_id = %(id)s;', {'id': entity.id})
+        g.execute('DELETE FROM gis.linestring WHERE entity_id = %(id)s;', {'id': entity.id})
+        g.execute('DELETE FROM gis.polygon WHERE entity_id = %(id)s;', {'id': entity.id})

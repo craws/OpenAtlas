@@ -13,6 +13,53 @@ tinymce.init({
 
 $(document).ready(function() {
 
+    // DataTables - sort for checkbox columns
+    $.fn.dataTable.ext.order['dom-checkbox'] = function(settings, col) {
+        return this.api().column(col, {order:'index'}).nodes().map( function (td, i) {
+            return $('input', td).prop('checked') ? '1' : '0';
+        });
+    };
+
+    // DataTables - sort for CIDOC model
+    $.fn.dataTable.ext.order['cidoc-model'] = function(settings, col) {
+        return this.api().column(col, {order:'index'}).nodes().map( function (td, i) {
+            const d = td.firstChild.innerText
+                .replace('OA', '100')
+                .replace(/[\D]*/,'');
+            return parseInt(d, 10);
+        });
+    };
+
+    // DataTables - ignore special characters for search
+    (function(){
+        function removeAccents ( data ) {
+            if ( data.normalize ) {
+                // Use I18n API if available to split characters and accents, then remove
+                // the accents wholesale. Note that we use the original data as well as
+                // the new to allow for searching of either form.
+                return data +' '+ data
+                    .normalize('NFD')
+                    .replace(/[\u0300-\u036f]/g, '');
+            }
+            return data;
+        }
+        var searchType = jQuery.fn.DataTable.ext.type.search;
+        searchType.string = function ( data ) {
+            return ! data ?
+                '' :
+                typeof data === 'string' ?
+                    removeAccents( data ) :
+                    data;
+        };
+        searchType.html = function ( data ) {
+            return ! data ?
+                '' :
+                typeof data === 'string' ?
+                    removeAccents( data.replace( /<.*?>/g, '' ) ) :
+                    data;
+        };
+    }());
+
     /* jQuery UI tabs init */
     $("#tabs").tabs({
         activate: function(event, ui) {
@@ -74,21 +121,6 @@ $(document).ready(function() {
 
 $.jstree.defaults.core.themes.dots = false;
 
-$.tablesorter.addParser({
-    id: 'class_code',
-    is: function (string) {return false;},
-    format: function (string) {return string.replace(/E/,'');},
-    type: 'numeric'
-});
-
-$.tablesorter.addParser({
-    id: 'property_code',
-    is: function (string) {return false;},
-    format: function(string) {return string.replace(/P/,'');},
-    type: 'numeric'
-});
-
-
 function resizeText(multiplier) {
     if (document.body.style.fontSize === '') {
         document.body.style.fontSize = '1.0em';
@@ -133,7 +165,8 @@ function createOverlay(name, title=false, multiple=false, type='table', value_ty
             }
         });
         $('#' + name + '-table').trigger('applyWidgets');
-        $('#' + name + '-search').focus();
+        $('#' + name + '-search').focus(); /* set search focus for tree select */
+        $('#' + name + '_table_filter > label > input').focus(); /* focus for multi table select */
     });
 }
 
@@ -195,18 +228,15 @@ function selectFromTable(element, table, id) {
 function selectFromTableMulti(name) {
     var checkedNames = '';
     var ids = [];
-    $("#" + name + "-table .multi-table-select").each(function () {
-        if ($(this).is(':checked')) {
-            checkedNames += $(this).val() + "<br />";
-            ids.push($(this).attr('id'));
-        }
-    });
-    if (ids.length > 0) {
-        $("#" + name).val('[' + ids + ']');
-    } else {
-        $("#" + name).val('');
-    }
-    $("#" + name + "-selection").html(checkedNames);
+    $('#' + name + '_table').DataTable().rows().nodes().to$().find('input[type="checkbox"]').each(
+        function() {
+            if ($(this).is(':checked')) {
+                checkedNames += $(this).val() + '<br />';
+                ids.push($(this).attr('id'));
+            }
+        });
+    $('#' + name + '-selection').html(checkedNames);
+    $('#' + name).val(ids.length > 0 ? '[' + ids+ ']' : '').trigger('change');
 }
 
 function clearSelect(name) {

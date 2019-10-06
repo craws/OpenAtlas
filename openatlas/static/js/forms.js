@@ -1,5 +1,27 @@
 
 $(document).ready(function () {
+
+    // Write selected DataTables checkboxes to hidden input
+    $('#checkbox-form').submit((a) => {
+        ids = [];
+        $('#checkbox-form .dataTable').DataTable().rows().nodes().to$().find('input[type="checkbox"]').each(
+            function() {
+                if ($(this).is(':checked')) {
+                    ids.push($(this).attr('value'));
+                }
+            });
+        $('#checkbox_values').val(ids.length > 0 ? '[' + ids+ ']' : '');
+    });
+
+    // Needed for ajax bookmark functionality
+    $.ajaxSetup({
+        beforeSend: function(xhr, settings) {
+            if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
+                xhr.setRequestHeader("X-CSRFToken", bookmark_csrf_token);
+            }
+        }
+    });
+
     $.validator.setDefaults({
         ignore: [], // Enable validation for hidden fields
     });

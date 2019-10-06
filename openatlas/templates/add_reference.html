@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    <a href="{{ url_for(entity.view_name + '_index') }}">{{ _(entity.view_name)|uc_first }}</a>
+    > {{ entity|link|safe }}
+    > {{ _('add')|uc_first }} {{ _('reference')|uc_first }}
+{% endblock %}
+{% block content %}
+    {{ form|display_form|safe }}
+{% endblock %}

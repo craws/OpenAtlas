@@ -1,4 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+from typing import Optional
+
 from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import Form
@@ -20,7 +22,7 @@ class NoteForm(Form):
 
 @app.route('/note/insert/<int:entity_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def note_insert(entity_id=None):
+def note_insert(entity_id: int) -> str:
     entity = EntityMapper.get_by_id(entity_id)
     form = build_form(NoteForm, 'note-form')
     if form.validate_on_submit():
@@ -31,7 +33,7 @@ def note_insert(entity_id=None):
 
 @app.route('/note/update/<int:entity_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def note_update(entity_id):
+def note_update(entity_id: int) -> str:
     entity = EntityMapper.get_by_id(entity_id)
     form = build_form(NoteForm, 'note-form')
     if form.validate_on_submit():
@@ -41,7 +43,7 @@ def note_update(entity_id):
     return render_template('note/update.html', form=form, entity=entity)
 
 
-def save(form, entity, insert=True):
+def save(form, entity, insert: Optional[bool] = True) -> None:
     g.cursor.execute('BEGIN')
     try:
         if insert:
@@ -58,7 +60,7 @@ def save(form, entity, insert=True):
 
 @app.route('/note/delete/<int:entity_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def note_delete(entity_id):
+def note_delete(entity_id: int) -> str:
     entity = EntityMapper.get_by_id(entity_id)
     UserMapper.delete_note(entity)
     flash(_('note deleted'), 'info')

@@ -1,0 +1,53 @@
+
+table.dataTable {
+    width: auto;
+    margin: 0;
+    margin-bottom: 1em;
+    text-align: left;
+}
+
+table.dataTable.stripe tbody tr.odd,
+table.dataTable.display tbody tr.odd {
+    background-color: #adadad;
+}
+
+.dataTables_length select {
+    white-space: nowrap;
+    display: inline;
+}
+
+table.dataTable th,
+.tabs-container table.dataTable th,
+.overlay-container table.dataTable th {
+    color: #ffffff;
+    background-color: #000000;
+    font-weight: bold;
+    border-right: 1px solid #ddd;
+    cursor: pointer;
+}
+
+table.dataTable.no-footer {
+    border-bottom: none;
+}
+
+table.dataTable.compact tbody th,
+table.dataTable.compact tbody td {
+    padding: 5px;
+}
+
+.dataTables_wrapper .ui-widget-header {
+    background-color: inherit;
+    color: #000000;
+}
+
+.dataTables_wrapper .dataTables_length select {
+    width: auto;
+}
+
+.dataTables_paginate .ui-state-default {
+    background-color: inherit;
+}
+
+.dataTables_wrapper .ui-toolbar {
+    padding: 0;
+}
