@@ -104,3 +104,6 @@ class ImportMapper:
                 location = EntityMapper.insert('E53', 'Location of ' + row['name'],
                                                'place location')
                 entity.link('P53', location)
+                if row['easting'] and row['northing']:
+                    # Todo: implement insert of gis point
+                    pass

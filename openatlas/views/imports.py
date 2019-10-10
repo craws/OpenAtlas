@@ -124,6 +124,8 @@ def import_data(project_id: int, class_code: str) -> str:
         separator = '/' if os.name == "posix" else '\\'
         file_path = app.config['IMPORT_FOLDER_PATH'] + separator + secure_filename(file_.filename)
         columns = {'allowed': ['name', 'id', 'description'], 'valid': [], 'invalid': []}
+        if class_code == 'E18':
+            columns['allowed'] += ['easting', 'northing']
         try:
             file_.save(file_path)
             if file_path.rsplit('.', 1)[1].lower() in ['xls', 'xlsx']:
