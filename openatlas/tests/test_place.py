@@ -22,16 +22,15 @@ class PlaceTest(TestBaseCase):
                 unit_node = NodeMapper.get_hierarchy_by_name('Administrative Unit')
                 unit_sub1 = g.nodes[unit_node.subs[0]]
                 unit_sub2 = g.nodes[unit_node.subs[1]]
-                reference_id = EntityMapper.insert('E31',
-                                                   'https://openatlas.eu', 'external reference').id
+                reference = EntityMapper.insert('E31', 'https://openatlas.eu', 'external reference')
                 place_node = NodeMapper.get_hierarchy_by_name('Place')
-                source_id = EntityMapper.insert('E33', 'Tha source').id
+                source = EntityMapper.insert('E33', 'Necronomicon')
             data = {'name': 'Asgard',
                     'alias-0': 'Valhöll',
                     'geonames_id': '123',
                     'geonames_precision': True,
-                    unit_node.id: '[' + str(unit_sub1.id) + ',' + str(unit_sub2.id) + ']'}
-            rv = self.app.post(url_for('place_insert', origin_id=reference_id), data=data,
+                    unit_node.id: str([unit_sub1.id, unit_sub2.id])}
+            rv = self.app.post(url_for('place_insert', origin_id=reference.id), data=data,
                                follow_redirects=True)
             assert b'Asgard' in rv.data
             data['gis_points'] = """[{
@@ -55,9 +54,9 @@ class PlaceTest(TestBaseCase):
                 "properties":{"name":"","description":"","shapeType":"shape"}}]"""
             data[place_node.id] = place_node.subs
             data['continue_'] = 'yes'
-            rv = self.app.post(url_for('place_insert', origin_id=source_id), data=data,
+            rv = self.app.post(url_for('place_insert', origin_id=source.id), data=data,
                                follow_redirects=True)
-            assert b'Tha source' in rv.data
+            assert b'Necronomicon' in rv.data
             with app.test_request_context():
                 app.preprocess_request()
                 places = EntityMapper.get_by_system_type('place')
@@ -66,7 +65,7 @@ class PlaceTest(TestBaseCase):
                 location = place2.get_linked_entity('P53')
                 actor = EntityMapper.insert('E21', 'Milla Jovovich')
                 actor.link('P74', location)
-            assert b'Tha source' in rv.data
+            assert b'Necronomicon' in rv.data
             rv = self.app.get(url_for('place_index'))
             assert b'Asgard' in rv.data
             rv = self.app.get(url_for('place_update', id_=place.id))
@@ -110,7 +109,7 @@ class PlaceTest(TestBaseCase):
                  [299.00650977389887, -5.893358673645309], [298.9848804404028, -5.9070188333813585],
                  [298.9893436362036, -5.888919049309554]]]},
                 "properties": {"name": "", "description": "", "shapeType": "shape"}}]"""
-            rv = self.app.post(url_for('place_insert', origin_id=source_id), data=data,
+            rv = self.app.post(url_for('place_insert', origin_id=source.id), data=data,
                                follow_redirects=True)
             assert b'An invalid geometry was entered' in rv.data
 
@@ -118,7 +117,7 @@ class PlaceTest(TestBaseCase):
             with open(os.path.dirname(__file__) + '/../static/images/layout/logo.png', 'rb') as img:
                 rv = self.app.post(
                     url_for('file_insert', origin_id=place.id),
-                    data={'name': 'OpenAtlas logo', 'file': img}, follow_redirects=True)
+                    data={'name': 'X-Files', 'file': img}, follow_redirects=True)
             assert b'An entry has been created' in rv.data
             with app.test_request_context():
                 app.preprocess_request()
@@ -126,7 +125,7 @@ class PlaceTest(TestBaseCase):
                 link_id = LinkMapper.insert(file, 'P67', place.id)
             rv = self.app.get(url_for('overlay_insert', image_id=file.id, place_id=place.id,
                                       link_id=link_id))
-            assert b'OpenAtlas logo' in rv.data
+            assert b'X-Files' in rv.data
             data = {'top_left_easting': 42, 'top_left_northing': 12,
                     'bottom_right_easting': 43, 'bottom_right_northing': 13}
             rv = self.app.post(url_for('overlay_insert', image_id=file.id, place_id=place.id,
@@ -146,6 +145,27 @@ class PlaceTest(TestBaseCase):
             self.app.get(url_for('overlay_remove', id_=overlay_id, place_id=place.id),
                          follow_redirects=True)
 
+            # Add to place
+            rv = self.app.get(url_for('place_add_file', id_=place.id))
+            assert b'Add File' in rv.data
+
+            rv = self.app.post(url_for('place_add_file', id_=place.id),
+                               data={'checkbox_values': str([file.id])}, follow_redirects=True)
+            assert b'X-Files' in rv.data
+
+            rv = self.app.get(url_for('place_add_source', id_=place.id))
+            assert b'Add Source' in rv.data
+            rv = self.app.post(url_for('place_add_source', id_=place.id),
+                               data={'checkbox_values': str([source.id])}, follow_redirects=True)
+            assert b'Necronomicon' in rv.data
+
+            rv = self.app.get(url_for('place_add_reference', id_=place.id))
+            assert b'Add Reference' in rv.data
+            rv = self.app.post(url_for('place_add_reference', id_=place.id),
+                               data={'reference': reference.id, 'page': '777'},
+                               follow_redirects=True)
+            assert b'777' in rv.data
+
             # Place types
             rv = self.app.get(url_for('node_move_entities', id_=unit_sub1.id))
             assert b'Asgard' in rv.data
@@ -153,14 +173,14 @@ class PlaceTest(TestBaseCase):
             # Test move entities of multiple node if link to new node exists
             rv = self.app.post(url_for('node_move_entities', id_=unit_sub1.id),
                                data={unit_node.id: unit_sub2.id, 'selection': location.id,
-                                     'checkbox_values': '[' + str(location.id) + ']'},
+                                     'checkbox_values': str([location.id])},
                                follow_redirects=True)
             assert b'Entities where updated' in rv.data
 
             # Test move entities of multiple node if link to new node doesn't exists
             rv = self.app.post(url_for('node_move_entities', id_=unit_sub2.id),
                                data={unit_node.id: unit_sub1.id, 'selection': location.id,
-                                     'checkbox_values': '[' + str(location.id) + ']'},
+                                     'checkbox_values': str([location.id])},
                                follow_redirects=True)
             assert b'Entities where updated' in rv.data
 

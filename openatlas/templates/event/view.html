@@ -11,6 +11,9 @@
         {% if tables['subs'].rows %}
             <li><a href="#tab-subs">{{ _('sub events')|uc_first }} {{ tables['subs']|format_tab_number|safe }}</a></li>
         {% endif %}
+        {% if gis_data %}
+            <li><a href="#tab-map" id="map-tab-id">{{ _('map')|uc_first }}</a></li>
+        {% endif %}
         <li><a href="#tab-source">{{ _('source')|uc_first }} {{ tables['source']|format_tab_number|safe }}</a></li>
         <li><a href="#tab-actor">{{ _('actor')|uc_first }} {{ tables['actor']|format_tab_number|safe }}</a></li>
         <li><a href="#tab-reference">{{ _('reference')|uc_first }} {{ tables['reference']|format_tab_number|safe }}</a></li>
@@ -29,8 +32,8 @@
             {{ profile_image_id|display_profile_image|safe }}
             <div style="float:left;">
                 {{ tables['info']|data_table|safe }}
-                {{ event|display_external_references|safe }}
                 {{ event|note|safe }}
+                {{ event|display_external_references|safe }}
                 {{ event|description|safe }}
             </div>
             <div style="clear:both;"></div>
@@ -41,10 +44,22 @@
             {{ tables['subs'].display('subs')|safe }}
         </div>
     {% endif %}
+    {% if gis_data %}
+        <div id="tab-map">
+            <div id="map" class="map" style="float:none;margin:0;width:70em;"></div>
+        </div>
+        <script src="/static/js/map/map.js"></script>
+        <script>
+            /* workaround for leaflet bug when map not in the first tab */
+            $("body").on('click','#map-tab-id', function() {
+                map.panBy(new L.Point(0, -1));
+            });
+        </script>
+    {% endif %}
     <div id="tab-source">
         {% if 'contributor'|is_authorized %}
             <div class="button-bar">
-                <a href="{{ url_for('source_add', origin_id=event.id)}}">{{ _('add')|uc_first }}</a>
+                <a href="{{ url_for('event_add_source', id_=event.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('source_insert', origin_id=event.id) }}">+ {{ _('source')|uc_first }}</a>
             </div>
         {% endif %}
@@ -64,7 +79,7 @@
     <div id="tab-reference">
         {% if 'contributor'|is_authorized %}
             <div class="button-bar">
-                <a href="{{ url_for('reference_add', origin_id=event.id)}}">{{ _('add')|uc_first }}</a>
+                <a href="{{ url_for('event_add_reference', id_=event.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='bibliography', origin_id=event.id) }}">+ {{ _('bibliography')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='edition', origin_id=event.id) }}">+ {{ _('edition')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='external_reference', origin_id=event.id) }}">+ {{ _('external reference')|uc_first }}</a>
@@ -75,7 +90,7 @@
     <div id="tab-file">
         {% if 'contributor'|is_authorized %}
             <div class="button-bar">
-                <a href="{{ url_for('file_add', origin_id=event.id)}}">{{ _('add')|uc_first }}</a>
+                <a href="{{ url_for('event_add_file', id_=event.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('file_insert', origin_id=event.id) }}">+ {{ _('file')|uc_first }}</a>
             </div>
         {% endif %}

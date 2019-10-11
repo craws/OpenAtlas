@@ -32,8 +32,8 @@
             {{ profile_image_id|display_profile_image|safe }}
             <div style="float:left;">
                 {{ tables['info']|data_table|safe }}
-                {{ source|display_external_references|safe }}
                 {{ source|note|safe }}
+                {{ source|display_external_references|safe }}
                 {{ source|description|safe }}
             </div>
             <div style="clear:both;"></div>
@@ -44,7 +44,7 @@
             <div id="tab-{{ name }}">
                 {% if 'contributor'|is_authorized and name not in ['feature', 'stratigraphic-unit', 'find'] %}
                     <div class="button-bar">
-                        <a href="{{ url_for('source_add2', id_=source.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
+                        <a href="{{ url_for('source_add', id_=source.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
                         {% if name == 'place' %}
                             <a href="{{ url_for('place_insert', origin_id=source.id) }}">+ {{ _('place')|uc_first }}</a>
                         {% else %}
@@ -61,7 +61,7 @@
     <div id="tab-reference">
         {% if 'contributor'|is_authorized %}
             <div class="button-bar">
-                <a href="{{ url_for('reference_add', origin_id=source.id)}}">{{ _('add')|uc_first }}</a>
+                <a href="{{ url_for('source_add_reference', id_=source.id) }}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='bibliography', origin_id=source.id) }}">+ {{ _('bibliography')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='edition', origin_id=source.id) }}">+ {{ _('edition')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='external_reference', origin_id=source.id) }}">+ {{ _('external reference')|uc_first }}</a>
@@ -80,7 +80,7 @@
     <div id="tab-file">
         {% if 'contributor'|is_authorized %}
             <div class="button-bar">
-                <a href="{{ url_for('file_add', origin_id=source.id)}}">{{ _('add')|uc_first }}</a>
+                <a href="{{ url_for('source_add_file', id_=source.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('file_insert', origin_id=source.id) }}">+ {{ _('file')|uc_first }}</a>
             </div>
         {% endif %}

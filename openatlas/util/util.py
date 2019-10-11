@@ -27,7 +27,7 @@ from openatlas.models.property import Property
 from openatlas.models.user import User
 
 
-def convert_size(size_bytes):
+def convert_size(size_bytes: int) -> str:
     if size_bytes == 0:
         return "0B"  # pragma: no cover
     size_name = ("B", "KB", "MB", "GB", "TB", "PB", "EB", "ZB", "YB")
@@ -59,7 +59,7 @@ def print_file_extension(entity) -> str:
     return os.path.splitext(path)[1] if path else 'N/A'
 
 
-def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
+def send_mail(subject: str, text: str, recipients, log_body=True) -> bool:  # pragma: no cover
     """ Send one mail to every recipient, set log_body to False for sensitive data e.g. passwords"""
     settings = session['settings']
     recipients = recipients if type(recipients) is list else [recipients]
@@ -83,11 +83,11 @@ def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
         log_text += ' Content: ' + text if log_body else ''
         openatlas.logger.log('info', 'mail', 'Mail send from ' + from_, log_text)
     except smtplib.SMTPAuthenticationError as e:
-        openatlas.logger.log('error', 'mail', 'Error mail login for ' + mail_user, str(e))
+        openatlas.logger.log('error', 'mail', 'Error mail login for ' + mail_user, e)
         flash(_('error mail login'), 'error')
         return False
     except Exception as e:
-        openatlas.logger.log('error', 'mail', 'Error send mail for ' + mail_user, str(e))
+        openatlas.logger.log('error', 'mail', 'Error send mail for ' + mail_user, e)
         flash(_('error mail send'), 'error')
         return False
     return True
@@ -95,20 +95,20 @@ def send_mail(subject, text, recipients, log_body=True):  # pragma: no cover
 
 class MLStripper(HTMLParser):
 
-    def error(self, message):  # pragma: no cover
+    def error(self, message) -> None:  # pragma: no cover
         pass
 
-    def __init__(self):
+    def __init__(self) -> None:
         super().__init__()
         self.reset()
         self.strict = False
         self.convert_charrefs = True
-        self.fed = []
+        self.fed = []  # type: list
 
     def handle_data(self, d):
         self.fed.append(d)
 
-    def get_data(self):
+    def get_data(self) -> str:
         return ''.join(self.fed)
 
 
@@ -197,7 +197,6 @@ def get_entity_data(entity, location=None):
     The location parameter is for places which have a location attached.
     """
     data = []
-
     # Aliases
     if entity.aliases:
         data.append((uc_first(_('alias')), '<br />'.join(entity.aliases.values())))
@@ -224,6 +223,11 @@ def get_entity_data(entity, location=None):
         data.append((uc_first(_('size')), print_file_size(entity)))
         data.append((uc_first(_('extension')), print_file_extension(entity)))
 
+    # Info for source
+    if entity.system_type == 'source content':
+        data.append((uc_first(_('information carrier')), '<br />'.join(
+            [link(recipient) for recipient in entity.get_linked_entities('P128', inverse=True)])))
+
     # Info for events
     if entity.class_.code in app.config['CLASS_CODES']['event']:
         super_event = entity.get_linked_entity('P117')
@@ -244,6 +248,21 @@ def get_entity_data(entity, location=None):
             data.append((uc_first(_('given place')), '<br />'.join(
                 [link(place) for place in entity.get_linked_entities('P24')])))
 
+        # Info for moves
+        if entity.class_.code == 'E9':
+            person_data = []
+            object_data = []
+            for linked_entity in entity.get_linked_entities('P25'):
+                if linked_entity.class_.code == 'E21':
+                    person_data.append(linked_entity)
+                elif linked_entity.class_.code == 'E84':
+                    object_data.append(linked_entity)
+            if person_data:
+                data.append((uc_first(_('person')), '<br />'.join(
+                    [link(object_) for object_ in person_data])))
+            if object_data:
+                data.append((uc_first(_('object')), '<br />'.join(
+                    [link(object_) for object_ in object_data])))
     return add_system_data(entity, data)
 
 
@@ -402,6 +421,8 @@ def link(entity) -> str:
             url = url_for('place_view', id_=entity.id)
         elif entity.class_.code in (app.config['CLASS_CODES']['reference']):
             url = url_for('reference_view', id_=entity.id)
+        elif entity.class_.code in (app.config['CLASS_CODES']['object']):
+            url = url_for('object_view', id_=entity.id)
         elif entity.class_.code in ['E55', 'E53']:
             url = url_for('node_view', id_=entity.id)
             if not entity.root:
@@ -434,7 +455,7 @@ def get_base_table_data(entity, file_stats=None):
         data.append(g.classes[entity.class_.code].name)
     if entity.view_name in ['reference'] and entity.system_type != 'file':
         data.append(uc_first(_(entity.system_type)))
-    if entity.view_name in ['event', 'place', 'source', 'reference', 'file']:
+    if entity.view_name in ['event', 'place', 'source', 'reference', 'file', 'object']:
         data.append(entity.print_base_type())
     if entity.system_type == 'file':
         if file_stats:

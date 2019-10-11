@@ -4,7 +4,7 @@ from collections import OrderedDict
 
 from flask_babel import lazy_gettext as _
 
-VERSION = '3.20.0'
+VERSION = '3.21.0'
 DEMO_MODE = False  # If in demo mode some options are disabled and the login form is pre filled
 
 LANGUAGES = {'en': 'English', 'de': 'Deutsch'}
@@ -64,25 +64,28 @@ FEEDBACK_SUBJECTS[_('problem').title()] = _('problem').title()
 
 # Mappings between model and user interface
 CODE_CLASS = {
-    'E33': 'source',
-    'E7': 'event',
-    'E8': 'event',
-    'E9': 'event',
     'E21': 'actor',
     'E40': 'actor',
     'E74': 'actor',
+    'E7': 'event',
+    'E8': 'event',
+    'E9': 'event',
+    'E84': 'object',
     'E18': 'place',
     'E22': 'place',
     'E31': 'reference',
-    'E84': 'reference'}
+    'E33': 'source'}
 
 CLASS_CODES = {
-    'source': ['E33'],
-    'event': ['E7', 'E8', 'E9'],
     'actor': ['E21', 'E74', 'E40'],
+    'event': ['E7', 'E8', 'E9'],
     'group': ['E40', 'E74'],
+    'information_carrier': ['E84'],
+    'object': ['E84'],
+    'person': ['E21'],
     'place': ['E18', 'E22'],
-    'reference': ['E31', 'E84']}
+    'reference': ['E31'],
+    'source': ['E33']}
 
 PROPERTY_TYPES = ['Actor Actor Relation', 'Actor Function', 'Involvement']
 

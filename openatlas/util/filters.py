@@ -37,7 +37,7 @@ def note(self, entity: Entity) -> str:
         return ''  # pragma no cover
     if not entity.note:
         url = url_for('note_insert', entity_id=entity.id)
-        return '<a href="' + url + '">+ ' + util.uc_first(_('note')) + '</a>'
+        return '<p><a href="' + url + '">+ ' + util.uc_first(_('note')) + '</a></p>'
     url = url_for('note_update', entity_id=entity.id)
     html = '<h2>' + util.uc_first(_('note')) + '</h2><p>' + entity.note + '</p>'
     html += '<a href="' + url + '">' + util.uc_first(_('edit note')) + '</a>'
@@ -386,7 +386,8 @@ def display_menu(self, origin) -> str:
     html = ''
     if current_user.is_authenticated:
         selected = origin.view_name if origin else ''
-        items = ['overview', 'source', 'event', 'actor', 'place', 'reference', 'types', 'admin', 'api']
+        items = ['overview', 'source', 'event', 'actor', 'place', 'reference', 'object', 'types',
+                 'admin', 'api']
         for item in items:
             if selected:
                 css = 'active' if item == selected else ''

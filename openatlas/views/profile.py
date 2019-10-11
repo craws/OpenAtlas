@@ -82,7 +82,7 @@ def profile_index() -> str:
 
 @app.route('/profile/update', methods=['POST', 'GET'])
 @login_required
-def profile_update():
+def profile_update() -> str:
     form = ProfileForm()
     user = current_user
     if form.validate_on_submit():
@@ -142,7 +142,7 @@ def profile_update():
 
 @app.route('/profile/password', methods=['POST', 'GET'])
 @login_required
-def profile_password():
+def profile_password() -> str:
     form = PasswordForm()
     if form.validate_on_submit():
         current_user.password = bcrypt.hashpw(form.password.data.encode('utf-8'),

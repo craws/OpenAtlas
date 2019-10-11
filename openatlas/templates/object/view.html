@@ -1,0 +1,50 @@
+{% extends "layout.html" %}
+{% block title_name %}- {{ object_.name }}{% endblock %}
+{% block breadcrumb %}
+    <a href="{{ url_for('object_index') }}">{{ _('object')|uc_first }}</a>
+    > {{ object_.name|truncate_string|safe }}
+{% endblock %}
+{% block content %}
+<div id="tabs" class="tabs-container">
+    <ul>
+        <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
+        <li><a href="#tab-source">{{ _('source')|uc_first }} {{ tables['source']|format_tab_number|safe }}</a></li>
+        <li><a href="#tab-event">{{ _('event')|uc_first }} {{ tables['event']|format_tab_number|safe }}</a></li>
+    </ul>
+    <div id="tab-info">
+        <div class="button-bar">
+            {% if 'contributor'|is_authorized %}
+                <a href="{{ url_for('object_update', id_=object_.id) }}">{{ _('edit')|uc_first }}</a>
+                {{ object_|display_delete_link|safe }}
+            {% endif %}
+            {{ object_.id|bookmark_toggle|safe }}
+        </div>
+        <h1>{{ object_.name }}</h1>
+        <div>
+            <div style="float:left;">
+                {{ tables['info']|data_table|safe }}
+                {{ object_|note|safe }}
+                {{ object_|description|safe }}
+            </div>
+            <div style="clear:both;"></div>
+        </div>
+    </div>
+    <div id="tab-source">
+        {% if 'contributor'|is_authorized %}
+            <div class="button-bar">
+                <a href="{{ url_for('object_add_source', id_=object_.id)}}">{{ _('add')|uc_first }}</a>
+                <a href="{{ url_for('source_insert', origin_id=object_.id) }}">+ {{ _('source')|uc_first }}</a>
+            </div>
+        {% endif %}
+        {{ tables['source'].display('source')|safe }}
+    </div>
+    <div id="tab-event">
+        {% if 'contributor'|is_authorized %}
+            <div class="button-bar">
+                <a href="{{ url_for('event_insert', code='E9', origin_id=object_.id) }}">+ {{ 'E9'|get_class_name }}</a>
+            </div>
+        {% endif %}
+        {{ tables['event'].display('event')|safe }}
+    </div>
+</div>
+{% endblock %}

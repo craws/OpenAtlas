@@ -1,5 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-import ast
+from typing import Optional
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -9,17 +9,19 @@ from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import build_form, build_table_form
+from openatlas.forms.forms import TableMultiField, build_form, build_table_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.user import UserMapper
 from openatlas.util.table import Table
 from openatlas.util.util import (display_remove_link, get_base_table_data,
                                  get_entity_data, get_profile_image_table_link, is_authorized, link,
                                  required_group, truncate_string, uc_first, was_modified)
+from openatlas.views.reference import AddReferenceForm
 
 
 class SourceForm(Form):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
+    information_carrier = TableMultiField()
     description = TextAreaField(_('content'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
@@ -29,7 +31,7 @@ class SourceForm(Form):
 
 @app.route('/source')
 @required_group('readonly')
-def source_index():
+def source_index() -> str:
     table = Table(Table.HEADERS['source'])
     for source in EntityMapper.get_by_codes('source'):
         data = get_base_table_data(source)
@@ -40,19 +42,21 @@ def source_index():
 @app.route('/source/insert/<int:origin_id>', methods=['POST', 'GET'])
 @app.route('/source/insert', methods=['POST', 'GET'])
 @required_group('contributor')
-def source_insert(origin_id=None):
+def source_insert(origin_id: Optional[int] = None) -> str:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(SourceForm, 'Source')
     if origin:
         del form.insert_and_continue
     if form.validate_on_submit():
         return redirect(save(form, origin=origin))
+    if origin and origin.class_.code == 'E84':
+        form.information_carrier.data = [origin_id]
     return render_template('source/insert.html', form=form, origin=origin)
 
 
 @app.route('/source/view/<int:id_>')
 @required_group('readonly')
-def source_view(id_):
+def source_view(id_: int) -> str:
     source = EntityMapper.get_by_id(id_, nodes=True)
     source.note = UserMapper.get_note(source)
     tables = {'info': get_entity_data(source),
@@ -76,7 +80,7 @@ def source_view(id_):
             data.append(display_remove_link(url + '#tab-' + range_.table_name, range_.name))
         tables[range_.table_name].rows.append(data)
     profile_image_id = source.get_profile_image_id()
-    for link_ in source.get_links(['P67', 'P128'], True):
+    for link_ in source.get_links(['P67'], True):
         domain = link_.domain
         data = get_base_table_data(domain)
         if domain.view_name == 'file':  # pragma: no cover
@@ -99,35 +103,45 @@ def source_view(id_):
                            profile_image_id=profile_image_id)
 
 
-@app.route('/source/add/<int:origin_id>', methods=['POST', 'GET'])
+@app.route('/source/add/<int:id_>/<class_name>', methods=['POST', 'GET'])
 @required_group('contributor')
-def source_add(origin_id):
-    """ Link an entity to source coming from the entity."""
-    origin = EntityMapper.get_by_id(origin_id)
-    if request.method == 'POST':
-        if request.form['checkbox_values']:
-            origin.link('P67', ast.literal_eval(request.form['checkbox_values']), inverse=True)
-        return redirect(url_for(origin.view_name + '_view', id_=origin.id) + '#tab-source')
-    form = build_table_form('source', origin.get_linked_entities('P67', True))
-    return render_template('source/add.html', origin=origin, form=form)
-
-
-@app.route('/source/add2/<int:id_>/<class_name>', methods=['POST', 'GET'])
-@required_group('contributor')
-def source_add2(id_, class_name):
-    """ Link an entity to source coming from the source"""
+def source_add(id_: int, class_name: str) -> str:
     source = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:
-            source.link('P67', ast.literal_eval(request.form['checkbox_values']))
+            source.link('P67', request.form['checkbox_values'])
         return redirect(url_for('source_view', id_=source.id) + '#tab-' + class_name)
     form = build_table_form(class_name, source.get_linked_entities('P67'))
-    return render_template('source/add2.html', source=source, class_name=class_name, form=form)
+    return render_template('source/add.html', source=source, class_name=class_name, form=form)
+
+
+@app.route('/source/add/reference/<int:id_>', methods=['POST', 'GET'])
+@required_group('contributor')
+def source_add_reference(id_: int) -> str:
+    source = EntityMapper.get_by_id(id_)
+    form = AddReferenceForm()
+    if form.validate_on_submit():
+        source.link('P67', form.reference.data, description=form.page.data, inverse=True)
+        return redirect(url_for('source_view', id_=id_) + '#tab-reference')
+    form.page.label.text = uc_first(_('page / link text'))
+    return render_template('add_reference.html', entity=source, form=form)
+
+
+@app.route('/source/add/file/<int:id_>', methods=['GET', 'POST'])
+@required_group('contributor')
+def source_add_file(id_: int) -> str:
+    source = EntityMapper.get_by_id(id_)
+    if request.method == 'POST':
+        if request.form['checkbox_values']:
+            source.link('P67', request.form['checkbox_values'], inverse=True)
+        return redirect(url_for('source_view', id_=id_) + '#tab-file')
+    form = build_table_form('file', source.get_linked_entities('P67', inverse=True))
+    return render_template('add_file.html', entity=source, form=form)
 
 
 @app.route('/source/delete/<int:id_>')
 @required_group('contributor')
-def source_delete(id_):
+def source_delete(id_: int) -> str:
     EntityMapper.delete(id_)
     logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
@@ -136,7 +150,7 @@ def source_delete(id_):
 
 @app.route('/source/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def source_update(id_):
+def source_update(id_: int) -> str:
     source = EntityMapper.get_by_id(id_, nodes=True)
     form = build_form(SourceForm, 'Source', source, request)
     if form.validate_on_submit():
@@ -148,21 +162,29 @@ def source_update(id_):
                                    modifier=modifier)
         save(form, source)
         return redirect(url_for('source_view', id_=id_))
+    form.information_carrier.data = [entity.id for entity in
+                                     source.get_linked_entities('P128', inverse=True)]
     return render_template('source/update.html', form=form, source=source)
 
 
-def save(form, source=None, origin=None):
+def save(form, source=None, origin=None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
     try:
         if not source:
             source = EntityMapper.insert('E33', form.name.data, 'source content')
             log_action = 'insert'
+        url = url_for('source_view', id_=source.id)
         source.name = form.name.data
         source.description = form.description.data
         source.update()
         source.save_nodes(form)
-        url = url_for('source_view', id_=source.id)
+
+        # Information carrier
+        source.delete_links(['P128'], inverse=True)
+        if form.information_carrier.data:
+            source.link('P128', form.information_carrier.data, inverse=True)
+
         if origin:
             url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-source'
             if origin.view_name == 'reference':
@@ -170,7 +192,7 @@ def save(form, source=None, origin=None):
                 url = url_for('reference_link_update', link_id=link_id, origin_id=origin)
             elif origin.view_name == 'file':
                 origin.link('P67', source)
-            else:
+            elif origin.class_.code != 'E84':
                 source.link('P67', origin)
         g.cursor.execute('COMMIT')
         if form.continue_.data == 'yes':

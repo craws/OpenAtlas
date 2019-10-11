@@ -1,0 +1,9 @@
+{% extends 'layout.html' %}
+{% block breadcrumb %}
+    <a href="{{ url_for('object_index') }}">{{ _('object')|uc_first }}</a>
+    > {{ object_|link|safe }}
+    > {{ _('edit')|uc_first }}
+{% endblock %}
+{% block content %}
+    {{ form|display_form()|safe }}
+{% endblock %}

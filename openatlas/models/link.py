@@ -79,6 +79,8 @@ class LinkMapper:
         property_ = g.properties[property_code]
         try:
             linked_entities = ast.literal_eval(linked_entities)
+            if not linked_entities:  # pragma: no cover
+                return None
         except (SyntaxError, ValueError):
             pass
         linked_entities = linked_entities if type(linked_entities) is list else [linked_entities]
@@ -172,9 +174,12 @@ class LinkMapper:
         return links
 
     @staticmethod
-    def delete_by_codes(entity, codes: list) -> None:
+    def delete_by_codes(entity, codes, inverse: bool = False) -> None:
         codes = codes if type(codes) is list else [codes]
-        sql = 'DELETE FROM model.link WHERE property_code IN %(codes)s AND domain_id = %(id)s;'
+        sql = """
+            DELETE FROM model.link
+            WHERE property_code IN %(codes)s AND {field} = %(id)s;""".format(
+                field='range_id' if inverse else 'domain_id')
         g.execute(sql, {'id': entity.id, 'codes': tuple(codes)})
 
     @staticmethod

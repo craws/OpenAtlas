@@ -3,12 +3,13 @@ from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from werkzeug.utils import redirect
+from typing import Optional as OptionalTyping
 from wtforms import (BooleanField, FieldList, HiddenField, IntegerField, StringField, SubmitField,
                      TextAreaField)
 from wtforms.validators import InputRequired, Optional
 
 from openatlas import app, logger
-from openatlas.forms.forms import DateForm, build_form
+from openatlas.forms.forms import DateForm, build_form, build_table_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper, InvalidGeomException
 from openatlas.models.geonames import GeonamesMapper
@@ -18,6 +19,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  get_profile_image_table_link, is_authorized, link, required_group,
                                  truncate_string, uc_first, was_modified)
+from openatlas.views.reference import AddReferenceForm
 
 
 class PlaceForm(DateForm):
@@ -49,7 +51,7 @@ class FeatureForm(DateForm):
 
 @app.route('/place')
 @required_group('readonly')
-def place_index():
+def place_index() -> str:
     table = Table(Table.HEADERS['place'], defs='[{className: "dt-body-right", targets: [2,3]}]')
     for place in EntityMapper.get_by_system_type(
             'place', nodes=True, aliases=current_user.settings['table_show_aliases']):
@@ -60,7 +62,7 @@ def place_index():
 @app.route('/place/insert', methods=['POST', 'GET'])
 @app.route('/place/insert/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def place_insert(origin_id=None):
+def place_insert(origin_id: OptionalTyping[int] = None) -> str:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     geonames_buttons = False
     if origin and origin.system_type == 'place':
@@ -106,7 +108,7 @@ def place_insert(origin_id=None):
 
 @app.route('/place/view/<int:id_>')
 @required_group('readonly')
-def place_view(id_):
+def place_view(id_: int) -> str:
     object_ = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
     object_.note = UserMapper.get_note(object_)
     location = object_.get_linked_entity('P53', nodes=True)
@@ -133,7 +135,7 @@ def place_view(id_):
     for link_ in object_.get_links('P67', inverse=True):
         domain = link_.domain
         data = get_base_table_data(domain)
-        if domain.view_name == 'file':  # pragma: no cover
+        if domain.view_name == 'file':
             extension = data[3].replace('.', '')
             data.append(get_profile_image_table_link(domain, object_, extension, profile_image_id))
             if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
@@ -147,7 +149,7 @@ def place_view(id_):
                         url = url_for('overlay_insert', image_id=domain.id, place_id=object_.id,
                                       link_id=link_.id)
                         data.append('<a href="' + url + '">' + uc_first(_('add')) + '</a>')
-                else:
+                else:  # pragma: no cover
                     data.append('')
         if domain.view_name not in ['source', 'file']:
             data.append(truncate_string(link_.description))
@@ -206,7 +208,7 @@ def place_view(id_):
 
 @app.route('/place/delete/<int:id_>')
 @required_group('contributor')
-def place_delete(id_):
+def place_delete(id_: int) -> str:
     entity = EntityMapper.get_by_id(id_)
     parent = None if entity.system_type == 'place' else entity.get_linked_entity('P46', True)
     if entity.get_linked_entities('P46'):
@@ -220,9 +222,45 @@ def place_delete(id_):
     return redirect(url_for('place_index'))
 
 
+@app.route('/place/add/source/<int:id_>', methods=['POST', 'GET'])
+@required_group('contributor')
+def place_add_source(id_: int) -> str:
+    object_ = EntityMapper.get_by_id(id_)
+    if request.method == 'POST':
+        if request.form['checkbox_values']:
+            object_.link('P67', request.form['checkbox_values'], inverse=True)
+        return redirect(url_for('place_view', id_=id_) + '#tab-source')
+    form = build_table_form('source', object_.get_linked_entities('P67', inverse=True))
+    return render_template('add_source.html', entity=object_, form=form)
+
+
+@app.route('/place/add/reference/<int:id_>', methods=['POST', 'GET'])
+@required_group('contributor')
+def place_add_reference(id_: int) -> str:
+    object_ = EntityMapper.get_by_id(id_)
+    form = AddReferenceForm()
+    if form.validate_on_submit():
+        object_.link('P67', form.reference.data, description=form.page.data, inverse=True)
+        return redirect(url_for('place_view', id_=id_) + '#tab-reference')
+    form.page.label.text = uc_first(_('page / link text'))
+    return render_template('add_reference.html', entity=object_, form=form)
+
+
+@app.route('/place/add/file/<int:id_>', methods=['GET', 'POST'])
+@required_group('contributor')
+def place_add_file(id_: int) -> str:
+    object_ = EntityMapper.get_by_id(id_)
+    if request.method == 'POST':
+        if request.form['checkbox_values']:
+            object_.link('P67', request.form['checkbox_values'], inverse=True)
+        return redirect(url_for('place_view', id_=id_) + '#tab-file')
+    form = build_table_form('file', object_.get_linked_entities('P67', inverse=True))
+    return render_template('add_file.html', entity=object_, form=form)
+
+
 @app.route('/place/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def place_update(id_):
+def place_update(id_: int) -> str:
     object_ = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
     location = object_.get_linked_entity('P53', nodes=True)
     geonames_buttons = False
@@ -329,13 +367,13 @@ def save(form: DateForm, object_=None, location=None, origin=None) -> str:
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
     except InvalidGeomException as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        logger.log('error', 'database', 'transaction failed because of invalid geom', str(e))
+        logger.log('error', 'database', 'transaction failed because of invalid geom', e)
         flash(_('Invalid geom entered'), 'error')
         url = url_for('place_index') if log_action == 'insert' else url_for('place_view',
                                                                             id_=object_.id)
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        logger.log('error', 'database', 'transaction failed', str(e))
+        logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
         url = url_for('place_index') if log_action == 'insert' else url_for('place_view',
                                                                             id_=object_.id)

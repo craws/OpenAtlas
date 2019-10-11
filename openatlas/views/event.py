@@ -1,5 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-import ast
+from typing import Optional
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -9,14 +9,17 @@ from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import DateForm, TableField, TableMultiField, build_form
+from openatlas.forms.forms import DateForm, TableField, TableMultiField, build_form, \
+    build_table_form
 from openatlas.models.entity import EntityMapper
+from openatlas.models.gis import GisMapper
 from openatlas.models.link import LinkMapper
 from openatlas.models.user import UserMapper
 from openatlas.util.table import Table
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  get_profile_image_table_link, is_authorized, link, required_group,
                                  truncate_string, uc_first, was_modified)
+from openatlas.views.reference import AddReferenceForm
 
 
 class EventForm(DateForm):
@@ -25,6 +28,8 @@ class EventForm(DateForm):
     place = TableField(_('location'))
     place_from = TableField(_('from'))
     place_to = TableField(_('to'))
+    object = TableMultiField()
+    person = TableMultiField()
     event_id = HiddenField()
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
@@ -56,12 +61,7 @@ def event_index() -> str:
     return render_template('event/index.html', table=table)
 
 
-@app.route('/event/insert/<code>', methods=['POST', 'GET'])
-@app.route('/event/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
-@required_group('contributor')
-def event_insert(code=str, origin_id=None) -> str:
-    origin = EntityMapper.get_by_id(origin_id) if origin_id else None
-    form = build_form(EventForm, 'Event')
+def prepare_form(form: EventForm, code: str):
     if code != 'E8':
         del form.given_place
     if code == 'E9':
@@ -69,16 +69,35 @@ def event_insert(code=str, origin_id=None) -> str:
     else:
         del form.place_from
         del form.place_to
+        del form.object
+        del form.person
+    return form
+
+
+@app.route('/event/insert/<code>', methods=['POST', 'GET'])
+@app.route('/event/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
+@required_group('contributor')
+def event_insert(code: str, origin_id=None) -> str:
+    origin = EntityMapper.get_by_id(origin_id) if origin_id else None
+    form = prepare_form(build_form(EventForm, 'Event'), code)
     if origin:
         del form.insert_and_continue
     if form.validate_on_submit():
         return redirect(save(form, code=code, origin=origin))
+    if origin:
+        if origin.class_.code == 'E84':
+            form.object.data = [origin.id]
+        elif origin.class_.code == 'E18':
+            if code == 'E9':
+                form.place_from.data = origin.id
+            else:
+                form.place.data = origin.id
     return render_template('event/insert.html', form=form, code=code, origin=origin)
 
 
 @app.route('/event/delete/<int:id_>')
 @required_group('contributor')
-def event_delete(id_: int):
+def event_delete(id_: int) -> str:
     EntityMapper.delete(id_)
     logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
@@ -87,16 +106,9 @@ def event_delete(id_: int):
 
 @app.route('/event/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def event_update(id_: int):
+def event_update(id_: int) -> str:
     event = EntityMapper.get_by_id(id_, nodes=True)
-    form = build_form(EventForm, 'Event', event, request)
-    if event.class_.code != 'E8':
-        del form.given_place
-    if event.class_.code == 'E9':
-        del form.place
-    else:
-        del form.place_from
-        del form.place_to
+    form = prepare_form(build_form(EventForm, 'Event', event, request), event.class_.code)
     form.event_id.data = event.id
     if form.validate_on_submit():
         if was_modified(form, event):  # pragma: no cover
@@ -113,6 +125,15 @@ def event_update(id_: int):
         form.place_from.data = place_from.get_linked_entity('P53', True).id if place_from else ''
         place_to = event.get_linked_entity('P26')
         form.place_to.data = place_to.get_linked_entity('P53', True).id if place_to else ''
+        person_data = []
+        object_data = []
+        for entity in event.get_linked_entities('P25'):
+            if entity.class_.code == 'E21':
+                person_data.append(entity.id)
+            elif entity.class_.code == 'E84':
+                object_data.append(entity.id)
+        form.person.data = person_data
+        form.object.data = object_data
     else:
         place = event.get_linked_entity('P7')
         form.place.data = place.get_linked_entity('P53', True).id if place else ''
@@ -155,7 +176,7 @@ def event_view(id_: int) -> str:
     for link_ in event.get_links('P67', True):
         domain = link_.domain
         data = get_base_table_data(domain)
-        if domain.view_name == 'file':  # pragma: no cover
+        if domain.view_name == 'file':
             extension = data[3].replace('.', '')
             data.append(get_profile_image_table_link(domain, event, extension, profile_image_id))
             if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
@@ -173,17 +194,57 @@ def event_view(id_: int) -> str:
         tables[domain.view_name].rows.append(data)
     for sub_event in event.get_linked_entities('P117', inverse=True, nodes=True):
         tables['subs'].rows.append(get_base_table_data(sub_event))
+    objects = []
+    for location in event.get_linked_entities(['P7', 'P26', 'P27']):
+        objects.append(location.get_linked_entity('P53', True))
     return render_template('event/view.html', event=event, tables=tables,
-                           profile_image_id=profile_image_id)
+                           profile_image_id=profile_image_id,
+                           gis_data=GisMapper.get_all(objects) if objects else None)
 
 
-def save(form: Form, event=None, code=None, origin=None) -> str:
+@app.route('/event/add/source/<int:id_>', methods=['POST', 'GET'])
+@required_group('contributor')
+def event_add_source(id_: int) -> str:
+    event = EntityMapper.get_by_id(id_)
+    if request.method == 'POST':
+        if request.form['checkbox_values']:
+            event.link('P67', request.form['checkbox_values'], inverse=True)
+        return redirect(url_for('event_view', id_=id_) + '#tab-source')
+    form = build_table_form('source', event.get_linked_entities('P67', inverse=True))
+    return render_template('add_source.html', entity=event, form=form)
+
+
+@app.route('/event/add/reference/<int:id_>', methods=['POST', 'GET'])
+@required_group('contributor')
+def event_add_reference(id_: int) -> str:
+    event = EntityMapper.get_by_id(id_)
+    form = AddReferenceForm()
+    if form.validate_on_submit():
+        event.link('P67', form.reference.data, description=form.page.data, inverse=True)
+        return redirect(url_for('event_view', id_=id_) + '#tab-reference')
+    form.page.label.text = uc_first(_('page / link text'))
+    return render_template('add_reference.html', entity=event, form=form)
+
+
+@app.route('/event/add/file/<int:id_>', methods=['GET', 'POST'])
+@required_group('contributor')
+def event_add_file(id_: int) -> str:
+    event = EntityMapper.get_by_id(id_)
+    if request.method == 'POST':
+        if request.form['checkbox_values']:
+            event.link('P67', request.form['checkbox_values'], inverse=True)
+        return redirect(url_for('event_view', id_=id_) + '#tab-file')
+    form = build_table_form('file', event.get_linked_entities('P67', inverse=True))
+    return render_template('add_file.html', entity=event, form=form)
+
+
+def save(form: Form, event=None, code: Optional[str] = None, origin=None) -> str:
     g.cursor.execute('BEGIN')
     try:
         log_action = 'insert'
         if event:
             log_action = 'update'
-            event.delete_links(['P117', 'P7', 'P24', 'P25', 'P26', 'P27'])
+            event.delete_links(['P7', 'P24', 'P25', 'P26', 'P27', 'P117'])
         else:
             event = EntityMapper.insert(code, form.name.data)
         event.name = form.name.data
@@ -192,16 +253,20 @@ def save(form: Form, event=None, code=None, origin=None) -> str:
         event.update()
         event.save_nodes(form)
         if form.event.data:
-            event.link('P117', EntityMapper.get_by_id(form.event.data))
+            event.link('P117', int(form.event.data))
         if form.place and form.place.data:
             event.link('P7', LinkMapper.get_linked_entity(int(form.place.data), 'P53'))
         if event.class_.code == 'E8' and form.given_place.data:  # Link place for acquisition
-            places = [EntityMapper.get_by_id(i) for i in ast.literal_eval(form.given_place.data)]
-            event.link('P24', places)
-        if event.class_.code == 'E9' and form.place_from.data:  # Link place for move from
-            event.link('P27', LinkMapper.get_linked_entity(int(form.place_from.data), 'P53'))
-        if event.class_.code == 'E9' and form.place_to.data:  # Link place for move to
-            event.link('P26', LinkMapper.get_linked_entity(int(form.place_to.data), 'P53'))
+            event.link('P24', form.given_place.data)
+        if event.class_.code == 'E9':  # Move
+            if form.object.data:  # Moved objects
+                event.link('P25', form.object.data)
+            if form.person.data:  # Moved persons
+                event.link('P25', form.person.data)
+            if form.place_from.data:  # Link place for move from
+                event.link('P27', LinkMapper.get_linked_entity(int(form.place_from.data), 'P53'))
+            if form.place_to.data:  # Link place for move to
+                event.link('P26', LinkMapper.get_linked_entity(int(form.place_to.data), 'P53'))
         url = url_for('event_view', id_=event.id)
         if origin:
             url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-event'
@@ -222,7 +287,7 @@ def save(form: Form, event=None, code=None, origin=None) -> str:
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
-        logger.log('error', 'database', 'transaction failed', str(e))
+        logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
         url = url_for('event_index')
     return url

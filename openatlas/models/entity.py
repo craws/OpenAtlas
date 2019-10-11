@@ -85,8 +85,8 @@ class Entity:
     def delete(self) -> None:
         EntityMapper.delete(self.id)
 
-    def delete_links(self, codes) -> None:
-        LinkMapper.delete_by_codes(self, codes)
+    def delete_links(self, codes, inverse: bool = False) -> None:
+        LinkMapper.delete_by_codes(self, codes, inverse)
 
     def update(self) -> None:
         EntityMapper.update(self)
@@ -154,6 +154,8 @@ class Entity:
             root_name = uc_first(self.system_type)
             if self.system_type == 'stratigraphic unit':
                 root_name = 'Stratigraphic Unit'
+        elif self.class_.code == 'E84':
+            root_name = 'Information Carrier'
         root_id = NodeMapper.get_hierarchy_by_name(root_name).id
         for node in self.nodes:
             if node.root and node.root[-1] == root_id:

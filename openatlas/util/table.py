@@ -6,16 +6,19 @@ from typing import Optional
 
 
 class Table:
-    HEADERS = {'source': ['name', 'type', 'description'],
+    HEADERS = {'actor': ['name', 'class', 'begin', 'end'],
                'event': ['name', 'class', 'type', 'begin', 'end'],
-               'actor': ['name', 'class', 'begin', 'end'],
-               'group': ['name', 'class', 'begin', 'end'],
-               'place': ['name', 'type', 'begin', 'end'],
                'feature': ['name', 'type', 'begin', 'end'],
-               'stratigraphic-unit': ['name', 'type', 'begin', 'end'],
                'find': ['name', 'type', 'begin', 'end'],
+               'file': ['name', 'license', 'size', 'extension', 'description'],
+               'group': ['name', 'class', 'begin', 'end'],
+               'information_carrier': ['name', 'type'],
+               'object': ['name', 'type'],
+               'person': ['name', 'class', 'begin', 'end'],
+               'place': ['name', 'type', 'begin', 'end'],
                'reference': ['name', 'class', 'type'],
-               'file': ['name', 'license', 'size', 'extension', 'description']}
+               'source': ['name', 'type', 'description'],
+               'stratigraphic-unit': ['name', 'type', 'begin', 'end']}
 
     def __init__(self,
                  header: Optional[list] = None,  # A list of column header labels

@@ -165,7 +165,8 @@ function createOverlay(name, title=false, multiple=false, type='table', value_ty
             }
         });
         $('#' + name + '-table').trigger('applyWidgets');
-        $('#' + name + '-search').focus();
+        $('#' + name + '-search').focus(); /* set search focus for tree select */
+        $('#' + name + '_table_filter > label > input').focus(); /* focus for multi table select */
     });
 }
 
