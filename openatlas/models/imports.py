@@ -82,6 +82,7 @@ class ImportMapper:
     @staticmethod
     def import_data(project, class_code: str, data) -> None:
         from openatlas.models.entity import EntityMapper
+        from openatlas.models.gis import GisMapper
         for row in data:
             system_type = None
             if class_code == 'E33':  # pragma: no cover
@@ -105,5 +106,5 @@ class ImportMapper:
                                                'place location')
                 entity.link('P53', location)
                 if row['easting'] and row['northing']:
-                    # Todo: implement insert of gis point
-                    pass
+                    GisMapper.insert_import(entity, location, project,
+                                            row['easting'], row['northing'])
