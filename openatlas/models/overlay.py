@@ -41,8 +41,8 @@ class OverlayMapper:
         sql = """
             UPDATE web.map_overlay SET bounding_box = %(bounding_box)s
             WHERE image_id = %(image_id)s AND place_id = %(place_id)s;"""
-        bounding_box = '[[{top_left_easting},{top_left_northing}],' \
-                       '[{bottom_right_easting},{bottom_right_northing}]]'.format(
+        bounding_box = '[[{top_left_northing},{top_left_easting}],' \
+                       '[{bottom_right_northing},{bottom_right_easting}]]'.format(
                         top_left_easting=form.top_left_easting.data,
                         top_left_northing=form.top_left_northing.data,
                         bottom_right_easting=form.bottom_right_easting.data,
