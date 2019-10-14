@@ -2,14 +2,15 @@
 
 Some knowledge about package installation, web server and database configuration will be needed.
 
-This software was developed and tested on Linux/Debian 9 and the easiest way to install would be on Debian 9 following these instructions.
+This software was developed and tested on Linux/Debian 10 (codename "buster") and the easiest way to
+install would be on Debian 10 system following these instructions.
 
-It may work on other Linux distributions or even non Linux systems but would need substantially more
-knowledge about server administration.
+It may work on other Linux distributions or even on non Linux systems but would need substantially
+more knowledge about server administration.
 
 ## Requirements
 
-### Python 3.5 and Flask 0.12
+### Python 3.7 and Flask 1.0
 
     # apt-get install python3 python3-bcrypt python3-dateutil python3-jinja2 python3-psycopg2
     # apt-get install python3-flask python3-flask-babel python3-flask-login python3-flaskext.wtf
@@ -19,9 +20,9 @@ knowledge about server administration.
 
     # apt-get install apache2 libapache2-mod-wsgi-py3
 
-### PostgreSQL 9.6 and PostGIS 2.3
+### PostgreSQL 11 and PostGIS 2.5
 
-    # apt-get install postgresql postgresql-9.6-postgis-2.3 postgresql-9.6-postgis-2.3-scripts
+    # apt-get install postgresql postgresql-11-postgis-2.5 postgresql-11-postgis-2.5-scripts
 
 ### gettext
 
