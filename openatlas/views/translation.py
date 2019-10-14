@@ -1,7 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
@@ -12,7 +12,7 @@ from openatlas.models.entity import EntityMapper
 from openatlas.util.util import get_entity_data, required_group
 
 
-class TranslationForm(Form):
+class TranslationForm(FlaskForm):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     description = TextAreaField(_('content'))
     save = SubmitField(_('insert'))

@@ -4,7 +4,7 @@ from typing import Optional
 from flask import abort, flash, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from wtforms import (BooleanField, HiddenField, PasswordField, SelectField, StringField,
                      SubmitField, TextAreaField)
@@ -18,7 +18,7 @@ from openatlas.util.util import (format_date, is_authorized, link, required_grou
                                  uc_first)
 
 
-class UserForm(Form):
+class UserForm(FlaskForm):
     user_id = None  # type: int
     active = BooleanField(_('active'), default=True)
     username = StringField(_('username'), [InputRequired()], render_kw={'autofocus': True})
@@ -35,7 +35,7 @@ class UserForm(Form):
     continue_ = HiddenField()
 
     def validate(self) -> bool:
-        valid = Form.validate(self)
+        valid = FlaskForm.validate(self)
         user = UserMapper.get_by_id(self.user_id) if self.user_id else User()
         if user.username != self.username.data and UserMapper.get_by_username(self.username.data):
             self.username.errors.append(str(_('error username exists')))
@@ -54,7 +54,7 @@ class UserForm(Form):
         return valid
 
 
-class ActivityForm(Form):
+class ActivityForm(FlaskForm):
     action_choices = (('all', _('all')), ('insert', _('insert')), ('update', _('update')),
                       ('delete', _('delete')))
     limit = SelectField(_('limit'), choices=((0, _('all')), (100, 100), (500, 500)),

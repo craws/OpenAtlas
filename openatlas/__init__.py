@@ -9,12 +9,12 @@ from typing import Dict, Optional
 import psycopg2.extras
 from flask import Flask, g, request, session
 from flask_babel import Babel, lazy_gettext as _
-from flask_wtf import Form
-from flask_wtf.csrf import CsrfProtect
+from flask_wtf import FlaskForm
+from flask_wtf.csrf import CSRFProtect
 from wtforms import StringField, SubmitField
 
 app = Flask(__name__, instance_relative_config=True)  # type: Flask
-csrf = CsrfProtect(app)  # Make sure all forms are CSRF protected
+csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 
 # Use the test database if running tests
 instance_name = 'production' if 'test_runner.py' not in sys.argv[0] else 'testing'
@@ -28,7 +28,7 @@ babel = Babel(app)
 debug_model = OrderedDict()  # type: OrderedDict
 
 
-class GlobalSearchForm(Form):
+class GlobalSearchForm(FlaskForm):
     term = StringField('', render_kw={"placeholder": _('search term')})
     search = SubmitField(_('search'))
 

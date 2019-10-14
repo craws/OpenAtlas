@@ -4,7 +4,7 @@ from os.path import basename
 
 from flask import flash, render_template, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from wtforms import BooleanField, SelectField, SubmitField
 
@@ -14,11 +14,11 @@ from openatlas.util.table import Table
 from openatlas.util.util import convert_size, is_authorized, required_group, uc_first
 
 
-class ExportSqlForm(Form):
+class ExportSqlForm(FlaskForm):
     save = SubmitField(uc_first(_('export SQL')))
 
 
-class ExportCsvForm(Form):
+class ExportCsvForm(FlaskForm):
     zip = BooleanField(_('export as ZIP and add info file'), default=True)
     timestamps = BooleanField('created and modified dates', default=False)
     gis_format = SelectField(_('GIS format'), choices=[

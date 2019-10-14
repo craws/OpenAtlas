@@ -4,7 +4,7 @@ from typing import Optional, Union
 
 from flask import abort, flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from wtforms import (HiddenField, SelectMultipleField, StringField, SubmitField, TextAreaField,
                      widgets)
@@ -19,7 +19,7 @@ from openatlas.util.util import (get_entity_data, link, required_group, sanitize
                                  uc_first)
 
 
-class NodeForm(Form):
+class NodeForm(FlaskForm):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     name_inverse = StringField(_('inverse'))
     is_node_form = HiddenField()
@@ -125,7 +125,7 @@ def node_delete(id_: int) -> str:
     return redirect(url_for('node_view', id_=root.id) if root else url_for('node_index'))
 
 
-class MoveForm(Form):
+class MoveForm(FlaskForm):
     is_node_form = HiddenField()
     checkbox_values = HiddenField()
     selection = SelectMultipleField('', [InputRequired()], coerce=int,

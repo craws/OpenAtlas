@@ -1,7 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import flash, render_template, session, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from wtforms import TextAreaField
 
@@ -12,7 +12,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import required_group
 
 
-class ContentForm(Form):
+class ContentForm(FlaskForm):
     pass
 
 

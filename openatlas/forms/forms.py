@@ -7,7 +7,7 @@ from typing import Optional as Optional_Type, Iterator
 from flask import g, session
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from flask_wtf.csrf import generate_csrf
 from wtforms import FloatField, HiddenField
 from wtforms.validators import Optional
@@ -345,7 +345,7 @@ class ValueFloatField(FloatField):
     pass
 
 
-def build_move_form(form, node) -> Form:
+def build_move_form(form, node) -> FlaskForm:
     root = g.nodes[node.root[-1]]
     setattr(form, str(root.id), TreeField(str(root.id)))
     form_instance = form(obj=node)

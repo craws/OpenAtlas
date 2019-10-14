@@ -5,7 +5,7 @@ import os
 import pandas as pd
 from flask import flash, g, render_template, request, url_for
 from flask_babel import format_number, lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect, secure_filename
 from wtforms import BooleanField, FileField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
@@ -17,14 +17,14 @@ from openatlas.util.table import Table
 from openatlas.util.util import format_date, link, required_group, truncate_string
 
 
-class ProjectForm(Form):
+class ProjectForm(FlaskForm):
     project_id = None  # type: int
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
 
     def validate(self) -> bool:
-        valid = Form.validate(self)
+        valid = FlaskForm.validate(self)
         project = ImportMapper.get_project_by_id(self.project_id) if self.project_id else Project()
         if project.name != self.name.data and ImportMapper.get_project_by_name(self.name.data):
             self.name.errors.append(_('error name exists'))
@@ -91,14 +91,14 @@ def import_project_delete(id_: int) -> str:
     return redirect(url_for('import_index'))
 
 
-class ImportForm(Form):
+class ImportForm(FlaskForm):
     file = FileField(_('file'), [InputRequired()])
     preview = BooleanField(_('preview only'), default=True)
     duplicate = BooleanField(_('check for duplicates'), default=True)
     save = SubmitField(_('import'))
 
     def validate(self) -> bool:
-        valid = Form.validate(self)
+        valid = FlaskForm.validate(self)
         file_ = request.files['file']
         extensions = app.config['IMPORT_FILE_EXTENSIONS']
         if not file_:  # pragma: no cover

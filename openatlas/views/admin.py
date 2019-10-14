@@ -8,7 +8,7 @@ from typing import Optional
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from wtforms import BooleanField, IntegerField, SelectField, StringField, SubmitField, TextAreaField
 from wtforms.validators import Email, InputRequired
@@ -27,7 +27,7 @@ from openatlas.util.util import (convert_size, format_date, format_datetime, get
                                  uc_first)
 
 
-class GeneralForm(Form):
+class GeneralForm(FlaskForm):
     site_name = StringField(uc_first(_('site name')))
     site_header = StringField(uc_first(_('site header')))
     default_language = SelectField(uc_first(_('default language')),
@@ -58,7 +58,7 @@ def admin_index() -> str:
     return render_template('admin/index.html', writeable_dirs=writeable_dirs)
 
 
-class MapForm(Form):
+class MapForm(FlaskForm):
     map_cluster_enabled = BooleanField(uc_first(_('use cluster')))
     map_cluster_max_radius = IntegerField('maxClusterRadius')
     map_cluster_disable_at_zoom = IntegerField('disableClusteringAtZoom')
@@ -141,7 +141,7 @@ def admin_delete_single_type_duplicate(entity_id: int, node_id: int) -> str:
     return redirect(url_for('admin_check_link_duplicates'))
 
 
-class FileForm(Form):
+class FileForm(FlaskForm):
     file_upload_max_size = IntegerField(_('max file size in MB'))
     file_upload_allowed_extension = StringField('allowed file extensions')
     profile_image_width = IntegerField(_('profile image width in pixel'))
@@ -170,7 +170,7 @@ def admin_file() -> str:
     return render_template('admin/file.html', form=form)
 
 
-class SimilarForm(Form):
+class SimilarForm(FlaskForm):
     classes = SelectField(_('class'), choices=[])
     ratio = IntegerField(default=100)
     apply = SubmitField(_('search'))
@@ -290,7 +290,7 @@ def admin_orphans() -> str:
     return render_template('admin/orphans.html', tables=tables)
 
 
-class LogoForm(Form):
+class LogoForm(FlaskForm):
     file = TableField(_('file'), [InputRequired()])
     save = SubmitField(uc_first(_('change logo')))
 
@@ -342,7 +342,7 @@ def admin_file_delete(filename: str) -> str:  # pragma: no cover
     return redirect(url_for('admin_orphans') + '#tab-orphaned-files')
 
 
-class LogForm(Form):
+class LogForm(FlaskForm):
     limit = SelectField(_('limit'), choices=((0, _('all')), (100, 100), (500, 500)), default=100)
     priority = SelectField(_('priority'), choices=(list(app.config['LOG_LEVELS'].items())),
                            default=6)
@@ -376,7 +376,7 @@ def admin_log_delete():
     return redirect(url_for('admin_log'))
 
 
-class NewsLetterForm(Form):
+class NewsLetterForm(FlaskForm):
     subject = StringField('', [InputRequired()], render_kw={'placeholder': _('subject'),
                                                             'autofocus': True})
     body = TextAreaField('', [InputRequired()], render_kw={'placeholder': _('content')})
@@ -411,7 +411,7 @@ def admin_newsletter() -> str:
     return render_template('admin/newsletter.html', form=form, table=table)
 
 
-class TestMailForm(Form):
+class TestMailForm(FlaskForm):
     receiver = StringField(_('test mail receiver'), [InputRequired(), Email()])
     send = SubmitField(_('send test mail'))
 
@@ -488,7 +488,7 @@ def admin_general_update() -> str:
     return render_template('admin/general_update.html', form=form, settings=session['settings'])
 
 
-class MailForm(Form):
+class MailForm(FlaskForm):
     mail = BooleanField(uc_first(_('mail')))
     mail_transport_username = StringField(uc_first(_('mail transport username')))
     mail_transport_host = StringField(uc_first(_('mail transport host')))

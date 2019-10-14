@@ -3,7 +3,7 @@ from collections import OrderedDict
 
 from flask import g, render_template
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import (BooleanField, HiddenField, IntegerField, SelectMultipleField, StringField,
                      SubmitField, widgets)
 from wtforms.validators import InputRequired
@@ -14,7 +14,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import link, required_group
 
 
-class LinkCheckForm(Form):
+class LinkCheckForm(FlaskForm):
     domain = HiddenField()
     property = HiddenField()
     range = HiddenField()
@@ -117,7 +117,7 @@ def property_view(code: str) -> str:
     return render_template('model/property_view.html', property=property_, tables=tables)
 
 
-class NetworkForm(Form):
+class NetworkForm(FlaskForm):
     width = IntegerField(default=1200, validators=[InputRequired()])
     height = IntegerField(default=600, validators=[InputRequired()])
     charge = StringField(default=-800, validators=[InputRequired()])

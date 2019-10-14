@@ -4,7 +4,7 @@ from typing import Tuple
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from wtforms import SelectField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
@@ -19,7 +19,7 @@ from openatlas.util.util import (bookmark_toggle, format_date, link, required_gr
                                  truncate_string, uc_first)
 
 
-class FeedbackForm(Form):
+class FeedbackForm(FlaskForm):
     subject = SelectField(_('subject'),
                           choices=list(app.config['FEEDBACK_SUBJECTS'].items()),
                           render_kw={'autofocus': True})

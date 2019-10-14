@@ -3,7 +3,7 @@ import ast
 
 from flask import flash, render_template, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from wtforms import FloatField, SubmitField
 from wtforms.validators import InputRequired
@@ -14,7 +14,7 @@ from openatlas.models.overlay import OverlayMapper
 from openatlas.util.util import required_group, uc_first
 
 
-class OverlayForm(Form):
+class OverlayForm(FlaskForm):
     top_left_easting = FloatField('', [InputRequired()], render_kw={'autofocus': True})
     top_left_northing = FloatField('', [InputRequired()])
     bottom_right_easting = FloatField('', [InputRequired()])

@@ -1,14 +1,14 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import numpy
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField
 from wtforms.validators import NoneOf, NumberRange, Optional
 
 from openatlas.models.date import DateMapper
 
 
-class DateForm(Form):
+class DateForm(FlaskForm):
 
     validator_day = [Optional(), NumberRange(min=1, max=31)]
     validator_month = [Optional(), NumberRange(min=1, max=12)]
@@ -65,7 +65,7 @@ class DateForm(Form):
                 self.end_day_to.data = DateForm.format_date(item.end_to, 'day')
 
     def validate(self) -> bool:
-        valid = Form.validate(self)
+        valid = FlaskForm.validate(self)
 
         # Check date format, if valid put dates into a list called "dates"
         dates = {}
