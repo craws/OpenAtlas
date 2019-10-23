@@ -354,7 +354,7 @@ class EntityMapper:
         return {similar: data for similar, data in similar.items() if data['entities']}
 
     @staticmethod
-    def get_overview_counts() -> OrderedDict:
+    def get_overview_counts() -> dict:
         sql = """
             SELECT
             SUM(CASE WHEN
@@ -369,7 +369,7 @@ class EntityMapper:
             FROM model.entity;"""
         g.execute(sql)
         row = g.cursor.fetchone()
-        counts = OrderedDict()  # type: OrderedDict
+        counts = {}
         for idx, col in enumerate(g.cursor.description):
             counts[col[0]] = row[idx]
         return counts

@@ -1,6 +1,4 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from collections import OrderedDict
-
 from flask import g, render_template
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
@@ -23,12 +21,12 @@ class LinkCheckForm(FlaskForm):
 @app.route('/overview/model', methods=["GET", "POST"])
 def model_index() -> str:
     form = LinkCheckForm()
-    form_classes = OrderedDict()  # type: dict
+    form_classes = {}
     for code, class_ in g.classes.items():
         form_classes[code] = code + ' ' + class_.name
     form.domain.choices = form_classes.items()
     form.range.choices = form_classes.items()
-    form_properties = OrderedDict()  # type: dict
+    form_properties = {}
     for code, property_ in g.properties.items():
         form_properties[code] = code + ' ' + property_.name
     form.property.choices = form_properties.items()
@@ -84,7 +82,7 @@ def property_index() -> str:
 @app.route('/overview/model/class_view/<code>')
 def class_view(code: str) -> str:
     class_ = g.classes[code]
-    tables = OrderedDict()  # type: dict
+    tables = {}
     for table in ['super', 'sub']:
         tables[table] = Table(['code', 'name'], paging=False)
         for code in getattr(class_, table):

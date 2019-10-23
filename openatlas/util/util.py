@@ -145,7 +145,7 @@ def display_remove_link(url: str, name: str) -> str:
 
 
 def add_type_data(entity, data, location=None):
-    type_data = OrderedDict()
+    type_data = {}
     # Nodes
     if location:
         entity.nodes.update(location.nodes)  # Add location types

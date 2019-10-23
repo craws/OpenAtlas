@@ -1,5 +1,4 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from collections import OrderedDict
 from typing import Optional, Union
 
 from flask import abort, flash, g, render_template, request, session, url_for
@@ -33,8 +32,7 @@ class NodeForm(FlaskForm):
 @app.route('/types')
 @required_group('readonly')
 def node_index() -> str:
-    nodes = {'system': OrderedDict(), 'custom': OrderedDict(),
-             'places': OrderedDict(), 'value': OrderedDict()}  # type: dict
+    nodes = {'system': {}, 'custom': {}, 'places': {}, 'value': {}}  # type: dict
     for id_, node in g.nodes.items():
         if node.root:
             continue

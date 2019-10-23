@@ -1,7 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import datetime
 import os
-from collections import OrderedDict
 from os.path import basename, splitext
 from typing import Optional
 
@@ -430,14 +429,14 @@ def admin_mail() -> str:
             flash(_('A test mail was sent to %(email)s.', email=form.receiver.data))
     else:
         form.receiver.data = current_user.email
-    mail_settings = OrderedDict([
-        (_('mail'), uc_first(_('on')) if settings['mail'] else uc_first(_('off'))),
-        (_('mail transport username'), settings['mail_transport_username']),
-        (_('mail transport host'), settings['mail_transport_host']),
-        (_('mail transport port'), settings['mail_transport_port']),
-        (_('mail from email'), settings['mail_from_email']),
-        (_('mail from name'), settings['mail_from_name']),
-        (_('mail recipients feedback'), ';'.join(settings['mail_recipients_feedback']))])
+    mail_settings = {
+        _('mail'): uc_first(_('on')) if settings['mail'] else uc_first(_('off')),
+        _('mail transport username'): settings['mail_transport_username'],
+        _('mail transport host'): settings['mail_transport_host'],
+        _('mail transport port'): settings['mail_transport_port'],
+        _('mail from email'): settings['mail_from_email'],
+        _('mail from name'): settings['mail_from_name'],
+        _('mail recipients feedback'): ';'.join(settings['mail_recipients_feedback'])}
     return render_template('admin/mail.html', settings=settings, mail_settings=mail_settings,
                            form=form)
 
@@ -446,20 +445,20 @@ def admin_mail() -> str:
 @required_group('admin')
 def admin_general() -> str:
     settings = session['settings']
-    general_settings = OrderedDict([
-        (_('site name'), settings['site_name']),
-        (_('site header'), settings['site_header']),
-        (_('default language'), app.config['LANGUAGES'][settings['default_language']]),
-        (_('default table rows'), settings['default_table_rows']),
-        (_('log level'), app.config['LOG_LEVELS'][int(settings['log_level'])]),
-        (_('debug mode'), uc_first(_('on')) if settings['debug_mode'] else uc_first(_('off'))),
-        (_('random password length'), settings['random_password_length']),
-        (_('minimum password length'), settings['minimum_password_length']),
-        (_('reset confirm hours'), settings['reset_confirm_hours']),
-        (_('failed login tries'), settings['failed_login_tries']),
-        (_('failed login forget minutes'), settings['failed_login_forget_minutes']),
-        (_('minimum jstree search'), settings['minimum_jstree_search']),
-        (_('minimum tablesorter search'), settings['minimum_tablesorter_search'])])
+    general_settings = {
+        _('site name'): settings['site_name'],
+        _('site header'): settings['site_header'],
+        _('default language'): app.config['LANGUAGES'][settings['default_language']],
+        _('default table rows'): settings['default_table_rows'],
+        _('log level'): app.config['LOG_LEVELS'][int(settings['log_level'])],
+        _('debug mode'): uc_first(_('on')) if settings['debug_mode'] else uc_first(_('off')),
+        _('random password length'): settings['random_password_length'],
+        _('minimum password length'): settings['minimum_password_length'],
+        _('reset confirm hours'): settings['reset_confirm_hours'],
+        _('failed login tries'): settings['failed_login_tries'],
+        _('failed login forget minutes'): settings['failed_login_forget_minutes'],
+        _('minimum jstree search'): settings['minimum_jstree_search'],
+        _('minimum tablesorter search'): settings['minimum_tablesorter_search']}
     return render_template('admin/general.html', settings=settings,
                            general_settings=general_settings)
 
