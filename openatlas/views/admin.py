@@ -273,20 +273,21 @@ def admin_orphans() -> str:
                                                  truncate_string(entity.description)])
 
     # Get orphaned files (no corresponding entity)
-    for file in os.scandir(app.config['UPLOAD_FOLDER_PATH']):
-        name = file.name
-        if name != '.gitignore' and splitext(file.name)[0] not in file_ids:
-            confirm = ' onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
-            tables['orphaned_files'].rows.append([
-                name,
-                convert_size(file.stat().st_size),
-                format_date(datetime.datetime.utcfromtimestamp(file.stat().st_ctime)),
-                splitext(name)[1],
-                '<a href="' + url_for('download_file', filename=name) + '">' + uc_first(
-                    _('download')) + '</a>',
-                '<a href="' + url_for('admin_file_delete', filename=name) + '" ' +
-                confirm + '>' + uc_first(_('delete')) + '</a>'])
-    return render_template('admin/orphans.html', tables=tables)
+    with os.scandir(app.config['UPLOAD_FOLDER_PATH']) as it:
+        for file in it:
+            name = file.name
+            if name != '.gitignore' and splitext(file.name)[0] not in file_ids:
+                confirm = ' onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
+                tables['orphaned_files'].rows.append([
+                    name,
+                    convert_size(file.stat().st_size),
+                    format_date(datetime.datetime.utcfromtimestamp(file.stat().st_ctime)),
+                    splitext(name)[1],
+                    '<a href="' + url_for('download_file', filename=name) + '">' + uc_first(
+                        _('download')) + '</a>',
+                    '<a href="' + url_for('admin_file_delete', filename=name) + '" ' +
+                    confirm + '>' + uc_first(_('delete')) + '</a>'])
+        return render_template('admin/orphans.html', tables=tables)
 
 
 class LogoForm(FlaskForm):
