@@ -2,6 +2,8 @@
 from flask import g
 from flask_login import current_user
 
+from openatlas.util.util import is_float
+
 
 class Project:
 
@@ -105,8 +107,8 @@ class ImportMapper:
                 location = EntityMapper.insert('E53', 'Location of ' + row['name'],
                                                'place location')
                 entity.link('P53', location)
-                if row['easting'] and row['easting'].replace('.', '', 1).isdigit():
-                    if row['northing'] and row['northing'].replace('.', '', 1).isdigit():
+                if 'easting' in row and is_float(row['easting']):
+                    if 'northing' in row and is_float(row['northing']):
                         GisMapper.insert_import(entity=entity,
                                                 location=location,
                                                 project=project,

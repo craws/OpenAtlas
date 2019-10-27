@@ -22,7 +22,6 @@ import openatlas
 from openatlas import app
 from openatlas.models.classObject import ClassObject
 from openatlas.models.date import DateMapper
-from openatlas.models.imports import Project
 from openatlas.models.property import Property
 from openatlas.models.user import User
 
@@ -387,6 +386,7 @@ def get_profile_image_table_link(file, entity, extension, profile_image_id):
 def link(entity) -> str:
     # Builds an html link to entity view for display
     from openatlas.models.entity import Entity
+    from openatlas.models.imports import Project
     if not entity:
         return ''
     html = ''
@@ -539,3 +539,11 @@ def get_appearance(event_links):
                 last_string = format_entry_end(event) + ' ' + _('at an') + ' ' + event_link
                 last_string += (' ' + _('in') + ' ' + link(link_.object_)) if link_.object_ else ''
     return first_string, last_string
+
+
+def is_float(value):
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False

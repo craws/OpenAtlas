@@ -14,7 +14,7 @@ from openatlas import app, logger
 from openatlas.models.entity import EntityMapper
 from openatlas.models.imports import ImportMapper, Project
 from openatlas.util.table import Table
-from openatlas.util.util import format_date, link, required_group, truncate_string
+from openatlas.util.util import format_date, is_float, link, required_group, truncate_string
 
 
 class ProjectForm(Form):
@@ -156,9 +156,8 @@ def import_data(project_id: int, class_code: str) -> str:
                 checked_row = {}
                 for item in headers:
                     value = row[item]
-                    if item in ['northing', 'easting']:
-                        if not row[item].replace('.', '', 1).isdigit():
-                            value = '<span class="error">' + row[item] + '</span>'
+                    if item in ['northing', 'easting'] and not is_float(row[item]):
+                        value = '<span class="error">' + row[item] + '</span>'  # pragma: no cover
                     table_row.append(value)
                     checked_row[item] = row[item]
                     if item == 'name' and form.duplicate.data:
