@@ -14,7 +14,7 @@ from openatlas import app, logger
 from openatlas.models.entity import EntityMapper
 from openatlas.models.imports import ImportMapper, Project
 from openatlas.util.table import Table
-from openatlas.util.util import format_date, link, required_group, truncate_string
+from openatlas.util.util import format_date, is_float, link, required_group, truncate_string
 
 
 class ProjectForm(FlaskForm):
@@ -124,6 +124,8 @@ def import_data(project_id: int, class_code: str) -> str:
         separator = '/' if os.name == "posix" else '\\'
         file_path = app.config['IMPORT_FOLDER_PATH'] + separator + secure_filename(file_.filename)
         columns = {'allowed': ['name', 'id', 'description'], 'valid': [], 'invalid': []}
+        if class_code == 'E18':
+            columns['allowed'] += ['easting', 'northing']
         try:
             file_.save(file_path)
             if file_path.rsplit('.', 1)[1].lower() in ['xls', 'xlsx']:
@@ -153,7 +155,10 @@ def import_data(project_id: int, class_code: str) -> str:
                 table_row = []
                 checked_row = {}
                 for item in headers:
-                    table_row.append(row[item])
+                    value = row[item]
+                    if item in ['northing', 'easting'] and not is_float(row[item]):
+                        value = '<span class="error">' + row[item] + '</span>'  # pragma: no cover
+                    table_row.append(value)
                     checked_row[item] = row[item]
                     if item == 'name' and form.duplicate.data:
                         names.append(row['name'].lower())
