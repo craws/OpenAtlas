@@ -155,7 +155,11 @@ def import_data(project_id: int, class_code: str) -> str:
                 table_row = []
                 checked_row = {}
                 for item in headers:
-                    table_row.append(row[item])
+                    value = row[item]
+                    if item in ['northing', 'easting']:
+                        if not row[item].replace('.', '', 1).isdigit():
+                            value = '<span class="error">' + row[item] + '</span>'
+                    table_row.append(value)
                     checked_row[item] = row[item]
                     if item == 'name' and form.duplicate.data:
                         names.append(row['name'].lower())

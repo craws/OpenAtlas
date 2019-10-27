@@ -105,6 +105,10 @@ class ImportMapper:
                 location = EntityMapper.insert('E53', 'Location of ' + row['name'],
                                                'place location')
                 entity.link('P53', location)
-                if row['easting'] and row['northing']:
-                    GisMapper.insert_import(entity, location, project,
-                                            row['easting'], row['northing'])
+                if row['easting'] and row['easting'].replace('.', '', 1).isdigit():
+                    if row['northing'] and row['northing'].replace('.', '', 1).isdigit():
+                        GisMapper.insert_import(entity=entity,
+                                                location=location,
+                                                project=project,
+                                                easting=row['easting'],
+                                                northing=row['northing'])
