@@ -1,6 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
-from collections import OrderedDict
 from typing import Dict, Optional
 
 from flask import g
@@ -37,7 +36,7 @@ class NodeMapper(EntityMapper):
         types = g.cursor.fetchall()
         g.execute(sql, {'class_code': 'E53', 'property_code': 'P89'})
         places = g.cursor.fetchall()
-        nodes = OrderedDict()  # type: Dict
+        nodes = {}
         for row in types + places:
             node = Entity(row)
             nodes[node.id] = node
@@ -128,10 +127,7 @@ class NodeMapper(EntityMapper):
             JOIN web.form f ON hf.form_id = f.id AND f.name = %(form_name)s
             ORDER BY h.name;"""
         g.execute(sql, {'form_name': form_id})
-        nodes = OrderedDict()
-        for row in g.cursor.fetchall():
-            nodes[row.id] = g.nodes[row.id]
-        return nodes
+        return {row.id: g.nodes[row.id] for row in g.cursor.fetchall()}
 
     @staticmethod
     def get_form_choices(root=None):
