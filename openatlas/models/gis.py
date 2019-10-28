@@ -129,6 +129,26 @@ class GisMapper:
                     'geojson': json.dumps(item['geometry'])})
 
     @staticmethod
+    def insert_import(entity, location, project, easting, northing) -> None:
+        # Insert places from CSV imports
+        sql = """
+            INSERT INTO gis.point (entity_id, name, description, type, geom) VALUES (
+                %(entity_id)s,
+                %(name)s,
+                %(description)s,
+                %(type)s,
+                public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));"""
+        g.execute(sql, {
+            'entity_id': location.id,
+            'name': '',
+            'description': 'Imported centerpoint of {name} from the {project} project'.format(
+                name=sanitize(entity.name, 'description'),
+                project=sanitize(project.name, 'description')),
+            'type': 'centerpoint',
+            'geojson': '''{{"type":"Point", "coordinates": [{easting},{northing}]}}'''.format(
+                easting=easting, northing=northing)})
+
+    @staticmethod
     def delete_by_entity(entity) -> None:
         g.execute('DELETE FROM gis.point WHERE entity_id = %(id)s;', {'id': entity.id})
         g.execute('DELETE FROM gis.linestring WHERE entity_id = %(id)s;', {'id': entity.id})

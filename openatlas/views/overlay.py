@@ -45,10 +45,10 @@ def overlay_update(id_: int) -> str:
         flash(_('info update'), 'info')
         return redirect(url_for('place_view', id_=overlay.place_id) + '#tab-file')
     bounding = ast.literal_eval(overlay.bounding_box)
-    form.top_left_easting.data = bounding[0][0]
-    form.top_left_northing.data = bounding[0][1]
-    form.bottom_right_easting.data = bounding[1][0]
-    form.bottom_right_northing.data = bounding[1][1]
+    form.top_left_easting.data = bounding[0][1]
+    form.top_left_northing.data = bounding[0][0]
+    form.bottom_right_easting.data = bounding[1][1]
+    form.bottom_right_northing.data = bounding[1][0]
     return render_template('overlay/update.html', form=form, overlay=overlay,
                            place=EntityMapper.get_by_id(overlay.place_id),
                            image=EntityMapper.get_by_id(overlay.image_id))
