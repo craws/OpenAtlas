@@ -11,20 +11,20 @@
         {% endif%}
         <link rel="mask-icon" href="/static/safari-pinned-tab.svg" />
         <link rel="stylesheet" href="/static/css/reset.css?v={{ config['VERSION'] }}" />
-        <link rel="stylesheet" href="/static/vendor/jquery/jquery-ui-1.12.1/jquery-ui.min.css" />
-        <link rel="stylesheet" href="/static/vendor/jquery/jstree-3.3.7/themes/default/style.min.css" />
+        <link rel="stylesheet" href="/static/node_modules/jquery-ui-dist/jquery-ui.min.css" />
+        <link rel="stylesheet" href="/static/node_modules/jstree/dist/themes/default/style.min.css" />
         <link rel="stylesheet" href="/static/css/style.css?v={{ config['VERSION'] }}" />
         <link rel="stylesheet" href="/static/css/color.css?v={{ config['VERSION'] }}" />
         <link rel="stylesheet" href="/static/css/images.css?v={{ config['VERSION'] }}" />
-        <link rel="stylesheet" href="/static/vendor/jquery/DataTables-1.10.18/datatables.css" />
+        <link rel="stylesheet" href="/static/node_modules/datatables.net-dt/css/jquery.datatables.min.css" />
         <link rel="stylesheet" href="/static/css/table.css?v={{ config['VERSION'] }}" />
-        <script src="/static/vendor/jquery/jquery-3.3.1.min.js"></script>
-        <script src="/static/vendor/jquery/jquery-ui-1.12.1/jquery-ui.min.js"></script>
-        <script src="/static/vendor/jquery/DataTables-1.10.18/datatables.min.js"></script>
-        <script src="/static/vendor/jquery/jquery-validation-1.15.0/jquery.validate.min.js"></script>
-        <script src="/static/vendor/jquery/jstree-3.3.7/jstree.min.js"></script>
-        <script src="/static/vendor/jquery/jstree-3.3.7/jstree.search.js"></script>
-        <script src="/static/vendor/tinymce/tinymce.min.js"></script>
+        <script src="/static/node_modules/jquery/dist/jquery.min.js"></script>
+        <script src="/static/node_modules/jquery-ui-dist/jquery-ui.min.js"></script>
+        <script src="/static/node_modules/datatables.net/js/jquery.datatables.min.js"></script>
+        <script src="/static/node_modules/datatables.net-dt/js/datatables.datatables.min.js"></script>
+        <script src="/static/node_modules/jquery-validation/dist/jquery.validate.min.js"></script>
+        <script src="/static/node_modules/jstree/dist/jstree.min.js"></script>
+        <script src="/static/node_modules/tinymce/tinymce.min.js"></script>
         {% if gis_data %}
             {% include "map.html" %}
         {% endif %}

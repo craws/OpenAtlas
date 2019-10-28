@@ -3,11 +3,11 @@
     {{ _('network')|uc_first }}
 {% endblock %}
 {% block content %}
-    <link rel="stylesheet" href="/static/vendor/huebee-2.0.0/huebee.min.css" />
-    <script src="/static/vendor/huebee-2.0.0/huebee.pkgd.min.js"></script>
+    <link rel="stylesheet" href="/static/node_modules/huebee/dist/huebee.min.css" />
+    <script src="/static/node_modules/huebee/dist/huebee.pkgd.min.js"></script>
     {% if json_data %}
         <link rel="stylesheet" href="/static/css/network.css" />
-        <script src="/static/vendor/d3-5.5.0/d3-5.5.0.min.js"></script>
+        <script src="/static/node_modules/d3/dist/d3.min.js"></script>
         <div style="float:right;">
             <svg></svg>
             <p><a class="button" onclick="saveSvgAsPng(d3.select('svg').node(), 'network.png')">{{ _('download')|uc_first }}</a></p>
@@ -20,7 +20,7 @@
             var distance = {{ network_params['options']['distance'] }};
         </script>
         <script src="/static/js/network.js"></script>
-        <script src="/static/vendor/saveSvgAsPng-1.4.5/saveSvgAsPng.js"></script>
+        <script src="/static/node_modules/save-svg-as-png/lib/saveSvgAsPng.js"></script>
     {% else %}
         <h2 style="float:right;">{{ _('no data to display')|uc_first }}</h2>
     {% endif %}

@@ -13,7 +13,7 @@ knowledge about server administration.
 
     # apt-get install python3 python3-bcrypt python3-dateutil python3-jinja2 python3-psycopg2
     # apt-get install python3-flask python3-flask-babel python3-flask-login python3-flaskext.wtf
-    # apt-get install python3-markdown python3-numpy python3-pandas python3-fuzzywuzzy
+    # apt-get install python3-markdown python3-numpy python3-pandas python3-fuzzywuzzy python3-pip
 
 ### Apache 2.4
 
@@ -26,6 +26,14 @@ knowledge about server administration.
 ### gettext
 
     # apt-get install gettext
+    
+### install calmjs and frontend libraries
+
+    # cd openatlas/static
+    # pip install -e ./install
+    # calmjs npm --install openatlas
+    
+
 
 ## Installation
 

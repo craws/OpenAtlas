@@ -22,3 +22,7 @@ openatlas/export/sql/*
 # ide
 .idea
 .ftpconfig
+
+# npm modules etc
+openatlas/static/node_modules
+openatlas/static/openatlas.egg-info
