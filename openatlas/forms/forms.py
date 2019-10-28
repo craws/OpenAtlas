@@ -156,6 +156,10 @@ class TreeSelect(HiddenInput):
                         if (this.value.length >= {min_chars}) {{
                             $("#{name}-tree").jstree("search", $(this).val());
                         }}
+                        else if (this.value.length == 0) {{
+                            $("#{name}-tree").jstree("search", $(this).val());
+                            $("#{name}-tree").jstree(true).show_all();
+                        }}                        
                     }});
                 }});
             </script>""".format(filter=uc_first(_('type to search')),
