@@ -128,11 +128,12 @@ def get_file_stats(path: Optional[str] = app.config['UPLOAD_FOLDER_PATH']) -> di
     """ Build a dict with file ids and stats from files in given directory.
         It's much faster to do this in one call for every file."""
     file_stats = {}
-    for file in os.scandir(path):
-        split_name = os.path.splitext(file.name)
-        if len(split_name) > 1 and split_name[0].isdigit():
-            file_stats[int(split_name[0])] = {'ext': split_name[1], 'size': file.stat().st_size,
-                                              'date': file.stat().st_ctime}
+    with os.scandir(path) as it:
+        for file in it:
+            split_name = os.path.splitext(file.name)
+            if len(split_name) > 1 and split_name[0].isdigit():
+                file_stats[int(split_name[0])] = {'ext': split_name[1], 'size': file.stat().st_size,
+                                                  'date': file.stat().st_ctime}
     return file_stats
 
 
@@ -144,7 +145,7 @@ def display_remove_link(url: str, name: str) -> str:
 
 
 def add_type_data(entity, data, location=None):
-    type_data = OrderedDict()
+    type_data = {}
     # Nodes
     if location:
         entity.nodes.update(location.nodes)  # Add location types

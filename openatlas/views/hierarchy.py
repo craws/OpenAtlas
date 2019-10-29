@@ -3,11 +3,11 @@ from typing import Optional
 
 from flask import abort, flash, g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from wtforms import (BooleanField, SelectMultipleField, StringField, SubmitField, TextAreaField,
                      widgets)
-from wtforms.validators import InputRequired, optional
+from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import build_form
@@ -17,7 +17,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import required_group, sanitize, uc_first
 
 
-class HierarchyForm(Form):
+class HierarchyForm(FlaskForm):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     multiple = BooleanField(_('multiple'), description=_('tooltip hierarchy multiple'))
     forms = SelectMultipleField(_('forms'),

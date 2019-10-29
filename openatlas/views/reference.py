@@ -3,7 +3,7 @@ from typing import Optional
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired, URL
@@ -20,7 +20,7 @@ from openatlas.util.util import (display_remove_link, get_base_table_data, get_e
                                  was_modified, get_profile_image_table_link)
 
 
-class ReferenceForm(Form):
+class ReferenceForm(FlaskForm):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
@@ -29,37 +29,37 @@ class ReferenceForm(Form):
     opened = HiddenField()
 
 
-class AddReferenceForm(Form):
+class AddReferenceForm(FlaskForm):
     reference = TableField(_('reference'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
 
-class AddSourceForm(Form):
+class AddSourceForm(FlaskForm):
     source = TableField(_('source'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
 
-class AddEventForm(Form):
+class AddEventForm(FlaskForm):
     event = TableField(_('event'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
 
-class AddActorForm(Form):
+class AddActorForm(FlaskForm):
     actor = TableField(_('actor'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
 
-class AddPlaceForm(Form):
+class AddPlaceForm(FlaskForm):
     place = TableField(_('place'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
 
-class AddFileForm(Form):
+class AddFileForm(FlaskForm):
     file = TableField(_('file'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))

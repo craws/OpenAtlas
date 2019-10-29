@@ -5,7 +5,7 @@ from bcrypt import hashpw
 from flask import abort, flash, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import LoginManager, current_user, login_required, login_user, logout_user
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from wtforms import BooleanField, PasswordField, StringField, SubmitField
 from wtforms.validators import Email, InputRequired
@@ -24,14 +24,14 @@ def load_user(user_id: int):
     return UserMapper.get_by_id(user_id, True)
 
 
-class LoginForm(Form):
+class LoginForm(FlaskForm):
     username = StringField(_('username'), [InputRequired()], render_kw={'autofocus': True})
     password = PasswordField(_('password'), [InputRequired()])
     show_passwords = BooleanField(_('show password'))
     save = SubmitField(_('login'))
 
 
-class PasswordResetForm(Form):
+class PasswordResetForm(FlaskForm):
     email = StringField(_('email'), [InputRequired(), Email()])
     save = SubmitField(_('submit'))
 

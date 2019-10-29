@@ -5,7 +5,7 @@ from os.path import basename
 
 from flask import flash, g, render_template
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
@@ -19,7 +19,7 @@ def sql_index() -> str:
     return render_template('sql/index.html')
 
 
-class SqlForm(Form):
+class SqlForm(FlaskForm):
     statement = TextAreaField(_('statement'), [InputRequired()])
     save = SubmitField(_('execute'))
 

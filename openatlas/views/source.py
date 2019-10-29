@@ -3,7 +3,7 @@ from typing import Optional
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
@@ -19,7 +19,7 @@ from openatlas.util.util import (display_remove_link, get_base_table_data,
 from openatlas.views.reference import AddReferenceForm
 
 
-class SourceForm(Form):
+class SourceForm(FlaskForm):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     information_carrier = TableMultiField()
     description = TextAreaField(_('content'))

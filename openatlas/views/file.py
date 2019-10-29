@@ -6,7 +6,7 @@ from typing import Optional
 
 from flask import flash, g, render_template, request, send_from_directory, session, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect, secure_filename
 from wtforms import FileField, HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
@@ -23,7 +23,7 @@ from openatlas.util.util import (convert_size, display_remove_link, format_date,
 from openatlas.views.reference import AddReferenceForm
 
 
-class FileForm(Form):
+class FileForm(FlaskForm):
     file = FileField(_('file'), [InputRequired()])
     name = StringField(_('name'), [InputRequired()])
     description = TextAreaField(_('description'))
@@ -31,7 +31,7 @@ class FileForm(Form):
     opened = HiddenField()
 
     def validate(self) -> bool:
-        valid = Form.validate(self)
+        valid = FlaskForm.validate(self)
         if request.files:
             file_ = request.files['file']
             ext = session['settings']['file_upload_allowed_extension'].split()

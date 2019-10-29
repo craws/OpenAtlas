@@ -3,7 +3,7 @@ import bcrypt
 from flask import flash, g, render_template, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_required
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from wtforms import BooleanField, IntegerField, PasswordField, SelectField, StringField, SubmitField
 from wtforms.validators import Email, InputRequired
@@ -12,7 +12,7 @@ from openatlas import app, logger
 from openatlas.util.util import uc_first
 
 
-class PasswordForm(Form):
+class PasswordForm(FlaskForm):
     password_old = PasswordField(_('old password'), [InputRequired()])
     password = PasswordField(_('password'), [InputRequired()])
     password2 = PasswordField(_('repeat password'), [InputRequired()])
@@ -20,7 +20,7 @@ class PasswordForm(Form):
     save = SubmitField(_('save'))
 
     def validate(self) -> bool:
-        valid = Form.validate(self)
+        valid = FlaskForm.validate(self)
         hash_ = bcrypt.hashpw(self.password_old.data.encode('utf-8'),
                               current_user.password.encode('utf-8'))
         if hash_ != current_user.password.encode('utf-8'):
@@ -39,7 +39,7 @@ class PasswordForm(Form):
         return valid
 
 
-class ProfileForm(Form):
+class ProfileForm(FlaskForm):
     name = StringField(description=_('tooltip full name'))
     email = StringField([InputRequired(), Email()], description=_('tooltip email'))
     show_email = BooleanField(description=_('tooltip show email'))

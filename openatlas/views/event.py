@@ -3,7 +3,7 @@ from typing import Optional
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
@@ -238,7 +238,7 @@ def event_add_file(id_: int) -> str:
     return render_template('add_file.html', entity=event, form=form)
 
 
-def save(form: Form, event=None, code: Optional[str] = None, origin=None) -> str:
+def save(form: FlaskForm, event=None, code: Optional[str] = None, origin=None) -> str:
     g.cursor.execute('BEGIN')
     try:
         log_action = 'insert'

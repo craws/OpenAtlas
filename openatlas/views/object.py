@@ -2,7 +2,7 @@
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
@@ -17,7 +17,7 @@ from openatlas.util.util import (get_base_table_data, get_entity_data,
                                  display_remove_link)
 
 
-class InformationCarrierForm(Form):
+class InformationCarrierForm(FlaskForm):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))

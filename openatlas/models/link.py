@@ -4,7 +4,7 @@ from typing import Dict, Iterator, Optional, Union
 
 from flask import abort, flash, g, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 
 from openatlas import logger
 from openatlas.forms.date import DateForm
@@ -42,7 +42,7 @@ class Link:
     def delete(self) -> None:
         LinkMapper.delete(self.id)
 
-    def set_dates(self, form: Form) -> None:
+    def set_dates(self, form: FlaskForm) -> None:
         self.begin_from = None
         self.begin_to = None
         self.begin_comment = None
