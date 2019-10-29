@@ -3,8 +3,11 @@
 
 class Changelog:
     versions = {
-        '3.21.0': ['TBA', {
-            'feature': {}}],
+        '4.0.0': ['TBA', {
+            'feature': {
+                '1049': 'Upgrade Python to 3.7',
+                '1068': 'Place import with point coordinates'
+            }}],
         '3.20.1': ['2019-10-13', {
             'fix': {
                 '1069': 'Overlay maps: interchanged easting and northing'}}],
