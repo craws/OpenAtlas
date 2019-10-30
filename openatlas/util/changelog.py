@@ -6,7 +6,9 @@ class Changelog:
         '4.0.0': ['TBA', {
             'feature': {
                 '1049': 'Upgrade Python to 3.7',
-                '1068': 'Place import with point coordinates'
+                '1068': 'Place import with point coordinates'},
+            'fix': {
+                '1071': "Filter function in jsTree doesn't clear correctly",
             }}],
         '3.20.1': ['2019-10-13', {
             'fix': {
