@@ -1,9 +1,10 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Optional
+from typing import Optional, Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import FieldList, HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
@@ -205,7 +206,7 @@ def actor_insert(code: str, origin_id: Optional[int] = None):
 
 @app.route('/actor/delete/<int:id_>')
 @required_group('contributor')
-def actor_delete(id_: int) -> str:
+def actor_delete(id_: int) -> Response:
     EntityMapper.delete(id_)
     logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
@@ -214,7 +215,7 @@ def actor_delete(id_: int) -> str:
 
 @app.route('/actor/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def actor_update(id_: int) -> str:
+def actor_update(id_: int) -> Union[str, Response]:
     actor = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
     code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
     form = build_form(ActorForm, code_class[actor.class_.code], actor, request)
@@ -243,7 +244,7 @@ def actor_update(id_: int) -> str:
 
 @app.route('/actor/add/source/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def actor_add_source(id_: int) -> str:
+def actor_add_source(id_: int) -> Union[str, Response]:
     actor = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:
@@ -255,7 +256,7 @@ def actor_add_source(id_: int) -> str:
 
 @app.route('/actor/add/reference/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def actor_add_reference(id_: int) -> str:
+def actor_add_reference(id_: int) -> Union[str, Response]:
     actor = EntityMapper.get_by_id(id_)
     form = AddReferenceForm()
     if form.validate_on_submit():
@@ -267,7 +268,7 @@ def actor_add_reference(id_: int) -> str:
 
 @app.route('/actor/add/file/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
-def actor_add_file(id_: int) -> str:
+def actor_add_file(id_: int) -> Union[str, Response]:
     actor = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:
@@ -277,7 +278,7 @@ def actor_add_file(id_: int) -> str:
     return render_template('add_file.html', entity=actor, form=form)
 
 
-def save(form, actor=None, code: Optional[str] = None, origin=None) -> str:
+def save(form, actor=None, code: Optional[str] = None, origin=None) -> Union[str, Response]:
     g.cursor.execute('BEGIN')
     try:
         log_action = 'update'

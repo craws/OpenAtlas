@@ -24,7 +24,7 @@ if os.name == "posix":  # For other operating systems e.g. Windows, we would nee
     locale.setlocale(locale.LC_ALL, 'en_US.utf-8')  # pragma: no cover
 
 babel = Babel(app)
-debug_model = {}
+debug_model: Dict = {}
 
 
 class GlobalSearchForm(FlaskForm):
