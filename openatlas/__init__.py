@@ -15,16 +15,17 @@ from wtforms import StringField, SubmitField
 app = Flask(__name__, instance_relative_config=True)  # type: Flask
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 
-# Use the test database if running tests
 instance_name = 'production' if 'test_runner.py' not in sys.argv[0] else 'testing'
-app.config.from_object('config.default')  # Load config/INSTANCE_NAME.py
-app.config.from_pyfile(instance_name + '.py')  # Load instance/INSTANCE_NAME.py
+
+# Load config/default.py and instance/INSTANCE_NAME.py
+app.config.from_object('config.default')  # type: ignore
+app.config.from_pyfile(instance_name + '.py')  # type: ignore
 
 if os.name == "posix":  # For other operating systems e.g. Windows, we would need adaptions here
     locale.setlocale(locale.LC_ALL, 'en_US.utf-8')  # pragma: no cover
 
 babel = Babel(app)
-debug_model = {}
+debug_model: Dict = {}
 
 
 class GlobalSearchForm(FlaskForm):
