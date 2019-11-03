@@ -2,13 +2,14 @@
 import datetime
 import os
 from os.path import basename, splitext
-from typing import Optional
+from typing import Optional, Union
 
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import BooleanField, IntegerField, SelectField, StringField, SubmitField, TextAreaField
 from wtforms.validators import Email, InputRequired
 
@@ -66,7 +67,7 @@ class MapForm(FlaskForm):
 
 @app.route('/admin/map', methods=['POST', 'GET'])
 @required_group('manager')
-def admin_map() -> str:
+def admin_map() -> Union[str, Response]:
     form = MapForm(obj=session['settings'])
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
@@ -101,7 +102,7 @@ def admin_check_links(check: Optional[str] = None) -> str:
 @app.route('/admin/check_link_duplicates')
 @app.route('/admin/check_link_duplicates/<delete>')
 @required_group('contributor')
-def admin_check_link_duplicates(delete: Optional[str] = None) -> str:
+def admin_check_link_duplicates(delete: Optional[str] = None) -> Union[str, Response]:
     if delete:
         delete_count = str(LinkMapper.delete_link_duplicates())
         logger.log('info', 'admin', 'Deleted duplicate links: ' + delete_count)
@@ -134,7 +135,7 @@ def admin_check_link_duplicates(delete: Optional[str] = None) -> str:
 
 @app.route('/admin/delete_single_type_duplicate/<int:entity_id>/<int:node_id>')
 @required_group('contributor')
-def admin_delete_single_type_duplicate(entity_id: int, node_id: int) -> str:
+def admin_delete_single_type_duplicate(entity_id: int, node_id: int) -> Response:
     NodeMapper.remove_by_entity_and_node(entity_id, node_id)
     flash(_('link removed'), 'info')
     return redirect(url_for('admin_check_link_duplicates'))
@@ -149,7 +150,7 @@ class FileForm(FlaskForm):
 
 @app.route('/admin/file', methods=['POST', 'GET'])
 @required_group('manager')
-def admin_file() -> str:
+def admin_file() -> Union[str, Response]:
     form = FileForm()
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
@@ -195,7 +196,7 @@ def admin_check_similar() -> str:
 
 @app.route('/admin/orphans/delete/<parameter>')
 @required_group('admin')
-def admin_orphans_delete(parameter: str) -> str:
+def admin_orphans_delete(parameter: str) -> Response:
     count = EntityMapper.delete_orphans(parameter)
     flash(_('info orphans deleted:') + ' ' + str(count), 'info')
     return redirect(url_for('admin_orphans'))
@@ -298,7 +299,7 @@ class LogoForm(FlaskForm):
 @app.route('/admin/logo/', methods=['POST', 'GET'])
 @app.route('/admin/logo/<action>')
 @required_group('manager')
-def admin_logo(action: Optional[str] = None) -> str:
+def admin_logo(action: Optional[str] = None) -> Union[str, Response]:
     if action == 'remove':
         SettingsMapper.set_logo()
         return redirect(url_for('admin_logo'))
@@ -315,7 +316,7 @@ def admin_logo(action: Optional[str] = None) -> str:
 
 @app.route('/admin/file/delete/<filename>')
 @required_group('contributor')
-def admin_file_delete(filename: str) -> str:  # pragma: no cover
+def admin_file_delete(filename: str) -> Response:  # pragma: no cover
     if filename != 'all':
         try:
             os.remove(app.config['UPLOAD_FOLDER_PATH'] + '/' + filename)
@@ -385,7 +386,7 @@ class NewsLetterForm(FlaskForm):
 
 @app.route('/admin/newsletter', methods=['POST', 'GET'])
 @required_group('manager')
-def admin_newsletter() -> str:
+def admin_newsletter() -> Union[str, Response]:
     form = NewsLetterForm()
     if form.validate_on_submit():  # pragma: no cover
         recipients = 0
@@ -466,7 +467,7 @@ def admin_general() -> str:
 
 @app.route('/admin/general/update', methods=["GET", "POST"])
 @required_group('admin')
-def admin_general_update() -> str:
+def admin_general_update() -> Union[str, Response]:
     form = GeneralForm()
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
@@ -501,7 +502,7 @@ class MailForm(FlaskForm):
 
 @app.route('/admin/mail/update', methods=["GET", "POST"])
 @required_group('admin')
-def admin_mail_update() -> str:
+def admin_mail_update() -> Union[str, Response]:
     form = MailForm()
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
