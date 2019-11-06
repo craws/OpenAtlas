@@ -22,7 +22,7 @@
         <h1>{{ object_.name }}</h1>
         <div>
             <div style="float:left;">
-                {{ tables['info']|data_table|safe }}
+                {{ info|display_info|safe }}
                 {{ object_|note|safe }}
                 {{ object_|description|safe }}
             </div>

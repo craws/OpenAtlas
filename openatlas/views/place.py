@@ -114,8 +114,7 @@ def place_view(id_: int) -> str:
     object_ = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
     object_.note = UserMapper.get_note(object_)
     location = object_.get_linked_entity('P53', nodes=True)
-    tables = {'info': get_entity_data(object_, location),
-              'file': Table(Table.HEADERS['file'] + [_('main image')]),
+    tables = {'file': Table(Table.HEADERS['file'] + [_('main image')]),
               'source': Table(Table.HEADERS['source']),
               'event': Table(Table.HEADERS['event'],
                              defs='[{className: "dt-body-right", targets: [3,4]}]'),
@@ -202,7 +201,8 @@ def place_view(id_: int) -> str:
         place = feature.get_linked_entity('P46', True)
     elif object_.system_type == 'feature':
         place = object_.get_linked_entity('P46', True)
-    return render_template('place/view.html', object_=object_, tables=tables, gis_data=gis_data,
+    return render_template('place/view.html', object_=object_, tables=tables,
+                           info=get_entity_data(object_, location), gis_data=gis_data,
                            place=place, feature=feature, stratigraphic_unit=stratigraphic_unit,
                            has_subunits=has_subunits, profile_image_id=profile_image_id,
                            overlays=overlays)

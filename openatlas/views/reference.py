@@ -109,8 +109,7 @@ def reference_link_update(link_id: int, origin_id: int) -> Union[str, Response]:
 def reference_view(id_: int) -> str:
     reference = EntityMapper.get_by_id(id_, nodes=True)
     reference.note = UserMapper.get_note(reference)
-    tables = {'info': get_entity_data(reference),
-              'file': Table(Table.HEADERS['file'] + ['page', _('main image')])}
+    tables = {'file': Table(Table.HEADERS['file'] + ['page', _('main image')])}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find']:
         header_label = 'link text' if reference.system_type == 'external reference' else 'page'
         tables[name] = Table(Table.HEADERS[name] + [header_label])
@@ -138,7 +137,7 @@ def reference_view(id_: int) -> str:
             data.append(display_remove_link(url + '#tab-' + range_.table_name, range_.name))
         tables[range_.table_name].rows.append(data)
     return render_template('reference/view.html', reference=reference, tables=tables,
-                           profile_image_id=profile_image_id)
+                           info=get_entity_data(reference), profile_image_id=profile_image_id)
 
 
 @app.route('/reference')

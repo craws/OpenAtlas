@@ -60,8 +60,7 @@ def source_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
 def source_view(id_: int) -> str:
     source = EntityMapper.get_by_id(id_, nodes=True)
     source.note = UserMapper.get_note(source)
-    tables = {'info': get_entity_data(source),
-              'text': Table(['text', 'type', 'content']),
+    tables = {'text': Table(['text', 'type', 'content']),
               'file': Table(Table.HEADERS['file'] + [_('main image')]),
               'reference': Table(Table.HEADERS['reference'] + ['page'])}
     for text in source.get_linked_entities('P73', nodes=True):
@@ -101,7 +100,7 @@ def source_view(id_: int) -> str:
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
         tables[domain.view_name].rows.append(data)
     return render_template('source/view.html', source=source, tables=tables,
-                           profile_image_id=profile_image_id)
+                           info=get_entity_data(source), profile_image_id=profile_image_id)
 
 
 @app.route('/source/add/<int:id_>/<class_name>', methods=['POST', 'GET'])

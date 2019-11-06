@@ -95,7 +95,7 @@ def class_view(code: str) -> str:
         elif code == property_.range_class_code:
             tables['ranges'].rows.append([link(property_), property_.name])
     return render_template('model/class_view.html', class_=class_, tables=tables,
-                           data={'info': [('code', class_.code), ('name', class_.name)]})
+                           info=[('code', class_.code), ('name', class_.name)])
 
 
 @app.route('/overview/model/property_view/<code>')
@@ -103,16 +103,17 @@ def property_view(code: str) -> str:
     property_ = g.properties[code]
     domain = g.classes[property_.domain_class_code]
     range_ = g.classes[property_.range_class_code]
-    tables = {'info': [('code', property_.code),
-                       ('name', property_.name),
-                       ('inverse', property_.name_inverse),
-                       ('domain', link(domain) + ' ' + domain.name),
-                       ('range', link(range_) + ' ' + range_.name)]}
+    info = [('code', property_.code),
+            ('name', property_.name),
+            ('inverse', property_.name_inverse),
+            ('domain', link(domain) + ' ' + domain.name),
+            ('range', link(range_) + ' ' + range_.name)]
+    tables = {}
     for table in ['super', 'sub']:
         tables[table] = Table(['code', 'name'], paging=False)
         for code in getattr(property_, table):
             tables[table].rows.append([link(g.properties[code]), g.properties[code].name])
-    return render_template('model/property_view.html', property=property_, tables=tables)
+    return render_template('model/property_view.html', property=property_, tables=tables, info=info)
 
 
 class NetworkForm(FlaskForm):

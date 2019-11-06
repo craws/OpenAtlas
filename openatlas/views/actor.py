@@ -42,8 +42,7 @@ def actor_view(id_: int) -> str:
     info = []
     if actor.aliases:
         info.append((uc_first(_('alias')), '<br>'.join(actor.aliases.values())))
-    tables = {'info': info,
-              'file': Table(Table.HEADERS['file'] + [_('main image')]),
+    tables = {'file': Table(Table.HEADERS['file'] + [_('main image')]),
               'source': Table(Table.HEADERS['source']),
               'reference': Table(Table.HEADERS['reference'] + ['page / link text']),
               'event': Table(['event', 'class', 'involvement', 'first', 'last', 'description'],
@@ -170,8 +169,8 @@ def actor_view(id_: int) -> str:
     gis_data = GisMapper.get_all(objects) if objects else None
     if gis_data and gis_data['gisPointSelected'] == '[]':
         gis_data = None
-    return render_template('actor/view.html', actor=actor, tables=tables, gis_data=gis_data,
-                           profile_image_id=profile_image_id)
+    return render_template('actor/view.html', actor=actor, info=info, tables=tables,
+                           gis_data=gis_data, profile_image_id=profile_image_id)
 
 
 @app.route('/actor')

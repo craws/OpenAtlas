@@ -90,7 +90,7 @@ def node_view(id_: int) -> str:
     header = [_('name'), _('class'), _('info')]
     if root and root.value_type:  # pragma: no cover
         header = [_('name'), _('value'), _('class'), _('info')]
-    tables = {'info': get_entity_data(node), 'entities': Table(header)}
+    tables = {'entities': Table(header)}
     for entity in node.get_linked_entities(['P2', 'P89'], inverse=True, nodes=True):
         # If it is a place location get the corresponding object
         entity = entity if node.class_.code == 'E55' else entity.get_linked_entity('P53', True)
@@ -109,7 +109,8 @@ def node_view(id_: int) -> str:
     for sub_id in node.subs:
         sub = g.nodes[sub_id]
         tables['subs'].rows.append([link(sub), sub.count, truncate_string(sub.description)])
-    return render_template('types/view.html', node=node, super_=super_, tables=tables, root=root)
+    return render_template('types/view.html', node=node, super_=super_, tables=tables, root=root,
+                           info=get_entity_data(node))
 
 
 @app.route('/types/delete/<int:id_>', methods=['POST', 'GET'])

@@ -75,7 +75,7 @@ def nl2br(self, value: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def data_table(self, data: Iterator) -> str:
+def display_info(self, data: Iterator) -> str:
     html = '<div class="data-table">'
     for key, value in data:
         if value or value == 0:
@@ -86,8 +86,7 @@ def data_table(self, data: Iterator) -> str:
                     <div>{key}</div>
                     <div class="table-cell">{value}</div>
                 </div>'''.format(key=util.uc_first(key), value=value)
-    html += '</div>'
-    return html
+    return html + '</div>'
 
 
 @jinja2.contextfilter
@@ -188,9 +187,9 @@ def display_content_translation(self, text: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def manual_link(self, wiki_site):
+def manual_link(self, wiki_site) -> str:
     # Creates a link to a manual page
-    html = """
+    return """
         <p class="manual">
             <a class="manual" href="{url}" rel="noopener" target="_blank">
                 <img style="height:14px;" src="/static/images/icons/book.png" alt=''>
@@ -199,7 +198,6 @@ def manual_link(self, wiki_site):
         </p>
         """.format(url='https://redmine.openatlas.eu/projects/uni/wiki/' + wiki_site,
                    label=util.uc_first(_('manual')))
-    return html
 
 
 @jinja2.contextfilter

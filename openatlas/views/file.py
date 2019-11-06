@@ -135,7 +135,7 @@ def file_add_reference(id_: int) -> Union[str, Response]:
 def file_view(id_: int) -> str:
     file = EntityMapper.get_by_id(id_, nodes=True)
     path = get_file_path(file.id)
-    tables = {'info': get_entity_data(file)}
+    tables = {}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find',
                  'reference']:
         tables[name] = Table(Table.HEADERS[name] + (['page'] if name == 'reference' else []))
@@ -158,7 +158,8 @@ def file_view(id_: int) -> str:
             data.append(display_remove_link(unlink_url + '#tab-reference', link_.domain.name))
         tables['reference'].rows.append(data)
     return render_template('file/view.html', missing_file=False if path else True, entity=file,
-                           tables=tables, preview=True if path and preview_file(path) else False,
+                           info=get_entity_data(file), tables=tables,
+                           preview=True if path and preview_file(path) else False,
                            filename=os.path.basename(path) if path else False)
 
 

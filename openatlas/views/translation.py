@@ -41,9 +41,9 @@ def translation_insert(source_id: int) -> Union[str, Response]:
 @required_group('readonly')
 def translation_view(id_: int) -> str:
     translation = EntityMapper.get_by_id(id_, nodes=True)
-    source = translation.get_linked_entity('P73', True)
-    return render_template('translation/view.html', source=source, translation=translation,
-                           tables={'info': get_entity_data(translation)})
+    return render_template('translation/view.html', info=get_entity_data(translation),
+                           source=translation.get_linked_entity('P73', True),
+                           translation=translation,)
 
 
 @app.route('/source/translation/delete/<int:id_>/<int:source_id>')

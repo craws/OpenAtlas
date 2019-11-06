@@ -9,7 +9,7 @@
         <p>
             <strong>{{ _('info')|uc_first }}</strong>
         </p>
-        {{ data['info']|data_table|safe }}
+        {{ info|display_info|safe }}
     </div>
     {% if tables['super'].rows %}
         <div style="float:left;padding-right:2em;">

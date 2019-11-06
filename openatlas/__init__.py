@@ -12,7 +12,7 @@ from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect
 from wtforms import StringField, SubmitField
 
-app = Flask(__name__, instance_relative_config=True)  # type: Flask
+app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 
 instance_name = 'production' if 'test_runner.py' not in sys.argv[0] else 'testing'

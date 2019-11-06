@@ -31,7 +31,7 @@
         <div>
             {{ profile_image_id|display_profile_image|safe }}
             <div style="float:left;">
-                {{ tables['info']|data_table|safe }}
+                {{ info|display_info|safe }}
                 {{ source|note|safe }}
                 {{ source|display_external_references|safe }}
                 {{ source|description|safe }}

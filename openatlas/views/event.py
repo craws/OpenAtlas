@@ -10,8 +10,8 @@ from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import DateForm, TableField, TableMultiField, build_form, \
-    build_table_form
+from openatlas.forms.forms import (DateForm, TableField, TableMultiField, build_form,
+                                   build_table_form)
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
 from openatlas.models.link import LinkMapper
@@ -148,8 +148,7 @@ def event_update(id_: int) -> Union[str, Response]:
 def event_view(id_: int) -> str:
     event = EntityMapper.get_by_id(id_, nodes=True)
     event.note = UserMapper.get_note(event)
-    tables = {'info': get_entity_data(event),
-              'file': Table(Table.HEADERS['file'] + [_('main image')]),
+    tables = {'file': Table(Table.HEADERS['file'] + [_('main image')]),
               'subs': Table(Table.HEADERS['event']),
               'source': Table(Table.HEADERS['source']),
               'actor': Table(['actor', 'class', 'involvement', 'first', 'last', 'description'],
@@ -199,7 +198,7 @@ def event_view(id_: int) -> str:
     for location in event.get_linked_entities(['P7', 'P26', 'P27']):
         objects.append(location.get_linked_entity('P53', True))
     return render_template('event/view.html', event=event, tables=tables,
-                           profile_image_id=profile_image_id,
+                           info=get_entity_data(event), profile_image_id=profile_image_id,
                            gis_data=GisMapper.get_all(objects) if objects else None)
 
 
