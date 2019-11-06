@@ -1,12 +1,14 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import collections
 import os
+from typing import Union
 
 import pandas as pd
 from flask import flash, g, render_template, request, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect, secure_filename
+from werkzeug.wrappers import Response
 from wtforms import BooleanField, FileField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
@@ -45,7 +47,7 @@ def import_index() -> str:
 
 @app.route('/import/project/insert', methods=['POST', 'GET'])
 @required_group('manager')
-def import_project_insert() -> str:
+def import_project_insert() -> Union[str, Response]:
     form = ProjectForm()
     if form.validate_on_submit():
         id_ = ImportMapper.insert_project(form.name.data, form.description.data)
@@ -70,7 +72,7 @@ def import_project_view(id_: int) -> str:
 
 @app.route('/import/project/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('manager')
-def import_project_update(id_: int) -> str:
+def import_project_update(id_: int) -> Union[str, Response]:
     project = ImportMapper.get_project_by_id(id_)
     form = ProjectForm(obj=project)
     form.project_id = id_
@@ -85,7 +87,7 @@ def import_project_update(id_: int) -> str:
 
 @app.route('/import/project/delete/<int:id_>')
 @required_group('manager')
-def import_project_delete(id_: int) -> str:
+def import_project_delete(id_: int) -> Response:
     ImportMapper.delete_project(id_)
     flash(_('project deleted'), 'info')
     return redirect(url_for('import_index'))

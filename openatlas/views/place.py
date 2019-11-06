@@ -1,9 +1,11 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+from typing import Optional as OptionalTyping, Union
+
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
+from requests import Response
 from werkzeug.utils import redirect
-from typing import Optional as OptionalTyping
 from wtforms import (BooleanField, FieldList, HiddenField, IntegerField, StringField, SubmitField,
                      TextAreaField)
 from wtforms.validators import InputRequired, Optional
@@ -11,10 +13,10 @@ from wtforms.validators import InputRequired, Optional
 from openatlas import app, logger
 from openatlas.forms.forms import DateForm, build_form, build_table_form
 from openatlas.models.entity import EntityMapper
-from openatlas.models.gis import GisMapper, InvalidGeomException
 from openatlas.models.geonames import GeonamesMapper
-from openatlas.models.user import UserMapper
+from openatlas.models.gis import GisMapper, InvalidGeomException
 from openatlas.models.overlay import OverlayMapper
+from openatlas.models.user import UserMapper
 from openatlas.util.table import Table
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  get_profile_image_table_link, is_authorized, link, required_group,
@@ -62,7 +64,7 @@ def place_index() -> str:
 @app.route('/place/insert', methods=['POST', 'GET'])
 @app.route('/place/insert/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def place_insert(origin_id: OptionalTyping[int] = None) -> str:
+def place_insert(origin_id: OptionalTyping[int] = None) -> Union[str, Response]:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     geonames_buttons = False
     if origin and origin.system_type == 'place':
@@ -208,7 +210,7 @@ def place_view(id_: int) -> str:
 
 @app.route('/place/delete/<int:id_>')
 @required_group('contributor')
-def place_delete(id_: int) -> str:
+def place_delete(id_: int) -> Union[str, Response]:
     entity = EntityMapper.get_by_id(id_)
     parent = None if entity.system_type == 'place' else entity.get_linked_entity('P46', True)
     if entity.get_linked_entities('P46'):
@@ -224,7 +226,7 @@ def place_delete(id_: int) -> str:
 
 @app.route('/place/add/source/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def place_add_source(id_: int) -> str:
+def place_add_source(id_: int) -> Union[str, Response]:
     object_ = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:
@@ -236,7 +238,7 @@ def place_add_source(id_: int) -> str:
 
 @app.route('/place/add/reference/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def place_add_reference(id_: int) -> str:
+def place_add_reference(id_: int) -> Union[str, Response]:
     object_ = EntityMapper.get_by_id(id_)
     form = AddReferenceForm()
     if form.validate_on_submit():
@@ -248,7 +250,7 @@ def place_add_reference(id_: int) -> str:
 
 @app.route('/place/add/file/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
-def place_add_file(id_: int) -> str:
+def place_add_file(id_: int) -> Union[str, Response]:
     object_ = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:
@@ -260,7 +262,7 @@ def place_add_file(id_: int) -> str:
 
 @app.route('/place/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def place_update(id_: int) -> str:
+def place_update(id_: int) -> Union[str, Response]:
     object_ = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
     location = object_.get_linked_entity('P53', nodes=True)
     geonames_buttons = False

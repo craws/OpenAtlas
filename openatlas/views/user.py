@@ -1,11 +1,12 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Optional
+from typing import Optional, Union
 
 from flask import abort, flash, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import (BooleanField, HiddenField, PasswordField, SelectField, StringField,
                      SubmitField, TextAreaField)
 from wtforms.validators import Email, InputRequired
@@ -122,7 +123,7 @@ def user_index() -> str:
 
 @app.route('/admin/user/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('manager')
-def user_update(id_: int) -> str:
+def user_update(id_: int) -> Union[str, Response]:
     user = UserMapper.get_by_id(id_)
     if user.group == 'admin' and current_user.group != 'admin':
         abort(403)  # pragma: no cover
@@ -147,7 +148,7 @@ def user_update(id_: int) -> str:
 
 @app.route('/admin/user/insert', methods=['POST', 'GET'])
 @required_group('manager')
-def user_insert() -> str:
+def user_insert() -> Union[str, Response]:
     form = UserForm()
     form.group.choices = get_groups()
     if not session['settings']['mail']:
@@ -185,7 +186,7 @@ def get_groups() -> list:
 
 @app.route('/admin/user/delete/<int:id_>')
 @required_group('manager')
-def user_delete(id_: int) -> str:
+def user_delete(id_: int) -> Response:
     user = UserMapper.get_by_id(id_)
     if (user.group == 'admin' and current_user.group != 'admin') and user.id != current_user.id:
         abort(403)  # pragma: no cover

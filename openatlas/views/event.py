@@ -1,10 +1,11 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Optional
+from typing import Optional, Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
@@ -77,7 +78,7 @@ def prepare_form(form: EventForm, code: str):
 @app.route('/event/insert/<code>', methods=['POST', 'GET'])
 @app.route('/event/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def event_insert(code: str, origin_id=None) -> str:
+def event_insert(code: str, origin_id=None) -> Union[str, Response]:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = prepare_form(build_form(EventForm, 'Event'), code)
     if origin:
@@ -97,7 +98,7 @@ def event_insert(code: str, origin_id=None) -> str:
 
 @app.route('/event/delete/<int:id_>')
 @required_group('contributor')
-def event_delete(id_: int) -> str:
+def event_delete(id_: int) -> Response:
     EntityMapper.delete(id_)
     logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
@@ -106,7 +107,7 @@ def event_delete(id_: int) -> str:
 
 @app.route('/event/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def event_update(id_: int) -> str:
+def event_update(id_: int) -> Union[str, Response]:
     event = EntityMapper.get_by_id(id_, nodes=True)
     form = prepare_form(build_form(EventForm, 'Event', event, request), event.class_.code)
     form.event_id.data = event.id
@@ -204,7 +205,7 @@ def event_view(id_: int) -> str:
 
 @app.route('/event/add/source/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def event_add_source(id_: int) -> str:
+def event_add_source(id_: int) -> Union[str, Response]:
     event = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:
@@ -216,7 +217,7 @@ def event_add_source(id_: int) -> str:
 
 @app.route('/event/add/reference/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def event_add_reference(id_: int) -> str:
+def event_add_reference(id_: int) -> Union[str, Response]:
     event = EntityMapper.get_by_id(id_)
     form = AddReferenceForm()
     if form.validate_on_submit():
@@ -228,7 +229,7 @@ def event_add_reference(id_: int) -> str:
 
 @app.route('/event/add/file/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
-def event_add_file(id_: int) -> str:
+def event_add_file(id_: int) -> Union[str, Response]:
     event = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:

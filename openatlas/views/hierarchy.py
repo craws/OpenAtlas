@@ -1,10 +1,11 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Optional
+from typing import Optional, Union
 
 from flask import abort, flash, g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import (BooleanField, SelectMultipleField, StringField, SubmitField, TextAreaField,
                      widgets)
 from wtforms.validators import InputRequired
@@ -33,7 +34,7 @@ class HierarchyForm(FlaskForm):
 
 @app.route('/hierarchy/insert/<param>', methods=['POST', 'GET'])
 @required_group('manager')
-def hierarchy_insert(param: str) -> str:
+def hierarchy_insert(param: str) -> Union[str, Response]:
     form = build_form(HierarchyForm, 'hierarchy')  # type: HierarchyForm
     form.forms.choices = NodeMapper.get_form_choices()
     if param == 'value':
@@ -50,7 +51,7 @@ def hierarchy_insert(param: str) -> str:
 
 @app.route('/hierarchy/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('manager')
-def hierarchy_update(id_: int) -> str:
+def hierarchy_update(id_: int) -> Union[str, Response]:
     root = g.nodes[id_]
     if root.system:
         abort(403)
@@ -80,7 +81,7 @@ def hierarchy_update(id_: int) -> str:
 
 @app.route('/hierarchy/remove_form/<int:id_>/<int:remove_id>')
 @required_group('manager')
-def hierarchy_remove_form(id_: int, remove_id: int) -> str:
+def hierarchy_remove_form(id_: int, remove_id: int) -> Response:
     root = g.nodes[id_]
     if NodeMapper.get_form_count(root, remove_id):
         abort(403)  # pragma: no cover
@@ -95,7 +96,7 @@ def hierarchy_remove_form(id_: int, remove_id: int) -> str:
 
 @app.route('/hierarchy/delete/<int:id_>', methods=['POST', 'GET'])
 @required_group('manager')
-def hierarchy_delete(id_: int) -> str:
+def hierarchy_delete(id_: int) -> Response:
     node = g.nodes[id_]
     if node.system or node.subs or node.count:
         abort(403)

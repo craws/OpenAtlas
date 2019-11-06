@@ -1,8 +1,11 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+from typing import Union
+
 from flask import flash, render_template, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import TextAreaField
 
 from openatlas import app
@@ -39,7 +42,7 @@ def content_view(item) -> str:
 
 @app.route('/admin/content/update/<string:item>', methods=["GET", "POST"])
 @required_group('manager')
-def content_update(item: str) -> str:
+def content_update(item: str) -> Union[str, Response]:
     languages = app.config['LANGUAGES'].keys()
     for language in languages:
         setattr(ContentForm, language, TextAreaField())

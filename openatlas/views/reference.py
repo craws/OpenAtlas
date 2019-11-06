@@ -1,10 +1,11 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Optional
+from typing import Optional, Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired, URL
 
@@ -16,8 +17,8 @@ from openatlas.models.link import LinkMapper
 from openatlas.models.user import UserMapper
 from openatlas.util.table import Table
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 is_authorized, link, required_group, truncate_string, uc_first,
-                                 was_modified, get_profile_image_table_link)
+                                 get_profile_image_table_link, is_authorized, link, required_group,
+                                 truncate_string, uc_first, was_modified)
 
 
 class ReferenceForm(FlaskForm):
@@ -67,7 +68,7 @@ class AddFileForm(FlaskForm):
 
 @app.route('/reference/add/<int:id_>/<class_name>', methods=['POST', 'GET'])
 @required_group('contributor')
-def reference_add(id_: int, class_name: str) -> str:
+def reference_add(id_: int, class_name: str) -> Union[str, Response]:
     reference = EntityMapper.get_by_id(id_)
     form = getattr(openatlas.views.reference, 'Add' + uc_first(class_name) + 'Form')()
     if form.validate_on_submit():
@@ -83,7 +84,7 @@ def reference_add(id_: int, class_name: str) -> str:
 
 @app.route('/reference/link-update/<int:link_id>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def reference_link_update(link_id: int, origin_id: int) -> str:
+def reference_link_update(link_id: int, origin_id: int) -> Union[str, Response]:
     link_ = LinkMapper.get_by_id(link_id)
     origin = EntityMapper.get_by_id(origin_id)
     form = AddReferenceForm()
@@ -154,7 +155,7 @@ def reference_index() -> str:
 @app.route('/reference/insert/<code>', methods=['POST', 'GET'])
 @app.route('/reference/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def reference_insert(code: str, origin_id: Optional[int] = None) -> str:
+def reference_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(ReferenceForm, 'External Reference' if code == 'external_reference' else code)
     if code == 'external_reference':
@@ -169,7 +170,7 @@ def reference_insert(code: str, origin_id: Optional[int] = None) -> str:
 
 @app.route('/reference/delete/<int:id_>')
 @required_group('contributor')
-def reference_delete(id_: int) -> str:
+def reference_delete(id_: int) -> Response:
     EntityMapper.delete(id_)
     logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
@@ -178,7 +179,7 @@ def reference_delete(id_: int) -> str:
 
 @app.route('/reference/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def reference_update(id_: int) -> str:
+def reference_update(id_: int) -> Union[str, Response]:
     reference = EntityMapper.get_by_id(id_, nodes=True)
     form = build_form(ReferenceForm, reference.system_type.title(), reference, request)
     if reference.system_type == 'external reference':

@@ -1,10 +1,13 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+from typing import Union
+
 import bcrypt
 from flask import flash, g, render_template, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import BooleanField, IntegerField, PasswordField, SelectField, StringField, SubmitField
 from wtforms.validators import Email, InputRequired
 
@@ -82,7 +85,7 @@ def profile_index() -> str:
 
 @app.route('/profile/update', methods=['POST', 'GET'])
 @login_required
-def profile_update() -> str:
+def profile_update() -> Union[str, Response]:
     form = ProfileForm()
     user = current_user
     if form.validate_on_submit():
@@ -142,7 +145,7 @@ def profile_update() -> str:
 
 @app.route('/profile/password', methods=['POST', 'GET'])
 @login_required
-def profile_password() -> str:
+def profile_password() -> Union[str, Response]:
     form = PasswordForm()
     if form.validate_on_submit():
         current_user.password = bcrypt.hashpw(form.password.data.encode('utf-8'),

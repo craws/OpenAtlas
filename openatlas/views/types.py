@@ -5,6 +5,7 @@ from flask import abort, flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import (HiddenField, SelectMultipleField, StringField, SubmitField, TextAreaField,
                      widgets)
 from wtforms.validators import InputRequired
@@ -66,7 +67,7 @@ def node_insert(root_id: int, super_id: Optional[bool] = None):
 
 @app.route('/types/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
-def node_update(id_: int) -> str:
+def node_update(id_: int) -> Union[str, Response]:
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]] if node.root else None
     if node.system or (root and root.locked):
@@ -113,7 +114,7 @@ def node_view(id_: int) -> str:
 
 @app.route('/types/delete/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
-def node_delete(id_: int) -> str:
+def node_delete(id_: int) -> Response:
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]] if node.root else None
     if node.system or node.subs or node.count or (root and root.locked):
@@ -134,7 +135,7 @@ class MoveForm(FlaskForm):
 
 @app.route('/types/move/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
-def node_move_entities(id_: int) -> str:
+def node_move_entities(id_: int) -> Union[str, Response]:
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]]
     if root.value_type:  # pragma: no cover

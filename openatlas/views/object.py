@@ -1,9 +1,11 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+from typing import Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
@@ -12,9 +14,8 @@ from openatlas.forms.forms import build_form, build_table_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.user import UserMapper
 from openatlas.util.table import Table
-from openatlas.util.util import (get_base_table_data, get_entity_data,
-                                 link, required_group, truncate_string, was_modified, is_authorized,
-                                 display_remove_link)
+from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
+                                 is_authorized, link, required_group, truncate_string, was_modified)
 
 
 class InformationCarrierForm(FlaskForm):
@@ -64,7 +65,7 @@ def object_view(id_: int) -> str:
 
 @app.route('/object/add/source/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def object_add_source(id_: int) -> str:
+def object_add_source(id_: int) -> Union[str, Response]:
     object_ = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:
@@ -76,7 +77,7 @@ def object_add_source(id_: int) -> str:
 
 @app.route('/object/insert', methods=['POST', 'GET'])
 @required_group('contributor')
-def object_insert() -> str:
+def object_insert() -> Union[str, Response]:
     form = build_form(InformationCarrierForm, 'Information Carrier')
     if form.validate_on_submit():
         return redirect(save(form))
@@ -85,7 +86,7 @@ def object_insert() -> str:
 
 @app.route('/object/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def object_update(id_: int) -> str:
+def object_update(id_: int) -> Union[str, Response]:
     object_ = EntityMapper.get_by_id(id_, nodes=True)
     form = build_form(InformationCarrierForm, object_.system_type.title(), object_, request)
     if form.validate_on_submit():
@@ -126,7 +127,7 @@ def save(form, object_=None) -> str:
 
 @app.route('/object/delete/<int:id_>')
 @required_group('contributor')
-def object_delete(id_: int) -> str:
+def object_delete(id_: int) -> Response:
     EntityMapper.delete(id_)
     logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')

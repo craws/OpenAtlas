@@ -1,11 +1,12 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Tuple
+from typing import Tuple, Union
 
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import SelectField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
@@ -64,7 +65,7 @@ def index() -> str:
 
 
 @app.route('/index/setlocale/<language>')
-def set_locale(language: str) -> str:
+def set_locale(language: str) -> Response:
     session['language'] = language
     if hasattr(current_user, 'id') and current_user.id:
         current_user.settings['language'] = language
@@ -74,7 +75,7 @@ def set_locale(language: str) -> str:
 
 @app.route('/overview/feedback', methods=['POST', 'GET'])
 @required_group('readonly')
-def index_feedback() -> str:
+def index_feedback() -> Union[str, Response]:
     form = FeedbackForm()
     if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
         subject = form.subject.data + ' from ' + session['settings']['site_name']

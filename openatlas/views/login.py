@@ -1,12 +1,15 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-import bcrypt
 import datetime
+from typing import Union
+
+import bcrypt
 from bcrypt import hashpw
 from flask import abort, flash, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import LoginManager, current_user, login_required, login_user, logout_user
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import BooleanField, PasswordField, StringField, SubmitField
 from wtforms.validators import Email, InputRequired
 
@@ -37,7 +40,7 @@ class PasswordResetForm(FlaskForm):
 
 
 @app.route('/login', methods=["GET", "POST"])
-def login() -> str:
+def login() -> Union[str, Response]:
     if current_user.is_authenticated:
         return redirect('/')
     form = LoginForm()
@@ -77,7 +80,7 @@ def login() -> str:
 
 
 @app.route('/password_reset', methods=["GET", "POST"])
-def reset_password() -> str:
+def reset_password() -> Union[str, Response]:
     if current_user.is_authenticated:  # Prevent password reset if already logged in
         return redirect(url_for('index'))
     form = PasswordResetForm()
@@ -112,7 +115,7 @@ def reset_password() -> str:
 
 
 @app.route('/reset_confirm/<code>')
-def reset_confirm(code: str) -> str:  # pragma: no cover
+def reset_confirm(code: str) -> Response:  # pragma: no cover
     user = UserMapper.get_by_reset_code(code)
     if not user:
         logger.log('info', 'auth', 'unknown reset code')

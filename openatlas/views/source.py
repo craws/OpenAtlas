@@ -1,10 +1,11 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Optional
+from typing import Optional, Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
@@ -42,7 +43,7 @@ def source_index() -> str:
 @app.route('/source/insert/<int:origin_id>', methods=['POST', 'GET'])
 @app.route('/source/insert', methods=['POST', 'GET'])
 @required_group('contributor')
-def source_insert(origin_id: Optional[int] = None) -> str:
+def source_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(SourceForm, 'Source')
     if origin:
@@ -105,7 +106,7 @@ def source_view(id_: int) -> str:
 
 @app.route('/source/add/<int:id_>/<class_name>', methods=['POST', 'GET'])
 @required_group('contributor')
-def source_add(id_: int, class_name: str) -> str:
+def source_add(id_: int, class_name: str) -> Union[str, Response]:
     source = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:
@@ -117,7 +118,7 @@ def source_add(id_: int, class_name: str) -> str:
 
 @app.route('/source/add/reference/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def source_add_reference(id_: int) -> str:
+def source_add_reference(id_: int) -> Union[str, Response]:
     source = EntityMapper.get_by_id(id_)
     form = AddReferenceForm()
     if form.validate_on_submit():
@@ -129,7 +130,7 @@ def source_add_reference(id_: int) -> str:
 
 @app.route('/source/add/file/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
-def source_add_file(id_: int) -> str:
+def source_add_file(id_: int) -> Union[str, Response]:
     source = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:
@@ -141,7 +142,7 @@ def source_add_file(id_: int) -> str:
 
 @app.route('/source/delete/<int:id_>')
 @required_group('contributor')
-def source_delete(id_: int) -> str:
+def source_delete(id_: int) -> Response:
     EntityMapper.delete(id_)
     logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
@@ -150,7 +151,7 @@ def source_delete(id_: int) -> str:
 
 @app.route('/source/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def source_update(id_: int) -> str:
+def source_update(id_: int) -> Union[str, Response]:
     source = EntityMapper.get_by_id(id_, nodes=True)
     form = build_form(SourceForm, 'Source', source, request)
     if form.validate_on_submit():
