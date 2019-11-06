@@ -152,24 +152,24 @@ class Changelog:
                 '877': """Python/Flask Port
                 <p>This version includes many new features and changes. Some are listed below.</p>
                 <p style="font-weight:bold">User Interface and Usability</p>
-                &#8226 Performance improvements<br />
-                &#8226 More possibilities to create and link entries in one go<br />
-                &#8226 Merge of front and backend and cleaner user interface<br />
-                &#8226 Advanced display and editing of source translations<br />
-                &#8226 Acquisition: multiple recipients, donors and places<br />
-                &#8226 Advanced type index view<br />
-                &#8226 Restructured admin area<br />
-                &#8226 Admin functions to check and deal with orphaned data<br />
+                &#8226 Performance improvements<br>
+                &#8226 More possibilities to create and link entries in one go<br>
+                &#8226 Merge of front and backend and cleaner user interface<br>
+                &#8226 Advanced display and editing of source translations<br>
+                &#8226 Acquisition: multiple recipients, donors and places<br>
+                &#8226 Advanced type index view<br>
+                &#8226 Restructured admin area<br>
+                &#8226 Admin functions to check and deal with orphaned data<br>
                 &#8226 Show more/less option for long descriptions
                 <p style="font-weight:bold">Software and Code</p>
-                &#8226 Switched main programming language to Python 3<br />
-                &#8226 Switched web application framework to Flask<br />
-                &#8226 Switched template engine to Jinja2<br />
+                &#8226 Switched main programming language to Python 3<br>
+                &#8226 Switched web application framework to Flask<br>
+                &#8226 Switched template engine to Jinja2<br>
                 &#8226 Update of third party JavaScript libraries
                 <p style="font-weight:bold">Security</p>
-                &#8226 bcrypt hash algorithm for sensitive data<br />
-                &#8226 CSRF protection for forms<br />
-                &#8226 Adaptions for using HTTPS<br />
+                &#8226 bcrypt hash algorithm for sensitive data<br>
+                &#8226 CSRF protection for forms<br>
+                &#8226 Adaptions for using HTTPS<br>
                 &#8226 A show password option at forms"""}}],
         '2.4.0': ['2017-03-27', {
             'feature': {

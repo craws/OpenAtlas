@@ -41,7 +41,7 @@ def actor_view(id_: int) -> str:
     actor.note = UserMapper.get_note(actor)
     info = []
     if actor.aliases:
-        info.append((uc_first(_('alias')), '<br />'.join(actor.aliases.values())))
+        info.append((uc_first(_('alias')), '<br>'.join(actor.aliases.values())))
     tables = {'info': info,
               'file': Table(Table.HEADERS['file'] + [_('main image')]),
               'source': Table(Table.HEADERS['source']),

@@ -134,7 +134,7 @@ def table_select_model(self, name: str, selected=None) -> str:
     value = selected.code + ' ' + selected.name if selected else ''
     html = """
         <input id="{name}-button" value="{value}" class="table-select" type="text"
-            onfocus="this.blur()" readonly="readonly" />
+            onfocus="this.blur()" readonly="readonly">
         <div id="{name}-overlay" class="overlay">
             <div id="{name}-dialog" class="overlay-container">
                 {table}
@@ -156,7 +156,7 @@ def get_class_name(self, code: str) -> str:
 def description(self, entity) -> str:
     if not entity.description:
         return ''
-    text = entity.description.replace('\r\n', '<br />')
+    text = entity.description.replace('\r\n', '<br>')
     label = util.uc_first(_('description'))
     if hasattr(entity, 'system_type') and entity.system_type == 'source content':
         label = util.uc_first(_('content'))
@@ -174,7 +174,7 @@ def display_profile_image(self, image_id: int) -> str:
     return """
         <div id="profile_image_div">
             <a href="/file/view/{id}">
-                <img style="max-width:{width}px;" alt="profile image" src="{src}" />
+                <img style="max-width:{width}px;" alt="profile image" src="{src}">
             </a>
         </div>
         """.format(id=image_id, src=src, width=session['settings']['profile_image_width'])
@@ -193,7 +193,7 @@ def manual_link(self, wiki_site):
     html = """
         <p class="manual">
             <a class="manual" href="{url}" rel="noopener" target="_blank">
-                <img style="height:14px;" src="/static/images/icons/book.png" alt='' /> 
+                <img style="height:14px;" src="/static/images/icons/book.png" alt=''>
                 {label}
             </a>
         </p>
@@ -210,7 +210,7 @@ def display_logo(self, file_id: str) -> str:
         extension = print_file_extension(int(file_id))
         if extension != 'N/A':
             src = url_for('display_logo', filename=file_id + extension)
-    return '<img src="{src}" alt="Logo" />'.format(src=src)
+    return '<img src="{src}" alt="Logo">'.format(src=src)
 
 
 @jinja2.contextfilter
@@ -288,8 +288,8 @@ def display_form(self, form,
         field.label.text = util.uc_first(field.label.text)
         field.label.text += ' *' if field.flags.required and form_id != 'login-form' else ''
         if field.id == 'description':
-            html['footer'] += '<br />{label}<br />{text}<br />'.format(
-                label=field.label, text=field(class_=class_))
+            html['footer'] += '<br>{label}<br>{text}<br>'.format(label=field.label,
+                                                                 text=field(class_=class_))
             continue
         if field.type == 'SubmitField':
             html['footer'] += str(field)
@@ -418,7 +418,7 @@ def display_debug_info(self, debug_model: Dict, form) -> str:
             </div>""".format(name=name, value=value)
     if form and hasattr(form, 'errors'):
         for fieldName, errorMessages in form.errors.items():
-            html += fieldName + ' - ' + errorMessages[0] + '<br />'
+            html += fieldName + ' - ' + errorMessages[0] + '<br>'
     return html
 
 
@@ -435,5 +435,5 @@ def display_external_references(self, entity) -> str:
         if link_.domain.system_type == 'external reference geonames':
             name = 'GeoNames (' + link_.domain.name + ')'
             url = app.config['GEONAMES_VIEW_URL'] + link_.domain.name
-        html += '<a target="_blank" href="{url}">{name}</a><br />'.format(url=url, name=name)
+        html += '<a target="_blank" href="{url}">{name}</a><br>'.format(url=url, name=name)
     return '<h2>' + util.uc_first(_('external references')) + '</h2>' + html if html else ''

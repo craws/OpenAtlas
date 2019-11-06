@@ -132,12 +132,12 @@ class TreeSelect(HiddenInput):
         html = """
             <input id="{name}-button" name="{name}-button" type="text"
                 class="table-select {required}" onfocus="this.blur()"
-                readonly="readonly" value="{selection}" placeholder="{change_label}" />
+                readonly="readonly" value="{selection}" placeholder="{change_label}">
             <a id="{name}-clear" {clear_style} class="button"
                 onclick="clearSelect('{name}');">{clear_label}</a>
             <div id="{name}-overlay" class="overlay">
                 <div id="{name}-dialog" class="overlay-container">
-                    <input class="tree-filter" id="{name}-tree-search" placeholder="{filter}" />
+                    <input class="tree-filter" id="{name}-tree-search" placeholder="{filter}">
                     <div id="{name}-tree"></div>
                 </div>
             </div>
@@ -190,13 +190,13 @@ class TreeMultiSelect(HiddenInput):
             field.data = ast.literal_eval(field.data) if type(field.data) is str else field.data
             for entity_id in field.data:
                 selected_ids.append(entity_id)
-                selection += g.nodes[entity_id].name + '<br />'
+                selection += g.nodes[entity_id].name + '<br>'
         html = """
             <span id="{name}-button" class="button">{change_label}</span>
             <div id="{name}-selection" style="text-align:left;">{selection}</div>
             <div id="{name}-overlay" class="overlay">
                <div id="{name}-dialog" class="overlay-container">
-                   <input class="tree-filter" id="{name}-tree-search" placeholder="{filter}" />
+                   <input class="tree-filter" id="{name}-tree-search" placeholder="{filter}">
                    <div id="{name}-tree"></div>
                </div>
             </div>
@@ -267,7 +267,7 @@ class TableSelect(HiddenInput):
                         """.format(name=field.id,
                                    entity_id=entity.id,
                                    entity_name=truncate_string(entity.name, span=False))
-            data[0] = '<br />'.join([data[0]] + [
+            data[0] = '<br>'.join([data[0]] + [
                 truncate_string(alias) for id_, alias in entity.aliases.items()])
             table.rows.append(data)
         html = """
@@ -331,7 +331,7 @@ class TableMultiSelect(HiddenInput):
                 checked='checked = "checked"' if field.data and entity.id in field.data else ''))
             table.rows.append(data)
         html = """
-            <span id="{name}-button" class="button">{change_label}</span><br />
+            <span id="{name}-button" class="button">{change_label}</span><br>
             <div id="{name}-selection" class="selection" style="text-align:left;">{selection}</div>
             <div id="{name}-overlay" class="overlay">
             <div id="{name}-dialog" class="overlay-container">{table}</div></div>

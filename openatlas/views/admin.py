@@ -365,7 +365,7 @@ def admin_log() -> str:
                            row.type,
                            row.message,
                            link(user) if user and user.id else row.user_id,
-                           row.info.replace('\n', '<br />')])
+                           row.info.replace('\n', '<br>')])
     return render_template('admin/log.html', table=table, form=form)
 
 

@@ -169,7 +169,7 @@ def add_type_data(entity, data, location=None):
     if 'type' in type_data:
         type_data.move_to_end('type', last=False)
     for root_name, nodes in type_data.items():
-        data.append((root_name, '<br />'.join(nodes)))
+        data.append((root_name, '<br>'.join(nodes)))
     return data
 
 
@@ -199,7 +199,7 @@ def get_entity_data(entity, location=None):
     data = []
     # Aliases
     if entity.aliases:
-        data.append((uc_first(_('alias')), '<br />'.join(entity.aliases.values())))
+        data.append((uc_first(_('alias')), '<br>'.join(entity.aliases.values())))
 
     # Dates
     from_link = ''
@@ -225,7 +225,7 @@ def get_entity_data(entity, location=None):
 
     # Info for source
     if entity.system_type == 'source content':
-        data.append((uc_first(_('information carrier')), '<br />'.join(
+        data.append((uc_first(_('information carrier')), '<br>'.join(
             [link(recipient) for recipient in entity.get_linked_entities('P128', inverse=True)])))
 
     # Info for events
@@ -241,11 +241,11 @@ def get_entity_data(entity, location=None):
 
         # Info for acquisitions
         if entity.class_.code == 'E8':
-            data.append((uc_first(_('recipient')), '<br />'.join(
+            data.append((uc_first(_('recipient')), '<br>'.join(
                 [link(recipient) for recipient in entity.get_linked_entities('P22')])))
-            data.append((uc_first(_('donor')), '<br />'.join(
+            data.append((uc_first(_('donor')), '<br>'.join(
                 [link(donor) for donor in entity.get_linked_entities('P23')])))
-            data.append((uc_first(_('given place')), '<br />'.join(
+            data.append((uc_first(_('given place')), '<br>'.join(
                 [link(place) for place in entity.get_linked_entities('P24')])))
 
         # Info for moves
@@ -258,10 +258,10 @@ def get_entity_data(entity, location=None):
                 elif linked_entity.class_.code == 'E84':
                     object_data.append(linked_entity)
             if person_data:
-                data.append((uc_first(_('person')), '<br />'.join(
+                data.append((uc_first(_('person')), '<br>'.join(
                     [link(object_) for object_ in person_data])))
             if object_data:
-                data.append((uc_first(_('object')), '<br />'.join(
+                data.append((uc_first(_('object')), '<br>'.join(
                     [link(object_) for object_ in object_data])))
     return add_system_data(entity, data)
 
@@ -449,7 +449,7 @@ def truncate_string(string: str, length: Optional[int] = 40, span: Optional[bool
 
 def get_base_table_data(entity, file_stats=None):
     """ Returns standard table data for an entity"""
-    data = ['<br />'.join([link(entity)] + [
+    data = ['<br>'.join([link(entity)] + [
         truncate_string(alias) for alias in entity.aliases.values()])]
     if entity.view_name in ['event', 'actor']:
         data.append(g.classes[entity.class_.code].name)

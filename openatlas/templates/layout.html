@@ -1,23 +1,23 @@
 <!DOCTYPE html>
 <html lang="{{ session['language'] }}">
     <head>
-        <meta charset="UTF-8" />
-        <meta name="theme-color" content="#ffffff" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png" />
-        <link rel="icon" type="image/png" href="/static/favicon-32x32.png" sizes="32x32" />
-        <link rel="icon" type="image/png" href="/static/favicon-16x16.png" sizes="16x16" />
+        <meta charset="UTF-8">
+        <meta name="theme-color" content="#ffffff">
+        <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
+        <link rel="icon" type="image/png" href="/static/favicon-32x32.png" sizes="32x32">
+        <link rel="icon" type="image/png" href="/static/favicon-16x16.png" sizes="16x16">
         {% if '127.0.0' not in request.url %}
-            <link rel="manifest" href="/static/manifest.json" />
+            <link rel="manifest" href="/static/manifest.json">
         {% endif%}
-        <link rel="mask-icon" href="/static/safari-pinned-tab.svg" />
-        <link rel="stylesheet" href="/static/css/reset.css?v={{ config['VERSION'] }}" />
-        <link rel="stylesheet" href="/static/vendor/jquery/jquery-ui-1.12.1/jquery-ui.min.css" />
-        <link rel="stylesheet" href="/static/vendor/jquery/jstree-3.3.7/themes/default/style.min.css" />
-        <link rel="stylesheet" href="/static/css/style.css?v={{ config['VERSION'] }}" />
-        <link rel="stylesheet" href="/static/css/color.css?v={{ config['VERSION'] }}" />
-        <link rel="stylesheet" href="/static/css/images.css?v={{ config['VERSION'] }}" />
-        <link rel="stylesheet" href="/static/vendor/jquery/DataTables-1.10.18/datatables.css" />
-        <link rel="stylesheet" href="/static/css/table.css?v={{ config['VERSION'] }}" />
+        <link rel="mask-icon" href="/static/safari-pinned-tab.svg">
+        <link rel="stylesheet" href="/static/css/reset.css?v={{ config['VERSION'] }}">
+        <link rel="stylesheet" href="/static/vendor/jquery/jquery-ui-1.12.1/jquery-ui.min.css">
+        <link rel="stylesheet" href="/static/vendor/jquery/jstree-3.3.7/themes/default/style.min.css">
+        <link rel="stylesheet" href="/static/css/style.css?v={{ config['VERSION'] }}">
+        <link rel="stylesheet" href="/static/css/color.css?v={{ config['VERSION'] }}">
+        <link rel="stylesheet" href="/static/css/images.css?v={{ config['VERSION'] }}">
+        <link rel="stylesheet" href="/static/vendor/jquery/DataTables-1.10.18/datatables.css">
+        <link rel="stylesheet" href="/static/css/table.css?v={{ config['VERSION'] }}">
         <script src="/static/vendor/jquery/jquery-3.3.1.min.js"></script>
         <script src="/static/vendor/jquery/jquery-ui-1.12.1/jquery-ui.min.js"></script>
         <script src="/static/vendor/jquery/DataTables-1.10.18/datatables.min.js"></script>
@@ -58,7 +58,7 @@
                 {{ session['settings']['site_header'] }}
                 {% if 'local' in request['url_root'] %}local{% endif %}
                 <noscript><div class="error">{{ _('warning no js') }}</div></noscript>
-                <br /><br />
+                <br><br>
                 {% with messages = get_flashed_messages(with_categories=true) %}
                     {% if messages %}
                         {% for category, message in messages %}
@@ -72,7 +72,7 @@
                     {{ _('version')|uc_first }} {{ config['VERSION'] }} -
                     <a href="{{ url_for('index_changelog') }}">{{ _('changelog')|uc_first }}</a>
                     - <a href="https://redmine.openatlas.eu/projects/uni/wiki/Manual" target="_blank" rel="noopener">
-                        <img style="height:14px;" src="/static/images/icons/book.png" alt='' /> {{ _('manual')|uc_first }}
+                        <img style="height:14px;" src="/static/images/icons/book.png" alt=''> {{ _('manual')|uc_first }}
                       </a>
                     - <a href="{{ url_for('model_index') }}">{{ _('model')|uc_first }}</a>
                     - <a href="{{ url_for('index_credits') }}">{{ _('credits')|uc_first }}</a>
@@ -91,8 +91,8 @@
                     <div style="clear:both;"></div>
                 {% endif %}
                 <div id="language-menu">
-                    <img class="zoom" src="/static/images/icons/zoom-in.png" title="{{ _('zoom in') }}" onclick="resizeText(1)" alt="{{ _('zoom in') }}" />
-                    <img class="zoom" src="/static/images/icons/zoom-out.png" title="{{ _('zoom out') }}" onclick="resizeText(-1)" alt="{{ _('zoom out') }}" />
+                    <img class="zoom" src="/static/images/icons/zoom-in.png" title="{{ _('zoom in') }}" onclick="resizeText(1)" alt="{{ _('zoom in') }}">
+                    <img class="zoom" src="/static/images/icons/zoom-out.png" title="{{ _('zoom out') }}" onclick="resizeText(-1)" alt="{{ _('zoom out') }}">
                     {% for language in config['LANGUAGES'].keys()|sort %}
                         {% if 'language' in session and session['language'] == language %}
                             <span>{{ language|upper }}</span>

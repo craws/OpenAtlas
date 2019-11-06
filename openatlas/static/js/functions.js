@@ -203,9 +203,9 @@ function selectFromTreeMulti(name, value_type=false) {
                     value: '20',
                     class: 'value_input'
             }));
-            $('#' + name + '-button').after($('<br />'));
+            $('#' + name + '-button').after($('<br>'));
         } else {
-            checkedNames += node['text'] + "<br />";
+            checkedNames += node['text'] + "<br>";
         }
     });
     $("#" + name + "-selection").html(checkedNames);
@@ -231,7 +231,7 @@ function selectFromTableMulti(name) {
     $('#' + name + '_table').DataTable().rows().nodes().to$().find('input[type="checkbox"]').each(
         function() {
             if ($(this).is(':checked')) {
-                checkedNames += $(this).val() + '<br />';
+                checkedNames += $(this).val() + '<br>';
                 ids.push($(this).attr('id'));
             }
         });
