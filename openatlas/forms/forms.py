@@ -22,7 +22,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, get_file_stats, truncate_string, uc_first
 
 
-def get_link_type(form: FlaskForm) -> Optional_Type[Entity]:
+def get_link_type(form) -> Optional_Type[Entity]:
     """ Returns the link type provided by a link form, e.g. involvement between actor and event."""
     for field in form:
         if type(field) is TreeField and field.data:
@@ -30,7 +30,7 @@ def get_link_type(form: FlaskForm) -> Optional_Type[Entity]:
     return None
 
 
-def build_form(form, form_name: str, entity=None, request_origin=None, entity2=None) -> FlaskForm:
+def build_form(form, form_name: str, entity=None, request_origin=None, entity2=None):
     # Add custom fields, the entity parameter can also be a link.
     custom_list = []
 
@@ -80,7 +80,7 @@ def build_form(form, form_name: str, entity=None, request_origin=None, entity2=N
     return form_instance
 
 
-def build_node_form(form, node, request_origin=None) -> FlaskForm:
+def build_node_form(form, node, request_origin=None):
     if not request_origin:
         root = node
         node = None

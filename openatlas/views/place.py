@@ -4,8 +4,8 @@ from typing import Optional as OptionalTyping, Union
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
-from requests import Response
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import (BooleanField, FieldList, HiddenField, IntegerField, StringField, SubmitField,
                      TextAreaField)
 from wtforms.validators import InputRequired, Optional
@@ -210,7 +210,7 @@ def place_view(id_: int) -> str:
 
 @app.route('/place/delete/<int:id_>')
 @required_group('contributor')
-def place_delete(id_: int) -> Union[str, Response]:
+def place_delete(id_: int) -> Response:
     entity = EntityMapper.get_by_id(id_)
     parent = None if entity.system_type == 'place' else entity.get_linked_entity('P46', True)
     if entity.get_linked_entities('P46'):

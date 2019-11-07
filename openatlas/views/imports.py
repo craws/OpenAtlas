@@ -125,7 +125,7 @@ def import_data(project_id: int, class_code: str) -> str:
         # TODO fix windows separator
         separator = '/' if os.name == "posix" else '\\'
         file_path = app.config['IMPORT_FOLDER_PATH'] + separator + secure_filename(file_.filename)
-        columns = {'allowed': ['name', 'id', 'description'], 'valid': [], 'invalid': []}
+        columns: dict = {'allowed': ['name', 'id', 'description'], 'valid': [], 'invalid': []}
         if class_code == 'E18':
             columns['allowed'] += ['easting', 'northing']
         try:

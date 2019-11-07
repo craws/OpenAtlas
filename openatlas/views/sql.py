@@ -2,6 +2,7 @@
 import os
 from datetime import datetime, timedelta
 from os.path import basename
+from typing import Dict
 
 from flask import flash, g, render_template
 from flask_babel import lazy_gettext as _
@@ -38,7 +39,7 @@ def sql_execute() -> str:
         if not latest_file_date or file_date > latest_file_date:
             latest_file = file
             latest_file_date = file_date
-    file_data = {'backup_to_old': True}
+    file_data: Dict[str, any] = {'backup_to_old': True}
     if latest_file:
         yesterday = datetime.today() - timedelta(days=1)
         file_data['file'] = latest_file

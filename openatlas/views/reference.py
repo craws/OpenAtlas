@@ -200,7 +200,7 @@ def save(form, reference=None, code: Optional[str] = None, origin=None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
     try:
-        if not reference:
+        if code and not reference:
             log_action = 'insert'
             system_type = code.replace('_', ' ')
             reference = EntityMapper.insert('E31', form.name.data, system_type)

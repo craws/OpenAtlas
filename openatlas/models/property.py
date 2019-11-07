@@ -55,6 +55,7 @@ class Property:
                 return True
             elif self.find_subs(attr, class_id, g.classes[sub_id].sub):
                 return True
+        return False
 
 
 class PropertyMapper:

@@ -134,13 +134,13 @@ class Entity:
             self.end_to = DateMapper.form_to_datetime64(
                 form.end_year_to.data, form.end_month_to.data, form.end_day_to.data, True)
 
-    def get_profile_image_id(self):
+    def get_profile_image_id(self) -> Optional[int]:
         return EntityMapper.get_profile_image_id(self.id)
 
-    def remove_profile_image(self):
-        return EntityMapper.remove_profile_image(self.id)
+    def remove_profile_image(self) -> None:
+        EntityMapper.remove_profile_image(self.id)
 
-    def print_base_type(self):
+    def print_base_type(self) -> str:
         from openatlas.models.node import NodeMapper
         if not self.view_name or self.view_name == 'actor':  # actors have no base type
             return ''
@@ -163,7 +163,7 @@ class Entity:
                 return node.name
         return ''
 
-    def get_name_directed(self, inverse=False):
+    def get_name_directed(self, inverse: Optional[bool] = False) -> str:
         """ Returns name part of a directed type e.g. Actor Actor Relation: Parent of (Child of)"""
         from openatlas.util.util import sanitize
         name_parts = self.name.split(' (')
@@ -181,7 +181,7 @@ class EntityMapper:
         WHERE l1.domain_id IS NULL AND l2.range_id IS NULL AND e.class_code != 'E55'"""
 
     @staticmethod
-    def build_sql(nodes=False, aliases=False):
+    def build_sql(nodes: Optional[bool] = False, aliases: Optional[bool] = False) -> str:
         # Performance: only join nodes and/or aliases if requested
         sql = """
             SELECT
@@ -230,14 +230,15 @@ class EntityMapper:
             'description': sanitize(entity.description, 'description')})
 
     @staticmethod
-    def get_by_system_type(system_type, nodes=False, aliases=False):
+    def get_by_system_type(system_type, nodes: Optional[bool] = False,
+                           aliases: Optional[bool] = False) -> list:
         sql = EntityMapper.build_sql(nodes=nodes, aliases=aliases)
         sql += ' WHERE e.system_type = %(system_type)s GROUP BY e.id;'
         g.execute(sql, {'system_type': system_type})
         return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_display_files():
+    def get_display_files() -> list:
         sql_clause = " WHERE e.system_type = 'file' GROUP BY e.id;"
         g.execute(EntityMapper.build_sql(nodes=True) + sql_clause)
         entities = []
@@ -247,11 +248,11 @@ class EntityMapper:
         return entities
 
     @staticmethod
-    def insert(code, name, system_type=None, description=None):
+    def insert(code, name, system_type=None, description=None) -> Optional[Entity]:
         from openatlas.util.util import sanitize
         if not name:  # pragma: no cover
-            logger.log('error', 'database', 'Insert entity without name and date')
-            return
+            logger.log('error', 'database', 'Insert entity without name')
+            return None
         sql = """
             INSERT INTO model.entity (name, system_type, class_code, description)
             VALUES (%(name)s, %(system_type)s, %(code)s, %(description)s)
@@ -263,17 +264,18 @@ class EntityMapper:
         return EntityMapper.get_by_id(g.cursor.fetchone()[0])
 
     @staticmethod
-    def get_by_id(entity_id: int, nodes=False, aliases=False, ignore_not_found=False):
+    def get_by_id(entity_id: int,
+                  nodes: Optional[bool] = False,
+                  aliases: Optional[bool] = False,
+                  ignore_not_found: Optional[bool] = False) -> Optional[Entity]:
         if entity_id in g.nodes:  # pragma: no cover, just in case a node is requested
             return g.nodes[entity_id]
         sql = EntityMapper.build_sql(nodes, aliases) + ' WHERE e.id = %(id)s GROUP BY e.id;'
         g.execute(sql, {'id': entity_id})
-        if g.cursor.rowcount < 1 and ignore_not_found:
-            return None  # pragma: no cover, only used where expected to avoid a 418 e.g. at logs
-        return Entity(g.cursor.fetchone())
+        return None if g.cursor.rowcount < 1 and ignore_not_found else Entity(g.cursor.fetchone())
 
     @staticmethod
-    def get_by_ids(entity_ids: Union[Iterator, Set, List], nodes=False) -> list:
+    def get_by_ids(entity_ids: Union[Iterator, Set, List], nodes: Optional[bool] = False) -> list:
         if not entity_ids:
             return []
         sql = EntityMapper.build_sql(nodes) + ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name'
@@ -327,7 +329,7 @@ class EntityMapper:
             return EntityMapper.get_by_id(g.cursor.fetchone()[0])
 
     @staticmethod
-    def delete(entity) -> None:
+    def delete(entity: Entity) -> None:
         """ Triggers function model.delete_entity_related() for deleting related entities"""
         id_ = entity if type(entity) is int else entity.id
         g.execute('DELETE FROM model.entity WHERE id = %(id_)s;', {'id_': id_})
@@ -370,10 +372,7 @@ class EntityMapper:
             FROM model.entity;"""
         g.execute(sql)
         row = g.cursor.fetchone()
-        counts = {}
-        for idx, col in enumerate(g.cursor.description):
-            counts[col[0]] = row[idx]
-        return counts
+        return {col[0]: row[idx] for idx, col in enumerate(g.cursor.description)}
 
     @staticmethod
     def get_orphans() -> list:
@@ -534,7 +533,7 @@ class EntityMapper:
         g.execute(sql, {'entity_id': origin_id, 'image_id': id_})
 
     @staticmethod
-    def get_profile_image_id(id_: int):
+    def get_profile_image_id(id_: int) -> Optional[int]:
         sql = 'SELECT image_id FROM web.entity_profile_image WHERE entity_id = %(entity_id)s;'
         g.execute(sql, {'entity_id': id_})
         return g.cursor.fetchone()[0] if g.cursor.rowcount else None

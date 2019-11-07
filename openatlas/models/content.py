@@ -11,7 +11,7 @@ class ContentMapper:
 
     @staticmethod
     def get_content() -> Dict:
-        content = {}
+        content: dict = {}
         for name in ['intro', 'legal_notice', 'contact']:
             content[name] = {}
             for language in app.config['LANGUAGES'].keys():

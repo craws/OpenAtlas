@@ -20,7 +20,7 @@ from openatlas.util import util
 from openatlas.util.table import Table
 from openatlas.util.util import get_file_path, print_file_extension
 
-blueprint = flask.Blueprint('filters', __name__)
+blueprint: flask.Blueprint = flask.Blueprint('filters', __name__)
 paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 
 
@@ -347,6 +347,7 @@ def display_form(self, form,
 def test_file(self, file_name: str) -> Optional[str]:
     if os.path.isfile(app.root_path + '/' + file_name):
         return file_name
+    return None
 
 
 @jinja2.contextfilter

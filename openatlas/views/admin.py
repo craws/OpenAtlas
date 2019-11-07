@@ -183,14 +183,15 @@ def admin_check_similar() -> str:
     choices = ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic unit', 'find',
                'reference', 'file']
     form.classes.choices = [(x, uc_first(_(x))) for x in choices]
-    table = Table(['name', uc_first(_('count'))])
+    table = None
     if form.validate_on_submit():
+        table = Table(['name', uc_first(_('count'))])
         for sample_id, sample in EntityMapper.get_similar_named(form).items():
             html = link(sample['entity'])
             for entity in sample['entities']:
                 html += '<br/>' + link(entity)
             table.rows.append([html, len(sample['entities']) + 1])
-        table = table if table.rows else 'none found'
+        print(table.rows)
     return render_template('admin/check_similar.html', table=table, form=form)
 
 
@@ -392,7 +393,7 @@ def admin_newsletter() -> Union[str, Response]:
         recipients = 0
         for user_id in (request.form.getlist('recipient')):
             user = UserMapper.get_by_id(user_id)
-            if user.settings['newsletter'] and user.active:
+            if user and user.settings['newsletter'] and user.active:
                 code = UserMapper.generate_password()
                 user.unsubscribe_code = code
                 user.update()
@@ -405,7 +406,7 @@ def admin_newsletter() -> Union[str, Response]:
         return redirect(url_for('admin_index'))
     table = Table(['username', 'email', 'receiver'])
     for user in UserMapper.get_all():
-        if user.settings['newsletter'] and user.active:  # pragma: no cover
+        if user and user.settings['newsletter'] and user.active:  # pragma: no cover
             checkbox = '<input value="' + str(user.id) + '" name="recipient"'
             checkbox += ' type="checkbox" checked="checked">'
             table.rows.append([user.username, user.email, checkbox])

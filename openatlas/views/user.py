@@ -131,7 +131,7 @@ def user_update(id_: int) -> Union[str, Response]:
     form.user_id = id_
     del form.password, form.password2, form.send_info, form.insert_and_continue, form.show_passwords
     form.group.choices = get_groups()
-    if form.validate_on_submit():
+    if user and form.validate_on_submit():
         user.active = True if user.id == current_user.id else form.active.data  # no self deactivate
         user.real_name = form.real_name.data
         user.username = form.username.data
