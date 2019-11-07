@@ -22,16 +22,16 @@ from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, get_file_stats, truncate_string, uc_first
 
 
-def get_link_type(form) -> Optional_Type[Entity]:
+def get_link_type(form: FlaskForm) -> Optional_Type[Entity]:
     """ Returns the link type provided by a link form, e.g. involvement between actor and event."""
     for field in form:
         if type(field) is TreeField and field.data:
             return g.nodes[int(field.data)]
+    return None
 
 
-def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
-    """ The entity parameter can also be a link."""
-    # Add custom fields
+def build_form(form, form_name: str, entity=None, request_origin=None, entity2=None) -> FlaskForm:
+    # Add custom fields, the entity parameter can also be a link.
     custom_list = []
 
     def add_value_type_fields(subs) -> None:
@@ -66,7 +66,7 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
             nodes.update(entity2.nodes)
         if hasattr(form, 'opened'):
             form_instance.opened.data = time.time()
-        node_data = {}  # type: dict
+        node_data: dict = {}
         for node, node_value in nodes.items():
             root = g.nodes[node.root[-1]] if node.root else node
             if root.id not in node_data:
@@ -80,7 +80,7 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
     return form_instance
 
 
-def build_node_form(form, node, request_origin=None):
+def build_node_form(form, node, request_origin=None) -> FlaskForm:
     if not request_origin:
         root = node
         node = None

@@ -20,7 +20,7 @@ from openatlas.util.util import (format_date, is_authorized, link, required_grou
 
 
 class UserForm(FlaskForm):
-    user_id = None  # type: int
+    user_id = None
     active = BooleanField(_('active'), default=True)
     username = StringField(_('username'), [InputRequired()], render_kw={'autofocus': True})
     group = SelectField(_('group'), choices=[])

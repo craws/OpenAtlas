@@ -33,7 +33,7 @@ class NodeForm(FlaskForm):
 @app.route('/types')
 @required_group('readonly')
 def node_index() -> str:
-    nodes = {'system': {}, 'custom': {}, 'places': {}, 'value': {}}  # type: dict
+    nodes: dict = {'system': {}, 'custom': {}, 'places': {}, 'value': {}}
     for id_, node in g.nodes.items():
         if node.root:
             continue

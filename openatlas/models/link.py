@@ -22,7 +22,7 @@ class Link:
         self.domain = domain if domain else EntityMapper.get_by_id(row.domain_id)
         self.range = range_ if range_ else EntityMapper.get_by_id(row.range_id)
         self.type = g.nodes[row.type_id] if row.type_id else None
-        self.nodes = dict()  # type: Dict
+        self.nodes: dict = {}
         if hasattr(row, 'type_id') and row.type_id:
             self.nodes[g.nodes[row.type_id]] = None
         if hasattr(row, 'begin_from'):

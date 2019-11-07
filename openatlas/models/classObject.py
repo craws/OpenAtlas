@@ -14,9 +14,9 @@ class ClassObject:
         self._name = row.name
         self.code = row.code
         self.id = row.id
-        self.i18n = {}  # type: Dict
-        self.sub = []  # type: list
-        self.super = []  # type: list
+        self.i18n: dict = {}
+        self.sub: list = []
+        self.super: list = []
 
     @property
     def name(self) -> str:

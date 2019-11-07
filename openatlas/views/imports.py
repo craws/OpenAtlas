@@ -20,7 +20,7 @@ from openatlas.util.util import format_date, is_float, link, required_group, tru
 
 
 class ProjectForm(FlaskForm):
-    project_id = None  # type: int
+    project_id = None
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
@@ -119,7 +119,7 @@ def import_data(project_id: int, class_code: str) -> str:
     form = ImportForm()
     table = None
     imported = False
-    messages = {'error': [], 'warn': []}  # type: dict
+    messages: dict = {'error': [], 'warn': []}
     if form.validate_on_submit():
         file_ = request.files['file']
         # TODO fix windows separator

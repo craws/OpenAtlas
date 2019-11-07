@@ -17,9 +17,9 @@ class Property:
         self.domain_class_code = row.domain_class_code
         self.range_class_code = row.range_class_code
         self.id = row.id
-        self.i18n = {}  # type: Dict
-        self.super = []  # type: list
-        self.sub = []  # type: list
+        self.i18n: dict = {}
+        self.super: list = []
+        self.sub: list = []
 
     @property
     def name(self) -> str:

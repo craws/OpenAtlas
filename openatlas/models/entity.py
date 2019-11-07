@@ -1,4 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+import itertools
 from collections import OrderedDict
 from typing import Dict, Iterator, List, Optional, Set, Union
 
@@ -20,17 +21,17 @@ class Entity:
             logger.log('error', 'model', 'invalid id')
             abort(418)
         self.id = row.id
-        self.nodes = {}  # type: Dict
+        self.nodes: Dict = {}
         if hasattr(row, 'nodes') and row.nodes:
             for node in row.nodes:
                 self.nodes[g.nodes[node['f1']]] = node['f2']  # f1 = node id, f2 = value
-        self.aliases = {}  # type: Dict
+        self.aliases: dict = {}
         if hasattr(row, 'aliases') and row.aliases:
             for alias in row.aliases:
                 self.aliases[alias['f1']] = alias['f2']  # f1 = alias id, f2 = alias name
             self.aliases = OrderedDict(sorted(self.aliases.items(), key=lambda kv: (kv[1], kv[0])))
         self.name = row.name
-        self.root = None  # type: Optional[list]
+        self.root: Optional[list] = None
         self.description = row.description if row.description else ''
         self.system_type = row.system_type
         self.created = row.created
@@ -41,8 +42,8 @@ class Entity:
         self.end_from = None
         self.end_to = None
         self.end_comment = None
-        self.note = None  # type: Optional[str]  # private, user specific note for an entity
-        self.origin_id = None  # type: Optional[int]
+        self.note: Optional[str] = None  # User specific, private note for an entity
+        self.origin_id: Optional[int] = None
         if hasattr(row, 'begin_from'):
             self.begin_from = DateMapper.timestamp_to_datetime64(row.begin_from)
             self.begin_to = DateMapper.timestamp_to_datetime64(row.begin_to)
@@ -55,7 +56,7 @@ class Entity:
             self.last = DateForm.format_date(self.end_to, 'year') if self.end_to else self.last
         self.class_ = g.classes[row.class_code]
         self.view_name = None  # view_name is used to build urls
-        self.external_references = []  # type: list
+        self.external_references: list = []
         if self.system_type == 'file':
             self.view_name = 'file'
         elif self.class_.code in app.config['CODE_CLASS']:
@@ -338,8 +339,8 @@ class EntityMapper:
             entities = EntityMapper.get_by_codes(class_)
         else:
             entities = EntityMapper.get_by_system_type(class_)
-        similar = {}  # type: dict
-        already_added = set()  # type: set
+        similar: dict = {}
+        already_added: set = set()
         for sample in entities:
             if sample.id in already_added:
                 continue
@@ -383,9 +384,7 @@ class EntityMapper:
     @staticmethod
     def get_latest(limit: int) -> list:
         """ Returns the newest created entities"""
-        codes = []  # type: list
-        for class_codes in app.config['CLASS_CODES'].values():
-            codes += class_codes
+        codes = list(itertools.chain(*[code_ for code_ in app.config['CLASS_CODES'].values()]))
         sql = EntityMapper.build_sql() + """
                 WHERE e.class_code IN %(codes)s GROUP BY e.id
                 ORDER BY e.created DESC LIMIT %(limit)s;"""
