@@ -5,8 +5,8 @@
 {% block content %}
     {{ 'Object'|manual_link|safe }}
     {% if 'contributor'|is_authorized %}
-        <div class="button-bar">
-            <a href="{{ url_for('object_insert') }}">+ {{ 'E84'|get_class_name }}</a>
+        <div>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('object_insert') }}">+ {{ 'E84'|get_class_name }}</a>
         </div>
     {% endif %}
     {{ table.display()|safe }}

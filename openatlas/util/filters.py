@@ -393,7 +393,7 @@ def display_menu(self, origin) -> str:
             else:
                 css = 'active' if request.path.startswith('/' + item) or \
                                   (item == 'overview' and request.path == '/') else ''
-            html += '<div class="{css}"><a href="/{item}">{label}</a></div>'.format(
+            html += '<a href="/{item}" class="nav-item nav-link {css}">{label}</a>'.format(
                 css=css, item=item, label=util.uc_first(_(item)))
     return html
 

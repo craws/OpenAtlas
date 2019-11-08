@@ -5,8 +5,8 @@
 {% block content %}
     {{ 'Reference'|manual_link|safe }}
     {% if 'contributor'|is_authorized %}
-        <div class="button-bar">
-            <a href="{{ url_for('reference_insert', code='bibliography') }}">+ {{ _('bibliography')|uc_first }}</a>
+        <div>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('reference_insert', code='bibliography') }}">+ {{ _('bibliography')|uc_first }}</a>
             <a href="{{ url_for('reference_insert', code='edition') }}">+ {{ _('edition')|uc_first }}</a>
             <a href="{{ url_for('reference_insert', code='external_reference') }}">+ {{ _('external reference')|uc_first }}</a>
         </div>

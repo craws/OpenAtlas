@@ -18,6 +18,7 @@
         <link rel="stylesheet" href="/static/css/images.css?v={{ config['VERSION'] }}">
         <link rel="stylesheet" href="/static/vendor/jquery/DataTables-1.10.18/datatables.css">
         <link rel="stylesheet" href="/static/css/table.css?v={{ config['VERSION'] }}">
+        <link rel="stylesheet" href="/static/vendor/bootstrap-4.3.1-dist/css/bootstrap.min.css">
         <script src="/static/vendor/jquery/jquery-3.3.1.min.js"></script>
         <script src="/static/vendor/jquery/jquery-ui-1.12.1/jquery-ui.min.js"></script>
         <script src="/static/vendor/jquery/DataTables-1.10.18/datatables.min.js"></script>
@@ -25,6 +26,8 @@
         <script src="/static/vendor/jquery/jstree-3.3.7/jstree.min.js"></script>
         <script src="/static/vendor/jquery/jstree-3.3.7/jstree.search.js"></script>
         <script src="/static/vendor/tinymce/tinymce.min.js"></script>
+        <script src="/static/vendor/bootstrap-4.3.1-dist/js/bootstrap.min.js"></script>
+        <script src="/static/vendor/popper.js-1.16.0/dist/umd/popper.min.js"></script>
         {% if gis_data %}
             {% include "map.html" %}
         {% endif %}
@@ -108,8 +111,15 @@
                 </div>
             </div>
         </div>
-        <div id="menu">
-            {{ origin|display_menu|safe }}
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+          </button>
+          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                {{ origin|display_menu|safe }}
+            </div>
+          </div>
             {% if current_user.is_authenticated %}
                 <div id="index-search">
                     <form method="post" action="{{ url_for('search_index') }}">
@@ -119,12 +129,14 @@
                     </form>
                 </div>
             {% endif %}
-        </div>
-        <div id="breadcrumb">
+        </nav>
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
             {% block breadcrumb %}{% endblock %}
-        </div>
+            </ol>
+        </nav>
         <main>
-            <div id="content">
+            <div id="content" >
                 <div style="float:left">{% block content %}{% endblock %}</div>
                 {% if session['settings']['debug_mode'] and 'admin'|is_authorized %}
                     <div class="data-table" style="float:right;margin:1em;">

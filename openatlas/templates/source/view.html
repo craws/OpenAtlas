@@ -43,8 +43,8 @@
         {% if name not in ['feature', 'stratigraphic-unit', 'find'] or tables[name].rows %}
             <div id="tab-{{ name }}">
                 {% if 'contributor'|is_authorized and name not in ['feature', 'stratigraphic-unit', 'find'] %}
-                    <div class="button-bar">
-                        <a href="{{ url_for('source_add', id_=source.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
+                    <div>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('source_add', id_=source.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
                         {% if name == 'place' %}
                             <a href="{{ url_for('place_insert', origin_id=source.id) }}">+ {{ _('place')|uc_first }}</a>
                         {% else %}
@@ -60,8 +60,8 @@
     {% endfor %}
     <div id="tab-reference">
         {% if 'contributor'|is_authorized %}
-            <div class="button-bar">
-                <a href="{{ url_for('source_add_reference', id_=source.id) }}">{{ _('add')|uc_first }}</a>
+            <div>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('source_add_reference', id_=source.id) }}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='bibliography', origin_id=source.id) }}">+ {{ _('bibliography')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='edition', origin_id=source.id) }}">+ {{ _('edition')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='external_reference', origin_id=source.id) }}">+ {{ _('external reference')|uc_first }}</a>
@@ -71,16 +71,16 @@
     </div>
     <div id="tab-text">
         {% if 'contributor'|is_authorized %}
-            <div class="button-bar">
-                <a href="{{ url_for('translation_insert', source_id=source.id) }}">+ {{ _('text')|uc_first }}</a>
+            <div>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('translation_insert', source_id=source.id) }}">+ {{ _('text')|uc_first }}</a>
             </div>
         {% endif %}
         {{ tables['text'].display('text')|safe }}
     </div>
     <div id="tab-file">
         {% if 'contributor'|is_authorized %}
-            <div class="button-bar">
-                <a href="{{ url_for('source_add_file', id_=source.id)}}">{{ _('add')|uc_first }}</a>
+            <div>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('source_add_file', id_=source.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('file_insert', origin_id=source.id) }}">+ {{ _('file')|uc_first }}</a>
             </div>
         {% endif %}

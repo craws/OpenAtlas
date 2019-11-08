@@ -65,8 +65,8 @@
     {% endif %}
     <div id="tab-source">
         {% if 'contributor'|is_authorized %}
-            <div class="button-bar">
-                <a href="{{ url_for('place_add_source', id_=object_.id) }}">{{ _('add')|uc_first }}</a>
+            <div>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('place_add_source', id_=object_.id) }}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('source_insert', origin_id=object_.id) }}">+ {{ _('source')|uc_first }}</a>
             </div>
         {% endif %}
@@ -89,8 +89,8 @@
     {% endif %}
     <div id="tab-reference">
         {% if 'contributor'|is_authorized %}
-            <div class="button-bar">
-                <a href="{{ url_for('place_add_reference', id_=object_.id)}}">{{ _('add')|uc_first }}</a>
+            <div>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('place_add_reference', id_=object_.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='bibliography', origin_id=object_.id) }}">+ {{ _('bibliography')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='edition', origin_id=object_.id) }}">+ {{ _('edition')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='external_reference', origin_id=object_.id) }}">+ {{ _('external reference')|uc_first }}</a>
@@ -100,8 +100,8 @@
     </div>
     <div id="tab-file">
         {% if 'contributor'|is_authorized %}
-            <div class="button-bar">
-                <a href="{{ url_for('place_add_file', id_=object_.id)}}">{{ _('add')|uc_first }}</a>
+            <div>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('place_add_file', id_=object_.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('file_insert', origin_id=object_.id) }}">+ {{ _('file')|uc_first }}</a>
             </div>
         {% endif %}
@@ -109,22 +109,22 @@
     </div>
     {% if object_.system_type == 'place' %}
         <div id="tab-feature">
-            <div class="button-bar">
-                <a href="{{ url_for('place_insert', origin_id=object_.id)}}">+ {{ _('feature')|uc_first }}</a>
+            <div>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('place_insert', origin_id=object_.id)}}">+ {{ _('feature')|uc_first }}</a>
             </div>
             {{ tables['feature'].display('feature')|safe }}
         </div>
     {% elif object_.system_type == 'feature' %}
         <div id="tab-stratigraphic-unit">
-            <div class="button-bar">
-                <a href="{{ url_for('place_insert', origin_id=object_.id)}}">+ {{ _('stratigraphic unit')|uc_first }}</a>
+            <div>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('place_insert', origin_id=object_.id)}}">+ {{ _('stratigraphic unit')|uc_first }}</a>
             </div>
             {{ tables['stratigraphic-unit'].display('stratigraphic-unit')|safe }}
         </div>
     {% elif object_.system_type == 'stratigraphic unit' %}
         <div id="tab-find">
-            <div class="button-bar">
-                <a href="{{ url_for('place_insert', origin_id=object_.id)}}">+ {{ _('find')|uc_first }}</a>
+            <div>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('place_insert', origin_id=object_.id)}}">+ {{ _('find')|uc_first }}</a>
             </div>
             {{ tables['find'].display('find')|safe }}
         </div>

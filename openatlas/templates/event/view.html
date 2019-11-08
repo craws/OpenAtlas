@@ -58,8 +58,8 @@
     {% endif %}
     <div id="tab-source">
         {% if 'contributor'|is_authorized %}
-            <div class="button-bar">
-                <a href="{{ url_for('event_add_source', id_=event.id)}}">{{ _('add')|uc_first }}</a>
+            <div>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('event_add_source', id_=event.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('source_insert', origin_id=event.id) }}">+ {{ _('source')|uc_first }}</a>
             </div>
         {% endif %}
@@ -67,8 +67,8 @@
     </div>
     <div id="tab-actor">
         {% if 'contributor'|is_authorized %}
-            <div class="button-bar">
-                <a href="{{ url_for('involvement_insert', origin_id=event.id)}}">{{ _('add')|uc_first }}</a>
+            <div>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('involvement_insert', origin_id=event.id)}}">{{ _('add')|uc_first }}</a>
                 {% for code in config['CLASS_CODES']['actor'] %}
                     <a href="{{ url_for('actor_insert', code=code, origin_id=event.id) }}">+ {{ code|get_class_name }}</a>
                 {% endfor %}
@@ -78,8 +78,8 @@
     </div>
     <div id="tab-reference">
         {% if 'contributor'|is_authorized %}
-            <div class="button-bar">
-                <a href="{{ url_for('event_add_reference', id_=event.id)}}">{{ _('add')|uc_first }}</a>
+            <div>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('event_add_reference', id_=event.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='bibliography', origin_id=event.id) }}">+ {{ _('bibliography')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='edition', origin_id=event.id) }}">+ {{ _('edition')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='external_reference', origin_id=event.id) }}">+ {{ _('external reference')|uc_first }}</a>
@@ -89,8 +89,8 @@
     </div>
     <div id="tab-file">
         {% if 'contributor'|is_authorized %}
-            <div class="button-bar">
-                <a href="{{ url_for('event_add_file', id_=event.id)}}">{{ _('add')|uc_first }}</a>
+            <div>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('event_add_file', id_=event.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('file_insert', origin_id=event.id) }}">+ {{ _('file')|uc_first }}</a>
             </div>
         {% endif %}

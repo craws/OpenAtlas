@@ -5,8 +5,8 @@
     > {{ _('edit note')|uc_first }}
 {% endblock %}
 {% block content %}
-    <div class="button-bar">
-        <a href="{{ url_for('note_delete', entity_id=entity.id) }}" onclick="return confirm('{{ _('Delete note?') }}');">{{ _('delete')|uc_first }}</a>
+    <div>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('note_delete', entity_id=entity.id) }}" onclick="return confirm('{{ _('Delete note?') }}');">{{ _('delete')|uc_first }}</a>
     </div>
     {{ form|display_form|safe }}
 {% endblock %}

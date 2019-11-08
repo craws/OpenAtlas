@@ -4,8 +4,8 @@
     > {{ _('logs')|uc_first }}
 {% endblock %}
 {% block content %}
-    <div class="button-bar">
-        <a onclick="return confirm('{{_('delete all logs?')|uc_first }}')"
+    <div>
+            <a class="btn btn-outline-primary btn-sm" onclick="return confirm('{{_('delete all logs?')|uc_first }}')"
                href="{{ url_for('admin_log_delete') }}">{{ _('delete all')|uc_first }}</a>
     </div>
     {{ form|display_form|safe }}

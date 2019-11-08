@@ -562,3 +562,8 @@ select.pagesize, select#gis {
 div.data-table div.display-none {
     display: none;
 }
+
+/*bootstrap mods*/
+.navbar {
+    width: 100%;
+}

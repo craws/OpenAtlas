@@ -51,8 +51,8 @@
     </div>
     <div id="tab-source">
         {% if 'contributor'|is_authorized %}
-            <div class="button-bar">
-                <a href="{{ url_for('file_add', id_=entity.id, class_name='source')}}">{{ _('add')|uc_first }}</a>
+            <div>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('file_add', id_=entity.id, class_name='source')}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('source_insert', origin_id=entity.id) }}">+ {{ _('source')|uc_first }}</a>
             </div>
         {% endif %}
@@ -62,8 +62,8 @@
         {% if name not in ['feature', 'stratigraphic-unit', 'find'] or tables[name].rows %}
             <div id="tab-{{name}}">
                 {% if 'contributor'|is_authorized and name not in ['feature', 'stratigraphic-unit', 'find'] %}
-                    <div class="button-bar">
-                        <a href="{{ url_for('file_add', id_=entity.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
+                    <div>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('file_add', id_=entity.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
                         {% if name == 'place' %}
                             <a href="{{ url_for('place_insert', origin_id=entity.id) }}">+ {{ _('place')|uc_first }}</a>
                         {% else %}
@@ -79,8 +79,8 @@
     {% endfor %}
     <div id="tab-reference">
         {% if 'contributor'|is_authorized %}
-            <div class="button-bar">
-                <a href="{{ url_for('file_add_reference', id_=entity.id)}}">{{ _('add')|uc_first }}</a>
+            <div>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('file_add_reference', id_=entity.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='bibliography', origin_id=entity.id) }}">+ {{ _('bibliography')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='edition', origin_id=entity.id) }}">+ {{ _('edition')|uc_first }}</a>
             </div>
