@@ -12,7 +12,6 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import build_form
-from openatlas.models.entity import EntityMapper
 from openatlas.models.node import NodeMapper
 from openatlas.util.table import Table
 from openatlas.util.util import required_group, sanitize, uc_first
@@ -100,7 +99,7 @@ def hierarchy_delete(id_: int) -> Response:
     node = g.nodes[id_]
     if node.system or node.subs or node.count:
         abort(403)
-    EntityMapper.delete(node.id)
+    node.delete()
     flash(_('entity deleted'), 'info')
     return redirect(url_for('node_index'))
 

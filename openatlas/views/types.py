@@ -120,7 +120,7 @@ def node_delete(id_: int) -> Response:
     root = g.nodes[node.root[-1]] if node.root else None
     if node.system or node.subs or node.count or (root and root.locked):
         abort(403)
-    EntityMapper.delete(node.id)
+    node.delete()
     flash(_('entity deleted'), 'info')
     return redirect(url_for('node_view', id_=root.id) if root else url_for('node_index'))
 

@@ -194,7 +194,7 @@ def file_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
 
 @app.route('/file/delete/<int:id_>')
 @required_group('contributor')
-def file_delete(id_: Optional[int] = None) -> Response:
+def file_delete(id_: int) -> Response:
     try:
         EntityMapper.delete(id_)
         logger.log_user(id_, 'delete')
@@ -212,7 +212,7 @@ def file_delete(id_: Optional[int] = None) -> Response:
     return redirect(url_for('file_index'))
 
 
-def save(form: FileForm, file: Optional[Entity] = None, origin: Optional[Entity] = None) -> str:
+def save(form: FileForm, file=None, origin: Optional[Entity] = None) -> str:
     g.cursor.execute('BEGIN')
     try:
         log_action = 'update'

@@ -80,7 +80,7 @@ class Entity:
              type_id: Optional[int] = None) -> Union[int, None]:
         return LinkMapper.insert(self, code, range_, description, inverse, type_id)
 
-    def get_links(self, code: str, inverse: Optional[bool] = False) -> list:
+    def get_links(self, code: Union[str, list], inverse: Optional[bool] = False) -> list:
         return LinkMapper.get_links(self, code, inverse)
 
     def delete(self) -> None:
@@ -267,7 +267,8 @@ class EntityMapper:
     def get_by_id(entity_id: int,
                   nodes: Optional[bool] = False,
                   aliases: Optional[bool] = False,
-                  ignore_not_found: Optional[bool] = False) -> Optional[Entity]:
+                  ignore_not_found: Optional[bool] = False):
+        # To do: add "-> Optional[Entity]" return value and solve many MyPy errors
         if entity_id in g.nodes:  # pragma: no cover, just in case a node is requested
             return g.nodes[entity_id]
         sql = EntityMapper.build_sql(nodes, aliases) + ' WHERE e.id = %(id)s GROUP BY e.id;'
@@ -329,9 +330,8 @@ class EntityMapper:
             return EntityMapper.get_by_id(g.cursor.fetchone()[0])
 
     @staticmethod
-    def delete(entity: Entity) -> None:
-        """ Triggers function model.delete_entity_related() for deleting related entities"""
-        id_ = entity if type(entity) is int else entity.id
+    def delete(id_: int) -> None:
+        """ Triggers function model.delete_entity_related() for deleting related entities."""
         g.execute('DELETE FROM model.entity WHERE id = %(id_)s;', {'id_': id_})
 
     @staticmethod
@@ -402,7 +402,7 @@ class EntityMapper:
         elif parameter == 'types':
             count = 0
             for node in NodeMapper.get_orphans():
-                EntityMapper.delete(node)
+                node.delete()
                 count += 1
             return count
         else:
