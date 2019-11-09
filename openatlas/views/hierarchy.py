@@ -104,7 +104,7 @@ def hierarchy_delete(id_: int) -> Response:
     return redirect(url_for('node_index'))
 
 
-def save(form, node=None, value_type: Optional[bool] = False):
+def save(form, node=None, value_type=None):
     g.cursor.execute('BEGIN')
     try:
         if not node:

@@ -212,7 +212,7 @@ def file_delete(id_: int) -> Response:
     return redirect(url_for('file_index'))
 
 
-def save(form: FileForm, file=None, origin: Optional[Entity] = None) -> str:
+def save(form: FileForm, file=None, origin=None) -> str:
     g.cursor.execute('BEGIN')
     try:
         log_action = 'update'

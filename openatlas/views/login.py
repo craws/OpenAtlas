@@ -146,7 +146,7 @@ def reset_confirm(code: str) -> Response:  # pragma: no cover
 
 @app.route('/logout')
 @login_required
-def logout() -> str:
+def logout() -> Response:
     logout_user()
     logger.log('info', 'auth', 'logout')
     return redirect(url_for('login'))

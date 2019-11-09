@@ -55,13 +55,13 @@ class Entity:
             self.last = DateForm.format_date(self.end_from, 'year') if self.end_from else None
             self.last = DateForm.format_date(self.end_to, 'year') if self.end_to else self.last
         self.class_ = g.classes[row.class_code]
-        self.view_name = None  # view_name is used to build urls
+        self.view_name = None  # Used to build URLs
         self.external_references: list = []
         if self.system_type == 'file':
             self.view_name = 'file'
         elif self.class_.code in app.config['CODE_CLASS']:
             self.view_name = app.config['CODE_CLASS'][self.class_.code]
-        self.table_name = self.view_name  # table_name is used to build tables
+        self.table_name = self.view_name  # Used to build tables
         if self.view_name == 'place':
             self.table_name = self.system_type.replace(' ', '-')
 
@@ -248,7 +248,7 @@ class EntityMapper:
         return entities
 
     @staticmethod
-    def insert(code, name, system_type=None, description=None) -> Optional[Entity]:
+    def insert(code, name, system_type: Optional[str] = None, description: Optional[str] = None):
         from openatlas.util.util import sanitize
         if not name:  # pragma: no cover
             logger.log('error', 'database', 'Insert entity without name')
