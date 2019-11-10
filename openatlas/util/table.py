@@ -45,7 +45,7 @@ class Table:
         if hasattr(current_user, 'settings'):
             table_rows = current_user.settings['table_rows']
         html = """
-            <table id="{name}_table" class="compact stripe cell-border hover"></table>
+            <table id="{name}_table" class="table table-striped table-bordered hover" style="width:100%"></table>
             <script>
                 $(document).ready(function() {{
                     $('#{name}_table').DataTable( {{
