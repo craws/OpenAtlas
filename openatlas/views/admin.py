@@ -191,7 +191,6 @@ def admin_check_similar() -> str:
             for entity in sample['entities']:
                 html += '<br/>' + link(entity)
             table.rows.append([html, len(sample['entities']) + 1])
-        print(table.rows)
     return render_template('admin/check_similar.html', table=table, form=form)
 
 
