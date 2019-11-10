@@ -55,13 +55,13 @@ class Entity:
             self.last = DateForm.format_date(self.end_from, 'year') if self.end_from else None
             self.last = DateForm.format_date(self.end_to, 'year') if self.end_to else self.last
         self.class_ = g.classes[row.class_code]
-        self.view_name = None  # view_name is used to build urls
+        self.view_name = None  # Used to build URLs
         self.external_references: list = []
         if self.system_type == 'file':
             self.view_name = 'file'
         elif self.class_.code in app.config['CODE_CLASS']:
             self.view_name = app.config['CODE_CLASS'][self.class_.code]
-        self.table_name = self.view_name  # table_name is used to build tables
+        self.table_name = self.view_name  # Used to build tables
         if self.view_name == 'place':
             self.table_name = self.system_type.replace(' ', '-')
 
@@ -80,7 +80,7 @@ class Entity:
              type_id: Optional[int] = None) -> Union[int, None]:
         return LinkMapper.insert(self, code, range_, description, inverse, type_id)
 
-    def get_links(self, code: str, inverse: Optional[bool] = False) -> list:
+    def get_links(self, code: Union[str, list], inverse: Optional[bool] = False) -> list:
         return LinkMapper.get_links(self, code, inverse)
 
     def delete(self) -> None:
@@ -248,7 +248,7 @@ class EntityMapper:
         return entities
 
     @staticmethod
-    def insert(code, name, system_type=None, description=None) -> Optional[Entity]:
+    def insert(code, name, system_type: Optional[str] = None, description: Optional[str] = None):
         from openatlas.util.util import sanitize
         if not name:  # pragma: no cover
             logger.log('error', 'database', 'Insert entity without name')
@@ -267,7 +267,8 @@ class EntityMapper:
     def get_by_id(entity_id: int,
                   nodes: Optional[bool] = False,
                   aliases: Optional[bool] = False,
-                  ignore_not_found: Optional[bool] = False) -> Optional[Entity]:
+                  ignore_not_found: Optional[bool] = False):
+        # To do: add "-> Optional[Entity]" return value and solve many MyPy errors
         if entity_id in g.nodes:  # pragma: no cover, just in case a node is requested
             return g.nodes[entity_id]
         sql = EntityMapper.build_sql(nodes, aliases) + ' WHERE e.id = %(id)s GROUP BY e.id;'
@@ -329,9 +330,8 @@ class EntityMapper:
             return EntityMapper.get_by_id(g.cursor.fetchone()[0])
 
     @staticmethod
-    def delete(entity: Entity) -> None:
-        """ Triggers function model.delete_entity_related() for deleting related entities"""
-        id_ = entity if type(entity) is int else entity.id
+    def delete(id_: int) -> None:
+        """ Triggers function model.delete_entity_related() for deleting related entities."""
         g.execute('DELETE FROM model.entity WHERE id = %(id_)s;', {'id_': id_})
 
     @staticmethod
@@ -402,7 +402,7 @@ class EntityMapper:
         elif parameter == 'types':
             count = 0
             for node in NodeMapper.get_orphans():
-                EntityMapper.delete(node)
+                node.delete()
                 count += 1
             return count
         else:

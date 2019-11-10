@@ -43,7 +43,7 @@ class NodeMapper(EntityMapper):
             node.count = row.count + row.count_property
             node.count_subs = 0
             node.subs = []
-            node.locked = None
+            node.locked = False
             node.root = [row.super_id] if row.super_id else []
         NodeMapper.populate_subs(nodes)
         return nodes
