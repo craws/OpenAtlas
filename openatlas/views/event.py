@@ -108,7 +108,7 @@ def event_delete(id_: int) -> Response:
 @app.route('/event/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def event_update(id_: int) -> Union[str, Response]:
-    event = EntityMapper.get_by_id(id_, nodes=True)
+    event = EntityMapper.get_by_id(id_, nodes=True, view_name='event')
     form = prepare_form(build_form(EventForm, 'Event', event, request), event.class_.code)
     form.event_id.data = event.id
     if form.validate_on_submit():
@@ -146,7 +146,7 @@ def event_update(id_: int) -> Union[str, Response]:
 @app.route('/event/view/<int:id_>')
 @required_group('readonly')
 def event_view(id_: int) -> str:
-    event = EntityMapper.get_by_id(id_, nodes=True)
+    event = EntityMapper.get_by_id(id_, nodes=True, view_name='event')
     event.note = UserMapper.get_note(event)
     tables = {'file': Table(Table.HEADERS['file'] + [_('main image')]),
               'subs': Table(Table.HEADERS['event']),
@@ -205,7 +205,7 @@ def event_view(id_: int) -> str:
 @app.route('/event/add/source/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def event_add_source(id_: int) -> Union[str, Response]:
-    event = EntityMapper.get_by_id(id_)
+    event = EntityMapper.get_by_id(id_, view_name='event')
     if request.method == 'POST':
         if request.form['checkbox_values']:
             event.link('P67', request.form['checkbox_values'], inverse=True)
@@ -217,7 +217,7 @@ def event_add_source(id_: int) -> Union[str, Response]:
 @app.route('/event/add/reference/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def event_add_reference(id_: int) -> Union[str, Response]:
-    event = EntityMapper.get_by_id(id_)
+    event = EntityMapper.get_by_id(id_, view_name='event')
     form = AddReferenceForm()
     if form.validate_on_submit():
         event.link('P67', form.reference.data, description=form.page.data, inverse=True)
@@ -229,7 +229,7 @@ def event_add_reference(id_: int) -> Union[str, Response]:
 @app.route('/event/add/file/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def event_add_file(id_: int) -> Union[str, Response]:
-    event = EntityMapper.get_by_id(id_)
+    event = EntityMapper.get_by_id(id_, view_name='event')
     if request.method == 'POST':
         if request.form['checkbox_values']:
             event.link('P67', request.form['checkbox_values'], inverse=True)

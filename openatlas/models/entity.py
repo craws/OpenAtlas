@@ -267,13 +267,22 @@ class EntityMapper:
     def get_by_id(entity_id: int,
                   nodes: Optional[bool] = False,
                   aliases: Optional[bool] = False,
+                  view_name: Optional[str] = None,
                   ignore_not_found: Optional[bool] = False):
         # To do: add "-> Optional[Entity]" return value and solve many MyPy errors
         if entity_id in g.nodes:  # pragma: no cover, just in case a node is requested
             return g.nodes[entity_id]
         sql = EntityMapper.build_sql(nodes, aliases) + ' WHERE e.id = %(id)s GROUP BY e.id;'
         g.execute(sql, {'id': entity_id})
-        return None if g.cursor.rowcount < 1 and ignore_not_found else Entity(g.cursor.fetchone())
+        if g.cursor.rowcount < 1 and ignore_not_found:
+            return None
+        entity = Entity(g.cursor.fetchone())
+        if view_name and view_name != entity.view_name:  # Entity was called from wrong view, abort!
+            logger.log('error', 'model',
+                       'entity ({id}) has view name "{view}", requested was "{request}"'.format(
+                           id=entity_id, view=entity.view_name, request=view_name))
+            abort(418)
+        return entity
 
     @staticmethod
     def get_by_ids(entity_ids: Union[Iterator, Set, List], nodes: Optional[bool] = False) -> list:
@@ -496,7 +505,7 @@ class EntityMapper:
 
             # Date criteria present but entity has no dates
             if not entity.begin_from and not entity.begin_to and not entity.end_from \
-                    and not entity.end_to:
+                and not entity.end_to:
                 if form.include_dateless.data:  # Include dateless entities
                     entities.append(entity)
                 continue

@@ -69,7 +69,7 @@ class AddFileForm(FlaskForm):
 @app.route('/reference/add/<int:id_>/<class_name>', methods=['POST', 'GET'])
 @required_group('contributor')
 def reference_add(id_: int, class_name: str) -> Union[str, Response]:
-    reference = EntityMapper.get_by_id(id_)
+    reference = EntityMapper.get_by_id(id_, view_name='reference')
     form = getattr(openatlas.views.reference, 'Add' + uc_first(class_name) + 'Form')()
     if form.validate_on_submit():
         property_code = 'P128' if reference.class_.code == 'E84' else 'P67'
@@ -107,7 +107,7 @@ def reference_link_update(link_id: int, origin_id: int) -> Union[str, Response]:
 @app.route('/reference/view/<int:id_>')
 @required_group('readonly')
 def reference_view(id_: int) -> str:
-    reference = EntityMapper.get_by_id(id_, nodes=True)
+    reference = EntityMapper.get_by_id(id_, nodes=True, view_name='reference')
     reference.note = UserMapper.get_note(reference)
     tables = {'file': Table(Table.HEADERS['file'] + ['page', _('main image')])}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find']:
@@ -179,7 +179,7 @@ def reference_delete(id_: int) -> Response:
 @app.route('/reference/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def reference_update(id_: int) -> Union[str, Response]:
-    reference = EntityMapper.get_by_id(id_, nodes=True)
+    reference = EntityMapper.get_by_id(id_, nodes=True, view_name='reference')
     form = build_form(ReferenceForm, reference.system_type.title(), reference, request)
     if reference.system_type == 'external reference':
         form.name.validators = [InputRequired(), URL()]
@@ -189,8 +189,8 @@ def reference_update(id_: int) -> Union[str, Response]:
             del form.save
             flash(_('error modified'), 'error')
             modifier = link(logger.get_log_for_advanced_view(reference.id)['modifier'])
-            return render_template(
-                'reference/update.html', form=form, reference=reference, modifier=modifier)
+            return render_template('reference/update.html', form=form, reference=reference,
+                                   modifier=modifier)
         save(form, reference)
         return redirect(url_for('reference_view', id_=id_))
     return render_template('reference/update.html', form=form, reference=reference)

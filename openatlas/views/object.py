@@ -41,7 +41,7 @@ def object_index() -> str:
 @app.route('/object/view/<int:id_>')
 @required_group('readonly')
 def object_view(id_: int) -> str:
-    object_ = EntityMapper.get_by_id(id_, nodes=True)
+    object_ = EntityMapper.get_by_id(id_, nodes=True, view_name='object')
     object_.note = UserMapper.get_note(object_)
     tables = {'source': Table(Table.HEADERS['source']), 'event': Table(Table.HEADERS['event'])}
     for link_ in object_.get_links('P128'):
@@ -65,7 +65,7 @@ def object_view(id_: int) -> str:
 @app.route('/object/add/source/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def object_add_source(id_: int) -> Union[str, Response]:
-    object_ = EntityMapper.get_by_id(id_)
+    object_ = EntityMapper.get_by_id(id_, view_name='object')
     if request.method == 'POST':
         if request.form['checkbox_values']:
             object_.link('P128', request.form['checkbox_values'])
@@ -86,7 +86,7 @@ def object_insert() -> Union[str, Response]:
 @app.route('/object/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def object_update(id_: int) -> Union[str, Response]:
-    object_ = EntityMapper.get_by_id(id_, nodes=True)
+    object_ = EntityMapper.get_by_id(id_, nodes=True, view_name='object')
     form = build_form(InformationCarrierForm, object_.system_type.title(), object_, request)
     if form.validate_on_submit():
         if was_modified(form, object_):  # pragma: no cover

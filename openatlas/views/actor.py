@@ -37,7 +37,7 @@ class ActorForm(DateForm):
 @app.route('/actor/view/<int:id_>')
 @required_group('readonly')
 def actor_view(id_: int) -> str:
-    actor = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
+    actor = EntityMapper.get_by_id(id_, nodes=True, aliases=True, view_name='actor')
     actor.note = UserMapper.get_note(actor)
     info = []
     if actor.aliases:
@@ -215,7 +215,7 @@ def actor_delete(id_: int) -> Response:
 @app.route('/actor/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def actor_update(id_: int) -> Union[str, Response]:
-    actor = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
+    actor = EntityMapper.get_by_id(id_, nodes=True, aliases=True, view_name='actor')
     code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
     form = build_form(ActorForm, code_class[actor.class_.code], actor, request)
     if form.validate_on_submit():
@@ -244,7 +244,7 @@ def actor_update(id_: int) -> Union[str, Response]:
 @app.route('/actor/add/source/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def actor_add_source(id_: int) -> Union[str, Response]:
-    actor = EntityMapper.get_by_id(id_)
+    actor = EntityMapper.get_by_id(id_, view_name='actor')
     if request.method == 'POST':
         if request.form['checkbox_values']:
             actor.link('P67', request.form['checkbox_values'], inverse=True)
@@ -256,7 +256,7 @@ def actor_add_source(id_: int) -> Union[str, Response]:
 @app.route('/actor/add/reference/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def actor_add_reference(id_: int) -> Union[str, Response]:
-    actor = EntityMapper.get_by_id(id_)
+    actor = EntityMapper.get_by_id(id_, view_name='actor')
     form = AddReferenceForm()
     if form.validate_on_submit():
         actor.link('P67', form.reference.data, description=form.page.data, inverse=True)
@@ -268,7 +268,7 @@ def actor_add_reference(id_: int) -> Union[str, Response]:
 @app.route('/actor/add/file/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def actor_add_file(id_: int) -> Union[str, Response]:
-    actor = EntityMapper.get_by_id(id_)
+    actor = EntityMapper.get_by_id(id_, view_name='actor')
     if request.method == 'POST':
         if request.form['checkbox_values']:
             actor.link('P67', request.form['checkbox_values'], inverse=True)
@@ -294,13 +294,13 @@ def save(form, actor=None, code: Optional[str] = None, origin=None) -> Union[str
         actor.save_nodes(form)
         url = url_for('actor_view', id_=actor.id)
         if form.residence.data:
-            object_ = EntityMapper.get_by_id(form.residence.data)
+            object_ = EntityMapper.get_by_id(form.residence.data, view_name='place')
             actor.link('P74', object_.get_linked_entity('P53'))
         if form.begins_in.data:
-            object_ = EntityMapper.get_by_id(form.begins_in.data)
+            object_ = EntityMapper.get_by_id(form.begins_in.data, view_name='place')
             actor.link('OA8', object_.get_linked_entity('P53'))
         if form.ends_in.data:
-            object_ = EntityMapper.get_by_id(form.ends_in.data)
+            object_ = EntityMapper.get_by_id(form.ends_in.data, view_name='place')
             actor.link('OA9', object_.get_linked_entity('P53'))
 
         if origin:

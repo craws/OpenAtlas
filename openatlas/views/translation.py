@@ -26,7 +26,7 @@ class TranslationForm(FlaskForm):
 @app.route('/source/translation/insert/<int:source_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def translation_insert(source_id: int) -> Union[str, Response]:
-    source = EntityMapper.get_by_id(source_id)
+    source = EntityMapper.get_by_id(source_id, view_name='source')
     form = build_form(TranslationForm, 'Source translation')
     if form.validate_on_submit():
         translation = save(form, source=source)

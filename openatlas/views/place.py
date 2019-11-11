@@ -111,7 +111,7 @@ def place_insert(origin_id: OptionalTyping[int] = None) -> Union[str, Response]:
 @app.route('/place/view/<int:id_>')
 @required_group('readonly')
 def place_view(id_: int) -> str:
-    object_ = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
+    object_ = EntityMapper.get_by_id(id_, nodes=True, aliases=True, view_name='place')
     object_.note = UserMapper.get_note(object_)
     location = object_.get_linked_entity('P53', nodes=True)
     tables = {'file': Table(Table.HEADERS['file'] + [_('main image')]),
@@ -179,7 +179,7 @@ def place_view(id_: int) -> str:
         data.append(truncate_string(entity.description))
         tables[entity.system_type.replace(' ', '-')].rows.append(data)
     for link_ in location.get_links(['P74', 'OA8', 'OA9'], inverse=True):
-        actor = EntityMapper.get_by_id(link_.domain.id)
+        actor = EntityMapper.get_by_id(link_.domain.id, view_name='actor')
         tables['actor'].rows.append([link(actor),
                                      g.properties[link_.property.code].name,
                                      actor.class_.name,
@@ -227,7 +227,7 @@ def place_delete(id_: int) -> Response:
 @app.route('/place/add/source/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def place_add_source(id_: int) -> Union[str, Response]:
-    object_ = EntityMapper.get_by_id(id_)
+    object_ = EntityMapper.get_by_id(id_, view_name='place')
     if request.method == 'POST':
         if request.form['checkbox_values']:
             object_.link('P67', request.form['checkbox_values'], inverse=True)
@@ -239,7 +239,7 @@ def place_add_source(id_: int) -> Union[str, Response]:
 @app.route('/place/add/reference/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def place_add_reference(id_: int) -> Union[str, Response]:
-    object_ = EntityMapper.get_by_id(id_)
+    object_ = EntityMapper.get_by_id(id_, view_name='place')
     form = AddReferenceForm()
     if form.validate_on_submit():
         object_.link('P67', form.reference.data, description=form.page.data, inverse=True)
@@ -251,7 +251,7 @@ def place_add_reference(id_: int) -> Union[str, Response]:
 @app.route('/place/add/file/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def place_add_file(id_: int) -> Union[str, Response]:
-    object_ = EntityMapper.get_by_id(id_)
+    object_ = EntityMapper.get_by_id(id_, view_name='place')
     if request.method == 'POST':
         if request.form['checkbox_values']:
             object_.link('P67', request.form['checkbox_values'], inverse=True)
@@ -263,7 +263,7 @@ def place_add_file(id_: int) -> Union[str, Response]:
 @app.route('/place/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def place_update(id_: int) -> Union[str, Response]:
-    object_ = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
+    object_ = EntityMapper.get_by_id(id_, nodes=True, aliases=True, view_name='place')
     location = object_.get_linked_entity('P53', nodes=True)
     geonames_buttons = False
     if object_.system_type == 'feature':
