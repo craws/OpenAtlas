@@ -151,11 +151,13 @@ def model_network() -> str:
     form = NetworkForm()
     form.classes.choices = []
     form.properties.choices = []
-    params = {'classes': {}, 'properties': {}, 'options': {'orphans': form.orphans.data,
-                                                           'width': form.width.data,
-                                                           'height': form.height.data,
-                                                           'charge': form.charge.data,
-                                                           'distance': form.distance.data}}
+    params: dict = {'classes': {},
+                    'properties': {},
+                    'options': {'orphans': form.orphans.data,
+                                'width': form.width.data,
+                                'height': form.height.data,
+                                'charge': form.charge.data,
+                                'distance': form.distance.data}}
     for code in ['E21', 'E7', 'E31', 'E33', 'E40', 'E74', 'E53', 'E18', 'E8', 'E84']:
         form.classes.choices.append((code, g.classes[code].name))
         params['classes'][code] = {'active': (code in form.classes.data),

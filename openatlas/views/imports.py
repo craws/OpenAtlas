@@ -1,7 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import collections
 import os
-from typing import Union
+from typing import Union, Optional
 
 import pandas as pd
 from flask import flash, g, render_template, request, url_for
@@ -20,7 +20,7 @@ from openatlas.util.util import format_date, is_float, link, required_group, tru
 
 
 class ProjectForm(FlaskForm):
-    project_id = None
+    project_id: Optional[int] = None
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))

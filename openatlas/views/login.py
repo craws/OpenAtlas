@@ -46,7 +46,7 @@ def login() -> Union[str, Response]:
     form = LoginForm()
     if form.validate_on_submit():
         user = UserMapper.get_by_username(request.form['username'])
-        if user:
+        if user and user.username:
             if user.login_attempts_exceeded():
                 logger.log('notice', 'auth', 'Login attempts exceeded: ' + user.username)
                 flash(_('error login attempts exceeded'), 'error')
@@ -117,7 +117,7 @@ def reset_password() -> Union[str, Response]:
 @app.route('/reset_confirm/<code>')
 def reset_confirm(code: str) -> Response:  # pragma: no cover
     user = UserMapper.get_by_reset_code(code)
-    if not user:
+    if not user or not user.username:
         logger.log('info', 'auth', 'unknown reset code')
         flash(_('invalid password reset confirmation code'), 'error')
         abort(404)
