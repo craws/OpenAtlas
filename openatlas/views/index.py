@@ -116,6 +116,11 @@ def invalid_id(e) -> Tuple[str, int]:
     return render_template('418.html', e=e), 418
 
 
+@app.errorhandler(422)
+def unprocessable_entity(e) -> Tuple[str, int]:
+    return render_template('422.html', e=e), 422
+
+
 @app.route('/overview/changelog')
 def index_changelog() -> str:
     return render_template('index/changelog.html', versions=Changelog.versions)
