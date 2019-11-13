@@ -8,7 +8,7 @@ from openatlas.test_base import TestBaseCase
 
 class ActorTests(TestBaseCase):
 
-    def test_actor(self):
+    def test_actor(self) -> None:
         with app.app_context():
             self.login()
             rv = self.app.get(url_for('actor_index'))

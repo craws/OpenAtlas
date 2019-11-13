@@ -6,7 +6,7 @@ from openatlas.test_base import TestBaseCase
 
 class ContentTests(TestBaseCase):
 
-    def test_content(self):
+    def test_content(self) -> None:
         with app.app_context():
             self.login()
             rv = self.app.get(url_for('content_view', item='legal_notice'))

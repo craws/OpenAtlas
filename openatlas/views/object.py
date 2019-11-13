@@ -70,7 +70,7 @@ def object_add_source(id_: int) -> Union[str, Response]:
         if request.form['checkbox_values']:
             object_.link('P128', request.form['checkbox_values'])
         return redirect(url_for('object_view', id_=id_) + '#tab-source')
-    form = build_table_form('source', object_.get_linked_entities('P128'))
+    form = build_table_form('source', object_.get_linked_entities(['P128']))
     return render_template('add_source.html', entity=object_, form=form)
 
 

@@ -9,8 +9,9 @@ from wtforms import FieldList, HiddenField, StringField, SubmitField, TextAreaFi
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import DateForm, TableField, build_form, build_table_form
-from openatlas.models.entity import EntityMapper
+from openatlas.forms.date import DateForm
+from openatlas.forms.forms import TableField, build_form, build_table_form
+from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.gis import GisMapper
 from openatlas.models.user import UserMapper
 from openatlas.util.table import Table
@@ -249,7 +250,7 @@ def actor_add_source(id_: int) -> Union[str, Response]:
         if request.form['checkbox_values']:
             actor.link('P67', request.form['checkbox_values'], inverse=True)
         return redirect(url_for('actor_view', id_=id_) + '#tab-source')
-    form = build_table_form('source', actor.get_linked_entities('P67', inverse=True))
+    form = build_table_form('source', actor.get_linked_entities(['P67'], inverse=True))
     return render_template('add_source.html', entity=actor, form=form)
 
 
@@ -273,11 +274,12 @@ def actor_add_file(id_: int) -> Union[str, Response]:
         if request.form['checkbox_values']:
             actor.link('P67', request.form['checkbox_values'], inverse=True)
         return redirect(url_for('actor_view', id_=id_) + '#tab-file')
-    form = build_table_form('file', actor.get_linked_entities('P67', inverse=True))
+    form = build_table_form('file', actor.get_linked_entities(['P67'], inverse=True))
     return render_template('add_file.html', entity=actor, form=form)
 
 
-def save(form, actor=None, code: str = None, origin=None) -> Union[str, Response]:
+def save(form: ActorForm, actor: Entity = None, code: str = '',
+         origin: Entity = None) -> Union[str, Response]:
     g.cursor.execute('BEGIN')
     try:
         log_action = 'update'

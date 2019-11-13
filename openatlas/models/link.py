@@ -1,20 +1,21 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
-from typing import Iterator, Union
+from typing import Iterator, Union, List
 
 from flask import abort, flash, g, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 
 from openatlas import logger
-from openatlas.forms.date import DateForm
 from openatlas.models.date import DateMapper
+from openatlas.models.entity import Entity
 from openatlas.util.util import link, uc_first
 
 
 class Link:
 
     def __init__(self, row, domain: bool = None, range_: bool = None) -> None:
+        from openatlas.forms.date import DateForm
         from openatlas.models.entity import EntityMapper
         self.id = row.id
         self.description = row.description
@@ -118,7 +119,7 @@ class LinkMapper:
 
     @staticmethod
     def get_linked_entity(entity_param, code: str, inverse: bool = False, nodes: bool = False):
-        result = LinkMapper.get_linked_entities(entity_param, code, inverse=inverse, nodes=nodes)
+        result = LinkMapper.get_linked_entities(entity_param, [code], inverse=inverse, nodes=nodes)
         if len(result) > 1:  # pragma: no cover
             logger.log('error', 'model', 'multiple linked entities found for ' + code)
             flash(_('error multiple linked entities found'), 'error')
@@ -127,7 +128,8 @@ class LinkMapper:
             return result[0]
 
     @staticmethod
-    def get_linked_entities(entity, codes, inverse: bool = False, nodes: bool = False) -> list:
+    def get_linked_entities(entity, codes: list, inverse: bool = False,
+                            nodes: bool = False) -> list:
         from openatlas.models.entity import EntityMapper
         sql = """
             SELECT range_id AS result_id FROM model.link
@@ -137,7 +139,7 @@ class LinkMapper:
                 SELECT domain_id AS result_id FROM model.link
                 WHERE range_id = %(entity_id)s AND property_code IN %(codes)s;"""
         g.execute(sql, {'entity_id': entity if type(entity) is int else entity.id,
-                        'codes': tuple(codes if type(codes) is list else [codes])})
+                        'codes': tuple(codes)})
         ids = [element for (element,) in g.cursor.fetchall()]
         return EntityMapper.get_by_ids(ids, nodes=nodes)
 
@@ -169,8 +171,7 @@ class LinkMapper:
         return links
 
     @staticmethod
-    def delete_by_codes(entity, codes, inverse: bool = False) -> None:
-        codes = codes if type(codes) is list else [codes]
+    def delete_by_codes(entity: Entity, codes: List[str], inverse: bool = False) -> None:
         sql = """
             DELETE FROM model.link
             WHERE property_code IN %(codes)s AND {field} = %(id)s;""".format(

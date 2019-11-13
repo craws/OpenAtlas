@@ -225,7 +225,7 @@ def get_entity_data(entity, location=None):
     # Info for source
     if entity.system_type == 'source content':
         data.append((uc_first(_('information carrier')), '<br>'.join(
-            [link(recipient) for recipient in entity.get_linked_entities('P128', inverse=True)])))
+            [link(recipient) for recipient in entity.get_linked_entities(['P128'], inverse=True)])))
 
     # Info for events
     if entity.class_.code in app.config['CLASS_CODES']['event']:
@@ -241,17 +241,17 @@ def get_entity_data(entity, location=None):
         # Info for acquisitions
         if entity.class_.code == 'E8':
             data.append((uc_first(_('recipient')), '<br>'.join(
-                [link(recipient) for recipient in entity.get_linked_entities('P22')])))
+                [link(recipient) for recipient in entity.get_linked_entities(['P22'])])))
             data.append((uc_first(_('donor')), '<br>'.join(
-                [link(donor) for donor in entity.get_linked_entities('P23')])))
+                [link(donor) for donor in entity.get_linked_entities(['P23'])])))
             data.append((uc_first(_('given place')), '<br>'.join(
-                [link(place) for place in entity.get_linked_entities('P24')])))
+                [link(place) for place in entity.get_linked_entities(['P24'])])))
 
         # Info for moves
         if entity.class_.code == 'E9':
             person_data = []
             object_data = []
-            for linked_entity in entity.get_linked_entities('P25'):
+            for linked_entity in entity.get_linked_entities(['P25']):
                 if linked_entity.class_.code == 'E21':
                     person_data.append(linked_entity)
                 elif linked_entity.class_.code == 'E84':

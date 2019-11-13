@@ -1,4 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+from typing import Union
+
 import numpy
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
@@ -6,6 +8,8 @@ from wtforms import IntegerField, StringField
 from wtforms.validators import NoneOf, NumberRange, Optional
 
 from openatlas.models.date import DateMapper
+from openatlas.models.entity import Entity
+from openatlas.models.link import Link
 
 
 class DateForm(FlaskForm):
@@ -43,7 +47,7 @@ class DateForm(FlaskForm):
             return parts[1]
         return parts[2]
 
-    def populate_dates(self, item) -> None:
+    def populate_dates(self, item: Union[Entity, Link]) -> None:
         """ Populates date form fields with date values of an entity or link."""
         if item.begin_from:
             self.begin_year_from.data = DateForm.format_date(item.begin_from, 'year')

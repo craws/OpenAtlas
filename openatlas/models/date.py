@@ -1,6 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from datetime import datetime
-from typing import Optional
+from typing import Optional, Any, Dict
 
 import numpy
 from flask import g
@@ -45,13 +45,14 @@ class DateMapper:
         return string + postfix
 
     @staticmethod
-    def form_to_datetime64(year, month, day, to_date=False) -> Optional[numpy.datetime64]:
-        """ Converts form fields (year, month, day) to a numpy.datetime64"""
+    def form_to_datetime64(year: Any, month: Any, day: Any,
+                           to_date: bool = False) -> Optional[numpy.datetime64]:
+        """ Converts form fields (year, month, day) to a numpy.datetime64."""
         if not year:
             return None
         year = format(year, '03d') if year > 0 else format(year + 1, '04d')
 
-        def is_leap_year(year_):  # pragma: no cover
+        def is_leap_year(year_: int) -> bool:
             if year_ % 400 == 0:  # e.g. 2000
                 return True
 
@@ -63,13 +64,13 @@ class DateMapper:
 
             return False
 
-        def get_last_day_of_month(year_, month_):
-            months_days = {1: 31, 2: 28, 3: 31, 4: 30, 5: 31, 6: 30, 7: 31, 8: 31, 9: 30, 10: 31,
-                           11: 30, 12: 31}
-            months_days_leap = {1: 31, 2: 29, 3: 31, 4: 30, 5: 31, 6: 30, 7: 31, 8: 31, 9: 30,
-                                10: 31, 11: 30, 12: 31}
+        def get_last_day_of_month(year_: int, month_: int) -> int:
+            months_days: Dict[int, int] = {1: 31, 2: 28, 3: 31, 4: 30, 5: 31, 6: 30, 7: 31, 8: 31,
+                                           9: 30, 10: 31, 11: 30, 12: 31}
+            months_days_leap: Dict[int, int] = {1: 31, 2: 29, 3: 31, 4: 30, 5: 31, 6: 30, 7: 31,
+                                                8: 31, 9: 30, 10: 31, 11: 30, 12: 31}
             date_lookup = months_days_leap if is_leap_year(year_) else months_days
-            return date_lookup.get(month_)
+            return date_lookup[month_]
 
         if month:
             month = format(month, '02d')

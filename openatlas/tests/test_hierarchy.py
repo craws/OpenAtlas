@@ -7,7 +7,7 @@ from openatlas.test_base import TestBaseCase
 
 class HierarchyTest(TestBaseCase):
 
-    def test_hierarchy(self):
+    def test_hierarchy(self) -> None:
         with app.app_context():
             self.login()
 

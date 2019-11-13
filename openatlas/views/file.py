@@ -114,7 +114,7 @@ def file_add(id_: int, class_name: str) -> Union[str, Response]:
         if request.form['checkbox_values']:
             file.link('P67', request.form['checkbox_values'])
         return redirect(url_for('file_view', id_=file.id) + '#tab-' + class_name)
-    form = build_table_form(class_name, file.get_linked_entities('P67'))
+    form = build_table_form(class_name, file.get_linked_entities(['P67']))
     return render_template('file/add.html', entity=file, class_name=class_name, form=form)
 
 

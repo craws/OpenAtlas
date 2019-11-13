@@ -11,7 +11,8 @@ from wtforms import (BooleanField, FieldList, HiddenField, IntegerField, StringF
 from wtforms.validators import InputRequired, Optional
 
 from openatlas import app, logger
-from openatlas.forms.forms import DateForm, build_form, build_table_form
+from openatlas.forms.date import DateForm
+from openatlas.forms.forms import build_form, build_table_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.geonames import GeonamesMapper
 from openatlas.models.gis import GisMapper, InvalidGeomException
@@ -173,7 +174,7 @@ def place_view(id_: int) -> str:
         if event.id not in event_ids:  # Don't add again if already in table
             tables['event'].rows.append(get_base_table_data(event))
     has_subunits = False
-    for entity in object_.get_linked_entities('P46', nodes=True):
+    for entity in object_.get_linked_entities(['P46'], nodes=True):
         has_subunits = True
         data = get_base_table_data(entity)
         data.append(truncate_string(entity.description))
@@ -212,7 +213,7 @@ def place_view(id_: int) -> str:
 def place_delete(id_: int) -> Response:
     entity = EntityMapper.get_by_id(id_)
     parent = None if entity.system_type == 'place' else entity.get_linked_entity('P46', True)
-    if entity.get_linked_entities('P46'):
+    if entity.get_linked_entities(['P46']):
         flash(_('Deletion not possible if subunits exists'), 'error')
         return redirect(url_for('place_view', id_=id_))
     entity.delete()
@@ -231,7 +232,7 @@ def place_add_source(id_: int) -> Union[str, Response]:
         if request.form['checkbox_values']:
             object_.link('P67', request.form['checkbox_values'], inverse=True)
         return redirect(url_for('place_view', id_=id_) + '#tab-source')
-    form = build_table_form('source', object_.get_linked_entities('P67', inverse=True))
+    form = build_table_form('source', object_.get_linked_entities(['P67'], inverse=True))
     return render_template('add_source.html', entity=object_, form=form)
 
 
@@ -255,7 +256,7 @@ def place_add_file(id_: int) -> Union[str, Response]:
         if request.form['checkbox_values']:
             object_.link('P67', request.form['checkbox_values'], inverse=True)
         return redirect(url_for('place_view', id_=id_) + '#tab-file')
-    form = build_table_form('file', object_.get_linked_entities('P67', inverse=True))
+    form = build_table_form('file', object_.get_linked_entities(['P67'], inverse=True))
     return render_template('add_file.html', entity=object_, form=form)
 
 

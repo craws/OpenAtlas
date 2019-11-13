@@ -13,8 +13,6 @@ from wtforms import IntegerField
 from wtforms.validators import Email
 
 from openatlas import app
-from openatlas.forms.forms import TreeField, ValueFloatField
-from openatlas.models.content import ContentMapper
 from openatlas.models.entity import Entity
 from openatlas.util import util
 from openatlas.util.table import Table
@@ -98,6 +96,7 @@ def bookmark_toggle(self, entity_id: int) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_move_form(self, form, root_name: str) -> str:
+    from openatlas.forms.forms import TreeField
     html = ''
     for field in form:
         if type(field) is TreeField:
@@ -185,6 +184,7 @@ def display_profile_image(self, image_id: int) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_content_translation(self, text: str) -> str:
+    from openatlas.models.content import ContentMapper
     return ContentMapper.get_translation(text)
 
 
@@ -216,6 +216,7 @@ def display_logo(self, file_id: str) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_form(self, form, form_id: str = None, for_persons: bool = False) -> str:
+    from openatlas.forms.forms import ValueFloatField
     multipart = 'enctype="multipart/form-data"' if hasattr(form, 'file') else ''
     if 'update' in request.path:
         if hasattr(form, 'save') and hasattr(form.save, 'label'):

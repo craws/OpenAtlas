@@ -10,7 +10,8 @@ from wtforms import HiddenField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import DateForm, TableMultiField, build_form, get_link_type
+from openatlas.forms.date import DateForm
+from openatlas.forms.forms import TableMultiField, build_form, get_link_type
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import required_group

@@ -9,7 +9,7 @@ from openatlas.test_base import TestBaseCase
 
 class FileTest(TestBaseCase):
 
-    def test_event(self):
+    def test_event(self) -> None:
         with app.app_context():
             self.login()
 

@@ -9,7 +9,7 @@ from openatlas.test_base import TestBaseCase
 
 class InvolvementTests(TestBaseCase):
 
-    def test_involvement(self):
+    def test_involvement(self) -> None:
         with app.app_context():
             self.login()
             rv = self.app.post(url_for('event_insert', code='E8'),

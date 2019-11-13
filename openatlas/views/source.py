@@ -63,7 +63,7 @@ def source_view(id_: int) -> str:
     tables = {'text': Table(['text', 'type', 'content']),
               'file': Table(Table.HEADERS['file'] + [_('main image')]),
               'reference': Table(Table.HEADERS['reference'] + ['page'])}
-    for text in source.get_linked_entities('P73', nodes=True):
+    for text in source.get_linked_entities(['P73'], nodes=True):
         tables['text'].rows.append([link(text),
                                     next(iter(text.nodes)).name if text.nodes else '',
                                     truncate_string(text.description)])
@@ -111,7 +111,7 @@ def source_add(id_: int, class_name: str) -> Union[str, Response]:
         if request.form['checkbox_values']:
             source.link('P67', request.form['checkbox_values'])
         return redirect(url_for('source_view', id_=source.id) + '#tab-' + class_name)
-    form = build_table_form(class_name, source.get_linked_entities('P67'))
+    form = build_table_form(class_name, source.get_linked_entities(['P67']))
     return render_template('source/add.html', source=source, class_name=class_name, form=form)
 
 
@@ -135,7 +135,7 @@ def source_add_file(id_: int) -> Union[str, Response]:
         if request.form['checkbox_values']:
             source.link('P67', request.form['checkbox_values'], inverse=True)
         return redirect(url_for('source_view', id_=id_) + '#tab-file')
-    form = build_table_form('file', source.get_linked_entities('P67', inverse=True))
+    form = build_table_form('file', source.get_linked_entities(['P67'], inverse=True))
     return render_template('add_file.html', entity=source, form=form)
 
 
@@ -163,7 +163,7 @@ def source_update(id_: int) -> Union[str, Response]:
         save(form, source)
         return redirect(url_for('source_view', id_=id_))
     form.information_carrier.data = [entity.id for entity in
-                                     source.get_linked_entities('P128', inverse=True)]
+                                     source.get_linked_entities(['P128'], inverse=True)]
     return render_template('source/update.html', form=form, source=source)
 
 

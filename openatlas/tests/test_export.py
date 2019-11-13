@@ -9,7 +9,7 @@ from openatlas.test_base import TestBaseCase
 
 class ExportTest(TestBaseCase):
 
-    def test_export(self):
+    def test_export(self) -> None:
         with app.app_context():
             self.login()
 

@@ -2,7 +2,7 @@
 import ast
 import re
 import time
-from typing import Optional as Optional_Type, Iterator
+from typing import List, Optional as Optional_Type
 
 from flask import g, session
 from flask_babel import lazy_gettext as _
@@ -14,7 +14,6 @@ from wtforms.validators import Optional
 from wtforms.widgets import HiddenInput
 
 from openatlas import app
-from openatlas.forms.date import DateForm
 from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.models.node import NodeMapper
@@ -58,6 +57,7 @@ def build_form(form, form_name: str, entity=None, request_origin=None, entity2=N
 
     # Set field data if available and only if it's a GET request
     if entity and request_origin and request_origin.method == 'GET':
+        from openatlas.forms.date import DateForm
         # Important to use isinstance instead type check, because can be a sub type (e.g. ActorForm)
         if isinstance(form_instance, DateForm):
             form_instance.populate_dates(entity)
@@ -368,7 +368,7 @@ def build_move_form(form, node) -> FlaskForm:
 
     choices = []
     if root.class_.code == 'E53':
-        for entity in node.get_linked_entities('P89', True):
+        for entity in node.get_linked_entities(['P89'], True):
             place = entity.get_linked_entity('P53', True)
             if place:
                 choices.append((entity.id, place.name))
@@ -378,14 +378,14 @@ def build_move_form(form, node) -> FlaskForm:
             range_ = EntityMapper.get_by_id(row.range_id)
             choices.append((row.id, domain.name + ' - ' + range_.name))
     else:
-        for entity in node.get_linked_entities('P2', True):
+        for entity in node.get_linked_entities(['P2'], True):
             choices.append((entity.id, entity.name))
 
     form_instance.selection.choices = choices
     return form_instance
 
 
-def build_table_form(class_name: str, linked_entities: Iterator) -> str:
+def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
     """ Returns a form with a list of entities with checkboxes"""
     from openatlas.models.entity import EntityMapper
     table = Table(Table.HEADERS[class_name] + [''])

@@ -1,25 +1,26 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+from __future__ import annotations  # Needed for Python 4.0 type annotations
+
 import itertools
 from collections import OrderedDict
-from typing import Dict, Iterator, List, Optional, Set, Union
+from typing import Dict, Iterator, List, Optional, Set, Union, ValuesView
 
 from flask import g
 from flask_login import current_user
+from flask_wtf import FlaskForm
 from fuzzywuzzy import fuzz
+from psycopg2.extras import NamedTupleCursor
 from werkzeug.exceptions import abort
 
 from openatlas import app, logger
-from openatlas.forms.date import DateForm
 from openatlas.models.date import DateMapper
-from openatlas.models.link import LinkMapper
 from openatlas.util.util import print_file_extension, uc_first
 
 
 class Entity:
-    def __init__(self, row) -> None:
-        if not row:
-            logger.log('error', 'model', 'invalid id')
-            abort(418)
+    def __init__(self, row: NamedTupleCursor.Record) -> None:
+        from openatlas.forms.date import DateForm
+
         self.id = row.id
         self.nodes: Dict = {}
         if hasattr(row, 'nodes') and row.nodes:
@@ -71,29 +72,35 @@ class Entity:
         self.subs: list = []
         self.locked = False
 
-    def get_linked_entity(self, code: str, inverse: bool = False, nodes: bool = False):
+    def get_linked_entity(self, code: str, inverse: bool = False, nodes: bool = False) -> Entity:
+        from openatlas.models.link import LinkMapper
         return LinkMapper.get_linked_entity(self, code, inverse=inverse, nodes=nodes)
 
-    def get_linked_entities(self, code: str, inverse: bool = False, nodes: bool = False):
+    def get_linked_entities(self, code: list, inverse: bool = False,
+                            nodes: bool = False) -> List[Entity]:
+        from openatlas.models.link import LinkMapper
         return LinkMapper.get_linked_entities(self, code, inverse=inverse, nodes=nodes)
 
-    def link(self, code: str, range_, description: str = None, inverse: bool = False,
-             type_id: int = None) -> Union[int, None]:
+    def link(self, code: str, range_: Union[int, Entity], description: str = None,
+             inverse: bool = False, type_id: int = None) -> Union[int, None]:
+        from openatlas.models.link import LinkMapper
         return LinkMapper.insert(self, code, range_, description, inverse, type_id)
 
     def get_links(self, code: Union[str, list], inverse: bool = False) -> list:
+        from openatlas.models.link import LinkMapper
         return LinkMapper.get_links(self, code, inverse)
 
     def delete(self) -> None:
         EntityMapper.delete(self.id)
 
-    def delete_links(self, codes, inverse: bool = False) -> None:
+    def delete_links(self, codes: List[str], inverse: bool = False) -> None:
+        from openatlas.models.link import LinkMapper
         LinkMapper.delete_by_codes(self, codes, inverse)
 
     def update(self) -> None:
         EntityMapper.update(self)
 
-    def update_aliases(self, form) -> None:
+    def update_aliases(self, form: FlaskForm) -> None:
         old_aliases = self.aliases
         new_aliases = form.alias.data
         delete_ids = []
@@ -110,11 +117,11 @@ class Entity:
             elif alias.strip():
                 self.link('P131', EntityMapper.insert('E82', alias))
 
-    def save_nodes(self, form) -> None:
+    def save_nodes(self, form: FlaskForm) -> None:
         from openatlas.models.node import NodeMapper
         NodeMapper.save_entity_nodes(self, form)
 
-    def set_dates(self, form) -> None:
+    def set_dates(self, form: FlaskForm) -> None:
         self.begin_from = None
         self.begin_to = None
         self.begin_comment = None
@@ -231,7 +238,7 @@ class EntityMapper:
             'description': sanitize(entity.description, 'description')})
 
     @staticmethod
-    def get_by_system_type(system_type, nodes: bool = False, aliases: bool = False) -> list:
+    def get_by_system_type(system_type: str, nodes: bool = False, aliases: bool = False) -> list:
         sql = EntityMapper.build_sql(nodes=nodes, aliases=aliases)
         sql += ' WHERE e.system_type = %(system_type)s GROUP BY e.id;'
         g.execute(sql, {'system_type': system_type})
@@ -248,11 +255,12 @@ class EntityMapper:
         return entities
 
     @staticmethod
-    def insert(code, name, system_type: str = None, description: str = None):
+    def insert(code: str, name: str, system_type: str = None,
+               description: str = None) -> Entity:
         from openatlas.util.util import sanitize
         if not name:  # pragma: no cover
             logger.log('error', 'database', 'Insert entity without name')
-            return None
+            abort(422)
         sql = """
             INSERT INTO model.entity (name, system_type, class_code, description)
             VALUES (%(name)s, %(system_type)s, %(code)s, %(description)s)
@@ -264,14 +272,14 @@ class EntityMapper:
         return EntityMapper.get_by_id(g.cursor.fetchone()[0])
 
     @staticmethod
-    def get_by_id(entity_id: int, nodes: bool = False, aliases: bool = False, view_name: str = None,
-                  ignore_not_found: bool = False):
+    def get_by_id(entity_id: int, nodes: bool = False, aliases: bool = False,
+                  view_name: str = None) -> Entity:
         if entity_id in g.nodes:  # pragma: no cover, just in case a node is requested
             return g.nodes[entity_id]
         sql = EntityMapper.build_sql(nodes, aliases) + ' WHERE e.id = %(id)s GROUP BY e.id;'
         g.execute(sql, {'id': entity_id})
-        if g.cursor.rowcount < 1 and ignore_not_found:  # pragma: no cover
-            return None  # Could be an artifact from user logging
+        if g.cursor.rowcount < 1:  # pragma: no cover
+            abort(418)
         entity = Entity(g.cursor.fetchone())
         if view_name and view_name != entity.view_name:  # Entity was called from wrong view, abort!
             logger.log('error', 'model',
@@ -328,11 +336,12 @@ class EntityMapper:
         return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_by_name_and_system_type(name: Union[str, int], system_type: str):
+    def get_by_name_and_system_type(name: Union[str, int], system_type: str) -> Optional[Entity]:
         sql = "SELECT id FROM model.entity WHERE name = %(name)s AND system_type = %(system_type)s;"
         g.execute(sql, {'name': str(name), 'system_type': system_type})
         if g.cursor.rowcount:
             return EntityMapper.get_by_id(g.cursor.fetchone()[0])
+        return None
 
     @staticmethod
     def delete(id_: int) -> None:
@@ -340,7 +349,7 @@ class EntityMapper:
         g.execute('DELETE FROM model.entity WHERE id = %(id_)s;', {'id_': id_})
 
     @staticmethod
-    def get_similar_named(form) -> dict:
+    def get_similar_named(form: FlaskForm) -> dict:
         class_ = form.classes.data
         if class_ in ['source', 'event', 'actor']:
             entities = EntityMapper.get_by_codes(class_)
@@ -396,7 +405,7 @@ class EntityMapper:
         return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def delete_orphans(parameter) -> int:
+    def delete_orphans(parameter: str) -> int:
         from openatlas.models.node import NodeMapper
         class_codes = tuple(app.config['CODE_CLASS'].keys())
         if parameter == 'orphans':
@@ -417,9 +426,9 @@ class EntityMapper:
         return g.cursor.rowcount
 
     @staticmethod
-    def search(form):
+    def search(form: FlaskForm) -> ValuesView:
         if not form.term.data:
-            return []
+            return {}.values()
         sql = EntityMapper.build_sql() + """
             {user_clause} WHERE (LOWER(e.name) LIKE LOWER(%(term)s) {description_clause})
             AND {user_clause2} (""".format(
@@ -481,6 +490,7 @@ class EntityMapper:
 
         entities = []
         for row in g.cursor.fetchall():
+            from openatlas.models.link import LinkMapper
             entity = None
             if row.class_code == 'E82':  # If found in actor alias
                 entity = LinkMapper.get_linked_entity(row.id, 'P131', True)
@@ -526,7 +536,6 @@ class EntityMapper:
 
             if begin_check_ok and end_check_ok:
                 entities.append(entity)
-
         return {d.id: d for d in entities}.values()  # Remove duplicates before returning
 
     @staticmethod

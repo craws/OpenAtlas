@@ -371,7 +371,7 @@ def admin_log() -> str:
 
 @app.route('/admin/log/delete')
 @required_group('admin')
-def admin_log_delete():
+def admin_log_delete() -> Response:
     logger.delete_all_system_logs()
     flash(_('Logs deleted'))
     return redirect(url_for('admin_log'))

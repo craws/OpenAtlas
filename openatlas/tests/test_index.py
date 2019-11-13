@@ -7,7 +7,7 @@ from openatlas.test_base import TestBaseCase
 
 class IndexTests(TestBaseCase):
 
-    def test_index(self):
+    def test_index(self) -> None:
         with app.app_context():
             rv = self.app.get('/')
             assert b'Overview' in rv.data

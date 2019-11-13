@@ -10,8 +10,8 @@ from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import (DateForm, TableField, TableMultiField, build_form,
-                                   build_table_form)
+from openatlas.forms.date import DateForm
+from openatlas.forms.forms import TableField, TableMultiField, build_form, build_table_form
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
 from openatlas.models.link import LinkMapper
@@ -62,7 +62,7 @@ def event_index() -> str:
     return render_template('event/index.html', table=table)
 
 
-def prepare_form(form: EventForm, code: str):
+def prepare_form(form: EventForm, code: str) -> FlaskForm:
     if code != 'E8':
         del form.given_place
     if code == 'E9':
@@ -78,7 +78,7 @@ def prepare_form(form: EventForm, code: str):
 @app.route('/event/insert/<code>', methods=['POST', 'GET'])
 @app.route('/event/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def event_insert(code: str, origin_id=None) -> Union[str, Response]:
+def event_insert(code: str, origin_id: int = None) -> Union[str, Response]:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = prepare_form(build_form(EventForm, 'Event'), code)
     if origin:
@@ -128,7 +128,7 @@ def event_update(id_: int) -> Union[str, Response]:
         form.place_to.data = place_to.get_linked_entity('P53', True).id if place_to else ''
         person_data = []
         object_data = []
-        for entity in event.get_linked_entities('P25'):
+        for entity in event.get_linked_entities(['P25']):
             if entity.class_.code == 'E21':
                 person_data.append(entity.id)
             elif entity.class_.code == 'E84':
@@ -139,7 +139,7 @@ def event_update(id_: int) -> Union[str, Response]:
         place = event.get_linked_entity('P7')
         form.place.data = place.get_linked_entity('P53', True).id if place else ''
     if event.class_.code == 'E8':  # Form data for acquisition
-        form.given_place.data = [entity.id for entity in event.get_linked_entities('P24')]
+        form.given_place.data = [entity.id for entity in event.get_linked_entities(['P24'])]
     return render_template('event/update.html', form=form, event=event)
 
 
@@ -192,7 +192,7 @@ def event_view(id_: int) -> str:
             url = url_for('link_delete', id_=link_.id, origin_id=event.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
         tables[domain.view_name].rows.append(data)
-    for sub_event in event.get_linked_entities('P117', inverse=True, nodes=True):
+    for sub_event in event.get_linked_entities(['P117'], inverse=True, nodes=True):
         tables['subs'].rows.append(get_base_table_data(sub_event))
     objects = []
     for location in event.get_linked_entities(['P7', 'P26', 'P27']):
@@ -210,7 +210,7 @@ def event_add_source(id_: int) -> Union[str, Response]:
         if request.form['checkbox_values']:
             event.link('P67', request.form['checkbox_values'], inverse=True)
         return redirect(url_for('event_view', id_=id_) + '#tab-source')
-    form = build_table_form('source', event.get_linked_entities('P67', inverse=True))
+    form = build_table_form('source', event.get_linked_entities(['P67'], inverse=True))
     return render_template('add_source.html', entity=event, form=form)
 
 
@@ -234,7 +234,7 @@ def event_add_file(id_: int) -> Union[str, Response]:
         if request.form['checkbox_values']:
             event.link('P67', request.form['checkbox_values'], inverse=True)
         return redirect(url_for('event_view', id_=id_) + '#tab-file')
-    form = build_table_form('file', event.get_linked_entities('P67', inverse=True))
+    form = build_table_form('file', event.get_linked_entities(['P67'], inverse=True))
     return render_template('add_file.html', entity=event, form=form)
 
 

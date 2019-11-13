@@ -7,7 +7,7 @@ from openatlas.test_base import TestBaseCase
 
 class SourceTest(TestBaseCase):
 
-    def test_source(self):
+    def test_source(self) -> None:
         with app.app_context():
             self.login()
 

@@ -82,7 +82,10 @@ def user_activity(user_id: int = 0) -> str:
         activities = UserMapper.get_activities(100, 0, 'all')
     table = Table(['date', 'user', 'action', 'entity'])
     for row in activities:
-        entity = EntityMapper.get_by_id(row.entity_id, ignore_not_found=True)
+        try:
+            entity = EntityMapper.get_by_id(row.entity_id)
+        except Exception as e:  # pragma: no cover
+            entity = None
         user = UserMapper.get_by_id(row.user_id)
         table.rows.append([format_date(row.created),
                            link(user) if user else 'id ' + str(row.user_id),

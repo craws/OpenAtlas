@@ -7,7 +7,7 @@ from openatlas.test_base import TestBaseCase
 
 class ObjectTest(TestBaseCase):
 
-    def test_object(self):
+    def test_object(self) -> None:
         with app.app_context():
             self.login()
             with app.test_request_context():

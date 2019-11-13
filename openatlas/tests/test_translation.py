@@ -7,7 +7,7 @@ from openatlas.test_base import TestBaseCase
 
 class TranslationTest(TestBaseCase):
 
-    def test_source(self):
+    def test_source(self) -> None:
         with app.app_context():
             self.login()
             with app.test_request_context():

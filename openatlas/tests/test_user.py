@@ -7,7 +7,7 @@ from openatlas.test_base import TestBaseCase
 
 class UserTests(TestBaseCase):
 
-    def test_user(self):
+    def test_user(self) -> None:
         data = {'active': '',
                 'username': 'Ripley',
                 'email': 'ripley@nostromo.org',

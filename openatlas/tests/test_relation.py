@@ -9,7 +9,7 @@ from openatlas.test_base import TestBaseCase
 
 class RelationTests(TestBaseCase):
 
-    def test_relation(self):
+    def test_relation(self) -> None:
         with app.app_context():
             self.login()
             with app.test_request_context():

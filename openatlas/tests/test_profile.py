@@ -6,7 +6,7 @@ from openatlas.test_base import TestBaseCase
 
 class ProfileTests(TestBaseCase):
 
-    def test_profile(self):
+    def test_profile(self) -> None:
         with app.app_context():
             self.login()
 

@@ -7,7 +7,7 @@ from openatlas.test_base import TestBaseCase
 
 class ReferenceTest(TestBaseCase):
 
-    def test_reference(self):
+    def test_reference(self) -> None:
 
         with app.app_context():
             self.login()

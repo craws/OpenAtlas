@@ -8,7 +8,7 @@ from openatlas.test_base import TestBaseCase
 
 class MemberTests(TestBaseCase):
 
-    def test_member(self):
+    def test_member(self) -> None:
         with app.app_context():
             self.login()
             with app.test_request_context():

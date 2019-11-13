@@ -9,7 +9,7 @@ from openatlas.models.entity import EntityMapper
 
 class ExportTest(TestBaseCase):
 
-    def test_export(self):
+    def test_export(self) -> None:
         with app.app_context():
             self.login()
             # Projects
