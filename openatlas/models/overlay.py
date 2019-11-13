@@ -50,7 +50,7 @@ class OverlayMapper:
         g.execute(sql, {'image_id': image_id, 'place_id': place_id, 'bounding_box': bounding_box})
 
     @staticmethod
-    def get_by_object(object_) -> Union[None, dict]:
+    def get_by_object(object_) -> dict:
         ids = [object_.id]
 
         # Get overlays of parents
