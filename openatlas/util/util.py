@@ -34,7 +34,7 @@ def convert_size(size_bytes: int) -> str:
     return "%s %s" % (int(size_bytes / math.pow(1024, i)), size_name[i])
 
 
-def get_file_path(entity) -> str:
+def get_file_path(entity) -> Optional[str]:
     entity_id = entity if type(entity) is int else entity.id
     path = glob.glob(os.path.join(app.config['UPLOAD_FOLDER_PATH'], str(entity_id) + '.*'))
     return path[0] if path else None
@@ -111,7 +111,7 @@ class MLStripper(HTMLParser):
         return ''.join(self.fed)
 
 
-def sanitize(string: str, mode: Optional[str] = None) -> str:
+def sanitize(string: str, mode: str = None) -> str:
     if mode == 'node':
         # Remove all characters from a string except letters, numbers and spaces
         return re.sub(r'([^\s\w]|_)+', '', string).strip()
@@ -123,7 +123,7 @@ def sanitize(string: str, mode: Optional[str] = None) -> str:
     return re.sub('[^A-Za-z0-9]+', '', string).strip()
 
 
-def get_file_stats(path: Optional[str] = app.config['UPLOAD_FOLDER_PATH']) -> dict:
+def get_file_stats(path: str = app.config['UPLOAD_FOLDER_PATH']) -> dict:
     """ Build a dict with file ids and stats from files in given directory.
         It's much faster to do this in one call for every file."""
     file_stats = {}
@@ -336,7 +336,7 @@ def required_group(group):
     return wrapper
 
 
-def bookmark_toggle(entity_id: int, for_table: Optional[bool] = False) -> str:
+def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
     label = uc_first(_('bookmark remove') if entity_id in current_user.bookmarks else _('bookmark'))
     if for_table:
         return """<a id="bookmark{entity_id}" onclick="ajaxBookmark('{entity_id}');"
@@ -432,7 +432,7 @@ def link(entity) -> str:
     return html
 
 
-def truncate_string(string: str, length: Optional[int] = 40, span: Optional[bool] = True) -> str:
+def truncate_string(string: str, length: int = 40, span: bool = True) -> str:
     """
     Returns a truncates string with '..' at the end if it was longer than length
     Also adds a span title (for mouse over) with the original string if parameter "span" is True

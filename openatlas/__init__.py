@@ -3,7 +3,7 @@ import locale
 import os
 import sys
 import time
-from typing import Dict, Optional
+from typing import Dict
 
 import psycopg2.extras
 from flask import Flask, g, request, session
@@ -67,7 +67,7 @@ def connect():
         raise Exception(e)
 
 
-def execute(query, vars_: Optional[list] = None) -> None:
+def execute(query, vars_: list = None) -> None:
     debug_model['sql'] += 1
     return g.cursor.execute(query, vars_)
 

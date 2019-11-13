@@ -1,5 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Optional, Union
+from typing import Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -154,7 +154,7 @@ def reference_index() -> str:
 @app.route('/reference/insert/<code>', methods=['POST', 'GET'])
 @app.route('/reference/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def reference_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Response]:
+def reference_insert(code: str, origin_id: int = None) -> Union[str, Response]:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(ReferenceForm, 'External Reference' if code == 'external_reference' else code)
     if code == 'external_reference':
@@ -196,7 +196,7 @@ def reference_update(id_: int) -> Union[str, Response]:
     return render_template('reference/update.html', form=form, reference=reference)
 
 
-def save(form, reference=None, code: Optional[str] = None, origin=None) -> str:
+def save(form, reference=None, code: str = None, origin=None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
     try:

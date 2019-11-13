@@ -1,5 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Optional, Union
+from typing import Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -238,7 +238,7 @@ def event_add_file(id_: int) -> Union[str, Response]:
     return render_template('add_file.html', entity=event, form=form)
 
 
-def save(form: FlaskForm, event=None, code: Optional[str] = None, origin=None) -> str:
+def save(form: FlaskForm, event=None, code: str = None, origin=None) -> str:
     g.cursor.execute('BEGIN')
     try:
         log_action = 'insert'

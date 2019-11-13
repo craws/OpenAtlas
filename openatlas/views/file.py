@@ -2,7 +2,7 @@
 import datetime
 import math
 import os
-from typing import Optional, Union
+from typing import Union
 
 from flask import flash, g, render_template, request, send_from_directory, session, url_for
 from flask_babel import lazy_gettext as _
@@ -15,7 +15,7 @@ from wtforms.validators import InputRequired
 import openatlas
 from openatlas import app, logger
 from openatlas.forms.forms import build_form, build_table_form
-from openatlas.models.entity import Entity, EntityMapper
+from openatlas.models.entity import EntityMapper
 from openatlas.util.table import Table
 from openatlas.util.util import (convert_size, display_remove_link, format_date,
                                  get_base_table_data, get_entity_data, get_file_path,
@@ -183,7 +183,7 @@ def file_update(id_: int) -> Union[str, Response]:
 @app.route('/file/insert', methods=['GET', 'POST'])
 @app.route('/file/insert/<int:origin_id>', methods=['GET', 'POST'])
 @required_group('contributor')
-def file_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
+def file_insert(origin_id: int = None) -> Union[str, Response]:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(FileForm, 'File')
     if form.validate_on_submit():

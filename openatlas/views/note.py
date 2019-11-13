@@ -1,5 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Optional, Union
+from typing import Union
 
 from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
@@ -44,7 +44,7 @@ def note_update(entity_id: int) -> Union[str, Response]:
     return render_template('note/update.html', form=form, entity=entity)
 
 
-def save(form, entity, insert: Optional[bool] = True) -> None:
+def save(form, entity, insert: bool = True) -> None:
     g.cursor.execute('BEGIN')
     try:
         if insert:

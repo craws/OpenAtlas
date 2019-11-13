@@ -1,5 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Optional, Union
+from typing import Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -188,7 +188,7 @@ def actor_index() -> str:
 @app.route('/actor/insert/<code>', methods=['POST', 'GET'])
 @app.route('/actor/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def actor_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Response]:
+def actor_insert(code: str, origin_id: int = None) -> Union[str, Response]:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
     form = build_form(ActorForm, code_class[code])
@@ -277,7 +277,7 @@ def actor_add_file(id_: int) -> Union[str, Response]:
     return render_template('add_file.html', entity=actor, form=form)
 
 
-def save(form, actor=None, code: Optional[str] = None, origin=None) -> Union[str, Response]:
+def save(form, actor=None, code: str = None, origin=None) -> Union[str, Response]:
     g.cursor.execute('BEGIN')
     try:
         log_action = 'update'

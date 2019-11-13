@@ -20,7 +20,7 @@ from openatlas.util.util import (format_date, is_authorized, link, required_grou
 
 
 class UserForm(FlaskForm):
-    user_id = None
+    user_id: Optional[int] = None
     active = BooleanField(_('active'), default=True)
     username = StringField(_('username'), [InputRequired()], render_kw={'autofocus': True})
     group = SelectField(_('group'), choices=[])
@@ -37,7 +37,9 @@ class UserForm(FlaskForm):
 
     def validate(self) -> bool:
         valid = FlaskForm.validate(self)
-        user = UserMapper.get_by_id(self.user_id) if self.user_id else User()
+        user = User()
+        if self.user_id:
+            user = UserMapper.get_by_id(self.user_id)
         if user.username != self.username.data and UserMapper.get_by_username(self.username.data):
             self.username.errors.append(str(_('error username exists')))
             valid = False
@@ -68,7 +70,7 @@ class ActivityForm(FlaskForm):
 @app.route('/admin/user/activity', methods=['POST', 'GET'])
 @app.route('/admin/user/activity/<int:user_id>', methods=['POST', 'GET'])
 @required_group('readonly')
-def user_activity(user_id: Optional[int] = 0) -> str:
+def user_activity(user_id: int = 0) -> str:
     form = ActivityForm()
     form.user.choices = [(0, _('all'))] + UserMapper.get_users()
     if form.validate_on_submit():

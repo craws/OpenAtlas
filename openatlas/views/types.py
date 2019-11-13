@@ -1,5 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Optional, Union
+from typing import List, Union
 
 from flask import abort, flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -12,7 +12,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import build_move_form, build_node_form
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.node import NodeMapper
 from openatlas.util.table import Table
 from openatlas.util.util import (get_entity_data, link, required_group, sanitize, truncate_string,
@@ -51,7 +51,7 @@ def node_index() -> str:
 @app.route('/types/insert/<int:root_id>', methods=['GET', 'POST'])
 @app.route('/types/insert/<int:root_id>/<int:super_id>', methods=['GET', 'POST'])
 @required_group('editor')
-def node_insert(root_id: int, super_id: Optional[int] = None) -> Union[str, Response]:
+def node_insert(root_id: int, super_id: int = None) -> Union[str, Response]:
     root = g.nodes[root_id]
     form = build_node_form(NodeForm, root)
     # Check if form is valid and if it wasn't a submit of the search form
@@ -153,10 +153,10 @@ def node_move_entities(id_: int) -> Union[str, Response]:
     return render_template('types/move.html', node=node, root=root, form=form)
 
 
-def walk_tree(param: Union[int, list]) -> str:
+def walk_tree(nodes: List[Entity]) -> str:
     """ Builds JSON for jsTree"""
     text = ''
-    for id_ in param if type(param) is list else [param]:
+    for id_ in nodes:
         item = g.nodes[id_]
         count_subs = ' (' + format_number(item.count_subs) + ')' if item.count_subs else ''
         text += "{href: '" + url_for('node_view', id_=item.id) + "',"
@@ -167,7 +167,7 @@ def walk_tree(param: Union[int, list]) -> str:
         if item.subs:
             text += ",'children' : ["
             for sub in item.subs:
-                text += walk_tree(sub)
+                text += walk_tree([sub])
             text += "]"
         text += "},"
     return text
