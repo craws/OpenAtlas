@@ -1,16 +1,16 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import os
 
-from flask_login import current_user
-from typing import Union
-
 from flask import g
+from flask_wtf import FlaskForm
+from psycopg2.extras import NamedTupleCursor
 
-from openatlas.util.util import get_file_path, is_authorized
+from openatlas.models.entity import Entity
+from openatlas.util.util import get_file_path
 
 
 class Overlay:
-    def __init__(self, row) -> None:
+    def __init__(self, row: NamedTupleCursor.Record) -> None:
         self.id = row.id
         self.name = row.name if hasattr(row, 'name') else ''
         self.image_id = row.image_id
@@ -23,7 +23,7 @@ class Overlay:
 class OverlayMapper:
 
     @staticmethod
-    def insert(form, image_id: int, place_id: int, link_id: int) -> None:
+    def insert(form: FlaskForm, image_id: int, place_id: int, link_id: int) -> None:
         sql = """
             INSERT INTO web.map_overlay (image_id, place_id, link_id, bounding_box)
             VALUES (%(image_id)s, %(place_id)s, %(link_id)s, %(bounding_box)s);"""
@@ -37,7 +37,7 @@ class OverlayMapper:
                         'bounding_box': bounding_box})
 
     @staticmethod
-    def update(form, image_id: int, place_id: int) -> None:
+    def update(form: FlaskForm, image_id: int, place_id: int) -> None:
         sql = """
             UPDATE web.map_overlay SET bounding_box = %(bounding_box)s
             WHERE image_id = %(image_id)s AND place_id = %(place_id)s;"""
@@ -50,7 +50,7 @@ class OverlayMapper:
         g.execute(sql, {'image_id': image_id, 'place_id': place_id, 'bounding_box': bounding_box})
 
     @staticmethod
-    def get_by_object(object_) -> dict:
+    def get_by_object(object_: Entity) -> dict:
         ids = [object_.id]
 
         # Get overlays of parents

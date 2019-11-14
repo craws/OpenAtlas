@@ -1,5 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Optional, Union
+from typing import Union
 
 from flask import abort, flash, g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -104,7 +104,7 @@ def hierarchy_delete(id_: int) -> Response:
     return redirect(url_for('node_index'))
 
 
-def save(form, node=None, value_type=None):
+def save(form: FlaskForm, node=None, value_type=None):
     g.cursor.execute('BEGIN')
     try:
         if not node:

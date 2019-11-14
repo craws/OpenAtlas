@@ -105,7 +105,7 @@ class ImportMapper:
             if class_code == 'E18':
                 location = EntityMapper.insert('E53', 'Location of ' + row['name'],
                                                'place location')
-                entity.link('P53', location)
+                entity.link('P53', [location])
                 if 'easting' in row and is_float(row['easting']):
                     if 'northing' in row and is_float(row['northing']):
                         GisMapper.insert_import(entity=entity,

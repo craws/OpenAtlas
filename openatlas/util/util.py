@@ -23,7 +23,6 @@ from openatlas import app
 from openatlas.models.classObject import ClassObject
 from openatlas.models.date import DateMapper
 from openatlas.models.property import Property
-from openatlas.models.user import User
 
 
 def convert_size(size_bytes: int) -> str:
@@ -387,6 +386,7 @@ def link(entity) -> str:
     # Builds an html link to entity view for display
     from openatlas.models.entity import Entity
     from openatlas.models.imports import Project
+    from openatlas.models.user import User
     if not entity:
         return ''
     html = ''

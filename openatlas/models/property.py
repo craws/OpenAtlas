@@ -2,6 +2,7 @@
 from typing import Dict
 
 from flask import g, session
+from psycopg2.extras import NamedTupleCursor
 
 import openatlas
 from openatlas import app
@@ -9,7 +10,7 @@ from openatlas import app
 
 class Property:
 
-    def __init__(self, row) -> None:
+    def __init__(self, row: NamedTupleCursor.Record) -> None:
         self._comment = ''
         self._name = row.name
         self._name_inverse = row.name_inverse

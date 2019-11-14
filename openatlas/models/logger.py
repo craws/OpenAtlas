@@ -7,7 +7,6 @@ from psycopg2.extras import NamedTupleCursor
 
 from openatlas import app
 from openatlas.models.imports import ImportMapper
-from openatlas.models.user import UserMapper
 
 
 class DBHandler:
@@ -56,6 +55,7 @@ class DBHandler:
 
     @staticmethod
     def get_log_for_advanced_view(entity_id: str) -> dict:
+        from openatlas.models.user import UserMapper
         sql = """
             SELECT ul.created, ul.user_id, ul.entity_id, u.username
             FROM web.user_log ul

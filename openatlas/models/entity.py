@@ -12,7 +12,7 @@ from fuzzywuzzy import fuzz
 from psycopg2.extras import NamedTupleCursor
 from werkzeug.exceptions import abort
 
-from openatlas import app, logger
+from openatlas import app
 from openatlas.models.date import DateMapper
 from openatlas.util.util import print_file_extension, uc_first
 
@@ -32,7 +32,6 @@ class Entity:
                 self.aliases[alias['f1']] = alias['f2']  # f1 = alias id, f2 = alias name
             self.aliases = OrderedDict(sorted(self.aliases.items(), key=lambda kv: (kv[1], kv[0])))
         self.name = row.name
-        self.root: Optional[list] = None
         self.description = row.description if row.description else ''
         self.system_type = row.system_type
         self.created = row.created
@@ -69,10 +68,17 @@ class Entity:
         # Node attributes
         self.count = 0
         self.count_subs = 0
+        self.root: list = []
         self.subs: list = []
         self.locked = False
+        self.multiple = False
+        self.system = False
+        self.value_type = False
+        self.directional = False
+        self.forms: list = []
 
-    def get_linked_entity(self, code: str, inverse: bool = False, nodes: bool = False) -> Entity:
+    def get_linked_entity(self, code: str, inverse: bool = False,
+                          nodes: bool = False) -> Optional[Entity]:
         from openatlas.models.link import LinkMapper
         return LinkMapper.get_linked_entity(self.id, code, inverse=inverse, nodes=nodes)
 
@@ -81,7 +87,7 @@ class Entity:
         from openatlas.models.link import LinkMapper
         return LinkMapper.get_linked_entities(self.id, code, inverse=inverse, nodes=nodes)
 
-    def link(self, code: str, range_: Union[int, Entity], description: str = None,
+    def link(self, code: str, range_: list, description: str = None,
              inverse: bool = False, type_id: int = None) -> Union[int, None]:
         from openatlas.models.link import LinkMapper
         return LinkMapper.insert(self, code, range_, description, inverse, type_id)
@@ -113,9 +119,9 @@ class Entity:
             EntityMapper.delete(id_)
         for alias in new_aliases:  # Insert new aliases if not empty
             if alias.strip() and self.class_.code == 'E18':
-                self.link('P1', EntityMapper.insert('E41', alias))
+                self.link('P1', [EntityMapper.insert('E41', alias)])
             elif alias.strip():
-                self.link('P131', EntityMapper.insert('E82', alias))
+                self.link('P131', [EntityMapper.insert('E82', alias)])
 
     def save_nodes(self, form: FlaskForm) -> None:
         from openatlas.models.node import NodeMapper
@@ -258,6 +264,7 @@ class EntityMapper:
     def insert(code: str, name: str, system_type: str = None,
                description: str = None) -> Entity:
         from openatlas.util.util import sanitize
+        from openatlas import logger
         if not name:  # pragma: no cover
             logger.log('error', 'database', 'Insert entity without name')
             abort(422)
@@ -274,6 +281,7 @@ class EntityMapper:
     @staticmethod
     def get_by_id(entity_id: int, nodes: bool = False, aliases: bool = False,
                   view_name: str = None) -> Entity:
+        from openatlas import logger
         if entity_id in g.nodes:  # pragma: no cover, just in case a node is requested
             return g.nodes[entity_id]
         sql = EntityMapper.build_sql(nodes, aliases) + ' WHERE e.id = %(id)s GROUP BY e.id;'

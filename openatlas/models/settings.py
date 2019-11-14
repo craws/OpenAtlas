@@ -2,6 +2,7 @@
 from typing import Dict
 
 from flask import g
+from flask_wtf import FlaskForm
 
 
 class SettingsMapper:
@@ -51,7 +52,7 @@ class SettingsMapper:
         return settings
 
     @staticmethod
-    def update(form) -> None:
+    def update(form: FlaskForm) -> None:
         sql = 'UPDATE web.settings SET "value" = %(value)s WHERE "name" = %(name)s;'
         for field in SettingsMapper.fields:
             if field in form:
@@ -61,7 +62,7 @@ class SettingsMapper:
                 g.execute(sql, {'name': field, 'value': value})
 
     @staticmethod
-    def update_file_settings(form) -> None:
+    def update_file_settings(form: FlaskForm) -> None:
         sql = 'UPDATE web.settings SET "value" = %(value)s WHERE "name" = %(name)s;'
         for field in SettingsMapper.fields:
             if field.startswith('file_') or field == 'profile_image_width':
@@ -69,7 +70,7 @@ class SettingsMapper:
                 g.execute(sql, {'name': field, 'value': value})
 
     @staticmethod
-    def update_map_settings(form) -> None:
+    def update_map_settings(form: FlaskForm) -> None:
         sql = 'UPDATE web.settings SET "value" = %(value)s WHERE "name" = %(name)s;'
         for field in SettingsMapper.fields:
             if not field.startswith('map_'):

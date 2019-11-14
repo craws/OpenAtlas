@@ -1,19 +1,22 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import datetime
-import random
+import secrets
 import string
-from typing import Optional, Union
+from typing import List, Optional, Union
 
 import bcrypt
 from flask import g, session
 from flask_babel import lazy_gettext as _
 from flask_login import UserMixin, current_user
+from flask_wtf import FlaskForm
+from psycopg2.extras import NamedTupleCursor
 
 from openatlas import app
+from openatlas.models.entity import Entity
 
 
 class User(UserMixin):
-    def __init__(self, row=None, bookmarks=None) -> None:
+    def __init__(self, row: NamedTupleCursor.Record = None, bookmarks: list = None) -> None:
         self.id = None
         self.username = None
         self.email = None
@@ -70,7 +73,7 @@ class UserMapper:
         return [User(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_by_id(user_id: int, with_bookmarks: bool = False):
+    def get_by_id(user_id: int, with_bookmarks: bool = False) -> Optional[User]:
         bookmarks = None
         if with_bookmarks:
             sql = 'SELECT entity_id FROM web.user_bookmarks WHERE user_id = %(user_id)s;'
@@ -96,12 +99,13 @@ class UserMapper:
         return User(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod
-    def get_by_unsubscribe_code(code: str):
+    def get_by_unsubscribe_code(code: str) -> Optional[User]:
         g.execute(UserMapper.sql + ' WHERE u.unsubscribe_code = %(code)s;', {'code': code})
         return User(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod
-    def get_activities(limit: Union[int, str], user_id: Union[int, str], action: str):
+    def get_activities(limit: Union[int, str], user_id: Union[int, str],
+                       action: str) -> List[NamedTupleCursor.Record]:
         sql = """
             SELECT id, user_id, entity_id, created, action, 'ignore' AS ignore
             FROM web.user_log WHERE TRUE"""
@@ -113,13 +117,13 @@ class UserMapper:
         return g.cursor.fetchall()
 
     @staticmethod
-    def get_created_entities_count(user_id: int):
+    def get_created_entities_count(user_id: int) -> int:
         sql = "SELECT COUNT(*) FROM web.user_log WHERE user_id = %(user_id)s AND action = 'insert';"
         g.execute(sql, {'user_id': user_id})
         return g.cursor.fetchone()[0]
 
     @staticmethod
-    def insert(form):
+    def insert(form: FlaskForm) -> int:
         sql = """
             INSERT INTO web.user (username, real_name, info, email, active, password, group_id)
             VALUES (%(username)s, %(real_name)s, %(info)s, %(email)s, %(active)s, %(password)s,
@@ -163,7 +167,7 @@ class UserMapper:
                         'password_reset_date': user.password_reset_date})
 
     @staticmethod
-    def update_settings(user):
+    def update_settings(user: User) -> None:
         for name, value in user.settings.items():
             if name in ['newsletter', 'show_email',
                         'module_geonames', 'module_map_overlay', 'module_notes']:
@@ -175,18 +179,18 @@ class UserMapper:
             g.execute(sql, {'user_id': user.id, 'name': name, 'value': value})
 
     @staticmethod
-    def delete(user_id):
+    def delete(user_id: int) -> None:
         sql = 'DELETE FROM web."user" WHERE id = %(user_id)s;'
         g.execute(sql, {'user_id': user_id})
 
     @staticmethod
-    def get_users():
+    def get_users() -> list:
         sql = 'SELECT id, username FROM web.user ORDER BY username;'
         g.execute(sql)
         return [(row.id, row.username) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def toggle_bookmark(entity_id):
+    def toggle_bookmark(entity_id: int) -> str:
         sql = """
                 INSERT INTO web.user_bookmarks (user_id, entity_id)
                 VALUES (%(user_id)s, %(entity_id)s);"""
@@ -200,7 +204,7 @@ class UserMapper:
         return label
 
     @staticmethod
-    def get_settings(user_id):
+    def get_settings(user_id: int) -> dict:
         sql = 'SELECT "name", value FROM web.user_settings WHERE user_id = %(user_id)s;'
         g.execute(sql, {'user_id': user_id})
         settings = {row.name: row.value for row in g.cursor.fetchall()}
@@ -226,16 +230,13 @@ class UserMapper:
         return settings
 
     @staticmethod
-    def generate_password(length=None):  # pragma no cover - because only used in mail functions
+    def generate_password(length: int = None) -> str:  # pragma no cover - used only for mail
         length = length if length else session['settings']['random_password_length']
-        # with python 3.6 following can be used instead:
-        # ''.join(secrets.choice(string.ascii_uppercase + string.digits) for _ in range(length))
-        password = ''.join(random.SystemRandom().choice(
-            string.ascii_uppercase + string.digits) for _ in range(length))
-        return password
+        return ''.join(
+            secrets.choice(string.ascii_uppercase + string.digits) for _ in range(length))
 
     @staticmethod
-    def insert_note(entity, note):
+    def insert_note(entity: Entity, note: str) -> None:
         from openatlas.util.util import sanitize
         sql = """
             INSERT INTO web.user_notes (user_id, entity_id, text)
@@ -244,7 +245,7 @@ class UserMapper:
                         'text': sanitize(note, 'description')})
 
     @staticmethod
-    def update_note(entity, note):
+    def update_note(entity: Entity, note: str) -> None:
         from openatlas.util.util import sanitize
         sql = """
             UPDATE web.user_notes SET text = %(text)s
@@ -253,7 +254,7 @@ class UserMapper:
                         'text': sanitize(note, 'description')})
 
     @staticmethod
-    def get_note(entity):
+    def get_note(entity: Entity) -> Optional[str]:
         if not current_user.settings['module_notes']:  # pragma no cover
             return None
         sql = """
@@ -263,7 +264,7 @@ class UserMapper:
         return g.cursor.fetchone()[0] if g.cursor.rowcount == 1 else None
 
     @staticmethod
-    def get_notes():
+    def get_notes() -> dict:
         if not current_user.settings['module_notes']:  # pragma no cover
             return {}
         sql = "SELECT entity_id, text FROM web.user_notes WHERE user_id = %(user_id)s;"
@@ -271,6 +272,6 @@ class UserMapper:
         return {row.entity_id: row.text for row in g.cursor.fetchall()}
 
     @staticmethod
-    def delete_note(entity):
+    def delete_note(entity: Entity) -> None:
         sql = "DELETE FROM web.user_notes WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s"
         g.execute(sql, {'user_id': current_user.id, 'entity_id': entity.id})

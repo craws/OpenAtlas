@@ -54,7 +54,7 @@ class ContentTests(TestBaseCase):
                 person.begin_from = '2018-01-31'
                 person.begin_to = '2018-01-01'
                 person.update()
-                involvement = LinkMapper.get_by_id(event.link('P11', person))
+                involvement = LinkMapper.get_by_id(event.link('P11', [person]))
                 involvement.begin_from = '2017-01-31'
                 involvement.begin_to = '2017-01-01'
                 involvement.end_from = '2017-01-01'
@@ -87,8 +87,8 @@ class ContentTests(TestBaseCase):
                 app.preprocess_request()
                 event = EntityMapper.insert('E8', 'Event Horizon')
                 source = EntityMapper.insert('E33', 'Tha source')
-                source.link('P67', event)
-                source.link('P67', event)
+                source.link('P67', [event])
+                source.link('P67', [event])
                 source_node = NodeMapper.get_hierarchy_by_name('Source')
                 source.link('P2', source_node.subs[0])
                 source.link('P2', source_node.subs[1])

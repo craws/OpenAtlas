@@ -1,8 +1,11 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
+import collections
 from typing import Dict, List
 
 from flask import g
+from flask_wtf import FlaskForm
+from psycopg2.extras import NamedTupleCursor
 
 from openatlas import app
 from openatlas.models.entity import Entity, EntityMapper
@@ -49,7 +52,7 @@ class NodeMapper(EntityMapper):
         return nodes
 
     @staticmethod
-    def populate_subs(nodes: Dict) -> None:
+    def populate_subs(nodes: Dict[int, Entity]) -> None:
         g.execute("SELECT id, name, extendable FROM web.form ORDER BY name ASC;")
         forms = {}
         for row in g.cursor.fetchall():
@@ -78,7 +81,7 @@ class NodeMapper(EntityMapper):
                 node.forms = {form_id: forms[form_id] for form_id in hierarchies[node.id].form_ids}
 
     @staticmethod
-    def get_root_path(nodes: dict, node, super_id: int, root):
+    def get_root_path(nodes: dict, node: Entity, super_id: int, root: list) -> list:
         super_ = nodes[super_id]
         super_.count_subs += node.count
         if not super_.root:
@@ -94,7 +97,7 @@ class NodeMapper(EntityMapper):
         return []
 
     @staticmethod
-    def get_hierarchy_by_name(name: str):
+    def get_hierarchy_by_name(name: str) -> Entity:
         name = name.replace('_', ' ')
         for id_, node in g.nodes.items():
             if node.name == name and not node.root:
@@ -121,7 +124,7 @@ class NodeMapper(EntityMapper):
         return string
 
     @staticmethod
-    def get_nodes_for_form(form_id):
+    def get_nodes_for_form(form_id: int) -> Dict[int, Entity]:
         sql = """
             SELECT h.id FROM web.hierarchy h
             JOIN web.hierarchy_form hf ON h.id = hf.hierarchy_id
@@ -131,7 +134,7 @@ class NodeMapper(EntityMapper):
         return {row.id: g.nodes[row.id] for row in g.cursor.fetchall()}
 
     @staticmethod
-    def get_form_choices(root=None):
+    def get_form_choices(root: Entity = None) -> list:
         sql = "SELECT f.id, f.name FROM web.form f WHERE f.extendable = True ORDER BY name ASC;"
         g.execute(sql)
         forms = []
@@ -141,7 +144,7 @@ class NodeMapper(EntityMapper):
         return forms
 
     @staticmethod
-    def save_entity_nodes(entity, form):
+    def save_entity_nodes(entity: Entity, form: collections.Iterable) -> None:
         from openatlas.forms.forms import TreeField, TreeMultiField, ValueFloatField
         if hasattr(entity, 'nodes'):
             entity.delete_links(['P2', 'P89'])
@@ -162,7 +165,7 @@ class NodeMapper(EntityMapper):
                     entity.link('P2', range_)
 
     @staticmethod
-    def insert_hierarchy(node: Entity, form, value_type: bool) -> None:
+    def insert_hierarchy(node: Entity, form: FlaskForm, value_type: bool) -> None:
         sql = """
             INSERT INTO web.hierarchy (id, name, multiple, value_type)
             VALUES (%(id)s, %(name)s, %(multiple)s, %(value_type)s);"""
@@ -176,7 +179,7 @@ class NodeMapper(EntityMapper):
         NodeMapper.add_forms_to_hierarchy(node, form)
 
     @staticmethod
-    def update_hierarchy(node, form) -> None:
+    def update_hierarchy(node: Entity, form: FlaskForm) -> None:
         sql = "UPDATE web.hierarchy SET name = %(name)s, multiple = %(multiple)s WHERE id = %(id)s;"
         multiple = False
         if node.multiple or (hasattr(form, 'multiple') and form.multiple and form.multiple.data):
@@ -185,7 +188,7 @@ class NodeMapper(EntityMapper):
         NodeMapper.add_forms_to_hierarchy(node, form)
 
     @staticmethod
-    def add_forms_to_hierarchy(node, form) -> None:
+    def add_forms_to_hierarchy(node: Entity, form: FlaskForm) -> None:
         for form_id in form.forms.data:
             sql = """
                 INSERT INTO web.hierarchy_form (hierarchy_id, form_id)
@@ -193,7 +196,7 @@ class NodeMapper(EntityMapper):
             g.execute(sql, {'node_id': node.id, 'form_id': form_id})
 
     @staticmethod
-    def get_orphans():
+    def get_orphans() -> List[Entity]:
         nodes = []
         for key, node in g.nodes.items():
             if node.root and node.count < 1 and not node.subs:
@@ -201,7 +204,7 @@ class NodeMapper(EntityMapper):
         return nodes
 
     @staticmethod
-    def move_entities(old_node, new_type_id: int, checkbox_values: str) -> None:
+    def move_entities(old_node: Entity, new_type_id: int, checkbox_values: str) -> None:
         root = g.nodes[old_node.root[-1]]
         entity_ids = ast.literal_eval(checkbox_values)
         delete_ids = []
@@ -242,7 +245,7 @@ class NodeMapper(EntityMapper):
             g.execute(sql, {'old_type_id': old_node.id, 'delete_ids': tuple(delete_ids)})
 
     @staticmethod
-    def get_all_sub_ids(node, subs: list = None) -> list:
+    def get_all_sub_ids(node: Entity, subs: list = None) -> list:
         # Recursive function to return a list with all sub node ids
         subs = subs if subs else []
         subs += node.subs
@@ -251,7 +254,7 @@ class NodeMapper(EntityMapper):
         return subs
 
     @staticmethod
-    def get_form_count(root_node, form_id: int):
+    def get_form_count(root_node: Entity, form_id: int) -> NamedTupleCursor.Record:
         # Check if nodes are already linked to entities before offering to remove a node from form
         node_ids = NodeMapper.get_all_sub_ids(root_node)
         if not node_ids:  # There are no sub nodes so skipping test

@@ -13,7 +13,7 @@ from wtforms.validators import Email, InputRequired
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
-from openatlas.models.user import User, UserMapper
+from openatlas.models.user import UserMapper
 from openatlas.util.table import Table
 from openatlas.util.util import (format_date, is_authorized, link, required_group, send_mail,
                                  uc_first)
@@ -36,6 +36,7 @@ class UserForm(FlaskForm):
     continue_ = HiddenField()
 
     def validate(self) -> bool:
+        from openatlas.models.user import User
         valid = FlaskForm.validate(self)
         user = User()
         if self.user_id:
