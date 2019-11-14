@@ -3,6 +3,7 @@ from typing import Union
 
 from flask import g, request, session
 from flask_login import current_user
+from psycopg2.extras import NamedTupleCursor
 
 from openatlas import app
 from openatlas.models.imports import ImportMapper
@@ -32,7 +33,7 @@ class DBHandler:
         g.execute(sql, params)
 
     @staticmethod
-    def get_system_logs(limit: str, priority: str, user_id: str):
+    def get_system_logs(limit: str, priority: str, user_id: str) -> NamedTupleCursor.Record:
         sql = """
             SELECT id, priority, type, message, user_id, info, created FROM web.system_log
             WHERE priority <= %(priority)s"""

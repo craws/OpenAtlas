@@ -3,13 +3,14 @@ from typing import List, Optional
 
 from flask import g
 from flask_login import current_user
+from psycopg2.extras import NamedTupleCursor
 
 from openatlas.util.util import is_float
 
 
 class Project:
 
-    def __init__(self, row=None) -> None:
+    def __init__(self, row: NamedTupleCursor.Record = None) -> None:
         self.id = None
         self.name = None
         if not row:
@@ -28,7 +29,7 @@ class ImportMapper:
         FROM import.project p LEFT JOIN import.entity e ON p.id = e.project_id """
 
     @staticmethod
-    def insert_project(name: str, description: str = None):
+    def insert_project(name: str, description: str = None) -> NamedTupleCursor.Record:
         description = description.strip() if description else None
         sql = """
             INSERT INTO import.project (name, description) VALUES (%(name)s, %(description)s)

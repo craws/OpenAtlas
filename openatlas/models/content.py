@@ -3,6 +3,7 @@ from typing import Dict
 
 from flask import flash, g, session
 from flask_babel import lazy_gettext as _
+from flask_wtf import FlaskForm
 
 from openatlas import app, logger
 
@@ -29,7 +30,7 @@ class ContentMapper:
         return translations[session['settings']['default_language']]
 
     @staticmethod
-    def update_content(name: str, form) -> None:
+    def update_content(name: str, form: FlaskForm) -> None:
         g.execute('BEGIN')
         try:
             for language in app.config['LANGUAGES'].keys():

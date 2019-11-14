@@ -42,7 +42,7 @@ class InvolvementTests(TestBaseCase):
             # Update involvement
             with app.test_request_context():
                 app.preprocess_request()
-                link_id = LinkMapper.get_links(event_id, 'P22')[0].id
+                link_id = LinkMapper.get_links(event_id, ['P22'])[0].id
             rv = self.app.get(url_for('involvement_update', id_=link_id, origin_id=event_id))
             assert b'Captain' in rv.data
             rv = self.app.post(

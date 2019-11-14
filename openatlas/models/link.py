@@ -1,10 +1,11 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
-from typing import Iterator, Union, List
+from typing import Iterator, Union, List, Optional
 
 from flask import abort, flash, g, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
+from psycopg2.extras import NamedTupleCursor
 
 from openatlas import logger
 from openatlas.models.date import DateMapper
@@ -14,7 +15,8 @@ from openatlas.util.util import link, uc_first
 
 class Link:
 
-    def __init__(self, row, domain: bool = None, range_: bool = None) -> None:
+    def __init__(self, row: NamedTupleCursor.Record, domain: Entity = None,
+                 range_: Entity = None) -> None:
         from openatlas.forms.date import DateForm
         from openatlas.models.entity import EntityMapper
         self.id = row.id
@@ -67,7 +69,7 @@ class Link:
 class LinkMapper:
 
     @staticmethod
-    def insert(entity,
+    def insert(entity: Entity,
                property_code: str,
                linked_entities,
                description: str = None,
@@ -118,17 +120,19 @@ class LinkMapper:
         return result
 
     @staticmethod
-    def get_linked_entity(entity_param, code: str, inverse: bool = False, nodes: bool = False):
-        result = LinkMapper.get_linked_entities(entity_param, [code], inverse=inverse, nodes=nodes)
+    def get_linked_entity(entity_id: int, code: str, inverse: bool = False,
+                          nodes: bool = False) -> Optional[Entity]:
+        result = LinkMapper.get_linked_entities(entity_id, [code], inverse=inverse, nodes=nodes)
         if len(result) > 1:  # pragma: no cover
             logger.log('error', 'model', 'multiple linked entities found for ' + code)
             flash(_('error multiple linked entities found'), 'error')
-            return
+            return None
         if result:
             return result[0]
+        return None
 
     @staticmethod
-    def get_linked_entities(entity, codes: list, inverse: bool = False,
+    def get_linked_entities(entity_id: int, codes: list, inverse: bool = False,
                             nodes: bool = False) -> list:
         from openatlas.models.entity import EntityMapper
         sql = """
@@ -138,13 +142,12 @@ class LinkMapper:
             sql = """
                 SELECT domain_id AS result_id FROM model.link
                 WHERE range_id = %(entity_id)s AND property_code IN %(codes)s;"""
-        g.execute(sql, {'entity_id': entity if type(entity) is int else entity.id,
-                        'codes': tuple(codes)})
+        g.execute(sql, {'entity_id': entity_id, 'codes': tuple(codes)})
         ids = [element for (element,) in g.cursor.fetchall()]
         return EntityMapper.get_by_ids(ids, nodes=nodes)
 
     @staticmethod
-    def get_links(entity, codes, inverse=False) -> list:
+    def get_links(entity_id: int, codes: List[str], inverse: bool = False) -> list:
         from openatlas.models.entity import EntityMapper
         sql = """
             SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description, l.created,
@@ -157,8 +160,7 @@ class LinkMapper:
             JOIN model.entity e ON l.{second}_id = e.id AND l.property_code IN %(codes)s
             WHERE l.{first}_id = %(entity_id)s GROUP BY l.id, e.name ORDER BY e.name;""".format(
             first='range' if inverse else 'domain', second='domain' if inverse else 'range')
-        g.execute(sql, {'entity_id': entity if type(entity) is int else entity.id,
-                        'codes': tuple(codes if type(codes) is list else [codes])})
+        g.execute(sql, {'entity_id': entity_id, 'codes': tuple(codes)})
         entity_ids = set()
         result = g.cursor.fetchall()
         for row in result:
@@ -193,7 +195,7 @@ class LinkMapper:
         return Link(g.cursor.fetchone())
 
     @staticmethod
-    def get_entities_by_node(node) -> Iterator:
+    def get_entities_by_node(node: Entity) -> Iterator:
         sql = "SELECT id, domain_id, range_id from model.link WHERE type_id = %(node_id)s;"
         g.execute(sql, {'node_id': node.id})
         return g.cursor.fetchall()

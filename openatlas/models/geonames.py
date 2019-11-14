@@ -1,29 +1,32 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+from typing import Optional
 
 from flask import g
+from flask_wtf import FlaskForm
 
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import EntityMapper, Entity
+from openatlas.models.link import Link
 from openatlas.models.node import NodeMapper
 
 
 class GeonamesMapper:
 
     @staticmethod
-    def get_geonames_link(object_):
-        for link_ in object_.get_links('P67', inverse=True):
+    def get_geonames_link(object_: Entity) -> Optional[Link]:
+        for link_ in object_.get_links(['P67'], inverse=True):
             if link_.domain.system_type == 'external reference geonames':
                 return link_
-        return
+        return None
 
     @staticmethod
-    def update_geonames(form, object_) -> None:
+    def update_geonames(form: FlaskForm, object_: Entity) -> None:
         new_geonames_id = form.geonames_id.data
         geonames_link = GeonamesMapper.get_geonames_link(object_)
         geonames_entity = geonames_link.domain if geonames_link else None
 
         if not new_geonames_id:
             if geonames_entity:
-                if len(geonames_entity.get_links('P67')) > 1:  # pragma: no cover
+                if len(geonames_entity.get_links(['P67'])) > 1:  # pragma: no cover
                     geonames_link.delete()  # There are more linked so only remove this link
                 else:
                     geonames_entity.delete()  # Nothing else is linked to the reference so delete it

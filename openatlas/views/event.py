@@ -173,7 +173,7 @@ def event_view(id_: int) -> str:
             data.append(display_remove_link(unlink_url, link_.range.name))
         tables['actor'].rows.append(data)
     profile_image_id = event.get_profile_image_id()
-    for link_ in event.get_links('P67', True):
+    for link_ in event.get_links(['P67'], True):
         domain = link_.domain
         data = get_base_table_data(domain)
         if domain.view_name == 'file':

@@ -139,7 +139,7 @@ def file_view(id_: int) -> str:
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find',
                  'reference']:
         tables[name] = Table(Table.HEADERS[name] + (['page'] if name == 'reference' else []))
-    for link_ in file.get_links('P67'):
+    for link_ in file.get_links(['P67']):
         range_ = link_.range
         data = get_base_table_data(range_)
         view_name = range_.view_name
@@ -148,7 +148,7 @@ def file_view(id_: int) -> str:
             url = url_for('link_delete', id_=link_.id, origin_id=file.id)
             data.append(display_remove_link(url + '#tab-' + view_name, range_.name))
         tables[view_name].rows.append(data)
-    for link_ in file.get_links('P67', True):
+    for link_ in file.get_links(['P67'], True):
         data = get_base_table_data(link_.domain)
         data.append(link_.description)
         if is_authorized('contributor'):

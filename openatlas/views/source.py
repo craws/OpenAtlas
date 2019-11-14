@@ -72,7 +72,7 @@ def source_view(id_: int) -> str:
     tables['actor'].defs = '[{className: "dt-body-right", targets: [2,3]}]'
     tables['event'].defs = '[{className: "dt-body-right", targets: [3,4]}]'
     tables['place'].defs = '[{className: "dt-body-right", targets: [2,3]}]'
-    for link_ in source.get_links('P67'):
+    for link_ in source.get_links(['P67']):
         range_ = link_.range
         data = get_base_table_data(range_)
         if is_authorized('contributor'):

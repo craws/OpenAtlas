@@ -134,7 +134,7 @@ def place_view(id_: int) -> str:
         if is_authorized('editor'):
             tables['file'].header.append(uc_first(_('overlay')))
 
-    for link_ in object_.get_links('P67', inverse=True):
+    for link_ in object_.get_links(['P67'], inverse=True):
         domain = link_.domain
         data = get_base_table_data(domain)
         if domain.view_name == 'file':
@@ -186,7 +186,7 @@ def place_view(id_: int) -> str:
                                      actor.class_.name,
                                      actor.first,
                                      actor.last])
-    gis_data: dict = GisMapper.get_all(object_)
+    gis_data: dict = GisMapper.get_all([object_])
     if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]' \
             and gis_data['gisLineSelected'] == '[]':
         gis_data = {}
@@ -290,7 +290,7 @@ def place_update(id_: int) -> Union[str, Response]:
         for alias in object_.aliases.values():
             form.alias.append_entry(alias)
         form.alias.append_entry('')
-    gis_data = GisMapper.get_all(object_)
+    gis_data = GisMapper.get_all([object_])
     if hasattr(form, 'geonames_id') and current_user.settings['module_geonames']:
         geonames_link = GeonamesMapper.get_geonames_link(object_)
         if geonames_link:

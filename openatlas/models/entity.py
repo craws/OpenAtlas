@@ -74,21 +74,21 @@ class Entity:
 
     def get_linked_entity(self, code: str, inverse: bool = False, nodes: bool = False) -> Entity:
         from openatlas.models.link import LinkMapper
-        return LinkMapper.get_linked_entity(self, code, inverse=inverse, nodes=nodes)
+        return LinkMapper.get_linked_entity(self.id, code, inverse=inverse, nodes=nodes)
 
     def get_linked_entities(self, code: list, inverse: bool = False,
                             nodes: bool = False) -> List[Entity]:
         from openatlas.models.link import LinkMapper
-        return LinkMapper.get_linked_entities(self, code, inverse=inverse, nodes=nodes)
+        return LinkMapper.get_linked_entities(self.id, code, inverse=inverse, nodes=nodes)
 
     def link(self, code: str, range_: Union[int, Entity], description: str = None,
              inverse: bool = False, type_id: int = None) -> Union[int, None]:
         from openatlas.models.link import LinkMapper
         return LinkMapper.insert(self, code, range_, description, inverse, type_id)
 
-    def get_links(self, code: Union[str, list], inverse: bool = False) -> list:
+    def get_links(self, codes: list, inverse: bool = False) -> list:
         from openatlas.models.link import LinkMapper
-        return LinkMapper.get_links(self, code, inverse)
+        return LinkMapper.get_links(self.id, codes, inverse)
 
     def delete(self) -> None:
         EntityMapper.delete(self.id)

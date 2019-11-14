@@ -53,7 +53,7 @@ def actor_view(id_: int) -> str:
               'member_of': Table(['member of', 'function', 'first', 'last', 'description'],
                                  defs='[{className: "dt-body-right", targets: [2,3]}]')}
     profile_image_id = actor.get_profile_image_id()
-    for link_ in actor.get_links('P67', True):
+    for link_ in actor.get_links(['P67'], True):
         domain = link_.domain
         data = get_base_table_data(domain)
         if domain.view_name == 'file':
@@ -131,7 +131,7 @@ def actor_view(id_: int) -> str:
     add_type_data(actor, info)
     add_system_data(actor, info)
 
-    for link_ in actor.get_links('OA7') + actor.get_links('OA7', True):
+    for link_ in actor.get_links(['OA7']) + actor.get_links(['OA7'], True):
         if actor.id == link_.domain.id:
             type_ = link_.type.get_name_directed() if link_.type else ''
             related = link_.range
@@ -145,7 +145,7 @@ def actor_view(id_: int) -> str:
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             data.append(display_remove_link(unlink_url, related.name))
         tables['relation'].rows.append(data)
-    for link_ in actor.get_links('P107', True):
+    for link_ in actor.get_links(['P107'], True):
         data = ([link(link_.domain), link_.type.name if link_.type else '',
                  link_.first, link_.last, truncate_string(link_.description)])
         if is_authorized('contributor'):
@@ -157,7 +157,7 @@ def actor_view(id_: int) -> str:
     if actor.class_.code in app.config['CLASS_CODES']['group']:
         tables['member'] = Table(['member', 'function', 'first', 'last', 'description'],
                                  defs='[{className: "dt-body-right", targets: [2,3]}]')
-        for link_ in actor.get_links('P107'):
+        for link_ in actor.get_links(['P107']):
             data = ([link(link_.range), link_.type.name if link_.type else '',
                      link_.first, link_.last, truncate_string(link_.description)])
             if is_authorized('contributor'):

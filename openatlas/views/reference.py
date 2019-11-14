@@ -113,7 +113,7 @@ def reference_view(id_: int) -> str:
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find']:
         header_label = 'link text' if reference.system_type == 'external reference' else 'page'
         tables[name] = Table(Table.HEADERS[name] + [header_label])
-    for link_ in reference.get_links('P67', True):
+    for link_ in reference.get_links(['P67'], True):
         domain = link_.domain
         data = get_base_table_data(domain)
         if is_authorized('contributor'):

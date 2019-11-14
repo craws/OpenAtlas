@@ -1,4 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+from typing import Optional
+
 from flask import g
 
 from openatlas.util.util import truncate_string
@@ -7,7 +9,7 @@ from openatlas.util.util import truncate_string
 class Network:
 
     @staticmethod
-    def get_network_json(params):
+    def get_network_json(params: dict) -> Optional[str]:
         """ Returns JSON data for d3.js"""
         properties = [code for code, param in params['properties'].items() if param['active']]
         classes = [code for code, param in params['classes'].items() if param['active']]
