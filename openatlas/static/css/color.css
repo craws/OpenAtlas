@@ -20,26 +20,6 @@ div.tabs-container .ui-state-active a {
     color: #666666;
 }
 
-#menu div a,
-#breadcrumb a,
-#header-menu span,
-#language-menu a,
-input[type=submit],
-button,
-.date-switch,
-.value-type-switch,
-span.button,
-a.button,
-.button-bar a,
-.changelog-version,
-.inverse-heading,
-.ui-widget-header,
-.ui-widget-content .button-bar a,
-.ui-state-default a:link,
-.ui-state-default a:visited{
-    color: #ffffff;
-}
-
 a,
 .info,
 span.tooltip,
@@ -67,7 +47,6 @@ body, .ui-widget-content, .ui-dialog .ui-dialog-content {
 }
 
 #menu,
-#header-menu span,
 .overlay,
 .inverse-heading,
 .ui-widget-header,

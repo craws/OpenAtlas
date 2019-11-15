@@ -18,6 +18,7 @@
         <link rel="stylesheet" href="/static/css/images.css?v={{ config['VERSION'] }}">
         <link rel="stylesheet" href="/static/vendor/jquery/DataTables-1.10.18/DataTables-1.10.18/css/datatables.bootstrap4.min.css">
         <link rel="stylesheet" href="/static/vendor/bootstrap-4.3.1-dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="/static/vendor/fontawesome-5.8.1/css/fontawesome.min.css">
         <script src="/static/vendor/jquery/jquery-3.3.1.min.js"></script>
         <script src="/static/vendor/jquery/jquery-ui-1.12.1/jquery-ui.min.js"></script>
         <script src="/static/vendor/jquery/DataTables-1.10.18/datatables.min.js"></script>
@@ -28,6 +29,7 @@
         <script src="/static/vendor/tinymce/tinymce.min.js"></script>
         <script src="/static/vendor/bootstrap-4.3.1-dist/js/bootstrap.min.js"></script>
         <script src="/static/vendor/popper.js-1.16.0/dist/umd/popper.min.js"></script>
+        <script src="/static/vendor/fontawesome-5.8.1/js/all.min.js"></script>
         {% if gis_data %}
             {% include "map.html" %}
         {% endif %}
@@ -71,6 +73,14 @@
                 {% endwith %}
             </div>
             <div id="header-menu">
+                <div style="float: right">
+                    <span style="font-size: 30px; color: Dodgerblue;">
+                        <i class="fas fa-cog"></i>
+                    </span>
+                    <span style="font-size: 30px; color: Dodgerblue;">
+                        <i class="far fa-user"></i>
+                    </span>
+                </div>
                 <div>
                     {{ _('version')|uc_first }} {{ config['VERSION'] }} -
                     <a href="{{ url_for('index_changelog') }}">{{ _('changelog')|uc_first }}</a>
@@ -93,20 +103,20 @@
                     </div>
                     <div style="clear:both;"></div>
                 {% endif %}
-                <div id="language-menu">
-                    <img class="zoom" src="/static/images/icons/zoom-in.png" title="{{ _('zoom in') }}" onclick="resizeText(1)" alt="{{ _('zoom in') }}">
-                    <img class="zoom" src="/static/images/icons/zoom-out.png" title="{{ _('zoom out') }}" onclick="resizeText(-1)" alt="{{ _('zoom out') }}">
+                <div>
+                <div class="btn-group btn-group-toggle">
                     {% for language in config['LANGUAGES'].keys()|sort %}
                         {% if 'language' in session and session['language'] == language %}
-                            <span>{{ language|upper }}</span>
+                            <span class="btn btn-secondary active btn-sm">{{ language|upper }}</span>
                         {% else %}
-                            <a href="{{ url_for('set_locale', language=language) }}">{{ language|upper }}</a>
+                            <a class="btn btn-secondary btn-sm" href="{{ url_for('set_locale', language=language) }}">{{ language|upper }}</a>
                         {% endif %}
                     {% endfor %}
+                </div>
                     {% if current_user.is_authenticated %}
-                        <a href="/logout" style="margin-left:1em;">{{ _('logout')|uc_first }}</a>
+                        <a class="btn btn-warning btn-sm" href="/logout">{{ _('logout')|uc_first }}</a>
                     {% else %}
-                        <a href="/login" style="margin-left:1em;">{{ _('login')|uc_first }}</a>
+                        <a class="btn btn-warning btn-sm" href="/login">{{ _('login')|uc_first }}</a>
                     {% endif %}
                 </div>
             </div>
