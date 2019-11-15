@@ -1,5 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import List, Union
+from typing import List, Union, Optional
 
 from flask import abort, flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -197,7 +197,7 @@ def tree_select(name: str) -> str:
     return html
 
 
-def save(form, node=None, root=None):
+def save(form: FlaskForm, node: Entity = None, root=None) -> Optional[str]:
     g.cursor.execute('BEGIN')
     try:
         if node:
@@ -212,10 +212,10 @@ def save(form, node=None, root=None):
         new_super = g.nodes[int(new_super_id)] if new_super_id else g.nodes[root.id]
         if new_super.id == node.id:
             flash(_('error node self as super'), 'error')
-            return
+            return None
         if new_super.root and node.id in new_super.root:
             flash(_('error node sub as super'), 'error')
-            return
+            return None
         node.name = form.name.data
         if root.directional and form.name_inverse.data.strip():
             node.name += ' (' + form.name_inverse.data.strip() + ')'

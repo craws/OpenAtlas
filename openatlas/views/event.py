@@ -253,9 +253,9 @@ def save(form: FlaskForm, event=None, code: str = None, origin=None) -> str:
         event.update()
         event.save_nodes(form)
         if form.event.data:
-            event.link('P117', int(form.event.data))
+            event.link('P117', [int(form.event.data)])
         if form.place and form.place.data:
-            event.link('P7', LinkMapper.get_linked_entity(int(form.place.data), 'P53'))
+            event.link('P7', [LinkMapper.get_linked_entity(int(form.place.data), 'P53')])
         if event.class_.code == 'E8' and form.given_place.data:  # Link place for acquisition
             event.link('P24', form.given_place.data)
         if event.class_.code == 'E9':  # Move
@@ -264,9 +264,9 @@ def save(form: FlaskForm, event=None, code: str = None, origin=None) -> str:
             if form.person.data:  # Moved persons
                 event.link('P25', form.person.data)
             if form.place_from.data:  # Link place for move from
-                event.link('P27', LinkMapper.get_linked_entity(int(form.place_from.data), 'P53'))
+                event.link('P27', [LinkMapper.get_linked_entity(int(form.place_from.data), 'P53')])
             if form.place_to.data:  # Link place for move to
-                event.link('P26', LinkMapper.get_linked_entity(int(form.place_to.data), 'P53'))
+                event.link('P26', [LinkMapper.get_linked_entity(int(form.place_to.data), 'P53')])
         url = url_for('event_view', id_=event.id)
         if origin:
             url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-event'
