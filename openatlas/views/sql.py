@@ -39,8 +39,8 @@ def sql_execute() -> str:
         if not latest_file_date or file_date > latest_file_date:
             latest_file = file
             latest_file_date = file_date
-    file_data: Dict[str, any] = {'backup_to_old': True}
-    if latest_file:
+    file_data: Dict = {'backup_to_old': True}
+    if latest_file and latest_file_date:
         yesterday = datetime.today() - timedelta(days=1)
         file_data['file'] = latest_file
         file_data['backup_to_old'] = True if yesterday > latest_file_date else False
@@ -62,6 +62,6 @@ def sql_execute() -> str:
         except Exception as e:
             g.cursor.execute('ROLLBACK')
             logger.log('error', 'database', 'transaction failed', e)
-            response = e
+            response = str(e)
             flash(_('error transaction'), 'error')
     return render_template('sql/execute.html', form=form, response=response, file_data=file_data)

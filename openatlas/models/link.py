@@ -1,6 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
-from typing import Dict, Iterator, Optional, Union
+from typing import Iterator, Union
 
 from flask import abort, flash, g, url_for
 from flask_babel import lazy_gettext as _
@@ -69,9 +69,9 @@ class LinkMapper:
     def insert(entity,
                property_code: str,
                linked_entities,
-               description: Optional[str] = None,
-               inverse: Optional[bool] = False,
-               type_id: Optional[int] = None) -> Union[int, None]:
+               description: str = None,
+               inverse: bool = False,
+               type_id: int = None) -> Union[int, None]:
         from openatlas.models.entity import Entity, EntityMapper
         # Linked_entities can be an entity, an entity id or a list of them
         if not entity or not linked_entities:  # pragma: no cover
@@ -117,10 +117,7 @@ class LinkMapper:
         return result
 
     @staticmethod
-    def get_linked_entity(entity_param,
-                          code: str,
-                          inverse: Optional[bool] = False,
-                          nodes: Optional[bool] = False):
+    def get_linked_entity(entity_param, code: str, inverse: bool = False, nodes: bool = False):
         result = LinkMapper.get_linked_entities(entity_param, code, inverse=inverse, nodes=nodes)
         if len(result) > 1:  # pragma: no cover
             logger.log('error', 'model', 'multiple linked entities found for ' + code)
@@ -130,9 +127,7 @@ class LinkMapper:
             return result[0]
 
     @staticmethod
-    def get_linked_entities(entity, codes,
-                            inverse: Optional[bool] = False,
-                            nodes: Optional[bool] = False) -> list:
+    def get_linked_entities(entity, codes, inverse: bool = False, nodes: bool = False) -> list:
         from openatlas.models.entity import EntityMapper
         sql = """
             SELECT range_id AS result_id FROM model.link

@@ -1,6 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
-from typing import Dict, Optional
+from typing import Dict, List
 
 from flask import g
 
@@ -87,10 +87,11 @@ class NodeMapper(EntityMapper):
         return NodeMapper.get_root_path(nodes, node, super_.root[0], root)
 
     @staticmethod
-    def get_nodes(name: str):
+    def get_nodes(name: str) -> list:
         for id_, node in g.nodes.items():
             if node.name == name and not node.root:
                 return node.subs
+        return []
 
     @staticmethod
     def get_hierarchy_by_name(name: str):
@@ -104,9 +105,9 @@ class NodeMapper(EntityMapper):
         return NodeMapper.walk_tree(g.nodes[node_id].subs, selected_ids)
 
     @staticmethod
-    def walk_tree(param, selected_ids: list) -> str:
+    def walk_tree(nodes: List[Entity], selected_ids: list) -> str:
         string = ''
-        for id_ in param if type(param) is list else [param]:
+        for id_ in nodes:
             item = g.nodes[id_]
             selected = ",'state' : {'selected' : true}" if item.id in selected_ids else ''
             name = item.name.replace("'", "&apos;")
@@ -114,7 +115,7 @@ class NodeMapper(EntityMapper):
             if item.subs:
                 string += ",'children' : ["
                 for sub in item.subs:
-                    string += NodeMapper.walk_tree(sub, selected_ids)
+                    string += NodeMapper.walk_tree([sub], selected_ids)
                 string += "]"
             string += "},"
         return string
@@ -241,7 +242,7 @@ class NodeMapper(EntityMapper):
             g.execute(sql, {'old_type_id': old_node.id, 'delete_ids': tuple(delete_ids)})
 
     @staticmethod
-    def get_all_sub_ids(node, subs: Optional[list] = None) -> list:
+    def get_all_sub_ids(node, subs: list = None) -> list:
         # Recursive function to return a list with all sub node ids
         subs = subs if subs else []
         subs += node.subs

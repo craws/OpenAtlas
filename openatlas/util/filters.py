@@ -169,14 +169,17 @@ def description(self, entity) -> str:
 def display_profile_image(self, image_id: int) -> str:
     if not image_id:
         return ''
-    src = url_for('display_file', filename=os.path.basename(get_file_path(image_id)))
-    return """
-        <div id="profile_image_div">
-            <a href="/file/view/{id}">
-                <img style="max-width:{width}px;" alt="profile image" src="{src}">
-            </a>
-        </div>
-        """.format(id=image_id, src=src, width=session['settings']['profile_image_width'])
+    file_path = get_file_path(image_id)
+    if file_path:
+        src = url_for('display_file', filename=os.path.basename(file_path))
+        return """
+            <div id="profile_image_div">
+                <a href="/file/view/{id}">
+                    <img style="max-width:{width}px;" alt="profile image" src="{src}">
+                </a>
+            </div>
+            """.format(id=image_id, src=src, width=session['settings']['profile_image_width'])
+    return ''  # pragma no cover
 
 
 @jinja2.contextfilter
@@ -192,8 +195,7 @@ def manual_link(self, wiki_site) -> str:
     return """
         <p class="manual">
             <a class="manual" href="{url}" rel="noopener" target="_blank">
-                <img style="height:14px;" src="/static/images/icons/book.png" alt=''>
-                {label}
+                <img style="height:14px;" src="/static/images/icons/book.png" alt=''> {label}
             </a>
         </p>
         """.format(url='https://redmine.openatlas.eu/projects/uni/wiki/' + wiki_site,
@@ -213,9 +215,7 @@ def display_logo(self, file_id: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_form(self, form,
-                 form_id: Optional[str] = None,
-                 for_persons: Optional[bool] = False) -> str:
+def display_form(self, form, form_id: str = None, for_persons: bool = False) -> str:
     multipart = 'enctype="multipart/form-data"' if hasattr(form, 'file') else ''
     if 'update' in request.path:
         if hasattr(form, 'save') and hasattr(form.save, 'label'):

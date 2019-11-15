@@ -65,22 +65,23 @@ class Entity:
         if self.view_name == 'place':
             self.table_name = self.system_type.replace(' ', '-')
 
-    def get_linked_entity(self, code: str, inverse: Optional[bool] = False,
-                          nodes: Optional[bool] = False):
+        # Node attributes
+        self.count = 0
+        self.count_subs = 0
+        self.subs: list = []
+        self.locked = False
+
+    def get_linked_entity(self, code: str, inverse: bool = False, nodes: bool = False):
         return LinkMapper.get_linked_entity(self, code, inverse=inverse, nodes=nodes)
 
-    def get_linked_entities(self, code: str,
-                            inverse: Optional[bool] = False,
-                            nodes: Optional[bool] = False):
+    def get_linked_entities(self, code: str, inverse: bool = False, nodes: bool = False):
         return LinkMapper.get_linked_entities(self, code, inverse=inverse, nodes=nodes)
 
-    def link(self, code: str, range_,
-             description: Optional[str] = None,
-             inverse: Optional[bool] = False,
-             type_id: Optional[int] = None) -> Union[int, None]:
+    def link(self, code: str, range_, description: str = None, inverse: bool = False,
+             type_id: int = None) -> Union[int, None]:
         return LinkMapper.insert(self, code, range_, description, inverse, type_id)
 
-    def get_links(self, code: Union[str, list], inverse: Optional[bool] = False) -> list:
+    def get_links(self, code: Union[str, list], inverse: bool = False) -> list:
         return LinkMapper.get_links(self, code, inverse)
 
     def delete(self) -> None:
@@ -163,7 +164,7 @@ class Entity:
                 return node.name
         return ''
 
-    def get_name_directed(self, inverse: Optional[bool] = False) -> str:
+    def get_name_directed(self, inverse: bool = False) -> str:
         """ Returns name part of a directed type e.g. Actor Actor Relation: Parent of (Child of)"""
         from openatlas.util.util import sanitize
         name_parts = self.name.split(' (')
@@ -181,7 +182,7 @@ class EntityMapper:
         WHERE l1.domain_id IS NULL AND l2.range_id IS NULL AND e.class_code != 'E55'"""
 
     @staticmethod
-    def build_sql(nodes: Optional[bool] = False, aliases: Optional[bool] = False) -> str:
+    def build_sql(nodes: bool = False, aliases: bool = False) -> str:
         # Performance: only join nodes and/or aliases if requested
         sql = """
             SELECT
@@ -230,8 +231,7 @@ class EntityMapper:
             'description': sanitize(entity.description, 'description')})
 
     @staticmethod
-    def get_by_system_type(system_type, nodes: Optional[bool] = False,
-                           aliases: Optional[bool] = False) -> list:
+    def get_by_system_type(system_type, nodes: bool = False, aliases: bool = False) -> list:
         sql = EntityMapper.build_sql(nodes=nodes, aliases=aliases)
         sql += ' WHERE e.system_type = %(system_type)s GROUP BY e.id;'
         g.execute(sql, {'system_type': system_type})
@@ -248,7 +248,7 @@ class EntityMapper:
         return entities
 
     @staticmethod
-    def insert(code, name, system_type: Optional[str] = None, description: Optional[str] = None):
+    def insert(code, name, system_type: str = None, description: str = None):
         from openatlas.util.util import sanitize
         if not name:  # pragma: no cover
             logger.log('error', 'database', 'Insert entity without name')
@@ -264,19 +264,24 @@ class EntityMapper:
         return EntityMapper.get_by_id(g.cursor.fetchone()[0])
 
     @staticmethod
-    def get_by_id(entity_id: int,
-                  nodes: Optional[bool] = False,
-                  aliases: Optional[bool] = False,
-                  ignore_not_found: Optional[bool] = False):
-        # To do: add "-> Optional[Entity]" return value and solve many MyPy errors
+    def get_by_id(entity_id: int, nodes: bool = False, aliases: bool = False, view_name: str = None,
+                  ignore_not_found: bool = False):
         if entity_id in g.nodes:  # pragma: no cover, just in case a node is requested
             return g.nodes[entity_id]
         sql = EntityMapper.build_sql(nodes, aliases) + ' WHERE e.id = %(id)s GROUP BY e.id;'
         g.execute(sql, {'id': entity_id})
-        return None if g.cursor.rowcount < 1 and ignore_not_found else Entity(g.cursor.fetchone())
+        if g.cursor.rowcount < 1 and ignore_not_found:  # pragma: no cover
+            return None  # Could be an artifact from user logging
+        entity = Entity(g.cursor.fetchone())
+        if view_name and view_name != entity.view_name:  # Entity was called from wrong view, abort!
+            logger.log('error', 'model',
+                       'entity ({id}) has view name "{view}", requested was "{request}"'.format(
+                           id=entity_id, view=entity.view_name, request=view_name))
+            abort(422)
+        return entity
 
     @staticmethod
-    def get_by_ids(entity_ids: Union[Iterator, Set, List], nodes: Optional[bool] = False) -> list:
+    def get_by_ids(entity_ids: Union[Iterator, Set, List], nodes: bool = False) -> list:
         if not entity_ids:
             return []
         sql = EntityMapper.build_sql(nodes) + ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name'

@@ -75,8 +75,8 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
 @required_group('contributor')
 def involvement_update(id_: int, origin_id: int) -> Union[str, Response]:
     link_ = LinkMapper.get_by_id(id_)
-    event = EntityMapper.get_by_id(link_.domain.id)
-    actor = EntityMapper.get_by_id(link_.range.id)
+    event = EntityMapper.get_by_id(link_.domain.id, view_name='event')
+    actor = EntityMapper.get_by_id(link_.range.id, view_name='actor')
     origin = event if origin_id == event.id else actor
     form = build_form(ActorForm, 'Involvement', link_, request)
     form.save.label.text = _('save')
