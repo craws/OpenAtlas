@@ -9,6 +9,7 @@ class Changelog:
                 '1068': 'Place import with point coordinates'},
             'fix': {
                 '1071': "Filter function in jsTree doesn't clear correctly",
+                '1069': 'Overlay maps: interchanged easting and northing'
             }}],
         '3.20.1': ['2019-10-13', {
             'fix': {
