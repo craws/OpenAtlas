@@ -71,22 +71,24 @@ class LinkMapper:
     @staticmethod
     def insert(entity: Entity,
                property_code: str,
-               linked_entities: list,
+               range_: Union[Entity, list, str],
                description: str = None,
                inverse: bool = False,
                type_id: int = None) -> Union[int, None]:
         from openatlas.models.entity import Entity, EntityMapper
         # Linked_entities can be an entity, an entity id or a list of them
-        if not entity or not linked_entities:  # pragma: no cover
+        if not entity or not range_:  # pragma: no cover
             return None
         property_ = g.properties[property_code]
-        try:
-            linked_entities = ast.literal_eval(linked_entities)
+
+        if isinstance(range_, str):
+            linked_entities = ast.literal_eval(range_)
             if not linked_entities:  # pragma: no cover
                 return None
-        except (SyntaxError, ValueError):
-            pass
-        linked_entities = linked_entities if type(linked_entities) is list else [linked_entities]
+        elif isinstance(range_, list):
+            linked_entities = range_
+        else:
+            linked_entities = [range_]
         if type(linked_entities[0]) is not Entity:
             linked_entities = EntityMapper.get_by_ids(linked_entities)
         result = None

@@ -87,7 +87,7 @@ class Entity:
         from openatlas.models.link import LinkMapper
         return LinkMapper.get_linked_entities(self.id, code, inverse=inverse, nodes=nodes)
 
-    def link(self, code: str, range_: list, description: str = None,
+    def link(self, code: str, range_: Union[Entity, list], description: str = None,
              inverse: bool = False, type_id: int = None) -> Union[int, None]:
         from openatlas.models.link import LinkMapper
         return LinkMapper.insert(self, code, range_, description, inverse, type_id)
