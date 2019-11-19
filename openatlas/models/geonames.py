@@ -4,7 +4,7 @@ from typing import Optional
 from flask import g
 from flask_wtf import FlaskForm
 
-from openatlas.models.entity import EntityMapper, Entity
+from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.link import Link
 from openatlas.models.node import NodeMapper
 
@@ -63,7 +63,7 @@ class GeonamesMapper:
             return
 
         # Its linked to a different geonames reference
-        if len(geonames_entity.get_links('P67')) > 1:
+        if len(geonames_entity.get_links(['P67'])) > 1:
             geonames_link.delete()  # There are more linked so only remove this link
         else:  # pragma: no cover
             geonames_entity.delete()  # Nothing else is linked to the reference so delete it

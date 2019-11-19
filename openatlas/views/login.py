@@ -14,7 +14,7 @@ from wtforms import BooleanField, PasswordField, StringField, SubmitField
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app, logger
-from openatlas.models.user import UserMapper
+from openatlas.models.user import User, UserMapper
 from openatlas.util.util import send_mail, uc_first
 
 login_manager = LoginManager()
@@ -23,7 +23,7 @@ login_manager.login_view = 'login'
 
 
 @login_manager.user_loader
-def load_user(user_id: int):
+def load_user(user_id: int) -> User:
     return UserMapper.get_by_id(user_id, True)
 
 

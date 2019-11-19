@@ -1,6 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
-from typing import Iterator, Union, List, Optional
+from typing import Iterator, List, Optional, Union
 
 from flask import abort, flash, g, url_for
 from flask_babel import lazy_gettext as _
@@ -71,7 +71,7 @@ class LinkMapper:
     @staticmethod
     def insert(entity: Entity,
                property_code: str,
-               linked_entities,
+               linked_entities: list,
                description: str = None,
                inverse: bool = False,
                type_id: int = None) -> Union[int, None]:

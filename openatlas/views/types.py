@@ -1,5 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import List, Union, Optional
+from typing import List, Optional, Union
 
 from flask import abort, flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -197,7 +197,7 @@ def tree_select(name: str) -> str:
     return html
 
 
-def save(form: FlaskForm, node: Entity = None, root=None) -> Optional[str]:
+def save(form: FlaskForm, node: Entity = None, root: Entity = None) -> Optional[str]:
     g.cursor.execute('BEGIN')
     try:
         if node:

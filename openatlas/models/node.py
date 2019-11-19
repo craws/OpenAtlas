@@ -124,13 +124,13 @@ class NodeMapper(EntityMapper):
         return string
 
     @staticmethod
-    def get_nodes_for_form(form_id: int) -> Dict[int, Entity]:
+    def get_nodes_for_form(form_name: str) -> Dict[int, Entity]:
         sql = """
             SELECT h.id FROM web.hierarchy h
             JOIN web.hierarchy_form hf ON h.id = hf.hierarchy_id
             JOIN web.form f ON hf.form_id = f.id AND f.name = %(form_name)s
             ORDER BY h.name;"""
-        g.execute(sql, {'form_name': form_id})
+        g.execute(sql, {'form_name': form_name})
         return {row.id: g.nodes[row.id] for row in g.cursor.fetchall()}
 
     @staticmethod

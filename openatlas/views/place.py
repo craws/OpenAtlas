@@ -13,7 +13,7 @@ from wtforms.validators import InputRequired, Optional
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
 from openatlas.forms.forms import build_form, build_table_form
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.geonames import GeonamesMapper
 from openatlas.models.gis import GisMapper, InvalidGeomException
 from openatlas.models.overlay import OverlayMapper
@@ -319,7 +319,8 @@ def place_update(id_: int) -> Union[str, Response]:
                            overlays=overlays, geonames_buttons=geonames_buttons)
 
 
-def save(form: DateForm, object_=None, location=None, origin=None) -> str:
+def save(form: DateForm, object_: Entity = None, location: Entity = None,
+         origin: Entity = None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
     try:

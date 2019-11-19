@@ -11,7 +11,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import build_form
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.user import UserMapper
 from openatlas.util.util import (required_group)
 
@@ -44,7 +44,7 @@ def note_update(entity_id: int) -> Union[str, Response]:
     return render_template('note/update.html', form=form, entity=entity)
 
 
-def save(form, entity, insert: bool = True) -> None:
+def save(form: FlaskForm, entity: Entity, insert: bool = True) -> None:
     g.cursor.execute('BEGIN')
     try:
         if insert:

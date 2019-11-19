@@ -11,7 +11,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import build_form
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity, EntityMapper
 from openatlas.util.util import get_entity_data, required_group
 
 
@@ -68,7 +68,7 @@ def translation_update(id_: int) -> Union[str, Response]:
                            form=form)
 
 
-def save(form, entity=None, source=None):
+def save(form: FlaskForm, entity: Entity = None, source: Entity = None):
     g.cursor.execute('BEGIN')
     try:
         if entity:

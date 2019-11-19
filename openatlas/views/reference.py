@@ -1,5 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Union
+from typing import Any, Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -12,7 +12,7 @@ from wtforms.validators import InputRequired, URL
 import openatlas
 from openatlas import app, logger
 from openatlas.forms.forms import TableField, build_form
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.models.user import UserMapper
 from openatlas.util.table import Table
@@ -196,7 +196,7 @@ def reference_update(id_: int) -> Union[str, Response]:
     return render_template('reference/update.html', form=form, reference=reference)
 
 
-def save(form, reference=None, code: str = None, origin=None) -> str:
+def save(form: Any, reference: Entity = None, code: str = None, origin: Entity = None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
     try:

@@ -1,10 +1,12 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+from __future__ import annotations  # Needed for Python 4.0 type annotations
+
 import ast
 import re
 import time
-from typing import List, Optional as Optional_Type
+from typing import Any, List, Optional as Optional_Type
 
-from flask import g, session
+from flask import g, session, Request
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
@@ -21,7 +23,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, get_file_stats, truncate_string, uc_first
 
 
-def get_link_type(form) -> Optional_Type[Entity]:
+def get_link_type(form: Any) -> Optional_Type[Entity]:
     """ Returns the link type provided by a link form, e.g. involvement between actor and event."""
     for field in form:
         if type(field) is TreeField and field.data:
@@ -29,11 +31,12 @@ def get_link_type(form) -> Optional_Type[Entity]:
     return None
 
 
-def build_form(form, form_name: str, entity=None, request_origin=None, entity2=None):
+def build_form(form: Any, form_name: str, entity: Entity = None, request_origin: Request = None,
+               entity2: Entity = None) -> Any:
     # Add custom fields, the entity parameter can also be a link.
     custom_list = []
 
-    def add_value_type_fields(subs) -> None:
+    def add_value_type_fields(subs: list) -> None:
         for sub_id in subs:
             sub = g.nodes[sub_id]
             setattr(form, str(sub.id), ValueFloatField(sub.name, [Optional()]))
@@ -80,7 +83,7 @@ def build_form(form, form_name: str, entity=None, request_origin=None, entity2=N
     return form_instance
 
 
-def build_node_form(form, node, request_origin=None):
+def build_node_form(form: Any, node: Entity, request_origin: Request = None) -> FlaskForm:
     if not request_origin:
         root = node
         node = None
@@ -121,7 +124,7 @@ def build_node_form(form, node, request_origin=None):
 
 class TreeSelect(HiddenInput):
 
-    def __call__(self, field, **kwargs):
+    def __call__(self, field: TreeField, **kwargs: Any) -> TreeSelect:
         from openatlas.models.node import NodeMapper
         selection = ''
         selected_ids = []
@@ -181,7 +184,7 @@ class TreeField(HiddenField):
 
 class TreeMultiSelect(HiddenInput):
 
-    def __call__(self, field, **kwargs):
+    def __call__(self, field: TreeField, **kwargs: Any) -> TreeMultiSelect:
         selection = ''
         selected_ids = []
         root = g.nodes[int(field.id)]
@@ -233,7 +236,7 @@ class TreeMultiField(HiddenField):
 
 class TableSelect(HiddenInput):
 
-    def __call__(self, field, **kwargs):
+    def __call__(self, field: TableField, **kwargs: Any) -> TableSelect:
         file_stats = None
         place_fields = ['residence', 'begins_in', 'ends_in', 'place_to', 'place_from']
         class_ = 'place' if field.id in place_fields else field.id
@@ -297,7 +300,7 @@ class TableField(HiddenField):
 class TableMultiSelect(HiddenInput):
     """ Table with checkboxes used in a popup for forms."""
 
-    def __call__(self, field, **kwargs):
+    def __call__(self, field: TableField, **kwargs: Any) -> TableMultiSelect:
         if field.data and type(field.data) is str:
             field.data = ast.literal_eval(field.data)
         selection = ''
@@ -353,7 +356,7 @@ class ValueFloatField(FloatField):
     pass
 
 
-def build_move_form(form, node) -> FlaskForm:
+def build_move_form(form: Any, node: Entity) -> FlaskForm:
     root = g.nodes[node.root[-1]]
     setattr(form, str(root.id), TreeField(str(root.id)))
     form_instance = form(obj=node)

@@ -9,7 +9,7 @@ from openatlas import app
 
 class TestBaseCase(unittest.TestCase):
 
-    def setUp(self):
+    def setUp(self) -> None:
         app.testing = True
         app.config['SERVER_NAME'] = 'local.host'
         app.config['WTF_CSRF_ENABLED'] = False
@@ -17,11 +17,11 @@ class TestBaseCase(unittest.TestCase):
         self.setup_database()
         self.app = app.test_client()
 
-    def login(self):
+    def login(self) -> None:
         self.app.post('/login', data={'username': 'Alice', 'password': 'test'})
 
     @staticmethod
-    def setup_database():
+    def setup_database() -> None:
         connection = psycopg2.connect(database=app.config['DATABASE_NAME'],
                                       host=app.config['DATABASE_HOST'],
                                       user=app.config['DATABASE_USER'],

@@ -12,7 +12,7 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
 from openatlas.forms.forms import TableField, TableMultiField, build_form, build_table_form
-from openatlas.models.entity import EntityMapper, Entity
+from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.gis import GisMapper
 from openatlas.models.link import LinkMapper
 from openatlas.models.user import UserMapper
@@ -245,7 +245,7 @@ def save(form: FlaskForm, event: Entity = None, code: str = None, origin: Entity
         if event:
             log_action = 'update'
             event.delete_links(['P7', 'P24', 'P25', 'P26', 'P27', 'P117'])
-        else:
+        elif code:
             event = EntityMapper.insert(code, form.name.data)
         event.name = form.name.data
         event.description = form.description.data

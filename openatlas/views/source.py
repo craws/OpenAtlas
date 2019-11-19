@@ -11,7 +11,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import TableMultiField, build_form, build_table_form
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.user import UserMapper
 from openatlas.util.table import Table
 from openatlas.util.util import (display_remove_link, get_base_table_data,
@@ -167,7 +167,7 @@ def source_update(id_: int) -> Union[str, Response]:
     return render_template('source/update.html', form=form, source=source)
 
 
-def save(form, source=None, origin=None) -> str:
+def save(form: FlaskForm, source: Entity = None, origin: Entity = None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
     try:
