@@ -1,7 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import os
 from os.path import basename
-from typing import Union
+from typing import Union, Any
 
 from flask import flash, render_template, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
@@ -70,7 +70,7 @@ def export_sql() -> Union[str, Response]:
 
 @app.route('/download/sql/<filename>')
 @required_group('manager')
-def download_sql(filename: str):
+def download_sql(filename: str) -> Response:
     path = app.config['EXPORT_FOLDER_PATH'] + '/sql/'
     return send_from_directory(path, filename, as_attachment=True)
 
@@ -90,7 +90,7 @@ def delete_sql(filename: str) -> Response:
 
 @app.route('/download/csv/<filename>')
 @required_group('manager')
-def download_csv(filename: str):
+def download_csv(filename: str) -> Any:
     path = app.config['EXPORT_FOLDER_PATH'] + '/csv/'
     return send_from_directory(path, filename, as_attachment=True)
 

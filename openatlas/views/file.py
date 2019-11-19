@@ -2,7 +2,7 @@
 import datetime
 import math
 import os
-from typing import Union
+from typing import Union, Any
 
 from flask import flash, g, render_template, request, send_from_directory, session, url_for
 from flask_babel import lazy_gettext as _
@@ -15,7 +15,7 @@ from wtforms.validators import InputRequired
 import openatlas
 from openatlas import app, logger
 from openatlas.forms.forms import build_form, build_table_form
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import EntityMapper, Entity
 from openatlas.util.table import Table
 from openatlas.util.util import (convert_size, display_remove_link, format_date,
                                  get_base_table_data, get_entity_data, get_file_path,
@@ -51,18 +51,18 @@ def preview_file(name: str) -> bool:
 
 @app.route('/download/<path:filename>')
 @required_group('readonly')
-def download_file(filename: str):
+def download_file(filename: str) -> Any:
     return send_from_directory(app.config['UPLOAD_FOLDER_PATH'], filename, as_attachment=True)
 
 
 @app.route('/display/<path:filename>')
 @required_group('readonly')
-def display_file(filename: str):
+def display_file(filename: str) -> Any:
     return send_from_directory(app.config['UPLOAD_FOLDER_PATH'], filename)
 
 
 @app.route('/display_logo/<path:filename>')
-def display_logo(filename: str):  # File display function for public
+def display_logo(filename: str) -> Any:  # File display function for public
     return send_from_directory(app.config['UPLOAD_FOLDER_PATH'], filename)
 
 
@@ -212,7 +212,7 @@ def file_delete(id_: int) -> Response:
     return redirect(url_for('file_index'))
 
 
-def save(form: FileForm, file=None, origin=None) -> str:
+def save(form: FileForm, file: Entity = None, origin: Entity = None) -> str:
     g.cursor.execute('BEGIN')
     try:
         log_action = 'update'

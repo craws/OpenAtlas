@@ -12,7 +12,7 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
 from openatlas.forms.forms import TableField, TableMultiField, build_form, build_table_form
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import EntityMapper, Entity
 from openatlas.models.gis import GisMapper
 from openatlas.models.link import LinkMapper
 from openatlas.models.user import UserMapper
@@ -238,7 +238,7 @@ def event_add_file(id_: int) -> Union[str, Response]:
     return render_template('add_file.html', entity=event, form=form)
 
 
-def save(form: FlaskForm, event=None, code: str = None, origin=None) -> str:
+def save(form: FlaskForm, event: Entity = None, code: str = None, origin: Entity = None) -> str:
     g.cursor.execute('BEGIN')
     try:
         log_action = 'insert'
