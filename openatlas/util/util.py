@@ -328,10 +328,10 @@ def add_dates_to_form(form: Any, for_person: bool = False) -> str:
     return html
 
 
-def required_group(group: str) -> Response:
-    def wrapper(f: Any) -> Any:
+def required_group(group):  # type: ignore
+    def wrapper(f):  # type: ignore
         @wraps(f)
-        def wrapped(*args: Any, **kwargs: Any) -> Any:
+        def wrapped(*args, **kwargs):  # type: ignore
             if not current_user.is_authenticated:
                 return redirect(url_for('login', next=request.path))
             if not is_authorized(group):
