@@ -245,7 +245,7 @@ def save(form: FlaskForm, event: Entity = None, code: str = None, origin: Entity
         if event:
             log_action = 'update'
             event.delete_links(['P7', 'P24', 'P25', 'P26', 'P27', 'P117'])
-        elif code:
+        else:
             event = EntityMapper.insert(code, form.name.data)
         event.name = form.name.data
         event.description = form.description.data

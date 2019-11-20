@@ -20,7 +20,6 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from numpy import math
 from werkzeug.utils import redirect
-from werkzeug.wrappers import Response
 
 import openatlas
 from openatlas import app
@@ -30,6 +29,8 @@ from openatlas.models.property import Property
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
+    from openatlas.models.imports import Project
+    from openatlas.models.user import User
 
 
 def convert_size(size_bytes: int) -> str:
@@ -371,7 +372,7 @@ def uc_first(string: str) -> str:
 
 
 def format_date(value: Union[datetime.date, numpy.datetime64]) -> str:
-    if type(value) is numpy.datetime64:
+    if isinstance(value, numpy.datetime64):
         return DateMapper.datetime64_to_timestamp(value)
     return value.date().isoformat() if value else ''
 
@@ -391,7 +392,7 @@ def get_profile_image_table_link(file: 'Entity', entity: 'Entity', extension: st
     return ''  # pragma: no cover - only happens for non image files
 
 
-def link(entity: 'Entity') -> str:
+def link(entity: Union['Entity', ClassObject, Property, 'Project', 'User']) -> str:
     # Builds an html link to entity view for display
     from openatlas.models.entity import Entity
     from openatlas.models.imports import Project
@@ -402,17 +403,17 @@ def link(entity: 'Entity') -> str:
     if type(entity) is Project:
         url = url_for('import_project_view', id_=entity.id)
         html = '<a href="' + url + '">' + entity.name + '</a>'
-    elif type(entity) is User:
+    elif isinstance(entity, User):
         style = '' if entity.active else 'class="inactive"'
         url = url_for('user_view', id_=entity.id)
         html = '<a ' + style + ' href="' + url + '">' + entity.username + '</a>'
-    elif type(entity) is ClassObject:
+    elif isinstance(entity, ClassObject):
         url = url_for('class_view', code=entity.code)
         html = '<a href="' + url + '">' + entity.code + '</a>'
-    elif type(entity) is Property:
+    elif isinstance(entity, Property):
         url = url_for('property_view', code=entity.code)
         html = '<a href="' + url + '">' + entity.code + '</a>'
-    elif type(entity) is Entity:
+    elif isinstance(entity, Entity):
         url = ''
         if entity.class_.code == 'E33':
             if entity.system_type == 'source content':

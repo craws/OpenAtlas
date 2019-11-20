@@ -89,7 +89,8 @@ class LinkMapper:
             linked_entities = range_
         else:
             linked_entities = [range_]
-        if type(linked_entities[0]) is not Entity:
+        print(linked_entities)
+        if not isinstance(linked_entities[0], Entity):
             linked_entities = EntityMapper.get_by_ids(linked_entities)
         result = None
         for linked_entity in linked_entities:
