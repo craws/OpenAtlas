@@ -38,15 +38,31 @@ def connect():
 
 def import_cidoc():  # pragma: no cover
     start = time.time()
+    classes = []
+    properties = []
 
     graph = Graph()
-    graph.parse(FILENAME)
+    graph.parse(FILENAME, format='application/rdf+xml')
+
     for subject, predicate, object_ in graph:
-        name = subject.replace(CRM_URL, '')
-        print(name)
+        code, name = subject.replace(CRM_URL, '').split('_', 1)
+        name = name.replace('_', ' ')
+        print(predicate)
+        for name_, value in object_:
+            print(name_)
+            print(value_)
+        if name[0] == 'E':
+            classes.append(object_)
+        elif name[0] == 'P':
+            properties.append(object_)
+
         #print(subject)
         #print(predicate)
-        #print(object_)
+        # print(object_)
+
+
+
+
     #connection = connect()
     #cursor = connection.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
     #cursor.execute('BEGIN;')
