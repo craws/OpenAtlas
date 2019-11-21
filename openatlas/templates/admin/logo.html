@@ -11,6 +11,6 @@
         <p>
             <a class="button" href="{{ url_for('admin_logo', action='remove') }}">{{ _('remove logo')|uc_first }}</a>
         </p>
-        <img alt="logo" src="{{ url_for('display_file', filename=filename) }}" />
+        <img alt="logo" src="{{ url_for('display_file', filename=filename) }}">
     {% endif %}
 {% endblock %}

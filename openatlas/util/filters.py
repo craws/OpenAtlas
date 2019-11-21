@@ -20,7 +20,7 @@ from openatlas.util import util
 from openatlas.util.table import Table
 from openatlas.util.util import get_file_path, print_file_extension
 
-blueprint = flask.Blueprint('filters', __name__)
+blueprint: flask.Blueprint = flask.Blueprint('filters', __name__)
 paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 
 
@@ -75,7 +75,7 @@ def nl2br(self, value: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def data_table(self, data: Iterator) -> str:
+def display_info(self, data: Iterator) -> str:
     html = '<div class="data-table">'
     for key, value in data:
         if value or value == 0:
@@ -86,8 +86,7 @@ def data_table(self, data: Iterator) -> str:
                     <div>{key}</div>
                     <div class="table-cell">{value}</div>
                 </div>'''.format(key=util.uc_first(key), value=value)
-    html += '</div>'
-    return html
+    return html + '</div>'
 
 
 @jinja2.contextfilter
@@ -134,7 +133,7 @@ def table_select_model(self, name: str, selected=None) -> str:
     value = selected.code + ' ' + selected.name if selected else ''
     html = """
         <input id="{name}-button" value="{value}" class="table-select" type="text"
-            onfocus="this.blur()" readonly="readonly" />
+            onfocus="this.blur()" readonly="readonly">
         <div id="{name}-overlay" class="overlay">
             <div id="{name}-dialog" class="overlay-container">
                 {table}
@@ -156,7 +155,7 @@ def get_class_name(self, code: str) -> str:
 def description(self, entity) -> str:
     if not entity.description:
         return ''
-    text = entity.description.replace('\r\n', '<br />')
+    text = entity.description.replace('\r\n', '<br>')
     label = util.uc_first(_('description'))
     if hasattr(entity, 'system_type') and entity.system_type == 'source content':
         label = util.uc_first(_('content'))
@@ -170,14 +169,17 @@ def description(self, entity) -> str:
 def display_profile_image(self, image_id: int) -> str:
     if not image_id:
         return ''
-    src = url_for('display_file', filename=os.path.basename(get_file_path(image_id)))
-    return """
-        <div id="profile_image_div">
-            <a href="/file/view/{id}">
-                <img style="max-width:{width}px;" alt="profile image" src="{src}" />
-            </a>
-        </div>
-        """.format(id=image_id, src=src, width=session['settings']['profile_image_width'])
+    file_path = get_file_path(image_id)
+    if file_path:
+        src = url_for('display_file', filename=os.path.basename(file_path))
+        return """
+            <div id="profile_image_div">
+                <a href="/file/view/{id}">
+                    <img style="max-width:{width}px;" alt="profile image" src="{src}">
+                </a>
+            </div>
+            """.format(id=image_id, src=src, width=session['settings']['profile_image_width'])
+    return ''  # pragma no cover
 
 
 @jinja2.contextfilter
@@ -188,18 +190,16 @@ def display_content_translation(self, text: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def manual_link(self, wiki_site):
+def manual_link(self, wiki_site) -> str:
     # Creates a link to a manual page
-    html = """
+    return """
         <p class="manual">
             <a class="manual" href="{url}" rel="noopener" target="_blank">
-                <img style="height:14px;" src="/static/images/icons/book.png" alt='' /> 
-                {label}
+                <img style="height:14px;" src="/static/images/icons/book.png" alt=''> {label}
             </a>
         </p>
         """.format(url='https://redmine.openatlas.eu/projects/uni/wiki/' + wiki_site,
                    label=util.uc_first(_('manual')))
-    return html
 
 
 @jinja2.contextfilter
@@ -210,14 +210,12 @@ def display_logo(self, file_id: str) -> str:
         extension = print_file_extension(int(file_id))
         if extension != 'N/A':
             src = url_for('display_logo', filename=file_id + extension)
-    return '<img src="{src}" alt="Logo" />'.format(src=src)
+    return '<img src="{src}" alt="Logo">'.format(src=src)
 
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_form(self, form,
-                 form_id: Optional[str] = None,
-                 for_persons: Optional[bool] = False) -> str:
+def display_form(self, form, form_id: str = None, for_persons: bool = False) -> str:
     multipart = 'enctype="multipart/form-data"' if hasattr(form, 'file') else ''
     if 'update' in request.path:
         if hasattr(form, 'save') and hasattr(form.save, 'label'):
@@ -288,8 +286,8 @@ def display_form(self, form,
         field.label.text = util.uc_first(field.label.text)
         field.label.text += ' *' if field.flags.required and form_id != 'login-form' else ''
         if field.id == 'description':
-            html['footer'] += '<br />{label}<br />{text}<br />'.format(
-                label=field.label, text=field(class_=class_))
+            html['footer'] += '<br>{label}<br>{text}<br>'.format(label=field.label,
+                                                                 text=field(class_=class_))
             continue
         if field.type == 'SubmitField':
             html['footer'] += str(field)
@@ -349,6 +347,7 @@ def display_form(self, form,
 def test_file(self, file_name: str) -> Optional[str]:
     if os.path.isfile(app.root_path + '/' + file_name):
         return file_name
+    return None
 
 
 @jinja2.contextfilter
@@ -418,7 +417,7 @@ def display_debug_info(self, debug_model: Dict, form) -> str:
             </div>""".format(name=name, value=value)
     if form and hasattr(form, 'errors'):
         for fieldName, errorMessages in form.errors.items():
-            html += fieldName + ' - ' + errorMessages[0] + '<br />'
+            html += fieldName + ' - ' + errorMessages[0] + '<br>'
     return html
 
 
@@ -435,5 +434,5 @@ def display_external_references(self, entity) -> str:
         if link_.domain.system_type == 'external reference geonames':
             name = 'GeoNames (' + link_.domain.name + ')'
             url = app.config['GEONAMES_VIEW_URL'] + link_.domain.name
-        html += '<a target="_blank" href="{url}">{name}</a><br />'.format(url=url, name=name)
+        html += '<a target="_blank" href="{url}">{name}</a><br>'.format(url=url, name=name)
     return '<h2>' + util.uc_first(_('external references')) + '</h2>' + html if html else ''

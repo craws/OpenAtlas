@@ -1,10 +1,9 @@
 # Don't edit this file. To override settings please use instance/production.py
 import os
-from collections import OrderedDict
 
 from flask_babel import lazy_gettext as _
 
-VERSION = '3.21.0'
+VERSION = '4.0.0'
 DEMO_MODE = False  # If in demo mode some options are disabled and the login form is pre filled
 
 LANGUAGES = {'en': 'English', 'de': 'Deutsch'}
@@ -35,32 +34,26 @@ GEONAMES_USERNAME = 'openatlas'
 GEONAMES_VIEW_URL = 'http://www.geonames.org/'
 THUNDERFOREST_KEY = '7878b4fb224f4902ab42fc846e92b96a'
 
-# Table rows options
-DEFAULT_TABLE_ROWS = OrderedDict()  # type: OrderedDict
-DEFAULT_TABLE_ROWS[10] = '10'
-DEFAULT_TABLE_ROWS[25] = '25'
-DEFAULT_TABLE_ROWS[50] = '50'
-DEFAULT_TABLE_ROWS[100] = '100'
+# Table options
+DEFAULT_TABLE_ROWS = {10: '10', 25: '25', 50: '50', 100: '100'}
 
 # Minimum required characters for table filters
 MIN_CHARS_JSTREE_SEARCH = 1
 
 # Log levels
-LOG_LEVELS = OrderedDict()  # type: OrderedDict
-LOG_LEVELS[0] = 'emergency'
-LOG_LEVELS[1] = 'alert'
-LOG_LEVELS[2] = 'critical'
-LOG_LEVELS[3] = 'error'
-LOG_LEVELS[4] = 'warn'
-LOG_LEVELS[5] = 'notice'
-LOG_LEVELS[6] = 'info'
-LOG_LEVELS[7] = 'debug'
+LOG_LEVELS = {0: 'emergency',
+              1: 'alert',
+              2: 'critical',
+              3: 'error',
+              4: 'warn',
+              5: 'notice',
+              6: 'info',
+              7: 'debug'}
 
 # Feedback
-FEEDBACK_SUBJECTS = OrderedDict()  # type: OrderedDict
-FEEDBACK_SUBJECTS[_('suggestion').title()] = _('suggestion').title()
-FEEDBACK_SUBJECTS[_('question').title()] = _('question').title()
-FEEDBACK_SUBJECTS[_('problem').title()] = _('problem').title()
+FEEDBACK_SUBJECTS = {_('suggestion').title(): _('suggestion').title(),
+                     _('question').title(): _('question').title(),
+                     _('problem').title(): _('problem').title()}
 
 # Mappings between model and user interface
 CODE_CLASS = {

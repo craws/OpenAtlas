@@ -1,6 +1,7 @@
 from flask import url_for
 
 from openatlas import app
+from openatlas.models.entity import EntityMapper
 from openatlas.test_base import TestBaseCase
 
 
@@ -30,7 +31,7 @@ class IndexTests(TestBaseCase):
                 rv = self.app.post(url_for('login'), data={'username': 'inactive', 'password': '?'})
             assert b'Too many login attempts' in rv.data
 
-            # test reset password, unsubscribe
+            # Reset password, unsubscribe
             rv = self.app.get(url_for('reset_password'))
             assert b'Forgot your password?' in rv.data
             rv = self.app.get(url_for('reset_confirm', code='1234'))
@@ -46,7 +47,7 @@ class IndexTests(TestBaseCase):
             rv = self.app.get(url_for('index_feedback'))
             assert b'Thank you' in rv.data
 
-            # test redirection to overview if trying to login again
+            # Redirection to overview if trying to login again
             rv = self.app.get(url_for('login'), follow_redirects=True)
             assert b'first' in rv.data
             rv = self.app.get(url_for('set_locale', language='de'), follow_redirects=True)
@@ -56,7 +57,13 @@ class IndexTests(TestBaseCase):
             rv = self.app.get('/404')
             assert b'not found' in rv.data
 
-            # raise an id not found error
             self.login()
-            rv = self.app.get('/actor/view/666', follow_redirects=True)
-            assert b'teapot' in rv.data
+            rv = self.app.get(url_for('actor_view', id_=666), follow_redirects=True)
+            assert b'teapot' in rv.data  # Id not found error
+
+            with app.test_request_context():
+                app.preprocess_request()
+                actor = EntityMapper.insert('E21', 'Game master')
+
+            rv = self.app.get(url_for('event_view', id_=actor.id), follow_redirects=True)
+            assert b'422 - Unprocessable entity' in rv.data

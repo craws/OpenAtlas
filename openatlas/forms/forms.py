@@ -7,7 +7,7 @@ from typing import Optional as Optional_Type, Iterator
 from flask import g, session
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from flask_wtf.csrf import generate_csrf
 from wtforms import FloatField, HiddenField
 from wtforms.validators import Optional
@@ -27,11 +27,11 @@ def get_link_type(form) -> Optional_Type[Entity]:
     for field in form:
         if type(field) is TreeField and field.data:
             return g.nodes[int(field.data)]
+    return None
 
 
-def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
-    """ The entity parameter can also be a link."""
-    # Add custom fields
+def build_form(form, form_name: str, entity=None, request_origin=None, entity2=None):
+    # Add custom fields, the entity parameter can also be a link.
     custom_list = []
 
     def add_value_type_fields(subs) -> None:
@@ -66,7 +66,7 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
             nodes.update(entity2.nodes)
         if hasattr(form, 'opened'):
             form_instance.opened.data = time.time()
-        node_data = {}  # type: dict
+        node_data: dict = {}
         for node, node_value in nodes.items():
             root = g.nodes[node.root[-1]] if node.root else node
             if root.id not in node_data:
@@ -132,12 +132,12 @@ class TreeSelect(HiddenInput):
         html = """
             <input id="{name}-button" name="{name}-button" type="text"
                 class="table-select {required}" onfocus="this.blur()"
-                readonly="readonly" value="{selection}" placeholder="{change_label}" />
+                readonly="readonly" value="{selection}" placeholder="{change_label}">
             <a id="{name}-clear" {clear_style} class="button"
                 onclick="clearSelect('{name}');">{clear_label}</a>
             <div id="{name}-overlay" class="overlay">
                 <div id="{name}-dialog" class="overlay-container">
-                    <input class="tree-filter" id="{name}-tree-search" placeholder="{filter}" />
+                    <input class="tree-filter" id="{name}-tree-search" placeholder="{filter}">
                     <div id="{name}-tree"></div>
                 </div>
             </div>
@@ -156,6 +156,10 @@ class TreeSelect(HiddenInput):
                         if (this.value.length >= {min_chars}) {{
                             $("#{name}-tree").jstree("search", $(this).val());
                         }}
+                        else if (this.value.length == 0) {{
+                            $("#{name}-tree").jstree("search", $(this).val());
+                            $("#{name}-tree").jstree(true).show_all();
+                        }}                        
                     }});
                 }});
             </script>""".format(filter=uc_first(_('type to search')),
@@ -186,13 +190,13 @@ class TreeMultiSelect(HiddenInput):
             field.data = ast.literal_eval(field.data) if type(field.data) is str else field.data
             for entity_id in field.data:
                 selected_ids.append(entity_id)
-                selection += g.nodes[entity_id].name + '<br />'
+                selection += g.nodes[entity_id].name + '<br>'
         html = """
             <span id="{name}-button" class="button">{change_label}</span>
             <div id="{name}-selection" style="text-align:left;">{selection}</div>
             <div id="{name}-overlay" class="overlay">
                <div id="{name}-dialog" class="overlay-container">
-                   <input class="tree-filter" id="{name}-tree-search" placeholder="{filter}" />
+                   <input class="tree-filter" id="{name}-tree-search" placeholder="{filter}">
                    <div id="{name}-tree"></div>
                </div>
             </div>
@@ -207,6 +211,10 @@ class TreeMultiSelect(HiddenInput):
                 $("#{name}-tree-search").keyup(function(){{
                     if (this.value.length >= {min_chars}) {{
                         $("#{name}-tree").jstree("search", $(this).val());
+                    }}
+                    else if (this.value.length == 0) {{
+                        $("#{name}-tree").jstree("search", $(this).val());
+                        $("#{name}-tree").jstree(true).show_all();
                     }}
                 }});
             </script>""".format(filter=uc_first(_('type to search')),
@@ -259,7 +267,7 @@ class TableSelect(HiddenInput):
                         """.format(name=field.id,
                                    entity_id=entity.id,
                                    entity_name=truncate_string(entity.name, span=False))
-            data[0] = '<br />'.join([data[0]] + [
+            data[0] = '<br>'.join([data[0]] + [
                 truncate_string(alias) for id_, alias in entity.aliases.items()])
             table.rows.append(data)
         html = """
@@ -323,7 +331,7 @@ class TableMultiSelect(HiddenInput):
                 checked='checked = "checked"' if field.data and entity.id in field.data else ''))
             table.rows.append(data)
         html = """
-            <span id="{name}-button" class="button">{change_label}</span><br />
+            <span id="{name}-button" class="button">{change_label}</span><br>
             <div id="{name}-selection" class="selection" style="text-align:left;">{selection}</div>
             <div id="{name}-overlay" class="overlay">
             <div id="{name}-dialog" class="overlay-container">{table}</div></div>
@@ -345,7 +353,7 @@ class ValueFloatField(FloatField):
     pass
 
 
-def build_move_form(form, node) -> Form:
+def build_move_form(form, node) -> FlaskForm:
     root = g.nodes[node.root[-1]]
     setattr(form, str(root.id), TreeField(str(root.id)))
     form_instance = form(obj=node)

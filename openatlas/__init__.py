@@ -3,32 +3,32 @@ import locale
 import os
 import sys
 import time
-from collections import OrderedDict
-from typing import Dict, Optional
+from typing import Dict
 
 import psycopg2.extras
 from flask import Flask, g, request, session
 from flask_babel import Babel, lazy_gettext as _
-from flask_wtf import Form
-from flask_wtf.csrf import CsrfProtect
+from flask_wtf import FlaskForm
+from flask_wtf.csrf import CSRFProtect
 from wtforms import StringField, SubmitField
 
-app = Flask(__name__, instance_relative_config=True)  # type: Flask
-csrf = CsrfProtect(app)  # Make sure all forms are CSRF protected
+app: Flask = Flask(__name__, instance_relative_config=True)
+csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 
-# Use the test database if running tests
 instance_name = 'production' if 'test_runner.py' not in sys.argv[0] else 'testing'
-app.config.from_object('config.default')  # Load config/INSTANCE_NAME.py
-app.config.from_pyfile(instance_name + '.py')  # Load instance/INSTANCE_NAME.py
+
+# Load config/default.py and instance/INSTANCE_NAME.py
+app.config.from_object('config.default')  # type: ignore
+app.config.from_pyfile(instance_name + '.py')  # type: ignore
 
 if os.name == "posix":  # For other operating systems e.g. Windows, we would need adaptions here
     locale.setlocale(locale.LC_ALL, 'en_US.utf-8')  # pragma: no cover
 
 babel = Babel(app)
-debug_model = OrderedDict()  # type: OrderedDict
+debug_model: Dict = {}
 
 
-class GlobalSearchForm(Form):
+class GlobalSearchForm(FlaskForm):
     term = StringField('', render_kw={"placeholder": _('search term')})
     search = SubmitField(_('search'))
 
@@ -67,7 +67,7 @@ def connect():
         raise Exception(e)
 
 
-def execute(query, vars_: Optional[list] = None) -> None:
+def execute(query, vars_: list = None) -> None:
     debug_model['sql'] += 1
     return g.cursor.execute(query, vars_)
 

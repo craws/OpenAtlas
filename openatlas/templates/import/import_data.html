@@ -23,10 +23,10 @@
     </p>
     {{ form|display_form|safe }}
     {% for item in messages['error'] %}
-        <span class="error">{{ _('error')|uc_first }} - {{ item }}</span><br />
+        <span class="error">{{ _('error')|uc_first }} - {{ item }}</span><br>
     {% endfor %}
     {% for item in messages['warn'] %}
-        <span class="error">{{ _('warning')|uc_first }} - {{ item }}</span><br />
+        <span class="error">{{ _('warning')|uc_first }} - {{ item }}</span><br>
     {% endfor %}
     {% if table %}
         <h2>

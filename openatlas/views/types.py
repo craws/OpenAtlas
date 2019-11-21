@@ -1,25 +1,25 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from collections import OrderedDict
-from typing import Optional, Union
+from typing import List, Union
 
 from flask import abort, flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import (HiddenField, SelectMultipleField, StringField, SubmitField, TextAreaField,
                      widgets)
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import build_move_form, build_node_form
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.node import NodeMapper
 from openatlas.util.table import Table
 from openatlas.util.util import (get_entity_data, link, required_group, sanitize, truncate_string,
                                  uc_first)
 
 
-class NodeForm(Form):
+class NodeForm(FlaskForm):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     name_inverse = StringField(_('inverse'))
     is_node_form = HiddenField()
@@ -33,8 +33,7 @@ class NodeForm(Form):
 @app.route('/types')
 @required_group('readonly')
 def node_index() -> str:
-    nodes = {'system': OrderedDict(), 'custom': OrderedDict(),
-             'places': OrderedDict(), 'value': OrderedDict()}  # type: dict
+    nodes: dict = {'system': {}, 'custom': {}, 'places': {}, 'value': {}}
     for id_, node in g.nodes.items():
         if node.root:
             continue
@@ -52,7 +51,7 @@ def node_index() -> str:
 @app.route('/types/insert/<int:root_id>', methods=['GET', 'POST'])
 @app.route('/types/insert/<int:root_id>/<int:super_id>', methods=['GET', 'POST'])
 @required_group('editor')
-def node_insert(root_id: int, super_id: Optional[bool] = None):
+def node_insert(root_id: int, super_id: int = None) -> Union[str, Response]:
     root = g.nodes[root_id]
     form = build_node_form(NodeForm, root)
     # Check if form is valid and if it wasn't a submit of the search form
@@ -68,7 +67,7 @@ def node_insert(root_id: int, super_id: Optional[bool] = None):
 
 @app.route('/types/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
-def node_update(id_: int) -> str:
+def node_update(id_: int) -> Union[str, Response]:
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]] if node.root else None
     if node.system or (root and root.locked):
@@ -91,7 +90,7 @@ def node_view(id_: int) -> str:
     header = [_('name'), _('class'), _('info')]
     if root and root.value_type:  # pragma: no cover
         header = [_('name'), _('value'), _('class'), _('info')]
-    tables = {'info': get_entity_data(node), 'entities': Table(header)}
+    tables = {'entities': Table(header)}
     for entity in node.get_linked_entities(['P2', 'P89'], inverse=True, nodes=True):
         # If it is a place location get the corresponding object
         entity = entity if node.class_.code == 'E55' else entity.get_linked_entity('P53', True)
@@ -110,22 +109,23 @@ def node_view(id_: int) -> str:
     for sub_id in node.subs:
         sub = g.nodes[sub_id]
         tables['subs'].rows.append([link(sub), sub.count, truncate_string(sub.description)])
-    return render_template('types/view.html', node=node, super_=super_, tables=tables, root=root)
+    return render_template('types/view.html', node=node, super_=super_, tables=tables, root=root,
+                           info=get_entity_data(node))
 
 
 @app.route('/types/delete/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
-def node_delete(id_: int) -> str:
+def node_delete(id_: int) -> Response:
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]] if node.root else None
     if node.system or node.subs or node.count or (root and root.locked):
         abort(403)
-    EntityMapper.delete(node.id)
+    node.delete()
     flash(_('entity deleted'), 'info')
     return redirect(url_for('node_view', id_=root.id) if root else url_for('node_index'))
 
 
-class MoveForm(Form):
+class MoveForm(FlaskForm):
     is_node_form = HiddenField()
     checkbox_values = HiddenField()
     selection = SelectMultipleField('', [InputRequired()], coerce=int,
@@ -136,7 +136,7 @@ class MoveForm(Form):
 
 @app.route('/types/move/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
-def node_move_entities(id_: int) -> str:
+def node_move_entities(id_: int) -> Union[str, Response]:
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]]
     if root.value_type:  # pragma: no cover
@@ -153,10 +153,10 @@ def node_move_entities(id_: int) -> str:
     return render_template('types/move.html', node=node, root=root, form=form)
 
 
-def walk_tree(param: Union[int, list]) -> str:
+def walk_tree(nodes: List[Entity]) -> str:
     """ Builds JSON for jsTree"""
     text = ''
-    for id_ in param if type(param) is list else [param]:
+    for id_ in nodes:
         item = g.nodes[id_]
         count_subs = ' (' + format_number(item.count_subs) + ')' if item.count_subs else ''
         text += "{href: '" + url_for('node_view', id_=item.id) + "',"
@@ -167,7 +167,7 @@ def walk_tree(param: Union[int, list]) -> str:
         if item.subs:
             text += ",'children' : ["
             for sub in item.subs:
-                text += walk_tree(sub)
+                text += walk_tree([sub])
             text += "]"
         text += "},"
     return text

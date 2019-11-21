@@ -7,8 +7,8 @@
     <form id="newsletter-form" name="newsletter_form" method="post">
         {{ form.csrf_token }}
         <div style="float:left;">
-            {{ form.subject(class_="required") }}<br /><br />
-            {{ form.body(class_="required") }}<br />
+            {{ form.subject(class_="required") }}<br><br>
+            {{ form.body(class_="required") }}<br>
             {{ form.send }}
         </div>
         <div style="float:left;margin-left:1em;">

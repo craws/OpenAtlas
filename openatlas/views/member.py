@@ -1,9 +1,11 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
+from typing import Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import HiddenField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
@@ -38,7 +40,7 @@ class MemberForm(DateForm):
 
 @app.route('/membership/insert/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def membership_insert(origin_id: int) -> str:
+def membership_insert(origin_id: int) -> Union[str, Response]:
     origin = EntityMapper.get_by_id(origin_id)
     form = build_form(MemberForm, 'Member')
     del form.actor
@@ -65,7 +67,7 @@ def membership_insert(origin_id: int) -> str:
 
 @app.route('/member/insert/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def member_insert(origin_id: int) -> str:
+def member_insert(origin_id: int) -> Union[str, Response]:
     origin = EntityMapper.get_by_id(origin_id)
     form = build_form(MemberForm, 'Member')
     del form.group
@@ -93,7 +95,7 @@ def member_insert(origin_id: int) -> str:
 
 @app.route('/member/update/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def member_update(id_: int, origin_id: int) -> str:
+def member_update(id_: int, origin_id: int) -> Union[str, Response]:
     link_ = LinkMapper.get_by_id(id_)
     domain = EntityMapper.get_by_id(link_.domain.id)
     range_ = EntityMapper.get_by_id(link_.range.id)

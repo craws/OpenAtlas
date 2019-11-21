@@ -2,7 +2,6 @@
 from flask import json, session
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
-from typing import Optional
 
 
 class Table:
@@ -21,18 +20,18 @@ class Table:
                'stratigraphic-unit': ['name', 'type', 'begin', 'end']}
 
     def __init__(self,
-                 header: Optional[list] = None,  # A list of column header labels
-                 rows: Optional[list] = None,  # rows containing the data
-                 order: Optional[str] = None,  # Column order option
-                 defs: Optional[str] = None,  # Additional definitions for DataTables
-                 paging: Optional[bool] = True) -> None:  # Whether to show pager
+                 header: list = None,  # A list of column header labels
+                 rows: list = None,  # rows containing the data
+                 order: str = None,  # Column order option
+                 defs: str = None,  # Additional definitions for DataTables
+                 paging: bool = True) -> None:  # Whether to show pager
         self.header = header if header else []
         self.rows = rows if rows else []
         self.paging = 'true' if paging else 'false'
         self.order = order if order else ''
         self.defs = defs if defs else ''
 
-    def display(self, name: Optional[str] = 'table') -> str:
+    def display(self, name: str = 'table') -> str:
         from openatlas.util.util import uc_first
         if not self.rows:
             return '<p>' + uc_first(_('no entries')) + '</p>'

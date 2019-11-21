@@ -1,15 +1,15 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import datetime
 import os
-from collections import OrderedDict
 from os.path import basename, splitext
-from typing import Optional
+from typing import Union
 
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import BooleanField, IntegerField, SelectField, StringField, SubmitField, TextAreaField
 from wtforms.validators import Email, InputRequired
 
@@ -27,7 +27,7 @@ from openatlas.util.util import (convert_size, format_date, format_datetime, get
                                  uc_first)
 
 
-class GeneralForm(Form):
+class GeneralForm(FlaskForm):
     site_name = StringField(uc_first(_('site name')))
     site_header = StringField(uc_first(_('site header')))
     default_language = SelectField(uc_first(_('default language')),
@@ -58,7 +58,7 @@ def admin_index() -> str:
     return render_template('admin/index.html', writeable_dirs=writeable_dirs)
 
 
-class MapForm(Form):
+class MapForm(FlaskForm):
     map_cluster_enabled = BooleanField(uc_first(_('use cluster')))
     map_cluster_max_radius = IntegerField('maxClusterRadius')
     map_cluster_disable_at_zoom = IntegerField('disableClusteringAtZoom')
@@ -67,7 +67,7 @@ class MapForm(Form):
 
 @app.route('/admin/map', methods=['POST', 'GET'])
 @required_group('manager')
-def admin_map() -> str:
+def admin_map() -> Union[str, Response]:
     form = MapForm(obj=session['settings'])
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
@@ -90,7 +90,7 @@ def admin_map() -> str:
 @app.route('/admin/check_links')
 @app.route('/admin/check_links/<check>')
 @required_group('contributor')
-def admin_check_links(check: Optional[str] = None) -> str:
+def admin_check_links(check: str = None) -> str:
     table = None
     if check:
         table = Table(['domain', 'property', 'range'])
@@ -102,7 +102,7 @@ def admin_check_links(check: Optional[str] = None) -> str:
 @app.route('/admin/check_link_duplicates')
 @app.route('/admin/check_link_duplicates/<delete>')
 @required_group('contributor')
-def admin_check_link_duplicates(delete: Optional[str] = None) -> str:
+def admin_check_link_duplicates(delete: str = None) -> Union[str, Response]:
     if delete:
         delete_count = str(LinkMapper.delete_link_duplicates())
         logger.log('info', 'admin', 'Deleted duplicate links: ' + delete_count)
@@ -135,13 +135,13 @@ def admin_check_link_duplicates(delete: Optional[str] = None) -> str:
 
 @app.route('/admin/delete_single_type_duplicate/<int:entity_id>/<int:node_id>')
 @required_group('contributor')
-def admin_delete_single_type_duplicate(entity_id: int, node_id: int) -> str:
+def admin_delete_single_type_duplicate(entity_id: int, node_id: int) -> Response:
     NodeMapper.remove_by_entity_and_node(entity_id, node_id)
     flash(_('link removed'), 'info')
     return redirect(url_for('admin_check_link_duplicates'))
 
 
-class FileForm(Form):
+class FileForm(FlaskForm):
     file_upload_max_size = IntegerField(_('max file size in MB'))
     file_upload_allowed_extension = StringField('allowed file extensions')
     profile_image_width = IntegerField(_('profile image width in pixel'))
@@ -150,7 +150,7 @@ class FileForm(Form):
 
 @app.route('/admin/file', methods=['POST', 'GET'])
 @required_group('manager')
-def admin_file() -> str:
+def admin_file() -> Union[str, Response]:
     form = FileForm()
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
@@ -170,7 +170,7 @@ def admin_file() -> str:
     return render_template('admin/file.html', form=form)
 
 
-class SimilarForm(Form):
+class SimilarForm(FlaskForm):
     classes = SelectField(_('class'), choices=[])
     ratio = IntegerField(default=100)
     apply = SubmitField(_('search'))
@@ -183,20 +183,20 @@ def admin_check_similar() -> str:
     choices = ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic unit', 'find',
                'reference', 'file']
     form.classes.choices = [(x, uc_first(_(x))) for x in choices]
-    table = Table(['name', uc_first(_('count'))])
+    table = None
     if form.validate_on_submit():
+        table = Table(['name', uc_first(_('count'))])
         for sample_id, sample in EntityMapper.get_similar_named(form).items():
             html = link(sample['entity'])
             for entity in sample['entities']:
                 html += '<br/>' + link(entity)
             table.rows.append([html, len(sample['entities']) + 1])
-        table = table if table.rows else 'none found'
     return render_template('admin/check_similar.html', table=table, form=form)
 
 
 @app.route('/admin/orphans/delete/<parameter>')
 @required_group('admin')
-def admin_orphans_delete(parameter: str) -> str:
+def admin_orphans_delete(parameter: str) -> Response:
     count = EntityMapper.delete_orphans(parameter)
     flash(_('info orphans deleted:') + ' ' + str(count), 'info')
     return redirect(url_for('admin_orphans'))
@@ -274,23 +274,24 @@ def admin_orphans() -> str:
                                                  truncate_string(entity.description)])
 
     # Get orphaned files (no corresponding entity)
-    for file in os.scandir(app.config['UPLOAD_FOLDER_PATH']):
-        name = file.name
-        if name != '.gitignore' and splitext(file.name)[0] not in file_ids:
-            confirm = ' onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
-            tables['orphaned_files'].rows.append([
-                name,
-                convert_size(file.stat().st_size),
-                format_date(datetime.datetime.utcfromtimestamp(file.stat().st_ctime)),
-                splitext(name)[1],
-                '<a href="' + url_for('download_file', filename=name) + '">' + uc_first(
-                    _('download')) + '</a>',
-                '<a href="' + url_for('admin_file_delete', filename=name) + '" ' +
-                confirm + '>' + uc_first(_('delete')) + '</a>'])
-    return render_template('admin/orphans.html', tables=tables)
+    with os.scandir(app.config['UPLOAD_FOLDER_PATH']) as it:
+        for file in it:
+            name = file.name
+            if name != '.gitignore' and splitext(file.name)[0] not in file_ids:
+                confirm = ' onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
+                tables['orphaned_files'].rows.append([
+                    name,
+                    convert_size(file.stat().st_size),
+                    format_date(datetime.datetime.utcfromtimestamp(file.stat().st_ctime)),
+                    splitext(name)[1],
+                    '<a href="' + url_for('download_file', filename=name) + '">' + uc_first(
+                        _('download')) + '</a>',
+                    '<a href="' + url_for('admin_file_delete', filename=name) + '" ' +
+                    confirm + '>' + uc_first(_('delete')) + '</a>'])
+        return render_template('admin/orphans.html', tables=tables)
 
 
-class LogoForm(Form):
+class LogoForm(FlaskForm):
     file = TableField(_('file'), [InputRequired()])
     save = SubmitField(uc_first(_('change logo')))
 
@@ -298,7 +299,7 @@ class LogoForm(Form):
 @app.route('/admin/logo/', methods=['POST', 'GET'])
 @app.route('/admin/logo/<action>')
 @required_group('manager')
-def admin_logo(action: Optional[str] = None) -> str:
+def admin_logo(action: str = None) -> Union[str, Response]:
     if action == 'remove':
         SettingsMapper.set_logo()
         return redirect(url_for('admin_logo'))
@@ -315,7 +316,7 @@ def admin_logo(action: Optional[str] = None) -> str:
 
 @app.route('/admin/file/delete/<filename>')
 @required_group('contributor')
-def admin_file_delete(filename: str) -> str:  # pragma: no cover
+def admin_file_delete(filename: str) -> Response:  # pragma: no cover
     if filename != 'all':
         try:
             os.remove(app.config['UPLOAD_FOLDER_PATH'] + '/' + filename)
@@ -342,7 +343,7 @@ def admin_file_delete(filename: str) -> str:  # pragma: no cover
     return redirect(url_for('admin_orphans') + '#tab-orphaned-files')
 
 
-class LogForm(Form):
+class LogForm(FlaskForm):
     limit = SelectField(_('limit'), choices=((0, _('all')), (100, 100), (500, 500)), default=100)
     priority = SelectField(_('priority'), choices=(list(app.config['LOG_LEVELS'].items())),
                            default=6)
@@ -364,7 +365,7 @@ def admin_log() -> str:
                            row.type,
                            row.message,
                            link(user) if user and user.id else row.user_id,
-                           row.info.replace('\n', '<br />')])
+                           row.info.replace('\n', '<br>')])
     return render_template('admin/log.html', table=table, form=form)
 
 
@@ -376,7 +377,7 @@ def admin_log_delete():
     return redirect(url_for('admin_log'))
 
 
-class NewsLetterForm(Form):
+class NewsLetterForm(FlaskForm):
     subject = StringField('', [InputRequired()], render_kw={'placeholder': _('subject'),
                                                             'autofocus': True})
     body = TextAreaField('', [InputRequired()], render_kw={'placeholder': _('content')})
@@ -385,13 +386,13 @@ class NewsLetterForm(Form):
 
 @app.route('/admin/newsletter', methods=['POST', 'GET'])
 @required_group('manager')
-def admin_newsletter() -> str:
+def admin_newsletter() -> Union[str, Response]:
     form = NewsLetterForm()
     if form.validate_on_submit():  # pragma: no cover
         recipients = 0
         for user_id in (request.form.getlist('recipient')):
             user = UserMapper.get_by_id(user_id)
-            if user.settings['newsletter'] and user.active:
+            if user and user.settings['newsletter'] and user.active:
                 code = UserMapper.generate_password()
                 user.unsubscribe_code = code
                 user.update()
@@ -404,14 +405,14 @@ def admin_newsletter() -> str:
         return redirect(url_for('admin_index'))
     table = Table(['username', 'email', 'receiver'])
     for user in UserMapper.get_all():
-        if user.settings['newsletter'] and user.active:  # pragma: no cover
+        if user and user.settings['newsletter'] and user.active:  # pragma: no cover
             checkbox = '<input value="' + str(user.id) + '" name="recipient"'
             checkbox += ' type="checkbox" checked="checked">'
             table.rows.append([user.username, user.email, checkbox])
     return render_template('admin/newsletter.html', form=form, table=table)
 
 
-class TestMailForm(Form):
+class TestMailForm(FlaskForm):
     receiver = StringField(_('test mail receiver'), [InputRequired(), Email()])
     send = SubmitField(_('send test mail'))
 
@@ -430,14 +431,14 @@ def admin_mail() -> str:
             flash(_('A test mail was sent to %(email)s.', email=form.receiver.data))
     else:
         form.receiver.data = current_user.email
-    mail_settings = OrderedDict([
-        (_('mail'), uc_first(_('on')) if settings['mail'] else uc_first(_('off'))),
-        (_('mail transport username'), settings['mail_transport_username']),
-        (_('mail transport host'), settings['mail_transport_host']),
-        (_('mail transport port'), settings['mail_transport_port']),
-        (_('mail from email'), settings['mail_from_email']),
-        (_('mail from name'), settings['mail_from_name']),
-        (_('mail recipients feedback'), ';'.join(settings['mail_recipients_feedback']))])
+    mail_settings = {
+        _('mail'): uc_first(_('on')) if settings['mail'] else uc_first(_('off')),
+        _('mail transport username'): settings['mail_transport_username'],
+        _('mail transport host'): settings['mail_transport_host'],
+        _('mail transport port'): settings['mail_transport_port'],
+        _('mail from email'): settings['mail_from_email'],
+        _('mail from name'): settings['mail_from_name'],
+        _('mail recipients feedback'): ';'.join(settings['mail_recipients_feedback'])}
     return render_template('admin/mail.html', settings=settings, mail_settings=mail_settings,
                            form=form)
 
@@ -446,27 +447,27 @@ def admin_mail() -> str:
 @required_group('admin')
 def admin_general() -> str:
     settings = session['settings']
-    general_settings = OrderedDict([
-        (_('site name'), settings['site_name']),
-        (_('site header'), settings['site_header']),
-        (_('default language'), app.config['LANGUAGES'][settings['default_language']]),
-        (_('default table rows'), settings['default_table_rows']),
-        (_('log level'), app.config['LOG_LEVELS'][int(settings['log_level'])]),
-        (_('debug mode'), uc_first(_('on')) if settings['debug_mode'] else uc_first(_('off'))),
-        (_('random password length'), settings['random_password_length']),
-        (_('minimum password length'), settings['minimum_password_length']),
-        (_('reset confirm hours'), settings['reset_confirm_hours']),
-        (_('failed login tries'), settings['failed_login_tries']),
-        (_('failed login forget minutes'), settings['failed_login_forget_minutes']),
-        (_('minimum jstree search'), settings['minimum_jstree_search']),
-        (_('minimum tablesorter search'), settings['minimum_tablesorter_search'])])
+    general_settings = {
+        _('site name'): settings['site_name'],
+        _('site header'): settings['site_header'],
+        _('default language'): app.config['LANGUAGES'][settings['default_language']],
+        _('default table rows'): settings['default_table_rows'],
+        _('log level'): app.config['LOG_LEVELS'][int(settings['log_level'])],
+        _('debug mode'): uc_first(_('on')) if settings['debug_mode'] else uc_first(_('off')),
+        _('random password length'): settings['random_password_length'],
+        _('minimum password length'): settings['minimum_password_length'],
+        _('reset confirm hours'): settings['reset_confirm_hours'],
+        _('failed login tries'): settings['failed_login_tries'],
+        _('failed login forget minutes'): settings['failed_login_forget_minutes'],
+        _('minimum jstree search'): settings['minimum_jstree_search'],
+        _('minimum tablesorter search'): settings['minimum_tablesorter_search']}
     return render_template('admin/general.html', settings=settings,
                            general_settings=general_settings)
 
 
 @app.route('/admin/general/update', methods=["GET", "POST"])
 @required_group('admin')
-def admin_general_update() -> str:
+def admin_general_update() -> Union[str, Response]:
     form = GeneralForm()
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
@@ -488,7 +489,7 @@ def admin_general_update() -> str:
     return render_template('admin/general_update.html', form=form, settings=session['settings'])
 
 
-class MailForm(Form):
+class MailForm(FlaskForm):
     mail = BooleanField(uc_first(_('mail')))
     mail_transport_username = StringField(uc_first(_('mail transport username')))
     mail_transport_host = StringField(uc_first(_('mail transport host')))
@@ -501,7 +502,7 @@ class MailForm(Form):
 
 @app.route('/admin/mail/update', methods=["GET", "POST"])
 @required_group('admin')
-def admin_mail_update() -> str:
+def admin_mail_update() -> Union[str, Response]:
     form = MailForm()
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')

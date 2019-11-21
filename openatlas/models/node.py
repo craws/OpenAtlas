@@ -1,7 +1,6 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
-from collections import OrderedDict
-from typing import Dict, Optional
+from typing import Dict, List
 
 from flask import g
 
@@ -37,14 +36,14 @@ class NodeMapper(EntityMapper):
         types = g.cursor.fetchall()
         g.execute(sql, {'class_code': 'E53', 'property_code': 'P89'})
         places = g.cursor.fetchall()
-        nodes = OrderedDict()  # type: Dict
+        nodes = {}
         for row in types + places:
             node = Entity(row)
             nodes[node.id] = node
             node.count = row.count + row.count_property
             node.count_subs = 0
             node.subs = []
-            node.locked = None
+            node.locked = False
             node.root = [row.super_id] if row.super_id else []
         NodeMapper.populate_subs(nodes)
         return nodes
@@ -88,10 +87,11 @@ class NodeMapper(EntityMapper):
         return NodeMapper.get_root_path(nodes, node, super_.root[0], root)
 
     @staticmethod
-    def get_nodes(name: str):
+    def get_nodes(name: str) -> list:
         for id_, node in g.nodes.items():
             if node.name == name and not node.root:
                 return node.subs
+        return []
 
     @staticmethod
     def get_hierarchy_by_name(name: str):
@@ -105,9 +105,9 @@ class NodeMapper(EntityMapper):
         return NodeMapper.walk_tree(g.nodes[node_id].subs, selected_ids)
 
     @staticmethod
-    def walk_tree(param, selected_ids: list) -> str:
+    def walk_tree(nodes: List[Entity], selected_ids: list) -> str:
         string = ''
-        for id_ in param if type(param) is list else [param]:
+        for id_ in nodes:
             item = g.nodes[id_]
             selected = ",'state' : {'selected' : true}" if item.id in selected_ids else ''
             name = item.name.replace("'", "&apos;")
@@ -115,7 +115,7 @@ class NodeMapper(EntityMapper):
             if item.subs:
                 string += ",'children' : ["
                 for sub in item.subs:
-                    string += NodeMapper.walk_tree(sub, selected_ids)
+                    string += NodeMapper.walk_tree([sub], selected_ids)
                 string += "]"
             string += "},"
         return string
@@ -128,10 +128,7 @@ class NodeMapper(EntityMapper):
             JOIN web.form f ON hf.form_id = f.id AND f.name = %(form_name)s
             ORDER BY h.name;"""
         g.execute(sql, {'form_name': form_id})
-        nodes = OrderedDict()
-        for row in g.cursor.fetchall():
-            nodes[row.id] = g.nodes[row.id]
-        return nodes
+        return {row.id: g.nodes[row.id] for row in g.cursor.fetchall()}
 
     @staticmethod
     def get_form_choices(root=None):
@@ -245,7 +242,7 @@ class NodeMapper(EntityMapper):
             g.execute(sql, {'old_type_id': old_node.id, 'delete_ids': tuple(delete_ids)})
 
     @staticmethod
-    def get_all_sub_ids(node, subs: Optional[list] = None) -> list:
+    def get_all_sub_ids(node, subs: list = None) -> list:
         # Recursive function to return a list with all sub node ids
         subs = subs if subs else []
         subs += node.subs
@@ -262,7 +259,7 @@ class NodeMapper(EntityMapper):
         g.execute("SELECT name FROM web.form WHERE id = %(form_id)s;", {'form_id': form_id})
         form_name = g.cursor.fetchone()[0]
         system_type = ''
-        class_code = []  # type: list
+        class_code: list = []
         if form_name == 'Source':
             system_type = 'source content'
         elif form_name == 'Event':

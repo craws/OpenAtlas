@@ -152,9 +152,9 @@ function setObjectId(e) {
 function buildPopup(feature, action='view', selected=false) {
     popupHtml = '<div id="popup">'
     if (feature.properties.objectName) {
-        popupHtml += '<strong>' + feature.properties.objectName + '</strong><br />';
+        popupHtml += '<strong>' + feature.properties.objectName + '</strong><br>';
         if (feature.properties.objectType) {
-            popupHtml += '<i>' + feature.properties.objectType + '</i><br />'
+            popupHtml += '<i>' + feature.properties.objectType + '</i><br>'
         }
     }
     popupHtml += `

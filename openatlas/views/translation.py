@@ -1,8 +1,11 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+from typing import Union
+
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
@@ -12,7 +15,7 @@ from openatlas.models.entity import EntityMapper
 from openatlas.util.util import get_entity_data, required_group
 
 
-class TranslationForm(Form):
+class TranslationForm(FlaskForm):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     description = TextAreaField(_('content'))
     save = SubmitField(_('insert'))
@@ -22,8 +25,8 @@ class TranslationForm(Form):
 
 @app.route('/source/translation/insert/<int:source_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def translation_insert(source_id: int) -> str:
-    source = EntityMapper.get_by_id(source_id)
+def translation_insert(source_id: int) -> Union[str, Response]:
+    source = EntityMapper.get_by_id(source_id, view_name='source')
     form = build_form(TranslationForm, 'Source translation')
     if form.validate_on_submit():
         translation = save(form, source=source)
@@ -38,14 +41,14 @@ def translation_insert(source_id: int) -> str:
 @required_group('readonly')
 def translation_view(id_: int) -> str:
     translation = EntityMapper.get_by_id(id_, nodes=True)
-    source = translation.get_linked_entity('P73', True)
-    return render_template('translation/view.html', source=source, translation=translation,
-                           tables={'info': get_entity_data(translation)})
+    return render_template('translation/view.html', info=get_entity_data(translation),
+                           source=translation.get_linked_entity('P73', True),
+                           translation=translation,)
 
 
 @app.route('/source/translation/delete/<int:id_>/<int:source_id>')
 @required_group('contributor')
-def translation_delete(id_: int, source_id: int) -> str:
+def translation_delete(id_: int, source_id: int) -> Response:
     EntityMapper.delete(id_)
     flash(_('entity deleted'), 'info')
     return redirect(url_for('source_view', id_=source_id))
@@ -53,7 +56,7 @@ def translation_delete(id_: int, source_id: int) -> str:
 
 @app.route('/source/translation/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def translation_update(id_: int) -> str:
+def translation_update(id_: int) -> Union[str, Response]:
     translation = EntityMapper.get_by_id(id_, nodes=True)
     source = translation.get_linked_entity('P73', True)
     form = build_form(TranslationForm, 'Source translation', translation, request)

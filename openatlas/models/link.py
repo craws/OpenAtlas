@@ -1,10 +1,10 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
-from typing import Dict, Iterator, Optional, Union
+from typing import Iterator, Union
 
 from flask import abort, flash, g, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 
 from openatlas import logger
 from openatlas.forms.date import DateForm
@@ -22,7 +22,7 @@ class Link:
         self.domain = domain if domain else EntityMapper.get_by_id(row.domain_id)
         self.range = range_ if range_ else EntityMapper.get_by_id(row.range_id)
         self.type = g.nodes[row.type_id] if row.type_id else None
-        self.nodes = dict()  # type: Dict
+        self.nodes: dict = {}
         if hasattr(row, 'type_id') and row.type_id:
             self.nodes[g.nodes[row.type_id]] = None
         if hasattr(row, 'begin_from'):
@@ -42,7 +42,7 @@ class Link:
     def delete(self) -> None:
         LinkMapper.delete(self.id)
 
-    def set_dates(self, form: Form) -> None:
+    def set_dates(self, form: FlaskForm) -> None:
         self.begin_from = None
         self.begin_to = None
         self.begin_comment = None
@@ -69,9 +69,9 @@ class LinkMapper:
     def insert(entity,
                property_code: str,
                linked_entities,
-               description: Optional[str] = None,
-               inverse: Optional[bool] = False,
-               type_id: Optional[int] = None) -> Union[int, None]:
+               description: str = None,
+               inverse: bool = False,
+               type_id: int = None) -> Union[int, None]:
         from openatlas.models.entity import Entity, EntityMapper
         # Linked_entities can be an entity, an entity id or a list of them
         if not entity or not linked_entities:  # pragma: no cover
@@ -117,10 +117,7 @@ class LinkMapper:
         return result
 
     @staticmethod
-    def get_linked_entity(entity_param,
-                          code: str,
-                          inverse: Optional[bool] = False,
-                          nodes: Optional[bool] = False):
+    def get_linked_entity(entity_param, code: str, inverse: bool = False, nodes: bool = False):
         result = LinkMapper.get_linked_entities(entity_param, code, inverse=inverse, nodes=nodes)
         if len(result) > 1:  # pragma: no cover
             logger.log('error', 'model', 'multiple linked entities found for ' + code)
@@ -130,9 +127,7 @@ class LinkMapper:
             return result[0]
 
     @staticmethod
-    def get_linked_entities(entity, codes,
-                            inverse: Optional[bool] = False,
-                            nodes: Optional[bool] = False) -> list:
+    def get_linked_entities(entity, codes, inverse: bool = False, nodes: bool = False) -> list:
         from openatlas.models.entity import EntityMapper
         sql = """
             SELECT range_id AS result_id FROM model.link
@@ -323,6 +318,6 @@ class LinkMapper:
                                 offending_nodes.append(
                                     '<a href="' + url + '">' + uc_first(_('remove')) + '</a> ' +
                                     entity_node.name)
-                        data.append([link(entity), entity.class_.name,
-                                     link(g.nodes[id_]), '<br />'.join(offending_nodes)])
+                        data.append([link(entity), entity.class_.name, link(g.nodes[id_]),
+                                     '<br>'.join(offending_nodes)])
         return data

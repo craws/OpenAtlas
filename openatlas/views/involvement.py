@@ -1,9 +1,11 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
+from typing import Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import HiddenField, SelectField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
@@ -26,7 +28,7 @@ class ActorForm(DateForm):
 
 @app.route('/involvement/insert/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def involvement_insert(origin_id: int) -> str:
+def involvement_insert(origin_id: int) -> Union[str, Response]:
     origin = EntityMapper.get_by_id(origin_id)
     form = build_form(ActorForm, 'Involvement')
     if origin.view_name == 'event':
@@ -71,10 +73,10 @@ def involvement_insert(origin_id: int) -> str:
 
 @app.route('/involvement/update/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def involvement_update(id_: int, origin_id: int) -> str:
+def involvement_update(id_: int, origin_id: int) -> Union[str, Response]:
     link_ = LinkMapper.get_by_id(id_)
-    event = EntityMapper.get_by_id(link_.domain.id)
-    actor = EntityMapper.get_by_id(link_.range.id)
+    event = EntityMapper.get_by_id(link_.domain.id, view_name='event')
+    actor = EntityMapper.get_by_id(link_.range.id, view_name='actor')
     origin = event if origin_id == event.id else actor
     form = build_form(ActorForm, 'Involvement', link_, request)
     form.save.label.text = _('save')

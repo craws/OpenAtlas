@@ -1,16 +1,17 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Optional
+from typing import Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import DateForm, TableField, TableMultiField, build_form, \
-    build_table_form
+from openatlas.forms.forms import (DateForm, TableField, TableMultiField, build_form,
+                                   build_table_form)
 from openatlas.models.entity import EntityMapper
 from openatlas.models.gis import GisMapper
 from openatlas.models.link import LinkMapper
@@ -77,7 +78,7 @@ def prepare_form(form: EventForm, code: str):
 @app.route('/event/insert/<code>', methods=['POST', 'GET'])
 @app.route('/event/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def event_insert(code: str, origin_id=None) -> str:
+def event_insert(code: str, origin_id=None) -> Union[str, Response]:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = prepare_form(build_form(EventForm, 'Event'), code)
     if origin:
@@ -97,7 +98,7 @@ def event_insert(code: str, origin_id=None) -> str:
 
 @app.route('/event/delete/<int:id_>')
 @required_group('contributor')
-def event_delete(id_: int) -> str:
+def event_delete(id_: int) -> Response:
     EntityMapper.delete(id_)
     logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
@@ -106,8 +107,8 @@ def event_delete(id_: int) -> str:
 
 @app.route('/event/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def event_update(id_: int) -> str:
-    event = EntityMapper.get_by_id(id_, nodes=True)
+def event_update(id_: int) -> Union[str, Response]:
+    event = EntityMapper.get_by_id(id_, nodes=True, view_name='event')
     form = prepare_form(build_form(EventForm, 'Event', event, request), event.class_.code)
     form.event_id.data = event.id
     if form.validate_on_submit():
@@ -145,10 +146,9 @@ def event_update(id_: int) -> str:
 @app.route('/event/view/<int:id_>')
 @required_group('readonly')
 def event_view(id_: int) -> str:
-    event = EntityMapper.get_by_id(id_, nodes=True)
+    event = EntityMapper.get_by_id(id_, nodes=True, view_name='event')
     event.note = UserMapper.get_note(event)
-    tables = {'info': get_entity_data(event),
-              'file': Table(Table.HEADERS['file'] + [_('main image')]),
+    tables = {'file': Table(Table.HEADERS['file'] + [_('main image')]),
               'subs': Table(Table.HEADERS['event']),
               'source': Table(Table.HEADERS['source']),
               'actor': Table(['actor', 'class', 'involvement', 'first', 'last', 'description'],
@@ -198,14 +198,14 @@ def event_view(id_: int) -> str:
     for location in event.get_linked_entities(['P7', 'P26', 'P27']):
         objects.append(location.get_linked_entity('P53', True))
     return render_template('event/view.html', event=event, tables=tables,
-                           profile_image_id=profile_image_id,
+                           info=get_entity_data(event), profile_image_id=profile_image_id,
                            gis_data=GisMapper.get_all(objects) if objects else None)
 
 
 @app.route('/event/add/source/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def event_add_source(id_: int) -> str:
-    event = EntityMapper.get_by_id(id_)
+def event_add_source(id_: int) -> Union[str, Response]:
+    event = EntityMapper.get_by_id(id_, view_name='event')
     if request.method == 'POST':
         if request.form['checkbox_values']:
             event.link('P67', request.form['checkbox_values'], inverse=True)
@@ -216,8 +216,8 @@ def event_add_source(id_: int) -> str:
 
 @app.route('/event/add/reference/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def event_add_reference(id_: int) -> str:
-    event = EntityMapper.get_by_id(id_)
+def event_add_reference(id_: int) -> Union[str, Response]:
+    event = EntityMapper.get_by_id(id_, view_name='event')
     form = AddReferenceForm()
     if form.validate_on_submit():
         event.link('P67', form.reference.data, description=form.page.data, inverse=True)
@@ -228,8 +228,8 @@ def event_add_reference(id_: int) -> str:
 
 @app.route('/event/add/file/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
-def event_add_file(id_: int) -> str:
-    event = EntityMapper.get_by_id(id_)
+def event_add_file(id_: int) -> Union[str, Response]:
+    event = EntityMapper.get_by_id(id_, view_name='event')
     if request.method == 'POST':
         if request.form['checkbox_values']:
             event.link('P67', request.form['checkbox_values'], inverse=True)
@@ -238,7 +238,7 @@ def event_add_file(id_: int) -> str:
     return render_template('add_file.html', entity=event, form=form)
 
 
-def save(form: Form, event=None, code: Optional[str] = None, origin=None) -> str:
+def save(form: FlaskForm, event=None, code: str = None, origin=None) -> str:
     g.cursor.execute('BEGIN')
     try:
         log_action = 'insert'

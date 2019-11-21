@@ -1,10 +1,11 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Optional
+from typing import Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired, URL
 
@@ -16,11 +17,11 @@ from openatlas.models.link import LinkMapper
 from openatlas.models.user import UserMapper
 from openatlas.util.table import Table
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 is_authorized, link, required_group, truncate_string, uc_first,
-                                 was_modified, get_profile_image_table_link)
+                                 get_profile_image_table_link, is_authorized, link, required_group,
+                                 truncate_string, uc_first, was_modified)
 
 
-class ReferenceForm(Form):
+class ReferenceForm(FlaskForm):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
@@ -29,37 +30,37 @@ class ReferenceForm(Form):
     opened = HiddenField()
 
 
-class AddReferenceForm(Form):
+class AddReferenceForm(FlaskForm):
     reference = TableField(_('reference'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
 
-class AddSourceForm(Form):
+class AddSourceForm(FlaskForm):
     source = TableField(_('source'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
 
-class AddEventForm(Form):
+class AddEventForm(FlaskForm):
     event = TableField(_('event'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
 
-class AddActorForm(Form):
+class AddActorForm(FlaskForm):
     actor = TableField(_('actor'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
 
-class AddPlaceForm(Form):
+class AddPlaceForm(FlaskForm):
     place = TableField(_('place'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
 
-class AddFileForm(Form):
+class AddFileForm(FlaskForm):
     file = TableField(_('file'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
@@ -67,8 +68,8 @@ class AddFileForm(Form):
 
 @app.route('/reference/add/<int:id_>/<class_name>', methods=['POST', 'GET'])
 @required_group('contributor')
-def reference_add(id_: int, class_name: str) -> str:
-    reference = EntityMapper.get_by_id(id_)
+def reference_add(id_: int, class_name: str) -> Union[str, Response]:
+    reference = EntityMapper.get_by_id(id_, view_name='reference')
     form = getattr(openatlas.views.reference, 'Add' + uc_first(class_name) + 'Form')()
     if form.validate_on_submit():
         property_code = 'P128' if reference.class_.code == 'E84' else 'P67'
@@ -83,7 +84,7 @@ def reference_add(id_: int, class_name: str) -> str:
 
 @app.route('/reference/link-update/<int:link_id>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def reference_link_update(link_id: int, origin_id: int) -> str:
+def reference_link_update(link_id: int, origin_id: int) -> Union[str, Response]:
     link_ = LinkMapper.get_by_id(link_id)
     origin = EntityMapper.get_by_id(origin_id)
     form = AddReferenceForm()
@@ -106,10 +107,9 @@ def reference_link_update(link_id: int, origin_id: int) -> str:
 @app.route('/reference/view/<int:id_>')
 @required_group('readonly')
 def reference_view(id_: int) -> str:
-    reference = EntityMapper.get_by_id(id_, nodes=True)
+    reference = EntityMapper.get_by_id(id_, nodes=True, view_name='reference')
     reference.note = UserMapper.get_note(reference)
-    tables = {'info': get_entity_data(reference),
-              'file': Table(Table.HEADERS['file'] + ['page', _('main image')])}
+    tables = {'file': Table(Table.HEADERS['file'] + ['page', _('main image')])}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find']:
         header_label = 'link text' if reference.system_type == 'external reference' else 'page'
         tables[name] = Table(Table.HEADERS[name] + [header_label])
@@ -137,7 +137,7 @@ def reference_view(id_: int) -> str:
             data.append(display_remove_link(url + '#tab-' + range_.table_name, range_.name))
         tables[range_.table_name].rows.append(data)
     return render_template('reference/view.html', reference=reference, tables=tables,
-                           profile_image_id=profile_image_id)
+                           info=get_entity_data(reference), profile_image_id=profile_image_id)
 
 
 @app.route('/reference')
@@ -154,7 +154,7 @@ def reference_index() -> str:
 @app.route('/reference/insert/<code>', methods=['POST', 'GET'])
 @app.route('/reference/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def reference_insert(code: str, origin_id: Optional[int] = None) -> str:
+def reference_insert(code: str, origin_id: int = None) -> Union[str, Response]:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(ReferenceForm, 'External Reference' if code == 'external_reference' else code)
     if code == 'external_reference':
@@ -169,7 +169,7 @@ def reference_insert(code: str, origin_id: Optional[int] = None) -> str:
 
 @app.route('/reference/delete/<int:id_>')
 @required_group('contributor')
-def reference_delete(id_: int) -> str:
+def reference_delete(id_: int) -> Response:
     EntityMapper.delete(id_)
     logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
@@ -178,8 +178,8 @@ def reference_delete(id_: int) -> str:
 
 @app.route('/reference/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def reference_update(id_: int) -> str:
-    reference = EntityMapper.get_by_id(id_, nodes=True)
+def reference_update(id_: int) -> Union[str, Response]:
+    reference = EntityMapper.get_by_id(id_, nodes=True, view_name='reference')
     form = build_form(ReferenceForm, reference.system_type.title(), reference, request)
     if reference.system_type == 'external reference':
         form.name.validators = [InputRequired(), URL()]
@@ -189,18 +189,18 @@ def reference_update(id_: int) -> str:
             del form.save
             flash(_('error modified'), 'error')
             modifier = link(logger.get_log_for_advanced_view(reference.id)['modifier'])
-            return render_template(
-                'reference/update.html', form=form, reference=reference, modifier=modifier)
+            return render_template('reference/update.html', form=form, reference=reference,
+                                   modifier=modifier)
         save(form, reference)
         return redirect(url_for('reference_view', id_=id_))
     return render_template('reference/update.html', form=form, reference=reference)
 
 
-def save(form, reference=None, code: Optional[str] = None, origin=None) -> str:
+def save(form, reference=None, code: str = None, origin=None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
     try:
-        if not reference:
+        if code and not reference:
             log_action = 'insert'
             system_type = code.replace('_', ' ')
             reference = EntityMapper.insert('E31', form.name.data, system_type)

@@ -1,9 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from collections import OrderedDict
-
 from flask import g, render_template
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from wtforms import (BooleanField, HiddenField, IntegerField, SelectMultipleField, StringField,
                      SubmitField, widgets)
 from wtforms.validators import InputRequired
@@ -14,7 +12,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import link, required_group
 
 
-class LinkCheckForm(Form):
+class LinkCheckForm(FlaskForm):
     domain = HiddenField()
     property = HiddenField()
     range = HiddenField()
@@ -23,12 +21,12 @@ class LinkCheckForm(Form):
 @app.route('/overview/model', methods=["GET", "POST"])
 def model_index() -> str:
     form = LinkCheckForm()
-    form_classes = OrderedDict()  # type: dict
+    form_classes = {}
     for code, class_ in g.classes.items():
         form_classes[code] = code + ' ' + class_.name
     form.domain.choices = form_classes.items()
     form.range.choices = form_classes.items()
-    form_properties = OrderedDict()  # type: dict
+    form_properties = {}
     for code, property_ in g.properties.items():
         form_properties[code] = code + ' ' + property_.name
     form.property.choices = form_properties.items()
@@ -84,7 +82,7 @@ def property_index() -> str:
 @app.route('/overview/model/class_view/<code>')
 def class_view(code: str) -> str:
     class_ = g.classes[code]
-    tables = OrderedDict()  # type: dict
+    tables = {}
     for table in ['super', 'sub']:
         tables[table] = Table(['code', 'name'], paging=False)
         for code in getattr(class_, table):
@@ -97,7 +95,7 @@ def class_view(code: str) -> str:
         elif code == property_.range_class_code:
             tables['ranges'].rows.append([link(property_), property_.name])
     return render_template('model/class_view.html', class_=class_, tables=tables,
-                           data={'info': [('code', class_.code), ('name', class_.name)]})
+                           info=[('code', class_.code), ('name', class_.name)])
 
 
 @app.route('/overview/model/property_view/<code>')
@@ -105,19 +103,20 @@ def property_view(code: str) -> str:
     property_ = g.properties[code]
     domain = g.classes[property_.domain_class_code]
     range_ = g.classes[property_.range_class_code]
-    tables = {'info': [('code', property_.code),
-                       ('name', property_.name),
-                       ('inverse', property_.name_inverse),
-                       ('domain', link(domain) + ' ' + domain.name),
-                       ('range', link(range_) + ' ' + range_.name)]}
+    info = [('code', property_.code),
+            ('name', property_.name),
+            ('inverse', property_.name_inverse),
+            ('domain', link(domain) + ' ' + domain.name),
+            ('range', link(range_) + ' ' + range_.name)]
+    tables = {}
     for table in ['super', 'sub']:
         tables[table] = Table(['code', 'name'], paging=False)
         for code in getattr(property_, table):
             tables[table].rows.append([link(g.properties[code]), g.properties[code].name])
-    return render_template('model/property_view.html', property=property_, tables=tables)
+    return render_template('model/property_view.html', property=property_, tables=tables, info=info)
 
 
-class NetworkForm(Form):
+class NetworkForm(FlaskForm):
     width = IntegerField(default=1200, validators=[InputRequired()])
     height = IntegerField(default=600, validators=[InputRequired()])
     charge = StringField(default=-800, validators=[InputRequired()])
@@ -152,11 +151,13 @@ def model_network() -> str:
     form = NetworkForm()
     form.classes.choices = []
     form.properties.choices = []
-    params = {'classes': {}, 'properties': {}, 'options': {'orphans': form.orphans.data,
-                                                           'width': form.width.data,
-                                                           'height': form.height.data,
-                                                           'charge': form.charge.data,
-                                                           'distance': form.distance.data}}
+    params: dict = {'classes': {},
+                    'properties': {},
+                    'options': {'orphans': form.orphans.data,
+                                'width': form.width.data,
+                                'height': form.height.data,
+                                'charge': form.charge.data,
+                                'distance': form.distance.data}}
     for code in ['E21', 'E7', 'E31', 'E33', 'E40', 'E74', 'E53', 'E18', 'E8', 'E84']:
         form.classes.choices.append((code, g.classes[code].name))
         params['classes'][code] = {'active': (code in form.classes.data),

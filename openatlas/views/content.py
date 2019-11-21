@@ -1,8 +1,11 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+from typing import Union
+
 from flask import flash, render_template, session, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import TextAreaField
 
 from openatlas import app
@@ -12,7 +15,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import required_group
 
 
-class ContentForm(Form):
+class ContentForm(FlaskForm):
     pass
 
 
@@ -23,7 +26,7 @@ def content_index() -> str:
     for item, languages in ContentMapper.get_content().items():
         url = url_for('content_view', item=item)
         content = ['<a href="' + url + '">' + util.uc_first(_(item)) + '</a>']
-        html_ok = '<img src="/static/images/icons/dialog-apply.png" alt="ok" />'
+        html_ok = '<img src="/static/images/icons/dialog-apply.png" alt="ok">'
         for language in app.config['LANGUAGES'].keys():
             content.append(html_ok if languages[language] else '')
         content.append(languages[session['language']])
@@ -39,7 +42,7 @@ def content_view(item) -> str:
 
 @app.route('/admin/content/update/<string:item>', methods=["GET", "POST"])
 @required_group('manager')
-def content_update(item: str) -> str:
+def content_update(item: str) -> Union[str, Response]:
     languages = app.config['LANGUAGES'].keys()
     for language in languages:
         setattr(ContentForm, language, TextAreaField())

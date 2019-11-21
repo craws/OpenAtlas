@@ -53,7 +53,7 @@ class ExportTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()
                 place_id = EntityMapper.get_by_system_type('place')[0].id
-            rv = self.app.get(url_for('actor_view', id_=place_id))
+            rv = self.app.get(url_for('place_view', id_=place_id))
             assert b'Yup' in rv.data
 
             rv = self.app.get(url_for('import_project_delete', id_=project_id),

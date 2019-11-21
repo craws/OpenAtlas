@@ -1,11 +1,12 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Optional
+from typing import Optional, Union
 
 from flask import abort, flash, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import (BooleanField, HiddenField, PasswordField, SelectField, StringField,
                      SubmitField, TextAreaField)
 from wtforms.validators import Email, InputRequired
@@ -18,8 +19,8 @@ from openatlas.util.util import (format_date, is_authorized, link, required_grou
                                  uc_first)
 
 
-class UserForm(Form):
-    user_id = None  # type: int
+class UserForm(FlaskForm):
+    user_id: Optional[int] = None
     active = BooleanField(_('active'), default=True)
     username = StringField(_('username'), [InputRequired()], render_kw={'autofocus': True})
     group = SelectField(_('group'), choices=[])
@@ -35,8 +36,10 @@ class UserForm(Form):
     continue_ = HiddenField()
 
     def validate(self) -> bool:
-        valid = Form.validate(self)
-        user = UserMapper.get_by_id(self.user_id) if self.user_id else User()
+        valid = FlaskForm.validate(self)
+        user = User()
+        if self.user_id:
+            user = UserMapper.get_by_id(self.user_id)
         if user.username != self.username.data and UserMapper.get_by_username(self.username.data):
             self.username.errors.append(str(_('error username exists')))
             valid = False
@@ -54,7 +57,7 @@ class UserForm(Form):
         return valid
 
 
-class ActivityForm(Form):
+class ActivityForm(FlaskForm):
     action_choices = (('all', _('all')), ('insert', _('insert')), ('update', _('update')),
                       ('delete', _('delete')))
     limit = SelectField(_('limit'), choices=((0, _('all')), (100, 100), (500, 500)),
@@ -67,7 +70,7 @@ class ActivityForm(Form):
 @app.route('/admin/user/activity', methods=['POST', 'GET'])
 @app.route('/admin/user/activity/<int:user_id>', methods=['POST', 'GET'])
 @required_group('readonly')
-def user_activity(user_id: Optional[int] = 0) -> str:
+def user_activity(user_id: int = 0) -> str:
     form = ActivityForm()
     form.user.choices = [(0, _('all'))] + UserMapper.get_users()
     if form.validate_on_submit():
@@ -92,15 +95,15 @@ def user_activity(user_id: Optional[int] = 0) -> str:
 @required_group('readonly')
 def user_view(id_: int) -> str:
     user = UserMapper.get_by_id(id_)
-    data = {'info': [
+    info = [
         (_('username'), link(user)),
         (_('group'), user.group),
         (_('full name'), user.real_name),
         (_('email'), user.email if is_authorized('manager') or user.settings['show_email'] else ''),
         (_('language'), user.settings['language']),
         (_('last login'), format_date(user.login_last_success)),
-        (_('failed logins'), user.login_failed_count if is_authorized('manager') else '')]}
-    return render_template('user/view.html', user=user, data=data)
+        (_('failed logins'), user.login_failed_count if is_authorized('manager') else '')]
+    return render_template('user/view.html', user=user, info=info)
 
 
 @app.route('/admin/user')
@@ -122,7 +125,7 @@ def user_index() -> str:
 
 @app.route('/admin/user/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('manager')
-def user_update(id_: int) -> str:
+def user_update(id_: int) -> Union[str, Response]:
     user = UserMapper.get_by_id(id_)
     if user.group == 'admin' and current_user.group != 'admin':
         abort(403)  # pragma: no cover
@@ -130,7 +133,7 @@ def user_update(id_: int) -> str:
     form.user_id = id_
     del form.password, form.password2, form.send_info, form.insert_and_continue, form.show_passwords
     form.group.choices = get_groups()
-    if form.validate_on_submit():
+    if user and form.validate_on_submit():
         user.active = True if user.id == current_user.id else form.active.data  # no self deactivate
         user.real_name = form.real_name.data
         user.username = form.username.data
@@ -147,7 +150,7 @@ def user_update(id_: int) -> str:
 
 @app.route('/admin/user/insert', methods=['POST', 'GET'])
 @required_group('manager')
-def user_insert() -> str:
+def user_insert() -> Union[str, Response]:
     form = UserForm()
     form.group.choices = get_groups()
     if not session['settings']['mail']:
@@ -185,7 +188,7 @@ def get_groups() -> list:
 
 @app.route('/admin/user/delete/<int:id_>')
 @required_group('manager')
-def user_delete(id_: int) -> str:
+def user_delete(id_: int) -> Response:
     user = UserMapper.get_by_id(id_)
     if (user.group == 'admin' and current_user.group != 'admin') and user.id != current_user.id:
         abort(403)  # pragma: no cover

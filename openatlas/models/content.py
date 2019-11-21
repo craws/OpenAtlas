@@ -1,5 +1,4 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from collections import OrderedDict
 from typing import Dict
 
 from flask import flash, g, session
@@ -12,9 +11,9 @@ class ContentMapper:
 
     @staticmethod
     def get_content() -> Dict:
-        content = OrderedDict()  # type: Dict
+        content: dict = {}
         for name in ['intro', 'legal_notice', 'contact']:
-            content[name] = OrderedDict()
+            content[name] = {}
             for language in app.config['LANGUAGES'].keys():
                 content[name][language] = ''
         g.execute("SELECT name, language, text FROM web.i18n;")

@@ -113,7 +113,7 @@ class ContentTests(TestBaseCase):
                                data={'classes': 'file', 'ratio': 100})
             assert b'No entries' in rv.data
 
-            data = {name: '' for name in SettingsMapper.fields}  # type: Dict[str, Union[str, int]]
+            data: Dict[str, Union[str, int]] = {name: '' for name in SettingsMapper.fields}
             data['default_language'] = 'en'
             data['default_table_rows'] = '10'
             data['failed_login_forget_minutes'] = '10'

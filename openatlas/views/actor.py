@@ -1,9 +1,10 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Optional
+from typing import Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import FieldList, HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
@@ -36,13 +37,12 @@ class ActorForm(DateForm):
 @app.route('/actor/view/<int:id_>')
 @required_group('readonly')
 def actor_view(id_: int) -> str:
-    actor = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
+    actor = EntityMapper.get_by_id(id_, nodes=True, aliases=True, view_name='actor')
     actor.note = UserMapper.get_note(actor)
     info = []
     if actor.aliases:
-        info.append((uc_first(_('alias')), '<br />'.join(actor.aliases.values())))
-    tables = {'info': info,
-              'file': Table(Table.HEADERS['file'] + [_('main image')]),
+        info.append((uc_first(_('alias')), '<br>'.join(actor.aliases.values())))
+    tables = {'file': Table(Table.HEADERS['file'] + [_('main image')]),
               'source': Table(Table.HEADERS['source']),
               'reference': Table(Table.HEADERS['reference'] + ['page / link text']),
               'event': Table(['event', 'class', 'involvement', 'first', 'last', 'description'],
@@ -169,8 +169,8 @@ def actor_view(id_: int) -> str:
     gis_data = GisMapper.get_all(objects) if objects else None
     if gis_data and gis_data['gisPointSelected'] == '[]':
         gis_data = None
-    return render_template('actor/view.html', actor=actor, tables=tables, gis_data=gis_data,
-                           profile_image_id=profile_image_id)
+    return render_template('actor/view.html', actor=actor, info=info, tables=tables,
+                           gis_data=gis_data, profile_image_id=profile_image_id)
 
 
 @app.route('/actor')
@@ -188,7 +188,7 @@ def actor_index() -> str:
 @app.route('/actor/insert/<code>', methods=['POST', 'GET'])
 @app.route('/actor/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def actor_insert(code: str, origin_id: Optional[int] = None):
+def actor_insert(code: str, origin_id: int = None) -> Union[str, Response]:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
     form = build_form(ActorForm, code_class[code])
@@ -205,7 +205,7 @@ def actor_insert(code: str, origin_id: Optional[int] = None):
 
 @app.route('/actor/delete/<int:id_>')
 @required_group('contributor')
-def actor_delete(id_: int) -> str:
+def actor_delete(id_: int) -> Response:
     EntityMapper.delete(id_)
     logger.log_user(id_, 'delete')
     flash(_('entity deleted'), 'info')
@@ -214,8 +214,8 @@ def actor_delete(id_: int) -> str:
 
 @app.route('/actor/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def actor_update(id_: int) -> str:
-    actor = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
+def actor_update(id_: int) -> Union[str, Response]:
+    actor = EntityMapper.get_by_id(id_, nodes=True, aliases=True, view_name='actor')
     code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
     form = build_form(ActorForm, code_class[actor.class_.code], actor, request)
     if form.validate_on_submit():
@@ -243,8 +243,8 @@ def actor_update(id_: int) -> str:
 
 @app.route('/actor/add/source/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def actor_add_source(id_: int) -> str:
-    actor = EntityMapper.get_by_id(id_)
+def actor_add_source(id_: int) -> Union[str, Response]:
+    actor = EntityMapper.get_by_id(id_, view_name='actor')
     if request.method == 'POST':
         if request.form['checkbox_values']:
             actor.link('P67', request.form['checkbox_values'], inverse=True)
@@ -255,8 +255,8 @@ def actor_add_source(id_: int) -> str:
 
 @app.route('/actor/add/reference/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
-def actor_add_reference(id_: int) -> str:
-    actor = EntityMapper.get_by_id(id_)
+def actor_add_reference(id_: int) -> Union[str, Response]:
+    actor = EntityMapper.get_by_id(id_, view_name='actor')
     form = AddReferenceForm()
     if form.validate_on_submit():
         actor.link('P67', form.reference.data, description=form.page.data, inverse=True)
@@ -267,8 +267,8 @@ def actor_add_reference(id_: int) -> str:
 
 @app.route('/actor/add/file/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
-def actor_add_file(id_: int) -> str:
-    actor = EntityMapper.get_by_id(id_)
+def actor_add_file(id_: int) -> Union[str, Response]:
+    actor = EntityMapper.get_by_id(id_, view_name='actor')
     if request.method == 'POST':
         if request.form['checkbox_values']:
             actor.link('P67', request.form['checkbox_values'], inverse=True)
@@ -277,7 +277,7 @@ def actor_add_file(id_: int) -> str:
     return render_template('add_file.html', entity=actor, form=form)
 
 
-def save(form, actor=None, code: Optional[str] = None, origin=None) -> str:
+def save(form, actor=None, code: str = None, origin=None) -> Union[str, Response]:
     g.cursor.execute('BEGIN')
     try:
         log_action = 'update'
@@ -294,13 +294,13 @@ def save(form, actor=None, code: Optional[str] = None, origin=None) -> str:
         actor.save_nodes(form)
         url = url_for('actor_view', id_=actor.id)
         if form.residence.data:
-            object_ = EntityMapper.get_by_id(form.residence.data)
+            object_ = EntityMapper.get_by_id(form.residence.data, view_name='place')
             actor.link('P74', object_.get_linked_entity('P53'))
         if form.begins_in.data:
-            object_ = EntityMapper.get_by_id(form.begins_in.data)
+            object_ = EntityMapper.get_by_id(form.begins_in.data, view_name='place')
             actor.link('OA8', object_.get_linked_entity('P53'))
         if form.ends_in.data:
-            object_ = EntityMapper.get_by_id(form.ends_in.data)
+            object_ = EntityMapper.get_by_id(form.ends_in.data, view_name='place')
             actor.link('OA9', object_.get_linked_entity('P53'))
 
         if origin:

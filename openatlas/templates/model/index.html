@@ -5,7 +5,7 @@
 {% block content %}
     <div style="float:left">
         <a href="/static/images/model/openatlas_schema.png">
-            <img src="/static/images/model/openatlas_schema.png" style="width:500px" alt="OpenAtlas schema" />
+            <img src="/static/images/model/openatlas_schema.png" style="width:500px" alt="OpenAtlas schema">
         </a>
     </div>
     <div style="float:left;margin-left:1em;">
@@ -24,8 +24,8 @@
                 (form.property.label, form.property|string + 'property'|table_select_model(property)),
                 (form.range.label, form.range|string + 'range'|table_select_model(range)),
             ] %}
-            {{ data|data_table|safe }}
-            <input type="submit" value="{{ _('test')|uc_first }}" />
+            {{ data|display_info|safe }}
+            <input type="submit" value="{{ _('test')|uc_first }}">
         </form>
         {% if test_result %}
             <p style="margin-top:1em;">

@@ -70,7 +70,7 @@ class UserMapper:
         return [User(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_by_id(user_id: int, with_bookmarks: Optional[bool] = False) -> Optional[User]:
+    def get_by_id(user_id: int, with_bookmarks: bool = False):
         bookmarks = None
         if with_bookmarks:
             sql = 'SELECT entity_id FROM web.user_bookmarks WHERE user_id = %(user_id)s;'
