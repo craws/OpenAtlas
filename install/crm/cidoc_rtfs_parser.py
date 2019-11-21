@@ -47,14 +47,16 @@ def import_cidoc():  # pragma: no cover
     for subject, predicate, object_ in graph:
         code, name = subject.replace(CRM_URL, '').split('_', 1)
         name = name.replace('_', ' ')
-        print(predicate)
-        for name_, value in object_:
-            print(name_)
-            print(value_)
+        print(name)
+        print(code)
+        label = graph.preferredLabel(subject, lang='de')[0][1]
+        print(label)
+
         if name[0] == 'E':
             classes.append(object_)
         elif name[0] == 'P':
             properties.append(object_)
+        break
 
         #print(subject)
         #print(predicate)
