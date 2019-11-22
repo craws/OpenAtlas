@@ -11,6 +11,7 @@
 # Todo: Add and document shortcuts
 
 import time
+from pprint import pprint
 
 import psycopg2.extras
 from rdflib.graph import Graph
@@ -36,6 +37,14 @@ def connect():
         raise Exception(e)
 
 
+class Item:
+    def __init__(self, code, name, comment) -> None:
+        self.code = code
+        self.name = name
+        self.comment = comment
+        self.label = {}
+
+
 def import_cidoc():  # pragma: no cover
     start = time.time()
     classes = []
@@ -43,32 +52,31 @@ def import_cidoc():  # pragma: no cover
 
     graph = Graph()
     graph.parse(FILENAME, format='application/rdf+xml')
-
+    # pprint(dir(graph))
     for subject, predicate, object_ in graph:
-        code, name = subject.replace(CRM_URL, '').split('_', 1)
-        name = name.replace('_', ' ')
-        print(name)
-        print(code)
-        label = graph.preferredLabel(subject, lang='de')[0][1]
-        print(label)
 
+        code, name = subject.replace(CRM_URL, '').split('_', 1)
+        item = Item(code, name.replace('_', ' '), graph.comment(subject))
+        for language in ['de', 'en', 'fr', 'ru', 'el', 'pt', 'zh']:
+            translation = graph.preferredLabel(subject, lang=language)[0]
+            if translation:
+                item.label[language] = translation[1]
         if name[0] == 'E':
-            classes.append(object_)
+            classes.append(item)
         elif name[0] == 'P':
-            properties.append(object_)
+            properties.append(item)
+
+        # print(item.code)
+        # print(item.name)
+        # print(item.comment)
+        # print(item.label['en'])
+        # print(item.label['de'])
         break
 
-        #print(subject)
-        #print(predicate)
-        # print(object_)
-
-
-
-
-    #connection = connect()
-    #cursor = connection.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
-    #cursor.execute('BEGIN;')
-    #cursor.execute('COMMIT;')
+    # connection = connect()
+    # cursor = connection.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
+    # cursor.execute('BEGIN;')
+    # cursor.execute('COMMIT;')
     print('Execution time: ' + str(int(time.time() - start)) + ' seconds')
 
 
