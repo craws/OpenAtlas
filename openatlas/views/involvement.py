@@ -92,8 +92,8 @@ def involvement_update(id_: int, origin_id: int) -> Union[str, Response]:
         g.cursor.execute('BEGIN')
         try:
             link_.delete()
-            link_ = LinkMapper.get_by_id(event.link(form.activity.data, actor,
-                                                    form.description.data))
+            link_ = LinkMapper.get_by_id(
+                event.link(form.activity.data, actor, form.description.data))
             link_.set_dates(form)
             link_.type = get_link_type(form)
             link_.update()

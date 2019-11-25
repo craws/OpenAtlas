@@ -68,7 +68,7 @@ def object_add_source(id_: int) -> Union[str, Response]:
     object_ = EntityMapper.get_by_id(id_, view_name='object')
     if request.method == 'POST':
         if request.form['checkbox_values']:
-            object_.link('P128', request.form['checkbox_values'])
+            object_.link_string('P128', request.form['checkbox_values'])
         return redirect(url_for('object_view', id_=id_) + '#tab-source')
     form = build_table_form('source', object_.get_linked_entities(['P128']))
     return render_template('add_source.html', entity=object_, form=form)

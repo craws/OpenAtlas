@@ -109,7 +109,7 @@ def source_add(id_: int, class_name: str) -> Union[str, Response]:
     source = EntityMapper.get_by_id(id_, view_name='source')
     if request.method == 'POST':
         if request.form['checkbox_values']:
-            source.link('P67', request.form['checkbox_values'])
+            source.link_string('P67', request.form['checkbox_values'])
         return redirect(url_for('source_view', id_=source.id) + '#tab-' + class_name)
     form = build_table_form(class_name, source.get_linked_entities(['P67']))
     return render_template('source/add.html', source=source, class_name=class_name, form=form)
@@ -121,7 +121,7 @@ def source_add_reference(id_: int) -> Union[str, Response]:
     source = EntityMapper.get_by_id(id_, view_name='source')
     form = AddReferenceForm()
     if form.validate_on_submit():
-        source.link('P67', form.reference.data, description=form.page.data, inverse=True)
+        source.link_string('P67', form.reference.data, description=form.page.data, inverse=True)
         return redirect(url_for('source_view', id_=id_) + '#tab-reference')
     form.page.label.text = uc_first(_('page / link text'))
     return render_template('add_reference.html', entity=source, form=form)
@@ -133,7 +133,7 @@ def source_add_file(id_: int) -> Union[str, Response]:
     source = EntityMapper.get_by_id(id_, view_name='source')
     if request.method == 'POST':
         if request.form['checkbox_values']:
-            source.link('P67', request.form['checkbox_values'], inverse=True)
+            source.link_string('P67', request.form['checkbox_values'], inverse=True)
         return redirect(url_for('source_view', id_=id_) + '#tab-file')
     form = build_table_form('file', source.get_linked_entities(['P67'], inverse=True))
     return render_template('add_file.html', entity=source, form=form)
@@ -183,7 +183,7 @@ def save(form: FlaskForm, source: Entity = None, origin: Entity = None) -> str:
         # Information carrier
         source.delete_links(['P128'], inverse=True)
         if form.information_carrier.data:
-            source.link('P128', form.information_carrier.data, inverse=True)
+            source.link_string('P128', form.information_carrier.data, inverse=True)
 
         if origin:
             url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-source'

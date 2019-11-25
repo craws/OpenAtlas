@@ -1,6 +1,6 @@
 from typing import Union, Dict
 
-from flask import url_for
+from flask import url_for, g
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
@@ -90,8 +90,8 @@ class ContentTests(TestBaseCase):
                 source.link('P67', [event])
                 source.link('P67', [event])
                 source_node = NodeMapper.get_hierarchy_by_name('Source')
-                source.link('P2', source_node.subs[0])
-                source.link('P2', source_node.subs[1])
+                source.link('P2', g.nodes[source_node.subs[0]])
+                source.link('P2', g.nodes[source_node.subs[1]])
             rv = self.app.get(url_for('admin_check_link_duplicates'))
             assert b'Event Horizon' in rv.data
             rv = self.app.get(url_for('admin_check_link_duplicates', delete='delete'),

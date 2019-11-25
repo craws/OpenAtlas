@@ -248,7 +248,7 @@ def actor_add_source(id_: int) -> Union[str, Response]:
     actor = EntityMapper.get_by_id(id_, view_name='actor')
     if request.method == 'POST':
         if request.form['checkbox_values']:
-            actor.link('P67', request.form['checkbox_values'], inverse=True)
+            actor.link_string('P67', request.form['checkbox_values'], inverse=True)
         return redirect(url_for('actor_view', id_=id_) + '#tab-source')
     form = build_table_form('source', actor.get_linked_entities(['P67'], inverse=True))
     return render_template('add_source.html', entity=actor, form=form)
@@ -260,7 +260,7 @@ def actor_add_reference(id_: int) -> Union[str, Response]:
     actor = EntityMapper.get_by_id(id_, view_name='actor')
     form = AddReferenceForm()
     if form.validate_on_submit():
-        actor.link('P67', form.reference.data, description=form.page.data, inverse=True)
+        actor.link_string('P67', form.reference.data, description=form.page.data, inverse=True)
         return redirect(url_for('actor_view', id_=id_) + '#tab-reference')
     form.page.label.text = uc_first(_('page / link text'))
     return render_template('add_reference.html', entity=actor, form=form)
@@ -272,7 +272,7 @@ def actor_add_file(id_: int) -> Union[str, Response]:
     actor = EntityMapper.get_by_id(id_, view_name='actor')
     if request.method == 'POST':
         if request.form['checkbox_values']:
-            actor.link('P67', request.form['checkbox_values'], inverse=True)
+            actor.link_string('P67', request.form['checkbox_values'], inverse=True)
         return redirect(url_for('actor_view', id_=id_) + '#tab-file')
     form = build_table_form('file', actor.get_linked_entities(['P67'], inverse=True))
     return render_template('add_file.html', entity=actor, form=form)

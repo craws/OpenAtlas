@@ -4,9 +4,9 @@ from __future__ import annotations  # Needed for Python 4.0 type annotations
 import ast
 import re
 import time
-from typing import Any, List, Optional as Optional_Type
+from typing import Any, List, Optional as Optional_Type, Union
 
-from flask import g, session, Request
+from flask import Request, g, session
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
@@ -17,7 +17,7 @@ from wtforms.widgets import HiddenInput
 
 from openatlas import app
 from openatlas.models.entity import Entity, EntityMapper
-from openatlas.models.link import LinkMapper
+from openatlas.models.link import Link, LinkMapper
 from openatlas.models.node import NodeMapper
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, get_file_stats, truncate_string, uc_first
@@ -31,10 +31,8 @@ def get_link_type(form: Any) -> Optional_Type[Entity]:
     return None
 
 
-def build_form(form: Any, form_name: str, entity: Entity = None, request_origin: Request = None,
-               entity2: Entity = None) -> Any:
-    # Add custom fields, the entity parameter can also be a link.
-    custom_list = []
+def build_form(form: Any, form_name: str, selected_object: Union[Entity, Link] = None,
+               request_origin: Request = None, entity2: Entity = None) -> Any:
 
     def add_value_type_fields(subs: list) -> None:
         for sub_id in subs:
@@ -42,13 +40,14 @@ def build_form(form: Any, form_name: str, entity: Entity = None, request_origin:
             setattr(form, str(sub.id), ValueFloatField(sub.name, [Optional()]))
             add_value_type_fields(sub.subs)
 
+    # Add custom fields
+    custom_list = []
     for id_, node in NodeMapper.get_nodes_for_form(form_name).items():
         custom_list.append(id_)
         setattr(form, str(id_), TreeMultiField(str(id_)) if node.multiple else TreeField(str(id_)))
         if node.value_type:
             add_value_type_fields(node.subs)
-
-    form_instance = form(obj=entity)
+    form_instance = form(obj=selected_object)
 
     # Delete custom fields except the ones specified for the form
     delete_list = []  # Can't delete fields in the loop so creating a list for later deletion
@@ -59,12 +58,12 @@ def build_form(form: Any, form_name: str, entity: Entity = None, request_origin:
         delattr(form_instance, item)
 
     # Set field data if available and only if it's a GET request
-    if entity and request_origin and request_origin.method == 'GET':
+    if selected_object and request_origin and request_origin.method == 'GET':
         from openatlas.forms.date import DateForm
         # Important to use isinstance instead type check, because can be a sub type (e.g. ActorForm)
         if isinstance(form_instance, DateForm):
-            form_instance.populate_dates(entity)
-        nodes = entity.nodes
+            form_instance.populate_dates(selected_object)
+        nodes = selected_object.nodes
         if entity2:
             nodes.update(entity2.nodes)
         if hasattr(form, 'opened'):

@@ -230,7 +230,7 @@ def place_add_source(id_: int) -> Union[str, Response]:
     object_ = EntityMapper.get_by_id(id_, view_name='place')
     if request.method == 'POST':
         if request.form['checkbox_values']:
-            object_.link('P67', request.form['checkbox_values'], inverse=True)
+            object_.link_string('P67', request.form['checkbox_values'], inverse=True)
         return redirect(url_for('place_view', id_=id_) + '#tab-source')
     form = build_table_form('source', object_.get_linked_entities(['P67'], inverse=True))
     return render_template('add_source.html', entity=object_, form=form)
@@ -242,7 +242,7 @@ def place_add_reference(id_: int) -> Union[str, Response]:
     object_ = EntityMapper.get_by_id(id_, view_name='place')
     form = AddReferenceForm()
     if form.validate_on_submit():
-        object_.link('P67', form.reference.data, description=form.page.data, inverse=True)
+        object_.link_string('P67', form.reference.data, description=form.page.data, inverse=True)
         return redirect(url_for('place_view', id_=id_) + '#tab-reference')
     form.page.label.text = uc_first(_('page / link text'))
     return render_template('add_reference.html', entity=object_, form=form)
@@ -254,7 +254,7 @@ def place_add_file(id_: int) -> Union[str, Response]:
     object_ = EntityMapper.get_by_id(id_, view_name='place')
     if request.method == 'POST':
         if request.form['checkbox_values']:
-            object_.link('P67', request.form['checkbox_values'], inverse=True)
+            object_.link_string('P67', request.form['checkbox_values'], inverse=True)
         return redirect(url_for('place_view', id_=id_) + '#tab-file')
     form = build_table_form('file', object_.get_linked_entities(['P67'], inverse=True))
     return render_template('add_file.html', entity=object_, form=form)

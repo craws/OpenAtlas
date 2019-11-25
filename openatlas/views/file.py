@@ -112,7 +112,7 @@ def file_add(id_: int, class_name: str) -> Union[str, Response]:
     file = EntityMapper.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:
-            file.link('P67', request.form['checkbox_values'])
+            file.link_string('P67', request.form['checkbox_values'])
         return redirect(url_for('file_view', id_=file.id) + '#tab-' + class_name)
     form = build_table_form(class_name, file.get_linked_entities(['P67']))
     return render_template('file/add.html', entity=file, class_name=class_name, form=form)
@@ -124,7 +124,7 @@ def file_add_reference(id_: int) -> Union[str, Response]:
     file = EntityMapper.get_by_id(id_)
     form = AddReferenceForm()
     if form.validate_on_submit():
-        file.link('P67', form.reference.data, description=form.page.data, inverse=True)
+        file.link_string('P67', form.reference.data, description=form.page.data, inverse=True)
         return redirect(url_for('file_view', id_=id_) + '#tab-reference')
     form.page.label.text = uc_first(_('page / link text'))
     return render_template('add_reference.html', entity=file, form=form)

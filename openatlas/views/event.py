@@ -208,7 +208,7 @@ def event_add_source(id_: int) -> Union[str, Response]:
     event = EntityMapper.get_by_id(id_, view_name='event')
     if request.method == 'POST':
         if request.form['checkbox_values']:
-            event.link('P67', request.form['checkbox_values'], inverse=True)
+            event.link_string('P67', request.form['checkbox_values'], inverse=True)
         return redirect(url_for('event_view', id_=id_) + '#tab-source')
     form = build_table_form('source', event.get_linked_entities(['P67'], inverse=True))
     return render_template('add_source.html', entity=event, form=form)
@@ -220,7 +220,7 @@ def event_add_reference(id_: int) -> Union[str, Response]:
     event = EntityMapper.get_by_id(id_, view_name='event')
     form = AddReferenceForm()
     if form.validate_on_submit():
-        event.link('P67', form.reference.data, description=form.page.data, inverse=True)
+        event.link_string('P67', form.reference.data, description=form.page.data, inverse=True)
         return redirect(url_for('event_view', id_=id_) + '#tab-reference')
     form.page.label.text = uc_first(_('page / link text'))
     return render_template('add_reference.html', entity=event, form=form)
@@ -232,7 +232,7 @@ def event_add_file(id_: int) -> Union[str, Response]:
     event = EntityMapper.get_by_id(id_, view_name='event')
     if request.method == 'POST':
         if request.form['checkbox_values']:
-            event.link('P67', request.form['checkbox_values'], inverse=True)
+            event.link_string('P67', request.form['checkbox_values'], inverse=True)
         return redirect(url_for('event_view', id_=id_) + '#tab-file')
     form = build_table_form('file', event.get_linked_entities(['P67'], inverse=True))
     return render_template('add_file.html', entity=event, form=form)
@@ -253,20 +253,20 @@ def save(form: FlaskForm, event: Entity = None, code: str = None, origin: Entity
         event.update()
         event.save_nodes(form)
         if form.event.data:
-            event.link('P117', [int(form.event.data)])
+            event.link_string('P117', form.event.data)
         if form.place and form.place.data:
-            event.link('P7', [LinkMapper.get_linked_entity(int(form.place.data), 'P53')])
+            event.link('P7', LinkMapper.get_linked_entity(int(form.place.data), 'P53'))
         if event.class_.code == 'E8' and form.given_place.data:  # Link place for acquisition
-            event.link('P24', form.given_place.data)
+            event.link_string('P24', form.given_place.data)
         if event.class_.code == 'E9':  # Move
             if form.object.data:  # Moved objects
-                event.link('P25', form.object.data)
+                event.link_string('P25', form.object.data)
             if form.person.data:  # Moved persons
-                event.link('P25', form.person.data)
+                event.link_string('P25', form.person.data)
             if form.place_from.data:  # Link place for move from
-                event.link('P27', [LinkMapper.get_linked_entity(int(form.place_from.data), 'P53')])
+                event.link('P27', LinkMapper.get_linked_entity(int(form.place_from.data), 'P53'))
             if form.place_to.data:  # Link place for move to
-                event.link('P26', [LinkMapper.get_linked_entity(int(form.place_to.data), 'P53')])
+                event.link('P26', LinkMapper.get_linked_entity(int(form.place_to.data), 'P53'))
         url = url_for('event_view', id_=event.id)
         if origin:
             url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-event'

@@ -1,6 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
+import ast
 import itertools
 from collections import OrderedDict
 from typing import Dict, Iterator, List, Optional, Set, Union, ValuesView
@@ -14,6 +15,7 @@ from werkzeug.exceptions import abort
 
 from openatlas import app
 from openatlas.models.date import DateMapper
+from openatlas.models.link import LinkMapper
 from openatlas.util.util import print_file_extension, uc_first
 
 
@@ -79,28 +81,31 @@ class Entity:
 
     def get_linked_entity(self, code: str, inverse: bool = False,
                           nodes: bool = False) -> Optional[Entity]:
-        from openatlas.models.link import LinkMapper
         return LinkMapper.get_linked_entity(self.id, code, inverse=inverse, nodes=nodes)
 
     def get_linked_entities(self, code: list, inverse: bool = False,
                             nodes: bool = False) -> List[Entity]:
-        from openatlas.models.link import LinkMapper
         return LinkMapper.get_linked_entities(self.id, code, inverse=inverse, nodes=nodes)
 
-    def link(self, code: str, range_: Union[Entity, list], description: str = None,
+    def link(self, code: str, range_: Union[Entity, List[Entity]], description: str = None,
              inverse: bool = False, type_id: int = None) -> Union[int, None]:
-        from openatlas.models.link import LinkMapper
         return LinkMapper.insert(self, code, range_, description, inverse, type_id)
 
+    def link_string(self, code: str, range_: str, description: str = None,
+                    inverse: bool = False) -> Optional[int]:
+        # range_ string from a form, can be empty, an int or an int list presentation
+        # e.g. '', '1', '[]', '[1, 2]'
+        ids = ast.literal_eval(range_)
+        ids = [int(id_) for id_ in ids] if isinstance(ids, list) else [int(ids)]
+        return LinkMapper.insert(self, code, EntityMapper.get_by_ids(ids), description, inverse)
+
     def get_links(self, codes: list, inverse: bool = False) -> list:
-        from openatlas.models.link import LinkMapper
         return LinkMapper.get_links(self.id, codes, inverse)
 
     def delete(self) -> None:
         EntityMapper.delete(self.id)
 
     def delete_links(self, codes: List[str], inverse: bool = False) -> None:
-        from openatlas.models.link import LinkMapper
         LinkMapper.delete_by_codes(self, codes, inverse)
 
     def update(self) -> None:
@@ -498,7 +503,6 @@ class EntityMapper:
 
         entities = []
         for row in g.cursor.fetchall():
-            from openatlas.models.link import LinkMapper
             entity = None
             if row.class_code == 'E82':  # If found in actor alias
                 entity = LinkMapper.get_linked_entity(row.id, 'P131', True)

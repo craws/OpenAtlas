@@ -1,6 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-import ast
-from typing import Iterator, List, Optional, Union
+from typing import Iterator, List, Optional, TYPE_CHECKING, Union
 
 from flask import abort, flash, g, url_for
 from flask_babel import lazy_gettext as _
@@ -9,14 +8,16 @@ from psycopg2.extras import NamedTupleCursor
 
 from openatlas import logger
 from openatlas.models.date import DateMapper
-from openatlas.models.entity import Entity
 from openatlas.util.util import link, uc_first
+
+if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
+    from life.models.entity import Entity
 
 
 class Link:
 
-    def __init__(self, row: NamedTupleCursor.Record, domain: Entity = None,
-                 range_: Entity = None) -> None:
+    def __init__(self, row: NamedTupleCursor.Record, domain: 'Entity' = None,
+                 range_: 'Entity' = None) -> None:
         from openatlas.forms.date import DateForm
         from openatlas.models.entity import EntityMapper
         self.id = row.id
@@ -69,31 +70,16 @@ class Link:
 class LinkMapper:
 
     @staticmethod
-    def insert(entity: Entity,
+    def insert(entity: 'Entity',
                property_code: str,
-               range_: Union[Entity, list, str],
+               range_: Union['Entity', List['Entity']],
                description: str = None,
                inverse: bool = False,
                type_id: int = None) -> Union[int, None]:
-        from openatlas.models.entity import Entity, EntityMapper
-        # Linked_entities can be an entity, an entity id or a list of them
-        if not entity or not range_:  # pragma: no cover
-            return None
         property_ = g.properties[property_code]
-
-        if isinstance(range_, str):
-            linked_entities = ast.literal_eval(range_)
-            if not linked_entities:  # pragma: no cover
-                return None
-        elif isinstance(range_, list):
-            linked_entities = range_
-        else:
-            linked_entities = [range_]
-        print(linked_entities)
-        if not isinstance(linked_entities[0], Entity):
-            linked_entities = EntityMapper.get_by_ids(linked_entities)
+        entities = range_ if isinstance(range_, list) else [range_]
         result = None
-        for linked_entity in linked_entities:
+        for linked_entity in entities:
             domain = linked_entity if inverse else entity
             range_ = entity if inverse else linked_entity
             domain_error = True
@@ -124,7 +110,7 @@ class LinkMapper:
 
     @staticmethod
     def get_linked_entity(entity_id: int, code: str, inverse: bool = False,
-                          nodes: bool = False) -> Optional[Entity]:
+                          nodes: bool = False) -> Optional['Entity']:
         result = LinkMapper.get_linked_entities(entity_id, [code], inverse=inverse, nodes=nodes)
         if len(result) > 1:  # pragma: no cover
             logger.log('error', 'model', 'multiple linked entities found for ' + code)
@@ -176,7 +162,7 @@ class LinkMapper:
         return links
 
     @staticmethod
-    def delete_by_codes(entity: Entity, codes: List[str], inverse: bool = False) -> None:
+    def delete_by_codes(entity: 'Entity', codes: List[str], inverse: bool = False) -> None:
         sql = """
             DELETE FROM model.link
             WHERE property_code IN %(codes)s AND {field} = %(id)s;""".format(
@@ -198,7 +184,7 @@ class LinkMapper:
         return Link(g.cursor.fetchone())
 
     @staticmethod
-    def get_entities_by_node(node: Entity) -> Iterator:
+    def get_entities_by_node(node: 'Entity') -> Iterator:
         sql = "SELECT id, domain_id, range_id from model.link WHERE type_id = %(node_id)s;"
         g.execute(sql, {'node_id': node.id})
         return g.cursor.fetchall()
