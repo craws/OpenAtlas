@@ -57,7 +57,7 @@ class Entity:
             self.last = DateForm.format_date(self.end_from, 'year') if self.end_from else None
             self.last = DateForm.format_date(self.end_to, 'year') if self.end_to else self.last
         self.class_ = g.classes[row.class_code]
-        self.view_name = None  # Used to build URLs
+        self.view_name = ''  # Used to build URLs
         self.external_references: list = []
         if self.system_type == 'file':
             self.view_name = 'file'
@@ -79,8 +79,7 @@ class Entity:
         self.directional = False
         self.forms: list = []
 
-    def get_linked_entity(self, code: str, inverse: bool = False,
-                          nodes: bool = False) -> Optional[Entity]:
+    def get_linked_entity(self, code: str, inverse: bool = False, nodes: bool = False) -> Entity:
         return LinkMapper.get_linked_entity(self.id, code, inverse=inverse, nodes=nodes)
 
     def get_linked_entities(self, code: list, inverse: bool = False,

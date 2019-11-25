@@ -10,11 +10,7 @@ from openatlas.util.util import is_float
 
 class Project:
 
-    def __init__(self, row: NamedTupleCursor.Record = None) -> None:
-        self.id = None
-        self.name = None
-        if not row:
-            return
+    def __init__(self, row: NamedTupleCursor.Record) -> None:
         self.id = row.id
         self.name = row.name
         self.count = row.count

@@ -392,7 +392,7 @@ def admin_newsletter() -> Union[str, Response]:
         recipients = 0
         for user_id in (request.form.getlist('recipient')):
             user = UserMapper.get_by_id(user_id)
-            if user and user.settings['newsletter'] and user.active:
+            if user and user.settings['newsletter'] and user.active and user.email:
                 code = UserMapper.generate_password()
                 user.unsubscribe_code = code
                 user.update()

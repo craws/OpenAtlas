@@ -6,7 +6,7 @@ import os
 import re
 import smtplib
 from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, date
 from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
@@ -41,8 +41,8 @@ def convert_size(size_bytes: int) -> str:
     return "%s %s" % (int(size_bytes / math.pow(1024, i)), size_name[i])
 
 
-def get_file_path(entity: 'Entity') -> Optional[str]:
-    entity_id = entity if type(entity) is int else entity.id
+def get_file_path(entity: Union[int, 'Entity']) -> Optional[str]:
+    entity_id = entity if isinstance(entity, int) else entity.id
     path = glob.glob(os.path.join(app.config['UPLOAD_FOLDER_PATH'], str(entity_id) + '.*'))
     return path[0] if path else None
 
@@ -59,17 +59,17 @@ def display_tooltip(text: str) -> str:
     return ' <span class="tooltip" title="{title}">i</span>'.format(title=text.replace('"', "'"))
 
 
-def print_file_extension(entity: 'Entity') -> str:
-    entity_id = entity if type(entity) is int else entity.id
+def print_file_extension(entity: Union[int, 'Entity']) -> str:
+    entity_id = entity if isinstance(entity, int) else entity.id
     path = get_file_path(entity_id)
     return os.path.splitext(path)[1] if path else 'N/A'
 
 
-def send_mail(subject: str, text: str, recipients: List[str],
+def send_mail(subject: str, text: str, recipients: Union[str, List[str]],
               log_body: bool = True) -> bool:  # pragma: no cover
     """ Send one mail to every recipient, set log_body to False for sensitive data e.g. passwords"""
+    recipients = recipients if isinstance(recipients, list) else [recipients]
     settings = session['settings']
-    recipients = recipients if type(recipients) is list else [recipients]
     if not settings['mail'] or len(recipients) < 1:
         return False
     mail_user = settings['mail_transport_username']
@@ -152,7 +152,7 @@ def display_remove_link(url: str, name: str) -> str:
 
 
 def add_type_data(entity: 'Entity', data: list, location: 'Entity' = None) -> list:
-    type_data: dict = {}
+    type_data: OrderedDict = OrderedDict()
     # Nodes
     if location:
         entity.nodes.update(location.nodes)  # Add location types
@@ -371,10 +371,13 @@ def uc_first(string: str) -> str:
     return str(string)[0].upper() + str(string)[1:] if string else ''
 
 
-def format_date(value: Union[datetime.date, numpy.datetime64]) -> str:
+def format_date(value: Union[datetime, numpy.datetime64]) -> str:
+    if not value:
+        return ''
     if isinstance(value, numpy.datetime64):
-        return DateMapper.datetime64_to_timestamp(value)
-    return value.date().isoformat() if value else ''
+        date_ = DateMapper.datetime64_to_timestamp(value)
+        return date_ if date_ else ''
+    return value.date().isoformat()
 
 
 def format_datetime(value) -> str:
@@ -382,7 +385,7 @@ def format_datetime(value) -> str:
 
 
 def get_profile_image_table_link(file: 'Entity', entity: 'Entity', extension: str,
-                                 profile_image_id: int) -> str:
+                                 profile_image_id: int = None) -> str:
     if file.id == profile_image_id:
         url = url_for('file_remove_profile_image', entity_id=entity.id)
         return '<a href="' + url + '">' + uc_first(_('unset')) + '</a>'
@@ -458,7 +461,7 @@ def truncate_string(string: str, length: int = 40, span: bool = True) -> str:
 
 def get_base_table_data(entity: 'Entity', file_stats: dict = None) -> list:
     """ Returns standard table data for an entity"""
-    data = ['<br>'.join([link(entity)] + [
+    data: list = ['<br>'.join([link(entity)] + [
         truncate_string(alias) for alias in entity.aliases.values()])]
     if entity.view_name in ['event', 'actor']:
         data.append(g.classes[entity.class_.code].name)
@@ -494,7 +497,7 @@ def was_modified(form: FlaskForm, entity: 'Entity') -> bool:  # pragma: no cover
 
 
 def format_entry_begin(entry: 'Entity', object_: 'Entity' = None) -> str:
-    html = link(object_)
+    html = link(object_) if object_ else ''
     if entry.begin_from:
         html += ', ' if html else ''
         if entry.begin_to:
@@ -507,7 +510,7 @@ def format_entry_begin(entry: 'Entity', object_: 'Entity' = None) -> str:
 
 
 def format_entry_end(entry: 'Entity', object_: 'Entity' = None) -> str:
-    html = link(object_)
+    html = link(object_) if object_ else ''
     if entry.end_from:
         html += ', ' if html else ''
         if entry.end_to:

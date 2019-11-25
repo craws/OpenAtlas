@@ -1,7 +1,7 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
 import collections
 import os
-from typing import Union, Optional
+from typing import Optional, Union
 
 import pandas as pd
 from flask import flash, g, render_template, request, url_for
@@ -14,7 +14,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.models.entity import EntityMapper
-from openatlas.models.imports import ImportMapper, Project
+from openatlas.models.imports import ImportMapper
 from openatlas.util.table import Table
 from openatlas.util.util import format_date, is_float, link, required_group, truncate_string
 
@@ -27,8 +27,8 @@ class ProjectForm(FlaskForm):
 
     def validate(self) -> bool:
         valid = FlaskForm.validate(self)
-        project = ImportMapper.get_project_by_id(self.project_id) if self.project_id else Project()
-        if project.name != self.name.data and ImportMapper.get_project_by_name(self.name.data):
+        name = ImportMapper.get_project_by_id(self.project_id).name if self.project_id else ''
+        if name != self.name.data and ImportMapper.get_project_by_name(self.name.data):
             self.name.errors.append(_('error name exists'))
             valid = False
         return valid
