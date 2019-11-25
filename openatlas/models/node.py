@@ -99,9 +99,7 @@ class NodeMapper(EntityMapper):
     @staticmethod
     def get_hierarchy_by_name(name: str) -> Entity:
         name = name.replace('_', ' ')
-        for id_, node in g.nodes.items():
-            if node.name == name and not node.root:
-                return node
+        return [root for id_, root in g.nodes.items() if root.name == name][0]
 
     @staticmethod
     def get_tree_data(node_id: int, selected_ids: list) -> str:

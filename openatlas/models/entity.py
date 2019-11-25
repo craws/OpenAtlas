@@ -77,7 +77,7 @@ class Entity:
         self.system = False
         self.value_type = False
         self.directional = False
-        self.forms: list = []
+        self.forms: dict = {}
 
     def get_linked_entity(self, code: str, inverse: bool = False, nodes: bool = False) -> Entity:
         return LinkMapper.get_linked_entity(self.id, code, inverse=inverse, nodes=nodes)

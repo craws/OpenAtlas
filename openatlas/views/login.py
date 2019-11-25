@@ -117,7 +117,7 @@ def reset_password() -> Union[str, Response]:
 @app.route('/reset_confirm/<code>')
 def reset_confirm(code: str) -> Response:  # pragma: no cover
     user = UserMapper.get_by_reset_code(code)
-    if not user or not user.username:
+    if not user or not user.username or not user.email:
         logger.log('info', 'auth', 'unknown reset code')
         flash(_('invalid password reset confirmation code'), 'error')
         abort(404)
