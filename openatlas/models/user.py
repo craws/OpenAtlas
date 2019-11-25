@@ -80,7 +80,7 @@ class UserMapper:
             g.execute(sql, {'user_id': user_id})
             bookmarks = [row.entity_id for row in g.cursor.fetchall()]
         g.execute(UserMapper.sql + ' WHERE u.id = %(id)s;', {'id': user_id})
-        return User(g.cursor.fetchone(), bookmarks) if g.cursor.rowcount == 1 else None
+        return User(g.cursor.fetchone(), bookmarks)
 
     @staticmethod
     def get_by_reset_code(code: str) -> Optional[User]:

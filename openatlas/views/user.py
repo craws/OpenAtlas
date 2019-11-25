@@ -86,6 +86,7 @@ def user_activity(user_id: int = 0) -> str:
         try:
             entity = EntityMapper.get_by_id(row.entity_id)
         except Exception as e:  # pragma: no cover
+            # Todo: update SQL to remove logs of deleted entities, set foreign key, remove try
             entity = None
         user = UserMapper.get_by_id(row.user_id)
         table.rows.append([format_date(row.created),
