@@ -231,7 +231,7 @@ def save(form: FileForm, file: Entity = None, origin: Entity = None) -> str:
         url = url_for('file_view', id_=file.id)
         if origin:
             if origin.system_type in ['edition', 'bibliography']:
-                link_id = origin.link('P67', file)
+                link_id = origin.link('P67', file)[0]
                 url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
             else:
                 file.link('P67', origin)

@@ -1,9 +1,11 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+
 from typing import Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
+from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
@@ -245,8 +247,10 @@ def save(form: FlaskForm, event: Entity = None, code: str = None, origin: Entity
         if event:
             log_action = 'update'
             event.delete_links(['P7', 'P24', 'P25', 'P26', 'P27', 'P117'])
-        else:
+        elif code:
             event = EntityMapper.insert(code, form.name.data)
+        else:
+            abort(404)  # pragma: no cover, either event or code has to be provided
         event.name = form.name.data
         event.description = form.description.data
         event.set_dates(form)
@@ -271,12 +275,12 @@ def save(form: FlaskForm, event: Entity = None, code: str = None, origin: Entity
         if origin:
             url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-event'
             if origin.view_name == 'reference':
-                link_id = origin.link('P67', event)
+                link_id = origin.link('P67', event)[0]
                 url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
             elif origin.view_name == 'source':
                 origin.link('P67', event)
             elif origin.view_name == 'actor':
-                link_id = event.link('P11', origin)
+                link_id = event.link('P11', origin)[0]
                 url = url_for('involvement_update', id_=link_id, origin_id=origin.id)
             elif origin.view_name == 'file':
                 origin.link('P67', event)

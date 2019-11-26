@@ -54,7 +54,7 @@ class ContentTests(TestBaseCase):
                 person.begin_from = '2018-01-31'
                 person.begin_to = '2018-01-01'
                 person.update()
-                involvement = LinkMapper.get_by_id(event.link('P11', [person]))
+                involvement = LinkMapper.get_by_id(event.link('P11', [person])[0])
                 involvement.begin_from = '2017-01-31'
                 involvement.begin_to = '2017-01-01'
                 involvement.end_from = '2017-01-01'

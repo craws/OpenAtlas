@@ -105,10 +105,11 @@ def hierarchy_delete(id_: int) -> Response:
     return redirect(url_for('node_index'))
 
 
-def save(form: FlaskForm, node: Entity = None, value_type: bool = False) -> Entity:
+def save(form: FlaskForm, node_: Entity = None, value_type: bool = False) -> Entity:
     g.cursor.execute('BEGIN')
     try:
-        if node:
+        if node_:
+            node = node_
             NodeMapper.update_hierarchy(node, form)
         else:
             node = NodeMapper.insert('E55', sanitize(form.name.data, 'node'))

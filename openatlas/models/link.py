@@ -1,5 +1,5 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Iterator, List, Optional, TYPE_CHECKING, Union
+from typing import Iterator, List, TYPE_CHECKING, Union
 
 from flask import abort, flash, g, url_for
 from flask_babel import lazy_gettext as _
@@ -11,7 +11,7 @@ from openatlas.models.date import DateMapper
 from openatlas.util.util import link, uc_first
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
-    from life.models.entity import Entity
+    from openatlas.models.entity import Entity
 
 
 class Link:
@@ -75,10 +75,10 @@ class LinkMapper:
                range_: Union['Entity', List['Entity']],
                description: str = None,
                inverse: bool = False,
-               type_id: int = None) -> Union[int, None]:
+               type_id: int = None) -> List[int]:
         property_ = g.properties[property_code]
         entities = range_ if isinstance(range_, list) else [range_]
-        result = None
+        new_link_ids = []
         for linked_entity in entities:
             domain = linked_entity if inverse else entity
             range_ = entity if inverse else linked_entity
@@ -105,8 +105,8 @@ class LinkMapper:
                             'range_id': range_.id,
                             'description': description,
                             'type_id': type_id})
-            result = g.cursor.fetchone()[0]
-        return result
+            new_link_ids.append(g.cursor.fetchone()[0])
+        return new_link_ids
 
     @staticmethod
     def get_linked_entity(entity_id: int, code: str, inverse: bool = False,

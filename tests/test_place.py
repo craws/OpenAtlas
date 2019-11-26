@@ -122,7 +122,7 @@ class PlaceTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()
                 file = EntityMapper.get_by_system_type('file')[0]
-                link_id = LinkMapper.insert(file, 'P67', place)
+                link_id = LinkMapper.insert(file, 'P67', place)[0]
             rv = self.app.get(url_for('overlay_insert', image_id=file.id, place_id=place.id,
                                       link_id=link_id))
             assert b'X-Files' in rv.data

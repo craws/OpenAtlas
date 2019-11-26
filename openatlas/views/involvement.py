@@ -47,15 +47,15 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
         try:
             if origin.view_name == 'event':
                 for actor in EntityMapper.get_by_ids(ast.literal_eval(form.actor.data)):
-                    link_ = LinkMapper.get_by_id(
-                        origin.link(form.activity.data, actor, form.description.data))
+                    link_ = LinkMapper.get_by_id(origin.link(form.activity.data, actor,
+                                                             form.description.data)[0])
                     link_.set_dates(form)
                     link_.type = get_link_type(form)
                     link_.update()
             else:
                 for event in EntityMapper.get_by_ids(ast.literal_eval(form.event.data)):
-                    link_ = LinkMapper.get_by_id(
-                        event.link(form.activity.data, origin, form.description.data))
+                    link_ = LinkMapper.get_by_id(event.link(form.activity.data, origin,
+                                                            form.description.data)[0])
                     link_.set_dates(form)
                     link_.type = get_link_type(form)
                     link_.update()
@@ -92,8 +92,8 @@ def involvement_update(id_: int, origin_id: int) -> Union[str, Response]:
         g.cursor.execute('BEGIN')
         try:
             link_.delete()
-            link_ = LinkMapper.get_by_id(
-                event.link(form.activity.data, actor, form.description.data))
+            link_ = LinkMapper.get_by_id(event.link(form.activity.data, actor,
+                                                    form.description.data)[0])
             link_.set_dates(form)
             link_.type = get_link_type(form)
             link_.update()

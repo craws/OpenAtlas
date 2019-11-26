@@ -32,8 +32,8 @@ class RelationTests(TestBaseCase):
                     'begin_year_to': '-1948',
                     'end_year_from': '2049',
                     'end_year_to': '2050'}
-            rv = self.app.post(
-                url_for('relation_insert', origin_id=actor.id), data=data, follow_redirects=True)
+            rv = self.app.post(url_for('relation_insert', origin_id=actor.id), data=data,
+                               follow_redirects=True)
             assert b'The Kurgan' in rv.data
             rv = self.app.get(url_for('node_view', id_=relation_sub_id))
             assert b'Connor' in rv.data

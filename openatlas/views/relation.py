@@ -46,11 +46,11 @@ def relation_insert(origin_id: int) -> Union[str, Response]:
         try:
             for actor in EntityMapper.get_by_ids(ast.literal_eval(form.actor.data)):
                 if form.inverse.data:
-                    link_ = LinkMapper.get_by_id(
-                        actor.link('OA7', origin, form.description.data))
+                    link_ = LinkMapper.get_by_id(actor.link('OA7', origin,
+                                                            form.description.data)[0])
                 else:
-                    link_ = LinkMapper.get_by_id(
-                        origin.link('OA7', actor, form.description.data))
+                    link_ = LinkMapper.get_by_id(origin.link('OA7', actor,
+                                                             form.description.data)[0])
                 link_.set_dates(form)
                 link_.type = get_link_type(form)
                 link_.update()
@@ -81,9 +81,9 @@ def relation_update(id_: int, origin_id: int) -> Union[str, Response]:
         try:
             link_.delete()
             if form.inverse.data:
-                link_ = LinkMapper.get_by_id(related.link('OA7', origin, form.description.data))
+                link_ = LinkMapper.get_by_id(related.link('OA7', origin, form.description.data)[0])
             else:
-                link_ = LinkMapper.get_by_id(origin.link('OA7', related, form.description.data))
+                link_ = LinkMapper.get_by_id(origin.link('OA7', related, form.description.data)[0])
             link_.set_dates(form)
             link_.type = get_link_type(form)
             link_.update()

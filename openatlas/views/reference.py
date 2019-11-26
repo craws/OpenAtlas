@@ -210,7 +210,7 @@ def save(form: Any, reference: Entity = None, code: str = None, origin: Entity =
         reference.save_nodes(form)
         url = url_for('reference_view', id_=reference.id)
         if origin:
-            link_id = reference.link('P67', origin)
+            link_id = reference.link('P67', origin)[0]
             url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
         if form.continue_.data == 'yes' and code:
             url = url_for('reference_insert', code=code)

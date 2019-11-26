@@ -27,7 +27,8 @@ class GeonamesMapper:
         if not new_geonames_id:
             if geonames_entity:
                 if len(geonames_entity.get_links(['P67'])) > 1:  # pragma: no cover
-                    geonames_link.delete()  # There are more linked so only remove this link
+                    if geonames_link:
+                        geonames_link.delete()  # There are more linked so only remove this link
                 else:
                     geonames_entity.delete()  # Nothing else is linked to the reference so delete it
             return
@@ -53,17 +54,18 @@ class GeonamesMapper:
             object_.link('P67', [reference], inverse=True, type_id=match_id)
             return
 
-        if int(new_geonames_id) == int(geonames_entity.name) and match_id == geonames_link.type.id:
+        if geonames_link and int(new_geonames_id) == int(geonames_entity.name) \
+                and match_id == geonames_link.type.id:
             return  # It's the same link so do nothing
 
         # Only the match type change so delete and recreate the link
-        if int(new_geonames_id) == int(geonames_entity.name):
+        if geonames_link and int(new_geonames_id) == int(geonames_entity.name):
             geonames_link.delete()
             object_.link('P67', geonames_entity, inverse=True, type_id=match_id)
             return
 
         # Its linked to a different geonames reference
-        if len(geonames_entity.get_links(['P67'])) > 1:
+        if geonames_link and len(geonames_entity.get_links(['P67'])) > 1:
             geonames_link.delete()  # There are more linked so only remove this link
         else:  # pragma: no cover
             geonames_entity.delete()  # Nothing else is linked to the reference so delete it

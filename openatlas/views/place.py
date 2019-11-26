@@ -355,7 +355,7 @@ def save(form: DateForm, object_: Entity = None, location: Entity = None,
         if origin:
             url = url_for(origin.view_name + '_view', id_=origin.id) + '#tab-place'
             if origin.view_name == 'reference':
-                link_id = origin.link('P67', object_)
+                link_id = origin.link('P67', object_)[0]
                 url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
             elif origin.system_type in ['place', 'feature', 'stratigraphic unit']:
                 url = url_for('place_view', id_=object_.id)

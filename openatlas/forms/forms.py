@@ -82,12 +82,13 @@ def build_form(form: Any, form_name: str, selected_object: Union[Entity, Link] =
     return form_instance
 
 
-def build_node_form(form: Any, node: Entity, request_origin: Request = None) -> FlaskForm:
+def build_node_form(form: Any, node_: Entity, request_origin: Request = None) -> FlaskForm:
     if not request_origin:
-        root = node
+        root = node_
         node = None
     else:
-        root = g.nodes[node.root[-1]]
+        node = node_
+        root = g.nodes[node_.root[-1]]
     setattr(form, str(root.id), TreeField(str(root.id)))
     form_instance = form(obj=node)
     if not root.directional:

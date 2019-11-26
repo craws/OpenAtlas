@@ -87,11 +87,11 @@ class Entity:
         return LinkMapper.get_linked_entities(self.id, code, inverse=inverse, nodes=nodes)
 
     def link(self, code: str, range_: Union[Entity, List[Entity]], description: str = None,
-             inverse: bool = False, type_id: int = None) -> Union[int, None]:
+             inverse: bool = False, type_id: int = None) -> List[int]:
         return LinkMapper.insert(self, code, range_, description, inverse, type_id)
 
     def link_string(self, code: str, range_: str, description: str = None,
-                    inverse: bool = False) -> Optional[int]:
+                    inverse: bool = False) -> List[int]:
         # range_ string from a form, can be empty, an int or an int list presentation
         # e.g. '', '1', '[]', '[1, 2]'
         ids = ast.literal_eval(range_)

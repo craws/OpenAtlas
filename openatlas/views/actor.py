@@ -307,16 +307,16 @@ def save(form: ActorForm, actor: Entity = None, code: str = '',
 
         if origin:
             if origin.view_name == 'reference':
-                link_id = origin.link('P67', actor)
+                link_id = origin.link('P67', actor)[0]
                 url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
             elif origin.view_name == 'source':
                 origin.link('P67', actor)
                 url = url_for('source_view', id_=origin.id) + '#tab-actor'
             elif origin.view_name == 'event':
-                link_id = origin.link('P11', actor)
+                link_id = origin.link('P11', actor)[0]
                 url = url_for('involvement_update', id_=link_id, origin_id=origin.id)
             elif origin.view_name == 'actor':
-                link_id = origin.link('OA7', actor)
+                link_id = origin.link('OA7', actor)[0]
                 url = url_for('relation_update', id_=link_id, origin_id=origin.id)
         if form.continue_.data == 'yes' and code:
             url = url_for('actor_insert', code=code)
