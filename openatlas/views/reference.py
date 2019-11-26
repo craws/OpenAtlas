@@ -165,7 +165,7 @@ def save(form: Any, reference: Entity = None, code: str = None, origin: Entity =
 
     try:
         if not code and not reference:
-            abort(404)  # pragma: no cover, either reference or code has to be provided
+            abort(400)  # pragma: no cover, either reference or code has to be provided
         elif not reference:
             log_action = 'insert'
             system_type = code.replace('_', ' ')  # type: ignore

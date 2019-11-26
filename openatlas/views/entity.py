@@ -3,9 +3,10 @@ import os
 import sys
 from typing import Union
 
-from flask import g, render_template, url_for
+from flask import g, render_template, url_for, flash
 from flask_babel import lazy_gettext as _, format_number
 from flask_login import current_user
+from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
@@ -33,6 +34,9 @@ def entity_view(id_: int) -> Union[str, Response]:
         else:
             return redirect(url_for('node_index') + '#tab-' + str(id_))
     entity = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
+    if not entity.view_name:  # pragma: no cover
+        flash('No view found for this entity', 'error')
+        abort(400)
     return getattr(sys.modules[__name__], '{name}_view'.format(name=entity.view_name))(entity)
 
 

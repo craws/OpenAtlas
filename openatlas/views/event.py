@@ -188,7 +188,7 @@ def save(form: FlaskForm, event: Entity = None, code: str = None, origin: Entity
         elif code:
             event = EntityMapper.insert(code, form.name.data)
         else:
-            abort(404)  # pragma: no cover, either event or code has to be provided
+            abort(400)  # pragma: no cover, either event or code has to be provided
         event.name = form.name.data
         event.description = form.description.data
         event.set_dates(form)

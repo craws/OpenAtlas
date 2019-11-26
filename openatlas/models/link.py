@@ -115,7 +115,7 @@ class LinkMapper:
         if len(result) > 1:  # pragma: no cover
             logger.log('error', 'model', 'Multiple linked entities found for ' + code)
             flash(_('error multiple linked entities found'), 'error')
-            abort(404)
+            abort(400)
         return result[0] if result else None  # type: ignore  # problematic because place/location
 
     @staticmethod

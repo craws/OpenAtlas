@@ -101,6 +101,11 @@ def index_credits() -> str:
     return render_template('index/credits.html')
 
 
+@app.errorhandler(400)
+def bad_request(e: Exception) -> Tuple[str, int]:  # pragma: no cover
+    return render_template('400.html', e=e), 400
+
+
 @app.errorhandler(403)
 def forbidden(e: Exception) -> Tuple[str, int]:
     return render_template('403.html', e=e), 403

@@ -70,7 +70,7 @@ def save(form: FlaskForm, entity: Entity = None, source: Entity = None) -> Entit
             source.link('P73', entity)
             logger.log_user(entity.id, 'insert')
         else:
-            abort(404)  # pragma: no cover, either entity or source has to be provided
+            abort(400)  # pragma: no cover, either entity or source has to be provided
         entity.name = form.name.data
         entity.description = form.description.data
         entity.update()
