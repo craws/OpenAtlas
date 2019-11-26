@@ -134,7 +134,7 @@ def place_view(id_: int) -> str:
         if is_authorized('editor'):
             tables['file'].header.append(uc_first(_('overlay')))
 
-    for link_ in object_.get_links(['P67'], inverse=True):
+    for link_ in object_.get_links('P67', inverse=True):
         domain = link_.domain
         data = get_base_table_data(domain)
         if domain.view_name == 'file':
@@ -170,11 +170,11 @@ def place_view(id_: int) -> str:
     for event in location.get_linked_entities(['P7', 'P26', 'P27'], inverse=True):
         tables['event'].rows.append(get_base_table_data(event))
         event_ids.append(event.id)
-    for event in object_.get_linked_entities(['P24'], inverse=True):
+    for event in object_.get_linked_entities('P24', inverse=True):
         if event.id not in event_ids:  # Don't add again if already in table
             tables['event'].rows.append(get_base_table_data(event))
     has_subunits = False
-    for entity in object_.get_linked_entities(['P46'], nodes=True):
+    for entity in object_.get_linked_entities('P46', nodes=True):
         has_subunits = True
         data = get_base_table_data(entity)
         data.append(truncate_string(entity.description))
@@ -232,7 +232,7 @@ def place_add_source(id_: int) -> Union[str, Response]:
         if request.form['checkbox_values']:
             object_.link_string('P67', request.form['checkbox_values'], inverse=True)
         return redirect(url_for('place_view', id_=id_) + '#tab-source')
-    form = build_table_form('source', object_.get_linked_entities(['P67'], inverse=True))
+    form = build_table_form('source', object_.get_linked_entities('P67', inverse=True))
     return render_template('add_source.html', entity=object_, form=form)
 
 
@@ -256,7 +256,7 @@ def place_add_file(id_: int) -> Union[str, Response]:
         if request.form['checkbox_values']:
             object_.link_string('P67', request.form['checkbox_values'], inverse=True)
         return redirect(url_for('place_view', id_=id_) + '#tab-file')
-    form = build_table_form('file', object_.get_linked_entities(['P67'], inverse=True))
+    form = build_table_form('file', object_.get_linked_entities('P67', inverse=True))
     return render_template('add_file.html', entity=object_, form=form)
 
 

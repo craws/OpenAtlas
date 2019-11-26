@@ -56,8 +56,8 @@ class RelationTests(TestBaseCase):
             # Update relationship
             with app.test_request_context():
                 app.preprocess_request()
-                link_id = LinkMapper.get_links(actor.id, ['OA7'])[0].id
-                link_id2 = LinkMapper.get_links(actor.id, ['OA7'], True)[0].id
+                link_id = LinkMapper.get_links(actor.id, 'OA7')[0].id
+                link_id2 = LinkMapper.get_links(actor.id, 'OA7', True)[0].id
 
             rv = self.app.post(url_for('node_move_entities', id_=relation_sub_id),
                                data={relation_id: relation_sub_id2, 'selection': [link_id],

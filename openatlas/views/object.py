@@ -44,14 +44,14 @@ def object_view(id_: int) -> str:
     object_ = EntityMapper.get_by_id(id_, nodes=True, view_name='object')
     object_.note = UserMapper.get_note(object_)
     tables = {'source': Table(Table.HEADERS['source']), 'event': Table(Table.HEADERS['event'])}
-    for link_ in object_.get_links(['P128']):
+    for link_ in object_.get_links('P128'):
         data = get_base_table_data(link_.range)
         if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=object_.id)
             data.append(
                 display_remove_link(url + '#tab-' + link_.range.table_name, link_.range.name))
         tables['source'].rows.append(data)
-    for link_ in object_.get_links(['P25'], inverse=True):
+    for link_ in object_.get_links('P25', inverse=True):
         data = get_base_table_data(link_.domain)
         if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=object_.id)

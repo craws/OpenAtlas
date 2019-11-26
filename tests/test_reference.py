@@ -50,7 +50,7 @@ class ReferenceTest(TestBaseCase):
             # Reference link update
             with app.test_request_context():
                 app.preprocess_request()
-                link_id = batman.get_links(['P67'], True)[0].id
+                link_id = batman.get_links('P67', True)[0].id
                 file = EntityMapper.insert('E31', 'The X-Files', 'file')
                 file.link('P67', reference)
             rv = self.app.post(

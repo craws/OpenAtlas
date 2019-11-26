@@ -83,7 +83,7 @@ class Entity:
     def get_linked_entity(self, code: str, inverse: bool = False, nodes: bool = False) -> Entity:
         return LinkMapper.get_linked_entity(self.id, code, inverse=inverse, nodes=nodes)
 
-    def get_linked_entities(self, code: list, inverse: bool = False,
+    def get_linked_entities(self, code: Union[str, List[str]], inverse: bool = False,
                             nodes: bool = False) -> List[Entity]:
         return LinkMapper.get_linked_entities(self.id, code, inverse=inverse, nodes=nodes)
 
@@ -99,7 +99,7 @@ class Entity:
         ids = [int(id_) for id_ in ids] if isinstance(ids, list) else [int(ids)]
         return LinkMapper.insert(self, code, EntityMapper.get_by_ids(ids), description, inverse)
 
-    def get_links(self, codes: list, inverse: bool = False) -> list:
+    def get_links(self, codes: Union[str, List[str]], inverse: bool = False) -> list:
         return LinkMapper.get_links(self.id, codes, inverse)
 
     def delete(self) -> None:

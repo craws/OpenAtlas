@@ -371,7 +371,7 @@ def build_move_form(form: Any, node: Entity) -> FlaskForm:
 
     choices = []
     if root.class_.code == 'E53':
-        for entity in node.get_linked_entities(['P89'], True):
+        for entity in node.get_linked_entities('P89', True):
             place = entity.get_linked_entity('P53', True)
             if place:
                 choices.append((entity.id, place.name))
@@ -381,7 +381,7 @@ def build_move_form(form: Any, node: Entity) -> FlaskForm:
             range_ = EntityMapper.get_by_id(row.range_id)
             choices.append((row.id, domain.name + ' - ' + range_.name))
     else:
-        for entity in node.get_linked_entities(['P2'], True):
+        for entity in node.get_linked_entities('P2', True):
             choices.append((entity.id, entity.name))
 
     form_instance.selection.choices = choices

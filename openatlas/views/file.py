@@ -114,7 +114,7 @@ def file_add(id_: int, class_name: str) -> Union[str, Response]:
         if request.form['checkbox_values']:
             file.link_string('P67', request.form['checkbox_values'])
         return redirect(url_for('file_view', id_=file.id) + '#tab-' + class_name)
-    form = build_table_form(class_name, file.get_linked_entities(['P67']))
+    form = build_table_form(class_name, file.get_linked_entities('P67'))
     return render_template('file/add.html', entity=file, class_name=class_name, form=form)
 
 
@@ -139,7 +139,7 @@ def file_view(id_: int) -> str:
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find',
                  'reference']:
         tables[name] = Table(Table.HEADERS[name] + (['page'] if name == 'reference' else []))
-    for link_ in file.get_links(['P67']):
+    for link_ in file.get_links('P67'):
         range_ = link_.range
         data = get_base_table_data(range_)
         view_name = range_.view_name
@@ -148,7 +148,7 @@ def file_view(id_: int) -> str:
             url = url_for('link_delete', id_=link_.id, origin_id=file.id)
             data.append(display_remove_link(url + '#tab-' + view_name, range_.name))
         tables[view_name].rows.append(data)
-    for link_ in file.get_links(['P67'], True):
+    for link_ in file.get_links('P67', True):
         data = get_base_table_data(link_.domain)
         data.append(link_.description)
         if is_authorized('contributor'):

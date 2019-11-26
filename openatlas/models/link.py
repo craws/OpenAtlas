@@ -119,9 +119,10 @@ class LinkMapper:
         return result[0] if result else None  # type: ignore  # problematic because place/location
 
     @staticmethod
-    def get_linked_entities(entity_id: int, codes: list, inverse: bool = False,
+    def get_linked_entities(entity_id: int, codes: Union[str, List[str]], inverse: bool = False,
                             nodes: bool = False) -> list:
         from openatlas.models.entity import EntityMapper
+        codes = codes if isinstance(codes, list) else [codes]
         sql = """
             SELECT range_id AS result_id FROM model.link
             WHERE domain_id = %(entity_id)s AND property_code IN %(codes)s;"""
@@ -134,8 +135,9 @@ class LinkMapper:
         return EntityMapper.get_by_ids(ids, nodes=nodes)
 
     @staticmethod
-    def get_links(entity_id: int, codes: List[str], inverse: bool = False) -> list:
+    def get_links(entity_id: int, codes: Union[str, List[str]], inverse: bool = False) -> list:
         from openatlas.models.entity import EntityMapper
+        codes = codes if isinstance(codes, list) else [codes]
         sql = """
             SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description, l.created,
                 l.modified, e.name, l.type_id,

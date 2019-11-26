@@ -130,7 +130,7 @@ def event_update(id_: int) -> Union[str, Response]:
         form.place_to.data = place_to.get_linked_entity('P53', True).id if place_to else ''
         person_data = []
         object_data = []
-        for entity in event.get_linked_entities(['P25']):
+        for entity in event.get_linked_entities('P25'):
             if entity.class_.code == 'E21':
                 person_data.append(entity.id)
             elif entity.class_.code == 'E84':
@@ -141,7 +141,7 @@ def event_update(id_: int) -> Union[str, Response]:
         place = event.get_linked_entity('P7')
         form.place.data = place.get_linked_entity('P53', True).id if place else ''
     if event.class_.code == 'E8':  # Form data for acquisition
-        form.given_place.data = [entity.id for entity in event.get_linked_entities(['P24'])]
+        form.given_place.data = [entity.id for entity in event.get_linked_entities('P24')]
     return render_template('event/update.html', form=form, event=event)
 
 
@@ -175,7 +175,7 @@ def event_view(id_: int) -> str:
             data.append(display_remove_link(unlink_url, link_.range.name))
         tables['actor'].rows.append(data)
     profile_image_id = event.get_profile_image_id()
-    for link_ in event.get_links(['P67'], True):
+    for link_ in event.get_links('P67', True):
         domain = link_.domain
         data = get_base_table_data(domain)
         if domain.view_name == 'file':
@@ -194,7 +194,7 @@ def event_view(id_: int) -> str:
             url = url_for('link_delete', id_=link_.id, origin_id=event.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
         tables[domain.view_name].rows.append(data)
-    for sub_event in event.get_linked_entities(['P117'], inverse=True, nodes=True):
+    for sub_event in event.get_linked_entities('P117', inverse=True, nodes=True):
         tables['subs'].rows.append(get_base_table_data(sub_event))
     objects = []
     for location in event.get_linked_entities(['P7', 'P26', 'P27']):
@@ -212,7 +212,7 @@ def event_add_source(id_: int) -> Union[str, Response]:
         if request.form['checkbox_values']:
             event.link_string('P67', request.form['checkbox_values'], inverse=True)
         return redirect(url_for('event_view', id_=id_) + '#tab-source')
-    form = build_table_form('source', event.get_linked_entities(['P67'], inverse=True))
+    form = build_table_form('source', event.get_linked_entities('P67', inverse=True))
     return render_template('add_source.html', entity=event, form=form)
 
 
@@ -236,7 +236,7 @@ def event_add_file(id_: int) -> Union[str, Response]:
         if request.form['checkbox_values']:
             event.link_string('P67', request.form['checkbox_values'], inverse=True)
         return redirect(url_for('event_view', id_=id_) + '#tab-file')
-    form = build_table_form('file', event.get_linked_entities(['P67'], inverse=True))
+    form = build_table_form('file', event.get_linked_entities('P67', inverse=True))
     return render_template('add_file.html', entity=event, form=form)
 
 

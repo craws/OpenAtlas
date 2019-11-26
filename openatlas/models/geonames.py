@@ -13,7 +13,7 @@ class GeonamesMapper:
 
     @staticmethod
     def get_geonames_link(object_: Entity) -> Optional[Link]:
-        for link_ in object_.get_links(['P67'], inverse=True):
+        for link_ in object_.get_links('P67', inverse=True):
             if link_.domain.system_type == 'external reference geonames':
                 return link_
         return None
