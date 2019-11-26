@@ -7,7 +7,7 @@ from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.models.node import NodeMapper
 from openatlas.models.overlay import OverlayMapper
-from openatlas.test_base import TestBaseCase
+from tests.base import TestBaseCase
 
 
 class PlaceTest(TestBaseCase):
@@ -114,7 +114,7 @@ class PlaceTest(TestBaseCase):
             assert b'An invalid geometry was entered' in rv.data
 
             # Test Overlays
-            with open(os.path.dirname(__file__) + '/../static/images/layout/logo.png', 'rb') as img:
+            with open(os.path.dirname(__file__) + '/../openatlas/static/images/layout/logo.png', 'rb') as img:
                 rv = self.app.post(
                     url_for('file_insert', origin_id=place.id),
                     data={'name': 'X-Files', 'file': img}, follow_redirects=True)

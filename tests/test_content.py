@@ -1,7 +1,7 @@
 from flask import url_for
 
 from openatlas import app
-from openatlas.test_base import TestBaseCase
+from tests.base import TestBaseCase
 
 
 class ContentTests(TestBaseCase):

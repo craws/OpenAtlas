@@ -3,8 +3,8 @@ import os
 from flask import url_for
 
 from openatlas import app
-from openatlas.test_base import TestBaseCase
 from openatlas.models.entity import EntityMapper
+from tests.base import TestBaseCase
 
 
 class ExportTest(TestBaseCase):
@@ -31,17 +31,17 @@ class ExportTest(TestBaseCase):
             # Import data
             rv = self.app.get(url_for('import_data', class_code='E21', project_id=project_id))
             assert b'File *' in rv.data
-            with open(os.path.dirname(__file__) + '/../static/import/example.csv', 'rb') as file:
+            with open(os.path.dirname(__file__) + '/../openatlas/static/import/example.csv', 'rb') as file:
                 rv = self.app.post(
                     url_for('import_data', class_code='E18', project_id=project_id),
                     data={'file': file, 'duplicate': True}, follow_redirects=True)
             assert b'Vienna' in rv.data
-            with open(os.path.dirname(__file__) + '/../static/import/example.xlsx', 'rb') as file:
+            with open(os.path.dirname(__file__) + '/../openatlas/static/import/example.xlsx', 'rb') as file:
                 rv = self.app.post(
                     url_for('import_data', class_code='E18', project_id=project_id),
                     data={'file': file, 'duplicate': True}, follow_redirects=True)
             assert b'IDs already in database' in rv.data
-            with open(os.path.dirname(__file__) + '/../static/favicon.ico', 'rb') as file:
+            with open(os.path.dirname(__file__) + '/../openatlas/static/favicon.ico', 'rb') as file:
                 rv = self.app.post(
                     url_for('import_data', class_code='E18', project_id=project_id),
                     data={'file': file}, follow_redirects=True)

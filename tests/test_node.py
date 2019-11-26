@@ -2,7 +2,7 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.node import NodeMapper
-from openatlas.test_base import TestBaseCase
+from tests.base import TestBaseCase
 
 
 class NodeTest(TestBaseCase):

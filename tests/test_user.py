@@ -3,7 +3,7 @@ from werkzeug.exceptions import abort
 
 from openatlas import app
 from openatlas.models.user import UserMapper
-from openatlas.test_base import TestBaseCase
+from tests.base import TestBaseCase
 
 
 class UserTests(TestBaseCase):
@@ -41,7 +41,7 @@ class UserTests(TestBaseCase):
                 app.preprocess_request()
                 logged_in_user = UserMapper.get_by_username('Alice')
                 if not logged_in_user:
-                    abort(404)
+                    abort(404)  # pragma: no cover
             rv = self.app.get(url_for('user_insert'))
             assert b'+ User' in rv.data
             rv = self.app.post(url_for('user_insert'), data=data)

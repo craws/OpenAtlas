@@ -4,7 +4,7 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
-from openatlas.test_base import TestBaseCase
+from tests.base import TestBaseCase
 
 
 class FileTest(TestBaseCase):
@@ -23,12 +23,14 @@ class FileTest(TestBaseCase):
             rv = self.app.get(url_for('file_insert', origin_id=actor.id))
             assert b'+ File' in rv.data
 
-            with open(os.path.dirname(__file__) + '/../static/images/layout/logo.png', 'rb') as img:
+            with open(os.path.dirname(__file__) + '/../openatlas/static/images/layout/logo.png',
+                      'rb') as img:
                 rv = self.app.post(url_for('file_insert', origin_id=actor.id),
                                    data={'name': 'OpenAtlas logo', 'file': img},
                                    follow_redirects=True)
             assert b'An entry has been created' in rv.data
-            with open(os.path.dirname(__file__) + '/../static/images/layout/logo.png', 'rb') as img:
+            with open(os.path.dirname(__file__) + '/../openatlas/static/images/layout/logo.png',
+                      'rb') as img:
                 rv = self.app.post(url_for('file_insert', origin_id=reference.id),
                                    data={'name': 'OpenAtlas logo', 'file': img},
                                    follow_redirects=True)

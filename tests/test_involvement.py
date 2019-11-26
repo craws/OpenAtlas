@@ -4,7 +4,7 @@ from openatlas import app
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.models.node import NodeMapper
-from openatlas.test_base import TestBaseCase
+from tests.base import TestBaseCase
 
 
 class InvolvementTests(TestBaseCase):
