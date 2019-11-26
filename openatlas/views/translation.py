@@ -4,6 +4,7 @@ from typing import Union
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
+from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
@@ -68,15 +69,17 @@ def translation_update(id_: int) -> Union[str, Response]:
                            form=form)
 
 
-def save(form: FlaskForm, entity: Entity = None, source: Entity = None):
+def save(form: FlaskForm, entity: Entity = None, source: Entity = None) -> Entity:
     g.cursor.execute('BEGIN')
     try:
         if entity:
             logger.log_user(entity.id, 'update')
-        else:
+        elif source:
             entity = EntityMapper.insert('E33', form.name.data, 'source translation')
             source.link('P73', entity)
             logger.log_user(entity.id, 'insert')
+        else:
+            abort(404)  # pragma: no cover, either entity or source has to be provided
         entity.name = form.name.data
         entity.description = form.description.data
         entity.update()
@@ -86,4 +89,4 @@ def save(form: FlaskForm, entity: Entity = None, source: Entity = None):
         g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
-    return entity
+    return entity  # type: ignore

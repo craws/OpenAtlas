@@ -319,12 +319,14 @@ def place_update(id_: int) -> Union[str, Response]:
                            overlays=overlays, geonames_buttons=geonames_buttons)
 
 
-def save(form: DateForm, object_: Entity = None, location: Entity = None,
+def save(form: DateForm, object__: Entity = None, location_: Entity = None,
          origin: Entity = None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
     try:
-        if object_:
+        if object__ and location_:
+            object_ = object__
+            location = location_
             GisMapper.delete_by_entity(location)
         else:
             log_action = 'insert'

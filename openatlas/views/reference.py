@@ -4,6 +4,7 @@ from typing import Any, Union
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
+from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import HiddenField, StringField, SubmitField, TextAreaField
@@ -199,10 +200,13 @@ def reference_update(id_: int) -> Union[str, Response]:
 def save(form: Any, reference: Entity = None, code: str = None, origin: Entity = None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
+
     try:
-        if code and not reference:
+        if not code and not reference:
+            abort(404)  # pragma: no cover, either reference or code has to be provided
+        elif not reference:
             log_action = 'insert'
-            system_type = code.replace('_', ' ')
+            system_type = code.replace('_', ' ')  # type: ignore
             reference = EntityMapper.insert('E31', form.name.data, system_type)
         reference.name = form.name.data
         reference.description = form.description.data

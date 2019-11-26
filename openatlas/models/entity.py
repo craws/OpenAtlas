@@ -20,6 +20,7 @@ from openatlas.util.util import print_file_extension, uc_first
 
 
 class Entity:
+
     def __init__(self, row: NamedTupleCursor.Record) -> None:
         from openatlas.forms.date import DateForm
 

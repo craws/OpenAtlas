@@ -6,7 +6,7 @@ import os
 import re
 import smtplib
 from collections import OrderedDict
-from datetime import datetime, date
+from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
@@ -380,7 +380,7 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
     return value.date().isoformat()
 
 
-def format_datetime(value) -> str:
+def format_datetime(value: Any) -> str:
     return value.replace(microsecond=0).isoformat() if value else ''
 
 

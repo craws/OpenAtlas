@@ -199,17 +199,20 @@ def tree_select(name: str) -> str:
 
 def save(form: FlaskForm, node: Entity = None, root: Entity = None) -> Optional[str]:
     g.cursor.execute('BEGIN')
+    super_ = None
+    log_action = 'insert'
     try:
         if node:
             log_action = 'update'
             root = g.nodes[node.root[-1]] if node.root else None
             super_ = g.nodes[node.root[0]] if node.root else None
-        else:
-            log_action = 'insert'
+        elif root:
             node = NodeMapper.insert(root.class_.code, form.name.data)
             super_ = 'new'
-        new_super_id = getattr(form, str(root.id)).data
-        new_super = g.nodes[int(new_super_id)] if new_super_id else g.nodes[root.id]
+        else:
+            abort(404)  # pragma: no cover, either node or root has to be provided
+        new_super_id = getattr(form, str(root.id)).data  # type: ignore
+        new_super = g.nodes[int(new_super_id)] if new_super_id else g.nodes[root.id]  # type: ignore
         if new_super.id == node.id:
             flash(_('error node self as super'), 'error')
             return None
@@ -217,9 +220,9 @@ def save(form: FlaskForm, node: Entity = None, root: Entity = None) -> Optional[
             flash(_('error node sub as super'), 'error')
             return None
         node.name = form.name.data
-        if root.directional and form.name_inverse.data.strip():
+        if root and root.directional and form.name_inverse.data.strip():
             node.name += ' (' + form.name_inverse.data.strip() + ')'
-        if not root.directional:
+        if root and not root.directional:
             node.name = node.name.replace('(', '').replace(')', '')
         node.description = form.description.data if form.description else form.unit.data
         node.update()
@@ -232,7 +235,7 @@ def save(form: FlaskForm, node: Entity = None, root: Entity = None) -> Optional[
         g.cursor.execute('COMMIT')
         url = url_for('node_view', id_=node.id)
         if form.continue_.data == 'yes':
-            url = url_for('node_insert', root_id=root.id,
+            url = url_for('node_insert', root_id=root.id,  # type: ignore
                           super_id=new_super_id if new_super_id else None)
         logger.log_user(node.id, log_action)
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
