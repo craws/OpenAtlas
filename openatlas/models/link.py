@@ -113,12 +113,10 @@ class LinkMapper:
                           nodes: bool = False) -> 'Entity':
         result = LinkMapper.get_linked_entities(entity_id, [code], inverse=inverse, nodes=nodes)
         if len(result) > 1:  # pragma: no cover
-            logger.log('error', 'model', 'multiple linked entities found for ' + code)
+            logger.log('error', 'model', 'Multiple linked entities found for ' + code)
             flash(_('error multiple linked entities found'), 'error')
-            return None
-        if result:
-            return result[0]
-        return None
+            abort(404)
+        return result[0] if result else None  # type: ignore  # problematic because place/location
 
     @staticmethod
     def get_linked_entities(entity_id: int, codes: list, inverse: bool = False,
