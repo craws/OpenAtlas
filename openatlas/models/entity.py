@@ -62,6 +62,8 @@ class Entity:
         self.external_references: list = []
         if self.system_type == 'file':
             self.view_name = 'file'
+        elif self.class_.code == 'E33' and self.system_type == 'source translation':
+            self.view_name = 'translation'
         elif self.class_.code in app.config['CODE_CLASS']:
             self.view_name = app.config['CODE_CLASS'][self.class_.code]
         self.table_name = self.view_name  # Used to build tables

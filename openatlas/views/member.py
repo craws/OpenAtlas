@@ -62,7 +62,7 @@ def membership_insert(origin_id: int) -> Union[str, Response]:
             flash(_('error transaction'), 'error')
         if form.continue_.data == 'yes':
             return redirect(url_for('membership_insert', origin_id=origin_id))
-        return redirect(url_for('actor_view', id_=origin.id) + '#tab-member-of')
+        return redirect(url_for('entity_view', id_=origin.id) + '#tab-member-of')
     return render_template('member/insert.html', origin=origin, form=form)
 
 
@@ -89,7 +89,7 @@ def member_insert(origin_id: int) -> Union[str, Response]:
             flash(_('error transaction'), 'error')
         if form.continue_.data == 'yes':
             return redirect(url_for('member_insert', origin_id=origin_id))
-        return redirect(url_for('actor_view', id_=origin.id) + '#tab-member')
+        return redirect(url_for('entity_view', id_=origin.id) + '#tab-member')
     return render_template('member/insert.html', origin=origin, form=form)
 
 
@@ -116,7 +116,7 @@ def member_update(id_: int, origin_id: int) -> Union[str, Response]:
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         tab = '#tab-member-of' if origin.id == range_.id else '#tab-member'
-        return redirect(url_for('actor_view', id_=origin.id) + tab)
+        return redirect(url_for('entity_view', id_=origin.id) + tab)
     form.save.label.text = _('save')
     form.populate_dates(link_)
     related = range_ if origin_id == domain.id else domain

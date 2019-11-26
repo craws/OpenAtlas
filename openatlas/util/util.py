@@ -396,7 +396,7 @@ def get_profile_image_table_link(file: 'Entity', entity: 'Entity', extension: st
 
 
 def link(entity: Union['Entity', ClassObject, Property, 'Project', 'User']) -> str:
-    # Builds an html link to entity view for display
+    # Builds an HTML link to entity view for display
     from openatlas.models.entity import Entity
     from openatlas.models.imports import Project
     from openatlas.models.user import User
@@ -417,31 +417,8 @@ def link(entity: Union['Entity', ClassObject, Property, 'Project', 'User']) -> s
         url = url_for('property_view', code=entity.code)
         html = '<a href="' + url + '">' + entity.code + '</a>'
     elif isinstance(entity, Entity):
-        url = ''
-        if entity.class_.code == 'E33':
-            if entity.system_type == 'source content':
-                url = url_for('source_view', id_=entity.id)
-            elif entity.system_type == 'source translation':
-                url = url_for('translation_view', id_=entity.id)
-        elif entity.system_type == 'file':
-            url = url_for('file_view', id_=entity.id)
-        elif entity.class_.code in (app.config['CLASS_CODES']['event']):
-            url = url_for('event_view', id_=entity.id)
-        elif entity.class_.code in (app.config['CLASS_CODES']['actor']):
-            url = url_for('actor_view', id_=entity.id)
-        elif entity.class_.code in (app.config['CLASS_CODES']['place']):
-            url = url_for('place_view', id_=entity.id)
-        elif entity.class_.code in (app.config['CLASS_CODES']['reference']):
-            url = url_for('reference_view', id_=entity.id)
-        elif entity.class_.code in (app.config['CLASS_CODES']['object']):
-            url = url_for('object_view', id_=entity.id)
-        elif entity.class_.code in ['E55', 'E53']:
-            url = url_for('node_view', id_=entity.id)
-            if not entity.root:
-                url = url_for('node_index') + '#tab-' + str(entity.id)
-        if not url:
-            return entity.name + ' (' + entity.class_.name + ')'
-        return '<a href="' + url + '">' + truncate_string(entity.name) + '</a>'
+        url = url_for('entity_view', id_=entity.id)
+        html = '<a href="' + url + '">' + truncate_string(entity.name) + '</a>'
     return html
 
 
@@ -532,7 +509,7 @@ def get_appearance(event_links: list) -> tuple:
         event = link_.domain
         actor = link_.range
         event_link = '<a href="{url}">{label}</a> '.format(label=uc_first(_('event')),
-                                                           url=url_for('event_view', id_=event.id))
+                                                           url=url_for('entity_view', id_=event.id))
         if not actor.first:
             if link_.first and (not first_year or int(link_.first) < int(first_year)):
                 first_year = link_.first

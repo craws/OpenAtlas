@@ -30,7 +30,7 @@ def overlay_insert(image_id: int, place_id: int, link_id: int) -> Union[str, Res
     form = OverlayForm()
     if form.validate_on_submit():
         OverlayMapper.insert(form=form, image_id=image_id, place_id=place_id, link_id=link_id)
-        return redirect(url_for('place_view', id_=place_id) + '#tab-file')
+        return redirect(url_for('entity_view', id_=place_id) + '#tab-file')
     form.save.label.text = uc_first(_('insert'))
     return render_template('overlay/insert.html', form=form,
                            place=EntityMapper.get_by_id(place_id),
@@ -45,7 +45,7 @@ def overlay_update(id_: int) -> Union[str, Response]:
     if form.validate_on_submit():
         OverlayMapper.update(form=form, image_id=overlay.image_id, place_id=overlay.place_id)
         flash(_('info update'), 'info')
-        return redirect(url_for('place_view', id_=overlay.place_id) + '#tab-file')
+        return redirect(url_for('entity_view', id_=overlay.place_id) + '#tab-file')
     bounding = ast.literal_eval(overlay.bounding_box)
     form.top_left_easting.data = bounding[0][1]
     form.top_left_northing.data = bounding[0][0]
@@ -60,4 +60,4 @@ def overlay_update(id_: int) -> Union[str, Response]:
 @required_group('editor')
 def overlay_remove(id_: int, place_id: int) -> Response:
     OverlayMapper.remove(id_)
-    return redirect(url_for('place_view', id_=place_id) + '#tab-file')
+    return redirect(url_for('entity_view', id_=place_id) + '#tab-file')

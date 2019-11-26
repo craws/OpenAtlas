@@ -60,7 +60,7 @@ class SourceTest(TestBaseCase):
             rv = self.app.post(url_for('source_add', id_=source.id, class_name='actor'),
                                data={'checkbox_values': [actor.id]}, follow_redirects=True)
             assert b'Gillian Anderson' in rv.data
-            rv = self.app.get(url_for('source_view', id_=source.id))
+            rv = self.app.get(url_for('entity_view', id_=source.id))
             assert b'Gillian Anderson' in rv.data
             rv = self.app.get(url_for('source_add', id_=source.id, class_name='place'))
             assert b'Add Place' in rv.data
@@ -72,7 +72,7 @@ class SourceTest(TestBaseCase):
             rv = self.app.post(url_for('source_update', id_=source.id), data=data,
                                follow_redirects=True)
             assert b'Source updated' in rv.data
-            rv = self.app.get(url_for('source_view', id_=source.id))
+            rv = self.app.get(url_for('entity_view', id_=source.id))
             assert b'some description' in rv.data
 
             # Add to source

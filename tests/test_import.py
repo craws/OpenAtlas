@@ -31,12 +31,14 @@ class ExportTest(TestBaseCase):
             # Import data
             rv = self.app.get(url_for('import_data', class_code='E21', project_id=project_id))
             assert b'File *' in rv.data
-            with open(os.path.dirname(__file__) + '/../openatlas/static/import/example.csv', 'rb') as file:
+            path = os.path.dirname(__file__) + '/../openatlas/static/import/example.csv'
+            with open(path, 'rb') as file:
                 rv = self.app.post(
                     url_for('import_data', class_code='E18', project_id=project_id),
                     data={'file': file, 'duplicate': True}, follow_redirects=True)
             assert b'Vienna' in rv.data
-            with open(os.path.dirname(__file__) + '/../openatlas/static/import/example.xlsx', 'rb') as file:
+            path = os.path.dirname(__file__) + '/../openatlas/static/import/example.xlsx'
+            with open(path, 'rb') as file:
                 rv = self.app.post(
                     url_for('import_data', class_code='E18', project_id=project_id),
                     data={'file': file, 'duplicate': True}, follow_redirects=True)
@@ -53,7 +55,7 @@ class ExportTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()
                 place_id = EntityMapper.get_by_system_type('place')[0].id
-            rv = self.app.get(url_for('place_view', id_=place_id))
+            rv = self.app.get(url_for('entity_view', id_=place_id))
             assert b'Yup' in rv.data
 
             rv = self.app.get(url_for('import_project_delete', id_=project_id),

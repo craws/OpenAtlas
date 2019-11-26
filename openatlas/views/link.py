@@ -5,7 +5,6 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import required_group
 
@@ -15,5 +14,4 @@ from openatlas.util.util import required_group
 def link_delete(id_: int, origin_id: int) -> Response:
     LinkMapper.delete(id_)
     flash(_('link removed'), 'info')
-    origin = EntityMapper.get_by_id(origin_id)
-    return redirect(url_for(origin.view_name + '_view', id_=origin.id))
+    return redirect(url_for('entity_view', id_=origin_id))

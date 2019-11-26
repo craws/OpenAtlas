@@ -28,7 +28,7 @@ def note_insert(entity_id: int) -> Union[str, Response]:
     form = build_form(NoteForm, 'note-form')
     if form.validate_on_submit():
         save(form, entity=entity)
-        return redirect(url_for(entity.view_name + '_view', id_=entity.id))
+        return redirect(url_for('entity_view', id_=entity.id))
     return render_template('note/insert.html', form=form, entity=entity)
 
 
@@ -39,7 +39,7 @@ def note_update(entity_id: int) -> Union[str, Response]:
     form = build_form(NoteForm, 'note-form')
     if form.validate_on_submit():
         save(form, entity=entity, insert=False)
-        return redirect(url_for(entity.view_name + '_view', id_=entity.id))
+        return redirect(url_for('entity_view', id_=entity.id))
     form.description.data = UserMapper.get_note(entity)
     return render_template('note/update.html', form=form, entity=entity)
 
@@ -65,4 +65,4 @@ def note_delete(entity_id: int) -> Response:
     entity = EntityMapper.get_by_id(entity_id)
     UserMapper.delete_note(entity)
     flash(_('note deleted'), 'info')
-    return redirect(url_for(entity.view_name + '_view', id_=entity.id))
+    return redirect(url_for('entity_view', id_=entity.id))

@@ -52,7 +52,7 @@ class EventTest(TestBaseCase):
                                      'begin_day_from': '8',
                                      'end_year_from': '1951'})
             event_id = rv.location.split('/')[-1]
-            rv = self.app.get(url_for('event_view', id_=event_id))
+            rv = self.app.get(url_for('entity_view', id_=event_id))
             assert b'Test event' in rv.data
 
             # Move
@@ -63,7 +63,7 @@ class EventTest(TestBaseCase):
                                      'object': carrier.id,
                                      'person': actor.id})
             move_id = rv.location.split('/')[-1]
-            rv = self.app.get(url_for('event_view', id_=move_id))
+            rv = self.app.get(url_for('entity_view', id_=move_id))
             assert b'Keep it moving' in rv.data
             rv = self.app.get(url_for('event_update', id_=move_id))
             assert b'Keep it moving' in rv.data
@@ -71,16 +71,16 @@ class EventTest(TestBaseCase):
             # Add another event and test if events are seen at place
             self.app.post(url_for('event_insert', code='E8'),
                           data={'name': 'Dusk', 'given_place': [residence_id]})
-            rv = self.app.get(url_for('place_view', id_=residence_id))
+            rv = self.app.get(url_for('entity_view', id_=residence_id))
             assert b'Test event' in rv.data
-            rv = self.app.get(url_for('actor_view', id_=actor.id))
+            rv = self.app.get(url_for('entity_view', id_=actor.id))
             assert b'Game master' in rv.data
             rv = self.app.post(url_for('event_insert', code='E8'), follow_redirects=True,
                                data={'name': 'Test event', 'continue_': 'yes'})
             assert b'An entry has been created' in rv.data
             rv = self.app.get(url_for('event_index'))
             assert b'Test event' in rv.data
-            self.app.get(url_for('event_view', id_=activity_id))
+            self.app.get(url_for('entity_view', id_=activity_id))
 
             # Add to event
             rv = self.app.get(url_for('event_add_file', id_=event_id))

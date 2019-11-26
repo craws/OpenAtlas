@@ -62,7 +62,7 @@ def relation_insert(origin_id: int) -> Union[str, Response]:
             flash(_('error transaction'), 'error')
         if form.continue_.data == 'yes':
             return redirect(url_for('relation_insert', origin_id=origin_id))
-        return redirect(url_for('actor_view', id_=origin.id) + '#tab-relation')
+        return redirect(url_for('entity_view', id_=origin.id) + '#tab-relation')
     return render_template('relation/insert.html', origin=origin, form=form)
 
 
@@ -93,7 +93,7 @@ def relation_update(id_: int, origin_id: int) -> Union[str, Response]:
             g.cursor.execute('ROLLBACK')
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(url_for('actor_view', id_=origin.id) + '#tab-relation')
+        return redirect(url_for('entity_view', id_=origin.id) + '#tab-relation')
     if origin.id == range_.id:
         form.inverse.data = True
     form.save.label.text = _('save')

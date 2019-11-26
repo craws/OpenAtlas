@@ -68,7 +68,7 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
         if form.continue_.data == 'yes':
             return redirect(url_for('involvement_insert', origin_id=origin_id))
         tab = 'actor' if origin.view_name == 'event' else 'event'
-        return redirect(url_for(origin.view_name + '_view', id_=origin.id) + '#tab-' + tab)
+        return redirect(url_for('entity_view', id_=origin.id) + '#tab-' + tab)
     return render_template('involvement/insert.html', origin=origin, form=form)
 
 
@@ -103,7 +103,7 @@ def involvement_update(id_: int, origin_id: int) -> Union[str, Response]:
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         tab = 'actor' if origin.view_name == 'event' else 'event'
-        return redirect(url_for(origin.view_name + '_view', id_=origin.id) + '#tab-' + tab)
+        return redirect(url_for('entity_view', id_=origin.id) + '#tab-' + tab)
     form.activity.data = link_.property.code
     form.description.data = link_.description
     form.populate_dates(link_)

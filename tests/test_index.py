@@ -58,12 +58,12 @@ class IndexTests(TestBaseCase):
             assert b'not found' in rv.data
 
             self.login()
-            rv = self.app.get(url_for('actor_view', id_=666), follow_redirects=True)
+            rv = self.app.get(url_for('entity_view', id_=666), follow_redirects=True)
             assert b'teapot' in rv.data  # Id not found error
 
             with app.test_request_context():
                 app.preprocess_request()
                 actor = EntityMapper.insert('E21', 'Game master')
 
-            rv = self.app.get(url_for('event_view', id_=actor.id), follow_redirects=True)
+            rv = self.app.get(url_for('event_update', id_=actor.id), follow_redirects=True)
             assert b'422 - Unprocessable entity' in rv.data
