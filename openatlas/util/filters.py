@@ -384,7 +384,7 @@ def display_delete_link(self: Any, entity: Entity) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_menu(self: Any, origin: Entity) -> str:
-    """ Returns html with the menu and mark appropriate item as selected."""
+    """ Returns HTML with the menu and mark appropriate item as selected."""
     html = ''
     if current_user.is_authenticated:
         selected = origin.view_name if origin else ''
@@ -404,7 +404,7 @@ def display_menu(self: Any, origin: Entity) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_debug_info(self: Any, debug_model: Dict, form: Any) -> str:
-    """ Returns html with debug information about database queries and form errors."""
+    """ Returns HTML with debug information about database queries and form errors."""
     html = ''
     for name, value in debug_model.items():
         if name in ['current']:

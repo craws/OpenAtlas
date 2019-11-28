@@ -1,5 +1,4 @@
 import collections
-import os
 from typing import Optional, Union
 
 import pandas as pd
@@ -121,15 +120,13 @@ def import_data(project_id: int, class_code: str) -> str:
     messages: dict = {'error': [], 'warn': []}
     if form.validate_on_submit():
         file_ = request.files['file']
-        # TODO fix windows separator
-        separator = '/' if os.name == "posix" else '\\'
-        file_path = app.config['IMPORT_FOLDER_PATH'] + separator + secure_filename(file_.filename)
+        file_path = app.config['TMP_FOLDER_PATH'].joinpath(secure_filename(file_.filename))
         columns: dict = {'allowed': ['name', 'id', 'description'], 'valid': [], 'invalid': []}
         if class_code == 'E18':
             columns['allowed'] += ['easting', 'northing']
         try:
-            file_.save(file_path)
-            if file_path.rsplit('.', 1)[1].lower() in ['xls', 'xlsx']:
+            file_.save(str(file_path))
+            if str(file_path).rsplit('.', 1)[1].lower() in ['xls', 'xlsx']:
                 df = pd.read_excel(file_path, keep_default_na=False)
             else:
                 df = pd.read_csv(file_path, keep_default_na=False)

@@ -1,5 +1,3 @@
-import os
-
 from flask import g, url_for
 
 from openatlas import app
@@ -114,7 +112,7 @@ class PlaceTest(TestBaseCase):
             assert b'An invalid geometry was entered' in rv.data
 
             # Test Overlays
-            path = os.path.dirname(__file__) + '/../openatlas/static/images/layout/logo.png'
+            path = app.config['ROOT_PATH'].joinpath('static', 'images', 'layout', 'logo.png')
             with open(path, 'rb') as img:
                 rv = self.app.post(
                     url_for('file_insert', origin_id=place.id),

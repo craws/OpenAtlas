@@ -1,5 +1,3 @@
-import os
-
 from flask import url_for
 
 from openatlas import app
@@ -22,15 +20,13 @@ class FileTest(TestBaseCase):
             # Insert
             rv = self.app.get(url_for('file_insert', origin_id=actor.id))
             assert b'+ File' in rv.data
-
-            with open(os.path.dirname(__file__) + '/../openatlas/static/images/layout/logo.png',
-                      'rb') as img:
+            logo = app.config['ROOT_PATH'].joinpath('static', 'images', 'layout', 'logo.png')
+            with open(logo, 'rb') as img:
                 rv = self.app.post(url_for('file_insert', origin_id=actor.id),
                                    data={'name': 'OpenAtlas logo', 'file': img},
                                    follow_redirects=True)
             assert b'An entry has been created' in rv.data
-            with open(os.path.dirname(__file__) + '/../openatlas/static/images/layout/logo.png',
-                      'rb') as img:
+            with open(logo, 'rb') as img:
                 rv = self.app.post(url_for('file_insert', origin_id=reference.id),
                                    data={'name': 'OpenAtlas logo', 'file': img},
                                    follow_redirects=True)
@@ -51,7 +47,7 @@ class FileTest(TestBaseCase):
             rv = self.app.get(url_for('admin_logo', action='remove'), follow_redirects=True)
             assert b'Change logo' in rv.data
 
-            with open(os.path.dirname(__file__) + '/test_file.py', 'rb') as invalid_file:
+            with open(app.config['ROOT_PATH'].joinpath('views', 'index.py'), 'rb') as invalid_file:
                 rv = self.app.post(url_for('file_insert', origin_id=actor.id),
                                    data={'name': 'Invalid file', 'file': invalid_file},
                                    follow_redirects=True)
