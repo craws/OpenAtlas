@@ -323,7 +323,7 @@ class TableMultiSelect(HiddenInput):
         else:
             entities = EntityMapper.get_by_codes(class_)
         for entity in entities:
-            selection += entity.name + '<br/>' if field.data and entity.id in field.data else ''
+            selection += entity.name + '<br>' if field.data and entity.id in field.data else ''
             data = get_base_table_data(entity)
             data[0] = re.sub(re.compile('<a.*?>'), '', data[0])  # Remove links
             data.append("""<input type="checkbox" id="{id}" {checked} value="{name}"

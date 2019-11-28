@@ -188,7 +188,7 @@ def admin_check_similar() -> str:
         for sample_id, sample in EntityMapper.get_similar_named(form).items():
             html = link(sample['entity'])
             for entity in sample['entities']:
-                html += '<br/>' + link(entity)
+                html += '<br>' + link(entity)
             table.rows.append([html, len(sample['entities']) + 1])
     return render_template('admin/check_similar.html', table=table, form=form)
 
