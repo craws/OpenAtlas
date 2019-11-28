@@ -4,7 +4,8 @@ class Changelog:
             'feature': {
                 '1049': 'Upgrade Python to 3.7',
                 '1068': 'Place import with point coordinates',
-                '1079': 'Static type checking with Mypy'},
+                '1079': 'Static type checking with Mypy',
+                '1101': 'Disable showing default images for reference'},
             'fix': {
                 '1071': "Filter function in jsTree doesn't clear correctly",
                 '1069': 'Overlay maps: interchanged easting and northing'

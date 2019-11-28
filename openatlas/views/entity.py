@@ -403,8 +403,6 @@ def reference_view(reference: Entity) -> str:
         if range_.view_name == 'file':  # pragma: no cover
             ext = data[3].replace('.', '')
             data.append(get_profile_image_table_link(range_, reference, ext, profile_image_id))
-            if not profile_image_id and ext in app.config['DISPLAY_FILE_EXTENSIONS']:
-                profile_image_id = range_.id
         if is_authorized('contributor'):
             url = url_for('reference_link_update', link_id=link_.id, origin_id=reference.id)
             data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
