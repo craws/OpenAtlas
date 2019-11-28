@@ -52,8 +52,8 @@ def admin_index() -> str:
     export_path = app.config['EXPORT_FOLDER_PATH']
     writeable_dirs = {
         'uploads': True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False,
-        'export/sql': True if os.access(export_path + '/sql', os.W_OK) else False,
-        'export/csv': True if os.access(export_path + '/csv', os.W_OK) else False}
+        'export/sql': True if os.access(export_path.joinpath('sql'), os.W_OK) else False,
+        'export/csv': True if os.access(export_path.joinpath('csv'), os.W_OK) else False}
     return render_template('admin/index.html', writeable_dirs=writeable_dirs)
 
 
@@ -318,7 +318,7 @@ def admin_logo(action: str = None) -> Union[str, Response]:
 def admin_file_delete(filename: str) -> Response:  # pragma: no cover
     if filename != 'all':
         try:
-            os.remove(app.config['UPLOAD_FOLDER_PATH'] + '/' + filename)
+            os.remove(app.config['UPLOAD_FOLDER_PATH'].joinpath(filename))
             flash(filename + ' ' + _('was deleted'), 'info')
         except Exception as e:
             logger.log('error', 'file', 'deletion of ' + filename + ' failed', e)
@@ -335,7 +335,7 @@ def admin_file_delete(filename: str) -> Response:  # pragma: no cover
             filename = basename(file)
             if filename != '.gitignore' and splitext(filename)[0] not in file_ids:
                 try:
-                    os.remove(app.config['UPLOAD_FOLDER_PATH'] + '/' + filename)
+                    os.remove(app.config['UPLOAD_FOLDER_PATH'].joinpath(filename))
                 except Exception as e:
                     logger.log('error', 'file', 'deletion of ' + filename + ' failed', e)
                     flash(_('error file delete'), 'error')
