@@ -1,4 +1,3 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
 from datetime import datetime
 from typing import Optional, Any, Dict
 

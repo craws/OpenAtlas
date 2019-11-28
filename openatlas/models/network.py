@@ -1,4 +1,3 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
 from typing import Optional
 
 from flask import g

@@ -1,4 +1,3 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 import glob

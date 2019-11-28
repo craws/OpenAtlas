@@ -1,6 +1,3 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
-
-
 class Changelog:
     versions = {
         '4.0.0': ['TBA', {

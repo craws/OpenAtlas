@@ -1,4 +1,3 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
 import os
 from datetime import datetime, timedelta
 from os.path import basename

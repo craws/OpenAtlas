@@ -1,4 +1,3 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
 import os
 from os.path import basename
 from typing import Union, Any

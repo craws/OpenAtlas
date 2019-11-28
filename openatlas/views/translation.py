@@ -1,4 +1,3 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
 from typing import Union
 
 from flask import flash, g, render_template, request, url_for

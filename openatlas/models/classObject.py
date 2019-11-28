@@ -1,5 +1,3 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
-
 from flask import g, session
 from psycopg2.extras import NamedTupleCursor
 

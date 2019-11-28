@@ -1,4 +1,3 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
 import os
 import re
 from typing import Any, Dict, Iterator, Optional, Union
