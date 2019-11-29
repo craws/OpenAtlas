@@ -1,44 +1,26 @@
-from flask import g, request, url_for
+from flask import request, url_for
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import EntityMapper, Entity
 from openatlas.models.geonames import GeonamesMapper
+from openatlas.models.link import LinkMapper
 from openatlas.util.util import format_date
 
 
 class Api:
 
     @staticmethod
-    def get_links(entity) -> list:
-        # Todo: the same has to be done the other way round with an i at property e.g. crm:P55i_...
-        sql = """
-            SELECT l.id, l.property_code, l.range_id, e.name
-            FROM model.link l
-            JOIN model.entity e ON l.range_id = e.id AND l.domain_id = %(entity_id)s;"""
-
-        sql_inverse = """
-            SELECT l.id, l.property_code, l.domain_id, e.name
-            FROM model.link l
-            JOIN model.entity e ON l.domain_id = e.id AND l.range_id = %(entity_id)s;"""
-
-        g.execute(sql, {'entity_id': entity.id})
-        result = g.cursor.fetchall()
+    def get_links(entity: Entity) -> list:
         links = []
-        for row in result:
-            # related_entity = EntityMapper.get_by_id(row.range_id, nodes=True)
-            property_ = g.properties[row.property_code]
-            links.append({'label': row.name,
-                          'relationTo': url_for('api_entity', id_=row.range_id, _external=True),
-                          'relationType': 'crm:' + property_.code + '_' + property_.name.replace(' ', '_')}, )
+        for link in LinkMapper.get_links(entity.id):
+            links.append({'label': link.range.name,
+                          'relationTo': url_for('api_entity', id_=link.range.id, _external=True),
+                          'relationType': 'crm:' + link.property.code + '_' + link.property.name.replace(' ', '_')}, )
 
-        g.execute(sql_inverse, {'entity_id': entity.id})
-        result = g.cursor.fetchall()
-        for row in result:
-            # related_entity = EntityMapper.get_by_id(row.domain_id, nodes=True)
-            property_ = g.properties[row.property_code]
-            links.append({'label': row.name,
-                          'relationTo': url_for('api_entity', id_=row.domain_id, _external=True),
-                          'relationType': 'crm:' + property_.code + 'i_' + property_.name.replace(' ', '_')}, )
+        for link in LinkMapper.get_links(entity.id, inverse=True):
+            links.append({'label': link.domain.name,
+                          'relationTo': url_for('api_entity', id_=link.domain.id, _external=True),
+                          'relationType': 'crm:' + link.property.code + '_' + link.property.name.replace(' ', '_')}, )
         return links
 
     @staticmethod
@@ -52,14 +34,13 @@ class Api:
             nodes.append({'identifier': url_for('api_entity', id_=node.id, _external=True),
                           'label': node.name})
         geo = GeonamesMapper.get_geonames_link(entity)
-        data = {
+        data: dict = {
             'type': type_,  # Todo: what if it's a person, event, ...
             '@context': request.base_url,
             'features': [{  # Todo: what if it's a person, event, ...
                 '@id': url_for('entity_view', id_=entity.id, _external=True),
                 'type': entity.system_type,  # Todo: 'feature' if place but what if else
                 'properties': {'title': entity.name},
-                # Todo: add comments of dates?
                 'when': {'timespans': [{
                     'start': {'earliest': format_date(entity.begin_from),
                               'latest': format_date(entity.begin_to),
@@ -68,8 +49,9 @@ class Api:
                             'latest': format_date(entity.end_to),
                             'comment': entity.end_comment}}]},
                 'types': nodes,
-                'links': [{'type': geo.type.name,
-                           'identifier': app.config['GEONAMES_VIEW_URL'] + geo.domain.name,
+                #  Todo: Only add if Geo exists --> make a new if statement like the geometry
+                'links': [{'type': geo.type.name if geo else '',
+                           'identifier': app.config['GEONAMES_VIEW_URL'] + geo.domain.name if geo else '',
                            }],
                 'relations': Api.get_links(entity),
                 'descriptions': [

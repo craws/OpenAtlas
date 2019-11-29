@@ -1,5 +1,3 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
-
 from pprint import pprint
 
 from flask import json, render_template
