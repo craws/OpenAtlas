@@ -12,7 +12,7 @@ from openatlas.util.util import required_group
 @app.route('/api/0.1/entity/<int:id_>')
 @required_group('manager')
 def api_entity(id_: int) -> str:
-    pprint(Api.get_entity(id_))
+    # pprint(Api.get_entity(id_))
     return json.dumps(Api.get_entity(id_=id_))
 
 

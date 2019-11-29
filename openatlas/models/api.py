@@ -1,8 +1,6 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
-from pprint import pprint
-
 from flask import g, request, url_for
 
+from openatlas import app
 from openatlas.models.entity import EntityMapper
 from openatlas.models.geonames import GeonamesMapper
 from openatlas.util.util import format_date
@@ -18,15 +16,29 @@ class Api:
             FROM model.link l
             JOIN model.entity e ON l.range_id = e.id AND l.domain_id = %(entity_id)s;"""
 
+        sql_inverse = """
+            SELECT l.id, l.property_code, l.domain_id, e.name
+            FROM model.link l
+            JOIN model.entity e ON l.domain_id = e.id AND l.range_id = %(entity_id)s;"""
+
         g.execute(sql, {'entity_id': entity.id})
         result = g.cursor.fetchall()
         links = []
         for row in result:
+            # related_entity = EntityMapper.get_by_id(row.range_id, nodes=True)
             property_ = g.properties[row.property_code]
-            links.append({
-                'label': row.name,
-                'relationTo': url_for('api_entity', id_=row.range_id, _external=True),
-                'relationType': 'crm:' + property_.code + '_' + property_.name.replace(' ', '_')},)
+            links.append({'label': row.name,
+                          'relationTo': url_for('api_entity', id_=row.range_id, _external=True),
+                          'relationType': 'crm:' + property_.code + '_' + property_.name.replace(' ', '_')}, )
+
+        g.execute(sql_inverse, {'entity_id': entity.id})
+        result = g.cursor.fetchall()
+        for row in result:
+            # related_entity = EntityMapper.get_by_id(row.domain_id, nodes=True)
+            property_ = g.properties[row.property_code]
+            links.append({'label': row.name,
+                          'relationTo': url_for('api_entity', id_=row.domain_id, _external=True),
+                          'relationType': 'crm:' + property_.code + 'i_' + property_.name.replace(' ', '_')}, )
         return links
 
     @staticmethod
@@ -35,8 +47,6 @@ class Api:
         type_ = 'unknown'
         if entity.class_.code == 'E18' and entity.system_type == 'place':
             type_ = 'FeatureCollection'
-        elif entity.class_.code == 'E55':
-            entity.view_name = 'node'
         nodes = []
         for node in entity.nodes:
             nodes.append({'identifier': url_for('api_entity', id_=node.id, _external=True),
@@ -46,7 +56,7 @@ class Api:
             'type': type_,  # Todo: what if it's a person, event, ...
             '@context': request.base_url,
             'features': [{  # Todo: what if it's a person, event, ...
-                '@id': url_for(entity.view_name + '_view', id_=entity.id, _external=True),
+                '@id': url_for('entity_view', id_=entity.id, _external=True),
                 'type': entity.system_type,  # Todo: 'feature' if place but what if else
                 'properties': {'title': entity.name},
                 # Todo: add comments of dates?
@@ -58,13 +68,9 @@ class Api:
                             'latest': format_date(entity.end_to),
                             'comment': entity.end_comment}}]},
                 'types': nodes,
-                'links': [
-                    {
-                        'type': geo.type.name,
-                        'identifier': geo.id,
-                        'bla': dir(geo)
-                    }
-                ],
+                'links': [{'type': geo.type.name,
+                           'identifier': app.config['GEONAMES_VIEW_URL'] + geo.domain.name,
+                           }],
                 'relations': Api.get_links(entity),
                 'descriptions': [
                     {'@id': 'https://thanados.openatlas.eu/api/v01/50505',
