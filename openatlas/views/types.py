@@ -1,5 +1,4 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import List, Union
+from typing import List, Optional, Union
 
 from flask import abort, flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -12,11 +11,9 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import build_move_form, build_node_form
-from openatlas.models.entity import Entity, EntityMapper
+from openatlas.models.entity import Entity
 from openatlas.models.node import NodeMapper
-from openatlas.util.table import Table
-from openatlas.util.util import (get_entity_data, link, required_group, sanitize, truncate_string,
-                                 uc_first)
+from openatlas.util.util import required_group, sanitize, uc_first
 
 
 class NodeForm(FlaskForm):
@@ -75,42 +72,9 @@ def node_update(id_: int) -> Union[str, Response]:
     form = build_node_form(NodeForm, node, request)
     if form.validate_on_submit():
         save(form, node)
-        return redirect(url_for('node_view', id_=id_))
+        return redirect(url_for('entity_view', id_=id_))
     getattr(form, str(root.id)).label.text = 'super'
     return render_template('types/update.html', node=node, root=root, form=form)
-
-
-@app.route('/types/view/<int:id_>')
-@required_group('readonly')
-def node_view(id_: int) -> str:
-    from openatlas.models.link import LinkMapper
-    node = g.nodes[id_]
-    root = g.nodes[node.root[-1]] if node.root else None
-    super_ = g.nodes[node.root[0]] if node.root else None
-    header = [_('name'), _('class'), _('info')]
-    if root and root.value_type:  # pragma: no cover
-        header = [_('name'), _('value'), _('class'), _('info')]
-    tables = {'entities': Table(header)}
-    for entity in node.get_linked_entities(['P2', 'P89'], inverse=True, nodes=True):
-        # If it is a place location get the corresponding object
-        entity = entity if node.class_.code == 'E55' else entity.get_linked_entity('P53', True)
-        if entity:  # If not entity it is a place node, so do not add
-            data = [link(entity)]
-            if root and root.value_type:  # pragma: no cover
-                data.append(format_number(entity.nodes[node]))
-            data.append(g.classes[entity.class_.code].name)
-            data.append(truncate_string(entity.description))
-            tables['entities'].rows.append(data)
-    tables['link_entities'] = Table([_('domain'), _('range')])
-    for row in LinkMapper.get_entities_by_node(node):
-        tables['link_entities'].rows.append([link(EntityMapper.get_by_id(row.domain_id)),
-                                             link(EntityMapper.get_by_id(row.range_id))])
-    tables['subs'] = Table([_('name'), _('count'), _('info')])
-    for sub_id in node.subs:
-        sub = g.nodes[sub_id]
-        tables['subs'].rows.append([link(sub), sub.count, truncate_string(sub.description)])
-    return render_template('types/view.html', node=node, super_=super_, tables=tables, root=root,
-                           info=get_entity_data(node))
 
 
 @app.route('/types/delete/<int:id_>', methods=['POST', 'GET'])
@@ -122,7 +86,7 @@ def node_delete(id_: int) -> Response:
         abort(403)
     node.delete()
     flash(_('entity deleted'), 'info')
-    return redirect(url_for('node_view', id_=root.id) if root else url_for('node_index'))
+    return redirect(url_for('entity_view', id_=root.id) if root else url_for('node_index'))
 
 
 class MoveForm(FlaskForm):
@@ -159,8 +123,8 @@ def walk_tree(nodes: List[Entity]) -> str:
     for id_ in nodes:
         item = g.nodes[id_]
         count_subs = ' (' + format_number(item.count_subs) + ')' if item.count_subs else ''
-        text += "{href: '" + url_for('node_view', id_=item.id) + "',"
-        text += "a_attr: { href: '" + url_for('node_view', id_=item.id) + "'}, "
+        text += "{href: '" + url_for('entity_view', id_=item.id) + "',"
+        text += "a_attr: { href: '" + url_for('entity_view', id_=item.id) + "'}, "
         text += "text: '" + item.name.replace("'", "&apos;") + " "
         text += '<span style="font-weight:normal">' + format_number(item.count) + count_subs
         text += "', 'id':'" + str(item.id) + "'"
@@ -197,29 +161,32 @@ def tree_select(name: str) -> str:
     return html
 
 
-def save(form, node=None, root=None):
+def save(form: FlaskForm, node: Entity = None, root: Entity = None) -> Optional[str]:
     g.cursor.execute('BEGIN')
+    super_ = None
+    log_action = 'insert'
     try:
         if node:
             log_action = 'update'
             root = g.nodes[node.root[-1]] if node.root else None
             super_ = g.nodes[node.root[0]] if node.root else None
-        else:
-            log_action = 'insert'
+        elif root:
             node = NodeMapper.insert(root.class_.code, form.name.data)
             super_ = 'new'
-        new_super_id = getattr(form, str(root.id)).data
-        new_super = g.nodes[int(new_super_id)] if new_super_id else g.nodes[root.id]
+        else:
+            abort(404)  # pragma: no cover, either node or root has to be provided
+        new_super_id = getattr(form, str(root.id)).data  # type: ignore
+        new_super = g.nodes[int(new_super_id)] if new_super_id else g.nodes[root.id]  # type: ignore
         if new_super.id == node.id:
             flash(_('error node self as super'), 'error')
-            return
+            return None
         if new_super.root and node.id in new_super.root:
             flash(_('error node sub as super'), 'error')
-            return
+            return None
         node.name = form.name.data
-        if root.directional and form.name_inverse.data.strip():
+        if root and root.directional and form.name_inverse.data.strip():
             node.name += ' (' + form.name_inverse.data.strip() + ')'
-        if not root.directional:
+        if root and not root.directional:
             node.name = node.name.replace('(', '').replace(')', '')
         node.description = form.description.data if form.description else form.unit.data
         node.update()
@@ -227,12 +194,12 @@ def save(form, node=None, root=None):
         # Update super if changed and node is not a root node
         if super_ and (super_ == 'new' or super_.id != new_super_id):
             property_code = 'P127' if node.class_.code == 'E55' else 'P89'
-            node.delete_links(property_code)
+            node.delete_links([property_code])
             node.link(property_code, new_super)
         g.cursor.execute('COMMIT')
-        url = url_for('node_view', id_=node.id)
+        url = url_for('entity_view', id_=node.id)
         if form.continue_.data == 'yes':
-            url = url_for('node_insert', root_id=root.id,
+            url = url_for('node_insert', root_id=root.id,  # type: ignore
                           super_id=new_super_id if new_super_id else None)
         logger.log_user(node.id, log_action)
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')

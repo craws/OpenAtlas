@@ -2,12 +2,12 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
-from openatlas.test_base import TestBaseCase
+from tests.base import TestBaseCase
 
 
 class ReferenceTest(TestBaseCase):
 
-    def test_reference(self):
+    def test_reference(self) -> None:
 
         with app.app_context():
             self.login()

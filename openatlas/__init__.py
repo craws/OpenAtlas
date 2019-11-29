@@ -1,12 +1,11 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
 import locale
 import os
 import sys
 import time
-from typing import Dict
+from typing import Dict, Any
 
 import psycopg2.extras
-from flask import Flask, g, request, session
+from flask import Flask, g, request, session, Response
 from flask_babel import Babel, lazy_gettext as _
 from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect
@@ -41,7 +40,7 @@ from openatlas.util import filters
 from openatlas.views import (actor, admin, ajax, content, event, export, hierarchy, index,
                              involvement, imports, link, login, types, model, place, profile, note,
                              overlay, reference, source, translation, user, relation, member,
-                             search, file, object, sql)
+                             search, file, object, sql, entity)
 
 
 @babel.localeselector
@@ -53,7 +52,7 @@ def get_locale() -> str:
     return best_match if best_match else session['settings']['default_language']
 
 
-def connect():
+def connect() -> psycopg2.connect:
     try:
         connection_ = psycopg2.connect(database=app.config['DATABASE_NAME'],
                                        user=app.config['DATABASE_USER'],
@@ -67,7 +66,7 @@ def connect():
         raise Exception(e)
 
 
-def execute(query, vars_: list = None) -> None:
+def execute(query: str, vars_: list = None) -> None:
     debug_model['sql'] += 1
     return g.cursor.execute(query, vars_)
 
@@ -98,7 +97,7 @@ def before_request() -> None:
 
 
 @app.after_request
-def apply_caching(response):
+def apply_caching(response: Response) -> Response:
     response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
@@ -110,7 +109,7 @@ def apply_caching(response):
 
 
 @app.teardown_request
-def teardown_request(exception) -> None:
+def teardown_request(exception: Any) -> None:
     if hasattr(g, 'db'):
         g.db.close()
 

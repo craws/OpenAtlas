@@ -2,12 +2,12 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
-from openatlas.test_base import TestBaseCase
+from tests.base import TestBaseCase
 
 
 class NoteTest(TestBaseCase):
 
-    def test_note(self):
+    def test_note(self) -> None:
         with app.app_context():
             self.login()
             with app.test_request_context():

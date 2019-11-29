@@ -1,12 +1,11 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
-
-
 class Changelog:
     versions = {
         '4.0.0': ['TBA', {
             'feature': {
                 '1049': 'Upgrade Python to 3.7',
-                '1068': 'Place import with point coordinates'},
+                '1068': 'Place import with point coordinates',
+                '1079': 'Static type checking with Mypy',
+                '1101': 'Disable showing default images for reference'},
             'fix': {
                 '1071': "Filter function in jsTree doesn't clear correctly",
                 '1069': 'Overlay maps: interchanged easting and northing'

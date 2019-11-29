@@ -133,4 +133,4 @@ Add/change values as appropriate.
 
 Use these parameters for running with coverage and HTML report:
 
-    --with-coverage --cover-package openatlas --cover-html --cover-tests --cover-erase
+    --with-coverage --cover-package openatlas --cover-package tests --cover-html --cover-tests --cover-erase

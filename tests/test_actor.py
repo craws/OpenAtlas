@@ -3,12 +3,12 @@ from flask import g, url_for
 from openatlas import app
 from openatlas.models.entity import EntityMapper
 from openatlas.models.node import NodeMapper
-from openatlas.test_base import TestBaseCase
+from tests.base import TestBaseCase
 
 
 class ActorTests(TestBaseCase):
 
-    def test_actor(self):
+    def test_actor(self) -> None:
         with app.app_context():
             self.login()
             rv = self.app.get(url_for('actor_index'))
@@ -48,7 +48,7 @@ class ActorTests(TestBaseCase):
             actor_id = rv.location.split('/')[-1]
 
             # Test actor nodes
-            rv = self.app.get(url_for('node_view', id_=sex_node_sub_1.id))
+            rv = self.app.get(url_for('entity_view', id_=sex_node_sub_1.id))
             assert b'Susan' in rv.data
             rv = self.app.get(url_for('node_move_entities', id_=sex_node_sub_1.id))
             assert b'Sigourney' in rv.data

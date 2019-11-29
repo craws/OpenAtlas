@@ -1,15 +1,15 @@
-from flask import url_for, g
+from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.models.node import NodeMapper
-from openatlas.test_base import TestBaseCase
+from tests.base import TestBaseCase
 
 
 class RelationTests(TestBaseCase):
 
-    def test_relation(self):
+    def test_relation(self) -> None:
         with app.app_context():
             self.login()
             with app.test_request_context():
@@ -32,17 +32,17 @@ class RelationTests(TestBaseCase):
                     'begin_year_to': '-1948',
                     'end_year_from': '2049',
                     'end_year_to': '2050'}
-            rv = self.app.post(
-                url_for('relation_insert', origin_id=actor.id), data=data, follow_redirects=True)
+            rv = self.app.post(url_for('relation_insert', origin_id=actor.id), data=data,
+                               follow_redirects=True)
             assert b'The Kurgan' in rv.data
-            rv = self.app.get(url_for('node_view', id_=relation_sub_id))
+            rv = self.app.get(url_for('entity_view', id_=relation_sub_id))
             assert b'Connor' in rv.data
             data['continue_'] = 'yes'
             data['inverse'] = True
             rv = self.app.post(
                 url_for('relation_insert', origin_id=actor.id), data=data, follow_redirects=True)
             assert b'The Kurgan' in rv.data
-            rv = self.app.get(url_for('actor_view', id_=actor.id))
+            rv = self.app.get(url_for('entity_view', id_=actor.id))
             assert b'The Kurgan' in rv.data
 
             rv = self.app.post(url_for('relation_insert', origin_id=related.id),

@@ -1,4 +1,3 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
 from flask import render_template, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
@@ -67,7 +66,7 @@ def search_index() -> str:
     return render_template('search/index.html', form=form, table=table)
 
 
-def build_search_table(form) -> Table:
+def build_search_table(form: FlaskForm) -> Table:
     table = Table(['name', 'class', 'first', 'last', 'description'],
                   defs='[{className: "dt-body-right", targets: [2,3]}]')
     for entity in EntityMapper.search(form):

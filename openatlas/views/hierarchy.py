@@ -1,5 +1,4 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Optional, Union
+from typing import Union
 
 from flask import abort, flash, g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -12,6 +11,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import build_form
+from openatlas.models.entity import Entity
 from openatlas.models.node import NodeMapper
 from openatlas.util.table import Table
 from openatlas.util.util import required_group, sanitize, uc_first
@@ -104,15 +104,15 @@ def hierarchy_delete(id_: int) -> Response:
     return redirect(url_for('node_index'))
 
 
-def save(form, node=None, value_type=None):
+def save(form: FlaskForm, node_: Entity = None, value_type: bool = False) -> Entity:
     g.cursor.execute('BEGIN')
     try:
-        if not node:
+        if node_:
+            node = node_
+            NodeMapper.update_hierarchy(node, form)
+        else:
             node = NodeMapper.insert('E55', sanitize(form.name.data, 'node'))
             NodeMapper.insert_hierarchy(node, form, value_type)
-        else:
-            node = g.nodes[node.id]
-            NodeMapper.update_hierarchy(node, form)
         node.name = sanitize(form.name.data, 'node')
         node.description = form.description.data
         node.update()

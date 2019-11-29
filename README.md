@@ -16,6 +16,15 @@ Documentation: [Wiki](https://redmine.openatlas.eu/projects/uni/wiki), [Issues](
 
 Please refer to [install.md](install.md) for requirements and installation.
 
+# Development Team
+
+Stefan Eichert (Idea, Concept and Data Modelling)
+Alexander Watzinger (Lead Developer and Concept)
+Bernhard Koschicek (Software Development)
+Christoph Hoffmann (Frontend Development)
+Jan Belik (Logo Design and Design Consulting)
+Daniel Kittel (Quality Assurance)
+
 # Licensing
 
 All OpenAtlas code unless otherwise noted is licensed under the terms of the GNU General Public License Version 2,

@@ -1,19 +1,15 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
 from typing import List, Optional
 
 from flask import g
 from flask_login import current_user
+from psycopg2.extras import NamedTupleCursor
 
 from openatlas.util.util import is_float
 
 
 class Project:
 
-    def __init__(self, row=None) -> None:
-        self.id = None
-        self.name = None
-        if not row:
-            return
+    def __init__(self, row: NamedTupleCursor.Record) -> None:
         self.id = row.id
         self.name = row.name
         self.count = row.count
@@ -28,7 +24,7 @@ class ImportMapper:
         FROM import.project p LEFT JOIN import.entity e ON p.id = e.project_id """
 
     @staticmethod
-    def insert_project(name: str, description: str = None):
+    def insert_project(name: str, description: str = None) -> NamedTupleCursor.Record:
         description = description.strip() if description else None
         sql = """
             INSERT INTO import.project (name, description) VALUES (%(name)s, %(description)s)
@@ -104,7 +100,7 @@ class ImportMapper:
             if class_code == 'E18':
                 location = EntityMapper.insert('E53', 'Location of ' + row['name'],
                                                'place location')
-                entity.link('P53', location)
+                entity.link('P53', [location])
                 if 'easting' in row and is_float(row['easting']):
                     if 'northing' in row and is_float(row['northing']):
                         GisMapper.insert_import(entity=entity,

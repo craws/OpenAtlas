@@ -1,4 +1,3 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
 from typing import Union
 
 from flask import flash, render_template, session, url_for
@@ -36,7 +35,7 @@ def content_index() -> str:
 
 @app.route('/admin/content/view/<string:item>')
 @required_group('manager')
-def content_view(item) -> str:
+def content_view(item: str) -> str:
     return render_template('content/view.html', item=item, content=ContentMapper.get_content())
 
 
