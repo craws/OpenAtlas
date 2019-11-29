@@ -10,6 +10,16 @@ After following the instructions restart Apache and test if the application is w
 
     service apache2 restart
 
+### 3.20.x to 4.0.0
+
+WARNING - this is a major release and requieres some software updates. If you are using Debian you should upgrade to 10 (buster).
+
+See install.md which versions of software are needed after the upgrade.
+
+### 3.20.0 to 3.20.1
+
+A code base update (e.g. with git pull) and an Apache restart should be sufficient.
+
 ### 3.19.x to 3.20.0
 
 Execute install/upgrade/3.20.0.sql after making backups
@@ -45,7 +55,7 @@ Execute install/upgrade/3.15.0.sql after making backups
 
 ### 3.13.0 to 3.14.0
 
-A code base update (e.g. with git pull) and an Apache restart should be sufficient
+A code base update (e.g. with git pull) and an Apache restart should be sufficient.
 
 ### 3.12.0 to 3.13.0
 

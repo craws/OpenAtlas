@@ -1,4 +1,5 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
+from __future__ import annotations  # Needed for Python 4.0 type annotations
+
 import glob
 import os
 import re
@@ -9,12 +10,13 @@ from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
 from html.parser import HTMLParser
-from typing import Optional
+from typing import Any, List, Optional, TYPE_CHECKING, Union
 
 import numpy
 from flask import abort, flash, g, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
+from flask_wtf import FlaskForm
 from numpy import math
 from werkzeug.utils import redirect
 
@@ -22,9 +24,12 @@ import openatlas
 from openatlas import app
 from openatlas.models.classObject import ClassObject
 from openatlas.models.date import DateMapper
-from openatlas.models.imports import Project
 from openatlas.models.property import Property
-from openatlas.models.user import User
+
+if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
+    from openatlas.models.entity import Entity
+    from openatlas.models.imports import Project
+    from openatlas.models.user import User
 
 
 def convert_size(size_bytes: int) -> str:
@@ -35,13 +40,13 @@ def convert_size(size_bytes: int) -> str:
     return "%s %s" % (int(size_bytes / math.pow(1024, i)), size_name[i])
 
 
-def get_file_path(entity) -> str:
-    entity_id = entity if type(entity) is int else entity.id
+def get_file_path(entity: Union[int, 'Entity']) -> Optional[str]:
+    entity_id = entity if isinstance(entity, int) else entity.id
     path = glob.glob(os.path.join(app.config['UPLOAD_FOLDER_PATH'], str(entity_id) + '.*'))
     return path[0] if path else None
 
 
-def print_file_size(entity) -> str:
+def print_file_size(entity: 'Entity') -> str:
     entity_id = entity if type(entity) is int else entity.id
     path = get_file_path(entity_id)
     return convert_size(os.path.getsize(path)) if path else 'N/A'
@@ -53,16 +58,17 @@ def display_tooltip(text: str) -> str:
     return ' <span class="tooltip" title="{title}">i</span>'.format(title=text.replace('"', "'"))
 
 
-def print_file_extension(entity) -> str:
-    entity_id = entity if type(entity) is int else entity.id
+def print_file_extension(entity: Union[int, 'Entity']) -> str:
+    entity_id = entity if isinstance(entity, int) else entity.id
     path = get_file_path(entity_id)
     return os.path.splitext(path)[1] if path else 'N/A'
 
 
-def send_mail(subject: str, text: str, recipients, log_body=True) -> bool:  # pragma: no cover
+def send_mail(subject: str, text: str, recipients: Union[str, List[str]],
+              log_body: bool = True) -> bool:  # pragma: no cover
     """ Send one mail to every recipient, set log_body to False for sensitive data e.g. passwords"""
+    recipients = recipients if isinstance(recipients, list) else [recipients]
     settings = session['settings']
-    recipients = recipients if type(recipients) is list else [recipients]
     if not settings['mail'] or len(recipients) < 1:
         return False
     mail_user = settings['mail_transport_username']
@@ -95,7 +101,7 @@ def send_mail(subject: str, text: str, recipients, log_body=True) -> bool:  # pr
 
 class MLStripper(HTMLParser):
 
-    def error(self, message) -> None:  # pragma: no cover
+    def error(self: MLStripper, message: str) -> None:  # pragma: no cover
         pass
 
     def __init__(self) -> None:
@@ -103,19 +109,16 @@ class MLStripper(HTMLParser):
         self.reset()
         self.strict = False
         self.convert_charrefs = True
-        self.fed = []  # type: list
+        self.fed: list = []
 
-    def handle_data(self, d):
+    def handle_data(self, d: Any) -> None:
         self.fed.append(d)
 
     def get_data(self) -> str:
         return ''.join(self.fed)
 
 
-def sanitize(string: str, mode: Optional[str] = None) -> str:
-    if not mode:
-        # Remove all characters from a string except ASCII letters and numbers
-        return re.sub('[^A-Za-z0-9]+', '', string).strip()
+def sanitize(string: str, mode: str = None) -> str:
     if mode == 'node':
         # Remove all characters from a string except letters, numbers and spaces
         return re.sub(r'([^\s\w]|_)+', '', string).strip()
@@ -123,17 +126,20 @@ def sanitize(string: str, mode: Optional[str] = None) -> str:
         s = MLStripper()
         s.feed(string)
         return s.get_data().strip()
+    # Remove all characters from a string except ASCII letters and numbers
+    return re.sub('[^A-Za-z0-9]+', '', string).strip()
 
 
-def get_file_stats(path: Optional[str] = app.config['UPLOAD_FOLDER_PATH']) -> dict:
+def get_file_stats(path: str = app.config['UPLOAD_FOLDER_PATH']) -> dict:
     """ Build a dict with file ids and stats from files in given directory.
         It's much faster to do this in one call for every file."""
     file_stats = {}
-    for file in os.scandir(path):
-        split_name = os.path.splitext(file.name)
-        if len(split_name) > 1 and split_name[0].isdigit():
-            file_stats[int(split_name[0])] = {'ext': split_name[1], 'size': file.stat().st_size,
-                                              'date': file.stat().st_ctime}
+    with os.scandir(path) as it:
+        for file in it:
+            split_name = os.path.splitext(file.name)
+            if len(split_name) > 1 and split_name[0].isdigit():
+                file_stats[int(split_name[0])] = {'ext': split_name[1], 'size': file.stat().st_size,
+                                                  'date': file.stat().st_ctime}
     return file_stats
 
 
@@ -144,8 +150,8 @@ def display_remove_link(url: str, name: str) -> str:
     return '<a ' + confirm + ' href="' + url + '">' + uc_first(_('remove')) + '</a>'
 
 
-def add_type_data(entity, data, location=None):
-    type_data = OrderedDict()
+def add_type_data(entity: 'Entity', data: list, location: 'Entity' = None) -> list:
+    type_data: OrderedDict = OrderedDict()
     # Nodes
     if location:
         entity.nodes.update(location.nodes)  # Add location types
@@ -169,11 +175,11 @@ def add_type_data(entity, data, location=None):
     if 'type' in type_data:
         type_data.move_to_end('type', last=False)
     for root_name, nodes in type_data.items():
-        data.append((root_name, '<br />'.join(nodes)))
+        data.append((root_name, '<br>'.join(nodes)))
     return data
 
 
-def add_system_data(entity, data):
+def add_system_data(entity: 'Entity', data: list) -> list:
     # Additional info for advanced layout
     if hasattr(current_user, 'settings') and current_user.settings['layout'] == 'advanced':
         data.append((uc_first(_('class')), link(entity.class_)))
@@ -191,7 +197,7 @@ def add_system_data(entity, data):
     return data
 
 
-def get_entity_data(entity, location=None):
+def get_entity_data(entity: 'Entity', location: 'Entity' = None) -> list:
     """
     Return related entity information for a table for view.
     The location parameter is for places which have a location attached.
@@ -199,7 +205,7 @@ def get_entity_data(entity, location=None):
     data = []
     # Aliases
     if entity.aliases:
-        data.append((uc_first(_('alias')), '<br />'.join(entity.aliases.values())))
+        data.append((uc_first(_('alias')), '<br>'.join(entity.aliases.values())))
 
     # Dates
     from_link = ''
@@ -225,8 +231,8 @@ def get_entity_data(entity, location=None):
 
     # Info for source
     if entity.system_type == 'source content':
-        data.append((uc_first(_('information carrier')), '<br />'.join(
-            [link(recipient) for recipient in entity.get_linked_entities('P128', inverse=True)])))
+        data.append((uc_first(_('information carrier')), '<br>'.join(
+            [link(recipient) for recipient in entity.get_linked_entities(['P128'], inverse=True)])))
 
     # Info for events
     if entity.class_.code in app.config['CLASS_CODES']['event']:
@@ -241,32 +247,32 @@ def get_entity_data(entity, location=None):
 
         # Info for acquisitions
         if entity.class_.code == 'E8':
-            data.append((uc_first(_('recipient')), '<br />'.join(
-                [link(recipient) for recipient in entity.get_linked_entities('P22')])))
-            data.append((uc_first(_('donor')), '<br />'.join(
-                [link(donor) for donor in entity.get_linked_entities('P23')])))
-            data.append((uc_first(_('given place')), '<br />'.join(
-                [link(place) for place in entity.get_linked_entities('P24')])))
+            data.append((uc_first(_('recipient')), '<br>'.join(
+                [link(recipient) for recipient in entity.get_linked_entities(['P22'])])))
+            data.append((uc_first(_('donor')), '<br>'.join(
+                [link(donor) for donor in entity.get_linked_entities(['P23'])])))
+            data.append((uc_first(_('given place')), '<br>'.join(
+                [link(place) for place in entity.get_linked_entities(['P24'])])))
 
         # Info for moves
         if entity.class_.code == 'E9':
             person_data = []
             object_data = []
-            for linked_entity in entity.get_linked_entities('P25'):
+            for linked_entity in entity.get_linked_entities(['P25']):
                 if linked_entity.class_.code == 'E21':
                     person_data.append(linked_entity)
                 elif linked_entity.class_.code == 'E84':
                     object_data.append(linked_entity)
             if person_data:
-                data.append((uc_first(_('person')), '<br />'.join(
+                data.append((uc_first(_('person')), '<br>'.join(
                     [link(object_) for object_ in person_data])))
             if object_data:
-                data.append((uc_first(_('object')), '<br />'.join(
+                data.append((uc_first(_('object')), '<br>'.join(
                     [link(object_) for object_ in object_data])))
     return add_system_data(entity, data)
 
 
-def add_dates_to_form(form, for_person=False):
+def add_dates_to_form(form: Any, for_person: bool = False) -> str:
     errors = {}
     valid_dates = True
     for field_name in ['begin_year_from', 'begin_month_from', 'begin_day_from',
@@ -322,10 +328,10 @@ def add_dates_to_form(form, for_person=False):
     return html
 
 
-def required_group(group):
-    def wrapper(f):
+def required_group(group):  # type: ignore
+    def wrapper(f):  # type: ignore
         @wraps(f)
-        def wrapped(*args, **kwargs):
+        def wrapped(*args, **kwargs):  # type: ignore
             if not current_user.is_authenticated:
                 return redirect(url_for('login', next=request.path))
             if not is_authorized(group):
@@ -337,7 +343,7 @@ def required_group(group):
     return wrapper
 
 
-def bookmark_toggle(entity_id: int, for_table: Optional[bool] = False) -> str:
+def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
     label = uc_first(_('bookmark remove') if entity_id in current_user.bookmarks else _('bookmark'))
     if for_table:
         return """<a id="bookmark{entity_id}" onclick="ajaxBookmark('{entity_id}');"
@@ -364,17 +370,21 @@ def uc_first(string: str) -> str:
     return str(string)[0].upper() + str(string)[1:] if string else ''
 
 
-def format_date(value):
-    if type(value) is numpy.datetime64:
-        return DateMapper.datetime64_to_timestamp(value)
-    return value.date().isoformat() if value else ''
+def format_date(value: Union[datetime, numpy.datetime64]) -> str:
+    if not value:
+        return ''
+    if isinstance(value, numpy.datetime64):
+        date_ = DateMapper.datetime64_to_timestamp(value)
+        return date_ if date_ else ''
+    return value.date().isoformat()
 
 
-def format_datetime(value):
+def format_datetime(value: Any) -> str:
     return value.replace(microsecond=0).isoformat() if value else ''
 
 
-def get_profile_image_table_link(file, entity, extension, profile_image_id):
+def get_profile_image_table_link(file: 'Entity', entity: 'Entity', extension: str,
+                                 profile_image_id: int = None) -> str:
     if file.id == profile_image_id:
         url = url_for('file_remove_profile_image', entity_id=entity.id)
         return '<a href="' + url + '">' + uc_first(_('unset')) + '</a>'
@@ -384,55 +394,34 @@ def get_profile_image_table_link(file, entity, extension, profile_image_id):
     return ''  # pragma: no cover - only happens for non image files
 
 
-def link(entity) -> str:
-    # Builds an html link to entity view for display
+def link(entity: Union['Entity', ClassObject, Property, 'Project', 'User']) -> str:
+    # Builds an HTML link to entity view for display
     from openatlas.models.entity import Entity
+    from openatlas.models.imports import Project
+    from openatlas.models.user import User
     if not entity:
         return ''
     html = ''
     if type(entity) is Project:
         url = url_for('import_project_view', id_=entity.id)
         html = '<a href="' + url + '">' + entity.name + '</a>'
-    elif type(entity) is User:
+    elif isinstance(entity, User):
         style = '' if entity.active else 'class="inactive"'
         url = url_for('user_view', id_=entity.id)
         html = '<a ' + style + ' href="' + url + '">' + entity.username + '</a>'
-    elif type(entity) is ClassObject:
+    elif isinstance(entity, ClassObject):
         url = url_for('class_view', code=entity.code)
         html = '<a href="' + url + '">' + entity.code + '</a>'
-    elif type(entity) is Property:
+    elif isinstance(entity, Property):
         url = url_for('property_view', code=entity.code)
         html = '<a href="' + url + '">' + entity.code + '</a>'
-    elif type(entity) is Entity:
-        url = ''
-        if entity.class_.code == 'E33':
-            if entity.system_type == 'source content':
-                url = url_for('source_view', id_=entity.id)
-            elif entity.system_type == 'source translation':
-                url = url_for('translation_view', id_=entity.id)
-        elif entity.system_type == 'file':
-            url = url_for('file_view', id_=entity.id)
-        elif entity.class_.code in (app.config['CLASS_CODES']['event']):
-            url = url_for('event_view', id_=entity.id)
-        elif entity.class_.code in (app.config['CLASS_CODES']['actor']):
-            url = url_for('actor_view', id_=entity.id)
-        elif entity.class_.code in (app.config['CLASS_CODES']['place']):
-            url = url_for('place_view', id_=entity.id)
-        elif entity.class_.code in (app.config['CLASS_CODES']['reference']):
-            url = url_for('reference_view', id_=entity.id)
-        elif entity.class_.code in (app.config['CLASS_CODES']['object']):
-            url = url_for('object_view', id_=entity.id)
-        elif entity.class_.code in ['E55', 'E53']:
-            url = url_for('node_view', id_=entity.id)
-            if not entity.root:
-                url = url_for('node_index') + '#tab-' + str(entity.id)
-        if not url:
-            return entity.name + ' (' + entity.class_.name + ')'
-        return '<a href="' + url + '">' + truncate_string(entity.name) + '</a>'
+    elif isinstance(entity, Entity):
+        url = url_for('entity_view', id_=entity.id)
+        html = '<a href="' + url + '">' + truncate_string(entity.name) + '</a>'
     return html
 
 
-def truncate_string(string: str, length: Optional[int] = 40, span: Optional[bool] = True) -> str:
+def truncate_string(string: str, length: int = 40, span: bool = True) -> str:
     """
     Returns a truncates string with '..' at the end if it was longer than length
     Also adds a span title (for mouse over) with the original string if parameter "span" is True
@@ -446,9 +435,9 @@ def truncate_string(string: str, length: Optional[int] = 40, span: Optional[bool
     return '<span title="' + string.replace('"', '') + '">' + string[:length] + '..' + '</span>'
 
 
-def get_base_table_data(entity, file_stats=None):
+def get_base_table_data(entity: 'Entity', file_stats: dict = None) -> list:
     """ Returns standard table data for an entity"""
-    data = ['<br />'.join([link(entity)] + [
+    data: list = ['<br>'.join([link(entity)] + [
         truncate_string(alias) for alias in entity.aliases.values()])]
     if entity.view_name in ['event', 'actor']:
         data.append(g.classes[entity.class_.code].name)
@@ -473,7 +462,7 @@ def get_base_table_data(entity, file_stats=None):
     return data
 
 
-def was_modified(form, entity):  # pragma: no cover
+def was_modified(form: FlaskForm, entity: 'Entity') -> bool:  # pragma: no cover
     """ Checks if an entity was modified after an update form was opened."""
     if not entity.modified or not form.opened.data:
         return False
@@ -483,8 +472,8 @@ def was_modified(form, entity):  # pragma: no cover
     return True
 
 
-def format_entry_begin(entry, object_=None):
-    html = link(object_)
+def format_entry_begin(entry: 'Entity', object_: 'Entity' = None) -> str:
+    html = link(object_) if object_ else ''
     if entry.begin_from:
         html += ', ' if html else ''
         if entry.begin_to:
@@ -496,8 +485,8 @@ def format_entry_begin(entry, object_=None):
     return html
 
 
-def format_entry_end(entry, object_=None):
-    html = link(object_)
+def format_entry_end(entry: 'Entity', object_: 'Entity' = None) -> str:
+    html = link(object_) if object_ else ''
     if entry.end_from:
         html += ', ' if html else ''
         if entry.end_to:
@@ -509,7 +498,7 @@ def format_entry_end(entry, object_=None):
     return html
 
 
-def get_appearance(event_links):
+def get_appearance(event_links: list) -> tuple:
     # Get first/last appearance from events for actors without begin/end
     first_year = None
     last_year = None
@@ -519,7 +508,7 @@ def get_appearance(event_links):
         event = link_.domain
         actor = link_.range
         event_link = '<a href="{url}">{label}</a> '.format(label=uc_first(_('event')),
-                                                           url=url_for('event_view', id_=event.id))
+                                                           url=url_for('entity_view', id_=event.id))
         if not actor.first:
             if link_.first and (not first_year or int(link_.first) < int(first_year)):
                 first_year = link_.first
@@ -539,3 +528,11 @@ def get_appearance(event_links):
                 last_string = format_entry_end(event) + ' ' + _('at an') + ' ' + event_link
                 last_string += (' ' + _('in') + ' ' + link(link_.object_)) if link_.object_ else ''
     return first_string, last_string
+
+
+def is_float(value: Union[int, float]) -> bool:
+    try:
+        float(value)
+        return True
+    except ValueError:
+        return False

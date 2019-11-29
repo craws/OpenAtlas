@@ -6,7 +6,7 @@
     <div id="admin_index">
         {% for dir, value in writeable_dirs.items() %}
             {% if not value %}
-                <span class="error">{{ _('directory not writable')|uc_first }}: {{ dir }}</span><br />
+                <span class="error">{{ _('directory not writable')|uc_first }}: {{ dir }}</span><br>
             {% endif %}
         {% endfor %}
         <h1>{{ _('user')|uc_first }}</h1>

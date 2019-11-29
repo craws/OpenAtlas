@@ -10,7 +10,7 @@
         {{ form.csrf_token }}
         {% for language in languages %}
             <p class="inverse-heading">{{ language|upper }}</p>
-            {{ form[language](class='tinymce') }}<br />
+            {{ form[language](class='tinymce') }}<br>
         {% endfor %}
         <p>
             <button type="submit">{{ _('save')|uc_first }}</button>

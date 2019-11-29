@@ -1,7 +1,5 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Dict
-
 from flask import g, session
+from psycopg2.extras import NamedTupleCursor
 
 import openatlas
 from openatlas import app
@@ -9,14 +7,14 @@ from openatlas import app
 
 class ClassObject:
 
-    def __init__(self, row) -> None:
+    def __init__(self, row: NamedTupleCursor.Record) -> None:
         self._comment = ''
         self._name = row.name
         self.code = row.code
         self.id = row.id
-        self.i18n = {}  # type: Dict
-        self.sub = []  # type: list
-        self.super = []  # type: list
+        self.i18n: dict = {}
+        self.sub: list = []
+        self.super: list = []
 
     @property
     def name(self) -> str:

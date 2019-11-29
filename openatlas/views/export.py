@@ -1,11 +1,12 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
 import os
 from os.path import basename
+from typing import Union, Any
 
 from flask import flash, render_template, send_from_directory, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import BooleanField, SelectField, SubmitField
 
 from openatlas import app, logger
@@ -14,11 +15,11 @@ from openatlas.util.table import Table
 from openatlas.util.util import convert_size, is_authorized, required_group, uc_first
 
 
-class ExportSqlForm(Form):
+class ExportSqlForm(FlaskForm):
     save = SubmitField(uc_first(_('export SQL')))
 
 
-class ExportCsvForm(Form):
+class ExportCsvForm(FlaskForm):
     zip = BooleanField(_('export as ZIP and add info file'), default=True)
     timestamps = BooleanField('created and modified dates', default=False)
     gis_format = SelectField(_('GIS format'), choices=[
@@ -37,8 +38,8 @@ class ExportCsvForm(Form):
 
 @app.route('/export/sql', methods=['POST', 'GET'])
 @required_group('manager')
-def export_sql() -> str:
-    path = app.config['EXPORT_FOLDER_PATH'] + '/sql'
+def export_sql() -> Union[str, Response]:
+    path = app.config['EXPORT_FOLDER_PATH'].joinpath('sql')
     writeable = True if os.access(path, os.W_OK) else False
     form = ExportSqlForm()
     if form.validate_on_submit() and writeable:
@@ -55,7 +56,7 @@ def export_sql() -> str:
         if name == '.gitignore':
             continue
         url = url_for('download_sql', filename=name)
-        data = [name, convert_size(os.path.getsize(path + '/' + name)),
+        data = [name, convert_size(os.path.getsize(path.joinpath(name))),
                 '<a href="' + url + '">' + uc_first(_('download')) + '</a>']
         if is_authorized('admin') and writeable:
             confirm = ' onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
@@ -68,16 +69,16 @@ def export_sql() -> str:
 
 @app.route('/download/sql/<filename>')
 @required_group('manager')
-def download_sql(filename: str):
-    path = app.config['EXPORT_FOLDER_PATH'] + '/sql/'
+def download_sql(filename: str) -> Response:
+    path = app.config['EXPORT_FOLDER_PATH'].joinpath('sql')
     return send_from_directory(path, filename, as_attachment=True)
 
 
 @app.route('/delete/sql/<filename>')
 @required_group('admin')
-def delete_sql(filename: str) -> str:
+def delete_sql(filename: str) -> Response:
     try:
-        os.remove(app.config['EXPORT_FOLDER_PATH'] + '/sql/' + filename)
+        os.remove(app.config['EXPORT_FOLDER_PATH'].joinpath('sql', filename))
         logger.log('info', 'file', 'SQL file deleted')
         flash(_('file deleted'), 'info')
     except Exception as e:  # pragma: no cover
@@ -88,15 +89,15 @@ def delete_sql(filename: str) -> str:
 
 @app.route('/download/csv/<filename>')
 @required_group('manager')
-def download_csv(filename: str):
-    path = app.config['EXPORT_FOLDER_PATH'] + '/csv/'
+def download_csv(filename: str) -> Any:
+    path = app.config['EXPORT_FOLDER_PATH'].joinpath('csv')
     return send_from_directory(path, filename, as_attachment=True)
 
 
 @app.route('/export/csv', methods=['POST', 'GET'])
 @required_group('manager')
-def export_csv() -> str:
-    path = app.config['EXPORT_FOLDER_PATH'] + '/csv'
+def export_csv() -> Union[str, Response]:
+    path = app.config['EXPORT_FOLDER_PATH'].joinpath('csv')
     writeable = True if os.access(path, os.W_OK) else False
     form = ExportCsvForm()
     if form.validate_on_submit() and writeable:
@@ -111,7 +112,7 @@ def export_csv() -> str:
             continue
         link = '<a href="{url}">{label}</a>'.format(url=url_for('download_csv', filename=name),
                                                     label=uc_first(_('download')))
-        data = [name, convert_size(os.path.getsize(path + '/' + name)), link]
+        data = [name, convert_size(os.path.getsize(path.joinpath(name))), link]
         if is_authorized('admin') and writeable:
             confirm = ' onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
             delete = '<a href="' + url_for('delete_csv', filename=name)
@@ -123,9 +124,9 @@ def export_csv() -> str:
 
 @app.route('/delete/csv/<filename>')
 @required_group('admin')
-def delete_csv(filename: str) -> str:
+def delete_csv(filename: str) -> Response:
     try:
-        os.remove(app.config['EXPORT_FOLDER_PATH'] + '/csv/' + filename)
+        os.remove(app.config['EXPORT_FOLDER_PATH'].joinpath('csv', filename))
         logger.log('info', 'file', 'CSV file deleted')
         flash(_('file deleted'), 'info')
     except Exception as e:  # pragma: no cover

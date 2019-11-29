@@ -17,7 +17,7 @@
             {% endif %}
         </div>
     {% endif %}
-    {{ data['info']|data_table|safe }}
+    {{ info|display_info|safe }}
     <a href="{{ url_for('user_activity', user_id=user.id) }}">{{ _('activity')|uc_first }}</a>
     {{ user|description|safe }}
 {% endblock %}

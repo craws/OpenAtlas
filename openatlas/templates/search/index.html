@@ -8,18 +8,18 @@
     <div style="float:left;">
         <form method="post">
             {{ form.csrf_token }}
-            {{ form.term }}<br /><br />
-            {{ form.own }} {{ form.own.label }}<br />
-            {{ form.desc }} {{ form.desc.label }}<br />
+            {{ form.term }}<br><br>
+            {{ form.own }} {{ form.own.label }}<br>
+            {{ form.desc }} {{ form.desc.label }}<br>
             <h2>{{ _('date')|uc_first }}</h2>
             <span style="display:inline-block;width:3em;">{{ _('from')|uc_first }}</span>
             {{ form.begin_year(class_='year') }} {{ form.begin_month(class_='month') }} {{ form.begin_day(class_='day') }}
             {% if form.errors['begin_year'] %}
                 <span class="error">{{ form.errors['begin_year'][0]|safe }}</span>
             {% endif %}
-            <br />
+            <br>
             <span style="display:inline-block;width:3em;">{{ _('to')|uc_first }}</span>
-            {{ form.end_year(class_='year') }} {{ form.end_month(class_='month') }} {{ form.end_day(class_='day') }} <br />
+            {{ form.end_year(class_='year') }} {{ form.end_month(class_='month') }} {{ form.end_day(class_='day') }} <br>
             {{ form.include_dateless }} {{ form.include_dateless.label }}
             <h2>{{ _('classes')|uc_first }}</h2>
             <p id="select_all" class="select_all">{{ _('deselect all')|uc_first }}</p>

@@ -1,11 +1,11 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Tuple
+from typing import Tuple, Union
 
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
+from werkzeug.wrappers import Response
 from wtforms import SelectField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
@@ -19,7 +19,7 @@ from openatlas.util.util import (bookmark_toggle, format_date, link, required_gr
                                  truncate_string, uc_first)
 
 
-class FeedbackForm(Form):
+class FeedbackForm(FlaskForm):
     subject = SelectField(_('subject'),
                           choices=list(app.config['FEEDBACK_SUBJECTS'].items()),
                           render_kw={'autofocus': True})
@@ -64,7 +64,7 @@ def index() -> str:
 
 
 @app.route('/index/setlocale/<language>')
-def set_locale(language: str) -> str:
+def set_locale(language: str) -> Response:
     session['language'] = language
     if hasattr(current_user, 'id') and current_user.id:
         current_user.settings['language'] = language
@@ -74,7 +74,7 @@ def set_locale(language: str) -> str:
 
 @app.route('/overview/feedback', methods=['POST', 'GET'])
 @required_group('readonly')
-def index_feedback() -> str:
+def index_feedback() -> Union[str, Response]:
     form = FeedbackForm()
     if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
         subject = form.subject.data + ' from ' + session['settings']['site_name']
@@ -100,19 +100,29 @@ def index_credits() -> str:
     return render_template('index/credits.html')
 
 
+@app.errorhandler(400)
+def bad_request(e: Exception) -> Tuple[str, int]:  # pragma: no cover
+    return render_template('400.html', e=e), 400
+
+
 @app.errorhandler(403)
-def forbidden(e) -> Tuple[str, int]:
+def forbidden(e: Exception) -> Tuple[str, int]:
     return render_template('403.html', e=e), 403
 
 
 @app.errorhandler(404)
-def page_not_found(e) -> Tuple[str, int]:
+def page_not_found(e: Exception) -> Tuple[str, int]:
     return render_template('404.html', e=e), 404
 
 
 @app.errorhandler(418)
-def invalid_id(e) -> Tuple[str, int]:
+def invalid_id(e: Exception) -> Tuple[str, int]:
     return render_template('418.html', e=e), 418
+
+
+@app.errorhandler(422)
+def unprocessable_entity(e: Exception) -> Tuple[str, int]:
+    return render_template('422.html', e=e), 422
 
 
 @app.route('/overview/changelog')

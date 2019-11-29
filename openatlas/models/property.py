@@ -1,7 +1,7 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
 from typing import Dict
 
 from flask import g, session
+from psycopg2.extras import NamedTupleCursor
 
 import openatlas
 from openatlas import app
@@ -9,7 +9,7 @@ from openatlas import app
 
 class Property:
 
-    def __init__(self, row) -> None:
+    def __init__(self, row: NamedTupleCursor.Record) -> None:
         self._comment = ''
         self._name = row.name
         self._name_inverse = row.name_inverse
@@ -17,9 +17,9 @@ class Property:
         self.domain_class_code = row.domain_class_code
         self.range_class_code = row.range_class_code
         self.id = row.id
-        self.i18n = {}  # type: Dict
-        self.super = []  # type: list
-        self.sub = []  # type: list
+        self.i18n: dict = {}
+        self.super: list = []
+        self.sub: list = []
 
     @property
     def name(self) -> str:
@@ -55,6 +55,7 @@ class Property:
                 return True
             elif self.find_subs(attr, class_id, g.classes[sub_id].sub):
                 return True
+        return False
 
 
 class PropertyMapper:

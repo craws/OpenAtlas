@@ -76,20 +76,20 @@ inputForm.onAdd = function (map) {
             <span id="closeButton" title="` + translate["map_info_close"] + `" onclick="closeForm()" class="fad">X</span>
             <span id="inputFormTitle"></span>
             <p id="inputFormInfo"></p>
-            <input type="text" id="nameField" placeholder="Enter a name if desired" />
+            <input type="text" id="nameField" placeholder="Enter a name if desired">
             <textarea rows="3" cols="70" id="descriptionField" placeholder="` + translate["map_info_description"] + `"/></textarea>
             <div id="coordinatesDiv">
                 <div style="display:block;clear:both;">
                     <label for='easting'>Easting</label>
-                    <input type="text" style="margin-top:0.5em;" oninput="check_coordinates_input()" id="easting" placeholder="decimal degrees" />
+                    <input type="text" style="margin-top:0.5em;" oninput="check_coordinates_input()" id="easting" placeholder="decimal degrees">
                 </div>
                 <div style="display:block;clear:both;">
                     <label for='northing'>Northing</label>
-                    <input type="text" style="margin-top:0.5em;" oninput="check_coordinates_input()" id="northing" placeholder="decimal degrees" />
+                    <input type="text" style="margin-top:0.5em;" oninput="check_coordinates_input()" id="northing" placeholder="decimal degrees">
                 </div>
             </div>
             <div style="clear:both;"></div>
-            <input type="button" id="saveButton" disabled value="` + translate["save"] + `" onclick="saveForm('` + shapeType + `')" />
+            <input type="button" id="saveButton" disabled value="` + translate["save"] + `" onclick="saveForm('` + shapeType + `')">
         </form>`;
     return div;
 };

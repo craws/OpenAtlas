@@ -1,19 +1,19 @@
 from flask import url_for
 
 from openatlas import app
-from openatlas.test_base import TestBaseCase
+from tests.base import TestBaseCase
 
 
 class DateTest(TestBaseCase):
 
-    def test_date(self):
+    def test_date(self) -> None:
         with app.app_context():
             self.login()
 
-            # Dates insert
+            # Dates insert (don't change year values - they test leap years too)
             data = {'name': 'Date place',
                     'begin_year_from': -1949, 'begin_month_from': 2, 'begin_day_from': 8,
-                    'begin_year_to': -1948, 'end_year_from': 2040, 'end_year_to': 2050}
+                    'begin_year_to': -1948, 'end_year_from': 1996, 'end_year_to': 1996}
             rv = self.app.post(url_for('place_insert'), data=data, follow_redirects=True)
             assert b'Date place' in rv.data
 

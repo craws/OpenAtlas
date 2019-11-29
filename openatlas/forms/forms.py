@@ -1,52 +1,52 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
+from __future__ import annotations  # Needed for Python 4.0 type annotations
+
 import ast
 import re
 import time
-from typing import Optional as Optional_Type, Iterator
+from typing import Any, List, Optional as Optional_Type, Union
 
-from flask import g, session
+from flask import Request, g, session
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from flask_wtf.csrf import generate_csrf
 from wtforms import FloatField, HiddenField
 from wtforms.validators import Optional
 from wtforms.widgets import HiddenInput
 
 from openatlas import app
-from openatlas.forms.date import DateForm
 from openatlas.models.entity import Entity, EntityMapper
-from openatlas.models.link import LinkMapper
+from openatlas.models.link import Link, LinkMapper
 from openatlas.models.node import NodeMapper
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, get_file_stats, truncate_string, uc_first
 
 
-def get_link_type(form) -> Optional_Type[Entity]:
+def get_link_type(form: Any) -> Optional_Type[Entity]:
     """ Returns the link type provided by a link form, e.g. involvement between actor and event."""
     for field in form:
         if type(field) is TreeField and field.data:
             return g.nodes[int(field.data)]
+    return None
 
 
-def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
-    """ The entity parameter can also be a link."""
-    # Add custom fields
-    custom_list = []
+def build_form(form: Any, form_name: str, selected_object: Union[Entity, Link] = None,
+               request_origin: Request = None, entity2: Entity = None) -> Any:
 
-    def add_value_type_fields(subs) -> None:
+    def add_value_type_fields(subs: list) -> None:
         for sub_id in subs:
             sub = g.nodes[sub_id]
             setattr(form, str(sub.id), ValueFloatField(sub.name, [Optional()]))
             add_value_type_fields(sub.subs)
 
+    # Add custom fields
+    custom_list = []
     for id_, node in NodeMapper.get_nodes_for_form(form_name).items():
         custom_list.append(id_)
         setattr(form, str(id_), TreeMultiField(str(id_)) if node.multiple else TreeField(str(id_)))
         if node.value_type:
             add_value_type_fields(node.subs)
-
-    form_instance = form(obj=entity)
+    form_instance = form(obj=selected_object)
 
     # Delete custom fields except the ones specified for the form
     delete_list = []  # Can't delete fields in the loop so creating a list for later deletion
@@ -57,16 +57,17 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
         delattr(form_instance, item)
 
     # Set field data if available and only if it's a GET request
-    if entity and request_origin and request_origin.method == 'GET':
+    if selected_object and request_origin and request_origin.method == 'GET':
+        from openatlas.forms.date import DateForm
         # Important to use isinstance instead type check, because can be a sub type (e.g. ActorForm)
         if isinstance(form_instance, DateForm):
-            form_instance.populate_dates(entity)
-        nodes = entity.nodes
+            form_instance.populate_dates(selected_object)
+        nodes = selected_object.nodes
         if entity2:
             nodes.update(entity2.nodes)
         if hasattr(form, 'opened'):
             form_instance.opened.data = time.time()
-        node_data = {}  # type: dict
+        node_data: dict = {}
         for node, node_value in nodes.items():
             root = g.nodes[node.root[-1]] if node.root else node
             if root.id not in node_data:
@@ -80,12 +81,13 @@ def build_form(form, form_name, entity=None, request_origin=None, entity2=None):
     return form_instance
 
 
-def build_node_form(form, node, request_origin=None):
+def build_node_form(form: Any, node_: Entity, request_origin: Request = None) -> FlaskForm:
     if not request_origin:
-        root = node
+        root = node_
         node = None
     else:
-        root = g.nodes[node.root[-1]]
+        node = node_
+        root = g.nodes[node_.root[-1]]
     setattr(form, str(root.id), TreeField(str(root.id)))
     form_instance = form(obj=node)
     if not root.directional:
@@ -121,7 +123,7 @@ def build_node_form(form, node, request_origin=None):
 
 class TreeSelect(HiddenInput):
 
-    def __call__(self, field, **kwargs):
+    def __call__(self, field: TreeField, **kwargs: Any) -> TreeSelect:
         from openatlas.models.node import NodeMapper
         selection = ''
         selected_ids = []
@@ -132,12 +134,12 @@ class TreeSelect(HiddenInput):
         html = """
             <input id="{name}-button" name="{name}-button" type="text"
                 class="table-select {required}" onfocus="this.blur()"
-                readonly="readonly" value="{selection}" placeholder="{change_label}" />
+                readonly="readonly" value="{selection}" placeholder="{change_label}">
             <a id="{name}-clear" {clear_style} class="button"
                 onclick="clearSelect('{name}');">{clear_label}</a>
             <div id="{name}-overlay" class="overlay">
                 <div id="{name}-dialog" class="overlay-container">
-                    <input class="tree-filter" id="{name}-tree-search" placeholder="{filter}" />
+                    <input class="tree-filter" id="{name}-tree-search" placeholder="{filter}">
                     <div id="{name}-tree"></div>
                 </div>
             </div>
@@ -156,6 +158,10 @@ class TreeSelect(HiddenInput):
                         if (this.value.length >= {min_chars}) {{
                             $("#{name}-tree").jstree("search", $(this).val());
                         }}
+                        else if (this.value.length == 0) {{
+                            $("#{name}-tree").jstree("search", $(this).val());
+                            $("#{name}-tree").jstree(true).show_all();
+                        }}                        
                     }});
                 }});
             </script>""".format(filter=uc_first(_('type to search')),
@@ -177,7 +183,7 @@ class TreeField(HiddenField):
 
 class TreeMultiSelect(HiddenInput):
 
-    def __call__(self, field, **kwargs):
+    def __call__(self, field: TreeField, **kwargs: Any) -> TreeMultiSelect:
         selection = ''
         selected_ids = []
         root = g.nodes[int(field.id)]
@@ -186,13 +192,13 @@ class TreeMultiSelect(HiddenInput):
             field.data = ast.literal_eval(field.data) if type(field.data) is str else field.data
             for entity_id in field.data:
                 selected_ids.append(entity_id)
-                selection += g.nodes[entity_id].name + '<br />'
+                selection += g.nodes[entity_id].name + '<br>'
         html = """
             <span id="{name}-button" class="button">{change_label}</span>
             <div id="{name}-selection" style="text-align:left;">{selection}</div>
             <div id="{name}-overlay" class="overlay">
                <div id="{name}-dialog" class="overlay-container">
-                   <input class="tree-filter" id="{name}-tree-search" placeholder="{filter}" />
+                   <input class="tree-filter" id="{name}-tree-search" placeholder="{filter}">
                    <div id="{name}-tree"></div>
                </div>
             </div>
@@ -207,6 +213,10 @@ class TreeMultiSelect(HiddenInput):
                 $("#{name}-tree-search").keyup(function(){{
                     if (this.value.length >= {min_chars}) {{
                         $("#{name}-tree").jstree("search", $(this).val());
+                    }}
+                    else if (this.value.length == 0) {{
+                        $("#{name}-tree").jstree("search", $(this).val());
+                        $("#{name}-tree").jstree(true).show_all();
                     }}
                 }});
             </script>""".format(filter=uc_first(_('type to search')),
@@ -225,7 +235,7 @@ class TreeMultiField(HiddenField):
 
 class TableSelect(HiddenInput):
 
-    def __call__(self, field, **kwargs):
+    def __call__(self, field: TableField, **kwargs: Any) -> TableSelect:
         file_stats = None
         place_fields = ['residence', 'begins_in', 'ends_in', 'place_to', 'place_from']
         class_ = 'place' if field.id in place_fields else field.id
@@ -259,7 +269,7 @@ class TableSelect(HiddenInput):
                         """.format(name=field.id,
                                    entity_id=entity.id,
                                    entity_name=truncate_string(entity.name, span=False))
-            data[0] = '<br />'.join([data[0]] + [
+            data[0] = '<br>'.join([data[0]] + [
                 truncate_string(alias) for id_, alias in entity.aliases.items()])
             table.rows.append(data)
         html = """
@@ -289,7 +299,7 @@ class TableField(HiddenField):
 class TableMultiSelect(HiddenInput):
     """ Table with checkboxes used in a popup for forms."""
 
-    def __call__(self, field, **kwargs):
+    def __call__(self, field: TableField, **kwargs: Any) -> TableMultiSelect:
         if field.data and type(field.data) is str:
             field.data = ast.literal_eval(field.data)
         selection = ''
@@ -313,7 +323,7 @@ class TableMultiSelect(HiddenInput):
         else:
             entities = EntityMapper.get_by_codes(class_)
         for entity in entities:
-            selection += entity.name + '<br/>' if field.data and entity.id in field.data else ''
+            selection += entity.name + '<br>' if field.data and entity.id in field.data else ''
             data = get_base_table_data(entity)
             data[0] = re.sub(re.compile('<a.*?>'), '', data[0])  # Remove links
             data.append("""<input type="checkbox" id="{id}" {checked} value="{name}"
@@ -323,7 +333,7 @@ class TableMultiSelect(HiddenInput):
                 checked='checked = "checked"' if field.data and entity.id in field.data else ''))
             table.rows.append(data)
         html = """
-            <span id="{name}-button" class="button">{change_label}</span><br />
+            <span id="{name}-button" class="button">{change_label}</span><br>
             <div id="{name}-selection" class="selection" style="text-align:left;">{selection}</div>
             <div id="{name}-overlay" class="overlay">
             <div id="{name}-dialog" class="overlay-container">{table}</div></div>
@@ -345,7 +355,7 @@ class ValueFloatField(FloatField):
     pass
 
 
-def build_move_form(form, node) -> Form:
+def build_move_form(form: Any, node: Entity) -> FlaskForm:
     root = g.nodes[node.root[-1]]
     setattr(form, str(root.id), TreeField(str(root.id)))
     form_instance = form(obj=node)
@@ -377,7 +387,7 @@ def build_move_form(form, node) -> Form:
     return form_instance
 
 
-def build_table_form(class_name: str, linked_entities: Iterator) -> str:
+def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
     """ Returns a form with a list of entities with checkboxes"""
     from openatlas.models.entity import EntityMapper
     table = Table(Table.HEADERS[class_name] + [''])

@@ -34,12 +34,12 @@
         <h1>{{ entity.name }}</h1>
         <div>
             <div style="float:left;">
-                {{ tables['info']|data_table|safe }}
+                {{ info|display_info|safe }}
             </div>
             <div class="preview" style="float:left;">
                 {% if preview %}
                     <a href="{{ url_for('display_file', filename=filename) }}" target="_blank">
-                        <img alt="{{ filename }}" src="{{ url_for('display_file', filename=filename) }}" />
+                        <img alt="{{ filename }}" src="{{ url_for('display_file', filename=filename) }}">
                     </a>
                 {% elif not missing_file %}
                     {{ _('no preview available')|uc_first }}

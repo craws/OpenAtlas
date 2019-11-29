@@ -1,32 +1,32 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
 import collections
-import os
+from typing import Optional, Union
 
 import pandas as pd
 from flask import flash, g, render_template, request, url_for
 from flask_babel import format_number, lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect, secure_filename
+from werkzeug.wrappers import Response
 from wtforms import BooleanField, FileField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.models.entity import EntityMapper
-from openatlas.models.imports import ImportMapper, Project
+from openatlas.models.imports import ImportMapper
 from openatlas.util.table import Table
-from openatlas.util.util import format_date, link, required_group, truncate_string
+from openatlas.util.util import format_date, is_float, link, required_group, truncate_string
 
 
-class ProjectForm(Form):
-    project_id = None  # type: int
+class ProjectForm(FlaskForm):
+    project_id: Optional[int] = None
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
 
     def validate(self) -> bool:
-        valid = Form.validate(self)
-        project = ImportMapper.get_project_by_id(self.project_id) if self.project_id else Project()
-        if project.name != self.name.data and ImportMapper.get_project_by_name(self.name.data):
+        valid = FlaskForm.validate(self)
+        name = ImportMapper.get_project_by_id(self.project_id).name if self.project_id else ''
+        if name != self.name.data and ImportMapper.get_project_by_name(self.name.data):
             self.name.errors.append(_('error name exists'))
             valid = False
         return valid
@@ -45,7 +45,7 @@ def import_index() -> str:
 
 @app.route('/import/project/insert', methods=['POST', 'GET'])
 @required_group('manager')
-def import_project_insert() -> str:
+def import_project_insert() -> Union[str, Response]:
     form = ProjectForm()
     if form.validate_on_submit():
         id_ = ImportMapper.insert_project(form.name.data, form.description.data)
@@ -70,7 +70,7 @@ def import_project_view(id_: int) -> str:
 
 @app.route('/import/project/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('manager')
-def import_project_update(id_: int) -> str:
+def import_project_update(id_: int) -> Union[str, Response]:
     project = ImportMapper.get_project_by_id(id_)
     form = ProjectForm(obj=project)
     form.project_id = id_
@@ -85,20 +85,20 @@ def import_project_update(id_: int) -> str:
 
 @app.route('/import/project/delete/<int:id_>')
 @required_group('manager')
-def import_project_delete(id_: int) -> str:
+def import_project_delete(id_: int) -> Response:
     ImportMapper.delete_project(id_)
     flash(_('project deleted'), 'info')
     return redirect(url_for('import_index'))
 
 
-class ImportForm(Form):
+class ImportForm(FlaskForm):
     file = FileField(_('file'), [InputRequired()])
     preview = BooleanField(_('preview only'), default=True)
     duplicate = BooleanField(_('check for duplicates'), default=True)
     save = SubmitField(_('import'))
 
     def validate(self) -> bool:
-        valid = Form.validate(self)
+        valid = FlaskForm.validate(self)
         file_ = request.files['file']
         extensions = app.config['IMPORT_FILE_EXTENSIONS']
         if not file_:  # pragma: no cover
@@ -117,16 +117,16 @@ def import_data(project_id: int, class_code: str) -> str:
     form = ImportForm()
     table = None
     imported = False
-    messages = {'error': [], 'warn': []}  # type: dict
+    messages: dict = {'error': [], 'warn': []}
     if form.validate_on_submit():
         file_ = request.files['file']
-        # TODO fix windows separator
-        separator = '/' if os.name == "posix" else '\\'
-        file_path = app.config['IMPORT_FOLDER_PATH'] + separator + secure_filename(file_.filename)
-        columns = {'allowed': ['name', 'id', 'description'], 'valid': [], 'invalid': []}
+        file_path = app.config['TMP_FOLDER_PATH'].joinpath(secure_filename(file_.filename))
+        columns: dict = {'allowed': ['name', 'id', 'description'], 'valid': [], 'invalid': []}
+        if class_code == 'E18':
+            columns['allowed'] += ['easting', 'northing']
         try:
-            file_.save(file_path)
-            if file_path.rsplit('.', 1)[1].lower() in ['xls', 'xlsx']:
+            file_.save(str(file_path))
+            if str(file_path).rsplit('.', 1)[1].lower() in ['xls', 'xlsx']:
                 df = pd.read_excel(file_path, keep_default_na=False)
             else:
                 df = pd.read_csv(file_path, keep_default_na=False)
@@ -153,7 +153,10 @@ def import_data(project_id: int, class_code: str) -> str:
                 table_row = []
                 checked_row = {}
                 for item in headers:
-                    table_row.append(row[item])
+                    value = row[item]
+                    if item in ['northing', 'easting'] and not is_float(row[item]):
+                        value = '<span class="error">' + row[item] + '</span>'  # pragma: no cover
+                    table_row.append(value)
                     checked_row[item] = row[item]
                     if item == 'name' and form.duplicate.data:
                         names.append(row['name'].lower())

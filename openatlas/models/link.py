@@ -1,20 +1,23 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
-import ast
-from typing import Dict, Iterator, Optional, Union
+from typing import Iterator, List, TYPE_CHECKING, Union
 
 from flask import abort, flash, g, url_for
 from flask_babel import lazy_gettext as _
-from flask_wtf import Form
+from flask_wtf import FlaskForm
+from psycopg2.extras import NamedTupleCursor
 
 from openatlas import logger
-from openatlas.forms.date import DateForm
 from openatlas.models.date import DateMapper
 from openatlas.util.util import link, uc_first
+
+if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
+    from openatlas.models.entity import Entity
 
 
 class Link:
 
-    def __init__(self, row, domain: bool = None, range_: bool = None) -> None:
+    def __init__(self, row: NamedTupleCursor.Record, domain: 'Entity' = None,
+                 range_: 'Entity' = None) -> None:
+        from openatlas.forms.date import DateForm
         from openatlas.models.entity import EntityMapper
         self.id = row.id
         self.description = row.description
@@ -22,7 +25,7 @@ class Link:
         self.domain = domain if domain else EntityMapper.get_by_id(row.domain_id)
         self.range = range_ if range_ else EntityMapper.get_by_id(row.range_id)
         self.type = g.nodes[row.type_id] if row.type_id else None
-        self.nodes = dict()  # type: Dict
+        self.nodes: dict = {}
         if hasattr(row, 'type_id') and row.type_id:
             self.nodes[g.nodes[row.type_id]] = None
         if hasattr(row, 'begin_from'):
@@ -42,7 +45,7 @@ class Link:
     def delete(self) -> None:
         LinkMapper.delete(self.id)
 
-    def set_dates(self, form: Form) -> None:
+    def set_dates(self, form: FlaskForm) -> None:
         self.begin_from = None
         self.begin_to = None
         self.begin_comment = None
@@ -66,28 +69,16 @@ class Link:
 class LinkMapper:
 
     @staticmethod
-    def insert(entity,
+    def insert(entity: 'Entity',
                property_code: str,
-               linked_entities,
-               description: Optional[str] = None,
-               inverse: Optional[bool] = False,
-               type_id: Optional[int] = None) -> Union[int, None]:
-        from openatlas.models.entity import Entity, EntityMapper
-        # Linked_entities can be an entity, an entity id or a list of them
-        if not entity or not linked_entities:  # pragma: no cover
-            return None
+               range_: Union['Entity', List['Entity']],
+               description: str = None,
+               inverse: bool = False,
+               type_id: int = None) -> List[int]:
         property_ = g.properties[property_code]
-        try:
-            linked_entities = ast.literal_eval(linked_entities)
-            if not linked_entities:  # pragma: no cover
-                return None
-        except (SyntaxError, ValueError):
-            pass
-        linked_entities = linked_entities if type(linked_entities) is list else [linked_entities]
-        if type(linked_entities[0]) is not Entity:
-            linked_entities = EntityMapper.get_by_ids(linked_entities)
-        result = None
-        for linked_entity in linked_entities:
+        entities = range_ if isinstance(range_, list) else [range_]
+        new_link_ids = []
+        for linked_entity in entities:
             domain = linked_entity if inverse else entity
             range_ = entity if inverse else linked_entity
             domain_error = True
@@ -113,27 +104,24 @@ class LinkMapper:
                             'range_id': range_.id,
                             'description': description,
                             'type_id': type_id})
-            result = g.cursor.fetchone()[0]
-        return result
+            new_link_ids.append(g.cursor.fetchone()[0])
+        return new_link_ids
 
     @staticmethod
-    def get_linked_entity(entity_param,
-                          code: str,
-                          inverse: Optional[bool] = False,
-                          nodes: Optional[bool] = False):
-        result = LinkMapper.get_linked_entities(entity_param, code, inverse=inverse, nodes=nodes)
+    def get_linked_entity(entity_id: int, code: str, inverse: bool = False,
+                          nodes: bool = False) -> 'Entity':
+        result = LinkMapper.get_linked_entities(entity_id, [code], inverse=inverse, nodes=nodes)
         if len(result) > 1:  # pragma: no cover
-            logger.log('error', 'model', 'multiple linked entities found for ' + code)
+            logger.log('error', 'model', 'Multiple linked entities found for ' + code)
             flash(_('error multiple linked entities found'), 'error')
-            return
-        if result:
-            return result[0]
+            abort(400)
+        return result[0] if result else None  # type: ignore  # problematic because place/location
 
     @staticmethod
-    def get_linked_entities(entity, codes,
-                            inverse: Optional[bool] = False,
-                            nodes: Optional[bool] = False) -> list:
+    def get_linked_entities(entity_id: int, codes: Union[str, List[str]], inverse: bool = False,
+                            nodes: bool = False) -> list:
         from openatlas.models.entity import EntityMapper
+        codes = codes if isinstance(codes, list) else [codes]
         sql = """
             SELECT range_id AS result_id FROM model.link
             WHERE domain_id = %(entity_id)s AND property_code IN %(codes)s;"""
@@ -141,14 +129,14 @@ class LinkMapper:
             sql = """
                 SELECT domain_id AS result_id FROM model.link
                 WHERE range_id = %(entity_id)s AND property_code IN %(codes)s;"""
-        g.execute(sql, {'entity_id': entity if type(entity) is int else entity.id,
-                        'codes': tuple(codes if type(codes) is list else [codes])})
+        g.execute(sql, {'entity_id': entity_id, 'codes': tuple(codes)})
         ids = [element for (element,) in g.cursor.fetchall()]
         return EntityMapper.get_by_ids(ids, nodes=nodes)
 
     @staticmethod
-    def get_links(entity, codes, inverse=False) -> list:
+    def get_links(entity_id: int, codes: Union[str, List[str]], inverse: bool = False) -> list:
         from openatlas.models.entity import EntityMapper
+        codes = codes if isinstance(codes, list) else [codes]
         sql = """
             SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description, l.created,
                 l.modified, e.name, l.type_id,
@@ -160,8 +148,7 @@ class LinkMapper:
             JOIN model.entity e ON l.{second}_id = e.id AND l.property_code IN %(codes)s
             WHERE l.{first}_id = %(entity_id)s GROUP BY l.id, e.name ORDER BY e.name;""".format(
             first='range' if inverse else 'domain', second='domain' if inverse else 'range')
-        g.execute(sql, {'entity_id': entity if type(entity) is int else entity.id,
-                        'codes': tuple(codes if type(codes) is list else [codes])})
+        g.execute(sql, {'entity_id': entity_id, 'codes': tuple(codes)})
         entity_ids = set()
         result = g.cursor.fetchall()
         for row in result:
@@ -174,8 +161,7 @@ class LinkMapper:
         return links
 
     @staticmethod
-    def delete_by_codes(entity, codes, inverse: bool = False) -> None:
-        codes = codes if type(codes) is list else [codes]
+    def delete_by_codes(entity: 'Entity', codes: List[str], inverse: bool = False) -> None:
         sql = """
             DELETE FROM model.link
             WHERE property_code IN %(codes)s AND {field} = %(id)s;""".format(
@@ -197,7 +183,7 @@ class LinkMapper:
         return Link(g.cursor.fetchone())
 
     @staticmethod
-    def get_entities_by_node(node) -> Iterator:
+    def get_entities_by_node(node: 'Entity') -> Iterator:
         sql = "SELECT id, domain_id, range_id from model.link WHERE type_id = %(node_id)s;"
         g.execute(sql, {'node_id': node.id})
         return g.cursor.fetchall()
@@ -323,6 +309,6 @@ class LinkMapper:
                                 offending_nodes.append(
                                     '<a href="' + url + '">' + uc_first(_('remove')) + '</a> ' +
                                     entity_node.name)
-                        data.append([link(entity), entity.class_.name,
-                                     link(g.nodes[id_]), '<br />'.join(offending_nodes)])
+                        data.append([link(entity), entity.class_.name, link(g.nodes[id_]),
+                                     '<br>'.join(offending_nodes)])
         return data

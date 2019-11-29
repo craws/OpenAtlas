@@ -33,7 +33,7 @@
         {% if super_ %}
             <p>{{_('super')|uc_first}}: {{ super_|link|safe }}</p>
         {% endif %}
-        {{ tables['info']|data_table|safe }}
+        {{ info|display_info|safe }}
         {% if root.value_type %}
             <p>{{_('unit')|uc_first}}: {{node.description}}</p>
         {% else %}

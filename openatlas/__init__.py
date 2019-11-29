@@ -1,34 +1,34 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
 import locale
 import os
 import sys
 import time
-from collections import OrderedDict
-from typing import Dict, Optional
+from typing import Dict, Any
 
 import psycopg2.extras
-from flask import Flask, g, request, session
+from flask import Flask, g, request, session, Response
 from flask_babel import Babel, lazy_gettext as _
-from flask_wtf import Form
-from flask_wtf.csrf import CsrfProtect
+from flask_wtf import FlaskForm
+from flask_wtf.csrf import CSRFProtect
 from wtforms import StringField, SubmitField
 
-app = Flask(__name__, instance_relative_config=True)  # type: Flask
-csrf = CsrfProtect(app)  # Make sure all forms are CSRF protected
+app: Flask = Flask(__name__, instance_relative_config=True)
+csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 
 # Use the test database if running tests
 instance_name = 'production' if 'test_runner.py' not in sys.argv[0] else 'testing'
-app.config.from_object('config.default')  # Load config/INSTANCE_NAME.py
-app.config.from_pyfile(instance_name + '.py')  # Load instance/INSTANCE_NAME.py
+
+# Load config/default.py and instance/INSTANCE_NAME.py
+app.config.from_object('config.default')  # type: ignore
+app.config.from_pyfile(instance_name + '.py')  # type: ignore
 
 if os.name == "posix":  # For other operating systems e.g. Windows, we would need adaptions here
     locale.setlocale(locale.LC_ALL, 'en_US.utf-8')  # pragma: no cover
 
 babel = Babel(app)
-debug_model = OrderedDict()  # type: OrderedDict
+debug_model: Dict = {}
 
 
-class GlobalSearchForm(Form):
+class GlobalSearchForm(FlaskForm):
     term = StringField('', render_kw={"placeholder": _('search term')})
     search = SubmitField(_('search'))
 
@@ -41,7 +41,7 @@ from openatlas.util import filters
 from openatlas.views import (actor, admin, ajax, content, event, export, hierarchy, index,
                              involvement, imports, link, login, types, model, place, profile, note,
                              overlay, reference, source, translation, user, relation, member,
-                             search, file, api, object, sql)
+                             search, file, api, object, sql, entity)
 
 
 @babel.localeselector
@@ -53,7 +53,7 @@ def get_locale() -> str:
     return best_match if best_match else session['settings']['default_language']
 
 
-def connect():
+def connect() -> psycopg2.connect:
     try:
         connection_ = psycopg2.connect(database=app.config['DATABASE_NAME'],
                                        user=app.config['DATABASE_USER'],
@@ -67,7 +67,7 @@ def connect():
         raise Exception(e)
 
 
-def execute(query, vars_: Optional[list] = None) -> None:
+def execute(query: str, vars_: list = None) -> None:
     debug_model['sql'] += 1
     return g.cursor.execute(query, vars_)
 
@@ -98,7 +98,7 @@ def before_request() -> None:
 
 
 @app.after_request
-def apply_caching(response):
+def apply_caching(response: Response) -> Response:
     response.headers['Strict-Transport-Security'] = 'max-age=31536000; includeSubDomains'
     response.headers['X-Content-Type-Options'] = 'nosniff'
     response.headers['X-Frame-Options'] = 'SAMEORIGIN'
@@ -110,7 +110,7 @@ def apply_caching(response):
 
 
 @app.teardown_request
-def teardown_request(exception) -> None:
+def teardown_request(exception: Any) -> None:
     if hasattr(g, 'db'):
         g.db.close()
 

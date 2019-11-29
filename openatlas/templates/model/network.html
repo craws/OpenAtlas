@@ -3,10 +3,10 @@
     {{ _('network')|uc_first }}
 {% endblock %}
 {% block content %}
-    <link rel="stylesheet" href="/static/vendor/huebee-2.0.0/huebee.min.css" />
+    <link rel="stylesheet" href="/static/vendor/huebee-2.0.0/huebee.min.css">
     <script src="/static/vendor/huebee-2.0.0/huebee.pkgd.min.js"></script>
     {% if json_data %}
-        <link rel="stylesheet" href="/static/css/network.css" />
+        <link rel="stylesheet" href="/static/css/network.css">
         <script src="/static/vendor/d3-5.5.0/d3-5.5.0.min.js"></script>
         <div style="float:right;">
             <svg></svg>
@@ -33,7 +33,7 @@
                 <div id="classes" style="float:left">
                     <p id="select_all" class="select_all">{{ _('select all')|uc_first }}</p>
                     {% for item in form.classes %}
-                        {{ form['color_' + item.data] }} {{ item }} {{ item.label }}<br />
+                        {{ form['color_' + item.data] }} {{ item }} {{ item.label }}<br>
                     {% endfor %}
                 </div>
             </div>
@@ -45,10 +45,10 @@
                 {{ form.properties }}
             </div>
             <h2>{{ _('network options')|uc_first }}</h2>
-            {{ form.width }} {{ form.width.label }}<br />
-            {{ form.height }} {{ form.height.label }}<br />
-            {{ form.charge }} {{ form.charge.label }}<br />
-            {{ form.distance }} {{ form.distance.label }}<br />
+            {{ form.width }} {{ form.width.label }}<br>
+            {{ form.height }} {{ form.height.label }}<br>
+            {{ form.charge }} {{ form.charge.label }}<br>
+            {{ form.distance }} {{ form.distance.label }}<br>
             <input id="save" name="save" value="{{ _('apply')|uc_first }}" type="submit">
         </form>
     </div>
