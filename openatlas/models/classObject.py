@@ -1,20 +1,20 @@
 from flask import g, session
-from psycopg2.extras import NamedTupleCursor
 
 import openatlas
 from openatlas import app
+from dataclasses import dataclass
 
 
+@dataclass
 class ClassObject:
 
-    def __init__(self, row: NamedTupleCursor.Record) -> None:
-        self._comment = ''
-        self._name = row.name
-        self.code = row.code
-        self.id = row.id
-        self.i18n: dict = {}
-        self.sub: list = []
-        self.super: list = []
+    _name: str
+    code: str
+    id: int
+    i18n: dict
+    sub: list
+    super: list
+    _comment: str = ''
 
     @property
     def name(self) -> str:
@@ -39,7 +39,8 @@ class ClassMapper:
     @staticmethod
     def get_all() -> dict:
         g.execute("SELECT id, code, name FROM model.class;")
-        classes = {row.code: ClassObject(row) for row in g.cursor.fetchall()}
+        classes = {row.code: ClassObject(_name=row.name, code=row.code, id=row.id, i18n={},
+                                         sub=[], super=[]) for row in g.cursor.fetchall()}
         g.execute("SELECT super_code, sub_code FROM model.class_inheritance;")
         for row in g.cursor.fetchall():
             classes[row.super_code].sub.append(row.sub_code)
