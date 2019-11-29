@@ -1,8 +1,10 @@
 # Created by Alexander Watzinger and others. Please see README.md for licensing information
+from pprint import pprint
 
 from flask import g, request, url_for
 
 from openatlas.models.entity import EntityMapper
+from openatlas.models.geonames import GeonamesMapper
 from openatlas.util.util import format_date
 
 
@@ -39,7 +41,7 @@ class Api:
         for node in entity.nodes:
             nodes.append({'identifier': url_for('api_entity', id_=node.id, _external=True),
                           'label': node.name})
-
+        geo = GeonamesMapper.get_geonames_link(entity)
         data = {
             'type': type_,  # Todo: what if it's a person, event, ...
             '@context': request.base_url,
@@ -56,13 +58,14 @@ class Api:
                             'latest': format_date(entity.end_to),
                             'comment': entity.end_comment}}]},
                 'types': nodes,
+                'links': [
+                    {
+                        'type': geo.type.name,
+                        'identifier': geo.id,
+                        'bla': dir(geo)
+                    }
+                ],
                 'relations': Api.get_links(entity),
-                # 'links': [
-                #     {
-                #         'type': geonames,
-                #         'identifier': geonames
-                #     }
-                # ]
                 'descriptions': [
                     {'@id': 'https://thanados.openatlas.eu/api/v01/50505',
                      'value': '''...In the area of Obere Holzwiese 215 inhumation burials 

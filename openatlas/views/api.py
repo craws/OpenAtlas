@@ -3,7 +3,6 @@
 from pprint import pprint
 
 from flask import json, render_template
-from werkzeug.exceptions import abort
 
 from openatlas import app
 from openatlas.models.api import Api
