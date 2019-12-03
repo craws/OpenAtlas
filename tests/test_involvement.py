@@ -4,12 +4,12 @@ from openatlas import app
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.models.node import NodeMapper
-from openatlas.test_base import TestBaseCase
+from tests.base import TestBaseCase
 
 
 class InvolvementTests(TestBaseCase):
 
-    def test_involvement(self):
+    def test_involvement(self) -> None:
         with app.app_context():
             self.login()
             rv = self.app.post(url_for('event_insert', code='E8'),
@@ -34,9 +34,9 @@ class InvolvementTests(TestBaseCase):
             rv = self.app.post(url_for('involvement_insert', origin_id=event_id), data=data,
                                follow_redirects=True)
             assert b'Event Horizon' in rv.data
-            rv = self.app.get(url_for('event_view', id_=event_id))
+            rv = self.app.get(url_for('entity_view', id_=event_id))
             assert b'Event Horizon' in rv.data
-            rv = self.app.get(url_for('actor_view', id_=actor.id))
+            rv = self.app.get(url_for('entity_view', id_=actor.id))
             assert b'Appears first' in rv.data
 
             # Update involvement
@@ -50,7 +50,7 @@ class InvolvementTests(TestBaseCase):
                 data={'description': 'Infinite Space - Infinite Terror', 'activity': 'P23'},
                 follow_redirects=True)
             assert b'Infinite Space - Infinite Terror' in rv.data
-            rv = self.app.get(url_for('actor_view', id_=actor.id))
+            rv = self.app.get(url_for('entity_view', id_=actor.id))
             assert b'Appears first' in rv.data
-            rv = self.app.get(url_for('event_view', id_=event_id))
+            rv = self.app.get(url_for('entity_view', id_=event_id))
             assert b'Infinite Space - Infinite Terror' in rv.data

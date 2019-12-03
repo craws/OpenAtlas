@@ -1,4 +1,3 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
 from typing import Union
 
@@ -10,7 +9,8 @@ from wtforms import BooleanField, HiddenField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import DateForm, TableMultiField, build_form, get_link_type
+from openatlas.forms.date import DateForm
+from openatlas.forms.forms import TableMultiField, build_form, get_link_type
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import required_group
@@ -45,9 +45,11 @@ def relation_insert(origin_id: int) -> Union[str, Response]:
         try:
             for actor in EntityMapper.get_by_ids(ast.literal_eval(form.actor.data)):
                 if form.inverse.data:
-                    link_ = LinkMapper.get_by_id(actor.link('OA7', origin, form.description.data))
+                    link_ = LinkMapper.get_by_id(actor.link('OA7', origin,
+                                                            form.description.data)[0])
                 else:
-                    link_ = LinkMapper.get_by_id(origin.link('OA7', actor, form.description.data))
+                    link_ = LinkMapper.get_by_id(origin.link('OA7', actor,
+                                                             form.description.data)[0])
                 link_.set_dates(form)
                 link_.type = get_link_type(form)
                 link_.update()
@@ -59,7 +61,7 @@ def relation_insert(origin_id: int) -> Union[str, Response]:
             flash(_('error transaction'), 'error')
         if form.continue_.data == 'yes':
             return redirect(url_for('relation_insert', origin_id=origin_id))
-        return redirect(url_for('actor_view', id_=origin.id) + '#tab-relation')
+        return redirect(url_for('entity_view', id_=origin.id) + '#tab-relation')
     return render_template('relation/insert.html', origin=origin, form=form)
 
 
@@ -78,9 +80,9 @@ def relation_update(id_: int, origin_id: int) -> Union[str, Response]:
         try:
             link_.delete()
             if form.inverse.data:
-                link_ = LinkMapper.get_by_id(related.link('OA7', origin, form.description.data))
+                link_ = LinkMapper.get_by_id(related.link('OA7', origin, form.description.data)[0])
             else:
-                link_ = LinkMapper.get_by_id(origin.link('OA7', related, form.description.data))
+                link_ = LinkMapper.get_by_id(origin.link('OA7', related, form.description.data)[0])
             link_.set_dates(form)
             link_.type = get_link_type(form)
             link_.update()
@@ -90,7 +92,7 @@ def relation_update(id_: int, origin_id: int) -> Union[str, Response]:
             g.cursor.execute('ROLLBACK')
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(url_for('actor_view', id_=origin.id) + '#tab-relation')
+        return redirect(url_for('entity_view', id_=origin.id) + '#tab-relation')
     if origin.id == range_.id:
         form.inverse.data = True
     form.save.label.text = _('save')

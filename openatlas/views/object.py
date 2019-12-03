@@ -1,5 +1,4 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
-from typing import Union
+from typing import Any, Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -11,11 +10,10 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import build_form, build_table_form
-from openatlas.models.entity import EntityMapper
-from openatlas.models.user import UserMapper
+from openatlas.models.entity import Entity, EntityMapper
 from openatlas.util.table import Table
-from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 is_authorized, link, required_group, truncate_string, was_modified)
+from openatlas.util.util import (get_base_table_data, link, required_group, truncate_string,
+                                 was_modified)
 
 
 class InformationCarrierForm(FlaskForm):
@@ -38,39 +36,15 @@ def object_index() -> str:
     return render_template('object/index.html', table=table)
 
 
-@app.route('/object/view/<int:id_>')
-@required_group('readonly')
-def object_view(id_: int) -> str:
-    object_ = EntityMapper.get_by_id(id_, nodes=True, view_name='object')
-    object_.note = UserMapper.get_note(object_)
-    tables = {'source': Table(Table.HEADERS['source']), 'event': Table(Table.HEADERS['event'])}
-    for link_ in object_.get_links('P128'):
-        data = get_base_table_data(link_.range)
-        if is_authorized('contributor'):
-            url = url_for('link_delete', id_=link_.id, origin_id=object_.id)
-            data.append(
-                display_remove_link(url + '#tab-' + link_.range.table_name, link_.range.name))
-        tables['source'].rows.append(data)
-    for link_ in object_.get_links('P25', inverse=True):
-        data = get_base_table_data(link_.domain)
-        if is_authorized('contributor'):
-            url = url_for('link_delete', id_=link_.id, origin_id=object_.id)
-            data.append(
-                display_remove_link(url + '#tab-' + link_.range.table_name, link_.range.name))
-        tables['event'].rows.append(data)
-    return render_template('object/view.html', object_=object_, tables=tables,
-                           info=get_entity_data(object_))
-
-
 @app.route('/object/add/source/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def object_add_source(id_: int) -> Union[str, Response]:
     object_ = EntityMapper.get_by_id(id_, view_name='object')
     if request.method == 'POST':
         if request.form['checkbox_values']:
-            object_.link('P128', request.form['checkbox_values'])
-        return redirect(url_for('object_view', id_=id_) + '#tab-source')
-    form = build_table_form('source', object_.get_linked_entities('P128'))
+            object_.link_string('P128', request.form['checkbox_values'])
+        return redirect(url_for('entity_view', id_=id_) + '#tab-source')
+    form = build_table_form('source', object_.get_linked_entities(['P128']))
     return render_template('add_source.html', entity=object_, form=form)
 
 
@@ -96,11 +70,11 @@ def object_update(id_: int) -> Union[str, Response]:
             return render_template('object/update.html', form=form, object_=object_,
                                    modifier=modifier)
         save(form, object_)
-        return redirect(url_for('object_view', id_=id_))
+        return redirect(url_for('entity_view', id_=id_))
     return render_template('object/update.html', form=form, object_=object_)
 
 
-def save(form, object_=None) -> str:
+def save(form: Any, object_: Entity = None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
     try:
@@ -111,7 +85,7 @@ def save(form, object_=None) -> str:
         object_.description = form.description.data
         object_.update()
         object_.save_nodes(form)
-        url = url_for('object_view', id_=object_.id)
+        url = url_for('entity_view', id_=object_.id)
         url = url_for('object_insert') if form.continue_.data == 'yes' else url
         g.cursor.execute('COMMIT')
         logger.log_user(object_.id, log_action)

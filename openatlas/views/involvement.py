@@ -1,4 +1,3 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
 from typing import Union
 
@@ -10,7 +9,8 @@ from wtforms import HiddenField, SelectField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import DateForm, TableMultiField, build_form, get_link_type
+from openatlas.forms.date import DateForm
+from openatlas.forms.forms import TableMultiField, build_form, get_link_type
 from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.util.util import required_group
@@ -46,15 +46,15 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
         try:
             if origin.view_name == 'event':
                 for actor in EntityMapper.get_by_ids(ast.literal_eval(form.actor.data)):
-                    link_ = LinkMapper.get_by_id(
-                        origin.link(form.activity.data, actor, form.description.data))
+                    link_ = LinkMapper.get_by_id(origin.link(form.activity.data, actor,
+                                                             form.description.data)[0])
                     link_.set_dates(form)
                     link_.type = get_link_type(form)
                     link_.update()
             else:
                 for event in EntityMapper.get_by_ids(ast.literal_eval(form.event.data)):
-                    link_ = LinkMapper.get_by_id(
-                        event.link(form.activity.data, origin, form.description.data))
+                    link_ = LinkMapper.get_by_id(event.link(form.activity.data, origin,
+                                                            form.description.data)[0])
                     link_.set_dates(form)
                     link_.type = get_link_type(form)
                     link_.update()
@@ -67,7 +67,7 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
         if form.continue_.data == 'yes':
             return redirect(url_for('involvement_insert', origin_id=origin_id))
         tab = 'actor' if origin.view_name == 'event' else 'event'
-        return redirect(url_for(origin.view_name + '_view', id_=origin.id) + '#tab-' + tab)
+        return redirect(url_for('entity_view', id_=origin.id) + '#tab-' + tab)
     return render_template('involvement/insert.html', origin=origin, form=form)
 
 
@@ -92,7 +92,7 @@ def involvement_update(id_: int, origin_id: int) -> Union[str, Response]:
         try:
             link_.delete()
             link_ = LinkMapper.get_by_id(event.link(form.activity.data, actor,
-                                                    form.description.data))
+                                                    form.description.data)[0])
             link_.set_dates(form)
             link_.type = get_link_type(form)
             link_.update()
@@ -102,7 +102,7 @@ def involvement_update(id_: int, origin_id: int) -> Union[str, Response]:
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         tab = 'actor' if origin.view_name == 'event' else 'event'
-        return redirect(url_for(origin.view_name + '_view', id_=origin.id) + '#tab-' + tab)
+        return redirect(url_for('entity_view', id_=origin.id) + '#tab-' + tab)
     form.activity.data = link_.property.code
     form.description.data = link_.description
     form.populate_dates(link_)

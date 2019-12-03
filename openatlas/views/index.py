@@ -1,4 +1,3 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
 from typing import Tuple, Union
 
 from flask import flash, g, render_template, request, session, url_for
@@ -101,23 +100,28 @@ def index_credits() -> str:
     return render_template('index/credits.html')
 
 
+@app.errorhandler(400)
+def bad_request(e: Exception) -> Tuple[str, int]:  # pragma: no cover
+    return render_template('400.html', e=e), 400
+
+
 @app.errorhandler(403)
-def forbidden(e) -> Tuple[str, int]:
+def forbidden(e: Exception) -> Tuple[str, int]:
     return render_template('403.html', e=e), 403
 
 
 @app.errorhandler(404)
-def page_not_found(e) -> Tuple[str, int]:
+def page_not_found(e: Exception) -> Tuple[str, int]:
     return render_template('404.html', e=e), 404
 
 
 @app.errorhandler(418)
-def invalid_id(e) -> Tuple[str, int]:
+def invalid_id(e: Exception) -> Tuple[str, int]:
     return render_template('418.html', e=e), 418
 
 
 @app.errorhandler(422)
-def unprocessable_entity(e) -> Tuple[str, int]:
+def unprocessable_entity(e: Exception) -> Tuple[str, int]:
     return render_template('422.html', e=e), 422
 
 

@@ -1,12 +1,12 @@
 from flask import url_for
 
 from openatlas import app
-from openatlas.test_base import TestBaseCase
+from tests.base import TestBaseCase
 
 
 class ProfileTests(TestBaseCase):
 
-    def test_profile(self):
+    def test_profile(self) -> None:
         with app.app_context():
             self.login()
 

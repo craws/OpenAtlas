@@ -1,30 +1,33 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
+from typing import Optional
 
 from flask import g
+from flask_wtf import FlaskForm
 
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity, EntityMapper
+from openatlas.models.link import Link
 from openatlas.models.node import NodeMapper
 
 
 class GeonamesMapper:
 
     @staticmethod
-    def get_geonames_link(object_):
+    def get_geonames_link(object_: Entity) -> Optional[Link]:
         for link_ in object_.get_links('P67', inverse=True):
             if link_.domain.system_type == 'external reference geonames':
                 return link_
-        return
+        return None
 
     @staticmethod
-    def update_geonames(form, object_) -> None:
+    def update_geonames(form: FlaskForm, object_: Entity) -> None:
         new_geonames_id = form.geonames_id.data
         geonames_link = GeonamesMapper.get_geonames_link(object_)
         geonames_entity = geonames_link.domain if geonames_link else None
 
         if not new_geonames_id:
             if geonames_entity:
-                if len(geonames_entity.get_links('P67')) > 1:  # pragma: no cover
-                    geonames_link.delete()  # There are more linked so only remove this link
+                if len(geonames_entity.get_links(['P67'])) > 1:  # pragma: no cover
+                    if geonames_link:
+                        geonames_link.delete()  # There are more linked so only remove this link
                 else:
                     geonames_entity.delete()  # Nothing else is linked to the reference so delete it
             return
@@ -47,20 +50,21 @@ class GeonamesMapper:
                 reference = EntityMapper.insert('E31', new_geonames_id,
                                                 'external reference geonames',
                                                 description='GeoNames ID')
-            object_.link('P67', reference, inverse=True, type_id=match_id)
+            object_.link('P67', [reference], inverse=True, type_id=match_id)
             return
 
-        if int(new_geonames_id) == int(geonames_entity.name) and match_id == geonames_link.type.id:
+        if geonames_link and int(new_geonames_id) == int(geonames_entity.name) \
+                and match_id == geonames_link.type.id:
             return  # It's the same link so do nothing
 
         # Only the match type change so delete and recreate the link
-        if int(new_geonames_id) == int(geonames_entity.name):
+        if geonames_link and int(new_geonames_id) == int(geonames_entity.name):
             geonames_link.delete()
             object_.link('P67', geonames_entity, inverse=True, type_id=match_id)
             return
 
         # Its linked to a different geonames reference
-        if len(geonames_entity.get_links('P67')) > 1:
+        if geonames_link and len(geonames_entity.get_links(['P67'])) > 1:
             geonames_link.delete()  # There are more linked so only remove this link
         else:  # pragma: no cover
             geonames_entity.delete()  # Nothing else is linked to the reference so delete it
@@ -70,4 +74,4 @@ class GeonamesMapper:
         if not reference:  # The selected reference doesn't exist so create it
             reference = EntityMapper.insert('E31', new_geonames_id, 'external reference geonames',
                                             description='GeoNames ID')
-        object_.link('P67', reference, inverse=True, type_id=match_id)
+        object_.link('P67', [reference], inverse=True, type_id=match_id)

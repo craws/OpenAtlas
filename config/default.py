@@ -1,13 +1,16 @@
 # Don't edit this file. To override settings please use instance/production.py
-import os
+import pathlib
 
 from flask_babel import lazy_gettext as _
+
+from openatlas import app
 
 VERSION = '4.0.0'
 DEMO_MODE = False  # If in demo mode some options are disabled and the login form is pre filled
 
 LANGUAGES = {'en': 'English', 'de': 'Deutsch'}
 DEBUG = False
+
 
 DATABASE_NAME = 'openatlas'
 DATABASE_USER = 'openatlas'
@@ -17,11 +20,19 @@ DATABASE_PASS = 'CHANGE ME'
 MAIL_PASSWORD = 'CHANGE ME'
 SECRET_KEY = 'CHANGE ME'
 
-IMPORT_FOLDER_PATH = '/tmp'  # Needed for processing of import files, any temp folder will do
-IMPORT_FILE_EXTENSIONS = ['csv', 'xls', 'xlsx']
-EXPORT_FOLDER_PATH = os.path.dirname(__file__) + '/../openatlas/export'
-UPLOAD_FOLDER_PATH = os.path.dirname(__file__) + '/../openatlas/uploads'
+# Files with these extensions are available as profile image and will be displayed in the browser
 DISPLAY_FILE_EXTENSIONS = ['bmp', 'gif', 'ico', 'jpeg', 'jpg', 'png', 'svg']
+
+# Files with these extension are selectable for import, it would make no sense to overwrite them
+IMPORT_FILE_EXTENSIONS = ['csv', 'xls', 'xlsx']
+
+# Paths are implemented operating system independent using pathlib.
+# If you want to override them (in instance/production.py) either use them like here
+# or use absolute paths like e.g. pathlib.Path('/some/location/somewhere')
+TMP_FOLDER_PATH = pathlib.Path('/tmp')  # e.g. for processing import/export files
+ROOT_PATH = pathlib.Path(app.root_path)
+EXPORT_FOLDER_PATH = ROOT_PATH.joinpath('export')
+UPLOAD_FOLDER_PATH = ROOT_PATH.joinpath('uploads')
 
 # Security
 SESSION_COOKIE_SECURE = False  # Should be set to True in production.py if using HTTPS only

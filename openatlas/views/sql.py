@@ -1,4 +1,3 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
 import os
 from datetime import datetime, timedelta
 from os.path import basename
@@ -28,14 +27,14 @@ class SqlForm(FlaskForm):
 @app.route('/sql/execute', methods=['POST', 'GET'])
 @required_group('admin')
 def sql_execute() -> str:
-    path = app.config['EXPORT_FOLDER_PATH'] + '/sql'
+    path = app.config['EXPORT_FOLDER_PATH'].joinpath('sql')
     latest_file = None
     latest_file_date = None
     for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
         name = basename(file)
         if name == '.gitignore':
             continue
-        file_date = datetime.utcfromtimestamp(os.path.getmtime(path + '/' + file))
+        file_date = datetime.utcfromtimestamp(os.path.getmtime(path.joinpath(file)))
         if not latest_file_date or file_date > latest_file_date:
             latest_file = file
             latest_file_date = file_date
@@ -44,7 +43,7 @@ def sql_execute() -> str:
         yesterday = datetime.today() - timedelta(days=1)
         file_data['file'] = latest_file
         file_data['backup_to_old'] = True if yesterday > latest_file_date else False
-        file_data['size'] = convert_size(os.path.getsize(path + '/' + latest_file))
+        file_data['size'] = convert_size(os.path.getsize(path.joinpath(latest_file)))
         file_data['date'] = format_date(latest_file_date)
     response = ''
     form = SqlForm()

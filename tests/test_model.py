@@ -2,12 +2,12 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
-from openatlas.test_base import TestBaseCase
+from tests.base import TestBaseCase
 
 
 class ModelTests(TestBaseCase):
 
-    def test_model(self):
+    def test_model(self) -> None:
         with app.app_context():
             rv = self.app.get(url_for('model_index'))
             assert b'Browse' in rv.data
@@ -19,7 +19,7 @@ class ModelTests(TestBaseCase):
             assert b'P1' in rv.data
             rv = self.app.get(url_for('property_view', code='P68'))
             assert b'P68' in rv.data
-            data = {'domain': 'E1', 'range': 'E1', 'property': 'P13'}
+            data: dict = {'domain': 'E1', 'range': 'E1', 'property': 'P13'}
             rv = self.app.post(url_for('model_index'), data=data)
             assert b'Wrong domain' in rv.data
             data = {'domain': 'E1', 'range': 'E1', 'property': 'P67'}
@@ -36,7 +36,8 @@ class ModelTests(TestBaseCase):
                 source.link('P67', event)
             rv = self.app.get(url_for('model_network'))
             assert b'orphans' in rv.data
-            data = {'orphans': True, 'width': 100, 'height': 40, 'distance': -666, 'charge': 500}
+            data = {'orphans': True, 'width': 100, 'height': 40, 'distance': -666,
+                          'charge': 500}
             rv = self.app.post(url_for('model_network'), data=data)
             assert b'666' in rv.data
 

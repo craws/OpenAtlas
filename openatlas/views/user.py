@@ -1,4 +1,3 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
 from typing import Optional, Union
 
 from flask import abort, flash, render_template, request, session, url_for
@@ -13,7 +12,7 @@ from wtforms.validators import Email, InputRequired
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
-from openatlas.models.user import User, UserMapper
+from openatlas.models.user import UserMapper
 from openatlas.util.table import Table
 from openatlas.util.util import (format_date, is_authorized, link, required_group, send_mail,
                                  uc_first)
@@ -36,6 +35,7 @@ class UserForm(FlaskForm):
     continue_ = HiddenField()
 
     def validate(self) -> bool:
+        from openatlas.models.user import User
         valid = FlaskForm.validate(self)
         user = User()
         if self.user_id:
@@ -82,12 +82,17 @@ def user_activity(user_id: int = 0) -> str:
         activities = UserMapper.get_activities(100, 0, 'all')
     table = Table(['date', 'user', 'action', 'entity'])
     for row in activities:
-        entity = EntityMapper.get_by_id(row.entity_id, ignore_not_found=True)
+        try:
+            entity = EntityMapper.get_by_id(row.entity_id)
+            entity_string = link(entity)
+        except Exception as e:  # pragma: no cover
+            # Todo: update SQL to remove logs of deleted entities, set foreign key, remove try
+            entity_string = ''
         user = UserMapper.get_by_id(row.user_id)
         table.rows.append([format_date(row.created),
                            link(user) if user else 'id ' + str(row.user_id),
                            _(row.action),
-                           link(entity) if entity else 'id ' + str(row.entity_id)])
+                           entity_string if entity_string else 'id ' + str(row.entity_id)])
     return render_template('user/activity.html', table=table, form=form)
 
 

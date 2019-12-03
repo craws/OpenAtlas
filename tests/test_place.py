@@ -1,5 +1,3 @@
-import os
-
 from flask import g, url_for
 
 from openatlas import app
@@ -7,12 +5,12 @@ from openatlas.models.entity import EntityMapper
 from openatlas.models.link import LinkMapper
 from openatlas.models.node import NodeMapper
 from openatlas.models.overlay import OverlayMapper
-from openatlas.test_base import TestBaseCase
+from tests.base import TestBaseCase
 
 
 class PlaceTest(TestBaseCase):
 
-    def test_place(self):
+    def test_place(self) -> None:
         with app.app_context():
             self.login()
             rv = self.app.get(url_for('place_insert'))
@@ -99,7 +97,7 @@ class PlaceTest(TestBaseCase):
                 event = EntityMapper.insert('E8', 'Valhalla rising')
                 event.link('P7', location)
                 event.link('P24', location)
-            rv = self.app.get(url_for('place_view', id_=place2.id))
+            rv = self.app.get(url_for('entity_view', id_=place2.id))
             assert rv.data and b'Valhalla rising' in rv.data
 
             # Test invalid geom
@@ -114,7 +112,8 @@ class PlaceTest(TestBaseCase):
             assert b'An invalid geometry was entered' in rv.data
 
             # Test Overlays
-            with open(os.path.dirname(__file__) + '/../static/images/layout/logo.png', 'rb') as img:
+            path = app.config['ROOT_PATH'].joinpath('static', 'images', 'layout', 'logo.png')
+            with open(path, 'rb') as img:
                 rv = self.app.post(
                     url_for('file_insert', origin_id=place.id),
                     data={'name': 'X-Files', 'file': img}, follow_redirects=True)
@@ -122,7 +121,7 @@ class PlaceTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()
                 file = EntityMapper.get_by_system_type('file')[0]
-                link_id = LinkMapper.insert(file, 'P67', place.id)
+                link_id = LinkMapper.insert(file, 'P67', place)[0]
             rv = self.app.get(url_for('overlay_insert', image_id=file.id, place_id=place.id,
                                       link_id=link_id))
             assert b'X-Files' in rv.data
@@ -207,11 +206,11 @@ class PlaceTest(TestBaseCase):
                 find_id = rv.location.split('/')[-1]
                 self.app.get(url_for('place_update', id_=find_id))
                 self.app.post(url_for('place_update', id_=find_id), data=data)
-            rv = self.app.get(url_for('place_view', id_=feat_id))
+            rv = self.app.get(url_for('entity_view', id_=feat_id))
             assert b'not a bug' in rv.data
-            rv = self.app.get(url_for('place_view', id_=stratigraphic_id))
+            rv = self.app.get(url_for('entity_view', id_=stratigraphic_id))
             assert b'a stratigraphic unit' in rv.data
-            rv = self.app.get(url_for('place_view', id_=find_id))
+            rv = self.app.get(url_for('entity_view', id_=find_id))
             assert b'You never' in rv.data
             rv = self.app.get(url_for('place_delete', id_=place.id), follow_redirects=True)
             assert b'not possible if subunits' in rv.data

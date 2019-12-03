@@ -1,4 +1,3 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
 import datetime
 from typing import Union
 
@@ -14,7 +13,7 @@ from wtforms import BooleanField, PasswordField, StringField, SubmitField
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app, logger
-from openatlas.models.user import UserMapper
+from openatlas.models.user import User, UserMapper
 from openatlas.util.util import send_mail, uc_first
 
 login_manager = LoginManager()
@@ -23,7 +22,7 @@ login_manager.login_view = 'login'
 
 
 @login_manager.user_loader
-def load_user(user_id: int):
+def load_user(user_id: int) -> User:
     return UserMapper.get_by_id(user_id, True)
 
 
@@ -117,7 +116,7 @@ def reset_password() -> Union[str, Response]:
 @app.route('/reset_confirm/<code>')
 def reset_confirm(code: str) -> Response:  # pragma: no cover
     user = UserMapper.get_by_reset_code(code)
-    if not user or not user.username:
+    if not user or not user.username or not user.email:
         logger.log('info', 'auth', 'unknown reset code')
         flash(_('invalid password reset confirmation code'), 'error')
         abort(404)

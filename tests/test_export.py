@@ -1,15 +1,13 @@
-import os
-
 from flask import url_for
 
 from openatlas import app
 from openatlas.models.date import DateMapper
-from openatlas.test_base import TestBaseCase
+from tests.base import TestBaseCase
 
 
 class ExportTest(TestBaseCase):
 
-    def test_export(self):
+    def test_export(self) -> None:
         with app.app_context():
             self.login()
 
@@ -17,8 +15,7 @@ class ExportTest(TestBaseCase):
             rv = self.app.get(url_for('export_sql'))
             assert b'Export SQL' in rv.data
             rv = self.app.post(url_for('export_sql'), follow_redirects=True)
-            if os.name == "posix":
-                assert b'Data was exported as SQL' in rv.data
+            assert b'Data was exported as SQL' in rv.data
             date_string = DateMapper.current_date_for_filename()
             self.app.get(url_for('download_sql', filename=date_string + '_dump.sql'))
 

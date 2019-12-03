@@ -1,9 +1,11 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
 import ast
-from typing import Dict
+from typing import List
 
 from flask import g, json
+from flask_wtf import FlaskForm
 
+from openatlas.models.entity import Entity
+from openatlas.models.imports import Project
 from openatlas.models.node import NodeMapper
 from openatlas.util.util import sanitize
 
@@ -15,18 +17,15 @@ class InvalidGeomException(Exception):
 class GisMapper:
 
     @staticmethod
-    def get_all(objects=None) -> dict:
+    def get_all(objects: List[Entity] = None) -> dict:
+        if objects is None:
+            objects = []
         all_: dict = {'point': [], 'linestring': [], 'polygon': []}
         selected: dict = {'point': [], 'linestring': [], 'polygon': [], 'polygon_point': []}
         # Workaround to include GIS features of a subunit which would be otherwise omitted
         subunit_selected_id = 0
-        if objects:
-            if type(objects) is not list:
-                if objects.system_type in ['feature', 'find', 'stratigraphic unit']:
-                    subunit_selected_id = objects.id
-                objects = [objects]
-        else:
-            objects = []
+        if objects and objects[0].system_type in ['feature', 'find', 'stratigraphic unit']:
+            subunit_selected_id = objects[0].id
         object_ids = [x.id for x in objects]
         polygon_point_sql = \
             'public.ST_AsGeoJSON(public.ST_PointOnSurface(polygon.geom)) AS polygon_point, '
@@ -96,7 +95,7 @@ class GisMapper:
                                              selected['linestring'] + selected['point'])}
 
     @staticmethod
-    def insert(entity, form) -> None:
+    def insert(entity: Entity, form: FlaskForm) -> None:
         for shape in ['point', 'line', 'polygon']:
             data = getattr(form, 'gis_' + shape + 's').data
             if not data:
@@ -129,7 +128,8 @@ class GisMapper:
                     'geojson': json.dumps(item['geometry'])})
 
     @staticmethod
-    def insert_import(entity, location, project, easting, northing) -> None:
+    def insert_import(entity: Entity, location: Entity, project: Project,
+                      easting: float, northing: float) -> None:
         # Insert places from CSV imports
         sql = """
             INSERT INTO gis.point (entity_id, name, description, type, geom) VALUES (
@@ -149,7 +149,7 @@ class GisMapper:
                 easting=easting, northing=northing)})
 
     @staticmethod
-    def delete_by_entity(entity) -> None:
+    def delete_by_entity(entity: Entity) -> None:
         g.execute('DELETE FROM gis.point WHERE entity_id = %(id)s;', {'id': entity.id})
         g.execute('DELETE FROM gis.linestring WHERE entity_id = %(id)s;', {'id': entity.id})
         g.execute('DELETE FROM gis.polygon WHERE entity_id = %(id)s;', {'id': entity.id})

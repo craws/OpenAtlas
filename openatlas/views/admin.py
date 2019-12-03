@@ -1,4 +1,3 @@
-# Created by Alexander Watzinger and others. Please see README.md for licensing information
 import datetime
 import os
 from os.path import basename, splitext
@@ -53,8 +52,8 @@ def admin_index() -> str:
     export_path = app.config['EXPORT_FOLDER_PATH']
     writeable_dirs = {
         'uploads': True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False,
-        'export/sql': True if os.access(export_path + '/sql', os.W_OK) else False,
-        'export/csv': True if os.access(export_path + '/csv', os.W_OK) else False}
+        'export/sql': True if os.access(export_path.joinpath('sql'), os.W_OK) else False,
+        'export/csv': True if os.access(export_path.joinpath('csv'), os.W_OK) else False}
     return render_template('admin/index.html', writeable_dirs=writeable_dirs)
 
 
@@ -189,7 +188,7 @@ def admin_check_similar() -> str:
         for sample_id, sample in EntityMapper.get_similar_named(form).items():
             html = link(sample['entity'])
             for entity in sample['entities']:
-                html += '<br/>' + link(entity)
+                html += '<br>' + link(entity)
             table.rows.append([html, len(sample['entities']) + 1])
     return render_template('admin/check_similar.html', table=table, form=form)
 
@@ -319,7 +318,7 @@ def admin_logo(action: str = None) -> Union[str, Response]:
 def admin_file_delete(filename: str) -> Response:  # pragma: no cover
     if filename != 'all':
         try:
-            os.remove(app.config['UPLOAD_FOLDER_PATH'] + '/' + filename)
+            os.remove(app.config['UPLOAD_FOLDER_PATH'].joinpath(filename))
             flash(filename + ' ' + _('was deleted'), 'info')
         except Exception as e:
             logger.log('error', 'file', 'deletion of ' + filename + ' failed', e)
@@ -336,7 +335,7 @@ def admin_file_delete(filename: str) -> Response:  # pragma: no cover
             filename = basename(file)
             if filename != '.gitignore' and splitext(filename)[0] not in file_ids:
                 try:
-                    os.remove(app.config['UPLOAD_FOLDER_PATH'] + '/' + filename)
+                    os.remove(app.config['UPLOAD_FOLDER_PATH'].joinpath(filename))
                 except Exception as e:
                     logger.log('error', 'file', 'deletion of ' + filename + ' failed', e)
                     flash(_('error file delete'), 'error')
@@ -371,7 +370,7 @@ def admin_log() -> str:
 
 @app.route('/admin/log/delete')
 @required_group('admin')
-def admin_log_delete():
+def admin_log_delete() -> Response:
     logger.delete_all_system_logs()
     flash(_('Logs deleted'))
     return redirect(url_for('admin_log'))
@@ -392,7 +391,7 @@ def admin_newsletter() -> Union[str, Response]:
         recipients = 0
         for user_id in (request.form.getlist('recipient')):
             user = UserMapper.get_by_id(user_id)
-            if user and user.settings['newsletter'] and user.active:
+            if user and user.settings['newsletter'] and user.active and user.email:
                 code = UserMapper.generate_password()
                 user.unsubscribe_code = code
                 user.update()

@@ -12,9 +12,16 @@ After following the instructions restart Apache and test if the application is w
 
 ### 3.20.x to 4.0.0
 
-WARNING - this is a major release and requieres some software updates. If you are using Debian you should upgrade to 10 (buster).
+WARNING - this is a major release and requires software upgrades. If you are using Debian upgrade it to 10 (buster).
 
 See install.md which versions of software are needed after the upgrade.
+
+If you upgrade a Debian system to buster be sure to have the new postgis packages installed (see install.md) before you upgrade database clusters.
+
+#### Paths
+
+The new version uses operating system independent paths with pathlib.
+In case you want to override the ones in default.py take a look there, how to do it.
 
 ### 3.20.0 to 3.20.1
 
