@@ -48,8 +48,13 @@ class EventForm(DateForm):
 
 
 @app.route('/event')
+@app.route('/event/<action>/<int:id_>')
 @required_group('readonly')
-def event_index() -> str:
+def event_index(action: str = None, id_: int = None) -> str:
+    if id_ and action == 'delete':
+        EntityMapper.delete(id_)
+        logger.log_user(id_, 'delete')
+        flash(_('entity deleted'), 'info')
     table = Table(Table.HEADERS['event'] + ['description'],
                   defs='[{className: "dt-body-right", targets: [3,4]}]')
     for event in EntityMapper.get_by_codes('event'):
@@ -91,15 +96,6 @@ def event_insert(code: str, origin_id: int = None) -> Union[str, Response]:
             else:
                 form.place.data = origin.id
     return render_template('event/insert.html', form=form, code=code, origin=origin)
-
-
-@app.route('/event/delete/<int:id_>')
-@required_group('contributor')
-def event_delete(id_: int) -> Response:
-    EntityMapper.delete(id_)
-    logger.log_user(id_, 'delete')
-    flash(_('entity deleted'), 'info')
-    return redirect(url_for('event_index'))
 
 
 @app.route('/event/update/<int:id_>', methods=['POST', 'GET'])

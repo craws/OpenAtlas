@@ -31,8 +31,13 @@ class ActorForm(DateForm):
 
 
 @app.route('/actor')
+@app.route('/actor/<action>/<int:id_>')
 @required_group('readonly')
-def actor_index() -> str:
+def actor_index(action: str = None, id_: int = None) -> str:
+    if id_ and action == 'delete':
+        EntityMapper.delete(id_)
+        logger.log_user(id_, 'delete')
+        flash(_('entity deleted'), 'info')
     table = Table(Table.HEADERS['actor'] + ['description'],
                   defs='[{className: "dt-body-right", targets: [2,3]}]')
     for actor in EntityMapper.get_by_codes('actor'):
@@ -58,15 +63,6 @@ def actor_insert(code: str, origin_id: int = None) -> Union[str, Response]:
         form.begins_in.label.text = _('born in')
         form.ends_in.label.text = _('died in')
     return render_template('actor/insert.html', form=form, code=code, origin=origin)
-
-
-@app.route('/actor/delete/<int:id_>')
-@required_group('contributor')
-def actor_delete(id_: int) -> Response:
-    EntityMapper.delete(id_)
-    logger.log_user(id_, 'delete')
-    flash(_('entity deleted'), 'info')
-    return redirect(url_for('actor_index'))
 
 
 @app.route('/actor/update/<int:id_>', methods=['POST', 'GET'])

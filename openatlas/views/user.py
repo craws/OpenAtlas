@@ -112,8 +112,15 @@ def user_view(id_: int) -> str:
 
 
 @app.route('/admin/user')
+@app.route('/admin/user/<action>/<int:id_>')
 @required_group('readonly')
-def user_index() -> str:
+def user_index(action: str = None, id_: int = None) -> str:
+    if id_ and action == 'delete':
+        user = UserMapper.get_by_id(id_)
+        if (user.group == 'admin' and current_user.group != 'admin') and user.id != current_user.id:
+            abort(403)  # pragma: no cover
+        UserMapper.delete(id_)
+        flash(_('user deleted'), 'info')
     table = Table(['username', 'group', 'email', 'newsletter', 'created', 'last login', 'entities'])
     for user in UserMapper.get_all():
         count = UserMapper.get_created_entities_count(user.id)
@@ -189,14 +196,3 @@ def get_groups() -> list:
     if is_authorized('admin'):
         choices.append(('admin', 'admin'))  # admin group is only available for admins
     return choices
-
-
-@app.route('/admin/user/delete/<int:id_>')
-@required_group('manager')
-def user_delete(id_: int) -> Response:
-    user = UserMapper.get_by_id(id_)
-    if (user.group == 'admin' and current_user.group != 'admin') and user.id != current_user.id:
-        abort(403)  # pragma: no cover
-    UserMapper.delete(id_)
-    flash(_('user deleted'), 'info')
-    return redirect(url_for('user_index'))

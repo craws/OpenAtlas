@@ -122,5 +122,5 @@ class ActorTests(TestBaseCase):
             assert b'removed' in rv.data
 
             # Actor delete
-            rv = self.app.get(url_for('actor_delete', id_=actor_id), follow_redirects=True)
+            rv = self.app.get(url_for('actor_index', action='delete', id_=actor_id))
             assert b'The entry has been deleted.' in rv.data

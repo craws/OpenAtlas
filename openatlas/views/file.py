@@ -77,8 +77,24 @@ def file_remove_profile_image(entity_id: int) -> Response:
 
 
 @app.route('/file/index')
+@app.route('/file/<action>/<int:id_>')
 @required_group('readonly')
-def file_index() -> str:
+def file_index(action: str = None, id_: int = None) -> str:
+    if id_ and action == 'delete':
+        try:
+            EntityMapper.delete(id_)
+            logger.log_user(id_, 'delete')
+            flash(_('entity deleted'), 'info')
+        except Exception as e:  # pragma: no cover
+            logger.log('error', 'database', 'Deletion failed', e)
+            flash(_('error database'), 'error')
+        try:
+            path = get_file_path(id_)
+            if path:
+                os.remove(path)
+        except Exception as e:  # pragma: no cover
+            logger.log('error', 'file', 'file deletion failed', e)
+            flash(_('error file delete'), 'error')
     table = Table(['date'] + Table.HEADERS['file'])
     file_stats = get_file_stats()
     for entity in EntityMapper.get_by_system_type('file', nodes=True):
@@ -153,26 +169,6 @@ def file_insert(origin_id: int = None) -> Union[str, Response]:
         return redirect(save(form, origin=origin))
     writeable = True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False
     return render_template('file/insert.html', form=form, origin=origin, writeable=writeable)
-
-
-@app.route('/file/delete/<int:id_>')
-@required_group('contributor')
-def file_delete(id_: int) -> Response:
-    try:
-        EntityMapper.delete(id_)
-        logger.log_user(id_, 'delete')
-    except Exception as e:  # pragma: no cover
-        logger.log('error', 'database', 'Deletion failed', e)
-        flash(_('error database'), 'error')
-    try:
-        path = get_file_path(id_)
-        if path:
-            os.remove(path)
-    except Exception as e:  # pragma: no cover
-        logger.log('error', 'file', 'file deletion failed', e)
-        flash(_('error file delete'), 'error')
-    flash(_('entity deleted'), 'info')
-    return redirect(url_for('file_index'))
 
 
 def save(form: FileForm, file: Entity = None, origin: Entity = None) -> str:

@@ -13,7 +13,7 @@
             {% endif %}
             {% if user.id != current_user.id and (user.group != 'admin' or current_user.group == 'admin') %}
                 <a onclick="return confirm('{{_('delete')|uc_first }} {{ user.username }}?')"
-                   href="{{ url_for('user_delete', id_=user.id) }}">{{ _('delete')|uc_first }}</a>
+                   href="{{ url_for('user_index', action='delete', id_=user.id) }}">{{ _('delete')|uc_first }}</a>
             {% endif %}
         </div>
     {% endif %}

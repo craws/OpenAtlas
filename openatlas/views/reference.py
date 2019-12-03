@@ -103,8 +103,13 @@ def reference_link_update(link_id: int, origin_id: int) -> Union[str, Response]:
 
 
 @app.route('/reference')
+@app.route('/reference/<action>/<int:id_>')
 @required_group('readonly')
-def reference_index() -> str:
+def reference_index(action: str = None, id_: int = None) -> str:
+    if id_ and action == 'delete':
+        EntityMapper.delete(id_)
+        logger.log_user(id_, 'delete')
+        flash(_('entity deleted'), 'info')
     table = Table(Table.HEADERS['reference'] + ['description'])
     for reference in EntityMapper.get_by_codes('reference'):
         data = get_base_table_data(reference)
@@ -127,15 +132,6 @@ def reference_insert(code: str, origin_id: int = None) -> Union[str, Response]:
     if form.validate_on_submit():
         return redirect(save(form, code=code, origin=origin))
     return render_template('reference/insert.html', form=form, code=code, origin=origin)
-
-
-@app.route('/reference/delete/<int:id_>')
-@required_group('contributor')
-def reference_delete(id_: int) -> Response:
-    EntityMapper.delete(id_)
-    logger.log_user(id_, 'delete')
-    flash(_('entity deleted'), 'info')
-    return redirect(url_for('reference_index'))
 
 
 @app.route('/reference/update/<int:id_>', methods=['POST', 'GET'])
