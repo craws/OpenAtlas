@@ -90,7 +90,7 @@ def file_index() -> str:
             convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
             file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
             truncate_string(entity.description)])
-    disk_space_values = {'total': 'N/A', 'free': 'N/A', 'percent': 'N/A'}
+    disk_space_values: dict = {'total': 'N/A', 'free': 'N/A', 'percent': 'N/A'}
     if os.name == "posix":  # e.g. Windows has no statvfs
         statvfs = os.statvfs(app.config['UPLOAD_FOLDER_PATH'])
         disk_space = statvfs.f_frsize * statvfs.f_blocks
@@ -129,18 +129,18 @@ def file_add_reference(id_: int) -> Union[str, Response]:
 @app.route('/file/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def file_update(id_: int) -> Union[str, Response]:
-    file = EntityMapper.get_by_id(id_, nodes=True)
-    form = build_form(FileForm, 'File', file, request)
+    file_ = EntityMapper.get_by_id(id_, nodes=True)
+    form = build_form(FileForm, 'File', file_, request)
     del form.file
     if form.validate_on_submit():
-        if was_modified(form, file):  # pragma: no cover
+        if was_modified(form, file_):  # pragma: no cover
             del form.save
             flash(_('error modified'), 'error')
-            modifier = link(logger.get_log_for_advanced_view(file.id)['modifier'])
-            return render_template('file/update.html', form=form, file=file, modifier=modifier)
-        save(form, file)
+            modifier = link(logger.get_log_for_advanced_view(file_.id)['modifier'])
+            return render_template('file/update.html', form=form, file=file_, modifier=modifier)
+        save(form, file_)
         return redirect(url_for('entity_view', id_=id_))
-    return render_template('file/update.html', form=form, file=file)
+    return render_template('file/update.html', form=form, file=file_)
 
 
 @app.route('/file/insert', methods=['GET', 'POST'])
