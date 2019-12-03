@@ -80,7 +80,7 @@ def user_activity(user_id: int = 0) -> str:
         activities = UserMapper.get_activities(100, user_id, 'all')
     else:
         activities = UserMapper.get_activities(100, 0, 'all')
-    table = Table(['date', 'user', 'action', 'entity'])
+    table = Table(['date', 'user', 'action', 'entity'], order='[[0, "desc"]]')
     for row in activities:
         try:
             entity = EntityMapper.get_by_id(row.entity_id)
@@ -90,7 +90,7 @@ def user_activity(user_id: int = 0) -> str:
             entity_string = ''
         user = UserMapper.get_by_id(row.user_id)
         table.rows.append([format_date(row.created),
-                           link(user) if user else 'id ' + str(row.user_id),
+                           link(user) if user and user.id else 'id ' + str(row.user_id),
                            _(row.action),
                            entity_string if entity_string else 'id ' + str(row.entity_id)])
     return render_template('user/activity.html', table=table, form=form)

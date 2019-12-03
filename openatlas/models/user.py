@@ -15,6 +15,7 @@ from openatlas.models.entity import Entity
 
 
 class User(UserMixin):
+
     def __init__(self, row: NamedTupleCursor.Record = None, bookmarks: list = None) -> None:
         self.id = None
         self.username = None
@@ -110,7 +111,7 @@ class UserMapper:
             FROM web.user_log WHERE TRUE"""
         sql += ' AND user_id = %(user_id)s' if int(user_id) else ''
         sql += ' AND action = %(action)s' if action != 'all' else ''
-        sql += ' ORDER BY created DESC'
+        sql += ' ORDER BY created DESC'  # Order is mportant because of limit filter
         sql += ' LIMIT %(limit)s' if int(limit) else ''
         g.execute(sql, {'limit': limit, 'user_id': user_id, 'action': action})
         return g.cursor.fetchall()
