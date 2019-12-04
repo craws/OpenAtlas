@@ -77,8 +77,24 @@ def file_remove_profile_image(entity_id: int) -> Response:
 
 
 @app.route('/file/index')
+@app.route('/file/<action>/<int:id_>')
 @required_group('readonly')
-def file_index() -> str:
+def file_index(action: str = None, id_: int = None) -> str:
+    if id_ and action == 'delete':
+        try:
+            EntityMapper.delete(id_)
+            logger.log_user(id_, 'delete')
+            flash(_('entity deleted'), 'info')
+        except Exception as e:  # pragma: no cover
+            logger.log('error', 'database', 'Deletion failed', e)
+            flash(_('error database'), 'error')
+        try:
+            path = get_file_path(id_)
+            if path:
+                os.remove(path)
+        except Exception as e:  # pragma: no cover
+            logger.log('error', 'file', 'file deletion failed', e)
+            flash(_('error file delete'), 'error')
     table = Table(['date'] + Table.HEADERS['file'])
     file_stats = get_file_stats()
     for entity in EntityMapper.get_by_system_type('file', nodes=True):
@@ -90,12 +106,15 @@ def file_index() -> str:
             convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
             file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
             truncate_string(entity.description)])
-    statvfs = os.statvfs(app.config['UPLOAD_FOLDER_PATH'])
-    disk_space = statvfs.f_frsize * statvfs.f_blocks
-    free_space = statvfs.f_frsize * statvfs.f_bavail  # Available space without reserved blocks
-    disk_space_values = {'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
-                         'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
-                         'percent': 100 - math.ceil(free_space / (disk_space / 100))}
+    disk_space_values: dict = {'total': 'N/A', 'free': 'N/A', 'percent': 'N/A'}
+    if os.name == "posix":  # e.g. Windows has no statvfs
+        statvfs = os.statvfs(app.config['UPLOAD_FOLDER_PATH'])
+        disk_space = statvfs.f_frsize * statvfs.f_blocks
+        free_space = statvfs.f_frsize * statvfs.f_bavail  # Available space without reserved blocks
+        disk_space_values = {'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
+                             'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
+                             'percent': 100 - math.ceil(free_space / (disk_space / 100))}
+
     return render_template('file/index.html', table=table, disk_space_values=disk_space_values)
 
 
@@ -126,18 +145,18 @@ def file_add_reference(id_: int) -> Union[str, Response]:
 @app.route('/file/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def file_update(id_: int) -> Union[str, Response]:
-    file = EntityMapper.get_by_id(id_, nodes=True)
-    form = build_form(FileForm, 'File', file, request)
+    file_ = EntityMapper.get_by_id(id_, nodes=True)
+    form = build_form(FileForm, 'File', file_, request)
     del form.file
     if form.validate_on_submit():
-        if was_modified(form, file):  # pragma: no cover
+        if was_modified(form, file_):  # pragma: no cover
             del form.save
             flash(_('error modified'), 'error')
-            modifier = link(logger.get_log_for_advanced_view(file.id)['modifier'])
-            return render_template('file/update.html', form=form, file=file, modifier=modifier)
-        save(form, file)
+            modifier = link(logger.get_log_for_advanced_view(file_.id)['modifier'])
+            return render_template('file/update.html', form=form, file=file_, modifier=modifier)
+        save(form, file_)
         return redirect(url_for('entity_view', id_=id_))
-    return render_template('file/update.html', form=form, file=file)
+    return render_template('file/update.html', form=form, file=file_)
 
 
 @app.route('/file/insert', methods=['GET', 'POST'])
@@ -150,26 +169,6 @@ def file_insert(origin_id: int = None) -> Union[str, Response]:
         return redirect(save(form, origin=origin))
     writeable = True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False
     return render_template('file/insert.html', form=form, origin=origin, writeable=writeable)
-
-
-@app.route('/file/delete/<int:id_>')
-@required_group('contributor')
-def file_delete(id_: int) -> Response:
-    try:
-        EntityMapper.delete(id_)
-        logger.log_user(id_, 'delete')
-    except Exception as e:  # pragma: no cover
-        logger.log('error', 'database', 'Deletion failed', e)
-        flash(_('error database'), 'error')
-    try:
-        path = get_file_path(id_)
-        if path:
-            os.remove(path)
-    except Exception as e:  # pragma: no cover
-        logger.log('error', 'file', 'file deletion failed', e)
-        flash(_('error file delete'), 'error')
-    flash(_('entity deleted'), 'info')
-    return redirect(url_for('file_index'))
 
 
 def save(form: FileForm, file: Entity = None, origin: Entity = None) -> str:

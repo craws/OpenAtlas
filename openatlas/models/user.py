@@ -9,12 +9,15 @@ from flask_babel import lazy_gettext as _
 from flask_login import UserMixin, current_user
 from flask_wtf import FlaskForm
 from psycopg2.extras import NamedTupleCursor
+from werkzeug.exceptions import abort
 
 from openatlas import app
 from openatlas.models.entity import Entity
+from openatlas.util.util import is_authorized
 
 
 class User(UserMixin):
+
     def __init__(self, row: NamedTupleCursor.Record = None, bookmarks: list = None) -> None:
         self.id = None
         self.username = None
@@ -110,7 +113,7 @@ class UserMapper:
             FROM web.user_log WHERE TRUE"""
         sql += ' AND user_id = %(user_id)s' if int(user_id) else ''
         sql += ' AND action = %(action)s' if action != 'all' else ''
-        sql += ' ORDER BY created DESC'
+        sql += ' ORDER BY created DESC'  # Order is mportant because of limit filter
         sql += ' LIMIT %(limit)s' if int(limit) else ''
         g.execute(sql, {'limit': limit, 'user_id': user_id, 'action': action})
         return g.cursor.fetchall()
@@ -142,14 +145,14 @@ class UserMapper:
     @staticmethod
     def update(user: User) -> None:
         sql = """
-                UPDATE web.user SET (username, password, real_name, info, email, active,
-                    login_last_success, login_last_failure, login_failed_count, group_id,
-                    password_reset_code, password_reset_date, unsubscribe_code) =
-                (%(username)s, %(password)s, %(real_name)s, %(info)s, %(email)s, %(active)s,
-                    %(login_last_success)s, %(login_last_failure)s, %(login_failed_count)s,
-                    (SELECT id FROM web.group WHERE name LIKE %(group_name)s),
-                    %(password_reset_code)s, %(password_reset_date)s, %(unsubscribe_code)s)
-                WHERE id = %(id)s;"""
+            UPDATE web.user SET (username, password, real_name, info, email, active,
+                login_last_success, login_last_failure, login_failed_count, group_id,
+                password_reset_code, password_reset_date, unsubscribe_code) =
+            (%(username)s, %(password)s, %(real_name)s, %(info)s, %(email)s, %(active)s,
+                %(login_last_success)s, %(login_last_failure)s, %(login_failed_count)s,
+                (SELECT id FROM web.group WHERE name LIKE %(group_name)s),
+                %(password_reset_code)s, %(password_reset_date)s, %(unsubscribe_code)s)
+            WHERE id = %(id)s;"""
         g.execute(sql, {'id': user.id,
                         'username': user.username,
                         'real_name': user.real_name,
@@ -168,36 +171,39 @@ class UserMapper:
     @staticmethod
     def update_settings(user: User) -> None:
         for name, value in user.settings.items():
-            if name in ['newsletter', 'show_email',
-                        'module_geonames', 'module_map_overlay', 'module_notes']:
+            if name in ['newsletter', 'show_email', 'module_geonames',
+                        'module_map_overlay', 'module_notes']:
                 value = 'True' if user.settings[name] else ''
             sql = """
-                    INSERT INTO web.user_settings (user_id, "name", "value")
-                    VALUES (%(user_id)s, %(name)s, %(value)s)
-                    ON CONFLICT (user_id, name) DO UPDATE SET "value" = excluded.value;"""
+                INSERT INTO web.user_settings (user_id, "name", "value")
+                VALUES (%(user_id)s, %(name)s, %(value)s)
+                ON CONFLICT (user_id, name) DO UPDATE SET "value" = excluded.value;"""
             g.execute(sql, {'user_id': user.id, 'name': name, 'value': value})
 
     @staticmethod
-    def delete(user_id: int) -> None:
+    def delete(id_: int) -> None:
+        user = UserMapper.get_by_id(id_)
+        if not is_authorized('manager') or user.id == current_user.id or (
+                (user.group == 'admin' and not is_authorized('admin'))):
+            abort(403)  # pragma: no cover
         sql = 'DELETE FROM web."user" WHERE id = %(user_id)s;'
-        g.execute(sql, {'user_id': user_id})
+        g.execute(sql, {'user_id': id_})
 
     @staticmethod
     def get_users() -> list:
-        sql = 'SELECT id, username FROM web.user ORDER BY username;'
-        g.execute(sql)
+        g.execute('SELECT id, username FROM web.user ORDER BY username;')
         return [(row.id, row.username) for row in g.cursor.fetchall()]
 
     @staticmethod
     def toggle_bookmark(entity_id: int) -> str:
         sql = """
-                INSERT INTO web.user_bookmarks (user_id, entity_id)
-                VALUES (%(user_id)s, %(entity_id)s);"""
+            INSERT INTO web.user_bookmarks (user_id, entity_id)
+            VALUES (%(user_id)s, %(entity_id)s);"""
         label = _('bookmark remove')
         if int(entity_id) in current_user.bookmarks:
             sql = """
-                    DELETE FROM web.user_bookmarks
-                    WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s;"""
+                DELETE FROM web.user_bookmarks
+                WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s;"""
             label = _('bookmark')
         g.execute(sql, {'user_id': current_user.id, 'entity_id': entity_id})
         return label
@@ -271,6 +277,6 @@ class UserMapper:
         return {row.entity_id: row.text for row in g.cursor.fetchall()}
 
     @staticmethod
-    def delete_note(entity: Entity) -> None:
+    def delete_note(entity_id: int) -> None:
         sql = "DELETE FROM web.user_notes WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s"
-        g.execute(sql, {'user_id': current_user.id, 'entity_id': entity.id})
+        g.execute(sql, {'user_id': current_user.id, 'entity_id': entity_id})

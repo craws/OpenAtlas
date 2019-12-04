@@ -15,7 +15,7 @@ from werkzeug.exceptions import abort
 from openatlas import app
 from openatlas.models.date import DateMapper
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import print_file_extension, uc_first
+from openatlas.util.util import print_file_extension, uc_first, is_authorized
 
 
 class Entity:
@@ -359,6 +359,8 @@ class EntityMapper:
 
     @staticmethod
     def delete(id_: int) -> None:
+        if not is_authorized('contributor'):
+            abort(403)  # pragma: no cover
         """ Triggers function model.delete_entity_related() for deleting related entities."""
         g.execute('DELETE FROM model.entity WHERE id = %(id_)s;', {'id_': id_})
 

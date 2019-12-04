@@ -134,9 +134,9 @@ class LinkMapper:
         return EntityMapper.get_by_ids(ids, nodes=nodes)
 
     @staticmethod
-    def get_links(entity_id: int, codes: Union[str, List[str]], inverse: bool = False) -> list:
-        from openatlas.models.entity import EntityMapper
-        codes = codes if isinstance(codes, list) else [codes]
+    def get_links(entity_id: int,
+                  codes: Union[str, List[str]] = None,
+                  inverse: bool = False) -> list:
         sql = """
             SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description, l.created,
                 l.modified, e.name, l.type_id,
@@ -145,15 +145,22 @@ class LinkMapper:
                 COALESCE(to_char(l.end_from, 'yyyy-mm-dd BC'), '') AS end_from, l.end_comment,
                 COALESCE(to_char(l.end_to, 'yyyy-mm-dd BC'), '') AS end_to
             FROM model.link l
-            JOIN model.entity e ON l.{second}_id = e.id AND l.property_code IN %(codes)s
-            WHERE l.{first}_id = %(entity_id)s GROUP BY l.id, e.name ORDER BY e.name;""".format(
-            first='range' if inverse else 'domain', second='domain' if inverse else 'range')
-        g.execute(sql, {'entity_id': entity_id, 'codes': tuple(codes)})
+            JOIN model.entity e ON l.{second}_id = e.id """.format(
+            second='domain' if inverse else 'range')
+        if codes:
+            codes = codes if isinstance(codes, list) else [codes]
+            sql += ' AND l.property_code IN %(codes)s '
+        sql += """
+            WHERE l.{first}_id = %(entity_id)s
+            GROUP BY l.id, e.name
+            ORDER BY e.name;""".format(first='range' if inverse else 'domain')
+        g.execute(sql, {'entity_id': entity_id, 'codes': tuple(codes) if codes else ''})
         entity_ids = set()
         result = g.cursor.fetchall()
         for row in result:
             entity_ids.add(row.domain_id)
             entity_ids.add(row.range_id)
+        from openatlas.models.entity import EntityMapper
         entities = {entity.id: entity for entity in EntityMapper.get_by_ids(entity_ids, nodes=True)}
         links = []
         for row in result:

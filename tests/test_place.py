@@ -212,9 +212,11 @@ class PlaceTest(TestBaseCase):
             assert b'a stratigraphic unit' in rv.data
             rv = self.app.get(url_for('entity_view', id_=find_id))
             assert b'You never' in rv.data
-            rv = self.app.get(url_for('place_delete', id_=place.id), follow_redirects=True)
+            rv = self.app.get(url_for('place_index', action='delete', id_=place.id),
+                              follow_redirects=True)
             assert b'not possible if subunits' in rv.data
-            rv = self.app.get(url_for('place_delete', id_=find_id), follow_redirects=True)
+            rv = self.app.get(url_for('place_index', action='delete', id_=find_id),
+                              follow_redirects=True)
             assert b'The entry has been deleted.' in rv.data
-            rv = self.app.get(url_for('place_delete', id_=place2.id), follow_redirects=True)
+            rv = self.app.get(url_for('place_index', action='delete', id_=place2.id))
             assert b'The entry has been deleted.' in rv.data
