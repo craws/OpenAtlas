@@ -116,9 +116,6 @@ def user_view(id_: int) -> str:
 @required_group('readonly')
 def user_index(action: str = None, id_: int = None) -> str:
     if id_ and action == 'delete':
-        user = UserMapper.get_by_id(id_)
-        if (user.group == 'admin' and current_user.group != 'admin') and user.id != current_user.id:
-            abort(403)  # pragma: no cover
         UserMapper.delete(id_)
         flash(_('user deleted'), 'info')
     table = Table(['username', 'group', 'email', 'newsletter', 'created', 'last login', 'entities'])
