@@ -277,6 +277,6 @@ class UserMapper:
         return {row.entity_id: row.text for row in g.cursor.fetchall()}
 
     @staticmethod
-    def delete_note(entity: Entity) -> None:
+    def delete_note(entity_id: int) -> None:
         sql = "DELETE FROM web.user_notes WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s"
-        g.execute(sql, {'user_id': current_user.id, 'entity_id': entity.id})
+        g.execute(sql, {'user_id': current_user.id, 'entity_id': entity_id})
