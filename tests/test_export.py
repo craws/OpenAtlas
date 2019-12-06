@@ -1,3 +1,4 @@
+import os
 from flask import url_for
 
 from openatlas import app
@@ -27,12 +28,14 @@ class ExportTest(TestBaseCase):
             rv = self.app.post(url_for('sql_execute'), data={'statement': 'SELECT * FROM web.user'})
             assert b'Alice' in rv.data
             rv = self.app.post(url_for('sql_execute'), data={'statement': 'SELECT * FROM fail;'})
-            assert b'relation "fail" does not exist' in rv.data
+            if os.name == 'posix':
+                assert b'relation "fail" does not exist' in rv.data
 
             # Delete SQL dump
             rv = self.app.get(url_for('delete_sql', filename=date_string + '_dump.sql'),
                               follow_redirects=True)
-            assert b'File deleted' in rv.data
+            if os.name == 'posix':
+                assert b'File deleted' in rv.data
 
             # CSV export
             rv = self.app.get(url_for('export_csv'))
