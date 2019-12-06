@@ -119,5 +119,5 @@ class EventTest(TestBaseCase):
             assert b'error' in rv.data
 
             # Delete
-            rv = self.app.get(url_for('event_delete', id_=event_id), follow_redirects=True)
+            rv = self.app.get(url_for('event_index', action='delete', id_=event_id))
             assert b'The entry has been deleted.' in rv.data

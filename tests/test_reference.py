@@ -59,6 +59,5 @@ class ReferenceTest(TestBaseCase):
             assert b'Changes have been saved' in rv.data
 
             # Reference delete
-            rv = self.app.get(url_for('reference_delete', id_=reference.id),
-                              follow_redirects=True)
+            rv = self.app.get(url_for('reference_index', action='delete', id_=reference.id))
             assert b'The entry has been deleted.' in rv.data

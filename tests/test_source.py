@@ -91,5 +91,5 @@ class SourceTest(TestBaseCase):
             assert b'777' in rv.data
 
             # Delete source
-            rv = self.app.get(url_for('source_delete', id_=source.id), follow_redirects=True)
+            rv = self.app.get(url_for('source_index', action='delete', id_=source.id))
             assert b'The entry has been deleted.' in rv.data

@@ -27,8 +27,13 @@ class SourceForm(FlaskForm):
 
 
 @app.route('/source')
+@app.route('/source/<action>/<int:id_>')
 @required_group('readonly')
-def source_index() -> str:
+def source_index(action: str = None, id_: int = None) -> str:
+    if id_ and action == 'delete':
+        EntityMapper.delete(id_)
+        logger.log_user(id_, 'delete')
+        flash(_('entity deleted'), 'info')
     table = Table(Table.HEADERS['source'])
     for source in EntityMapper.get_by_codes('source'):
         data = get_base_table_data(source)
@@ -85,15 +90,6 @@ def source_add_file(id_: int) -> Union[str, Response]:
         return redirect(url_for('entity_view', id_=id_) + '#tab-file')
     form = build_table_form('file', source.get_linked_entities('P67', inverse=True))
     return render_template('add_file.html', entity=source, form=form)
-
-
-@app.route('/source/delete/<int:id_>')
-@required_group('contributor')
-def source_delete(id_: int) -> Response:
-    EntityMapper.delete(id_)
-    logger.log_user(id_, 'delete')
-    flash(_('entity deleted'), 'info')
-    return redirect(url_for('source_index'))
 
 
 @app.route('/source/update/<int:id_>', methods=['POST', 'GET'])

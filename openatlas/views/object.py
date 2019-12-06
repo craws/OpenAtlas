@@ -26,8 +26,13 @@ class InformationCarrierForm(FlaskForm):
 
 
 @app.route('/object')
+@app.route('/object/<action>/<int:id_>')
 @required_group('readonly')
-def object_index() -> str:
+def object_index(action: str = None, id_: int = None) -> str:
+    if id_ and action == 'delete':
+        EntityMapper.delete(id_)
+        logger.log_user(id_, 'delete')
+        flash(_('entity deleted'), 'info')
     table = Table(Table.HEADERS['object'] + ['description'])
     for object_ in EntityMapper.get_by_codes('object'):
         data = get_base_table_data(object_)
@@ -96,12 +101,3 @@ def save(form: Any, object_: Entity = None) -> str:
         flash(_('error transaction'), 'error')
         url = url_for('object_index')
     return url
-
-
-@app.route('/object/delete/<int:id_>')
-@required_group('contributor')
-def object_delete(id_: int) -> Response:
-    EntityMapper.delete(id_)
-    logger.log_user(id_, 'delete')
-    flash(_('entity deleted'), 'info')
-    return redirect(url_for('object_index'))

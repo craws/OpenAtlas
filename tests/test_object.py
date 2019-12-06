@@ -46,5 +46,5 @@ class ObjectTest(TestBaseCase):
                                follow_redirects=True)
             assert b'Event Horizon' in rv.data
 
-            rv = self.app.get(url_for('object_delete', id_=object_.id), follow_redirects=True)
+            rv = self.app.get(url_for('object_index', action='delete', id_=object_.id))
             assert b'has been deleted' in rv.data

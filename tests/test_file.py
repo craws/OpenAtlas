@@ -99,5 +99,5 @@ class FileTest(TestBaseCase):
             assert b'File keeper' in rv.data
 
             # Delete
-            rv = self.app.get(url_for('file_delete', id_=file_id), follow_redirects=True)
+            rv = self.app.get(url_for('file_index', action='delete', id_=file_id))
             assert b'The entry has been deleted' in rv.data

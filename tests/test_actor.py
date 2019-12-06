@@ -119,8 +119,8 @@ class ActorTests(TestBaseCase):
             assert b'Bookmark' in rv.data
             rv = self.app.get(url_for('link_delete', origin_id=actor_id, id_=666),
                               follow_redirects=True)
-            assert b'removed'in rv.data
+            assert b'removed' in rv.data
 
             # Actor delete
-            rv = self.app.get(url_for('actor_delete', id_=actor_id), follow_redirects=True)
+            rv = self.app.get(url_for('actor_index', action='delete', id_=actor_id))
             assert b'The entry has been deleted.' in rv.data

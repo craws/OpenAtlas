@@ -49,8 +49,20 @@ class FeatureForm(DateForm):
 
 
 @app.route('/place')
+@app.route('/place/<action>/<int:id_>')
 @required_group('readonly')
-def place_index() -> str:
+def place_index(action: str = None, id_: int = None) -> Union[str, Response]:
+    if id_ and action == 'delete':
+        entity = EntityMapper.get_by_id(id_)
+        parent = None if entity.system_type == 'place' else entity.get_linked_entity('P46', True)
+        if entity.get_linked_entities(['P46']):
+            flash(_('Deletion not possible if subunits exists'), 'error')
+            return redirect(url_for('entity_view', id_=id_))
+        entity.delete()
+        logger.log_user(id_, 'delete')
+        flash(_('entity deleted'), 'info')
+        if parent:
+            return redirect(url_for('entity_view', id_=parent.id) + '#tab-' + entity.system_type)
     table = Table(Table.HEADERS['place'], defs='[{className: "dt-body-right", targets: [2,3]}]')
     for place in EntityMapper.get_by_system_type(
             'place', nodes=True, aliases=current_user.settings['table_show_aliases']):
@@ -103,22 +115,6 @@ def place_insert(origin_id: OptionalTyping[int] = None) -> Union[str, Response]:
     return render_template('place/insert.html', form=form, title=title, place=place, origin=origin,
                            gis_data=gis_data, feature=feature, geonames_buttons=geonames_buttons,
                            overlays=overlays)
-
-
-@app.route('/place/delete/<int:id_>')
-@required_group('contributor')
-def place_delete(id_: int) -> Response:
-    entity = EntityMapper.get_by_id(id_)
-    parent = None if entity.system_type == 'place' else entity.get_linked_entity('P46', True)
-    if entity.get_linked_entities(['P46']):
-        flash(_('Deletion not possible if subunits exists'), 'error')
-        return redirect(url_for('entity_view', id_=id_))
-    entity.delete()
-    logger.log_user(id_, 'delete')
-    flash(_('entity deleted'), 'info')
-    if parent:
-        return redirect(url_for('entity_view', id_=parent.id) + '#tab-' + entity.system_type)
-    return redirect(url_for('place_index'))
 
 
 @app.route('/place/add/source/<int:id_>', methods=['POST', 'GET'])

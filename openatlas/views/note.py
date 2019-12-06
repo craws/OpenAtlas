@@ -61,7 +61,6 @@ def save(form: FlaskForm, entity: Entity, insert: bool = True) -> None:
 @app.route('/note/delete/<int:entity_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def note_delete(entity_id: int) -> Response:
-    entity = EntityMapper.get_by_id(entity_id)
-    UserMapper.delete_note(entity)
+    UserMapper.delete_note(entity_id)
     flash(_('note deleted'), 'info')
-    return redirect(url_for('entity_view', id_=entity.id))
+    return redirect(url_for('entity_view', id_=entity_id))
