@@ -55,11 +55,8 @@ class Api:
                            }],
                 'relations': Api.get_links(entity),
                 'descriptions': [
-                    {'@id': 'https://thanados.openatlas.eu/api/v01/50505',
-                     'value': '''...In the area of Obere Holzwiese 215 inhumation burials 
-                              were  documented in different excavations. There might have been a 
-                              wooden church in the north-western part of the areal, which might 
-                              date back to the first half  of the 9th century...'''}],
+                    {'@id': request.base_url,
+                     'value': entity.description}],
                 'depictions': [
                     {'@id': 'https://thanados.openatlas.eu/display/112760.png',
                      'title': 'Map of the cemetery',
