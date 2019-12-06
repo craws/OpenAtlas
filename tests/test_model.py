@@ -36,8 +36,7 @@ class ModelTests(TestBaseCase):
                 source.link('P67', event)
             rv = self.app.get(url_for('model_network'))
             assert b'orphans' in rv.data
-            data = {'orphans': True, 'width': 100, 'height': 40, 'distance': -666,
-                          'charge': 500}
+            data = {'orphans': True, 'width': 100, 'height': 40, 'distance': -666, 'charge': 500}
             rv = self.app.post(url_for('model_network'), data=data)
             assert b'666' in rv.data
 

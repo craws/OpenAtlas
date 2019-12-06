@@ -11,6 +11,7 @@ DEMO_MODE = False  # If in demo mode some options are disabled and the login for
 LANGUAGES = {'en': 'English', 'de': 'Deutsch'}
 DEBUG = True
 
+
 DATABASE_NAME = 'openatlas'
 DATABASE_USER = 'openatlas'
 DATABASE_HOST = 'localhost'
@@ -19,12 +20,19 @@ DATABASE_PASS = 'CHANGE ME'
 MAIL_PASSWORD = 'CHANGE ME'
 SECRET_KEY = 'CHANGE ME'
 
-TMP_FOLDER_PATH = pathlib.Path('/tmp')  # e.g. for processing import/export files
+# Files with these extensions are available as profile image and will be displayed in the browser
+DISPLAY_FILE_EXTENSIONS = ['bmp', 'gif', 'ico', 'jpeg', 'jpg', 'png', 'svg']
+
+# Files with these extension are selectable for import, it would make no sense to overwrite them
 IMPORT_FILE_EXTENSIONS = ['csv', 'xls', 'xlsx']
+
+# Paths are implemented operating system independent using pathlib.
+# If you want to override them (in instance/production.py) either use them like here
+# or use absolute paths like e.g. pathlib.Path('/some/location/somewhere')
+TMP_FOLDER_PATH = pathlib.Path('/tmp')  # e.g. for processing import/export files
 ROOT_PATH = pathlib.Path(app.root_path)
 EXPORT_FOLDER_PATH = ROOT_PATH.joinpath('export')
 UPLOAD_FOLDER_PATH = ROOT_PATH.joinpath('uploads')
-DISPLAY_FILE_EXTENSIONS = ['bmp', 'gif', 'ico', 'jpeg', 'jpg', 'png', 'svg']
 
 # Security
 SESSION_COOKIE_SECURE = False  # Should be set to True in production.py if using HTTPS only

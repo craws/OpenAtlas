@@ -8,7 +8,7 @@ We are happy about participation and there are multiple ways to contribute.
 
 Feedback is always appriciated, preferable in a constructive way. E.g.
 
-* Contacting us at <info@openatlas.eu>
+* Contacting us at <openatlas@oeaw.ac.at>
 * Using our issue tracker [Redmine](https://redmine.openaltas.eu/wiki/uni) after
 reading our [How to report an issue](https://redmine.openatlas.eu/projects/uni/wiki/Issues_howto).
 

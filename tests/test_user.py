@@ -62,7 +62,7 @@ class UserTests(TestBaseCase):
             rv = self.app.post(url_for('user_update', id_=user_id),
                                data=data, follow_redirects=True)
             assert b'The warrant officer' in rv.data
-            rv = self.app.get(url_for('user_delete', id_=user_id), follow_redirects=True)
+            rv = self.app.get(url_for('user_index', action='delete', id_=user_id))
             assert b'User deleted' in rv.data
 
             # Test activity log
