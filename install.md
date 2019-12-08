@@ -6,7 +6,9 @@ This software was developed and tested on Linux/Debian 10 (codename "buster") an
 install would be on Debian 10 system following these instructions.
 
 It may work on other Linux distributions or even on non Linux systems but would need substantially
-more knowledge about server administration.
+more knowledge about server administration. E.g. you could try to install required packages using 
+pip with the requirements.txt or follow the Windows install notes which are located in the install 
+folder but aren't fully tested and still experimental.
 
 ## Requirements
 
@@ -112,7 +114,7 @@ When configured Apache to use HTTPS only, add this line to instance/production.p
 
     SESSION_COOKIE_SECURE = True
 
-### Unit tests (optional)
+### Tests (optional)
 
 Install required packages:
 
@@ -129,8 +131,8 @@ Copy instance/example_testing.py to instance/testing.py
 
     $ cp instance/example_testing.py instance/testing.py
 
-Add/change values as appropriate.
+Add/change values as appropriate. If using PyCharm create a Nosetest.
 
-Use these parameters for running with coverage and HTML report:
+Use these parameters to run tests with coverage and HTML report:
 
-    --with-coverage --cover-package openatlas --cover-package tests --cover-html --cover-tests --cover-erase
+    --with-coverage --cover-html --cover-package tests --cover-package openatlas --cover-tests --cover-erase

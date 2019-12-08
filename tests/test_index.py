@@ -1,3 +1,5 @@
+import os
+
 from flask import url_for
 
 from openatlas import app
@@ -50,8 +52,9 @@ class IndexTests(TestBaseCase):
             # Redirection to overview if trying to login again
             rv = self.app.get(url_for('login'), follow_redirects=True)
             assert b'first' in rv.data
-            rv = self.app.get(url_for('set_locale', language='de'), follow_redirects=True)
-            assert b'Quelle' in rv.data
+            if os.name == 'posix':
+                rv = self.app.get(url_for('set_locale', language='de'), follow_redirects=True)
+                assert b'Quelle' in rv.data
             rv = self.app.get(url_for('logout'), follow_redirects=True)
             assert b'Password' in rv.data
             rv = self.app.get('/404')

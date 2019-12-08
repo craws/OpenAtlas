@@ -1,3 +1,4 @@
+import os
 from flask import url_for
 
 from openatlas import app
@@ -40,7 +41,8 @@ class ExportTest(TestBaseCase):
                 rv = self.app.post(
                     url_for('import_data', class_code='E18', project_id=project_id),
                     data={'file': file, 'duplicate': True}, follow_redirects=True)
-            assert b'IDs already in database' in rv.data
+            if os.name == 'posix':
+                assert b'IDs already in database' in rv.data
             with open(app.config['ROOT_PATH'].joinpath('static', 'favicon.ico'), 'rb') as file:
                 rv = self.app.post(
                     url_for('import_data', class_code='E18', project_id=project_id),
