@@ -16,6 +16,9 @@ from rdflib.graph import Graph
 FILENAME = 'cidoc_crm_v6.2.1.rdfs'
 CRM_URL = 'http://www.cidoc-crm.org/cidoc-crm/'
 
+EXCLUDE_PROPERTIES = ['P3', 'P57', 'P79', 'P80', 'P81', 'P81a', 'P81b', 'P82', 'P82a', 'P82b',
+                      'P90', 'P168']
+
 DATABASE_NAME = 'cidoc'
 DATABASE_USER = 'openatlas'
 DATABASE_PORT = '5432'
@@ -49,8 +52,8 @@ class Item:
         self.sub_property_of: list = []
 
 
-
 def import_cidoc():  # pragma: no cover
+
     start = time.time()
     classes = {}
     properties = {}
@@ -71,7 +74,7 @@ def import_cidoc():  # pragma: no cover
         if code[0] == 'E':
             classes[code] = item
         elif code[0] == 'P':
-            if code[-1] == 'i':
+            if code[-1] == 'i' or code in EXCLUDE_PROPERTIES:
                 pass
             else:
                 properties[code] = item
@@ -87,7 +90,7 @@ def import_cidoc():  # pragma: no cover
     subs = graph.triples((None, URIRef('http://www.w3.org/2000/01/rdf-schema#subPropertyOf'), None))
     for subject__, predicate__, object__ in subs:
         property_ = subject__.replace(CRM_URL, '').split('_', 1)[0]
-        if property_[-1] == 'i':
+        if property_[-1] == 'i' or property_ in EXCLUDE_PROPERTIES:
             continue
         sub_property_of = object__.replace(CRM_URL, '').split('_', 1)[0]
         properties[property_].sub_property_of.append(sub_property_of)
@@ -96,7 +99,7 @@ def import_cidoc():  # pragma: no cover
     domains = graph.triples((None, URIRef('http://www.w3.org/2000/01/rdf-schema#domain'), None))
     for subject__, predicate__, object__ in domains:
         property_ = subject__.replace(CRM_URL, '').split('_', 1)[0]
-        if property_[-1] == 'i':
+        if property_[-1] == 'i' or property_ in EXCLUDE_PROPERTIES:
             continue
         properties[property_].domain_code = object__.replace(CRM_URL, '').split('_', 1)[0]
 
@@ -104,9 +107,25 @@ def import_cidoc():  # pragma: no cover
     ranges = graph.triples((None, URIRef('http://www.w3.org/2000/01/rdf-schema#range'), None))
     for subject__, predicate__, object__ in ranges:
         property_ = subject__.replace(CRM_URL, '').split('_', 1)[0]
-        if property_[-1] == 'i':
+        if property_[-1] == 'i' or property_ in EXCLUDE_PROPERTIES:
             continue
         properties[property_].range_code = object__.replace(CRM_URL, '').split('_', 1)[0]
+
+    # OpenAtlas shortcuts
+    properties['OA7'] = Item('OA7', 'has relationship to', 'OA7 is used to link two Actors (E39) via a certain relationship E39 Actor linked with E39 Actor: E39 (Actor) - P11i (participated in) - E5 (Event) - P11 (had participant) - E39 (Actor) Example: [ Stefan (E21)] participated in [ Relationship from Stefan to Joachim (E5)] had participant [Joachim (E21)] The connecting event is defined by an entity of class E55 (Type): [Relationship from Stefan to Joachim (E5)] has type [Son to Father (E55)]')
+    properties['OA7'].domain_code = 'E39'
+    properties['OA7'].range_code = 'E39'
+    properties['OA7'].label = {'en': 'has relationship to', 'de': 'hat Beziehung zu'}
+
+    properties['OA8'] = Item('OA8', ' begins in', "OA8 is used to link the beginning of a persistent item's (E77) life span (or time of usage) with a certain place. E.g to document the birthplace of a person. E77 Persistent Item linked with a E53 Place: E77 (Persistent Item) - P92i (was brought into existence by) - E63 (Beginning of Existence) - P7 (took place at) - E53 (Place) Example: [Albert Einstein (E21)] was brought into existence by [Birth of Albert Einstein (E12)] took place at [Ulm (E53)]")
+    properties['OA8'].domain_code = 'E77'
+    properties['OA8'].range_code = 'E53'
+    properties['OA8'].label = {'en': 'begins in', 'de': 'beginnt in'}
+
+    properties['OA9'] = Item('OA9', ' begins in', "OA9 is used to link the end of a persistent item's (E77) life span (or time of usage) with a certain place. E.g to document a person's place of death. E77 Persistent Item linked with a E53 Place: E77 (Persistent Item) - P93i (was taken out of existence by) - E64 (End of Existence) - P7 (took place at) - E53 (Place) Example: [Albert Einstein (E21)] was taken out of by [Death of Albert Einstein (E12)] took place at [Princeton (E53)]")
+    properties['OA9'].domain_code = 'E77'
+    properties['OA9'].range_code = 'E53'
+    properties['OA9'].label = {'en': 'ends in', 'de': 'endet in'}
 
     connection = connect()
     cursor = connection.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
@@ -183,6 +202,9 @@ def import_cidoc():  # pragma: no cover
         ALTER TABLE ONLY model.class_i18n ADD CONSTRAINT class_i18n_class_code_fkey FOREIGN KEY (class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
         ALTER TABLE ONLY model.class_inheritance ADD CONSTRAINT class_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
         ALTER TABLE ONLY model.class_inheritance ADD CONSTRAINT class_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+        ALTER TABLE ONLY model.property ADD CONSTRAINT property_domain_class_code_fkey FOREIGN KEY (domain_class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+        ALTER TABLE ONLY model.property ADD CONSTRAINT property_range_class_code_fkey FOREIGN KEY (range_class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+        ALTER TABLE ONLY model.link ADD CONSTRAINT link_property_code_fkey FOREIGN KEY (property_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
         COMMIT;""")
 
     print('Execution time: ' + str(int(time.time() - start)) + ' seconds')
