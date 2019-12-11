@@ -163,7 +163,7 @@ function buildPopup(feature, action='view', selected=false) {
     if (action == 'edited') {
         popupHtml += '<p><i>' + translate['map_info_reedit'] + '</i></p>';
     } else if (!selected || window.location.href.indexOf('place') < 1) {
-        popupHtml += '<p><a href="/place/view/' + feature.properties.objectId + '">' + translate['details'] + '</a></p>';
+        popupHtml += '<p><a href="/entity/' + feature.properties.objectId + '">' + translate['details'] + '</a></p>';
     } else if (window.location.href.indexOf('update') >= 0) {
         popupHtml += `
             <div id="buttonBar" style="white-space:nowrap;">
