@@ -7,6 +7,8 @@
 # In this script the rdfs is parsed and entered to a PostgreSQL database
 # Installation of needed package: # apt-get install python3-rdflib
 
+# This script was written for one use only, there sure is room for improvement if needed again ;)
+
 import time
 
 import psycopg2.extras
@@ -41,12 +43,12 @@ class Item:
 
     domain_code: str
     range_code: str
-    name_inverse: str
 
     def __init__(self, code: str, name: str, comment: str) -> None:
         self.code = code
         self.name = name
         self.comment = comment
+        self.name_inverse = None
         self.label: dict = {}
         self.sub_class_of: list = []
         self.sub_property_of: list = []
@@ -57,6 +59,7 @@ def import_cidoc():  # pragma: no cover
     start = time.time()
     classes = {}
     properties = {}
+    properties_inverse = {}
     graph = Graph()
     graph.parse(FILENAME, format='application/rdf+xml')
 
@@ -74,10 +77,15 @@ def import_cidoc():  # pragma: no cover
         if code[0] == 'E':
             classes[code] = item
         elif code[0] == 'P':
-            if code[-1] == 'i' or code in EXCLUDE_PROPERTIES:
+            if code in EXCLUDE_PROPERTIES:
                 pass
+            elif code[-1] == 'i':
+                properties_inverse[code[:-1]] = item
             else:
                 properties[code] = item
+
+    for code, property_inverse in properties_inverse.items():
+        properties[code].name_inverse = property_inverse.name
 
     # Get subClassOf
     subs = graph.triples((None, URIRef('http://www.w3.org/2000/01/rdf-schema#subClassOf'), None))
@@ -94,7 +102,6 @@ def import_cidoc():  # pragma: no cover
             continue
         sub_property_of = object__.replace(CRM_URL, '').split('_', 1)[0]
         sub_property_of = sub_property_of.replace('i', '')  # P10i, P130i, P59i
-
         properties[property_].sub_property_of.append(sub_property_of)
 
     # Get domain for properties
@@ -138,6 +145,8 @@ def import_cidoc():  # pragma: no cover
         ALTER TABLE model.class ADD COLUMN comment text;
         ALTER TABLE model.property DROP COLUMN IF EXISTS comment;
         ALTER TABLE model.property ADD COLUMN comment text;
+        ALTER TABLE model.property_i18n DROP COLUMN IF EXISTS text_inverse;
+        ALTER TABLE model.property_i18n ADD COLUMN text_inverse text;
 
         ALTER TABLE model.entity DROP CONSTRAINT IF EXISTS entity_class_code_fkey;
         ALTER TABLE model.link DROP CONSTRAINT IF EXISTS link_property_code_fkey;
@@ -181,10 +190,11 @@ def import_cidoc():  # pragma: no cover
     # Properties
     for code, property_ in properties.items():
         sql = """
-            INSERT INTO model.property (code, name, comment, domain_class_code, range_class_code)
-            VALUES (%(code)s, %(name)s, %(comment)s, %(domain_code)s, %(range_code)s);"""
+            INSERT INTO model.property (code, name, name_inverse, comment, domain_class_code, range_class_code)
+            VALUES (%(code)s, %(name)s, %(name_inverse)s, %(comment)s, %(domain_code)s, %(range_code)s);"""
         cursor.execute(sql, {'code': property_.code,
                              'name': property_.name,
+                             'name_inverse': property_.name_inverse,
                              'comment': property_.comment,
                              'domain_code': property_.domain_code,
                              'range_code': property_.range_code})
@@ -194,12 +204,16 @@ def import_cidoc():  # pragma: no cover
                 INSERT INTO model.property_inheritance (super_code, sub_code)
                 VALUES (%(super_code)s, %(sub_code)s);"""
             cursor.execute(sql, {'super_code': sub_property_of, 'sub_code': property_.code})
-        for language, label in property_.label.items():
-            sql = """
-                INSERT INTO model.property_i18n (property_code, language_code, text)
-                VALUES (%(property)s, %(language)s, %(text)s);"""
-            cursor.execute(sql, {'property': property_.code, 'language': language, 'text': label})
 
+        for language, label in property_.label.items():
+            text_inverse = None
+            if property_.code in properties_inverse and language in properties_inverse[property_.code].label:
+                text_inverse = properties_inverse[property_.code].label[language]
+            sql = """
+                INSERT INTO model.property_i18n (property_code, language_code, text, text_inverse)
+                VALUES (%(property)s, %(language)s, %(text)s, %(text_inverse)s);"""
+            cursor.execute(sql, {'property': property_.code, 'language': language, 'text': label,
+                                 'text_inverse': text_inverse})
     cursor.execute("""
         ALTER TABLE ONLY model.entity ADD CONSTRAINT entity_class_code_fkey FOREIGN KEY (class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
         ALTER TABLE ONLY model.link ADD CONSTRAINT link_property_code_fkey FOREIGN KEY (property_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
