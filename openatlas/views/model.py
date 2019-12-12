@@ -84,14 +84,14 @@ def class_view(code: str) -> str:
     tables = {}
     for table in ['super', 'sub']:
         tables[table] = Table(['code', 'name'], paging=False)
-        for code in getattr(class_, table):
-            tables[table].rows.append([link(g.classes[code]), g.classes[code].name])
+        for code_ in getattr(class_, table):
+            tables[table].rows.append([link(g.classes[code_]), g.classes[code_].name])
     tables['domains'] = Table(['code', 'name'], paging=False)
     tables['ranges'] = Table(['code', 'name'], paging=False)
     for key, property_ in g.properties.items():
-        if code == property_.domain_class_code:
+        if class_.code == property_.domain_class_code:
             tables['domains'].rows.append([link(property_), property_.name])
-        elif code == property_.range_class_code:
+        elif class_.code == property_.range_class_code:
             tables['ranges'].rows.append([link(property_), property_.name])
     return render_template('model/class_view.html', class_=class_, tables=tables,
                            info=[('code', class_.code), ('name', class_.name)])
