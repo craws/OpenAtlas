@@ -93,6 +93,8 @@ def import_cidoc():  # pragma: no cover
         if property_[-1] == 'i' or property_ in EXCLUDE_PROPERTIES:
             continue
         sub_property_of = object__.replace(CRM_URL, '').split('_', 1)[0]
+        sub_property_of = sub_property_of.replace('i', '')  # P10i, P130i, P59i
+
         properties[property_].sub_property_of.append(sub_property_of)
 
     # Get domain for properties
@@ -142,11 +144,11 @@ def import_cidoc():  # pragma: no cover
         ALTER TABLE model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
         ALTER TABLE model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_sub_code_fkey;
         ALTER TABLE model.class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_fkey;
+        ALTER TABLE model.property DROP CONSTRAINT IF EXISTS property_domain_class_code_fkey;
         ALTER TABLE model.property DROP CONSTRAINT IF EXISTS property_range_class_code_fkey;
         ALTER TABLE model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_super_code_fkey;
         ALTER TABLE model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_sub_code_fkey;
         ALTER TABLE model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property_code_fkey;
-        ALTER TABLE model.property DROP CONSTRAINT IF EXISTS property_domain_class_code_fkey;
 
         ALTER TABLE model.class_i18n DROP COLUMN IF EXISTS attribute;
         ALTER TABLE model.property_i18n DROP COLUMN IF EXISTS attribute;
@@ -199,12 +201,16 @@ def import_cidoc():  # pragma: no cover
             cursor.execute(sql, {'property': property_.code, 'language': language, 'text': label})
 
     cursor.execute("""
-        ALTER TABLE ONLY model.class_i18n ADD CONSTRAINT class_i18n_class_code_fkey FOREIGN KEY (class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY model.class_inheritance ADD CONSTRAINT class_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+        ALTER TABLE ONLY model.entity ADD CONSTRAINT entity_class_code_fkey FOREIGN KEY (class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+        ALTER TABLE ONLY model.link ADD CONSTRAINT link_property_code_fkey FOREIGN KEY (property_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
         ALTER TABLE ONLY model.class_inheritance ADD CONSTRAINT class_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+        ALTER TABLE ONLY model.class_inheritance ADD CONSTRAINT class_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
+        ALTER TABLE ONLY model.class_i18n ADD CONSTRAINT class_i18n_class_code_fkey FOREIGN KEY (class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
         ALTER TABLE ONLY model.property ADD CONSTRAINT property_domain_class_code_fkey FOREIGN KEY (domain_class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
         ALTER TABLE ONLY model.property ADD CONSTRAINT property_range_class_code_fkey FOREIGN KEY (range_class_code) REFERENCES model.class(code) ON UPDATE CASCADE ON DELETE CASCADE;
-        ALTER TABLE ONLY model.link ADD CONSTRAINT link_property_code_fkey FOREIGN KEY (property_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+        ALTER TABLE ONLY model.property_inheritance ADD CONSTRAINT property_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+        ALTER TABLE ONLY model.property_inheritance ADD CONSTRAINT property_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+        ALTER TABLE ONLY model.property_i18n ADD CONSTRAINT property_i18n_property_code_fkey FOREIGN KEY (property_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
         COMMIT;""")
 
     print('Execution time: ' + str(int(time.time() - start)) + ' seconds')
