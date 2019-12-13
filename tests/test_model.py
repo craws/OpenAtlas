@@ -44,5 +44,7 @@ class ModelTests(TestBaseCase):
             self.app.get('/index/setlocale/de')
             rv = self.app.get(url_for('property_view', code='P68'))
             assert b'verweist auf' in rv.data
-            rv = self.app.get(url_for('class_view', code='E4'))
-            assert b'Phase' in rv.data
+            rv = self.app.get(url_for('class_view', code='E18'))
+            assert b'Materielles' in rv.data
+            rv = self.app.get(url_for('property_view', code='P166'))
+            assert b'was a presence of' in rv.data

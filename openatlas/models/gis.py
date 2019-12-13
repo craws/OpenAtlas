@@ -99,7 +99,7 @@ class GisMapper:
         for shape in ['point', 'line', 'polygon']:
             data = getattr(form, 'gis_' + shape + 's').data
             if not data:
-                continue
+                continue  # pragma: no cover
             for item in json.loads(data):
                 # Don't save geom if coordinates are empty
                 if not item['geometry']['coordinates'] or item['geometry']['coordinates'] == [[]]:

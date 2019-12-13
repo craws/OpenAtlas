@@ -30,7 +30,7 @@ class Property:
         locale_default = session['settings']['default_language']
         if locale_default in self.i18n:
             return self.i18n[locale_default]
-        return getattr(self, '_name')
+        return getattr(self, '_name')  # pragma: no cover
 
     @property
     def name_inverse(self) -> str:
@@ -40,14 +40,13 @@ class Property:
         locale_default = session['settings']['default_language']
         if locale_default in self.i18n_inverse:
             return self.i18n_inverse[locale_default]
-        return getattr(self, '_name_inverse')
+        return getattr(self, '_name_inverse')  # pragma: no cover
 
     def find_object(self, attr: str, class_id: int) -> bool:
         # Used to check if links are CIDOC CRM valid
         valid_domain_id = getattr(self, attr)
         if valid_domain_id == class_id:
             return True
-        print(valid_domain_id)
         return self.find_subs(attr, class_id, g.classes[valid_domain_id].sub)
 
     def find_subs(self, attr: str, class_id: int, valid_subs: list) -> bool:
