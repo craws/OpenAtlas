@@ -225,6 +225,8 @@ def import_cidoc():  # pragma: no cover
         ALTER TABLE ONLY model.property_inheritance ADD CONSTRAINT property_inheritance_super_code_fkey FOREIGN KEY (super_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
         ALTER TABLE ONLY model.property_inheritance ADD CONSTRAINT property_inheritance_sub_code_fkey FOREIGN KEY (sub_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
         ALTER TABLE ONLY model.property_i18n ADD CONSTRAINT property_i18n_property_code_fkey FOREIGN KEY (property_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
+        ALTER TABLE ONLY model.class_i18n ADD CONSTRAINT class_i18n_class_code_language_code_key UNIQUE (class_code, language_code);
+        ALTER TABLE ONLY model.property_i18n ADD CONSTRAINT property_i18n_property_code_language_code_key UNIQUE (property_code, language_code);
         COMMIT;""")
 
     print('Execution time: ' + str(int(time.time() - start)) + ' seconds')
