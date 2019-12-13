@@ -90,7 +90,7 @@ def class_view(code: str) -> str:
                               defs='''[{"orderDataType": "cidoc-model", "targets":[0]},
                                                           {"sType": "numeric", "targets": [0]}]''')
     tables['ranges'] = Table(['code', 'name'], paging=False,
-                              defs='''[{"orderDataType": "cidoc-model", "targets":[0]},
+                             defs='''[{"orderDataType": "cidoc-model", "targets":[0]},
                                                           {"sType": "numeric", "targets": [0]}]''')
     for key, property_ in g.properties.items():
         if class_.code == property_.domain_class_code:
