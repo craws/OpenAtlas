@@ -23,6 +23,8 @@ ALTER TABLE model.property DROP CONSTRAINT IF EXISTS property_range_class_code_f
 ALTER TABLE model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_super_code_fkey;
 ALTER TABLE model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_sub_code_fkey;
 ALTER TABLE model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property_code_fkey;
+ALTER TABLE ONLY model.class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_language_code_key;
+ALTER TABLE ONLY model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property_code_language_code_key;
 
 ALTER TABLE model.class_i18n DROP COLUMN IF EXISTS attribute;
 ALTER TABLE model.property_i18n DROP COLUMN IF EXISTS attribute;
