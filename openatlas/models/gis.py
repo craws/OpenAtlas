@@ -91,8 +91,8 @@ class GisMapper:
                 'gisPolygonAll': json.dumps(all_['polygon']),
                 'gisPolygonSelected': json.dumps(selected['polygon']),
                 'gisPolygonPointSelected': json.dumps(selected['polygon_point']),
-                'gisAllSelected': json.dumps(selected['polygon'] +
-                                             selected['linestring'] + selected['point'])}
+                'gisAllSelected': json.dumps(selected['polygon'] + selected['linestring'] +
+                                             selected['point'])}
 
     @staticmethod
     def insert(entity: Entity, form: FlaskForm) -> None:
