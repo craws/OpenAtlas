@@ -5,6 +5,7 @@ class Changelog:
                 '905': 'Upgrade CIDOC CRM to 6.2.1.',
                 '1049': 'Upgrade Python to 3.7',
                 '1068': 'Place import with point coordinates',
+                '1072':  'Show places of movement at the person view',
                 '1079': 'Static type checking with Mypy',
                 '1101': 'Disable showing default images for reference'},
             'fix': {
