@@ -1,5 +1,5 @@
 import ast
-from typing import List
+from typing import List, Optional
 
 from flask import g, json
 from flask_wtf import FlaskForm
@@ -17,7 +17,7 @@ class InvalidGeomException(Exception):
 class GisMapper:
 
     @staticmethod
-    def get_all(objects: List[Entity] = None) -> dict:
+    def get_all(objects: Optional[List[Entity]] = None) -> dict:
         if objects is None:
             objects = []
         all_: dict = {'point': [], 'linestring': [], 'polygon': []}

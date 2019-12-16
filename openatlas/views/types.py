@@ -48,7 +48,7 @@ def node_index() -> str:
 @app.route('/types/insert/<int:root_id>', methods=['GET', 'POST'])
 @app.route('/types/insert/<int:root_id>/<int:super_id>', methods=['GET', 'POST'])
 @required_group('editor')
-def node_insert(root_id: int, super_id: int = None) -> Union[str, Response]:
+def node_insert(root_id: int, super_id: Optional[int] = None) -> Union[str, Response]:
     root = g.nodes[root_id]
     form = build_node_form(NodeForm, root)
     # Check if form is valid and if it wasn't a submit of the search form

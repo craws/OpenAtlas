@@ -114,7 +114,7 @@ def user_view(id_: int) -> str:
 @app.route('/admin/user')
 @app.route('/admin/user/<action>/<int:id_>')
 @required_group('readonly')
-def user_index(action: str = None, id_: int = None) -> str:
+def user_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
     if id_ and action == 'delete':
         UserMapper.delete(id_)
         flash(_('user deleted'), 'info')

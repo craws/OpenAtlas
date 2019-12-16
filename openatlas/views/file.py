@@ -1,7 +1,7 @@
 import datetime
 import math
 import os
-from typing import Any, Union
+from typing import Any, Optional, Union
 
 from flask import flash, g, render_template, request, send_from_directory, session, url_for
 from flask_babel import lazy_gettext as _
@@ -79,7 +79,7 @@ def file_remove_profile_image(entity_id: int) -> Response:
 @app.route('/file/index')
 @app.route('/file/<action>/<int:id_>')
 @required_group('readonly')
-def file_index(action: str = None, id_: int = None) -> str:
+def file_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
     if id_ and action == 'delete':
         try:
             EntityMapper.delete(id_)
@@ -162,7 +162,7 @@ def file_update(id_: int) -> Union[str, Response]:
 @app.route('/file/insert', methods=['GET', 'POST'])
 @app.route('/file/insert/<int:origin_id>', methods=['GET', 'POST'])
 @required_group('contributor')
-def file_insert(origin_id: int = None) -> Union[str, Response]:
+def file_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(FileForm, 'File')
     if form.validate_on_submit():
@@ -171,7 +171,7 @@ def file_insert(origin_id: int = None) -> Union[str, Response]:
     return render_template('file/insert.html', form=form, origin=origin, writeable=writeable)
 
 
-def save(form: FileForm, file: Entity = None, origin: Entity = None) -> str:
+def save(form: FileForm, file: Optional[Entity] = None, origin: Optional[Entity] = None) -> str:
     g.cursor.execute('BEGIN')
     try:
         log_action = 'update'

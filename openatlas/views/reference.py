@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any, Optional, Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -105,7 +105,7 @@ def reference_link_update(link_id: int, origin_id: int) -> Union[str, Response]:
 @app.route('/reference')
 @app.route('/reference/<action>/<int:id_>')
 @required_group('readonly')
-def reference_index(action: str = None, id_: int = None) -> str:
+def reference_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
     if id_ and action == 'delete':
         EntityMapper.delete(id_)
         logger.log_user(id_, 'delete')
@@ -121,7 +121,7 @@ def reference_index(action: str = None, id_: int = None) -> str:
 @app.route('/reference/insert/<code>', methods=['POST', 'GET'])
 @app.route('/reference/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def reference_insert(code: str, origin_id: int = None) -> Union[str, Response]:
+def reference_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(ReferenceForm, 'External Reference' if code == 'external_reference' else code)
     if code == 'external_reference':
@@ -154,7 +154,10 @@ def reference_update(id_: int) -> Union[str, Response]:
     return render_template('reference/update.html', form=form, reference=reference)
 
 
-def save(form: Any, reference: Entity = None, code: str = None, origin: Entity = None) -> str:
+def save(form: Any,
+         reference: Optional[Entity] = None,
+         code: Optional[str] = None,
+         origin: Optional[Entity] = None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
 

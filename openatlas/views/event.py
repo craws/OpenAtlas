@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -50,7 +50,7 @@ class EventForm(DateForm):
 @app.route('/event')
 @app.route('/event/<action>/<int:id_>')
 @required_group('readonly')
-def event_index(action: str = None, id_: int = None) -> str:
+def event_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
     if id_ and action == 'delete':
         EntityMapper.delete(id_)
         logger.log_user(id_, 'delete')
@@ -80,7 +80,7 @@ def prepare_form(form: EventForm, code: str) -> FlaskForm:
 @app.route('/event/insert/<code>', methods=['POST', 'GET'])
 @app.route('/event/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def event_insert(code: str, origin_id: int = None) -> Union[str, Response]:
+def event_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = prepare_form(build_form(EventForm, 'Event'), code)
     if origin:
@@ -172,7 +172,10 @@ def event_add_file(id_: int) -> Union[str, Response]:
     return render_template('add_file.html', entity=event, form=form)
 
 
-def save(form: FlaskForm, event: Entity = None, code: str = None, origin: Entity = None) -> str:
+def save(form: FlaskForm,
+         event: Optional[Entity] = None,
+         code: Optional[str] = None,
+         origin: Optional[Entity] = None) -> str:
     g.cursor.execute('BEGIN')
     try:
         log_action = 'insert'

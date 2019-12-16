@@ -1,3 +1,5 @@
+from typing import Optional
+
 from flask import json, session
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
@@ -19,10 +21,10 @@ class Table:
                'stratigraphic-unit': ['name', 'type', 'begin', 'end']}
 
     def __init__(self,
-                 header: list = None,  # A list of column header labels
-                 rows: list = None,  # rows containing the data
-                 order: str = None,  # Column order option
-                 defs: str = None,  # Additional definitions for DataTables
+                 header: Optional[list] = None,  # A list of column header labels
+                 rows: Optional[list] = None,  # rows containing the data
+                 order: Optional[str] = None,  # Column order option
+                 defs: Optional[str] = None,  # Additional definitions for DataTables
                  paging: bool = True) -> None:  # Whether to show pager
         self.header = header if header else []
         self.rows = rows if rows else []

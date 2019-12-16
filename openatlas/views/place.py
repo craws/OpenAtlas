@@ -1,4 +1,4 @@
-from typing import Optional as OptionalTyping, Union
+from typing import Optional, Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -7,7 +7,7 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import (BooleanField, FieldList, HiddenField, IntegerField, StringField, SubmitField,
                      TextAreaField)
-from wtforms.validators import InputRequired, Optional
+from wtforms.validators import InputRequired, Optional as OptValidator
 
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
@@ -23,7 +23,7 @@ from openatlas.views.reference import AddReferenceForm
 
 class PlaceForm(DateForm):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
-    geonames_id = IntegerField('GeoNames Id', [Optional()], description=_('tooltip geonames'))
+    geonames_id = IntegerField('GeoNames Id', [OptValidator()], description=_('tooltip geonames'))
     geonames_precision = BooleanField('exact match')
     alias = FieldList(StringField(''), description=_('tooltip alias'))
     description = TextAreaField(_('description'))
@@ -51,7 +51,7 @@ class FeatureForm(DateForm):
 @app.route('/place')
 @app.route('/place/<action>/<int:id_>')
 @required_group('readonly')
-def place_index(action: str = None, id_: int = None) -> Union[str, Response]:
+def place_index(action: Optional[str] = None, id_: Optional[int] = None) -> Union[str, Response]:
     if id_ and action == 'delete':
         entity = EntityMapper.get_by_id(id_)
         parent = None if entity.system_type == 'place' else entity.get_linked_entity('P46', True)
@@ -73,7 +73,7 @@ def place_index(action: str = None, id_: int = None) -> Union[str, Response]:
 @app.route('/place/insert', methods=['POST', 'GET'])
 @app.route('/place/insert/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def place_insert(origin_id: OptionalTyping[int] = None) -> Union[str, Response]:
+def place_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     geonames_buttons = False
     if origin and origin.system_type == 'place':
@@ -212,7 +212,9 @@ def place_update(id_: int) -> Union[str, Response]:
                            overlays=overlays, geonames_buttons=geonames_buttons)
 
 
-def save(form: DateForm, object__: Entity = None, location_: Entity = None,
+def save(form: DateForm,
+         object__: Optional[Entity] = None,
+         location_: Optional[Entity] = None,
          origin: Entity = None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'

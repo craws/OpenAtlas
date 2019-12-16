@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -29,7 +29,7 @@ class SourceForm(FlaskForm):
 @app.route('/source')
 @app.route('/source/<action>/<int:id_>')
 @required_group('readonly')
-def source_index(action: str = None, id_: int = None) -> str:
+def source_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
     if id_ and action == 'delete':
         EntityMapper.delete(id_)
         logger.log_user(id_, 'delete')
@@ -44,7 +44,7 @@ def source_index(action: str = None, id_: int = None) -> str:
 @app.route('/source/insert/<int:origin_id>', methods=['POST', 'GET'])
 @app.route('/source/insert', methods=['POST', 'GET'])
 @required_group('contributor')
-def source_insert(origin_id: int = None) -> Union[str, Response]:
+def source_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     form = build_form(SourceForm, 'Source')
     if origin:
@@ -111,7 +111,7 @@ def source_update(id_: int) -> Union[str, Response]:
     return render_template('source/update.html', form=form, source=source)
 
 
-def save(form: FlaskForm, source: Entity = None, origin: Entity = None) -> str:
+def save(form: FlaskForm, source: Optional[Entity] = None, origin: Optional[Entity] = None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
     try:

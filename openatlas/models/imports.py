@@ -24,7 +24,7 @@ class ImportMapper:
         FROM import.project p LEFT JOIN import.entity e ON p.id = e.project_id """
 
     @staticmethod
-    def insert_project(name: str, description: str = None) -> NamedTupleCursor.Record:
+    def insert_project(name: str, description: Optional[str] = None) -> NamedTupleCursor.Record:
         description = description.strip() if description else None
         sql = """
             INSERT INTO import.project (name, description) VALUES (%(name)s, %(description)s)

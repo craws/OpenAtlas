@@ -1,7 +1,7 @@
 import datetime
 import os
 from os.path import basename, splitext
-from typing import Union
+from typing import Optional, Union
 
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
@@ -89,7 +89,7 @@ def admin_map() -> Union[str, Response]:
 @app.route('/admin/check_links')
 @app.route('/admin/check_links/<check>')
 @required_group('contributor')
-def admin_check_links(check: str = None) -> str:
+def admin_check_links(check: Optional[str] = None) -> str:
     table = None
     if check:
         table = Table(['domain', 'property', 'range'])
@@ -101,7 +101,7 @@ def admin_check_links(check: str = None) -> str:
 @app.route('/admin/check_link_duplicates')
 @app.route('/admin/check_link_duplicates/<delete>')
 @required_group('contributor')
-def admin_check_link_duplicates(delete: str = None) -> Union[str, Response]:
+def admin_check_link_duplicates(delete: Optional[str] = None) -> Union[str, Response]:
     if delete:
         delete_count = str(LinkMapper.delete_link_duplicates())
         logger.log('info', 'admin', 'Deleted duplicate links: ' + delete_count)
@@ -298,7 +298,7 @@ class LogoForm(FlaskForm):
 @app.route('/admin/logo/', methods=['POST', 'GET'])
 @app.route('/admin/logo/<action>')
 @required_group('manager')
-def admin_logo(action: str = None) -> Union[str, Response]:
+def admin_logo(action: Optional[str] = None) -> Union[str, Response]:
     if action == 'remove':
         SettingsMapper.set_logo()
         return redirect(url_for('admin_logo'))

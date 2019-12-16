@@ -118,7 +118,7 @@ class MLStripper(HTMLParser):
         return ''.join(self.fed)
 
 
-def sanitize(string: str, mode: str = None) -> str:
+def sanitize(string: Optional[str], mode: Optional[str] = None) -> str:
     if mode == 'node':
         # Remove all characters from a string except letters, numbers and spaces
         return re.sub(r'([^\s\w]|_)+', '', string).strip()
@@ -130,7 +130,7 @@ def sanitize(string: str, mode: str = None) -> str:
     return re.sub('[^A-Za-z0-9]+', '', string).strip()
 
 
-def get_file_stats(path: str = app.config['UPLOAD_FOLDER_PATH']) -> dict:
+def get_file_stats(path: Optional[str] = app.config['UPLOAD_FOLDER_PATH']) -> dict:
     """ Build a dict with file ids and stats from files in given directory.
         It's much faster to do this in one call for every file."""
     file_stats = {}
@@ -150,7 +150,7 @@ def display_remove_link(url: str, name: str) -> str:
     return '<a ' + confirm + ' href="' + url + '">' + uc_first(_('remove')) + '</a>'
 
 
-def add_type_data(entity: 'Entity', data: list, location: 'Entity' = None) -> list:
+def add_type_data(entity: 'Entity', data: list, location: Optional['Entity'] = None) -> list:
     type_data: OrderedDict = OrderedDict()
     # Nodes
     if location:
@@ -197,7 +197,7 @@ def add_system_data(entity: 'Entity', data: list) -> list:
     return data
 
 
-def get_entity_data(entity: 'Entity', location: 'Entity' = None) -> list:
+def get_entity_data(entity: 'Entity', location: Optional['Entity'] = None) -> list:
     """
     Return related entity information for a table for view.
     The location parameter is for places which have a location attached.
@@ -383,8 +383,10 @@ def format_datetime(value: Any) -> str:
     return value.replace(microsecond=0).isoformat() if value else ''
 
 
-def get_profile_image_table_link(file: 'Entity', entity: 'Entity', extension: str,
-                                 profile_image_id: int = None) -> str:
+def get_profile_image_table_link(file: 'Entity',
+                                 entity: 'Entity',
+                                 extension: str,
+                                 profile_image_id: Optional[int] = None) -> str:
     if file.id == profile_image_id:
         url = url_for('file_remove_profile_image', entity_id=entity.id)
         return '<a href="' + url + '">' + uc_first(_('unset')) + '</a>'
@@ -435,7 +437,7 @@ def truncate_string(string: str, length: int = 40, span: bool = True) -> str:
     return '<span title="' + string.replace('"', '') + '">' + string[:length] + '..' + '</span>'
 
 
-def get_base_table_data(entity: 'Entity', file_stats: dict = None) -> list:
+def get_base_table_data(entity: 'Entity', file_stats: Optional[dict] = None) -> list:
     """ Returns standard table data for an entity"""
     data: list = ['<br>'.join([link(entity)] + [
         truncate_string(alias) for alias in entity.aliases.values()])]
@@ -472,7 +474,7 @@ def was_modified(form: FlaskForm, entity: 'Entity') -> bool:  # pragma: no cover
     return True
 
 
-def format_entry_begin(entry: 'Entity', object_: 'Entity' = None) -> str:
+def format_entry_begin(entry: 'Entity', object_: Optional['Entity'] = None) -> str:
     html = link(object_) if object_ else ''
     if entry.begin_from:
         html += ', ' if html else ''
@@ -485,7 +487,7 @@ def format_entry_begin(entry: 'Entity', object_: 'Entity' = None) -> str:
     return html
 
 
-def format_entry_end(entry: 'Entity', object_: 'Entity' = None) -> str:
+def format_entry_end(entry: 'Entity', object_: Optional['Entity'] = None) -> str:
     html = link(object_) if object_ else ''
     if entry.end_from:
         html += ', ' if html else ''

@@ -30,8 +30,11 @@ def get_link_type(form: Any) -> Optional_Type[Entity]:
     return None
 
 
-def build_form(form: Any, form_name: str, selected_object: Union[Entity, Link] = None,
-               request_origin: Request = None, entity2: Entity = None) -> Any:
+def build_form(form: Any,
+               form_name: str,
+               selected_object: Union[Entity, Link, None] = None,
+               request_origin: Optional[Request] = None,
+               entity2: Optional[Entity] = None) -> Any:
 
     def add_value_type_fields(subs: list) -> None:
         for sub_id in subs:
