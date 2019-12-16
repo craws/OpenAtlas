@@ -21,7 +21,7 @@ from openatlas.util.util import (convert_size, format_date, get_file_path, get_f
 from openatlas.views.reference import AddReferenceForm
 
 
-class FileForm(FlaskForm):
+class FileForm(FlaskForm):  # type: ignore
     file = FileField(_('file'), [InputRequired()])
     name = StringField(_('name'), [InputRequired()])
     description = TextAreaField(_('description'))

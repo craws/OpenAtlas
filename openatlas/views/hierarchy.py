@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 
 from flask import abort, flash, g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -17,7 +17,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import required_group, sanitize, uc_first
 
 
-class HierarchyForm(FlaskForm):
+class HierarchyForm(FlaskForm):  # type: ignore
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     multiple = BooleanField(_('multiple'), description=_('tooltip hierarchy multiple'))
     forms = SelectMultipleField(_('forms'),
@@ -104,7 +104,7 @@ def hierarchy_delete(id_: int) -> Response:
     return redirect(url_for('node_index'))
 
 
-def save(form: FlaskForm, node_: Entity = None, value_type: bool = False) -> Entity:
+def save(form: FlaskForm, node_: Optional[Entity] = None, value_type: bool = False) -> Entity:
     g.cursor.execute('BEGIN')
     try:
         if node_:

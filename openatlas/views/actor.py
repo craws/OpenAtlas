@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import Union, Optional
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _

@@ -15,7 +15,7 @@ from openatlas.models.entity import Entity, EntityMapper
 from openatlas.util.util import required_group
 
 
-class TranslationForm(FlaskForm):
+class TranslationForm(FlaskForm):  # type: ignore
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     description = TextAreaField(_('content'))
     save = SubmitField(_('insert'))

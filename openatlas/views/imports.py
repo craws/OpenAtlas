@@ -17,7 +17,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import format_date, is_float, link, required_group, truncate_string
 
 
-class ProjectForm(FlaskForm):
+class ProjectForm(FlaskForm):  # type: ignore
     project_id: Optional[int] = None
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     description = TextAreaField(_('description'))
@@ -91,7 +91,7 @@ def import_project_delete(id_: int) -> Response:
     return redirect(url_for('import_index'))
 
 
-class ImportForm(FlaskForm):
+class ImportForm(FlaskForm):  # type: ignore
     file = FileField(_('file'), [InputRequired()])
     preview = BooleanField(_('preview only'), default=True)
     duplicate = BooleanField(_('check for duplicates'), default=True)

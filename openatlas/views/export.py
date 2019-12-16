@@ -15,11 +15,11 @@ from openatlas.util.table import Table
 from openatlas.util.util import convert_size, is_authorized, required_group, uc_first
 
 
-class ExportSqlForm(FlaskForm):
+class ExportSqlForm(FlaskForm):  # type: ignore
     save = SubmitField(uc_first(_('export SQL')))
 
 
-class ExportCsvForm(FlaskForm):
+class ExportCsvForm(FlaskForm):  # type: ignore
     zip = BooleanField(_('export as ZIP and add info file'), default=True)
     timestamps = BooleanField('created and modified dates', default=False)
     gis_format = SelectField(_('GIS format'), choices=[

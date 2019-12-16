@@ -26,7 +26,7 @@ from openatlas.util.util import (convert_size, format_date, format_datetime, get
                                  uc_first)
 
 
-class GeneralForm(FlaskForm):
+class GeneralForm(FlaskForm):  # type: ignore
     site_name = StringField(uc_first(_('site name')))
     site_header = StringField(uc_first(_('site header')))
     default_language = SelectField(uc_first(_('default language')),
@@ -57,7 +57,7 @@ def admin_index() -> str:
     return render_template('admin/index.html', writeable_dirs=writeable_dirs)
 
 
-class MapForm(FlaskForm):
+class MapForm(FlaskForm):  # type: ignore
     map_cluster_enabled = BooleanField(uc_first(_('use cluster')))
     map_cluster_max_radius = IntegerField('maxClusterRadius')
     map_cluster_disable_at_zoom = IntegerField('disableClusteringAtZoom')
@@ -140,7 +140,7 @@ def admin_delete_single_type_duplicate(entity_id: int, node_id: int) -> Response
     return redirect(url_for('admin_check_link_duplicates'))
 
 
-class FileForm(FlaskForm):
+class FileForm(FlaskForm):  # type: ignore
     file_upload_max_size = IntegerField(_('max file size in MB'))
     file_upload_allowed_extension = StringField('allowed file extensions')
     profile_image_width = IntegerField(_('profile image width in pixel'))
@@ -169,7 +169,7 @@ def admin_file() -> Union[str, Response]:
     return render_template('admin/file.html', form=form)
 
 
-class SimilarForm(FlaskForm):
+class SimilarForm(FlaskForm):  # type: ignore
     classes = SelectField(_('class'), choices=[])
     ratio = IntegerField(default=100)
     apply = SubmitField(_('search'))
@@ -290,7 +290,7 @@ def admin_orphans() -> str:
         return render_template('admin/orphans.html', tables=tables)
 
 
-class LogoForm(FlaskForm):
+class LogoForm(FlaskForm):  # type: ignore
     file = TableField(_('file'), [InputRequired()])
     save = SubmitField(uc_first(_('change logo')))
 
@@ -342,7 +342,7 @@ def admin_file_delete(filename: str) -> Response:  # pragma: no cover
     return redirect(url_for('admin_orphans') + '#tab-orphaned-files')
 
 
-class LogForm(FlaskForm):
+class LogForm(FlaskForm):  # type: ignore
     limit = SelectField(_('limit'), choices=((0, _('all')), (100, 100), (500, 500)), default=100)
     priority = SelectField(_('priority'), choices=(list(app.config['LOG_LEVELS'].items())),
                            default=6)
@@ -376,7 +376,7 @@ def admin_log_delete() -> Response:
     return redirect(url_for('admin_log'))
 
 
-class NewsLetterForm(FlaskForm):
+class NewsLetterForm(FlaskForm):  # type: ignore
     subject = StringField('', [InputRequired()], render_kw={'placeholder': _('subject'),
                                                             'autofocus': True})
     body = TextAreaField('', [InputRequired()], render_kw={'placeholder': _('content')})
@@ -411,7 +411,7 @@ def admin_newsletter() -> Union[str, Response]:
     return render_template('admin/newsletter.html', form=form, table=table)
 
 
-class TestMailForm(FlaskForm):
+class TestMailForm(FlaskForm):  # type: ignore
     receiver = StringField(_('test mail receiver'), [InputRequired(), Email()])
     send = SubmitField(_('send test mail'))
 
@@ -488,7 +488,7 @@ def admin_general_update() -> Union[str, Response]:
     return render_template('admin/general_update.html', form=form, settings=session['settings'])
 
 
-class MailForm(FlaskForm):
+class MailForm(FlaskForm):  # type: ignore
     mail = BooleanField(uc_first(_('mail')))
     mail_transport_username = StringField(uc_first(_('mail transport username')))
     mail_transport_host = StringField(uc_first(_('mail transport host')))

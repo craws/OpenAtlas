@@ -29,7 +29,7 @@ class UserTests(TestBaseCase):
                  'continue_': 'yes',
                  'send_info': ''}
 
-        with app.app_context():
+        with app.app_context():  # type: ignore
             rv = self.app.get(url_for('user_insert'), follow_redirects=True)
             assert b'Password' in rv.data
             self.app.post('/login', data={'username': 'Editor', 'password': 'test'})
@@ -38,7 +38,7 @@ class UserTests(TestBaseCase):
             self.app.get(url_for('logout'), follow_redirects=True)
             self.login()
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 logged_in_user = UserMapper.get_by_username('Alice')
                 if not logged_in_user:
                     abort(404)  # pragma: no cover

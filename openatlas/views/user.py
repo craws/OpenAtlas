@@ -18,7 +18,7 @@ from openatlas.util.util import (format_date, is_authorized, link, required_grou
                                  uc_first)
 
 
-class UserForm(FlaskForm):
+class UserForm(FlaskForm):  # type: ignore
     user_id: Optional[int] = None
     active = BooleanField(_('active'), default=True)
     username = StringField(_('username'), [InputRequired()], render_kw={'autofocus': True})
@@ -57,7 +57,7 @@ class UserForm(FlaskForm):
         return valid
 
 
-class ActivityForm(FlaskForm):
+class ActivityForm(FlaskForm):  # type: ignore
     action_choices = (('all', _('all')), ('insert', _('insert')), ('update', _('update')),
                       ('delete', _('delete')))
     limit = SelectField(_('limit'), choices=((0, _('all')), (100, 100), (500, 500)),

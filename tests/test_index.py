@@ -10,7 +10,7 @@ from tests.base import TestBaseCase
 class IndexTests(TestBaseCase):
 
     def test_index(self) -> None:
-        with app.app_context():
+        with app.app_context():  # type: ignore
             rv = self.app.get('/')
             assert b'Overview' in rv.data
             rv = self.app.get('/some_missing_site')
@@ -65,7 +65,7 @@ class IndexTests(TestBaseCase):
             assert b'teapot' in rv.data  # Id not found error
 
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 actor = EntityMapper.insert('E21', 'Game master')
 
             rv = self.app.get(url_for('event_update', id_=actor.id), follow_redirects=True)

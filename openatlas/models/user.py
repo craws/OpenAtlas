@@ -16,7 +16,7 @@ from openatlas.models.entity import Entity
 from openatlas.util.util import is_authorized
 
 
-class User(UserMixin):
+class User(UserMixin):  # type: ignore
 
     def __init__(self,
                  row: NamedTupleCursor.Record = None,

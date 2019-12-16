@@ -96,7 +96,10 @@ class Entity:
              type_id: Optional[int] = None) -> List[int]:
         return LinkMapper.insert(self, code, range_, description, inverse, type_id)
 
-    def link_string(self, code: str, range_: str, description: str = None,
+    def link_string(self,
+                    code: str,
+                    range_: str,
+                    description: Optional[str] = None,
                     inverse: bool = False) -> List[int]:
         # range_ string from a form, can be empty, an int or an int list presentation
         # e.g. '', '1', '[]', '[1, 2]'
@@ -271,8 +274,10 @@ class EntityMapper:
         return entities
 
     @staticmethod
-    def insert(code: str, name: str, system_type: str = None,
-               description: str = None) -> Entity:
+    def insert(code: str,
+               name: str,
+               system_type: Optional[str] = None,
+               description: Optional[str] = None) -> Entity:
         from openatlas.util.util import sanitize
         from openatlas import logger
         if not name:  # pragma: no cover
@@ -290,8 +295,10 @@ class EntityMapper:
         return EntityMapper.get_by_id(g.cursor.fetchone()[0])
 
     @staticmethod
-    def get_by_id(entity_id: int, nodes: bool = False, aliases: bool = False,
-                  view_name: str = None) -> Entity:
+    def get_by_id(entity_id: int,
+                  nodes: bool = False,
+                  aliases: bool = False,
+                  view_name: Optional[str] = None) -> Entity:
         from openatlas import logger
         if entity_id in g.nodes:  # pragma: no cover, just in case a node is requested
             return g.nodes[entity_id]

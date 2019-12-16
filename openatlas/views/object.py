@@ -16,7 +16,7 @@ from openatlas.util.util import (get_base_table_data, link, required_group, trun
                                  was_modified)
 
 
-class InformationCarrierForm(FlaskForm):
+class InformationCarrierForm(FlaskForm):  # type: ignore
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))

@@ -8,10 +8,10 @@ from tests.base import TestBaseCase
 class NoteTest(TestBaseCase):
 
     def test_note(self) -> None:
-        with app.app_context():
+        with app.app_context():  # type: ignore
             self.login()
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 actor = EntityMapper.insert('E21', 'Ripley')
             rv = self.app.get(url_for('note_insert', entity_id=actor.id))
             assert b'Note *' in rv.data

@@ -27,7 +27,7 @@ babel = Babel(app)
 debug_model: Dict = {}
 
 
-class GlobalSearchForm(FlaskForm):
+class GlobalSearchForm(FlaskForm):  # type: ignore
     term = StringField('', render_kw={"placeholder": _('search term')})
     search = SubmitField(_('search'))
 

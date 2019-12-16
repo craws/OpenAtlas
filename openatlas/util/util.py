@@ -328,7 +328,7 @@ def add_dates_to_form(form: Any, for_person: bool = False) -> str:
     return html
 
 
-def required_group(group):  # type: ignore
+def required_group(group: str):  # type: ignore
     def wrapper(f):  # type: ignore
         @wraps(f)
         def wrapped(*args, **kwargs):  # type: ignore

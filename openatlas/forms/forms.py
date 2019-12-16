@@ -84,7 +84,9 @@ def build_form(form: Any,
     return form_instance
 
 
-def build_node_form(form: Any, node_: Entity, request_origin: Request = None) -> FlaskForm:
+def build_node_form(form: Any,
+                    node_: Entity,
+                    request_origin: Optional[Request] = None) -> FlaskForm:
     if not request_origin:
         root = node_
         node = None
@@ -124,7 +126,7 @@ def build_node_form(form: Any, node_: Entity, request_origin: Request = None) ->
     return form_instance
 
 
-class TreeSelect(HiddenInput):
+class TreeSelect(HiddenInput):  # type: ignore
 
     def __call__(self, field: TreeField, **kwargs: Any) -> TreeSelect:
         from openatlas.models.node import NodeMapper
@@ -180,11 +182,11 @@ class TreeSelect(HiddenInput):
         return super(TreeSelect, self).__call__(field, **kwargs) + html
 
 
-class TreeField(HiddenField):
+class TreeField(HiddenField):  # type: ignore
     widget = TreeSelect()
 
 
-class TreeMultiSelect(HiddenInput):
+class TreeMultiSelect(HiddenInput):  # type: ignore
 
     def __call__(self, field: TreeField, **kwargs: Any) -> TreeMultiSelect:
         selection = ''
@@ -232,11 +234,11 @@ class TreeMultiSelect(HiddenInput):
         return super(TreeMultiSelect, self).__call__(field, **kwargs) + html
 
 
-class TreeMultiField(HiddenField):
+class TreeMultiField(HiddenField):  # type: ignore
     widget = TreeMultiSelect()
 
 
-class TableSelect(HiddenInput):
+class TableSelect(HiddenInput):  # type: ignore
 
     def __call__(self, field: TableField, **kwargs: Any) -> TableSelect:
         file_stats = None
@@ -295,11 +297,11 @@ class TableSelect(HiddenInput):
         return super(TableSelect, self).__call__(field, **kwargs) + html
 
 
-class TableField(HiddenField):
+class TableField(HiddenField):  # type: ignore
     widget = TableSelect()
 
 
-class TableMultiSelect(HiddenInput):
+class TableMultiSelect(HiddenInput):  # type: ignore
     """ Table with checkboxes used in a popup for forms."""
 
     def __call__(self, field: TableField, **kwargs: Any) -> TableMultiSelect:
@@ -350,11 +352,11 @@ class TableMultiSelect(HiddenInput):
         return super(TableMultiSelect, self).__call__(field, **kwargs) + html
 
 
-class TableMultiField(HiddenField):
+class TableMultiField(HiddenField):  # type: ignore
     widget = TableMultiSelect()
 
 
-class ValueFloatField(FloatField):
+class ValueFloatField(FloatField):  # type: ignore
     pass
 
 

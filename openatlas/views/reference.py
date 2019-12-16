@@ -19,7 +19,7 @@ from openatlas.util.util import (get_base_table_data, link, required_group, trun
                                  uc_first, was_modified)
 
 
-class ReferenceForm(FlaskForm):
+class ReferenceForm(FlaskForm):  # type: ignore
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
@@ -28,37 +28,37 @@ class ReferenceForm(FlaskForm):
     opened = HiddenField()
 
 
-class AddReferenceForm(FlaskForm):
+class AddReferenceForm(FlaskForm):  # type: ignore
     reference = TableField(_('reference'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
 
-class AddSourceForm(FlaskForm):
+class AddSourceForm(FlaskForm):  # type: ignore
     source = TableField(_('source'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
 
-class AddEventForm(FlaskForm):
+class AddEventForm(FlaskForm):  # type: ignore
     event = TableField(_('event'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
 
-class AddActorForm(FlaskForm):
+class AddActorForm(FlaskForm):  # type: ignore
     actor = TableField(_('actor'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
 
-class AddPlaceForm(FlaskForm):
+class AddPlaceForm(FlaskForm):  # type: ignore
     place = TableField(_('place'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))
 
 
-class AddFileForm(FlaskForm):
+class AddFileForm(FlaskForm):  # type: ignore
     file = TableField(_('file'), [InputRequired()])
     page = StringField(_('page'))
     save = SubmitField(_('insert'))

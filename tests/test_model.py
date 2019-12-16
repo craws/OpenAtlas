@@ -8,7 +8,7 @@ from tests.base import TestBaseCase
 class ModelTests(TestBaseCase):
 
     def test_model(self) -> None:
-        with app.app_context():
+        with app.app_context():  # type: ignore
             rv = self.app.get(url_for('model_index'))
             assert b'Browse' in rv.data
             rv = self.app.get(url_for('class_index'))
@@ -27,7 +27,7 @@ class ModelTests(TestBaseCase):
 
             self.login()
             with app.test_request_context():  # Insert data to display in network view
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 actor = EntityMapper.insert('E21', 'King Arthur')
                 event = EntityMapper.insert('E7', 'Battle of Camlann')
                 source = EntityMapper.insert('E33', 'Tha source')

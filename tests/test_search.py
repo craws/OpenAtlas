@@ -10,7 +10,7 @@ class SearchTest(TestBaseCase):
     def test_search(self) -> None:
         self.login()
         with app.test_request_context():
-            app.preprocess_request()
+            app.preprocess_request()  # type: ignore
             person = EntityMapper.insert('E21', 'Waldo')
             person.begin_to = '2018-01-01'
             person.update()
@@ -18,7 +18,7 @@ class SearchTest(TestBaseCase):
             object_ = EntityMapper.insert('E18', 'Waldorf', 'place')
             object_.link('P1', EntityMapper.insert('E41', 'Waldorf alias'))
             EntityMapper.insert('E21', 'Waldo without date')
-        with app.app_context():
+        with app.app_context():  # type: ignore
             self.app.post(url_for('search_index'), data={'global-term': ''})
             rv = self.app.post(url_for('search_index'), data={'global-term': 'wal',
                                                               'include_dateless': True,

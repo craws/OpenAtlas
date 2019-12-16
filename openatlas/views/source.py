@@ -16,7 +16,7 @@ from openatlas.util.util import get_base_table_data, link, required_group, uc_fi
 from openatlas.views.reference import AddReferenceForm
 
 
-class SourceForm(FlaskForm):
+class SourceForm(FlaskForm):  # type: ignore
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     information_carrier = TableMultiField()
     description = TextAreaField(_('content'))

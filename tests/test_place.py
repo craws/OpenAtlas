@@ -11,12 +11,12 @@ from tests.base import TestBaseCase
 class PlaceTest(TestBaseCase):
 
     def test_place(self) -> None:
-        with app.app_context():
+        with app.app_context():  # type: ignore
             self.login()
             rv = self.app.get(url_for('place_insert'))
             assert b'+ Place' in rv.data
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 unit_node = NodeMapper.get_hierarchy_by_name('Administrative Unit')
                 unit_sub1 = g.nodes[unit_node.subs[0]]
                 unit_sub2 = g.nodes[unit_node.subs[1]]
@@ -56,7 +56,7 @@ class PlaceTest(TestBaseCase):
                                follow_redirects=True)
             assert b'Necronomicon' in rv.data
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 places = EntityMapper.get_by_system_type('place')
                 place = places[0]
                 place2 = places[1]
@@ -93,7 +93,7 @@ class PlaceTest(TestBaseCase):
             assert b'Val-hall' in rv.data
 
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 event = EntityMapper.insert('E8', 'Valhalla rising')
                 event.link('P7', location)
                 event.link('P24', location)
@@ -119,7 +119,7 @@ class PlaceTest(TestBaseCase):
                     data={'name': 'X-Files', 'file': img}, follow_redirects=True)
             assert b'An entry has been created' in rv.data
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 file = EntityMapper.get_by_system_type('file')[0]
                 link_id = LinkMapper.insert(file, 'P67', place)[0]
             rv = self.app.get(url_for('overlay_insert', image_id=file.id, place_id=place.id,
@@ -132,7 +132,7 @@ class PlaceTest(TestBaseCase):
             assert b'Edit' in rv.data
 
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 overlay = OverlayMapper.get_by_object(place)
                 overlay_id = overlay[list(overlay.keys())[0]].id
             rv = self.app.get(url_for('overlay_update', id_=overlay_id, place_id=place.id,
@@ -184,7 +184,7 @@ class PlaceTest(TestBaseCase):
             assert b'Entities where updated' in rv.data
 
             # Subunits
-            with app.app_context():
+            with app.app_context():  # type: ignore
                 self.app.get(url_for('place_insert', origin_id=place.id))
                 rv = self.app.post(url_for('place_insert', origin_id=place.id),
                                    data={'name': "It's not a bug, it's a feature!"})

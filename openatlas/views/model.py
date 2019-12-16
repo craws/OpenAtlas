@@ -11,7 +11,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import link, required_group
 
 
-class LinkCheckForm(FlaskForm):
+class LinkCheckForm(FlaskForm):  # type: ignore
     domain = HiddenField()
     property = HiddenField()
     range = HiddenField()
@@ -121,7 +121,7 @@ def property_view(code: str) -> str:
     return render_template('model/property_view.html', property=property_, tables=tables, info=info)
 
 
-class NetworkForm(FlaskForm):
+class NetworkForm(FlaskForm):  # type: ignore
     width = IntegerField(default=1200, validators=[InputRequired()])
     height = IntegerField(default=600, validators=[InputRequired()])
     charge = StringField(default=-800, validators=[InputRequired()])

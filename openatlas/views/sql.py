@@ -19,7 +19,7 @@ def sql_index() -> str:
     return render_template('sql/index.html')
 
 
-class SqlForm(FlaskForm):
+class SqlForm(FlaskForm):  # type: ignore
     statement = TextAreaField(_('statement'), [InputRequired()])
     save = SubmitField(_('execute'))
 

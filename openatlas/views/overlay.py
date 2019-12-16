@@ -15,7 +15,7 @@ from openatlas.models.overlay import OverlayMapper
 from openatlas.util.util import required_group, uc_first
 
 
-class OverlayForm(FlaskForm):
+class OverlayForm(FlaskForm):  # type: ignore
     top_left_easting = FloatField('', [InputRequired()], render_kw={'autofocus': True})
     top_left_northing = FloatField('', [InputRequired()])
     bottom_right_easting = FloatField('', [InputRequired()])
