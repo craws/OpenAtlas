@@ -29,14 +29,6 @@ folder but aren't fully tested and still experimental.
 ### gettext
 
     # apt-get install gettext
-    
-### install calmjs and frontend libraries
-
-    # cd openatlas/static
-    # pip install -e ./
-    # calmjs npm --install openatlas
-    
-
 
 ## Installation
 
@@ -45,6 +37,12 @@ folder but aren't fully tested and still experimental.
 Copy the files to /var/www/your_site_name or clone OpenAtlas from GitHub
 
     $ git clone https://github.com/craws/OpenAtlas.git
+
+### Frontend libraries
+
+    # cd openatlas/static
+    # pip3 install -e ./
+    # calmjs npm --install openatlas
 
 ### Database
 
