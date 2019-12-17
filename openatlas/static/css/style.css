@@ -78,7 +78,7 @@ input[type="text"].data-huebee {
     border-radius:3px;
 }
 
-#disk_size .ui-widget-header {
+#disk_size {
     margin: 0;
     border-radius: 0;
 }
@@ -444,56 +444,9 @@ input[type=submit] {
     border:0;
 }
 
-.ui-tabs .ui-tabs-nav li.ui-tabs-active a , .ui-widget-content a{
-    cursor: pointer;
-}
-
-.ui-tabs-vertical .ui-tabs-nav {
-    float: left;
-}
-
-.ui-tabs-vertical .ui-tabs-nav li {
-    float: none;
-    width: 100%;
-}
-
-#content .ui-tabs-vertical .ui-tabs-nav li a {
+#content {
     float: none;
     display: block;
-}
-
-.ui-tabs-vertical .ui-tabs-panel {
-    float: right;
-}
-
-.ui-tabs .ui-tabs-nav li {
-    margin: 1px;
-}
-
-.tabs-container {
-    display: inline-block;
-}
-
-.tabs-container .ui-widget-header, .ui-widget-header {
-    border: none;
-    background: none;
-    background-color: inherit;
-}
-
-.tabs-container .ui-corner-all, .ui-corner-all {
-    border-radius: 0;
-}
-
-.tabs-container.ui-widget-content {
-    border: none;
-}
-
-.ui-tabs {
-    padding: 0;
-}
-
-.ui-tabs .ui-tabs-panel {
-    padding: 1em;
 }
 
 .tabs-container .pagesize, .overlay-container .pagesize, a.button {
@@ -540,10 +493,4 @@ div.data-table div.display-none {
 /*bootstrap mods*/
 .navbar {
     width: 100%;
-}
-
-/* Table Headers */
-
-#overview_table_wrapper > * , #overview_table_filter, #overview_table_filter > * {
-    box-sizing: content-box!important;
 }
