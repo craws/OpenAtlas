@@ -33,7 +33,7 @@ folder but aren't fully tested and still experimental.
 ### install calmjs and frontend libraries
 
     # cd openatlas/static
-    # pip install -e ./install
+    # pip install -e ./
     # calmjs npm --install openatlas
     
 
