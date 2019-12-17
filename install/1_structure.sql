@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 9.6.15
--- Dumped by pg_dump version 9.6.15
+-- Dumped from database version 11.5 (Debian 11.5-1+deb10u1)
+-- Dumped by pg_dump version 11.5 (Debian 11.5-1+deb10u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -37,6 +37,7 @@ ALTER TABLE IF EXISTS ONLY model.property_i18n DROP CONSTRAINT IF EXISTS propert
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_domain_class_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_type_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_range_id_fkey;
+ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_property_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_domain_id_fkey;
 ALTER TABLE IF EXISTS ONLY model.entity DROP CONSTRAINT IF EXISTS entity_class_code_fkey;
 ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_code_fkey;
@@ -98,7 +99,7 @@ ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS en
 ALTER TABLE IF EXISTS ONLY web.entity_profile_image DROP CONSTRAINT IF EXISTS entity_profile_image_entity_id_key;
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_pkey;
 ALTER TABLE IF EXISTS ONLY model.property_inheritance DROP CONSTRAINT IF EXISTS property_inheritance_pkey;
-ALTER TABLE IF EXISTS ONLY model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property_code_language_code_attribute_key;
+ALTER TABLE IF EXISTS ONLY model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_property_code_language_code_key;
 ALTER TABLE IF EXISTS ONLY model.property_i18n DROP CONSTRAINT IF EXISTS property_i18n_pkey;
 ALTER TABLE IF EXISTS ONLY model.property DROP CONSTRAINT IF EXISTS property_code_key;
 ALTER TABLE IF EXISTS ONLY model.link DROP CONSTRAINT IF EXISTS link_pkey;
@@ -108,7 +109,7 @@ ALTER TABLE IF EXISTS ONLY model.class DROP CONSTRAINT IF EXISTS class_name_key;
 ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_super_id_sub_id_key;
 ALTER TABLE IF EXISTS ONLY model.class_inheritance DROP CONSTRAINT IF EXISTS class_inheritance_pkey;
 ALTER TABLE IF EXISTS ONLY model.class_i18n DROP CONSTRAINT IF EXISTS class_i18n_pkey;
-ALTER TABLE IF EXISTS ONLY model.class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_language_code_attribute_key;
+ALTER TABLE IF EXISTS ONLY model.class_i18n DROP CONSTRAINT IF EXISTS class_i18n_class_code_language_code_key;
 ALTER TABLE IF EXISTS ONLY model.class DROP CONSTRAINT IF EXISTS class_code_key;
 ALTER TABLE IF EXISTS ONLY import.project DROP CONSTRAINT IF EXISTS project_pkey;
 ALTER TABLE IF EXISTS ONLY import.project DROP CONSTRAINT IF EXISTS project_name_key;
@@ -521,7 +522,8 @@ CREATE TABLE model.class (
     code text NOT NULL,
     name text NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
+    modified timestamp without time zone,
+    comment text
 );
 
 
@@ -549,7 +551,6 @@ CREATE TABLE model.class_i18n (
     id integer NOT NULL,
     class_code text NOT NULL,
     language_code text NOT NULL,
-    attribute text NOT NULL,
     text text NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified time without time zone
@@ -737,7 +738,8 @@ CREATE TABLE model.property (
     name text NOT NULL,
     name_inverse text,
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
+    modified timestamp without time zone,
+    comment text
 );
 
 
@@ -751,10 +753,10 @@ CREATE TABLE model.property_i18n (
     id integer NOT NULL,
     property_code text NOT NULL,
     language_code text NOT NULL,
-    attribute text NOT NULL,
     text text NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,
-    modified timestamp without time zone
+    modified timestamp without time zone,
+    text_inverse text
 );
 
 
@@ -1653,11 +1655,11 @@ ALTER TABLE ONLY model.class
 
 
 --
--- Name: class_i18n class_i18n_class_code_language_code_attribute_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: class_i18n class_i18n_class_code_language_code_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY model.class_i18n
-    ADD CONSTRAINT class_i18n_class_code_language_code_attribute_key UNIQUE (class_code, language_code, attribute);
+    ADD CONSTRAINT class_i18n_class_code_language_code_key UNIQUE (class_code, language_code);
 
 
 --
@@ -1733,11 +1735,11 @@ ALTER TABLE ONLY model.property_i18n
 
 
 --
--- Name: property_i18n property_i18n_property_code_language_code_attribute_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
+-- Name: property_i18n property_i18n_property_code_language_code_key; Type: CONSTRAINT; Schema: model; Owner: openatlas
 --
 
 ALTER TABLE ONLY model.property_i18n
-    ADD CONSTRAINT property_i18n_property_code_language_code_attribute_key UNIQUE (property_code, language_code, attribute);
+    ADD CONSTRAINT property_i18n_property_code_language_code_key UNIQUE (property_code, language_code);
 
 
 --
@@ -2203,6 +2205,14 @@ ALTER TABLE ONLY model.entity
 
 ALTER TABLE ONLY model.link
     ADD CONSTRAINT link_domain_id_fkey FOREIGN KEY (domain_id) REFERENCES model.entity(id) ON UPDATE CASCADE ON DELETE CASCADE;
+
+
+--
+-- Name: link link_property_code_fkey; Type: FK CONSTRAINT; Schema: model; Owner: openatlas
+--
+
+ALTER TABLE ONLY model.link
+    ADD CONSTRAINT link_property_code_fkey FOREIGN KEY (property_code) REFERENCES model.property(code) ON UPDATE CASCADE ON DELETE CASCADE;
 
 
 --

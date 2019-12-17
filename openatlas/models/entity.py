@@ -15,7 +15,7 @@ from werkzeug.exceptions import abort
 from openatlas import app
 from openatlas.models.date import DateMapper
 from openatlas.models.link import LinkMapper
-from openatlas.util.util import print_file_extension, uc_first, is_authorized
+from openatlas.util.util import is_authorized, print_file_extension, uc_first
 
 
 class Entity:
@@ -88,11 +88,18 @@ class Entity:
                             nodes: bool = False) -> List[Entity]:
         return LinkMapper.get_linked_entities(self.id, code, inverse=inverse, nodes=nodes)
 
-    def link(self, code: str, range_: Union[Entity, List[Entity]], description: str = None,
-             inverse: bool = False, type_id: int = None) -> List[int]:
+    def link(self,
+             code: str,
+             range_: Union[Entity, List[Entity]],
+             description: Optional[str] = None,
+             inverse: bool = False,
+             type_id: Optional[int] = None) -> List[int]:
         return LinkMapper.insert(self, code, range_, description, inverse, type_id)
 
-    def link_string(self, code: str, range_: str, description: str = None,
+    def link_string(self,
+                    code: str,
+                    range_: str,
+                    description: Optional[str] = None,
                     inverse: bool = False) -> List[int]:
         # range_ string from a form, can be empty, an int or an int list presentation
         # e.g. '', '1', '[]', '[1, 2]'
@@ -267,8 +274,10 @@ class EntityMapper:
         return entities
 
     @staticmethod
-    def insert(code: str, name: str, system_type: str = None,
-               description: str = None) -> Entity:
+    def insert(code: str,
+               name: str,
+               system_type: Optional[str] = None,
+               description: Optional[str] = None) -> Entity:
         from openatlas.util.util import sanitize
         from openatlas import logger
         if not name:  # pragma: no cover
@@ -278,15 +287,18 @@ class EntityMapper:
             INSERT INTO model.entity (name, system_type, class_code, description)
             VALUES (%(name)s, %(system_type)s, %(code)s, %(description)s)
             RETURNING id;"""
-        params = {'name': str(name).strip(), 'code': code,
+        params = {'name': str(name).strip(),
+                  'code': code,
                   'system_type': system_type.strip() if system_type else None,
                   'description': sanitize(description, 'description') if description else None}
         g.execute(sql, params)
         return EntityMapper.get_by_id(g.cursor.fetchone()[0])
 
     @staticmethod
-    def get_by_id(entity_id: int, nodes: bool = False, aliases: bool = False,
-                  view_name: str = None) -> Entity:
+    def get_by_id(entity_id: int,
+                  nodes: bool = False,
+                  aliases: bool = False,
+                  view_name: Optional[str] = None) -> Entity:
         from openatlas import logger
         if entity_id in g.nodes:  # pragma: no cover, just in case a node is requested
             return g.nodes[entity_id]

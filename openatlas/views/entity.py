@@ -81,20 +81,23 @@ def actor_view(actor: Entity) -> str:
     objects = []
     for link_ in event_links:
         event = link_.domain
-        place = event.get_linked_entity('P7')
+        places = event.get_linked_entities(['P7', 'P26', 'P27'])
         link_.object_ = None
-        if place:
+        for place in places:
             object_ = place.get_linked_entity('P53', True)
             objects.append(object_)
-            link_.object_ = object_  # May be used later for first/last appearance info
+            link_.object_ = object_  # Needed later for first/last appearance info
         first = link_.first
         if not link_.first and event.first:
             first = '<span class="inactive" style="float:right;">' + event.first + '</span>'
         last = link_.last
         if not link_.last and event.last:
             last = '<span class="inactive" style="float:right;">' + event.last + '</span>'
-        data = ([link(event), g.classes[event.class_.code].name,
-                 link_.type.name if link_.type else '', first, last,
+        data = ([link(event),
+                 g.classes[event.class_.code].name,
+                 link_.type.name if link_.type else '',
+                 first,
+                 last,
                  truncate_string(link_.description)])
         if is_authorized('contributor'):
             update_url = url_for('involvement_update', id_=link_.id, origin_id=actor.id)
@@ -173,8 +176,9 @@ def actor_view(actor: Entity) -> str:
                 data.append(display_remove_link(unlink_url, link_.range.name))
             tables['member'].rows.append(data)
     gis_data = GisMapper.get_all(objects) if objects else None
-    if gis_data and gis_data['gisPointSelected'] == '[]':
-        gis_data = None
+    if gis_data:
+        if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]':
+            gis_data = None
     return render_template('actor/view.html', actor=actor, info=info, tables=tables,
                            gis_data=gis_data, profile_image_id=profile_image_id)
 

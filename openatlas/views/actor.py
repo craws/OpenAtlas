@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Union, Optional
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -33,7 +33,7 @@ class ActorForm(DateForm):
 @app.route('/actor')
 @app.route('/actor/<action>/<int:id_>')
 @required_group('readonly')
-def actor_index(action: str = None, id_: int = None) -> str:
+def actor_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
     if id_ and action == 'delete':
         EntityMapper.delete(id_)
         logger.log_user(id_, 'delete')
@@ -50,7 +50,7 @@ def actor_index(action: str = None, id_: int = None) -> str:
 @app.route('/actor/insert/<code>', methods=['POST', 'GET'])
 @app.route('/actor/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def actor_insert(code: str, origin_id: int = None) -> Union[str, Response]:
+def actor_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = EntityMapper.get_by_id(origin_id) if origin_id else None
     code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
     form = build_form(ActorForm, code_class[code])
@@ -130,8 +130,10 @@ def actor_add_file(id_: int) -> Union[str, Response]:
     return render_template('add_file.html', entity=actor, form=form)
 
 
-def save(form: ActorForm, actor: Entity = None, code: str = '',
-         origin: Entity = None) -> Union[str, Response]:
+def save(form: ActorForm,
+         actor: Optional[Entity] = None,
+         code: Optional[str] = '',
+         origin: Optional[Entity] = None) -> Union[str, Response]:
     g.cursor.execute('BEGIN')
     try:
         log_action = 'update'

@@ -8,14 +8,14 @@ from tests.base import TestBaseCase
 class EventTest(TestBaseCase):
 
     def test_event(self) -> None:
-        with app.app_context():
+        with app.app_context():  # type: ignore
             self.login()
 
             # Create entities for event
             rv = self.app.post(url_for('place_insert'), data={'name': 'My house'})
             residence_id = rv.location.split('/')[-1]
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 actor = EntityMapper.insert('E21', 'Game master')
                 file = EntityMapper.insert('E31', 'X-Files', 'file')
                 source = EntityMapper.insert('E33', 'Necronomicon', 'source content')
@@ -31,7 +31,7 @@ class EventTest(TestBaseCase):
                                data=data, follow_redirects=True)
             assert b'First event ever' in rv.data
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 activity_id = EntityMapper.get_by_codes('event')[0].id
             self.app.post(url_for('event_insert', code='E7', origin_id=actor.id), data=data)
             self.app.post(url_for('event_insert', code='E7', origin_id=file.id), data=data)

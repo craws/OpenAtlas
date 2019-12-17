@@ -14,7 +14,7 @@ from openatlas import app, logger
 from openatlas.util.util import uc_first
 
 
-class PasswordForm(FlaskForm):
+class PasswordForm(FlaskForm):  # type: ignore
     password_old = PasswordField(_('old password'), [InputRequired()])
     password = PasswordField(_('password'), [InputRequired()])
     password2 = PasswordField(_('repeat password'), [InputRequired()])
@@ -41,7 +41,7 @@ class PasswordForm(FlaskForm):
         return valid
 
 
-class ProfileForm(FlaskForm):
+class ProfileForm(FlaskForm):  # type: ignore
     name = StringField(description=_('tooltip full name'))
     email = StringField([InputRequired(), Email()], description=_('tooltip email'))
     show_email = BooleanField(description=_('tooltip show email'))

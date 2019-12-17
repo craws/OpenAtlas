@@ -1,5 +1,5 @@
 import ast
-from typing import List
+from typing import List, Optional
 
 from flask import g, json
 from flask_wtf import FlaskForm
@@ -17,7 +17,7 @@ class InvalidGeomException(Exception):
 class GisMapper:
 
     @staticmethod
-    def get_all(objects: List[Entity] = None) -> dict:
+    def get_all(objects: Optional[List[Entity]] = None) -> dict:
         if objects is None:
             objects = []
         all_: dict = {'point': [], 'linestring': [], 'polygon': []}
@@ -91,15 +91,15 @@ class GisMapper:
                 'gisPolygonAll': json.dumps(all_['polygon']),
                 'gisPolygonSelected': json.dumps(selected['polygon']),
                 'gisPolygonPointSelected': json.dumps(selected['polygon_point']),
-                'gisAllSelected': json.dumps(selected['polygon'] +
-                                             selected['linestring'] + selected['point'])}
+                'gisAllSelected': json.dumps(selected['polygon'] + selected['linestring'] +
+                                             selected['point'])}
 
     @staticmethod
     def insert(entity: Entity, form: FlaskForm) -> None:
         for shape in ['point', 'line', 'polygon']:
             data = getattr(form, 'gis_' + shape + 's').data
             if not data:
-                continue
+                continue  # pragma: no cover
             for item in json.loads(data):
                 # Don't save geom if coordinates are empty
                 if not item['geometry']['coordinates'] or item['geometry']['coordinates'] == [[]]:

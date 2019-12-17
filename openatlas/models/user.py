@@ -16,9 +16,11 @@ from openatlas.models.entity import Entity
 from openatlas.util.util import is_authorized
 
 
-class User(UserMixin):
+class User(UserMixin):  # type: ignore
 
-    def __init__(self, row: NamedTupleCursor.Record = None, bookmarks: list = None) -> None:
+    def __init__(self,
+                 row: NamedTupleCursor.Record = None,
+                 bookmarks: Optional[list] = None) -> None:
         self.id = None
         self.username = None
         self.email = None
@@ -235,7 +237,7 @@ class UserMapper:
         return settings
 
     @staticmethod
-    def generate_password(length: int = None) -> str:  # pragma no cover - used only for mail
+    def generate_password(length: Optional[int] = None) -> str:  # pragma no cover - only for mail
         length = length if length else session['settings']['random_password_length']
         return ''.join(
             secrets.choice(string.ascii_uppercase + string.digits) for _ in range(length))

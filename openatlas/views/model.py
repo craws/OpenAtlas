@@ -11,7 +11,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import link, required_group
 
 
-class LinkCheckForm(FlaskForm):
+class LinkCheckForm(FlaskForm):  # type: ignore
     domain = HiddenField()
     property = HiddenField()
     range = HiddenField()
@@ -84,14 +84,18 @@ def class_view(code: str) -> str:
     tables = {}
     for table in ['super', 'sub']:
         tables[table] = Table(['code', 'name'], paging=False)
-        for code in getattr(class_, table):
-            tables[table].rows.append([link(g.classes[code]), g.classes[code].name])
-    tables['domains'] = Table(['code', 'name'], paging=False)
-    tables['ranges'] = Table(['code', 'name'], paging=False)
+        for code_ in getattr(class_, table):
+            tables[table].rows.append([link(g.classes[code_]), g.classes[code_].name])
+    tables['domains'] = Table(['code', 'name'], paging=False,
+                              defs='''[{"orderDataType": "cidoc-model", "targets":[0]},
+                                                          {"sType": "numeric", "targets": [0]}]''')
+    tables['ranges'] = Table(['code', 'name'], paging=False,
+                             defs='''[{"orderDataType": "cidoc-model", "targets":[0]},
+                                                          {"sType": "numeric", "targets": [0]}]''')
     for key, property_ in g.properties.items():
-        if code == property_.domain_class_code:
+        if class_.code == property_.domain_class_code:
             tables['domains'].rows.append([link(property_), property_.name])
-        elif code == property_.range_class_code:
+        elif class_.code == property_.range_class_code:
             tables['ranges'].rows.append([link(property_), property_.name])
     return render_template('model/class_view.html', class_=class_, tables=tables,
                            info=[('code', class_.code), ('name', class_.name)])
@@ -109,13 +113,15 @@ def property_view(code: str) -> str:
             ('range', link(range_) + ' ' + range_.name)]
     tables = {}
     for table in ['super', 'sub']:
-        tables[table] = Table(['code', 'name'], paging=False)
+        tables[table] = Table(['code', 'name'], paging=False,
+                              defs='''[{"orderDataType": "cidoc-model", "targets":[0]},
+                                                          {"sType": "numeric", "targets": [0]}]''')
         for code in getattr(property_, table):
             tables[table].rows.append([link(g.properties[code]), g.properties[code].name])
     return render_template('model/property_view.html', property=property_, tables=tables, info=info)
 
 
-class NetworkForm(FlaskForm):
+class NetworkForm(FlaskForm):  # type: ignore
     width = IntegerField(default=1200, validators=[InputRequired()])
     height = IntegerField(default=600, validators=[InputRequired()])
     charge = StringField(default=-800, validators=[InputRequired()])

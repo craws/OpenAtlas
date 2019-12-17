@@ -16,7 +16,7 @@ from openatlas.models.node import NodeMapper
 from openatlas.util.util import required_group, sanitize, uc_first
 
 
-class NodeForm(FlaskForm):
+class NodeForm(FlaskForm):  # type: ignore
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     name_inverse = StringField(_('inverse'))
     is_node_form = HiddenField()
@@ -48,7 +48,7 @@ def node_index() -> str:
 @app.route('/types/insert/<int:root_id>', methods=['GET', 'POST'])
 @app.route('/types/insert/<int:root_id>/<int:super_id>', methods=['GET', 'POST'])
 @required_group('editor')
-def node_insert(root_id: int, super_id: int = None) -> Union[str, Response]:
+def node_insert(root_id: int, super_id: Optional[int] = None) -> Union[str, Response]:
     root = g.nodes[root_id]
     form = build_node_form(NodeForm, root)
     # Check if form is valid and if it wasn't a submit of the search form
@@ -89,7 +89,7 @@ def node_delete(id_: int) -> Response:
     return redirect(url_for('entity_view', id_=root.id) if root else url_for('node_index'))
 
 
-class MoveForm(FlaskForm):
+class MoveForm(FlaskForm):  # type: ignore
     is_node_form = HiddenField()
     checkbox_values = HiddenField()
     selection = SelectMultipleField('', [InputRequired()], coerce=int,
@@ -161,7 +161,9 @@ def tree_select(name: str) -> str:
     return html
 
 
-def save(form: FlaskForm, node: Entity = None, root: Entity = None) -> Optional[str]:
+def save(form: FlaskForm,
+         node: Optional[Entity] = None,
+         root: Optional[Entity] = None) -> Optional[str]:
     g.cursor.execute('BEGIN')
     super_ = None
     log_action = 'insert'

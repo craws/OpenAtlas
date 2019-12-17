@@ -26,14 +26,14 @@ def load_user(user_id: int) -> User:
     return UserMapper.get_by_id(user_id, True)
 
 
-class LoginForm(FlaskForm):
+class LoginForm(FlaskForm):  # type: ignore
     username = StringField(_('username'), [InputRequired()], render_kw={'autofocus': True})
     password = PasswordField(_('password'), [InputRequired()])
     show_passwords = BooleanField(_('show password'))
     save = SubmitField(_('login'))
 
 
-class PasswordResetForm(FlaskForm):
+class PasswordResetForm(FlaskForm):  # type: ignore
     email = StringField(_('email'), [InputRequired(), Email()])
     save = SubmitField(_('submit'))
 

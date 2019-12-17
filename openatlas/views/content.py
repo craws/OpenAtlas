@@ -14,7 +14,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import required_group
 
 
-class ContentForm(FlaskForm):
+class ContentForm(FlaskForm):  # type: ignore
     pass
 
 

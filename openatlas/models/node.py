@@ -1,6 +1,6 @@
 import ast
 import collections
-from typing import Dict, List
+from typing import Dict, List, Optional
 
 from flask import g
 from flask_wtf import FlaskForm
@@ -131,7 +131,7 @@ class NodeMapper(EntityMapper):
         return {row.id: g.nodes[row.id] for row in g.cursor.fetchall()}
 
     @staticmethod
-    def get_form_choices(root: Entity = None) -> list:
+    def get_form_choices(root: Optional[Entity] = None) -> list:
         sql = "SELECT f.id, f.name FROM web.form f WHERE f.extendable = True ORDER BY name ASC;"
         g.execute(sql)
         forms = []
@@ -242,7 +242,7 @@ class NodeMapper(EntityMapper):
             g.execute(sql, {'old_type_id': old_node.id, 'delete_ids': tuple(delete_ids)})
 
     @staticmethod
-    def get_all_sub_ids(node: Entity, subs: list = None) -> list:
+    def get_all_sub_ids(node: Entity, subs: Optional[list] = None) -> list:
         # Recursive function to return a list with all sub node ids
         subs = subs if subs else []
         subs += node.subs

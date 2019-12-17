@@ -18,6 +18,8 @@ See install.md which versions of software are needed after the upgrade.
 
 If you upgrade a Debian system to buster be sure to have the new postgis packages installed (see install.md) before you upgrade database clusters.
 
+Execute install/upgrade/4.0.0.sql after making backups
+
 #### Paths
 
 The new version uses operating system independent paths with pathlib.

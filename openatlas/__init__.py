@@ -2,10 +2,10 @@ import locale
 import os
 import sys
 import time
-from typing import Dict, Any
+from typing import Any, Dict, Optional
 
 import psycopg2.extras
-from flask import Flask, g, request, session, Response
+from flask import Flask, Response, g, request, session
 from flask_babel import Babel, lazy_gettext as _
 from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect
@@ -27,7 +27,7 @@ babel = Babel(app)
 debug_model: Dict = {}
 
 
-class GlobalSearchForm(FlaskForm):
+class GlobalSearchForm(FlaskForm):  # type: ignore
     term = StringField('', render_kw={"placeholder": _('search term')})
     search = SubmitField(_('search'))
 
@@ -66,7 +66,7 @@ def connect() -> psycopg2.connect:
         raise Exception(e)
 
 
-def execute(query: str, vars_: list = None) -> None:
+def execute(query: str, vars_: Optional[Dict[str, Any]] = None) -> None:
     debug_model['sql'] += 1
     return g.cursor.execute(query, vars_)
 

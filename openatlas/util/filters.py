@@ -117,7 +117,8 @@ def display_move_form(self: Any, form: Any, root_name: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def table_select_model(self: Any, name: str, selected: Union[ClassObject, Property] = None) -> str:
+def table_select_model(self: Any, name: str,
+                       selected: Union[ClassObject, Property, None] = None) -> str:
     # Todo: extra sort function for class and property code e.g. E69
     if name in ['domain', 'range']:
         entities = g.classes
@@ -217,7 +218,10 @@ def display_logo(self: Any, file_id: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_form(self: Any, form: Any, form_id: str = None, for_persons: bool = False) -> str:
+def display_form(self: Any,
+                 form: Any,
+                 form_id: Optional[str] = None,
+                 for_persons: bool = False) -> str:
     from openatlas.forms.forms import ValueFloatField
     multipart = 'enctype="multipart/form-data"' if hasattr(form, 'file') else ''
     if 'update' in request.path:

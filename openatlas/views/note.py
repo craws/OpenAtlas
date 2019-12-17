@@ -15,7 +15,7 @@ from openatlas.models.user import UserMapper
 from openatlas.util.util import (required_group)
 
 
-class NoteForm(FlaskForm):
+class NoteForm(FlaskForm):  # type: ignore
     description = TextAreaField(_('note'), [InputRequired()])
     save = SubmitField(_('insert'))
 

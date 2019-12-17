@@ -9,7 +9,7 @@ from tests.base import TestBaseCase
 class ExportTest(TestBaseCase):
 
     def test_export(self) -> None:
-        with app.app_context():
+        with app.app_context():  # type: ignore
             self.login()
             # Projects
             rv = self.app.get(url_for('import_project_insert'))
@@ -53,7 +53,7 @@ class ExportTest(TestBaseCase):
 
             # View an imported entity
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 place_id = EntityMapper.get_by_system_type('place')[0].id
             rv = self.app.get(url_for('entity_view', id_=place_id))
             assert b'Yup' in rv.data

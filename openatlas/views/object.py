@@ -1,4 +1,4 @@
-from typing import Any, Union
+from typing import Any, Optional, Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -16,7 +16,7 @@ from openatlas.util.util import (get_base_table_data, link, required_group, trun
                                  was_modified)
 
 
-class InformationCarrierForm(FlaskForm):
+class InformationCarrierForm(FlaskForm):  # type: ignore
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
@@ -28,7 +28,7 @@ class InformationCarrierForm(FlaskForm):
 @app.route('/object')
 @app.route('/object/<action>/<int:id_>')
 @required_group('readonly')
-def object_index(action: str = None, id_: int = None) -> str:
+def object_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
     if id_ and action == 'delete':
         EntityMapper.delete(id_)
         logger.log_user(id_, 'delete')
@@ -79,7 +79,7 @@ def object_update(id_: int) -> Union[str, Response]:
     return render_template('object/update.html', form=form, object_=object_)
 
 
-def save(form: Any, object_: Entity = None) -> str:
+def save(form: Any, object_: Optional[Entity] = None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
     try:

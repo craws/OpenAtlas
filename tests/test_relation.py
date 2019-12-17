@@ -10,10 +10,10 @@ from tests.base import TestBaseCase
 class RelationTests(TestBaseCase):
 
     def test_relation(self) -> None:
-        with app.app_context():
+        with app.app_context():  # type: ignore
             self.login()
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 actor = EntityMapper.insert('E21', 'Connor MacLeod')
                 related = EntityMapper.insert('E21', 'The Kurgan')
 
@@ -55,7 +55,7 @@ class RelationTests(TestBaseCase):
 
             # Update relationship
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 link_id = LinkMapper.get_links(actor.id, 'OA7')[0].id
                 link_id2 = LinkMapper.get_links(actor.id, 'OA7', True)[0].id
 

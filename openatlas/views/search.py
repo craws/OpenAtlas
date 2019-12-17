@@ -12,7 +12,7 @@ from openatlas.util.table import Table
 from openatlas.util.util import link, required_group, truncate_string, uc_first
 
 
-class SearchForm(FlaskForm):
+class SearchForm(FlaskForm):  # type: ignore
     term = StringField(_('search'), [InputRequired()],
                        render_kw={'placeholder': _('search term'), 'autofocus': True})
     own = BooleanField(_('Only entities edited by me'))

@@ -19,7 +19,7 @@ from openatlas.util.util import (bookmark_toggle, format_date, link, required_gr
                                  truncate_string, uc_first)
 
 
-class FeedbackForm(FlaskForm):
+class FeedbackForm(FlaskForm):  # type: ignore
     subject = SelectField(_('subject'),
                           choices=list(app.config['FEEDBACK_SUBJECTS'].items()),
                           render_kw={'autofocus': True})

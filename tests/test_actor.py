@@ -9,7 +9,7 @@ from tests.base import TestBaseCase
 class ActorTests(TestBaseCase):
 
     def test_actor(self) -> None:
-        with app.app_context():
+        with app.app_context():  # type: ignore
             self.login()
             rv = self.app.get(url_for('actor_index'))
             assert b'No entries' in rv.data
@@ -18,7 +18,7 @@ class ActorTests(TestBaseCase):
             rv = self.app.post(url_for('place_insert'), data={'name': 'Nostromos'})
             residence_id = rv.location.split('/')[-1]
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 sex_node = NodeMapper.get_hierarchy_by_name('Sex')
                 sex_node_sub_1 = g.nodes[sex_node.subs[0]]
                 sex_node_sub_2 = g.nodes[sex_node.subs[1]]

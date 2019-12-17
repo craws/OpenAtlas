@@ -11,7 +11,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 
 
-class DateForm(FlaskForm):
+class DateForm(FlaskForm):  # type: ignore
 
     validator_day = [Optional(), NumberRange(min=1, max=31)]
     validator_month = [Optional(), NumberRange(min=1, max=12)]

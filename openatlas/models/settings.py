@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 
 from flask import g
 from flask_wtf import FlaskForm
@@ -80,6 +80,6 @@ class SettingsMapper:
             g.execute(sql, {'name': field, 'value': value})
 
     @staticmethod
-    def set_logo(file_id: int = None) -> None:
+    def set_logo(file_id: Optional[int] = None) -> None:
         sql = "UPDATE web.settings SET value = %(file_id)s WHERE name = 'logo_file_id';"
         g.execute(sql, {'file_id': file_id if file_id else ''})

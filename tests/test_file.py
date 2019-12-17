@@ -8,12 +8,12 @@ from tests.base import TestBaseCase
 class FileTest(TestBaseCase):
 
     def test_event(self) -> None:
-        with app.app_context():
+        with app.app_context():  # type: ignore
             self.login()
 
             # Create entities for file
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 actor = EntityMapper.insert('E21', 'File keeper')
                 reference = EntityMapper.insert('E31', 'Ancient Books', 'edition')
 
@@ -32,7 +32,7 @@ class FileTest(TestBaseCase):
                                    follow_redirects=True)
             assert b'An entry has been created' in rv.data
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 files = EntityMapper.get_by_system_type('file')
                 file_id = files[0].id
                 file_id2 = files[1].id

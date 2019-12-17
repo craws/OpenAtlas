@@ -8,10 +8,10 @@ from tests.base import TestBaseCase
 class ObjectTest(TestBaseCase):
 
     def test_object(self) -> None:
-        with app.app_context():
+        with app.app_context():  # type: ignore
             self.login()
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 source = EntityMapper.insert('E33', 'Necronomicon')
 
             rv = self.app.get(url_for('object_insert'))
@@ -22,7 +22,7 @@ class ObjectTest(TestBaseCase):
             rv = self.app.get(url_for('object_index'))
             assert b'Love-letter' in rv.data
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 object_ = EntityMapper.get_by_codes('object')[0]
             rv = self.app.get(url_for('object_update', id_=object_.id))
             assert b'Love-letter' in rv.data

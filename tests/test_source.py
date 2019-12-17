@@ -8,14 +8,14 @@ from tests.base import TestBaseCase
 class SourceTest(TestBaseCase):
 
     def test_source(self) -> None:
-        with app.app_context():
+        with app.app_context():  # type: ignore
             self.login()
 
             # Source insert
             rv = self.app.get(url_for('source_insert'))
             assert b'+ Source' in rv.data
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 origin = EntityMapper.insert('E21', 'David Duchovny')
                 actor = EntityMapper.insert('E21', 'Gillian Anderson Gillian Anderson ')
                 carrier = EntityMapper.insert('E84', 'I care for you', 'information carrier')
@@ -26,7 +26,7 @@ class SourceTest(TestBaseCase):
                                data={'name': 'Test source'}, follow_redirects=True)
             assert b'An entry has been created' in rv.data
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 source = EntityMapper.get_by_codes('source')[0]
             rv = self.app.post(url_for('source_insert', origin_id=reference.id),
                                data={'name': 'Test source'}, follow_redirects=True)

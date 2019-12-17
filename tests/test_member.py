@@ -9,10 +9,10 @@ from tests.base import TestBaseCase
 class MemberTests(TestBaseCase):
 
     def test_member(self) -> None:
-        with app.app_context():
+        with app.app_context():  # type: ignore
             self.login()
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 actor = EntityMapper.insert('E21', 'Ripley')
                 group = EntityMapper.insert('E74', 'Space Marines')
 
@@ -47,7 +47,7 @@ class MemberTests(TestBaseCase):
 
             # Update
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 link_id = LinkMapper.get_links(group.id, 'P107')[0].id
             rv = self.app.get(url_for('member_update', id_=link_id, origin_id=group.id))
             assert b'Ripley' in rv.data

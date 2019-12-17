@@ -8,10 +8,10 @@ from tests.base import TestBaseCase
 class NodeTest(TestBaseCase):
 
     def test_node(self) -> None:
-        with app.app_context():
+        with app.app_context():  # type: ignore
             self.login()
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 actor_node = NodeMapper.get_hierarchy_by_name('Actor Actor Relation')
                 dimension_node = NodeMapper.get_hierarchy_by_name('Dimensions')
                 sex_node = NodeMapper.get_hierarchy_by_name('Sex')

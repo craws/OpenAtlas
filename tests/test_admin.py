@@ -13,11 +13,11 @@ from tests.base import TestBaseCase
 class ContentTests(TestBaseCase):
 
     def test_content_and_newsletter(self) -> None:
-        with app.app_context():
+        with app.app_context():  # type: ignore
             self.login()
             self.app.post(url_for('actor_insert', code='E21'), data={'name': 'Oliver Twist'})
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 EntityMapper.insert('E31', 'One forsaken file entity', 'file')  # Add orphaned file
             rv = self.app.get(url_for('admin_orphans'))
             assert all(x in rv.data for x in [b'Oliver Twist', b'forsaken'])
@@ -31,7 +31,7 @@ class ContentTests(TestBaseCase):
 
     def test_logs(self) -> None:
         self.login()
-        with app.app_context():
+        with app.app_context():  # type: ignore
             rv = self.app.get(url_for('admin_log'))
             assert b'Login' in rv.data
             rv = self.app.get(url_for('admin_log_delete', follow_redirects=True))
@@ -39,15 +39,15 @@ class ContentTests(TestBaseCase):
 
     def test_links(self) -> None:
         self.login()
-        with app.app_context():
+        with app.app_context():  # type: ignore
             rv = self.app.get(url_for('admin_check_links', check='check'))
             assert b'Invalid linked entity' in rv.data
 
     def test_dates(self) -> None:
         self.login()
-        with app.app_context():
+        with app.app_context():  # type: ignore
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 # Create invalid dates for an actor and a relation link
                 person = EntityMapper.insert('E21', 'Person')
                 event = EntityMapper.insert('E7', 'Event')
@@ -65,7 +65,7 @@ class ContentTests(TestBaseCase):
             assert b'Invalid involvement dates <span class="tab-counter">1' in rv.data
 
     def test_admin(self) -> None:
-        with app.app_context():
+        with app.app_context():  # type: ignore
             self.login()
             rv = self.app.get(url_for('admin_mail'))
             assert b'Email from' in rv.data
@@ -84,7 +84,7 @@ class ContentTests(TestBaseCase):
 
             # Check link duplicates and multi use of single nodes
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 event = EntityMapper.insert('E8', 'Event Horizon')
                 source = EntityMapper.insert('E33', 'Tha source')
                 source.link('P67', [event])
@@ -103,7 +103,7 @@ class ContentTests(TestBaseCase):
 
             # Check similar names
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 EntityMapper.insert('E21', 'I have the same name!')
                 EntityMapper.insert('E21', 'I have the same name!')
             rv = self.app.post(url_for('admin_check_similar'), follow_redirects=True,

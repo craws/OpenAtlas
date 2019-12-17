@@ -8,7 +8,7 @@ from tests.base import TestBaseCase
 class HierarchyTest(TestBaseCase):
 
     def test_hierarchy(self) -> None:
-        with app.app_context():
+        with app.app_context():  # type: ignore
             self.login()
 
             # Custom types

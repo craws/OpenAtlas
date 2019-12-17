@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -15,7 +15,7 @@ from openatlas.models.entity import Entity, EntityMapper
 from openatlas.util.util import required_group
 
 
-class TranslationForm(FlaskForm):
+class TranslationForm(FlaskForm):  # type: ignore
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     description = TextAreaField(_('content'))
     save = SubmitField(_('insert'))
@@ -59,7 +59,9 @@ def translation_update(id_: int) -> Union[str, Response]:
                            form=form)
 
 
-def save(form: FlaskForm, entity: Entity = None, source: Entity = None) -> Entity:
+def save(form: FlaskForm,
+         entity: Optional[Entity] = None,
+         source: Optional[Entity] = None) -> Entity:
     g.cursor.execute('BEGIN')
     try:
         if entity:

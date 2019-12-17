@@ -1,4 +1,4 @@
-from typing import Iterator, List, TYPE_CHECKING, Union
+from typing import Iterator, List, Optional, TYPE_CHECKING, Union
 
 from flask import abort, flash, g, url_for
 from flask_babel import lazy_gettext as _
@@ -15,8 +15,10 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
 
 class Link:
 
-    def __init__(self, row: NamedTupleCursor.Record, domain: 'Entity' = None,
-                 range_: 'Entity' = None) -> None:
+    def __init__(self,
+                 row: NamedTupleCursor.Record,
+                 domain: Optional['Entity'] = None,
+                 range_: Optional['Entity'] = None) -> None:
         from openatlas.forms.date import DateForm
         from openatlas.models.entity import EntityMapper
         self.id = row.id
@@ -72,9 +74,9 @@ class LinkMapper:
     def insert(entity: 'Entity',
                property_code: str,
                range_: Union['Entity', List['Entity']],
-               description: str = None,
+               description: Optional[str] = None,
                inverse: bool = False,
-               type_id: int = None) -> List[int]:
+               type_id: Optional[int] = None) -> List[int]:
         property_ = g.properties[property_code]
         entities = range_ if isinstance(range_, list) else [range_]
         new_link_ids = []
@@ -135,7 +137,7 @@ class LinkMapper:
 
     @staticmethod
     def get_links(entity_id: int,
-                  codes: Union[str, List[str]] = None,
+                  codes: Union[str, List[str], None] = None,
                   inverse: bool = False) -> list:
         sql = """
             SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description, l.created,
