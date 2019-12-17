@@ -27,6 +27,5 @@ openatlas/export/sql/*
 # npm libs
 /openatlas/static/node_modules
 /openatlas/static/openatlas.egg-info/
-/openatlas/static/vendor/popper.js-1.16.0/
 /openatlas/static/package.json
 /openatlas/static/package-lock.json

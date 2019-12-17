@@ -17,7 +17,8 @@ package_json = {
         "leaflet": "^1.5.1",
         "save-svg-as-png": "^1.4.14",
         "tinymce": "^5.1.1",
-        "bootstrap": "^4.3.1"
+        "bootstrap": "^4.3.1",
+        "popper.js": "^1.16.0"
     }
 }
 
