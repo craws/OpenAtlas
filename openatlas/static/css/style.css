@@ -192,18 +192,6 @@ form input[type="text"].month, form input[type="text"].day {
     width: 25em;
 }
 
-.ui-dialog,
-.ui-dialog .ui-dialog-content,
-.ui-state-active,
-.ui-state-default,
-.ui-widget-content .ui-state-default,
-.ui-widget-header .ui-state-default,
-.ui-widget-content .ui-state-active,
-.ui-widget-header,
-.ui-widget-header .ui-state-active {
-    background: none;
-}
-
 .overlay {
     display: none;
     left: 0;
@@ -446,20 +434,6 @@ input[type=submit] {
     white-space: nowrap;
 }
 
-.tabs-container .ui-widget-header,
-.ui-state-active,
-.ui-state-default,
-.ui-tabs .ui-tabs-panel,
-.tabs-container .ui-widget-header,
-.ui-widget-header,
-.ui-widget-content .ui-state-default,
-.ui-widget-content .ui-state-active,
-.ui-widget-header .ui-state-default,
-.ui-widget-header .ui-state-active,
-.ui-widget.ui-widget-content {
-    border: none;
-    background: none;
-}
 
 
 /* important to hide jquery ui dotted line of selected tabs */
