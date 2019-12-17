@@ -541,3 +541,9 @@ div.data-table div.display-none {
 .navbar {
     width: 100%;
 }
+
+/* Table Headers */
+
+#overview_table_wrapper > * , #overview_table_filter, #overview_table_filter > * {
+    box-sizing: content-box!important;
+}
