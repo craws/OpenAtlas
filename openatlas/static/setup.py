@@ -13,6 +13,7 @@ package_json = {
         "datatables.net-dt": "^1.10.20",
         "datatables.net-buttons": "^1.6.1",
         "datatables.net-buttons-dt": "^1.6.1",
+        "datatables.net-bs4": "^1.10.20",
         "leaflet": "^1.5.1",
         "save-svg-as-png": "^1.4.14",
         "tinymce": "^5.1.1",

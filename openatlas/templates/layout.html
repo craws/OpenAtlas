@@ -16,18 +16,21 @@
         <link rel="stylesheet" href="/static/css/style.css?v={{ config['VERSION'] }}" />
         <link rel="stylesheet" href="/static/css/color.css?v={{ config['VERSION'] }}" />
         <link rel="stylesheet" href="/static/css/images.css?v={{ config['VERSION'] }}" />
-        <link rel="stylesheet" href="/static/node_modules/datatables.net-dt/css/jquery.datatables.min.css" />
-        <link rel="stylesheet" href="/static/css/table.css?v={{ config['VERSION'] }}" />
+
+        <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="/static/node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css" />
+        <link rel="stylesheet" href="/static/node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css" />
+
         <script src="/static/node_modules/jquery/dist/jquery.min.js"></script>
         <script src="/static/node_modules/jquery-ui-dist/jquery-ui.min.js"></script>
         <script src="/static/node_modules/datatables.net/js/jquery.datatables.min.js"></script>
-        <script src="/static/node_modules/datatables.net-dt/js/datatables.datatables.min.js"></script>
+        <script src="/static/node_modules/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
         <script src="/static/node_modules/jquery-validation/dist/jquery.validate.min.js"></script>
         <script src="/static/node_modules/jstree/dist/jstree.min.js"></script>
         <script src="/static/node_modules/tinymce/tinymce.min.js"></script>
-        <script src="/static/vendor/bootstrap-4.3.1-dist/js/bootstrap.min.js"></script>
+        <script src="/static/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
         <script src="/static/vendor/popper.js-1.16.0/dist/umd/popper.min.js"></script>
-        <script src="/static/vendor/fontawesome-5.8.1/js/all.min.js"></script>
+        <script src="/static/node_modules/@fortawesome/fontawesome-free/js/all.min.js"></script>
         {% if gis_data %}
             {% include "map.html" %}
         {% endif %}
