@@ -40,9 +40,9 @@ Copy the files to /var/www/your_site_name or clone OpenAtlas from GitHub
 
 ### Frontend libraries
 
-    # cd openatlas/static
-    # pip3 install -e ./
-    # calmjs npm --install openatlas
+    $ cd openatlas/static
+    $ pip3 install -e ./
+    $ calmjs npm --install openatlas
 
 ### Database
 
