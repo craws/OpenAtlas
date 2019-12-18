@@ -24,7 +24,7 @@ if os.name == "posix":  # For other operating systems e.g. Windows, we would nee
     locale.setlocale(locale.LC_ALL, 'en_US.utf-8')  # pragma: no cover
 
 babel = Babel(app)
-debug_model: Dict = {}
+debug_model: Dict[str, float] = {}
 
 
 class GlobalSearchForm(FlaskForm):  # type: ignore
@@ -115,17 +115,12 @@ def teardown_request(exception: Any) -> None:
 
 
 @app.context_processor
-def inject_search_form() -> Dict:
+def inject_search_form() -> Dict[str, GlobalSearchForm]:
     return dict(search_form=GlobalSearchForm(prefix="global"))
 
 
 app.register_blueprint(filters.blueprint)
 app.add_template_global(debug_model, 'debug_model')
-
-
-@app.context_processor
-def inject_debug() -> Dict:
-    return dict(debug=app.debug)
 
 
 if __name__ == "__main__":  # pragma: no cover

@@ -132,7 +132,7 @@ def actor_add_file(id_: int) -> Union[str, Response]:
 
 def save(form: ActorForm,
          actor: Optional[Entity] = None,
-         code: Optional[str] = '',
+         code: str = '',
          origin: Optional[Entity] = None) -> Union[str, Response]:
     g.cursor.execute('BEGIN')
     try:

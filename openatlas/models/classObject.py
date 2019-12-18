@@ -1,8 +1,12 @@
+from __future__ import annotations  # Needed for Python 4.0 type annotations
+
+from dataclasses import dataclass
+from typing import Dict, List
+
 from flask import g, session
 
 import openatlas
 from openatlas import app
-from dataclasses import dataclass
 
 
 @dataclass
@@ -12,9 +16,9 @@ class ClassObject:
     comment: str
     code: str
     id: int
-    i18n: dict
-    sub: list
-    super: list
+    i18n: Dict[str, str]
+    sub: List[ClassObject]
+    super: List[ClassObject]
 
     @property
     def name(self) -> str:
@@ -33,9 +37,9 @@ class ClassObject:
 class ClassMapper:
 
     @staticmethod
-    def get_all() -> dict:
+    def get_all() -> Dict[str, ClassObject]:
         g.execute("SELECT id, code, name, comment FROM model.class;")
-        classes = {
+        classes: Dict[str, ClassObject] = {
             row.code: ClassObject(_name=row.name, code=row.code, id=row.id, comment=row.comment,
                                   i18n={}, sub=[], super=[]) for row in g.cursor.fetchall()}
         g.execute("SELECT super_code, sub_code FROM model.class_inheritance;")
@@ -47,8 +51,5 @@ class ClassMapper:
             WHERE language_code IN %(language_codes)s;"""
         g.execute(sql, {'language_codes': tuple(app.config['LANGUAGES'].keys())})
         for row in g.cursor.fetchall():
-            class_ = classes[row.class_code]
-            if row.language_code not in class_.i18n:
-                class_.i18n[row.language_code] = {}
-            class_.i18n[row.language_code] = row.text
+            classes[row.class_code].i18n[row.language_code] = row.text
         return classes
