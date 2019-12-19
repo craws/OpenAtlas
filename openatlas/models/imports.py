@@ -52,7 +52,7 @@ class ImportMapper:
         g.execute('DELETE FROM import.project WHERE id = %(id)s;', {'id': id_})
 
     @staticmethod
-    def check_origin_ids(project: Project, origin_ids: List[int]) -> List[int]:
+    def check_origin_ids(project: Project, origin_ids: List[str]) -> List[str]:
         """ Check if origin ids already in database"""
         sql = """
             SELECT origin_id FROM import.entity
@@ -79,7 +79,7 @@ class ImportMapper:
                         'description': sanitize(project.description, 'description')})
 
     @staticmethod
-    def import_data(project: Project, class_code: str, data: list) -> None:
+    def import_data(project: Project, class_code: str, data: List) -> None:
         from openatlas.models.entity import EntityMapper
         from openatlas.models.gis import GisMapper
         for row in data:

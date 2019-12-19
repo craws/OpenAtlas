@@ -10,7 +10,7 @@ from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
 from html.parser import HTMLParser
-from typing import Any, List, Optional, TYPE_CHECKING, Union
+from typing import Any, Dict, List, Optional, TYPE_CHECKING, Tuple, Union
 
 import numpy
 from flask import abort, flash, g, request, session, url_for
@@ -30,6 +30,7 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
     from openatlas.models.imports import Project
     from openatlas.models.user import User
+    from openatlas.models.link import Link
 
 
 def convert_size(size_bytes: int) -> str:
@@ -109,7 +110,7 @@ class MLStripper(HTMLParser):
         self.reset()
         self.strict = False
         self.convert_charrefs = True
-        self.fed: list = []
+        self.fed: List[str] = []
 
     def handle_data(self, d: Any) -> None:
         self.fed.append(d)
@@ -119,6 +120,8 @@ class MLStripper(HTMLParser):
 
 
 def sanitize(string: Optional[str], mode: Optional[str] = None) -> str:
+    if not string:
+        return ''
     if mode == 'node':
         # Remove all characters from a string except letters, numbers and spaces
         return re.sub(r'([^\s\w]|_)+', '', string).strip()
@@ -130,7 +133,8 @@ def sanitize(string: Optional[str], mode: Optional[str] = None) -> str:
     return re.sub('[^A-Za-z0-9]+', '', string).strip()
 
 
-def get_file_stats(path: Optional[str] = app.config['UPLOAD_FOLDER_PATH']) -> dict:
+def get_file_stats(path: Optional[str] = app.config['UPLOAD_FOLDER_PATH']
+                   ) -> Dict[int, Dict[str, Union[Union[bytes, str], Any]]]:
     """ Build a dict with file ids and stats from files in given directory.
         It's much faster to do this in one call for every file."""
     file_stats = {}
@@ -150,7 +154,9 @@ def display_remove_link(url: str, name: str) -> str:
     return '<a ' + confirm + ' href="' + url + '">' + uc_first(_('remove')) + '</a>'
 
 
-def add_type_data(entity: 'Entity', data: list, location: Optional['Entity'] = None) -> list:
+def add_type_data(entity: 'Entity',
+                  data: List[Tuple[str, str]],
+                  location: Optional['Entity'] = None) -> List[Tuple[str, str]]:
     type_data: OrderedDict = OrderedDict()
     # Nodes
     if location:
@@ -179,7 +185,7 @@ def add_type_data(entity: 'Entity', data: list, location: Optional['Entity'] = N
     return data
 
 
-def add_system_data(entity: 'Entity', data: list) -> list:
+def add_system_data(entity: 'Entity', data: List[Tuple[str, str]]) -> List[Tuple[str, str]]:
     # Additional info for advanced layout
     if hasattr(current_user, 'settings') and current_user.settings['layout'] == 'advanced':
         data.append((uc_first(_('class')), link(entity.class_)))
@@ -197,7 +203,7 @@ def add_system_data(entity: 'Entity', data: list) -> list:
     return data
 
 
-def get_entity_data(entity: 'Entity', location: Optional['Entity'] = None) -> list:
+def get_entity_data(entity: 'Entity', location: Optional['Entity'] = None) -> List[Tuple[str, str]]:
     """
     Return related entity information for a table for view.
     The location parameter is for places which have a location attached.
@@ -437,7 +443,7 @@ def truncate_string(string: str, length: int = 40, span: bool = True) -> str:
     return '<span title="' + string.replace('"', '') + '">' + string[:length] + '..' + '</span>'
 
 
-def get_base_table_data(entity: 'Entity', file_stats: Optional[dict] = None) -> list:
+def get_base_table_data(entity: 'Entity', file_stats: Optional[Dict[Any]] = None) -> List[str]:
     """ Returns standard table data for an entity"""
     data: list = ['<br>'.join([link(entity)] + [
         truncate_string(alias) for alias in entity.aliases.values()])]
@@ -474,7 +480,7 @@ def was_modified(form: FlaskForm, entity: 'Entity') -> bool:  # pragma: no cover
     return True
 
 
-def format_entry_begin(entry: 'Entity', object_: Optional['Entity'] = None) -> str:
+def format_entry_begin(entry: Union['Entity', 'Link'], object_: Optional['Entity'] = None) -> str:
     html = link(object_) if object_ else ''
     if entry.begin_from:
         html += ', ' if html else ''
@@ -500,7 +506,7 @@ def format_entry_end(entry: 'Entity', object_: Optional['Entity'] = None) -> str
     return html
 
 
-def get_appearance(event_links: list) -> tuple:
+def get_appearance(event_links: List['Link']) -> Tuple[Optional[str], Optional[str]]:
     # Get first/last appearance from events for actors without begin/end
     first_year = None
     last_year = None

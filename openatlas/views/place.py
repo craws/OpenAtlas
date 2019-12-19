@@ -215,7 +215,7 @@ def place_update(id_: int) -> Union[str, Response]:
 def save(form: DateForm,
          object__: Optional[Entity] = None,
          location_: Optional[Entity] = None,
-         origin: Entity = None) -> str:
+         origin: Optional[Entity] = None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
     try:

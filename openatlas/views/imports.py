@@ -122,7 +122,9 @@ def import_data(project_id: int, class_code: str) -> str:
         file_ = request.files['file']
         file_path = app.config['TMP_FOLDER_PATH'].joinpath(
             secure_filename(file_.filename))  # type: ignore
-        columns: dict = {'allowed': ['name', 'id', 'description'], 'valid': [], 'invalid': []}
+        columns: Dict[str, List[str]] = {'allowed': ['name', 'id', 'description'],
+                                         'valid': [],
+                                         'invalid': []}
         if class_code == 'E18':
             columns['allowed'] += ['easting', 'northing']
         try:

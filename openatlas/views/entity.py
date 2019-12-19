@@ -1,6 +1,6 @@
 import os
 import sys
-from typing import Dict, Union
+from typing import Any, Dict, List, Tuple, Union
 
 from flask import flash, g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -41,7 +41,7 @@ def entity_view(id_: int) -> Union[str, Response]:
 
 def actor_view(actor: Entity) -> str:
     actor.note = UserMapper.get_note(actor)
-    info = []
+    info: List[Tuple[str, str]] = []
     if actor.aliases:
         info.append((uc_first(_('alias')), '<br>'.join(actor.aliases.values())))
     tables = {'file': Table(Table.HEADERS['file'] + [_('main image')]),
@@ -113,12 +113,12 @@ def actor_view(actor: Entity) -> str:
     begin_place = actor.get_linked_entity('OA8')
     begin_object = None
     if begin_place:
-        begin_object = begin_place.get_linked_entity('P53', True)
+        begin_object = begin_place.get_linked_entity_safe('P53', True)
         objects.append(begin_object)
     end_place = actor.get_linked_entity('OA9')
     end_object = None
     if end_place:
-        end_object = end_place.get_linked_entity('P53', True)
+        end_object = end_place.get_linked_entity_safe('P53', True)
         objects.append(end_object)
     label = uc_first(_('born') if actor.class_.code == 'E21' else _('begin'))
     info.append((label, format_entry_begin(actor, begin_object)))
@@ -364,7 +364,7 @@ def place_view(object_: Entity) -> str:
                                      actor.class_.name,
                                      actor.first,
                                      actor.last])
-    gis_data: Dict[str, str] = GisMapper.get_all([object_])
+    gis_data: Dict[str, List[Any]] = GisMapper.get_all([object_])
     if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]' \
             and gis_data['gisLineSelected'] == '[]':
         gis_data = {}

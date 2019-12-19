@@ -1,4 +1,4 @@
-from typing import Union, Optional
+from typing import Optional, Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -80,11 +80,11 @@ def actor_update(id_: int) -> Union[str, Response]:
         save(form, actor)
         return redirect(url_for('entity_view', id_=id_))
     residence = actor.get_linked_entity('P74')
-    form.residence.data = residence.get_linked_entity('P53', True).id if residence else ''
+    form.residence.data = residence.get_linked_entity_safe('P53', True).id if residence else ''
     first = actor.get_linked_entity('OA8')
-    form.begins_in.data = first.get_linked_entity('P53', True).id if first else ''
+    form.begins_in.data = first.get_linked_entity_safe('P53', True).id if first else ''
     last = actor.get_linked_entity('OA9')
-    form.ends_in.data = last.get_linked_entity('P53', True).id if last else ''
+    form.ends_in.data = last.get_linked_entity_safe('P53', True).id if last else ''
     for alias in actor.aliases.values():
         form.alias.append_entry(alias)
     form.alias.append_entry('')
@@ -151,13 +151,13 @@ def save(form: ActorForm,
         url = url_for('entity_view', id_=actor.id)
         if form.residence.data:
             object_ = EntityMapper.get_by_id(form.residence.data, view_name='place')
-            actor.link('P74', object_.get_linked_entity('P53'))
+            actor.link('P74', object_.get_linked_entity_safe('P53'))
         if form.begins_in.data:
             object_ = EntityMapper.get_by_id(form.begins_in.data, view_name='place')
-            actor.link('OA8', object_.get_linked_entity('P53'))
+            actor.link('OA8', object_.get_linked_entity_safe('P53'))
         if form.ends_in.data:
             object_ = EntityMapper.get_by_id(form.ends_in.data, view_name='place')
-            actor.link('OA9', object_.get_linked_entity('P53'))
+            actor.link('OA9', object_.get_linked_entity_safe('P53'))
 
         if origin:
             if origin.view_name == 'reference':

@@ -75,7 +75,7 @@ def nl2br(self: Any, value: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_info(self: Any, data: {str, str}) -> str:
+def display_info(self: Any, data: Dict[str, str]) -> str:
     html = '<div class="data-table">'
     for key, value in data:
         if value or value == 0:

@@ -1,6 +1,5 @@
 import ast
-import collections
-from typing import Dict, List, Optional
+from typing import Any, Dict, List, Optional, Tuple
 
 from flask import g
 from flask_wtf import FlaskForm
@@ -13,7 +12,7 @@ from openatlas.models.entity import Entity, EntityMapper
 class NodeMapper(EntityMapper):
 
     @staticmethod
-    def get_all_nodes() -> Dict:
+    def get_all_nodes() -> Dict[int, Entity]:
         """ Get and return all type and place nodes"""
         sql = """
             SELECT e.id, e.name, e.class_code, e.description, e.system_type, e.created, e.modified,
@@ -80,7 +79,10 @@ class NodeMapper(EntityMapper):
                 node.forms = {form_id: forms[form_id] for form_id in hierarchies[node.id].form_ids}
 
     @staticmethod
-    def get_root_path(nodes: dict, node: Entity, super_id: int, root: list) -> list:
+    def get_root_path(nodes: Dict[int, Entity],
+                      node: Entity,
+                      super_id: int,
+                      root: List[int]) -> List[int]:
         super_ = nodes[super_id]
         super_.count_subs += node.count
         if not super_.root:
@@ -89,7 +91,7 @@ class NodeMapper(EntityMapper):
         return NodeMapper.get_root_path(nodes, node, super_.root[0], root)
 
     @staticmethod
-    def get_nodes(name: str) -> list:
+    def get_nodes(name: str) -> List[int]:
         for id_, node in g.nodes.items():
             if node.name == name and not node.root:
                 return node.subs
@@ -101,11 +103,11 @@ class NodeMapper(EntityMapper):
         return [root for id_, root in g.nodes.items() if root.name == name][0]
 
     @staticmethod
-    def get_tree_data(node_id: int, selected_ids: list) -> str:
+    def get_tree_data(node_id: int, selected_ids: List[int]) -> str:
         return NodeMapper.walk_tree(g.nodes[node_id].subs, selected_ids)
 
     @staticmethod
-    def walk_tree(nodes: List[Entity], selected_ids: list) -> str:
+    def walk_tree(nodes: List[Entity], selected_ids: List[int]) -> str:
         string = ''
         for id_ in nodes:
             item = g.nodes[id_]
@@ -131,7 +133,7 @@ class NodeMapper(EntityMapper):
         return {row.id: g.nodes[row.id] for row in g.cursor.fetchall()}
 
     @staticmethod
-    def get_form_choices(root: Optional[Entity] = None) -> list:
+    def get_form_choices(root: Optional[Entity] = None) -> List[Tuple[int, str]]:
         sql = "SELECT f.id, f.name FROM web.form f WHERE f.extendable = True ORDER BY name ASC;"
         g.execute(sql)
         forms = []
@@ -141,7 +143,7 @@ class NodeMapper(EntityMapper):
         return forms
 
     @staticmethod
-    def save_entity_nodes(entity: Entity, form: collections.Iterable) -> None:
+    def save_entity_nodes(entity: Entity, form: Any) -> None:
         from openatlas.forms.forms import TreeField, TreeMultiField, ValueFloatField
         if hasattr(entity, 'nodes'):
             entity.delete_links(['P2', 'P89'])
@@ -242,7 +244,7 @@ class NodeMapper(EntityMapper):
             g.execute(sql, {'old_type_id': old_node.id, 'delete_ids': tuple(delete_ids)})
 
     @staticmethod
-    def get_all_sub_ids(node: Entity, subs: Optional[list] = None) -> list:
+    def get_all_sub_ids(node: Entity, subs: Optional[List[int]] = None) -> List[int]:
         # Recursive function to return a list with all sub node ids
         subs = subs if subs else []
         subs += node.subs
@@ -259,7 +261,7 @@ class NodeMapper(EntityMapper):
         g.execute("SELECT name FROM web.form WHERE id = %(form_id)s;", {'form_id': form_id})
         form_name = g.cursor.fetchone()[0]
         system_type = ''
-        class_code: list = []
+        class_code: List[str] = []
         if form_name == 'Source':
             system_type = 'source content'
         elif form_name == 'Event':

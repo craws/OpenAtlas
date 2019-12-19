@@ -1,4 +1,4 @@
-from typing import Iterator, List, Optional, TYPE_CHECKING, Union
+from typing import Dict, Iterator, List, Optional, TYPE_CHECKING, Union
 
 from flask import abort, flash, g, url_for
 from flask_babel import lazy_gettext as _
@@ -28,7 +28,7 @@ class Link:
         self.domain = domain if domain else EntityMapper.get_by_id(row.domain_id)
         self.range = range_ if range_ else EntityMapper.get_by_id(row.range_id)
         self.type = g.nodes[row.type_id] if row.type_id else None
-        self.nodes: dict = {}
+        self.nodes: Dict['Entity', None] = {}
         if hasattr(row, 'type_id') and row.type_id:
             self.nodes[g.nodes[row.type_id]] = None
         if hasattr(row, 'begin_from'):
@@ -112,7 +112,7 @@ class LinkMapper:
 
     @staticmethod
     def get_linked_entity(entity_id: int, code: str, inverse: bool = False,
-                          nodes: bool = False) -> 'Entity':
+                          nodes: bool = False) -> Optional['Entity']:
         result = LinkMapper.get_linked_entities(entity_id, [code], inverse=inverse, nodes=nodes)
         if len(result) > 1:  # pragma: no cover
             logger.log('error', 'model', 'Multiple linked entities found for ' + code)
@@ -122,7 +122,7 @@ class LinkMapper:
 
     @staticmethod
     def get_linked_entities(entity_id: int, codes: Union[str, List[str]], inverse: bool = False,
-                            nodes: bool = False) -> list:
+                            nodes: bool = False) -> List['Entity']:
         from openatlas.models.entity import EntityMapper
         codes = codes if isinstance(codes, list) else [codes]
         sql = """
@@ -193,7 +193,7 @@ class LinkMapper:
         return Link(g.cursor.fetchone())
 
     @staticmethod
-    def get_entities_by_node(node: 'Entity') -> Iterator:
+    def get_entities_by_node(node: 'Entity') -> Iterator[NamedTupleCursor.Record]:
         sql = "SELECT id, domain_id, range_id from model.link WHERE type_id = %(node_id)s;"
         g.execute(sql, {'node_id': node.id})
         return g.cursor.fetchall()
@@ -228,7 +228,7 @@ class LinkMapper:
                         'end_comment': link_.end_comment})
 
     @staticmethod
-    def check_links() -> list:
+    def check_links() -> List[Dict[str, str]]:
         """ Check all existing links for CIDOC CRM validity and return the invalid ones."""
         from openatlas.util.util import link
         from openatlas.models.entity import EntityMapper
@@ -270,7 +270,7 @@ class LinkMapper:
         return invalid_links
 
     @staticmethod
-    def check_link_duplicates() -> list:
+    def check_link_duplicates() -> List[NamedTupleCursor.Record]:
         # Find links with the same data (except id, created, modified)
         sql = """
             SELECT COUNT(*) AS count, domain_id, range_id, property_code, description, type_id,
@@ -295,7 +295,7 @@ class LinkMapper:
         return g.cursor.rowcount
 
     @staticmethod
-    def check_single_type_duplicates() -> list:
+    def check_single_type_duplicates() -> List[List[str]]:
         # Find entities with multiple types attached which should be single
         from openatlas.models.node import NodeMapper
         from openatlas.models.entity import EntityMapper

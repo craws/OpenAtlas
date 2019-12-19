@@ -81,13 +81,17 @@ class Entity:
         self.directional = False
         self.forms: Dict[int, Any] = {}
 
-    def get_linked_entity(self, code: str, inverse: bool = False, nodes: bool = False) -> Entity:
+    def get_linked_entity(self,
+                          code: str,
+                          inverse: bool = False,
+                          nodes: bool = False) -> Optional[Entity]:
         return LinkMapper.get_linked_entity(self.id, code, inverse=inverse, nodes=nodes)
 
     def get_linked_entity_safe(self,
                                code: str,
                                inverse: bool = False,
                                nodes: bool = False) -> 'Entity':
+        # Should return always an entity e.g. an object for a place, so abort if not
         entity = LinkMapper.get_linked_entity(self.id, code, inverse, nodes)
         if not entity:
             abort(418)  # pragma: no cover
@@ -412,7 +416,7 @@ class EntityMapper:
         return {similar: data for similar, data in similar.items() if data['entities']}
 
     @staticmethod
-    def get_overview_counts() -> Dict[int, int]:
+    def get_overview_counts() -> Dict[str, int]:
         sql = """
             SELECT
             SUM(CASE WHEN

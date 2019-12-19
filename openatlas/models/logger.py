@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Any, Dict, Union
 
 from flask import g, request, session
 from flask_login import current_user
@@ -53,7 +53,7 @@ class DBHandler:
         g.execute(sql, {'user_id': current_user.id, 'entity_id': entity_id, 'action': action})
 
     @staticmethod
-    def get_log_for_advanced_view(entity_id: str) -> dict:
+    def get_log_for_advanced_view(entity_id: str) -> Dict[str, Any]:
         from openatlas.models.user import UserMapper
         sql = """
             SELECT ul.created, ul.user_id, ul.entity_id, u.username
