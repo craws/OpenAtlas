@@ -10,8 +10,8 @@ from openatlas import app, logger
 class ContentMapper:
 
     @staticmethod
-    def get_content() -> Dict:
-        content: dict = {}
+    def get_content() -> Dict[str, Dict[str, str]]:
+        content: Dict[str, Dict[str, str]] = {}
         for name in ['intro', 'legal_notice', 'contact']:
             content[name] = {}
             for language in app.config['LANGUAGES'].keys():

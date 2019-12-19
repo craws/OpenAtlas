@@ -1,8 +1,12 @@
 from datetime import datetime
-from typing import Optional, Any, Dict
+from typing import Any, Dict, List, Optional, TYPE_CHECKING
 
 import numpy
 from flask import g
+
+if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
+    from openatlas.models.entity import Entity
+    from openatlas.models.link import Link
 
 
 class DateMapper:
@@ -92,7 +96,7 @@ class DateMapper:
         return datetime_
 
     @staticmethod
-    def invalid_involvement_dates() -> list:
+    def invalid_involvement_dates() -> List['Link']:
         """ Search invalid event participation dates and return the actors
             e.g. attending person was born after the event ended"""
         from openatlas.models.link import LinkMapper
@@ -114,7 +118,7 @@ class DateMapper:
         return [LinkMapper.get_by_id(row.id) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_invalid_dates() -> list:
+    def get_invalid_dates() -> List['Entity']:
         """ Search for entities with invalid date combinations, e.g. begin after end"""
         from openatlas.models.entity import EntityMapper
         sql = """
@@ -126,7 +130,7 @@ class DateMapper:
         return [EntityMapper.get_by_id(row.id, nodes=True) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_invalid_link_dates() -> list:
+    def get_invalid_link_dates() -> List['Link']:
         """ Search for links with invalid date combinations, e.g. begin after end"""
         from openatlas.models.link import LinkMapper
         sql = """

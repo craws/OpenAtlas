@@ -3,7 +3,7 @@ from __future__ import annotations  # Needed for Python 4.0 type annotations
 import ast
 import itertools
 from collections import OrderedDict
-from typing import Dict, Iterator, List, Optional, Set, Union, ValuesView
+from typing import Any, Dict, Iterator, List, Optional, Set, Union, ValuesView
 
 from flask import g
 from flask_login import current_user
@@ -14,7 +14,7 @@ from werkzeug.exceptions import abort
 
 from openatlas import app
 from openatlas.models.date import DateMapper
-from openatlas.models.link import LinkMapper
+from openatlas.models.link import Link, LinkMapper
 from openatlas.util.util import is_authorized, print_file_extension, uc_first
 
 
@@ -24,11 +24,11 @@ class Entity:
         from openatlas.forms.date import DateForm
 
         self.id = row.id
-        self.nodes: Dict = {}
+        self.nodes: Dict[Entity, str] = {}
         if hasattr(row, 'nodes') and row.nodes:
             for node in row.nodes:
                 self.nodes[g.nodes[node['f1']]] = node['f2']  # f1 = node id, f2 = value
-        self.aliases: dict = {}
+        self.aliases: Dict[int, str] = {}
         if hasattr(row, 'aliases') and row.aliases:
             for alias in row.aliases:
                 self.aliases[alias['f1']] = alias['f2']  # f1 = alias id, f2 = alias name
@@ -58,7 +58,7 @@ class Entity:
             self.last = DateForm.format_date(self.end_to, 'year') if self.end_to else self.last
         self.class_ = g.classes[row.class_code]
         self.view_name = ''  # Used to build URLs
-        self.external_references: list = []
+        self.external_references: List[Link] = []
         if self.system_type == 'file':
             self.view_name = 'file'
         elif self.class_.code == 'E33' and self.system_type == 'source translation':
@@ -72,14 +72,14 @@ class Entity:
         # Node attributes
         self.count = 0
         self.count_subs = 0
-        self.root: list = []
-        self.subs: list = []
+        self.root: List[int] = []
+        self.subs: List[int] = []
         self.locked = False
         self.multiple = False
         self.system = False
         self.value_type = False
         self.directional = False
-        self.forms: dict = {}
+        self.forms: Dict[int, Any] = {}
 
     def get_linked_entity(self, code: str, inverse: bool = False, nodes: bool = False) -> Entity:
         return LinkMapper.get_linked_entity(self.id, code, inverse=inverse, nodes=nodes)
@@ -107,7 +107,7 @@ class Entity:
         ids = [int(id_) for id_ in ids] if isinstance(ids, list) else [int(ids)]
         return LinkMapper.insert(self, code, EntityMapper.get_by_ids(ids), description, inverse)
 
-    def get_links(self, codes: Union[str, List[str]], inverse: bool = False) -> list:
+    def get_links(self, codes: Union[str, List[str]], inverse: bool = False) -> List[Link]:
         return LinkMapper.get_links(self.id, codes, inverse)
 
     def delete(self) -> None:
@@ -257,14 +257,16 @@ class EntityMapper:
             'description': sanitize(entity.description, 'description')})
 
     @staticmethod
-    def get_by_system_type(system_type: str, nodes: bool = False, aliases: bool = False) -> list:
+    def get_by_system_type(system_type: str,
+                           nodes: bool = False,
+                           aliases: bool = False) -> List[Entity]:
         sql = EntityMapper.build_sql(nodes=nodes, aliases=aliases)
         sql += ' WHERE e.system_type = %(system_type)s GROUP BY e.id;'
         g.execute(sql, {'system_type': system_type})
         return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_display_files() -> list:
+    def get_display_files() -> List[Entity]:
         sql_clause = " WHERE e.system_type = 'file' GROUP BY e.id;"
         g.execute(EntityMapper.build_sql(nodes=True) + sql_clause)
         entities = []

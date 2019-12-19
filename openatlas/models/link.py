@@ -138,7 +138,7 @@ class LinkMapper:
     @staticmethod
     def get_links(entity_id: int,
                   codes: Union[str, List[str], None] = None,
-                  inverse: bool = False) -> list:
+                  inverse: bool = False) -> List[Link]:
         sql = """
             SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description, l.created,
                 l.modified, e.name, l.type_id,
