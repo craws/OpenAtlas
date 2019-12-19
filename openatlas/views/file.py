@@ -1,7 +1,7 @@
 import datetime
 import math
 import os
-from typing import Any, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 from flask import flash, g, render_template, request, send_from_directory, session, url_for
 from flask_babel import lazy_gettext as _
@@ -106,7 +106,7 @@ def file_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
             convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
             file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
             truncate_string(entity.description)])
-    disk_space_values: dict = {'total': 'N/A', 'free': 'N/A', 'percent': 'N/A'}
+    disk_space_values: Dict[str, str] = {'total': 'N/A', 'free': 'N/A', 'percent': 'N/A'}
     if os.name == "posix":  # e.g. Windows has no statvfs
         statvfs = os.statvfs(app.config['UPLOAD_FOLDER_PATH'])
         disk_space = statvfs.f_frsize * statvfs.f_blocks
@@ -179,7 +179,8 @@ def save(form: FileForm, file: Optional[Entity] = None, origin: Optional[Entity]
             log_action = 'insert'
             file_ = request.files['file']
             file = EntityMapper.insert('E31', form.name.data, 'file')
-            filename = secure_filename('a' + file_.filename)  # Add an 'a' to prevent emtpy filename
+            # Add an 'a' to prevent emtpy filename
+            filename = secure_filename('a' + file_.filename)  # type: ignore
             new_name = str(file.id) + '.' + filename.rsplit('.', 1)[1].lower()
             full_path = os.path.join(app.config['UPLOAD_FOLDER_PATH'], new_name)
             file_.save(full_path)

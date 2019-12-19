@@ -1,5 +1,5 @@
 import ast
-from typing import List, Optional
+from typing import Any, Dict, List, Optional
 
 from flask import g, json
 from flask_wtf import FlaskForm
@@ -17,11 +17,12 @@ class InvalidGeomException(Exception):
 class GisMapper:
 
     @staticmethod
-    def get_all(objects: Optional[List[Entity]] = None) -> dict:
+    def get_all(objects: Optional[List[Entity]] = None) -> Dict[str, List[Any]]:
         if objects is None:
             objects = []
-        all_: dict = {'point': [], 'linestring': [], 'polygon': []}
-        selected: dict = {'point': [], 'linestring': [], 'polygon': [], 'polygon_point': []}
+        all_: Dict[str, List[Any]] = {'point': [], 'linestring': [], 'polygon': []}
+        selected: Dict[str, List[Any]] = {
+            'point': [], 'linestring': [], 'polygon': [], 'polygon_point': []}
         # Workaround to include GIS features of a subunit which would be otherwise omitted
         subunit_selected_id = 0
         if objects and objects[0].system_type in ['feature', 'find', 'stratigraphic unit']:

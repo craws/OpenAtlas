@@ -3,7 +3,7 @@ from __future__ import annotations  # Needed for Python 4.0 type annotations
 import ast
 import itertools
 from collections import OrderedDict
-from typing import Any, Dict, Iterator, List, Optional, Set, Union, ValuesView
+from typing import Any, Dict, List, Optional, Set, Union, ValuesView
 
 from flask import g
 from flask_login import current_user
@@ -84,7 +84,18 @@ class Entity:
     def get_linked_entity(self, code: str, inverse: bool = False, nodes: bool = False) -> Entity:
         return LinkMapper.get_linked_entity(self.id, code, inverse=inverse, nodes=nodes)
 
-    def get_linked_entities(self, code: Union[str, List[str]], inverse: bool = False,
+    def get_linked_entity_safe(self,
+                               code: str,
+                               inverse: bool = False,
+                               nodes: bool = False) -> 'Entity':
+        entity = LinkMapper.get_linked_entity(self.id, code, inverse, nodes)
+        if not entity:
+            abort(418)  # pragma: no cover
+        return entity
+
+    def get_linked_entities(self,
+                            code: Union[str, List[str]],
+                            inverse: bool = False,
                             nodes: bool = False) -> List[Entity]:
         return LinkMapper.get_linked_entities(self.id, code, inverse=inverse, nodes=nodes)
 
@@ -317,7 +328,7 @@ class EntityMapper:
         return entity
 
     @staticmethod
-    def get_by_ids(entity_ids: Union[Iterator, Set, List], nodes: bool = False) -> list:
+    def get_by_ids(entity_ids: Any, nodes: bool = False) -> List[Entity]:
         if not entity_ids:
             return []
         sql = EntityMapper.build_sql(nodes) + ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name'
@@ -325,7 +336,7 @@ class EntityMapper:
         return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_by_project_id(project_id: int) -> list:
+    def get_by_project_id(project_id: int) -> List[Entity]:
         sql = """
             SELECT e.id, ie.origin_id, e.class_code, e.name, e.description, e.created, e.modified,
                 e.system_type,
@@ -345,7 +356,7 @@ class EntityMapper:
         return entities
 
     @staticmethod
-    def get_by_codes(class_name: str) -> list:
+    def get_by_codes(class_name: str) -> List[Entity]:
         # Possible class names: actor, event, place, reference, source
         if class_name == 'source':
             sql = EntityMapper.build_sql(nodes=True) + """
@@ -379,14 +390,14 @@ class EntityMapper:
         g.execute('DELETE FROM model.entity WHERE id = %(id_)s;', {'id_': id_})
 
     @staticmethod
-    def get_similar_named(form: FlaskForm) -> dict:
+    def get_similar_named(form: FlaskForm) -> Dict[int, Any]:
         class_ = form.classes.data
         if class_ in ['source', 'event', 'actor']:
             entities = EntityMapper.get_by_codes(class_)
         else:
             entities = EntityMapper.get_by_system_type(class_)
-        similar: dict = {}
-        already_added: set = set()
+        similar: Dict[int, Any] = {}
+        already_added: Set[int] = set()
         for sample in entities:
             if sample.id in already_added:
                 continue
@@ -401,7 +412,7 @@ class EntityMapper:
         return {similar: data for similar, data in similar.items() if data['entities']}
 
     @staticmethod
-    def get_overview_counts() -> dict:
+    def get_overview_counts() -> Dict[int, int]:
         sql = """
             SELECT
             SUM(CASE WHEN
@@ -419,13 +430,13 @@ class EntityMapper:
         return {col[0]: row[idx] for idx, col in enumerate(g.cursor.description)}
 
     @staticmethod
-    def get_orphans() -> list:
+    def get_orphans() -> List[Entity]:
         """ Returns entities without links. """
         g.execute(EntityMapper.sql_orphan)
         return [EntityMapper.get_by_id(row.id) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_latest(limit: int) -> list:
+    def get_latest(limit: int) -> List[Entity]:
         """ Returns the newest created entities"""
         codes = list(itertools.chain(*[code_ for code_ in app.config['CLASS_CODES'].values()]))
         sql = EntityMapper.build_sql() + """
@@ -456,7 +467,7 @@ class EntityMapper:
         return g.cursor.rowcount
 
     @staticmethod
-    def search(form: FlaskForm) -> ValuesView:
+    def search(form: FlaskForm) -> ValuesView[Entity]:
         if not form.term.data:
             return {}.values()
         sql = EntityMapper.build_sql() + """
@@ -587,7 +598,7 @@ class EntityMapper:
         g.execute(sql, {'entity_id': entity_id})
 
     @staticmethod
-    def get_circular() -> list:
+    def get_circular() -> List[Entity]:
         """ Get entities that are linked to itself"""
         g.execute('SELECT domain_id FROM model.link WHERE domain_id = range_id;')
         return [EntityMapper.get_by_id(row.domain_id) for row in g.cursor.fetchall()]

@@ -52,7 +52,7 @@ class ImportMapper:
         g.execute('DELETE FROM import.project WHERE id = %(id)s;', {'id': id_})
 
     @staticmethod
-    def check_origin_ids(project: Project, origin_ids: list) -> list:
+    def check_origin_ids(project: Project, origin_ids: List[int]) -> List[int]:
         """ Check if origin ids already in database"""
         sql = """
             SELECT origin_id FROM import.entity
@@ -61,7 +61,7 @@ class ImportMapper:
         return [row.origin_id for row in g.cursor.fetchall()]
 
     @staticmethod
-    def check_duplicates(class_code: str, names: list) -> list:
+    def check_duplicates(class_code: str, names: List[str]) -> List[str]:
         sql = """
             SELECT DISTINCT name FROM model.entity
             WHERE class_code = %(class_code)s AND LOWER(name) IN %(names)s;"""

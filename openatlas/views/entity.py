@@ -1,9 +1,9 @@
 import os
 import sys
-from typing import Union
+from typing import Dict, Union
 
-from flask import g, render_template, url_for, flash
-from flask_babel import lazy_gettext as _, format_number
+from flask import flash, g, render_template, url_for
+from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
@@ -13,7 +13,7 @@ from openatlas import app
 from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.gis import GisMapper
 from openatlas.models.link import LinkMapper
-from openatlas.models.overlay import OverlayMapper
+from openatlas.models.overlay import Overlay, OverlayMapper
 from openatlas.models.user import UserMapper
 from openatlas.util.table import Table
 from openatlas.util.util import (add_system_data, add_type_data, display_remove_link,
@@ -84,7 +84,7 @@ def actor_view(actor: Entity) -> str:
         places = event.get_linked_entities(['P7', 'P26', 'P27'])
         link_.object_ = None
         for place in places:
-            object_ = place.get_linked_entity('P53', True)
+            object_ = place.get_linked_entity_safe('P53', True)
             objects.append(object_)
             link_.object_ = object_  # Needed later for first/last appearance info
         first = link_.first
@@ -306,7 +306,7 @@ def place_view(object_: Entity) -> str:
     if object_.system_type == 'stratigraphic unit':
         tables['find'] = Table(Table.HEADERS['place'] + [_('description')])
     profile_image_id = object_.get_profile_image_id()
-    overlays: dict = {}
+    overlays: Dict[int, Overlay] = {}
     if current_user.settings['module_map_overlay']:
         overlays = OverlayMapper.get_by_object(object_)
         if is_authorized('editor'):
@@ -364,7 +364,7 @@ def place_view(object_: Entity) -> str:
                                      actor.class_.name,
                                      actor.first,
                                      actor.last])
-    gis_data: dict = GisMapper.get_all([object_])
+    gis_data: Dict[str, str] = GisMapper.get_all([object_])
     if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]' \
             and gis_data['gisLineSelected'] == '[]':
         gis_data = {}

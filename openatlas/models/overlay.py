@@ -1,4 +1,5 @@
 import os
+from typing import Dict
 
 from flask import g
 from flask_wtf import FlaskForm
@@ -49,7 +50,7 @@ class OverlayMapper:
         g.execute(sql, {'image_id': image_id, 'place_id': place_id, 'bounding_box': bounding_box})
 
     @staticmethod
-    def get_by_object(object_: Entity) -> dict:
+    def get_by_object(object_: Entity) -> Dict[int, Overlay]:
         ids = [object_.id]
 
         # Get overlays of parents

@@ -1,6 +1,6 @@
 import os
 import re
-from typing import Any, Dict, Iterator, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import flask
 import jinja2
@@ -75,7 +75,7 @@ def nl2br(self: Any, value: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_info(self: Any, data: Iterator) -> str:
+def display_info(self: Any, data: {str, str}) -> str:
     html = '<div class="data-table">'
     for key, value in data:
         if value or value == 0:
@@ -232,7 +232,7 @@ def display_form(self: Any,
     id_attribute = ' id="' + form_id + '" ' if form_id else ''
     html = {'main': '', 'types': '', 'value_types': '', 'header': '', 'footer': ''}
 
-    def display_value_type_fields(subs: list, html_: str = '') -> str:
+    def display_value_type_fields(subs: List[int], html_: str = '') -> str:
         for sub_id in subs:
             sub = g.nodes[sub_id]
             field_ = getattr(form, str(sub_id))
@@ -407,7 +407,7 @@ def display_menu(self: Any, origin: Entity) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_debug_info(self: Any, debug_model: Dict, form: Any) -> str:
+def display_debug_info(self: Any, debug_model: Dict[str, float], form: Any) -> str:
     """ Returns HTML with debug information about database queries and form errors."""
     html = ''
     for name, value in debug_model.items():

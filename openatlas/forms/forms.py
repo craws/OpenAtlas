@@ -3,7 +3,7 @@ from __future__ import annotations  # Needed for Python 4.0 type annotations
 import ast
 import re
 import time
-from typing import Any, List, Optional as Optional_Type, Union
+from typing import Any, Dict, List, Optional as Optional_Type, Union
 
 from flask import Request, g, session
 from flask_babel import lazy_gettext as _
@@ -36,7 +36,7 @@ def build_form(form: Any,
                request_origin: Optional[Request] = None,
                entity2: Optional[Entity] = None) -> Any:
 
-    def add_value_type_fields(subs: list) -> None:
+    def add_value_type_fields(subs: List[int]) -> None:
         for sub_id in subs:
             sub = g.nodes[sub_id]
             setattr(form, str(sub.id), ValueFloatField(sub.name, [Optional()]))
@@ -70,7 +70,7 @@ def build_form(form: Any,
             nodes.update(entity2.nodes)
         if hasattr(form, 'opened'):
             form_instance.opened.data = time.time()
-        node_data: dict = {}
+        node_data: Dict[int, List[int]] = {}
         for node, node_value in nodes.items():
             root = g.nodes[node.root[-1]] if node.root else node
             if root.id not in node_data:
