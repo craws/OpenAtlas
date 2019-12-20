@@ -97,6 +97,23 @@ class ImportMapper:
             g.execute(sql, {'project_id': project.id, 'entity_id': entity.id,
                             'user_id': current_user.id,
                             'origin_id': row['id'] if 'id' in row and row['id'] else None})
+
+            # Dates
+            if 'begin_from' in row and row['begin_from']:
+                entity.begin_from = row['begin_from']
+                if 'begin_to' in row and row['begin_to']:
+                    entity.begin_to = row['begin_to']
+                if 'begin_comment' in row and row['begin_comment']:
+                    entity.begin_comment = row['begin_comment']
+
+            if 'end_from' in row and row['end_from']:
+                entity.end_from = row['end_from']
+                if 'end_to' in row and row['end_to']:
+                    entity.end_to = row['end_to']
+                if 'end_comment' in row and row['end_comment']:
+                    entity.end_comment = row['end_comment']
+
+            # GIS
             if class_code == 'E18':
                 location = EntityMapper.insert('E53', 'Location of ' + row['name'],
                                                'place location')

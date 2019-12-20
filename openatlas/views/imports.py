@@ -1,6 +1,7 @@
 import collections
 from typing import Optional, Union
 
+import numpy
 import pandas as pd
 from flask import flash, g, render_template, request, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -121,7 +122,11 @@ def import_data(project_id: int, class_code: str) -> str:
     if form.validate_on_submit():
         file_ = request.files['file']
         file_path = app.config['TMP_FOLDER_PATH'].joinpath(secure_filename(file_.filename))
-        columns: dict = {'allowed': ['name', 'id', 'description'], 'valid': [], 'invalid': []}
+        columns: dict = {'allowed': ['name', 'id', 'description',
+                                     'begin_from', 'begin_to', 'begin_comment'
+                                     'end_from', 'end_to', 'end_comment'],
+                         'valid': [],
+                         'invalid': []}
         if class_code == 'E18':
             columns['allowed'] += ['easting', 'northing']
         try:
@@ -155,8 +160,20 @@ def import_data(project_id: int, class_code: str) -> str:
                 for item in headers:
                     value = row[item]
                     if item in ['northing', 'easting'] and not is_float(row[item]):
-                        value = '<span class="error">' + row[item] + '</span>'  # pragma: no cover
-                    table_row.append(value)
+                        value = '<span class="error">' + value + '</span>'  # pragma: no cover
+                    if item in ['begin_from', 'begin_to', 'end_from', 'end_to']:
+                        if not value:
+                            value = ''
+                        else:
+                            try:
+                                value = numpy.datetime64(value)
+                            except ValueError:
+                                if str(value) == 'NaT':
+                                    value = ''
+                                else:
+                                    value = '<span class="error">' + str(
+                                        value) + '</span>'  # pragma: no cover
+                    table_row.append(str(value))
                     checked_row[item] = row[item]
                     if item == 'name' and form.duplicate.data:
                         names.append(row['name'].lower())
