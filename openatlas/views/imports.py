@@ -12,6 +12,7 @@ from wtforms import BooleanField, FileField, StringField, SubmitField, TextAreaF
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
+from openatlas.models.date import DateMapper
 from openatlas.models.entity import EntityMapper
 from openatlas.models.imports import ImportMapper
 from openatlas.util.table import Table
@@ -123,7 +124,7 @@ def import_data(project_id: int, class_code: str) -> str:
         file_ = request.files['file']
         file_path = app.config['TMP_FOLDER_PATH'].joinpath(secure_filename(file_.filename))
         columns: dict = {'allowed': ['name', 'id', 'description',
-                                     'begin_from', 'begin_to', 'begin_comment'
+                                     'begin_from', 'begin_to', 'begin_comment',
                                      'end_from', 'end_to', 'end_comment'],
                          'valid': [],
                          'invalid': []}
@@ -131,10 +132,7 @@ def import_data(project_id: int, class_code: str) -> str:
             columns['allowed'] += ['easting', 'northing']
         try:
             file_.save(str(file_path))
-            if str(file_path).rsplit('.', 1)[1].lower() in ['xls', 'xlsx']:
-                df = pd.read_excel(file_path, keep_default_na=False)
-            else:
-                df = pd.read_csv(file_path, keep_default_na=False)
+            df = pd.read_csv(file_path, keep_default_na=False)
             headers = list(df.columns.values)
             if 'name' not in headers:  # pragma: no cover
                 messages['error'].append(_('missing name column'))
@@ -166,13 +164,14 @@ def import_data(project_id: int, class_code: str) -> str:
                             value = ''
                         else:
                             try:
-                                value = numpy.datetime64(value)
-                            except ValueError:
+                                value = DateMapper.datetime64_to_timestamp(numpy.datetime64(value))
+                                row[item] = value
+                            except ValueError:  # pragma: no cover
+                                row[item] = ''
                                 if str(value) == 'NaT':
                                     value = ''
                                 else:
-                                    value = '<span class="error">' + str(
-                                        value) + '</span>'  # pragma: no cover
+                                    value = '<span class="error">' + str(value) + '</span>'
                     table_row.append(str(value))
                     checked_row[item] = row[item]
                     if item == 'name' and form.duplicate.data:

@@ -36,7 +36,7 @@ class ExportTest(TestBaseCase):
                     url_for('import_data', class_code='E18', project_id=project_id),
                     data={'file': file, 'duplicate': True}, follow_redirects=True)
             assert b'Vienna' in rv.data
-            path = app.config['ROOT_PATH'].joinpath('static', 'import', 'example.xlsx')
+            path = app.config['ROOT_PATH'].joinpath('static', 'import', 'example.csv')
             with open(path, 'rb') as file:
                 rv = self.app.post(
                     url_for('import_data', class_code='E18', project_id=project_id),

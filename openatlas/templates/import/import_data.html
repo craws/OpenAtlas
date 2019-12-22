@@ -17,9 +17,7 @@
     <p>
         {{ _('allowed extensions')|uc_first }}:
         <span style="font-weight: bold;">{{ config['IMPORT_FILE_EXTENSIONS']|join(', ') }}</span> -
-        {{ _('example files')|uc_first }}:
-        <a href="/static/import/example.csv">example.csv</a>,
-        <a href="/static/import/example.xlsx">example.xlsx</a>
+        {{ _('example files')|uc_first }}: <a href="/static/import/example.csv">example.csv</a>
     </p>
     {{ form|display_form|safe }}
     {% for item in messages['error'] %}

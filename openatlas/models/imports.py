@@ -112,6 +112,7 @@ class ImportMapper:
                     entity.end_to = row['end_to']
                 if 'end_comment' in row and row['end_comment']:
                     entity.end_comment = row['end_comment']
+            entity.update()
 
             # GIS
             if class_code == 'E18':
