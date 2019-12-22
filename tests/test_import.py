@@ -32,21 +32,18 @@ class ExportTest(TestBaseCase):
             assert b'File *' in rv.data
             path = app.config['ROOT_PATH'].joinpath('static', 'import', 'example.csv')
             with open(path, 'rb') as file:
-                rv = self.app.post(
-                    url_for('import_data', class_code='E18', project_id=project_id),
-                    data={'file': file, 'duplicate': True}, follow_redirects=True)
+                rv = self.app.post(url_for('import_data', class_code='E18', project_id=project_id),
+                                   data={'file': file, 'duplicate': True}, follow_redirects=True)
             assert b'Vienna' in rv.data
             path = app.config['ROOT_PATH'].joinpath('static', 'import', 'example.csv')
             with open(path, 'rb') as file:
-                rv = self.app.post(
-                    url_for('import_data', class_code='E18', project_id=project_id),
-                    data={'file': file, 'duplicate': True}, follow_redirects=True)
+                rv = self.app.post(url_for('import_data', class_code='E18', project_id=project_id),
+                                   data={'file': file, 'duplicate': True}, follow_redirects=True)
             if os.name == 'posix':
                 assert b'IDs already in database' in rv.data
             with open(app.config['ROOT_PATH'].joinpath('static', 'favicon.ico'), 'rb') as file:
-                rv = self.app.post(
-                    url_for('import_data', class_code='E18', project_id=project_id),
-                    data={'file': file}, follow_redirects=True)
+                rv = self.app.post(url_for('import_data', class_code='E18', project_id=project_id),
+                                   data={'file': file}, follow_redirects=True)
             assert b'File type not allowed' in rv.data
             rv = self.app.get(url_for('import_project_view', id_=project_id))
             assert b'London' in rv.data

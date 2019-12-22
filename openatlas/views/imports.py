@@ -16,7 +16,8 @@ from openatlas.models.date import DateMapper
 from openatlas.models.entity import EntityMapper
 from openatlas.models.imports import ImportMapper
 from openatlas.util.table import Table
-from openatlas.util.util import format_date, is_float, link, required_group, truncate_string
+from openatlas.util.util import (format_date, get_backup_file_data, is_float, link, required_group,
+                                 truncate_string)
 
 
 class ProjectForm(FlaskForm):  # type: ignore
@@ -120,6 +121,7 @@ def import_data(project_id: int, class_code: str) -> str:
     table = None
     imported = False
     messages: dict = {'error': [], 'warn': []}
+    file_data = get_backup_file_data()
     if form.validate_on_submit():
         file_ = request.files['file']
         file_path = app.config['TMP_FOLDER_PATH'].joinpath(secure_filename(file_.filename))
@@ -200,9 +202,9 @@ def import_data(project_id: int, class_code: str) -> str:
         except Exception as e:  # pragma: no cover
             flash(_('error at import'), 'error')
             return render_template('import/import_data.html', project=project, form=form,
-                                   class_code=class_code, messages=messages)
+                                   class_code=class_code, messages=messages, file_data=file_data)
 
-        if not form.preview.data and checked_data:
+        if not form.preview.data and checked_data and not file_data['backup_too_old']:
             g.cursor.execute('BEGIN')
             try:
                 ImportMapper.import_data(project, class_code, checked_data)
@@ -215,4 +217,5 @@ def import_data(project_id: int, class_code: str) -> str:
                 logger.log('error', 'import', 'import failed', e)
                 flash(_('error transaction'), 'error')
     return render_template('import/import_data.html', project=project, form=form,
-                           class_code=class_code, table=table, imported=imported, messages=messages)
+                           file_data=file_data, class_code=class_code, table=table,
+                           imported=imported, messages=messages)
