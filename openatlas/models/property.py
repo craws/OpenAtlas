@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, List
 
 from flask import g, session
 
@@ -15,10 +15,10 @@ class Property:
     comment: str
     code: str
     id: int
-    i18n: dict
-    i18n_inverse: dict
-    sub: list
-    super: list
+    i18n: Dict[str, str]
+    i18n_inverse: Dict[str, str]
+    sub: List[int]
+    super: List[int]
     domain_class_code: str
     range_class_code: str
 
@@ -49,7 +49,7 @@ class Property:
             return True
         return self.find_subs(attr, class_id, g.classes[valid_domain_id].sub)
 
-    def find_subs(self, attr: str, class_id: int, valid_subs: list) -> bool:
+    def find_subs(self, attr: str, class_id: int, valid_subs: List[int]) -> bool:
         for sub_id in valid_subs:
             if sub_id == class_id:
                 return True
@@ -61,15 +61,19 @@ class Property:
 class PropertyMapper:
 
     @staticmethod
-    def get_all() -> Dict:
+    def get_all() -> Dict[str, Property]:
         sql = """
             SELECT id, code, comment, domain_class_code, range_class_code, name, name_inverse
             FROM model.property;"""
         g.execute(sql)
-        properties = {row.code: Property(id=row.id, _name=row.name, _name_inverse=row.name_inverse,
-                                         code=row.code, comment=row.comment, i18n={}, sub=[],
-                                         super=[], domain_class_code=row.domain_class_code,
-                                         range_class_code=row.range_class_code, i18n_inverse={}
+        properties = {row.code: Property(id=row.id,
+                                         _name=row.name,
+                                         _name_inverse=row.name_inverse,
+                                         code=row.code,
+                                         comment=row.comment,
+                                         domain_class_code=row.domain_class_code,
+                                         range_class_code=row.range_class_code,
+                                         sub=[], super=[], i18n={}, i18n_inverse={}
                                          ) for row in g.cursor.fetchall()}
         g.execute('SELECT super_code, sub_code FROM model.property_inheritance;')
         for row in g.cursor.fetchall():
