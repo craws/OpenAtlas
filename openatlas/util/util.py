@@ -5,12 +5,13 @@ import os
 import re
 import smtplib
 from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timedelta
 from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
 from html.parser import HTMLParser
-from typing import Any, Dict, List, Optional, TYPE_CHECKING, Tuple, Union
+from os.path import basename
+from typing import Any, Dict, List, Optional, TYPE_CHECKING, Union, Tuple
 
 import numpy
 from flask import abort, flash, g, request, session, url_for
@@ -536,6 +537,28 @@ def get_appearance(event_links: List['Link']) -> Tuple[Optional[str], Optional[s
                 last_string = format_entry_end(event) + ' ' + _('at an') + ' ' + event_link
                 last_string += (' ' + _('in') + ' ' + link(link_.object_)) if link_.object_ else ''
     return first_string, last_string
+
+
+def get_backup_file_data() -> Dict:
+    path = app.config['EXPORT_FOLDER_PATH'].joinpath('sql')
+    latest_file = None
+    latest_file_date = None
+    for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
+        name = basename(file)
+        if name == '.gitignore':
+            continue
+        file_date = datetime.utcfromtimestamp(os.path.getmtime(path.joinpath(file)))
+        if not latest_file_date or file_date > latest_file_date:
+            latest_file = file
+            latest_file_date = file_date
+    file_data: Dict = {'backup_too_old': True}
+    if latest_file and latest_file_date:
+        yesterday = datetime.today() - timedelta(days=1)
+        file_data['file'] = latest_file
+        file_data['backup_too_old'] = True if yesterday > latest_file_date else False
+        file_data['size'] = convert_size(os.path.getsize(path.joinpath(latest_file)))
+        file_data['date'] = format_date(latest_file_date)
+    return file_data
 
 
 def is_float(value: Union[int, float]) -> bool:

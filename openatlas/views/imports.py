@@ -1,6 +1,7 @@
 import collections
 from typing import Dict, List, Optional, Union
 
+import numpy
 import pandas as pd
 from flask import flash, g, render_template, request, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -11,10 +12,12 @@ from wtforms import BooleanField, FileField, StringField, SubmitField, TextAreaF
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
+from openatlas.models.date import DateMapper
 from openatlas.models.entity import EntityMapper
 from openatlas.models.imports import ImportMapper
 from openatlas.util.table import Table
-from openatlas.util.util import format_date, is_float, link, required_group, truncate_string
+from openatlas.util.util import (format_date, get_backup_file_data, is_float, link, required_group,
+                                 truncate_string)
 
 
 class ProjectForm(FlaskForm):  # type: ignore
@@ -118,21 +121,20 @@ def import_data(project_id: int, class_code: str) -> str:
     table = None
     imported = False
     messages: Dict[str, List[str]] = {'error': [], 'warn': []}
+    file_data = get_backup_file_data()
     if form.validate_on_submit():
         file_ = request.files['file']
-        file_path = app.config['TMP_FOLDER_PATH'].joinpath(
-            secure_filename(file_.filename))  # type: ignore
-        columns: Dict[str, List[str]] = {'allowed': ['name', 'id', 'description'],
-                                         'valid': [],
-                                         'invalid': []}
+        file_path = app.config['TMP_FOLDER_PATH'].joinpath(secure_filename(file_.filename))
+        columns: Dict[str, List[str]] = {'allowed': ['name', 'id', 'description',
+                                     'begin_from', 'begin_to', 'begin_comment',
+                                     'end_from', 'end_to', 'end_comment'],
+                         'valid': [],
+                         'invalid': []}
         if class_code == 'E18':
             columns['allowed'] += ['easting', 'northing']
         try:
             file_.save(str(file_path))
-            if str(file_path).rsplit('.', 1)[1].lower() in ['xls', 'xlsx']:
-                df = pd.read_excel(file_path, keep_default_na=False)
-            else:
-                df = pd.read_csv(file_path, keep_default_na=False)
+            df = pd.read_csv(file_path, keep_default_na=False)
             headers = list(df.columns.values)
             if 'name' not in headers:  # pragma: no cover
                 messages['error'].append(_('missing name column'))
@@ -158,8 +160,21 @@ def import_data(project_id: int, class_code: str) -> str:
                 for item in headers:
                     value = row[item]
                     if item in ['northing', 'easting'] and not is_float(row[item]):
-                        value = '<span class="error">' + row[item] + '</span>'  # pragma: no cover
-                    table_row.append(value)
+                        value = '<span class="error">' + value + '</span>'  # pragma: no cover
+                    if item in ['begin_from', 'begin_to', 'end_from', 'end_to']:
+                        if not value:
+                            value = ''
+                        else:
+                            try:
+                                value = DateMapper.datetime64_to_timestamp(numpy.datetime64(value))
+                                row[item] = value
+                            except ValueError:  # pragma: no cover
+                                row[item] = ''
+                                if str(value) == 'NaT':
+                                    value = ''
+                                else:
+                                    value = '<span class="error">' + str(value) + '</span>'
+                    table_row.append(str(value))
                     checked_row[item] = row[item]
                     if item == 'name' and form.duplicate.data:
                         names.append(row['name'].lower())
@@ -187,9 +202,9 @@ def import_data(project_id: int, class_code: str) -> str:
         except Exception as e:  # pragma: no cover
             flash(_('error at import'), 'error')
             return render_template('import/import_data.html', project=project, form=form,
-                                   class_code=class_code, messages=messages)
+                                   class_code=class_code, messages=messages, file_data=file_data)
 
-        if not form.preview.data and checked_data:
+        if not form.preview.data and checked_data and not file_data['backup_too_old']:
             g.cursor.execute('BEGIN')
             try:
                 ImportMapper.import_data(project, class_code, checked_data)
@@ -202,4 +217,5 @@ def import_data(project_id: int, class_code: str) -> str:
                 logger.log('error', 'import', 'import failed', e)
                 flash(_('error transaction'), 'error')
     return render_template('import/import_data.html', project=project, form=form,
-                           class_code=class_code, table=table, imported=imported, messages=messages)
+                           file_data=file_data, class_code=class_code, table=table,
+                           imported=imported, messages=messages)
