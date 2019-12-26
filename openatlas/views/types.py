@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 from flask import abort, flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -30,7 +30,7 @@ class NodeForm(FlaskForm):  # type: ignore
 @app.route('/types')
 @required_group('readonly')
 def node_index() -> str:
-    nodes: dict = {'system': {}, 'custom': {}, 'places': {}, 'value': {}}
+    nodes: Dict[str, Dict[Entity, str]] = {'system': {}, 'custom': {}, 'places': {}, 'value': {}}
     for id_, node in g.nodes.items():
         if node.root:
             continue
@@ -117,7 +117,7 @@ def node_move_entities(id_: int) -> Union[str, Response]:
     return render_template('types/move.html', node=node, root=root, form=form)
 
 
-def walk_tree(nodes: List[Entity]) -> str:
+def walk_tree(nodes: List[int]) -> str:
     """ Builds JSON for jsTree"""
     text = ''
     for id_ in nodes:

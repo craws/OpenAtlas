@@ -1,3 +1,5 @@
+from typing import Any, Dict
+
 from flask import url_for
 
 from openatlas import app
@@ -19,7 +21,7 @@ class ModelTests(TestBaseCase):
             assert b'P1' in rv.data
             rv = self.app.get(url_for('property_view', code='P68'))
             assert b'P68' in rv.data
-            data: dict = {'domain': 'E1', 'range': 'E1', 'property': 'P13'}
+            data: Dict[str, Any] = {'domain': 'E1', 'range': 'E1', 'property': 'P13'}
             rv = self.app.post(url_for('model_index'), data=data)
             assert b'Wrong domain' in rv.data
             data = {'domain': 'E1', 'range': 'E1', 'property': 'P67'}

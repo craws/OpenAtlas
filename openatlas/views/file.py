@@ -106,7 +106,7 @@ def file_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
             convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
             file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
             truncate_string(entity.description)])
-    disk_space_values: Dict[str, float] = {'total': 'N/A', 'free': 'N/A', 'percent': 'N/A'}
+    disk_space_values: Dict[str, Any] = {'total': 'N/A', 'free': 'N/A', 'percent': 'N/A'}
     if os.name == "posix":  # e.g. Windows has no statvfs
         statvfs = os.statvfs(app.config['UPLOAD_FOLDER_PATH'])
         disk_space = statvfs.f_frsize * statvfs.f_blocks

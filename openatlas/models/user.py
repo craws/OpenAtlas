@@ -1,7 +1,7 @@
 import datetime
 import secrets
 import string
-from typing import List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import bcrypt
 from flask import g, session
@@ -20,7 +20,7 @@ class User(UserMixin):  # type: ignore
 
     def __init__(self,
                  row: NamedTupleCursor.Record = None,
-                 bookmarks: Optional[list] = None) -> None:
+                 bookmarks: Optional[List[int]] = None) -> None:
         self.id = None
         self.username = None
         self.email = None
@@ -72,7 +72,7 @@ class UserMapper:
         LEFT JOIN web.group r ON u.group_id = r.id """
 
     @staticmethod
-    def get_all() -> list:
+    def get_all() -> List[User]:
         g.execute(UserMapper.sql + ' ORDER BY username;')
         return [User(row) for row in g.cursor.fetchall()]
 
@@ -115,7 +115,7 @@ class UserMapper:
             FROM web.user_log WHERE TRUE"""
         sql += ' AND user_id = %(user_id)s' if int(user_id) else ''
         sql += ' AND action = %(action)s' if action != 'all' else ''
-        sql += ' ORDER BY created DESC'  # Order is mportant because of limit filter
+        sql += ' ORDER BY created DESC'  # Order is important because of limit filter
         sql += ' LIMIT %(limit)s' if int(limit) else ''
         g.execute(sql, {'limit': limit, 'user_id': user_id, 'action': action})
         return g.cursor.fetchall()
@@ -192,7 +192,7 @@ class UserMapper:
         g.execute(sql, {'user_id': id_})
 
     @staticmethod
-    def get_users() -> list:
+    def get_users() -> List[Tuple[int, str]]:
         g.execute('SELECT id, username FROM web.user ORDER BY username;')
         return [(row.id, row.username) for row in g.cursor.fetchall()]
 
@@ -211,7 +211,7 @@ class UserMapper:
         return label
 
     @staticmethod
-    def get_settings(user_id: int) -> dict:
+    def get_settings(user_id: int) -> Dict[str, Any]:
         sql = 'SELECT "name", value FROM web.user_settings WHERE user_id = %(user_id)s;'
         g.execute(sql, {'user_id': user_id})
         settings = {row.name: row.value for row in g.cursor.fetchall()}
@@ -271,7 +271,7 @@ class UserMapper:
         return g.cursor.fetchone()[0] if g.cursor.rowcount == 1 else None
 
     @staticmethod
-    def get_notes() -> dict:
+    def get_notes() -> Dict[int, str]:
         if not current_user.settings['module_notes']:  # pragma no cover
             return {}
         sql = "SELECT entity_id, text FROM web.user_notes WHERE user_id = %(user_id)s;"

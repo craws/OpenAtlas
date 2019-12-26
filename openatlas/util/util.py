@@ -11,7 +11,7 @@ from email.mime.text import MIMEText
 from functools import wraps
 from html.parser import HTMLParser
 from os.path import basename
-from typing import Any, Dict, List, Optional, TYPE_CHECKING, Union, Tuple
+from typing import Any, Dict, List, Optional, TYPE_CHECKING, Tuple, Union
 
 import numpy
 from flask import abort, flash, g, request, session, url_for
@@ -158,7 +158,7 @@ def display_remove_link(url: str, name: str) -> str:
 def add_type_data(entity: 'Entity',
                   data: List[Tuple[str, str]],
                   location: Optional['Entity'] = None) -> List[Tuple[str, str]]:
-    type_data: OrderedDict = OrderedDict()
+    type_data: OrderedDict[str, Any] = OrderedDict()
     # Nodes
     if location:
         entity.nodes.update(location.nodes)  # Add location types
@@ -444,9 +444,9 @@ def truncate_string(string: str, length: int = 40, span: bool = True) -> str:
     return '<span title="' + string.replace('"', '') + '">' + string[:length] + '..' + '</span>'
 
 
-def get_base_table_data(entity: 'Entity', file_stats: Optional[Dict[Any]] = None) -> List[str]:
+def get_base_table_data(entity: 'Entity', file_stats: Optional[Dict[str, Any]] = None) -> List[str]:
     """ Returns standard table data for an entity"""
-    data: list = ['<br>'.join([link(entity)] + [
+    data: List[str] = ['<br>'.join([link(entity)] + [
         truncate_string(alias) for alias in entity.aliases.values()])]
     if entity.view_name in ['event', 'actor']:
         data.append(g.classes[entity.class_.code].name)
@@ -539,7 +539,7 @@ def get_appearance(event_links: List['Link']) -> Tuple[Optional[str], Optional[s
     return first_string, last_string
 
 
-def get_backup_file_data() -> Dict:
+def get_backup_file_data() -> Dict[str, Any]:
     path = app.config['EXPORT_FOLDER_PATH'].joinpath('sql')
     latest_file = None
     latest_file_date = None
@@ -551,7 +551,7 @@ def get_backup_file_data() -> Dict:
         if not latest_file_date or file_date > latest_file_date:
             latest_file = file
             latest_file_date = file_date
-    file_data: Dict = {'backup_too_old': True}
+    file_data: Dict[str, Any] = {'backup_too_old': True}
     if latest_file and latest_file_date:
         yesterday = datetime.today() - timedelta(days=1)
         file_data['file'] = latest_file

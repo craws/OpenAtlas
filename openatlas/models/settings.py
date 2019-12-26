@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from flask import g
 from flask_wtf import FlaskForm
@@ -33,7 +33,7 @@ class SettingsMapper:
               'site_header'}
 
     @staticmethod
-    def get_settings() -> Dict:
+    def get_settings() -> Dict[str, Any]:
         g.execute("SELECT name, value FROM web.settings;")
         settings = {}
         for row in g.cursor.fetchall():

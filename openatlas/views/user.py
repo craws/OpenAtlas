@@ -1,4 +1,4 @@
-from typing import Optional, Union
+from typing import List, Optional, Tuple, Union
 
 from flask import abort, flash, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -187,7 +187,7 @@ def user_insert() -> Union[str, Response]:
     return render_template('user/insert.html', form=form)
 
 
-def get_groups() -> list:
+def get_groups() -> List[Tuple[str, str]]:
     """ Returns groups, hardcoded because order is relevant (weakest permissions to strongest)"""
     choices = [(name, name) for name in ['readonly', 'contributor', 'editor', 'manager']]
     if is_authorized('admin'):
