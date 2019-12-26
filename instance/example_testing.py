@@ -1,3 +1,4 @@
 DATABASE_NAME = 'openatlas_test'
 DATABASE_PASS = 'CHANGE ME'
+IS_UNIT_TEST = True
 DEBUG = True

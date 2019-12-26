@@ -127,10 +127,10 @@ def import_data(project_id: int, class_code: str) -> str:
         file_path = app.config['TMP_FOLDER_PATH'].joinpath(
             secure_filename(file_.filename))  # type: ignore
         columns: Dict[str, List[str]] = {'allowed': ['name', 'id', 'description',
-                                     'begin_from', 'begin_to', 'begin_comment',
-                                     'end_from', 'end_to', 'end_comment'],
-                         'valid': [],
-                         'invalid': []}
+                                                     'begin_from', 'begin_to', 'begin_comment',
+                                                     'end_from', 'end_to', 'end_comment'],
+                                         'valid': [],
+                                         'invalid': []}
         if class_code == 'E18':
             columns['allowed'] += ['easting', 'northing']
         try:
@@ -205,18 +205,19 @@ def import_data(project_id: int, class_code: str) -> str:
             return render_template('import/import_data.html', project=project, form=form,
                                    class_code=class_code, messages=messages, file_data=file_data)
 
-        if not form.preview.data and checked_data and not file_data['backup_too_old']:
-            g.cursor.execute('BEGIN')
-            try:
-                ImportMapper.import_data(project, class_code, checked_data)
-                g.cursor.execute('COMMIT')
-                logger.log('info', 'import', 'import: ' + str(len(checked_data)))
-                flash(_('import of') + ': ' + str(len(checked_data)), 'info')
-                imported = True
-            except Exception as e:  # pragma: no cover
-                g.cursor.execute('ROLLBACK')
-                logger.log('error', 'import', 'import failed', e)
-                flash(_('error transaction'), 'error')
+        if not form.preview.data and checked_data:
+            if not file_data['backup_too_old'] or app.config['IS_UNIT_TEST']:
+                g.cursor.execute('BEGIN')
+                try:
+                    ImportMapper.import_data(project, class_code, checked_data)
+                    g.cursor.execute('COMMIT')
+                    logger.log('info', 'import', 'import: ' + str(len(checked_data)))
+                    flash(_('import of') + ': ' + str(len(checked_data)), 'info')
+                    imported = True
+                except Exception as e:  # pragma: no cover
+                    g.cursor.execute('ROLLBACK')
+                    logger.log('error', 'import', 'import failed', e)
+                    flash(_('error transaction'), 'error')
     return render_template('import/import_data.html', project=project, form=form,
                            file_data=file_data, class_code=class_code, table=table,
                            imported=imported, messages=messages)
