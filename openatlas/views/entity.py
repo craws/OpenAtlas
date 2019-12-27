@@ -130,7 +130,7 @@ def actor_view(actor: Entity) -> str:
 
     residence_place = actor.get_linked_entity('P74')
     if residence_place:
-        residence_object = residence_place.get_linked_entity('P53', True)
+        residence_object = residence_place.get_linked_entity_safe('P53', True)
         objects.append(residence_object)
         info.append((uc_first(_('residence')), link(residence_object)))
     add_type_data(actor, info)
@@ -233,7 +233,7 @@ def event_view(event: Entity) -> str:
         tables['subs'].rows.append(get_base_table_data(sub_event))
     objects = []
     for location in event.get_linked_entities(['P7', 'P26', 'P27']):
-        objects.append(location.get_linked_entity('P53', True))
+        objects.append(location.get_linked_entity_safe('P53', True))
     return render_template('event/view.html', event=event, tables=tables,
                            info=get_entity_data(event), profile_image_id=profile_image_id,
                            gis_data=GisMapper.get_all(objects) if objects else None)
@@ -292,7 +292,7 @@ def object_view(object_: Entity) -> str:
 
 def place_view(object_: Entity) -> str:
     object_.note = UserMapper.get_note(object_)
-    location = object_.get_linked_entity('P53', nodes=True)
+    location = object_.get_linked_entity_safe('P53', nodes=True)
     tables = {'file': Table(Table.HEADERS['file'] + [_('main image')]),
               'source': Table(Table.HEADERS['source']),
               'event': Table(Table.HEADERS['event'],
@@ -471,7 +471,7 @@ def node_view(node: Entity) -> str:
     tables = {'entities': Table(header)}
     for entity in node.get_linked_entities(['P2', 'P89'], inverse=True, nodes=True):
         # If it is a place location get the corresponding object
-        entity = entity if node.class_.code == 'E55' else entity.get_linked_entity('P53', True)
+        entity = entity if node.class_.code == 'E55' else entity.get_linked_entity_safe('P53', True)
         if entity:  # If not entity it is a place node, so do not add
             data = [link(entity)]
             if root and root.value_type:  # pragma: no cover

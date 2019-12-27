@@ -157,7 +157,7 @@ def place_add_file(id_: int) -> Union[str, Response]:
 @required_group('contributor')
 def place_update(id_: int) -> Union[str, Response]:
     object_ = EntityMapper.get_by_id(id_, nodes=True, aliases=True, view_name='place')
-    location = object_.get_linked_entity('P53', nodes=True)
+    location = object_.get_linked_entity_safe('P53', nodes=True)
     geonames_buttons = False
     if object_.system_type == 'feature':
         form = build_form(FeatureForm, 'Feature', object_, request, location)

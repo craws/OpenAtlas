@@ -116,9 +116,9 @@ def event_update(id_: int) -> Union[str, Response]:
     form.event.data = super_event.id if super_event else ''
     if event.class_.code == 'E9':  # Form data for move
         place_from = event.get_linked_entity('P27')
-        form.place_from.data = place_from.get_linked_entity('P53', True).id if place_from else ''
+        form.place_from.data = place_from.get_linked_entity_safe('P53', True).id if place_from else ''
         place_to = event.get_linked_entity('P26')
-        form.place_to.data = place_to.get_linked_entity('P53', True).id if place_to else ''
+        form.place_to.data = place_to.get_linked_entity_safe('P53', True).id if place_to else ''
         person_data = []
         object_data = []
         for entity in event.get_linked_entities('P25'):
@@ -130,7 +130,7 @@ def event_update(id_: int) -> Union[str, Response]:
         form.object.data = object_data
     else:
         place = event.get_linked_entity('P7')
-        form.place.data = place.get_linked_entity('P53', True).id if place else ''
+        form.place.data = place.get_linked_entity_safe('P53', True).id if place else ''
     if event.class_.code == 'E8':  # Form data for acquisition
         form.given_place.data = [entity.id for entity in event.get_linked_entities('P24')]
     return render_template('event/update.html', form=form, event=event)

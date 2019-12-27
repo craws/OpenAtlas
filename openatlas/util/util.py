@@ -220,10 +220,10 @@ def get_entity_data(entity: 'Entity', location: Optional['Entity'] = None) -> Li
     if entity.class_.code == 'E9':  # Add places to dates if it's a move
         place_from = entity.get_linked_entity('P27')
         if place_from:
-            from_link = link(place_from.get_linked_entity('P53', True)) + ' '
+            from_link = link(place_from.get_linked_entity_safe('P53', True)) + ' '
         place_to = entity.get_linked_entity('P26')
         if place_to:
-            to_link = link(place_to.get_linked_entity('P53', True)) + ' '
+            to_link = link(place_to.get_linked_entity_safe('P53', True)) + ' '
     data.append((uc_first(_('begin')), (from_link if from_link else '') +
                  format_entry_begin(entity)))
     data.append((uc_first(_('end')), (to_link if to_link else '') + format_entry_end(entity)))
@@ -250,7 +250,8 @@ def get_entity_data(entity: 'Entity', location: Optional['Entity'] = None) -> Li
         if not entity.class_.code == 'E9':
             place = entity.get_linked_entity('P7')
             if place:
-                data.append((uc_first(_('location')), link(place.get_linked_entity('P53', True))))
+                data.append((uc_first(_('location')),
+                             link(place.get_linked_entity_safe('P53', True))))
 
         # Info for acquisitions
         if entity.class_.code == 'E8':

@@ -60,7 +60,7 @@ class PlaceTest(TestBaseCase):
                 places = EntityMapper.get_by_system_type('place')
                 place = places[0]
                 place2 = places[1]
-                location = place2.get_linked_entity('P53')
+                location = place2.get_linked_entity_safe('P53')
                 actor = EntityMapper.insert('E21', 'Milla Jovovich')
                 actor.link('P74', location)
             assert b'Necronomicon' in rv.data
