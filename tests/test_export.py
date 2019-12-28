@@ -15,9 +15,9 @@ class ExportTest(TestBaseCase):
             # SQL export
             rv = self.app.get(url_for('export_sql'))
             assert b'Export SQL' in rv.data
+            date_string = DateMapper.current_date_for_filename()  # Less error prone to do before
             rv = self.app.post(url_for('export_sql'), follow_redirects=True)
             assert b'Data was exported as SQL' in rv.data
-            date_string = DateMapper.current_date_for_filename()
             self.app.get(url_for('download_sql', filename=date_string + '_dump.sql'))
 
             # SQL execute (located here because a recent dump is needed to work

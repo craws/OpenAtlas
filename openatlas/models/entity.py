@@ -5,7 +5,7 @@ import itertools
 from collections import OrderedDict
 from typing import Any, Dict, List, Optional, Set, Union, ValuesView
 
-from flask import g
+from flask import g, flash
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from fuzzywuzzy import fuzz
@@ -93,8 +93,9 @@ class Entity:
                                nodes: bool = False) -> 'Entity':
         # Should return always an entity e.g. an object for a place, so abort if not
         entity = LinkMapper.get_linked_entity(self.id, code, inverse, nodes)
-        if not entity:
-            abort(418)  # pragma: no cover
+        if not entity:  # pragma: no cover
+            flash('Missing linked ' + code + ' for ' + str(self.id), 'error')
+            abort(418)
         return entity
 
     def get_linked_entities(self,
@@ -147,9 +148,9 @@ class Entity:
             EntityMapper.delete(id_)
         for alias in new_aliases:  # Insert new aliases if not empty
             if alias.strip() and self.class_.code == 'E18':
-                self.link('P1', [EntityMapper.insert('E41', alias)])
+                self.link('P1', EntityMapper.insert('E41', alias))
             elif alias.strip():
-                self.link('P131', [EntityMapper.insert('E82', alias)])
+                self.link('P131', EntityMapper.insert('E82', alias))
 
     def save_nodes(self, form: FlaskForm) -> None:
         from openatlas.models.node import NodeMapper

@@ -376,7 +376,7 @@ def build_move_form(form: Any, node: Entity) -> FlaskForm:
     choices = []
     if root.class_.code == 'E53':
         for entity in node.get_linked_entities('P89', True):
-            place = entity.get_linked_entity_safe('P53', True)
+            place = entity.get_linked_entity('P53', True)
             if place:
                 choices.append((entity.id, place.name))
     elif root.name in app.config['PROPERTY_TYPES']:

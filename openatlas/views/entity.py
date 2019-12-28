@@ -471,7 +471,7 @@ def node_view(node: Entity) -> str:
     tables = {'entities': Table(header)}
     for entity in node.get_linked_entities(['P2', 'P89'], inverse=True, nodes=True):
         # If it is a place location get the corresponding object
-        entity = entity if node.class_.code == 'E55' else entity.get_linked_entity_safe('P53', True)
+        entity = entity if node.class_.code == 'E55' else entity.get_linked_entity('P53', True)
         if entity:  # If not entity it is a place node, so do not add
             data = [link(entity)]
             if root and root.value_type:  # pragma: no cover

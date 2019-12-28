@@ -94,7 +94,8 @@ class ImportMapper:
             sql = """
                 INSERT INTO import.entity (project_id, origin_id, entity_id, user_id)
                 VALUES (%(project_id)s, %(origin_id)s, %(entity_id)s, %(user_id)s);"""
-            g.execute(sql, {'project_id': project.id, 'entity_id': entity.id,
+            g.execute(sql, {'project_id': project.id,
+                            'entity_id': entity.id,
                             'user_id': current_user.id,
                             'origin_id': row['id'] if 'id' in row and row['id'] else None})
 
@@ -118,7 +119,7 @@ class ImportMapper:
             if class_code == 'E18':
                 location = EntityMapper.insert('E53', 'Location of ' + row['name'],
                                                'place location')
-                entity.link('P53', [location])
+                entity.link('P53', location)
                 if 'easting' in row and is_float(row['easting']):
                     if 'northing' in row and is_float(row['northing']):
                         GisMapper.insert_import(entity=entity,

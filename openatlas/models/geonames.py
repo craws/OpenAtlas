@@ -50,7 +50,7 @@ class GeonamesMapper:
                 reference = EntityMapper.insert('E31', new_geonames_id,
                                                 'external reference geonames',
                                                 description='GeoNames ID')
-            object_.link('P67', [reference], inverse=True, type_id=match_id)
+            object_.link('P67', reference, inverse=True, type_id=match_id)
             return
 
         if geonames_link and int(new_geonames_id) == int(geonames_entity.name) \
@@ -74,4 +74,4 @@ class GeonamesMapper:
         if not reference:  # The selected reference doesn't exist so create it
             reference = EntityMapper.insert('E31', new_geonames_id, 'external reference geonames',
                                             description='GeoNames ID')
-        object_.link('P67', [reference], inverse=True, type_id=match_id)
+        object_.link('P67', reference, inverse=True, type_id=match_id)
