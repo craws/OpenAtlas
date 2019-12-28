@@ -5,7 +5,7 @@ import itertools
 from collections import OrderedDict
 from typing import Any, Dict, List, Optional, Set, Union, ValuesView
 
-from flask import g, flash
+from flask import g
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from fuzzywuzzy import fuzz
@@ -91,12 +91,7 @@ class Entity:
                                code: str,
                                inverse: bool = False,
                                nodes: bool = False) -> 'Entity':
-        # Should return always an entity e.g. an object for a place, so abort if not
-        entity = LinkMapper.get_linked_entity(self.id, code, inverse, nodes)
-        if not entity:  # pragma: no cover
-            flash('Missing linked ' + code + ' for ' + str(self.id), 'error')
-            abort(418)
-        return entity
+        return LinkMapper.get_linked_entity_safe(self.id, code, inverse, nodes)
 
     def get_linked_entities(self,
                             code: Union[str, List[str]],

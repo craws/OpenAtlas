@@ -111,30 +111,45 @@ class LinkMapper:
         return new_link_ids
 
     @staticmethod
-    def get_linked_entity(entity_id: int, code: str, inverse: bool = False,
+    def get_linked_entity(id_: int,
+                          code: str,
+                          inverse: bool = False,
                           nodes: bool = False) -> Optional['Entity']:
-        result = LinkMapper.get_linked_entities(entity_id, [code], inverse=inverse, nodes=nodes)
+        result = LinkMapper.get_linked_entities(id_, [code], inverse=inverse, nodes=nodes)
         if len(result) > 1:  # pragma: no cover
             logger.log('error', 'model', 'Multiple linked entities found for ' + code)
             flash(_('error multiple linked entities found'), 'error')
             abort(400)
-        return result[0] if result else None  # type: ignore  # problematic because place/location
+        return result[0] if result else None
 
     @staticmethod
-    def get_linked_entities(entity_id: int, codes: Union[str, List[str]], inverse: bool = False,
+    def get_linked_entities(id_: int,
+                            codes: Union[str, List[str]],
+                            inverse: bool = False,
                             nodes: bool = False) -> List['Entity']:
         from openatlas.models.entity import EntityMapper
         codes = codes if isinstance(codes, list) else [codes]
         sql = """
             SELECT range_id AS result_id FROM model.link
-            WHERE domain_id = %(entity_id)s AND property_code IN %(codes)s;"""
+            WHERE domain_id = %(id_)s AND property_code IN %(codes)s;"""
         if inverse:
             sql = """
                 SELECT domain_id AS result_id FROM model.link
-                WHERE range_id = %(entity_id)s AND property_code IN %(codes)s;"""
-        g.execute(sql, {'entity_id': entity_id, 'codes': tuple(codes)})
+                WHERE range_id = %(id_)s AND property_code IN %(codes)s;"""
+        g.execute(sql, {'id_': id_, 'codes': tuple(codes)})
         ids = [element for (element,) in g.cursor.fetchall()]
         return EntityMapper.get_by_ids(ids, nodes=nodes)
+
+    @staticmethod
+    def get_linked_entity_safe(id_: int, code: str,
+                               inverse: bool = False,
+                               nodes: bool = False) -> 'Entity':
+        # Should return always an entity e.g. an object for a place, so abort if not
+        entity = LinkMapper.get_linked_entity(id_, code, inverse, nodes)
+        if not entity:  # pragma: no cover
+            flash('Missing linked ' + code + ' for ' + str(id_), 'error')
+            abort(418)
+        return entity
 
     @staticmethod
     def get_links(entity_id: int,

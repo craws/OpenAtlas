@@ -103,10 +103,10 @@ def place_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
     place = None
     feature = None
     if origin and origin.system_type == 'stratigraphic unit':
-        feature = origin.get_linked_entity('P46', True)
-        place = feature.get_linked_entity('P46', True)
+        feature = origin.get_linked_entity_safe('P46', True)
+        place = feature.get_linked_entity_safe('P46', True)
     elif origin and origin.system_type == 'feature':
-        place = origin.get_linked_entity('P46', True)
+        place = origin.get_linked_entity_safe('P46', True)
 
     overlays = None
     if origin and origin.class_.code == 'E18' and current_user.settings['module_map_overlay']:
@@ -195,14 +195,14 @@ def place_update(id_: int) -> Union[str, Response]:
     feature = None
     stratigraphic_unit = None
     if object_.system_type == 'find':
-        stratigraphic_unit = object_.get_linked_entity('P46', True)
-        feature = stratigraphic_unit.get_linked_entity('P46', True)
-        place = feature.get_linked_entity('P46', True)
+        stratigraphic_unit = object_.get_linked_entity_safe('P46', True)
+        feature = stratigraphic_unit.get_linked_entity_safe('P46', True)
+        place = feature.get_linked_entity_safe('P46', True)
     if object_.system_type == 'stratigraphic unit':
-        feature = object_.get_linked_entity('P46', True)
-        place = feature.get_linked_entity('P46', True)
+        feature = object_.get_linked_entity_safe('P46', True)
+        place = feature.get_linked_entity_safe('P46', True)
     elif object_.system_type == 'feature':
-        place = object_.get_linked_entity('P46', True)
+        place = object_.get_linked_entity_safe('P46', True)
 
     overlays = OverlayMapper.get_by_object(object_) if current_user.settings['module_map_overlay'] \
         else None
@@ -269,12 +269,10 @@ def save(form: DateForm,
         g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'transaction failed because of invalid geom', e)
         flash(_('Invalid geom entered'), 'error')
-        url = url_for('place_index') if log_action == 'insert' else url_for('place_view',
-                                                                            id_=object_.id)
+        url = url_for('place_index') if log_action == 'insert' else url_for('place_index')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
-        url = url_for('place_index') if log_action == 'insert' else url_for('place_view',
-                                                                            id_=object_.id)
+        url = url_for('place_index') if log_action == 'insert' else url_for('place_index')
     return url

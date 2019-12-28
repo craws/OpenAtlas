@@ -21,11 +21,6 @@ class User(UserMixin):  # type: ignore
     def __init__(self,
                  row: NamedTupleCursor.Record = None,
                  bookmarks: Optional[List[int]] = None) -> None:
-        self.id = None
-        self.username = None
-        self.email = None
-        if not row:
-            return
         self.id = row.id
         self.active = True if row.active == 1 else False
         self.username = row.username

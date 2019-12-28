@@ -33,8 +33,8 @@ def get_link_type(form: Any) -> Optional_Type[Entity]:
 def build_form(form: Any,
                form_name: str,
                selected_object: Union[Entity, Link, None] = None,
-               request_origin: Optional[Request] = None,
-               entity2: Optional[Entity] = None) -> Any:
+               request_origin: Optional_Type[Request] = None,
+               entity2: Optional_Type[Entity] = None) -> Any:
 
     def add_value_type_fields(subs: List[int]) -> None:
         for sub_id in subs:
@@ -66,8 +66,8 @@ def build_form(form: Any,
         if isinstance(form_instance, DateForm):
             form_instance.populate_dates(selected_object)
         nodes = selected_object.nodes
-        if entity2:
-            nodes.update(entity2.nodes)
+        if isinstance(entity2, Entity):
+            nodes.update(entity2.nodes)  # type: ignore
         if hasattr(form, 'opened'):
             form_instance.opened.data = time.time()
         node_data: Dict[int, List[int]] = {}
@@ -78,15 +78,15 @@ def build_form(form: Any,
             node_data[root.id].append(node.id)
             if root.value_type:
                 getattr(form_instance, str(node.id)).data = node_value
-        for root_id, nodes in node_data.items():
+        for root_id, nodes_ in node_data.items():
             if hasattr(form_instance, str(root_id)):
-                getattr(form_instance, str(root_id)).data = nodes
+                getattr(form_instance, str(root_id)).data = nodes_
     return form_instance
 
 
 def build_node_form(form: Any,
                     node_: Entity,
-                    request_origin: Optional[Request] = None) -> FlaskForm:
+                    request_origin: Optional_Type[Request] = None) -> FlaskForm:
     if not request_origin:
         root = node_
         node = None

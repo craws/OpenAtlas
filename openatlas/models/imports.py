@@ -1,4 +1,6 @@
-from typing import List, Optional
+from __future__ import annotations  # Needed for Python 4.0 type annotations
+
+from typing import Any, List, Optional
 
 from flask import g
 from flask_login import current_user
@@ -79,7 +81,7 @@ class ImportMapper:
                         'description': sanitize(project.description, 'description')})
 
     @staticmethod
-    def import_data(project: Project, class_code: str, data: List) -> None:
+    def import_data(project: 'Project', class_code: str, data: List[Any]) -> None:
         from openatlas.models.entity import EntityMapper
         from openatlas.models.gis import GisMapper
         for row in data:

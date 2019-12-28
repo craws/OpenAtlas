@@ -134,11 +134,10 @@ def sanitize(string: Optional[str], mode: Optional[str] = None) -> str:
     return re.sub('[^A-Za-z0-9]+', '', string).strip()
 
 
-def get_file_stats(path: Optional[str] = app.config['UPLOAD_FOLDER_PATH']
-                   ) -> Dict[int, Dict[str, Union[Union[bytes, str], Any]]]:
+def get_file_stats(path: str = app.config['UPLOAD_FOLDER_PATH']) -> Dict[Union[int, str], Any]:
     """ Build a dict with file ids and stats from files in given directory.
         It's much faster to do this in one call for every file."""
-    file_stats = {}
+    file_stats: Dict[Union[int, str], Any] = {}
     with os.scandir(path) as it:
         for file in it:
             split_name = os.path.splitext(file.name)
@@ -157,7 +156,7 @@ def display_remove_link(url: str, name: str) -> str:
 
 def add_type_data(entity: 'Entity',
                   data: List[Tuple[str, Optional[str]]],
-                  location: Optional['Entity'] = None) -> List[Tuple[str, str]]:
+                  location: Optional['Entity'] = None) -> List[Tuple[str, Optional[str]]]:
     type_data: OrderedDict[str, Any] = OrderedDict()
     # Nodes
     if location:
@@ -205,12 +204,13 @@ def add_system_data(entity: 'Entity',
     return data
 
 
-def get_entity_data(entity: 'Entity', location: Optional['Entity'] = None) -> List[Tuple[str, str]]:
+def get_entity_data(entity: 'Entity',
+                    location: Optional['Entity'] = None) -> List[Tuple[str, Optional[str]]]:
     """
     Return related entity information for a table for view.
     The location parameter is for places which have a location attached.
     """
-    data = []
+    data: List[Tuple[str, Optional[str]]] = []
     # Aliases
     if entity.aliases:
         data.append((uc_first(_('alias')), '<br>'.join(entity.aliases.values())))
@@ -446,7 +446,8 @@ def truncate_string(string: Optional[str] = '', length: int = 40, span: bool = T
     return '<span title="' + string.replace('"', '') + '">' + string[:length] + '..' + '</span>'
 
 
-def get_base_table_data(entity: 'Entity', file_stats: Optional[Dict[str, Any]] = None) -> List[str]:
+def get_base_table_data(entity: 'Entity',
+                        file_stats: Optional[Dict[Union[int, str], Any]] = None) -> List[str]:
     """ Returns standard table data for an entity"""
     data: List[str] = ['<br>'.join([link(entity)] + [
         truncate_string(alias) for alias in entity.aliases.values()])]
@@ -466,8 +467,8 @@ def get_base_table_data(entity: 'Entity', file_stats: Optional[Dict[str, Any]] =
             data.append(print_file_size(entity))
             data.append(print_file_extension(entity))
     if entity.view_name in ['event', 'actor', 'place']:
-        data.append(entity.first)
-        data.append(entity.last)
+        data.append(entity.first if entity.first else '')
+        data.append(entity.last if entity.last else '')
     if entity.view_name in ['source'] or entity.system_type == 'file':
         data.append(truncate_string(entity.description))
     return data

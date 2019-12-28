@@ -35,15 +35,17 @@ class UserForm(FlaskForm):  # type: ignore
     continue_ = HiddenField()
 
     def validate(self) -> bool:
-        from openatlas.models.user import User
         valid = FlaskForm.validate(self)
-        user = User()
+        username = ''
+        user_email = ''
         if self.user_id:
             user = UserMapper.get_by_id(self.user_id)
-        if user.username != self.username.data and UserMapper.get_by_username(self.username.data):
+            username = user.username
+            user_email = user.email
+        if username != self.username.data and UserMapper.get_by_username(self.username.data):
             self.username.errors.append(str(_('error username exists')))
             valid = False
-        if user.email != self.email.data and UserMapper.get_by_email(self.email.data):
+        if user_email != self.email.data and UserMapper.get_by_email(self.email.data):
             self.email.errors.append(str(_('error email exists')))
             valid = False
         if getattr(self, 'password'):
@@ -143,7 +145,7 @@ def user_update(id_: int) -> Union[str, Response]:
     del form.password, form.password2, form.send_info, form.insert_and_continue, form.show_passwords
     form.group.choices = get_groups()
     if user and form.validate_on_submit():
-        user.active = True if user.id == current_user.id else form.active.data  # no self deactivate
+        user.active = True if user.id == current_user.id else form.active.data  # No self deactivate
         user.real_name = form.real_name.data
         user.username = form.username.data
         user.email = form.email.data

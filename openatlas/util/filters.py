@@ -407,7 +407,7 @@ def display_menu(self: Any, origin: Entity) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_debug_info(self: Any, debug_model: Dict[str, float], form: Any) -> str:
+def display_debug_info(self: Any, debug_model: Dict[str, Any], form: Any) -> str:
     """ Returns HTML with debug information about database queries and form errors."""
     html = ''
     for name, value in debug_model.items():

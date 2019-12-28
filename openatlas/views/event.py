@@ -116,7 +116,8 @@ def event_update(id_: int) -> Union[str, Response]:
     form.event.data = super_event.id if super_event else ''
     if event.class_.code == 'E9':  # Form data for move
         place_from = event.get_linked_entity('P27')
-        form.place_from.data = place_from.get_linked_entity_safe('P53', True).id if place_from else ''
+        form.place_from.data = place_from.get_linked_entity_safe('P53',
+                                                                 True).id if place_from else ''
         place_to = event.get_linked_entity('P26')
         form.place_to.data = place_to.get_linked_entity_safe('P53', True).id if place_to else ''
         person_data = []
@@ -194,7 +195,7 @@ def save(form: FlaskForm,
         if form.event.data:
             event.link_string('P117', form.event.data)
         if form.place and form.place.data:
-            event.link('P7', LinkMapper.get_linked_entity(int(form.place.data), 'P53'))
+            event.link('P7', LinkMapper.get_linked_entity_safe(int(form.place.data), 'P53'))
         if event.class_.code == 'E8' and form.given_place.data:  # Link place for acquisition
             event.link_string('P24', form.given_place.data)
         if event.class_.code == 'E9':  # Move
@@ -203,9 +204,10 @@ def save(form: FlaskForm,
             if form.person.data:  # Moved persons
                 event.link_string('P25', form.person.data)
             if form.place_from.data:  # Link place for move from
-                event.link('P27', LinkMapper.get_linked_entity(int(form.place_from.data), 'P53'))
+                linked_place = LinkMapper.get_linked_entity_safe(int(form.place_from.data), 'P53')
+                event.link('P27', linked_place)
             if form.place_to.data:  # Link place for move to
-                event.link('P26', LinkMapper.get_linked_entity(int(form.place_to.data), 'P53'))
+                event.link('P26', LinkMapper.get_linked_entity_safe(int(form.place_to.data), 'P53'))
         url = url_for('entity_view', id_=event.id)
         if origin:
             url = url_for('entity_view', id_=origin.id) + '#tab-event'

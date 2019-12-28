@@ -55,17 +55,17 @@ class OverlayMapper:
 
         # Get overlays of parents
         if object_.system_type == 'find':
-            stratigraphic_unit = object_.get_linked_entity('P46', True)
+            stratigraphic_unit = object_.get_linked_entity_safe('P46', True)
             ids.append(stratigraphic_unit.id)
-            feature = stratigraphic_unit.get_linked_entity('P46', True)
+            feature = stratigraphic_unit.get_linked_entity_safe('P46', True)
             ids.append(feature.id)
-            ids.append(feature.get_linked_entity('P46', True).id)
+            ids.append(feature.get_linked_entity_safe('P46', True).id)
         elif object_.system_type == 'stratigraphic unit':
-            feature = object_.get_linked_entity('P46', True)
+            feature = object_.get_linked_entity_safe('P46', True)
             ids.append(feature.id)
-            ids.append(feature.get_linked_entity('P46', True).id)
+            ids.append(feature.get_linked_entity_safe('P46', True).id)
         elif object_.system_type == 'feature':
-            ids.append(object_.get_linked_entity('P46', True).id)
+            ids.append(object_.get_linked_entity_safe('P46', True).id)
 
         sql = """
             SELECT o.id, o.place_id, o.image_id, o.bounding_box, i.name

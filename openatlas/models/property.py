@@ -84,11 +84,6 @@ class PropertyMapper:
             WHERE language_code IN %(language_codes)s;"""
         g.execute(sql, {'language_codes': tuple(app.config['LANGUAGES'].keys())})
         for row in g.cursor.fetchall():
-            property_ = properties[row.property_code]
-            if row.language_code not in property_.i18n:
-                property_.i18n[row.language_code] = {}
-            property_.i18n[row.language_code] = row.text
-            if row.language_code not in property_.i18n_inverse:
-                property_.i18n_inverse[row.language_code] = {}
-            property_.i18n_inverse[row.language_code] = row.text_inverse
+            properties[row.property_code].i18n[row.language_code] = row.text
+            properties[row.property_code].i18n_inverse[row.language_code] = row.text_inverse
         return properties
