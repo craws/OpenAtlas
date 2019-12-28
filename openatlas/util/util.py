@@ -156,7 +156,7 @@ def display_remove_link(url: str, name: str) -> str:
 
 
 def add_type_data(entity: 'Entity',
-                  data: List[Tuple[str, str]],
+                  data: List[Tuple[str, Optional[str]]],
                   location: Optional['Entity'] = None) -> List[Tuple[str, str]]:
     type_data: OrderedDict[str, Any] = OrderedDict()
     # Nodes
@@ -186,7 +186,8 @@ def add_type_data(entity: 'Entity',
     return data
 
 
-def add_system_data(entity: 'Entity', data: List[Tuple[str, str]]) -> List[Tuple[str, str]]:
+def add_system_data(entity: 'Entity',
+                    data: List[Tuple[str, Optional[str]]]) -> List[Tuple[str, Optional[str]]]:
     # Additional info for advanced layout
     if hasattr(current_user, 'settings') and current_user.settings['layout'] == 'advanced':
         data.append((uc_first(_('class')), link(entity.class_)))
@@ -431,7 +432,7 @@ def link(entity: Union['Entity', ClassObject, Property, 'Project', 'User']) -> s
     return html
 
 
-def truncate_string(string: str, length: int = 40, span: bool = True) -> str:
+def truncate_string(string: Optional[str] = '', length: int = 40, span: bool = True) -> str:
     """
     Returns a truncates string with '..' at the end if it was longer than length
     Also adds a span title (for mouse over) with the original string if parameter "span" is True

@@ -1,6 +1,6 @@
 import os
 import sys
-from typing import Any, Dict, List, Tuple, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 from flask import flash, g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -41,7 +41,7 @@ def entity_view(id_: int) -> Union[str, Response]:
 
 def actor_view(actor: Entity) -> str:
     actor.note = UserMapper.get_note(actor)
-    info: List[Tuple[str, str]] = []
+    info: List[Tuple[Any, Optional[str]]] = []
     if actor.aliases:
         info.append((uc_first(_('alias')), '<br>'.join(actor.aliases.values())))
     tables = {'file': Table(Table.HEADERS['file'] + [_('main image')]),
@@ -56,24 +56,24 @@ def actor_view(actor: Entity) -> str:
     profile_image_id = actor.get_profile_image_id()
     for link_ in actor.get_links('P67', True):
         domain = link_.domain
-        data = get_base_table_data(domain)
+        data_ = get_base_table_data(domain)
         if domain.view_name == 'file':
-            extension = data[3].replace('.', '')
-            data.append(
+            extension = data_[3].replace('.', '')
+            data_.append(
                 get_profile_image_table_link(domain, actor, extension, profile_image_id))
             if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                 profile_image_id = domain.id
         if domain.view_name not in ['source', 'file']:
-            data.append(truncate_string(link_.description))
+            data_.append(truncate_string(link_.description))
             if domain.system_type == 'external reference':
                 actor.external_references.append(link_)
             if is_authorized('contributor'):
                 url = url_for('reference_link_update', link_id=link_.id, origin_id=actor.id)
-                data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
+                data_.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
         if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=actor.id)
-            data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
-        tables[domain.view_name].rows.append(data)
+            data_.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
+        tables[domain.view_name].rows.append(data_)
 
     # Todo: Performance - getting every place of every object for every event is very costly
     event_links = actor.get_links(['P11', 'P14', 'P22', 'P23', 'P25'], True)
@@ -147,8 +147,7 @@ def actor_view(actor: Entity) -> str:
             [type_, link(related), link_.first, link_.last, truncate_string(link_.description)])
         if is_authorized('contributor'):
             update_url = url_for('relation_update', id_=link_.id, origin_id=actor.id)
-            unlink_url = url_for('link_delete', id_=link_.id,
-                                 origin_id=actor.id) + '#tab-relation'
+            unlink_url = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-relation'
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             data.append(display_remove_link(unlink_url, related.name))
         tables['relation'].rows.append(data)
@@ -372,14 +371,14 @@ def place_view(object_: Entity) -> str:
     feature = None
     stratigraphic_unit = None
     if object_.system_type == 'find':
-        stratigraphic_unit = object_.get_linked_entity('P46', True)
-        feature = stratigraphic_unit.get_linked_entity('P46', True)
-        place = feature.get_linked_entity('P46', True)
+        stratigraphic_unit = object_.get_linked_entity_safe('P46', True)
+        feature = stratigraphic_unit.get_linked_entity_safe('P46', True)
+        place = feature.get_linked_entity_safe('P46', True)
     elif object_.system_type == 'stratigraphic unit':
-        feature = object_.get_linked_entity('P46', True)
-        place = feature.get_linked_entity('P46', True)
+        feature = object_.get_linked_entity_safe('P46', True)
+        place = feature.get_linked_entity_safe('P46', True)
     elif object_.system_type == 'feature':
-        place = object_.get_linked_entity('P46', True)
+        place = object_.get_linked_entity_safe('P46', True)
     return render_template('place/view.html', object_=object_, tables=tables, overlays=overlays,
                            info=get_entity_data(object_, location), gis_data=gis_data,
                            place=place, feature=feature, stratigraphic_unit=stratigraphic_unit,
@@ -470,8 +469,8 @@ def node_view(node: Entity) -> str:
         header = [_('name'), _('value'), _('class'), _('info')]
     tables = {'entities': Table(header)}
     for entity in node.get_linked_entities(['P2', 'P89'], inverse=True, nodes=True):
-        # If it is a place location get the corresponding object
-        entity = entity if node.class_.code == 'E55' else entity.get_linked_entity('P53', True)
+        if not node.class_.code == 'E55':  # Get the object if it's a location
+            entity = entity.get_linked_entity_safe('P53', True)  # pragma: no cover
         if entity:  # If not entity it is a place node, so do not add
             data = [link(entity)]
             if root and root.value_type:  # pragma: no cover

@@ -1,4 +1,4 @@
-from typing import List, Optional
+from typing import Any, List, Optional
 
 from flask import json, session
 from flask_babel import lazy_gettext as _
@@ -22,7 +22,7 @@ class Table:
 
     def __init__(self,
                  header: Optional[List[str]] = None,  # A list of column header labels
-                 rows: Optional[List[List[str]]] = None,  # Rows containing the data
+                 rows: Optional[List[List[Any]]] = None,  # Rows containing the data
                  order: Optional[str] = None,  # Column order option
                  defs: Optional[str] = None,  # Additional definitions for DataTables
                  paging: bool = True) -> None:  # Whether to show pager
