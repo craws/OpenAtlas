@@ -144,10 +144,10 @@ class LinkMapper:
     def get_linked_entity_safe(id_: int, code: str,
                                inverse: bool = False,
                                nodes: bool = False) -> 'Entity':
-        # Should return always an entity e.g. an object for a place, so abort if not
         entity = LinkMapper.get_linked_entity(id_, code, inverse, nodes)
-        if not entity:  # pragma: no cover
+        if not entity:  # pragma: no cover - should return an entity so abort if not
             flash('Missing linked ' + code + ' for ' + str(id_), 'error')
+            logger.log('error', 'model', 'missing linked', 'id: ' + str(id_) + 'code: ' + code)
             abort(418)
         return entity
 

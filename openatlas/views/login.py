@@ -147,5 +147,4 @@ def reset_confirm(code: str) -> Response:  # pragma: no cover
 @login_required
 def logout() -> Response:
     logout_user()
-    logger.log('info', 'auth', 'logout')
     return redirect(url_for('login'))

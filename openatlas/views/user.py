@@ -85,16 +85,14 @@ def user_activity(user_id: int = 0) -> str:
     table = Table(['date', 'user', 'action', 'entity'], order='[[0, "desc"]]')
     for row in activities:
         try:
-            entity = EntityMapper.get_by_id(row.entity_id)
-            entity_string = link(entity)
-        except Exception as e:  # pragma: no cover
-            # Todo: update SQL to remove logs of deleted entities, set foreign key, remove try
-            entity_string = ''
-        user = UserMapper.get_by_id(row.user_id)
-        table.rows.append([format_date(row.created),
-                           link(user) if user and user.id else 'id ' + str(row.user_id),
-                           _(row.action),
-                           entity_string if entity_string else 'id ' + str(row.entity_id)])
+            entity = link(EntityMapper.get_by_id(row.entity_id))
+        except AttributeError:  # pragma: no cover - entity already deleted
+            entity = 'id ' + str(row.entity_id)
+        try:
+            user = link(UserMapper.get_by_id(row.user_id))
+        except AttributeError:  # pragma: no cover - user already deleted
+            user = 'id ' + str(row.user_id)
+        table.rows.append([format_date(row.created), user, _(row.action), entity])
     return render_template('user/activity.html', table=table, form=form)
 
 

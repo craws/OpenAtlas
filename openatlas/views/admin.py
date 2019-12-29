@@ -358,12 +358,17 @@ def admin_log() -> str:
     table = Table(['date', 'priority', 'type', 'message', 'user', 'info'], order='[[0, "desc"]]')
     logs = logger.get_system_logs(form.limit.data, form.priority.data, form.user.data)
     for row in logs:
-        user = UserMapper.get_by_id(row.user_id) if row.user_id else None
+        user = None
+        if row.user_id:
+            try:
+                user = link(UserMapper.get_by_id(row.user_id))
+            except AttributeError:  # pragma: no cover - user already deleted
+                user = 'id ' + str(row.user_id)
         table.rows.append([format_datetime(row.created),
                            str(row.priority) + ' ' + app.config['LOG_LEVELS'][row.priority],
                            row.type,
                            row.message,
-                           link(user) if user and user.id else row.user_id,
+                           user,
                            row.info.replace('\n', '<br>')])
     return render_template('admin/log.html', table=table, form=form)
 
