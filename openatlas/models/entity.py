@@ -3,7 +3,7 @@ from __future__ import annotations  # Needed for Python 4.0 type annotations
 import ast
 import itertools
 from collections import OrderedDict
-from typing import Any, Dict, List, Optional, Set, Union, ValuesView
+from typing import Any, Dict, List, Optional, Set, Union, ValuesView, TYPE_CHECKING
 
 from flask import g
 from flask_login import current_user
@@ -17,6 +17,9 @@ from openatlas.models.date import DateMapper
 from openatlas.models.link import Link, LinkMapper
 from openatlas.util.util import is_authorized, print_file_extension, uc_first
 
+if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
+    from openatlas.models.node import Node
+
 
 class Entity:
 
@@ -24,7 +27,7 @@ class Entity:
         from openatlas.forms.date import DateForm
 
         self.id = row.id
-        self.nodes: Dict[Entity, str] = {}
+        self.nodes: Dict['Node', str] = {}
         if hasattr(row, 'nodes') and row.nodes:
             for node in row.nodes:
                 self.nodes[g.nodes[node['f1']]] = node['f2']  # f1 = node id, f2 = value
@@ -68,18 +71,6 @@ class Entity:
         self.table_name = self.view_name  # Used to build tables
         if self.view_name == 'place':
             self.table_name = self.system_type.replace(' ', '-')
-
-        # Node attributes
-        self.count = 0
-        self.count_subs = 0
-        self.root: List[int] = []
-        self.subs: List[int] = []
-        self.locked = False
-        self.multiple = False
-        self.system = False
-        self.value_type = False
-        self.directional = False
-        self.forms: Dict[int, Any] = {}
 
     def get_linked_entity(self,
                           code: str,
@@ -456,7 +447,7 @@ class EntityMapper:
             sql_where = EntityMapper.sql_orphan + " AND e.class_code IN %(class_codes)s"
         elif parameter == 'types':
             count = 0
-            for node in NodeMapper.get_orphans():
+            for node in NodeMapper.get_node_orphans():
                 node.delete()
                 count += 1
             return count

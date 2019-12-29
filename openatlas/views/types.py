@@ -11,8 +11,8 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import build_move_form, build_node_form
-from openatlas.models.entity import Entity
-from openatlas.models.node import NodeMapper
+from openatlas.models.entity import Entity, EntityMapper
+from openatlas.models.node import NodeMapper, Node
 from openatlas.util.util import required_group, sanitize, uc_first
 
 
@@ -161,9 +161,7 @@ def tree_select(name: str) -> str:
     return html
 
 
-def save(form: FlaskForm,
-         node: Optional[Entity] = None,
-         root: Optional[Entity] = None) -> Optional[str]:
+def save(form: FlaskForm, node=None, root: Optional[Node] = None) -> Optional[str]:  # type: ignore
     g.cursor.execute('BEGIN')
     super_ = None
     log_action = 'insert'
@@ -173,7 +171,7 @@ def save(form: FlaskForm,
             root = g.nodes[node.root[-1]] if node.root else None
             super_ = g.nodes[node.root[0]] if node.root else None
         elif root:
-            node = NodeMapper.insert(root.class_.code, form.name.data)
+            node = EntityMapper.insert(root.class_.code, form.name.data)
             super_ = 'new'
         else:
             abort(404)  # pragma: no cover, either node or root has to be provided

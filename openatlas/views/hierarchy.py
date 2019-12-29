@@ -11,8 +11,8 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import build_form
-from openatlas.models.entity import Entity
-from openatlas.models.node import NodeMapper
+from openatlas.models.entity import EntityMapper
+from openatlas.models.node import NodeMapper, Node
 from openatlas.util.table import Table
 from openatlas.util.util import required_group, sanitize, uc_first
 
@@ -104,13 +104,13 @@ def hierarchy_delete(id_: int) -> Response:
     return redirect(url_for('node_index'))
 
 
-def save(form: FlaskForm, node: Optional[Entity] = None, value_type: bool = False) -> Entity:
+def save(form: FlaskForm, node=None, value_type: bool = False) -> Node:  # type: ignore
     g.cursor.execute('BEGIN')
     try:
         if node:
             NodeMapper.update_hierarchy(node, form)
         else:
-            node = NodeMapper.insert('E55', sanitize(form.name.data, 'node'))
+            node = EntityMapper.insert('E55', sanitize(form.name.data, 'node'))
             NodeMapper.insert_hierarchy(node, form, value_type)
         node.name = sanitize(form.name.data, 'node')
         node.description = form.description.data

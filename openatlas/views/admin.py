@@ -256,7 +256,7 @@ def admin_orphans() -> str:
                                   format_date(entity.created),
                                   format_date(entity.modified),
                                   truncate_string(entity.description)])
-    for node in NodeMapper.get_orphans():
+    for node in NodeMapper.get_node_orphans():
         tables['nodes'].rows.append([link(node), link(g.nodes[node.root[-1]])])
 
     # Get orphaned file entities (no corresponding file)

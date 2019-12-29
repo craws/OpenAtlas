@@ -17,7 +17,7 @@ from wtforms.widgets import HiddenInput
 from openatlas import app
 from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.link import Link, LinkMapper
-from openatlas.models.node import NodeMapper
+from openatlas.models.node import NodeMapper, Node
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, get_file_stats, truncate_string, uc_first
 
@@ -71,7 +71,7 @@ def build_form(form: Any,
         if hasattr(form, 'opened'):
             form_instance.opened.data = time.time()
         node_data: Dict[int, List[int]] = {}
-        for node, node_value in nodes.items():
+        for node, node_value in nodes.items():  # type: ignore
             root = g.nodes[node.root[-1]] if node.root else node
             if root.id not in node_data:
                 node_data[root.id] = []
@@ -85,7 +85,7 @@ def build_form(form: Any,
 
 
 def build_node_form(form: Any,
-                    node_: Entity,
+                    node_: Node,
                     request_origin: Optional_Type[Request] = None) -> FlaskForm:
     if not request_origin:
         root = node_
@@ -360,7 +360,7 @@ class ValueFloatField(FloatField):  # type: ignore
     pass
 
 
-def build_move_form(form: Any, node: Entity) -> FlaskForm:
+def build_move_form(form: Any, node: Node) -> FlaskForm:
     root = g.nodes[node.root[-1]]
     setattr(form, str(root.id), TreeField(str(root.id)))
     form_instance = form(obj=node)

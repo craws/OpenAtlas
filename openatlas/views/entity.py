@@ -13,6 +13,7 @@ from openatlas import app
 from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.gis import GisMapper
 from openatlas.models.link import LinkMapper
+from openatlas.models.node import Node
 from openatlas.models.overlay import Overlay, OverlayMapper
 from openatlas.models.user import UserMapper
 from openatlas.util.table import Table
@@ -461,7 +462,7 @@ def source_view(source: Entity) -> str:
                            info=get_entity_data(source), profile_image_id=profile_image_id)
 
 
-def node_view(node: Entity) -> str:
+def node_view(node: Node) -> str:
     root = g.nodes[node.root[-1]] if node.root else None
     super_ = g.nodes[node.root[0]] if node.root else None
     header = [_('name'), _('class'), _('info')]
