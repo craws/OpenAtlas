@@ -1,7 +1,7 @@
 # This script is for developing purposes and is not needed to install OpenAtlas.
 #
 # CIDOC CRM is used as basis for the underlying data model of OpenAtlas.
-# Currently we are using CIDOC CRM v6.2.1 from http://www.cidoc-crm.org/versions-of-the-cidoc-crm
+# Currently we are using CIDOC CRM 6.2.1 from http://www.cidoc-crm.org/versions-of-the-cidoc-crm
 #
 # The script parses the rdfs file and imports it to a PostgreSQL database.
 # Installation of needed package: # apt-get install python3-rdflib
