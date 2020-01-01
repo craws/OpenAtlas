@@ -1,5 +1,7 @@
 class Changelog:
     versions = {
+        '4.1.0': ['TBA', {
+            'feature': {}}],
         '4.0.0': ['2020-01-01', {
             'feature': {
                 '905': 'Upgrade CIDOC CRM to 6.2.1.',

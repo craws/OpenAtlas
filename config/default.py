@@ -5,7 +5,7 @@ from flask_babel import lazy_gettext as _
 
 from openatlas import app
 
-VERSION = '4.0.0'
+VERSION = '4.1.0'
 DEMO_MODE = False  # If in demo mode some options are disabled and the login form is pre filled
 
 LANGUAGES = {'en': 'English', 'de': 'Deutsch'}
