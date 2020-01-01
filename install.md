@@ -2,7 +2,7 @@
 
 Some knowledge about package installation, web server and database configuration will be needed.
 
-This software was developed and tested on Linux/Debian 10 (codename "buster") and the easiest way to
+This software was developed and tested on Linux/Debian 10 (codename "Buster") and the easiest way to
 install would be on Debian 10 system following these instructions.
 
 It may work on other Linux distributions or even on non Linux systems but would need substantially
