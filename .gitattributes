@@ -1,2 +1,2 @@
 openatlas/static/vendor/* linguist-vendored
-install/* linguist-documentation
+install/* linguist-documentation=true
