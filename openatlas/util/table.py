@@ -28,7 +28,7 @@ class Table:
                  paging: bool = True) -> None:  # Whether to show pager
         self.header = header if header else []
         self.rows = rows if rows else []
-        self.paging = 'true' if paging else 'false'
+        self.paging = paging
         self.order = order if order else ''
         self.defs = defs if defs else ''
 
@@ -66,7 +66,7 @@ class Table:
                                 columns=columns,
                                 order='order: ' + self.order + ',' if self.order else '',
                                 defs='columnDefs: ' + self.defs + ',' if self.defs else '',
-                                paging=self.paging)
+                                paging='true' if self.paging else 'false')
 
         # Toggle header and footer HTML
         css_header = '#{name}_table_wrapper table thead {{ display:none; }}'.format(name=name)
