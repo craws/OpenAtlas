@@ -18,11 +18,18 @@ Please refer to [install.md](install.md) for requirements and installation.
 
 # Development Team
 
-Stefan Eichert (Idea, Concept and Data Modelling)
-Alexander Watzinger (Lead Developer and Concept)
+Stefan Eichert (Idea, Concept and Data Modelling)<br>
+[stefan.eichert@oeaw.ac.at](mailto:stefan.eichert@oeaw.ac.at)
+
+Alexander Watzinger (Lead Developer and Concept)<br>
+[alexander.watzinger@oeaw.ac.at](mailto:alexander.watzinger@oeaw.ac.at)
+
 Bernhard Koschicek (Software Development)
+
 Christoph Hoffmann (Frontend Development)
+
 Jan Belik (Logo Design and Design Consulting)
+
 Daniel Kittel (Quality Assurance)
 
 # Licensing
