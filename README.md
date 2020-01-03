@@ -18,16 +18,21 @@ Please refer to [install.md](install.md) for requirements and installation.
 
 # Development Team
 
-Stefan Eichert (Idea, Concept and Data Modelling)
-Alexander Watzinger (Lead Developer and Concept)
-Bernhard Koschicek (Software Development)
-Christoph Hoffmann (Frontend Development)
-Jan Belik (Logo Design and Design Consulting)
-Daniel Kittel (Quality Assurance)
+**Stefan Eichert** - Idea, Concept and Data Modelling ([stefan.eichert@oeaw.ac.at](mailto:stefan.eichert@oeaw.ac.at))
+
+**Alexander Watzinger** - Lead Developer and Concept ([alexander.watzinger@oeaw.ac.at](mailto:alexander.watzinger@oeaw.ac.at))
+
+**Bernhard Koschicek** - Software Development
+
+**Christoph Hoffmann** - Frontend Development
+
+**Jan Belik** - Logo Design and Design Consulting
+
+**Daniel Kittel** - Quality Assurance
 
 # Licensing
 
 All OpenAtlas code unless otherwise noted is licensed under the terms of the GNU General Public License Version 2,
 June 1991. Please refer to the file COPYING in the root directory of this repository or the online version at <https://www.gnu.org/licenses/old-licenses/gpl-2.0.en.html>
 
-The OpenAtlas logo was designed by Jan Belik and is licensed under [CC-BY-SA 4.0](<https://creativecommons.org/licenses/by-sa/4.0/>).
+The OpenAtlas logo was designed by Jan Belik and is licensed under [CC-BY-SA 4.0](https://creativecommons.org/licenses/by-sa/4.0/).
