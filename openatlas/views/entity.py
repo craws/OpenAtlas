@@ -351,12 +351,6 @@ def place_view(object_: Entity) -> str:
     for event in object_.get_linked_entities('P24', inverse=True):
         if event.id not in event_ids:  # Don't add again if already in table
             tables['event'].rows.append(get_base_table_data(event))
-    has_subunits = False
-    for entity in object_.get_linked_entities('P46', nodes=True):
-        has_subunits = True
-        data = get_base_table_data(entity)
-        data.append(truncate_string(entity.description))
-        tables[entity.system_type.replace(' ', '-')].rows.append(data)
     for link_ in location.get_links(['P74', 'OA8', 'OA9'], inverse=True):
         actor = EntityMapper.get_by_id(link_.domain.id, view_name='actor')
         tables['actor'].rows.append([link(actor),
@@ -364,13 +358,15 @@ def place_view(object_: Entity) -> str:
                                      actor.class_.name,
                                      actor.first,
                                      actor.last])
-    gis_data: Dict[str, List[Any]] = GisMapper.get_all([object_])
-    if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]' \
-            and gis_data['gisLineSelected'] == '[]':
-        gis_data = {}
+    # Archeological subunits
     place = None
     feature = None
     stratigraphic_unit = None
+    subunits = object_.get_linked_entities('P46', nodes=True)
+    for entity in subunits:
+        data = get_base_table_data(entity)
+        data.append(truncate_string(entity.description))
+        tables[entity.system_type.replace(' ', '-')].rows.append(data)
     if object_.system_type == 'find':
         stratigraphic_unit = object_.get_linked_entity_safe('P46', True)
         feature = stratigraphic_unit.get_linked_entity_safe('P46', True)
@@ -380,10 +376,23 @@ def place_view(object_: Entity) -> str:
         place = feature.get_linked_entity_safe('P46', True)
     elif object_.system_type == 'feature':
         place = object_.get_linked_entity_safe('P46', True)
-    return render_template('place/view.html', object_=object_, tables=tables, overlays=overlays,
-                           info=get_entity_data(object_, location), gis_data=gis_data,
-                           place=place, feature=feature, stratigraphic_unit=stratigraphic_unit,
-                           has_subunits=has_subunits, profile_image_id=profile_image_id)
+
+    gis_data: Dict[str, List[Any]] = GisMapper.get_all([object_], subunits)
+    if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]' \
+            and gis_data['gisLineSelected'] == '[]':
+        gis_data = {}
+
+    return render_template('place/view.html',
+                           object_=object_,
+                           tables=tables,
+                           overlays=overlays,
+                           info=get_entity_data(object_, location),
+                           gis_data=gis_data,
+                           place=place,
+                           feature=feature,
+                           stratigraphic_unit=stratigraphic_unit,
+                           subunits=subunits,
+                           profile_image_id=profile_image_id)
 
 
 def reference_view(reference: Entity) -> str:
