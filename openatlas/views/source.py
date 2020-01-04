@@ -118,17 +118,14 @@ def save(form: FlaskForm, source: Optional[Entity] = None, origin: Optional[Enti
         if not source:
             source = EntityMapper.insert('E33', form.name.data, 'source content')
             log_action = 'insert'
-        url = url_for('entity_view', id_=source.id)
-        source.name = form.name.data
-        source.description = form.description.data
-        source.update()
-        source.save_nodes(form)
+        source.update(form)
 
         # Information carrier
         source.delete_links(['P128'], inverse=True)
         if form.information_carrier.data:
             source.link_string('P128', form.information_carrier.data, inverse=True)
 
+        url = url_for('entity_view', id_=source.id)
         if origin:
             url = url_for('entity_view', id_=origin.id) + '#tab-source'
             if origin.view_name == 'reference':

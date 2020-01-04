@@ -142,12 +142,7 @@ def save(form: ActorForm,
         else:
             actor = EntityMapper.insert(code, form.name.data)
             log_action = 'insert'
-        actor.name = form.name.data
-        actor.description = form.description.data
-        actor.set_dates(form)
-        actor.update()
-        actor.update_aliases(form)
-        actor.save_nodes(form)
+        actor.update(form)
         url = url_for('entity_view', id_=actor.id)
         if form.residence.data:
             object_ = EntityMapper.get_by_id(form.residence.data, view_name='place')

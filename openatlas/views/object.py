@@ -86,10 +86,7 @@ def save(form: Any, object_: Optional[Entity] = None) -> str:
         if not object_:
             log_action = 'insert'
             object_ = EntityMapper.insert('E84', form.name.data, 'information carrier')
-        object_.name = form.name.data
-        object_.description = form.description.data
-        object_.update()
-        object_.save_nodes(form)
+        object_.update(form)
         url = url_for('entity_view', id_=object_.id)
         url = url_for('object_insert') if form.continue_.data == 'yes' else url
         g.cursor.execute('COMMIT')

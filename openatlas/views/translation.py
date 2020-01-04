@@ -72,10 +72,7 @@ def save(form: FlaskForm,
             logger.log_user(entity.id, 'insert')
         else:
             abort(400)  # pragma: no cover, either entity or source has to be provided
-        entity.name = form.name.data
-        entity.description = form.description.data
-        entity.update()
-        entity.save_nodes(form)
+        entity.update(form)
         g.cursor.execute('COMMIT')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')

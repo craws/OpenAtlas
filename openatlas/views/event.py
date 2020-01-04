@@ -187,11 +187,7 @@ def save(form: FlaskForm,
             event = EntityMapper.insert(code, form.name.data)
         else:
             abort(400)  # pragma: no cover, either event or code has to be provided
-        event.name = form.name.data
-        event.description = form.description.data
-        event.set_dates(form)
-        event.update()
-        event.save_nodes(form)
+        event.update(form)
         if form.event.data:
             event.link_string('P117', form.event.data)
         if form.place and form.place.data:

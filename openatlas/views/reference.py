@@ -168,10 +168,7 @@ def save(form: Any,
             log_action = 'insert'
             system_type = code.replace('_', ' ')  # type: ignore
             reference = EntityMapper.insert('E31', form.name.data, system_type)
-        reference.name = form.name.data
-        reference.description = form.description.data
-        reference.update()
-        reference.save_nodes(form)
+        reference.update(form)
         url = url_for('entity_view', id_=reference.id)
         if origin:
             link_id = reference.link('P67', origin)[0]

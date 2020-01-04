@@ -236,16 +236,8 @@ def save(form: DateForm,
                 object_ = EntityMapper.insert('E18', form.name.data, system_type)
             location = EntityMapper.insert('E53', 'Location of ' + form.name.data, 'place location')
             object_.link('P53', location)
-        object_.name = form.name.data
-        object_.description = form.description.data
-        object_.set_dates(form)
-        object_.update()
-        object_.save_nodes(form)
-        if object_.system_type == 'place':
-            object_.update_aliases(form)
-        location.name = 'Location of ' + form.name.data
-        location.update()
-        location.save_nodes(form)
+        object_.update(form)
+        location.update(form)
         if hasattr(form, 'geonames_id') and current_user.settings['module_geonames']:
             GeonamesMapper.update_geonames(form, object_)
         url = url_for('entity_view', id_=object_.id)

@@ -3,7 +3,7 @@ from __future__ import annotations  # Needed for Python 4.0 type annotations
 import ast
 import itertools
 from collections import OrderedDict
-from typing import Any, Dict, List, Optional, Set, Union, ValuesView, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, Set, TYPE_CHECKING, Union, ValuesView
 
 from flask import g
 from flask_login import current_user
@@ -118,8 +118,8 @@ class Entity:
     def delete_links(self, codes: List[str], inverse: bool = False) -> None:
         LinkMapper.delete_by_codes(self, codes, inverse)
 
-    def update(self) -> None:
-        EntityMapper.update(self)
+    def update(self, form: Optional[FlaskForm] = None) -> None:
+        EntityMapper.update(self, form)
 
     def update_aliases(self, form: FlaskForm) -> None:
         old_aliases = self.aliases
@@ -241,22 +241,39 @@ class EntityMapper:
         return sql
 
     @staticmethod
-    def update(entity: Entity) -> None:
+    def update(entity: Entity, form: Optional[FlaskForm] = None) -> None:
+        from openatlas.forms.date import DateForm
         from openatlas.util.util import sanitize
+        if form:
+            entity.save_nodes(form)
+            for field in ['name', 'description']:
+                if hasattr(form, field):
+                    setattr(entity, field, getattr(form, field).data)
+            if isinstance(form, DateForm):
+                entity.set_dates(form)
+            if hasattr(form, 'alias') and (
+                entity.system_type == 'place' or
+                    entity.class_.code in app.config['CLASS_CODES']['actor']):
+                entity.update_aliases(form)
+        if entity.class_.code == 'E53':
+            entity.name = sanitize(entity.name, 'node')
+        if entity.system_type == 'place location':
+            entity.name = 'Location of ' + entity.name
+            entity.description = None
         sql = """
             UPDATE model.entity SET
             (name, description, begin_from, begin_to, begin_comment, end_from, end_to, end_comment) 
                 = (%(name)s, %(description)s, %(begin_from)s, %(begin_to)s, %(begin_comment)s, 
                 %(end_from)s, %(end_to)s, %(end_comment)s)
             WHERE id = %(id)s;"""
-        g.execute(sql, {
-            'id': entity.id, 'name': entity.name,
-            'begin_from': DateMapper.datetime64_to_timestamp(entity.begin_from),
-            'begin_to': DateMapper.datetime64_to_timestamp(entity.begin_to),
-            'end_from': DateMapper.datetime64_to_timestamp(entity.end_from),
-            'end_to': DateMapper.datetime64_to_timestamp(entity.end_to),
-            'begin_comment': entity.begin_comment, 'end_comment': entity.end_comment,
-            'description': sanitize(entity.description, 'description')})
+        g.execute(sql, {'id': entity.id,
+                        'name': entity.name,
+                        'begin_from': DateMapper.datetime64_to_timestamp(entity.begin_from),
+                        'begin_to': DateMapper.datetime64_to_timestamp(entity.begin_to),
+                        'end_from': DateMapper.datetime64_to_timestamp(entity.end_from),
+                        'end_to': DateMapper.datetime64_to_timestamp(entity.end_to),
+                        'begin_comment': entity.begin_comment, 'end_comment': entity.end_comment,
+                        'description': sanitize(entity.description, 'description')})
 
     @staticmethod
     def get_by_system_type(system_type: str,

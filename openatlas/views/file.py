@@ -184,10 +184,7 @@ def save(form: FileForm, file: Optional[Entity] = None, origin: Optional[Entity]
             new_name = str(file.id) + '.' + filename.rsplit('.', 1)[1].lower()
             full_path = os.path.join(app.config['UPLOAD_FOLDER_PATH'], new_name)
             file_.save(full_path)
-        file.name = form.name.data
-        file.description = form.description.data
-        file.update()
-        file.save_nodes(form)
+        file.update(form)
         url = url_for('entity_view', id_=file.id)
         if origin:
             if origin.system_type in ['edition', 'bibliography']:

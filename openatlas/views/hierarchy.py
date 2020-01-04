@@ -112,9 +112,7 @@ def save(form: FlaskForm, node=None, value_type: bool = False) -> Node:  # type:
         else:
             node = EntityMapper.insert('E55', sanitize(form.name.data, 'node'))
             NodeMapper.insert_hierarchy(node, form, value_type)
-        node.name = sanitize(form.name.data, 'node')
-        node.description = form.description.data
-        node.update()
+        node.update(form)
         g.cursor.execute('COMMIT')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
