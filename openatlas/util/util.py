@@ -158,6 +158,7 @@ def add_type_data(entity: 'Entity',
                   data: List[Tuple[str, Optional[str]]],
                   location: Optional['Entity'] = None) -> List[Tuple[str, Optional[str]]]:
     type_data: OrderedDict[str, Any] = OrderedDict()
+
     # Nodes
     if location:
         entity.nodes.update(location.nodes)  # Add location types

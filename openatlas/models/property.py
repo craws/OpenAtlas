@@ -1,3 +1,5 @@
+from __future__ import annotations  # Needed for Python 4.0 type annotations
+
 from dataclasses import dataclass
 from typing import Dict, List
 
@@ -56,9 +58,6 @@ class Property:
             elif self.find_subs(attr, class_id, g.classes[sub_id].sub):
                 return True
         return False
-
-
-class PropertyMapper:
 
     @staticmethod
     def get_all() -> Dict[str, Property]:

@@ -33,15 +33,15 @@ class ClassObject:
             return self.i18n[locale_default]
         return getattr(self, '_name')  # pragma: no cover
 
-
-class ClassMapper:
-
     @staticmethod
     def get_all() -> Dict[str, ClassObject]:
         g.execute("SELECT id, code, name, comment FROM model.class;")
-        classes: Dict[str, ClassObject] = {
-            row.code: ClassObject(_name=row.name, code=row.code, id=row.id, comment=row.comment,
-                                  i18n={}, sub=[], super=[]) for row in g.cursor.fetchall()}
+        classes = {row.code: ClassObject(_name=row.name,
+                                         code=row.code,
+                                         id=row.id,
+                                         comment=row.comment,
+                                         i18n={}, sub=[], super=[]
+                                         ) for row in g.cursor.fetchall()}
         g.execute("SELECT super_code, sub_code FROM model.class_inheritance;")
         for row in g.cursor.fetchall():
             classes[row.super_code].sub.append(row.sub_code)

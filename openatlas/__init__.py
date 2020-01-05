@@ -73,19 +73,19 @@ def execute(query: str, vars_: Optional[Dict[str, Any]] = None) -> None:
 
 @app.before_request
 def before_request() -> None:
-    from openatlas.models.classObject import ClassMapper
+    from openatlas.models.classObject import ClassObject
     from openatlas.models.node import NodeMapper
-    from openatlas.models.property import PropertyMapper
+    from openatlas.models.property import Property
     from openatlas.models.settings import SettingsMapper
     if request.path.startswith('/static'):  # pragma: no cover
-        return  # Only needed if not running with apache and static alias
+        return  # Only needed if not running with Apache and static alias
     debug_model['sql'] = 0
     debug_model['current'] = time.time()
     g.db = connect()
     g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
     g.execute = execute  # Add wrapper for g.cursor.execute to count SQL statements per request
-    g.classes = ClassMapper.get_all()
-    g.properties = PropertyMapper.get_all()
+    g.classes = ClassObject.get_all()
+    g.properties = Property.get_all()
     g.nodes = NodeMapper.get_all_nodes()
     session['settings'] = SettingsMapper.get_settings()
     session['language'] = get_locale()
