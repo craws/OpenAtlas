@@ -2,7 +2,6 @@ from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 import ast
 import itertools
-from collections import OrderedDict
 from typing import Any, Dict, List, Optional, Set, TYPE_CHECKING, Union, ValuesView
 
 from flask import g
@@ -14,7 +13,7 @@ from werkzeug.exceptions import abort
 
 from openatlas import app
 from openatlas.models.date import DateMapper
-from openatlas.models.link import Link, LinkMapper
+from openatlas.models.link import Link
 from openatlas.util.util import is_authorized, print_file_extension, uc_first
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
@@ -35,7 +34,7 @@ class Entity:
         if hasattr(row, 'aliases') and row.aliases:
             for alias in row.aliases:
                 self.aliases[alias['f1']] = alias['f2']  # f1 = alias id, f2 = alias name
-            self.aliases = OrderedDict(sorted(self.aliases.items(), key=lambda kv: (kv[1], kv[0])))
+            self.aliases = {k: v for k, v in sorted(self.aliases.items(), key=lambda item: item[1])}
         self.name = row.name
         self.description = row.description if row.description else ''
         self.system_type = row.system_type
@@ -76,19 +75,19 @@ class Entity:
                           code: str,
                           inverse: bool = False,
                           nodes: bool = False) -> Optional[Entity]:
-        return LinkMapper.get_linked_entity(self.id, code, inverse=inverse, nodes=nodes)
+        return Link.get_linked_entity(self.id, code, inverse=inverse, nodes=nodes)
 
     def get_linked_entity_safe(self,
                                code: str,
                                inverse: bool = False,
                                nodes: bool = False) -> 'Entity':
-        return LinkMapper.get_linked_entity_safe(self.id, code, inverse, nodes)
+        return Link.get_linked_entity_safe(self.id, code, inverse, nodes)
 
     def get_linked_entities(self,
                             code: Union[str, List[str]],
                             inverse: bool = False,
                             nodes: bool = False) -> List[Entity]:
-        return LinkMapper.get_linked_entities(self.id, code, inverse=inverse, nodes=nodes)
+        return Link.get_linked_entities(self.id, code, inverse=inverse, nodes=nodes)
 
     def link(self,
              code: str,
@@ -96,7 +95,7 @@ class Entity:
              description: Optional[str] = None,
              inverse: bool = False,
              type_id: Optional[int] = None) -> List[int]:
-        return LinkMapper.insert(self, code, range_, description, inverse, type_id)
+        return Link.insert(self, code, range_, description, inverse, type_id)
 
     def link_string(self,
                     code: str,
@@ -107,16 +106,16 @@ class Entity:
         # e.g. '', '1', '[]', '[1, 2]'
         ids = ast.literal_eval(range_)
         ids = [int(id_) for id_ in ids] if isinstance(ids, list) else [int(ids)]
-        return LinkMapper.insert(self, code, EntityMapper.get_by_ids(ids), description, inverse)
+        return Link.insert(self, code, EntityMapper.get_by_ids(ids), description, inverse)
 
     def get_links(self, codes: Union[str, List[str]], inverse: bool = False) -> List[Link]:
-        return LinkMapper.get_links(self.id, codes, inverse)
+        return Link.get_links(self.id, codes, inverse)
 
     def delete(self) -> None:
         EntityMapper.delete(self.id)
 
     def delete_links(self, codes: List[str], inverse: bool = False) -> None:
-        LinkMapper.delete_by_codes(self, codes, inverse)
+        Link.delete_by_codes(self, codes, inverse)
 
     def update(self, form: Optional[FlaskForm] = None) -> None:
         EntityMapper.update(self, form)
@@ -139,8 +138,8 @@ class Entity:
                 self.link('P131', EntityMapper.insert('E82', alias))
 
     def save_nodes(self, form: FlaskForm) -> None:
-        from openatlas.models.node import NodeMapper
-        NodeMapper.save_entity_nodes(self, form)
+        from openatlas.models.node import Node
+        Node.save_entity_nodes(self, form)
 
     def set_dates(self, form: FlaskForm) -> None:
         self.begin_from = None
@@ -170,7 +169,7 @@ class Entity:
         EntityMapper.remove_profile_image(self.id)
 
     def print_base_type(self) -> str:
-        from openatlas.models.node import NodeMapper
+        from openatlas.models.node import Node
         if not self.view_name or self.view_name == 'actor':  # actors have no base type
             return ''
         root_name = self.view_name.title()
@@ -186,7 +185,7 @@ class Entity:
                 root_name = 'Stratigraphic Unit'
         elif self.class_.code == 'E84':
             root_name = 'Information Carrier'
-        root_id = NodeMapper.get_hierarchy_by_name(root_name).id
+        root_id = Node.get_hierarchy(root_name).id
         for node in self.nodes:
             if node.root and node.root[-1] == root_id:
                 return node.name
@@ -455,7 +454,7 @@ class EntityMapper:
 
     @staticmethod
     def delete_orphans(parameter: str) -> int:
-        from openatlas.models.node import NodeMapper
+        from openatlas.models.node import Node
         class_codes = tuple(app.config['CODE_CLASS'].keys())
         if parameter == 'orphans':
             class_codes = class_codes + ('E55',)
@@ -464,7 +463,7 @@ class EntityMapper:
             sql_where = EntityMapper.sql_orphan + " AND e.class_code IN %(class_codes)s"
         elif parameter == 'types':
             count = 0
-            for node in NodeMapper.get_node_orphans():
+            for node in Node.get_node_orphans():
                 node.delete()
                 count += 1
             return count
@@ -541,9 +540,9 @@ class EntityMapper:
         for row in g.cursor.fetchall():
             entity = None
             if row.class_code == 'E82':  # If found in actor alias
-                entity = LinkMapper.get_linked_entity(row.id, 'P131', True)
+                entity = Link.get_linked_entity(row.id, 'P131', True)
             elif row.class_code == 'E41':  # If found in place alias
-                entity = LinkMapper.get_linked_entity(row.id, 'P1', True)
+                entity = Link.get_linked_entity(row.id, 'P1', True)
             elif row.class_code == 'E18':
                 if row.system_type in form.classes.data:
                     entity = Entity(row)

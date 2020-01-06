@@ -12,7 +12,7 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.forms.forms import build_move_form, build_node_form
 from openatlas.models.entity import Entity, EntityMapper
-from openatlas.models.node import NodeMapper, Node
+from openatlas.models.node import Node
 from openatlas.util.util import required_group, sanitize, uc_first
 
 
@@ -108,7 +108,7 @@ def node_move_entities(id_: int) -> Union[str, Response]:
     form = build_move_form(MoveForm, node)
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
-        NodeMapper.move_entities(node, getattr(form, str(root.id)).data, form.checkbox_values.data)
+        Node.move_entities(node, getattr(form, str(root.id)).data, form.checkbox_values.data)
         g.cursor.execute('COMMIT')
         flash('Entities where updated', 'success')
         return redirect(url_for('node_index') + '#tab-' + str(root.id))
@@ -157,7 +157,8 @@ def tree_select(name: str) -> str:
                 }});
             }});
         </script>""".format(min_chars=session['settings']['minimum_jstree_search'],
-                            name=sanitize(name), tree=walk_tree(NodeMapper.get_nodes(name)))
+                            name=sanitize(name),
+                            tree=walk_tree(Node.get_nodes(name)))
     return html
 
 

@@ -32,9 +32,9 @@ class GlobalSearchForm(FlaskForm):  # type: ignore
     search = SubmitField(_('search'))
 
 
-from openatlas.models.logger import DBHandler
+from openatlas.models.logger import Logger
 
-logger = DBHandler()
+logger = Logger()
 
 from openatlas.util import filters
 from openatlas.views import (actor, admin, ajax, content, event, export, hierarchy, index,
@@ -74,9 +74,9 @@ def execute(query: str, vars_: Optional[Dict[str, Any]] = None) -> None:
 @app.before_request
 def before_request() -> None:
     from openatlas.models.classObject import ClassObject
-    from openatlas.models.node import NodeMapper
+    from openatlas.models.node import Node
     from openatlas.models.property import Property
-    from openatlas.models.settings import SettingsMapper
+    from openatlas.models.settings import Settings
     if request.path.startswith('/static'):  # pragma: no cover
         return  # Only needed if not running with Apache and static alias
     debug_model['sql'] = 0
@@ -86,8 +86,8 @@ def before_request() -> None:
     g.execute = execute  # Add wrapper for g.cursor.execute to count SQL statements per request
     g.classes = ClassObject.get_all()
     g.properties = Property.get_all()
-    g.nodes = NodeMapper.get_all_nodes()
-    session['settings'] = SettingsMapper.get_settings()
+    g.nodes = Node.get_all_nodes()
+    session['settings'] = Settings.get_settings()
     session['language'] = get_locale()
     debug_model['model'] = time.time() - debug_model['current']
     debug_model['current'] = time.time()

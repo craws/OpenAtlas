@@ -2,7 +2,7 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
-from openatlas.models.node import NodeMapper
+from openatlas.models.node import Node
 from tests.base import TestBaseCase
 
 
@@ -19,7 +19,7 @@ class ActorTests(TestBaseCase):
             residence_id = rv.location.split('/')[-1]
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                sex_node = NodeMapper.get_hierarchy_by_name('Sex')
+                sex_node = Node.get_hierarchy('Sex')
                 sex_node_sub_1 = g.nodes[sex_node.subs[0]]
                 sex_node_sub_2 = g.nodes[sex_node.subs[1]]
                 event = EntityMapper.insert('E8', 'Event Horizon')

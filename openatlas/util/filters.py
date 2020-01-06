@@ -187,8 +187,8 @@ def display_profile_image(self: Any, image_id: int) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_content_translation(self: Any, text: str) -> str:
-    from openatlas.models.content import ContentMapper
-    return ContentMapper.get_translation(text)
+    from openatlas.models.content import Content
+    return Content.get_translation(text)
 
 
 @jinja2.contextfilter

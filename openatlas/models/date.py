@@ -99,7 +99,7 @@ class DateMapper:
     def invalid_involvement_dates() -> List['Link']:
         """ Search invalid event participation dates and return the actors
             e.g. attending person was born after the event ended"""
-        from openatlas.models.link import LinkMapper
+        from openatlas.models.link import Link
         sql = """
             SELECT l.id FROM model.entity actor
             JOIN model.link l ON actor.id = l.range_id
@@ -115,7 +115,7 @@ class DateMapper:
                 OR (actor.begin_to IS NOT NULL AND event.end_to IS NOT NULL
                     AND actor.begin_to > event.end_to);"""
         g.execute(sql)
-        return [LinkMapper.get_by_id(row.id) for row in g.cursor.fetchall()]
+        return [Link.get_by_id(row.id) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_invalid_dates() -> List['Entity']:
@@ -132,11 +132,11 @@ class DateMapper:
     @staticmethod
     def get_invalid_link_dates() -> List['Link']:
         """ Search for links with invalid date combinations, e.g. begin after end"""
-        from openatlas.models.link import LinkMapper
+        from openatlas.models.link import Link
         sql = """
             SELECT id FROM model.link WHERE
                 begin_from > begin_to OR end_from > end_to
                 OR (begin_from IS NOT NULL AND end_from IS NOT NULL AND begin_from > end_from)
                 OR (begin_to IS NOT NULL AND end_to IS NOT NULL AND begin_to > end_to);"""
         g.execute(sql)
-        return [LinkMapper.get_by_id(row.id) for row in g.cursor.fetchall()]
+        return [Link.get_by_id(row.id) for row in g.cursor.fetchall()]

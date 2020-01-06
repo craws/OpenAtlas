@@ -13,9 +13,9 @@ from openatlas import app, logger
 from openatlas.forms.date import DateForm
 from openatlas.forms.forms import build_form, build_table_form
 from openatlas.models.entity import Entity, EntityMapper
-from openatlas.models.geonames import GeonamesMapper
+from openatlas.models.geonames import Geonames
 from openatlas.models.gis import GisMapper, InvalidGeomException
-from openatlas.models.overlay import OverlayMapper
+from openatlas.models.overlay import Overlay
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, link, required_group, uc_first, was_modified
 from openatlas.views.reference import AddReferenceForm
@@ -110,7 +110,7 @@ def place_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
 
     overlays = None
     if origin and origin.class_.code == 'E18' and current_user.settings['module_map_overlay']:
-        overlays = OverlayMapper.get_by_object(origin)
+        overlays = Overlay.get_by_object(origin)
 
     return render_template('place/insert.html', form=form, title=title, place=place, origin=origin,
                            gis_data=gis_data, feature=feature, geonames_buttons=geonames_buttons,
@@ -185,7 +185,7 @@ def place_update(id_: int) -> Union[str, Response]:
         form.alias.append_entry('')
     gis_data = GisMapper.get_all([object_])
     if hasattr(form, 'geonames_id') and current_user.settings['module_geonames']:
-        geonames_link = GeonamesMapper.get_geonames_link(object_)
+        geonames_link = Geonames.get_geonames_link(object_)
         if geonames_link:
             geonames_entity = geonames_link.domain
             form.geonames_id.data = geonames_entity.name if geonames_entity else ''
@@ -204,7 +204,7 @@ def place_update(id_: int) -> Union[str, Response]:
     elif object_.system_type == 'feature':
         place = object_.get_linked_entity_safe('P46', True)
 
-    overlays = OverlayMapper.get_by_object(object_) if current_user.settings['module_map_overlay'] \
+    overlays = Overlay.get_by_object(object_) if current_user.settings['module_map_overlay'] \
         else None
 
     return render_template('place/update.html', form=form, object_=object_, gis_data=gis_data,
@@ -239,7 +239,7 @@ def save(form: DateForm,
         object_.update(form)
         location.update(form)
         if hasattr(form, 'geonames_id') and current_user.settings['module_geonames']:
-            GeonamesMapper.update_geonames(form, object_)
+            Geonames.update_geonames(form, object_)
         url = url_for('entity_view', id_=object_.id)
         if origin:
             url = url_for('entity_view', id_=origin.id) + '#tab-place'

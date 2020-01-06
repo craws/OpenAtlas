@@ -13,7 +13,7 @@ import openatlas
 from openatlas import app, logger
 from openatlas.forms.forms import TableField, build_form
 from openatlas.models.entity import Entity, EntityMapper
-from openatlas.models.link import LinkMapper
+from openatlas.models.link import Link
 from openatlas.util.table import Table
 from openatlas.util.util import (get_base_table_data, link, required_group, truncate_string,
                                  uc_first, was_modified)
@@ -83,7 +83,7 @@ def reference_add(id_: int, class_name: str) -> Union[str, Response]:
 @app.route('/reference/link-update/<int:link_id>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def reference_link_update(link_id: int, origin_id: int) -> Union[str, Response]:
-    link_ = LinkMapper.get_by_id(link_id)
+    link_ = Link.get_by_id(link_id)
     origin = EntityMapper.get_by_id(origin_id)
     form = AddReferenceForm()
     del form.reference

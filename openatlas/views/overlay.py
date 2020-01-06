@@ -11,7 +11,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
-from openatlas.models.overlay import OverlayMapper
+from openatlas.models.overlay import Overlay
 from openatlas.util.util import required_group, uc_first
 
 
@@ -28,7 +28,7 @@ class OverlayForm(FlaskForm):  # type: ignore
 def overlay_insert(image_id: int, place_id: int, link_id: int) -> Union[str, Response]:
     form = OverlayForm()
     if form.validate_on_submit():
-        OverlayMapper.insert(form=form, image_id=image_id, place_id=place_id, link_id=link_id)
+        Overlay.insert(form=form, image_id=image_id, place_id=place_id, link_id=link_id)
         return redirect(url_for('entity_view', id_=place_id) + '#tab-file')
     form.save.label.text = uc_first(_('insert'))
     return render_template('overlay/insert.html', form=form,
@@ -39,10 +39,10 @@ def overlay_insert(image_id: int, place_id: int, link_id: int) -> Union[str, Res
 @app.route('/overlay/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('editor')
 def overlay_update(id_: int) -> Union[str, Response]:
-    overlay = OverlayMapper.get_by_id(id_)
+    overlay = Overlay.get_by_id(id_)
     form = OverlayForm()
     if form.validate_on_submit():
-        OverlayMapper.update(form=form, image_id=overlay.image_id, place_id=overlay.place_id)
+        Overlay.update(form=form, image_id=overlay.image_id, place_id=overlay.place_id)
         flash(_('info update'), 'info')
         return redirect(url_for('entity_view', id_=overlay.place_id) + '#tab-file')
     bounding = ast.literal_eval(overlay.bounding_box)
@@ -58,5 +58,5 @@ def overlay_update(id_: int) -> Union[str, Response]:
 @app.route('/overlay/remove/<int:id_>/<int:place_id>')
 @required_group('editor')
 def overlay_remove(id_: int, place_id: int) -> Response:
-    OverlayMapper.remove(id_)
+    Overlay.remove(id_)
     return redirect(url_for('entity_view', id_=place_id) + '#tab-file')

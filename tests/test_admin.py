@@ -4,9 +4,9 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
-from openatlas.models.link import LinkMapper
-from openatlas.models.node import NodeMapper
-from openatlas.models.settings import SettingsMapper
+from openatlas.models.link import Link
+from openatlas.models.node import Node
+from openatlas.models.settings import Settings
 from tests.base import TestBaseCase
 
 
@@ -54,7 +54,7 @@ class ContentTests(TestBaseCase):
                 person.begin_from = '2018-01-31'
                 person.begin_to = '2018-01-01'
                 person.update()
-                involvement = LinkMapper.get_by_id(event.link('P11', person)[0])
+                involvement = Link.get_by_id(event.link('P11', person)[0])
                 involvement.begin_from = '2017-01-31'
                 involvement.begin_to = '2017-01-01'
                 involvement.end_from = '2017-01-01'
@@ -89,7 +89,7 @@ class ContentTests(TestBaseCase):
                 source = EntityMapper.insert('E33', 'Tha source')
                 source.link('P67', event)
                 source.link('P67', event)
-                source_node = NodeMapper.get_hierarchy_by_name('Source')
+                source_node = Node.get_hierarchy('Source')
                 source.link('P2', g.nodes[source_node.subs[0]])
                 source.link('P2', g.nodes[source_node.subs[1]])
             rv = self.app.get(url_for('admin_check_link_duplicates'))
@@ -113,7 +113,7 @@ class ContentTests(TestBaseCase):
                                data={'classes': 'file', 'ratio': 100})
             assert b'No entries' in rv.data
 
-            data: Dict[str, Union[str, int]] = {name: '' for name in SettingsMapper.fields}
+            data: Dict[str, Union[str, int]] = {name: '' for name in Settings.fields}
             data['default_language'] = 'en'
             data['default_table_rows'] = '10'
             data['failed_login_forget_minutes'] = '10'

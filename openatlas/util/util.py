@@ -157,11 +157,10 @@ def display_remove_link(url: str, name: str) -> str:
 def add_type_data(entity: 'Entity',
                   data: List[Tuple[str, Optional[str]]],
                   location: Optional['Entity'] = None) -> List[Tuple[str, Optional[str]]]:
-    type_data: OrderedDict[str, Any] = OrderedDict()
-
     # Nodes
     if location:
         entity.nodes.update(location.nodes)  # Add location types
+    type_data: OrderedDict[str, Any] = OrderedDict()
     for node, node_value in entity.nodes.items():
         root = g.nodes[node.root[-1]]
         name = 'type' if root.name in app.config['BASE_TYPES'] else root.name

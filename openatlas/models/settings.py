@@ -4,7 +4,7 @@ from flask import g
 from flask_wtf import FlaskForm
 
 
-class SettingsMapper:
+class Settings:
     fields = {'debug_mode',
               'default_language',
               'default_table_rows',
@@ -53,7 +53,7 @@ class SettingsMapper:
     @staticmethod
     def update(form: FlaskForm) -> None:
         sql = 'UPDATE web.settings SET "value" = %(value)s WHERE "name" = %(name)s;'
-        for field in SettingsMapper.fields:
+        for field in Settings.fields:
             if field in form:
                 value = getattr(form, field).data
                 if field in ['debug_mode', 'mail']:
@@ -63,7 +63,7 @@ class SettingsMapper:
     @staticmethod
     def update_file_settings(form: FlaskForm) -> None:
         sql = 'UPDATE web.settings SET "value" = %(value)s WHERE "name" = %(name)s;'
-        for field in SettingsMapper.fields:
+        for field in Settings.fields:
             if field.startswith('file_') or field == 'profile_image_width':
                 value = getattr(form, field).data
                 g.execute(sql, {'name': field, 'value': value})
@@ -71,7 +71,7 @@ class SettingsMapper:
     @staticmethod
     def update_map_settings(form: FlaskForm) -> None:
         sql = 'UPDATE web.settings SET "value" = %(value)s WHERE "name" = %(name)s;'
-        for field in SettingsMapper.fields:
+        for field in Settings.fields:
             if not field.startswith('map_'):
                 continue
             value = getattr(form, field).data

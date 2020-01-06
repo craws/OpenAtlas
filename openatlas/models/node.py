@@ -1,3 +1,5 @@
+from __future__ import annotations  # Needed for Python 4.0 type annotations
+
 import ast
 from typing import Any, Dict, List, Optional, Tuple
 
@@ -24,9 +26,6 @@ class Node(Entity):
         self.root: List[int] = []
         self.subs: List[int] = []
         self.forms: Dict[int, Any] = {}
-
-
-class NodeMapper:
 
     @staticmethod
     def get_all_nodes() -> Dict[int, Node]:
@@ -63,7 +62,7 @@ class NodeMapper:
             node.subs = []
             node.locked = False
             node.root = [row.super_id] if row.super_id else []
-        NodeMapper.populate_subs(nodes)
+        Node.populate_subs(nodes)
         return nodes
 
     @staticmethod
@@ -84,7 +83,7 @@ class NodeMapper:
             if node.root:
                 super_ = nodes[node.root[0]]
                 super_.subs.append(id_)
-                node.root = NodeMapper.get_root_path(nodes, node, node.root[0], node.root)
+                node.root = Node.get_root_path(nodes, node, node.root[0], node.root)
                 node.system = False
                 node.locked = nodes[node.root[0]].locked
             else:
@@ -105,7 +104,7 @@ class NodeMapper:
         if not super_.root:
             return root
         node.root.append(super_.root[0])
-        return NodeMapper.get_root_path(nodes, node, super_.root[0], root)
+        return Node.get_root_path(nodes, node, super_.root[0], root)
 
     @staticmethod
     def get_nodes(name: str) -> List[int]:
@@ -115,13 +114,13 @@ class NodeMapper:
         return []
 
     @staticmethod
-    def get_hierarchy_by_name(name: str) -> Node:
+    def get_hierarchy(name: str) -> Node:
         name = name.replace('_', ' ')
         return [root for id_, root in g.nodes.items() if root.name == name][0]
 
     @staticmethod
     def get_tree_data(node_id: int, selected_ids: List[int]) -> str:
-        return NodeMapper.walk_tree(g.nodes[node_id].subs, selected_ids)
+        return Node.walk_tree(g.nodes[node_id].subs, selected_ids)
 
     @staticmethod
     def walk_tree(nodes: List[Node], selected_ids: List[int]) -> str:
@@ -134,7 +133,7 @@ class NodeMapper:
             if item.subs:
                 string += ",'children' : ["
                 for sub in item.subs:
-                    string += NodeMapper.walk_tree([sub], selected_ids)
+                    string += Node.walk_tree([sub], selected_ids)
                 string += "]"
             string += "},"
         return string
@@ -192,7 +191,7 @@ class NodeMapper:
                         'name': node.name,
                         'multiple': multiple,
                         'value_type': value_type})
-        NodeMapper.add_forms_to_hierarchy(node, form)
+        Node.add_forms_to_hierarchy(node, form)
 
     @staticmethod
     def update_hierarchy(node: Node, form: FlaskForm) -> None:
@@ -201,7 +200,7 @@ class NodeMapper:
         if node.multiple or (hasattr(form, 'multiple') and form.multiple and form.multiple.data):
             multiple = True
         g.execute(sql, {'id': node.id, 'name': form.name.data, 'multiple': multiple})
-        NodeMapper.add_forms_to_hierarchy(node, form)
+        Node.add_forms_to_hierarchy(node, form)
 
     @staticmethod
     def add_forms_to_hierarchy(node: Node, form: FlaskForm) -> None:
@@ -266,13 +265,13 @@ class NodeMapper:
         subs = subs if subs else []
         subs += node.subs
         for sub_id in node.subs:
-            NodeMapper.get_all_sub_ids(g.nodes[sub_id], subs)
+            Node.get_all_sub_ids(g.nodes[sub_id], subs)
         return subs
 
     @staticmethod
     def get_form_count(root_node: Node, form_id: int) -> NamedTupleCursor.Record:
         # Check if nodes are already linked to entities before offering to remove a node from form
-        node_ids = NodeMapper.get_all_sub_ids(root_node)
+        node_ids = Node.get_all_sub_ids(root_node)
         if not node_ids:  # There are no sub nodes so skipping test
             return
         g.execute("SELECT name FROM web.form WHERE id = %(form_id)s;", {'form_id': form_id})

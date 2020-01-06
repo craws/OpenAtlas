@@ -12,7 +12,7 @@ from wtforms.validators import Email, InputRequired
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
-from openatlas.models.user import UserMapper
+from openatlas.models.user import User
 from openatlas.util.table import Table
 from openatlas.util.util import (format_date, is_authorized, link, required_group, send_mail,
                                  uc_first)
@@ -39,13 +39,13 @@ class UserForm(FlaskForm):  # type: ignore
         username = ''
         user_email = ''
         if self.user_id:
-            user = UserMapper.get_by_id(self.user_id)
+            user = User.get_by_id(self.user_id)
             username = user.username
             user_email = user.email
-        if username != self.username.data and UserMapper.get_by_username(self.username.data):
+        if username != self.username.data and User.get_by_username(self.username.data):
             self.username.errors.append(str(_('error username exists')))
             valid = False
-        if user_email != self.email.data and UserMapper.get_by_email(self.email.data):
+        if user_email != self.email.data and User.get_by_email(self.email.data):
             self.email.errors.append(str(_('error email exists')))
             valid = False
         if getattr(self, 'password'):
@@ -74,14 +74,14 @@ class ActivityForm(FlaskForm):  # type: ignore
 @required_group('readonly')
 def user_activity(user_id: int = 0) -> str:
     form = ActivityForm()
-    form.user.choices = [(0, _('all'))] + UserMapper.get_users()
+    form.user.choices = [(0, _('all'))] + User.get_users()
     if form.validate_on_submit():
-        activities = UserMapper.get_activities(form.limit.data, form.user.data, form.action.data)
+        activities = User.get_activities(form.limit.data, form.user.data, form.action.data)
     elif user_id:
         form.user.data = user_id
-        activities = UserMapper.get_activities(100, user_id, 'all')
+        activities = User.get_activities(100, user_id, 'all')
     else:
-        activities = UserMapper.get_activities(100, 0, 'all')
+        activities = User.get_activities(100, 0, 'all')
     table = Table(['date', 'user', 'action', 'entity'], order='[[0, "desc"]]')
     for row in activities:
         try:
@@ -89,7 +89,7 @@ def user_activity(user_id: int = 0) -> str:
         except AttributeError:  # pragma: no cover - entity already deleted
             entity = 'id ' + str(row.entity_id)
         try:
-            user = link(UserMapper.get_by_id(row.user_id))
+            user = link(User.get_by_id(row.user_id))
         except AttributeError:  # pragma: no cover - user already deleted
             user = 'id ' + str(row.user_id)
         table.rows.append([format_date(row.created), user, _(row.action), entity])
@@ -99,7 +99,7 @@ def user_activity(user_id: int = 0) -> str:
 @app.route('/admin/user/view/<int:id_>')
 @required_group('readonly')
 def user_view(id_: int) -> str:
-    user = UserMapper.get_by_id(id_)
+    user = User.get_by_id(id_)
     info = [
         (_('username'), link(user)),
         (_('group'), user.group),
@@ -116,11 +116,11 @@ def user_view(id_: int) -> str:
 @required_group('readonly')
 def user_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
     if id_ and action == 'delete':
-        UserMapper.delete(id_)
+        User.delete(id_)
         flash(_('user deleted'), 'info')
     table = Table(['username', 'group', 'email', 'newsletter', 'created', 'last login', 'entities'])
-    for user in UserMapper.get_all():
-        count = UserMapper.get_created_entities_count(user.id)
+    for user in User.get_all():
+        count = User.get_created_entities_count(user.id)
         table.rows.append([
             link(user),
             user.group,
@@ -135,7 +135,7 @@ def user_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
 @app.route('/admin/user/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('manager')
 def user_update(id_: int) -> Union[str, Response]:
-    user = UserMapper.get_by_id(id_)
+    user = User.get_by_id(id_)
     if user.group == 'admin' and current_user.group != 'admin':
         abort(403)  # pragma: no cover
     form = UserForm(obj=user)
@@ -165,7 +165,7 @@ def user_insert() -> Union[str, Response]:
     if not session['settings']['mail']:
         del form.send_info
     if form.validate_on_submit():
-        user_id = UserMapper.insert(form)
+        user_id = User.insert(form)
         flash(_('user created'), 'info')
         if session['settings']['mail'] and form.send_info.data:  # pragma: no cover
             subject = _('Your account information for %(sitename)s',

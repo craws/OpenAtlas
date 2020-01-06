@@ -16,10 +16,10 @@ from openatlas import app, logger
 from openatlas.forms.forms import TableField
 from openatlas.models.date import DateMapper
 from openatlas.models.entity import EntityMapper
-from openatlas.models.link import LinkMapper
-from openatlas.models.node import NodeMapper
-from openatlas.models.settings import SettingsMapper
-from openatlas.models.user import UserMapper
+from openatlas.models.link import Link
+from openatlas.models.node import Node
+from openatlas.models.settings import Settings
+from openatlas.models.user import User
 from openatlas.util.table import Table
 from openatlas.util.util import (convert_size, format_date, format_datetime, get_file_path,
                                  is_authorized, link, required_group, send_mail, truncate_string,
@@ -71,7 +71,7 @@ def admin_map() -> Union[str, Response]:
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
-            SettingsMapper.update_map_settings(form)
+            Settings.update_map_settings(form)
             logger.log('info', 'settings', 'Settings updated')
             g.cursor.execute('COMMIT')
             flash(_('info update'), 'info')
@@ -93,7 +93,7 @@ def admin_check_links(check: Optional[str] = None) -> str:
     table = None
     if check:
         table = Table(['domain', 'property', 'range'])
-        for result in LinkMapper.check_links():  # pragma: no cover
+        for result in Link.check_links():  # pragma: no cover
             table.rows.append([result['domain'], result['property'], result['range']])
     return render_template('admin/check_links.html', table=table, check=check)
 
@@ -103,14 +103,14 @@ def admin_check_links(check: Optional[str] = None) -> str:
 @required_group('contributor')
 def admin_check_link_duplicates(delete: Optional[str] = None) -> Union[str, Response]:
     if delete:
-        delete_count = str(LinkMapper.delete_link_duplicates())
+        delete_count = str(Link.delete_link_duplicates())
         logger.log('info', 'admin', 'Deleted duplicate links: ' + delete_count)
         flash(_('deleted links') + ': ' + delete_count, 'info')
         return redirect(url_for('admin_check_link_duplicates'))
     table = Table(['domain', 'range', 'property_code', 'description', 'type_id', 'begin_from',
                    'begin_to', 'begin_comment', 'end_from', 'end_to', 'end_comment', 'count'])
 
-    for result in LinkMapper.check_link_duplicates():
+    for result in Link.check_link_duplicates():
         table.rows.append([link(EntityMapper.get_by_id(result.domain_id)),
                            link(EntityMapper.get_by_id(result.range_id)),
                            link(g.properties[result.property_code]),
@@ -128,14 +128,14 @@ def admin_check_link_duplicates(delete: Optional[str] = None) -> Union[str, Resp
         duplicates = True
     else:  # If no exact duplicates where found check if single types are used multiple times
         table = Table(['entity', 'class', 'base type', 'incorrect multiple types'],
-                      rows=LinkMapper.check_single_type_duplicates())
+                      rows=Link.check_single_type_duplicates())
     return render_template('admin/check_link_duplicates.html', table=table, duplicates=duplicates)
 
 
 @app.route('/admin/delete_single_type_duplicate/<int:entity_id>/<int:node_id>')
 @required_group('contributor')
 def admin_delete_single_type_duplicate(entity_id: int, node_id: int) -> Response:
-    NodeMapper.remove_by_entity_and_node(entity_id, node_id)
+    Node.remove_by_entity_and_node(entity_id, node_id)
     flash(_('link removed'), 'info')
     return redirect(url_for('admin_check_link_duplicates'))
 
@@ -154,7 +154,7 @@ def admin_file() -> Union[str, Response]:
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
-            SettingsMapper.update_file_settings(form)
+            Settings.update_file_settings(form)
             logger.log('info', 'settings', 'Settings updated')
             g.cursor.execute('COMMIT')
             flash(_('info update'), 'info')
@@ -256,7 +256,7 @@ def admin_orphans() -> str:
                                   format_date(entity.created),
                                   format_date(entity.modified),
                                   truncate_string(entity.description)])
-    for node in NodeMapper.get_node_orphans():
+    for node in Node.get_node_orphans():
         tables['nodes'].rows.append([link(node), link(g.nodes[node.root[-1]])])
 
     # Get orphaned file entities (no corresponding file)
@@ -300,7 +300,7 @@ class LogoForm(FlaskForm):  # type: ignore
 @required_group('manager')
 def admin_logo(action: Optional[str] = None) -> Union[str, Response]:
     if action == 'remove':
-        SettingsMapper.set_logo()
+        Settings.set_logo()
         return redirect(url_for('admin_logo'))
     if session['settings']['logo_file_id']:
         path = get_file_path(int(session['settings']['logo_file_id']))
@@ -308,7 +308,7 @@ def admin_logo(action: Optional[str] = None) -> Union[str, Response]:
                                filename=os.path.basename(path) if path else False)
     form = LogoForm()
     if form.validate_on_submit():
-        SettingsMapper.set_logo(form.file.data)
+        Settings.set_logo(form.file.data)
         return redirect(url_for('admin_logo'))
     return render_template('admin/logo.html', form=form)
 
@@ -354,14 +354,14 @@ class LogForm(FlaskForm):  # type: ignore
 @required_group('admin')
 def admin_log() -> str:
     form = LogForm()
-    form.user.choices = [(0, _('all'))] + UserMapper.get_users()
+    form.user.choices = [(0, _('all'))] + User.get_users()
     table = Table(['date', 'priority', 'type', 'message', 'user', 'info'], order='[[0, "desc"]]')
     logs = logger.get_system_logs(form.limit.data, form.priority.data, form.user.data)
     for row in logs:
         user = None
         if row.user_id:
             try:
-                user = link(UserMapper.get_by_id(row.user_id))
+                user = link(User.get_by_id(row.user_id))
             except AttributeError:  # pragma: no cover - user already deleted
                 user = 'id ' + str(row.user_id)
         table.rows.append([format_datetime(row.created),
@@ -395,9 +395,9 @@ def admin_newsletter() -> Union[str, Response]:
     if form.validate_on_submit():  # pragma: no cover
         recipients = 0
         for user_id in (request.form.getlist('recipient')):
-            user = UserMapper.get_by_id(user_id)
+            user = User.get_by_id(user_id)
             if user and user.settings['newsletter'] and user.active and user.email:
-                code = UserMapper.generate_password()
+                code = User.generate_password()
                 user.unsubscribe_code = code
                 user.update()
                 link_ = request.scheme + '://' + request.headers['Host']
@@ -408,7 +408,7 @@ def admin_newsletter() -> Union[str, Response]:
         flash(_('Newsletter send') + ': ' + str(recipients), 'info')
         return redirect(url_for('admin_index'))
     table = Table(['username', 'email', 'receiver'])
-    for user in UserMapper.get_all():
+    for user in User.get_all():
         if user and user.settings['newsletter'] and user.active:  # pragma: no cover
             checkbox = '<input value="' + str(user.id) + '" name="recipient"'
             checkbox += ' type="checkbox" checked="checked">'
@@ -476,7 +476,7 @@ def admin_general_update() -> Union[str, Response]:
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
-            SettingsMapper.update(form)
+            Settings.update(form)
             logger.log('info', 'settings', 'Settings updated')
             g.cursor.execute('COMMIT')
             flash(_('info update'), 'info')
@@ -485,7 +485,7 @@ def admin_general_update() -> Union[str, Response]:
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('admin_general'))
-    for field in SettingsMapper.fields:
+    for field in Settings.fields:
         if field in ['default_table_rows', 'log_level']:
             getattr(form, field).data = int(session['settings'][field])
         elif field in form:
@@ -511,7 +511,7 @@ def admin_mail_update() -> Union[str, Response]:
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
-            SettingsMapper.update(form)
+            Settings.update(form)
             logger.log('info', 'settings', 'Settings updated')
             g.cursor.execute('COMMIT')
             flash(_('info update'), 'info')
@@ -521,7 +521,7 @@ def admin_mail_update() -> Union[str, Response]:
             flash(_('error transaction'), 'error')
         return redirect(url_for('admin_mail'))
     if request.method == 'GET':
-        for field in SettingsMapper.fields:
+        for field in Settings.fields:
             if field in ['mail_recipients_feedback']:
                 getattr(form, field).data = ';'.join(session['settings'][field])
             elif field in form:

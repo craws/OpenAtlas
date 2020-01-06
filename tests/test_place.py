@@ -2,9 +2,9 @@ from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.entity import EntityMapper
-from openatlas.models.link import LinkMapper
-from openatlas.models.node import NodeMapper
-from openatlas.models.overlay import OverlayMapper
+from openatlas.models.link import Link
+from openatlas.models.node import Node
+from openatlas.models.overlay import Overlay
 from tests.base import TestBaseCase
 
 
@@ -17,11 +17,11 @@ class PlaceTest(TestBaseCase):
             assert b'+ Place' in rv.data
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                unit_node = NodeMapper.get_hierarchy_by_name('Administrative Unit')
+                unit_node = Node.get_hierarchy('Administrative Unit')
                 unit_sub1 = g.nodes[unit_node.subs[0]]
                 unit_sub2 = g.nodes[unit_node.subs[1]]
                 reference = EntityMapper.insert('E31', 'https://openatlas.eu', 'external reference')
-                place_node = NodeMapper.get_hierarchy_by_name('Place')
+                place_node = Node.get_hierarchy('Place')
                 source = EntityMapper.insert('E33', 'Necronomicon')
             data = {'name': 'Asgard',
                     'alias-0': 'Valhöll',
@@ -121,7 +121,7 @@ class PlaceTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 file = EntityMapper.get_by_system_type('file')[0]
-                link_id = LinkMapper.insert(file, 'P67', place)[0]
+                link_id = Link.insert(file, 'P67', place)[0]
             rv = self.app.get(url_for('overlay_insert', image_id=file.id, place_id=place.id,
                                       link_id=link_id))
             assert b'X-Files' in rv.data
@@ -133,7 +133,7 @@ class PlaceTest(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                overlay = OverlayMapper.get_by_object(place)
+                overlay = Overlay.get_by_object(place)
                 overlay_id = overlay[list(overlay.keys())[0]].id
             rv = self.app.get(url_for('overlay_update', id_=overlay_id, place_id=place.id,
                                       link_id=link_id))
@@ -200,7 +200,7 @@ class PlaceTest(TestBaseCase):
                 self.app.get(url_for('place_update', id_=stratigraphic_id))
                 self.app.post(url_for('place_update', id_=stratigraphic_id),
                               data={'name': "I'm a stratigraphic unit"})
-                dimension_node_id = NodeMapper.get_hierarchy_by_name('Dimensions').subs[0]
+                dimension_node_id = Node.get_hierarchy('Dimensions').subs[0]
                 data = {'name': 'You never find me', str(dimension_node_id): '50'}
                 rv = self.app.post(url_for('place_insert', origin_id=stratigraphic_id), data=data)
                 find_id = rv.location.split('/')[-1]

@@ -10,9 +10,9 @@ from wtforms import SelectField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.models.content import ContentMapper
+from openatlas.models.content import Content
 from openatlas.models.entity import EntityMapper
-from openatlas.models.user import UserMapper
+from openatlas.models.user import User
 from openatlas.util.changelog import Changelog
 from openatlas.util.table import Table
 from openatlas.util.util import (bookmark_toggle, format_date, link, required_group, send_mail,
@@ -44,7 +44,7 @@ def index() -> str:
             tables['bookmarks'].rows.append([link(entity), g.classes[entity.class_.code].name,
                                              entity.first, entity.last,
                                              bookmark_toggle(entity.id, True)])
-        for entity_id, text in UserMapper.get_notes().items():
+        for entity_id, text in User.get_notes().items():
             entity = EntityMapper.get_by_id(entity_id)
             tables['notes'].rows.append([link(entity), g.classes[entity.class_.code].name,
                                         entity.first, entity.last, truncate_string(text)])
@@ -59,7 +59,7 @@ def index() -> str:
                 link(entity), g.classes[entity.class_.code].name,
                 entity.first, entity.last, format_date(entity.created),
                 link(logger.get_log_for_advanced_view(entity.id)['creator'])])
-    intro = ContentMapper.get_translation('intro')
+    intro = Content.get_translation('intro')
     return render_template('index/index.html', intro=intro, tables=tables)
 
 
@@ -91,8 +91,7 @@ def index_feedback() -> Union[str, Response]:
 
 @app.route('/overview/content/<item>')
 def index_content(item: str) -> str:
-    return render_template('index/content.html', text=ContentMapper.get_translation(item),
-                           title=item)
+    return render_template('index/content.html', text=Content.get_translation(item), title=item)
 
 
 @app.route('/overview/credits')
@@ -132,7 +131,7 @@ def index_changelog() -> str:
 
 @app.route('/unsubscribe/<code>')
 def index_unsubscribe(code: str) -> str:
-    user = UserMapper.get_by_unsubscribe_code(code)
+    user = User.get_by_unsubscribe_code(code)
     text = _('unsubscribe link not valid')
     if user:  # pragma: no cover
         user.settings['newsletter'] = ''

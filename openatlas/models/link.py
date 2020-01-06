@@ -1,3 +1,5 @@
+from __future__ import annotations  # Needed for Python 4.0 type annotations
+
 from typing import Dict, Iterator, List, Optional, TYPE_CHECKING, Union
 
 from flask import abort, flash, g, url_for
@@ -43,10 +45,28 @@ class Link:
             self.last = DateForm.format_date(self.end_to, 'year') if self.end_to else self.last
 
     def update(self) -> None:
-        LinkMapper.update(self)
+        sql = """
+            UPDATE model.link SET (property_code, domain_id, range_id, description, type_id,
+                begin_from, begin_to, begin_comment, end_from, end_to, end_comment) =
+                (%(property_code)s, %(domain_id)s, %(range_id)s, %(description)s, %(type_id)s,
+                 %(begin_from)s, %(begin_to)s, %(begin_comment)s, %(end_from)s, %(end_to)s,
+                 %(end_comment)s)
+            WHERE id = %(id)s;"""
+        g.execute(sql, {'id': self.id,
+                        'property_code': self.property.code,
+                        'domain_id': self.domain.id,
+                        'range_id': self.range.id,
+                        'type_id': self.type.id if self.type else None,
+                        'description': self.description,
+                        'begin_from': DateMapper.datetime64_to_timestamp(self.begin_from),
+                        'begin_to': DateMapper.datetime64_to_timestamp(self.begin_to),
+                        'begin_comment': self.begin_comment,
+                        'end_from': DateMapper.datetime64_to_timestamp(self.end_from),
+                        'end_to': DateMapper.datetime64_to_timestamp(self.end_to),
+                        'end_comment': self.end_comment})
 
     def delete(self) -> None:
-        LinkMapper.delete(self.id)
+        Link.delete_(self.id)
 
     def set_dates(self, form: FlaskForm) -> None:
         self.begin_from = None
@@ -67,9 +87,6 @@ class Link:
             self.end_to = DateMapper.form_to_datetime64(
                 form.end_year_to.data, form.end_month_to.data, form.end_day_to.data, True)
             self.end_comment = form.end_comment.data
-
-
-class LinkMapper:
 
     @staticmethod
     def insert(entity: 'Entity',
@@ -115,7 +132,7 @@ class LinkMapper:
                           code: str,
                           inverse: bool = False,
                           nodes: bool = False) -> Optional['Entity']:
-        result = LinkMapper.get_linked_entities(id_, [code], inverse=inverse, nodes=nodes)
+        result = Link.get_linked_entities(id_, [code], inverse=inverse, nodes=nodes)
         if len(result) > 1:  # pragma: no cover
             logger.log('error', 'model', 'Multiple linked entities found for ' + code)
             flash(_('error multiple linked entities found'), 'error')
@@ -144,7 +161,7 @@ class LinkMapper:
     def get_linked_entity_safe(id_: int, code: str,
                                inverse: bool = False,
                                nodes: bool = False) -> 'Entity':
-        entity = LinkMapper.get_linked_entity(id_, code, inverse, nodes)
+        entity = Link.get_linked_entity(id_, code, inverse, nodes)
         if not entity:  # pragma: no cover - should return an entity so abort if not
             flash('Missing linked ' + code + ' for ' + str(id_), 'error')
             logger.log('error', 'model', 'missing linked', 'id: ' + str(id_) + 'code: ' + code)
@@ -214,33 +231,11 @@ class LinkMapper:
         return g.cursor.fetchall()
 
     @staticmethod
-    def delete(id_: int) -> None:
+    def delete_(id_: int) -> None:
         from openatlas.util.util import is_authorized
         if not is_authorized('contributor'):  # pragma: no cover
             abort(403)
         g.execute("DELETE FROM model.link WHERE id = %(id)s;", {'id': id_})
-
-    @staticmethod
-    def update(link_: Link) -> None:
-        sql = """
-            UPDATE model.link SET (property_code, domain_id, range_id, description, type_id,
-                begin_from, begin_to, begin_comment, end_from, end_to, end_comment) =
-                (%(property_code)s, %(domain_id)s, %(range_id)s, %(description)s, %(type_id)s,
-                 %(begin_from)s, %(begin_to)s, %(begin_comment)s, %(end_from)s, %(end_to)s,
-                 %(end_comment)s)
-            WHERE id = %(id)s;"""
-        g.execute(sql, {'id': link_.id,
-                        'property_code': link_.property.code,
-                        'domain_id': link_.domain.id,
-                        'range_id': link_.range.id,
-                        'type_id': link_.type.id if link_.type else None,
-                        'description': link_.description,
-                        'begin_from': DateMapper.datetime64_to_timestamp(link_.begin_from),
-                        'begin_to': DateMapper.datetime64_to_timestamp(link_.begin_to),
-                        'begin_comment': link_.begin_comment,
-                        'end_from': DateMapper.datetime64_to_timestamp(link_.end_from),
-                        'end_to': DateMapper.datetime64_to_timestamp(link_.end_to),
-                        'end_comment': link_.end_comment})
 
     @staticmethod
     def check_links() -> List[Dict[str, str]]:
@@ -312,12 +307,12 @@ class LinkMapper:
     @staticmethod
     def check_single_type_duplicates() -> List[List[str]]:
         # Find entities with multiple types attached which should be single
-        from openatlas.models.node import NodeMapper
+        from openatlas.models.node import Node
         from openatlas.models.entity import EntityMapper
         data = []
         for id_, node in g.nodes.items():
             if not node.root and not node.multiple and not node.value_type:
-                node_ids = NodeMapper.get_all_sub_ids(node)
+                node_ids = Node.get_all_sub_ids(node)
                 if node_ids:
                     sql = """
                         SELECT domain_id FROM model.link

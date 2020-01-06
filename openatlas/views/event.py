@@ -13,7 +13,7 @@ from openatlas import app, logger
 from openatlas.forms.date import DateForm
 from openatlas.forms.forms import TableField, TableMultiField, build_form, build_table_form
 from openatlas.models.entity import Entity, EntityMapper
-from openatlas.models.link import LinkMapper
+from openatlas.models.link import Link
 from openatlas.util.table import Table
 from openatlas.util.util import (get_base_table_data, link, required_group, truncate_string,
                                  uc_first, was_modified)
@@ -191,7 +191,7 @@ def save(form: FlaskForm,
         if form.event.data:
             event.link_string('P117', form.event.data)
         if form.place and form.place.data:
-            event.link('P7', LinkMapper.get_linked_entity_safe(int(form.place.data), 'P53'))
+            event.link('P7', Link.get_linked_entity_safe(int(form.place.data), 'P53'))
         if event.class_.code == 'E8' and form.given_place.data:  # Link place for acquisition
             event.link_string('P24', form.given_place.data)
         if event.class_.code == 'E9':  # Move
@@ -200,10 +200,10 @@ def save(form: FlaskForm,
             if form.person.data:  # Moved persons
                 event.link_string('P25', form.person.data)
             if form.place_from.data:  # Link place for move from
-                linked_place = LinkMapper.get_linked_entity_safe(int(form.place_from.data), 'P53')
+                linked_place = Link.get_linked_entity_safe(int(form.place_from.data), 'P53')
                 event.link('P27', linked_place)
             if form.place_to.data:  # Link place for move to
-                event.link('P26', LinkMapper.get_linked_entity_safe(int(form.place_to.data), 'P53'))
+                event.link('P26', Link.get_linked_entity_safe(int(form.place_to.data), 'P53'))
         url = url_for('entity_view', id_=event.id)
         if origin:
             url = url_for('entity_view', id_=origin.id) + '#tab-event'

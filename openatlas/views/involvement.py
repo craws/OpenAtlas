@@ -12,7 +12,7 @@ from openatlas import app, logger
 from openatlas.forms.date import DateForm
 from openatlas.forms.forms import TableMultiField, build_form, get_link_type
 from openatlas.models.entity import EntityMapper
-from openatlas.models.link import LinkMapper
+from openatlas.models.link import Link
 from openatlas.util.util import required_group
 
 
@@ -46,15 +46,17 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
         try:
             if origin.view_name == 'event':
                 for actor in EntityMapper.get_by_ids(ast.literal_eval(form.actor.data)):
-                    link_ = LinkMapper.get_by_id(origin.link(form.activity.data, actor,
-                                                             form.description.data)[0])
+                    link_ = Link.get_by_id(origin.link(form.activity.data,
+                                                       actor,
+                                                       form.description.data)[0])
                     link_.set_dates(form)
                     link_.type = get_link_type(form)
                     link_.update()
             else:
                 for event in EntityMapper.get_by_ids(ast.literal_eval(form.event.data)):
-                    link_ = LinkMapper.get_by_id(event.link(form.activity.data, origin,
-                                                            form.description.data)[0])
+                    link_ = Link.get_by_id(event.link(form.activity.data,
+                                                      origin,
+                                                      form.description.data)[0])
                     link_.set_dates(form)
                     link_.type = get_link_type(form)
                     link_.update()
@@ -74,7 +76,7 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
 @app.route('/involvement/update/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def involvement_update(id_: int, origin_id: int) -> Union[str, Response]:
-    link_ = LinkMapper.get_by_id(id_)
+    link_ = Link.get_by_id(id_)
     event = EntityMapper.get_by_id(link_.domain.id, view_name='event')
     actor = EntityMapper.get_by_id(link_.range.id, view_name='actor')
     origin = event if origin_id == event.id else actor
@@ -91,8 +93,7 @@ def involvement_update(id_: int, origin_id: int) -> Union[str, Response]:
         g.cursor.execute('BEGIN')
         try:
             link_.delete()
-            link_ = LinkMapper.get_by_id(event.link(form.activity.data, actor,
-                                                    form.description.data)[0])
+            link_ = Link.get_by_id(event.link(form.activity.data, actor, form.description.data)[0])
             link_.set_dates(form)
             link_.type = get_link_type(form)
             link_.update()

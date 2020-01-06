@@ -16,8 +16,8 @@ from wtforms.widgets import HiddenInput
 
 from openatlas import app
 from openatlas.models.entity import Entity, EntityMapper
-from openatlas.models.link import Link, LinkMapper
-from openatlas.models.node import NodeMapper, Node
+from openatlas.models.link import Link
+from openatlas.models.node import Node
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, get_file_stats, truncate_string, uc_first
 
@@ -44,7 +44,7 @@ def build_form(form: Any,
 
     # Add custom fields
     custom_list = []
-    for id_, node in NodeMapper.get_nodes_for_form(form_name).items():
+    for id_, node in Node.get_nodes_for_form(form_name).items():
         custom_list.append(id_)
         setattr(form, str(id_), TreeMultiField(str(id_)) if node.multiple else TreeField(str(id_)))
         if node.value_type:
@@ -129,7 +129,7 @@ def build_node_form(form: Any,
 class TreeSelect(HiddenInput):  # type: ignore
 
     def __call__(self, field: TreeField, **kwargs: Any) -> TreeSelect:
-        from openatlas.models.node import NodeMapper
+        from openatlas.models.node import Node
         selection = ''
         selected_ids = []
         if field.data:
@@ -176,7 +176,7 @@ class TreeSelect(HiddenInput):  # type: ignore
                                 change_label=uc_first(_('change')),
                                 clear_label=uc_first(_('clear')),
                                 selection=selection,
-                                tree_data=NodeMapper.get_tree_data(int(field.id), selected_ids),
+                                tree_data=Node.get_tree_data(int(field.id), selected_ids),
                                 clear_style='' if selection else ' style="display: none;" ',
                                 required=' required' if field.flags.required else '')
         return super(TreeSelect, self).__call__(field, **kwargs) + html
@@ -230,7 +230,7 @@ class TreeMultiSelect(HiddenInput):  # type: ignore
                                 title=root.name,
                                 selection=selection,
                                 change_label=uc_first(_('change')),
-                                tree_data=NodeMapper.get_tree_data(int(field.id), selected_ids))
+                                tree_data=Node.get_tree_data(int(field.id), selected_ids))
         return super(TreeMultiSelect, self).__call__(field, **kwargs) + html
 
 
@@ -380,7 +380,7 @@ def build_move_form(form: Any, node: Node) -> FlaskForm:
             if place:
                 choices.append((entity.id, place.name))
     elif root.name in app.config['PROPERTY_TYPES']:
-        for row in LinkMapper.get_entities_by_node(node):
+        for row in Link.get_entities_by_node(node):
             domain = EntityMapper.get_by_id(row.domain_id)
             range_ = EntityMapper.get_by_id(row.range_id)
             choices.append((row.id, domain.name + ' - ' + range_.name))

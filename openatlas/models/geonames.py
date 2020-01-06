@@ -5,10 +5,10 @@ from flask_wtf import FlaskForm
 
 from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.link import Link
-from openatlas.models.node import NodeMapper
+from openatlas.models.node import Node
 
 
-class GeonamesMapper:
+class Geonames:
 
     @staticmethod
     def get_geonames_link(object_: Entity) -> Optional[Link]:
@@ -20,7 +20,7 @@ class GeonamesMapper:
     @staticmethod
     def update_geonames(form: FlaskForm, object_: Entity) -> None:
         new_geonames_id = form.geonames_id.data
-        geonames_link = GeonamesMapper.get_geonames_link(object_)
+        geonames_link = Geonames.get_geonames_link(object_)
         geonames_entity = geonames_link.domain if geonames_link else None
 
         if not new_geonames_id:
@@ -34,7 +34,7 @@ class GeonamesMapper:
 
         # Get id of the match type
         match_id = None
-        for node_id in NodeMapper.get_hierarchy_by_name('External Reference Match').subs:
+        for node_id in Node.get_hierarchy('External Reference Match').subs:
             if g.nodes[node_id].name == 'exact match' and form.geonames_precision.data:
                 match_id = node_id
                 break

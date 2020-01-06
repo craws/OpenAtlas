@@ -12,10 +12,10 @@ from werkzeug.wrappers import Response
 from openatlas import app
 from openatlas.models.entity import Entity, EntityMapper
 from openatlas.models.gis import GisMapper
-from openatlas.models.link import LinkMapper
+from openatlas.models.link import Link
 from openatlas.models.node import Node
-from openatlas.models.overlay import Overlay, OverlayMapper
-from openatlas.models.user import UserMapper
+from openatlas.models.overlay import Overlay
+from openatlas.models.user import User
 from openatlas.util.table import Table
 from openatlas.util.util import (add_system_data, add_type_data, display_remove_link,
                                  format_entry_begin, format_entry_end, get_appearance,
@@ -41,7 +41,7 @@ def entity_view(id_: int) -> Union[str, Response]:
 
 
 def actor_view(actor: Entity) -> str:
-    actor.note = UserMapper.get_note(actor)
+    actor.note = User.get_note(actor)
     info: List[Tuple[Any, Optional[str]]] = []
     if actor.aliases:
         info.append((uc_first(_('alias')), '<br>'.join(actor.aliases.values())))
@@ -184,7 +184,7 @@ def actor_view(actor: Entity) -> str:
 
 
 def event_view(event: Entity) -> str:
-    event.note = UserMapper.get_note(event)
+    event.note = User.get_note(event)
     tables = {'file': Table(Table.HEADERS['file'] + [_('main image')]),
               'subs': Table(Table.HEADERS['event']),
               'source': Table(Table.HEADERS['source']),
@@ -270,7 +270,7 @@ def file_view(file: Entity) -> str:
 
 
 def object_view(object_: Entity) -> str:
-    object_.note = UserMapper.get_note(object_)
+    object_.note = User.get_note(object_)
     tables = {'source': Table(Table.HEADERS['source']), 'event': Table(Table.HEADERS['event'])}
     for link_ in object_.get_links('P128'):
         data = get_base_table_data(link_.range)
@@ -291,7 +291,7 @@ def object_view(object_: Entity) -> str:
 
 
 def place_view(object_: Entity) -> str:
-    object_.note = UserMapper.get_note(object_)
+    object_.note = User.get_note(object_)
     location = object_.get_linked_entity_safe('P53', nodes=True)
     tables = {'file': Table(Table.HEADERS['file'] + [_('main image')]),
               'source': Table(Table.HEADERS['source']),
@@ -308,7 +308,7 @@ def place_view(object_: Entity) -> str:
     profile_image_id = object_.get_profile_image_id()
     overlays: Dict[int, Overlay] = {}
     if current_user.settings['module_map_overlay']:
-        overlays = OverlayMapper.get_by_object(object_)
+        overlays = Overlay.get_by_object(object_)
         if is_authorized('editor'):
             tables['file'].header.append(uc_first(_('overlay')))
 
@@ -387,7 +387,7 @@ def place_view(object_: Entity) -> str:
 
 
 def reference_view(reference: Entity) -> str:
-    reference.note = UserMapper.get_note(reference)
+    reference.note = User.get_note(reference)
     tables = {'file': Table(Table.HEADERS['file'] + ['page', _('main image')])}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find']:
         header_label = 'link text' if reference.system_type == 'external reference' else 'page'
@@ -418,7 +418,7 @@ def reference_view(reference: Entity) -> str:
 
 
 def source_view(source: Entity) -> str:
-    source.note = UserMapper.get_note(source)
+    source.note = User.get_note(source)
     tables = {'text': Table(['text', 'type', 'content']),
               'file': Table(Table.HEADERS['file'] + [_('main image')]),
               'reference': Table(Table.HEADERS['reference'] + ['page'])}
@@ -480,7 +480,7 @@ def node_view(node: Node) -> str:
             data.append(truncate_string(entity.description))
             tables['entities'].rows.append(data)
     tables['link_entities'] = Table([_('domain'), _('range')])
-    for row in LinkMapper.get_entities_by_node(node):
+    for row in Link.get_entities_by_node(node):
         tables['link_entities'].rows.append([link(EntityMapper.get_by_id(row.domain_id)),
                                              link(EntityMapper.get_by_id(row.range_id))])
     tables['subs'] = Table([_('name'), _('count'), _('info')])

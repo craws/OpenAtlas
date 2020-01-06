@@ -11,7 +11,7 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.forms.forms import build_form
 from openatlas.models.entity import Entity, EntityMapper
-from openatlas.models.user import UserMapper
+from openatlas.models.user import User
 from openatlas.util.util import (required_group)
 
 
@@ -39,7 +39,7 @@ def note_update(entity_id: int) -> Union[str, Response]:
     if form.validate_on_submit():
         save(form, entity=entity, insert=False)
         return redirect(url_for('entity_view', id_=entity.id))
-    form.description.data = UserMapper.get_note(entity)
+    form.description.data = User.get_note(entity)
     return render_template('note/update.html', form=form, entity=entity)
 
 
@@ -47,9 +47,9 @@ def save(form: FlaskForm, entity: Entity, insert: bool = True) -> None:
     g.cursor.execute('BEGIN')
     try:
         if insert:
-            UserMapper.insert_note(entity, form.description.data)
+            User.insert_note(entity, form.description.data)
         else:
-            UserMapper.update_note(entity, form.description.data)
+            User.update_note(entity, form.description.data)
         g.cursor.execute('COMMIT')
         flash(_('note added') if insert else _('note updated'), 'info')
     except Exception as e:  # pragma: no cover
@@ -61,6 +61,6 @@ def save(form: FlaskForm, entity: Entity, insert: bool = True) -> None:
 @app.route('/note/delete/<int:entity_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def note_delete(entity_id: int) -> Response:
-    UserMapper.delete_note(entity_id)
+    User.delete_note(entity_id)
     flash(_('note deleted'), 'info')
     return redirect(url_for('entity_view', id_=entity_id))
