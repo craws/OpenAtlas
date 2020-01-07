@@ -14,7 +14,7 @@ from werkzeug.exceptions import abort
 from openatlas import app
 from openatlas.models.date import Date
 from openatlas.models.link import Link
-from openatlas.util.util import is_authorized, print_file_extension, uc_first
+from openatlas.util.util import is_authorized, print_file_extension
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.node import Node
@@ -78,16 +78,12 @@ class Entity:
         LEFT JOIN model.link l2 on e.id = l2.range_id
         WHERE l1.domain_id IS NULL AND l2.range_id IS NULL AND e.class_code != 'E55'"""
 
-    def get_linked_entity(self,
-                          code: str,
-                          inverse: bool = False,
+    def get_linked_entity(self, code: str, inverse: bool = False,
                           nodes: bool = False) -> Optional[Entity]:
         return Link.get_linked_entity(self.id, code, inverse=inverse, nodes=nodes)
 
-    def get_linked_entity_safe(self,
-                               code: str,
-                               inverse: bool = False,
-                               nodes: bool = False) -> 'Entity':
+    def get_linked_entity_safe(self, code: str, inverse: bool = False,
+                               nodes: bool = False) -> Entity:
         return Link.get_linked_entity_safe(self.id, code, inverse, nodes)
 
     def get_linked_entities(self,
@@ -120,13 +116,6 @@ class Entity:
 
     def delete(self) -> None:
         Entity.delete_(self.id)
-
-    @staticmethod
-    def delete_(id_: int) -> None:
-        """ Triggers psql function model.delete_entity_related() for deleting related entities."""
-        if not is_authorized('contributor'):
-            abort(403)  # pragma: no cover
-        g.execute('DELETE FROM model.entity WHERE id = %(id_)s;', {'id_': id_})
 
     def delete_links(self, codes: List[str], inverse: bool = False) -> None:
         Link.delete_by_codes(self, codes, inverse)
@@ -196,17 +185,23 @@ class Entity:
         self.end_comment = None
         if form.begin_year_from.data:  # Only if begin year is set create a begin date or time span
             self.begin_comment = form.begin_comment.data
-            self.begin_from = Date.form_to_datetime64(
-                form.begin_year_from.data, form.begin_month_from.data, form.begin_day_from.data)
-            self.begin_to = Date.form_to_datetime64(
-                form.begin_year_to.data, form.begin_month_to.data, form.begin_day_to.data, True)
+            self.begin_from = Date.form_to_datetime64(form.begin_year_from.data,
+                                                      form.begin_month_from.data,
+                                                      form.begin_day_from.data)
+            self.begin_to = Date.form_to_datetime64(form.begin_year_to.data,
+                                                    form.begin_month_to.data,
+                                                    form.begin_day_to.data,
+                                                    to_date=True)
 
         if form.end_year_from.data:  # Only if end year is set create a year date or time span
             self.end_comment = form.end_comment.data
-            self.end_from = Date.form_to_datetime64(
-                form.end_year_from.data, form.end_month_from.data, form.end_day_from.data)
-            self.end_to = Date.form_to_datetime64(
-                form.end_year_to.data, form.end_month_to.data, form.end_day_to.data, True)
+            self.end_from = Date.form_to_datetime64(form.end_year_from.data,
+                                                    form.end_month_from.data,
+                                                    form.end_day_from.data)
+            self.end_to = Date.form_to_datetime64(form.end_year_to.data,
+                                                  form.end_month_to.data,
+                                                  form.end_day_to.data,
+                                                  to_date=True)
 
     def get_profile_image_id(self) -> Optional[int]:
         sql = 'SELECT image_id FROM web.entity_profile_image WHERE entity_id = %(entity_id)s;'
@@ -214,8 +209,7 @@ class Entity:
         return g.cursor.fetchone()[0] if g.cursor.rowcount else None
 
     def remove_profile_image(self) -> None:
-        sql = 'DELETE FROM web.entity_profile_image WHERE entity_id = %(entity_id)s;'
-        g.execute(sql, {'entity_id': self.id})
+        g.execute('DELETE FROM web.entity_profile_image WHERE entity_id = %(id)s;', {'id': self.id})
 
     def print_base_type(self) -> str:
         from openatlas.models.node import Node
@@ -229,9 +223,7 @@ class Entity:
         elif self.view_name == 'file':
             root_name = 'License'
         elif self.view_name == 'place':
-            root_name = uc_first(self.system_type)
-            if self.system_type == 'stratigraphic unit':
-                root_name = 'Stratigraphic Unit'
+            root_name = self.system_type.title()
         elif self.class_.code == 'E84':
             root_name = 'Information Carrier'
         root_id = Node.get_hierarchy(root_name).id
@@ -247,6 +239,13 @@ class Entity:
         if inverse and len(name_parts) > 1:  # pragma: no cover
             return sanitize(name_parts[1], 'node')
         return name_parts[0]
+
+    @staticmethod
+    def delete_(id_: int) -> None:
+        """ Triggers psql function model.delete_entity_related() for deleting related entities."""
+        if not is_authorized('contributor'):
+            abort(403)  # pragma: no cover
+        g.execute('DELETE FROM model.entity WHERE id = %(id_)s;', {'id_': id_})
 
     @staticmethod
     def build_sql(nodes: bool = False, aliases: bool = False) -> str:
@@ -332,9 +331,8 @@ class Entity:
             abort(418)
         entity = Entity(g.cursor.fetchone())
         if view_name and view_name != entity.view_name:  # Entity was called from wrong view, abort!
-            logger.log('error', 'model',
-                       'entity ({id}) has view name "{view}", requested was "{request}"'.format(
-                           id=entity_id, view=entity.view_name, request=view_name))
+            logger.log('error', 'model', 'entity ({id}) view name="{view}", requested="{request}"'.
+                       format(id=entity_id, view=entity.view_name, request=view_name))
             abort(422)
         return entity
 
@@ -513,7 +511,7 @@ class Entity:
         to_date = Date.form_to_datetime64(form.end_year.data,
                                           form.end_month.data,
                                           form.end_day.data,
-                                          True)
+                                          to_date=True)
 
         # Refill form in case dates were completed
         if from_date:
@@ -595,6 +593,6 @@ class Entity:
 
     @staticmethod
     def get_circular() -> List[Entity]:
-        """ Get entities that are linked to itself"""
+        """ Get entities that are linked to itself."""
         g.execute('SELECT domain_id FROM model.link WHERE domain_id = range_id;')
         return [Entity.get_by_id(row.domain_id) for row in g.cursor.fetchall()]

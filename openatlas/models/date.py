@@ -22,7 +22,7 @@ class Date:
 
     @staticmethod
     def timestamp_to_datetime64(string: str) -> Optional[numpy.datetime64]:
-        """ Converts a timestamp string to a numpy.datetime64"""
+        """ Converts a timestamp string to a numpy.datetime64."""
         if not string:
             return None
         if 'BC' in string:
@@ -32,7 +32,7 @@ class Date:
 
     @staticmethod
     def datetime64_to_timestamp(date: numpy.datetime64) -> Optional[str]:
-        """ Converts a numpy.datetime64 to a timestamp string"""
+        """ Converts a numpy.datetime64 to a timestamp string."""
         if not date:
             return None
         string = str(date)
@@ -48,7 +48,9 @@ class Date:
         return string + postfix
 
     @staticmethod
-    def form_to_datetime64(year: Any, month: Any, day: Any,
+    def form_to_datetime64(year: Any,
+                           month: Any,
+                           day: Any,
                            to_date: bool = False) -> Optional[numpy.datetime64]:
         """ Converts form fields (year, month, day) to a numpy.datetime64."""
         if not year:
