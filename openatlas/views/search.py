@@ -7,7 +7,7 @@ from wtforms.validators import InputRequired, NoneOf, NumberRange, Optional
 
 from openatlas import app
 from openatlas.models.date import DateMapper
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity
 from openatlas.util.table import Table
 from openatlas.util.util import link, required_group, truncate_string, uc_first
 
@@ -69,7 +69,7 @@ def search_index() -> str:
 def build_search_table(form: FlaskForm) -> Table:
     table = Table(['name', 'class', 'first', 'last', 'description'],
                   defs='[{className: "dt-body-right", targets: [2,3]}]')
-    for entity in EntityMapper.search(form):
+    for entity in Entity.search(form):
         table.rows.append([link(entity),
                            entity.class_.name,
                            entity.first,

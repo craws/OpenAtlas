@@ -13,7 +13,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.models.date import DateMapper
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity
 from openatlas.models.imports import ImportMapper
 from openatlas.util.table import Table
 from openatlas.util.util import (format_date, get_backup_file_data, is_float, link, required_group,
@@ -61,7 +61,7 @@ def import_project_insert() -> Union[str, Response]:
 @required_group('contributor')
 def import_project_view(id_: int) -> str:
     table = Table([_('name'), _('class'), _('description'), 'origin ID', _('date')])
-    for entity in EntityMapper.get_by_project_id(id_):
+    for entity in Entity.get_by_project_id(id_):
         table.rows.append([link(entity),
                            entity.class_.name,
                            truncate_string(entity.description),

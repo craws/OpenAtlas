@@ -15,7 +15,7 @@ from wtforms.validators import Optional
 from wtforms.widgets import HiddenInput
 
 from openatlas import app
-from openatlas.models.entity import Entity, EntityMapper
+from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.util.table import Table
@@ -246,16 +246,16 @@ class TableSelect(HiddenInput):  # type: ignore
         class_ = 'place' if field.id in place_fields else field.id
         if class_ == 'place':
             aliases = current_user.settings['table_show_aliases']
-            entities = EntityMapper.get_by_system_type('place', nodes=True, aliases=aliases)
+            entities = Entity.get_by_system_type('place', nodes=True, aliases=aliases)
         elif class_ == 'reference':
-            entities = EntityMapper.get_by_system_type('bibliography') + \
-                       EntityMapper.get_by_system_type('edition') + \
-                       EntityMapper.get_by_system_type('external reference')
+            entities = Entity.get_by_system_type('bibliography') + \
+                       Entity.get_by_system_type('edition') + \
+                       Entity.get_by_system_type('external reference')
         elif class_ == 'file':
-            entities = EntityMapper.get_display_files()
+            entities = Entity.get_display_files()
             file_stats = get_file_stats()
         else:
-            entities = EntityMapper.get_by_codes(class_)
+            entities = Entity.get_by_codes(class_)
         selection = ''
         table = Table(Table.HEADERS[class_])
 
@@ -324,9 +324,9 @@ class TableMultiSelect(HiddenInput):  # type: ignore
 
         if class_ == 'place':
             aliases = current_user.settings['table_show_aliases']
-            entities = EntityMapper.get_by_system_type('place', nodes=True, aliases=aliases)
+            entities = Entity.get_by_system_type('place', nodes=True, aliases=aliases)
         else:
-            entities = EntityMapper.get_by_codes(class_)
+            entities = Entity.get_by_codes(class_)
         for entity in entities:
             selection += entity.name + '<br>' if field.data and entity.id in field.data else ''
             data = get_base_table_data(entity)
@@ -381,8 +381,8 @@ def build_move_form(form: Any, node: Node) -> FlaskForm:
                 choices.append((entity.id, place.name))
     elif root.name in app.config['PROPERTY_TYPES']:
         for row in Link.get_entities_by_node(node):
-            domain = EntityMapper.get_by_id(row.domain_id)
-            range_ = EntityMapper.get_by_id(row.range_id)
+            domain = Entity.get_by_id(row.domain_id)
+            range_ = Entity.get_by_id(row.range_id)
             choices.append((row.id, domain.name + ' - ' + range_.name))
     else:
         for entity in node.get_linked_entities('P2', True):
@@ -394,16 +394,15 @@ def build_move_form(form: Any, node: Node) -> FlaskForm:
 
 def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
     """ Returns a form with a list of entities with checkboxes"""
-    from openatlas.models.entity import EntityMapper
     table = Table(Table.HEADERS[class_name] + [''])
     linked_ids = [entity.id for entity in linked_entities]
     file_stats = get_file_stats() if class_name == 'file' else None
     if class_name == 'file':
-        entities = EntityMapper.get_by_system_type('file', nodes=True)
+        entities = Entity.get_by_system_type('file', nodes=True)
     elif class_name == 'place':
-        entities = EntityMapper.get_by_system_type('place', nodes=True, aliases=True)
+        entities = Entity.get_by_system_type('place', nodes=True, aliases=True)
     else:
-        entities = EntityMapper.get_by_codes(class_name)
+        entities = Entity.get_by_codes(class_name)
     for entity in entities:
         if entity.id in linked_ids:
             continue  # Don't show already linked entries

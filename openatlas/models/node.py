@@ -8,7 +8,7 @@ from flask_wtf import FlaskForm
 from psycopg2.extras import NamedTupleCursor
 
 from openatlas import app
-from openatlas.models.entity import Entity, EntityMapper
+from openatlas.models.entity import Entity
 
 
 class Node(Entity):
@@ -226,7 +226,7 @@ class Node(Entity):
         if new_type_id:  # A new type was selected
             if root.multiple:
                 cleaned_entity_ids = []
-                for entity in EntityMapper.get_by_ids(entity_ids, nodes=True):
+                for entity in Entity.get_by_ids(entity_ids, nodes=True):
                     if any(node.id == int(new_type_id) for node in entity.nodes):
                         delete_ids.append(entity.id)  # If already linked add to delete ids
                     else:

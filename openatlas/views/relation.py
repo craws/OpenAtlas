@@ -11,7 +11,7 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
 from openatlas.forms.forms import TableMultiField, build_form, get_link_type
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.util.util import required_group
 
@@ -37,13 +37,13 @@ class RelationForm(DateForm):
 @app.route('/relation/insert/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def relation_insert(origin_id: int) -> Union[str, Response]:
-    origin = EntityMapper.get_by_id(origin_id)
+    origin = Entity.get_by_id(origin_id)
     form = build_form(RelationForm, 'Actor Actor Relation')
     form.origin_id.data = origin.id
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
-            for actor in EntityMapper.get_by_ids(ast.literal_eval(form.actor.data)):
+            for actor in Entity.get_by_ids(ast.literal_eval(form.actor.data)):
                 if form.inverse.data:
                     link_ = Link.get_by_id(actor.link('OA7', origin, form.description.data)[0])
                 else:
@@ -67,8 +67,8 @@ def relation_insert(origin_id: int) -> Union[str, Response]:
 @required_group('contributor')
 def relation_update(id_: int, origin_id: int) -> Union[str, Response]:
     link_ = Link.get_by_id(id_)
-    domain = EntityMapper.get_by_id(link_.domain.id)
-    range_ = EntityMapper.get_by_id(link_.range.id)
+    domain = Entity.get_by_id(link_.domain.id)
+    range_ = Entity.get_by_id(link_.range.id)
     origin = range_ if origin_id == range_.id else domain
     related = range_ if origin_id == domain.id else domain
     form = build_form(RelationForm, 'Actor Actor Relation', link_, request)

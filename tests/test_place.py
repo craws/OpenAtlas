@@ -1,7 +1,7 @@
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.models.overlay import Overlay
@@ -20,9 +20,9 @@ class PlaceTest(TestBaseCase):
                 unit_node = Node.get_hierarchy('Administrative Unit')
                 unit_sub1 = g.nodes[unit_node.subs[0]]
                 unit_sub2 = g.nodes[unit_node.subs[1]]
-                reference = EntityMapper.insert('E31', 'https://openatlas.eu', 'external reference')
+                reference = Entity.insert('E31', 'https://openatlas.eu', 'external reference')
                 place_node = Node.get_hierarchy('Place')
-                source = EntityMapper.insert('E33', 'Necronomicon')
+                source = Entity.insert('E33', 'Necronomicon')
             data = {'name': 'Asgard',
                     'alias-0': 'Valhöll',
                     'geonames_id': '123',
@@ -57,11 +57,11 @@ class PlaceTest(TestBaseCase):
             assert b'Necronomicon' in rv.data
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                places = EntityMapper.get_by_system_type('place')
+                places = Entity.get_by_system_type('place')
                 place = places[0]
                 place2 = places[1]
                 location = place2.get_linked_entity_safe('P53')
-                actor = EntityMapper.insert('E21', 'Milla Jovovich')
+                actor = Entity.insert('E21', 'Milla Jovovich')
                 actor.link('P74', location)
             assert b'Necronomicon' in rv.data
             rv = self.app.get(url_for('place_index'))
@@ -94,7 +94,7 @@ class PlaceTest(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                event = EntityMapper.insert('E8', 'Valhalla rising')
+                event = Entity.insert('E8', 'Valhalla rising')
                 event.link('P7', location)
                 event.link('P24', location)
             rv = self.app.get(url_for('entity_view', id_=place2.id))
@@ -120,7 +120,7 @@ class PlaceTest(TestBaseCase):
             assert b'An entry has been created' in rv.data
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                file = EntityMapper.get_by_system_type('file')[0]
+                file = Entity.get_by_system_type('file')[0]
                 link_id = Link.insert(file, 'P67', place)[0]
             rv = self.app.get(url_for('overlay_insert', image_id=file.id, place_id=place.id,
                                       link_id=link_id))

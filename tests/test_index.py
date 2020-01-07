@@ -3,7 +3,7 @@ import os
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity
 from tests.base import TestBaseCase
 
 
@@ -66,7 +66,7 @@ class IndexTests(TestBaseCase):
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                actor = EntityMapper.insert('E21', 'Game master')
+                actor = Entity.insert('E21', 'Game master')
 
             rv = self.app.get(url_for('event_update', id_=actor.id), follow_redirects=True)
             assert b'422 - Unprocessable entity' in rv.data

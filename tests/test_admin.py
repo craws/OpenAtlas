@@ -3,7 +3,7 @@ from typing import Dict, Union
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.models.settings import Settings
@@ -18,7 +18,7 @@ class ContentTests(TestBaseCase):
             self.app.post(url_for('actor_insert', code='E21'), data={'name': 'Oliver Twist'})
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                EntityMapper.insert('E31', 'One forsaken file entity', 'file')  # Add orphaned file
+                Entity.insert('E31', 'One forsaken file entity', 'file')  # Add orphaned file
             rv = self.app.get(url_for('admin_orphans'))
             assert all(x in rv.data for x in [b'Oliver Twist', b'forsaken'])
             rv = self.app.get(url_for('admin_orphans_delete', parameter='orphans'))
@@ -49,8 +49,8 @@ class ContentTests(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 # Create invalid dates for an actor and a relation link
-                person = EntityMapper.insert('E21', 'Person')
-                event = EntityMapper.insert('E7', 'Event')
+                person = Entity.insert('E21', 'Person')
+                event = Entity.insert('E7', 'Event')
                 person.begin_from = '2018-01-31'
                 person.begin_to = '2018-01-01'
                 person.update()
@@ -85,8 +85,8 @@ class ContentTests(TestBaseCase):
             # Check link duplicates and multi use of single nodes
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                event = EntityMapper.insert('E8', 'Event Horizon')
-                source = EntityMapper.insert('E33', 'Tha source')
+                event = Entity.insert('E8', 'Event Horizon')
+                source = Entity.insert('E33', 'Tha source')
                 source.link('P67', event)
                 source.link('P67', event)
                 source_node = Node.get_hierarchy('Source')
@@ -104,8 +104,8 @@ class ContentTests(TestBaseCase):
             # Check similar names
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                EntityMapper.insert('E21', 'I have the same name!')
-                EntityMapper.insert('E21', 'I have the same name!')
+                Entity.insert('E21', 'I have the same name!')
+                Entity.insert('E21', 'I have the same name!')
             rv = self.app.post(url_for('admin_check_similar'), follow_redirects=True,
                                data={'classes': 'actor', 'ratio': 100})
             assert b'I have the same name!' in rv.data

@@ -11,7 +11,7 @@ from wtforms import (BooleanField, HiddenField, PasswordField, SelectField, Stri
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.table import Table
 from openatlas.util.util import (format_date, is_authorized, link, required_group, send_mail,
@@ -85,7 +85,7 @@ def user_activity(user_id: int = 0) -> str:
     table = Table(['date', 'user', 'action', 'entity'], order='[[0, "desc"]]')
     for row in activities:
         try:
-            entity = link(EntityMapper.get_by_id(row.entity_id))
+            entity = link(Entity.get_by_id(row.entity_id))
         except AttributeError:  # pragma: no cover - entity already deleted
             entity = 'id ' + str(row.entity_id)
         try:

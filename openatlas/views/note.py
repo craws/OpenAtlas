@@ -10,7 +10,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import build_form
-from openatlas.models.entity import Entity, EntityMapper
+from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.util import (required_group)
 
@@ -23,7 +23,7 @@ class NoteForm(FlaskForm):  # type: ignore
 @app.route('/note/insert/<int:entity_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def note_insert(entity_id: int) -> Union[str, Response]:
-    entity = EntityMapper.get_by_id(entity_id)
+    entity = Entity.get_by_id(entity_id)
     form = build_form(NoteForm, 'note-form')
     if form.validate_on_submit():
         save(form, entity=entity)
@@ -34,7 +34,7 @@ def note_insert(entity_id: int) -> Union[str, Response]:
 @app.route('/note/update/<int:entity_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def note_update(entity_id: int) -> Union[str, Response]:
-    entity = EntityMapper.get_by_id(entity_id)
+    entity = Entity.get_by_id(entity_id)
     form = build_form(NoteForm, 'note-form')
     if form.validate_on_submit():
         save(form, entity=entity, insert=False)

@@ -120,14 +120,14 @@ class DateMapper:
     @staticmethod
     def get_invalid_dates() -> List['Entity']:
         """ Search for entities with invalid date combinations, e.g. begin after end"""
-        from openatlas.models.entity import EntityMapper
+        from openatlas.models.entity import Entity
         sql = """
             SELECT id FROM model.entity WHERE
                 begin_from > begin_to OR end_from > end_to
                 OR (begin_from IS NOT NULL AND end_from IS NOT NULL AND begin_from > end_from)
                 OR (begin_to IS NOT NULL AND end_to IS NOT NULL AND begin_to > end_to);"""
         g.execute(sql)
-        return [EntityMapper.get_by_id(row.id, nodes=True) for row in g.cursor.fetchall()]
+        return [Entity.get_by_id(row.id, nodes=True) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_invalid_link_dates() -> List['Link']:

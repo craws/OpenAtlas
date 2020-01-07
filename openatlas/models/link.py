@@ -23,12 +23,12 @@ class Link:
                  domain: Optional['Entity'] = None,
                  range_: Optional['Entity'] = None) -> None:
         from openatlas.forms.date import DateForm
-        from openatlas.models.entity import EntityMapper
+        from openatlas.models.entity import Entity
         self.id = row.id
         self.description = row.description
         self.property = g.properties[row.property_code]
-        self.domain = domain if domain else EntityMapper.get_by_id(row.domain_id)
-        self.range = range_ if range_ else EntityMapper.get_by_id(row.range_id)
+        self.domain = domain if domain else Entity.get_by_id(row.domain_id)
+        self.range = range_ if range_ else Entity.get_by_id(row.range_id)
         self.type = g.nodes[row.type_id] if row.type_id else None
         self.nodes: Dict['Entity', None] = {}
         if hasattr(row, 'type_id') and row.type_id:
@@ -144,7 +144,7 @@ class Link:
                             codes: Union[str, List[str]],
                             inverse: bool = False,
                             nodes: bool = False) -> List['Entity']:
-        from openatlas.models.entity import EntityMapper
+        from openatlas.models.entity import Entity
         codes = codes if isinstance(codes, list) else [codes]
         sql = """
             SELECT range_id AS result_id FROM model.link
@@ -155,7 +155,7 @@ class Link:
                 WHERE range_id = %(id_)s AND property_code IN %(codes)s;"""
         g.execute(sql, {'id_': id_, 'codes': tuple(codes)})
         ids = [element for (element,) in g.cursor.fetchall()]
-        return EntityMapper.get_by_ids(ids, nodes=nodes)
+        return Entity.get_by_ids(ids, nodes=nodes)
 
     @staticmethod
     def get_linked_entity_safe(id_: int, code: str,
@@ -172,6 +172,7 @@ class Link:
     def get_links(entity_id: int,
                   codes: Union[str, List[str], None] = None,
                   inverse: bool = False) -> List[Link]:
+        from openatlas.models.entity import Entity
         sql = """
             SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description, l.created,
                 l.modified, e.name, l.type_id,
@@ -195,8 +196,7 @@ class Link:
         for row in result:
             entity_ids.add(row.domain_id)
             entity_ids.add(row.range_id)
-        from openatlas.models.entity import EntityMapper
-        entities = {entity.id: entity for entity in EntityMapper.get_by_ids(entity_ids, nodes=True)}
+        entities = {entity.id: entity for entity in Entity.get_by_ids(entity_ids, nodes=True)}
         links = []
         for row in result:
             links.append(Link(row, domain=entities[row.domain_id], range_=entities[row.range_id]))
@@ -241,7 +241,7 @@ class Link:
     def check_links() -> List[Dict[str, str]]:
         """ Check all existing links for CIDOC CRM validity and return the invalid ones."""
         from openatlas.util.util import link
-        from openatlas.models.entity import EntityMapper
+        from openatlas.models.entity import Entity
         sql = """
             SELECT DISTINCT l.property_code AS property, d.class_code AS domain,
                 r.class_code AS range
@@ -272,8 +272,8 @@ class Link:
                 g.execute(sql, {'property': item['property'], 'domain': item['domain'],
                                 'range': item['range']})
                 for row2 in g.cursor.fetchall():
-                    domain = EntityMapper.get_by_id(row2.domain_id)
-                    range_ = EntityMapper.get_by_id(row2.range_id)
+                    domain = Entity.get_by_id(row2.domain_id)
+                    range_ = Entity.get_by_id(row2.range_id)
                     invalid_links.append({'domain': link(domain) + ' (' + domain.class_.code + ')',
                                           'property': link(g.properties[row2.property_code]),
                                           'range': link(range_) + ' (' + range_.class_.code + ')'})
@@ -308,7 +308,7 @@ class Link:
     def check_single_type_duplicates() -> List[List[str]]:
         # Find entities with multiple types attached which should be single
         from openatlas.models.node import Node
-        from openatlas.models.entity import EntityMapper
+        from openatlas.models.entity import Entity
         data = []
         for id_, node in g.nodes.items():
             if not node.root and not node.multiple and not node.value_type:
@@ -321,7 +321,7 @@ class Link:
                     g.execute(sql, {'node_ids': tuple(node_ids)})
                     for row in g.cursor.fetchall():
                         offending_nodes = []
-                        entity = EntityMapper.get_by_id(row.domain_id, nodes=True)
+                        entity = Entity.get_by_id(row.domain_id, nodes=True)
                         for entity_node in entity.nodes:
                             if g.nodes[entity_node.root[-1]].id == node.id:
                                 url = url_for('admin_delete_single_type_duplicate',

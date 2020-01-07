@@ -11,7 +11,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import build_form
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity
 from openatlas.models.node import Node
 from openatlas.util.table import Table
 from openatlas.util.util import required_group, sanitize, uc_first
@@ -110,7 +110,7 @@ def save(form: FlaskForm, node=None, value_type: bool = False) -> Node:  # type:
         if node:
             Node.update_hierarchy(node, form)
         else:
-            node = EntityMapper.insert('E55', sanitize(form.name.data, 'node'))
+            node = Entity.insert('E55', sanitize(form.name.data, 'node'))
             Node.insert_hierarchy(node, form, value_type)
         node.update(form)
         g.cursor.execute('COMMIT')

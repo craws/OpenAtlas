@@ -71,6 +71,13 @@ class Entity:
         if self.view_name == 'place':
             self.table_name = self.system_type.replace(' ', '-')
 
+    sql_orphan = """
+        SELECT e.id FROM model.entity e
+        LEFT JOIN model.link l1 on e.id = l1.domain_id AND l1.range_id NOT IN
+            (SELECT id FROM model.entity WHERE class_code = 'E55')
+        LEFT JOIN model.link l2 on e.id = l2.range_id
+        WHERE l1.domain_id IS NULL AND l2.range_id IS NULL AND e.class_code != 'E55'"""
+
     def get_linked_entity(self,
                           code: str,
                           inverse: bool = False,
@@ -106,19 +113,58 @@ class Entity:
         # e.g. '', '1', '[]', '[1, 2]'
         ids = ast.literal_eval(range_)
         ids = [int(id_) for id_ in ids] if isinstance(ids, list) else [int(ids)]
-        return Link.insert(self, code, EntityMapper.get_by_ids(ids), description, inverse)
+        return Link.insert(self, code, Entity.get_by_ids(ids), description, inverse)
 
     def get_links(self, codes: Union[str, List[str]], inverse: bool = False) -> List[Link]:
         return Link.get_links(self.id, codes, inverse)
 
     def delete(self) -> None:
-        EntityMapper.delete(self.id)
+        Entity.delete_(self.id)
+
+    @staticmethod
+    def delete_(id_: int) -> None:
+        """ Triggers psql function model.delete_entity_related() for deleting related entities."""
+        if not is_authorized('contributor'):
+            abort(403)  # pragma: no cover
+        g.execute('DELETE FROM model.entity WHERE id = %(id_)s;', {'id_': id_})
 
     def delete_links(self, codes: List[str], inverse: bool = False) -> None:
         Link.delete_by_codes(self, codes, inverse)
 
     def update(self, form: Optional[FlaskForm] = None) -> None:
-        EntityMapper.update(self, form)
+        from openatlas.forms.date import DateForm
+        from openatlas.util.util import sanitize
+        if form:
+            self.save_nodes(form)
+            for field in ['name', 'description']:
+                if hasattr(form, field):
+                    setattr(self, field, getattr(form, field).data)
+            if isinstance(form, DateForm):
+                self.set_dates(form)
+            if hasattr(form, 'alias') and (
+                self.system_type == 'place' or
+                    self.class_.code in app.config['CLASS_CODES']['actor']):
+                self.update_aliases(form)
+        if self.class_.code == 'E53':
+            self.name = sanitize(self.name, 'node')
+        if self.system_type == 'place location':
+            self.name = 'Location of ' + self.name
+            self.description = None
+        sql = """
+            UPDATE model.entity SET
+            (name, description, begin_from, begin_to, begin_comment, end_from, end_to, end_comment) 
+                = (%(name)s, %(description)s, %(begin_from)s, %(begin_to)s, %(begin_comment)s, 
+                %(end_from)s, %(end_to)s, %(end_comment)s)
+            WHERE id = %(id)s;"""
+        g.execute(sql, {'id': self.id,
+                        'name': self.name,
+                        'begin_from': DateMapper.datetime64_to_timestamp(self.begin_from),
+                        'begin_to': DateMapper.datetime64_to_timestamp(self.begin_to),
+                        'end_from': DateMapper.datetime64_to_timestamp(self.end_from),
+                        'end_to': DateMapper.datetime64_to_timestamp(self.end_to),
+                        'begin_comment': self.begin_comment,
+                        'end_comment': self.end_comment,
+                        'description': sanitize(self.description, 'description')})
 
     def update_aliases(self, form: FlaskForm) -> None:
         old_aliases = self.aliases
@@ -130,12 +176,12 @@ class Entity:
             else:
                 delete_ids.append(id_)
         for id_ in delete_ids:  # Delete obsolete aliases
-            EntityMapper.delete(id_)
+            Entity.delete_(id_)
         for alias in new_aliases:  # Insert new aliases if not empty
             if alias.strip() and self.class_.code == 'E18':
-                self.link('P1', EntityMapper.insert('E41', alias))
+                self.link('P1', Entity.insert('E41', alias))
             elif alias.strip():
-                self.link('P131', EntityMapper.insert('E82', alias))
+                self.link('P131', Entity.insert('E82', alias))
 
     def save_nodes(self, form: FlaskForm) -> None:
         from openatlas.models.node import Node
@@ -163,10 +209,13 @@ class Entity:
                 form.end_year_to.data, form.end_month_to.data, form.end_day_to.data, True)
 
     def get_profile_image_id(self) -> Optional[int]:
-        return EntityMapper.get_profile_image_id(self.id)
+        sql = 'SELECT image_id FROM web.entity_profile_image WHERE entity_id = %(entity_id)s;'
+        g.execute(sql, {'entity_id': self.id})
+        return g.cursor.fetchone()[0] if g.cursor.rowcount else None
 
     def remove_profile_image(self) -> None:
-        EntityMapper.remove_profile_image(self.id)
+        sql = 'DELETE FROM web.entity_profile_image WHERE entity_id = %(entity_id)s;'
+        g.execute(sql, {'entity_id': self.id})
 
     def print_base_type(self) -> str:
         from openatlas.models.node import Node
@@ -198,15 +247,6 @@ class Entity:
         if inverse and len(name_parts) > 1:  # pragma: no cover
             return sanitize(name_parts[1], 'node')
         return name_parts[0]
-
-
-class EntityMapper:
-    sql_orphan = """
-        SELECT e.id FROM model.entity e
-        LEFT JOIN model.link l1 on e.id = l1.domain_id AND l1.range_id NOT IN
-            (SELECT id FROM model.entity WHERE class_code = 'E55')
-        LEFT JOIN model.link l2 on e.id = l2.range_id
-        WHERE l1.domain_id IS NULL AND l2.range_id IS NULL AND e.class_code != 'E55'"""
 
     @staticmethod
     def build_sql(nodes: bool = False, aliases: bool = False) -> str:
@@ -240,53 +280,17 @@ class EntityMapper:
         return sql
 
     @staticmethod
-    def update(entity: Entity, form: Optional[FlaskForm] = None) -> None:
-        from openatlas.forms.date import DateForm
-        from openatlas.util.util import sanitize
-        if form:
-            entity.save_nodes(form)
-            for field in ['name', 'description']:
-                if hasattr(form, field):
-                    setattr(entity, field, getattr(form, field).data)
-            if isinstance(form, DateForm):
-                entity.set_dates(form)
-            if hasattr(form, 'alias') and (
-                entity.system_type == 'place' or
-                    entity.class_.code in app.config['CLASS_CODES']['actor']):
-                entity.update_aliases(form)
-        if entity.class_.code == 'E53':
-            entity.name = sanitize(entity.name, 'node')
-        if entity.system_type == 'place location':
-            entity.name = 'Location of ' + entity.name
-            entity.description = None
-        sql = """
-            UPDATE model.entity SET
-            (name, description, begin_from, begin_to, begin_comment, end_from, end_to, end_comment) 
-                = (%(name)s, %(description)s, %(begin_from)s, %(begin_to)s, %(begin_comment)s, 
-                %(end_from)s, %(end_to)s, %(end_comment)s)
-            WHERE id = %(id)s;"""
-        g.execute(sql, {'id': entity.id,
-                        'name': entity.name,
-                        'begin_from': DateMapper.datetime64_to_timestamp(entity.begin_from),
-                        'begin_to': DateMapper.datetime64_to_timestamp(entity.begin_to),
-                        'end_from': DateMapper.datetime64_to_timestamp(entity.end_from),
-                        'end_to': DateMapper.datetime64_to_timestamp(entity.end_to),
-                        'begin_comment': entity.begin_comment, 'end_comment': entity.end_comment,
-                        'description': sanitize(entity.description, 'description')})
-
-    @staticmethod
     def get_by_system_type(system_type: str,
                            nodes: bool = False,
                            aliases: bool = False) -> List[Entity]:
-        sql = EntityMapper.build_sql(nodes=nodes, aliases=aliases)
+        sql = Entity.build_sql(nodes=nodes, aliases=aliases)
         sql += ' WHERE e.system_type = %(system_type)s GROUP BY e.id;'
         g.execute(sql, {'system_type': system_type})
         return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_display_files() -> List[Entity]:
-        sql_clause = " WHERE e.system_type = 'file' GROUP BY e.id;"
-        g.execute(EntityMapper.build_sql(nodes=True) + sql_clause)
+        g.execute(Entity.build_sql(nodes=True) + " WHERE e.system_type = 'file' GROUP BY e.id;")
         entities = []
         for row in g.cursor.fetchall():
             if print_file_extension(row.id)[1:] in app.config['DISPLAY_FILE_EXTENSIONS']:
@@ -312,7 +316,7 @@ class EntityMapper:
                   'system_type': system_type.strip() if system_type else None,
                   'description': sanitize(description, 'description') if description else None}
         g.execute(sql, params)
-        return EntityMapper.get_by_id(g.cursor.fetchone()[0])
+        return Entity.get_by_id(g.cursor.fetchone()[0])
 
     @staticmethod
     def get_by_id(entity_id: int,
@@ -322,7 +326,7 @@ class EntityMapper:
         from openatlas import logger
         if entity_id in g.nodes:  # pragma: no cover, just in case a node is requested
             return g.nodes[entity_id]
-        sql = EntityMapper.build_sql(nodes, aliases) + ' WHERE e.id = %(id)s GROUP BY e.id;'
+        sql = Entity.build_sql(nodes, aliases) + ' WHERE e.id = %(id)s GROUP BY e.id;'
         g.execute(sql, {'id': entity_id})
         if g.cursor.rowcount < 1:  # pragma: no cover
             abort(418)
@@ -338,7 +342,7 @@ class EntityMapper:
     def get_by_ids(entity_ids: Any, nodes: bool = False) -> List[Entity]:
         if not entity_ids:
             return []
-        sql = EntityMapper.build_sql(nodes) + ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name'
+        sql = Entity.build_sql(nodes) + ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name'
         g.execute(sql, {'ids': tuple(entity_ids)})
         return [Entity(row) for row in g.cursor.fetchall()]
 
@@ -366,17 +370,17 @@ class EntityMapper:
     def get_by_codes(class_name: str) -> List[Entity]:
         # Possible class names: actor, event, place, reference, source
         if class_name == 'source':
-            sql = EntityMapper.build_sql(nodes=True) + """
+            sql = Entity.build_sql(nodes=True) + """
                 WHERE e.class_code IN %(codes)s AND e.system_type = 'source content'
                 GROUP BY e.id;"""
         elif class_name == 'reference':
-            sql = EntityMapper.build_sql(nodes=True) + """
+            sql = Entity.build_sql(nodes=True) + """
                 WHERE e.class_code IN %(codes)s AND e.system_type != 'file' GROUP BY e.id;"""
         else:
             aliases = True if class_name == 'actor' and current_user.settings[
                 'table_show_aliases'] else False
-            sql = EntityMapper.build_sql(nodes=True if class_name == 'event' else False,
-                                         aliases=aliases) + """
+            sql = Entity.build_sql(nodes=True if class_name == 'event' else False,
+                                   aliases=aliases) + """
                 WHERE e.class_code IN %(codes)s GROUP BY e.id;"""
         g.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][class_name])})
         return [Entity(row) for row in g.cursor.fetchall()]
@@ -386,23 +390,16 @@ class EntityMapper:
         sql = "SELECT id FROM model.entity WHERE name = %(name)s AND system_type = %(system_type)s;"
         g.execute(sql, {'name': str(name), 'system_type': system_type})
         if g.cursor.rowcount:
-            return EntityMapper.get_by_id(g.cursor.fetchone()[0])
+            return Entity.get_by_id(g.cursor.fetchone()[0])
         return None
-
-    @staticmethod
-    def delete(id_: int) -> None:
-        if not is_authorized('contributor'):
-            abort(403)  # pragma: no cover
-        """ Triggers function model.delete_entity_related() for deleting related entities."""
-        g.execute('DELETE FROM model.entity WHERE id = %(id_)s;', {'id_': id_})
 
     @staticmethod
     def get_similar_named(form: FlaskForm) -> Dict[int, Any]:
         class_ = form.classes.data
         if class_ in ['source', 'event', 'actor']:
-            entities = EntityMapper.get_by_codes(class_)
+            entities = Entity.get_by_codes(class_)
         else:
-            entities = EntityMapper.get_by_system_type(class_)
+            entities = Entity.get_by_system_type(class_)
         similar: Dict[int, Any] = {}
         already_added: Set[int] = set()
         for sample in entities:
@@ -439,14 +436,14 @@ class EntityMapper:
     @staticmethod
     def get_orphans() -> List[Entity]:
         """ Returns entities without links. """
-        g.execute(EntityMapper.sql_orphan)
-        return [EntityMapper.get_by_id(row.id) for row in g.cursor.fetchall()]
+        g.execute(Entity.sql_orphan)
+        return [Entity.get_by_id(row.id) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_latest(limit: int) -> List[Entity]:
         """ Returns the newest created entities"""
         codes = list(itertools.chain(*[code_ for code_ in app.config['CLASS_CODES'].values()]))
-        sql = EntityMapper.build_sql() + """
+        sql = Entity.build_sql() + """
                 WHERE e.class_code IN %(codes)s GROUP BY e.id
                 ORDER BY e.created DESC LIMIT %(limit)s;"""
         g.execute(sql, {'codes': tuple(codes), 'limit': limit})
@@ -458,9 +455,9 @@ class EntityMapper:
         class_codes = tuple(app.config['CODE_CLASS'].keys())
         if parameter == 'orphans':
             class_codes = class_codes + ('E55',)
-            sql_where = EntityMapper.sql_orphan + " AND e.class_code NOT IN %(class_codes)s"
+            sql_where = Entity.sql_orphan + " AND e.class_code NOT IN %(class_codes)s"
         elif parameter == 'unlinked':
-            sql_where = EntityMapper.sql_orphan + " AND e.class_code IN %(class_codes)s"
+            sql_where = Entity.sql_orphan + " AND e.class_code IN %(class_codes)s"
         elif parameter == 'types':
             count = 0
             for node in Node.get_node_orphans():
@@ -477,7 +474,7 @@ class EntityMapper:
     def search(form: FlaskForm) -> ValuesView[Entity]:
         if not form.term.data:
             return {}.values()
-        sql = EntityMapper.build_sql() + """
+        sql = Entity.build_sql() + """
             {user_clause} WHERE (LOWER(e.name) LIKE LOWER(%(term)s) {description_clause})
             AND {user_clause2} (""".format(
             user_clause="""
@@ -594,18 +591,7 @@ class EntityMapper:
         g.execute(sql, {'entity_id': origin_id, 'image_id': id_})
 
     @staticmethod
-    def get_profile_image_id(id_: int) -> Optional[int]:
-        sql = 'SELECT image_id FROM web.entity_profile_image WHERE entity_id = %(entity_id)s;'
-        g.execute(sql, {'entity_id': id_})
-        return g.cursor.fetchone()[0] if g.cursor.rowcount else None
-
-    @staticmethod
-    def remove_profile_image(entity_id: int) -> None:
-        sql = 'DELETE FROM web.entity_profile_image WHERE entity_id = %(entity_id)s;'
-        g.execute(sql, {'entity_id': entity_id})
-
-    @staticmethod
     def get_circular() -> List[Entity]:
         """ Get entities that are linked to itself"""
         g.execute('SELECT domain_id FROM model.link WHERE domain_id = range_id;')
-        return [EntityMapper.get_by_id(row.domain_id) for row in g.cursor.fetchall()]
+        return [Entity.get_by_id(row.domain_id) for row in g.cursor.fetchall()]

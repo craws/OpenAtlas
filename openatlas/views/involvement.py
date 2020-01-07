@@ -11,7 +11,7 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
 from openatlas.forms.forms import TableMultiField, build_form, get_link_type
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.util.util import required_group
 
@@ -29,7 +29,7 @@ class ActorForm(DateForm):
 @app.route('/involvement/insert/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def involvement_insert(origin_id: int) -> Union[str, Response]:
-    origin = EntityMapper.get_by_id(origin_id)
+    origin = Entity.get_by_id(origin_id)
     form = build_form(ActorForm, 'Involvement')
     if origin.view_name == 'event':
         del form.event
@@ -45,7 +45,7 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
         g.cursor.execute('BEGIN')
         try:
             if origin.view_name == 'event':
-                for actor in EntityMapper.get_by_ids(ast.literal_eval(form.actor.data)):
+                for actor in Entity.get_by_ids(ast.literal_eval(form.actor.data)):
                     link_ = Link.get_by_id(origin.link(form.activity.data,
                                                        actor,
                                                        form.description.data)[0])
@@ -53,7 +53,7 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
                     link_.type = get_link_type(form)
                     link_.update()
             else:
-                for event in EntityMapper.get_by_ids(ast.literal_eval(form.event.data)):
+                for event in Entity.get_by_ids(ast.literal_eval(form.event.data)):
                     link_ = Link.get_by_id(event.link(form.activity.data,
                                                       origin,
                                                       form.description.data)[0])
@@ -77,8 +77,8 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
 @required_group('contributor')
 def involvement_update(id_: int, origin_id: int) -> Union[str, Response]:
     link_ = Link.get_by_id(id_)
-    event = EntityMapper.get_by_id(link_.domain.id, view_name='event')
-    actor = EntityMapper.get_by_id(link_.range.id, view_name='actor')
+    event = Entity.get_by_id(link_.domain.id, view_name='event')
+    actor = Entity.get_by_id(link_.range.id, view_name='actor')
     origin = event if origin_id == event.id else actor
     form = build_form(ActorForm, 'Involvement', link_, request)
     form.save.label.text = _('save')

@@ -1,7 +1,7 @@
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
 from tests.base import TestBaseCase
@@ -14,8 +14,8 @@ class RelationTests(TestBaseCase):
             self.login()
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                actor = EntityMapper.insert('E21', 'Connor MacLeod')
-                related = EntityMapper.insert('E21', 'The Kurgan')
+                actor = Entity.insert('E21', 'Connor MacLeod')
+                related = Entity.insert('E21', 'The Kurgan')
 
             # Add relationship
             rv = self.app.get(url_for('relation_insert', origin_id=actor.id))

@@ -15,7 +15,7 @@ from wtforms.validators import Email, InputRequired
 from openatlas import app, logger
 from openatlas.forms.forms import TableField
 from openatlas.models.date import DateMapper
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.models.settings import Settings
@@ -111,8 +111,8 @@ def admin_check_link_duplicates(delete: Optional[str] = None) -> Union[str, Resp
                    'begin_to', 'begin_comment', 'end_from', 'end_to', 'end_comment', 'count'])
 
     for result in Link.check_link_duplicates():
-        table.rows.append([link(EntityMapper.get_by_id(result.domain_id)),
-                           link(EntityMapper.get_by_id(result.range_id)),
+        table.rows.append([link(Entity.get_by_id(result.domain_id)),
+                           link(Entity.get_by_id(result.range_id)),
                            link(g.properties[result.property_code]),
                            truncate_string(result.description),
                            link(g.nodes[result.type_id]) if result.type_id else '',
@@ -185,7 +185,7 @@ def admin_check_similar() -> str:
     table = None
     if form.validate_on_submit():
         table = Table(['name', uc_first(_('count'))])
-        for sample_id, sample in EntityMapper.get_similar_named(form).items():
+        for sample_id, sample in Entity.get_similar_named(form).items():
             html = link(sample['entity'])
             for entity in sample['entities']:
                 html += '<br>' + link(entity)
@@ -196,7 +196,7 @@ def admin_check_similar() -> str:
 @app.route('/admin/orphans/delete/<parameter>')
 @required_group('admin')
 def admin_orphans_delete(parameter: str) -> Response:
-    count = EntityMapper.delete_orphans(parameter)
+    count = Entity.delete_orphans(parameter)
     flash(_('info orphans deleted:') + ' ' + str(count), 'info')
     return redirect(url_for('admin_orphans'))
 
@@ -246,8 +246,8 @@ def admin_orphans() -> str:
               'circular': Table(['entity']),
               'nodes': Table(['name', 'root']),
               'orphaned_files': Table(['name', 'size', 'date', 'ext'])}
-    tables['circular'].rows = [[link(entity)] for entity in EntityMapper.get_circular()]
-    for entity in EntityMapper.get_orphans():
+    tables['circular'].rows = [[link(entity)] for entity in Entity.get_circular()]
+    for entity in Entity.get_orphans():
         name = 'unlinked' if entity.class_.code in app.config['CODE_CLASS'].keys() else 'orphans'
         tables[name].rows.append([link(entity),
                                   link(entity.class_),
@@ -261,7 +261,7 @@ def admin_orphans() -> str:
 
     # Get orphaned file entities (no corresponding file)
     file_ids = []
-    for entity in EntityMapper.get_by_system_type('file', nodes=True):
+    for entity in Entity.get_by_system_type('file', nodes=True):
         file_ids.append(str(entity.id))
         if not get_file_path(entity):
             tables['missing_files'].rows.append([link(entity),
@@ -327,7 +327,7 @@ def admin_file_delete(filename: str) -> Response:  # pragma: no cover
 
     if is_authorized('admin'):
         # Get all files with entities
-        file_ids = [str(entity.id) for entity in EntityMapper.get_by_system_type('file')]
+        file_ids = [str(entity.id) for entity in Entity.get_by_system_type('file')]
 
         # Get orphaned files (no corresponding entity)
         path = app.config['UPLOAD_FOLDER_PATH']

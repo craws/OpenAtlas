@@ -82,7 +82,7 @@ class ImportMapper:
 
     @staticmethod
     def import_data(project: 'Project', class_code: str, data: List[Any]) -> None:
-        from openatlas.models.entity import EntityMapper
+        from openatlas.models.entity import Entity
         from openatlas.models.gis import GisMapper
         for row in data:
             system_type = None
@@ -91,8 +91,7 @@ class ImportMapper:
             elif class_code == 'E18':
                 system_type = 'place'
             desc = row['description'] if 'description' in row and row['description'] else None
-            entity = EntityMapper.insert(code=class_code, name=row['name'], description=desc,
-                                         system_type=system_type)
+            entity = Entity.insert(class_code, row['name'], system_type, desc)
             sql = """
                 INSERT INTO import.entity (project_id, origin_id, entity_id, user_id)
                 VALUES (%(project_id)s, %(origin_id)s, %(entity_id)s, %(user_id)s);"""
@@ -108,7 +107,6 @@ class ImportMapper:
                     entity.begin_to = row['begin_to']
                 if 'begin_comment' in row and row['begin_comment']:
                     entity.begin_comment = row['begin_comment']
-
             if 'end_from' in row and row['end_from']:
                 entity.end_from = row['end_from']
                 if 'end_to' in row and row['end_to']:
@@ -119,8 +117,7 @@ class ImportMapper:
 
             # GIS
             if class_code == 'E18':
-                location = EntityMapper.insert('E53', 'Location of ' + row['name'],
-                                               'place location')
+                location = Entity.insert('E53', 'Location of ' + row['name'], 'place location')
                 entity.link('P53', location)
                 if 'easting' in row and is_float(row['easting']):
                     if 'northing' in row and is_float(row['northing']):

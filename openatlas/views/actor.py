@@ -10,7 +10,7 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
 from openatlas.forms.forms import TableField, build_form, build_table_form
-from openatlas.models.entity import Entity, EntityMapper
+from openatlas.models.entity import Entity
 from openatlas.util.table import Table
 from openatlas.util.util import (get_base_table_data, link, required_group, truncate_string,
                                  uc_first, was_modified)
@@ -35,12 +35,12 @@ class ActorForm(DateForm):
 @required_group('readonly')
 def actor_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
     if id_ and action == 'delete':
-        EntityMapper.delete(id_)
+        Entity.delete_(id_)
         logger.log_user(id_, 'delete')
         flash(_('entity deleted'), 'info')
     table = Table(Table.HEADERS['actor'] + ['description'],
                   defs='[{className: "dt-body-right", targets: [2,3]}]')
-    for actor in EntityMapper.get_by_codes('actor'):
+    for actor in Entity.get_by_codes('actor'):
         data = get_base_table_data(actor)
         data.append(truncate_string(actor.description))
         table.rows.append(data)
@@ -51,7 +51,7 @@ def actor_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
 @app.route('/actor/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def actor_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Response]:
-    origin = EntityMapper.get_by_id(origin_id) if origin_id else None
+    origin = Entity.get_by_id(origin_id) if origin_id else None
     code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
     form = build_form(ActorForm, code_class[code])
     if form.validate_on_submit():
@@ -68,7 +68,7 @@ def actor_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Respo
 @app.route('/actor/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def actor_update(id_: int) -> Union[str, Response]:
-    actor = EntityMapper.get_by_id(id_, nodes=True, aliases=True, view_name='actor')
+    actor = Entity.get_by_id(id_, nodes=True, aliases=True, view_name='actor')
     code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
     form = build_form(ActorForm, code_class[actor.class_.code], actor, request)
     if form.validate_on_submit():
@@ -97,7 +97,7 @@ def actor_update(id_: int) -> Union[str, Response]:
 @app.route('/actor/add/source/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def actor_add_source(id_: int) -> Union[str, Response]:
-    actor = EntityMapper.get_by_id(id_, view_name='actor')
+    actor = Entity.get_by_id(id_, view_name='actor')
     if request.method == 'POST':
         if request.form['checkbox_values']:
             actor.link_string('P67', request.form['checkbox_values'], inverse=True)
@@ -109,7 +109,7 @@ def actor_add_source(id_: int) -> Union[str, Response]:
 @app.route('/actor/add/reference/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def actor_add_reference(id_: int) -> Union[str, Response]:
-    actor = EntityMapper.get_by_id(id_, view_name='actor')
+    actor = Entity.get_by_id(id_, view_name='actor')
     form = AddReferenceForm()
     if form.validate_on_submit():
         actor.link_string('P67', form.reference.data, description=form.page.data, inverse=True)
@@ -121,7 +121,7 @@ def actor_add_reference(id_: int) -> Union[str, Response]:
 @app.route('/actor/add/file/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def actor_add_file(id_: int) -> Union[str, Response]:
-    actor = EntityMapper.get_by_id(id_, view_name='actor')
+    actor = Entity.get_by_id(id_, view_name='actor')
     if request.method == 'POST':
         if request.form['checkbox_values']:
             actor.link_string('P67', request.form['checkbox_values'], inverse=True)
@@ -140,18 +140,18 @@ def save(form: ActorForm,
         if actor:
             actor.delete_links(['P74', 'OA8', 'OA9'])
         else:
-            actor = EntityMapper.insert(code, form.name.data)
+            actor = Entity.insert(code, form.name.data)
             log_action = 'insert'
         actor.update(form)
         url = url_for('entity_view', id_=actor.id)
         if form.residence.data:
-            object_ = EntityMapper.get_by_id(form.residence.data, view_name='place')
+            object_ = Entity.get_by_id(form.residence.data, view_name='place')
             actor.link('P74', object_.get_linked_entity_safe('P53'))
         if form.begins_in.data:
-            object_ = EntityMapper.get_by_id(form.begins_in.data, view_name='place')
+            object_ = Entity.get_by_id(form.begins_in.data, view_name='place')
             actor.link('OA8', object_.get_linked_entity_safe('P53'))
         if form.ends_in.data:
-            object_ = EntityMapper.get_by_id(form.ends_in.data, view_name='place')
+            object_ = Entity.get_by_id(form.ends_in.data, view_name='place')
             actor.link('OA9', object_.get_linked_entity_safe('P53'))
 
         if origin:

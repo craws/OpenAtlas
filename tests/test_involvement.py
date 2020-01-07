@@ -1,7 +1,7 @@
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
 from tests.base import TestBaseCase
@@ -19,7 +19,7 @@ class InvolvementTests(TestBaseCase):
             event_id = int(rv.location.split('/')[-1])
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                actor = EntityMapper.insert('E21', 'Captain Miller')
+                actor = Entity.insert('E21', 'Captain Miller')
                 involvement = Node.get_hierarchy('Involvement')
 
             # Add involvement

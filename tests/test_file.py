@@ -1,7 +1,7 @@
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity
 from tests.base import TestBaseCase
 
 
@@ -14,8 +14,8 @@ class FileTest(TestBaseCase):
             # Create entities for file
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                actor = EntityMapper.insert('E21', 'File keeper')
-                reference = EntityMapper.insert('E31', 'Ancient Books', 'edition')
+                actor = Entity.insert('E21', 'File keeper')
+                reference = Entity.insert('E31', 'Ancient Books', 'edition')
 
             # Insert
             rv = self.app.get(url_for('file_insert', origin_id=actor.id))
@@ -33,7 +33,7 @@ class FileTest(TestBaseCase):
             assert b'An entry has been created' in rv.data
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                files = EntityMapper.get_by_system_type('file')
+                files = Entity.get_by_system_type('file')
                 file_id = files[0].id
                 file_id2 = files[1].id
 

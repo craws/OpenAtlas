@@ -3,7 +3,7 @@ import os
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity
 from tests.base import TestBaseCase
 
 
@@ -52,7 +52,7 @@ class ExportTest(TestBaseCase):
             # View an imported entity
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                place_id = EntityMapper.get_by_system_type('place')[0].id
+                place_id = Entity.get_by_system_type('place')[0].id
             rv = self.app.get(url_for('entity_view', id_=place_id))
             assert b'Yup' in rv.data
 

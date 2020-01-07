@@ -10,7 +10,7 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.models.entity import Entity, EntityMapper
+from openatlas.models.entity import Entity
 from openatlas.models.gis import GisMapper
 from openatlas.models.link import Link
 from openatlas.models.node import Node
@@ -33,7 +33,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             return node_view(g.nodes[id_])
         else:
             return redirect(url_for('node_index') + '#tab-' + str(id_))
-    entity = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
+    entity = Entity.get_by_id(id_, nodes=True, aliases=True)
     if not entity.view_name:  # pragma: no cover
         flash(_("This entity can't be viewed directly"), 'error')
         abort(400)
@@ -358,7 +358,7 @@ def place_view(object_: Entity) -> str:
         data.append(truncate_string(entity.description))
         tables[entity.system_type.replace(' ', '-')].rows.append(data)
     for link_ in location.get_links(['P74', 'OA8', 'OA9'], inverse=True):
-        actor = EntityMapper.get_by_id(link_.domain.id, view_name='actor')
+        actor = Entity.get_by_id(link_.domain.id, view_name='actor')
         tables['actor'].rows.append([link(actor),
                                      g.properties[link_.property.code].name,
                                      actor.class_.name,
@@ -481,8 +481,8 @@ def node_view(node: Node) -> str:
             tables['entities'].rows.append(data)
     tables['link_entities'] = Table([_('domain'), _('range')])
     for row in Link.get_entities_by_node(node):
-        tables['link_entities'].rows.append([link(EntityMapper.get_by_id(row.domain_id)),
-                                             link(EntityMapper.get_by_id(row.range_id))])
+        tables['link_entities'].rows.append([link(Entity.get_by_id(row.domain_id)),
+                                             link(Entity.get_by_id(row.range_id))])
     tables['subs'] = Table([_('name'), _('count'), _('info')])
     for sub_id in node.subs:
         sub = g.nodes[sub_id]
