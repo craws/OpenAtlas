@@ -10,8 +10,52 @@ from openatlas import app
 
 
 @dataclass
-class Property:
+class CidocClass:
+    _name: str
+    comment: str
+    code: str
+    id: int
+    i18n: Dict[str, str]
+    sub: List[CidocClass]
+    super: List[CidocClass]
 
+    @property
+    def name(self) -> str:
+        return self.get_i18n()
+
+    def get_i18n(self) -> str:
+        locale_session = openatlas.get_locale()
+        if locale_session in self.i18n:
+            return self.i18n[locale_session]
+        locale_default = session['settings']['default_language']
+        if locale_default in self.i18n:
+            return self.i18n[locale_default]
+        return getattr(self, '_name')  # pragma: no cover
+
+    @staticmethod
+    def get_all() -> Dict[str, CidocClass]:
+        g.execute("SELECT id, code, name, comment FROM model.class;")
+        classes = {row.code: CidocClass(_name=row.name,
+                                        code=row.code,
+                                        id=row.id,
+                                        comment=row.comment,
+                                        i18n={}, sub=[], super=[]
+                                        ) for row in g.cursor.fetchall()}
+        g.execute("SELECT super_code, sub_code FROM model.class_inheritance;")
+        for row in g.cursor.fetchall():
+            classes[row.super_code].sub.append(row.sub_code)
+            classes[row.sub_code].super.append(row.super_code)
+        sql = """
+            SELECT class_code, language_code, text FROM model.class_i18n
+            WHERE language_code IN %(language_codes)s;"""
+        g.execute(sql, {'language_codes': tuple(app.config['LANGUAGES'].keys())})
+        for row in g.cursor.fetchall():
+            classes[row.class_code].i18n[row.language_code] = row.text
+        return classes
+
+
+@dataclass
+class CidocProperty:
     _name: str
     _name_inverse: str
     comment: str
@@ -60,20 +104,20 @@ class Property:
         return False
 
     @staticmethod
-    def get_all() -> Dict[str, Property]:
+    def get_all() -> Dict[str, CidocProperty]:
         sql = """
             SELECT id, code, comment, domain_class_code, range_class_code, name, name_inverse
             FROM model.property;"""
         g.execute(sql)
-        properties = {row.code: Property(id=row.id,
-                                         _name=row.name,
-                                         _name_inverse=row.name_inverse,
-                                         code=row.code,
-                                         comment=row.comment,
-                                         domain_class_code=row.domain_class_code,
-                                         range_class_code=row.range_class_code,
-                                         sub=[], super=[], i18n={}, i18n_inverse={}
-                                         ) for row in g.cursor.fetchall()}
+        properties = {row.code: CidocProperty(id=row.id,
+                                              _name=row.name,
+                                              _name_inverse=row.name_inverse,
+                                              code=row.code,
+                                              comment=row.comment,
+                                              domain_class_code=row.domain_class_code,
+                                              range_class_code=row.range_class_code,
+                                              sub=[], super=[], i18n={}, i18n_inverse={}
+                                              ) for row in g.cursor.fetchall()}
         g.execute('SELECT super_code, sub_code FROM model.property_inheritance;')
         for row in g.cursor.fetchall():
             properties[row.super_code].sub.append(row.sub_code)

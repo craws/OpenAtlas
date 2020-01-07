@@ -23,9 +23,8 @@ from werkzeug.utils import redirect
 
 import openatlas
 from openatlas import app
-from openatlas.models.classObject import ClassObject
 from openatlas.models.date import DateMapper
-from openatlas.models.property import Property
+from openatlas.models.model import CidocClass, CidocProperty
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
@@ -405,7 +404,7 @@ def get_profile_image_table_link(file: 'Entity',
     return ''  # pragma: no cover - only happens for non image files
 
 
-def link(entity: Union['Entity', ClassObject, Property, 'Project', 'User']) -> str:
+def link(entity: Union['Entity', CidocClass, CidocProperty, 'Project', 'User']) -> str:
     # Builds an HTML link to entity view for display
     from openatlas.models.entity import Entity
     from openatlas.models.imports import Project
@@ -420,10 +419,10 @@ def link(entity: Union['Entity', ClassObject, Property, 'Project', 'User']) -> s
         style = '' if entity.active else 'class="inactive"'
         url = url_for('user_view', id_=entity.id)
         html = '<a ' + style + ' href="' + url + '">' + entity.username + '</a>'
-    elif isinstance(entity, ClassObject):
+    elif isinstance(entity, CidocClass):
         url = url_for('class_view', code=entity.code)
         html = '<a href="' + url + '">' + entity.code + '</a>'
-    elif isinstance(entity, Property):
+    elif isinstance(entity, CidocProperty):
         url = url_for('property_view', code=entity.code)
         html = '<a href="' + url + '">' + entity.code + '</a>'
     elif isinstance(entity, Entity):

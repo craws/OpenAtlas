@@ -12,9 +12,8 @@ from wtforms import IntegerField
 from wtforms.validators import Email
 
 from openatlas import app
-from openatlas.models.classObject import ClassObject
 from openatlas.models.entity import Entity
-from openatlas.models.property import Property
+from openatlas.models.model import CidocClass, CidocProperty
 from openatlas.util import util
 from openatlas.util.table import Table
 from openatlas.util.util import get_file_path, print_file_extension
@@ -118,7 +117,7 @@ def display_move_form(self: Any, form: Any, root_name: str) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def table_select_model(self: Any, name: str,
-                       selected: Union[ClassObject, Property, None] = None) -> str:
+                       selected: Union[CidocClass, CidocProperty, None] = None) -> str:
     # Todo: extra sort function for class and property code e.g. E69
     if name in ['domain', 'range']:
         entities = g.classes

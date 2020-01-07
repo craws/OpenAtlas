@@ -73,9 +73,8 @@ def execute(query: str, vars_: Optional[Dict[str, Any]] = None) -> None:
 
 @app.before_request
 def before_request() -> None:
-    from openatlas.models.classObject import ClassObject
+    from openatlas.models.model import CidocClass, CidocProperty
     from openatlas.models.node import Node
-    from openatlas.models.property import Property
     from openatlas.models.settings import Settings
     if request.path.startswith('/static'):  # pragma: no cover
         return  # Only needed if not running with Apache and static alias
@@ -84,8 +83,8 @@ def before_request() -> None:
     g.db = connect()
     g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
     g.execute = execute  # Add wrapper for g.cursor.execute to count SQL statements per request
-    g.classes = ClassObject.get_all()
-    g.properties = Property.get_all()
+    g.classes = CidocClass.get_all()
+    g.properties = CidocProperty.get_all()
     g.nodes = Node.get_all_nodes()
     session['settings'] = Settings.get_settings()
     session['language'] = get_locale()
