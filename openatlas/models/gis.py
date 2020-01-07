@@ -14,7 +14,7 @@ class InvalidGeomException(Exception):
     pass
 
 
-class GisMapper:
+class Gis:
 
     @staticmethod
     def get_all(objects: Optional[List[Entity]] = None) -> Dict[str, List[Any]]:

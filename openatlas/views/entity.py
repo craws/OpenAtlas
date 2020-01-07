@@ -11,7 +11,7 @@ from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from openatlas.models.gis import GisMapper
+from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.models.overlay import Overlay
@@ -175,7 +175,7 @@ def actor_view(actor: Entity) -> str:
                 data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
                 data.append(display_remove_link(unlink_url, link_.range.name))
             tables['member'].rows.append(data)
-    gis_data = GisMapper.get_all(objects) if objects else None
+    gis_data = Gis.get_all(objects) if objects else None
     if gis_data:
         if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]':
             gis_data = None
@@ -236,7 +236,7 @@ def event_view(event: Entity) -> str:
         objects.append(location.get_linked_entity_safe('P53', True))
     return render_template('event/view.html', event=event, tables=tables,
                            info=get_entity_data(event), profile_image_id=profile_image_id,
-                           gis_data=GisMapper.get_all(objects) if objects else None)
+                           gis_data=Gis.get_all(objects) if objects else None)
 
 
 def file_view(file: Entity) -> str:
@@ -364,7 +364,7 @@ def place_view(object_: Entity) -> str:
                                      actor.class_.name,
                                      actor.first,
                                      actor.last])
-    gis_data: Dict[str, List[Any]] = GisMapper.get_all([object_])
+    gis_data: Dict[str, List[Any]] = Gis.get_all([object_])
     if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]' \
             and gis_data['gisLineSelected'] == '[]':
         gis_data = {}

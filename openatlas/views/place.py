@@ -14,7 +14,7 @@ from openatlas.forms.date import DateForm
 from openatlas.forms.forms import build_form, build_table_form
 from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
-from openatlas.models.gis import GisMapper, InvalidGeomException
+from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, link, required_group, uc_first, was_modified
@@ -67,7 +67,7 @@ def place_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
     for place in Entity.get_by_system_type(
             'place', nodes=True, aliases=current_user.settings['table_show_aliases']):
         table.rows.append(get_base_table_data(place))
-    return render_template('place/index.html', table=table, gis_data=GisMapper.get_all())
+    return render_template('place/index.html', table=table, gis_data=Gis.get_all())
 
 
 @app.route('/place/insert', methods=['POST', 'GET'])
@@ -99,7 +99,6 @@ def place_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
 
     if title == 'place':
         form.alias.append_entry('')
-    gis_data = GisMapper.get_all()
     place = None
     feature = None
     if origin and origin.system_type == 'stratigraphic unit':
@@ -112,8 +111,14 @@ def place_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
     if origin and origin.class_.code == 'E18' and current_user.settings['module_map_overlay']:
         overlays = Overlay.get_by_object(origin)
 
-    return render_template('place/insert.html', form=form, title=title, place=place, origin=origin,
-                           gis_data=gis_data, feature=feature, geonames_buttons=geonames_buttons,
+    return render_template('place/insert.html',
+                           form=form,
+                           title=title,
+                           place=place,
+                           origin=origin,
+                           gis_data=Gis.get_all(),
+                           feature=feature,
+                           geonames_buttons=geonames_buttons,
                            overlays=overlays)
 
 
@@ -183,7 +188,6 @@ def place_update(id_: int) -> Union[str, Response]:
         for alias in object_.aliases.values():
             form.alias.append_entry(alias)
         form.alias.append_entry('')
-    gis_data = GisMapper.get_all([object_])
     if hasattr(form, 'geonames_id') and current_user.settings['module_geonames']:
         geonames_link = Geonames.get_geonames_link(object_)
         if geonames_link:
@@ -207,9 +211,15 @@ def place_update(id_: int) -> Union[str, Response]:
     overlays = Overlay.get_by_object(object_) if current_user.settings['module_map_overlay'] \
         else None
 
-    return render_template('place/update.html', form=form, object_=object_, gis_data=gis_data,
-                           place=place, feature=feature, stratigraphic_unit=stratigraphic_unit,
-                           overlays=overlays, geonames_buttons=geonames_buttons)
+    return render_template('place/update.html',
+                           form=form,
+                           object_=object_,
+                           gis_data=Gis.get_all([object_]),
+                           place=place,
+                           feature=feature,
+                           stratigraphic_unit=stratigraphic_unit,
+                           overlays=overlays,
+                           geonames_buttons=geonames_buttons)
 
 
 def save(form: DateForm,
@@ -222,7 +232,7 @@ def save(form: DateForm,
         if object__ and location_:
             object_ = object__
             location = location_
-            GisMapper.delete_by_entity(location)
+            Gis.delete_by_entity(location)
         else:
             log_action = 'insert'
             if origin and origin.system_type == 'stratigraphic unit':
@@ -251,7 +261,7 @@ def save(form: DateForm,
                 origin.link('P46', object_)
             else:
                 origin.link('P67', object_)
-        GisMapper.insert(location, form)
+        Gis.insert(location, form)
         g.cursor.execute('COMMIT')
         if form.continue_.data == 'yes':
             url = url_for('place_insert', origin_id=origin.id if origin else None)

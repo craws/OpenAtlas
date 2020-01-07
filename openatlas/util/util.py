@@ -23,7 +23,7 @@ from werkzeug.utils import redirect
 
 import openatlas
 from openatlas import app
-from openatlas.models.date import DateMapper
+from openatlas.models.date import Date
 from openatlas.models.model import CidocClass, CidocProperty
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
@@ -382,7 +382,7 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
     if not value:
         return ''
     if isinstance(value, numpy.datetime64):
-        date_ = DateMapper.datetime64_to_timestamp(value)
+        date_ = Date.datetime64_to_timestamp(value)
         return date_ if date_ else ''
     return value.date().isoformat()
 

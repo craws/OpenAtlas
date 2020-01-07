@@ -5,7 +5,7 @@ from flask_login import current_user
 from psycopg2.extras import NamedTupleCursor
 
 from openatlas import app
-from openatlas.models.imports import ImportMapper
+from openatlas.models.imports import Import
 
 
 class Logger:
@@ -68,7 +68,7 @@ class Logger:
         sql = 'SELECT project_id, origin_id, user_id FROM import.entity WHERE entity_id = %(id)s;'
         g.execute(sql, {'id': entity_id})
         row_import = g.cursor.fetchone()
-        project = ImportMapper.get_project_by_id(row_import.project_id) if row_import else None
+        project = Import.get_project_by_id(row_import.project_id) if row_import else None
         log = {'creator': User.get_by_id(row_insert.user_id) if row_insert else None,
                'created': row_insert.created if row_insert else None,
                'modifier': User.get_by_id(row_update.user_id) if row_update else None,

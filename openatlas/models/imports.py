@@ -20,7 +20,7 @@ class Project:
         self.modified = row.modified
 
 
-class ImportMapper:
+class Import:
     sql = """
         SELECT p.id, p.name, p.description, p.created, p.modified, COUNT(e.id) AS count
         FROM import.project p LEFT JOIN import.entity e ON p.id = e.project_id """
@@ -36,17 +36,17 @@ class ImportMapper:
 
     @staticmethod
     def get_all_projects() -> List[Project]:
-        g.execute(ImportMapper.sql + ' GROUP by p.id ORDER BY name;')
+        g.execute(Import.sql + ' GROUP by p.id ORDER BY name;')
         return [Project(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_project_by_id(id_: int) -> Project:
-        g.execute(ImportMapper.sql + ' WHERE p.id = %(id)s GROUP by p.id;', {'id': id_})
+        g.execute(Import.sql + ' WHERE p.id = %(id)s GROUP by p.id;', {'id': id_})
         return Project(g.cursor.fetchone())
 
     @staticmethod
     def get_project_by_name(name: str) -> Optional[Project]:
-        g.execute(ImportMapper.sql + ' WHERE p.name = %(name)s GROUP by p.id;', {'name': name})
+        g.execute(Import.sql + ' WHERE p.name = %(name)s GROUP by p.id;', {'name': name})
         return Project(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod
@@ -83,7 +83,7 @@ class ImportMapper:
     @staticmethod
     def import_data(project: 'Project', class_code: str, data: List[Any]) -> None:
         from openatlas.models.entity import Entity
-        from openatlas.models.gis import GisMapper
+        from openatlas.models.gis import Gis
         for row in data:
             system_type = None
             if class_code == 'E33':  # pragma: no cover
@@ -121,8 +121,8 @@ class ImportMapper:
                 entity.link('P53', location)
                 if 'easting' in row and is_float(row['easting']):
                     if 'northing' in row and is_float(row['northing']):
-                        GisMapper.insert_import(entity=entity,
-                                                location=location,
-                                                project=project,
-                                                easting=row['easting'],
-                                                northing=row['northing'])
+                        Gis.insert_import(entity=entity,
+                                          location=location,
+                                          project=project,
+                                          easting=row['easting'],
+                                          northing=row['northing'])

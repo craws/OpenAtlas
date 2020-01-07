@@ -9,7 +9,7 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.link import Link
 
 
-class DateMapper:
+class Date:
 
     @staticmethod
     def current_date_for_filename() -> str:

@@ -8,7 +8,7 @@ from flask_wtf import FlaskForm
 from psycopg2.extras import NamedTupleCursor
 
 from openatlas import logger
-from openatlas.models.date import DateMapper
+from openatlas.models.date import Date
 from openatlas.util.util import link, uc_first
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
@@ -34,11 +34,11 @@ class Link:
         if hasattr(row, 'type_id') and row.type_id:
             self.nodes[g.nodes[row.type_id]] = None
         if hasattr(row, 'begin_from'):
-            self.begin_from = DateMapper.timestamp_to_datetime64(row.begin_from)
-            self.begin_to = DateMapper.timestamp_to_datetime64(row.begin_to)
+            self.begin_from = Date.timestamp_to_datetime64(row.begin_from)
+            self.begin_to = Date.timestamp_to_datetime64(row.begin_to)
             self.begin_comment = row.begin_comment
-            self.end_from = DateMapper.timestamp_to_datetime64(row.end_from)
-            self.end_to = DateMapper.timestamp_to_datetime64(row.end_to)
+            self.end_from = Date.timestamp_to_datetime64(row.end_from)
+            self.end_to = Date.timestamp_to_datetime64(row.end_to)
             self.end_comment = row.end_comment
             self.first = DateForm.format_date(self.begin_from, 'year') if self.begin_from else None
             self.last = DateForm.format_date(self.end_from, 'year') if self.end_from else None
@@ -58,11 +58,11 @@ class Link:
                         'range_id': self.range.id,
                         'type_id': self.type.id if self.type else None,
                         'description': self.description,
-                        'begin_from': DateMapper.datetime64_to_timestamp(self.begin_from),
-                        'begin_to': DateMapper.datetime64_to_timestamp(self.begin_to),
+                        'begin_from': Date.datetime64_to_timestamp(self.begin_from),
+                        'begin_to': Date.datetime64_to_timestamp(self.begin_to),
                         'begin_comment': self.begin_comment,
-                        'end_from': DateMapper.datetime64_to_timestamp(self.end_from),
-                        'end_to': DateMapper.datetime64_to_timestamp(self.end_to),
+                        'end_from': Date.datetime64_to_timestamp(self.end_from),
+                        'end_to': Date.datetime64_to_timestamp(self.end_to),
                         'end_comment': self.end_comment})
 
     def delete(self) -> None:
@@ -76,15 +76,15 @@ class Link:
         self.end_to = None
         self.end_comment = None
         if form.begin_year_from.data:  # Only if begin year is set create a begin date or time span
-            self.begin_from = DateMapper.form_to_datetime64(
+            self.begin_from = Date.form_to_datetime64(
                 form.begin_year_from.data, form.begin_month_from.data, form.begin_day_from.data)
-            self.begin_to = DateMapper.form_to_datetime64(
+            self.begin_to = Date.form_to_datetime64(
                 form.begin_year_to.data, form.begin_month_to.data, form.begin_day_to.data, True)
             self.begin_comment = form.begin_comment.data
         if form.end_year_from.data:  # Only if end year is set create a year date or time span
-            self.end_from = DateMapper.form_to_datetime64(
+            self.end_from = Date.form_to_datetime64(
                 form.end_year_from.data, form.end_month_from.data, form.end_day_from.data)
-            self.end_to = DateMapper.form_to_datetime64(
+            self.end_to = Date.form_to_datetime64(
                 form.end_year_to.data, form.end_month_to.data, form.end_day_to.data, True)
             self.end_comment = form.end_comment.data
 

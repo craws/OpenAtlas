@@ -7,7 +7,7 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 
 from openatlas import app
-from openatlas.models.date import DateMapper
+from openatlas.models.date import Date
 
 
 class Export:
@@ -16,7 +16,7 @@ class Export:
     def export_csv(form: FlaskForm) -> None:
         """ Creates CSV file(s) in the export/csv folder, filename begins with current date."""
         import pandas.io.sql as psql
-        date_string = DateMapper.current_date_for_filename()
+        date_string = Date.current_date_for_filename()
         path = app.config['EXPORT_FOLDER_PATH'].joinpath('csv')
         if form.zip.data:
             path = app.config['TMP_FOLDER_PATH'].joinpath(date_string + '_openatlas_csv_export')
@@ -73,7 +73,7 @@ class Export:
     def export_sql() -> bool:
         """ Creates a pg_dump file in the export/sql folder, filename begins with current date."""
         # Todo: prevent exposing the database password to the process list
-        file_name = DateMapper.current_date_for_filename() + '_dump.sql'
+        file_name = Date.current_date_for_filename() + '_dump.sql'
         path = app.config['EXPORT_FOLDER_PATH'].joinpath('sql', file_name)
         command = """pg_dump -h {host} -d {database} -U {user} -p {port} -f {file}""".format(
             host=app.config['DATABASE_HOST'],

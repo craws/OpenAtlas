@@ -14,7 +14,7 @@ from wtforms.validators import Email, InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import TableField
-from openatlas.models.date import DateMapper
+from openatlas.models.date import Date
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
@@ -209,12 +209,12 @@ def admin_check_dates() -> str:
               'involvement_dates': Table(['actor', 'event', 'class', 'involvement', 'description']),
               'dates': Table(['name', 'class', 'type', 'system type', 'created', 'updated',
                               'description'])}
-    for entity in DateMapper.get_invalid_dates():
+    for entity in Date.get_invalid_dates():
         tables['dates'].rows.append([link(entity), link(entity.class_), entity.print_base_type(),
                                      entity.system_type, format_date(entity.created),
                                      format_date(entity.modified),
                                      truncate_string(entity.description)])
-    for link_ in DateMapper.get_invalid_link_dates():
+    for link_ in Date.get_invalid_link_dates():
         label = ''
         if link_.property.code == 'OA7':  # pragma: no cover
             label = 'relation'
@@ -225,7 +225,7 @@ def admin_check_dates() -> str:
         url = url_for(label + '_update', id_=link_.id, origin_id=link_.domain.id)
         tables['link_dates'].rows.append(['<a href="' + url + '">' + uc_first(_(label)) + '</a>',
                                           link(link_.domain), link(link_.range)])
-    for link_ in DateMapper.invalid_involvement_dates():
+    for link_ in Date.invalid_involvement_dates():
         event = link_.domain
         actor = link_.range
         update_url = url_for('involvement_update', id_=link_.id, origin_id=actor.id)
