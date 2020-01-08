@@ -364,10 +364,6 @@ def place_view(object_: Entity) -> str:
                                      actor.class_.name,
                                      actor.first,
                                      actor.last])
-    gis_data: Dict[str, List[Any]] = Gis.get_all([object_])
-    if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]' \
-            and gis_data['gisLineSelected'] == '[]':
-        gis_data = {}
     # Archeological subunits
     place = None
     feature = None

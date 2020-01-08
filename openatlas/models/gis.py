@@ -22,18 +22,22 @@ class Gis:
         if objects is None:
             objects = []
         all_: Dict[str, List[Any]] = {'point': [], 'linestring': [], 'polygon': []}
-        selected: Dict[str, List[Any]] = {'point': [], 'linestring': [], 'polygon': [],
+        selected: Dict[str, List[Any]] = {'point': [],
+                                          'linestring': [],
+                                          'polygon': [],
                                           'polygon_point': []}
 
         # Include GIS features of subunits which would be otherwise omitted
-        subunit_selected_id = 0
-        if objects and objects[0].system_type in ['feature', 'find', 'stratigraphic unit']:
+        subunit_ids = [0]
+        if objects and objects[0].system_type in ['place', 'feature', 'find', 'stratigraphic unit']:
             subunit_selected_id = objects[0].id
+            subunit_ids = [subunit.id for subunit in subunits] + [subunit_selected_id]
 
         object_ids = [x.id for x in objects]
         polygon_point_sql = \
             'public.ST_AsGeoJSON(public.ST_PointOnSurface(polygon.geom)) AS polygon_point, '
         for shape in ['point', 'polygon', 'linestring']:
+            polygon_sql = polygon_point_sql if shape == 'polygon' else ''
             sql = """
                 SELECT
                     object.id AS object_id,
@@ -41,7 +45,7 @@ class Gis:
                     {shape}.name,
                     {shape}.description,
                     {shape}.type,
-                    public.ST_AsGeoJSON({shape}.geom) AS geojson, {polygon_point_sql}
+                    public.ST_AsGeoJSON({shape}.geom) AS geojson, {polygon_sql}
                     object.name AS object_name,
                     object.description AS object_desc,
                     string_agg(CAST(t.range_id AS text), ',') AS types
@@ -52,11 +56,9 @@ class Gis:
                 LEFT JOIN model.link t ON object.id = t.domain_id AND t.property_code = 'P2'
                 WHERE place.class_code = 'E53'
                     AND l.property_code = 'P53'
-                    AND (object.system_type = 'place' OR object.id = {subunit_selected_id})
-                GROUP BY object.id, {shape}.id;""".format(
-                shape=shape, subunit_selected_id=subunit_selected_id,
-                polygon_point_sql=polygon_point_sql if shape == 'polygon' else '')
-            g.execute(sql)
+                    AND (object.system_type = 'place' OR object.id IN %(subunit_ids)s)
+                GROUP BY object.id, {shape}.id;""".format(shape=shape, polygon_sql=polygon_sql)
+            g.execute(sql, {'subunit_ids': tuple(subunit_ids)})
             place_root = Node.get_hierarchy('Place')
             for row in g.cursor.fetchall():
                 description = row.description.replace('"', '\"') if row.description else ''
