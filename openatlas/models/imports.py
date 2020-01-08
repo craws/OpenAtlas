@@ -20,7 +20,7 @@ class Project:
         self.modified = row.modified
 
 
-class ImportMapper:
+class Import:
     sql = """
         SELECT p.id, p.name, p.description, p.created, p.modified, COUNT(e.id) AS count
         FROM import.project p LEFT JOIN import.entity e ON p.id = e.project_id """
@@ -36,17 +36,17 @@ class ImportMapper:
 
     @staticmethod
     def get_all_projects() -> List[Project]:
-        g.execute(ImportMapper.sql + ' GROUP by p.id ORDER BY name;')
+        g.execute(Import.sql + ' GROUP by p.id ORDER BY name;')
         return [Project(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_project_by_id(id_: int) -> Project:
-        g.execute(ImportMapper.sql + ' WHERE p.id = %(id)s GROUP by p.id;', {'id': id_})
+        g.execute(Import.sql + ' WHERE p.id = %(id)s GROUP by p.id;', {'id': id_})
         return Project(g.cursor.fetchone())
 
     @staticmethod
     def get_project_by_name(name: str) -> Optional[Project]:
-        g.execute(ImportMapper.sql + ' WHERE p.name = %(name)s GROUP by p.id;', {'name': name})
+        g.execute(Import.sql + ' WHERE p.name = %(name)s GROUP by p.id;', {'name': name})
         return Project(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod
@@ -82,8 +82,8 @@ class ImportMapper:
 
     @staticmethod
     def import_data(project: 'Project', class_code: str, data: List[Any]) -> None:
-        from openatlas.models.entity import EntityMapper
-        from openatlas.models.gis import GisMapper
+        from openatlas.models.entity import Entity
+        from openatlas.models.gis import Gis
         for row in data:
             system_type = None
             if class_code == 'E33':  # pragma: no cover
@@ -91,8 +91,7 @@ class ImportMapper:
             elif class_code == 'E18':
                 system_type = 'place'
             desc = row['description'] if 'description' in row and row['description'] else None
-            entity = EntityMapper.insert(code=class_code, name=row['name'], description=desc,
-                                         system_type=system_type)
+            entity = Entity.insert(class_code, row['name'], system_type, desc)
             sql = """
                 INSERT INTO import.entity (project_id, origin_id, entity_id, user_id)
                 VALUES (%(project_id)s, %(origin_id)s, %(entity_id)s, %(user_id)s);"""
@@ -108,7 +107,6 @@ class ImportMapper:
                     entity.begin_to = row['begin_to']
                 if 'begin_comment' in row and row['begin_comment']:
                     entity.begin_comment = row['begin_comment']
-
             if 'end_from' in row and row['end_from']:
                 entity.end_from = row['end_from']
                 if 'end_to' in row and row['end_to']:
@@ -119,13 +117,12 @@ class ImportMapper:
 
             # GIS
             if class_code == 'E18':
-                location = EntityMapper.insert('E53', 'Location of ' + row['name'],
-                                               'place location')
+                location = Entity.insert('E53', 'Location of ' + row['name'], 'place location')
                 entity.link('P53', location)
                 if 'easting' in row and is_float(row['easting']):
                     if 'northing' in row and is_float(row['northing']):
-                        GisMapper.insert_import(entity=entity,
-                                                location=location,
-                                                project=project,
-                                                easting=row['easting'],
-                                                northing=row['northing'])
+                        Gis.insert_import(entity=entity,
+                                          location=location,
+                                          project=project,
+                                          easting=row['easting'],
+                                          northing=row['northing'])

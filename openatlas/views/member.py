@@ -11,8 +11,8 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
 from openatlas.forms.forms import TableMultiField, build_form, get_link_type
-from openatlas.models.entity import EntityMapper
-from openatlas.models.link import LinkMapper
+from openatlas.models.entity import Entity
+from openatlas.models.link import Link
 from openatlas.util.util import required_group
 
 
@@ -41,15 +41,15 @@ class MemberForm(DateForm):
 @app.route('/membership/insert/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def membership_insert(origin_id: int) -> Union[str, Response]:
-    origin = EntityMapper.get_by_id(origin_id)
+    origin = Entity.get_by_id(origin_id)
     form = build_form(MemberForm, 'Member')
     del form.actor
     form.origin_id.data = origin.id
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
-            for actor in EntityMapper.get_by_ids(ast.literal_eval(form.group.data)):
-                link_ = LinkMapper.get_by_id(actor.link('P107', origin, form.description.data)[0])
+            for actor in Entity.get_by_ids(ast.literal_eval(form.group.data)):
+                link_ = Link.get_by_id(actor.link('P107', origin, form.description.data)[0])
                 link_.set_dates(form)
                 link_.type = get_link_type(form)
                 link_.update()
@@ -68,15 +68,15 @@ def membership_insert(origin_id: int) -> Union[str, Response]:
 @app.route('/member/insert/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def member_insert(origin_id: int) -> Union[str, Response]:
-    origin = EntityMapper.get_by_id(origin_id)
+    origin = Entity.get_by_id(origin_id)
     form = build_form(MemberForm, 'Member')
     del form.group
     form.origin_id.data = origin.id
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
-            for actor in EntityMapper.get_by_ids(ast.literal_eval(form.actor.data)):
-                link_ = LinkMapper.get_by_id(origin.link('P107', actor, form.description.data)[0])
+            for actor in Entity.get_by_ids(ast.literal_eval(form.actor.data)):
+                link_ = Link.get_by_id(origin.link('P107', actor, form.description.data)[0])
                 link_.set_dates(form)
                 link_.type = get_link_type(form)
                 link_.update()
@@ -95,9 +95,9 @@ def member_insert(origin_id: int) -> Union[str, Response]:
 @app.route('/member/update/<int:id_>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def member_update(id_: int, origin_id: int) -> Union[str, Response]:
-    link_ = LinkMapper.get_by_id(id_)
-    domain = EntityMapper.get_by_id(link_.domain.id)
-    range_ = EntityMapper.get_by_id(link_.range.id)
+    link_ = Link.get_by_id(id_)
+    domain = Entity.get_by_id(link_.domain.id)
+    range_ = Entity.get_by_id(link_.range.id)
     origin = range_ if origin_id == range_.id else domain
     form = build_form(MemberForm, 'Member', link_, request)
     del form.actor, form.group, form.insert_and_continue
@@ -105,7 +105,7 @@ def member_update(id_: int, origin_id: int) -> Union[str, Response]:
         g.cursor.execute('BEGIN')
         try:
             link_.delete()
-            link_ = LinkMapper.get_by_id(domain.link('P107', range_, form.description.data)[0])
+            link_ = Link.get_by_id(domain.link('P107', range_, form.description.data)[0])
             link_.set_dates(form)
             link_.type = get_link_type(form)
             link_.update()

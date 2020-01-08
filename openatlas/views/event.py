@@ -12,8 +12,8 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
 from openatlas.forms.forms import TableField, TableMultiField, build_form, build_table_form
-from openatlas.models.entity import Entity, EntityMapper
-from openatlas.models.link import LinkMapper
+from openatlas.models.entity import Entity
+from openatlas.models.link import Link
 from openatlas.util.table import Table
 from openatlas.util.util import (get_base_table_data, link, required_group, truncate_string,
                                  uc_first, was_modified)
@@ -52,12 +52,12 @@ class EventForm(DateForm):
 @required_group('readonly')
 def event_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
     if id_ and action == 'delete':
-        EntityMapper.delete(id_)
+        Entity.delete_(id_)
         logger.log_user(id_, 'delete')
         flash(_('entity deleted'), 'info')
     table = Table(Table.HEADERS['event'] + ['description'],
                   defs='[{className: "dt-body-right", targets: [3,4]}]')
-    for event in EntityMapper.get_by_codes('event'):
+    for event in Entity.get_by_codes('event'):
         data = get_base_table_data(event)
         data.append(truncate_string(event.description))
         table.rows.append(data)
@@ -81,7 +81,7 @@ def prepare_form(form: EventForm, code: str) -> FlaskForm:
 @app.route('/event/insert/<code>/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def event_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Response]:
-    origin = EntityMapper.get_by_id(origin_id) if origin_id else None
+    origin = Entity.get_by_id(origin_id) if origin_id else None
     form = prepare_form(build_form(EventForm, 'Event'), code)
     if origin:
         del form.insert_and_continue
@@ -101,7 +101,7 @@ def event_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Respo
 @app.route('/event/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def event_update(id_: int) -> Union[str, Response]:
-    event = EntityMapper.get_by_id(id_, nodes=True, view_name='event')
+    event = Entity.get_by_id(id_, nodes=True, view_name='event')
     form = prepare_form(build_form(EventForm, 'Event', event, request), event.class_.code)
     form.event_id.data = event.id
     if form.validate_on_submit():
@@ -140,7 +140,7 @@ def event_update(id_: int) -> Union[str, Response]:
 @app.route('/event/add/source/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def event_add_source(id_: int) -> Union[str, Response]:
-    event = EntityMapper.get_by_id(id_, view_name='event')
+    event = Entity.get_by_id(id_, view_name='event')
     if request.method == 'POST':
         if request.form['checkbox_values']:
             event.link_string('P67', request.form['checkbox_values'], inverse=True)
@@ -152,7 +152,7 @@ def event_add_source(id_: int) -> Union[str, Response]:
 @app.route('/event/add/reference/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def event_add_reference(id_: int) -> Union[str, Response]:
-    event = EntityMapper.get_by_id(id_, view_name='event')
+    event = Entity.get_by_id(id_, view_name='event')
     form = AddReferenceForm()
     if form.validate_on_submit():
         event.link_string('P67', form.reference.data, description=form.page.data, inverse=True)
@@ -164,7 +164,7 @@ def event_add_reference(id_: int) -> Union[str, Response]:
 @app.route('/event/add/file/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def event_add_file(id_: int) -> Union[str, Response]:
-    event = EntityMapper.get_by_id(id_, view_name='event')
+    event = Entity.get_by_id(id_, view_name='event')
     if request.method == 'POST':
         if request.form['checkbox_values']:
             event.link_string('P67', request.form['checkbox_values'], inverse=True)
@@ -184,14 +184,14 @@ def save(form: FlaskForm,
             log_action = 'update'
             event.delete_links(['P7', 'P24', 'P25', 'P26', 'P27', 'P117'])
         elif code:
-            event = EntityMapper.insert(code, form.name.data)
+            event = Entity.insert(code, form.name.data)
         else:
             abort(400)  # pragma: no cover, either event or code has to be provided
         event.update(form)
         if form.event.data:
             event.link_string('P117', form.event.data)
         if form.place and form.place.data:
-            event.link('P7', LinkMapper.get_linked_entity_safe(int(form.place.data), 'P53'))
+            event.link('P7', Link.get_linked_entity_safe(int(form.place.data), 'P53'))
         if event.class_.code == 'E8' and form.given_place.data:  # Link place for acquisition
             event.link_string('P24', form.given_place.data)
         if event.class_.code == 'E9':  # Move
@@ -200,10 +200,10 @@ def save(form: FlaskForm,
             if form.person.data:  # Moved persons
                 event.link_string('P25', form.person.data)
             if form.place_from.data:  # Link place for move from
-                linked_place = LinkMapper.get_linked_entity_safe(int(form.place_from.data), 'P53')
+                linked_place = Link.get_linked_entity_safe(int(form.place_from.data), 'P53')
                 event.link('P27', linked_place)
             if form.place_to.data:  # Link place for move to
-                event.link('P26', LinkMapper.get_linked_entity_safe(int(form.place_to.data), 'P53'))
+                event.link('P26', Link.get_linked_entity_safe(int(form.place_to.data), 'P53'))
         url = url_for('entity_view', id_=event.id)
         if origin:
             url = url_for('entity_view', id_=origin.id) + '#tab-event'

@@ -1,7 +1,7 @@
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity
 from tests.base import TestBaseCase
 
 
@@ -16,11 +16,11 @@ class EventTest(TestBaseCase):
             residence_id = rv.location.split('/')[-1]
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                actor = EntityMapper.insert('E21', 'Game master')
-                file = EntityMapper.insert('E31', 'X-Files', 'file')
-                source = EntityMapper.insert('E33', 'Necronomicon', 'source content')
-                carrier = EntityMapper.insert('E84', 'I care for you', 'information carrier')
-                reference = EntityMapper.insert('E31', 'https://openatlas.eu', 'external reference')
+                actor = Entity.insert('E21', 'Game master')
+                file = Entity.insert('E31', 'X-Files', 'file')
+                source = Entity.insert('E33', 'Necronomicon', 'source content')
+                carrier = Entity.insert('E84', 'I care for you', 'information carrier')
+                reference = Entity.insert('E31', 'https://openatlas.eu', 'external reference')
 
             # Insert
             rv = self.app.get(url_for('event_insert', code='E7'))
@@ -32,7 +32,7 @@ class EventTest(TestBaseCase):
             assert b'First event ever' in rv.data
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                activity_id = EntityMapper.get_by_codes('event')[0].id
+                activity_id = Entity.get_by_codes('event')[0].id
             self.app.post(url_for('event_insert', code='E7', origin_id=actor.id), data=data)
             self.app.post(url_for('event_insert', code='E7', origin_id=file.id), data=data)
             self.app.post(url_for('event_insert', code='E7', origin_id=source.id), data=data)

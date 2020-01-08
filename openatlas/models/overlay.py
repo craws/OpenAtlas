@@ -1,3 +1,5 @@
+from __future__ import annotations  # Needed for Python 4.0 type annotations
+
 import os
 from typing import Dict
 
@@ -18,9 +20,6 @@ class Overlay:
         self.bounding_box = row.bounding_box
         path = get_file_path(row.image_id)
         self.image_name = os.path.basename(path) if path else False
-
-
-class OverlayMapper:
 
     @staticmethod
     def insert(form: FlaskForm, image_id: int, place_id: int, link_id: int) -> None:

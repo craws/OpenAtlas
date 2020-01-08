@@ -1,7 +1,7 @@
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.node import NodeMapper
+from openatlas.models.node import Node
 from tests.base import TestBaseCase
 
 
@@ -54,7 +54,7 @@ class HierarchyTest(TestBaseCase):
             assert b'valued' in rv.data
 
             # Test checks
-            actor_node = NodeMapper.get_hierarchy_by_name('Actor Actor Relation')
+            actor_node = Node.get_hierarchy('Actor Actor Relation')
             rv = self.app.get(url_for('hierarchy_update', id_=actor_node.id), follow_redirects=True)
             assert b'Forbidden' in rv.data
             rv = self.app.get(url_for('hierarchy_delete', id_=actor_node.id), follow_redirects=True)

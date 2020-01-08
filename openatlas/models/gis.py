@@ -6,7 +6,7 @@ from flask_wtf import FlaskForm
 
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Project
-from openatlas.models.node import NodeMapper
+from openatlas.models.node import Node
 from openatlas.util.util import sanitize
 
 
@@ -14,7 +14,7 @@ class InvalidGeomException(Exception):
     pass
 
 
-class GisMapper:
+class Gis:
 
     @staticmethod
     def get_all(objects: Optional[List[Entity]] = None,
@@ -57,7 +57,7 @@ class GisMapper:
                 shape=shape, subunit_selected_id=subunit_selected_id,
                 polygon_point_sql=polygon_point_sql if shape == 'polygon' else '')
             g.execute(sql)
-            place_type_root_id = NodeMapper.get_hierarchy_by_name('Place').id
+            place_root = Node.get_hierarchy('Place')
             for row in g.cursor.fetchall():
                 description = row.description.replace('"', '\"') if row.description else ''
                 object_desc = row.object_desc.replace('"', '\"') if row.object_desc else ''
@@ -74,7 +74,7 @@ class GisMapper:
                     nodes_list = ast.literal_eval('[' + row.types + ']')
                     for node_id in list(set(nodes_list)):
                         node = g.nodes[node_id]
-                        if node.root and node.root[-1] == place_type_root_id:
+                        if node.root and node.root[-1] == place_root.id:
                             item['properties']['objectType'] = node.name.replace('"', '\"')
                             break
                 if row.object_id in object_ids:

@@ -14,7 +14,7 @@ from wtforms.validators import InputRequired
 import openatlas
 from openatlas import app, logger
 from openatlas.forms.forms import build_form, build_table_form
-from openatlas.models.entity import Entity, EntityMapper
+from openatlas.models.entity import Entity
 from openatlas.util.table import Table
 from openatlas.util.util import (convert_size, format_date, get_file_path, get_file_stats,
                                  link, required_group, truncate_string, uc_first, was_modified)
@@ -65,13 +65,13 @@ def display_logo(filename: str) -> Any:  # File display function for public
 
 @app.route('/file/set_as_profile_image/<int:id_>/<int:origin_id>')
 def file_set_as_profile_image(id_: int, origin_id: int) -> Response:
-    EntityMapper.set_profile_image(id_, origin_id)
+    Entity.set_profile_image(id_, origin_id)
     return redirect(url_for('entity_view', id_=origin_id))
 
 
 @app.route('/file/set_as_profile_image/<int:entity_id>')
 def file_remove_profile_image(entity_id: int) -> Response:
-    entity = EntityMapper.get_by_id(entity_id)
+    entity = Entity.get_by_id(entity_id)
     entity.remove_profile_image()
     return redirect(url_for('entity_view', id_=entity.id))
 
@@ -82,7 +82,7 @@ def file_remove_profile_image(entity_id: int) -> Response:
 def file_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
     if id_ and action == 'delete':
         try:
-            EntityMapper.delete(id_)
+            Entity.delete_(id_)
             logger.log_user(id_, 'delete')
             flash(_('entity deleted'), 'info')
         except Exception as e:  # pragma: no cover
@@ -97,7 +97,7 @@ def file_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
             flash(_('error file delete'), 'error')
     table = Table(['date'] + Table.HEADERS['file'])
     file_stats = get_file_stats()
-    for entity in EntityMapper.get_by_system_type('file', nodes=True):
+    for entity in Entity.get_by_system_type('file', nodes=True):
         date = 'N/A'
         if entity.id in file_stats:
             date = format_date(datetime.datetime.utcfromtimestamp(file_stats[entity.id]['date']))
@@ -121,7 +121,7 @@ def file_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
 @app.route('/file/add/<int:id_>/<class_name>', methods=['POST', 'GET'])
 @required_group('contributor')
 def file_add(id_: int, class_name: str) -> Union[str, Response]:
-    file = EntityMapper.get_by_id(id_)
+    file = Entity.get_by_id(id_)
     if request.method == 'POST':
         if request.form['checkbox_values']:
             file.link_string('P67', request.form['checkbox_values'])
@@ -133,7 +133,7 @@ def file_add(id_: int, class_name: str) -> Union[str, Response]:
 @app.route('/file/add/reference/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def file_add_reference(id_: int) -> Union[str, Response]:
-    file = EntityMapper.get_by_id(id_)
+    file = Entity.get_by_id(id_)
     form = AddReferenceForm()
     if form.validate_on_submit():
         file.link_string('P67', form.reference.data, description=form.page.data, inverse=True)
@@ -145,7 +145,7 @@ def file_add_reference(id_: int) -> Union[str, Response]:
 @app.route('/file/update/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def file_update(id_: int) -> Union[str, Response]:
-    file_ = EntityMapper.get_by_id(id_, nodes=True)
+    file_ = Entity.get_by_id(id_, nodes=True)
     form = build_form(FileForm, 'File', file_, request)
     del form.file
     if form.validate_on_submit():
@@ -163,7 +163,7 @@ def file_update(id_: int) -> Union[str, Response]:
 @app.route('/file/insert/<int:origin_id>', methods=['GET', 'POST'])
 @required_group('contributor')
 def file_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
-    origin = EntityMapper.get_by_id(origin_id) if origin_id else None
+    origin = Entity.get_by_id(origin_id) if origin_id else None
     form = build_form(FileForm, 'File')
     if form.validate_on_submit():
         return redirect(save(form, origin=origin))
@@ -178,7 +178,7 @@ def save(form: FileForm, file: Optional[Entity] = None, origin: Optional[Entity]
         if not file:
             log_action = 'insert'
             file_ = request.files['file']
-            file = EntityMapper.insert('E31', form.name.data, 'file')
+            file = Entity.insert('E31', form.name.data, 'file')
             # Add an 'a' to prevent emtpy filename
             filename = secure_filename('a' + file_.filename)  # type: ignore
             new_name = str(file.id) + '.' + filename.rsplit('.', 1)[1].lower()

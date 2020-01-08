@@ -15,9 +15,9 @@ from wtforms.validators import Optional
 from wtforms.widgets import HiddenInput
 
 from openatlas import app
-from openatlas.models.entity import Entity, EntityMapper
-from openatlas.models.link import Link, LinkMapper
-from openatlas.models.node import NodeMapper, Node
+from openatlas.models.entity import Entity
+from openatlas.models.link import Link
+from openatlas.models.node import Node
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, get_file_stats, truncate_string, uc_first
 
@@ -44,7 +44,7 @@ def build_form(form: Any,
 
     # Add custom fields
     custom_list = []
-    for id_, node in NodeMapper.get_nodes_for_form(form_name).items():
+    for id_, node in Node.get_nodes_for_form(form_name).items():
         custom_list.append(id_)
         setattr(form, str(id_), TreeMultiField(str(id_)) if node.multiple else TreeField(str(id_)))
         if node.value_type:
@@ -129,7 +129,7 @@ def build_node_form(form: Any,
 class TreeSelect(HiddenInput):  # type: ignore
 
     def __call__(self, field: TreeField, **kwargs: Any) -> TreeSelect:
-        from openatlas.models.node import NodeMapper
+        from openatlas.models.node import Node
         selection = ''
         selected_ids = []
         if field.data:
@@ -176,7 +176,7 @@ class TreeSelect(HiddenInput):  # type: ignore
                                 change_label=uc_first(_('change')),
                                 clear_label=uc_first(_('clear')),
                                 selection=selection,
-                                tree_data=NodeMapper.get_tree_data(int(field.id), selected_ids),
+                                tree_data=Node.get_tree_data(int(field.id), selected_ids),
                                 clear_style='' if selection else ' style="display: none;" ',
                                 required=' required' if field.flags.required else '')
         return super(TreeSelect, self).__call__(field, **kwargs) + html
@@ -230,7 +230,7 @@ class TreeMultiSelect(HiddenInput):  # type: ignore
                                 title=root.name,
                                 selection=selection,
                                 change_label=uc_first(_('change')),
-                                tree_data=NodeMapper.get_tree_data(int(field.id), selected_ids))
+                                tree_data=Node.get_tree_data(int(field.id), selected_ids))
         return super(TreeMultiSelect, self).__call__(field, **kwargs) + html
 
 
@@ -246,16 +246,16 @@ class TableSelect(HiddenInput):  # type: ignore
         class_ = 'place' if field.id in place_fields else field.id
         if class_ == 'place':
             aliases = current_user.settings['table_show_aliases']
-            entities = EntityMapper.get_by_system_type('place', nodes=True, aliases=aliases)
+            entities = Entity.get_by_system_type('place', nodes=True, aliases=aliases)
         elif class_ == 'reference':
-            entities = EntityMapper.get_by_system_type('bibliography') + \
-                       EntityMapper.get_by_system_type('edition') + \
-                       EntityMapper.get_by_system_type('external reference')
+            entities = Entity.get_by_system_type('bibliography') + \
+                       Entity.get_by_system_type('edition') + \
+                       Entity.get_by_system_type('external reference')
         elif class_ == 'file':
-            entities = EntityMapper.get_display_files()
+            entities = Entity.get_display_files()
             file_stats = get_file_stats()
         else:
-            entities = EntityMapper.get_by_codes(class_)
+            entities = Entity.get_by_codes(class_)
         selection = ''
         table = Table(Table.HEADERS[class_])
 
@@ -324,9 +324,9 @@ class TableMultiSelect(HiddenInput):  # type: ignore
 
         if class_ == 'place':
             aliases = current_user.settings['table_show_aliases']
-            entities = EntityMapper.get_by_system_type('place', nodes=True, aliases=aliases)
+            entities = Entity.get_by_system_type('place', nodes=True, aliases=aliases)
         else:
-            entities = EntityMapper.get_by_codes(class_)
+            entities = Entity.get_by_codes(class_)
         for entity in entities:
             selection += entity.name + '<br>' if field.data and entity.id in field.data else ''
             data = get_base_table_data(entity)
@@ -380,9 +380,9 @@ def build_move_form(form: Any, node: Node) -> FlaskForm:
             if place:
                 choices.append((entity.id, place.name))
     elif root.name in app.config['PROPERTY_TYPES']:
-        for row in LinkMapper.get_entities_by_node(node):
-            domain = EntityMapper.get_by_id(row.domain_id)
-            range_ = EntityMapper.get_by_id(row.range_id)
+        for row in Link.get_entities_by_node(node):
+            domain = Entity.get_by_id(row.domain_id)
+            range_ = Entity.get_by_id(row.range_id)
             choices.append((row.id, domain.name + ' - ' + range_.name))
     else:
         for entity in node.get_linked_entities('P2', True):
@@ -394,16 +394,15 @@ def build_move_form(form: Any, node: Node) -> FlaskForm:
 
 def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
     """ Returns a form with a list of entities with checkboxes"""
-    from openatlas.models.entity import EntityMapper
     table = Table(Table.HEADERS[class_name] + [''])
     linked_ids = [entity.id for entity in linked_entities]
     file_stats = get_file_stats() if class_name == 'file' else None
     if class_name == 'file':
-        entities = EntityMapper.get_by_system_type('file', nodes=True)
+        entities = Entity.get_by_system_type('file', nodes=True)
     elif class_name == 'place':
-        entities = EntityMapper.get_by_system_type('place', nodes=True, aliases=True)
+        entities = Entity.get_by_system_type('place', nodes=True, aliases=True)
     else:
-        entities = EntityMapper.get_by_codes(class_name)
+        entities = Entity.get_by_codes(class_name)
     for entity in entities:
         if entity.id in linked_ids:
             continue  # Don't show already linked entries
@@ -417,5 +416,6 @@ def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
             <input id="csrf_token" name="csrf_token" type="hidden" value="{token}">
             <input id="checkbox_values" name="checkbox_values" type="hidden">
             {table} <button name="form-submit" id="form-submit" type="submit">{add}</button>
-        </form>""".format(add=uc_first(_('add')), token=generate_csrf(),
+        </form>""".format(add=uc_first(_('add')),
+                          token=generate_csrf(),
                           table=table.display(class_name))

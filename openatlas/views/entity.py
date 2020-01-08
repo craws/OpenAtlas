@@ -10,12 +10,12 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.models.entity import Entity, EntityMapper
-from openatlas.models.gis import GisMapper
-from openatlas.models.link import LinkMapper
+from openatlas.models.entity import Entity
+from openatlas.models.gis import Gis
+from openatlas.models.link import Link
 from openatlas.models.node import Node
-from openatlas.models.overlay import Overlay, OverlayMapper
-from openatlas.models.user import UserMapper
+from openatlas.models.overlay import Overlay
+from openatlas.models.user import User
 from openatlas.util.table import Table
 from openatlas.util.util import (add_system_data, add_type_data, display_remove_link,
                                  format_entry_begin, format_entry_end, get_appearance,
@@ -33,7 +33,7 @@ def entity_view(id_: int) -> Union[str, Response]:
             return node_view(g.nodes[id_])
         else:
             return redirect(url_for('node_index') + '#tab-' + str(id_))
-    entity = EntityMapper.get_by_id(id_, nodes=True, aliases=True)
+    entity = Entity.get_by_id(id_, nodes=True, aliases=True)
     if not entity.view_name:  # pragma: no cover
         flash(_("This entity can't be viewed directly"), 'error')
         abort(400)
@@ -41,7 +41,7 @@ def entity_view(id_: int) -> Union[str, Response]:
 
 
 def actor_view(actor: Entity) -> str:
-    actor.note = UserMapper.get_note(actor)
+    actor.note = User.get_note(actor)
     info: List[Tuple[Any, Optional[str]]] = []
     if actor.aliases:
         info.append((uc_first(_('alias')), '<br>'.join(actor.aliases.values())))
@@ -175,7 +175,7 @@ def actor_view(actor: Entity) -> str:
                 data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
                 data.append(display_remove_link(unlink_url, link_.range.name))
             tables['member'].rows.append(data)
-    gis_data = GisMapper.get_all(objects) if objects else None
+    gis_data = Gis.get_all(objects) if objects else None
     if gis_data:
         if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]':
             gis_data = None
@@ -184,7 +184,7 @@ def actor_view(actor: Entity) -> str:
 
 
 def event_view(event: Entity) -> str:
-    event.note = UserMapper.get_note(event)
+    event.note = User.get_note(event)
     tables = {'file': Table(Table.HEADERS['file'] + [_('main image')]),
               'subs': Table(Table.HEADERS['event']),
               'source': Table(Table.HEADERS['source']),
@@ -236,7 +236,7 @@ def event_view(event: Entity) -> str:
         objects.append(location.get_linked_entity_safe('P53', True))
     return render_template('event/view.html', event=event, tables=tables,
                            info=get_entity_data(event), profile_image_id=profile_image_id,
-                           gis_data=GisMapper.get_all(objects) if objects else None)
+                           gis_data=Gis.get_all(objects) if objects else None)
 
 
 def file_view(file: Entity) -> str:
@@ -270,7 +270,7 @@ def file_view(file: Entity) -> str:
 
 
 def object_view(object_: Entity) -> str:
-    object_.note = UserMapper.get_note(object_)
+    object_.note = User.get_note(object_)
     tables = {'source': Table(Table.HEADERS['source']), 'event': Table(Table.HEADERS['event'])}
     for link_ in object_.get_links('P128'):
         data = get_base_table_data(link_.range)
@@ -291,7 +291,7 @@ def object_view(object_: Entity) -> str:
 
 
 def place_view(object_: Entity) -> str:
-    object_.note = UserMapper.get_note(object_)
+    object_.note = User.get_note(object_)
     location = object_.get_linked_entity_safe('P53', nodes=True)
     tables = {'file': Table(Table.HEADERS['file'] + [_('main image')]),
               'source': Table(Table.HEADERS['source']),
@@ -308,7 +308,7 @@ def place_view(object_: Entity) -> str:
     profile_image_id = object_.get_profile_image_id()
     overlays: Dict[int, Overlay] = {}
     if current_user.settings['module_map_overlay']:
-        overlays = OverlayMapper.get_by_object(object_)
+        overlays = Overlay.get_by_object(object_)
         if is_authorized('editor'):
             tables['file'].header.append(uc_first(_('overlay')))
 
@@ -351,13 +351,23 @@ def place_view(object_: Entity) -> str:
     for event in object_.get_linked_entities('P24', inverse=True):
         if event.id not in event_ids:  # Don't add again if already in table
             tables['event'].rows.append(get_base_table_data(event))
+    has_subunits = False
+    for entity in object_.get_linked_entities('P46', nodes=True):
+        has_subunits = True
+        data = get_base_table_data(entity)
+        data.append(truncate_string(entity.description))
+        tables[entity.system_type.replace(' ', '-')].rows.append(data)
     for link_ in location.get_links(['P74', 'OA8', 'OA9'], inverse=True):
-        actor = EntityMapper.get_by_id(link_.domain.id, view_name='actor')
+        actor = Entity.get_by_id(link_.domain.id, view_name='actor')
         tables['actor'].rows.append([link(actor),
                                      g.properties[link_.property.code].name,
                                      actor.class_.name,
                                      actor.first,
                                      actor.last])
+    gis_data: Dict[str, List[Any]] = Gis.get_all([object_])
+    if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]' \
+            and gis_data['gisLineSelected'] == '[]':
+        gis_data = {}
     # Archeological subunits
     place = None
     feature = None
@@ -377,7 +387,7 @@ def place_view(object_: Entity) -> str:
     elif object_.system_type == 'feature':
         place = object_.get_linked_entity_safe('P46', True)
 
-    gis_data: Dict[str, List[Any]] = GisMapper.get_all([object_], subunits)
+    gis_data: Dict[str, List[Any]] = Gis.get_all([object_], subunits)
     if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]' \
             and gis_data['gisLineSelected'] == '[]':
         gis_data = {}
@@ -396,7 +406,7 @@ def place_view(object_: Entity) -> str:
 
 
 def reference_view(reference: Entity) -> str:
-    reference.note = UserMapper.get_note(reference)
+    reference.note = User.get_note(reference)
     tables = {'file': Table(Table.HEADERS['file'] + ['page', _('main image')])}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find']:
         header_label = 'link text' if reference.system_type == 'external reference' else 'page'
@@ -427,7 +437,7 @@ def reference_view(reference: Entity) -> str:
 
 
 def source_view(source: Entity) -> str:
-    source.note = UserMapper.get_note(source)
+    source.note = User.get_note(source)
     tables = {'text': Table(['text', 'type', 'content']),
               'file': Table(Table.HEADERS['file'] + [_('main image')]),
               'reference': Table(Table.HEADERS['reference'] + ['page'])}
@@ -489,9 +499,9 @@ def node_view(node: Node) -> str:
             data.append(truncate_string(entity.description))
             tables['entities'].rows.append(data)
     tables['link_entities'] = Table([_('domain'), _('range')])
-    for row in LinkMapper.get_entities_by_node(node):
-        tables['link_entities'].rows.append([link(EntityMapper.get_by_id(row.domain_id)),
-                                             link(EntityMapper.get_by_id(row.range_id))])
+    for row in Link.get_entities_by_node(node):
+        tables['link_entities'].rows.append([link(Entity.get_by_id(row.domain_id)),
+                                             link(Entity.get_by_id(row.range_id))])
     tables['subs'] = Table([_('name'), _('count'), _('info')])
     for sub_id in node.subs:
         sub = g.nodes[sub_id]

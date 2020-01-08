@@ -12,9 +12,9 @@ from wtforms import BooleanField, FileField, StringField, SubmitField, TextAreaF
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.models.date import DateMapper
-from openatlas.models.entity import EntityMapper
-from openatlas.models.imports import ImportMapper
+from openatlas.models.date import Date
+from openatlas.models.entity import Entity
+from openatlas.models.imports import Import
 from openatlas.util.table import Table
 from openatlas.util.util import (format_date, get_backup_file_data, is_float, link, required_group,
                                  truncate_string)
@@ -28,8 +28,8 @@ class ProjectForm(FlaskForm):  # type: ignore
 
     def validate(self) -> bool:
         valid = FlaskForm.validate(self)
-        name = ImportMapper.get_project_by_id(self.project_id).name if self.project_id else ''
-        if name != self.name.data and ImportMapper.get_project_by_name(self.name.data):
+        name = Import.get_project_by_id(self.project_id).name if self.project_id else ''
+        if name != self.name.data and Import.get_project_by_name(self.name.data):
             self.name.errors.append(_('error name exists'))
             valid = False
         return valid
@@ -39,7 +39,7 @@ class ProjectForm(FlaskForm):  # type: ignore
 @required_group('contributor')
 def import_index() -> str:
     table = Table([_('project'), _('entities'), _('description')])
-    for project in ImportMapper.get_all_projects():
+    for project in Import.get_all_projects():
         table.rows.append([link(project),
                            format_number(project.count),
                            truncate_string(project.description)])
@@ -51,7 +51,7 @@ def import_index() -> str:
 def import_project_insert() -> Union[str, Response]:
     form = ProjectForm()
     if form.validate_on_submit():
-        id_ = ImportMapper.insert_project(form.name.data, form.description.data)
+        id_ = Import.insert_project(form.name.data, form.description.data)
         flash(_('project inserted'), 'info')
         return redirect(url_for('import_project_view', id_=id_))
     return render_template('import/project_insert.html', form=form)
@@ -61,26 +61,26 @@ def import_project_insert() -> Union[str, Response]:
 @required_group('contributor')
 def import_project_view(id_: int) -> str:
     table = Table([_('name'), _('class'), _('description'), 'origin ID', _('date')])
-    for entity in EntityMapper.get_by_project_id(id_):
+    for entity in Entity.get_by_project_id(id_):
         table.rows.append([link(entity),
                            entity.class_.name,
                            truncate_string(entity.description),
                            entity.origin_id,
                            format_date(entity.created)])
-    project = ImportMapper.get_project_by_id(id_)
+    project = Import.get_project_by_id(id_)
     return render_template('import/project_view.html', project=project, table=table)
 
 
 @app.route('/import/project/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('manager')
 def import_project_update(id_: int) -> Union[str, Response]:
-    project = ImportMapper.get_project_by_id(id_)
+    project = Import.get_project_by_id(id_)
     form = ProjectForm(obj=project)
     form.project_id = id_
     if form.validate_on_submit():
         project.name = form.name.data
         project.description = form.description.data
-        ImportMapper.update_project(project)
+        Import.update_project(project)
         flash(_('project updated'), 'info')
         return redirect(url_for('import_project_view', id_=project.id))
     return render_template('import/project_update.html', project=project, form=form)
@@ -89,7 +89,7 @@ def import_project_update(id_: int) -> Union[str, Response]:
 @app.route('/import/project/delete/<int:id_>')
 @required_group('manager')
 def import_project_delete(id_: int) -> Response:
-    ImportMapper.delete_project(id_)
+    Import.delete_project(id_)
     flash(_('project deleted'), 'info')
     return redirect(url_for('import_index'))
 
@@ -116,7 +116,7 @@ class ImportForm(FlaskForm):  # type: ignore
 @app.route('/import/data/<int:project_id>/<class_code>', methods=['POST', 'GET'])
 @required_group('manager')
 def import_data(project_id: int, class_code: str) -> str:
-    project = ImportMapper.get_project_by_id(project_id)
+    project = Import.get_project_by_id(project_id)
     form = ImportForm()
     table = None
     imported = False
@@ -167,7 +167,7 @@ def import_data(project_id: int, class_code: str) -> str:
                             value = ''
                         else:
                             try:
-                                value = DateMapper.datetime64_to_timestamp(numpy.datetime64(value))
+                                value = Date.datetime64_to_timestamp(numpy.datetime64(value))
                                 row[item] = value
                             except ValueError:  # pragma: no cover
                                 row[item] = ''
@@ -191,11 +191,11 @@ def import_data(project_id: int, class_code: str) -> str:
             doubles = [item for item, count in collections.Counter(origin_ids).items() if count > 1]
             if doubles:  # pragma: no cover
                 messages['error'].append(_('double IDs in import') + ': ' + ', '.join(doubles))
-            existing = ImportMapper.check_origin_ids(project, origin_ids) if origin_ids else None
+            existing = Import.check_origin_ids(project, origin_ids) if origin_ids else None
             if existing:
                 messages['error'].append(_('IDs already in database') + ': ' + ', '.join(existing))
             if form.duplicate.data:  # Check for possible duplicates
-                duplicates = ImportMapper.check_duplicates(class_code, names)
+                duplicates = Import.check_duplicates(class_code, names)
                 if duplicates:  # pragma: no cover
                     messages['warn'].append(_('possible duplicates') + ': ' + ', '.join(duplicates))
             if messages['error']:
@@ -209,7 +209,7 @@ def import_data(project_id: int, class_code: str) -> str:
             if not file_data['backup_too_old'] or app.config['IS_UNIT_TEST']:
                 g.cursor.execute('BEGIN')
                 try:
-                    ImportMapper.import_data(project, class_code, checked_data)
+                    Import.import_data(project, class_code, checked_data)
                     g.cursor.execute('COMMIT')
                     logger.log('info', 'import', 'import: ' + str(len(checked_data)))
                     flash(_('import of') + ': ' + str(len(checked_data)), 'info')
