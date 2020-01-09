@@ -14,7 +14,9 @@ After following the instructions restart Apache and test if the application is w
 
 A code base update (e.g. with git pull) and an Apache restart should be sufficient.
 
-For developers: if you are running tests there is a new option *IS_UNIT_TEST* in config/default.py which should be set to False in instance/testing.py
+If you're using tests make sure that this line is in instance/testing.py
+
+    IS_UNIT_TEST = True
 
 ### 3.20.x to 4.0.0
 

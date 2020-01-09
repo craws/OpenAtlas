@@ -377,18 +377,19 @@ def place_view(object_: Entity) -> str:
     place = None
     feature = None
     stratigraphic_unit = None
+    siblings: List[Entity] = []
     if object_.system_type == 'find':
         stratigraphic_unit = object_.get_linked_entity_safe('P46', inverse=True)
         feature = stratigraphic_unit.get_linked_entity_safe('P46', inverse=True)
         place = feature.get_linked_entity_safe('P46', inverse=True)
         # Add finds of same stratigraphic unit above to subunits
-        subunits = subunits + stratigraphic_unit.get_linked_entities('P46')
+        siblings = stratigraphic_unit.get_linked_entities('P46')
     elif object_.system_type == 'stratigraphic unit':
         feature = object_.get_linked_entity_safe('P46', inverse=True)
         place = feature.get_linked_entity_safe('P46', inverse=True)
     elif object_.system_type == 'feature':
         place = object_.get_linked_entity_safe('P46', inverse=True)
-    gis_data = Gis.get_all([object_], subunits)
+    gis_data = Gis.get_all([object_], subunits, siblings)
     if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]' \
             and gis_data['gisLineSelected'] == '[]':
         gis_data = {}
