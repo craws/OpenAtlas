@@ -306,12 +306,10 @@ def place_view(object_: Entity) -> str:
     if object_.system_type == 'stratigraphic unit':
         tables['find'] = Table(Table.HEADERS['place'] + [_('description')])
     profile_image_id = object_.get_profile_image_id()
-    overlays: Dict[int, Overlay] = {}
-    if current_user.settings['module_map_overlay']:
-        overlays = Overlay.get_by_object(object_)
-        if is_authorized('editor'):
-            tables['file'].header.append(uc_first(_('overlay')))
+    if current_user.settings['module_map_overlay'] and is_authorized('editor'):
+        tables['file'].header.append(uc_first(_('overlay')))
 
+    overlays = Overlay.get_by_object(object_)
     for link_ in object_.get_links('P67', inverse=True):
         domain = link_.domain
         data = get_base_table_data(domain)

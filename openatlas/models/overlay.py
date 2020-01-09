@@ -4,6 +4,7 @@ import os
 from typing import Dict
 
 from flask import g
+from flask_login import current_user
 from flask_wtf import FlaskForm
 from psycopg2.extras import NamedTupleCursor
 
@@ -50,8 +51,10 @@ class Overlay:
 
     @staticmethod
     def get_by_object(object_: Entity) -> Dict[int, Overlay]:
-        ids = [object_.id]
+        if current_user.settings['module_map_overlay']:
+            return {}
 
+        ids = [object_.id]
         # Get overlays of parents
         if object_.system_type == 'find':
             stratigraphic_unit = object_.get_linked_entity_safe('P46', True)
