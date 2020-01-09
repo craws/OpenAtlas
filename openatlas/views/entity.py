@@ -1,6 +1,6 @@
 import os
 import sys
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union
 
 from flask import flash, g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -349,9 +349,8 @@ def place_view(object_: Entity) -> str:
     for event in object_.get_linked_entities('P24', inverse=True):
         if event.id not in event_ids:  # Don't add again if already in table
             tables['event'].rows.append(get_base_table_data(event))
-    has_subunits = False
-    for entity in object_.get_linked_entities('P46', nodes=True):
-        has_subunits = True
+    subunits = object_.get_linked_entities('P46', nodes=True)
+    for entity in subunits:
         data = get_base_table_data(entity)
         data.append(truncate_string(entity.description))
         tables[entity.system_type.replace(' ', '-')].rows.append(data)
@@ -366,11 +365,6 @@ def place_view(object_: Entity) -> str:
     place = None
     feature = None
     stratigraphic_unit = None
-    subunits = object_.get_linked_entities('P46', nodes=True)
-    for entity in subunits:
-        data = get_base_table_data(entity)
-        data.append(truncate_string(entity.description))
-        tables[entity.system_type.replace(' ', '-')].rows.append(data)
     if object_.system_type == 'find':
         stratigraphic_unit = object_.get_linked_entity_safe('P46', inverse=True)
         feature = stratigraphic_unit.get_linked_entity_safe('P46', inverse=True)
@@ -380,7 +374,6 @@ def place_view(object_: Entity) -> str:
         place = feature.get_linked_entity_safe('P46', inverse=True)
     elif object_.system_type == 'feature':
         place = object_.get_linked_entity_safe('P46', inverse=True)
-
     gis_data = Gis.get_all([object_], subunits)
     if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]' \
             and gis_data['gisLineSelected'] == '[]':
@@ -395,7 +388,6 @@ def place_view(object_: Entity) -> str:
                            place=place,
                            feature=feature,
                            stratigraphic_unit=stratigraphic_unit,
-                           subunits=subunits,
                            profile_image_id=profile_image_id)
 
 
