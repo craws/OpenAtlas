@@ -19,8 +19,10 @@ class Gis:
     @staticmethod
     def get_all(objects: Optional[List[Entity]] = None,
                 subunits: Optional[List[Entity]] = None) -> Dict[str, List[Any]]:
-        if objects is None:
+        if not objects:
             objects = []
+        if not subunits:
+            subunits = []
         all_: Dict[str, List[Any]] = {'point': [], 'linestring': [], 'polygon': []}
         selected: Dict[str, List[Any]] = {'point': [],
                                           'linestring': [],

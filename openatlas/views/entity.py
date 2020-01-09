@@ -372,16 +372,16 @@ def place_view(object_: Entity) -> str:
         data.append(truncate_string(entity.description))
         tables[entity.system_type.replace(' ', '-')].rows.append(data)
     if object_.system_type == 'find':
-        stratigraphic_unit = object_.get_linked_entity_safe('P46', True)
-        feature = stratigraphic_unit.get_linked_entity_safe('P46', True)
-        place = feature.get_linked_entity_safe('P46', True)
+        stratigraphic_unit = object_.get_linked_entity_safe('P46', inverse=True)
+        feature = stratigraphic_unit.get_linked_entity_safe('P46', inverse=True)
+        place = feature.get_linked_entity_safe('P46', inverse=True)
     elif object_.system_type == 'stratigraphic unit':
-        feature = object_.get_linked_entity_safe('P46', True)
-        place = feature.get_linked_entity_safe('P46', True)
+        feature = object_.get_linked_entity_safe('P46', inverse=True)
+        place = feature.get_linked_entity_safe('P46', inverse=True)
     elif object_.system_type == 'feature':
-        place = object_.get_linked_entity_safe('P46', True)
+        place = object_.get_linked_entity_safe('P46', inverse=True)
 
-    gis_data: Dict[str, List[Any]] = Gis.get_all([object_], subunits)
+    gis_data = Gis.get_all([object_], subunits)
     if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]' \
             and gis_data['gisLineSelected'] == '[]':
         gis_data = {}
