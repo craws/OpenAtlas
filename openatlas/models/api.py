@@ -1,3 +1,5 @@
+from typing import List, Dict, Any
+
 from flask import request, url_for
 
 from openatlas import app
@@ -10,7 +12,7 @@ from openatlas.util.util import format_date
 class Api:
 
     @staticmethod
-    def get_links(entity: Entity) -> list:
+    def get_links(entity: Entity) -> List[Dict[str, str]]:
         links = []
         for link in Link.get_links(entity.id):
             links.append({'label': link.range.name,
@@ -24,7 +26,7 @@ class Api:
         return links
 
     @staticmethod
-    def get_entity(id_: int) -> dict:
+    def get_entity(id_: int) -> Dict[str, Any]:
         entity = Entity.get_by_id(id_, nodes=True, aliases=True)
         type_ = 'unknown'
         if entity.class_.code == 'E18' and entity.system_type == 'place':
