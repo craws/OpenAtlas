@@ -1,4 +1,6 @@
-from typing import Iterator, List, TYPE_CHECKING, Union
+from __future__ import annotations  # Needed for Python 4.0 type annotations
+
+from typing import Dict, Iterator, List, Optional, TYPE_CHECKING, Union
 
 from flask import abort, flash, g, url_for
 from flask_babel import lazy_gettext as _
@@ -6,7 +8,7 @@ from flask_wtf import FlaskForm
 from psycopg2.extras import NamedTupleCursor
 
 from openatlas import logger
-from openatlas.models.date import DateMapper
+from openatlas.models.date import Date
 from openatlas.util.util import link, uc_first
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
@@ -14,36 +16,57 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
 
 
 class Link:
+    object_: Optional['Entity']
 
-    def __init__(self, row: NamedTupleCursor.Record, domain: 'Entity' = None,
-                 range_: 'Entity' = None) -> None:
+    def __init__(self,
+                 row: NamedTupleCursor.Record,
+                 domain: Optional['Entity'] = None,
+                 range_: Optional['Entity'] = None) -> None:
         from openatlas.forms.date import DateForm
-        from openatlas.models.entity import EntityMapper
+        from openatlas.models.entity import Entity
         self.id = row.id
         self.description = row.description
         self.property = g.properties[row.property_code]
-        self.domain = domain if domain else EntityMapper.get_by_id(row.domain_id)
-        self.range = range_ if range_ else EntityMapper.get_by_id(row.range_id)
+        self.domain = domain if domain else Entity.get_by_id(row.domain_id)
+        self.range = range_ if range_ else Entity.get_by_id(row.range_id)
         self.type = g.nodes[row.type_id] if row.type_id else None
-        self.nodes: dict = {}
+        self.nodes: Dict['Entity', None] = {}
         if hasattr(row, 'type_id') and row.type_id:
             self.nodes[g.nodes[row.type_id]] = None
         if hasattr(row, 'begin_from'):
-            self.begin_from = DateMapper.timestamp_to_datetime64(row.begin_from)
-            self.begin_to = DateMapper.timestamp_to_datetime64(row.begin_to)
+            self.begin_from = Date.timestamp_to_datetime64(row.begin_from)
+            self.begin_to = Date.timestamp_to_datetime64(row.begin_to)
             self.begin_comment = row.begin_comment
-            self.end_from = DateMapper.timestamp_to_datetime64(row.end_from)
-            self.end_to = DateMapper.timestamp_to_datetime64(row.end_to)
+            self.end_from = Date.timestamp_to_datetime64(row.end_from)
+            self.end_to = Date.timestamp_to_datetime64(row.end_to)
             self.end_comment = row.end_comment
             self.first = DateForm.format_date(self.begin_from, 'year') if self.begin_from else None
             self.last = DateForm.format_date(self.end_from, 'year') if self.end_from else None
             self.last = DateForm.format_date(self.end_to, 'year') if self.end_to else self.last
 
     def update(self) -> None:
-        LinkMapper.update(self)
+        sql = """
+            UPDATE model.link SET (property_code, domain_id, range_id, description, type_id,
+                begin_from, begin_to, begin_comment, end_from, end_to, end_comment) =
+                (%(property_code)s, %(domain_id)s, %(range_id)s, %(description)s, %(type_id)s,
+                 %(begin_from)s, %(begin_to)s, %(begin_comment)s, %(end_from)s, %(end_to)s,
+                 %(end_comment)s)
+            WHERE id = %(id)s;"""
+        g.execute(sql, {'id': self.id,
+                        'property_code': self.property.code,
+                        'domain_id': self.domain.id,
+                        'range_id': self.range.id,
+                        'type_id': self.type.id if self.type else None,
+                        'description': self.description,
+                        'begin_from': Date.datetime64_to_timestamp(self.begin_from),
+                        'begin_to': Date.datetime64_to_timestamp(self.begin_to),
+                        'begin_comment': self.begin_comment,
+                        'end_from': Date.datetime64_to_timestamp(self.end_from),
+                        'end_to': Date.datetime64_to_timestamp(self.end_to),
+                        'end_comment': self.end_comment})
 
     def delete(self) -> None:
-        LinkMapper.delete(self.id)
+        Link.delete_(self.id)
 
     def set_dates(self, form: FlaskForm) -> None:
         self.begin_from = None
@@ -53,28 +76,25 @@ class Link:
         self.end_to = None
         self.end_comment = None
         if form.begin_year_from.data:  # Only if begin year is set create a begin date or time span
-            self.begin_from = DateMapper.form_to_datetime64(
+            self.begin_from = Date.form_to_datetime64(
                 form.begin_year_from.data, form.begin_month_from.data, form.begin_day_from.data)
-            self.begin_to = DateMapper.form_to_datetime64(
+            self.begin_to = Date.form_to_datetime64(
                 form.begin_year_to.data, form.begin_month_to.data, form.begin_day_to.data, True)
             self.begin_comment = form.begin_comment.data
         if form.end_year_from.data:  # Only if end year is set create a year date or time span
-            self.end_from = DateMapper.form_to_datetime64(
+            self.end_from = Date.form_to_datetime64(
                 form.end_year_from.data, form.end_month_from.data, form.end_day_from.data)
-            self.end_to = DateMapper.form_to_datetime64(
+            self.end_to = Date.form_to_datetime64(
                 form.end_year_to.data, form.end_month_to.data, form.end_day_to.data, True)
             self.end_comment = form.end_comment.data
-
-
-class LinkMapper:
 
     @staticmethod
     def insert(entity: 'Entity',
                property_code: str,
                range_: Union['Entity', List['Entity']],
-               description: str = None,
+               description: Optional[str] = None,
                inverse: bool = False,
-               type_id: int = None) -> List[int]:
+               type_id: Optional[int] = None) -> List[int]:
         property_ = g.properties[property_code]
         entities = range_ if isinstance(range_, list) else [range_]
         new_link_ids = []
@@ -108,35 +128,51 @@ class LinkMapper:
         return new_link_ids
 
     @staticmethod
-    def get_linked_entity(entity_id: int, code: str, inverse: bool = False,
-                          nodes: bool = False) -> 'Entity':
-        result = LinkMapper.get_linked_entities(entity_id, [code], inverse=inverse, nodes=nodes)
+    def get_linked_entity(id_: int,
+                          code: str,
+                          inverse: bool = False,
+                          nodes: bool = False) -> Optional['Entity']:
+        result = Link.get_linked_entities(id_, [code], inverse=inverse, nodes=nodes)
         if len(result) > 1:  # pragma: no cover
             logger.log('error', 'model', 'Multiple linked entities found for ' + code)
             flash(_('error multiple linked entities found'), 'error')
             abort(400)
-        return result[0] if result else None  # type: ignore  # problematic because place/location
+        return result[0] if result else None
 
     @staticmethod
-    def get_linked_entities(entity_id: int, codes: Union[str, List[str]], inverse: bool = False,
-                            nodes: bool = False) -> list:
-        from openatlas.models.entity import EntityMapper
+    def get_linked_entities(id_: int,
+                            codes: Union[str, List[str]],
+                            inverse: bool = False,
+                            nodes: bool = False) -> List['Entity']:
+        from openatlas.models.entity import Entity
         codes = codes if isinstance(codes, list) else [codes]
         sql = """
             SELECT range_id AS result_id FROM model.link
-            WHERE domain_id = %(entity_id)s AND property_code IN %(codes)s;"""
+            WHERE domain_id = %(id_)s AND property_code IN %(codes)s;"""
         if inverse:
             sql = """
                 SELECT domain_id AS result_id FROM model.link
-                WHERE range_id = %(entity_id)s AND property_code IN %(codes)s;"""
-        g.execute(sql, {'entity_id': entity_id, 'codes': tuple(codes)})
+                WHERE range_id = %(id_)s AND property_code IN %(codes)s;"""
+        g.execute(sql, {'id_': id_, 'codes': tuple(codes)})
         ids = [element for (element,) in g.cursor.fetchall()]
-        return EntityMapper.get_by_ids(ids, nodes=nodes)
+        return Entity.get_by_ids(ids, nodes=nodes)
+
+    @staticmethod
+    def get_linked_entity_safe(id_: int, code: str,
+                               inverse: bool = False,
+                               nodes: bool = False) -> 'Entity':
+        entity = Link.get_linked_entity(id_, code, inverse, nodes)
+        if not entity:  # pragma: no cover - should return an entity so abort if not
+            flash('Missing linked ' + code + ' for ' + str(id_), 'error')
+            logger.log('error', 'model', 'missing linked', 'id: ' + str(id_) + 'code: ' + code)
+            abort(418)
+        return entity
 
     @staticmethod
     def get_links(entity_id: int,
-                  codes: Union[str, List[str]] = None,
-                  inverse: bool = False) -> list:
+                  codes: Union[str, List[str], None] = None,
+                  inverse: bool = False) -> List[Link]:
+        from openatlas.models.entity import Entity
         sql = """
             SELECT l.id, l.property_code, l.domain_id, l.range_id, l.description, l.created,
                 l.modified, e.name, l.type_id,
@@ -160,8 +196,7 @@ class LinkMapper:
         for row in result:
             entity_ids.add(row.domain_id)
             entity_ids.add(row.range_id)
-        from openatlas.models.entity import EntityMapper
-        entities = {entity.id: entity for entity in EntityMapper.get_by_ids(entity_ids, nodes=True)}
+        entities = {entity.id: entity for entity in Entity.get_by_ids(entity_ids, nodes=True)}
         links = []
         for row in result:
             links.append(Link(row, domain=entities[row.domain_id], range_=entities[row.range_id]))
@@ -190,45 +225,23 @@ class LinkMapper:
         return Link(g.cursor.fetchone())
 
     @staticmethod
-    def get_entities_by_node(node: 'Entity') -> Iterator:
+    def get_entities_by_node(node: 'Entity') -> Iterator[NamedTupleCursor.Record]:
         sql = "SELECT id, domain_id, range_id from model.link WHERE type_id = %(node_id)s;"
         g.execute(sql, {'node_id': node.id})
         return g.cursor.fetchall()
 
     @staticmethod
-    def delete(id_: int) -> None:
+    def delete_(id_: int) -> None:
         from openatlas.util.util import is_authorized
         if not is_authorized('contributor'):  # pragma: no cover
             abort(403)
         g.execute("DELETE FROM model.link WHERE id = %(id)s;", {'id': id_})
 
     @staticmethod
-    def update(link_: Link) -> None:
-        sql = """
-            UPDATE model.link SET (property_code, domain_id, range_id, description, type_id,
-                begin_from, begin_to, begin_comment, end_from, end_to, end_comment) =
-                (%(property_code)s, %(domain_id)s, %(range_id)s, %(description)s, %(type_id)s,
-                 %(begin_from)s, %(begin_to)s, %(begin_comment)s, %(end_from)s, %(end_to)s,
-                 %(end_comment)s)
-            WHERE id = %(id)s;"""
-        g.execute(sql, {'id': link_.id,
-                        'property_code': link_.property.code,
-                        'domain_id': link_.domain.id,
-                        'range_id': link_.range.id,
-                        'type_id': link_.type.id if link_.type else None,
-                        'description': link_.description,
-                        'begin_from': DateMapper.datetime64_to_timestamp(link_.begin_from),
-                        'begin_to': DateMapper.datetime64_to_timestamp(link_.begin_to),
-                        'begin_comment': link_.begin_comment,
-                        'end_from': DateMapper.datetime64_to_timestamp(link_.end_from),
-                        'end_to': DateMapper.datetime64_to_timestamp(link_.end_to),
-                        'end_comment': link_.end_comment})
-
-    @staticmethod
-    def check_links() -> list:
+    def check_links() -> List[Dict[str, str]]:
         """ Check all existing links for CIDOC CRM validity and return the invalid ones."""
         from openatlas.util.util import link
-        from openatlas.models.entity import EntityMapper
+        from openatlas.models.entity import Entity
         sql = """
             SELECT DISTINCT l.property_code AS property, d.class_code AS domain,
                 r.class_code AS range
@@ -259,15 +272,15 @@ class LinkMapper:
                 g.execute(sql, {'property': item['property'], 'domain': item['domain'],
                                 'range': item['range']})
                 for row2 in g.cursor.fetchall():
-                    domain = EntityMapper.get_by_id(row2.domain_id)
-                    range_ = EntityMapper.get_by_id(row2.range_id)
+                    domain = Entity.get_by_id(row2.domain_id)
+                    range_ = Entity.get_by_id(row2.range_id)
                     invalid_links.append({'domain': link(domain) + ' (' + domain.class_.code + ')',
                                           'property': link(g.properties[row2.property_code]),
                                           'range': link(range_) + ' (' + range_.class_.code + ')'})
         return invalid_links
 
     @staticmethod
-    def check_link_duplicates() -> list:
+    def check_link_duplicates() -> List[NamedTupleCursor.Record]:
         # Find links with the same data (except id, created, modified)
         sql = """
             SELECT COUNT(*) AS count, domain_id, range_id, property_code, description, type_id,
@@ -292,14 +305,14 @@ class LinkMapper:
         return g.cursor.rowcount
 
     @staticmethod
-    def check_single_type_duplicates() -> list:
+    def check_single_type_duplicates() -> List[List[str]]:
         # Find entities with multiple types attached which should be single
-        from openatlas.models.node import NodeMapper
-        from openatlas.models.entity import EntityMapper
+        from openatlas.models.node import Node
+        from openatlas.models.entity import Entity
         data = []
         for id_, node in g.nodes.items():
             if not node.root and not node.multiple and not node.value_type:
-                node_ids = NodeMapper.get_all_sub_ids(node)
+                node_ids = Node.get_all_sub_ids(node)
                 if node_ids:
                     sql = """
                         SELECT domain_id FROM model.link
@@ -308,7 +321,7 @@ class LinkMapper:
                     g.execute(sql, {'node_ids': tuple(node_ids)})
                     for row in g.cursor.fetchall():
                         offending_nodes = []
-                        entity = EntityMapper.get_by_id(row.domain_id, nodes=True)
+                        entity = Entity.get_by_id(row.domain_id, nodes=True)
                         for entity_node in entity.nodes:
                             if g.nodes[entity_node.root[-1]].id == node.id:
                                 url = url_for('admin_delete_single_type_duplicate',

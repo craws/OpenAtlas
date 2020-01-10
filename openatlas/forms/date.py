@@ -6,12 +6,12 @@ from flask_wtf import FlaskForm
 from wtforms import IntegerField, StringField
 from wtforms.validators import NoneOf, NumberRange, Optional
 
-from openatlas.models.date import DateMapper
+from openatlas.models.date import Date
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 
 
-class DateForm(FlaskForm):
+class DateForm(FlaskForm):  # type: ignore
 
     validator_day = [Optional(), NumberRange(min=1, max=31)]
     validator_month = [Optional(), NumberRange(min=1, max=12)]
@@ -75,7 +75,7 @@ class DateForm(FlaskForm):
         for prefix in ['begin_', 'end_']:
             for postfix in ['_from', '_to']:
                 if getattr(self, prefix + 'year' + postfix).data:
-                    date = DateMapper.form_to_datetime64(
+                    date = Date.form_to_datetime64(
                         getattr(self, prefix + 'year' + postfix).data,
                         getattr(self, prefix + 'month' + postfix).data,
                         getattr(self, prefix + 'day' + postfix).data)

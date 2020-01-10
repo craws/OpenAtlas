@@ -1,6 +1,6 @@
 import os
 import re
-from typing import Any, Dict, Iterator, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 import flask
 import jinja2
@@ -12,9 +12,8 @@ from wtforms import IntegerField
 from wtforms.validators import Email
 
 from openatlas import app
-from openatlas.models.classObject import ClassObject
 from openatlas.models.entity import Entity
-from openatlas.models.property import Property
+from openatlas.models.model import CidocClass, CidocProperty
 from openatlas.util import util
 from openatlas.util.table import Table
 from openatlas.util.util import get_file_path, print_file_extension
@@ -75,7 +74,7 @@ def nl2br(self: Any, value: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_info(self: Any, data: Iterator) -> str:
+def display_info(self: Any, data: Dict[str, str]) -> str:
     html = '<div class="data-table">'
     for key, value in data:
         if value or value == 0:
@@ -117,7 +116,8 @@ def display_move_form(self: Any, form: Any, root_name: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def table_select_model(self: Any, name: str, selected: Union[ClassObject, Property] = None) -> str:
+def table_select_model(self: Any, name: str,
+                       selected: Union[CidocClass, CidocProperty, None] = None) -> str:
     # Todo: extra sort function for class and property code e.g. E69
     if name in ['domain', 'range']:
         entities = g.classes
@@ -186,8 +186,8 @@ def display_profile_image(self: Any, image_id: int) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_content_translation(self: Any, text: str) -> str:
-    from openatlas.models.content import ContentMapper
-    return ContentMapper.get_translation(text)
+    from openatlas.models.content import Content
+    return Content.get_translation(text)
 
 
 @jinja2.contextfilter
@@ -217,7 +217,10 @@ def display_logo(self: Any, file_id: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_form(self: Any, form: Any, form_id: str = None, for_persons: bool = False) -> str:
+def display_form(self: Any,
+                 form: Any,
+                 form_id: Optional[str] = None,
+                 for_persons: bool = False) -> str:
     from openatlas.forms.forms import ValueFloatField
     multipart = 'enctype="multipart/form-data"' if hasattr(form, 'file') else ''
     if 'update' in request.path:
@@ -228,7 +231,7 @@ def display_form(self: Any, form: Any, form_id: str = None, for_persons: bool = 
     id_attribute = ' id="' + form_id + '" ' if form_id else ''
     html = {'main': '', 'types': '', 'value_types': '', 'header': '', 'footer': ''}
 
-    def display_value_type_fields(subs: list, html_: str = '') -> str:
+    def display_value_type_fields(subs: List[int], html_: str = '') -> str:
         for sub_id in subs:
             sub = g.nodes[sub_id]
             field_ = getattr(form, str(sub_id))
@@ -403,7 +406,7 @@ def display_menu(self: Any, origin: Entity) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_debug_info(self: Any, debug_model: Dict, form: Any) -> str:
+def display_debug_info(self: Any, debug_model: Dict[str, Any], form: Any) -> str:
     """ Returns HTML with debug information about database queries and form errors."""
     html = ''
     for name, value in debug_model.items():

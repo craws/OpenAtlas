@@ -14,28 +14,39 @@
 {% endblock %}
 {% block content %}
     {{ 'Import'|manual_link|safe }}
-    <p>
-        {{ _('allowed extensions')|uc_first }}:
-        <span style="font-weight: bold;">{{ config['IMPORT_FILE_EXTENSIONS']|join(', ') }}</span> -
-        {{ _('example files')|uc_first }}:
-        <a href="/static/import/example.csv">example.csv</a>,
-        <a href="/static/import/example.xlsx">example.xlsx</a>
-    </p>
-    {{ form|display_form|safe }}
-    {% for item in messages['error'] %}
-        <span class="error">{{ _('error')|uc_first }} - {{ item }}</span><br>
-    {% endfor %}
-    {% for item in messages['warn'] %}
-        <span class="error">{{ _('warning')|uc_first }} - {{ item }}</span><br>
-    {% endfor %}
-    {% if table %}
-        <h2>
-            {% if imported %}
-                {{ _('imported')|uc_first }}
-            {% else %}
-                {{ _('preview')|uc_first }}
-            {% endif %}
-        </h2>
-        {{ table.display()|safe }}
+    {% if file_data['file'] %}
+        <p style="margin-top: 1em;">
+            {{ _('latest backup')|uc_first }}: {{ file_data['file'] }}, {{ file_data['size'] }},
+            <a href="{{ url_for('download_sql', filename=file_data['file']) }}">{{ _('download')|uc_first }}</a>
+        </p>
+    {% endif %}
+    {% if file_data['backup_too_old'] and not config['IS_UNIT_TEST'] %}
+        <p>
+            {{ _('There seems to be no recent backup, please make one') }}
+            <a href="{{ url_for('export_sql') }}">{{ _('here') }}</a>.
+        </p>
+    {% else %}
+        <p>
+            {{ _('allowed extensions')|uc_first }}:
+            <span style="font-weight: bold;">{{ config['IMPORT_FILE_EXTENSIONS']|join(', ') }}</span> -
+            {{ _('example files')|uc_first }}: <a href="/static/import/example.csv">example.csv</a>
+        </p>
+        {{ form|display_form|safe }}
+        {% for item in messages['error'] %}
+            <span class="error">{{ _('error')|uc_first }} - {{ item }}</span><br>
+        {% endfor %}
+        {% for item in messages['warn'] %}
+            <span class="error">{{ _('warning')|uc_first }} - {{ item }}</span><br>
+        {% endfor %}
+        {% if table %}
+            <h2>
+                {% if imported %}
+                    {{ _('imported')|uc_first }}
+                {% else %}
+                    {{ _('preview')|uc_first }}
+                {% endif %}
+            </h2>
+            {{ table.display()|safe }}
+        {% endif %}
     {% endif %}
 {% endblock %}

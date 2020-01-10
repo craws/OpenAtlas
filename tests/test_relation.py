@@ -1,26 +1,26 @@
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
-from openatlas.models.link import LinkMapper
-from openatlas.models.node import NodeMapper
+from openatlas.models.entity import Entity
+from openatlas.models.link import Link
+from openatlas.models.node import Node
 from tests.base import TestBaseCase
 
 
 class RelationTests(TestBaseCase):
 
     def test_relation(self) -> None:
-        with app.app_context():
+        with app.app_context():  # type: ignore
             self.login()
             with app.test_request_context():
-                app.preprocess_request()
-                actor = EntityMapper.insert('E21', 'Connor MacLeod')
-                related = EntityMapper.insert('E21', 'The Kurgan')
+                app.preprocess_request()  # type: ignore
+                actor = Entity.insert('E21', 'Connor MacLeod')
+                related = Entity.insert('E21', 'The Kurgan')
 
             # Add relationship
             rv = self.app.get(url_for('relation_insert', origin_id=actor.id))
             assert b'Actor Actor Relation' in rv.data
-            relation_id = NodeMapper.get_hierarchy_by_name('Actor Actor Relation').id
+            relation_id = Node.get_hierarchy('Actor Actor Relation').id
             relation_sub_id = g.nodes[relation_id].subs[0]
             relation_sub_id2 = g.nodes[relation_id].subs[1]
             data = {'actor': str([related.id]),
@@ -55,9 +55,9 @@ class RelationTests(TestBaseCase):
 
             # Update relationship
             with app.test_request_context():
-                app.preprocess_request()
-                link_id = LinkMapper.get_links(actor.id, 'OA7')[0].id
-                link_id2 = LinkMapper.get_links(actor.id, 'OA7', True)[0].id
+                app.preprocess_request()  # type: ignore
+                link_id = Link.get_links(actor.id, 'OA7')[0].id
+                link_id2 = Link.get_links(actor.id, 'OA7', True)[0].id
 
             rv = self.app.post(url_for('node_move_entities', id_=relation_sub_id),
                                data={relation_id: relation_sub_id2, 'selection': [link_id],

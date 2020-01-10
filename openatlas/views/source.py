@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -10,13 +10,13 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import TableMultiField, build_form, build_table_form
-from openatlas.models.entity import Entity, EntityMapper
+from openatlas.models.entity import Entity
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, link, required_group, uc_first, was_modified
 from openatlas.views.reference import AddReferenceForm
 
 
-class SourceForm(FlaskForm):
+class SourceForm(FlaskForm):  # type: ignore
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     information_carrier = TableMultiField()
     description = TextAreaField(_('content'))
@@ -29,13 +29,13 @@ class SourceForm(FlaskForm):
 @app.route('/source')
 @app.route('/source/<action>/<int:id_>')
 @required_group('readonly')
-def source_index(action: str = None, id_: int = None) -> str:
+def source_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
     if id_ and action == 'delete':
-        EntityMapper.delete(id_)
+        Entity.delete_(id_)
         logger.log_user(id_, 'delete')
         flash(_('entity deleted'), 'info')
     table = Table(Table.HEADERS['source'])
-    for source in EntityMapper.get_by_codes('source'):
+    for source in Entity.get_by_codes('source'):
         data = get_base_table_data(source)
         table.rows.append(data)
     return render_template('source/index.html', table=table)
@@ -44,8 +44,8 @@ def source_index(action: str = None, id_: int = None) -> str:
 @app.route('/source/insert/<int:origin_id>', methods=['POST', 'GET'])
 @app.route('/source/insert', methods=['POST', 'GET'])
 @required_group('contributor')
-def source_insert(origin_id: int = None) -> Union[str, Response]:
-    origin = EntityMapper.get_by_id(origin_id) if origin_id else None
+def source_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
+    origin = Entity.get_by_id(origin_id) if origin_id else None
     form = build_form(SourceForm, 'Source')
     if origin:
         del form.insert_and_continue
@@ -59,7 +59,7 @@ def source_insert(origin_id: int = None) -> Union[str, Response]:
 @app.route('/source/add/<int:id_>/<class_name>', methods=['POST', 'GET'])
 @required_group('contributor')
 def source_add(id_: int, class_name: str) -> Union[str, Response]:
-    source = EntityMapper.get_by_id(id_, view_name='source')
+    source = Entity.get_by_id(id_, view_name='source')
     if request.method == 'POST':
         if request.form['checkbox_values']:
             source.link_string('P67', request.form['checkbox_values'])
@@ -71,7 +71,7 @@ def source_add(id_: int, class_name: str) -> Union[str, Response]:
 @app.route('/source/add/reference/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def source_add_reference(id_: int) -> Union[str, Response]:
-    source = EntityMapper.get_by_id(id_, view_name='source')
+    source = Entity.get_by_id(id_, view_name='source')
     form = AddReferenceForm()
     if form.validate_on_submit():
         source.link_string('P67', form.reference.data, description=form.page.data, inverse=True)
@@ -83,7 +83,7 @@ def source_add_reference(id_: int) -> Union[str, Response]:
 @app.route('/source/add/file/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def source_add_file(id_: int) -> Union[str, Response]:
-    source = EntityMapper.get_by_id(id_, view_name='source')
+    source = Entity.get_by_id(id_, view_name='source')
     if request.method == 'POST':
         if request.form['checkbox_values']:
             source.link_string('P67', request.form['checkbox_values'], inverse=True)
@@ -95,7 +95,7 @@ def source_add_file(id_: int) -> Union[str, Response]:
 @app.route('/source/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def source_update(id_: int) -> Union[str, Response]:
-    source = EntityMapper.get_by_id(id_, nodes=True, view_name='source')
+    source = Entity.get_by_id(id_, nodes=True, view_name='source')
     form = build_form(SourceForm, 'Source', source, request)
     if form.validate_on_submit():
         if was_modified(form, source):  # pragma: no cover
@@ -111,24 +111,21 @@ def source_update(id_: int) -> Union[str, Response]:
     return render_template('source/update.html', form=form, source=source)
 
 
-def save(form: FlaskForm, source: Entity = None, origin: Entity = None) -> str:
+def save(form: FlaskForm, source: Optional[Entity] = None, origin: Optional[Entity] = None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
     try:
         if not source:
-            source = EntityMapper.insert('E33', form.name.data, 'source content')
+            source = Entity.insert('E33', form.name.data, 'source content')
             log_action = 'insert'
-        url = url_for('entity_view', id_=source.id)
-        source.name = form.name.data
-        source.description = form.description.data
-        source.update()
-        source.save_nodes(form)
+        source.update(form)
 
         # Information carrier
         source.delete_links(['P128'], inverse=True)
         if form.information_carrier.data:
             source.link_string('P128', form.information_carrier.data, inverse=True)
 
+        url = url_for('entity_view', id_=source.id)
         if origin:
             url = url_for('entity_view', id_=origin.id) + '#tab-source'
             if origin.view_name == 'reference':

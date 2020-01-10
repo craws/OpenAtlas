@@ -2,10 +2,10 @@ import locale
 import os
 import sys
 import time
-from typing import Dict, Any
+from typing import Any, Dict, Optional
 
 import psycopg2.extras
-from flask import Flask, g, request, session, Response
+from flask import Flask, Response, g, request, session
 from flask_babel import Babel, lazy_gettext as _
 from flask_wtf import FlaskForm
 from flask_wtf.csrf import CSRFProtect
@@ -25,17 +25,17 @@ if os.name == "posix":  # For other operating systems e.g. Windows, we would nee
     locale.setlocale(locale.LC_ALL, 'en_US.utf-8')  # pragma: no cover
 
 babel = Babel(app)
-debug_model: Dict = {}
+debug_model: Dict[str, float] = {}
 
 
-class GlobalSearchForm(FlaskForm):
+class GlobalSearchForm(FlaskForm):  # type: ignore
     term = StringField('', render_kw={"placeholder": _('search term')})
     search = SubmitField(_('search'))
 
 
-from openatlas.models.logger import DBHandler
+from openatlas.models.logger import Logger
 
-logger = DBHandler()
+logger = Logger()
 
 from openatlas.util import filters
 from openatlas.views import (actor, admin, ajax, content, event, export, hierarchy, index,
@@ -67,28 +67,27 @@ def connect() -> psycopg2.connect:
         raise Exception(e)
 
 
-def execute(query: str, vars_: list = None) -> None:
+def execute(query: str, vars_: Optional[Dict[str, Any]] = None) -> None:
     debug_model['sql'] += 1
     return g.cursor.execute(query, vars_)
 
 
 @app.before_request
 def before_request() -> None:
-    from openatlas.models.classObject import ClassMapper
-    from openatlas.models.node import NodeMapper
-    from openatlas.models.property import PropertyMapper
-    from openatlas.models.settings import SettingsMapper
+    from openatlas.models.model import CidocClass, CidocProperty
+    from openatlas.models.node import Node
+    from openatlas.models.settings import Settings
     if request.path.startswith('/static'):  # pragma: no cover
-        return  # Only needed if not running with apache and static alias
+        return  # Only needed if not running with Apache and static alias
     debug_model['sql'] = 0
     debug_model['current'] = time.time()
     g.db = connect()
     g.cursor = g.db.cursor(cursor_factory=psycopg2.extras.NamedTupleCursor)
     g.execute = execute  # Add wrapper for g.cursor.execute to count SQL statements per request
-    g.classes = ClassMapper.get_all()
-    g.properties = PropertyMapper.get_all()
-    g.nodes = NodeMapper.get_all_nodes()
-    session['settings'] = SettingsMapper.get_settings()
+    g.classes = CidocClass.get_all()
+    g.properties = CidocProperty.get_all()
+    g.nodes = Node.get_all_nodes()
+    session['settings'] = Settings.get_settings()
     session['language'] = get_locale()
     debug_model['model'] = time.time() - debug_model['current']
     debug_model['current'] = time.time()
@@ -116,17 +115,12 @@ def teardown_request(exception: Any) -> None:
 
 
 @app.context_processor
-def inject_search_form() -> Dict:
+def inject_search_form() -> Dict[str, GlobalSearchForm]:
     return dict(search_form=GlobalSearchForm(prefix="global"))
 
 
 app.register_blueprint(filters.blueprint)
 app.add_template_global(debug_model, 'debug_model')
-
-
-@app.context_processor
-def inject_debug() -> Dict:
-    return dict(debug=app.debug)
 
 
 if __name__ == "__main__":  # pragma: no cover

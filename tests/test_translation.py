@@ -1,24 +1,24 @@
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity
 from tests.base import TestBaseCase
 
 
 class TranslationTest(TestBaseCase):
 
     def test_source(self) -> None:
-        with app.app_context():
+        with app.app_context():  # type: ignore
             self.login()
             with app.test_request_context():
-                app.preprocess_request()
-                source = EntityMapper.insert('E33', 'Necronomicon', 'source content')
+                app.preprocess_request()  # type: ignore
+                source = Entity.insert('E33', 'Necronomicon', 'source content')
             rv = self.app.get(url_for('translation_insert', source_id=source.id))
             assert b'+ Text' in rv.data
             data = {'name': 'Test translation'}
             rv = self.app.post(url_for('translation_insert', source_id=source.id), data=data)
             with app.test_request_context():
-                app.preprocess_request()
+                app.preprocess_request()  # type: ignore
                 translation_id = rv.location.split('/')[-1]
             rv = self.app.get(url_for('entity_view', id_=source.id))
             assert b'Test translation' in rv.data

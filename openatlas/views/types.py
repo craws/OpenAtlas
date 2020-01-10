@@ -1,4 +1,4 @@
-from typing import List, Optional, Union
+from typing import Dict, List, Optional, Union
 
 from flask import abort, flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -12,11 +12,11 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.forms.forms import build_move_form, build_node_form
 from openatlas.models.entity import Entity
-from openatlas.models.node import NodeMapper
+from openatlas.models.node import Node
 from openatlas.util.util import required_group, sanitize, uc_first
 
 
-class NodeForm(FlaskForm):
+class NodeForm(FlaskForm):  # type: ignore
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     name_inverse = StringField(_('inverse'))
     is_node_form = HiddenField()
@@ -30,7 +30,7 @@ class NodeForm(FlaskForm):
 @app.route('/types')
 @required_group('readonly')
 def node_index() -> str:
-    nodes: dict = {'system': {}, 'custom': {}, 'places': {}, 'value': {}}
+    nodes: Dict[str, Dict[Entity, str]] = {'system': {}, 'custom': {}, 'places': {}, 'value': {}}
     for id_, node in g.nodes.items():
         if node.root:
             continue
@@ -48,7 +48,7 @@ def node_index() -> str:
 @app.route('/types/insert/<int:root_id>', methods=['GET', 'POST'])
 @app.route('/types/insert/<int:root_id>/<int:super_id>', methods=['GET', 'POST'])
 @required_group('editor')
-def node_insert(root_id: int, super_id: int = None) -> Union[str, Response]:
+def node_insert(root_id: int, super_id: Optional[int] = None) -> Union[str, Response]:
     root = g.nodes[root_id]
     form = build_node_form(NodeForm, root)
     # Check if form is valid and if it wasn't a submit of the search form
@@ -89,7 +89,7 @@ def node_delete(id_: int) -> Response:
     return redirect(url_for('entity_view', id_=root.id) if root else url_for('node_index'))
 
 
-class MoveForm(FlaskForm):
+class MoveForm(FlaskForm):  # type: ignore
     is_node_form = HiddenField()
     checkbox_values = HiddenField()
     selection = SelectMultipleField('', [InputRequired()], coerce=int,
@@ -108,7 +108,7 @@ def node_move_entities(id_: int) -> Union[str, Response]:
     form = build_move_form(MoveForm, node)
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
-        NodeMapper.move_entities(node, getattr(form, str(root.id)).data, form.checkbox_values.data)
+        Node.move_entities(node, getattr(form, str(root.id)).data, form.checkbox_values.data)
         g.cursor.execute('COMMIT')
         flash('Entities where updated', 'success')
         return redirect(url_for('node_index') + '#tab-' + str(root.id))
@@ -117,7 +117,7 @@ def node_move_entities(id_: int) -> Union[str, Response]:
     return render_template('types/move.html', node=node, root=root, form=form)
 
 
-def walk_tree(nodes: List[Entity]) -> str:
+def walk_tree(nodes: List[int]) -> str:
     """ Builds JSON for jsTree"""
     text = ''
     for id_ in nodes:
@@ -157,11 +157,12 @@ def tree_select(name: str) -> str:
                 }});
             }});
         </script>""".format(min_chars=session['settings']['minimum_jstree_search'],
-                            name=sanitize(name), tree=walk_tree(NodeMapper.get_nodes(name)))
+                            name=sanitize(name),
+                            tree=walk_tree(Node.get_nodes(name)))
     return html
 
 
-def save(form: FlaskForm, node: Entity = None, root: Entity = None) -> Optional[str]:
+def save(form: FlaskForm, node=None, root: Optional[Node] = None) -> Optional[str]:  # type: ignore
     g.cursor.execute('BEGIN')
     super_ = None
     log_action = 'insert'
@@ -171,7 +172,7 @@ def save(form: FlaskForm, node: Entity = None, root: Entity = None) -> Optional[
             root = g.nodes[node.root[-1]] if node.root else None
             super_ = g.nodes[node.root[0]] if node.root else None
         elif root:
-            node = NodeMapper.insert(root.class_.code, form.name.data)
+            node = Entity.insert(root.class_.code, form.name.data)
             super_ = 'new'
         else:
             abort(404)  # pragma: no cover, either node or root has to be provided

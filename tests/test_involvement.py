@@ -1,16 +1,16 @@
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
-from openatlas.models.link import LinkMapper
-from openatlas.models.node import NodeMapper
+from openatlas.models.entity import Entity
+from openatlas.models.link import Link
+from openatlas.models.node import Node
 from tests.base import TestBaseCase
 
 
 class InvolvementTests(TestBaseCase):
 
     def test_involvement(self) -> None:
-        with app.app_context():
+        with app.app_context():  # type: ignore
             self.login()
             rv = self.app.post(url_for('event_insert', code='E8'),
                                data={'name': 'Event Horizon',
@@ -18,9 +18,9 @@ class InvolvementTests(TestBaseCase):
                                      'begin_day_from': '8', 'end_year_from': '1951'})
             event_id = int(rv.location.split('/')[-1])
             with app.test_request_context():
-                app.preprocess_request()
-                actor = EntityMapper.insert('E21', 'Captain Miller')
-                involvement = NodeMapper.get_hierarchy_by_name('Involvement')
+                app.preprocess_request()  # type: ignore
+                actor = Entity.insert('E21', 'Captain Miller')
+                involvement = Node.get_hierarchy('Involvement')
 
             # Add involvement
             rv = self.app.get(url_for('involvement_insert', origin_id=actor.id))
@@ -41,8 +41,8 @@ class InvolvementTests(TestBaseCase):
 
             # Update involvement
             with app.test_request_context():
-                app.preprocess_request()
-                link_id = LinkMapper.get_links(event_id, 'P22')[0].id
+                app.preprocess_request()  # type: ignore
+                link_id = Link.get_links(event_id, 'P22')[0].id
             rv = self.app.get(url_for('involvement_update', id_=link_id, origin_id=event_id))
             assert b'Captain' in rv.data
             rv = self.app.post(

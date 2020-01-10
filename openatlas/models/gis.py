@@ -1,12 +1,12 @@
 import ast
-from typing import List
+from typing import Any, Dict, List, Optional
 
 from flask import g, json
 from flask_wtf import FlaskForm
 
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Project
-from openatlas.models.node import NodeMapper
+from openatlas.models.node import Node
 from openatlas.util.util import sanitize
 
 
@@ -14,14 +14,15 @@ class InvalidGeomException(Exception):
     pass
 
 
-class GisMapper:
+class Gis:
 
     @staticmethod
-    def get_all(objects: List[Entity] = None) -> dict:
+    def get_all(objects: Optional[List[Entity]] = None) -> Dict[str, List[Any]]:
         if objects is None:
             objects = []
-        all_: dict = {'point': [], 'linestring': [], 'polygon': []}
-        selected: dict = {'point': [], 'linestring': [], 'polygon': [], 'polygon_point': []}
+        all_: Dict[str, List[Any]] = {'point': [], 'linestring': [], 'polygon': []}
+        selected: Dict[str, List[Any]] = {
+            'point': [], 'linestring': [], 'polygon': [], 'polygon_point': []}
         # Workaround to include GIS features of a subunit which would be otherwise omitted
         subunit_selected_id = 0
         if objects and objects[0].system_type in ['feature', 'find', 'stratigraphic unit']:
@@ -53,7 +54,7 @@ class GisMapper:
                 shape=shape, subunit_selected_id=subunit_selected_id,
                 polygon_point_sql=polygon_point_sql if shape == 'polygon' else '')
             g.execute(sql)
-            place_type_root_id = NodeMapper.get_hierarchy_by_name('Place').id
+            place_root = Node.get_hierarchy('Place')
             for row in g.cursor.fetchall():
                 description = row.description.replace('"', '\"') if row.description else ''
                 object_desc = row.object_desc.replace('"', '\"') if row.object_desc else ''
@@ -70,7 +71,7 @@ class GisMapper:
                     nodes_list = ast.literal_eval('[' + row.types + ']')
                     for node_id in list(set(nodes_list)):
                         node = g.nodes[node_id]
-                        if node.root and node.root[-1] == place_type_root_id:
+                        if node.root and node.root[-1] == place_root.id:
                             item['properties']['objectType'] = node.name.replace('"', '\"')
                             break
                 if row.object_id in object_ids:
@@ -91,15 +92,15 @@ class GisMapper:
                 'gisPolygonAll': json.dumps(all_['polygon']),
                 'gisPolygonSelected': json.dumps(selected['polygon']),
                 'gisPolygonPointSelected': json.dumps(selected['polygon_point']),
-                'gisAllSelected': json.dumps(selected['polygon'] +
-                                             selected['linestring'] + selected['point'])}
+                'gisAllSelected': json.dumps(selected['polygon'] + selected['linestring'] +
+                                             selected['point'])}
 
     @staticmethod
     def insert(entity: Entity, form: FlaskForm) -> None:
         for shape in ['point', 'line', 'polygon']:
             data = getattr(form, 'gis_' + shape + 's').data
             if not data:
-                continue
+                continue  # pragma: no cover
             for item in json.loads(data):
                 # Don't save geom if coordinates are empty
                 if not item['geometry']['coordinates'] or item['geometry']['coordinates'] == [[]]:

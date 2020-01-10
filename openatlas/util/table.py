@@ -1,3 +1,5 @@
+from typing import Any, List, Optional
+
 from flask import json, session
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
@@ -19,14 +21,14 @@ class Table:
                'stratigraphic-unit': ['name', 'type', 'begin', 'end']}
 
     def __init__(self,
-                 header: list = None,  # A list of column header labels
-                 rows: list = None,  # rows containing the data
-                 order: str = None,  # Column order option
-                 defs: str = None,  # Additional definitions for DataTables
+                 header: Optional[List[str]] = None,  # A list of column header labels
+                 rows: Optional[List[List[Any]]] = None,  # Rows containing the data
+                 order: Optional[str] = None,  # Column order option
+                 defs: Optional[str] = None,  # Additional definitions for DataTables
                  paging: bool = True) -> None:  # Whether to show pager
         self.header = header if header else []
         self.rows = rows if rows else []
-        self.paging = 'true' if paging else 'false'
+        self.paging = paging
         self.order = order if order else ''
         self.defs = defs if defs else ''
 
@@ -64,7 +66,7 @@ class Table:
                                 columns=columns,
                                 order='order: ' + self.order + ',' if self.order else '',
                                 defs='columnDefs: ' + self.defs + ',' if self.defs else '',
-                                paging=self.paging)
+                                paging='true' if self.paging else 'false')
 
         # Toggle header and footer HTML
         css_header = '#{name}_table_wrapper table thead {{ display:none; }}'.format(name=name)

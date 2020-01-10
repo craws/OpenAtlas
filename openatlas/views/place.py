@@ -1,4 +1,4 @@
-from typing import Optional as OptionalTyping, Union
+from typing import Optional, Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -7,15 +7,15 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import (BooleanField, FieldList, HiddenField, IntegerField, StringField, SubmitField,
                      TextAreaField)
-from wtforms.validators import InputRequired, Optional
+from wtforms.validators import InputRequired, Optional as OptValidator
 
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
 from openatlas.forms.forms import build_form, build_table_form
-from openatlas.models.entity import Entity, EntityMapper
-from openatlas.models.geonames import GeonamesMapper
-from openatlas.models.gis import GisMapper, InvalidGeomException
-from openatlas.models.overlay import OverlayMapper
+from openatlas.models.entity import Entity
+from openatlas.models.geonames import Geonames
+from openatlas.models.gis import Gis, InvalidGeomException
+from openatlas.models.overlay import Overlay
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, link, required_group, uc_first, was_modified
 from openatlas.views.reference import AddReferenceForm
@@ -23,7 +23,7 @@ from openatlas.views.reference import AddReferenceForm
 
 class PlaceForm(DateForm):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
-    geonames_id = IntegerField('GeoNames Id', [Optional()], description=_('tooltip geonames'))
+    geonames_id = IntegerField('GeoNames Id', [OptValidator()], description=_('tooltip geonames'))
     geonames_precision = BooleanField('exact match')
     alias = FieldList(StringField(''), description=_('tooltip alias'))
     description = TextAreaField(_('description'))
@@ -40,9 +40,9 @@ class FeatureForm(DateForm):
     name = StringField(_('name'), [InputRequired()])
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
-    gis_points = HiddenField()
-    gis_polygons = HiddenField()
-    gis_lines = HiddenField()
+    gis_points = HiddenField(default='[]')
+    gis_polygons = HiddenField(default='[]')
+    gis_lines = HiddenField(default='[]')
     insert_and_continue = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
     opened = HiddenField()
@@ -51,9 +51,9 @@ class FeatureForm(DateForm):
 @app.route('/place')
 @app.route('/place/<action>/<int:id_>')
 @required_group('readonly')
-def place_index(action: str = None, id_: int = None) -> Union[str, Response]:
+def place_index(action: Optional[str] = None, id_: Optional[int] = None) -> Union[str, Response]:
     if id_ and action == 'delete':
-        entity = EntityMapper.get_by_id(id_)
+        entity = Entity.get_by_id(id_)
         parent = None if entity.system_type == 'place' else entity.get_linked_entity('P46', True)
         if entity.get_linked_entities(['P46']):
             flash(_('Deletion not possible if subunits exists'), 'error')
@@ -64,17 +64,17 @@ def place_index(action: str = None, id_: int = None) -> Union[str, Response]:
         if parent:
             return redirect(url_for('entity_view', id_=parent.id) + '#tab-' + entity.system_type)
     table = Table(Table.HEADERS['place'], defs='[{className: "dt-body-right", targets: [2,3]}]')
-    for place in EntityMapper.get_by_system_type(
+    for place in Entity.get_by_system_type(
             'place', nodes=True, aliases=current_user.settings['table_show_aliases']):
         table.rows.append(get_base_table_data(place))
-    return render_template('place/index.html', table=table, gis_data=GisMapper.get_all())
+    return render_template('place/index.html', table=table, gis_data=Gis.get_all())
 
 
 @app.route('/place/insert', methods=['POST', 'GET'])
 @app.route('/place/insert/<int:origin_id>', methods=['POST', 'GET'])
 @required_group('contributor')
-def place_insert(origin_id: OptionalTyping[int] = None) -> Union[str, Response]:
-    origin = EntityMapper.get_by_id(origin_id) if origin_id else None
+def place_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
+    origin = Entity.get_by_id(origin_id) if origin_id else None
     geonames_buttons = False
     if origin and origin.system_type == 'place':
         title = 'feature'
@@ -99,28 +99,33 @@ def place_insert(origin_id: OptionalTyping[int] = None) -> Union[str, Response]:
 
     if title == 'place':
         form.alias.append_entry('')
-    gis_data = GisMapper.get_all()
     place = None
     feature = None
     if origin and origin.system_type == 'stratigraphic unit':
-        feature = origin.get_linked_entity('P46', True)
-        place = feature.get_linked_entity('P46', True)
+        feature = origin.get_linked_entity_safe('P46', True)
+        place = feature.get_linked_entity_safe('P46', True)
     elif origin and origin.system_type == 'feature':
-        place = origin.get_linked_entity('P46', True)
+        place = origin.get_linked_entity_safe('P46', True)
 
     overlays = None
     if origin and origin.class_.code == 'E18' and current_user.settings['module_map_overlay']:
-        overlays = OverlayMapper.get_by_object(origin)
+        overlays = Overlay.get_by_object(origin)
 
-    return render_template('place/insert.html', form=form, title=title, place=place, origin=origin,
-                           gis_data=gis_data, feature=feature, geonames_buttons=geonames_buttons,
+    return render_template('place/insert.html',
+                           form=form,
+                           title=title,
+                           place=place,
+                           origin=origin,
+                           gis_data=Gis.get_all(),
+                           feature=feature,
+                           geonames_buttons=geonames_buttons,
                            overlays=overlays)
 
 
 @app.route('/place/add/source/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def place_add_source(id_: int) -> Union[str, Response]:
-    object_ = EntityMapper.get_by_id(id_, view_name='place')
+    object_ = Entity.get_by_id(id_, view_name='place')
     if request.method == 'POST':
         if request.form['checkbox_values']:
             object_.link_string('P67', request.form['checkbox_values'], inverse=True)
@@ -132,7 +137,7 @@ def place_add_source(id_: int) -> Union[str, Response]:
 @app.route('/place/add/reference/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def place_add_reference(id_: int) -> Union[str, Response]:
-    object_ = EntityMapper.get_by_id(id_, view_name='place')
+    object_ = Entity.get_by_id(id_, view_name='place')
     form = AddReferenceForm()
     if form.validate_on_submit():
         object_.link_string('P67', form.reference.data, description=form.page.data, inverse=True)
@@ -144,7 +149,7 @@ def place_add_reference(id_: int) -> Union[str, Response]:
 @app.route('/place/add/file/<int:id_>', methods=['GET', 'POST'])
 @required_group('contributor')
 def place_add_file(id_: int) -> Union[str, Response]:
-    object_ = EntityMapper.get_by_id(id_, view_name='place')
+    object_ = Entity.get_by_id(id_, view_name='place')
     if request.method == 'POST':
         if request.form['checkbox_values']:
             object_.link_string('P67', request.form['checkbox_values'], inverse=True)
@@ -156,8 +161,8 @@ def place_add_file(id_: int) -> Union[str, Response]:
 @app.route('/place/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def place_update(id_: int) -> Union[str, Response]:
-    object_ = EntityMapper.get_by_id(id_, nodes=True, aliases=True, view_name='place')
-    location = object_.get_linked_entity('P53', nodes=True)
+    object_ = Entity.get_by_id(id_, nodes=True, aliases=True, view_name='place')
+    location = object_.get_linked_entity_safe('P53', nodes=True)
     geonames_buttons = False
     if object_.system_type == 'feature':
         form = build_form(FeatureForm, 'Feature', object_, request, location)
@@ -183,9 +188,8 @@ def place_update(id_: int) -> Union[str, Response]:
         for alias in object_.aliases.values():
             form.alias.append_entry(alias)
         form.alias.append_entry('')
-    gis_data = GisMapper.get_all([object_])
     if hasattr(form, 'geonames_id') and current_user.settings['module_geonames']:
-        geonames_link = GeonamesMapper.get_geonames_link(object_)
+        geonames_link = Geonames.get_geonames_link(object_)
         if geonames_link:
             geonames_entity = geonames_link.domain
             form.geonames_id.data = geonames_entity.name if geonames_entity else ''
@@ -195,57 +199,57 @@ def place_update(id_: int) -> Union[str, Response]:
     feature = None
     stratigraphic_unit = None
     if object_.system_type == 'find':
-        stratigraphic_unit = object_.get_linked_entity('P46', True)
-        feature = stratigraphic_unit.get_linked_entity('P46', True)
-        place = feature.get_linked_entity('P46', True)
+        stratigraphic_unit = object_.get_linked_entity_safe('P46', True)
+        feature = stratigraphic_unit.get_linked_entity_safe('P46', True)
+        place = feature.get_linked_entity_safe('P46', True)
     if object_.system_type == 'stratigraphic unit':
-        feature = object_.get_linked_entity('P46', True)
-        place = feature.get_linked_entity('P46', True)
+        feature = object_.get_linked_entity_safe('P46', True)
+        place = feature.get_linked_entity_safe('P46', True)
     elif object_.system_type == 'feature':
-        place = object_.get_linked_entity('P46', True)
+        place = object_.get_linked_entity_safe('P46', True)
 
-    overlays = OverlayMapper.get_by_object(object_) if current_user.settings['module_map_overlay'] \
+    overlays = Overlay.get_by_object(object_) if current_user.settings['module_map_overlay'] \
         else None
 
-    return render_template('place/update.html', form=form, object_=object_, gis_data=gis_data,
-                           place=place, feature=feature, stratigraphic_unit=stratigraphic_unit,
-                           overlays=overlays, geonames_buttons=geonames_buttons)
+    return render_template('place/update.html',
+                           form=form,
+                           object_=object_,
+                           gis_data=Gis.get_all([object_]),
+                           place=place,
+                           feature=feature,
+                           stratigraphic_unit=stratigraphic_unit,
+                           overlays=overlays,
+                           geonames_buttons=geonames_buttons)
 
 
-def save(form: DateForm, object__: Entity = None, location_: Entity = None,
-         origin: Entity = None) -> str:
+def save(form: DateForm,
+         object__: Optional[Entity] = None,
+         location_: Optional[Entity] = None,
+         origin: Optional[Entity] = None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
     try:
         if object__ and location_:
             object_ = object__
             location = location_
-            GisMapper.delete_by_entity(location)
+            Gis.delete_by_entity(location)
         else:
             log_action = 'insert'
             if origin and origin.system_type == 'stratigraphic unit':
-                object_ = EntityMapper.insert('E22', form.name.data, 'find')
+                object_ = Entity.insert('E22', form.name.data, 'find')
             else:
                 system_type = 'place'
                 if origin and origin.system_type == 'place':
                     system_type = 'feature'
                 elif origin and origin.system_type == 'feature':
                     system_type = 'stratigraphic unit'
-                object_ = EntityMapper.insert('E18', form.name.data, system_type)
-            location = EntityMapper.insert('E53', 'Location of ' + form.name.data, 'place location')
+                object_ = Entity.insert('E18', form.name.data, system_type)
+            location = Entity.insert('E53', 'Location of ' + form.name.data, 'place location')
             object_.link('P53', location)
-        object_.name = form.name.data
-        object_.description = form.description.data
-        object_.set_dates(form)
-        object_.update()
-        object_.save_nodes(form)
-        if object_.system_type == 'place':
-            object_.update_aliases(form)
-        location.name = 'Location of ' + form.name.data
-        location.update()
-        location.save_nodes(form)
+        object_.update(form)
+        location.update(form)
         if hasattr(form, 'geonames_id') and current_user.settings['module_geonames']:
-            GeonamesMapper.update_geonames(form, object_)
+            Geonames.update_geonames(form, object_)
         url = url_for('entity_view', id_=object_.id)
         if origin:
             url = url_for('entity_view', id_=origin.id) + '#tab-place'
@@ -257,7 +261,7 @@ def save(form: DateForm, object__: Entity = None, location_: Entity = None,
                 origin.link('P46', object_)
             else:
                 origin.link('P67', object_)
-        GisMapper.insert(location, form)
+        Gis.insert(location, form)
         g.cursor.execute('COMMIT')
         if form.continue_.data == 'yes':
             url = url_for('place_insert', origin_id=origin.id if origin else None)
@@ -267,12 +271,10 @@ def save(form: DateForm, object__: Entity = None, location_: Entity = None,
         g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'transaction failed because of invalid geom', e)
         flash(_('Invalid geom entered'), 'error')
-        url = url_for('place_index') if log_action == 'insert' else url_for('place_view',
-                                                                            id_=object_.id)
+        url = url_for('place_index') if log_action == 'insert' else url_for('place_index')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')
         logger.log('error', 'database', 'transaction failed', e)
         flash(_('error transaction'), 'error')
-        url = url_for('place_index') if log_action == 'insert' else url_for('place_view',
-                                                                            id_=object_.id)
+        url = url_for('place_index') if log_action == 'insert' else url_for('place_index')
     return url

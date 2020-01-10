@@ -13,7 +13,7 @@ from wtforms import BooleanField, PasswordField, StringField, SubmitField
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app, logger
-from openatlas.models.user import User, UserMapper
+from openatlas.models.user import User
 from openatlas.util.util import send_mail, uc_first
 
 login_manager = LoginManager()
@@ -23,17 +23,17 @@ login_manager.login_view = 'login'
 
 @login_manager.user_loader
 def load_user(user_id: int) -> User:
-    return UserMapper.get_by_id(user_id, True)
+    return User.get_by_id(user_id, True)
 
 
-class LoginForm(FlaskForm):
+class LoginForm(FlaskForm):  # type: ignore
     username = StringField(_('username'), [InputRequired()], render_kw={'autofocus': True})
     password = PasswordField(_('password'), [InputRequired()])
     show_passwords = BooleanField(_('show password'))
     save = SubmitField(_('login'))
 
 
-class PasswordResetForm(FlaskForm):
+class PasswordResetForm(FlaskForm):  # type: ignore
     email = StringField(_('email'), [InputRequired(), Email()])
     save = SubmitField(_('submit'))
 
@@ -44,7 +44,7 @@ def login() -> Union[str, Response]:
         return redirect('/')
     form = LoginForm()
     if form.validate_on_submit():
-        user = UserMapper.get_by_username(request.form['username'])
+        user = User.get_by_username(request.form['username'])
         if user and user.username:
             if user.login_attempts_exceeded():
                 logger.log('notice', 'auth', 'Login attempts exceeded: ' + user.username)
@@ -84,12 +84,12 @@ def reset_password() -> Union[str, Response]:
         return redirect(url_for('index'))
     form = PasswordResetForm()
     if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
-        user = UserMapper.get_by_email(form.email.data)
+        user = User.get_by_email(form.email.data)
         if not user:
             logger.log('info', 'password', 'Password reset for non existing ' + form.email.data)
             flash(_('error non existing email'), 'error')
         else:
-            code = UserMapper.generate_password()
+            code = User.generate_password()
             user.password_reset_code = code
             user.password_reset_date = datetime.datetime.now()
             user.update()
@@ -115,7 +115,7 @@ def reset_password() -> Union[str, Response]:
 
 @app.route('/reset_confirm/<code>')
 def reset_confirm(code: str) -> Response:  # pragma: no cover
-    user = UserMapper.get_by_reset_code(code)
+    user = User.get_by_reset_code(code)
     if not user or not user.username or not user.email:
         logger.log('info', 'auth', 'unknown reset code')
         flash(_('invalid password reset confirmation code'), 'error')
@@ -125,7 +125,7 @@ def reset_confirm(code: str) -> Response:  # pragma: no cover
         logger.log('info', 'auth', 'reset code expired')
         flash(_('This reset confirmation code has expired.'), 'error')
         abort(404)
-    password = UserMapper.generate_password()
+    password = User.generate_password()
     user.password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
     user.password_reset_code = None
     user.password_reset_date = None
@@ -147,5 +147,4 @@ def reset_confirm(code: str) -> Response:  # pragma: no cover
 @login_required
 def logout() -> Response:
     logout_user()
-    logger.log('info', 'auth', 'logout')
     return redirect(url_for('login'))

@@ -1,4 +1,4 @@
-from typing import Union
+from typing import Optional, Union
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import lazy_gettext as _
@@ -11,11 +11,11 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import build_form
-from openatlas.models.entity import Entity, EntityMapper
+from openatlas.models.entity import Entity
 from openatlas.util.util import required_group
 
 
-class TranslationForm(FlaskForm):
+class TranslationForm(FlaskForm):  # type: ignore
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     description = TextAreaField(_('content'))
     save = SubmitField(_('insert'))
@@ -26,7 +26,7 @@ class TranslationForm(FlaskForm):
 @app.route('/source/translation/insert/<int:source_id>', methods=['POST', 'GET'])
 @required_group('contributor')
 def translation_insert(source_id: int) -> Union[str, Response]:
-    source = EntityMapper.get_by_id(source_id, view_name='source')
+    source = Entity.get_by_id(source_id, view_name='source')
     form = build_form(TranslationForm, 'Source translation')
     if form.validate_on_submit():
         translation = save(form, source=source)
@@ -40,7 +40,7 @@ def translation_insert(source_id: int) -> Union[str, Response]:
 @app.route('/source/translation/delete/<int:id_>/<int:source_id>')
 @required_group('contributor')
 def translation_delete(id_: int, source_id: int) -> Response:
-    EntityMapper.delete(id_)
+    Entity.delete_(id_)
     flash(_('entity deleted'), 'info')
     return redirect(url_for('entity_view', id_=source_id))
 
@@ -48,7 +48,7 @@ def translation_delete(id_: int, source_id: int) -> Response:
 @app.route('/source/translation/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def translation_update(id_: int) -> Union[str, Response]:
-    translation = EntityMapper.get_by_id(id_, nodes=True)
+    translation = Entity.get_by_id(id_, nodes=True)
     source = translation.get_linked_entity('P73', True)
     form = build_form(TranslationForm, 'Source translation', translation, request)
     if form.validate_on_submit():
@@ -59,21 +59,20 @@ def translation_update(id_: int) -> Union[str, Response]:
                            form=form)
 
 
-def save(form: FlaskForm, entity: Entity = None, source: Entity = None) -> Entity:
+def save(form: FlaskForm,
+         entity: Optional[Entity] = None,
+         source: Optional[Entity] = None) -> Entity:
     g.cursor.execute('BEGIN')
     try:
         if entity:
             logger.log_user(entity.id, 'update')
         elif source:
-            entity = EntityMapper.insert('E33', form.name.data, 'source translation')
+            entity = Entity.insert('E33', form.name.data, 'source translation')
             source.link('P73', entity)
             logger.log_user(entity.id, 'insert')
         else:
             abort(400)  # pragma: no cover, either entity or source has to be provided
-        entity.name = form.name.data
-        entity.description = form.description.data
-        entity.update()
-        entity.save_nodes(form)
+        entity.update(form)
         g.cursor.execute('COMMIT')
     except Exception as e:  # pragma: no cover
         g.cursor.execute('ROLLBACK')

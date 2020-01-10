@@ -1,15 +1,15 @@
 from flask import g, url_for
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
-from openatlas.models.node import NodeMapper
+from openatlas.models.entity import Entity
+from openatlas.models.node import Node
 from tests.base import TestBaseCase
 
 
 class ActorTests(TestBaseCase):
 
     def test_actor(self) -> None:
-        with app.app_context():
+        with app.app_context():  # type: ignore
             self.login()
             rv = self.app.get(url_for('actor_index'))
             assert b'No entries' in rv.data
@@ -18,13 +18,13 @@ class ActorTests(TestBaseCase):
             rv = self.app.post(url_for('place_insert'), data={'name': 'Nostromos'})
             residence_id = rv.location.split('/')[-1]
             with app.test_request_context():
-                app.preprocess_request()
-                sex_node = NodeMapper.get_hierarchy_by_name('Sex')
+                app.preprocess_request()  # type: ignore
+                sex_node = Node.get_hierarchy('Sex')
                 sex_node_sub_1 = g.nodes[sex_node.subs[0]]
                 sex_node_sub_2 = g.nodes[sex_node.subs[1]]
-                event = EntityMapper.insert('E8', 'Event Horizon')
-                source = EntityMapper.insert('E33', 'Necronomicon')
-                file = EntityMapper.insert('E31', 'X-Files', 'file')
+                event = Entity.insert('E8', 'Event Horizon')
+                source = Entity.insert('E33', 'Necronomicon')
+                file = Entity.insert('E31', 'X-Files', 'file')
 
             # Actor insert
             rv = self.app.get(url_for('actor_insert', code='E21'))

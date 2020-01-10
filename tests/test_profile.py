@@ -7,7 +7,7 @@ from tests.base import TestBaseCase
 class ProfileTests(TestBaseCase):
 
     def test_profile(self) -> None:
-        with app.app_context():
+        with app.app_context():  # type: ignore
             self.login()
 
             # Profile update

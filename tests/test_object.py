@@ -1,18 +1,18 @@
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity
 from tests.base import TestBaseCase
 
 
 class ObjectTest(TestBaseCase):
 
     def test_object(self) -> None:
-        with app.app_context():
+        with app.app_context():  # type: ignore
             self.login()
             with app.test_request_context():
-                app.preprocess_request()
-                source = EntityMapper.insert('E33', 'Necronomicon')
+                app.preprocess_request()  # type: ignore
+                source = Entity.insert('E33', 'Necronomicon')
 
             rv = self.app.get(url_for('object_insert'))
             assert b'+ Information Carrier' in rv.data
@@ -22,8 +22,8 @@ class ObjectTest(TestBaseCase):
             rv = self.app.get(url_for('object_index'))
             assert b'Love-letter' in rv.data
             with app.test_request_context():
-                app.preprocess_request()
-                object_ = EntityMapper.get_by_codes('object')[0]
+                app.preprocess_request()  # type: ignore
+                object_ = Entity.get_by_codes('object')[0]
             rv = self.app.get(url_for('object_update', id_=object_.id))
             assert b'Love-letter' in rv.data
             rv = self.app.post(url_for('object_update', id_=object_.id), follow_redirects=True,

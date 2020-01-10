@@ -1,7 +1,7 @@
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity
 from tests.base import TestBaseCase
 
 
@@ -10,15 +10,15 @@ class SearchTest(TestBaseCase):
     def test_search(self) -> None:
         self.login()
         with app.test_request_context():
-            app.preprocess_request()
-            person = EntityMapper.insert('E21', 'Waldo')
+            app.preprocess_request()  # type: ignore
+            person = Entity.insert('E21', 'Waldo')
             person.begin_to = '2018-01-01'
             person.update()
-            person.link('P131', EntityMapper.insert('E82', 'Waldo alias'))
-            object_ = EntityMapper.insert('E18', 'Waldorf', 'place')
-            object_.link('P1', EntityMapper.insert('E41', 'Waldorf alias'))
-            EntityMapper.insert('E21', 'Waldo without date')
-        with app.app_context():
+            person.link('P131', Entity.insert('E82', 'Waldo alias'))
+            object_ = Entity.insert('E18', 'Waldorf', 'place')
+            object_.link('P1', Entity.insert('E41', 'Waldorf alias'))
+            Entity.insert('E21', 'Waldo without date')
+        with app.app_context():  # type: ignore
             self.app.post(url_for('search_index'), data={'global-term': ''})
             rv = self.app.post(url_for('search_index'), data={'global-term': 'wal',
                                                               'include_dateless': True,

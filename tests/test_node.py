@@ -1,20 +1,20 @@
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.node import NodeMapper
+from openatlas.models.node import Node
 from tests.base import TestBaseCase
 
 
 class NodeTest(TestBaseCase):
 
     def test_node(self) -> None:
-        with app.app_context():
+        with app.app_context():  # type: ignore
             self.login()
             with app.test_request_context():
-                app.preprocess_request()
-                actor_node = NodeMapper.get_hierarchy_by_name('Actor Actor Relation')
-                dimension_node = NodeMapper.get_hierarchy_by_name('Dimensions')
-                sex_node = NodeMapper.get_hierarchy_by_name('Sex')
+                app.preprocess_request()  # type: ignore
+                actor_node = Node.get_hierarchy('Actor Actor Relation')
+                dimension_node = Node.get_hierarchy('Dimensions')
+                sex_node = Node.get_hierarchy('Sex')
             rv = self.app.get(url_for('node_index'))
             assert b'Actor Actor Relation' in rv.data
             rv = self.app.get(url_for('node_insert', root_id=actor_node.id, super_id=actor_node.id))
