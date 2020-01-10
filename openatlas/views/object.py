@@ -10,7 +10,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.forms import build_form, build_table_form
-from openatlas.models.entity import Entity, EntityMapper
+from openatlas.models.entity import Entity
 from openatlas.util.table import Table
 from openatlas.util.util import (get_base_table_data, link, required_group, truncate_string,
                                  was_modified)
@@ -30,11 +30,11 @@ class InformationCarrierForm(FlaskForm):  # type: ignore
 @required_group('readonly')
 def object_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
     if id_ and action == 'delete':
-        EntityMapper.delete(id_)
+        Entity.delete_(id_)
         logger.log_user(id_, 'delete')
         flash(_('entity deleted'), 'info')
     table = Table(Table.HEADERS['object'] + ['description'])
-    for object_ in EntityMapper.get_by_codes('object'):
+    for object_ in Entity.get_by_codes('object'):
         data = get_base_table_data(object_)
         data.append(truncate_string(object_.description))
         table.rows.append(data)
@@ -44,7 +44,7 @@ def object_index(action: Optional[str] = None, id_: Optional[int] = None) -> str
 @app.route('/object/add/source/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def object_add_source(id_: int) -> Union[str, Response]:
-    object_ = EntityMapper.get_by_id(id_, view_name='object')
+    object_ = Entity.get_by_id(id_, view_name='object')
     if request.method == 'POST':
         if request.form['checkbox_values']:
             object_.link_string('P128', request.form['checkbox_values'])
@@ -65,7 +65,7 @@ def object_insert() -> Union[str, Response]:
 @app.route('/object/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def object_update(id_: int) -> Union[str, Response]:
-    object_ = EntityMapper.get_by_id(id_, nodes=True, view_name='object')
+    object_ = Entity.get_by_id(id_, nodes=True, view_name='object')
     form = build_form(InformationCarrierForm, object_.system_type.title(), object_, request)
     if form.validate_on_submit():
         if was_modified(form, object_):  # pragma: no cover
@@ -85,11 +85,8 @@ def save(form: Any, object_: Optional[Entity] = None) -> str:
     try:
         if not object_:
             log_action = 'insert'
-            object_ = EntityMapper.insert('E84', form.name.data, 'information carrier')
-        object_.name = form.name.data
-        object_.description = form.description.data
-        object_.update()
-        object_.save_nodes(form)
+            object_ = Entity.insert('E84', form.name.data, 'information carrier')
+        object_.update(form)
         url = url_for('entity_view', id_=object_.id)
         url = url_for('object_insert') if form.continue_.data == 'yes' else url
         g.cursor.execute('COMMIT')

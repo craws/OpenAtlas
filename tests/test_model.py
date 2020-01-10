@@ -1,7 +1,9 @@
+from typing import Any, Dict
+
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity
 from tests.base import TestBaseCase
 
 
@@ -19,7 +21,7 @@ class ModelTests(TestBaseCase):
             assert b'P1' in rv.data
             rv = self.app.get(url_for('property_view', code='P68'))
             assert b'P68' in rv.data
-            data: dict = {'domain': 'E1', 'range': 'E1', 'property': 'P13'}
+            data: Dict[str, Any] = {'domain': 'E1', 'range': 'E1', 'property': 'P13'}
             rv = self.app.post(url_for('model_index'), data=data)
             assert b'Wrong domain' in rv.data
             data = {'domain': 'E1', 'range': 'E1', 'property': 'P67'}
@@ -28,11 +30,11 @@ class ModelTests(TestBaseCase):
             self.login()
             with app.test_request_context():  # Insert data to display in network view
                 app.preprocess_request()  # type: ignore
-                actor = EntityMapper.insert('E21', 'King Arthur')
-                event = EntityMapper.insert('E7', 'Battle of Camlann')
-                source = EntityMapper.insert('E33', 'Tha source')
+                actor = Entity.insert('E21', 'King Arthur')
+                event = Entity.insert('E7', 'Battle of Camlann')
+                source = Entity.insert('E33', 'Tha source')
                 actor.link('P11', event)
-                actor.link('P67', EntityMapper.insert('E89', 'Propositional Object'))
+                actor.link('P67', Entity.insert('E89', 'Propositional Object'))
                 source.link('P67', event)
             rv = self.app.get(url_for('model_network'))
             assert b'orphans' in rv.data

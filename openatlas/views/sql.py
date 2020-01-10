@@ -1,8 +1,3 @@
-import os
-from datetime import datetime, timedelta
-from os.path import basename
-from typing import Dict
-
 from flask import flash, g, render_template
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
@@ -10,7 +5,7 @@ from wtforms import SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.util.util import convert_size, format_date, required_group
+from openatlas.util.util import required_group, get_backup_file_data
 
 
 @app.route('/sql')
@@ -27,27 +22,10 @@ class SqlForm(FlaskForm):  # type: ignore
 @app.route('/sql/execute', methods=['POST', 'GET'])
 @required_group('admin')
 def sql_execute() -> str:
-    path = app.config['EXPORT_FOLDER_PATH'].joinpath('sql')
-    latest_file = None
-    latest_file_date = None
-    for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
-        name = basename(file)
-        if name == '.gitignore':
-            continue
-        file_date = datetime.utcfromtimestamp(os.path.getmtime(path.joinpath(file)))
-        if not latest_file_date or file_date > latest_file_date:
-            latest_file = file
-            latest_file_date = file_date
-    file_data: Dict = {'backup_to_old': True}
-    if latest_file and latest_file_date:
-        yesterday = datetime.today() - timedelta(days=1)
-        file_data['file'] = latest_file
-        file_data['backup_to_old'] = True if yesterday > latest_file_date else False
-        file_data['size'] = convert_size(os.path.getsize(path.joinpath(latest_file)))
-        file_data['date'] = format_date(latest_file_date)
+    file_data = get_backup_file_data()
     response = ''
     form = SqlForm()
-    if form.validate_on_submit() and not file_data['backup_to_old']:
+    if form.validate_on_submit() and not file_data['backup_too_old']:
         g.execute('BEGIN')
         try:
             g.execute(form.statement.data)

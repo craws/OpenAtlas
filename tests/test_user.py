@@ -2,7 +2,7 @@ from flask import url_for
 from werkzeug.exceptions import abort
 
 from openatlas import app
-from openatlas.models.user import UserMapper
+from openatlas.models.user import User
 from tests.base import TestBaseCase
 
 
@@ -39,7 +39,7 @@ class UserTests(TestBaseCase):
             self.login()
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                logged_in_user = UserMapper.get_by_username('Alice')
+                logged_in_user = User.get_by_username('Alice')
                 if not logged_in_user:
                     abort(404)  # pragma: no cover
             rv = self.app.get(url_for('user_insert'))

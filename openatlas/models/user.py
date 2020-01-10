@@ -1,7 +1,9 @@
+from __future__ import annotations  # Needed for Python 4.0 type annotations
+
 import datetime
 import secrets
 import string
-from typing import List, Optional, Union
+from typing import Any, Dict, List, Optional, Tuple, Union
 
 import bcrypt
 from flask import g, session
@@ -20,12 +22,7 @@ class User(UserMixin):  # type: ignore
 
     def __init__(self,
                  row: NamedTupleCursor.Record = None,
-                 bookmarks: Optional[list] = None) -> None:
-        self.id = None
-        self.username = None
-        self.email = None
-        if not row:
-            return
+                 bookmarks: Optional[List[int]] = None) -> None:
         self.id = row.id
         self.active = True if row.active == 1 else False
         self.username = row.username
@@ -36,7 +33,7 @@ class User(UserMixin):  # type: ignore
         self.real_name = row.real_name
         self.email = row.email
         self.description = row.info
-        self.settings = UserMapper.get_settings(row.id)
+        self.settings = User.get_settings(row.id)
         self.bookmarks = bookmarks
         self.password_reset_code = row.password_reset_code
         self.password_reset_date = row.password_reset_date
@@ -46,10 +43,40 @@ class User(UserMixin):  # type: ignore
         self.modified = row.modified
 
     def update(self) -> None:
-        UserMapper.update(self)
+        sql = """
+            UPDATE web.user SET (username, password, real_name, info, email, active,
+                login_last_success, login_last_failure, login_failed_count, group_id,
+                password_reset_code, password_reset_date, unsubscribe_code) =
+            (%(username)s, %(password)s, %(real_name)s, %(info)s, %(email)s, %(active)s,
+                %(login_last_success)s, %(login_last_failure)s, %(login_failed_count)s,
+                (SELECT id FROM web.group WHERE name LIKE %(group_name)s),
+                %(password_reset_code)s, %(password_reset_date)s, %(unsubscribe_code)s)
+            WHERE id = %(id)s;"""
+        g.execute(sql, {'id': self.id,
+                        'username': self.username,
+                        'real_name': self.real_name,
+                        'password': self.password,
+                        'info': self.description,
+                        'email': self.email,
+                        'active': self.active,
+                        'group_name': self.group,
+                        'login_last_success': self.login_last_success,
+                        'login_last_failure': self.login_last_failure,
+                        'login_failed_count': self.login_failed_count,
+                        'unsubscribe_code': self.unsubscribe_code,
+                        'password_reset_code': self.password_reset_code,
+                        'password_reset_date': self.password_reset_date})
 
     def update_settings(self) -> None:
-        UserMapper.update_settings(self)
+        for name, value in self.settings.items():
+            if name in ['newsletter', 'show_email', 'module_geonames',
+                        'module_map_overlay', 'module_notes']:
+                value = 'True' if self.settings[name] else ''
+            sql = """
+                INSERT INTO web.user_settings (user_id, "name", "value")
+                VALUES (%(user_id)s, %(name)s, %(value)s)
+                ON CONFLICT (user_id, name) DO UPDATE SET "value" = excluded.value;"""
+            g.execute(sql, {'user_id': self.id, 'name': name, 'value': value})
 
     def login_attempts_exceeded(self) -> bool:
         failed_login_tries = int(session['settings']['failed_login_tries'])
@@ -62,8 +89,6 @@ class User(UserMixin):  # type: ignore
             return True
         return False  # pragma no cover - not waiting in tests for forget_minutes to pass
 
-
-class UserMapper:
     sql = """
         SELECT u.id, u.username, u.password, u.active, u.real_name, u.info, u.created, u.modified,
             u.login_last_success, u.login_last_failure, u.login_failed_count, u.password_reset_code,
@@ -72,8 +97,8 @@ class UserMapper:
         LEFT JOIN web.group r ON u.group_id = r.id """
 
     @staticmethod
-    def get_all() -> list:
-        g.execute(UserMapper.sql + ' ORDER BY username;')
+    def get_all() -> List[User]:
+        g.execute(User.sql + ' ORDER BY username;')
         return [User(row) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -83,28 +108,28 @@ class UserMapper:
             sql = 'SELECT entity_id FROM web.user_bookmarks WHERE user_id = %(user_id)s;'
             g.execute(sql, {'user_id': user_id})
             bookmarks = [row.entity_id for row in g.cursor.fetchall()]
-        g.execute(UserMapper.sql + ' WHERE u.id = %(id)s;', {'id': user_id})
+        g.execute(User.sql + ' WHERE u.id = %(id)s;', {'id': user_id})
         return User(g.cursor.fetchone(), bookmarks)
 
     @staticmethod
     def get_by_reset_code(code: str) -> Optional[User]:
-        g.execute(UserMapper.sql + ' WHERE u.password_reset_code = %(code)s;', {'code': code})
+        g.execute(User.sql + ' WHERE u.password_reset_code = %(code)s;', {'code': code})
         return User(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod
     def get_by_email(email: str) -> Optional[User]:
-        g.execute(UserMapper.sql + ' WHERE LOWER(u.email) = LOWER(%(email)s);', {'email': email})
+        g.execute(User.sql + ' WHERE LOWER(u.email) = LOWER(%(email)s);', {'email': email})
         return User(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod
     def get_by_username(username: str) -> Optional[User]:
-        sql = UserMapper.sql + ' WHERE LOWER(u.username) = LOWER(%(username)s);'
+        sql = User.sql + ' WHERE LOWER(u.username) = LOWER(%(username)s);'
         g.execute(sql, {'username': username})
         return User(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod
     def get_by_unsubscribe_code(code: str) -> Optional[User]:
-        g.execute(UserMapper.sql + ' WHERE u.unsubscribe_code = %(code)s;', {'code': code})
+        g.execute(User.sql + ' WHERE u.unsubscribe_code = %(code)s;', {'code': code})
         return User(g.cursor.fetchone()) if g.cursor.rowcount == 1 else None
 
     @staticmethod
@@ -115,7 +140,7 @@ class UserMapper:
             FROM web.user_log WHERE TRUE"""
         sql += ' AND user_id = %(user_id)s' if int(user_id) else ''
         sql += ' AND action = %(action)s' if action != 'all' else ''
-        sql += ' ORDER BY created DESC'  # Order is mportant because of limit filter
+        sql += ' ORDER BY created DESC'  # Order is important because of limit filter
         sql += ' LIMIT %(limit)s' if int(limit) else ''
         g.execute(sql, {'limit': limit, 'user_id': user_id, 'action': action})
         return g.cursor.fetchall()
@@ -145,46 +170,8 @@ class UserMapper:
         return g.cursor.fetchone()[0]
 
     @staticmethod
-    def update(user: User) -> None:
-        sql = """
-            UPDATE web.user SET (username, password, real_name, info, email, active,
-                login_last_success, login_last_failure, login_failed_count, group_id,
-                password_reset_code, password_reset_date, unsubscribe_code) =
-            (%(username)s, %(password)s, %(real_name)s, %(info)s, %(email)s, %(active)s,
-                %(login_last_success)s, %(login_last_failure)s, %(login_failed_count)s,
-                (SELECT id FROM web.group WHERE name LIKE %(group_name)s),
-                %(password_reset_code)s, %(password_reset_date)s, %(unsubscribe_code)s)
-            WHERE id = %(id)s;"""
-        g.execute(sql, {'id': user.id,
-                        'username': user.username,
-                        'real_name': user.real_name,
-                        'password': user.password,
-                        'info': user.description,
-                        'email': user.email,
-                        'active': user.active,
-                        'group_name': user.group,
-                        'login_last_success': user.login_last_success,
-                        'login_last_failure': user.login_last_failure,
-                        'login_failed_count': user.login_failed_count,
-                        'unsubscribe_code': user.unsubscribe_code,
-                        'password_reset_code': user.password_reset_code,
-                        'password_reset_date': user.password_reset_date})
-
-    @staticmethod
-    def update_settings(user: User) -> None:
-        for name, value in user.settings.items():
-            if name in ['newsletter', 'show_email', 'module_geonames',
-                        'module_map_overlay', 'module_notes']:
-                value = 'True' if user.settings[name] else ''
-            sql = """
-                INSERT INTO web.user_settings (user_id, "name", "value")
-                VALUES (%(user_id)s, %(name)s, %(value)s)
-                ON CONFLICT (user_id, name) DO UPDATE SET "value" = excluded.value;"""
-            g.execute(sql, {'user_id': user.id, 'name': name, 'value': value})
-
-    @staticmethod
     def delete(id_: int) -> None:
-        user = UserMapper.get_by_id(id_)
+        user = User.get_by_id(id_)
         if not is_authorized('manager') or user.id == current_user.id or (
                 (user.group == 'admin' and not is_authorized('admin'))):
             abort(403)  # pragma: no cover
@@ -192,7 +179,7 @@ class UserMapper:
         g.execute(sql, {'user_id': id_})
 
     @staticmethod
-    def get_users() -> list:
+    def get_users() -> List[Tuple[int, str]]:
         g.execute('SELECT id, username FROM web.user ORDER BY username;')
         return [(row.id, row.username) for row in g.cursor.fetchall()]
 
@@ -211,7 +198,7 @@ class UserMapper:
         return label
 
     @staticmethod
-    def get_settings(user_id: int) -> dict:
+    def get_settings(user_id: int) -> Dict[str, Any]:
         sql = 'SELECT "name", value FROM web.user_settings WHERE user_id = %(user_id)s;'
         g.execute(sql, {'user_id': user_id})
         settings = {row.name: row.value for row in g.cursor.fetchall()}
@@ -271,7 +258,7 @@ class UserMapper:
         return g.cursor.fetchone()[0] if g.cursor.rowcount == 1 else None
 
     @staticmethod
-    def get_notes() -> dict:
+    def get_notes() -> Dict[int, str]:
         if not current_user.settings['module_notes']:  # pragma no cover
             return {}
         sql = "SELECT entity_id, text FROM web.user_notes WHERE user_id = %(user_id)s;"

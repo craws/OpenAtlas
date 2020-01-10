@@ -7,11 +7,11 @@ from flask_wtf import FlaskForm
 from openatlas import app, logger
 
 
-class ContentMapper:
+class Content:
 
     @staticmethod
-    def get_content() -> Dict:
-        content: dict = {}
+    def get_content() -> Dict[str, Dict[str, str]]:
+        content: Dict[str, Dict[str, str]] = {}
         for name in ['intro', 'legal_notice', 'contact']:
             content[name] = {}
             for language in app.config['LANGUAGES'].keys():
@@ -23,7 +23,7 @@ class ContentMapper:
 
     @staticmethod
     def get_translation(name: str) -> str:
-        translations = ContentMapper.get_content()[name]
+        translations = Content.get_content()[name]
         if translations[session['language']]:  # pragma: no cover
             return translations[session['language']]
         return translations[session['settings']['default_language']]

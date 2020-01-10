@@ -1,7 +1,7 @@
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity
 from tests.base import TestBaseCase
 
 
@@ -12,7 +12,7 @@ class NoteTest(TestBaseCase):
             self.login()
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                actor = EntityMapper.insert('E21', 'Ripley')
+                actor = Entity.insert('E21', 'Ripley')
             rv = self.app.get(url_for('note_insert', entity_id=actor.id))
             assert b'Note *' in rv.data
             rv = self.app.post(url_for('note_insert', entity_id=actor.id),

@@ -10,9 +10,9 @@ from wtforms import SelectField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.models.content import ContentMapper
-from openatlas.models.entity import EntityMapper
-from openatlas.models.user import UserMapper
+from openatlas.models.content import Content
+from openatlas.models.entity import Entity
+from openatlas.models.user import User
 from openatlas.util.changelog import Changelog
 from openatlas.util.table import Table
 from openatlas.util.util import (bookmark_toggle, format_date, link, required_group, send_mail,
@@ -40,26 +40,26 @@ def index() -> str:
                               defs='[{className: "dt-body-right", targets: [2,3]}]')}
     if current_user.is_authenticated and hasattr(current_user, 'bookmarks'):
         for entity_id in current_user.bookmarks:
-            entity = EntityMapper.get_by_id(entity_id)
+            entity = Entity.get_by_id(entity_id)
             tables['bookmarks'].rows.append([link(entity), g.classes[entity.class_.code].name,
                                              entity.first, entity.last,
                                              bookmark_toggle(entity.id, True)])
-        for entity_id, text in UserMapper.get_notes().items():
-            entity = EntityMapper.get_by_id(entity_id)
+        for entity_id, text in User.get_notes().items():
+            entity = Entity.get_by_id(entity_id)
             tables['notes'].rows.append([link(entity), g.classes[entity.class_.code].name,
                                         entity.first, entity.last, truncate_string(text)])
-        for name, count in EntityMapper.get_overview_counts().items():
+        for name, count in Entity.get_overview_counts().items():
             if count:
                 count = format_number(count) if count else ''
                 url = url_for(name + '_index') if name != 'find' else url_for('place_index')
                 tables['overview'].rows.append([
                     '<a href="' + url + '">' + uc_first(_(name)) + '</a>', count])
-        for entity in EntityMapper.get_latest(8):
+        for entity in Entity.get_latest(8):
             tables['latest'].rows.append([
                 link(entity), g.classes[entity.class_.code].name,
                 entity.first, entity.last, format_date(entity.created),
                 link(logger.get_log_for_advanced_view(entity.id)['creator'])])
-    intro = ContentMapper.get_translation('intro')
+    intro = Content.get_translation('intro')
     return render_template('index/index.html', intro=intro, tables=tables)
 
 
@@ -91,8 +91,7 @@ def index_feedback() -> Union[str, Response]:
 
 @app.route('/overview/content/<item>')
 def index_content(item: str) -> str:
-    return render_template('index/content.html', text=ContentMapper.get_translation(item),
-                           title=item)
+    return render_template('index/content.html', text=Content.get_translation(item), title=item)
 
 
 @app.route('/overview/credits')
@@ -132,7 +131,7 @@ def index_changelog() -> str:
 
 @app.route('/unsubscribe/<code>')
 def index_unsubscribe(code: str) -> str:
-    user = UserMapper.get_by_unsubscribe_code(code)
+    user = User.get_by_unsubscribe_code(code)
     text = _('unsubscribe link not valid')
     if user:  # pragma: no cover
         user.settings['newsletter'] = ''

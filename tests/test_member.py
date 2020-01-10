@@ -1,8 +1,8 @@
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
-from openatlas.models.link import LinkMapper
+from openatlas.models.entity import Entity
+from openatlas.models.link import Link
 from tests.base import TestBaseCase
 
 
@@ -13,8 +13,8 @@ class MemberTests(TestBaseCase):
             self.login()
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                actor = EntityMapper.insert('E21', 'Ripley')
-                group = EntityMapper.insert('E74', 'Space Marines')
+                actor = Entity.insert('E21', 'Ripley')
+                group = Entity.insert('E74', 'Space Marines')
 
             # Add membership
             rv = self.app.get(url_for('member_insert', origin_id=group.id))
@@ -48,7 +48,7 @@ class MemberTests(TestBaseCase):
             # Update
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                link_id = LinkMapper.get_links(group.id, 'P107')[0].id
+                link_id = Link.get_links(group.id, 'P107')[0].id
             rv = self.app.get(url_for('member_update', id_=link_id, origin_id=group.id))
             assert b'Ripley' in rv.data
             rv = self.app.post(

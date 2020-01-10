@@ -1,15 +1,13 @@
 # This script is for developing purposes and is not needed to install OpenAtlas.
 #
 # CIDOC CRM is used as basis for the underlying data model of OpenAtlas.
-# Currently we are using CIDOC CRM v6.2.1
-# The rdfs file was downloaded from http://www.cidoc-crm.org/versions-of-the-cidoc-crm
-
-# In this script the rdfs is parsed and entered to a PostgreSQL database
+# Currently we are using CIDOC CRM 6.2.1 from http://www.cidoc-crm.org/versions-of-the-cidoc-crm
+#
+# The script parses the rdfs file and imports it to a PostgreSQL database.
 # Installation of needed package: # apt-get install python3-rdflib
 
-# This script was written for one use only, there sure is room for improvement if needed again ;)
-
 import time
+from typing import Dict, List, Optional
 
 import psycopg2.extras
 from rdflib import URIRef
@@ -28,7 +26,7 @@ DATABASE_HOST = 'localhost'
 DATABASE_PASS = 'CHANGE ME'
 
 
-def connect():
+def connect() -> psycopg2.connect:
     try:
         connection_ = psycopg2.connect(database=DATABASE_NAME, user=DATABASE_USER,
                                        password=DATABASE_PASS, port=DATABASE_PORT,
@@ -48,18 +46,18 @@ class Item:
         self.code = code
         self.name = name
         self.comment = comment
-        self.name_inverse = None
-        self.label: dict = {}
-        self.sub_class_of: list = []
-        self.sub_property_of: list = []
+        self.name_inverse: Optional[str] = None
+        self.label: Dict[str, str] = {}
+        self.sub_class_of: List[str] = []
+        self.sub_property_of: List[str] = []
 
 
-def import_cidoc():  # pragma: no cover
+def import_cidoc() -> None:  # pragma: no cover
 
     start = time.time()
     classes = {}
-    properties = {}
-    properties_inverse = {}
+    properties: Dict[str, Item] = {}
+    properties_inverse: Dict[str, Item] = {}
     graph = Graph()
     graph.parse(FILENAME, format='application/rdf+xml')
 

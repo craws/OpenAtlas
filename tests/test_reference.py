@@ -1,7 +1,7 @@
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
+from openatlas.models.entity import Entity
 from tests.base import TestBaseCase
 
 
@@ -21,7 +21,7 @@ class ReferenceTest(TestBaseCase):
             rv = self.app.post(url_for('reference_insert', code='external_reference'), data=data)
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                reference = EntityMapper.get_by_id(rv.location.split('/')[-1])
+                reference = Entity.get_by_id(rv.location.split('/')[-1])
             data['continue_'] = 'yes'
             rv = self.app.post(url_for('reference_insert', code='external_reference'),
                                data=data, follow_redirects=True)
@@ -40,7 +40,7 @@ class ReferenceTest(TestBaseCase):
             # Reference link
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                batman = EntityMapper.insert('E21', 'Batman')
+                batman = Entity.insert('E21', 'Batman')
             rv = self.app.get(url_for('reference_add', id_=reference.id, class_name='actor'))
             assert b'Batman' in rv.data
             rv = self.app.post(url_for('reference_add', id_=reference.id, class_name='actor'),
@@ -51,7 +51,7 @@ class ReferenceTest(TestBaseCase):
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 link_id = batman.get_links('P67', True)[0].id
-                file = EntityMapper.insert('E31', 'The X-Files', 'file')
+                file = Entity.insert('E31', 'The X-Files', 'file')
                 file.link('P67', reference)
             rv = self.app.post(
                 url_for('reference_link_update', link_id=link_id, origin_id=reference.id),

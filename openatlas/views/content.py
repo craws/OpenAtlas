@@ -8,7 +8,7 @@ from werkzeug.wrappers import Response
 from wtforms import TextAreaField
 
 from openatlas import app
-from openatlas.models.content import ContentMapper
+from openatlas.models.content import Content
 from openatlas.util import util
 from openatlas.util.table import Table
 from openatlas.util.util import required_group
@@ -22,7 +22,7 @@ class ContentForm(FlaskForm):  # type: ignore
 @required_group('manager')
 def content_index() -> str:
     table = Table(['name'] + [language for language in app.config['LANGUAGES'].keys()] + ['text'])
-    for item, languages in ContentMapper.get_content().items():
+    for item, languages in Content.get_content().items():
         url = url_for('content_view', item=item)
         content = ['<a href="' + url + '">' + util.uc_first(_(item)) + '</a>']
         html_ok = '<img src="/static/images/icons/dialog-apply.png" alt="ok">'
@@ -36,7 +36,7 @@ def content_index() -> str:
 @app.route('/admin/content/view/<string:item>')
 @required_group('manager')
 def content_view(item: str) -> str:
-    return render_template('content/view.html', item=item, content=ContentMapper.get_content())
+    return render_template('content/view.html', item=item, content=Content.get_content())
 
 
 @app.route('/admin/content/update/<string:item>', methods=["GET", "POST"])
@@ -47,10 +47,10 @@ def content_update(item: str) -> Union[str, Response]:
         setattr(ContentForm, language, TextAreaField())
     form = ContentForm()
     if form.validate_on_submit():
-        ContentMapper.update_content(item, form)
+        Content.update_content(item, form)
         flash(_('info update'), 'info')
         return redirect(url_for('content_view', item=item))
-    content = ContentMapper.get_content()
+    content = Content.get_content()
     for language in languages:
         form.__getattribute__(language).data = content[item][language]
     return render_template('content/update.html', item=item, form=form, languages=languages)

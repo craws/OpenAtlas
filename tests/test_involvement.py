@@ -1,9 +1,9 @@
 from flask import url_for
 
 from openatlas import app
-from openatlas.models.entity import EntityMapper
-from openatlas.models.link import LinkMapper
-from openatlas.models.node import NodeMapper
+from openatlas.models.entity import Entity
+from openatlas.models.link import Link
+from openatlas.models.node import Node
 from tests.base import TestBaseCase
 
 
@@ -19,8 +19,8 @@ class InvolvementTests(TestBaseCase):
             event_id = int(rv.location.split('/')[-1])
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                actor = EntityMapper.insert('E21', 'Captain Miller')
-                involvement = NodeMapper.get_hierarchy_by_name('Involvement')
+                actor = Entity.insert('E21', 'Captain Miller')
+                involvement = Node.get_hierarchy('Involvement')
 
             # Add involvement
             rv = self.app.get(url_for('involvement_insert', origin_id=actor.id))
@@ -42,7 +42,7 @@ class InvolvementTests(TestBaseCase):
             # Update involvement
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                link_id = LinkMapper.get_links(event_id, 'P22')[0].id
+                link_id = Link.get_links(event_id, 'P22')[0].id
             rv = self.app.get(url_for('involvement_update', id_=link_id, origin_id=event_id))
             assert b'Captain' in rv.data
             rv = self.app.post(

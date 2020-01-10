@@ -5,7 +5,7 @@ from flask_babel import lazy_gettext as _
 
 from openatlas import app
 
-VERSION = '4.0.0'
+VERSION = '4.1.0'
 DEMO_MODE = False  # If in demo mode some options are disabled and the login form is pre filled
 
 LANGUAGES = {'en': 'English', 'de': 'Deutsch'}
@@ -24,7 +24,7 @@ SECRET_KEY = 'CHANGE ME'
 DISPLAY_FILE_EXTENSIONS = ['bmp', 'gif', 'ico', 'jpeg', 'jpg', 'png', 'svg']
 
 # Files with these extension are selectable for import, it would make no sense to overwrite them
-IMPORT_FILE_EXTENSIONS = ['csv', 'xls', 'xlsx']
+IMPORT_FILE_EXTENSIONS = ['csv']
 
 # Paths are implemented operating system independent using pathlib.
 # If you want to override them (in instance/production.py) either use them like here

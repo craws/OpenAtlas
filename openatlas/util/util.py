@@ -5,12 +5,13 @@ import os
 import re
 import smtplib
 from collections import OrderedDict
-from datetime import datetime
+from datetime import datetime, timedelta
 from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
 from html.parser import HTMLParser
-from typing import Any, List, Optional, TYPE_CHECKING, Union
+from os.path import basename
+from typing import Any, Dict, List, Optional, TYPE_CHECKING, Tuple, Union
 
 import numpy
 from flask import abort, flash, g, request, session, url_for
@@ -22,14 +23,14 @@ from werkzeug.utils import redirect
 
 import openatlas
 from openatlas import app
-from openatlas.models.classObject import ClassObject
-from openatlas.models.date import DateMapper
-from openatlas.models.property import Property
+from openatlas.models.date import Date
+from openatlas.models.model import CidocClass, CidocProperty
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
     from openatlas.models.imports import Project
     from openatlas.models.user import User
+    from openatlas.models.link import Link
 
 
 def convert_size(size_bytes: int) -> str:
@@ -109,7 +110,7 @@ class MLStripper(HTMLParser):
         self.reset()
         self.strict = False
         self.convert_charrefs = True
-        self.fed: list = []
+        self.fed: List[str] = []
 
     def handle_data(self, d: Any) -> None:
         self.fed.append(d)
@@ -119,6 +120,8 @@ class MLStripper(HTMLParser):
 
 
 def sanitize(string: Optional[str], mode: Optional[str] = None) -> str:
+    if not string:
+        return ''
     if mode == 'node':
         # Remove all characters from a string except letters, numbers and spaces
         return re.sub(r'([^\s\w]|_)+', '', string).strip()
@@ -130,10 +133,10 @@ def sanitize(string: Optional[str], mode: Optional[str] = None) -> str:
     return re.sub('[^A-Za-z0-9]+', '', string).strip()
 
 
-def get_file_stats(path: Optional[str] = app.config['UPLOAD_FOLDER_PATH']) -> dict:
+def get_file_stats(path: str = app.config['UPLOAD_FOLDER_PATH']) -> Dict[Union[int, str], Any]:
     """ Build a dict with file ids and stats from files in given directory.
         It's much faster to do this in one call for every file."""
-    file_stats = {}
+    file_stats: Dict[Union[int, str], Any] = {}
     with os.scandir(path) as it:
         for file in it:
             split_name = os.path.splitext(file.name)
@@ -150,11 +153,13 @@ def display_remove_link(url: str, name: str) -> str:
     return '<a ' + confirm + ' href="' + url + '">' + uc_first(_('remove')) + '</a>'
 
 
-def add_type_data(entity: 'Entity', data: list, location: Optional['Entity'] = None) -> list:
-    type_data: OrderedDict = OrderedDict()
+def add_type_data(entity: 'Entity',
+                  data: List[Tuple[str, Optional[str]]],
+                  location: Optional['Entity'] = None) -> List[Tuple[str, Optional[str]]]:
     # Nodes
     if location:
         entity.nodes.update(location.nodes)  # Add location types
+    type_data: OrderedDict[str, Any] = OrderedDict()
     for node, node_value in entity.nodes.items():
         root = g.nodes[node.root[-1]]
         name = 'type' if root.name in app.config['BASE_TYPES'] else root.name
@@ -179,7 +184,8 @@ def add_type_data(entity: 'Entity', data: list, location: Optional['Entity'] = N
     return data
 
 
-def add_system_data(entity: 'Entity', data: list) -> list:
+def add_system_data(entity: 'Entity',
+                    data: List[Tuple[str, Optional[str]]]) -> List[Tuple[str, Optional[str]]]:
     # Additional info for advanced layout
     if hasattr(current_user, 'settings') and current_user.settings['layout'] == 'advanced':
         data.append((uc_first(_('class')), link(entity.class_)))
@@ -197,12 +203,13 @@ def add_system_data(entity: 'Entity', data: list) -> list:
     return data
 
 
-def get_entity_data(entity: 'Entity', location: Optional['Entity'] = None) -> list:
+def get_entity_data(entity: 'Entity',
+                    location: Optional['Entity'] = None) -> List[Tuple[str, Optional[str]]]:
     """
     Return related entity information for a table for view.
     The location parameter is for places which have a location attached.
     """
-    data = []
+    data: List[Tuple[str, Optional[str]]] = []
     # Aliases
     if entity.aliases:
         data.append((uc_first(_('alias')), '<br>'.join(entity.aliases.values())))
@@ -213,10 +220,10 @@ def get_entity_data(entity: 'Entity', location: Optional['Entity'] = None) -> li
     if entity.class_.code == 'E9':  # Add places to dates if it's a move
         place_from = entity.get_linked_entity('P27')
         if place_from:
-            from_link = link(place_from.get_linked_entity('P53', True)) + ' '
+            from_link = link(place_from.get_linked_entity_safe('P53', True)) + ' '
         place_to = entity.get_linked_entity('P26')
         if place_to:
-            to_link = link(place_to.get_linked_entity('P53', True)) + ' '
+            to_link = link(place_to.get_linked_entity_safe('P53', True)) + ' '
     data.append((uc_first(_('begin')), (from_link if from_link else '') +
                  format_entry_begin(entity)))
     data.append((uc_first(_('end')), (to_link if to_link else '') + format_entry_end(entity)))
@@ -243,7 +250,8 @@ def get_entity_data(entity: 'Entity', location: Optional['Entity'] = None) -> li
         if not entity.class_.code == 'E9':
             place = entity.get_linked_entity('P7')
             if place:
-                data.append((uc_first(_('location')), link(place.get_linked_entity('P53', True))))
+                data.append((uc_first(_('location')),
+                             link(place.get_linked_entity_safe('P53', True))))
 
         # Info for acquisitions
         if entity.class_.code == 'E8':
@@ -374,7 +382,7 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
     if not value:
         return ''
     if isinstance(value, numpy.datetime64):
-        date_ = DateMapper.datetime64_to_timestamp(value)
+        date_ = Date.datetime64_to_timestamp(value)
         return date_ if date_ else ''
     return value.date().isoformat()
 
@@ -396,7 +404,7 @@ def get_profile_image_table_link(file: 'Entity',
     return ''  # pragma: no cover - only happens for non image files
 
 
-def link(entity: Union['Entity', ClassObject, Property, 'Project', 'User']) -> str:
+def link(entity: Union['Entity', CidocClass, CidocProperty, 'Project', 'User']) -> str:
     # Builds an HTML link to entity view for display
     from openatlas.models.entity import Entity
     from openatlas.models.imports import Project
@@ -411,10 +419,10 @@ def link(entity: Union['Entity', ClassObject, Property, 'Project', 'User']) -> s
         style = '' if entity.active else 'class="inactive"'
         url = url_for('user_view', id_=entity.id)
         html = '<a ' + style + ' href="' + url + '">' + entity.username + '</a>'
-    elif isinstance(entity, ClassObject):
+    elif isinstance(entity, CidocClass):
         url = url_for('class_view', code=entity.code)
         html = '<a href="' + url + '">' + entity.code + '</a>'
-    elif isinstance(entity, Property):
+    elif isinstance(entity, CidocProperty):
         url = url_for('property_view', code=entity.code)
         html = '<a href="' + url + '">' + entity.code + '</a>'
     elif isinstance(entity, Entity):
@@ -423,7 +431,7 @@ def link(entity: Union['Entity', ClassObject, Property, 'Project', 'User']) -> s
     return html
 
 
-def truncate_string(string: str, length: int = 40, span: bool = True) -> str:
+def truncate_string(string: Optional[str] = '', length: int = 40, span: bool = True) -> str:
     """
     Returns a truncates string with '..' at the end if it was longer than length
     Also adds a span title (for mouse over) with the original string if parameter "span" is True
@@ -437,9 +445,10 @@ def truncate_string(string: str, length: int = 40, span: bool = True) -> str:
     return '<span title="' + string.replace('"', '') + '">' + string[:length] + '..' + '</span>'
 
 
-def get_base_table_data(entity: 'Entity', file_stats: Optional[dict] = None) -> list:
+def get_base_table_data(entity: 'Entity',
+                        file_stats: Optional[Dict[Union[int, str], Any]] = None) -> List[str]:
     """ Returns standard table data for an entity"""
-    data: list = ['<br>'.join([link(entity)] + [
+    data: List[str] = ['<br>'.join([link(entity)] + [
         truncate_string(alias) for alias in entity.aliases.values()])]
     if entity.view_name in ['event', 'actor']:
         data.append(g.classes[entity.class_.code].name)
@@ -457,8 +466,8 @@ def get_base_table_data(entity: 'Entity', file_stats: Optional[dict] = None) -> 
             data.append(print_file_size(entity))
             data.append(print_file_extension(entity))
     if entity.view_name in ['event', 'actor', 'place']:
-        data.append(entity.first)
-        data.append(entity.last)
+        data.append(entity.first if entity.first else '')
+        data.append(entity.last if entity.last else '')
     if entity.view_name in ['source'] or entity.system_type == 'file':
         data.append(truncate_string(entity.description))
     return data
@@ -474,7 +483,7 @@ def was_modified(form: FlaskForm, entity: 'Entity') -> bool:  # pragma: no cover
     return True
 
 
-def format_entry_begin(entry: 'Entity', object_: Optional['Entity'] = None) -> str:
+def format_entry_begin(entry: Union['Entity', 'Link'], object_: Optional['Entity'] = None) -> str:
     html = link(object_) if object_ else ''
     if entry.begin_from:
         html += ', ' if html else ''
@@ -500,7 +509,7 @@ def format_entry_end(entry: 'Entity', object_: Optional['Entity'] = None) -> str
     return html
 
 
-def get_appearance(event_links: list) -> tuple:
+def get_appearance(event_links: List['Link']) -> Tuple[Optional[str], Optional[str]]:
     # Get first/last appearance from events for actors without begin/end
     first_year = None
     last_year = None
@@ -530,6 +539,28 @@ def get_appearance(event_links: list) -> tuple:
                 last_string = format_entry_end(event) + ' ' + _('at an') + ' ' + event_link
                 last_string += (' ' + _('in') + ' ' + link(link_.object_)) if link_.object_ else ''
     return first_string, last_string
+
+
+def get_backup_file_data() -> Dict[str, Any]:
+    path = app.config['EXPORT_FOLDER_PATH'].joinpath('sql')
+    latest_file = None
+    latest_file_date = None
+    for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
+        name = basename(file)
+        if name == '.gitignore':
+            continue
+        file_date = datetime.utcfromtimestamp(os.path.getmtime(path.joinpath(file)))
+        if not latest_file_date or file_date > latest_file_date:
+            latest_file = file
+            latest_file_date = file_date
+    file_data: Dict[str, Any] = {'backup_too_old': True}
+    if latest_file and latest_file_date:
+        yesterday = datetime.today() - timedelta(days=1)
+        file_data['file'] = latest_file
+        file_data['backup_too_old'] = True if yesterday > latest_file_date else False
+        file_data['size'] = convert_size(os.path.getsize(path.joinpath(latest_file)))
+        file_data['date'] = format_date(latest_file_date)
+    return file_data
 
 
 def is_float(value: Union[int, float]) -> bool:
