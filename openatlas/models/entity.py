@@ -308,8 +308,6 @@ class EntityMapper:
             return g.nodes[entity_id]
         sql = EntityMapper.build_sql(nodes, aliases) + ' WHERE e.id = %(id)s GROUP BY e.id;'
         g.execute(sql, {'id': entity_id})
-        if g.cursor.rowcount < 1:  # pragma: no cover
-            abort(418)
         entity = Entity(g.cursor.fetchone())
         if view_name and view_name != entity.view_name:  # Entity was called from wrong view, abort!
             logger.log('error', 'model',
