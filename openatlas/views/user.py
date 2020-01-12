@@ -88,10 +88,8 @@ def user_activity(user_id: int = 0) -> str:
             entity = link(Entity.get_by_id(row.entity_id))
         except AttributeError:  # pragma: no cover - entity already deleted
             entity = 'id ' + str(row.entity_id)
-        try:
-            user = link(User.get_by_id(row.user_id))
-        except AttributeError:  # pragma: no cover - user already deleted
-            user = 'id ' + str(row.user_id)
+        user = User.get_by_id(row.user_id)
+        user = link(user) if user else 'id ' + str(row.user_id)
         table.rows.append([format_date(row.created), user, _(row.action), entity])
     return render_template('user/activity.html', table=table, form=form)
 

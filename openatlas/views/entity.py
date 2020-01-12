@@ -33,9 +33,13 @@ def entity_view(id_: int) -> Union[str, Response]:
             return node_view(g.nodes[id_])
         else:
             return redirect(url_for('node_index') + '#tab-' + str(id_))
-    entity = Entity.get_by_id(id_, nodes=True, aliases=True)
+    try:
+        entity = Entity.get_by_id(id_, nodes=True, aliases=True)
+    except AttributeError:
+        abort(418)
+        return ''  # pragma: no cover
     if not entity.view_name:  # pragma: no cover
-        flash(_("This entity can't be viewed directly"), 'error')
+        flash(_("This entity can't be viewed directly."), 'error')
         abort(400)
     return getattr(sys.modules[__name__], '{name}_view'.format(name=entity.view_name))(entity)
 
