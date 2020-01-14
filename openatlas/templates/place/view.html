@@ -2,9 +2,9 @@
 {% block title_name %}- {{ object_.name }}{% endblock %}
 {% block breadcrumb %}
     <a href="{{ url_for('place_index') }}">{{ _('place')|uc_first }}</a>
-    {{ '> ' + place|link|safe if place else '' }}
-    {{ '> ' + feature|link|safe if feature else '' }}
-    {{ '> ' + stratigraphic_unit|link|safe if stratigraphic_unit else '' }}
+    {{ '> ' + structure['place']|link|safe if structure['place'] else '' }}
+    {{ '> ' + structure['feature']|link|safe if structure['feature'] else '' }}
+    {{ '> ' + structure['stratigraphic_unit']|link|safe if structure['stratigraphic_unit'] else '' }}
     > {{ object_.name|truncate_string|safe }}
 {% endblock %}
 {% block content %}

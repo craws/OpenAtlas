@@ -10,6 +10,7 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
+from openatlas.models.archeology import get_structure
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -378,22 +379,9 @@ def place_view(object_: Entity) -> str:
         data = get_base_table_data(entity)
         data.append(truncate_string(entity.description))
         tables[entity.system_type.replace(' ', '-')].rows.append(data)
-    place = None
-    feature = None
-    stratigraphic_unit = None
-    siblings: List[Entity] = []
-    if object_.system_type == 'find':
-        stratigraphic_unit = object_.get_linked_entity_safe('P46', inverse=True)
-        feature = stratigraphic_unit.get_linked_entity_safe('P46', inverse=True)
-        place = feature.get_linked_entity_safe('P46', inverse=True)
-        # Add finds of same stratigraphic unit above to subunits
-        siblings = stratigraphic_unit.get_linked_entities('P46')
-    elif object_.system_type == 'stratigraphic unit':
-        feature = object_.get_linked_entity_safe('P46', inverse=True)
-        place = feature.get_linked_entity_safe('P46', inverse=True)
-    elif object_.system_type == 'feature':
-        place = object_.get_linked_entity_safe('P46', inverse=True)
-    gis_data = Gis.get_all([object_], subunits, siblings)
+    structure = get_structure(object_)
+
+    gis_data = Gis.get_all([object_], subunits, structure['siblings'])
     if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]' \
             and gis_data['gisLineSelected'] == '[]':
         gis_data = {}
@@ -404,9 +392,7 @@ def place_view(object_: Entity) -> str:
                            overlays=overlays,
                            info=get_entity_data(object_, location),
                            gis_data=gis_data,
-                           place=place,
-                           feature=feature,
-                           stratigraphic_unit=stratigraphic_unit,
+                           structure=structure,
                            profile_image_id=profile_image_id)
 
 
