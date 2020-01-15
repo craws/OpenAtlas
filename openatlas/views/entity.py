@@ -10,12 +10,12 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.models.archeology import get_structure
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.models.overlay import Overlay
+from openatlas.models.place import get_structure
 from openatlas.models.user import User
 from openatlas.util.table import Table
 from openatlas.util.util import (add_system_data, add_type_data, display_remove_link,
