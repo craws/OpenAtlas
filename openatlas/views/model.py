@@ -172,5 +172,7 @@ def model_network() -> str:
     for code in ['P107', 'P24', 'P23', 'P11', 'P14', 'P7', 'P74', 'P67', 'OA7', 'OA8', 'OA9']:
         form.properties.choices.append((code, g.properties[code].name))
         params['properties'][code] = {'active': (code in form.properties.data)}
-    return render_template('model/network.html', form=form, network_params=params,
+    return render_template('model/network.html',
+                           form=form,
+                           network_params=params,
                            json_data=Network.get_network_json(params))

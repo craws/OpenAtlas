@@ -20,6 +20,10 @@ div.tabs-container .ui-state-active a {
     color: #666666;
 }
 
+#visualization canvas {
+    background-color: #ffffff;
+}
+
 #menu div a,
 #breadcrumb a,
 #header-menu span,

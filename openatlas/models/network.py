@@ -9,7 +9,6 @@ class Network:
 
     @staticmethod
     def get_network_json(params: Dict[str, Any]) -> Optional[str]:
-        """ Returns JSON data for d3.js"""
         properties = [code for code, param in params['properties'].items() if param['active']]
         classes = [code for code, param in params['classes'].items() if param['active']]
         if not classes:
@@ -20,14 +19,19 @@ class Network:
         edges = ''
         if properties:
             sql = """
-                SELECT l.domain_id, l.range_id FROM model.link l
+                SELECT l.id, l.domain_id, l.range_id FROM model.link l
                 JOIN model.entity e ON l.domain_id = e.id
                 WHERE property_code IN %(properties)s
                     AND (e.system_type IS NULL OR e.system_type != 'file');"""
             g.execute(sql, {'properties': tuple(properties)})
             for row in g.cursor.fetchall():
-                edges += "{{'source':'{domain_id}','target':'{range_id}'}},".format(
-                    domain_id=row.domain_id, range_id=row.range_id)
+                edges += """{{
+                    'source':'{domain_id}',
+                    'target':'{range_id}',
+                    'id':'{link_id}'}},""".format(
+                    domain_id=row.domain_id,
+                    range_id=row.range_id,
+                    link_id=row.id)
                 entities.update([row.domain_id, row.range_id])
 
         # Get entities
@@ -38,7 +42,7 @@ class Network:
         for row in g.cursor.fetchall():
             if params['options']['orphans'] or row.id in entities:
                 entities_already.add(row.id)
-                nodes += """{{'id':'{id}','name':'{name}','color':'{color}'}},""".format(
+                nodes += """{{'id':'{id}','label':'{name}','color':'{color}'}},""".format(
                     id=row.id,
                     name=truncate_string(row.name.replace("'", ""), span=False),
                     color=params['classes'][row.class_code]['color'])
@@ -53,8 +57,10 @@ class Network:
                 color = ''
                 if row.class_code in params['classes']:  # pragma: no cover
                     color = params['classes'][row.class_code]['color']
-                nodes += """{{'id':'{id}','name':'{name}','color':'{color}'}},""".format(
-                    id=row.id, color=color,
+                nodes += """{{'id':'{id}','label':'{name}','color':'{color}'}},""".format(
+                    id=row.id,
+                    color=color,
                     name=truncate_string(row.name.replace("'", ""), span=False))
 
-        return "graph = {'nodes': [" + nodes + "],  links: [" + edges + "]};" if nodes else None
+        return "{{nodes: [{nodes}], edges: [{edges}], types: {{nodes: [], edges: []}} }};".format(
+            nodes=nodes, edges=edges)

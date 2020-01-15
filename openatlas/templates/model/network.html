@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+{{ _('network')|uc_first }}
+{% endblock %}
+{% block content %}
+
+{% if json_data %}
+    <script src="/static/vendor/network/react.production.min.js"></script>
+    <script src="/static/vendor/network/react-dom.production.min.js"></script>
+    <script src="/static/vendor/network/three.min.js"></script>
+    <script src="/static/vendor/network/network-visualization.umd.js"></script>
+
+    <div id="visualization" style="position: relative; height: 600px;"></div>
+    <script>
+        const graph = {{ json_data|safe }}
+        ReactDOM.render(
+            React.createElement(NetworkVisualization.SelectionControls, {
+                dimensions: 2,
+                onNodeClick: function({ node }) { console.log(node.label) },
+                showNeighborsOnly: true,
+                graph,
+                width: 900,
+                height: 600,
+            }),
+            document.getElementById('visualization')
+        )
+    </script>
+{% else %}
+    <h2 style="float:right;">{{ _('no data to display')|uc_first }}</h2>
+{% endif %}
+
+{% endblock %}
