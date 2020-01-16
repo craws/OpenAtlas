@@ -176,3 +176,30 @@ def model_network() -> str:
                            form=form,
                            network_params=params,
                            json_data=Network.get_network_json(params))
+
+
+@app.route('/overview/network2/<int:dimensions>', methods=["GET", "POST"])
+@required_group('readonly')
+def model_network2(dimensions: int) -> str:
+    form = NetworkForm()
+    form.classes.choices = []
+    form.properties.choices = []
+    params: Dict[str, Any] = {'classes': {},
+                              'properties': {},
+                              'options': {'orphans': form.orphans.data,
+                                          'width': form.width.data,
+                                          'height': form.height.data,
+                                          'charge': form.charge.data,
+                                          'distance': form.distance.data}}
+    for code in ['E21', 'E7', 'E31', 'E33', 'E40', 'E74', 'E53', 'E18', 'E8', 'E84']:
+        form.classes.choices.append((code, g.classes[code].name))
+        params['classes'][code] = {'active': (code in form.classes.data),
+                                   'color': getattr(form, 'color_' + code).data}
+    for code in ['P107', 'P24', 'P23', 'P11', 'P14', 'P7', 'P74', 'P67', 'OA7', 'OA8', 'OA9']:
+        form.properties.choices.append((code, g.properties[code].name))
+        params['properties'][code] = {'active': (code in form.properties.data)}
+    return render_template('model/network2.html',
+                           form=form,
+                           network_params=params,
+                           dimensions=dimensions,
+                           json_data=Network.get_network_json2(params))
