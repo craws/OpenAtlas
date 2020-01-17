@@ -1,6 +1,6 @@
 import os
 import sys
-from typing import Any, Dict, List, Optional, Tuple, Union
+from typing import Any, List, Optional, Tuple, Union
 
 from flask import flash, g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -33,9 +33,13 @@ def entity_view(id_: int) -> Union[str, Response]:
             return node_view(g.nodes[id_])
         else:
             return redirect(url_for('node_index') + '#tab-' + str(id_))
-    entity = Entity.get_by_id(id_, nodes=True, aliases=True)
+    try:
+        entity = Entity.get_by_id(id_, nodes=True, aliases=True)
+    except AttributeError:
+        abort(418)
+        return ''  # pragma: no cover
     if not entity.view_name:  # pragma: no cover
-        flash(_("This entity can't be viewed directly"), 'error')
+        flash(_("This entity can't be viewed directly."), 'error')
         abort(400)
     return getattr(sys.modules[__name__], '{name}_view'.format(name=entity.view_name))(entity)
 
@@ -179,8 +183,12 @@ def actor_view(actor: Entity) -> str:
     if gis_data:
         if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]':
             gis_data = None
-    return render_template('actor/view.html', actor=actor, info=info, tables=tables,
-                           gis_data=gis_data, profile_image_id=profile_image_id)
+    return render_template('actor/view.html',
+                           actor=actor,
+                           info=info,
+                           tables=tables,
+                           gis_data=gis_data,
+                           profile_image_id=profile_image_id)
 
 
 def event_view(event: Entity) -> str:
@@ -234,8 +242,11 @@ def event_view(event: Entity) -> str:
     objects = []
     for location in event.get_linked_entities(['P7', 'P26', 'P27']):
         objects.append(location.get_linked_entity_safe('P53', True))
-    return render_template('event/view.html', event=event, tables=tables,
-                           info=get_entity_data(event), profile_image_id=profile_image_id,
+    return render_template('event/view.html',
+                           event=event,
+                           tables=tables,
+                           info=get_entity_data(event),
+                           profile_image_id=profile_image_id,
                            gis_data=Gis.get_all(objects) if objects else None)
 
 
@@ -263,8 +274,11 @@ def file_view(file: Entity) -> str:
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=file.id)
             data.append(display_remove_link(unlink_url + '#tab-reference', link_.domain.name))
         tables['reference'].rows.append(data)
-    return render_template('file/view.html', missing_file=False if path else True, entity=file,
-                           info=get_entity_data(file), tables=tables,
+    return render_template('file/view.html',
+                           missing_file=False if path else True,
+                           entity=file,
+                           info=get_entity_data(file),
+                           tables=tables,
                            preview=True if path and preview_file(path) else False,
                            filename=os.path.basename(path) if path else False)
 
@@ -286,7 +300,9 @@ def object_view(object_: Entity) -> str:
             data.append(
                 display_remove_link(url + '#tab-' + link_.range.table_name, link_.range.name))
         tables['event'].rows.append(data)
-    return render_template('object/view.html', object_=object_, tables=tables,
+    return render_template('object/view.html',
+                           object_=object_,
+                           tables=tables,
                            info=get_entity_data(object_))
 
 
@@ -306,12 +322,10 @@ def place_view(object_: Entity) -> str:
     if object_.system_type == 'stratigraphic unit':
         tables['find'] = Table(Table.HEADERS['place'] + [_('description')])
     profile_image_id = object_.get_profile_image_id()
-    overlays: Dict[int, Overlay] = {}
-    if current_user.settings['module_map_overlay']:
-        overlays = Overlay.get_by_object(object_)
-        if is_authorized('editor'):
-            tables['file'].header.append(uc_first(_('overlay')))
+    if current_user.settings['module_map_overlay'] and is_authorized('editor'):
+        tables['file'].header.append(uc_first(_('overlay')))
 
+    overlays = Overlay.get_by_object(object_)
     for link_ in object_.get_links('P67', inverse=True):
         domain = link_.domain
         data = get_base_table_data(domain)
@@ -351,12 +365,6 @@ def place_view(object_: Entity) -> str:
     for event in object_.get_linked_entities('P24', inverse=True):
         if event.id not in event_ids:  # Don't add again if already in table
             tables['event'].rows.append(get_base_table_data(event))
-    has_subunits = False
-    for entity in object_.get_linked_entities('P46', nodes=True):
-        has_subunits = True
-        data = get_base_table_data(entity)
-        data.append(truncate_string(entity.description))
-        tables[entity.system_type.replace(' ', '-')].rows.append(data)
     for link_ in location.get_links(['P74', 'OA8', 'OA9'], inverse=True):
         actor = Entity.get_by_id(link_.domain.id, view_name='actor')
         tables['actor'].rows.append([link(actor),
@@ -364,26 +372,42 @@ def place_view(object_: Entity) -> str:
                                      actor.class_.name,
                                      actor.first,
                                      actor.last])
-    gis_data: Dict[str, List[Any]] = Gis.get_all([object_])
-    if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]' \
-            and gis_data['gisLineSelected'] == '[]':
-        gis_data = {}
+    # Archeological subunits
+    subunits = object_.get_linked_entities('P46', nodes=True)
+    for entity in subunits:
+        data = get_base_table_data(entity)
+        data.append(truncate_string(entity.description))
+        tables[entity.system_type.replace(' ', '-')].rows.append(data)
     place = None
     feature = None
     stratigraphic_unit = None
+    siblings: List[Entity] = []
     if object_.system_type == 'find':
-        stratigraphic_unit = object_.get_linked_entity_safe('P46', True)
-        feature = stratigraphic_unit.get_linked_entity_safe('P46', True)
-        place = feature.get_linked_entity_safe('P46', True)
+        stratigraphic_unit = object_.get_linked_entity_safe('P46', inverse=True)
+        feature = stratigraphic_unit.get_linked_entity_safe('P46', inverse=True)
+        place = feature.get_linked_entity_safe('P46', inverse=True)
+        # Add finds of same stratigraphic unit above to subunits
+        siblings = stratigraphic_unit.get_linked_entities('P46')
     elif object_.system_type == 'stratigraphic unit':
-        feature = object_.get_linked_entity_safe('P46', True)
-        place = feature.get_linked_entity_safe('P46', True)
+        feature = object_.get_linked_entity_safe('P46', inverse=True)
+        place = feature.get_linked_entity_safe('P46', inverse=True)
     elif object_.system_type == 'feature':
-        place = object_.get_linked_entity_safe('P46', True)
-    return render_template('place/view.html', object_=object_, tables=tables, overlays=overlays,
-                           info=get_entity_data(object_, location), gis_data=gis_data,
-                           place=place, feature=feature, stratigraphic_unit=stratigraphic_unit,
-                           has_subunits=has_subunits, profile_image_id=profile_image_id)
+        place = object_.get_linked_entity_safe('P46', inverse=True)
+    gis_data = Gis.get_all([object_], subunits, siblings)
+    if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]' \
+            and gis_data['gisLineSelected'] == '[]':
+        gis_data = {}
+
+    return render_template('place/view.html',
+                           object_=object_,
+                           tables=tables,
+                           overlays=overlays,
+                           info=get_entity_data(object_, location),
+                           gis_data=gis_data,
+                           place=place,
+                           feature=feature,
+                           stratigraphic_unit=stratigraphic_unit,
+                           profile_image_id=profile_image_id)
 
 
 def reference_view(reference: Entity) -> str:

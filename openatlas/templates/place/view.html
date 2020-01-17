@@ -33,7 +33,7 @@
         <div class="button-bar">
             {% if 'contributor'|is_authorized %}
                 <a href="{{ url_for('place_update', id_=object_.id) }}">{{ _('edit')|uc_first }}</a>
-                {% if not has_subunits %}
+                {% if not subunits %}
                     {{ object_|display_delete_link|safe }}
                 {% endif %}
             {% endif %}

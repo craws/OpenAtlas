@@ -107,10 +107,7 @@ def place_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
     elif origin and origin.system_type == 'feature':
         place = origin.get_linked_entity_safe('P46', True)
 
-    overlays = None
-    if origin and origin.class_.code == 'E18' and current_user.settings['module_map_overlay']:
-        overlays = Overlay.get_by_object(origin)
-
+    overlays = Overlay.get_by_object(origin) if origin and origin.class_.code == 'E18' else None
     return render_template('place/insert.html',
                            form=form,
                            title=title,
@@ -208,9 +205,6 @@ def place_update(id_: int) -> Union[str, Response]:
     elif object_.system_type == 'feature':
         place = object_.get_linked_entity_safe('P46', True)
 
-    overlays = Overlay.get_by_object(object_) if current_user.settings['module_map_overlay'] \
-        else None
-
     return render_template('place/update.html',
                            form=form,
                            object_=object_,
@@ -218,7 +212,7 @@ def place_update(id_: int) -> Union[str, Response]:
                            place=place,
                            feature=feature,
                            stratigraphic_unit=stratigraphic_unit,
-                           overlays=overlays,
+                           overlays=Overlay.get_by_object(object_),
                            geonames_buttons=geonames_buttons)
 
 
