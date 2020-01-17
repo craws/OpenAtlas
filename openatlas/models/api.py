@@ -38,7 +38,7 @@ class Api:
         geo = Geonames.get_geonames_link(entity)
         data: dict = {
             'type': type_,  # Todo: what if it's a person, event, ...
-            '@context': request.base_url,
+            '@context': app.config['API_SCHEMA'],
             'features': [{  # Todo: what if it's a person, event, ...
                 '@id': url_for('entity_view', id_=entity.id, _external=True),
                 'type': entity.system_type,  # Todo: 'feature' if place but what if else
@@ -63,7 +63,7 @@ class Api:
                     {'@id': 'https://thanados.openatlas.eu/display/112760.png',
                      'title': 'Map of the cemetery',
                      'license': 'cc:by-nc-nd/4.0/',
-                     '@context': 'https://thanados.openatlas.eu/api/v01/112760'}]}]}
+                     '@context': app.config['API_SCHEMA']}]}]}
 
         if type_ == 'FeatureCollection':
             # gis = Gis.get_all(entity)
