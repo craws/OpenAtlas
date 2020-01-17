@@ -1,3 +1,5 @@
+import os
+from pprint import pprint
 from typing import List, Dict, Any
 
 from flask import request, url_for
@@ -5,8 +7,10 @@ from flask import request, url_for
 from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
+from openatlas.models.gis import Gis
 from openatlas.models.link import Link
-from openatlas.util.util import format_date
+from openatlas.util.util import format_date, get_file_path
+from openatlas.views.file import display_file
 
 
 class Api:
@@ -24,6 +28,20 @@ class Api:
                           'relationTo': url_for('api_entity', id_=link.domain.id, _external=True),
                           'relationType': 'crm:' + link.property.code + '_' + link.property.name.replace(' ', '_')}, )
         return links
+
+    @staticmethod
+    def get_file(entity: Entity) -> List[Dict[str, str]]:
+        files = []
+        for link in Link.get_links(entity.id, inverse=True):
+            if link.domain.system_type == 'file':
+                path = get_file_path(link.domain.id)
+                filename = os.path.basename(path) if path else False
+                files.append({'@id': url_for('api_entity', id_=link.domain.id, _external=True),
+                              'title': link.domain.name,
+                              'license': 'cc:by-nc-nd/4.0/',  # Todo: Search for licence
+                              'url': url_for('display_file', filename=filename, _external=True)})
+
+        return files
 
     @staticmethod
     def get_entity(id_: int) -> Dict[str, Any]:
@@ -60,12 +78,10 @@ class Api:
                     {'@id': request.base_url,
                      'value': entity.description}],
                 'depictions': [
-                    {'@id': 'https://thanados.openatlas.eu/display/112760.png',
-                     'title': 'Map of the cemetery',
-                     'license': 'cc:by-nc-nd/4.0/',
-                     '@context': app.config['API_SCHEMA']}]}]}
+                    Api.get_file(entity)]}]}
 
         if type_ == 'FeatureCollection':
+            # gis = Gis.get_all(entity)
             # gis = Gis.get_all(entity)
             # location = entity.get_linked_entity('P53', nodes=True)
             # geonames = Geonames.get_geonames_link(entity)
@@ -76,6 +92,6 @@ class Api:
                     'coordinates': [15.643286705017092, 48.586735522177],
                     'classification': 'centerpoint',
                     'description': 'Point in the center of the cemetery',
-                    'title': 'Thunau centerpoint'}]}})
+                    'title': ''}]}})
 
         return data
