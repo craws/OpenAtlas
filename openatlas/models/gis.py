@@ -30,12 +30,12 @@ class Gis:
                                           'polygon': [],
                                           'polygon_point': []}
 
-        # Include GIS features of subunits which would be otherwise omitted
+        # Include GIS of subunits which would be otherwise omitted
         extra_ids = [0]
-        if objects and objects[0].system_type in ['place', 'feature', 'find', 'stratigraphic unit']:
+        if subunits or siblings:
             subunit_ids = [subunit.id for subunit in subunits]
             sibling_ids = [sibling.id for sibling in siblings] if siblings else []
-            extra_ids = [objects[0].id] + subunit_ids + sibling_ids
+            extra_ids = [objects[0].id if objects else 0] + subunit_ids + sibling_ids
 
         object_ids = [x.id for x in objects]
         polygon_point_sql = \

@@ -63,7 +63,7 @@ class Network:
     def get_network_json2(params: Dict[str, Any]) -> Optional[str]:
         properties = [code for code, param in params['properties'].items() if param['active']]
         classes = [code for code, param in params['classes'].items() if param['active']]
-        if not classes:
+        if not classes:  # pragma: no cover
             return None
 
         # Get edges

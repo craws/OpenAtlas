@@ -2,8 +2,8 @@
 {% block breadcrumb %}
     {% if origin %}
         <a href="{{ url_for(origin.view_name + '_index') }}">{{ _(origin.view_name)|uc_first }}</a>
-        {{ '> ' + place|link|safe if place else '' }}
-        {{ '> ' + feature|link|safe if feature else '' }}
+        {{ '> ' + structure['place']|link|safe if structure['place'] else '' }}
+        {{ '> ' + structure['feature']|link|safe if structure['feature'] else '' }}
         > {{ origin|link|safe }}
     {% else %}
         <a href="{{ url_for('place_index') }}">{{ _('place')|uc_first }}</a>

@@ -373,15 +373,13 @@ def place_view(object_: Entity) -> str:
                                      actor.class_.name,
                                      actor.first,
                                      actor.last])
-    # Archeological subunits
-    subunits = object_.get_linked_entities('P46', nodes=True)
-    for entity in subunits:
+    structure = get_structure(object_)
+    for entity in structure['subunits']:
         data = get_base_table_data(entity)
         data.append(truncate_string(entity.description))
         tables[entity.system_type.replace(' ', '-')].rows.append(data)
-    structure = get_structure(object_)
 
-    gis_data = Gis.get_all([object_], subunits, structure['siblings'])
+    gis_data = Gis.get_all([object_], structure['subunits'], structure['siblings'])
     if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]' \
             and gis_data['gisLineSelected'] == '[]':
         gis_data = {}
