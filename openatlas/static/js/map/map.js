@@ -7,6 +7,9 @@ newIcon = L.icon({iconUrl: '/static/images/map/marker-icon_new.png', iconAnchor:
 editIcon = L.icon({iconUrl: "/static/images/map/marker-icon_edit.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
 editedIcon = L.icon({iconUrl: "/static/images/map/marker-icon_edited.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
 grayMarker = L.icon({iconUrl: '/static/images/map/marker-icon-gray.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
+superMarker = L.icon({iconUrl: '/static/images/map/marker-icon-cyan.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
+subsMarker = L.icon({iconUrl: '/static/images/map/marker-icon-green.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
+siblingsMarker = L.icon({iconUrl: '/static/images/map/marker-icon-orange.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
 
 // Define base layers
 baseMaps = {
@@ -28,6 +31,12 @@ if (gisPointAll) {
         pointToLayer: function(feature, latlng) {
             if (window.location.pathname == '/place') {
                 return L.marker(latlng);
+            }
+            if (feature.properties.objectId == gisPointSuperId) {
+                return L.marker(latlng, {icon: superMarker});
+            }
+            if ( gisPointSubIds.includes(feature.properties.objectId)) {
+                return L.marker(latlng, {icon: subsMarker});
             }
             return L.marker(latlng, {icon: grayMarker});
         }

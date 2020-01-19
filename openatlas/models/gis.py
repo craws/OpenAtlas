@@ -18,6 +18,7 @@ class Gis:
 
     @staticmethod
     def get_all(objects: Optional[List[Entity]] = None,
+                super_id: Optional[int] = None,
                 subunits: Optional[List[Entity]] = None,
                 siblings: Optional[List[Entity]] = None) -> Dict[str, List[Any]]:
         if not objects:
@@ -31,11 +32,11 @@ class Gis:
                                           'polygon_point': []}
 
         # Include GIS of subunits which would be otherwise omitted
+        subunit_ids = [subunit.id for subunit in subunits]
+        sibling_ids = [sibling.id for sibling in siblings] if siblings else []
         extra_ids = [0]
         if subunits or siblings:
-            subunit_ids = [subunit.id for subunit in subunits]
-            sibling_ids = [sibling.id for sibling in siblings] if siblings else []
-            extra_ids = [objects[0].id if objects else 0] + subunit_ids + sibling_ids
+            extra_ids = [objects[0].id if objects else 0] + [super_id] + subunit_ids + sibling_ids
 
         object_ids = [x.id for x in objects]
         polygon_point_sql = \
@@ -96,6 +97,9 @@ class Gis:
                         all_['point'].append(polygon_point_item)
         return {'gisPointAll': json.dumps(all_['point']),
                 'gisPointSelected': json.dumps(selected['point']),
+                'gisPointSuperId': super_id,
+                'gisPointSubIds': subunit_ids,
+                'gisPointSiblingIds': sibling_ids,
                 'gisLineAll': json.dumps(all_['linestring']),
                 'gisLineSelected': json.dumps(selected['linestring']),
                 'gisPolygonAll': json.dumps(all_['polygon']),

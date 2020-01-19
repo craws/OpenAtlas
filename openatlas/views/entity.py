@@ -378,8 +378,7 @@ def place_view(object_: Entity) -> str:
         data = get_base_table_data(entity)
         data.append(truncate_string(entity.description))
         tables[entity.system_type.replace(' ', '-')].rows.append(data)
-
-    gis_data = Gis.get_all([object_], structure['subunits'], structure['siblings'])
+    gis_data = structure['gis_data']
     if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]' \
             and gis_data['gisLineSelected'] == '[]':
         gis_data = {}

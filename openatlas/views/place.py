@@ -101,14 +101,13 @@ def place_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
     if title == 'place':
         form.alias.append_entry('')
     structure = get_structure(origin)
-
     overlays = Overlay.get_by_object(origin) if origin and origin.class_.code == 'E18' else None
     return render_template('place/insert.html',
                            form=form,
                            title=title,
                            origin=origin,
                            structure=structure,
-                           gis_data=Gis.get_all([], structure['subunits']),
+                           gis_data=structure['gis_data'],
                            geonames_buttons=geonames_buttons,
                            overlays=overlays)
 
@@ -187,14 +186,11 @@ def place_update(id_: int) -> Union[str, Response]:
             exact_match = True if g.nodes[geonames_link.type.id].name == 'exact match' else False
             form.geonames_precision.data = exact_match
     structure = get_structure(object_)
-
     return render_template('place/update.html',
                            form=form,
                            object_=object_,
                            structure=structure,
-                           gis_data=Gis.get_all([object_],
-                                                structure['subunits'],
-                                                structure['siblings']),
+                           gis_data=structure['gis_data'],
                            overlays=Overlay.get_by_object(object_),
                            geonames_buttons=geonames_buttons)
 
