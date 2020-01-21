@@ -380,9 +380,10 @@ def place_view(object_: Entity) -> str:
         tables[entity.system_type.replace(' ', '-')].rows.append(data)
     gis_data = structure['gis_data']
     if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]' \
-            and gis_data['gisLineSelected'] == '[]':
+            and gis_data['gisLineSelected'] == '[]' and not structure['super_id']:
         gis_data = {}
-
+    #print(structure)
+    #print(gis_data)
     return render_template('place/view.html',
                            object_=object_,
                            tables=tables,

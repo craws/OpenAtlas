@@ -3,7 +3,7 @@
     var geoNamesUsername = '{{ config['GEONAMES_USERNAME'] }}';
     var thunderforestKey = '{{ config['THUNDERFOREST_KEY'] }}';
     var gisPointAll = {{ gis_data['gisPointAll']|safe }};
-    var gisPointSuperId = {{ gis_data['gisPointSuperId'] }};
+    var gisPointSuperId = {{ gis_data['gisPointSuperId'] if gis_data['gisPointSuperId'] else 'null' }};
     var gisPointSubIds = {{ gis_data['gisPointSubIds']|tojson }};
     var gisPointSiblingIds = {{ gis_data['gisPointSiblingIds']|tojson }};
     var gisPointSelected = {{ gis_data['gisPointSelected']|safe }};

@@ -35,10 +35,9 @@ class Gis:
         subunit_ids = [subunit.id for subunit in subunits]
         sibling_ids = [sibling.id for sibling in siblings] if siblings else []
         extra_ids = [0]
-        if subunits or siblings:
+        if subunits or siblings or super_id:
             extra_ids = [objects[0].id if objects else 0] + [super_id] + subunit_ids + sibling_ids
-
-        object_ids = [x.id for x in objects]
+        object_ids = [x.id for x in objects] if objects else []
         polygon_point_sql = \
             'public.ST_AsGeoJSON(public.ST_PointOnSurface(polygon.geom)) AS polygon_point, '
         for shape in ['point', 'polygon', 'linestring']:

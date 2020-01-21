@@ -100,7 +100,7 @@ def place_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
 
     if title == 'place':
         form.alias.append_entry('')
-    structure = get_structure(origin)
+    structure = get_structure(super_=origin)
     overlays = Overlay.get_by_object(origin) if origin and origin.class_.code == 'E18' else None
     return render_template('place/insert.html',
                            form=form,

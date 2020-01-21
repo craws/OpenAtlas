@@ -35,13 +35,18 @@ if (gisPointAll) {
             if (feature.properties.objectId == gisPointSuperId) {
                 return L.marker(latlng, {icon: superMarker});
             }
-            if ( gisPointSubIds.includes(feature.properties.objectId)) {
+            if (gisPointSubIds.includes(feature.properties.objectId)) {
                 return L.marker(latlng, {icon: subsMarker});
+            }
+            if (gisPointSiblingIds.includes(feature.properties.objectId)) {
+                return L.marker(latlng, {icon: siblingsMarker});
             }
             return L.marker(latlng, {icon: grayMarker});
         }
     });
 }
+
+
 
 if (useCluster) {
     cluster.addLayer(pointLayer);
@@ -95,6 +100,14 @@ let allSelected = [];
 if (gisLineSelected != '') allSelected.push(gisLines);
 if (gisPolygonSelected != '') allSelected.push(gisPolygons);
 if (gisPointSelected != '') allSelected.push(gisPoints);
+
+$.each(gisPointAll, function( index, object_ ) {
+    id_ = object_.properties.objectId
+    if (id_ == gisPointSuperId || gisPointSubIds.includes(id_) || gisPointSiblingIds.includes(id_)) {
+        allSelected.push(object_);
+    }
+});
+
 if (allSelected.length > 0) map.fitBounds(L.featureGroup(allSelected).getBounds(), {maxZoom: 12});
 else if(gisPointAll.length > 0) map.fitBounds(pointLayer.getBounds(), {maxZoom: 12});
 else map.setView([30, 0], 2);
