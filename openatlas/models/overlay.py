@@ -4,9 +4,11 @@ import os
 from typing import Dict
 
 from flask import g
+from flask_login import current_user
 from flask_wtf import FlaskForm
 from psycopg2.extras import NamedTupleCursor
 
+from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.util.util import get_file_path
 
@@ -32,7 +34,9 @@ class Overlay:
                         top_left_northing=form.top_left_northing.data,
                         bottom_right_easting=form.bottom_right_easting.data,
                         bottom_right_northing=form.bottom_right_northing.data)
-        g.execute(sql, {'image_id': image_id, 'place_id': place_id, 'link_id': link_id,
+        g.execute(sql, {'image_id': image_id,
+                        'place_id': place_id,
+                        'link_id': link_id,
                         'bounding_box': bounding_box})
 
     @staticmethod
@@ -50,8 +54,10 @@ class Overlay:
 
     @staticmethod
     def get_by_object(object_: Entity) -> Dict[int, Overlay]:
-        ids = [object_.id]
+        if not app.config['IS_UNIT_TEST'] and not current_user.settings['module_map_overlay']:
+            return {}  # pragma: no cover - tests have no direct access to user settings
 
+        ids = [object_.id]
         # Get overlays of parents
         if object_.system_type == 'find':
             stratigraphic_unit = object_.get_linked_entity_safe('P46', True)

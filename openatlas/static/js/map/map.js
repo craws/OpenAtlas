@@ -7,6 +7,9 @@ newIcon = L.icon({iconUrl: '/static/images/map/marker-icon_new.png', iconAnchor:
 editIcon = L.icon({iconUrl: "/static/images/map/marker-icon_edit.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
 editedIcon = L.icon({iconUrl: "/static/images/map/marker-icon_edited.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
 grayMarker = L.icon({iconUrl: '/static/images/map/marker-icon-gray.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
+superMarker = L.icon({iconUrl: '/static/images/map/marker-icon-cyan.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
+subsMarker = L.icon({iconUrl: '/static/images/map/marker-icon-green.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
+siblingsMarker = L.icon({iconUrl: '/static/images/map/marker-icon-orange.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
 
 // Define base layers
 baseMaps = {
@@ -32,6 +35,46 @@ if (gisPointAll) {
             return L.marker(latlng, {icon: grayMarker});
         }
     });
+}
+
+if (gisPointSupers) {
+    pointSupersLayer = new L.GeoJSON(gisPointSupers, {
+        onEachFeature: setPopup,
+        pointToLayer: function(feature, latlng) {
+            return L.marker(latlng, {icon: superMarker});
+        }
+    });
+    map.addLayer(pointSupersLayer);
+}
+
+if (gisPointSubs) {
+    pointSubsLayer = new L.GeoJSON(gisPointSubs, {
+        onEachFeature: setPopup,
+        pointToLayer: function(feature, latlng) {
+            return L.marker(latlng, {icon: subsMarker});
+        }
+    });
+    map.addLayer(pointSubsLayer);
+}
+
+if (gisPointSupers) {
+    pointSupersLayer = new L.GeoJSON(gisPointSupers, {
+        onEachFeature: setPopup,
+        pointToLayer: function(feature, latlng) {
+            return L.marker(latlng, {icon: superMarker});
+        }
+    });
+    map.addLayer(pointSupersLayer);
+}
+
+if (gisPointSibling) {
+    pointSiblingsLayer = new L.GeoJSON(gisPointSibling, {
+        onEachFeature: setPopup,
+        pointToLayer: function(feature, latlng) {
+            return L.marker(latlng, {icon: siblingsMarker});
+        }
+    });
+    map.addLayer(pointSiblingsLayer);
 }
 
 if (useCluster) {
@@ -86,6 +129,10 @@ let allSelected = [];
 if (gisLineSelected != '') allSelected.push(gisLines);
 if (gisPolygonSelected != '') allSelected.push(gisPolygons);
 if (gisPointSelected != '') allSelected.push(gisPoints);
+if (gisPointSupers != '') allSelected.push(pointSupersLayer);
+if (gisPointSubs != '') allSelected.push(pointSubsLayer);
+if (gisPointSibling != '') allSelected.push(pointSiblingsLayer);
+
 if (allSelected.length > 0) map.fitBounds(L.featureGroup(allSelected).getBounds(), {maxZoom: 12});
 else if(gisPointAll.length > 0) map.fitBounds(pointLayer.getBounds(), {maxZoom: 12});
 else map.setView([30, 0], 2);

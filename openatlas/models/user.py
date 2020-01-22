@@ -102,13 +102,15 @@ class User(UserMixin):  # type: ignore
         return [User(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_by_id(user_id: int, with_bookmarks: bool = False) -> User:
+    def get_by_id(user_id: int, with_bookmarks: bool = False):  # type: ignore
         bookmarks = None
         if with_bookmarks:
             sql = 'SELECT entity_id FROM web.user_bookmarks WHERE user_id = %(user_id)s;'
             g.execute(sql, {'user_id': user_id})
             bookmarks = [row.entity_id for row in g.cursor.fetchall()]
         g.execute(User.sql + ' WHERE u.id = %(id)s;', {'id': user_id})
+        if not g.cursor.rowcount:
+            return None   # pragma no cover - something went wrong, e.g. obsolete session values
         return User(g.cursor.fetchone(), bookmarks)
 
     @staticmethod

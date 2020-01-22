@@ -2,9 +2,9 @@
 {% block title_name %}- {{ object_.name }}{% endblock %}
 {% block breadcrumb %}
     <a href="{{ url_for('place_index') }}">{{ _('place')|uc_first }}</a>
-    {{ '> ' + place|link|safe if place else '' }}
-    {{ '> ' + feature|link|safe if feature else '' }}
-    {{ '> ' + stratigraphic_unit|link|safe if stratigraphic_unit else '' }}
+    {{ '> ' + structure['place']|link|safe if structure['place'] else '' }}
+    {{ '> ' + structure['feature']|link|safe if structure['feature'] else '' }}
+    {{ '> ' + structure['stratigraphic_unit']|link|safe if structure['stratigraphic_unit'] else '' }}
     > {{ object_.name|truncate_string|safe }}
 {% endblock %}
 {% block content %}
@@ -33,7 +33,7 @@
         <div class="button-bar">
             {% if 'contributor'|is_authorized %}
                 <a href="{{ url_for('place_update', id_=object_.id) }}">{{ _('edit')|uc_first }}</a>
-                {% if not has_subunits %}
+                {% if not subunits %}
                     {{ object_|display_delete_link|safe }}
                 {% endif %}
             {% endif %}

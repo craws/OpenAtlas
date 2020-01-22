@@ -36,6 +36,7 @@ class ModelTests(TestBaseCase):
                 actor.link('P11', event)
                 actor.link('P67', Entity.insert('E89', 'Propositional Object'))
                 source.link('P67', event)
+            self.app.get(url_for('model_network2', dimensions=2))
             rv = self.app.get(url_for('model_network'))
             assert b'orphans' in rv.data
             data = {'orphans': True, 'width': 100, 'height': 40, 'distance': -666, 'charge': 500}
