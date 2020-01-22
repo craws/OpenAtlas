@@ -3,9 +3,9 @@
     var geoNamesUsername = '{{ config['GEONAMES_USERNAME'] }}';
     var thunderforestKey = '{{ config['THUNDERFOREST_KEY'] }}';
     var gisPointAll = {{ gis_data['gisPointAll']|safe }};
-    var gisPointSuperId = {{ gis_data['gisPointSuperId'] if gis_data['gisPointSuperId'] else 'null' }};
-    var gisPointSubIds = {{ gis_data['gisPointSubIds']|tojson }};
-    var gisPointSiblingIds = {{ gis_data['gisPointSiblingIds']|tojson }};
+    var gisPointSupers = {{ gis_data['gisPointSupers']|safe }};
+    var gisPointSubs = {{ gis_data['gisPointSubs']|safe }};
+    var gisPointSibling = {{ gis_data['gisPointSibling']|safe }};
     var gisPointSelected = {{ gis_data['gisPointSelected']|safe }};
     var gisLineAll = {{ gis_data['gisLineAll']|safe }};
     var gisLineSelected = {{ gis_data['gisLineSelected']|safe }};

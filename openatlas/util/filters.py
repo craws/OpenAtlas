@@ -172,7 +172,6 @@ def display_profile_image(self: Any, image_id: int) -> str:
         return ''
     file_path = get_file_path(image_id)
     if file_path:
-        1/0
         src = url_for('display_file', filename=os.path.basename(file_path))
         return """
             <div id="profile_image_div">

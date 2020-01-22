@@ -30,6 +30,7 @@ class Gis:
                                           'linestring': [],
                                           'polygon': [],
                                           'polygon_point': []}
+        extra: Dict[str, List[Any]] = {'supers': [], 'subs': [], 'siblings': []}
 
         # Include GIS of subunits which would be otherwise omitted
         subunit_ids = [subunit.id for subunit in subunits]
@@ -85,20 +86,32 @@ class Gis:
                             break
                 if row.object_id in object_ids:
                     selected[shape].append(item)
+                elif row.object_id == super_id:
+                    extra['supers'].append(item)
+                elif row.object_id in subunit_ids:  # pragma no cover
+                    extra['subs'].append(item)
+                elif row.object_id in sibling_ids:  # pragma no cover
+                    extra['siblings'].append(item)
                 else:
                     all_[shape].append(item)
                 if hasattr(row, 'polygon_point'):
-                    polygon_point_item = dict(item)  # make a copy to prevent overriding geometry
+                    polygon_point_item = dict(item)  # Make a copy to prevent overriding geometry
                     polygon_point_item['geometry'] = json.loads(row.polygon_point)
                     if row.object_id in object_ids:
                         selected['polygon_point'].append(polygon_point_item)
+                    elif row.object_id == super_id:
+                        extra['supers'].append(polygon_point_item)
+                    elif row.object_id in subunit_ids:  # pragma no cover
+                        extra['subs'].append(polygon_point_item)
+                    elif row.object_id in sibling_ids:  # pragma no cover
+                        extra['siblings'].append(polygon_point_item)
                     else:
                         all_['point'].append(polygon_point_item)
         return {'gisPointAll': json.dumps(all_['point']),
                 'gisPointSelected': json.dumps(selected['point']),
-                'gisPointSuperId': super_id,
-                'gisPointSubIds': subunit_ids,
-                'gisPointSiblingIds': sibling_ids,
+                'gisPointSupers': json.dumps(extra['supers']),
+                'gisPointSubs': json.dumps(extra['subs']),
+                'gisPointSibling': json.dumps(extra['siblings']),
                 'gisLineAll': json.dumps(all_['linestring']),
                 'gisLineSelected': json.dumps(selected['linestring']),
                 'gisPolygonAll': json.dumps(all_['polygon']),
