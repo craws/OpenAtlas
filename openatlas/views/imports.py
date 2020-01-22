@@ -103,11 +103,10 @@ class ImportForm(FlaskForm):  # type: ignore
     def validate(self) -> bool:
         valid = FlaskForm.validate(self)
         file_ = request.files['file']
-        extensions = app.config['IMPORT_FILE_EXTENSIONS']
         if not file_:  # pragma: no cover
             self.file.errors.append(_('no file to upload'))
             valid = False
-        elif not ('.' in file_.filename and file_.filename.rsplit('.', 1)[1].lower() in extensions):
+        elif not ('.' in file_.filename and file_.filename.rsplit('.', 1)[1].lower() == 'csv'):
             self.file.errors.append(_('file type not allowed'))
             valid = False
         return valid
@@ -200,10 +199,14 @@ def import_data(project_id: int, class_code: str) -> str:
                     messages['warn'].append(_('possible duplicates') + ': ' + ', '.join(duplicates))
             if messages['error']:
                 raise Exception()
-        except Exception as e:  # pragma: no cover
+        except Exception:  # pragma: no cover
             flash(_('error at import'), 'error')
-            return render_template('import/import_data.html', project=project, form=form,
-                                   class_code=class_code, messages=messages, file_data=file_data)
+            return render_template('import/import_data.html',
+                                   project=project,
+                                   form=form,
+                                   class_code=class_code,
+                                   messages=messages,
+                                   file_data=file_data)
 
         if not form.preview.data and checked_data:
             if not file_data['backup_too_old'] or app.config['IS_UNIT_TEST']:
@@ -218,6 +221,11 @@ def import_data(project_id: int, class_code: str) -> str:
                     g.cursor.execute('ROLLBACK')
                     logger.log('error', 'import', 'import failed', e)
                     flash(_('error transaction'), 'error')
-    return render_template('import/import_data.html', project=project, form=form,
-                           file_data=file_data, class_code=class_code, table=table,
-                           imported=imported, messages=messages)
+    return render_template('import/import_data.html',
+                           project=project,
+                           form=form,
+                           file_data=file_data,
+                           class_code=class_code,
+                           table=table,
+                           imported=imported,
+                           messages=messages)

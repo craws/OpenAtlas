@@ -115,8 +115,7 @@ class Node(Entity):
 
     @staticmethod
     def get_hierarchy(name: str) -> Node:
-        name = name.replace('_', ' ')
-        return [root for id_, root in g.nodes.items() if root.name == name][0]
+        return [root for id_, root in g.nodes.items() if root.name == name.replace('_', ' ')][0]
 
     @staticmethod
     def get_tree_data(node_id: int, selected_ids: List[int]) -> str:
@@ -150,13 +149,8 @@ class Node(Entity):
 
     @staticmethod
     def get_form_choices(root: Optional[Node] = None) -> List[Tuple[int, str]]:
-        sql = "SELECT f.id, f.name FROM web.form f WHERE f.extendable = True ORDER BY name ASC;"
-        g.execute(sql)
-        forms = []
-        for row in g.cursor.fetchall():
-            if not root or row.id not in root.forms:
-                forms.append((row.id, row.name))
-        return forms
+        g.execute("SELECT f.id, f.name FROM web.form f WHERE f.extendable = True ORDER BY name ASC")
+        return [(r.id, r.name) for r in g.cursor.fetchall() if not root or r.id not in root.forms]
 
     @staticmethod
     def save_entity_nodes(entity: Entity, form: Any) -> None:
@@ -212,11 +206,7 @@ class Node(Entity):
 
     @staticmethod
     def get_node_orphans() -> List[Node]:
-        nodes = []
-        for key, node in g.nodes.items():
-            if node.root and node.count < 1 and not node.subs:
-                nodes.append(node)
-        return nodes
+        return[n for key, n in g.nodes.items() if n.root and n.count < 1 and not n.subs]
 
     @staticmethod
     def move_entities(old_node: Node, new_type_id: int, checkbox_values: str) -> None:
@@ -241,10 +231,9 @@ class Node(Entity):
                     sql = """
                         UPDATE model.link SET range_id = %(new_type_id)s
                         WHERE range_id = %(old_type_id)s AND domain_id IN %(entity_ids)s;"""
-                params = {'old_type_id': old_node.id,
-                          'new_type_id': new_type_id,
-                          'entity_ids': tuple(entity_ids)}
-                g.execute(sql, params)
+                g.execute(sql, {'old_type_id': old_node.id,
+                                'new_type_id': new_type_id,
+                                'entity_ids': tuple(entity_ids)})
         else:
             delete_ids = entity_ids  # No new type was selected so delete all links
 
@@ -294,7 +283,7 @@ class Node(Entity):
             SELECT count(*) FROM model.link l
             JOIN model.entity e ON l.domain_id = e.id AND l.range_id IN %(node_ids)s
             WHERE l.property_code = 'P2' AND {sql_where} %(params)s;""".format(
-            sql_where='e.system_type =' if system_type else 'e.class_code IN')
+                sql_where='e.system_type =' if system_type else 'e.class_code IN')
         g.execute(sql, {'node_ids': tuple(node_ids),
                         'params': system_type if system_type else tuple(class_code)})
         return g.cursor.fetchone()[0]

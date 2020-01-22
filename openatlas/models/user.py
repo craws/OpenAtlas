@@ -69,8 +69,8 @@ class User(UserMixin):  # type: ignore
 
     def update_settings(self) -> None:
         for name, value in self.settings.items():
-            if name in ['newsletter', 'show_email', 'module_geonames',
-                        'module_map_overlay', 'module_notes']:
+            if name in ['newsletter', 'show_email', 'module_geonames', 'module_map_overlay',
+                        'module_notes']:
                 value = 'True' if self.settings[name] else ''
             sql = """
                 INSERT INTO web.user_settings (user_id, "name", "value")
@@ -204,8 +204,8 @@ class User(UserMixin):  # type: ignore
         sql = 'SELECT "name", value FROM web.user_settings WHERE user_id = %(user_id)s;'
         g.execute(sql, {'user_id': user_id})
         settings = {row.name: row.value for row in g.cursor.fetchall()}
-        for item in ['newsletter', 'show_email',
-                     'module_notes', 'module_geonames', 'module_map_overlay']:
+        for item in ['newsletter', 'show_email', 'module_notes', 'module_geonames',
+                     'module_map_overlay']:
             settings[item] = True if item in settings and settings[item] == 'True' else False
         if 'table_show_aliases' in settings and settings['table_show_aliases'] == 'False':
             settings['table_show_aliases'] = False
@@ -237,7 +237,8 @@ class User(UserMixin):  # type: ignore
         sql = """
             INSERT INTO web.user_notes (user_id, entity_id, text)
             VALUES (%(user_id)s, %(entity_id)s, %(text)s);"""
-        g.execute(sql, {'user_id': current_user.id, 'entity_id': entity.id,
+        g.execute(sql, {'user_id': current_user.id,
+                        'entity_id': entity.id,
                         'text': sanitize(note, 'description')})
 
     @staticmethod
@@ -246,7 +247,8 @@ class User(UserMixin):  # type: ignore
         sql = """
             UPDATE web.user_notes SET text = %(text)s
             WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s;"""
-        g.execute(sql, {'user_id': current_user.id, 'entity_id': entity.id,
+        g.execute(sql, {'user_id': current_user.id,
+                        'entity_id': entity.id,
                         'text': sanitize(note, 'description')})
 
     @staticmethod
