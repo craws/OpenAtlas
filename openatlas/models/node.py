@@ -40,9 +40,7 @@ class Node(Entity):
             LEFT JOIN model.entity es ON l.range_id = es.id
 
             -- Get count
-            LEFT JOIN model.link l2 ON e.id = l2.range_id AND
-                (l2.property_code = 'P2' OR
-                    (l2.property_code = 'P89' AND e.system_type = 'place location'))
+            LEFT JOIN model.link l2 ON e.id = l2.range_id AND l2.property_code IN ('P2', 'P89')
             LEFT JOIN model.link l3 ON e.id = l3.type_id
             
             WHERE e.class_code = %(class_code)s
@@ -54,6 +52,7 @@ class Node(Entity):
         g.execute(sql, {'class_code': 'E53', 'property_code': 'P89'})
         places = g.cursor.fetchall()
         nodes = {}
+
         for row in types + places:
             node = Node(row)
             nodes[node.id] = node
