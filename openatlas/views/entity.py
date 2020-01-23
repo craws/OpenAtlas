@@ -47,9 +47,6 @@ def entity_view(id_: int) -> Union[str, Response]:
 
 def actor_view(actor: Entity) -> str:
     actor.note = User.get_note(actor)
-    info: List[Tuple[Any, Optional[str]]] = []
-    if actor.aliases:
-        info.append((uc_first(_('alias')), '<br>'.join(actor.aliases.values())))
     tables = {'file': Table(Table.HEADERS['file'] + [_('main image')]),
               'source': Table(Table.HEADERS['source']),
               'reference': Table(Table.HEADERS['reference'] + ['page / link text']),
@@ -127,6 +124,9 @@ def actor_view(actor: Entity) -> str:
         end_object = end_place.get_linked_entity_safe('P53', True)
         objects.append(end_object)
     label = uc_first(_('born') if actor.class_.code == 'E21' else _('begin'))
+    info: List[Tuple[Any, Optional[str]]] = []
+    if actor.aliases:
+        info.append((uc_first(_('alias')), '<br>'.join(actor.aliases.values())))
     info.append((label, format_entry_begin(actor, begin_object)))
     label = uc_first(_('died') if actor.class_.code == 'E21' else _('end'))
     info.append((label, format_entry_end(actor, end_object)))

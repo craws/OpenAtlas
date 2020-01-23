@@ -8,5 +8,4 @@ from openatlas.util.util import required_group, uc_first
 @app.route('/ajax/bookmark', methods=['POST'])
 @required_group('readonly')
 def ajax_bookmark() -> str:
-    label = User.toggle_bookmark(request.form['entity_id'])
-    return jsonify(uc_first(label))
+    return jsonify(uc_first(User.toggle_bookmark(request.form['entity_id'])))

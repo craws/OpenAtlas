@@ -143,7 +143,7 @@ def save(form: ActorForm,
             actor = Entity.insert(code, form.name.data)
             log_action = 'insert'
         actor.update(form)
-        url = url_for('entity_view', id_=actor.id)
+
         if form.residence.data:
             object_ = Entity.get_by_id(form.residence.data, view_name='place')
             actor.link('P74', object_.get_linked_entity_safe('P53'))
@@ -154,6 +154,7 @@ def save(form: ActorForm,
             object_ = Entity.get_by_id(form.ends_in.data, view_name='place')
             actor.link('OA9', object_.get_linked_entity_safe('P53'))
 
+        url = url_for('entity_view', id_=actor.id)
         if origin:
             if origin.view_name == 'reference':
                 link_id = origin.link('P67', actor)[0]
