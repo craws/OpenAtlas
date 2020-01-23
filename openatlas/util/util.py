@@ -48,8 +48,7 @@ def get_file_path(entity: Union[int, 'Entity']) -> Optional[str]:
 
 
 def print_file_size(entity: 'Entity') -> str:
-    entity_id = entity if type(entity) is int else entity.id
-    path = get_file_path(entity_id)
+    path = get_file_path(entity.id)
     return convert_size(os.path.getsize(path)) if path else 'N/A'
 
 
@@ -65,7 +64,9 @@ def print_file_extension(entity: Union[int, 'Entity']) -> str:
     return os.path.splitext(path)[1] if path else 'N/A'
 
 
-def send_mail(subject: str, text: str, recipients: Union[str, List[str]],
+def send_mail(subject: str,
+              text: str,
+              recipients: Union[str, List[str]],
               log_body: bool = True) -> bool:  # pragma: no cover
     """ Send one mail to every recipient, set log_body to False for sensitive data e.g. passwords"""
     recipients = recipients if isinstance(recipients, list) else [recipients]
@@ -141,7 +142,8 @@ def get_file_stats(path: str = app.config['UPLOAD_FOLDER_PATH']) -> Dict[Union[i
         for file in it:
             split_name = os.path.splitext(file.name)
             if len(split_name) > 1 and split_name[0].isdigit():
-                file_stats[int(split_name[0])] = {'ext': split_name[1], 'size': file.stat().st_size,
+                file_stats[int(split_name[0])] = {'ext': split_name[1],
+                                                  'size': file.stat().st_size,
                                                   'date': file.stat().st_ctime}
     return file_stats
 
@@ -303,7 +305,8 @@ def add_dates_to_form(form: Any, for_person: bool = False) -> str:
             <div class="table-cell date-switcher">
                 <span id="date-switcher" class="button">{show}</span>
             </div>
-        </div>""".format(date=uc_first(_('date')), tooltip=display_tooltip(_('tooltip date')),
+        </div>""".format(date=uc_first(_('date')),
+                         tooltip=display_tooltip(_('tooltip date')),
                          show=uc_first(_('show')))
     html += '<div class="table-row date-switch" ' + style + '>'
     html += '<div>' + uc_first(_('birth') if for_person else _('begin')) + '</div>'
@@ -396,11 +399,13 @@ def get_profile_image_table_link(file: 'Entity',
                                  extension: str,
                                  profile_image_id: Optional[int] = None) -> str:
     if file.id == profile_image_id:
-        url = url_for('file_remove_profile_image', entity_id=entity.id)
-        return '<a href="' + url + '">' + uc_first(_('unset')) + '</a>'
+        return '<a href="{url}">{label}</a>'.format(
+            url=url_for('file_remove_profile_image', entity_id=entity.id),
+            label=uc_first(_('unset')))
     elif extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-        url = url_for('file_set_as_profile_image', id_=file.id, origin_id=entity.id)
-        return '<a href="' + url + '">' + uc_first(_('set')) + '</a>'
+        return '<a href="{url}">{label}</a>'.format(
+            url=url_for('file_set_as_profile_image', id_=file.id, origin_id=entity.id),
+            label=uc_first(_('set')))
     return ''  # pragma: no cover - only happens for non image files
 
 
@@ -448,8 +453,8 @@ def truncate_string(string: Optional[str] = '', length: int = 40, span: bool = T
 def get_base_table_data(entity: 'Entity',
                         file_stats: Optional[Dict[Union[int, str], Any]] = None) -> List[str]:
     """ Returns standard table data for an entity"""
-    data: List[str] = ['<br>'.join([link(entity)] + [
-        truncate_string(alias) for alias in entity.aliases.values()])]
+    data: List[str] = ['<br>'.join([link(entity)] + [truncate_string(alias) for
+                                                     alias in entity.aliases.values()])]
     if entity.view_name in ['event', 'actor']:
         data.append(g.classes[entity.class_.code].name)
     if entity.view_name in ['reference'] and entity.system_type != 'file':
@@ -546,8 +551,7 @@ def get_backup_file_data() -> Dict[str, Any]:
     latest_file = None
     latest_file_date = None
     for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
-        name = basename(file)
-        if name == '.gitignore':
+        if basename(file) == '.gitignore':
             continue
         file_date = datetime.utcfromtimestamp(os.path.getmtime(path.joinpath(file)))
         if not latest_file_date or file_date > latest_file_date:

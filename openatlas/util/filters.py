@@ -34,20 +34,20 @@ def note(self: Any, entity: Entity) -> str:
     if not current_user.settings['module_notes'] or not util.is_authorized('contributor'):
         return ''  # pragma no cover
     if not entity.note:
-        url = url_for('note_insert', entity_id=entity.id)
-        return '<p><a href="' + url + '">+ ' + util.uc_first(_('note')) + '</a></p>'
-    url = url_for('note_update', entity_id=entity.id)
-    html = '<h2>' + util.uc_first(_('note')) + '</h2><p>' + entity.note + '</p>'
-    html += '<a href="' + url + '">' + util.uc_first(_('edit note')) + '</a>'
-    return html
+        return '<p><a href="{url}">{label}</a></p>'.format(
+            url=url_for('note_insert', entity_id=entity.id),
+            label=util.uc_first(_('note')))
+    return '<h2>{label}</h2><p>{note}</p><a href="{url}">{edit}</a>'.format(
+        label=util.uc_first(_('note')),
+        note=entity.note,
+        url=url_for('note_update', entity_id=entity.id),
+        edit=util.uc_first(_('edit note')))
 
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def format_tab_number(self: Any, param: Union[int, Table]) -> str:
-    length = param
-    if isinstance(param, Table):
-        length = len(param.rows)
+    length = len(param.rows) if isinstance(param, Table) else param
     return '<span class="tab-counter">' + babel_format_number(length) + '</span>'
 
 
@@ -102,16 +102,16 @@ def display_move_form(self: Any, form: Any, root_name: str) -> str:
     for field in form:
         if type(field) is TreeField:
             html += '<p>' + root_name + ' ' + str(field) + '</p>'
-    html += """
+    table = Table(header=['#', util.uc_first(_('selection'))],
+                  rows=[[item, item.label.text] for item in form.selection])
+    return html + """
         <p>
             <a class="button" id="select-all">{select_all}</a>
             <a class="button" id="select-none">{deselect_all}</a>
-        </p>""".format(select_all=util.uc_first(_('select all')),
-                       deselect_all=util.uc_first(_('deselect all')))
-    table = Table(['#', util.uc_first(_('selection'))])
-    for item in form.selection:
-        table.rows.append([item, item.label.text])
-    return html + table.display('move')
+        </p>
+        {table}""".format(select_all=util.uc_first(_('select all')),
+                          deselect_all=util.uc_first(_('deselect all')),
+                          table=table.display('move'))
 
 
 @jinja2.contextfilter
@@ -172,14 +172,15 @@ def display_profile_image(self: Any, image_id: int) -> str:
         return ''
     file_path = get_file_path(image_id)
     if file_path:
-        src = url_for('display_file', filename=os.path.basename(file_path))
         return """
             <div id="profile_image_div">
                 <a href="/file/view/{id}">
                     <img style="max-width:{width}px;" alt="profile image" src="{src}">
                 </a>
             </div>
-            """.format(id=image_id, src=src, width=session['settings']['profile_image_width'])
+            """.format(id=image_id,
+                       src=url_for('display_file', filename=os.path.basename(file_path)),
+                       width=session['settings']['profile_image_width'])
     return ''  # pragma no cover
 
 
@@ -240,8 +241,10 @@ def display_form(self: Any,
                     <div><label>{label}</label></div>
                     <div class="table-cell">{field} {unit}</div>
                 </div>
-            """.format(label=sub.name, unit=sub.description, field=field_(class_='value-type'))
-            html_ += display_value_type_fields(sub.subs)
+                {value_fields}""".format(label=sub.name,
+                                         unit=sub.description,
+                                         field=field_(class_='value-type'),
+                                         value_fields=display_value_type_fields(sub.subs))
         return html_
 
     for field in form:
@@ -264,14 +267,15 @@ def display_form(self: Any,
                 label = util.uc_first(_('super'))
             if node.value_type and 'is_node_form' not in form:
                 html['value_types'] += """
-                        <div class="table-row value-type-switch">
-                            <div></div>
-                            <div class="table-cell">
-                                <label style="font-weight:bold;">{label}</label> {tooltip}
-                            </div>
+                    <div class="table-row value-type-switch">
+                        <div></div>
+                        <div class="table-cell">
+                            <label style="font-weight:bold;">{label}</label> {tooltip}
                         </div>
-                    """.format(label=label, tooltip=util.display_tooltip(node.description))
-                html['value_types'] += display_value_type_fields(node.subs)
+                    </div>
+                    {value_fields}""".format(label=label,
+                                             tooltip=util.display_tooltip(node.description),
+                                             value_fields=display_value_type_fields(node.subs))
                 continue
             else:
                 info = '' if 'is_node_form' in form else util.display_tooltip(node.description)
@@ -317,8 +321,11 @@ def display_form(self: Any,
             <div class="table-row">
                 <div>{label}</div>
                 <div class="table-cell">{field}{precision_field}{precision_label} {errors}</div>
-            </div>'''.format(label=field.label, errors=errors, field=field(class_=class_),
-                             precision_field=precision_field, precision_label=precision_field.label)
+            </div>'''.format(label=field.label,
+                             errors=errors,
+                             field=field(class_=class_),
+                             precision_field=precision_field,
+                             precision_label=precision_field.label)
             continue
         if field.id == 'geonames_precision':
             continue  # Is already added with geonames_id field
@@ -326,7 +333,8 @@ def display_form(self: Any,
             <div class="table-row">
                 <div>{label}</div>
                 <div class="table-cell">{field} {errors}</div>
-            </div>'''.format(label=field.label, errors=errors,
+            </div>'''.format(label=field.label,
+                             errors=errors,
                              field=field(class_=class_).replace('> ', '>'))
 
     html_all = '<form method="post"' + id_attribute + ' ' + multipart + '>'
@@ -351,9 +359,7 @@ def display_form(self: Any,
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def test_file(self: Any, file_name: str) -> Optional[str]:
-    if os.path.isfile(app.root_path + '/' + file_name):
-        return file_name
-    return None
+    return file_name if os.path.isfile(app.root_path + '/' + file_name) else None
 
 
 @jinja2.contextfilter
@@ -379,9 +385,10 @@ def truncate_string(self: Any, string: str) -> str:
 def display_delete_link(self: Any, entity: Entity) -> str:
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
-    confirm = 'onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
-    url = url_for(entity.view_name + '_index', action='delete', id_=entity.id)
-    return '<a ' + confirm + ' href="' + url + '">' + util.uc_first(_('delete')) + '</a>'
+    return '<a {confirm} href="{url}">{label}</a>'.format(
+        confirm='onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"',
+        url=url_for(entity.view_name + '_index', action='delete', id_=entity.id),
+        label=util.uc_first(_('delete')))
 
 
 @jinja2.contextfilter
