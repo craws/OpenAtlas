@@ -88,5 +88,4 @@ class Overlay:
 
     @staticmethod
     def remove(id_: int) -> None:
-        sql = 'DELETE FROM web.map_overlay WHERE id = %(id)s;'
-        g.execute(sql, {'id': id_})
+        g.execute('DELETE FROM web.map_overlay WHERE id = %(id)s;', {'id': id_})

@@ -63,7 +63,7 @@ class Network:
     def get_network_json2(params: Dict[str, Any]) -> Optional[str]:
         properties = [code for code, param in params['properties'].items() if param['active']]
         classes = [code for code, param in params['classes'].items() if param['active']]
-        if not classes:
+        if not classes:  # pragma: no cover
             return None
 
         # Get edges
@@ -77,13 +77,8 @@ class Network:
                     AND (e.system_type IS NULL OR e.system_type != 'file');"""
             g.execute(sql, {'properties': tuple(properties)})
             for row in g.cursor.fetchall():
-                edges += """{{
-                    'source':'{domain_id}',
-                    'target':'{range_id}',
-                    'id':'{link_id}'}},""".format(
-                    domain_id=row.domain_id,
-                    range_id=row.range_id,
-                    link_id=row.id)
+                edges += "{{'source':'{d_id}', 'target':'{r_id}', 'id':'{l_id}'}},".format(
+                    d_id=row.domain_id, r_id=row.range_id, l_id=row.id)
                 entities.update([row.domain_id, row.range_id])
 
         # Get entities

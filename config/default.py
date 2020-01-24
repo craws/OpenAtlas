@@ -23,9 +23,6 @@ SECRET_KEY = 'CHANGE ME'
 # Files with these extensions are available as profile image and will be displayed in the browser
 DISPLAY_FILE_EXTENSIONS = ['bmp', 'gif', 'ico', 'jpeg', 'jpg', 'png', 'svg']
 
-# Files with these extension are selectable for import, it would make no sense to overwrite them
-IMPORT_FILE_EXTENSIONS = ['csv']
-
 # Paths are implemented operating system independent using pathlib.
 # If you want to override them (in instance/production.py) either use them like here
 # or use absolute paths like e.g. pathlib.Path('/some/location/somewhere')
@@ -64,6 +61,12 @@ LOG_LEVELS = {0: 'emergency',
               6: 'info',
               7: 'debug'}
 
+# Types
+PROPERTY_TYPES = ['Actor Actor Relation', 'Actor Function', 'Involvement']
+
+BASE_TYPES = ['Actor', 'Bibliography', 'Edition', 'Event', 'Feature', 'Find', 'Information Carrier',
+              'Place', 'Source', 'Stratigraphic Unit']
+
 # Feedback
 FEEDBACK_SUBJECTS = {_('suggestion').title(): _('suggestion').title(),
                      _('question').title(): _('question').title(),
@@ -93,8 +96,3 @@ CLASS_CODES = {
     'place': ['E18', 'E22'],
     'reference': ['E31'],
     'source': ['E33']}
-
-PROPERTY_TYPES = ['Actor Actor Relation', 'Actor Function', 'Involvement']
-
-BASE_TYPES = ['Place', 'Information Carrier', 'Bibliography', 'Source', 'Edition', 'Event', 'Actor',
-              'Stratigraphic Unit', 'Feature', 'Find']

@@ -329,6 +329,8 @@ class Link:
                                 offending_nodes.append(
                                     '<a href="' + url + '">' + uc_first(_('remove')) + '</a> ' +
                                     entity_node.name)
-                        data.append([link(entity), entity.class_.name, link(g.nodes[id_]),
+                        data.append([link(entity),
+                                     entity.class_.name,
+                                     link(g.nodes[id_]),
                                      '<br>'.join(offending_nodes)])
         return data

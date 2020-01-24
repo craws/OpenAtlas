@@ -1,6 +1,6 @@
 import os
 from os.path import basename
-from typing import Union, Any
+from typing import Any, Union
 
 from flask import flash, render_template, send_from_directory, url_for
 from flask_babel import lazy_gettext as _

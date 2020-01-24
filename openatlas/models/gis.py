@@ -1,5 +1,5 @@
 import ast
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from flask import g, json
 from flask_wtf import FlaskForm
@@ -17,7 +17,33 @@ class InvalidGeomException(Exception):
 class Gis:
 
     @staticmethod
+    def get_by_id(id_: int) -> List[Dict[str, Union[str, int]]]:
+        # Needed only in API for now
+        geometries = []
+        for shape in ['point', 'polygon', 'linestring']:
+            sql = """
+                SELECT
+                    {shape}.id,
+                    {shape}.name,
+                    {shape}.description,
+                    {shape}.type,
+                    public.ST_AsGeoJSON({shape}.geom) AS geojson
+                FROM model.entity place
+                JOIN gis.{shape} {shape} ON place.id = {shape}.entity_id
+                WHERE place.id = %(id_)s;""".format(shape=shape)
+            g.execute(sql, {'id_': id_})
+            for row in g.cursor.fetchall():
+                geometries.append({'id': row.id,
+                                   'shape': shape,
+                                   'geometry': json.loads(row.geojson),
+                                   'name': row.name,
+                                   'description': row.description,
+                                   'type': row.type})
+        return geometries
+
+    @staticmethod
     def get_all(objects: Optional[List[Entity]] = None,
+                super_id: Optional[int] = None,
                 subunits: Optional[List[Entity]] = None,
                 siblings: Optional[List[Entity]] = None) -> Dict[str, List[Any]]:
         if not objects:
@@ -25,19 +51,19 @@ class Gis:
         if not subunits:
             subunits = []
         all_: Dict[str, List[Any]] = {'point': [], 'linestring': [], 'polygon': []}
+        extra: Dict[str, List[Any]] = {'supers': [], 'subs': [], 'siblings': []}
         selected: Dict[str, List[Any]] = {'point': [],
                                           'linestring': [],
                                           'polygon': [],
                                           'polygon_point': []}
 
-        # Include GIS features of subunits which would be otherwise omitted
+        # Include GIS of subunits which would be otherwise omitted
+        subunit_ids = [subunit.id for subunit in subunits]
+        sibling_ids = [sibling.id for sibling in siblings] if siblings else []
         extra_ids = [0]
-        if objects and objects[0].system_type in ['place', 'feature', 'find', 'stratigraphic unit']:
-            subunit_ids = [subunit.id for subunit in subunits]
-            sibling_ids = [sibling.id for sibling in siblings] if siblings else []
-            extra_ids = [objects[0].id] + subunit_ids + sibling_ids
-
-        object_ids = [x.id for x in objects]
+        if subunits or siblings or super_id:
+            extra_ids = [objects[0].id if objects else 0] + [super_id] + subunit_ids + sibling_ids
+        object_ids = [x.id for x in objects] if objects else []
         polygon_point_sql = \
             'public.ST_AsGeoJSON(public.ST_PointOnSurface(polygon.geom)) AS polygon_point, '
         for shape in ['point', 'polygon', 'linestring']:
@@ -85,17 +111,32 @@ class Gis:
                             break
                 if row.object_id in object_ids:
                     selected[shape].append(item)
+                elif row.object_id == super_id:
+                    extra['supers'].append(item)
+                elif row.object_id in subunit_ids:  # pragma no cover
+                    extra['subs'].append(item)
+                elif row.object_id in sibling_ids:  # pragma no cover
+                    extra['siblings'].append(item)
                 else:
                     all_[shape].append(item)
                 if hasattr(row, 'polygon_point'):
-                    polygon_point_item = dict(item)  # make a copy to prevent overriding geometry
+                    polygon_point_item = dict(item)  # Make a copy to prevent overriding geometry
                     polygon_point_item['geometry'] = json.loads(row.polygon_point)
                     if row.object_id in object_ids:
                         selected['polygon_point'].append(polygon_point_item)
+                    elif row.object_id == super_id:
+                        extra['supers'].append(polygon_point_item)
+                    elif row.object_id in subunit_ids:  # pragma no cover
+                        extra['subs'].append(polygon_point_item)
+                    elif row.object_id in sibling_ids:  # pragma no cover
+                        extra['siblings'].append(polygon_point_item)
                     else:
                         all_['point'].append(polygon_point_item)
         return {'gisPointAll': json.dumps(all_['point']),
                 'gisPointSelected': json.dumps(selected['point']),
+                'gisPointSupers': json.dumps(extra['supers']),
+                'gisPointSubs': json.dumps(extra['subs']),
+                'gisPointSibling': json.dumps(extra['siblings']),
                 'gisLineAll': json.dumps(all_['linestring']),
                 'gisLineSelected': json.dumps(selected['linestring']),
                 'gisPolygonAll': json.dumps(all_['polygon']),

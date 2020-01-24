@@ -1,9 +1,9 @@
 {% extends 'layout.html' %}
 {% block breadcrumb %}
     {% if origin %}
-        <a href="{{ url_for(origin.view_name + '_index') }}">{{ _(origin.view_name)|uc_first }}</a>
-        {{ '> ' + place|link|safe if place else '' }}
-        {{ '> ' + feature|link|safe if feature else '' }}
+        <a href="{{ url_for(origin.view_name + '_index') }}">{{ _(structure['place'].view_name)|uc_first }}</a>
+        {{ '> ' + structure['feature']|link|safe if structure['feature'] else '' }}
+        {{ '> ' + structure['stratigraphic_unit']|link|safe if structure['stratigraphic_unit'] else '' }}
         > {{ origin|link|safe }}
     {% else %}
         <a href="{{ url_for('place_index') }}">{{ _('place')|uc_first }}</a>

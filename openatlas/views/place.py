@@ -16,6 +16,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
+from openatlas.models.place import get_structure
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, link, required_group, uc_first, was_modified
 from openatlas.views.reference import AddReferenceForm
@@ -99,22 +100,14 @@ def place_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
 
     if title == 'place':
         form.alias.append_entry('')
-    place = None
-    feature = None
-    if origin and origin.system_type == 'stratigraphic unit':
-        feature = origin.get_linked_entity_safe('P46', True)
-        place = feature.get_linked_entity_safe('P46', True)
-    elif origin and origin.system_type == 'feature':
-        place = origin.get_linked_entity_safe('P46', True)
-
+    structure = get_structure(super_=origin)
     overlays = Overlay.get_by_object(origin) if origin and origin.class_.code == 'E18' else None
     return render_template('place/insert.html',
                            form=form,
                            title=title,
-                           place=place,
                            origin=origin,
-                           gis_data=Gis.get_all(),
-                           feature=feature,
+                           structure=structure,
+                           gis_data=structure['gis_data'],
                            geonames_buttons=geonames_buttons,
                            overlays=overlays)
 
@@ -192,26 +185,12 @@ def place_update(id_: int) -> Union[str, Response]:
             form.geonames_id.data = geonames_entity.name if geonames_entity else ''
             exact_match = True if g.nodes[geonames_link.type.id].name == 'exact match' else False
             form.geonames_precision.data = exact_match
-    place = None
-    feature = None
-    stratigraphic_unit = None
-    if object_.system_type == 'find':
-        stratigraphic_unit = object_.get_linked_entity_safe('P46', True)
-        feature = stratigraphic_unit.get_linked_entity_safe('P46', True)
-        place = feature.get_linked_entity_safe('P46', True)
-    if object_.system_type == 'stratigraphic unit':
-        feature = object_.get_linked_entity_safe('P46', True)
-        place = feature.get_linked_entity_safe('P46', True)
-    elif object_.system_type == 'feature':
-        place = object_.get_linked_entity_safe('P46', True)
-
+    structure = get_structure(object_)
     return render_template('place/update.html',
                            form=form,
                            object_=object_,
-                           gis_data=Gis.get_all([object_]),
-                           place=place,
-                           feature=feature,
-                           stratigraphic_unit=stratigraphic_unit,
+                           structure=structure,
+                           gis_data=structure['gis_data'],
                            overlays=Overlay.get_by_object(object_),
                            geonames_buttons=geonames_buttons)
 

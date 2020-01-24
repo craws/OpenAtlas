@@ -15,6 +15,7 @@ from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.models.overlay import Overlay
+from openatlas.models.place import get_structure
 from openatlas.models.user import User
 from openatlas.util.table import Table
 from openatlas.util.util import (add_system_data, add_type_data, display_remove_link,
@@ -46,9 +47,6 @@ def entity_view(id_: int) -> Union[str, Response]:
 
 def actor_view(actor: Entity) -> str:
     actor.note = User.get_note(actor)
-    info: List[Tuple[Any, Optional[str]]] = []
-    if actor.aliases:
-        info.append((uc_first(_('alias')), '<br>'.join(actor.aliases.values())))
     tables = {'file': Table(Table.HEADERS['file'] + [_('main image')]),
               'source': Table(Table.HEADERS['source']),
               'reference': Table(Table.HEADERS['reference'] + ['page / link text']),
@@ -126,6 +124,9 @@ def actor_view(actor: Entity) -> str:
         end_object = end_place.get_linked_entity_safe('P53', True)
         objects.append(end_object)
     label = uc_first(_('born') if actor.class_.code == 'E21' else _('begin'))
+    info: List[Tuple[Any, Optional[str]]] = []
+    if actor.aliases:
+        info.append((uc_first(_('alias')), '<br>'.join(actor.aliases.values())))
     info.append((label, format_entry_begin(actor, begin_object)))
     label = uc_first(_('died') if actor.class_.code == 'E21' else _('end'))
     info.append((label, format_entry_end(actor, end_object)))
@@ -231,8 +232,9 @@ def event_view(event: Entity) -> str:
                 event.external_references.append(link_)
             data.append(truncate_string(link_.description))
             if is_authorized('contributor'):
-                url = url_for('reference_link_update', link_id=link_.id, origin_id=event.id)
-                data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
+                data.append('<a href="{url}">{label}</a>'.format(
+                    label=uc_first(_('edit')),
+                    url=url_for('reference_link_update', link_id=link_.id, origin_id=event.id)))
         if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=event.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
@@ -372,41 +374,22 @@ def place_view(object_: Entity) -> str:
                                      actor.class_.name,
                                      actor.first,
                                      actor.last])
-    # Archeological subunits
-    subunits = object_.get_linked_entities('P46', nodes=True)
-    for entity in subunits:
+    structure = get_structure(object_)
+    for entity in structure['subunits']:
         data = get_base_table_data(entity)
         data.append(truncate_string(entity.description))
         tables[entity.system_type.replace(' ', '-')].rows.append(data)
-    place = None
-    feature = None
-    stratigraphic_unit = None
-    siblings: List[Entity] = []
-    if object_.system_type == 'find':
-        stratigraphic_unit = object_.get_linked_entity_safe('P46', inverse=True)
-        feature = stratigraphic_unit.get_linked_entity_safe('P46', inverse=True)
-        place = feature.get_linked_entity_safe('P46', inverse=True)
-        # Add finds of same stratigraphic unit above to subunits
-        siblings = stratigraphic_unit.get_linked_entities('P46')
-    elif object_.system_type == 'stratigraphic unit':
-        feature = object_.get_linked_entity_safe('P46', inverse=True)
-        place = feature.get_linked_entity_safe('P46', inverse=True)
-    elif object_.system_type == 'feature':
-        place = object_.get_linked_entity_safe('P46', inverse=True)
-    gis_data = Gis.get_all([object_], subunits, siblings)
+    gis_data = structure['gis_data']
     if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]' \
-            and gis_data['gisLineSelected'] == '[]':
+            and gis_data['gisLineSelected'] == '[]' and not structure['super_id']:
         gis_data = {}
-
     return render_template('place/view.html',
                            object_=object_,
                            tables=tables,
                            overlays=overlays,
                            info=get_entity_data(object_, location),
                            gis_data=gis_data,
-                           place=place,
-                           feature=feature,
-                           stratigraphic_unit=stratigraphic_unit,
+                           structure=structure,
                            profile_image_id=profile_image_id)
 
 
@@ -482,8 +465,11 @@ def source_view(source: Entity) -> str:
             url = url_for('link_delete', id_=link_.id, origin_id=source.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
         tables[domain.view_name].rows.append(data)
-    return render_template('source/view.html', source=source, tables=tables,
-                           info=get_entity_data(source), profile_image_id=profile_image_id)
+    return render_template('source/view.html',
+                           source=source,
+                           tables=tables,
+                           info=get_entity_data(source),
+                           profile_image_id=profile_image_id)
 
 
 def node_view(node: Node) -> str:
@@ -494,15 +480,17 @@ def node_view(node: Node) -> str:
         header = [_('name'), _('value'), _('class'), _('info')]
     tables = {'entities': Table(header)}
     for entity in node.get_linked_entities(['P2', 'P89'], inverse=True, nodes=True):
-        if not node.class_.code == 'E55':  # Get the object if it's a location
-            entity = entity.get_linked_entity_safe('P53', True)  # pragma: no cover
-        if entity:  # If not entity it is a place node, so do not add
-            data = [link(entity)]
-            if root and root.value_type:  # pragma: no cover
-                data.append(format_number(entity.nodes[node]))
-            data.append(g.classes[entity.class_.code].name)
-            data.append(truncate_string(entity.description))
-            tables['entities'].rows.append(data)
+        if node.class_.code == 'E53':  # pragma: no cover
+            object_ = entity.get_linked_entity('P53', inverse=True)
+            if not object_:  # If it's a location show the object, continue otherwise
+                continue
+            entity = object_
+        data = [link(entity)]
+        if root and root.value_type:  # pragma: no cover
+            data.append(format_number(entity.nodes[node]))
+        data.append(g.classes[entity.class_.code].name)
+        data.append(truncate_string(entity.description))
+        tables['entities'].rows.append(data)
     tables['link_entities'] = Table([_('domain'), _('range')])
     for row in Link.get_entities_by_node(node):
         tables['link_entities'].rows.append([link(Entity.get_by_id(row.domain_id)),
@@ -511,7 +499,11 @@ def node_view(node: Node) -> str:
     for sub_id in node.subs:
         sub = g.nodes[sub_id]
         tables['subs'].rows.append([link(sub), sub.count, truncate_string(sub.description)])
-    return render_template('types/view.html', node=node, super_=super_, tables=tables, root=root,
+    return render_template('types/view.html',
+                           node=node,
+                           super_=super_,
+                           tables=tables,
+                           root=root,
                            info=get_entity_data(node))
 
 

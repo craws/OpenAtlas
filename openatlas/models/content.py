@@ -13,9 +13,7 @@ class Content:
     def get_content() -> Dict[str, Dict[str, str]]:
         content: Dict[str, Dict[str, str]] = {}
         for name in ['intro', 'legal_notice', 'contact']:
-            content[name] = {}
-            for language in app.config['LANGUAGES'].keys():
-                content[name][language] = ''
+            content[name] = {language: '' for language in app.config['LANGUAGES'].keys()}
         g.execute("SELECT name, language, text FROM web.i18n;")
         for row in g.cursor.fetchall():
             content[row.name][row.language] = row.text
@@ -41,7 +39,7 @@ class Content:
                 g.execute(sql, {'name': name,
                                 'language': language,
                                 'text': form.__getattribute__(language).data.strip()})
-                g.execute('COMMIT')
+            g.execute('COMMIT')
         except Exception as e:  # pragma: no cover
             g.execute('ROLLBACK')
             logger.log('error', 'database', 'transaction failed', e)
