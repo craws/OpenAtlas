@@ -301,7 +301,7 @@ def add_dates_to_form(form: Any, for_person: bool = False) -> str:
                 <label>{date}</label> {tooltip}
             </div>
             <div class="table-cell date-switcher">
-                <span id="date-switcher" class="button">{show}</span>
+                <span id="date-switcher" class="btn btn-secondary">{show}</span>
             </div>
         </div>""".format(date=uc_first(_('date')), tooltip=display_tooltip(_('tooltip date')),
                          show=uc_first(_('show')))

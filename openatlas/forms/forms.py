@@ -140,7 +140,7 @@ class TreeSelect(HiddenInput):  # type: ignore
             <input id="{name}-button" name="{name}-button" type="text"
                 class="table-select {required}" onfocus="this.blur()"
                 readonly="readonly" value="{selection}" placeholder="{change_label}">
-            <a id="{name}-clear" {clear_style} class="button"
+            <a id="{name}-clear" {clear_style} class="btn btn-secondary"
                 onclick="clearSelect('{name}');">{clear_label}</a>
             <div id="{name}-overlay" class="overlay">
                 <div id="{name}-dialog" class="overlay-container">
@@ -199,7 +199,7 @@ class TreeMultiSelect(HiddenInput):  # type: ignore
                 selected_ids.append(entity_id)
                 selection += g.nodes[entity_id].name + '<br>'
         html = """
-            <span id="{name}-button" class="button">{change_label}</span>
+            <span id="{name}-button" class="button btn btn-secondary">{change_label}</span>
             <div id="{name}-selection" style="text-align:left;">{selection}</div>
             <div id="{name}-overlay" class="overlay">
                <div id="{name}-dialog" class="overlay-container">
@@ -281,7 +281,7 @@ class TableSelect(HiddenInput):  # type: ignore
             <input id="{name}-button" name="{name}-button" class="table-select {required}"
                 type="text" placeholder="{change_label}" onfocus="this.blur()" readonly="readonly"
                 value="{selection}">
-            <a id="{name}-clear" class="button" {clear_style}
+            <a id="{name}-clear" class="btn btn-secondary" {clear_style}
                 onclick="clearSelect('{name}');">{clear_label}</a>
             <div id="{name}-overlay" class="overlay">
             <div id="{name}-dialog" class="overlay-container">{table}</div></div>
@@ -338,7 +338,7 @@ class TableMultiSelect(HiddenInput):  # type: ignore
                 checked='checked = "checked"' if field.data and entity.id in field.data else ''))
             table.rows.append(data)
         html = """
-            <span id="{name}-button" class="button">{change_label}</span><br>
+            <span id="{name}-button" class="button btn btn-secondary">{change_label}</span><br>
             <div id="{name}-selection" class="selection" style="text-align:left;">{selection}</div>
             <div id="{name}-overlay" class="overlay">
             <div id="{name}-dialog" class="overlay-container">{table}</div></div>
