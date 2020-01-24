@@ -23,7 +23,8 @@ class Network:
                 SELECT l.domain_id, l.range_id FROM model.link l
                 JOIN model.entity e ON l.domain_id = e.id
                 WHERE property_code IN %(properties)s
-                    AND (e.system_type IS NULL OR e.system_type != 'file');"""
+                    AND (e.system_type IS NULL OR (e.system_type != 'file' 
+                        AND e.system_type NOT LIKE 'external reference%%'));"""
             g.execute(sql, {'properties': tuple(properties)})
             for row in g.cursor.fetchall():
                 edges += "{{'source':'{domain_id}','target':'{range_id}'}},".format(
@@ -74,7 +75,8 @@ class Network:
                 SELECT l.id, l.domain_id, l.range_id FROM model.link l
                 JOIN model.entity e ON l.domain_id = e.id
                 WHERE property_code IN %(properties)s
-                    AND (e.system_type IS NULL OR e.system_type != 'file');"""
+                    AND (e.system_type IS NULL OR (e.system_type != 'file' 
+                        AND e.system_type NOT LIKE 'external reference%%'));"""
             g.execute(sql, {'properties': tuple(properties)})
             for row in g.cursor.fetchall():
                 edges += "{{'source':'{d_id}', 'target':'{r_id}', 'id':'{l_id}'}},".format(

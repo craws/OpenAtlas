@@ -181,6 +181,7 @@ def model_network() -> str:
 @app.route('/overview/network2/<int:dimensions>', methods=["GET", "POST"])
 @required_group('readonly')
 def model_network2(dimensions: int) -> str:
+    # For now "params" are build via a form (which isn't used in the template). Will be adapted.
     form = NetworkForm()
     form.classes.choices = []
     form.properties.choices = []
@@ -199,7 +200,6 @@ def model_network2(dimensions: int) -> str:
         form.properties.choices.append((code, g.properties[code].name))
         params['properties'][code] = {'active': (code in form.properties.data)}
     return render_template('model/network2.html',
-                           form=form,
                            network_params=params,
                            dimensions=dimensions,
                            json_data=Network.get_network_json2(params))
