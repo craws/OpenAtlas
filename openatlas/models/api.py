@@ -1,5 +1,4 @@
 import os
-from pprint import pprint
 from typing import List, Dict, Any
 
 from flask import request, url_for
@@ -10,7 +9,6 @@ from openatlas.models.geonames import Geonames
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.util.util import format_date, get_file_path
-from openatlas.views.file import display_file
 
 
 class Api:
@@ -22,11 +20,14 @@ class Api:
             links.append({'label': link.range.name,
                           'relationTo': url_for('api_entity', id_=link.range.id, _external=True),
                           'relationType': 'crm:' + link.property.code + '_' + link.property.name.replace(' ', '_')}, )
+            if link.property.code == 'P53':
+                entity.location = link.range
 
         for link in Link.get_links(entity.id, inverse=True):
             links.append({'label': link.domain.name,
                           'relationTo': url_for('api_entity', id_=link.domain.id, _external=True),
                           'relationType': 'crm:' + link.property.code + '_' + link.property.name.replace(' ', '_')}, )
+
         return links
 
     @staticmethod
@@ -90,17 +91,17 @@ class Api:
                     Api.get_file(entity)]}]}
 
         if type_ == 'FeatureCollection':
-            #gis = Gis.get_all(entity)
-            # gis = Gis.get_all(entity)
-            # location = entity.get_linked_entity('P53', nodes=True)
-            # geonames = Geonames.get_geonames_link(entity)
+            geometries = []
+            for geo in Gis.get_by_id(entity.location.id):
+                geometries.append({
+                    'type': geo['shape'],
+                    'coordinates': geo['geometry']['coordinates'],
+                    'classification': geo['type'],
+                    'description': geo['description'],
+                    'title': geo['name']}
+                )
             data['features'].append({'geometry': {
                 'type': 'GeometryCollection',
-                'geometries': [{
-                    'type': 'Point',
-                    'coordinates': [15.643286705017092, 48.586735522177],
-                    'classification': 'centerpoint',
-                    'description': 'Point in the center of the cemetery',
-                    'title': ''}]}})
+                'geometries': geometries}})
 
         return data
