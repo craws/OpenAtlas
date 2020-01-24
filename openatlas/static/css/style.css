@@ -134,15 +134,39 @@ input[type="text"].value_input {
     opacity: 0.5;
 }
 
-#menu > #index-search {
+#index-search {
     float: right;
     margin: 0;
-    padding: 0;
+    padding: 0px 0px 0px 10px;
+    width: 0px;
+    display: inline-flex;
+    height: 35px;
+    overflow: hidden;
+    position :relative;
+    transition: width 500ms;
+    font-size: 15px;
 }
 
-#menu > #index-search input[type="submit"] {
-    margin-top: 0.7em;
-    padding: 0.1em 0.4em 0.1em 0.4em;
+#index-search input {
+    margin: 2px 5px 2px 5px;
+}
+
+.iconbutton {
+    cursor: pointer;
+    display: inline-flex;
+    vertical-align: middle;
+    margin: 0px 5px 0px 5px;
+    font-size: 29px;
+    color: gray;
+}
+
+.iconbutton a {
+    color: gray;
+}
+
+#index-search-button:hover #index-search {
+    width: 305px;
+
 }
 
 list-style-type: none;
@@ -436,10 +460,7 @@ input[type=submit] {
 
 
 
-/* important to hide jquery ui dotted line of selected tabs */
-:focus {
-    outline:none;
-}
+
 ::-moz-focus-inner {
     border:0;
 }
@@ -488,6 +509,62 @@ select.pagesize, select#gis {
 
 div.data-table div.display-none {
     display: none;
+}
+
+.ui-tabs .ui-tabs-nav li.ui-tabs-active a , .ui-widget-content a{
+    cursor: pointer;
+}
+
+.ui-tabs-vertical .ui-tabs-nav {
+    float: left;
+}
+
+.ui-tabs-vertical .ui-tabs-nav li {
+    float: none;
+    width: 100%;
+}
+
+#content .ui-tabs-vertical .ui-tabs-nav li a {
+    float: none;
+    display: block;
+}
+
+.ui-tabs-vertical .ui-tabs-panel {
+    float: right;
+}
+
+.ui-tabs .ui-tabs-nav li {
+    margin: 1px;
+}
+
+.tabs-container {
+    display: inline-block;
+}
+
+.tabs-container .ui-widget-header, .ui-widget-header {
+    border: none;
+    background: none;
+    background-color: inherit;
+}
+
+.tabs-container .ui-corner-all, .ui-corner-all {
+    border-radius: 0;
+}
+
+.tabs-container.ui-widget-content {
+    border: none;
+}
+
+.ui-tabs {
+    padding: 0;
+}
+
+.ui-tabs .ui-tabs-panel {
+    padding: 1em;
+}
+
+.tabs-container .pagesize, .overlay-container .pagesize, a.button {
+    font-size: 0.9em;
 }
 
 /*bootstrap mods*/

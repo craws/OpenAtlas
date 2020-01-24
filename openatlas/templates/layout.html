@@ -1,169 +1,225 @@
 <!DOCTYPE html>
 <html lang="{{ session['language'] }}">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="theme-color" content="#ffffff">
-        <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
-        <link rel="icon" type="image/png" href="/static/favicon-32x32.png" sizes="32x32">
-        <link rel="icon" type="image/png" href="/static/favicon-16x16.png" sizes="16x16">
-        {% if '127.0.0' not in request.url %}
-            <link rel="manifest" href="/static/manifest.json">
-        {% endif%}
-        <link rel="mask-icon" href="/static/safari-pinned-tab.svg" />
-        <link rel="stylesheet" href="/static/css/reset.css?v={{ config['VERSION'] }}" />
-        <link rel="stylesheet" href="/static/css/uitheme.css" />
-        <link rel="stylesheet" href="/static/css/style.css?v={{ config['VERSION'] }}" />
-        <link rel="stylesheet" href="/static/css/color.css?v={{ config['VERSION'] }}" />
-        <link rel="stylesheet" href="/static/css/images.css?v={{ config['VERSION'] }}" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="theme-color" content="#ffffff">
+    <link rel="apple-touch-icon" sizes="180x180" href="/static/apple-touch-icon.png">
+    <link rel="icon" type="image/png" href="/static/favicon-32x32.png" sizes="32x32">
+    <link rel="icon" type="image/png" href="/static/favicon-16x16.png" sizes="16x16">
+    {% if '127.0.0' not in request.url %}
+        <link rel="manifest" href="/static/manifest.json">
+    {% endif %}
+    <link rel="mask-icon" href="/static/safari-pinned-tab.svg"/>
+    <link rel="stylesheet" href="/static/css/reset.css?v={{ config['VERSION'] }}"/>
+    <link rel="stylesheet" href="/static/css/uitheme.css"/>
+    <link rel="stylesheet" href="/static/css/style.css?v={{ config['VERSION'] }}"/>
+    <link rel="stylesheet" href="/static/css/color.css?v={{ config['VERSION'] }}"/>
+    <link rel="stylesheet" href="/static/css/images.css?v={{ config['VERSION'] }}"/>
 
-        <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css" />
-        <link rel="stylesheet" href="/static/node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css" />
-        <link rel="stylesheet" href="/static/node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css" />
+    <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/static/node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css"/>
+    <link rel="stylesheet" href="/static/node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css"/>
 
-        <script src="/static/node_modules/jquery/dist/jquery.min.js"></script>
-        <script src="/static/node_modules/jquery-ui-dist/jquery-ui.min.js"></script>
-        <script src="/static/node_modules/datatables.net/js/jquery.dataTables.min.js"></script>
-        <script src="/static/node_modules/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
-        <script src="/static/node_modules/jquery-validation/dist/jquery.validate.min.js"></script>
-        <script src="/static/node_modules/jstree/dist/jstree.min.js"></script>
-        <script src="/static/node_modules/tinymce/tinymce.min.js"></script>
-        <script src="/static/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
-        <script src="/static/node_modules/popper.js/dist/umd/popper.min.js"></script>
-        <script src="/static/node_modules/@fortawesome/fontawesome-free/js/all.min.js"></script>
-        {% if gis_data %}
-            {% include "map.html" %}
-        {% endif %}
-        <script>
-            bookmark_csrf_token = '{{ csrf_token() }}';
-            minimumPasswordLength = {{ session['settings']['minimum_password_length'] }};
-            show = '{{ _('show')|uc_first }}';
-            hide = '{{ _('hide')|uc_first }}';
-            moreText = '{{ _('show more')|uc_first }}';
-            lessText = '{{ _('show less')|uc_first }}';
-            maxFileSize = {{ session['settings']['file_upload_max_size'] }}
-        </script>
-        <script src="/static/js/functions.js"></script>
-        <script src="/static/js/forms.js"></script>
-        {% set js_translation_file = '/static/js/messages_' + session['language'] + '.js' %}
-        {% if js_translation_file|test_file %}
-            <script src="{{ js_translation_file }}"></script>
-        {% endif %}
-        <title>
-            {{ session['settings']['site_name'] }}
-            {{ ' - ' + request.path.split('/')[1]|uc_first if request.path.split('/')[1] else '' }}
-            {% block title_name %}{% endblock %}
-        </title>
-    </head>
-    <body>
- <!--       <div id="header">
-            <div id="logo">
-                <a href="/">{{ session['settings']['logo_file_id']|display_logo|safe }}</a>
-            </div>
-            <div id="site-name">
-                {{ session['settings']['site_header'] }}
-                {% if 'local' in request['url_root'] %}local{% endif %}
-                <noscript><div class="error">{{ _('warning no js') }}</div></noscript>
+    <script src="/static/node_modules/jquery/dist/jquery.min.js"></script>
+    <script src="/static/node_modules/jquery-ui-dist/jquery-ui.min.js"></script>
+    <script src="/static/node_modules/datatables.net/js/jquery.dataTables.min.js"></script>
+    <script src="/static/node_modules/datatables.net-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="/static/node_modules/jquery-validation/dist/jquery.validate.min.js"></script>
+    <script src="/static/node_modules/jstree/dist/jstree.min.js"></script>
+    <script src="/static/node_modules/tinymce/tinymce.min.js"></script>
+    <script src="/static/node_modules/popper.js/dist/umd/popper.min.js"></script>
+    <script src="/static/node_modules/bootstrap/dist/js/bootstrap.min.js"></script>
+    <script src="/static/node_modules/@fortawesome/fontawesome-free/js/all.min.js"></script>
+    {% if gis_data %}
+        {% include "map.html" %}
+    {% endif %}
+    <script>
+        bookmark_csrf_token = '{{ csrf_token() }}';
+        minimumPasswordLength = {{ session['settings']['minimum_password_length'] }};
+        show = '{{ _('show')|uc_first }}';
+        hide = '{{ _('hide')|uc_first }}';
+        moreText = '{{ _('show more')|uc_first }}';
+        lessText = '{{ _('show less')|uc_first }}';
+        maxFileSize =
+        {{ session['settings']['file_upload_max_size'] }}
+    </script>
+    <script src="/static/js/functions.js"></script>
+    <script src="/static/js/forms.js"></script>
+    {% set js_translation_file = '/static/js/messages_' + session['language'] + '.js' %}
+    {% if js_translation_file|test_file %}
+        <script src="{{ js_translation_file }}"></script>
+    {% endif %}
+    <title>
+        {{ session['settings']['site_name'] }}
+        {{ ' - ' + request.path.split('/')[1]|uc_first if request.path.split('/')[1] else '' }}
+        {% block title_name %}{% endblock %}
+    </title>
+</head>
+<body>
+<!--       <div id="site-name">
+
+
+
                 <br><br>
-                {% with messages = get_flashed_messages(with_categories=true) %}
-                    {% if messages %}
-                        {% for category, message in messages %}
-                            <div class="message {{ category }}">{{ message|uc_first }}</div>
-                        {% endfor %}
-                    {% endif %}
-                {% endwith %}
-            </div>
-            <div id="header-menu">
-                <div>
-                    {{ _('version')|uc_first }} {{ config['VERSION'] }} -
-                    <a href="{{ url_for('index_changelog') }}">{{ _('changelog')|uc_first }}</a>
-                    - <a href="https://redmine.openatlas.eu/projects/uni/wiki/Manual" target="_blank" rel="noopener">
-                        <img style="height:14px;" src="/static/images/icons/book.png" alt=''> {{ _('manual')|uc_first }}
-                      </a>
-                    - <a href="{{ url_for('model_index') }}">{{ _('model')|uc_first }}</a>
-                    - <a href="{{ url_for('index_credits') }}">{{ _('credits')|uc_first }}</a>
-                    {% if 'contact'|display_content_translation %}
-                        - <a href="{{ url_for('index_content', item='contact') }}">{{ _('contact')|uc_first }}</a>
-                    {% endif %}
-                    {% if 'legal_notice'|display_content_translation %}
-                        - <a href="{{ url_for('index_content', item='legal_notice') }}">{{ _('legal_notice')|uc_first }}</a>
-                    {% endif %}
-                </div>
-                {% if current_user.is_authenticated %}
-                    <div id="greeting">
-                        {{ _('hello')|uc_first }} {{ current_user.username }} |
-                        <a href="{{ url_for('profile_index') }}">{{ _('profile')|uc_first }}</a>
-                    </div>
-                    <div style="clear:both;"></div>
-                {% endif %}
-                <div>
 
+            </div>
+-->
+<nav class="navbar navbar-expand-lg navbar-light bg-light">
+    <a class="navbar-brand" href="/">
+        <img src="/static/images/layout/logo_small.png" height="40px" alt="Logo">
+    </a>
+    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+        <div class="navbar-nav">
+            {{ origin|display_menu|safe }}
+        </div>
+    </div>
+    <div style="float: right;">
+        {% if current_user.is_authenticated %}
+        <div id="index-search-button" class="iconbutton">
+            <a href="#">
+            <span >
+                <i class="fas fa-search"></i>
+            </span>
+            </a>
+            <div id="index-search">
+                <form method="post" action="{{ url_for('search_index') }}" style="display: inline-flex">
+                    {{ search_form.csrf_token }}
+                    {{ search_form.term }}
+                    {{ search_form.search}}
+                </form>
             </div>
         </div>
--->        <nav class="navbar navbar-expand-lg navbar-light bg-light">
-          <a class="navbar-brand" href="/">
-            <img src="/static/images/layout/logo_small.png" height="40px" alt="Logo">
-          </a>
-          <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-            <span class="navbar-toggler-icon"></span>
-          </button>
-          <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-            <div class="navbar-nav">
-                {{ origin|display_menu|safe }}
-            </div>
-          </div>
-            {% if current_user.is_authenticated %}
-                <div id="index-search">
-                    <form method="post" action="{{ url_for('search_index') }}">
-                        {{ search_form.csrf_token }}
-                        {{ search_form.term }}
-                        {{ search_form.search}}
-                    </form>
-                </div>
-            {% endif %}
-                <div style="float: right">
-                    <a href="">
-                        <span style="font-size: 25px; color: gray;">
-                            <i class="fas fa-search"></i>
-                        </span>
-                    </a>
-                    <a href="">
-                        <span style="font-size: 25px; color: gray;">
-                            <i class="far fa-user"></i>
-                        </span>
-                    </a>
-                    <div class="btn-group btn-group-toggle">
-                        {% for language in config['LANGUAGES'].keys()|sort %}
-                            {% if 'language' in session and session['language'] == language %}
-                                <span class="btn btn-secondary active btn-sm">{{ language|upper }}</span>
-                            {% else %}
-                                <a class="btn btn-secondary btn-sm" href="{{ url_for('set_locale', language=language) }}">{{ language|upper }}</a>
-                            {% endif %}
-                        {% endfor %}
-                    </div>
-                        {% if current_user.is_authenticated %}
-                            <a class="btn btn-warning btn-sm" href="/logout">{{ _('logout')|uc_first }}</a>
-                        {% else %}
-                            <a class="btn btn-warning btn-sm" href="/login">{{ _('login')|uc_first }}</a>
-                        {% endif %}
-                    </div>
-                </div>
-        </nav>
-        <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-            {% block breadcrumb %}{% endblock %}
-            </ol>
-        </nav>
-        <main>
-            <div id="content" >
-                <div style="float:left">{% block content %}{% endblock %}</div>
-                {% if session['settings']['debug_mode'] and 'admin'|is_authorized %}
-                    <div class="data-table" style="float:right;margin:1em;">
-                        <p>Debug</p>
-                        {{ debug_model|display_debug_info(form)|safe }}
-                    </div>
+        <div class="iconbutton"
+             data-toggle="popover"
+             title="{{ _('profile')|uc_first }}"
+             data-content="{{ _('hello')|uc_first }} {{ current_user.username }}"
+             data-trigger="hover">
+            <a href="{{ url_for('profile_index') }}">
+                <span >
+                    <i class="far fa-user"></i>
+                </span>
+            </a>
+        </div>
+        {% endif %}
+        <div class="iconbutton"
+             data-toggle="popover"
+             title="{{ _('manual')|uc_first }}"
+             data-content="{{ _('manual')|uc_first }}"
+             data-trigger="hover">
+            <a href="https://redmine.openatlas.eu/projects/uni/wiki/Manual" target="_blank" rel="noopener">
+                <span>
+                    <i class="fas fa-book"></i>
+                </span>
+            </a>
+        </div>
+        <div class="iconbutton"
+             data-toggle="popover"
+             title="{{ _('version')|uc_first }}"
+             data-content="{{ config['VERSION'] }}"
+             data-trigger="hover">
+            <a href="{{ url_for('index_changelog') }}" >
+                <span>
+                    <i class="fas fa-code-branch"></i>
+                </span>
+            </a>
+        </div>
+        <div class="iconbutton"
+             data-toggle="popover"
+             title="{{ _('model')|uc_first }}"
+             data-content="{{ _('model')|uc_first }}"
+             data-trigger="hover">
+            <a href="{{ url_for('model_index') }}" >
+                <span>
+                    <i class="fas fa-sitemap"></i>
+                </span>
+            </a>
+        </div>
+        <div class="iconbutton"
+             data-toggle="popover"
+             title="{{ _('credits')|uc_first }}"
+             data-content="{{ _('credits')|uc_first }}"
+             data-trigger="hover">
+            <a href="{{ url_for('index_credits') }}" >
+                <span>
+                    <i class="fas fa-info-circle"></i>
+                </span>
+            </a>
+        </div>
+        {% if 'contact'|display_content_translation %}
+        <div class="iconbutton"
+             data-toggle="popover"
+             title="{{ _('contact')|uc_first }}"
+             data-content="{{ _('contact')|uc_first }}"
+             data-trigger="hover">
+            <a href="{{ url_for('index_content', item='contact') }}" >
+                <span>
+                    <i class="fas fa-at"></i>
+                </span>
+            </a>
+        </div>
+        {% endif %}
+        {% if 'legal_notice'|display_content_translation %}
+        <div class="iconbutton"
+             data-toggle="popover"
+             title="{{ _('legal_notice')|uc_first }}"
+             data-content="{{ _('legal_notice')|uc_first }}"
+             data-trigger="hover">
+            <a href="{{ url_for('index_content', item='legal_notice') }}" >
+                <span>
+                    <i class="fas fa-balance-scale"></i>
+                </span>
+            </a>
+        </div>
+        {% endif %}
+        <div class="btn-group btn-group-toggle">
+            {% for language in config['LANGUAGES'].keys()|sort %}
+                {% if 'language' in session and session['language'] == language %}
+                    <span class="btn btn-secondary active btn-sm">{{ language|upper }}</span>
+                {% else %}
+                    <a class="btn btn-secondary btn-sm"
+                       href="{{ url_for('set_locale', language=language) }}">{{ language|upper }}</a>
                 {% endif %}
-                <div style="clear:both"></div>
+            {% endfor %}
+        </div>
+        {% if current_user.is_authenticated %}
+            <a class="btn btn-warning btn-sm" href="/logout">{{ _('logout')|uc_first }}</a>
+        {% else %}
+            <a class="btn btn-warning btn-sm" href="/login">{{ _('login')|uc_first }}</a>
+        {% endif %}
+    </div>
+</nav>
+<nav aria-label="breadcrumb">
+    <ol class="breadcrumb">
+        {% block breadcrumb %}{% endblock %}
+    </ol>
+</nav>
+<noscript><div class="error">{{ _('warning no js') }}</div></noscript>
+{{ session['settings']['site_header'] }}
+{% if 'local' in request['url_root'] %}local{% endif %}
+{% with messages = get_flashed_messages(with_categories=true) %}
+    {% if messages %}
+        {% for category, message in messages %}
+            <div class="alert alert-{{ category }}" role="alert">
+              {{ message|uc_first }}
             </div>
-        </main>
-    </body>
+        {% endfor %}
+    {% endif %}
+{% endwith %}
+<main>
+    <div id="content">
+        <div style="float:left">{% block content %}{% endblock %}</div>
+        {% if session['settings']['debug_mode'] and 'admin'|is_authorized %}
+            <div class="data-table" style="float:right;margin:1em;">
+                <p>Debug</p>
+                {{ debug_model|display_debug_info(form)|safe }}
+            </div>
+        {% endif %}
+        <div style="clear:both"></div>
+    </div>
+</main>
+</body>
 </html>
