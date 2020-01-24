@@ -38,10 +38,19 @@ class Api:
                 filename = os.path.basename(path) if path else False
                 files.append({'@id': url_for('api_entity', id_=link.domain.id, _external=True),
                               'title': link.domain.name,
-                              'license': 'cc:by-nc-nd/4.0/',  # Todo: Search for licence
+                              'license': Api.get_license(link.domain.id),  # Todo: Search for licence
                               'url': url_for('display_file', filename=filename, _external=True)})
 
         return files
+
+    @staticmethod
+    def get_license(entity_id) -> List[Dict[str, str]]:
+        file_license = ""
+        for link in Link.get_links(entity_id):
+            if link.property.code == "P2":
+                file_license = link.range.name
+
+        return file_license
 
     @staticmethod
     def get_entity(id_: int) -> Dict[str, Any]:
@@ -81,7 +90,7 @@ class Api:
                     Api.get_file(entity)]}]}
 
         if type_ == 'FeatureCollection':
-            # gis = Gis.get_all(entity)
+            #gis = Gis.get_all(entity)
             # gis = Gis.get_all(entity)
             # location = entity.get_linked_entity('P53', nodes=True)
             # geonames = Geonames.get_geonames_link(entity)
