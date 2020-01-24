@@ -668,7 +668,11 @@
 }
 
 .ui-button-icon-only { width: 2.2em; } /* to make room for the icon, a width needs to be set here */
-button.ui-button-icon-only { } /* button elements seem to need a little more width */
+button.ui-button-icon-only {
+  text-indent: 100%;
+  white-space: nowrap;
+  overflow: hidden;
+} /* button elements seem to need a little more width */
 .ui-button-icons-only { width: 3.4em; }
 button.ui-button-icons-only { width: 3.7em; }
 
