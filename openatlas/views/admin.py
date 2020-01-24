@@ -31,9 +31,11 @@ class GeneralForm(FlaskForm):  # type: ignore
     site_header = StringField(uc_first(_('site header')))
     default_language = SelectField(uc_first(_('default language')),
                                    choices=list(app.config['LANGUAGES'].items()))
-    default_table_rows = SelectField(uc_first(_('default table rows')), coerce=int,
+    default_table_rows = SelectField(uc_first(_('default table rows')),
+                                     coerce=int,
                                      choices=list(app.config['DEFAULT_TABLE_ROWS'].items()))
-    log_level = SelectField(uc_first(_('log level')), coerce=int,
+    log_level = SelectField(uc_first(_('log level')),
+                            coerce=int,
                             choices=list(app.config['LOG_LEVELS'].items()))
     debug_mode = BooleanField(uc_first(_('debug mode')))
     random_password_length = IntegerField(uc_first(_('random password length')))
@@ -210,8 +212,11 @@ def admin_check_dates() -> str:
               'dates': Table(['name', 'class', 'type', 'system type', 'created', 'updated',
                               'description'])}
     for entity in Date.get_invalid_dates():
-        tables['dates'].rows.append([link(entity), link(entity.class_), entity.print_base_type(),
-                                     entity.system_type, format_date(entity.created),
+        tables['dates'].rows.append([link(entity),
+                                     link(entity.class_),
+                                     entity.print_base_type(),
+                                     entity.system_type,
+                                     format_date(entity.created),
                                      format_date(entity.modified),
                                      truncate_string(entity.description)])
     for link_ in Date.get_invalid_link_dates():
@@ -344,7 +349,8 @@ def admin_file_delete(filename: str) -> Response:  # pragma: no cover
 
 class LogForm(FlaskForm):  # type: ignore
     limit = SelectField(_('limit'), choices=((0, _('all')), (100, 100), (500, 500)), default=100)
-    priority = SelectField(_('priority'), choices=(list(app.config['LOG_LEVELS'].items())),
+    priority = SelectField(_('priority'),
+                           choices=(list(app.config['LOG_LEVELS'].items())),
                            default=6)
     user = SelectField(_('user'), choices=([(0, _('all'))]), default=0)
     apply = SubmitField(_('apply'))
@@ -427,9 +433,8 @@ def admin_mail() -> str:
     form = TestMailForm()
     settings = session['settings']
     if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
-        user = current_user
         subject = _('Test mail from %(site_name)s', site_name=session['settings']['site_name'])
-        body = _('This test mail was sent by %(username)s', username=user.username)
+        body = _('This test mail was sent by %(username)s', username=current_user.username)
         body += ' ' + _('at') + ' ' + request.headers['Host']
         if send_mail(subject, body, form.receiver.data):
             flash(_('A test mail was sent to %(email)s.', email=form.receiver.data))
@@ -443,7 +448,9 @@ def admin_mail() -> str:
         _('mail from email'): settings['mail_from_email'],
         _('mail from name'): settings['mail_from_name'],
         _('mail recipients feedback'): ';'.join(settings['mail_recipients_feedback'])}
-    return render_template('admin/mail.html', settings=settings, mail_settings=mail_settings,
+    return render_template('admin/mail.html',
+                           settings=settings,
+                           mail_settings=mail_settings,
                            form=form)
 
 
@@ -465,7 +472,8 @@ def admin_general() -> str:
         _('failed login forget minutes'): settings['failed_login_forget_minutes'],
         _('minimum jstree search'): settings['minimum_jstree_search'],
         _('minimum tablesorter search'): settings['minimum_tablesorter_search']}
-    return render_template('admin/general.html', settings=settings,
+    return render_template('admin/general.html',
+                           settings=settings,
                            general_settings=general_settings)
 
 

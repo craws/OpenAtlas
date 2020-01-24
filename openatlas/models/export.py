@@ -82,7 +82,8 @@ class Export:
             user=app.config['DATABASE_USER'],
             file=path)
         try:
-            subprocess.Popen(command, shell=True, stdin=subprocess.PIPE,
+            subprocess.Popen(command, shell=True,
+                             stdin=subprocess.PIPE,
                              env={'PGPASSWORD': app.config['DATABASE_PASS']}).wait()
         except Exception:  # pragma: no cover
             return False

@@ -88,8 +88,7 @@ class CidocProperty:
             return self.i18n_inverse[locale_default]
         return getattr(self, '_name_inverse')  # pragma: no cover
 
-    def find_object(self, attr: str, class_id: int) -> bool:
-        # Used to check if links are CIDOC CRM valid
+    def find_object(self, attr: str, class_id: int) -> bool:  # Check if links are CIDOC CRM valid
         valid_domain_id = getattr(self, attr)
         if valid_domain_id == class_id:
             return True
