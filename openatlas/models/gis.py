@@ -1,5 +1,5 @@
 import ast
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 from flask import g, json
 from flask_wtf import FlaskForm
@@ -17,7 +17,7 @@ class InvalidGeomException(Exception):
 class Gis:
 
     @staticmethod
-    def get_by_id(id_: int) -> List[Dict[str, Union[str, int]]]:
+    def get_by_id(id_: int) -> List[Dict[str, Any]]:  # pragma no cover
         # Needed only in API for now
         geometries = []
         for shape in ['point', 'polygon', 'linestring']:

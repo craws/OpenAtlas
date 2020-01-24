@@ -31,19 +31,13 @@
             <h2>{{ _('classes')|uc_first }}</h2>
             <div>
                 <div id="classes" style="float:left">
-                    <p id="select_all" class="select_all">{{ _('select all')|uc_first }}</p>
                     {% for item in form.classes %}
-                        {{ form['color_' + item.data] }} {{ item }} {{ item.label }}<br>
+                        {{ form['color_' + item.data] }} {{ item.label }}<br>
                     {% endfor %}
                 </div>
             </div>
             <div style="clear:both;"></div>
             <p>{{ form.orphans }} {{ _('show orphans')|uc_first }}</p>
-            <h2>{{ _('links')|uc_first }}</h2>
-            <p id="select_all_links" class="select_all">{{ _('deselect all')|uc_first }}</p>
-            <div id="links">
-                {{ form.properties }}
-            </div>
             <h2>{{ _('network options')|uc_first }}</h2>
             {{ form.width }} {{ form.width.label }}<br>
             {{ form.height }} {{ form.height.label }}<br>
@@ -52,39 +46,4 @@
             <input id="save" name="save" value="{{ _('apply')|uc_first }}" type="submit">
         </form>
     </div>
-
-    <script>
-        $("#select_all").click(function() {
-            if ($("#classes :checkbox").length == $("#classes :checkbox:checked").length) {
-                $("#classes :checkbox").each(function(){this.checked = false;});
-                $("#select_all").html('{{ _('select all')|uc_first }}');
-            } else {
-                $("#classes :checkbox").each(function(){this.checked = true;});
-                $("#select_all").html('{{ _('deselect all')|uc_first }}');
-            }
-        })
-        $("#classes :checkbox").change(function() {
-            if ($("#classes :checkbox").length == $("#classes :checkbox:checked").length) {
-                $("#select_all").html('{{ _('deselect all')|uc_first }}');
-            } else {
-                $("#select_all").html('{{ _('select all')|uc_first }}');
-            }
-        });
-        $("#select_all_links").click(function() {
-            if ($("#links :checkbox").length == $("#links :checkbox:checked").length) {
-                $("#links :checkbox").each(function(){this.checked = false;});
-                $("#select_all_links").html('{{ _('select all')|uc_first }}');
-            } else {
-                $("#links :checkbox").each(function(){this.checked = true;});
-                $("#select_all_links").html('{{ _('deselect all')|uc_first }}');
-            }
-        })
-        $("#links :checkbox").change(function() {
-            if ($("#links :checkbox").length == $("#links :checkbox:checked").length) {
-                $("#select_all_links").html('{{ _('deselect all')|uc_first }}');
-            } else {
-                $("#select_all_links").html('{{ _('select all')|uc_first }}');
-            }
-        });
-    </script>
 {% endblock %}

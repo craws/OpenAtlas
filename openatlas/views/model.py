@@ -132,12 +132,7 @@ class NetworkForm(FlaskForm):  # type: ignore
     classes = SelectMultipleField(_('classes'),
                                   option_widget=widgets.CheckboxInput(),
                                   widget=widgets.ListWidget(prefix_label=False),
-                                  default=['E21', 'E7', 'E40', 'E74', 'E8'])
-    properties = SelectMultipleField(
-        _('properties'),
-        option_widget=widgets.CheckboxInput(),
-        widget=widgets.ListWidget(prefix_label=False),
-        default=['P107', 'P24', 'P23', 'P11', 'P14', 'P7', 'P74', 'P67', 'OA7', 'OA8', 'OA9'])
+                                  default=['E21', 'E7', 'E40', 'E74', 'E8', 'E18', 'E53'])
     kw_params = {'data-huebee': True, 'class': 'data-huebee'}
     color_E21 = StringField(default='#34B522', render_kw=kw_params)
     color_E7 = StringField(default='#E54A2A', render_kw=kw_params)
@@ -157,9 +152,7 @@ class NetworkForm(FlaskForm):  # type: ignore
 def model_network() -> str:
     form = NetworkForm()
     form.classes.choices = []
-    form.properties.choices = []
     params: Dict[str, Any] = {'classes': {},
-                              'properties': {},
                               'options': {'orphans': form.orphans.data,
                                           'width': form.width.data,
                                           'height': form.height.data,
@@ -169,9 +162,6 @@ def model_network() -> str:
         form.classes.choices.append((code, g.classes[code].name))
         params['classes'][code] = {'active': (code in form.classes.data),
                                    'color': getattr(form, 'color_' + code).data}
-    for code in ['P107', 'P24', 'P23', 'P11', 'P14', 'P7', 'P74', 'P67', 'OA7', 'OA8', 'OA9']:
-        form.properties.choices.append((code, g.properties[code].name))
-        params['properties'][code] = {'active': (code in form.properties.data)}
     return render_template('model/network.html',
                            form=form,
                            network_params=params,
@@ -184,9 +174,7 @@ def model_network2(dimensions: int) -> str:
     # For now "params" are build via a form (which isn't used in the template). Will be adapted.
     form = NetworkForm()
     form.classes.choices = []
-    form.properties.choices = []
     params: Dict[str, Any] = {'classes': {},
-                              'properties': {},
                               'options': {'orphans': form.orphans.data,
                                           'width': form.width.data,
                                           'height': form.height.data,
@@ -196,9 +184,6 @@ def model_network2(dimensions: int) -> str:
         form.classes.choices.append((code, g.classes[code].name))
         params['classes'][code] = {'active': (code in form.classes.data),
                                    'color': getattr(form, 'color_' + code).data}
-    for code in ['P107', 'P24', 'P23', 'P11', 'P14', 'P7', 'P74', 'P67', 'OA7', 'OA8', 'OA9']:
-        form.properties.choices.append((code, g.properties[code].name))
-        params['properties'][code] = {'active': (code in form.properties.data)}
     return render_template('model/network2.html',
                            network_params=params,
                            dimensions=dimensions,
