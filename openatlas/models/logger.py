@@ -17,7 +17,8 @@ class Logger:
         priority = list(log_levels.keys())[list(log_levels.values()).index(priority_)]
         if int(session['settings']['log_level']) < priority:
             return
-        info = '{method} {path}{info}'.format(path=request.path, method=request.method,
+        info = '{method} {path}{info}'.format(path=request.path,
+                                              method=request.method,
                                               info='\n' + str(info) if info else '')
         sql = """
             INSERT INTO web.system_log (priority, type, message, user_id, info)

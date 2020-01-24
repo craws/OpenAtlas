@@ -26,11 +26,11 @@ class Gis:
         if not subunits:
             subunits = []
         all_: Dict[str, List[Any]] = {'point': [], 'linestring': [], 'polygon': []}
+        extra: Dict[str, List[Any]] = {'supers': [], 'subs': [], 'siblings': []}
         selected: Dict[str, List[Any]] = {'point': [],
                                           'linestring': [],
                                           'polygon': [],
                                           'polygon_point': []}
-        extra: Dict[str, List[Any]] = {'supers': [], 'subs': [], 'siblings': []}
 
         # Include GIS of subunits which would be otherwise omitted
         subunit_ids = [subunit.id for subunit in subunits]

@@ -23,7 +23,7 @@ from openatlas.util.util import get_base_table_data, get_file_stats, truncate_st
 
 
 def get_link_type(form: Any) -> Optional_Type[Entity]:
-    """ Returns the link type provided by a link form, e.g. involvement between actor and event."""
+    """ Returns the base type provided by a link form, e.g. involvement between actor and event."""
     for field in form:
         if type(field) is TreeField and field.data:
             return g.nodes[int(field.data)]
@@ -256,7 +256,6 @@ class TableSelect(HiddenInput):  # type: ignore
             file_stats = get_file_stats()
         else:
             entities = Entity.get_by_codes(class_)
-        selection = ''
         table = Table(Table.HEADERS[class_])
 
         # Table definitions (aligning)
@@ -265,6 +264,7 @@ class TableSelect(HiddenInput):  # type: ignore
         elif class_ in ['actor', 'group', 'feature', 'place']:
             table.defs += '[{className: "dt-body-right", targets: [2,3]}]'
 
+        selection = ''
         for entity in entities:
             # Todo: don't show self e.g. at source
             if field.data and entity.id == int(field.data):
@@ -307,7 +307,6 @@ class TableMultiSelect(HiddenInput):  # type: ignore
     def __call__(self, field: TableField, **kwargs: Any) -> TableMultiSelect:
         if field.data and type(field.data) is str:
             field.data = ast.literal_eval(field.data)
-        selection = ''
         class_ = field.id if field.id != 'given_place' else 'place'
         headers_len = str(len(Table.HEADERS[class_]))
 
@@ -327,8 +326,8 @@ class TableMultiSelect(HiddenInput):  # type: ignore
             entities = Entity.get_by_system_type('place', nodes=True, aliases=aliases)
         else:
             entities = Entity.get_by_codes(class_)
+
         for entity in entities:
-            selection += entity.name + '<br>' if field.data and entity.id in field.data else ''
             data = get_base_table_data(entity)
             data[0] = re.sub(re.compile('<a.*?>'), '', data[0])  # Remove links
             data.append("""<input type="checkbox" id="{id}" {checked} value="{name}"
@@ -337,6 +336,7 @@ class TableMultiSelect(HiddenInput):  # type: ignore
                 name=entity.name,
                 checked='checked = "checked"' if field.data and entity.id in field.data else ''))
             table.rows.append(data)
+        selection = [entity.name for entity in entities if field.data and entity.id]
         html = """
             <span id="{name}-button" class="button btn btn-secondary">{change_label}</span><br>
             <div id="{name}-selection" class="selection" style="text-align:left;">{selection}</div>
@@ -347,7 +347,7 @@ class TableMultiSelect(HiddenInput):  # type: ignore
             </script>""".format(name=field.id,
                                 change_label=uc_first(_('change')),
                                 title=_(field.id.replace('_', ' ')),
-                                selection=selection,
+                                selection='<br>'.join(selection),
                                 table=table.display(field.id))
         return super(TableMultiSelect, self).__call__(field, **kwargs) + html
 
@@ -394,15 +394,16 @@ def build_move_form(form: Any, node: Node) -> FlaskForm:
 
 def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
     """ Returns a form with a list of entities with checkboxes"""
-    table = Table(Table.HEADERS[class_name] + [''])
-    linked_ids = [entity.id for entity in linked_entities]
-    file_stats = get_file_stats() if class_name == 'file' else None
     if class_name == 'file':
         entities = Entity.get_by_system_type('file', nodes=True)
     elif class_name == 'place':
         entities = Entity.get_by_system_type('place', nodes=True, aliases=True)
     else:
         entities = Entity.get_by_codes(class_name)
+
+    linked_ids = [entity.id for entity in linked_entities]
+    table = Table(Table.HEADERS[class_name] + [''])
+    file_stats = get_file_stats() if class_name == 'file' else None
     for entity in entities:
         if entity.id in linked_ids:
             continue  # Don't show already linked entries
