@@ -270,12 +270,21 @@ class TableSelect(HiddenInput):  # type: ignore
             if field.data and entity.id == int(field.data):
                 selection = entity.name
             data = get_base_table_data(entity, file_stats)
-            data[0] = """<a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
-                        """.format(name=field.id,
-                                   entity_id=entity.id,
-                                   entity_name=truncate_string(entity.name, span=False))
-            data[0] = '<br>'.join([data[0]] + [
-                truncate_string(alias) for id_, alias in entity.aliases.items()])
+            if len(entity.aliases) > 0:
+                data[0] = """<p><a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a></p>
+                            """.format(name=field.id,
+                                       entity_id=entity.id,
+                                       entity_name=truncate_string(entity.name, span=False))
+            else:
+                data[0] = """<a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
+                            """.format(name=field.id,
+                                       entity_id=entity.id,
+                                       entity_name=truncate_string(entity.name, span=False))
+            for i, (id_, alias) in enumerate(entity.aliases.items()):
+                if i == len(entity.aliases) - 1:
+                    data[0] = ''.join([data[0]] + [truncate_string(alias)])
+                else:
+                    data[0] = ''.join([data[0]] + ['<p>'+truncate_string(alias)+'</p>'])
             table.rows.append(data)
         html = """
             <input id="{name}-button" name="{name}-button" class="table-select {required}"

@@ -187,6 +187,9 @@
 <nav aria-label="breadcrumb">
     <ol class="breadcrumb">
         {% block breadcrumb %}{% endblock %}
+        <li style="float: right">
+        v{{ config['VERSION'] }}
+        </li>
     </ol>
 </nav>
 <noscript><div class="error">{{ _('warning no js') }}</div></noscript>
