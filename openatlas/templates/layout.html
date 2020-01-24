@@ -81,7 +81,7 @@
                 <form method="post" action="{{ url_for('search_index') }}" style="display: inline-flex">
                     {{ search_form.csrf_token }}
                     {{ search_form.term }}
-                    {{ search_form.search(class_="btn btn-secondary")}}
+                    {{ search_form.search(class_="btn btn-outline-primary btn-sm")}}
                 </form>
             </div>
         </div>

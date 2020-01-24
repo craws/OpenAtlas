@@ -186,16 +186,6 @@ list-style-type: none;
     width: 30em;
 }
 
-span.tooltip {
-    font-family: courier new, monospace;
-    padding: 0.2em 0.2em 0 0.1em;
-    font-weight: bold;
-    border-width: 1px;
-    border-style: solid;
-    cursor: help;
-    position: relative;
-}
-
 form input[type="text"].month, form input[type="text"].day {
     text-align: right;
     width: 2em;
@@ -443,23 +433,6 @@ input[type=text], input[type=password], textarea {
     padding-left: 0.2em;
     padding-right: 0.2em;
 }
-
-input[type=submit] {
-    background: none;
-    border: none;
-    cursor: pointer;
-    display: inline-block;
-    font-size: 1em;
-    font-weight: bold;
-    margin-right: 1em;
-    margin-top: 1em;
-    padding: 0.3em 0.5em;
-    text-decoration: none;
-    white-space: nowrap;
-}
-
-
-
 
 ::-moz-focus-inner {
     border:0;

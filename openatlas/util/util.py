@@ -55,7 +55,7 @@ def print_file_size(entity: 'Entity') -> str:
 def display_tooltip(text: str) -> str:
     if not text:
         return ''
-    return ' <span class="tooltip" title="{title}">i</span>'.format(title=text.replace('"', "'"))
+    return '<span><i class="fas fa-info-circle" title="{title}"></i></span>'.format(title=text.replace('"', "'"))
 
 
 def print_file_extension(entity: Union[int, 'Entity']) -> str:
