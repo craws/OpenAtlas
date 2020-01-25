@@ -7,12 +7,12 @@ from openatlas.util.util import truncate_string
 
 class Network:
 
-    properties = ['P107', 'P24', 'P23', 'P11', 'P14', 'P7', 'P74', 'P67', 'OA7', 'OA8', 'OA9']
-    classes = ['E21', 'E7', 'E31', 'E33', 'E40', 'E74', 'E53', 'E18', 'E8', 'E84']
+    properties = ['P7', 'P11', 'P14', 'P23', 'P24', 'P67', 'P74', 'P107', 'OA7', 'OA8', 'OA9']
+    classes = ['E7', 'E8', 'E18', 'E21', 'E31', 'E33', 'E40', 'E53', 'E74', 'E84']
     sql_where = """
-        AND (e.system_type IS NULL
-            OR (e.system_type NOT IN ('file', 'source translation')
-                AND e.system_type NOT LIKE 'external reference%%'));"""
+        AND ((e.system_type IS NULL AND e.class_code != 'E53')
+                OR (e.system_type NOT IN ('file', 'source translation')
+                    AND e.system_type NOT LIKE 'external reference%%'));"""
 
     @staticmethod
     def get_edges():
@@ -33,82 +33,70 @@ class Network:
         return g.cursor.fetchall()
 
     @staticmethod
-    def get_network_json(params: Dict[str, Any]) -> Optional[str]:
-        # Get object - location mapping
+    def get_object_mapping():
+        # Get mapping between location and objects to join them into one entity
         sql = """
             SELECT e.id, l.range_id
             FROM model.entity e
             JOIN model.link l ON e.id = domain_id AND l.property_code = 'P53';"""
         g.execute(sql)
-        object_mapping = {row.id: row.range_id for row in g.cursor.fetchall()}
+        return {row.range_id: row.id for row in g.cursor.fetchall()}
 
+    @staticmethod
+    def get_network_json(params: Dict[str, Any]) -> Optional[str]:
+        mapping = Network.get_object_mapping()
         entities = set()
+        nodes = ''
+        for row in Network.get_entities():
+            if row.id in mapping:  # pragma: no cover - Locations will be mapped to objects
+                continue
+            entities.add(row.id)
+            nodes += """{{'id':'{id}','name':'{name}','color':'{color}'}},""".format(
+                id=row.id,
+                name=truncate_string(row.name.replace("'", ""), span=False),
+                color=params['classes'][row.class_code]['color'])
+
         edges = ''
         for row in Network.get_edges():
-            edges += "{{'source':'{domain_id}','target':'{range_id}'}},".format(
-                domain_id=row.domain_id, range_id=row.range_id)
-            entities.update([row.domain_id, row.range_id])
-
-        nodes = ''
-        entities_already = set()
-        for row in Network.get_entities():
-            if params['options']['orphans'] or row.id in entities:
-                entities_already.add(row.id)
-                nodes += """{{'id':'{id}','name':'{name}','color':'{color}'}},""".format(
-                    id=row.id,
-                    name=truncate_string(row.name.replace("'", ""), span=False),
-                    color=params['classes'][row.class_code]['color'])
-
-        # Get entities of links which weren't present in class selection
-        array_diff = [item for item in entities if item not in entities_already]
-        if array_diff:
-            sql = "SELECT id, class_code, name FROM model.entity WHERE id IN %(array_diff)s;"
-            g.execute(sql, {'array_diff': tuple(array_diff)})
-            result = g.cursor.fetchall()
-            for row in result:
-                color = ''
-                if row.class_code in params['classes']:  # pragma: no cover
-                    color = params['classes'][row.class_code]['color']
-                nodes += """{{'id':'{id}','name':'{name}','color':'{color}'}},""".format(
-                    id=row.id,
-                    color=color,
-                    name=truncate_string(row.name.replace("'", ""), span=False))
+            domain_id = mapping[row.domain_id] if row.domain_id in mapping else row.domain_id
+            range_id = mapping[row.range_id] if row.range_id in mapping else row.range_id
+            if domain_id not in entities:  # pragma: no cover
+                # print('Missing entity id: ' + str(domain_id))
+                continue
+            if range_id not in entities:  # pragma: no cover
+                # print('Missing entity id: ' + str(range_id))
+                continue
+            edges += "{{'source':'{source}','target':'{target}'}},".format(source=domain_id,
+                                                                           target=range_id)
 
         return "graph = {'nodes': [" + nodes + "],  links: [" + edges + "]};" if nodes else None
 
     @staticmethod
     def get_network_json2(params: Dict[str, Any]) -> Optional[str]:
+        mapping = Network.get_object_mapping()
         entities = set()
+        nodes = ''
+        for row in Network.get_entities():
+            if row.id in mapping:  # pragma: no cover - Locations will be mapped to objects
+                continue
+            entities.add(row.id)
+            nodes += """{{'id':'{id}','label':'{name}','color':'{color}'}},""".format(
+                id=row.id,
+                name=truncate_string(row.name.replace("'", ""), span=False),
+                color=params['classes'][row.class_code]['color'])
+
         edges = ''
         for row in Network.get_edges():
-            edges += "{{'source':'{d_id}', 'target':'{r_id}', 'id':'{l_id}'}},".format(
-                d_id=row.domain_id, r_id=row.range_id, l_id=row.id)
-            entities.update([row.domain_id, row.range_id])
-
-        nodes = ''
-        entities_already = set()
-        for row in Network.get_entities():
-            if params['options']['orphans'] or row.id in entities:
-                entities_already.add(row.id)
-                nodes += """{{'id':'{id}','label':'{name}','color':'{color}'}},""".format(
-                    id=row.id,
-                    name=truncate_string(row.name.replace("'", ""), span=False),
-                    color=params['classes'][row.class_code]['color'])
-
-        # Get entities of links which weren't present in class selection
-        array_diff = [item for item in entities if item not in entities_already]
-        if array_diff:
-            sql = "SELECT id, class_code, name FROM model.entity WHERE id IN %(array_diff)s;"
-            g.execute(sql, {'array_diff': tuple(array_diff)})
-            result = g.cursor.fetchall()
-            for row in result:
-                color = ''
-                if row.class_code in params['classes']:  # pragma: no cover
-                    color = params['classes'][row.class_code]['color']
-                nodes += """{{'id':'{id}','label':'{name}','color':'{color}'}},""".format(
-                    id=row.id,
-                    color=color,
-                    name=truncate_string(row.name.replace("'", ""), span=False))
+            domain_id = mapping[row.domain_id] if row.domain_id in mapping else row.domain_id
+            range_id = mapping[row.range_id] if row.range_id in mapping else row.range_id
+            if domain_id not in entities:  # pragma: no cover
+                # print('Missing entity id: ' + str(domain_id))
+                continue
+            if range_id not in entities:  # pragma: no cover
+                # print('Missing entity id: ' + str(range_id))
+                continue
+            edges += "{{'source':'{source}', 'target':'{target}', 'id':'{id}'}},".format(
+                source=domain_id, target=range_id, id=row.id)
 
         return "{{nodes: [{nodes}], edges: [{edges}], types: {{nodes: [], edges: []}} }};".format(
             nodes=nodes, edges=edges)
