@@ -55,7 +55,9 @@ def translation_update(id_: int) -> Union[str, Response]:
         save(form, translation)
         flash(_('info update'), 'info')
         return redirect(url_for('entity_view', id_=translation.id))
-    return render_template('translation/update.html', translation=translation, source=source,
+    return render_template('translation/update.html',
+                           translation=translation,
+                           source=source,
                            form=form)
 
 

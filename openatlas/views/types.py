@@ -92,7 +92,9 @@ def node_delete(id_: int) -> Response:
 class MoveForm(FlaskForm):  # type: ignore
     is_node_form = HiddenField()
     checkbox_values = HiddenField()
-    selection = SelectMultipleField('', [InputRequired()], coerce=int,
+    selection = SelectMultipleField('',
+                                    [InputRequired()],
+                                    coerce=int,
                                     option_widget=widgets.CheckboxInput(),
                                     widget=widgets.ListWidget(prefix_label=False))
     save = SubmitField()

@@ -62,8 +62,10 @@ class UserForm(FlaskForm):  # type: ignore
 class ActivityForm(FlaskForm):  # type: ignore
     action_choices = (('all', _('all')), ('insert', _('insert')), ('update', _('update')),
                       ('delete', _('delete')))
-    limit = SelectField(_('limit'), choices=((0, _('all')), (100, 100), (500, 500)),
-                        default=100, coerce=int)
+    limit = SelectField(_('limit'),
+                        choices=((0, _('all')), (100, 100), (500, 500)),
+                        default=100,
+                        coerce=int)
     user = SelectField(_('user'), choices=([(0, _('all'))]), default=0, coerce=int)
     action = SelectField(_('action'), choices=action_choices, default='all')
     apply = SubmitField(_('apply'))

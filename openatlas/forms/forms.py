@@ -274,8 +274,8 @@ class TableSelect(HiddenInput):  # type: ignore
                         """.format(name=field.id,
                                    entity_id=entity.id,
                                    entity_name=truncate_string(entity.name, span=False))
-            data[0] = '<br>'.join([data[0]] + [
-                truncate_string(alias) for id_, alias in entity.aliases.items()])
+            data[0] = '<br>'.join([data[0]] + [truncate_string(alias) for
+                                               id_, alias in entity.aliases.items()])
             table.rows.append(data)
         html = """
             <input id="{name}-button" name="{name}-button" class="table-select {required}"

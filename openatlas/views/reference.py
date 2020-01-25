@@ -76,7 +76,9 @@ def reference_add(id_: int, class_name: str) -> Union[str, Response]:
         return redirect(url_for('entity_view', id_=reference.id) + '#tab-' + class_name)
     if reference.system_type == 'external reference':
         form.page.label.text = uc_first(_('link text'))
-    return render_template('reference/add.html', reference=reference, form=form,
+    return render_template('reference/add.html',
+                           reference=reference,
+                           form=form,
                            class_name=class_name)
 
 
@@ -98,7 +100,9 @@ def reference_link_update(link_id: int, origin_id: int) -> Union[str, Response]:
     if link_.domain.system_type == 'external reference':
         form.page.label.text = uc_first(_('link text'))
     linked_object = link_.domain if link_.domain.id != origin.id else link_.range
-    return render_template('reference/link-update.html', origin=origin, form=form,
+    return render_template('reference/link-update.html',
+                           origin=origin,
+                           form=form,
                            linked_object=linked_object)
 
 
@@ -147,7 +151,9 @@ def reference_update(id_: int) -> Union[str, Response]:
             del form.save
             flash(_('error modified'), 'error')
             modifier = link(logger.get_log_for_advanced_view(reference.id)['modifier'])
-            return render_template('reference/update.html', form=form, reference=reference,
+            return render_template('reference/update.html',
+                                   form=form,
+                                   reference=reference,
                                    modifier=modifier)
         save(form, reference)
         return redirect(url_for('entity_view', id_=id_))

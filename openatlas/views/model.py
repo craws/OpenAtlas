@@ -38,7 +38,9 @@ def model_index() -> str:
         property_ = g.properties[form.property.data]
         domain_is_valid = property_.find_object('domain_class_code', domain.code)
         range_is_valid = property_.find_object('range_class_code', range_.code)
-        test_result = {'domain': domain, 'property': property_, 'range': range_,
+        test_result = {'domain': domain,
+                       'property': property_,
+                       'range': range_,
                        'domain_error': False if domain_is_valid else True,
                        'range_error': False if range_is_valid else True}
     else:
@@ -48,15 +50,18 @@ def model_index() -> str:
         form.domain.data = domain.code
         form.property.data = property_.code
         form.range.data = range_.code
-    return render_template('model/index.html', form=form, test_result=test_result, domain=domain,
-                           property=property_, range=range_)
+    return render_template('model/index.html',
+                           form=form,
+                           test_result=test_result,
+                           domain=domain,
+                           property=property_,
+                           range=range_)
 
 
 @app.route('/overview/model/class')
 def class_index() -> str:
-    table = Table(['code', 'name'],
-                  defs='''[{"orderDataType": "cidoc-model", "targets":[0]},
-                            {"sType": "numeric", "targets": [0]}]''')
+    table = Table(['code', 'name'], defs='''[{"orderDataType": "cidoc-model", "targets":[0]},
+                                             {"sType": "numeric", "targets": [0]}]''')
     for class_id, class_ in g.classes.items():
         table.rows.append([link(class_), class_.name])
     return render_template('model/class.html', table=table)
@@ -68,7 +73,7 @@ def property_index() -> str:
     properties = g.properties
     table = Table(['code', 'name', 'inverse', 'domain', 'domain name', 'range', 'range name'],
                   defs='''[{"orderDataType": "cidoc-model", "targets":[0, 3, 5]},
-                            {"sType": "numeric", "targets": [0, 3, 5]}]''')
+                           {"sType": "numeric", "targets": [0, 3, 5]}]''')
     for property_id, property_ in properties.items():
         table.rows.append([link(property_),
                            property_.name,
@@ -88,18 +93,22 @@ def class_view(code: str) -> str:
         tables[table] = Table(['code', 'name'], paging=False)
         for code_ in getattr(class_, table):
             tables[table].rows.append([link(g.classes[code_]), g.classes[code_].name])
-    tables['domains'] = Table(['code', 'name'], paging=False,
+    tables['domains'] = Table(['code', 'name'],
+                              paging=False,
                               defs='''[{"orderDataType": "cidoc-model", "targets":[0]},
-                                                          {"sType": "numeric", "targets": [0]}]''')
-    tables['ranges'] = Table(['code', 'name'], paging=False,
+                                       {"sType": "numeric", "targets": [0]}]''')
+    tables['ranges'] = Table(['code', 'name'],
+                             paging=False,
                              defs='''[{"orderDataType": "cidoc-model", "targets":[0]},
-                                                          {"sType": "numeric", "targets": [0]}]''')
+                                      {"sType": "numeric", "targets": [0]}]''')
     for key, property_ in g.properties.items():
         if class_.code == property_.domain_class_code:
             tables['domains'].rows.append([link(property_), property_.name])
         elif class_.code == property_.range_class_code:
             tables['ranges'].rows.append([link(property_), property_.name])
-    return render_template('model/class_view.html', class_=class_, tables=tables,
+    return render_template('model/class_view.html',
+                           class_=class_,
+                           tables=tables,
                            info=[('code', class_.code), ('name', class_.name)])
 
 
@@ -115,9 +124,10 @@ def property_view(code: str) -> str:
             ('range', link(range_) + ' ' + range_.name)]
     tables = {}
     for table in ['super', 'sub']:
-        tables[table] = Table(['code', 'name'], paging=False,
+        tables[table] = Table(['code', 'name'],
+                              paging=False,
                               defs='''[{"orderDataType": "cidoc-model", "targets":[0]},
-                                                          {"sType": "numeric", "targets": [0]}]''')
+                                       {"sType": "numeric", "targets": [0]}]''')
         for code in getattr(property_, table):
             tables[table].rows.append([link(g.properties[code]), g.properties[code].name])
     return render_template('model/property_view.html', property=property_, tables=tables, info=info)
