@@ -197,4 +197,4 @@ def model_network2(dimensions: int) -> str:
     return render_template('model/network2.html',
                            network_params=params,
                            dimensions=dimensions,
-                           json_data=Network.get_network_json2(params))
+                           json_data=Network.get_network_json(params, classic=False))
