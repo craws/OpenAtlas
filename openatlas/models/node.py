@@ -117,24 +117,19 @@ class Node(Entity):
         return [root for id_, root in g.nodes.items() if root.name == name.replace('_', ' ')][0]
 
     @staticmethod
-    def get_tree_data(node_id: int, selected_ids: List[int]) -> str:
+    def get_tree_data(node_id: int, selected_ids: List[int]) -> List[Dict[str, Any]]:
         return Node.walk_tree(g.nodes[node_id].subs, selected_ids)
 
     @staticmethod
-    def walk_tree(nodes: List[Node], selected_ids: List[int]) -> str:
-        string = ''
+    def walk_tree(nodes: List[Node], selected_ids: List[int]) -> List[Dict[str, Any]]:
+        items = []
         for id_ in nodes:
             item = g.nodes[id_]
-            selected = ",'state' : {'selected' : true}" if item.id in selected_ids else ''
-            name = item.name.replace("'", "&apos;")
-            string += "{'text':'" + name + "', 'id':'" + str(item.id) + "'" + selected
-            if item.subs:
-                string += ",'children' : ["
-                for sub in item.subs:
-                    string += Node.walk_tree([sub], selected_ids)
-                string += "]"
-            string += "},"
-        return string
+            items.append({'id': item.id,
+                          'text': item.name.replace("'", "&apos;"),
+                          'state': {'selected': 'true'} if item.id in selected_ids else '',
+                          'children': Node.walk_tree(item.subs, selected_ids)})
+        return items
 
     @staticmethod
     def get_nodes_for_form(form_name: str) -> Dict[int, Node]:

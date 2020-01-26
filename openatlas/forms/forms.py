@@ -152,7 +152,7 @@ class TreeSelect(HiddenInput):  # type: ignore
                 $(document).ready(function () {{
                     createOverlay("{name}","{title}",false,);
                     $("#{name}-tree").jstree({{
-                        "core" : {{"check_callback" : true, 'data':[{tree_data}]}},
+                        "core" : {{"check_callback": true, "data": {tree_data}}},
                         "search": {{"case_insensitive": true, "show_only_matches": true}},
                         "plugins" : ["search"],
                     }});
@@ -210,7 +210,7 @@ class TreeMultiSelect(HiddenInput):  # type: ignore
             <script>
                 createOverlay("{name}", "{title}", true, "tree");
                 $("#{name}-tree").jstree({{
-                    "core" : {{ "check_callback" : true, 'data':[{tree_data}] }},
+                    "core" : {{ "check_callback": true, "data": {tree_data} }},
                     "search": {{"case_insensitive": true, "show_only_matches": true}},
                     "plugins": ["search", "checkbox"],
                     "checkbox": {{"three_state": false}}

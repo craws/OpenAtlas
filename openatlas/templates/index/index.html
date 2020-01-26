@@ -19,10 +19,9 @@
                     <a href="{{ url_for('profile_index') }}">{{ _('profile')|uc_first }}</a>.
                 </p>
             {% endif %}
-            <a href="{{ url_for('model_network') }}">{{ _('network')|uc_first }}</a><br><br>
-            Experimental:
-            <a href="{{ url_for('model_network2', dimensions=2) }}">2D {{ _('network')|uc_first }}</a> -
-            <a href="{{ url_for('model_network2', dimensions=3) }}">3D {{ _('network')|uc_first }}</a>
+            {{ _('network')|uc_first }}: <a href="{{ url_for('model_network') }}">Classic</a> -
+            <a href="{{ url_for('model_network2', dimensions=2) }}">2D</a> -
+            <a href="{{ url_for('model_network2', dimensions=3) }}">3D</a>
             <p style="font-size:0.9em;">
                 {% if session['login_previous_success'] %}
                     {{ _('last login')|uc_first }}: {{ session['login_previous_success'] }}
