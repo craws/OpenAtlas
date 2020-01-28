@@ -1,9 +1,10 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-{{ _('network')|uc_first }}
+    <a href="{{ url_for('index') }}">{{ _('overview')|uc_first }}</a>
+    > {{ _('network visualization')|uc_first }}
 {% endblock %}
 {% block content %}
-
+{{ 'Network_visualization'|manual_link|safe }}
 {% if json_data %}
     <script src="/static/vendor/network/react.production.min.js"></script>
     <script src="/static/vendor/network/react-dom.production.min.js"></script>
