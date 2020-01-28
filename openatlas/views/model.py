@@ -174,4 +174,4 @@ def model_network(dimensions: Optional[int] = None) -> str:
                            form=form,
                            dimensions=dimensions,
                            network_params=params,
-                           json_data=Network.get_network_json(params, dimensions))
+                           json_data=Network.get_network_json(form, params, dimensions))

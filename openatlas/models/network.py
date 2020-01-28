@@ -1,6 +1,7 @@
 from typing import Any, Dict, Iterator, Optional
 
-from flask import g
+from flask import g, flash
+from flask_wtf import FlaskForm
 from psycopg2.extras import NamedTupleCursor
 
 from openatlas.util.util import truncate_string
@@ -45,12 +46,26 @@ class Network:
         return {row.range_id: row.id for row in g.cursor.fetchall()}
 
     @staticmethod
-    def get_network_json(params: Dict[str, Any], dimensions: Optional[int]) -> Optional[str]:
+    def get_network_json(form: FlaskForm,
+                         params: Dict[str, Any],
+                         dimensions: Optional[int]) -> Optional[str]:
         mapping = Network.get_object_mapping()
         entities = set()
+
+        linked_entity_ids = set()
+        edges = []
+        for row in Network.get_edges():
+            domain_id = mapping[row.domain_id] if row.domain_id in mapping else row.domain_id
+            range_id = mapping[row.range_id] if row.range_id in mapping else row.range_id
+            linked_entity_ids.add(domain_id)
+            linked_entity_ids.add(range_id)
+            edges.append({'id': int(row.id), 'source': domain_id, 'target': range_id})
         nodes = []
+
         for row in Network.get_entities():
             if row.id in mapping:  # pragma: no cover - Locations will be mapped to objects
+                continue
+            if not form.orphans.data and row.id not in linked_entity_ids:  # Hide orphans
                 continue
             entities.add(row.id)
             name = truncate_string(row.name.replace("'", ""), span=False)
@@ -58,15 +73,8 @@ class Network:
                           'label' if dimensions else 'name': name,
                           'color': params['classes'][row.class_code]['color']})
 
-        edges = []
-        for row in Network.get_edges():
-            domain_id = mapping[row.domain_id] if row.domain_id in mapping else row.domain_id
-            range_id = mapping[row.range_id] if row.range_id in mapping else row.range_id
-            if domain_id not in entities:  # pragma: no cover
-                # print('Missing entity id: ' + str(domain_id))
-                continue
-            if range_id not in entities:  # pragma: no cover
-                # print('Missing entity id: ' + str(range_id))
-                continue
-            edges.append({'id': int(row.id), 'source': domain_id, 'target': range_id})
+        if not linked_entity_ids.issubset(entities):  # pragma: no cover
+            flash('Missing nodes for links', 'error')
+            return ''
+
         return str({'nodes': nodes, 'edges' if dimensions else 'links': edges}) if nodes else None
