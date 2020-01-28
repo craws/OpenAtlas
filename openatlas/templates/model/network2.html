@@ -4,31 +4,54 @@
     > {{ _('network visualization')|uc_first }}
 {% endblock %}
 {% block content %}
-{{ 'Network_visualization'|manual_link|safe }}
-{% if json_data %}
-    <script src="/static/vendor/network/react.production.min.js"></script>
-    <script src="/static/vendor/network/react-dom.production.min.js"></script>
-    <script src="/static/vendor/network/three.min.js"></script>
-    <script src="/static/vendor/network/network-visualization.umd.js"></script>
-
-    <div id="visualization" style="position: relative; height: 600px;"></div>
-    <script>
-        const graph = {{ json_data|safe }}
-        ReactDOM.render(
-            React.createElement(NetworkVisualization.SelectionControls, {
-                dimensions: {{ dimensions }},
-                onNodeClick: function({ node }) { console.log(node.label) },
-                showNeighborsOnly: true,
-                nodeRelativeSize: 1,
-                graph,
-                width: 900,
-                height: 600,
-            }),
-            document.getElementById('visualization')
-        )
-    </script>
-{% else %}
-    <h2 style="float:right;">{{ _('no data to display')|uc_first }}</h2>
-{% endif %}
-
+    <link rel="stylesheet" href="/static/vendor/huebee-2.0.0/huebee.min.css">
+    <script src="/static/vendor/huebee-2.0.0/huebee.pkgd.min.js"></script>
+    {% if json_data %}
+        <script src="/static/vendor/network/react.production.min.js"></script>
+        <script src="/static/vendor/network/react-dom.production.min.js"></script>
+        <script src="/static/vendor/network/three.min.js"></script>
+        <script src="/static/vendor/network/network-visualization.umd.js"></script>
+        <div style="float:right;">
+            <div id="visualization" style="position: relative; height: 600px;"></div>
+        </div>
+        <script>
+            const graph = {{ json_data|safe }}
+            ReactDOM.render(
+                React.createElement(NetworkVisualization.SelectionControls, {
+                    dimensions: {{ dimensions }},
+                    onNodeClick: function({ node }) { console.log(node.label) },
+                    showNeighborsOnly: true,
+                    nodeRelativeSize: 1,
+                    graph,
+                    width: {{ network_params['options']['width'] }},
+                    height: {{ network_params['options']['height'] }},
+                }),
+                document.getElementById('visualization')
+            )
+        </script>
+    {% else %}
+        <h2 style="float:right;">{{ _('no data to display')|uc_first }}</h2>
+    {% endif %}
+    <div style="float:left;">
+        {{ 'Network_visualization'|manual_link|safe }}
+        <form method="post" id="network-form" style="margin-right:1em;">
+            {{ form.csrf_token }}
+            <h2>{{ _('classes')|uc_first }}</h2>
+            <div>
+                <div id="classes" style="float:left">
+                    {% for item in form.classes %}
+                        {{ form['color_' + item.data] }} {{ item.label }}<br>
+                    {% endfor %}
+                </div>
+            </div>
+            <div style="clear:both;"></div>
+            <p>{{ form.orphans }} {{ _('show orphans')|uc_first }}</p>
+            <h2>{{ _('network options')|uc_first }}</h2>
+            {{ form.width }} {{ form.width.label }}<br>
+            {{ form.height }} {{ form.height.label }}<br>
+            {{ form.charge }} {{ form.charge.label }}<br>
+            {{ form.distance }} {{ form.distance.label }}<br>
+            <input id="save" name="save" value="{{ _('apply')|uc_first }}" type="submit">
+        </form>
+    </div>
 {% endblock %}
