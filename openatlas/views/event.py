@@ -56,7 +56,7 @@ def event_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
         logger.log_user(id_, 'delete')
         flash(_('entity deleted'), 'info')
     table = Table(Table.HEADERS['event'] + ['description'],
-                  defs='[{className: "dt-body-right", targets: [3,4]}]')
+                  defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])
     for event in Entity.get_by_codes('event'):
         data = get_base_table_data(event)
         data.append(truncate_string(event.description))

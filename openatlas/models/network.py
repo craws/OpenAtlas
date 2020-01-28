@@ -50,9 +50,8 @@ class Network:
                          params: Dict[str, Any],
                          dimensions: Optional[int]) -> Optional[str]:
         mapping = Network.get_object_mapping()
-        entities = set()
-
         linked_entity_ids = set()
+
         edges = []
         for row in Network.get_edges():
             domain_id = mapping[row.domain_id] if row.domain_id in mapping else row.domain_id
@@ -62,6 +61,7 @@ class Network:
             edges.append({'id': int(row.id), 'source': domain_id, 'target': range_id})
         nodes = []
 
+        entities = set()
         for row in Network.get_entities():
             if row.id in mapping:  # pragma: no cover - Locations will be mapped to objects
                 continue
@@ -72,9 +72,7 @@ class Network:
             nodes.append({'id': row.id,
                           'label' if dimensions else 'name': name,
                           'color': params['classes'][row.class_code]['color']})
-
         if not linked_entity_ids.issubset(entities):  # pragma: no cover
             flash('Missing nodes for links', 'error')
             return ''
-
         return str({'nodes': nodes, 'edges' if dimensions else 'links': edges}) if nodes else None

@@ -1,4 +1,4 @@
-from typing import Any, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from flask import json, session
 from flask_babel import lazy_gettext as _
@@ -23,8 +23,8 @@ class Table:
     def __init__(self,
                  header: Optional[List[str]] = None,  # A list of column header labels
                  rows: Optional[List[List[Any]]] = None,  # Rows containing the data
-                 order: Optional[str] = None,  # Column order option
-                 defs: Optional[str] = None,  # Additional definitions for DataTables
+                 order: Optional[List[List[Union[int, str]]]] = None,  # Column order option
+                 defs: Optional[List[Dict[str, Union[int, str, List[int]]]]] = None,  # Definitions
                  paging: bool = True) -> None:  # Whether to show pager
         self.header = header if header else []
         self.rows = rows if rows else []
@@ -37,36 +37,40 @@ class Table:
         if not self.rows:
             return '<p>' + uc_first(_('no entries')) + '</p>'
 
-        columns = ''
+        columns: List[Dict[str, str]] = []
         for item in self.header:
-            columns += "{title:'" + item.capitalize() + "'},"
-        columns += "{title:''}," * (len(self.rows[0]) - len(self.header))  # Add emtpy headers
+            columns.append({'title': item.capitalize()})
+        # Add emtpy headers
+        columns += [{'title': ''} for i in range(len(self.rows[0]) - len(self.header))]
+
         table_rows = session['settings']['default_table_rows']
         if hasattr(current_user, 'settings'):
             table_rows = current_user.settings['table_rows']
+
+        # Replace None values with empty strings in table data
+        for n, row in enumerate(self.rows):
+            for n2, item in enumerate(self.rows[n]):
+                if not item:
+                    self.rows[n][n2] = ''
+
+        data_table = {'data': self.rows,
+                      'stateSave': 'false' if session['settings']['debug_mode'] else 'true',
+                      'columns': columns,
+                      'paging': json.dumps(self.paging),
+                      'pageLength': table_rows,
+                      'autoWidth': 'false'}
+        if self.order:
+            data_table['order'] = self.order
+        if self.defs:
+            data_table['columnDefs'] = self.defs
+
         html = """
             <table id="{name}_table" class="compact stripe cell-border hover"></table>
             <script>
                 $(document).ready(function() {{
-                    $('#{name}_table').DataTable( {{
-                        data: {data},
-                        stateSave: {stateSave},
-                        columns: [{columns}],
-                        {order}
-                        {defs}
-                        paging: {paging},
-                        pageLength: {table_rows},
-                        autoWidth: false,
-                    }});
+                    $('#{name}_table').DataTable({data_table});
                 }});
-            </script>""".format(name=name,
-                                data=json.dumps(self.rows),
-                                stateSave='false' if session['settings']['debug_mode'] else 'true',
-                                table_rows=table_rows,
-                                columns=columns,
-                                order='order: ' + self.order + ',' if self.order else '',
-                                defs='columnDefs: ' + self.defs + ',' if self.defs else '',
-                                paging='true' if self.paging else 'false')
+            </script>""".format(name=name, data_table=data_table,)
 
         # Toggle header and footer HTML
         css_header = '#{name}_table_wrapper table thead {{ display:none; }}'.format(name=name)

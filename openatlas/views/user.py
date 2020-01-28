@@ -84,7 +84,7 @@ def user_activity(user_id: int = 0) -> str:
         activities = User.get_activities(100, user_id, 'all')
     else:
         activities = User.get_activities(100, 0, 'all')
-    table = Table(['date', 'user', 'action', 'entity'], order='[[0, "desc"]]')
+    table = Table(['date', 'user', 'action', 'entity'], order=[[0, 'desc']])
     for row in activities:
         try:
             entity = link(Entity.get_by_id(row.entity_id))

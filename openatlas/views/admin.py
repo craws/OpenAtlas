@@ -361,7 +361,7 @@ class LogForm(FlaskForm):  # type: ignore
 def admin_log() -> str:
     form = LogForm()
     form.user.choices = [(0, _('all'))] + User.get_users()
-    table = Table(['date', 'priority', 'type', 'message', 'user', 'info'], order='[[0, "desc"]]')
+    table = Table(['date', 'priority', 'type', 'message', 'user', 'info'], order=[[0, 'desc']])
     logs = logger.get_system_logs(form.limit.data, form.priority.data, form.user.data)
     for row in logs:
         user = None

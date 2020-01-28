@@ -26,6 +26,10 @@ table.dataTable th,
     cursor: pointer;
 }
 
+table.dataTable td {
+    white-space:nowrap;
+}
+
 table.dataTable.no-footer {
     border-bottom: none;
 }

@@ -51,11 +51,11 @@ def actor_view(actor: Entity) -> str:
               'source': Table(Table.HEADERS['source']),
               'reference': Table(Table.HEADERS['reference'] + ['page / link text']),
               'event': Table(['event', 'class', 'involvement', 'first', 'last', 'description'],
-                             defs='[{className: "dt-body-right", targets: [3,4]}]'),
+                             defs=[{'className': 'dt-body-right', 'targets': [3, 4]}]),
               'relation': Table(['relation', 'actor', 'first', 'last', 'description'],
-                                defs='[{className: "dt-body-right", targets: [2,3]}]'),
+                                defs=[{'className': 'dt-body-right', 'targets': [2, 3]}]),
               'member_of': Table(['member of', 'function', 'first', 'last', 'description'],
-                                 defs='[{className: "dt-body-right", targets: [2,3]}]')}
+                                 defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])}
     profile_image_id = actor.get_profile_image_id()
     for link_ in actor.get_links('P67', True):
         domain = link_.domain
@@ -169,7 +169,7 @@ def actor_view(actor: Entity) -> str:
         tables['member_of'].rows.append(data)
     if actor.class_.code in app.config['CLASS_CODES']['group']:
         tables['member'] = Table(['member', 'function', 'first', 'last', 'description'],
-                                 defs='[{className: "dt-body-right", targets: [2,3]}]')
+                                 defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])
         for link_ in actor.get_links('P107'):
             data = ([link(link_.range), link_.type.name if link_.type else '',
                      link_.first, link_.last, truncate_string(link_.description)])
@@ -198,7 +198,7 @@ def event_view(event: Entity) -> str:
               'subs': Table(Table.HEADERS['event']),
               'source': Table(Table.HEADERS['source']),
               'actor': Table(['actor', 'class', 'involvement', 'first', 'last', 'description'],
-                             defs='[{className: "dt-body-right", targets: [3,4]}]'),
+                             defs=[{'className': 'dt-body-right', 'targets': [3, 4]}]),
               'reference': Table(Table.HEADERS['reference'] + ['page / link text'])}
     for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
         first = link_.first
@@ -314,7 +314,7 @@ def place_view(object_: Entity) -> str:
     tables = {'file': Table(Table.HEADERS['file'] + [_('main image')]),
               'source': Table(Table.HEADERS['source']),
               'event': Table(Table.HEADERS['event'],
-                             defs='[{className: "dt-body-right", targets: [3,4]}]'),
+                             defs=[{'className': 'dt-body-right', 'targets': [3, 4]}]),
               'reference': Table(Table.HEADERS['reference'] + ['page / link text']),
               'actor': Table([_('actor'), _('property'), _('class'), _('first'), _('last')])}
     if object_.system_type == 'place':

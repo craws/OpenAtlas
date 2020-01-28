@@ -73,7 +73,7 @@ def search_index() -> str:
 
 def build_search_table(form: FlaskForm) -> Table:
     table = Table(['name', 'class', 'first', 'last', 'description'],
-                  defs='[{className: "dt-body-right", targets: [2,3]}]')
+                  defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])
     for entity in Entity.search(form):
         table.rows.append([link(entity),
                            entity.class_.name,

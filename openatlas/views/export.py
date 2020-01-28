@@ -50,7 +50,7 @@ def export_sql() -> Union[str, Response]:
             logger.log('error', 'database', 'SQL export failed')
             flash(_('SQL export failed'), 'error')
         return redirect(url_for('export_sql'))
-    table = Table(['name', 'size'], order='[[0, "desc"]]')
+    table = Table(['name', 'size'], order=[[0, 'desc']])
     for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
         name = basename(file)
         if name == '.gitignore':
@@ -105,7 +105,7 @@ def export_csv() -> Union[str, Response]:
         logger.log('info', 'database', 'CSV export')
         flash(_('data was exported as CSV'), 'info')
         return redirect(url_for('export_csv'))
-    table = Table(['name', 'size'], order='[[0, "desc"]]')
+    table = Table(['name', 'size'], order=[[0, 'desc']])
     for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
         name = basename(file)
         if name == '.gitignore':
