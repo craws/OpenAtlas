@@ -65,8 +65,8 @@ def place_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
         if parent:
             return redirect(url_for('entity_view', id_=parent.id) + '#tab-' + entity.system_type)
     table = Table(Table.HEADERS['place'], defs='[{className: "dt-body-right", targets: [2,3]}]')
-    for place in Entity.get_by_system_type(
-            'place', nodes=True, aliases=current_user.settings['table_show_aliases']):
+    aliases = current_user.settings['table_show_aliases']
+    for place in Entity.get_by_system_type('place', nodes=True, aliases=aliases):
         table.rows.append(get_base_table_data(place))
     return render_template('place/index.html', table=table, gis_data=Gis.get_all())
 
@@ -170,8 +170,10 @@ def place_update(id_: int) -> Union[str, Response]:
             del form.save
             flash(_('error modified'), 'error')
             modifier = link(logger.get_log_for_advanced_view(object_.id)['modifier'])
-            return render_template(
-                'place/update.html', form=form, object_=object_, modifier=modifier)
+            return render_template('place/update.html',
+                                   form=form,
+                                   object_=object_,
+                                   modifier=modifier)
         save(form, object_, location)
         return redirect(url_for('entity_view', id_=id_))
     if object_.system_type == 'place':

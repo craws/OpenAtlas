@@ -17,6 +17,31 @@ class InvalidGeomException(Exception):
 class Gis:
 
     @staticmethod
+    def get_by_id(id_: int) -> List[Dict[str, Any]]:  # pragma no cover
+        # Needed only in API for now
+        geometries = []
+        for shape in ['point', 'polygon', 'linestring']:
+            sql = """
+                SELECT
+                    {shape}.id,
+                    {shape}.name,
+                    {shape}.description,
+                    {shape}.type,
+                    public.ST_AsGeoJSON({shape}.geom) AS geojson
+                FROM model.entity place
+                JOIN gis.{shape} {shape} ON place.id = {shape}.entity_id
+                WHERE place.id = %(id_)s;""".format(shape=shape)
+            g.execute(sql, {'id_': id_})
+            for row in g.cursor.fetchall():
+                geometries.append({'id': row.id,
+                                   'shape': shape,
+                                   'geometry': json.loads(row.geojson),
+                                   'name': row.name,
+                                   'description': row.description,
+                                   'type': row.type})
+        return geometries
+
+    @staticmethod
     def get_all(objects: Optional[List[Entity]] = None,
                 super_id: Optional[int] = None,
                 subunits: Optional[List[Entity]] = None,

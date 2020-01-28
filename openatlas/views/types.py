@@ -1,4 +1,4 @@
-from typing import Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional, Union
 
 from flask import abort, flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -92,7 +92,9 @@ def node_delete(id_: int) -> Response:
 class MoveForm(FlaskForm):  # type: ignore
     is_node_form = HiddenField()
     checkbox_values = HiddenField()
-    selection = SelectMultipleField('', [InputRequired()], coerce=int,
+    selection = SelectMultipleField('',
+                                    [InputRequired()],
+                                    coerce=int,
                                     option_widget=widgets.CheckboxInput(),
                                     widget=widgets.ListWidget(prefix_label=False))
     save = SubmitField()
@@ -117,24 +119,18 @@ def node_move_entities(id_: int) -> Union[str, Response]:
     return render_template('types/move.html', node=node, root=root, form=form)
 
 
-def walk_tree(nodes: List[int]) -> str:
-    """ Builds JSON for jsTree"""
-    text = ''
+def walk_tree(nodes: List[int]) -> List[Dict[str, Any]]:
+    items = []
     for id_ in nodes:
         item = g.nodes[id_]
         count_subs = ' (' + format_number(item.count_subs) + ')' if item.count_subs else ''
-        text += "{href: '" + url_for('entity_view', id_=item.id) + "',"
-        text += "a_attr: { href: '" + url_for('entity_view', id_=item.id) + "'}, "
-        text += "text: '" + item.name.replace("'", "&apos;") + " "
-        text += '<span style="font-weight:normal">' + format_number(item.count) + count_subs
-        text += "', 'id':'" + str(item.id) + "'"
-        if item.subs:
-            text += ",'children' : ["
-            for sub in item.subs:
-                text += walk_tree([sub])
-            text += "]"
-        text += "},"
-    return text
+        items.append({
+            'id': item.id,
+            'href': url_for('entity_view', id_=item.id),
+            'a_attr': {'href': url_for('entity_view', id_=item.id)},
+            'text': item.name.replace("'", "&apos;") + ' ' + format_number(item.count) + count_subs,
+            'children': walk_tree(item.subs)})
+    return items
 
 
 def tree_select(name: str) -> str:
@@ -145,7 +141,7 @@ def tree_select(name: str) -> str:
                 $("#{name}-tree").jstree({{
                     "search": {{ "case_insensitive": true, "show_only_matches": true }},
                     "plugins" : ["core", "html_data", "search"],
-                    "core":{{ "data":[{tree}] }}
+                    "core":{{ "data": {tree_data} }}
                 }});
                 $("#{name}-tree").on("select_node.jstree", function (e, data) {{
                     document.location.href = data.node.original.href;
@@ -158,7 +154,7 @@ def tree_select(name: str) -> str:
             }});
         </script>""".format(min_chars=session['settings']['minimum_jstree_search'],
                             name=sanitize(name),
-                            tree=walk_tree(Node.get_nodes(name)))
+                            tree_data=walk_tree(Node.get_nodes(name)))
     return html
 
 

@@ -13,11 +13,14 @@ from openatlas.util.util import link, required_group, truncate_string, uc_first
 
 
 class SearchForm(FlaskForm):  # type: ignore
-    term = StringField(_('search'), [InputRequired()],
+    term = StringField(_('search'),
+                       [InputRequired()],
                        render_kw={'placeholder': _('search term'), 'autofocus': True})
     own = BooleanField(_('Only entities edited by me'))
     desc = BooleanField(_('Also search in description'))
-    classes = SelectMultipleField(_('classes'), [InputRequired()], choices=(),
+    classes = SelectMultipleField(_('classes'),
+                                  [InputRequired()],
+                                  choices=(),
                                   option_widget=widgets.CheckboxInput(),
                                   widget=widgets.ListWidget(prefix_label=False))
     search = SubmitField(_('search'))
@@ -59,8 +62,7 @@ def search_index() -> str:
     form.classes.default = choices
     form.classes.process(request.form)
     table = Table()
-    if request.method == 'POST' and 'global-term' in request.form:
-        # Coming from global search
+    if request.method == 'POST' and 'global-term' in request.form:  # Coming from global search
         form.term.data = request.form['global-term']
         form.classes.data = choices
         table = build_search_table(form)
