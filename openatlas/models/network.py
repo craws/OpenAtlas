@@ -8,8 +8,9 @@ from openatlas.util.util import truncate_string
 
 class Network:
 
-    properties = ['P7', 'P11', 'P14', 'P23', 'P24', 'P67', 'P74', 'P107', 'OA7', 'OA8', 'OA9']
-    classes = ['E7', 'E8', 'E18', 'E21', 'E31', 'E33', 'E40', 'E53', 'E74', 'E84']
+    properties = ['P7', 'P11', 'P14', 'P22', 'P23', 'P24', 'P25', 'P67', 'P74', 'P107', 'OA7',
+                  'OA8', 'OA9']
+    classes = ['E7', 'E8', 'E9', 'E18', 'E21', 'E31', 'E33', 'E40', 'E53', 'E74', 'E84']
     sql_where = """
         AND ((e.system_type IS NULL AND e.class_code != 'E53')
                 OR (e.system_type NOT IN ('file', 'source translation')
@@ -44,7 +45,7 @@ class Network:
         return {row.range_id: row.id for row in g.cursor.fetchall()}
 
     @staticmethod
-    def get_network_json(params: Dict[str, Any], classic: Optional[bool] = True) -> Optional[str]:
+    def get_network_json(params: Dict[str, Any], dimensions: Optional[int]) -> Optional[str]:
         mapping = Network.get_object_mapping()
         entities = set()
         nodes = []
@@ -54,7 +55,7 @@ class Network:
             entities.add(row.id)
             name = truncate_string(row.name.replace("'", ""), span=False)
             nodes.append({'id': row.id,
-                          'name' if classic else 'label': name,
+                          'label' if dimensions else 'name': name,
                           'color': params['classes'][row.class_code]['color']})
 
         edges = []
@@ -68,4 +69,4 @@ class Network:
                 # print('Missing entity id: ' + str(range_id))
                 continue
             edges.append({'id': int(row.id), 'source': domain_id, 'target': range_id})
-        return str({'nodes': nodes, 'links' if classic else 'edges': edges}) if nodes else None
+        return str({'nodes': nodes, 'edges' if dimensions else 'links': edges}) if nodes else None

@@ -1,4 +1,4 @@
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 
 from flask import g, render_template
 from flask_babel import lazy_gettext as _
@@ -139,27 +139,26 @@ class NetworkForm(FlaskForm):  # type: ignore
     charge = StringField(default=-800, validators=[InputRequired()])
     distance = IntegerField(default=80, validators=[InputRequired()])
     orphans = BooleanField(default=False)
-    classes = SelectMultipleField(_('classes'),
-                                  option_widget=widgets.CheckboxInput(),
-                                  widget=widgets.ListWidget(prefix_label=False),
-                                  default=['E21', 'E7', 'E40', 'E74', 'E8', 'E18', 'E53'])
+    classes = SelectMultipleField(_('classes'), widget=widgets.ListWidget(prefix_label=False))
     kw_params = {'data-huebee': True, 'class': 'data-huebee'}
+    color_E7 = StringField(default='#0000FF', render_kw=kw_params)
+    color_E8 = StringField(default='#0000FF', render_kw=kw_params)
+    color_E9 = StringField(default='#0000FF', render_kw=kw_params)
+    color_E18 = StringField(default='#FF0000', render_kw=kw_params)
     color_E21 = StringField(default='#34B522', render_kw=kw_params)
-    color_E7 = StringField(default='#E54A2A', render_kw=kw_params)
     color_E31 = StringField(default='#FFA500', render_kw=kw_params)
     color_E33 = StringField(default='#FFA500', render_kw=kw_params)
     color_E40 = StringField(default='#34623C', render_kw=kw_params)
-    color_E74 = StringField(default='#34623C', render_kw=kw_params)
     color_E53 = StringField(default='#00FF00', render_kw=kw_params)
-    color_E18 = StringField(default='#FF0000', render_kw=kw_params)
-    color_E8 = StringField(default='#E54A2A', render_kw=kw_params)
+    color_E74 = StringField(default='#34623C', render_kw=kw_params)
     color_E84 = StringField(default='#EE82EE', render_kw=kw_params)
     save = SubmitField(_('apply'))
 
 
 @app.route('/overview/network/', methods=["GET", "POST"])
+@app.route('/overview/network/<int:dimensions>', methods=["GET", "POST"])
 @required_group('readonly')
-def model_network() -> str:
+def model_network(dimensions: Optional[int] = None) -> str:
     form = NetworkForm()
     form.classes.choices = []
     params: Dict[str, Any] = {'classes': {},
@@ -168,33 +167,11 @@ def model_network() -> str:
                                           'height': form.height.data,
                                           'charge': form.charge.data,
                                           'distance': form.distance.data}}
-    for code in ['E21', 'E7', 'E31', 'E33', 'E40', 'E74', 'E53', 'E18', 'E8', 'E84']:
+    for code in Network.classes:
         form.classes.choices.append((code, g.classes[code].name))
-        params['classes'][code] = {'active': (code in form.classes.data),
-                                   'color': getattr(form, 'color_' + code).data}
-    return render_template('model/network.html',
+        params['classes'][code] = {'color': getattr(form, 'color_' + code).data}
+    return render_template('model/network2.html' if dimensions else 'model/network.html',
                            form=form,
-                           network_params=params,
-                           json_data=Network.get_network_json(params))
-
-
-@app.route('/overview/network2/<int:dimensions>', methods=["GET", "POST"])
-@required_group('readonly')
-def model_network2(dimensions: int) -> str:
-    # For now "params" are build via a form (which isn't used in the template). Will be adapted.
-    form = NetworkForm()
-    form.classes.choices = []
-    params: Dict[str, Any] = {'classes': {},
-                              'options': {'orphans': form.orphans.data,
-                                          'width': form.width.data,
-                                          'height': form.height.data,
-                                          'charge': form.charge.data,
-                                          'distance': form.distance.data}}
-    for code in ['E21', 'E7', 'E31', 'E33', 'E40', 'E74', 'E53', 'E18', 'E8', 'E84']:
-        form.classes.choices.append((code, g.classes[code].name))
-        params['classes'][code] = {'active': (code in form.classes.data),
-                                   'color': getattr(form, 'color_' + code).data}
-    return render_template('model/network2.html',
-                           network_params=params,
                            dimensions=dimensions,
-                           json_data=Network.get_network_json(params, classic=False))
+                           network_params=params,
+                           json_data=Network.get_network_json(params, dimensions))
