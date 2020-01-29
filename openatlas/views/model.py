@@ -132,7 +132,7 @@ def property_view(code: str) -> str:
 class NetworkForm(FlaskForm):  # type: ignore
     width = IntegerField(default=1200, validators=[InputRequired()])
     height = IntegerField(default=600, validators=[InputRequired()])
-    charge = StringField(default=-800, validators=[InputRequired()])
+    charge = StringField(default=-80, validators=[InputRequired()])
     distance = IntegerField(default=80, validators=[InputRequired()])
     orphans = BooleanField(default=False)
     classes = SelectMultipleField(_('classes'), widget=widgets.ListWidget(prefix_label=False))

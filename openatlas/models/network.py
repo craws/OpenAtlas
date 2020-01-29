@@ -1,6 +1,6 @@
 from typing import Any, Dict, Iterator, Optional
 
-from flask import g, flash
+from flask import flash, g
 from flask_wtf import FlaskForm
 from psycopg2.extras import NamedTupleCursor
 
@@ -14,15 +14,22 @@ class Network:
     classes = ['E7', 'E8', 'E9', 'E18', 'E21', 'E31', 'E33', 'E40', 'E53', 'E74', 'E84']
     sql_where = """
         AND ((e.system_type IS NULL AND e.class_code != 'E53')
-                OR (e.system_type NOT IN ('file', 'source translation')
-                    AND e.system_type NOT LIKE 'external reference%%'));"""
+                OR (e.system_type NOT IN ('feature', 'stratigraphic-unit', 'find', 'file',
+                                            'source translation')
+                        AND e.system_type NOT LIKE 'external reference%%'))"""
+    sql_where2 = """
+        AND ((e2.system_type IS NULL AND e2.class_code != 'E53')
+                OR (e2.system_type NOT IN ('feature', 'stratigraphic-unit', 'find', 'file',
+                                            'source translation')
+                    AND e2.system_type NOT LIKE 'external reference%%'))"""
 
     @staticmethod
     def get_edges() -> Iterator[NamedTupleCursor.Record]:
         sql = """
             SELECT l.id, l.domain_id, l.range_id FROM model.link l
             JOIN model.entity e ON l.domain_id = e.id
-            WHERE property_code IN %(properties)s """ + Network.sql_where
+            JOIN model.entity e2 ON l.range_id = e2.id
+            WHERE property_code IN %(properties)s """ + Network.sql_where + Network.sql_where2
         g.execute(sql, {'properties': tuple(Network.properties)})
         return g.cursor.fetchall()
 
@@ -73,6 +80,9 @@ class Network:
                           'label' if dimensions else 'name': name,
                           'color': params['classes'][row.class_code]['color']})
         if not linked_entity_ids.issubset(entities):  # pragma: no cover
+            # for id_ in [x for x in linked_entity_ids if x not in entities]:
+            #    entity = Entity.get_by_id(id_)
+            #    print(entity.class_.code, entity.system_type)
             flash('Missing nodes for links', 'error')
             return ''
         return str({'nodes': nodes, 'edges' if dimensions else 'links': edges}) if nodes else None

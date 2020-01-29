@@ -17,7 +17,7 @@
             var graph = {{ json_data|safe }};
             var width = {{ network_params['options']['width'] }};
             var height = {{ network_params['options']['height'] }};
-            var charge = {{ network_params['options']['charge'] }};
+            var charge = {{ network_params['options']['charge'] * 10 }};
             var distance = {{ network_params['options']['distance'] }};
         </script>
         <script src="/static/js/network.js"></script>

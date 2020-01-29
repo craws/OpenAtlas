@@ -1,30 +1,40 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
     <a href="{{ url_for('index') }}">{{ _('overview')|uc_first }}</a>
-    > {{ _('network visualization')|uc_first }}
+    > {{ _('network visualization')|uc_first }} {{ dimensions }}D
 {% endblock %}
 {% block content %}
     <link rel="stylesheet" href="/static/vendor/huebee-2.0.0/huebee.min.css">
     <script src="/static/vendor/huebee-2.0.0/huebee.pkgd.min.js"></script>
     {% if json_data %}
-        <script src="/static/vendor/network/react.production.min.js"></script>
-        <script src="/static/vendor/network/react-dom.production.min.js"></script>
+        <script src="/static/vendor/network/preact.umd.js"></script>
+        <script src="/static/vendor/network/hooks.umd.js"></script>
+        <script src="/static/vendor/network/compat.umd.js"></script>
         <script src="/static/vendor/network/three.min.js"></script>
+        <script>var React = preactCompat</script>
         <script src="/static/vendor/network/network-visualization.umd.js"></script>
         <div style="float:right;">
             <div id="visualization" style="position: relative; height: 600px;"></div>
         </div>
         <script>
             const graph = {{ json_data|safe }}
-            ReactDOM.render(
+            const graphSizeFactor = Math.floor(graph.edges.length / 500)
+            React.render(
                 React.createElement(NetworkVisualization.SelectionControls, {
                     dimensions: {{ dimensions }},
-                    onNodeClick: function({ node }) { console.log(node.label) },
                     showNeighborsOnly: true,
                     nodeRelativeSize: 1,
                     graph,
+                    nodeSize: node => 3 + node.neighbors.size * 0.1,
+                    showDirectionality: true,
+                    showLabels: (node, selectedNodeIds) =>
+                        selectedNodeIds.size > 0 || node.neighbors.size > 2 + graphSizeFactor,
                     width: {{ network_params['options']['width'] }},
                     height: {{ network_params['options']['height'] }},
+                    simulation: {
+                        charge: {{ network_params['options']['charge'] }},
+                        distance: {{ network_params['options']['distance'] }},
+                    }
                 }),
                 document.getElementById('visualization')
             )
