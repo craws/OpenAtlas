@@ -122,7 +122,8 @@ def table_select_model(self: Any, name: str,
         entities = g.classes
     else:
         entities = g.properties
-    table = Table(['code', 'name'], defs=[{'orderDataType': 'cidoc-model', 'targets': [0]}])
+    table = Table(['code', 'name'], defs=[{'orderDataType': 'cidoc-model', 'targets': [0]},
+                                          {'sType': 'numeric', 'targets': [0]}])
     for id_ in entities:
         table.rows.append([
             '<a onclick="selectFromTable(this, \'' + name + '\', \'' + str(id_) + '\')">' +

@@ -36,41 +36,26 @@ class Table:
         from openatlas.util.util import uc_first
         if not self.rows:
             return '<p>' + uc_first(_('no entries')) + '</p>'
-
-        columns: List[Dict[str, str]] = []
-        for item in self.header:
-            columns.append({'title': item.capitalize()})
-        # Add emtpy headers
-        columns += [{'title': ''} for i in range(len(self.rows[0]) - len(self.header))]
-
+        columns: List[Dict[str, str]] = [{'title': item.capitalize()} for item in self.header]
+        columns += [{'title': ''} for i in range(len(self.rows[0]) - len(self.header))]  # Add empty
         table_rows = session['settings']['default_table_rows']
         if hasattr(current_user, 'settings'):
             table_rows = current_user.settings['table_rows']
-
-        # Replace None values with empty strings in table data
-        for n, row in enumerate(self.rows):
-            for n2, item in enumerate(self.rows[n]):
-                if not item:
-                    self.rows[n][n2] = ''
-
         data_table = {'data': self.rows,
                       'stateSave': 'false' if session['settings']['debug_mode'] else 'true',
                       'columns': columns,
-                      'paging': json.dumps(self.paging),
+                      'paging': self.paging,
                       'pageLength': table_rows,
                       'autoWidth': 'false'}
         if self.order:
             data_table['order'] = self.order
         if self.defs:
             data_table['columnDefs'] = self.defs
-
         html = """
             <table id="{name}_table" class="compact stripe cell-border hover"></table>
             <script>
-                $(document).ready(function() {{
-                    $('#{name}_table').DataTable({data_table});
-                }});
-            </script>""".format(name=name, data_table=data_table,)
+                $(document).ready(function() {{ $('#{name}_table').DataTable({data_table}); }});
+            </script>""".format(name=name, data_table=json.dumps(data_table),)
 
         # Toggle header and footer HTML
         css_header = '#{name}_table_wrapper table thead {{ display:none; }}'.format(name=name)
