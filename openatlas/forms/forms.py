@@ -314,12 +314,11 @@ class TableMultiSelect(HiddenInput):  # type: ignore
         table = Table(Table.HEADERS[class_], order=[[headers_len, 'desc'], [0, 'asc']])
 
         # Table definitions (ordering and aligning)
-        defs = '{"orderDataType": "dom-checkbox", "targets":' + headers_len + '}'
+        table.defs = [{'orderDataType': 'dom-checkbox', 'targets': [headers_len]}]
         if class_ == 'event':
-            defs += ',{className: "dt-body-right", targets: [3,4]}'
+            table.defs.append({'className': 'dt-body-right', 'targets': [3, 4]})
         elif class_ in ['actor', 'group', 'feature', 'place']:
-            defs += ',{className: "dt-body-right", targets: [2,3]}'
-        table.defs = '[' + defs + ']'
+            table.defs.append({'className': 'dt-body-right', 'targets': [2, 3]})
 
         if class_ == 'place':
             aliases = current_user.settings['table_show_aliases']
