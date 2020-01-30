@@ -1,6 +1,6 @@
 class Changelog:
     versions = {
-        '4.1.0': ['TBA', {
+        '4.1.0': ['2020-01-30', {
             'feature': {
                 '1070': 'Enhance network visualization',
                 '952': 'Show subunits on map'}}],
