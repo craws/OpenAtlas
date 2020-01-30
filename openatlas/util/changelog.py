@@ -1,5 +1,9 @@
 class Changelog:
     versions = {
+        '4.2.0': ['TBA', {
+            'feature': {
+                '1089': 'Human Remains',
+                }}],
         '4.1.0': ['2020-01-30', {
             'feature': {
                 '1070': 'Enhance network visualization',

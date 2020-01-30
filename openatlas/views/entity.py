@@ -323,6 +323,7 @@ def place_view(object_: Entity) -> str:
         tables['stratigraphic-unit'] = Table(Table.HEADERS['place'] + [_('description')])
     if object_.system_type == 'stratigraphic unit':
         tables['find'] = Table(Table.HEADERS['place'] + [_('description')])
+        tables['human-remains'] = Table(Table.HEADERS['place'] + [_('description')])
     profile_image_id = object_.get_profile_image_id()
     if current_user.settings['module_map_overlay'] and is_authorized('editor'):
         tables['file'].header.append(uc_first(_('overlay')))

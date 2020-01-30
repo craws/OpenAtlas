@@ -73,8 +73,10 @@ def place_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
 
 @app.route('/place/insert', methods=['POST', 'GET'])
 @app.route('/place/insert/<int:origin_id>', methods=['POST', 'GET'])
+@app.route('/place/insert/<int:origin_id>/<system_type>', methods=['POST', 'GET'])
 @required_group('contributor')
-def place_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
+def place_insert(origin_id: Optional[int] = None,
+                 system_type: Optional[str] = None) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id) if origin_id else None
     geonames_buttons = False
     if origin and origin.system_type == 'place':
@@ -84,8 +86,12 @@ def place_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
         title = 'stratigraphic unit'
         form = build_form(FeatureForm, 'Stratigraphic Unit')
     elif origin and origin.system_type == 'stratigraphic unit':
-        title = 'find'
-        form = build_form(FeatureForm, 'Find')
+        if system_type == 'human_remains':  # URL param system_type only used for human remains now
+            title = 'human remains'
+            form = build_form(FeatureForm, 'Human Remains')
+        else:
+            title = 'find'
+            form = build_form(FeatureForm, 'Find')
     else:
         title = 'place'
         form = build_form(PlaceForm, 'Place')
@@ -96,7 +102,7 @@ def place_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
     if hasattr(form, 'geonames_id') and not current_user.settings['module_geonames']:
         del form.geonames_id, form.geonames_precision  # pragma: no cover
     if form.validate_on_submit():
-        return redirect(save(form, origin=origin))
+        return redirect(save(form, origin=origin, system_type=system_type))
 
     if title == 'place':
         form.alias.append_entry('')
@@ -200,7 +206,8 @@ def place_update(id_: int) -> Union[str, Response]:
 def save(form: DateForm,
          object__: Optional[Entity] = None,
          location_: Optional[Entity] = None,
-         origin: Optional[Entity] = None) -> str:
+         origin: Optional[Entity] = None,
+         system_type: Optional[str] = None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
     try:
@@ -210,7 +217,9 @@ def save(form: DateForm,
             Gis.delete_by_entity(location)
         else:
             log_action = 'insert'
-            if origin and origin.system_type == 'stratigraphic unit':
+            if system_type == 'human_remains':
+                object_ = Entity.insert('E20', form.name.data, 'human remains')
+            elif origin and origin.system_type == 'stratigraphic unit':
                 object_ = Entity.insert('E22', form.name.data, 'find')
             else:
                 system_type = 'place'
