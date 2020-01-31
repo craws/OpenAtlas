@@ -63,7 +63,8 @@ def place_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
         logger.log_user(id_, 'delete')
         flash(_('entity deleted'), 'info')
         if parent:
-            return redirect(url_for('entity_view', id_=parent.id) + '#tab-' + entity.system_type)
+            tab = '#tab-' + entity.system_type.replace(' ', '-')
+            return redirect(url_for('entity_view', id_=parent.id) + tab)
     table = Table(Table.HEADERS['place'], defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])
     aliases = current_user.settings['table_show_aliases']
     for place in Entity.get_by_system_type('place', nodes=True, aliases=aliases):
