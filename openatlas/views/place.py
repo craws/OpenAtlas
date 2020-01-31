@@ -250,7 +250,9 @@ def save(form: DateForm,
         Gis.insert(location, form)
         g.cursor.execute('COMMIT')
         if form.continue_.data == 'yes':
-            url = url_for('place_insert', origin_id=origin.id if origin else None)
+            url = url_for('place_insert',
+                          origin_id=origin.id if origin else None,
+                          system_type=system_type if system_type else None)
         logger.log_user(object_.id, log_action)
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
     except InvalidGeomException as e:  # pragma: no cover
