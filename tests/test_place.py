@@ -206,6 +206,14 @@ class PlaceTest(TestBaseCase):
                 find_id = rv.location.split('/')[-1]
                 self.app.get(url_for('place_update', id_=find_id))
                 self.app.post(url_for('place_update', id_=find_id), data=data)
+                data = {'name': 'My human remains'}
+                rv = self.app.post(url_for('place_insert',
+                                           origin_id=stratigraphic_id,
+                                           system_type='human_remains'),
+                                   data=data,
+                                   follow_redirects=True)
+                assert b'E20' in rv.data
+
             rv = self.app.get(url_for('entity_view', id_=feat_id))
             assert b'not a bug' in rv.data
             rv = self.app.get(url_for('entity_view', id_=stratigraphic_id))

@@ -86,7 +86,7 @@ def place_insert(origin_id: Optional[int] = None,
         title = 'stratigraphic unit'
         form = build_form(FeatureForm, 'Stratigraphic Unit')
     elif origin and origin.system_type == 'stratigraphic unit':
-        if system_type == 'human_remains':  # URL param system_type only used for human remains now
+        if system_type == 'human_remains':  # URL param system_type only used for human remains
             title = 'human remains'
             form = build_form(FeatureForm, 'Human Remains')
         else:

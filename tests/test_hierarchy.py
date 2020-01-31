@@ -14,7 +14,7 @@ class HierarchyTest(TestBaseCase):
             # Custom types
             data = {
                 'name': 'Geronimo',
-                'forms': [1, 2, 4, 5, 6],
+                'forms': [1, 2, 4, 5, 6, 7],
                 'multiple': True,
                 'description': 'Very important!'}
             rv = self.app.post(url_for('hierarchy_insert', param='custom'), data=data)
