@@ -210,9 +210,10 @@ class PlaceTest(TestBaseCase):
                 rv = self.app.post(url_for('place_insert',
                                            origin_id=stratigraphic_id,
                                            system_type='human_remains'),
-                                   data=data,
-                                   follow_redirects=True)
-                assert b'E20' in rv.data
+                                   data=data)
+                human_remains_id = rv.location.split('/')[-1]
+                rv = self.app.get(url_for('place_update', id_=human_remains_id))
+                assert b'My human remains' in rv.data
 
             rv = self.app.get(url_for('entity_view', id_=feat_id))
             assert b'not a bug' in rv.data

@@ -166,6 +166,8 @@ def place_update(id_: int) -> Union[str, Response]:
         form = build_form(FeatureForm, 'Stratigraphic Unit', object_, request, location)
     elif object_.system_type == 'find':
         form = build_form(FeatureForm, 'Find', object_, request, location)
+    elif object_.system_type == 'human remains':
+        form = build_form(FeatureForm, 'Human Remains', object_, request, location)
     else:
         geonames_buttons = True if current_user.settings['module_geonames'] else False
         form = build_form(PlaceForm, 'Place', object_, request, location)
