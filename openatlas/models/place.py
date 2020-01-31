@@ -25,7 +25,7 @@ def get_structure(object_: Optional[Entity] = None,
             place = super_
     elif not object_:
         pass
-    elif object_.system_type == 'find':
+    elif object_.system_type in ['find', 'human remains']:
         stratigraphic_unit = object_.get_linked_entity_safe('P46', inverse=True)
         super_id = stratigraphic_unit.id
         feature = stratigraphic_unit.get_linked_entity_safe('P46', inverse=True)

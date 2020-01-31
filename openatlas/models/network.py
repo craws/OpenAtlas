@@ -14,12 +14,12 @@ class Network:
     classes = ['E7', 'E8', 'E9', 'E18', 'E21', 'E31', 'E33', 'E40', 'E53', 'E74', 'E84']
     sql_where = """
         AND ((e.system_type IS NULL AND e.class_code != 'E53')
-                OR (e.system_type NOT IN ('feature', 'stratigraphic-unit', 'find', 'file',
+                OR (e.system_type NOT IN ('feature', 'stratigraphic unit', 'find', 'file',
                                             'source translation')
                         AND e.system_type NOT LIKE 'external reference%%'))"""
     sql_where2 = """
         AND ((e2.system_type IS NULL AND e2.class_code != 'E53')
-                OR (e2.system_type NOT IN ('feature', 'stratigraphic-unit', 'find', 'file',
+                OR (e2.system_type NOT IN ('feature', 'stratigraphic unit', 'find', 'file',
                                             'source translation')
                     AND e2.system_type NOT LIKE 'external reference%%'))"""
 

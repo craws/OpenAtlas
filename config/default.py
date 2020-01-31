@@ -78,6 +78,7 @@ CODE_CLASS = {
     'E9': 'event',
     'E84': 'object',
     'E18': 'place',
+    'E20': 'place',
     'E22': 'place',
     'E31': 'reference',
     'E33': 'source'}
@@ -89,6 +90,6 @@ CLASS_CODES = {
     'information_carrier': ['E84'],
     'object': ['E84'],
     'person': ['E21'],
-    'place': ['E18', 'E22'],
+    'place': ['E18', 'E20', 'E22'],
     'reference': ['E31'],
     'source': ['E33']}
