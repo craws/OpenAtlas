@@ -1,8 +1,5 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}
-    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
-    > {{ _('check dates')|uc_first }}
-{% endblock %}
+{% block breadcrumb %}{{ [[_('admin'), 'admin_index'], _('check dates')]|breadcrumb|safe }}{% endblock %}
 {% block content %}
 {{ 'Data_integrity'|manual_link|safe }}
 <div id="tabs" class="tabs-container">

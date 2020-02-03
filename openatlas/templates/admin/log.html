@@ -1,8 +1,5 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}
-    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
-    > {{ _('logs')|uc_first }}
-{% endblock %}
+{% block breadcrumb %}{{ [[_('admin'), 'admin_index'], _('logs')]|breadcrumb|safe }}{% endblock %}
 {% block content %}
     <div class="button-bar">
         <a onclick="return confirm('{{_('delete all logs?')|uc_first }}')"

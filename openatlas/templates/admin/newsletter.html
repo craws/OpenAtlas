@@ -1,8 +1,5 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}
-    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
-    > {{ _('newsletter')|uc_first }}
-{% endblock %}
+{% block breadcrumb %}{{ [[_('admin'), 'admin_index'], _('newsletter')]|breadcrumb|safe }}{% endblock %}
 {% block content %}
     <form id="newsletter-form" name="newsletter_form" method="post">
         {{ form.csrf_token }}

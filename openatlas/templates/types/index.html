@@ -1,7 +1,5 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}
-    {{ _('types')|uc_first }}
-{% endblock %}
+{% block breadcrumb %}{{ [_('types')]|breadcrumb|safe }}{% endblock %}
 {% block content %}
     {{ 'Form_field_type'|manual_link|safe }}
     <div id="tabs-menu" class="tabs-container">

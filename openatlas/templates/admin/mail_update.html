@@ -1,9 +1,5 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}
-    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
-    > <a href="{{ url_for('admin_mail') }}">{{ _('mail')|uc_first }}</a>
-    > {{ _('edit')|uc_first }}
-{% endblock %}
+{% block breadcrumb %}{{ [[_('admin'), 'admin_index'], [_('mail'), 'admin_mail'], _('edit')]|breadcrumb|safe }}{% endblock %}
 {% block content %}
     {{ form|display_form|safe }}
 {% endblock %}

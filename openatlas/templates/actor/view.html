@@ -1,9 +1,6 @@
 {% extends "layout.html" %}
 {% block title_name %}- {{ actor.name }}{% endblock %}
-{% block breadcrumb %}
-    <a href="{{ url_for('actor_index') }}">{{ _('actor')|uc_first }}</a>
-    > {{ actor.name|truncate_string|safe }}
-{% endblock %}
+{% block breadcrumb %}{{ [[_('actor'), 'actor_index'], actor.name]|breadcrumb|safe }}{% endblock %}
 {% block content %}
 <div id="tabs" class="tabs-container">
     <ul>

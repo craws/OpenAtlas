@@ -1,7 +1,5 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}
-    {{ _('actor')|uc_first }}
-{% endblock %}
+{% block breadcrumb %}{{ [_('actor')]|breadcrumb|safe }}{% endblock %}
 {% block content %}
     {{ 'Actor'|manual_link|safe }}
     {% if 'contributor'|is_authorized %}

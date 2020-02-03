@@ -1,7 +1,5 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}
-    {{ _('profile')|uc_first }}
-{% endblock %}
+{% block breadcrumb %}{{ [_('profile')]|breadcrumb|safe }}{% endblock %}
 {% block content %}
     {{ 'Profile'|manual_link|safe }}
     {% if not config['DEMO_MODE'] %}

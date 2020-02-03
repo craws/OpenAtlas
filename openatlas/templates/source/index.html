@@ -1,7 +1,5 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}
-    {{ _('source')|uc_first }}
-{% endblock %}
+{% block breadcrumb %}{{ [_('source')]|breadcrumb|safe }}{% endblock %}
 {% block content %}
     {{ 'Source'|manual_link|safe }}
     {% if 'contributor'|is_authorized %}

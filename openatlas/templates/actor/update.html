@@ -1,10 +1,6 @@
 {% extends 'layout.html' %}
 {% block title_name %}- {{ actor.name }}{% endblock %}
-{% block breadcrumb %}
-    <a href="{{ url_for('actor_index') }}">{{ _('actor')|uc_first }}</a>
-    > {{ actor|link|safe }}
-    > {{ _('edit')|uc_first }}
-{% endblock %}
+{% block breadcrumb %}{{ [[_('actor'), 'actor_index'], actor, _('edit')]|breadcrumb|safe }}{% endblock %}
 {% block content %}
     {% if modifier %}
         <p class="error">{{ _('error modified by %(username)s', username=modifier|safe) }}</p>

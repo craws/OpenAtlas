@@ -1,8 +1,5 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}
-    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
-    > {{ _('check links')|uc_first }}
-{% endblock %}
+{% block breadcrumb %}{{ [[_('admin'), 'admin_index'], _('check links')]|breadcrumb|safe }}{% endblock %}
 {% block content %}
     {{ 'Data_integrity'|manual_link|safe }}
     <p>

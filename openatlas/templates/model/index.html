@@ -1,7 +1,5 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}
-    {{ _('model')|uc_first }}
-{% endblock %}
+{% block breadcrumb %}{{ [_('model')]|breadcrumb|safe }}{% endblock %}
 {% block content %}
     <div style="float:left">
         <a href="/static/images/model/openatlas_schema.png">
