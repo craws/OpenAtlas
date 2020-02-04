@@ -375,7 +375,7 @@ def place_view(object_: Entity) -> str:
                                      actor.class_.name,
                                      actor.first,
                                      actor.last])
-    structure = get_structure(object_)
+    structure = get_structure(object_, mode='view')
     for entity in structure['subunits']:
         data = get_base_table_data(entity)
         data.append(truncate_string(entity.description))

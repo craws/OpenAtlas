@@ -107,7 +107,7 @@ def place_insert(origin_id: Optional[int] = None,
 
     if title == 'place':
         form.alias.append_entry('')
-    structure = get_structure(super_=origin)
+    structure = get_structure(super_=origin, mode='insert')
     overlays = Overlay.get_by_object(origin) if origin and origin.class_.code == 'E18' else None
     return render_template('place/insert.html',
                            form=form,
@@ -196,7 +196,7 @@ def place_update(id_: int) -> Union[str, Response]:
             form.geonames_id.data = geonames_entity.name if geonames_entity else ''
             exact_match = True if g.nodes[geonames_link.type.id].name == 'exact match' else False
             form.geonames_precision.data = exact_match
-    structure = get_structure(object_)
+    structure = get_structure(object_, mode='update')
     return render_template('place/update.html',
                            form=form,
                            object_=object_,

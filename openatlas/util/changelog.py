@@ -2,8 +2,9 @@ class Changelog:
     versions = {
         '4.2.0': ['TBA', {
             'feature': {
-                '1089': 'Human Remains',
-                }}],
+                '1089': 'Human Remains'},
+            'fix': {
+                '1134': 'Overlay maps: not enabled if Geonames disabled'}}],
         '4.1.0': ['2020-01-30', {
             'feature': {
                 '1070': 'Enhance network visualization',
