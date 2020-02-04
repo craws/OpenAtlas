@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ [[_('admin'), 'admin_index'], [_('general'), 'admin_general'], _('edit')]|breadcrumb|safe }}{% endblock %}
+{% block breadcrumb %}{{ [[_('admin'), 'admin_index'], [_('general'), 'admin_general'], _('edit')]|crumb|safe }}{% endblock %}
 {% block content %}
     {{ 'General'|manual_link|safe }}
     {{ form|display_form|safe }}

@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ [_('reference')]|breadcrumb|safe }}{% endblock %}
+{% block breadcrumb %}
+    {{ [_('reference')]|crumb|safe }}
+{% endblock %}
 {% block content %}
     {{ 'Reference'|manual_link|safe }}
     {% if 'contributor'|is_authorized %}

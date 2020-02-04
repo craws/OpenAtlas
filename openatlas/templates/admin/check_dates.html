@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ [[_('admin'), 'admin_index'], _('check dates')]|breadcrumb|safe }}{% endblock %}
+{% block breadcrumb %}{{ [[_('admin'), 'admin_index'], _('check dates')]|crumb|safe }}{% endblock %}
 {% block content %}
 {{ 'Data_integrity'|manual_link|safe }}
 <div id="tabs" class="tabs-container">

@@ -1,8 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('file_index') }}">{{ _('files')|uc_first }}</a>
-    > {{ file|link|safe }}
-    > {{ _('edit')|uc_first }}
+    {{ [[_('files'), 'file_index'], file, _('edit')]|crumb|safe }}
 {% endblock %}
 {% block content %}
     {{ form|display_form|safe }}

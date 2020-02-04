@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ [[_('admin'), 'admin_index'], _('logs')]|breadcrumb|safe }}{% endblock %}
+{% block breadcrumb %}{{ [[_('admin'), 'admin_index'], _('logs')]|crumb|safe }}{% endblock %}
 {% block content %}
     <div class="button-bar">
         <a onclick="return confirm('{{_('delete all logs?')|uc_first }}')"

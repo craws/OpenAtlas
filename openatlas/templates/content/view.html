@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ [[_('admin'), 'admin_index'], [_('content'), 'content_index'], _('item')]|breadcrumb|safe }}{% endblock %}
+{% block breadcrumb %}
+    {{ [[_('admin'), 'admin_index'], [_('content'), 'content_index'], _('item')]|crumb|safe }}
+{% endblock %}
 {% block content %}
     <div class="button-bar">
         <a href="{{ url_for('content_update', item=item) }}">{{ _('edit')|uc_first }}</a>

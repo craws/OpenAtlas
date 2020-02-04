@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ [_('place')]|breadcrumb|safe }}{% endblock %}
+{% block breadcrumb %}
+    {{ [_('place')]|crumb|safe }}
+{% endblock %}
 {% block content %}
     <div style="float:left;">
         {{ 'Place'|manual_link|safe }}

@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ [[_('admin'), 'admin_index'], _('logo')]|breadcrumb|safe }}{% endblock %}
+{% block breadcrumb %}{{ [[_('admin'), 'admin_index'], _('logo')]|crumb|safe }}{% endblock %}
 {% block content %}
     {{ 'Logo'|manual_link|safe }}
     {% if form %}

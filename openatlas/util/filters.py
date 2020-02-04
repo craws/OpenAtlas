@@ -30,13 +30,17 @@ def link(self: Any, entity: Entity) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def breadcrumb(self: Any, crumbs: List[Any]) -> str:
+def crumb(self: Any, crumbs: List[Any]) -> str:
     items = []
     for item in crumbs:
         if not item:
             continue
         elif isinstance(item, list):
-            items.append('<a href="' + url_for(item[1]) + '">' + util.uc_first(item[0]) + '</a>')
+            if len(item) == 2:
+                url = url_for(item[1])
+            else:
+                url = url_for(item[1], item=item[2])
+            items.append('<a href="' + url + '">' + util.uc_first(item[0]) + '</a>')
         elif isinstance(item, Entity):
             items.append(util.link(item))
         else:
