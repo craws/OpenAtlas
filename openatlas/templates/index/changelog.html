@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('index') }}">{{ _('overview')|uc_first }}</a>
-    > {{ _('changelog')|uc_first }}
+    {{ [[_('overview'), 'index'], _('changelog')]|crumb|safe }}
 {% endblock %}
 {% block content %}
     {{ 'Features_Versioning_and_Roadmap'|manual_link|safe }}

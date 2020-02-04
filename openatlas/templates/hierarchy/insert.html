@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('node_index') }}">{{ _('types')|uc_first }}</a>
-    > + {{ _(param)|uc_first }}
+    {{ [[_('types'), 'node_index'], '+ ' + _(param).capitalize()]|crumb|safe }}
 {% endblock %}
 {% block content %}
     {{ form|display_form|safe }}
