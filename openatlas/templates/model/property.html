@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('model_index') }}">{{ _('model')|uc_first }}</a>
-    > {{ _('properties')|uc_first }}
+    {{ [[_('model'), 'model_index'], _('properties')]|crumb|safe }}
 {% endblock %}
 {% block content %}
     {{ table.display()|safe }}

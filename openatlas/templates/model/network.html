@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('index') }}">{{ _('overview')|uc_first }}</a>
-    > {{ _('network visualization')|uc_first }}
+    {{ [[_('overview'), 'index'], _('network visualization')]|crumb|safe }}
 {% endblock %}
 {% block content %}
     <link rel="stylesheet" href="/static/vendor/huebee-2.0.0/huebee.min.css">
