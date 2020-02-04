@@ -173,7 +173,7 @@ def display_profile_image(self: Any, image_id: int) -> str:
     if file_path:
         return """
             <div id="profile_image_div">
-                <a href="/file/view/{id}">
+                <a href="/entity/{id}">
                     <img style="max-width:{width}px;" alt="profile image" src="{src}">
                 </a>
             </div>
