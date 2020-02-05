@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('file_index') }}">{{ _('files')|uc_first }}</a>
+    {{ [_('files')]|crumb|safe }}
 {% endblock %}
 {% block content %}
     {% if 'contributor'|is_authorized %}

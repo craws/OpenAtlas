@@ -1,9 +1,7 @@
 {% extends 'layout.html' %}
 {% block title_name %}- {{ actor.name }}{% endblock %}
 {% block breadcrumb %}
-    <a href="{{ url_for('actor_index') }}">{{ _('actor')|uc_first }}</a>
-    > {{ actor|link|safe }}
-    > {{ _('edit')|uc_first }}
+    {{ [[_('actor'), 'actor_index'], actor, _('edit')]|crumb|safe }}
 {% endblock %}
 {% block content %}
     {% if modifier %}

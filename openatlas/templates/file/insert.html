@@ -1,12 +1,10 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
     {% if origin %}
-        <a href="{{ url_for(origin.view_name + '_index') }}">{{ _(origin.view_name)|uc_first }}</a>
-        > {{ origin|link|safe }}
+        {{ [[_(origin.view_name), origin.view_name + '_index'], origin, '+ ' + _('file').capitalize()]|crumb|safe }}
     {% else %}
-        <a href="{{ url_for('file_index') }}">{{ _('files')|uc_first }}</a>
+        {{ [[_('files'), 'file_index'], '+ ' + _('file').capitalize()]|crumb|safe }}
     {% endif %}
-    > + {{ _('file')|uc_first }}
 {% endblock %}
 {% block content %}
     <p>

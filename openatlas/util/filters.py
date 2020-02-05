@@ -30,6 +30,26 @@ def link(self: Any, entity: Entity) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
+def crumb(self: Any, crumbs: List[Any]) -> str:
+    items = []
+    for item in crumbs:
+        if not item:
+            continue
+        elif isinstance(item, list):
+            if len(item) == 2:
+                url = url_for(item[1])
+            else:
+                url = url_for(item[1], item=item[2])
+            items.append('<a href="' + url + '">' + util.uc_first(item[0]) + '</a>')
+        elif isinstance(item, Entity):
+            items.append(util.link(item))
+        else:
+            items.append(util.uc_first(item))
+    return ' > '.join(items)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
 def note(self: Any, entity: Entity) -> str:
     if not current_user.settings['module_notes'] or not util.is_authorized('contributor'):
         return ''  # pragma no cover

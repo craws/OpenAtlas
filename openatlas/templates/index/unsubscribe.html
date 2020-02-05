@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('index') }}">{{ _('overview')|uc_first }}</a>
-    > {{ _('unsubscribe newsletter')|uc_first }}
+    {{ [[_('overview'), 'index'], _('unsubscribe newsletter')]|crumb|safe }}
 {% endblock %}
 {% block content %}
     {{ text }}

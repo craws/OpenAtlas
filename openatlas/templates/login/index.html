@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('index') }}">{{ _('overview')|uc_first }}</a>
-    > {{ _('login')|uc_first }}
+    {{ [[_('overview'), 'index'], _('login')]|crumb|safe }}
 {% endblock %}
 {% block content %}
     {{ form|display_form('login-form')|safe }}
