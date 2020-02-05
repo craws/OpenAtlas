@@ -9,16 +9,16 @@
     {% if '127.0.0' not in request.url %}
         <link rel="manifest" href="/static/manifest.json">
     {% endif %}
+    <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css"/>
+    <link rel="stylesheet" href="/static/node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css"/>
+    <link rel="stylesheet" href="/static/node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css"/>
+
     <link rel="mask-icon" href="/static/safari-pinned-tab.svg"/>
     <link rel="stylesheet" href="/static/css/reset.css?v={{ config['VERSION'] }}"/>
     <link rel="stylesheet" href="/static/css/uitheme.css"/>
     <link rel="stylesheet" href="/static/css/style.css?v={{ config['VERSION'] }}"/>
     <link rel="stylesheet" href="/static/css/color.css?v={{ config['VERSION'] }}"/>
     <link rel="stylesheet" href="/static/css/images.css?v={{ config['VERSION'] }}"/>
-
-    <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="/static/node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css"/>
-    <link rel="stylesheet" href="/static/node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css"/>
 
     <script src="/static/node_modules/jquery/dist/jquery.min.js"></script>
     <script src="/static/node_modules/datatables.net/js/jquery.dataTables.min.js"></script>
@@ -110,17 +110,6 @@
         </div>
         <div class="iconbutton"
              data-toggle="popover"
-             title="{{ _('version')|uc_first }}"
-             data-content="{{ config['VERSION'] }}"
-             data-trigger="hover">
-            <a href="{{ url_for('index_changelog') }}" >
-                <span>
-                    <i class="fas fa-code-branch"></i>
-                </span>
-            </a>
-        </div>
-        <div class="iconbutton"
-             data-toggle="popover"
              title="{{ _('model')|uc_first }}"
              data-content="{{ _('model')|uc_first }}"
              data-trigger="hover">
@@ -185,12 +174,14 @@
     </div>
 </nav>
 <nav aria-label="breadcrumb">
-    <ol class="breadcrumb">
+    <div class="breadcrumb">
         {% block breadcrumb %}{% endblock %}
-        <li style="float: right">
-        v{{ config['VERSION'] }}
-        </li>
-    </ol>
+        <div style="position: absolute; right: 16px">
+            <a href="{{ url_for('index_changelog') }}" >
+                v{{ config['VERSION'] }}
+            </a>
+        </div>
+    </div>
 </nav>
 <noscript><div class="error">{{ _('warning no js') }}</div></noscript>
 {{ session['settings']['site_header'] }}

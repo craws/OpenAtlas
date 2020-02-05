@@ -453,8 +453,16 @@ def truncate_string(string: Optional[str] = '', length: int = 40, span: bool = T
 def get_base_table_data(entity: 'Entity',
                         file_stats: Optional[Dict[Union[int, str], Any]] = None) -> List[str]:
     """ Returns standard table data for an entity"""
-    data: List[str] = ['<br>'.join([link(entity)] + [truncate_string(alias) for
-                                                     alias in entity.aliases.values()])]
+    if len(entity.aliases) > 0:
+        data: List[str] = ['<p>' + link(entity) + '</p>']
+    else:
+        data: List[str] = [link(entity)]
+    # Aliases
+    for i, (id_, alias) in enumerate(entity.aliases.items()):
+        if i == len(entity.aliases) - 1:
+            data[0] = ''.join([data[0]] + [truncate_string(alias)])
+        else:
+            data[0] = ''.join([data[0]] + ['<p>'+truncate_string(alias)+'</p>'])
     if entity.view_name in ['event', 'actor']:
         data.append(g.classes[entity.class_.code].name)
     if entity.view_name in ['reference'] and entity.system_type != 'file':
