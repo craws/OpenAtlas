@@ -77,13 +77,12 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
 @required_group('contributor')
 def involvement_update(id_: int, origin_id: int) -> Union[str, Response]:
     link_ = Link.get_by_id(id_)
+    form = build_form(ActorForm, 'Involvement', link_, request)
+    del form.actor, form.event, form.insert_and_continue
+    form.activity.choices = [('P11', g.properties['P11'].name)]
     event = Entity.get_by_id(link_.domain.id, view_name='event')
     actor = Entity.get_by_id(link_.range.id, view_name='actor')
     origin = event if origin_id == event.id else actor
-    form = build_form(ActorForm, 'Involvement', link_, request)
-    form.save.label.text = _('save')
-    del form.actor, form.event, form.insert_and_continue
-    form.activity.choices = [('P11', g.properties['P11'].name)]
     if event.class_.code in ['E7', 'E8']:
         form.activity.choices.append(('P14', g.properties['P14'].name))
     if event.class_.code == 'E8':
@@ -104,8 +103,11 @@ def involvement_update(id_: int, origin_id: int) -> Union[str, Response]:
             flash(_('error transaction'), 'error')
         tab = 'actor' if origin.view_name == 'event' else 'event'
         return redirect(url_for('entity_view', id_=origin.id) + '#tab-' + tab)
+    form.save.label.text = _('save')
     form.activity.data = link_.property.code
     form.description.data = link_.description
     form.populate_dates(link_)
-    return render_template('involvement/update.html', origin=origin, form=form,
+    return render_template('involvement/update.html',
+                           origin=origin,
+                           form=form,
                            linked_object=event if origin_id != event.id else actor)

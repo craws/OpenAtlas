@@ -5,7 +5,7 @@ from flask_babel import lazy_gettext as _
 
 from openatlas import app
 
-VERSION = '4.1.0'
+VERSION = '4.2.0'
 DEMO_MODE = False  # If in demo mode some options are disabled and the login form is pre filled
 IS_UNIT_TEST = False
 
@@ -63,9 +63,8 @@ LOG_LEVELS = {0: 'emergency',
 
 # Types
 PROPERTY_TYPES = ['Actor Actor Relation', 'Actor Function', 'Involvement']
-
-BASE_TYPES = ['Actor', 'Bibliography', 'Edition', 'Event', 'Feature', 'Find', 'Information Carrier',
-              'Place', 'Source', 'Stratigraphic Unit']
+BASE_TYPES = ['Actor', 'Bibliography', 'Edition', 'Event', 'Feature', 'Find', 'Human Remains',
+              'Information Carrier', 'Place', 'Source', 'Stratigraphic Unit']
 
 # Feedback
 FEEDBACK_SUBJECTS = {_('suggestion').title(): _('suggestion').title(),
@@ -82,6 +81,7 @@ CODE_CLASS = {
     'E9': 'event',
     'E84': 'object',
     'E18': 'place',
+    'E20': 'place',
     'E22': 'place',
     'E31': 'reference',
     'E33': 'source'}
@@ -93,6 +93,6 @@ CLASS_CODES = {
     'information_carrier': ['E84'],
     'object': ['E84'],
     'person': ['E21'],
-    'place': ['E18', 'E22'],
+    'place': ['E18', 'E20', 'E22'],
     'reference': ['E31'],
     'source': ['E33']}

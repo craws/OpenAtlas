@@ -72,7 +72,9 @@ def object_update(id_: int) -> Union[str, Response]:
             del form.save
             flash(_('error modified'), 'error')
             modifier = link(logger.get_log_for_advanced_view(object_.id)['modifier'])
-            return render_template('object/update.html', form=form, object_=object_,
+            return render_template('object/update.html',
+                                   form=form,
+                                   object_=object_,
                                    modifier=modifier)
         save(form, object_)
         return redirect(url_for('entity_view', id_=id_))

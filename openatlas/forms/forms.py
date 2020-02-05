@@ -152,7 +152,7 @@ class TreeSelect(HiddenInput):  # type: ignore
                 $(document).ready(function () {{
                     createOverlay("{name}","{title}",false,);
                     $("#{name}-tree").jstree({{
-                        "core" : {{"check_callback" : true, 'data':[{tree_data}]}},
+                        "core" : {{"check_callback": true, "data": {tree_data}}},
                         "search": {{"case_insensitive": true, "show_only_matches": true}},
                         "plugins" : ["search"],
                     }});
@@ -210,7 +210,7 @@ class TreeMultiSelect(HiddenInput):  # type: ignore
             <script>
                 createOverlay("{name}", "{title}", true, "tree");
                 $("#{name}-tree").jstree({{
-                    "core" : {{ "check_callback" : true, 'data':[{tree_data}] }},
+                    "core" : {{ "check_callback": true, "data": {tree_data} }},
                     "search": {{"case_insensitive": true, "show_only_matches": true}},
                     "plugins": ["search", "checkbox"],
                     "checkbox": {{"three_state": false}}
@@ -260,9 +260,9 @@ class TableSelect(HiddenInput):  # type: ignore
 
         # Table definitions (aligning)
         if class_ == 'event':
-            table.defs += '[{className: "dt-body-right", targets: [3,4]}]'
+            table.defs = [{'className': 'dt-body-right', 'targets': [3, 4]}]
         elif class_ in ['actor', 'group', 'feature', 'place']:
-            table.defs += '[{className: "dt-body-right", targets: [2,3]}]'
+            table.defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
 
         selection = ''
         for entity in entities:
@@ -274,8 +274,8 @@ class TableSelect(HiddenInput):  # type: ignore
                         """.format(name=field.id,
                                    entity_id=entity.id,
                                    entity_name=truncate_string(entity.name, span=False))
-            data[0] = '<br>'.join([data[0]] + [
-                truncate_string(alias) for id_, alias in entity.aliases.items()])
+            data[0] = '<br>'.join([data[0]] + [truncate_string(alias) for
+                                               id_, alias in entity.aliases.items()])
             table.rows.append(data)
         html = """
             <input id="{name}-button" name="{name}-button" class="table-select {required}"
@@ -311,15 +311,14 @@ class TableMultiSelect(HiddenInput):  # type: ignore
         headers_len = str(len(Table.HEADERS[class_]))
 
         # Make checkbox column sortable and show selected on top
-        table = Table(Table.HEADERS[class_], order='[[' + headers_len + ', "desc"], [0, "asc"]]')
+        table = Table(Table.HEADERS[class_], order=[[headers_len, 'desc'], [0, 'asc']])
 
         # Table definitions (ordering and aligning)
-        defs = '{"orderDataType": "dom-checkbox", "targets":' + headers_len + '}'
+        table.defs = [{'orderDataType': 'dom-checkbox', 'targets': [headers_len]}]
         if class_ == 'event':
-            defs += ',{className: "dt-body-right", targets: [3,4]}'
+            table.defs.append({'className': 'dt-body-right', 'targets': [3, 4]})
         elif class_ in ['actor', 'group', 'feature', 'place']:
-            defs += ',{className: "dt-body-right", targets: [2,3]}'
-        table.defs = '[' + defs + ']'
+            table.defs.append({'className': 'dt-body-right', 'targets': [2, 3]})
 
         if class_ == 'place':
             aliases = current_user.settings['table_show_aliases']

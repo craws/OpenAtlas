@@ -118,13 +118,12 @@ def display_move_form(self: Any, form: Any, root_name: str) -> str:
 @blueprint.app_template_filter()
 def table_select_model(self: Any, name: str,
                        selected: Union[CidocClass, CidocProperty, None] = None) -> str:
-    # Todo: extra sort function for class and property code e.g. E69
     if name in ['domain', 'range']:
         entities = g.classes
     else:
         entities = g.properties
-    table = Table(['code', 'name'], defs='''[{"orderDataType": "cidoc-model", "targets":[0]},
-                                            {"sType": "numeric", "targets": [0]}]''')
+    table = Table(['code', 'name'], defs=[{'orderDataType': 'cidoc-model', 'targets': [0]},
+                                          {'sType': 'numeric', 'targets': [0]}])
     for id_ in entities:
         table.rows.append([
             '<a onclick="selectFromTable(this, \'' + name + '\', \'' + str(id_) + '\')">' +
@@ -174,7 +173,7 @@ def display_profile_image(self: Any, image_id: int) -> str:
     if file_path:
         return """
             <div id="profile_image_div">
-                <a href="/file/view/{id}">
+                <a href="/entity/{id}">
                     <img style="max-width:{width}px;" alt="profile image" src="{src}">
                 </a>
             </div>

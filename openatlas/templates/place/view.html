@@ -27,6 +27,7 @@
             <li><a href="#tab-stratigraphic-unit">{{ _('stratigraphic unit')|uc_first }} {{ tables['stratigraphic-unit']|format_tab_number|safe }}</a></li>
         {% elif object_.system_type == 'stratigraphic unit' %}
             <li><a href="#tab-find">{{ _('find')|uc_first }} {{ tables['find']|format_tab_number|safe }}</a></li>
+            <li><a href="#tab-human-remains">{{ _('human remains')|uc_first }} {{ tables['human-remains']|format_tab_number|safe }}</a></li>
         {% endif %}
     </ul>
     <div id="tab-info">
@@ -127,6 +128,12 @@
                 <a href="{{ url_for('place_insert', origin_id=object_.id)}}">+ {{ _('find')|uc_first }}</a>
             </div>
             {{ tables['find'].display('find')|safe }}
+        </div>
+        <div id="tab-human-remains">
+            <div class="button-bar">
+                <a href="{{ url_for('place_insert', origin_id=object_.id, system_type='human_remains')}}">+ {{ _('human remains')|uc_first }}</a>
+            </div>
+            {{ tables['human-remains'].display('human_remains')|safe }}
         </div>
     {% endif %}
 </div>

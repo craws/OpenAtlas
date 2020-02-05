@@ -1,118 +1,88 @@
-from typing import Any, Dict, Optional
+from typing import Any, Dict, Iterator, Optional
 
-from flask import g
+from flask import flash, g
+from flask_wtf import FlaskForm
+from psycopg2.extras import NamedTupleCursor
 
 from openatlas.util.util import truncate_string
 
 
 class Network:
 
-    @staticmethod
-    def get_network_json(params: Dict[str, Any]) -> Optional[str]:
-        """ Returns JSON data for d3.js"""
-        properties = ['P107', 'P24', 'P23', 'P11', 'P14', 'P7', 'P74', 'P67', 'OA7', 'OA8', 'OA9']
-        classes = ['E21', 'E7', 'E31', 'E33', 'E40', 'E74', 'E53', 'E18', 'E8', 'E84']
+    properties = ['P7', 'P11', 'P14', 'P22', 'P23', 'P24', 'P25', 'P67', 'P74', 'P107', 'OA7',
+                  'OA8', 'OA9']
+    classes = ['E7', 'E8', 'E9', 'E18', 'E21', 'E31', 'E33', 'E40', 'E53', 'E74', 'E84']
+    sql_where = """
+        AND ((e.system_type IS NULL AND e.class_code != 'E53')
+                OR (e.system_type NOT IN ('feature', 'stratigraphic unit', 'find', 'file',
+                                            'source translation')
+                        AND e.system_type NOT LIKE 'external reference%%'))"""
+    sql_where2 = """
+        AND ((e2.system_type IS NULL AND e2.class_code != 'E53')
+                OR (e2.system_type NOT IN ('feature', 'stratigraphic unit', 'find', 'file',
+                                            'source translation')
+                    AND e2.system_type NOT LIKE 'external reference%%'))"""
 
-        # Get object - location mapping
+    @staticmethod
+    def get_edges() -> Iterator[NamedTupleCursor.Record]:
+        sql = """
+            SELECT l.id, l.domain_id, l.range_id FROM model.link l
+            JOIN model.entity e ON l.domain_id = e.id
+            JOIN model.entity e2 ON l.range_id = e2.id
+            WHERE property_code IN %(properties)s """ + Network.sql_where + Network.sql_where2
+        g.execute(sql, {'properties': tuple(Network.properties)})
+        return g.cursor.fetchall()
+
+    @staticmethod
+    def get_entities() -> Iterator[NamedTupleCursor.Record]:
+        sql = """
+            SELECT e.id, e.class_code, e.name
+            FROM model.entity e
+            WHERE class_code IN %(classes)s """ + Network.sql_where
+        g.execute(sql, {'classes': tuple(Network.classes)})
+        return g.cursor.fetchall()
+
+    @staticmethod
+    def get_object_mapping() -> Dict[int, int]:
+        # Get mapping between location and objects to join them into one entity
         sql = """
             SELECT e.id, l.range_id
             FROM model.entity e
             JOIN model.link l ON e.id = domain_id AND l.property_code = 'P53';"""
         g.execute(sql)
-        object_mapping = {row.id: row.range_id for row in g.cursor.fetchall()}
-
-        # Get edges
-        entities = set()
-        edges = ''
-        sql = """
-            SELECT l.domain_id, l.range_id FROM model.link l
-            JOIN model.entity e ON l.domain_id = e.id
-            WHERE property_code IN %(properties)s
-                AND (e.system_type IS NULL OR (e.system_type != 'file'
-                    AND e.system_type NOT LIKE 'external reference%%'));"""
-        g.execute(sql, {'properties': tuple(properties)})
-        for row in g.cursor.fetchall():
-            edges += "{{'source':'{domain_id}','target':'{range_id}'}},".format(
-                domain_id=row.domain_id, range_id=row.range_id)
-            entities.update([row.domain_id, row.range_id])
-
-        # Get entities
-        sql = "SELECT id, class_code, name FROM model.entity WHERE class_code IN %(classes)s;"
-        g.execute(sql, {'classes': tuple(classes)})
-        nodes = ''
-        entities_already = set()
-        for row in g.cursor.fetchall():
-            if params['options']['orphans'] or row.id in entities:
-                entities_already.add(row.id)
-                nodes += """{{'id':'{id}','name':'{name}','color':'{color}'}},""".format(
-                    id=row.id,
-                    name=truncate_string(row.name.replace("'", ""), span=False),
-                    color=params['classes'][row.class_code]['color'])
-
-        # Get entities of links which weren't present in class selection
-        array_diff = [item for item in entities if item not in entities_already]
-        if array_diff:
-            sql = "SELECT id, class_code, name FROM model.entity WHERE id IN %(array_diff)s;"
-            g.execute(sql, {'array_diff': tuple(array_diff)})
-            result = g.cursor.fetchall()
-            for row in result:
-                color = ''
-                if row.class_code in params['classes']:  # pragma: no cover
-                    color = params['classes'][row.class_code]['color']
-                nodes += """{{'id':'{id}','name':'{name}','color':'{color}'}},""".format(
-                    id=row.id,
-                    color=color,
-                    name=truncate_string(row.name.replace("'", ""), span=False))
-
-        return "graph = {'nodes': [" + nodes + "],  links: [" + edges + "]};" if nodes else None
+        return {row.range_id: row.id for row in g.cursor.fetchall()}
 
     @staticmethod
-    def get_network_json2(params: Dict[str, Any]) -> Optional[str]:
-        properties = ['P107', 'P24', 'P23', 'P11', 'P14', 'P7', 'P74', 'P67', 'OA7', 'OA8', 'OA9']
-        classes = ['E21', 'E7', 'E31', 'E33', 'E40', 'E74', 'E53', 'E18', 'E8', 'E84']
+    def get_network_json(form: FlaskForm,
+                         params: Dict[str, Any],
+                         dimensions: Optional[int]) -> Optional[str]:
+        mapping = Network.get_object_mapping()
+        linked_entity_ids = set()
 
-        # Get edges
+        edges = []
+        for row in Network.get_edges():
+            domain_id = mapping[row.domain_id] if row.domain_id in mapping else row.domain_id
+            range_id = mapping[row.range_id] if row.range_id in mapping else row.range_id
+            linked_entity_ids.add(domain_id)
+            linked_entity_ids.add(range_id)
+            edges.append({'id': int(row.id), 'source': domain_id, 'target': range_id})
+        nodes = []
+
         entities = set()
-        edges = ''
-        sql = """
-            SELECT l.id, l.domain_id, l.range_id FROM model.link l
-            JOIN model.entity e ON l.domain_id = e.id
-            WHERE property_code IN %(properties)s
-                AND (e.system_type IS NULL OR (e.system_type != 'file'
-                    AND e.system_type NOT LIKE 'external reference%%'));"""
-        g.execute(sql, {'properties': tuple(properties)})
-        for row in g.cursor.fetchall():
-            edges += "{{'source':'{d_id}', 'target':'{r_id}', 'id':'{l_id}'}},".format(
-                d_id=row.domain_id, r_id=row.range_id, l_id=row.id)
-            entities.update([row.domain_id, row.range_id])
-
-        # Get entities
-        sql = "SELECT id, class_code, name FROM model.entity WHERE class_code IN %(classes)s;"
-        g.execute(sql, {'classes': tuple(classes)})
-        nodes = ''
-        entities_already = set()
-        for row in g.cursor.fetchall():
-            if params['options']['orphans'] or row.id in entities:
-                entities_already.add(row.id)
-                nodes += """{{'id':'{id}','label':'{name}','color':'{color}'}},""".format(
-                    id=row.id,
-                    name=truncate_string(row.name.replace("'", ""), span=False),
-                    color=params['classes'][row.class_code]['color'])
-
-        # Get entities of links which weren't present in class selection
-        array_diff = [item for item in entities if item not in entities_already]
-        if array_diff:
-            sql = "SELECT id, class_code, name FROM model.entity WHERE id IN %(array_diff)s;"
-            g.execute(sql, {'array_diff': tuple(array_diff)})
-            result = g.cursor.fetchall()
-            for row in result:
-                color = ''
-                if row.class_code in params['classes']:  # pragma: no cover
-                    color = params['classes'][row.class_code]['color']
-                nodes += """{{'id':'{id}','label':'{name}','color':'{color}'}},""".format(
-                    id=row.id,
-                    color=color,
-                    name=truncate_string(row.name.replace("'", ""), span=False))
-
-        return "{{nodes: [{nodes}], edges: [{edges}], types: {{nodes: [], edges: []}} }};".format(
-            nodes=nodes, edges=edges)
+        for row in Network.get_entities():
+            if row.id in mapping:  # pragma: no cover - Locations will be mapped to objects
+                continue
+            if not form.orphans.data and row.id not in linked_entity_ids:  # Hide orphans
+                continue
+            entities.add(row.id)
+            name = truncate_string(row.name.replace("'", ""), span=False)
+            nodes.append({'id': row.id,
+                          'label' if dimensions else 'name': name,
+                          'color': params['classes'][row.class_code]['color']})
+        if not linked_entity_ids.issubset(entities):  # pragma: no cover
+            # for id_ in [x for x in linked_entity_ids if x not in entities]:
+            #    entity = Entity.get_by_id(id_)
+            #    print(entity.class_.code, entity.system_type)
+            flash('Missing nodes for links', 'error')
+            return ''
+        return str({'nodes': nodes, 'edges' if dimensions else 'links': edges}) if nodes else None

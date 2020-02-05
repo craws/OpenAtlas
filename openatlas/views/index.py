@@ -30,24 +30,29 @@ class FeedbackForm(FlaskForm):  # type: ignore
 @app.route('/')
 @app.route('/overview')
 def index() -> str:
-    tables = {'overview': Table(paging=False, defs='[{className: "dt-body-right", targets: 1}]'),
+    tables = {'overview': Table(paging=False, defs=[{'className': 'dt-body-right', 'targets': 1}]),
               'bookmarks': Table(['name', 'class', 'first', 'last'],
-                                 defs='[{className: "dt-body-right", targets: [2,3]}]'),
+                                 defs=[{'className': 'dt-body-right', 'targets': [2, 3]}]),
               'notes': Table(['name', 'class', 'first', 'last', _('note')],
-                             defs='[{className: "dt-body-right", targets: [2,3]}]'),
+                             defs=[{'className': 'dt-body-right', 'targets': [2, 3]}]),
               'latest': Table(['name', 'class', 'first', 'last', 'date', 'user'],
-                              order='[[4, "desc"]]',
-                              defs='[{className: "dt-body-right", targets: [2,3]}]')}
+                              order=[[4, 'desc']],
+                              defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])}
     if current_user.is_authenticated and hasattr(current_user, 'bookmarks'):
         for entity_id in current_user.bookmarks:
             entity = Entity.get_by_id(entity_id)
-            tables['bookmarks'].rows.append([link(entity), g.classes[entity.class_.code].name,
-                                             entity.first, entity.last,
+            tables['bookmarks'].rows.append([link(entity),
+                                             g.classes[entity.class_.code].name,
+                                             entity.first,
+                                             entity.last,
                                              bookmark_toggle(entity.id, True)])
         for entity_id, text in User.get_notes().items():
             entity = Entity.get_by_id(entity_id)
-            tables['notes'].rows.append([link(entity), g.classes[entity.class_.code].name,
-                                        entity.first, entity.last, truncate_string(text)])
+            tables['notes'].rows.append([link(entity),
+                                         g.classes[entity.class_.code].name,
+                                         entity.first,
+                                         entity.last,
+                                         truncate_string(text)])
         for name, count in Entity.get_overview_counts().items():
             if count:
                 count = format_number(count) if count else ''
@@ -56,8 +61,11 @@ def index() -> str:
                     '<a href="' + url + '">' + uc_first(_(name)) + '</a>', count])
         for entity in Entity.get_latest(8):
             tables['latest'].rows.append([
-                link(entity), g.classes[entity.class_.code].name,
-                entity.first, entity.last, format_date(entity.created),
+                link(entity),
+                g.classes[entity.class_.code].name,
+                entity.first,
+                entity.last,
+                format_date(entity.created),
                 link(logger.get_log_for_advanced_view(entity.id)['creator'])])
     intro = Content.get_translation('intro')
     return render_template('index/index.html', intro=intro, tables=tables)
@@ -92,11 +100,6 @@ def index_feedback() -> Union[str, Response]:
 @app.route('/overview/content/<item>')
 def index_content(item: str) -> str:
     return render_template('index/content.html', text=Content.get_translation(item), title=item)
-
-
-@app.route('/overview/credits')
-def index_credits() -> str:
-    return render_template('index/credits.html')
 
 
 @app.errorhandler(400)

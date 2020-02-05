@@ -18,8 +18,6 @@ class IndexTests(TestBaseCase):
             rv = self.app.get(url_for('index_changelog'))
             assert b'2.0.0' in rv.data
             self.app.get(url_for('index_content', item='contact'))
-            rv = self.app.get(url_for('index_credits'))
-            assert b'Stefan Eichert' in rv.data
             self.app.get(url_for('set_locale', language='en'))
             rv = self.app.get(url_for('login'))
             assert b'Password' in rv.data
