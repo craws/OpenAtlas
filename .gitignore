@@ -2,9 +2,10 @@
 instance/*
 !instance/example_*
 
-# cache
+# cache, system logs
 __pycache__/*
 .mypy_cache/*
+.bash_history
 
 # compiled files
 *.pyc
@@ -15,7 +16,7 @@ openatlas/tests/cover
 .coverage
 cover
 
-# created files 
+# created files
 openatlas/uploads/*
 openatlas/export/csv/*
 openatlas/export/sql/*

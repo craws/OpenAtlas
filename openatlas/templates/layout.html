@@ -108,28 +108,6 @@
                 </span>
             </a>
         </div>
-        <div class="iconbutton"
-             data-toggle="popover"
-             title="{{ _('model')|uc_first }}"
-             data-content="{{ _('model')|uc_first }}"
-             data-trigger="hover">
-            <a href="{{ url_for('model_index') }}" >
-                <span>
-                    <i class="fas fa-sitemap"></i>
-                </span>
-            </a>
-        </div>
-        <div class="iconbutton"
-             data-toggle="popover"
-             title="{{ _('credits')|uc_first }}"
-             data-content="{{ _('credits')|uc_first }}"
-             data-trigger="hover">
-            <a href="{{ url_for('index_credits') }}" >
-                <span>
-                    <i class="fas fa-info-circle"></i>
-                </span>
-            </a>
-        </div>
         {% if 'contact'|display_content_translation %}
         <div class="iconbutton"
              data-toggle="popover"

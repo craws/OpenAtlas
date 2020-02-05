@@ -51,8 +51,8 @@ input[type="text"].value-type, input[type="text"].integer {
 }
 
 input[type="text"].data-huebee {
-    width: 5em;
-    height: 1.1em;
+    width: 6em;
+    height: 1.2em;
     font-size: 0.8em;
     margin-top: 0.2em;
 }

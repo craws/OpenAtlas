@@ -260,9 +260,9 @@ class TableSelect(HiddenInput):  # type: ignore
 
         # Table definitions (aligning)
         if class_ == 'event':
-            table.defs += '[{className: "dt-body-right", targets: [3,4]}]'
+            table.defs = [{'className': 'dt-body-right', 'targets': [3, 4]}]
         elif class_ in ['actor', 'group', 'feature', 'place']:
-            table.defs += '[{className: "dt-body-right", targets: [2,3]}]'
+            table.defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
 
         selection = ''
         for entity in entities:
@@ -320,15 +320,14 @@ class TableMultiSelect(HiddenInput):  # type: ignore
         headers_len = str(len(Table.HEADERS[class_]))
 
         # Make checkbox column sortable and show selected on top
-        table = Table(Table.HEADERS[class_], order='[[' + headers_len + ', "desc"], [0, "asc"]]')
+        table = Table(Table.HEADERS[class_], order=[[headers_len, 'desc'], [0, 'asc']])
 
         # Table definitions (ordering and aligning)
-        defs = '{"orderDataType": "dom-checkbox", "targets":' + headers_len + '}'
+        table.defs = [{'orderDataType': 'dom-checkbox', 'targets': [headers_len]}]
         if class_ == 'event':
-            defs += ',{className: "dt-body-right", targets: [3,4]}'
+            table.defs.append({'className': 'dt-body-right', 'targets': [3, 4]})
         elif class_ in ['actor', 'group', 'feature', 'place']:
-            defs += ',{className: "dt-body-right", targets: [2,3]}'
-        table.defs = '[' + defs + ']'
+            table.defs.append({'className': 'dt-body-right', 'targets': [2, 3]})
 
         if class_ == 'place':
             aliases = current_user.settings['table_show_aliases']

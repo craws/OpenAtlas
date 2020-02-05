@@ -63,8 +63,9 @@ def place_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
         logger.log_user(id_, 'delete')
         flash(_('entity deleted'), 'info')
         if parent:
-            return redirect(url_for('entity_view', id_=parent.id) + '#tab-' + entity.system_type)
-    table = Table(Table.HEADERS['place'], defs='[{className: "dt-body-right", targets: [2,3]}]')
+            tab = '#tab-' + entity.system_type.replace(' ', '-')
+            return redirect(url_for('entity_view', id_=parent.id) + tab)
+    table = Table(Table.HEADERS['place'], defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])
     aliases = current_user.settings['table_show_aliases']
     for place in Entity.get_by_system_type('place', nodes=True, aliases=aliases):
         table.rows.append(get_base_table_data(place))
@@ -73,8 +74,10 @@ def place_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
 
 @app.route('/place/insert', methods=['POST', 'GET'])
 @app.route('/place/insert/<int:origin_id>', methods=['POST', 'GET'])
+@app.route('/place/insert/<int:origin_id>/<system_type>', methods=['POST', 'GET'])
 @required_group('contributor')
-def place_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
+def place_insert(origin_id: Optional[int] = None,
+                 system_type: Optional[str] = None) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id) if origin_id else None
     geonames_buttons = False
     if origin and origin.system_type == 'place':
@@ -84,8 +87,12 @@ def place_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
         title = 'stratigraphic unit'
         form = build_form(FeatureForm, 'Stratigraphic Unit')
     elif origin and origin.system_type == 'stratigraphic unit':
-        title = 'find'
-        form = build_form(FeatureForm, 'Find')
+        if system_type == 'human_remains':  # URL param system_type only used for human remains
+            title = 'human remains'
+            form = build_form(FeatureForm, 'Human Remains')
+        else:
+            title = 'find'
+            form = build_form(FeatureForm, 'Find')
     else:
         title = 'place'
         form = build_form(PlaceForm, 'Place')
@@ -96,11 +103,11 @@ def place_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
     if hasattr(form, 'geonames_id') and not current_user.settings['module_geonames']:
         del form.geonames_id, form.geonames_precision  # pragma: no cover
     if form.validate_on_submit():
-        return redirect(save(form, origin=origin))
+        return redirect(save(form, origin=origin, system_type=system_type))
 
     if title == 'place':
         form.alias.append_entry('')
-    structure = get_structure(super_=origin)
+    structure = get_structure(super_=origin, mode='insert')
     overlays = Overlay.get_by_object(origin) if origin and origin.class_.code == 'E18' else None
     return render_template('place/insert.html',
                            form=form,
@@ -160,6 +167,8 @@ def place_update(id_: int) -> Union[str, Response]:
         form = build_form(FeatureForm, 'Stratigraphic Unit', object_, request, location)
     elif object_.system_type == 'find':
         form = build_form(FeatureForm, 'Find', object_, request, location)
+    elif object_.system_type == 'human remains':
+        form = build_form(FeatureForm, 'Human Remains', object_, request, location)
     else:
         geonames_buttons = True if current_user.settings['module_geonames'] else False
         form = build_form(PlaceForm, 'Place', object_, request, location)
@@ -187,7 +196,7 @@ def place_update(id_: int) -> Union[str, Response]:
             form.geonames_id.data = geonames_entity.name if geonames_entity else ''
             exact_match = True if g.nodes[geonames_link.type.id].name == 'exact match' else False
             form.geonames_precision.data = exact_match
-    structure = get_structure(object_)
+    structure = get_structure(object_, mode='update')
     return render_template('place/update.html',
                            form=form,
                            object_=object_,
@@ -200,7 +209,8 @@ def place_update(id_: int) -> Union[str, Response]:
 def save(form: DateForm,
          object__: Optional[Entity] = None,
          location_: Optional[Entity] = None,
-         origin: Optional[Entity] = None) -> str:
+         origin: Optional[Entity] = None,
+         system_type: Optional[str] = None) -> str:
     g.cursor.execute('BEGIN')
     log_action = 'update'
     try:
@@ -210,7 +220,9 @@ def save(form: DateForm,
             Gis.delete_by_entity(location)
         else:
             log_action = 'insert'
-            if origin and origin.system_type == 'stratigraphic unit':
+            if system_type == 'human_remains':
+                object_ = Entity.insert('E20', form.name.data, 'human remains')
+            elif origin and origin.system_type == 'stratigraphic unit':
                 object_ = Entity.insert('E22', form.name.data, 'find')
             else:
                 system_type = 'place'
@@ -239,7 +251,9 @@ def save(form: DateForm,
         Gis.insert(location, form)
         g.cursor.execute('COMMIT')
         if form.continue_.data == 'yes':
-            url = url_for('place_insert', origin_id=origin.id if origin else None)
+            url = url_for('place_insert',
+                          origin_id=origin.id if origin else None,
+                          system_type=system_type if system_type else None)
         logger.log_user(object_.id, log_action)
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
     except InvalidGeomException as e:  # pragma: no cover

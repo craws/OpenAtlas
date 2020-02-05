@@ -10,6 +10,10 @@ After following the instructions restart Apache and test if the application is w
 
     service apache2 restart
 
+### 4.1.0 to 4.2.0
+
+Execute install/upgrade/4.2.0.sql after making backups
+
 ### 4.0.0 to 4.1.0
 
 A code base update (e.g. with git pull) and an Apache restart should be sufficient.

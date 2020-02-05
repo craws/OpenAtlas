@@ -39,7 +39,7 @@ def actor_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
         logger.log_user(id_, 'delete')
         flash(_('entity deleted'), 'info')
     table = Table(Table.HEADERS['actor'] + ['description'],
-                  defs='[{className: "dt-body-right", targets: [2,3]}]')
+                  defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])
     for actor in Entity.get_by_codes('actor'):
         data = get_base_table_data(actor)
         data.append(truncate_string(actor.description))

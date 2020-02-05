@@ -1,6 +1,6 @@
 from typing import Any, Dict, Iterator, Optional
 
-from flask import g, flash
+from flask import flash, g
 from flask_wtf import FlaskForm
 from psycopg2.extras import NamedTupleCursor
 
@@ -14,15 +14,22 @@ class Network:
     classes = ['E7', 'E8', 'E9', 'E18', 'E21', 'E31', 'E33', 'E40', 'E53', 'E74', 'E84']
     sql_where = """
         AND ((e.system_type IS NULL AND e.class_code != 'E53')
-                OR (e.system_type NOT IN ('file', 'source translation')
-                    AND e.system_type NOT LIKE 'external reference%%'));"""
+                OR (e.system_type NOT IN ('feature', 'stratigraphic unit', 'find', 'file',
+                                            'source translation')
+                        AND e.system_type NOT LIKE 'external reference%%'))"""
+    sql_where2 = """
+        AND ((e2.system_type IS NULL AND e2.class_code != 'E53')
+                OR (e2.system_type NOT IN ('feature', 'stratigraphic unit', 'find', 'file',
+                                            'source translation')
+                    AND e2.system_type NOT LIKE 'external reference%%'))"""
 
     @staticmethod
     def get_edges() -> Iterator[NamedTupleCursor.Record]:
         sql = """
             SELECT l.id, l.domain_id, l.range_id FROM model.link l
             JOIN model.entity e ON l.domain_id = e.id
-            WHERE property_code IN %(properties)s """ + Network.sql_where
+            JOIN model.entity e2 ON l.range_id = e2.id
+            WHERE property_code IN %(properties)s """ + Network.sql_where + Network.sql_where2
         g.execute(sql, {'properties': tuple(Network.properties)})
         return g.cursor.fetchall()
 
@@ -50,9 +57,8 @@ class Network:
                          params: Dict[str, Any],
                          dimensions: Optional[int]) -> Optional[str]:
         mapping = Network.get_object_mapping()
-        entities = set()
-
         linked_entity_ids = set()
+
         edges = []
         for row in Network.get_edges():
             domain_id = mapping[row.domain_id] if row.domain_id in mapping else row.domain_id
@@ -62,6 +68,7 @@ class Network:
             edges.append({'id': int(row.id), 'source': domain_id, 'target': range_id})
         nodes = []
 
+        entities = set()
         for row in Network.get_entities():
             if row.id in mapping:  # pragma: no cover - Locations will be mapped to objects
                 continue
@@ -72,9 +79,10 @@ class Network:
             nodes.append({'id': row.id,
                           'label' if dimensions else 'name': name,
                           'color': params['classes'][row.class_code]['color']})
-
         if not linked_entity_ids.issubset(entities):  # pragma: no cover
+            # for id_ in [x for x in linked_entity_ids if x not in entities]:
+            #    entity = Entity.get_by_id(id_)
+            #    print(entity.class_.code, entity.system_type)
             flash('Missing nodes for links', 'error')
             return ''
-
         return str({'nodes': nodes, 'edges' if dimensions else 'links': edges}) if nodes else None
