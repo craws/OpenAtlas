@@ -56,20 +56,25 @@ class Api:
     @staticmethod
     def get_entity(id_: int) -> Dict[str, Any]:
         entity = Entity.get_by_id(id_, nodes=True, aliases=True)
+        possible_types: dict = {'E53': 'Place', 'E21': 'Actor', 'E74': 'Actor', 'E40': 'Actor', 'E7': 'Event',
+                                'E8': 'Event', 'E9': 'Event', 'E33': 'Source', 'E31': 'Document', 'E84': 'Object',
+                                'E18': 'FeatureCollection'}  # Todo: find better vocabulary for types
         type_ = 'unknown'
-        if entity.class_.code == 'E18' and entity.system_type == 'place':
-            type_ = 'FeatureCollection'
+        for t in possible_types:
+            if t == entity.class_.code:
+                type_ = possible_types.get(t)
+
         nodes = []
         for node in entity.nodes:
             nodes.append({'identifier': url_for('api_entity', id_=node.id, _external=True),
                           'label': node.name})
         geo = Geonames.get_geonames_link(entity)
         data: dict = {
-            'type': type_,  # Todo: what if it's a person, event, ...
+            'type': type_,
             '@context': app.config['API_SCHEMA'],
-            'features': [{  # Todo: what if it's a person, event, ...
+            'features': [{
                 '@id': url_for('entity_view', id_=entity.id, _external=True),
-                'type': entity.system_type,  # Todo: 'feature' if place but what if else
+                'type': entity.system_type,
                 'properties': {'title': entity.name},
                 'when': {'timespans': [{
                     'start': {'earliest': format_date(entity.begin_from),
@@ -79,10 +84,6 @@ class Api:
                             'latest': format_date(entity.end_to),
                             'comment': entity.end_comment}}]},
                 'types': nodes,
-                #  Todo: Only add if Geo exists --> make a new if statement like the geometry
-                'links': [{'type': geo.type.name if geo else '',
-                           'identifier': app.config['GEONAMES_VIEW_URL'] + geo.domain.name if geo else '',
-                           }],
                 'relations': Api.get_links(entity),
                 'descriptions': [
                     {'@id': request.base_url,
@@ -91,6 +92,10 @@ class Api:
                     Api.get_file(entity)]}]}
 
         if type_ == 'FeatureCollection':
+            link_type = geo.type.name if geo else ''
+            identifier = app.config['GEONAMES_VIEW_URL'] + geo.domain.name if geo else ''
+            data['features'].append({'links': [{'type': link_type, 'identifier': identifier}]})
+
             geometries = []
             for geo in Gis.get_by_id(entity.location.id):
                 geometries.append({
