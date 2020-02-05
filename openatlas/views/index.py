@@ -102,11 +102,6 @@ def index_content(item: str) -> str:
     return render_template('index/content.html', text=Content.get_translation(item), title=item)
 
 
-@app.route('/overview/credits')
-def index_credits() -> str:
-    return render_template('index/credits.html')
-
-
 @app.errorhandler(400)
 def bad_request(e: Exception) -> Tuple[str, int]:  # pragma: no cover
     return render_template('400.html', e=e), 400
