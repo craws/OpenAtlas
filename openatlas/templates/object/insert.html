@@ -1,7 +1,6 @@
 {% extends 'layout.html' %}
 {% block breadcrumb %}
-    <a href="{{ url_for('object_index') }}">{{ _('object')|uc_first }}</a>
-    > + {{ 'E84'|get_class_name }}
+    {{ [[_('object'), 'object_index'], '+ ' + g.classes['E84'].name]|crumb|safe }}
 {% endblock %}
 {% block content %}
     {{ form|display_form()|safe }}

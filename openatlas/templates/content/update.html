@@ -2,7 +2,7 @@
 {% block breadcrumb %}
     {{ [[_('admin'), 'admin_index'],
         [_('content'), 'content_index'],
-        [item, 'content_view', {'item': item}],
+        [_(item), 'content_view', {'item': item}],
         _('edit')]|crumb|safe }}
 {% endblock %}
 {% block content %}
