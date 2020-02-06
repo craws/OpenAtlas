@@ -22,16 +22,6 @@ div.preview img {
      margin-right: 1em;
 }
 
-#institutes img, #projects img {
-    height: 60px;
-    margin-right: 0.5em;
-    background-color: white;
-}
-
-#projects img {
-    height: 50px;
-}
-
 table.tablesorter thead tr .tablesorter-header {
     background-image: url("/static/images/icons/arrow_updown.png");
     background-position: right 0.4em top 0.4em;
