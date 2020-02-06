@@ -11,6 +11,7 @@ class ModelTests(TestBaseCase):
 
     def test_model(self) -> None:
         with app.app_context():  # type: ignore
+            self.login()
             rv = self.app.get(url_for('model_index'))
             assert b'Browse' in rv.data
             rv = self.app.get(url_for('class_index'))
@@ -27,7 +28,6 @@ class ModelTests(TestBaseCase):
             data = {'domain': 'E1', 'range': 'E1', 'property': 'P67'}
             self.app.post(url_for('model_index'), data=data)
 
-            self.login()
             with app.test_request_context():  # Insert data to display in network view
                 app.preprocess_request()  # type: ignore
                 actor = Entity.insert('E21', 'King Arthur')

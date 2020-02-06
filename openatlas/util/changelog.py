@@ -2,7 +2,8 @@ class Changelog:
     versions = {
         '4.2.0': ['TBA', {
             'feature': {
-                '1089': 'Human Remains'},
+                '1089': 'Human Remains',
+                '1138': 'Display usage of CIDOC CRM classes and properties'},
             'fix': {
                 '1134': 'Overlay maps: not enabled if Geonames disabled'}}],
         '4.1.0': ['2020-01-30', {

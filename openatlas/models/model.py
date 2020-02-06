@@ -18,6 +18,7 @@ class CidocClass:
     i18n: Dict[str, str]
     sub: List[CidocClass]
     super: List[CidocClass]
+    count: int
 
     @property
     def name(self) -> str:
@@ -34,11 +35,16 @@ class CidocClass:
 
     @staticmethod
     def get_all() -> Dict[str, CidocClass]:
-        g.execute("SELECT id, code, name, comment FROM model.class;")
+        g.execute("""
+            SELECT c.id, c.code, c.name, comment, COUNT(e.id) AS count
+            FROM model.class c
+            LEFT JOIN model.entity e ON c.code = e.class_code
+            GROUP BY (c.id, c.name, c.comment);""")
         classes = {row.code: CidocClass(_name=row.name,
                                         code=row.code,
                                         id=row.id,
                                         comment=row.comment,
+                                        count=row.count,
                                         i18n={}, sub=[], super=[]
                                         ) for row in g.cursor.fetchall()}
         g.execute("SELECT super_code, sub_code FROM model.class_inheritance;")
@@ -67,6 +73,7 @@ class CidocProperty:
     super: List[int]
     domain_class_code: str
     range_class_code: str
+    count: int
 
     @property
     def name(self) -> str:
@@ -105,8 +112,12 @@ class CidocProperty:
     @staticmethod
     def get_all() -> Dict[str, CidocProperty]:
         sql = """
-            SELECT id, code, comment, domain_class_code, range_class_code, name, name_inverse
-            FROM model.property;"""
+            SELECT p.id, p.code, p.comment, p.domain_class_code, p.range_class_code, p.name,
+                p.name_inverse, COUNT(l.id) AS count
+            FROM model.property p
+            LEFT JOIN model.link l ON p.code = l.property_code
+            GROUP BY (p.id, p.code, p.comment, p.domain_class_code, p.range_class_code, p.name,
+                p.name_inverse);"""
         g.execute(sql)
         properties = {row.code: CidocProperty(id=row.id,
                                               _name=row.name,
@@ -115,6 +126,7 @@ class CidocProperty:
                                               comment=row.comment,
                                               domain_class_code=row.domain_class_code,
                                               range_class_code=row.range_class_code,
+                                              count=row.count,
                                               sub=[], super=[], i18n={}, i18n_inverse={}
                                               ) for row in g.cursor.fetchall()}
         g.execute('SELECT super_code, sub_code FROM model.property_inheritance;')
