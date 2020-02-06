@@ -17,7 +17,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.imports import Import
 from openatlas.util.table import Table
 from openatlas.util.util import (format_date, get_backup_file_data, is_float, link, required_group,
-                                 truncate_string)
+                                 truncate_string, uc_first)
 
 
 class ProjectForm(FlaskForm):  # type: ignore
@@ -121,6 +121,12 @@ def import_data(project_id: int, class_code: str) -> str:
     imported = False
     messages: Dict[str, List[str]] = {'error': [], 'warn': []}
     file_data = get_backup_file_data()
+    if class_code == 'E18':
+        class_label = uc_first('place')
+    elif class_code == 'E33':  # pragma: no cover
+        class_label = uc_first('source')
+    else:
+        class_label = g.classes[class_code].name
     if form.validate_on_submit():
         file_ = request.files['file']
         file_path = app.config['TMP_FOLDER_PATH'].joinpath(
@@ -205,6 +211,7 @@ def import_data(project_id: int, class_code: str) -> str:
                                    project=project,
                                    form=form,
                                    class_code=class_code,
+                                   class_label=class_label,
                                    messages=messages,
                                    file_data=file_data)
 
@@ -226,6 +233,7 @@ def import_data(project_id: int, class_code: str) -> str:
                            form=form,
                            file_data=file_data,
                            class_code=class_code,
+                           class_label=class_label,
                            table=table,
                            imported=imported,
                            messages=messages)

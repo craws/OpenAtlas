@@ -13,6 +13,7 @@ from wtforms.validators import Email
 
 from openatlas import app
 from openatlas.models.entity import Entity
+from openatlas.models.imports import Project
 from openatlas.models.model import CidocClass, CidocProperty
 from openatlas.util import util
 from openatlas.util.table import Table
@@ -41,7 +42,7 @@ def crumb(self: Any, crumbs: List[Any]) -> str:
             else:
                 url = url_for(item[1], **item[2])
             items.append('<a href="' + url + '">' + util.uc_first(item[0]) + '</a>')
-        elif isinstance(item, Entity):
+        elif isinstance(item, Entity) or isinstance(item, Project):
             items.append(util.link(item))
         else:
             items.append(util.uc_first(item))
