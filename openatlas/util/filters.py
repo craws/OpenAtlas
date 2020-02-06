@@ -39,7 +39,7 @@ def crumb(self: Any, crumbs: List[Any]) -> str:
             if len(item) == 2:
                 url = url_for(item[1])
             else:
-                url = url_for(item[1], item=item[2])
+                url = url_for(item[1], **item[2])
             items.append('<a href="' + url + '">' + util.uc_first(item[0]) + '</a>')
         elif isinstance(item, Entity):
             items.append(util.link(item))
