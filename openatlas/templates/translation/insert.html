@@ -1,8 +1,6 @@
 {% extends 'layout.html' %}
 {% block breadcrumb %}
-    <a href="{{ url_for('source_index') }}">{{ _('source')|uc_first }}</a>
-    > {{ source|link|safe }}
-    > + {{ _('text')|uc_first }}
+    {{ [[_('source'), 'source_index'], source, '+ ' + _('text').capitalize()]|crumb|safe }}
 {% endblock %}
 {% block content %}
     {{ form|display_form|safe }}

@@ -1,8 +1,6 @@
 {% extends 'layout.html' %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
-    > <a href="{{ url_for('user_index') }}">{{ _('user')|uc_first }}</a>
-    > + {{ _('user')|uc_first }}
+    {{ [[_('admin'), 'admin_index'], [_('user'), 'user_index'], '+ ' + ('user').capitalize()]|crumb|safe }}
 {% endblock %}
 {% block content %}
     {{ form|display_form('user-form')|safe }}

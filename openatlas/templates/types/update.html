@@ -1,11 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('node_index') }}">{{ _('types')|uc_first }}</a>
-    {% if root %}
-        > {{ root|link|safe }}
-    {% endif %}
-    > {{ node|link|safe }}
-    > {{ _('edit') }}
+    {{ [[_('types'), 'node_index'], root, node, _('edit')]|crumb|safe }}
 {% endblock %}
 {% block content %}
     {{ form|display_form|safe }}

@@ -1,10 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('node_index') }}">{{ _('types')|uc_first }}</a>
-    {% if root %}
-        > {{ root|link|safe }}
-    {% endif %}
-    > {{ node.name }}
+    {{ [[_('types'), 'node_index'], root, node.name]|crumb|safe }}
 {% endblock %}
 {% block content %}
 <div id="tabs" class="tabs-container">

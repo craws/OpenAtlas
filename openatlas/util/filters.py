@@ -393,12 +393,6 @@ def sanitize(self: Any, string: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def truncate_string(self: Any, string: str) -> str:
-    return util.truncate_string(string)
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
 def display_delete_link(self: Any, entity: Entity) -> str:
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
