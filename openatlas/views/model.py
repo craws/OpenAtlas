@@ -77,8 +77,11 @@ def class_index() -> str:
     for class_id, class_ in g.classes.items():
         count = ''
         if class_.count:
-            url = url_for('class_entities', code=class_.code)
-            count = '<a href="' + url + '">' + format_number(class_.count) + '</a>'
+            if class_.code in ['E53', 'E41', 'E82']:
+                count = format_number(class_.count)
+            else:
+                url = url_for('class_entities', code=class_.code)
+                count = '<a href="' + url + '">' + format_number(class_.count) + '</a>'
         table.rows.append([link(class_), class_.name, count])
     return render_template('model/class.html', table=table)
 
