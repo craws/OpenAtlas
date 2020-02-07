@@ -43,6 +43,9 @@ class ModelTests(TestBaseCase):
             rv = self.app.post(url_for('model_network'), data=data)
             assert b'666' in rv.data
 
+            rv = self.app.get(url_for('class_entities', code='E21'))
+            assert b'King Arthur' in rv.data
+
             # Translations
             self.app.get('/index/setlocale/de')
             rv = self.app.get(url_for('property_view', code='P68'))

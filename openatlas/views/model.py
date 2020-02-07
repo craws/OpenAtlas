@@ -1,6 +1,6 @@
 from typing import Any, Dict, Optional
 
-from flask import g, render_template
+from flask import g, render_template, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (BooleanField, HiddenField, IntegerField, SelectMultipleField, StringField,
@@ -8,6 +8,7 @@ from wtforms import (BooleanField, HiddenField, IntegerField, SelectMultipleFiel
 from wtforms.validators import InputRequired
 
 from openatlas import app
+from openatlas.models.entity import Entity
 from openatlas.models.network import Network
 from openatlas.util.table import Table
 from openatlas.util.util import link, required_group
@@ -59,6 +60,13 @@ def model_index() -> str:
                            range=range_)
 
 
+@app.route('/overview/model/class/<code>')
+@required_group('readonly')
+def class_entities(code: str) -> str:
+    table = Table(['name'], rows=[[link(entity)] for entity in Entity.get_by_class(code)])
+    return render_template('model/class_entities.html', table=table, class_=g.classes[code])
+
+
 @app.route('/overview/model/class')
 @required_group('readonly')
 def class_index() -> str:
@@ -67,9 +75,11 @@ def class_index() -> str:
                         {'orderDataType': 'cidoc-model', 'targets': [0]},
                         {'sType': 'numeric', 'targets': [0]}])
     for class_id, class_ in g.classes.items():
-        table.rows.append([link(class_),
-                           class_.name,
-                           format_number(class_.count) if class_.count else ''])
+        count = ''
+        if class_.count:
+            url = url_for('class_entities', code=class_.code)
+            count = '<a href="' + url + '">' + format_number(class_.count) + '</a>'
+        table.rows.append([link(class_), class_.name, count])
     return render_template('model/class.html', table=table)
 
 
