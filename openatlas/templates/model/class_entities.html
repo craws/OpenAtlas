@@ -1,8 +1,7 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'], [_('user'), 'user_index'], _('activity')]|crumb|safe }}
+    {{ [[_('model'), 'model_index'], [_('classes'), 'class_index'], class_|link, _('entities')]|crumb|safe }}
 {% endblock %}
 {% block content %}
-    {{ form|display_form|safe }}
     {{ table.display()|safe }}
 {% endblock %}

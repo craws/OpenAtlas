@@ -1,7 +1,6 @@
 {% extends 'layout.html' %}
 {% block breadcrumb %}
-    <a href="{{ url_for('index') }}">{{ _('overview')|uc_first }}</a>
-    > {{ _('search')|uc_first }}
+    {{ [[_('overview'), 'index'], _('search')]|crumb|safe }}
 {% endblock %}
 {% block content %}
     {{ 'Search'|manual_link|safe }}

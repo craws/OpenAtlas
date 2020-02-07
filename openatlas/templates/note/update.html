@@ -1,8 +1,6 @@
 {% extends 'layout.html' %}
 {% block breadcrumb %}
-    <a href="{{ url_for(entity.view_name + '_index') }}">{{ _(entity.view_name)|uc_first }}</a>
-    > {{ entity|link|safe }}
-    > {{ _('edit note')|uc_first }}
+    {{ [[_(entity.view_name), entity.view_name + '_index'], entity, _('edit note')]|crumb|safe }}
 {% endblock %}
 {% block content %}
     <div>

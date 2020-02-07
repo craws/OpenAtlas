@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin_index') }}">{{ _('admin')|uc_first }}</a>
-    > {{ _('user')|uc_first }}
+    {{ [[_('admin'), 'admin_index'], _('user')]|crumb|safe }}
 {% endblock %}
 {% block content %}
     {{ 'User'|manual_link|safe }}
