@@ -1,12 +1,10 @@
 {% extends 'layout.html' %}
 {% block breadcrumb %}
     {% if origin %}
-        <a href="{{ url_for(origin.view_name + '_index') }}">{{ _(origin.view_name)|uc_first }}</a>
-        > {{ origin|link|safe }}
+        {{ [[_(origin.view_name), origin.view_name + '_index'], origin, '+ ' + _(code).capitalize()]|crumb|safe }}
     {% else %}
-        <a href="{{ url_for('reference_index') }}">{{ _('reference')|uc_first }}</a>
+        {{ [[_(reference), 'reference_index'], '+ ' + _(code).capitalize()]|crumb|safe }}
     {% endif %}
-    > + {{ _(code)|uc_first }}
 {% endblock %}
 {% block content %}
     {{ form|display_form(code)|safe }}
