@@ -991,11 +991,15 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
 .ui-tabs { position: relative; padding: .2em; zoom: 1; border:0px;} /* position: relative prevents IE scroll bug (element with position: relative inside container with overflow: auto appear as "fixed") */
 
 .ui-tabs .ui-tabs-nav li.ui-tabs-active,
+.ui-tabs .ui-tabs-nav li.ui-tabs-active:hover,
+.ui-tabs .ui-tabs-nav li.ui-tabs-active,
 .ui-tabs .ui-tabs-nav li:hover {
   background:#f8f9fa;
   border-bottom:2px solid #0047bb;
   padding-bottom:0px;
-   color:#0047bb;
+  color:#0047bb;
+  outline:none;
+  margin-bottom:0px;
 }
 
 .ui-tabs .ui-tabs-nav { margin: 0; padding: .2em .2em 0; border-bottom:1px solid #DDD; }
@@ -1039,12 +1043,7 @@ button.ui-button::-moz-focus-inner { border: 0; padding: 0; } /* reset extra pad
   color:gray;
   outline:none;
 }
-.ui-tabs .ui-tabs-nav li.ui-tabs-active,
-.ui-tabs .ui-tabs-nav li.ui-tabs-active:hover {
-  background:#f8f9fa;
-  outline:none;
-  margin-bottom:0px;
-}
+
 .ui-tabs .ui-tabs-nav li.ui-tabs-active a,
 .ui-tabs .ui-tabs-nav li.ui-state-disabled a,
 .ui-tabs .ui-tabs-nav li.ui-tabs-loading a { cursor: text; }

@@ -31,7 +31,7 @@
     </div>
     <div id="tab-source">
         {% if 'contributor'|is_authorized %}
-            <div>
+        <div class="toolbar">
             <a class="btn btn-outline-primary btn-sm" href="{{ url_for('object_add_source', id_=object_.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('source_insert', origin_id=object_.id) }}">+ {{ _('source')|uc_first }}</a>
             </div>
@@ -40,7 +40,7 @@
     </div>
     <div id="tab-event">
         {% if 'contributor'|is_authorized %}
-            <div>
+        <div class="toolbar">
             <a class="btn btn-outline-primary btn-sm" href="{{ url_for('event_insert', code='E9', origin_id=object_.id) }}">+ {{ 'E9'|get_class_name }}</a>
             </div>
         {% endif %}

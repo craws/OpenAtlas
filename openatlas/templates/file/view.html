@@ -50,7 +50,7 @@
     </div>
     <div id="tab-source">
         {% if 'contributor'|is_authorized %}
-            <div>
+        <div class="toolbar">
             <a class="btn btn-outline-primary btn-sm" href="{{ url_for('file_add', id_=entity.id, class_name='source')}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('source_insert', origin_id=entity.id) }}">+ {{ _('source')|uc_first }}</a>
             </div>
@@ -78,7 +78,7 @@
     {% endfor %}
     <div id="tab-reference">
         {% if 'contributor'|is_authorized %}
-            <div>
+        <div class="toolbar">
             <a class="btn btn-outline-primary btn-sm" href="{{ url_for('file_add_reference', id_=entity.id)}}">{{ _('add')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='bibliography', origin_id=entity.id) }}">+ {{ _('bibliography')|uc_first }}</a>
                 <a href="{{ url_for('reference_insert', code='edition', origin_id=entity.id) }}">+ {{ _('edition')|uc_first }}</a>

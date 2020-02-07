@@ -3,9 +3,9 @@
     {{ [_('source')]|crumb|safe }}
 {% endblock %}
 {% block content %}
-    {{ 'source'|manual_link|safe }}
     {% if 'contributor'|is_authorized %}
-        <div>
+        <div class="toolbar">
+            {{ 'source'|manual_link|safe }}
             <a class="btn btn-outline-primary btn-sm" href="{{ url_for('source_insert') }}">+ {{ _('source')|uc_first }}</a>
         </div>
     {% endif %}

@@ -215,11 +215,7 @@ def display_content_translation(self: Any, text: str) -> str:
 def manual_link(self: Any, wiki_site: str) -> str:
     # Creates a link to a manual page
     return """
-        <p class="manual">
-            <a class="manual" href="{url}" rel="noopener" target="_blank">
-                <img style="height:14px;" src="/static/images/icons/book.png" alt=''> {label}
-            </a>
-        </p>
+        <a class="btn btn-outline-primary btn-sm" href="{url}" target="_blank"> <img style="height:14px;" src="/static/images/icons/book.png" alt=''>{label}</a>
         """.format(url='https://redmine.openatlas.eu/projects/uni/wiki/' + wiki_site,
                    label=util.uc_first(_('manual')))
 

@@ -548,3 +548,7 @@ div.data-table div.display-none {
 .table tr {
     line-height: 0.3;
 }
+
+.toolbar {
+    margin-bottom: 5px;
+}
