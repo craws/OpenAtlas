@@ -67,6 +67,8 @@ class Entity:
             self.view_name = 'translation'
         elif self.class_.code in app.config['CODE_CLASS']:
             self.view_name = app.config['CODE_CLASS'][self.class_.code]
+        elif self.class_.code == 'E55':
+            self.view_name = 'node'
         self.table_name = self.view_name  # Used to build tables
         if self.view_name == 'place':
             self.table_name = self.system_type.replace(' ', '-')

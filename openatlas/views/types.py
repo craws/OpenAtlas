@@ -10,7 +10,7 @@ from wtforms import (HiddenField, SelectMultipleField, StringField, SubmitField,
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import build_move_form, build_node_form
+from openatlas.forms.forms import build_move_form, build_node_form, build_table_form
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
 from openatlas.util.util import required_group, sanitize, uc_first
@@ -43,6 +43,18 @@ def node_index() -> str:
             type_ = 'value'
         nodes[type_][node] = tree_select(node.name)
     return render_template('types/index.html', nodes=nodes, placeholder=_('type to search'))
+
+
+@app.route('/node/add/file/<int:id_>', methods=['GET', 'POST'])
+@required_group('contributor')
+def node_add_file(id_: int) -> Union[str, Response]:
+    node = g.nodes[id_]
+    if request.method == 'POST':
+        if request.form['checkbox_values']:
+            node.link_string('P67', request.form['checkbox_values'], inverse=True)
+        return redirect(url_for('entity_view', id_=id_) + '#tab-file')
+    form = build_table_form('file', node.get_linked_entities('P67', inverse=True))
+    return render_template('add_file.html', entity=node, form=form)
 
 
 @app.route('/types/insert/<int:root_id>', methods=['GET', 'POST'])

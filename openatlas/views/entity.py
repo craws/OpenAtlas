@@ -256,7 +256,7 @@ def file_view(file: Entity) -> str:
     path = get_file_path(file.id)
     tables = {}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find',
-                 'reference']:
+                 'reference', 'node']:
         tables[name] = Table(Table.HEADERS[name] + (['page'] if name == 'reference' else []))
     for link_ in file.get_links('P67'):
         range_ = link_.range
@@ -479,8 +479,9 @@ def node_view(node: Node) -> str:
     header = [_('name'), _('class'), _('info')]
     if root and root.value_type:  # pragma: no cover
         header = [_('name'), _('value'), _('class'), _('info')]
-    tables = {'entities': Table(header)}
-    for entity in node.get_linked_entities(['P2', 'P89'], inverse=True, nodes=True):
+    tables = {'entities': Table(header), 'file': Table(Table.HEADERS['file'] + [_('main image')])}
+    profile_image_id = node.get_profile_image_id()
+    for entity in node.get_linked_entities(['P2', 'P89', 'P67'], inverse=True, nodes=True):
         if node.class_.code == 'E53':  # pragma: no cover
             object_ = entity.get_linked_entity('P53', inverse=True)
             if not object_:  # If it's a location show the object, continue otherwise
@@ -493,6 +494,19 @@ def node_view(node: Node) -> str:
         data.append(truncate_string(entity.description))
         tables['entities'].rows.append(data)
     tables['link_entities'] = Table([_('domain'), _('range')])
+    for link_ in node.get_links('P67', True):
+        domain = link_.domain
+        data = get_base_table_data(domain)
+        if domain.view_name == 'file':  # pragma: no cover
+            extension = data[3].replace('.', '')
+            data.append(get_profile_image_table_link(domain, node, extension, profile_image_id))
+            if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+                profile_image_id = domain.id
+        if is_authorized('contributor'):
+            url = url_for('link_delete', id_=link_.id, origin_id=node.id)
+            data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
+        tables[domain.view_name].rows.append(data)
+
     for row in Link.get_entities_by_node(node):
         tables['link_entities'].rows.append([link(Entity.get_by_id(row.domain_id)),
                                              link(Entity.get_by_id(row.range_id))])
@@ -505,7 +519,8 @@ def node_view(node: Node) -> str:
                            super_=super_,
                            tables=tables,
                            root=root,
-                           info=get_entity_data(node))
+                           info=get_entity_data(node),
+                           profile_image_id=profile_image_id)
 
 
 def translation_view(translation: Entity) -> str:

@@ -14,6 +14,7 @@
                 <a href="#tab-entities">{{ _('entities')|uc_first }} {{ (tables['entities'].rows|length + tables['link_entities'].rows|length)|format_tab_number|safe }}</a>
             </li>
         {% endif %}
+        <li><a href="#tab-file">{{ _('files')|uc_first }} {{ tables['file']|format_tab_number|safe }}</a></li>
     </ul>
     <div id="tab-info">
         {% if 'editor'|is_authorized and node.root and not root.locked %}
@@ -26,15 +27,18 @@
             </div>
         {% endif %}
         <h1>{{ node.name }}</h1>
-        {% if super_ %}
-            <p>{{_('super')|uc_first}}: {{ super_|link|safe }}</p>
-        {% endif %}
-        {{ info|display_info|safe }}
-        {% if root.value_type %}
-            <p>{{_('unit')|uc_first}}: {{node.description}}</p>
-        {% else %}
-            {{ node|description|safe }}
-        {% endif %}
+        <div style="float:left;">
+            {{ profile_image_id|display_profile_image|safe }}
+            {% if super_ %}
+                <p>{{_('super')|uc_first}}: {{ super_|link|safe }}</p>
+            {% endif %}
+            {{ info|display_info|safe }}
+            {% if root.value_type %}
+                <p>{{_('unit')|uc_first}}: {{node.description}}</p>
+            {% else %}
+                {{ node|description|safe }}
+            {% endif %}
+        </div>
     </div>
     {% if tables['subs'].rows %}
         <div id="tab-subs">
@@ -56,5 +60,14 @@
             {% endif %}
         </div>
     {% endif %}
+    <div id="tab-file">
+        {% if 'contributor'|is_authorized %}
+            <div class="button-bar">
+                <a href="{{ url_for('node_add_file', id_=node.id)}}">{{ _('add')|uc_first }}</a>
+                <a href="{{ url_for('file_insert', origin_id=node.id) }}">+ {{ _('file')|uc_first }}</a>
+            </div>
+        {% endif %}
+        {{ tables['file'].display('file')|safe }}
+    </div>
 </div>
 {% endblock %}
