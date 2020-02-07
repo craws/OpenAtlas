@@ -37,11 +37,8 @@ def crumb(self: Any, crumbs: List[Any]) -> str:
         if not item:
             continue
         elif isinstance(item, list):
-            if len(item) == 2:
-                url = url_for(item[1])
-            else:
-                url = url_for(item[1], **item[2])
-            items.append('<a href="' + url + '">' + util.uc_first(item[0]) + '</a>')
+            url = url_for(item[1]) if len(item) == 2 else url_for(item[1], **item[2])
+            items.append('<a href="' + url + '">' + util.uc_first(str(item[0])) + '</a>')
         elif isinstance(item, Entity) or isinstance(item, Project):
             items.append(util.link(item))
         else:
