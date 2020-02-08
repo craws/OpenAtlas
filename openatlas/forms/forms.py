@@ -335,7 +335,7 @@ class TableMultiSelect(HiddenInput):  # type: ignore
                 name=entity.name,
                 checked='checked = "checked"' if field.data and entity.id in field.data else ''))
             table.rows.append(data)
-        selection = [entity.name for entity in entities if field.data and entity.id]
+        selection = [entity.name for entity in entities if field.data and entity.id in field.data]
         html = """
             <span id="{name}-button" class="button">{change_label}</span><br>
             <div id="{name}-selection" class="selection" style="text-align:left;">{selection}</div>
