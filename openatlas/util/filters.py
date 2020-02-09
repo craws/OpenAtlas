@@ -37,12 +37,13 @@ def crumb(self: Any, crumbs: List[Any]) -> str:
         if not item:
             continue
         elif isinstance(item, list):
-            url = url_for(item[1]) if len(item) == 2 else url_for(item[1], **item[2])
-            items.append('<a href="' + url + '">' + util.uc_first(str(item[0])) + '</a>')
+            items.append('<a href="{url}">{label}</a>'.format(
+                url=url_for(item[1]) if len(item) == 2 else url_for(item[1], **item[2]),
+                label=util.truncate(util.uc_first(str(item[0])))))
         elif isinstance(item, Entity) or isinstance(item, Project):
             items.append(util.link(item))
         else:
-            items.append(util.uc_first(item))
+            items.append(util.truncate(util.uc_first(item)))
     return ' > '.join(items)
 
 
@@ -452,7 +453,7 @@ def display_external_references(self: Any, entity: Entity) -> str:
     html = ''
     for link_ in entity.external_references:
         url = link_.domain.name
-        name = util.truncate_string(url.replace('http://', '').replace('https://', ''), span=False)
+        name = util.truncate(url.replace('http://', '').replace('https://', ''), span=False)
         if link_.description:
             name = link_.description
         if link_.domain.system_type == 'external reference geonames':

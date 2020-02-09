@@ -432,11 +432,11 @@ def link(entity: Union['Entity', CidocClass, CidocProperty, 'Project', 'User']) 
         html = '<a href="' + url + '">' + entity.code + '</a>'
     elif isinstance(entity, Entity):
         url = url_for('entity_view', id_=entity.id)
-        html = '<a href="' + url + '">' + truncate_string(entity.name) + '</a>'
+        html = '<a href="' + url + '">' + truncate(entity.name) + '</a>'
     return html
 
 
-def truncate_string(string: Optional[str] = '', length: int = 40, span: bool = True) -> str:
+def truncate(string: Optional[str] = '', length: int = 40, span: bool = True) -> str:
     """
     Returns a truncates string with '..' at the end if it was longer than length
     Also adds a span title (for mouse over) with the original string if parameter "span" is True
@@ -453,7 +453,7 @@ def truncate_string(string: Optional[str] = '', length: int = 40, span: bool = T
 def get_base_table_data(entity: 'Entity',
                         file_stats: Optional[Dict[Union[int, str], Any]] = None) -> List[str]:
     """ Returns standard table data for an entity"""
-    data: List[str] = ['<br>'.join([link(entity)] + [truncate_string(alias) for
+    data: List[str] = ['<br>'.join([link(entity)] + [truncate(alias) for
                                                      alias in entity.aliases.values()])]
     if entity.view_name in ['event', 'actor']:
         data.append(g.classes[entity.class_.code].name)
@@ -474,7 +474,7 @@ def get_base_table_data(entity: 'Entity',
         data.append(entity.first if entity.first else '')
         data.append(entity.last if entity.last else '')
     if entity.view_name in ['source'] or entity.system_type == 'file':
-        data.append(truncate_string(entity.description))
+        data.append(truncate(entity.description))
     return data
 
 

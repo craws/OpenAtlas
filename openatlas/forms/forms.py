@@ -19,7 +19,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.util.table import Table
-from openatlas.util.util import get_base_table_data, get_file_stats, truncate_string, uc_first
+from openatlas.util.util import get_base_table_data, get_file_stats, truncate, uc_first
 
 
 def get_link_type(form: Any) -> Optional_Type[Entity]:
@@ -273,8 +273,8 @@ class TableSelect(HiddenInput):  # type: ignore
             data[0] = """<a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
                         """.format(name=field.id,
                                    entity_id=entity.id,
-                                   entity_name=truncate_string(entity.name, span=False))
-            data[0] = '<br>'.join([data[0]] + [truncate_string(alias) for
+                                   entity_name=truncate(entity.name, span=False))
+            data[0] = '<br>'.join([data[0]] + [truncate(alias) for
                                                id_, alias in entity.aliases.items()])
             table.rows.append(data)
         html = """

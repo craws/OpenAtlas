@@ -15,8 +15,8 @@ from openatlas.forms.forms import TableField, build_form
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.util.table import Table
-from openatlas.util.util import (get_base_table_data, link, required_group, truncate_string,
-                                 uc_first, was_modified)
+from openatlas.util.util import (get_base_table_data, link, required_group, truncate, uc_first,
+                                 was_modified)
 
 
 class ReferenceForm(FlaskForm):  # type: ignore
@@ -117,7 +117,7 @@ def reference_index(action: Optional[str] = None, id_: Optional[int] = None) -> 
     table = Table(Table.HEADERS['reference'] + ['description'])
     for reference in Entity.get_by_codes('reference'):
         data = get_base_table_data(reference)
-        data.append(truncate_string(reference.description))
+        data.append(truncate(reference.description))
         table.rows.append(data)
     return render_template('reference/index.html', table=table)
 
