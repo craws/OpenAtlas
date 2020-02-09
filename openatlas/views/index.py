@@ -16,7 +16,7 @@ from openatlas.models.user import User
 from openatlas.util.changelog import Changelog
 from openatlas.util.table import Table
 from openatlas.util.util import (bookmark_toggle, format_date, link, required_group, send_mail,
-                                 truncate_string, uc_first)
+                                 truncate, uc_first)
 
 
 class FeedbackForm(FlaskForm):  # type: ignore
@@ -52,7 +52,7 @@ def index() -> str:
                                          g.classes[entity.class_.code].name,
                                          entity.first,
                                          entity.last,
-                                         truncate_string(text)])
+                                         truncate(text)])
         for name, count in Entity.get_overview_counts().items():
             if count:
                 count = format_number(count) if count else ''
