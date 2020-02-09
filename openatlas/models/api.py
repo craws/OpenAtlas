@@ -39,7 +39,7 @@ class Api:
                 filename = os.path.basename(path) if path else False
                 files.append({'@id': url_for('api_entity', id_=link.domain.id, _external=True),
                               'title': link.domain.name,
-                              'license': Api.get_license(link.domain.id),  # Todo: Search for licence
+                              'license': Api.get_license(link.domain.id),  
                               'url': url_for('display_file', filename=filename, _external=True)})
 
         return files
@@ -56,9 +56,12 @@ class Api:
     @staticmethod
     def get_entity(id_: int) -> Dict[str, Any]:
         entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-        possible_types: dict = {'E53': 'Place', 'E21': 'Actor', 'E74': 'Actor', 'E40': 'Actor', 'E7': 'Event',
-                                'E8': 'Event', 'E9': 'Event', 'E33': 'Source', 'E31': 'Document', 'E84': 'Object',
-                                'E18': 'FeatureCollection'}  # Todo: find better vocabulary for types
+        # Todo: find better vocabulary for types and shorten the dict
+        possible_types: dict = {'E53': 'PlaceCollection', 'E21': 'ActorCollection', 'E74': 'ActorCollection',
+                                'E40': 'ActorCollection', 'E7': 'EventCollection', 'E8': 'EventCollection',
+                                'E9': 'EventCollection', 'E33': 'SourceCollection', 'E31': 'DocumentCollection',
+                                'E84': 'ObjectCollection', 'E18': 'FeatureCollection'}
+
         type_ = 'unknown'
         for t in possible_types:
             if t == entity.class_.code:
@@ -74,7 +77,7 @@ class Api:
             '@context': app.config['API_SCHEMA'],
             'features': [{
                 '@id': url_for('entity_view', id_=entity.id, _external=True),
-                'type': entity.system_type,
+                'type': entity.class_.name,
                 'properties': {'title': entity.name},
                 'when': {'timespans': [{
                     'start': {'earliest': format_date(entity.begin_from),
