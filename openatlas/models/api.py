@@ -39,7 +39,7 @@ class Api:
                 filename = os.path.basename(path) if path else False
                 files.append({'@id': url_for('api_entity', id_=link.domain.id, _external=True),
                               'title': link.domain.name,
-                              'license': Api.get_license(link.domain.id),  
+                              'license': Api.get_license(link.domain.id),
                               'url': url_for('display_file', filename=filename, _external=True)})
 
         return files
@@ -79,13 +79,6 @@ class Api:
                 '@id': url_for('entity_view', id_=entity.id, _external=True),
                 'type': entity.class_.name,
                 'properties': {'title': entity.name},
-                'when': {'timespans': [{
-                    'start': {'earliest': format_date(entity.begin_from),
-                              'latest': format_date(entity.begin_to),
-                              'comment': entity.begin_comment},
-                    'end': {'earliest': format_date(entity.end_from),
-                            'latest': format_date(entity.end_to),
-                            'comment': entity.end_comment}}]},
                 'types': nodes,
                 'relations': Api.get_links(entity),
                 'descriptions': [
@@ -94,6 +87,17 @@ class Api:
                 'depictions': [
                     Api.get_file(entity)]}]}
 
+        # Timespans
+        if type_ == 'PlaceCollection' or type_ == 'ActorCollection' or type_ == 'EventCollection':
+            data['features'].append({'when': {'timespans': [{
+                'start': {'earliest': format_date(entity.begin_from),
+                          'latest': format_date(entity.begin_to),
+                          'comment': entity.begin_comment},
+                'end': {'earliest': format_date(entity.end_from),
+                        'latest': format_date(entity.end_to),
+                        'comment': entity.end_comment}}]}})
+
+        # Geometry and Geonames
         if type_ == 'FeatureCollection':
             link_type = geo.type.name if geo else ''
             identifier = app.config['GEONAMES_VIEW_URL'] + geo.domain.name if geo else ''
