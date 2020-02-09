@@ -13,6 +13,7 @@ from wtforms.validators import Email
 
 from openatlas import app
 from openatlas.models.entity import Entity
+from openatlas.models.imports import Project
 from openatlas.models.model import CidocClass, CidocProperty
 from openatlas.util import util
 from openatlas.util.table import Table
@@ -26,6 +27,24 @@ paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 @blueprint.app_template_filter()
 def link(self: Any, entity: Entity) -> str:
     return util.link(entity)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def crumb(self: Any, crumbs: List[Any]) -> str:
+    items = []
+    for item in crumbs:
+        if not item:
+            continue
+        elif isinstance(item, list):
+            items.append('<a href="{url}">{label}</a>'.format(
+                url=url_for(item[1]) if len(item) == 2 else url_for(item[1], **item[2]),
+                label=util.truncate(util.uc_first(str(item[0])))))
+        elif isinstance(item, Entity) or isinstance(item, Project):
+            items.append(util.link(item))
+        else:
+            items.append(util.truncate(util.uc_first(item)))
+    return ' > '.join(items)
 
 
 @jinja2.contextfilter
@@ -375,12 +394,6 @@ def sanitize(self: Any, string: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def truncate_string(self: Any, string: str) -> str:
-    return util.truncate_string(string)
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
 def display_delete_link(self: Any, entity: Entity) -> str:
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
@@ -440,7 +453,7 @@ def display_external_references(self: Any, entity: Entity) -> str:
     html = ''
     for link_ in entity.external_references:
         url = link_.domain.name
-        name = util.truncate_string(url.replace('http://', '').replace('https://', ''), span=False)
+        name = util.truncate(url.replace('http://', '').replace('https://', ''), span=False)
         if link_.description:
             name = link_.description
         if link_.domain.system_type == 'external reference geonames':

@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ _('profile')|uc_first }}
+    {{ [_('profile')]|crumb|safe }}
 {% endblock %}
 {% block content %}
     {{ 'Profile'|manual_link|safe }}

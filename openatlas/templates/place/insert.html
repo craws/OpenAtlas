@@ -1,15 +1,15 @@
 {% extends 'layout.html' %}
 {% block breadcrumb %}
     {% if origin %}
-        <a href="{{ url_for(origin.view_name + '_index') }}">{{ _(structure['place'].view_name)|uc_first }}</a>
-        {{ '> ' + structure['place']|link|safe if structure['place'] else '' }}
-        {{ '> ' + structure['feature']|link|safe if structure['feature'] else '' }}
-        {{ '> ' + structure['stratigraphic_unit']|link|safe if structure['stratigraphic_unit'] else '' }}
-        > {{ origin|link|safe }}
+        {{ [[origin.view_name, origin.view_name + '_index'],
+            structure['place'] if structure['place'].id != origin.id else None,
+            structure['feature'],
+            structure['stratigraphic_unit'],
+            origin,
+            '+ ' + _(title).capitalize()]|crumb|safe }}
     {% else %}
-        <a href="{{ url_for('place_index') }}">{{ _('place')|uc_first }}</a>
+        {{ [[_('place'), 'place_index'], '+ ' + _(title).capitalize()]|crumb|safe }}
     {% endif %}
-    > + {{ _(title)|uc_first }}
 {% endblock %}
 {% block content %}
     {% include "place/map_draw.html" %}

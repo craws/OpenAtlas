@@ -1,10 +1,6 @@
 {% extends 'layout.html' %}
 {% block breadcrumb %}
-    <a href="{{ url_for('actor_index') }}">
-        {{ _('actor')|uc_first }}
-    </a>
-    > {{ origin|link|safe }}
-    > + {{ _('member')|uc_first }}
+    {{ [[_('actor'), 'actor_index'], origin, '+' + _('member'.capitalize())]|crumb|safe }}
 {% endblock %}
 {% block content %}
     {{ form|display_form|safe }}

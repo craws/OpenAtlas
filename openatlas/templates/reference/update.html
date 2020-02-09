@@ -1,9 +1,7 @@
 {% extends 'layout.html' %}
 {% block title_name %}- {{ reference.name }}{% endblock %}
 {% block breadcrumb %}
-    <a href="{{ url_for('reference_index') }}">{{ _('reference')|uc_first }}</a>
-    > {{ reference|link|safe }}
-    > {{ _('edit')|uc_first }}
+    {{ [[_(reference), 'reference_index'], reference, _('edit')]|crumb|safe }}
 {% endblock %}
 {% block content %}
     {% if modifier %}

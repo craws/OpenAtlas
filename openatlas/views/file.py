@@ -17,7 +17,7 @@ from openatlas.forms.forms import build_form, build_table_form
 from openatlas.models.entity import Entity
 from openatlas.util.table import Table
 from openatlas.util.util import (convert_size, format_date, get_file_path, get_file_stats,
-                                 link, required_group, truncate_string, uc_first, was_modified)
+                                 link, required_group, truncate, uc_first, was_modified)
 from openatlas.views.reference import AddReferenceForm
 
 
@@ -105,7 +105,7 @@ def file_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
             date, link(entity), entity.print_base_type(),
             convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
             file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
-            truncate_string(entity.description)])
+            truncate(entity.description)])
     disk_space_values: Dict[str, Any] = {'total': 'N/A', 'free': 'N/A', 'percent': 'N/A'}
     if os.name == "posix":  # e.g. Windows has no statvfs
         statvfs = os.statvfs(app.config['UPLOAD_FOLDER_PATH'])

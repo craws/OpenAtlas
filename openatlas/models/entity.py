@@ -363,6 +363,11 @@ class Entity:
         return entities
 
     @staticmethod
+    def get_by_class(code: str) -> List[Entity]:
+        g.execute(Entity.build_sql() + 'WHERE class_code = %(code)s;', {'code': code})
+        return [Entity(row) for row in g.cursor.fetchall()]
+
+    @staticmethod
     def get_by_codes(class_name: str) -> List[Entity]:
         # Possible class names: actor, event, place, reference, source
         if class_name == 'source':

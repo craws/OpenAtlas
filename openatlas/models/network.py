@@ -4,7 +4,7 @@ from flask import flash, g
 from flask_wtf import FlaskForm
 from psycopg2.extras import NamedTupleCursor
 
-from openatlas.util.util import truncate_string
+from openatlas.util.util import truncate
 
 
 class Network:
@@ -75,7 +75,7 @@ class Network:
             if not form.orphans.data and row.id not in linked_entity_ids:  # Hide orphans
                 continue
             entities.add(row.id)
-            name = truncate_string(row.name.replace("'", ""), span=False)
+            name = truncate(row.name.replace("'", ""), span=False)
             nodes.append({'id': row.id,
                           'label' if dimensions else 'name': name,
                           'color': params['classes'][row.class_code]['color']})

@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    <a href="{{ url_for('source_index') }}">{{ _('source')|uc_first }}</a>
-    > {{ source.name|truncate_string|safe }}
+    {{ [[_('source'), 'source_index'], source.name]|crumb|safe }}
 {% endblock %}
 {% block content %}
 <div id="tabs" class="tabs-container">

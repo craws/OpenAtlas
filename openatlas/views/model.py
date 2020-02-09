@@ -1,13 +1,14 @@
 from typing import Any, Dict, Optional
 
-from flask import g, render_template
-from flask_babel import lazy_gettext as _
+from flask import g, render_template, url_for
+from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import FlaskForm
 from wtforms import (BooleanField, HiddenField, IntegerField, SelectMultipleField, StringField,
                      SubmitField, widgets)
 from wtforms.validators import InputRequired
 
 from openatlas import app
+from openatlas.models.entity import Entity
 from openatlas.models.network import Network
 from openatlas.util.table import Table
 from openatlas.util.util import link, required_group
@@ -20,6 +21,7 @@ class LinkCheckForm(FlaskForm):  # type: ignore
 
 
 @app.route('/overview/model', methods=["GET", "POST"])
+@required_group('readonly')
 def model_index() -> str:
     form = LinkCheckForm()
     form_classes = {}
@@ -58,21 +60,41 @@ def model_index() -> str:
                            range=range_)
 
 
+@app.route('/overview/model/class/<code>')
+@required_group('readonly')
+def class_entities(code: str) -> str:
+    table = Table(['name'], rows=[[link(entity)] for entity in Entity.get_by_class(code)])
+    return render_template('model/class_entities.html', table=table, class_=g.classes[code])
+
+
 @app.route('/overview/model/class')
+@required_group('readonly')
 def class_index() -> str:
-    table = Table(['code', 'name'], defs=[{'orderDataType': 'cidoc-model', 'targets': [0]},
-                                          {'sType': 'numeric', 'targets': [0]}])
+    table = Table(['code', 'name', 'count'],
+                  defs=[{'className': 'dt-body-right', 'targets': 2},
+                        {'orderDataType': 'cidoc-model', 'targets': [0]},
+                        {'sType': 'numeric', 'targets': [0]}])
     for class_id, class_ in g.classes.items():
-        table.rows.append([link(class_), class_.name])
+        count = ''
+        if class_.count:
+            if class_.code in ['E53', 'E41', 'E82']:
+                count = format_number(class_.count)
+            else:
+                url = url_for('class_entities', code=class_.code)
+                count = '<a href="' + url + '">' + format_number(class_.count) + '</a>'
+        table.rows.append([link(class_), class_.name, count])
     return render_template('model/class.html', table=table)
 
 
 @app.route('/overview/model/property')
+@required_group('readonly')
 def property_index() -> str:
     classes = g.classes
     properties = g.properties
-    table = Table(['code', 'name', 'inverse', 'domain', 'domain name', 'range', 'range name'],
-                  defs=[{'orderDataType': 'cidoc-model', 'targets': [0, 3, 5]},
+    table = Table(['code', 'name', 'inverse', 'domain', 'domain name', 'range', 'range name',
+                   'count'],
+                  defs=[{'className': 'dt-body-right', 'targets': 7},
+                        {'orderDataType': 'cidoc-model', 'targets': [0, 3, 5]},
                         {'sType': 'numeric', 'targets': [0]}])
     for property_id, property_ in properties.items():
         table.rows.append([link(property_),
@@ -81,11 +103,13 @@ def property_index() -> str:
                            link(classes[property_.domain_class_code]),
                            classes[property_.domain_class_code].name,
                            link(classes[property_.range_class_code]),
-                           classes[property_.range_class_code].name])
+                           classes[property_.range_class_code].name,
+                           format_number(property_.count) if property_.count else ''])
     return render_template('model/property.html', table=table)
 
 
 @app.route('/overview/model/class_view/<code>')
+@required_group('readonly')
 def class_view(code: str) -> str:
     class_ = g.classes[code]
     tables = {}
@@ -115,6 +139,7 @@ def class_view(code: str) -> str:
 
 
 @app.route('/overview/model/property_view/<code>')
+@required_group('readonly')
 def property_view(code: str) -> str:
     property_ = g.properties[code]
     domain = g.classes[property_.domain_class_code]

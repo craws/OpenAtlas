@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ _('event')|uc_first }}
+    {{ [_('event')]|crumb|safe }}
 {% endblock %}
 {% block content %}
     {{ 'Event'|manual_link|safe }}

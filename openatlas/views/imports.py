@@ -17,7 +17,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.imports import Import
 from openatlas.util.table import Table
 from openatlas.util.util import (format_date, get_backup_file_data, is_float, link, required_group,
-                                 truncate_string)
+                                 truncate, uc_first)
 
 
 class ProjectForm(FlaskForm):  # type: ignore
@@ -42,7 +42,7 @@ def import_index() -> str:
     for project in Import.get_all_projects():
         table.rows.append([link(project),
                            format_number(project.count),
-                           truncate_string(project.description)])
+                           truncate(project.description)])
     return render_template('import/index.html', table=table)
 
 
@@ -64,7 +64,7 @@ def import_project_view(id_: int) -> str:
     for entity in Entity.get_by_project_id(id_):
         table.rows.append([link(entity),
                            entity.class_.name,
-                           truncate_string(entity.description),
+                           truncate(entity.description),
                            entity.origin_id,
                            format_date(entity.created)])
     project = Import.get_project_by_id(id_)
@@ -121,6 +121,12 @@ def import_data(project_id: int, class_code: str) -> str:
     imported = False
     messages: Dict[str, List[str]] = {'error': [], 'warn': []}
     file_data = get_backup_file_data()
+    if class_code == 'E18':
+        class_label = uc_first('place')
+    elif class_code == 'E33':  # pragma: no cover
+        class_label = uc_first('source')
+    else:
+        class_label = g.classes[class_code].name
     if form.validate_on_submit():
         file_ = request.files['file']
         file_path = app.config['TMP_FOLDER_PATH'].joinpath(
@@ -205,6 +211,7 @@ def import_data(project_id: int, class_code: str) -> str:
                                    project=project,
                                    form=form,
                                    class_code=class_code,
+                                   class_label=class_label,
                                    messages=messages,
                                    file_data=file_data)
 
@@ -226,6 +233,7 @@ def import_data(project_id: int, class_code: str) -> str:
                            form=form,
                            file_data=file_data,
                            class_code=class_code,
+                           class_label=class_label,
                            table=table,
                            imported=imported,
                            messages=messages)
