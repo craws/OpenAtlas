@@ -84,11 +84,16 @@ class Api:
                 'descriptions': [
                     {'@id': request.base_url,
                      'value': entity.description}],
-                'depictions': [
-                    Api.get_file(entity)]}]}
+            }]}
+
+        # Depictions
+        if type_ == 'PlaceCollection' or type_ == 'ActorCollection' or type_ == 'EventCollection' \
+                or type_ == 'SourceCollection' or type_ == 'DocumentCollection' or type_ == 'FeatureCollection':
+            data['features'].append({'depictions': [Api.get_file(entity)]})
 
         # Timespans
-        if type_ == 'PlaceCollection' or type_ == 'ActorCollection' or type_ == 'EventCollection':
+        if type_ == 'PlaceCollection' or type_ == 'ActorCollection' or type_ == 'EventCollection' \
+                or type_ == 'FeatureCollection':
             data['features'].append({'when': {'timespans': [{
                 'start': {'earliest': format_date(entity.begin_from),
                           'latest': format_date(entity.begin_to),
