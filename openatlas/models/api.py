@@ -54,6 +54,13 @@ class Api:
         return file_license
 
     @staticmethod
+    def get_entity_by_code(code_: str):
+        entities = []
+        for actor in Entity.get_by_codes(code_):
+            entities.append(Api.get_entity(actor.id))
+        return entities
+
+    @staticmethod
     def get_entity(id_: int) -> Dict[str, Any]:
         entity = Entity.get_by_id(id_, nodes=True, aliases=True)
         # Todo: find better vocabulary for types and shorten the dict

@@ -3,5 +3,7 @@
     {{ _('API') }}
 {% endblock %}
 {% block content %}
-    <a href="{{ url_for('api_entity', version='1337', id_=105) }}">unsere erste enitity API</a>
+    <a href="{{ url_for('api_entity', version='1337', id_=105) }}">Test API</a>
+    <br />
+    <a href="{{ url_for('api_collection', code_='actor') }}">Actor</a>
 {% endblock %}
