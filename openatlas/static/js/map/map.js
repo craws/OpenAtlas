@@ -11,6 +11,30 @@ superMarker = L.icon({iconUrl: '/static/images/map/marker-icon-cyan.png', iconAn
 subsMarker = L.icon({iconUrl: '/static/images/map/marker-icon-green.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
 siblingsMarker = L.icon({iconUrl: '/static/images/map/marker-icon-orange.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
 
+siblingStyle = {
+    "color": "rgb(111,111,111)",
+    "weight": 1.5,
+    "fillOpacity": 0.5,
+    "radius": 10
+    //"opacity": 0.4
+};
+
+superStyle = {
+    "color": "rgb(255,231,191)",
+    "weight": 1.5,
+    "fillOpacity": 0.5,
+    "radius": 10
+    //"opacity": 0.4
+};
+
+subStyle = {
+    "color": "rgb(39,207,59)",
+    "weight": 1.5,
+    "fillOpacity": 0.5,
+    "radius": 10
+    //"opacity": 0.4
+};
+
 // Define base layers
 baseMaps = {
     Landscape: L.tileLayer('https://{s}.tile.thunderforest.com/landscape/{z}/{x}/{y}.png?apikey=' + thunderforestKey, {attribution: '&copy; <a href="http://www.thunderforest.com">Thunderforest Landscape'}),
@@ -37,44 +61,41 @@ if (gisPointAll) {
     });
 }
 
-if (gisPointSupers) {
-    pointSupersLayer = new L.GeoJSON(gisPointSupers, {
-        onEachFeature: setPopup,
-        pointToLayer: function(feature, latlng) {
-            return L.marker(latlng, {icon: superMarker});
-        }
-    });
-    map.addLayer(pointSupersLayer);
-}
 
-if (gisPointSubs) {
+if (gisPointSubs && gisPointSubs.length > 0) {
     pointSubsLayer = new L.GeoJSON(gisPointSubs, {
+        style: subStyle,
         onEachFeature: setPopup,
         pointToLayer: function(feature, latlng) {
             return L.marker(latlng, {icon: subsMarker});
         }
     });
     map.addLayer(pointSubsLayer);
+    controls.Subs = pointSubsLayer;
 }
-
-if (gisPointSupers) {
+console.log(gisPointSupers);
+if (gisPointSupers && gisPointSupers.length > 0) {
     pointSupersLayer = new L.GeoJSON(gisPointSupers, {
+        style: superStyle,
         onEachFeature: setPopup,
         pointToLayer: function(feature, latlng) {
             return L.marker(latlng, {icon: superMarker});
         }
     });
     map.addLayer(pointSupersLayer);
+    controls.Super = pointSupersLayer;
 }
 
-if (gisPointSibling) {
+if (gisPointSibling && gisPointSibling.length > 0) {
     pointSiblingsLayer = new L.GeoJSON(gisPointSibling, {
+        style: siblingStyle,
         onEachFeature: setPopup,
         pointToLayer: function(feature, latlng) {
             return L.marker(latlng, {icon: siblingsMarker});
         }
     });
     map.addLayer(pointSiblingsLayer);
+    controls.Siblings = pointSiblingsLayer;
 }
 
 if (useCluster) {
