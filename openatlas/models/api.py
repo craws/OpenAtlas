@@ -79,17 +79,27 @@ class Api:
                 '@id': url_for('entity_view', id_=entity.id, _external=True),
                 'type': entity.class_.name,
                 'properties': {'title': entity.name},
-                'types': nodes,
-                'relations': Api.get_links(entity),
-                'descriptions': [
-                    {'@id': request.base_url,
-                     'value': entity.description}],
             }]}
+
+        # Relations
+        if Api.get_links(entity):
+            data['features'].append({'relations': Api.get_links(entity)})
+
+        # Types
+        if nodes:
+            data['features'].append({'types': nodes})
+
+        # Descriptions
+        if entity.description:
+            data['features'].append({'descriptions': [
+                    {'@id': request.base_url,
+                     'value': entity.description}]})
 
         # Depictions
         if type_ == 'PlaceCollection' or type_ == 'ActorCollection' or type_ == 'EventCollection' \
                 or type_ == 'SourceCollection' or type_ == 'DocumentCollection' or type_ == 'FeatureCollection':
-            data['features'].append({'depictions': [Api.get_file(entity)]})
+            if Api.get_file(entity) is True:
+                data['features'].append({'depictions': [Api.get_file(entity)]})
 
         # Timespans
         if type_ == 'PlaceCollection' or type_ == 'ActorCollection' or type_ == 'EventCollection' \
