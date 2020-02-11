@@ -43,7 +43,7 @@ class Gis:
 
     @staticmethod
     def get_all(objects: Optional[List[Entity]] = None,
-                structure: Dict = None) -> Dict[str, List[Any]]:
+                structure: Optional[Dict[str, Any]] = None) -> Dict[str, List[Any]]:
         if not objects:
             objects = []
         all_: Dict[str, List[Any]] = {'point': [], 'linestring': [], 'polygon': []}

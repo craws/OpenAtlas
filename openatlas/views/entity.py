@@ -382,13 +382,16 @@ def place_view(object_: Entity) -> str:
                                      actor.first,
                                      actor.last])
     structure = get_structure(object_)
-    for entity in structure['subunits']:
-        data = get_base_table_data(entity)
-        data.append(truncate(entity.description))
-        tables[entity.system_type.replace(' ', '-')].rows.append(data)
+    if structure:
+        for entity in structure['subunits']:
+            data = get_base_table_data(entity)
+            data.append(truncate(entity.description))
+            tables[entity.system_type.replace(' ', '-')].rows.append(data)
     gis_data = Gis.get_all([object_], structure)
-    if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]' \
-            and gis_data['gisLineSelected'] == '[]' and not structure['super_id']:
+    if gis_data['gisPointSelected'] == '[]' \
+            and gis_data['gisPolygonSelected'] == '[]' \
+            and gis_data['gisLineSelected'] == '[]' \
+            and (not structure or not structure['super_id']):
         gis_data = {}
     return render_template('place/view.html',
                            object_=object_,
