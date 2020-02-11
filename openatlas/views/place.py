@@ -181,6 +181,7 @@ def place_update(id_: int) -> Union[str, Response]:
             modifier = link(logger.get_log_for_advanced_view(object_.id)['modifier'])
             return render_template('place/update.html',
                                    form=form,
+                                   structure=get_structure(object_),
                                    object_=object_,
                                    modifier=modifier)
         save(form, object_, location)
