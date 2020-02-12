@@ -3,12 +3,12 @@
     {{ [[_('source'), 'source_index'], source, translation.name]|crumb|safe }}
 {% endblock %}
 {% block content %}
-<div class="button-bar">
+<div class="toolbar">
     {% if 'contributor'|is_authorized %}
-        <a href="{{ url_for('translation_update', id_=translation.id) }}">
+        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('translation_update', id_=translation.id) }}">
             {{ _('edit')|uc_first }}
         </a>
-        <a onclick="return confirm('{{ _('delete')|uc_first }} {{ translation.name.replace('\'', '') }}?')"
+        <a class="btn btn-outline-primary btn-sm" onclick="return confirm('{{ _('delete')|uc_first }} {{ translation.name.replace('\'', '') }}?')"
            href="{{ url_for('translation_delete', id_=translation.id, source_id=source.id) }}">
             {{ _('delete')|uc_first }}
         </a>

@@ -125,8 +125,8 @@ def display_move_form(self: Any, form: Any, root_name: str) -> str:
                   rows=[[item, item.label.text] for item in form.selection])
     return html + """
         <div class="toolbar">
-            <a class="btn btn-outline-primary btn-sm" id="select-all">{select_all}</a>
-            <a class="btn btn-outline-primary btn-sm" id="select-none">{deselect_all}</a>
+            <span class="btn btn-outline-primary btn-sm" id="select-all">{select_all}</span>
+            <span class="btn btn-outline-primary btn-sm" id="select-none">{deselect_all}</span>
         </div>
         {table}""".format(select_all=util.uc_first(_('select all')),
                           deselect_all=util.uc_first(_('deselect all')),
@@ -394,7 +394,7 @@ def sanitize(self: Any, string: str) -> str:
 def display_delete_link(self: Any, entity: Entity) -> str:
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
-    return '<a {confirm} href="{url}">{label}</a>'.format(
+    return '<a class="btn btn-outline-primary btn-sm" {confirm} href="{url}">{label}</a>'.format(
         confirm='onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"',
         url=url_for(entity.view_name + '_index', action='delete', id_=entity.id),
         label=util.uc_first(_('delete')))
