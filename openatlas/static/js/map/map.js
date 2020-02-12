@@ -24,7 +24,7 @@ grayMarker = L.icon({
     popupAnchor: [0, -34]
 });
 superMarker = L.icon({
-    iconUrl: '/static/images/map/marker-icon-cyan.png',
+    iconUrl: '/static/images/map/marker-icon-orange.png',
     iconAnchor: [12, 41],
     popupAnchor: [0, -34]
 });
@@ -34,7 +34,7 @@ subsMarker = L.icon({
     popupAnchor: [0, -34]
 });
 siblingsMarker = L.icon({
-    iconUrl: '/static/images/map/marker-icon-orange.png',
+    iconUrl: '/static/images/map/marker-icon-gray.png',
     iconAnchor: [12, 41],
     popupAnchor: [0, -34]
 });
@@ -79,7 +79,11 @@ cluster = L.markerClusterGroup({
     disableClusteringAtZoom: disableClusteringAtZoom
 });
 
-controls = {}
+
+controls = {};
+UnitControls = {};
+markerControls = {}
+
 if (gisPointAll) {
     pointLayer = new L.GeoJSON(gisPointAll, {
         onEachFeature: setPopup,
@@ -93,80 +97,12 @@ if (gisPointAll) {
 }
 
 
-if (gisPointSubs && gisPointSubs.length > 0) {
-    pointSubsLayer = new L.GeoJSON(gisPointSubs, {
-        filter: pointFilter,
-        onEachFeature: setPopup,
-        pointToLayer: function (feature, latlng) {
-                    return L.marker(latlng, {icon: subsMarker});
-        },
-    });
-    map.addLayer(pointSubsLayer);
-    controls.SubPoints = pointSubsLayer;
-}
+cluster.addLayer(pointLayer);
+map.addLayer(cluster);
+markerControls.Cluster = cluster;
+//map.addLayer(pointLayer);
+markerControls.Markers = pointLayer;
 
-if (gisPointSubs && gisPointSubs.length > 0) {
-    polySubsLayer = new L.GeoJSON(gisPointSubs, {
-        filter: polygonFilter,
-        style: subStyle,
-        onEachFeature: setPopup,
-    });
-    map.addLayer(polySubsLayer);
-    controls.SubPolys = polySubsLayer;
-}
-
-if (gisPointSupers && gisPointSupers.length > 0) {
-    pointSupersLayer = new L.GeoJSON(gisPointSupers, {
-        filter: pointFilter,
-        onEachFeature: setPopup,
-        pointToLayer: function (feature, latlng) {
-            return L.marker(latlng, {icon: superMarker});
-        }
-    });
-    map.addLayer(pointSupersLayer);
-    controls.SuperPoints = pointSupersLayer;
-}
-
-if (gisPointSupers && gisPointSupers.length > 0) {
-    polySupersLayer = new L.GeoJSON(gisPointSupers, {
-        filter: polygonFilter,
-        style: superStyle,
-        onEachFeature: setPopup,
-    });
-    map.addLayer(polySupersLayer);
-    controls.SuperPolys = polySupersLayer;
-}
-
-if (gisPointSibling && gisPointSibling.length > 0) {
-    pointSiblingsLayer = new L.GeoJSON(gisPointSibling, {
-        filter: pointFilter,
-        onEachFeature: setPopup,
-        pointToLayer: function (feature, latlng) {
-            return L.marker(latlng, {icon: siblingsMarker});
-        }
-    });
-    map.addLayer(pointSiblingsLayer);
-    controls.SiblingsPoints = pointSiblingsLayer;
-}
-
-if (gisPointSibling && gisPointSibling.length > 0) {
-    polySiblingsLayer = new L.GeoJSON(gisPointSibling, {
-        filter: polygonFilter,
-        style: siblingStyle,
-        onEachFeature: setPopup,
-    });
-    map.addLayer(polySiblingsLayer);
-    controls.SiblingsPolys = polySiblingsLayer;
-}
-
-if (useCluster) {
-    cluster.addLayer(pointLayer);
-    map.addLayer(cluster);
-    controls.Points = cluster;
-} else {
-    map.addLayer(pointLayer);
-    controls.Points = pointLayer;
-}
 
 if (gisPolygonAll) {
     polygonLayer = new L.GeoJSON(gisPolygonAll, {
@@ -184,6 +120,9 @@ if (gisLineAll) {
     controls.Linestrings = linestringLayer;
 }
 
+setGeometries(gisPointSupers, 'super');
+setGeometries(gisPointSibling, 'sibling');
+
 if (gisPointSelected != '') {
     gisPoints = L.geoJson(gisPointSelected, {onEachFeature: setPopup}).addTo(map);
     gisPoints.on('click', setObjectId);
@@ -199,10 +138,106 @@ if (gisLineSelected != '') {
     gisLines.on('click', setObjectId);
 }
 
+setGeometries(gisPointSubs, 'subs')
+
+function setGeometries(data, level) {
+
+    switch (level) {
+        case 'super':
+            var iconLevel = superMarker;
+            var styleLevel = superStyle;
+            break;
+        case 'sibling':
+            var iconLevel = siblingsMarker;
+            var styleLevel = siblingStyle;
+            break;
+        default:
+            var iconLevel = subsMarker;
+            var styleLevel = subStyle;
+            break;
+    }
+
+    if (data && data.length > 0) {
+        //get points from GeoJSON
+        var pointLayer = new L.GeoJSON(data, {
+            filter: pointFilter,
+            onEachFeature: setPopup,
+            pointToLayer: function (feature, latlng) {
+                return L.marker(latlng, {icon: iconLevel});
+            },
+        });
+
+        //get polygons from GeoJSON
+        var polyLayer = new L.GeoJSON(data, {
+            filter: polygonFilter,
+            style: styleLevel,
+            onEachFeature: setPopup,
+        });
+
+        //get linestrings from GeoJSON
+        var lineLayer = new L.GeoJSON(data, {
+            filter: lineFilter,
+            style: styleLevel,
+            onEachFeature: setPopup,
+        });
+
+        switch (level) {
+            case 'super':
+                if (pointLayer.getLayers().length > 0) {
+                    pointSupersLayer = pointLayer;
+                    UnitControls.SuperPoints = pointSupersLayer;
+                }
+                if (polyLayer.getLayers().length > 0) {
+                    polySupersLayer = polyLayer;
+                    UnitControls.SuperPolys = polySupersLayer;
+                    map.addLayer(polySupersLayer);
+                }
+                if (lineLayer.getLayers().length > 0) {
+                    lineSupersLayer = lineLayer;
+                    UnitControls.SuperLines = lineSupersLayer;
+                    map.addLayer(polySupersLayer);
+                }
+                break;
+            case 'sibling':
+                if (pointLayer.getLayers().length > 0) {
+                    pointSiblingsLayer = pointLayer;
+                    UnitControls.SiblingPoints = pointSiblingsLayer;
+                }
+                if (polyLayer.getLayers().length > 0) {
+                    polySiblingsLayer = polyLayer;
+                    UnitControls.SiblingPolys = polySiblingsLayer;
+                    map.addLayer(polySiblingsLayer);
+                }
+                if (lineLayer.getLayers().length > 0) {
+                    lineSiblingsLayer = lineLayer;
+                    UnitControls.SiblingLines = lineSiblingsLayer;
+                    map.addLayer(lineSiblingsLayer);
+                }
+                break;
+            default:
+                if (pointLayer.getLayers().length > 0) {
+                    pointSubsLayer = pointLayer;
+                    UnitControls.SubsPoints = pointSubsLayer;
+                }
+                if (polyLayer.getLayers().length > 0) {
+                    polySubsLayer = polyLayer;
+                    UnitControls.SubsPolys = polySubsLayer;
+                    map.addLayer(polySubsLayer);
+                }
+                if (lineLayer.getLayers().length > 0) {
+                    lineSubsLayer = lineLayer;
+                    UnitControls.SubsLines = lineSubsLayer;
+                    map.addLayer(polySubsLayer);
+                }
+                break;
+        }
+    }
+}
+
 // Overlay maps
 for (i = 0; i < overlays.length; i++) {
     overlay = L.imageOverlay('/display/' + overlays[i].image, overlays[i].boundingBox)
-    controls[overlays[i].name] = overlay;
+    UnitControls[overlays[i].name] = overlay;
     overlay.addTo(map)
 }
 
@@ -225,7 +260,23 @@ if (allSelected.length > 0) map.fitBounds(L.featureGroup(allSelected).getBounds(
 else if (gisPointAll.length > 0) map.fitBounds(pointLayer.getBounds(), {maxZoom: 12});
 else map.setView([30, 0], 2);
 
-L.control.layers(baseMaps, controls).addTo(map);
+//todo: on add overlay place markers - check if markers count is too high. if yes: alert user that this may decrease performance
+groupedOverlays = {
+    "Places": markerControls,
+    "General": controls,
+    "Subunits": UnitControls
+};
+
+
+var GroupOptions = {
+    exclusiveGroups: ["Places"],
+    groupCheckboxes: true
+};
+
+
+L.control.groupedLayers(baseMaps, groupedOverlays, GroupOptions).addTo(map);
+//L.control.layers(baseMaps, controls).addTo(map);
+
 baseMaps.Landscape.addTo(map);
 
 var geoSearchControl = L.control.geonames({
