@@ -54,10 +54,18 @@ class Api:
         return file_license
 
     @staticmethod
-    def get_entity_by_code(code_: str):
+    def get_entities_by_code(code_: str):
         entities = []
         for entity in Entity.get_by_codes(code_):
             entities.append(Api.get_entity(entity.id))
+        return entities
+
+    @staticmethod
+    def get_entities_by_id(ids: list):
+        entities = []
+        for i in ids:
+            for entity in Entity.get_by_ids(i, nodes=True):
+                entities.append(Api.get_entity(entity.id))
         return entities
 
     @staticmethod

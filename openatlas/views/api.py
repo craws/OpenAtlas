@@ -18,15 +18,14 @@ def api_entity(id_: int) -> str:
 @app.route('/api/0.1')
 @required_group('manager')
 def api_test():
-    entity = request.args['entity']
-    return json.dumps(Api.get_entity(id_=entity))
+    entity = request.args.getlist('entity')
+    return json.dumps(Api.get_entities_by_id(ids=entity))
 
 
-# Todo: Not finished! Wie kann str übergeben werden? <str: code_> funktioniert nicht!
 @app.route('/api/0.1/entity/<code>')
 @required_group('manager')
 def api_collection(code):
-    return json.dumps(Api.get_entity_by_code(code_=code))
+    return json.dumps(Api.get_entities_by_code(code_=code))
 
 
 @app.route('/api')

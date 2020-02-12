@@ -3,15 +3,17 @@
     {{ _('API') }}
 {% endblock %}
 {% block content %}
-    <a href="{{ url_for('api_entity', version='1337', id_=105) }}">Test API</a>
-    <br />
+    <a href="{{ url_for('api_entity', id_=105) }}">Test API</a>
+    <br/>
     <a href="{{ url_for('api_collection', code='actor') }}">Actor</a>
-        <br />
+    <br/>
     <a href="{{ url_for('api_collection', code='place') }}">Place</a>
-        <br />
+    <br/>
     <a href="{{ url_for('api_collection', code='event') }}">Event</a>
-        <br />
+    <br/>
     <a href="{{ url_for('api_collection', code='source') }}">Source</a>
-        <br />
+    <br/>
     <a href="{{ url_for('api_collection', code='reference') }}">Reference</a>
+    <br/>
+    <a href="{{ url_for('api_collection', code='object') }}">Object</a>
 {% endblock %}
