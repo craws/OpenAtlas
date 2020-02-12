@@ -14,15 +14,14 @@ def api_entity(id_: int) -> str:
     return json.dumps(Api.get_entity(id_=id_))
 
 
-# Todo: Make more versatile.
 @app.route('/api/0.1')
 @required_group('manager')
-def api_test():
+def api_get_multiple_entities():
     entity = request.args.getlist('entity')
     return json.dumps(Api.get_entities_by_id(ids=entity))
 
 
-@app.route('/api/0.1/entity/<code>')
+@app.route('/api/0.1/<code>')
 @required_group('manager')
 def api_collection(code):
     return json.dumps(Api.get_entities_by_code(code_=code))
