@@ -221,7 +221,7 @@ p.inverse-heading {
     padding: 0.4em;
 }
 
-button, span.button, a.button {
+button {
     cursor: pointer;
     display: inline-block;
     font-weight: bold;
@@ -443,7 +443,7 @@ input[type=text], input[type=password], textarea {
     display: block;
 }
 
-.tabs-container .pagesize, .overlay-container .pagesize, a.button {
+.tabs-container .pagesize, .overlay-container .pagesize {
     font-size: 0.9em;
 }
 
@@ -536,7 +536,7 @@ div.data-table div.display-none {
     padding: 1em;
 }
 
-.tabs-container .pagesize, .overlay-container .pagesize, a.button {
+.tabs-container .pagesize, .overlay-container .pagesize {
     font-size: 0.9em;
 }
 

@@ -124,10 +124,10 @@ def display_move_form(self: Any, form: Any, root_name: str) -> str:
     table = Table(header=['#', util.uc_first(_('selection'))],
                   rows=[[item, item.label.text] for item in form.selection])
     return html + """
-        <p>
-            <a class="button" id="select-all">{select_all}</a>
-            <a class="button" id="select-none">{deselect_all}</a>
-        </p>
+        <div class="toolbar">
+            <a class="btn btn-outline-primary btn-sm" id="select-all">{select_all}</a>
+            <a class="btn btn-outline-primary btn-sm" id="select-none">{deselect_all}</a>
+        </div>
         {table}""".format(select_all=util.uc_first(_('select all')),
                           deselect_all=util.uc_first(_('deselect all')),
                           table=table.display('move'))
@@ -135,7 +135,8 @@ def display_move_form(self: Any, form: Any, root_name: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def table_select_model(self: Any, name: str,
+def table_select_model(self: Any,
+                       name: str,
                        selected: Union[CidocClass, CidocProperty, None] = None) -> str:
     if name in ['domain', 'range']:
         entities = g.classes
@@ -360,7 +361,7 @@ def display_form(self: Any,
                     <label>{values}</label>
                 </div>
                 <div class="table-cell value-type-switcher">
-                    <span id="value-type-switcher" class="button">{show}</span>
+                    <span class="btn btn-outline-primary btn-sm" id="value-type-switcher">{show}</span>
                 </div>
             </div>
             """.format(values=util.uc_first(_('values')), show=util.uc_first(_('show')))

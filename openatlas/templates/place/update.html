@@ -10,8 +10,12 @@
 {% endblock %}
 {% block content %}
     {% if modifier %}
-        <p class="error">{{ _('error modified by %(username)s', username=modifier|safe) }}</p>
-        <p><a class="button" href="{{ url_for('place_update', id_=object_.id) }}">{{ _('reload')|uc_first }}</a></p>
+        <p class="error">
+            {{ _('error modified by %(username)s', username=modifier|safe) }}
+        </p>
+        <p>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('place_update', id_=object_.id) }}">{{ _('reload')|uc_first }}</a>
+        </p>
     {% endif %}
     <script>
         map_update_mode = true;

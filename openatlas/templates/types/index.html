@@ -21,7 +21,7 @@
                             <li><a href="#tab-{{ node.id }}">{{ node.name }}</a></li>
                         {% endfor %}
                         {% if type_ in ['custom', 'value'] and 'manager'|is_authorized %}
-                            <a class="button" href="{{ url_for('hierarchy_insert', param=type_) }}" style="margin:1em;color:#ffffff;">
+                            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('hierarchy_insert', param=type_) }}" style="margin:1em;">
                                 + {{ _('type')|uc_first }}
                             </a>
                         {% endif %}
