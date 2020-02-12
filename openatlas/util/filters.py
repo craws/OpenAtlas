@@ -44,7 +44,7 @@ def crumb(self: Any, crumbs: List[Any]) -> str:
             items.append(util.link(item))
         else:
             items.append(util.truncate(util.uc_first(item)))
-    return ' > '.join(items)
+    return '&nbsp;>&nbsp; '.join(items)
 
 
 @jinja2.contextfilter
