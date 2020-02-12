@@ -56,8 +56,8 @@ class Api:
     @staticmethod
     def get_entity_by_code(code_: str):
         entities = []
-        for actor in Entity.get_by_codes(code_):
-            entities.append(Api.get_entity(actor.id))
+        for entity in Entity.get_by_codes(code_):
+            entities.append(Api.get_entity(entity.id))
         return entities
 
     @staticmethod
@@ -85,7 +85,7 @@ class Api:
             'features': [{
                 '@id': url_for('entity_view', id_=entity.id, _external=True),
                 'type': entity.class_.name,
-                'properties': {'title': entity.name},
+                'properties': {'title': entity.name}
             }]}
 
         # Relations
@@ -102,11 +102,10 @@ class Api:
                     {'@id': request.base_url,
                      'value': entity.description}]})
 
+        # Todo: How to get into the if function? Why this method won't work?
         # Depictions
-        if type_ == 'PlaceCollection' or type_ == 'ActorCollection' or type_ == 'EventCollection' \
-                or type_ == 'SourceCollection' or type_ == 'DocumentCollection' or type_ == 'FeatureCollection':
-            if Api.get_file(entity) is True:
-                data['features'].append({'depictions': [Api.get_file(entity)]})
+        if Api.get_file(entity):
+            data['features'].append({'depictions': [Api.get_file(entity)]})
 
         # Timespans
         if type_ == 'PlaceCollection' or type_ == 'ActorCollection' or type_ == 'EventCollection' \
