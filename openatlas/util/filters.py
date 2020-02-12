@@ -315,7 +315,7 @@ def display_form(self: Any,
                                                                  text=field(class_=class_))
             continue
         if field.type == 'SubmitField':
-            html['footer'] += str(field)
+            html['footer'] += str(field(class_='btn btn-outline-primary btn-sm'))
             continue
         if field.id.split('_', 1)[0] in ('begin', 'end'):  # If it's a date field use a function
             if field.id == 'begin_year_from':
