@@ -3,7 +3,9 @@
     {{ [_('types')]|crumb|safe }}
 {% endblock %}
 {% block content %}
-    {{ 'Form_field_type'|manual_link|safe }}
+    <div class="toolbar">
+        {{ 'Form_field_type'|manual_link|safe }}
+    </div>
     <div id="tabs-menu" class="tabs-container">
         <ul>
             <li><a href="#menu-tab-system">{{ _('system types')|uc_first }}</a></li>

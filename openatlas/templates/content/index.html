@@ -3,6 +3,8 @@
     {{ [[_('admin'), 'admin_index'], _('content')]|crumb|safe }}
 {% endblock %}
 {% block content %}
-    {{ 'Content'|manual_link|safe }}
+    <div class="toolbar">
+        {{ 'Content'|manual_link|safe }}
+    </div>
     {{ table.display()|safe }}
 {% endblock %}

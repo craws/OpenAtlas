@@ -1,6 +1,8 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}{{ [[_('admin'), 'admin_index'], _('files')]|crumb|safe }}{% endblock %}
 {% block content %}
-    {{ 'Files'|manual_link|safe }}
+    <div class="toolbar">
+        {{ 'Files'|manual_link|safe }}
+    </div>
     {{ form|display_form|safe }}
 {% endblock %}

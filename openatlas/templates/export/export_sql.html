@@ -3,7 +3,9 @@
     {{ [[_('admin'), 'admin_index'], _('export SQL')]|crumb|safe }}
 {% endblock %}
 {% block content %}
-    {{ 'Export'|manual_link|safe }}
+    <div class="toolbar">
+        {{ 'Export'|manual_link|safe }}
+    </div>
     {% if writeable %}
         {{ form|display_form|safe }}
     {% else %}

@@ -1,7 +1,9 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}{{ [[_('admin'), 'admin_index'], [_('general'), 'admin_general'], _('edit')]|crumb|safe }}{% endblock %}
 {% block content %}
-    {{ 'General'|manual_link|safe }}
+    <div class="toolbar">
+        {{ 'General'|manual_link|safe }}
+    </div>
     {{ form|display_form|safe }}
     {% for field, errors in form.errors.items() %}
         {{ form[field].label }}: {{ ', '.join(errors) }}

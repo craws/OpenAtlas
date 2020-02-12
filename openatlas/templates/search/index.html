@@ -3,7 +3,9 @@
     {{ [[_('overview'), 'index'], _('search')]|crumb|safe }}
 {% endblock %}
 {% block content %}
-    {{ 'Search'|manual_link|safe }}
+    <div class="toolbar">
+        {{ 'Search'|manual_link|safe }}
+    </div>
     <div style="float:left;">
         <form method="post">
             {{ form.csrf_token }}

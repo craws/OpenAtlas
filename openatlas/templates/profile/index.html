@@ -3,11 +3,11 @@
     {{ [_('profile')]|crumb|safe }}
 {% endblock %}
 {% block content %}
-    {{ 'Profile'|manual_link|safe }}
     {% if not config['DEMO_MODE'] %}
-        <div>
+        <div class="toolbar">
+            {{ 'Profile'|manual_link|safe }}
             <a class="btn btn-outline-primary btn-sm" href="{{ url_for('profile_update') }}">{{ _('edit')|uc_first }}</a>
-            <a href="{{ url_for('profile_password') }}">{{ _('change password')|uc_first }}</a>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('profile_password') }}">{{ _('change password')|uc_first }}</a>
         </div>
     {% endif %}
     <div style="float:left;">

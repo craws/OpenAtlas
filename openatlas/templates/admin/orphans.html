@@ -3,7 +3,9 @@
     {{ [[_('admin'), 'admin_index'], _('orphans')]|crumb|safe }}
 {% endblock %}
 {% block content %}
-{{ 'Data_integrity'|manual_link|safe }}
+<div class="toolbar">
+    {{ 'Data_integrity'|manual_link|safe }}
+</div>
 <div id="tabs" class="tabs-container">
     <ul>
         <li><a href="#tab-orphan">{{ _('orphans')|uc_first }} {{ tables['orphans']|format_tab_number|safe }}</a></li>

@@ -3,8 +3,8 @@
     {{ [[_('admin'), 'admin_index'], [_('content'), 'content_index'], item]|crumb|safe }}
 {% endblock %}
 {% block content %}
-    <div>
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('content_update', item=item) }}">{{ _('edit')|uc_first }}</a>
+    <div class="toolbar">
+        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('content_update', item=item) }}">{{ _('edit')|uc_first }}</a>
     </div>
     {% for language, text in content[item].items() %}
         <p class="inverse-heading">{{ language|upper }}</p>

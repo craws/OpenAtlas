@@ -3,7 +3,6 @@
     {{ [_('event')]|crumb|safe }}
 {% endblock %}
 {% block content %}
-
     {% if 'contributor'|is_authorized %}
         <div class="toolbar">
             {{ 'Event'|manual_link|safe }}

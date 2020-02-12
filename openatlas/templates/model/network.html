@@ -25,7 +25,9 @@
         <h2 style="float:right;">{{ _('no data to display')|uc_first }}</h2>
     {% endif %}
     <div style="float:left;">
-        {{ 'Network_visualization'|manual_link|safe }}
+        <div class="toolbar">
+            {{ 'Network_visualization'|manual_link|safe }}
+        </div>
         <form method="post" id="network-form" style="margin-right:1em;">
             {{ form.csrf_token }}
             <h2>{{ _('classes')|uc_first }}</h2>
