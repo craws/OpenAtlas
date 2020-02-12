@@ -82,7 +82,7 @@ cluster = L.markerClusterGroup({
 
 controls = {};
 UnitControls = {};
-markerControls = {}
+markerControls = {};
 
 if (gisPointAll) {
     pointLayer = new L.GeoJSON(gisPointAll, {
