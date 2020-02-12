@@ -59,7 +59,7 @@
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="/">
-        <img src="/static/images/layout/logo_small.png" height="40px" alt="Logo">
+        {{ session['settings']['logo_file_id']|display_logo|safe }}
     </a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
             aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
@@ -156,6 +156,7 @@
     <div class="breadcrumb">
         {% block breadcrumb %}{% endblock %}
         <div style="position: absolute; right: 16px">
+            {{ session['settings']['site_header'] }}
             <a href="{{ url_for('index_changelog') }}" >
                 v{{ config['VERSION'] }}
             </a>
@@ -163,7 +164,7 @@
     </div>
 </nav>
 <noscript><div class="error">{{ _('warning no js') }}</div></noscript>
-{{ session['settings']['site_header'] }}
+
 {% if 'local' in request['url_root'] %}local{% endif %}
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
