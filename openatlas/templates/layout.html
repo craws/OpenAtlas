@@ -82,7 +82,7 @@
                 <form method="post" action="{{ url_for('search_index') }}" style="display: inline-flex">
                     {{ search_form.csrf_token }}
                     {{ search_form.term }}
-                    {{ search_form.search(class_="btn btn-outline-primary btn-sm")}}
+                    {{ search_form.search(class_="btn btn-outline-primary btn-sm") }}
                 </form>
             </div>
         </div>
@@ -92,7 +92,7 @@
              data-content="{{ _('hello')|uc_first }} {{ current_user.username }}"
              data-trigger="hover">
             <a href="{{ url_for('profile_index') }}">
-                <span >
+                <span>
                     <i class="far fa-user"></i>
                 </span>
             </a>
