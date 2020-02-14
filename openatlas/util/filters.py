@@ -31,6 +31,12 @@ def link(self: Any, entity: Entity) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
+def api_link(self: Any, entity: Entity) -> str:
+    return '<p><a href="{url}" target="_blank">API</a></p>'.format(url=url_for('api_entity', id_=entity.id))
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
 def crumb(self: Any, crumbs: List[Any]) -> str:
     items = []
     for item in crumbs:
