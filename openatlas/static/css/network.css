@@ -1,5 +1,9 @@
 @charset "UTF-8";
 
+canvas {
+    border: 1px solid black;
+}
+
 svg {
     background-color: white;
     border: 1px solid black;
