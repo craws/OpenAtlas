@@ -86,18 +86,20 @@ class Api:
             nodes.append({'identifier': url_for('api_entity', id_=node.id, _external=True),
                           'label': node.name})
         geo = Geonames.get_geonames_link(entity)
-        data: dict = {
-            'type': type_,
-            '@context': app.config['API_SCHEMA'],
-            'features': [{
-                '@id': url_for('entity_view', id_=entity.id, _external=True),
-                'type': entity.class_.name,
-                'properties': {'title': entity.name}
-            }]}
+
+        features = {'@id': url_for('entity_view', id_=entity.id, _external=True),
+                    'type': entity.class_.name,
+                    'properties': {'title': entity.name}}
 
         # Relations
         if Api.get_links(entity):
-            data['features'].append({'relations': Api.get_links(entity)})
+            features['relations'] = Api.get_links(entity)
+
+        data: dict = {
+            'type': type_,
+            '@context': app.config['API_SCHEMA'],
+            'features': [features]
+        }
 
         # Types
         if nodes:
