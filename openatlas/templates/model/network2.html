@@ -3,8 +3,8 @@
     {{ [[_('overview'), 'index'], _('network visualization' + ' {dimensions}D'.format(dimensions=dimensions))]|crumb|safe }}
 {% endblock %}
 {% block content %}
-    <link rel="stylesheet" href="/static/vendor/huebee-2.0.0/huebee.min.css">
-    <script src="/static/vendor/huebee-2.0.0/huebee.pkgd.min.js"></script>
+    <link rel="stylesheet" href="/static/node_modules/huebee/dist/huebee.min.css" />
+    <script src="/static/node_modules/huebee/dist/huebee.pkgd.min.js"></script>
     {% if json_data %}
         <script src="/static/vendor/network/preact.umd.js"></script>
         <script src="/static/vendor/network/hooks.umd.js"></script>
