@@ -96,55 +96,56 @@ class Api:
         if Api.get_links(entity):
             features['relations'] = Api.get_links(entity)
 
-        data: dict = {
-            'type': type_,
-            '@context': app.config['API_SCHEMA'],
-            'features': [features]
-        }
+        # Descriptions
+        if entity.description:
+            features['description'] = [{'@id': request.base_url,
+                                        'value': entity.description}]
 
         # Types
         if nodes:
-            data['features'].append({'types': nodes})
-
-        # Descriptions
-        if entity.description:
-            data['features'].append({'descriptions': [
-                    {'@id': request.base_url,
-                     'value': entity.description}]})
+            features['types'] = nodes
 
         # Todo: How to get into the if function? Why this method won't work?
         # Depictions
         if Api.get_file(entity):
-            data['features'].append({'depictions': [Api.get_file(entity)]})
+            features['depictions'] = [Api.get_file(entity)]
 
+        # Todo: Make it flexible
         # Timespans
         if type_ == 'PlaceCollection' or type_ == 'ActorCollection' or type_ == 'EventCollection' \
                 or type_ == 'FeatureCollection':
-            data['features'].append({'when': {'timespans': [{
+            features['when'] = {'timespans': [{
                 'start': {'earliest': format_date(entity.begin_from),
                           'latest': format_date(entity.begin_to),
                           'comment': entity.begin_comment},
                 'end': {'earliest': format_date(entity.end_from),
                         'latest': format_date(entity.end_to),
-                        'comment': entity.end_comment}}]}})
+                        'comment': entity.end_comment}}]}
 
         # Geometry and Geonames
         if type_ == 'FeatureCollection':
-            link_type = geo.type.name if geo else ''
-            identifier = app.config['GEONAMES_VIEW_URL'] + geo.domain.name if geo else ''
-            data['features'].append({'links': [{'type': link_type, 'identifier': identifier}]})
+            if geo:
+                link_type = geo.type.name if geo else ''
+                identifier = app.config['GEONAMES_VIEW_URL'] + geo.domain.name if geo else ''
+                features['links'] = [{'type': link_type, 'identifier': identifier}]
 
-            geometries = []
-            for geo in Gis.get_by_id(entity.location.id):
-                geometries.append({
-                    'type': geo['shape'],
-                    'coordinates': geo['geometry']['coordinates'],
-                    'classification': geo['type'],
-                    'description': geo['description'],
-                    'title': geo['name']}
-                )
-            data['features'].append({'geometry': {
-                'type': 'GeometryCollection',
-                'geometries': geometries}})
+            if Gis.get_by_id(entity.location.id):
+                geometries = []
+                for geo in Gis.get_by_id(entity.location.id):
+                    geometries.append({
+                        'type': geo['shape'],
+                        'coordinates': geo['geometry']['coordinates'],
+                        'classification': geo['type'],
+                        'description': geo['description'],
+                        'title': geo['name']}
+                    )
+                features['geometry'] = {'type': 'GeometryCollection',
+                                        'geometries': geometries}
+
+        data: dict = {
+            'type': type_,
+            '@context': app.config['API_SCHEMA'],
+            'features': [features]
+        }
 
         return data
