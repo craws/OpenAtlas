@@ -262,7 +262,7 @@ def file_view(file: Entity) -> str:
     path = get_file_path(file.id)
     tables = {}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find',
-                 'reference', 'node']:
+                 'reference', 'node', 'human-remains']:
         tables[name] = Table(Table.HEADERS[name] + (['page'] if name == 'reference' else []))
     for link_ in file.get_links('P67'):
         range_ = link_.range

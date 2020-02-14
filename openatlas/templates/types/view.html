@@ -27,17 +27,20 @@
             </div>
         {% endif %}
         <h1>{{ node.name }}</h1>
-        <div style="float:left;">
+        <div>
             {{ profile_image_id|display_profile_image|safe }}
-            {% if super_ %}
-                <p>{{_('super')|uc_first}}: {{ super_|link|safe }}</p>
-            {% endif %}
-            {{ info|display_info|safe }}
-            {% if root.value_type %}
-                <p>{{_('unit')|uc_first}}: {{node.description}}</p>
-            {% else %}
-                {{ node|description|safe }}
-            {% endif %}
+            <div style="float:left;">
+                {% if super_ %}
+                    <p>{{_('super')|uc_first}}: {{ super_|link|safe }}</p>
+                {% endif %}
+                {{ info|display_info|safe }}
+                {% if root.value_type %}
+                    <p>{{_('unit')|uc_first}}: {{node.description}}</p>
+                {% else %}
+                    {{ node|description|safe }}
+                {% endif %}
+            </div>
+            <div style="clear:both;"></div>
         </div>
     </div>
     {% if tables['subs'].rows %}
