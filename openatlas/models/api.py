@@ -40,8 +40,7 @@ class Api:
                 files.append({'@id': url_for('api_entity', id_=link.domain.id, _external=True),
                               'title': link.domain.name,
                               'license': Api.get_license(link.domain.id),
-                              'url': url_for('display_file', filename=filename, _external=True)})
-
+                              'url': url_for('display_file', filename=filename, _external=True) if filename else 'N/A'})
         return files
 
     @staticmethod
