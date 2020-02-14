@@ -88,7 +88,8 @@ class Api:
         geo = Geonames.get_geonames_link(entity)
 
         features = {'@id': url_for('entity_view', id_=entity.id, _external=True),
-                    'type': entity.class_.name,
+                    'type': entity.class_.code,
+                    'typeLabel': entity.class_.name,
                     'properties': {'title': entity.name}}
 
         # Relations
