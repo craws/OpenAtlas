@@ -6,9 +6,9 @@ This software was developed and tested on Linux/Debian 10 (codename "Buster") an
 install would be on Debian 10 system following these instructions.
 
 It may work on other Linux distributions or even on non Linux systems but would need substantially
-more knowledge about server administration. E.g. you could try to install required packages using 
-pip with the requirements.txt or follow the Windows install notes which are located in the install 
-folder but aren't fully tested and still experimental.
+more knowledge about server administration. E.g. you could try to install the required packages
+using pip with the requirements.txt or follow the Windows install notes which are located in the
+install folder but aren't fully tested and still experimental.
 
 ## Requirements
 
@@ -16,7 +16,7 @@ folder but aren't fully tested and still experimental.
 
     # apt-get install python3 python3-bcrypt python3-dateutil python3-jinja2 python3-psycopg2
     # apt-get install python3-flask python3-flask-babel python3-flask-login python3-flaskext.wtf
-    # apt-get install python3-markdown python3-numpy python3-pandas python3-fuzzywuzzy python3-pip
+    # apt-get install python3-markdown python3-numpy python3-pandas python3-fuzzywuzzy
 
 ### Apache 2.4
 
@@ -26,9 +26,9 @@ folder but aren't fully tested and still experimental.
 
     # apt-get install postgresql postgresql-11-postgis-2.5 postgresql-11-postgis-2.5-scripts
 
-### gettext
+### gettext, pip, npm
 
-    # apt-get install gettext
+    # apt-get gettext npm python3-pip
 
 ## Installation
 
@@ -42,7 +42,7 @@ Copy the files to /var/www/your_site_name or clone OpenAtlas from GitHub
 
     $ cd openatlas/static
     $ pip3 install -e ./
-    $ calmjs npm --install openatlas
+    $ ~/.local/bin/calmjs npm --install openatlas
 
 ### Database
 
