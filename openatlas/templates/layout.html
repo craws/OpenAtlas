@@ -155,15 +155,16 @@
     <div class="breadcrumb">
         {% block breadcrumb %}{% endblock %}
         <div style="position: absolute; right: 16px">
-            {{ session['settings']['site_header'] }}
-            <a href="{{ url_for('index_changelog') }}" >
-                v{{ config['VERSION'] }}
-            </a>
+            {% if session['settings']['site_header'] %}
+                {{ session['settings']['site_header'] }}
+            {% else %}
+                OpenAtlas
+            {% endif %}
+            <a href="{{ url_for('index_changelog') }}">{{ config['VERSION'] }}</a>
         </div>
     </div>
 </nav>
 <noscript><div class="error">{{ _('warning no js') }}</div></noscript>
-
 {% if 'local' in request['url_root'] %}local{% endif %}
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}

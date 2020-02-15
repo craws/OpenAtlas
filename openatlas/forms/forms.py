@@ -19,7 +19,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.util.table import Table
-from openatlas.util.util import get_base_table_data, get_file_stats, truncate, uc_first
+from openatlas.util.util import get_base_table_data, get_file_stats, uc_first
 
 
 def get_link_type(form: Any) -> Optional_Type[Entity]:
@@ -272,19 +272,15 @@ class TableSelect(HiddenInput):  # type: ignore
             data = get_base_table_data(entity, file_stats)
             if len(entity.aliases) > 0:
                 data[0] = """<p><a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a></p>
-                            """.format(name=field.id,
-                                       entity_id=entity.id,
-                                       entity_name=truncate(entity.name, span=False))
+                            """.format(name=field.id, entity_id=entity.id, entity_name=entity.name)
             else:
                 data[0] = """<a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
-                            """.format(name=field.id,
-                                       entity_id=entity.id,
-                                       entity_name=truncate(entity.name, span=False))
+                            """.format(name=field.id, entity_id=entity.id, entity_name=entity.name)
             for i, (id_, alias) in enumerate(entity.aliases.items()):
                 if i == len(entity.aliases) - 1:
-                    data[0] = ''.join([data[0]] + [truncate(alias)])
+                    data[0] = ''.join([data[0]] + [alias])
                 else:
-                    data[0] = ''.join([data[0]] + ['<p>'+truncate(alias)+'</p>'])
+                    data[0] = ''.join([data[0]] + ['<p>' + alias + '</p>'])
             table.rows.append(data)
         html = """
             <input id="{name}-button" name="{name}-button" class="table-select {required}"

@@ -22,7 +22,7 @@ from openatlas.models.settings import Settings
 from openatlas.models.user import User
 from openatlas.util.table import Table
 from openatlas.util.util import (convert_size, format_date, format_datetime, get_file_path,
-                                 is_authorized, link, required_group, send_mail, truncate, uc_first)
+                                 is_authorized, link, required_group, send_mail, uc_first)
 
 
 class GeneralForm(FlaskForm):  # type: ignore
@@ -115,14 +115,14 @@ def admin_check_link_duplicates(delete: Optional[str] = None) -> Union[str, Resp
         table.rows.append([link(Entity.get_by_id(result.domain_id)),
                            link(Entity.get_by_id(result.range_id)),
                            link(g.properties[result.property_code]),
-                           truncate(result.description),
+                           result.description,
                            link(g.nodes[result.type_id]) if result.type_id else '',
                            format_date(result.begin_from),
                            format_date(result.begin_to),
-                           truncate(result.begin_comment),
+                           result.begin_comment,
                            format_date(result.end_from),
                            format_date(result.end_to),
-                           truncate(result.end_comment),
+                           result.end_comment,
                            result.count])
     duplicates = False
     if table.rows:
@@ -217,7 +217,7 @@ def admin_check_dates() -> str:
                                      entity.system_type,
                                      format_date(entity.created),
                                      format_date(entity.modified),
-                                     truncate(entity.description)])
+                                     entity.description])
     for link_ in Date.get_invalid_link_dates():
         label = ''
         if link_.property.code == 'OA7':  # pragma: no cover
@@ -237,7 +237,7 @@ def admin_check_dates() -> str:
                  link(event),
                  g.classes[event.class_.code].name,
                  link_.type.name if link_.type else '',
-                 truncate(link_.description),
+                 link_.description,
                  '<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>'])
         tables['involvement_dates'].rows.append(data)
     return render_template('admin/check_dates.html', tables=tables)
@@ -262,7 +262,7 @@ def admin_orphans() -> str:
                                   entity.system_type,
                                   format_date(entity.created),
                                   format_date(entity.modified),
-                                  truncate(entity.description)])
+                                  entity.description])
     for node in Node.get_node_orphans():
         tables['nodes'].rows.append([link(node), link(g.nodes[node.root[-1]])])
 
@@ -277,7 +277,7 @@ def admin_orphans() -> str:
                                                  entity.system_type,
                                                  format_date(entity.created),
                                                  format_date(entity.modified),
-                                                 truncate(entity.description)])
+                                                 entity.description])
 
     # Get orphaned files (no corresponding entity)
     with os.scandir(app.config['UPLOAD_FOLDER_PATH']) as it:

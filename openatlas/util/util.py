@@ -434,7 +434,7 @@ def link(entity: Union['Entity', CidocClass, CidocProperty, 'Project', 'User']) 
         html = '<a href="' + url + '">' + entity.code + '</a>'
     elif isinstance(entity, Entity):
         url = url_for('entity_view', id_=entity.id)
-        html = '<a href="' + url + '">' + truncate(entity.name) + '</a>'
+        html = '<a href="' + url + '">' + entity.name + '</a>'
     return html
 
 
@@ -462,9 +462,9 @@ def get_base_table_data(entity: 'Entity',
     # Aliases
     for i, (id_, alias) in enumerate(entity.aliases.items()):
         if i == len(entity.aliases) - 1:
-            data[0] = ''.join([data[0]] + [truncate(alias)])
+            data[0] = ''.join([data[0]] + [alias])
         else:
-            data[0] = ''.join([data[0]] + ['<p>'+truncate(alias)+'</p>'])
+            data[0] = ''.join([data[0]] + ['<p>' + alias + '</p>'])
     if entity.view_name in ['event', 'actor']:
         data.append(g.classes[entity.class_.code].name)
     if entity.view_name in ['reference'] and entity.system_type != 'file':
@@ -484,7 +484,7 @@ def get_base_table_data(entity: 'Entity',
         data.append(entity.first if entity.first else '')
         data.append(entity.last if entity.last else '')
     if entity.view_name in ['source'] or entity.system_type == 'file':
-        data.append(truncate(entity.description))
+        data.append(entity.description)
     return data
 
 

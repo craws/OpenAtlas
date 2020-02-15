@@ -17,7 +17,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.imports import Import
 from openatlas.util.table import Table
 from openatlas.util.util import (format_date, get_backup_file_data, is_float, link, required_group,
-                                 truncate, uc_first)
+                                 uc_first)
 
 
 class ProjectForm(FlaskForm):  # type: ignore
@@ -40,9 +40,7 @@ class ProjectForm(FlaskForm):  # type: ignore
 def import_index() -> str:
     table = Table([_('project'), _('entities'), _('description')])
     for project in Import.get_all_projects():
-        table.rows.append([link(project),
-                           format_number(project.count),
-                           truncate(project.description)])
+        table.rows.append([link(project), format_number(project.count), project.description])
     return render_template('import/index.html', table=table)
 
 
@@ -64,7 +62,7 @@ def import_project_view(id_: int) -> str:
     for entity in Entity.get_by_project_id(id_):
         table.rows.append([link(entity),
                            entity.class_.name,
-                           truncate(entity.description),
+                           entity.description,
                            entity.origin_id,
                            format_date(entity.created)])
     project = Import.get_project_by_id(id_)

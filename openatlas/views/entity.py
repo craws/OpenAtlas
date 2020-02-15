@@ -22,7 +22,7 @@ from openatlas.util.util import (add_system_data, add_type_data, display_remove_
                                  format_entry_begin, format_entry_end, get_appearance,
                                  get_base_table_data, get_entity_data, get_file_path,
                                  get_profile_image_table_link, is_authorized, link, required_group,
-                                 truncate, uc_first)
+                                 uc_first)
 from openatlas.views.file import preview_file
 
 
@@ -67,7 +67,7 @@ def actor_view(actor: Entity) -> str:
             if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                 profile_image_id = domain.id
         if domain.view_name not in ['source', 'file']:
-            data_.append(truncate(link_.description))
+            data_.append(link_.description)
             if domain.system_type == 'external reference':
                 actor.external_references.append(link_)
             if is_authorized('contributor'):
@@ -101,7 +101,7 @@ def actor_view(actor: Entity) -> str:
                  link_.type.name if link_.type else '',
                  first,
                  last,
-                 truncate(link_.description)])
+                 link_.description])
         if is_authorized('contributor'):
             update_url = url_for('involvement_update', id_=link_.id, origin_id=actor.id)
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-event'
@@ -150,7 +150,7 @@ def actor_view(actor: Entity) -> str:
             type_ = link_.type.get_name_directed(True) if link_.type else ''
             related = link_.domain
         data = (
-            [type_, link(related), link_.first, link_.last, truncate(link_.description)])
+            [type_, link(related), link_.first, link_.last, link_.description])
         if is_authorized('contributor'):
             update_url = url_for('relation_update', id_=link_.id, origin_id=actor.id)
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-relation'
@@ -162,7 +162,7 @@ def actor_view(actor: Entity) -> str:
                  link_.type.name if link_.type else '',
                  link_.first,
                  link_.last,
-                 truncate(link_.description)])
+                 link_.description])
         if is_authorized('contributor'):
             update_url = url_for('member_update', id_=link_.id, origin_id=actor.id)
             unlink_url = url_for('link_delete', id_=link_.id,
@@ -178,7 +178,7 @@ def actor_view(actor: Entity) -> str:
                      link_.type.name if link_.type else '',
                      link_.first,
                      link_.last,
-                     truncate(link_.description)])
+                     link_.description])
             if is_authorized('contributor'):
                 update_url = url_for('member_update', id_=link_.id, origin_id=actor.id)
                 unlink_url = url_for('link_delete', id_=link_.id,
@@ -217,7 +217,7 @@ def event_view(event: Entity) -> str:
                  g.classes[link_.range.class_.code].name,
                  link_.type.name if link_.type else '',
                  first, last,
-                 truncate(link_.description)])
+                 link_.description])
         if is_authorized('contributor'):
             update_url = url_for('involvement_update', id_=link_.id, origin_id=event.id)
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=event.id) + '#tab-actor'
@@ -236,7 +236,7 @@ def event_view(event: Entity) -> str:
         if domain.view_name not in ['source', 'file']:
             if domain.system_type == 'external reference':
                 event.external_references.append(link_)
-            data.append(truncate(link_.description))
+            data.append(link_.description)
             if is_authorized('contributor'):
                 data.append('<a href="{url}">{label}</a>'.format(
                     label=uc_first(_('edit')),
@@ -355,7 +355,7 @@ def place_view(object_: Entity) -> str:
                 else:  # pragma: no cover
                     data.append('')
         if domain.view_name not in ['source', 'file']:
-            data.append(truncate(link_.description))
+            data.append(link_.description)
             if domain.system_type.startswith('external reference'):
                 object_.external_references.append(link_)
             if is_authorized('contributor') and domain.system_type != 'external reference geonames':
@@ -384,7 +384,7 @@ def place_view(object_: Entity) -> str:
     structure = get_structure(object_, mode='view')
     for entity in structure['subunits']:
         data = get_base_table_data(entity)
-        data.append(truncate(entity.description))
+        data.append(entity.description)
         tables[entity.system_type.replace(' ', '-')].rows.append(data)
     gis_data = structure['gis_data']
     if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]' \
@@ -417,7 +417,7 @@ def reference_view(reference: Entity) -> str:
     for link_ in reference.get_links(['P67', 'P128']):
         range_ = link_.range
         data = get_base_table_data(range_)
-        data.append(truncate(link_.description))
+        data.append(link_.description)
         if range_.view_name == 'file':  # pragma: no cover
             ext = data[3].replace('.', '')
             data.append(get_profile_image_table_link(range_, reference, ext, profile_image_id))
@@ -439,7 +439,7 @@ def source_view(source: Entity) -> str:
     for text in source.get_linked_entities('P73', nodes=True):
         tables['text'].rows.append([link(text),
                                     next(iter(text.nodes)).name if text.nodes else '',
-                                    truncate(text.description)])
+                                    text.description])
     for name in ['actor', 'event', 'place', 'feature', 'stratigraphic-unit', 'find']:
         tables[name] = Table(Table.HEADERS[name])
     tables['actor'].defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
@@ -496,7 +496,7 @@ def node_view(node: Node) -> str:
         if root and root.value_type:  # pragma: no cover
             data.append(format_number(entity.nodes[node]))
         data.append(g.classes[entity.class_.code].name)
-        data.append(truncate(entity.description))
+        data.append(entity.description)
         tables['entities'].rows.append(data)
     tables['link_entities'] = Table([_('domain'), _('range')])
     for row in Link.get_entities_by_node(node):
@@ -505,7 +505,7 @@ def node_view(node: Node) -> str:
     tables['subs'] = Table([_('name'), _('count'), _('info')])
     for sub_id in node.subs:
         sub = g.nodes[sub_id]
-        tables['subs'].rows.append([link(sub), sub.count, truncate(sub.description)])
+        tables['subs'].rows.append([link(sub), sub.count, sub.description])
     return render_template('types/view.html',
                            node=node,
                            super_=super_,

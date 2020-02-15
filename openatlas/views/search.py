@@ -9,7 +9,7 @@ from openatlas import app
 from openatlas.models.date import Date
 from openatlas.models.entity import Entity
 from openatlas.util.table import Table
-from openatlas.util.util import link, required_group, truncate, uc_first
+from openatlas.util.util import link, required_group, uc_first
 
 
 class SearchForm(FlaskForm):  # type: ignore
@@ -79,5 +79,5 @@ def build_search_table(form: FlaskForm) -> Table:
                            entity.class_.name,
                            entity.first,
                            entity.last,
-                           truncate(entity.description)])
+                           entity.description])
     return table

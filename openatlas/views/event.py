@@ -15,8 +15,7 @@ from openatlas.forms.forms import TableField, TableMultiField, build_form, build
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.util.table import Table
-from openatlas.util.util import (get_base_table_data, link, required_group, truncate, uc_first,
-                                 was_modified)
+from openatlas.util.util import get_base_table_data, link, required_group, uc_first, was_modified
 from openatlas.views.reference import AddReferenceForm
 
 
@@ -59,7 +58,7 @@ def event_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
                   defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])
     for event in Entity.get_by_codes('event'):
         data = get_base_table_data(event)
-        data.append(truncate(event.description))
+        data.append(event.description)
         table.rows.append(data)
     return render_template('event/index.html', table=table)
 
