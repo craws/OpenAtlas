@@ -8,6 +8,7 @@ from flask import g, request, session, url_for
 from flask_babel import format_number as babel_format_number, lazy_gettext as _
 from flask_login import current_user
 from jinja2 import escape, evalcontextfilter
+from markupsafe import Markup
 from wtforms import IntegerField
 from wtforms.validators import Email
 
@@ -27,6 +28,19 @@ paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 @blueprint.app_template_filter()
 def link(self: Any, entity: Entity) -> str:
     return util.link(entity)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def button(self: Any, label: str, url: str, css: Optional[str] = 'primary') -> str:
+    classes = {'primary': 'btn btn-outline-primary btn-sm'}
+    label = util.uc_first(label)
+    if '/insert/' in url and label != util.uc_first(_('add')):
+        label = '+ ' + label
+    html = '<a class="{class_}" href="{url}">{label}</a>'.format(class_=classes[css],
+                                                                 url=url,
+                                                                 label=label)
+    return Markup(html)
 
 
 @jinja2.contextfilter
