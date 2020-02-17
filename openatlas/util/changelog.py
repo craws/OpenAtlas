@@ -1,6 +1,6 @@
 class Changelog:
     versions = {
-        '4.2.0': ['TBA', {
+        '5.0.0': ['TBA', {
             'feature': {
                 '1089': 'Human Remains',
                 '1138': 'Display usage of CIDOC CRM classes and properties'},

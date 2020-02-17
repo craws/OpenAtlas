@@ -10,7 +10,7 @@ After following the instructions restart Apache and test if the application is w
 
     service apache2 restart
 
-### 4.2.0 to 5.0.0
+### 4.1.0 to 5.0.0
 
 WARNING - this is a major release and requires new software. JavaScript libraries are now installed in a separate step.
 
@@ -24,9 +24,7 @@ Install frontend libraries with npm:
     $ pip3 install -e ./
     $ ~/.local/bin/calmjs npm --install openatlas
 
-### 4.1.0 to 4.2.0
-
-Execute install/upgrade/4.2.0.sql after making backups
+Execute install/upgrade/5.0.0.sql after making backups
 
 ### 4.0.0 to 4.1.0
 
