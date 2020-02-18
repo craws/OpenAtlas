@@ -19,14 +19,14 @@ class Api:
         for link in Link.get_links(entity.id):
             links.append({'label': link.range.name,
                           'relationTo': url_for('api_entity', id_=link.range.id, _external=True),
-                          'relationType': 'crm:' + link.property.code + '_' + link.property.name.replace(' ', '_')}, )
+                          'relationType': 'crm:' + link.property.code + '_' + link.property.i18n['en'].replace(' ', '_')}, )
             if link.property.code == 'P53':
                 entity.location = link.range
 
         for link in Link.get_links(entity.id, inverse=True):
             links.append({'label': link.domain.name,
                           'relationTo': url_for('api_entity', id_=link.domain.id, _external=True),
-                          'relationType': 'crm:' + link.property.code + '_' + link.property.name.replace(' ', '_')}, )
+                          'relationType': 'crm:' + link.property.code + '_' + link.property.i18n['en'].replace(' ', '_')}, )
 
         return links
 
@@ -71,10 +71,17 @@ class Api:
     def get_entity(id_: int) -> Dict[str, Any]:
         entity = Entity.get_by_id(id_, nodes=True, aliases=True)
         # Todo: find better vocabulary for types and shorten the dict
-        possible_types: dict = {'E53': 'PlaceCollection', 'E21': 'ActorCollection', 'E74': 'ActorCollection',
-                                'E40': 'ActorCollection', 'E7': 'EventCollection', 'E8': 'EventCollection',
-                                'E9': 'EventCollection', 'E33': 'SourceCollection', 'E31': 'DocumentCollection',
-                                'E84': 'ObjectCollection', 'E18': 'FeatureCollection'}
+        possible_types: dict = {'E7': 'EventCollection',
+                                'E8': 'EventCollection',
+                                'E9': 'EventCollection',
+                                'E18': 'FeatureCollection',
+                                'E21': 'ActorCollection',
+                                'E31': 'DocumentCollection',
+                                'E33': 'SourceCollection',
+                                'E40': 'ActorCollection',
+                                'E53': 'PlaceCollection',
+                                'E74': 'ActorCollection',
+                                'E84': 'ObjectCollection'}
 
         type_ = 'unknown'
         for t in possible_types:
@@ -89,7 +96,7 @@ class Api:
 
         features = {'@id': url_for('entity_view', id_=entity.id, _external=True),
                     'type': entity.class_.code,
-                    'typeLabel': entity.class_.name,
+                    'typeLabel': entity.class_.i18n['en'],
                     'properties': {'title': entity.name}}
 
         # Relations
@@ -98,8 +105,7 @@ class Api:
 
         # Descriptions
         if entity.description:
-            features['description'] = [{'@id': request.base_url,
-                                        'value': entity.description}]
+            features['description'] = [{'@id': request.base_url, 'value': entity.description}]
 
         # Types
         if nodes:
@@ -111,7 +117,7 @@ class Api:
             features['depictions'] = [Api.get_file(entity)]
 
         # Todo: Make it flexible
-        # Timespans
+        # Time spans
         if type_ == 'PlaceCollection' or type_ == 'ActorCollection' or type_ == 'EventCollection' \
                 or type_ == 'FeatureCollection':
             features['when'] = {'timespans': [{
@@ -132,20 +138,13 @@ class Api:
             if Gis.get_by_id(entity.location.id):
                 geometries = []
                 for geo in Gis.get_by_id(entity.location.id):
-                    geometries.append({
-                        'type': geo['shape'],
-                        'coordinates': geo['geometry']['coordinates'],
-                        'classification': geo['type'],
-                        'description': geo['description'],
-                        'title': geo['name']}
-                    )
-                features['geometry'] = {'type': 'GeometryCollection',
-                                        'geometries': geometries}
+                    geometries.append({'type': geo['shape'],
+                                       'coordinates': geo['geometry']['coordinates'],
+                                       'classification': geo['type'],
+                                       'description': geo['description'],
+                                       'title': geo['name']})
+                features['geometry'] = {'type': 'GeometryCollection', 'geometries': geometries}
 
-        data: dict = {
-            'type': type_,
-            '@context': app.config['API_SCHEMA'],
-            'features': [features]
-        }
+        data: dict = {'type': type_, '@context': app.config['API_SCHEMA'], 'features': [features]}
 
         return data
