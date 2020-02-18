@@ -177,7 +177,7 @@
 {% endwith %}
 <main>
     <div id="content" >
-        <div style="float:left" class="container">{% block content %}{% endblock %}</div>
+        <div style="float:left" class="container-fluid">{% block content %}{% endblock %}</div>
         {% if session['settings']['debug_mode'] and 'admin'|is_authorized %}
             <div class="data-table" style="float:right;margin:1em;">
                 <p>Debug</p>
