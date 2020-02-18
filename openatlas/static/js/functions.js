@@ -261,3 +261,15 @@ function openParentTab() {
         }
     }
 }
+
+function overflow(name) {
+    $('td').bind('mouseenter', function(){
+        var $this = $(this);
+        if(this.offsetWidth < this.scrollWidth && !$this.attr('title')){
+            $this.attr('title', $this.text());
+        }
+    });
+    $(`#${name}_table`).on( 'page.dt', () => {
+        setTimeout(overflow(name), 0);
+    } );
+}

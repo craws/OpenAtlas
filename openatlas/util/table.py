@@ -54,7 +54,7 @@ class Table:
         html = """
             <table id="{name}_table" class="table table-striped hover" style="width:100%"></table>
             <script>
-                $(document).ready(function() {{ $('#{name}_table').DataTable({data_table}); }});
+                $(document).ready(function() {{ $('#{name}_table').DataTable({data_table}); overflow('{name}'); }});
             </script>""".format(name=name, data_table=json.dumps(data_table),)
 
         # Toggle header and footer HTML
