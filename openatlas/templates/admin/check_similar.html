@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ [[_('admin'), 'admin_index'], _('check similar names')]|crumb|safe }}{% endblock %}
+{% block breadcrumb %}{{ [[_('admin'), 'admin_index'], _('check similar names')]|crumb }}{% endblock %}
 {% block content %}
     <div class="toolbar">
         {{ 'Data_integrity'|manual_link|safe }}

@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [[_('model'), 'model_index'], [_('classes'), 'class_index'], class_.code]|crumb|safe }}
+    {{ [[_('model'), 'model_index'], [_('classes'), 'class_index'], class_.code]|crumb }}
 {% endblock %}
 {% block content %}
     <div style="float:left;padding-right:2em;">

@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [[_('overview'), 'index'], _('network visualization' + ' {dimensions}D'.format(dimensions=dimensions))]|crumb|safe }}
+    {{ [[_('overview'), 'index'], _('network visualization' + ' {dimensions}D'.format(dimensions=dimensions))]|crumb }}
 {% endblock %}
 {% block content %}
     <link rel="stylesheet" href="/static/node_modules/huebee/dist/huebee.min.css">

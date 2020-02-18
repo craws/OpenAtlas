@@ -1,5 +1,5 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ [_('admin')]|crumb|safe }}{% endblock %}
+{% block breadcrumb %}{{ [_('admin')]|crumb }}{% endblock %}
 {% block content %}
     <div id="admin_index">
         {% for dir, value in writeable_dirs.items() %}

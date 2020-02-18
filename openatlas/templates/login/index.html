@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [[_('overview'), 'index'], _('login')]|crumb|safe }}
+    {{ [[_('overview'), 'index'], _('login')]|crumb }}
 {% endblock %}
 {% block content %}
     {{ form|display_form('login-form')|safe }}

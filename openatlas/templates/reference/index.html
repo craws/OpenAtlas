@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [_('reference')]|crumb|safe }}
+    {{ [_('reference')]|crumb }}
 {% endblock %}
 {% block content %}
     {% if 'contributor'|is_authorized %}

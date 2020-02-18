@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 {% block breadcrumb %}
-    {{ [[_(origin.view_name), origin.view_name + '_index'], origin, _('involvement')]|crumb|safe }}
+    {{ [[_(origin.view_name), origin.view_name + '_index'], origin, _('involvement')]|crumb }}
 {% endblock %}
 {% block content %}
     {{ form|display_form|safe }}

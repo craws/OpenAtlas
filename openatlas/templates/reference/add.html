@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [[_('reference'), 'reference_index'], reference, _('add')]|crumb|safe }}
+    {{ [[_('reference'), 'reference_index'], reference, _('add')]|crumb }}
 {% endblock %}
 {% block content %}
     {{ form|display_form|safe }}

@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [[_('types'), 'node_index'], root, node, _('move')]|crumb|safe }}
+    {{ [[_('types'), 'node_index'], root, node, _('move')]|crumb }}
 {% endblock %}
 {% block content %}
     <form class="table" id="checkbox-form" method="post">

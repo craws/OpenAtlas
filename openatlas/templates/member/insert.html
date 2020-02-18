@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 {% block breadcrumb %}
-    {{ [[_('actor'), 'actor_index'], origin, '+' + _('member'.capitalize())]|crumb|safe }}
+    {{ [[_('actor'), 'actor_index'], origin, '+' + _('member'.capitalize())]|crumb }}
 {% endblock %}
 {% block content %}
     {{ form|display_form|safe }}

@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 {% block breadcrumb %}
-    {{ [[_('source'), 'source_index'], source, _('edit')]|crumb|safe }}
+    {{ [[_('source'), 'source_index'], source, _('edit')]|crumb }}
 {% endblock %}
 {% block content %}
     {% if modifier %}

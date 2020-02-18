@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 {% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'], [_('user'), 'user_index'], '+ ' + ('user').capitalize()]|crumb|safe }}
+    {{ [[_('admin'), 'admin_index'], [_('user'), 'user_index'], '+ ' + ('user').capitalize()]|crumb }}
 {% endblock %}
 {% block content %}
     {{ form|display_form('user-form')|safe }}

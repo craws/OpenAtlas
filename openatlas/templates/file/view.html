@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [[_('files'), 'file_index'], entity.name]|crumb|safe }}
+    {{ [[_('files'), 'file_index'], entity.name]|crumb }}
 {% endblock %}
 {% block content %}
     <div id="tabs" class="tabs-container">

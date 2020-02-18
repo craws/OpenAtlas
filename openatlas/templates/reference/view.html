@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title_name %}- {{ reference.name }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_(reference), 'reference_index'], reference.name]|crumb|safe }}
+    {{ [[_(reference), 'reference_index'], reference.name]|crumb }}
 {% endblock %}
 {% block content %}
 <div id="tabs" class="tabs-container">

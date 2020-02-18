@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [[_(entity.view_name), entity.view_name + '_index'], entity, _('add') + ' ' + _('source').capitalize()]|crumb|safe }}
+    {{ [[_(entity.view_name), entity.view_name + '_index'], entity, _('add') + ' ' + _('source').capitalize()]|crumb }}
 {% endblock %}
 {% block content %}
     {{ form|safe }}

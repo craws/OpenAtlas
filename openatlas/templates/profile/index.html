@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [_('profile')]|crumb|safe }}
+    {{ [_('profile')]|crumb }}
 {% endblock %}
 {% block content %}
     {% if not config['DEMO_MODE'] %}

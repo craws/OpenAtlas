@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [[_('types'), 'node_index'], root, node, _('edit')]|crumb|safe }}
+    {{ [[_('types'), 'node_index'], root, node, _('edit')]|crumb }}
 {% endblock %}
 {% block content %}
     {{ form|display_form|safe }}

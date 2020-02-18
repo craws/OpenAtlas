@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block title_name %}- {{ user.username }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'], [_('user'), 'user_index'], user, _('edit')]|crumb|safe }}
+    {{ [[_('admin'), 'admin_index'], [_('user'), 'user_index'], user, _('edit')]|crumb }}
 {% endblock %}
 {% block content %}
     {{ form|display_form('user-form')|safe }}

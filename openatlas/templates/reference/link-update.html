@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [[_(origin.view_name), origin.view_name + '_index'], origin, linked_object, _(edit)]|crumb|safe }}
+    {{ [[_(origin.view_name), origin.view_name + '_index'], origin, linked_object, _(edit)]|crumb }}
 {% endblock %}
 {% block content %}
     {{ form|display_form|safe }}

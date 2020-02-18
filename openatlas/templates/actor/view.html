@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title_name %}- {{ actor.name }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('actor'), 'actor_index'], actor.name]|crumb|safe }}
+    {{ [[_('actor'), 'actor_index'], actor.name]|crumb }}
 {% endblock %}
 {% block content %}
 <div id="tabs" class="tabs-container">

@@ -1,6 +1,6 @@
 {% extends 'layout.html' %}
 {% block breadcrumb %}
-    {{ [[_('source'), 'source_index'], source, '+ ' + _('text').capitalize()]|crumb|safe }}
+    {{ [[_('source'), 'source_index'], source, '+ ' + _('text').capitalize()]|crumb }}
 {% endblock %}
 {% block content %}
     {{ form|display_form|safe }}

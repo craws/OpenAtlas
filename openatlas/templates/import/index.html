@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'], _('import')]|crumb|safe }}
+    {{ [[_('admin'), 'admin_index'], _('import')]|crumb }}
 {% endblock %}
 {% block content %}
     {% if 'admin'|is_authorized %}

@@ -1,7 +1,11 @@
 {% extends "layout.html" %}
 {% block title_name %}- {{ object_.name }}{% endblock %}
 {% block breadcrumb %}
-    {{ [['place', 'place_index'], structure['place'], structure['feature'], structure['stratigraphic_unit'], object_.name]|crumb|safe }}
+    {{ [['place', 'place_index'],
+        structure['place'],
+        structure['feature'],
+        structure['stratigraphic_unit'],
+        object_.name]|crumb }}
 {% endblock %}
 {% block content %}
 <div id="tabs" class="tabs-container">

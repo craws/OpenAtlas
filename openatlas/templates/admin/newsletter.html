@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'], _('newsletter')]|crumb|safe }}
+    {{ [[_('admin'), 'admin_index'], _('newsletter')]|crumb }}
 {% endblock %}
 {% block content %}
     <form id="newsletter-form" name="newsletter_form" method="post">

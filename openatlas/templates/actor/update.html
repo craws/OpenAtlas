@@ -1,7 +1,7 @@
 {% extends 'layout.html' %}
 {% block title_name %}- {{ actor.name }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('actor'), 'actor_index'], actor, _('edit')]|crumb|safe }}
+    {{ [[_('actor'), 'actor_index'], actor, _('edit')]|crumb }}
 {% endblock %}
 {% block content %}
     {% if modifier %}

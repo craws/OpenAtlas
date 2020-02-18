@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [[_('files'), 'file_index'], file, _('edit')]|crumb|safe }}
+    {{ [[_('files'), 'file_index'], file, _('edit')]|crumb }}
 {% endblock %}
 {% block content %}
     {{ form|display_form|safe }}

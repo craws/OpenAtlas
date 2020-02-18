@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [[_('model'), 'model_index'], [_('classes'), 'class_index'], class_|link, _('entities')]|crumb|safe }}
+    {{ [[_('model'), 'model_index'], [_('classes'), 'class_index'], class_|link, _('entities')]|crumb }}
 {% endblock %}
 {% block content %}
     {{ table.display()|safe }}

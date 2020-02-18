@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
     {% if origin %}
-        {{ [[_(origin.view_name), origin.view_name + '_index'], origin, '+ ' + _('file').capitalize()]|crumb|safe }}
+        {{ [[_(origin.view_name), origin.view_name + '_index'], origin, '+ ' + _('file').capitalize()]|crumb }}
     {% else %}
-        {{ [[_('files'), 'file_index'], '+ ' + _('file').capitalize()]|crumb|safe }}
+        {{ [[_('files'), 'file_index'], '+ ' + _('file').capitalize()]|crumb }}
     {% endif %}
 {% endblock %}
 {% block content %}

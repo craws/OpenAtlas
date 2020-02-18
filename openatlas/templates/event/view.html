@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title_name %}- {{ event.name }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('event'), 'event_index'], event.name]|crumb|safe }}
+    {{ [[_('event'), 'event_index'], event.name]|crumb }}
 {% endblock %}
 {% block content %}
 <div id="tabs" class="tabs-container">

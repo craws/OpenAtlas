@@ -3,7 +3,7 @@
     {{ [[_('admin'), 'admin_index'],
         [_('content'), 'content_index'],
         [_(item), 'content_view', {'item': item}],
-        _('edit')]|crumb|safe }}
+        _('edit')]|crumb }}
 {% endblock %}
 {% block content %}
     <form method="post">

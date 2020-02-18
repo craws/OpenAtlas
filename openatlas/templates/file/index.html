@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [_('files')]|crumb|safe }}
+    {{ [_('files')]|crumb }}
 {% endblock %}
 {% block content %}
     {% if 'contributor'|is_authorized %}

@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'], [_('mail'), 'admin_mail'], _('edit')]|crumb|safe }}
+    {{ [[_('admin'), 'admin_index'], [_('mail'), 'admin_mail'], _('edit')]|crumb }}
 {% endblock %}
 {% block content %}
     {{ form|display_form|safe }}

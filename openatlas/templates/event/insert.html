@@ -1,9 +1,9 @@
 {% extends 'layout.html' %}
 {% block breadcrumb %}
     {% if origin %}
-        {{ [[_(origin.view_name), origin.view_name + '_index'], origin, '+ ' + g.classes[code].name]|crumb|safe }}
+        {{ [[_(origin.view_name), origin.view_name + '_index'], origin, '+ ' + g.classes[code].name]|crumb }}
     {% else %}
-        {{ [[_('event'), 'event_index'], '+ ' + g.classes[code].name]|crumb|safe }}
+        {{ [[_('event'), 'event_index'], '+ ' + g.classes[code].name]|crumb }}
     {% endif %}
 {% endblock %}
 {% block content %}

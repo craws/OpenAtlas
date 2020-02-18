@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'], [_('import'), 'import_index'], project.name]|crumb|safe }}
+    {{ [[_('admin'), 'admin_index'], [_('import'), 'import_index'], project.name]|crumb }}
 {% endblock %}
 {% block content %}
 <div id="tabs" class="tabs-container">
