@@ -105,8 +105,13 @@ div.pager {
     display:none;
 }
 
-.more-content span {
-    display: none;
+.more {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 10;
+    -webkit-box-orient: vertical;
 }
 
 .more-link {
