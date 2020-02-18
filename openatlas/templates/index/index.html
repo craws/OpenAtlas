@@ -5,11 +5,11 @@
 {% block content %}
     {% if current_user.is_authenticated %}
         {% if tables['overview']['rows'] %}
-            <div style="float:left;margin-right:2em;">
+            <div style="float:left;margin-right:2em;min-width: 500px;">
                 {{ tables['overview'].display('overview')|safe }}
             </div>
         {% endif %}
-        <div style="float:left;">
+        <div style="float:left; ">
             <p>
                 {{ _('feedback teaser') }} <a href="{{ url_for('index_feedback') }}">{{ _('feedback')|uc_first }}</a>.
             </p>

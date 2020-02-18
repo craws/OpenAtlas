@@ -8,6 +8,7 @@ from flask import g, request, session, url_for
 from flask_babel import format_number as babel_format_number, lazy_gettext as _
 from flask_login import current_user
 from jinja2 import escape, evalcontextfilter
+from markupsafe import Markup
 from wtforms import IntegerField
 from wtforms.validators import Email
 
@@ -31,6 +32,19 @@ def link(self: Any, entity: Entity) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
+def button(self: Any, label: str, url: str, css: Optional[str] = 'primary') -> str:
+    classes = {'primary': 'btn btn-outline-primary btn-sm'}
+    label = util.uc_first(label)
+    if '/insert/' in url and label != util.uc_first(_('add')):
+        label = '+ ' + label
+    html = '<a class="{class_}" href="{url}">{label}</a>'.format(class_=classes[css],
+                                                                 url=url,
+                                                                 label=label)
+    return Markup(html)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
 def crumb(self: Any, crumbs: List[Any]) -> str:
     items = []
     for item in crumbs:
@@ -44,7 +58,7 @@ def crumb(self: Any, crumbs: List[Any]) -> str:
             items.append(util.link(item))
         else:
             items.append(util.truncate(util.uc_first(item)))
-    return ' > '.join(items)
+    return '&nbsp;>&nbsp; '.join(items)
 
 
 @jinja2.contextfilter
@@ -124,10 +138,10 @@ def display_move_form(self: Any, form: Any, root_name: str) -> str:
     table = Table(header=['#', util.uc_first(_('selection'))],
                   rows=[[item, item.label.text] for item in form.selection])
     return html + """
-        <p>
-            <a class="button" id="select-all">{select_all}</a>
-            <a class="button" id="select-none">{deselect_all}</a>
-        </p>
+        <div class="toolbar">
+            <span class="btn btn-outline-primary btn-sm" id="select-all">{select_all}</span>
+            <span class="btn btn-outline-primary btn-sm" id="select-none">{deselect_all}</span>
+        </div>
         {table}""".format(select_all=util.uc_first(_('select all')),
                           deselect_all=util.uc_first(_('deselect all')),
                           table=table.display('move'))
@@ -135,7 +149,8 @@ def display_move_form(self: Any, form: Any, root_name: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def table_select_model(self: Any, name: str,
+def table_select_model(self: Any,
+                       name: str,
                        selected: Union[CidocClass, CidocProperty, None] = None) -> str:
     if name in ['domain', 'range']:
         entities = g.classes
@@ -214,11 +229,7 @@ def display_content_translation(self: Any, text: str) -> str:
 def manual_link(self: Any, wiki_site: str) -> str:
     # Creates a link to a manual page
     return """
-        <p class="manual">
-            <a class="manual" href="{url}" rel="noopener" target="_blank">
-                <img style="height:14px;" src="/static/images/icons/book.png" alt=''> {label}
-            </a>
-        </p>
+        <a class="btn btn-outline-primary btn-sm" href="{url}" target="_blank"> <img style="height:14px;" src="/static/images/icons/book.png" alt=''>{label}</a>
         """.format(url='https://redmine.openatlas.eu/projects/uni/wiki/' + wiki_site,
                    label=util.uc_first(_('manual')))
 
@@ -226,12 +237,12 @@ def manual_link(self: Any, wiki_site: str) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_logo(self: Any, file_id: str) -> str:
-    src = '/static/images/layout/logo.png'
+    src = '/static/images/layout/logo_small.png'
     if file_id:
         extension = print_file_extension(int(file_id))
         if extension != 'N/A':
             src = url_for('display_logo', filename=file_id + extension)
-    return '<img src="{src}" alt="Logo">'.format(src=src)
+    return '<img src="{src}" height="40px" alt="Logo">'.format(src=src)
 
 
 @jinja2.contextfilter
@@ -318,7 +329,7 @@ def display_form(self: Any,
                                                                  text=field(class_=class_))
             continue
         if field.type == 'SubmitField':
-            html['footer'] += str(field)
+            html['footer'] += str(field(class_='btn btn-outline-primary btn-sm'))
             continue
         if field.id.split('_', 1)[0] in ('begin', 'end'):  # If it's a date field use a function
             if field.id == 'begin_year_from':
@@ -364,7 +375,7 @@ def display_form(self: Any,
                     <label>{values}</label>
                 </div>
                 <div class="table-cell value-type-switcher">
-                    <span id="value-type-switcher" class="button">{show}</span>
+                    <span class="btn btn-outline-primary btn-sm" id="value-type-switcher">{show}</span>
                 </div>
             </div>
             """.format(values=util.uc_first(_('values')), show=util.uc_first(_('show')))
@@ -397,7 +408,7 @@ def sanitize(self: Any, string: str) -> str:
 def display_delete_link(self: Any, entity: Entity) -> str:
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
-    return '<a {confirm} href="{url}">{label}</a>'.format(
+    return '<a class="btn btn-outline-primary btn-sm" {confirm} href="{url}">{label}</a>'.format(
         confirm='onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"',
         url=url_for(entity.view_name + '_index', action='delete', id_=entity.id),
         label=util.uc_first(_('delete')))
@@ -421,10 +432,9 @@ def display_menu(self: Any, entity: Optional[Entity]) -> str:
             if entity:
                 css = 'active' if entity.view_name == item else ''
             else:
-                if request.path.startswith('/' + item) or \
-                        (item == 'overview' and request.path == '/'):
-                    css = 'active'
-            html += '<div class="{css}"><a href="/{item}">{label}</a></div>'.format(
+                css = 'active' if request.path.startswith('/' + item) or \
+                                  (item == 'overview' and request.path == '/') else ''
+            html += '<a href="/{item}" class="nav-item nav-link {css}">{label}</a>'.format(
                 css=css, item=item, label=util.uc_first(_(item)))
     return html
 

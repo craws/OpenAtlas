@@ -11,9 +11,9 @@
         <li><a href="#tab-event">{{ _('event')|uc_first }} {{ tables['event']|format_tab_number|safe }}</a></li>
     </ul>
     <div id="tab-info">
-        <div class="button-bar">
+        <div class="toolbar">
             {% if 'contributor'|is_authorized %}
-                <a href="{{ url_for('object_update', id_=object_.id) }}">{{ _('edit')|uc_first }}</a>
+                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('object_update', id_=object_.id) }}">{{ _('edit')|uc_first }}</a>
                 {{ object_|display_delete_link|safe }}
             {% endif %}
             {{ object_.id|bookmark_toggle|safe }}
@@ -30,17 +30,17 @@
     </div>
     <div id="tab-source">
         {% if 'contributor'|is_authorized %}
-            <div class="button-bar">
-                <a href="{{ url_for('object_add_source', id_=object_.id)}}">{{ _('add')|uc_first }}</a>
-                <a href="{{ url_for('source_insert', origin_id=object_.id) }}">+ {{ _('source')|uc_first }}</a>
+            <div class="toolbar">
+                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('object_add_source', id_=object_.id)}}">{{ _('add')|uc_first }}</a>
+                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('source_insert', origin_id=object_.id) }}">+ {{ _('source')|uc_first }}</a>
             </div>
         {% endif %}
         {{ tables['source'].display('source')|safe }}
     </div>
     <div id="tab-event">
         {% if 'contributor'|is_authorized %}
-            <div class="button-bar">
-                <a href="{{ url_for('event_insert', code='E9', origin_id=object_.id) }}">+ {{ 'E9'|get_class_name }}</a>
+            <div class="toolbar">
+                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('event_insert', code='E9', origin_id=object_.id) }}">+ {{ 'E9'|get_class_name }}</a>
             </div>
         {% endif %}
         {{ tables['event'].display('event')|safe }}

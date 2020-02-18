@@ -12,7 +12,7 @@ from openatlas import app, logger
 from openatlas.forms.forms import build_form, build_table_form
 from openatlas.models.entity import Entity
 from openatlas.util.table import Table
-from openatlas.util.util import get_base_table_data, link, required_group, truncate, was_modified
+from openatlas.util.util import get_base_table_data, link, required_group, was_modified
 
 
 class InformationCarrierForm(FlaskForm):  # type: ignore
@@ -35,7 +35,7 @@ def object_index(action: Optional[str] = None, id_: Optional[int] = None) -> str
     table = Table(Table.HEADERS['object'] + ['description'])
     for object_ in Entity.get_by_codes('object'):
         data = get_base_table_data(object_)
-        data.append(truncate(object_.description))
+        data.append(object_.description)
         table.rows.append(data)
     return render_template('object/index.html', table=table)
 

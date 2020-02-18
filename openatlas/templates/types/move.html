@@ -9,7 +9,6 @@
         {{ form|display_move_form(root.name)|safe }}
         {{ form.save }}
     </form>
-
     <script>
         $('#select-all').click(function() {
             var checkboxes = $(this).closest('form').find(':checkbox');

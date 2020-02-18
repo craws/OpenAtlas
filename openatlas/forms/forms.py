@@ -19,7 +19,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.util.table import Table
-from openatlas.util.util import get_base_table_data, get_file_stats, truncate, uc_first
+from openatlas.util.util import get_base_table_data, get_file_stats, uc_first
 
 
 def get_link_type(form: Any) -> Optional_Type[Entity]:
@@ -140,7 +140,7 @@ class TreeSelect(HiddenInput):  # type: ignore
             <input id="{name}-button" name="{name}-button" type="text"
                 class="table-select {required}" onfocus="this.blur()"
                 readonly="readonly" value="{selection}" placeholder="{change_label}">
-            <a id="{name}-clear" {clear_style} class="button"
+            <a id="{name}-clear" {clear_style} class="btn btn-secondary"
                 onclick="clearSelect('{name}');">{clear_label}</a>
             <div id="{name}-overlay" class="overlay">
                 <div id="{name}-dialog" class="overlay-container">
@@ -199,7 +199,7 @@ class TreeMultiSelect(HiddenInput):  # type: ignore
                 selected_ids.append(entity_id)
                 selection += g.nodes[entity_id].name + '<br>'
         html = """
-            <span id="{name}-button" class="button">{change_label}</span>
+            <span id="{name}-button" class="button btn btn-secondary">{change_label}</span>
             <div id="{name}-selection" style="text-align:left;">{selection}</div>
             <div id="{name}-overlay" class="overlay">
                <div id="{name}-dialog" class="overlay-container">
@@ -270,18 +270,23 @@ class TableSelect(HiddenInput):  # type: ignore
             if field.data and entity.id == int(field.data):
                 selection = entity.name
             data = get_base_table_data(entity, file_stats)
-            data[0] = """<a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
-                        """.format(name=field.id,
-                                   entity_id=entity.id,
-                                   entity_name=truncate(entity.name, span=False))
-            data[0] = '<br>'.join([data[0]] + [truncate(alias) for
-                                               id_, alias in entity.aliases.items()])
+            if len(entity.aliases) > 0:
+                data[0] = """<p><a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a></p>
+                            """.format(name=field.id, entity_id=entity.id, entity_name=entity.name)
+            else:
+                data[0] = """<a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
+                            """.format(name=field.id, entity_id=entity.id, entity_name=entity.name)
+            for i, (id_, alias) in enumerate(entity.aliases.items()):
+                if i == len(entity.aliases) - 1:
+                    data[0] = ''.join([data[0]] + [alias])
+                else:
+                    data[0] = ''.join([data[0]] + ['<p>' + alias + '</p>'])
             table.rows.append(data)
         html = """
             <input id="{name}-button" name="{name}-button" class="table-select {required}"
                 type="text" placeholder="{change_label}" onfocus="this.blur()" readonly="readonly"
                 value="{selection}">
-            <a id="{name}-clear" class="button" {clear_style}
+            <a id="{name}-clear" class="btn btn-secondary" {clear_style}
                 onclick="clearSelect('{name}');">{clear_label}</a>
             <div id="{name}-overlay" class="overlay">
             <div id="{name}-dialog" class="overlay-container">{table}</div></div>
@@ -337,7 +342,7 @@ class TableMultiSelect(HiddenInput):  # type: ignore
             table.rows.append(data)
         selection = [entity.name for entity in entities if field.data and entity.id in field.data]
         html = """
-            <span id="{name}-button" class="button">{change_label}</span><br>
+            <span id="{name}-button" class="button btn btn-secondary">{change_label}</span><br>
             <div id="{name}-selection" class="selection" style="text-align:left;">{selection}</div>
             <div id="{name}-overlay" class="overlay">
             <div id="{name}-dialog" class="overlay-container">{table}</div></div>

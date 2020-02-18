@@ -1,11 +1,15 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}{{ [[_('admin'), 'admin_index'], _('check link duplicates')]|crumb|safe }}{% endblock %}
 {% block content %}
-    {{ 'Data_integrity'|manual_link|safe }}
+    <div class="toolbar">
+        {{ 'Data_integrity'|manual_link|safe }}
+        {% if duplicates %}
+            <div>
+                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('admin_check_link_duplicates', delete='delete') }}">{{ _('delete link duplicates')|uc_first }}</a>
+            </div>
+        {% endif %}
+    </div>
     {% if duplicates %}
-        <div class="button-bar">
-            <a href="{{ url_for('admin_check_link_duplicates', delete='delete') }}">{{ _('delete link duplicates')|uc_first }}</a>
-        </div>
         {{ table.display()|safe }}
     {% elif table.rows %}
         {{ table.display()|safe }}

@@ -1,9 +1,9 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}{{ [[_('admin'), 'admin_index'], _('mail')]|crumb|safe }}{% endblock %}
 {% block content %}
-    {{ 'Mail'|manual_link|safe }}
-    <div class="button-bar">
-        <a href="{{ url_for('admin_mail_update') }}">{{ _('edit')|uc_first }}</a>
+    <div class="toolbar">
+        {{ 'Mail'|manual_link|safe }}
+        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('admin_mail_update') }}">{{ _('edit')|uc_first }}</a>
     </div>
     <div class="data-table">
         {% for name, value in mail_settings.items() %}

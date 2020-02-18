@@ -18,12 +18,12 @@
     </ul>
     <div id="tab-info">
         {% if 'editor'|is_authorized and node.root and not root.locked %}
-            <div class="button-bar">
-                <a href="{{ url_for('node_update', id_=node.id) }}">{{ _('edit')|uc_first }}</a>
-                {% if not node.system and node.count < 1 and not node.subs %}
-                    <a onclick="return confirm('{{ _('delete')|uc_first }} {{ node.name.replace('\'', '') }}?')"
-                       href="{{ url_for('node_delete', id_=node.id) }}">{{ _('delete')|uc_first }}</a>
-                {% endif %}
+            <div class="toolbar">
+                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('node_update', id_=node.id) }}">{{ _('edit')|uc_first }}</a>
+                    {% if not node.system and node.count < 1 and not node.subs %}
+                        <a class="btn btn-outline-primary btn-sm" onclick="return confirm('{{ _('delete')|uc_first }} {{ node.name.replace('\'', '') }}?')"
+                           href="{{ url_for('node_delete', id_=node.id) }}">{{ _('delete')|uc_first }}</a>
+                    {% endif %}
             </div>
         {% endif %}
         <h1>{{ node.name }}</h1>
@@ -51,8 +51,8 @@
     {% if tables['entities'].rows or tables['link_entities'].rows %}
         <div id="tab-entities">
             {% if 'editor'|is_authorized and not root.value_type %}
-                <div class="button-bar">
-                    <a class="button" href="{{ url_for('node_move_entities', id_=node.id) }}">{{ _('move entities')|uc_first }}</a>
+                <div class="toolbar">
+                    <a class="btn btn-outline-primary btn-sm" href="{{ url_for('node_move_entities', id_=node.id) }}">{{ _('move entities')|uc_first }}</a>
                 </div>
             {% endif %}
             {% if tables['entities'].rows %}

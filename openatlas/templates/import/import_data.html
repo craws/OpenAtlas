@@ -3,13 +3,13 @@
     {{ [[_('admin'), 'admin_index'], [_('import'), 'import_index'], project, class_label]|crumb|safe }}
 {% endblock %}
 {% block content %}
-    {{ 'Import'|manual_link|safe }}
-    {% if file_data['file'] %}
-        <p style="margin-top: 1em;">
-            {{ _('latest backup')|uc_first }}: {{ file_data['file'] }}, {{ file_data['size'] }},
-            <a href="{{ url_for('download_sql', filename=file_data['file']) }}">{{ _('download')|uc_first }}</a>
-        </p>
-    {% endif %}
+    <div class="toolbar">
+        {{ 'Import'|manual_link|safe }}
+        {% if file_data['file'] %}
+            {{ _('latest backup')|uc_first }}: {{ file_data['file'] }}, {{ file_data['size'] }}
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('download_sql', filename=file_data['file']) }}">{{ _('download')|uc_first }}</a>
+        {% endif %}
+    </div>
     {% if file_data['backup_too_old'] and not config['IS_UNIT_TEST'] %}
         <p>
             {{ _('There seems to be no recent backup, please make one') }}

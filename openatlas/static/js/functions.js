@@ -13,6 +13,9 @@ tinymce.init({
 
 $(document).ready(function() {
 
+    //popovers init
+    $('[data-toggle="popover"]').popover();
+
     // DataTables - sort for checkbox columns
     $.fn.dataTable.ext.order['dom-checkbox'] = function(settings, col) {
         return this.api().column(col, {order:'index'}).nodes().map( function (td, i) {

@@ -3,7 +3,9 @@
     {{ [[_('overview'), 'index'], _('changelog')]|crumb|safe }}
 {% endblock %}
 {% block content %}
-    {{ 'Features_Versioning_and_Roadmap'|manual_link|safe }}
+    <div class="toolbar">
+        {{ 'Features_Versioning_and_Roadmap'|manual_link|safe }}
+    </div>
     {% for version_name, version in versions.items() %}
         <div class="changelog-version">
             {{ _('version')|uc_first }} {{ version_name }}

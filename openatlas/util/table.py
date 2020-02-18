@@ -54,7 +54,7 @@ class Table:
         if self.defs:
             data_table['columnDefs'] = self.defs
         html = """
-            <table id="{name}_table" class="compact stripe cell-border hover"></table>
+            <table id="{name}_table" class="table table-striped hover" style="width:100%"></table>
             <script>
                 $(document).ready(function() {{ $('#{name}_table').DataTable({data_table}); }});
             </script>""".format(name=name, data_table=json.dumps(data_table),)

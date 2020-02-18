@@ -3,7 +3,9 @@
     {{ [[_('profile'), 'profile_index'], _('edit')]|crumb|safe }}
 {% endblock %}
 {% block content %}
-    {{ 'Profile'|manual_link|safe }}
+    <div class="toolbar">
+        {{ 'Profile'|manual_link|safe }}
+    </div>
     <form method="post">
         {{ form.csrf_token }}
         <div style="float:left;margin-right:2em;">

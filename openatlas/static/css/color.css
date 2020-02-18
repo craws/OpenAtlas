@@ -24,26 +24,6 @@ div.tabs-container .ui-state-active a {
     background-color: #ffffff;
 }
 
-#menu div a,
-#breadcrumb a,
-#header-menu span,
-#language-menu a,
-input[type=submit],
-button,
-.date-switch,
-.value-type-switch,
-span.button,
-a.button,
-.button-bar a,
-.changelog-version,
-.inverse-heading,
-.ui-widget-header,
-.ui-widget-content .button-bar a,
-.ui-state-default a:link,
-.ui-state-default a:visited{
-    color: #ffffff;
-}
-
 a,
 .info,
 span.tooltip,
@@ -52,26 +32,16 @@ span.tooltip,
 #menu div.active a,
 #menu div.active a:hover,
 .ui-widget-content a {
-    color: #4088c3;
-}
-
-div.tabs-container table a:hover,
-table a:hover {
-    color: #46779f;
-}
-
-.error {
-    color: #e60005;
+    color: #0047bb;
 }
 
 /* Background color */
 
-body, .ui-widget-content, .ui-dialog .ui-dialog-content {
-    background-color: #efefef;
+.ui-widget-content,
+.ui-dialog .ui-dialog-content {
+    background-color: #e9ecef;
 }
 
-#menu,
-#header-menu span,
 .overlay,
 .inverse-heading,
 .ui-widget-header,
@@ -86,40 +56,16 @@ body, .ui-widget-content, .ui-dialog .ui-dialog-content {
 select,
 span.tooltip,
 input[type="text"],
-.ui-tabs .ui-tabs-panel,
 .ui-widget-content .ui-state-active,
 .ui-widget-header .ui-state-active,
-div.tabs-container .ui-widget-content,
 div.tabs-container .ui-state-active,
 div.tabs-container .ui-state-active.ui-state-hover {
     background-color: #ffffff;
 }
 
-#language-menu a {
-    background-color: #adadad;
-}
-
-button,
-a.button,
-#breadcrumb,
-.date-switch,
-.value-type-switch,
-input[type=submit],
-span.button,
-.button-bar a,
-.ui-state-default,
-.changelog-version,
-#disk_size .ui-widget-header {
-    background-color: #4088c3;
-}
-
-input[type=submit]:hover,
-div.tabs-container .ui-state-hover,
-a.button:hover,
-button:hover,
-.button-bar a:hover,
-span.button:hover {
-    background-color: #46779f;
+.ui-tabs .ui-tabs-panel,
+div.tabs-container .ui-widget-content {
+    background-color: #f8f9fa!important;
 }
 
 /* Border color */
@@ -129,7 +75,7 @@ span.button:hover {
 }
 
 #menu > div.active, #disk_size {
-    border-color: #4088c3;
+    border-color: #0047bb;
 }
 
 textarea,
@@ -144,4 +90,25 @@ div.pagedisplay {
     border-left-color: #969392;
     border-bottom-color: #ffffff;
     border-right-color: #ffffff;
+}
+
+/* tables */
+
+.table {
+    border: none;
+}
+
+.table thead th {
+    border-bottom: 2px solid #0047bb;
+    background-color: #e9ecef;
+}
+
+div.tabs-container table a:hover,
+table a:hover {
+    color: #0047bb;
+    text-decoration: none;
+}
+
+.table td, .table th {
+    border-top: none;
 }

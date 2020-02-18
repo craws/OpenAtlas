@@ -55,7 +55,7 @@ def print_file_size(entity: 'Entity') -> str:
 def display_tooltip(text: str) -> str:
     if not text:
         return ''
-    return ' <span class="tooltip" title="{title}">i</span>'.format(title=text.replace('"', "'"))
+    return '<span><i class="fas fa-info-circle" title="{title}"></i></span>'.format(title=text.replace('"', "'"))
 
 
 def print_file_extension(entity: Union[int, 'Entity']) -> str:
@@ -303,7 +303,7 @@ def add_dates_to_form(form: Any, for_person: bool = False) -> str:
                 <label>{date}</label> {tooltip}
             </div>
             <div class="table-cell date-switcher">
-                <span id="date-switcher" class="button">{show}</span>
+                <span id="date-switcher" class="btn btn-secondary">{show}</span>
             </div>
         </div>""".format(date=uc_first(_('date')),
                          tooltip=display_tooltip(_('tooltip date')),
@@ -357,10 +357,12 @@ def required_group(group: str):  # type: ignore
 def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
     label = uc_first(_('bookmark remove') if entity_id in current_user.bookmarks else _('bookmark'))
     if for_table:
-        return """<a id="bookmark{entity_id}" onclick="ajaxBookmark('{entity_id}');"
-                style="cursor:pointer;">{label}</a>""".format(entity_id=entity_id, label=label)
-    return """<button id="bookmark{entity_id}" onclick="ajaxBookmark('{entity_id}');"
-                type="button">{label}</button>""".format(entity_id=entity_id, label=label)
+        return """<span class="btn btn-outline-primary btn-sm" id="bookmark{entity_id}"
+            onclick="ajaxBookmark('{entity_id}');" style="cursor:pointer;">{label}</a>
+            """.format(entity_id=entity_id, label=label)
+    return """<span class="btn btn-outline-primary btn-sm" id="bookmark{entity_id}"
+        onclick="ajaxBookmark('{entity_id}');" type="button">{label}</span>
+        """.format(entity_id=entity_id, label=label)
 
 
 def is_authorized(group: str) -> bool:
@@ -432,7 +434,7 @@ def link(entity: Union['Entity', CidocClass, CidocProperty, 'Project', 'User']) 
         html = '<a href="' + url + '">' + entity.code + '</a>'
     elif isinstance(entity, Entity):
         url = url_for('entity_view', id_=entity.id)
-        html = '<a href="' + url + '">' + truncate(entity.name) + '</a>'
+        html = '<a href="' + url + '">' + entity.name + '</a>'
     return html
 
 
@@ -453,8 +455,16 @@ def truncate(string: Optional[str] = '', length: int = 40, span: bool = True) ->
 def get_base_table_data(entity: 'Entity',
                         file_stats: Optional[Dict[Union[int, str], Any]] = None) -> List[str]:
     """ Returns standard table data for an entity"""
-    data: List[str] = ['<br>'.join([link(entity)] + [truncate(alias) for
-                                                     alias in entity.aliases.values()])]
+    if len(entity.aliases) > 0:
+        data: List[str] = ['<p>' + link(entity) + '</p>']
+    else:
+        data: List[str] = [link(entity)]
+    # Aliases
+    for i, (id_, alias) in enumerate(entity.aliases.items()):
+        if i == len(entity.aliases) - 1:
+            data[0] = ''.join([data[0]] + [alias])
+        else:
+            data[0] = ''.join([data[0]] + ['<p>' + alias + '</p>'])
     if entity.view_name in ['event', 'actor']:
         data.append(g.classes[entity.class_.code].name)
     if entity.view_name in ['reference'] and entity.system_type != 'file':
@@ -474,7 +484,7 @@ def get_base_table_data(entity: 'Entity',
         data.append(entity.first if entity.first else '')
         data.append(entity.last if entity.last else '')
     if entity.view_name in ['source'] or entity.system_type == 'file':
-        data.append(truncate(entity.description))
+        data.append(entity.description)
     return data
 
 

@@ -3,8 +3,8 @@
     {{ [[_('place'), 'place_index'], place, image, _('update overlay')]|crumb|safe }}
 {% endblock %}
 {% block content %}
-    <div class="button-bar">
-        <a href="{{ url_for('overlay_remove', id_=overlay.id, place_id=place.id) }}" onclick="return confirm('{{ _('remove')|uc_first }}?');">
+    <div>
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('overlay_remove', id_=overlay.id, place_id=place.id) }}" onclick="return confirm('{{ _('remove')|uc_first }}?');">
             {{ _('remove')|uc_first }}
         </a>
     </div>

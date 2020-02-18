@@ -3,10 +3,10 @@
     {{ [[_('admin'), 'admin_index'], _('user')]|crumb|safe }}
 {% endblock %}
 {% block content %}
-    {{ 'User'|manual_link|safe }}
     {% if 'manager'|is_authorized %}
-        <div class="button-bar">
-            <a href="{{ url_for('user_insert') }}">+ {{ _('user')|uc_first }}</a>
+        <div class="toolbar">
+            {{ 'User'|manual_link|safe }}
+            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('user_insert') }}">+ {{ _('user')|uc_first }}</a>
         </div>
     {% endif %}
     {{ table.display()|safe }}

@@ -3,7 +3,9 @@
     {{ [_('types')]|crumb|safe }}
 {% endblock %}
 {% block content %}
-    {{ 'Form_field_type'|manual_link|safe }}
+    <div class="toolbar">
+        {{ 'Form_field_type'|manual_link|safe }}
+    </div>
     <div id="tabs-menu" class="tabs-container">
         <ul>
             <li><a href="#menu-tab-system">{{ _('system types')|uc_first }}</a></li>
@@ -19,7 +21,7 @@
                             <li><a href="#tab-{{ node.id }}">{{ node.name }}</a></li>
                         {% endfor %}
                         {% if type_ in ['custom', 'value'] and 'manager'|is_authorized %}
-                            <a class="button" href="{{ url_for('hierarchy_insert', param=type_) }}" style="margin:1em;color:#ffffff;">
+                            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('hierarchy_insert', param=type_) }}" style="margin:1em;">
                                 + {{ _('type')|uc_first }}
                             </a>
                         {% endif %}
@@ -28,7 +30,7 @@
                         <div id="tab-{{ node.id }}">
                             <p><strong>{{ node.name }}</strong></p>
                             <div style="float:left;margin-right:3em;">
-                                <div class="button-bar">
+                                <div class="toolbar">
                                     {% if node.locked or not 'editor'|is_authorized %}
                                         <input
                                             class="tree-filter"
@@ -47,15 +49,15 @@
                                                 style="width:8em;">
                                             {% if not node.locked %}
                                                 <input type="hidden" name="mode" value="insert">
-                                                <button type="submit" value="insert" name="add-node-submit">+</button>
+                                                <button class="btn btn-outline-primary btn-sm" type="submit" value="insert" name="add-node-submit">+</button>
                                             {% endif %}
                                         </form>
                                     {% endif %}
 
                                     {% if type_ in ['custom', 'value'] and 'manager'|is_authorized %}
-                                        <a href="{{ url_for('hierarchy_update', id_=node.id) }} ">{{ _('edit')|uc_first }}</a>
+                                        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('hierarchy_update', id_=node.id) }} ">{{ _('edit')|uc_first }}</a>
                                         {% if not node.system and node.count < 1 and not node.subs %}
-                                            <a onclick="return confirm('{{ _('delete')|uc_first }} {{ node.name.replace('\'', '') }}?')"
+                                            <a class="btn btn-outline-primary btn-sm" onclick="return confirm('{{ _('delete')|uc_first }} {{ node.name.replace('\'', '') }}?')"
                                                 href="{{ url_for('hierarchy_delete', id_=node.id) }} ">{{ _('delete')|uc_first }}</a>
                                         {% endif %}
                                     {% endif %}
