@@ -61,7 +61,7 @@
         {% if name not in ['node', 'feature', 'stratigraphic-unit', 'find', 'human-remains'] or tables[name].rows %}
             <div id="tab-{{name}}">
                 {% if 'contributor'|is_authorized and name not in ['feature', 'stratigraphic-unit', 'find', 'human-remains'] %}
-                    <div>
+                    <div class="toolbar">
                         <a class="btn btn-outline-primary btn-sm" href="{{ url_for('file_add', id_=entity.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
                         {% if name == 'place' %}
                             <a class="btn btn-outline-primary btn-sm" href="{{ url_for('place_insert', origin_id=entity.id) }}">+ {{ _('place')|uc_first }}</a>
