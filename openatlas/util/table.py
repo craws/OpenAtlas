@@ -57,7 +57,7 @@ class Table:
                 $(document).ready(function() {{ 
                     $('#{name}_table').DataTable({data_table}); 
                     overflow('{name}'); 
-                    $('#{name}_table').on( 'page.dt', () => overflow('{name}'));
+                    $('#{name}_table').on( 'page.dt', () => overflow());
                 }});                
             </script>""".format(name=name, data_table=json.dumps(data_table),)
 

@@ -262,7 +262,7 @@ function openParentTab() {
     }
 }
 
-function overflow(name) {
+function overflow() {
     setTimeout(() => {
         $('td').bind('mouseenter', function(){
             var $this = $(this);
