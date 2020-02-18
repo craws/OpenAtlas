@@ -5,7 +5,7 @@
 {% block content %}
     <div class="toolbar">
         {{ 'Data_integrity'|manual_link|safe }}
-        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('admin_check_links', check='check')}}">{{ _('check links')|uc_first }}</a>
+        {{ _('check links')|button(url_for('admin_check_links', check='check')) }}
         {{ _('this could take some time')|uc_first }}
     </div>
     {% if table.rows %}

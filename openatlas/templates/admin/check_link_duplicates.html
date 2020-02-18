@@ -6,9 +6,7 @@
     <div class="toolbar">
         {{ 'Data_integrity'|manual_link|safe }}
         {% if duplicates %}
-            <div>
-                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('admin_check_link_duplicates', delete='delete') }}">{{ _('delete link duplicates')|uc_first }}</a>
-            </div>
+            {{ _('delete link duplicates')|button(url_for('admin_check_link_duplicates', delete='delete')) }}
         {% endif %}
     </div>
     {% if duplicates %}
