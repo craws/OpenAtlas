@@ -122,6 +122,13 @@ div.pager {
     display: none;
 }
 
+.jstree li > a {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 300px;
+}
+
 a {
     font-weight: bold;
     text-decoration: none;
