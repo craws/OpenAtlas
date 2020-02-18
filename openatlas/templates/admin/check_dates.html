@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ [[_('admin'), 'admin_index'], _('check dates')]|crumb }}{% endblock %}
+{% block breadcrumb %}
+    {{ [[_('admin'), 'admin_index'], _('check dates')]|crumb }}
+{% endblock %}
 {% block content %}
 {{ 'Data_integrity'|manual_link|safe }}
 <div id="tabs" class="tabs-container">
@@ -21,7 +23,6 @@
     {% else %}
         {{ _('Congratulations, everything looks fine!') }}
     {% endif %}
-
     </div>
     <div id="tab-involvement-dates">
         {% if tables['involvement_dates'].rows %}

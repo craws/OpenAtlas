@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ [[_('admin'), 'admin_index'], _('mail')]|crumb }}{% endblock %}
+{% block breadcrumb %}
+    {{ [[_('admin'), 'admin_index'], _('mail')]|crumb }}
+{% endblock %}
 {% block content %}
     <div class="toolbar">
         {{ 'Mail'|manual_link|safe }}
