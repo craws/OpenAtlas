@@ -48,6 +48,7 @@ def button(self: Any, label: str, url: str, css: Optional[str] = 'primary') -> s
                                                                  label=label)
     return Markup(html)
 
+
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def crumb(self: Any, crumbs: List[Any]) -> str:
