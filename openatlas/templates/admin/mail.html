@@ -5,7 +5,7 @@
 {% block content %}
     <div class="toolbar">
         {{ 'Mail'|manual_link }}
-        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('admin_mail_update') }}">{{ _('edit')|uc_first }}</a>
+        {{ _('edit')|button(url_for('admin_mail_update')) }}
     </div>
     <div class="data-table">
         {% for name, value in mail_settings.items() %}

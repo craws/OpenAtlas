@@ -6,7 +6,7 @@
     <div class="toolbar">
         {{ 'Logo'|manual_link }}
         {% if not form %}
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('admin_logo', action='remove') }}">{{ _('remove logo')|uc_first }}</a>
+            {{ _('remove logo')|button(url_for('admin_logo', action='remove')) }}
         {% endif %}
     </div>
     {% if form %}

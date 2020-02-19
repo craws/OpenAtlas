@@ -38,17 +38,19 @@ def api_link(self: Any, entity: Entity) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def button(self: Any, label: str, url: str, css: Optional[str] = 'primary') -> str:
-    """
-    :param css: is used to choose from config['CSS']['button']
-    """
+def button(self: Any,
+           label: str,
+           url: str,
+           css: Optional[str] = 'primary',
+           js: Optional[str] = '') -> str:
     label = util.uc_first(label)
     if '/insert/' in url and label != util.uc_first(_('add')):
         label = '+ ' + label
-    html = '<a class="{class_}" href="{url}">{label}</a>'.format(
+    html = '<a class="{class_}" href="{url}" {js}>{label}</a>'.format(
         class_=app.config['CSS']['button'][css],
         url=url,
-        label=label)
+        label=label,
+        js=js)
     return Markup(html)
 
 

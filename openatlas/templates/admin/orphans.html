@@ -17,9 +17,8 @@
     </ul>
     <div id="tab-orphan">
         {% if tables['orphans'].rows and 'admin'|is_authorized %}
-            <div>
-            <a class="btn btn-outline-primary btn-sm" onclick="return confirm('{{_('delete orphans')|uc_first }}?')"
-                   href="{{ url_for('admin_orphans_delete', parameter='orphans') }}">{{ _('delete orphans')|uc_first }}</a>
+            <div class="toolbar">
+                {{ _('delete orphans')|button(url_for('admin_orphans_delete', parameter='orphans'), js='onclick="return confirm(\'' + _('delete orphans')|uc_first + '?\')"') }}
             </div>
         {% endif %}
         {% if tables['orphans'].rows %}
@@ -37,9 +36,8 @@
     </div>
     <div id="tab-nodes">
         {% if tables['nodes'].rows and 'admin'|is_authorized %}
-            <div>
-            <a class="btn btn-outline-primary btn-sm" onclick="return confirm('{{_('delete types')|uc_first }}?')"
-                   href="{{ url_for('admin_orphans_delete', parameter='types') }}">{{ _('delete types')|uc_first }}</a>
+            <div class="toolbar">
+                {{ _('delete types')|button(url_for('admin_orphans_delete', parameter='types'), js='onclick="return confirm(\'' + _('delete types')|uc_first + '?\')"') }}
             </div>
         {% endif %}
         {% if tables['nodes'].rows %}
@@ -57,9 +55,8 @@
     </div>
     <div id="tab-orphaned-files">
         {% if tables['orphaned_files'].rows and 'admin'|is_authorized %}
-            <div>
-            <a class="btn btn-outline-primary btn-sm" onclick="return confirm('{{_('delete all files without corresponding entities?')|uc_first }}')"
-                   href="{{ url_for('admin_file_delete', filename='all') }}">{{ _('delete all files')|uc_first }}</a>
+            <div class="toolbar">
+                {{ _('delete all files')|button(url_for('admin_file_delete', filename='all'), js='onclick="return confirm(\'' + _('delete all files without corresponding entities?')|uc_first + '\')"') }}
             </div>
         {% endif %}
         {% if tables['orphaned_files'].rows %}
