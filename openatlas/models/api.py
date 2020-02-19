@@ -38,11 +38,11 @@ class Api:
         for link in Link.get_links(entity.id, inverse=True):
             if link.domain.system_type == 'file':
                 path = get_file_path(link.domain.id)
-                filename = os.path.basename(path) if path else False
+                filename = os.path.basename(path) if path else None
                 files.append({'@id': url_for('api_entity', id_=link.domain.id, _external=True),
                               'title': link.domain.name,
-                              'license': Api.get_license(link.domain.id),
-                              'url': url_for('display_file', filename=filename, _external=True) if filename else 'N/A'})
+                              'license': Api.get_license(link.domain.id) if Api.get_license(link.domain.id) else None,
+                              'url': url_for('display_file', filename=filename, _external=True) if filename else None})
         return files
 
     @staticmethod
@@ -119,7 +119,7 @@ class Api:
         # Todo: How to get into the if function? Why this method won't work?
         # Depictions
         if Api.get_file(entity):
-            features['depictions'] = [Api.get_file(entity)]
+            features['depictions'] = Api.get_file(entity)
 
         # Todo: Make it flexible
         # Timespans
