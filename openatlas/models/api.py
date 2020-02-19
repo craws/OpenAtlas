@@ -64,6 +64,20 @@ class Api:
         return entities
 
     @staticmethod
+    def get_entities_by_class(class_code_: str):
+        entities = []
+        for entity in Entity.get_by_class(class_code_):
+            entities.append(Api.get_entity(entity.id))
+        return entities
+
+    @staticmethod
+    def get_entities_get_latest(limit_: int):
+        entities = []
+        for entity in Entity.get_latest(limit_):
+            entities.append(Api.get_entity(entity.id))
+        return entities
+
+    @staticmethod
     def get_entities_by_id(ids: list):
         entities = []
         for i in ids:

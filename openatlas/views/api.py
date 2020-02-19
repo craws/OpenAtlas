@@ -25,10 +25,17 @@ def api_get_by_code(code):
                     mimetype='application/ld+json')
 
 
-@app.route('/api/0.1/type/<types>')
+@app.route('/api/0.1/class/<class_code>')
 @required_group('readonly')
-def api_get_by_types(types):
-    return Response(json.dumps(Api.get_entities_by_code(types_=types)),
+def api_get_by_class(class_code):
+    return Response(json.dumps(Api.get_entities_by_class(class_code_=class_code)),
+                    mimetype='application/ld+json')
+
+
+@app.route('/api/0.1/latest/<limit>')
+@required_group('readonly')
+def api_get_latest(limit):
+    return Response(json.dumps(Api.get_entities_get_latest(limit_=limit)),
                     mimetype='application/ld+json')
 
 
