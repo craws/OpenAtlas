@@ -18,10 +18,18 @@ def api_get_multiple_entities():
     return Response(json.dumps(Api.get_entities_by_id(ids=entity)), mimetype='application/ld+json')
 
 
-@app.route('/api/0.1/<code>')
+@app.route('/api/0.1/code/<code>')
 @required_group('readonly')
-def api_collection(code):
-    return Response(json.dumps(Api.get_entities_by_code(code_=code)), mimetype='application/ld+json')
+def api_get_by_code(code):
+    return Response(json.dumps(Api.get_entities_by_code(code_=code)),
+                    mimetype='application/ld+json')
+
+
+@app.route('/api/0.1/type/<types>')
+@required_group('readonly')
+def api_get_by_types(types):
+    return Response(json.dumps(Api.get_entities_by_code(types_=types)),
+                    mimetype='application/ld+json')
 
 
 @app.route('/api')

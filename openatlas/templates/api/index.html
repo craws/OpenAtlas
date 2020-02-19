@@ -5,15 +5,15 @@
 {% block content %}
     <a href="{{ url_for('api_entity', id_=105) }}">Test API</a>
     <br/>
-    <a href="{{ url_for('api_collection', code='actor') }}">Actor</a>
+    <a href="{{ url_for('api_get_by_code', code='actor') }}">Actor</a>
     <br/>
-    <a href="{{ url_for('api_collection', code='place') }}">Place</a>
+    <a href="{{ url_for('api_get_by_code', code='place') }}">Place</a>
     <br/>
-    <a href="{{ url_for('api_collection', code='event') }}">Event</a>
+    <a href="{{ url_for('api_get_by_code', code='event') }}">Event</a>
     <br/>
-    <a href="{{ url_for('api_collection', code='source') }}">Source</a>
+    <a href="{{ url_for('api_get_by_code', code='source') }}">Source</a>
     <br/>
-    <a href="{{ url_for('api_collection', code='reference') }}">Reference</a>
+    <a href="{{ url_for('api_get_by_code', code='reference') }}">Reference</a>
     <br/>
-    <a href="{{ url_for('api_collection', code='object') }}">Object</a>
+    <a href="{{ url_for('api_get_by_code', code='object') }}">Object</a>
 {% endblock %}

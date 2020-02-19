@@ -19,16 +19,16 @@ class Api:
         for link in Link.get_links(entity.id):
             links.append({'label': link.range.name,
                           'relationTo': url_for('api_entity', id_=link.range.id, _external=True),
-                          'relationType': 'crm:' + link.property.code + '_' + link.property.i18n['en'].replace(' ',
-                                                                                                               '_')}, )
+                          'relationType': 'crm:' + link.property.code + '_'
+                                          + link.property.i18n['en'].replace(' ', '_')}, )
             if link.property.code == 'P53':
                 entity.location = link.range
 
         for link in Link.get_links(entity.id, inverse=True):
             links.append({'label': link.domain.name,
                           'relationTo': url_for('api_entity', id_=link.domain.id, _external=True),
-                          'relationType': 'crm:' + link.property.code + '_' + link.property.i18n['en'].replace(' ',
-                                                                                                               '_')}, )
+                          'relationType': 'crm:' + link.property.code + '_'
+                                          + link.property.i18n['en'].replace(' ', '_')}, )
 
         return links
 
@@ -41,8 +41,10 @@ class Api:
                 filename = os.path.basename(path) if path else None
                 files.append({'@id': url_for('api_entity', id_=link.domain.id, _external=True),
                               'title': link.domain.name,
-                              'license': Api.get_license(link.domain.id) if Api.get_license(link.domain.id) else None,
-                              'url': url_for('display_file', filename=filename, _external=True) if filename else None})
+                              'license': Api.get_license(link.domain.id) if Api.get_license(
+                                  link.domain.id) else None,
+                              'url': url_for('display_file', filename=filename,
+                                             _external=True) if filename else None})
         return files
 
     @staticmethod
@@ -72,12 +74,11 @@ class Api:
     @staticmethod
     def get_entity(id_: int) -> Dict[str, Any]:
         entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-        # Todo: find better vocabulary for types and shorten the dict
         possible_types: dict = {'E7': 'EventCollection',
                                 'E8': 'EventCollection',
                                 'E9': 'EventCollection',
                                 'E18': 'FeatureCollection',
-                                'E21': 'FindCollection',
+                                'E20': 'FindCollection',
                                 'E21': 'ActorCollection',
                                 'E22': 'FindCollection',
                                 'E31': 'DocumentCollection',
@@ -121,7 +122,6 @@ class Api:
         if Api.get_file(entity):
             features['depictions'] = Api.get_file(entity)
 
-        # Todo: Make it flexible
         # Timespans
         if entity.begin_from or entity.begin_to or entity.end_from or entity.end_to:
             features['when'] = {'timespans': [{
