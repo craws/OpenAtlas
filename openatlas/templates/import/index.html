@@ -5,7 +5,7 @@
 {% block content %}
     {% if 'admin'|is_authorized %}
         <div class="toolbar">
-            {{ 'Import'|manual_link|safe }}
+            {{ 'Import'|manual_link }}
             <a class="btn btn-outline-primary btn-sm" href="{{ url_for('import_project_insert') }}">+ {{ _('project')|uc_first }}</a>
         </div>
     {% endif %}

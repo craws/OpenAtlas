@@ -4,7 +4,7 @@
 {% endblock %}
 {% block content %}
     <div class="toolbar">
-        {{ 'General'|manual_link|safe }}
+        {{ 'General'|manual_link }}
         <a class="btn btn-outline-primary btn-sm" href="{{ url_for('admin_general_update') }}">{{ _('edit')|uc_first }}</a>
     </div>
     <div class="data-table">

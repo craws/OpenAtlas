@@ -5,7 +5,7 @@
 {% block content %}
     {% if not config['DEMO_MODE'] %}
         <div class="toolbar">
-            {{ 'Profile'|manual_link|safe }}
+            {{ 'Profile'|manual_link }}
             <a class="btn btn-outline-primary btn-sm" href="{{ url_for('profile_update') }}">{{ _('edit')|uc_first }}</a>
             <a class="btn btn-outline-primary btn-sm" href="{{ url_for('profile_password') }}">{{ _('change password')|uc_first }}</a>
         </div>

@@ -6,7 +6,7 @@
     <div style="float:left;">
         {% if 'contributor'|is_authorized %}
             <div class="toolbar">
-                {{ 'Place'|manual_link|safe }}
+                {{ 'Place'|manual_link }}
                 <a class="btn btn-outline-primary btn-sm" href="{{ url_for('place_insert') }}">+ {{ _('place')|uc_first }}</a>
             </div>
         {% endif %}

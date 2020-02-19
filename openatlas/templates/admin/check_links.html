@@ -4,7 +4,7 @@
 {% endblock %}
 {% block content %}
     <div class="toolbar">
-        {{ 'Data_integrity'|manual_link|safe }}
+        {{ 'Data_integrity'|manual_link }}
         {{ _('check links')|button(url_for('admin_check_links', check='check')) }}
         {{ _('this could take some time')|uc_first }}
     </div>
