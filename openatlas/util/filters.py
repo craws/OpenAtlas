@@ -291,6 +291,7 @@ def display_form(self: Any,
         errors = ''
         for error in field.errors:
             errors += util.uc_first(error)
+        tooltip = util.display_tooltip(field.description)
         if field.type in ['TreeField', 'TreeMultiField']:
             hierarchy_id = int(field.id)
             node = g.nodes[hierarchy_id]
@@ -308,17 +309,18 @@ def display_form(self: Any,
                         </div>
                     </div>
                     {value_fields}""".format(label=label,
-                                             tooltip=util.display_tooltip(node.description),
+                                             tooltip=tooltip,
                                              value_fields=display_value_type_fields(node.subs))
                 continue
             else:
-                info = '' if 'is_node_form' in form else util.display_tooltip(node.description)
                 type_field = """
                     <div class="table-row">
-                        <div><label>{label}</label> {info}</div>
+                        <div><label>{label}</label> {tooltip}</div>
                         <div class="table-cell">{field}</div>
                     </div>
-                """.format(label=label, field=str(field(class_=class_)) + errors, info=info)
+                """.format(label=label,
+                           field=str(field(class_=class_)) + errors,
+                           tooltip= '' if 'is_node_form' in form else tooltip)
                 if node.name in app.config['BASE_TYPES']:  # base type should be above other fields
                     html['types'] = type_field + html['types']
                 else:
@@ -340,24 +342,27 @@ def display_form(self: Any,
             if field.id == 'begin_year_from':
                 html['footer'] += util.add_dates_to_form(form, for_persons)
             continue
-        field.label.text += util.display_tooltip(field.description)
         errors = ' <span class="error">' + errors + ' </span>' if errors else ''
         if field.id in ('file', 'name'):
             html['header'] += '''
                 <div class="table-row">
-                    <div>{label}</div>
+                    <div>{label} {tooltip}</div>
                     <div class="table-cell">{field} {errors}</div>
-                </div>'''.format(label=field.label, errors=errors, field=field(class_=class_))
+                </div>'''.format(label=field.label,
+                                 errors=errors,
+                                 field=field(class_=class_),
+                                 tooltip=tooltip)
             continue
         if field.id == 'geonames_id':
             precision_field = getattr(form, 'geonames_precision')
             html['main'] += '''
             <div class="table-row">
-                <div>{label}</div>
+                <div>{label} {tooltip}</div>
                 <div class="table-cell">{field}{precision_field}{precision_label} {errors}</div>
             </div>'''.format(label=field.label,
                              errors=errors,
                              field=field(class_=class_),
+                             tooltip=tooltip,
                              precision_field=precision_field,
                              precision_label=precision_field.label)
             continue
@@ -365,11 +370,12 @@ def display_form(self: Any,
             continue  # Is already added with geonames_id field
         html['main'] += '''
             <div class="table-row">
-                <div>{label}</div>
+                <div>{label} {tooltip}</div>
                 <div class="table-cell">{field} {errors}</div>
             </div>'''.format(label=field.label,
                              errors=errors,
-                             field=field(class_=class_).replace('> ', '>'))
+                             field=field(class_=class_).replace('> ', '>'),
+                             tooltip=tooltip)
 
     html_all = '<form method="post"' + id_attribute + ' ' + multipart + '>'
     html_all += '<div class="data-table">'
