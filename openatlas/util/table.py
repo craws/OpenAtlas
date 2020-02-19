@@ -62,8 +62,8 @@ class Table:
             </script>""".format(name=name, data_table=json.dumps(data_table),)
 
         # Toggle header and footer HTML
-        css_header = '#{name}_table_wrapper table thead {{ display:none; }}'.format(name=name)
-        css_toolbar = '#{name}_table_wrapper .fg-toolbar {{ display:none; }}'.format(name=name)
+        css_header = '#{name}_table_wrapper .row:first-of-type {{ display:none; }}'.format(name=name)
+        css_toolbar = '#{name}_table_wrapper .row:last-of-type {{ display:none; }}'.format(name=name)
         html += '<style type="text/css">{header} {toolbar}</style>'.format(
             header=css_header if not self.header else '',
             toolbar=css_toolbar if len(self.rows) <= table_rows else '')
