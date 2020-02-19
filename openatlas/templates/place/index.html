@@ -3,17 +3,19 @@
     {{ [_('place')]|crumb }}
 {% endblock %}
 {% block content %}
-    <div style="float:left;">
-        {% if 'contributor'|is_authorized %}
-            <div class="toolbar">
-                {{ 'Place'|manual_link|safe }}
-                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('place_insert') }}">+ {{ _('place')|uc_first }}</a>
-            </div>
-        {% endif %}
+    <div class="row">
+    <div class="col">
+    {% if 'contributor'|is_authorized %}
+    <div class="toolbar">
+        {{ 'Place'|manual_link|safe }}
+        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('place_insert') }}">+ {{ _('place')|uc_first }}</a>
+    </div>
+    {% endif %}
         {{ table.display()|safe }}
     </div>
     {% if gis_data %}
-        <div id="map" class="map"></div>
-        <script src="/static/js/map/map.js"></script>
+        <div id="map" class="col"></div>
     {% endif %}
+    </div>
+    <script src="/static/js/map/map.js"></script>
 {% endblock %}

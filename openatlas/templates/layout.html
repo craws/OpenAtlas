@@ -179,7 +179,7 @@
     <div id="content" >
         <div style="float:left" class="container-fluid">{% block content %}{% endblock %}</div>
         {% if session['settings']['debug_mode'] and 'admin'|is_authorized %}
-            <div class="data-table" style="float:right;margin:1em;">
+            <div class="data-table" style="float:right;margin:1em; position: absolute; right: 5px; top: 150px;">
                 <p>Debug</p>
                 {{ debug_model|display_debug_info(form)|safe }}
             </div>
