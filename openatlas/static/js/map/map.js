@@ -3,19 +3,74 @@ map = L.map('map', {maxZoom: mapMaxZoom, fullscreenControl: true});
 L.control.scale().addTo(map);
 
 // Icons
-newIcon = L.icon({iconUrl: '/static/images/map/marker-icon_new.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
-editIcon = L.icon({iconUrl: "/static/images/map/marker-icon_edit.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
-editedIcon = L.icon({iconUrl: "/static/images/map/marker-icon_edited.png", iconAnchor: [12, 41], popupAnchor: [0, -34]});
-grayMarker = L.icon({iconUrl: '/static/images/map/marker-icon-gray.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
-superMarker = L.icon({iconUrl: '/static/images/map/marker-icon-cyan.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
-subsMarker = L.icon({iconUrl: '/static/images/map/marker-icon-green.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
-siblingsMarker = L.icon({iconUrl: '/static/images/map/marker-icon-orange.png', iconAnchor: [12, 41], popupAnchor: [0, -34]});
+newIcon = L.icon({
+    iconUrl: '/static/images/map/marker-icon_new.png',
+    iconAnchor: [12, 41],
+    popupAnchor: [0, -34]
+});
+editIcon = L.icon({
+    iconUrl: "/static/images/map/marker-icon_edit.png",
+    iconAnchor: [12, 41],
+    popupAnchor: [0, -34]
+});
+editedIcon = L.icon({
+    iconUrl: "/static/images/map/marker-icon_edited.png",
+    iconAnchor: [12, 41],
+    popupAnchor: [0, -34]
+});
+grayMarker = L.icon({
+    iconUrl: '/static/images/map/marker-icon-gray.png',
+    iconAnchor: [12, 41],
+    popupAnchor: [0, -34]
+});
+superMarker = L.icon({
+    iconUrl: '/static/images/map/marker-icon-orange.png',
+    iconAnchor: [12, 41],
+    popupAnchor: [0, -34]
+});
+subsMarker = L.icon({
+    iconUrl: '/static/images/map/marker-icon-green.png',
+    iconAnchor: [12, 41],
+    popupAnchor: [0, -34]
+});
+siblingsMarker = L.icon({
+    iconUrl: '/static/images/map/marker-icon-gray.png',
+    iconAnchor: [12, 41],
+    popupAnchor: [0, -34]
+});
+
+siblingStyle = {
+    "color": "rgb(111,111,111)",
+    "weight": 1.5,
+    "fillOpacity": 0.5,
+    "radius": 10
+    //"opacity": 0.4
+};
+
+superStyle = {
+    "color": "rgb(255,231,191)",
+    "weight": 1.5,
+    "fillOpacity": 0.5,
+    "radius": 10
+    //"opacity": 0.4
+};
+
+subStyle = {
+    "color": "rgb(39,207,59)",
+    "weight": 1.5,
+    "fillOpacity": 0.5,
+    "radius": 10
+    //"opacity": 0.4
+};
 
 // Define base layers
 baseMaps = {
     Landscape: L.tileLayer('https://{s}.tile.thunderforest.com/landscape/{z}/{x}/{y}.png?apikey=' + thunderforestKey, {attribution: '&copy; <a href="http://www.thunderforest.com">Thunderforest Landscape'}),
     OpenStreetMap: L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'}),
-    GoogleSatellite: L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {subdomains: ['mt0', 'mt1', 'mt2', 'mt3'], attribution: '&copy; Google Maps'}),
+    GoogleSatellite: L.tileLayer('http://{s}.google.com/vt/lyrs=s&x={x}&y={y}&z={z}', {
+        subdomains: ['mt0', 'mt1', 'mt2', 'mt3'],
+        attribution: '&copy; Google Maps'
+    }),
 };
 
 cluster = L.markerClusterGroup({
@@ -24,11 +79,15 @@ cluster = L.markerClusterGroup({
     disableClusteringAtZoom: disableClusteringAtZoom
 });
 
-controls = {}
+
+controls = {};
+UnitControls = {};
+markerControls = {};
+
 if (gisPointAll) {
     pointLayer = new L.GeoJSON(gisPointAll, {
         onEachFeature: setPopup,
-        pointToLayer: function(feature, latlng) {
+        pointToLayer: function (feature, latlng) {
             if (window.location.pathname == '/place') {
                 return L.marker(latlng);
             }
@@ -37,64 +96,32 @@ if (gisPointAll) {
     });
 }
 
-if (gisPointSupers) {
-    pointSupersLayer = new L.GeoJSON(gisPointSupers, {
-        onEachFeature: setPopup,
-        pointToLayer: function(feature, latlng) {
-            return L.marker(latlng, {icon: superMarker});
-        }
-    });
-    map.addLayer(pointSupersLayer);
-}
 
-if (gisPointSubs) {
-    pointSubsLayer = new L.GeoJSON(gisPointSubs, {
-        onEachFeature: setPopup,
-        pointToLayer: function(feature, latlng) {
-            return L.marker(latlng, {icon: subsMarker});
-        }
-    });
-    map.addLayer(pointSubsLayer);
-}
+cluster.addLayer(pointLayer);
+map.addLayer(cluster);
+markerControls.Cluster = cluster;
+//map.addLayer(pointLayer);
+markerControls.Markers = pointLayer;
 
-if (gisPointSupers) {
-    pointSupersLayer = new L.GeoJSON(gisPointSupers, {
-        onEachFeature: setPopup,
-        pointToLayer: function(feature, latlng) {
-            return L.marker(latlng, {icon: superMarker});
-        }
-    });
-    map.addLayer(pointSupersLayer);
-}
-
-if (gisPointSibling) {
-    pointSiblingsLayer = new L.GeoJSON(gisPointSibling, {
-        onEachFeature: setPopup,
-        pointToLayer: function(feature, latlng) {
-            return L.marker(latlng, {icon: siblingsMarker});
-        }
-    });
-    map.addLayer(pointSiblingsLayer);
-}
-
-if (useCluster) {
-    cluster.addLayer(pointLayer);
-    map.addLayer(cluster);
-    controls.Points = cluster;
-} else {
-    map.addLayer(pointLayer);
-    controls.Points = pointLayer;
-}
 
 if (gisPolygonAll) {
-    polygonLayer = new L.GeoJSON(gisPolygonAll, {onEachFeature: setPopup, style: {color: '#9A9A9A'}});
+    polygonLayer = new L.GeoJSON(gisPolygonAll, {
+        onEachFeature: setPopup,
+        style: {color: '#9A9A9A'}
+    });
     controls.Polygons = polygonLayer;
 }
 
 if (gisLineAll) {
-    linestringLayer = new L.GeoJSON(gisLineAll, {onEachFeature: setPopup, style: {color: '#9A9A9A'}});
+    linestringLayer = new L.GeoJSON(gisLineAll, {
+        onEachFeature: setPopup,
+        style: {color: '#9A9A9A'}
+    });
     controls.Linestrings = linestringLayer;
 }
+
+setGeometries(gisPointSupers, 'super');
+setGeometries(gisPointSibling, 'sibling');
 
 if (gisPointSelected != '') {
     gisPoints = L.geoJson(gisPointSelected, {onEachFeature: setPopup}).addTo(map);
@@ -111,10 +138,106 @@ if (gisLineSelected != '') {
     gisLines.on('click', setObjectId);
 }
 
+setGeometries(gisPointSubs, 'subs')
+
+function setGeometries(data, level) {
+
+    switch (level) {
+        case 'super':
+            var iconLevel = superMarker;
+            var styleLevel = superStyle;
+            break;
+        case 'sibling':
+            var iconLevel = siblingsMarker;
+            var styleLevel = siblingStyle;
+            break;
+        default:
+            var iconLevel = subsMarker;
+            var styleLevel = subStyle;
+            break;
+    }
+
+    if (data && data.length > 0) {
+        //get points from GeoJSON
+        var pointLayer = new L.GeoJSON(data, {
+            filter: pointFilter,
+            onEachFeature: setPopup,
+            pointToLayer: function (feature, latlng) {
+                return L.marker(latlng, {icon: iconLevel});
+            },
+        });
+
+        //get polygons from GeoJSON
+        var polyLayer = new L.GeoJSON(data, {
+            filter: polygonFilter,
+            style: styleLevel,
+            onEachFeature: setPopup,
+        });
+
+        //get linestrings from GeoJSON
+        var lineLayer = new L.GeoJSON(data, {
+            filter: lineFilter,
+            style: styleLevel,
+            onEachFeature: setPopup,
+        });
+
+        switch (level) {
+            case 'super':
+                if (pointLayer.getLayers().length > 0) {
+                    pointSupersLayer = pointLayer;
+                    UnitControls.SuperPoints = pointSupersLayer;
+                }
+                if (polyLayer.getLayers().length > 0) {
+                    polySupersLayer = polyLayer;
+                    UnitControls.SuperPolys = polySupersLayer;
+                    map.addLayer(polySupersLayer);
+                }
+                if (lineLayer.getLayers().length > 0) {
+                    lineSupersLayer = lineLayer;
+                    UnitControls.SuperLines = lineSupersLayer;
+                    map.addLayer(polySupersLayer);
+                }
+                break;
+            case 'sibling':
+                if (pointLayer.getLayers().length > 0) {
+                    pointSiblingsLayer = pointLayer;
+                    UnitControls.SiblingPoints = pointSiblingsLayer;
+                }
+                if (polyLayer.getLayers().length > 0) {
+                    polySiblingsLayer = polyLayer;
+                    UnitControls.SiblingPolys = polySiblingsLayer;
+                    map.addLayer(polySiblingsLayer);
+                }
+                if (lineLayer.getLayers().length > 0) {
+                    lineSiblingsLayer = lineLayer;
+                    UnitControls.SiblingLines = lineSiblingsLayer;
+                    map.addLayer(lineSiblingsLayer);
+                }
+                break;
+            default:
+                if (pointLayer.getLayers().length > 0) {
+                    pointSubsLayer = pointLayer;
+                    UnitControls.SubsPoints = pointSubsLayer;
+                }
+                if (polyLayer.getLayers().length > 0) {
+                    polySubsLayer = polyLayer;
+                    UnitControls.SubsPolys = polySubsLayer;
+                    map.addLayer(polySubsLayer);
+                }
+                if (lineLayer.getLayers().length > 0) {
+                    lineSubsLayer = lineLayer;
+                    UnitControls.SubsLines = lineSubsLayer;
+                    map.addLayer(polySubsLayer);
+                }
+                break;
+        }
+    }
+}
+
 // Overlay maps
-for (i=0; i < overlays.length; i++) {
+for (i = 0; i < overlays.length; i++) {
     overlay = L.imageOverlay('/display/' + overlays[i].image, overlays[i].boundingBox)
-    controls[overlays[i].name] = overlay;
+    UnitControls[overlays[i].name] = overlay;
     overlay.addTo(map)
 }
 
@@ -133,11 +256,27 @@ if (gisPointSupers != '') allSelected.push(pointSupersLayer);
 if (gisPointSubs != '') allSelected.push(pointSubsLayer);
 if (gisPointSibling != '') allSelected.push(pointSiblingsLayer);
 
-if (allSelected.length > 0) map.fitBounds(L.featureGroup(allSelected).getBounds(), {maxZoom: 12});
-else if(gisPointAll.length > 0) map.fitBounds(pointLayer.getBounds(), {maxZoom: 12});
+if (allSelected.length > 0) map.fitBounds(L.featureGroup(allSelected).getBounds(), {maxZoom: 18});
+else if (gisPointAll.length > 0) map.fitBounds(pointLayer.getBounds(), {maxZoom: 12});
 else map.setView([30, 0], 2);
 
-L.control.layers(baseMaps, controls).addTo(map);
+//todo: on add overlay place markers - check if markers count is too high. if yes: alert user that this may decrease performance
+groupedOverlays = {
+    "Places": markerControls,
+    "General": controls,
+    "Subunits": UnitControls
+};
+
+
+var GroupOptions = {
+    exclusiveGroups: ["Places"],
+    groupCheckboxes: true
+};
+
+
+L.control.groupedLayers(baseMaps, groupedOverlays, GroupOptions).addTo(map);
+//L.control.layers(baseMaps, controls).addTo(map);
+
 baseMaps.Landscape.addTo(map);
 
 var geoSearchControl = L.control.geonames({
@@ -164,7 +303,7 @@ var geoSearchControl = L.control.geonames({
     placeholder: translate['map_geonames_placeholder'] // Search input placeholder text.
 });
 
-geoSearchControl.on('select', function(e){
+geoSearchControl.on('select', function (e) {
     if (geoNamesModule) {
         var popup = `<div>
                   <a href='https://www.geonames.org/${e.geoname.geonameId}' target='_blank'>${e.geoname.name}</a><br>
@@ -196,7 +335,7 @@ function setObjectId(e) {
     editMarker = e.marker;
 }
 
-function buildPopup(feature, action='view', selected=false) {
+function buildPopup(feature, action = 'view', selected = false) {
     popupHtml = '<div id="popup">'
     if (feature.properties.objectName) {
         popupHtml += '<strong>' + feature.properties.objectName + '</strong><br>';
@@ -248,4 +387,22 @@ function setPopup(feature, layer, mode) {
         }
     }
     layer.bindPopup(buildPopup(feature, 'view', selected));
+}
+
+//filter to get polygons from the geojson
+function polygonFilter(feature) {
+    if (feature.geometry.type === "Polygon")
+        return true
+}
+
+//filter to get points from the geojson
+function pointFilter(feature) {
+    if (feature.geometry.type === "Point")
+        return true
+}
+
+//filter to get linestrings from the geojson
+function lineFilter(feature) {
+    if (feature.geometry.type === "Linestring")
+        return true
 }
