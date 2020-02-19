@@ -136,7 +136,7 @@ class Api:
         if Api.get_file(entity):
             features['depictions'] = Api.get_file(entity)
 
-        # Timespans
+        # Time spans
         if entity.begin_from or entity.begin_to or entity.end_from or entity.end_to:
             features['when'] = {'timespans': [{
                 'start': {'earliest': format_date(entity.begin_from) if entity.begin_from else None,

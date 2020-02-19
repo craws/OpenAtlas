@@ -13,7 +13,7 @@ def api_entity(id_: int) -> Response:
 
 @app.route('/api/0.1')
 @required_group('readonly')
-def api_get_multiple_entities():
+def api_get_multiple_entities():  # pragma: no cover
     entity = request.args.getlist('entity')
     return Response(json.dumps(Api.get_entities_by_id(ids=entity)), mimetype='application/ld+json')
 
