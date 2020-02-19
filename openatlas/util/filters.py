@@ -39,13 +39,16 @@ def api_link(self: Any, entity: Entity) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def button(self: Any, label: str, url: str, css: Optional[str] = 'primary') -> str:
-    classes = {'primary': 'btn btn-outline-primary btn-sm'}
+    """
+    :param css: is used to choose from config['CSS']['button']
+    """
     label = util.uc_first(label)
     if '/insert/' in url and label != util.uc_first(_('add')):
         label = '+ ' + label
-    html = '<a class="{class_}" href="{url}">{label}</a>'.format(class_=classes[css],
-                                                                 url=url,
-                                                                 label=label)
+    html = '<a class="{class_}" href="{url}">{label}</a>'.format(
+        class_=app.config['CSS']['button'][css],
+        url=url,
+        label=label)
     return Markup(html)
 
 
@@ -336,7 +339,7 @@ def display_form(self: Any,
                                                                  text=field(class_=class_))
             continue
         if field.type == 'SubmitField':
-            html['footer'] += str(field(class_='btn btn-outline-primary btn-sm'))
+            html['footer'] += str(field(class_=app.config['CSS']['button']['primary']))
             continue
         if field.id.split('_', 1)[0] in ('begin', 'end'):  # If it's a date field use a function
             if field.id == 'begin_year_from':
