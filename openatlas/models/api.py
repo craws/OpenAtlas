@@ -112,23 +112,24 @@ class Api:
 
         # Todo: Make it flexible
         # Timespans
-        if type_ == 'PlaceCollection' or type_ == 'ActorCollection' or type_ == 'EventCollection' \
-                or type_ == 'FeatureCollection':
+        if entity.begin_from or entity.begin_to or entity.end_from or entity.end_to:
             features['when'] = {'timespans': [{
-                'start': {'earliest': format_date(entity.begin_from),
-                          'latest': format_date(entity.begin_to),
-                          'comment': entity.begin_comment},
-                'end': {'earliest': format_date(entity.end_from),
-                        'latest': format_date(entity.end_to),
-                        'comment': entity.end_comment}}]}
+                'start': {'earliest': format_date(entity.begin_from) if entity.begin_from else None,
+                          'latest': format_date(entity.begin_to) if entity.begin_to else None,
+                          'comment': entity.begin_comment if entity.begin_comment else None},
+                'end': {'earliest': format_date(entity.end_from) if entity.end_from else None,
+                        'latest': format_date(entity.end_to)if entity.end_to else None,
+                        'comment': entity.end_comment if entity.end_comment else None}}]}
 
         # Geometry and Geonames
-        if type_ == 'FeatureCollection':
-            if geo:
-                link_type = geo.type.name if geo else ''
-                identifier = app.config['GEONAMES_VIEW_URL'] + geo.domain.name if geo else ''
-                features['links'] = [{'type': link_type, 'identifier': identifier}]
 
+        if geo:
+            geo_type = geo.type.name.split(' ')
+            link_type = geo_type[0] + ''.join(x.title() for x in geo_type[1:]) if geo else ''
+            identifier = app.config['GEONAMES_VIEW_URL'] + geo.domain.name if geo else ''
+            features['links'] = [{'type': link_type, 'identifier': identifier}]
+
+        if type_ == "FeatureCollection":
             if Gis.get_by_id(entity.location.id):
                 geometries = []
                 for geo in Gis.get_by_id(entity.location.id):
