@@ -406,6 +406,10 @@ div.data-table > div > div {
     width: inherit;
 }
 
+.dt-body-right  {
+    text-align: right;
+}
+
 form div.table-row div {
     text-align: right;
     vertical-align: top;
