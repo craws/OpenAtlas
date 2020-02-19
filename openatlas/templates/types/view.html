@@ -35,6 +35,7 @@
         {% else %}
             {{ node|description|safe }}
         {% endif %}
+        {{ node|api_link|safe }}
     </div>
     {% if tables['subs'].rows %}
         <div id="tab-subs">

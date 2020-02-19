@@ -32,6 +32,12 @@ def link(self: Any, entity: Entity) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
+def api_link(self: Any, entity: Entity) -> str:
+    return '<p><a href="{url}" target="_blank">API</a></p>'.format(url=url_for('api_entity', id_=entity.id))
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
 def button(self: Any, label: str, url: str, css: Optional[str] = 'primary') -> str:
     classes = {'primary': 'btn btn-outline-primary btn-sm'}
     label = util.uc_first(label)
@@ -41,7 +47,6 @@ def button(self: Any, label: str, url: str, css: Optional[str] = 'primary') -> s
                                                                  url=url,
                                                                  label=label)
     return Markup(html)
-
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()

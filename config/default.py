@@ -10,7 +10,7 @@ DEMO_MODE = False  # If in demo mode some options are disabled and the login for
 IS_UNIT_TEST = False
 
 LANGUAGES = {'en': 'English', 'de': 'Deutsch'}
-DEBUG = False
+DEBUG = True
 
 DATABASE_NAME = 'openatlas'
 DATABASE_USER = 'openatlas'
@@ -41,6 +41,9 @@ MAX_ZOOM = 18  # Can be overridden by users in their profile
 GEONAMES_USERNAME = 'openatlas'
 GEONAMES_VIEW_URL = 'http://www.geonames.org/'
 THUNDERFOREST_KEY = '7878b4fb224f4902ab42fc846e92b96a'
+
+# API
+API_SCHEMA = 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.jsonld'
 
 # Table options
 DEFAULT_TABLE_ROWS = {10: '10', 25: '25', 50: '50', 100: '100'}

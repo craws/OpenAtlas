@@ -1,5 +1,5 @@
 import ast
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from flask import g, json
 from flask_wtf import FlaskForm
