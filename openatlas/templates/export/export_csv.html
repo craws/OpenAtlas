@@ -6,7 +6,7 @@
     {% if writeable %}
         <div style="float:left;margin-right: 1em;">
             {{ 'Export'|manual_link|safe }}
-            {{ form|display_form|safe }}
+            {{ form|display_form }}
         </div>
     {% else %}
         <p><span class="error">{{ _('directory not writable')|uc_first }}: export/csv</span></p>

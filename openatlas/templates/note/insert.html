@@ -3,5 +3,5 @@
     {{ [[_(entity.view_name), entity.view_name + '_index'], entity, '+ ' + _('note').capitalize()]|crumb }}
 {% endblock %}
 {% block content %}
-    {{ form|display_form|safe }}
+    {{ form|display_form }}
 {% endblock %}

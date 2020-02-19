@@ -397,7 +397,7 @@ def display_form(self: Any,
         html['value_types'] = values_html + html['value_types']
     html_all += html['header'] + html['types'] + html['main'] + html['value_types'] + html['footer']
     html_all += '</div></form>'
-    return html_all
+    return Markup(html_all)
 
 
 @jinja2.contextfilter

@@ -3,6 +3,6 @@
     {{ [[_('admin'), 'admin_index'], [_('user'), 'user_index'], _('activity')]|crumb }}
 {% endblock %}
 {% block content %}
-    {{ form|display_form|safe }}
+    {{ form|display_form }}
     {{ table.display()|safe }}
 {% endblock %}

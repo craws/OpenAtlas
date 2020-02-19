@@ -12,5 +12,5 @@
             <a class="btn btn-outline-primary btn-sm" href="{{ url_for('event_update', id_=event.id) }}">{{ _('reload')|uc_first }}</a>
         </p>
     {% endif %}
-    {{ form|display_form|safe }}
+    {{ form|display_form }}
 {% endblock %}

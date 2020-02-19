@@ -7,7 +7,7 @@
         {{ 'Export'|manual_link|safe }}
     </div>
     {% if writeable %}
-        {{ form|display_form|safe }}
+        {{ form|display_form }}
     {% else %}
         <p><span class="error">{{ _('directory not writable')|uc_first }}: export/sql</span></p>
     {% endif %}

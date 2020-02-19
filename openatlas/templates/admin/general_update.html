@@ -6,7 +6,7 @@
     <div class="toolbar">
         {{ 'General'|manual_link|safe }}
     </div>
-    {{ form|display_form|safe }}
+    {{ form|display_form }}
     {% for field, errors in form.errors.items() %}
         {{ form[field].label }}: {{ ', '.join(errors) }}
     {% endfor %}

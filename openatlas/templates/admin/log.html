@@ -7,6 +7,6 @@
         <a class="btn btn-outline-primary btn-sm" onclick="return confirm('{{_('delete all logs?')|uc_first }}')"
             href="{{ url_for('admin_log_delete') }}">{{ _('delete all')|uc_first }}</a>
     </div>
-    {{ form|display_form|safe }}
+    {{ form|display_form }}
     {{ table.display()|safe }}
 {% endblock %}
