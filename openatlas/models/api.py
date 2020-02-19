@@ -77,11 +77,14 @@ class Api:
                                 'E8': 'EventCollection',
                                 'E9': 'EventCollection',
                                 'E18': 'FeatureCollection',
+                                'E21': 'FindCollection',
                                 'E21': 'ActorCollection',
+                                'E22': 'FindCollection',
                                 'E31': 'DocumentCollection',
                                 'E33': 'SourceCollection',
                                 'E40': 'ActorCollection',
                                 'E53': 'PlaceCollection',
+                                'E55': 'TypeCollection',
                                 'E74': 'ActorCollection',
                                 'E84': 'ObjectCollection'}
 

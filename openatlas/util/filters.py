@@ -416,7 +416,7 @@ def display_menu(self: Any, entity: Optional[Entity]) -> str:
     html = ''
     if current_user.is_authenticated:
         items = ['overview', 'source', 'event', 'actor', 'place', 'reference', 'object', 'types',
-                 'admin', 'api']
+                 'admin']
         if request.path.startswith('/entity'):
             try:
                 entity = Entity.get_by_id(request.path.split('/')[-1])
