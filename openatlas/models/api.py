@@ -19,14 +19,16 @@ class Api:
         for link in Link.get_links(entity.id):
             links.append({'label': link.range.name,
                           'relationTo': url_for('api_entity', id_=link.range.id, _external=True),
-                          'relationType': 'crm:' + link.property.code + '_' + link.property.i18n['en'].replace(' ', '_')}, )
+                          'relationType': 'crm:' + link.property.code + '_' + link.property.i18n['en'].replace(' ',
+                                                                                                               '_')}, )
             if link.property.code == 'P53':
                 entity.location = link.range
 
         for link in Link.get_links(entity.id, inverse=True):
             links.append({'label': link.domain.name,
                           'relationTo': url_for('api_entity', id_=link.domain.id, _external=True),
-                          'relationType': 'crm:' + link.property.code + '_' + link.property.i18n['en'].replace(' ', '_')}, )
+                          'relationType': 'crm:' + link.property.code + '_' + link.property.i18n['en'].replace(' ',
+                                                                                                               '_')}, )
 
         return links
 
@@ -122,10 +124,12 @@ class Api:
             features['when'] = {'timespans': [{
                 'start': {'earliest': format_date(entity.begin_from) if entity.begin_from else None,
                           'latest': format_date(entity.begin_to) if entity.begin_to else None,
-                          'comment': entity.begin_comment if entity.begin_comment else None},
+                          'comment': entity.begin_comment if entity.begin_comment else None}
+                if entity.begin_from or entity.begin_to else None,
                 'end': {'earliest': format_date(entity.end_from) if entity.end_from else None,
-                        'latest': format_date(entity.end_to)if entity.end_to else None,
-                        'comment': entity.end_comment if entity.end_comment else None}}]}
+                        'latest': format_date(entity.end_to) if entity.end_to else None,
+                        'comment': entity.end_comment if entity.end_comment else None}
+                if entity.end_from or entity.end_to else None}]}
 
         # Geometry and Geonames
         if type_ == 'FeatureCollection':
