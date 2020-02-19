@@ -105,8 +105,13 @@ div.pager {
     display:none;
 }
 
-.more-content span {
-    display: none;
+.more {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 10;
+    -webkit-box-orient: vertical;
 }
 
 .more-link {
@@ -120,6 +125,13 @@ div.pager {
 
 .jstree li > a > .jstree-icon {
     display: none;
+}
+
+.jstree li > a {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 300px;
 }
 
 a {
@@ -412,6 +424,14 @@ form div.table-row div.table-cell div {
     margin-top: 0.3em;
 }
 
+table td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 400px;
+}
+
+/*forms*/
 label.error {
     padding-left: 0.5em;
 }
@@ -553,3 +573,5 @@ div.data-table div.display-none {
 .toolbar {
     margin-bottom: 5px;
 }
+
+/*datatables

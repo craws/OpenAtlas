@@ -99,25 +99,22 @@ $(document).ready(function() {
     var ellipsesText = "...";
     $('.more').each(function() {
         var content = $(this).html();
-        if (content.length > showChar) {
-            var c = content.substr(0, showChar);
-            var h = content.substr(showChar, content.length - showChar);
-            var html = c + '<span class="more-ellipses">' + ellipsesText + '</span>'
-            html += '<span class="more-content"><span>' + h + '</span>'
-            html += '<a href="" class="more-link">' + moreText + '</a></span>';
-            $(this).html(html);
+        lines =  content.split(/<br>/).length;
+        if (lines > 10) {
+            more = '<a href="" class="more-link">' + moreText + '</a></span>';
+            $(more).insertAfter(this);
         }
     });
     $(".more-link").click(function(){
         if($(this).hasClass("less")) {
             $(this).removeClass("less");
             $(this).html(moreText);
+            $(this).prev().css('-webkit-line-clamp', "10");
         } else {
             $(this).addClass("less");
             $(this).html(lessText);
+            $(this).prev().css('-webkit-line-clamp', "1000");
         }
-        $(this).parent().prev().toggle();
-        $(this).prev().toggle();
         return false;
     });
 });
@@ -260,4 +257,15 @@ function openParentTab() {
             }
         }
     }
+}
+
+function overflow() {
+    setTimeout(() => {
+        $('td').bind('mouseenter', function(){
+            var $this = $(this);
+            if(this.offsetWidth < this.scrollWidth){
+                $this.attr('title', $this.text());
+            }
+        });
+    }, 0);
 }
