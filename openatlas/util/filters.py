@@ -292,7 +292,7 @@ def display_form(self: Any,
         errors = ''
         for error in field.errors:
             errors += util.uc_first(error)
-        tooltip = util.display_tooltip(field.description)
+
         if field.type in ['TreeField', 'TreeMultiField']:
             hierarchy_id = int(field.id)
             node = g.nodes[hierarchy_id]
@@ -310,18 +310,17 @@ def display_form(self: Any,
                         </div>
                     </div>
                     {value_fields}""".format(label=label,
-                                             tooltip=tooltip,
+                                             tooltip=util.display_tooltip(node.description),
                                              value_fields=display_value_type_fields(node.subs))
                 continue
             else:
+                tooltip = '' if 'is_node_form' in form else util.display_tooltip(node.description)
                 type_field = """
                     <div class="table-row">
                         <div><label>{label}</label> {tooltip}</div>
                         <div class="table-cell">{field}</div>
                     </div>
-                """.format(label=label,
-                           field=str(field(class_=class_)) + errors,
-                           tooltip= '' if 'is_node_form' in form else tooltip)
+                """.format(label=label, field=str(field(class_=class_)) + errors, tooltip=tooltip)
                 if node.name in app.config['BASE_TYPES']:  # base type should be above other fields
                     html['types'] = type_field + html['types']
                 else:
@@ -344,6 +343,7 @@ def display_form(self: Any,
                 html['footer'] += util.add_dates_to_form(form, for_persons)
             continue
         errors = ' <span class="error">' + errors + ' </span>' if errors else ''
+        tooltip = util.display_tooltip(field.description)
         if field.id in ('file', 'name'):
             html['header'] += '''
                 <div class="table-row">
