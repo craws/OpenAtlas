@@ -20,14 +20,14 @@
     <div id="tab-info">
         <div class="toolbar">
             {% if 'contributor'|is_authorized %}
-                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('file_update', id_=entity.id) }}">{{ _('edit')|uc_first }}</a>
+                {{ _('edit')|button(url_for('file_update', id_=entity.id)) }}
                 {{ entity|display_delete_link }}
             {% endif %}
             {{ entity.id|bookmark_toggle }}
             {% if missing_file %}
                 <span class="error">{{ _('missing file')|uc_first }}!</span>
             {% else %}
-                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('download_file', filename=filename) }}">{{ _('download')|uc_first }}</a>
+                {{ _('download')|button(url_for('download_file', filename=filename)) }}
             {% endif %}
         </div>
         <h1>{{ entity.name }}</h1>
@@ -52,8 +52,8 @@
     <div id="tab-source">
         {% if 'contributor'|is_authorized %}
         <div class="toolbar">
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('file_add', id_=entity.id, class_name='source')}}">{{ _('add')|uc_first }}</a>
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('source_insert', origin_id=entity.id) }}">+ {{ _('source')|uc_first }}</a>
+            {{ _('add')|button(url_for('file_add', id_=entity.id, class_name='source')) }}
+            {{ _('source')|button(url_for('source_insert', origin_id=entity.id)) }}
         </div>
         {% endif %}
         {{ tables['source'].display('source')|safe }}
@@ -63,12 +63,12 @@
             <div id="tab-{{name}}">
                 {% if 'contributor'|is_authorized and name not in ['feature', 'stratigraphic-unit', 'find'] %}
                     <div class="toolbar">
-                        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('file_add', id_=entity.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
+                        {{ _('add')|button(url_for('file_add', id_=entity.id, class_name=name)) }}
                         {% if name == 'place' %}
-                            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('place_insert', origin_id=entity.id) }}">+ {{ _('place')|uc_first }}</a>
+                            {{ _('place')|button(url_for('place_insert', origin_id=entity.id)) }}
                         {% else %}
                             {% for code in config['CLASS_CODES'][name]%}
-                                <a class="btn btn-outline-primary btn-sm" href="{{ url_for(name + '_insert', code=code, origin_id=entity.id) }}">+ {{ code|get_class_name }}</a>
+                                {{ code|get_class_name|button(url_for(name + '_insert', code=code, origin_id=entity.id)) }}
                             {% endfor %}
                         {% endif %}
                     </div>
@@ -80,9 +80,9 @@
     <div id="tab-reference">
         {% if 'contributor'|is_authorized %}
             <div class="toolbar">
-                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('file_add_reference', id_=entity.id)}}">{{ _('add')|uc_first }}</a>
-                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('reference_insert', code='bibliography', origin_id=entity.id) }}">+ {{ _('bibliography')|uc_first }}</a>
-                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('reference_insert', code='edition', origin_id=entity.id) }}">+ {{ _('edition')|uc_first }}</a>
+                {{ _('add')|button(url_for('file_add_reference', id_=entity.id)) }}
+                {{ _('bibliography')|button(url_for('reference_insert', code='bibliography', origin_id=entity.id)) }}
+                {{ _('edition')|button(url_for('reference_insert', code='edition', origin_id=entity.id)) }}
             </div>
         {% endif %}
         {{ tables['reference'].display('reference')|safe }}

@@ -5,7 +5,7 @@
 {% block content %}
     {% if 'contributor'|is_authorized %}
         <div class="toolbar">
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('file_insert') }}">+ {{ _('file')|uc_first }}</a>
+            {{ _('file')|button(url_for('file_insert')) }}
         </div>
     {% endif %}
     {{ _('total disk space')|uc_first }} <strong>{{ disk_space_values.total }}</strong> -
