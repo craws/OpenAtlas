@@ -357,12 +357,12 @@ def required_group(group: str):  # type: ignore
 def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
     label = uc_first(_('bookmark remove') if entity_id in current_user.bookmarks else _('bookmark'))
     if for_table:
-        return """<span class="btn btn-outline-primary btn-sm" id="bookmark{entity_id}"
-            onclick="ajaxBookmark('{entity_id}');" style="cursor:pointer;">{label}</a>
-            """.format(entity_id=entity_id, label=label)
-    return """<span class="btn btn-outline-primary btn-sm" id="bookmark{entity_id}"
-        onclick="ajaxBookmark('{entity_id}');" type="button">{label}</span>
-        """.format(entity_id=entity_id, label=label)
+        return """<a href='#' id="bookmark{id}" onclick="ajaxBookmark('{id}');">{label}
+            </a>""".format(id=entity_id, label=label)
+    return """<span class="{class_}" id="bookmark{id}" onclick="ajaxBookmark('{id}');">
+        {label}</span>""".format(id=entity_id,
+                                 label=label,
+                                 class_=app.config['CSS']['button']['primary'])
 
 
 def is_authorized(group: str) -> bool:

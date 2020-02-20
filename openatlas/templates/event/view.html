@@ -21,7 +21,7 @@
     <div id="tab-info">
         <div class="toolbar">
             {% if 'contributor'|is_authorized %}
-                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('event_update', id_=event.id) }}">{{ _('edit')|uc_first }}</a>
+                {{ _('edit')|button(url_for('event_update', id_=event.id)) }}
                 {{ event|display_delete_link|safe }}
             {% endif %}
             {{ event.id|bookmark_toggle|safe }}
@@ -59,8 +59,8 @@
     <div id="tab-source">
         {% if 'contributor'|is_authorized %}
             <div class="toolbar">
-                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('event_add_source', id_=event.id)}}">{{ _('add')|uc_first }}</a>
-                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('source_insert', origin_id=event.id) }}">+ {{ _('source')|uc_first }}</a>
+                {{ _('add')|button(url_for('event_add_source', id_=event.id)) }}
+                {{ _('source')|button(url_for('source_insert', origin_id=event.id)) }}
             </div>
         {% endif %}
         {{ tables['source'].display('source')|safe }}
@@ -68,9 +68,9 @@
     <div id="tab-actor">
         {% if 'contributor'|is_authorized %}
         <div class="toolbar">
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('involvement_insert', origin_id=event.id)}}">{{ _('add')|uc_first }}</a>
+            {{ _('add')|button(url_for('involvement_insert', origin_id=event.id)) }}
             {% for code in config['CLASS_CODES']['actor'] %}
-                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('actor_insert', code=code, origin_id=event.id) }}">+ {{ code|get_class_name }}</a>
+                {{ code|get_class_name|button(url_for('actor_insert', code=code, origin_id=event.id)) }}
             {% endfor %}
         </div>
         {% endif %}
@@ -79,10 +79,10 @@
     <div id="tab-reference">
         {% if 'contributor'|is_authorized %}
         <div class="toolbar">
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('event_add_reference', id_=event.id)}}">{{ _('add')|uc_first }}</a>
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('reference_insert', code='bibliography', origin_id=event.id) }}">+ {{ _('bibliography')|uc_first }}</a>
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('reference_insert', code='edition', origin_id=event.id) }}">+ {{ _('edition')|uc_first }}</a>
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('reference_insert', code='external_reference', origin_id=event.id) }}">+ {{ _('external reference')|uc_first }}</a>
+            {{ _('add')|button(url_for('event_add_reference', id_=event.id)) }}
+            {{ _('bibliography')|button(url_for('reference_insert', code='bibliography', origin_id=event.id)) }}
+            {{ _('edition')|button(url_for('reference_insert', code='edition', origin_id=event.id)) }}
+            {{ _('external reference')|button(url_for('reference_insert', code='external_reference', origin_id=event.id)) }}
         </div>
         {% endif %}
         {{ tables['reference'].display('reference')|safe }}
@@ -90,8 +90,8 @@
     <div id="tab-file">
         {% if 'contributor'|is_authorized %}
         <div class="toolbar">
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('event_add_file', id_=event.id)}}">{{ _('add')|uc_first }}</a>
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('file_insert', origin_id=event.id) }}">+ {{ _('file')|uc_first }}</a>
+            {{ _('add')|button(url_for('event_add_file', id_=event.id)) }}
+            {{ _('file')|button(url_for('file_insert', origin_id=event.id)) }}
         </div>
         {% endif %}
         {{ tables['file'].display('file')|safe }}
