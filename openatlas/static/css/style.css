@@ -435,6 +435,11 @@ table td {
     max-width: 400px;
 }
 
+select[name="table_table_length"] {
+    padding-top: initial;
+    padding-bottom: initial;
+}
+
 /*forms*/
 label.error {
     padding-left: 0.5em;
