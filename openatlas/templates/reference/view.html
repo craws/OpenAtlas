@@ -28,12 +28,12 @@
         </div>
         <h1>{{ reference.name }}</h1>
         <div>
-            {{ profile_image_id|display_profile_image|safe }}
+            {{ profile_image_id|display_profile_image }}
             <div style="float:left;">
-                {{ info|display_info|safe }}
-                {{ reference|note|safe }}
-                {{ reference|description|safe }}
-                {{ reference|api_link|safe }}
+                {{ info|display_info }}
+                {{ reference|note }}
+                {{ reference|description }}
+                {{ reference|api_link }}
             </div>
             <div style="clear:both;"></div>
         </div>

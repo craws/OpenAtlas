@@ -30,13 +30,13 @@
         </div>
         <h1>{{ actor.name }}</h1>
         <div>
-            {{ profile_image_id|display_profile_image|safe }}
+            {{ profile_image_id|display_profile_image }}
             <div style="float:left;">
-                {{ info|display_info|safe }}
-                {{ actor|note|safe }}
-                {{ actor|display_external_references|safe }}
-                {{ actor|description|safe }}
-                {{ actor|api_link|safe }}
+                {{ info|display_info }}
+                {{ actor|note }}
+                {{ actor|display_external_references }}
+                {{ actor|description }}
+                {{ actor|api_link }}
             </div>
             <div style="clear:both;"></div>
         </div>

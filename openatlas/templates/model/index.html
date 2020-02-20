@@ -24,7 +24,7 @@
                 (form.property.label, form.property|string + 'property'|table_select_model(property)),
                 (form.range.label, form.range|string + 'range'|table_select_model(range)),
             ] %}
-            {{ data|display_info|safe }}
+            {{ data|display_info }}
             <input type="submit" value="{{ _('test')|uc_first }}">
         </form>
         {% if test_result %}

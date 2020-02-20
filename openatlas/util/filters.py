@@ -33,8 +33,8 @@ def link(self: Any, entity: Entity) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def api_link(self: Any, entity: Entity) -> str:
-    return '<p><a href="{url}" target="_blank">API</a></p>'.format(
-        url=url_for('api_entity', id_=entity.id))
+    return Markup('<p><a href="{url}" target="_blank">API</a></p>'.format(
+        url=url_for('api_entity', id_=entity.id)))
 
 
 @jinja2.contextfilter
@@ -79,14 +79,16 @@ def note(self: Any, entity: Entity) -> str:
     if not current_user.settings['module_notes'] or not util.is_authorized('contributor'):
         return ''  # pragma no cover
     if not entity.note:
-        return '<p><a href="{url}">{label}</a></p>'.format(
+        html = '<p><a href="{url}">{label}</a></p>'.format(
             url=url_for('note_insert', entity_id=entity.id),
             label=util.uc_first(_('note')))
-    return '<h2>{label}</h2><p>{note}</p><a href="{url}">{edit}</a>'.format(
-        label=util.uc_first(_('note')),
-        note=entity.note,
-        url=url_for('note_update', entity_id=entity.id),
-        edit=util.uc_first(_('edit note')))
+    else:
+        html = '<h2>{label}</h2><p>{note}</p><a href="{url}">{edit}</a>'.format(
+            label=util.uc_first(_('note')),
+            note=entity.note,
+            url=url_for('note_update', entity_id=entity.id),
+            edit=util.uc_first(_('edit note')))
+    return Markup(html)
 
 
 @jinja2.contextfilter
@@ -130,7 +132,7 @@ def display_info(self: Any, data: Dict[str, str]) -> str:
                     <div>{key}</div>
                     <div class="table-cell">{value}</div>
                 </div>'''.format(key=util.uc_first(key), value=value)
-    return html + '</div>'
+    return Markup(html + '</div>')
 
 
 @jinja2.contextfilter
@@ -207,7 +209,7 @@ def description(self: Any, entity: Entity) -> str:
         label = util.uc_first(_('content'))
     html = """<h2>{label}</h2>
         <div class="description more">{description}</div>""".format(label=label, description=text)
-    return html
+    return Markup(html)
 
 
 @jinja2.contextfilter
@@ -217,7 +219,7 @@ def display_profile_image(self: Any, image_id: int) -> str:
         return ''
     file_path = get_file_path(image_id)
     if file_path:
-        return """
+        html = """
             <div id="profile_image_div">
                 <a href="/entity/{id}">
                     <img style="max-width:{width}px;" alt="profile image" src="{src}">
@@ -226,6 +228,7 @@ def display_profile_image(self: Any, image_id: int) -> str:
             """.format(id=image_id,
                        src=url_for('display_file', filename=os.path.basename(file_path)),
                        width=session['settings']['profile_image_width'])
+        return Markup(html)
     return ''  # pragma no cover
 
 
@@ -498,4 +501,4 @@ def display_external_references(self: Any, entity: Entity) -> str:
             name = 'GeoNames (' + link_.domain.name + ')'
             url = app.config['GEONAMES_VIEW_URL'] + link_.domain.name
         html += '<a target="_blank" href="{url}">{name}</a><br>'.format(url=url, name=name)
-    return '<h2>' + util.uc_first(_('external references')) + '</h2>' + html if html else ''
+    return Markup('<h2>' + util.uc_first(_('external references')) + '</h2>' + html) if html else ''

@@ -29,13 +29,13 @@
         {% if super_ %}
             <p>{{_('super')|uc_first}}: {{ super_|link|safe }}</p>
         {% endif %}
-        {{ info|display_info|safe }}
+        {{ info|display_info }}
         {% if root.value_type %}
             <p>{{_('unit')|uc_first}}: {{node.description}}</p>
         {% else %}
-            {{ node|description|safe }}
+            {{ node|description }}
         {% endif %}
-        {{ node|api_link|safe }}
+        {{ node|api_link }}
     </div>
     {% if tables['subs'].rows %}
         <div id="tab-subs">

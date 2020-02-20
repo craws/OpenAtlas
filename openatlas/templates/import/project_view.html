@@ -28,7 +28,7 @@
                 <a class="btn btn-outline-primary btn-sm" href="{{ url_for('import_data', project_id=project.id, class_code='E18') }}">{{ 'place'|uc_first }}</a>
             </div>
         {% endif %}
-        {{ project|description|safe }}
+        {{ project|description }}
     </div>
     {% if table.rows %}
         <div id="tab-entity">

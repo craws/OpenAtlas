@@ -33,8 +33,8 @@
         <h1>{{ entity.name }}</h1>
         <div>
             <div style="float:left;">
-                {{ info|display_info|safe }}
-                {{ entity|api_link|safe }}
+                {{ info|display_info }}
+                {{ entity|api_link }}
             </div>
             <div class="preview" style="float:left;">
                 {% if preview %}
@@ -47,7 +47,7 @@
             </div>
         </div>
         <div style="clear:both;"></div>
-        {{ entity|description|safe }}
+        {{ entity|description }}
     </div>
     <div id="tab-source">
         {% if 'contributor'|is_authorized %}

@@ -28,13 +28,13 @@
         </div>
         <h1>{{ event.name }}</h1>
         <div>
-            {{ profile_image_id|display_profile_image|safe }}
+            {{ profile_image_id|display_profile_image }}
             <div style="float:left;">
-                {{ info|display_info|safe }}
-                {{ event|note|safe }}
-                {{ event|display_external_references|safe }}
-                {{ event|description|safe }}
-                {{ event|api_link|safe }}
+                {{ info|display_info }}
+                {{ event|note }}
+                {{ event|display_external_references }}
+                {{ event|description }}
+                {{ event|api_link }}
             </div>
             <div style="clear:both;"></div>
         </div>

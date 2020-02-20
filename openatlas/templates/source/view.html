@@ -28,13 +28,13 @@
         </div>
         <h1>{{ source.name }}</h1>
         <div>
-            {{ profile_image_id|display_profile_image|safe }}
+            {{ profile_image_id|display_profile_image }}
             <div style="float:left;">
-                {{ info|display_info|safe }}
-                {{ source|note|safe }}
-                {{ source|display_external_references|safe }}
-                {{ source|description|safe }}
-                {{ source|api_link|safe }}
+                {{ info|display_info }}
+                {{ source|note }}
+                {{ source|display_external_references }}
+                {{ source|description }}
+                {{ source|api_link }}
             </div>
             <div style="clear:both;"></div>
         </div>

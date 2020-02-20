@@ -12,16 +12,16 @@
     {% endif %}
     <div style="float:left;">
         <h1>{{ _('general')|uc_first }}</h1>
-        {{ data['info']|display_info|safe }}
+        {{ data['info']|display_info }}
     </div>
     <div style="float:left;margin-left:2em;">
         <h1>{{ _('display')|uc_first }}</h1>
-        {{ data['display']|display_info|safe }}
+        {{ data['display']|display_info }}
     </div>
     {% if 'contributor'|is_authorized %}
         <div style="float:left;margin-left:2em;">
             <h1>{{ _('modules')|uc_first }}</h1>
-            {{ data['modules']|display_info|safe }}
+            {{ data['modules']|display_info }}
         </div>
     {% endif %}
 {% endblock %}
