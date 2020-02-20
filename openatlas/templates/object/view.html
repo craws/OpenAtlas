@@ -7,16 +7,16 @@
 <div id="tabs" class="tabs-container">
     <ul>
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
-        <li><a href="#tab-source">{{ _('source')|uc_first }} {{ tables['source']|format_tab_number|safe }}</a></li>
-        <li><a href="#tab-event">{{ _('event')|uc_first }} {{ tables['event']|format_tab_number|safe }}</a></li>
+        <li><a href="#tab-source">{{ _('source')|uc_first }} {{ tables['source']|format_tab_number }}</a></li>
+        <li><a href="#tab-event">{{ _('event')|uc_first }} {{ tables['event']|format_tab_number }}</a></li>
     </ul>
     <div id="tab-info">
         <div class="toolbar">
             {% if 'contributor'|is_authorized %}
                 <a class="btn btn-outline-primary btn-sm" href="{{ url_for('object_update', id_=object_.id) }}">{{ _('edit')|uc_first }}</a>
-                {{ object_|display_delete_link|safe }}
+                {{ object_|display_delete_link }}
             {% endif %}
-            {{ object_.id|bookmark_toggle|safe }}
+            {{ object_.id|bookmark_toggle }}
         </div>
         <h1>{{ object_.name }}</h1>
         <div>

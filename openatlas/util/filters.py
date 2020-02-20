@@ -33,7 +33,8 @@ def link(self: Any, entity: Entity) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def api_link(self: Any, entity: Entity) -> str:
-    return '<p><a href="{url}" target="_blank">API</a></p>'.format(url=url_for('api_entity', id_=entity.id))
+    return '<p><a href="{url}" target="_blank">API</a></p>'.format(
+        url=url_for('api_entity', id_=entity.id))
 
 
 @jinja2.contextfilter
@@ -92,7 +93,7 @@ def note(self: Any, entity: Entity) -> str:
 @blueprint.app_template_filter()
 def format_tab_number(self: Any, param: Union[int, Table]) -> str:
     length = len(param.rows) if isinstance(param, Table) else param
-    return '<span class="tab-counter">' + babel_format_number(length) + '</span>'
+    return Markup('<span class="tab-counter">' + babel_format_number(length) + '</span>')
 
 
 @jinja2.contextfilter
@@ -135,7 +136,7 @@ def display_info(self: Any, data: Dict[str, str]) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def bookmark_toggle(self: Any, entity_id: int) -> str:
-    return util.bookmark_toggle(entity_id)
+    return Markup(util.bookmark_toggle(entity_id))
 
 
 @jinja2.contextfilter
@@ -429,10 +430,10 @@ def sanitize(self: Any, string: str) -> str:
 def display_delete_link(self: Any, entity: Entity) -> str:
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
-    return '<a class="btn btn-outline-primary btn-sm" {confirm} href="{url}">{label}</a>'.format(
-        confirm='onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"',
-        url=url_for(entity.view_name + '_index', action='delete', id_=entity.id),
-        label=util.uc_first(_('delete')))
+    return button(self,
+                  _('delete'),
+                  url_for(entity.view_name + '_index', action='delete', id_=entity.id),
+                  js='onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"')
 
 
 @jinja2.contextfilter

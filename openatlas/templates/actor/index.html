@@ -7,7 +7,7 @@
         <div class="toolbar">
             {{ 'Actor'|manual_link }}
             {% for code in config['CLASS_CODES']['actor'] %}
-                {{ ('+ ' + code|get_class_name)|button(url_for('actor_insert', code=code)) }}
+                {{ (code|get_class_name)|button(url_for('actor_insert', code=code)) }}
             {% endfor %}
         </div>
     {% endif %}

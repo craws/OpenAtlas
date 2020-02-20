@@ -7,7 +7,7 @@
     <ul>
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
         {% if table.rows %}
-            <li><a href="#tab-entity">{{ _('entities')|uc_first }} {{ table|format_tab_number|safe }}</a></li>
+            <li><a href="#tab-entity">{{ _('entities')|uc_first }} {{ table|format_tab_number }}</a></li>
         {% endif %}
     </ul>
     <div id="tab-info">
