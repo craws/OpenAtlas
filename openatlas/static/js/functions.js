@@ -117,6 +117,11 @@ $(document).ready(function() {
         }
         return false;
     });
+    /* prevent scroll on jquery ui tab links*/
+    $('a[href^="#tabs-"]').on('click', function(e) {
+        console.log(e);
+      e.preventDefault();
+    });
 });
 
 $.jstree.defaults.core.themes.dots = false;
