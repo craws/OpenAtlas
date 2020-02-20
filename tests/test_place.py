@@ -28,7 +28,8 @@ class PlaceTest(TestBaseCase):
                     'geonames_id': '123',
                     'geonames_precision': True,
                     unit_node.id: str([unit_sub1.id, unit_sub2.id])}
-            rv = self.app.post(url_for('place_insert', origin_id=reference.id), data=data,
+            rv = self.app.post(url_for('place_insert', origin_id=reference.id),
+                               data=data,
                                follow_redirects=True)
             assert b'Asgard' in rv.data
             data['gis_points'] = """[{
@@ -52,7 +53,8 @@ class PlaceTest(TestBaseCase):
                 "properties":{"name":"","description":"","shapeType":"shape"}}]"""
             data[place_node.id] = place_node.subs
             data['continue_'] = 'yes'
-            rv = self.app.post(url_for('place_insert', origin_id=source.id), data=data,
+            rv = self.app.post(url_for('place_insert', origin_id=source.id),
+                               data=data,
                                follow_redirects=True)
             assert b'Necronomicon' in rv.data
             with app.test_request_context():
@@ -71,24 +73,28 @@ class PlaceTest(TestBaseCase):
             data['continue_'] = ''
             data['alias-1'] = 'Val-hall'
             data['geonames_id'] = '321'
-            rv = self.app.post(url_for('place_update', id_=place.id), data=data,
+            rv = self.app.post(url_for('place_update', id_=place.id),
+                               data=data,
                                follow_redirects=True)
             assert b'Val-hall' in rv.data
 
             # Test with same GeoNames id
-            rv = self.app.post(url_for('place_update', id_=place.id), data=data,
+            rv = self.app.post(url_for('place_update', id_=place.id),
+                               data=data,
                                follow_redirects=True)
             assert b'Val-hall' in rv.data
 
             # Test with same GeoNames id but different precision
             data['geonames_precision'] = ''
-            rv = self.app.post(url_for('place_update', id_=place.id), data=data,
+            rv = self.app.post(url_for('place_update', id_=place.id),
+                               data=data,
                                follow_redirects=True)
             assert b'Val-hall' in rv.data
 
             # Test update without the previous GeoNames id
             data['geonames_id'] = ''
-            rv = self.app.post(url_for('place_update', id_=place.id), data=data,
+            rv = self.app.post(url_for('place_update', id_=place.id),
+                               data=data,
                                follow_redirects=True)
             assert b'Val-hall' in rv.data
 
@@ -107,7 +113,8 @@ class PlaceTest(TestBaseCase):
                  [299.00650977389887, -5.893358673645309], [298.9848804404028, -5.9070188333813585],
                  [298.9893436362036, -5.888919049309554]]]},
                 "properties": {"name": "", "description": "", "shapeType": "shape"}}]"""
-            rv = self.app.post(url_for('place_insert', origin_id=source.id), data=data,
+            rv = self.app.post(url_for('place_insert', origin_id=source.id),
+                               data=data,
                                follow_redirects=True)
             assert b'An invalid geometry was entered' in rv.data
 
@@ -127,19 +134,29 @@ class PlaceTest(TestBaseCase):
             assert b'X-Files' in rv.data
             data = {'top_left_easting': 42, 'top_left_northing': 12,
                     'bottom_right_easting': 43, 'bottom_right_northing': 13}
-            rv = self.app.post(url_for('overlay_insert', image_id=file.id, place_id=place.id,
-                                       link_id=link_id), data=data, follow_redirects=True)
+            rv = self.app.post(url_for('overlay_insert',
+                                       image_id=file.id,
+                                       place_id=place.id,
+                                       link_id=link_id),
+                               data=data,
+                               follow_redirects=True)
             assert b'Edit' in rv.data
 
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 overlay = Overlay.get_by_object(place)
                 overlay_id = overlay[list(overlay.keys())[0]].id
-            rv = self.app.get(url_for('overlay_update', id_=overlay_id, place_id=place.id,
+            rv = self.app.get(url_for('overlay_update',
+                                      id_=overlay_id,
+                                      place_id=place.id,
                                       link_id=link_id))
             assert b'42' in rv.data
-            rv = self.app.post(url_for('overlay_update', id_=overlay_id, place_id=place.id,
-                                       link_id=link_id), data=data, follow_redirects=True)
+            rv = self.app.post(url_for('overlay_update',
+                                       id_=overlay_id,
+                                       place_id=place.id,
+                                       link_id=link_id),
+                               data=data,
+                               follow_redirects=True)
             assert b'Changes have been saved' in rv.data
             self.app.get(url_for('overlay_remove', id_=overlay_id, place_id=place.id),
                          follow_redirects=True)
@@ -149,15 +166,19 @@ class PlaceTest(TestBaseCase):
             assert b'Add File' in rv.data
 
             rv = self.app.post(url_for('place_add_file', id_=place.id),
-                               data={'checkbox_values': str([file.id])}, follow_redirects=True)
+                               data={'checkbox_values': str([file.id])},
+                               follow_redirects=True)
             assert b'X-Files' in rv.data
 
             rv = self.app.get(url_for('place_add_source', id_=place.id))
             assert b'Add Source' in rv.data
             rv = self.app.post(url_for('place_add_source', id_=place.id),
-                               data={'checkbox_values': str([source.id])}, follow_redirects=True)
+                               data={'checkbox_values': str([source.id])},
+                               follow_redirects=True)
             assert b'Necronomicon' in rv.data
 
+            rv = self.app.get(url_for('reference_add', id_=reference.id, class_name='place'))
+            assert b'Val-hall' in rv.data
             rv = self.app.get(url_for('place_add_reference', id_=place.id))
             assert b'Add Reference' in rv.data
             rv = self.app.post(url_for('place_add_reference', id_=place.id),
@@ -171,14 +192,16 @@ class PlaceTest(TestBaseCase):
 
             # Test move entities of multiple node if link to new node exists
             rv = self.app.post(url_for('node_move_entities', id_=unit_sub1.id),
-                               data={unit_node.id: unit_sub2.id, 'selection': location.id,
+                               data={unit_node.id: unit_sub2.id,
+                                     'selection': location.id,
                                      'checkbox_values': str([location.id])},
                                follow_redirects=True)
             assert b'Entities where updated' in rv.data
 
             # Test move entities of multiple node if link to new node doesn't exists
             rv = self.app.post(url_for('node_move_entities', id_=unit_sub2.id),
-                               data={unit_node.id: unit_sub1.id, 'selection': location.id,
+                               data={unit_node.id: unit_sub1.id,
+                                     'selection': location.id,
                                      'checkbox_values': str([location.id])},
                                follow_redirects=True)
             assert b'Entities where updated' in rv.data
