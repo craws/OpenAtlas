@@ -4,10 +4,10 @@
 {% endblock %}
 {% block content %}
     <div class="toolbar">
-        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('content_update', item=item) }}">{{ _('edit')|uc_first }}</a>
+        {{ _('edit')|button(url_for('content_update', item=item)) }}
     </div>
     {% for language, text in content[item].items() %}
-        <p class="inverse-heading">{{ language|upper }}</p>
+        <p>{{ language|upper }}</p>
         <div class="text-preview">{{ text|safe }}</div>
     {% endfor %}
 {% endblock %}

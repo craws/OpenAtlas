@@ -238,14 +238,6 @@ form input[type="text"].month, form input[type="text"].day {
     top: 0;
 }
 
-p.inverse-heading {
-    display: inline-block;
-    font-size: 1.1em;
-    font-weight: bold;
-    margin-bottom: 0.3em;
-    padding: 0.4em;
-}
-
 button {
     cursor: pointer;
     display: inline-block;
