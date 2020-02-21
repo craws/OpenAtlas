@@ -95,7 +95,7 @@ class Api:
         nodes = []
         for node in entity.nodes:
             nodes.append({'identifier': url_for('api_entity', id_=node.id, _external=True),
-                          'label': node.name})
+                          'label': node.name, 'description': node.description})
         geo = Geonames.get_geonames_link(entity)
 
         features = {'@id': url_for('entity_view', id_=entity.id, _external=True),
