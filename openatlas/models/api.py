@@ -131,6 +131,11 @@ class Api:
         if nodes:
             features['types'] = nodes
 
+        if entity.aliases:
+            features['names'] = []
+            for key, value in entity.aliases.items():
+                features['names'].append({"alias": value})
+
         # Todo: How to get into the if function? Why this method won't work?
         # Depictions
         if Api.get_file(entity):
@@ -148,13 +153,14 @@ class Api:
                         'comment': entity.end_comment if entity.end_comment else None}
                 if entity.end_from or entity.end_to else None}]}
 
-        # Geometry and Geonames
+        # Geonames
         if type_ == 'FeatureCollection':
             if geo:
                 link_type = geo.type.name if geo else ''
                 identifier = app.config['GEONAMES_VIEW_URL'] + geo.domain.name if geo else ''
                 features['links'] = [{'type': link_type, 'identifier': identifier}]
 
+        # Geometry
         if geo:
             geo_type = geo.type.name.split(' ')
             link_type = geo_type[0] + ''.join(x.title() for x in geo_type[1:]) if geo else ''
@@ -168,8 +174,9 @@ class Api:
                     geometries.append({'type': geo['shape'],
                                        'coordinates': geo['geometry']['coordinates'],
                                        'classification': geo['type'],
-                                       'description': geo['description'],
-                                       'title': geo['name']})
+                                       'description': geo['description'] if geo[
+                                           'description'] else None,
+                                       'title': geo['name'] if geo['description'] else None})
                 features['geometry'] = {'type': 'GeometryCollection', 'geometries': geometries}
 
         data: dict = {'type': type_, '@context': app.config['API_SCHEMA'], 'features': [features]}
