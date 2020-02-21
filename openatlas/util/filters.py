@@ -45,7 +45,7 @@ def button(self: Any,
            css: Optional[str] = 'primary',
            js: Optional[str] = '') -> str:
     label = util.uc_first(label)
-    if '/insert/' in url and label != util.uc_first(_('add')):
+    if '/insert' in url and label != util.uc_first(_('add')):
         label = '+ ' + label
     html = '<a class="{class_}" href="{url}" {js}>{label}</a>'.format(
         class_=app.config['CSS']['button'][css],

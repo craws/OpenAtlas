@@ -7,7 +7,7 @@
         {{ 'Import'|manual_link }}
         {% if file_data['file'] %}
             {{ _('latest backup')|uc_first }}: {{ file_data['file'] }}, {{ file_data['size'] }}
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('download_sql', filename=file_data['file']) }}">{{ _('download')|uc_first }}</a>
+            {{ _('download')|button(url_for('download_sql', filename=file_data['file'])) }}
         {% endif %}
     </div>
     {% if file_data['backup_too_old'] and not config['IS_UNIT_TEST'] %}
