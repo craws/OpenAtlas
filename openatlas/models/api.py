@@ -154,30 +154,23 @@ class Api:
                 if entity.end_from or entity.end_to else None}]}
 
         # Geonames
-        if type_ == 'FeatureCollection':
-            if geo:
-                link_type = geo.type.name if geo else ''
-                identifier = app.config['GEONAMES_VIEW_URL'] + geo.domain.name if geo else ''
-                features['links'] = [{'type': link_type, 'identifier': identifier}]
-
-        # Geometry
         if geo:
             geo_type = geo.type.name.split(' ')
             link_type = geo_type[0] + ''.join(x.title() for x in geo_type[1:]) if geo else ''
             identifier = app.config['GEONAMES_VIEW_URL'] + geo.domain.name if geo else ''
             features['links'] = [{'type': link_type, 'identifier': identifier}]
 
-        if type_ == "FeatureCollection":
-            if Gis.get_by_id(entity.location.id):
-                geometries = []
-                for geo in Gis.get_by_id(entity.location.id):
-                    geometries.append({'type': geo['shape'],
-                                       'coordinates': geo['geometry']['coordinates'],
-                                       'classification': geo['type'],
-                                       'description': geo['description'] if geo[
-                                           'description'] else None,
-                                       'title': geo['name'] if geo['description'] else None})
-                features['geometry'] = {'type': 'GeometryCollection', 'geometries': geometries}
+        # Geometry
+        if Gis.get_by_id(entity.location.id):
+            geometries = []
+            for geo in Gis.get_by_id(entity.location.id):
+                geometries.append({'type': geo['shape'],
+                                   'coordinates': geo['geometry']['coordinates'],
+                                   'classification': geo['type'],
+                                   'description': geo['description'] if geo[
+                                       'description'] else None,
+                                   'title': geo['name'] if geo['description'] else None})
+            features['geometry'] = {'type': 'GeometryCollection', 'geometries': geometries}
 
         data: dict = {'type': type_, '@context': app.config['API_SCHEMA'], 'features': [features]}
 
