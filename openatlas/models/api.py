@@ -5,6 +5,7 @@ from typing import List, Dict, Any
 from flask import request, url_for
 
 from openatlas import app
+from openatlas.models.model import CidocClass
 from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
 from openatlas.models.gis import Gis
@@ -101,7 +102,7 @@ class Api:
         features = {'@id': url_for('entity_view', id_=entity.id, _external=True),
                     'type': 'Feature',
                     'crmClass': entity.class_.code,
-                    'classLabel': entity.class_.i18n['en'],
+                    'crmClassLabel': entity.class_.i18n['en'],
                     'properties': {'title': entity.name}}
 
         # Relations
@@ -162,7 +163,7 @@ class Api:
             else:
                 features['geometry'] = {'type': 'GeometryCollection', 'geometries': geometries}
         except (AttributeError, KeyError):
-            features['geometry'] = {'type': 'Point', 'coordinates': [0, 0]}
+            features['geometry'] = {'type': 'GeometryCollection', 'geometries': []}
 
         data: dict = {'type': type_, '@context': app.config['API_SCHEMA'], 'features': [features]}
 
