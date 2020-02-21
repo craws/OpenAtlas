@@ -1,3 +1,4 @@
+import json
 import os
 from typing import List, Dict, Any
 
@@ -88,25 +89,8 @@ class Api:
     @staticmethod
     def get_entity(id_: int) -> Dict[str, Any]:
         entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-        possible_types: dict = {'E7': 'EventCollection',
-                                'E8': 'EventCollection',
-                                'E9': 'EventCollection',
-                                'E18': 'FeatureCollection',
-                                'E20': 'FindCollection',
-                                'E21': 'ActorCollection',
-                                'E22': 'FindCollection',
-                                'E31': 'DocumentCollection',
-                                'E33': 'SourceCollection',
-                                'E40': 'ActorCollection',
-                                'E53': 'PlaceCollection',
-                                'E55': 'TypeCollection',
-                                'E74': 'ActorCollection',
-                                'E84': 'ObjectCollection'}
 
-        type_ = 'unknown'
-        for t in possible_types:
-            if t == entity.class_.code:
-                type_ = possible_types.get(t)
+        type_ = 'FeatureCollection'
 
         nodes = []
         for node in entity.nodes:
@@ -115,8 +99,9 @@ class Api:
         geo = Geonames.get_geonames_link(entity)
 
         features = {'@id': url_for('entity_view', id_=entity.id, _external=True),
-                    'type': entity.class_.code,
-                    'typeLabel': entity.class_.i18n['en'],
+                    'type': 'Feature',
+                    'crmClass': entity.class_.code,
+                    'classLabel': entity.class_.i18n['en'],
                     'properties': {'title': entity.name}}
 
         # Relations
@@ -161,16 +146,23 @@ class Api:
             features['links'] = [{'type': link_type, 'identifier': identifier}]
 
         # Geometry
-        if Gis.get_by_id(entity.location.id):
+        try:
             geometries = []
+            shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
             for geo in Gis.get_by_id(entity.location.id):
-                geometries.append({'type': geo['shape'],
+                geometries.append({'type': shape[geo['shape']],
                                    'coordinates': geo['geometry']['coordinates'],
                                    'classification': geo['type'],
                                    'description': geo['description'] if geo[
                                        'description'] else None,
                                    'title': geo['name'] if geo['description'] else None})
-            features['geometry'] = {'type': 'GeometryCollection', 'geometries': geometries}
+
+            if len(geometries) == 1:
+                features['geometry'] = geometries[0]
+            else:
+                features['geometry'] = {'type': 'GeometryCollection', 'geometries': geometries}
+        except (AttributeError, KeyError):
+            features['geometry'] = {'type': 'Point', 'coordinates': [0, 0]}
 
         data: dict = {'type': type_, '@context': app.config['API_SCHEMA'], 'features': [features]}
 
