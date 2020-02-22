@@ -165,7 +165,6 @@
     </div>
 </nav>
 <noscript><div class="error">{{ _('warning no js') }}</div></noscript>
-{% if 'local' in request['url_root'] %}local{% endif %}
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
         {% for category, message in messages %}
