@@ -4,6 +4,11 @@ html, body, input, select, textarea {
     font-family: helvetica, arial, sans-serif;
 }
 
+#site-name-and-version {
+    position: absolute;
+    right: 16px
+}
+
 div.preview {
     margin-left: 1em;
 }

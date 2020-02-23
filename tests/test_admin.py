@@ -78,7 +78,7 @@ class ContentTests(TestBaseCase):
             rv = self.app.get(url_for('admin_map'))
             assert b'MaxClusterRadius' in rv.data
             rv = self.app.post(url_for('admin_map'), follow_redirects=True, data={
-                'map_cluster_enabled': True, 'map_cluster_max_radius': 2,
+                'map_cluster_max_radius': 2,
                 'map_cluster_disable_at_zoom': 5})
             assert b'Changes have been saved.' in rv.data
 

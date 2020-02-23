@@ -27,7 +27,6 @@ from openatlas.util.util import (convert_size, format_date, format_datetime, get
 
 class GeneralForm(FlaskForm):  # type: ignore
     site_name = StringField(uc_first(_('site name')))
-    site_header = StringField(uc_first(_('site header')))
     default_language = SelectField(uc_first(_('default language')),
                                    choices=list(app.config['LANGUAGES'].items()))
     default_table_rows = SelectField(uc_first(_('default table rows')),
@@ -59,7 +58,6 @@ def admin_index() -> str:
 
 
 class MapForm(FlaskForm):  # type: ignore
-    map_cluster_enabled = BooleanField(uc_first(_('use cluster')))
     map_cluster_max_radius = IntegerField('maxClusterRadius')
     map_cluster_disable_at_zoom = IntegerField('disableClusteringAtZoom')
     save = SubmitField(uc_first(_('save')))
@@ -81,7 +79,6 @@ def admin_map() -> Union[str, Response]:
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('admin_index'))
-    form.map_cluster_enabled.data = session['settings']['map_cluster_enabled']
     form.map_cluster_max_radius.data = session['settings']['map_cluster_max_radius']
     form.map_cluster_disable_at_zoom.data = session['settings']['map_cluster_disable_at_zoom']
     return render_template('admin/map.html', form=form)
@@ -462,7 +459,6 @@ def admin_general() -> str:
     settings = session['settings']
     general_settings = {
         _('site name'): settings['site_name'],
-        _('site header'): settings['site_header'],
         _('default language'): app.config['LANGUAGES'][settings['default_language']],
         _('default table rows'): settings['default_table_rows'],
         _('log level'): app.config['LOG_LEVELS'][int(settings['log_level'])],

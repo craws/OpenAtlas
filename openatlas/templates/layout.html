@@ -154,12 +154,8 @@
 <nav aria-label="breadcrumb">
     <div class="breadcrumb">
         {% block breadcrumb %}{% endblock %}
-        <div style="position: absolute; right: 16px">
-            {% if session['settings']['site_header'] %}
-                {{ session['settings']['site_header'] }}
-            {% else %}
-                OpenAtlas
-            {% endif %}
+        <div id="site-name-and-version">
+            {{ session['settings']['site_name'] }}
             <a href="{{ url_for('index_changelog') }}">{{ config['VERSION'] }}</a>
         </div>
     </div>
