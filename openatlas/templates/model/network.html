@@ -8,11 +8,12 @@
     {% if json_data %}
         <link rel="stylesheet" href="/static/css/network.css">
         <script src="/static/node_modules/d3/dist/d3.min.js"></script>
-        <div style="float:right;">
-            <svg></svg>
-            <p>
-                <span class="btn btn-outline-primary btn-sm" onclick="saveSvgAsPng(d3.select('svg').node(), 'network.png')">{{ _('download')|uc_first }}</span>
-            </p>
+        <div class="toolbar">
+            {{ 'Network_visualization'|manual_link }}
+            {{ _('download')|button('#', js='onclick="saveSvgAsPng(d3.select(\'svg\').node(), \'network.png\')"') }}
+        </div>
+        <div>
+            <svg id="network-svg"></svg>
         </div>
         <script>
             var graph = {{ json_data|safe }};
@@ -24,12 +25,12 @@
         <script src="/static/js/network.js"></script>
         <script src="/static/node_modules/save-svg-as-png/lib/saveSvgAsPng.js"></script>
     {% else %}
-        <h2 style="float:right;">{{ _('no data to display')|uc_first }}</h2>
-    {% endif %}
-    <div style="float:left;">
         <div class="toolbar">
             {{ 'Network_visualization'|manual_link }}
         </div>
+        <h2>{{ _('no data to display')|uc_first }}</h2>
+    {% endif %}
+    <div>
         <form method="post" id="network-form" style="margin-right:1em;">
             {{ form.csrf_token }}
             <h2>{{ _('classes')|uc_first }}</h2>
@@ -47,7 +48,9 @@
             {{ form.height }} {{ form.height.label }}<br>
             {{ form.charge }} {{ form.charge.label }}<br>
             {{ form.distance }} {{ form.distance.label }}<br>
-            <input id="save" name="save" value="{{ _('apply')|uc_first }}" type="submit">
+            <div class="toolbar" style="margin-top: 1em;">
+                <input class="{{ config['CSS']['button']['primary'] }}" id="save" name="save" value="{{ _('apply')|uc_first }}" type="submit">
+            </div>
         </form>
     </div>
 {% endblock %}

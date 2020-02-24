@@ -4,7 +4,7 @@ canvas {
     border: 1px solid black;
 }
 
-svg {
+svg#network-svg {
     background-color: white;
     border: 1px solid black;
 }
