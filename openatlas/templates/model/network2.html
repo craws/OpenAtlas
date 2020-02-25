@@ -6,6 +6,9 @@
     <link rel="stylesheet" href="/static/node_modules/huebee/dist/huebee.min.css">
     <link rel="stylesheet" href="/static/css/network.css">
     <script src="/static/node_modules/huebee/dist/huebee.pkgd.min.js"></script>
+    <div class="toolbar">
+        {{ 'Network_visualization'|manual_link }}
+    </div>
     {% if json_data %}
         <script src="/static/vendor/network/preact.umd.js"></script>
         <script src="/static/vendor/network/hooks.umd.js"></script>
@@ -13,9 +16,7 @@
         <script src="/static/vendor/network/three.min.js"></script>
         <script>var React = preactCompat</script>
         <script src="/static/vendor/network/network-visualization.umd.js"></script>
-        <div style="float:right;">
-            <div id="visualization" style="position: relative; height: 600px;"></div>
-        </div>
+        <div id="visualization" style="position: relative; height: 600px;"></div>
         <script>
             const graph = {{ json_data|safe }}
             const graphSizeFactor = Math.floor(graph.edges.length / 500)
@@ -40,30 +41,27 @@
             )
         </script>
     {% else %}
-        <h2 style="float:right;">{{ _('no data to display')|uc_first }}</h2>
+        <h2>{{ _('no data to display')|uc_first }}</h2>
     {% endif %}
-    <div style="float:left;">
-        <div class="toolbar">
-            {{ 'Network_visualization'|manual_link }}
-        </div>
-        <form method="post" id="network-form" style="margin-right:1em;">
-            {{ form.csrf_token }}
-            <h2>{{ _('classes')|uc_first }}</h2>
-            <div>
-                <div id="classes" style="float:left">
-                    {% for item in form.classes %}
-                        {{ form['color_' + item.data] }} {{ item.label }}<br>
-                    {% endfor %}
-                </div>
+    <form method="post" id="network-form" style="margin-right:1em;">
+        {{ form.csrf_token }}
+        <h2>{{ _('classes')|uc_first }}</h2>
+        <div>
+            <div id="classes" style="float:left">
+                {% for item in form.classes %}
+                    {{ form['color_' + item.data] }} {{ item.label }}<br>
+                {% endfor %}
             </div>
-            <div style="clear:both;"></div>
-            <p>{{ form.orphans }} {{ _('show orphans')|uc_first }}</p>
-            <h2>{{ _('network options')|uc_first }}</h2>
-            {{ form.width }} {{ form.width.label }}<br>
-            {{ form.height }} {{ form.height.label }}<br>
-            {{ form.charge }} {{ form.charge.label }}<br>
-            {{ form.distance }} {{ form.distance.label }}<br>
-            <input id="save" name="save" value="{{ _('apply')|uc_first }}" type="submit">
-        </form>
-    </div>
+        </div>
+        <div style="clear:both;"></div>
+        <p>{{ form.orphans }} {{ _('show orphans')|uc_first }}</p>
+        <h2>{{ _('network options')|uc_first }}</h2>
+        {{ form.width }} {{ form.width.label }}<br>
+        {{ form.height }} {{ form.height.label }}<br>
+        {{ form.charge }} {{ form.charge.label }}<br>
+        {{ form.distance }} {{ form.distance.label }}<br>
+        <div class="toolbar" style="margin-top: 1em;">
+            <input class="{{ config['CSS']['button']['primary'] }}" id="save" name="save" value="{{ _('apply')|uc_first }}" type="submit">
+        </div>
+    </form>
 {% endblock %}

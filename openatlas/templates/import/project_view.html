@@ -14,7 +14,7 @@
         {% if 'manager'|is_authorized %}
             <div class="toolbar">
                 {{ _('edit')|button(url_for('import_project_update', id_=project.id)) }}
-                {{ _('delete')|button(url_for('import_project_delete', id_=project.id), js='onclick="return confirm(\'' + _('delete %(name)s?', name=project.name)|replace("'", "")|uc_first + '\')"') }}
+                {{ _('delete')|button(url_for('import_project_delete', id_=project.id), onclick="return confirm('" + _('delete %(name)s?', name=project.name)|replace("'", "")|uc_first + "')") }}
             </div>
             <p>{{ _('new import')|uc_first }}:</p>
             <div class="toolbar">

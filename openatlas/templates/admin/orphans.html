@@ -18,7 +18,7 @@
     <div id="tab-orphan">
         {% if tables['orphans'].rows and 'admin'|is_authorized %}
             <div class="toolbar">
-                {{ _('delete orphans')|button(url_for('admin_orphans_delete', parameter='orphans'), js='onclick="return confirm(\'' + _('delete orphans')|uc_first + '?\')"') }}
+                {{ _('delete orphans')|button(url_for('admin_orphans_delete', parameter='orphans'), onclick="return confirm('" + _('delete orphans')|uc_first + "?')") }}
             </div>
         {% endif %}
         {% if tables['orphans'].rows %}
@@ -37,7 +37,7 @@
     <div id="tab-nodes">
         {% if tables['nodes'].rows and 'admin'|is_authorized %}
             <div class="toolbar">
-                {{ _('delete types')|button(url_for('admin_orphans_delete', parameter='types'), js='onclick="return confirm(\'' + _('delete types')|uc_first + '?\')"') }}
+                {{ _('delete types')|button(url_for('admin_orphans_delete', parameter='types'), onclick="return confirm('" + _('delete types')|uc_first + "?')") }}
             </div>
         {% endif %}
         {% if tables['nodes'].rows %}
@@ -56,7 +56,7 @@
     <div id="tab-orphaned-files">
         {% if tables['orphaned_files'].rows and 'admin'|is_authorized %}
             <div class="toolbar">
-                {{ _('delete all files')|button(url_for('admin_file_delete', filename='all'), js='onclick="return confirm(\'' + _('delete all files without corresponding entities?')|uc_first + '\')"') }}
+                {{ _('delete all files')|button(url_for('admin_file_delete', filename='all'), onclick="return confirm('" + _('delete all files without corresponding entities?')|uc_first + "')") }}
             </div>
         {% endif %}
         {% if tables['orphaned_files'].rows %}

@@ -10,7 +10,7 @@
         <script src="/static/node_modules/d3/dist/d3.min.js"></script>
         <div class="toolbar">
             {{ 'Network_visualization'|manual_link }}
-            {{ _('download')|button('#', js='onclick="saveSvgAsPng(d3.select(\'svg\').node(), \'network.png\')"') }}
+            {{ _('download')|button('#', onclick="saveSvgAsPng(d3.select('svg').node(), 'network.png')") }}
         </div>
         <div>
             <svg id="network-svg"></svg>
@@ -30,27 +30,25 @@
         </div>
         <h2>{{ _('no data to display')|uc_first }}</h2>
     {% endif %}
-    <div>
-        <form method="post" id="network-form" style="margin-right:1em;">
-            {{ form.csrf_token }}
-            <h2>{{ _('classes')|uc_first }}</h2>
-            <div>
-                <div id="classes" style="float:left">
-                    {% for item in form.classes %}
-                        {{ form['color_' + item.data] }} {{ item.label }}<br>
-                    {% endfor %}
-                </div>
+    <form method="post" id="network-form" style="margin-right:1em;">
+        {{ form.csrf_token }}
+        <h2>{{ _('classes')|uc_first }}</h2>
+        <div>
+            <div id="classes" style="float:left">
+                {% for item in form.classes %}
+                    {{ form['color_' + item.data] }} {{ item.label }}<br>
+                {% endfor %}
             </div>
-            <div style="clear:both;"></div>
-            <p>{{ form.orphans }} {{ _('show orphans')|uc_first }}</p>
-            <h2>{{ _('network options')|uc_first }}</h2>
-            {{ form.width }} {{ form.width.label }}<br>
-            {{ form.height }} {{ form.height.label }}<br>
-            {{ form.charge }} {{ form.charge.label }}<br>
-            {{ form.distance }} {{ form.distance.label }}<br>
-            <div class="toolbar" style="margin-top: 1em;">
-                <input class="{{ config['CSS']['button']['primary'] }}" id="save" name="save" value="{{ _('apply')|uc_first }}" type="submit">
-            </div>
-        </form>
-    </div>
+        </div>
+        <div style="clear:both;"></div>
+        <p>{{ form.orphans }} {{ _('show orphans')|uc_first }}</p>
+        <h2>{{ _('network options')|uc_first }}</h2>
+        {{ form.width }} {{ form.width.label }}<br>
+        {{ form.height }} {{ form.height.label }}<br>
+        {{ form.charge }} {{ form.charge.label }}<br>
+        {{ form.distance }} {{ form.distance.label }}<br>
+        <div class="toolbar" style="margin-top: 1em;">
+            <input class="{{ config['CSS']['button']['primary'] }}" id="save" name="save" value="{{ _('apply')|uc_first }}" type="submit">
+        </div>
+    </form>
 {% endblock %}

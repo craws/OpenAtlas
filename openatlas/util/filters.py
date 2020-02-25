@@ -43,15 +43,15 @@ def button(self: Any,
            label: str,
            url: str,
            css: Optional[str] = 'primary',
-           js: Optional[str] = '') -> str:
+           onclick: Optional[str] = '') -> str:
     label = util.uc_first(label)
     if '/insert' in url and label != util.uc_first(_('add')):
         label = '+ ' + label
-    html = '<a class="{class_}" href="{url}" {js}>{label}</a>'.format(
+    html = '<a class="{class_}" href="{url}" {onclick}>{label}</a>'.format(
         class_=app.config['CSS']['button'][css],
         url=url,
         label=label,
-        js=js)
+        onclick='onclick="{onclick}"'.format(onclick=onclick) if onclick else '')
     return Markup(html)
 
 
@@ -436,7 +436,7 @@ def display_delete_link(self: Any, entity: Entity) -> str:
     return button(self,
                   _('delete'),
                   url_for(entity.view_name + '_index', action='delete', id_=entity.id),
-                  js='onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"')
+                  onclick="return confirm('" + _('Delete %(name)s?', name=name) + "')")
 
 
 @jinja2.contextfilter
