@@ -6,7 +6,7 @@
     {% if 'contributor'|is_authorized %}
         <div class="toolbar">
             {{ 'Object'|manual_link }}
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('object_insert') }}">+ {{ 'E84'|get_class_name }}</a>
+            {{ 'E84'|get_class_name|button(url_for('object_insert')) }}
         </div>
     {% endif %}
     {{ table.display()|safe }}
