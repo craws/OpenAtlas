@@ -16,7 +16,7 @@ Documentation: [Wiki](https://redmine.openatlas.eu/projects/uni/wiki), [Issues](
 
 Please refer to [install.md](install.md) for requirements and installation.
 
-# Development Team
+# Team
 
 **Stefan Eichert** - Idea, Concept and Data Modelling ([stefan.eichert@univie.ac.at](mailto:stefan.eichert@univie.ac.at))
 
