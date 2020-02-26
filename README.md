@@ -18,13 +18,15 @@ Please refer to [install.md](install.md) for requirements and installation.
 
 # Development Team
 
-**Stefan Eichert** - Idea, Concept and Data Modelling ([stefan.eichert@oeaw.ac.at](mailto:stefan.eichert@univie.ac.at))
+**Stefan Eichert** - Idea, Concept and Data Modelling ([stefan.eichert@univie.ac.at](mailto:stefan.eichert@univie.ac.at))
 
 **Alexander Watzinger** - Lead Developer and Concept ([alexander.watzinger@oeaw.ac.at](mailto:alexander.watzinger@oeaw.ac.at))
 
 **Bernhard Koschicek** - Software Development
 
 **Christoph Hoffmann** - Frontend Development
+
+**Veronika Gründhammer** - Project Administration
 
 **Jan Belik** - Logo Design and Design Consulting
 
