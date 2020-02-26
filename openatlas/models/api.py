@@ -16,6 +16,13 @@ from openatlas.util.util import format_date, get_file_path
 class Api:
 
     @staticmethod
+    def to_camelcase(string: str) -> str:
+        if not string:
+            return ''
+        words = string.split(' ')
+        return words[0] + ''.join(x.title() for x in words[1:])
+
+    @staticmethod
     def get_links(entity: Entity) -> List[Dict[str, str]]:
         links = []
         for link in Link.get_links(entity.id):
@@ -141,8 +148,7 @@ class Api:
 
         # Geonames
         if geo:
-            geo_type = geo.type.name.split(' ')
-            link_type = geo_type[0] + ''.join(x.title() for x in geo_type[1:]) if geo else ''
+            link_type = Api.to_camelcase(geo.type.name)
             identifier = app.config['GEONAMES_VIEW_URL'] + geo.domain.name if geo else ''
             features['links'] = [{'type': link_type, 'identifier': identifier}]
 
