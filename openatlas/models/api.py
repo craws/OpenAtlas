@@ -135,16 +135,22 @@ class Api:
             features['depictions'] = Api.get_file(entity)
 
         # Time spans
-        if entity.begin_from or entity.begin_to or entity.end_from or entity.end_to:
-            features['when'] = {'timespans': [{
-                'start': {'earliest': format_date(entity.begin_from) if entity.begin_from else None,
-                          'latest': format_date(entity.begin_to) if entity.begin_to else None,
-                          'comment': entity.begin_comment if entity.begin_comment else None}
-                if entity.begin_from or entity.begin_to else None,
-                'end': {'earliest': format_date(entity.end_from) if entity.end_from else None,
-                        'latest': format_date(entity.end_to) if entity.end_to else None,
-                        'comment': entity.end_comment if entity.end_comment else None}
-                if entity.end_from or entity.end_to else None}]}
+        if entity.begin_from or entity.end_from:
+            features['when'] = {}
+            if entity.begin_from:
+                start = {'earliest': format_date(entity.begin_from)}
+                if entity.begin_to:
+                    start['latest'] = format_date(entity.begin_to)
+                if entity.begin_comment:
+                    start['comment'] = entity.begin_comment
+                features['when']['start'] = start
+            if entity.end_from:
+                end = {'earliest': format_date(entity.end_from)}
+                if entity.end_to:
+                    end['latest'] = format_date(entity.end_to)
+                if entity.end_comment:
+                    end['comment'] = entity.end_comment
+                features['when']['end'] = end
 
         # Geonames
         if geo:
