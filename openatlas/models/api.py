@@ -135,6 +135,7 @@ class Api:
             features['depictions'] = Api.get_file(entity)
 
         # Time spans
+        # todo: Put everything in an array named timespans
         if entity.begin_from or entity.end_from:
             features['when'] = {}
             if entity.begin_from:
@@ -153,10 +154,15 @@ class Api:
                 features['when']['end'] = end
 
         # Geonames
+        # todo: Put everything in an array
         if geo:
-            link_type = Api.to_camelcase(geo.type.name)
-            identifier = app.config['GEONAMES_VIEW_URL'] + geo.domain.name if geo else ''
-            features['links'] = [{'type': link_type, 'identifier': identifier}]
+            features['links'] = {}
+            if geo.type.name:
+                features['links']['type'] = Api.to_camelcase(geo.type.name)
+            if geo.domain.name:
+                features['links']['identifier'] = app.config['GEONAMES_VIEW_URL'] + geo.domain.name
+
+
 
         # Geometry
         try:
