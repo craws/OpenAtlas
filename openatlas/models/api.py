@@ -47,13 +47,16 @@ class Api:
         for link in Link.get_links(entity.id, inverse=True):
             if link.domain.system_type == 'file':
                 path = get_file_path(link.domain.id)
-                filename = os.path.basename(path)
+                #filename = os.path.basename(path)
                 file_dict = {'@id': url_for('api_entity', id_=link.domain.id, _external=True),
                              'title': link.domain.name}
                 if Api.get_license(link.domain.id):
                     file_dict['license'] = Api.get_license(link.domain.id)
-                if filename:
+                try:
+                    filename = os.path.basename(path)
                     file_dict['url'] = url_for('display_file', filename=filename, external=True)
+                except (TypeError):
+                    pass
                 files.append(file_dict)
         return files
 
@@ -120,7 +123,6 @@ class Api:
                         nodes_dict['unit'] = node.description
             if 'unit' not in nodes_dict and node.description:
                 nodes_dict['description'] = node.description
-
             nodes.append(nodes_dict)
 
         # Relations
