@@ -29,7 +29,7 @@ class Api:
             links.append({'label': link.range.name,
                           'relationTo': url_for('api_entity', id_=link.range.id, _external=True),
                           'relationType': 'crm:' + link.property.code + '_'
-                                          + link.property.i18n['en'].replace(' ', '_')}, )
+                                          + link.property.i18n['en'].replace(' ', '_')})
             if link.property.code == 'P53':
                 entity.location = link.range
 
@@ -37,7 +37,7 @@ class Api:
             links.append({'label': link.domain.name,
                           'relationTo': url_for('api_entity', id_=link.domain.id, _external=True),
                           'relationType': 'crm:' + link.property.code + '_'
-                                          + link.property.i18n['en'].replace(' ', '_')}, )
+                                          + link.property.i18n['en'].replace(' ', '_')})
 
         return links
 
@@ -112,8 +112,15 @@ class Api:
         for node in entity.nodes:
             nodes_dict = {'identifier': url_for('api_entity', id_=node.id, _external=True),
                           'label': node.name}
-            if node.description:
+
+            for link in Link.get_links(entity.id):
+                if link.range.id == node.id and link.description:
+                    nodes_dict['value'] = link.description
+                    if link.range.id == node.id and node.description:
+                        nodes_dict['unit'] = node.description
+            if 'unit' not in nodes_dict and node.description:
                 nodes_dict['description'] = node.description
+
             nodes.append(nodes_dict)
 
         # Relations
