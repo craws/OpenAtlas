@@ -154,15 +154,14 @@ class Api:
                 features['when']['end'] = end
 
         # Geonames
-        # todo: Put everything in an array
         if geo:
-            features['links'] = {}
+            features['links'] = []
+            geo_name = {}
             if geo.type.name:
-                features['links']['type'] = Api.to_camelcase(geo.type.name)
+                geo_name['type'] = Api.to_camelcase(geo.type.name)
             if geo.domain.name:
-                features['links']['identifier'] = app.config['GEONAMES_VIEW_URL'] + geo.domain.name
-
-
+                geo_name['identifier'] = app.config['GEONAMES_VIEW_URL'] + geo.domain.name
+            features['links'].append(geo_name)
 
         # Geometry
         try:
