@@ -172,12 +172,14 @@ class Api:
             geometries = []
             shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
             for geo in Gis.get_by_id(entity.location.id):
-                geometries.append({'type': shape[geo['shape']],
-                                   'coordinates': geo['geometry']['coordinates'],
-                                   'classification': geo['type'],
-                                   'description': geo['description'] if geo[
-                                       'description'] else None,
-                                   'title': geo['name'] if geo['description'] else None})
+                geo_meta = {'type': shape[geo['shape']],
+                            'coordinates': geo['geometry']['coordinates'],
+                            'classification': geo['type']}
+                if geo['description']:
+                    geo_meta['description'] = geo['description']
+                if geo['name']:
+                    geo_meta['title'] = geo['name']
+                geometries.append(geo_meta)
 
             if len(geometries) == 1:
                 features['geometry'] = geometries[0]
