@@ -129,29 +129,33 @@ class Api:
             for key, value in entity.aliases.items():
                 features['names'].append({"alias": value})
 
-        # Todo: How to get into the if function? Why this method won't work?
+        # Todo: This functions won't work on references! Need to change
         # Depictions
         if Api.get_file(entity):
             features['depictions'] = Api.get_file(entity)
 
         # Time spans
-        # todo: Put everything in an array named timespans
         if entity.begin_from or entity.end_from:
-            features['when'] = {}
+            features['when'] = {'timespans': []}
             if entity.begin_from:
                 start = {'earliest': format_date(entity.begin_from)}
                 if entity.begin_to:
                     start['latest'] = format_date(entity.begin_to)
                 if entity.begin_comment:
                     start['comment'] = entity.begin_comment
-                features['when']['start'] = start
             if entity.end_from:
                 end = {'earliest': format_date(entity.end_from)}
                 if entity.end_to:
                     end['latest'] = format_date(entity.end_to)
                 if entity.end_comment:
                     end['comment'] = entity.end_comment
-                features['when']['end'] = end
+
+            if entity.begin_from and not entity.end_from:
+                features['when']['timespans'].append({'start': start})
+            elif not entity.begin_from and entity.end_from:
+                features['when']['timespans'].append({'end': end})
+            else:
+                features['when']['timespans'].append({'start': start, 'end': end})
 
         # Geonames
         if geo:
