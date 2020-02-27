@@ -101,19 +101,20 @@ class Api:
         geo = Geonames.get_geonames_link(entity)
         type_ = 'FeatureCollection'
         nodes = []
+        features = {'@id': url_for('entity_view', id_=entity.id, _external=True),
+                    'type': 'Feature',
+                    'crmClass': "".join(entity.class_.code + " "
+                                        + entity.class_.i18n['en']).replace(" ", "_"),
+                    'crmClassLabel': entity.class_.i18n['en'],
+                    'properties': {'title': entity.name}}
 
+        # Types
         for node in entity.nodes:
             nodes_dict = {'identifier': url_for('api_entity', id_=node.id, _external=True),
                           'label': node.name}
             if node.description:
                 nodes_dict['description'] = node.description
             nodes.append(nodes_dict)
-
-        features = {'@id': url_for('entity_view', id_=entity.id, _external=True),
-                    'type': 'Feature',
-                    'crmClass': entity.class_.code,
-                    'crmClassLabel': entity.class_.i18n['en'],
-                    'properties': {'title': entity.name}}
 
         # Relations
         if Api.get_links(entity):
