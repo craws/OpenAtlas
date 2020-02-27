@@ -3,7 +3,7 @@
     {% if origin %}
         {{ [[_(origin.view_name), origin.view_name + '_index'], origin, '+ ' + _(code).capitalize()]|crumb }}
     {% else %}
-        {{ [[_(reference), 'reference_index'], '+ ' + _(code).capitalize()]|crumb }}
+        {{ [[_('reference'), 'reference_index'], '+ ' + _(code).capitalize()]|crumb }}
     {% endif %}
 {% endblock %}
 {% block content %}

@@ -6,13 +6,13 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import FloatField
+from wtforms import FloatField, SubmitField
 from wtforms.validators import InputRequired
 
 from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.overlay import Overlay
-from openatlas.util.util import required_group
+from openatlas.util.util import required_group, uc_first
 
 
 class OverlayForm(FlaskForm):  # type: ignore
@@ -20,6 +20,7 @@ class OverlayForm(FlaskForm):  # type: ignore
     top_left_northing = FloatField('', [InputRequired()])
     bottom_right_easting = FloatField('', [InputRequired()])
     bottom_right_northing = FloatField('', [InputRequired()])
+    save = SubmitField()
 
 
 @app.route('/overlay/insert/<int:image_id>/<int:place_id>/<int:link_id>', methods=['POST', 'GET'])

@@ -25,6 +25,6 @@
                 <div class="table-cell">{{ form.bottom_right_northing(class_='number') }}</div>
             </div>
         </div>
-        <input class="{{ config['CSS']['button']['primary'] }}" id="save" name="save" value="{{ _('save')|uc_first }}" type="submit">
+        {{ form.save(class=config['CSS']['button']['primary']) }}
     </form>
 {% endblock %}
