@@ -47,13 +47,14 @@ class Api:
         for link in Link.get_links(entity.id, inverse=True):
             if link.domain.system_type == 'file':
                 path = get_file_path(link.domain.id)
-                filename = os.path.basename(path) if path else None
-                files.append({'@id': url_for('api_entity', id_=link.domain.id, _external=True),
-                              'title': link.domain.name,
-                              'license': Api.get_license(link.domain.id) if Api.get_license(
-                                  link.domain.id) else None,
-                              'url': url_for('display_file', filename=filename,
-                                             _external=True) if filename else None})
+                filename = os.path.basename(path)
+                file_dict = {'@id': url_for('api_entity', id_=link.domain.id, _external=True),
+                             'title': link.domain.name}
+                if Api.get_license(link.domain.id):
+                    file_dict['license'] = Api.get_license(link.domain.id)
+                if filename:
+                    file_dict['url'] = url_for('display_file', filename=filename, external=True)
+                files.append(file_dict)
         return files
 
     @staticmethod
@@ -97,14 +98,16 @@ class Api:
     @staticmethod
     def get_entity(id_: int) -> Dict[str, Any]:
         entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-
-        type_ = 'FeatureCollection'
-
-        nodes = []
-        for node in entity.nodes:
-            nodes.append({'identifier': url_for('api_entity', id_=node.id, _external=True),
-                          'label': node.name, 'description': node.description})
         geo = Geonames.get_geonames_link(entity)
+        type_ = 'FeatureCollection'
+        nodes = []
+
+        for node in entity.nodes:
+            nodes_dict = {'identifier': url_for('api_entity', id_=node.id, _external=True),
+                          'label': node.name}
+            if node.description:
+                nodes_dict['description'] = node.description
+            nodes.append(nodes_dict)
 
         features = {'@id': url_for('entity_view', id_=entity.id, _external=True),
                     'type': 'Feature',
@@ -172,12 +175,14 @@ class Api:
             geometries = []
             shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
             for geo in Gis.get_by_id(entity.location.id):
-                geometries.append({'type': shape[geo['shape']],
-                                   'coordinates': geo['geometry']['coordinates'],
-                                   'classification': geo['type'],
-                                   'description': geo['description'] if geo[
-                                       'description'] else None,
-                                   'title': geo['name'] if geo['description'] else None})
+                geo_dict = {'type': shape[geo['shape']],
+                            'coordinates': geo['geometry']['coordinates'],
+                            'classification': geo['type']}
+                if geo['description']:
+                    geo_dict['description'] = geo['description']
+                if geo['name']:
+                    geo_dict['title'] = geo['name']
+                geometries.append(geo_dict)
 
             if len(geometries) == 1:
                 features['geometry'] = geometries[0]
