@@ -1,7 +1,7 @@
 import os
 from typing import List, Dict, Any
 
-from flask import request, url_for
+from flask import request, url_for, g
 
 from openatlas import app
 from openatlas.models.entity import Entity
@@ -118,6 +118,14 @@ class Api:
                         nodes_dict['unit'] = node.description
             if 'unit' not in nodes_dict and node.description:
                 nodes_dict['description'] = node.description
+
+            #  This feature is soley for Stefan
+            hierarchy = []
+            for root in node.root:
+                hierarchy.append(g.nodes[root].name)
+            hierarchy.reverse()
+            nodes_dict['hierarchy'] = ' -> '.join(map(str, hierarchy))
+
             nodes.append(nodes_dict)
 
         # Relations
