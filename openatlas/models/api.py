@@ -52,7 +52,8 @@ class Api:
                 if Api.get_license(link.domain.id):
                     file_dict['license'] = Api.get_license(link.domain.id)
                 try:
-                    file_dict['url'] = url_for('display_file', filename=os.path.basename(path), external=True)
+                    file_dict['url'] = url_for('display_file', filename=os.path.basename(path),
+                                               _external=True)
                 except TypeError:
                     pass
                 files.append(file_dict)
@@ -169,7 +170,8 @@ class Api:
                 features['when']['timespans'].append({'start': start, 'end': end})
 
         # Geonames
-        if geo:
+        # if geo:
+        try:
             features['links'] = []
             geo_name = {}
             if geo.type.name:
@@ -177,6 +179,8 @@ class Api:
             if geo.domain.name:
                 geo_name['identifier'] = app.config['GEONAMES_VIEW_URL'] + geo.domain.name
             features['links'].append(geo_name)
+        except AttributeError:
+            pass
 
         # Geometry
         try:
