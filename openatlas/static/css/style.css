@@ -526,5 +526,6 @@ div.data-table div.display-none {
 }
 
 .error {
-  color: #491217;
+  color: #721c24;
+  font-weight: bold;
 }
