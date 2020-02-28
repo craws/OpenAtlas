@@ -107,7 +107,6 @@ class Api:
                     'type': 'Feature',
                     'crmClass': "".join(entity.class_.code + " "
                                         + entity.class_.i18n['en']).replace(" ", "_"),
-                    'crmClassLabel': entity.class_.i18n['en'],
                     'properties': {'title': entity.name}}
 
         # Types
