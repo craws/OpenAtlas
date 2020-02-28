@@ -25,8 +25,7 @@ div.tabs-container .ui-state-active a {
 
 a,
 .info,
-.jstree-default .jstree-search,
-.ui-widget-content a {
+.jstree-default .jstree-search {
     color: #0047bb;
 }
 
