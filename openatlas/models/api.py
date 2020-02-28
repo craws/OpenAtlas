@@ -1,11 +1,9 @@
-import json
 import os
 from typing import List, Dict, Any
 
 from flask import request, url_for
 
 from openatlas import app
-from openatlas.models.model import CidocClass
 from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
 from openatlas.models.gis import Gis
@@ -100,7 +98,7 @@ class Api:
     @staticmethod
     def get_entity(id_: int) -> Dict[str, Any]:
         entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-        geo = Geonames.get_geonames_link(entity)
+        geonames_link = Geonames.get_geonames_link(entity)
         type_ = 'FeatureCollection'
         nodes = []
         features = {'@id': url_for('entity_view', id_=entity.id, _external=True),
@@ -147,54 +145,46 @@ class Api:
 
         # Time spans
         if entity.begin_from or entity.end_from:
-            features['when'] = {'timespans': []}
+            time = {}
             if entity.begin_from:
                 start = {'earliest': format_date(entity.begin_from)}
                 if entity.begin_to:
                     start['latest'] = format_date(entity.begin_to)
                 if entity.begin_comment:
                     start['comment'] = entity.begin_comment
+                time['start'] = start
             if entity.end_from:
                 end = {'earliest': format_date(entity.end_from)}
                 if entity.end_to:
                     end['latest'] = format_date(entity.end_to)
                 if entity.end_comment:
                     end['comment'] = entity.end_comment
-
-            if entity.begin_from and not entity.end_from:
-                features['when']['timespans'].append({'start': start})
-            elif not entity.begin_from and entity.end_from:
-                features['when']['timespans'].append({'end': end})
-            else:
-                features['when']['timespans'].append({'start': start, 'end': end})
+                time['end'] = end
+            features['when'] = {'timespans': [time]}
 
         # Geonames
-
-        try:
-            if geo is not None:
-                geo_name = {}
-                if geo.type.name:
-                    geo_name['type'] = Api.to_camelcase(geo.type.name)
-                if geo.domain.name:
-                    geo_name['identifier'] = app.config['GEONAMES_VIEW_URL'] + geo.domain.name
-                if geo.type.name or geo.domain.name:
-                    features['links'] = []
-                    features['links'].append(geo_name)
-        except AttributeError:
-            pass
+        if geonames_link and geonames_link.range.class_.code == 'E18':
+            geo_name = {}
+            if geonames_link.type.name:
+                geo_name['type'] = Api.to_camelcase(geonames_link.type.name)
+            if geonames_link.domain.name:
+                geo_name['identifier'] = app.config['GEONAMES_VIEW_URL'] + geonames_link.domain.name
+            if geonames_link.type.name or geonames_link.domain.name:
+                features['links'] = []
+                features['links'].append(geo_name)
 
         # Geometry
         try:
             geometries = []
             shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
-            for geo in Gis.get_by_id(entity.location.id):
-                geo_dict = {'type': shape[geo['shape']],
-                            'coordinates': geo['geometry']['coordinates'],
-                            'classification': geo['type']}
-                if geo['description']:
-                    geo_dict['description'] = geo['description']
-                if geo['name']:
-                    geo_dict['title'] = geo['name']
+            for geonames_link in Gis.get_by_id(entity.location.id):
+                geo_dict = {'type': shape[geonames_link['shape']],
+                            'coordinates': geonames_link['geometry']['coordinates'],
+                            'classification': geonames_link['type']}
+                if geonames_link['description']:
+                    geo_dict['description'] = geonames_link['description']
+                if geonames_link['name']:
+                    geo_dict['title'] = geonames_link['name']
                 geometries.append(geo_dict)
 
             if len(geometries) == 1:
