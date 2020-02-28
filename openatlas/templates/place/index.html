@@ -5,12 +5,12 @@
 {% block content %}
     <div class="row">
         <div class="col">
-	    {% if 'contributor'|is_authorized %}
-	        <div class="toolbar">
-		    {{ 'Place'|manual_link }}
-		    <a class="btn btn-outline-primary btn-sm" href="{{ url_for('place_insert') }}">+ {{ _('place')|uc_first }}</a>
-		</div>
-	    {% endif %}
+            {% if 'contributor'|is_authorized %}
+                <div class="toolbar">
+                    {{ 'Place'|manual_link }}
+                    {{ _('place')|button(url_for('place_insert')) }}
+                </div>
+            {% endif %}
             {{ table.display()|safe }}
         </div>
         {% if gis_data %}

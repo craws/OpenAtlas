@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title_name %}- {{ reference.name }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_(reference), 'reference_index'], reference.name]|crumb }}
+    {{ [[_('reference'), 'reference_index'], reference.name]|crumb }}
 {% endblock %}
 {% block content %}
 <div id="tabs" class="tabs-container">
@@ -21,7 +21,7 @@
     <div id="tab-info">
         <div class="toolbar">
             {% if 'contributor'|is_authorized %}
-                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('reference_update', id_=reference.id) }}">{{ _('edit')|uc_first }}</a>
+                {{ _('edit')|button(url_for('reference_update', id_=reference.id)) }}
                 {{ reference|display_delete_link }}
             {% endif %}
             {{ reference.id|bookmark_toggle }}
@@ -43,16 +43,16 @@
             <div id="tab-{{name}}">
                 {% if 'contributor'|is_authorized and name not in ['feature', 'stratigraphic-unit', 'find'] %}
                     <div class="toolbar">
-                        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('reference_add', id_=reference.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
+                        {{ _('add')|button(url_for('reference_add', id_=reference.id, class_name=name)) }}
                         {% if name == 'place' %}
-                            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('place_insert', origin_id=reference.id) }}">+ {{ _('place')|uc_first }}</a>
+                            {{ _('place')|button(url_for('place_insert', origin_id=reference.id)) }}
                         {% elif name == 'source' %}
-                            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('source_insert', origin_id=reference.id) }}">+ {{ _('source')|uc_first }}</a>
+                            {{ _('source')|button(url_for('source_insert', origin_id=reference.id)) }}
                         {% elif name == 'file' %}
-                            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('file_insert', origin_id=reference.id) }}">+ {{ _('file')|uc_first }}</a>
+                            {{ _('file')|button(url_for('file_insert', origin_id=reference.id)) }}
                         {% else %}
                             {% for code in config['CLASS_CODES'][name]%}
-                                <a class="btn btn-outline-primary btn-sm" href="{{ url_for(name + '_insert', code=code, origin_id=reference.id) }}">+ {{ code|get_class_name }}</a>
+                                {{ code|get_class_name|button(url_for(name + '_insert', code=code, origin_id=reference.id)) }}
                             {% endfor %}
                         {% endif %}
                     </div>
