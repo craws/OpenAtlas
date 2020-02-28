@@ -96,3 +96,5 @@ CLASS_CODES = {
     'place': ['E18', 'E20', 'E22'],
     'reference': ['E31'],
     'source': ['E33']}
+
+CSS = {'button': {'primary': 'btn btn-outline-primary btn-sm'}}

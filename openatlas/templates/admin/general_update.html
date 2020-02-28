@@ -4,9 +4,9 @@
 {% endblock %}
 {% block content %}
     <div class="toolbar">
-        {{ 'General'|manual_link|safe }}
+        {{ 'General'|manual_link }}
     </div>
-    {{ form|display_form|safe }}
+    {{ form|display_form }}
     {% for field, errors in form.errors.items() %}
         {{ form[field].label }}: {{ ', '.join(errors) }}
     {% endfor %}

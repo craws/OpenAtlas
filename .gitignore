@@ -9,6 +9,7 @@ __pycache__/*
 
 # compiled files
 *.pyc
+/openatlas/static/.eggs/
 
 # unit tests
 openatlas/tests/.coverage
@@ -30,3 +31,5 @@ openatlas/export/sql/*
 /openatlas/static/openatlas.egg-info/
 /openatlas/static/package.json
 /openatlas/static/package-lock.json
+
+

@@ -6,35 +6,35 @@
 <div id="tabs" class="tabs-container">
     <ul>
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
-        <li><a href="#tab-event">{{ _('event')|uc_first }} {{ tables['event']|format_tab_number|safe }}</a></li>
-        <li><a href="#tab-actor">{{ _('actor')|uc_first }} {{ tables['actor']|format_tab_number|safe }}</a></li>
-        <li><a href="#tab-place">{{ _('place')|uc_first }} {{ tables['place']|format_tab_number|safe }}</a></li>
+        <li><a href="#tab-event">{{ _('event')|uc_first }} {{ tables['event']|format_tab_number }}</a></li>
+        <li><a href="#tab-actor">{{ _('actor')|uc_first }} {{ tables['actor']|format_tab_number }}</a></li>
+        <li><a href="#tab-place">{{ _('place')|uc_first }} {{ tables['place']|format_tab_number }}</a></li>
         {% for table_name in ['feature', 'stratigraphic-unit', 'find'] %}
             {% if tables[table_name].rows %}
-                <li><a href="#tab-{{ table_name }}">{{ _(table_name)|uc_first }} {{ tables[table_name]|format_tab_number|safe }}</a></li>
+                <li><a href="#tab-{{ table_name }}">{{ _(table_name)|uc_first }} {{ tables[table_name]|format_tab_number }}</a></li>
             {% endif %}
         {% endfor %}
-        <li><a href="#tab-reference">{{ _('reference')|uc_first }} {{ tables['reference']|format_tab_number|safe }}</a></li>
-        <li><a href="#tab-text">{{ _('texts')|uc_first }} {{ tables['text']|format_tab_number|safe }}</a></li>
-        <li><a href="#tab-file">{{ _('files')|uc_first }} {{ tables['file']|format_tab_number|safe }}</a></li>
+        <li><a href="#tab-reference">{{ _('reference')|uc_first }} {{ tables['reference']|format_tab_number }}</a></li>
+        <li><a href="#tab-text">{{ _('texts')|uc_first }} {{ tables['text']|format_tab_number }}</a></li>
+        <li><a href="#tab-file">{{ _('files')|uc_first }} {{ tables['file']|format_tab_number }}</a></li>
     </ul>
     <div id="tab-info">
         <div class="toolbar">
             {% if 'contributor'|is_authorized %}
                 <a class="btn btn-outline-primary btn-sm" href="{{ url_for('source_update', id_=source.id) }}">{{ _('edit')|uc_first }}</a>
-                {{ source|display_delete_link|safe }}
+                {{ source|display_delete_link }}
             {% endif %}
-            {{ source.id|bookmark_toggle|safe }}
+            {{ source.id|bookmark_toggle }}
         </div>
         <h1>{{ source.name }}</h1>
         <div>
-            {{ profile_image_id|display_profile_image|safe }}
+            {{ profile_image_id|display_profile_image }}
             <div style="float:left;">
-                {{ info|display_info|safe }}
-                {{ source|note|safe }}
-                {{ source|display_external_references|safe }}
-                {{ source|description|safe }}
-                {{ source|api_link|safe }}
+                {{ info|display_info }}
+                {{ source|note }}
+                {{ source|display_external_references }}
+                {{ source|description }}
+                {{ source|api_link }}
             </div>
             <div style="clear:both;"></div>
         </div>

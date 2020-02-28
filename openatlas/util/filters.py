@@ -33,20 +33,27 @@ def link(self: Any, entity: Entity) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def api_link(self: Any, entity: Entity) -> str:
-    return '<p><a href="{url}" target="_blank">API</a></p>'.format(url=url_for('api_entity', id_=entity.id))
+    return Markup('<p><a href="{url}" target="_blank">API</a></p>'.format(
+        url=url_for('api_entity', id_=entity.id)))
 
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def button(self: Any, label: str, url: str, css: Optional[str] = 'primary') -> str:
-    classes = {'primary': 'btn btn-outline-primary btn-sm'}
+def button(self: Any,
+           label: str,
+           url: str,
+           css: Optional[str] = 'primary',
+           onclick: Optional[str] = '') -> str:
     label = util.uc_first(label)
-    if '/insert/' in url and label != util.uc_first(_('add')):
+    if '/insert' in url and label != util.uc_first(_('add')):
         label = '+ ' + label
-    html = '<a class="{class_}" href="{url}">{label}</a>'.format(class_=classes[css],
-                                                                 url=url,
-                                                                 label=label)
+    html = '<a class="{class_}" href="{url}" {onclick}>{label}</a>'.format(
+        class_=app.config['CSS']['button'][css],
+        url=url,
+        label=label,
+        onclick='onclick="{onclick}"'.format(onclick=onclick) if onclick else '')
     return Markup(html)
+
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
@@ -72,21 +79,23 @@ def note(self: Any, entity: Entity) -> str:
     if not current_user.settings['module_notes'] or not util.is_authorized('contributor'):
         return ''  # pragma no cover
     if not entity.note:
-        return '<p><a href="{url}">{label}</a></p>'.format(
+        html = '<p><a href="{url}">{label}</a></p>'.format(
             url=url_for('note_insert', entity_id=entity.id),
             label=util.uc_first(_('note')))
-    return '<h2>{label}</h2><p>{note}</p><a href="{url}">{edit}</a>'.format(
-        label=util.uc_first(_('note')),
-        note=entity.note,
-        url=url_for('note_update', entity_id=entity.id),
-        edit=util.uc_first(_('edit note')))
+    else:
+        html = '<h2>{label}</h2><p>{note}</p><a href="{url}">{edit}</a>'.format(
+            label=util.uc_first(_('note')),
+            note=entity.note,
+            url=url_for('note_update', entity_id=entity.id),
+            edit=util.uc_first(_('edit note')))
+    return Markup(html)
 
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def format_tab_number(self: Any, param: Union[int, Table]) -> str:
     length = len(param.rows) if isinstance(param, Table) else param
-    return '<span class="tab-counter">' + babel_format_number(length) + '</span>'
+    return Markup('<span class="tab-counter">' + babel_format_number(length) + '</span>')
 
 
 @jinja2.contextfilter
@@ -123,13 +132,13 @@ def display_info(self: Any, data: Dict[str, str]) -> str:
                     <div>{key}</div>
                     <div class="table-cell">{value}</div>
                 </div>'''.format(key=util.uc_first(key), value=value)
-    return html + '</div>'
+    return Markup(html + '</div>')
 
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def bookmark_toggle(self: Any, entity_id: int) -> str:
-    return util.bookmark_toggle(entity_id)
+    return Markup(util.bookmark_toggle(entity_id))
 
 
 @jinja2.contextfilter
@@ -200,7 +209,7 @@ def description(self: Any, entity: Entity) -> str:
         label = util.uc_first(_('content'))
     html = """<h2>{label}</h2>
         <div class="description more">{description}</div>""".format(label=label, description=text)
-    return html
+    return Markup(html)
 
 
 @jinja2.contextfilter
@@ -210,7 +219,7 @@ def display_profile_image(self: Any, image_id: int) -> str:
         return ''
     file_path = get_file_path(image_id)
     if file_path:
-        return """
+        html = """
             <div id="profile_image_div">
                 <a href="/entity/{id}">
                     <img style="max-width:{width}px;" alt="profile image" src="{src}">
@@ -219,6 +228,7 @@ def display_profile_image(self: Any, image_id: int) -> str:
             """.format(id=image_id,
                        src=url_for('display_file', filename=os.path.basename(file_path)),
                        width=session['settings']['profile_image_width'])
+        return Markup(html)
     return ''  # pragma no cover
 
 
@@ -233,10 +243,14 @@ def display_content_translation(self: Any, text: str) -> str:
 @blueprint.app_template_filter()
 def manual_link(self: Any, wiki_site: str) -> str:
     # Creates a link to a manual page
-    return """
-        <a class="btn btn-outline-primary btn-sm" href="{url}" target="_blank"> <img style="height:14px;" src="/static/images/icons/book.png" alt=''>{label}</a>
+    html = """
+        <a class="{css}" href="{url}" target="_blank">
+            <img style="height:14px;" src="/static/images/icons/book.png" alt=''>{label}
+        </a>
         """.format(url='https://redmine.openatlas.eu/projects/uni/wiki/' + wiki_site,
+                   css=app.config['CSS']['button']['primary'],
                    label=util.uc_first(_('manual')))
+    return Markup(html)
 
 
 @jinja2.contextfilter
@@ -291,7 +305,7 @@ def display_form(self: Any,
         errors = ''
         for error in field.errors:
             errors += util.uc_first(error)
-        tooltip = util.display_tooltip(field.description)
+
         if field.type in ['TreeField', 'TreeMultiField']:
             hierarchy_id = int(field.id)
             node = g.nodes[hierarchy_id]
@@ -309,18 +323,17 @@ def display_form(self: Any,
                         </div>
                     </div>
                     {value_fields}""".format(label=label,
-                                             tooltip=tooltip,
+                                             tooltip=util.display_tooltip(node.description),
                                              value_fields=display_value_type_fields(node.subs))
                 continue
             else:
+                tooltip = '' if 'is_node_form' in form else util.display_tooltip(node.description)
                 type_field = """
                     <div class="table-row">
                         <div><label>{label}</label> {tooltip}</div>
                         <div class="table-cell">{field}</div>
                     </div>
-                """.format(label=label,
-                           field=str(field(class_=class_)) + errors,
-                           tooltip= '' if 'is_node_form' in form else tooltip)
+                """.format(label=label, field=str(field(class_=class_)) + errors, tooltip=tooltip)
                 if node.name in app.config['BASE_TYPES']:  # base type should be above other fields
                     html['types'] = type_field + html['types']
                 else:
@@ -336,13 +349,14 @@ def display_form(self: Any,
                                                                  text=field(class_=class_))
             continue
         if field.type == 'SubmitField':
-            html['footer'] += str(field(class_='btn btn-outline-primary btn-sm'))
+            html['footer'] += str(field(class_=app.config['CSS']['button']['primary']))
             continue
         if field.id.split('_', 1)[0] in ('begin', 'end'):  # If it's a date field use a function
             if field.id == 'begin_year_from':
                 html['footer'] += util.add_dates_to_form(form, for_persons)
             continue
         errors = ' <span class="error">' + errors + ' </span>' if errors else ''
+        tooltip = util.display_tooltip(field.description)
         if field.id in ('file', 'name'):
             html['header'] += '''
                 <div class="table-row">
@@ -393,7 +407,7 @@ def display_form(self: Any,
         html['value_types'] = values_html + html['value_types']
     html_all += html['header'] + html['types'] + html['main'] + html['value_types'] + html['footer']
     html_all += '</div></form>'
-    return html_all
+    return Markup(html_all)
 
 
 @jinja2.contextfilter
@@ -419,10 +433,10 @@ def sanitize(self: Any, string: str) -> str:
 def display_delete_link(self: Any, entity: Entity) -> str:
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
-    return '<a class="btn btn-outline-primary btn-sm" {confirm} href="{url}">{label}</a>'.format(
-        confirm='onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"',
-        url=url_for(entity.view_name + '_index', action='delete', id_=entity.id),
-        label=util.uc_first(_('delete')))
+    return button(self,
+                  _('delete'),
+                  url_for(entity.view_name + '_index', action='delete', id_=entity.id),
+                  onclick="return confirm('" + _('Delete %(name)s?', name=name) + "')")
 
 
 @jinja2.contextfilter
@@ -487,4 +501,4 @@ def display_external_references(self: Any, entity: Entity) -> str:
             name = 'GeoNames (' + link_.domain.name + ')'
             url = app.config['GEONAMES_VIEW_URL'] + link_.domain.name
         html += '<a target="_blank" href="{url}">{name}</a><br>'.format(url=url, name=name)
-    return '<h2>' + util.uc_first(_('external references')) + '</h2>' + html if html else ''
+    return Markup('<h2>' + util.uc_first(_('external references')) + '</h2>' + html) if html else ''

@@ -28,7 +28,7 @@ install folder but aren't fully tested and still experimental.
 
 ### gettext, pip, npm
 
-    # apt-get gettext npm python3-pip
+    # apt-get install gettext npm python3-pip
 
 ## Installation
 

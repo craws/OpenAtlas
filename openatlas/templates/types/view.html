@@ -7,11 +7,11 @@
     <ul>
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
         {% if tables['subs'].rows %}
-            <li><a href="#tab-subs">{{ _('subs')|uc_first }} {{ tables['subs']|format_tab_number|safe }}</a></li>
+            <li><a href="#tab-subs">{{ _('subs')|uc_first }} {{ tables['subs']|format_tab_number }}</a></li>
         {% endif %}
         {% if tables['entities'].rows or tables['link_entities'].rows %}
             <li>
-                <a href="#tab-entities">{{ _('entities')|uc_first }} {{ (tables['entities'].rows|length + tables['link_entities'].rows|length)|format_tab_number|safe }}</a>
+                <a href="#tab-entities">{{ _('entities')|uc_first }} {{ (tables['entities'].rows|length + tables['link_entities'].rows|length)|format_tab_number }}</a>
             </li>
         {% endif %}
     </ul>
@@ -29,13 +29,13 @@
         {% if super_ %}
             <p>{{_('super')|uc_first}}: {{ super_|link|safe }}</p>
         {% endif %}
-        {{ info|display_info|safe }}
+        {{ info|display_info }}
         {% if root.value_type %}
             <p>{{_('unit')|uc_first}}: {{node.description}}</p>
         {% else %}
-            {{ node|description|safe }}
+            {{ node|description }}
         {% endif %}
-        {{ node|api_link|safe }}
+        {{ node|api_link }}
     </div>
     {% if tables['subs'].rows %}
         <div id="tab-subs">

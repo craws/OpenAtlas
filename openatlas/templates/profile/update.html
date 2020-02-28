@@ -4,7 +4,7 @@
 {% endblock %}
 {% block content %}
     <div class="toolbar">
-        {{ 'Profile'|manual_link|safe }}
+        {{ 'Profile'|manual_link }}
     </div>
     <form method="post">
         {{ form.csrf_token }}
@@ -74,7 +74,7 @@
             </div>
         {% endif %}
         <div style="clear:both"></div>
-        {{ form.save}}
+        {{ form.save(class=config['CSS']['button']['primary']) }}
     </form>
 
 {% endblock %}

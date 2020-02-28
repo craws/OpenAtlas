@@ -4,6 +4,11 @@ html, body, input, select, textarea {
     font-family: helvetica, arial, sans-serif;
 }
 
+#site-name-and-version {
+    position: absolute;
+    right: 16px
+}
+
 div.preview {
     margin-left: 1em;
 }
@@ -238,14 +243,6 @@ form input[type="text"].month, form input[type="text"].day {
     top: 0;
 }
 
-p.inverse-heading {
-    display: inline-block;
-    font-size: 1.1em;
-    font-weight: bold;
-    margin-bottom: 0.3em;
-    padding: 0.4em;
-}
-
 button {
     cursor: pointer;
     display: inline-block;
@@ -279,23 +276,6 @@ noscript div {
     margin-top: 1em;
 }
 
-#header-menu {
-    float: right;
-    font-weight: bold;
-    font-size: 0.9em;
-    padding: 0.5em 1em;
-}
-
-#language-menu a, #language-menu span {
-    padding: 0.2em 0.4em;
-}
-
-img.zoom {
-    cursor: pointer;
-    margin-right: 0.5em;
-    vertical-align: middle;
-}
-
 #content {
     margin: 1em;
     text-align: left;
@@ -307,55 +287,6 @@ img.zoom {
     border-width: 1px;
     padding: 0.5em;
     width: 60em;
-}
-
-#site-name {
-    font-size: 1.4em;
-    font-weight: bold;
-    float: left;
-    margin: 0.5em 0.5em 0.5em 2em;
-}
-
-#menu {
-    clear: both;
-    height: 3em;
-}
-
-#menu, #breadcrumb {
-    padding-left: 1em;
-    padding-right: 1em;
-    font-weight: bold;
-}
-
-#breadcrumb {
-    padding-top: 0.6em;
-    height: 1.8em;
-}
-
-#breadcrumb a {
-    margin-right: 0.2em;
-}
-
-#menu > div {
-    float: left;
-    margin-right: 1em;
-    margin-top: 1em;
-}
-
-#menu > div.active {
-    height: 1.6em;
-    border-bottom-width: 0.5em;
-    border-bottom-style: solid;
-}
-
-#menu a, #breadcrumb div span {
-    display: block;
-    text-decoration: none;
-}
-
-#language-menu {
-    float: right;
-    margin-top: 2em;
 }
 
 #greeting {
@@ -499,13 +430,6 @@ div.pager a {
     margin-right: 0.5em;
 }
 
-div.pager div.navigation {
-    background-repeat: no-repeat;
-    height: 21px;
-    width: 20px;
-
-}
-
 select.pagesize, select#gis {
     width: auto;
 }
@@ -582,5 +506,3 @@ div.data-table div.display-none {
 .toolbar {
     margin-bottom: 5px;
 }
-
-/*datatables

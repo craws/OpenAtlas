@@ -3,12 +3,12 @@
     {{ [[_('admin'), 'admin_index'], _('check dates')]|crumb }}
 {% endblock %}
 {% block content %}
-{{ 'Data_integrity'|manual_link|safe }}
+{{ 'Data_integrity'|manual_link }}
 <div id="tabs" class="tabs-container">
     <ul>
-        <li><a href="#tab-dates">{{ _('invalid dates')|uc_first }} {{ tables['dates']|format_tab_number|safe }}</a></li>
-        <li><a href="#tab-link-dates">{{ _('invalid link dates')|uc_first }} {{ tables['link_dates']|format_tab_number|safe }}</a></li>
-        <li><a href="#tab-involvement-dates">{{ _('invalid involvement dates')|uc_first }} {{ tables['involvement_dates']|format_tab_number|safe }}</a></li>
+        <li><a href="#tab-dates">{{ _('invalid dates')|uc_first }} {{ tables['dates']|format_tab_number }}</a></li>
+        <li><a href="#tab-link-dates">{{ _('invalid link dates')|uc_first }} {{ tables['link_dates']|format_tab_number }}</a></li>
+        <li><a href="#tab-involvement-dates">{{ _('invalid involvement dates')|uc_first }} {{ tables['involvement_dates']|format_tab_number }}</a></li>
     </ul>
     <div id="tab-dates">
     {% if tables['dates'].rows %}

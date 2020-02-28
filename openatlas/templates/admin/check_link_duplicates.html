@@ -4,7 +4,7 @@
 {% endblock %}
 {% block content %}
     <div class="toolbar">
-        {{ 'Data_integrity'|manual_link|safe }}
+        {{ 'Data_integrity'|manual_link }}
         {% if duplicates %}
             {{ _('delete link duplicates')|button(url_for('admin_check_link_duplicates', delete='delete')) }}
         {% endif %}

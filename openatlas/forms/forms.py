@@ -271,11 +271,14 @@ class TableSelect(HiddenInput):  # type: ignore
                 selection = entity.name
             data = get_base_table_data(entity, file_stats)
             if len(entity.aliases) > 0:
-                data[0] = """<p><a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a></p>
-                            """.format(name=field.id, entity_id=entity.id, entity_name=entity.name)
+                data[0] = """
+                    <p>
+                        <a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
+                    </p>""".format(name=field.id, entity_id=entity.id, entity_name=entity.name)
             else:
-                data[0] = """<a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
-                            """.format(name=field.id, entity_id=entity.id, entity_name=entity.name)
+                data[0] = """
+                    <a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
+                    """.format(name=field.id, entity_id=entity.id, entity_name=entity.name)
             for i, (id_, alias) in enumerate(entity.aliases.items()):
                 if i == len(entity.aliases) - 1:
                     data[0] = ''.join([data[0]] + [alias])
@@ -397,7 +400,7 @@ def build_move_form(form: Any, node: Node) -> FlaskForm:
 
 
 def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
-    """ Returns a form with a list of entities with checkboxes"""
+    """ Returns a form with a list of entities with checkboxes."""
     if class_name == 'file':
         entities = Entity.get_by_system_type('file', nodes=True)
     elif class_name == 'place':
@@ -420,7 +423,9 @@ def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
         <form class="table" id="checkbox-form" method="post">
             <input id="csrf_token" name="csrf_token" type="hidden" value="{token}">
             <input id="checkbox_values" name="checkbox_values" type="hidden">
-            {table} <button name="form-submit" id="form-submit" type="submit">{add}</button>
+            {table}
+            <input id="save" class="{class_}" name="save" type="submit" value="{add}">
         </form>""".format(add=uc_first(_('add')),
                           token=generate_csrf(),
+                          class_=app.config['CSS']['button']['primary'],
                           table=table.display(class_name))

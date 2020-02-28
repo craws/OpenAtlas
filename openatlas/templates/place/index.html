@@ -4,18 +4,18 @@
 {% endblock %}
 {% block content %}
     <div class="row">
-    <div class="col">
-    {% if 'contributor'|is_authorized %}
-    <div class="toolbar">
-        {{ 'Place'|manual_link|safe }}
-        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('place_insert') }}">+ {{ _('place')|uc_first }}</a>
-    </div>
-    {% endif %}
-        {{ table.display()|safe }}
-    </div>
-    {% if gis_data %}
-        <div id="map" class="col"></div>
-    {% endif %}
+        <div class="col">
+            {% if 'contributor'|is_authorized %}
+                <div class="toolbar">
+                    {{ 'Place'|manual_link }}
+                    {{ _('place')|button(url_for('place_insert')) }}
+                </div>
+            {% endif %}
+            {{ table.display()|safe }}
+        </div>
+        {% if gis_data %}
+            <div id="map" class="col"></div>
+        {% endif %}
     </div>
     <script src="/static/js/map/map.js"></script>
 {% endblock %}

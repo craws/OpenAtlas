@@ -4,7 +4,7 @@
 {% endblock %}
 {% block content %}
     <div class="toolbar">
-        {{ 'SQL'|manual_link|safe }}
+        {{ 'SQL'|manual_link }}
         {% if file_data['file'] %}
             <p style="margin-top: 1em;">
                 {{ _('latest backup')|uc_first }}: {{ file_data['file'] }}, {{ file_data['size'] }},
@@ -18,7 +18,7 @@
             <a href="{{ url_for('export_sql') }}">{{ _('here') }}</a>.
         </p>
     {% else %}
-        {{ form|display_form|safe }}
+        {{ form|display_form }}
         <p>
             {{ response|safe }}
         </p>

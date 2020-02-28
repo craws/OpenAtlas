@@ -6,35 +6,35 @@
     <div id="tabs" class="tabs-container">
     <ul>
         <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
-        <li><a href="#tab-source">{{ _('source')|uc_first }} {{ tables['source']|format_tab_number|safe }}</a></li>
-        <li><a href="#tab-event">{{ _('event')|uc_first }} {{ tables['event']|format_tab_number|safe }}</a></li>
-        <li><a href="#tab-actor">{{ _('actor')|uc_first }} {{ tables['actor']|format_tab_number|safe }}</a></li>
-        <li><a href="#tab-place">{{ _('place')|uc_first }} {{ tables['place']|format_tab_number|safe }}</a></li>
+        <li><a href="#tab-source">{{ _('source')|uc_first }} {{ tables['source']|format_tab_number }}</a></li>
+        <li><a href="#tab-event">{{ _('event')|uc_first }} {{ tables['event']|format_tab_number }}</a></li>
+        <li><a href="#tab-actor">{{ _('actor')|uc_first }} {{ tables['actor']|format_tab_number }}</a></li>
+        <li><a href="#tab-place">{{ _('place')|uc_first }} {{ tables['place']|format_tab_number }}</a></li>
         {% for table_name in ['feature', 'stratigraphic-unit', 'find'] %}
             {% if tables[table_name].rows %}
-                <li><a href="#tab-{{ table_name }}">{{ _(table_name)|uc_first }} {{ tables[table_name]|format_tab_number|safe }}</a></li>
+                <li><a href="#tab-{{ table_name }}">{{ _(table_name)|uc_first }} {{ tables[table_name]|format_tab_number }}</a></li>
             {% endif %}
         {% endfor %}
-        <li><a href="#tab-reference">{{ _('reference')|uc_first }} {{ tables['reference']|format_tab_number|safe }}</a></li>
+        <li><a href="#tab-reference">{{ _('reference')|uc_first }} {{ tables['reference']|format_tab_number }}</a></li>
     </ul>
     <div id="tab-info">
         <div class="toolbar">
             {% if 'contributor'|is_authorized %}
-                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('file_update', id_=entity.id) }}">{{ _('edit')|uc_first }}</a>
-                {{ entity|display_delete_link|safe }}
+                {{ _('edit')|button(url_for('file_update', id_=entity.id)) }}
+                {{ entity|display_delete_link }}
             {% endif %}
-            {{ entity.id|bookmark_toggle|safe }}
+            {{ entity.id|bookmark_toggle }}
             {% if missing_file %}
                 <span class="error">{{ _('missing file')|uc_first }}!</span>
             {% else %}
-                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('download_file', filename=filename) }}">{{ _('download')|uc_first }}</a>
+                {{ _('download')|button(url_for('download_file', filename=filename)) }}
             {% endif %}
         </div>
         <h1>{{ entity.name }}</h1>
         <div>
             <div style="float:left;">
-                {{ info|display_info|safe }}
-                {{ entity|api_link|safe }}
+                {{ info|display_info }}
+                {{ entity|api_link }}
             </div>
             <div class="preview" style="float:left;">
                 {% if preview %}
@@ -47,13 +47,13 @@
             </div>
         </div>
         <div style="clear:both;"></div>
-        {{ entity|description|safe }}
+        {{ entity|description }}
     </div>
     <div id="tab-source">
         {% if 'contributor'|is_authorized %}
         <div class="toolbar">
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('file_add', id_=entity.id, class_name='source')}}">{{ _('add')|uc_first }}</a>
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('source_insert', origin_id=entity.id) }}">+ {{ _('source')|uc_first }}</a>
+            {{ _('add')|button(url_for('file_add', id_=entity.id, class_name='source')) }}
+            {{ _('source')|button(url_for('source_insert', origin_id=entity.id)) }}
         </div>
         {% endif %}
         {{ tables['source'].display('source')|safe }}
@@ -63,12 +63,12 @@
             <div id="tab-{{name}}">
                 {% if 'contributor'|is_authorized and name not in ['feature', 'stratigraphic-unit', 'find'] %}
                     <div class="toolbar">
-                        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('file_add', id_=entity.id, class_name=name)}}">{{ _('add')|uc_first }}</a>
+                        {{ _('add')|button(url_for('file_add', id_=entity.id, class_name=name)) }}
                         {% if name == 'place' %}
-                            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('place_insert', origin_id=entity.id) }}">+ {{ _('place')|uc_first }}</a>
+                            {{ _('place')|button(url_for('place_insert', origin_id=entity.id)) }}
                         {% else %}
                             {% for code in config['CLASS_CODES'][name]%}
-                                <a class="btn btn-outline-primary btn-sm" href="{{ url_for(name + '_insert', code=code, origin_id=entity.id) }}">+ {{ code|get_class_name }}</a>
+                                {{ code|get_class_name|button(url_for(name + '_insert', code=code, origin_id=entity.id)) }}
                             {% endfor %}
                         {% endif %}
                     </div>
@@ -80,9 +80,9 @@
     <div id="tab-reference">
         {% if 'contributor'|is_authorized %}
             <div class="toolbar">
-                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('file_add_reference', id_=entity.id)}}">{{ _('add')|uc_first }}</a>
-                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('reference_insert', code='bibliography', origin_id=entity.id) }}">+ {{ _('bibliography')|uc_first }}</a>
-                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('reference_insert', code='edition', origin_id=entity.id) }}">+ {{ _('edition')|uc_first }}</a>
+                {{ _('add')|button(url_for('file_add_reference', id_=entity.id)) }}
+                {{ _('bibliography')|button(url_for('reference_insert', code='bibliography', origin_id=entity.id)) }}
+                {{ _('edition')|button(url_for('reference_insert', code='edition', origin_id=entity.id)) }}
             </div>
         {% endif %}
         {{ tables['reference'].display('reference')|safe }}

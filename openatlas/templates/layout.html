@@ -9,16 +9,16 @@
     {% if '127.0.0' not in request.url %}
         <link rel="manifest" href="/static/manifest.json">
     {% endif %}
-    <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="/static/node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css"/>
-    <link rel="stylesheet" href="/static/node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css"/>
-    <link rel="stylesheet" href="/static/node_modules/jstree/dist/themes/default/style.min.css"/>
+    <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css">
+    <link rel="stylesheet" href="/static/node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="/static/node_modules/jstree/dist/themes/default/style.min.css">
 
-    <link rel="mask-icon" href="/static/safari-pinned-tab.svg"/>
-    <link rel="stylesheet" href="/static/css/reset.css?v={{ config['VERSION'] }}"/>
-    <link rel="stylesheet" href="/static/css/uitheme.css"/>
-    <link rel="stylesheet" href="/static/css/style.css?v={{ config['VERSION'] }}"/>
-    <link rel="stylesheet" href="/static/css/color.css?v={{ config['VERSION'] }}"/>
+    <link rel="mask-icon" href="/static/safari-pinned-tab.svg">
+    <link rel="stylesheet" href="/static/css/reset.css?v={{ config['VERSION'] }}">
+    <link rel="stylesheet" href="/static/css/uitheme.css">
+    <link rel="stylesheet" href="/static/css/style.css?v={{ config['VERSION'] }}">
+    <link rel="stylesheet" href="/static/css/color.css?v={{ config['VERSION'] }}">
 
     <script src="/static/node_modules/jquery/dist/jquery.min.js"></script>
     <script src="/static/node_modules/datatables.net/js/jquery.dataTables.min.js"></script>
@@ -81,7 +81,7 @@
                 <form method="post" action="{{ url_for('search_index') }}" style="display: inline-flex">
                     {{ search_form.csrf_token }}
                     {{ search_form.term }}
-                    {{ search_form.search(class_="btn btn-outline-primary btn-sm") }}
+                    {{ search_form.search(class_=config['CSS']['button']['primary']) }}
                 </form>
             </div>
         </div>
@@ -154,18 +154,13 @@
 <nav aria-label="breadcrumb">
     <div class="breadcrumb">
         {% block breadcrumb %}{% endblock %}
-        <div style="position: absolute; right: 16px">
-            {% if session['settings']['site_header'] %}
-                {{ session['settings']['site_header'] }}
-            {% else %}
-                OpenAtlas
-            {% endif %}
+        <div id="site-name-and-version">
+            {{ session['settings']['site_name'] }}
             <a href="{{ url_for('index_changelog') }}">{{ config['VERSION'] }}</a>
         </div>
     </div>
 </nav>
 <noscript><div class="error">{{ _('warning no js') }}</div></noscript>
-{% if 'local' in request['url_root'] %}local{% endif %}
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
         {% for category, message in messages %}

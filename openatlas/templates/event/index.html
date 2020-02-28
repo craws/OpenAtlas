@@ -5,9 +5,9 @@
 {% block content %}
     {% if 'contributor'|is_authorized %}
         <div class="toolbar">
-            {{ 'Event'|manual_link|safe }}
+            {{ 'Event'|manual_link }}
             {% for code in config['CLASS_CODES']['event'] %}
-                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('event_insert', code=code) }}">+ {{ code|get_class_name }}</a>
+                {{ code|get_class_name|button(url_for('event_insert', code=code)) }}
             {% endfor %}
         </div>
     {% endif %}
