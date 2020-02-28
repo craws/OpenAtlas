@@ -124,7 +124,7 @@ class Api:
             for root in node.root:
                 hierarchy.append(g.nodes[root].name)
             hierarchy.reverse()
-            nodes_dict['hierarchy'] = ' -> '.join(map(str, hierarchy))
+            nodes_dict['hierarchy'] = ' > '.join(map(str, hierarchy))
 
             nodes.append(nodes_dict)
 
