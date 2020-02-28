@@ -366,7 +366,12 @@ table td {
     max-width: 400px;
 }
 
-/* forms */
+select[name="table_table_length"] {
+    padding-top: initial;
+    padding-bottom: initial;
+}
+
+/*forms*/
 label.error {
     padding-left: 0.5em;
 }
@@ -388,6 +393,10 @@ input[type=text], input[type=password], select {
 input[type=text], input[type=password], textarea {
     padding-left: 0.2em;
     padding-right: 0.2em;
+}
+
+input[type=submit] {
+    margin-right: 0.5em;
 }
 
 ::-moz-focus-inner {
@@ -500,4 +509,23 @@ div.data-table div.display-none {
 
 .toolbar {
     margin-bottom: 5px;
+}
+
+.alert-error {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+.alert-error hr {
+  border-top-color: #f1b0b7;
+}
+
+.alert-error .alert-link {
+  color: #491217;
+}
+
+.error {
+  color: #721c24;
+  font-weight: bold;
 }
