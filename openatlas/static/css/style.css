@@ -395,6 +395,10 @@ input[type=text], input[type=password], textarea {
     padding-right: 0.2em;
 }
 
+input[type=submit] {
+    margin-right: 0.5em;
+}
+
 ::-moz-focus-inner {
     border:0;
 }
@@ -505,4 +509,22 @@ div.data-table div.display-none {
 
 .toolbar {
     margin-bottom: 5px;
+}
+
+.alert-error {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+.alert-error hr {
+  border-top-color: #f1b0b7;
+}
+
+.alert-error .alert-link {
+  color: #491217;
+}
+
+.error {
+  color: #491217;
 }
