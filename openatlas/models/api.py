@@ -113,7 +113,6 @@ class Api:
         for node in entity.nodes:
             nodes_dict = {'identifier': url_for('api_entity', id_=node.id, _external=True),
                           'label': node.name}
-
             for link in Link.get_links(entity.id):
                 if link.range.id == node.id and link.description:
                     nodes_dict['value'] = link.description
@@ -121,6 +120,7 @@ class Api:
                         nodes_dict['unit'] = node.description
             if 'unit' not in nodes_dict and node.description:
                 nodes_dict['description'] = node.description
+
             nodes.append(nodes_dict)
 
         # Relations
@@ -169,15 +169,17 @@ class Api:
                 features['when']['timespans'].append({'start': start, 'end': end})
 
         # Geonames
-        # if geo:
+
         try:
-            features['links'] = []
-            geo_name = {}
-            if geo.type.name:
-                geo_name['type'] = Api.to_camelcase(geo.type.name)
-            if geo.domain.name:
-                geo_name['identifier'] = app.config['GEONAMES_VIEW_URL'] + geo.domain.name
-            features['links'].append(geo_name)
+            if geo is not None:
+                geo_name = {}
+                if geo.type.name:
+                    geo_name['type'] = Api.to_camelcase(geo.type.name)
+                if geo.domain.name:
+                    geo_name['identifier'] = app.config['GEONAMES_VIEW_URL'] + geo.domain.name
+                if geo.type.name or geo.domain.name:
+                    features['links'] = []
+                    features['links'].append(geo_name)
         except AttributeError:
             pass
 
