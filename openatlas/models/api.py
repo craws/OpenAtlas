@@ -118,7 +118,6 @@ class Api:
                         nodes_dict['unit'] = node.description
             if 'unit' not in nodes_dict and node.description:
                 nodes_dict['description'] = node.description
-
             nodes.append(nodes_dict)
 
         # Relations
