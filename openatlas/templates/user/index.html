@@ -6,7 +6,7 @@
     {% if 'manager'|is_authorized %}
         <div class="toolbar">
             {{ 'User'|manual_link }}
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('user_insert') }}">+ {{ _('user')|uc_first }}</a>
+            {{ _('user')|button(url_for('user_insert')) }}
         </div>
     {% endif %}
     {{ table.display()|safe }}

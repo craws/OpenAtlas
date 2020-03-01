@@ -97,4 +97,5 @@ CLASS_CODES = {
     'reference': ['E31'],
     'source': ['E33']}
 
-CSS = {'button': {'primary': 'btn btn-outline-primary btn-sm'}}
+CSS = {'button': {'primary': 'btn btn-outline-primary btn-sm',
+                  'secondary': 'btn btn-secondary'}}

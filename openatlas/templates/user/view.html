@@ -6,16 +6,16 @@
 {% block content %}
     {% if 'manager'|is_authorized %}
         <div class="toolbar">
+            {{ 'User'|manual_link }}
             {% if user.group != 'admin' or current_user.group == 'admin' %}
-                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('user_update', id_=user.id) }}">{{ _('edit')|uc_first }}</a>
+                {{ _('edit')|button(url_for('user_update', id_=user.id)) }}
             {% endif %}
             {% if user.id != current_user.id and (user.group != 'admin' or current_user.group == 'admin') %}
-                <a class="btn btn-outline-primary btn-sm" onclick="return confirm('{{_('delete')|uc_first }} {{ user.username }}?')"
-                   href="{{ url_for('user_index', action='delete', id_=user.id) }}">{{ _('delete')|uc_first }}</a>
+                {{ _('delete')|button(url_for('user_index', action='delete', id_=user.id), onclick="return confirm('" + _('delete')|uc_first + " " + user.username.replace("'", '').replace('"', '') + "?');") }}
             {% endif %}
+            {{ _('activity')|button(url_for('user_activity', user_id=user.id)) }}
         </div>
     {% endif %}
     {{ info|display_info }}
-    <a href="{{ url_for('user_activity', user_id=user.id) }}">{{ _('activity')|uc_first }}</a>
     {{ user|description }}
 {% endblock %}

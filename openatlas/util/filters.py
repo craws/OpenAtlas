@@ -41,20 +41,11 @@ def api_link(self: Any, entity: Entity) -> str:
 @blueprint.app_template_filter()
 def button(self: Any,
            label: str,
-           url: str,
+           url: Optional[str] = '#',
            css: Optional[str] = 'primary',
            id_: Optional[str] = None,
            onclick: Optional[str] = '') -> str:
-    label = util.uc_first(label)
-    if '/insert' in url and label != util.uc_first(_('add')):
-        label = '+ ' + label
-    html = '<a class="{class_}" href="{url}" {id} {onclick}>{label}</a>'.format(
-        class_=app.config['CSS']['button'][css],
-        url=url,
-        label=label,
-        id='id="' + id_ + '"' if id_ else '',
-        onclick='onclick="{onclick}"'.format(onclick=onclick) if onclick else '')
-    return Markup(html)
+    return util.button(label, url, css, id_, onclick)
 
 
 @jinja2.contextfilter
@@ -155,11 +146,11 @@ def display_move_form(self: Any, form: Any, root_name: str) -> str:
                   rows=[[item, item.label.text] for item in form.selection])
     return html + """
         <div class="toolbar">
-            <span class="btn btn-outline-primary btn-sm" id="select-all">{select_all}</span>
-            <span class="btn btn-outline-primary btn-sm" id="select-none">{deselect_all}</span>
+            {select_all}
+            {deselect_all}
         </div>
-        {table}""".format(select_all=util.uc_first(_('select all')),
-                          deselect_all=util.uc_first(_('deselect all')),
+        {table}""".format(select_all=util.button(_('select all'), id_="select-all"),
+                          deselect_all=util.button(_('deselect all'), id_="select-none"),
                           table=table.display('move'))
 
 
@@ -402,10 +393,11 @@ def display_form(self: Any,
                     <label>{values}</label>
                 </div>
                 <div class="table-cell value-type-switcher">
-                    <span class="btn btn-outline-primary btn-sm" id="value-type-switcher">{show}</span>
+                    {switcher}
                 </div>
             </div>
-            """.format(values=util.uc_first(_('values')), show=util.uc_first(_('show')))
+            """.format(values=util.uc_first(_('values')),
+                       switcher=util.button(_('show'), id_="value-type-switcher", css="secondary"))
         html['value_types'] = values_html + html['value_types']
     html_all += html['header'] + html['types'] + html['main'] + html['value_types'] + html['footer']
     html_all += '</div></form>'
@@ -435,10 +427,9 @@ def sanitize(self: Any, string: str) -> str:
 def display_delete_link(self: Any, entity: Entity) -> str:
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
-    return button(self,
-                  _('delete'),
-                  url_for(entity.view_name + '_index', action='delete', id_=entity.id),
-                  onclick="return confirm('" + _('Delete %(name)s?', name=name) + "')")
+    return util.button(_('delete'),
+                       url_for(entity.view_name + '_index', action='delete', id_=entity.id),
+                       onclick="return confirm('" + _('Delete %(name)s?', name=name) + "')")
 
 
 @jinja2.contextfilter
@@ -455,7 +446,6 @@ def display_menu(self: Any, entity: Optional[Entity]) -> str:
             except:  # Catch the exception to prevent a recursive call
                 pass
         for item in items:
-            css = ''
             if entity:
                 css = 'active' if entity.view_name == item else ''
             else:

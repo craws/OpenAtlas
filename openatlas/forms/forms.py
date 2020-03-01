@@ -140,7 +140,7 @@ class TreeSelect(HiddenInput):  # type: ignore
             <input id="{name}-button" name="{name}-button" type="text"
                 class="table-select {required}" onfocus="this.blur()"
                 readonly="readonly" value="{selection}" placeholder="{change_label}">
-            <a id="{name}-clear" {clear_style} class="btn btn-secondary"
+            <a  href="#" id="{name}-clear" {clear_style} class="{button_class}"
                 onclick="clearSelect('{name}');">{clear_label}</a>
             <div id="{name}-overlay" class="overlay">
                 <div id="{name}-dialog" class="overlay-container">
@@ -172,6 +172,7 @@ class TreeSelect(HiddenInput):  # type: ignore
             </script>""".format(filter=uc_first(_('type to search')),
                                 min_chars=session['settings']['minimum_jstree_search'],
                                 name=field.id,
+                                button_class=app.config['CSS']['button']['secondary'],
                                 title=g.nodes[int(field.id)].name,
                                 change_label=uc_first(_('change')),
                                 clear_label=uc_first(_('clear')),
@@ -199,7 +200,7 @@ class TreeMultiSelect(HiddenInput):  # type: ignore
                 selected_ids.append(entity_id)
                 selection += g.nodes[entity_id].name + '<br>'
         html = """
-            <span id="{name}-button" class="button btn btn-secondary">{change_label}</span>
+            <span id="{name}-button" class="{button_class}">{change_label}</span>
             <div id="{name}-selection" style="text-align:left;">{selection}</div>
             <div id="{name}-overlay" class="overlay">
                <div id="{name}-dialog" class="overlay-container">
@@ -227,6 +228,7 @@ class TreeMultiSelect(HiddenInput):  # type: ignore
             </script>""".format(filter=uc_first(_('type to search')),
                                 min_chars=session['settings']['minimum_jstree_search'],
                                 name=field.id,
+                                button_class=app.config['CSS']['button']['secondary'],
                                 title=root.name,
                                 selection=selection,
                                 change_label=uc_first(_('change')),
@@ -289,13 +291,14 @@ class TableSelect(HiddenInput):  # type: ignore
             <input id="{name}-button" name="{name}-button" class="table-select {required}"
                 type="text" placeholder="{change_label}" onfocus="this.blur()" readonly="readonly"
                 value="{selection}">
-            <a id="{name}-clear" class="btn btn-secondary" {clear_style}
+            <a href="#" id="{name}-clear" class="{button_class}" {clear_style}
                 onclick="clearSelect('{name}');">{clear_label}</a>
             <div id="{name}-overlay" class="overlay">
             <div id="{name}-dialog" class="overlay-container">{table}</div></div>
             <script>$(document).ready(function () {{createOverlay("{name}", "{title}");}});</script>
             """.format(name=field.id,
                        title=_(field.id.replace('_', ' ')),
+                       button_class=app.config['CSS']['button']['secondary'],
                        change_label=uc_first(_('change')),
                        clear_label=uc_first(_('clear')),
                        table=table.display(field.id),
@@ -345,13 +348,14 @@ class TableMultiSelect(HiddenInput):  # type: ignore
             table.rows.append(data)
         selection = [entity.name for entity in entities if field.data and entity.id in field.data]
         html = """
-            <span id="{name}-button" class="button btn btn-secondary">{change_label}</span><br>
+            <span id="{name}-button" class="{button_class}">{change_label}</span><br>
             <div id="{name}-selection" class="selection" style="text-align:left;">{selection}</div>
             <div id="{name}-overlay" class="overlay">
             <div id="{name}-dialog" class="overlay-container">{table}</div></div>
             <script>
                 $(document).ready(function () {{createOverlay("{name}", "{title}", true);}});
             </script>""".format(name=field.id,
+                                button_class=app.config['CSS']['button']['secondary'],
                                 change_label=uc_first(_('change')),
                                 title=_(field.id.replace('_', ' ')),
                                 selection='<br>'.join(selection),

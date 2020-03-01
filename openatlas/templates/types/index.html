@@ -21,9 +21,7 @@
                             <li><a href="#tab-{{ node.id }}">{{ node.name }}</a></li>
                         {% endfor %}
                         {% if type_ in ['custom', 'value'] and 'manager'|is_authorized %}
-                            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('hierarchy_insert', param=type_) }}" style="margin:1em;">
-                                + {{ _('type')|uc_first }}
-                            </a>
+                            <span style="margin:1em;">{{ _('type')|button(url_for('hierarchy_insert', param=type_)) }}</span>
                         {% endif %}
                     </ul>
                     {% for node, tree in nodes[type_].items() %}
@@ -49,16 +47,16 @@
                                                 style="width:8em;">
                                             {% if not node.locked %}
                                                 <input type="hidden" name="mode" value="insert">
-                                                <button class="btn btn-outline-primary btn-sm" type="submit" value="insert" name="add-node-submit">+</button>
+                                                <button class="{{ config['CSS']['button']['primary'] }}" type="submit" value="insert" name="add-node-submit">+</button>
+
                                             {% endif %}
                                         </form>
                                     {% endif %}
-
                                     {% if type_ in ['custom', 'value'] and 'manager'|is_authorized %}
-                                        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('hierarchy_update', id_=node.id) }} ">{{ _('edit')|uc_first }}</a>
+                                        {{ _('edit')|button(url_for('hierarchy_update', id_=node.id)) }}
                                         {% if not node.system and node.count < 1 and not node.subs %}
-                                            <a class="btn btn-outline-primary btn-sm" onclick="return confirm('{{ _('delete')|uc_first }} {{ node.name.replace('\'', '') }}?')"
-                                                href="{{ url_for('hierarchy_delete', id_=node.id) }} ">{{ _('delete')|uc_first }}</a>
+                                            {{ _('delete')|button(url_for('hierarchy_delete', id_=node.id),
+                                                                  onclick="return confirm('" + _('delete')|uc_first + " " + node.name.replace("'", '').replace('"', '') + "?');") }}
                                         {% endif %}
                                     {% endif %}
                                 </div>

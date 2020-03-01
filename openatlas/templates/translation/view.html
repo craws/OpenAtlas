@@ -3,18 +3,14 @@
     {{ [[_('source'), 'source_index'], source, translation.name]|crumb }}
 {% endblock %}
 {% block content %}
-<div class="toolbar">
     {% if 'contributor'|is_authorized %}
-        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('translation_update', id_=translation.id) }}">
-            {{ _('edit')|uc_first }}
-        </a>
-        <a class="btn btn-outline-primary btn-sm" onclick="return confirm('{{ _('delete')|uc_first }} {{ translation.name.replace('\'', '') }}?')"
-           href="{{ url_for('translation_delete', id_=translation.id, source_id=source.id) }}">
-            {{ _('delete')|uc_first }}
-        </a>
+        <div class="toolbar">
+            {{ _('edit')|button(url_for('translation_update', id_=translation.id)) }}
+            {{ _('delete')|button(url_for('translation_delete', id_=translation.id, source_id=source.id),
+                                  onclick="return confirm('" + _('delete')|uc_first + " " + translation.name.replace('"', '').replace("'", '') + "?');") }}
+        </div>
     {% endif %}
-</div>
-<h1>{{ translation.name }}</h1>
-{{ info|display_info }}
-{{ translation|description }}
+    <h1>{{ translation.name }}</h1>
+    {{ info|display_info }}
+    {{ translation|description }}
 {% endblock %}
