@@ -6,16 +6,13 @@
     <div class="toolbar">
         {{ 'SQL'|manual_link }}
         {% if file_data['file'] %}
-            <p style="margin-top: 1em;">
-                {{ _('latest backup')|uc_first }}: {{ file_data['file'] }}, {{ file_data['size'] }},
-                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('download_sql', filename=file_data['file']) }}">{{ _('download')|uc_first }}</a>
-            </p>
+            {{ _('latest backup')|uc_first }}: {{ file_data['file'] }}, {{ file_data['size'] }}
+            {{ _('download')|button(url_for('download_sql', filename=file_data['file'])) }}
         {% endif %}
     </div>
     {% if file_data['backup_too_old'] %}
         <p>
-            {{ _('There seems to be no recent backup, please make one') }}
-            <a href="{{ url_for('export_sql') }}">{{ _('here') }}</a>.
+            {{ _('There seems to be no recent backup, please make one') }} <a href="{{ url_for('export_sql') }}">{{ _('here') }}</a>.
         </p>
     {% else %}
         {{ form|display_form }}

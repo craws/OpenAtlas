@@ -43,14 +43,16 @@ def button(self: Any,
            label: str,
            url: str,
            css: Optional[str] = 'primary',
+           id_: Optional[str] = None,
            onclick: Optional[str] = '') -> str:
     label = util.uc_first(label)
     if '/insert' in url and label != util.uc_first(_('add')):
         label = '+ ' + label
-    html = '<a class="{class_}" href="{url}" {onclick}>{label}</a>'.format(
+    html = '<a class="{class_}" href="{url}" {id} {onclick}>{label}</a>'.format(
         class_=app.config['CSS']['button'][css],
         url=url,
         label=label,
+        id='id="' + id_ + '"' if id_ else '',
         onclick='onclick="{onclick}"'.format(onclick=onclick) if onclick else '')
     return Markup(html)
 

@@ -13,15 +13,15 @@
         <input id="sql_risk_aware" type="checkbox">
         {{ _("I'm aware of the risk and have read the documentation.") }}
     </p>
-    <p>
-        <a class="btn btn-outline-primary btn-sm" id="proceed_link" href="">{{ _('proceed')|uc_first }}</a>
-    </p>
+    <div class="toolbar">
+        {{ _('proceed')|button('#', id_='proceed_button') }}
+    </div>
     <script>
         $('#sql_risk_aware').change(function() {
             if (this.checked) {
-                $("#proceed_link").attr("href", "{{ url_for('sql_execute') }}")
+                $("#proceed_button").attr("href", "{{ url_for('sql_execute') }}")
             } else {
-                $("#proceed_link").attr("href", "")
+                $("#proceed_button").attr("href", "")
             }
         });
     </script>
