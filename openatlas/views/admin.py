@@ -22,7 +22,7 @@ from openatlas.models.settings import Settings
 from openatlas.models.user import User
 from openatlas.util.table import Table
 from openatlas.util.util import (convert_size, format_date, format_datetime, get_file_path,
-                                 is_authorized, link, required_group, send_mail, truncate, uc_first)
+                                 is_authorized, link, required_group, send_mail, uc_first)
 
 
 class GeneralForm(FlaskForm):  # type: ignore
@@ -374,7 +374,7 @@ def admin_log() -> str:
                            row.type,
                            row.message,
                            user,
-                           truncate(row.info.replace('\n', '<br>'))])
+                           row.info])
     return render_template('admin/log.html', table=table, form=form)
 
 
