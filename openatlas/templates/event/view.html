@@ -4,99 +4,92 @@
     {{ [[_('event'), 'event_index'], event.name]|crumb }}
 {% endblock %}
 {% block content %}
-<div>
-    <ul class="nav nav-tabs" role="tablist">
-        <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" aria-selected="true" href="#tab-info">{{ _('info')|uc_first }}</a></li>
-        {% if tables['subs'].rows %}
-            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-subs">{{ _('sub events')|uc_first }} {{ tables['subs']|format_tab_number }}</a></li>
-        {% endif %}
-        {% if gis_data %}
-            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-map" id="map-tab-id">{{ _('map')|uc_first }}</a></li>
-        {% endif %}
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-source">{{ _('source')|uc_first }} {{ tables['source']|format_tab_number }}</a></li>
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-actor">{{ _('actor')|uc_first }} {{ tables['actor']|format_tab_number }}</a></li>
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-reference">{{ _('reference')|uc_first }} {{ tables['reference']|format_tab_number }}</a></li>
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-file">{{ _('files')|uc_first }} {{ tables['file']|format_tab_number }}</a></li>
-    </ul>
-    <div class="tab-content" id="myTabContent">
-        <div class="tab-pane fade show active" role="tabpanel" id="tab-info">
-            <div class="toolbar">
-                {% if 'contributor'|is_authorized %}
-                    {{ _('edit')|button(url_for('event_update', id_=event.id)) }}
-                    {{ event|display_delete_link }}
-                {% endif %}
-                {{ event.id|bookmark_toggle }}
-            </div>
-            <h1>{{ event.name }}</h1>
-            <div>
-                {{ profile_image_id|display_profile_image }}
-                <div style="float:left;">
-                    {{ info|display_info }}
-                    {{ event|note }}
-                    {{ event|display_external_references }}
-                    {{ event|description }}
-                    {{ event|api_link }}
-                </div>
-                <div style="clear:both;"></div>
-            </div>
-        </div>
-        {% if tables['subs'].rows %}
-            <div class="tab-pane fade" role="tabpanel" id="tab-subs">
-                {{ tables['subs'].display('subs')|safe }}
-            </div>
-        {% endif %}
-        {% if gis_data %}
-            <div class="tab-pane fade" role="tabpanel" id="tab-map">
-                <div id="map" class="map" style="float:none;margin:0;width:70em;"></div>
-            </div>
-            <script src="/static/js/map/map.js"></script>
-            <script>
-                /* workaround for leaflet bug when map not in the first tab */
-                $("body").on('click','#map-tab-id', function() {
-                    map.panBy(new L.Point(0, -1));
-                });
-            </script>
-        {% endif %}
-        <div class="tab-pane fade" role="tabpanel" id="tab-source">
-            {% if 'contributor'|is_authorized %}
+<div class="row">
+    <div class="col-6">
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" aria-selected="true" href="#tab-info">{{ _('info')|uc_first }}</a></li>
+            {% if tables['subs'].rows %}
+                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-subs">{{ _('sub events')|uc_first }} {{ tables['subs']|format_tab_number }}</a></li>
+            {% endif %}
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-source">{{ _('source')|uc_first }} {{ tables['source']|format_tab_number }}</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-actor">{{ _('actor')|uc_first }} {{ tables['actor']|format_tab_number }}</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-reference">{{ _('reference')|uc_first }} {{ tables['reference']|format_tab_number }}</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-file">{{ _('files')|uc_first }} {{ tables['file']|format_tab_number }}</a></li>
+        </ul>
+        <div class="tab-content" id="myTabContent">
+            <div class="tab-pane fade show active" role="tabpanel" id="tab-info">
                 <div class="toolbar">
-                    {{ _('add')|button(url_for('event_add_source', id_=event.id)) }}
-                    {{ _('source')|button(url_for('source_insert', origin_id=event.id)) }}
+                    {% if 'contributor'|is_authorized %}
+                        {{ _('edit')|button(url_for('event_update', id_=event.id)) }}
+                        {{ event|display_delete_link }}
+                    {% endif %}
+                    {{ event.id|bookmark_toggle }}
+                </div>
+                <h1>{{ event.name }}</h1>
+                <div>
+                    {{ profile_image_id|display_profile_image }}
+                    <div style="float:left;">
+                        {{ info|display_info }}
+                        {{ event|note }}
+                        {{ event|display_external_references }}
+                        {{ event|description }}
+                        {{ event|api_link }}
+                    </div>
+                    <div style="clear:both;"></div>
+                </div>
+            </div>
+            {% if tables['subs'].rows %}
+                <div class="tab-pane fade" role="tabpanel" id="tab-subs">
+                    {{ tables['subs'].display('subs')|safe }}
                 </div>
             {% endif %}
-            {{ tables['source'].display('source')|safe }}
-        </div>
-        <div class="tab-pane fade" role="tabpanel" id="tab-actor">
-            {% if 'contributor'|is_authorized %}
-            <div class="toolbar">
-                {{ _('add')|button(url_for('involvement_insert', origin_id=event.id)) }}
-                {% for code in config['CLASS_CODES']['actor'] %}
-                    {{ code|get_class_name|button(url_for('actor_insert', code=code, origin_id=event.id)) }}
-                {% endfor %}
+            <div class="tab-pane fade" role="tabpanel" id="tab-source">
+                {% if 'contributor'|is_authorized %}
+                    <div class="toolbar">
+                        {{ _('add')|button(url_for('event_add_source', id_=event.id)) }}
+                        {{ _('source')|button(url_for('source_insert', origin_id=event.id)) }}
+                    </div>
+                {% endif %}
+                {{ tables['source'].display('source')|safe }}
             </div>
-            {% endif %}
-            {{ tables['actor'].display('actor')|safe }}
-        </div>
-        <div class="tab-pane fade" role="tabpanel" id="tab-reference">
-            {% if 'contributor'|is_authorized %}
-            <div class="toolbar">
-                {{ _('add')|button(url_for('event_add_reference', id_=event.id)) }}
-                {{ _('bibliography')|button(url_for('reference_insert', code='bibliography', origin_id=event.id)) }}
-                {{ _('edition')|button(url_for('reference_insert', code='edition', origin_id=event.id)) }}
-                {{ _('external reference')|button(url_for('reference_insert', code='external_reference', origin_id=event.id)) }}
+            <div class="tab-pane fade" role="tabpanel" id="tab-actor">
+                {% if 'contributor'|is_authorized %}
+                <div class="toolbar">
+                    {{ _('add')|button(url_for('involvement_insert', origin_id=event.id)) }}
+                    {% for code in config['CLASS_CODES']['actor'] %}
+                        {{ code|get_class_name|button(url_for('actor_insert', code=code, origin_id=event.id)) }}
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {{ tables['actor'].display('actor')|safe }}
             </div>
-            {% endif %}
-            {{ tables['reference'].display('reference')|safe }}
-        </div>
-        <div class="tab-pane fade" role="tabpanel" id="tab-file">
-            {% if 'contributor'|is_authorized %}
-            <div class="toolbar">
-                {{ _('add')|button(url_for('event_add_file', id_=event.id)) }}
-                {{ _('file')|button(url_for('file_insert', origin_id=event.id)) }}
+            <div class="tab-pane fade" role="tabpanel" id="tab-reference">
+                {% if 'contributor'|is_authorized %}
+                <div class="toolbar">
+                    {{ _('add')|button(url_for('event_add_reference', id_=event.id)) }}
+                    {{ _('bibliography')|button(url_for('reference_insert', code='bibliography', origin_id=event.id)) }}
+                    {{ _('edition')|button(url_for('reference_insert', code='edition', origin_id=event.id)) }}
+                    {{ _('external reference')|button(url_for('reference_insert', code='external_reference', origin_id=event.id)) }}
+                </div>
+                {% endif %}
+                {{ tables['reference'].display('reference')|safe }}
             </div>
-            {% endif %}
-            {{ tables['file'].display('file')|safe }}
+            <div class="tab-pane fade" role="tabpanel" id="tab-file">
+                {% if 'contributor'|is_authorized %}
+                <div class="toolbar">
+                    {{ _('add')|button(url_for('event_add_file', id_=event.id)) }}
+                    {{ _('file')|button(url_for('file_insert', origin_id=event.id)) }}
+                </div>
+                {% endif %}
+                {{ tables['file'].display('file')|safe }}
+            </div>
         </div>
+    </div>
+    <div class="col-6">
+        {% if gis_data %}
+            <div id="map" class="map" style="float:none;margin:0;width:70em;"></div>
+            <script src="/static/js/map/map.js"></script>
+        {% endif %}
     </div>
 </div>
 {% endblock %}
