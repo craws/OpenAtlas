@@ -555,3 +555,7 @@ div.data-table div.display-none {
     padding-top: 0.2em;
     padding-left: 1em;
 }
+
+.accordionheader {
+    padding: initial!important;
+}
