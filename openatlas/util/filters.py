@@ -254,7 +254,7 @@ def display_logo(self: Any, file_id: str) -> str:
         extension = print_file_extension(int(file_id))
         if extension != 'N/A':
             src = url_for('display_logo', filename=file_id + extension)
-    return '<img src="{src}" height="40px" alt="Logo">'.format(src=src)
+    return '<img src="{src}" id="logo" alt="Logo">'.format(src=src)
 
 
 @jinja2.contextfilter

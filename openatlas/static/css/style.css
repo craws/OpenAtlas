@@ -4,6 +4,10 @@ html, body, input, select, textarea {
     font-family: helvetica, arial, sans-serif;
 }
 
+img#logo {
+    height: 40px;
+}
+
 #site-name-and-version {
     position: absolute;
     right: 16px
