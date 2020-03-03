@@ -527,3 +527,29 @@ div.data-table div.display-none {
   color: #721c24;
   font-weight: bold;
 }
+
+.tab-content {
+    padding: 1em;
+    background-color: #f8f9fa!important;
+}
+
+.nav-tabs .nav-link.active {
+    background: #f8f9fa;
+    border-bottom: 2px solid #0047bb;
+    padding-bottom: 0px;
+    color: #0047bb;
+    outline: none;
+    margin-bottom: 0px;
+    height: 100%;
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    border-radius: initial;
+}
+
+.nav-tabs {
+    background-color: #e9ecef;
+    padding-top: 0.5em;
+    padding-left: 1em;
+}
