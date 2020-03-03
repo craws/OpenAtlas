@@ -56,7 +56,7 @@ def print_file_size(entity: 'Entity') -> str:
 def display_tooltip(text: str) -> str:
     if not text:
         return ''
-    return '<span><i class="fas fa-info-circle" title="{title}"></i></span>'.format(
+    return '<span><i class="fas fa-info-circle tooltipicon" title="{title}"></i></span>'.format(
         title=text.replace('"', "'"))
 
 

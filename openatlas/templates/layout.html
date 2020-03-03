@@ -72,11 +72,6 @@
     <div style="float: right;">
         {% if current_user.is_authenticated %}
         <div id="index-search-button" class="iconbutton">
-            <a href="#">
-            <span>
-                <i class="fas fa-search"></i>
-            </span>
-            </a>
             <div id="index-search">
                 <form method="post" action="{{ url_for('search_index') }}" style="display: inline-flex">
                     {{ search_form.csrf_token }}

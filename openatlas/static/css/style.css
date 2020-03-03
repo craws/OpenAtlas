@@ -171,10 +171,8 @@ input[type="text"].value_input {
     float: right;
     margin: 0;
     padding: 0px 0px 0px 10px;
-    width: 0px;
     display: inline-flex;
     height: 35px;
-    overflow: hidden;
     position :relative;
     transition: width 500ms;
     font-size: 15px;
@@ -538,9 +536,9 @@ div.data-table div.display-none {
 
 .nav-tabs .nav-link.active {
     background: #f8f9fa;
-    border-bottom: 2px solid #0047bb;
+    border-bottom: 2px solid #007bff;
     padding-bottom: 0px;
-    color: #0047bb;
+    color: #007bff;
     outline: none;
     margin-bottom: 0px;
     height: 100%;
@@ -561,4 +559,8 @@ div.data-table div.display-none {
 
 .accordionheader {
     padding: initial!important;
+}
+
+.tooltipicon {
+    color: #007bff;
 }
