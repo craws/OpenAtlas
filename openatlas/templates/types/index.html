@@ -16,7 +16,6 @@
         <div class="tab-content" id="menuTabContent">
         {% for type_ in ['system', 'custom', 'value', 'places'] %}
             <div class="tab-pane fade" role="tabpanel" id="menu-tab-{{ type_ }}" style="padding: 0;">
-
                 <div class="accordion" id="TypeAccordion">
                     {% for node, tree in nodes[type_].items() %}
                       <div class="card">
@@ -36,12 +35,14 @@
                                             id="{{ node.name|sanitize }}-tree-search"
                                             placeholder="{{ placeholder|uc_first }}"
                                             name="name_search"
+                                            type="text",
                                             style="width:8em;">
                                     {% else %}
                                         <form style="float:left" method="post" action="{{ url_for('node_insert', root_id=node.id) }}">
                                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
                                             <input
                                                 class="tree-filter"
+                                                type="text"
                                                 id="{{ node.name|sanitize }}-tree-search"
                                                 placeholder="{{ placeholder|uc_first }}"
                                                 name="name_search"
@@ -49,7 +50,6 @@
                                             {% if not node.locked %}
                                                 <input type="hidden" name="mode" value="insert">
                                                 <button class="{{ config['CSS']['button']['primary'] }}" type="submit" value="insert" name="add-node-submit">+</button>
-
                                             {% endif %}
                                         </form>
                                     {% endif %}
