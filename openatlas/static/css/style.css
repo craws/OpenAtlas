@@ -546,11 +546,12 @@ div.data-table div.display-none {
 .nav-tabs .nav-link {
     border: none;
     border-radius: initial;
-    line-height: 24px;
+    line-height: 20px;
+    font-weight: 100;
 }
 
 .nav-tabs {
     background-color: #e9ecef;
-    padding-top: 0.5em;
+    padding-top: 0.2em;
     padding-left: 1em;
 }
