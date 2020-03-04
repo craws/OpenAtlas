@@ -35,7 +35,7 @@
                                             id="{{ node.name|sanitize }}-tree-search"
                                             placeholder="{{ placeholder|uc_first }}"
                                             name="name_search"
-                                            type="text",
+                                            type="text"
                                             style="width:8em;">
                                     {% else %}
                                         <form style="float:left" method="post" action="{{ url_for('node_insert', root_id=node.id) }}">
