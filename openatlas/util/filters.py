@@ -338,8 +338,10 @@ def display_form(self: Any,
         field.label.text = util.uc_first(field.label.text)
         field.label.text += ' *' if field.flags.required and form_id != 'login-form' else ''
         if field.id == 'description':
-            html['footer'] += '<br>{label}<br>{text}<br>'.format(label=field.label,
-                                                                 text=field(class_=class_))
+            html['footer'] += '''<div class="table-row">
+                                    <div>{label}</div>
+                                    <div class="table-cell">{field}</div>
+                                </div>'''.format(label=field.label, field=field(class_=class_))
             continue
         if field.type == 'SubmitField':
             html['footer'] += str(field(class_=app.config['CSS']['button']['primary']))
