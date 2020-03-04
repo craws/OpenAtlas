@@ -20,6 +20,7 @@ Install pip and npm packages, e.g. on Debian:
 
 Install frontend libraries with npm:
 
+    $ pip3 install calmjs
     $ cd openatlas/static
     $ pip3 install -e ./
     $ ~/.local/bin/calmjs npm --install openatlas
