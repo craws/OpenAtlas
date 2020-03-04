@@ -14,6 +14,12 @@ After following the instructions restart Apache and test if the application is w
 
 WARNING - this is a major release and requires new software. JavaScript libraries are now installed in a separate step.
 
+#### Software
+
+Make a code base update (e.g. with git pull).
+
+#### New frontend libraries
+
 Install pip and npm packages, e.g. on Debian:
 
     # apt-get install python3-pip npm
@@ -25,7 +31,12 @@ Install frontend libraries with npm:
     $ pip3 install -e ./
     $ ~/.local/bin/calmjs npm --install openatlas
 
+#### Database
+
 Execute install/upgrade/5.0.0.sql after making backups
+
+#### Logo
+In the new layout a much smaller logo is needed (40px height). To save bandwidth you could exchange an existing logo with a 40px height one.
 
 ### 4.0.0 to 4.1.0
 
