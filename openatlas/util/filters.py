@@ -249,7 +249,7 @@ def manual_link(self: Any, wiki_site: str) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_logo(self: Any, file_id: str) -> str:
-    src = '/static/images/layout/logo_small.png'
+    src = '/static/images/layout/logo.png'
     if file_id:
         extension = print_file_extension(int(file_id))
         if extension != 'N/A':
