@@ -36,7 +36,7 @@ class Table:
         from openatlas.util.util import uc_first
         if not self.rows:
             return '<p>' + uc_first(_('no entries')) + '</p>'
-        columns: List[Dict[str, str]] = [{'title': item.capitalize()} for item in self.header]
+        columns: List[Dict[str, str]] = [{'title': _(item).capitalize()} for item in self.header]
         columns += [{'title': ''} for i in range(len(self.rows[0]) - len(self.header))]  # Add empty
         table_rows = session['settings']['default_table_rows']
         if hasattr(current_user, 'settings'):
