@@ -118,7 +118,15 @@
     </div>
     <script>
         $(document).ready(function () {
-            $('#menu-tab-system').tab('show')
+            if (location.hash) {
+                let url = location.href.replace(/\/$/, "");
+                const hash = url.split("#");
+                if (hash[1] == 'menu-tab-system') $('#menu-tab-system').tab('show');
+            }
+            else {
+                $('#menu-tab-system').tab('show');
+            }
+
         });
     </script>
 {% endblock %}
