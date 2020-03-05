@@ -35,7 +35,7 @@
                                      data-parent="#TypeAccordion">
                                     <div class="card-body">
                                         <div class="row">
-                                            <div class="col-6">
+                                            <div class="col-6 contentbox">
                                                 <div class="toolbar">
                                                     {% if node.locked or not 'editor'|is_authorized %}
                                                         <input
@@ -48,7 +48,7 @@
                                                     {% else %}
                                                         <form method="post"
                                                               action="{{ url_for('node_insert', root_id=node.id) }}"
-                                                            style="display: inline;"
+                                                              style="display: inline;"
                                                         >
                                                             <input type="hidden" name="csrf_token"
                                                                    value="{{ csrf_token() }}">
@@ -79,7 +79,7 @@
                                                 </div>
                                                 {{ tree|safe }}
                                             </div>
-                                            <div class="col-6">
+                                            <div class="col-5 contentbox">
                                                 {% if not node.value_type %}
                                                     <p>
                                                         <strong>{{ _('selection')|uc_first }}</strong>:

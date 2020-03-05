@@ -505,8 +505,8 @@ div.data-table div.display-none {
 }
 
 .toolbar {
+    margin-top: 5px;
     margin-bottom: 5px;
-    display: inline;
 }
 
 .alert-error {
@@ -562,4 +562,10 @@ div.data-table div.display-none {
 
 .tooltipicon {
     color: #007bff;
+}
+
+.contentbox {
+    margin: 0.5em;
+    padding: 0.5em;
+    background-color: #f8f9fa!important;
 }
