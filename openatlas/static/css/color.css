@@ -26,7 +26,7 @@ div.tabs-container .ui-state-active a {
 a,
 .info,
 .jstree-default .jstree-search {
-    color: #0047bb;
+    color: #007bff;
 }
 
 /* Background color */
@@ -80,12 +80,12 @@ select {
 }
 
 .table thead th {
-    border-bottom: 2px solid #0047bb;
+    border-bottom: 2px solid #007bff;
     background-color: #e9ecef;
 }
 
 div.tabs-container table a:hover,
 table a:hover {
-    color: #0047bb;
+    color: #007bff;
     text-decoration: none;
 }

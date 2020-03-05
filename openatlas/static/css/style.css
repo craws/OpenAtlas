@@ -139,7 +139,6 @@ div.pager {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 300px;
 }
 
 a {
@@ -171,10 +170,8 @@ input[type="text"].value_input {
     float: right;
     margin: 0;
     padding: 0px 0px 0px 10px;
-    width: 0px;
     display: inline-flex;
     height: 35px;
-    overflow: hidden;
     position :relative;
     transition: width 500ms;
     font-size: 15px;
@@ -250,7 +247,6 @@ button {
     cursor: pointer;
     display: inline-block;
     font-weight: bold;
-    margin-right: 1em;
     padding: 0.3em 0.5em;
     text-decoration: none;
     border: none;
@@ -384,7 +380,7 @@ input[type=text], input[type=password], textarea, select  {
 
 input[type=text], input[type=password], select {
     width: 15.6em;
-    height: 1.6em;
+    height: 21px;
     -ms-box-sizing:content-box;
     -moz-box-sizing:content-box;
     -webkit-box-sizing:content-box;
@@ -509,6 +505,7 @@ div.data-table div.display-none {
 }
 
 .toolbar {
+    margin-top: 5px;
     margin-bottom: 5px;
 }
 
@@ -538,9 +535,9 @@ div.data-table div.display-none {
 
 .nav-tabs .nav-link.active {
     background: #f8f9fa;
-    border-bottom: 2px solid #0047bb;
+    border-bottom: 2px solid #007bff;
     padding-bottom: 0px;
-    color: #0047bb;
+    color: #007bff;
     outline: none;
     margin-bottom: 0px;
     height: 100%;
@@ -561,4 +558,14 @@ div.data-table div.display-none {
 
 .accordionheader {
     padding: initial!important;
+}
+
+.tooltipicon {
+    color: #007bff;
+}
+
+.contentbox {
+    margin: 0.5em;
+    padding: 0.5em;
+    background-color: #f8f9fa!important;
 }
