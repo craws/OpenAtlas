@@ -247,7 +247,6 @@ button {
     cursor: pointer;
     display: inline-block;
     font-weight: bold;
-    margin-right: 1em;
     padding: 0.3em 0.5em;
     text-decoration: none;
     border: none;
@@ -507,6 +506,7 @@ div.data-table div.display-none {
 
 .toolbar {
     margin-bottom: 5px;
+    display: inline;
 }
 
 .alert-error {

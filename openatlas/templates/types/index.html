@@ -47,7 +47,9 @@
                                                                 type="text">
                                                     {% else %}
                                                         <form method="post"
-                                                              action="{{ url_for('node_insert', root_id=node.id) }}">
+                                                              action="{{ url_for('node_insert', root_id=node.id) }}"
+                                                            style="display: inline;"
+                                                        >
                                                             <input type="hidden" name="csrf_token"
                                                                    value="{{ csrf_token() }}">
                                                             <input
