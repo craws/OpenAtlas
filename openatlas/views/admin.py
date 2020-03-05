@@ -382,7 +382,7 @@ def admin_log() -> str:
 @required_group('admin')
 def admin_log_delete() -> Response:
     logger.delete_all_system_logs()
-    flash(_('Logs deleted'))
+    flash(_('Logs deleted'), 'info')
     return redirect(url_for('admin_log'))
 
 
@@ -436,7 +436,7 @@ def admin_mail() -> str:
         body = _('This test mail was sent by %(username)s', username=current_user.username)
         body += ' ' + _('at') + ' ' + request.headers['Host']
         if send_mail(subject, body, form.receiver.data):
-            flash(_('A test mail was sent to %(email)s.', email=form.receiver.data))
+            flash(_('A test mail was sent to %(email)s.', email=form.receiver.data), 'info')
     else:
         form.receiver.data = current_user.email
     mail_settings = {
