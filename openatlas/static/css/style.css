@@ -139,7 +139,6 @@ div.pager {
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
-    max-width: 300px;
 }
 
 a {
@@ -382,7 +381,7 @@ input[type=text], input[type=password], textarea, select  {
 
 input[type=text], input[type=password], select {
     width: 15.6em;
-    height: 1.6em;
+    height: 21px;
     -ms-box-sizing:content-box;
     -moz-box-sizing:content-box;
     -webkit-box-sizing:content-box;
