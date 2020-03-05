@@ -103,7 +103,7 @@ class Api:
         nodes = []
         features = {'@id': url_for('entity_view', id_=entity.id, _external=True),
                     'type': 'Feature',
-                    'crmClass': "".join(entity.class_.code + " "
+                    'crmClass': "crm:".join(entity.class_.code + " "
                                         + entity.class_.i18n['en']).replace(" ", "_"),
                     'properties': {'title': entity.name}}
 
