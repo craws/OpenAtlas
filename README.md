@@ -4,7 +4,7 @@
 
 The information is mapped as a network using classes and properties of the [CIDOC CRM](http://www.cidoc-crm.org/).
 
-Documentation: [Wiki](https://redmine.openatlas.eu/projects/uni/wiki), [Issues](https://redmine.openatlas.eu/projects/uni/issues), [Features](https://redmine.openatlas.eu/projects/uni/wiki/Features)
+Documentation: [Wiki](https://redmine.openatlas.eu/projects/uni/wiki), [Issues](https://redmine.openatlas.eu/projects/uni/issues)
 
 # Demo versions
 
