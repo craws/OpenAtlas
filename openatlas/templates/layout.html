@@ -82,6 +82,7 @@
         </div>
         <div class="iconbutton"
              data-toggle="popover"
+             data-placement="bottom"
              title="{{ _('profile')|uc_first }}"
              data-content="{{ _('hello')|uc_first }} {{ current_user.username }}"
              data-trigger="hover">
@@ -94,7 +95,7 @@
         {% endif %}
         <div class="iconbutton"
              data-toggle="popover"
-             title="{{ _('manual')|uc_first }}"
+             data-placement="bottom"
              data-content="{{ _('manual')|uc_first }}"
              data-trigger="hover">
             <a href="https://redmine.openatlas.eu/projects/uni/wiki/Manual" target="_blank" rel="noopener">
@@ -106,7 +107,7 @@
         {% if 'contact'|display_content_translation %}
         <div class="iconbutton"
              data-toggle="popover"
-             title="{{ _('contact')|uc_first }}"
+             data-placement="bottom"
              data-content="{{ _('contact')|uc_first }}"
              data-trigger="hover">
             <a href="{{ url_for('index_content', item='contact') }}" >
@@ -119,7 +120,7 @@
         {% if 'legal_notice'|display_content_translation %}
         <div class="iconbutton"
              data-toggle="popover"
-             title="{{ _('legal_notice')|uc_first }}"
+             data-placement="bottom"
              data-content="{{ _('legal_notice')|uc_first }}"
              data-trigger="hover">
             <a href="{{ url_for('index_content', item='legal_notice') }}" >
