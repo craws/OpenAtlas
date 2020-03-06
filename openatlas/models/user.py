@@ -219,6 +219,10 @@ class User(UserMixin):  # type: ignore
             settings['max_zoom'] = int(settings['max_zoom'])
         else:
             settings['max_zoom'] = app.config['MAX_ZOOM']
+        if 'default_zoom' in settings:
+            settings['default_zoom'] = int(settings['default_zoom'])
+        else:
+            settings['default_zoom'] = app.config['DEFAULT_ZOOM']
         if 'table_rows' in settings:
             settings['table_rows'] = int(settings['table_rows'])
         else:

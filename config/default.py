@@ -38,6 +38,7 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 
 # Map
 MAX_ZOOM = 18  # Can be overridden by users in their profile
+DEFAULT_ZOOM = 12  # Can be overridden by users in their profile
 GEONAMES_USERNAME = 'openatlas'
 GEONAMES_VIEW_URL = 'http://www.geonames.org/'
 THUNDERFOREST_KEY = '7878b4fb224f4902ab42fc846e92b96a'
