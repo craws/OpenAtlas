@@ -2,10 +2,17 @@ class Changelog:
     versions = {
         '5.0.0': ['TBA', {
             'feature': {
+                '1048': 'Bootstrap layout',
                 '1089': 'Human Remains',
-                '1138': 'Display usage of CIDOC CRM classes and properties'},
+                '1136': 'Display geodata in map enhancements',
+                '1138': 'Display usage of CIDOC CRM classes and properties',
+                '1066': 'Package Manager for JavaScript Libraries'},
             'fix': {
-                '1134': 'Overlay maps: not enabled if Geonames disabled'}}],
+                '1134': 'Overlay maps: not enabled if Geonames disabled',
+                '1139': 'Breadcrumbs show place twice',
+                '1140': 'HTML Code is showing in description text Actions',
+                '1152': "Menu item isn't marked as active in entity view"
+            }}],
         '4.1.0': ['2020-01-30', {
             'feature': {
                 '1070': 'Enhance network visualization',
