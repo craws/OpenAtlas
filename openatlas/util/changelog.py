@@ -4,7 +4,7 @@ class Changelog:
             'feature': {
                 '1048': 'Bootstrap layout',
                 '1089': 'Human Remains',
-                '1136': 'Display geodata in map enhancements',
+                '1136': 'Map enhancements',
                 '1138': 'Display usage of CIDOC CRM classes and properties',
                 '1066': 'Package Manager for JavaScript Libraries'},
             'fix': {
