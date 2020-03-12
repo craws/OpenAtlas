@@ -204,6 +204,9 @@ def add_system_data(entity: 'Entity',
             data.append((_('imported by'), link(info['import_user'])))
         if info['import_origin_id']:
             data.append(('origin ID', info['import_origin_id']))
+        data.append(('API',
+                     '<a href="{url}" target="_blank">GeoJSON</a>'.format(
+                         url=url_for('api_entity', id_=entity.id))))
     return data
 
 
@@ -361,9 +364,8 @@ def api_access():
     def wrapper(f):  # type: ignore
         @wraps(f)
         def wrapped(*args, **kwargs):  # type: ignore
-            print()
             if not current_user.is_authenticated and not session['settings']['api_public']:
-                abort(403)
+                abort(403)  # pragma: nocover
             return f(*args, **kwargs)
 
         return wrapped
