@@ -4,6 +4,10 @@ html, body, input, select, textarea {
     font-family: helvetica, arial, sans-serif;
 }
 
+textarea {
+    resize: both;
+}
+
 img#logo {
     height: 40px;
 }
