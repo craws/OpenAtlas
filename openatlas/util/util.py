@@ -357,6 +357,20 @@ def required_group(group: str):  # type: ignore
     return wrapper
 
 
+def api_access():
+    def wrapper(f):  # type: ignore
+        @wraps(f)
+        def wrapped(*args, **kwargs):  # type: ignore
+            print()
+            if not current_user.is_authenticated and not session['settings']['api_public']:
+                abort(403)
+            return f(*args, **kwargs)
+
+        return wrapped
+
+    return wrapper
+
+
 def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
     label = uc_first(_('bookmark remove') if entity_id in current_user.bookmarks else _('bookmark'))
     if for_table:
