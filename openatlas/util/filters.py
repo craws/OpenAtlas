@@ -437,7 +437,7 @@ def display_menu(self: Any, entity: Optional[Entity]) -> str:
                  'admin']
         if request.path.startswith('/entity'):
             try:
-                entity = Entity.get_by_id(request.path.split('/')[-1])
+                entity = Entity.get_by_id(int(request.path.split('/')[-1]))
             except:  # Catch the exception to prevent a recursive call
                 pass
         for item in items:

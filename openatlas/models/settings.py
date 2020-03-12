@@ -32,7 +32,7 @@ class Settings:
               'site_name'}
 
     @staticmethod
-    def update_api(form):
+    def update_api(form: FlaskForm) -> None:
         sql = "UPDATE web.settings SET value = %(value)s WHERE name = 'api_public';"
         g.execute(sql, {'value': 'True' if getattr(form, 'api_public').data else ''})
 

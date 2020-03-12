@@ -360,7 +360,7 @@ def required_group(group: str):  # type: ignore
     return wrapper
 
 
-def api_access():
+def api_access():  # type: ignore
     def wrapper(f):  # type: ignore
         @wraps(f)
         def wrapped(*args, **kwargs):  # type: ignore
@@ -389,7 +389,7 @@ def button(label: str,
            id_: Optional[str] = None,
            onclick: Optional[str] = '') -> str:
     label = uc_first(label)
-    if '/insert' in url and label != uc_first(_('add')):
+    if url and '/insert' in url and label != uc_first(_('add')):
         label = '+ ' + label
     html = '<a class="{class_}" href="{url}" {id} {onclick}>{label}</a>'.format(
         class_=app.config['CSS']['button'][css],
@@ -493,7 +493,7 @@ def get_base_table_data(entity: 'Entity',
     if len(entity.aliases) > 0:
         data: List[str] = ['<p>' + link(entity) + '</p>']
     else:
-        data: List[str] = [link(entity)]
+        data = [link(entity)]
     # Aliases
     for i, (id_, alias) in enumerate(entity.aliases.items()):
         if i == len(entity.aliases) - 1:
