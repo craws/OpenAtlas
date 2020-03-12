@@ -5,7 +5,8 @@ from flask_wtf import FlaskForm
 
 
 class Settings:
-    fields = {'debug_mode',
+    fields = {'api_public',
+              'debug_mode',
               'default_language',
               'default_table_rows',
               'failed_login_forget_minutes',
@@ -29,6 +30,11 @@ class Settings:
               'random_password_length',
               'reset_confirm_hours',
               'site_name'}
+
+    @staticmethod
+    def update_api(form):
+        sql = "UPDATE web.settings SET value = %(value)s WHERE name = 'api_public';"
+        g.execute(sql, {'value': 'True' if getattr(form, 'api_public').data else ''})
 
     @staticmethod
     def get_settings() -> Dict[str, Any]:

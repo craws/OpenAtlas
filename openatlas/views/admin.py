@@ -84,6 +84,31 @@ def admin_map() -> Union[str, Response]:
     return render_template('admin/map.html', form=form)
 
 
+class ApiForm(FlaskForm):  # type: ignore
+    api_public = BooleanField('public')
+    save = SubmitField(uc_first(_('save')))
+
+
+@app.route('/admin/api', methods=['POST', 'GET'])
+@required_group('manager')
+def admin_api() -> Union[str, Response]:
+    form = ApiForm(obj=session['settings'])
+    if form.validate_on_submit():
+        g.cursor.execute('BEGIN')
+        try:
+            Settings.update_api(form)
+            logger.log('info', 'settings', 'API updated')
+            g.cursor.execute('COMMIT')
+            flash(_('info update'), 'info')
+        except Exception as e:  # pragma: no cover
+            g.cursor.execute('ROLLBACK')
+            logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
+        return redirect(url_for('admin_index'))
+    form.api_public.data = session['settings']['api_public']
+    return render_template('admin/api.html', form=form)
+
+
 @app.route('/admin/check_links')
 @app.route('/admin/check_links/<check>')
 @required_group('contributor')

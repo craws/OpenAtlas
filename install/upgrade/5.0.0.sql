@@ -3,6 +3,9 @@
 
 BEGIN;
 
+-- #1050: OpenAtlas API - add setting for public
+INSERT INTO web.settings (name, value) VALUES ('api_public', '');
+
 -- #1048 Bootstrap - remove obsolete settings
 DELETE FROM web.settings WHERE name in ('site_header', 'map_cluster_enabled');
 

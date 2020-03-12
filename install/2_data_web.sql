@@ -15,6 +15,7 @@ INSERT INTO web.user (username, password, active, email, group_id) VALUES (
     (SELECT id FROM web.group WHERE name = 'admin'));
 
 INSERT INTO settings (name, value) VALUES
+    ('api_public', ''),
     ('debug_mode', ''),
     ('default_language', 'en'),
     ('default_table_rows', '25'),
