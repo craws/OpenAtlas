@@ -53,8 +53,8 @@ class ProfileForm(FlaskForm):  # type: ignore
     table_show_aliases = SelectField(choices=[('off', _('off')), ('on', _('on'))])
     layout_choices = [('default', _('default')), ('advanced', _('advanced'))]
     layout = SelectField(_('layout'), description=_('tooltip layout'), choices=layout_choices)
-    max_zoom = IntegerField(description=_('tooltip max zoom'))
-    default_zoom = IntegerField(description=_('tooltip default zoom'))
+    max_zoom = IntegerField()
+    default_zoom = IntegerField()
     module_geonames = BooleanField(description=_('tooltip geonames'))
     module_map_overlay = BooleanField(description=_('tooltip map overlay'))
     module_notes = BooleanField(description=_('tooltip notes'))
