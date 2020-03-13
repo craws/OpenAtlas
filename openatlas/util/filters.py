@@ -264,7 +264,7 @@ def display_form(self: Any,
         if hasattr(form, 'insert_and_continue'):
             del form.insert_and_continue
     id_attribute = ' id="' + form_id + '" ' if form_id else ''
-    html = {'main': '', 'types': '', 'value_types': '', 'header': '', 'footer': ''}
+    html = {'main': '', 'types': '', 'value_types': '', 'header': '', 'footer': '', 'buttons': ''}
 
     def display_value_type_fields(subs: List[int], html_: str = '') -> str:
         for sub_id in subs:
@@ -337,7 +337,7 @@ def display_form(self: Any,
                                 </div>'''.format(label=field.label, field=field(class_=class_))
             continue
         if field.type == 'SubmitField':
-            html['footer'] += str(field(class_=app.config['CSS']['button']['primary']))
+            html['buttons'] += str(field(class_=app.config['CSS']['button']['primary']))
             continue
         if field.id.split('_', 1)[0] in ('begin', 'end'):  # If it's a date field use a function
             if field.id == 'begin_year_from':
@@ -395,7 +395,7 @@ def display_form(self: Any,
                        switcher=util.button(_('show'), id_="value-type-switcher", css="secondary"))
         html['value_types'] = values_html + html['value_types']
     html_all += html['header'] + html['types'] + html['main'] + html['value_types'] + html['footer']
-    html_all += '</div></form>'
+    html_all += '</div><div class="toolbar">' + html['buttons'] + '</div></form>'
     return Markup(html_all)
 
 

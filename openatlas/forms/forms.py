@@ -140,7 +140,7 @@ class TreeSelect(HiddenInput):  # type: ignore
             <input id="{name}-button" name="{name}-button" type="text"
                 class="table-select {required}" onfocus="this.blur()"
                 readonly="readonly" value="{selection}" placeholder="{change_label}">
-            <a  href="#" id="{name}-clear" {clear_style} class="{button_class}"
+            <a href="#" id="{name}-clear" {clear_style} class="{button_class}"
                 onclick="clearSelect('{name}');">{clear_label}</a>
             <div id="{name}-overlay" class="overlay">
                 <div id="{name}-dialog" class="overlay-container">
