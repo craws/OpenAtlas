@@ -4,6 +4,8 @@ from openatlas import app
 from openatlas.models.api import Api
 from openatlas.util.util import api_access
 
+# Todo: unit tests and Mypy checks
+
 
 @app.route('/api/0.1/entity/<int:id_>')
 @api_access()

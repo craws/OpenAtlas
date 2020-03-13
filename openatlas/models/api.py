@@ -12,6 +12,7 @@ from openatlas.util.util import format_date, get_file_path
 
 
 class Api:
+    # Todo: unit tests and Mypy checks
 
     @staticmethod
     def to_camelcase(string: str) -> str:  # pragma: nocover
