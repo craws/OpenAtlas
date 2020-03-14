@@ -6,6 +6,7 @@ class Changelog:
                 '1089': 'Human Remains',
                 '1136': 'Map enhancements',
                 '1138': 'Display usage of CIDOC CRM classes and properties',
+                '1175': 'Additional date checks',
                 '1066': 'Package Manager for JavaScript Libraries'},
             'fix': {
                 '1134': 'Overlay maps: not enabled if Geonames disabled',
