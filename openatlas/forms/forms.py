@@ -319,17 +319,16 @@ class TableMultiSelect(HiddenInput):  # type: ignore
         if field.data and type(field.data) is str:
             field.data = ast.literal_eval(field.data)
         class_ = field.id if field.id != 'given_place' else 'place'
-        headers_len = str(len(Table.HEADERS[class_]))
 
         # Make checkbox column sortable and show selected on top
-        table = Table(Table.HEADERS[class_], order=[[headers_len, 'desc'], [0, 'asc']])
+        table = Table([''] + Table.HEADERS[class_], order=[[0, 'desc'], [1, 'asc']])
 
         # Table definitions (ordering and aligning)
-        table.defs = [{'orderDataType': 'dom-checkbox', 'targets': [headers_len]}]
+        table.defs = [{'orderDataType': 'dom-checkbox', 'targets': 0}]
         if class_ == 'event':
-            table.defs.append({'className': 'dt-body-right', 'targets': [3, 4]})
+            table.defs.append({'className': 'dt-body-right', 'targets': [4, 5]})
         elif class_ in ['actor', 'group', 'feature', 'place']:
-            table.defs.append({'className': 'dt-body-right', 'targets': [2, 3]})
+            table.defs.append({'className': 'dt-body-right', 'targets': [3, 4]})
 
         if class_ == 'place':
             aliases = current_user.settings['table_show_aliases']
@@ -340,7 +339,7 @@ class TableMultiSelect(HiddenInput):  # type: ignore
         for entity in entities:
             data = get_base_table_data(entity)
             data[0] = re.sub(re.compile('<a.*?>'), '', data[0])  # Remove links
-            data.append("""<input type="checkbox" id="{id}" {checked} value="{name}"
+            data.insert(0, """<input type="checkbox" id="{id}" {checked} value="{name}"
                 class="multi-table-select">""".format(
                 id=str(entity.id),
                 name=entity.name,
