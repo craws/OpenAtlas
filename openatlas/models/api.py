@@ -135,7 +135,7 @@ class Api:
 
         # Descriptions
         if entity.description:
-            features['description'] = [{'@id': request.base_url, 'value': entity.description}]
+            features['description'] = [{'value': entity.description}]
 
         # Types
         if nodes:  # pragma: nocover
