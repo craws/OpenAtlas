@@ -57,10 +57,10 @@
         {% endif %}
         {{ tables['source'].display('source')|safe }}
     </div>
-    {% for name in ['event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find'] %}
-        {% if name not in ['feature', 'stratigraphic-unit', 'find'] or tables[name].rows %}
+    {% for name in ['node', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find'] %}
+        {% if name not in ['node', 'feature', 'stratigraphic-unit', 'find'] or tables[name].rows %}
             <div id="tab-{{name}}">
-                {% if 'contributor'|is_authorized and name not in ['feature', 'stratigraphic-unit', 'find'] %}
+                {% if 'contributor'|is_authorized and name not in ['node', 'feature', 'stratigraphic-unit', 'find'] %}
                     <div class="toolbar">
                         {{ _('add')|button(url_for('file_add', id_=entity.id, class_name=name)) }}
                         {% if name == 'place' %}
