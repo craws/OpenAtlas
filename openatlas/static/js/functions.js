@@ -1,71 +1,71 @@
-
 tinymce.init({
     menubar: false,
-    relative_urls : false,
+    relative_urls: false,
     mode: 'specific_textareas',
     editor_selector: 'tinymce',
     resize: 'both',
-    toolbar_items_size : 'small',
+    toolbar_items_size: 'small',
     plugins: 'link code textcolor colorpicker',
     toolbar: 'bold italic underline strikethrough alignleft aligncenter alignright alignjustify ' +
         ' undo redo link unlink fontselect fontsizeselect forecolor code',
 });
 
-$(document).ready(function() {
+$(document).ready(function () {
 
     //popovers init
     $('[data-toggle="popover"]').popover();
 
     // DataTables - sort for checkbox columns
-    $.fn.dataTable.ext.order['dom-checkbox'] = function(settings, col) {
-        return this.api().column(col, {order:'index'}).nodes().map( function (td, i) {
+    $.fn.dataTable.ext.order['dom-checkbox'] = function (settings, col) {
+        return this.api().column(col, {order: 'index'}).nodes().map(function (td, i) {
             return $('input', td).prop('checked') ? '1' : '0';
         });
     };
 
     // DataTables - sort for CIDOC model
-    $.fn.dataTable.ext.order['cidoc-model'] = function(settings, col) {
-        return this.api().column(col, {order:'index'}).nodes().map( function (td, i) {
+    $.fn.dataTable.ext.order['cidoc-model'] = function (settings, col) {
+        return this.api().column(col, {order: 'index'}).nodes().map(function (td, i) {
             const d = td.firstChild.innerText
                 .replace('OA', '100')
-                .replace(/[\D]*/,'');
+                .replace(/[\D]*/, '');
             return parseInt(d, 10);
         });
     };
 
     // DataTables - ignore special characters for search
-    (function(){
-        function removeAccents ( data ) {
-            if ( data.normalize ) {
+    (function () {
+        function removeAccents(data) {
+            if (data.normalize) {
                 // Use I18n API if available to split characters and accents, then remove
                 // the accents wholesale. Note that we use the original data as well as
                 // the new to allow for searching of either form.
-                return data +' '+ data
+                return data + ' ' + data
                     .normalize('NFD')
                     .replace(/[\u0300-\u036f]/g, '');
             }
             return data;
         }
+
         var searchType = jQuery.fn.DataTable.ext.type.search;
-        searchType.string = function ( data ) {
-            return ! data ?
+        searchType.string = function (data) {
+            return !data ?
                 '' :
                 typeof data === 'string' ?
-                    removeAccents( data ) :
+                    removeAccents(data) :
                     data;
         };
-        searchType.html = function ( data ) {
-            return ! data ?
+        searchType.html = function (data) {
+            return !data ?
                 '' :
                 typeof data === 'string' ?
-                    removeAccents( data.replace( /<.*?>/g, '' ) ) :
+                    removeAccents(data.replace(/<.*?>/g, '')) :
                     data;
         };
     }());
 
     /* jQuery UI tabs init */
     $("#tabs").tabs({
-        activate: function(event, ui) {
+        activate: function (event, ui) {
             window.location.hash = ui.newPanel.attr('id');
         }
     });
@@ -73,7 +73,7 @@ $(document).ready(function() {
     /* Show and hide function for date input fields */
     $("#date-switcher").click(function () {
         $(".date-switch").toggleClass('display-none');
-        $(this).text(function(i, text){
+        $(this).text(function (i, text) {
             return text === show ? hide : show;
         })
     });
@@ -81,13 +81,13 @@ $(document).ready(function() {
     /* Show and hide function for value type input fields */
     $("#value-type-switcher").click(function () {
         $(".value-type-switch").toggleClass('display-none');
-        $(this).text(function(i, text){
+        $(this).text(function (i, text) {
             return text === show ? hide : show;
         })
     })
 
     /* When selecting a file for upload: if name is empty, fill with filename without extension */
-    $('#file').on("change", function() {
+    $('#file').on("change", function () {
         if ($('#name').val() == '') {
             var filename = $('#file')[0].files.length ? $('#file')[0].files[0].name : '';
             $('#name').val(filename.replace(/\.[^/.]+$/, ""));
@@ -97,29 +97,47 @@ $(document).ready(function() {
     /* Show more/less function for texts */
     var showChar = 800;
     var ellipsesText = "...";
-    $('.more').each(function() {
+    $('.more').each(function () {
         var content = $(this).html();
-        if (content.length > showChar) {
-            var c = content.substr(0, showChar);
-            var h = content.substr(showChar, content.length - showChar);
-            var html = c + '<span class="more-ellipses">' + ellipsesText + '</span>'
-            html += '<span class="more-content"><span>' + h + '</span>'
-            html += '<a href="" class="more-link">' + moreText + '</a></span>';
-            $(this).html(html);
+        lines = content.split(/<br>/).length;
+        if (lines > 10) {
+            more = '<a href="" class="more-link">' + moreText + '</a></span>';
+            $(more).insertAfter(this);
         }
     });
-    $(".more-link").click(function(){
-        if($(this).hasClass("less")) {
+    $(".more-link").click(function () {
+        if ($(this).hasClass("less")) {
             $(this).removeClass("less");
             $(this).html(moreText);
+            $(this).prev().css('-webkit-line-clamp', "10");
         } else {
             $(this).addClass("less");
             $(this).html(lessText);
+            $(this).prev().css('-webkit-line-clamp', "1000");
         }
-        $(this).parent().prev().toggle();
-        $(this).prev().toggle();
         return false;
     });
+
+    //tabs navigation
+    let url = location.href.replace(/\/$/, "");
+    if (location.hash) {
+        const hash = url.split("#");
+        console.log(hash[1], $(`#${hash[1]}`));
+        $(`a[href="#${hash[1]}"]`).tab('show');
+        url = location.href.replace(/\/#/, "#");
+        history.replaceState(null, null, url);
+        setTimeout(() => {
+            $(window).scrollTop(0);
+        }, 400);
+    }
+
+    $('a[data-toggle="tab"]').on("click", function () {
+        let newUrl;
+        const hash = $(this).attr("href");
+        newUrl = url.split("#")[0] + hash;
+        history.replaceState(null, null, newUrl);
+    });
+
 });
 
 $.jstree.defaults.core.themes.dots = false;
@@ -139,7 +157,7 @@ function ucString(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-function createOverlay(name, title=false, multiple=false, type='table', value_type=false) {
+function createOverlay(name, title = false, multiple = false, type = 'table', value_type = false) {
     if (!title) {
         title = name;
     }
@@ -158,10 +176,10 @@ function createOverlay(name, title=false, multiple=false, type='table', value_ty
             width: 'auto',
             height: 'auto',
             close: function () {
-                if (multiple && type=='tree') {
+                if (multiple && type == 'tree') {
                     selectFromTreeMulti(name, value_type);
                 }
-                if (multiple && type=='table') {
+                if (multiple && type == 'table') {
                     selectFromTableMulti(name);
                 }
                 $('#' + name + '-overlay').css('display', 'none');
@@ -191,7 +209,7 @@ function selectFromTree(name, id, text) {
     $('#' + name + '-clear').show();
 }
 
-function selectFromTreeMulti(name, value_type=false) {
+function selectFromTreeMulti(name, value_type = false) {
     var checkedNames = '';
     var ids = $('#' + name + '-tree').jstree('get_selected');
     ids.forEach(function (item, index, array) {
@@ -201,11 +219,11 @@ function selectFromTreeMulti(name, value_type=false) {
             $('#' + name + '-button').after(
                 $('<input>').attr({
                     type: 'text',
-                    id: node.id ,
+                    id: node.id,
                     name: node.id,
                     value: '20',
                     class: 'value_input'
-            }));
+                }));
             $('#' + name + '-button').after($('<br>'));
         } else {
             checkedNames += node['text'] + "<br>";
@@ -232,14 +250,14 @@ function selectFromTableMulti(name) {
     var checkedNames = '';
     var ids = [];
     $('#' + name + '_table').DataTable().rows().nodes().to$().find('input[type="checkbox"]').each(
-        function() {
+        function () {
             if ($(this).is(':checked')) {
                 checkedNames += $(this).val() + '<br>';
                 ids.push($(this).attr('id'));
             }
         });
     $('#' + name + '-selection').html(checkedNames);
-    $('#' + name).val(ids.length > 0 ? '[' + ids+ ']' : '').trigger('change');
+    $('#' + name).val(ids.length > 0 ? '[' + ids + ']' : '').trigger('change');
 }
 
 function clearSelect(name) {
@@ -260,4 +278,15 @@ function openParentTab() {
             }
         }
     }
+}
+
+function overflow() {
+    setTimeout(() => {
+        $('td').bind('mouseenter', function () {
+            var $this = $(this);
+            if (this.offsetWidth < this.scrollWidth) {
+                $this.attr('title', $this.text());
+            }
+        });
+    }, 0);
 }

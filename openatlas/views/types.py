@@ -153,7 +153,7 @@ def tree_select(name: str) -> str:
                 $("#{name}-tree").jstree({{
                     "search": {{ "case_insensitive": true, "show_only_matches": true }},
                     "plugins" : ["core", "html_data", "search"],
-                    "core":{{ "data": {tree_data} }}
+                    "core": {{ "data": {tree_data} }}
                 }});
                 $("#{name}-tree").on("select_node.jstree", function (e, data) {{
                     document.location.href = data.node.original.href;

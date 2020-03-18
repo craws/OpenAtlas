@@ -28,7 +28,7 @@ install folder but aren't fully tested and still experimental.
 
 ### gettext, pip, npm
 
-    # apt-get gettext npm python3-pip
+    # apt-get install gettext npm python3-pip
 
 ## Installation
 
@@ -40,6 +40,7 @@ Copy the files to /var/www/your_site_name or clone OpenAtlas from GitHub
 
 ### Frontend libraries
 
+    $ pip3 install calmjs
     $ cd openatlas/static
     $ pip3 install -e ./
     $ ~/.local/bin/calmjs npm --install openatlas

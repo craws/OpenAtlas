@@ -27,7 +27,6 @@ from openatlas.util.util import (convert_size, format_date, format_datetime, get
 
 class GeneralForm(FlaskForm):  # type: ignore
     site_name = StringField(uc_first(_('site name')))
-    site_header = StringField(uc_first(_('site header')))
     default_language = SelectField(uc_first(_('default language')),
                                    choices=list(app.config['LANGUAGES'].items()))
     default_table_rows = SelectField(uc_first(_('default table rows')),
@@ -59,7 +58,6 @@ def admin_index() -> str:
 
 
 class MapForm(FlaskForm):  # type: ignore
-    map_cluster_enabled = BooleanField(uc_first(_('use cluster')))
     map_cluster_max_radius = IntegerField('maxClusterRadius')
     map_cluster_disable_at_zoom = IntegerField('disableClusteringAtZoom')
     save = SubmitField(uc_first(_('save')))
@@ -81,10 +79,34 @@ def admin_map() -> Union[str, Response]:
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('admin_index'))
-    form.map_cluster_enabled.data = session['settings']['map_cluster_enabled']
     form.map_cluster_max_radius.data = session['settings']['map_cluster_max_radius']
     form.map_cluster_disable_at_zoom.data = session['settings']['map_cluster_disable_at_zoom']
     return render_template('admin/map.html', form=form)
+
+
+class ApiForm(FlaskForm):  # type: ignore
+    api_public = BooleanField('public')
+    save = SubmitField(uc_first(_('save')))
+
+
+@app.route('/admin/api', methods=['POST', 'GET'])
+@required_group('manager')
+def admin_api() -> Union[str, Response]:
+    form = ApiForm(obj=session['settings'])
+    if form.validate_on_submit():
+        g.cursor.execute('BEGIN')
+        try:
+            Settings.update_api(form)
+            logger.log('info', 'settings', 'API updated')
+            g.cursor.execute('COMMIT')
+            flash(_('info update'), 'info')
+        except Exception as e:  # pragma: no cover
+            g.cursor.execute('ROLLBACK')
+            logger.log('error', 'database', 'transaction failed', e)
+            flash(_('error transaction'), 'error')
+        return redirect(url_for('admin_index'))
+    form.api_public.data = session['settings']['api_public']
+    return render_template('admin/api.html', form=form)
 
 
 @app.route('/admin/check_links')
@@ -189,7 +211,7 @@ def admin_check_similar() -> str:
         for sample_id, sample in Entity.get_similar_named(form).items():
             html = link(sample['entity'])
             for entity in sample['entities']:
-                html += '<br>' + link(entity)
+                html += '<br><br><br><br><br>' + link(entity)  # Workaround for linebreaks in tables
             table.rows.append([html, len(sample['entities']) + 1])
     return render_template('admin/check_similar.html', table=table, form=form)
 
@@ -377,7 +399,7 @@ def admin_log() -> str:
                            row.type,
                            row.message,
                            user,
-                           row.info.replace('\n', '<br>')])
+                           row.info])
     return render_template('admin/log.html', table=table, form=form)
 
 
@@ -385,7 +407,7 @@ def admin_log() -> str:
 @required_group('admin')
 def admin_log_delete() -> Response:
     logger.delete_all_system_logs()
-    flash(_('Logs deleted'))
+    flash(_('Logs deleted'), 'info')
     return redirect(url_for('admin_log'))
 
 
@@ -439,7 +461,7 @@ def admin_mail() -> str:
         body = _('This test mail was sent by %(username)s', username=current_user.username)
         body += ' ' + _('at') + ' ' + request.headers['Host']
         if send_mail(subject, body, form.receiver.data):
-            flash(_('A test mail was sent to %(email)s.', email=form.receiver.data))
+            flash(_('A test mail was sent to %(email)s.', email=form.receiver.data), 'info')
     else:
         form.receiver.data = current_user.email
     mail_settings = {
@@ -462,7 +484,6 @@ def admin_general() -> str:
     settings = session['settings']
     general_settings = {
         _('site name'): settings['site_name'],
-        _('site header'): settings['site_header'],
         _('default language'): app.config['LANGUAGES'][settings['default_language']],
         _('default table rows'): settings['default_table_rows'],
         _('log level'): app.config['LOG_LEVELS'][int(settings['log_level'])],

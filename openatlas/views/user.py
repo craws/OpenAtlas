@@ -101,7 +101,7 @@ def user_activity(user_id: int = 0) -> str:
 def user_view(id_: int) -> str:
     user = User.get_by_id(id_)
     info = [
-        (_('username'), link(user)),
+        (_('username'), user.username),
         (_('group'), user.group),
         (_('full name'), user.real_name),
         (_('email'), user.email if is_authorized('manager') or user.settings['show_email'] else ''),

@@ -14,6 +14,7 @@ from wtforms import StringField, SubmitField
 app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 
+# Use the test database if running tests
 instance_name = 'production' if 'test_runner.py' not in sys.argv[0] else 'testing'
 
 # Load config/default.py and instance/INSTANCE_NAME.py
@@ -40,7 +41,7 @@ from openatlas.util import filters
 from openatlas.views import (actor, admin, ajax, content, event, export, hierarchy, index,
                              involvement, imports, link, login, types, model, place, profile, note,
                              overlay, reference, source, translation, user, relation, member,
-                             search, file, object, sql, entity)
+                             search, file, api, object, sql, entity)
 
 
 @babel.localeselector

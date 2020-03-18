@@ -1,6 +1,6 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [[_('files'), 'file_index'], entity, _('add') + ' ' + _(class_name).capitalize()]|crumb|safe }}
+    {{ [[_('files'), 'file_index'], entity, _('add') + ' ' + _(class_name).capitalize()]|crumb }}
 {% endblock %}
 {% block content %}
     {{ form|safe }}

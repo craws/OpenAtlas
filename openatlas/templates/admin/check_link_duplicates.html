@@ -1,12 +1,12 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ [[_('admin'), 'admin_index'], _('check link duplicates')]|crumb|safe }}{% endblock %}
+{% block breadcrumb %}
+    {{ [[_('admin'), 'admin_index'], _('check link duplicates')]|crumb }}
+{% endblock %}
 {% block content %}
     <div class="toolbar">
-        {{ 'Data_integrity'|manual_link|safe }}
+        {{ 'Data_integrity'|manual_link }}
         {% if duplicates %}
-            <div>
-                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('admin_check_link_duplicates', delete='delete') }}">{{ _('delete link duplicates')|uc_first }}</a>
-            </div>
+            {{ _('delete link duplicates')|button(url_for('admin_check_link_duplicates', delete='delete')) }}
         {% endif %}
     </div>
     {% if duplicates %}

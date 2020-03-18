@@ -6,9 +6,9 @@
             structure['feature'],
             structure['stratigraphic_unit'],
             origin,
-            '+ ' + _(title).capitalize()]|crumb|safe }}
+            '+ ' + _(title).capitalize()]|crumb }}
     {% else %}
-        {{ [[_('place'), 'place_index'], '+ ' + _(title).capitalize()]|crumb|safe }}
+        {{ [[_('place'), 'place_index'], '+ ' + _(title).capitalize()]|crumb }}
     {% endif %}
 {% endblock %}
 {% block content %}

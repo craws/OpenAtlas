@@ -140,7 +140,7 @@ class TreeSelect(HiddenInput):  # type: ignore
             <input id="{name}-button" name="{name}-button" type="text"
                 class="table-select {required}" onfocus="this.blur()"
                 readonly="readonly" value="{selection}" placeholder="{change_label}">
-            <a id="{name}-clear" {clear_style} class="btn btn-secondary"
+            <a href="#" id="{name}-clear" {clear_style} class="{button_class}"
                 onclick="clearSelect('{name}');">{clear_label}</a>
             <div id="{name}-overlay" class="overlay">
                 <div id="{name}-dialog" class="overlay-container">
@@ -172,6 +172,7 @@ class TreeSelect(HiddenInput):  # type: ignore
             </script>""".format(filter=uc_first(_('type to search')),
                                 min_chars=session['settings']['minimum_jstree_search'],
                                 name=field.id,
+                                button_class=app.config['CSS']['button']['secondary'],
                                 title=g.nodes[int(field.id)].name,
                                 change_label=uc_first(_('change')),
                                 clear_label=uc_first(_('clear')),
@@ -199,7 +200,7 @@ class TreeMultiSelect(HiddenInput):  # type: ignore
                 selected_ids.append(entity_id)
                 selection += g.nodes[entity_id].name + '<br>'
         html = """
-            <span id="{name}-button" class="button btn btn-secondary">{change_label}</span>
+            <span id="{name}-button" class="{button_class}">{change_label}</span>
             <div id="{name}-selection" style="text-align:left;">{selection}</div>
             <div id="{name}-overlay" class="overlay">
                <div id="{name}-dialog" class="overlay-container">
@@ -227,6 +228,7 @@ class TreeMultiSelect(HiddenInput):  # type: ignore
             </script>""".format(filter=uc_first(_('type to search')),
                                 min_chars=session['settings']['minimum_jstree_search'],
                                 name=field.id,
+                                button_class=app.config['CSS']['button']['secondary'],
                                 title=root.name,
                                 selection=selection,
                                 change_label=uc_first(_('change')),
@@ -271,11 +273,14 @@ class TableSelect(HiddenInput):  # type: ignore
                 selection = entity.name
             data = get_base_table_data(entity, file_stats)
             if len(entity.aliases) > 0:
-                data[0] = """<p><a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a></p>
-                            """.format(name=field.id, entity_id=entity.id, entity_name=entity.name)
+                data[0] = """
+                    <p>
+                        <a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
+                    </p>""".format(name=field.id, entity_id=entity.id, entity_name=entity.name)
             else:
-                data[0] = """<a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
-                            """.format(name=field.id, entity_id=entity.id, entity_name=entity.name)
+                data[0] = """
+                    <a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
+                    """.format(name=field.id, entity_id=entity.id, entity_name=entity.name)
             for i, (id_, alias) in enumerate(entity.aliases.items()):
                 if i == len(entity.aliases) - 1:
                     data[0] = ''.join([data[0]] + [alias])
@@ -286,13 +291,14 @@ class TableSelect(HiddenInput):  # type: ignore
             <input id="{name}-button" name="{name}-button" class="table-select {required}"
                 type="text" placeholder="{change_label}" onfocus="this.blur()" readonly="readonly"
                 value="{selection}">
-            <a id="{name}-clear" class="btn btn-secondary" {clear_style}
+            <a href="#" id="{name}-clear" class="{button_class}" {clear_style}
                 onclick="clearSelect('{name}');">{clear_label}</a>
             <div id="{name}-overlay" class="overlay">
             <div id="{name}-dialog" class="overlay-container">{table}</div></div>
             <script>$(document).ready(function () {{createOverlay("{name}", "{title}");}});</script>
             """.format(name=field.id,
                        title=_(field.id.replace('_', ' ')),
+                       button_class=app.config['CSS']['button']['secondary'],
                        change_label=uc_first(_('change')),
                        clear_label=uc_first(_('clear')),
                        table=table.display(field.id),
@@ -313,17 +319,16 @@ class TableMultiSelect(HiddenInput):  # type: ignore
         if field.data and type(field.data) is str:
             field.data = ast.literal_eval(field.data)
         class_ = field.id if field.id != 'given_place' else 'place'
-        headers_len = str(len(Table.HEADERS[class_]))
 
         # Make checkbox column sortable and show selected on top
-        table = Table(Table.HEADERS[class_], order=[[headers_len, 'desc'], [0, 'asc']])
+        table = Table([''] + Table.HEADERS[class_], order=[[0, 'desc'], [1, 'asc']])
 
         # Table definitions (ordering and aligning)
-        table.defs = [{'orderDataType': 'dom-checkbox', 'targets': [headers_len]}]
+        table.defs = [{'orderDataType': 'dom-checkbox', 'targets': 0}]
         if class_ == 'event':
-            table.defs.append({'className': 'dt-body-right', 'targets': [3, 4]})
+            table.defs.append({'className': 'dt-body-right', 'targets': [4, 5]})
         elif class_ in ['actor', 'group', 'feature', 'place']:
-            table.defs.append({'className': 'dt-body-right', 'targets': [2, 3]})
+            table.defs.append({'className': 'dt-body-right', 'targets': [3, 4]})
 
         if class_ == 'place':
             aliases = current_user.settings['table_show_aliases']
@@ -334,7 +339,7 @@ class TableMultiSelect(HiddenInput):  # type: ignore
         for entity in entities:
             data = get_base_table_data(entity)
             data[0] = re.sub(re.compile('<a.*?>'), '', data[0])  # Remove links
-            data.append("""<input type="checkbox" id="{id}" {checked} value="{name}"
+            data.insert(0, """<input type="checkbox" id="{id}" {checked} value="{name}"
                 class="multi-table-select">""".format(
                 id=str(entity.id),
                 name=entity.name,
@@ -342,13 +347,14 @@ class TableMultiSelect(HiddenInput):  # type: ignore
             table.rows.append(data)
         selection = [entity.name for entity in entities if field.data and entity.id in field.data]
         html = """
-            <span id="{name}-button" class="button btn btn-secondary">{change_label}</span><br>
+            <span id="{name}-button" class="{button_class}">{change_label}</span><br>
             <div id="{name}-selection" class="selection" style="text-align:left;">{selection}</div>
             <div id="{name}-overlay" class="overlay">
             <div id="{name}-dialog" class="overlay-container">{table}</div></div>
             <script>
                 $(document).ready(function () {{createOverlay("{name}", "{title}", true);}});
             </script>""".format(name=field.id,
+                                button_class=app.config['CSS']['button']['secondary'],
                                 change_label=uc_first(_('change')),
                                 title=_(field.id.replace('_', ' ')),
                                 selection='<br>'.join(selection),
@@ -397,7 +403,7 @@ def build_move_form(form: Any, node: Node) -> FlaskForm:
 
 
 def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
-    """ Returns a form with a list of entities with checkboxes"""
+    """ Returns a form with a list of entities with checkboxes."""
     if class_name == 'file':
         entities = Entity.get_by_system_type('file', nodes=True)
     elif class_name == 'place':
@@ -420,7 +426,9 @@ def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
         <form class="table" id="checkbox-form" method="post">
             <input id="csrf_token" name="csrf_token" type="hidden" value="{token}">
             <input id="checkbox_values" name="checkbox_values" type="hidden">
-            {table} <button name="form-submit" id="form-submit" type="submit">{add}</button>
+            {table}
+            <input id="save" class="{class_}" name="save" type="submit" value="{add}">
         </form>""".format(add=uc_first(_('add')),
                           token=generate_csrf(),
+                          class_=app.config['CSS']['button']['primary'],
                           table=table.display(class_name))

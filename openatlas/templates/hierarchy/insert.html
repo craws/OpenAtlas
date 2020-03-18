@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [[_('types'), 'node_index'], '+ ' + _(param).capitalize()]|crumb|safe }}
+    {{ [[_('types'), 'node_index'], '+ ' + _(param).capitalize()]|crumb }}
 {% endblock %}
 {% block content %}
-    {{ form|display_form|safe }}
+    {{ form|display_form }}
 {% endblock %}

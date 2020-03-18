@@ -112,7 +112,19 @@ class Date:
                 OR (actor.begin_from IS NOT NULL AND event.end_from IS NOT NULL
                     AND actor.begin_from > event.end_from)
                 OR (actor.begin_to IS NOT NULL AND event.end_to IS NOT NULL
-                    AND actor.begin_to > event.end_to);"""
+                    AND actor.begin_to > event.end_to)
+                OR (actor.end_from IS NOT NULL AND event.end_to IS NOT NULL
+                    AND actor.end_from > event.end_to)
+                OR (l.begin_from IS NOT NULL AND l.end_from IS NOT NULL
+                    AND l.begin_from > l.end_from)
+                OR (l.begin_to IS NOT NULL AND l.end_to IS NOT NULL
+                    AND l.begin_to > l.end_to)
+                OR (l.begin_from IS NOT NULL AND event.end_from IS NOT NULL
+                    AND l.begin_from > event.end_from)
+                OR (l.begin_to IS NOT NULL AND event.end_to IS NOT NULL
+                    AND l.begin_to > event.end_to)
+                OR (l.end_from IS NOT NULL AND event.end_to IS NOT NULL
+                    AND l.end_from > event.end_to);"""
         g.execute(sql)
         return [Link.get_by_id(row.id) for row in g.cursor.fetchall()]
 

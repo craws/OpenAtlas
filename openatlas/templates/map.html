@@ -16,8 +16,8 @@
     var jsonSearch = [];
     var translate = [];
     var mapMaxZoom = {{ current_user.settings['max_zoom'] if current_user.settings['max_zoom'] else config['MAX_ZOOM'] }}
+    var mapDefaultZoom = {{ current_user.settings['default_zoom'] if current_user.settings['default_zoom'] else config['DEFAULT_ZOOM'] }}
     var map_update_mode = false;  // enables e.g. edit buttons in popup ups if true
-    var useCluster = {{ 'true' if session['settings']['map_cluster_enabled'] else 'false' }};
     var maxClusterRadius = {{ session['settings']['map_cluster_max_radius'] }};
     var disableClusteringAtZoom = {{ session['settings']['map_cluster_disable_at_zoom'] }};
     translate['save'] = '{{ _('save')|uc_first|safe }}';
@@ -49,15 +49,16 @@
         ];
     {% endif %}
 </script>
-<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/leaflet.css" />
-<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/fullscreen/leaflet.fullscreen.css" />
-<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/Geonames-0.4.7/L.Control.Geonames.css" />
-<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/usermarker-1.0/leaflet.usermarker.css" />
-<link rel="stylesheet" href="/static/node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css" />
-<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/markercluster-1.4.1/MarkerCluster.css" />
-<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/markercluster-1.4.1/MarkerCluster.Default.css" />
-<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/zoomdisplay/leaflet.zoomdisplay.css" />
-<link rel="stylesheet" href="/static/css/map.css" />
+<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/leaflet.css">
+<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/fullscreen/leaflet.fullscreen.css">
+<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/Geonames-0.4.7/L.Control.Geonames.css">
+<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/usermarker-1.0/leaflet.usermarker.css">
+<link rel="stylesheet" href="/static/node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css">
+<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/markercluster-1.4.1/MarkerCluster.css">
+<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/markercluster-1.4.1/MarkerCluster.Default.css">
+<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/zoomdisplay/leaflet.zoomdisplay.css">
+<link rel="stylesheet" href="/static/css/map.css">
+<link rel="stylesheet" href="/static/vendor/leaflet-1.3.4/leaflet-groupedlayercontrol-gh-pages/dist/leaflet.groupedlayercontrol.min.css">
 
 
 <script src="/static/vendor/leaflet-1.3.4/leaflet.js"></script>
@@ -68,4 +69,5 @@
 <script src="/static/vendor/leaflet-1.3.4/Geonames-0.4.7/L.Control.Geonames.js"></script>
 <script src="/static/vendor/leaflet-1.3.4/markercluster-1.4.1/leaflet.markercluster.js"></script>
 <script src="/static/vendor/leaflet-1.3.4/usermarker-1.0/leaflet.usermarker.js"></script>
+<script src="/static/vendor/leaflet-1.3.4/leaflet-groupedlayercontrol-gh-pages/dist/leaflet.groupedlayercontrol.min.js"></script>
 

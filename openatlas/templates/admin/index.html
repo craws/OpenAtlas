@@ -1,5 +1,7 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ [_('admin')]|crumb|safe }}{% endblock %}
+{% block breadcrumb %}
+    {{ [_('admin')]|crumb }}
+{% endblock %}
 {% block content %}
     <div id="admin_index">
         {% for dir, value in writeable_dirs.items() %}
@@ -40,11 +42,12 @@
 
         {% if 'contributor'|is_authorized %}
             <h1>{{ _('data transfer')|uc_first }}</h1>
-            <a href="{{ url_for('import_index') }}">{{ _('import')|uc_first }}</a>
             {% if 'manager'|is_authorized %}
+                <a href="{{ url_for('admin_api') }}">API</a>
                 <a href="{{ url_for('export_csv') }}">{{ _('export')|uc_first }} CSV</a>
                 <a href="{{ url_for('export_sql') }}">{{ _('export')|uc_first }} SQL</a>
             {% endif %}
+            <a href="{{ url_for('import_index') }}">{{ _('import')|uc_first }}</a>
             {% if 'admin'|is_authorized %}
                 <a href="{{ url_for('sql_index') }}">SQL</a>
             {% endif %}

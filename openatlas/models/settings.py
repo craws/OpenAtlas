@@ -5,7 +5,8 @@ from flask_wtf import FlaskForm
 
 
 class Settings:
-    fields = {'debug_mode',
+    fields = {'api_public',
+              'debug_mode',
               'default_language',
               'default_table_rows',
               'failed_login_forget_minutes',
@@ -19,7 +20,6 @@ class Settings:
               'mail_transport_host',
               'mail_from_email',
               'mail_from_name',
-              'map_cluster_enabled',
               'map_cluster_max_radius',
               'map_cluster_disable_at_zoom',
               'mail_recipients_feedback',
@@ -29,8 +29,12 @@ class Settings:
               'profile_image_width',
               'random_password_length',
               'reset_confirm_hours',
-              'site_name',
-              'site_header'}
+              'site_name'}
+
+    @staticmethod
+    def update_api(form: FlaskForm) -> None:
+        sql = "UPDATE web.settings SET value = %(value)s WHERE name = 'api_public';"
+        g.execute(sql, {'value': 'True' if getattr(form, 'api_public').data else ''})
 
     @staticmethod
     def get_settings() -> Dict[str, Any]:
@@ -75,8 +79,6 @@ class Settings:
             if not field.startswith('map_'):
                 continue
             value = getattr(form, field).data
-            if field == 'map_cluster_enabled':
-                value = 'True' if getattr(form, field).data else ''
             g.execute(sql, {'name': field, 'value': value})
 
     @staticmethod

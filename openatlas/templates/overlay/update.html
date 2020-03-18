@@ -1,12 +1,10 @@
 {% extends 'layout.html' %}
 {% block breadcrumb %}
-    {{ [[_('place'), 'place_index'], place, image, _('update overlay')]|crumb|safe }}
+    {{ [[_('place'), 'place_index'], place, image, _('update overlay')]|crumb }}
 {% endblock %}
 {% block content %}
-    <div>
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('overlay_remove', id_=overlay.id, place_id=place.id) }}" onclick="return confirm('{{ _('remove')|uc_first }}?');">
-            {{ _('remove')|uc_first }}
-        </a>
+    <div class="toolbar">
+        {{ _('remove')|button(url_for('overlay_remove', id_=overlay.id, place_id=place.id), onclick="return confirm('" +  _('remove')|uc_first + "?');") }}
     </div>
     <form method="post">
         {{ form.csrf_token }}
@@ -27,6 +25,6 @@
                 <div class="table-cell">{{ form.bottom_right_northing(class_='number') }}</div>
             </div>
         </div>
-        {{ form.save }}
+        {{ form.save(class=config['CSS']['button']['primary']) }}
     </form>
 {% endblock %}

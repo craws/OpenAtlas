@@ -1,12 +1,12 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [_('source')]|crumb|safe }}
+    {{ [_('source')]|crumb }}
 {% endblock %}
 {% block content %}
     {% if 'contributor'|is_authorized %}
         <div class="toolbar">
-            {{ 'source'|manual_link|safe }}
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('source_insert') }}">+ {{ _('source')|uc_first }}</a>
+            {{ 'source'|manual_link }}
+            {{ _('source')|button(url_for('source_insert')) }}
         </div>
     {% endif %}
     {{ table.display()|safe }}

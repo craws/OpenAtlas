@@ -11,7 +11,7 @@ from openatlas import app
 from openatlas.models.content import Content
 from openatlas.util import util
 from openatlas.util.table import Table
-from openatlas.util.util import required_group
+from openatlas.util.util import required_group, sanitize
 
 
 class ContentForm(FlaskForm):  # type: ignore
@@ -28,7 +28,7 @@ def content_index() -> str:
         html_ok = '<img src="/static/images/icons/dialog-apply.png" alt="ok">'
         for language in app.config['LANGUAGES'].keys():
             content.append(html_ok if languages[language] else '')
-        content.append(languages[session['language']])
+        content.append(sanitize(languages[session['language']], 'description'))
         table.rows.append(content)
     return render_template('content/index.html', table=table)
 

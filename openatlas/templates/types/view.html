@@ -1,76 +1,71 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [[_('types'), 'node_index'], root, node.name]|crumb|safe }}
+    {{ [[_('types'), 'node_index'], root, node.name]|crumb }}
 {% endblock %}
 {% block content %}
-<div id="tabs" class="tabs-container">
-    <ul>
-        <li><a href="#tab-info">{{ _('info')|uc_first }}</a></li>
+<div>
+    <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item"> <a class="nav-link active" data-toggle="tab" role="tab" aria-selected="true" href="#tab-info">{{ _('info')|uc_first }}</a></li>
         {% if tables['subs'].rows %}
-            <li><a href="#tab-subs">{{ _('subs')|uc_first }} {{ tables['subs']|format_tab_number|safe }}</a></li>
+            <li class="nav-item"> <a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-subs">{{ _('subs')|uc_first }} {{ tables['subs']|format_tab_number }}</a></li>
         {% endif %}
         {% if tables['entities'].rows or tables['link_entities'].rows %}
             <li>
-                <a href="#tab-entities">{{ _('entities')|uc_first }} {{ (tables['entities'].rows|length + tables['link_entities'].rows|length)|format_tab_number|safe }}</a>
+                <a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-entities">{{ _('entities')|uc_first }} {{ (tables['entities'].rows|length + tables['link_entities'].rows|length)|format_tab_number }}</a>
             </li>
         {% endif %}
-        <li><a href="#tab-file">{{ _('files')|uc_first }} {{ tables['file']|format_tab_number|safe }}</a></li>
+        <li><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false"  href="#tab-file">{{ _('files')|uc_first }} {{ tables['file']|format_tab_number|safe }}</a></li>
     </ul>
-    <div id="tab-info">
-        {% if 'editor'|is_authorized and node.root and not root.locked %}
-            <div class="toolbar">
-                <a class="btn btn-outline-primary btn-sm" href="{{ url_for('node_update', id_=node.id) }}">{{ _('edit')|uc_first }}</a>
-                    {% if not node.system and node.count < 1 and not node.subs %}
-                        <a class="btn btn-outline-primary btn-sm" onclick="return confirm('{{ _('delete')|uc_first }} {{ node.name.replace('\'', '') }}?')"
-                           href="{{ url_for('node_delete', id_=node.id) }}">{{ _('delete')|uc_first }}</a>
-                    {% endif %}
-            </div>
-        {% endif %}
-        <h1>{{ node.name }}</h1>
-        <div>
-            {{ profile_image_id|display_profile_image|safe }}
-            <div style="float:left;">
-                {% if super_ %}
-                    <p>{{_('super')|uc_first}}: {{ super_|link|safe }}</p>
-                {% endif %}
-                {{ info|display_info|safe }}
-                {% if root.value_type %}
-                    <p>{{_('unit')|uc_first}}: {{node.description}}</p>
-                {% else %}
-                    {{ node|description|safe }}
-                {% endif %}
-            </div>
-            <div style="clear:both;"></div>
-        </div>
-    </div>
-    {% if tables['subs'].rows %}
-        <div id="tab-subs">
-            {{ tables['subs'].display('subs')|safe }}
-        </div>
-    {% endif %}
-    {% if tables['entities'].rows or tables['link_entities'].rows %}
-        <div id="tab-entities">
-            {% if 'editor'|is_authorized and not root.value_type %}
+    <div class="tab-content" id="myTabContent">
+        <div class="tab-pane fade show active" role="tabpanel" id="tab-info">
+            {% if 'editor'|is_authorized and node.root and not root.locked %}
                 <div class="toolbar">
-                    <a class="btn btn-outline-primary btn-sm" href="{{ url_for('node_move_entities', id_=node.id) }}">{{ _('move entities')|uc_first }}</a>
+                    {{ _('edit')|button(url_for('node_update', id_=node.id)) }}
+                        {% if not node.system and node.count < 1 and not node.subs %}
+                            {{ _('delete')|button(url_for('node_delete', id_=node.id), onclick="return confirm('" + _('delete')|uc_first + " " + node.name.replace("'", '').replace('"', '') + "?');") }}
+                        {% endif %}
                 </div>
             {% endif %}
-            {% if tables['entities'].rows %}
-                {{ tables['entities'].display('entities')|safe }}
+            <h1>{{ node.name }}</h1>
+            {% if super_ %}
+                <p>{{_('super')|uc_first}}: {{ super_|link|safe }}</p>
             {% endif %}
-            {% if tables['link_entities'].rows %}
-                {{ tables['link_entities'].display('link_entities')|safe }}
+            {{ info|display_info }}
+            {% if root.value_type %}
+                <p>{{_('unit')|uc_first}}: {{node.description}}</p>
+            {% else %}
+                {{ node|description }}
             {% endif %}
         </div>
-    {% endif %}
-    <div id="tab-file">
-        {% if 'contributor'|is_authorized %}
-            <div class="button-bar">
-                <a href="{{ url_for('node_add_file', id_=node.id)}}">{{ _('add')|uc_first }}</a>
-                <a href="{{ url_for('file_insert', origin_id=node.id) }}">+ {{ _('file')|uc_first }}</a>
+        {% if tables['subs'].rows %}
+            <div class="tab-pane fade" role="tabpanel" id="tab-subs">
+                {{ tables['subs'].display('subs')|safe }}
             </div>
         {% endif %}
-        {{ tables['file'].display('file')|safe }}
+        {% if tables['entities'].rows or tables['link_entities'].rows %}
+            <div class="tab-pane fade" role="tabpanel" id="tab-entities">
+                {% if 'editor'|is_authorized and not root.value_type %}
+                    <div class="toolbar">
+                        {{ _('move entities')|button(url_for('node_move_entities', id_=node.id)) }}
+                    </div>
+                {% endif %}
+                {% if tables['entities'].rows %}
+                    {{ tables['entities'].display('entities')|safe }}
+                {% endif %}
+                {% if tables['link_entities'].rows %}
+                    {{ tables['link_entities'].display('link_entities')|safe }}
+                {% endif %}
+            </div>
+        {% endif %}
+        <div class="tab-pane fade" role="tabpanel" id="tab-file">
+            {% if 'contributor'|is_authorized %}
+                <div class="button-bar">
+                    <a href="{{ url_for('node_add_file', id_=node.id)}}">{{ _('add')|uc_first }}</a>
+                    <a href="{{ url_for('file_insert', origin_id=node.id) }}">+ {{ _('file')|uc_first }}</a>
+                </div>
+            {% endif %}
+            {{ tables['file'].display('file')|safe }}
+        </div>
     </div>
 </div>
 {% endblock %}

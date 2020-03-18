@@ -4,6 +4,19 @@ html, body, input, select, textarea {
     font-family: helvetica, arial, sans-serif;
 }
 
+textarea {
+    resize: both;
+}
+
+img#logo {
+    height: 40px;
+}
+
+#site-name-and-version {
+    position: absolute;
+    right: 16px
+}
+
 div.preview {
     margin-left: 1em;
 }
@@ -105,8 +118,12 @@ div.pager {
     display:none;
 }
 
-.more-content span {
-    display: none;
+.more {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 10;
+    -webkit-box-orient: vertical;
 }
 
 .more-link {
@@ -120,6 +137,12 @@ div.pager {
 
 .jstree li > a > .jstree-icon {
     display: none;
+}
+
+.jstree li > a {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 a {
@@ -151,10 +174,8 @@ input[type="text"].value_input {
     float: right;
     margin: 0;
     padding: 0px 0px 0px 10px;
-    width: 0px;
     display: inline-flex;
     height: 35px;
-    overflow: hidden;
     position :relative;
     transition: width 500ms;
     font-size: 15px;
@@ -226,19 +247,10 @@ form input[type="text"].month, form input[type="text"].day {
     top: 0;
 }
 
-p.inverse-heading {
-    display: inline-block;
-    font-size: 1.1em;
-    font-weight: bold;
-    margin-bottom: 0.3em;
-    padding: 0.4em;
-}
-
 button {
     cursor: pointer;
     display: inline-block;
     font-weight: bold;
-    margin-right: 1em;
     padding: 0.3em 0.5em;
     text-decoration: none;
     border: none;
@@ -267,23 +279,6 @@ noscript div {
     margin-top: 1em;
 }
 
-#header-menu {
-    float: right;
-    font-weight: bold;
-    font-size: 0.9em;
-    padding: 0.5em 1em;
-}
-
-#language-menu a, #language-menu span {
-    padding: 0.2em 0.4em;
-}
-
-img.zoom {
-    cursor: pointer;
-    margin-right: 0.5em;
-    vertical-align: middle;
-}
-
 #content {
     margin: 1em;
     text-align: left;
@@ -297,55 +292,6 @@ img.zoom {
     width: 60em;
 }
 
-#site-name {
-    font-size: 1.4em;
-    font-weight: bold;
-    float: left;
-    margin: 0.5em 0.5em 0.5em 2em;
-}
-
-#menu {
-    clear: both;
-    height: 3em;
-}
-
-#menu, #breadcrumb {
-    padding-left: 1em;
-    padding-right: 1em;
-    font-weight: bold;
-}
-
-#breadcrumb {
-    padding-top: 0.6em;
-    height: 1.8em;
-}
-
-#breadcrumb a {
-    margin-right: 0.2em;
-}
-
-#menu > div {
-    float: left;
-    margin-right: 1em;
-    margin-top: 1em;
-}
-
-#menu > div.active {
-    height: 1.6em;
-    border-bottom-width: 0.5em;
-    border-bottom-style: solid;
-}
-
-#menu a, #breadcrumb div span {
-    display: block;
-    text-decoration: none;
-}
-
-#language-menu {
-    float: right;
-    margin-top: 2em;
-}
-
 #greeting {
     float: right;
     margin-top: 1em;
@@ -354,9 +300,7 @@ img.zoom {
 div.changelog-version {
     font-size: 1.1em;
     font-weight: bold;
-    padding: 0.3em;
     margin-top: 1em;
-    width: 31em;
 }
 
 div.changelog-date {
@@ -394,6 +338,10 @@ div.data-table > div > div {
     width: inherit;
 }
 
+.dt-body-right  {
+    text-align: right;
+}
+
 form div.table-row div {
     text-align: right;
     vertical-align: top;
@@ -412,6 +360,19 @@ form div.table-row div.table-cell div {
     margin-top: 0.3em;
 }
 
+table td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100px;
+}
+
+select[name="table_table_length"] {
+    padding-top: initial;
+    padding-bottom: initial;
+}
+
+/*forms*/
 label.error {
     padding-left: 0.5em;
 }
@@ -423,7 +384,7 @@ input[type=text], input[type=password], textarea, select  {
 
 input[type=text], input[type=password], select {
     width: 15.6em;
-    height: 1.6em;
+    height: 21px;
     -ms-box-sizing:content-box;
     -moz-box-sizing:content-box;
     -webkit-box-sizing:content-box;
@@ -433,6 +394,10 @@ input[type=text], input[type=password], select {
 input[type=text], input[type=password], textarea {
     padding-left: 0.2em;
     padding-right: 0.2em;
+}
+
+input[type=submit] {
+    margin-right: 0.5em;
 }
 
 ::-moz-focus-inner {
@@ -468,13 +433,6 @@ div.pager a {
     font-size: 0.9em;
     padding: 0.1em 0 0 0;
     margin-right: 0.5em;
-}
-
-div.pager div.navigation {
-    background-repeat: no-repeat;
-    height: 21px;
-    width: 20px;
-
 }
 
 select.pagesize, select#gis {
@@ -551,5 +509,67 @@ div.data-table div.display-none {
 }
 
 .toolbar {
+    margin-top: 5px;
     margin-bottom: 5px;
+}
+
+.alert-error {
+  color: #721c24;
+  background-color: #f8d7da;
+  border-color: #f5c6cb;
+}
+
+.alert-error hr {
+  border-top-color: #f1b0b7;
+}
+
+.alert-error .alert-link {
+  color: #491217;
+}
+
+.error {
+  color: #721c24;
+  font-weight: bold;
+}
+
+.tab-content {
+    padding: 1em;
+    background-color: #f8f9fa!important;
+}
+
+.nav-tabs .nav-link.active {
+    background: #f8f9fa;
+    border-bottom: 2px solid #007bff;
+    padding-bottom: 0px;
+    color: #007bff;
+    outline: none;
+    margin-bottom: 0px;
+    height: 100%;
+}
+
+.nav-tabs .nav-link {
+    border: none;
+    border-radius: initial;
+    line-height: 20px;
+    font-weight: 100;
+}
+
+.nav-tabs {
+    background-color: #e9ecef;
+    padding-top: 0.2em;
+    padding-left: 1em;
+}
+
+.accordionheader {
+    padding: initial!important;
+}
+
+.tooltipicon {
+    color: #007bff;
+}
+
+.contentbox {
+    margin: 0.5em;
+    padding: 0.5em;
+    background-color: #f8f9fa!important;
 }

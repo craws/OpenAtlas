@@ -1,10 +1,12 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ [[_('admin'), 'admin_index'], _('check similar names')]|crumb|safe }}{% endblock %}
+{% block breadcrumb %}
+    {{ [[_('admin'), 'admin_index'], _('check similar names')]|crumb }}
+{% endblock %}
 {% block content %}
     <div class="toolbar">
-        {{ 'Data_integrity'|manual_link|safe }}
+        {{ 'Data_integrity'|manual_link }}
     </div>
-    {{ form|display_form|safe }}
+    {{ form|display_form }}
     {% if table %}
         {% if table.rows %}
             {{ table.display()|safe }}

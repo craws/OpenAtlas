@@ -1,9 +1,11 @@
 {% extends "layout.html" %}
-{% block breadcrumb %}{{ [[_('admin'), 'admin_index'], _('general')]|crumb|safe }}{% endblock %}
+{% block breadcrumb %}
+    {{ [[_('admin'), 'admin_index'], _('general')]|crumb }}
+{% endblock %}
 {% block content %}
     <div class="toolbar">
-        {{ 'General'|manual_link|safe }}
-        <a class="btn btn-outline-primary btn-sm" href="{{ url_for('admin_general_update') }}">{{ _('edit')|uc_first }}</a>
+        {{ 'General'|manual_link }}
+        {{ _('edit')|button(url_for('admin_general_update')) }}
     </div>
     <div class="data-table">
         {% for name, value in general_settings.items() %}

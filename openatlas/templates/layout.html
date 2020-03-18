@@ -9,16 +9,16 @@
     {% if '127.0.0' not in request.url %}
         <link rel="manifest" href="/static/manifest.json">
     {% endif %}
-    <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css"/>
-    <link rel="stylesheet" href="/static/node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css"/>
-    <link rel="stylesheet" href="/static/node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css"/>
-    <link rel="stylesheet" href="/static/node_modules/jstree/dist/themes/default/style.min.css"/>
+    <link rel="stylesheet" href="/static/node_modules/bootstrap/dist/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/node_modules/@fortawesome/fontawesome-free/css/fontawesome.min.css">
+    <link rel="stylesheet" href="/static/node_modules/datatables.net-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="/static/node_modules/jstree/dist/themes/default/style.min.css">
 
-    <link rel="mask-icon" href="/static/safari-pinned-tab.svg"/>
-    <link rel="stylesheet" href="/static/css/reset.css?v={{ config['VERSION'] }}"/>
-    <link rel="stylesheet" href="/static/css/uitheme.css"/>
-    <link rel="stylesheet" href="/static/css/style.css?v={{ config['VERSION'] }}"/>
-    <link rel="stylesheet" href="/static/css/color.css?v={{ config['VERSION'] }}"/>
+    <link rel="mask-icon" href="/static/safari-pinned-tab.svg">
+    <link rel="stylesheet" href="/static/css/reset.css?v={{ config['VERSION'] }}">
+    <link rel="stylesheet" href="/static/css/uitheme.css">
+    <link rel="stylesheet" href="/static/css/style.css?v={{ config['VERSION'] }}">
+    <link rel="stylesheet" href="/static/css/color.css?v={{ config['VERSION'] }}">
 
     <script src="/static/node_modules/jquery/dist/jquery.min.js"></script>
     <script src="/static/node_modules/datatables.net/js/jquery.dataTables.min.js"></script>
@@ -72,21 +72,17 @@
     <div style="float: right;">
         {% if current_user.is_authenticated %}
         <div id="index-search-button" class="iconbutton">
-            <a href="#">
-            <span>
-                <i class="fas fa-search"></i>
-            </span>
-            </a>
             <div id="index-search">
                 <form method="post" action="{{ url_for('search_index') }}" style="display: inline-flex">
                     {{ search_form.csrf_token }}
                     {{ search_form.term }}
-                    {{ search_form.search(class_="btn btn-outline-primary btn-sm") }}
+                    {{ search_form.search(class_=config['CSS']['button']['primary']) }}
                 </form>
             </div>
         </div>
         <div class="iconbutton"
              data-toggle="popover"
+             data-placement="bottom"
              title="{{ _('profile')|uc_first }}"
              data-content="{{ _('hello')|uc_first }} {{ current_user.username }}"
              data-trigger="hover">
@@ -99,7 +95,7 @@
         {% endif %}
         <div class="iconbutton"
              data-toggle="popover"
-             title="{{ _('manual')|uc_first }}"
+             data-placement="bottom"
              data-content="{{ _('manual')|uc_first }}"
              data-trigger="hover">
             <a href="https://redmine.openatlas.eu/projects/uni/wiki/Manual" target="_blank" rel="noopener">
@@ -111,7 +107,7 @@
         {% if 'contact'|display_content_translation %}
         <div class="iconbutton"
              data-toggle="popover"
-             title="{{ _('contact')|uc_first }}"
+             data-placement="bottom"
              data-content="{{ _('contact')|uc_first }}"
              data-trigger="hover">
             <a href="{{ url_for('index_content', item='contact') }}" >
@@ -124,7 +120,7 @@
         {% if 'legal_notice'|display_content_translation %}
         <div class="iconbutton"
              data-toggle="popover"
-             title="{{ _('legal_notice')|uc_first }}"
+             data-placement="bottom"
              data-content="{{ _('legal_notice')|uc_first }}"
              data-trigger="hover">
             <a href="{{ url_for('index_content', item='legal_notice') }}" >
@@ -154,18 +150,13 @@
 <nav aria-label="breadcrumb">
     <div class="breadcrumb">
         {% block breadcrumb %}{% endblock %}
-        <div style="position: absolute; right: 16px">
-            {% if session['settings']['site_header'] %}
-                {{ session['settings']['site_header'] }}
-            {% else %}
-                OpenAtlas
-            {% endif %}
+        <div id="site-name-and-version">
+            {{ session['settings']['site_name'] }}
             <a href="{{ url_for('index_changelog') }}">{{ config['VERSION'] }}</a>
         </div>
     </div>
 </nav>
 <noscript><div class="error">{{ _('warning no js') }}</div></noscript>
-{% if 'local' in request['url_root'] %}local{% endif %}
 {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
         {% for category, message in messages %}
@@ -176,10 +167,10 @@
     {% endif %}
 {% endwith %}
 <main>
-    <div id="content">
-        <div style="float:left">{% block content %}{% endblock %}</div>
+    <div id="content" >
+        <div style="float:left" class="container-fluid">{% block content %}{% endblock %}</div>
         {% if session['settings']['debug_mode'] and 'admin'|is_authorized %}
-            <div class="data-table" style="float:right;margin:1em;">
+            <div class="data-table" style="float:right;margin:1em;position: absolute;right: 5px;background: rgba(230,219,0,0.4);top: 150px;padding: 5px;">
                 <p>Debug</p>
                 {{ debug_model|display_debug_info(form)|safe }}
             </div>

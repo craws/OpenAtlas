@@ -38,7 +38,8 @@ class Table:
         from openatlas.util.util import uc_first
         if not self.rows:
             return '<p>' + uc_first(_('no entries')) + '</p>'
-        columns: List[Dict[str, str]] = [{'title': item.capitalize()} for item in self.header]
+        columns: List[Dict[str, str]] = [{'title': _(item).capitalize() if item else ''} for item in
+                                         self.header]
         columns += [{'title': ''} for i in range(len(self.rows[0]) - len(self.header))]  # Add empty
         table_rows = session['settings']['default_table_rows']
         if hasattr(current_user, 'settings'):
@@ -56,12 +57,18 @@ class Table:
         html = """
             <table id="{name}_table" class="table table-striped hover" style="width:100%"></table>
             <script>
-                $(document).ready(function() {{ $('#{name}_table').DataTable({data_table}); }});
-            </script>""".format(name=name, data_table=json.dumps(data_table),)
+                $(document).ready(function() {{ 
+                    $('#{name}_table').DataTable({data_table}); 
+                    overflow('{name}'); 
+                    $('#{name}_table').on( 'page.dt', () => overflow());
+                }});                
+            </script>""".format(name=name, data_table=json.dumps(data_table), )
 
         # Toggle header and footer HTML
-        css_header = '#{name}_table_wrapper table thead {{ display:none; }}'.format(name=name)
-        css_toolbar = '#{name}_table_wrapper .fg-toolbar {{ display:none; }}'.format(name=name)
+        css_header = '#{name}_table_wrapper .row:first-of-type {{ display:none; }}'.format(
+            name=name)
+        css_toolbar = '#{name}_table_wrapper .row:last-of-type {{ display:none; }}'.format(
+            name=name)
         html += '<style type="text/css">{header} {toolbar}</style>'.format(
             header=css_header if not self.header else '',
             toolbar=css_toolbar if len(self.rows) <= table_rows else '')

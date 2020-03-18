@@ -18,6 +18,7 @@ from flask import abort, flash, g, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
+from markupsafe import Markup
 from numpy import math
 from werkzeug.utils import redirect
 
@@ -55,7 +56,8 @@ def print_file_size(entity: 'Entity') -> str:
 def display_tooltip(text: str) -> str:
     if not text:
         return ''
-    return '<span><i class="fas fa-info-circle" title="{title}"></i></span>'.format(title=text.replace('"', "'"))
+    return '<span><i class="fas fa-info-circle tooltipicon" title="{title}"></i></span>'.format(
+        title=text.replace('"', "'"))
 
 
 def print_file_extension(entity: Union[int, 'Entity']) -> str:
@@ -202,6 +204,9 @@ def add_system_data(entity: 'Entity',
             data.append((_('imported by'), link(info['import_user'])))
         if info['import_origin_id']:
             data.append(('origin ID', info['import_origin_id']))
+        data.append(('API',
+                     '<a href="{url}" target="_blank">GeoJSON</a>'.format(
+                         url=url_for('api_entity', id_=entity.id))))
     return data
 
 
@@ -303,9 +308,10 @@ def add_dates_to_form(form: Any, for_person: bool = False) -> str:
                 <label>{date}</label> {tooltip}
             </div>
             <div class="table-cell date-switcher">
-                <span id="date-switcher" class="btn btn-secondary">{show}</span>
+                <span id="date-switcher" class="{button_class}">{show}</span>
             </div>
         </div>""".format(date=uc_first(_('date')),
+                         button_class=app.config['CSS']['button']['secondary'],
                          tooltip=display_tooltip(_('tooltip date')),
                          show=uc_first(_('show')))
     html += '<div class="table-row date-switch" ' + style + '>'
@@ -354,15 +360,44 @@ def required_group(group: str):  # type: ignore
     return wrapper
 
 
+def api_access():  # type: ignore
+    def wrapper(f):  # type: ignore
+        @wraps(f)
+        def wrapped(*args, **kwargs):  # type: ignore
+            if not current_user.is_authenticated and not session['settings']['api_public']:
+                abort(403)  # pragma: nocover
+            return f(*args, **kwargs)
+
+        return wrapped
+
+    return wrapper
+
+
 def bookmark_toggle(entity_id: int, for_table: bool = False) -> str:
     label = uc_first(_('bookmark remove') if entity_id in current_user.bookmarks else _('bookmark'))
     if for_table:
-        return """<span class="btn btn-outline-primary btn-sm" id="bookmark{entity_id}"
-            onclick="ajaxBookmark('{entity_id}');" style="cursor:pointer;">{label}</a>
-            """.format(entity_id=entity_id, label=label)
-    return """<span class="btn btn-outline-primary btn-sm" id="bookmark{entity_id}"
-        onclick="ajaxBookmark('{entity_id}');" type="button">{label}</span>
-        """.format(entity_id=entity_id, label=label)
+        return """<a href='#' id="bookmark{id}" onclick="ajaxBookmark('{id}');">{label}
+            </a>""".format(id=entity_id, label=label)
+    return button(label,
+                  id_='bookmark' + str(entity_id),
+                  onclick="ajaxBookmark('" + str(entity_id) + "');")
+
+
+def button(label: str,
+           url: Optional[str] = '#',
+           css: Optional[str] = 'primary',
+           id_: Optional[str] = None,
+           onclick: Optional[str] = '') -> str:
+    label = uc_first(label)
+    if url and '/insert' in url and label != uc_first(_('add')):
+        label = '+ ' + label
+    html = '<a class="{class_}" href="{url}" {id} {onclick}>{label}</a>'.format(
+        class_=app.config['CSS']['button'][css],
+        url=url,
+        label=label,
+        id='id="' + id_ + '"' if id_ else '',
+        onclick='onclick="{onclick}"'.format(onclick=onclick) if onclick else '')
+    return Markup(html)
 
 
 def is_authorized(group: str) -> bool:
@@ -458,7 +493,7 @@ def get_base_table_data(entity: 'Entity',
     if len(entity.aliases) > 0:
         data: List[str] = ['<p>' + link(entity) + '</p>']
     else:
-        data: List[str] = [link(entity)]
+        data = [link(entity)]
     # Aliases
     for i, (id_, alias) in enumerate(entity.aliases.items()):
         if i == len(entity.aliases) - 1:

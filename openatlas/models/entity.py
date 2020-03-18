@@ -48,6 +48,7 @@ class Entity:
         self.end_comment = None
         self.note: Optional[str] = None  # User specific, private note for an entity
         self.origin_id: Optional[int] = None
+        self.location: Optional[Entity] = None  # Needed for API
         if hasattr(row, 'begin_from'):
             self.begin_from = Date.timestamp_to_datetime64(row.begin_from)
             self.begin_to = Date.timestamp_to_datetime64(row.begin_to)

@@ -1,10 +1,10 @@
 {% extends 'layout.html' %}
 {% block breadcrumb %}
-    {{ [[_('overview'), 'index'], _('search')]|crumb|safe }}
+    {{ [[_('overview'), 'index'], _('search')]|crumb }}
 {% endblock %}
 {% block content %}
     <div class="toolbar">
-        {{ 'Search'|manual_link|safe }}
+        {{ 'Search'|manual_link }}
     </div>
     <div style="float:left;">
         <form method="post">
@@ -25,7 +25,7 @@
             <h2>{{ _('classes')|uc_first }}</h2>
             <p id="select_all" class="select_all">{{ _('deselect all')|uc_first }}</p>
             {{ form.classes }}
-            {{ form.search }}
+            {{ form.search(class_=config['CSS']['button']['primary']) }}
         </form>
     </div>
     <div style="float:left;margin-left: 1em;">

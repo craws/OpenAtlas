@@ -1,8 +1,8 @@
 #map {
     z-index: 0;
     float: left;
-    height: 440px;
-    width: 600px;
+    height: calc(100vh - 140px);
+    width: 100%;
     margin-left: 1em;
 }
 

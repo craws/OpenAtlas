@@ -1,10 +1,10 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [[_('profile'), 'profile_index'], _('edit')]|crumb|safe }}
+    {{ [[_('profile'), 'profile_index'], _('edit')]|crumb }}
 {% endblock %}
 {% block content %}
     <div class="toolbar">
-        {{ 'Profile'|manual_link|safe }}
+        {{ 'Profile'|manual_link }}
     </div>
     <form method="post">
         {{ form.csrf_token }}
@@ -52,6 +52,10 @@
                     <div>{{ form.max_zoom.label|safe }} {{ form.max_zoom.description|display_tooltip|safe }}</div>
                     <div class="table-cell">{{ form.max_zoom(class_='integer') }}</div>
                 </div>
+                <div class="table-row">
+                    <div>{{ form.default_zoom.label|safe }} {{ form.default_zoom.description|display_tooltip|safe }}</div>
+                    <div class="table-cell">{{ form.default_zoom(class_='integer') }}</div>
+                </div>
             </div>
         </div>
         {% if 'contributor'|is_authorized %}
@@ -74,7 +78,7 @@
             </div>
         {% endif %}
         <div style="clear:both"></div>
-        {{ form.save}}
+        {{ form.save(class=config['CSS']['button']['primary']) }}
     </form>
 
 {% endblock %}

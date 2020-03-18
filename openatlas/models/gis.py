@@ -1,5 +1,5 @@
 import ast
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from flask import g, json
 from flask_wtf import FlaskForm
@@ -43,13 +43,9 @@ class Gis:
 
     @staticmethod
     def get_all(objects: Optional[List[Entity]] = None,
-                super_id: Optional[int] = None,
-                subunits: Optional[List[Entity]] = None,
-                siblings: Optional[List[Entity]] = None) -> Dict[str, List[Any]]:
+                structure: Optional[Dict[str, Any]] = None) -> Dict[str, List[Any]]:
         if not objects:
             objects = []
-        if not subunits:
-            subunits = []
         all_: Dict[str, List[Any]] = {'point': [], 'linestring': [], 'polygon': []}
         extra: Dict[str, List[Any]] = {'supers': [], 'subs': [], 'siblings': []}
         selected: Dict[str, List[Any]] = {'point': [],
@@ -58,11 +54,12 @@ class Gis:
                                           'polygon_point': []}
 
         # Include GIS of subunits which would be otherwise omitted
-        subunit_ids = [subunit.id for subunit in subunits]
-        sibling_ids = [sibling.id for sibling in siblings] if siblings else []
+        subunit_ids = [subunit.id for subunit in structure['subunits']] if structure else []
+        sibling_ids = [sibling.id for sibling in structure['siblings']] if structure else []
         extra_ids = [0]
-        if subunits or siblings or super_id:
-            extra_ids = [objects[0].id if objects else 0] + [super_id] + subunit_ids + sibling_ids
+        if structure:
+            extra_ids = [objects[0].id if objects else 0] + [structure['super_id']] + subunit_ids \
+                        + sibling_ids
         object_ids = [x.id for x in objects] if objects else []
         polygon_point_sql = \
             'public.ST_AsGeoJSON(public.ST_PointOnSurface(polygon.geom)) AS polygon_point, '
@@ -109,10 +106,10 @@ class Gis:
                         if node.root and node.root[-1] == place_root.id:
                             item['properties']['objectType'] = node.name.replace('"', '\"')
                             break
-                if row.object_id in object_ids:
-                    selected[shape].append(item)
-                elif row.object_id == super_id:
+                if structure and row.object_id == structure['super_id']:
                     extra['supers'].append(item)
+                elif row.object_id in object_ids:
+                    selected[shape].append(item)
                 elif row.object_id in subunit_ids:  # pragma no cover
                     extra['subs'].append(item)
                 elif row.object_id in sibling_ids:  # pragma no cover
@@ -124,7 +121,7 @@ class Gis:
                     polygon_point_item['geometry'] = json.loads(row.polygon_point)
                     if row.object_id in object_ids:
                         selected['polygon_point'].append(polygon_point_item)
-                    elif row.object_id == super_id:
+                    elif row.object_id and structure and row.object_id == structure['super_id']:
                         extra['supers'].append(polygon_point_item)
                     elif row.object_id in subunit_ids:  # pragma no cover
                         extra['subs'].append(polygon_point_item)

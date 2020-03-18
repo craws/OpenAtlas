@@ -10,7 +10,6 @@ div.tabs-container .ui-state-active a,
 li.ui-state-active a,
 li.ui-state-active a:link,
 li.ui-state-active a:visited,
-#breadcrumb a:hover,
 div.tabs-container .ui-state-active a {
     color: #000000;
 }
@@ -26,13 +25,8 @@ div.tabs-container .ui-state-active a {
 
 a,
 .info,
-span.tooltip,
-.jstree-default .jstree-search,
-#menu div a:hover,
-#menu div.active a,
-#menu div.active a:hover,
-.ui-widget-content a {
-    color: #0047bb;
+.jstree-default .jstree-search {
+    color: #007bff;
 }
 
 /* Background color */
@@ -43,7 +37,6 @@ span.tooltip,
 }
 
 .overlay,
-.inverse-heading,
 .ui-widget-header,
 .ui-widget-header .ui-state-default {
     background-color: #000000;
@@ -54,7 +47,6 @@ span.tooltip,
 .date-switch label.error,
 .info,
 select,
-span.tooltip,
 input[type="text"],
 .ui-widget-content .ui-state-active,
 .ui-widget-header .ui-state-active,
@@ -74,22 +66,11 @@ div.tabs-container .ui-widget-content {
     border-color: #000000;
 }
 
-#menu > div.active, #disk_size {
-    border-color: #0047bb;
-}
-
 textarea,
 input[type=text],
 input[type=password],
 select {
     border-color: #adadad;
-}
-
-div.pagedisplay {
-    border-top-color: #969392;
-    border-left-color: #969392;
-    border-bottom-color: #ffffff;
-    border-right-color: #ffffff;
 }
 
 /* tables */
@@ -99,16 +80,12 @@ div.pagedisplay {
 }
 
 .table thead th {
-    border-bottom: 2px solid #0047bb;
+    border-bottom: 2px solid #007bff;
     background-color: #e9ecef;
 }
 
 div.tabs-container table a:hover,
 table a:hover {
-    color: #0047bb;
+    color: #007bff;
     text-decoration: none;
-}
-
-.table td, .table th {
-    border-top: none;
 }

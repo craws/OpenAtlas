@@ -1,12 +1,12 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'], _('export CSV')]|crumb|safe }}
+    {{ [[_('admin'), 'admin_index'], _('export CSV')]|crumb }}
 {% endblock %}
 {% block content %}
     {% if writeable %}
         <div style="float:left;margin-right: 1em;">
-            {{ 'Export'|manual_link|safe }}
-            {{ form|display_form|safe }}
+            {{ 'Export'|manual_link }}
+            {{ form|display_form }}
         </div>
     {% else %}
         <p><span class="error">{{ _('directory not writable')|uc_first }}: export/csv</span></p>

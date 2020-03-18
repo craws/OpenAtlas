@@ -1,11 +1,11 @@
 {% extends 'layout.html' %}
 {% block breadcrumb %}
     {% if origin %}
-        {{ [[_(origin.view_name), origin.view_name + '_index'], origin, '+ ' + _('source').capitalize()]|crumb|safe }}
+        {{ [[_(origin.view_name), origin.view_name + '_index'], origin, '+ ' + _('source').capitalize()]|crumb }}
     {% else %}
-        {{ [[_('source'), 'source_index'], '+ ' + _('source').capitalize()]|crumb|safe }}
+        {{ [[_('source'), 'source_index'], '+ ' + _('source').capitalize()]|crumb }}
     {% endif %}
 {% endblock %}
 {% block content %}
-    {{ form|display_form|safe }}
+    {{ form|display_form }}
 {% endblock %}

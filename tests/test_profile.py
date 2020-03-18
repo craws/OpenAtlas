@@ -18,6 +18,7 @@ class ProfileTests(TestBaseCase):
             data = {'name': 'Alice Abernathy',
                     'email': 'alice@umbrella.net',
                     'max_zoom': 20,
+                    'default_zoom': 14,
                     'module_geonames': '',
                     'module_notes': '',
                     'show_email': '',

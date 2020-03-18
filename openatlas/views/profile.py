@@ -53,7 +53,8 @@ class ProfileForm(FlaskForm):  # type: ignore
     table_show_aliases = SelectField(choices=[('off', _('off')), ('on', _('on'))])
     layout_choices = [('default', _('default')), ('advanced', _('advanced'))]
     layout = SelectField(_('layout'), description=_('tooltip layout'), choices=layout_choices)
-    max_zoom = IntegerField(description=_('tooltip max zoom'))
+    max_zoom = IntegerField()
+    default_zoom = IntegerField()
     module_geonames = BooleanField(description=_('tooltip geonames'))
     module_map_overlay = BooleanField(description=_('tooltip map overlay'))
     module_notes = BooleanField(description=_('tooltip notes'))
@@ -75,7 +76,8 @@ def profile_index() -> str:
                         (_('table rows'), user.settings['table_rows']),
                         (_('show aliases in tables'), user.settings['table_show_aliases']),
                         (_('layout'), user.settings['layout']),
-                        (_('max map zoom'), user.settings['max_zoom'])],
+                        (_('max map zoom'), user.settings['max_zoom']),
+                        (_('default map zoom'), user.settings['default_zoom'])],
             'modules': [(_('GeoNames'), user.settings['module_geonames']),
                         (_('map overlay'), user.settings['module_map_overlay']),
                         (_('notes'), user.settings['module_notes'])]}
@@ -98,6 +100,7 @@ def profile_update() -> Union[str, Response]:
         user.settings['module_map_overlay'] = form.module_map_overlay.data
         user.settings['module_notes'] = form.module_notes.data
         user.settings['max_zoom'] = form.max_zoom.data
+        user.settings['default_zoom'] = form.default_zoom.data
         user.settings[
             'table_show_aliases'] = 'True' if form.table_show_aliases.data == 'on' else 'False'
         user.settings['layout'] = form.layout.data
@@ -132,6 +135,8 @@ def profile_update() -> Union[str, Response]:
     form.layout.label.text = uc_first(_('layout'))
     form.max_zoom.data = user.settings['max_zoom']
     form.max_zoom.label.text = uc_first(_('max map zoom'))
+    form.default_zoom.data = user.settings['default_zoom']
+    form.default_zoom.label.text = uc_first(_('default map zoom'))
     form.module_geonames.data = user.settings['module_geonames']
     form.module_geonames.label.text = 'GeoNames'
     form.module_map_overlay.data = user.settings['module_map_overlay']

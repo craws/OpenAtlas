@@ -3,17 +3,17 @@
     {{ [[_('admin'), 'admin_index'],
         [_('content'), 'content_index'],
         [_(item), 'content_view', {'item': item}],
-        _('edit')]|crumb|safe }}
+        _('edit')]|crumb }}
 {% endblock %}
 {% block content %}
     <form method="post">
         {{ form.csrf_token }}
         {% for language in languages %}
-            <p class="inverse-heading">{{ language|upper }}</p>
+            <p>{{ language|upper }}</p>
             {{ form[language](class='tinymce') }}<br>
         {% endfor %}
         <p>
-            <button type="submit">{{ _('save')|uc_first }}</button>
+            <button type="submit" class="{{ config['CSS']['button']['primary'] }}">{{ _('save')|uc_first }}</button>
         </p>
     </form>
 {% endblock %}

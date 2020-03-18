@@ -1,16 +1,16 @@
 {% extends 'layout.html' %}
 {% block title_name %}- {{ event.name }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('event'), 'event_index'], event, _('edit')]|crumb|safe }}
+    {{ [[_('event'), 'event_index'], event, _('edit')]|crumb }}
 {% endblock %}
 {% block content %}
     {% if modifier %}
         <p class="error">
             {{ _('error modified by %(username)s', username=modifier|safe) }}
         </p>
-        <p>
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('event_update', id_=event.id) }}">{{ _('reload')|uc_first }}</a>
-        </p>
+        <div class="toolbar">
+            {{ _('reload')|button(url_for('event_update', id_=event.id)) }}
+        </div>
     {% endif %}
-    {{ form|display_form|safe }}
+    {{ form|display_form }}
 {% endblock %}

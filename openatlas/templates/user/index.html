@@ -1,12 +1,12 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'], _('user')]|crumb|safe }}
+    {{ [[_('admin'), 'admin_index'], _('user')]|crumb }}
 {% endblock %}
 {% block content %}
     {% if 'manager'|is_authorized %}
         <div class="toolbar">
-            {{ 'User'|manual_link|safe }}
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('user_insert') }}">+ {{ _('user')|uc_first }}</a>
+            {{ 'User'|manual_link }}
+            {{ _('user')|button(url_for('user_insert')) }}
         </div>
     {% endif %}
     {{ table.display()|safe }}

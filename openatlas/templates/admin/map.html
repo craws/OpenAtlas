@@ -1,10 +1,10 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'], _('map')]|crumb|safe }}
+    {{ [[_('admin'), 'admin_index'], _('map')]|crumb }}
 {% endblock %}
 {% block content %}
     <div class="toolbar">
-        {{ 'Map'|manual_link|safe }}
+        {{ 'Map'|manual_link }}
     </div>
-    {{ form|display_form|safe }}
+    {{ form|display_form }}
 {% endblock %}

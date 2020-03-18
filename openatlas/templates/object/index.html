@@ -1,12 +1,12 @@
 {% extends "layout.html" %}
 {% block breadcrumb %}
-    {{ [_('object')]|crumb|safe }}
+    {{ [_('object')]|crumb }}
 {% endblock %}
 {% block content %}
     {% if 'contributor'|is_authorized %}
         <div class="toolbar">
-            {{ 'Object'|manual_link|safe }}
-            <a class="btn btn-outline-primary btn-sm" href="{{ url_for('object_insert') }}">+ {{ 'E84'|get_class_name }}</a>
+            {{ 'Object'|manual_link }}
+            {{ 'E84'|get_class_name|button(url_for('object_insert')) }}
         </div>
     {% endif %}
     {{ table.display()|safe }}

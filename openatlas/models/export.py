@@ -55,14 +55,16 @@ class Export:
                                 ST_Y(public.ST_PointOnSurface(geom)) AS polygon_center_point""")
                     else:
                         fields.append('geom')
-                sql = "SELECT {fields} FROM {table};".format(
-                    fields=','.join(fields), table=table.replace('_', '.', 1))
+                sql = "SELECT {fields} FROM {table};".format(fields=','.join(fields),
+                                                             table=table.replace('_', '.', 1))
                 data_frame = psql.read_sql(sql, g.db)
                 data_frame.to_csv(path.joinpath(date_string + '_' + table + '.csv'), index=False)
         if form.zip.data:
             info = 'CSV export from: {host}\n'.format(host=request.headers['Host'])
             info += 'Created: {date} by {user}\nOpenAtlas version: {version}'.format(
-                date=date_string, user=current_user.username, version=app.config['VERSION'])
+                date=date_string,
+                user=current_user.username,
+                version=app.config['VERSION'])
             with open(path.joinpath('info.txt'), "w") as file:
                 print(info, file=file)
             zip_file = app.config['EXPORT_FOLDER_PATH'].joinpath('csv', date_string + '_csv')
@@ -82,7 +84,8 @@ class Export:
             user=app.config['DATABASE_USER'],
             file=path)
         try:
-            subprocess.Popen(command, shell=True,
+            subprocess.Popen(command,
+                             shell=True,
                              stdin=subprocess.PIPE,
                              env={'PGPASSWORD': app.config['DATABASE_PASS']}).wait()
         except Exception:  # pragma: no cover

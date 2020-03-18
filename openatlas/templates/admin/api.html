@@ -1,0 +1,10 @@
+{% extends "layout.html" %}
+{% block breadcrumb %}
+    {{ [[_('admin'), 'admin_index'], 'API']|crumb }}
+{% endblock %}
+{% block content %}
+    <div class="toolbar">
+        {{ 'API'|manual_link }}
+    </div>
+    {{ form|display_form }}
+{% endblock %}
