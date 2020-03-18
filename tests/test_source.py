@@ -76,13 +76,6 @@ class SourceTest(TestBaseCase):
             assert b'some description' in rv.data
 
             # Add to source
-            rv = self.app.get(url_for('source_add_file', id_=source.id))
-            assert b'Add File' in rv.data
-
-            rv = self.app.post(url_for('source_add_file', id_=source.id),
-                               data={'checkbox_values': str([file.id])}, follow_redirects=True)
-            assert b'X-Files' in rv.data
-
             rv = self.app.get(url_for('source_add_reference', id_=source.id))
             assert b'Add Reference' in rv.data
             rv = self.app.post(url_for('source_add_reference', id_=source.id),

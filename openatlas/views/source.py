@@ -80,18 +80,6 @@ def source_add_reference(id_: int) -> Union[str, Response]:
     return render_template('add_reference.html', entity=source, form=form)
 
 
-@app.route('/source/add/file/<int:id_>', methods=['GET', 'POST'])
-@required_group('contributor')
-def source_add_file(id_: int) -> Union[str, Response]:
-    source = Entity.get_by_id(id_, view_name='source')
-    if request.method == 'POST':
-        if request.form['checkbox_values']:
-            source.link_string('P67', request.form['checkbox_values'], inverse=True)
-        return redirect(url_for('entity_view', id_=id_) + '#tab-file')
-    form = build_table_form('file', source.get_linked_entities('P67', inverse=True))
-    return render_template('add_file.html', entity=source, form=form)
-
-
 @app.route('/source/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('contributor')
 def source_update(id_: int) -> Union[str, Response]:
