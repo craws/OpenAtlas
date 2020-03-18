@@ -162,10 +162,10 @@ class PlaceTest(TestBaseCase):
                          follow_redirects=True)
 
             # Add to place
-            rv = self.app.get(url_for('place_add_file', id_=place.id))
+            rv = self.app.get(url_for('entity_add_file', id_=place.id))
             assert b'Add File' in rv.data
 
-            rv = self.app.post(url_for('place_add_file', id_=place.id),
+            rv = self.app.post(url_for('entity_add_file', id_=place.id),
                                data={'checkbox_values': str([file.id])},
                                follow_redirects=True)
             assert b'X-Files' in rv.data
