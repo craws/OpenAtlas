@@ -45,18 +45,6 @@ def node_index() -> str:
     return render_template('types/index.html', nodes=nodes, placeholder=_('type to search'))
 
 
-@app.route('/node/add/file/<int:id_>', methods=['GET', 'POST'])
-@required_group('contributor')
-def node_add_file(id_: int) -> Union[str, Response]:
-    node = g.nodes[id_]
-    if request.method == 'POST':
-        if request.form['checkbox_values']:
-            node.link_string('P67', request.form['checkbox_values'], inverse=True)
-        return redirect(url_for('entity_view', id_=id_) + '#tab-file')
-    form = build_table_form('file', node.get_linked_entities('P67', inverse=True))
-    return render_template('add_file.html', entity=node, form=form)
-
-
 @app.route('/types/insert/<int:root_id>', methods=['GET', 'POST'])
 @app.route('/types/insert/<int:root_id>/<int:super_id>', methods=['GET', 'POST'])
 @required_group('editor')
