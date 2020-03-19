@@ -102,10 +102,10 @@ class Api:
         geonames_link = Geonames.get_geonames_link(entity)
         type_ = 'FeatureCollection'
         nodes = []
+        class_code = ''.join(entity.class_.code + " " + entity.class_.i18n['en']).replace(" ", "_")
         features = {'@id': url_for('entity_view', id_=entity.id, _external=True),
                     'type': 'Feature',
-                    'crmClass': "crm:".join(entity.class_.code + " "
-                                            + entity.class_.i18n['en']).replace(" ", "_"),
+                    'crmClass': "crm:" + class_code,
                     'properties': {'title': entity.name}}
 
         # Types
