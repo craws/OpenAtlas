@@ -11,7 +11,7 @@ from wtforms.validators import InputRequired, Optional as OptValidator
 
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
-from openatlas.forms.forms import build_form, build_table_form
+from openatlas.forms.forms import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
 from openatlas.models.gis import Gis, InvalidGeomException
@@ -118,18 +118,6 @@ def place_insert(origin_id: Optional[int] = None,
                            gis_data=gis_data,
                            geonames_buttons=geonames_buttons,
                            overlays=overlays)
-
-
-@app.route('/place/add/source/<int:id_>', methods=['POST', 'GET'])
-@required_group('contributor')
-def place_add_source(id_: int) -> Union[str, Response]:
-    object_ = Entity.get_by_id(id_, view_name='place')
-    if request.method == 'POST':
-        if request.form['checkbox_values']:
-            object_.link_string('P67', request.form['checkbox_values'], inverse=True)
-        return redirect(url_for('entity_view', id_=id_) + '#tab-source')
-    form = build_table_form('source', object_.get_linked_entities('P67', inverse=True))
-    return render_template('add_source.html', entity=object_, form=form)
 
 
 @app.route('/place/add/reference/<int:id_>', methods=['POST', 'GET'])

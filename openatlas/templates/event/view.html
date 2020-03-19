@@ -45,7 +45,7 @@
             <div class="tab-pane fade" role="tabpanel" id="tab-source">
                 {% if 'contributor'|is_authorized %}
                     <div class="toolbar">
-                        {{ _('add')|button(url_for('event_add_source', id_=event.id)) }}
+                        {{ _('add')|button(url_for('entity_add_source', id_=event.id)) }}
                         {{ _('source')|button(url_for('source_insert', origin_id=event.id)) }}
                     </div>
                 {% endif %}

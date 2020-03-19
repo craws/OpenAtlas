@@ -42,7 +42,7 @@
             <div class="tab-pane fade" role="tabpanel" id="tab-source">
                 {% if 'contributor'|is_authorized %}
                     <div class="toolbar">
-                        {{ _('add')|button(url_for('actor_add_source', id_=actor.id)) }}
+                        {{ _('add')|button(url_for('entity_add_source', id_=actor.id)) }}
                         {{ _('source')|button(url_for('source_insert', origin_id=actor.id)) }}
                     </div>
                 {% endif %}
@@ -116,4 +116,5 @@
             <script src="/static/js/map/map.js"></script>
         {% endif %}
     </div>
+</div>
 {% endblock %}

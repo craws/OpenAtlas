@@ -9,7 +9,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
-from openatlas.forms.forms import TableField, build_form, build_table_form
+from openatlas.forms.forms import TableField, build_form
 from openatlas.models.entity import Entity
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, link, required_group, uc_first, was_modified
@@ -91,18 +91,6 @@ def actor_update(id_: int) -> Union[str, Response]:
         form.begins_in.label.text = _('born in')
         form.ends_in.label.text = _('died in')
     return render_template('actor/update.html', form=form, actor=actor)
-
-
-@app.route('/actor/add/source/<int:id_>', methods=['POST', 'GET'])
-@required_group('contributor')
-def actor_add_source(id_: int) -> Union[str, Response]:
-    actor = Entity.get_by_id(id_, view_name='actor')
-    if request.method == 'POST':
-        if request.form['checkbox_values']:
-            actor.link_string('P67', request.form['checkbox_values'], inverse=True)
-        return redirect(url_for('entity_view', id_=id_) + '#tab-source')
-    form = build_table_form('source', actor.get_linked_entities('P67', inverse=True))
-    return render_template('add_source.html', entity=actor, form=form)
 
 
 @app.route('/actor/add/reference/<int:id_>', methods=['POST', 'GET'])

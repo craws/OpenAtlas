@@ -32,9 +32,9 @@ class ObjectTest(TestBaseCase):
             assert b'Changes have been saved' in rv.data
 
             # Add to object
-            rv = self.app.get(url_for('object_add_source', id_=object_.id))
+            rv = self.app.get(url_for('entity_add_source', id_=object_.id))
             assert b'Add Source' in rv.data
-            rv = self.app.post(url_for('object_add_source', id_=object_.id),
+            rv = self.app.post(url_for('entity_add_source', id_=object_.id),
                                data={'checkbox_values': str([source.id])}, follow_redirects=True)
             assert b'Necronomicon' in rv.data
 

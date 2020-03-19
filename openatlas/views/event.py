@@ -11,7 +11,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
-from openatlas.forms.forms import TableField, TableMultiField, build_form, build_table_form
+from openatlas.forms.forms import TableField, TableMultiField, build_form
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.util.table import Table
@@ -134,18 +134,6 @@ def event_update(id_: int) -> Union[str, Response]:
     if event.class_.code == 'E8':  # Form data for acquisition
         form.given_place.data = [entity.id for entity in event.get_linked_entities('P24')]
     return render_template('event/update.html', form=form, event=event)
-
-
-@app.route('/event/add/source/<int:id_>', methods=['POST', 'GET'])
-@required_group('contributor')
-def event_add_source(id_: int) -> Union[str, Response]:
-    event = Entity.get_by_id(id_, view_name='event')
-    if request.method == 'POST':
-        if request.form['checkbox_values']:
-            event.link_string('P67', request.form['checkbox_values'], inverse=True)
-        return redirect(url_for('entity_view', id_=id_) + '#tab-source')
-    form = build_table_form('source', event.get_linked_entities('P67', inverse=True))
-    return render_template('add_source.html', entity=event, form=form)
 
 
 @app.route('/event/add/reference/<int:id_>', methods=['POST', 'GET'])

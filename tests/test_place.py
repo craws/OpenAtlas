@@ -170,13 +170,6 @@ class PlaceTest(TestBaseCase):
                                follow_redirects=True)
             assert b'X-Files' in rv.data
 
-            rv = self.app.get(url_for('place_add_source', id_=place.id))
-            assert b'Add Source' in rv.data
-            rv = self.app.post(url_for('place_add_source', id_=place.id),
-                               data={'checkbox_values': str([source.id])},
-                               follow_redirects=True)
-            assert b'Necronomicon' in rv.data
-
             rv = self.app.get(url_for('reference_add', id_=reference.id, class_name='place'))
             assert b'Val-hall' in rv.data
             rv = self.app.get(url_for('place_add_reference', id_=place.id))

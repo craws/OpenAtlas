@@ -78,9 +78,9 @@ class ActorTests(TestBaseCase):
             assert b'Sigourney Weaver' in rv.data
 
             # Add to actor
-            rv = self.app.get(url_for('actor_add_source', id_=actor_id))
+            rv = self.app.get(url_for('entity_add_source', id_=actor_id))
             assert b'Add Source' in rv.data
-            rv = self.app.post(url_for('actor_add_source', id_=actor_id),
+            rv = self.app.post(url_for('entity_add_source', id_=actor_id),
                                data={'checkbox_values': str([source.id])}, follow_redirects=True)
             assert b'Necronomicon' in rv.data
 

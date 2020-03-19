@@ -39,6 +39,20 @@ def entity_add_file(id_: int) -> Union[str, Response]:
     return render_template('entity/add_file.html', entity=entity, form=form)
 
 
+@app.route('/entity/add/source/<int:id_>', methods=['POST', 'GET'])
+@required_group('contributor')
+def entity_add_source(id_: int) -> Union[str, Response]:
+    entity = Entity.get_by_id(id_)
+    property_code = 'P128' if entity.class_.code == 'E84' else 'P67'
+    inverse = False if entity.class_.code == 'E84' else True
+    if request.method == 'POST':
+        if request.form['checkbox_values']:
+            entity.link_string(property_code, request.form['checkbox_values'], inverse=inverse)
+        return redirect(url_for('entity_view', id_=id_) + '#tab-source')
+    form = build_table_form('source', entity.get_linked_entities(property_code, inverse=inverse))
+    return render_template('entity/add_source.html', entity=entity, form=form)
+
+
 @app.route('/entity/<int:id_>')
 @required_group('readonly')
 def entity_view(id_: int) -> Union[str, Response]:
