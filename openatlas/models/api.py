@@ -146,7 +146,6 @@ class Api:
             for key, value in entity.aliases.items():
                 features['names'].append({"alias": value})
 
-        # Todo: This functions won't work on references! Need to change
         # Depictions
         if Api.get_file(entity):  # pragma: nocover
             features['depictions'] = Api.get_file(entity)
