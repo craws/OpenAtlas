@@ -186,8 +186,7 @@ class Api:
             shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
             for geonames_link in Gis.get_by_id(entity.location.id):  # pragma: nocover
                 geo_dict = {'type': shape[geonames_link['shape']],
-                            'coordinates': geonames_link['geometry']['coordinates'],
-                            'classification': geonames_link['type']}
+                            'coordinates': geonames_link['geometry']['coordinates']}
                 if geonames_link['description']:
                     geo_dict['description'] = geonames_link['description']
                 if geonames_link['name']:
