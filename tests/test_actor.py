@@ -24,7 +24,6 @@ class ActorTests(TestBaseCase):
                 sex_node_sub_2 = g.nodes[sex_node.subs[1]]
                 event = Entity.insert('E8', 'Event Horizon')
                 source = Entity.insert('E33', 'Necronomicon')
-                file = Entity.insert('E31', 'X-Files', 'file')
 
             # Actor insert
             rv = self.app.get(url_for('actor_insert', code='E21'))
@@ -79,12 +78,6 @@ class ActorTests(TestBaseCase):
             assert b'Sigourney Weaver' in rv.data
 
             # Add to actor
-            rv = self.app.get(url_for('actor_add_file', id_=actor_id))
-            assert b'Add File' in rv.data
-            rv = self.app.post(url_for('actor_add_file', id_=actor_id),
-                               data={'checkbox_values': str([file.id])}, follow_redirects=True)
-            assert b'X-Files' in rv.data
-
             rv = self.app.get(url_for('actor_add_source', id_=actor_id))
             assert b'Add Source' in rv.data
             rv = self.app.post(url_for('actor_add_source', id_=actor_id),

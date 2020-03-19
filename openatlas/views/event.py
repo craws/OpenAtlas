@@ -160,18 +160,6 @@ def event_add_reference(id_: int) -> Union[str, Response]:
     return render_template('add_reference.html', entity=event, form=form)
 
 
-@app.route('/event/add/file/<int:id_>', methods=['GET', 'POST'])
-@required_group('contributor')
-def event_add_file(id_: int) -> Union[str, Response]:
-    event = Entity.get_by_id(id_, view_name='event')
-    if request.method == 'POST':
-        if request.form['checkbox_values']:
-            event.link_string('P67', request.form['checkbox_values'], inverse=True)
-        return redirect(url_for('entity_view', id_=id_) + '#tab-file')
-    form = build_table_form('file', event.get_linked_entities('P67', inverse=True))
-    return render_template('add_file.html', entity=event, form=form)
-
-
 def save(form: FlaskForm,
          event: Optional[Entity] = None,
          code: Optional[str] = None,

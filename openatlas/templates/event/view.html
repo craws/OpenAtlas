@@ -76,7 +76,7 @@
             <div class="tab-pane fade" role="tabpanel" id="tab-file">
                 {% if 'contributor'|is_authorized %}
                 <div class="toolbar">
-                    {{ _('add')|button(url_for('event_add_file', id_=event.id)) }}
+                    {{ _('add')|button(url_for('entity_add_file', id_=event.id)) }}
                     {{ _('file')|button(url_for('file_insert', origin_id=event.id)) }}
                 </div>
                 {% endif %}

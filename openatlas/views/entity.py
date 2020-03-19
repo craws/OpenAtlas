@@ -2,7 +2,7 @@ import os
 import sys
 from typing import Any, List, Optional, Tuple, Union
 
-from flask import flash, g, render_template, url_for
+from flask import flash, g, render_template, request, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 from werkzeug.exceptions import abort
@@ -10,6 +10,7 @@ from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app
+from openatlas.forms.forms import build_table_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -24,6 +25,18 @@ from openatlas.util.util import (add_system_data, add_type_data, display_remove_
                                  get_profile_image_table_link, is_authorized, link, required_group,
                                  uc_first)
 from openatlas.views.file import preview_file
+
+
+@app.route('/entity/add/file/<int:id_>', methods=['GET', 'POST'])
+@required_group('contributor')
+def entity_add_file(id_: int) -> Union[str, Response]:
+    entity = Entity.get_by_id(id_)
+    if request.method == 'POST':
+        if request.form['checkbox_values']:
+            entity.link_string('P67', request.form['checkbox_values'], inverse=True)
+        return redirect(url_for('entity_view', id_=id_) + '#tab-file')
+    form = build_table_form('file', entity.get_linked_entities('P67', inverse=True))
+    return render_template('entity/add_file.html', entity=entity, form=form)
 
 
 @app.route('/entity/<int:id_>')

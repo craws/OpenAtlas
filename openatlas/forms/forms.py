@@ -412,14 +412,14 @@ def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
         entities = Entity.get_by_codes(class_name)
 
     linked_ids = [entity.id for entity in linked_entities]
-    table = Table(Table.HEADERS[class_name] + [''])
+    table = Table([''] + Table.HEADERS[class_name])
     file_stats = get_file_stats() if class_name == 'file' else None
     for entity in entities:
         if entity.id in linked_ids:
             continue  # Don't show already linked entries
         input_ = '<input id="selection-{id}" name="values" type="checkbox" value="{id}">'.format(
             id=entity.id)
-        table.rows.append(get_base_table_data(entity, file_stats) + [input_])
+        table.rows.append([input_] + get_base_table_data(entity, file_stats))
     if not table.rows:
         return uc_first(_('no entries'))
     return """
