@@ -76,9 +76,9 @@ class SourceTest(TestBaseCase):
             assert b'some description' in rv.data
 
             # Add to source
-            rv = self.app.get(url_for('source_add_reference', id_=source.id))
+            rv = self.app.get(url_for('entity_add_reference', id_=source.id))
             assert b'Add Reference' in rv.data
-            rv = self.app.post(url_for('source_add_reference', id_=source.id),
+            rv = self.app.post(url_for('entity_add_reference', id_=source.id),
                                data={'reference': reference.id, 'page': '777'},
                                follow_redirects=True)
             assert b'777' in rv.data

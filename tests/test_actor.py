@@ -84,9 +84,9 @@ class ActorTests(TestBaseCase):
                                data={'checkbox_values': str([source.id])}, follow_redirects=True)
             assert b'Necronomicon' in rv.data
 
-            rv = self.app.get(url_for('actor_add_reference', id_=actor_id))
+            rv = self.app.get(url_for('entity_add_reference', id_=actor_id))
             assert b'Add Reference' in rv.data
-            rv = self.app.post(url_for('actor_add_reference', id_=actor_id),
+            rv = self.app.post(url_for('entity_add_reference', id_=actor_id),
                                data={'reference': reference_id, 'page': '777'},
                                follow_redirects=True)
             assert b'777' in rv.data

@@ -25,6 +25,7 @@ from openatlas.util.util import (add_system_data, add_type_data, display_remove_
                                  get_profile_image_table_link, is_authorized, link, required_group,
                                  uc_first)
 from openatlas.views.file import preview_file
+from openatlas.views.reference import AddReferenceForm
 
 
 @app.route('/entity/add/file/<int:id_>', methods=['GET', 'POST'])
@@ -51,6 +52,18 @@ def entity_add_source(id_: int) -> Union[str, Response]:
         return redirect(url_for('entity_view', id_=id_) + '#tab-source')
     form = build_table_form('source', entity.get_linked_entities(property_code, inverse=inverse))
     return render_template('entity/add_source.html', entity=entity, form=form)
+
+
+@app.route('/entity/add/reference/<int:id_>', methods=['POST', 'GET'])
+@required_group('contributor')
+def entity_add_reference(id_: int) -> Union[str, Response]:
+    entity = Entity.get_by_id(id_)
+    form = AddReferenceForm()
+    if form.validate_on_submit():
+        entity.link_string('P67', form.reference.data, description=form.page.data, inverse=True)
+        return redirect(url_for('entity_view', id_=id_) + '#tab-reference')
+    form.page.label.text = uc_first(_('page / link text'))
+    return render_template('entity/add_reference.html', entity=entity, form=form)
 
 
 @app.route('/entity/<int:id_>')

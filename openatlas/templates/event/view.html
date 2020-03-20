@@ -65,7 +65,7 @@
             <div class="tab-pane fade" role="tabpanel" id="tab-reference">
                 {% if 'contributor'|is_authorized %}
                 <div class="toolbar">
-                    {{ _('add')|button(url_for('event_add_reference', id_=event.id)) }}
+                    {{ _('add')|button(url_for('entity_add_reference', id_=event.id)) }}
                     {{ _('bibliography')|button(url_for('reference_insert', code='bibliography', origin_id=event.id)) }}
                     {{ _('edition')|button(url_for('reference_insert', code='edition', origin_id=event.id)) }}
                     {{ _('external reference')|button(url_for('reference_insert', code='external_reference', origin_id=event.id)) }}

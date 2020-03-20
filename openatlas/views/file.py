@@ -16,9 +16,8 @@ from openatlas import app, logger
 from openatlas.forms.forms import build_form, build_table_form
 from openatlas.models.entity import Entity
 from openatlas.util.table import Table
-from openatlas.util.util import (convert_size, format_date, get_file_path, get_file_stats,
-                                 link, required_group, uc_first, was_modified)
-from openatlas.views.reference import AddReferenceForm
+from openatlas.util.util import (convert_size, format_date, get_file_path, get_file_stats, link,
+                                 required_group, was_modified)
 
 
 class FileForm(FlaskForm):  # type: ignore
@@ -128,18 +127,6 @@ def file_add(id_: int, class_name: str) -> Union[str, Response]:
         return redirect(url_for('entity_view', id_=file.id) + '#tab-' + class_name)
     form = build_table_form(class_name, file.get_linked_entities('P67'))
     return render_template('file/add.html', entity=file, class_name=class_name, form=form)
-
-
-@app.route('/file/add/reference/<int:id_>', methods=['POST', 'GET'])
-@required_group('contributor')
-def file_add_reference(id_: int) -> Union[str, Response]:
-    file = Entity.get_by_id(id_)
-    form = AddReferenceForm()
-    if form.validate_on_submit():
-        file.link_string('P67', form.reference.data, description=form.page.data, inverse=True)
-        return redirect(url_for('entity_view', id_=id_) + '#tab-reference')
-    form.page.label.text = uc_first(_('page / link text'))
-    return render_template('add_reference.html', entity=file, form=form)
 
 
 @app.route('/file/update/<int:id_>', methods=['GET', 'POST'])

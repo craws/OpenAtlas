@@ -79,7 +79,7 @@
     <div id="tab-reference">
         {% if 'contributor'|is_authorized %}
             <div class="toolbar">
-                {{ _('add')|button(url_for('file_add_reference', id_=entity.id)) }}
+                {{ _('add')|button(url_for('entity_add_reference', id_=entity.id)) }}
                 {{ _('bibliography')|button(url_for('reference_insert', code='bibliography', origin_id=entity.id)) }}
                 {{ _('edition')|button(url_for('reference_insert', code='edition', origin_id=entity.id)) }}
             </div>

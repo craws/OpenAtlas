@@ -12,8 +12,7 @@ from openatlas.forms.date import DateForm
 from openatlas.forms.forms import TableField, build_form
 from openatlas.models.entity import Entity
 from openatlas.util.table import Table
-from openatlas.util.util import get_base_table_data, link, required_group, uc_first, was_modified
-from openatlas.views.reference import AddReferenceForm
+from openatlas.util.util import get_base_table_data, link, required_group, was_modified
 
 
 class ActorForm(DateForm):
@@ -91,18 +90,6 @@ def actor_update(id_: int) -> Union[str, Response]:
         form.begins_in.label.text = _('born in')
         form.ends_in.label.text = _('died in')
     return render_template('actor/update.html', form=form, actor=actor)
-
-
-@app.route('/actor/add/reference/<int:id_>', methods=['POST', 'GET'])
-@required_group('contributor')
-def actor_add_reference(id_: int) -> Union[str, Response]:
-    actor = Entity.get_by_id(id_, view_name='actor')
-    form = AddReferenceForm()
-    if form.validate_on_submit():
-        actor.link_string('P67', form.reference.data, description=form.page.data, inverse=True)
-        return redirect(url_for('entity_view', id_=id_) + '#tab-reference')
-    form.page.label.text = uc_first(_('page / link text'))
-    return render_template('add_reference.html', entity=actor, form=form)
 
 
 def save(form: ActorForm,
