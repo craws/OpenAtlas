@@ -205,7 +205,12 @@ class Entity:
                                                   to_date=True)
 
     def get_profile_image_id(self) -> Optional[int]:
-        sql = 'SELECT image_id FROM web.entity_profile_image WHERE entity_id = %(entity_id)s;'
+        # Also joining model.link to ensure that model association of profile link (still) exists
+        sql = '''
+            SELECT i.image_id
+            FROM web.entity_profile_image i
+            JOIN model.link l ON i.entity_id = l.range_id AND i.image_id = l.domain_id
+            WHERE i.entity_id = %(entity_id)s;'''
         g.execute(sql, {'entity_id': self.id})
         return g.cursor.fetchone()[0] if g.cursor.rowcount else None
 
