@@ -82,7 +82,7 @@ def delete_sql(filename: str) -> Response:
         os.remove(app.config['EXPORT_FOLDER_PATH'].joinpath('sql', filename))
         logger.log('info', 'file', 'SQL file deleted')
         flash(_('file deleted'), 'info')
-    except Exception as e:  # pragma: no cover
+    except Exception as e:
         logger.log('error', 'file', 'SQL file deletion failed', e)
         flash(_('error file delete'), 'error')
     return redirect(url_for('export_sql'))
@@ -130,7 +130,7 @@ def delete_csv(filename: str) -> Response:
         os.remove(app.config['EXPORT_FOLDER_PATH'].joinpath('csv', filename))
         logger.log('info', 'file', 'CSV file deleted')
         flash(_('file deleted'), 'info')
-    except Exception as e:  # pragma: no cover
+    except Exception as e:
         logger.log('error', 'file', 'CSV deletion failed', e)
         flash(_('error file delete'), 'error')
     return redirect(url_for('export_csv'))
