@@ -530,7 +530,7 @@ def node_view(node: Node) -> str:
         header = [_('name'), _('value'), _('class'), _('info')]
     tables = {'entities': Table(header), 'file': Table(Table.HEADERS['file'] + [_('main image')])}
     profile_image_id = node.get_profile_image_id()
-    for entity in node.get_linked_entities(['P2', 'P89', 'P67'], inverse=True, nodes=True):
+    for entity in node.get_linked_entities(['P2', 'P89'], inverse=True, nodes=True):
         if node.class_.code == 'E53':  # pragma: no cover
             object_ = entity.get_linked_entity('P53', inverse=True)
             if not object_:  # If it's a location show the object, continue otherwise
@@ -543,7 +543,7 @@ def node_view(node: Node) -> str:
         data.append(entity.description)
         tables['entities'].rows.append(data)
     tables['link_entities'] = Table([_('domain'), _('range')])
-    for link_ in node.get_links('P67', True):
+    for link_ in node.get_links('P67', inverse=True):
         domain = link_.domain
         data = get_base_table_data(domain)
         if domain.view_name == 'file':  # pragma: no cover
