@@ -1,4 +1,5 @@
 {% extends 'layout.html' %}
+{% block title_name %} - {{ _('event')|uc_first }}{% endblock %}
 {% block breadcrumb %}
     {% if origin %}
         {{ [[_(origin.view_name), origin.view_name + '_index'], origin, '+ ' + g.classes[code].name]|crumb }}
