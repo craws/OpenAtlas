@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% block title_name %} - {{ node.name }}{% endblock %}
 {% block breadcrumb %}
     {{ [[_('types'), 'node_index'], root, node.name]|crumb }}
 {% endblock %}

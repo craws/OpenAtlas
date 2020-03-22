@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% block title_name %} - {{ source.name }}{% endblock %}
 {% block breadcrumb %}
     {{ [[_('source'), 'source_index'], source.name]|crumb }}
 {% endblock %}

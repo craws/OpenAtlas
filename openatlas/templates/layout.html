@@ -51,7 +51,6 @@
     {% endif %}
     <title>
         {{ session['settings']['site_name'] }}
-        {{ ' - ' + request.path.split('/')[1]|uc_first if request.path.split('/')[1] else '' }}
         {% block title_name %}{% endblock %}
     </title>
 </head>

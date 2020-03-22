@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% block title_name %} - {{ _('export SQL')|uc_first }}{% endblock %}
 {% block breadcrumb %}
     {{ [[_('admin'), 'admin_index'], _('export SQL')]|crumb }}
 {% endblock %}
