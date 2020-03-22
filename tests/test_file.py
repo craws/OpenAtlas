@@ -78,9 +78,9 @@ class FileTest(TestBaseCase):
             self.app.get(url_for('file_remove_profile_image', entity_id=actor.id))
 
             # Add to file
-            rv = self.app.get(url_for('file_add_reference', id_=file_id))
+            rv = self.app.get(url_for('entity_add_reference', id_=file_id))
             assert b'Add Reference' in rv.data
-            rv = self.app.post(url_for('file_add_reference', id_=file_id),
+            rv = self.app.post(url_for('entity_add_reference', id_=file_id),
                                data={'reference': reference.id, 'page': '777'},
                                follow_redirects=True)
             assert b'777' in rv.data

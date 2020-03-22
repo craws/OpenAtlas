@@ -9,7 +9,7 @@ from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import build_form, build_table_form
+from openatlas.forms.forms import build_form
 from openatlas.models.entity import Entity
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, link, required_group, was_modified
@@ -38,18 +38,6 @@ def object_index(action: Optional[str] = None, id_: Optional[int] = None) -> str
         data.append(object_.description)
         table.rows.append(data)
     return render_template('object/index.html', table=table)
-
-
-@app.route('/object/add/source/<int:id_>', methods=['POST', 'GET'])
-@required_group('contributor')
-def object_add_source(id_: int) -> Union[str, Response]:
-    object_ = Entity.get_by_id(id_, view_name='object')
-    if request.method == 'POST':
-        if request.form['checkbox_values']:
-            object_.link_string('P128', request.form['checkbox_values'])
-        return redirect(url_for('entity_view', id_=id_) + '#tab-source')
-    form = build_table_form('source', object_.get_linked_entities(['P128']))
-    return render_template('add_source.html', entity=object_, form=form)
 
 
 @app.route('/object/insert', methods=['POST', 'GET'])

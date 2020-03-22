@@ -102,10 +102,10 @@ class Api:
         geonames_link = Geonames.get_geonames_link(entity)
         type_ = 'FeatureCollection'
         nodes = []
+        class_code = ''.join(entity.class_.code + " " + entity.class_.i18n['en']).replace(" ", "_")
         features = {'@id': url_for('entity_view', id_=entity.id, _external=True),
                     'type': 'Feature',
-                    'crmClass': "crm:".join(entity.class_.code + " "
-                                            + entity.class_.i18n['en']).replace(" ", "_"),
+                    'crmClass': "crm:" + class_code,
                     'properties': {'title': entity.name}}
 
         # Types
@@ -146,7 +146,6 @@ class Api:
             for key, value in entity.aliases.items():
                 features['names'].append({"alias": value})
 
-        # Todo: This functions won't work on references! Need to change
         # Depictions
         if Api.get_file(entity):  # pragma: nocover
             features['depictions'] = Api.get_file(entity)
@@ -187,8 +186,7 @@ class Api:
             shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
             for geonames_link in Gis.get_by_id(entity.location.id):  # pragma: nocover
                 geo_dict = {'type': shape[geonames_link['shape']],
-                            'coordinates': geonames_link['geometry']['coordinates'],
-                            'classification': geonames_link['type']}
+                            'coordinates': geonames_link['geometry']['coordinates']}
                 if geonames_link['description']:
                     geo_dict['description'] = geonames_link['description']
                 if geonames_link['name']:

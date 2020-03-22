@@ -36,6 +36,8 @@ class ExportTest(TestBaseCase):
                               follow_redirects=True)
             if os.name == 'posix':
                 assert b'File deleted' in rv.data
+            rv = self.app.get(url_for('delete_sql', filename='non_existing'), follow_redirects=True)
+            assert b'An error occurred when trying to delete the file' in rv.data
 
             # CSV export
             rv = self.app.get(url_for('export_csv'))
@@ -57,3 +59,5 @@ class ExportTest(TestBaseCase):
             rv = self.app.get(url_for('delete_csv', filename=date_string + '_csv.zip'),
                               follow_redirects=True)
             assert b'File deleted' in rv.data
+            rv = self.app.get(url_for('delete_csv', filename='non_existing'), follow_redirects=True)
+            assert b'An error occurred when trying to delete the file' in rv.data

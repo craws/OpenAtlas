@@ -89,15 +89,9 @@ class EventTest(TestBaseCase):
                                data={'checkbox_values': str([file.id])}, follow_redirects=True)
             assert b'X-Files' in rv.data
 
-            rv = self.app.get(url_for('event_add_source', id_=event_id))
-            assert b'Add Source' in rv.data
-            rv = self.app.post(url_for('event_add_source', id_=event_id),
-                               data={'checkbox_values': str([source.id])}, follow_redirects=True)
-            assert b'Necronomicon' in rv.data
-
-            rv = self.app.get(url_for('event_add_reference', id_=event_id))
+            rv = self.app.get(url_for('entity_add_reference', id_=event_id))
             assert b'Add Reference' in rv.data
-            rv = self.app.post(url_for('event_add_reference', id_=event_id),
+            rv = self.app.post(url_for('entity_add_reference', id_=event_id),
                                data={'reference': reference.id, 'page': '777'},
                                follow_redirects=True)
             assert b'777' in rv.data
