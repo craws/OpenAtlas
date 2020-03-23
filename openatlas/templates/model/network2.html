@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% block title_name %} - {{ _('model')|uc_first }}{% endblock %}
 {% block breadcrumb %}
     {{ [[_('overview'), 'index'], _('network visualization' + ' {dimensions}D'.format(dimensions=dimensions))]|crumb }}
 {% endblock %}

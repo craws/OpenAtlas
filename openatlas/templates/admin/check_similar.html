@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% block title_name %} - {{ _('admin')|uc_first }}{% endblock %}
 {% block breadcrumb %}
     {{ [[_('admin'), 'admin_index'], _('check similar names')]|crumb }}
 {% endblock %}

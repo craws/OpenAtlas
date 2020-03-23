@@ -1,4 +1,5 @@
 {% extends 'layout.html' %}
+{% block title_name %} - {{ _('overlay')|uc_first }}{% endblock %}
 {% block breadcrumb %}
     {{ [[_('place'), 'place_index'], place, image, _('overlay')]|crumb }}
 {% endblock %}

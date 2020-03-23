@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
+{% block title_name %} - {{ _('file')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_(entity.view_name), entity.view_name + '_index'], entity, _('add') + ' ' + _('file').capitalize()]|crumb }}
+    {{ [[_(entity.view_name), entity.view_name + '_index'], entity, _('add') + ' ' + _('file')|uc_first]|crumb }}
 {% endblock %}
 {% block content %}
     {{ form|safe }}

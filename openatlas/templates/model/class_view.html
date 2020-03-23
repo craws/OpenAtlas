@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% block title_name %} - {{ _('model')|uc_first }}{% endblock %}
 {% block breadcrumb %}
     {{ [[_('model'), 'model_index'], [_('classes'), 'class_index'], class_.code]|crumb }}
 {% endblock %}
