@@ -35,7 +35,6 @@ def build_form(form: Any,
                selected_object: Union[Entity, Link, None] = None,
                request_origin: Optional_Type[Request] = None,
                entity2: Optional_Type[Entity] = None) -> Any:
-
     def add_value_type_fields(subs: List[int]) -> None:
         for sub_id in subs:
             sub = g.nodes[sub_id]
@@ -138,19 +137,35 @@ class TreeSelect(HiddenInput):  # type: ignore
             selected_ids.append(g.nodes[int(field.data)].id)
         html = """
             <input id="{name}-button" name="{name}-button" type="text"
-                class="table-select {required}" onfocus="this.blur()"
-                readonly="readonly" value="{selection}" placeholder="{change_label}">
+                class="table-select {required}" 
+                onfocus="this.blur()"
+                onclick="$('#{name}-modal').modal('show')"
+                readonly="readonly" 
+                value="{selection}" 
+                placeholder="{change_label}">
             <a href="#" id="{name}-clear" {clear_style} class="{button_class}"
                 onclick="clearSelect('{name}');">{clear_label}</a>
-            <div id="{name}-overlay" class="overlay">
-                <div id="{name}-dialog" class="overlay-container">
-                    <input class="tree-filter" id="{name}-tree-search" placeholder="{filter}">
-                    <div id="{name}-tree"></div>
+            <div id="{name}-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">{title}</h5>
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">                                        
+                            <input class="tree-filter" id="{name}-tree-search" placeholder="{filter}" type="text">
+                            <div id="{name}-tree" style="text-align: left!important;"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-dismiss="modal">{close_label}</button>
+                        </div>                        
+                    </div>
                 </div>
             </div>
             <script>
                 $(document).ready(function () {{
-                    createOverlay("{name}","{title}",false,);
                     $("#{name}-tree").jstree({{
                         "core" : {{"check_callback": true, "data": {tree_data}}},
                         "search": {{"case_insensitive": true, "show_only_matches": true}},
@@ -176,6 +191,7 @@ class TreeSelect(HiddenInput):  # type: ignore
                                 title=g.nodes[int(field.id)].name,
                                 change_label=uc_first(_('change')),
                                 clear_label=uc_first(_('clear')),
+                                close_label=uc_first(_('close')),
                                 selection=selection,
                                 tree_data=Node.get_tree_data(int(field.id), selected_ids),
                                 clear_style='' if selection else ' style="display: none;" ',
@@ -200,16 +216,28 @@ class TreeMultiSelect(HiddenInput):  # type: ignore
                 selected_ids.append(entity_id)
                 selection += g.nodes[entity_id].name + '<br>'
         html = """
-            <span id="{name}-button" class="{button_class}">{change_label}</span>
+            <span id="{name}-button" class="{button_class}" onclick="$('#{name}-modal').modal('show')">{change_label}</span>
             <div id="{name}-selection" style="text-align:left;">{selection}</div>
-            <div id="{name}-overlay" class="overlay">
-               <div id="{name}-dialog" class="overlay-container">
-                   <input class="tree-filter" id="{name}-tree-search" placeholder="{filter}">
-                   <div id="{name}-tree"></div>
-               </div>
-            </div>
+            <div id="{name}-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog" role="document">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">{title}</h5>
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">                                        
+                            <input class="tree-filter" id="{name}-tree-search" placeholder="{filter}" type="text">
+                            <div id="{name}-tree" style="text-align: left!important;"></div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-dismiss="modal" onclick="selectFromTreeMulti({name})">{close_label}</button>
+                        </div>                        
+                    </div>
+                </div>
+            </div>            
             <script>
-                createOverlay("{name}", "{title}", true, "tree");
                 $("#{name}-tree").jstree({{
                     "core" : {{ "check_callback": true, "data": {tree_data} }},
                     "search": {{"case_insensitive": true, "show_only_matches": true}},
@@ -232,6 +260,7 @@ class TreeMultiSelect(HiddenInput):  # type: ignore
                                 title=root.name,
                                 selection=selection,
                                 change_label=uc_first(_('change')),
+                                close_label=uc_first(_('close')),
                                 tree_data=Node.get_tree_data(int(field.id), selected_ids))
         return super(TreeMultiSelect, self).__call__(field, **kwargs) + html
 
@@ -290,17 +319,32 @@ class TableSelect(HiddenInput):  # type: ignore
         html = """
             <input id="{name}-button" name="{name}-button" class="table-select {required}"
                 type="text" placeholder="{change_label}" onfocus="this.blur()" readonly="readonly"
-                value="{selection}">
+                value="{selection}" onclick="$('#{name}-modal').modal('show')">
             <a href="#" id="{name}-clear" class="{button_class}" {clear_style}
                 onclick="clearSelect('{name}');">{clear_label}</a>
-            <div id="{name}-overlay" class="overlay">
-            <div id="{name}-dialog" class="overlay-container">{table}</div></div>
+            <div id="{name}-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog" role="document" style="max-width: 100%!important;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">{title}</h5>
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">{table}</div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-dismiss="modal">{close_label}</button>
+                        </div>                        
+                    </div>
+                </div>
+            </div>
             <script>$(document).ready(function () {{createOverlay("{name}", "{title}");}});</script>
             """.format(name=field.id,
                        title=_(field.id.replace('_', ' ')),
                        button_class=app.config['CSS']['button']['secondary'],
                        change_label=uc_first(_('change')),
                        clear_label=uc_first(_('clear')),
+                       close_label=uc_first(_('close')),
                        table=table.display(field.id),
                        selection=selection,
                        clear_style='' if selection else ' style="display: none;" ',
@@ -347,15 +391,30 @@ class TableMultiSelect(HiddenInput):  # type: ignore
             table.rows.append(data)
         selection = [entity.name for entity in entities if field.data and entity.id in field.data]
         html = """
-            <span id="{name}-button" class="{button_class}">{change_label}</span><br>
+            <span id="{name}-button" class="{button_class}" onclick="$('#{name}-modal').modal('show')">{change_label}</span><br>
             <div id="{name}-selection" class="selection" style="text-align:left;">{selection}</div>
-            <div id="{name}-overlay" class="overlay">
-            <div id="{name}-dialog" class="overlay-container">{table}</div></div>
+            <div id="{name}-modal" class="modal fade" tabindex="-1" role="dialog" aria-hidden="true">
+                <div class="modal-dialog" role="document" style="max-width: 100%!important;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">{title}</h5>
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">{table}</div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary btn-sm" data-dismiss="modal" 
+                                onclick="selectFromTableMulti('{name}')">{close_label}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>            
             <script>
-                $(document).ready(function () {{createOverlay("{name}", "{title}", true);}});
             </script>""".format(name=field.id,
                                 button_class=app.config['CSS']['button']['secondary'],
                                 change_label=uc_first(_('change')),
+                                close_label=uc_first(_('close')),
                                 title=_(field.id.replace('_', ' ')),
                                 selection='<br>'.join(selection),
                                 table=table.display(field.id))

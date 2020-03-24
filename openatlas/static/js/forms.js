@@ -1,21 +1,20 @@
-
 $(document).ready(function () {
 
     // Write selected DataTables checkboxes to hidden input
     $('#checkbox-form').submit((a) => {
         ids = [];
         $('#checkbox-form .dataTable').DataTable().rows().nodes().to$().find('input[type="checkbox"]').each(
-            function() {
+            function () {
                 if ($(this).is(':checked')) {
                     ids.push($(this).attr('value'));
                 }
             });
-        $('#checkbox_values').val(ids.length > 0 ? '[' + ids+ ']' : '');
+        $('#checkbox_values').val(ids.length > 0 ? '[' + ids + ']' : '');
     });
 
     // Needed for ajax bookmark functionality
     $.ajaxSetup({
-        beforeSend: function(xhr, settings) {
+        beforeSend: function (xhr, settings) {
             if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
                 xhr.setRequestHeader("X-CSRFToken", bookmark_csrf_token);
             }
@@ -26,7 +25,7 @@ $(document).ready(function () {
         ignore: [], // Enable validation for hidden fields
     });
 
-    $.validator.addMethod('notEqual', function(value, element, param) {
+    $.validator.addMethod('notEqual', function (value, element, param) {
         return this.optional(element) || value != $(param).val();
     }, 'This has to be different');
 
@@ -34,7 +33,7 @@ $(document).ready(function () {
         return this.optional(element) || element.files[0].size <= param;
     }, 'This file it too large, allowed are ' + maxFileSize + ' MB');
 
-    $.validator.addMethod("signedInteger", function(value, element) {
+    $.validator.addMethod("signedInteger", function (value, element) {
         return /^-?\d+$/i.test(value);
     }, 'Please enter a valid integer.');
 
@@ -48,7 +47,7 @@ $(document).ready(function () {
 
     $('.value-type-switch').addClass('display-none');
     $('label[for="show_passwords"]').css('display', 'block');
-    $('#show_passwords').change(function() {
+    $('#show_passwords').change(function () {
         $('#password')[0].type = this.checked ? 'text' : 'password';
         $('#password2')[0].type = this.checked ? 'text' : 'password';
         if (document.getElementById('password_old')) {
@@ -56,10 +55,10 @@ $(document).ready(function () {
         }
     });
 
-    $("form").on('click', '#generate-password', function() {
+    $("form").on('click', '#generate-password', function () {
         charset = '123456789abcdefghjklmnopqrstuvwxyzABCDEFGHJKLMNPQRSTUVWXYZ';
         random_password = '';
-        for (var i=0; i< minimumPasswordLength; i++) {
+        for (var i = 0; i < minimumPasswordLength; i++) {
             index = Math.floor(Math.random() * (charset.length));
             random_password += charset[index];
         }
@@ -67,7 +66,7 @@ $(document).ready(function () {
         $("#password2").val(random_password);
     })
 
-    $('#insert_and_continue').click(function() {
+    $('#insert_and_continue').click(function () {
         $('#continue_').val('yes');
         $('form').submit();
     });
@@ -88,7 +87,7 @@ $(document).ready(function () {
 
     $('#file-form').validate({
         rules: {
-            file: {fileSize: maxFileSize  * 1024 * 1024}
+            file: {fileSize: maxFileSize * 1024 * 1024}
         }
     });
 
