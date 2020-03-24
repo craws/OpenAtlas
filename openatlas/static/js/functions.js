@@ -157,40 +157,6 @@ function ucString(string) {
     return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
-function createOverlay(name, title = false, multiple = false, type = 'table', value_type = false) {
-    if (!title) {
-        title = name;
-    }
-    $('#' + name + '-overlay').click(function () {
-        $('#' + name + '-dialog').dialog('close');
-    });
-    $('#' + name + '-button').click(function () {
-        $('#' + name + '-overlay').height($(window).height());
-        $('#' + name + '-overlay').width($(window).width());
-        $('#' + name + '-overlay').fadeTo(1, 0.6);
-        $('#' + name + '-dialog').dialog({
-            position: {my: 'center top', at: 'center top+80', of: window},
-            closeText: 'X',
-            title: ucString(title).replace('_', ' '),
-            closeOnEscape: true,
-            width: 'auto',
-            height: 'auto',
-            close: function () {
-                if (multiple && type == 'tree') {
-                    selectFromTreeMulti(name, value_type);
-                }
-                if (multiple && type == 'table') {
-                    selectFromTableMulti(name);
-                }
-                $('#' + name + '-overlay').css('display', 'none');
-            }
-        });
-        $('#' + name + '-table').trigger('applyWidgets');
-        $('#' + name + '-search').focus(); /* set search focus for tree select */
-        $('#' + name + '_table_filter > label > input').focus(); /* focus for multi table select */
-    });
-}
-
 function ajaxBookmark(entityId) {
     $.ajax({
         type: 'POST',
@@ -205,7 +171,7 @@ function ajaxBookmark(entityId) {
 function selectFromTree(name, id, text) {
     $('#' + name).val(id)
     $('#' + name + '-button').val(text.replace(/&apos;/g, "'"));
-    $('#' + name + '-dialog').dialog('close');
+    $('#' + name + '-modal').modal('hide');
     $('#' + name + '-clear').show();
 }
 
@@ -243,7 +209,7 @@ function selectFromTable(element, table, id) {
     $("#" + table + "-button").val(element.innerText);
     $("#" + table + "-button").focus(); /* to refresh/fill button and remove validation errors */
     $("#" + table + "-clear").show();
-    $(".ui-dialog-titlebar-close").trigger('click');
+    $('#' + table + '-modal').modal('hide');
 }
 
 function selectFromTableMulti(name) {

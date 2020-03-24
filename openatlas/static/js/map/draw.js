@@ -41,7 +41,9 @@ pointButton = new L.Control.EasyButtons({
     intentedIcon: 'fa-map-marker-alt fa',
     title: translate['map_info_centerpoint']
 })
-pointButton.intendedFunction = function () {drawGeometry('centerpoint');}
+pointButton.intendedFunction = function () {
+    drawGeometry('centerpoint');
+}
 map.addControl(pointButton);
 
 polylineButton = new L.Control.EasyButtons({
@@ -49,7 +51,9 @@ polylineButton = new L.Control.EasyButtons({
     intentedIcon: 'fa-project-diagram fa',
     title: translate['map_info_linestring']
 })
-polylineButton.intendedFunction = function() {drawGeometry('polyline');}
+polylineButton.intendedFunction = function () {
+    drawGeometry('polyline');
+}
 map.addControl(polylineButton);
 
 polygonButton = new L.Control.EasyButtons({
@@ -57,7 +61,9 @@ polygonButton = new L.Control.EasyButtons({
     intentedIcon: 'fa-vector-square fa',
     title: translate['map_info_shape']
 })
-polygonButton.intendedFunction = function() {drawGeometry('shape');}
+polygonButton.intendedFunction = function () {
+    drawGeometry('shape');
+}
 map.addControl(polygonButton);
 
 areaButton = new L.Control.EasyButtons({
@@ -65,7 +71,9 @@ areaButton = new L.Control.EasyButtons({
     intentedIcon: 'fa-draw-polygon fa',
     title: translate['map_info_area']
 })
-areaButton.intendedFunction = function() {drawGeometry('area');}
+areaButton.intendedFunction = function () {
+    drawGeometry('area');
+}
 map.addControl(areaButton);
 
 inputForm = L.control();
@@ -94,7 +102,7 @@ inputForm.onAdd = function (map) {
     return div;
 };
 
-map.on('click', function(e) {
+map.on('click', function (e) {
     if (captureCoordinates && shapeType == 'centerpoint') {
         $('#saveButton').prop('disabled', false);
         if (marker) {  // Marker already exists so move it
@@ -132,21 +140,21 @@ map.on('draw:created', function (e) {
     drawnPolygon.addLayer(e.layer);
     layer = e.layer;
     geoJsonArray = [];
-    if(Array.isArray(layer.getLatLngs()[0])) coordinates = layer.getLatLngs()[0];
+    if (Array.isArray(layer.getLatLngs()[0])) coordinates = layer.getLatLngs()[0];
     else coordinates = layer.getLatLngs();
     for (i = 0; i < coordinates.length; i++) {
         geoJsonArray.push('[' + coordinates[i].lng + ',' + coordinates[i].lat + ']');
     }
-     // Add first xy again as last xy to close polygon
-    if(Array.isArray(layer.getLatLngs()[0])) geoJsonArray.push('[' + coordinates[0].lng + ',' + coordinates[0].lat + ']');
+    // Add first xy again as last xy to close polygon
+    if (Array.isArray(layer.getLatLngs()[0])) geoJsonArray.push('[' + coordinates[0].lng + ',' + coordinates[0].lat + ']');
     $('#saveButton').prop('disabled', false);
 });
 
 function check_coordinates_input() {
     if ($('#easting').val() && $('#northing').val()) {
-         $('#saveButton').prop('disabled', false);
+        $('#saveButton').prop('disabled', false);
     } else {
-         $('#saveButton').prop('disabled', true);
+        $('#saveButton').prop('disabled', true);
     }
 }
 
@@ -215,7 +223,7 @@ function closeForm(withoutSave = true) {
 function drawGeometry(selectedType) {
     shapeType = selectedType;
     map.addControl(inputForm);
-    $('#inputFormTitle').text(selectedType.substr(0,1).toUpperCase() + selectedType.substr(1));
+    $('#inputFormTitle').text(selectedType.substr(0, 1).toUpperCase() + selectedType.substr(1));
     $('#inputFormInfo').text(translate['map_info_' + selectedType]);
     if (selectedType == 'polyline') {
         $('#inputFormInfo').text(translate['map_info_linestring']);
@@ -242,8 +250,8 @@ function drawGeometry(selectedType) {
 
 
 function saveForm(shapeType) {
-    name = $('#nameField').val().replace(/\"/g,'\\"');
-    description = $('#descriptionField').val().replace(/\"/g,'\\"');
+    name = $('#nameField').val().replace(/\"/g, '\\"');
+    description = $('#descriptionField').val().replace(/\"/g, '\\"');
     if (editLayer || editedLayer) {
         saveEditedGeometry(shapeType);
     } else {
@@ -282,7 +290,7 @@ function saveEditedGeometry(shapeType) {
         });
         // Insert new polyline
         // if geometry edited
-        if(geoJsonArray.length > 0) {
+        if (geoJsonArray.length > 0) {
             coordinates = '[' + geoJsonArray.join(',') + ']'
             line =
                 `{"type": "Feature", "geometry":` +
@@ -291,7 +299,7 @@ function saveEditedGeometry(shapeType) {
             lines.push(JSON.parse(line));
         }
         // if geometry unchanged just change labels
-        else if(geoJsonArray.length === 0) {
+        else if (geoJsonArray.length === 0) {
             removed.properties.name = name;
             removed.properties.description = description;
             lines.push(removed);
@@ -310,7 +318,7 @@ function saveEditedGeometry(shapeType) {
         });
         // Insert new polygon
         // if geometry edited
-        if(geoJsonArray.length > 0) {
+        if (geoJsonArray.length > 0) {
             coordinates = '[[' + geoJsonArray.join(',') + ']]'
             polygon =
                 `{"type": "Feature", "geometry":` +
@@ -319,7 +327,7 @@ function saveEditedGeometry(shapeType) {
             polygons.push(JSON.parse(polygon));
         }
         // if geometry unchanged just change labels
-        else if(geoJsonArray.length === 0) {
+        else if (geoJsonArray.length === 0) {
             removed.properties.name = name;
             removed.properties.description = description;
             polygons.push(removed);
@@ -404,8 +412,12 @@ function saveNewGeometry(shapeType) {
 
 function deleteGeometry() {
     // Remove layer of geometry, remove geometry from form field value
-    if (typeof(editLayer) == 'object') {map.removeLayer(editLayer);}
-    if (typeof(editMarker) == 'object') {map.removeLayer(editMarker);}
+    if (typeof (editLayer) == 'object') {
+        map.removeLayer(editLayer);
+    }
+    if (typeof (editMarker) == 'object') {
+        map.removeLayer(editMarker);
+    }
     if (feature.properties.shapeType == 'centerpoint') {
         points = JSON.parse($('#gis_points').val());
         $.each(points, function (key, value) {
@@ -441,7 +453,7 @@ function editGeometry() {
     map.closePopup();
     map.addControl(inputForm);
     $('#saveButton').prop('disabled', false);
-    $('#inputFormTitle').text(shapeType.substr(0,1).toUpperCase() + shapeType.substr(1));
+    $('#inputFormTitle').text(shapeType.substr(0, 1).toUpperCase() + shapeType.substr(1));
     $('#inputFormInfo').text(translate['map_info_' + shapeType]);
     $('#nameField').val(feature.properties.name);
     $('#descriptionField').val(feature.properties.description);
@@ -508,7 +520,7 @@ function interactionOn() {
     if (map.tap) {
         map.tap.enable();
     }
-    $('#map').css( 'cursor', 'crosshair');
+    $('#map').css('cursor', 'crosshair');
 }
 
 function interactionOff() {
