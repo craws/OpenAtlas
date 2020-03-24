@@ -1,8 +1,9 @@
 class Changelog:
     versions = {
-        '5.0.0': ['TBA', {
+        '5.0.0': ['2020-03-24', {
             'feature': {
                 '1048': 'Bootstrap layout',
+                '1050': 'API',
                 '1089': 'Human Remains',
                 '1136': 'Map enhancements',
                 '1138': 'Display usage of CIDOC CRM classes and properties',
@@ -12,8 +13,7 @@ class Changelog:
                 '1134': 'Overlay maps: not enabled if Geonames disabled',
                 '1139': 'Breadcrumbs show place twice',
                 '1140': 'HTML Code is showing in description text Actions',
-                '1152': "Menu item isn't marked as active in entity view"
-            }}],
+                '1152': "Menu item isn't marked as active in entity view"}}],
         '4.1.0': ['2020-01-30', {
             'feature': {
                 '1070': 'Enhance network visualization',
