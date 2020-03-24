@@ -6,9 +6,7 @@ This software was developed and tested on Linux/Debian 10 (codename "Buster") an
 install would be on Debian 10 system following these instructions.
 
 It may work on other Linux distributions or even on non Linux systems but would need substantially
-more knowledge about server administration. E.g. you could try to install the required packages
-using pip with the requirements.txt or follow the Windows install notes which are located in the
-install folder but aren't fully tested and still experimental.
+more knowledge about server administration.
 
 ## Requirements
 
