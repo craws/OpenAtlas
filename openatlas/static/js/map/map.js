@@ -340,14 +340,14 @@ function buildPopup(feature, action = 'view', selected = false) {
     if (feature.properties.objectName) {
         popupHtml += '<strong>' + feature.properties.objectName + '</strong><br>';
         if (feature.properties.objectType) {
-            popupHtml += '<i>' + feature.properties.objectType + '</i><br>'
+            popupHtml += feature.properties.objectType + '<br>'
         }
     }
     popupHtml += `
         <strong>` + feature.properties.name + `</strong>
         <div style="max-height:140px;overflow-y:auto">` + feature.properties.description + `</div>`
     if (action == 'edited') {
-        popupHtml += '<p><i>' + translate['map_info_reedit'] + '</i></p>';
+        popupHtml += '<p>' + translate['map_info_reedit'] + '</p>';
     } else if (!selected || window.location.href.indexOf('place') < 1) {
         popupHtml += '<p><a href="/entity/' + feature.properties.objectId + '">' + translate['details'] + '</a></p>';
     } else if (window.location.href.indexOf('update') >= 0) {
