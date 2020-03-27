@@ -1,6 +1,7 @@
 {% extends "layout.html" %}
+{% block title_name %} - {{ _('types')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('types'), 'node_index'], '+ ' + _(param).capitalize()]|crumb }}
+    {{ [[_('types'), 'node_index'], '+ ' + _(param)|uc_first]|crumb }}
 {% endblock %}
 {% block content %}
     {{ form|display_form }}

@@ -1,6 +1,7 @@
 {% extends 'layout.html' %}
+{% block title_name %} - {{ _('user')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'], [_('user'), 'user_index'], '+ ' + ('user').capitalize()]|crumb }}
+    {{ [[_('admin'), 'admin_index'], [_('user'), 'user_index'], '+ ' + ('user')|uc_first]|crumb }}
 {% endblock %}
 {% block content %}
     {{ form|display_form('user-form')|safe }}

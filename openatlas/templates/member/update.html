@@ -1,4 +1,5 @@
 {% extends 'layout.html' %}
+{% block title_name %} - {{ _('member')|uc_first }}{% endblock %}
 {% block breadcrumb %}
     {{ [[_('actor'), 'actor_index'], origin, related, ('edit')]|crumb }}
 {% endblock %}

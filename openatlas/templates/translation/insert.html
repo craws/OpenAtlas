@@ -1,6 +1,7 @@
 {% extends 'layout.html' %}
+{% block title_name %} - {{ _('source')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('source'), 'source_index'], source, '+ ' + _('text').capitalize()]|crumb }}
+    {{ [[_('source'), 'source_index'], source, '+ ' + _('text')|uc_first]|crumb }}
 {% endblock %}
 {% block content %}
     {{ form|display_form }}

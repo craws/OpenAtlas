@@ -177,7 +177,6 @@ input[type="text"].value_input {
     display: inline-flex;
     height: 35px;
     position :relative;
-    transition: width 500ms;
     font-size: 15px;
 }
 
@@ -196,11 +195,6 @@ input[type="text"].value_input {
 
 .iconbutton a {
     color: gray;
-}
-
-#index-search-button:hover #index-search {
-    width: 305px;
-
 }
 
 list-style-type: none;
@@ -342,7 +336,7 @@ div.data-table > div > div {
     text-align: right;
 }
 
-form div.table-row div {
+form div.table-row > div {
     text-align: right;
     vertical-align: top;
 }

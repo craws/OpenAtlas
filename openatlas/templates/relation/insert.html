@@ -1,6 +1,7 @@
 {% extends 'layout.html' %}
+{% block title_name %} - {{ _('relation')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('actor'), 'actor_index'], origin, '+ ' + _('relation').capitalize()]|crumb }}
+    {{ [[_('actor'), 'actor_index'], origin, '+ ' + _('relation')|uc_first]|crumb }}
 {% endblock %}
 {% block content %}
     {{ form|display_form }}

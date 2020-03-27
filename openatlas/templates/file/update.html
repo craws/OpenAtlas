@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% block title_name %} - {{ file.name }}{% endblock %}
 {% block breadcrumb %}
     {{ [[_('files'), 'file_index'], file, _('edit')]|crumb }}
 {% endblock %}

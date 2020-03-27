@@ -1,4 +1,5 @@
 {% extends 'layout.html' %}
+{% block title_name %} - {{ _('involvement')|uc_first }}{% endblock %}
 {% block breadcrumb %}
     {{ [[_(origin.view_name), origin.view_name + '_index'], origin, _('involvement')]|crumb }}
 {% endblock %}

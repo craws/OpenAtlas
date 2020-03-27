@@ -1,4 +1,5 @@
 {% extends "layout.html" %}
+{% block title_name %} - {{ _('user')|uc_first }}{% endblock %}
 {% block breadcrumb %}
     {{ [[_('admin'), 'admin_index'], [_('user'), 'user_index'], _('activity')]|crumb }}
 {% endblock %}
