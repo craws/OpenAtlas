@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-03-24 14:59+0100\n"
-"PO-Revision-Date: 2020-03-24 15:01+0100\n"
+"POT-Creation-Date: 2020-03-27 15:17+0100\n"
+"PO-Revision-Date: 2020-03-27 15:18+0100\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: de\n"
 "Language-Team: de <LL@li.org>\n"
@@ -73,7 +73,7 @@ msgstr "entfernen"
 msgid "close"
 msgstr "schließen"
 
-#: forms/forms.py:483 templates/admin/check_similar.html:15 util/table.py:38
+#: forms/forms.py:483 templates/admin/check_similar.html:15 util/table.py:40
 msgid "no entries"
 msgstr "Keine Einträge"
 
@@ -90,8 +90,8 @@ msgstr "Keine Einträge"
 #: templates/place/view.html:81 templates/place/view.html:92
 #: templates/reference/add.html:4 templates/reference/view.html:46
 #: templates/source/add.html:4 templates/source/view.html:48
-#: templates/source/view.html:65 templates/source/view.html:84 util/util.py:392
-#: views/entity.py:394
+#: templates/source/view.html:65 templates/source/view.html:84
+#: templates/types/view.html:68 util/util.py:392 views/entity.py:394
 msgid "add"
 msgstr "hinzufügen"
 
@@ -243,7 +243,7 @@ msgstr "speichern"
 #: templates/source/update.html:4 templates/source/view.html:26
 #: templates/translation/update.html:4 templates/translation/view.html:9
 #: templates/types/index.html:74 templates/types/update.html:4
-#: templates/types/view.html:23 templates/user/update.html:4
+#: templates/types/view.html:24 templates/user/update.html:4
 #: templates/user/view.html:11 views/admin.py:263 views/entity.py:115
 #: views/entity.py:149 views/entity.py:197 views/entity.py:210 views/entity.py:226
 #: views/entity.py:264 views/entity.py:282 views/entity.py:321 views/entity.py:390
@@ -254,7 +254,7 @@ msgstr "bearbeiten"
 #: templates/import/project_view.html:18 templates/map.html:25
 #: templates/note/update.html:8 templates/translation/view.html:10
 #: templates/translation/view.html:11 templates/types/index.html:76
-#: templates/types/index.html:77 templates/types/view.html:25
+#: templates/types/index.html:77 templates/types/view.html:26
 #: templates/user/view.html:14 util/filters.py:425 views/admin.py:318
 #: views/export.py:65 views/export.py:120 views/user.py:64
 msgid "delete"
@@ -356,7 +356,7 @@ msgstr "Neu laden"
 #: templates/object/view.html:9 templates/place/view.html:14
 #: templates/reference/view.html:9 templates/source/view.html:9
 #: templates/types/view.html:9 views/entity.py:528 views/entity.py:530
-#: views/entity.py:548 views/user.py:31
+#: views/entity.py:562 views/user.py:31
 msgid "info"
 msgstr "Info"
 
@@ -419,7 +419,7 @@ msgstr "Referenz"
 #: templates/file/index.html:4 templates/file/insert.html:7
 #: templates/file/update.html:4 templates/file/view.html:4
 #: templates/place/view.html:21 templates/reference/view.html:19
-#: templates/source/view.html:20
+#: templates/source/view.html:20 templates/types/view.html:18
 msgid "files"
 msgstr "Dateien"
 
@@ -448,7 +448,8 @@ msgstr "Externe Referenz"
 #: templates/file/insert.html:2 templates/file/insert.html:5
 #: templates/file/insert.html:7 templates/place/view.html:93
 #: templates/reference/view.html:52 templates/source/view.html:85
-#: views/admin.py:323 views/file.py:24 views/imports.py:96 views/reference.py:61
+#: templates/types/view.html:69 views/admin.py:323 views/file.py:24
+#: views/imports.py:96 views/reference.py:61
 msgid "file"
 msgstr "Datei"
 
@@ -905,7 +906,7 @@ msgid "classes"
 msgstr "Klassen"
 
 #: templates/model/class_view.html:15 templates/model/property_view.html:13
-#: templates/types/view.html:31 util/filters.py:302
+#: templates/types/view.html:34 util/filters.py:302
 msgid "super"
 msgstr "Super"
 
@@ -1149,11 +1150,11 @@ msgstr "Formulare"
 msgid "move"
 msgstr "verschieben"
 
-#: templates/types/view.html:35 views/types.py:23
+#: templates/types/view.html:38 views/types.py:23
 msgid "unit"
 msgstr "Einheit"
 
-#: templates/types/view.html:49
+#: templates/types/view.html:54
 msgid "move entities"
 msgstr "Entitäten verschieben"
 
@@ -1294,7 +1295,7 @@ msgstr "bei einem"
 msgid "in"
 msgstr "in"
 
-#: views/actor.py:19 views/entity.py:528 views/entity.py:530 views/entity.py:548
+#: views/actor.py:19 views/entity.py:528 views/entity.py:530 views/entity.py:562
 #: views/event.py:22 views/file.py:25 views/hierarchy.py:21 views/imports.py:25
 #: views/imports.py:61 views/object.py:19 views/place.py:25 views/place.py:40
 #: views/reference.py:22 views/source.py:19 views/translation.py:19
@@ -1428,7 +1429,7 @@ msgstr "max Größe in MB"
 msgid "profile image width in pixel"
 msgstr "Profile Bildbreite in Pixel"
 
-#: views/admin.py:210 views/entity.py:548
+#: views/admin.py:210 views/entity.py:562
 msgid "count"
 msgstr "Anzahl"
 
@@ -1552,7 +1553,7 @@ msgid "This entity can't be viewed directly."
 msgstr "Dieser Eintrag kann nicht direkt aufgerufen werden."
 
 #: views/entity.py:90 views/entity.py:243 views/entity.py:360 views/entity.py:448
-#: views/entity.py:480
+#: views/entity.py:480 views/entity.py:531
 msgid "main image"
 msgstr "Angezeigtes Bild"
 
@@ -1572,6 +1573,10 @@ msgstr "Erstes Erscheinen"
 msgid "appears last"
 msgstr "Letztes Erscheinen"
 
+#: views/entity.py:305
+msgid "node"
+msgstr "Typ"
+
 #: views/entity.py:365
 msgid "property"
 msgstr "Eigenschaft"
@@ -1588,11 +1593,11 @@ msgstr "Letztes"
 msgid "value"
 msgstr "Wert"
 
-#: views/entity.py:544
+#: views/entity.py:545
 msgid "domain"
 msgstr "Ausgangsklasse"
 
-#: views/entity.py:544
+#: views/entity.py:545
 msgid "range"
 msgstr "Zielklasse"
 

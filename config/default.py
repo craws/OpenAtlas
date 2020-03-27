@@ -72,6 +72,9 @@ FEEDBACK_SUBJECTS = {_('suggestion').title(): _('suggestion').title(),
                      _('question').title(): _('question').title(),
                      _('problem').title(): _('problem').title()}
 
+# Needed for translation
+_('node')
+
 # Mappings between model and user interface
 CODE_CLASS = {
     'E21': 'actor',
