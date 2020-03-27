@@ -1,5 +1,9 @@
 class Changelog:
     versions = {
+        '5.1.0': ['TBA', {
+            'feature': {
+                '991': 'Images/Files for Types',
+            }}],
         '5.0.0': ['2020-03-24', {
             'feature': {
                 '1048': 'Bootstrap layout',
