@@ -491,3 +491,23 @@ def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
                           token=generate_csrf(),
                           class_=app.config['CSS']['button']['primary'],
                           table=table.display(class_name))
+
+
+def get_form_settings(form: Any) -> Dict[str, str]:
+    settings = {}
+    for field in form:
+        if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
+            continue
+        label = _(field.name.replace('_', ' '))
+        value = session['settings'][field.name]
+        if field.type in ['StringField', 'IntegerField']:
+            if type(value) == list:
+                value = ';'.join(value)
+            settings[label] = value
+        if field.type == 'BooleanField':
+            settings[label] = uc_first(_('on')) if value else uc_first(_('off'))
+        if field.type == 'SelectField':
+            if type(value) is str and value.isdigit():
+                value = int(value)
+            settings[label] = dict(field.choices).get(value)
+    return settings

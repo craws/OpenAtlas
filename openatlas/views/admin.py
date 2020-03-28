@@ -10,10 +10,11 @@ from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import BooleanField, IntegerField, SelectField, StringField, SubmitField, TextAreaField
-from wtforms.validators import Email, InputRequired
+from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import TableField
+from openatlas.forms.admin_forms import GeneralForm, MailForm, TestMailForm
+from openatlas.forms.forms import TableField, get_form_settings
 from openatlas.models.date import Date
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -23,27 +24,6 @@ from openatlas.models.user import User
 from openatlas.util.table import Table
 from openatlas.util.util import (convert_size, format_date, format_datetime, get_file_path,
                                  is_authorized, link, required_group, send_mail, uc_first)
-
-
-class GeneralForm(FlaskForm):  # type: ignore
-    site_name = StringField(uc_first(_('site name')))
-    default_language = SelectField(uc_first(_('default language')),
-                                   choices=list(app.config['LANGUAGES'].items()))
-    default_table_rows = SelectField(uc_first(_('default table rows')),
-                                     coerce=int,
-                                     choices=list(app.config['DEFAULT_TABLE_ROWS'].items()))
-    log_level = SelectField(uc_first(_('log level')),
-                            coerce=int,
-                            choices=list(app.config['LOG_LEVELS'].items()))
-    debug_mode = BooleanField(uc_first(_('debug mode')))
-    random_password_length = IntegerField(uc_first(_('random password length')))
-    minimum_password_length = IntegerField(uc_first(_('minimum password length')))
-    reset_confirm_hours = IntegerField(uc_first(_('reset confirm hours')))
-    failed_login_tries = IntegerField(uc_first(_('failed login tries')))
-    failed_login_forget_minutes = IntegerField(uc_first(_('failed login forget minutes')))
-    minimum_jstree_search = IntegerField(uc_first(_('minimum jstree search')))
-    minimum_tablesorter_search = IntegerField(uc_first(_('minimum tablesorter search')))
-    save = SubmitField(uc_first(_('save')))
 
 
 @app.route('/admin')
@@ -446,11 +426,6 @@ def admin_newsletter() -> Union[str, Response]:
     return render_template('admin/newsletter.html', form=form, table=table)
 
 
-class TestMailForm(FlaskForm):  # type: ignore
-    receiver = StringField(_('test mail receiver'), [InputRequired(), Email()])
-    send = SubmitField(_('send test mail'))
-
-
 @app.route('/admin/mail', methods=["GET", "POST"])
 @required_group('admin')
 def admin_mail() -> str:
@@ -464,40 +439,16 @@ def admin_mail() -> str:
             flash(_('A test mail was sent to %(email)s.', email=form.receiver.data), 'info')
     else:
         form.receiver.data = current_user.email
-    mail_settings = {
-        _('mail'): uc_first(_('on')) if settings['mail'] else uc_first(_('off')),
-        _('mail transport username'): settings['mail_transport_username'],
-        _('mail transport host'): settings['mail_transport_host'],
-        _('mail transport port'): settings['mail_transport_port'],
-        _('mail from email'): settings['mail_from_email'],
-        _('mail from name'): settings['mail_from_name'],
-        _('mail recipients feedback'): ';'.join(settings['mail_recipients_feedback'])}
     return render_template('admin/mail.html',
                            settings=settings,
-                           mail_settings=mail_settings,
+                           mail_settings=get_form_settings(MailForm()),
                            form=form)
 
 
 @app.route('/admin/general', methods=["GET", "POST"])
 @required_group('admin')
 def admin_general() -> str:
-    settings = session['settings']
-    general_settings = {
-        _('site name'): settings['site_name'],
-        _('default language'): app.config['LANGUAGES'][settings['default_language']],
-        _('default table rows'): settings['default_table_rows'],
-        _('log level'): app.config['LOG_LEVELS'][int(settings['log_level'])],
-        _('debug mode'): uc_first(_('on')) if settings['debug_mode'] else uc_first(_('off')),
-        _('random password length'): settings['random_password_length'],
-        _('minimum password length'): settings['minimum_password_length'],
-        _('reset confirm hours'): settings['reset_confirm_hours'],
-        _('failed login tries'): settings['failed_login_tries'],
-        _('failed login forget minutes'): settings['failed_login_forget_minutes'],
-        _('minimum jstree search'): settings['minimum_jstree_search'],
-        _('minimum tablesorter search'): settings['minimum_tablesorter_search']}
-    return render_template('admin/general.html',
-                           settings=settings,
-                           general_settings=general_settings)
+    return render_template('admin/general.html', general_settings=get_form_settings(GeneralForm()))
 
 
 @app.route('/admin/general/update', methods=["GET", "POST"])
@@ -522,17 +473,6 @@ def admin_general_update() -> Union[str, Response]:
         elif field in form:
             getattr(form, field).data = session['settings'][field]
     return render_template('admin/general_update.html', form=form, settings=session['settings'])
-
-
-class MailForm(FlaskForm):  # type: ignore
-    mail = BooleanField(uc_first(_('mail')))
-    mail_transport_username = StringField(uc_first(_('mail transport username')))
-    mail_transport_host = StringField(uc_first(_('mail transport host')))
-    mail_transport_port = StringField(uc_first(_('mail transport port')))
-    mail_from_email = StringField(uc_first(_('mail from email')), [Email()])
-    mail_from_name = StringField(uc_first(_('mail from name')))
-    mail_recipients_feedback = StringField(uc_first(_('mail recipients feedback')))
-    save = SubmitField(uc_first(_('save')))
 
 
 @app.route('/admin/mail/update', methods=["GET", "POST"])
