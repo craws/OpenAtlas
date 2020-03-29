@@ -6,15 +6,13 @@ from typing import Optional, Union
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
-from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import BooleanField, IntegerField, SelectField, StringField, SubmitField, TextAreaField
-from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.admin_forms import GeneralForm, MailForm, TestMailForm
-from openatlas.forms.forms import TableField, get_form_settings
+from openatlas.forms.admin_forms import (ApiForm, GeneralForm, LogForm, LogoForm, MailForm, MapForm,
+                                         NewsLetterForm, SimilarForm, TestMailForm, FileForm)
+from openatlas.forms.forms import get_form_settings
 from openatlas.models.date import Date
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -37,12 +35,6 @@ def admin_index() -> str:
     return render_template('admin/index.html', writeable_dirs=writeable_dirs)
 
 
-class MapForm(FlaskForm):  # type: ignore
-    map_cluster_max_radius = IntegerField('maxClusterRadius')
-    map_cluster_disable_at_zoom = IntegerField('disableClusteringAtZoom')
-    save = SubmitField(uc_first(_('save')))
-
-
 @app.route('/admin/map', methods=['POST', 'GET'])
 @required_group('manager')
 def admin_map() -> Union[str, Response]:
@@ -62,11 +54,6 @@ def admin_map() -> Union[str, Response]:
     form.map_cluster_max_radius.data = session['settings']['map_cluster_max_radius']
     form.map_cluster_disable_at_zoom.data = session['settings']['map_cluster_disable_at_zoom']
     return render_template('admin/map.html', form=form)
-
-
-class ApiForm(FlaskForm):  # type: ignore
-    api_public = BooleanField('public')
-    save = SubmitField(uc_first(_('save')))
 
 
 @app.route('/admin/api', methods=['POST', 'GET'])
@@ -112,7 +99,6 @@ def admin_check_link_duplicates(delete: Optional[str] = None) -> Union[str, Resp
         return redirect(url_for('admin_check_link_duplicates'))
     table = Table(['domain', 'range', 'property_code', 'description', 'type_id', 'begin_from',
                    'begin_to', 'begin_comment', 'end_from', 'end_to', 'end_comment', 'count'])
-
     for result in Link.check_link_duplicates():
         table.rows.append([link(Entity.get_by_id(result.domain_id)),
                            link(Entity.get_by_id(result.range_id)),
@@ -143,13 +129,6 @@ def admin_delete_single_type_duplicate(entity_id: int, node_id: int) -> Response
     return redirect(url_for('admin_check_link_duplicates'))
 
 
-class FileForm(FlaskForm):  # type: ignore
-    file_upload_max_size = IntegerField(_('max file size in MB'))
-    file_upload_allowed_extension = StringField('allowed file extensions')
-    profile_image_width = IntegerField(_('profile image width in pixel'))
-    save = SubmitField(uc_first(_('save')))
-
-
 @app.route('/admin/file', methods=['POST', 'GET'])
 @required_group('manager')
 def admin_file() -> Union[str, Response]:
@@ -170,12 +149,6 @@ def admin_file() -> Union[str, Response]:
     form.file_upload_allowed_extension.data = session['settings']['file_upload_allowed_extension']
     form.profile_image_width.data = session['settings']['profile_image_width']
     return render_template('admin/file.html', form=form)
-
-
-class SimilarForm(FlaskForm):  # type: ignore
-    classes = SelectField(_('class'), choices=[])
-    ratio = IntegerField(default=100)
-    apply = SubmitField(_('search'))
 
 
 @app.route('/admin/similar', methods=['POST', 'GET'])
@@ -299,11 +272,6 @@ def admin_orphans() -> str:
         return render_template('admin/orphans.html', tables=tables)
 
 
-class LogoForm(FlaskForm):  # type: ignore
-    file = TableField(_('file'), [InputRequired()])
-    save = SubmitField(uc_first(_('change logo')))
-
-
 @app.route('/admin/logo/', methods=['POST', 'GET'])
 @app.route('/admin/logo/<action>')
 @required_group('manager')
@@ -351,15 +319,6 @@ def admin_file_delete(filename: str) -> Response:  # pragma: no cover
     return redirect(url_for('admin_orphans') + '#tab-orphaned-files')
 
 
-class LogForm(FlaskForm):  # type: ignore
-    limit = SelectField(_('limit'), choices=((0, _('all')), (100, 100), (500, 500)), default=100)
-    priority = SelectField(_('priority'),
-                           choices=(list(app.config['LOG_LEVELS'].items())),
-                           default=6)
-    user = SelectField(_('user'), choices=([(0, _('all'))]), default=0)
-    apply = SubmitField(_('apply'))
-
-
 @app.route('/admin/log', methods=['POST', 'GET'])
 @required_group('admin')
 def admin_log() -> str:
@@ -389,13 +348,6 @@ def admin_log_delete() -> Response:
     logger.delete_all_system_logs()
     flash(_('Logs deleted'), 'info')
     return redirect(url_for('admin_log'))
-
-
-class NewsLetterForm(FlaskForm):  # type: ignore
-    subject = StringField('', [InputRequired()], render_kw={'placeholder': _('subject'),
-                                                            'autofocus': True})
-    body = TextAreaField('', [InputRequired()], render_kw={'placeholder': _('content')})
-    send = SubmitField(uc_first(_('send')))
 
 
 @app.route('/admin/newsletter', methods=['POST', 'GET'])

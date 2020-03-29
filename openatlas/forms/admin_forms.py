@@ -1,9 +1,11 @@
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import BooleanField, IntegerField, SelectField, StringField, SubmitField
+from wtforms import (BooleanField, IntegerField, SelectField, StringField, SubmitField,
+                     TextAreaField)
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app
+from openatlas.forms.forms import TableField
 from openatlas.util.util import (uc_first)
 
 
@@ -42,3 +44,48 @@ class MailForm(FlaskForm):  # type: ignore
     mail_from_name = StringField(uc_first(_('mail from name')))
     mail_recipients_feedback = StringField(uc_first(_('mail recipients feedback')))
     save = SubmitField(uc_first(_('save')))
+
+
+class NewsLetterForm(FlaskForm):  # type: ignore
+    subject = StringField('', [InputRequired()], render_kw={'placeholder': _('subject'),
+                                                            'autofocus': True})
+    body = TextAreaField('', [InputRequired()], render_kw={'placeholder': _('content')})
+    send = SubmitField(uc_first(_('send')))
+
+
+class LogForm(FlaskForm):  # type: ignore
+    limit = SelectField(_('limit'), choices=((0, _('all')), (100, 100), (500, 500)), default=100)
+    priority = SelectField(_('priority'),
+                           choices=(list(app.config['LOG_LEVELS'].items())),
+                           default=6)
+    user = SelectField(_('user'), choices=([(0, _('all'))]), default=0)
+    apply = SubmitField(_('apply'))
+
+
+class MapForm(FlaskForm):  # type: ignore
+    map_cluster_max_radius = IntegerField('maxClusterRadius')
+    map_cluster_disable_at_zoom = IntegerField('disableClusteringAtZoom')
+    save = SubmitField(uc_first(_('save')))
+
+
+class ApiForm(FlaskForm):  # type: ignore
+    api_public = BooleanField('public')
+    save = SubmitField(uc_first(_('save')))
+
+
+class FileForm(FlaskForm):  # type: ignore
+    file_upload_max_size = IntegerField(_('max file size in MB'))
+    file_upload_allowed_extension = StringField('allowed file extensions')
+    profile_image_width = IntegerField(_('profile image width in pixel'))
+    save = SubmitField(uc_first(_('save')))
+
+
+class SimilarForm(FlaskForm):  # type: ignore
+    classes = SelectField(_('class'), choices=[])
+    ratio = IntegerField(default=100)
+    apply = SubmitField(_('search'))
+
+
+class LogoForm(FlaskForm):  # type: ignore
+    file = TableField(_('file'), [InputRequired()])
+    save = SubmitField(uc_first(_('change logo')))
