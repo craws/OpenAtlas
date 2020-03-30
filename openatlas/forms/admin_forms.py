@@ -26,7 +26,6 @@ class GeneralForm(FlaskForm):  # type: ignore
     failed_login_tries = IntegerField(uc_first(_('failed login tries')))
     failed_login_forget_minutes = IntegerField(uc_first(_('failed login forget minutes')))
     minimum_jstree_search = IntegerField(uc_first(_('minimum jstree search')))
-    minimum_tablesorter_search = IntegerField(uc_first(_('minimum tablesorter search')))
     save = SubmitField(uc_first(_('save')))
 
 

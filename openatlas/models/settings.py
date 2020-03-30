@@ -25,7 +25,6 @@ class Settings:
               'mail_recipients_feedback',
               'minimum_password_length',
               'minimum_jstree_search',
-              'minimum_tablesorter_search',
               'profile_image_width',
               'random_password_length',
               'reset_confirm_hours',
