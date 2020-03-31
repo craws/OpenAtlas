@@ -49,8 +49,6 @@ class Settings:
                             'random_password_length',
                             'reset_confirm_hours']:
                 settings[row.name] = int(row.value)
-            elif row.name in ['mail_recipients_feedback']:
-                settings[row.name] = row.value.split(';')
         return settings
 
     @staticmethod

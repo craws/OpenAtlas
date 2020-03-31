@@ -18,6 +18,7 @@ from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
+from openatlas.models.settings import Settings
 from openatlas.util.table import Table
 from openatlas.util.util import get_base_table_data, get_file_stats, uc_first
 
@@ -511,3 +512,13 @@ def get_form_settings(form: Any) -> Dict[str, str]:
                 value = int(value)
             settings[label] = dict(field.choices).get(value)
     return settings
+
+
+def set_form_settings(form: Any):
+    for field in form:
+        if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
+            continue
+        if field.name in ['log_level']:
+            field.data = int(session['settings'][field.name])
+            continue
+        field.data = session['settings'][field.name]

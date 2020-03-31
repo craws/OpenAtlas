@@ -12,7 +12,7 @@ from werkzeug.wrappers import Response
 from openatlas import app, logger
 from openatlas.forms.admin_forms import (ApiForm, GeneralForm, LogForm, LogoForm, MailForm, MapForm,
                                          NewsLetterForm, SimilarForm, TestMailForm, FileForm)
-from openatlas.forms.forms import get_form_settings
+from openatlas.forms.forms import get_form_settings, set_form_settings
 from openatlas.models.date import Date
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -51,8 +51,7 @@ def admin_map() -> Union[str, Response]:
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('admin_index'))
-    form.map_cluster_max_radius.data = session['settings']['map_cluster_max_radius']
-    form.map_cluster_disable_at_zoom.data = session['settings']['map_cluster_disable_at_zoom']
+    set_form_settings(form)
     return render_template('admin/map.html', form=form)
 
 
@@ -72,7 +71,7 @@ def admin_api() -> Union[str, Response]:
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('admin_index'))
-    form.api_public.data = session['settings']['api_public']
+    set_form_settings(form)
     return render_template('admin/api.html', form=form)
 
 
@@ -145,9 +144,7 @@ def admin_file() -> Union[str, Response]:
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('admin_index'))
-    form.file_upload_max_size.data = session['settings']['file_upload_max_size']
-    form.file_upload_allowed_extension.data = session['settings']['file_upload_allowed_extension']
-    form.profile_image_width.data = session['settings']['profile_image_width']
+    set_form_settings(form)
     return render_template('admin/file.html', form=form)
 
 
@@ -419,11 +416,7 @@ def admin_general_update() -> Union[str, Response]:
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('admin_general'))
-    for field in Settings.fields:
-        if field in ['default_table_rows', 'log_level']:
-            getattr(form, field).data = int(session['settings'][field])
-        elif field in form:
-            getattr(form, field).data = session['settings'][field]
+    set_form_settings(form)
     return render_template('admin/general_update.html', form=form, settings=session['settings'])
 
 
@@ -443,10 +436,5 @@ def admin_mail_update() -> Union[str, Response]:
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('admin_mail'))
-    if request.method == 'GET':
-        for field in Settings.fields:
-            if field in ['mail_recipients_feedback']:
-                getattr(form, field).data = ';'.join(session['settings'][field])
-            elif field in form:
-                getattr(form, field).data = session['settings'][field]
+    set_form_settings(form)
     return render_template('admin/mail_update.html', form=form, settings=session['settings'])
