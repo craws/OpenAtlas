@@ -2,8 +2,8 @@
 -- PostgreSQL database dump
 --
 
--- Dumped from database version 11.5 (Debian 11.5-1+deb10u1)
--- Dumped by pg_dump version 11.5 (Debian 11.5-1+deb10u1)
+-- Dumped from database version 11.7 (Debian 11.7-0+deb10u1)
+-- Dumped by pg_dump version 11.7 (Debian 11.7-0+deb10u1)
 
 SET statement_timeout = 0;
 SET lock_timeout = 0;
@@ -49,29 +49,29 @@ ALTER TABLE IF EXISTS ONLY import.entity DROP CONSTRAINT IF EXISTS entity_entity
 ALTER TABLE IF EXISTS ONLY gis.polygon DROP CONSTRAINT IF EXISTS polygon_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY gis.point DROP CONSTRAINT IF EXISTS point_entity_id_fkey;
 ALTER TABLE IF EXISTS ONLY gis.linestring DROP CONSTRAINT IF EXISTS linestring_entity_id_fkey;
-DROP TRIGGER IF EXISTS update_modified ON web.map_overlay;
+DROP TRIGGER IF EXISTS update_modified ON web.user_settings;
 DROP TRIGGER IF EXISTS update_modified ON web.user_notes;
+DROP TRIGGER IF EXISTS update_modified ON web.user_bookmarks;
+DROP TRIGGER IF EXISTS update_modified ON web."user";
+DROP TRIGGER IF EXISTS update_modified ON web.map_overlay;
 DROP TRIGGER IF EXISTS update_modified ON web.i18n;
 DROP TRIGGER IF EXISTS update_modified ON web.hierarchy_form;
-DROP TRIGGER IF EXISTS update_modified ON web.form;
 DROP TRIGGER IF EXISTS update_modified ON web.hierarchy;
-DROP TRIGGER IF EXISTS update_modified ON web.user_bookmarks;
-DROP TRIGGER IF EXISTS update_modified ON web.user_settings;
 DROP TRIGGER IF EXISTS update_modified ON web."group";
-DROP TRIGGER IF EXISTS update_modified ON web."user";
-DROP TRIGGER IF EXISTS update_modified ON model.property_i18n;
-DROP TRIGGER IF EXISTS update_modified ON model.class_i18n;
+DROP TRIGGER IF EXISTS update_modified ON web.form;
 DROP TRIGGER IF EXISTS update_modified ON model.property_inheritance;
+DROP TRIGGER IF EXISTS update_modified ON model.property_i18n;
+DROP TRIGGER IF EXISTS update_modified ON model.property;
 DROP TRIGGER IF EXISTS update_modified ON model.link;
 DROP TRIGGER IF EXISTS update_modified ON model.entity;
-DROP TRIGGER IF EXISTS update_modified ON model.property;
 DROP TRIGGER IF EXISTS update_modified ON model.class_inheritance;
+DROP TRIGGER IF EXISTS update_modified ON model.class_i18n;
 DROP TRIGGER IF EXISTS update_modified ON model.class;
 DROP TRIGGER IF EXISTS on_delete_entity ON model.entity;
 DROP TRIGGER IF EXISTS update_modified ON import.project;
 DROP TRIGGER IF EXISTS update_modified ON gis.polygon;
-DROP TRIGGER IF EXISTS update_modified ON gis.linestring;
 DROP TRIGGER IF EXISTS update_modified ON gis.point;
+DROP TRIGGER IF EXISTS update_modified ON gis.linestring;
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS user_username_key;
 ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_user_id_name_key;
 ALTER TABLE IF EXISTS ONLY web.user_settings DROP CONSTRAINT IF EXISTS user_settings_pkey;
@@ -84,6 +84,7 @@ ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_boo
 ALTER TABLE IF EXISTS ONLY web.user_bookmarks DROP CONSTRAINT IF EXISTS user_bookmarks_pkey;
 ALTER TABLE IF EXISTS ONLY web."user" DROP CONSTRAINT IF EXISTS unsubscribe_code_key;
 ALTER TABLE IF EXISTS ONLY web.settings DROP CONSTRAINT IF EXISTS settings_pkey;
+ALTER TABLE IF EXISTS ONLY web.settings DROP CONSTRAINT IF EXISTS settings_name_key;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_pkey;
 ALTER TABLE IF EXISTS ONLY web.map_overlay DROP CONSTRAINT IF EXISTS map_overlay_image_id_place_id_key;
 ALTER TABLE IF EXISTS ONLY web.system_log DROP CONSTRAINT IF EXISTS log_pkey;
@@ -1863,6 +1864,14 @@ ALTER TABLE ONLY web.map_overlay
 
 
 --
+-- Name: settings settings_name_key; Type: CONSTRAINT; Schema: web; Owner: openatlas
+--
+
+ALTER TABLE ONLY web.settings
+    ADD CONSTRAINT settings_name_key UNIQUE (name);
+
+
+--
 -- Name: settings settings_pkey; Type: CONSTRAINT; Schema: web; Owner: openatlas
 --
 
@@ -1959,17 +1968,17 @@ ALTER TABLE ONLY web."user"
 
 
 --
--- Name: point update_modified; Type: TRIGGER; Schema: gis; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON gis.point FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
-
-
---
 -- Name: linestring update_modified; Type: TRIGGER; Schema: gis; Owner: openatlas
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON gis.linestring FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+
+
+--
+-- Name: point update_modified; Type: TRIGGER; Schema: gis; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON gis.point FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
@@ -2001,17 +2010,17 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON model.class FOR EACH ROW EXECUTE
 
 
 --
+-- Name: class_i18n update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON model.class_i18n FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+
+
+--
 -- Name: class_inheritance update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON model.class_inheritance FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
-
-
---
--- Name: property update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON model.property FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
@@ -2029,17 +2038,10 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON model.link FOR EACH ROW EXECUTE 
 
 
 --
--- Name: property_inheritance update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
+-- Name: property update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON model.property_inheritance FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
-
-
---
--- Name: class_i18n update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON model.class_i18n FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON model.property FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
@@ -2050,10 +2052,17 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON model.property_i18n FOR EACH ROW
 
 
 --
--- Name: user update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
+-- Name: property_inheritance update_modified; Type: TRIGGER; Schema: model; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON web."user" FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON model.property_inheritance FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+
+
+--
+-- Name: form update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON web.form FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
@@ -2064,31 +2073,10 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON web."group" FOR EACH ROW EXECUTE
 
 
 --
--- Name: user_settings update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON web.user_settings FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
-
-
---
--- Name: user_bookmarks update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON web.user_bookmarks FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
-
-
---
 -- Name: hierarchy update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
 CREATE TRIGGER update_modified BEFORE UPDATE ON web.hierarchy FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
-
-
---
--- Name: form update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
---
-
-CREATE TRIGGER update_modified BEFORE UPDATE ON web.form FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
@@ -2106,6 +2094,27 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON web.i18n FOR EACH ROW EXECUTE PR
 
 
 --
+-- Name: map_overlay update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON web.map_overlay FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+
+
+--
+-- Name: user update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON web."user" FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+
+
+--
+-- Name: user_bookmarks update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
+--
+
+CREATE TRIGGER update_modified BEFORE UPDATE ON web.user_bookmarks FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+
+
+--
 -- Name: user_notes update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
@@ -2113,10 +2122,10 @@ CREATE TRIGGER update_modified BEFORE UPDATE ON web.user_notes FOR EACH ROW EXEC
 
 
 --
--- Name: map_overlay update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
+-- Name: user_settings update_modified; Type: TRIGGER; Schema: web; Owner: openatlas
 --
 
-CREATE TRIGGER update_modified BEFORE UPDATE ON web.map_overlay FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
+CREATE TRIGGER update_modified BEFORE UPDATE ON web.user_settings FOR EACH ROW EXECUTE PROCEDURE model.update_modified();
 
 
 --
