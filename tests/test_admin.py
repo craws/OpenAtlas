@@ -6,7 +6,6 @@ from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
-from openatlas.models.settings import Settings
 from tests.base import TestBaseCase
 
 
@@ -112,18 +111,16 @@ class ContentTests(TestBaseCase):
             rv = self.app.post(url_for('admin_check_similar'), follow_redirects=True,
                                data={'classes': 'file', 'ratio': 100})
             assert b'No entries' in rv.data
-
-            data: Dict[str, Union[str, int]] = {name: '' for name in Settings.fields}
-            data['default_language'] = 'en'
-            data['default_table_rows'] = '10'
-            data['failed_login_forget_minutes'] = '10'
-            data['failed_login_tries'] = '10'
-            data['minimum_password_length'] = '10'
-            data['random_password_length'] = '10'
-            data['reset_confirm_hours'] = '10'
-            data['log_level'] = '0'
-            data['site_name'] = 'Nostromo'
-            data['minimum_jstree_search'] = 3
+            data = {'default_language': 'en',
+                    'default_table_rows': '10',
+                    'failed_login_forget_minutes': '10',
+                    'failed_login_tries': '10',
+                    'minimum_password_length': '10',
+                    'random_password_length': '10',
+                    'reset_confirm_hours': '10',
+                    'log_level': '0',
+                    'site_name': 'Nostromo',
+                    'minimum_jstree_search': 3}
             rv = self.app.post(url_for('admin_general_update'), data=data, follow_redirects=True)
             assert b'Nostromo' in rv.data
             rv = self.app.get(url_for('admin_mail_update'))
@@ -143,7 +140,7 @@ class ContentTests(TestBaseCase):
                                data={'file_upload_max_size': 20, 'profile_image_width': 20},
                                follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
-            rv = self.app.get(url_for('admin_api'),)
+            rv = self.app.get(url_for('admin_api'), )
             assert b'public' in rv.data
             rv = self.app.post(url_for('admin_api'), data={'public': True}, follow_redirects=True)
             assert b'Changes have been saved' in rv.data

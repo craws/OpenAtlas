@@ -42,7 +42,7 @@ def admin_map() -> Union[str, Response]:
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
-            Settings.update_map_settings(form)
+            Settings.update(form)
             logger.log('info', 'settings', 'Settings updated')
             g.cursor.execute('COMMIT')
             flash(_('info update'), 'info')
@@ -62,7 +62,7 @@ def admin_api() -> Union[str, Response]:
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
-            Settings.update_api(form)
+            Settings.update(form)
             logger.log('info', 'settings', 'API updated')
             g.cursor.execute('COMMIT')
             flash(_('info update'), 'info')
@@ -135,7 +135,7 @@ def admin_file() -> Union[str, Response]:
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
-            Settings.update_file_settings(form)
+            Settings.update(form)
             logger.log('info', 'settings', 'Settings updated')
             g.cursor.execute('COMMIT')
             flash(_('info update'), 'info')
