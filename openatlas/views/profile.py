@@ -42,22 +42,23 @@ class PasswordForm(FlaskForm):  # type: ignore
 
 
 class ProfileForm(FlaskForm):  # type: ignore
-    name = StringField(description=_('tooltip full name'))
-    email = StringField([InputRequired(), Email()], description=_('tooltip email'))
-    show_email = BooleanField(description=_('tooltip show email'))
-    newsletter = BooleanField(description=_('tooltip newsletter'))
-    language = SelectField(choices=list(app.config['LANGUAGES'].items()))
-    table_rows = SelectField(description=_('tooltip table rows'),
+    name = StringField(_('full name'), description=_('tooltip full name'))
+    email = StringField(_('email'), [InputRequired(), Email()], description=_('tooltip email'))
+    show_email = BooleanField(_('show email'), description=_('tooltip show email'))
+    newsletter = BooleanField(_('newsletter'), description=_('tooltip newsletter'))
+    language = SelectField(_('language'), choices=list(app.config['LANGUAGES'].items()))
+    table_rows = SelectField(_('table rows'),
+                             description=_('tooltip table rows'),
                              choices=list(app.config['DEFAULT_TABLE_ROWS'].items()),
                              coerce=int)
-    table_show_aliases = SelectField(choices=[('off', _('off')), ('on', _('on'))])
+    table_show_aliases = BooleanField(_('show aliases in tables'))
     layout_choices = [('default', _('default')), ('advanced', _('advanced'))]
     layout = SelectField(_('layout'), description=_('tooltip layout'), choices=layout_choices)
-    max_zoom = IntegerField()
-    default_zoom = IntegerField()
-    module_geonames = BooleanField(description=_('tooltip geonames'))
-    module_map_overlay = BooleanField(description=_('tooltip map overlay'))
-    module_notes = BooleanField(description=_('tooltip notes'))
+    max_zoom = IntegerField(_('max map zoom'))
+    default_zoom = IntegerField(_('default map zoom'))
+    module_geonames = BooleanField('GeoNames', description=_('tooltip geonames'))
+    module_map_overlay = BooleanField(_('map overlay'), description=_('tooltip map overlay'))
+    module_notes = BooleanField(_('notes'), description=_('tooltip notes'))
     save = SubmitField(_('save'))
 
 
@@ -78,7 +79,7 @@ def profile_index() -> str:
                         (_('layout'), user.settings['layout']),
                         (_('max map zoom'), user.settings['max_zoom']),
                         (_('default map zoom'), user.settings['default_zoom'])],
-            'modules': [(_('GeoNames'), user.settings['module_geonames']),
+            'modules': [('GeoNames', user.settings['module_geonames']),
                         (_('map overlay'), user.settings['module_map_overlay']),
                         (_('notes'), user.settings['module_notes'])]}
     return render_template('profile/index.html', data=data)
@@ -101,8 +102,7 @@ def profile_update() -> Union[str, Response]:
         user.settings['module_notes'] = form.module_notes.data
         user.settings['max_zoom'] = form.max_zoom.data
         user.settings['default_zoom'] = form.default_zoom.data
-        user.settings[
-            'table_show_aliases'] = 'True' if form.table_show_aliases.data == 'on' else 'False'
+        user.settings['table_show_aliases'] = 'True' if form.table_show_aliases.data else ''
         user.settings['layout'] = form.layout.data
         g.cursor.execute('BEGIN')
         try:
@@ -116,33 +116,16 @@ def profile_update() -> Union[str, Response]:
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('profile_index'))
-    form.name.data = current_user.real_name
-    form.name.label.text = uc_first(_('full name'))
-    form.email.data = current_user.email
-    form.email.label.text = uc_first(_('email'))
-    form.show_email.data = current_user.settings['show_email']
-    form.show_email.label.text = uc_first(_('show email'))
-    form.newsletter.data = current_user.settings['newsletter']
-    form.newsletter.label.text = uc_first(_('newsletter'))
-    language = user.settings['language'] if user.settings['language'] else session['language']
-    form.language.data = language
-    form.language.label.text = uc_first(_('language'))
-    form.table_rows.data = user.settings['table_rows']
-    form.table_rows.label.text = uc_first(_('table rows'))
-    form.table_show_aliases.data = 'on' if user.settings['table_show_aliases'] else 'off'
-    form.table_show_aliases.label.text = uc_first(_('show aliases in tables'))
-    form.layout.data = user.settings['layout']
-    form.layout.label.text = uc_first(_('layout'))
-    form.max_zoom.data = user.settings['max_zoom']
-    form.max_zoom.label.text = uc_first(_('max map zoom'))
-    form.default_zoom.data = user.settings['default_zoom']
-    form.default_zoom.label.text = uc_first(_('default map zoom'))
-    form.module_geonames.data = user.settings['module_geonames']
-    form.module_geonames.label.text = 'GeoNames'
-    form.module_map_overlay.data = user.settings['module_map_overlay']
-    form.module_map_overlay.label.text = uc_first(_('map overlay'))
-    form.module_notes.data = user.settings['module_notes']
-    form.module_notes.label.text = uc_first(_('notes'))
+    for field in form:
+        if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
+            continue
+        field.label.text = uc_first(field.label.text)
+        if field.name == 'name':
+            field.data = current_user.real_name
+        elif field.name == 'email':
+            field.data = current_user.email
+        else:
+            field.data = current_user.settings[field.name]
     form.save.label.text = uc_first(_('save'))
     return render_template('profile/update.html', form=form)
 

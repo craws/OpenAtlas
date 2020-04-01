@@ -19,13 +19,8 @@ class ProfileTests(TestBaseCase):
                     'email': 'alice@umbrella.net',
                     'max_zoom': 20,
                     'default_zoom': 14,
-                    'module_geonames': '',
-                    'module_notes': '',
-                    'show_email': '',
-                    'newsletter': '',
                     'language': 'en',
                     'table_rows': '100',
-                    'table_show_aliases': 'off',
                     'layout': 'advanced'}
             rv = self.app.post(url_for('profile_update'), data=data, follow_redirects=True)
             assert b'saved' in rv.data

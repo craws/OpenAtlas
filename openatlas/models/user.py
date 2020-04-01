@@ -204,17 +204,20 @@ class User(UserMixin):  # type: ignore
         sql = 'SELECT "name", value FROM web.user_settings WHERE user_id = %(user_id)s;'
         g.execute(sql, {'user_id': user_id})
         settings = {row.name: row.value for row in g.cursor.fetchall()}
-        for item in ['newsletter', 'show_email', 'module_notes', 'module_geonames',
+        for item in ['newsletter',
+                     'show_email',
+                     'module_notes',
+                     'module_geonames',
                      'module_map_overlay']:
             settings[item] = True if item in settings and settings[item] == 'True' else False
-        if 'table_show_aliases' in settings and settings['table_show_aliases'] == 'False':
+        if 'table_show_aliases' in settings and not settings['table_show_aliases']:
             settings['table_show_aliases'] = False
         else:
             settings['table_show_aliases'] = True
         if 'layout' not in settings:
             settings['layout'] = 'default'
         if 'language' not in settings:
-            settings['language'] = ''
+            settings['language'] = session['language']
         if 'max_zoom' in settings:
             settings['max_zoom'] = int(settings['max_zoom'])
         else:
