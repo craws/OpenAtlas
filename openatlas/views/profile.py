@@ -66,13 +66,13 @@ class ProfileForm(FlaskForm):  # type: ignore
 @login_required
 def profile_index() -> str:
     user = current_user
-    data = {'info': [(_('username'), user.username),
-                     (_('full name'), user.real_name),
-                     (_('email'), user.email),
-                     (_('show email'),
-                      uc_first(_('on')) if user.settings['show_email'] else uc_first(_('off'))),
-                     (_('newsletter'),
-                      uc_first(_('on')) if user.settings['newsletter'] else uc_first(_('off')))],
+    data = {'general': [(_('username'), user.username),
+                        (_('full name'), user.real_name),
+                        (_('email'), user.email),
+                        (_('show email'),
+                         uc_first(_('on')) if user.settings['show_email'] else uc_first(_('off'))),
+                        (_('newsletter'),
+                         uc_first(_('on')) if user.settings['newsletter'] else uc_first(_('off')))],
             'display': [(_('language'), user.settings['language']),
                         (_('table rows'), user.settings['table_rows']),
                         (_('show aliases in tables'), user.settings['table_show_aliases']),
@@ -91,19 +91,15 @@ def profile_update() -> Union[str, Response]:
     form = ProfileForm()
     user = current_user
     if form.validate_on_submit():
-        user.real_name = form.name.data
-        user.email = form.email.data
-        user.settings['show_email'] = form.show_email.data
-        user.settings['newsletter'] = form.newsletter.data
-        user.settings['language'] = form.language.data
-        user.settings['table_rows'] = form.table_rows.data
-        user.settings['module_geonames'] = form.module_geonames.data
-        user.settings['module_map_overlay'] = form.module_map_overlay.data
-        user.settings['module_notes'] = form.module_notes.data
-        user.settings['max_zoom'] = form.max_zoom.data
-        user.settings['default_zoom'] = form.default_zoom.data
-        user.settings['table_show_aliases'] = 'True' if form.table_show_aliases.data else ''
-        user.settings['layout'] = form.layout.data
+        for field in form:
+            if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
+                continue
+            if field.name == 'name':
+                user.real_name = field.data
+            elif field.name == 'email':
+                user.email = field.data
+            else:
+                user.settings[field.name] = field.data
         g.cursor.execute('BEGIN')
         try:
             user.update()
@@ -127,7 +123,21 @@ def profile_update() -> Union[str, Response]:
         else:
             field.data = current_user.settings[field.name]
     form.save.label.text = uc_first(_('save'))
-    return render_template('profile/update.html', form=form)
+    return render_template('profile/update.html',
+                           form=form,
+                           form_fields={_('general'): [form.name,
+                                                       form.email,
+                                                       form.show_email,
+                                                       form.newsletter],
+                                        _('display'): [form.language,
+                                                       form.table_rows,
+                                                       form.table_show_aliases,
+                                                       form.layout,
+                                                       form.max_zoom,
+                                                       form.default_zoom],
+                                        _('modules'): [form.module_geonames,
+                                                       form.module_map_overlay,
+                                                       form.module_notes]})
 
 
 @app.route('/profile/password', methods=['POST', 'GET'])

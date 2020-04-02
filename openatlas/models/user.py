@@ -69,8 +69,12 @@ class User(UserMixin):  # type: ignore
 
     def update_settings(self) -> None:
         for name, value in self.settings.items():
-            if name in ['newsletter', 'show_email', 'module_geonames', 'module_map_overlay',
-                        'module_notes']:
+            if name in ['module_geonames',
+                        'module_map_overlay',
+                        'module_notes',
+                        'newsletter',
+                        'table_show_aliases',
+                        'show_email']:
                 value = 'True' if self.settings[name] else ''
             sql = """
                 INSERT INTO web.user_settings (user_id, "name", "value")

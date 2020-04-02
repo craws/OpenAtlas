@@ -111,8 +111,8 @@ def display_info(self: Any, data: Dict[str, str]) -> str:
     html = '<div class="data-table">'
     for key, value in data:
         if value or value == 0:
-            value = util.uc_first(_('no')) if value is False else value
-            value = util.uc_first(_('yes')) if value is True else value
+            value = util.uc_first(_('off')) if value is False else value
+            value = util.uc_first(_('on')) if value is True else value
             html += '''
                 <div class="table-row">
                     <div>{key}</div>
