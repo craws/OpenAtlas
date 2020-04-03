@@ -252,7 +252,7 @@ let allSelected = [];
 if (gisLineSelected != '') allSelected.push(gisLines);
 if (gisPolygonSelected != '') allSelected.push(gisPolygons);
 if (gisPointSelected != '') allSelected.push(gisPoints);
-if (gisPointSupers != '') allSelected.push(pointSupersLayer);
+if (gisPointSupers != '' && typeof pointSupersLayer != "undefined") allSelected.push(pointSupersLayer);
 if (gisPointSubs != '') allSelected.push(pointSubsLayer);
 if (gisPointSibling != '') allSelected.push(pointSiblingsLayer);
 
