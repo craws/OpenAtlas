@@ -16,6 +16,7 @@ from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Project
 from openatlas.models.model import CidocClass, CidocProperty
+from openatlas.models.user import User
 from openatlas.util import util
 from openatlas.util.table import Table
 from openatlas.util.util import get_file_path, print_file_extension
@@ -52,7 +53,7 @@ def crumb(self: Any, crumbs: List[Any]) -> str:
             items.append('<a href="{url}">{label}</a>'.format(
                 url=url_for(item[1]) if len(item) == 2 else url_for(item[1], **item[2]),
                 label=util.truncate(util.uc_first(str(item[0])))))
-        elif isinstance(item, Entity) or isinstance(item, Project):
+        elif isinstance(item, Entity) or isinstance(item, Project) or isinstance(item, User):
             items.append(util.link(item))
         else:
             items.append(util.truncate(util.uc_first(item)))

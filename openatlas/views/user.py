@@ -1,7 +1,7 @@
 from typing import List, Optional, Tuple, Union
 
 from flask import abort, flash, render_template, request, session, url_for
-from flask_babel import format_number, lazy_gettext as _
+from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
@@ -111,27 +111,6 @@ def user_view(id_: int) -> str:
     return render_template('user/view.html', user=user, info=info)
 
 
-@app.route('/admin/user')
-@app.route('/admin/user/<action>/<int:id_>')
-@required_group('readonly')
-def user_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
-    if id_ and action == 'delete':
-        User.delete(id_)
-        flash(_('user deleted'), 'info')
-    table = Table(['username', 'group', 'email', 'newsletter', 'created', 'last login', 'entities'])
-    for user in User.get_all():
-        count = User.get_created_entities_count(user.id)
-        table.rows.append([
-            link(user),
-            user.group,
-            user.email if is_authorized('manager') or user.settings['show_email'] else '',
-            _('yes') if user.settings['newsletter'] else '',
-            format_date(user.created),
-            format_date(user.login_last_success),
-            format_number(count) if count else ''])
-    return render_template('user/index.html', table=table)
-
-
 @app.route('/admin/user/update/<int:id_>', methods=['POST', 'GET'])
 @required_group('manager')
 def user_update(id_: int) -> Union[str, Response]:
@@ -180,7 +159,6 @@ def user_insert() -> Union[str, Response]:
             else:
                 flash(_('Failed to send account details to %(email)s.',
                         email=form.email.data), 'error')
-            return redirect(url_for('user_index'))
         if form.continue_.data == 'yes':
             return redirect(url_for('user_insert'))
         return redirect(url_for('user_view', id_=user_id))

@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title_name %} - {{ user.username }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'], [_('user'), 'user_index'], user.username]|crumb }}
+    {{ [[_('admin'), 'admin_index'], _('user'), user.username]|crumb }}
 {% endblock %}
 {% block content %}
     {% if 'manager'|is_authorized %}
@@ -11,7 +11,8 @@
                 {{ _('edit')|button(url_for('user_update', id_=user.id)) }}
             {% endif %}
             {% if user.id != current_user.id and (user.group != 'admin' or current_user.group == 'admin') %}
-                {{ _('delete')|button(url_for('user_index', action='delete', id_=user.id), onclick="return confirm('" + _('delete')|uc_first + " " + user.username.replace("'", '').replace('"', '') + "?');") }}
+                {{ _('delete')|button(url_for('admin_index', action='delete_user', id_=user.id) + '#tab-user',
+                    onclick="return confirm('" + _('delete')|uc_first + " " + user.username.replace("'", '').replace('"', '') + "?');") }}
             {% endif %}
             {{ _('activity')|button(url_for('user_activity', user_id=user.id)) }}
         </div>

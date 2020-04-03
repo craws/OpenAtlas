@@ -18,7 +18,6 @@ class UserTests(TestBaseCase):
                 'name': 'Ripley Weaver',
                 'description': '',
                 'send_info': ''}
-
         data2 = {'active': '',
                  'username': 'Newt',
                  'email': 'newt@nostromo.org',
@@ -28,7 +27,6 @@ class UserTests(TestBaseCase):
                  'name': 'Newt',
                  'continue_': 'yes',
                  'send_info': ''}
-
         with app.app_context():  # type: ignore
             rv = self.app.get(url_for('user_insert'), follow_redirects=True)
             assert b'Password' in rv.data
@@ -62,7 +60,7 @@ class UserTests(TestBaseCase):
             rv = self.app.post(url_for('user_update', id_=user_id),
                                data=data, follow_redirects=True)
             assert b'The warrant officer' in rv.data
-            rv = self.app.get(url_for('user_index', action='delete', id_=user_id))
+            rv = self.app.get(url_for('admin_index', action='delete_user', id_=user_id))
             assert b'User deleted' in rv.data
 
             # Test activity log

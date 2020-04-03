@@ -4,14 +4,15 @@ from os.path import basename, splitext
 from typing import Optional, Union
 
 from flask import flash, g, render_template, request, session, url_for
-from flask_babel import lazy_gettext as _
+from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 
 from openatlas import app, logger
-from openatlas.forms.admin_forms import (ApiForm, GeneralForm, LogForm, LogoForm, MailForm, MapForm,
-                                         NewsLetterForm, SimilarForm, TestMailForm, FileForm)
+from openatlas.forms.admin_forms import (ApiForm, FileForm, GeneralForm, LogForm, LogoForm,
+                                         MailForm, MapForm, NewsLetterForm, SimilarForm,
+                                         TestMailForm)
 from openatlas.forms.forms import get_form_settings, set_form_settings
 from openatlas.models.date import Date
 from openatlas.models.entity import Entity
@@ -25,14 +26,29 @@ from openatlas.util.util import (convert_size, format_date, format_datetime, get
 
 
 @app.route('/admin')
+@app.route('/admin/user/<action>/<int:id_>')
 @required_group('readonly')
-def admin_index() -> str:
+def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
+    if is_authorized('manager') and id_ and action == 'delete_user':
+        User.delete(id_)
+        flash(_('user deleted'), 'info')
     export_path = app.config['EXPORT_FOLDER_PATH']
     writeable_dirs = {
         'uploads': True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False,
         'export/sql': True if os.access(export_path.joinpath('sql'), os.W_OK) else False,
         'export/csv': True if os.access(export_path.joinpath('csv'), os.W_OK) else False}
-    return render_template('admin/index.html', writeable_dirs=writeable_dirs)
+    table = Table(['username', 'group', 'email', 'newsletter', 'created', 'last login', 'entities'])
+    for user in User.get_all():
+        count = User.get_created_entities_count(user.id)
+        table.rows.append([
+            link(user),
+            user.group,
+            user.email if is_authorized('manager') or user.settings['show_email'] else '',
+            _('yes') if user.settings['newsletter'] else '',
+            format_date(user.created),
+            format_date(user.login_last_success),
+            format_number(count) if count else ''])
+    return render_template('admin/index.html', writeable_dirs=writeable_dirs, table=table)
 
 
 @app.route('/admin/map', methods=['POST', 'GET'])
