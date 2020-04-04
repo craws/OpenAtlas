@@ -6,9 +6,9 @@
 {% block content %}
 <div>
     <ul class="nav nav-tabs" role="tablist">
-        <li class="nav-item"> <a class="nav-link active" data-toggle="tab" role="tab" aria-selected="true" href="#tab-info">{{ _('info')|uc_first }}</a></li>
+        <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" aria-selected="true" href="#tab-info">{{ _('info')|uc_first }}</a></li>
         {% if tables['subs'].rows %}
-            <li class="nav-item"> <a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-subs">{{ _('subs')|uc_first }} {{ tables['subs']|format_tab_number }}</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-subs">{{ _('subs')|uc_first }} {{ tables['subs']|format_tab_number }}</a></li>
         {% endif %}
         {% if tables['entities'].rows or tables['link_entities'].rows %}
             <li>
@@ -17,7 +17,7 @@
         {% endif %}
         <li><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false"  href="#tab-file">{{ _('files')|uc_first }} {{ tables['file']|format_tab_number|safe }}</a></li>
     </ul>
-    <div class="tab-content" id="myTabContent">
+    <div class="tab-content">
         <div class="tab-pane fade show active" role="tabpanel" id="tab-info">
             {% if 'editor'|is_authorized and node.root and not root.locked %}
                 <div class="toolbar">
