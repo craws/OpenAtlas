@@ -1,5 +1,3 @@
-from typing import Dict, Union
-
 from flask import g, url_for
 
 from openatlas import app
@@ -67,7 +65,7 @@ class ContentTests(TestBaseCase):
         with app.app_context():  # type: ignore
             self.login()
             rv = self.app.get(url_for('admin_mail'))
-            assert b'Email from' in rv.data
+            assert b'Mail from' in rv.data
             rv = self.app.get(url_for('admin_index'))
             assert b'User' in rv.data
             rv = self.app.get(url_for('admin_general'))

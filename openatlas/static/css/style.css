@@ -95,13 +95,9 @@ input[type="text"].data-huebee {
     display: none;
 }
 
-#disk_size {
+#disk-size {
     width: 40em;
     height: 1em;
-    margin-bottom: 1em;
-    border-style: solid;
-    border-width: 0.2em;
-    border-radius:3px;
 }
 
 #disk_size {

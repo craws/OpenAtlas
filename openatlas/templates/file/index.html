@@ -1,21 +1,14 @@
 {% extends "layout.html" %}
 {% block title_name %} - {{ _('file')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    {{ [_('files')]|crumb }}
+    {{ [[_('admin'), 'admin_index'], _('files')]|crumb }}
 {% endblock %}
 {% block content %}
     {% if 'contributor'|is_authorized %}
         <div class="toolbar">
+            {{ 'Files'|manual_link }}
             {{ _('file')|button(url_for('file_insert')) }}
         </div>
     {% endif %}
-    {{ _('total disk space')|uc_first }} <strong>{{ disk_space_values.total }}</strong> -
-    {{ _('free disk space')|uc_first }} <strong>{{ disk_space_values.free }}</strong>
-    <div id="disk_size"></div>
-    <script>
-        $( function() {
-            $("#disk_size").progressbar({value: {{ disk_space_values.percent }} });
-        });
-    </script>
     {{ table.display()|safe }}
 {% endblock %}

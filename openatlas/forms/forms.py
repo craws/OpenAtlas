@@ -498,7 +498,7 @@ def get_form_settings(form: Any) -> Dict[str, str]:
     for field in form:
         if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
             continue
-        label = _(field.name.replace('_', ' '))
+        label = uc_first(field.label.text)
         value = session['settings'][field.name]
         if field.type in ['StringField', 'IntegerField']:
             if type(value) == list:

@@ -157,6 +157,17 @@ def display_remove_link(url: str, name: str) -> str:
     return '<a ' + confirm + ' href="' + url + '">' + uc_first(_('remove')) + '</a>'
 
 
+def get_disk_space_info() -> Optional[Dict[str, Any]]:
+    if os.name != "posix":  # cover: ignore - e.g. Windows has no statvfs
+        return None
+    statvfs = os.statvfs(app.config['UPLOAD_FOLDER_PATH'])
+    disk_space = statvfs.f_frsize * statvfs.f_blocks
+    free_space = statvfs.f_frsize * statvfs.f_bavail  # Available space without reserved blocks
+    return {'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
+            'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
+            'percent': 100 - math.ceil(free_space / (disk_space / 100))}
+
+
 def add_type_data(entity: 'Entity',
                   data: List[Tuple[str, Optional[str]]],
                   location: Optional['Entity'] = None) -> List[Tuple[str, Optional[str]]]:

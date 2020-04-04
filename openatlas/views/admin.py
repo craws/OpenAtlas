@@ -21,8 +21,9 @@ from openatlas.models.node import Node
 from openatlas.models.settings import Settings
 from openatlas.models.user import User
 from openatlas.util.table import Table
-from openatlas.util.util import (convert_size, format_date, format_datetime, get_file_path,
-                                 is_authorized, link, required_group, send_mail, uc_first)
+from openatlas.util.util import (convert_size, format_date, format_datetime, get_disk_space_info,
+                                 get_file_path, is_authorized, link, required_group, send_mail,
+                                 uc_first)
 
 
 @app.route('/admin')
@@ -33,22 +34,25 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
         User.delete(id_)
         flash(_('user deleted'), 'info')
     export_path = app.config['EXPORT_FOLDER_PATH']
-    writeable_dirs = {
-        'uploads': True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False,
-        'export/sql': True if os.access(export_path.joinpath('sql'), os.W_OK) else False,
-        'export/csv': True if os.access(export_path.joinpath('csv'), os.W_OK) else False}
+    dirs = {'uploads': True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False,
+            'export/sql': True if os.access(export_path.joinpath('sql'), os.W_OK) else False,
+            'export/csv': True if os.access(export_path.joinpath('csv'), os.W_OK) else False}
     table = Table(['username', 'group', 'email', 'newsletter', 'created', 'last login', 'entities'])
     for user in User.get_all():
         count = User.get_created_entities_count(user.id)
-        table.rows.append([
-            link(user),
-            user.group,
-            user.email if is_authorized('manager') or user.settings['show_email'] else '',
-            _('yes') if user.settings['newsletter'] else '',
-            format_date(user.created),
-            format_date(user.login_last_success),
-            format_number(count) if count else ''])
-    return render_template('admin/index.html', writeable_dirs=writeable_dirs, table=table)
+        email = user.email if is_authorized('manager') or user.settings['show_email'] else ''
+        table.rows.append([link(user),
+                           user.group,
+                           email,
+                           _('yes') if user.settings['newsletter'] else '',
+                           format_date(user.created),
+                           format_date(user.login_last_success),
+                           format_number(count) if count else ''])
+    return render_template('admin/index.html',
+                           writeable_dirs=dirs,
+                           disk_space_info=get_disk_space_info(),
+                           file_settings=list(get_form_settings(FileForm()).items()),
+                           table=table)
 
 
 @app.route('/admin/map', methods=['POST', 'GET'])
@@ -159,7 +163,7 @@ def admin_file() -> Union[str, Response]:
             g.cursor.execute('ROLLBACK')
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(url_for('admin_index'))
+        return redirect(url_for('admin_index') + '#tab-files')
     set_form_settings(form)
     return render_template('admin/file.html', form=form)
 

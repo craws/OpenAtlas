@@ -1,7 +1,6 @@
 import datetime
-import math
 import os
-from typing import Any, Dict, Optional, Union
+from typing import Any, Optional, Union
 
 from flask import flash, g, render_template, request, send_from_directory, session, url_for
 from flask_babel import lazy_gettext as _
@@ -105,16 +104,7 @@ def file_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
             convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
             file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
             entity.description])
-    disk_space_values: Dict[str, Any] = {'total': 'N/A', 'free': 'N/A', 'percent': 'N/A'}
-    if os.name == "posix":  # e.g. Windows has no statvfs
-        statvfs = os.statvfs(app.config['UPLOAD_FOLDER_PATH'])
-        disk_space = statvfs.f_frsize * statvfs.f_blocks
-        free_space = statvfs.f_frsize * statvfs.f_bavail  # Available space without reserved blocks
-        disk_space_values = {'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
-                             'free': convert_size(statvfs.f_frsize * statvfs.f_bavail),
-                             'percent': 100 - math.ceil(free_space / (disk_space / 100))}
-
-    return render_template('file/index.html', table=table, disk_space_values=disk_space_values)
+    return render_template('file/index.html', table=table)
 
 
 @app.route('/file/add/<int:id_>/<class_name>', methods=['POST', 'GET'])
