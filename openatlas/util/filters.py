@@ -109,16 +109,19 @@ def nl2br(self: Any, value: str) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_info(self: Any, data: Dict[str, str]) -> str:
+    if isinstance(data, dict):
+        data = data.items()  # Todo: move .items() to loop after refactored display_info
     html = '<div class="data-table">'
-    for key, value in data:
+    for label, value in data:
         if value or value == 0:
-            value = util.uc_first(_('off')) if value is False else value
-            value = util.uc_first(_('on')) if value is True else value
+            if isinstance(value, bool):  # Used in display of settings
+                value = util.uc_first(_('off')) if value is False else value
+                value = util.uc_first(_('on')) if value is True else value
             html += '''
                 <div class="table-row">
-                    <div>{key}</div>
+                    <div>{label}</div>
                     <div class="table-cell">{value}</div>
-                </div>'''.format(key=util.uc_first(key), value=value)
+                </div>'''.format(label=util.uc_first(label), value=value)
     return Markup(html + '</div>')
 
 

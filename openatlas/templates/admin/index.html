@@ -17,7 +17,7 @@
                     {{ 'General'|manual_link }}
                 </div>
                 <div>
-                    {{ general_settings|display_info }}
+                    {{ settings.general|display_info }}
                     {% if 'admin'|is_authorized %}
                         <div class="toolbar">
                             {{ _('edit')|button(url_for('admin_general')) }}
@@ -66,7 +66,7 @@
                     </script>
                 {% endif %}
                 <div>
-                    {{ file_settings|display_info }}
+                    {{ settings.file|display_info }}
                     {% if 'manager'|is_authorized %}
                         <div class="toolbar">
                             {{  _('edit')|button(url_for('admin_file')) }}

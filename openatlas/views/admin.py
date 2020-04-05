@@ -51,9 +51,9 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
     return render_template('admin/index.html',
                            writeable_dirs=dirs,
                            disk_space_info=get_disk_space_info(),
-                           file_settings=list(get_form_settings(FileForm()).items()),
-                           general_settings=list(get_form_settings(GeneralForm()).items()),
-                           table=table)
+                           table=table,
+                           settings={'file': get_form_settings(FileForm()),
+                                     'general': get_form_settings(GeneralForm())})
 
 
 @app.route('/admin/map', methods=['POST', 'GET'])
