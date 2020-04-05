@@ -50,9 +50,10 @@ def crumb(self: Any, crumbs: List[Any]) -> str:
         if not item:
             continue
         elif isinstance(item, list):
-            items.append('<a href="{url}">{label}</a>'.format(
-                url=url_for(item[1]) if len(item) == 2 else url_for(item[1], **item[2]),
-                label=util.truncate(util.uc_first(str(item[0])))))
+            # If there are more arguments than the label add them as URL parameters
+            url = url_for(item[1]) if len(item) == 2 else url_for(item[1], **item[2])
+            label = util.truncate(util.uc_first(str(item[0])))
+            items.append('<a href="{url}">{label}</a>'.format(url=url, label=label))
         elif isinstance(item, Entity) or isinstance(item, Project) or isinstance(item, User):
             items.append(util.link(item))
         else:
