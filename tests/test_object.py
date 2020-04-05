@@ -9,7 +9,6 @@ class ObjectTest(TestBaseCase):
 
     def test_object(self) -> None:
         with app.app_context():  # type: ignore
-            self.login()
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 source = Entity.insert('E33', 'Necronomicon')

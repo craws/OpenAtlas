@@ -2,7 +2,6 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from openatlas.models.link import Link
 from tests.base import TestBaseCase
 
 
@@ -10,7 +9,6 @@ class ApiTests(TestBaseCase):
 
     def test_api(self) -> None:
         with app.app_context():  # type: ignore
-            self.login()
             rv = self.app.post(url_for('place_insert'),
                                data={'name': 'Nostromos',
                                      'description': 'In space, no one can hears you scream'})

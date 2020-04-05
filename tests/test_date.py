@@ -8,8 +8,6 @@ class DateTest(TestBaseCase):
 
     def test_date(self) -> None:
         with app.app_context():  # type: ignore
-            self.login()
-
             # Dates insert (don't change year values - they test leap years too)
             data = {'name': 'Date place',
                     'begin_year_from': -1949, 'begin_month_from': 2, 'begin_day_from': 8,

@@ -8,10 +8,7 @@ from tests.base import TestBaseCase
 class ReferenceTest(TestBaseCase):
 
     def test_reference(self) -> None:
-
         with app.app_context():  # type: ignore
-            self.login()
-
             # Reference insert
             rv = self.app.get(url_for('reference_insert', code='bibliography'))
             assert b'+ Bibliography' in rv.data

@@ -8,7 +8,6 @@ from tests.base import TestBaseCase
 class SearchTest(TestBaseCase):
 
     def test_search(self) -> None:
-        self.login()
         with app.test_request_context():
             app.preprocess_request()  # type: ignore
             person = Entity.insert('E21', 'Waldo')

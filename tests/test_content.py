@@ -8,7 +8,6 @@ class ContentTests(TestBaseCase):
 
     def test_content(self) -> None:
         with app.app_context():  # type: ignore
-            self.login()
             rv = self.app.get(url_for('content_view', item='legal_notice'))
             assert b'Edit' in rv.data
             rv = self.app.get(url_for('content_update', item='legal_notice'))

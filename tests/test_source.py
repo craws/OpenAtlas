@@ -9,8 +9,6 @@ class SourceTest(TestBaseCase):
 
     def test_source(self) -> None:
         with app.app_context():  # type: ignore
-            self.login()
-
             # Source insert
             rv = self.app.get(url_for('source_insert'))
             assert b'+ Source' in rv.data

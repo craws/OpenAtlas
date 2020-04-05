@@ -158,7 +158,7 @@ def display_remove_link(url: str, name: str) -> str:
 
 
 def get_disk_space_info() -> Optional[Dict[str, Any]]:
-    if os.name != "posix":  # cover: ignore - e.g. Windows has no statvfs
+    if os.name != "posix":  # pragma: no cover - e.g. Windows has no statvfs
         return None
     statvfs = os.statvfs(app.config['UPLOAD_FOLDER_PATH'])
     disk_space = statvfs.f_frsize * statvfs.f_blocks

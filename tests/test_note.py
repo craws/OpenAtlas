@@ -9,7 +9,6 @@ class NoteTest(TestBaseCase):
 
     def test_note(self) -> None:
         with app.app_context():  # type: ignore
-            self.login()
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 actor = Entity.insert('E21', 'Ripley')

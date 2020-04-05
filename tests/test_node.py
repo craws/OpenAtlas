@@ -9,7 +9,6 @@ class NodeTest(TestBaseCase):
 
     def test_node(self) -> None:
         with app.app_context():  # type: ignore
-            self.login()
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 actor_node = Node.get_hierarchy('Actor Actor Relation')

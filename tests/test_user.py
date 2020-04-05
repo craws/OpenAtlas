@@ -28,13 +28,6 @@ class UserTests(TestBaseCase):
                  'continue_': 'yes',
                  'send_info': ''}
         with app.app_context():  # type: ignore
-            rv = self.app.get(url_for('user_insert'), follow_redirects=True)
-            assert b'Password' in rv.data
-            self.app.post('/login', data={'username': 'Editor', 'password': 'test'})
-            rv = self.app.get(url_for('user_insert'), follow_redirects=True)
-            assert b'403 - Forbidden' in rv.data
-            self.app.get(url_for('logout'), follow_redirects=True)
-            self.login()
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 logged_in_user = User.get_by_username('Alice')
@@ -73,3 +66,11 @@ class UserTests(TestBaseCase):
             data = {'limit': 'all', 'action': 'all', 'user': 'all'}
             rv = self.app.post(url_for('user_activity', data=data))
             assert b'Activity' in rv.data
+
+            # Test missing permission
+            self.app.get(url_for('logout'), follow_redirects=True)
+            rv = self.app.get(url_for('user_insert'), follow_redirects=True)
+            assert b'Forgot your password?' not in rv.data
+            self.app.post('/login', data={'username': 'Editor', 'password': 'test'})
+            rv = self.app.get(url_for('user_insert'), follow_redirects=True)
+            assert b'403 - Forbidden' in rv.data

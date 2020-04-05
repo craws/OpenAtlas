@@ -10,7 +10,6 @@ class ActorTests(TestBaseCase):
 
     def test_actor(self) -> None:
         with app.app_context():  # type: ignore
-            self.login()
             rv = self.app.get(url_for('actor_index'))
             assert b'No entries' in rv.data
 

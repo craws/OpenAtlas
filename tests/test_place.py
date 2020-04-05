@@ -12,7 +12,6 @@ class PlaceTest(TestBaseCase):
 
     def test_place(self) -> None:
         with app.app_context():  # type: ignore
-            self.login()
             rv = self.app.get(url_for('place_insert'))
             assert b'+ Place' in rv.data
             with app.test_request_context():

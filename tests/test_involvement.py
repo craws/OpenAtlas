@@ -11,7 +11,6 @@ class InvolvementTests(TestBaseCase):
 
     def test_involvement(self) -> None:
         with app.app_context():  # type: ignore
-            self.login()
             rv = self.app.post(url_for('event_insert', code='E8'),
                                data={'name': 'Event Horizon',
                                      'begin_year_from': '949', 'begin_month_from': '10',

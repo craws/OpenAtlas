@@ -11,7 +11,6 @@ class ModelTests(TestBaseCase):
 
     def test_model(self) -> None:
         with app.app_context():  # type: ignore
-            self.login()
             rv = self.app.get(url_for('model_index'))
             assert b'Browse' in rv.data
             rv = self.app.get(url_for('class_index'))

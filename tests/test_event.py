@@ -9,8 +9,6 @@ class EventTest(TestBaseCase):
 
     def test_event(self) -> None:
         with app.app_context():  # type: ignore
-            self.login()
-
             # Create entities for event
             rv = self.app.post(url_for('place_insert'), data={'name': 'My house'})
             residence_id = rv.location.split('/')[-1]

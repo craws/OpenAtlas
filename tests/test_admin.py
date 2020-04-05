@@ -11,7 +11,6 @@ class ContentTests(TestBaseCase):
 
     def test_content_and_newsletter(self) -> None:
         with app.app_context():  # type: ignore
-            self.login()
             self.app.post(url_for('actor_insert', code='E21'), data={'name': 'Oliver Twist'})
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
@@ -27,7 +26,6 @@ class ContentTests(TestBaseCase):
             assert b'Newsletter' in rv.data
 
     def test_logs(self) -> None:
-        self.login()
         with app.app_context():  # type: ignore
             rv = self.app.get(url_for('admin_log'))
             assert b'Login' in rv.data
@@ -35,13 +33,11 @@ class ContentTests(TestBaseCase):
             assert b'Login' not in rv.data
 
     def test_links(self) -> None:
-        self.login()
         with app.app_context():  # type: ignore
             rv = self.app.get(url_for('admin_check_links', check='check'))
             assert b'Invalid linked entity' in rv.data
 
     def test_dates(self) -> None:
-        self.login()
         with app.app_context():  # type: ignore
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
@@ -61,25 +57,8 @@ class ContentTests(TestBaseCase):
             assert b'Invalid link dates <span class="tab-counter">1' in rv.data
             assert b'Invalid involvement dates <span class="tab-counter">1' in rv.data
 
-    def test_admin(self) -> None:
+    def test_duplicates(self) -> None:
         with app.app_context():  # type: ignore
-            self.login()
-            rv = self.app.get(url_for('admin_mail'))
-            assert b'Mail from' in rv.data
-            rv = self.app.get(url_for('admin_index'))
-            assert b'User' in rv.data
-            rv = self.app.get(url_for('admin_general'))
-            assert b'Edit' in rv.data
-            rv = self.app.get(url_for('admin_general_update'))
-            assert b'Save' in rv.data
-            rv = self.app.get(url_for('admin_map'))
-            assert b'MaxClusterRadius' in rv.data
-            rv = self.app.post(url_for('admin_map'), follow_redirects=True, data={
-                'map_cluster_max_radius': 2,
-                'map_cluster_disable_at_zoom': 5})
-            assert b'Changes have been saved.' in rv.data
-
-            # Check link duplicates and multi use of single nodes
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 event = Entity.insert('E8', 'Event Horizon')
@@ -98,7 +77,8 @@ class ContentTests(TestBaseCase):
                                       node_id=source_node.subs[0]), follow_redirects=True)
             assert b'Congratulations, everything looks fine!' in rv.data
 
-            # Check similar names
+    def test_similar(self) -> None:
+        with app.app_context():  # type: ignore
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
                 Entity.insert('E21', 'I have the same name!')
@@ -109,6 +89,23 @@ class ContentTests(TestBaseCase):
             rv = self.app.post(url_for('admin_check_similar'), follow_redirects=True,
                                data={'classes': 'file', 'ratio': 100})
             assert b'No entries' in rv.data
+
+    def test_settings(self) -> None:
+        with app.app_context():  # type: ignore
+            rv = self.app.get(url_for('admin_index'))
+            assert b'User' in rv.data
+
+            # Map
+            rv = self.app.get(url_for('admin_map'))
+            assert b'MaxClusterRadius' in rv.data
+            rv = self.app.post(url_for('admin_map'), follow_redirects=True, data={
+                'map_cluster_max_radius': 2,
+                'map_cluster_disable_at_zoom': 5})
+            assert b'Changes have been saved.' in rv.data
+
+            # General
+            rv = self.app.get(url_for('admin_general'))
+            assert b'Save' in rv.data
             data = {'default_language': 'en',
                     'default_table_rows': '10',
                     'failed_login_forget_minutes': '10',
@@ -119,8 +116,12 @@ class ContentTests(TestBaseCase):
                     'log_level': '0',
                     'site_name': 'Nostromo',
                     'minimum_jstree_search': 3}
-            rv = self.app.post(url_for('admin_general_update'), data=data, follow_redirects=True)
+            rv = self.app.post(url_for('admin_general'), data=data, follow_redirects=True)
             assert b'Nostromo' in rv.data
+
+            # Mail
+            rv = self.app.get(url_for('admin_mail'))
+            assert b'Mail from' in rv.data
             rv = self.app.get(url_for('admin_mail_update'))
             assert b'Mail transport port' in rv.data
             data = {'mail': True,
@@ -132,13 +133,17 @@ class ContentTests(TestBaseCase):
                     'mail_recipients_feedback': 'headroom@example.com'}
             rv = self.app.post(url_for('admin_mail_update'), data=data, follow_redirects=True)
             assert b'Max Headroom' in rv.data
+
+            # File
             rv = self.app.get(url_for('admin_file'))
             assert b'jpg' in rv.data
             rv = self.app.post(url_for('admin_file'),
                                data={'file_upload_max_size': 20, 'profile_image_width': 20},
                                follow_redirects=True)
             assert b'Changes have been saved.' in rv.data
-            rv = self.app.get(url_for('admin_api'), )
+
+            # API
+            rv = self.app.get(url_for('admin_api'))
             assert b'public' in rv.data
             rv = self.app.post(url_for('admin_api'), data={'public': True}, follow_redirects=True)
             assert b'Changes have been saved' in rv.data
