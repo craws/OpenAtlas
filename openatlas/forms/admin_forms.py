@@ -10,23 +10,23 @@ from openatlas.util.util import (uc_first)
 
 
 class GeneralForm(FlaskForm):  # type: ignore
-    site_name = StringField(uc_first(_('site name')))
-    default_language = SelectField(uc_first(_('default language')),
+    site_name = StringField(_('site name'))
+    default_language = SelectField(_('default language'),
                                    choices=list(app.config['LANGUAGES'].items()))
-    default_table_rows = SelectField(uc_first(_('default table rows')),
+    default_table_rows = SelectField(_('default table rows'),
                                      coerce=int,
                                      choices=list(app.config['DEFAULT_TABLE_ROWS'].items()))
-    log_level = SelectField(uc_first(_('log level')),
+    log_level = SelectField(_('log level'),
                             coerce=int,
                             choices=list(app.config['LOG_LEVELS'].items()))
-    debug_mode = BooleanField(uc_first(_('debug mode')))
-    random_password_length = IntegerField(uc_first(_('random password length')))
-    minimum_password_length = IntegerField(uc_first(_('minimum password length')))
-    reset_confirm_hours = IntegerField(uc_first(_('reset confirm hours')))
-    failed_login_tries = IntegerField(uc_first(_('failed login tries')))
-    failed_login_forget_minutes = IntegerField(uc_first(_('failed login forget minutes')))
-    minimum_jstree_search = IntegerField(uc_first(_('minimum jstree search')))
-    save = SubmitField(uc_first(_('save')))
+    debug_mode = BooleanField(_('debug mode'))
+    random_password_length = IntegerField(_('random password length'))
+    minimum_password_length = IntegerField(_('minimum password length'))
+    reset_confirm_hours = IntegerField(_('reset confirm hours'))
+    failed_login_tries = IntegerField(_('failed login tries'))
+    failed_login_forget_minutes = IntegerField(_('failed login forget minutes'))
+    minimum_jstree_search = IntegerField(_('minimum jstree search'))
+    save = SubmitField(_('save'))
 
 
 class TestMailForm(FlaskForm):  # type: ignore

@@ -1,19 +1,14 @@
 {% extends "layout.html" %}
 {% block title_name %} - {{ _('admin')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'], _('general')]|crumb }}
+    {{ [[_('admin'), 'admin_index'], _('edit')]|crumb }}
 {% endblock %}
 {% block content %}
     <div class="toolbar">
         {{ 'General'|manual_link }}
-        {{ _('edit')|button(url_for('admin_general_update')) }}
     </div>
-    <div class="data-table">
-        {% for name, value in general_settings.items() %}
-            <div>
-                <div>{{ name|uc_first }}</div>
-                <div>{{ value }}</div>
-            </div>
-        {% endfor %}
-    </div>
+    {{ form|display_form }}
+    {% for field, errors in form.errors.items() %}
+        {{ form[field].label }}: {{ ', '.join(errors) }}
+    {% endfor %}
 {% endblock %}

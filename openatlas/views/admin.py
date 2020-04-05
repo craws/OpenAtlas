@@ -52,6 +52,7 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
                            writeable_dirs=dirs,
                            disk_space_info=get_disk_space_info(),
                            file_settings=list(get_form_settings(FileForm()).items()),
+                           general_settings=list(get_form_settings(GeneralForm()).items()),
                            table=table)
 
 
@@ -416,13 +417,7 @@ def admin_mail() -> str:
 
 @app.route('/admin/general', methods=["GET", "POST"])
 @required_group('admin')
-def admin_general() -> str:
-    return render_template('admin/general.html', general_settings=get_form_settings(GeneralForm()))
-
-
-@app.route('/admin/general/update', methods=["GET", "POST"])
-@required_group('admin')
-def admin_general_update() -> Union[str, Response]:
+def admin_general() -> Union[str, Response]:
     form = GeneralForm()
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
@@ -435,9 +430,9 @@ def admin_general_update() -> Union[str, Response]:
             g.cursor.execute('ROLLBACK')
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(url_for('admin_general'))
+        return redirect(url_for('admin_index') + '#tab-general')
     set_form_settings(form)
-    return render_template('admin/general_update.html', form=form, settings=session['settings'])
+    return render_template('admin/general.html', form=form, settings=session['settings'])
 
 
 @app.route('/admin/mail/update', methods=["GET", "POST"])
