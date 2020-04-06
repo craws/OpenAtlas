@@ -10,6 +10,9 @@
             <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" aria-selected="true" href="#tab-general">{{ _('general')|uc_first }}</a></li>
             <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-user">{{ _('user')|uc_first }}</a></li>
             <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-files">{{ _('files')|uc_first }}</a></li>
+            {% if 'admin'|is_authorized %}
+                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-mail">{{ _('email')|uc_first }}</a></li>
+            {% endif  %}
         </ul>
         <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade show active" role="tabpanel" id="tab-general">
@@ -20,7 +23,7 @@
                     {% endif  %}
                 </div>
                 <div>
-                    {{ settings.general|display_info }}
+                    {{ info.general|display_info }}
                 </div>
                 {% if disk_space_info %}
                     <div id="disk-size"></div>
@@ -67,18 +70,32 @@
                     {% endif %}
                 {% endfor %}
                 <div>
-                    {{ settings.file|display_info }}
+                    {{ info.file|display_info }}
                 </div>
             </div>
+            {% if 'admin'|is_authorized %}
+                <div class="tab-pane fade" role="tabpanel" id="tab-mail">
+                    <div class="toolbar">
+                        {{ 'Mail'|manual_link }}
+                        {{ _('edit settings')|button(url_for('admin_mail')) }}
+                    </div>
+                    <div>
+                        {{ info.mail|display_info }}
+                    </div>
+                    {% if settings['mail'] %}
+                        {{ form|display_form }}
+                    {% endif %}
+                </div>
+            {% endif  %}
         </div>
     </div>
 </div>
 
 
     <div id="admin_index" style="margin-top:2em;">
-        {% if 'admin'|is_authorized %}
-            <a href="{{ url_for('admin_mail') }}">{{ _('mail')|uc_first }}</a>
-        {% endif  %}
+
+
+
         {% if 'manager'|is_authorized %}
             <a href="{{ url_for('admin_map') }}">{{ _('map')|uc_first }}</a>
             <a href="{{ url_for('content_index') }}">{{ _('content')|uc_first }}</a>

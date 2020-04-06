@@ -35,14 +35,14 @@ class TestMailForm(FlaskForm):  # type: ignore
 
 
 class MailForm(FlaskForm):  # type: ignore
-    mail = BooleanField(uc_first(_('mail')))
-    mail_transport_username = StringField(uc_first(_('mail transport username')))
-    mail_transport_host = StringField(uc_first(_('mail transport host')))
-    mail_transport_port = StringField(uc_first(_('mail transport port')))
-    mail_from_email = StringField(uc_first(_('mail from email')), [Email()])
-    mail_from_name = StringField(uc_first(_('mail from name')))
-    mail_recipients_feedback = StringField(uc_first(_('mail recipients feedback')))
-    save = SubmitField(uc_first(_('save')))
+    mail = BooleanField(_('mail'))
+    mail_transport_username = StringField(_('mail transport username'))
+    mail_transport_host = StringField(_('mail transport host'))
+    mail_transport_port = StringField(_('mail transport port'))
+    mail_from_email = StringField(_('mail from email'), [Email()])
+    mail_from_name = StringField(_('mail from name'))
+    mail_recipients_feedback = StringField(_('mail recipients feedback'))
+    save = SubmitField(_('save'))
 
 
 class NewsLetterForm(FlaskForm):  # type: ignore

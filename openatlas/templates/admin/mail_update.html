@@ -1,8 +1,0 @@
-{% extends "layout.html" %}
-{% block title_name %} - {{ _('admin')|uc_first }}{% endblock %}
-{% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'], [_('mail'), 'admin_mail'], _('edit')]|crumb }}
-{% endblock %}
-{% block content %}
-    {{ form|display_form }}
-{% endblock %}

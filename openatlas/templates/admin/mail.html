@@ -4,20 +4,5 @@
     {{ [[_('admin'), 'admin_index'], _('mail')]|crumb }}
 {% endblock %}
 {% block content %}
-    <div class="toolbar">
-        {{ 'Mail'|manual_link }}
-        {{ _('edit')|button(url_for('admin_mail_update')) }}
-    </div>
-    <div class="data-table">
-        {% for name, value in mail_settings.items() %}
-            {% set style = 'class ="faded"' if not settings['mail'] else '' %}
-            <div {{ style|safe }}>
-                <div>{{ name|uc_first }}</div>
-                <div>{{ value }}</div>
-            </div>
-        {% endfor %}
-    </div>
-    {% if settings['mail'] %}
-        {{ form|display_form }}
-    {% endif %}
+    {{ form|display_form }}
 {% endblock %}

@@ -73,8 +73,10 @@ class ContentTests(TestBaseCase):
             rv = self.app.get(url_for('admin_check_link_duplicates', delete='delete'),
                               follow_redirects=True)
             assert b'Remove' in rv.data
-            rv = self.app.get(url_for('admin_delete_single_type_duplicate', entity_id=source.id,
-                                      node_id=source_node.subs[0]), follow_redirects=True)
+            rv = self.app.get(url_for('admin_delete_single_type_duplicate',
+                                      entity_id=source.id,
+                                      node_id=source_node.subs[0]),
+                              follow_redirects=True)
             assert b'Congratulations, everything looks fine!' in rv.data
 
     def test_similar(self) -> None:
@@ -83,10 +85,12 @@ class ContentTests(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 Entity.insert('E21', 'I have the same name!')
                 Entity.insert('E21', 'I have the same name!')
-            rv = self.app.post(url_for('admin_check_similar'), follow_redirects=True,
+            rv = self.app.post(url_for('admin_check_similar'),
+                               follow_redirects=True,
                                data={'classes': 'actor', 'ratio': 100})
             assert b'I have the same name!' in rv.data
-            rv = self.app.post(url_for('admin_check_similar'), follow_redirects=True,
+            rv = self.app.post(url_for('admin_check_similar'),
+                               follow_redirects=True,
                                data={'classes': 'file', 'ratio': 100})
             assert b'No entries' in rv.data
 
@@ -98,9 +102,9 @@ class ContentTests(TestBaseCase):
             # Map
             rv = self.app.get(url_for('admin_map'))
             assert b'MaxClusterRadius' in rv.data
-            rv = self.app.post(url_for('admin_map'), follow_redirects=True, data={
-                'map_cluster_max_radius': 2,
-                'map_cluster_disable_at_zoom': 5})
+            rv = self.app.post(url_for('admin_map'),
+                               follow_redirects=True,
+                               data={'map_cluster_max_radius': 2, 'map_cluster_disable_at_zoom': 5})
             assert b'Changes have been saved.' in rv.data
 
             # General
@@ -121,9 +125,7 @@ class ContentTests(TestBaseCase):
 
             # Mail
             rv = self.app.get(url_for('admin_mail'))
-            assert b'Mail from' in rv.data
-            rv = self.app.get(url_for('admin_mail_update'))
-            assert b'Mail transport port' in rv.data
+            assert b'Recipients feedback' in rv.data
             data = {'mail': True,
                     'mail_transport_username': 'whatever',
                     'mail_transport_host': 'localhost',
@@ -131,7 +133,7 @@ class ContentTests(TestBaseCase):
                     'mail_from_email': 'max@example.com',
                     'mail_from_name': 'Max Headroom',
                     'mail_recipients_feedback': 'headroom@example.com'}
-            rv = self.app.post(url_for('admin_mail_update'), data=data, follow_redirects=True)
+            rv = self.app.post(url_for('admin_mail'), data=data, follow_redirects=True)
             assert b'Max Headroom' in rv.data
 
             # File

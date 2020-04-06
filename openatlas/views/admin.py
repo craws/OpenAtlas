@@ -26,7 +26,7 @@ from openatlas.util.util import (convert_size, format_date, format_datetime, get
                                  uc_first)
 
 
-@app.route('/admin')
+@app.route('/admin', methods=["GET", "POST"])
 @app.route('/admin/user/<action>/<int:id_>')
 @required_group('readonly')
 def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
@@ -48,12 +48,26 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
                            format_date(user.created),
                            format_date(user.login_last_success),
                            format_number(count) if count else ''])
+    form = None
+    if is_authorized('admin'):
+        form = TestMailForm()
+        if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
+            subject = _('Test mail from %(site_name)s', site_name=session['settings']['site_name'])
+            body = _('This test mail was sent by %(username)s', username=current_user.username)
+            body += ' ' + _('at') + ' ' + request.headers['Host']
+            if send_mail(subject, body, form.receiver.data):
+                flash(_('A test mail was sent to %(email)s.', email=form.receiver.data), 'info')
+        else:
+            form.receiver.data = current_user.email
     return render_template('admin/index.html',
                            writeable_dirs=dirs,
+                           form=form,
                            disk_space_info=get_disk_space_info(),
                            table=table,
-                           settings={'file': get_form_settings(FileForm()),
-                                     'general': get_form_settings(GeneralForm())})
+                           settings=session['settings'],
+                           info={'file': get_form_settings(FileForm()),
+                                 'general': get_form_settings(GeneralForm()),
+                                 'mail': get_form_settings(MailForm())})
 
 
 @app.route('/admin/map', methods=['POST', 'GET'])
@@ -396,25 +410,6 @@ def admin_newsletter() -> Union[str, Response]:
     return render_template('admin/newsletter.html', form=form, table=table)
 
 
-@app.route('/admin/mail', methods=["GET", "POST"])
-@required_group('admin')
-def admin_mail() -> str:
-    form = TestMailForm()
-    settings = session['settings']
-    if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
-        subject = _('Test mail from %(site_name)s', site_name=session['settings']['site_name'])
-        body = _('This test mail was sent by %(username)s', username=current_user.username)
-        body += ' ' + _('at') + ' ' + request.headers['Host']
-        if send_mail(subject, body, form.receiver.data):
-            flash(_('A test mail was sent to %(email)s.', email=form.receiver.data), 'info')
-    else:
-        form.receiver.data = current_user.email
-    return render_template('admin/mail.html',
-                           settings=settings,
-                           mail_settings=get_form_settings(MailForm()),
-                           form=form)
-
-
 @app.route('/admin/general', methods=["GET", "POST"])
 @required_group('admin')
 def admin_general() -> Union[str, Response]:
@@ -432,12 +427,12 @@ def admin_general() -> Union[str, Response]:
             flash(_('error transaction'), 'error')
         return redirect(url_for('admin_index') + '#tab-general')
     set_form_settings(form)
-    return render_template('admin/general.html', form=form, settings=session['settings'])
+    return render_template('admin/general.html', form=form)
 
 
-@app.route('/admin/mail/update', methods=["GET", "POST"])
+@app.route('/admin/mail', methods=["GET", "POST"])
 @required_group('admin')
-def admin_mail_update() -> Union[str, Response]:
+def admin_mail() -> Union[str, Response]:
     form = MailForm()
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
@@ -450,6 +445,6 @@ def admin_mail_update() -> Union[str, Response]:
             g.cursor.execute('ROLLBACK')
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(url_for('admin_mail'))
+        return redirect(url_for('admin_index') + '#tab-mail')
     set_form_settings(form)
-    return render_template('admin/mail_update.html', form=form, settings=session['settings'])
+    return render_template('admin/mail.html', form=form)
