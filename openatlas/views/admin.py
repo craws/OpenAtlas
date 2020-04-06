@@ -60,14 +60,15 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
         else:
             form.receiver.data = current_user.email
     return render_template('admin/index.html',
-                           writeable_dirs=dirs,
                            form=form,
-                           disk_space_info=get_disk_space_info(),
                            table=table,
                            settings=session['settings'],
+                           writeable_dirs=dirs,
+                           disk_space_info=get_disk_space_info(),
                            info={'file': get_form_settings(FileForm()),
                                  'general': get_form_settings(GeneralForm()),
-                                 'mail': get_form_settings(MailForm())})
+                                 'mail': get_form_settings(MailForm()),
+                                 'map': get_form_settings(MapForm())})
 
 
 @app.route('/admin/map', methods=['POST', 'GET'])
@@ -85,7 +86,7 @@ def admin_map() -> Union[str, Response]:
             g.cursor.execute('ROLLBACK')
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(url_for('admin_index'))
+        return redirect(url_for('admin_index') + '#tab-map')
     set_form_settings(form)
     return render_template('admin/map.html', form=form)
 

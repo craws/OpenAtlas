@@ -46,8 +46,9 @@ class MailForm(FlaskForm):  # type: ignore
 
 
 class NewsLetterForm(FlaskForm):  # type: ignore
-    subject = StringField('', [InputRequired()], render_kw={'placeholder': _('subject'),
-                                                            'autofocus': True})
+    subject = StringField('',
+                          [InputRequired()],
+                          render_kw={'placeholder': _('subject'), 'autofocus': True})
     body = TextAreaField('', [InputRequired()], render_kw={'placeholder': _('content')})
     send = SubmitField(uc_first(_('send')))
 
@@ -62,8 +63,8 @@ class LogForm(FlaskForm):  # type: ignore
 
 
 class MapForm(FlaskForm):  # type: ignore
-    map_cluster_max_radius = IntegerField('maxClusterRadius')
-    map_cluster_disable_at_zoom = IntegerField('disableClusteringAtZoom')
+    map_cluster_max_radius = IntegerField(_('max cluster radius'))
+    map_cluster_disable_at_zoom = IntegerField(_('disable clustering at zoom'))
     save = SubmitField(uc_first(_('save')))
 
 
