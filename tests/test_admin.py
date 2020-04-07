@@ -149,3 +149,15 @@ class ContentTests(TestBaseCase):
             assert b'public' in rv.data
             rv = self.app.post(url_for('admin_api'), data={'public': True}, follow_redirects=True)
             assert b'Changes have been saved' in rv.data
+
+            # Content
+            rv = self.app.get(url_for('admin_content', item='legal_notice'))
+            assert b'Save' in rv.data
+            data = {'en': 'Legal notice', 'de': 'Impressum'}
+            rv = self.app.post(url_for('admin_content', item='legal_notice'),
+                               data=data,
+                               follow_redirects=True)
+            assert b'Legal notice' in rv.data
+            self.app.get('/index/setlocale/de')
+            rv = self.app.get('/', follow_redirects=True)
+            assert b'Impressum' in rv.data

@@ -9,6 +9,10 @@ from openatlas.forms.forms import TableField
 from openatlas.util.util import (uc_first)
 
 
+class ContentForm(FlaskForm):  # type: ignore
+    pass
+
+
 class GeneralForm(FlaskForm):  # type: ignore
     site_name = StringField(_('site name'))
     default_language = SelectField(_('default language'),

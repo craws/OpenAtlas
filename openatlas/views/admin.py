@@ -8,12 +8,14 @@ from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
+from wtforms import TextAreaField
 
 from openatlas import app, logger
-from openatlas.forms.admin_forms import (ApiForm, FileForm, GeneralForm, LogForm, LogoForm,
-                                         MailForm, MapForm, NewsLetterForm, SimilarForm,
+from openatlas.forms.admin_forms import (ApiForm, ContentForm, FileForm, GeneralForm, LogForm,
+                                         LogoForm, MailForm, MapForm, NewsLetterForm, SimilarForm,
                                          TestMailForm)
 from openatlas.forms.forms import get_form_settings, set_form_settings
+from openatlas.models.content import Content
 from openatlas.models.date import Date
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -22,8 +24,8 @@ from openatlas.models.settings import Settings
 from openatlas.models.user import User
 from openatlas.util.table import Table
 from openatlas.util.util import (convert_size, format_date, format_datetime, get_disk_space_info,
-                                 get_file_path, is_authorized, link, required_group, send_mail,
-                                 uc_first)
+                                 get_file_path, is_authorized, link, required_group, sanitize,
+                                 send_mail, uc_first)
 
 
 @app.route('/admin', methods=["GET", "POST"])
@@ -37,17 +39,29 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
     dirs = {'uploads': True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False,
             'export/sql': True if os.access(export_path.joinpath('sql'), os.W_OK) else False,
             'export/csv': True if os.access(export_path.joinpath('csv'), os.W_OK) else False}
-    table = Table(['username', 'group', 'email', 'newsletter', 'created', 'last login', 'entities'])
+    tables = {'user': Table(['username', 'group', 'email', 'newsletter', 'created', 'last login',
+                             'entities']),
+              'content': Table(['name'] + [language for language in app.config['LANGUAGES'].keys()]
+                               + ['text'])}
     for user in User.get_all():
         count = User.get_created_entities_count(user.id)
         email = user.email if is_authorized('manager') or user.settings['show_email'] else ''
-        table.rows.append([link(user),
-                           user.group,
-                           email,
-                           _('yes') if user.settings['newsletter'] else '',
-                           format_date(user.created),
-                           format_date(user.login_last_success),
-                           format_number(count) if count else ''])
+        tables['user'].rows.append([link(user),
+                                    user.group,
+                                    email,
+                                    _('yes') if user.settings['newsletter'] else '',
+                                    format_date(user.created),
+                                    format_date(user.login_last_success),
+                                    format_number(count) if count else ''])
+    for item, languages in Content.get_content().items():
+        content = [uc_first(_(item))]
+        html_ok = '<img src="/static/images/icons/dialog-apply.png" alt="ok">'
+        for language in app.config['LANGUAGES'].keys():
+            content.append(html_ok if languages[language] else '')
+        content.append(sanitize(languages[session['language']], 'description'))
+        content.append('<a href="' + url_for('admin_content', item=item) + '">' +
+                       uc_first(_('edit')) + '</a>')
+        tables['content'].rows.append(content)
     form = None
     if is_authorized('admin'):
         form = TestMailForm()
@@ -61,7 +75,7 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
             form.receiver.data = current_user.email
     return render_template('admin/index.html',
                            form=form,
-                           table=table,
+                           tables=tables,
                            settings=session['settings'],
                            writeable_dirs=dirs,
                            disk_space_info=get_disk_space_info(),
@@ -69,6 +83,23 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
                                  'general': get_form_settings(GeneralForm()),
                                  'mail': get_form_settings(MailForm()),
                                  'map': get_form_settings(MapForm())})
+
+
+@app.route('/admin/content/<string:item>', methods=["GET", "POST"])
+@required_group('manager')
+def admin_content(item: str) -> Union[str, Response]:
+    languages = app.config['LANGUAGES'].keys()
+    for language in languages:
+        setattr(ContentForm, language, TextAreaField())
+    form = ContentForm()
+    if form.validate_on_submit():
+        Content.update_content(item, form)
+        flash(_('info update'), 'info')
+        return redirect(url_for('admin_index'))
+    content = Content.get_content()
+    for language in languages:
+        form.__getattribute__(language).data = content[item][language]
+    return render_template('admin/content.html', item=item, form=form, languages=languages)
 
 
 @app.route('/admin/map', methods=['POST', 'GET'])

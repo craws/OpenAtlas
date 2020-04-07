@@ -38,10 +38,10 @@ from openatlas.models.logger import Logger
 logger = Logger()
 
 from openatlas.util import filters
-from openatlas.views import (actor, admin, ajax, content, event, export, hierarchy, index,
-                             involvement, imports, link, login, types, model, place, profile, note,
-                             overlay, reference, source, translation, user, relation, member,
-                             search, file, api, object, sql, entity)
+from openatlas.views import (actor, admin, ajax, api, entity, event, export, file, hierarchy, index,
+                             involvement, imports, link, login, member, model, note, object,
+                             overlay, place, profile, reference, relation, search, source, sql,
+                             translation, types, user)
 
 
 @babel.localeselector

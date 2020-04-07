@@ -1,10 +1,7 @@
 {% extends "layout.html" %}
 {% block title_name %} - {{ _('content')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'],
-        [_('content'), 'content_index'],
-        [_(item), 'content_view', {'item': item}],
-        _('edit')]|crumb }}
+    {{ [[_('admin'), 'admin_index'], _(item)]|crumb }}
 {% endblock %}
 {% block content %}
     <form method="post">
