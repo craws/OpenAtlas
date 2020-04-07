@@ -6,13 +6,6 @@
 {% block content %}
     <div class="toolbar">
         {{ 'Logo'|manual_link }}
-        {% if not form %}
-            {{ _('remove logo')|button(url_for('admin_logo', action='remove')) }}
-        {% endif %}
     </div>
-    {% if form %}
-        {{ form|display_form }}
-    {% else %}
-        <img alt="logo" src="{{ url_for('display_file', filename=filename) }}">
-    {% endif %}
+    {{ table.display()|safe }}
 {% endblock %}

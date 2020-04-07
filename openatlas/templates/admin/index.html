@@ -17,7 +17,6 @@
             {% if 'admin'|is_authorized %}
                 <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-mail">{{ _('email')|uc_first }}</a></li>
             {% endif  %}
-
         </ul>
         <div class="tab-content" id="myTabContent">
             <div class="tab-pane fade show active" role="tabpanel" id="tab-general">
@@ -26,10 +25,18 @@
                     {% if 'admin'|is_authorized %}
                         {{ _('edit settings')|button(url_for('admin_general')) }}
                     {% endif  %}
+                    {% if 'manager'|is_authorized: %}
+                        {% if settings['logo_file_id']: %}
+                            {{ _('remove logo')|button(url_for('admin_index', action='remove_logo', id_=0)) }}
+                        {% else %}
+                            {{  _('logo')|button(url_for('admin_logo')) }}
+                        {% endif %}
+                    {% endif %}
                 </div>
-                <div>
+                <div style="float:left">
                     {{ info.general|display_info }}
                 </div>
+                <div style="clear:both;"></div>
                 {% if disk_space_info %}
                     <div id="disk-size"></div>
                     <p>
@@ -117,10 +124,6 @@
 
 
     <div id="admin_index" style="margin-top:2em;">
-
-        {% if 'manager'|is_authorized %}
-            <a href="{{ url_for('admin_logo') }}">{{ _('logo')|uc_first }}</a>
-        {% endif %}
         <h1>{{ _('logs')|uc_first }}</h1>
         {% if 'admin'|is_authorized %}
             <a href="{{ url_for('admin_log') }}">{{ _('system log')|uc_first }}</a>

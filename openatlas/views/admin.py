@@ -6,13 +6,14 @@ from typing import Optional, Union
 from flask import flash, g, render_template, request, session, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
+from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import TextAreaField
 
 from openatlas import app, logger
 from openatlas.forms.admin_forms import (ApiForm, ContentForm, FileForm, GeneralForm, LogForm,
-                                         LogoForm, MailForm, MapForm, NewsLetterForm, SimilarForm,
+                                         MailForm, MapForm, NewsLetterForm, SimilarForm,
                                          TestMailForm)
 from openatlas.forms.forms import get_form_settings, set_form_settings
 from openatlas.models.content import Content
@@ -24,17 +25,21 @@ from openatlas.models.settings import Settings
 from openatlas.models.user import User
 from openatlas.util.table import Table
 from openatlas.util.util import (convert_size, format_date, format_datetime, get_disk_space_info,
-                                 get_file_path, is_authorized, link, required_group, sanitize,
-                                 send_mail, uc_first)
+                                 get_file_path, get_file_stats, is_authorized, link, required_group,
+                                 sanitize, send_mail, uc_first, truncate)
 
 
 @app.route('/admin', methods=["GET", "POST"])
-@app.route('/admin/user/<action>/<int:id_>')
+@app.route('/admin/<action>/<int:id_>')
 @required_group('readonly')
 def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
-    if is_authorized('manager') and id_ and action == 'delete_user':
-        User.delete(id_)
-        flash(_('user deleted'), 'info')
+    if is_authorized('manager'):
+        if id_ and action == 'delete_user':
+            User.delete(id_)
+            flash(_('user deleted'), 'info')
+        elif action == 'remove_logo':
+            Settings.set_logo()
+            return redirect(url_for('admin_index') + '#tab-general')
     export_path = app.config['EXPORT_FOLDER_PATH']
     dirs = {'uploads': True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False,
             'export/sql': True if os.access(export_path.joinpath('sql'), os.W_OK) else False,
@@ -336,22 +341,31 @@ def admin_orphans() -> str:
         return render_template('admin/orphans.html', tables=tables)
 
 
-@app.route('/admin/logo/', methods=['POST', 'GET'])
-@app.route('/admin/logo/<action>')
+@app.route('/admin/logo/')
+@app.route('/admin/logo/<int:id_>')
 @required_group('manager')
-def admin_logo(action: Optional[str] = None) -> Union[str, Response]:
-    if action == 'remove':
-        Settings.set_logo()
-        return redirect(url_for('admin_logo'))
+def admin_logo(id_: int = None) -> Union[str, Response]:
     if session['settings']['logo_file_id']:
-        path = get_file_path(int(session['settings']['logo_file_id']))
-        return render_template('admin/logo.html',
-                               filename=os.path.basename(path) if path else False)
-    form = LogoForm()
-    if form.validate_on_submit():
-        Settings.set_logo(form.file.data)
-        return redirect(url_for('admin_logo'))
-    return render_template('admin/logo.html', form=form)
+        abort(418)  # pragma: no cover - Logo already set
+    if id_:
+        Settings.set_logo(id_)
+        return redirect(url_for('admin_index') + '#tab-general')
+    file_stats = get_file_stats()
+    table = Table([''] + Table.HEADERS['file'] + ['date'])
+    for entity in Entity.get_display_files():
+        date = 'N/A'
+        if entity.id in file_stats:
+            date = format_date(datetime.datetime.utcfromtimestamp(file_stats[entity.id]['date']))
+        table.rows.append([
+            '<a href="{url}">{label}</a>'.format(url=url_for('admin_logo', id_=entity.id),
+                                                 label=uc_first(_('set'))),
+            truncate(entity.name),
+            entity.print_base_type(),
+            convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
+            file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
+            entity.description,
+            date])
+    return render_template('admin/logo.html', table=table)
 
 
 @app.route('/admin/file/delete/<filename>')

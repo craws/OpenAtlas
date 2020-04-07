@@ -5,7 +5,6 @@ from wtforms import (BooleanField, IntegerField, SelectField, StringField, Submi
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app
-from openatlas.forms.forms import TableField
 from openatlas.util.util import (uc_first)
 
 
@@ -88,8 +87,3 @@ class SimilarForm(FlaskForm):  # type: ignore
     classes = SelectField(_('class'), choices=[])
     ratio = IntegerField(default=100)
     apply = SubmitField(_('search'))
-
-
-class LogoForm(FlaskForm):  # type: ignore
-    file = TableField(_('file'), [InputRequired()])
-    save = SubmitField(uc_first(_('change logo')))

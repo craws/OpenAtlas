@@ -292,9 +292,6 @@ class TableSelect(HiddenInput):  # type: ignore
             entities = Entity.get_by_system_type('bibliography') + \
                        Entity.get_by_system_type('edition') + \
                        Entity.get_by_system_type('external reference')
-        elif class_ == 'file':
-            entities = Entity.get_display_files()
-            file_stats = get_file_stats()
         else:
             entities = Entity.get_by_codes(class_)
         table = Table(Table.HEADERS[class_])

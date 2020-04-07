@@ -100,7 +100,9 @@ def file_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
         if entity.id in file_stats:
             date = format_date(datetime.datetime.utcfromtimestamp(file_stats[entity.id]['date']))
         table.rows.append([
-            date, link(entity), entity.print_base_type(),
+            date,
+            link(entity),
+            entity.print_base_type(),
             convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',
             file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A',
             entity.description])

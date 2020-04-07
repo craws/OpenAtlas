@@ -38,14 +38,15 @@ class FileTest(TestBaseCase):
                 file_id2 = files[1].id
 
             # Logo
-            rv = self.app.get(url_for('admin_logo'))
-            assert b'Change logo' in rv.data
-            rv = self.app.post(url_for('admin_logo'), data={'file': file_id}, follow_redirects=True)
-            assert b'Remove logo' in rv.data
+            rv = self.app.get(url_for('admin_logo'), data={'file': file_id}, follow_redirects=True)
+            assert b'OpenAtlas logo' in rv.data
             with self.app.get(url_for('display_logo', filename=str(file_id) + '.png')):
-                pass   # Calling with "with" to prevent unclosed files warning
-            rv = self.app.get(url_for('admin_logo', action='remove'), follow_redirects=True)
-            assert b'Change logo' in rv.data
+                pass   # Test logo display, calling with "with" to prevent unclosed files warning
+            rv = self.app.get(url_for('admin_logo', id_=file_id), follow_redirects=True)
+            assert b'Remove logo' in rv.data
+            rv = self.app.get(url_for('admin_index', action="remove_logo", id_=0),
+                              follow_redirects=True)
+            assert b'Logo' in rv.data
 
             with open(app.config['ROOT_PATH'].joinpath('views', 'index.py'), 'rb') as invalid_file:
                 rv = self.app.post(url_for('file_insert', origin_id=actor.id),
