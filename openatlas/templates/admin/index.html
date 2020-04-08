@@ -7,9 +7,9 @@
 <div class="row">
     <div class="col-6">
         <ul class="nav nav-tabs" role="tablist">
-            <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" aria-selected="true" href="#tab-general">{{ _('general')|uc_first }}</a></li>
-            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-user">{{ _('user')|uc_first }}</a></li>
-            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-files">{{ _('files')|uc_first }}</a></li>
+            <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" aria-selected="true" href="#tab-files">{{ _('files')|uc_first }}</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-user">{{ _('user')|uc_first }} {{ tables.user|format_tab_number }}</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-general">{{ _('general')|uc_first }}</a></li>
             {% if 'contributor'|is_authorized %}
                 <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-data">{{ _('data')|uc_first }}</a></li>
             {% endif %}
@@ -22,25 +22,23 @@
             {% endif  %}
         </ul>
         <div class="tab-content">
-            <div class="tab-pane fade show active" role="tabpanel" id="tab-general">
+            <div class="tab-pane fade show active" role="tabpanel" id="tab-files">
                 <div class="toolbar">
-                    {{ 'General'|manual_link }}
-                    {% if 'manager'|is_authorized: %}
-                        {% if settings['logo_file_id']: %}
-                            {{ _('remove logo')|button(url_for('admin_index', action='remove_logo', id_=0)) }}
-                        {% else %}
-                            {{  _('logo')|button(url_for('admin_logo')) }}
-                        {% endif %}
+                    {{ 'Files'|manual_link }}
+                    {{ _('file')|button(url_for('file_insert')) }}
+                    {{ _('list')|button(url_for('file_index')) }}
+                    {% if 'manager'|is_authorized %}
+                        {{  _('edit settings')|button(url_for('admin_file')) }}
                     {% endif %}
-                    {% if 'admin'|is_authorized %}
-                        {{ _('edit settings')|button(url_for('admin_general')) }}
-                        {{ _('system log')|button(url_for('admin_log')) }}
-                    {% endif  %}
                 </div>
-                <div style="float:left">
-                    {{ info.general|display_info }}
-                </div>
-                <div style="clear:both;"></div>
+                {% for dir, value in writeable_dirs.items() %}
+                    {% if not value %}
+                        <p>
+                            <span class="error">{{ _('directory not writable')|uc_first }}: {{ dir }}</span>
+                        </p>
+                    {% endif %}
+                {% endfor %}
+                {{ info.file|display_info }}
                 {% if disk_space_info %}
                     <div id="disk-size"></div>
                     <p>
@@ -65,29 +63,24 @@
                         {{ _('newsletter')|button(url_for('admin_newsletter')) }}
                     {% endif %}
                 </div>
-                <div>
-                    {{ tables.user.display('user')|safe }}
-                </div>
+                {{ tables.user.display('user')|safe }}
             </div>
-            <div class="tab-pane fade" role="tabpanel" id="tab-files">
+            <div class="tab-pane fade" role="tabpanel" id="tab-general">
                 <div class="toolbar">
-                    {{ 'Files'|manual_link }}
-                    {{ _('file')|button(url_for('file_insert')) }}
-                    {{ _('list')|button(url_for('file_index')) }}
-                    {% if 'manager'|is_authorized %}
-                        {{  _('edit settings')|button(url_for('admin_file')) }}
+                    {{ 'General'|manual_link }}
+                    {% if 'manager'|is_authorized: %}
+                        {% if settings['logo_file_id']: %}
+                            {{ _('remove logo')|button(url_for('admin_index', action='remove_logo', id_=0)) }}
+                        {% else %}
+                            {{  _('logo')|button(url_for('admin_logo')) }}
+                        {% endif %}
                     {% endif %}
+                    {% if 'admin'|is_authorized %}
+                        {{ _('edit settings')|button(url_for('admin_general')) }}
+                        {{ _('system log')|button(url_for('admin_log')) }}
+                    {% endif  %}
                 </div>
-                {% for dir, value in writeable_dirs.items() %}
-                    {% if not value %}
-                        <p>
-                            <span class="error">{{ _('directory not writable')|uc_first }}: {{ dir }}</span>
-                        </p>
-                    {% endif %}
-                {% endfor %}
-                <div>
-                    {{ info.file|display_info }}
-                </div>
+                {{ info.general|display_info }}
             </div>
             {% if 'manager'|is_authorized %}
                 <div class="tab-pane fade" role="tabpanel" id="tab-map">
@@ -108,20 +101,6 @@
                     </div>
                 </div>
             {% endif %}
-            {% if 'admin'|is_authorized %}
-                <div class="tab-pane fade" role="tabpanel" id="tab-mail">
-                    <div class="toolbar">
-                        {{ 'Mail'|manual_link }}
-                        {{ _('edit settings')|button(url_for('admin_mail')) }}
-                    </div>
-                    <div>
-                        {{ info.mail|display_info }}
-                    </div>
-                    {% if settings['mail'] %}
-                        {{ form|display_form }}
-                    {% endif %}
-                </div>
-            {% endif  %}
             {% if 'contributor'|is_authorized %}
                 <div class="tab-pane fade" role="tabpanel" id="tab-data">
                     <h1>{{ _('data integrity')|uc_first }}</h1>
@@ -144,8 +123,27 @@
                             {{ _('execute SQL')|button(url_for('sql_index')) }}
                         {% endif %}
                     </div>
+                    <div class="toolbar">
+                        <h1>{{ 'API'|uc_first }}</h1>
+                        {% if 'manager'|is_authorized %}
+                            {{ _('edit settings')|button(url_for('admin_api')) }}
+                        {% endif %}
+                    </div>
+                    {{ info.api|display_info }}
                 </div>
             {% endif %}
+            {% if 'admin'|is_authorized %}
+                <div class="tab-pane fade" role="tabpanel" id="tab-mail">
+                    <div class="toolbar">
+                        {{ 'Mail'|manual_link }}
+                        {{ _('edit settings')|button(url_for('admin_mail')) }}
+                    </div>
+                    {{ info.mail|display_info }}
+                    {% if settings['mail'] %}
+                        {{ form|display_form }}
+                    {% endif %}
+                </div>
+            {% endif  %}
         </div>
     </div>
 </div>

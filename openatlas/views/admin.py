@@ -87,7 +87,8 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
                            info={'file': get_form_settings(FileForm()),
                                  'general': get_form_settings(GeneralForm()),
                                  'mail': get_form_settings(MailForm()),
-                                 'map': get_form_settings(MapForm())})
+                                 'map': get_form_settings(MapForm()),
+                                 'api': get_form_settings(ApiForm())})
 
 
 @app.route('/admin/content/<string:item>', methods=["GET", "POST"])
