@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title_name %} - {{ _('admin')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'], 'API']|crumb }}
+    <a href="{{ url_for('admin_index') }}#tab-data">{{ _('admin')|uc_first }}</a>&nbsp;> API
 {% endblock %}
 {% block content %}
     <div class="toolbar">
