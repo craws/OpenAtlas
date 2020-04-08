@@ -44,7 +44,7 @@ def hierarchy_insert(param: str) -> Union[str, Response]:
             return render_template('hierarchy/insert.html', form=form)
         node = save(form, value_type=True if param == 'value' else False)
         flash(_('entity created'), 'info')
-        return redirect(url_for('node_index') + '#tab-' + str(node.id))
+        return redirect(url_for('node_index') + '#menu-tab-' + param)
     return render_template('hierarchy/insert.html', form=form, param=param)
 
 

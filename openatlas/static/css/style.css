@@ -567,3 +567,7 @@ div.data-table div.display-none {
     padding: 0.5em;
     background-color: #f8f9fa!important;
 }
+
+tr:hover {
+    background-color: rgba(0,0,0,0.1) !important;
+}
