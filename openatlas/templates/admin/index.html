@@ -22,9 +22,6 @@
             <div class="tab-pane fade show active" role="tabpanel" id="tab-general">
                 <div class="toolbar">
                     {{ 'General'|manual_link }}
-                    {% if 'admin'|is_authorized %}
-                        {{ _('edit settings')|button(url_for('admin_general')) }}
-                    {% endif  %}
                     {% if 'manager'|is_authorized: %}
                         {% if settings['logo_file_id']: %}
                             {{ _('remove logo')|button(url_for('admin_index', action='remove_logo', id_=0)) }}
@@ -32,6 +29,10 @@
                             {{  _('logo')|button(url_for('admin_logo')) }}
                         {% endif %}
                     {% endif %}
+                    {% if 'admin'|is_authorized %}
+                        {{ _('edit settings')|button(url_for('admin_general')) }}
+                        {{ _('system log')|button(url_for('admin_log')) }}
+                    {% endif  %}
                 </div>
                 <div style="float:left">
                     {{ info.general|display_info }}
@@ -124,11 +125,6 @@
 
 
     <div id="admin_index" style="margin-top:2em;">
-        <h1>{{ _('logs')|uc_first }}</h1>
-        {% if 'admin'|is_authorized %}
-            <a href="{{ url_for('admin_log') }}">{{ _('system log')|uc_first }}</a>
-        {% endif %}
-
         {% if 'contributor'|is_authorized %}
             <h1>{{ _('data transfer')|uc_first }}</h1>
             {% if 'manager'|is_authorized %}
