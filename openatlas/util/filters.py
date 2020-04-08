@@ -48,14 +48,14 @@ def crumb(self: Any, crumbs: List[Any]) -> str:
     items = []
     for item in crumbs:
         if not item:
-            continue
-        elif isinstance(item, list):
-            # If there are more arguments than the label add them as URL parameters
-            url = url_for(item[1]) if len(item) == 2 else url_for(item[1], **item[2])
-            label = util.truncate(util.uc_first(str(item[0])))
-            items.append('<a href="{url}">{label}</a>'.format(url=url, label=label))
+            continue  # Item can be None e.g. if a dynamic generated URL has no origin parameter
         elif isinstance(item, Entity) or isinstance(item, Project) or isinstance(item, User):
             items.append(util.link(item))
+        elif isinstance(item, list):
+            items.append('<a href="{url}">{label}</a>'.format(
+                # If there are more than 2 arguments pass them as parameters with **
+                url=url_for(item[1]) if len(item) == 2 else url_for(item[1], **item[2]),
+                label=util.truncate(util.uc_first(str(item[0])))))
         else:
             items.append(util.truncate(util.uc_first(item)))
     return Markup('&nbsp;>&nbsp; '.join(items))
@@ -194,13 +194,12 @@ def get_class_name(self: Any, code: str) -> str:
 def description(self: Any, entity: Entity) -> str:
     if not entity.description:
         return ''
-    text = entity.description.replace('\r\n', '<br>')
     label = util.uc_first(_('description'))
     if hasattr(entity, 'system_type') and entity.system_type == 'source content':
         label = util.uc_first(_('content'))
-    html = """<h2>{label}</h2>
-        <div class="description more">{description}</div>""".format(label=label, description=text)
-    return Markup(html)
+    return Markup("""<h2>*{label}</h2><div class="description more">{description}</div>""".format(
+        label=label,
+        description=entity.description.replace('\r\n', '<br>')))
 
 
 @jinja2.contextfilter
