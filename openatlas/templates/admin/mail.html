@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title_name %} - {{ _('admin')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'], _('mail')]|crumb }}
+    <a href="{{ url_for('admin_index') }}#tab-mail">{{ _('admin')|uc_first }}</a>&nbsp;> {{ _('mail')|uc_first }}
 {% endblock %}
 {% block content %}
     {{ form|display_form }}

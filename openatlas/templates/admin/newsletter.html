@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title_name %} - {{ _('admin')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'], _('newsletter')]|crumb }}
+    <a href="{{ url_for('admin_index') }}#tab-user">{{ _('admin')|uc_first }}</a>&nbsp;> {{ _('newsletter')|uc_first }}
 {% endblock %}
 {% block content %}
     <form id="newsletter-form" name="newsletter_form" method="post">

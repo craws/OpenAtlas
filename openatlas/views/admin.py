@@ -149,15 +149,12 @@ def admin_api() -> Union[str, Response]:
 
 
 @app.route('/admin/check_links')
-@app.route('/admin/check_links/<check>')
 @required_group('contributor')
-def admin_check_links(check: Optional[str] = None) -> str:
-    table = None
-    if check:
-        table = Table(['domain', 'property', 'range'])
-        for result in Link.check_links():  # pragma: no cover
-            table.rows.append([result['domain'], result['property'], result['range']])
-    return render_template('admin/check_links.html', table=table, check=check)
+def admin_check_links() -> str:
+    table = Table(['domain', 'property', 'range'],
+                  rows=[[result['domain'], result['property'], result['range']] for result in
+                        Link.check_links()])
+    return render_template('admin/check_links.html', table=table)
 
 
 @app.route('/admin/check_link_duplicates')
@@ -339,7 +336,7 @@ def admin_orphans() -> str:
                         _('download')) + '</a>',
                     '<a href="' + url_for('admin_file_delete', filename=name) + '" ' +
                     confirm + '>' + uc_first(_('delete')) + '</a>'])
-        return render_template('admin/orphans.html', tables=tables)
+        return render_template('admin/check_orphans.html', tables=tables)
 
 
 @app.route('/admin/logo/')

@@ -34,7 +34,7 @@ class ContentTests(TestBaseCase):
 
     def test_links(self) -> None:
         with app.app_context():  # type: ignore
-            rv = self.app.get(url_for('admin_check_links', check='check'))
+            rv = self.app.get(url_for('admin_check_links'))
             assert b'Invalid linked entity' in rv.data
 
     def test_dates(self) -> None:
