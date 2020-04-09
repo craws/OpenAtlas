@@ -17,7 +17,6 @@ table.dataTable.display tbody tr.odd {
 }
 
 table.dataTable th,
-.tabs-container table.dataTable th,
 .overlay-container table.dataTable th {
     color: #ffffff;
     background-color: #000000;

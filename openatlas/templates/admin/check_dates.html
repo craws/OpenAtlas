@@ -4,33 +4,39 @@
     <a href="{{ url_for('admin_index') }}#tab-data">{{ _('admin')|uc_first }}</a>&nbsp;> {{ _('check dates')|uc_first }}
 {% endblock %}
 {% block content %}
-<div id="tabs" class="tabs-container">
+<div class="toolbar">
     {{ 'Data_integrity'|manual_link }}
-    <ul>
-        <li><a href="#tab-dates">{{ _('invalid dates')|uc_first }} {{ tables['dates']|format_tab_number }}</a></li>
-        <li><a href="#tab-link-dates">{{ _('invalid link dates')|uc_first }} {{ tables['link_dates']|format_tab_number }}</a></li>
-        <li><a href="#tab-involvement-dates">{{ _('invalid involvement dates')|uc_first }} {{ tables['involvement_dates']|format_tab_number }}</a></li>
-    </ul>
-    <div id="tab-dates">
-    {% if tables['dates'].rows %}
-        {{ tables['dates'].display('dates')|safe }}
-    {% else %}
-        {{ _('Congratulations, everything looks fine!') }}
-    {% endif %}
-    </div>
-    <div id="tab-link-dates">
-    {% if tables['link_dates'].rows %}
-       {{ tables['link_dates'].display('link_dates')|safe }}
-    {% else %}
-        {{ _('Congratulations, everything looks fine!') }}
-    {% endif %}
-    </div>
-    <div id="tab-involvement-dates">
-        {% if tables['involvement_dates'].rows %}
-            {{ tables['involvement_dates'].display('involvement_dates')|safe }}
-        {% else %}
-            {{ _('Congratulations, everything looks fine!') }}
-        {% endif %}
+</div>
+<div class="row">
+    <div class="col-6">
+        <ul class="nav nav-tabs" role="tablist">
+            <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" aria-selected="true" href="#tab-dates">{{ _('invalid dates')|uc_first }} {{ tables['dates']|format_tab_number }}</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-link-dates">{{ _('invalid link dates')|uc_first }} {{ tables['link_dates']|format_tab_number }}</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-involvement-dates">{{ _('invalid involvement dates')|uc_first }} {{ tables['involvement_dates']|format_tab_number }}</a></li>
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" role="tabpanel" id="tab-dates">
+                {% if tables['dates'].rows %}
+                    {{ tables['dates'].display('dates')|safe }}
+                {% else %}
+                    {{ _('Congratulations, everything looks fine!') }}
+                {% endif %}
+            </div>
+            <div class="tab-pane fade" role="tabpanel" id="tab-link-dates">
+                {% if tables['link_dates'].rows %}
+                   {{ tables['link_dates'].display('link_dates')|safe }}
+                {% else %}
+                    {{ _('Congratulations, everything looks fine!') }}
+                {% endif %}
+            </div>
+            <div class="tab-pane fade" role="tabpanel" id="tab-involvement-dates">
+                {% if tables['involvement_dates'].rows %}
+                    {{ tables['involvement_dates'].display('involvement_dates')|safe }}
+                {% else %}
+                    {{ _('Congratulations, everything looks fine!') }}
+                {% endif %}
+            </div>
+        </div>
     </div>
 </div>
 {% endblock %}

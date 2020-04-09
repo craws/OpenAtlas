@@ -399,7 +399,7 @@ input[type=submit] {
     display: block;
 }
 
-.tabs-container .pagesize, .overlay-container .pagesize {
+.overlay-container .pagesize {
     font-size: 0.9em;
 }
 
@@ -459,22 +459,14 @@ div.data-table div.display-none {
     margin: 1px;
 }
 
-.tabs-container {
-    display: inline-block;
-}
-
-.tabs-container .ui-widget-header, .ui-widget-header {
+.ui-widget-header {
     border: none;
     background: none;
     background-color: inherit;
 }
 
-.tabs-container .ui-corner-all, .ui-corner-all {
+.ui-corner-all {
     border-radius: 0;
-}
-
-.tabs-container.ui-widget-content {
-    border: none;
 }
 
 .ui-tabs {
@@ -485,7 +477,7 @@ div.data-table div.display-none {
     padding: 1em;
 }
 
-.tabs-container .pagesize, .overlay-container .pagesize {
+.overlay-container .pagesize {
     font-size: 0.9em;
 }
 
