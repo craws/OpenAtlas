@@ -104,6 +104,14 @@ class MoveForm(FlaskForm):  # type: ignore
 @required_group('editor')
 def node_move_entities(id_: int) -> Union[str, Response]:
     node = g.nodes[id_]
+    if g.nodes[id_].class_.code == 'E53':
+        tabhash = '#menu-tab-places_collapse-'
+    elif g.nodes[id_].system:
+        tabhash = '#menu-tab-system_collapse-'
+    elif g.nodes[id_].value_type:
+        tabhash = '#menu-tab-value_collapse-'
+    else:
+        tabhash = '#menu-tab-custom_collapse-'
     root = g.nodes[node.root[-1]]
     if root.value_type:  # pragma: no cover
         abort(403)
@@ -113,7 +121,7 @@ def node_move_entities(id_: int) -> Union[str, Response]:
         Node.move_entities(node, getattr(form, str(root.id)).data, form.checkbox_values.data)
         g.cursor.execute('COMMIT')
         flash('Entities where updated', 'success')
-        return redirect(url_for('node_index') + '#tab-' + str(root.id))
+        return redirect(url_for('node_index') + tabhash + str(root.id))
     form.save.label.text = uc_first(_('move'))
     getattr(form, str(root.id)).data = node.id
     return render_template('types/move.html', node=node, root=root, form=form)
