@@ -70,10 +70,19 @@ def entity_add_reference(id_: int) -> Union[str, Response]:
 @required_group('readonly')
 def entity_view(id_: int) -> Union[str, Response]:
     if id_ in g.nodes:
-        if g.nodes[id_].root:
-            return node_view(g.nodes[id_])
-        else:
-            return redirect(url_for('node_index') + '#tab-' + str(id_))
+        node = g.nodes[id_]
+        if node.root:
+            return node_view(node)
+        else:  # pragma: no cover
+            if node.class_.code == 'E53':
+                tab_hash = '#menu-tab-places_collapse-'
+            elif node.system:
+                tab_hash = '#menu-tab-system_collapse-'
+            elif node.value_type:
+                tab_hash = '#menu-tab-value_collapse-'
+            else:
+                tab_hash = '#menu-tab-custom_collapse-'
+            return redirect(url_for('node_index') + tab_hash + str(id_))
     try:
         entity = Entity.get_by_id(id_, nodes=True, aliases=True)
     except AttributeError:

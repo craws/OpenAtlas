@@ -63,13 +63,6 @@ $(document).ready(function () {
         };
     }());
 
-    /* jQuery UI tabs init */
-    $("#tabs").tabs({
-        activate: function (event, ui) {
-            window.location.hash = ui.newPanel.attr('id');
-        }
-    });
-
     /* Show and hide function for date input fields */
     $("#date-switcher").click(function () {
         $(".date-switch").toggleClass('display-none');
@@ -118,12 +111,13 @@ $(document).ready(function () {
         return false;
     });
 
-    //tabs navigation
+    //bootstrap tabs navigation
     let url = location.href.replace(/\/$/, "");
     if (location.hash) {
-        const hash = url.split("#");
-        console.log(hash[1], $(`#${hash[1]}`));
-        $(`a[href="#${hash[1]}"]`).tab('show');
+        const hashes = url.split("#")[1].split("_");
+        console.log($(`#${hashes[1]}`));
+        $(`a[href="#${hashes[0]}"]`).tab('show');
+        $(`#${hashes[1]}`).collapse('show');
         url = location.href.replace(/\/#/, "#");
         history.replaceState(null, null, url);
         setTimeout(() => {
@@ -231,19 +225,6 @@ function clearSelect(name) {
     $('#' + name + '-button').val('');
     $('#' + name + '-tree').jstree('deselect_all');
     $('#' + name + '-clear').hide();
-}
-
-function openParentTab() {
-    locationHash = location.hash.substring(1);
-    if (locationHash) {
-        var hash = $('#' + locationHash);
-        if (hash.length) {
-            if (hash.closest(".tab-content").length) {
-                var tabNumber = hash.closest(".tab-content").index();
-                $("#tabs-menu").tabs({active: tabNumber - 1});
-            }
-        }
-    }
 }
 
 function overflow() {
