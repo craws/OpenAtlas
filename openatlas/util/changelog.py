@@ -3,7 +3,10 @@ class Changelog:
         '5.1.0': ['TBA', {
             'feature': {
                 '991': 'Images/Files for Types',
-            }}],
+                '1183': 'Mouse over effect for table rows'},
+            'fix': {
+                '1182': 'Type view: links and redirect',
+                '1188': 'Missing map in add feature view'}}],
         '5.0.0': ['2020-03-24', {
             'feature': {
                 '1048': 'Bootstrap layout',

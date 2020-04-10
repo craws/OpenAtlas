@@ -10,6 +10,10 @@ After following the instructions restart Apache and test if the application is w
 
     service apache2 restart
 
+### 5.0.0 to 5.1.0
+
+A code base update (e.g. with git pull) and an Apache restart should be sufficient.
+
 ### 4.1.0 to 5.0.0
 
 WARNING - this is a major release and requires new software. JavaScript libraries are now installed in a separate step.
