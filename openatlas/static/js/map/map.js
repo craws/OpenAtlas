@@ -253,8 +253,8 @@ if (gisLineSelected != '') allSelected.push(gisLines);
 if (gisPolygonSelected != '') allSelected.push(gisPolygons);
 if (gisPointSelected != '') allSelected.push(gisPoints);
 if (gisPointSupers != '' && typeof pointSupersLayer != "undefined") allSelected.push(pointSupersLayer);
-if (gisPointSubs != '') allSelected.push(pointSubsLayer);
-if (gisPointSibling != '') allSelected.push(pointSiblingsLayer);
+if (gisPointSubs != '' && typeof pointSubsLayer != "undefined") allSelected.push(pointSubsLayer);
+if (gisPointSibling != '' && typeof pointSiblingsLayer != "undefined") allSelected.push(pointSiblingsLayer);
 
 if (allSelected.length > 0) map.fitBounds(L.featureGroup(allSelected).getBounds(), {maxZoom: mapDefaultZoom});
 else if (gisPointAll.length > 0) map.fitBounds(pointLayer.getBounds(), {maxZoom: mapDefaultZoom});
