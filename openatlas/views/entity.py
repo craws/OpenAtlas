@@ -70,14 +70,15 @@ def entity_add_reference(id_: int) -> Union[str, Response]:
 @required_group('readonly')
 def entity_view(id_: int) -> Union[str, Response]:
     if id_ in g.nodes:
-        if g.nodes[id_].root:
-            return node_view(g.nodes[id_])
+        node = g.nodes[id_]
+        if node.root:
+            return node_view(node)
         else:
-            if g.nodes[id_].class_.code == 'E53':
+            if node.class_.code == 'E53':
                 tabhash = '#menu-tab-places_collapse-'
-            elif g.nodes[id_].system:
+            elif node.system:
                 tabhash = '#menu-tab-system_collapse-'
-            elif g.nodes[id_].value_type:
+            elif node.value_type:
                 tabhash = '#menu-tab-value_collapse-'
             else:
                 tabhash = '#menu-tab-custom_collapse-'

@@ -104,15 +104,15 @@ class MoveForm(FlaskForm):  # type: ignore
 @required_group('editor')
 def node_move_entities(id_: int) -> Union[str, Response]:
     node = g.nodes[id_]
-    if g.nodes[id_].class_.code == 'E53':
+    root = g.nodes[node.root[-1]]
+    if node.class_.code == 'E53':
         tabhash = '#menu-tab-places_collapse-'
-    elif g.nodes[id_].system:
+    elif root.system:
         tabhash = '#menu-tab-system_collapse-'
-    elif g.nodes[id_].value_type:
+    elif node.value_type:
         tabhash = '#menu-tab-value_collapse-'
     else:
         tabhash = '#menu-tab-custom_collapse-'
-    root = g.nodes[node.root[-1]]
     if root.value_type:  # pragma: no cover
         abort(403)
     form = build_move_form(MoveForm, node)
