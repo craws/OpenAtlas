@@ -73,16 +73,16 @@ def entity_view(id_: int) -> Union[str, Response]:
         node = g.nodes[id_]
         if node.root:
             return node_view(node)
-        else:
+        else:  # pragma: no cover
             if node.class_.code == 'E53':
-                tabhash = '#menu-tab-places_collapse-'
+                tab_hash = '#menu-tab-places_collapse-'
             elif node.system:
-                tabhash = '#menu-tab-system_collapse-'
+                tab_hash = '#menu-tab-system_collapse-'
             elif node.value_type:
-                tabhash = '#menu-tab-value_collapse-'
+                tab_hash = '#menu-tab-value_collapse-'
             else:
-                tabhash = '#menu-tab-custom_collapse-'
-            return redirect(url_for('node_index') + tabhash + str(id_))
+                tab_hash = '#menu-tab-custom_collapse-'
+            return redirect(url_for('node_index') + tab_hash + str(id_))
     try:
         entity = Entity.get_by_id(id_, nodes=True, aliases=True)
     except AttributeError:

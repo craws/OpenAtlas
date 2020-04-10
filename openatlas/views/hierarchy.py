@@ -42,7 +42,7 @@ def hierarchy_insert(param: str) -> Union[str, Response]:
         if Node.get_nodes(form.name.data):
             flash(_('error name exists'), 'error')
             return render_template('hierarchy/insert.html', form=form)
-        node = save(form, value_type=True if param == 'value' else False)
+        save(form, value_type=True if param == 'value' else False)
         flash(_('entity created'), 'info')
         return redirect(url_for('node_index') + '#menu-tab-' + param)
     return render_template('hierarchy/insert.html', form=form, param=param)
@@ -53,9 +53,9 @@ def hierarchy_insert(param: str) -> Union[str, Response]:
 def hierarchy_update(id_: int) -> Union[str, Response]:
     root = g.nodes[id_]
     if g.nodes[id_].value_type:
-        tabhash = '#menu-tab-value_collapse-'
+        tab_hash = '#menu-tab-value_collapse-'
     else:
-        tabhash = '#menu-tab-custom_collapse-'
+        tab_hash = '#menu-tab-custom_collapse-'
     if root.system:
         abort(403)
     form = build_form(HierarchyForm, 'hierarchy', root)
@@ -67,10 +67,10 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
     if form.validate_on_submit():
         if form.name.data != root.name and Node.get_nodes(form.name.data):
             flash(_('error name exists'), 'error')
-            return redirect(url_for('node_index') + tabhash + str(root.id))
+            return redirect(url_for('node_index') + tab_hash + str(root.id))
         save(form, root)
         flash(_('info update'), 'info')
-        return redirect(url_for('node_index') + tabhash + str(root.id))
+        return redirect(url_for('node_index') + tab_hash + str(root.id))
     form.multiple = root.multiple
     table = Table(['form', 'count'], paging=False)
     for form_id, form_ in root.forms.items():
