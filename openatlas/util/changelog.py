@@ -1,6 +1,6 @@
 class Changelog:
     versions = {
-        '5.1.0': ['TBA', {
+        '5.1.0': ['2020-04-11', {
             'feature': {
                 '991': 'Images/Files for Types',
                 '1183': 'Mouse over effect for table rows'},
