@@ -127,7 +127,7 @@ def unprocessable_entity(e: Exception) -> Tuple[str, int]:
     return render_template('422.html', e=e), 422
 
 
-@app.route('/overview/changelog')
+@app.route('/changelog')
 def index_changelog() -> str:
     return render_template('index/changelog.html', versions=Changelog.versions)
 
