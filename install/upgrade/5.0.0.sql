@@ -1,5 +1,5 @@
 -- Upgrade 4.x.x to 5.0.0
--- Be sure to backup the database and read the update notes before executing this!
+-- Be sure to backup the database and read the upgrade notes before executing this!
 
 BEGIN;
 
