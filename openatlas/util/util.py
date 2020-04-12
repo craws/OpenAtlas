@@ -313,6 +313,7 @@ def add_dates_to_form(form: Any, for_person: bool = False) -> str:
                 errors[field_name] += uc_first(error)
             errors[field_name] += ' </label>'
     style = '' if valid_dates else ' style="display:table-row" '
+    switch_label = _('hide') if form.begin_year_from.data or form.end_year_from.data else _('show')
     html = """
         <div class="table-row">
             <div>
@@ -324,7 +325,7 @@ def add_dates_to_form(form: Any, for_person: bool = False) -> str:
         </div>""".format(date=uc_first(_('date')),
                          button_class=app.config['CSS']['button']['secondary'],
                          tooltip=display_tooltip(_('tooltip date')),
-                         show=uc_first(_('show')))
+                         show=uc_first(switch_label))
     html += '<div class="table-row date-switch" ' + style + '>'
     html += '<div>' + uc_first(_('birth') if for_person else _('begin')) + '</div>'
     html += '<div class="table-cell">'
@@ -416,11 +417,11 @@ def is_authorized(group: str) -> bool:
         return False  # pragma: no cover - needed because AnonymousUserMixin has no group
 
     if current_user.group == 'admin' or (
-            current_user.group == 'manager' and group in
-            ['manager', 'editor', 'contributor', 'readonly']) or (
-            current_user.group == 'editor' and group in ['editor', 'contributor', 'readonly']) or (
-            current_user.group == 'contributor' and group in ['contributor', 'readonly']) or (
-            current_user.group == 'readonly' and group == 'readonly'):
+        current_user.group == 'manager' and group in
+        ['manager', 'editor', 'contributor', 'readonly']) or (
+        current_user.group == 'editor' and group in ['editor', 'contributor', 'readonly']) or (
+        current_user.group == 'contributor' and group in ['contributor', 'readonly']) or (
+        current_user.group == 'readonly' and group == 'readonly'):
         return True
     return False
 

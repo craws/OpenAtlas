@@ -10,9 +10,13 @@ After following the instructions restart Apache and test if the application is w
 
     service apache2 restart
 
-### 5.1.0 to 5.2.0
+### 5.1.x to 5.2.0
 
 Execute install/upgrade/5.2.0.sql after making backups
+
+### 5.1.0 to 5.1.1
+
+A code base update (e.g. with git pull) and an Apache restart should be sufficient.
 
 ### 5.0.0 to 5.1.0
 
