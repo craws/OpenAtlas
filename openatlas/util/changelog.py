@@ -1,5 +1,9 @@
 class Changelog:
     versions = {
+        '5.1.1': ['2020-04-12', {
+            'fix': {
+                '1190': 'Tabs not shown in file view',
+                '1191': 'Show/Hide date is switched'}}],
         '5.1.0': ['2020-04-11', {
             'feature': {
                 '991': 'Images/Files for Types',
