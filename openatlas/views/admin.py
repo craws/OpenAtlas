@@ -1,4 +1,5 @@
 import datetime
+import importlib
 import os
 from os.path import basename, splitext
 from typing import Optional, Union
@@ -12,7 +13,7 @@ from werkzeug.wrappers import Response
 from wtforms import TextAreaField
 
 from openatlas import app, logger
-from openatlas.forms.admin_forms import (ApiForm, ContentForm, FileForm, GeneralForm, LogForm,
+from openatlas.forms.admin_forms import (ApiForm, ContentForm, FilesForm, GeneralForm, LogForm,
                                          MailForm, MapForm, NewsLetterForm, SimilarForm,
                                          TestMailForm)
 from openatlas.forms.forms import get_form_settings, set_form_settings
@@ -26,7 +27,7 @@ from openatlas.models.user import User
 from openatlas.util.table import Table
 from openatlas.util.util import (convert_size, format_date, format_datetime, get_disk_space_info,
                                  get_file_path, get_file_stats, is_authorized, link, required_group,
-                                 sanitize, send_mail, uc_first, truncate)
+                                 sanitize, send_mail, truncate, uc_first)
 
 
 @app.route('/admin', methods=["GET", "POST"])
@@ -84,7 +85,7 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
                            settings=session['settings'],
                            writeable_dirs=dirs,
                            disk_space_info=get_disk_space_info(),
-                           info={'file': get_form_settings(FileForm()),
+                           info={'file': get_form_settings(FilesForm()),
                                  'general': get_form_settings(GeneralForm()),
                                  'mail': get_form_settings(MailForm()),
                                  'map': get_form_settings(MapForm()),
@@ -106,46 +107,6 @@ def admin_content(item: str) -> Union[str, Response]:
     for language in languages:
         form.__getattribute__(language).data = content[item][language]
     return render_template('admin/content.html', item=item, form=form, languages=languages)
-
-
-@app.route('/admin/map', methods=['POST', 'GET'])
-@required_group('manager')
-def admin_map() -> Union[str, Response]:
-    form = MapForm(obj=session['settings'])
-    if form.validate_on_submit():
-        g.cursor.execute('BEGIN')
-        try:
-            Settings.update(form)
-            logger.log('info', 'settings', 'Settings updated')
-            g.cursor.execute('COMMIT')
-            flash(_('info update'), 'info')
-        except Exception as e:  # pragma: no cover
-            g.cursor.execute('ROLLBACK')
-            logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
-        return redirect(url_for('admin_index') + '#tab-map')
-    set_form_settings(form)
-    return render_template('admin/settings.html', form=form, category='map')
-
-
-@app.route('/admin/api', methods=['POST', 'GET'])
-@required_group('manager')
-def admin_api() -> Union[str, Response]:
-    form = ApiForm(obj=session['settings'])
-    if form.validate_on_submit():
-        g.cursor.execute('BEGIN')
-        try:
-            Settings.update(form)
-            logger.log('info', 'settings', 'API updated')
-            g.cursor.execute('COMMIT')
-            flash(_('info update'), 'info')
-        except Exception as e:  # pragma: no cover
-            g.cursor.execute('ROLLBACK')
-            logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
-        return redirect(url_for('admin_index') + '#tab-data')
-    set_form_settings(form)
-    return render_template('admin/settings.html', form=form, category='api')
 
 
 @app.route('/admin/check_links')
@@ -198,10 +159,13 @@ def admin_delete_single_type_duplicate(entity_id: int, node_id: int) -> Response
     return redirect(url_for('admin_check_link_duplicates'))
 
 
-@app.route('/admin/file', methods=['POST', 'GET'])
+@app.route('/admin/settings/<category>', methods=['POST', 'GET'])
 @required_group('manager')
-def admin_file() -> Union[str, Response]:
-    form = FileForm()
+def admin_settings(category: str) -> Union[str, Response]:
+    if category in ['general', 'mail'] and not is_authorized('admin'):
+        abort(403)  # pragma: no cover
+    form = getattr(importlib.import_module('openatlas.forms.admin_forms'),
+                   uc_first(category) + 'Form')()  # Get forms dynamically
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
         try:
@@ -213,9 +177,10 @@ def admin_file() -> Union[str, Response]:
             g.cursor.execute('ROLLBACK')
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(url_for('admin_index') + '#tab-files')
+        tab = 'data' if category == 'api' else category
+        return redirect(url_for('admin_index') + '#tab-' + tab)
     set_form_settings(form)
-    return render_template('admin/settings.html', form=form, category='files')
+    return render_template('admin/settings.html', form=form, category=category)
 
 
 @app.route('/admin/similar', methods=['POST', 'GET'])
@@ -452,43 +417,3 @@ def admin_newsletter() -> Union[str, Response]:
             checkbox += ' type="checkbox" checked="checked">'
             table.rows.append([user.username, user.email, checkbox])
     return render_template('admin/newsletter.html', form=form, table=table)
-
-
-@app.route('/admin/general', methods=["GET", "POST"])
-@required_group('admin')
-def admin_general() -> Union[str, Response]:
-    form = GeneralForm()
-    if form.validate_on_submit():
-        g.cursor.execute('BEGIN')
-        try:
-            Settings.update(form)
-            logger.log('info', 'settings', 'Settings updated')
-            g.cursor.execute('COMMIT')
-            flash(_('info update'), 'info')
-        except Exception as e:  # pragma: no cover
-            g.cursor.execute('ROLLBACK')
-            logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
-        return redirect(url_for('admin_index') + '#tab-general')
-    set_form_settings(form)
-    return render_template('admin/settings.html', form=form, category='general')
-
-
-@app.route('/admin/mail', methods=["GET", "POST"])
-@required_group('admin')
-def admin_mail() -> Union[str, Response]:
-    form = MailForm()
-    if form.validate_on_submit():
-        g.cursor.execute('BEGIN')
-        try:
-            Settings.update(form)
-            logger.log('info', 'settings', 'Settings updated')
-            g.cursor.execute('COMMIT')
-            flash(_('info update'), 'info')
-        except Exception as e:  # pragma: no cover
-            g.cursor.execute('ROLLBACK')
-            logger.log('error', 'database', 'transaction failed', e)
-            flash(_('error transaction'), 'error')
-        return redirect(url_for('admin_index') + '#tab-mail')
-    set_form_settings(form)
-    return render_template('admin/settings.html', form=form, category='mail')

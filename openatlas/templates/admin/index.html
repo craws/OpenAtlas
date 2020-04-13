@@ -26,7 +26,7 @@
                 <div class="toolbar">
                     {{ 'Files'|manual_link }}
                     {% if 'manager'|is_authorized %}
-                        {{  _('edit settings')|button(url_for('admin_file')) }}
+                        {{  _('edit settings')|button(url_for('admin_settings', category='files')) }}
                     {% endif %}
                     {{ _('file')|button(url_for('file_insert')) }}
                     {{ _('list')|button(url_for('file_index')) }}
@@ -82,7 +82,7 @@
                 <div class="tab-pane fade" role="tabpanel" id="tab-general">
                     <div class="toolbar">
                         {{ 'General'|manual_link }}
-                        {{ _('edit settings')|button(url_for('admin_general')) }}
+                        {{ _('edit settings')|button(url_for('admin_settings', category='general')) }}
                         {{ _('system log')|button(url_for('admin_log')) }}
                     </div>
                     {{ info.general|display_info }}
@@ -90,7 +90,7 @@
                 <div class="tab-pane fade" role="tabpanel" id="tab-mail">
                     <div class="toolbar">
                         {{ 'Mail'|manual_link }}
-                        {{ _('edit settings')|button(url_for('admin_mail')) }}
+                        {{ _('edit settings')|button(url_for('admin_settings', category='mail')) }}
                     </div>
                     {{ info.mail|display_info }}
                     {% if settings['mail'] %}
@@ -102,7 +102,7 @@
                 <div class="tab-pane fade" role="tabpanel" id="tab-map">
                     <div class="toolbar">
                         {{ 'Map'|manual_link }}
-                        {{ _('edit settings')|button(url_for('admin_map')) }}
+                        {{ _('edit settings')|button(url_for('admin_settings', category='map')) }}
                     </div>
                     <div>
                         {{ info.map|display_info }}
@@ -143,7 +143,7 @@
                         <h1>{{ 'API'|uc_first }}</h1>
                         {{ 'API'|manual_link }}
                         {% if 'manager'|is_authorized %}
-                            {{ _('edit settings')|button(url_for('admin_api')) }}
+                            {{ _('edit settings')|button(url_for('admin_settings', category='api')) }}
                         {% endif %}
                     </div>
                     {{ info.api|display_info }}

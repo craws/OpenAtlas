@@ -99,32 +99,8 @@ class ContentTests(TestBaseCase):
             rv = self.app.get(url_for('admin_index'))
             assert b'User' in rv.data
 
-            # Map
-            rv = self.app.get(url_for('admin_map'))
-            assert b'Max cluster radius' in rv.data
-            rv = self.app.post(url_for('admin_map'),
-                               follow_redirects=True,
-                               data={'map_cluster_max_radius': 2, 'map_cluster_disable_at_zoom': 5})
-            assert b'Changes have been saved.' in rv.data
-
-            # General
-            rv = self.app.get(url_for('admin_general'))
-            assert b'Save' in rv.data
-            data = {'default_language': 'en',
-                    'default_table_rows': '10',
-                    'failed_login_forget_minutes': '10',
-                    'failed_login_tries': '10',
-                    'minimum_password_length': '10',
-                    'random_password_length': '10',
-                    'reset_confirm_hours': '10',
-                    'log_level': '0',
-                    'site_name': 'Nostromo',
-                    'minimum_jstree_search': 3}
-            rv = self.app.post(url_for('admin_general'), data=data, follow_redirects=True)
-            assert b'Nostromo' in rv.data
-
             # Mail
-            rv = self.app.get(url_for('admin_mail'))
+            rv = self.app.get(url_for('admin_settings', category='mail'))
             assert b'Recipients feedback' in rv.data
             data = {'mail': True,
                     'mail_transport_username': 'whatever',
@@ -133,22 +109,10 @@ class ContentTests(TestBaseCase):
                     'mail_from_email': 'max@example.com',
                     'mail_from_name': 'Max Headroom',
                     'mail_recipients_feedback': 'headroom@example.com'}
-            rv = self.app.post(url_for('admin_mail'), data=data, follow_redirects=True)
-            assert b'Max Headroom' in rv.data
-
-            # File
-            rv = self.app.get(url_for('admin_file'))
-            assert b'jpg' in rv.data
-            rv = self.app.post(url_for('admin_file'),
-                               data={'file_upload_max_size': 20, 'profile_image_width': 20},
+            rv = self.app.post(url_for('admin_settings', category='mail'),
+                               data=data,
                                follow_redirects=True)
-            assert b'Changes have been saved.' in rv.data
-
-            # API
-            rv = self.app.get(url_for('admin_api'))
-            assert b'public' in rv.data
-            rv = self.app.post(url_for('admin_api'), data={'public': True}, follow_redirects=True)
-            assert b'Changes have been saved' in rv.data
+            assert b'Max Headroom' in rv.data
 
             # Content
             rv = self.app.get(url_for('admin_content', item='legal_notice'))

@@ -15,7 +15,7 @@ class Logger:
             info: Union[str, Exception, None] = None) -> None:
         log_levels = app.config['LOG_LEVELS']
         priority = list(log_levels.keys())[list(log_levels.values()).index(priority_)]
-        if int(session['settings']['log_level']) < priority:
+        if int(session['settings']['log_level']) < priority:  # pragma: no cover
             return
         info = '{method} {path}{info}'.format(path=request.path,
                                               method=request.method,

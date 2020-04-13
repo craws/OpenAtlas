@@ -76,7 +76,7 @@ class ApiForm(FlaskForm):  # type: ignore
     save = SubmitField(uc_first(_('save')))
 
 
-class FileForm(FlaskForm):  # type: ignore
+class FilesForm(FlaskForm):  # type: ignore
     file_upload_max_size = IntegerField(_('maximum file size in MB'))
     profile_image_width = IntegerField(_('profile image width in pixel'))
     file_upload_allowed_extension = StringField(_('allowed file extensions'))
