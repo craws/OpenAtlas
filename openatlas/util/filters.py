@@ -245,13 +245,13 @@ def manual_link(self: Any, wiki_site: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_logo(self: Any, file_id: str) -> str:
-    src = '/static/images/layout/logo.png'
-    if file_id:
-        extension = print_file_extension(int(file_id))
+def get_logo(self: Any, todo) -> str:
+    logo = '/static/images/layout/logo.png'
+    if session['settings']['logo_file_id']:
+        extension = print_file_extension(int(session['settings']['logo_file_id']))
         if extension != 'N/A':
-            src = url_for('display_logo', filename=file_id + extension)
-    return '<img src="{src}" id="logo" alt="Logo">'.format(src=src)
+            logo = url_for('display_logo', filename=session['settings']['logo_file_id'] + extension)
+    return logo
 
 
 @jinja2.contextfilter

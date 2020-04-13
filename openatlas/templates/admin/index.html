@@ -9,48 +9,61 @@
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" aria-selected="true" href="#tab-files">{{ _('files')|uc_first }}</a></li>
             <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-user">{{ _('user')|uc_first }} {{ tables.user|format_tab_number }}</a></li>
-            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-general">{{ _('general')|uc_first }}</a></li>
-            {% if 'contributor'|is_authorized %}
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-data">{{ _('data')|uc_first }}</a></li>
-            {% endif %}
-            {% if 'manager'|is_authorized %}
+            {% if 'admin'|is_authorized %}
+                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-general">{{ _('general')|uc_first }}</a></li>
+                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-mail">{{ _('email')|uc_first }}</a></li>
+            {% endif  %}
+            {% if 'manager'|is_authorized: %}
                 <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-map">{{ _('map')|uc_first }}</a></li>
                 <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-content">{{ _('content')|uc_first }}</a></li>
             {% endif %}
-            {% if 'admin'|is_authorized %}
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-mail">{{ _('email')|uc_first }}</a></li>
-            {% endif  %}
+            {% if 'contributor'|is_authorized %}
+                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-data">{{ _('data')|uc_first }}</a></li>
+            {% endif %}
         </ul>
         <div class="tab-content">
             <div class="tab-pane fade show active" role="tabpanel" id="tab-files">
                 <div class="toolbar">
                     {{ 'Files'|manual_link }}
-                    {{ _('file')|button(url_for('file_insert')) }}
-                    {{ _('list')|button(url_for('file_index')) }}
                     {% if 'manager'|is_authorized %}
                         {{  _('edit settings')|button(url_for('admin_file')) }}
                     {% endif %}
+                    {{ _('file')|button(url_for('file_insert')) }}
+                    {{ _('list')|button(url_for('file_index')) }}
                 </div>
-                {% for dir, value in writeable_dirs.items() %}
-                    {% if not value %}
+                <div style="float:left;">
+                    {% for dir, value in writeable_dirs.items() %}
+                        {% if not value %}
+                            <p>
+                                <span class="error">{{ _('directory not writable')|uc_first }}: {{ dir }}</span>
+                            </p>
+                        {% endif %}
+                    {% endfor %}
+                    {{ info.file|display_info }}
+                    {% if disk_space_info %}
+                        <div id="disk-size"></div>
                         <p>
-                            <span class="error">{{ _('directory not writable')|uc_first }}: {{ dir }}</span>
+                            {{ _('total disk space')|uc_first }} <strong>{{ disk_space_info.total }}</strong> -
+                            {{ _('free disk space')|uc_first }} <strong>{{ disk_space_info.free }}</strong>
                         </p>
+                        <script>
+                            $( function() {
+                                $("#disk-size").progressbar({value: {{ disk_space_info.percent }} });
+                            });
+                        </script>
                     {% endif %}
-                {% endfor %}
-                {{ info.file|display_info }}
-                {% if disk_space_info %}
-                    <div id="disk-size"></div>
-                    <p>
-                        {{ _('total disk space')|uc_first }} <strong>{{ disk_space_info.total }}</strong> -
-                        {{ _('free disk space')|uc_first }} <strong>{{ disk_space_info.free }}</strong>
-                    </p>
-                    <script>
-                        $( function() {
-                            $("#disk-size").progressbar({value: {{ disk_space_info.percent }} });
-                        });
-                    </script>
+                </div>
+                {% if 'manager'|is_authorized %}
+                    <div style="float:left;margin-left:2em;">
+                        <img src="{{ ''|get_logo|safe }}" id="logo-preview" alt="Logo" style="max-width:400px;"><br>
+                        {% if settings['logo_file_id']: %}
+                            {{ _('remove custom logo')|button(url_for('admin_index', action='remove_logo', id_=0)) }}
+                        {% else %}
+                            {{  _('choose custom logo')|button(url_for('admin_logo')) }}
+                        {% endif %}
+                    </div>
                 {% endif %}
+                <div style="clear:both;"></div>
             </div>
             <div class="tab-pane fade" role="tabpanel" id="tab-user">
                 <div class="toolbar">
@@ -65,23 +78,26 @@
                 </div>
                 {{ tables.user.display('user')|safe }}
             </div>
-            <div class="tab-pane fade" role="tabpanel" id="tab-general">
-                <div class="toolbar">
-                    {{ 'General'|manual_link }}
-                    {% if 'manager'|is_authorized: %}
-                        {% if settings['logo_file_id']: %}
-                            {{ _('remove logo')|button(url_for('admin_index', action='remove_logo', id_=0)) }}
-                        {% else %}
-                            {{  _('logo')|button(url_for('admin_logo')) }}
-                        {% endif %}
-                    {% endif %}
-                    {% if 'admin'|is_authorized %}
+            {% if 'admin'|is_authorized: %}
+                <div class="tab-pane fade" role="tabpanel" id="tab-general">
+                    <div class="toolbar">
+                        {{ 'General'|manual_link }}
                         {{ _('edit settings')|button(url_for('admin_general')) }}
                         {{ _('system log')|button(url_for('admin_log')) }}
-                    {% endif  %}
+                    </div>
+                    {{ info.general|display_info }}
                 </div>
-                {{ info.general|display_info }}
-            </div>
+                <div class="tab-pane fade" role="tabpanel" id="tab-mail">
+                    <div class="toolbar">
+                        {{ 'Mail'|manual_link }}
+                        {{ _('edit settings')|button(url_for('admin_mail')) }}
+                    </div>
+                    {{ info.mail|display_info }}
+                    {% if settings['mail'] %}
+                        {{ form|display_form }}
+                    {% endif %}
+                </div>
+            {% endif  %}
             {% if 'manager'|is_authorized %}
                 <div class="tab-pane fade" role="tabpanel" id="tab-map">
                     <div class="toolbar">
@@ -100,7 +116,7 @@
                         {{ tables.content.display('content')|safe }}
                     </div>
                 </div>
-            {% endif %}
+            {% endif  %}
             {% if 'contributor'|is_authorized %}
                 <div class="tab-pane fade" role="tabpanel" id="tab-data">
                     <h1>{{ _('data integrity checks')|uc_first }}</h1>
@@ -133,18 +149,6 @@
                     {{ info.api|display_info }}
                 </div>
             {% endif %}
-            {% if 'admin'|is_authorized %}
-                <div class="tab-pane fade" role="tabpanel" id="tab-mail">
-                    <div class="toolbar">
-                        {{ 'Mail'|manual_link }}
-                        {{ _('edit settings')|button(url_for('admin_mail')) }}
-                    </div>
-                    {{ info.mail|display_info }}
-                    {% if settings['mail'] %}
-                        {{ form|display_form }}
-                    {% endif %}
-                </div>
-            {% endif  %}
         </div>
     </div>
 </div>

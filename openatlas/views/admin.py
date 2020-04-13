@@ -39,7 +39,7 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
             flash(_('user deleted'), 'info')
         elif action == 'remove_logo':
             Settings.set_logo()
-            return redirect(url_for('admin_index') + '#tab-general')
+            return redirect(url_for('admin_index') + '#tab-file')
     export_path = app.config['EXPORT_FOLDER_PATH']
     dirs = {'uploads': True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False,
             'export/sql': True if os.access(export_path.joinpath('sql'), os.W_OK) else False,
@@ -347,7 +347,7 @@ def admin_logo(id_: int = None) -> Union[str, Response]:
         abort(418)  # pragma: no cover - Logo already set
     if id_:
         Settings.set_logo(id_)
-        return redirect(url_for('admin_index') + '#tab-general')
+        return redirect(url_for('admin_index') + '#tab-file')
     file_stats = get_file_stats()
     table = Table([''] + Table.HEADERS['file'] + ['date'])
     for entity in Entity.get_display_files():

@@ -1,7 +1,6 @@
 {% extends "layout.html" %}
 {% block title_name %} - {{ _('admin')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'], _('logo')]|crumb }}
     <a href="{{ url_for('admin_index') }}#tab-general">{{ _('admin')|uc_first }}</a>&nbsp;> {{ _('logo')|uc_first }}
 {% endblock %}
 {% block content %}

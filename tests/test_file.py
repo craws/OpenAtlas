@@ -43,7 +43,7 @@ class FileTest(TestBaseCase):
             with self.app.get(url_for('display_logo', filename=str(file_id) + '.png')):
                 pass   # Test logo display, calling with "with" to prevent unclosed files warning
             rv = self.app.get(url_for('admin_logo', id_=file_id), follow_redirects=True)
-            assert b'Remove logo' in rv.data
+            assert b'Remove custom logo' in rv.data
             rv = self.app.get(url_for('admin_index', action="remove_logo", id_=0),
                               follow_redirects=True)
             assert b'Logo' in rv.data
