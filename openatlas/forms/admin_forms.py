@@ -13,7 +13,7 @@ class ContentForm(FlaskForm):  # type: ignore
 
 
 class GeneralForm(FlaskForm):  # type: ignore
-    site_name = StringField(_('site name'))
+    site_name = StringField(_('site name'), [InputRequired()])
     default_language = SelectField(_('default language'),
                                    choices=list(app.config['LANGUAGES'].items()))
     default_table_rows = SelectField(_('default table rows'),

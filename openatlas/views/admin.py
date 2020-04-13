@@ -125,7 +125,7 @@ def admin_map() -> Union[str, Response]:
             flash(_('error transaction'), 'error')
         return redirect(url_for('admin_index') + '#tab-map')
     set_form_settings(form)
-    return render_template('admin/map.html', form=form)
+    return render_template('admin/settings.html', form=form, category='map')
 
 
 @app.route('/admin/api', methods=['POST', 'GET'])
@@ -143,9 +143,9 @@ def admin_api() -> Union[str, Response]:
             g.cursor.execute('ROLLBACK')
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(url_for('admin_index'))
+        return redirect(url_for('admin_index') + '#tab-data')
     set_form_settings(form)
-    return render_template('admin/api.html', form=form)
+    return render_template('admin/settings.html', form=form, category='api')
 
 
 @app.route('/admin/check_links')
@@ -215,7 +215,7 @@ def admin_file() -> Union[str, Response]:
             flash(_('error transaction'), 'error')
         return redirect(url_for('admin_index') + '#tab-files')
     set_form_settings(form)
-    return render_template('admin/file.html', form=form)
+    return render_template('admin/settings.html', form=form, category='files')
 
 
 @app.route('/admin/similar', methods=['POST', 'GET'])
@@ -471,7 +471,7 @@ def admin_general() -> Union[str, Response]:
             flash(_('error transaction'), 'error')
         return redirect(url_for('admin_index') + '#tab-general')
     set_form_settings(form)
-    return render_template('admin/general.html', form=form)
+    return render_template('admin/settings.html', form=form, category='general')
 
 
 @app.route('/admin/mail', methods=["GET", "POST"])
@@ -491,4 +491,4 @@ def admin_mail() -> Union[str, Response]:
             flash(_('error transaction'), 'error')
         return redirect(url_for('admin_index') + '#tab-mail')
     set_form_settings(form)
-    return render_template('admin/mail.html', form=form)
+    return render_template('admin/settings.html', form=form, category='mail')
