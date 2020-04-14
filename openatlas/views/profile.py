@@ -54,8 +54,8 @@ class ProfileForm(FlaskForm):  # type: ignore
     table_show_aliases = BooleanField(_('show aliases in tables'))
     layout_choices = [('default', _('default')), ('advanced', _('advanced'))]
     layout = SelectField(_('layout'), description=_('tooltip layout'), choices=layout_choices)
-    max_zoom = IntegerField(_('max map zoom'))
-    default_zoom = IntegerField(_('default map zoom'))
+    map_zoom_default = IntegerField(_('default map zoom'), [InputRequired()])
+    map_zoom_max = IntegerField(_('max map zoom'), [InputRequired()])
     module_geonames = BooleanField('GeoNames', description=_('tooltip geonames'))
     module_map_overlay = BooleanField(_('map overlay'), description=_('tooltip map overlay'))
     module_notes = BooleanField(_('notes'), description=_('tooltip notes'))
@@ -77,8 +77,8 @@ def profile_index() -> str:
                         (_('table rows'), user.settings['table_rows']),
                         (_('show aliases in tables'), user.settings['table_show_aliases']),
                         (_('layout'), user.settings['layout']),
-                        (_('max map zoom'), user.settings['max_zoom']),
-                        (_('default map zoom'), user.settings['default_zoom'])],
+                        (_('default map zoom'), user.settings['map_zoom_default']),
+                        (_('max map zoom'), user.settings['map_zoom_max'])],
             'modules': [('GeoNames', user.settings['module_geonames']),
                         (_('map overlay'), user.settings['module_map_overlay']),
                         (_('notes'), user.settings['module_notes'])]}
@@ -133,8 +133,8 @@ def profile_update() -> Union[str, Response]:
                                                        form.table_rows,
                                                        form.table_show_aliases,
                                                        form.layout,
-                                                       form.max_zoom,
-                                                       form.default_zoom],
+                                                       form.map_zoom_default,
+                                                       form.map_zoom_max],
                                         _('modules'): [form.module_geonames,
                                                        form.module_map_overlay,
                                                        form.module_notes]})

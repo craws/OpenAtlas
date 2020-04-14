@@ -15,8 +15,8 @@
     var gisAllSelected = {{ gis_data['gisAllSelected']|safe }};
     var jsonSearch = [];
     var translate = [];
-    var mapMaxZoom = {{ current_user.settings['max_zoom'] if current_user.settings['max_zoom'] else config['MAX_ZOOM'] }}
-    var mapDefaultZoom = {{ current_user.settings['default_zoom'] if current_user.settings['default_zoom'] else config['DEFAULT_ZOOM'] }}
+    var mapMaxZoom = {{ current_user.settings['map_zoom_max'] }}
+    var mapDefaultZoom = {{ current_user.settings['map_zoom_default'] }}
     var map_update_mode = false;  // enables e.g. edit buttons in popup ups if true
     var maxClusterRadius = {{ session['settings']['map_cluster_max_radius'] }};
     var disableClusteringAtZoom = {{ session['settings']['map_cluster_disable_at_zoom'] }};

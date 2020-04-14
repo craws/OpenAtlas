@@ -15,8 +15,8 @@ class ProfileTests(TestBaseCase):
             assert b'Newsletter' in rv.data
             data = {'name': 'Alice Abernathy',
                     'email': 'alice@umbrella.net',
-                    'max_zoom': 20,
-                    'default_zoom': 14,
+                    'map_zoom_max': 20,
+                    'map_zoom_default': 14,
                     'language': 'en',
                     'table_rows': '100',
                     'layout': 'advanced'}

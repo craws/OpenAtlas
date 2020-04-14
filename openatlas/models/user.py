@@ -222,14 +222,14 @@ class User(UserMixin):  # type: ignore
             settings['layout'] = 'default'
         if 'language' not in settings:
             settings['language'] = session['language']
-        if 'max_zoom' in settings:
-            settings['max_zoom'] = int(settings['max_zoom'])
+        if 'map_zoom_max' in settings:
+            settings['map_zoom_max'] = settings['map_zoom_max']
         else:
-            settings['max_zoom'] = app.config['MAX_ZOOM']
-        if 'default_zoom' in settings:
-            settings['default_zoom'] = int(settings['default_zoom'])
+            settings['map_zoom_max'] = session['settings']['map_zoom_max']
+        if 'map_zoom_default' in settings:
+            settings['map_zoom_default'] = int(settings['map_zoom_default'])
         else:
-            settings['default_zoom'] = app.config['DEFAULT_ZOOM']
+            settings['map_zoom_default'] = session['settings']['map_zoom_default']
         if 'table_rows' in settings:
             settings['table_rows'] = int(settings['table_rows'])
         else:
