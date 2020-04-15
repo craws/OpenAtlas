@@ -23,6 +23,8 @@ INSERT INTO settings (name, value) VALUES
     ('failed_login_tries', '3'),
     ('file_upload_max_size', '10'),
     ('file_upload_allowed_extension', 'gif jpeg jpg pdf png txt zip'),
+    ('geonames_username', 'openatlas'),
+    ('geonames_url', 'https://www.geonames.org/'),
     ('log_level', '6'),
     ('logo_file_id', ''),
     ('mail', ''),

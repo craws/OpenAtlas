@@ -16,9 +16,11 @@ Execute install/upgrade/5.2.0.sql after making backups
 
 Some map configurations were moved from default/config.py to the database and can now be adjusted in the admin interface.
 In case you have overwritten them in instance/production.py (where they are not used anymore) you should adjust these settings at admin/map.
-Values moved are:
+Moved values:
 * MAX_ZOOM
 * DEFAULT_ZOOM
+* GEONAMES_USERNAME
+* GEONAMES_VIEW_URL
 
 ### 5.1.0 to 5.1.1
 

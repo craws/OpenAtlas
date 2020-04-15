@@ -36,9 +36,7 @@ SESSION_COOKIE_SECURE = False  # Should be set to True in production.py if using
 REMEMBER_COOKIE_SECURE = True
 SESSION_COOKIE_SAMESITE = 'Lax'
 
-# Map
-GEONAMES_USERNAME = 'openatlas'
-GEONAMES_VIEW_URL = 'http://www.geonames.org/'
+# Key for Thunderforest map layer
 THUNDERFOREST_KEY = '7878b4fb224f4902ab42fc846e92b96a'
 
 # API

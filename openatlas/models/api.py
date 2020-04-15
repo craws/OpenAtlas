@@ -1,7 +1,7 @@
 import os
-from typing import List, Dict, Any
+from typing import Any, Dict, List
 
-from flask import request, url_for, g
+from flask import g, session, url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
@@ -120,7 +120,7 @@ class Api:
             if 'unit' not in nodes_dict and node.description:
                 nodes_dict['description'] = node.description
 
-            #  This feature is soley for Stefan
+            #  This feature is solely for Stefan
             hierarchy = []
             for root in node.root:
                 hierarchy.append(g.nodes[root].name)
@@ -175,7 +175,8 @@ class Api:
             if geonames_link.type.name:
                 geo_name['type'] = Api.to_camelcase(geonames_link.type.name)
             if geonames_link.domain.name:
-                geo_name['identifier'] = app.config['GEONAMES_VIEW_URL'] + geonames_link.domain.name
+                geo_name['identifier'] = session['settings']['geonames_url'] + \
+                                         geonames_link.domain.name
             if geonames_link.type.name or geonames_link.domain.name:
                 features['links'] = []
                 features['links'].append(geo_name)

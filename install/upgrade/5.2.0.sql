@@ -9,6 +9,8 @@ ALTER TABLE ONLY web.settings ADD CONSTRAINT settings_name_key UNIQUE (name);
 
 INSERT INTO web.settings (name, value) VALUES ('map_zoom_max', '18');
 INSERT INTO web.settings (name, value) VALUES ('map_zoom_default', '12');
+INSERT INTO web.settings (name, value) VALUES ('geonames_username', 'openatlas');
+INSERT INTO web.settings (name, value) VALUES ('geonames_url', 'https://www.geonames.org/');
 UPDATE web.user_settings SET name = 'map_zoom_max' WHERE name = 'max_zoom';
 UPDATE web.user_settings SET name = 'map_zoom_default' WHERE name = 'default_zoom';
 

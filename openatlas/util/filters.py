@@ -490,6 +490,6 @@ def display_external_references(self: Any, entity: Entity) -> str:
             name = link_.description
         if link_.domain.system_type == 'external reference geonames':
             name = 'GeoNames (' + link_.domain.name + ')'
-            url = app.config['GEONAMES_VIEW_URL'] + link_.domain.name
+            url = session['settings']['geonames_url'] + link_.domain.name
         html += '<a target="_blank" href="{url}">{name}</a><br>'.format(url=url, name=name)
     return Markup('<h2>' + util.uc_first(_('external references')) + '</h2>' + html) if html else ''
