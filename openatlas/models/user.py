@@ -13,9 +13,9 @@ from flask_wtf import FlaskForm
 from psycopg2.extras import NamedTupleCursor
 from werkzeug.exceptions import abort
 
-from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.util.util import is_authorized
+from openatlas.views.profile import ProfileForm
 
 
 class User(UserMixin):  # type: ignore
@@ -205,35 +205,29 @@ class User(UserMixin):  # type: ignore
 
     @staticmethod
     def get_settings(user_id: int) -> Dict[str, Any]:
+        # Set defaults
+        settings = {'layout': 'default',
+                    'language': session['language'],
+                    'map_zoom_max': session['settings']['map_zoom_max'],
+                    'map_zoom_default': session['settings']['map_zoom_default'],
+                    'module_notes': False,
+                    'module_geonames': False,
+                    'module_map_overlay': False,
+                    'newsletter': False,
+                    'table_rows': session['settings']['default_table_rows'],
+                    'table_show_aliases': True,
+                    'show_email': False,}
         sql = 'SELECT "name", value FROM web.user_settings WHERE user_id = %(user_id)s;'
         g.execute(sql, {'user_id': user_id})
-        settings = {row.name: row.value for row in g.cursor.fetchall()}
-        for item in ['newsletter',
-                     'show_email',
-                     'module_notes',
-                     'module_geonames',
-                     'module_map_overlay']:
-            settings[item] = True if item in settings and settings[item] == 'True' else False
-        if 'table_show_aliases' in settings and not settings['table_show_aliases']:
-            settings['table_show_aliases'] = False
-        else:
-            settings['table_show_aliases'] = True
-        if 'layout' not in settings:
-            settings['layout'] = 'default'
-        if 'language' not in settings:
-            settings['language'] = session['language']
-        if 'map_zoom_max' in settings:
-            settings['map_zoom_max'] = settings['map_zoom_max']
-        else:
-            settings['map_zoom_max'] = session['settings']['map_zoom_max']
-        if 'map_zoom_default' in settings:
-            settings['map_zoom_default'] = int(settings['map_zoom_default'])
-        else:
-            settings['map_zoom_default'] = session['settings']['map_zoom_default']
-        if 'table_rows' in settings:
-            settings['table_rows'] = int(settings['table_rows'])
-        else:
-            settings['table_rows'] = session['settings']['default_table_rows']
+        form = ProfileForm()
+        for row in g.cursor.fetchall():
+            value = row.value
+            form_field = getattr(form, row.name)   # Use profile form to determine value data types
+            if form_field.type == 'BooleanField':
+                value = True if value == 'True' else False
+            elif form_field.type == 'IntegerField' or form_field.name == 'table_rows':
+                value = int(value)
+            settings[row.name] = value
         return settings
 
     @staticmethod
