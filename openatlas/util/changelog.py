@@ -2,6 +2,7 @@ class Changelog:
     versions = {
         '5.2.0': ['TBA', {
             'feature': {
+                '1167': 'Settings and profile'
                 },
         }],
         '5.1.1': ['2020-04-12', {
