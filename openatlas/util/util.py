@@ -421,7 +421,7 @@ def is_authorized(group: str) -> bool:
         ['manager', 'editor', 'contributor', 'readonly']) or (
         current_user.group == 'editor' and group in ['editor', 'contributor', 'readonly']) or (
         current_user.group == 'contributor' and group in ['contributor', 'readonly']) or (
-        current_user.group == 'readonly' and group == 'readonly'):
+            current_user.group == 'readonly' and group == 'readonly'):
         return True
     return False
 

@@ -19,6 +19,8 @@ class Settings:
                             'random_password_length',
                             'reset_confirm_hours']:
                 settings[row.name] = int(row.value)
+            if row.name in ['mail_recipients_feedback', 'file_upload_allowed_extension']:
+                settings[row.name] = row.value.split(' ')
         return settings
 
     @staticmethod

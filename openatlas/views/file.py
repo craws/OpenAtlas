@@ -30,7 +30,7 @@ class FileForm(FlaskForm):  # type: ignore
         valid = FlaskForm.validate(self)
         if request.files:
             file_ = request.files['file']
-            ext = session['settings']['file_upload_allowed_extension'].split()
+            ext = session['settings']['file_upload_allowed_extension']
             if not file_:  # pragma: no cover
                 self.file.errors.append(_('no file to upload'))
                 valid = False

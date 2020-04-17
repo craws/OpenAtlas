@@ -515,8 +515,6 @@ def get_form_settings(form: Any) -> Dict[str, str]:
         label = uc_first(field.label.text)
         value = session['settings'][field.name]
         if field.type in ['StringField', 'IntegerField']:
-            if type(value) == list:
-                value = ';'.join(value)
             settings[label] = value
         if field.type == 'BooleanField':
             settings[label] = uc_first(_('on')) if value else uc_first(_('off'))
@@ -524,6 +522,8 @@ def get_form_settings(form: Any) -> Dict[str, str]:
             if type(value) is str and value.isdigit():
                 value = int(value)
             settings[label] = dict(field.choices).get(value)
+        if field.name in ['mail_recipients_feedback', 'file_upload_allowed_extension']:
+            settings[label] = ' '.join(value)
     return settings
 
 
@@ -531,7 +531,10 @@ def set_form_settings(form: Any) -> None:
     for field in form:
         if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
             continue
-        if field.name in ['log_level']:
+        if field.name in ['log_level']:  # pragma: no cover
             field.data = int(session['settings'][field.name])
+            continue
+        if field.name in ['mail_recipients_feedback', 'file_upload_allowed_extension']:
+            field.data = ' '.join(session['settings'][field.name])
             continue
         field.data = session['settings'][field.name]
