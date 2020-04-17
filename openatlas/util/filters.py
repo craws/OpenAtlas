@@ -197,7 +197,7 @@ def description(self: Any, entity: Entity) -> str:
     label = util.uc_first(_('description'))
     if hasattr(entity, 'system_type') and entity.system_type == 'source content':
         label = util.uc_first(_('content'))
-    return Markup("""<h2>*{label}</h2><div class="description more">{description}</div>""".format(
+    return Markup("""<h2>{label}</h2><div class="description more">{description}</div>""".format(
         label=label,
         description=entity.description.replace('\r\n', '<br>')))
 

@@ -10,17 +10,19 @@
     <form method="post">
         {{ form.csrf_token }}
         {% for category, fields in form_fields.items() %}
-            <div style="float:left;margin-right:2em;">
-                <h1>{{ category|uc_first }}</h1>
-                <div class="data-table">
-                    {% for field in fields %}
-                        <div class="table-row">
-                            <div>{{ field.label }} {{ field.description|display_tooltip|safe }}</div>
-                            <div class="table-cell">{{ field }}</div>
-                        </div>
-                    {% endfor %}
+            {% if category != 'modules' or 'contributor'|is_authorized %}
+                <div style="float:left;margin-right:2em;">
+                    <h1>{{ category|uc_first }}</h1>
+                    <div class="data-table">
+                        {% for field in fields %}
+                            <div class="table-row">
+                                <div>{{ field.label }} {{ field.description|display_tooltip|safe }}</div>
+                                <div class="table-cell">{{ field }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
                 </div>
-            </div>
+            {% endif %}
         {% endfor %}
         <div style="clear:both"></div>
         {{ form.save(class=config['CSS']['button']['primary']) }}
