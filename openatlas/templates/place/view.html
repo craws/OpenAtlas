@@ -12,20 +12,20 @@
     <div class="col-6">
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" aria-selected="true" href="#tab-info">{{ _('info')|uc_first }}</a></li>
-            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-source">{{ _('source')|uc_first }} {{ tables['source']|format_tab_number }}</a></li>
-            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-event">{{ _('event')|uc_first }} {{ tables['event']|format_tab_number }}</a></li>
-            {% if tables['actor'].rows %}
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-actor">{{ _('actor')|uc_first }} {{ tables['actor']|format_tab_number }}</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-source">{{ _('source')|uc_first }} {{ tables.source|format_tab_number }}</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-event">{{ _('event')|uc_first }} {{ tables.event|format_tab_number }}</a></li>
+            {% if tables.actor.rows %}
+                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-actor">{{ _('actor')|uc_first }} {{ tables.actor|format_tab_number }}</a></li>
             {% endif %}
-            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-reference">{{ _('reference')|uc_first }} {{ tables['reference']|format_tab_number }}</a></li>
-            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-file">{{ _('files')|uc_first }} {{ tables['file']|format_tab_number }}</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-reference">{{ _('reference')|uc_first }} {{ tables.reference|format_tab_number }}</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-file">{{ _('files')|uc_first }} {{ tables.file|format_tab_number }}</a></li>
             {% if object_.system_type == 'place' %}
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-feature">{{ _('feature')|uc_first }} {{ tables['feature']|format_tab_number }}</a></li>
+                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-feature">{{ _('feature')|uc_first }} {{ tables.feature|format_tab_number }}</a></li>
             {% elif object_.system_type == 'feature' %}
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-stratigraphic-unit">{{ _('stratigraphic unit')|uc_first }} {{ tables['stratigraphic-unit']|format_tab_number }}</a></li>
+                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-stratigraphic-unit">{{ _('stratigraphic unit')|uc_first }} {{ tables.stratigraphic_unit|format_tab_number }}</a></li>
             {% elif object_.system_type == 'stratigraphic unit' %}
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-find">{{ _('find')|uc_first }} {{ tables['find']|format_tab_number }}</a></li>
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-human-remains">{{ _('human remains')|uc_first }} {{ tables['human-remains']|format_tab_number }}</a></li>
+                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-find">{{ _('find')|uc_first }} {{ tables.find|format_tab_number }}</a></li>
+                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-human-remains">{{ _('human remains')|uc_first }} {{ tables.human_remains|format_tab_number }}</a></li>
             {% endif %}
         </ul>
         <div class="tab-content">
@@ -58,7 +58,7 @@
                     {{ _('source')|button(url_for('source_insert', origin_id=object_.id)) }}
                 </div>
                 {% endif %}
-                {{ tables['source'].display('source')|safe }}
+                {{ tables.source.display('source')|safe }}
             </div>
             <div class="tab-pane fade" role="tabpanel" id="tab-event">
                 {% if 'contributor'|is_authorized %}
@@ -68,11 +68,11 @@
                         {% endfor %}
                     </div>
                 {% endif %}
-                {{ tables['event'].display('event')|safe }}
+                {{ tables.event.display('event')|safe }}
             </div>
-            {% if tables['actor'].rows %}
+            {% if tables.actor.rows %}
                 <div class="tab-pane fade" role="tabpanel" id="tab-actor">
-                    {{ tables['actor'].display('actor')|safe }}
+                    {{ tables.actor.display('actor')|safe }}
                 </div>
             {% endif %}
             <div class="tab-pane fade" role="tabpanel" id="tab-reference">
@@ -84,7 +84,7 @@
                         {{ _('external reference')|button(url_for('reference_insert', code='external_reference', origin_id=object_.id)) }}
                     </div>
                 {% endif %}
-                {{ tables['reference'].display('reference')|safe }}
+                {{ tables.reference.display('reference')|safe }}
             </div>
             <div class="tab-pane fade" role="tabpanel" id="tab-file">
                 {% if 'contributor'|is_authorized %}
@@ -93,34 +93,34 @@
                         {{ _('file')|button(url_for('file_insert', origin_id=object_.id)) }}
                     </div>
                 {% endif %}
-                {{ tables['file'].display('file')|safe }}
+                {{ tables.file.display('file')|safe }}
             </div>
             {% if object_.system_type == 'place' %}
                 <div class="tab-pane fade" role="tabpanel" id="tab-feature">
                     <div class="toolbar">
                         {{ _('feature')|button(url_for('place_insert', origin_id=object_.id)) }}
                     </div>
-                    {{ tables['feature'].display('feature')|safe }}
+                    {{ tables.feature.display('feature')|safe }}
                 </div>
             {% elif object_.system_type == 'feature' %}
                 <div class="tab-pane fade" role="tabpanel" id="tab-stratigraphic-unit">
                     <div class="toolbar">
                         {{ _('stratigraphic unit')|button(url_for('place_insert', origin_id=object_.id)) }}
                     </div>
-                    {{ tables['stratigraphic-unit'].display('stratigraphic-unit')|safe }}
+                    {{ tables.stratigraphic_unit.display('stratigraphic_unit')|safe }}
                 </div>
             {% elif object_.system_type == 'stratigraphic unit' %}
                 <div class="tab-pane fade" role="tabpanel" id="tab-find">
                     <div class="toolbar">
                         {{ _('find')|button(url_for('place_insert', origin_id=object_.id)) }}
                     </div>
-                    {{ tables['find'].display('find')|safe }}
+                    {{ tables.find.display('find')|safe }}
                 </div>
                 <div class="tab-pane fade" role="tabpanel" id="tab-human-remains">
                     <div class="toolbar">
                         {{ _('human remains')|button(url_for('place_insert', origin_id=object_.id, system_type='human_remains')) }}
                     </div>
-                    {{ tables['human-remains'].display('human_remains')|safe }}
+                    {{ tables.human_remains.display('human_remains')|safe }}
                 </div>
             {% endif %}
         </div>

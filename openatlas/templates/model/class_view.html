@@ -10,28 +10,28 @@
         </p>
         {{ info|display_info }}
     </div>
-    {% if tables['super'].rows %}
+    {% if tables.super.rows %}
         <div style="float:left;padding-right:2em;">
             <p><strong>{{ _('super')|uc_first }}</strong></p>
-            {{ tables['super'].display('super')|safe }}
+            {{ tables.super.display('super')|safe }}
         </div>
     {% endif %}
-    {% if tables['sub'].rows %}
+    {% if tables.sub.rows %}
         <div style="float:left;padding-right:2em;">
             <p><strong>{{ _('subs')|uc_first }}</strong></p>
-            {{ tables['sub'].display('sub')|safe }}
+            {{ tables.sub.display('sub')|safe }}
         </div>
     {% endif %}
-    {% if tables['domains'].rows %}
+    {% if tables.domains.rows %}
         <div style="float:left;padding-right:2em;">
             <p><strong>{{ _('domain for')|uc_first }}</strong></p>
-            {{ tables['domains'].display('domains')|safe }}
+            {{ tables.domains.display('domains')|safe }}
         </div>
     {% endif %}
-    {% if tables['ranges'].rows %}
+    {% if tables.ranges.rows %}
         <div style="float:left;padding-right:2em;">
             <p><strong>{{ _('range for')|uc_first }}</strong></p>
-            {{ tables['ranges'].display('ranges')|safe }}
+            {{ tables.ranges.display('ranges')|safe }}
         </div>
     {% endif %}
     <div style="clear:both"></div>

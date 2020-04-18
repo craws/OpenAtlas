@@ -12,7 +12,7 @@ class Table:
                'find': ['name', 'type', 'begin', 'end'],
                'file': ['name', 'license', 'size', 'extension', 'description'],
                'group': ['name', 'class', 'begin', 'end'],
-               'human-remains': ['name', 'type', 'begin', 'end'],
+               'human_remains': ['name', 'type', 'begin', 'end'],
                'information_carrier': ['name', 'type'],
                'object': ['name', 'type'],
                'node': ['name'],
@@ -20,7 +20,7 @@ class Table:
                'place': ['name', 'type', 'begin', 'end'],
                'reference': ['name', 'class', 'type'],
                'source': ['name', 'type', 'description'],
-               'stratigraphic-unit': ['name', 'type', 'begin', 'end']}
+               'stratigraphic_unit': ['name', 'type', 'begin', 'end']}
 
     def __init__(self,
                  header: Optional[List[str]] = None,  # A list of column header labels

@@ -7,15 +7,15 @@
 <div>
     <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" aria-selected="true" href="#tab-info">{{ _('info')|uc_first }}</a></li>
-        {% if tables['subs'].rows %}
-            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-subs">{{ _('subs')|uc_first }} {{ tables['subs']|format_tab_number }}</a></li>
+        {% if tables.subs.rows %}
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-subs">{{ _('subs')|uc_first }} {{ tables.subs|format_tab_number }}</a></li>
         {% endif %}
-        {% if tables['entities'].rows or tables['link_entities'].rows %}
+        {% if tables.entities.rows or tables.link_entities.rows %}
             <li>
-                <a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-entities">{{ _('entities')|uc_first }} {{ (tables['entities'].rows|length + tables['link_entities'].rows|length)|format_tab_number }}</a>
+                <a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-entities">{{ _('entities')|uc_first }} {{ (tables.entities.rows|length + tables.link_entities.rows|length)|format_tab_number }}</a>
             </li>
         {% endif %}
-        <li><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false"  href="#tab-file">{{ _('files')|uc_first }} {{ tables['file']|format_tab_number|safe }}</a></li>
+        <li><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false"  href="#tab-file">{{ _('files')|uc_first }} {{ tables.file|format_tab_number|safe }}</a></li>
     </ul>
     <div class="tab-content">
         <div class="tab-pane fade show active" role="tabpanel" id="tab-info">
@@ -42,23 +42,23 @@
             </div>
             <div style="clear:both;"></div>
         </div>
-        {% if tables['subs'].rows %}
+        {% if tables.subs.rows %}
             <div class="tab-pane fade" role="tabpanel" id="tab-subs">
-                {{ tables['subs'].display('subs')|safe }}
+                {{ tables.subs.display('subs')|safe }}
             </div>
         {% endif %}
-        {% if tables['entities'].rows or tables['link_entities'].rows %}
+        {% if tables.entities.rows or tables.link_entities.rows %}
             <div class="tab-pane fade" role="tabpanel" id="tab-entities">
                 {% if 'editor'|is_authorized and not root.value_type %}
                     <div class="toolbar">
                         {{ _('move entities')|button(url_for('node_move_entities', id_=node.id)) }}
                     </div>
                 {% endif %}
-                {% if tables['entities'].rows %}
-                    {{ tables['entities'].display('entities')|safe }}
+                {% if tables.entities.rows %}
+                    {{ tables.entities.display('entities')|safe }}
                 {% endif %}
-                {% if tables['link_entities'].rows %}
-                    {{ tables['link_entities'].display('link_entities')|safe }}
+                {% if tables.link_entities.rows %}
+                    {{ tables.link_entities.display('link_entities')|safe }}
                 {% endif %}
             </div>
         {% endif %}
@@ -69,7 +69,7 @@
                     {{ _('file')|button(url_for('file_insert', origin_id=node.id)) }}
                 </div>
             {% endif %}
-            {{ tables['file'].display('file')|safe }}
+            {{ tables.file.display('file')|safe }}
         </div>
     </div>
 </div>

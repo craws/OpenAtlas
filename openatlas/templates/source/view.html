@@ -7,17 +7,17 @@
 <div >
     <ul class="nav nav-tabs" role="tablist">
         <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" aria-selected="true" href="#tab-info">{{ _('info')|uc_first }}</a></li>
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-event">{{ _('event')|uc_first }} {{ tables['event']|format_tab_number }}</a></li>
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-actor">{{ _('actor')|uc_first }} {{ tables['actor']|format_tab_number }}</a></li>
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-place">{{ _('place')|uc_first }} {{ tables['place']|format_tab_number }}</a></li>
-        {% for table_name in ['feature', 'stratigraphic-unit', 'find'] %}
+        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-event">{{ _('event')|uc_first }} {{ tables.event|format_tab_number }}</a></li>
+        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-actor">{{ _('actor')|uc_first }} {{ tables.actor|format_tab_number }}</a></li>
+        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-place">{{ _('place')|uc_first }} {{ tables.place|format_tab_number }}</a></li>
+        {% for table_name in ['feature', 'stratigraphic_unit', 'find'] %}
             {% if tables[table_name].rows %}
                 <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-{{ table_name }}">{{ _(table_name)|uc_first }} {{ tables[table_name]|format_tab_number }}</a></li>
             {% endif %}
         {% endfor %}
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-reference">{{ _('reference')|uc_first }} {{ tables['reference']|format_tab_number }}</a></li>
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-text">{{ _('texts')|uc_first }} {{ tables['text']|format_tab_number }}</a></li>
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-file">{{ _('files')|uc_first }} {{ tables['file']|format_tab_number }}</a></li>
+        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-reference">{{ _('reference')|uc_first }} {{ tables.reference|format_tab_number }}</a></li>
+        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-text">{{ _('texts')|uc_first }} {{ tables.text|format_tab_number }}</a></li>
+        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-file">{{ _('files')|uc_first }} {{ tables.file|format_tab_number }}</a></li>
     </ul>
     <div class="tab-content">
         <div class="tab-pane fade show active" role="tabpanel" id="tab-info">
@@ -40,10 +40,10 @@
                 <div style="clear:both;"></div>
             </div>
         </div>
-        {% for name in ['event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find'] %}
-            {% if name not in ['feature', 'stratigraphic-unit', 'find'] or tables[name].rows %}
+        {% for name in ['event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find'] %}
+            {% if name not in ['feature', 'stratigraphic_unit', 'find'] or tables[name].rows %}
                 <div class="tab-pane fade" role="tabpanel" id="tab-{{ name }}">
-                    {% if 'contributor'|is_authorized and name not in ['feature', 'stratigraphic-unit', 'find'] %}
+                    {% if 'contributor'|is_authorized and name not in ['feature', 'stratigraphic_unit', 'find'] %}
                         <div class="toolbar">
                             {{ _('add')|button(url_for('source_add', id_=source.id, class_name=name)) }}
                             {% if name == 'place' %}
@@ -68,7 +68,7 @@
                     {{ _('external reference')|button(url_for('reference_insert', code='external_reference', origin_id=source.id)) }}
                 </div>
             {% endif %}
-            {{ tables['reference'].display('reference')|safe }}
+            {{ tables.reference.display('reference')|safe }}
         </div>
         <div class="tab-pane fade" role="tabpanel" id="tab-text">
             {% if 'contributor'|is_authorized %}
@@ -76,7 +76,7 @@
                     {{ _('text')|button(url_for('translation_insert', source_id=source.id)) }}
                 </div>
             {% endif %}
-            {{ tables['text'].display('text')|safe }}
+            {{ tables.text.display('text')|safe }}
         </div>
         <div class="tab-pane fade" role="tabpanel" id="tab-file">
             {% if 'contributor'|is_authorized %}
@@ -85,7 +85,7 @@
                     {{ _('file')|button(url_for('file_insert', origin_id=source.id)) }}
                 </div>
             {% endif %}
-            {{ tables['file'].display('file')|safe }}
+            {{ tables.file.display('file')|safe }}
         </div>
     </div>
 </div>

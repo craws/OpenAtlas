@@ -4,9 +4,9 @@
 {% endblock %}
 {% block content %}
     {% if current_user.is_authenticated %}
-        {% if tables['overview']['rows'] %}
+        {% if tables.overview['rows'] %}
             <div style="float:left;margin-right:2em;min-width: 500px;">
-                {{ tables['overview'].display('overview')|safe }}
+                {{ tables.overview.display('overview')|safe }}
             </div>
         {% endif %}
         <div style="float:left; ">
@@ -40,20 +40,20 @@
             </p>
         </div>
         <div style="clear:both;"></div>
-        {% if tables['latest'].rows %}
+        {% if tables.latest.rows %}
             <h1>{{ _('latest')|uc_first }}</h1>
-            {{ tables['latest'].display('latest')|safe }}
+            {{ tables.latest.display('latest')|safe }}
             <div class="toolbar">
                 {{ _('Show all activity')|button(url_for('user_activity')) }}
             </div>
         {% endif %}
-        {% if tables['bookmarks'].rows %}
+        {% if tables.bookmarks.rows %}
             <h1>{{ _('bookmarks')|uc_first }}</h1>
-            {{ tables['bookmarks'].display('bookmarks')|safe }}
+            {{ tables.bookmarks.display('bookmarks')|safe }}
         {% endif %}
-        {% if tables['notes'].rows %}
+        {% if tables.notes.rows %}
             <h1>{{ _('notes')|uc_first }}</h1>
-            {{ tables['notes'].display('notes')|safe }}
+            {{ tables.notes.display('notes')|safe }}
         {% endif %}
     {% else %}
         {% if intro: %}

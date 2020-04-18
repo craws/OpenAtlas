@@ -311,8 +311,8 @@ def event_view(event: Entity) -> str:
 def file_view(file: Entity) -> str:
     path = get_file_path(file.id)
     tables = {}
-    for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find',
-                 'reference', 'node', 'human-remains']:
+    for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
+                 'reference', 'node', 'human_remains']:
         tables[name] = Table(Table.HEADERS[name] + (['page'] if name == 'reference' else []))
     for link_ in file.get_links('P67'):
         range_ = link_.range
@@ -376,10 +376,10 @@ def place_view(object_: Entity) -> str:
     if object_.system_type == 'place':
         tables['feature'] = Table(Table.HEADERS['place'] + [_('description')])
     if object_.system_type == 'feature':
-        tables['stratigraphic-unit'] = Table(Table.HEADERS['place'] + [_('description')])
+        tables['stratigraphic_unit'] = Table(Table.HEADERS['place'] + [_('description')])
     if object_.system_type == 'stratigraphic unit':
         tables['find'] = Table(Table.HEADERS['place'] + [_('description')])
-        tables['human-remains'] = Table(Table.HEADERS['place'] + [_('description')])
+        tables['human_remains'] = Table(Table.HEADERS['place'] + [_('description')])
     profile_image_id = object_.get_profile_image_id()
     if current_user.settings['module_map_overlay'] and is_authorized('editor'):
         tables['file'].header.append(uc_first(_('overlay')))
@@ -436,7 +436,7 @@ def place_view(object_: Entity) -> str:
         for entity in structure['subunits']:
             data = get_base_table_data(entity)
             data.append(entity.description)
-            tables[entity.system_type.replace(' ', '-')].rows.append(data)
+            tables[entity.system_type.replace(' ', '_')].rows.append(data)
     gis_data = Gis.get_all([object_], structure)
     if gis_data['gisPointSelected'] == '[]' \
             and gis_data['gisPolygonSelected'] == '[]' \
@@ -456,7 +456,7 @@ def place_view(object_: Entity) -> str:
 def reference_view(reference: Entity) -> str:
     reference.note = User.get_note(reference)
     tables = {'file': Table(Table.HEADERS['file'] + ['page', _('main image')])}
-    for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic-unit', 'find']:
+    for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find']:
         header_label = 'link text' if reference.system_type == 'external reference' else 'page'
         tables[name] = Table(Table.HEADERS[name] + [header_label])
     for link_ in reference.get_links('P67', True):
@@ -493,7 +493,7 @@ def source_view(source: Entity) -> str:
         tables['text'].rows.append([link(text),
                                     next(iter(text.nodes)).name if text.nodes else '',
                                     text.description])
-    for name in ['actor', 'event', 'place', 'feature', 'stratigraphic-unit', 'find']:
+    for name in ['actor', 'event', 'place', 'feature', 'stratigraphic_unit', 'find']:
         tables[name] = Table(Table.HEADERS[name])
     tables['actor'].defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
     tables['event'].defs = [{'className': 'dt-body-right', 'targets': [3, 4]}]

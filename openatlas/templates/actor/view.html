@@ -8,15 +8,15 @@
     <div class="col-6">
         <ul class="nav nav-tabs" role="tablist">
             <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" aria-selected="true" href="#tab-info">{{ _('info')|uc_first }}</a></li>
-            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-source">{{ _('source')|uc_first }} {{ tables['source']|format_tab_number }}</a></li>
-            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-event">{{ _('event')|uc_first }} {{ tables['event']|format_tab_number }}</a></li>
-            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-relation">{{ _('relation')|uc_first }} {{ tables['relation']|format_tab_number }}</a></li>
-            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-member-of">{{ _('member of')|uc_first }} {{ tables['member_of']|format_tab_number }}</a></li>
-            {% if tables['member'] %}
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-member">{{ _('member')|uc_first }} {{ tables['member']|format_tab_number }}</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-source">{{ _('source')|uc_first }} {{ tables.source|format_tab_number }}</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-event">{{ _('event')|uc_first }} {{ tables.event|format_tab_number }}</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-relation">{{ _('relation')|uc_first }} {{ tables.relation|format_tab_number }}</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-member-of">{{ _('member of')|uc_first }} {{ tables.member_of|format_tab_number }}</a></li>
+            {% if tables.member %}
+                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-member">{{ _('member')|uc_first }} {{ tables.member|format_tab_number }}</a></li>
             {% endif %}
-            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-reference">{{ _('reference')|uc_first }} {{ tables['reference']|format_tab_number }}</a></li>
-            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-file">{{ _('files')|uc_first }} {{ tables['file']|format_tab_number }}</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-reference">{{ _('reference')|uc_first }} {{ tables.reference|format_tab_number }}</a></li>
+            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-file">{{ _('files')|uc_first }} {{ tables.file|format_tab_number }}</a></li>
         </ul>
         <div class="tab-content">
             <div class="tab-pane fade show active" role="tabpanel" id="tab-info">
@@ -46,7 +46,7 @@
                         {{ _('source')|button(url_for('source_insert', origin_id=actor.id)) }}
                     </div>
                 {% endif %}
-                {{ tables['source'].display('source')|safe }}
+                {{ tables.source.display('source')|safe }}
             </div>
             <div class="tab-pane fade" role="tabpanel" id="tab-event">
                 {% if 'contributor'|is_authorized %}
@@ -57,7 +57,7 @@
                         {% endfor %}
                     </div>
                 {% endif %}
-                {{ tables['event'].display('event')|safe }}
+                {{ tables.event.display('event')|safe }}
             </div>
             <div class="tab-pane fade" role="tabpanel" id="tab-relation">
                 {% if 'contributor'|is_authorized %}
@@ -68,7 +68,7 @@
                         {% endfor %}
                     </div>
                 {% endif %}
-                {{ tables['relation'].display('relation')|safe }}
+                {{ tables.relation.display('relation')|safe }}
             </div>
             <div class="tab-pane fade" role="tabpanel" id="tab-member-of">
                 {% if 'contributor'|is_authorized %}
@@ -76,16 +76,16 @@
                         {{ _('add')|button(url_for('membership_insert', origin_id=actor.id)) }}
                     </div>
                 {% endif %}
-                {{ tables['member_of'].display('member_of')|safe }}
+                {{ tables.member_of.display('member_of')|safe }}
             </div>
-            {% if tables['member'] %}
+            {% if tables.member %}
                 <div class="tab-pane fade" role="tabpanel" id="tab-member">
                     {% if 'contributor'|is_authorized %}
                         <div class="toolbar">
                             {{ _('add')|button(url_for('member_insert', origin_id=actor.id)) }}
                         </div>
                     {% endif %}
-                    {{ tables['member'].display('member')|safe }}
+                    {{ tables.member.display('member')|safe }}
                 </div>
             {% endif %}
             <div class="tab-pane fade" role="tabpanel" id="tab-reference">
@@ -97,7 +97,7 @@
                         {{ _('external reference')|button(url_for('reference_insert', code='external_reference', origin_id=actor.id)) }}
                     </div>
                 {% endif %}
-                {{ tables['reference'].display('reference')|safe }}
+                {{ tables.reference.display('reference')|safe }}
             </div>
             <div class="tab-pane fade" role="tabpanel" id="tab-file">
                 {% if 'contributor'|is_authorized %}
@@ -106,7 +106,7 @@
                         {{ _('file')|button(url_for('file_insert', origin_id=actor.id)) }}
                     </div>
                 {% endif %}
-                {{ tables['file'].display('file')|safe }}
+                {{ tables.file.display('file')|safe }}
             </div>
         </div>
     </div>
