@@ -27,31 +27,31 @@
             } %}
             {{ data|display_info }}
             <div class="toolbar">
-                {{ form.test(class_=config['CSS']['button']['primary']) }}
+                {{ form.test(class_=config.CSS.button.primary) }}
             </div>
         </form>
         {% if test_result %}
             <p style="margin-top:1em;">
                 {{ _('result for')|uc_first }}
-                {{ test_result['domain']|link|safe }} >
-                {{ test_result['property']|link|safe }} >
-                {{ test_result['range']|link|safe }}
+                {{ test_result.domain|link|safe }} >
+                {{ test_result.property|link|safe }} >
+                {{ test_result.range|link|safe }}
             </p>
-            {% if not test_result['domain_error'] and not test_result['range_error'] %}
+            {% if not test_result.domain_error and not test_result.range_error %}
                 <p>{{ _('valid link')|uc_first }}<br>
             {% endif %}
-            {% if test_result['domain_error'] %}
+            {% if test_result.domain_error %}
                 <p>
                     <span class="error">{{ _('wrong domain')|uc_first }}</span>
-                    {{ test_result['domain']|link|safe }} {{ _('for') }}
-                    {{ test_result['property']|link|safe }}
+                    {{ test_result.domain|link|safe }} {{ _('for') }}
+                    {{ test_result.property|link|safe }}
                 </p>
             {% endif %}
-            {% if test_result['range_error'] %}
+            {% if test_result.range_error %}
                 <p>
                     <span class="error">{{ _('wrong range')|uc_first }}</span>
-                    {{ test_result['range']|link|safe }} {{ _('for') }}
-                    {{ test_result['property']|link|safe }}
+                    {{ test_result.range|link|safe }} {{ _('for') }}
+                    {{ test_result.property|link|safe }}
                 </p>
             {% endif %}
         {% endif %}

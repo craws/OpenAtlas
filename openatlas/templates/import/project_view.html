@@ -22,7 +22,7 @@
                     <p>{{ _('new import')|uc_first }}:</p>
                     <div class="toolbar">
                         {{ _('source')|button(url_for('import_data', project_id=project.id, class_code='E33')) }}
-                        {% for code in config['CLASS_CODES']['event'] + config['CLASS_CODES']['actor'] %}
+                        {% for code in config.CLASS_CODES.event + config.CLASS_CODES.actor %}
                             {{ code|get_class_name|button(url_for('import_data', project_id=project.id, class_code=code)) }}
                         {% endfor %}
                         {{ _('place')|button(url_for('import_data', project_id=project.id, class_code='E18')) }}

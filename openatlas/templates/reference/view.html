@@ -51,7 +51,7 @@
                             {% elif name == 'file' %}
                                 {{ _('file')|button(url_for('file_insert', origin_id=reference.id)) }}
                             {% else %}
-                                {% for code in config['CLASS_CODES'][name]%}
+                                {% for code in config.CLASS_CODES[name]%}
                                     {{ code|get_class_name|button(url_for(name + '_insert', code=code, origin_id=reference.id)) }}
                                 {% endfor %}
                             {% endif %}

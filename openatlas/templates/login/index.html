@@ -5,7 +5,7 @@
 {% endblock %}
 {% block content %}
     {{ form|display_form('login-form')|safe }}
-    {% if config['DEMO_MODE'] %}
+    {% if config.DEMO_MODE %}
         <p>User: Demolina, Pass: Demolina</p>
         <script>
             $(document).ready(function () {
@@ -13,7 +13,7 @@
                 $("#password").val('Demolina');
             });
         </script>
-    {% elif session['settings']['mail'] %}
+    {% elif session.settings.mail %}
         <p>
             <a href="{{ url_for('reset_password') }}">{{ _('Forgot your password?') }}</a>
         </p>

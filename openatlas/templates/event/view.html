@@ -55,7 +55,7 @@
                 {% if 'contributor'|is_authorized %}
                 <div class="toolbar">
                     {{ _('add')|button(url_for('involvement_insert', origin_id=event.id)) }}
-                    {% for code in config['CLASS_CODES']['actor'] %}
+                    {% for code in config.CLASS_CODES.actor %}
                         {{ code|get_class_name|button(url_for('actor_insert', code=code, origin_id=event.id)) }}
                     {% endfor %}
                 </div>

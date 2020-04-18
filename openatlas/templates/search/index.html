@@ -16,8 +16,8 @@
             <h2>{{ _('date')|uc_first }}</h2>
             <span style="display:inline-block;width:3em;">{{ _('from')|uc_first }}</span>
             {{ form.begin_year(class_='year') }} {{ form.begin_month(class_='month') }} {{ form.begin_day(class_='day') }}
-            {% if form.errors['begin_year'] %}
-                <span class="error">{{ form.errors['begin_year'][0]|safe }}</span>
+            {% if form.errors.begin_year %}
+                <span class="error">{{ form.errors.begin_year[0]|safe }}</span>
             {% endif %}
             <br>
             <span style="display:inline-block;width:3em;">{{ _('to')|uc_first }}</span>
@@ -26,7 +26,7 @@
             <h2>{{ _('classes')|uc_first }}</h2>
             <p id="select_all" class="select_all">{{ _('deselect all')|uc_first }}</p>
             {{ form.classes }}
-            {{ form.search(class_=config['CSS']['button']['primary']) }}
+            {{ form.search(class_=config.CSS.button.primary) }}
         </form>
     </div>
     <div style="float:left;margin-left: 1em;">

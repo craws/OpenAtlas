@@ -31,11 +31,11 @@
                     showDirectionality: true,
                     showLabels: (node, selectedNodeIds) =>
                         selectedNodeIds.size > 0 || node.neighbors.size > 2 + graphSizeFactor,
-                    width: {{ network_params['options']['width'] }},
-                    height: {{ network_params['options']['height'] }},
+                    width: {{ network_params.options.width }},
+                    height: {{ network_params.options.height }},
                     simulation: {
-                        charge: {{ network_params['options']['charge'] }},
-                        distance: {{ network_params['options']['distance'] }},
+                        charge: {{ network_params.options.charge }},
+                        distance: {{ network_params.options.distance }},
                     }
                 }),
                 document.getElementById('visualization')
@@ -62,7 +62,7 @@
         {{ form.charge }} {{ form.charge.label }}<br>
         {{ form.distance }} {{ form.distance.label }}<br>
         <div class="toolbar" style="margin-top: 1em;">
-            <input class="{{ config['CSS']['button']['primary'] }}" id="save" name="save" value="{{ _('apply')|uc_first }}" type="submit">
+            <input class="{{ config.CSS.button.primary }}" id="save" name="save" value="{{ _('apply')|uc_first }}" type="submit">
         </div>
     </form>
 {% endblock %}

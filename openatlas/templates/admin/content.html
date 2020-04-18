@@ -11,7 +11,7 @@
             {{ form[language](class='tinymce') }}<br>
         {% endfor %}
         <p>
-            <button type="submit" class="{{ config['CSS']['button']['primary'] }}">{{ _('save')|uc_first }}</button>
+            <button type="submit" class="{{ config.CSS.button.primary }}">{{ _('save')|uc_first }}</button>
         </p>
     </form>
 {% endblock %}

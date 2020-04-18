@@ -57,7 +57,7 @@
                     <div style="float:left;margin-left:2em;">
                         <img src="{{ ''|get_logo|safe }}" id="logo-preview" alt="Logo" style="max-width:400px;"><br>
                         <div class="toolbar">
-                            {% if settings['logo_file_id']: %}
+                            {% if settings.logo_file_id: %}
                                 {{ _('remove custom logo')|button(url_for('admin_index', action='remove_logo', id_=0)) }}
                             {% else %}
                                 {{  _('choose custom logo')|button(url_for('admin_logo')) }}
@@ -72,7 +72,7 @@
                     {{ 'User'|manual_link }}
                     {{ _('activity')|button(url_for('user_activity')) }}
                     {% if 'manager'|is_authorized %}
-                        {% if session['settings']['mail'] %}
+                        {% if session.settings.mail %}
                             {{ _('newsletter')|button(url_for('admin_newsletter')) }}
                         {% endif %}
                         {{ _('user')|button(url_for('user_insert')) }}
@@ -95,7 +95,7 @@
                         {{ _('edit settings')|button(url_for('admin_settings', category='mail')) }}
                     </div>
                     {{ info.mail|display_info }}
-                    {% if settings['mail'] %}
+                    {% if settings.mail %}
                         {{ form|display_form }}
                     {% endif %}
                 </div>

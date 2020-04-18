@@ -2,9 +2,9 @@
 {% block title_name %}- {{ object_.name }}{% endblock %}
 {% block breadcrumb %}
     {{ [['place', 'place_index'],
-        structure['place'],
-        structure['feature'],
-        structure['stratigraphic_unit'],
+        structure.place,
+        structure.feature,
+        structure.stratigraphic_unit,
         object_,
         _('edit')]|crumb }}
 {% endblock %}

@@ -49,7 +49,7 @@
                             {% if name == 'place' %}
                                 {{ _('place')|button(url_for('place_insert', origin_id=source.id)) }}
                             {% else %}
-                                {% for code in config['CLASS_CODES'][name]%}
+                                {% for code in config.CLASS_CODES[name]%}
                                     {{ code|get_class_name|button(url_for(name + '_insert', code=code, origin_id=source.id)) }}
                                 {% endfor %}
                             {% endif %}
