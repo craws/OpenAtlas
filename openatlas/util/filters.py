@@ -114,8 +114,7 @@ def display_info(self: Any, data: Dict[str, Union[str, List[str]]]) -> str:
     for label, value in data.items():
         if value or value == 0:
             if isinstance(value, bool):  # Used in display of settings
-                value = util.uc_first(_('off')) if value is False else value
-                value = util.uc_first(_('on')) if value is True else value
+                value = _('on') if value else _('off')
             if isinstance(value, list):
                 value = '<br>'.join(value)
             html += '''

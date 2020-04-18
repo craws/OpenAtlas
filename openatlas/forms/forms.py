@@ -517,7 +517,7 @@ def get_form_settings(form: Any) -> Dict[str, str]:
         if field.type in ['StringField', 'IntegerField']:
             settings[label] = value
         if field.type == 'BooleanField':
-            settings[label] = uc_first(_('on')) if value else uc_first(_('off'))
+            settings[label] = _('on') if value else _('off')
         if field.type == 'SelectField':
             if type(value) is str and value.isdigit():
                 value = int(value)
