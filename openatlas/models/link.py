@@ -311,26 +311,30 @@ class Link:
         from openatlas.models.entity import Entity
         data = []
         for id_, node in g.nodes.items():
-            if not node.root and not node.multiple and not node.value_type:
-                node_ids = Node.get_all_sub_ids(node)
-                if node_ids:
-                    sql = """
-                        SELECT domain_id FROM model.link
-                        WHERE property_code = 'P2' AND range_id IN %(node_ids)s
-                        GROUP BY domain_id HAVING COUNT(*) > 1;"""
-                    g.execute(sql, {'node_ids': tuple(node_ids)})
-                    for row in g.cursor.fetchall():
-                        offending_nodes = []
-                        entity = Entity.get_by_id(row.domain_id, nodes=True)
-                        for entity_node in entity.nodes:
-                            if g.nodes[entity_node.root[-1]].id == node.id:
-                                url = url_for('admin_delete_single_type_duplicate',
-                                              entity_id=entity.id, node_id=entity_node.id)
-                                offending_nodes.append(
-                                    '<a href="' + url + '">' + uc_first(_('remove')) + '</a> ' +
-                                    entity_node.name)
-                        data.append([link(entity),
-                                     entity.class_.name,
-                                     link(g.nodes[id_]),
-                                     '<br>'.join(offending_nodes)])
+            if node.root or node.multiple or node.value_type:
+                continue  # pragma: no cover
+            node_ids = Node.get_all_sub_ids(node)
+            if not node_ids:
+                continue  # pragma: no cover
+            sql = """
+                SELECT domain_id FROM model.link
+                WHERE property_code = 'P2' AND range_id IN %(node_ids)s
+                GROUP BY domain_id HAVING COUNT(*) > 1;"""
+            g.execute(sql, {'node_ids': tuple(node_ids)})
+            for row in g.cursor.fetchall():
+                offending_nodes = []
+                entity = Entity.get_by_id(row.domain_id, nodes=True)
+                for entity_node in entity.nodes:
+                    if g.nodes[entity_node.root[-1]].id != node.id:
+                        continue  # pragma: no cover
+                    offending_nodes.append('<a href="{url}">{label}</a> {name}'.format(
+                        label=uc_first(_('remove')),
+                        name=entity_node.name,
+                        url=url_for('admin_delete_single_type_duplicate',
+                                    entity_id=entity.id,
+                                    node_id=entity_node.id)))
+                data.append([link(entity),
+                             entity.class_.name,
+                             link(g.nodes[id_]),
+                             '<br>'.join(offending_nodes)])
         return data

@@ -100,14 +100,14 @@ def user_activity(user_id: int = 0) -> str:
 @required_group('readonly')
 def user_view(id_: int) -> str:
     user = User.get_by_id(id_)
-    info = [
-        (_('username'), user.username),
-        (_('group'), user.group),
-        (_('full name'), user.real_name),
-        (_('email'), user.email if is_authorized('manager') or user.settings['show_email'] else ''),
-        (_('language'), user.settings['language']),
-        (_('last login'), format_date(user.login_last_success)),
-        (_('failed logins'), user.login_failed_count if is_authorized('manager') else '')]
+    info = {
+        _('username'): user.username,
+        _('group'): user.group,
+        _('full name'): user.real_name,
+        _('email'): user.email if is_authorized('manager') or user.settings['show_email'] else '',
+        _('language'): user.settings['language'],
+        _('last login'): format_date(user.login_last_success),
+        _('failed logins'): user.login_failed_count if is_authorized('manager') else ''}
     return render_template('user/view.html', user=user, info=info)
 
 

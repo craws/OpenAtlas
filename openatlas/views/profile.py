@@ -66,22 +66,22 @@ class ProfileForm(FlaskForm):  # type: ignore
 @login_required
 def profile_index() -> str:
     user = current_user
-    data = {'general': [(_('username'), user.username),
-                        (_('full name'), user.real_name),
-                        (_('email'), user.email),
-                        (_('show email'),
-                         uc_first(_('on')) if user.settings['show_email'] else uc_first(_('off'))),
-                        (_('newsletter'),
-                         uc_first(_('on')) if user.settings['newsletter'] else uc_first(_('off')))],
-            'display': [(_('language'), user.settings['language']),
-                        (_('table rows'), user.settings['table_rows']),
-                        (_('show aliases in tables'), user.settings['table_show_aliases']),
-                        (_('layout'), user.settings['layout']),
-                        (_('default map zoom'), user.settings['map_zoom_default']),
-                        (_('max map zoom'), user.settings['map_zoom_max'])],
-            'modules': [('GeoNames', user.settings['module_geonames']),
-                        (_('map overlay'), user.settings['module_map_overlay']),
-                        (_('notes'), user.settings['module_notes'])]}
+    data = {'general': {_('username'): user.username,
+                        _('full name'): user.real_name,
+                        _('email'): user.email,
+                        _('show email'): uc_first(_('on')) if user.settings[
+                            'show_email'] else uc_first(_('off')),
+                        _('newsletter'): uc_first(_('on')) if user.settings[
+                            'newsletter'] else uc_first(_('off'))},
+            'display': {_('language'): user.settings['language'],
+                        _('table rows'): user.settings['table_rows'],
+                        _('show aliases in tables'): user.settings['table_show_aliases'],
+                        _('layout'): user.settings['layout'],
+                        _('default map zoom'): user.settings['map_zoom_default'],
+                        _('max map zoom'): user.settings['map_zoom_max']},
+            'modules': {'GeoNames': user.settings['module_geonames'],
+                        _('map overlay'): user.settings['module_map_overlay'],
+                        _('notes'): user.settings['module_notes']}}
     return render_template('profile/index.html', data=data)
 
 

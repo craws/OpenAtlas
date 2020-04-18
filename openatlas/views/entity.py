@@ -1,6 +1,6 @@
 import os
 import sys
-from typing import Any, List, Optional, Tuple, Union
+from typing import Union, Dict, List
 
 from flask import flash, g, render_template, request, url_for
 from flask_babel import format_number, lazy_gettext as _
@@ -172,22 +172,23 @@ def actor_view(actor: Entity) -> str:
     if end_place:
         end_object = end_place.get_linked_entity_safe('P53', True)
         objects.append(end_object)
-    label = uc_first(_('born') if actor.class_.code == 'E21' else _('begin'))
-    info: List[Tuple[Any, Optional[str]]] = []
-    if actor.aliases:
-        info.append((uc_first(_('alias')), '<br>'.join(actor.aliases.values())))
-    info.append((label, format_entry_begin(actor, begin_object)))
-    label = uc_first(_('died') if actor.class_.code == 'E21' else _('end'))
-    info.append((label, format_entry_end(actor, end_object)))
-    appears_first, appears_last = get_appearance(event_links)
-    info.append((_('appears first'), appears_first))
-    info.append((_('appears last'), appears_last))
 
     residence_place = actor.get_linked_entity('P74')
+    residence_object = None
     if residence_place:
         residence_object = residence_place.get_linked_entity_safe('P53', True)
         objects.append(residence_object)
-        info.append((uc_first(_('residence')), link(residence_object)))
+
+    # Collect data for info tab
+    appears_first, appears_last = get_appearance(event_links)
+    info: Dict[str, Union[str, List[str]]] = {
+        _('alias'): list(actor.aliases.values()),
+        _('born') if actor.class_.code == 'E21' else _('begin'):
+            format_entry_begin(actor, begin_object),
+        _('died') if actor.class_.code == 'E21' else _('end'): format_entry_end(actor, end_object),
+        _('appears first'): appears_first,
+        _('appears last'): appears_last,
+        _('residence'): link(residence_object) if residence_object else ''}
     add_type_data(actor, info)
     add_system_data(actor, info)
 

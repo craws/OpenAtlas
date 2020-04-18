@@ -109,15 +109,15 @@ def nl2br(self: Any, value: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_info(self: Any, data: Dict[str, str]) -> str:
-    if isinstance(data, dict):
-        data = data.items()  # Todo: move .items() to loop after refactored display_info
+def display_info(self: Any, data: Dict[str, Union[str, List[str]]]) -> str:
     html = '<div class="data-table">'
-    for label, value in data:
+    for label, value in data.items():
         if value or value == 0:
             if isinstance(value, bool):  # Used in display of settings
                 value = util.uc_first(_('off')) if value is False else value
                 value = util.uc_first(_('on')) if value is True else value
+            if isinstance(value, list):
+                value = '<br>'.join(value)
             html += '''
                 <div class="table-row">
                     <div>{label}</div>
@@ -245,7 +245,7 @@ def manual_link(self: Any, wiki_site: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def get_logo(self: Any, todo) -> str:
+def get_logo(self: Any, todo: None) -> str:
     logo = '/static/images/layout/logo.png'
     if session['settings']['logo_file_id']:
         extension = print_file_extension(int(session['settings']['logo_file_id']))

@@ -33,7 +33,7 @@ from openatlas.util.util import (convert_size, format_date, format_datetime, get
 @app.route('/admin', methods=["GET", "POST"])
 @app.route('/admin/<action>/<int:id_>')
 @required_group('readonly')
-def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
+def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Union[str, Response]:
     if is_authorized('manager'):
         if id_ and action == 'delete_user':
             User.delete(id_)
@@ -307,7 +307,7 @@ def admin_orphans() -> str:
 @app.route('/admin/logo/')
 @app.route('/admin/logo/<int:id_>')
 @required_group('manager')
-def admin_logo(id_: int = None) -> Union[str, Response]:
+def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
     if session['settings']['logo_file_id']:
         abort(418)  # pragma: no cover - Logo already set
     if id_:

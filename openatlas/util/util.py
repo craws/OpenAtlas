@@ -169,8 +169,8 @@ def get_disk_space_info() -> Optional[Dict[str, Any]]:
 
 
 def add_type_data(entity: 'Entity',
-                  data: List[Tuple[str, Optional[str]]],
-                  location: Optional['Entity'] = None) -> List[Tuple[str, Optional[str]]]:
+                  data: Dict[str, Union[str, List[str]]],
+                  location: Optional['Entity'] = None) -> Dict[str, Union[str, List[str]]]:
     # Nodes
     if location:
         entity.nodes.update(location.nodes)  # Add location types
@@ -195,42 +195,38 @@ def add_type_data(entity: 'Entity',
     if 'type' in type_data:
         type_data.move_to_end('type', last=False)
     for root_name, nodes in type_data.items():
-        data.append((root_name, '<br>'.join(nodes)))
+        data[root_name] = nodes
     return data
 
 
 def add_system_data(entity: 'Entity',
-                    data: List[Tuple[str, Optional[str]]]) -> List[Tuple[str, Optional[str]]]:
+                    data: Dict[str, Union[str, List[str]]]) -> Dict[str, Union[str, List[str]]]:
     # Additional info for advanced layout
     if hasattr(current_user, 'settings') and current_user.settings['layout'] == 'advanced':
-        data.append((uc_first(_('class')), link(entity.class_)))
+        data[_('class')] = link(entity.class_)
         info = openatlas.logger.get_log_for_advanced_view(entity.id)
-        data.append((_('created'), format_date(entity.created) + ' ' + link(info['creator'])))
+        data[_('created')] = format_date(entity.created) + ' ' + link(info['creator'])
         if info['modified']:
             html = format_date(info['modified']) + ' ' + link(info['modifier'])
-            data.append((_('modified'), html))
+            data[_('modified')] = html
         if info['import_project']:
-            data.append((_('imported from'), link(info['import_project'])))
+            data[_('imported from')] = link(info['import_project'])
         if info['import_user']:
-            data.append((_('imported by'), link(info['import_user'])))
+            data[_('imported by')] = link(info['import_user'])
         if info['import_origin_id']:
-            data.append(('origin ID', info['import_origin_id']))
-        data.append(('API',
-                     '<a href="{url}" target="_blank">GeoJSON</a>'.format(
-                         url=url_for('api_entity', id_=entity.id))))
+            data['origin ID'] = info['import_origin_id']
+        data['API'] = '<a href="{url}" target="_blank">GeoJSON</a>'.format(
+            url=url_for('api_entity', id_=entity.id))
     return data
 
 
 def get_entity_data(entity: 'Entity',
-                    location: Optional['Entity'] = None) -> List[Tuple[str, Optional[str]]]:
+                    location: Optional['Entity'] = None) -> Dict[str, Union[str, List[str]]]:
     """
     Return related entity information for a table for view.
     The location parameter is for places which have a location attached.
     """
-    data: List[Tuple[str, Optional[str]]] = []
-    # Aliases
-    if entity.aliases:
-        data.append((uc_first(_('alias')), '<br>'.join(entity.aliases.values())))
+    data: Dict[str, Union[str, List[str]]] = {_('alias'): list(entity.aliases.values())}
 
     # Dates
     from_link = ''
@@ -242,43 +238,38 @@ def get_entity_data(entity: 'Entity',
         place_to = entity.get_linked_entity('P26')
         if place_to:
             to_link = link(place_to.get_linked_entity_safe('P53', True)) + ' '
-    data.append((uc_first(_('begin')), (from_link if from_link else '') +
-                 format_entry_begin(entity)))
-    data.append((uc_first(_('end')), (to_link if to_link else '') + format_entry_end(entity)))
+    data[_('begin')] = (from_link if from_link else '') + format_entry_begin(entity)
+    data[_('end')] = (to_link if to_link else '') + format_entry_end(entity)
 
     # Types
     add_type_data(entity, data, location=location)
 
     # Info for files
     if entity.system_type == 'file':
-        data.append((uc_first(_('size')), print_file_size(entity)))
-        data.append((uc_first(_('extension')), print_file_extension(entity)))
+        data[_('size')] = print_file_size(entity)
+        data[_('extension')] = print_file_extension(entity)
 
     # Info for source
     if entity.system_type == 'source content':
-        data.append((uc_first(_('information carrier')), '<br>'.join(
-            [link(recipient) for recipient in entity.get_linked_entities(['P128'], inverse=True)])))
+        data[_('information carrier')] = [link(recipient) for recipient in
+                                          entity.get_linked_entities(['P128'], inverse=True)]
 
     # Info for events
     if entity.class_.code in app.config['CLASS_CODES']['event']:
         super_event = entity.get_linked_entity('P117')
         if super_event:
-            data.append((uc_first(_('sub event of')), link(super_event)))
-
+            data[_('sub event of')] = link(super_event)
         if not entity.class_.code == 'E9':
             place = entity.get_linked_entity('P7')
             if place:
-                data.append((uc_first(_('location')),
-                             link(place.get_linked_entity_safe('P53', True))))
+                data[_('location')] = link(place.get_linked_entity_safe('P53', True))
 
         # Info for acquisitions
         if entity.class_.code == 'E8':
-            data.append((uc_first(_('recipient')), '<br>'.join(
-                [link(recipient) for recipient in entity.get_linked_entities(['P22'])])))
-            data.append((uc_first(_('donor')), '<br>'.join(
-                [link(donor) for donor in entity.get_linked_entities(['P23'])])))
-            data.append((uc_first(_('given place')), '<br>'.join(
-                [link(place) for place in entity.get_linked_entities(['P24'])])))
+            data[_('recipient')] = [link(recipient) for recipient in
+                                    entity.get_linked_entities(['P22'])]
+            data[_('donor')] = [link(donor) for donor in entity.get_linked_entities(['P23'])]
+            data[_('given place')] = [link(place) for place in entity.get_linked_entities(['P24'])]
 
         # Info for moves
         if entity.class_.code == 'E9':
@@ -289,12 +280,8 @@ def get_entity_data(entity: 'Entity',
                     person_data.append(linked_entity)
                 elif linked_entity.class_.code == 'E84':
                     object_data.append(linked_entity)
-            if person_data:
-                data.append((uc_first(_('person')), '<br>'.join(
-                    [link(object_) for object_ in person_data])))
-            if object_data:
-                data.append((uc_first(_('object')), '<br>'.join(
-                    [link(object_) for object_ in object_data])))
+            data[_('person')] = [link(object_) for object_ in person_data]
+            data[_('object')] = [link(object_) for object_ in object_data]
     return add_system_data(entity, data)
 
 
@@ -421,7 +408,7 @@ def is_authorized(group: str) -> bool:
         ['manager', 'editor', 'contributor', 'readonly']) or (
         current_user.group == 'editor' and group in ['editor', 'contributor', 'readonly']) or (
         current_user.group == 'contributor' and group in ['contributor', 'readonly']) or (
-            current_user.group == 'readonly' and group == 'readonly'):
+        current_user.group == 'readonly' and group == 'readonly'):
         return True
     return False
 
@@ -571,12 +558,12 @@ def format_entry_end(entry: 'Entity', object_: Optional['Entity'] = None) -> str
     return html
 
 
-def get_appearance(event_links: List['Link']) -> Tuple[Optional[str], Optional[str]]:
+def get_appearance(event_links: List['Link']) -> Tuple[str, str]:
     # Get first/last appearance from events for actors without begin/end
     first_year = None
     last_year = None
-    first_string = None
-    last_string = None
+    first_string = ''
+    last_string = ''
     for link_ in event_links:
         event = link_.domain
         actor = link_.range

@@ -11,13 +11,14 @@ from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.network import Network
 from openatlas.util.table import Table
-from openatlas.util.util import link, required_group
+from openatlas.util.util import link, required_group, uc_first
 
 
 class LinkCheckForm(FlaskForm):  # type: ignore
     domain = HiddenField()
     property = HiddenField()
     range = HiddenField()
+    test = SubmitField(uc_first(_('test')))
 
 
 @app.route('/overview/model', methods=["GET", "POST"])
@@ -135,7 +136,7 @@ def class_view(code: str) -> str:
     return render_template('model/class_view.html',
                            class_=class_,
                            tables=tables,
-                           info=[('code', class_.code), ('name', class_.name)])
+                           info={'code': class_.code, 'name': class_.name})
 
 
 @app.route('/overview/model/property_view/<code>')
@@ -144,11 +145,11 @@ def property_view(code: str) -> str:
     property_ = g.properties[code]
     domain = g.classes[property_.domain_class_code]
     range_ = g.classes[property_.range_class_code]
-    info = [('code', property_.code),
-            ('name', property_.name),
-            ('inverse', property_.name_inverse),
-            ('domain', link(domain) + ' ' + domain.name),
-            ('range', link(range_) + ' ' + range_.name)]
+    info = {'code': property_.code,
+            'name': property_.name,
+            'inverse': property_.name_inverse,
+            'domain': link(domain) + ' ' + domain.name,
+            'range': link(range_) + ' ' + range_.name}
     tables = {}
     for table in ['super', 'sub']:
         tables[table] = Table(['code', 'name'],
