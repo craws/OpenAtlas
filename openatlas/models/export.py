@@ -14,7 +14,7 @@ class Export:
 
     @staticmethod
     def export_csv(form: FlaskForm) -> None:
-        """ Creates CSV file(s) in the export/csv folder, filename begins with current date."""
+        """ Creates CSV file(s) in export/csv folder, filename begins with current date_time."""
         import pandas.io.sql as psql
         date_string = Date.current_date_for_filename()
         path = app.config['EXPORT_FOLDER_PATH'].joinpath('csv')
@@ -25,12 +25,28 @@ class Export:
             os.makedirs(path)
         tables = {'model_class': ['id', 'name', 'code'],
                   'model_class_inheritance': ['id', 'super_code', 'sub_code'],
-                  'model_entity': ['id', 'name', 'description', 'class_code', 'begin_from',
-                                   'begin_to', 'begin_comment', 'end_from', 'end_to',
+                  'model_entity': ['id',
+                                   'name',
+                                   'description',
+                                   'class_code',
+                                   "replace(to_char(begin_from, 'yyyy-mm-dd BC'), ' AD', '')",
+                                   "replace(to_char(begin_to, 'yyyy-mm-dd BC'), ' AD', '')",
+                                   'begin_comment',
+                                   "replace(to_char(end_from, 'yyyy-mm-dd BC'), ' AD', '')",
+                                   "replace(to_char(end_to, 'yyyy-mm-dd BC'), ' AD', '')",
                                    'end_comment'],
-                  'model_link': ['id', 'property_code', 'domain_id', 'range_id', 'type_id',
-                                 'description', 'begin_from', 'begin_to', 'begin_comment',
-                                 'end_from', 'end_to', 'end_comment'],
+                  'model_link': ['id',
+                                 'property_code',
+                                 'domain_id',
+                                 'range_id',
+                                 'type_id',
+                                 'description',
+                                 "replace(to_char(begin_from, 'yyyy-mm-dd BC'), ' AD', '')",
+                                 "replace(to_char(begin_to, 'yyyy-mm-dd BC'), ' AD', '')",
+                                 'begin_comment',
+                                 "replace(to_char(end_from, 'yyyy-mm-dd BC'), ' AD', '')",
+                                 "replace(to_char(end_to, 'yyyy-mm-dd BC'), ' AD', '')",
+                                 'end_comment'],
                   'model_property': ['id', 'code', 'range_class_code', 'domain_class_code', 'name',
                                      'name_inverse'],
                   'model_property_inheritance': ['id', 'super_code', 'sub_code'],
@@ -73,7 +89,7 @@ class Export:
 
     @staticmethod
     def export_sql() -> bool:
-        """ Creates a pg_dump file in the export/sql folder, filename begins with current date."""
+        """ Creates pg_dump file in export/sql folder, filename begins with current date_time."""
         # Todo: prevent exposing the database password to the process list
         file_name = Date.current_date_for_filename() + '_dump.sql'
         path = app.config['EXPORT_FOLDER_PATH'].joinpath('sql', file_name)
