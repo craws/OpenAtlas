@@ -14,7 +14,7 @@ from werkzeug.exceptions import abort
 from openatlas import app
 from openatlas.models.date import Date
 from openatlas.models.link import Link
-from openatlas.util.util import is_authorized, print_file_extension
+from openatlas.util.util import is_authorized, get_file_extension
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.node import Node
@@ -300,7 +300,7 @@ class Entity:
         g.execute(Entity.build_sql(nodes=True) + " WHERE e.system_type = 'file' GROUP BY e.id;")
         entities = []
         for row in g.cursor.fetchall():
-            if print_file_extension(row.id)[1:] in app.config['DISPLAY_FILE_EXTENSIONS']:
+            if get_file_extension(row.id)[1:] in app.config['DISPLAY_FILE_EXTENSIONS']:
                 entities.append(Entity(row))
         return entities
 

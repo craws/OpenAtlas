@@ -60,9 +60,8 @@ def display_tooltip(text: str) -> str:
         title=text.replace('"', "'"))
 
 
-def print_file_extension(entity: Union[int, 'Entity']) -> str:
-    entity_id = entity if isinstance(entity, int) else entity.id
-    path = get_file_path(entity_id)
+def get_file_extension(entity: Union[int, 'Entity']) -> str:
+    path = get_file_path(entity if isinstance(entity, int) else entity.id)
     return os.path.splitext(path)[1] if path else 'N/A'
 
 
@@ -247,7 +246,7 @@ def get_entity_data(entity: 'Entity',
     # Info for files
     if entity.system_type == 'file':
         data[_('size')] = print_file_size(entity)
-        data[_('extension')] = print_file_extension(entity)
+        data[_('extension')] = get_file_extension(entity)
 
     # Info for source
     if entity.system_type == 'source content':
@@ -513,7 +512,7 @@ def get_base_table_data(entity: 'Entity',
                 file_stats[entity.id]['ext'] if entity.id in file_stats else 'N/A')
         else:
             data.append(print_file_size(entity))
-            data.append(print_file_extension(entity))
+            data.append(get_file_extension(entity))
     if entity.view_name in ['event', 'actor', 'place']:
         data.append(entity.first if entity.first else '')
         data.append(entity.last if entity.last else '')

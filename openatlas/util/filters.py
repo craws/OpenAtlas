@@ -19,7 +19,7 @@ from openatlas.models.model import CidocClass, CidocProperty
 from openatlas.models.user import User
 from openatlas.util import util
 from openatlas.util.table import Table
-from openatlas.util.util import get_file_path, print_file_extension
+from openatlas.util.util import get_file_path
 
 blueprint: flask.Blueprint = flask.Blueprint('filters', __name__)
 paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
@@ -240,17 +240,6 @@ def manual_link(self: Any, wiki_site: str) -> str:
                    css=app.config['CSS']['button']['primary'],
                    label=util.uc_first(_('manual')))
     return Markup(html)
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
-def get_logo(self: Any, todo: None) -> str:
-    logo = '/static/images/layout/logo.png'
-    if session['settings']['logo_file_id']:
-        extension = print_file_extension(int(session['settings']['logo_file_id']))
-        if extension != 'N/A':
-            logo = url_for('display_logo', filename=session['settings']['logo_file_id'] + extension)
-    return logo
 
 
 @jinja2.contextfilter

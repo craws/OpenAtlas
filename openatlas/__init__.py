@@ -6,10 +6,9 @@ from typing import Any, Dict, Optional
 
 import psycopg2.extras
 from flask import Flask, Response, g, request, session
-from flask_babel import Babel, lazy_gettext as _
-from flask_wtf import FlaskForm
+from flask_babel import Babel
 from flask_wtf.csrf import CSRFProtect
-from wtforms import StringField, SubmitField
+
 
 app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
@@ -28,16 +27,11 @@ babel = Babel(app)
 debug_model: Dict[str, float] = {}
 
 
-class GlobalSearchForm(FlaskForm):  # type: ignore
-    term = StringField('', render_kw={"placeholder": _('search term')})
-    search = SubmitField(_('search'))
-
-
 from openatlas.models.logger import Logger
 
 logger = Logger()
 
-from openatlas.util import filters
+from openatlas.util import filters, processors
 from openatlas.views import (actor, admin, ajax, api, entity, event, export, file, hierarchy, index,
                              involvement, imports, link, login, member, model, note, object,
                              overlay, place, profile, reference, relation, search, source, sql,
@@ -112,11 +106,6 @@ def apply_caching(response: Response) -> Response:
 def teardown_request(exception: Any) -> None:
     if hasattr(g, 'db'):
         g.db.close()
-
-
-@app.context_processor
-def inject_search_form() -> Dict[str, GlobalSearchForm]:
-    return dict(search_form=GlobalSearchForm(prefix="global"))
 
 
 app.register_blueprint(filters.blueprint)
