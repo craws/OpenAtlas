@@ -31,7 +31,7 @@ from openatlas.models.logger import Logger
 
 logger = Logger()
 
-from openatlas.util import filters, processors
+from openatlas.util import filters, processor
 from openatlas.views import (actor, admin, ajax, api, entity, event, export, file, hierarchy, index,
                              involvement, imports, link, login, member, model, note, object,
                              overlay, place, profile, reference, relation, search, source, sql,
