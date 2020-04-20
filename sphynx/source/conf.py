@@ -39,7 +39,7 @@ master_doc = 'index'
 
 # General information about the project.
 project = 'OpenAtlas'
-copyright = '2020, Alexander Watzinger CC-BY 4.0'
+copyright = '2020, Alexander Watzinger and the OpenAtlas team, CC-BY 4.0'
 author = 'Alexander Watzinger'
 
 # The version info for the project you're documenting, acts as replacement for
