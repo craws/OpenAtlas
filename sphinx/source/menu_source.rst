@@ -7,15 +7,15 @@ Written sources like for example medieval charters are mapped in OpenAtlas as a 
 several entities. On the source index page is an overview of already entered sources with their
 type and description.
 
-Click on the **+ Source** button at the top to enter a new source.
+Click **+ Source** to enter a new source.
 
-Click on the **name** of a source to get to the detail view.
+Click on the **name** of a source in the list to access the detail view.
 
 To edit a source, click on the **Edit** button in the detail view.
 
 Form fields:
 
-    Name
+:doc:`form_name`
 
     Type
 

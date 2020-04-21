@@ -10,5 +10,6 @@ specific documentation in our Redmine `Wiki <https://redmine.openatlas.eu/projec
 .. toctree::
 
    menu
+   form
 
 

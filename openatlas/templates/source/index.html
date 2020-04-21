@@ -6,7 +6,7 @@
 {% block content %}
     {% if 'contributor'|is_authorized %}
         <div class="toolbar">
-            {{ 'source'|manual_link }}
+            {{ 'menu_source'|manual }}
             {{ _('source')|button(url_for('source_insert')) }}
         </div>
     {% endif %}

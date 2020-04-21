@@ -244,6 +244,17 @@ def manual_link(self: Any, wiki_site: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
+def manual(self: Any, site: str) -> str:  # Creates a link to a manual page
+    return Markup("""
+        <a class="{css}" href="/static/manual/{site}.html" target="_blank" title="{label}">
+            <img style="height:14px;" src="/static/images/icons/book.png" alt=''>
+        </a>""".format(site=site,
+                       label=util.uc_first('manual'),
+                       css=app.config['CSS']['button']['primary']))
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
 def display_form(self: Any,
                  form: Any,
                  form_id: Optional[str] = None,
