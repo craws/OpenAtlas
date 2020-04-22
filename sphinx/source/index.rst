@@ -9,7 +9,8 @@ specific documentation in our Redmine `Wiki <https://redmine.openatlas.eu/projec
 
 .. toctree::
 
-   menu
-   form
+   menu/index
+   form/index
+   tools/index
 
 

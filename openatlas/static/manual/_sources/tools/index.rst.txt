@@ -1,0 +1,5 @@
+Tools
+=====
+
+.. toctree::
+   search.rst

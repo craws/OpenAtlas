@@ -1,5 +1,5 @@
-Main menu
-=========
+Menu
+====
 
 Most information that historians work with comes from historical documents. Usually, the first step
 is to digitize the **sources** so that they are easier to work with. Often the next step is to
@@ -11,4 +11,4 @@ The menu structure reflects that workflow.
 
 .. toctree::
 
-   menu_source
+   source

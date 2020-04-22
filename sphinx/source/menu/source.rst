@@ -15,7 +15,7 @@ To edit a source, click on the **Edit** button in the detail view.
 
 Form fields:
 
-:doc:`form_name`
+:doc:`../form/name`
 
     Type
 
