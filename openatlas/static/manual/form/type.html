@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Source &mdash; OpenAtlas 5.2.0 documentation</title>
+  <title>Type &mdash; OpenAtlas 5.2.0 documentation</title>
   
 
   
@@ -37,8 +37,8 @@
   <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Form" href="../form/index.html" />
-    <link rel="prev" title="Menu" href="index.html" /> 
+    <link rel="next" title="Tools" href="../tools/index.html" />
+    <link rel="prev" title="Description" href="description.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -87,13 +87,16 @@
             
             
               <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">Menu</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Source</a><ul class="simple">
+<li class="toctree-l1"><a class="reference internal" href="../menu/index.html">Menu</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Form</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="name.html">Name</a></li>
+<li class="toctree-l2"><a class="reference internal" href="alias.html">Alias</a></li>
+<li class="toctree-l2"><a class="reference internal" href="description.html">Description</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Type</a><ul class="simple">
 </ul>
 </li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../form/index.html">Form</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
 </ul>
 
@@ -140,15 +143,15 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-          <li><a href="index.html">Menu</a> &raquo;</li>
+          <li><a href="index.html">Form</a> &raquo;</li>
         
-      <li>Source</li>
+      <li>Type</li>
     
     
       <li class="wy-breadcrumbs-aside">
         
             
-            <a href="../_sources/menu/source.rst.txt" rel="nofollow"> View page source</a>
+            <a href="../_sources/form/type.rst.txt" rel="nofollow"> View page source</a>
           
         
       </li>
@@ -161,31 +164,41 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="source">
-<h1>Source<a class="headerlink" href="#source" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="type">
+<h1>Type<a class="headerlink" href="#type" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>Written sources like for example medieval charters are mapped in OpenAtlas as a combination of
-several entities. On the source index page is an overview of already entered sources with their
-type and description.</p>
+<p>Types are used to add information or group entities. They are hierarchical and can be accessed and
+edited via the <strong>Types</strong> menu item. With this feature the model and user interface (forms) can be
+adapted for specific research interests.</p>
 <ul class="simple">
-<li>Click <strong>+ Source</strong> to enter a new source.</li>
-<li>Click on the <strong>name</strong> of a source in the list to access the detail view.</li>
-<li>To edit a source, click on the <strong>Edit</strong> button in the detail view.</li>
+<li>Type names can’t include round brackets</li>
+<li>Type descriptions are shown in forms as a mouser over text at the <strong>i</strong> icon</li>
 </ul>
-<p>Form fields:</p>
+<p><strong>Standard types</strong></p>
+<p>Standard types are already present in the default installation with a few examples.</p>
 <ul class="simple">
-<li><a class="reference internal" href="../form/name.html"><span class="doc">Name</span></a></li>
-<li><a class="reference internal" href="../form/type.html"><span class="doc">Type</span></a></li>
+<li>Cannot be deleted or renamed (but subtypes of them can)</li>
+<li>Are single select only</li>
+<li>In forms they appear with a <strong>Type</strong> label</li>
+<li>Are displayed in entity tables</li>
 </ul>
-<hr class="docutils" />
-<blockquote>
-<div>Content - a source content usually contains a summary or the whole text of the source</div></blockquote>
-<p>A source can be linked to translations respectively to the text in the original language
-(e.g. Latin). The source can also be linked to a reference e.g. a physical object
-(parchment manuscript) of the original charter that carries the information described in the source.
-The source can also be documented in other documents like for example various editions of charters
-or also secondary source.</p>
+<p><strong>Custom types</strong></p>
+<p>Custom types can be created, deleted and renamed, e.g. you can add a new typ “hair color” for
+persons. The default installation comes with one example custom type <strong>Sex</strong> which is used in actor
+forms.</p>
+<ul class="simple">
+<li>Can be set to allow single or multiple choices (once multiple can’t be revert to single later)</li>
+<li>Can be used for multiple forms,  e.g. a hierarchy “importance” for places, actors and groups</li>
+</ul>
+<p><strong>Value types</strong></p>
+<p>Value types can be created, deleted and renamed. The default installation comes with an example
+value type <strong>Dimensions</strong> with the subtypes <strong>Height</strong> and <strong>Weight</strong> which are used in the form
+for finds.</p>
+<ul class="simple">
+<li>Can be used for multiple forms</li>
+<li>Values can be entered as decimals in forms</li>
+</ul>
 </div>
 
 
@@ -196,10 +209,10 @@ or also secondary source.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../form/index.html" class="btn btn-neutral float-right" title="Form" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../tools/index.html" class="btn btn-neutral float-right" title="Tools" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral float-left" title="Menu" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="description.html" class="btn btn-neutral float-left" title="Description" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
