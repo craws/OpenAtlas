@@ -56,9 +56,7 @@
 </head>
 <body>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="/">
-        <img src="{{ get_logo|safe }}" id="logo" alt="Logo">
-    </a>
+    <a class="navbar-brand" href="/"><img src="{{ get_logo|safe }}" id="logo" alt="Logo"></a>
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
             aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
@@ -70,64 +68,61 @@
     </div>
     <div style="float: right;">
         {% if current_user.is_authenticated %}
-        <div id="index-search-button" class="iconbutton">
-            <div id="index-search">
-                <form method="post" action="{{ url_for('search_index') }}" style="display: inline-flex">
-                    {{ search_form.csrf_token }}
-                    {{ search_form.term }}
-                    {{ search_form.search(class_=config['CSS']['button']['primary']) }}
-                </form>
+            <div id="index-search-button" class="iconbutton">
+                <div id="index-search">
+                    <form method="post" action="{{ url_for('search_index') }}" style="display: inline-flex">
+                        {{ search_form.csrf_token }}
+                        {{ search_form.term }}
+                        {{ search_form.search(class_=config['CSS']['button']['primary']) }}
+                    </form>
+                </div>
             </div>
-        </div>
-        <div class="iconbutton"
-             data-toggle="popover"
-             data-placement="bottom"
-             title="{{ _('profile')|uc_first }}"
-             data-content="{{ _('hello')|uc_first }} {{ current_user.username }}"
-             data-trigger="hover">
-            <a href="{{ url_for('profile_index') }}">
-                <span>
-                    <i class="far fa-user"></i>
-                </span>
-            </a>
-        </div>
+            <div class="iconbutton"
+                 data-toggle="popover"
+                 data-placement="bottom"
+                 title="{{ _('profile')|uc_first }}"
+                 data-content="{{ _('hello')|uc_first }} {{ current_user.username }}"
+                 data-trigger="hover">
+                <a href="{{ url_for('profile_index') }}">
+                    <span><i class="far fa-user"></i></span>
+                </a>
+            </div>
+        {% else %}
+            <div class="iconbutton"
+                 data-toggle="popover"
+                 data-placement="bottom"
+                 data-content="{{ _('manual')|uc_first }}"
+                 data-trigger="hover">
+                <a href="/static/manual/index.html" target="_blank" rel="noopener">
+                    <span><i class="fas fa-book"></i></span>
+                </a>
+            </div>
         {% endif %}
-        <div class="iconbutton"
-             data-toggle="popover"
-             data-placement="bottom"
-             data-content="{{ _('manual')|uc_first }}"
-             data-trigger="hover">
-            <a href="/static/manual/index.html" target="_blank" rel="noopener">
-                <span>
-                    <i class="fas fa-book"></i>
-                </span>
-            </a>
-        </div>
         {% if 'contact'|display_content_translation %}
-        <div class="iconbutton"
-             data-toggle="popover"
-             data-placement="bottom"
-             data-content="{{ _('contact')|uc_first }}"
-             data-trigger="hover">
-            <a href="{{ url_for('index_content', item='contact') }}" >
-                <span>
-                    <i class="fas fa-at"></i>
-                </span>
-            </a>
-        </div>
+            <div class="iconbutton"
+                 data-toggle="popover"
+                 data-placement="bottom"
+                 data-content="{{ _('contact')|uc_first }}"
+                 data-trigger="hover">
+                <a href="{{ url_for('index_content', item='contact') }}" >
+                    <span>
+                        <i class="fas fa-at"></i>
+                    </span>
+                </a>
+            </div>
         {% endif %}
         {% if 'legal_notice'|display_content_translation %}
-        <div class="iconbutton"
-             data-toggle="popover"
-             data-placement="bottom"
-             data-content="{{ _('legal_notice')|uc_first }}"
-             data-trigger="hover">
-            <a href="{{ url_for('index_content', item='legal_notice') }}" >
-                <span>
-                    <i class="fas fa-balance-scale"></i>
-                </span>
-            </a>
-        </div>
+            <div class="iconbutton"
+                 data-toggle="popover"
+                 data-placement="bottom"
+                 data-content="{{ _('legal_notice')|uc_first }}"
+                 data-trigger="hover">
+                <a href="{{ url_for('index_content', item='legal_notice') }}" >
+                    <span>
+                        <i class="fas fa-balance-scale"></i>
+                    </span>
+                </a>
+            </div>
         {% endif %}
         <div class="btn-group btn-group-toggle">
             {% for language in config['LANGUAGES'].keys()|sort %}
