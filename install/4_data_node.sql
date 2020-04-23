@@ -230,7 +230,7 @@ INSERT INTO model.entity (class_code, name, description) VALUES ('E55', 'Upper B
 INSERT INTO model.entity (class_code, name, description) VALUES ('E55', 'Lower Body', '');
 INSERT INTO model.link (property_code, range_id, domain_id) VALUES ('P127', (SELECT id FROM model.entity WHERE name='Human Remains' AND class_code = 'E55'), (SELECT id FROM model.entity WHERE name='Upper Body'));
 INSERT INTO model.link (property_code, range_id, domain_id) VALUES ('P127', (SELECT id FROM model.entity WHERE name='Human Remains' AND class_code = 'E55'), (SELECT id FROM model.entity WHERE name='Lower Body'));
-INSERT INTO web.hierarchy (id, name, multiple, system, directional, value_type) VALUES ((SELECT id FROM model.entity WHERE name='Human Remains' AND class_code = 'E55'), 'Human Remains', False, True, False, False);
+INSERT INTO web.hierarchy (id, name, multiple, standard, directional, value_type) VALUES ((SELECT id FROM model.entity WHERE name='Human Remains' AND class_code = 'E55'), 'Human Remains', False, True, False, False);
 INSERT INTO web.form (name, extendable) VALUES ('Human Remains', True);
 INSERT INTO web.hierarchy_form (hierarchy_id, form_id) VALUES ((SELECT id FROM web.hierarchy WHERE name='Human Remains'),(SELECT id FROM web.form WHERE name='Human Remains'));
 
@@ -295,7 +295,7 @@ INSERT INTO model.link (property_code, range_id, domain_id) VALUES
 -------------------------------
 -- Web hierarchies and forms --
 -------------------------------
-INSERT INTO web.hierarchy (id, name, multiple, system, directional, value_type, locked) VALUES
+INSERT INTO web.hierarchy (id, name, multiple, standard, directional, value_type, locked) VALUES
 ((SELECT id FROM entity WHERE name='License'), 'License', False, True, False, False, False),
 ((SELECT id FROM entity WHERE name='Source'), 'Source', False, True, False, False, False),
 ((SELECT id FROM entity WHERE name='Event'), 'Event', False, True, False, False, False),

@@ -17,7 +17,7 @@ class Node(Entity):
     count_subs = 0
     locked = False
     multiple = False
-    system = False
+    standard = False
     value_type = False
     directional = False
 
@@ -71,7 +71,7 @@ class Node(Entity):
         for row in g.cursor.fetchall():
             forms[row.id] = {'id': row.id, 'name': row.name, 'extendable': row.extendable}
         sql = """
-            SELECT h.id, h.name, h.multiple, h.system, h.directional, h.value_type, h.locked,
+            SELECT h.id, h.name, h.multiple, h.standard, h.directional, h.value_type, h.locked,
                 (SELECT ARRAY(
                     SELECT f.id FROM web.form f JOIN web.hierarchy_form hf ON f.id = hf.form_id
                     AND hf.hierarchy_id = h.id)) AS form_ids
@@ -83,13 +83,13 @@ class Node(Entity):
                 super_ = nodes[node.root[0]]
                 super_.subs.append(id_)
                 node.root = Node.get_root_path(nodes, node, node.root[0], node.root)
-                node.system = False
+                node.standard = False
                 node.locked = nodes[node.root[0]].locked
             else:
                 node.value_type = hierarchies[node.id].value_type
                 node.directional = hierarchies[node.id].directional
                 node.multiple = hierarchies[node.id].multiple
-                node.system = hierarchies[node.id].system
+                node.standard = hierarchies[node.id].standard
                 node.locked = hierarchies[node.id].locked
                 node.forms = {form_id: forms[form_id] for form_id in hierarchies[node.id].form_ids}
 

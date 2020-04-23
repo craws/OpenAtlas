@@ -3,6 +3,9 @@
 
 BEGIN;
 
+-- Renaming system property for nodes to standard
+ALTER TABLE web.hierarchy RENAME COLUMN system TO standard;
+
 -- #1167: Settings and profile
 DELETE FROM web.settings WHERE name = 'minimum_tablesorter_search';
 ALTER TABLE ONLY web.settings ADD CONSTRAINT settings_name_key UNIQUE (name);

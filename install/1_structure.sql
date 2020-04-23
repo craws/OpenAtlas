@@ -959,7 +959,7 @@ CREATE TABLE web.hierarchy (
     id integer NOT NULL,
     name text NOT NULL,
     multiple boolean DEFAULT false NOT NULL,
-    system boolean DEFAULT false NOT NULL,
+    standard boolean DEFAULT false NOT NULL,
     directional boolean DEFAULT false NOT NULL,
     created timestamp without time zone DEFAULT now() NOT NULL,
     modified timestamp without time zone,

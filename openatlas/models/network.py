@@ -80,9 +80,6 @@ class Network:
                           'label' if dimensions else 'name': name,
                           'color': params['classes'][row.class_code]['color']})
         if not linked_entity_ids.issubset(entities):  # pragma: no cover
-            # for id_ in [x for x in linked_entity_ids if x not in entities]:
-            #    entity = Entity.get_by_id(id_)
-            #    print(entity.class_.code, entity.system_type)
             flash('Missing nodes for links', 'error')
             return ''
         return str({'nodes': nodes, 'edges' if dimensions else 'links': edges}) if nodes else None
