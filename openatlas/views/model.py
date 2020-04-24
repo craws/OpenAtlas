@@ -64,7 +64,7 @@ def model_index() -> str:
 @app.route('/overview/model/class/<code>')
 @required_group('readonly')
 def class_entities(code: str) -> str:
-    table = Table(['name'], rows=[[link(entity)] for entity in Entity.get_by_class(code)])
+    table = Table(['name'], rows=[[link(entity)] for entity in Entity.get_by_class_code(code)])
     return render_template('model/class_entities.html', table=table, class_=g.classes[code])
 
 

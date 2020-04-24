@@ -293,7 +293,7 @@ class TableSelect(HiddenInput):  # type: ignore
                        Entity.get_by_system_type('edition') + \
                        Entity.get_by_system_type('external reference')
         else:
-            entities = Entity.get_by_codes(class_)
+            entities = Entity.get_by_menu_item(class_)
         table = Table(Table.HEADERS[class_])
 
         # Table definitions (aligning)
@@ -388,7 +388,7 @@ class TableMultiSelect(HiddenInput):  # type: ignore
             aliases = current_user.settings['table_show_aliases']
             entities = Entity.get_by_system_type('place', nodes=True, aliases=aliases)
         else:
-            entities = Entity.get_by_codes(class_)
+            entities = Entity.get_by_menu_item(class_)
 
         for entity in entities:
             data = get_base_table_data(entity)
@@ -482,7 +482,7 @@ def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
     elif class_name == 'place':
         entities = Entity.get_by_system_type('place', nodes=True, aliases=True)
     else:
-        entities = Entity.get_by_codes(class_name)
+        entities = Entity.get_by_menu_item(class_name)
 
     linked_ids = [entity.id for entity in linked_entities]
     table = Table([''] + Table.HEADERS[class_name], order=[[1, 'asc']])

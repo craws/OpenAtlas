@@ -25,7 +25,7 @@ class SourceTest(TestBaseCase):
             assert b'An entry has been created' in rv.data
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
-                source = Entity.get_by_codes('source')[0]
+                source = Entity.get_by_menu_item('source')[0]
             rv = self.app.post(url_for('source_insert', origin_id=reference.id),
                                data={'name': 'Test source'}, follow_redirects=True)
             assert b'https://openatlas.eu' in rv.data

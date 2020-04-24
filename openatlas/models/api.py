@@ -70,14 +70,14 @@ class Api:
     @staticmethod
     def get_entities_by_code(code_: str):
         entities = []
-        for entity in Entity.get_by_codes(code_):
+        for entity in Entity.get_by_menu_item(code_):
             entities.append(Api.get_entity(entity.id))
         return entities
 
     @staticmethod
     def get_entities_by_class(class_code_: str):
         entities = []
-        for entity in Entity.get_by_class(class_code_):
+        for entity in Entity.get_by_class_code(class_code_):
             entities.append(Api.get_entity(entity.id))
         return entities
 
