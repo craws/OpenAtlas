@@ -3,7 +3,7 @@ Event
 
 .. toctree::
 
-Available event classes based on the CIDOC CRM:
+Available event classes based on `CIDOC CRM <http://www.cidoc-crm.org/>`_:
 
 * **Activity** - the most common, e.g. a battle, a meeting or a wedding
 * **Acquisition** - this is a special case where a change of property can be mapped, see below
@@ -20,18 +20,22 @@ Form fields:
 * :doc:`../form/name`
 * :doc:`../form/type`
 * :doc:`../form/date`
-* Description
-* Sub event of - an event can be a sub event of another event e.g. a war has some battles as sub event.
-* Location - a location where the event occurred can be chosen.
+* :doc:`../form/description`
+* **Location** - a :doc:`place` where the event occurred
+* **Sub event of** - events can be part of another event, e.g. a battle as a sub event of a war.
 
-Acquisition
+**Acquisition** has an additional field:
 
-If the event is an acquisition there is an additional field Given Place to select which places changed ownership.
+* **Given Place** - to select which :doc:`places <place>` changed ownership.
 
-To add recipients and donors go to the Actor tab, add an actor and select as Activity:
+To add **recipients** and **donors** go to the **Actor** tab, add actors and select as activity:
 
-acquired title through for recipients or
+* **acquired title through** for **recipients**
+* **surrendered title through** for **donors**
 
-surrendered title through for donors.
+**Move** has additional fields:
 
-A move event has a from and a to location, also you can select objects or person who moved.
+* **From** - a :doc:`place` as a start point
+* **To** - a :doc:`place` as a destination point
+* :doc:`object` - to select objects that were moved
+* :doc:`Person <actor>` - to select persons that were moved

@@ -171,7 +171,7 @@
 <h1>Event<a class="headerlink" href="#event" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>Available event classes based on the CIDOC CRM:</p>
+<p>Available event classes based on <a class="reference external" href="http://www.cidoc-crm.org/">CIDOC CRM</a>:</p>
 <ul class="simple">
 <li><strong>Activity</strong> - the most common, e.g. a battle, a meeting or a wedding</li>
 <li><strong>Acquisition</strong> - this is a special case where a change of property can be mapped, see below</li>
@@ -188,16 +188,26 @@
 <li><a class="reference internal" href="../form/name.html"><span class="doc">Name</span></a></li>
 <li><a class="reference internal" href="../form/type.html"><span class="doc">Type</span></a></li>
 <li><a class="reference internal" href="../form/date.html"><span class="doc">Date</span></a></li>
-<li>Description</li>
-<li>Sub event of - an event can be a sub event of another event e.g. a war has some battles as sub event.</li>
-<li>Location - a location where the event occurred can be chosen.</li>
+<li><a class="reference internal" href="../form/description.html"><span class="doc">Description</span></a></li>
+<li><strong>Location</strong> - a <a class="reference internal" href="place.html"><span class="doc">Place</span></a> where the event occurred</li>
+<li><strong>Sub event of</strong> - events can be part of another event, e.g. a battle as a sub event of a war.</li>
 </ul>
-<p>Acquisition</p>
-<p>If the event is an acquisition there is an additional field Given Place to select which places changed ownership.</p>
-<p>To add recipients and donors go to the Actor tab, add an actor and select as Activity:</p>
-<p>acquired title through for recipients or</p>
-<p>surrendered title through for donors.</p>
-<p>A move event has a from and a to location, also you can select objects or person who moved.</p>
+<p><strong>Acquisition</strong> has an additional field:</p>
+<ul class="simple">
+<li><strong>Given Place</strong> - to select which <a class="reference internal" href="place.html"><span class="doc">places</span></a> changed ownership.</li>
+</ul>
+<p>To add <strong>recipients</strong> and <strong>donors</strong> go to the <strong>Actor</strong> tab, add actors and select as activity:</p>
+<ul class="simple">
+<li><strong>acquired title through</strong> for <strong>recipients</strong></li>
+<li><strong>surrendered title through</strong> for <strong>donors</strong></li>
+</ul>
+<p><strong>Move</strong> has additional fields:</p>
+<ul class="simple">
+<li><strong>From</strong> - a <a class="reference internal" href="place.html"><span class="doc">Place</span></a> as a start point</li>
+<li><strong>To</strong> - a <a class="reference internal" href="place.html"><span class="doc">Place</span></a> as a destination point</li>
+<li><a class="reference internal" href="object.html"><span class="doc">Object</span></a> - to select objects that were moved</li>
+<li><a class="reference internal" href="actor.html"><span class="doc">Person</span></a> - to select persons that were moved</li>
+</ul>
 </div>
 
 
