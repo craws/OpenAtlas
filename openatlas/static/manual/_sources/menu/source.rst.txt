@@ -8,22 +8,18 @@ several entities. On the source index page is an overview of already entered sou
 type and description.
 
 * Click **+ Source** to enter a new source.
-* Click on the **name** of a source in the list to access the detail view.
-* To edit a source, click on the **Edit** button in the detail view.
+* Click on the **name** of an entry in the list to access the detail view.
+* To edit an object, click on the **Edit** button in the detail view.
 
 Form fields:
 
 * :doc:`../form/name`
 * :doc:`../form/type`
+* :doc:`Information carrier <../menu/object>`
+* **Content** - a source content usually contains a summary or the whole text of the source
 
-----------
+Can be linked to:
 
-    Content - a source content usually contains a summary or the whole text of the source
-
-A source can be linked to translations respectively to the text in the original language
-(e.g. Latin). The source can also be linked to a reference e.g. a physical object
-(parchment manuscript) of the original charter that carries the information described in the source.
-The source can also be documented in other documents like for example various editions of charters
-or also secondary source.
-
-
+* :doc:`event`, :doc:`actor` and :doc:`place` it references
+* :doc:`reference` where it is documented in, e.g. in various editions of charters or secondary sources
+* a **translation** respectively to the text in the original language (e.g. Latin), can be a comment too

@@ -22,6 +22,7 @@
     <div class="tab-content">
         <div class="tab-pane fade show active" role="tabpanel" id="tab-info">
             <div class="toolbar">
+                {{ 'menu/source'|manual }}
                 {% if 'contributor'|is_authorized %}
                     {{ _('edit')|button(url_for('source_update', id_=source.id)) }}
                     {{ source|display_delete_link }}

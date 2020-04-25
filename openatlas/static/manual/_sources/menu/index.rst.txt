@@ -12,3 +12,9 @@ The menu structure reflects that workflow.
 .. toctree::
 
    source
+   event
+   actor
+   place
+   reference
+   object
+   Types <../form/type>
