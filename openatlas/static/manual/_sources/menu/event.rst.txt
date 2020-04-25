@@ -3,7 +3,7 @@ Event
 
 .. toctree::
 
-These types of events (based on the CIDOC CRM) are available:
+Available event classes based on the CIDOC CRM:
 
 * **Activity** - the most common, e.g. a battle, a meeting or a wedding
 * **Acquisition** - this is a special case where a change of property can be mapped, see below

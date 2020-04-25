@@ -3,11 +3,13 @@ Date
 
 .. toctree::
 
-Date input fields in forms are initially hidden to not clutter the interface. You can reveal them
-with clicking on **Show** beside the **Date** label.
+Date input fields in forms are initially hidden and can be shown with clicking on **Show** beside
+the **Date** label.
 
 To manage uncertainty in time up to 4 dates can be used: a time span for the beginning and a time
 span for the ending.
+
+.. image:: date.png
 
 **Exact date**
 
