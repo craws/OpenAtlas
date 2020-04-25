@@ -371,27 +371,28 @@ class Entity:
         return entities
 
     @staticmethod
-    def get_by_class(code: str) -> List[Entity]:
-        g.execute(Entity.build_sql() + 'WHERE class_code = %(code)s;', {'code': code})
+    def get_by_class_code(code: Union[str, List[str]]) -> List[Entity]:
+        codes = code if isinstance(code, list) else [code]
+        g.execute(Entity.build_sql() + 'WHERE class_code IN %(codes)s;', {'codes': tuple(codes)})
         return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_by_codes(class_name: str) -> List[Entity]:
+    def get_by_menu_item(menu_item: str) -> List[Entity]:
         # Possible class names: actor, event, place, reference, source
-        if class_name == 'source':
+        if menu_item == 'source':
             sql = Entity.build_sql(nodes=True) + """
                 WHERE e.class_code IN %(codes)s AND e.system_type = 'source content'
                 GROUP BY e.id;"""
-        elif class_name == 'reference':
+        elif menu_item == 'reference':
             sql = Entity.build_sql(nodes=True) + """
                 WHERE e.class_code IN %(codes)s AND e.system_type != 'file' GROUP BY e.id;"""
         else:
-            aliases = True if class_name == 'actor' and current_user.settings[
+            aliases = True if menu_item == 'actor' and current_user.settings[
                 'table_show_aliases'] else False
-            sql = Entity.build_sql(nodes=True if class_name == 'event' else False,
+            sql = Entity.build_sql(nodes=True if menu_item == 'event' else False,
                                    aliases=aliases) + """
                 WHERE e.class_code IN %(codes)s GROUP BY e.id;"""
-        g.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][class_name])})
+        g.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][menu_item])})
         return [Entity(row) for row in g.cursor.fetchall()]
 
     @staticmethod
@@ -406,7 +407,7 @@ class Entity:
     def get_similar_named(form: FlaskForm) -> Dict[int, Any]:
         class_ = form.classes.data
         if class_ in ['source', 'event', 'actor']:
-            entities = Entity.get_by_codes(class_)
+            entities = Entity.get_by_menu_item(class_)
         else:
             entities = Entity.get_by_system_type(class_)
         similar: Dict[int, Any] = {}

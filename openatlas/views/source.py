@@ -34,7 +34,7 @@ def source_index(action: Optional[str] = None, id_: Optional[int] = None) -> str
         logger.log_user(id_, 'delete')
         flash(_('entity deleted'), 'info')
     table = Table(Table.HEADERS['source'])
-    for source in Entity.get_by_codes('source'):
+    for source in Entity.get_by_menu_item('source'):
         data = get_base_table_data(source)
         table.rows.append(data)
     return render_template('source/index.html', table=table)
