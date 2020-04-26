@@ -9,11 +9,7 @@ Available event classes based on `CIDOC CRM <http://www.cidoc-crm.org/>`_:
 * **Acquisition** - this is a special case where a change of property can be mapped, see below
 * **Move** - this event is for objects or person who moved
 
-On the index page you can see already entered events.
-
-* Click **+ Event** to enter a new one.
-* Click on the **name** of an entry in the list to access the detail view.
-* To edit an object, click on the **Edit** button in the detail view.
+.. include:: navigation.rst
 
 Form fields:
 

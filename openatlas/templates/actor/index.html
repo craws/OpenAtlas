@@ -6,7 +6,7 @@
 {% block content %}
     {% if 'contributor'|is_authorized %}
         <div class="toolbar">
-            {{ 'Actor'|manual_link }}
+            {{ 'menu/actor'|manual }}
             {% for code in config['CLASS_CODES']['actor'] %}
                 {{ (code|get_class_name)|button(url_for('actor_insert', code=code)) }}
             {% endfor %}

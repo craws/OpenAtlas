@@ -21,6 +21,7 @@
         <div class="tab-content">
             <div class="tab-pane fade show active" role="tabpanel" id="tab-info">
                 <div class="toolbar">
+                    {{ 'menu/actor'|manual }}
                     {% if 'contributor'|is_authorized %}
                         {{ _('edit')|button(url_for('actor_update', id_=actor.id)) }}
                         {{ actor|display_delete_link }}
