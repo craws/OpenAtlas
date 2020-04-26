@@ -16,7 +16,7 @@ Form fields:
 * :doc:`Information carrier <../menu/object>`
 * **Content** - a source content usually contains a summary or the whole text of the source
 
-Can be linked to:
+Can be linked via tabs in the detail view to:
 
 * :doc:`event`, :doc:`actor` and :doc:`place` it references
 * :doc:`reference` where it is documented in, e.g. in various editions of charters or secondary sources

@@ -12,5 +12,4 @@ specific documentation in our Redmine `Wiki <https://redmine.openatlas.eu/projec
    menu/index
    form/index
    tools/index
-
-
+   admin/index

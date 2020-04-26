@@ -21,4 +21,12 @@ Form fields:
 * **Born in / Begins in** - the :doc:`place` where a person was born or a group/legal body began
 * **Died in / Ends in** - the :doc:`place` where a person died or a group/legal body ended
 
-Can be linked to:
+Can be linked via tabs in the detail view to:
+
+* :doc:`source` - when it is referenced there
+* :doc:`event` - for participation
+* **Relation** - to other actors
+* **Member of** - to groups or legal bodies it is member of
+* **Member** - to actors who are members (only available for groups and legal bodies)
+* :doc:`reference`
+* :doc:`../admin/file`
