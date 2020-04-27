@@ -317,12 +317,10 @@ def file_view(file: Entity) -> str:
     for link_ in file.get_links('P67'):
         range_ = link_.range
         data = get_base_table_data(range_)
-        view_name = range_.view_name
-        view_name = view_name if view_name != 'place' else range_.system_type.replace(' ', '-')
         if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=file.id)
-            data.append(display_remove_link(url + '#tab-' + view_name, range_.name))
-        tables[view_name].rows.append(data)
+            data.append(display_remove_link(url + '#tab-' + range_.table_name, range_.name))
+        tables[range_.table_name].rows.append(data)
     for link_ in file.get_links('P67', True):
         data = get_base_table_data(link_.domain)
         data.append(link_.description)
@@ -456,7 +454,8 @@ def place_view(object_: Entity) -> str:
 def reference_view(reference: Entity) -> str:
     reference.note = User.get_note(reference)
     tables = {'file': Table(Table.HEADERS['file'] + ['page', _('main image')])}
-    for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find']:
+    for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
+                 'human_remains']:
         header_label = 'link text' if reference.system_type == 'external reference' else 'page'
         tables[name] = Table(Table.HEADERS[name] + [header_label])
     for link_ in reference.get_links('P67', True):
@@ -480,8 +479,11 @@ def reference_view(reference: Entity) -> str:
             url = url_for('link_delete', id_=link_.id, origin_id=reference.id)
             data.append(display_remove_link(url + '#tab-' + range_.table_name, range_.name))
         tables[range_.table_name].rows.append(data)
-    return render_template('reference/view.html', reference=reference, tables=tables,
-                           info=get_entity_data(reference), profile_image_id=profile_image_id)
+    return render_template('reference/view.html',
+                           reference=reference,
+                           tables=tables,
+                           info=get_entity_data(reference),
+                           profile_image_id=profile_image_id)
 
 
 def source_view(source: Entity) -> str:
@@ -493,7 +495,8 @@ def source_view(source: Entity) -> str:
         tables['text'].rows.append([link(text),
                                     next(iter(text.nodes)).name if text.nodes else '',
                                     text.description])
-    for name in ['actor', 'event', 'place', 'feature', 'stratigraphic_unit', 'find']:
+    for name in ['actor', 'event', 'place', 'feature', 'stratigraphic_unit', 'find',
+                 'human_remains']:
         tables[name] = Table(Table.HEADERS[name])
     tables['actor'].defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
     tables['event'].defs = [{'className': 'dt-body-right', 'targets': [3, 4]}]
