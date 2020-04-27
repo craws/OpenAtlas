@@ -10,9 +10,13 @@
         <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-event">{{ _('event')|uc_first }} {{ tables.event|format_tab_number }}</a></li>
         <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-actor">{{ _('actor')|uc_first }} {{ tables.actor|format_tab_number }}</a></li>
         <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-place">{{ _('place')|uc_first }} {{ tables.place|format_tab_number }}</a></li>
-        {% for table_name in ['feature', 'stratigraphic_unit', 'find'] %}
+        {% for table_name in ['feature', 'stratigraphic_unit', 'find', 'human_remains'] %}
             {% if tables[table_name].rows %}
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-{{ table_name }}">{{ _(table_name)|uc_first }} {{ tables[table_name]|format_tab_number }}</a></li>
+                <li class="nav-item">
+                    <a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-{{ table_name }}">
+                        {{ _(table_name|replace('_', ' '))|uc_first }} {{ tables[table_name]|format_tab_number }}
+                    </a>
+                </li>
             {% endif %}
         {% endfor %}
         <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-reference">{{ _('reference')|uc_first }} {{ tables.reference|format_tab_number }}</a></li>
@@ -40,7 +44,7 @@
                 <div style="clear:both;"></div>
             </div>
         </div>
-        {% for name in ['event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find'] %}
+        {% for name in ['event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find', 'human_remains'] %}
             {% if name not in ['feature', 'stratigraphic_unit', 'find'] or tables[name].rows %}
                 <div class="tab-pane fade" role="tabpanel" id="tab-{{ name }}">
                     {% if 'contributor'|is_authorized and name not in ['feature', 'stratigraphic_unit', 'find'] %}

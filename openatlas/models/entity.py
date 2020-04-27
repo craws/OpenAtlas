@@ -72,7 +72,7 @@ class Entity:
             self.view_name = 'node'
         self.table_name = self.view_name  # Used to build tables
         if self.view_name == 'place':
-            self.table_name = self.system_type.replace(' ', '-')
+            self.table_name = self.system_type.replace(' ', '_')
 
     sql_orphan = """
         SELECT e.id FROM model.entity e
