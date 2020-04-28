@@ -27,6 +27,6 @@ Can be linked via tabs in the detail view to:
 * :doc:`event` - for participation
 * **Relation** - to other actors
 * **Member of** - to groups or legal bodies it is member of
-* **Member** - to other actors who are members (only available for groups and legal bodies)
+* **Member** - to actors who are members (only available for groups and legal bodies)
 * :doc:`reference`
 * :doc:`../admin/file`
