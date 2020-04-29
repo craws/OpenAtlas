@@ -8,6 +8,7 @@ OpenAtlas `Website <https://openatlas.eu>`_ and development
 specific documentation in our Redmine `Wiki <https://redmine.openatlas.eu/projects/uni/wiki/Wiki>`_.
 
 .. toctree::
+   :maxdepth: 2
 
    menu/index
    form/index

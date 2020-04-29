@@ -11,8 +11,8 @@ Available event classes based on `CIDOC CRM <http://www.cidoc-crm.org/>`_:
 
 .. include:: navigation.rst
 
-Form fields:
-
+Form fields
+-----------
 * :doc:`../form/name`
 * :doc:`../form/type`
 * :doc:`../form/date`
@@ -20,8 +20,15 @@ Form fields:
 * **Location** - a :doc:`place` where the event occurred
 * **Sub event of** - events can be part of another event, e.g. a battle as a sub event of a war.
 
-**Acquisition** has an additional field:
+Move
+****
+* **From** - a :doc:`place` as a start point
+* **To** - a :doc:`place` as a destination point
+* :doc:`object` - to select objects that were moved
+* :doc:`Person <actor>` - to select persons that were moved
 
+Acquisition
+***********
 * **Given Place** - to select which :doc:`places <place>` changed ownership.
 
 To add **recipients** and **donors** go to the **Actor** tab, add actors and select as activity:
@@ -29,9 +36,9 @@ To add **recipients** and **donors** go to the **Actor** tab, add actors and sel
 * **acquired title through** for **recipients**
 * **surrendered title through** for **donors**
 
-**Move** has additional fields:
-
-* **From** - a :doc:`place` as a start point
-* **To** - a :doc:`place` as a destination point
-* :doc:`object` - to select objects that were moved
-* :doc:`Person <actor>` - to select persons that were moved
+Can be linked via tabs to
+-------------------------
+* :doc:`source` - when it is referenced there
+* :doc:`actor` - to add participants, or recipient and donor for an acquisition
+* :doc:`reference`
+* :doc:`../admin/file`

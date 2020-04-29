@@ -31,6 +31,7 @@
         <div class="tab-content">
             <div class="tab-pane fade show active" role="tabpanel" id="tab-info">
                 <div class="toolbar">
+                    {{ 'menu/place'|manual }}
                     {% if 'contributor'|is_authorized %}
                         {{ _('edit')|button(url_for('place_update', id_=object_.id)) }}
                         {% if not subunits %}

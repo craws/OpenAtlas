@@ -7,8 +7,13 @@ This menu item is for physical objects. Currently only **Information Carrier** i
 
 .. include:: navigation.rst
 
-Form fields:
+Form fields
+-----------
 
 * :doc:`../form/name` (for external references there is an URL field instead of a name field)
 * :doc:`../form/type`
-*  Description
+* :doc:`../form/description`
+
+Can be linked via tabs to
+-------------------------
+* :doc:`source` - when it is referenced there

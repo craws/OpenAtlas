@@ -11,8 +11,8 @@ Available event classes based on `CIDOC CRM <http://www.cidoc-crm.org/>`_:
 
 .. include:: navigation.rst
 
-Form fields:
-
+Form fields
+-----------
 * :doc:`../form/name`
 * :doc:`../form/alias`
 * :doc:`../form/date`
@@ -21,8 +21,8 @@ Form fields:
 * **Born in / Begins in** - the :doc:`place` where a person was born or a group/legal body began
 * **Died in / Ends in** - the :doc:`place` where a person died or a group/legal body ended
 
-Can be linked via tabs in the detail view to:
-
+Can be linked via tabs to
+-------------------------
 * :doc:`source` - when it is referenced there
 * :doc:`event` - for participation
 * **Relation** - to other actors
