@@ -9,11 +9,11 @@ This menu item is for physical objects. Currently only **Information Carrier** i
 
 Form fields
 -----------
-
-* :doc:`../form/name` (for external references there is an URL field instead of a name field)
+* :doc:`../form/name`
 * :doc:`../form/type`
 * :doc:`../form/description`
 
 Can be linked via tabs to
 -------------------------
 * :doc:`source` - when it is referenced there
+* :doc:`event` - when it was moved at a **Move** event

@@ -4,11 +4,12 @@
     {{ [_('object')]|crumb }}
 {% endblock %}
 {% block content %}
-    {% if 'contributor'|is_authorized %}
-        <div class="toolbar">
+    <div class="toolbar">
+        {{ 'menu/object'|manual }}
+        {% if 'contributor'|is_authorized %}
             {{ 'Object'|manual_link }}
             {{ 'E84'|get_class_name|button(url_for('object_insert')) }}
-        </div>
-    {% endif %}
+        {% endif %}
+    </div>
     {{ table.display()|safe }}
 {% endblock %}

@@ -13,6 +13,7 @@
     <div class="tab-content">
         <div class="tab-pane fade show active" role="tabpanel" id="tab-info">
             <div class="toolbar">
+                {{ 'menu/object'|manual }}
                 {% if 'contributor'|is_authorized %}
                     {{ _('edit')|button(url_for('object_update', id_=object_.id)) }}
                     {{ object_|display_delete_link }}
