@@ -12,25 +12,17 @@ The global search finds entities containing the search term in their name or ali
 After clicking on the search button in the top right you will be redirected to a result page where
 more options are available:
 
-**Only entities edited by me**
+* **Only entities edited by me** - show only entities which you have created or edited.
+* **Also search in description**
+* **Classes** - search only in selected classes, e.g. Place
 
-Show only entities which you have created or edited.
+* **Dates**
 
-**Also search in description**
-
-Entities where the search term is found in the description will be shown too.
-
-**Dates**
-
-* This filter is only active if at least the **from** or **to** year is filled out.
-* If you only provide the year the **from** date will be **YYYY-01-01** and the **to** date will be **YYYY-12-31**
-* If you provide a year and a month it will be the last of this month.
-* If the option **Include dateless entities** is checked, entities that have no dates but fulfill the other criteria will be included too.
+  * This filter is only active if at least the **from** or **to** year is filled out.
+  * If only a year is provide the **from** date will be **YYYY-01-01**, the **to** date will be **YYYY-12-31**
+  * If only a year and a month is provided it will be the last of this month.
+  * If the option **Include dateless entities** is checked, entities without dates will be found too.
 
 Because entities can have up to 4 date values (time span for begin and time span for end) they will
 be added to the result if at least one date meets the criteria. E.g. a person that lived from **1540
 to 1560** will be found when the **from year** value is **1550**.
-
-**Classes**
-
-Search only in selected classes, e.g. Place

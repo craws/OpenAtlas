@@ -37,8 +37,8 @@
   <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Search" href="search.html" />
-    <link rel="prev" title="Tools" href="index.html" /> 
+    <link rel="next" title="Admin" href="../admin/index.html" />
+    <link rel="prev" title="Profile" href="profile.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -90,10 +90,16 @@
 <li class="toctree-l1"><a class="reference internal" href="../menu/index.html">Menu</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../form/index.html">Form</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Tools</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Map</a><ul class="simple">
+<li class="toctree-l2"><a class="reference internal" href="search.html">Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="profile.html">Profile</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Map</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#navigation">Navigation</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#search">Search</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#adding-new-geometries">Adding new geometries</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#id1">GeoNames</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#map-overlay">Map Overlay</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="search.html">Search</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
@@ -167,14 +173,49 @@
 <h1>Map<a class="headerlink" href="#map" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>To do: finish writing, this is just a collection of unordered content</p>
+<p>The interactive map is a tool to present and enter the location of places.</p>
+<div class="section" id="navigation">
+<h2>Navigation<a class="headerlink" href="#navigation" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><em>GeoNames ID</em> The “GeoNames”:<a class="reference external" href="http://www.geonames.org/">http://www.geonames.org/</a> ID of the place. Can either be manually entered or automatically imported from a selected Map Search Result.</li>
+<li>You can zoom in/out with the mousewheel or the <strong>+</strong>/<strong>-</strong> buttons in the upper left corner.</li>
+<li>You can drag the content with the mouse (left click and hold)</li>
+<li>Change the basemap at the layer button in the upper right corner.</li>
+<li>Switch to full screen with the rectangle in the upper left.</li>
 </ul>
-<p>_Note_: this field is only available, when the GeoNames Module is activated in the [[Profile]] section. The checkbox “exact match” can be used if there is a high degree of confidence that the concepts can be used interchangeably. By default it is a close match, which means that the concepts are sufficiently similar that they can be used interchangeably in some information retrieval applications. Please refer to “SKOS”:<a class="reference external" href="https://www.w3.org/TR/skos-reference/">https://www.w3.org/TR/skos-reference/</a> for further information.</p>
-<p>h2. Map Overlay</p>
-<p>If you have the module map overlay activated in the [[Profile]], overlays for places which they were added will be visible on the map by default and can be toggled at map layer button at the right top.</p>
-<p>To insert new overlays (group editor or above) go to the view of a specific place. After adding an image file in the file tab you can click <em>add</em> in the overlay column to enter coordinates for the left upper and bottom right corner to position the image on the map.</p>
+</div>
+<div class="section" id="search">
+<h2>Search<a class="headerlink" href="#search" title="Permalink to this headline">¶</a></h2>
+<p>With the magnifying glass icon in the upper left you can search for (current) places at
+<a class="reference external" href="https://www.geonames.org/">GeoNames</a>.</p>
+</div>
+<div class="section" id="adding-new-geometries">
+<h2>Adding new geometries<a class="headerlink" href="#adding-new-geometries" title="Permalink to this headline">¶</a></h2>
+<p>When in insert or update mode of a place you have following options available (can be combined):</p>
+<ul class="simple">
+<li>Set a marker/point at the position where the physical thing is located.</li>
+<li>Draw a line connected to a physical objects spatial characteristics, e.g. the course of a road.</li>
+<li>Draw the shape of a physical thing if the precise extend is known.</li>
+<li>Draw the area in which the physical thing is located. E.g. if its precise shape is not known but known to be within a certain area.</li>
+</ul>
+</div>
+<div class="section" id="id1">
+<h2>GeoNames<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h2>
+<p>The <em>GeoNames ID</em> field (available only if activated in your <a class="reference internal" href="profile.html"><span class="doc">Profile</span></a>) can either be manually
+entered or imported from a map search result.</p>
+<p>The checkbox <strong>exact match</strong> can be used if there is a high
+degree of confidence that the concepts can be used interchangeably. By default it is a
+<strong>close match</strong>, which means that the concepts are sufficiently similar that they can be used
+interchangeably in some information retrieval applications. Please refer to
+<a class="reference external" href="https://www.w3.org/TR/skos-reference/">SKOS</a> for further information.</p>
+</div>
+<div class="section" id="map-overlay">
+<h2>Map Overlay<a class="headerlink" href="#map-overlay" title="Permalink to this headline">¶</a></h2>
+<p>If you have the module map overlay activated in your <a class="reference internal" href="profile.html"><span class="doc">Profile</span></a>, added overlays for places will
+be visible on the map by default and can be toggled at map layer button at the upper right corner.</p>
+<p>To insert new overlays (only available for editors and admins) go to the view of a specific place.
+After adding an image file in the file tab you can click <strong>add</strong> in the overlay column to enter
+coordinates for the left upper and bottom right corner to position the image on the map.</p>
+</div>
 </div>
 
 
@@ -185,10 +226,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="search.html" class="btn btn-neutral float-right" title="Search" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../admin/index.html" class="btn btn-neutral float-right" title="Admin" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral float-left" title="Tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="profile.html" class="btn btn-neutral float-left" title="Profile" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

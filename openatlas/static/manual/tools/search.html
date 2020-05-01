@@ -37,8 +37,8 @@
   <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Admin" href="../admin/index.html" />
-    <link rel="prev" title="Map" href="map.html" /> 
+    <link rel="next" title="Profile" href="profile.html" />
+    <link rel="prev" title="Tools" href="index.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -90,10 +90,11 @@
 <li class="toctree-l1"><a class="reference internal" href="../menu/index.html">Menu</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../form/index.html">Form</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Tools</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="map.html">Map</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Search</a><ul class="simple">
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="profile.html">Profile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map.html">Map</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
@@ -175,22 +176,21 @@
 </ul>
 <p>After clicking on the search button in the top right you will be redirected to a result page where
 more options are available:</p>
-<p><strong>Only entities edited by me</strong></p>
-<p>Show only entities which you have created or edited.</p>
-<p><strong>Also search in description</strong></p>
-<p>Entities where the search term is found in the description will be shown too.</p>
-<p><strong>Dates</strong></p>
 <ul class="simple">
+<li><strong>Only entities edited by me</strong> - show only entities which you have created or edited.</li>
+<li><strong>Also search in description</strong></li>
+<li><strong>Classes</strong> - search only in selected classes, e.g. Place</li>
+<li><strong>Dates</strong><ul>
 <li>This filter is only active if at least the <strong>from</strong> or <strong>to</strong> year is filled out.</li>
-<li>If you only provide the year the <strong>from</strong> date will be <strong>YYYY-01-01</strong> and the <strong>to</strong> date will be <strong>YYYY-12-31</strong></li>
-<li>If you provide a year and a month it will be the last of this month.</li>
-<li>If the option <strong>Include dateless entities</strong> is checked, entities that have no dates but fulfill the other criteria will be included too.</li>
+<li>If only a year is provide the <strong>from</strong> date will be <strong>YYYY-01-01</strong>, the <strong>to</strong> date will be <strong>YYYY-12-31</strong></li>
+<li>If only a year and a month is provided it will be the last of this month.</li>
+<li>If the option <strong>Include dateless entities</strong> is checked, entities without dates will be found too.</li>
+</ul>
+</li>
 </ul>
 <p>Because entities can have up to 4 date values (time span for begin and time span for end) they will
 be added to the result if at least one date meets the criteria. E.g. a person that lived from <strong>1540
 to 1560</strong> will be found when the <strong>from year</strong> value is <strong>1550</strong>.</p>
-<p><strong>Classes</strong></p>
-<p>Search only in selected classes, e.g. Place</p>
 </div>
 
 
@@ -201,10 +201,10 @@ to 1560</strong> will be found when the <strong>from year</strong> value is <str
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="../admin/index.html" class="btn btn-neutral float-right" title="Admin" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="profile.html" class="btn btn-neutral float-right" title="Profile" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="map.html" class="btn btn-neutral float-left" title="Map" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="index.html" class="btn btn-neutral float-left" title="Tools" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

@@ -2,5 +2,6 @@ Tools
 =====
 
 .. toctree::
-   map.rst
    search.rst
+   profile.rst
+   map.rst
