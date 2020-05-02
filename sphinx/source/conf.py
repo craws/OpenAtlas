@@ -13,6 +13,7 @@ language = 'en'
 pygments_style = 'sphinx'
 extensions = []
 
+html_logo = 'logo.png'
 html_theme = 'sphinx_rtd_theme'
 html_static_path = ['_static']
 html_domain_indices = False
