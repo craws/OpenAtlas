@@ -11,6 +11,7 @@ The menu structure reflects that workflow.
 
 .. toctree::
 
+   overview
    source
    event
    actor
