@@ -1,6 +1,0 @@
-Admin
-=====
-
-.. toctree::
-
-   file
