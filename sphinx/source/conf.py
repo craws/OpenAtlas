@@ -19,3 +19,8 @@ html_static_path = ['_static']
 html_domain_indices = False
 html_use_index = False
 html_copy_source = False  # prevent including source html files
+
+html_theme_options = {
+    'display_version': True,
+    'style_external_links': True,
+    'navigation_depth': 2}
