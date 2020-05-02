@@ -10,6 +10,7 @@ can ask questions like: *Where was this person in the course of his life?* or
 The menu structure reflects that workflow.
 
 .. toctree::
+   :maxdepth: 1
 
    overview
    source
