@@ -19,6 +19,6 @@ Form fields
 Can be linked via tabs to
 -------------------------
 * :doc:`event`, :doc:`actor` and :doc:`place` it references
-* :doc:`reference` where it is documented in, e.g. in various editions of charters or secondary sources
-* **translation** respectively to the text in the original language (e.g. Latin), can be a comment too
+* :doc:`reference` - where it is documented in, e.g. in various editions of charters or secondary sources
+* **Translation** - respectively to the text in the original language (e.g. Latin), can be a comment too
 * :doc:`../admin/file`
