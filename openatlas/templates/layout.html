@@ -87,16 +87,6 @@
                     <span><i class="far fa-user"></i></span>
                 </a>
             </div>
-        {% else %}
-            <div class="iconbutton"
-                 data-toggle="popover"
-                 data-placement="bottom"
-                 data-content="{{ _('manual')|uc_first }}"
-                 data-trigger="hover">
-                <a href="/static/manual/index.html" target="_blank" rel="noopener">
-                    <span><i class="fas fa-book"></i></span>
-                </a>
-            </div>
         {% endif %}
         {% if 'contact'|display_content_translation %}
             <div class="iconbutton"

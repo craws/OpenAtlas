@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Tools &mdash; OpenAtlas 5.2.0 documentation</title>
+  <title>Network visualization &mdash; OpenAtlas 5.2.0 documentation</title>
   
 
   
@@ -36,8 +36,8 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Search" href="search.html" />
-    <link rel="prev" title="Description" href="../form/description.html" /> 
+    <link rel="next" title="Admin" href="../admin/index.html" />
+    <link rel="prev" title="Map" href="map.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -91,11 +91,11 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../menu/index.html">Menu</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../form/index.html">Form</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Tools</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tools</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="search.html">Search</a></li>
 <li class="toctree-l2"><a class="reference internal" href="profile.html">Profile</a></li>
 <li class="toctree-l2"><a class="reference internal" href="map.html">Map</a></li>
-<li class="toctree-l2"><a class="reference internal" href="network.html">Network visualization</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Network visualization</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
@@ -144,7 +144,9 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>Tools</li>
+          <li><a href="index.html">Tools</a> &raquo;</li>
+        
+      <li>Network visualization</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -161,40 +163,55 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="tools">
-<h1>Tools<a class="headerlink" href="#tools" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="network-visualization">
+<h1>Network visualization<a class="headerlink" href="#network-visualization" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="search.html">Search</a><ul class="simple">
+</div>
+<p>With the integration of <a class="reference external" href="https://d3js.org/">D3.js</a> data can be visualized as a network graph
+available at one of the <strong>Network visualization</strong> buttons at the <a class="reference internal" href="../menu/overview.html"><span class="doc">Overview</span></a>.</p>
+<div class="section" id="navigation">
+<h2>Navigation<a class="headerlink" href="#navigation" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Zoom with mouse wheel</li>
+<li>Drag and drop one node with the left mouse button to move the node</li>
+<li>Drag and drop the background with the left mouse button to move around</li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="profile.html">Profile</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="profile.html#change-password">Change password</a></li>
-<li class="toctree-l2"><a class="reference internal" href="profile.html#general">General</a></li>
-<li class="toctree-l2"><a class="reference internal" href="profile.html#display">Display</a></li>
-<li class="toctree-l2"><a class="reference internal" href="profile.html#modules">Modules</a></li>
+<div class="section" id="d">
+<h3>2D<a class="headerlink" href="#d" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Select a node with the left mouse button to only show its direct connections</li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="map.html">Map</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="map.html#navigation">Navigation</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map.html#search">Search</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map.html#adding-new-geometries">Adding new geometries</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map.html#id1">GeoNames</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map.html#map-overlay">Map Overlay</a></li>
+</div>
+<div class="section" id="id1">
+<h3>3D<a class="headerlink" href="#id1" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li>Select a node with the left mouse button to only show its direct connections</li>
+<li>Drag and drop the background with the left mouse button to rotate</li>
+<li>Drag and drop the background with the right mouse button to pan</li>
 </ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="network.html">Network visualization</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="network.html#navigation">Navigation</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="network.html#d">2D</a></li>
-<li class="toctree-l3"><a class="reference internal" href="network.html#id1">3D</a></li>
+</div>
+</div>
+<div class="section" id="options">
+<h2>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li><strong>Classes</strong> - you can change the node color of classes</li>
+<li><strong>Show orphans</strong> - if selected nodes without any connections are shown too</li>
+<li><strong>Width</strong> - the width of the resulting image in pixel</li>
+<li><strong>Height</strong> - the height of the resulting image in pixel</li>
+<li><strong>Charge</strong> - a parameter for the distance between entries which are not connected</li>
+<li><strong>Distance</strong> - a parameter for the distance between connected entries</li>
 </ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="network.html#options">Options</a></li>
-<li class="toctree-l2"><a class="reference internal" href="network.html#in-case-of-performance-issues">In case of performance issues</a></li>
-<li class="toctree-l2"><a class="reference internal" href="network.html#download">Download</a></li>
+</div>
+<div class="section" id="in-case-of-performance-issues">
+<h2>In case of performance issues<a class="headerlink" href="#in-case-of-performance-issues" title="Permalink to this headline">¶</a></h2>
+<ul class="simple">
+<li>Check if your browser has hardware acceleration enabled</li>
+<li>Try different browsers, some are faster than others when dealing with large data sets</li>
 </ul>
-</li>
-</ul>
+</div>
+<div class="section" id="download">
+<h2>Download<a class="headerlink" href="#download" title="Permalink to this headline">¶</a></h2>
+<p>If an image is available (classic mode only) you can download it as PNG. Be aware that the resulting image is exactly what you see in this moment so you may want to change width and height in the options before. Also you may want to choose a zoom level where labels are readable.</p>
 </div>
 </div>
 
@@ -206,10 +223,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="search.html" class="btn btn-neutral float-right" title="Search" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../admin/index.html" class="btn btn-neutral float-right" title="Admin" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="../form/description.html" class="btn btn-neutral float-left" title="Description" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="map.html" class="btn btn-neutral float-left" title="Map" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
