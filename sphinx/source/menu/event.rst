@@ -13,10 +13,10 @@ Available event classes based on `CIDOC CRM <http://www.cidoc-crm.org/>`_:
 
 Form fields
 -----------
-* :doc:`../form/name`
-* :doc:`../form/type`
-* :doc:`../form/date`
-* :doc:`../form/description`
+* :doc:`/form/name`
+* :doc:`/form/type`
+* :doc:`/form/date`
+* :doc:`/form/description`
 * **Location** - a :doc:`place` where the event occurred
 * **Sub event of** - events can be part of another event, e.g. a battle as a sub event of a war.
 
@@ -41,4 +41,4 @@ Can be linked via tabs to
 * :doc:`source` - when it is referenced there
 * :doc:`actor` - to add participants, or recipient and donor for an acquisition
 * :doc:`reference`
-* :doc:`../admin/file`
+* :doc:`/tools/file`

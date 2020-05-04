@@ -13,10 +13,10 @@ Available event classes based on `CIDOC CRM <http://www.cidoc-crm.org/>`_:
 
 Form fields
 -----------
-* :doc:`../form/name`
-* :doc:`../form/alias`
-* :doc:`../form/date`
-* :doc:`../form/description`
+* :doc:`/form/name`
+* :doc:`/form/alias`
+* :doc:`/form/date`
+* :doc:`/form/description`
 * **Residence** - a :doc:`place`, e.g. the location of an institute or the main residence of an actor
 * **Born in / Begins in** - the :doc:`place` where a person was born or a group/legal body began
 * **Died in / Ends in** - the :doc:`place` where a person died or a group/legal body ended
@@ -29,4 +29,4 @@ Can be linked via tabs to
 * **Member of** - to groups or legal bodies it is member of
 * **Member** - to actors who are members (only available for groups and legal bodies)
 * :doc:`reference`
-* :doc:`../admin/file`
+* :doc:`/tools/file`

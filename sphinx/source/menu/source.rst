@@ -11,9 +11,9 @@ type and description.
 
 Form fields
 -----------
-* :doc:`../form/name`
-* :doc:`../form/type`
-* :doc:`Information carrier <../menu/object>`
+* :doc:`/form/name`
+* :doc:`/form/type`
+* :doc:`Information carrier </menu/object>`
 * **Content** - a source content usually contains a summary or the whole text of the source
 
 Can be linked via tabs to
@@ -21,4 +21,4 @@ Can be linked via tabs to
 * :doc:`event`, :doc:`actor` and :doc:`place` it references
 * :doc:`reference` - where it is documented in, e.g. in various editions of charters or secondary sources
 * **Translation** - respectively to the text in the original language (e.g. Latin), can be a comment too
-* :doc:`../admin/file`
+* :doc:`/tools/file`

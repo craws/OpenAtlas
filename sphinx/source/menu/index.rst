@@ -19,4 +19,4 @@ The menu structure reflects that workflow.
    place
    reference
    object
-   Types <../form/type>
+   Types </form/type>

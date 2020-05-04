@@ -9,12 +9,12 @@ A place can be e.g. a continent, a city or a graveyard.
 
 Form fields
 -----------
-* :doc:`../form/name`
-* :doc:`../form/alias`
-* :doc:`../form/type`
-* :doc:`../form/date`
-* :doc:`../form/description`
-* :doc:`../tools/map`
+* :doc:`/form/name`
+* :doc:`/form/alias`
+* :doc:`/form/type`
+* :doc:`/form/date`
+* :doc:`/form/description`
+* :doc:`/tools/map`
 * **Administrative Unit**
 * **Historical Place**
 
@@ -33,4 +33,4 @@ Can be linked via tabs to
 * :doc:`source` - when it is referenced there
 * :doc:`event` - as an event location
 * :doc:`reference`
-* :doc:`../admin/file`
+* :doc:`/tools/file`

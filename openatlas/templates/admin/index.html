@@ -24,7 +24,7 @@
         <div class="tab-content">
             <div class="tab-pane fade show active" role="tabpanel" id="tab-files">
                 <div class="toolbar">
-                    {{ 'Files'|manual_link }}
+                    {{ 'admin/file'|manual }}
                     {% if 'manager'|is_authorized %}
                         {{  _('edit settings')|button(url_for('admin_settings', category='files')) }}
                     {% endif %}
