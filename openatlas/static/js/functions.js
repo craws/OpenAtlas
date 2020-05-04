@@ -92,8 +92,7 @@ $(document).ready(function () {
     var ellipsesText = "...";
     $('.more').each(function () {
         var content = $(this).html();
-        lines = content.split(/<br>/).length;
-        if (lines > 10) {
+        if (this.scrollHeight > this.clientHeight) {
             more = '<a href="" class="more-link">' + moreText + '</a></span>';
             $(more).insertAfter(this);
         }
@@ -102,11 +101,11 @@ $(document).ready(function () {
         if ($(this).hasClass("less")) {
             $(this).removeClass("less");
             $(this).html(moreText);
-            $(this).prev().css('-webkit-line-clamp', "10");
+            $(this).prev().css('line-clamp', "10");
         } else {
             $(this).addClass("less");
             $(this).html(lessText);
-            $(this).prev().css('-webkit-line-clamp', "1000");
+            $(this).prev().css('line-clamp', "1000");
         }
         return false;
     });
