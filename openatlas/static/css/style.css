@@ -222,17 +222,14 @@ form input[type="text"].month, form input[type="text"].day {
 
 #description {
     height: 8em;
-    width: 40em;
+    width: 30em;
+    z-index: 1;
+    position: absolute;
 }
 
 .description {
     margin-top: 1em;
     max-width: 80em;
-}
-
-#map-info-display #description {
-    height: 8em;
-    width: 25em;
 }
 
 .overlay {
