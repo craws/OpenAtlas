@@ -5,8 +5,9 @@ class Changelog:
                 '1167': 'Settings and profile'
                 },
             'fix': {
-                '1208': 'CSV export error with BC dates'
-            },
+                '1208': 'CSV export error with BC dates',
+                '1218': 'Resizeable form elements vanish below map',
+                '1223': 'Visibility of Full Entries'},
         }],
         '5.1.1': ['2020-04-12', {
             'fix': {
