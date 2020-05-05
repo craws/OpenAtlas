@@ -3,7 +3,6 @@ File
 
 .. toctree::
 
-
 Settings
 
 * **Maximum file size in MB**

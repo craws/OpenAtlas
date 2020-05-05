@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Profile &mdash; OpenAtlas 5.2.0 documentation</title>
+  <title>User &mdash; OpenAtlas 5.2.0 documentation</title>
   
 
   
@@ -36,8 +36,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Map" href="map.html" />
-    <link rel="prev" title="Search" href="search.html" /> 
+    <link rel="prev" title="File" href="file.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -91,15 +90,12 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../menu/index.html">Menu</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../form/index.html">Form</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tools</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="search.html">Search</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Profile</a></li>
-<li class="toctree-l2"><a class="reference internal" href="map.html">Map</a></li>
-<li class="toctree-l2"><a class="reference internal" href="network.html">Network visualization</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Admin</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="file.html">File</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">User</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
 </ul>
 
             
@@ -145,9 +141,9 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-          <li><a href="index.html">Tools</a> &raquo;</li>
+          <li><a href="index.html">Admin</a> &raquo;</li>
         
-      <li>Profile</li>
+      <li>User</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -164,52 +160,35 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="profile">
-<h1>Profile<a class="headerlink" href="#profile" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="user">
+<h1>User<a class="headerlink" href="#user" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>When logged in you can access your <strong>profile</strong> at the right top of the site. There you can edit
-personal information and adapt the user interface to your preferences.</p>
-<div class="section" id="change-password">
-<h2>Change password<a class="headerlink" href="#change-password" title="Permalink to this headline">¶</a></h2>
-<p>When clicking on <strong>Change password</strong> you have to enter your current password and a new one (twice).</p>
-</div>
-<div class="section" id="general">
-<h2>General<a class="headerlink" href="#general" title="Permalink to this headline">¶</a></h2>
+<p>In the overview users with group, email, created/last login date and newsletter subscription are
+displayed. When viewing a user you can click on <em>Activity</em> to browse entity inserts, updates and
+deletes of this user.</p>
+<p>User can be added by admins or manager and a registration mail with account details can be sent by
+the system.</p>
+<div class="section" id="form-fields">
+<h2>Form fields<a class="headerlink" href="#form-fields" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><strong>Full name</strong> - optional, provide your full name to make it easier for other users to identify you.</li>
-<li><strong>Email</strong> - providing an email address is important in case you have to reset your password.</li>
-<li><strong>Show email</strong> - uncheck to hide your email for other users (except admins and managers).</li>
-<li><strong>Newsletter</strong> - check to receive newsletters including an unsubscribe link.</li>
+<li><strong>Active</strong> - ff not checked the user cannot log in anymore. Keeping an inactive user can be useful to keep associated information e.g. about created and modified entities.</li>
+<li><strong>Username</strong> - required to login and will be displayed in the advanced view of entries which have been created or modified by the user.</li>
+<li><strong>Full name</strong> - optional but makes it easier for other to be identified. Users can edit their full name themselves in their <a class="reference internal" href="../tools/profile.html"><span class="doc">Profile</span></a>.</li>
+<li><strong>Email</strong> - required for e.g. resetting the password</li>
 </ul>
 </div>
-<div class="section" id="display">
-<h2>Display<a class="headerlink" href="#display" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li><strong>Language</strong> - select your language for the user interface.</li>
-<li><strong>Table rows</strong> - amount of rows that are shown on one table page.</li>
-<li><strong>Show aliases in tables</strong> - show aliases of actors and places in tables and make them searchable.</li>
-<li><strong>Layout</strong> - in advanced you see more information about entities, e.g. the CIDOC class, creation/modification date and author and a link to the API.</li>
-<li><strong>Default map zoom</strong> - define the lowest zoom level to include all features on a <a class="reference internal" href="map.html"><span class="doc">Map</span></a> view.</li>
-<li><strong>Max map zoom</strong> - adjust how far you can zoom into a <a class="reference internal" href="map.html"><span class="doc">Map</span></a>.</li>
-</ul>
-</div>
-<div class="section" id="modules">
-<h2>Modules<a class="headerlink" href="#modules" title="Permalink to this headline">¶</a></h2>
-<p>With modules you can decide which features you want the user interface to include.</p>
-<ul class="simple">
-<li><strong>GeoNames</strong> - to use the GeoNames feature at <a class="reference internal" href="../menu/place.html"><span class="doc">Place</span></a> insert or update.</li>
-<li><strong>Map Overlay</strong> - to see overlays on the <a class="reference internal" href="map.html"><span class="doc">Map</span></a> or insert new ones (editor or above).</li>
-<li><strong>Notes</strong> - an additional tool for your workflow, e.g. to add a personal reminder to an entity.</li>
-</ul>
-<p>If notes are activated you can add notes with <strong>+ Note</strong> when viewing an entity. Notes will be
-displayed at the entity view and also all notes will be displayed at the <a class="reference internal" href="../menu/overview.html"><span class="doc">Overview</span></a>.</p>
-<p>Be aware that:</p>
-<ul class="simple">
-<li>Your notes are only visible to you (for public notes use the description field)</li>
-<li>There is only one note per entity possible</li>
-<li>Notes will get deleted if the entity is deleted by you or anybody else</li>
-</ul>
+<div class="section" id="groups">
+<h2>Groups<a class="headerlink" href="#groups" title="Permalink to this headline">¶</a></h2>
+<p>The group defines the access level of a user. Guest is the default group for users who aren’t logged in.</p>
+<p><a href="#id17"><span class="problematic" id="id18">|_.|_</span></a>.Admin|_.Manager|_.Editor|_.Contributor|_.Readonly|_.Guest|
+<a href="#id3"><span class="problematic" id="id4">|Browse data|{background:#ddd}.|{background:#ddd}.|{background:#ddd}.|{background:#ddd}.|{background:#ddd}.||</span></a>
+<a href="#id5"><span class="problematic" id="id6">|Edit data|{background:#ddd}.|{background:#ddd}.|{background:#ddd}.|{background:#ddd}.|||</span></a>
+<a href="#id7"><span class="problematic" id="id8">|Edit types|{background:#ddd}.|{background:#ddd}.|{background:#ddd}.||||</span></a>
+<a href="#id9"><span class="problematic" id="id10">|Add custom types|{background:#ddd}.|{background:#ddd}.|||||</span></a>
+<a href="#id11"><span class="problematic" id="id12">|Import/Export|{background:#ddd}.|{background:#ddd}.|||||</span></a>
+<a href="#id13"><span class="problematic" id="id14">|User management|{background:#ddd}.|{background:#ddd}.|||||</span></a>
+<a href="#id15"><span class="problematic" id="id16">|Site settings|{background:#ddd}.||||||</span></a></p>
 </div>
 </div>
 
@@ -221,10 +200,8 @@ displayed at the entity view and also all notes will be displayed at the <a clas
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="map.html" class="btn btn-neutral float-right" title="Map" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-      
-        <a href="search.html" class="btn btn-neutral float-left" title="Search" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="file.html" class="btn btn-neutral float-left" title="File" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
