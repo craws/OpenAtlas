@@ -1,5 +1,5 @@
-File
-====
+Files
+=====
 
 .. toctree::
 

@@ -6,7 +6,7 @@
 {% block content %}
     {% if 'manager'|is_authorized %}
         <div class="toolbar">
-            {{ 'User'|manual_link }}
+            {{ 'admin/user'|manual }}
             {% if user.group != 'admin' or current_user.group == 'admin' %}
                 {{ _('edit')|button(url_for('user_update', id_=user.id)) }}
             {% endif %}

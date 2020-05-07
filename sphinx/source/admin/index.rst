@@ -3,5 +3,6 @@ Admin
 
 .. toctree::
 
-   file
+   files
    user
+   general

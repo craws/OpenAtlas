@@ -10,11 +10,7 @@
 {% endblock %}
 {% block content %}
     <div class="toolbar">
-        {% if category == 'api' %}
-            {{ 'api_settings'|manual_link }}
-        {% else %}
-            {{ category|manual_link }}
-        {% endif %}
+        {{ ('admin/' + category)|manual }}
     </div>
     {{ form|display_form }}
 {% endblock %}

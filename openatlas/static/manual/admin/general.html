@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Admin &mdash; OpenAtlas 5.2.0 documentation</title>
+  <title>General &mdash; OpenAtlas 5.2.0 documentation</title>
   
 
   
@@ -36,8 +36,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Files" href="files.html" />
-    <link rel="prev" title="File" href="../tools/file.html" /> 
+    <link rel="prev" title="User" href="user.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -92,10 +91,10 @@
 <li class="toctree-l1"><a class="reference internal" href="../menu/index.html">Menu</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../form/index.html">Form</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
-<li class="toctree-l1 current"><a class="current reference internal" href="#">Admin</a><ul>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Admin</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="files.html">Files</a></li>
 <li class="toctree-l2"><a class="reference internal" href="user.html">User</a></li>
-<li class="toctree-l2"><a class="reference internal" href="general.html">General</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">General</a></li>
 </ul>
 </li>
 </ul>
@@ -143,7 +142,9 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-      <li>Admin</li>
+          <li><a href="index.html">Admin</a> &raquo;</li>
+        
+      <li>General</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -160,23 +161,31 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="admin">
-<h1>Admin<a class="headerlink" href="#admin" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="general">
+<h1>General<a class="headerlink" href="#general" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
-<ul>
-<li class="toctree-l1"><a class="reference internal" href="files.html">Files</a><ul class="simple">
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="user.html">User</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="user.html#form-fields">Form fields</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user.html#groups">Groups</a></li>
-</ul>
-</li>
-<li class="toctree-l1"><a class="reference internal" href="general.html">General</a><ul class="simple">
-</ul>
-</li>
-</ul>
 </div>
+<ul class="simple">
+<li><strong>Site name</strong> - the name of the site. Displayed in browser tabs and used in emails.</li>
+<li><strong>Default language</strong> - user can change their preferred language in the <a class="reference internal" href="../tools/profile.html"><span class="doc">Profile</span></a>.</li>
+<li><strong>Default table rows</strong> - user can set their preferred value in the <a class="reference internal" href="../tools/profile.html"><span class="doc">Profile</span></a></li>
+<li><strong>Log level</strong>  - how much should be logged. For now only info, notice and error are used</li>
+<li><strong>Debug mode</strong> - if turned on some debug information is displayed in the top right and DataTables stateSave option is turned off</li>
+</ul>
+<p>h2. Authentications</p>
+<ul class="simple">
+<li>Random password length - the length of generated passwords at password reset or user creation</li>
+<li>Minimum password length - the minimum length of provided passwords at password change or user creation</li>
+<li>Reset confirm hours - how long a requested password reset code is valid</li>
+<li>Failed logins - how often it could be tried to login with a specific username</li>
+<li>Failed login forget minutes - how many minutes to wait to be able to try again after failed logins are exceeded</li>
+</ul>
+<p>h2. Search</p>
+<p>For live search in tables or trees a minimum character threshold can be entered. The default is 1 but it can be useful to raise it when dealing with huge datasets.</p>
+<ul class="simple">
+<li>Minimum jstree search - the minimum characters that have to be entered to filter trees e.g. types</li>
+<li>Minimum tablesorter search - the minimum characters that have to be entered to filter tables e.g. actors</li>
+</ul>
 </div>
 
 
@@ -187,10 +196,8 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="files.html" class="btn btn-neutral float-right" title="Files" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-      
-        <a href="../tools/file.html" class="btn btn-neutral float-left" title="File" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="user.html" class="btn btn-neutral float-left" title="User" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
