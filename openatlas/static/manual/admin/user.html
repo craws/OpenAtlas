@@ -168,27 +168,100 @@
 displayed. When viewing a user you can click on <em>Activity</em> to browse entity inserts, updates and
 deletes of this user.</p>
 <p>User can be added by admins or manager and a registration mail with account details can be sent by
-the system.</p>
+the system if <strong>Send account information</strong> is checked.</p>
 <div class="section" id="form-fields">
 <h2>Form fields<a class="headerlink" href="#form-fields" title="Permalink to this headline">¶</a></h2>
 <ul class="simple">
-<li><strong>Active</strong> - ff not checked the user cannot log in anymore. Keeping an inactive user can be useful to keep associated information e.g. about created and modified entities.</li>
-<li><strong>Username</strong> - required to login and will be displayed in the advanced view of entries which have been created or modified by the user.</li>
-<li><strong>Full name</strong> - optional but makes it easier for other to be identified. Users can edit their full name themselves in their <a class="reference internal" href="../tools/profile.html"><span class="doc">Profile</span></a>.</li>
+<li><strong>Active</strong> - if not checked the user cannot log in anymore. Keeping inactive users can be useful to keep associated information e.g. about created and modified entities.</li>
+<li><strong>Group</strong> - defines the access level of a user, see table below</li>
+<li><strong>Username</strong> - required to login and displayed in advanced view of created/modified entries</li>
 <li><strong>Email</strong> - required for e.g. resetting the password</li>
+<li><strong>Full name</strong> - optional but makes it easier for other to be identified. Can be edited in <a class="reference internal" href="../tools/profile.html"><span class="doc">Profile</span></a>.</li>
+<li><strong>Info</strong> - a free text field for additional information</li>
 </ul>
 </div>
 <div class="section" id="groups">
 <h2>Groups<a class="headerlink" href="#groups" title="Permalink to this headline">¶</a></h2>
-<p>The group defines the access level of a user. Guest is the default group for users who aren’t logged in.</p>
-<p><a href="#id17"><span class="problematic" id="id18">|_.|_</span></a>.Admin|_.Manager|_.Editor|_.Contributor|_.Readonly|_.Guest|
-<a href="#id3"><span class="problematic" id="id4">|Browse data|{background:#ddd}.|{background:#ddd}.|{background:#ddd}.|{background:#ddd}.|{background:#ddd}.||</span></a>
-<a href="#id5"><span class="problematic" id="id6">|Edit data|{background:#ddd}.|{background:#ddd}.|{background:#ddd}.|{background:#ddd}.|||</span></a>
-<a href="#id7"><span class="problematic" id="id8">|Edit types|{background:#ddd}.|{background:#ddd}.|{background:#ddd}.||||</span></a>
-<a href="#id9"><span class="problematic" id="id10">|Add custom types|{background:#ddd}.|{background:#ddd}.|||||</span></a>
-<a href="#id11"><span class="problematic" id="id12">|Import/Export|{background:#ddd}.|{background:#ddd}.|||||</span></a>
-<a href="#id13"><span class="problematic" id="id14">|User management|{background:#ddd}.|{background:#ddd}.|||||</span></a>
-<a href="#id15"><span class="problematic" id="id16">|Site settings|{background:#ddd}.||||||</span></a></p>
+<p>Guest is the default for users who aren’t logged in.</p>
+<table border="1" class="docutils">
+<colgroup>
+<col width="28%" />
+<col width="9%" />
+<col width="12%" />
+<col width="10%" />
+<col width="19%" />
+<col width="14%" />
+<col width="9%" />
+</colgroup>
+<thead valign="bottom">
+<tr class="row-odd"><th class="head">&#160;</th>
+<th class="head">Admin</th>
+<th class="head">Manager</th>
+<th class="head">Editor</th>
+<th class="head">Contributor</th>
+<th class="head">Readonly</th>
+<th class="head">Guest</th>
+</tr>
+</thead>
+<tbody valign="top">
+<tr class="row-even"><td>Browse data</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>Edit data</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>Edit types</td>
+<td>yes</td>
+<td>yes</td>
+<td>yes</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>Add custom types</td>
+<td>yes</td>
+<td>yes</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>Import/Export</td>
+<td>yes</td>
+<td>yes</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-odd"><td>User management</td>
+<td>yes</td>
+<td>yes</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+<tr class="row-even"><td>Site settings</td>
+<td>yes</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+<td>&#160;</td>
+</tr>
+</tbody>
+</table>
 </div>
 </div>
 

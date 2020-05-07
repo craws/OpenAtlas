@@ -436,8 +436,7 @@ def display_menu(self: Any, entity: Optional[Entity]) -> str:
     """ Returns HTML with the menu and mark appropriate item as selected."""
     html = ''
     if current_user.is_authenticated:
-        items = ['overview', 'source', 'event', 'actor', 'place', 'reference', 'object', 'types',
-                 'admin']
+        items = ['source', 'event', 'actor', 'place', 'reference', 'object', 'types', 'admin']
         if request.path.startswith('/entity'):
             try:
                 entity = Entity.get_by_id(int(request.path.split('/')[-1]))
