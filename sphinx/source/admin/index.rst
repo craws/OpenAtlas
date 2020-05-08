@@ -7,3 +7,4 @@ Admin
    user
    general
    mail
+   map
