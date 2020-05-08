@@ -9,3 +9,4 @@ Admin
    mail
    map
    content
+   data_integrity_checks

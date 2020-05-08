@@ -123,7 +123,7 @@
                 <div class="tab-pane fade" role="tabpanel" id="tab-data">
                     <h1>{{ _('data integrity checks')|uc_first }}</h1>
                     <div class="toolbar">
-                        {{ 'data_integrity'|manual_link }}
+                        {{ 'admin/data_integrity_checks'|manual }}
                         {{ _('orphans')|button(url_for('admin_orphans')) }}
                         {{ _('dates')|button(url_for('admin_check_dates')) }}
                         {{ _('similar names')|button(url_for('admin_check_similar')) }}
