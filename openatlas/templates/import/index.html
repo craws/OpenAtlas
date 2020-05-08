@@ -4,11 +4,11 @@
     {{ [[_('admin'), 'admin_index'], _('import')]|crumb }}
 {% endblock %}
 {% block content %}
-    {% if 'admin'|is_authorized %}
-        <div class="toolbar">
-            {{ 'Import'|manual_link }}
+    <div class="toolbar">
+        {{ 'admin/import'|manual }}
+        {% if 'admin'|is_authorized %}
             {{ _('project')|button(url_for('import_project_insert')) }}
-        </div>
-    {% endif %}
+        {% endif %}
+    </div>
     {{ table.display()|safe }}
 {% endblock %}
