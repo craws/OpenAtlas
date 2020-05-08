@@ -8,3 +8,4 @@ Admin
    general
    mail
    map
+   content
