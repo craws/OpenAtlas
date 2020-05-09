@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Content &mdash; OpenAtlas 5.2.0 documentation</title>
+  <title>Export &mdash; OpenAtlas 5.2.0 documentation</title>
   
 
   
@@ -36,8 +36,7 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Data integrity checks" href="data_integrity_checks.html" />
-    <link rel="prev" title="Map" href="map.html" /> 
+    <link rel="prev" title="Import" href="import.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -98,10 +97,10 @@
 <li class="toctree-l2"><a class="reference internal" href="general.html">General</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mail.html">Mail</a></li>
 <li class="toctree-l2"><a class="reference internal" href="map.html">Map</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Content</a></li>
+<li class="toctree-l2"><a class="reference internal" href="content.html">Content</a></li>
 <li class="toctree-l2"><a class="reference internal" href="data_integrity_checks.html">Data integrity checks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="import.html">Import</a></li>
-<li class="toctree-l2"><a class="reference internal" href="export.html">Export</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Export</a></li>
 </ul>
 </li>
 </ul>
@@ -151,7 +150,7 @@
         
           <li><a href="index.html">Admin</a> &raquo;</li>
         
-      <li>Content</li>
+      <li>Export</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -168,17 +167,45 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="content">
-<h1>Content<a class="headerlink" href="#content" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="export">
+<h1>Export<a class="headerlink" href="#export" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>Displayed texts in available languages can be customized here:</p>
+<p>Available for admins and managers</p>
+<div class="section" id="export-sql">
+<h2>Export SQL<a class="headerlink" href="#export-sql" title="Permalink to this headline">¶</a></h2>
+<p>When clicking the <strong>Export SQL</strong> button a new SQL dump will be created with pg_dump.</p>
 <ul class="simple">
-<li><strong>Intro</strong> - displayed at the top at the start page before logging in</li>
-<li><strong>Contact</strong> - displayed at the contact site, e.g. the webmaster and project lead</li>
-<li><strong>Legal notice</strong> - displayed at the legal notice site, e.g. information about the institute</li>
+<li>Be aware, especially when sharing, that <strong>user data</strong>, e.g. email addresses, is included.</li>
+<li>Existing files are shown in a list and can be downloaded or deleted (only admins can delete)</li>
+<li>If the directory isn’t writeable, a warning will be shown</li>
+<li>SQL dumps are saved in the <strong>export/sql</strong> folder</li>
+<li>File names begin with date and time e.g. 2018-08-23_1533_dump.sql.</li>
 </ul>
-<p>Links to <strong>Contact</strong> and <strong>Legal notice</strong> are available in the menu if they contain text.</p>
+</div>
+<div class="section" id="export-csv">
+<h2>Export CSV<a class="headerlink" href="#export-csv" title="Permalink to this headline">¶</a></h2>
+<p>When clicking the <strong>Export CSV</strong> button a new CSV export file for all marked tables will be created.</p>
+<ul class="simple">
+<li>Existing files are shown in a list and can be downloaded or deleted (only admins can delete)</li>
+<li>If the directory isn’t writeable, a warning will be shown</li>
+<li>CSV exports are saved in the <strong>export/csv</strong> folder</li>
+<li>File names are constructed from the date, database schema and table name e.g. 2018-08-23_1533_model_class.csv</li>
+</ul>
+<div class="section" id="options">
+<h3>Options<a class="headerlink" href="#options" title="Permalink to this headline">¶</a></h3>
+<ul class="simple">
+<li><strong>Export as ZIP and add info file</strong> - files are compressed with an info file (date, username, domain)</li>
+<li><strong>Created and modified dates</strong> - additional columns for creation and last modified dates</li>
+<li><strong>GIS format</strong><ul>
+<li><strong>Coordinates</strong> - eg. “15.4498 47.0659”, for polygons a <a class="reference external" href="https://postgis.net/docs/ST_PointOnSurface.html">ST_PointOnSurface</a> will be calculated</li>
+<li><strong>WKT</strong> - <a class="reference external" href="https://en.wikipedia.org/wiki/Well-known_text">Well known text</a> e.g. POINT (15.4498 47.0659)</li>
+<li><strong>PostGIS geometry</strong> - <a class="reference external" href="https://en.wikipedia.org/wiki/PostGIS#Features">PostGIS</a> geometry format</li>
+</ul>
+</li>
+</ul>
+</div>
+</div>
 </div>
 
 
@@ -189,10 +216,8 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="data_integrity_checks.html" class="btn btn-neutral float-right" title="Data integrity checks" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
-      
-        <a href="map.html" class="btn btn-neutral float-left" title="Map" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="import.html" class="btn btn-neutral float-left" title="Import" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
