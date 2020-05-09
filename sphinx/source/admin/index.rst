@@ -13,3 +13,4 @@ Admin
    import
    export
    execute_sql
+   api

@@ -143,7 +143,7 @@
                     </div>
                     <div class="toolbar">
                         <h1>{{ 'API'|uc_first }}</h1>
-                        {{ 'API'|manual_link }}
+                        {{ 'admin/api'|manual }}
                         {% if 'manager'|is_authorized %}
                             {{ _('edit settings')|button(url_for('admin_settings', category='api')) }}
                         {% endif %}

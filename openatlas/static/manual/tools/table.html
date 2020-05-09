@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Execute SQL &mdash; OpenAtlas 5.2.0 documentation</title>
+  <title>Table &mdash; OpenAtlas 5.2.0 documentation</title>
   
 
   
@@ -36,8 +36,8 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="API" href="api.html" />
-    <link rel="prev" title="Export" href="export.html" /> 
+    <link rel="next" title="Admin" href="../admin/index.html" />
+    <link rel="prev" title="File" href="file.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -91,21 +91,16 @@
               <ul class="current">
 <li class="toctree-l1"><a class="reference internal" href="../menu/index.html">Menu</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../form/index.html">Form</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">Admin</a><ul class="current">
-<li class="toctree-l2"><a class="reference internal" href="files.html">Files</a></li>
-<li class="toctree-l2"><a class="reference internal" href="user.html">User</a></li>
-<li class="toctree-l2"><a class="reference internal" href="general.html">General</a></li>
-<li class="toctree-l2"><a class="reference internal" href="mail.html">Mail</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="search.html">Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="profile.html">Profile</a></li>
 <li class="toctree-l2"><a class="reference internal" href="map.html">Map</a></li>
-<li class="toctree-l2"><a class="reference internal" href="content.html">Content</a></li>
-<li class="toctree-l2"><a class="reference internal" href="data_integrity_checks.html">Data integrity checks</a></li>
-<li class="toctree-l2"><a class="reference internal" href="import.html">Import</a></li>
-<li class="toctree-l2"><a class="reference internal" href="export.html">Export</a></li>
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Execute SQL</a></li>
-<li class="toctree-l2"><a class="reference internal" href="api.html">API</a></li>
+<li class="toctree-l2"><a class="reference internal" href="network.html">Network visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="file.html">File</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Table</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
 </ul>
 
             
@@ -151,9 +146,9 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-          <li><a href="index.html">Admin</a> &raquo;</li>
+          <li><a href="index.html">Tools</a> &raquo;</li>
         
-      <li>Execute SQL</li>
+      <li>Table</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -170,39 +165,17 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="execute-sql">
-<h1>Execute SQL<a class="headerlink" href="#execute-sql" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="table">
+<h1>Table<a class="headerlink" href="#table" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>Admins can execute SQL direct to the database.</p>
-<p><strong>Warning</strong>: direct database manipulation can result in data loss and an unusable application!</p>
-<div class="section" id="preparation">
-<h2>Preparation<a class="headerlink" href="#preparation" title="Permalink to this headline">¶</a></h2>
+<p>Tables are used to show multiple entries at a glance. To navigate quickly multiple tools are available:</p>
 <ul class="simple">
-<li>Backup the database (<a class="reference internal" href="export.html"><span class="doc">Export</span></a>) and download it in case you lose data or crash the application</li>
-<li>Create a local database with the backup and test the SQL on this local version first</li>
-<li>If there is no recent backup (maximal one day old), the SQL function is not available</li>
+<li><strong>Sorting</strong> - click on the header to sort the entries, click a second time for invert sorting</li>
+<li><strong>Search</strong> - type into the search field on top right to filter entries containing the term</li>
+<li><strong>Paging</strong> - if there are multiple pages you can navigate with the buttons below</li>
 </ul>
-</div>
-<div class="section" id="keep-in-mind">
-<h2>Keep in mind<a class="headerlink" href="#keep-in-mind" title="Permalink to this headline">¶</a></h2>
-<ul class="simple">
-<li>It’s a simple but very powerful feature. Unlike the rest of the application there are no safeguards to prevent e.g. total data loss and/or making the application unusable.</li>
-<li>If data is lost and/or the application crashes it can be fixed <strong>only</strong> with server and database access. Depending on the situation fixing the problem could take some time.</li>
-<li>A transaction (BEGIN, COMMIT) is automatically build around your statement</li>
-<li>Don’t refresh the page (e.g pressing F5) because this will execute the statement again.</li>
-<li>You can use multiple statements (every statement has to be terminated with “;”) but only the result of the last one will be displayed.</li>
-</ul>
-</div>
-<div class="section" id="result">
-<h2>Result<a class="headerlink" href="#result" title="Permalink to this headline">¶</a></h2>
-<p>After clicking on <strong>Execute</strong> the result of the last query is shown below depending on the statement:</p>
-<ul class="simple">
-<li><strong>SELECT</strong> - the row count and the (not very readable) query result</li>
-<li><strong>INSERT, UPDATE, DELETE</strong> - the affected row count</li>
-<li><strong>Error</strong> - there is nothing to worry about because the transaction executes the statement(s) only if there is no error.</li>
-</ul>
-</div>
+<p>The amount of entries per page can be configured in your <a class="reference internal" href="profile.html"><span class="doc">Profile</span></a></p>
 </div>
 
 
@@ -213,10 +186,10 @@
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="api.html" class="btn btn-neutral float-right" title="API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="../admin/index.html" class="btn btn-neutral float-right" title="Admin" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="export.html" class="btn btn-neutral float-left" title="Export" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="file.html" class="btn btn-neutral float-left" title="File" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

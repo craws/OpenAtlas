@@ -258,7 +258,8 @@ def manual(self: Any, site: str) -> str:  # Creates a link to a manual page
 def display_form(self: Any,
                  form: Any,
                  form_id: Optional[str] = None,
-                 for_persons: bool = False) -> str:
+                 for_persons: bool = False,
+                 manual_page: Optional[str] = None) -> str:
     from openatlas.forms.forms import ValueFloatField
     multipart = 'enctype="multipart/form-data"' if hasattr(form, 'file') else ''
     if 'update' in request.path:
@@ -397,8 +398,10 @@ def display_form(self: Any,
             """.format(values=util.uc_first(_('values')),
                        switcher=util.button(_('show'), id_="value-type-switcher", css="secondary"))
         html['value_types'] = values_html + html['value_types']
+    if manual_page:
+        html['buttons'] = str(escape(manual(None, manual_page))) + ' ' + html['buttons']
     html_all += html['header'] + html['types'] + html['main'] + html['value_types'] + html['footer']
-    html_all += '</div><div class="toolbar">' + html['buttons'] + '</div></form>'
+    html_all += '</div><div class="toolbar">' +  html['buttons'] + '</div></form>'
     return Markup(html_all)
 
 

@@ -9,8 +9,5 @@
     &nbsp;> {{ _(category)|uc_first }}
 {% endblock %}
 {% block content %}
-    <div class="toolbar">
-        {{ ('admin/' + category)|manual }}
-    </div>
-    {{ form|display_form }}
+    {{ form|display_form(manual_page='admin/' + category) }}
 {% endblock %}

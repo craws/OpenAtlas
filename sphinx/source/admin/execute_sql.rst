@@ -9,7 +9,7 @@ Admins can execute SQL direct to the database.
 
 Preparation
 -----------
-* Backup the database (`export`) and download it in case you lose data or crash the application.
+* Backup the database (:doc:`export`) and download it in case you lose data or crash the application
 * Create a local database with the backup and test the SQL on this local version first
 * If there is no recent backup (maximal one day old), the SQL function is not available
 

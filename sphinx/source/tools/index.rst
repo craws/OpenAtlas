@@ -9,3 +9,4 @@ Tools
    map
    network
    file
+   table

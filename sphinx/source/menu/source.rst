@@ -4,8 +4,7 @@ Source
 .. toctree::
 
 Written sources like for example medieval charters are mapped in OpenAtlas as a combination of
-several entities. On the source index page is an overview of already entered sources with their
-type and description.
+several entities.
 
 .. include:: navigation.rst
 
