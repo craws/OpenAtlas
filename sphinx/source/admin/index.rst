@@ -12,3 +12,4 @@ Admin
    data_integrity_checks
    import
    export
+   execute_sql

@@ -5,7 +5,7 @@
 {% endblock %}
 {% block content %}
     <div class="toolbar">
-        {{ 'SQL'|manual_link }}
+        {{ 'admin/execute_sql'|manual }}
         {% if file_data['file'] %}
             {{ _('latest backup')|uc_first }}: {{ file_data['file'] }}, {{ file_data['size'] }}
             {{ _('download')|button(url_for('download_sql', filename=file_data['file'])) }}
