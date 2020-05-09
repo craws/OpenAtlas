@@ -1,0 +1,16 @@
+API
+===
+
+.. toctree::
+
+The OpenAtlas API
+(`Application programming interface <https://en.wikipedia.org/wiki/Application_programming_interface>`_)
+output is based on `JSON-LD syntax <https://json-ld.org/spec/latest/json-ld/>`_
+and `GeoJSON <https://tools.ietf.org/html/rfc7946>`_, and therefore could be rendered in many web
+mapping applications. In addition, `Linked Places <https://github.com/LinkedPasts/linked-places>`_
+was used as standard.
+
+The API links in the user interface are only visible for user with activated **advanced layout** in
+their :doc:`profile` but any logged in user has access to the API.
+
+Settings: :doc:`/admin/api`

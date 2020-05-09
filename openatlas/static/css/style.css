@@ -223,8 +223,6 @@ form input[type="text"].month, form input[type="text"].day {
 #description {
     height: 8em;
     width: 30em;
-    z-index: 1;
-    position: absolute;
 }
 
 .description {

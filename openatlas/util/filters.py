@@ -401,7 +401,7 @@ def display_form(self: Any,
     if manual_page:
         html['buttons'] = str(escape(manual(None, manual_page))) + ' ' + html['buttons']
     html_all += html['header'] + html['types'] + html['main'] + html['value_types'] + html['footer']
-    html_all += '</div><div class="toolbar">' +  html['buttons'] + '</div></form>'
+    html_all += '</div><div class="toolbar">' + html['buttons'] + '</div></form>'
     return Markup(html_all)
 
 
