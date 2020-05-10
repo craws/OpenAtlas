@@ -2,8 +2,8 @@ class Changelog:
     versions = {
         '5.2.0': ['TBA', {
             'feature': {
-                '1167': 'Settings and profile'
-                },
+                '1065': 'User manual in application',
+                '1167': 'Settings and profile'},
             'fix': {
                 '1208': 'CSV export error with BC dates',
                 '1218': 'Resizeable form elements vanish below map',
