@@ -4,8 +4,5 @@
     <a href="{{ url_for('admin_index') }}#tab-general">{{ _('admin')|uc_first }}</a>&nbsp;> {{ _('logo')|uc_first }}
 {% endblock %}
 {% block content %}
-    <div class="toolbar">
-        {{ 'Logo'|manual_link }}
-    </div>
     {{ table.display()|safe }}
 {% endblock %}
