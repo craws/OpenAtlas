@@ -12,7 +12,8 @@
         <div style="float:left; ">
             <div class="toolbar">
                 <p>
-                    {{ 'index'|manual }}
+                    <a class="{{ config['CSS']['button']['primary'] }}" href="/static/manual/index.html" target="_blank">
+                        <img style="height:14px;" src="/static/images/icons/book.png" alt=''> {{ _('manual')|uc_first}}</a>
                     {{ _('model')|button(url_for('model_index')) }}
                 </p>
                 <p>
