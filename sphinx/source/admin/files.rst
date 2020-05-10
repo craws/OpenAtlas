@@ -24,5 +24,5 @@ in the configuration file (e.g. instance/production.py) default is:
 Logo
 ----
 You can chose a custom logo. The file has to be uploaded before and has to have a display file
-extension. The displayed logo has a max-height of 120 px. If you selected a higher one the browser
+extension. The displayed logo has a max-height of 120 px. If you selected a larger one the browser
 will try to scale it.

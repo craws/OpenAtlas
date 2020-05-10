@@ -54,11 +54,13 @@ def index() -> str:
                                          entity.last,
                                          text])
         for name, count in Entity.get_overview_counts().items():
-            if count:
-                count = format_number(count) if count else ''
-                url = url_for(name + '_index') if name != 'find' else url_for('place_index')
-                tables['overview'].rows.append([
-                    '<a href="' + url + '">' + uc_first(_(name)) + '</a>', count])
+            if not count:
+                continue
+            label = uc_first(_(name))
+            if name not in ('find', 'human remains'):
+                label = '<a href="{url}">{text}</a>'.format(url=url_for(name + '_index'),
+                                                            text=label)
+            tables['overview'].rows.append([label, format_number(count)])
         for entity in Entity.get_latest(8):
             tables['latest'].rows.append([
                 link(entity),

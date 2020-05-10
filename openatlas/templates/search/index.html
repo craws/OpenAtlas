@@ -4,9 +4,6 @@
     {{ [[_('overview'), 'index'], _('search')]|crumb }}
 {% endblock %}
 {% block content %}
-    <div class="toolbar">
-        {{ 'tools/search'|manual }}
-    </div>
     <div style="float:left;">
         <form method="post">
             {{ form.csrf_token }}
@@ -26,7 +23,10 @@
             <h2>{{ _('classes')|uc_first }}</h2>
             <p id="select_all" class="select_all">{{ _('deselect all')|uc_first }}</p>
             {{ form.classes }}
-            {{ form.search(class_=config.CSS.button.primary) }}
+            <div class="toolbar">
+                {{ 'tools/search'|manual }}
+                {{ form.search(class_=config.CSS.button.primary) }}
+            </div>
         </form>
     </div>
     <div style="float:left;margin-left: 1em;">
