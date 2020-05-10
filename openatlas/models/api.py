@@ -35,7 +35,7 @@ class Api:
         for link in Link.get_links(entity.id, inverse=True):  # pragma: nocover
             links.append({'label': link.domain.name,
                           'relationTo': url_for('api_entity', id_=link.domain.id, _external=True),
-                          'relationType': 'crm:' + link.property.code + '_'
+                          'relationType': 'crm:' + link.property.code + 'i_'
                                           + link.property.i18n['en'].replace(' ', '_')})
 
         return links
