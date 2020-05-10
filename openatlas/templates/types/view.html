@@ -19,14 +19,15 @@
     </ul>
     <div class="tab-content">
         <div class="tab-pane fade show active" role="tabpanel" id="tab-info">
-            {% if 'editor'|is_authorized and node.root and not root.locked %}
-                <div class="toolbar">
+            <div class="toolbar">
+                {{ 'form/type'|manual }}
+                {% if 'editor'|is_authorized and node.root and not root.locked %}
                     {{ _('edit')|button(url_for('node_update', id_=node.id)) }}
                         {% if not node.system and node.count < 1 and not node.subs %}
                             {{ _('delete')|button(url_for('node_delete', id_=node.id), onclick="return confirm('" + _('delete')|uc_first + " " + node.name.replace("'", '').replace('"', '') + "?');") }}
                         {% endif %}
-                </div>
-            {% endif %}
+                {% endif %}
+            </div>
             <h1>{{ node.name }}</h1>
             {{ profile_image_id|display_profile_image }}
             <div style="float:left;">

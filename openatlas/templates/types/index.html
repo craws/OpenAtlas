@@ -5,7 +5,7 @@
 {% endblock %}
 {% block content %}
     <div class="toolbar">
-        {{ 'Form_field_type'|manual_link }}
+        {{ 'form/type'|manual }}
     </div>
     <div>
         <ul class="nav nav-tabs" role="tablist">
@@ -17,7 +17,6 @@
         <div class="tab-content" id="menuTabContent">
             {% for type_ in ['standard', 'custom', 'value', 'places'] %}
                 <div class="tab-pane fade" role="tabpanel" id="menu-tab-{{ type_ }}" style="padding: 0;">
-
                     <div class="accordion" id="TypeAccordion">
                         {% for node, tree in nodes[type_].items() %}
                             <div class="card">

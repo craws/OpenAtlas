@@ -22,7 +22,7 @@
         </p>
         {% if session.settings.mail and session.settings.mail_recipients_feedback %}
             <p>- {{ _('feedback_form') }}:</p>
-            {{ form|display_form('feedback-form')|safe }}
+            {{ form|display_form('feedback-form') }}
         {% endif %}
     {% endif %}
 {% endblock %}

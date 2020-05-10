@@ -6,7 +6,7 @@
 {% block content %}
     {% if 'contributor'|is_authorized %}
         <div class="toolbar">
-            {{ 'tools/files'|manual }}
+            {{ 'tools/file'|manual }}
             {{ _('file')|button(url_for('file_insert')) }}
         </div>
     {% endif %}

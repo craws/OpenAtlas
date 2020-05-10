@@ -26,6 +26,7 @@
         <div class="tab-content">
             <div class="tab-pane fade show active" role="tabpanel" id="tab-info">
                 <div class="toolbar">
+                    {{ 'tools/file'|manual }}
                     {% if 'contributor'|is_authorized %}
                         {{ _('edit')|button(url_for('file_update', id_=entity.id)) }}
                         {{ entity|display_delete_link }}

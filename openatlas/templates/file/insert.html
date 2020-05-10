@@ -13,10 +13,10 @@
         <span style="font-weight: bold;">{{ session['settings']['file_upload_max_size'] }} MB</span>.
         {{ _('if exceeded you will receive a connection error')|uc_first }}.
         {{ _('allowed extensions')|uc_first }}:
-        <span style="font-weight: bold;">{{ session['settings']['file_upload_allowed_extension'] }}</span>
+        <span style="font-weight: bold;">{{ ', '.join(session['settings']['file_upload_allowed_extension']) }}</span>
     </p>
     {% if writeable %}
-        {{ form|display_form('file-form')|safe }}
+        {{ form|display_form('file-form', manual_page='tools/file') }}
     {% else %}
         <span class="error">{{ _('directory not writable')|uc_first }}</span>
     {% endif %}

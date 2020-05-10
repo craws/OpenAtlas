@@ -1,14 +1,11 @@
 {% extends "layout.html" %}
 {% block title_name %} - {{ _('export SQL')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'], _('export SQL')]|crumb }}
+    <a href="{{ url_for('admin_index') }}#tab-data">{{ _('admin')|uc_first }}</a>&nbsp;> {{ _('export SQL')|uc_first }}
 {% endblock %}
 {% block content %}
-    <div class="toolbar">
-        {{ 'admin/export'|manual }}
-    </div>
     {% if writeable %}
-        {{ form|display_form }}
+        {{ form|display_form(manual_page='admin/export') }}
     {% else %}
         <p><span class="error">{{ _('directory not writable')|uc_first }}: export/sql</span></p>
     {% endif %}
