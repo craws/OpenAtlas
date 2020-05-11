@@ -1,9 +1,9 @@
--- Upgrade 5.1.0 to 5.2.0
+-- Upgrade 5.1.x to 5.2.0
 -- Be sure to backup the database and read the upgrade notes before executing this!
 
 BEGIN;
 
--- Renaming system property for nodes to standard
+-- Renaming system types (nodes) to standard types
 ALTER TABLE web.hierarchy RENAME COLUMN system TO standard;
 
 -- #1167: Settings and profile
