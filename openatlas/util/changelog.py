@@ -1,14 +1,13 @@
 class Changelog:
     versions = {
-        '5.2.0': ['TBA', {
+        '5.2.0': ['2020-05-11', {
             'feature': {
                 '1065': 'User manual in application',
                 '1167': 'Settings and profile'},
             'fix': {
                 '1208': 'CSV export error with BC dates',
                 '1218': 'Resizeable form elements vanish below map',
-                '1223': 'Visibility of Full Entries'},
-        }],
+                '1223': 'Visibility of Full Entries'}}],
         '5.1.1': ['2020-04-12', {
             'fix': {
                 '1190': 'Tabs not shown in file view',
