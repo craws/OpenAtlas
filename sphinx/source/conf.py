@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+from typing import List
 
 version = '5.2.0'
 release = '5.2.0'
@@ -10,7 +11,7 @@ project = 'OpenAtlas'
 author = 'Alexander Watzinger and the OpenAtlas team'
 language = 'en'
 pygments_style = 'sphinx'
-extensions = []
+extensions: List[str] = []
 
 html_logo = 'logo.png'
 html_theme = 'sphinx_rtd_theme'
