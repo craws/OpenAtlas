@@ -230,6 +230,15 @@ form input[type="text"].month, form input[type="text"].day {
     max-width: 80em;
 }
 
+label[for="description"] {
+    height: 8em;
+}
+
+.table-cell textarea {
+    z-index: 1;
+    position: absolute;
+}
+
 .overlay {
     display: none;
     left: 0;
