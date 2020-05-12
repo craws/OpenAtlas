@@ -4,5 +4,5 @@
     {{ [[_('types'), 'node_index'], root, node, _('edit')]|crumb }}
 {% endblock %}
 {% block content %}
-    {{ form|display_form }}
+    {{ form|display_form(manual_page='form/type') }}
 {% endblock %}

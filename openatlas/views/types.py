@@ -30,15 +30,15 @@ class NodeForm(FlaskForm):  # type: ignore
 @app.route('/types')
 @required_group('readonly')
 def node_index() -> str:
-    nodes: Dict[str, Dict[Entity, str]] = {'system': {}, 'custom': {}, 'places': {}, 'value': {}}
+    nodes: Dict[str, Dict[Entity, str]] = {'standard': {}, 'custom': {}, 'places': {}, 'value': {}}
     for id_, node in g.nodes.items():
         if node.root:
             continue
         type_ = 'custom'
         if node.class_.code == 'E53':
             type_ = 'places'
-        elif node.system:
-            type_ = 'system'
+        elif node.standard:
+            type_ = 'standard'
         elif node.value_type:
             type_ = 'value'
         nodes[type_][node] = tree_select(node.name)
@@ -67,7 +67,7 @@ def node_insert(root_id: int, super_id: Optional[int] = None) -> Union[str, Resp
 def node_update(id_: int) -> Union[str, Response]:
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]] if node.root else None
-    if node.system or (root and root.locked):
+    if node.standard or (root and root.locked):
         abort(403)
     form = build_node_form(NodeForm, node, request)
     if form.validate_on_submit():
@@ -82,7 +82,7 @@ def node_update(id_: int) -> Union[str, Response]:
 def node_delete(id_: int) -> Response:
     node = g.nodes[id_]
     root = g.nodes[node.root[-1]] if node.root else None
-    if node.system or node.subs or node.count or (root and root.locked):
+    if node.standard or node.subs or node.count or (root and root.locked):
         abort(403)
     node.delete()
     flash(_('entity deleted'), 'info')
@@ -107,8 +107,8 @@ def node_move_entities(id_: int) -> Union[str, Response]:
     root = g.nodes[node.root[-1]]
     if node.class_.code == 'E53':
         tab_hash = '#menu-tab-places_collapse-'
-    elif root.system:
-        tab_hash = '#menu-tab-system_collapse-'
+    elif root.standard:
+        tab_hash = '#menu-tab-standard_collapse-'
     elif node.value_type:  # pragma: no cover
         tab_hash = '#menu-tab-value_collapse-'
     else:

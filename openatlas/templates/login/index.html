@@ -4,7 +4,7 @@
     {{ [[_('overview'), 'index'], _('login')]|crumb }}
 {% endblock %}
 {% block content %}
-    {{ form|display_form('login-form')|safe }}
+    {{ form|display_form('login-form') }}
     {% if config.DEMO_MODE %}
         <p>User: Demolina, Pass: Demolina</p>
         <script>

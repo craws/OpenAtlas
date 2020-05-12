@@ -4,5 +4,5 @@
     {{ [[_('admin'), 'admin_index'], [_('import'), 'import_index'], project, _('edit')]|crumb }}
 {% endblock %}
 {% block content %}
-    {{ form|display_form }}
+    {{ form|display_form(manual_page='admin/import') }}
 {% endblock %}

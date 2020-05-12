@@ -223,13 +223,20 @@ form input[type="text"].month, form input[type="text"].day {
 #description {
     height: 8em;
     width: 30em;
-    z-index: 1;
-    position: absolute;
 }
 
 .description {
     margin-top: 1em;
     max-width: 80em;
+}
+
+label[for="description"] {
+    height: 8em;
+}
+
+.table-cell textarea {
+    z-index: 1;
+    position: absolute;
 }
 
 .overlay {

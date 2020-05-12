@@ -9,12 +9,5 @@
     &nbsp;> {{ _(category)|uc_first }}
 {% endblock %}
 {% block content %}
-    <div class="toolbar">
-        {% if category == 'api' %}
-            {{ 'api_settings'|manual_link }}
-        {% else %}
-            {{ category|manual_link }}
-        {% endif %}
-    </div>
-    {{ form|display_form }}
+    {{ form|display_form(manual_page='admin/' + category) }}
 {% endblock %}

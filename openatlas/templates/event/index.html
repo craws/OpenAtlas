@@ -6,7 +6,7 @@
 {% block content %}
     {% if 'contributor'|is_authorized %}
         <div class="toolbar">
-            {{ 'Event'|manual_link }}
+            {{ 'menu/event'|manual }}
             {% for code in config.CLASS_CODES.event %}
                 {{ code|get_class_name|button(url_for('event_insert', code=code)) }}
             {% endfor %}

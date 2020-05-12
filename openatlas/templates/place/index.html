@@ -6,12 +6,12 @@
 {% block content %}
     <div class="row">
         <div class="col">
-            {% if 'contributor'|is_authorized %}
-                <div class="toolbar">
-                    {{ 'Place'|manual_link }}
+            <div class="toolbar">
+                {{ 'menu/place'|manual }}
+                {% if 'contributor'|is_authorized %}
                     {{ _('place')|button(url_for('place_insert')) }}
-                </div>
-            {% endif %}
+                {% endif %}
+            </div>
             {{ table.display()|safe }}
         </div>
         {% if gis_data %}

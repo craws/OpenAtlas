@@ -76,8 +76,8 @@ def entity_view(id_: int) -> Union[str, Response]:
         else:  # pragma: no cover
             if node.class_.code == 'E53':
                 tab_hash = '#menu-tab-places_collapse-'
-            elif node.system:
-                tab_hash = '#menu-tab-system_collapse-'
+            elif node.standard:
+                tab_hash = '#menu-tab-standard_collapse-'
             elif node.value_type:
                 tab_hash = '#menu-tab-value_collapse-'
             else:

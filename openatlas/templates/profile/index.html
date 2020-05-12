@@ -6,7 +6,7 @@
 {% block content %}
     {% if not config['DEMO_MODE'] %}
         <div class="toolbar">
-            {{ 'Profile'|manual_link }}
+            {{ 'tools/profile'|manual }}
             {{ _('edit')|button(url_for('profile_update')) }}
             {{ _('change password')|button(url_for('profile_password')) }}
         </div>

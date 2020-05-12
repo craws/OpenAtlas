@@ -4,13 +4,13 @@
     {{ [[_('admin'), 'admin_index'], [_('import'), 'import_index'], project, class_label]|crumb }}
 {% endblock %}
 {% block content %}
-    <div class="toolbar">
-        {{ 'Import'|manual_link }}
-        {% if file_data.file %}
+
+    {% if file_data.file %}
+        <div class="toolbar">
             {{ _('latest backup')|uc_first }}: {{ file_data.file }}, {{ file_data.size }}
             {{ _('download')|button(url_for('download_sql', filename=file_data.file)) }}
-        {% endif %}
-    </div>
+        </div>
+    {% endif %}
     {% if file_data.backup_too_old and not config.IS_UNIT_TEST %}
         <p>
             {{ _('There seems to be no recent backup, please make one') }}
@@ -22,7 +22,7 @@
             <span style="font-weight: bold;">csv</span> -
             {{ _('example files')|uc_first }}: <a href="/static/import/example.csv">example.csv</a>
         </p>
-        {{ form|display_form }}
+        {{ form|display_form(manual_page='admin/import') }}
         {% for item in messages['error'] %}
             <span class="error">{{ _('error')|uc_first }} - {{ item }}</span><br>
         {% endfor %}

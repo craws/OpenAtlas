@@ -12,5 +12,5 @@
             {{ _('reload')|button(url_for('reference_update', id_=reference.id)) }}
         </div>
     {% endif %}
-    {{ form|display_form(reference.system_type|replace(" ","_"))|safe }}
+    {{ form|display_form(reference.system_type|replace(" ","_"), manual_page='menu/reference') }}
 {% endblock %}

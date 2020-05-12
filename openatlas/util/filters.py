@@ -230,16 +230,13 @@ def display_content_translation(self: Any, text: str) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def manual_link(self: Any, wiki_site: str) -> str:
-    # Creates a link to a manual page
-    html = """
-        <a class="{css}" href="{url}" target="_blank">
-            <img style="height:14px;" src="/static/images/icons/book.png" alt=''>{label}
-        </a>
-        """.format(url='https://redmine.openatlas.eu/projects/uni/wiki/' + wiki_site,
-                   css=app.config['CSS']['button']['primary'],
-                   label=util.uc_first(_('manual')))
-    return Markup(html)
+def manual(self: Any, site: str) -> str:  # Creates a link to a manual page
+    return Markup("""
+        <a class="{css}" href="/static/manual/{site}.html" target="_blank" title="{label}">
+            <img style="height:14px;" src="/static/images/icons/book.png" alt=''>
+        </a>""".format(site=site,
+                       label=util.uc_first('manual'),
+                       css=app.config['CSS']['button']['primary']))
 
 
 @jinja2.contextfilter
@@ -247,7 +244,8 @@ def manual_link(self: Any, wiki_site: str) -> str:
 def display_form(self: Any,
                  form: Any,
                  form_id: Optional[str] = None,
-                 for_persons: bool = False) -> str:
+                 for_persons: bool = False,
+                 manual_page: Optional[str] = None) -> str:
     from openatlas.forms.forms import ValueFloatField
     multipart = 'enctype="multipart/form-data"' if hasattr(form, 'file') else ''
     if 'update' in request.path:
@@ -386,6 +384,8 @@ def display_form(self: Any,
             """.format(values=util.uc_first(_('values')),
                        switcher=util.button(_('show'), id_="value-type-switcher", css="secondary"))
         html['value_types'] = values_html + html['value_types']
+    if manual_page:
+        html['buttons'] = str(escape(manual(None, manual_page))) + ' ' + html['buttons']
     html_all += html['header'] + html['types'] + html['main'] + html['value_types'] + html['footer']
     html_all += '</div><div class="toolbar">' + html['buttons'] + '</div></form>'
     return Markup(html_all)
@@ -425,8 +425,7 @@ def display_menu(self: Any, entity: Optional[Entity]) -> str:
     """ Returns HTML with the menu and mark appropriate item as selected."""
     html = ''
     if current_user.is_authenticated:
-        items = ['overview', 'source', 'event', 'actor', 'place', 'reference', 'object', 'types',
-                 'admin']
+        items = ['source', 'event', 'actor', 'place', 'reference', 'object', 'types', 'admin']
         if request.path.startswith('/entity'):
             try:
                 entity = Entity.get_by_id(int(request.path.split('/')[-1]))

@@ -4,13 +4,13 @@
     {{ [_('reference')]|crumb }}
 {% endblock %}
 {% block content %}
-    {% if 'contributor'|is_authorized %}
-        <div class="toolbar">
-            {{ 'Reference'|manual_link }}
+    <div class="toolbar">
+        {{ 'menu/reference'|manual }}
+        {% if 'contributor'|is_authorized %}
             {{ _('bibliography')|button(url_for('reference_insert', code='bibliography')) }}
             {{ _('edition')|button(url_for('reference_insert', code='edition')) }}
             {{ _('external reference')|button(url_for('reference_insert', code='external_reference')) }}
-        </div>
-    {% endif %}
+        {% endif %}
+    </div>
     {{ table.display()|safe }}
 {% endblock %}

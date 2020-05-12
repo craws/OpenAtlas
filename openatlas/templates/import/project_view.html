@@ -16,6 +16,7 @@
             <div class="tab-pane fade show active" role="tabpanel" id="tab-info">
                 {% if 'manager'|is_authorized %}
                     <div class="toolbar">
+                        {{ 'admin/import'|manual }}
                         {{ _('edit')|button(url_for('import_project_update', id_=project.id)) }}
                         {{ _('delete')|button(url_for('import_project_delete', id_=project.id), onclick="return confirm('" + _('delete %(name)s?', name=project.name)|replace("'", "")|uc_first + "')") }}
                     </div>

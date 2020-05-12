@@ -4,10 +4,7 @@
     <a href="{{ url_for('admin_index') }}#tab-data">{{ _('admin')|uc_first }}</a>&nbsp;> {{ _('check similar names')|uc_first }}
 {% endblock %}
 {% block content %}
-    <div class="toolbar">
-        {{ 'Data_integrity'|manual_link }}
-    </div>
-    {{ form|display_form }}
+    {{ form|display_form(manual_page='admin/data_integrity_checks')}}
     {% if table %}
         {% if table.rows %}
             {{ table.display()|safe }}

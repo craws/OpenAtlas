@@ -92,7 +92,7 @@ $(document).ready(function () {
     var ellipsesText = "...";
     $('.more').each(function () {
         var content = $(this).html();
-        if (this.scrollHeight > this.clientHeight) {
+        if (this.scrollHeight-1 > this.clientHeight) {
             more = '<a href="" class="more-link">' + moreText + '</a></span>';
             $(more).insertAfter(this);
         }

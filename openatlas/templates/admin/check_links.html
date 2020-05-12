@@ -5,7 +5,7 @@
 {% endblock %}
 {% block content %}
     <div class="toolbar">
-        {{ 'Data_integrity'|manual_link }}
+        {{ 'admin/data_integrity_checks'|manual }}
     </div>
     {% if table.rows %}
         {{ table.display()|safe }}

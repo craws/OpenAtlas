@@ -56,7 +56,7 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
         tab_hash = '#menu-tab-value_collapse-'
     else:
         tab_hash = '#menu-tab-custom_collapse-'
-    if root.system:
+    if root.standard:
         abort(403)
     form = build_form(HierarchyForm, 'hierarchy', root)
     form.forms.choices = Node.get_form_choices(root)
@@ -104,7 +104,7 @@ def hierarchy_remove_form(id_: int, remove_id: int) -> Response:
 @required_group('manager')
 def hierarchy_delete(id_: int) -> Response:
     node = g.nodes[id_]
-    if node.system or node.subs or node.count:
+    if node.standard or node.subs or node.count:
         abort(403)
     node.delete()
     flash(_('entity deleted'), 'info')
