@@ -9,6 +9,7 @@ from openatlas.models.geonames import Geonames
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.util.util import format_date, get_file_path
+from werkzeug import abort
 
 
 class Api:
@@ -98,7 +99,11 @@ class Api:
 
     @staticmethod
     def get_entity(id_: int) -> Dict[str, Any]:
-        entity = Entity.get_by_id(id_, nodes=True, aliases=True)
+        try:
+            entity = Entity.get_by_id(id_, nodes=True, aliases=True)
+        except Exception as e:
+            abort(404)
+
         geonames_link = Geonames.get_geonames_link(entity)
         type_ = 'FeatureCollection'
         nodes = []
