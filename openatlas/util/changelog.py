@@ -1,5 +1,8 @@
 class Changelog:
     versions = {
+        '5.3.0': ['TBA', {
+            'feature': {},
+            'fix': {}}],
         '5.2.0': ['2020-05-11', {
             'feature': {
                 '1065': 'User manual in application',
