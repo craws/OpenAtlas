@@ -1,0 +1,114 @@
+<div class="row">
+    <div class="col-6">
+        <ul class="nav nav-tabs" role="tablist">
+            {% for tab in tabs: %}
+                {% set active = 'active' if loop.index == 1 else '' %}
+                {% set selected = 'true' if loop.index == 1 else 'false' %}
+                <li class="nav-item">
+                    <a class="nav-link {{active}}" data-toggle="tab" role="tab" aria-selected="{{selected}}" href="#tab-{{tab.id}}">
+                        {{ tab.header|uc_first }}
+                    </a>
+                </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" role="tabpanel" id="tab-info">
+                <div class="toolbar">
+                    {{ 'menu/actor'|manual }}
+                    {% if 'contributor'|is_authorized %}
+                        {{ _('edit')|button(url_for('actor_update', id_=actor.id)) }}
+                        {{ actor|display_delete_link }}
+                    {% endif %}
+                    {{ actor.id|bookmark_toggle }}
+                </div>
+                <h1>{{ actor.name }}</h1>
+                <div>
+                    {{ profile_image_id|display_profile_image }}
+                    <div style="float:left;">
+                        {{ info|display_info }}
+                        {{ actor|note }}
+                        {{ actor|display_external_references }}
+                        {{ actor|description }}
+                    </div>
+                    <div style="clear:both;"></div>
+                </div>
+            </div>
+            <div class="tab-pane fade" role="tabpanel" id="tab-source">
+                {% if 'contributor'|is_authorized %}
+                    <div class="toolbar">
+                        {{ _('add')|button(url_for('entity_add_source', id_=actor.id)) }}
+                        {{ _('source')|button(url_for('source_insert', origin_id=actor.id)) }}
+                    </div>
+                {% endif %}
+                {{ tables.source.display('source')|safe }}
+            </div>
+            <div class="tab-pane fade" role="tabpanel" id="tab-event">
+                {% if 'contributor'|is_authorized %}
+                    <div class="toolbar">
+                        {{ _('add')|button(url_for('involvement_insert', origin_id=actor.id)) }}
+                        {% for code in config['CLASS_CODES']['event'] %}
+                            {{ code|get_class_name|button(url_for('event_insert', code=code, origin_id=actor.id)) }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {{ tables.event.display('event')|safe }}
+            </div>
+            <div class="tab-pane fade" role="tabpanel" id="tab-relation">
+                {% if 'contributor'|is_authorized %}
+                    <div class="toolbar">
+                        {{ _('add')|button(url_for('relation_insert', origin_id=actor.id)) }}
+                        {% for code in config['CLASS_CODES']['actor'] %}
+                            {{ code|get_class_name|button(url_for('actor_insert', code=code, origin_id=actor.id)) }}
+                        {% endfor %}
+                    </div>
+                {% endif %}
+                {{ tables.relation.display('relation')|safe }}
+            </div>
+            <div class="tab-pane fade" role="tabpanel" id="tab-member-of">
+                {% if 'contributor'|is_authorized %}
+                    <div class="toolbar">
+                        {{ _('add')|button(url_for('membership_insert', origin_id=actor.id)) }}
+                    </div>
+                {% endif %}
+                {{ tables.member_of.display('member_of')|safe }}
+            </div>
+            {% if tables.member %}
+                <div class="tab-pane fade" role="tabpanel" id="tab-member">
+                    {% if 'contributor'|is_authorized %}
+                        <div class="toolbar">
+                            {{ _('add')|button(url_for('member_insert', origin_id=actor.id)) }}
+                        </div>
+                    {% endif %}
+                    {{ tables.member.display('member')|safe }}
+                </div>
+            {% endif %}
+            <div class="tab-pane fade" role="tabpanel" id="tab-reference">
+                {% if 'contributor'|is_authorized %}
+                    <div class="toolbar">
+                        {{ _('add')|button(url_for('entity_add_reference', id_=actor.id)) }}
+                        {{ _('bibliography')|button(url_for('reference_insert', code='bibliography', origin_id=actor.id)) }}
+                        {{ _('edition')|button(url_for('reference_insert', code='edition', origin_id=actor.id)) }}
+                        {{ _('external reference')|button(url_for('reference_insert', code='external_reference', origin_id=actor.id)) }}
+                    </div>
+                {% endif %}
+                {{ tables.reference.display('reference')|safe }}
+            </div>
+            <div class="tab-pane fade" role="tabpanel" id="tab-file">
+                {% if 'contributor'|is_authorized %}
+                    <div class="toolbar">
+                        {{ _('add')|button(url_for('entity_add_file', id_=actor.id)) }}
+                        {{ _('file')|button(url_for('file_insert', origin_id=actor.id)) }}
+                    </div>
+                {% endif %}
+                {{ tables.file.display('file')|safe }}
+            </div>
+        </div>
+    </div>
+    <div class="col-6">
+        {% if gis_data %}
+            <div id="map" class="map"></div>
+            <script src="/static/js/map/map.js"></script>
+        {% endif %}
+    </div>
+</div>
