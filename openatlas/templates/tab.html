@@ -1,27 +1,33 @@
-<div class="col-6">
-    <ul class="nav nav-tabs" role="tablist">
-        {% for tab in tabs: %}
-            {% set active = 'active' if loop.index == 1 else '' %}
-            {% set selected = 'true' if loop.index == 1 else 'false' %}
-            <li class="nav-item">
-                <a class="nav-link {{active}}" data-toggle="tab" role="tab" aria-selected="{{selected}}" href="#tab-{{tab.id}}">
-                    {{ tab.header|uc_first }}
-                    {% if 'table' in tab: %}
-                        {{ tables[tab.table]|format_tab_number }}
-                    {% endif %}
-                </a>
-            </li>
-        {% endfor %}
-    </ul>
-    <div class="tab-content">
-        {% for tab in tabs: %}
-            {% set active = 'show active' if loop.index == 1 else '' %}
-            <div class="tab-pane fade {{active}}" role="tabpanel" id="tab-{{tab.id}}">
-                {% block tab_content %}test{% endblock %}
+{% extends "layout.html" %}
+{% block content %}
+    <div class="row">
+        <div class="col-6">
+            <ul class="nav nav-tabs" role="tablist">
+                {% for tab in tabs: %}
+                    {% set active = 'active' if loop.first else '' %}
+                    {% set selected = 'true' if loop.first else 'false' %}
+                    <li class="nav-item">
+                        <a class="nav-link {{active}}" data-toggle="tab" role="tab" aria-selected="{{selected}}" href="#tab-{{tab.id}}">
+                            {{ tab.header|uc_first }}
+                            {% if tab.id in tables: %}
+                                {{ tables[tab.id]|format_tab_number }}
+                            {% endif %}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+            <div class="tab-content">
+                {% for tab in tabs: %}
+                    {% set active = 'show active' if loop.index == 1 else '' %}
+                    <div class="tab-pane fade {{active}}" role="tabpanel" id="tab-{{tab.id}}">
+                        {{ tab_content(tab.id) }}
+                    </div>
+                {% endfor %}
             </div>
-        {% endfor %}
+        </div>
+        {% block content_rest %}{% endblock %}
     </div>
-</div>
+{% endblock %}
 
 
 
