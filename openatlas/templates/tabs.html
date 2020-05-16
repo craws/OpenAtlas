@@ -18,10 +18,22 @@
             </ul>
             <div class="tab-content">
                 {% for tab in tabs: %}
-                    {% set active = 'show active' if loop.index == 1 else '' %}
-                    <div class="tab-pane fade {{active}}" role="tabpanel" id="tab-{{tab.id}}">
-                        {{ tab_content(tab.id) }}
-                    </div>
+                    {% if loop.index == 1 %}
+                        <div class="tab-pane fade show active" role="tabpanel" id="tab-{{tab.id}}">
+                            {% block tab_info %}{% endblock%}
+                        </div>
+                    {% else %}
+                        <div class="tab-pane fade" role="tabpanel" id="tab-{{tab.id}}">
+                            <div class="toolbar">
+                                {% for button in tab.buttons: %}
+                                    {% if not 'group' in button or button.group|is_authorized:  %}
+                                        {{ button.label|button(button.url) }}
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            {{ tables[tab.id].display(tab.id)|safe }}
+                        </div>
+                    {% endif %}
                 {% endfor %}
             </div>
         </div>
