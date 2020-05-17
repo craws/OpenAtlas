@@ -19,7 +19,7 @@ from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.user import User
 from openatlas.util.table import Table
-from openatlas.util.util import (add_system_data, add_type_data, display_remove_link,
+from openatlas.util.util import (add_system_data, add_type_data, button, display_remove_link,
                                  format_entry_begin, format_entry_end, get_appearance,
                                  get_base_table_data, get_entity_data, get_file_path,
                                  get_profile_image_table_link, is_authorized, link, required_group,
@@ -240,9 +240,74 @@ def actor_view(actor: Entity) -> str:
     if gis_data:
         if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]':
             gis_data = None
+
+    tabs = {'info': {'header': _('info')},
+            'source': {
+                'header': _('source'),
+                'buttons': [button(_('add'), url_for('entity_add_source', id_=actor.id)),
+                            button(_('source'), url_for('source_insert', origin_id=actor.id))]},
+            'event': {
+                'header': _('event'),
+                'buttons': [button(_('add'), url_for('involvement_insert', origin_id=actor.id))]},
+            'relation': {
+                'header': _('relation'),
+                'buttons': [button(_('add'), url_for('relation_insert', origin_id=actor.id))]}
+    }
+    for code in app.config['CLASS_CODES']['actor']:
+        tabs['relation']['buttons'].append(
+            button(g.classes[code].name, url_for('actor_insert', code=code, origin_id=actor.id)))
+    for code in app.config['CLASS_CODES']['event']:
+        tabs['event']['buttons'].append(
+            button(g.classes[code].name, url_for('event_insert', code=code, origin_id=actor.id)))
+
+    '''
+    {'id': 'member-of', 'header': _('member of')},
+    {'id': 'reference', 'header': _('reference')},
+    {'id': 'file', 'header': _('files')},    
+    {% if tables.member %}
+        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-member">{{ _('member')|uc_first }} {{ tables.member|format_tab_number }}</a></li>
+    {% endif %}    
+    
+    {% if tables.member %}
+        <div class="tab-pane fade" role="tabpanel" id="tab-member">
+            {% if 'contributor'|is_authorized %}
+                <div class="toolbar">
+                    {{ _('add')|button(url_for('member_insert', origin_id=actor.id)) }}
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
+
+    {% elif tab_id == 'member-of': %}
+        {% if 'contributor'|is_authorized %}
+            <div class="toolbar">
+                {{ _('add')|button(url_for('membership_insert', origin_id=actor.id)) }}
+            </div>
+        {% endif %}
+
+    {% elif tab_id == 'reference': %}
+        {% if 'contributor'|is_authorized %}
+            <div class="toolbar">
+                {{ _('add')|button(url_for('entity_add_reference', id_=actor.id)) }}
+                {{ _('bibliography')|button(url_for('reference_insert', code='bibliography', origin_id=actor.id)) }}
+                {{ _('edition')|button(url_for('reference_insert', code='edition', origin_id=actor.id)) }}
+                {{ _('external reference')|button(url_for('reference_insert', code='external_reference', origin_id=actor.id)) }}
+            </div>
+        {% endif %}
+
+    {% elif tab_id == 'file': %}
+        {% if 'contributor'|is_authorized %}
+            <div class="toolbar">
+                {{ _('add')|button(url_for('entity_add_file', id_=actor.id)) }}
+                {{ _('file')|button(url_for('file_insert', origin_id=actor.id)) }}
+            </div>
+        {% endif %}
+'''
+
     return render_template('actor/view.html',
                            actor=actor,
                            info=info,
+                           tabs=tabs,
                            tables=tables,
                            gis_data=gis_data,
                            profile_image_id=profile_image_id)
@@ -437,9 +502,9 @@ def place_view(object_: Entity) -> str:
             tables[entity.system_type.replace(' ', '_')].rows.append(data)
     gis_data = Gis.get_all([object_], structure)
     if gis_data['gisPointSelected'] == '[]' \
-            and gis_data['gisPolygonSelected'] == '[]' \
-            and gis_data['gisLineSelected'] == '[]' \
-            and (not structure or not structure['super_id']):
+        and gis_data['gisPolygonSelected'] == '[]' \
+        and gis_data['gisLineSelected'] == '[]' \
+        and (not structure or not structure['super_id']):
         gis_data = {}
     return render_template('place/view.html',
                            object_=object_,

@@ -3,35 +3,38 @@
     <div class="row">
         <div class="col-6">
             <ul class="nav nav-tabs" role="tablist">
-                {% for tab in tabs: %}
-                    {% set active = 'active' if loop.first else '' %}
-                    {% set selected = 'true' if loop.first else 'false' %}
+                {% for id_, tab in tabs.items(): %}
                     <li class="nav-item">
-                        <a class="nav-link {{active}}" data-toggle="tab" role="tab" aria-selected="{{selected}}" href="#tab-{{tab.id}}">
-                            {{ tab.header|uc_first }}
-                            {% if tab.id in tables: %}
-                                {{ tables[tab.id]|format_tab_number }}
-                            {% endif %}
+                        <a
+                            role="tab"
+                            data-toggle="tab"
+                            href="#tab-{{ id_ }}"
+                            class="nav-link {{ 'active' if loop.first else '' }}"
+                            aria-selected="{{ 'true' if loop.first else 'false' }}">
+                                {{ tab.header|uc_first }}
+                                {% if id_ in tables: %}
+                                    {{ tables[id_]|format_tab_number }}
+                                {% endif %}
                         </a>
                     </li>
                 {% endfor %}
             </ul>
             <div class="tab-content">
-                {% for tab in tabs: %}
+                {% for id_, tab in tabs.items(): %}
                     {% if loop.index == 1 %}
-                        <div class="tab-pane fade show active" role="tabpanel" id="tab-{{tab.id}}">
+                        <div class="tab-pane fade show active" role="tabpanel" id="tab-{{ id_ }}">
                             {% block tab_info %}{% endblock%}
                         </div>
                     {% else %}
-                        <div class="tab-pane fade" role="tabpanel" id="tab-{{tab.id}}">
-                            <div class="toolbar">
-                                {% for button in tab.buttons: %}
-                                    {% if not 'group' in button or button.group|is_authorized:  %}
-                                        {{ button.label|button(button.url) }}
-                                    {% endif %}
-                                {% endfor %}
-                            </div>
-                            {{ tables[tab.id].display(tab.id)|safe }}
+                        <div class="tab-pane fade" role="tabpanel" id="tab-{{ id_ }}">
+                            {% if 'contributor'|is_authorized:  %}
+                                <div class="toolbar">
+                                    {% for button in tab.buttons: %}
+                                        {{ button|safe }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            {{ tables[id_].display(id_)|safe }}
                         </div>
                     {% endif %}
                 {% endfor %}
@@ -40,6 +43,3 @@
         {% block content_rest %}{% endblock %}
     </div>
 {% endblock %}
-
-
-

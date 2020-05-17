@@ -1,24 +1,8 @@
-{%
-    set tabs = [{'id': 'info', 'header': _('info')},
-                {'id': 'source',
-                 'header': _('source'),
-                 'buttons': [{'label': _('add'), 'url': url_for('entity_add_source', id_=actor.id), 'group': 'contributor'},
-                             {'label': _('source'), 'url': url_for('source_insert', origin_id=actor.id), 'group': 'contributor'}]}
-                ]
-
-%}
-
 {% extends "tabs.html" %}
 {% block title_name %} - {{ actor.name }}{% endblock %}
 {% block breadcrumb %}
     {{ [[_('actor'), 'actor_index'], actor.name]|crumb }}
 {% endblock %}
-
-        {'id': 'event', 'header': _('event')},
-        {'id': 'relation', 'header': _('relation')},
-        {'id': 'member-of', 'header': _('member of')},
-        {'id': 'reference', 'header': _('reference')},
-        {'id': 'file', 'header': _('files')},
 
 {% block tab_info %}
     <div class="toolbar">
@@ -42,66 +26,6 @@
     </div>
 {% endblock %}
 
-{% macro tab_content(tab_id) -%}
-
-    {% if tab_id == 'event': %}
-
-        {% if 'contributor'|is_authorized %}
-            <div class="toolbar">
-                {{ _('add')|button(url_for('involvement_insert', origin_id=actor.id)) }}
-                {% for code in config['CLASS_CODES']['event'] %}
-                    {{ code|get_class_name|button(url_for('event_insert', code=code, origin_id=actor.id)) }}
-                {% endfor %}
-            </div>
-        {% endif %}
-        {{ tables.event.display('event')|safe }}
-
-    {% elif tab_id == 'relation': %}
-
-        {% if 'contributor'|is_authorized %}
-            <div class="toolbar">
-                {{ _('add')|button(url_for('relation_insert', origin_id=actor.id)) }}
-                {% for code in config['CLASS_CODES']['actor'] %}
-                    {{ code|get_class_name|button(url_for('actor_insert', code=code, origin_id=actor.id)) }}
-                {% endfor %}
-            </div>
-        {% endif %}
-        {{ tables.relation.display('relation')|safe }}
-
-    {% elif tab_id == 'member-of': %}
-
-        {% if 'contributor'|is_authorized %}
-            <div class="toolbar">
-                {{ _('add')|button(url_for('membership_insert', origin_id=actor.id)) }}
-            </div>
-        {% endif %}
-        {{ tables.member_of.display('member_of')|safe }}
-
-    {% elif tab_id == 'reference': %}
-
-        {% if 'contributor'|is_authorized %}
-            <div class="toolbar">
-                {{ _('add')|button(url_for('entity_add_reference', id_=actor.id)) }}
-                {{ _('bibliography')|button(url_for('reference_insert', code='bibliography', origin_id=actor.id)) }}
-                {{ _('edition')|button(url_for('reference_insert', code='edition', origin_id=actor.id)) }}
-                {{ _('external reference')|button(url_for('reference_insert', code='external_reference', origin_id=actor.id)) }}
-            </div>
-        {% endif %}
-        {{ tables.reference.display('reference')|safe }}
-
-    {% elif tab_id == 'file': %}
-
-        {% if 'contributor'|is_authorized %}
-            <div class="toolbar">
-                {{ _('add')|button(url_for('entity_add_file', id_=actor.id)) }}
-                {{ _('file')|button(url_for('file_insert', origin_id=actor.id)) }}
-            </div>
-        {% endif %}
-        {{ tables.file.display('file')|safe }}
-
-    {% endif %}
-{%- endmacro %}
-
 {% block content_rest %}
     <div class="col-6">
         {% if gis_data %}
@@ -110,20 +34,3 @@
         {% endif %}
     </div>
 {% endblock %}
-
-
-{% if tables.member %}
-    <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-member">{{ _('member')|uc_first }} {{ tables.member|format_tab_number }}</a></li>
-{% endif %}
-
-
-{% if tables.member %}
-    <div class="tab-pane fade" role="tabpanel" id="tab-member">
-        {% if 'contributor'|is_authorized %}
-            <div class="toolbar">
-                {{ _('add')|button(url_for('member_insert', origin_id=actor.id)) }}
-            </div>
-        {% endif %}
-        {{ tables.member.display('member')|safe }}
-    </div>
-{% endif %}
