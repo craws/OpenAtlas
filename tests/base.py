@@ -17,7 +17,8 @@ class TestBaseCase(unittest.TestCase):
         self.login()  # login on default because needed almost everywhere
 
     def login(self) -> None:
-        self.app.post('/login', data={'username': 'Alice', 'password': 'test'})
+        with app.app_context():  # type: ignore
+            self.app.post('/login', data={'username': 'Alice', 'password': 'test'})
 
     @staticmethod
     def setup_database() -> None:
