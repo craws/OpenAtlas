@@ -111,11 +111,15 @@ def bad_request(e: Exception) -> Tuple[str, int]:  # pragma: no cover
 
 @app.errorhandler(403)
 def forbidden(e: Exception) -> Tuple[str, int]:
+    if request.path.startswith('/api'):
+        return "forbidden", 403
     return render_template('403.html', e=e), 403
 
 
 @app.errorhandler(404)
 def page_not_found(e: Exception) -> Tuple[str, int]:
+    if request.path.startswith('/api'):
+        return "not found", 404
     return render_template('404.html', e=e), 404
 
 
