@@ -2,6 +2,7 @@ from flask import url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
+from openatlas.models.node import Node
 from tests.base import TestBaseCase
 
 
@@ -17,6 +18,9 @@ class ApiTests(TestBaseCase):
                 app.preprocess_request()  # type: ignore
                 event = Entity.insert('E8', 'Event Horizon')
                 event.link('P7', Entity.get_by_id(place_id))
+                place_node = Node.get_hierarchy('Place')
+                place = Entity.get_by_id(place_id)
+                place.link("P2", place_node)
 
             rv = self.app.get(url_for('api_index'))
             assert b'Test API' in rv.data
@@ -28,3 +32,5 @@ class ApiTests(TestBaseCase):
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('api_get_latest', limit=10))
             assert b'Nostromos' in rv.data
+
+
