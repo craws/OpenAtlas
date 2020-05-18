@@ -60,7 +60,7 @@ class Api:
         return files
 
     @staticmethod
-    def get_license(entity_id) -> List[Dict[str, str]]:  # pragma: nocover
+    def get_license(entity_id: int) -> str:  # pragma: nocover
         file_license = ""
         for link in Link.get_links(entity_id):
             if link.property.code == "P2":
@@ -69,28 +69,28 @@ class Api:
         return file_license
 
     @staticmethod
-    def get_entities_by_code(code_: str):
+    def get_entities_by_code(code_: str) -> List[Dict[str, Any]]:
         entities = []
         for entity in Entity.get_by_menu_item(code_):
             entities.append(Api.get_entity(entity.id))
         return entities
 
     @staticmethod
-    def get_entities_by_class(class_code_: str):
+    def get_entities_by_class(class_code_: str) -> List[Dict[str, Any]]:
         entities = []
         for entity in Entity.get_by_class_code(class_code_):
             entities.append(Api.get_entity(entity.id))
         return entities
 
     @staticmethod
-    def get_entities_get_latest(limit_: int):
+    def get_entities_get_latest(limit_: int) -> List[Dict[str, Any]]:
         entities = []
         for entity in Entity.get_latest(limit_):
             entities.append(Api.get_entity(entity.id))
         return entities
 
     @staticmethod
-    def get_entities_by_id(ids: list):  # pragma: nocover
+    def get_entities_by_id(ids: List[int]) -> List[Dict[str, Any]]:  # pragma: nocover
         entities = []
         for i in ids:
             for entity in Entity.get_by_ids(i, nodes=True):
@@ -206,6 +206,7 @@ class Api:
         except (AttributeError, KeyError):
             features['geometry'] = {'type': 'GeometryCollection', 'geometries': []}
 
-        data: dict = {'type': type_, '@context': app.config['API_SCHEMA'], 'features': [features]}
+        data: Dict[str, Any] = {'type': type_, '@context': app.config['API_SCHEMA'],
+                                'features': [features]}
 
         return data
