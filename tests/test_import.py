@@ -1,4 +1,5 @@
 import os
+from pathlib import Path
 
 from flask import url_for
 
@@ -10,6 +11,8 @@ from tests.base import TestBaseCase
 class ExportTest(TestBaseCase):
 
     def test_export(self) -> None:
+        if os.name != "posix":  # For  e.g. Windows create a backup file to skip the backup
+            Path(app.config['EXPORT_FOLDER_PATH'].joinpath('sql', 'fake.sql')).touch()
         with app.app_context():  # type: ignore
             # Projects
             rv = self.app.get(url_for('import_project_insert'))

@@ -16,7 +16,7 @@ class Api:
     # Todo: unit tests and Mypy checks
 
     @staticmethod
-    def to_camelcase(string: str) -> str:  # pragma: nocover
+    def to_camelcase(string: str) -> str:
         if not string:
             return ''
         words = string.split(' ')
@@ -25,7 +25,7 @@ class Api:
     @staticmethod
     def get_links(entity: Entity) -> List[Dict[str, str]]:
         links = []
-        for link in Link.get_links(entity.id):  # pragma: nocover
+        for link in Link.get_links(entity.id):
             links.append({'label': link.range.name,
                           'relationTo': url_for('api_entity', id_=link.range.id, _external=True),
                           'relationType': 'crm:' + link.property.code + '_'
@@ -33,7 +33,7 @@ class Api:
             if link.property.code == 'P53':
                 entity.location = link.range
 
-        for link in Link.get_links(entity.id, inverse=True):  # pragma: nocover
+        for link in Link.get_links(entity.id, inverse=True):
             links.append({'label': link.domain.name,
                           'relationTo': url_for('api_entity', id_=link.domain.id, _external=True),
                           'relationType': 'crm:' + link.property.code + 'i_'
@@ -44,7 +44,7 @@ class Api:
     @staticmethod
     def get_file(entity: Entity) -> List[Dict[str, str]]:
         files = []
-        for link in Link.get_links(entity.id, inverse=True):  # pragma: nocover
+        for link in Link.get_links(entity.id, inverse=True):
             if link.domain.system_type == 'file':
                 path = get_file_path(link.domain.id)
                 file_dict = {'@id': url_for('api_entity', id_=link.domain.id, _external=True),
@@ -60,7 +60,7 @@ class Api:
         return files
 
     @staticmethod
-    def get_license(entity_id) -> List[Dict[str, str]]:  # pragma: nocover
+    def get_license(entity_id) -> List[Dict[str, str]]:
         file_license = ""
         for link in Link.get_links(entity_id):
             if link.property.code == "P2":
@@ -90,7 +90,7 @@ class Api:
         return entities
 
     @staticmethod
-    def get_entities_by_id(ids: list):  # pragma: nocover
+    def get_entities_by_id(ids: list):
         entities = []
         for i in ids:
             for entity in Entity.get_by_ids(i, nodes=True):
@@ -114,7 +114,7 @@ class Api:
                     'properties': {'title': entity.name}}
 
         # Types
-        for node in entity.nodes:  # pragma: nocover
+        for node in entity.nodes:
             nodes_dict = {'identifier': url_for('api_entity', id_=node.id, _external=True),
                           'label': node.name}
             for link in Link.get_links(entity.id):
@@ -143,20 +143,20 @@ class Api:
             features['description'] = [{'value': entity.description}]
 
         # Types
-        if nodes:  # pragma: nocover
+        if nodes:
             features['types'] = nodes
 
-        if entity.aliases:  # pragma: nocover
+        if entity.aliases:
             features['names'] = []
             for key, value in entity.aliases.items():
                 features['names'].append({"alias": value})
 
         # Depictions
-        if Api.get_file(entity):  # pragma: nocover
+        if Api.get_file(entity):
             features['depictions'] = Api.get_file(entity)
 
         # Time spans
-        if entity.begin_from or entity.end_from:  # pragma: nocover
+        if entity.begin_from or entity.end_from:
             time = {}
             if entity.begin_from:
                 start = {'earliest': format_date(entity.begin_from)}
@@ -175,7 +175,7 @@ class Api:
             features['when'] = {'timespans': [time]}
 
         # Geonames
-        if geonames_link and geonames_link.range.class_.code == 'E18':  # pragma: nocover
+        if geonames_link and geonames_link.range.class_.code == 'E18':
             geo_name = {}
             if geonames_link.type.name:
                 geo_name['type'] = Api.to_camelcase(geonames_link.type.name)
@@ -190,7 +190,7 @@ class Api:
         try:
             geometries = []
             shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
-            for geonames_link in Gis.get_by_id(entity.location.id):  # pragma: nocover
+            for geonames_link in Gis.get_by_id(entity.location.id):
                 geo_dict = {'type': shape[geonames_link['shape']],
                             'coordinates': geonames_link['geometry']['coordinates']}
                 if geonames_link['description']:
@@ -199,7 +199,7 @@ class Api:
                     geo_dict['title'] = geonames_link['name']
                 geometries.append(geo_dict)
 
-            if len(geometries) == 1:  # pragma: nocover
+            if len(geometries) == 1:
                 features['geometry'] = geometries[0]
             else:
                 features['geometry'] = {'type': 'GeometryCollection', 'geometries': geometries}
