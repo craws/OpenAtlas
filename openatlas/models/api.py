@@ -103,7 +103,7 @@ class Api:
         try:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
         except Exception as e:
-            raise APIError('Not found', status_code=404)
+            raise APIError('Entity ID doesn\'t exist!', status_code=404)
 
         geonames_link = Geonames.get_geonames_link(entity)
         type_ = 'FeatureCollection'

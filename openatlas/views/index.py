@@ -122,7 +122,7 @@ def forbidden(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
 @app.errorhandler(404)
 def page_not_found(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
     if request.path.startswith('/api'):
-        return APIError('Not Found', status_code=404).to_dict(), 404
+        return APIError('Syntax is incorrect!', status_code=404).to_dict(), 404
     return render_template('404.html', e=e), 404
 
 
