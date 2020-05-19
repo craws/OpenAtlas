@@ -1,6 +1,6 @@
 from typing import Tuple, Union
 
-from flask import flash, g, render_template, request, session, url_for
+from flask import flash, g, render_template, request, session, url_for, jsonify
 from flask_babel import format_number, lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
@@ -12,6 +12,7 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.models.content import Content
 from openatlas.models.entity import Entity
+from openatlas.models.api_error import APIError
 from openatlas.models.user import User
 from openatlas.util.changelog import Changelog
 from openatlas.util.table import Table
@@ -106,20 +107,22 @@ def index_content(item: str) -> str:
 
 @app.errorhandler(400)
 def bad_request(e: Exception) -> Tuple[str, int]:  # pragma: no cover
+    if request.path.startswith('/api'):
+        return APIError('Bad Request', status_code=403).to_dict(), 403
     return render_template('400.html', e=e), 400
 
 
 @app.errorhandler(403)
 def forbidden(e: Exception) -> Tuple[str, int]:
     if request.path.startswith('/api'):
-        return "forbidden", 403
+        return APIError('Forbidden', status_code=403).to_dict(), 403
     return render_template('403.html', e=e), 403
 
 
 @app.errorhandler(404)
 def page_not_found(e: Exception) -> Tuple[str, int]:
     if request.path.startswith('/api'):
-        return "not found", 404
+        return APIError('Not Found', status_code=404).to_dict(), 404
     return render_template('404.html', e=e), 404
 
 
@@ -131,6 +134,13 @@ def invalid_id(e: Exception) -> Tuple[str, int]:
 @app.errorhandler(422)
 def unprocessable_entity(e: Exception) -> Tuple[str, int]:
     return render_template('422.html', e=e), 422
+
+
+@app.errorhandler(APIError)
+def handle_api_error(error):
+    response = jsonify(error.to_dict())
+    response.status_code = error.status_code
+    return response
 
 
 @app.route('/changelog')

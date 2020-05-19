@@ -4,6 +4,7 @@ from typing import Any, Dict, List
 from flask import g, session, url_for
 
 from openatlas import app
+from openatlas.models.api_error import APIError
 from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
 from openatlas.models.gis import Gis
@@ -102,7 +103,7 @@ class Api:
         try:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
         except Exception as e:
-            abort(404)
+            raise APIError('Not found', status_code=404)
 
         geonames_link = Geonames.get_geonames_link(entity)
         type_ = 'FeatureCollection'
