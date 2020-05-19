@@ -1,4 +1,4 @@
-from typing import Tuple, Union
+from typing import Tuple, Union, Dict, Any
 
 from flask import flash, g, render_template, request, session, url_for, jsonify
 from flask_babel import format_number, lazy_gettext as _
@@ -106,21 +106,21 @@ def index_content(item: str) -> str:
 
 
 @app.errorhandler(400)
-def bad_request(e: Exception) -> Tuple[str, int]:  # pragma: no cover
+def bad_request(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:  # pragma: no cover
     if request.path.startswith('/api'):
-        return APIError('Bad Request', status_code=403).to_dict(), 403
+        return APIError('Bad Request', status_code=403).to_dict(), 400
     return render_template('400.html', e=e), 400
 
 
 @app.errorhandler(403)
-def forbidden(e: Exception) -> Tuple[str, int]:
+def forbidden(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
     if request.path.startswith('/api'):
         return APIError('Forbidden', status_code=403).to_dict(), 403
     return render_template('403.html', e=e), 403
 
 
 @app.errorhandler(404)
-def page_not_found(e: Exception) -> Tuple[str, int]:
+def page_not_found(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
     if request.path.startswith('/api'):
         return APIError('Not Found', status_code=404).to_dict(), 404
     return render_template('404.html', e=e), 404
@@ -137,7 +137,7 @@ def unprocessable_entity(e: Exception) -> Tuple[str, int]:
 
 
 @app.errorhandler(APIError)
-def handle_api_error(error):
+def handle_api_error(error: APIError) -> Tuple[Dict[str, str], int]:
     response = jsonify(error.to_dict())
     response.status_code = error.status_code
     return response
