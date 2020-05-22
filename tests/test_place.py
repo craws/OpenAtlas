@@ -1,3 +1,5 @@
+import os
+
 from flask import g, url_for
 
 from openatlas import app
@@ -140,25 +142,25 @@ class PlaceTest(TestBaseCase):
                                data=data,
                                follow_redirects=True)
             assert b'Edit' in rv.data
-
-            with app.test_request_context():
-                app.preprocess_request()  # type: ignore
-                overlay = Overlay.get_by_object(place)
-                overlay_id = overlay[list(overlay.keys())[0]].id
-            rv = self.app.get(url_for('overlay_update',
-                                      id_=overlay_id,
-                                      place_id=place.id,
-                                      link_id=link_id))
-            assert b'42' in rv.data
-            rv = self.app.post(url_for('overlay_update',
-                                       id_=overlay_id,
-                                       place_id=place.id,
-                                       link_id=link_id),
-                               data=data,
-                               follow_redirects=True)
-            assert b'Changes have been saved' in rv.data
-            self.app.get(url_for('overlay_remove', id_=overlay_id, place_id=place.id),
-                         follow_redirects=True)
+            if os.name == "posix":  # Ignore for other OS e.g. Windows
+                with app.test_request_context():
+                    app.preprocess_request()  # type: ignore
+                    overlay = Overlay.get_by_object(place)
+                    overlay_id = overlay[list(overlay.keys())[0]].id
+                rv = self.app.get(url_for('overlay_update',
+                                          id_=overlay_id,
+                                          place_id=place.id,
+                                          link_id=link_id))
+                assert b'42' in rv.data
+                rv = self.app.post(url_for('overlay_update',
+                                           id_=overlay_id,
+                                           place_id=place.id,
+                                           link_id=link_id),
+                                   data=data,
+                                   follow_redirects=True)
+                assert b'Changes have been saved' in rv.data
+                self.app.get(url_for('overlay_remove', id_=overlay_id, place_id=place.id),
+                             follow_redirects=True)
 
             # Add to place
             rv = self.app.get(url_for('entity_add_file', id_=place.id))
@@ -209,7 +211,7 @@ class PlaceTest(TestBaseCase):
                 self.app.post(url_for('place_update', id_=feat_id),
                               data={'name': "It's not a bug, it's a feature!"})
                 rv = self.app.post(url_for('place_insert', origin_id=feat_id),
-                                   data={'name':  "I'm a stratigraphic unit"})
+                                   data={'name': "I'm a stratigraphic unit"})
                 stratigraphic_id = rv.location.split('/')[-1]
                 self.app.get(url_for('place_insert', origin_id=stratigraphic_id))
                 self.app.get(url_for('place_update', id_=stratigraphic_id))

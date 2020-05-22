@@ -9,6 +9,7 @@ from openatlas.models.geonames import Geonames
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.util.util import format_date, get_file_path
+from werkzeug import abort
 
 
 class Api:
@@ -35,7 +36,7 @@ class Api:
         for link in Link.get_links(entity.id, inverse=True):  # pragma: nocover
             links.append({'label': link.domain.name,
                           'relationTo': url_for('api_entity', id_=link.domain.id, _external=True),
-                          'relationType': 'crm:' + link.property.code + '_'
+                          'relationType': 'crm:' + link.property.code + 'i_'
                                           + link.property.i18n['en'].replace(' ', '_')})
 
         return links
@@ -59,7 +60,7 @@ class Api:
         return files
 
     @staticmethod
-    def get_license(entity_id) -> List[Dict[str, str]]:  # pragma: nocover
+    def get_license(entity_id: int) -> str:  # pragma: nocover
         file_license = ""
         for link in Link.get_links(entity_id):
             if link.property.code == "P2":
@@ -68,28 +69,28 @@ class Api:
         return file_license
 
     @staticmethod
-    def get_entities_by_code(code_: str):
+    def get_entities_by_code(code_: str) -> List[Dict[str, Any]]:
         entities = []
         for entity in Entity.get_by_menu_item(code_):
             entities.append(Api.get_entity(entity.id))
         return entities
 
     @staticmethod
-    def get_entities_by_class(class_code_: str):
+    def get_entities_by_class(class_code_: str) -> List[Dict[str, Any]]:
         entities = []
         for entity in Entity.get_by_class_code(class_code_):
             entities.append(Api.get_entity(entity.id))
         return entities
 
     @staticmethod
-    def get_entities_get_latest(limit_: int):
+    def get_entities_get_latest(limit_: int) -> List[Dict[str, Any]]:
         entities = []
         for entity in Entity.get_latest(limit_):
             entities.append(Api.get_entity(entity.id))
         return entities
 
     @staticmethod
-    def get_entities_by_id(ids: list):  # pragma: nocover
+    def get_entities_by_id(ids: List[int]) -> List[Dict[str, Any]]:  # pragma: nocover
         entities = []
         for i in ids:
             for entity in Entity.get_by_ids(i, nodes=True):
@@ -98,7 +99,11 @@ class Api:
 
     @staticmethod
     def get_entity(id_: int) -> Dict[str, Any]:
-        entity = Entity.get_by_id(id_, nodes=True, aliases=True)
+        try:
+            entity = Entity.get_by_id(id_, nodes=True, aliases=True)
+        except Exception as e:
+            abort(404)
+
         geonames_link = Geonames.get_geonames_link(entity)
         type_ = 'FeatureCollection'
         nodes = []
@@ -201,6 +206,7 @@ class Api:
         except (AttributeError, KeyError):
             features['geometry'] = {'type': 'GeometryCollection', 'geometries': []}
 
-        data: dict = {'type': type_, '@context': app.config['API_SCHEMA'], 'features': [features]}
+        data: Dict[str, Any] = {'type': type_, '@context': app.config['API_SCHEMA'],
+                                'features': [features]}
 
         return data
