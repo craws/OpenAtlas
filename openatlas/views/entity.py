@@ -241,7 +241,8 @@ def actor_view(actor: Entity) -> str:
         if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]':
             gis_data = None
 
-    tabs = {'info': {'header': _('info')},
+    tabs = {'info': {
+                'header': _('info')},
             'source': {
                 'header': _('source'),
                 'buttons': [button(_('add'), url_for('entity_add_source', id_=actor.id)),
@@ -251,8 +252,28 @@ def actor_view(actor: Entity) -> str:
                 'buttons': [button(_('add'), url_for('involvement_insert', origin_id=actor.id))]},
             'relation': {
                 'header': _('relation'),
-                'buttons': [button(_('add'), url_for('relation_insert', origin_id=actor.id))]}
-    }
+                'buttons': [button(_('add'), url_for('relation_insert', origin_id=actor.id))]},
+            'member_of': {
+                'header': _('member of'),
+                'buttons': [button(_('add'), url_for('member_insert', origin_id=actor.id))]},
+            'reference': {
+                'header': _('reference'),
+                'buttons': [button(_('add'), url_for('entity_add_reference', id_=actor.id)),
+                            button(_('bibliography'), url_for('reference_insert',
+                                                              code='bibliography',
+                                                              origin_id=actor.id)),
+                            button(_('edition'), url_for('reference_insert',
+                                                         code='edition',
+                                                         origin_id=actor.id)),
+                            button(_('external reference'), url_for('reference_insert',
+                                                                    code='external_reference',
+                                                                    origin_id=actor.id))]},
+            'file': {
+                'header': _('files'),
+                'buttons': [button(_('add'), url_for('entity_add_file', id_=actor.id)),
+                           button(_('file'), url_for('file_insert', origin_id=actor.id))]}}
+
+
     for code in app.config['CLASS_CODES']['actor']:
         tabs['relation']['buttons'].append(
             button(g.classes[code].name, url_for('actor_insert', code=code, origin_id=actor.id)))
@@ -260,10 +281,7 @@ def actor_view(actor: Entity) -> str:
         tabs['event']['buttons'].append(
             button(g.classes[code].name, url_for('event_insert', code=code, origin_id=actor.id)))
 
-    '''
-    {'id': 'member-of', 'header': _('member of')},
-    {'id': 'reference', 'header': _('reference')},
-    {'id': 'file', 'header': _('files')},    
+    '''    
     {% if tables.member %}
         <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-member">{{ _('member')|uc_first }} {{ tables.member|format_tab_number }}</a></li>
     {% endif %}    
@@ -277,31 +295,6 @@ def actor_view(actor: Entity) -> str:
             {% endif %}
         </div>
     {% endif %}
-
-    {% elif tab_id == 'member-of': %}
-        {% if 'contributor'|is_authorized %}
-            <div class="toolbar">
-                {{ _('add')|button(url_for('membership_insert', origin_id=actor.id)) }}
-            </div>
-        {% endif %}
-
-    {% elif tab_id == 'reference': %}
-        {% if 'contributor'|is_authorized %}
-            <div class="toolbar">
-                {{ _('add')|button(url_for('entity_add_reference', id_=actor.id)) }}
-                {{ _('bibliography')|button(url_for('reference_insert', code='bibliography', origin_id=actor.id)) }}
-                {{ _('edition')|button(url_for('reference_insert', code='edition', origin_id=actor.id)) }}
-                {{ _('external reference')|button(url_for('reference_insert', code='external_reference', origin_id=actor.id)) }}
-            </div>
-        {% endif %}
-
-    {% elif tab_id == 'file': %}
-        {% if 'contributor'|is_authorized %}
-            <div class="toolbar">
-                {{ _('add')|button(url_for('entity_add_file', id_=actor.id)) }}
-                {{ _('file')|button(url_for('file_insert', origin_id=actor.id)) }}
-            </div>
-        {% endif %}
 '''
 
     return render_template('actor/view.html',
