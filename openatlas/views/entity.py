@@ -255,6 +255,9 @@ def actor_view(actor: Entity) -> str:
                 'buttons': [button(_('add'), url_for('relation_insert', origin_id=actor.id))]},
             'member_of': {
                 'header': _('member of'),
+                'buttons': [button(_('add'), url_for('membership_insert', origin_id=actor.id))]},
+            'member': {
+                'header': _('member') if 'member' in tables else '',
                 'buttons': [button(_('add'), url_for('member_insert', origin_id=actor.id))]},
             'reference': {
                 'header': _('reference'),
@@ -271,32 +274,13 @@ def actor_view(actor: Entity) -> str:
             'file': {
                 'header': _('files'),
                 'buttons': [button(_('add'), url_for('entity_add_file', id_=actor.id)),
-                           button(_('file'), url_for('file_insert', origin_id=actor.id))]}}
-
-
+                            button(_('file'), url_for('file_insert', origin_id=actor.id))]}}
     for code in app.config['CLASS_CODES']['actor']:
         tabs['relation']['buttons'].append(
             button(g.classes[code].name, url_for('actor_insert', code=code, origin_id=actor.id)))
     for code in app.config['CLASS_CODES']['event']:
         tabs['event']['buttons'].append(
             button(g.classes[code].name, url_for('event_insert', code=code, origin_id=actor.id)))
-
-    '''    
-    {% if tables.member %}
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-member">{{ _('member')|uc_first }} {{ tables.member|format_tab_number }}</a></li>
-    {% endif %}    
-    
-    {% if tables.member %}
-        <div class="tab-pane fade" role="tabpanel" id="tab-member">
-            {% if 'contributor'|is_authorized %}
-                <div class="toolbar">
-                    {{ _('add')|button(url_for('member_insert', origin_id=actor.id)) }}
-                </div>
-            {% endif %}
-        </div>
-    {% endif %}
-'''
-
     return render_template('actor/view.html',
                            actor=actor,
                            info=info,
@@ -495,9 +479,9 @@ def place_view(object_: Entity) -> str:
             tables[entity.system_type.replace(' ', '_')].rows.append(data)
     gis_data = Gis.get_all([object_], structure)
     if gis_data['gisPointSelected'] == '[]' \
-        and gis_data['gisPolygonSelected'] == '[]' \
-        and gis_data['gisLineSelected'] == '[]' \
-        and (not structure or not structure['super_id']):
+            and gis_data['gisPolygonSelected'] == '[]' \
+            and gis_data['gisLineSelected'] == '[]' \
+            and (not structure or not structure['super_id']):
         gis_data = {}
     return render_template('place/view.html',
                            object_=object_,

@@ -3,12 +3,12 @@
     <div class="row">
         <div class="col-6">
             <ul class="nav nav-tabs" role="tablist">
-                {% for id_, tab in tabs.items(): %}
+                {% for id_, tab in tabs.items() if tab.header: %}
                     <li class="nav-item">
                         <a
                             role="tab"
                             data-toggle="tab"
-                            href="#tab-{{ id_ }}"
+                            href="#tab-{{ id_|replace('_', '-') }}"
                             class="nav-link {{ 'active' if loop.first else '' }}"
                             aria-selected="{{ 'true' if loop.first else 'false' }}">
                                 {{ tab.header|uc_first }}
@@ -20,13 +20,14 @@
                 {% endfor %}
             </ul>
             <div class="tab-content">
-                {% for id_, tab in tabs.items(): %}
+                {% for id_, tab in tabs.items() if tab.header: %}
                     {% if loop.index == 1 %}
                         <div class="tab-pane fade show active" role="tabpanel" id="tab-{{ id_ }}">
                             {% block tab_info %}{% endblock%}
                         </div>
                     {% else %}
-                        <div class="tab-pane fade" role="tabpanel" id="tab-{{ id_ }}">
+                        <div class="tab-pane fade" role="tabpanel"
+                             id="tab-{{ id_|replace('_', '-') }}">
                             {% if 'contributor'|is_authorized:  %}
                                 <div class="toolbar">
                                     {% for button in tab.buttons: %}
