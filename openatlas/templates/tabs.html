@@ -12,8 +12,8 @@
                             class="nav-link {{ 'active' if loop.first else '' }}"
                             aria-selected="{{ 'true' if loop.first else 'false' }}">
                                 {{ tab.header|uc_first }}
-                                {% if id_ in tables: %}
-                                    {{ tables[id_]|format_tab_number }}
+                                {% if 'table' in tab: %}
+                                    {{ tab.table|format_tab_number }}
                                 {% endif %}
                         </a>
                     </li>
@@ -26,8 +26,7 @@
                             {% block tab_info %}{% endblock%}
                         </div>
                     {% else %}
-                        <div class="tab-pane fade" role="tabpanel"
-                             id="tab-{{ id_|replace('_', '-') }}">
+                        <div class="tab-pane fade" role="tabpanel" id="tab-{{ id_|replace('_', '-') }}">
                             {% if 'contributor'|is_authorized:  %}
                                 <div class="toolbar">
                                     {% for button in tab.buttons: %}
@@ -35,7 +34,7 @@
                                     {% endfor %}
                                 </div>
                             {% endif %}
-                            {{ tables[id_].display(id_)|safe }}
+                            {{ tab.table.display(id_)|safe }}
                         </div>
                     {% endif %}
                 {% endfor %}
