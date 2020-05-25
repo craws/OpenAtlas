@@ -13,7 +13,7 @@ from openatlas.forms.forms import TableMultiField, build_form, build_table_form
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.table import Table
-from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
+from openatlas.util.util import (button, display_remove_link, get_base_table_data, get_entity_data,
                                  get_profile_image_table_link, is_authorized, link, required_group,
                                  uc_first, was_modified)
 
@@ -151,7 +151,18 @@ def source_view(source: Entity) -> str:
             },
             'reference': {
                 'header': _('reference'),
-                'table': Table(Table.HEADERS['reference'] + ['page'])},
+                'table': Table(Table.HEADERS['reference'] + ['page']),
+                'buttons': [button(_('add'), url_for('entity_add_reference', id_=source.id)),
+                            button(_('bibliography'), url_for('reference_insert',
+                                                              code='bibliography',
+                                                              origin_id=source.id)),
+                            button(_('edition'), url_for('reference_insert',
+                                                         code='edition',
+                                                         origin_id=source.id)),
+                            button(_('external reference'), url_for('reference_insert',
+                                                                    code='external_reference',
+                                                                    origin_id=source.id))
+                ]},
             'text': {
                 'header': _('texts'),
                 'table': Table(['text', 'type', 'content'])
