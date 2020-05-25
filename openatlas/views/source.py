@@ -11,8 +11,11 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.forms.forms import TableMultiField, build_form, build_table_form
 from openatlas.models.entity import Entity
+from openatlas.models.user import User
 from openatlas.util.table import Table
-from openatlas.util.util import get_base_table_data, link, required_group, was_modified
+from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
+                                 get_profile_image_table_link, is_authorized, link, required_group,
+                                 uc_first, was_modified)
 
 
 class SourceForm(FlaskForm):  # type: ignore
@@ -123,3 +126,82 @@ def save(form: FlaskForm, source: Optional[Entity] = None, origin: Optional[Enti
         flash(_('error transaction'), 'error')
         url = url_for('source_insert', origin_id=origin.id if origin else None)
     return url
+
+
+def source_view(source: Entity) -> str:
+    tabs = {'info': {
+                'header': _('info')},
+            'event': {
+                'header': _('event'),},
+            'actor': {
+                'header': _('actor'),},
+            'place': {
+                'header': _('place'),},
+            'feature': {
+                'header': '',
+            },
+            'stratigraphic_unit': {
+                'header': '',
+            },
+            'find': {
+                'header': '',
+            },
+            'human_remains': {
+                'header': '',
+            },
+            'reference': {
+                'header': _('reference'),
+                'table': Table(Table.HEADERS['reference'] + ['page'])},
+            'text': {
+                'header': _('texts'),
+                'table': Table(['text', 'type', 'content'])
+            },
+            'file': {
+                'header': _('files'),
+                'table': Table(Table.HEADERS['file'] + [_('main image')]),
+            }
+    }
+
+    source.note = User.get_note(source)
+    for text in source.get_linked_entities('P73', nodes=True):
+        tabs['text']['table'].rows.append([link(text),
+                                    next(iter(text.nodes)).name if text.nodes else '',
+                                    text.description])
+    for name in ['actor', 'event', 'place', 'feature', 'stratigraphic_unit', 'find',
+                 'human_remains']:
+        tabs[name]['table'] = Table(Table.HEADERS[name])
+    tabs['actor']['table'].defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
+    tabs['event']['table'].defs = [{'className': 'dt-body-right', 'targets': [3, 4]}]
+    tabs['place']['table'].defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
+    for link_ in source.get_links('P67'):
+        range_ = link_.range
+        data = get_base_table_data(range_)
+        if is_authorized('contributor'):
+            url = url_for('link_delete', id_=link_.id, origin_id=source.id)
+            data.append(display_remove_link(url + '#tab-' + range_.table_name, range_.name))
+        tabs[range_.table_name]['table'].rows.append(data)
+    profile_image_id = source.get_profile_image_id()
+    for link_ in source.get_links('P67', True):
+        domain = link_.domain
+        data = get_base_table_data(domain)
+        if domain.view_name == 'file':  # pragma: no cover
+            extension = data[3].replace('.', '')
+            data.append(get_profile_image_table_link(domain, source, extension, profile_image_id))
+            if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+                profile_image_id = domain.id
+        if domain.view_name not in ['file']:
+            data.append(link_.description)
+            if domain.system_type == 'external reference':
+                source.external_references.append(link_)
+            if is_authorized('contributor'):
+                url = url_for('reference_link_update', link_id=link_.id, origin_id=source.id)
+                data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
+        if is_authorized('contributor'):
+            url = url_for('link_delete', id_=link_.id, origin_id=source.id)
+            data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
+        tabs[domain.view_name]['table'].rows.append(data)
+    return render_template('source/view.html',
+                           source=source,
+                           tabs=tabs,
+                           info=get_entity_data(source),
+                           profile_image_id=profile_image_id)

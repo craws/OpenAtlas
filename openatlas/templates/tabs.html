@@ -34,7 +34,9 @@
                                     {% endfor %}
                                 </div>
                             {% endif %}
-                            {{ tab.table.display(id_)|safe }}
+                            {% if 'table' in tab: %}
+                                {{ tab.table.display(id_)|safe }}
+                            {% endif %}
                         </div>
                     {% endif %}
                 {% endfor %}

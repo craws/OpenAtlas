@@ -89,7 +89,8 @@ def entity_view(id_: int) -> Union[str, Response]:
     if not entity.view_name:  # pragma: no cover
         flash(_("This entity can't be viewed directly."), 'error')
         abort(400)
-    if entity.view_name not in ['actor', 'event']:  # remove this after finished tab refactor
+    # remove this after finished tab refactor
+    if entity.view_name not in ['actor', 'event', 'source']:
         return getattr(sys.modules[__name__], '{name}_view'.format(name=entity.view_name))(entity)
     return getattr(sys.modules['openatlas.views.' + entity.view_name],
                    '{name}_view'.format(name=entity.view_name))(entity)
@@ -270,55 +271,6 @@ def reference_view(reference: Entity) -> str:
                            reference=reference,
                            tables=tables,
                            info=get_entity_data(reference),
-                           profile_image_id=profile_image_id)
-
-
-def source_view(source: Entity) -> str:
-    source.note = User.get_note(source)
-    tables = {'text': Table(['text', 'type', 'content']),
-              'file': Table(Table.HEADERS['file'] + [_('main image')]),
-              'reference': Table(Table.HEADERS['reference'] + ['page'])}
-    for text in source.get_linked_entities('P73', nodes=True):
-        tables['text'].rows.append([link(text),
-                                    next(iter(text.nodes)).name if text.nodes else '',
-                                    text.description])
-    for name in ['actor', 'event', 'place', 'feature', 'stratigraphic_unit', 'find',
-                 'human_remains']:
-        tables[name] = Table(Table.HEADERS[name])
-    tables['actor'].defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
-    tables['event'].defs = [{'className': 'dt-body-right', 'targets': [3, 4]}]
-    tables['place'].defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
-    for link_ in source.get_links('P67'):
-        range_ = link_.range
-        data = get_base_table_data(range_)
-        if is_authorized('contributor'):
-            url = url_for('link_delete', id_=link_.id, origin_id=source.id)
-            data.append(display_remove_link(url + '#tab-' + range_.table_name, range_.name))
-        tables[range_.table_name].rows.append(data)
-    profile_image_id = source.get_profile_image_id()
-    for link_ in source.get_links('P67', True):
-        domain = link_.domain
-        data = get_base_table_data(domain)
-        if domain.view_name == 'file':  # pragma: no cover
-            extension = data[3].replace('.', '')
-            data.append(get_profile_image_table_link(domain, source, extension, profile_image_id))
-            if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-                profile_image_id = domain.id
-        if domain.view_name not in ['file']:
-            data.append(link_.description)
-            if domain.system_type == 'external reference':
-                source.external_references.append(link_)
-            if is_authorized('contributor'):
-                url = url_for('reference_link_update', link_id=link_.id, origin_id=source.id)
-                data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
-        if is_authorized('contributor'):
-            url = url_for('link_delete', id_=link_.id, origin_id=source.id)
-            data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
-        tables[domain.view_name].rows.append(data)
-    return render_template('source/view.html',
-                           source=source,
-                           tables=tables,
-                           info=get_entity_data(source),
                            profile_image_id=profile_image_id)
 
 
