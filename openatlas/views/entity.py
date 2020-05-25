@@ -89,70 +89,10 @@ def entity_view(id_: int) -> Union[str, Response]:
     if not entity.view_name:  # pragma: no cover
         flash(_("This entity can't be viewed directly."), 'error')
         abort(400)
-    if entity.view_name not in ['actor']:  # remove this after finished tab refactor
+    if entity.view_name not in ['actor', 'event']:  # remove this after finished tab refactor
         return getattr(sys.modules[__name__], '{name}_view'.format(name=entity.view_name))(entity)
     return getattr(sys.modules['openatlas.views.' + entity.view_name],
                    '{name}_view'.format(name=entity.view_name))(entity)
-
-
-def event_view(event: Entity) -> str:
-    event.note = User.get_note(event)
-    tables = {'file': Table(Table.HEADERS['file'] + [_('main image')]),
-              'subs': Table(Table.HEADERS['event']),
-              'source': Table(Table.HEADERS['source']),
-              'actor': Table(['actor', 'class', 'involvement', 'first', 'last', 'description'],
-                             defs=[{'className': 'dt-body-right', 'targets': [3, 4]}]),
-              'reference': Table(Table.HEADERS['reference'] + ['page / link text'])}
-    for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
-        first = link_.first
-        if not link_.first and event.first:
-            first = '<span class="inactive" style="float:right;">' + event.first + '</span>'
-        last = link_.last
-        if not link_.last and event.last:
-            last = '<span class="inactive" style="float:right;">' + event.last + '</span>'
-        data = ([link(link_.range),
-                 g.classes[link_.range.class_.code].name,
-                 link_.type.name if link_.type else '',
-                 first, last,
-                 link_.description])
-        if is_authorized('contributor'):
-            update_url = url_for('involvement_update', id_=link_.id, origin_id=event.id)
-            unlink_url = url_for('link_delete', id_=link_.id, origin_id=event.id) + '#tab-actor'
-            data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
-            data.append(display_remove_link(unlink_url, link_.range.name))
-        tables['actor'].rows.append(data)
-    profile_image_id = event.get_profile_image_id()
-    for link_ in event.get_links('P67', True):
-        domain = link_.domain
-        data = get_base_table_data(domain)
-        if domain.view_name == 'file':
-            extension = data[3].replace('.', '')
-            data.append(get_profile_image_table_link(domain, event, extension, profile_image_id))
-            if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-                profile_image_id = domain.id
-        if domain.view_name not in ['source', 'file']:
-            if domain.system_type == 'external reference':
-                event.external_references.append(link_)
-            data.append(link_.description)
-            if is_authorized('contributor'):
-                data.append('<a href="{url}">{label}</a>'.format(
-                    label=uc_first(_('edit')),
-                    url=url_for('reference_link_update', link_id=link_.id, origin_id=event.id)))
-        if is_authorized('contributor'):
-            url = url_for('link_delete', id_=link_.id, origin_id=event.id)
-            data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
-        tables[domain.view_name].rows.append(data)
-    for sub_event in event.get_linked_entities('P117', inverse=True, nodes=True):
-        tables['subs'].rows.append(get_base_table_data(sub_event))
-    objects = []
-    for location in event.get_linked_entities(['P7', 'P26', 'P27']):
-        objects.append(location.get_linked_entity_safe('P53', True))
-    return render_template('event/view.html',
-                           event=event,
-                           tables=tables,
-                           info=get_entity_data(event),
-                           profile_image_id=profile_image_id,
-                           gis_data=Gis.get_all(objects) if objects else None)
 
 
 def file_view(file: Entity) -> str:

@@ -195,6 +195,12 @@ def actor_view(actor: Entity) -> str:
                 'table': Table(Table.HEADERS['file'] + [_('main image')]),
                 'buttons': [button(_('add'), url_for('entity_add_file', id_=actor.id)),
                             button(_('file'), url_for('file_insert', origin_id=actor.id))]}}
+    for code in app.config['CLASS_CODES']['actor']:
+        tabs['relation']['buttons'].append(
+            button(g.classes[code].name, url_for('actor_insert', code=code, origin_id=actor.id)))
+    for code in app.config['CLASS_CODES']['event']:
+        tabs['event']['buttons'].append(
+            button(g.classes[code].name, url_for('event_insert', code=code, origin_id=actor.id)))
 
     actor.note = User.get_note(actor)
     profile_image_id = actor.get_profile_image_id()
@@ -283,7 +289,6 @@ def actor_view(actor: Entity) -> str:
         _('residence'): link(residence_object) if residence_object else ''}
     add_type_data(actor, info)
     add_system_data(actor, info)
-    tabs['info']['info'] = info
 
     for link_ in actor.get_links('OA7') + actor.get_links('OA7', True):
         if actor.id == link_.domain.id:
@@ -331,14 +336,9 @@ def actor_view(actor: Entity) -> str:
     if gis_data:
         if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]':
             gis_data = None
-    for code in app.config['CLASS_CODES']['actor']:
-        tabs['relation']['buttons'].append(
-            button(g.classes[code].name, url_for('actor_insert', code=code, origin_id=actor.id)))
-    for code in app.config['CLASS_CODES']['event']:
-        tabs['event']['buttons'].append(
-            button(g.classes[code].name, url_for('event_insert', code=code, origin_id=actor.id)))
     return render_template('actor/view.html',
                            actor=actor,
+                           info=info,
                            tabs=tabs,
                            gis_data=gis_data,
                            profile_image_id=profile_image_id)
