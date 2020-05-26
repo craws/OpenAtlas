@@ -1,4 +1,3 @@
-
 from flask import Response, json, render_template, request, jsonify
 
 from openatlas import app

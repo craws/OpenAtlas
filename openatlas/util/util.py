@@ -215,10 +215,10 @@ def add_system_data(entity: 'Entity',
         if info['import_origin_id']:
             data['origin ID'] = info['import_origin_id']
         data['API'] = '<a href="{url}" target="_blank">GeoJSON</a>'.format(
-            url=url_for('api_entity', id_=entity.id)) \
-                      + ' <a href="{url}" target="_blank">' \
-                        '<img src="/static/images/icons/download.png" alt="download"></a>'.format(
-            url=url_for('api_download_entity', id_=entity.id))
+            url=url_for('api_entity', id_=entity.id)) + \
+                      ' <a href="{url}" target="_blank">' \
+                      ' <img src="/static/images/icons/download.png" alt="download"></a>'.format(
+                          url=url_for('api_download_entity', id_=entity.id))
     return data
 
 
