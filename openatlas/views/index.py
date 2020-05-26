@@ -108,7 +108,7 @@ def index_content(item: str) -> str:
 @app.errorhandler(400)
 def bad_request(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:  # pragma: no cover
     if request.path.startswith('/api'):
-        return APIError('Bad Request', status_code=403).to_dict(), 400
+        return APIError('Bad Request', status_code=400).to_dict(), 400
     return render_template('400.html', e=e), 400
 
 

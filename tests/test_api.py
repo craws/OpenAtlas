@@ -33,9 +33,10 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for('api_get_latest', limit=10))
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('api_entity', id_=99999999))
-            assert b'not found' in rv.data
+            assert b'404' in rv.data
             self.app.get(url_for('logout'), follow_redirects=True)
             rv = self.app.get(url_for('api_entity', id_=place_id))
-            assert b'forbidden' in rv.data
-
+            assert b'403' in rv.data
+            # rv = self.app.get(url_for('api_download_entity', id_=place_id))
+            # assert b'Download successful' in rv.data
 

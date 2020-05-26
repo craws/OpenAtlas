@@ -1,4 +1,7 @@
-from flask import Response, json, render_template, request, jsonify
+from flask import Response, json, request, jsonify, redirect, url_for
+from flask import flash, render_template
+from flask_babel import lazy_gettext as _
+from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.models.api import Api
@@ -17,6 +20,7 @@ def api_entity(id_: int) -> Response:
 @app.route('/api/0.1/entity/download/<int:id_>')
 @api_access()  # type: ignore
 def api_download_entity(id_: int) -> Response:
+    # flash(_('Download successful'), 'info')
     return Response(json.dumps(Api.get_entity(id_=id_)),
                     mimetype='application/json',
                     headers={'Content-Disposition': 'attachment;filename=' + str(id_) + '.json'})
