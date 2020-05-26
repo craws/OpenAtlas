@@ -192,7 +192,7 @@ class TreeSelect(HiddenInput):  # type: ignore
                                 min_chars=session['settings']['minimum_jstree_search'],
                                 name=field.id,
                                 button_class=app.config['CSS']['button']['secondary'],
-                                title=g.nodes[int(field.id)].name,
+                                title=uc_first(g.nodes[int(field.id)].name),
                                 change_label=uc_first(_('change')),
                                 clear_label=uc_first(_('clear')),
                                 close_label=uc_first(_('close')),
@@ -267,7 +267,7 @@ class TreeMultiSelect(HiddenInput):  # type: ignore
                                 min_chars=session['settings']['minimum_jstree_search'],
                                 name=field.id,
                                 button_class=app.config['CSS']['button']['secondary'],
-                                title=root.name,
+                                title=uc_first(root.name),
                                 selection=selection,
                                 change_label=uc_first(_('change')),
                                 close_label=uc_first(_('close')),
@@ -350,7 +350,7 @@ class TableSelect(HiddenInput):  # type: ignore
             </div>
             <script>$(document).ready(function () {{createOverlay("{name}", "{title}");}});</script>
             """.format(name=field.id,
-                       title=_(field.id.replace('_', ' ')),
+                       title=uc_first(_(field.id.replace('_', ' '))),
                        button_class=app.config['CSS']['button']['secondary'],
                        change_label=uc_first(_('change')),
                        clear_label=uc_first(_('clear')),
@@ -429,7 +429,7 @@ class TableMultiSelect(HiddenInput):  # type: ignore
                                 button_class=app.config['CSS']['button']['secondary'],
                                 change_label=uc_first(_('change')),
                                 close_label=uc_first(_('close')),
-                                title=_(field.id.replace('_', ' ')),
+                                title=uc_first(_(field.id.replace('_', ' '))),
                                 selection='<br>'.join(selection),
                                 table=table.display(field.id))
         return super(TableMultiSelect, self).__call__(field, **kwargs) + html

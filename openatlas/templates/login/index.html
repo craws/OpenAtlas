@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title_name %} - {{ _('login')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('overview'), 'index'], _('login')]|crumb }}
+    {{ [_('login')]|crumb }}
 {% endblock %}
 {% block content %}
     {{ form|display_form('login-form') }}

@@ -11,7 +11,7 @@ from tests.base import TestBaseCase
 class ExportTest(TestBaseCase):
 
     def test_export(self) -> None:
-        if os.name != "posix":  # For  e.g. Windows create a backup file to skip the backup
+        if os.name != "posix":  # pragma: no cover, for e.g. Windows make backup file to pass check
             Path(app.config['EXPORT_FOLDER_PATH'].joinpath('sql', 'fake.sql')).touch()
         with app.app_context():  # type: ignore
             # Projects

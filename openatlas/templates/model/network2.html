@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title_name %} - {{ _('model')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('overview'), 'index'], _('network visualization' + ' {dimensions}D'.format(dimensions=dimensions))]|crumb }}
+    {{ [_('network visualization' + ' {dimensions}D'.format(dimensions=dimensions))]|crumb }}
 {% endblock %}
 {% block content %}
     <link rel="stylesheet" href="/static/node_modules/huebee/dist/huebee.min.css">

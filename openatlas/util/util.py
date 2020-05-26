@@ -215,7 +215,10 @@ def add_system_data(entity: 'Entity',
         if info['import_origin_id']:
             data['origin ID'] = info['import_origin_id']
         data['API'] = '<a href="{url}" target="_blank">GeoJSON</a>'.format(
-            url=url_for('api_entity', id_=entity.id))
+            url=url_for('api_entity', id_=entity.id)) + \
+                      ' <a href="{url}" target="_blank">' \
+                      ' <img src="/static/images/icons/download.png" alt="download"></a>'.format(
+                          url=url_for('api_download_entity', id_=entity.id))
     return data
 
 
@@ -403,11 +406,11 @@ def is_authorized(group: str) -> bool:
         return False  # pragma: no cover - needed because AnonymousUserMixin has no group
 
     if current_user.group == 'admin' or (
-        current_user.group == 'manager' and group in
-        ['manager', 'editor', 'contributor', 'readonly']) or (
-        current_user.group == 'editor' and group in ['editor', 'contributor', 'readonly']) or (
-        current_user.group == 'contributor' and group in ['contributor', 'readonly']) or (
-        current_user.group == 'readonly' and group == 'readonly'):
+            current_user.group == 'manager' and group in
+            ['manager', 'editor', 'contributor', 'readonly']) or (
+            current_user.group == 'editor' and group in ['editor', 'contributor', 'readonly']) or (
+            current_user.group == 'contributor' and group in ['contributor', 'readonly']) or (
+            current_user.group == 'readonly' and group == 'readonly'):
         return True
     return False
 

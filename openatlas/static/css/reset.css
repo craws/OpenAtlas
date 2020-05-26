@@ -1,5 +1,5 @@
 @charset "UTF-8";
-html, body, div, span, iframe, h1, h2, h3, p, blockquote, pre, a, b, u, i, center, dl, dt, dd, ol, ul, li, fieldset,
+html, body, div, span, iframe, h1, h2, h3, p, blockquote, pre, a, b, u, i, center, dl, dt, dd, fieldset,
 form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, section, summary {
     margin: 0;
     padding: 0;
@@ -10,9 +10,6 @@ form, label, legend, table, caption, tbody, tfoot, thead, tr, th, td, section, s
 }
 body {
     line-height: 1;
-}
-ol, ul {
-    list-style: none;
 }
 blockquote, q {
     quotes: none;
