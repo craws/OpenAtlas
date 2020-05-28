@@ -129,55 +129,51 @@ def save(form: FlaskForm, source: Optional[Entity] = None, origin: Optional[Enti
 
 
 def source_view(source: Entity) -> str:
-    tabs = {'info': {
-                'header': _('info')},
-            'event': {
-                'header': _('event'),},
-            'actor': {
-                'header': _('actor'),},
-            'place': {
-                'header': _('place'),},
-            'feature': {
-                'header': '',
-            },
-            'stratigraphic_unit': {
-                'header': '',
-            },
-            'find': {
-                'header': '',
-            },
-            'human_remains': {
-                'header': '',
-            },
-            'reference': {
-                'header': _('reference'),
-                'table': Table(Table.HEADERS['reference'] + ['page']),
-                'buttons': [button(_('add'), url_for('entity_add_reference', id_=source.id)),
-                            button(_('bibliography'), url_for('reference_insert',
-                                                              code='bibliography',
-                                                              origin_id=source.id)),
-                            button(_('edition'), url_for('reference_insert',
-                                                         code='edition',
-                                                         origin_id=source.id)),
-                            button(_('external reference'), url_for('reference_insert',
-                                                                    code='external_reference',
-                                                                    origin_id=source.id))
-                ]},
-            'text': {
-                'header': _('texts'),
-                'table': Table(['text', 'type', 'content'])
-            },
-            'file': {
-                'header': _('files'),
-                'table': Table(Table.HEADERS['file'] + [_('main image')]),
-            }
-    }
-
     source.note = User.get_note(source)
+    tabs = {
+        'info': {'header': _('info')},
+        'event': {'header': _('event')},
+        'actor': {'header': _('actor')},
+        'place': {
+            'header': _('place'),
+            'buttons': [button(_('add'), url_for('source_add', id_=source.id, class_name='place')),
+                        button( _('place'), url_for('place_insert', origin_id=source.id))]},
+        'feature': {'header': _('feature')},
+        'stratigraphic_unit': {'header': 'stratigraphic unit'},
+        'find': {'header': _('find')},
+        'human_remains': {'header': _('human remains')},
+        'reference': {
+            'header': _('reference'),
+            'table': Table(Table.HEADERS['reference'] + ['page']),
+            'buttons': [button(_('add'), url_for('entity_add_reference', id_=source.id)),
+                        button(_('bibliography'), url_for('reference_insert',
+                                                          code='bibliography',
+                                                          origin_id=source.id)),
+                        button(_('edition'), url_for('reference_insert',
+                                                     code='edition',
+                                                     origin_id=source.id)),
+                        button(_('external reference'), url_for('reference_insert',
+                                                                code='external_reference',
+                                                                origin_id=source.id))]},
+        'text': {
+            'header': _('texts'),
+            'table': Table(['text', 'type', 'content']),
+            'buttons': [button(_('text'), url_for('translation_insert', source_id=source.id))]},
+        'file': {
+            'header': _('files'),
+            'table': Table(Table.HEADERS['file'] + [_('main image')]),
+            'buttons': [button(_('add'), url_for('entity_add_file', id_=source.id)),
+                        button(_('file'), url_for('file_insert', origin_id=source.id))]}}
+    for name in ['event', 'actor']:
+        tabs[name]['buttons'] = [
+            button(_('add'), url_for('source_add', id_=source.id, class_name=name))]
+        for code in app.config['CLASS_CODES'][name]:
+            tabs[name]['buttons'].append(button(
+                g.classes[code].name, url_for(name + '_insert', code=code, origin_id=source.id)))
     for text in source.get_linked_entities('P73', nodes=True):
         tabs['text']['table'].rows.append([link(text),
-                                    next(iter(text.nodes)).name if text.nodes else '',
-                                    text.description])
+                                           next(iter(text.nodes)).name if text.nodes else '',
+                                           text.description])
     for name in ['actor', 'event', 'place', 'feature', 'stratigraphic_unit', 'find',
                  'human_remains']:
         tabs[name]['table'] = Table(Table.HEADERS[name])
@@ -211,6 +207,11 @@ def source_view(source: Entity) -> str:
             url = url_for('link_delete', id_=link_.id, origin_id=source.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
         tabs[domain.view_name]['table'].rows.append(data)
+
+    # Remove empty sub units tabs
+    for name in ['feature', 'stratigraphic_unit', 'find', 'human_remains']:
+        if not tabs[name]['table'].rows:
+            tabs[name]['header'] = ''
     return render_template('source/view.html',
                            source=source,
                            tabs=tabs,
