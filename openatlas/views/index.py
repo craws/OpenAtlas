@@ -1,4 +1,4 @@
-from typing import Tuple, Union, Dict, Any
+from typing import Tuple, Union, Dict
 
 from flask import flash, g, render_template, request, session, url_for, jsonify
 from flask_babel import format_number, lazy_gettext as _
@@ -10,9 +10,9 @@ from wtforms import SelectField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
+from openatlas.models.api_error import APIError
 from openatlas.models.content import Content
 from openatlas.models.entity import Entity
-from openatlas.models.api_error import APIError
 from openatlas.models.user import User
 from openatlas.util.changelog import Changelog
 from openatlas.util.table import Table
@@ -126,6 +126,14 @@ def page_not_found(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
     return render_template('404.html', e=e), 404
 
 
+@app.errorhandler(405)
+def page_not_found(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
+    if request.path.startswith('/api'):
+        return APIError('Method Not Allowed', status_code=405).to_dict(), 405
+    # Todo: Make a 405.html page
+    return render_template('404.html', e=e), 405
+
+
 @app.errorhandler(418)
 def invalid_id(e: Exception) -> Tuple[str, int]:
     return render_template('418.html', e=e), 418
@@ -134,6 +142,13 @@ def invalid_id(e: Exception) -> Tuple[str, int]:
 @app.errorhandler(422)
 def unprocessable_entity(e: Exception) -> Tuple[str, int]:
     return render_template('422.html', e=e), 422
+
+
+@app.errorhandler(500)
+def internal_server(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
+    if request.path.startswith('/api'):
+        return APIError('An unexpected error has occurred', status_code=500).to_dict(), 404
+    return render_template('404.html', e=e), 404
 
 
 @app.errorhandler(APIError)

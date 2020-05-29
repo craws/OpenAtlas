@@ -1,6 +1,5 @@
-from flask import Response, json, request, jsonify, redirect, url_for
-from flask import flash, render_template
-from flask_babel import lazy_gettext as _
+from flask import Response, json, request, jsonify
+from flask import render_template
 from werkzeug.wrappers import Response
 
 from openatlas import app
