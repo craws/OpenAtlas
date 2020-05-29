@@ -1,4 +1,3 @@
-import os
 import sys
 from typing import Union
 
@@ -20,9 +19,8 @@ from openatlas.models.place import get_structure
 from openatlas.models.user import User
 from openatlas.util.table import Table
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 get_file_path, get_profile_image_table_link, is_authorized, link,
+                                 get_profile_image_table_link, is_authorized, link,
                                  required_group, uc_first)
-from openatlas.views.file import preview_file
 from openatlas.views.reference import AddReferenceForm
 
 
@@ -90,41 +88,10 @@ def entity_view(id_: int) -> Union[str, Response]:
         flash(_("This entity can't be viewed directly."), 'error')
         abort(400)
     # remove this after finished tab refactor
-    if entity.view_name not in ['actor', 'event', 'source']:
+    if entity.view_name not in ['actor', 'event', 'source', 'file']:
         return getattr(sys.modules[__name__], '{name}_view'.format(name=entity.view_name))(entity)
     return getattr(sys.modules['openatlas.views.' + entity.view_name],
                    '{name}_view'.format(name=entity.view_name))(entity)
-
-
-def file_view(file: Entity) -> str:
-    path = get_file_path(file.id)
-    tables = {}
-    for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
-                 'reference', 'node', 'human_remains']:
-        tables[name] = Table(Table.HEADERS[name] + (['page'] if name == 'reference' else []))
-    for link_ in file.get_links('P67'):
-        range_ = link_.range
-        data = get_base_table_data(range_)
-        if is_authorized('contributor'):
-            url = url_for('link_delete', id_=link_.id, origin_id=file.id)
-            data.append(display_remove_link(url + '#tab-' + range_.table_name, range_.name))
-        tables[range_.table_name].rows.append(data)
-    for link_ in file.get_links('P67', True):
-        data = get_base_table_data(link_.domain)
-        data.append(link_.description)
-        if is_authorized('contributor'):
-            update_url = url_for('reference_link_update', link_id=link_.id, origin_id=file.id)
-            data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
-            unlink_url = url_for('link_delete', id_=link_.id, origin_id=file.id)
-            data.append(display_remove_link(unlink_url + '#tab-reference', link_.domain.name))
-        tables['reference'].rows.append(data)
-    return render_template('file/view.html',
-                           missing_file=False if path else True,
-                           entity=file,
-                           info=get_entity_data(file),
-                           tables=tables,
-                           preview=True if path and preview_file(path) else False,
-                           filename=os.path.basename(path) if path else False)
 
 
 def object_view(object_: Entity) -> str:
