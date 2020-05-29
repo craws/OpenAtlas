@@ -1,6 +1,6 @@
 from flask import Response, json, request, jsonify
 from flask import render_template
-from werkzeug.wrappers import Response
+from werkzeug.wrappers import Response  # type: ignore
 
 from openatlas import app
 from openatlas.models.api import Api
