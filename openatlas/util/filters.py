@@ -177,7 +177,6 @@ def table_select_model(self: Any,
                 {table}
             </div>
         </div>
-        <script>$(document).ready(function () {{createOverlay("{name}");}});</script>
     """.format(name=name, value=value, table=table.display(name))
     return html
 
