@@ -9,7 +9,7 @@ class APIError(Exception):
     error_code = 200
 
     error_detail = {
-        400: "The request ist invalid. The body or parameters are wrong.",
+        400: "The request is invalid. The body or parameters are wrong.",
         401: "You failed to authenticate with the server.",
         403: "You don't have the permission to access the requested resource."
              " Please authenticate with the server, either through login via the user interface or"
