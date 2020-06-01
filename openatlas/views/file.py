@@ -154,17 +154,18 @@ def file_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
 
 def file_view(file: Entity) -> str:
     path = get_file_path(file.id)
-    tables = {}
+    tabs = {'info': {'header': _('info')}}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
                  'reference', 'node', 'human_remains']:
-        tables[name] = Table(Table.HEADERS[name] + (['page'] if name == 'reference' else []))
+        tabs[name] = {'header': name}
+        tabs[name]['table'] = Table(Table.HEADERS[name] + (['page'] if name == 'reference' else []))
     for link_ in file.get_links('P67'):
         range_ = link_.range
         data = get_base_table_data(range_)
         if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=file.id)
             data.append(display_remove_link(url + '#tab-' + range_.table_name, range_.name))
-        tables[range_.table_name].rows.append(data)
+        tabs[range_.table_name]['table'].rows.append(data)
     for link_ in file.get_links('P67', True):
         data = get_base_table_data(link_.domain)
         data.append(link_.description)
@@ -173,12 +174,12 @@ def file_view(file: Entity) -> str:
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=file.id)
             data.append(display_remove_link(unlink_url + '#tab-reference', link_.domain.name))
-        tables['reference'].rows.append(data)
+        tabs['reference']['table'].rows.append(data)
     return render_template('file/view.html',
                            missing_file=False if path else True,
                            entity=file,
                            info=get_entity_data(file),
-                           tables=tables,
+                           tabs=tabs,
                            preview=True if path and preview_file(path) else False,
                            filename=os.path.basename(path) if path else False)
 
