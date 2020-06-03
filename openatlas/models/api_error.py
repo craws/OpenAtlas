@@ -9,9 +9,9 @@ class APIError(Exception):
     error_code = "200"
 
     error_detail = {
-        400: [400, "The request is invalid. The body or parameters are wrong."],
-        401: [401, "You failed to authenticate with the server."],
-        403: [403, "You don't have the permission to access the requested resource. "
+        "400": [400, "The request is invalid. The body or parameters are wrong."],
+        "401": [401, "You failed to authenticate with the server."],
+        "403": [403, "You don't have the permission to access the requested resource. "
                    "Please authenticate with the server, either through login via the "
                    "user interface or token based authentication."],
         "404": [404, "Something went wrong! Maybe only digits are allowed. Please check the URL"],
@@ -23,8 +23,8 @@ class APIError(Exception):
         "404d": [404, "The syntax is incorrect. This class code is not supported. "
                       "For the classes please confer the model"],
         "404e": [404, "The syntax is incorrect. Only integers between 1 and 100 are allowed."],
-        405: [405, "The method used is not supported. Right now only GET is allowed."],
-        500: [500, "Please notify the administrator. Sorry for the inconvenience!"]}
+        "405": [405, "The method used is not supported. Right now only GET is allowed."],
+        "500": [500, "Please notify the administrator. Sorry for the inconvenience!"]}
 
     def __init__(self, message: str, status_code: str, payload: None = None) -> None:
         Exception.__init__(self)
