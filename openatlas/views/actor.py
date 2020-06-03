@@ -126,7 +126,7 @@ def save(form: ActorForm,
             if origin.view_name == 'reference':
                 link_id = origin.link('P67', actor)[0]
                 url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
-            elif origin.view_name == 'source':
+            elif origin.view_name in ['source', 'file']:
                 origin.link('P67', actor)
                 url = url_for('entity_view', id_=origin.id) + '#tab-actor'
             elif origin.view_name == 'event':

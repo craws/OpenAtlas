@@ -172,17 +172,15 @@ def save(form: FlaskForm,
                 event.link('P26', Link.get_linked_entity_safe(int(form.place_to.data), 'P53'))
         url = url_for('entity_view', id_=event.id)
         if origin:
-            url = url_for('entity_view', id_=origin.id) + '#tab-event'
+            url = url_for('entity_view', id_=origin.id) + '#tab-event'  # e.g origin is a place
             if origin.view_name == 'reference':
                 link_id = origin.link('P67', event)[0]
                 url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
-            elif origin.view_name == 'source':
+            elif origin.view_name in ['source', 'file']:
                 origin.link('P67', event)
             elif origin.view_name == 'actor':
                 link_id = event.link('P11', origin)[0]
                 url = url_for('involvement_update', id_=link_id, origin_id=origin.id)
-            elif origin.view_name == 'file':
-                origin.link('P67', event)
         if form.continue_.data == 'yes':
             url = url_for('event_insert', code=code, origin_id=origin.id if origin else None)
         g.cursor.execute('COMMIT')

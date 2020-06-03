@@ -154,8 +154,6 @@ def file_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
 # Todo:
 #  node name to type
 #  hide empty subunits and node tab
-#  actor insert and link not working
-
 
 def file_view(file: Entity) -> str:
     path = get_file_path(file.id)
