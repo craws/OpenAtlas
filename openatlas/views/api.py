@@ -1,4 +1,4 @@
-from flask import Response, json, request, jsonify
+from flask import Response, json, jsonify
 from flask import render_template
 from werkzeug.wrappers import Response  # type: ignore
 
@@ -8,7 +8,7 @@ from openatlas.models.api_error import APIError
 from openatlas.util.util import api_access
 
 
-# Todo: unit tests and Mypy checks
+# Todo: unit tests and mypy checks
 
 
 @app.route('/api/0.1/entity/<int:id_>', methods=['GET'])
@@ -42,7 +42,7 @@ def api_get_by_code(code: str) -> Response:
     try:
         Api.get_entities_by_code(code_=code)
         return jsonify(Api.get_entities_by_code(code_=code))
-    except Exception as e:
+    except Exception:
         raise APIError('Syntax is incorrect!', status_code="404c")
 
 

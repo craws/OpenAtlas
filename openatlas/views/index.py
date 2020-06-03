@@ -127,11 +127,11 @@ def page_not_found(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
 
 
 @app.errorhandler(405)
-def page_not_found(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
+def method_not_allowed(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
     if request.path.startswith('/api'):
         return APIError('Method Not Allowed', status_code="405").to_dict(), 405
     # Todo: Make a 405.html page
-    return render_template('404.html', e=e), 405
+    return render_template('405.html', e=e), 405
 
 
 @app.errorhandler(418)

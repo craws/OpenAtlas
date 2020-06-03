@@ -10,7 +10,6 @@ from openatlas.models.geonames import Geonames
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.util.util import format_date, get_file_path
-from werkzeug import abort
 
 
 class Api:
@@ -102,7 +101,7 @@ class Api:
     def get_entity(id_: int) -> Dict[str, Any]:
         try:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-        except Exception as e:
+        except Exception:
             raise APIError('Entity ID doesn\'t exist!', status_code="404a")
 
         geonames_link = Geonames.get_geonames_link(entity)
@@ -119,7 +118,7 @@ class Api:
             nodes_dict = {'identifier': url_for('api_entity', id_=node.id, _external=True),
                           'label': node.name}
             for link in Link.get_links(entity.id):
-                if link.range.id == node.id and link.description: # pragma: nocover
+                if link.range.id == node.id and link.description:  # pragma: nocover
                     nodes_dict['value'] = link.description
                     if link.range.id == node.id and node.description:
                         nodes_dict['unit'] = node.description

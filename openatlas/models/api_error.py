@@ -5,8 +5,8 @@ from flask import request
 
 
 class APIError(Exception):
-    status_code = 400
-    error_code = 200
+    status_code = "400"
+    error_code = "200"
 
     error_detail = {
         400: [400, "The request is invalid. The body or parameters are wrong."],
@@ -37,11 +37,11 @@ class APIError(Exception):
     def to_dict(self) -> Dict[str, str]:
         rv = dict(self.payload or ())
         rv['title'] = self.message
-        rv['status'] = self.error_detail[self.error_code][0]
+        rv['status'] = str(self.error_detail[self.error_code][0])
         rv['intern-status'] = self.error_code
-        rv['detail'] = self.error_detail[self.error_code][1]
+        rv['detail'] = str(self.error_detail[self.error_code][1])
         rv['instance'] = request.base_url
-        rv['timestamp'] = datetime.now()
+        rv['timestamp'] = str(datetime.now())
         if self.error_code in [403, 401]:
             rv['help'] = "https://redmine.craws.net/projects/uni/wiki/API_Authentication"
         else:
