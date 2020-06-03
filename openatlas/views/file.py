@@ -151,27 +151,25 @@ def file_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
     writeable = True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False
     return render_template('file/insert.html', form=form, origin=origin, writeable=writeable)
 
-# Todo:
-#  node name to type
-#  hide empty subunits and node tab
 
 def file_view(file: Entity) -> str:
     path = get_file_path(file.id)
     tabs = {'info': {'header': _('info')}}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
-                 'reference', 'node', 'human_remains']:
+                 'human_remains', 'reference']:
         tabs[name] = {'header': _(name.replace('_', ' '))}
         tabs[name]['table'] = Table(Table.HEADERS[name] + (['page'] if name == 'reference' else []))
+    tabs['node'] = {'header': _('types'), 'table': Table(Table.HEADERS['node'])}
     tabs['source']['buttons'] = [
         button(_('add'), url_for('file_add', id_=file.id, class_name='source')),
         button(_('source'), url_for('source_insert', origin_id=file.id))]
-    tabs['event']['buttons'] = [button(_('add'),
-                                       url_for('file_add', id_=file.id, class_name='event'))]
+    tabs['event']['buttons'] = [
+        button(_('add'), url_for('file_add', id_=file.id, class_name='event'))]
     for code in app.config['CLASS_CODES']['event']:
         tabs['event']['buttons'].append(
             button(g.classes[code].name, url_for('event_insert', code=code, origin_id=file.id)))
-    tabs['actor']['buttons'] = [button(_('add'),
-                                       url_for('file_add', id_=file.id, class_name='actor'))]
+    tabs['actor']['buttons'] = [
+        button(_('add'), url_for('file_add', id_=file.id, class_name='actor'))]
     for code in app.config['CLASS_CODES']['actor']:
         tabs['actor']['buttons'].append(
             button(g.classes[code].name, url_for('actor_insert', code=code, origin_id=file.id)))
