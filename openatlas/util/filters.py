@@ -170,15 +170,31 @@ def table_select_model(self: Any,
             entities[id_].name + '</a>'])
     value = selected.code + ' ' + selected.name if selected else ''
     html = """
-        <input id="{name}-button" value="{value}" class="table-select" type="text"
-            onfocus="this.blur()" readonly="readonly">
-        <div id="{name}-overlay" class="overlay">
-            <div id="{name}-dialog" class="overlay-container">
-                {table}
-            </div>
-        </div>
-        <script>$(document).ready(function () {{createOverlay("{name}");}});</script>
-    """.format(name=name, value=value, table=table.display(name))
+        <input id="{name}-button" name="{name}-button" class="table-select" type="text"
+            onfocus="this.blur()" readonly="readonly" value="{value}"
+            onclick="$('#{name}-modal').modal('show')">
+            <div id="{name}-modal" class="modal fade" tabindex="-1" role="dialog"
+                aria-hidden="true">
+                <div class="modal-dialog" role="document" style="max-width: 100%!important;">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">{name}</h5>
+                            <button type="button" class="btn btn-outline-primary btn-sm"
+                                data-dismiss="modal" aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                            </button>
+                        </div>
+                        <div class="modal-body">{table}</div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-outline-primary btn-sm"
+                                data-dismiss="modal">{close_label}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>""".format(name=name,
+                             value=value,
+                             close_label=util.uc_first(_('close')),
+                             table=table.display(name))
     return html
 
 

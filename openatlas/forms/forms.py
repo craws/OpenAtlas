@@ -348,7 +348,6 @@ class TableSelect(HiddenInput):  # type: ignore
                     </div>
                 </div>
             </div>
-            <script>$(document).ready(function () {{createOverlay("{name}", "{title}");}});</script>
             """.format(name=field.id,
                        title=uc_first(_(field.id.replace('_', ' '))),
                        button_class=app.config['CSS']['button']['secondary'],
