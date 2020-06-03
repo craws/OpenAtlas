@@ -57,11 +57,10 @@ def api_get_by_class(class_code: str) -> Response:
 @app.route('/api/0.1/latest/<int:limit>', methods=['GET'])
 @api_access()  # type: ignore
 def api_get_latest(limit: int) -> Response:
-    if type(limit) is int:
-        if 0 < limit < 100:
-            return jsonify(Api.get_entities_get_latest(limit_=limit))
-        else:
-            raise APIError('Syntax is incorrect!', status_code="404e")
+    if 0 < limit < 100:
+        return jsonify(Api.get_entities_get_latest(limit_=limit))
+    else:
+        raise APIError('Syntax is incorrect!', status_code="404e")
 
 
 @app.route('/api')
