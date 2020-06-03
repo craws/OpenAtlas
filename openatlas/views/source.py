@@ -207,11 +207,6 @@ def source_view(source: Entity) -> str:
             url = url_for('link_delete', id_=link_.id, origin_id=source.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
         tabs[domain.view_name]['table'].rows.append(data)
-
-    # Remove empty sub units tabs
-    for name in ['feature', 'stratigraphic_unit', 'find', 'human_remains']:
-        if not tabs[name]['table'].rows:
-            tabs[name]['header'] = ''
     return render_template('source/view.html',
                            source=source,
                            tabs=tabs,
