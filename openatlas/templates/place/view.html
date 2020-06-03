@@ -1,4 +1,4 @@
-{% extends "layout.html" %}
+{% extends "tabs.html" %}
 {% block title_name %}- {{ object_.name }}{% endblock %}
 {% block breadcrumb %}
     {{ [['place', 'place_index'],
@@ -7,7 +7,32 @@
         structure['stratigraphic_unit'],
         object_.name]|crumb }}
 {% endblock %}
-{% block content %}
+
+{% block tab_info %}
+    <div class="toolbar">
+        {{ 'menu/place'|manual }}
+        {% if 'contributor'|is_authorized %}
+            {{ _('edit')|button(url_for('place_update', id_=object_.id)) }}
+            {% if not subunits %}
+                {{ object_|display_delete_link }}
+            {% endif %}
+        {% endif %}
+        {{ object_.id|bookmark_toggle }}
+    </div>
+    <h1>{{ object_.name }}</h1>
+    <div>
+        {{ profile_image_id|display_profile_image }}
+        <div style="float:left;">
+            {{ info|display_info }}
+            {{ object_|note }}
+            {{ object_|display_external_references }}
+            {{ object_|description }}
+        </div>
+        <div style="clear:both;"></div>
+    </div>
+{% endblock %}
+
+{% block origin %}
 <div class="row">
     <div class="col-6">
         <ul class="nav nav-tabs" role="tablist">
@@ -29,29 +54,6 @@
             {% endif %}
         </ul>
         <div class="tab-content">
-            <div class="tab-pane fade show active" role="tabpanel" id="tab-info">
-                <div class="toolbar">
-                    {{ 'menu/place'|manual }}
-                    {% if 'contributor'|is_authorized %}
-                        {{ _('edit')|button(url_for('place_update', id_=object_.id)) }}
-                        {% if not subunits %}
-                            {{ object_|display_delete_link }}
-                        {% endif %}
-                    {% endif %}
-                    {{ object_.id|bookmark_toggle }}
-                </div>
-                <h1>{{ object_.name }}</h1>
-                <div>
-                    {{ profile_image_id|display_profile_image }}
-                    <div style="float:left;">
-                        {{ info|display_info }}
-                        {{ object_|note }}
-                        {{ object_|display_external_references }}
-                        {{ object_|description }}
-                    </div>
-                    <div style="clear:both;"></div>
-                </div>
-            </div>
             <div class="tab-pane fade" role="tabpanel" id="tab-source">
                 {% if 'contributor'|is_authorized %}
                 <div class="toolbar">
