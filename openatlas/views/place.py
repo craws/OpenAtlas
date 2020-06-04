@@ -19,10 +19,9 @@ from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.user import User
 from openatlas.util.table import Table
-from openatlas.util.util import display_remove_link, get_base_table_data, get_entity_data, \
-    get_profile_image_table_link, is_authorized, link, \
-    required_group, \
-    uc_first, was_modified
+from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
+                                 get_profile_image_table_link, is_authorized, link, required_group,
+                                 uc_first, was_modified)
 
 
 class PlaceForm(DateForm):
@@ -174,28 +173,42 @@ def place_update(id_: int) -> Union[str, Response]:
                            overlays=Overlay.get_by_object(object_),
                            geonames_buttons=geonames_buttons)
 
+# Todo:
+#  buttons
+#  hide actor tab if empty?
+#  test sub units
+
 
 def place_view(object_: Entity) -> str:
-    tabs = {'info': {'header': _('info')}}
+    tabs = {
+        'info': {'header': _('info')},
+        'source': {'header': _('source'),
+                   'table': Table(Table.HEADERS['source'])},
+        'event': {'header': _('event'),
+                  'table': Table(Table.HEADERS['event'],
+                                 defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])},
+        'actor': {'header': _('actor'),
+                  'table': Table([_('actor'), _('property'), _('class'), _('first'), _('last')])},
+        'reference': {'header': _('reference'),
+                      'table': Table(Table.HEADERS['reference'] + ['page / link text'])},
+        'file': {'header': _('files'),
+                 'table': Table(Table.HEADERS['file'] + [_('main image')])},
+        'feature': {'header': _('feature') if object_.system_type == 'place' else '',
+                    'table': Table(Table.HEADERS['place'] + [_('description')])},
+        'stratigraphic_unit': {
+            'header': _('stratigraphic unit') if object_.system_type == 'feature' else '',
+            'table': Table(Table.HEADERS['place'] + [_('description')])},
+        'find': {
+            'header': _('find') if object_.system_type == 'stratigraphic unit' else '',
+            'table': Table(Table.HEADERS['place'] + [_('description')])},
+        'human_remains': {
+            'header': _('human remains') if object_.system_type == 'stratigraphic unit' else '',
+            'table': Table(Table.HEADERS['place'] + [_('description')])}}
     object_.note = User.get_note(object_)
     location = object_.get_linked_entity_safe('P53', nodes=True)
-    tables = {'file': Table(Table.HEADERS['file'] + [_('main image')]),
-              'source': Table(Table.HEADERS['source']),
-              'event': Table(Table.HEADERS['event'],
-                             defs=[{'className': 'dt-body-right', 'targets': [3, 4]}]),
-              'reference': Table(Table.HEADERS['reference'] + ['page / link text']),
-              'actor': Table([_('actor'), _('property'), _('class'), _('first'), _('last')])}
-    if object_.system_type == 'place':
-        tables['feature'] = Table(Table.HEADERS['place'] + [_('description')])
-    if object_.system_type == 'feature':
-        tables['stratigraphic_unit'] = Table(Table.HEADERS['place'] + [_('description')])
-    if object_.system_type == 'stratigraphic unit':
-        tables['find'] = Table(Table.HEADERS['place'] + [_('description')])
-        tables['human_remains'] = Table(Table.HEADERS['place'] + [_('description')])
     profile_image_id = object_.get_profile_image_id()
     if current_user.settings['module_map_overlay'] and is_authorized('editor'):
-        tables['file'].header.append(uc_first(_('overlay')))
-
+        tabs['file']['table'].header.append(uc_first(_('overlay')))
     overlays = Overlay.get_by_object(object_)
     for link_ in object_.get_links('P67', inverse=True):
         domain = link_.domain
@@ -228,27 +241,27 @@ def place_view(object_: Entity) -> str:
         if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=object_.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
-        tables[domain.view_name].rows.append(data)
+        tabs[domain.view_name]['table'].rows.append(data)
     event_ids = []  # Keep track of already inserted events to prevent doubles
     for event in location.get_linked_entities(['P7', 'P26', 'P27'], inverse=True):
-        tables['event'].rows.append(get_base_table_data(event))
+        tabs['event']['table'].rows.append(get_base_table_data(event))
         event_ids.append(event.id)
     for event in object_.get_linked_entities('P24', inverse=True):
         if event.id not in event_ids:  # Don't add again if already in table
-            tables['event'].rows.append(get_base_table_data(event))
+            tabs['event']['table'].rows.append(get_base_table_data(event))
     for link_ in location.get_links(['P74', 'OA8', 'OA9'], inverse=True):
         actor = Entity.get_by_id(link_.domain.id, view_name='actor')
-        tables['actor'].rows.append([link(actor),
-                                     g.properties[link_.property.code].name,
-                                     actor.class_.name,
-                                     actor.first,
-                                     actor.last])
+        tabs['actor']['table'].rows.append([link(actor),
+                                            g.properties[link_.property.code].name,
+                                            actor.class_.name,
+                                            actor.first,
+                                            actor.last])
     structure = get_structure(object_)
     if structure:
         for entity in structure['subunits']:
             data = get_base_table_data(entity)
             data.append(entity.description)
-            tables[entity.system_type.replace(' ', '_')].rows.append(data)
+            tabs[entity.system_type.replace(' ', '_')]['table'].rows.append(data)
     gis_data = Gis.get_all([object_], structure)
     if gis_data['gisPointSelected'] == '[]' \
             and gis_data['gisPolygonSelected'] == '[]' \
