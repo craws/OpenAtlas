@@ -4,12 +4,12 @@ from typing import Any, Dict, List
 from flask import g, session, url_for
 
 from openatlas import app
+from openatlas.models.api_error import APIError
 from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.util.util import format_date, get_file_path
-from werkzeug import abort
 
 
 class Api:
@@ -101,8 +101,8 @@ class Api:
     def get_entity(id_: int) -> Dict[str, Any]:
         try:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-        except Exception as e:
-            abort(404)
+        except Exception:
+            raise APIError('Entity ID doesn\'t exist!', status_code="404a")
 
         geonames_link = Geonames.get_geonames_link(entity)
         type_ = 'FeatureCollection'
@@ -114,11 +114,11 @@ class Api:
                     'properties': {'title': entity.name}}
 
         # Types
-        for node in entity.nodes:  # pragma: nocover
+        for node in entity.nodes:
             nodes_dict = {'identifier': url_for('api_entity', id_=node.id, _external=True),
                           'label': node.name}
             for link in Link.get_links(entity.id):
-                if link.range.id == node.id and link.description:
+                if link.range.id == node.id and link.description:  # pragma: nocover
                     nodes_dict['value'] = link.description
                     if link.range.id == node.id and node.description:
                         nodes_dict['unit'] = node.description
@@ -128,7 +128,7 @@ class Api:
             #  This feature is solely for Stefan
             hierarchy = []
             for root in node.root:
-                hierarchy.append(g.nodes[root].name)
+                hierarchy.append(g.nodes[root].name)  # pragma: nocover
             hierarchy.reverse()
             nodes_dict['hierarchy'] = ' > '.join(map(str, hierarchy))
 
@@ -175,7 +175,7 @@ class Api:
             features['when'] = {'timespans': [time]}
 
         # Geonames
-        if geonames_link and geonames_link.range.class_.code == 'E18':  # pragma: nocover
+        if geonames_link and geonames_link.range.class_.code == 'E18':
             geo_name = {}
             if geonames_link.type.name:
                 geo_name['type'] = Api.to_camelcase(geonames_link.type.name)
@@ -190,17 +190,17 @@ class Api:
         try:
             geometries = []
             shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
-            for geonames_link in Gis.get_by_id(entity.location.id):  # pragma: nocover
+            for geonames_link in Gis.get_by_id(entity.location.id):
                 geo_dict = {'type': shape[geonames_link['shape']],
                             'coordinates': geonames_link['geometry']['coordinates']}
                 if geonames_link['description']:
-                    geo_dict['description'] = geonames_link['description']
+                    geo_dict['description'] = geonames_link['description']  # pragma: nocover
                 if geonames_link['name']:
                     geo_dict['title'] = geonames_link['name']
                 geometries.append(geo_dict)
 
-            if len(geometries) == 1:  # pragma: nocover
-                features['geometry'] = geometries[0]
+            if len(geometries) == 1:
+                features['geometry'] = geometries[0]  # pragma: nocover
             else:
                 features['geometry'] = {'type': 'GeometryCollection', 'geometries': geometries}
         except (AttributeError, KeyError):
