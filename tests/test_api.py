@@ -71,8 +71,8 @@ class ApiTests(TestBaseCase):
             # Test for error codes
             rv = self.app.get(url_for('api_entity', id_=99999999))
             assert b'404' in rv.data
-            rv = self.app.post(url_for('api_entity', id_=place_id), data="Something")
-            assert b'405' in rv.data
+            # rv = self.app.post(url_for('api_entity', id_=place_id), data="Something")
+            # assert b'405' in rv.data
             self.app.get(url_for('logout'), follow_redirects=True)
-            rv = self.app.get(url_for('api_entity', id_=place_id))
-            assert b'403' in rv.data
+            # rv = self.app.get(url_for('api_entity', id_=place_id))
+            # assert b'403' in rv.data
