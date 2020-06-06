@@ -54,6 +54,18 @@ def api_get_entities_by_json() -> Response:  # pragma: no cover
             if len(Api.get_entities_by_class(class_code_=c)) == 0:
                 raise APIError('Syntax is incorrect!', status_code="404d")
             out.extend(Api.get_entities_by_class(class_code_=c))
+    if 'latest' in req_data:
+        latest = req_data['latest'][0]
+        if type(latest) is int:
+            if 0 < latest < 100:
+                print(latest)
+                out.extend(Api.get_entities_get_latest(limit_=latest))
+            else:
+                raise APIError('Syntax is incorrect!', status_code="404e")
+        else:
+            raise APIError('Syntax is incorrect!', status_code="404")
+
+
     return jsonify(out)
 
 
