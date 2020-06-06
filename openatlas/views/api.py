@@ -1,4 +1,4 @@
-from flask import Response, json, jsonify
+from flask import Response, json, jsonify, request
 from flask import render_template
 from werkzeug.wrappers import Response  # type: ignore
 
@@ -29,19 +29,19 @@ def api_download_entity(id_: int) -> Response:
                     headers={'Content-Disposition': 'attachment;filename=' + str(id_) + '.json'})
 
 
-# @app.route('/api/0.1', methods=['GET'])
-# @api_access()  # type: ignore
-# def api_get_multiple_entities() -> Response:  # pragma: no cover
-#     entity = request.args.getlist('entity')
-#     return jsonify(Api.get_entities_by_id(ids=entity))
+@app.route('/api/0.1', methods=['GET'])
+@api_access()  # type: ignore
+def api_get_multiple_entities() -> Response:  # pragma: no cover
+    entity = request.args.getlist('entity')
+    return jsonify(Api.get_entities_by_id(ids=entity))
 
 
 @app.route('/api/0.1/code/<code>', methods=['GET'])
 @api_access()  # type: ignore
-def api_get_by_code(code: str) -> Response:
+def api_get_by_menu_item(code: str) -> Response:
     try:
-        Api.get_entities_by_code(code_=code)
-        return jsonify(Api.get_entities_by_code(code_=code))
+        Api.get_entities_by_menu_item(code_=code)
+        return jsonify(Api.get_entities_by_menu_item(code_=code))
     except Exception:
         raise APIError('Syntax is incorrect!', status_code="404c")
 

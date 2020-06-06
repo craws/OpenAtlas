@@ -5,10 +5,10 @@
 {% endblock %}
 {% block content %}
     <a href="{{ url_for('api_entity', id_=105) }}">Test API</a><br>
-    <a href="{{ url_for('api_get_by_code', code='actor') }}">Actor</a><br>
-    <a href="{{ url_for('api_get_by_code', code='place') }}">Place</a><br>
-    <a href="{{ url_for('api_get_by_code', code='event') }}">Event</a><br>
-    <a href="{{ url_for('api_get_by_code', code='source') }}">Source</a><br>
-    <a href="{{ url_for('api_get_by_code', code='reference') }}">Reference</a><br>
-    <a href="{{ url_for('api_get_by_code', code='object') }}">Object</a>
+    <a href="{{ url_for('api_get_by_menu_item', code='actor') }}">Actor</a><br>
+    <a href="{{ url_for('api_get_by_menu_item', code='place') }}">Place</a><br>
+    <a href="{{ url_for('api_get_by_menu_item', code='event') }}">Event</a><br>
+    <a href="{{ url_for('api_get_by_menu_item', code='source') }}">Source</a><br>
+    <a href="{{ url_for('api_get_by_menu_item', code='reference') }}">Reference</a><br>
+    <a href="{{ url_for('api_get_by_menu_item', code='object') }}">Object</a>
 {% endblock %}
