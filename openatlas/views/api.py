@@ -45,18 +45,16 @@ def api_get_entities_by_json() -> Response:  # pragma: no cover
         item = req_data['item']
         for i in item:
             try:
-                out.append(Api.get_entities_by_menu_item(code_=i))
+                out.extend(Api.get_entities_by_menu_item(code_=i))
             except Exception:
                 raise APIError('Syntax is incorrect!', status_code="404c")
     if 'class_code' in req_data:
         class_code = req_data['class_code']
-        print(class_code)
         for c in class_code:
-            print(c)
             if len(Api.get_entities_by_class(class_code_=c)) == 0:
                 raise APIError('Syntax is incorrect!', status_code="404d")
-            out.append(Api.get_entities_by_class(class_code_=c))
-    return jsonify(out[0])
+            out.extend(Api.get_entities_by_class(class_code_=c))
+    return jsonify(out)
 
 
 @app.route('/api/0.1/code/<code>', methods=['GET'])
