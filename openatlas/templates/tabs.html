@@ -3,7 +3,7 @@
     <div class="row">
         <div class="col-6">
             <ul class="nav nav-tabs" role="tablist">
-                {% for id_, tab in tabs.items() if tab.header and (id_ not in config.SUBUNITS + ['node'] or tab.table.rows): %}
+                {% for id_, tab in tabs.items() if tab.header and (id_ not in config.SUBUNITS + ['node'] or tab.table.rows or tab.buttons): %}
                     <li class="nav-item">
                         <a
                             role="tab"
@@ -20,7 +20,7 @@
                 {% endfor %}
             </ul>
             <div class="tab-content">
-                {% for id_, tab in tabs.items() if tab.header and (id_ not in config.SUBUNITS + ['node'] or tab.table.rows): %}
+                {% for id_, tab in tabs.items() if tab.header and (id_ not in config.SUBUNITS + ['node'] or tab.table.rows or tab.buttons): %}
                     {% if loop.index == 1 %}
                         <div class="tab-pane fade show active" role="tabpanel" id="tab-{{ id_ }}">
                             {% block tab_info %}{% endblock%}
@@ -42,6 +42,11 @@
                 {% endfor %}
             </div>
         </div>
-        {% block content_map %}{% endblock %}
+        {% if gis_data %}
+            <div class="col-6">
+                <div id="map" class="map"></div>
+                <script src="/static/js/map/map.js"></script>
+            </div>
+        {% endif %}
     </div>
 {% endblock %}
