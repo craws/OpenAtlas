@@ -65,7 +65,6 @@ def api_get_entities_by_json() -> Response:  # pragma: no cover
         else:
             raise APIError('Syntax is incorrect!', status_code="404")
 
-
     return jsonify(out)
 
 

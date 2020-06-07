@@ -39,6 +39,13 @@ class Api:
                           'relationType': 'crm:' + link.property.code + 'i_'
                                           + link.property.i18n['en'].replace(' ', '_')})
 
+        for node in entity.nodes:
+            for root in node.root:  # pragma: nocover
+                print(g.nodes[root].name)
+                links.append({'label': g.nodes[root].name,
+                              'relationTo': url_for('api_entity', id_=g.nodes[root].id,
+                                                    _external=True)})
+
         return links
 
     @staticmethod
