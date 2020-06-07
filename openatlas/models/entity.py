@@ -378,7 +378,7 @@ class Entity:
 
     @staticmethod
     def get_by_menu_item(menu_item: str) -> List[Entity]:
-        # Possible class names: actor, event, place, reference, source
+        # Possible class names: actor, event, place, reference, source, object
         if menu_item == 'source':
             sql = Entity.build_sql(nodes=True) + """
                 WHERE e.class_code IN %(codes)s AND e.system_type = 'source content'
