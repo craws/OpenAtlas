@@ -69,7 +69,7 @@ class Api:
         return file_license
 
     @staticmethod
-    def get_entities_by_code(code_: str) -> List[Dict[str, Any]]:
+    def get_entities_by_menu_item(code_: str) -> List[Dict[str, Any]]:
         entities = []
         for entity in Entity.get_by_menu_item(code_):
             entities.append(Api.get_entity(entity.id))
