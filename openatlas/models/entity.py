@@ -135,7 +135,7 @@ class Entity:
                 self.set_dates(form)
             if hasattr(form, 'alias') and (
                 self.system_type == 'place' or
-                    self.class_.code in app.config['CLASS_CODES']['actor']):
+                self.class_.code in app.config['CLASS_CODES']['actor']):
                 self.update_aliases(form)
         if self.class_.code == 'E53':
             self.name = sanitize(self.name, 'node')
@@ -387,8 +387,8 @@ class Entity:
             sql = Entity.build_sql(nodes=True) + """
                 WHERE e.class_code IN %(codes)s AND e.system_type != 'file' GROUP BY e.id;"""
         else:
-            aliases = True if menu_item == 'actor' and current_user.settings[
-                'table_show_aliases'] else False
+            aliases = True if menu_item == 'actor' and current_user.is_authenticated and \
+                current_user.settings['table_show_aliases'] else False
             sql = Entity.build_sql(nodes=True if menu_item == 'event' else False,
                                    aliases=aliases) + """
                 WHERE e.class_code IN %(codes)s GROUP BY e.id;"""
