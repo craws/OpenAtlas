@@ -84,33 +84,10 @@ def entity_view(id_: int) -> Union[str, Response]:
         flash(_("This entity can't be viewed directly."), 'error')
         abort(400)
     # remove this after finished tab refactor
-    if entity.view_name not in ['actor', 'event', 'source', 'file', 'place']:
+    if entity.view_name not in ['actor', 'event', 'source', 'file', 'place', 'object']:
         return getattr(sys.modules[__name__], '{name}_view'.format(name=entity.view_name))(entity)
     return getattr(sys.modules['openatlas.views.' + entity.view_name],
                    '{name}_view'.format(name=entity.view_name))(entity)
-
-
-def object_view(object_: Entity) -> str:
-    object_.note = User.get_note(object_)
-    tables = {'source': Table(Table.HEADERS['source']), 'event': Table(Table.HEADERS['event'])}
-    for link_ in object_.get_links('P128'):
-        data = get_base_table_data(link_.range)
-        if is_authorized('contributor'):
-            url = url_for('link_delete', id_=link_.id, origin_id=object_.id)
-            data.append(
-                display_remove_link(url + '#tab-' + link_.range.table_name, link_.range.name))
-        tables['source'].rows.append(data)
-    for link_ in object_.get_links('P25', inverse=True):
-        data = get_base_table_data(link_.domain)
-        if is_authorized('contributor'):
-            url = url_for('link_delete', id_=link_.id, origin_id=object_.id)
-            data.append(
-                display_remove_link(url + '#tab-' + link_.range.table_name, link_.range.name))
-        tables['event'].rows.append(data)
-    return render_template('object/view.html',
-                           object_=object_,
-                           tables=tables,
-                           info=get_entity_data(object_))
 
 
 def reference_view(reference: Entity) -> str:

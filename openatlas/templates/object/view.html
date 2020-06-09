@@ -1,52 +1,25 @@
-{% extends "layout.html" %}
+{% extends "tabs.html" %}
 {% block title_name %}- {{ object_.name }}{% endblock %}
 {% block breadcrumb %}
     {{ [[_('object'), 'object_index'], object_.name]|crumb }}
 {% endblock %}
-{% block content %}
-<div>
-    <ul class="nav nav-tabs" role="tablist">
-        <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" aria-selected="true" href="#tab-info">{{ _('info')|uc_first }}</a></li>
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-source">{{ _('source')|uc_first }} {{ tables.source|format_tab_number }}</a></li>
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-event">{{ _('event')|uc_first }} {{ tables.event|format_tab_number }}</a></li>
-    </ul>
-    <div class="tab-content">
-        <div class="tab-pane fade show active" role="tabpanel" id="tab-info">
-            <div class="toolbar">
-                {{ 'menu/object'|manual }}
-                {% if 'contributor'|is_authorized %}
-                    {{ _('edit')|button(url_for('object_update', id_=object_.id)) }}
-                    {{ object_|display_delete_link }}
-                {% endif %}
-                {{ object_.id|bookmark_toggle }}
-            </div>
-            <h1>{{ object_.name }}</h1>
-            <div>
-                <div style="float:left;">
-                    {{ info|display_info }}
-                    {{ object_|note }}
-                    {{ object_|description }}
-                </div>
-                <div style="clear:both;"></div>
-            </div>
-        </div>
-        <div class="tab-pane fade" role="tabpanel" id="tab-source">
-            {% if 'contributor'|is_authorized %}
-                <div class="toolbar">
-                    {{ _('add')|button(url_for('entity_add_source', id_=object_.id)) }}
-                    {{ _('source')|button(url_for('source_insert', origin_id=object_.id)) }}
-                </div>
-            {% endif %}
-            {{ tables.source.display('source')|safe }}
-        </div>
-        <div class="tab-pane fade" role="tabpanel" id="tab-event">
-            {% if 'contributor'|is_authorized %}
-                <div class="toolbar">
-                    {{ 'E9'|get_class_name|button(url_for('event_insert', code='E9', origin_id=object_.id)) }}
-                </div>
-            {% endif %}
-            {{ tables.event.display('event')|safe }}
-        </div>
+
+{% block tab_info %}
+    <div class="toolbar">
+        {{ 'menu/object'|manual }}
+        {% if 'contributor'|is_authorized %}
+            {{ _('edit')|button(url_for('object_update', id_=object_.id)) }}
+            {{ object_|display_delete_link }}
+        {% endif %}
+        {{ object_.id|bookmark_toggle }}
     </div>
-</div>
+    <h1>{{ object_.name }}</h1>
+    <div>
+        <div style="float:left;">
+            {{ info|display_info }}
+            {{ object_|note }}
+            {{ object_|description }}
+        </div>
+        <div style="clear:both;"></div>
+    </div>
 {% endblock %}
