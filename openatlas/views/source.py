@@ -131,19 +131,19 @@ def save(form: FlaskForm, source: Optional[Entity] = None, origin: Optional[Enti
 def source_view(source: Entity) -> str:
     source.note = User.get_note(source)
     tabs = {
-        'info': {'header': _('info')},
-        'event': {'header': _('event')},
-        'actor': {'header': _('actor')},
+        'info': {'title': _('info')},
+        'event': {'title': _('event')},
+        'actor': {'title': _('actor')},
         'place': {
-            'header': _('place'),
+            'title': _('place'),
             'buttons': [button(_('add'), url_for('source_add', id_=source.id, class_name='place')),
-                        button( _('place'), url_for('place_insert', origin_id=source.id))]},
-        'feature': {'header': _('feature')},
-        'stratigraphic_unit': {'header': 'stratigraphic unit'},
-        'find': {'header': _('find')},
-        'human_remains': {'header': _('human remains')},
+                        button(_('place'), url_for('place_insert', origin_id=source.id))]},
+        'feature': {'title': _('feature')},
+        'stratigraphic_unit': {'title': 'stratigraphic unit'},
+        'find': {'title': _('find')},
+        'human_remains': {'title': _('human remains')},
         'reference': {
-            'header': _('reference'),
+            'title': _('reference'),
             'table': Table(Table.HEADERS['reference'] + ['page']),
             'buttons': [button(_('add'), url_for('entity_add_reference', id_=source.id)),
                         button(_('bibliography'), url_for('reference_insert',
@@ -156,11 +156,11 @@ def source_view(source: Entity) -> str:
                                                                 code='external_reference',
                                                                 origin_id=source.id))]},
         'text': {
-            'header': _('texts'),
+            'title': _('texts'),
             'table': Table(['text', 'type', 'content']),
             'buttons': [button(_('text'), url_for('translation_insert', source_id=source.id))]},
         'file': {
-            'header': _('files'),
+            'title': _('files'),
             'table': Table(Table.HEADERS['file'] + [_('main image')]),
             'buttons': [button(_('add'), url_for('entity_add_file', id_=source.id)),
                         button(_('file'), url_for('file_insert', origin_id=source.id))]}}

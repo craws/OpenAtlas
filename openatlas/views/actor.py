@@ -150,35 +150,35 @@ def save(form: ActorForm,
 
 def actor_view(actor: Entity) -> str:
     tabs = {'info': {
-                'header': _('info')},
+                'title': _('info')},
             'source': {
-                'header': _('source'),
+                'title': _('source'),
                 'table': Table(Table.HEADERS['source']),
                 'buttons': [button(_('add'), url_for('entity_add_source', id_=actor.id)),
                             button(_('source'), url_for('source_insert', origin_id=actor.id))]},
             'event': {
-                'header': _('event'),
+                'title': _('event'),
                 'buttons': [button(_('add'), url_for('involvement_insert', origin_id=actor.id))],
                 'table': Table(['event', 'class', 'involvement', 'first', 'last', 'description'],
                                defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])},
             'relation': {
-                'header': _('relation'),
+                'title': _('relation'),
                 'buttons': [button(_('add'), url_for('relation_insert', origin_id=actor.id))],
                 'table': Table(['relation', 'actor', 'first', 'last', 'description'],
                                defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])},
             'member_of': {
-                'header': _('member of'),
+                'title': _('member of'),
                 'buttons': [button(_('add'), url_for('membership_insert', origin_id=actor.id))],
                 'table': Table(['member of', 'function', 'first', 'last', 'description'],
                                defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])},
             'member': {
-                'header':
+                'title':
                     _('member') if actor.class_.code in app.config['CLASS_CODES']['group'] else '',
                 'buttons': [button(_('add'), url_for('member_insert', origin_id=actor.id))],
                 'table': Table(['member', 'function', 'first', 'last', 'description'],
                                defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])},
             'reference': {
-                'header': _('reference'),
+                'title': _('reference'),
                 'table': Table(Table.HEADERS['reference'] + ['page / link text']),
                 'buttons': [button(_('add'), url_for('entity_add_reference', id_=actor.id)),
                             button(_('bibliography'), url_for('reference_insert',
@@ -191,7 +191,7 @@ def actor_view(actor: Entity) -> str:
                                                                     code='external_reference',
                                                                     origin_id=actor.id))]},
             'file': {
-                'header': _('files'),
+                'title': _('files'),
                 'table': Table(Table.HEADERS['file'] + [_('main image')]),
                 'buttons': [button(_('add'), url_for('entity_add_file', id_=actor.id)),
                             button(_('file'), url_for('file_insert', origin_id=actor.id))]}}

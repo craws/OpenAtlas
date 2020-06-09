@@ -97,7 +97,5 @@ CLASS_CODES = {
     'reference': ['E31'],
     'source': ['E33']}
 
-SUBUNITS = ['feature', 'stratigraphic_unit', 'find', 'human_remains']
-
 CSS = {'button': {'primary': 'btn btn-outline-primary btn-sm',
                   'secondary': 'btn btn-secondary btn-sm'}}

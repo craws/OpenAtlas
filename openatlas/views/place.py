@@ -177,18 +177,18 @@ def place_update(id_: int) -> Union[str, Response]:
 
 def place_view(obj: Entity) -> str:
     tabs = {
-        'info': {'header': _('info')},
-        'source': {'header': _('source'),
+        'info': {'title': _('info')},
+        'source': {'title': _('source'),
                    'table': Table(Table.HEADERS['source']),
                    'buttons': [button(_('add'), url_for('entity_add_source', id_=obj.id)),
                                button(_('source'), url_for('source_insert', origin_id=obj.id))]},
-        'event': {'header': _('event'),
+        'event': {'title': _('event'),
                   'buttons': [],
                   'table': Table(Table.HEADERS['event'],
                                  defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])},
-        'actor': {'header': _('actor'),
+        'actor': {'title': _('actor'),
                   'table': Table([_('actor'), _('property'), _('class'), _('first'), _('last')])},
-        'reference': {'header': _('reference'),
+        'reference': {'title': _('reference'),
                       'table': Table(Table.HEADERS['reference'] + ['page / link text']),
                       'buttons': [button(_('add'), url_for('entity_add_reference', id_=obj.id)),
                                   button(_('bibliography'), url_for('reference_insert',
@@ -200,24 +200,24 @@ def place_view(obj: Entity) -> str:
                                   button(_('external reference'), url_for('reference_insert',
                                                                           code='external_reference',
                                                                           origin_id=obj.id))]},
-        'file': {'header': _('files'),
+        'file': {'title': _('files'),
                  'table': Table(Table.HEADERS['file'] + [_('main image')]),
                  'buttons': [button(_('add'), url_for('entity_add_file', id_=obj.id)),
                              button(_('file'), url_for('file_insert', origin_id=obj.id))]},
-        'feature': {'header': _('feature') if obj.system_type == 'place' else '',
+        'feature': {'title': _('feature') if obj.system_type == 'place' else '',
                     'table': Table(Table.HEADERS['place'] + [_('description')]),
                     'buttons': [button(_('feature'), url_for('place_insert', origin_id=obj.id))]},
         'stratigraphic_unit': {
-            'header': _('stratigraphic unit') if obj.system_type == 'feature' else '',
+            'title': _('stratigraphic unit') if obj.system_type == 'feature' else '',
             'table': Table(Table.HEADERS['place'] + [_('description')]),
             'buttons': [button(_('stratigraphic unit'),
                                url_for('place_insert', origin_id=obj.id))]},
         'find': {
-            'header': _('find') if obj.system_type == 'stratigraphic unit' else '',
+            'title': _('find') if obj.system_type == 'stratigraphic unit' else '',
             'table': Table(Table.HEADERS['place'] + [_('description')]),
             'buttons': [button(_('find'), url_for('place_insert', origin_id=obj.id))]},
         'human_remains': {
-            'header': _('human remains') if obj.system_type == 'stratigraphic unit' else '',
+            'title': _('human remains') if obj.system_type == 'stratigraphic unit' else '',
             'table': Table(Table.HEADERS['place'] + [_('description')]),
             'buttons': [button(_('human remains'), url_for('place_insert', origin_id=obj.id,
                                                            system_type='human_remains'))]}}
@@ -288,7 +288,6 @@ def place_view(obj: Entity) -> str:
             and gis_data['gisLineSelected'] == '[]' \
             and (not structure or not structure['super_id']):
         gis_data = {}
-    tabs['actor']['header'] = tabs['actor']['header'] if tabs['actor']['table'].rows else ''
     return render_template('place/view.html',
                            object_=obj,
                            tabs=tabs,

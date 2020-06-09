@@ -154,12 +154,12 @@ def file_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
 
 def file_view(file: Entity) -> str:
     path = get_file_path(file.id)
-    tabs = {'info': {'header': _('info')}}
+    tabs = {'info': {'title': _('info')}}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
                  'human_remains', 'reference']:
-        tabs[name] = {'header': _(name.replace('_', ' '))}
+        tabs[name] = {'title': _(name.replace('_', ' '))}
         tabs[name]['table'] = Table(Table.HEADERS[name] + (['page'] if name == 'reference' else []))
-    tabs['node'] = {'header': _('types'), 'table': Table(Table.HEADERS['node'])}
+    tabs['node'] = {'title': _('types'), 'table': Table(Table.HEADERS['node'])}
     tabs['source']['buttons'] = [
         button(_('add'), url_for('file_add', id_=file.id, class_name='source')),
         button(_('source'), url_for('source_insert', origin_id=file.id))]

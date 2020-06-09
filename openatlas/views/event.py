@@ -197,22 +197,22 @@ def save(form: FlaskForm,
 def event_view(event: Entity) -> str:
     # if tables.subs.rows
     tabs = {'info': {
-                'header': _('info')},
+                'title': _('info')},
             'subs': {
-                'header': _('sub events'),
+                'title': _('sub events'),
                 'table': Table(Table.HEADERS['event'])},
             'source': {
-                'header': _('source'),
+                'title': _('source'),
                 'table': Table(Table.HEADERS['source']),
                 'buttons': [button(_('add'), url_for('entity_add_source', id_=event.id)),
                             button(_('source'), url_for('source_insert', origin_id=event.id))]},
             'actor': {
-                'header': _('actor'),
+                'title': _('actor'),
                 'buttons': [button(_('add'), url_for('involvement_insert', origin_id=event.id))],
                 'table': Table(['actor', 'class', 'involvement', 'first', 'last', 'description'],
                                defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])},
             'reference': {
-                'header': _('reference'),
+                'title': _('reference'),
                 'table': Table(Table.HEADERS['reference'] + ['page / link text']),
                 'buttons': [button(_('add'), url_for('entity_add_reference', id_=event.id)),
                             button(_('bibliography'), url_for('reference_insert',
@@ -225,19 +225,15 @@ def event_view(event: Entity) -> str:
                                                                     code='external_reference',
                                                                     origin_id=event.id))]},
             'file': {
-                'header': _('files'),
+                'title': _('files'),
                 'table': Table(Table.HEADERS['file'] + [_('main image')]),
                 'buttons': [button(_('add'), url_for('entity_add_file', id_=event.id)),
                             button(_('file'), url_for('file_insert', origin_id=event.id))]}}
     for code in app.config['CLASS_CODES']['actor']:
         tabs['actor']['buttons'].append(
             button(g.classes[code].name, url_for('actor_insert', code=code, origin_id=event.id)))
-
     for sub_event in event.get_linked_entities('P117', inverse=True, nodes=True):
         tabs['subs']['table'].rows.append(get_base_table_data(sub_event))
-    if not tabs['subs']['table'].rows:
-        tabs['subs']['header'] = ''  # set header empty to prevent tab showing if no sub events
-
     for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
         first = link_.first
         if not link_.first and event.first:
