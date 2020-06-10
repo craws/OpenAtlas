@@ -84,7 +84,7 @@ def entity_view(id_: int) -> Union[str, Response]:
         flash(_("This entity can't be viewed directly."), 'error')
         abort(400)
     # remove this after finished tab refactor
-    if entity.view_name not in ['actor', 'event', 'source', 'file', 'place', 'object']:
+    if entity.view_name in ['node', 'reference']:
         return getattr(sys.modules[__name__], '{name}_view'.format(name=entity.view_name))(entity)
     return getattr(sys.modules['openatlas.views.' + entity.view_name],
                    '{name}_view'.format(name=entity.view_name))(entity)
@@ -173,10 +173,3 @@ def node_view(node: Node) -> str:
                            root=root,
                            info=get_entity_data(node),
                            profile_image_id=profile_image_id)
-
-
-def translation_view(translation: Entity) -> str:
-    return render_template('translation/view.html',
-                           info=get_entity_data(translation),
-                           source=translation.get_linked_entity('P73', True),
-                           translation=translation)
