@@ -1,5 +1,4 @@
-from flask import Response, json, jsonify, request
-from flask import render_template
+from flask import json, jsonify, render_template, request
 from werkzeug.wrappers import Response  # type: ignore
 
 from openatlas import app
@@ -14,10 +13,7 @@ from openatlas.util.util import api_access
 @app.route('/api/0.1/entity/<int:id_>', methods=['GET'])
 @api_access()  # type: ignore
 def api_entity(id_: int) -> Response:
-    if type(id_) is int:
-        return jsonify(Api.get_entity(id_=id_))
-    else:
-        raise APIError('Syntax is incorrect!', status_code="404b")
+    return jsonify(Api.get_entity(id_=id_))
 
 
 @app.route('/api/0.1/entity/download/<int:id_>', methods=['GET'])
@@ -31,7 +27,7 @@ def api_download_entity(id_: int) -> Response:
 
 @app.route('/api/0.1/', methods=['GET'])
 @api_access()  # type: ignore
-def api_get_entities_by_json() -> Response:  # pragma: no cover
+def api_get_entities_by_json() -> Response:
     out = []
     req_data = request.get_json()
     if 'id' in req_data:
