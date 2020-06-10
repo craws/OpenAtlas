@@ -71,8 +71,6 @@ class ApiTests(TestBaseCase):
             # Test for error codes
             rv = self.app.get(url_for('api_entity', id_=99999999))
             assert b'404a' in rv.data
-            # rv = self.app.get(url_for('api_entity', id_="actor"))
-            # assert b'404b' in rv.data
             rv = self.app.get(url_for('api_get_latest', limit=99999))
             assert b'404e' in rv.data
             rv = self.app.get(url_for('api_get_by_class', class_code='E19'))
