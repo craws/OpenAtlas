@@ -42,7 +42,7 @@ class APIError(Exception):
         rv['detail'] = str(self.error_detail[self.error_code][1])
         rv['instance'] = request.base_url
         rv['timestamp'] = str(datetime.now())
-        if self.error_code in [403, 401]:
+        if self.error_code in ["403", "401"]:
             rv['help'] = "https://redmine.craws.net/projects/uni/wiki/API_Authentication"
         else:
             rv['help'] = "https://redmine.craws.net/projects/uni/wiki/Api"
