@@ -25,6 +25,8 @@ class Api:
     @staticmethod
     def get_links(entity: Entity) -> List[Dict[str, str]]:
         links = []
+
+
         for link in Link.get_links(entity.id):  # pragma: nocover
             links.append({'label': link.range.name,
                           'relationTo': url_for('api_entity', id_=link.range.id, _external=True),
@@ -39,20 +41,25 @@ class Api:
                           'relationType': 'crm:' + link.property.code + 'i_'
                                           + link.property.i18n['en'].replace(' ', '_')})
         #  Todo: If we get to the location node or to the p2 node, it won't work. Make an if statment to controll this.
-        #  Sample Id: 105 for location and 63 for p2 
+        #  Sample Id: 105 for location and 63 for p2
         for node in entity.nodes:
-            for root in node.root:  # pragma: nocover
-                links.append({'label': g.nodes[root].name,
-                              'relationTo': url_for('api_entity', id_=g.nodes[root].id,
-                                                    _external=True),
-                              'relationType': 'crm:' + g.properties['P2'].code + '_' +
-                                          g.properties['P2'].i18n['en'].replace(' ', '_')})
+            for root in node.root:
+                if not any(d.get('relationTo', None) == url_for('api_entity', id_=g.nodes[root].id,
+                                                        _external=True) for d in links): # pragma: nocover
+                    links.append({'label': g.nodes[root].name,
+                                  'relationTo': url_for('api_entity', id_=g.nodes[root].id,
+                                                        _external=True),
+                                  'relationType': 'crm:' + g.properties['P2'].code + '_' +
+                                              g.properties['P2'].i18n['en'].replace(' ', '_'),
+                                  'test': "TEST"})
 
         for place in entity.location.nodes:
-            links.append({'label': place.name,
-                          'relationTo': url_for('api_entity', id_=place.id, _external=True),
-                          'relationType': 'crm:' + g.properties['P89'].code + '_' +
-                                          g.properties['P89'].i18n['en'].replace(' ', '_')})
+            if not any(d.get('relationTo', None) == url_for('api_entity', id_=place.id, _external=True) for d in links): # pragma: nocover
+                links.append({'label': place.name,
+                              'relationTo': url_for('api_entity', id_=place.id, _external=True),
+                              'relationType': 'crm:' + g.properties['P89'].code + '_' +
+                                              g.properties['P89'].i18n['en'].replace(' ', '_'),
+                                  'test': "places"})
         return links
 
     @staticmethod
