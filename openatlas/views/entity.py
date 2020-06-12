@@ -12,7 +12,6 @@ from openatlas.forms.forms import build_table_form
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
-from openatlas.models.user import User
 from openatlas.util.table import Table
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  get_profile_image_table_link, is_authorized, link, required_group,
@@ -84,45 +83,10 @@ def entity_view(id_: int) -> Union[str, Response]:
         flash(_("This entity can't be viewed directly."), 'error')
         abort(400)
     # remove this after finished tab refactor
-    if entity.view_name in ['node', 'reference']:
+    if entity.view_name in ['node']:
         return getattr(sys.modules[__name__], '{name}_view'.format(name=entity.view_name))(entity)
     return getattr(sys.modules['openatlas.views.' + entity.view_name],
                    '{name}_view'.format(name=entity.view_name))(entity)
-
-
-def reference_view(reference: Entity) -> str:
-    reference.note = User.get_note(reference)
-    tables = {'file': Table(Table.HEADERS['file'] + ['page', _('main image')])}
-    for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
-                 'human_remains']:
-        header_label = 'link text' if reference.system_type == 'external reference' else 'page'
-        tables[name] = Table(Table.HEADERS[name] + [header_label])
-    for link_ in reference.get_links('P67', True):
-        domain = link_.domain
-        data = get_base_table_data(domain)
-        if is_authorized('contributor'):
-            url = url_for('link_delete', id_=link_.id, origin_id=reference.id) + '#tab-file'
-            data.append(display_remove_link(url, domain.name))
-        tables['file'].rows.append(data)
-    profile_image_id = reference.get_profile_image_id()
-    for link_ in reference.get_links(['P67', 'P128']):
-        range_ = link_.range
-        data = get_base_table_data(range_)
-        data.append(link_.description)
-        if range_.view_name == 'file':  # pragma: no cover
-            ext = data[3].replace('.', '')
-            data.append(get_profile_image_table_link(range_, reference, ext, profile_image_id))
-        if is_authorized('contributor'):
-            url = url_for('reference_link_update', link_id=link_.id, origin_id=reference.id)
-            data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
-            url = url_for('link_delete', id_=link_.id, origin_id=reference.id)
-            data.append(display_remove_link(url + '#tab-' + range_.table_name, range_.name))
-        tables[range_.table_name].rows.append(data)
-    return render_template('reference/view.html',
-                           reference=reference,
-                           tables=tables,
-                           info=get_entity_data(reference),
-                           profile_image_id=profile_image_id)
 
 
 def node_view(node: Node) -> str:
