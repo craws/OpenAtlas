@@ -13,6 +13,7 @@ from openatlas.forms.forms import TableField, build_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.user import User
+from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (add_system_data, add_type_data, button, display_remove_link,
                                  format_entry_begin, format_entry_end, get_appearance,
@@ -149,57 +150,55 @@ def save(form: ActorForm,
 
 
 def actor_view(actor: Entity) -> str:
-    tabs = {'info': {
-                'title': _('info')},
-            'source': {
-                'title': _('source'),
-                'table': Table(Table.HEADERS['source']),
-                'buttons': [button(_('add'), url_for('entity_add_source', id_=actor.id)),
-                            button(_('source'), url_for('source_insert', origin_id=actor.id))]},
-            'event': {
-                'title': _('event'),
-                'buttons': [button(_('add'), url_for('involvement_insert', origin_id=actor.id))],
-                'table': Table(['event', 'class', 'involvement', 'first', 'last', 'description'],
-                               defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])},
-            'relation': {
-                'title': _('relation'),
-                'buttons': [button(_('add'), url_for('relation_insert', origin_id=actor.id))],
-                'table': Table(['relation', 'actor', 'first', 'last', 'description'],
-                               defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])},
-            'member_of': {
-                'title': _('member of'),
-                'buttons': [button(_('add'), url_for('membership_insert', origin_id=actor.id))],
-                'table': Table(['member of', 'function', 'first', 'last', 'description'],
-                               defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])},
-            'member': {
-                'title':
-                    _('member') if actor.class_.code in app.config['CLASS_CODES']['group'] else '',
-                'buttons': [button(_('add'), url_for('member_insert', origin_id=actor.id))],
-                'table': Table(['member', 'function', 'first', 'last', 'description'],
-                               defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])},
-            'reference': {
-                'title': _('reference'),
-                'table': Table(Table.HEADERS['reference'] + ['page / link text']),
-                'buttons': [button(_('add'), url_for('entity_add_reference', id_=actor.id)),
-                            button(_('bibliography'), url_for('reference_insert',
-                                                              code='bibliography',
-                                                              origin_id=actor.id)),
-                            button(_('edition'), url_for('reference_insert',
-                                                         code='edition',
-                                                         origin_id=actor.id)),
-                            button(_('external reference'), url_for('reference_insert',
-                                                                    code='external_reference',
-                                                                    origin_id=actor.id))]},
+    tabs = {'info': Tab('info'),
+            'source': Tab(
+                'source',
+                table=Table(Table.HEADERS['source']),
+                buttons=[button(_('add'), url_for('entity_add_source', id_=actor.id)),
+                         button(_('source'), url_for('source_insert', origin_id=actor.id))]),
+            'event': Tab(
+                'event',
+                buttons=[button(_('add'), url_for('involvement_insert', origin_id=actor.id))],
+                table=Table(['event', 'class', 'involvement', 'first', 'last', 'description'],
+                            defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])),
+            'relation': Tab(
+                'relation',
+                buttons=[button(_('add'), url_for('relation_insert', origin_id=actor.id))],
+                table=Table(['relation', 'actor', 'first', 'last', 'description'],
+                            defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])),
+            'member_of': Tab(
+                'member_of',
+                buttons=[button(_('add'), url_for('membership_insert', origin_id=actor.id))],
+                table=Table(['member of', 'function', 'first', 'last', 'description'],
+                            defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])),
+            'member': Tab(
+                'member',
+                buttons=[button(_('add'), url_for('member_insert', origin_id=actor.id))],
+                table=Table(['member', 'function', 'first', 'last', 'description'],
+                            defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])),
+            'reference': Tab(
+                'reference',
+                table=Table(Table.HEADERS['reference'] + ['page / link text']),
+                buttons=[button(_('add'), url_for('entity_add_reference', id_=actor.id)),
+                         button(_('bibliography'), url_for('reference_insert',
+                                                           code='bibliography',
+                                                           origin_id=actor.id)),
+                         button(_('edition'), url_for('reference_insert',
+                                                      code='edition',
+                                                      origin_id=actor.id)),
+                         button(_('external reference'), url_for('reference_insert',
+                                                                 code='external_reference',
+                                                                 origin_id=actor.id))]),
             'file': {
                 'title': _('files'),
                 'table': Table(Table.HEADERS['file'] + [_('main image')]),
                 'buttons': [button(_('add'), url_for('entity_add_file', id_=actor.id)),
                             button(_('file'), url_for('file_insert', origin_id=actor.id))]}}
     for code in app.config['CLASS_CODES']['actor']:
-        tabs['relation']['buttons'].append(
+        tabs['relation'].buttons.append(
             button(g.classes[code].name, url_for('actor_insert', code=code, origin_id=actor.id)))
     for code in app.config['CLASS_CODES']['event']:
-        tabs['event']['buttons'].append(
+        tabs['event'].buttons.append(
             button(g.classes[code].name, url_for('event_insert', code=code, origin_id=actor.id)))
 
     actor.note = User.get_note(actor)
@@ -223,7 +222,7 @@ def actor_view(actor: Entity) -> str:
         if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=actor.id)
             data_.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
-        tabs[domain.view_name]['table'].rows.append(data_)
+        tabs[domain.view_name].table.rows.append(data_)
 
     # Todo: Performance - getting every place of every object for every event is very costly
     event_links = actor.get_links(['P11', 'P14', 'P22', 'P23', 'P25'], True)
@@ -257,7 +256,7 @@ def actor_view(actor: Entity) -> str:
             else:
                 data.append('')
             data.append(display_remove_link(unlink_url, link_.domain.name))
-        tabs['event']['table'].rows.append(data)
+        tabs['event'].table.rows.append(data)
 
     # Add info of dates and places
     begin_place = actor.get_linked_entity('OA8')
@@ -304,7 +303,7 @@ def actor_view(actor: Entity) -> str:
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-relation'
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             data.append(display_remove_link(unlink_url, related.name))
-        tabs['relation']['table'].rows.append(data)
+        tabs['relation'].table.rows.append(data)
     for link_ in actor.get_links('P107', True):
         data = ([link(link_.domain),
                  link_.type.name if link_.type else '',
@@ -317,8 +316,10 @@ def actor_view(actor: Entity) -> str:
                                  origin_id=actor.id) + '#tab-member-of'
             data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
             data.append(display_remove_link(unlink_url, link_.domain.name))
-        tabs['member_of']['table'].rows.append(data)
-    if actor.class_.code in app.config['CLASS_CODES']['group']:
+        tabs['member_of'].table.rows.append(data)
+    if actor.class_.code not in app.config['CLASS_CODES']['group']:
+        del tabs['member']
+    else:
         for link_ in actor.get_links('P107'):
             data = ([link(link_.range),
                      link_.type.name if link_.type else '',
@@ -331,7 +332,7 @@ def actor_view(actor: Entity) -> str:
                                      origin_id=actor.id) + '#tab-member'
                 data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
                 data.append(display_remove_link(unlink_url, link_.range.name))
-            tabs['member']['table'].rows.append(data)
+            tabs['member'].table.rows.append(data)
     gis_data = Gis.get_all(objects) if objects else None
     if gis_data:
         if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]':
