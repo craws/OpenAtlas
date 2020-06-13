@@ -18,6 +18,7 @@ from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.user import User
+from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (button, display_remove_link, get_base_table_data, get_entity_data,
                                  get_profile_image_table_link, is_authorized, link, required_group,
@@ -176,59 +177,66 @@ def place_update(id_: int) -> Union[str, Response]:
 
 
 def place_view(obj: Entity) -> str:
-    tabs = {
-        'info': {'title': _('info')},
-        'source': {'title': _('source'),
-                   'table': Table(Table.HEADERS['source']),
-                   'buttons': [button(_('add'), url_for('entity_add_source', id_=obj.id)),
-                               button(_('source'), url_for('source_insert', origin_id=obj.id))]},
-        'event': {'title': _('event'),
-                  'buttons': [],
-                  'table': Table(Table.HEADERS['event'],
-                                 defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])},
-        'actor': {'title': _('actor'),
-                  'table': Table([_('actor'), _('property'), _('class'), _('first'), _('last')])},
-        'reference': {'title': _('reference'),
-                      'table': Table(Table.HEADERS['reference'] + ['page / link text']),
-                      'buttons': [button(_('add'), url_for('entity_add_reference', id_=obj.id)),
-                                  button(_('bibliography'), url_for('reference_insert',
-                                                                    code='bibliography',
-                                                                    origin_id=obj.id)),
-                                  button(_('edition'), url_for('reference_insert',
-                                                               code='edition',
-                                                               origin_id=obj.id)),
-                                  button(_('external reference'), url_for('reference_insert',
-                                                                          code='external_reference',
-                                                                          origin_id=obj.id))]},
-        'file': {'title': _('files'),
-                 'table': Table(Table.HEADERS['file'] + [_('main image')]),
-                 'buttons': [button(_('add'), url_for('entity_add_file', id_=obj.id)),
-                             button(_('file'), url_for('file_insert', origin_id=obj.id))]},
-        'feature': {'title': _('feature') if obj.system_type == 'place' else '',
-                    'table': Table(Table.HEADERS['place'] + [_('description')]),
-                    'buttons': [button(_('feature'), url_for('place_insert', origin_id=obj.id))]},
-        'stratigraphic_unit': {
-            'title': _('stratigraphic unit') if obj.system_type == 'feature' else '',
-            'table': Table(Table.HEADERS['place'] + [_('description')]),
-            'buttons': [button(_('stratigraphic unit'),
-                               url_for('place_insert', origin_id=obj.id))]},
-        'find': {
-            'title': _('find') if obj.system_type == 'stratigraphic unit' else '',
-            'table': Table(Table.HEADERS['place'] + [_('description')]),
-            'buttons': [button(_('find'), url_for('place_insert', origin_id=obj.id))]},
-        'human_remains': {
-            'title': _('human remains') if obj.system_type == 'stratigraphic unit' else '',
-            'table': Table(Table.HEADERS['place'] + [_('description')]),
-            'buttons': [button(_('human remains'), url_for('place_insert', origin_id=obj.id,
-                                                           system_type='human_remains'))]}}
+    tabs = {'info': Tab('info'),
+            'source': Tab(
+                'source',
+                table=Table(Table.HEADERS['source']),
+                buttons=[button(_('add'), url_for('entity_add_source', id_=obj.id)),
+                         button(_('source'), url_for('source_insert', origin_id=obj.id))]),
+            'event': Tab(
+                'event',
+                table=Table(Table.HEADERS['event'],
+                            defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])),
+            'actor': Tab(
+                'actor',
+                table=Table([_('actor'), _('property'), _('class'), _('first'), _('last')])),
+            'reference': Tab('reference',
+                             table=Table(Table.HEADERS['reference'] + ['page / link text']),
+                             buttons=[
+                                 button(_('add'), url_for('entity_add_reference', id_=obj.id)),
+                                 button(_('bibliography'), url_for('reference_insert',
+                                                                   code='bibliography',
+                                                                   origin_id=obj.id)),
+                                 button(_('edition'), url_for('reference_insert',
+                                                              code='edition',
+                                                              origin_id=obj.id)),
+                                 button(_('external reference'), url_for('reference_insert',
+                                                                         code='external_reference',
+                                                                         origin_id=obj.id))]),
+            'file': Tab('files',
+                        table=Table(Table.HEADERS['file'] + [_('main image')]),
+                        buttons=[button(_('add'), url_for('entity_add_file', id_=obj.id)),
+                                 button(_('file'), url_for('file_insert', origin_id=obj.id))]),
+            'feature': Tab(
+                'feature',
+                table=Table(Table.HEADERS['place'] + [_('description')]),
+                buttons=[button(_('feature'), url_for('place_insert', origin_id=obj.id))]),
+            'stratigraphic_unit': Tab(
+                'stratigraphic_unit',
+                table=Table(Table.HEADERS['place'] + [_('description')]),
+                buttons=[button(_('stratigraphic unit'),
+                                url_for('place_insert', origin_id=obj.id))]),
+            'find': Tab('find',
+                        table=Table(Table.HEADERS['place'] + [_('description')]),
+                        buttons=[button(_('find'), url_for('place_insert', origin_id=obj.id))]),
+            'human_remains': Tab(
+                'human_remains',
+                table=Table(Table.HEADERS['place'] + [_('description')]),
+                buttons=[button(_('human remains'), url_for('place_insert',
+                                                            origin_id=obj.id,
+                                                            system_type='human_remains'))])}
+    # Tab('feature' if obj.system_type == 'place' else '',
+    # 'stratigraphic unit') if obj.system_type == 'feature' else '',
+    # 'title': _('find') if obj.system_type == 'stratigraphic unit' else '',
+    # _('human remains') if obj.system_type == 'stratigraphic unit' else '',
     for code in app.config['CLASS_CODES']['event']:
-        tabs['event']['buttons'].append(button(
+        tabs['event'].buttons.append(button(
             g.classes[code].name, url_for('event_insert', code=code, origin_id=obj.id)))
     obj.note = User.get_note(obj)
     location = obj.get_linked_entity_safe('P53', nodes=True)
     profile_image_id = obj.get_profile_image_id()
     if current_user.settings['module_map_overlay'] and is_authorized('editor'):
-        tabs['file']['table'].header.append(uc_first(_('overlay')))
+        tabs['file'].table.header.append(uc_first(_('overlay')))
     overlays = Overlay.get_by_object(obj)
     for link_ in obj.get_links('P67', inverse=True):
         domain = link_.domain
@@ -261,27 +269,27 @@ def place_view(obj: Entity) -> str:
         if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=obj.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
-        tabs[domain.view_name]['table'].rows.append(data)
+        tabs[domain.view_name].table.rows.append(data)
     event_ids = []  # Keep track of already inserted events to prevent doubles
     for event in location.get_linked_entities(['P7', 'P26', 'P27'], inverse=True):
-        tabs['event']['table'].rows.append(get_base_table_data(event))
+        tabs['event'].table.rows.append(get_base_table_data(event))
         event_ids.append(event.id)
     for event in obj.get_linked_entities('P24', inverse=True):
         if event.id not in event_ids:  # Don't add again if already in table
-            tabs['event']['table'].rows.append(get_base_table_data(event))
+            tabs['event'].table.rows.append(get_base_table_data(event))
     for link_ in location.get_links(['P74', 'OA8', 'OA9'], inverse=True):
         actor = Entity.get_by_id(link_.domain.id, view_name='actor')
-        tabs['actor']['table'].rows.append([link(actor),
-                                            g.properties[link_.property.code].name,
-                                            actor.class_.name,
-                                            actor.first,
-                                            actor.last])
+        tabs['actor'].table.rows.append([link(actor),
+                                         g.properties[link_.property.code].name,
+                                         actor.class_.name,
+                                         actor.first,
+                                         actor.last])
     structure = get_structure(obj)
     if structure:
         for entity in structure['subunits']:
             data = get_base_table_data(entity)
             data.append(entity.description)
-            tabs[entity.system_type.replace(' ', '_')]['table'].rows.append(data)
+            tabs[entity.system_type.replace(' ', '_')].table.rows.append(data)
     gis_data = Gis.get_all([obj], structure)
     if gis_data['gisPointSelected'] == '[]' \
             and gis_data['gisPolygonSelected'] == '[]' \

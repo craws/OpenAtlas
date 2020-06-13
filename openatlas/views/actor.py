@@ -189,11 +189,10 @@ def actor_view(actor: Entity) -> str:
                          button(_('external reference'), url_for('reference_insert',
                                                                  code='external_reference',
                                                                  origin_id=actor.id))]),
-            'file': {
-                'title': _('files'),
-                'table': Table(Table.HEADERS['file'] + [_('main image')]),
-                'buttons': [button(_('add'), url_for('entity_add_file', id_=actor.id)),
-                            button(_('file'), url_for('file_insert', origin_id=actor.id))]}}
+            'file': Tab('files',
+                        table=Table(Table.HEADERS['file'] + [_('main image')]),
+                        buttons=[button(_('add'), url_for('entity_add_file', id_=actor.id)),
+                                 button(_('file'), url_for('file_insert', origin_id=actor.id))])}
     for code in app.config['CLASS_CODES']['actor']:
         tabs['relation'].buttons.append(
             button(g.classes[code].name, url_for('actor_insert', code=code, origin_id=actor.id)))

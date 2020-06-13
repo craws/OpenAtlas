@@ -13,7 +13,7 @@ class Tab:
                  table: Optional[Table] = None) -> None:
         self.id = id_
         self.title = uc_first(_(id_.replace('_', ' ')))
-        self.buttons = buttons
+        self.buttons = buttons if buttons else []
         self.table = table
 
         # needed for translations
