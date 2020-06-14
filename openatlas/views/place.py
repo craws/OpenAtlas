@@ -203,7 +203,7 @@ def place_view(obj: Entity) -> str:
                                  button(_('external reference'), url_for('reference_insert',
                                                                          code='external_reference',
                                                                          origin_id=obj.id))]),
-            'file': Tab('files',
+            'file': Tab('file',
                         table=Table(Table.HEADERS['file'] + [_('main image')]),
                         buttons=[button(_('add'), url_for('entity_add_file', id_=obj.id)),
                                  button(_('file'), url_for('file_insert', origin_id=obj.id))])}

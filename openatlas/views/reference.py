@@ -15,6 +15,7 @@ from openatlas.forms.forms import TableField, build_form
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.user import User
+from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (button, display_remove_link, get_base_table_data, get_entity_data,
                                  get_profile_image_table_link, is_authorized, link,
@@ -163,25 +164,24 @@ def reference_update(id_: int) -> Union[str, Response]:
 
 
 def reference_view(reference: Entity) -> str:
-    tabs = {'info': {'title': _('info')}}
+    tabs = {'info': Tab('info')}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
                  'human_remains', 'file']:
         if name == 'file':
-            tabs['file'] = {'title': _('files'),
-                            'table': Table(Table.HEADERS['file'] + ['page', _('main image')])}
+            tabs['file'] = Tab('file',
+                               table=Table(Table.HEADERS['file'] + ['page', _('main image')]))
         else:
             header_label = 'link text' if reference.system_type == 'external reference' else 'page'
-            tabs[name] = {'title': _(name.replace('_', ' ')),
-                          'table': Table(Table.HEADERS[name] + [header_label])}
+            tabs[name] = Tab(name, table=Table(Table.HEADERS[name] + [header_label]))
         if name in ['source', 'place', 'file']:
-            tabs[name]['buttons'] = [
+            tabs[name].buttons = [
                 button(_('add'), url_for('reference_add', id_=reference.id, class_name=name)),
                 button(_(name), url_for(name + '_insert', origin_id=reference.id))]
         elif name in ['event', 'actor']:
-            tabs[name]['buttons'] = [
+            tabs[name].buttons = [
                 button(_('add'), url_for('reference_add', id_=reference.id, class_name=name))]
             for code in app.config['CLASS_CODES'][name]:
-                tabs[name]['buttons'].append(
+                tabs[name].buttons.append(
                     button(g.classes[code].name,
                            url_for(name + '_insert', code=code, origin_id=reference.id)))
 
@@ -191,7 +191,7 @@ def reference_view(reference: Entity) -> str:
         if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=reference.id) + '#tab-file'
             data.append(display_remove_link(url, domain.name))
-        tabs['file']['table'].rows.append(data)
+        tabs['file'].table.rows.append(data)
     profile_image_id = reference.get_profile_image_id()
     for link_ in reference.get_links(['P67', 'P128']):
         range_ = link_.range
@@ -205,7 +205,7 @@ def reference_view(reference: Entity) -> str:
             data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
             url = url_for('link_delete', id_=link_.id, origin_id=reference.id)
             data.append(display_remove_link(url + '#tab-' + range_.table_name, range_.name))
-        tabs[range_.table_name]['table'].rows.append(data)
+        tabs[range_.table_name].table.rows.append(data)
     reference.note = User.get_note(reference)
     return render_template('reference/view.html',
                            reference=reference,

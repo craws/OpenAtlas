@@ -223,7 +223,7 @@ def event_view(event: Entity) -> str:
                                                                  code='external_reference',
                                                                  origin_id=event.id))]),
             'file': Tab(
-                'files',
+                'file',
                 table=Table(Table.HEADERS['file'] + [_('main image')]),
                 buttons=[button(_('add'), url_for('entity_add_file', id_=event.id)),
                          button(_('file'), url_for('file_insert', origin_id=event.id))])}

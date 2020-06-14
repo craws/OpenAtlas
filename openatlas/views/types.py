@@ -14,6 +14,7 @@ from openatlas.forms.forms import build_move_form, build_node_form
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
+from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (button, display_remove_link, get_base_table_data, get_entity_data,
                                  get_profile_image_table_link, is_authorized, link, required_group,
@@ -146,7 +147,7 @@ def walk_tree(nodes: List[int]) -> List[Dict[str, Any]]:
 
 
 def tree_select(name: str) -> str:
-    html = """
+    return """
         <div id="{name}-tree"></div>
         <script>
             $(document).ready(function () {{
@@ -167,21 +168,20 @@ def tree_select(name: str) -> str:
         </script>""".format(min_chars=session['settings']['minimum_jstree_search'],
                             name=sanitize(name),
                             tree_data=walk_tree(Node.get_nodes(name)))
-    return html
 
 
 def node_view(node: Node) -> str:
     root = g.nodes[node.root[-1]] if node.root else None
     super_ = g.nodes[node.root[0]] if node.root else None
     tabs = {
-        'info': {'title': _('info')},
-        'subs': {'title': _('subs')},
-        'entities': {'title': _('entities'),
-                     'buttons': [
-                         button(_('move entities'), url_for('node_move_entities', id_=node.id))]},
-        'file': {'title': _('file'),
-                 'buttons': [button(_('add'), url_for('entity_add_file', id_=node.id)),
-                             button(_('file'), url_for('file_insert', origin_id=node.id))]}}
+        'info': Tab('info'),
+        'subs': Tab('subs'),
+        'entities': Tab('entities',
+                        buttons=[button(_('move entities'),
+                                        url_for('node_move_entities', id_=node.id))]),
+        'file': Tab('file',
+                    buttons=[button(_('add'), url_for('entity_add_file', id_=node.id)),
+                             button(_('file'), url_for('file_insert', origin_id=node.id))])}
     header = [_('name'), _('class'), _('info')]
     if root and root.value_type:  # pragma: no cover
         header = [_('name'), _('value'), _('class'), _('info')]
@@ -221,10 +221,10 @@ def node_view(node: Node) -> str:
         sub = g.nodes[sub_id]
         tables['subs'].rows.append([link(sub), sub.count, sub.description])
 
-    tabs['subs']['table'] = tables['subs']
-    tabs['entities']['table'] = tables['entities'] if tables['entities'].rows else \
+    tabs['subs'].table = tables['subs']
+    tabs['entities'].table = tables['entities'] if tables['entities'].rows else \
         tables['link_entities']
-    tabs['file']['table'] = tables['file']
+    tabs['file'].table = tables['file']
 
     return render_template('types/view.html',
                            node=node,
