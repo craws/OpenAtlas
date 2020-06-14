@@ -40,26 +40,6 @@ class Api:
                           'relationTo': url_for('api_entity', id_=link.domain.id, _external=True),
                           'relationType': 'crm:' + link.property.code + 'i_'
                                           + link.property.i18n['en'].replace(' ', '_')})
-        #  Todo: If we get to the location node or to the p2 node, it won't work. Make an if statment to controll this.
-        #  Sample Id: 105 for location and 63 for p2
-        for node in entity.nodes:
-            for root in node.root:
-                if not any(d.get('relationTo', None) == url_for('api_entity', id_=g.nodes[root].id,
-                                                        _external=True) for d in links): # pragma: nocover
-                    links.append({'label': g.nodes[root].name,
-                                  'relationTo': url_for('api_entity', id_=g.nodes[root].id,
-                                                        _external=True),
-                                  'relationType': 'crm:' + g.properties['P2'].code + '_' +
-                                              g.properties['P2'].i18n['en'].replace(' ', '_'),
-                                  'test': "TEST"})
-
-        for place in entity.location.nodes:
-            if not any(d.get('relationTo', None) == url_for('api_entity', id_=place.id, _external=True) for d in links): # pragma: nocover
-                links.append({'label': place.name,
-                              'relationTo': url_for('api_entity', id_=place.id, _external=True),
-                              'relationType': 'crm:' + g.properties['P89'].code + '_' +
-                                              g.properties['P89'].i18n['en'].replace(' ', '_'),
-                                  'test': "places"})
         return links
 
     @staticmethod
