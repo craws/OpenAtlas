@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import Dict
 
-from flask import request
+from flask import jsonify, request
 
 
 class APIError(Exception):
@@ -47,4 +47,4 @@ class APIError(Exception):
         else:
             rv['help'] = "https://redmine.craws.net/projects/uni/wiki/Api"
 
-        return rv
+        return jsonify(rv)
