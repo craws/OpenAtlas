@@ -216,7 +216,7 @@ class User(UserMixin):  # type: ignore
                     'newsletter': False,
                     'table_rows': session['settings']['default_table_rows'],
                     'table_show_aliases': True,
-                    'show_email': False,}
+                    'show_email': False}
         sql = 'SELECT "name", value FROM web.user_settings WHERE user_id = %(user_id)s;'
         g.execute(sql, {'user_id': user_id})
         form = ProfileForm()

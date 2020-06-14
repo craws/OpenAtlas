@@ -1,8 +1,6 @@
 # Don't edit this file. To override settings please use instance/production.py
 import pathlib
 
-from flask_babel import lazy_gettext as _
-
 from openatlas import app
 
 VERSION = '5.3.0'
@@ -62,14 +60,6 @@ LOG_LEVELS = {0: 'emergency',
 PROPERTY_TYPES = ['Actor Actor Relation', 'Actor Function', 'Involvement']
 BASE_TYPES = ['Actor', 'Bibliography', 'Edition', 'Event', 'Feature', 'Find', 'Human Remains',
               'Information Carrier', 'Place', 'Source', 'Stratigraphic Unit']
-
-# Feedback
-FEEDBACK_SUBJECTS = {_('suggestion').title(): _('suggestion').title(),
-                     _('question').title(): _('question').title(),
-                     _('problem').title(): _('problem').title()}
-
-# Needed for translation
-_('node')
 
 # Mappings between model and user interface
 CODE_CLASS = {

@@ -22,8 +22,10 @@ from openatlas.util.util import (bookmark_toggle, format_date, link, required_gr
 
 class FeedbackForm(FlaskForm):  # type: ignore
     subject = SelectField(_('subject'),
-                          choices=list(app.config['FEEDBACK_SUBJECTS'].items()),
-                          render_kw={'autofocus': True})
+                          render_kw={'autofocus': True},
+                          choices=(('suggestion', _('suggestion')),
+                                   ('question', _('question')),
+                                   ('problem', _('problem'))))
     description = TextAreaField(_('description'), [InputRequired()])
     send = SubmitField(_('send'))
 
@@ -88,7 +90,7 @@ def set_locale(language: str) -> Response:
 def index_feedback() -> Union[str, Response]:
     form = FeedbackForm()
     if form.validate_on_submit() and session['settings']['mail']:  # pragma: no cover
-        subject = form.subject.data + ' from ' + session['settings']['site_name']
+        subject = uc_first(form.subject.data) + ' from ' + session['settings']['site_name']
         user = current_user
         body = form.subject.data + ' from ' + user.username + ' (' + str(user.id) + ') '
         body += user.email + ' at ' + request.headers['Host'] + "\n\n" + form.description.data
@@ -108,28 +110,28 @@ def index_content(item: str) -> str:
 @app.errorhandler(400)
 def bad_request(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:  # pragma: no cover
     if request.path.startswith('/api'):
-        return APIError('Bad Request', status_code="400").to_dict(), 400
+        return str(APIError('Bad Request', status_code="400").to_dict()), 400
     return render_template('400.html', e=e), 400
 
 
 @app.errorhandler(403)
 def forbidden(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
     if request.path.startswith('/api'):
-        return APIError('Forbidden', status_code="403").to_dict(), 403
+        return str(APIError('Forbidden', status_code="403").to_dict()), 403
     return render_template('403.html', e=e), 403
 
 
 @app.errorhandler(404)
 def page_not_found(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
     if request.path.startswith('/api'):
-        return APIError('Syntax is incorrect!', status_code="404").to_dict(), 404
+        return str(APIError('Syntax is incorrect!', status_code="404").to_dict()), 404
     return render_template('404.html', e=e), 404
 
 
 @app.errorhandler(405)
 def method_not_allowed(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
     if request.path.startswith('/api'):
-        return APIError('Method Not Allowed', status_code="405").to_dict(), 405
+        return str(APIError('Method Not Allowed', status_code="405").to_dict()), 405
     # Todo: Make a 405.html page
     return render_template('405.html', e=e), 405
 
