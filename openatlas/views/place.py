@@ -206,29 +206,27 @@ def place_view(obj: Entity) -> str:
             'file': Tab('files',
                         table=Table(Table.HEADERS['file'] + [_('main image')]),
                         buttons=[button(_('add'), url_for('entity_add_file', id_=obj.id)),
-                                 button(_('file'), url_for('file_insert', origin_id=obj.id))]),
-            'feature': Tab(
-                'feature',
-                table=Table(Table.HEADERS['place'] + [_('description')]),
-                buttons=[button(_('feature'), url_for('place_insert', origin_id=obj.id))]),
-            'stratigraphic_unit': Tab(
-                'stratigraphic_unit',
-                table=Table(Table.HEADERS['place'] + [_('description')]),
-                buttons=[button(_('stratigraphic unit'),
-                                url_for('place_insert', origin_id=obj.id))]),
-            'find': Tab('find',
-                        table=Table(Table.HEADERS['place'] + [_('description')]),
-                        buttons=[button(_('find'), url_for('place_insert', origin_id=obj.id))]),
-            'human_remains': Tab(
-                'human_remains',
-                table=Table(Table.HEADERS['place'] + [_('description')]),
-                buttons=[button(_('human remains'), url_for('place_insert',
-                                                            origin_id=obj.id,
-                                                            system_type='human_remains'))])}
-    # Tab('feature' if obj.system_type == 'place' else '',
-    # 'stratigraphic unit') if obj.system_type == 'feature' else '',
-    # 'title': _('find') if obj.system_type == 'stratigraphic unit' else '',
-    # _('human remains') if obj.system_type == 'stratigraphic unit' else '',
+                                 button(_('file'), url_for('file_insert', origin_id=obj.id))])}
+    if obj.system_type == 'place':
+        tabs['feature'] = Tab(
+            'feature',
+            table=Table(Table.HEADERS['place'] + [_('description')]),
+            buttons=[button(_('feature'), url_for('place_insert', origin_id=obj.id))])
+    elif obj.system_type == 'feature':
+        tabs['stratigraphic_unit'] = Tab(
+            'stratigraphic_unit',
+            table=Table(Table.HEADERS['place'] + [_('description')]),
+            buttons=[button(_('stratigraphic unit'), url_for('place_insert', origin_id=obj.id))])
+    elif obj.system_type == 'stratigraphic unit':
+        tabs['find'] = Tab(
+            'find',
+            table=Table(Table.HEADERS['place'] + [_('description')]),
+            buttons=[button(_('find'), url_for('place_insert', origin_id=obj.id))])
+        tabs['human_remains'] = Tab(
+            'human_remains',
+            table=Table(Table.HEADERS['place'] + [_('description')]),
+            buttons=[button(_('human remains'), url_for('place_insert', origin_id=obj.id,
+                                                        system_type='human_remains'))])
     for code in app.config['CLASS_CODES']['event']:
         tabs['event'].buttons.append(button(
             g.classes[code].name, url_for('event_insert', code=code, origin_id=obj.id)))
