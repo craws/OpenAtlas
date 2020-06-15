@@ -43,8 +43,8 @@ class APIError(Exception):
         rv['instance'] = request.base_url
         rv['timestamp'] = str(datetime.now())
         if self.error_code in ["403", "401"]:
-            rv['help'] = "https://redmine.craws.net/projects/uni/wiki/API_Authentication"
+            rv['help'] = "https://redmine.openatlas.eu/projects/uni/wiki/API_Authentication"
         else:
-            rv['help'] = "https://redmine.craws.net/projects/uni/wiki/Api"
-        
+            rv['help'] = "https://redmine.openatlas.eu/projects/uni/wiki/Api"
+
         return rv
