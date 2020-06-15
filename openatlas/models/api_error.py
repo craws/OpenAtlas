@@ -46,5 +46,5 @@ class APIError(Exception):
             rv['help'] = "https://redmine.craws.net/projects/uni/wiki/API_Authentication"
         else:
             rv['help'] = "https://redmine.craws.net/projects/uni/wiki/Api"
-
-        return jsonify(rv)
+        
+        return rv

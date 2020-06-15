@@ -91,5 +91,4 @@ class ApiTests(TestBaseCase):
 
             self.app.get(url_for('logout'), follow_redirects=True)
             rv = self.app.get(url_for('api_entity', id_=place_id))
-            print(rv.data)
             assert b'403' in rv.data

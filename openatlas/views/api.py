@@ -13,7 +13,10 @@ from openatlas.util.util import api_access
 @app.route('/api/0.1/entity/<int:id_>')
 @api_access()  # type: ignore
 def api_entity(id_: int) -> Response:
-    return jsonify(Api.get_entity(id_=id_))
+    if type(id_) is int:
+        return jsonify(Api.get_entity(id_=id_))
+    else:
+        raise APIError('Syntax is incorrect!', status_code="404b")
 
 
 @app.route('/api/0.1/entity/download/<int:id_>')
