@@ -71,16 +71,16 @@ class ApiTests(TestBaseCase):
             # Test for error codes
             rv = self.app.get(url_for('api_entity', id_=99999999))
             assert b'404a' in rv.data
+            rv = self.app.get(url_for('api_entity', id_="EEEE"))
+            assert b'404b' in rv.data
             rv = self.app.get(url_for('api_get_latest', limit=99999))
             assert b'404e' in rv.data
             rv = self.app.get(url_for('api_get_by_class', class_code='E19'))
             assert b'404' in rv.data
             rv = self.app.get(url_for('api_get_by_menu_item', code='TWART'))
             assert b'404c' in rv.data
-
             rv = self.app.put(url_for('api_get_entities_by_json'))
             assert b'405' in rv.data
-
             self.app.get(url_for('logout'), follow_redirects=True)
             rv = self.app.get(url_for('api_entity', id_=place_id))
             assert b'403' in rv.data
