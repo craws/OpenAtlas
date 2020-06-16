@@ -10,13 +10,14 @@ from openatlas.util.util import api_access
 # Todo: unit tests and mypy checks
 
 
-@app.route('/api/0.1/entity/<int:id_>')
+@app.route('/api/0.1/entity/<id_>')
 @api_access()  # type: ignore
 def api_entity(id_: int) -> Response:
-    if type(id_) is int:
-        return jsonify(Api.get_entity(id_=id_))
-    else:
+    try:
+        int(id_)
+    except Exception:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404b")
+    return jsonify(Api.get_entity(id_=id_))
 
 
 @app.route('/api/0.1/entity/download/<int:id_>')
@@ -28,7 +29,7 @@ def api_download_entity(id_: int) -> Response:
                     headers={'Content-Disposition': 'attachment;filename=' + str(id_) + '.json'})
 
 
-@app.route('/api/0.1/', methods=["PUT"])
+@app.route('/api/0.1/', methods=['GET', 'VIEW'])
 @api_access()  # type: ignore
 def api_get_entities_by_json() -> Response:
     out = []

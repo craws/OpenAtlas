@@ -26,7 +26,6 @@ class Api:
     def get_links(entity: Entity) -> List[Dict[str, str]]:
         links = []
 
-
         for link in Link.get_links(entity.id):  # pragma: nocover
             links.append({'label': link.range.name,
                           'relationTo': url_for('api_entity', id_=link.range.id, _external=True),
@@ -103,7 +102,7 @@ class Api:
         try:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
         except Exception:
-            raise APIError('Entity ID doesn\'t exist', status_code="404a")
+            raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
 
         geonames_link = Geonames.get_geonames_link(entity)
         type_ = 'FeatureCollection'

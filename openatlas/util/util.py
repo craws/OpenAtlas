@@ -24,6 +24,7 @@ from werkzeug.utils import redirect
 
 import openatlas
 from openatlas import app
+from openatlas.models.api_error import APIError
 from openatlas.models.date import Date
 from openatlas.models.model import CidocClass, CidocProperty
 
@@ -366,7 +367,7 @@ def api_access():  # type: ignore
         @wraps(f)
         def wrapped(*args, **kwargs):  # type: ignore
             if not current_user.is_authenticated and not session['settings']['api_public']:
-                abort(403)  # pragma: nocover
+                raise APIError('Syntax is incorrect!', status_code=403, payload="403")  # pragma: nocover
             return f(*args, **kwargs)
 
         return wrapped

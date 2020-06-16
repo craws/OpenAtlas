@@ -25,7 +25,7 @@ class APIError(Exception):
         "405": "The method used is not supported. Right now only GET is allowed.",
         "500": "Please notify the administrator. Sorry for the inconvenience."}
 
-    def __init__(self, message: str, status_code: int = None, payload: str = None) -> None:
+    def __init__(self, message: str, status_code: int = int, payload: str = str) -> None:
         Exception.__init__(self)
         self.message = message
         if status_code is not None:

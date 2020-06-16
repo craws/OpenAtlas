@@ -78,16 +78,9 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for('api_get_by_menu_item', code='TWART'))
             assert b'404c' in rv.data
 
-            #  Todo: Alex will look into this problem. It works on Bernis IDE
+            rv = self.app.put(url_for('api_get_entities_by_json'))
+            assert b'405' in rv.data
 
-
-            json_payload = {"id": [15], "item": ["place", "source"], "class_code": ["E18"],
-                            "latest": [5]}
-
-            rv = self.app.put(url_for('api_get_entities_by_json'), data=json_payload)
-            print(rv.data)
-            assert b'place' in rv.data
-
-            # self.app.get(url_for('logout'), follow_redirects=True)
-            # rv = self.app.get(url_for('api_entity', id_=place_id))
-            # assert b'403' in rv.data
+            self.app.get(url_for('logout'), follow_redirects=True)
+            rv = self.app.get(url_for('api_entity', id_=place_id))
+            assert b'403' in rv.data
