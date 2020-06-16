@@ -24,7 +24,7 @@ class APIError(Exception):
                       "For the classes please confer the model"],
         "404e": [404, "The syntax is incorrect. Only integers between 1 and 100 are allowed."],
         "405": [405, "The method used is not supported. Right now only GET is allowed."],
-        "500": [500, "Please notify the administrator. Sorry for the inconvenience!"]}
+        "500": [500, "Please notify the administrator. Sorry for the inconvenience."]}
 
     def __init__(self, message: str, status_code: str, payload: None = None) -> None:
         Exception.__init__(self)
