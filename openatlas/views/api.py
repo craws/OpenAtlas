@@ -94,6 +94,37 @@ def api_get_latest(limit: int) -> Response:
     raise APIError('Syntax is incorrect!', status_code=404, payload="404e")
 
 
+@app.route('/api/0.1/query')
+@api_access()  # type: ignore
+def api_get_query() -> Response:
+    if request.args:
+        out = []
+        if request.args.getlist('entities[]'):
+            entities = request.args.getlist('entities[]')
+            for e in entities:
+                try:
+                    int(e)
+                except Exception:
+                    raise APIError('Syntax is incorrect!', status_code=404, payload="404b")
+                out.append(Api.get_entity(id_=e))
+        if request.args.getlist('items[]'):
+            items = request.args.getlist('items[]')
+            for i in items:
+                try:
+                    out.extend(Api.get_entities_by_menu_item(code_=i))
+                except Exception:
+                    raise APIError('Syntax is incorrect!', status_code=404, payload="404c")
+        if request.args.getlist('classes[]'):
+            classes = request.args.getlist('classes[]')
+            for c in classes:
+                if len(Api.get_entities_by_class(class_code_=c)) == 0:
+                    raise APIError('Syntax is incorrect!', status_code=404, payload="404d")
+                out.extend(Api.get_entities_by_class(class_code_=c))
+        return jsonify(out)
+    else:
+        raise APIError('Syntax is incorrect!', status_code=404, payload="404")
+
+
 @app.route('/api')
 @api_access()  # type: ignore
 def api_index() -> str:
