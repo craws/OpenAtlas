@@ -131,6 +131,16 @@ $(document).ready(function () {
         history.replaceState(null, null, newUrl);
     });
 
+
+    //prevent double submit
+    $('form').submit(function () {
+        // disable button
+        $('input[type="submit"]').prop("disabled", true);
+        // add spinner to button
+        $('input[type="submit"]').val('... in progress');
+        return true;
+    });
+
 });
 
 $.jstree.defaults.core.themes.dots = false;
