@@ -221,7 +221,7 @@ form input[type="text"].month, form input[type="text"].day {
 
 #description {
     height: 8em;
-    width: 30em;
+    width: 65%;
 }
 
 .description {
