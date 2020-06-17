@@ -326,7 +326,7 @@ class TableSelect(HiddenInput):  # type: ignore
         html = """
             <input id="{name}-button" name="{name}-button" class="table-select {required}"
                 type="text" placeholder="{change_label}" onfocus="this.blur()" readonly="readonly"
-                value="{selection}" onclick="$('#{name}-modal').modal('show')">
+                value="{selection}" onclick="$('#{name}-modal').modal('show'); $('#{name}_table_filter input')[0].focus()">
             <a href="#" id="{name}-clear" class="{button_class}" {clear_style}
                 onclick="clearSelect('{name}');">{clear_label}</a>
             <div id="{name}-modal" class="modal fade" tabindex="-1" role="dialog"

@@ -132,7 +132,6 @@ $(document).ready(function () {
         newUrl = url.split("#")[0] + hash;
         history.replaceState(null, null, newUrl);
     });
-
 });
 
 $.jstree.defaults.core.themes.dots = false;
