@@ -14,9 +14,12 @@ import openatlas
 from openatlas import app, logger
 from openatlas.forms.forms import build_form, build_table_form
 from openatlas.models.entity import Entity
+from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import (convert_size, format_date, get_file_path, get_file_stats, link,
-                                 required_group, was_modified)
+from openatlas.util.util import (button, convert_size, display_remove_link, format_date,
+                                 get_base_table_data, get_entity_data, get_file_path,
+                                 get_file_stats, is_authorized, link,
+                                 required_group, uc_first, was_modified)
 
 
 class FileForm(FlaskForm):  # type: ignore
@@ -148,6 +151,62 @@ def file_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
         return redirect(save(form, origin=origin))
     writeable = True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False
     return render_template('file/insert.html', form=form, origin=origin, writeable=writeable)
+
+
+def file_view(file: Entity) -> str:
+    path = get_file_path(file.id)
+    tabs = {'info': Tab('info')}
+    for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
+                 'human_remains', 'reference']:
+        tabs[name] = Tab(name, table=Table(
+            Table.HEADERS[name] + (['page'] if name == 'reference' else [])))
+    tabs['node'] = Tab('types', table=Table(Table.HEADERS['node']))
+    tabs['source'].buttons = [
+        button(_('add'), url_for('file_add', id_=file.id, class_name='source')),
+        button(_('source'), url_for('source_insert', origin_id=file.id))]
+    tabs['event'].buttons = [
+        button(_('add'), url_for('file_add', id_=file.id, class_name='event'))]
+    for code in app.config['CLASS_CODES']['event']:
+        tabs['event'].buttons.append(button(g.classes[code].name,
+                                            url_for('event_insert', code=code, origin_id=file.id)))
+    tabs['actor'].buttons = [
+        button(_('add'), url_for('file_add', id_=file.id, class_name='actor'))]
+    for code in app.config['CLASS_CODES']['actor']:
+        tabs['actor'].buttons.append(
+            button(g.classes[code].name, url_for('actor_insert', code=code, origin_id=file.id)))
+    tabs['place'].buttons = [
+        button(_('add'), url_for('file_add', id_=file.id, class_name='place')),
+        button(_('place'), url_for('place_insert', origin_id=file.id))]
+    tabs['reference'].buttons = [
+        button(_('add'), url_for('entity_add_reference', id_=file.id)),
+        button(_('bibliography'), url_for('reference_insert',
+                                          code='bibliography', origin_id=file.id)),
+        button(_('edition'), url_for('reference_insert', code='edition', origin_id=file.id)),
+        button(_('external reference'), url_for('reference_insert',
+                                                code='external_reference', origin_id=file.id))]
+    for link_ in file.get_links('P67'):
+        range_ = link_.range
+        data = get_base_table_data(range_)
+        if is_authorized('contributor'):
+            url = url_for('link_delete', id_=link_.id, origin_id=file.id)
+            data.append(display_remove_link(url + '#tab-' + range_.table_name, range_.name))
+        tabs[range_.table_name].table.rows.append(data)
+    for link_ in file.get_links('P67', True):
+        data = get_base_table_data(link_.domain)
+        data.append(link_.description)
+        if is_authorized('contributor'):
+            update_url = url_for('reference_link_update', link_id=link_.id, origin_id=file.id)
+            data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
+            unlink_url = url_for('link_delete', id_=link_.id, origin_id=file.id)
+            data.append(display_remove_link(unlink_url + '#tab-reference', link_.domain.name))
+        tabs['reference'].table.rows.append(data)
+    return render_template('file/view.html',
+                           missing_file=False if path else True,
+                           entity=file,
+                           info=get_entity_data(file),
+                           tabs=tabs,
+                           preview=True if path and preview_file(path) else False,
+                           filename=os.path.basename(path) if path else False)
 
 
 def save(form: FileForm, file: Optional[Entity] = None, origin: Optional[Entity] = None) -> str:

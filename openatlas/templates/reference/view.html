@@ -1,71 +1,26 @@
-{% extends "layout.html" %}
+{% extends "tabs.html" %}
 {% block title_name %} - {{ reference.name }}{% endblock %}
 {% block breadcrumb %}
     {{ [[_('reference'), 'reference_index'], reference.name]|crumb }}
 {% endblock %}
-{% block content %}
-<div>
-    <ul class="nav nav-tabs" role="tablist">
-        <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" aria-selected="true" href="#tab-info">{{ _('info')|uc_first }}</a></li>
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-source">{{ _('source')|uc_first }} {{ tables.source|format_tab_number }}</a></li>
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-event">{{ _('event')|uc_first }} {{ tables.event|format_tab_number }}</a></li>
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-actor">{{ _('actor')|uc_first }} {{ tables.actor|format_tab_number }}</a></li>
-        <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-place">{{ _('place')|uc_first }} {{ tables.place|format_tab_number }}</a></li>
-        {% for table_name in ['feature', 'stratigraphic_unit', 'find', 'human_remains'] %}
-            {% if tables[table_name].rows %}
-                <li class="nav-item">
-                    <a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-{{ table_name }}">
-                        {{ _(table_name|replace('_', ' '))|uc_first }} {{ tables[table_name]|format_tab_number }}
-                    </a>
-                </li>
-            {% endif %}
-        {% endfor %}
-        <li class="nav-item"> <a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-file">{{ _('files')|uc_first }} {{ tables.file|format_tab_number }}</a></li>
-    </ul>
-    <div class="tab-content">
-        <div class="tab-pane fade show active" role="tabpanel" id="tab-info">
-            <div class="toolbar">
-                {{ 'menu/reference'|manual }}
-                {% if 'contributor'|is_authorized %}
-                    {{ _('edit')|button(url_for('reference_update', id_=reference.id)) }}
-                    {{ reference|display_delete_link }}
-                {% endif %}
-                {{ reference.id|bookmark_toggle }}
-            </div>
-            <h1>{{ reference.name }}</h1>
-            <div>
-                {{ profile_image_id|display_profile_image }}
-                <div style="float:left;">
-                    {{ info|display_info }}
-                    {{ reference|note }}
-                    {{ reference|description }}
-                </div>
-                <div style="clear:both;"></div>
-            </div>
-        </div>
-        {% for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find', 'file'] %}
-            {% if name not in ['feature', 'stratigraphic_unit', 'find'] or tables[name].rows %}
-                <div class="tab-pane fade" role="tabpanel" id="tab-{{name}}">
-                    {% if 'contributor'|is_authorized and name not in ['feature', 'stratigraphic_unit', 'find'] %}
-                        <div class="toolbar">
-                            {{ _('add')|button(url_for('reference_add', id_=reference.id, class_name=name)) }}
-                            {% if name == 'place' %}
-                                {{ _('place')|button(url_for('place_insert', origin_id=reference.id)) }}
-                            {% elif name == 'source' %}
-                                {{ _('source')|button(url_for('source_insert', origin_id=reference.id)) }}
-                            {% elif name == 'file' %}
-                                {{ _('file')|button(url_for('file_insert', origin_id=reference.id)) }}
-                            {% else %}
-                                {% for code in config.CLASS_CODES[name]%}
-                                    {{ code|get_class_name|button(url_for(name + '_insert', code=code, origin_id=reference.id)) }}
-                                {% endfor %}
-                            {% endif %}
-                        </div>
-                    {% endif %}
-                    {{ tables[name].display(name)|safe }}
-                </div>
-            {% endif %}
-        {% endfor %}
+
+{% block tab_info %}
+    <div class="toolbar">
+        {{ 'menu/reference'|manual }}
+        {% if 'contributor'|is_authorized %}
+            {{ _('edit')|button(url_for('reference_update', id_=reference.id)) }}
+            {{ reference|display_delete_link }}
+        {% endif %}
+        {{ reference.id|bookmark_toggle }}
     </div>
-</div>
+    <h1>{{ reference.name }}</h1>
+    <div>
+        {{ profile_image_id|display_profile_image }}
+        <div style="float:left;">
+            {{ info|display_info }}
+            {{ reference|note }}
+            {{ reference|description }}
+        </div>
+        <div style="clear:both;"></div>
+    </div>
 {% endblock %}
