@@ -130,17 +130,6 @@ $(document).ready(function () {
         newUrl = url.split("#")[0] + hash;
         history.replaceState(null, null, newUrl);
     });
-
-
-    //prevent double submit
-    $('form').submit(function () {
-        // disable button
-        $('input[type="submit"]').prop("disabled", true);
-        // add spinner to button
-        $('input[type="submit"]').val('... in progress');
-        return true;
-    });
-
 });
 
 $.jstree.defaults.core.themes.dots = false;

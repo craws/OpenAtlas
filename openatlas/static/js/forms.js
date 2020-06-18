@@ -1,3 +1,9 @@
+var submitHandler = function(form) {
+            $('input[type="submit"]').prop("disabled", true)
+            .val('... in progress');
+            $(form).submit();
+          }
+
 $(document).ready(function () {
 
     // Write selected DataTables checkboxes to hidden input
@@ -88,7 +94,8 @@ $(document).ready(function () {
     $('#file-form').validate({
         rules: {
             file: {fileSize: maxFileSize * 1024 * 1024}
-        }
+        },
+        submitHandler: submitHandler(form),
     });
 
     $.validator.addClassRules({
@@ -102,6 +109,8 @@ $(document).ready(function () {
     });
 
     $("form").each(function () {
-        $(this).validate();
+        $(this).validate({
+          submitHandler: submitHandler(form),
+        });
     });
 });
