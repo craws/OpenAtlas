@@ -74,11 +74,7 @@ def object_update(id_: int) -> Union[str, Response]:
 def object_view(obj: Entity) -> str:
     obj.note = User.get_note(obj)
     tabs = {'info': Tab('info'),
-            'source': Tab(
-                'source',
-                table=Table(Table.HEADERS['source']),
-                buttons=[button(_('add'), url_for('entity_add_source', id_=obj.id)),
-                         button(_('source'), url_for('source_insert', origin_id=obj.id))]),
+            'source': Tab('source', origin=obj, table=Table(Table.HEADERS['source'])),
             'event': Tab('event',
                          table=Table(Table.HEADERS['event']),
                          buttons=[button(g.classes['E9'].name,

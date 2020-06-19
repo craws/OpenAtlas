@@ -151,11 +151,7 @@ def save(form: ActorForm,
 
 def actor_view(actor: Entity) -> str:
     tabs = {'info': Tab('info'),
-            'source': Tab(
-                'source',
-                table=Table(Table.HEADERS['source']),
-                buttons=[button(_('add'), url_for('entity_add_source', id_=actor.id)),
-                         button(_('source'), url_for('source_insert', origin_id=actor.id))]),
+            'source': Tab('source', origin=actor, table=Table(Table.HEADERS['source'])),
             'event': Tab(
                 'event',
                 buttons=[button(_('add'), url_for('involvement_insert', origin_id=actor.id))],

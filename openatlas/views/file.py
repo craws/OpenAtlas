@@ -161,11 +161,7 @@ def file_view(file: Entity) -> str:
         tabs[name] = Tab(name, table=Table(
             Table.HEADERS[name] + (['page'] if name == 'reference' else [])))
     tabs['node'] = Tab('types', table=Table(Table.HEADERS['node']))
-    tabs['source'].buttons = [
-        button(_('add'), url_for('file_add', id_=file.id, class_name='source')),
-        button(_('source'), url_for('source_insert', origin_id=file.id))]
-    tabs['event'].buttons = [
-        button(_('add'), url_for('file_add', id_=file.id, class_name='event'))]
+    tabs['event'].buttons = [button(_('add'), url_for('file_add', id_=file.id, class_name='event'))]
     for code in app.config['CLASS_CODES']['event']:
         tabs['event'].buttons.append(button(g.classes[code].name,
                                             url_for('event_insert', code=code, origin_id=file.id)))

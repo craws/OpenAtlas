@@ -178,11 +178,7 @@ def place_update(id_: int) -> Union[str, Response]:
 
 def place_view(obj: Entity) -> str:
     tabs = {'info': Tab('info'),
-            'source': Tab(
-                'source',
-                table=Table(Table.HEADERS['source']),
-                buttons=[button(_('add'), url_for('entity_add_source', id_=obj.id)),
-                         button(_('source'), url_for('source_insert', origin_id=obj.id))]),
+            'source': Tab('source', origin=obj, table=Table(Table.HEADERS['source'])),
             'event': Tab(
                 'event',
                 table=Table(Table.HEADERS['event'],

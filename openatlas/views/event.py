@@ -199,11 +199,7 @@ def event_view(event: Entity) -> str:
     # if tables.subs.rows
     tabs = {'info': Tab('info'),
             'subs': Tab('sub events', table=Table(Table.HEADERS['event'])),
-            'source': Tab(
-                'source',
-                table=Table(Table.HEADERS['source']),
-                buttons=[button(_('add'), url_for('entity_add_source', id_=event.id)),
-                         button(_('source'), url_for('source_insert', origin_id=event.id))]),
+            'source': Tab('source', origin=event, table=Table(Table.HEADERS['source'])),
             'actor': Tab(
                 'actor',
                 buttons=[button(_('add'), url_for('involvement_insert', origin_id=event.id))],

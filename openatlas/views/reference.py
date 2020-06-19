@@ -173,7 +173,7 @@ def reference_view(reference: Entity) -> str:
         else:
             header_label = 'link text' if reference.system_type == 'external reference' else 'page'
             tabs[name] = Tab(name, table=Table(Table.HEADERS[name] + [header_label]))
-        if name in ['source', 'place', 'file']:
+        if name in ['place', 'file']:
             tabs[name].buttons = [
                 button(_('add'), url_for('reference_add', id_=reference.id, class_name=name)),
                 button(_(name), url_for(name + '_insert', origin_id=reference.id))]
