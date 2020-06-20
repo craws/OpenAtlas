@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title_name %} - {{ _('file')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('files'), 'file_index'], entity, _('add') + ' ' + _(class_name)|uc_first]|crumb }}
+    {{ [[_('files'), 'file_index'], entity, _('link') + ' ' + _(class_name)|uc_first]|crumb }}
 {% endblock %}
 {% block content %}
     {{ form|safe }}

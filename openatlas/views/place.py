@@ -227,7 +227,7 @@ def place_view(obj: Entity) -> str:
                     else:
                         url = url_for('overlay_insert', image_id=domain.id, place_id=obj.id,
                                       link_id=link_.id)
-                        data.append('<a href="' + url + '">' + uc_first(_('add')) + '</a>')
+                        data.append('<a href="' + url + '">' + uc_first(_('link')) + '</a>')
                 else:  # pragma: no cover
                     data.append('')
         if domain.view_name not in ['source', 'file']:

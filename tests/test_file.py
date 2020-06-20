@@ -94,7 +94,7 @@ class FileTest(TestBaseCase):
             assert b'Changes have been saved' in rv.data and b'Updated file' in rv.data
 
             rv = self.app.get(url_for('file_add', id_=file_id, class_name='actor'))
-            assert b'Add Actor' in rv.data
+            assert b'Link Actor' in rv.data
             rv = self.app.post(url_for('file_add', id_=file_id, class_name='actor'),
                                data={'checkbox_values': [actor.id]}, follow_redirects=True)
             assert b'File keeper' in rv.data

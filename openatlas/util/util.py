@@ -390,7 +390,7 @@ def button(label: str,
            id_: Optional[str] = None,
            onclick: Optional[str] = '') -> str:
     label = uc_first(label)
-    if url and '/insert' in url and label != uc_first(_('add')):
+    if url and '/insert' in url and label != uc_first(_('link')):
         label = '+ ' + label
     html = '<a class="{class_}" href="{url}" {id} {onclick}>{label}</a>'.format(
         class_=app.config['CSS']['button'][css],

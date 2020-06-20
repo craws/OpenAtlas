@@ -501,8 +501,8 @@ def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
             <input id="csrf_token" name="csrf_token" type="hidden" value="{token}">
             <input id="checkbox_values" name="checkbox_values" type="hidden">
             {table}
-            <input id="save" class="{class_}" name="save" type="submit" value="{add}">
-        </form>""".format(add=uc_first(_('add')),
+            <input id="save" class="{class_}" name="save" type="submit" value="{link}">
+        </form>""".format(link=uc_first(_('link')),
                           token=generate_csrf(),
                           class_=app.config['CSS']['button']['primary'],
                           table=table.display(class_name))
