@@ -9,6 +9,7 @@ from flask_babel import lazy_gettext as _
 
 # needed for translations
 _('member of')
+_('texts')
 
 
 class Tab:
@@ -32,20 +33,23 @@ class Tab:
         id_ = self.origin.id
         buttons = []
         if self.name == 'source':
-            if self.origin.class_.code == 'E31':
+            if self.origin.class_.code in app.config['CLASS_CODES']['reference']:
                 buttons = [button(_('add'), url_for('reference_add', id_=id_, class_name='source'))]
             elif self.origin.system_type == 'file':
                 buttons = [button(_('add'), url_for('file_add', id_=id_, class_name='source'))]
             else:
                 buttons = [button(_('add'), url_for('entity_add_source', id_=id_))]
             buttons.append(button(_('source'), url_for('source_insert', origin_id=id_)))
+
         elif self.name == 'event':
             if self.origin.class_.code == 'E84':
-                buttons=[button(g.classes['E9'].name,
-                                url_for('event_insert', code='E9', origin_id=id_))]
+                buttons = [button(g.classes['E9'].name,
+                                  url_for('event_insert', code='E9', origin_id=id_))]
             else:
-                if self.origin.class_.code not in ['E18', 'E22']:
+                if self.origin.class_.code in app.config['CLASS_CODES']['actor']:
                     buttons = [button(_('add'), url_for('involvement_insert', origin_id=id_))]
+                elif self.origin.class_.code in app.config['CLASS_CODES']['source']:
+                    buttons = [button('add', url_for('source_add', id_=id_, class_name='event'))]
                 for code in app.config['CLASS_CODES']['event']:
                     label = g.classes[code].name
                     buttons.append(button(label, url_for('event_insert', code=code, origin_id=id_)))
@@ -78,6 +82,8 @@ class Tab:
         elif self.name == 'actor':
             if self.origin.class_.code in app.config['CLASS_CODES']['reference']:
                 buttons = [button(_('add'), url_for('reference_add', id_=id_, class_name='actor'))]
+            elif self.origin.class_.code in app.config['CLASS_CODES']['source']:
+                buttons = [button('add', url_for('source_add', id_=id_, class_name='actor'))]
             else:
                 buttons = [button(_('add'), url_for('involvement_insert', origin_id=id_))]
             for code in app.config['CLASS_CODES']['actor']:
@@ -94,11 +100,11 @@ class Tab:
                                                           origin_id=id_,
                                                           system_type='human_remains'))]
         elif self.name == 'place':
-            # for references
-            # if self.origin.class_.code in app.config['CLASS_CODES']['reference']:
-            #    buttons = [button(_('add'), url_for('reference_add', id_=id_, class_name='actor'))]
-            buttons = [
-                button(_('add'), url_for('reference_add', id_=id_, class_name='place')),
-                button(_('place'), url_for('place' + '_insert', origin_id=id_))]
-
+            if self.origin.class_.code in app.config['CLASS_CODES']['reference']:
+                buttons = [button(_('add'), url_for('reference_add', id_=id_, class_name='place'))]
+            elif self.origin.class_.code in app.config['CLASS_CODES']['source']:
+                buttons = [button(_('add'), url_for('source_add', id_=id_, class_name='place'))]
+            buttons.append(button(_('place'), url_for('place_insert', origin_id=id_)))
+        elif self.name == 'text':
+            buttons = [button(_('text'), url_for('translation_insert', source_id=id_))]
         return buttons
