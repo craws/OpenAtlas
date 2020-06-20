@@ -20,7 +20,7 @@ from openatlas.models.place import get_structure
 from openatlas.models.user import User
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import (button, display_remove_link, get_base_table_data, get_entity_data,
+from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  get_profile_image_table_link, is_authorized, link, required_group,
                                  uc_first, was_modified)
 
@@ -179,53 +179,32 @@ def place_update(id_: int) -> Union[str, Response]:
 def place_view(obj: Entity) -> str:
     tabs = {'info': Tab('info'),
             'source': Tab('source', origin=obj, table=Table(Table.HEADERS['source'])),
-            'event': Tab(
-                'event',
-                table=Table(Table.HEADERS['event'],
-                            defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])),
+            'event': Tab('event',
+                         origin=obj,
+                         table=Table(Table.HEADERS['event'],
+                                     defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])),
             'actor': Tab(
                 'actor',
                 table=Table([_('actor'), _('property'), _('class'), _('first'), _('last')])),
             'reference': Tab('reference',
-                             table=Table(Table.HEADERS['reference'] + ['page / link text']),
-                             buttons=[
-                                 button(_('add'), url_for('entity_add_reference', id_=obj.id)),
-                                 button(_('bibliography'), url_for('reference_insert',
-                                                                   code='bibliography',
-                                                                   origin_id=obj.id)),
-                                 button(_('edition'), url_for('reference_insert',
-                                                              code='edition',
-                                                              origin_id=obj.id)),
-                                 button(_('external reference'), url_for('reference_insert',
-                                                                         code='external_reference',
-                                                                         origin_id=obj.id))]),
-            'file': Tab('file',
-                        table=Table(Table.HEADERS['file'] + [_('main image')]),
-                        buttons=[button(_('add'), url_for('entity_add_file', id_=obj.id)),
-                                 button(_('file'), url_for('file_insert', origin_id=obj.id))])}
+                             origin=obj,
+                             table=Table(Table.HEADERS['reference'] + ['page / link text'])),
+            'file': Tab('file', origin=obj, table=Table(Table.HEADERS['file'] + [_('main image')]))}
     if obj.system_type == 'place':
-        tabs['feature'] = Tab(
-            'feature',
-            table=Table(Table.HEADERS['place'] + [_('description')]),
-            buttons=[button(_('feature'), url_for('place_insert', origin_id=obj.id))])
+        tabs['feature'] = Tab('feature',
+                              origin=obj,
+                              table=Table(Table.HEADERS['place'] + [_('description')]))
     elif obj.system_type == 'feature':
-        tabs['stratigraphic_unit'] = Tab(
-            'stratigraphic_unit',
-            table=Table(Table.HEADERS['place'] + [_('description')]),
-            buttons=[button(_('stratigraphic unit'), url_for('place_insert', origin_id=obj.id))])
+        tabs['stratigraphic_unit'] = Tab('stratigraphic_unit',
+                                         origin=obj,
+                                         table=Table(Table.HEADERS['place'] + [_('description')]))
     elif obj.system_type == 'stratigraphic unit':
-        tabs['find'] = Tab(
-            'find',
-            table=Table(Table.HEADERS['place'] + [_('description')]),
-            buttons=[button(_('find'), url_for('place_insert', origin_id=obj.id))])
-        tabs['human_remains'] = Tab(
-            'human_remains',
-            table=Table(Table.HEADERS['place'] + [_('description')]),
-            buttons=[button(_('human remains'), url_for('place_insert', origin_id=obj.id,
-                                                        system_type='human_remains'))])
-    for code in app.config['CLASS_CODES']['event']:
-        tabs['event'].buttons.append(button(
-            g.classes[code].name, url_for('event_insert', code=code, origin_id=obj.id)))
+        tabs['find'] = Tab('find',
+                           origin=obj,
+                           table=Table(Table.HEADERS['place'] + [_('description')]))
+        tabs['human_remains'] = Tab('human_remains',
+                                    origin=obj,
+                                    table=Table(Table.HEADERS['place'] + [_('description')]))
     obj.note = User.get_note(obj)
     location = obj.get_linked_entity_safe('P53', nodes=True)
     profile_image_id = obj.get_profile_image_id()

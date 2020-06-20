@@ -44,7 +44,8 @@ class Tab:
                 buttons=[button(g.classes['E9'].name,
                                 url_for('event_insert', code='E9', origin_id=id_))]
             else:
-                buttons = [button(_('add'), url_for('involvement_insert', origin_id=id_))]
+                if self.origin.class_.code not in ['E18', 'E22']:
+                    buttons = [button(_('add'), url_for('involvement_insert', origin_id=id_))]
                 for code in app.config['CLASS_CODES']['event']:
                     label = g.classes[code].name
                     buttons.append(button(label, url_for('event_insert', code=code, origin_id=id_)))
@@ -76,4 +77,14 @@ class Tab:
             for code in app.config['CLASS_CODES']['actor']:
                 buttons.append(button(g.classes[code].name,
                                       url_for('actor_insert', code=code, origin_id=id_)))
+        elif self.name == 'feature':
+            buttons = [button(_('feature'), url_for('place_insert', origin_id=id_))]
+        elif self.name == 'stratigraphic_unit':
+            buttons = [button(_('stratigraphic unit'), url_for('place_insert', origin_id=id_))]
+        elif self.name == 'find':
+            buttons = [button(_('find'), url_for('place_insert', origin_id=id_))]
+        elif self.name == 'human_remains':
+            buttons = [button(_('human remains'), url_for('place_insert',
+                                                          origin_id=id_,
+                                                          system_type='human_remains'))]
         return buttons
