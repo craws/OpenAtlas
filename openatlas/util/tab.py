@@ -67,4 +67,9 @@ class Tab:
         elif self.name == 'file':
             buttons = [button(_('add'), url_for('entity_add_file', id_=id_)),
                        button(_('file'), url_for('file_insert', origin_id=id_))]
+        elif self.name == 'actor':
+            buttons = [button(_('add'), url_for('involvement_insert', origin_id=id_))]
+            for code in app.config['CLASS_CODES']['actor']:
+                buttons.append(button(g.classes[code].name,
+                                      url_for('actor_insert', code=code, origin_id=id_)))
         return buttons

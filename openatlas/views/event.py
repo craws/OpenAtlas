@@ -18,7 +18,7 @@ from openatlas.models.link import Link
 from openatlas.models.user import User
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import (button, display_remove_link, get_base_table_data, get_entity_data,
+from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  get_profile_image_table_link, is_authorized, link, required_group,
                                  uc_first, was_modified)
 
@@ -196,36 +196,21 @@ def save(form: FlaskForm,
 
 
 def event_view(event: Entity) -> str:
-    # if tables.subs.rows
     tabs = {'info': Tab('info'),
             'subs': Tab('sub events', table=Table(Table.HEADERS['event'])),
             'source': Tab('source', origin=event, table=Table(Table.HEADERS['source'])),
             'actor': Tab(
                 'actor',
-                buttons=[button(_('add'), url_for('involvement_insert', origin_id=event.id))],
+                origin=event,
                 table=Table(['actor', 'class', 'involvement', 'first', 'last', 'description'],
                             defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])),
-            'reference': Tab(
-                'reference',
-                table=Table(Table.HEADERS['reference'] + ['page / link text']),
-                buttons=[button(_('add'), url_for('entity_add_reference', id_=event.id)),
-                         button(_('bibliography'), url_for('reference_insert',
-                                                           code='bibliography',
-                                                           origin_id=event.id)),
-                         button(_('edition'), url_for('reference_insert',
-                                                      code='edition',
-                                                      origin_id=event.id)),
-                         button(_('external reference'), url_for('reference_insert',
-                                                                 code='external_reference',
-                                                                 origin_id=event.id))]),
-            'file': Tab(
-                'file',
-                table=Table(Table.HEADERS['file'] + [_('main image')]),
-                buttons=[button(_('add'), url_for('entity_add_file', id_=event.id)),
-                         button(_('file'), url_for('file_insert', origin_id=event.id))])}
-    for code in app.config['CLASS_CODES']['actor']:
-        tabs['actor'].buttons.append(
-            button(g.classes[code].name, url_for('actor_insert', code=code, origin_id=event.id)))
+            'reference': Tab('reference',
+                             origin=event,
+                             table=Table(Table.HEADERS['reference'] + ['page / link text'])),
+            'file': Tab('file',
+                        origin=event,
+                        table=Table(Table.HEADERS['file'] + [_('main image')]))}
+
     for sub_event in event.get_linked_entities('P117', inverse=True, nodes=True):
         tabs['subs'].table.rows.append(get_base_table_data(sub_event))
     for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
