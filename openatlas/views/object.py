@@ -14,7 +14,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import (button, display_remove_link, get_base_table_data, get_entity_data,
+from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  is_authorized, link, required_group, was_modified)
 
 
@@ -72,13 +72,9 @@ def object_update(id_: int) -> Union[str, Response]:
 
 
 def object_view(obj: Entity) -> str:
-    obj.note = User.get_note(obj)
     tabs = {'info': Tab('info'),
             'source': Tab('source', origin=obj, table=Table(Table.HEADERS['source'])),
-            'event': Tab('event',
-                         table=Table(Table.HEADERS['event']),
-                         buttons=[button(g.classes['E9'].name,
-                                         url_for('event_insert', code='E9', origin_id=obj.id))])}
+            'event': Tab('event', origin=obj, table=Table(Table.HEADERS['event']))}
     for link_ in obj.get_links('P128'):
         data = get_base_table_data(link_.range)
         if is_authorized('contributor'):
@@ -93,6 +89,7 @@ def object_view(obj: Entity) -> str:
             data.append(display_remove_link(url + '#tab-' + link_.range.table_name,
                                             link_.range.name))
         tabs['event'].table.rows.append(data)
+    obj.note = User.get_note(obj)
     return render_template('object/view.html', object_=obj, tabs=tabs, info=get_entity_data(obj))
 
 

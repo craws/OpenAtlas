@@ -40,10 +40,14 @@ class Tab:
                 buttons = [button(_('add'), url_for('entity_add_source', id_=id_))]
             buttons.append(button(_('source'), url_for('source_insert', origin_id=id_)))
         elif self.name == 'event':
-            buttons = [button(_('add'), url_for('involvement_insert', origin_id=id_))]
-            for code in app.config['CLASS_CODES']['event']:
-                label = g.classes[code].name
-                buttons.append(button(label, url_for('event_insert', code=code, origin_id=id_)))
+            if self.origin.class_.code == 'E84':
+                buttons=[button(g.classes['E9'].name,
+                                url_for('event_insert', code='E9', origin_id=id_))]
+            else:
+                buttons = [button(_('add'), url_for('involvement_insert', origin_id=id_))]
+                for code in app.config['CLASS_CODES']['event']:
+                    label = g.classes[code].name
+                    buttons.append(button(label, url_for('event_insert', code=code, origin_id=id_)))
         elif self.name == 'relation':
             buttons = [button(_('add'), url_for('relation_insert', origin_id=id_))]
             for code in app.config['CLASS_CODES']['actor']:
