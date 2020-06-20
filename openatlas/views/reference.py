@@ -17,7 +17,7 @@ from openatlas.models.link import Link
 from openatlas.models.user import User
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import (button, display_remove_link, get_base_table_data, get_entity_data,
+from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  get_profile_image_table_link, is_authorized, link,
                                  required_group, uc_first, was_modified)
 
@@ -169,22 +169,13 @@ def reference_view(reference: Entity) -> str:
                  'human_remains', 'file']:
         if name == 'file':
             tabs['file'] = Tab('file',
+                               origin=reference,
                                table=Table(Table.HEADERS['file'] + ['page', _('main image')]))
         else:
             header_label = 'link text' if reference.system_type == 'external reference' else 'page'
-            tabs[name] = Tab(name, table=Table(Table.HEADERS[name] + [header_label]))
-        if name in ['place', 'file']:
-            tabs[name].buttons = [
-                button(_('add'), url_for('reference_add', id_=reference.id, class_name=name)),
-                button(_(name), url_for(name + '_insert', origin_id=reference.id))]
-        elif name in ['event', 'actor']:
-            tabs[name].buttons = [
-                button(_('add'), url_for('reference_add', id_=reference.id, class_name=name))]
-            for code in app.config['CLASS_CODES'][name]:
-                tabs[name].buttons.append(
-                    button(g.classes[code].name,
-                           url_for(name + '_insert', code=code, origin_id=reference.id)))
-
+            tabs[name] = Tab(name,
+                             origin=reference,
+                             table=Table(Table.HEADERS[name] + [header_label]))
     for link_ in reference.get_links('P67', True):
         domain = link_.domain
         data = get_base_table_data(domain)

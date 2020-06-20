@@ -70,21 +70,35 @@ class Tab:
                                                                code='external_reference',
                                                                origin_id=id_))]
         elif self.name == 'file':
-            buttons = [button(_('add'), url_for('entity_add_file', id_=id_)),
-                       button(_('file'), url_for('file_insert', origin_id=id_))]
+            if self.origin.class_.code in app.config['CLASS_CODES']['reference']:
+                buttons = [button(_('add'), url_for('reference_add', id_=id_, class_name='file'))]
+            else:
+                buttons = [button(_('add'), url_for('entity_add_file', id_=id_))]
+            buttons.append(button(_('file'), url_for('file_insert', origin_id=id_)))
         elif self.name == 'actor':
-            buttons = [button(_('add'), url_for('involvement_insert', origin_id=id_))]
+            if self.origin.class_.code in app.config['CLASS_CODES']['reference']:
+                buttons = [button(_('add'), url_for('reference_add', id_=id_, class_name='actor'))]
+            else:
+                buttons = [button(_('add'), url_for('involvement_insert', origin_id=id_))]
             for code in app.config['CLASS_CODES']['actor']:
                 buttons.append(button(g.classes[code].name,
                                       url_for('actor_insert', code=code, origin_id=id_)))
-        elif self.name == 'feature':
+        elif self.name == 'feature' and self.origin.system_type == 'place':
             buttons = [button(_('feature'), url_for('place_insert', origin_id=id_))]
-        elif self.name == 'stratigraphic_unit':
+        elif self.name == 'stratigraphic_unit' and self.origin.system_type == 'feature':
             buttons = [button(_('stratigraphic unit'), url_for('place_insert', origin_id=id_))]
-        elif self.name == 'find':
+        elif self.name == 'find' and self.origin.system_type == 'stratigraphic unit':
             buttons = [button(_('find'), url_for('place_insert', origin_id=id_))]
-        elif self.name == 'human_remains':
+        elif self.name == 'human_remains' and self.origin.system_type == 'stratigraphic unit':
             buttons = [button(_('human remains'), url_for('place_insert',
                                                           origin_id=id_,
                                                           system_type='human_remains'))]
+        elif self.name == 'place':
+            # for references
+            # if self.origin.class_.code in app.config['CLASS_CODES']['reference']:
+            #    buttons = [button(_('add'), url_for('reference_add', id_=id_, class_name='actor'))]
+            buttons = [
+                button(_('add'), url_for('reference_add', id_=id_, class_name='place')),
+                button(_('place'), url_for('place' + '_insert', origin_id=id_))]
+
         return buttons
