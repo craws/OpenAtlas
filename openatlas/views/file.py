@@ -16,7 +16,7 @@ from openatlas.forms.forms import build_form, build_table_form
 from openatlas.models.entity import Entity
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import (button, convert_size, display_remove_link, format_date,
+from openatlas.util.util import (convert_size, display_remove_link, format_date,
                                  get_base_table_data, get_entity_data, get_file_path,
                                  get_file_stats, is_authorized, link,
                                  required_group, uc_first, was_modified)
@@ -158,28 +158,9 @@ def file_view(file: Entity) -> str:
     tabs = {'info': Tab('info')}
     for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
                  'human_remains', 'reference']:
-        tabs[name] = Tab(name, table=Table(
+        tabs[name] = Tab(name, origin=file, table=Table(
             Table.HEADERS[name] + (['page'] if name == 'reference' else [])))
     tabs['node'] = Tab('types', table=Table(Table.HEADERS['node']))
-    tabs['event'].buttons = [button(_('add'), url_for('file_add', id_=file.id, class_name='event'))]
-    for code in app.config['CLASS_CODES']['event']:
-        tabs['event'].buttons.append(button(g.classes[code].name,
-                                            url_for('event_insert', code=code, origin_id=file.id)))
-    tabs['actor'].buttons = [
-        button(_('add'), url_for('file_add', id_=file.id, class_name='actor'))]
-    for code in app.config['CLASS_CODES']['actor']:
-        tabs['actor'].buttons.append(
-            button(g.classes[code].name, url_for('actor_insert', code=code, origin_id=file.id)))
-    tabs['place'].buttons = [
-        button(_('add'), url_for('file_add', id_=file.id, class_name='place')),
-        button(_('place'), url_for('place_insert', origin_id=file.id))]
-    tabs['reference'].buttons = [
-        button(_('add'), url_for('entity_add_reference', id_=file.id)),
-        button(_('bibliography'), url_for('reference_insert',
-                                          code='bibliography', origin_id=file.id)),
-        button(_('edition'), url_for('reference_insert', code='edition', origin_id=file.id)),
-        button(_('external reference'), url_for('reference_insert',
-                                                code='external_reference', origin_id=file.id))]
     for link_ in file.get_links('P67'):
         range_ = link_.range
         data = get_base_table_data(range_)

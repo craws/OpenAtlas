@@ -144,7 +144,7 @@ def source_view(source: Entity) -> str:
                          origin=source,
                          table=Table(Table.HEADERS['reference'] + ['page'])),
         'text': Tab('texts', origin=source, table=Table(['text', 'type', 'content'])),
-        'file': Tab('files', origin=source, table=Table(Table.HEADERS['file'] + [_('main image')]))}
+        'file': Tab('file', origin=source, table=Table(Table.HEADERS['file'] + [_('main image')]))}
     for text in source.get_linked_entities('P73', nodes=True):
         tabs['text'].table.rows.append([link(text),
                                         next(iter(text.nodes)).name if text.nodes else '',

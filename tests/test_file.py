@@ -78,11 +78,11 @@ class FileTest(TestBaseCase):
                          follow_redirects=True)
             self.app.get(url_for('file_remove_profile_image', entity_id=actor.id))
 
-            # Add to file
-            rv = self.app.get(url_for('entity_add_reference', id_=file_id))
-            assert b'Add Reference' in rv.data
-            rv = self.app.post(url_for('entity_add_reference', id_=file_id),
-                               data={'reference': reference.id, 'page': '777'},
+            # Add to reference
+            rv = self.app.get(url_for('reference_add', id_=reference.id, class_name='file'))
+            assert b'OpenAtlas logo' in rv.data
+            rv = self.app.post(url_for('reference_add', id_=reference.id, class_name='file'),
+                               data={'file': file_id, 'page': '777'},
                                follow_redirects=True)
             assert b'777' in rv.data
 
