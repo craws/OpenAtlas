@@ -89,6 +89,9 @@ class Tab:
                 buttons = [button(_('add'), url_for('entity_add_file', id_=id_))]
             buttons.append(button(_('file'), url_for('file_insert', origin_id=id_)))
 
+        elif name == 'entities':
+            buttons = [button(_('move entities'), url_for('node_move_entities', id_=id_))]
+
         elif name == 'actor':
             if self.origin.system_type == 'file':
                 buttons = [button('add', url_for('file_add', id_=id_, class_name='actor'))]

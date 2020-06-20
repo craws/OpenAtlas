@@ -16,7 +16,7 @@ from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import (button, display_remove_link, get_base_table_data, get_entity_data,
+from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
                                  get_profile_image_table_link, is_authorized, link, required_group,
                                  sanitize, uc_first)
 
@@ -173,15 +173,10 @@ def tree_select(name: str) -> str:
 def node_view(node: Node) -> str:
     root = g.nodes[node.root[-1]] if node.root else None
     super_ = g.nodes[node.root[0]] if node.root else None
-    tabs = {
-        'info': Tab('info'),
-        'subs': Tab('subs'),
-        'entities': Tab('entities',
-                        buttons=[button(_('move entities'),
-                                        url_for('node_move_entities', id_=node.id))]),
-        'file': Tab('file',
-                    buttons=[button(_('add'), url_for('entity_add_file', id_=node.id)),
-                             button(_('file'), url_for('file_insert', origin_id=node.id))])}
+    tabs = {'info': Tab('info'),
+            'subs': Tab('subs'),
+            'entities': Tab('entities', origin=node),
+            'file': Tab('file', origin=node)}
     header = [_('name'), _('class'), _('info')]
     if root and root.value_type:  # pragma: no cover
         header = [_('name'), _('value'), _('class'), _('info')]
