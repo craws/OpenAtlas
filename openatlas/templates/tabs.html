@@ -27,7 +27,7 @@
                         </div>
                     {% else %}
                         <div class="tab-pane fade" role="tabpanel" id="tab-{{ id_|replace('_', '-') }}">
-                            {% if 'contributor'|is_authorized:  %}
+                            {% if tab.buttons:  %}
                                 <div class="toolbar">
                                     {% for button in tab.buttons: %}
                                         {{ button|safe }}
