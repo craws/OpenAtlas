@@ -72,9 +72,7 @@ def object_update(id_: int) -> Union[str, Response]:
 
 
 def object_view(obj: Entity) -> str:
-    tabs = {'info': Tab('info'),
-            'source': Tab('source', origin=obj, table=Table(Table.HEADERS['source'])),
-            'event': Tab('event', origin=obj, table=Table(Table.HEADERS['event']))}
+    tabs = {name: Tab(name, origin=obj) for name in ['info', 'source', 'event']}
     for link_ in obj.get_links('P128'):
         data = get_base_table_data(link_.range)
         if is_authorized('contributor'):

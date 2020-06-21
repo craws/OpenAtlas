@@ -154,13 +154,9 @@ def file_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
 
 
 def file_view(file: Entity) -> str:
-    path = get_file_path(file.id)
-    tabs = {'info': Tab('info')}
-    for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
-                 'human_remains', 'reference']:
-        tabs[name] = Tab(name, origin=file, table=Table(
-            Table.HEADERS[name] + (['page'] if name == 'reference' else [])))
-    tabs['node'] = Tab('types', table=Table(Table.HEADERS['node']))
+    tabs = {name: Tab(name, origin=file) for name in [
+        'info', 'source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
+        'human_remains', 'reference', 'node']}
     for link_ in file.get_links('P67'):
         range_ = link_.range
         data = get_base_table_data(range_)
@@ -177,6 +173,7 @@ def file_view(file: Entity) -> str:
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=file.id)
             data.append(display_remove_link(unlink_url + '#tab-reference', link_.domain.name))
         tabs['reference'].table.rows.append(data)
+    path = get_file_path(file.id)
     return render_template('file/view.html',
                            missing_file=False if path else True,
                            entity=file,

@@ -196,21 +196,8 @@ def save(form: FlaskForm,
 
 
 def event_view(event: Entity) -> str:
-    tabs = {'info': Tab('info'),
-            'subs': Tab('sub events', table=Table(Table.HEADERS['event'])),
-            'source': Tab('source', origin=event, table=Table(Table.HEADERS['source'])),
-            'actor': Tab(
-                'actor',
-                origin=event,
-                table=Table(['actor', 'class', 'involvement', 'first', 'last', 'description'],
-                            defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])),
-            'reference': Tab('reference',
-                             origin=event,
-                             table=Table(Table.HEADERS['reference'] + ['page / link text'])),
-            'file': Tab('file',
-                        origin=event,
-                        table=Table(Table.HEADERS['file'] + [_('main image')]))}
-
+    tabs = {name: Tab(name, origin=event) for name in [
+        'info', 'subs', 'source', 'actor', 'reference', 'file']}
     for sub_event in event.get_linked_entities('P117', inverse=True, nodes=True):
         tabs['subs'].table.rows.append(get_base_table_data(sub_event))
     for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
@@ -253,9 +240,8 @@ def event_view(event: Entity) -> str:
             url = url_for('link_delete', id_=link_.id, origin_id=event.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
         tabs[domain.view_name].table.rows.append(data)
-    objects = []
-    for location in event.get_linked_entities(['P7', 'P26', 'P27']):
-        objects.append(location.get_linked_entity_safe('P53', True))
+    objects = [location.get_linked_entity_safe('P53', True)
+               for location in event.get_linked_entities(['P7', 'P26', 'P27'])]
     return render_template('event/view.html',
                            event=event,
                            tabs=tabs,

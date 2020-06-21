@@ -150,33 +150,8 @@ def save(form: ActorForm,
 
 
 def actor_view(actor: Entity) -> str:
-    tabs = {'info': Tab('info'),
-            'source': Tab('source', origin=actor, table=Table(Table.HEADERS['source'])),
-            'event': Tab(
-                'event',
-                origin=actor,
-                table=Table(['event', 'class', 'involvement', 'first', 'last', 'description'],
-                            defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])),
-            'relation': Tab('relation',
-                            origin=actor,
-                            table=Table(['relation', 'actor', 'first', 'last', 'description'],
-                                        defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])),
-            'member_of': Tab('member_of',
-                             origin=actor,
-                             table=Table(['member of', 'function', 'first', 'last', 'description'],
-                                         defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])),
-            'member': Tab('member',
-                          origin=actor,
-                          table=Table(['member', 'function', 'first', 'last', 'description'],
-                                      defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])),
-            'reference': Tab('reference',
-                             origin=actor,
-                             table=Table(Table.HEADERS['reference'] + ['page / link text'])),
-            'file': Tab('file',
-                        origin=actor,
-                        table=Table(Table.HEADERS['file'] + [_('main image')]))}
-
-    actor.note = User.get_note(actor)
+    tabs = {name: Tab(name, origin=actor) for name in [
+        'info', 'source', 'event', 'relation', 'member_of', 'member', 'reference', 'file']}
     profile_image_id = actor.get_profile_image_id()
     for link_ in actor.get_links('P67', True):
         domain = link_.domain
@@ -312,6 +287,7 @@ def actor_view(actor: Entity) -> str:
     if gis_data:
         if gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]':
             gis_data = None
+    actor.note = User.get_note(actor)
     return render_template('actor/view.html',
                            actor=actor,
                            info=info,
