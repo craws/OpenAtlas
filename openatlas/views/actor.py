@@ -188,10 +188,10 @@ def actor_view(actor: Entity) -> str:
             link_.object_ = object_  # Needed later for first/last appearance info
         first = link_.first
         if not link_.first and event.first:
-            first = '<span class="inactive" style="float:right;">' + event.first + '</span>'
+            first = '<span class="inactive">' + event.first + '</span>'
         last = link_.last
         if not link_.last and event.last:
-            last = '<span class="inactive" style="float:right;">' + event.last + '</span>'
+            last = '<span class="inactive">' + event.last + '</span>'
         data = ([link(event),
                  g.classes[event.class_.code].name,
                  link_.type.name if link_.type else '',

@@ -164,18 +164,9 @@ def reference_update(id_: int) -> Union[str, Response]:
 
 
 def reference_view(reference: Entity) -> str:
-    tabs = {'info': Tab('info')}
-    for name in ['source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
-                 'human_remains', 'file']:
-        if name == 'file':
-            tabs['file'] = Tab('file',
-                               origin=reference,
-                               table=Table(Table.HEADERS['file'] + ['page', _('main image')]))
-        else:
-            header_label = 'link text' if reference.system_type == 'external reference' else 'page'
-            tabs[name] = Tab(name,
-                             origin=reference,
-                             table=Table(Table.HEADERS[name] + [header_label]))
+    tabs = {name: Tab(name, origin=reference) for name in [
+        'info', 'source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
+        'human_remains', 'file']}
     for link_ in reference.get_links('P67', True):
         domain = link_.domain
         data = get_base_table_data(domain)

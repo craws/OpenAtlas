@@ -177,34 +177,15 @@ def place_update(id_: int) -> Union[str, Response]:
 
 
 def place_view(obj: Entity) -> str:
-    tabs = {'info': Tab('info'),
-            'source': Tab('source', origin=obj, table=Table(Table.HEADERS['source'])),
-            'event': Tab('event',
-                         origin=obj,
-                         table=Table(Table.HEADERS['event'],
-                                     defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])),
-            'actor': Tab(
-                'actor',
-                table=Table([_('actor'), _('property'), _('class'), _('first'), _('last')])),
-            'reference': Tab('reference',
-                             origin=obj,
-                             table=Table(Table.HEADERS['reference'] + ['page / link text'])),
-            'file': Tab('file', origin=obj, table=Table(Table.HEADERS['file'] + [_('main image')]))}
+    tabs = {name: Tab(name, origin=obj) for name in [
+        'info', 'source', 'event', 'actor', 'reference', 'file']}
     if obj.system_type == 'place':
-        tabs['feature'] = Tab('feature',
-                              origin=obj,
-                              table=Table(Table.HEADERS['place'] + [_('description')]))
+        tabs['feature'] = Tab('feature', origin=obj)
     elif obj.system_type == 'feature':
-        tabs['stratigraphic_unit'] = Tab('stratigraphic_unit',
-                                         origin=obj,
-                                         table=Table(Table.HEADERS['place'] + [_('description')]))
+        tabs['stratigraphic_unit'] = Tab('stratigraphic_unit', origin=obj)
     elif obj.system_type == 'stratigraphic unit':
-        tabs['find'] = Tab('find',
-                           origin=obj,
-                           table=Table(Table.HEADERS['place'] + [_('description')]))
-        tabs['human_remains'] = Tab('human_remains',
-                                    origin=obj,
-                                    table=Table(Table.HEADERS['place'] + [_('description')]))
+        tabs['find'] = Tab('find', origin=obj,)
+        tabs['human_remains'] = Tab('human_remains', origin=obj)
     obj.note = User.get_note(obj)
     location = obj.get_linked_entity_safe('P53', nodes=True)
     profile_image_id = obj.get_profile_image_id()

@@ -203,10 +203,10 @@ def event_view(event: Entity) -> str:
     for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
         first = link_.first
         if not link_.first and event.first:
-            first = '<span class="inactive" style="float:right;">' + event.first + '</span>'
+            first = '<span class="inactive">' + event.first + '</span>'
         last = link_.last
         if not link_.last and event.last:
-            last = '<span class="inactive" style="float:right;">' + event.last + '</span>'
+            last = '<span class="inactive">' + event.last + '</span>'
         data = ([link(link_.range),
                  g.classes[link_.range.class_.code].name,
                  link_.type.name if link_.type else '',

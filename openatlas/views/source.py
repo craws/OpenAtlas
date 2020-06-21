@@ -130,31 +130,13 @@ def save(form: FlaskForm, source: Optional[Entity] = None, origin: Optional[Enti
 
 
 def source_view(source: Entity) -> str:
-    source.note = User.get_note(source)
-    tabs = {
-        'info': Tab('info'),
-        'event': Tab('event', origin=source),
-        'actor': Tab('actor', origin=source),
-        'place': Tab('place', origin=source),
-        'feature': Tab('feature'),
-        'stratigraphic_unit': Tab('stratigraphic_unit'),
-        'find': Tab('find'),
-        'human_remains': Tab('human_remains'),
-        'reference': Tab('reference',
-                         origin=source,
-                         table=Table(Table.HEADERS['reference'] + ['page'])),
-        'text': Tab('texts', origin=source, table=Table(['text', 'type', 'content'])),
-        'file': Tab('file', origin=source, table=Table(Table.HEADERS['file'] + [_('main image')]))}
+    tabs = {name: Tab(name, origin=source) for name in [
+        'info', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find', 'human_remains',
+        'reference', 'text', 'file']}
     for text in source.get_linked_entities('P73', nodes=True):
         tabs['text'].table.rows.append([link(text),
                                         next(iter(text.nodes)).name if text.nodes else '',
                                         text.description])
-    for name in ['actor', 'event', 'place', 'feature', 'stratigraphic_unit', 'find',
-                 'human_remains']:
-        tabs[name].table = Table(Table.HEADERS[name])
-    tabs['actor'].table.defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
-    tabs['event'].table.defs = [{'className': 'dt-body-right', 'targets': [3, 4]}]
-    tabs['place'].table.defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
     for link_ in source.get_links('P67'):
         range_ = link_.range
         data = get_base_table_data(range_)
@@ -182,6 +164,7 @@ def source_view(source: Entity) -> str:
             url = url_for('link_delete', id_=link_.id, origin_id=source.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
         tabs[domain.view_name].table.rows.append(data)
+    source.note = User.get_note(source)
     return render_template('source/view.html',
                            source=source,
                            tabs=tabs,

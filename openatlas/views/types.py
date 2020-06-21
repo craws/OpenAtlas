@@ -173,10 +173,7 @@ def tree_select(name: str) -> str:
 def node_view(node: Node) -> str:
     root = g.nodes[node.root[-1]] if node.root else None
     super_ = g.nodes[node.root[0]] if node.root else None
-    tabs = {'info': Tab('info'),
-            'subs': Tab('subs'),
-            'entities': Tab('entities', origin=node),
-            'file': Tab('file', origin=node)}
+    tabs = {name: Tab(name, origin=node) for name in ['info', 'subs', 'entities', 'file']}
     header = [_('name'), _('class'), _('info')]
     if root and root.value_type:  # pragma: no cover
         header = [_('name'), _('value'), _('class'), _('info')]

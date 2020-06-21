@@ -36,10 +36,10 @@ class Tab:
         class_codes = app.config['CLASS_CODES']
         buttons = []
         if name == 'actor':
-            self.table = Table(Table.HEADERS['actor'])
-            if code in class_codes['event']:
-                self.table = Table(['actor', 'class', 'involvement', 'first', 'last',
-                                    'description'],
+            self.table = Table(Table.HEADERS['actor'],
+                               defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])
+            if code in ['E18', 'E22', 'E20']:
+                self.table = Table([_('actor'), _('property'), _('class'), _('first'), _('last')],
                                    defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])
             if system_type == 'file':
                 buttons = [button('link', url_for('file_add', id_=id_, class_name='actor'))]
@@ -48,6 +48,9 @@ class Tab:
             elif code in class_codes['source']:
                 buttons = [button('link', url_for('source_add', id_=id_, class_name='actor'))]
             elif code in class_codes['event']:
+                self.table = Table(['actor', 'class', 'involvement', 'first', 'last',
+                                    'description'],
+                                   defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])
                 buttons = [button(_('link'), url_for('involvement_insert', origin_id=id_))]
             for code in class_codes['actor']:
                 buttons.append(button(g.classes[code].name,
@@ -55,8 +58,11 @@ class Tab:
         elif name == 'entities':
             buttons = [button(_('move entities'), url_for('node_move_entities', id_=id_))]
         elif name == 'event':
-            self.table = Table(['event', 'class', 'involvement', 'first', 'last', 'description'],
+            self.table = Table(Table.HEADERS['event'],
                                defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])
+            if code in class_codes['actor']:
+                self.table.header = ['event', 'class', 'involvement', 'first', 'last',
+                                     'description']
             if code == 'E84':
                 buttons = [button(g.classes['E9'].name,
                                   url_for('event_insert', code='E9', origin_id=id_))]
@@ -70,21 +76,24 @@ class Tab:
                 for code in class_codes['event']:
                     label = g.classes[code].name
                     buttons.append(button(label, url_for('event_insert', code=code, origin_id=id_)))
-        elif name == 'feature' and system_type == 'place':
-            self.table = Table(Table.HEADERS['feature'])
-            buttons = [button(_('feature'), url_for('place_insert', origin_id=id_))]
-        elif name == 'find' and system_type == 'stratigraphic unit':
-            self.table = Table(Table.HEADERS['find'])
-            buttons = [button(_('find'), url_for('place_insert', origin_id=id_))]
+        elif name == 'feature':
+            self.table = Table(Table.HEADERS['feature'] + ['description'])
+            if system_type == 'place':
+                buttons = [button(_('feature'), url_for('place_insert', origin_id=id_))]
+        elif name == 'find':
+            self.table = Table(Table.HEADERS['find'] + ['description'])
+            if system_type == 'stratigraphic unit':
+                buttons = [button(_('find'), url_for('place_insert', origin_id=id_))]
         elif name == 'file':
             self.table = Table(Table.HEADERS['file'] + [_('main image')])
             if code in class_codes['reference']:
+                self.table = Table(Table.HEADERS['file'] + ['page', _('main image')])
                 buttons = [button(_('link'), url_for('reference_add', id_=id_, class_name='file'))]
             else:
                 buttons = [button(_('link'), url_for('entity_add_file', id_=id_))]
             buttons.append(button(_('file'), url_for('file_insert', origin_id=id_)))
         elif name == 'human_remains':
-            self.table = Table(Table.HEADERS['human_remains'])
+            self.table = Table(Table.HEADERS['human_remains'] + ['description'])
             if system_type == 'stratigraphic unit':
                 buttons = [button(_('human remains'), url_for('place_insert',
                                                               origin_id=id_,
@@ -119,8 +128,7 @@ class Tab:
                                                                code='external_reference',
                                                                origin_id=id_))]
         elif name == 'relation':
-            self.table = Table(['relation', 'actor', 'first', 'last', 'description'],
-                               defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])
+            self.table = Table(['relation', 'actor', 'first', 'last', 'description'])
             buttons = [button(_('link'), url_for('relation_insert', origin_id=id_))]
             for code in class_codes['actor']:
                 label = g.classes[code].name
@@ -137,10 +145,12 @@ class Tab:
             buttons.append(button(_('source'), url_for('source_insert', origin_id=id_)))
         elif name == 'subs':
             self.table = Table(Table.HEADERS['event'])
-        elif name == 'stratigraphic_unit' and system_type == 'feature':
-            self.table = Table(Table.HEADERS['stratigraphic_unit'])
-            buttons = [button(_('stratigraphic unit'), url_for('place_insert', origin_id=id_))]
-        elif name == 'texts':
+        elif name == 'stratigraphic_unit':
+            self.table = Table(Table.HEADERS['stratigraphic_unit'] + ['description'])
+            if system_type == 'feature':
+                buttons = [button(_('stratigraphic unit'), url_for('place_insert', origin_id=id_))]
+        elif name == 'text':
+            self.table = Table(['text', 'type', 'content'])
             buttons = [button(_('text'), url_for('translation_insert', source_id=id_))]
         elif name == 'node':
             self.table = Table(Table.HEADERS['node'])
