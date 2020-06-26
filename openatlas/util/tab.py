@@ -56,6 +56,7 @@ class Tab:
                 buttons.append(button(g.classes[code].name,
                                       url_for('actor_insert', code=code, origin_id=id_)))
         elif name == 'entities':
+            self.table = Table([_('name'), _('class'), _('info')])
             buttons = [button(_('move entities'), url_for('node_move_entities', id_=id_))]
         elif name == 'event':
             self.table = Table(Table.HEADERS['event'],
@@ -106,6 +107,8 @@ class Tab:
             self.table = Table(['member of', 'function', 'first', 'last', 'description'],
                                defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])
             buttons = [button(_('link'), url_for('membership_insert', origin_id=id_))]
+        elif name == 'node':
+            self.table = Table(Table.HEADERS['node'])
         elif name == 'place':
             self.table = Table(Table.HEADERS['place'])
             if system_type == 'file':
@@ -144,7 +147,10 @@ class Tab:
                 buttons = [button(_('link'), url_for('entity_add_source', id_=id_))]
             buttons.append(button(_('source'), url_for('source_insert', origin_id=id_)))
         elif name == 'subs':
-            self.table = Table(Table.HEADERS['event'])
+            if code == 'E55':
+                self.table = Table([_('name'), _('count'), _('info')])
+            else:
+                self.table = Table(Table.HEADERS['event'])
         elif name == 'stratigraphic_unit':
             self.table = Table(Table.HEADERS['stratigraphic_unit'] + ['description'])
             if system_type == 'feature':
@@ -152,6 +158,4 @@ class Tab:
         elif name == 'text':
             self.table = Table(['text', 'type', 'content'])
             buttons = [button(_('text'), url_for('translation_insert', source_id=id_))]
-        elif name == 'node':
-            self.table = Table(Table.HEADERS['node'])
         return buttons

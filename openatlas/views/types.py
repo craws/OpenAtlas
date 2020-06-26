@@ -174,11 +174,8 @@ def node_view(node: Node) -> str:
     root = g.nodes[node.root[-1]] if node.root else None
     super_ = g.nodes[node.root[0]] if node.root else None
     tabs = {name: Tab(name, origin=node) for name in ['info', 'subs', 'entities', 'file']}
-    header = [_('name'), _('class'), _('info')]
     if root and root.value_type:  # pragma: no cover
-        header = [_('name'), _('value'), _('class'), _('info')]
-    tables = {'entities': Table(header), 'file': Table(Table.HEADERS['file'] + [_('main image')])}
-    profile_image_id = node.get_profile_image_id()
+        tabs['entities'].table.header = [_('name'), _('value'), _('class'), _('info')]
     for entity in node.get_linked_entities(['P2', 'P89'], inverse=True, nodes=True):
         if node.class_.code == 'E53':  # pragma: no cover
             object_ = entity.get_linked_entity('P53', inverse=True)
@@ -190,8 +187,8 @@ def node_view(node: Node) -> str:
             data.append(format_number(entity.nodes[node]))
         data.append(g.classes[entity.class_.code].name)
         data.append(entity.description)
-        tables['entities'].rows.append(data)
-    tables['link_entities'] = Table([_('domain'), _('range')])
+        tabs['entities'].table.rows.append(data)
+    profile_image_id = node.get_profile_image_id()
     for link_ in node.get_links('P67', inverse=True):
         domain = link_.domain
         data = get_base_table_data(domain)
@@ -203,21 +200,15 @@ def node_view(node: Node) -> str:
         if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=node.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
-        tables[domain.view_name].rows.append(data)
-
-    for row in Link.get_entities_by_node(node):
-        tables['link_entities'].rows.append([link(Entity.get_by_id(row.domain_id)),
-                                             link(Entity.get_by_id(row.range_id))])
-    tables['subs'] = Table([_('name'), _('count'), _('info')])
+        tabs[domain.view_name].table.rows.append(data)
     for sub_id in node.subs:
         sub = g.nodes[sub_id]
-        tables['subs'].rows.append([link(sub), sub.count, sub.description])
-
-    tabs['subs'].table = tables['subs']
-    tabs['entities'].table = tables['entities'] if tables['entities'].rows else \
-        tables['link_entities']
-    tabs['file'].table = tables['file']
-
+        tabs['subs'].table.rows.append([link(sub), sub.count, sub.description])
+    if not tabs['entities'].table.rows:
+        tabs['entities'].table = Table([_('domain'), _('range')])
+        for row in Link.get_entities_by_node(node):
+            tabs['entities'].table.rows.append([link(Entity.get_by_id(row.domain_id)),
+                                                link(Entity.get_by_id(row.range_id))])
     return render_template('types/view.html',
                            node=node,
                            super_=super_,
