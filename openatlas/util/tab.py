@@ -122,7 +122,8 @@ class Tab:
                                                                code='external_reference',
                                                                origin_id=id_))]
         elif name == 'relation':
-            table = Table(['relation', 'actor', 'first', 'last', 'description'])
+            table = Table(['relation', 'actor', 'first', 'last', 'description'],
+                          defs=[{'className': 'dt-body-right', 'targets': [2, 3]}])
             buttons = [button(_('link'), url_for('relation_insert', origin_id=id_))]
             for code in class_codes['actor']:
                 label = g.classes[code].name
