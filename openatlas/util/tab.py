@@ -15,18 +15,18 @@ _('texts')
 class Tab:
     origin: Optional[Entity]
     buttons: Optional[List[str]]
-    table: Optional[Table]
+    table: Table
 
     def __init__(self, name: str, origin: Optional[Entity] = None) -> None:
         self.name = name
         self.title = uc_first(_(name.replace('_', ' ')))
         self.origin = origin
-        id_ = origin.id
-        system_type = origin.system_type
-        code = origin.class_.code
+        id_ = origin.id if origin else None
+        system_type = origin.system_type if origin else None
+        code = origin.class_.code if origin else None
         class_codes = app.config['CLASS_CODES']
-        buttons = []
-        table = None
+        buttons: List[str] = []
+        table = Table()
 
         if name == 'actor':
             table = Table(Table.HEADERS['actor'],

@@ -3,7 +3,7 @@
     <div class="row">
         <div class="col-6">
             <ul class="nav nav-tabs" role="tablist">
-                {% for id_, tab in tabs.items() if id_ == 'info' or tab.buttons or (tab.table and tab.table.rows): %}
+                {% for id_, tab in tabs.items() if id_ == 'info' or tab.buttons or tab.table.rows: %}
                     <li class="nav-item">
                         <a
                             role="tab"
@@ -11,16 +11,13 @@
                             href="#tab-{{ id_|replace('_', '-') }}"
                             class="nav-link {{ 'active' if loop.first else '' }}"
                             aria-selected="{{ 'true' if loop.first else 'false' }}">
-                                {{ tab.title|uc_first }}
-                                {% if tab.table: %}
-                                    {{ tab.table|format_tab_number }}
-                                {% endif %}
+                                {{ tab.title|uc_first }} {{ tab.table|format_tab_number }}
                         </a>
                     </li>
                 {% endfor %}
             </ul>
             <div class="tab-content">
-                {% for id_, tab in tabs.items() if id_ == 'info' or tab.buttons or (tab.table and tab.table.rows): %}
+                {% for id_, tab in tabs.items() if id_ == 'info' or tab.buttons or tab.table.rows: %}
                     {% if loop.index == 1 %}
                         <div class="tab-pane fade show active" role="tabpanel" id="tab-{{ id_ }}">
                             {% block tab_info %}{% endblock%}
@@ -34,7 +31,7 @@
                                     {% endfor %}
                                 </div>
                             {% endif %}
-                            {% if tab.table: %}
+                            {% if tab.table.rows: %}
                                 {{ tab.table.display(id_)|safe }}
                             {% endif %}
                         </div>
