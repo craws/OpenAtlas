@@ -4,6 +4,10 @@ html, body, input, select, textarea {
     font-family: helvetica, arial, sans-serif;
 }
 
+li.changelog {
+    margin-top: 0.3em;
+}
+
 textarea {
     resize: both;
 }
@@ -370,7 +374,7 @@ select[name="table_table_length"] {
     padding-bottom: initial;
 }
 
-/*forms*/
+/* forms */
 label.error {
     padding-left: 0.5em;
 }
@@ -489,7 +493,7 @@ div.data-table div.display-none {
     font-size: 0.9em;
 }
 
-/*bootstrap mods*/
+/* Bootstrap mods */
 .navbar {
     width: 100%;
 }
