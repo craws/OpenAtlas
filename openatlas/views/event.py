@@ -58,12 +58,8 @@ def event_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
         Entity.delete_(id_)
         logger.log_user(id_, 'delete')
         flash(_('entity deleted'), 'info')
-    table = Table(Table.HEADERS['event'] + ['description'],
-                  defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])
-    for event in Entity.get_by_menu_item('event'):
-        data = get_base_table_data(event)
-        data.append(event.description)
-        table.rows.append(data)
+    table = Table(Table.HEADERS['event'], defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])
+    table.rows = [get_base_table_data(item) for item in Entity.get_by_menu_item('event')]
     return render_template('event/index.html', table=table)
 
 

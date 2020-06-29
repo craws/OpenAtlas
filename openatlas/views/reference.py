@@ -117,11 +117,8 @@ def reference_index(action: Optional[str] = None, id_: Optional[int] = None) -> 
         Entity.delete_(id_)
         logger.log_user(id_, 'delete')
         flash(_('entity deleted'), 'info')
-    table = Table(Table.HEADERS['reference'] + ['description'])
-    for reference in Entity.get_by_menu_item('reference'):
-        data = get_base_table_data(reference)
-        data.append(reference.description)
-        table.rows.append(data)
+    table = Table(Table.HEADERS['reference'])
+    table.rows = [get_base_table_data(item) for item in Entity.get_by_menu_item('reference')]
     return render_template('reference/index.html', table=table)
 
 

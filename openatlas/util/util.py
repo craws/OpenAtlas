@@ -519,8 +519,7 @@ def get_base_table_data(entity: 'Entity',
     if entity.view_name in ['event', 'actor', 'place']:
         data.append(entity.first if entity.first else '')
         data.append(entity.last if entity.last else '')
-    if entity.view_name in ['source'] or entity.system_type == 'file':
-        data.append(entity.description)
+    data.append(entity.description)
     return data
 
 

@@ -215,8 +215,6 @@ def place_view(obj: Entity) -> str:
             data.append(link_.description)
             if domain.system_type.startswith('external reference'):
                 obj.external_references.append(link_)
-            if domain.view_name == 'reference':
-                data.append(link_.domain.description)
             if is_authorized('contributor') and domain.system_type != 'external reference geonames':
                 url = url_for('reference_link_update', link_id=link_.id, origin_id=obj.id)
                 data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
@@ -239,12 +237,12 @@ def place_view(obj: Entity) -> str:
                                          g.properties[link_.property.code].name,
                                          actor.class_.name,
                                          actor.first,
-                                         actor.last])
+                                         actor.last,
+                                         actor.description])
     structure = get_structure(obj)
     if structure:
         for entity in structure['subunits']:
             data = get_base_table_data(entity)
-            data.append(entity.description)
             tabs[entity.system_type.replace(' ', '_')].table.rows.append(data)
     gis_data = Gis.get_all([obj], structure)
     if gis_data['gisPointSelected'] == '[]' \
