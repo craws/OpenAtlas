@@ -215,6 +215,8 @@ def place_view(obj: Entity) -> str:
             data.append(link_.description)
             if domain.system_type.startswith('external reference'):
                 obj.external_references.append(link_)
+            if domain.view_name == 'reference':
+                data.append(link_.domain.description)
             if is_authorized('contributor') and domain.system_type != 'external reference geonames':
                 url = url_for('reference_link_update', link_id=link_.id, origin_id=obj.id)
                 data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')

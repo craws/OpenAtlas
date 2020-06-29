@@ -110,7 +110,9 @@ class Tab:
                 buttons = [button(_('link'), url_for('source_add', id_=id_, class_name='place'))]
             buttons.append(button(_('place'), url_for('place_insert', origin_id=id_)))
         elif name == 'reference':
-            table = Table(Table.HEADERS['reference'] + ['page / link text'])
+            table = Table(Table.HEADERS['reference'] + ['page'])
+            if origin.view_name == 'place':
+                table = Table(Table.HEADERS['reference'] + ['page', 'description'])
             buttons = [button(_('link'), url_for('entity_add_reference', id_=id_)),
                        button(_('bibliography'), url_for('reference_insert',
                                                          code='bibliography',

@@ -4,6 +4,7 @@ class Changelog:
             'feature': {
                 '1272': 'Tabs redesign',
                 '1279': 'Change "Add" button label to "Link"',
+                '1229': 'Show reference description on mouseover',
                 '1269': 'API: get_by_menu_item() for actors'},
             'fix': {
                 '1267': 'Model link checker bug',
