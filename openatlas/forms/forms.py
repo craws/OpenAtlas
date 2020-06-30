@@ -172,7 +172,7 @@ class TreeSelect(HiddenInput):  # type: ignore
                 $(document).ready(function () {{
                     $("#{name}-tree").jstree({{
                         "core" : {{"check_callback": true, "data": {tree_data}}},
-                        "search": {{"case_insensitive": true, "show_only_matches": true}},
+                        "search": {{"case_insensitive": true, "show_only_matches": true, "show_only_matches_children": true}},
                         "plugins" : ["search"],
                     }});
                     $("#{name}-tree").on("select_node.jstree", function (e, data) {{
@@ -250,7 +250,7 @@ class TreeMultiSelect(HiddenInput):  # type: ignore
             <script>
                 $("#{name}-tree").jstree({{
                     "core" : {{ "check_callback": true, "data": {tree_data} }},
-                    "search": {{"case_insensitive": true, "show_only_matches": true}},
+                    "search": {{"case_insensitive": true, "show_only_matches": true, "show_only_matches_children": true}},
                     "plugins": ["search", "checkbox"],
                     "checkbox": {{"three_state": false}}
                 }});
