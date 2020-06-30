@@ -1,9 +1,3 @@
-var submitHandler = function(form) {
-            $('input[type="submit"]').prop("disabled", true)
-            .val('... in progress');
-            $(form).submit();
-          }
-
 $(document).ready(function () {
 
     // Write selected DataTables checkboxes to hidden input
@@ -72,11 +66,6 @@ $(document).ready(function () {
         $("#password2").val(random_password);
     })
 
-    $('#insert_and_continue').click(function () {
-        $('#continue_').val('yes');
-        $('form').submit();
-    });
-
     $("#password-form").validate({
         rules: {
             password: {minlength: minimumPasswordLength, notEqual: "#password_old"},
@@ -95,7 +84,6 @@ $(document).ready(function () {
         rules: {
             file: {fileSize: maxFileSize * 1024 * 1024}
         },
-        submitHandler: submitHandler(form),
     });
 
     $.validator.addClassRules({
@@ -108,9 +96,15 @@ $(document).ready(function () {
         "value-type": {number: true}
     });
 
-    $("form").each(function () {
+    $("form").each(function() {
         $(this).validate({
-          submitHandler: submitHandler(form),
+            submitHandler: function(form) {
+                if(this.submitButton.id === "insert_and_continue") $('#continue_').val('yes');
+                $('input[type="submit"]').prop("disabled", true)
+                .val('... in progress');
+                form.submit();
+            },
         });
     });
+
 });
