@@ -7,7 +7,10 @@ class Changelog:
                 '1229': 'Show descriptions in all tables',
                 '1269': 'API: get_by_menu_item() for actors'},
             'fix': {
+                '547': 'Prevent double submit',
+                '1235': 'Layout issues on smaller screens',
                 '1267': 'Model link checker bug',
+                '1288': 'Forward upon failed form validation',
                 '1234': "API: Relation inverse doesn't work proper"}}],
         '5.2.0': ['2020-05-11', {
             'feature': {
