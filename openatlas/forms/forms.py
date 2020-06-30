@@ -292,6 +292,8 @@ class TableSelect(HiddenInput):  # type: ignore
             entities = Entity.get_by_system_type('bibliography') + \
                        Entity.get_by_system_type('edition') + \
                        Entity.get_by_system_type('external reference')
+        elif class_ == 'file':
+            entities = Entity.get_by_system_type('file')
         else:
             entities = Entity.get_by_menu_item(class_)
         table = Table(Table.HEADERS[class_])
@@ -499,8 +501,8 @@ def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
             <input id="csrf_token" name="csrf_token" type="hidden" value="{token}">
             <input id="checkbox_values" name="checkbox_values" type="hidden">
             {table}
-            <input id="save" class="{class_}" name="save" type="submit" value="{add}">
-        </form>""".format(add=uc_first(_('add')),
+            <input id="save" class="{class_}" name="save" type="submit" value="{link}">
+        </form>""".format(link=uc_first(_('link')),
                           token=generate_csrf(),
                           class_=app.config['CSS']['button']['primary'],
                           table=table.display(class_name))

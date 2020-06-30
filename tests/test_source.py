@@ -61,7 +61,7 @@ class SourceTest(TestBaseCase):
             rv = self.app.get(url_for('entity_view', id_=source.id))
             assert b'Gillian Anderson' in rv.data
             rv = self.app.get(url_for('source_add', id_=source.id, class_name='place'))
-            assert b'Add Place' in rv.data
+            assert b'Link Place' in rv.data
 
             # Update source
             rv = self.app.get(url_for('source_update', id_=source.id))
@@ -75,7 +75,7 @@ class SourceTest(TestBaseCase):
 
             # Add to source
             rv = self.app.get(url_for('entity_add_reference', id_=source.id))
-            assert b'Add Reference' in rv.data
+            assert b'Link Reference' in rv.data
             rv = self.app.post(url_for('entity_add_reference', id_=source.id),
                                data={'reference': reference.id, 'page': '777'},
                                follow_redirects=True)

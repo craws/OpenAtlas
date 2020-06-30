@@ -115,17 +115,15 @@ def class_view(code: str) -> str:
     class_ = g.classes[code]
     tables = {}
     for table in ['super', 'sub']:
-        tables[table] = Table(['code', 'name'], paging=False,
+        tables[table] = Table(paging=False,
                               defs=[{'orderDataType': 'cidoc-model', 'targets': [0]},
                                     {'sType': 'numeric', 'targets': [0]}])
         for code_ in getattr(class_, table):
             tables[table].rows.append([link(g.classes[code_]), g.classes[code_].name])
-    tables['domains'] = Table(['code', 'name'],
-                              paging=False,
+    tables['domains'] = Table(paging=False,
                               defs=[{'orderDataType': 'cidoc-model', 'targets': [0]},
                                     {'sType': 'numeric', 'targets': [0]}])
-    tables['ranges'] = Table(['code', 'name'],
-                             paging=False,
+    tables['ranges'] = Table(paging=False,
                              defs=[{'orderDataType': 'cidoc-model', 'targets': [0]},
                                    {'sType': 'numeric', 'targets': [0]}])
     for key, property_ in g.properties.items():
@@ -152,8 +150,7 @@ def property_view(code: str) -> str:
             'range': link(range_) + ' ' + range_.name}
     tables = {}
     for table in ['super', 'sub']:
-        tables[table] = Table(['code', 'name'],
-                              paging=False,
+        tables[table] = Table(paging=False,
                               defs=[{'orderDataType': 'cidoc-model', 'targets': [0]},
                                     {'sType': 'numeric', 'targets': [0]}])
         for code in getattr(property_, table):

@@ -6,21 +6,26 @@ from flask_login import current_user
 
 
 class Table:
-    HEADERS = {'actor': ['name', 'class', 'begin', 'end'],
-               'event': ['name', 'class', 'type', 'begin', 'end'],
-               'feature': ['name', 'type', 'begin', 'end'],
-               'find': ['name', 'type', 'begin', 'end'],
+    HEADERS = {'actor': ['name', 'class', 'begin', 'end', 'description'],
+               'entities': ['name', 'class', 'info'],
+               'event': ['name', 'class', 'type', 'begin', 'end', 'description'],
+               'feature': ['name', 'type', 'begin', 'end', 'description'],
+               'find': ['name', 'type', 'begin', 'end', 'description'],
                'file': ['name', 'license', 'size', 'extension', 'description'],
-               'group': ['name', 'class', 'begin', 'end'],
-               'human_remains': ['name', 'type', 'begin', 'end'],
-               'information_carrier': ['name', 'type'],
-               'object': ['name', 'type'],
-               'node': ['name'],
-               'person': ['name', 'class', 'begin', 'end'],
-               'place': ['name', 'type', 'begin', 'end'],
-               'reference': ['name', 'class', 'type'],
+               'group': ['name', 'class', 'begin', 'end', 'description'],
+               'human_remains': ['name', 'type', 'begin', 'end', 'description'],
+               'information_carrier': ['name', 'type', 'description'],
+               'member': ['member', 'function', 'first', 'last', 'description'],
+               'member_of': ['member of', 'function', 'first', 'last', 'description'],
+               'node': ['name', 'description'],
+               'object': ['name', 'type', 'description'],
+               'person': ['name', 'class', 'begin', 'end', 'description'],
+               'place': ['name', 'type', 'begin', 'end', 'description'],
+               'relation': ['relation', 'actor', 'first', 'last', 'description'],
+               'reference': ['name', 'class', 'type', 'description'],
                'source': ['name', 'type', 'description'],
-               'stratigraphic_unit': ['name', 'type', 'begin', 'end']}
+               'stratigraphic_unit': ['name', 'type', 'begin', 'end', 'description'],
+               'text': ['text', 'type', 'content']}
 
     def __init__(self,
                  header: Optional[List[str]] = None,  # A list of column header labels

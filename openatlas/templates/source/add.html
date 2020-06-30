@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title_name %} - {{ _('source')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('source'), 'source_index'], source, _('add') + ' ' + _(class_name)|uc_first]|crumb }}
+    {{ [[_('source'), 'source_index'], source, _('link') + ' ' + _(class_name)|uc_first]|crumb }}
 {% endblock %}
 {% block content %}
     {{ form|safe }}

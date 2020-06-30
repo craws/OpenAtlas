@@ -14,8 +14,12 @@ from openatlas import app, logger
 from openatlas.forms.forms import TableField, build_form
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
+from openatlas.models.user import User
+from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import get_base_table_data, link, required_group, uc_first, was_modified
+from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
+                                 get_profile_image_table_link, is_authorized, link,
+                                 required_group, uc_first, was_modified)
 
 
 class ReferenceForm(FlaskForm):  # type: ignore
@@ -113,11 +117,8 @@ def reference_index(action: Optional[str] = None, id_: Optional[int] = None) -> 
         Entity.delete_(id_)
         logger.log_user(id_, 'delete')
         flash(_('entity deleted'), 'info')
-    table = Table(Table.HEADERS['reference'] + ['description'])
-    for reference in Entity.get_by_menu_item('reference'):
-        data = get_base_table_data(reference)
-        data.append(reference.description)
-        table.rows.append(data)
+    table = Table(Table.HEADERS['reference'])
+    table.rows = [get_base_table_data(item) for item in Entity.get_by_menu_item('reference')]
     return render_template('reference/index.html', table=table)
 
 
@@ -157,6 +158,39 @@ def reference_update(id_: int) -> Union[str, Response]:
         save(form, reference)
         return redirect(url_for('entity_view', id_=id_))
     return render_template('reference/update.html', form=form, reference=reference)
+
+
+def reference_view(reference: Entity) -> str:
+    tabs = {name: Tab(name, origin=reference) for name in [
+        'info', 'source', 'event', 'actor', 'place', 'feature', 'stratigraphic_unit', 'find',
+        'human_remains', 'file']}
+    for link_ in reference.get_links('P67', True):
+        domain = link_.domain
+        data = get_base_table_data(domain)
+        if is_authorized('contributor'):
+            url = url_for('link_delete', id_=link_.id, origin_id=reference.id) + '#tab-file'
+            data.append(display_remove_link(url, domain.name))
+        tabs['file'].table.rows.append(data)
+    profile_image_id = reference.get_profile_image_id()
+    for link_ in reference.get_links(['P67', 'P128']):
+        range_ = link_.range
+        data = get_base_table_data(range_)
+        data.append(link_.description)
+        if range_.view_name == 'file':  # pragma: no cover
+            ext = data[3].replace('.', '')
+            data.append(get_profile_image_table_link(range_, reference, ext, profile_image_id))
+        if is_authorized('contributor'):
+            url = url_for('reference_link_update', link_id=link_.id, origin_id=reference.id)
+            data.append('<a href="' + url + '">' + uc_first(_('edit')) + '</a>')
+            url = url_for('link_delete', id_=link_.id, origin_id=reference.id)
+            data.append(display_remove_link(url + '#tab-' + range_.table_name, range_.name))
+        tabs[range_.table_name].table.rows.append(data)
+    reference.note = User.get_note(reference)
+    return render_template('reference/view.html',
+                           reference=reference,
+                           tabs=tabs,
+                           info=get_entity_data(reference),
+                           profile_image_id=profile_image_id)
 
 
 def save(form: Any,
