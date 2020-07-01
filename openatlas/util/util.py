@@ -391,7 +391,7 @@ def button(label: str,
            id_: Optional[str] = None,
            onclick: Optional[str] = '') -> str:
     label = uc_first(label)
-    if url and '/insert' in url and label != uc_first(_('add')):
+    if url and '/insert' in url and label != uc_first(_('link')):
         label = '+ ' + label
     html = '<a class="{class_}" href="{url}" {id} {onclick}>{label}</a>'.format(
         class_=app.config['CSS']['button'][css],
@@ -520,8 +520,7 @@ def get_base_table_data(entity: 'Entity',
     if entity.view_name in ['event', 'actor', 'place']:
         data.append(entity.first if entity.first else '')
         data.append(entity.last if entity.last else '')
-    if entity.view_name in ['source'] or entity.system_type == 'file':
-        data.append(entity.description)
+    data.append(entity.description)
     return data
 
 

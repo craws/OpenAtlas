@@ -4,6 +4,10 @@ html, body, input, select, textarea {
     font-family: helvetica, arial, sans-serif;
 }
 
+li.changelog {
+    margin-top: 0.3em;
+}
+
 textarea {
     resize: both;
 }
@@ -155,6 +159,10 @@ p {
     margin: 0.5em 0 1em;
 }
 
+#geonames_precision {
+    margin: 0 0.4em;
+}
+
 form input[type="text"].year {
     text-align: right;
     width: 4em;
@@ -221,7 +229,7 @@ form input[type="text"].month, form input[type="text"].day {
 
 #description {
     height: 8em;
-    width: 30em;
+    width: 65%;
 }
 
 .description {
@@ -370,7 +378,7 @@ select[name="table_table_length"] {
     padding-bottom: initial;
 }
 
-/*forms*/
+/* forms */
 label.error {
     padding-left: 0.5em;
 }
@@ -489,7 +497,7 @@ div.data-table div.display-none {
     font-size: 0.9em;
 }
 
-/*bootstrap mods*/
+/* Bootstrap mods */
 .navbar {
     width: 100%;
 }

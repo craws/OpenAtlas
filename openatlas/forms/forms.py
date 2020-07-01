@@ -172,7 +172,7 @@ class TreeSelect(HiddenInput):  # type: ignore
                 $(document).ready(function () {{
                     $("#{name}-tree").jstree({{
                         "core" : {{"check_callback": true, "data": {tree_data}}},
-                        "search": {{"case_insensitive": true, "show_only_matches": true}},
+                        "search": {{"case_insensitive": true, "show_only_matches": true, "show_only_matches_children": true}},
                         "plugins" : ["search"],
                     }});
                     $("#{name}-tree").on("select_node.jstree", function (e, data) {{
@@ -250,7 +250,7 @@ class TreeMultiSelect(HiddenInput):  # type: ignore
             <script>
                 $("#{name}-tree").jstree({{
                     "core" : {{ "check_callback": true, "data": {tree_data} }},
-                    "search": {{"case_insensitive": true, "show_only_matches": true}},
+                    "search": {{"case_insensitive": true, "show_only_matches": true, "show_only_matches_children": true}},
                     "plugins": ["search", "checkbox"],
                     "checkbox": {{"three_state": false}}
                 }});
@@ -292,6 +292,8 @@ class TableSelect(HiddenInput):  # type: ignore
             entities = Entity.get_by_system_type('bibliography') + \
                        Entity.get_by_system_type('edition') + \
                        Entity.get_by_system_type('external reference')
+        elif class_ == 'file':
+            entities = Entity.get_by_system_type('file')
         else:
             entities = Entity.get_by_menu_item(class_)
         table = Table(Table.HEADERS[class_])
@@ -311,11 +313,11 @@ class TableSelect(HiddenInput):  # type: ignore
             if len(entity.aliases) > 0:
                 data[0] = """
                     <p>
-                        <a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
+                        <a onclick="selectFromTable(this,'{name}', {entity_id})" href="#">{entity_name}</a>
                     </p>""".format(name=field.id, entity_id=entity.id, entity_name=entity.name)
             else:
                 data[0] = """
-                    <a onclick="selectFromTable(this,'{name}', {entity_id})">{entity_name}</a>
+                    <a onclick="selectFromTable(this,'{name}', {entity_id})" href="#">{entity_name}</a>
                     """.format(name=field.id, entity_id=entity.id, entity_name=entity.name)
             for i, (id_, alias) in enumerate(entity.aliases.items()):
                 if i == len(entity.aliases) - 1:
@@ -326,7 +328,7 @@ class TableSelect(HiddenInput):  # type: ignore
         html = """
             <input id="{name}-button" name="{name}-button" class="table-select {required}"
                 type="text" placeholder="{change_label}" onfocus="this.blur()" readonly="readonly"
-                value="{selection}" onclick="$('#{name}-modal').modal('show')">
+                value="{selection}" onclick="$('#{name}-modal').modal('show'); $('#{name}_table_filter input')[0].focus()">
             <a href="#" id="{name}-clear" class="{button_class}" {clear_style}
                 onclick="clearSelect('{name}');">{clear_label}</a>
             <div id="{name}-modal" class="modal fade" tabindex="-1" role="dialog"
@@ -499,8 +501,8 @@ def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
             <input id="csrf_token" name="csrf_token" type="hidden" value="{token}">
             <input id="checkbox_values" name="checkbox_values" type="hidden">
             {table}
-            <input id="save" class="{class_}" name="save" type="submit" value="{add}">
-        </form>""".format(add=uc_first(_('add')),
+            <input id="save" class="{class_}" name="save" type="submit" value="{link}">
+        </form>""".format(link=uc_first(_('link')),
                           token=generate_csrf(),
                           class_=app.config['CSS']['button']['primary'],
                           table=table.display(class_name))

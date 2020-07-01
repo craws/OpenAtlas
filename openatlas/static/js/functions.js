@@ -114,7 +114,6 @@ $(document).ready(function () {
     let url = location.href.replace(/\/$/, "");
     if (location.hash) {
         const hashes = url.split("#")[1].split("_");
-        console.log($(`#${hashes[1]}`));
         $(`a[href="#${hashes[0]}"]`).tab('show');
         $(`#${hashes[1]}`).collapse('show');
         url = location.href.replace(/\/#/, "#");
@@ -123,6 +122,9 @@ $(document).ready(function () {
             $(window).scrollTop(0);
         }, 400);
     }
+    else {
+        $(`a[href="#menu-tab-standard"]`).tab('show');
+    }
 
     $('a[data-toggle="tab"]').on("click", function () {
         let newUrl;
@@ -130,7 +132,6 @@ $(document).ready(function () {
         newUrl = url.split("#")[0] + hash;
         history.replaceState(null, null, newUrl);
     });
-
 });
 
 $.jstree.defaults.core.themes.dots = false;

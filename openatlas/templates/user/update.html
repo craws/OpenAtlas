@@ -1,7 +1,9 @@
 {% extends 'layout.html' %}
 {% block title_name %} - {{ user.username }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'], _('user'), user, _('edit')]|crumb }}
+    <a href="{{ url_for('admin_index') }}#tab-user">{{ _('admin')|uc_first }}</a>&nbsp;>&nbsp;
+    <a href="{{ url_for('user_view', id_=user.id) }}">{{ user.username }}</a>&nbsp;>&nbsp;
+    {{ _('edit')|uc_first }}
 {% endblock %}
 {% block content %}
     {{ form|display_form('user-form', manual_page='admin/user') }}

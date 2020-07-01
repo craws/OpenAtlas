@@ -100,6 +100,7 @@ openatlas/export/sql
 e.g.
 
     # chown www-data openatlas/uploads
+    # chown www-data openatlas/export/*
 
 ### Finishing
 

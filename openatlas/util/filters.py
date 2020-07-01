@@ -83,6 +83,8 @@ def note(self: Any, entity: Entity) -> str:
 @blueprint.app_template_filter()
 def format_tab_number(self: Any, param: Union[int, Table]) -> str:
     length = len(param.rows) if isinstance(param, Table) else param
+    if not length:
+        return ''
     return Markup('<span class="tab-counter">' + babel_format_number(length) + '</span>')
 
 

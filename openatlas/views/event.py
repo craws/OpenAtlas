@@ -13,9 +13,14 @@ from openatlas import app, logger
 from openatlas.forms.date import DateForm
 from openatlas.forms.forms import TableField, TableMultiField, build_form
 from openatlas.models.entity import Entity
+from openatlas.models.gis import Gis
 from openatlas.models.link import Link
+from openatlas.models.user import User
+from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import get_base_table_data, link, required_group, was_modified
+from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
+                                 get_profile_image_table_link, is_authorized, link, required_group,
+                                 uc_first, was_modified)
 
 
 class EventForm(DateForm):
@@ -53,12 +58,8 @@ def event_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
         Entity.delete_(id_)
         logger.log_user(id_, 'delete')
         flash(_('entity deleted'), 'info')
-    table = Table(Table.HEADERS['event'] + ['description'],
-                  defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])
-    for event in Entity.get_by_menu_item('event'):
-        data = get_base_table_data(event)
-        data.append(event.description)
-        table.rows.append(data)
+    table = Table(Table.HEADERS['event'], defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])
+    table.rows = [get_base_table_data(item) for item in Entity.get_by_menu_item('event')]
     return render_template('event/index.html', table=table)
 
 
@@ -168,17 +169,15 @@ def save(form: FlaskForm,
                 event.link('P26', Link.get_linked_entity_safe(int(form.place_to.data), 'P53'))
         url = url_for('entity_view', id_=event.id)
         if origin:
-            url = url_for('entity_view', id_=origin.id) + '#tab-event'
+            url = url_for('entity_view', id_=origin.id) + '#tab-event'  # e.g origin is a place
             if origin.view_name == 'reference':
                 link_id = origin.link('P67', event)[0]
                 url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
-            elif origin.view_name == 'source':
+            elif origin.view_name in ['source', 'file']:
                 origin.link('P67', event)
             elif origin.view_name == 'actor':
                 link_id = event.link('P11', origin)[0]
                 url = url_for('involvement_update', id_=link_id, origin_id=origin.id)
-            elif origin.view_name == 'file':
-                origin.link('P67', event)
         if form.continue_.data == 'yes':
             url = url_for('event_insert', code=code, origin_id=origin.id if origin else None)
         g.cursor.execute('COMMIT')
@@ -190,3 +189,58 @@ def save(form: FlaskForm,
         flash(_('error transaction'), 'error')
         url = url_for('event_index')
     return url
+
+
+def event_view(event: Entity) -> str:
+    tabs = {name: Tab(name, origin=event) for name in [
+        'info', 'subs', 'source', 'actor', 'reference', 'file']}
+    for sub_event in event.get_linked_entities('P117', inverse=True, nodes=True):
+        tabs['subs'].table.rows.append(get_base_table_data(sub_event))
+    for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
+        first = link_.first
+        if not link_.first and event.first:
+            first = '<span class="inactive">' + event.first + '</span>'
+        last = link_.last
+        if not link_.last and event.last:
+            last = '<span class="inactive">' + event.last + '</span>'
+        data = ([link(link_.range),
+                 g.classes[link_.range.class_.code].name,
+                 link_.type.name if link_.type else '',
+                 first, last,
+                 link_.description])
+        if is_authorized('contributor'):
+            update_url = url_for('involvement_update', id_=link_.id, origin_id=event.id)
+            unlink_url = url_for('link_delete', id_=link_.id, origin_id=event.id) + '#tab-actor'
+            data.append('<a href="' + update_url + '">' + uc_first(_('edit')) + '</a>')
+            data.append(display_remove_link(unlink_url, link_.range.name))
+        tabs['actor'].table.rows.append(data)
+    profile_image_id = event.get_profile_image_id()
+    event.note = User.get_note(event)
+    for link_ in event.get_links('P67', True):
+        domain = link_.domain
+        data = get_base_table_data(domain)
+        if domain.view_name == 'file':
+            extension = data[3].replace('.', '')
+            data.append(get_profile_image_table_link(domain, event, extension, profile_image_id))
+            if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+                profile_image_id = domain.id
+        if domain.view_name not in ['source', 'file']:
+            if domain.system_type == 'external reference':
+                event.external_references.append(link_)
+            data.append(link_.description)
+            if is_authorized('contributor'):
+                data.append('<a href="{url}">{label}</a>'.format(
+                    label=uc_first(_('edit')),
+                    url=url_for('reference_link_update', link_id=link_.id, origin_id=event.id)))
+        if is_authorized('contributor'):
+            url = url_for('link_delete', id_=link_.id, origin_id=event.id)
+            data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
+        tabs[domain.view_name].table.rows.append(data)
+    objects = [location.get_linked_entity_safe('P53', True)
+               for location in event.get_linked_entities(['P7', 'P26', 'P27'])]
+    return render_template('event/view.html',
+                           event=event,
+                           tabs=tabs,
+                           info=get_entity_data(event),
+                           profile_image_id=profile_image_id,
+                           gis_data=Gis.get_all(objects) if objects else None)
