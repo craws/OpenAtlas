@@ -1,8 +1,17 @@
 class Changelog:
     versions = {
         '5.3.0': ['TBA', {
-            'feature': {},
-            'fix': {}}],
+            'feature': {
+                '1272': 'Tabs redesign',
+                '1279': 'Change "Add" button label to "Link"',
+                '1229': 'Show descriptions in all tables',
+                '1269': 'API: get_by_menu_item() for actors'},
+            'fix': {
+                '547': 'Prevent double submit',
+                '1235': 'Layout issues on smaller screens',
+                '1267': 'Model link checker bug',
+                '1288': 'Forward upon failed form validation',
+                '1234': "API: Relation inverse doesn't work proper"}}],
         '5.2.0': ['2020-05-11', {
             'feature': {
                 '1065': 'User manual in application',

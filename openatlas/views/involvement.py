@@ -61,7 +61,6 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
                     link_.type = get_link_type(form)
                     link_.update()
             g.cursor.execute('COMMIT')
-            flash(_('entity created'), 'info')
         except Exception as e:  # pragma: no cover
             g.cursor.execute('ROLLBACK')
             logger.log('error', 'database', 'transaction failed', e)

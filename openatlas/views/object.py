@@ -11,8 +11,11 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.forms.forms import build_form
 from openatlas.models.entity import Entity
+from openatlas.models.user import User
+from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import get_base_table_data, link, required_group, was_modified
+from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
+                                 is_authorized, link, required_group, was_modified)
 
 
 class InformationCarrierForm(FlaskForm):  # type: ignore
@@ -32,11 +35,8 @@ def object_index(action: Optional[str] = None, id_: Optional[int] = None) -> str
         Entity.delete_(id_)
         logger.log_user(id_, 'delete')
         flash(_('entity deleted'), 'info')
-    table = Table(Table.HEADERS['object'] + ['description'])
-    for object_ in Entity.get_by_menu_item('object'):
-        data = get_base_table_data(object_)
-        data.append(object_.description)
-        table.rows.append(data)
+    table = Table(Table.HEADERS['object'])
+    table.rows = [get_base_table_data(item) for item in Entity.get_by_menu_item('object')]
     return render_template('object/index.html', table=table)
 
 
@@ -66,6 +66,26 @@ def object_update(id_: int) -> Union[str, Response]:
         save(form, object_)
         return redirect(url_for('entity_view', id_=id_))
     return render_template('object/update.html', form=form, object_=object_)
+
+
+def object_view(obj: Entity) -> str:
+    tabs = {name: Tab(name, origin=obj) for name in ['info', 'source', 'event']}
+    for link_ in obj.get_links('P128'):
+        data = get_base_table_data(link_.range)
+        if is_authorized('contributor'):
+            url = url_for('link_delete', id_=link_.id, origin_id=obj.id)
+            data.append(display_remove_link(url + '#tab-' + link_.range.table_name,
+                                            link_.range.name))
+        tabs['source'].table.rows.append(data)
+    for link_ in obj.get_links('P25', inverse=True):
+        data = get_base_table_data(link_.domain)
+        if is_authorized('contributor'):
+            url = url_for('link_delete', id_=link_.id, origin_id=obj.id)
+            data.append(display_remove_link(url + '#tab-' + link_.range.table_name,
+                                            link_.range.name))
+        tabs['event'].table.rows.append(data)
+    obj.note = User.get_note(obj)
+    return render_template('object/view.html', object_=obj, tabs=tabs, info=get_entity_data(obj))
 
 
 def save(form: Any, object_: Optional[Entity] = None) -> str:

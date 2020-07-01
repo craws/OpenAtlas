@@ -82,13 +82,13 @@ class EventTest(TestBaseCase):
 
             # Add to event
             rv = self.app.get(url_for('entity_add_file', id_=event_id))
-            assert b'Add File' in rv.data
+            assert b'Link File' in rv.data
             rv = self.app.post(url_for('entity_add_file', id_=event_id),
                                data={'checkbox_values': str([file.id])}, follow_redirects=True)
             assert b'X-Files' in rv.data
 
             rv = self.app.get(url_for('entity_add_reference', id_=event_id))
-            assert b'Add Reference' in rv.data
+            assert b'Link Reference' in rv.data
             rv = self.app.post(url_for('entity_add_reference', id_=event_id),
                                data={'reference': reference.id, 'page': '777'},
                                follow_redirects=True)

@@ -164,7 +164,7 @@ class PlaceTest(TestBaseCase):
 
             # Add to place
             rv = self.app.get(url_for('entity_add_file', id_=place.id))
-            assert b'Add File' in rv.data
+            assert b'Link File' in rv.data
 
             rv = self.app.post(url_for('entity_add_file', id_=place.id),
                                data={'checkbox_values': str([file.id])},
@@ -174,7 +174,7 @@ class PlaceTest(TestBaseCase):
             rv = self.app.get(url_for('reference_add', id_=reference.id, class_name='place'))
             assert b'Val-hall' in rv.data
             rv = self.app.get(url_for('entity_add_reference', id_=place.id))
-            assert b'Add Reference' in rv.data
+            assert b'Link Reference' in rv.data
             rv = self.app.post(url_for('entity_add_reference', id_=place.id),
                                data={'reference': reference.id, 'page': '777'},
                                follow_redirects=True)

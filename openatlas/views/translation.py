@@ -12,7 +12,7 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.forms.forms import build_form
 from openatlas.models.entity import Entity
-from openatlas.util.util import required_group
+from openatlas.util.util import get_entity_data, required_group
 
 
 class TranslationForm(FlaskForm):  # type: ignore
@@ -59,6 +59,13 @@ def translation_update(id_: int) -> Union[str, Response]:
                            translation=translation,
                            source=source,
                            form=form)
+
+
+def translation_view(translation: Entity) -> str:
+    return render_template('translation/view.html',
+                           info=get_entity_data(translation),
+                           source=translation.get_linked_entity('P73', True),
+                           translation=translation)
 
 
 def save(form: FlaskForm,

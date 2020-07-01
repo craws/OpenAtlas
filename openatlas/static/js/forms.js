@@ -66,11 +66,6 @@ $(document).ready(function () {
         $("#password2").val(random_password);
     })
 
-    $('#insert_and_continue').click(function () {
-        $('#continue_').val('yes');
-        $('form').submit();
-    });
-
     $("#password-form").validate({
         rules: {
             password: {minlength: minimumPasswordLength, notEqual: "#password_old"},
@@ -88,7 +83,7 @@ $(document).ready(function () {
     $('#file-form').validate({
         rules: {
             file: {fileSize: maxFileSize * 1024 * 1024}
-        }
+        },
     });
 
     $.validator.addClassRules({
@@ -101,7 +96,15 @@ $(document).ready(function () {
         "value-type": {number: true}
     });
 
-    $("form").each(function () {
-        $(this).validate();
+    $("form").each(function() {
+        $(this).validate({
+            submitHandler: function(form) {
+                if(this.submitButton.id === "insert_and_continue") $('#continue_').val('yes');
+                $('input[type="submit"]').prop("disabled", true)
+                .val('... in progress');
+                form.submit();
+            },
+        });
     });
+
 });

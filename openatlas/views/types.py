@@ -10,10 +10,15 @@ from wtforms import (HiddenField, SelectMultipleField, StringField, SubmitField,
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import build_move_form, build_node_form, build_table_form
+from openatlas.forms.forms import build_move_form, build_node_form
 from openatlas.models.entity import Entity
+from openatlas.models.link import Link
 from openatlas.models.node import Node
-from openatlas.util.util import required_group, sanitize, uc_first
+from openatlas.util.tab import Tab
+from openatlas.util.table import Table
+from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
+                                 get_profile_image_table_link, is_authorized, link, required_group,
+                                 sanitize, uc_first)
 
 
 class NodeForm(FlaskForm):  # type: ignore
@@ -142,7 +147,7 @@ def walk_tree(nodes: List[int]) -> List[Dict[str, Any]]:
 
 
 def tree_select(name: str) -> str:
-    html = """
+    return """
         <div id="{name}-tree"></div>
         <script>
             $(document).ready(function () {{
@@ -163,7 +168,54 @@ def tree_select(name: str) -> str:
         </script>""".format(min_chars=session['settings']['minimum_jstree_search'],
                             name=sanitize(name),
                             tree_data=walk_tree(Node.get_nodes(name)))
-    return html
+
+
+def node_view(node: Node) -> str:
+    root = g.nodes[node.root[-1]] if node.root else None
+    super_ = g.nodes[node.root[0]] if node.root else None
+    tabs = {name: Tab(name, origin=node) for name in ['info', 'subs', 'entities', 'file']}
+    if root and root.value_type:  # pragma: no cover
+        tabs['entities'].table.header = [_('name'), _('value'), _('class'), _('info')]
+    for entity in node.get_linked_entities(['P2', 'P89'], inverse=True, nodes=True):
+        if node.class_.code == 'E53':  # pragma: no cover
+            object_ = entity.get_linked_entity('P53', inverse=True)
+            if not object_:  # If it's a location show the object, continue otherwise
+                continue
+            entity = object_
+        data = [link(entity)]
+        if root and root.value_type:  # pragma: no cover
+            data.append(format_number(entity.nodes[node]))
+        data.append(g.classes[entity.class_.code].name)
+        data.append(entity.description)
+        tabs['entities'].table.rows.append(data)
+    profile_image_id = node.get_profile_image_id()
+    for link_ in node.get_links('P67', inverse=True):
+        domain = link_.domain
+        data = get_base_table_data(domain)
+        if domain.view_name == 'file':  # pragma: no cover
+            extension = data[3].replace('.', '')
+            data.append(get_profile_image_table_link(domain, node, extension, profile_image_id))
+            if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
+                profile_image_id = domain.id
+        if is_authorized('contributor'):
+            url = url_for('link_delete', id_=link_.id, origin_id=node.id)
+            data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
+        tabs[domain.view_name].table.rows.append(data)
+    for sub_id in node.subs:
+        sub = g.nodes[sub_id]
+        tabs['subs'].table.rows.append([link(sub), sub.count, sub.description])
+    if not tabs['entities'].table.rows:
+        tabs['entities'].table = Table([_('domain'), _('range')])
+        for row in Link.get_entities_by_node(node):
+            tabs['entities'].table.rows.append([link(Entity.get_by_id(row.domain_id)),
+                                                link(Entity.get_by_id(row.range_id))])
+    return render_template('types/view.html',
+                           node=node,
+                           super_=super_,
+                           tabs=tabs,
+                           root=root,
+                           info=get_entity_data(node),
+                           profile_image_id=profile_image_id)
 
 
 def save(form: FlaskForm, node=None, root: Optional[Node] = None) -> Optional[str]:  # type: ignore
