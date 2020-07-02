@@ -5,6 +5,8 @@ class Changelog:
                 '1272': 'Tabs redesign',
                 '1279': 'Change "Add" button label to "Link"',
                 '1229': 'Show descriptions in all tables',
+                '1287': 'Map tiles max zoom',
+                '1258': 'Manual Text for Subunits',
                 '1269': 'API: get_by_menu_item() for actors'},
             'fix': {
                 '547': 'Prevent double submit',

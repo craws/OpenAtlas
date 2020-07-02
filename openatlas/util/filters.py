@@ -101,15 +101,6 @@ def uc_first(self: Any, string: str) -> str:
 
 
 @jinja2.contextfilter
-@evalcontextfilter
-@blueprint.app_template_filter()
-def nl2br(self: Any, value: str) -> str:
-    result = u'\n\n'.join(
-        u'<p>%s</p>' % p.replace('\n', '<br>\n') for p in paragraph_re.split(escape(value)))
-    return result
-
-
-@jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_info(self: Any, data: Dict[str, Union[str, List[str]]]) -> str:
     html = '<div class="data-table">'
