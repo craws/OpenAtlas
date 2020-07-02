@@ -1,5 +1,5 @@
 from flask import json, jsonify, render_template, request
-from werkzeug.wrappers import Response  # type: ignore
+from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.models.api import Api
@@ -96,7 +96,7 @@ def api_get_latest(limit: int) -> Response:
 
 @app.route('/api/0.1/query')
 @api_access()  # type: ignore
-def api_get_query() -> Response:
+def api_get_query() -> Response:  # pragma: nocover
     if request.args:
         out = []
         if request.args.getlist('entities[]'):
