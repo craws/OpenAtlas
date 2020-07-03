@@ -43,10 +43,10 @@ space that can be connected to various other information (temporal, spatial, eve
 
 To record archaeological information a place can be divided into multiple subunits. The place can be
 understood as the superior unit and container for multiple further features (E.g. buildings, graves,
-pits, ditches, ramparts etc.). They are labelled as "Features" and can be accessed via the features
-tab. They are structured the same way as the place is and may also contain multiple subunits that
-are labelled as "Stratigraphic Units". The stratigraphic units can again contain multiple subunits
-labelled as finds and again are structured the same way as the superior units.
+pits, ditches, ramparts etc.). They are labelled as **Feature** and can be accessed via the
+features tab. They are structured the same way as the place is and may also contain multiple
+subunits that are labelled as **Stratigraphic Unit**. The stratigraphic units can again contain
+multiple subunits labelled as **Find** and again are structured the same way as the superior units.
 
 One example would be a graveyard. It will be the superior unit (Place). Each grave of this cemetery
 is a (sub) feature that forms part of the cemetery. Each grave is composed of one or many subunits
@@ -58,4 +58,4 @@ respective unit: e.g. the grave goods of one of the burials, the finds found in 
 
 Also Human remains can be recorded in detail, especially for anthropological analyses. This way
 each bone (resp. part of the human remains) can be recorded as subunits of stratigraphic units
-labelled as "Human Remains".
+labelled as **Human Remains**.
