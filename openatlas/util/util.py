@@ -24,7 +24,7 @@ from werkzeug.utils import redirect
 
 import openatlas
 from openatlas import app
-from openatlas.models.api_error import APIError
+from openatlas.models.api_helpers.api_error import APIError
 from openatlas.models.date import Date
 from openatlas.models.model import CidocClass, CidocProperty
 

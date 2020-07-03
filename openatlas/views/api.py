@@ -3,11 +3,12 @@ from werkzeug.wrappers import Response  # type: ignore
 
 from openatlas import app
 from openatlas.models.api import Api
-from openatlas.models.api_error import APIError
+from openatlas.models.api_helpers.api_error import APIError
 from openatlas.util.util import api_access
+from openatlas.models.api_helpers.api_sql import Entity
 
 
-# Todo: unit tests and mypy checks
+# Todo: unit test
 
 
 @app.route('/api/0.1/entity/<id_>')
@@ -123,6 +124,12 @@ def api_get_query() -> Response:
         return jsonify(out)
     else:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404")
+
+
+@app.route('/api/0.1/test')
+@api_access()  # type: ignore
+def api_get_test() -> Response:
+    return jsonify(Entity.get_pagination())
 
 
 @app.route('/api')

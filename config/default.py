@@ -17,6 +17,8 @@ DATABASE_PORT = 5432
 DATABASE_PASS = 'CHANGE ME'
 MAIL_PASSWORD = 'CHANGE ME'
 SECRET_KEY = 'CHANGE ME'
+PAGINATION_PAGE_SIZE = 10
+PAGINATION_PAGE_ARGUMENT_NAME = 'page'
 
 # Files with these extensions are available as profile image and will be displayed in the browser
 DISPLAY_FILE_EXTENSIONS = ['bmp', 'gif', 'ico', 'jpeg', 'jpg', 'png', 'svg']
