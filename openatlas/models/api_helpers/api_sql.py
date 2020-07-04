@@ -341,7 +341,7 @@ class Entity:
         sql = """SELECT e.id, e.class_code,
                     row_number() over(order by e.class_code, e.id) + 1 page_number
                 FROM (SELECT me.id, me.class_code,
-                        case row_number() over(order by me.id, me.class_code) % 10
+                        case row_number() over(order by me.id, me.class_code) % 5
                             when 0 then 1 
                             else 0
                         end page_boundary
