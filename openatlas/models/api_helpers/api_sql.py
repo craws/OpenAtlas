@@ -347,7 +347,7 @@ class Entity:
                         end page_boundary
                         from model.entity me
                          order by me.id) e
-        WHERE class_code IN ('E33') AND e.page_boundary = 1"""
+        WHERE class_code IN ('E33') AND e.page_boundary = 1;"""
         g.execute(sql)
-        print(g.cursor.fetchall())
-        return [Entity.get_by_id(row.domain_id) for row in g.cursor.fetchall()]
+        print(len(g.cursor.fetchall()))
+        return [Entity(row[0]) for row in g.cursor.fetchall()]
