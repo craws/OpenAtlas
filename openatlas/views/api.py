@@ -1,4 +1,5 @@
 from flask import json, jsonify, render_template, request
+from flask_cors import cross_origin
 from werkzeug.wrappers import Response  # type: ignore
 
 from openatlas import app
@@ -12,6 +13,7 @@ from openatlas.util.util import api_access
 
 @app.route('/api/0.1/entity/<id_>')
 @api_access()  # type: ignore
+@cross_origin()
 def api_entity(id_: int) -> Response:
     try:
         int(id_)
@@ -22,6 +24,7 @@ def api_entity(id_: int) -> Response:
 
 @app.route('/api/0.1/entity/download/<int:id_>')
 @api_access()  # type: ignore
+@cross_origin()
 def api_download_entity(id_: int) -> Response:
     # flash(_('Download successful'), 'info')
     return Response(json.dumps(Api.get_entity(id_=id_)),
@@ -31,6 +34,7 @@ def api_download_entity(id_: int) -> Response:
 
 @app.route('/api/0.1/', methods=['GET', 'VIEW'])
 @api_access()  # type: ignore
+@cross_origin()
 def api_get_entities_by_json() -> Response:  # pragma: nocover
     out = []
     req_data = request.get_json()
@@ -70,6 +74,7 @@ def api_get_entities_by_json() -> Response:  # pragma: nocover
 
 @app.route('/api/0.1/code/<code>')
 @api_access()  # type: ignore
+@cross_origin()
 def api_get_by_menu_item(code: str) -> Response:
     try:
         Api.get_entities_by_menu_item(code_=code)
@@ -80,6 +85,7 @@ def api_get_by_menu_item(code: str) -> Response:
 
 @app.route('/api/0.1/class/<class_code>')
 @api_access()  # type: ignore
+@cross_origin()
 def api_get_by_class(class_code: str) -> Response:
     if len(Api.get_entities_by_class(class_code_=class_code)) == 0:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404d")
@@ -88,6 +94,7 @@ def api_get_by_class(class_code: str) -> Response:
 
 @app.route('/api/0.1/latest/<int:limit>')
 @api_access()  # type: ignore
+@cross_origin()
 def api_get_latest(limit: int) -> Response:
     if 0 < limit < 100:
         return jsonify(Api.get_entities_get_latest(limit_=limit))
@@ -96,7 +103,8 @@ def api_get_latest(limit: int) -> Response:
 
 @app.route('/api/0.1/query')
 @api_access()  # type: ignore
-def api_get_query() -> Response:
+@cross_origin()
+def api_get_query() -> Response:  # pragma: nocover
     if request.args:
         out = []
         if request.args.getlist('entities[]'):
@@ -127,5 +135,7 @@ def api_get_query() -> Response:
 
 @app.route('/api')
 @api_access()  # type: ignore
+@cross_origin()
 def api_index() -> str:
     return render_template('api/index.html')
+
