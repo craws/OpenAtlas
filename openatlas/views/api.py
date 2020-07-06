@@ -129,7 +129,7 @@ def api_get_query() -> Response:
 @app.route('/api/0.1/test')
 @api_access()  # type: ignore
 def api_get_test() -> Response:
-    return jsonify(Pagination.get_pagination())
+    return jsonify(Pagination.get_by_menu_item(menu_item='actor'))
 
 
 @app.route('/api')
