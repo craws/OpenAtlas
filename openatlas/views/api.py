@@ -5,7 +5,7 @@ from openatlas import app
 from openatlas.models.api import Api
 from openatlas.models.api_helpers.api_error import APIError
 from openatlas.util.util import api_access
-from openatlas.models.api_helpers.api_sql import Entity
+from openatlas.models.api_helpers.api_pagination import Pagination
 
 
 # Todo: unit test
@@ -129,7 +129,7 @@ def api_get_query() -> Response:
 @app.route('/api/0.1/test')
 @api_access()  # type: ignore
 def api_get_test() -> Response:
-    return jsonify(Entity.get_pagination())
+    return jsonify(Pagination.get_pagination())
 
 
 @app.route('/api')
