@@ -49,14 +49,18 @@ class Api:
                 path = get_file_path(link.domain.id)
                 file_dict = {'@id': url_for('api_entity', id_=link.domain.id, _external=True),
                              'title': link.domain.name}
-                if Api.get_license(link.domain.id):
-                    file_dict['license'] = Api.get_license(link.domain.id)
-                try:
-                    file_dict['url'] = url_for('display_file', filename=os.path.basename(path),
-                                               _external=True)
-                except TypeError:
-                    pass
-                files.append(file_dict)
+                # Todo: better just add licence and if empty ignore somewhere else
+                license_ = Api.get_license(link.domain.id)
+                if license_:
+                    file_dict['license'] = license_
+                if path:
+                    try:
+                        file_dict['url'] = url_for('display_file',
+                                                   filename=os.path.basename(path),
+                                                   _external=True)
+                    except TypeError:
+                        pass
+                    files.append(file_dict)
         return files
 
     @staticmethod
@@ -187,26 +191,23 @@ class Api:
                 features['links'].append(geo_name)
 
         # Geometry
-        try:
-            geometries = []
-            shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
-            for geonames_link in Gis.get_by_id(entity.location.id):
-                geo_dict = {'type': shape[geonames_link['shape']],
-                            'coordinates': geonames_link['geometry']['coordinates']}
-                if geonames_link['description']:
-                    geo_dict['description'] = geonames_link['description']  # pragma: nocover
-                if geonames_link['name']:
-                    geo_dict['title'] = geonames_link['name']
+        geometries = []
+        shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
+        features['geometry'] = {'type': 'GeometryCollection', 'geometries': []}
+        if entity.location:
+            for geometry in Gis.get_by_id(entity.location.id):
+                geo_dict = {'type': shape[geometry['shape']],
+                            'coordinates': geometry['geometry']['coordinates']}
+                if geometry['description']:
+                    geo_dict['description'] = geometry['description']  # pragma: nocover
+                if geometry['name']:
+                    geo_dict['title'] = geometry['name']
                 geometries.append(geo_dict)
-
             if len(geometries) == 1:
                 features['geometry'] = geometries[0]  # pragma: nocover
             else:
                 features['geometry'] = {'type': 'GeometryCollection', 'geometries': geometries}
-        except (AttributeError, KeyError):
-            features['geometry'] = {'type': 'GeometryCollection', 'geometries': []}
-
-        data: Dict[str, Any] = {'type': type_, '@context': app.config['API_SCHEMA'],
+        data: Dict[str, Any] = {'type': type_,
+                                '@context': app.config['API_SCHEMA'],
                                 'features': [features]}
-
         return data

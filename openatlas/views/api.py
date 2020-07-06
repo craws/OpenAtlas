@@ -103,7 +103,6 @@ def api_get_latest(limit: int) -> Response:
 
 @app.route('/api/0.1/query')
 @api_access()  # type: ignore
-@cross_origin()
 def api_get_query() -> Response:  # pragma: nocover
     if request.args:
         out = []
