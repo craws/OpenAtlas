@@ -6,6 +6,7 @@ from flask import g, session, url_for
 from openatlas import app
 from openatlas.models.api_helpers.api_error import APIError
 from openatlas.models.api_helpers.api_pagination import Pagination
+from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -23,7 +24,7 @@ class Api:
         return words[0] + ''.join(x.title() for x in words[1:])
 
     @staticmethod
-    def get_links(entity: Pagination) -> List[Dict[str, str]]:
+    def get_links(entity: Entity) -> List[Dict[str, str]]:
         links = []
 
         for link in Link.get_links(entity.id):  # pragma: nocover
@@ -42,7 +43,7 @@ class Api:
         return links
 
     @staticmethod
-    def get_file(entity: Pagination) -> List[Dict[str, str]]:
+    def get_file(entity: Entity) -> List[Dict[str, str]]:
         files = []
         for link in Link.get_links(entity.id, inverse=True):  # pragma: nocover
             if link.domain.system_type == 'file':
@@ -71,21 +72,21 @@ class Api:
     @staticmethod
     def get_entities_by_menu_item(code_: str) -> List[Dict[str, Any]]:
         entities = []
-        for entity in Pagination.get_by_menu_item(code_):
+        for entity in Entity.get_by_menu_item(code_):
             entities.append(Api.get_entity(entity.id))
         return entities
 
     @staticmethod
     def get_entities_by_class(class_code_: str) -> List[Dict[str, Any]]:
         entities = []
-        for entity in Pagination.get_by_class_code(class_code_):
+        for entity in Entity.get_by_class_code(class_code_):
             entities.append(Api.get_entity(entity.id))
         return entities
 
     @staticmethod
     def get_entities_get_latest(limit_: int) -> List[Dict[str, Any]]:
         entities = []
-        for entity in Pagination.get_latest(limit_):
+        for entity in Entity.get_latest(limit_):
             entities.append(Api.get_entity(entity.id))
         return entities
 
@@ -93,14 +94,14 @@ class Api:
     def get_entities_by_id(ids: List[int]) -> List[Dict[str, Any]]:  # pragma: nocover
         entities = []
         for i in ids:
-            for entity in Pagination.get_by_ids(i, nodes=True):
+            for entity in Entity.get_by_ids(i, nodes=True):
                 entities.append(Api.get_entity(entity.id))
         return entities
 
     @staticmethod
     def get_entity(id_: int) -> Dict[str, Any]:
         try:
-            entity = Pagination.get_by_id(id_, nodes=True, aliases=True)
+            entity = Entity.get_by_id(id_, nodes=True, aliases=True)
         except Exception:
             raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
 
