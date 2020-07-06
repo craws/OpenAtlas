@@ -14,7 +14,8 @@ more knowledge about server administration.
 
     # apt-get install python3 python3-bcrypt python3-dateutil python3-jinja2 python3-psycopg2
     # apt-get install python3-flask python3-flask-babel python3-flask-login python3-flaskext.wtf
-    # apt-get install python3-markdown python3-numpy python3-pandas python3-fuzzywuzzy
+    # apt-get install python3-markdown python3-numpy python3-pandas python3-fuzzywuzzy 
+    # apt-get install python3-flask-cors
 
 ### Apache 2.4
 

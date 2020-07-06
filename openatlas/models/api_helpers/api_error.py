@@ -25,7 +25,7 @@ class APIError(Exception):
         "405": "The method used is not supported. Right now only GET is allowed.",
         "500": "Please notify the administrator. Sorry for the inconvenience."}
 
-    def __init__(self, message: str, status_code: int = int, payload: str = str) -> None:
+    def __init__(self, message: str, status_code: int, payload: str) -> None:
         Exception.__init__(self)
         self.message = message
         if status_code is not None:
@@ -34,16 +34,14 @@ class APIError(Exception):
         self.error_code = status_code
 
     def to_dict(self) -> Dict[str, str]:
-        rv = dict()
-        rv['title'] = self.message
-        rv['status'] = self.status_code
-        rv['intern-status'] = self.payload
-        rv['detail'] = str(self.error_detail[self.payload])
-        rv['instance'] = request.base_url
-        rv['timestamp'] = str(datetime.now())
+        rv = {'title': self.message,
+              'status': str(self.status_code),
+              'intern-status': self.payload,
+              'detail': str(self.error_detail[self.payload]),
+              'instance': request.base_url,
+              'timestamp': str(datetime.now())}
         if self.status_code in [403, 401]:
             rv['wiki'] = "https://redmine.openatlas.eu/projects/uni/wiki/API_Authentication"
         else:
             rv['wiki'] = "https://redmine.openatlas.eu/projects/uni/wiki/Api"
-
         return rv

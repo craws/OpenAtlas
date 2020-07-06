@@ -119,8 +119,6 @@ def forbidden(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
 
 @app.errorhandler(404)
 def page_not_found(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
-    if request.path.startswith('/api'):
-        return str(APIError('Method Not Allowed', status_code=405, payload="405").to_dict()), 404
     return render_template('404.html', e=e), 404
 
 
@@ -137,11 +135,6 @@ def invalid_id(e: Exception) -> Tuple[str, int]:
 @app.errorhandler(422)
 def unprocessable_entity(e: Exception) -> Tuple[str, int]:
     return render_template('422.html', e=e), 422
-
-
-@app.errorhandler(500)
-def internal_server(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
-    return render_template('404.html', e=e), 404
 
 
 @app.errorhandler(APIError)

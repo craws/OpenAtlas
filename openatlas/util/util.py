@@ -171,7 +171,6 @@ def get_disk_space_info() -> Optional[Dict[str, Any]]:
 def add_type_data(entity: 'Entity',
                   data: Dict[str, Union[str, List[str]]],
                   location: Optional['Entity'] = None) -> Dict[str, Union[str, List[str]]]:
-    # Nodes
     if location:
         entity.nodes.update(location.nodes)  # Add location types
     type_data: OrderedDict[str, Any] = OrderedDict()
@@ -184,7 +183,10 @@ def add_type_data(entity: 'Entity',
         if root.value_type:  # Text for value types
             text = ': {value} <span style="font-style:italic;">{description}</span>'.format(
                 value=format_number(node_value), description=node.description)
-        type_data[name].append(link(node) + text)
+        type_data[name].append('<span title="{path}">{link}</span>{text}'.format(
+            link=link(node),
+            path=' > '.join([g.nodes[id_].name for id_ in node.root]),
+            text=text))
 
     # Sort types by name
     type_data = OrderedDict(sorted(type_data.items(), key=lambda t: t[0]))
@@ -367,7 +369,8 @@ def api_access():  # type: ignore
         @wraps(f)
         def wrapped(*args, **kwargs):  # type: ignore
             if not current_user.is_authenticated and not session['settings']['api_public']:
-                raise APIError('Syntax is incorrect!', status_code=403, payload="403")  # pragma: nocover
+                raise APIError('Syntax is incorrect!', status_code=403,
+                               payload="403")  # pragma: nocover
             return f(*args, **kwargs)
 
         return wrapped

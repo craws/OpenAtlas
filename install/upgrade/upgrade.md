@@ -12,7 +12,10 @@ After following the instructions restart Apache and test if the application is w
 
 ### 5.2.0 to 5.3.0
 
-A code base update (e.g. with git pull) and an Apache restart should be sufficient.
+Install flask-cors packages e.g. on Debian: 
+
+    # apt-get install python3-flask-cors
+
 
 ### 5.1.x to 5.2.0
 
