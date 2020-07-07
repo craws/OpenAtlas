@@ -20,6 +20,7 @@ SECRET_KEY = 'CHANGE ME'
 PAGINATION_PAGE_SIZE = 10
 PAGINATION_PAGE_ARGUMENT_NAME = 'page'
 
+
 # Files with these extensions are available as profile image and will be displayed in the browser
 DISPLAY_FILE_EXTENSIONS = ['bmp', 'gif', 'ico', 'jpeg', 'jpg', 'png', 'svg']
 
@@ -41,6 +42,9 @@ THUNDERFOREST_KEY = '7878b4fb224f4902ab42fc846e92b96a'
 
 # API
 API_SCHEMA = 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.jsonld'
+
+# Cross-Origin source (CORS)
+CORS_ALLOWANCE = '*'
 
 # Table options
 DEFAULT_TABLE_ROWS = {10: '10', 25: '25', 50: '50', 100: '100'}
