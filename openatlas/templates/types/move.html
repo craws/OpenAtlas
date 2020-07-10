@@ -8,7 +8,7 @@
         {{ form.csrf_token }}
         {{ form.checkbox_values }}
         {{ form|display_move_form(root.name)|safe }}
-        {{ form.save }}
+        {{ form.save(class_=config.CSS.button.primary) }}
     </form>
     <script>
         $('#select-all').click(function() {
