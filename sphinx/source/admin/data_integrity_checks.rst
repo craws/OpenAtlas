@@ -29,8 +29,8 @@ were forgotten to link.
 
 Type
 ****
-These types where created but have no sub types or associated data. Maybe they originate from the
-first install or where never used.
+These types were created but have no sub types or associated data. Maybe they originate from the
+first install or were never used.
 
 Missing files
 *************

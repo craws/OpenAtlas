@@ -125,7 +125,7 @@ def node_move_entities(id_: int) -> Union[str, Response]:
         g.cursor.execute('BEGIN')
         Node.move_entities(node, getattr(form, str(root.id)).data, form.checkbox_values.data)
         g.cursor.execute('COMMIT')
-        flash('Entities where updated', 'success')
+        flash('Entities were updated', 'success')
         return redirect(url_for('node_index') + tab_hash + str(root.id))
     form.save.label.text = uc_first(_('move'))
     getattr(form, str(root.id)).data = node.id

@@ -55,13 +55,13 @@ class ActorTests(TestBaseCase):
                                      'selection': [actor_id],
                                      'checkbox_values': str([actor_id])},
                                follow_redirects=True)
-            assert b'Entities where updated' in rv.data
+            assert b'Entities were updated' in rv.data
             rv = self.app.post(url_for('node_move_entities', id_=sex_node_sub_2.id),
                                data={sex_node.id: '',
                                      'selection': [actor_id],
                                      'checkbox_values': str([actor_id])},
                                follow_redirects=True)
-            assert b'Entities where updated' in rv.data
+            assert b'Entities were updated' in rv.data
             self.app.post(url_for('actor_insert', code='E21', origin_id=actor_id), data=data)
             self.app.post(url_for('actor_insert', code='E21', origin_id=event.id), data=data)
             self.app.post(url_for('actor_insert', code='E21', origin_id=source.id), data=data)

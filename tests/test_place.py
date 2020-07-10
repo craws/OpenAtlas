@@ -190,7 +190,7 @@ class PlaceTest(TestBaseCase):
                                      'selection': location.id,
                                      'checkbox_values': str([location.id])},
                                follow_redirects=True)
-            assert b'Entities where updated' in rv.data
+            assert b'Entities were updated' in rv.data
 
             # Test move entities of multiple node if link to new node doesn't exists
             rv = self.app.post(url_for('node_move_entities', id_=unit_sub2.id),
@@ -198,7 +198,7 @@ class PlaceTest(TestBaseCase):
                                      'selection': location.id,
                                      'checkbox_values': str([location.id])},
                                follow_redirects=True)
-            assert b'Entities where updated' in rv.data
+            assert b'Entities were updated' in rv.data
 
             # Subunits
             with app.app_context():  # type: ignore
