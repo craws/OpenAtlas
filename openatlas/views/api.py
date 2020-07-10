@@ -1,6 +1,6 @@
 from flask import json, jsonify, render_template, request
 from flask_cors import cross_origin
-from werkzeug.wrappers import Response  # type: ignore
+from werkzeug.wrappers import Response
 
 from openatlas import app
 from openatlas.models.api import Api

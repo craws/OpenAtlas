@@ -6,6 +6,7 @@ class Changelog:
                 '1279': 'Change "Add" button label to "Link"',
                 '1229': 'Show descriptions in all tables',
                 '1283': 'More detailed type display e.g. body posture',
+                '1286': 'Notifications for date field',
                 '1287': 'Map tiles max zoom',
                 '1258': 'Manual Text for Subunits'},
             'fix': {
