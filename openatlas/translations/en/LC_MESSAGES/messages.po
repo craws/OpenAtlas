@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PROJECT VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-07-10 13:37+0200\n"
-"PO-Revision-Date: 2020-07-10 13:38+0200\n"
+"POT-Creation-Date: 2020-07-11 16:47+0200\n"
+"PO-Revision-Date: 2020-07-11 16:48+0200\n"
 "Last-Translator: Alexander Watzinger <alexander.watzinger@craws.net>\n"
 "Language: en\n"
 "Language-Team: en <LL@li.org>\n"
@@ -272,7 +272,7 @@ msgstr "no entries"
 #: openatlas/util/tab.py:99 openatlas/util/tab.py:101 openatlas/util/tab.py:103
 #: openatlas/util/tab.py:106 openatlas/util/tab.py:118 openatlas/util/tab.py:124
 #: openatlas/util/tab.py:126 openatlas/util/tab.py:129 openatlas/util/util.py:397
-#: openatlas/views/place.py:211
+#: openatlas/views/place.py:223
 msgid "link"
 msgstr "link"
 
@@ -291,7 +291,7 @@ msgstr "off"
 #: openatlas/views/involvement.py:102 openatlas/views/member.py:61
 #: openatlas/views/member.py:88 openatlas/views/member.py:116
 #: openatlas/views/note.py:58 openatlas/views/object.py:107
-#: openatlas/views/place.py:321 openatlas/views/profile.py:110
+#: openatlas/views/place.py:335 openatlas/views/profile.py:110
 #: openatlas/views/reference.py:223 openatlas/views/relation.py:59
 #: openatlas/views/relation.py:92 openatlas/views/source.py:125
 #: openatlas/views/sql.py:43 openatlas/views/translation.py:89
@@ -445,7 +445,7 @@ msgstr ""
 #: openatlas/views/actor.py:279 openatlas/views/admin.py:69
 #: openatlas/views/admin.py:248 openatlas/views/event.py:214
 #: openatlas/views/event.py:233 openatlas/views/file.py:172
-#: openatlas/views/place.py:207 openatlas/views/place.py:220
+#: openatlas/views/place.py:219 openatlas/views/place.py:232
 #: openatlas/views/reference.py:184 openatlas/views/source.py:160
 msgid "edit"
 msgstr "edit"
@@ -1147,7 +1147,7 @@ msgstr "range for"
 #: openatlas/views/imports.py:61 openatlas/views/index.py:29
 #: openatlas/views/involvement.py:23 openatlas/views/member.py:23
 #: openatlas/views/object.py:23 openatlas/views/place.py:33
-#: openatlas/views/place.py:45 openatlas/views/reference.py:27
+#: openatlas/views/place.py:46 openatlas/views/reference.py:27
 #: openatlas/views/relation.py:23 openatlas/views/types.py:29
 msgid "description"
 msgstr "description"
@@ -1228,7 +1228,7 @@ msgstr "object"
 
 #: openatlas/templates/overlay/insert.html:2
 #: openatlas/templates/overlay/insert.html:4
-#: openatlas/templates/overlay/update.html:2 openatlas/views/place.py:193
+#: openatlas/templates/overlay/update.html:2 openatlas/views/place.py:205
 msgid "overlay"
 msgstr "overlay"
 
@@ -1406,11 +1406,11 @@ msgstr "property"
 msgid "move entities"
 msgstr "move entities"
 
-#: openatlas/util/tab.py:74
+#: openatlas/util/tab.py:74 openatlas/views/place.py:111
 msgid "feature"
 msgstr "feature"
 
-#: openatlas/util/tab.py:77
+#: openatlas/util/tab.py:77 openatlas/views/place.py:98
 msgid "find"
 msgstr "find"
 
@@ -1418,7 +1418,7 @@ msgstr "find"
 msgid "main image"
 msgstr "main image"
 
-#: openatlas/util/tab.py:88
+#: openatlas/util/tab.py:88 openatlas/views/place.py:99
 msgid "human remains"
 msgstr "human remains"
 
@@ -1426,7 +1426,7 @@ msgstr "human remains"
 #: openatlas/views/event.py:27 openatlas/views/file.py:27
 #: openatlas/views/hierarchy.py:21 openatlas/views/imports.py:25
 #: openatlas/views/imports.py:61 openatlas/views/object.py:22
-#: openatlas/views/place.py:29 openatlas/views/place.py:44
+#: openatlas/views/place.py:29 openatlas/views/place.py:45
 #: openatlas/views/reference.py:26 openatlas/views/source.py:23
 #: openatlas/views/translation.py:19 openatlas/views/types.py:25
 #: openatlas/views/types.py:178
@@ -1437,7 +1437,7 @@ msgstr "name"
 msgid "count"
 msgstr "count"
 
-#: openatlas/util/tab.py:138
+#: openatlas/util/tab.py:138 openatlas/views/place.py:93
 msgid "stratigraphic unit"
 msgstr "stratigraphic unit"
 
@@ -1568,7 +1568,7 @@ msgstr "residence"
 #: openatlas/views/imports.py:27 openatlas/views/involvement.py:24
 #: openatlas/views/member.py:24 openatlas/views/note.py:20
 #: openatlas/views/object.py:24 openatlas/views/place.py:34
-#: openatlas/views/place.py:46 openatlas/views/reference.py:28
+#: openatlas/views/place.py:47 openatlas/views/reference.py:28
 #: openatlas/views/reference.py:37 openatlas/views/reference.py:43
 #: openatlas/views/reference.py:49 openatlas/views/reference.py:55
 #: openatlas/views/reference.py:61 openatlas/views/reference.py:67
@@ -1581,16 +1581,17 @@ msgstr "insert"
 #: openatlas/views/actor.py:32 openatlas/views/event.py:37
 #: openatlas/views/involvement.py:25 openatlas/views/member.py:25
 #: openatlas/views/object.py:25 openatlas/views/place.py:35
-#: openatlas/views/place.py:50 openatlas/views/reference.py:29
-#: openatlas/views/relation.py:25 openatlas/views/source.py:27
-#: openatlas/views/translation.py:22 openatlas/views/types.py:31
-#: openatlas/views/user.py:34
+#: openatlas/views/place.py:36 openatlas/views/place.py:51
+#: openatlas/views/place.py:52 openatlas/views/place.py:53
+#: openatlas/views/reference.py:29 openatlas/views/relation.py:25
+#: openatlas/views/source.py:27 openatlas/views/translation.py:22
+#: openatlas/views/types.py:31 openatlas/views/user.py:34
 msgid "insert and continue"
 msgstr "insert and continue"
 
 #: openatlas/views/actor.py:44 openatlas/views/event.py:60
 #: openatlas/views/file.py:88 openatlas/views/hierarchy.py:110
-#: openatlas/views/object.py:37 openatlas/views/place.py:67
+#: openatlas/views/object.py:37 openatlas/views/place.py:70
 #: openatlas/views/reference.py:119 openatlas/views/source.py:39
 #: openatlas/views/translation.py:44 openatlas/views/types.py:93
 msgid "entity deleted"
@@ -1606,7 +1607,7 @@ msgstr "died in"
 
 #: openatlas/views/actor.py:77 openatlas/views/event.py:109
 #: openatlas/views/file.py:136 openatlas/views/object.py:60
-#: openatlas/views/place.py:149 openatlas/views/reference.py:152
+#: openatlas/views/place.py:161 openatlas/views/reference.py:152
 #: openatlas/views/source.py:80
 msgid "error modified"
 msgstr "Update failed."
@@ -1614,7 +1615,7 @@ msgstr "Update failed."
 #: openatlas/views/actor.py:139 openatlas/views/event.py:185
 #: openatlas/views/file.py:210 openatlas/views/hierarchy.py:46
 #: openatlas/views/member.py:57 openatlas/views/member.py:84
-#: openatlas/views/object.py:103 openatlas/views/place.py:312
+#: openatlas/views/object.py:103 openatlas/views/place.py:326
 #: openatlas/views/reference.py:219 openatlas/views/relation.py:55
 #: openatlas/views/source.py:121 openatlas/views/translation.py:33
 #: openatlas/views/types.py:262
@@ -1625,7 +1626,7 @@ msgstr "An entry has been created."
 #: openatlas/views/admin.py:175 openatlas/views/event.py:185
 #: openatlas/views/file.py:210 openatlas/views/hierarchy.py:72
 #: openatlas/views/hierarchy.py:96 openatlas/views/object.py:103
-#: openatlas/views/overlay.py:46 openatlas/views/place.py:312
+#: openatlas/views/overlay.py:46 openatlas/views/place.py:326
 #: openatlas/views/profile.py:106 openatlas/views/reference.py:98
 #: openatlas/views/reference.py:219 openatlas/views/relation.py:88
 #: openatlas/views/source.py:121 openatlas/views/translation.py:56
@@ -1975,11 +1976,16 @@ msgstr "note deleted"
 msgid "tooltip geonames"
 msgstr "If enabled you can use the GeoNames feature at place insert/update."
 
-#: openatlas/views/place.py:63
+#: openatlas/views/place.py:66
 msgid "Deletion not possible if subunits exists"
 msgstr "Deletion not possible if subunits exists"
 
-#: openatlas/views/place.py:316
+#: openatlas/views/place.py:93 openatlas/views/place.py:98
+#: openatlas/views/place.py:99 openatlas/views/place.py:111
+msgid "with"
+msgstr "with"
+
+#: openatlas/views/place.py:330
 msgid "Invalid geom entered"
 msgstr "An invalid geometry was entered"
 
