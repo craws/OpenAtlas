@@ -204,6 +204,10 @@ class PlaceTest(TestBaseCase):
             with app.app_context():  # type: ignore
                 self.app.get(url_for('place_insert', origin_id=place.id))
                 rv = self.app.post(url_for('place_insert', origin_id=place.id),
+                                   data={'name': "Try continue insert feature", 'continue_': 'sub'},
+                                   follow_redirects=True)
+                assert b'Insert and continue with find' in rv.data
+                rv = self.app.post(url_for('place_insert', origin_id=place.id),
                                    data={'name': "It's not a bug, it's a feature!"})
                 feat_id = rv.location.split('/')[-1]
                 self.app.get(url_for('place_insert', origin_id=feat_id))
