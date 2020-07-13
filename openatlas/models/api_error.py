@@ -18,9 +18,9 @@ class APIError(Exception):
         "404b": "The syntax is incorrect. Only digits are allowed. "
                       "For further usage, please confer the help page",
         "404c": "The syntax is incorrect. Valid codes are: actor, event, place, source,"
-                      " reference and object. For further usage, please confer the help page",
-        "404d": "The syntax is incorrect. This class code is not supported. "
-                      "For the classes please confer the model",
+                      " reference and object. For further usage, please confer the help page.",
+        "404d": "The syntax is incorrect. These class code is not supported. "
+                      "For the classes please confer the model.",
         "404e": "The syntax is incorrect. Only integers between 1 and 100 are allowed.",
         "405": "The method used is not supported. Right now only GET is allowed.",
         "500": "Please notify the administrator. Sorry for the inconvenience."}
