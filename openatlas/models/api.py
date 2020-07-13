@@ -154,8 +154,8 @@ class Api:
             features['description'] = [{'value': entity.description}]
 
         # Types
-
-        features['types'] = Api.get_node(entity)
+        if Api.get_node(entity):
+            features['types'] = Api.get_node(entity)
 
         if entity.aliases:  # pragma: nocover
             features['names'] = []
