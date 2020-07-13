@@ -102,23 +102,10 @@ class Api:
         return entities
 
     @staticmethod
-    def get_entity(id_: int) -> Dict[str, Any]:
-        try:
-            entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-        except Exception:
-            raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
-
-        geonames_link = Geonames.get_geonames_link(entity)
-        type_ = 'FeatureCollection'
+    def get_node(entity):
         nodes = []
-        class_code = ''.join(entity.class_.code + " " + entity.class_.i18n['en']).replace(" ", "_")
-        features = {'@id': url_for('entity_view', id_=entity.id, _external=True),
-                    'type': 'Feature',
-                    'crmClass': "crm:" + class_code,
-                    'properties': {'title': entity.name}}
-
-        # Types
         for node in entity.nodes:
+            print(node)
             nodes_dict = {'identifier': url_for('api_entity', id_=node.id, _external=True),
                           'label': node.name}
             for link in Link.get_links(entity.id):
@@ -138,6 +125,26 @@ class Api:
 
             nodes.append(nodes_dict)
 
+        return nodes
+
+    @staticmethod
+    def get_entity(id_: int) -> Dict[str, Any]:
+        try:
+            entity = Entity.get_by_id(id_, nodes=True, aliases=True)
+        except Exception:
+            raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
+
+        geonames_link = Geonames.get_geonames_link(entity)
+        type_ = 'FeatureCollection'
+
+        class_code = ''.join(entity.class_.code + " " + entity.class_.i18n['en']).replace(" ", "_")
+        features = {'@id': url_for('entity_view', id_=entity.id, _external=True),
+                    'type': 'Feature',
+                    'crmClass': "crm:" + class_code,
+                    'properties': {'title': entity.name}}
+
+        # Types
+
         # Relations
         if Api.get_links(entity):
             features['relations'] = Api.get_links(entity)
@@ -147,8 +154,8 @@ class Api:
             features['description'] = [{'value': entity.description}]
 
         # Types
-        if nodes:  # pragma: nocover
-            features['types'] = nodes
+
+        features['types'] = Api.get_node(entity)
 
         if entity.aliases:  # pragma: nocover
             features['names'] = []
