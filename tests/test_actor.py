@@ -51,15 +51,17 @@ class ActorTests(TestBaseCase):
             rv = self.app.get(url_for('node_move_entities', id_=sex_node_sub_1.id))
             assert b'Sigourney' in rv.data
             rv = self.app.post(url_for('node_move_entities', id_=sex_node_sub_1.id),
-                               data={sex_node.id: sex_node_sub_2.id, 'selection': [actor_id],
+                               data={sex_node.id: sex_node_sub_2.id,
+                                     'selection': [actor_id],
                                      'checkbox_values': str([actor_id])},
                                follow_redirects=True)
-            assert b'Entities where updated' in rv.data
+            assert b'Entities were updated' in rv.data
             rv = self.app.post(url_for('node_move_entities', id_=sex_node_sub_2.id),
-                               data={sex_node.id: '', 'selection': [actor_id],
+                               data={sex_node.id: '',
+                                     'selection': [actor_id],
                                      'checkbox_values': str([actor_id])},
                                follow_redirects=True)
-            assert b'Entities where updated' in rv.data
+            assert b'Entities were updated' in rv.data
             self.app.post(url_for('actor_insert', code='E21', origin_id=actor_id), data=data)
             self.app.post(url_for('actor_insert', code='E21', origin_id=event.id), data=data)
             self.app.post(url_for('actor_insert', code='E21', origin_id=source.id), data=data)
@@ -67,10 +69,12 @@ class ActorTests(TestBaseCase):
                                data={'name': 'https://openatlas.eu'})
             reference_id = rv.location.split('/')[-1]
             rv = self.app.post(url_for('actor_insert', code='E21', origin_id=reference_id),
-                               data=data, follow_redirects=True)
+                               data=data,
+                               follow_redirects=True)
             assert b'An entry has been created' in rv.data
             data['continue_'] = 'yes'
-            rv = self.app.post(url_for('actor_insert', code='E21'), data=data,
+            rv = self.app.post(url_for('actor_insert', code='E21'),
+                               data=data,
                                follow_redirects=True)
             assert b'An entry has been created' in rv.data
             rv = self.app.get(url_for('actor_index'))
@@ -80,7 +84,8 @@ class ActorTests(TestBaseCase):
             rv = self.app.get(url_for('entity_add_source', id_=actor_id))
             assert b'Link Source' in rv.data
             rv = self.app.post(url_for('entity_add_source', id_=actor_id),
-                               data={'checkbox_values': str([source.id])}, follow_redirects=True)
+                               data={'checkbox_values': str([source.id])},
+                               follow_redirects=True)
             assert b'Necronomicon' in rv.data
 
             rv = self.app.get(url_for('entity_add_reference', id_=actor_id))
@@ -96,17 +101,21 @@ class ActorTests(TestBaseCase):
             data['name'] = 'Susan Alexandra Weaver'
             data['alias-1'] = 'Ripley1'
             data['end_year_from'] = ''
+            data['end_year_to'] = ''
             data['begin_year_to'] = '1950'
             data['begin_day_from'] = ''
-            rv = self.app.post(url_for('actor_update', id_=actor_id), data=data,
+            rv = self.app.post(url_for('actor_update', id_=actor_id),
+                               data=data,
                                follow_redirects=True)
-            assert b'Susan Alexandra Weaver' in rv.data
-            rv = self.app.post(url_for('ajax_bookmark'), data={'entity_id': actor_id},
+            assert b'Changes have been saved' in rv.data
+            rv = self.app.post(url_for('ajax_bookmark'),
+                               data={'entity_id': actor_id},
                                follow_redirects=True)
             assert b'Remove bookmark' in rv.data
             rv = self.app.get('/')
             assert b'Weaver' in rv.data
-            rv = self.app.post(url_for('ajax_bookmark'), data={'entity_id': actor_id},
+            rv = self.app.post(url_for('ajax_bookmark'),
+                               data={'entity_id': actor_id},
                                follow_redirects=True)
             assert b'Bookmark' in rv.data
             rv = self.app.get(url_for('link_delete', origin_id=actor_id, id_=666),

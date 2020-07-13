@@ -33,6 +33,7 @@ class PlaceForm(DateForm):
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))
+    insert_continue_sub = SubmitField(_('insert and continue'))
     gis_points = HiddenField(default='[]')
     gis_polygons = HiddenField(default='[]')
     gis_lines = HiddenField(default='[]')
@@ -48,6 +49,8 @@ class FeatureForm(DateForm):
     gis_polygons = HiddenField(default='[]')
     gis_lines = HiddenField(default='[]')
     insert_and_continue = SubmitField(_('insert and continue'))
+    insert_continue_sub = SubmitField(_('insert and continue'))
+    insert_continue_human_remains = SubmitField(_('insert and continue'))
     continue_ = HiddenField()
     opened = HiddenField()
 
@@ -87,9 +90,13 @@ def place_insert(origin_id: Optional[int] = None,
     if origin and origin.system_type == 'place':
         title = 'feature'
         form = build_form(FeatureForm, 'Feature')
+        form.insert_continue_sub.label.text += ' ' + _('with') + ' ' + _('stratigraphic unit')
+        del form.insert_continue_human_remains
     elif origin and origin.system_type == 'feature':
         title = 'stratigraphic unit'
         form = build_form(FeatureForm, 'Stratigraphic Unit')
+        form.insert_continue_sub.label.text += ' ' + _('with') + ' ' + _('find')
+        form.insert_continue_human_remains.label.text += ' ' + _('with') + ' ' + _('human remains')
     elif origin and origin.system_type == 'stratigraphic unit':
         if system_type == 'human_remains':  # URL param system_type only used for human remains
             title = 'human remains'
@@ -97,13 +104,14 @@ def place_insert(origin_id: Optional[int] = None,
         else:
             title = 'find'
             form = build_form(FeatureForm, 'Find')
+        del form.insert_continue_sub, form.insert_continue_human_remains
     else:
         title = 'place'
         form = build_form(PlaceForm, 'Place')
+        form.insert_continue_sub.label.text += ' ' + _('with') + ' ' + _('feature')
         geonames_buttons = True if current_user.settings['module_geonames'] else False
-    if origin and origin.system_type not in ['place', 'feature', 'stratigraphic unit'] \
-            and hasattr(form, 'insert_and_continue'):
-        del form.insert_and_continue
+        if origin:
+            del form.insert_and_continue, form.insert_continue_sub
     if hasattr(form, 'geonames_id') and not current_user.settings['module_geonames']:
         del form.geonames_id, form.geonames_precision  # pragma: no cover
     if form.validate_on_submit():
@@ -143,6 +151,10 @@ def place_update(id_: int) -> Union[str, Response]:
         form = build_form(PlaceForm, 'Place', object_, request, location)
     if hasattr(form, 'geonames_id') and not current_user.settings['module_geonames']:
         del form.geonames_id, form.geonames_precision  # pragma: no cover
+    if hasattr(form, 'insert_continue_sub'):
+        del form.insert_continue_sub
+    if hasattr(form, 'insert_continue_human_remains'):
+        del form.insert_continue_human_remains
     if form.validate_on_submit():
         if was_modified(form, object_):  # pragma: no cover
             del form.save
@@ -308,6 +320,8 @@ def save(form: DateForm,
             url = url_for('place_insert',
                           origin_id=origin.id if origin else None,
                           system_type=system_type if system_type else None)
+        elif form.continue_.data in ['sub', 'human_remains']:
+            url = url_for('place_insert', origin_id=object_.id, system_type=form.continue_.data)
         logger.log_user(object_.id, log_action)
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
     except InvalidGeomException as e:  # pragma: no cover

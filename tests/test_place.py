@@ -190,7 +190,7 @@ class PlaceTest(TestBaseCase):
                                      'selection': location.id,
                                      'checkbox_values': str([location.id])},
                                follow_redirects=True)
-            assert b'Entities where updated' in rv.data
+            assert b'Entities were updated' in rv.data
 
             # Test move entities of multiple node if link to new node doesn't exists
             rv = self.app.post(url_for('node_move_entities', id_=unit_sub2.id),
@@ -198,11 +198,15 @@ class PlaceTest(TestBaseCase):
                                      'selection': location.id,
                                      'checkbox_values': str([location.id])},
                                follow_redirects=True)
-            assert b'Entities where updated' in rv.data
+            assert b'Entities were updated' in rv.data
 
             # Subunits
             with app.app_context():  # type: ignore
                 self.app.get(url_for('place_insert', origin_id=place.id))
+                rv = self.app.post(url_for('place_insert', origin_id=place.id),
+                                   data={'name': "Try continue insert feature", 'continue_': 'sub'},
+                                   follow_redirects=True)
+                assert b'Insert and continue with find' in rv.data
                 rv = self.app.post(url_for('place_insert', origin_id=place.id),
                                    data={'name': "It's not a bug, it's a feature!"})
                 feat_id = rv.location.split('/')[-1]

@@ -34,3 +34,8 @@ class DateTest(TestBaseCase):
             data['end_year_to'] = ''
             rv = self.app.post(url_for('place_insert'), data=data, follow_redirects=True)
             assert b'Begin dates cannot start after end dates' in rv.data
+
+            # Missing form fields
+            data['begin_year_from'] = ''
+            rv = self.app.post(url_for('place_insert'), data=data, follow_redirects=True)
+            assert b'Required for time span' in rv.data

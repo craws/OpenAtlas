@@ -73,6 +73,10 @@ class DateForm(FlaskForm):  # type: ignore
         # Check date format, if valid put dates into a list called "dates"
         dates = {}
         for prefix in ['begin_', 'end_']:
+            if getattr(self, prefix + 'year_to').data and not getattr(self,
+                                                                      prefix + 'year_from').data:
+                getattr(self, prefix + 'year_from').errors.append(_("Required for time span"))
+                valid = False
             for postfix in ['_from', '_to']:
                 if getattr(self, prefix + 'year' + postfix).data:
                     date = Date.form_to_datetime64(
@@ -90,7 +94,7 @@ class DateForm(FlaskForm):  # type: ignore
             for prefix in ['begin', 'end']:
                 if prefix + '_from' in dates and prefix + '_to' in dates:
                     if dates[prefix + '_from'] > dates[prefix + '_to']:
-                        field = getattr(self,  prefix + '_day_from')
+                        field = getattr(self, prefix + '_day_from')
                         field.errors.append(_('First date cannot be after second.'))
                         valid = False
         if valid and 'begin_from' in dates and 'end_from' in dates:
