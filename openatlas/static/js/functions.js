@@ -105,6 +105,10 @@ $(document).ready(function () {
 
 $.jstree.defaults.core.themes.dots = false;
 
+/**
+ * sets default text size to a multiple of 0.2em via body stylesheet
+ * @param {number}multiplier
+ */
 function resizeText(multiplier) {
   if (document.body.style.fontSize === '') {
     document.body.style.fontSize = '1.0em';
@@ -113,13 +117,22 @@ function resizeText(multiplier) {
       parseFloat(document.body.style.fontSize) + (multiplier * 0.2) + 'em';
 }
 
+/**
+ * sets first character of passed string to an uppercase
+ * @param {string}string
+ * @returns {string}
+ */
 function ucString(string) {
-  if (!string) {
+  if (!string || typeof string !== 'string') {
     return '';
   }
   return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
+/**
+ * makes an ajax request to bookmark a passed entity
+ * @param {number}entityId
+ */
 function ajaxBookmark(entityId) {
   $.ajax({
     type: 'POST',
@@ -195,7 +208,6 @@ function clearSelect(name) {
   $('#' + name + '-tree').jstree('deselect_all');
   $('#' + name + '-clear').hide();
 }
-
 
 function overflow() {
   setTimeout(() => {
