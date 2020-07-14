@@ -9,6 +9,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
+from openatlas.models.node import Node
 from openatlas.util.util import format_date, get_file_path
 
 
@@ -102,10 +103,9 @@ class Api:
         return entities
 
     @staticmethod
-    def get_node(entity):
+    def get_node(entity: Entity) -> List[Dict[str, Any]]:
         nodes = []
         for node in entity.nodes:
-            print(node)
             nodes_dict = {'identifier': url_for('api_entity', id_=node.id, _external=True),
                           'label': node.name}
             for link in Link.get_links(entity.id):
@@ -116,7 +116,7 @@ class Api:
             if 'unit' not in nodes_dict and node.description:
                 nodes_dict['description'] = node.description
 
-            #  This feature is solely for Stefan
+            #  This feature is solely for the THANADOS project
             hierarchy = []
             for root in node.root:
                 hierarchy.append(g.nodes[root].name)  # pragma: nocover

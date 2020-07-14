@@ -62,7 +62,6 @@ def api_get_entities_by_json() -> Response:  # pragma: nocover
         latest = req_data['latest'][0]
         if type(latest) is int:
             if 0 < latest < 101:
-                print(latest)
                 out.extend(Api.get_entities_get_latest(limit_=latest))
             else:
                 raise APIError('Syntax is incorrect!', status_code=404, payload="404e")
