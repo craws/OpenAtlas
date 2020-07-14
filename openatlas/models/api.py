@@ -5,7 +5,7 @@ from flask import g, session, url_for
 
 from openatlas import app
 from openatlas.models.api_helpers.api_error import APIError
-from openatlas.models.api_helpers.api_pagination import Pagination
+from openatlas.models.api_helpers.api_sql import Query
 from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
 from openatlas.models.gis import Gis
@@ -81,9 +81,9 @@ class Api:
         return entities
 
     @staticmethod
-    def get_entities_by_class(class_code_: str) -> List[Dict[str, Any]]:
+    def get_entities_by_class(class_code_: str, meta: dict) -> List[Dict[str, Any]]:
         entities = []
-        for entity in Entity.get_by_class_code(class_code_):
+        for entity in Query.get_by_class_code(class_code_, meta):
             entities.append(Api.get_entity(entity.id))
         return entities
 

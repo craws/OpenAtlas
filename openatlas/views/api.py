@@ -6,8 +6,8 @@ from openatlas import app
 from openatlas.models.api import Api
 from openatlas.models.api_helpers.api_error import APIError
 from openatlas.util.util import api_access
-from openatlas.models.api_helpers.api_pagination import Pagination
-
+from openatlas.models.api_helpers.api_sql import Query
+from openatlas.models.api_helpers.api_validation import Validation
 
 # Todo: unit test
 
@@ -88,9 +88,10 @@ def api_get_by_menu_item(code: str) -> Response:
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_get_by_class(class_code: str) -> Response:
-    if len(Api.get_entities_by_class(class_code_=class_code)) == 0:
+    validation = Validation.validate_url_query(request.args)
+    if len(Api.get_entities_by_class(class_code_=class_code, meta=validation)) == 0:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404d")
-    return jsonify(Api.get_entities_by_class(class_code_=class_code))
+    return jsonify(Api.get_entities_by_class(class_code_=class_code, meta=validation))
 
 
 @app.route('/api/0.1/latest/<int:limit>')
@@ -137,7 +138,7 @@ def api_get_query() -> Response:  # pragma: nocover
 @app.route('/api/0.1/test')
 @api_access()  # type: ignore
 def api_get_test() -> Response:
-    return jsonify(Pagination.get_by_menu_item(menu_item='actor'))
+    return jsonify(Query.get_by_menu_item(menu_item='actor'))
 
 
 @app.route('/api')
@@ -145,5 +146,3 @@ def api_get_test() -> Response:
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_index() -> str:
     return render_template('api/index.html')
-
-
