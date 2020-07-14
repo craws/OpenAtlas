@@ -1,239 +1,220 @@
 tinymce.init({
-    menubar: false,
-    relative_urls: false,
-    mode: 'specific_textareas',
-    editor_selector: 'tinymce',
-    resize: 'both',
-    toolbar_items_size: 'small',
-    plugins: 'link code textcolor colorpicker',
-    toolbar: 'bold italic underline strikethrough alignleft aligncenter alignright alignjustify ' +
-        ' undo redo link unlink fontselect fontsizeselect forecolor code',
+  menubar: false,
+  relative_urls: false,
+  mode: 'specific_textareas',
+  editor_selector: 'tinymce',
+  resize: 'both',
+  toolbar_items_size: 'small',
+  plugins: 'link code textcolor colorpicker',
+  toolbar: 'bold italic underline strikethrough alignleft aligncenter alignright alignjustify ' +
+      ' undo redo link unlink fontselect fontsizeselect forecolor code',
 });
 
 $(document).ready(function () {
 
-    //popovers init
-    $('[data-toggle="popover"]').popover();
+  //popovers init
+  $('[data-toggle="popover"]').popover();
 
-    // DataTables - sort for checkbox columns
-    $.fn.dataTable.ext.order['dom-checkbox'] = function (settings, col) {
-        return this.api().column(col, {order: 'index'}).nodes().map(function (td, i) {
-            return $('input', td).prop('checked') ? '1' : '0';
-        });
-    };
-
-    // DataTables - sort for CIDOC model
-    $.fn.dataTable.ext.order['cidoc-model'] = function (settings, col) {
-        return this.api().column(col, {order: 'index'}).nodes().map(function (td, i) {
-            const d = td.firstChild.innerText
-                .replace('OA', '100')
-                .replace(/[\D]*/, '');
-            return parseInt(d, 10);
-        });
-    };
-
-    // DataTables - ignore special characters for search
-    (function () {
-        function removeAccents(data) {
-            if (data.normalize) {
-                // Use I18n API if available to split characters and accents, then remove
-                // the accents wholesale. Note that we use the original data as well as
-                // the new to allow for searching of either form.
-                return data + ' ' + data
-                    .normalize('NFD')
-                    .replace(/[\u0300-\u036f]/g, '');
-            }
-            return data;
-        }
-
-        var searchType = jQuery.fn.DataTable.ext.type.search;
-        searchType.string = function (data) {
-            return !data ?
-                '' :
-                typeof data === 'string' ?
-                    removeAccents(data) :
-                    data;
-        };
-        searchType.html = function (data) {
-            return !data ?
-                '' :
-                typeof data === 'string' ?
-                    removeAccents(data.replace(/<.*?>/g, '')) :
-                    data;
-        };
-    }());
-
-    /* Show and hide function for date input fields */
-    $("#date-switcher").click(function () {
-        $(".date-switch").toggleClass('display-none');
-        $(this).text(function (i, text) {
-            return text === show ? hide : show;
-        })
+  // DataTables - sort for checkbox columns
+  $.fn.dataTable.ext.order['dom-checkbox'] = function (settings, col) {
+    return this.api().column(col, {order: 'index'}).nodes().map(function (td, i) {
+      return $('input', td).prop('checked') ? '1' : '0';
     });
+  };
 
-    /* Show and hide function for value type input fields */
-    $("#value-type-switcher").click(function () {
-        $(".value-type-switch").toggleClass('display-none');
-        $(this).text(function (i, text) {
-            return text === show ? hide : show;
-        })
-    })
-
-    /* When selecting a file for upload: if name is empty, fill with filename without extension */
-    $('#file').on("change", function () {
-        if ($('#name').val() == '') {
-            var filename = $('#file')[0].files.length ? $('#file')[0].files[0].name : '';
-            $('#name').val(filename.replace(/\.[^/.]+$/, ""));
-        }
+  // DataTables - sort for CIDOC model
+  $.fn.dataTable.ext.order['cidoc-model'] = function (settings, col) {
+    return this.api().column(col, {order: 'index'}).nodes().map(function (td, i) {
+      const d = td.firstChild.innerText
+          .replace('OA', '100')
+          .replace(/[\D]*/, '');
+      return parseInt(d, 10);
     });
+  };
 
-    /* Show more/less function for texts */
-    var showChar = 800;
-    var ellipsesText = "...";
-    $('.more').each(function () {
-        var content = $(this).html();
-        if (this.scrollHeight-1 > this.clientHeight) {
-            more = '<a href="" class="more-link">' + moreText + '</a></span>';
-            $(more).insertAfter(this);
-        }
-    });
-    $(".more-link").click(function () {
-        if ($(this).hasClass("less")) {
-            $(this).removeClass("less");
-            $(this).html(moreText);
-            $(this).prev().css('line-clamp', "10");
-        } else {
-            $(this).addClass("less");
-            $(this).html(lessText);
-            $(this).prev().css('line-clamp', "1000");
-        }
-        return false;
-    });
+  // DataTables - ignore special characters for search
+  var searchType = jQuery.fn.DataTable.ext.type.search;
+  searchType.string = function (data) {
+    return !data ?
+        '' :
+        typeof data === 'string' ?
+            removeAccents(data) :
+            data;
+  };
+  searchType.html = function (data) {
+    return !data ?
+        '' :
+        typeof data === 'string' ?
+            removeAccents(data.replace(/<.*?>/g, '')) :
+            data;
+  };
 
-    //bootstrap tabs navigation
-    let url = location.href.replace(/\/$/, "");
-    if (location.hash) {
-        const hashes = url.split("#")[1].split("_");
-        $(`a[href="#${hashes[0]}"]`).tab('show');
-        $(`#${hashes[1]}`).collapse('show');
-        url = location.href.replace(/\/#/, "#");
-        history.replaceState(null, null, url);
-        setTimeout(() => {
-            $(window).scrollTop(0);
-        }, 400);
+  /* When selecting a file for upload: if name is empty, fill with filename without extension */
+  $('#file').on("change", function () {
+    if ($('#name').val() == '') {
+      var filename = $('#file')[0].files.length ? $('#file')[0].files[0].name : '';
+      $('#name').val(filename.replace(/\.[^/.]+$/, ""));
     }
-    else {
-        $(`a[href="#menu-tab-standard"]`).tab('show');
-    }
+  });
 
-    $('a[data-toggle="tab"]').on("click", function () {
-        let newUrl;
-        const hash = $(this).attr("href");
-        newUrl = url.split("#")[0] + hash;
-        history.replaceState(null, null, newUrl);
-    });
+  /* Show more/less function for texts */
+  var showChar = 800;
+  var ellipsesText = "...";
+  $('.more').each(function () {
+    var content = $(this).html();
+    if (this.scrollHeight - 1 > this.clientHeight) {
+      more = '<a href="" class="more-link">' + moreText + '</a></span>';
+      $(more).insertAfter(this);
+    }
+  });
+  $(".more-link").click(function () {
+    if ($(this).hasClass("less")) {
+      $(this).removeClass("less");
+      $(this).html(moreText);
+      $(this).prev().css('line-clamp', "10");
+    } else {
+      $(this).addClass("less");
+      $(this).html(lessText);
+      $(this).prev().css('line-clamp', "1000");
+    }
+    return false;
+  });
+
+  //bootstrap tabs navigation
+  let url = location.href.replace(/\/$/, "");
+  if (location.hash) {
+    const hashes = url.split("#")[1].split("_");
+    $(`a[href="#${hashes[0]}"]`).tab('show');
+    $(`#${hashes[1]}`).collapse('show');
+    url = location.href.replace(/\/#/, "#");
+    history.replaceState(null, null, url);
+    setTimeout(() => {
+      $(window).scrollTop(0);
+    }, 400);
+  } else {
+    $(`a[href="#menu-tab-standard"]`).tab('show');
+  }
+
+  $('a[data-toggle="tab"]').on("click", function () {
+    let newUrl;
+    const hash = $(this).attr("href");
+    newUrl = url.split("#")[0] + hash;
+    history.replaceState(null, null, newUrl);
+  });
 });
 
 $.jstree.defaults.core.themes.dots = false;
 
 function resizeText(multiplier) {
-    if (document.body.style.fontSize === '') {
-        document.body.style.fontSize = '1.0em';
-    }
-    document.body.style.fontSize =
-        parseFloat(document.body.style.fontSize) + (multiplier * 0.2) + 'em';
+  if (document.body.style.fontSize === '') {
+    document.body.style.fontSize = '1.0em';
+  }
+  document.body.style.fontSize =
+      parseFloat(document.body.style.fontSize) + (multiplier * 0.2) + 'em';
 }
 
 function ucString(string) {
-    if (!string) {
-        return '';
-    }
-    return string.charAt(0).toUpperCase() + string.slice(1);
+  if (!string) {
+    return '';
+  }
+  return string.charAt(0).toUpperCase() + string.slice(1);
 }
 
 function ajaxBookmark(entityId) {
-    $.ajax({
-        type: 'POST',
-        url: '/ajax/bookmark',
-        data: 'entity_id=' + entityId,
-        success: function (label) {
-            $('#bookmark' + entityId).html(label);
-        }
-    });
+  $.ajax({
+    type: 'POST',
+    url: '/ajax/bookmark',
+    data: 'entity_id=' + entityId,
+    success: function (label) {
+      $('#bookmark' + entityId).html(label);
+    }
+  });
 }
 
 function selectFromTree(name, id, text) {
-    $('#' + name).val(id)
-    $('#' + name + '-button').val(text.replace(/&apos;/g, "'"));
-    $('#' + name + '-modal').modal('hide');
-    $('#' + name + '-clear').show();
+  $('#' + name).val(id)
+  $('#' + name + '-button').val(text.replace(/&apos;/g, "'"));
+  $('#' + name + '-modal').modal('hide');
+  $('#' + name + '-clear').show();
 }
 
 function selectFromTreeMulti(name, value_type = false) {
-    var checkedNames = '';
-    var ids = $('#' + name + '-tree').jstree('get_selected');
-    ids.forEach(function (item, index, array) {
-        var node = $('#' + name + '-tree').jstree().get_node(item);
-        if (value_type) {
-            $('#' + name + '-button').after('<span> ' + node['text'] + '</span>');
-            $('#' + name + '-button').after(
-                $('<input>').attr({
-                    type: 'text',
-                    id: node.id,
-                    name: node.id,
-                    value: '20',
-                    class: 'value_input'
-                }));
-            $('#' + name + '-button').after($('<br>'));
-        } else {
-            checkedNames += node['text'] + "<br>";
-        }
-    });
-    $("#" + name + "-selection").html(checkedNames);
-    if (ids.length > 0) {
-        $("#" + name).val('[' + ids + ']');
+  var checkedNames = '';
+  var ids = $('#' + name + '-tree').jstree('get_selected');
+  ids.forEach(function (item, index, array) {
+    var node = $('#' + name + '-tree').jstree().get_node(item);
+    if (value_type) {
+      $('#' + name + '-button').after('<span> ' + node['text'] + '</span>');
+      $('#' + name + '-button').after(
+          $('<input>').attr({
+            type: 'text',
+            id: node.id,
+            name: node.id,
+            value: '20',
+            class: 'value_input'
+          }));
+      $('#' + name + '-button').after($('<br>'));
     } else {
-        $("#" + name).val('');
+      checkedNames += node['text'] + "<br>";
     }
-    $("#" + name).trigger('change');
+  });
+  $("#" + name + "-selection").html(checkedNames);
+  if (ids.length > 0) {
+    $("#" + name).val('[' + ids + ']');
+  } else {
+    $("#" + name).val('');
+  }
+  $("#" + name).trigger('change');
 }
 
 function selectFromTable(element, table, id) {
-    $("#" + table).attr('value', id);
-    $("#" + table + "-button").val(element.innerText);
-    $("#" + table + "-button").focus(); /* to refresh/fill button and remove validation errors */
-    $("#" + table + "-clear").show();
-    $('#' + table + '-modal').modal('hide');
+  $("#" + table).attr('value', id);
+  $("#" + table + "-button").val(element.innerText);
+  $("#" + table + "-button").focus(); /* to refresh/fill button and remove validation errors */
+  $("#" + table + "-clear").show();
+  $('#' + table + '-modal').modal('hide');
 }
 
 function selectFromTableMulti(name) {
-    var checkedNames = '';
-    var ids = [];
-    $('#' + name + '_table').DataTable().rows().nodes().to$().find('input[type="checkbox"]').each(
-        function () {
-            if ($(this).is(':checked')) {
-                checkedNames += $(this).val() + '<br>';
-                ids.push($(this).attr('id'));
-            }
-        });
-    $('#' + name + '-selection').html(checkedNames);
-    $('#' + name).val(ids.length > 0 ? '[' + ids + ']' : '').trigger('change');
+  var checkedNames = '';
+  var ids = [];
+  $('#' + name + '_table').DataTable().rows().nodes().to$().find('input[type="checkbox"]').each(
+      function () {
+        if ($(this).is(':checked')) {
+          checkedNames += $(this).val() + '<br>';
+          ids.push($(this).attr('id'));
+        }
+      });
+  $('#' + name + '-selection').html(checkedNames);
+  $('#' + name).val(ids.length > 0 ? '[' + ids + ']' : '').trigger('change');
 }
 
 function clearSelect(name) {
-    $('#' + name).attr('value', '');
-    $('#' + name + '-button').val('');
-    $('#' + name + '-tree').jstree('deselect_all');
-    $('#' + name + '-clear').hide();
+  $('#' + name).attr('value', '');
+  $('#' + name + '-button').val('');
+  $('#' + name + '-tree').jstree('deselect_all');
+  $('#' + name + '-clear').hide();
 }
 
 function overflow() {
-    setTimeout(() => {
-        $('td').bind('mouseenter', function () {
-            var $this = $(this);
-            if (this.offsetWidth < this.scrollWidth) {
-                $this.attr('title', $this.text());
-            }
-        });
-    }, 0);
+  setTimeout(() => {
+    $('td').bind('mouseenter', function () {
+      var $this = $(this);
+      if (this.offsetWidth < this.scrollWidth) {
+        $this.attr('title', $this.text());
+      }
+    });
+  }, 0);
+}
+
+function removeAccents(data) {
+  if (data.normalize) {
+    // Use I18n API if available to split characters and accents, then remove
+    // the accents wholesale. Note that we use the original data as well as
+    // the new to allow for searching of either form.
+    return data + ' ' + data
+        .normalize('NFD')
+        .replace(/[\u0300-\u036f]/g, '');
+  }
+  return data;
 }
