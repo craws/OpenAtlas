@@ -77,9 +77,10 @@ def api_get_entities_by_json() -> Response:  # pragma: nocover
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_get_by_menu_item(code: str) -> Response:
+    validation = Validation.validate_url_query(request.args)
     try:
-        Api.get_entities_by_menu_item(code_=code)
-        return jsonify(Api.get_entities_by_menu_item(code_=code))
+        Api.get_entities_by_menu_item(code_=code, meta=validation)
+        return jsonify(Api.get_entities_by_menu_item(code_=code, meta=validation))
     except Exception:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404c")
 

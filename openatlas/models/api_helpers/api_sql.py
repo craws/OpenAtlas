@@ -258,27 +258,39 @@ class Query:
                           meta: Dict[str, Union[str, int, List[str]]]) -> List[Query]:
         codes = code if isinstance(code, list) else [code]
         g.execute(
-            Query.build_sql() + 'WHERE class_code IN %(codes)s ORDER BY {order} {sort};'.format(
+            Query.build_sql() + 'WHERE class_code IN %(codes)s ORDER BY {order} {sort} '
+                                'LIMIT %(limit)s;'.format(
                 order=', '.join(meta['column']), sort=meta['sort']),
-            {'codes': tuple(codes)})
+            {'codes': tuple(codes), 'limit': meta['limit']})
 
         return [Query(row) for row in g.cursor.fetchall()]
 
     @staticmethod
-    def get_by_menu_item(menu_item: str) -> List[Query]:
+    def get_by_menu_item(menu_item: str,
+                         meta: Dict[str, Union[str, int, List[str]]]) -> List[Query]:
         # Possible class names: actor, event, place, reference, source, object
-
-        sql = Query.build_sql_pagination() + """ WHERE e.class_code IN %(codes)s GROUP BY e.name, e.id, e.class_code;"""
-
-        g.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][menu_item])})
-        pages = []
-        for row in g.cursor.fetchall():
-            page = {'id': row[0]}
-            page['name'] = row[1]
-            page['page'] = row[3]
-            pages.append(page)
-
-        return pages
+        if menu_item == 'source':
+            sql = Query.build_sql(nodes=True) + """
+                WHERE e.class_code IN %(codes)s AND e.system_type = 'source content'
+                GROUP BY e.id ORDER BY {order} {sort} 
+                                LIMIT %(limit)s;""".format(
+                order=', '.join(meta['column']), sort=meta['sort'])
+        elif menu_item == 'reference':
+            sql = Query.build_sql(nodes=True) + """
+                WHERE e.class_code IN %(codes)s AND e.system_type != 'file' GROUP BY e.id ORDER BY {order} {sort} 
+                                LIMIT %(limit)s;""".format(
+                order=', '.join(meta['column']), sort=meta['sort'])
+        else:
+            aliases = True if menu_item == 'actor' and current_user.is_authenticated and \
+                              current_user.settings['table_show_aliases'] else False
+            sql = Query.build_sql(nodes=True if menu_item == 'event' else False,
+                                  aliases=aliases) + """
+                WHERE e.class_code IN %(codes)s GROUP BY e.id ORDER BY {order} {sort} 
+                                LIMIT %(limit)s;""".format(
+                order=', '.join(meta['column']), sort=meta['sort'])
+        g.execute(sql,
+                  {'codes': tuple(app.config['CLASS_CODES'][menu_item]), 'limit': meta['limit']})
+        return [Query(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_by_name_and_system_type(name: Union[str, int], system_type: str) -> Optional[
