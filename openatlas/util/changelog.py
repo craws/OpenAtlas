@@ -1,4 +1,5 @@
 class Changelog:
+
     versions = {
         '5.3.0': ['TBA', {
             'feature': {
@@ -9,12 +10,17 @@ class Changelog:
                 '1283': 'More detailed type display',
                 '1286': 'Notifications for date field',
                 '1287': 'Map tiles max zoom',
-                '1258': 'Manual Text for Subunits'},
+                '1276': 'Show child nodes in tree search',
+                '1258': 'Manual Text for Subunits',
+                '1211': 'API: CORS handler',
+                '1232': 'API: Error/Exception Handling'},
             'fix': {
                 '547': 'Prevent double submit',
-                '1235': 'Layout issues on smaller screens',
+                '1235': 'Layout issues with forms on smaller screens',
+                '1278': 'Broken table list views on smaller screens',
                 '1267': 'Model link checker bug',
                 '1288': 'Forward upon failed form validation',
+                '1291': "Data tables mouse over doesn't work if filtered",
                 '1234': "API: Relation inverse doesn't work proper"}}],
         '5.2.0': ['2020-05-11', {
             'feature': {
