@@ -1,10 +1,13 @@
 from werkzeug.datastructures import ImmutableMultiDict
+import re
 
 
 class Validation:
-    default = {'filter': 'gte', 'limit': '20', 'sort': 'ASC', 'column': 'name'}
+    default = {'filter': '', 'limit': '20', 'sort': 'ASC', 'column': 'name'}
     column = ['id', 'class_code', 'name', 'description', 'created', 'modified', 'system_type',
               'begin_from', 'begin_to', 'end_from', 'end_to']
+    operators = ['eq', 'ne', 'lt', 'le', 'gt', 'ge', 'and', 'or', 'not', 'contains', 'startsWith',
+                 'in', 'match']
 
     @staticmethod
     def validate_url_query(query):
@@ -17,7 +20,15 @@ class Validation:
 
     @staticmethod
     def validate_filter(filter):
-        return filter
+        filter = re.findall(r'\(.*?\)', ''.join(filter))
+        print(type(filter))
+        for item in filter:
+            print(item)
+            if item[0] in Validation.operators and item[1] in Validation.column:
+                print(item)
+            else:
+                filter = Validation.default['filter']
+        return Validation.default['filter']
 
     @staticmethod
     def validate_limit(limit):

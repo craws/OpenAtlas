@@ -148,7 +148,8 @@ class Query:
         # Performance: only join nodes and/or aliases if requested
         sql = """
             SELECT
-                e.id, e.class_code, e.name, e.description, e.created, e.modified, e.system_type,
+                e.id as id, e.class_code as class_code, e.name as name, e.description as description,
+                e.created as created, e.modified as modified, e.system_type as system_type,
                 COALESCE(to_char(e.begin_from, 'yyyy-mm-dd BC'), '') AS begin_from, e.begin_comment,
                 COALESCE(to_char(e.begin_to, 'yyyy-mm-dd BC'), '') AS begin_to,
                 COALESCE(to_char(e.end_from, 'yyyy-mm-dd BC'), '') AS end_from, e.end_comment,
@@ -258,9 +259,10 @@ class Query:
                           meta: Dict[str, Union[str, int, List[str]]]) -> List[Query]:
         codes = code if isinstance(code, list) else [code]
         g.execute(
-            Query.build_sql() + 'WHERE class_code IN %(codes)s ORDER BY {order} {sort} '
-                                'LIMIT %(limit)s;'.format(
-                order=', '.join(meta['column']), sort=meta['sort']),
+            Query.build_sql() + """WHERE class_code IN %(codes)s {filter} ORDER BY {order} {sort} 
+                                LIMIT %(limit)s;""".format(filter=meta['filter'],
+                                                           order=', '.join(meta['column']),
+                                                           sort=meta['sort']),
             {'codes': tuple(codes), 'limit': meta['limit']})
 
         return [Query(row) for row in g.cursor.fetchall()]
@@ -343,12 +345,6 @@ class Query:
         return {col[0]: row[idx] for idx, col in enumerate(g.cursor.description)}
 
     @staticmethod
-    def get_orphans() -> List[Query]:
-        """ Returns entities without links. """
-        g.execute(Query.sql_orphan)
-        return [Query.get_by_id(row.id) for row in g.cursor.fetchall()]
-
-    @staticmethod
     def get_latest(limit: int) -> List[Query]:
         """ Returns the newest created entities"""
         codes = list(itertools.chain(*[code_ for code_ in app.config['CLASS_CODES'].values()]))
@@ -357,9 +353,3 @@ class Query:
                 ORDER BY e.created DESC LIMIT %(limit)s;"""
         g.execute(sql, {'codes': tuple(codes), 'limit': limit})
         return [Query(row) for row in g.cursor.fetchall()]
-
-    @staticmethod
-    def get_circular() -> List[Query]:
-        """ Get entities that are linked to itself."""
-        g.execute('SELECT domain_id FROM model.link WHERE domain_id = range_id;')
-        return [Query.get_by_id(row.domain_id) for row in g.cursor.fetchall()]
