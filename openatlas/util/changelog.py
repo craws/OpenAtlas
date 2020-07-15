@@ -1,7 +1,7 @@
 class Changelog:
 
     versions = {
-        '5.3.0': ['TBA', {
+        '5.3.0': ['2020-07-15', {
             'feature': {
                 '1272': 'Tabs redesign',
                 '1279': 'Change "Add" button label to "Link"',
