@@ -23,7 +23,9 @@ class Validation:
         filter = re.findall(r'\(.*?\)', ''.join(filter))
         print(type(filter))
         for item in filter:
-            print(item)
+            item = tuple(item)
+            for i in item:
+                print(i)
             if item[0] in Validation.operators and item[1] in Validation.column:
                 print(item)
             else:
