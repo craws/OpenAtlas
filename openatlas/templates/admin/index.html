@@ -14,6 +14,7 @@
                 <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-mail">{{ _('email')|uc_first }}</a></li>
             {% endif  %}
             {% if 'manager'|is_authorized: %}
+                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-modules">{{ _('modules')|uc_first }}</a></li>
                 <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-map">{{ _('map')|uc_first }}</a></li>
                 <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-content">{{ _('content')|uc_first }}</a></li>
             {% endif %}
@@ -101,6 +102,11 @@
                 </div>
             {% endif  %}
             {% if 'manager'|is_authorized %}
+                <div class="tab-pane fade" role="tabpanel" id="tab-modules">
+                    <div>
+
+                    </div>
+                </div>
                 <div class="tab-pane fade" role="tabpanel" id="tab-map">
                     <div class="toolbar">
                         {{ 'admin/map'|manual }}
