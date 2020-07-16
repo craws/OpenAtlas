@@ -259,7 +259,7 @@ class Query:
                           meta: Dict[str, Union[str, int, List[str]]]) -> List[Query]:
         codes = code if isinstance(code, list) else [code]
         g.execute(
-            Query.build_sql() + """WHERE class_code IN %(codes)s {filter} AND id LIKE 1%% ORDER BY {order} {sort} 
+            Query.build_sql() + """WHERE class_code IN %(codes)s {filter} ORDER BY {order} {sort} 
                                 LIMIT %(limit)s;""".format(filter=meta['filter'],
                                                            order=', '.join(meta['column']),
                                                            sort=meta['sort']),

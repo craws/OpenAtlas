@@ -28,13 +28,17 @@ class Validation:
             operator = item[0].lower()
             if operator in Validation.operators_dict:
                 filter_query += Validation.operators_dict[operator]
-                item = re.split('[,:;]', item[1])
+                item = re.split('[,]', item[1])
                 if item[0] in Validation.operators_dict and item[1] in Validation.column:
                     if item[0] == 'like':
-                        item[2] = '\'' + item[2] + '\''
-
+                        item[2] = '\'' + item[2] + '%%\''
+                        item[1] = item[1] + '::text'
+                    if item[0] == 'in':
+                        # remove [] and get all values between : re.split(':', item[2])
+                        pass
                     filter_query += ' ' + item[1] + ' ' \
                                     + Validation.operators_dict[item[0]] + ' ' + item[2] + ' '
+
                 else:
                     filter_query = Validation.default['filter']
             else:
