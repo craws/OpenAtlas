@@ -9,25 +9,32 @@
 {% endblock %}
 
 {% block tab_info %}
-    <div class="toolbar">
-        {{ 'menu/place'|manual }}
-        {% if 'contributor'|is_authorized %}
-            {{ _('edit')|button(url_for('place_update', id_=object_.id)) }}
-            {% if not subunits %}
-                {{ object_|display_delete_link }}
-            {% endif %}
-        {% endif %}
-        {{ object_.id|bookmark_toggle }}
-    </div>
-    <h1>{{ object_.name }}</h1>
-    <div>
-        {{ profile_image_id|display_profile_image }}
-        <div style="float:left;">
-            {{ info|display_info }}
-            {{ object_|note }}
-            {{ object_|display_external_references }}
-            {{ object_|description }}
+    <div class="row">
+        <div class="col-6">
+            <div class="toolbar">
+                {{ 'menu/place'|manual }}
+                {% if 'contributor'|is_authorized %}
+                    {{ _('edit')|button(url_for('place_update', id_=object_.id)) }}
+                    {% if not subunits %}
+                        {{ object_|display_delete_link }}
+                    {% endif %}
+                {% endif %}
+                {{ object_.id|bookmark_toggle }}
+            </div>
+            <h1>{{ object_.name }}</h1>
+            {{ profile_image_id|display_profile_image }}
+            <div style="float:left;">
+                {{ info|display_info }}
+                {{ object_|note }}
+                {{ object_|display_external_references }}
+                {{ object_|description }}
+            </div>
         </div>
-        <div style="clear:both;"></div>
+        <div class="col-6">
+            {% if gis_data %}
+                <div id="map" class="map"></div>
+                <script src="/static/js/map/map.js"></script>
+            {% endif %}
+        </div>
     </div>
 {% endblock %}

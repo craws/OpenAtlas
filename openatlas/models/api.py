@@ -10,6 +10,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
+from openatlas.models.node import Node
 from openatlas.util.util import format_date, get_file_path
 
 
@@ -103,22 +104,8 @@ class Api:
         return entities
 
     @staticmethod
-    def get_entity(id_: int) -> Dict[str, Any]:
-        try:
-            entity = Entity.get_by_id(id_, nodes=True, aliases=True)
-        except Exception:
-            raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
-
-        geonames_link = Geonames.get_geonames_link(entity)
-        type_ = 'FeatureCollection'
+    def get_node(entity: Entity) -> List[Dict[str, Any]]:
         nodes = []
-        class_code = ''.join(entity.class_.code + " " + entity.class_.i18n['en']).replace(" ", "_")
-        features = {'@id': url_for('entity_view', id_=entity.id, _external=True),
-                    'type': 'Feature',
-                    'crmClass': "crm:" + class_code,
-                    'properties': {'title': entity.name}}
-
-        # Types
         for node in entity.nodes:
             nodes_dict = {'identifier': url_for('api_entity', id_=node.id, _external=True),
                           'label': node.name}
@@ -130,7 +117,7 @@ class Api:
             if 'unit' not in nodes_dict and node.description:
                 nodes_dict['description'] = node.description
 
-            #  This feature is solely for Stefan
+            #  This feature is solely for the THANADOS project
             hierarchy = []
             for root in node.root:
                 hierarchy.append(g.nodes[root].name)  # pragma: nocover
@@ -138,6 +125,26 @@ class Api:
             nodes_dict['hierarchy'] = ' > '.join(map(str, hierarchy))
 
             nodes.append(nodes_dict)
+
+        return nodes
+
+    @staticmethod
+    def get_entity(id_: int) -> Dict[str, Any]:
+        try:
+            entity = Entity.get_by_id(id_, nodes=True, aliases=True)
+        except Exception:
+            raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
+
+        geonames_link = Geonames.get_geonames_link(entity)
+        type_ = 'FeatureCollection'
+
+        class_code = ''.join(entity.class_.code + " " + entity.class_.i18n['en']).replace(" ", "_")
+        features = {'@id': url_for('entity_view', id_=entity.id, _external=True),
+                    'type': 'Feature',
+                    'crmClass': "crm:" + class_code,
+                    'properties': {'title': entity.name}}
+
+        # Types
 
         # Relations
         if Api.get_links(entity):
@@ -148,8 +155,8 @@ class Api:
             features['description'] = [{'value': entity.description}]
 
         # Types
-        if nodes:  # pragma: nocover
-            features['types'] = nodes
+        if Api.get_node(entity):
+            features['types'] = Api.get_node(entity)
 
         if entity.aliases:  # pragma: nocover
             features['names'] = []

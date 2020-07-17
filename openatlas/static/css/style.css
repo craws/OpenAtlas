@@ -205,7 +205,6 @@ input[type="text"].value_input {
     color: gray;
 }
 
-list-style-type: none;
 #global-search {
     font-size: 0.8em;
     margin-right: 0;
@@ -449,6 +448,7 @@ div.data-table div.display-none {
     display: none;
 }
 
+/* tabs */
 .ui-tabs .ui-tabs-nav li.ui-tabs-active a , .ui-widget-content a{
     cursor: pointer;
 }

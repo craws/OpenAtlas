@@ -1,9 +1,8 @@
 #map {
     z-index: 0;
-    float: left;
-    height: calc(100vh - 140px);
+    float: right;
+    height: calc(100vh - 145px);
     width: 100%;
-    margin-left: 1em;
 }
 
 .mapFormDiv {

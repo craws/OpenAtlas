@@ -63,9 +63,9 @@ class Table:
             <table id="{name}_table" class="table table-striped hover" style="width:100%"></table>
             <script>
                 $(document).ready(function() {{ 
-                    $('#{name}_table').DataTable({data_table}); 
-                    overflow('{name}'); 
+                    $('#{name}_table').DataTable({data_table});
                     $('#{name}_table').on( 'page.dt', () => overflow());
+                    $('#{name}_table').on( 'search.dt', () => overflow());
                 }});                
             </script>""".format(name=name, data_table=json.dumps(data_table), )
 

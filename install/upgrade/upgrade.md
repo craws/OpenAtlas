@@ -16,7 +16,6 @@ Install flask-cors packages e.g. on Debian:
 
     # apt-get install python3-flask-cors
 
-
 ### 5.1.x to 5.2.0
 
 Execute install/upgrade/5.2.0.sql after making backups
