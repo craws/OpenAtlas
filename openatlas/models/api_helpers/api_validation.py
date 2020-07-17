@@ -9,8 +9,8 @@ class Validation:
     operators = ['eq', 'ne', 'lt', 'le', 'gt', 'ge', 'and', 'or', 'not', 'contains', 'startsWith',
                  'in', 'match']
     operators_dict = {'eq': '=', 'ne': '!=', 'lt': '<', 'le': '<=', 'gt': '>', 'ge': '>=',
-                      'and': 'AND', 'or': 'OR', 'onot': 'OR NOT', 'anot': 'AND NOT',
-                      'contains': 'CONTAINS', 'like': 'LIKE', 'in': 'IN'}
+                      'and': 'AND', 'or': 'OR', 'onot': 'OR NOT', 'anot': 'AND NOT', 'like': 'LIKE',
+                      'in': 'IN'}
 
     @staticmethod
     def validate_url_query(query):
@@ -34,8 +34,10 @@ class Validation:
                         item[2] = '\'' + item[2] + '%%\''
                         item[1] = item[1] + '::text'
                     if item[0] == 'in':
-                        # remove [] and get all values between : re.split(':', item[2])
-                        pass
+                        item[2] = item[2].replace('[', '')
+                        item[2] = item[2].replace(']', '')
+                        item[2] = str(tuple(map(str, item[2].split(':'))))
+
                     filter_query += ' ' + item[1] + ' ' \
                                     + Validation.operators_dict[item[0]] + ' ' + item[2] + ' '
 
