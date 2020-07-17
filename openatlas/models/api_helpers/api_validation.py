@@ -1,5 +1,6 @@
-from werkzeug.datastructures import ImmutableMultiDict
 import re
+
+from typing import Dict, List, Union
 
 
 class Validation:
@@ -13,7 +14,7 @@ class Validation:
                       'in': 'IN'}
 
     @staticmethod
-    def validate_url_query(query):
+    def validate_url_query(query: hash) -> Dict[str, Union[str, List[str]]]:
         query = {'filter': Validation.validate_filter(query.getlist('filter')),
                  'limit': Validation.validate_limit(query.getlist('limit')),
                  'sort': Validation.validate_sort(query.getlist('sort')),
@@ -21,10 +22,10 @@ class Validation:
         return query
 
     @staticmethod
-    def validate_filter(filter):
-        filter = re.findall(r'(\w+)\((.*?)\)', ''.join(filter))
+    def validate_filter(filter_: str) -> str:
+        filter_ = re.findall(r'(\w+)\((.*?)\)', ''.join(filter_))
         filter_query = ''
-        for item in filter:
+        for item in filter_:
             operator = item[0].lower()
             if operator in Validation.operators_dict:
                 filter_query += Validation.operators_dict[operator]
@@ -41,16 +42,14 @@ class Validation:
                         item[2] = '\'' + item[2] + '\''
                     filter_query += ' ' + item[1] + ' ' \
                                     + Validation.operators_dict[item[0]] + ' ' + item[2] + ' '
-
                 else:
                     filter_query = Validation.default['filter']
             else:
                 filter_query = Validation.default['filter']
-        print(filter_query)
         return filter_query
 
     @staticmethod
-    def validate_limit(limit):
+    def validate_limit(limit: list) -> str:
         limit_ = []
         if limit:
             for item in limit:
@@ -63,7 +62,7 @@ class Validation:
         return limit_[0]
 
     @staticmethod
-    def validate_sort(sort):
+    def validate_sort(sort: list) -> str:
         sort_ = []
         if sort:
             for item in reversed(sort):
@@ -76,7 +75,7 @@ class Validation:
         return sort_[0]
 
     @staticmethod
-    def validate_column(column):
+    def validate_column(column: list) -> List[str]:
         column_ = []
         if column:
             for item in column:

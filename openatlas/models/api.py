@@ -1,5 +1,5 @@
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from flask import g, session, url_for
 
@@ -10,7 +10,6 @@ from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
-from openatlas.models.node import Node
 from openatlas.util.util import format_date, get_file_path
 
 
@@ -75,16 +74,30 @@ class Api:
         return file_license
 
     @staticmethod
-    def get_entities_by_menu_item(code_: str, meta: dict) -> List[Dict[str, Any]]:
+    def get_entities_by_menu_item(code_: str,  meta: Optional[dict]) -> List[Dict[str, Any]]:
         entities = []
         for entity in Query.get_by_menu_item(code_, meta):
             entities.append(Api.get_entity(entity.id))
         return entities
 
     @staticmethod
-    def get_entities_by_class(class_code_: str, meta: dict) -> List[Dict[str, Any]]:
+    def get_entities_by_menu_item_simple(code_: str) -> List[Dict[str, Any]]:
+        entities = []
+        for entity in Entity.get_by_menu_item(code_):
+            entities.append(Api.get_entity(entity.id))
+        return entities
+
+    @staticmethod
+    def get_entities_by_class(class_code_: str, meta: Optional[dict]) -> List[Dict[str, Any]]:
         entities = []
         for entity in Query.get_by_class_code(class_code_, meta):
+            entities.append(Api.get_entity(entity.id))
+        return entities
+
+    @staticmethod
+    def get_entities_by_class_simple(class_code_: str) -> List[Dict[str, Any]]:
+        entities = []
+        for entity in Entity.get_by_class_code(class_code_):
             entities.append(Api.get_entity(entity.id))
         return entities
 

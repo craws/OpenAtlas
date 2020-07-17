@@ -27,7 +27,6 @@ def api_entity(id_: int) -> Response:
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_download_entity(id_: int) -> Response:
-    # flash(_('Download successful'), 'info')
     return Response(json.dumps(Api.get_entity(id_=id_)),
                     mimetype='application/json',
                     headers={'Content-Disposition': 'attachment;filename=' + str(id_) + '.json'})
@@ -50,15 +49,15 @@ def api_get_entities_by_json() -> Response:  # pragma: nocover
         item = req_data['item']
         for i in item:
             try:
-                out.extend(Api.get_entities_by_menu_item(code_=i))
+                out.extend(Api.get_entities_by_menu_item_simple(code_=i))
             except Exception:
                 raise APIError('Syntax is incorrect!', status_code=404, payload="404c")
     if 'class_code' in req_data:
         class_code = req_data['class_code']
         for c in class_code:
-            if len(Api.get_entities_by_class(class_code_=c)) == 0:
+            if len(Api.get_entities_by_class_simple(class_code_=c)) == 0:
                 raise APIError('Syntax is incorrect!', status_code=404, payload="404d")
-            out.extend(Api.get_entities_by_class(class_code_=c))
+            out.extend(Api.get_entities_by_class_simple(class_code_=c))
     if 'latest' in req_data:
         latest = req_data['latest'][0]
         if type(latest) is int:
@@ -121,15 +120,15 @@ def api_get_query() -> Response:  # pragma: nocover
             items = request.args.getlist('items[]')
             for i in items:
                 try:
-                    out.extend(Api.get_entities_by_menu_item(code_=i))
+                    out.extend(Api.get_entities_by_menu_item_simple(code_=i))
                 except Exception:
                     raise APIError('Syntax is incorrect!', status_code=404, payload="404c")
         if request.args.getlist('classes[]'):
             classes = request.args.getlist('classes[]')
             for c in classes:
-                if len(Api.get_entities_by_class(class_code_=c)) == 0:
+                if len(Api.get_entities_by_class_simple(class_code_=c)) == 0:
                     raise APIError('Syntax is incorrect!', status_code=404, payload="404d")
-                out.extend(Api.get_entities_by_class(class_code_=c))
+                out.extend(Api.get_entities_by_class_simple(class_code_=c))
         return jsonify(out)
     else:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404")
