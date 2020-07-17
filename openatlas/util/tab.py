@@ -3,6 +3,7 @@ from typing import List, Optional
 from flask import g, url_for
 from openatlas import app
 from openatlas.models.entity import Entity
+from openatlas.util.filters import format_tab_number
 from openatlas.util.table import Table
 from openatlas.util.util import button, is_authorized, uc_first
 from flask_babel import lazy_gettext as _
@@ -10,6 +11,22 @@ from flask_babel import lazy_gettext as _
 # Needed for translations
 _('member of')
 _('texts')
+
+
+def tab_header(item: str, table: Optional[Table] = None, active: Optional[bool] = False) -> str:
+    return '''
+        <li class="nav-item">
+            <a 
+                class="nav-link {active}" 
+                data-toggle="tab" 
+                role="tab" 
+                aria-selected="{selected}" 
+                href="#tab-{item}">{label}
+            </a>
+        </li>'''.format(active=' active' if active else '',
+                        selected='true' if active else 'false',
+                        label=uc_first(_(item)) + format_tab_number(None, table),
+                        item=item)
 
 
 class Tab:

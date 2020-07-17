@@ -17,7 +17,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.imports import Project
 from openatlas.models.model import CidocClass, CidocProperty
 from openatlas.models.user import User
-from openatlas.util import util
+from openatlas.util import tab, util
 from openatlas.util.table import Table
 from openatlas.util.util import get_file_path
 
@@ -92,6 +92,12 @@ def format_tab_number(self: Any, param: Union[int, Table]) -> str:
 @blueprint.app_template_filter()
 def is_authorized(self: Any, group: str) -> bool:
     return util.is_authorized(group)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def tab_header(self: Any, label: str, active: Optional[bool] = False) -> str:
+    return Markup(tab.tab_header(label, active))
 
 
 @jinja2.contextfilter
