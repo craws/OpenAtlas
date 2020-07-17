@@ -33,11 +33,12 @@ class Validation:
                     if item[0] == 'like':
                         item[2] = '\'' + item[2] + '%%\''
                         item[1] = item[1] + '::text'
-                    if item[0] == 'in':
+                    elif item[0] == 'in':
                         item[2] = item[2].replace('[', '')
                         item[2] = item[2].replace(']', '')
                         item[2] = str(tuple(map(str, item[2].split(':'))))
-
+                    else:
+                        item[2] = '\'' + item[2] + '\''
                     filter_query += ' ' + item[1] + ' ' \
                                     + Validation.operators_dict[item[0]] + ' ' + item[2] + ' '
 
