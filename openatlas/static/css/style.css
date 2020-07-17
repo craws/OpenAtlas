@@ -42,6 +42,8 @@ div.preview img {
 textarea#statement {
     width: 80em;
     height: 30em;
+    z-index: 0;
+    position: relative;
 }
 
 span.tab-counter {
