@@ -9,18 +9,17 @@
         <ul class="nav nav-tabs" role="tablist">
             {{ 'files'|tab_header(active=True) }}
             {{ 'user'|tab_header(table=tables.user) }}
-            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-user">{{ _('user')|uc_first }} {{ tables.user|format_tab_number }}</a></li>
             {% if 'admin'|is_authorized %}
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-general">{{ _('general')|uc_first }}</a></li>
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-mail">{{ _('email')|uc_first }}</a></li>
+                {{ 'general'|tab_header }}
+                {{ 'email'|tab_header }}
             {% endif  %}
             {% if 'manager'|is_authorized: %}
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-modules">{{ _('modules')|uc_first }}</a></li>
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-map">{{ _('map')|uc_first }}</a></li>
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-content">{{ _('content')|uc_first }}</a></li>
+                {{ 'modules'|tab_header }}
+                {{ 'map'|tab_header }}
+                {{ 'content'|tab_header }}
             {% endif %}
             {% if 'contributor'|is_authorized %}
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-data">{{ _('data')|uc_first }}</a></li>
+                {{ 'data'|tab_header }}
             {% endif %}
         </ul>
         <div class="tab-content">
@@ -91,7 +90,7 @@
                     </div>
                     {{ info.general|display_info }}
                 </div>
-                <div class="tab-pane fade" role="tabpanel" id="tab-mail">
+                <div class="tab-pane fade" role="tabpanel" id="tab-email">
                     <div class="toolbar">
                         {{ 'admin/mail'|manual }}
                         {{ _('edit settings')|button(url_for('admin_settings', category='mail')) }}

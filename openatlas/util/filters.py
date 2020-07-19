@@ -5,9 +5,9 @@ from typing import Any, Dict, List, Optional, Union
 import flask
 import jinja2
 from flask import g, request, session, url_for
-from flask_babel import format_number as babel_format_number, lazy_gettext as _
+from flask_babel import lazy_gettext as _
 from flask_login import current_user
-from jinja2 import escape, evalcontextfilter
+from jinja2 import escape
 from markupsafe import Markup
 from wtforms import IntegerField
 from wtforms.validators import Email
@@ -82,10 +82,7 @@ def note(self: Any, entity: Entity) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def format_tab_number(self: Any, param: Union[int, Table]) -> str:
-    length = len(param.rows) if isinstance(param, Table) else param
-    if not length:
-        return ''
-    return Markup('<span class="tab-counter">' + babel_format_number(length) + '</span>')
+    return Markup(tab.format_tab_number(param))
 
 
 @jinja2.contextfilter
@@ -96,8 +93,11 @@ def is_authorized(self: Any, group: str) -> bool:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def tab_header(self: Any, label: str, active: Optional[bool] = False) -> str:
-    return Markup(tab.tab_header(label, active))
+def tab_header(self: Any,
+               item: str,
+               table: Optional[Table] = None,
+               active: Optional[bool] = False) -> str:
+    return Markup(tab.tab_header(item, table, active))
 
 
 @jinja2.contextfilter

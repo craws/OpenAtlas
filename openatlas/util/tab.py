@@ -1,19 +1,24 @@
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from flask import g, url_for
+from flask_babel import format_number, lazy_gettext as _
+
 from openatlas import app
 from openatlas.models.entity import Entity
-from openatlas.util.filters import format_tab_number
 from openatlas.util.table import Table
 from openatlas.util.util import button, is_authorized, uc_first
-from flask_babel import lazy_gettext as _
 
 # Needed for translations
 _('member of')
 _('texts')
 
 
-def tab_header(item: str, table: Optional[Table] = None, active: Optional[bool] = False) -> str:
+def format_tab_number(param: Union[int, Table]) -> str:
+    length = len(param.rows) if isinstance(param, Table) else param
+    return ' <span class="tab-counter">' + format_number(length) + '</span>' if length else ''
+
+
+def tab_header(id_: str, table: Optional[Table] = None, active: Optional[bool] = False) -> str:
     return '''
         <li class="nav-item">
             <a 
@@ -21,12 +26,12 @@ def tab_header(item: str, table: Optional[Table] = None, active: Optional[bool] 
                 data-toggle="tab" 
                 role="tab" 
                 aria-selected="{selected}" 
-                href="#tab-{item}">{label}
+                href="#tab-{id}">{label}
             </a>
         </li>'''.format(active=' active' if active else '',
                         selected='true' if active else 'false',
-                        label=uc_first(_(item)) + format_tab_number(None, table),
-                        item=item)
+                        label=uc_first(_(id_)) + ' ' + format_tab_number(table),
+                        id=id_.replace('_', '-'))
 
 
 class Tab:
@@ -82,7 +87,8 @@ class Tab:
                 elif code in class_codes['source']:
                     buttons = [button('link', url_for('source_add', id_=id_, class_name='event'))]
                 elif code in class_codes['reference']:
-                    buttons = [button('link', url_for('reference_add', id_=id_, class_name='event'))]
+                    buttons = [button('link',
+                                      url_for('reference_add', id_=id_, class_name='event'))]
                 for code in class_codes['event']:
                     label = g.classes[code].name
                     buttons.append(button(label, url_for('event_insert', code=code, origin_id=id_)))
