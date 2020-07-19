@@ -8,9 +8,16 @@ from openatlas.models.entity import Entity
 from openatlas.util.table import Table
 from openatlas.util.util import button, is_authorized, uc_first
 
-# Needed for translations
+# Needed for translations of tab titles
 _('member of')
 _('texts')
+_('invalid dates')
+_('invalid link dates')
+_('invalid involvement dates')
+_('unlinked')
+_('missing files')
+_('orphaned files')
+_('circular dependencies')
 
 
 def format_tab_number(param: Union[int, Table]) -> str:
@@ -31,7 +38,7 @@ def tab_header(id_: str, table: Optional[Table] = None, active: Optional[bool] =
         </li>'''.format(active=' active' if active else '',
                         selected='true' if active else 'false',
                         label=uc_first(_(id_)) + ' ' + format_tab_number(table),
-                        id=id_.replace('_', '-'))
+                        id=id_.replace('_', '-').replace(' ', '-'))
 
 
 class Tab:
