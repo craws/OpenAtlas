@@ -41,9 +41,12 @@ class ActorTests(TestBaseCase):
                     'begin_year_to': '-1948',
                     'end_year_from': '2049',
                     'end_year_to': '2050'}
-            rv = self.app.post(url_for('actor_insert', code='E21', origin_id=residence_id),
-                               data=data)
+            rv = self.app.post(url_for('actor_insert', code='E21'), data=data)
             actor_id = rv.location.split('/')[-1]
+            rv = self.app.post(url_for('actor_insert', code='E21', origin_id=residence_id),
+                               data=data,
+                               follow_redirects=True)
+            assert b'An entry has been created' in rv.data
 
             # Test actor nodes
             rv = self.app.get(url_for('entity_view', id_=sex_node_sub_1.id))
