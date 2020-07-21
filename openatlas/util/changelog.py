@@ -1,7 +1,11 @@
 class Changelog:
 
     versions = {
-        '5.4.0': ['TBA', {}],
+        '5.4.0': ['TBA', {
+            'fix': {
+                '1308': 'Missing connection for actors created from place'
+            }
+        }],
         '5.3.0': ['2020-07-15', {
             'feature': {
                 '1272': 'Tabs redesign',
