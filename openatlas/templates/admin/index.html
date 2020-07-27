@@ -104,7 +104,7 @@
             {% if 'manager'|is_authorized %}
                 <div class="tab-pane fade" role="tabpanel" id="tab-modules">
                     <div>
-
+                        {{ info.module|display_info }}
                     </div>
                 </div>
                 <div class="tab-pane fade" role="tabpanel" id="tab-map">

@@ -15,7 +15,7 @@ from wtforms import TextAreaField
 from openatlas import app, logger
 from openatlas.forms.admin_forms import (ApiForm, ContentForm, FilesForm, GeneralForm, LogForm,
                                          MailForm, MapForm, NewsLetterForm, SimilarForm,
-                                         TestMailForm)
+                                         TestMailForm, ModuleForm)
 from openatlas.forms.forms import get_form_settings, set_form_settings
 from openatlas.models.content import Content
 from openatlas.models.date import Date
@@ -89,7 +89,8 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
                                  'general': get_form_settings(GeneralForm()),
                                  'mail': get_form_settings(MailForm()),
                                  'map': get_form_settings(MapForm()),
-                                 'api': get_form_settings(ApiForm())})
+                                 'api': get_form_settings(ApiForm()),
+                                 'module': get_form_settings(ModuleForm())})
 
 
 @app.route('/admin/content/<string:item>', methods=["GET", "POST"])

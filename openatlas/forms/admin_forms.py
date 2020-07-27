@@ -12,6 +12,13 @@ class ContentForm(FlaskForm):  # type: ignore
     pass
 
 
+class ModuleForm(FlaskForm):  # type: ignore
+    module_geonames = BooleanField('GeoNames')
+    module_map_overlay = BooleanField(_('map overlay'))
+    module_notes = BooleanField(_('notes'))
+    module_sub_units = BooleanField(_('sub units'))
+
+
 class GeneralForm(FlaskForm):  # type: ignore
     site_name = StringField(_('site name'), [InputRequired()])
     default_language = SelectField(_('default language'),

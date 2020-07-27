@@ -4,7 +4,7 @@
 BEGIN;
 
 -- #929: Module options
-INSERT INTO settings (name, value) VALUES
+INSERT INTO web.settings (name, value) VALUES
     ('module_geonames', ''),
     ('module_map_overlay', ''),
     ('module_notes', ''),
