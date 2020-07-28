@@ -12,7 +12,7 @@ from openatlas.models.api_helpers.api_validation import Validation
 # Todo: unit test
 
 
-@app.route('/api/0.1/entity/<id_>')
+@app.route('/api/0.1/entity/<id_>', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_entity(id_: int) -> Response:
@@ -23,7 +23,7 @@ def api_entity(id_: int) -> Response:
     return jsonify(Api.get_entity(id_=id_))
 
 
-@app.route('/api/0.1/entity/download/<int:id_>')
+@app.route('/api/0.1/entity/download/<int:id_>', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_download_entity(id_: int) -> Response:
@@ -32,7 +32,7 @@ def api_download_entity(id_: int) -> Response:
                     headers={'Content-Disposition': 'attachment;filename=' + str(id_) + '.json'})
 
 
-@app.route('/api/0.1/', methods=['GET', 'POST', 'VIEW', 'PUT'])
+@app.route('/api/0.1/', methods=['GET', 'POST', 'VIEW', 'PUT'], strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET', 'POST', 'VIEW', 'PUT'])
 def api_get_entities_by_json() -> Response:  # pragma: nocover
@@ -71,7 +71,7 @@ def api_get_entities_by_json() -> Response:  # pragma: nocover
     return jsonify(out)
 
 
-@app.route('/api/0.1/code/<code>')
+@app.route('/api/0.1/code/<code>', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_get_by_menu_item(code: str) -> Response:
@@ -83,7 +83,7 @@ def api_get_by_menu_item(code: str) -> Response:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404c")
 
 
-@app.route('/api/0.1/class/<class_code>')
+@app.route('/api/0.1/class/<class_code>', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_get_by_class(class_code: str) -> Response:
@@ -93,7 +93,7 @@ def api_get_by_class(class_code: str) -> Response:
     return jsonify(Api.get_entities_by_class(class_code_=class_code, meta=validation))
 
 
-@app.route('/api/0.1/latest/<int:limit>')
+@app.route('/api/0.1/latest/<int:limit>', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_get_latest(limit: int) -> Response:
@@ -102,7 +102,7 @@ def api_get_latest(limit: int) -> Response:
     raise APIError('Syntax is incorrect!', status_code=404, payload="404e")
 
 
-@app.route('/api/0.1/query')
+@app.route('/api/0.1/query', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_get_query() -> Response:  # pragma: nocover
@@ -134,13 +134,13 @@ def api_get_query() -> Response:  # pragma: nocover
         raise APIError('Syntax is incorrect!', status_code=404, payload="404")
 
 
-@app.route('/api/0.1/test')
+@app.route('/api/0.1/test', strict_slashes=False)
 @api_access()  # type: ignore
 def api_get_test() -> Response:
     return jsonify(Query.get_by_menu_item(menu_item='actor'))
 
 
-@app.route('/api')
+@app.route('/api', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_index() -> str:
