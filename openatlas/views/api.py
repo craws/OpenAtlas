@@ -32,9 +32,9 @@ def api_download_entity(id_: int) -> Response:
                     headers={'Content-Disposition': 'attachment;filename=' + str(id_) + '.json'})
 
 
-@app.route('/api/0.1/', methods=['GET', 'VIEW'])
+@app.route('/api/0.1/', methods=['GET', 'POST', 'VIEW', 'PUT'])
 @api_access()  # type: ignore
-@cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
+@cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET', 'POST', 'VIEW', 'PUT'])
 def api_get_entities_by_json() -> Response:  # pragma: nocover
     out = []
     req_data = request.get_json()
