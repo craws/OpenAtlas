@@ -59,6 +59,8 @@ def actor_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Respo
     form.alias.append_entry('')
     if origin:
         del form.insert_and_continue
+        if origin.system_type == 'place':
+            form.residence.data = origin_id
     if code == 'E21':
         form.begins_in.label.text = _('born in')
         form.ends_in.label.text = _('died in')
@@ -132,6 +134,8 @@ def save(form: ActorForm,
             elif origin.view_name == 'actor':
                 link_id = origin.link('OA7', actor)[0]
                 url = url_for('relation_update', id_=link_id, origin_id=origin.id)
+            elif origin.view_name == 'place':
+                url = url_for('entity_view', id_=origin.id) + '#tab-actor'
         if form.continue_.data == 'yes' and code:
             url = url_for('actor_insert', code=code)
         logger.log_user(actor.id, log_action)
