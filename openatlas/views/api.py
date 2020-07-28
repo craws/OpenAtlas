@@ -106,6 +106,7 @@ def api_get_latest(limit: int) -> Response:
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_get_query() -> Response:  # pragma: nocover
+    validation = Validation.validate_url_query(request.args)
     if request.args:
         out = []
         if request.args.getlist('entities[]'):
@@ -120,15 +121,15 @@ def api_get_query() -> Response:  # pragma: nocover
             items = request.args.getlist('items[]')
             for i in items:
                 try:
-                    out.extend(Api.get_entities_by_menu_item_simple(code_=i))
+                    out.extend(Api.get_entities_by_menu_item(code_=i, meta=validation))
                 except Exception:
                     raise APIError('Syntax is incorrect!', status_code=404, payload="404c")
         if request.args.getlist('classes[]'):
             classes = request.args.getlist('classes[]')
-            for c in classes:
-                if len(Api.get_entities_by_class_simple(class_code_=c)) == 0:
+            for class_code in classes:
+                if len(Api.get_entities_by_class(class_code_=class_code, meta=validation)) == 0:
                     raise APIError('Syntax is incorrect!', status_code=404, payload="404d")
-                out.extend(Api.get_entities_by_class_simple(class_code_=c))
+                out.extend(Api.get_entities_by_class(class_code_=class_code, meta=validation))
         return jsonify(out)
     else:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404")

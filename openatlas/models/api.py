@@ -1,3 +1,4 @@
+import itertools
 import os
 from typing import Any, Dict, List, Optional
 
@@ -74,10 +75,11 @@ class Api:
         return file_license
 
     @staticmethod
-    def get_entities_by_menu_item(code_: str,  meta: Optional[dict]) -> List[Dict[str, Any]]:
+    def get_entities_by_menu_item(code_: str, meta: Optional[dict]) -> List[Dict[str, Any]]:
         entities = []
         for entity in Query.get_by_menu_item(code_, meta):
             entities.append(Api.get_entity(entity.id))
+
         return entities
 
     @staticmethod
@@ -90,9 +92,18 @@ class Api:
     @staticmethod
     def get_entities_by_class(class_code_: str, meta: Optional[dict]) -> List[Dict[str, Any]]:
         entities = []
+        result = []
         for entity in Query.get_by_class_code(class_code_, meta):
-            entities.append(Api.get_entity(entity.id))
-        return entities
+            entities.append(entity.id)
+
+
+        a = list(itertools.islice(entities, entities.index(int(meta['last'])) + 1, None))
+        for i in a[:int(meta['limit'])]:
+            result.append(Api.get_entity(i))
+
+        print(list(a))
+        return result
+
 
     @staticmethod
     def get_entities_by_class_simple(class_code_: str) -> List[Dict[str, Any]]:

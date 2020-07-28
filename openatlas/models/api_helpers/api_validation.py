@@ -18,7 +18,8 @@ class Validation:
         query = {'filter': Validation.validate_filter(query.getlist('filter')),
                  'limit': Validation.validate_limit(query.getlist('limit')),
                  'sort': Validation.validate_sort(query.getlist('sort')),
-                 'column': Validation.validate_column(query.getlist('column'))}
+                 'column': Validation.validate_column(query.getlist('column')),
+                 'last': Validation.validate_last(query.getlist('last'))}
         return query
 
     @staticmethod
@@ -86,3 +87,17 @@ class Validation:
         if not column_:
             column_.append(Validation.default['column'])
         return column_
+
+    @staticmethod
+    def validate_last(last: list) -> List[str]:
+        last_ = []
+        if last:
+            for item in last:
+                if item.isdigit():
+                    last_.append(item)
+        else:
+            last_.append(Validation.default['limit'])
+        if not last_:
+            last_.append(Validation.default['limit'])
+        return last_[0]
+

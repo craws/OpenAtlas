@@ -259,11 +259,10 @@ class Query:
                           meta: Dict[str, Union[str, int, List[str]]]) -> List[Query]:
         codes = code if isinstance(code, list) else [code]
         g.execute(
-            Query.build_sql() + """WHERE class_code IN %(codes)s {filter} ORDER BY {order} {sort} 
-                                LIMIT {limit};""".format(filter=meta['filter'],
-                                                         order=', '.join(meta['column']),
-                                                         sort=meta['sort'],
-                                                         limit=meta['limit']),
+            Query.build_sql() + """WHERE class_code IN %(codes)s {filter} ORDER BY {order} {sort};""".format(
+                filter=meta['filter'],
+                order=', '.join(meta['column']),
+                sort=meta['sort']),
             {'codes': tuple(codes)})
 
         return [Query(row) for row in g.cursor.fetchall()]
@@ -284,9 +283,9 @@ class Query:
             sql = Query.build_sql(nodes=True) + """
                 WHERE e.class_code IN %(codes)s AND e.system_type != 'file' {filter}
                  ORDER BY {order} {sort} LIMIT {limit};""".format(filter=meta['filter'],
-                                                         order=', '.join(meta['column']),
-                                                         sort=meta['sort'],
-                                                         limit=meta['limit'])
+                                                                  order=', '.join(meta['column']),
+                                                                  sort=meta['sort'],
+                                                                  limit=meta['limit'])
         else:
             aliases = True if menu_item == 'actor' and current_user.is_authenticated and \
                               current_user.settings['table_show_aliases'] else False
@@ -294,9 +293,9 @@ class Query:
                                   aliases=aliases) + """
                 WHERE e.class_code IN %(codes)s {filter} 
                 ORDER BY {order} {sort} LIMIT {limit};""".format(filter=meta['filter'],
-                                                         order=', '.join(meta['column']),
-                                                         sort=meta['sort'],
-                                                         limit=meta['limit'])
+                                                                 order=', '.join(meta['column']),
+                                                                 sort=meta['sort'],
+                                                                 limit=meta['limit'])
         g.execute(sql,
                   {'codes': tuple(app.config['CLASS_CODES'][menu_item])})
         return [Query(row) for row in g.cursor.fetchall()]
