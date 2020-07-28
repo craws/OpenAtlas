@@ -78,9 +78,11 @@ class Api:
     def get_entities_by_menu_item(code_: str, meta: Optional[dict]) -> List[Dict[str, Any]]:
         entities = []
         for entity in Query.get_by_menu_item(code_, meta):
-            entities.append(Api.get_entity(entity.id))
+            entities.append(entity.id)
 
-        return entities
+        result = Api.pagination(entities=entities, meta=meta)
+
+        return result
 
     @staticmethod
     def get_entities_by_menu_item_simple(code_: str) -> List[Dict[str, Any]]:
@@ -92,16 +94,22 @@ class Api:
     @staticmethod
     def get_entities_by_class(class_code_: str, meta: Optional[dict]) -> List[Dict[str, Any]]:
         entities = []
-        result = []
         for entity in Query.get_by_class_code(class_code_, meta):
             entities.append(entity.id)
+        result = Api.pagination(entities=entities, meta=meta)
+        return result
 
-
-        a = list(itertools.islice(entities, entities.index(int(meta['last'])) + 1, None))
-        for i in a[:int(meta['limit'])]:
-            result.append(Api.get_entity(i))
-
-        print(list(a))
+    @staticmethod
+    def pagination(entities: List[int], meta: Optional[dict]) -> List[Dict[str, Any]]:
+        result = []
+        if meta['last']:
+            # Getting the ids after the given id
+            ids = list(itertools.islice(entities, entities.index(int(meta['last'])) + 1, None))
+            for entity in ids[:int(meta['limit'])]:
+                result.append(Api.get_entity(entity))
+        else:
+            for entity in entities:
+                result.append(Api.get_entity(entity))
         return result
 
 

@@ -4,7 +4,7 @@ from typing import Dict, List, Union
 
 
 class Validation:
-    default = {'filter': '', 'limit': '20', 'sort': 'ASC', 'column': 'name'}
+    default = {'filter': '', 'limit': '20', 'sort': 'ASC', 'column': 'name', 'last': None}
     column = ['id', 'class_code', 'name', 'description', 'created', 'modified', 'system_type',
               'begin_from', 'begin_to', 'end_from', 'end_to']
     operators = ['eq', 'ne', 'lt', 'le', 'gt', 'ge', 'and', 'or', 'not', 'contains', 'startsWith',
@@ -96,8 +96,8 @@ class Validation:
                 if item.isdigit():
                     last_.append(item)
         else:
-            last_.append(Validation.default['limit'])
+            last_.append(Validation.default['last'])
         if not last_:
-            last_.append(Validation.default['limit'])
+            last_.append(Validation.default['last'])
         return last_[0]
 
