@@ -4,7 +4,8 @@ from typing import Dict, List, Union
 
 
 class Validation:
-    default = {'filter': '', 'limit': '20', 'sort': 'ASC', 'column': 'name', 'last': None}
+    default = {'filter': '', 'limit': '20', 'sort': 'ASC', 'column': 'name', 'last': None,
+               'first': None}
     column = ['id', 'class_code', 'name', 'description', 'created', 'modified', 'system_type',
               'begin_from', 'begin_to', 'end_from', 'end_to']
     operators = ['eq', 'ne', 'lt', 'le', 'gt', 'ge', 'and', 'or', 'not', 'contains', 'startsWith',
@@ -19,7 +20,8 @@ class Validation:
                  'limit': Validation.validate_limit(query.getlist('limit')),
                  'sort': Validation.validate_sort(query.getlist('sort')),
                  'column': Validation.validate_column(query.getlist('column')),
-                 'last': Validation.validate_last(query.getlist('last'))}
+                 'last': Validation.validate_last(query.getlist('last')),
+                 'first': Validation.validate_first(query.getlist('first'))}
         return query
 
     @staticmethod
@@ -101,3 +103,15 @@ class Validation:
             last_.append(Validation.default['last'])
         return last_[0]
 
+    @staticmethod
+    def validate_first(first: list) -> List[str]:
+        first_ = []
+        if first:
+            for item in first:
+                if item.isdigit():
+                    first_.append(item)
+        else:
+            first_.append(Validation.default['first'])
+        if not first_:
+            first_.append(Validation.default['first'])
+        return first_[0]

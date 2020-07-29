@@ -102,16 +102,19 @@ class Api:
     @staticmethod
     def pagination(entities: List[int], meta: Optional[dict]) -> List[Dict[str, Any]]:
         result = []
+        print(entities)
+        index = []
+        for num, i in enumerate(list(itertools.islice(entities, 0, None, int(meta['limit'])))):
+            index.append(({'page': num+1, 'start_id': i}))
         if meta['last']:
-            # Getting the ids after the given id
-            ids = list(itertools.islice(entities, entities.index(int(meta['last'])) + 1, None))
-            for entity in ids[:int(meta['limit'])]:
-                result.append(Api.get_entity(entity))
-        else:
-            for entity in entities:
-                result.append(Api.get_entity(entity))
-        return result
+            entities = list(itertools.islice(entities, entities.index(int(meta['last'])) + 1, None))
+        if meta['first']:
+            entities = list(itertools.islice(entities, entities.index(int(meta['first'])), None))
 
+        for entity in entities[:int(meta['limit'])]:
+            result.append(Api.get_entity(entity))
+        result.append({'index': index})
+        return result
 
     @staticmethod
     def get_entities_by_class_simple(class_code_: str) -> List[Dict[str, Any]]:
