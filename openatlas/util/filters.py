@@ -81,12 +81,6 @@ def note(self: Any, entity: Entity) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def format_tab_number(self: Any, param: Union[int, Table]) -> str:
-    return Markup(tab.format_tab_number(param))
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
 def is_authorized(self: Any, group: str) -> bool:
     return util.is_authorized(group)
 
