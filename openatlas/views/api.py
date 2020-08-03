@@ -11,6 +11,7 @@ from openatlas.models.api_helpers.api_validation import Validation
 
 # Todo: unit test
 
+# Todo: unit tests and mypy checks
 
 @app.route('/api/0.1/entity/<id_>', strict_slashes=False)
 @api_access()  # type: ignore
@@ -146,3 +147,5 @@ def api_get_test() -> Response:
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_index() -> str:
     return render_template('api/index.html')
+
+
