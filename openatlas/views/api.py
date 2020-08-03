@@ -79,7 +79,8 @@ def api_get_by_menu_item(code: str) -> Response:
     validation = Validation.validate_url_query(request.args)
     try:
         Api.get_entities_by_menu_item(code_=code, meta=validation)
-        return jsonify(Api.get_entities_by_menu_item(code_=code, meta=validation))
+        return jsonify(Api.pagination(Api.get_entities_by_menu_item(code_=code, meta=validation),
+                                      meta=validation))
     except Exception:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404c")
 
@@ -114,25 +115,29 @@ def api_get_query() -> Response:  # pragma: nocover
         out = []
         if request.args.getlist('entities[]'):
             entities = request.args.getlist('entities[]')
+            ids = []
             for e in entities:
                 try:
-                    int(e)
+                    ids.append(int(e))
                 except Exception:
                     raise APIError('Syntax is incorrect!', status_code=404, payload="404b")
-                out.append(Api.get_entity(id_=e))
+            result = Api.pagination(ids, meta=validation)
+            print(result)
+            out.append({'entities': result})
         if request.args.getlist('items[]'):
             items = request.args.getlist('items[]')
             for i in items:
                 try:
-                    out.extend(Api.get_entities_by_menu_item(code_=i, meta=validation))
+                    out.append({'result': Api.pagination(Api.get_entities_by_menu_item(code_=i, meta=validation), meta=validation), 'code': i})
                 except Exception:
                     raise APIError('Syntax is incorrect!', status_code=404, payload="404c")
         if request.args.getlist('classes[]'):
             classes = request.args.getlist('classes[]')
+            print(classes)
             for class_code in classes:
                 if len(Api.get_entities_by_class(class_code_=class_code, meta=validation)) == 0:
                     raise APIError('Syntax is incorrect!', status_code=404, payload="404d")
-                out.extend(Api.get_entities_by_class(class_code_=class_code, meta=validation))
+                out.append({'result': Api.pagination(Api.get_entities_by_class(class_code_=class_code, meta=validation), meta=validation), 'class': class_code})
         return jsonify(out)
     else:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404")

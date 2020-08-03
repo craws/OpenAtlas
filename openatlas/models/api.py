@@ -75,7 +75,7 @@ class Api:
         return file_license
 
     @staticmethod
-    def get_entities_by_menu_item(code_: str, meta: Optional[dict]) -> List[Dict[str, Any]]:
+    def get_entities_by_menu_item(code_: str, meta: Optional[dict]) -> List[int]:
         entities = []
         for entity in Query.get_by_menu_item(code_, meta):
             entities.append(entity.id)
@@ -97,13 +97,14 @@ class Api:
         for entity in Query.get_by_class_code(class_code_, meta):
             entities.append(entity.id)
         # result = Api.pagination(entities=entities, meta=meta)
-        print(entities)
+
         return entities
 
     @staticmethod
     def pagination(entities: List[int], meta: Optional[dict]) -> List[Dict[str, Any]]:
         result = []
         index = []
+        total = entities
         for num, i in enumerate(list(itertools.islice(entities, 0, None, int(meta['limit'])))):
             index.append(({'page': num + 1, 'start_id': i}))
         if meta['last']:
@@ -113,7 +114,7 @@ class Api:
 
         for entity in entities[:int(meta['limit'])]:
             result.append(Api.get_entity(entity))
-        result.append({'entity_per_page': int(meta['limit']), 'entities': len(entities),
+        result.append({'entity_per_page': int(meta['limit']), 'entities': len(total),
                        'index': index, 'total_pages': len(index)})
         return result
 
