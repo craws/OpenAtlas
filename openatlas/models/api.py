@@ -80,9 +80,9 @@ class Api:
         for entity in Query.get_by_menu_item(code_, meta):
             entities.append(entity.id)
 
-        result = Api.pagination(entities=entities, meta=meta)
+        # result = Api.pagination(entities=entities, meta=meta)
 
-        return result
+        return entities
 
     @staticmethod
     def get_entities_by_menu_item_simple(code_: str) -> List[Dict[str, Any]]:
@@ -92,20 +92,20 @@ class Api:
         return entities
 
     @staticmethod
-    def get_entities_by_class(class_code_: str, meta: Optional[dict]) -> List[Dict[str, Any]]:
+    def get_entities_by_class(class_code_: str, meta: Optional[dict]) -> List[int]:
         entities = []
         for entity in Query.get_by_class_code(class_code_, meta):
             entities.append(entity.id)
-        result = Api.pagination(entities=entities, meta=meta)
-        return result
+        # result = Api.pagination(entities=entities, meta=meta)
+        print(entities)
+        return entities
 
     @staticmethod
     def pagination(entities: List[int], meta: Optional[dict]) -> List[Dict[str, Any]]:
         result = []
-        print(entities)
         index = []
         for num, i in enumerate(list(itertools.islice(entities, 0, None, int(meta['limit'])))):
-            index.append(({'page': num+1, 'start_id': i}))
+            index.append(({'page': num + 1, 'start_id': i}))
         if meta['last']:
             entities = list(itertools.islice(entities, entities.index(int(meta['last'])) + 1, None))
         if meta['first']:
@@ -113,7 +113,8 @@ class Api:
 
         for entity in entities[:int(meta['limit'])]:
             result.append(Api.get_entity(entity))
-        result.append({'index': index})
+        result.append({'entity_per_page': int(meta['limit']), 'entities': len(entities),
+                       'index': index, 'total_pages': len(index)})
         return result
 
     @staticmethod

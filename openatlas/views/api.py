@@ -5,13 +5,13 @@ from werkzeug.wrappers import Response
 from openatlas import app
 from openatlas.models.api import Api
 from openatlas.models.api_helpers.api_error import APIError
-from openatlas.util.util import api_access
 from openatlas.models.api_helpers.api_sql import Query
 from openatlas.models.api_helpers.api_validation import Validation
+from openatlas.util.util import api_access
+
 
 # Todo: unit test
 
-# Todo: unit tests and mypy checks
 
 @app.route('/api/0.1/entity/<id_>', strict_slashes=False)
 @api_access()  # type: ignore
@@ -91,7 +91,9 @@ def api_get_by_class(class_code: str) -> Response:
     validation = Validation.validate_url_query(request.args)
     if len(Api.get_entities_by_class(class_code_=class_code, meta=validation)) == 0:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404d")
-    return jsonify(Api.get_entities_by_class(class_code_=class_code, meta=validation))
+    return jsonify(
+        Api.pagination(Api.get_entities_by_class(class_code_=class_code, meta=validation),
+                       meta=validation))
 
 
 @app.route('/api/0.1/latest/<int:limit>', strict_slashes=False)
@@ -147,5 +149,3 @@ def api_get_test() -> Response:
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_index() -> str:
     return render_template('api/index.html')
-
-
