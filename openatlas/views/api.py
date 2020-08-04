@@ -16,11 +16,12 @@ from openatlas.util.util import api_access
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_entity(id_: int) -> Response:
+    validation = Validation.validate_url_query(request.args)
     try:
         int(id_)
     except Exception:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404b")
-    return jsonify(Api.get_entity(id_=id_))
+    return jsonify(Api.get_entity(id_=id_, meta=validation))
 
 
 @app.route('/api/0.1/entity/download/<int:id_>', strict_slashes=False)

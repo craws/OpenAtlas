@@ -5,7 +5,8 @@ from typing import Any, Dict, List
 
 class Validation:
     default = {'filter': '', 'limit': '20', 'sort': 'ASC', 'column': 'name', 'last': None,
-               'first': None}
+               'first': None,
+               'show': ['when', 'types', 'relations', 'names', 'links', 'geometry', 'depictions']}
     column = ['id', 'class_code', 'name', 'description', 'created', 'modified', 'system_type',
               'begin_from', 'begin_to', 'end_from', 'end_to']
     operators = ['eq', 'ne', 'lt', 'le', 'gt', 'ge', 'and', 'or', 'not', 'contains', 'startsWith',
@@ -21,7 +22,8 @@ class Validation:
                  'sort': Validation.validate_sort(query.getlist('sort')),
                  'column': Validation.validate_column(query.getlist('column')),
                  'last': Validation.validate_last(query.getlist('last')),
-                 'first': Validation.validate_first(query.getlist('first'))}
+                 'first': Validation.validate_first(query.getlist('first')),
+                 'show': Validation.validate_show(query.getlist('show'))}
         return query
 
     @staticmethod
@@ -105,3 +107,15 @@ class Validation:
         else:
             first_.append(Validation.default['first'])
         return first_[0]
+
+    @staticmethod
+    def validate_show(show: list) -> List[str]:
+        show_ = []
+        valid = ['when', 'types', 'relations', 'names', 'links', 'geometry', 'depictions', 'not']
+        if show:
+            for item in show:
+                if item in valid:
+                    show_.append(item)
+        else:
+            show_.append(Validation.default['show'])
+        return show_[0]

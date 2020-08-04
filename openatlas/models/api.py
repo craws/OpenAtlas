@@ -116,7 +116,7 @@ class Api:
             pass
 
         for entity in entities[:int(meta['limit'])]:
-            result.append(Api.get_entity(entity))
+            result.append(Api.get_entity(entity, meta))
         result.append({'entity_per_page': int(meta['limit']), 'entities': len(total),
                        'index': index, 'total_pages': len(index)})
         return result
@@ -169,7 +169,7 @@ class Api:
         return nodes
 
     @staticmethod
-    def get_entity(id_: int) -> Dict[str, Any]:
+    def get_entity(id_: int, meta: Dict[str, Any]) -> Dict[str, Any]:
         try:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
         except Exception:
@@ -185,7 +185,7 @@ class Api:
                     'properties': {'title': entity.name}}
 
         # Relations
-        if Api.get_links(entity):
+        if Api.get_links(entity) and 'relations' in meta['show']:
             features['relations'] = Api.get_links(entity)
 
         # Descriptions
@@ -193,7 +193,7 @@ class Api:
             features['description'] = [{'value': entity.description}]
 
         # Types
-        if Api.get_node(entity):
+        if Api.get_node(entity) and 'types' in meta['show']:
             features['types'] = Api.get_node(entity)
 
         if entity.aliases:  # pragma: nocover
@@ -202,30 +202,32 @@ class Api:
                 features['names'].append({"alias": value})
 
         # Depictions
-        if Api.get_file(entity):  # pragma: nocover
+        if Api.get_file(entity) and 'depictions' in meta['show']:  # pragma: nocover
             features['depictions'] = Api.get_file(entity)
 
         # Time spans
-        if entity.begin_from or entity.end_from:  # pragma: nocover
-            time = {}
-            if entity.begin_from:
-                start = {'earliest': format_date(entity.begin_from)}
-                if entity.begin_to:
-                    start['latest'] = format_date(entity.begin_to)
-                if entity.begin_comment:
-                    start['comment'] = entity.begin_comment
-                time['start'] = start
-            if entity.end_from:
-                end = {'earliest': format_date(entity.end_from)}
-                if entity.end_to:
-                    end['latest'] = format_date(entity.end_to)
-                if entity.end_comment:
-                    end['comment'] = entity.end_comment
-                time['end'] = end
-            features['when'] = {'timespans': [time]}
+        if 'when' in meta['show']:
+            if entity.begin_from or entity.end_from:  # pragma: nocover
+                time = {}
+                if entity.begin_from:
+                    start = {'earliest': format_date(entity.begin_from)}
+                    if entity.begin_to:
+                        start['latest'] = format_date(entity.begin_to)
+                    if entity.begin_comment:
+                        start['comment'] = entity.begin_comment
+                    time['start'] = start
+                if entity.end_from:
+                    end = {'earliest': format_date(entity.end_from)}
+                    if entity.end_to:
+                        end['latest'] = format_date(entity.end_to)
+                    if entity.end_comment:
+                        end['comment'] = entity.end_comment
+                    time['end'] = end
+                features['when'] = {'timespans': [time]}
 
         # Geonames
-        if geonames_link and geonames_link.range.class_.code == 'E18':
+        if geonames_link and geonames_link.range.class_.code == 'E18' \
+                and 'geometry' in meta['show']:
             geo_name = {}
             if geonames_link.type.name:
                 geo_name['type'] = Api.to_camelcase(geonames_link.type.name)
@@ -240,7 +242,7 @@ class Api:
         geometries = []
         shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
         features['geometry'] = {'type': 'GeometryCollection', 'geometries': []}
-        if entity.location:
+        if entity.location and 'geometry' in meta['show']:
             for geometry in Gis.get_by_id(entity.location.id):
                 geo_dict = {'type': shape[geometry['shape']],
                             'coordinates': geometry['geometry']['coordinates']}
