@@ -2,7 +2,7 @@ from __future__ import annotations  # Needed for Python 4.0 type annotations
 
 import ast
 import itertools
-from typing import Any, Dict, List, Optional, Set, TYPE_CHECKING, Union, ValuesView
+from typing import Any, Dict, Iterable, List, Optional, Set, TYPE_CHECKING, Union, ValuesView
 
 from flask import g
 from flask_login import current_user
@@ -74,75 +74,6 @@ class Query:
         if self.view_name == 'place':
             self.table_name = self.system_type.replace(' ', '_')
 
-    sql_orphan = """
-        SELECT e.id FROM model.entity e
-        LEFT JOIN model.link l1 on e.id = l1.domain_id AND l1.range_id NOT IN
-            (SELECT id FROM model.entity WHERE class_code = 'E55')
-        LEFT JOIN model.link l2 on e.id = l2.range_id
-        WHERE l1.domain_id IS NULL AND l2.range_id IS NULL AND e.class_code != 'E55'"""
-
-    def get_linked_entity(self, code: str, inverse: bool = False,
-                          nodes: bool = False) -> Optional[Query]:
-        return Link.get_linked_entity(self.id, code, inverse=inverse, nodes=nodes)
-
-    def get_linked_entity_safe(self, code: str, inverse: bool = False,
-                               nodes: bool = False) -> Query:
-        return Link.get_linked_entity_safe(self.id, code, inverse, nodes)
-
-    def get_linked_entities(self,
-                            code: Union[str, List[str]],
-                            inverse: bool = False,
-                            nodes: bool = False) -> List[Query]:
-        return Link.get_linked_entities(self.id, code, inverse=inverse, nodes=nodes)
-
-    def link(self,
-             code: str,
-             range_: Union[Query, List[Query]],
-             description: Optional[str] = None,
-             inverse: bool = False,
-             type_id: Optional[int] = None) -> List[int]:
-        return Link.insert(self, code, range_, description, inverse, type_id)
-
-    def link_string(self,
-                    code: str,
-                    range_: str,
-                    description: Optional[str] = None,
-                    inverse: bool = False) -> List[int]:
-        # range_ string from a form, can be empty, an int or an int list presentation
-        # e.g. '', '1', '[]', '[1, 2]'
-        ids = ast.literal_eval(range_)
-        ids = [int(id_) for id_ in ids] if isinstance(ids, list) else [int(ids)]
-        return Link.insert(self, code, Query.get_by_ids(ids), description, inverse)
-
-    def get_links(self, codes: Union[str, List[str]], inverse: bool = False) -> List[Link]:
-        return Link.get_links(self.id, codes, inverse)
-
-    def get_profile_image_id(self) -> Optional[int]:
-        sql = 'SELECT i.image_id FROM web.entity_profile_image i WHERE i.entity_id = %(entity_id)s;'
-        g.execute(sql, {'entity_id': self.id})
-        return g.cursor.fetchone()[0] if g.cursor.rowcount else None
-
-    def print_base_type(self) -> str:
-        from openatlas.models.node import Node
-        if not self.view_name or self.view_name == 'actor':  # actors have no base type
-            return ''
-        root_name = self.view_name.title()
-        if self.view_name == 'reference':
-            root_name = self.system_type.title()
-            if root_name == 'External Reference Geonames':
-                root_name = 'External Reference'
-        elif self.view_name == 'file':
-            root_name = 'License'
-        elif self.view_name == 'place':
-            root_name = self.system_type.title()
-        elif self.class_.code == 'E84':
-            root_name = 'Information Carrier'
-        root_id = Node.get_hierarchy(root_name).id
-        for node in self.nodes:
-            if node.root and node.root[-1] == root_id:
-                return node.name
-        return ''
-
     @staticmethod
     def build_sql(nodes: bool = False, aliases: bool = False) -> str:
         # Performance: only join nodes and/or aliases if requested
@@ -175,88 +106,76 @@ class Query:
                 LEFT JOIN model.entity alias ON la.range_id = alias.id """
         return sql
 
-    @staticmethod
-    def build_sql_pagination() -> str:
-        sql = """SELECT e.id, e.name, e.class_code,
-                    row_number() over(order by e.name, e.id, e.class_code) + 1 page_number
-                FROM (SELECT me.id, me.name, me.class_code,
-                        case MOD(row_number() over(order by me.name, me.id, me.class_code),  5)
-                            when 0 then 1 
-                            else 0
-                        end page_boundary
-                        from model.entity me
-                         order by me.id) e"""
-        return sql
 
-    @staticmethod
-    def get_by_system_type(system_type: str,
-                           nodes: bool = False,
-                           aliases: bool = False) -> List[Query]:
-        sql = Query.build_sql_pagination(nodes=nodes, aliases=aliases)
-        sql += ' WHERE e.system_type = %(system_type)s GROUP BY e.id;'
-        g.execute(sql, {'system_type': system_type})
-        return [Query(row) for row in g.cursor.fetchall()]
+    # @staticmethod
+    # def get_by_system_type(system_type: str,
+    #                        nodes: bool = False,
+    #                        aliases: bool = False) -> List[Query]:
+    #     sql = Query.build_sql_pagination(nodes=nodes, aliases=aliases)
+    #     sql += ' WHERE e.system_type = %(system_type)s GROUP BY e.id;'
+    #     g.execute(sql, {'system_type': system_type})
+    #     return [Query(row) for row in g.cursor.fetchall()]
 
-    @staticmethod
-    def get_display_files() -> List[Query]:
-        g.execute(Query.build_sql_pagination(
-            nodes=True) + " WHERE e.system_type = 'file' GROUP BY e.id;")
-        entities = []
-        for row in g.cursor.fetchall():
-            if get_file_extension(row.id)[1:] in app.config['DISPLAY_FILE_EXTENSIONS']:
-                entities.append(Query(row))
-        return entities
+    # @staticmethod
+    # def get_display_files() -> List[Query]:
+    #     g.execute(Query.build_sql_pagination(
+    #         nodes=True) + " WHERE e.system_type = 'file' GROUP BY e.id;")
+    #     entities = []
+    #     for row in g.cursor.fetchall():
+    #         if get_file_extension(row.id)[1:] in app.config['DISPLAY_FILE_EXTENSIONS']:
+    #             entities.append(Query(row))
+    #     return entities
 
-    @staticmethod
-    def get_by_id(entity_id: int,
-                  nodes: bool = False,
-                  aliases: bool = False,
-                  view_name: Optional[str] = None) -> Query:
-        from openatlas import logger
-        if entity_id in g.nodes:  # pragma: no cover, just in case a node is requested
-            return g.nodes[entity_id]
-        sql = Query.build_sql_pagination(nodes,
-                                         aliases) + ' WHERE e.id = %(id)s GROUP BY e.id;'
-        g.execute(sql, {'id': entity_id})
-        entity = Query(g.cursor.fetchone())
-        if view_name and view_name != entity.view_name:  # Entity was called from wrong view, abort!
-            logger.log('error', 'model', 'entity ({id}) view name="{view}", requested="{request}"'.
-                       format(id=entity_id, view=entity.view_name, request=view_name))
-            abort(422)
-        return entity
+    # @staticmethod
+    # def get_by_id(entity_id: int,
+    #               nodes: bool = False,
+    #               aliases: bool = False,
+    #               view_name: Optional[str] = None) -> Query:
+    #     from openatlas import logger
+    #     if entity_id in g.nodes:  # pragma: no cover, just in case a node is requested
+    #         return g.nodes[entity_id]
+    #     sql = Query.build_sql_pagination(nodes,
+    #                                      aliases) + ' WHERE e.id = %(id)s GROUP BY e.id;'
+    #     g.execute(sql, {'id': entity_id})
+    #     entity = Query(g.cursor.fetchone())
+    #     if view_name and view_name != entity.view_name:  # Entity was called from wrong view, abort!
+    #         logger.log('error', 'model', 'entity ({id}) view name="{view}", requested="{request}"'.
+    #                    format(id=entity_id, view=entity.view_name, request=view_name))
+    #         abort(422)
+    #     return entity
 
-    @staticmethod
-    def get_by_ids(entity_ids: Any, nodes: bool = False) -> List[Query]:
-        if not entity_ids:
-            return []
-        sql = Query.build_sql_pagination(
-            nodes) + ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name'
-        g.execute(sql, {'ids': tuple(entity_ids)})
-        return [Query(row) for row in g.cursor.fetchall()]
+    # @staticmethod
+    # def get_by_ids(entity_ids: Any, nodes: bool = False) -> List[Query]:
+    #     if not entity_ids:
+    #         return []
+    #     sql = Query.build_sql_pagination(
+    #         nodes) + ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name'
+    #     g.execute(sql, {'ids': tuple(entity_ids)})
+    #     return [Query(row) for row in g.cursor.fetchall()]
 
-    @staticmethod
-    def get_by_project_id(project_id: int) -> List[Query]:
-        sql = """
-            SELECT e.id, ie.origin_id, e.class_code, e.name, e.description, e.created, e.modified,
-                e.system_type,
-            array_to_json(
-                array_agg((t.range_id, t.description)) FILTER (WHERE t.range_id IS NOT NULL)
-            ) as nodes
-            FROM model.entity e
-            LEFT JOIN model.link t ON e.id = t.domain_id AND t.property_code IN ('P2', 'P89')
-            JOIN import.entity ie ON e.id = ie.entity_id
-            WHERE ie.project_id = %(id)s GROUP BY e.id, ie.origin_id;"""
-        g.execute(sql, {'id': project_id})
-        entities = []
-        for row in g.cursor.fetchall():
-            entity = Query(row)
-            entity.origin_id = row.origin_id
-            entities.append(entity)
-        return entities
+    # @staticmethod
+    # def get_by_project_id(project_id: int) -> List[Query]:
+    #     sql = """
+    #         SELECT e.id, ie.origin_id, e.class_code, e.name, e.description, e.created, e.modified,
+    #             e.system_type,
+    #         array_to_json(
+    #             array_agg((t.range_id, t.description)) FILTER (WHERE t.range_id IS NOT NULL)
+    #         ) as nodes
+    #         FROM model.entity e
+    #         LEFT JOIN model.link t ON e.id = t.domain_id AND t.property_code IN ('P2', 'P89')
+    #         JOIN import.entity ie ON e.id = ie.entity_id
+    #         WHERE ie.project_id = %(id)s GROUP BY e.id, ie.origin_id;"""
+    #     g.execute(sql, {'id': project_id})
+    #     entities = []
+    #     for row in g.cursor.fetchall():
+    #         entity = Query(row)
+    #         entity.origin_id = row.origin_id
+    #         entities.append(entity)
+    #     return entities
 
     @staticmethod
     def get_by_class_code(code: Union[str, List[str]],
-                          meta: Dict[str, Union[str, int, List[str]]]) -> List[Query]:
+                          meta: Dict[str, Any]) -> List[Query]:
         codes = code if isinstance(code, list) else [code]
         g.execute(
             Query.build_sql() + """WHERE class_code IN %(codes)s {filter} ORDER BY {order} {sort};""".format(
@@ -269,7 +188,7 @@ class Query:
 
     @staticmethod
     def get_by_menu_item(menu_item: str,
-                         meta: Dict[str, Union[str, int, List[str]]]) -> List[Query]:
+                         meta: Dict[str, Any]) -> List[Query]:
         # Possible class names: actor, event, place, reference, source, object
         if menu_item == 'source':
             sql = Query.build_sql(nodes=True) + """
@@ -295,62 +214,3 @@ class Query:
         g.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][menu_item])})
         return [Query(row) for row in g.cursor.fetchall()]
 
-    @staticmethod
-    def get_by_name_and_system_type(name: Union[str, int], system_type: str) -> Optional[
-        Query]:
-        sql = "SELECT id FROM model.entity WHERE name = %(name)s AND system_type = %(system_type)s;"
-        g.execute(sql, {'name': str(name), 'system_type': system_type})
-        if g.cursor.rowcount:
-            return Query.get_by_id(g.cursor.fetchone()[0])
-        return None
-
-    @staticmethod
-    def get_similar_named(form: FlaskForm) -> Dict[int, Any]:
-        class_ = form.classes.data
-        if class_ in ['source', 'event', 'actor']:
-            entities = Query.get_by_menu_item(class_)
-        else:
-            entities = Query.get_by_system_type(class_)
-        similar: Dict[int, Any] = {}
-        already_added: Set[int] = set()
-        for sample in entities:
-            if sample.id in already_added:
-                continue
-            similar[sample.id] = {'entity': sample, 'entities': []}
-            for entity in entities:
-                if sample.id == entity.id:
-                    continue
-                if fuzz.ratio(sample.name, entity.name) >= form.ratio.data:
-                    already_added.add(sample.id)
-                    already_added.add(entity.id)
-                    similar[sample.id]['entities'].append(entity)
-        return {similar: data for similar, data in similar.items() if data['entities']}
-
-    @staticmethod
-    def get_overview_counts() -> Dict[str, int]:
-        sql = """
-            SELECT
-            SUM(CASE WHEN
-                class_code = 'E33' AND system_type = 'source content' THEN 1 END) AS source,
-            SUM(CASE WHEN class_code IN ('E7', 'E8') THEN 1 END) AS event,
-            SUM(CASE WHEN class_code IN ('E21', 'E74', 'E40') THEN 1 END) AS actor,
-            SUM(CASE WHEN class_code = 'E18' THEN 1 END) AS place,
-            SUM(CASE WHEN class_code IN ('E31', 'E84') AND system_type != 'file' THEN 1 END)
-                AS reference,
-            SUM(CASE WHEN class_code = 'E22' THEN 1 END) AS find,
-            SUM(CASE WHEN system_type = 'human remains' THEN 1 END) AS "human remains",
-            SUM(CASE WHEN class_code = 'E31' AND system_type = 'file' THEN 1 END) AS file
-            FROM model.entity;"""
-        g.execute(sql)
-        row = g.cursor.fetchone()
-        return {col[0]: row[idx] for idx, col in enumerate(g.cursor.description)}
-
-    @staticmethod
-    def get_latest(limit: int) -> List[Query]:
-        """ Returns the newest created entities"""
-        codes = list(itertools.chain(*[code_ for code_ in app.config['CLASS_CODES'].values()]))
-        sql = Query.build_sql_pagination() + """
-                WHERE e.class_code IN %(codes)s GROUP BY e.id
-                ORDER BY e.created DESC LIMIT %(limit)s;"""
-        g.execute(sql, {'codes': tuple(codes), 'limit': limit})
-        return [Query(row) for row in g.cursor.fetchall()]

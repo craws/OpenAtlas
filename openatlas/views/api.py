@@ -128,7 +128,9 @@ def api_get_query() -> Response:  # pragma: nocover
             items = request.args.getlist('items[]')
             for i in items:
                 try:
-                    out.append({'result': Api.pagination(Api.get_entities_by_menu_item(code_=i, meta=validation), meta=validation), 'code': i})
+                    out.append({'result': Api.pagination(
+                        Api.get_entities_by_menu_item(code_=i, meta=validation), meta=validation),
+                                'code': i})
                 except Exception:
                     raise APIError('Syntax is incorrect!', status_code=404, payload="404c")
         if request.args.getlist('classes[]'):
@@ -137,16 +139,12 @@ def api_get_query() -> Response:  # pragma: nocover
             for class_code in classes:
                 if len(Api.get_entities_by_class(class_code_=class_code, meta=validation)) == 0:
                     raise APIError('Syntax is incorrect!', status_code=404, payload="404d")
-                out.append({'result': Api.pagination(Api.get_entities_by_class(class_code_=class_code, meta=validation), meta=validation), 'class': class_code})
+                out.append({'result': Api.pagination(
+                    Api.get_entities_by_class(class_code_=class_code, meta=validation),
+                    meta=validation), 'class': class_code})
         return jsonify(out)
     else:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404")
-
-
-@app.route('/api/0.1/test', strict_slashes=False)
-@api_access()  # type: ignore
-def api_get_test() -> Response:
-    return jsonify(Query.get_by_menu_item(menu_item='actor'))
 
 
 @app.route('/api', strict_slashes=False)

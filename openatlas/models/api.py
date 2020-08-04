@@ -75,42 +75,45 @@ class Api:
         return file_license
 
     @staticmethod
-    def get_entities_by_menu_item(code_: str, meta: Optional[dict]) -> List[int]:
+    def get_entities_by_menu_item(code_: str, meta: Dict[str, Any]) -> List[int]:
         entities = []
         for entity in Query.get_by_menu_item(code_, meta):
             entities.append(entity.id)
-
-        # result = Api.pagination(entities=entities, meta=meta)
-
         return entities
 
+    # Old method, marked for deletion
     @staticmethod
-    def get_entities_by_menu_item_simple(code_: str) -> List[Dict[str, Any]]:
+    def get_entities_by_menu_item_simple(code_: str) -> List[Dict[str, Any]]:  # pragma: nocover
         entities = []
         for entity in Entity.get_by_menu_item(code_):
             entities.append(Api.get_entity(entity.id))
         return entities
 
     @staticmethod
-    def get_entities_by_class(class_code_: str, meta: Optional[dict]) -> List[int]:
+    def get_entities_by_class(class_code_: str, meta: Dict[str, Any]) -> List[int]:
         entities = []
         for entity in Query.get_by_class_code(class_code_, meta):
             entities.append(entity.id)
-        # result = Api.pagination(entities=entities, meta=meta)
-
         return entities
 
     @staticmethod
-    def pagination(entities: List[int], meta: Optional[dict]) -> List[Dict[str, Any]]:
+    def pagination(entities: List[int], meta: Dict[str, Any]) -> List[Dict[str, Any]]:
         result = []
         index = []
         total = entities
         for num, i in enumerate(list(itertools.islice(entities, 0, None, int(meta['limit'])))):
             index.append(({'page': num + 1, 'start_id': i}))
-        if meta['last']:
-            entities = list(itertools.islice(entities, entities.index(int(meta['last'])) + 1, None))
-        if meta['first']:
-            entities = list(itertools.islice(entities, entities.index(int(meta['first'])), None))
+        if meta['last'] or meta['first']:
+            if meta['last'] and int(meta['last']) in entities:
+                entities = list(
+                    itertools.islice(entities, entities.index(int(meta['last'])) + 1, None))
+            elif meta['first'] and int(meta['first']) in entities:
+                entities = list(
+                    itertools.islice(entities, entities.index(int(meta['first'])), None))
+            else:
+                raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
+        else:
+            pass
 
         for entity in entities[:int(meta['limit'])]:
             result.append(Api.get_entity(entity))
@@ -118,8 +121,9 @@ class Api:
                        'index': index, 'total_pages': len(index)})
         return result
 
+    # Old method, marked for deletion
     @staticmethod
-    def get_entities_by_class_simple(class_code_: str) -> List[Dict[str, Any]]:
+    def get_entities_by_class_simple(class_code_: str) -> List[Dict[str, Any]]:  # pragma: nocover
         entities = []
         for entity in Entity.get_by_class_code(class_code_):
             entities.append(Api.get_entity(entity.id))
@@ -154,7 +158,7 @@ class Api:
             if 'unit' not in nodes_dict and node.description:
                 nodes_dict['description'] = node.description
 
-            #  This feature is solely for the THANADOS project
+
             hierarchy = []
             for root in node.root:
                 hierarchy.append(g.nodes[root].name)  # pragma: nocover

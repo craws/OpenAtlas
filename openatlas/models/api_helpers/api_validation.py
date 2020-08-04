@@ -1,6 +1,7 @@
 import re
 
-from typing import Dict, List, Union
+from typing import Any, Dict, List, Sequence, Union
+
 
 
 class Validation:
@@ -15,7 +16,7 @@ class Validation:
                       'in': 'IN'}
 
     @staticmethod
-    def validate_url_query(query: hash) -> Dict[str, Union[str, List[str]]]:
+    def validate_url_query(query: Any) -> Dict[str, Any]:
         query = {'filter': Validation.validate_filter(query.getlist('filter')),
                  'limit': Validation.validate_limit(query.getlist('limit')),
                  'sort': Validation.validate_sort(query.getlist('sort')),
@@ -40,15 +41,15 @@ class Validation:
                     elif item[0] == 'in':
                         item[2] = item[2].replace('[', '')
                         item[2] = item[2].replace(']', '')
-                        item[2] = str(tuple(map(str, item[2].split(':'))))
+                        if len(list(map(str, item[2].split(':')))) == 1:
+                            tmp = list(map(str, item[2].split(':')))
+                            item[2] = '(\'' + tmp[0] + '\')'
+                        else:
+                            item[2] = str(tuple(map(str, item[2].split(':'))))
                     else:
                         item[2] = '\'' + item[2] + '\''
                     filter_query += ' ' + item[1] + ' ' \
                                     + Validation.operators_dict[item[0]] + ' ' + item[2] + ' '
-                else:
-                    filter_query = Validation.default['filter']
-            else:
-                filter_query = Validation.default['filter']
         return filter_query
 
     @staticmethod
@@ -59,8 +60,6 @@ class Validation:
                 if item.isdigit():
                     limit_.append(item)
         else:
-            limit_.append(Validation.default['limit'])
-        if not limit_:
             limit_.append(Validation.default['limit'])
         return limit_[0]
 
@@ -73,8 +72,6 @@ class Validation:
                     sort_.append(item)
         else:
             sort_.append(Validation.default['sort'])
-        if not sort_:
-            sort_.append(Validation.default['sort'])
         return sort_[0]
 
     @staticmethod
@@ -85,8 +82,6 @@ class Validation:
                 if isinstance(item, str) and item.lower() in Validation.column:
                     column_.append(item)
         else:
-            column_.append(Validation.default['column'])
-        if not column_:
             column_.append(Validation.default['column'])
         return column_
 
@@ -99,8 +94,6 @@ class Validation:
                     last_.append(item)
         else:
             last_.append(Validation.default['last'])
-        if not last_:
-            last_.append(Validation.default['last'])
         return last_[0]
 
     @staticmethod
@@ -111,7 +104,5 @@ class Validation:
                 if item.isdigit():
                     first_.append(item)
         else:
-            first_.append(Validation.default['first'])
-        if not first_:
             first_.append(Validation.default['first'])
         return first_[0]
