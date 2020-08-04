@@ -5,7 +5,6 @@ from werkzeug.wrappers import Response
 from openatlas import app
 from openatlas.models.api import Api
 from openatlas.models.api_helpers.api_error import APIError
-from openatlas.models.api_helpers.api_sql import Query
 from openatlas.models.api_helpers.api_validation import Validation
 from openatlas.util.util import api_access
 

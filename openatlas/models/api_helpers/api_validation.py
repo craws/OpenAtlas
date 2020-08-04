@@ -1,7 +1,6 @@
 import re
 
-from typing import Any, Dict, List, Sequence, Union
-
+from typing import Any, Dict, List
 
 
 class Validation:

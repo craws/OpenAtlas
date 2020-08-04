@@ -1,20 +1,14 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-import ast
-import itertools
-from typing import Any, Dict, Iterable, List, Optional, Set, TYPE_CHECKING, Union, ValuesView
+from typing import Any, Dict, List, Optional, TYPE_CHECKING, Union
 
 from flask import g
 from flask_login import current_user
-from flask_wtf import FlaskForm
-from fuzzywuzzy import fuzz
 from psycopg2.extras import NamedTupleCursor
-from werkzeug.exceptions import abort
 
 from openatlas import app
 from openatlas.models.date import Date
 from openatlas.models.link import Link
-from openatlas.util.util import is_authorized, get_file_extension
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.node import Node

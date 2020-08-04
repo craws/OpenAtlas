@@ -1,6 +1,6 @@
 import itertools
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from flask import g, session, url_for
 
@@ -158,7 +158,6 @@ class Api:
             if 'unit' not in nodes_dict and node.description:
                 nodes_dict['description'] = node.description
 
-
             hierarchy = []
             for root in node.root:
                 hierarchy.append(g.nodes[root].name)  # pragma: nocover
@@ -184,8 +183,6 @@ class Api:
                     'type': 'Feature',
                     'crmClass': "crm:" + class_code,
                     'properties': {'title': entity.name}}
-
-        # Types
 
         # Relations
         if Api.get_links(entity):
