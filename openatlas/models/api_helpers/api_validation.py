@@ -81,10 +81,10 @@ class Validation:
             for item in column:
                 if isinstance(item, str) and item.lower() in Validation.column:
                     column_.append(item)
-            return column_
-        else:
-            return Validation.default['column']
 
+        else:
+            column_.append(Validation.default['column'])
+        return column_
 
     @staticmethod
     def validate_last(last: List[Any]) -> Union[str, int]:
@@ -109,13 +109,12 @@ class Validation:
         return first_[0]
 
     @staticmethod
-    def validate_show(show: List[str]) -> str:
+    def validate_show(show: List[str]) -> Union[List[str], str, None]:
         show_ = []
         valid = ['when', 'types', 'relations', 'names', 'links', 'geometry', 'depictions', 'not']
-        if show:
-            for item in show:
-                if item in valid:
-                    show_.append(item)
-            return show_[0]
-        else:
-            return Validation.default['show']
+        for pattern in valid:
+            if re.search(pattern, str(show)):
+                show_.append(pattern)
+        if not show_ or 'not' in show_:
+            show_ = (Validation.default['show'])
+        return show_
