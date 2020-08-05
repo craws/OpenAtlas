@@ -70,9 +70,9 @@ class Validation:
             for item in reversed(sort):
                 if isinstance(item, str) and item.lower() in ['asc', 'desc']:
                     sort_.append(item)
+            return sort_[0]
         else:
-            sort_ = Validation.default['sort']
-        return sort_[0]
+            return Validation.default['sort']
 
     @staticmethod
     def validate_column(column: List[Any]) -> Union[List[str], str, None]:
@@ -81,9 +81,10 @@ class Validation:
             for item in column:
                 if isinstance(item, str) and item.lower() in Validation.column:
                     column_.append(item)
+            return column_
         else:
-            column_ = Validation.default['column']
-        return column_
+            return Validation.default['column']
+
 
     @staticmethod
     def validate_last(last: List[Any]) -> Union[str, int]:
@@ -115,6 +116,6 @@ class Validation:
             for item in show:
                 if item in valid:
                     show_.append(item)
+            return show_[0]
         else:
-            show_ = Validation.default['show']
-        return show_[0]
+            return Validation.default['show']
