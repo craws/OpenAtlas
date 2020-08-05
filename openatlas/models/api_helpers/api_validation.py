@@ -1,6 +1,5 @@
 import re
-
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Union
 
 
 class Validation:
@@ -16,7 +15,7 @@ class Validation:
                       'in': 'IN'}
 
     @staticmethod
-    def validate_url_query(query: Any) -> Dict[str, Any]:
+    def validate_url_query(query: Any) -> Dict[str, Any]:  # type: ignore
         query = {'filter': Validation.validate_filter(query.getlist('filter')),
                  'limit': Validation.validate_limit(query.getlist('limit')),
                  'sort': Validation.validate_sort(query.getlist('sort')),
@@ -27,7 +26,7 @@ class Validation:
         return query
 
     @staticmethod
-    def validate_filter(filter_: str) -> str:
+    def validate_filter(filter_: List[Union[str, int]]) -> str:
         filter_ = re.findall(r'(\w+)\((.*?)\)', ''.join(filter_))
         filter_query = ''
         for item in filter_:
@@ -54,7 +53,7 @@ class Validation:
         return filter_query
 
     @staticmethod
-    def validate_limit(limit: list) -> str:
+    def validate_limit(limit: List[Union[str, int]]) -> str:
         limit_ = []
         if limit:
             for item in limit:
@@ -65,7 +64,7 @@ class Validation:
         return limit_[0]
 
     @staticmethod
-    def validate_sort(sort: list) -> str:
+    def validate_sort(sort: List[str]) -> str:
         sort_ = []
         if sort:
             for item in reversed(sort):
@@ -76,7 +75,7 @@ class Validation:
         return sort_[0]
 
     @staticmethod
-    def validate_column(column: list) -> List[str]:
+    def validate_column(column: List[str]) -> List[str]:
         column_ = []
         if column:
             for item in column:
@@ -87,7 +86,7 @@ class Validation:
         return column_
 
     @staticmethod
-    def validate_last(last: list) -> List[str]:
+    def validate_last(last: List[Union[str, int]]) -> List[str]:
         last_ = []
         if last:
             for item in last:
@@ -98,7 +97,7 @@ class Validation:
         return last_[0]
 
     @staticmethod
-    def validate_first(first: list) -> List[str]:
+    def validate_first(first: List[Union[str, int]]) -> List[str]:
         first_ = []
         if first:
             for item in first:
@@ -109,7 +108,7 @@ class Validation:
         return first_[0]
 
     @staticmethod
-    def validate_show(show: list) -> List[str]:
+    def validate_show(show: List[Union[str, int]]) -> List[str]:
         show_ = []
         valid = ['when', 'types', 'relations', 'names', 'links', 'geometry', 'depictions', 'not']
         if show:

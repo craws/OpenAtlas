@@ -81,14 +81,6 @@ class Api:
             entities.append(entity.id)
         return entities
 
-    # Old method, marked for deletion
-    @staticmethod
-    def get_entities_by_menu_item_simple(code_: str) -> List[Dict[str, Any]]:  # pragma: nocover
-        entities = []
-        for entity in Entity.get_by_menu_item(code_):
-            entities.append(Api.get_entity(entity.id))
-        return entities
-
     @staticmethod
     def get_entities_by_class(class_code_: str, meta: Dict[str, Any]) -> List[int]:
         entities = []
@@ -121,28 +113,22 @@ class Api:
                        'index': index, 'total_pages': len(index)})
         return result
 
-    # Old method, marked for deletion
     @staticmethod
-    def get_entities_by_class_simple(class_code_: str) -> List[Dict[str, Any]]:  # pragma: nocover
-        entities = []
-        for entity in Entity.get_by_class_code(class_code_):
-            entities.append(Api.get_entity(entity.id))
-        return entities
-
-    @staticmethod
-    def get_entities_get_latest(limit_: int) -> List[Dict[str, Any]]:
+    def get_entities_get_latest(limit_: int, meta: Dict[str, Any]) -> List[Dict[str, Any]]:
         entities = []
         for entity in Entity.get_latest(limit_):
-            entities.append(Api.get_entity(entity.id))
+            entities.append(Api.get_entity(entity.id, meta=meta))
         return entities
 
-    @staticmethod
-    def get_entities_by_id(ids: List[int]) -> List[Dict[str, Any]]:  # pragma: nocover
-        entities = []
-        for i in ids:
-            for entity in Entity.get_by_ids(i, nodes=True):
-                entities.append(Api.get_entity(entity.id))
-        return entities
+    # Not used?
+    # @staticmethod
+    # def get_entities_by_id(ids: List[int], meta: Dict[str, Any]) -> List[
+    #     Dict[str, Any]]:  # pragma: nocover
+    #     entities = []
+    #     for i in ids:
+    #         for entity in Entity.get_by_ids(i, nodes=True):
+    #             entities.append(Api.get_entity(entity.id, meta=meta))
+    #     return entities
 
     @staticmethod
     def get_node(entity: Entity) -> List[Dict[str, Any]]:
