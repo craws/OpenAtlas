@@ -83,7 +83,7 @@ class Validation:
                     column_.append(item)
 
         else:
-            column_.append(Validation.default['column'])
+            column_.append(str(Validation.default['column']))
         return column_
 
     @staticmethod
@@ -118,5 +118,5 @@ class Validation:
         if 'not' in show_:
             show_.clear()
         if not show_:
-            show_ = (Validation.default['show'])
+            show_ = Validation.default['show']
         return show_
