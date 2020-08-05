@@ -64,7 +64,7 @@ class Validation:
         return limit_[0]
 
     @staticmethod
-    def validate_sort(sort: List[Any]) -> Union[List[str], str, None]:
+    def validate_sort(sort: List[Any]) -> str:
         sort_ = []
         if sort:
             for item in reversed(sort):
@@ -75,7 +75,7 @@ class Validation:
         return sort_[0]
 
     @staticmethod
-    def validate_column(column: List[Any]) -> Union[List[str], str, None]:
+    def validate_column(column: List[Any]) -> str:
         column_ = []
         if column:
             for item in column:
@@ -108,7 +108,7 @@ class Validation:
         return first_[0]
 
     @staticmethod
-    def validate_show(show: List[str]) -> List[str]:
+    def validate_show(show: List[str]) -> str:
         show_ = []
         valid = ['when', 'types', 'relations', 'names', 'links', 'geometry', 'depictions', 'not']
         if show:
