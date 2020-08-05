@@ -1,5 +1,5 @@
 import re
-from typing import Any, Dict, List, Union
+from typing import Any, Dict, Iterable, List, Union
 
 
 class Validation:
@@ -26,7 +26,7 @@ class Validation:
         return query
 
     @staticmethod
-    def validate_filter(filter_: List[Union[str, int]]) -> str:
+    def validate_filter(filter_: Iterable[str]) -> str:
         filter_ = re.findall(r'(\w+)\((.*?)\)', ''.join(filter_))
         filter_query = ''
         for item in filter_:
@@ -53,7 +53,7 @@ class Validation:
         return filter_query
 
     @staticmethod
-    def validate_limit(limit: List[Union[str, int]]) -> str:
+    def validate_limit(limit: List[Any]) -> Union[str, int]:
         limit_ = []
         if limit:
             for item in limit:
@@ -64,7 +64,7 @@ class Validation:
         return limit_[0]
 
     @staticmethod
-    def validate_sort(sort: List[str]) -> str:
+    def validate_sort(sort: List[Any]) -> Union[List[str], str, None]:
         sort_ = []
         if sort:
             for item in reversed(sort):
@@ -75,7 +75,7 @@ class Validation:
         return sort_[0]
 
     @staticmethod
-    def validate_column(column: List[str]) -> List[str]:
+    def validate_column(column: List[Any]) -> Union[List[str], str, None]:
         column_ = []
         if column:
             for item in column:
@@ -86,7 +86,7 @@ class Validation:
         return column_
 
     @staticmethod
-    def validate_last(last: List[Union[str, int]]) -> List[str]:
+    def validate_last(last: List[Any]) -> Union[str, int]:
         last_ = []
         if last:
             for item in last:
@@ -97,7 +97,7 @@ class Validation:
         return last_[0]
 
     @staticmethod
-    def validate_first(first: List[Union[str, int]]) -> List[str]:
+    def validate_first(first: List[Any]) -> Union[str, int]:
         first_ = []
         if first:
             for item in first:
@@ -108,7 +108,7 @@ class Validation:
         return first_[0]
 
     @staticmethod
-    def validate_show(show: List[Union[str, int]]) -> List[str]:
+    def validate_show(show: List[str]) -> List[str]:
         show_ = []
         valid = ['when', 'types', 'relations', 'names', 'links', 'geometry', 'depictions', 'not']
         if show:
