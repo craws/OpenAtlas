@@ -64,25 +64,25 @@ class Validation:
         return limit_[0]
 
     @staticmethod
-    def validate_sort(sort: List[Any]) -> str:
+    def validate_sort(sort: List[Any]) -> Union[List[str], str, None]:
         sort_ = []
         if sort:
             for item in reversed(sort):
                 if isinstance(item, str) and item.lower() in ['asc', 'desc']:
                     sort_.append(item)
         else:
-            sort_.append(Validation.default['sort'])
+            sort_ = Validation.default['sort']
         return sort_[0]
 
     @staticmethod
-    def validate_column(column: List[Any]) -> str:
+    def validate_column(column: List[Any]) -> Union[List[str], str, None]:
         column_ = []
         if column:
             for item in column:
                 if isinstance(item, str) and item.lower() in Validation.column:
                     column_.append(item)
         else:
-            column_.append(Validation.default['column'])
+            column_ = Validation.default['column']
         return column_
 
     @staticmethod
@@ -116,5 +116,5 @@ class Validation:
                 if item in valid:
                     show_.append(item)
         else:
-            show_.append(Validation.default['show'])
+            show_ = Validation.default['show']
         return show_[0]
