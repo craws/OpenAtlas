@@ -20,8 +20,7 @@ class Validation:
                       'in': 'IN'}
 
     @staticmethod
-    def validate_url_query(query) -> Dict[str, Any]:  # type: ignore
-        reveal_type(query)
+    def validate_url_query(query: Any) -> Dict[str, Any]:
         query = {'filter': Validation.validate_filter(query.getlist('filter')),
                  'limit': Validation.validate_limit(query.getlist('limit')),
                  'sort': Validation.validate_sort(query.getlist('sort')),
@@ -129,6 +128,6 @@ class Validation:
         return show_
 
     @staticmethod
-    def validate_subtype(subtype: str):
+    def validate_subtype(subtype: str) -> bool:
         subtype_ = True if subtype == 'show' else False
         return subtype_
