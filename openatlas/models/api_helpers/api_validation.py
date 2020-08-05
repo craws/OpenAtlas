@@ -3,9 +3,14 @@ from typing import Any, Dict, Iterable, List, Union
 
 
 class Validation:
-    default = {'filter': '', 'limit': '20', 'sort': 'ASC', 'column': 'name', 'last': None,
+    default = {'filter': '',
+               'limit': '20',
+               'sort': 'ASC',
+               'column': 'name',
+               'last': None,
                'first': None,
-               'show': ['when', 'types', 'relations', 'names', 'links', 'geometry', 'depictions']}
+               'show': ['when', 'types', 'relations', 'names', 'links', 'geometry', 'depictions'],
+               'subtype': False}
     column = ['id', 'class_code', 'name', 'description', 'created', 'modified', 'system_type',
               'begin_from', 'begin_to', 'end_from', 'end_to']
     operators = ['eq', 'ne', 'lt', 'le', 'gt', 'ge', 'and', 'or', 'not', 'contains', 'startsWith',
@@ -15,14 +20,16 @@ class Validation:
                       'in': 'IN'}
 
     @staticmethod
-    def validate_url_query(query: Any) -> Dict[str, Any]:  # type: ignore
+    def validate_url_query(query) -> Dict[str, Any]:  # type: ignore
+        reveal_type(query)
         query = {'filter': Validation.validate_filter(query.getlist('filter')),
                  'limit': Validation.validate_limit(query.getlist('limit')),
                  'sort': Validation.validate_sort(query.getlist('sort')),
                  'column': Validation.validate_column(query.getlist('column')),
                  'last': Validation.validate_last(query.getlist('last')),
                  'first': Validation.validate_first(query.getlist('first')),
-                 'show': Validation.validate_show(query.getlist('show'))}
+                 'show': Validation.validate_show(query.getlist('show')),
+                 'subtype': Validation.validate_subtype(query.get('subtype'))}
         return query
 
     @staticmethod
@@ -120,3 +127,8 @@ class Validation:
         if not show_:
             show_ = Validation.default['show']
         return show_
+
+    @staticmethod
+    def validate_subtype(subtype: str):
+        subtype_ = True if subtype == 'show' else False
+        return subtype_
