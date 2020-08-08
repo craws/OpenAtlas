@@ -12,22 +12,21 @@ more knowledge about server administration.
 
 ### Python 3.7 and Flask 1.0
 
-    # apt-get install python3 python3-bcrypt python3-dateutil python3-jinja2 python3-psycopg2
-    # apt-get install python3-flask python3-flask-babel python3-flask-login python3-flaskext.wtf
-    # apt-get install python3-markdown python3-numpy python3-pandas python3-fuzzywuzzy 
-    # apt-get install python3-flask-cors
+    # apt install python3 python3-bcrypt python3-dateutil  python3-psycopg2 python3-fuzzywuzzy
+    # apt install python3-flask python3-flask-babel python3-flask-login python3-flaskext.wtf
+    # apt install python3-markdown python3-numpy python3-pandas python3-jinja2 python3-flask-cors
 
 ### Apache 2.4
 
-    # apt-get install apache2 libapache2-mod-wsgi-py3
+    # apt install apache2 libapache2-mod-wsgi-py3
 
 ### PostgreSQL 11 and PostGIS 2.5
 
-    # apt-get install postgresql postgresql-11-postgis-2.5 postgresql-11-postgis-2.5-scripts
+    # apt install postgresql postgresql-11-postgis-2.5 postgresql-11-postgis-2.5-scripts
 
 ### gettext, pip, npm
 
-    # apt-get install gettext npm python3-pip
+    # apt install gettext npm python3-pip
 
 ## Installation
 
@@ -125,7 +124,7 @@ When configured Apache to use HTTPS only, add this line to instance/production.p
 
 Install required packages:
 
-    # apt-get install python3-coverage python3-nose
+    # apt install python3-coverage python3-nose
 
 As postgres
 

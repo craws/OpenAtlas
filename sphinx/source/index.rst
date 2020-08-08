@@ -14,3 +14,4 @@ specific documentation in our Redmine `Wiki <https://redmine.openatlas.eu/projec
    form/index
    tools/index
    admin/index
+   troubleshooting/index
