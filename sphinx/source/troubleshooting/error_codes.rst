@@ -1,10 +1,10 @@
 Error Codes
-==============
+===========
 
 .. toctree::
 
-Here are some explanations for error codes you may encounter. Please report if you think that you
-received an error page because of a bug in the application.
+Here are some explanations for error codes you may encounter. Please let us know if you think you
+encountered a bug.
 
 403 - Forbidden
 ---------------
