@@ -9,3 +9,4 @@ problem please report the issue.
 
    login
    display
+   error_codes
