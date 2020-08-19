@@ -129,7 +129,7 @@ class Tab:
                 buttons = [button(_('link'), url_for('entity_add_source', id_=id_))]
             buttons.append(button(_('source'), url_for('source_insert', origin_id=id_)))
         elif name == 'subs':
-            if code == 'E55':
+            if code in ['E53', 'E55']:
                 table.header = [_('name'), _('count'), _('info')]
             else:
                 table.header = Table.HEADERS['event']
