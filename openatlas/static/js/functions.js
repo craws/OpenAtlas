@@ -12,7 +12,7 @@ tinymce.init({
 
 $(document).ready(function () {
 
-  //popovers init
+  // popovers init
   $('[data-toggle="popover"]').popover();
 
   // DataTables - sort for checkbox columns

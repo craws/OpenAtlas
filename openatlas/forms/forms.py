@@ -333,7 +333,7 @@ class TableSelect(HiddenInput):  # type: ignore
         html = """
             <input id="{name}-button" name="{name}-button" class="table-select {required}"
                 type="text" placeholder="{change_label}" onfocus="this.blur()" readonly="readonly"
-                value="{selection}" onclick="$('#{name}-modal').modal('show'); $('#{name}_table_filter input').focus()">
+                value="{selection}" onclick="$('#{name}-modal').modal('show');">
             <a href="#" id="{name}-clear" class="{button_class}" {clear_style}
                 onclick="clearSelect('{name}');">{clear_label}</a>
             <div id="{name}-modal" class="modal fade" tabindex="-1" role="dialog"
@@ -355,6 +355,11 @@ class TableSelect(HiddenInput):  # type: ignore
                     </div>
                 </div>
             </div>
+            <script>
+                $('#{name}-modal').on('shown.bs.modal', function () {{
+                    $('#{name}_table_filter input').focus();
+                }});
+            </script>
             """.format(name=field.id,
                        title=uc_first(_(field.id.replace('_', ' '))),
                        button_class=app.config['CSS']['button']['secondary'],
