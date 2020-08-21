@@ -64,6 +64,7 @@ class Table:
             <script>
                 $(document).ready(function() {{ 
                     $('#{name}_table').DataTable({data_table});
+                    overflow();
                     $('#{name}_table').on( 'page.dt', () => overflow());
                     $('#{name}_table').on( 'search.dt', () => overflow());
                 }});                
