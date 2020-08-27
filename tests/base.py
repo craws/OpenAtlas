@@ -1,8 +1,18 @@
 import unittest
+from typing import Optional
 
 import psycopg2
+import random
 
 from openatlas import app
+
+
+def random_string(length: Optional[int] = None) -> str:
+    # The idea is to test all/many unicode characters, this still needs work. One problem is that
+    # strings in tables aren't found, also special chars like ' and " should be tested more often.
+    # See test_event where tests for string in e.g. index table view were deactivated
+    length = length if length else random.randint(1, 64)
+    return ''.join(chr(random.randint(1, 10000)) for i in range(length))
 
 
 class TestBaseCase(unittest.TestCase):
