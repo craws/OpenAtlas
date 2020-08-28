@@ -15,6 +15,7 @@ from wtforms.validators import Optional
 from wtforms.widgets import HiddenInput
 
 from openatlas import app
+from openatlas.forms.admin_forms import ProfileForm
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
@@ -549,3 +550,26 @@ def set_form_settings(form: Any) -> None:
             field.data = ' '.join(session['settings'][field.name])
             continue
         field.data = session['settings'][field.name]
+
+
+def get_profile_form_settings(form: Any) -> Dict[str, str]:
+    settings = {}
+    if isinstance(form, ProfileForm):
+        return{'name': current_user.username,
+               'email': current_user.email,
+               'show_email': current_user.settings['show_email'],
+               'newsletter': current_user.settings['newsletter']}
+    for field in form:
+        if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
+            continue
+        label = uc_first(field.label.text)
+        value = current_user.settings[field.name]
+        if field.type in ['StringField', 'IntegerField']:
+            settings[label] = value
+        if field.type == 'BooleanField':
+            settings[label] = _('on') if value else _('off')
+        if field.type == 'SelectField':
+            if type(value) is str and value.isdigit():
+                value = int(value)
+            settings[label] = dict(field.choices).get(value)
+    return settings
