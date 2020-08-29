@@ -114,7 +114,7 @@ class User(UserMixin):  # type: ignore
             bookmarks = [row.entity_id for row in g.cursor.fetchall()]
         g.execute(User.sql + ' WHERE u.id = %(id)s;', {'id': user_id})
         if not g.cursor.rowcount:
-            return None   # pragma no cover - something went wrong, e.g. obsolete session values
+            return None  # pragma no cover - something went wrong, e.g. obsolete session values
         return User(g.cursor.fetchone(), bookmarks)
 
     @staticmethod
@@ -179,7 +179,7 @@ class User(UserMixin):  # type: ignore
     def delete(id_: int) -> None:
         user = User.get_by_id(id_)
         if not is_authorized('manager') or user.id == current_user.id or (
-                (user.group == 'admin' and not is_authorized('admin'))):
+            (user.group == 'admin' and not is_authorized('admin'))):
             abort(403)  # pragma: no cover
         sql = 'DELETE FROM web."user" WHERE id = %(user_id)s;'
         g.execute(sql, {'user_id': id_})
@@ -220,15 +220,14 @@ class User(UserMixin):  # type: ignore
                     'show_email': False}
         sql = 'SELECT "name", value FROM web.user_settings WHERE user_id = %(user_id)s;'
         g.execute(sql, {'user_id': user_id})
-        form = ProfileForm()
         for row in g.cursor.fetchall():
-            value = row.value
-            form_field = getattr(form, row.name)   # Use profile form to determine value data types
-            if form_field.type == 'BooleanField':
-                value = True if value == 'True' else False
-            elif form_field.type == 'IntegerField' or form_field.name == 'table_rows':
-                value = int(value)
-            settings[row.name] = value
+            settings[row.name] = row.value
+            if row.name in ['table_rows']:
+                settings[row.name] = int(row.value)
+            #if form_field.type == 'BooleanField':
+            #    value = True if value == 'True' else False
+            #elif form_field.type == 'IntegerField' or form_field.name == 'table_rows':
+            #    value = int(value)
         return settings
 
     @staticmethod

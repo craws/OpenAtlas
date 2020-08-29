@@ -555,10 +555,10 @@ def set_form_settings(form: Any) -> None:
 def get_profile_form_settings(form: Any) -> Dict[str, str]:
     settings = {}
     if isinstance(form, ProfileForm):
-        return{'name': current_user.username,
-               'email': current_user.email,
-               'show_email': current_user.settings['show_email'],
-               'newsletter': current_user.settings['newsletter']}
+        return {'name': current_user.username,
+                'email': current_user.email,
+                'show_email': _('on') if current_user.settings['show_email'] else _('off'),
+                'newsletter': _('on') if current_user.settings['newsletter'] else _('off')}
     for field in form:
         if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
             continue
@@ -573,3 +573,10 @@ def get_profile_form_settings(form: Any) -> Dict[str, str]:
                 value = int(value)
             settings[label] = dict(field.choices).get(value)
     return settings
+
+
+def set_form_profile_settings(form: Any) -> None:
+    for field in form:
+        if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
+            continue
+        field.data = current_user.settings[field.name]
