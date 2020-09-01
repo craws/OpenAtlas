@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Login &mdash; OpenAtlas 5.3.0 documentation</title>
+  <title>Display Errors &mdash; OpenAtlas 5.3.0 documentation</title>
   
 
   
@@ -36,8 +36,8 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Display Errors" href="display.html" />
-    <link rel="prev" title="Troubleshooting" href="index.html" /> 
+    <link rel="next" title="Error Codes" href="error_codes.html" />
+    <link rel="prev" title="Login" href="login.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -94,8 +94,8 @@
 <li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Troubleshooting</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Login</a></li>
-<li class="toctree-l2"><a class="reference internal" href="display.html">Display Errors</a></li>
+<li class="toctree-l2"><a class="reference internal" href="login.html">Login</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Display Errors</a></li>
 <li class="toctree-l2"><a class="reference internal" href="error_codes.html">Error Codes</a></li>
 </ul>
 </li>
@@ -146,7 +146,7 @@
         
           <li><a href="index.html">Troubleshooting</a> &raquo;</li>
         
-      <li>Login</li>
+      <li>Display Errors</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -163,33 +163,33 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="login">
-<h1>Login<a class="headerlink" href="#login" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="display-errors">
+<h1>Display Errors<a class="headerlink" href="#display-errors" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>Proceed according to the error message.</p>
-<div class="section" id="wrong-password">
-<h2>Wrong Password<a class="headerlink" href="#wrong-password" title="Permalink to this headline">¶</a></h2>
-<p>You can activate the <strong>show password</strong> checkbox to see the entered password and make sure that the
-problem isn’t keyboard related, e.g. capslock is turned on.</p>
-<p>You can request a new password when clicking
-<strong>Forgot your password?</strong> which is located under login button if email was set up.</p>
+<p>This is a general topic in case there are display errors like elements are out of place, missing or
+not working as intended. There can be many reasons for these errors and they have
+probably nothing to do with you but here are some suggestions you can try on your side to fix them.</p>
+<div class="section" id="browser-version">
+<h2>Browser Version<a class="headerlink" href="#browser-version" title="Permalink to this headline">¶</a></h2>
+<p>Make sure your browser is up to date. We try to support all major browsers but
+because OpenAtlas uses advanced features a current version may be required.</p>
 </div>
-<div class="section" id="no-user-with-this-name-found">
-<h2>No user with this name found.<a class="headerlink" href="#no-user-with-this-name-found" title="Permalink to this headline">¶</a></h2>
-<p>Either you misspelled the username or the user doesn’t exist (anymore).</p>
-<p>If there is a <strong>Forgot your password?</strong> link below the login you can request a new password with
-the email you are registered with. With the new password you’ll also receive your username.</p>
+<div class="section" id="refresh-your-browser">
+<h2>Refresh your Browser<a class="headerlink" href="#refresh-your-browser" title="Permalink to this headline">¶</a></h2>
+<p>Sometimes browser cache (remember) older content. A refresh should solve this problem. E.g. in
+Firefox you can do this with the <strong>F5</strong> key.</p>
 </div>
-<div class="section" id="this-user-is-not-activated">
-<h2>This user is not activated.<a class="headerlink" href="#this-user-is-not-activated" title="Permalink to this headline">¶</a></h2>
-<p>Your user was deactivated. If you think this to be a mistake please contact your project manager.</p>
+<div class="section" id="javascript">
+<h2>JavaScript<a class="headerlink" href="#javascript" title="Permalink to this headline">¶</a></h2>
+<p>JavaScript is required for advanced features to work. In case you haven’t activated JavaScript
+you should see a warning message at the top of the site.</p>
 </div>
-<div class="section" id="too-many-login-attempts">
-<h2>Too many login attempts.<a class="headerlink" href="#too-many-login-attempts" title="Permalink to this headline">¶</a></h2>
-<p>For security reasons (e.g. automatic attacks) the login gets locked after a few failed attempts.
-Number of failed attempts and minutes to wait until you can try again depend on project specific
-settings but in most cases you can try again after a few minutes.</p>
+<div class="section" id="if-the-problem-persists">
+<h2>If the problem persists<a class="headerlink" href="#if-the-problem-persists" title="Permalink to this headline">¶</a></h2>
+<p>If none of the above solutions work please report this bug. There is a <strong>Feedback</strong> link on
+the start page after you logged in. It would be very helpful if you provide which browser/version
+you are using and a screenshot showing the problem.</p>
 </div>
 </div>
 
@@ -201,10 +201,10 @@ settings but in most cases you can try again after a few minutes.</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="display.html" class="btn btn-neutral float-right" title="Display Errors" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="error_codes.html" class="btn btn-neutral float-right" title="Error Codes" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral float-left" title="Troubleshooting" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="login.html" class="btn btn-neutral float-left" title="Login" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   

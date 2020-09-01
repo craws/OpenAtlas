@@ -8,3 +8,5 @@ problem please report the issue.
    :maxdepth: 1
 
    login
+   display
+   error_codes
