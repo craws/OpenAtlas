@@ -4,6 +4,10 @@ html, body, input, select, textarea {
     font-family: helvetica, arial, sans-serif;
 }
 
+table.dataTable th {
+    white-space:nowrap;
+}
+
 li.changelog {
     margin-top: 0.3em;
 }

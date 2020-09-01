@@ -313,22 +313,27 @@ class TableSelect(HiddenInput):  # type: ignore
             if len(entity.aliases) > 0:
                 data[0] = """
                     <p>
-                        <a onclick="selectFromTable(this,'{name}', {entity_id})" href="#">{entity_name}</a>
+                        <a onclick="selectFromTable(this,'{name}', {entity_id}, '{entity_name}')" href="#">{entity_name}</a>
                     </p>""".format(name=field.id, entity_id=entity.id, entity_name=entity.name)
             else:
                 data[0] = """
-                    <a onclick="selectFromTable(this,'{name}', {entity_id})" href="#">{entity_name}</a>
+                    <a onclick="selectFromTable(this,'{name}', {entity_id}, '{entity_name}')" href="#">{entity_name}</a>
                     """.format(name=field.id, entity_id=entity.id, entity_name=entity.name)
             for i, (id_, alias) in enumerate(entity.aliases.items()):
                 if i == len(entity.aliases) - 1:
                     data[0] = ''.join([data[0]] + [alias])
                 else:
                     data[0] = ''.join([data[0]] + ['<p>' + alias + '</p>'])
+            data.insert(0, """
+                <div style="position: relative; top: 10px;" >
+                <div class="btn btn-outline-primary btn-sm" style="position: absolute; top: -30px; height: 27px" onclick="selectFromTable(this,'{name}', {entity_id}, '{entity_name}')">{label}</div>
+                </div>
+                """.format(name=field.id, entity_id=entity.id, entity_name=entity.name, label=uc_first(_('select'))))
             table.rows.append(data)
         html = """
             <input id="{name}-button" name="{name}-button" class="table-select {required}"
                 type="text" placeholder="{change_label}" onfocus="this.blur()" readonly="readonly"
-                value="{selection}" onclick="$('#{name}-modal').modal('show'); $('#{name}_table_filter input')[0].focus()">
+                value="{selection}" onclick="$('#{name}-modal').modal('show');">
             <a href="#" id="{name}-clear" class="{button_class}" {clear_style}
                 onclick="clearSelect('{name}');">{clear_label}</a>
             <div id="{name}-modal" class="modal fade" tabindex="-1" role="dialog"
@@ -350,6 +355,11 @@ class TableSelect(HiddenInput):  # type: ignore
                     </div>
                 </div>
             </div>
+            <script>
+                $('#{name}-modal').on('shown.bs.modal', function () {{
+                    $('#{name}_table_filter input').focus();
+                }});
+            </script>
             """.format(name=field.id,
                        title=uc_first(_(field.id.replace('_', ' '))),
                        button_class=app.config['CSS']['button']['secondary'],
