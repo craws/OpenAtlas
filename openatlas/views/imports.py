@@ -129,9 +129,9 @@ def import_data(project_id: int, class_code: str) -> str:
         file_ = request.files['file']
         file_path = app.config['TMP_FOLDER_PATH'].joinpath(
             secure_filename(file_.filename))  # type: ignore
-        columns: Dict[str, List[str]] = {'allowed': ['name', 'id', 'description',
-                                                     'begin_from', 'begin_to', 'begin_comment',
-                                                     'end_from', 'end_to', 'end_comment'],
+        columns: Dict[str, List[str]] = {'allowed': ['name', 'id', 'description', 'begin_from',
+                                                     'begin_to', 'begin_comment', 'end_from',
+                                                     'end_to', 'end_comment', 'type_ids'],
                                          'valid': [],
                                          'invalid': []}
         if class_code == 'E18':
@@ -163,6 +163,27 @@ def import_data(project_id: int, class_code: str) -> str:
                 checked_row = {}
                 for item in headers:
                     value = row[item]
+                    if item == 'type_ids':  # pragma: no cover
+                        checked_ids = []
+                        for type_id in value.split():
+                            checked_id = type_id
+                            if not type_id.isdigit():
+                                checked_id = '<span class="error">' + str(type_id) + '</span>'
+                            elif int(type_id) not in g.nodes:
+                                checked_id = '<span class="error">' + str(type_id) + '</span>'
+                            else:
+                                # Check if type is allowed (for corresponding form)
+                                valid_type = False
+                                root = g.nodes[g.nodes[int(type_id)].root[0]]
+                                for form_id, form_object in root.forms.items():
+                                    if form_object['name'] == \
+                                            uc_first(app.config['CODE_CLASS'][class_code]):
+                                        valid_type = True
+                                        break
+                                if not valid_type:
+                                    checked_id = '<span class="error">' + str(type_id) + '</span>'
+                            checked_ids.append(checked_id)
+                        value = ' '.join(checked_ids)
                     if item in ['northing', 'easting'] and not is_float(row[item]):
                         value = '<span class="error">' + value + '</span>'  # pragma: no cover
                     if item in ['begin_from', 'begin_to', 'end_from', 'end_to']:
