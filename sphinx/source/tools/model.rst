@@ -10,7 +10,7 @@ browsed and is used to verify link conformity between entities.
 Although it was paid much attention to design a web interface where users don't have to be aware of
 the underlying data model, interested user can get insights how their data is mapped.
 
-On the start page (after logged) is a **Model** button which leads to a graphical presentation of
+After login there is a **Model** button on the start page which leads to a graphical presentation of
 the model (see below), a link checker and links to browse the classes and properties.
 
 .. image:: openatlas_schema.png
@@ -32,5 +32,4 @@ the **Activity (E7)** will be linked with the property **took place at (P7)** to
 
 Link Checker
 ------------
-At the model overview there is also a link checker which can be used to test if certain
-class and properties connections are CIDOC CRM conform.
+With the link checker you can test if certain class and property connections are CIDOC CRM conform.
