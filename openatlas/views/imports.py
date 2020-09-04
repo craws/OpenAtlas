@@ -155,6 +155,8 @@ def import_data(project_id: int, class_code: str) -> str:
             origin_ids = []
             names = []
             missing_name_count = 0
+            invalid_type_ids = False
+            invalid_geoms = False
             for index, row in df.iterrows():
                 if not row['name']:  # pragma: no cover
                     missing_name_count += 1
@@ -170,9 +172,11 @@ def import_data(project_id: int, class_code: str) -> str:
                                 type_ids.append(type_id)
                             else:
                                 type_ids.append('<span class="error">' + type_id + '</span>')
+                                invalid_type_ids = True
                         value = ' '.join(type_ids)
-                    if item in ['northing', 'easting'] and not is_float(row[item]):
+                    if item in ['northing', 'easting'] and row[item] and not is_float(row[item]):
                         value = '<span class="error">' + value + '</span>'  # pragma: no cover
+                        invalid_geoms = True  # pragma: no cover
                     if item in ['begin_from', 'begin_to', 'end_from', 'end_to']:
                         if not value:
                             value = ''
@@ -194,8 +198,11 @@ def import_data(project_id: int, class_code: str) -> str:
                         origin_ids.append(str(row['id']))
                 table_data.append(table_row)
                 checked_data.append(checked_row)
+            if invalid_type_ids:
+                messages['warn'].append(_('invalid type ids'))
+            if invalid_geoms:
+                messages['warn'].append(_('invalid coordinates'))
             table = Table(headers, rows=table_data)
-
             # Checking for data inconsistency
             if missing_name_count:  # pragma: no cover
                 messages['warn'].append(_('empty names') + ': ' + str(missing_name_count))
