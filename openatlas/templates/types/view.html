@@ -18,14 +18,17 @@
     {{ profile_image_id|display_profile_image }}
     <div style="float:left;">
         {% if super_ %}
-            <p>{{_('super')|uc_first}}: {{ super_|link|safe }}</p>
+            <p>{{ _('super')|uc_first }}: {{ super_|link|safe }}</p>
         {% endif %}
         {{ info|display_info }}
         {% if root.value_type %}
-            <p>{{_('unit')|uc_first}}: {{node.description}}</p>
+            <p>{{ _('unit')|uc_first }}: {{ node.description }}</p>
         {% else %}
             {{ node|description }}
         {% endif %}
+        <p>
+            {{ _('ID for imports') }}: {{ node.id }}
+        </p>
     </div>
     <div style="clear:both;"></div>
 {% endblock %}
