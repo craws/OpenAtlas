@@ -164,26 +164,13 @@ def import_data(project_id: int, class_code: str) -> str:
                 for item in headers:
                     value = row[item]
                     if item == 'type_ids':  # pragma: no cover
-                        checked_ids = []
+                        type_ids = []
                         for type_id in value.split():
-                            checked_id = type_id
-                            if not type_id.isdigit():
-                                checked_id = '<span class="error">' + str(type_id) + '</span>'
-                            elif int(type_id) not in g.nodes:
-                                checked_id = '<span class="error">' + str(type_id) + '</span>'
+                            if Import.check_type_id(type_id, class_code):
+                                type_ids.append(type_id)
                             else:
-                                # Check if type is allowed (for corresponding form)
-                                valid_type = False
-                                root = g.nodes[g.nodes[int(type_id)].root[0]]
-                                for form_id, form_object in root.forms.items():
-                                    if form_object['name'] == \
-                                            uc_first(app.config['CODE_CLASS'][class_code]):
-                                        valid_type = True
-                                        break
-                                if not valid_type:
-                                    checked_id = '<span class="error">' + str(type_id) + '</span>'
-                            checked_ids.append(checked_id)
-                        value = ' '.join(checked_ids)
+                                type_ids.append('<span class="error">' + type_id + '</span>')
+                        value = ' '.join(type_ids)
                     if item in ['northing', 'easting'] and not is_float(row[item]):
                         value = '<span class="error">' + value + '</span>'  # pragma: no cover
                     if item in ['begin_from', 'begin_to', 'end_from', 'end_to']:

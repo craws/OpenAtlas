@@ -6,7 +6,8 @@ from flask import g
 from flask_login import current_user
 from psycopg2.extras import NamedTupleCursor
 
-from openatlas.util.util import is_float
+from openatlas import app
+from openatlas.util.util import is_float, uc_first
 
 
 class Project:
@@ -81,6 +82,23 @@ class Import:
                         'description': sanitize(project.description, 'description')})
 
     @staticmethod
+    def check_type_id(type_id: str, class_code: str) -> Optional['str']:
+        if not type_id.isdigit():
+            return
+        elif int(type_id) not in g.nodes:
+            return
+        else:
+            # Check if type is allowed (for corresponding form)
+            valid_type = False
+            root = g.nodes[g.nodes[int(type_id)].root[0]]
+            for form_id, form_object in root.forms.items():
+                if form_object['name'] == uc_first(app.config['CODE_CLASS'][class_code]):
+                    valid_type = True
+            if not valid_type:
+                return
+        return type_id
+
+    @staticmethod
     def import_data(project: 'Project', class_code: str, data: List[Any]) -> None:
         from openatlas.models.entity import Entity
         from openatlas.models.gis import Gis
@@ -114,6 +132,16 @@ class Import:
                 if 'end_comment' in row and row['end_comment']:
                     entity.end_comment = row['end_comment']
             entity.update()
+
+            # Types
+            if 'type_ids' in row and row['type_ids']:
+                for type_id in row['type_ids'].split():
+                    if not Import.check_type_id(type_id, class_code):
+                        continue
+                    sql = """
+                        INSERT INTO model.link (property_code, domain_id, range_id)
+                        VALUES ('P2', %(domain_id)s, %(type_id)s);"""
+                    g.execute(sql, {'domain_id': entity.id, 'type_id': int(type_id)})
 
             # GIS
             if class_code == 'E18':
