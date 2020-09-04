@@ -82,11 +82,11 @@ class Import:
                         'description': sanitize(project.description, 'description')})
 
     @staticmethod
-    def check_type_id(type_id: str, class_code: str) -> Optional['str']:
+    def check_type_id(type_id: str, class_code: str) -> bool:  # pragma: no cover
         if not type_id.isdigit():
-            return
+            return False
         elif int(type_id) not in g.nodes:
-            return
+            return False
         else:
             # Check if type is allowed (for corresponding form)
             valid_type = False
@@ -95,8 +95,8 @@ class Import:
                 if form_object['name'] == uc_first(app.config['CODE_CLASS'][class_code]):
                     valid_type = True
             if not valid_type:
-                return
-        return type_id
+                return False
+        return True
 
     @staticmethod
     def import_data(project: 'Project', class_code: str, data: List[Any]) -> None:
@@ -134,7 +134,7 @@ class Import:
             entity.update()
 
             # Types
-            if 'type_ids' in row and row['type_ids']:
+            if 'type_ids' in row and row['type_ids']:  # pragma: no cover
                 for type_id in row['type_ids'].split():
                     if not Import.check_type_id(type_id, class_code):
                         continue

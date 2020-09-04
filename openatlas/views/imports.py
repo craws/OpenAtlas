@@ -198,9 +198,9 @@ def import_data(project_id: int, class_code: str) -> str:
                         origin_ids.append(str(row['id']))
                 table_data.append(table_row)
                 checked_data.append(checked_row)
-            if invalid_type_ids:
+            if invalid_type_ids:  # pragma: no cover
                 messages['warn'].append(_('invalid type ids'))
-            if invalid_geoms:
+            if invalid_geoms:  # pragma: no cover
                 messages['warn'].append(_('invalid coordinates'))
             table = Table(headers, rows=table_data)
             # Checking for data inconsistency
