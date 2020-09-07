@@ -117,14 +117,14 @@ class Validation:
     @staticmethod
     def validate_show(show: List[str]) -> List[str]:
         show_ = []
-        valid = ['when', 'types', 'relations', 'names', 'links', 'geometry', 'depictions', 'not']
+        valid = ['when', 'types', 'relations', 'names', 'links', 'geometry', 'depictions']
         for pattern in valid:
             if re.search(pattern, str(show)):
                 show_.append(pattern)
-        if 'not' in show_:
+        if 'not' in show:
             show_.clear()
         if not show_:
-            show_.extend(Validation.default['show'])
+            show_.extend(valid)
         return show_
 
     @staticmethod
