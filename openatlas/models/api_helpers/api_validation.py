@@ -115,8 +115,8 @@ class Validation:
         return first_[0]
 
     @staticmethod
-    def validate_show(show: Union[bool, List[str], str, None]) -> Union[bool, List[str], str, None]:
-        show_ = []
+    def validate_show(show: List[str]) -> List[str]:
+        show_: List[str] = []
         valid = ['when', 'types', 'relations', 'names', 'links', 'geometry', 'depictions', 'not']
         for pattern in valid:
             if re.search(pattern, str(show)):
