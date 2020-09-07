@@ -121,10 +121,10 @@ class Validation:
         for pattern in valid:
             if re.search(pattern, str(show)):
                 show_.append(pattern)
-        if 'not' in show:
-            show_.clear()
         if not show_:
             show_.extend(valid)
+        if 'not' in show:
+            show_.clear()
         return show_
 
     @staticmethod
