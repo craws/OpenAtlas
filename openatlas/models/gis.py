@@ -1,5 +1,5 @@
 import ast
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 from flask import g, json
 from flask_wtf import FlaskForm
@@ -18,7 +18,7 @@ class Gis:
 
     @staticmethod
     def get_by_id(id_: int) -> List[Dict[str, Any]]:  # pragma no cover
-        # Needed only in API for now
+        # Used currently only for API
         geometries = []
         for shape in ['point', 'polygon', 'linestring']:
             sql = """
@@ -176,8 +176,11 @@ class Gis:
                     'geojson': json.dumps(item['geometry'])})
 
     @staticmethod
-    def insert_import(entity: Entity, location: Entity, project: Project,
-                      easting: float, northing: float) -> None:
+    def insert_import(entity: Entity,
+                      location: Entity,
+                      project: Project,
+                      easting: float,
+                      northing: float) -> None:
         # Insert places from CSV imports
         sql = """
             INSERT INTO gis.point (entity_id, name, description, type, geom) VALUES (

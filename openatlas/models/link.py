@@ -336,5 +336,5 @@ class Link:
                 data.append([link(entity),
                              entity.class_.name,
                              link(g.nodes[id_]),
-                             '<br>'.join(offending_nodes)])
+                             '<br><br><br><br><br>'.join(offending_nodes)])
         return data

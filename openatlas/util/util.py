@@ -218,10 +218,12 @@ def add_system_data(entity: 'Entity',
         if info['import_origin_id']:
             data['origin ID'] = info['import_origin_id']
         data['API'] = '<a href="{url}" target="_blank">GeoJSON</a>'.format(
-            url=url_for('api_entity', id_=entity.id)) + \
-                      ' <a class="btn btn-outline-primary btn-sm" href="{url}" target="_blank" title="Download">' \
-                      ' <i class="fas fa-download"></i> Download</a>'.format(
-                          url=url_for('api_download_entity', id_=entity.id))
+            url=url_for('api_entity', id_=entity.id))
+        data['API'] += ''' <a class="btn btn-outline-primary btn-sm" href="{url}"
+                            target="_blank" title="Download">
+                                <i class="fas fa-download"></i> {label}
+                            </a>'''.format(url=url_for('api_download_entity', id_=entity.id),
+                                           label=uc_first('download'))
     return data
 
 
@@ -489,7 +491,8 @@ def truncate(string: Optional[str] = '', length: int = 40, span: bool = True) ->
         return string
     if not span:
         return string[:length] + '..'
-    return '<span title="' + string.replace('"', '') + '">' + string[:length] + '..' + '</span>'
+    return '<span title="' + string.replace('"', '') + '">' + string[:length] \
+           + '..' + '</span>'  # pragma: no cover
 
 
 def get_base_table_data(entity: 'Entity',

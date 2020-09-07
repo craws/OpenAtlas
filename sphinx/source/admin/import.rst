@@ -7,10 +7,11 @@ Import is available for admins and managers and offers functionality to import d
 from `CSV <https://en.wikipedia.org/wiki/Comma-separated_values>`_ files.
 Currently lists can be imported containing:
 
-* name
-* description
-* dates
+* Name
+* Description
+* Dates
 * GIS data
+* Types
 * origin_id
 
 Preparations
@@ -53,8 +54,10 @@ an error message.
 * **begin_to** - used for dates, see below
 * **end_from** - used for dates, see below
 * **end_to** - used for dates, see below
+* **type_ids** - used to link to types, see below
 * **northing** - only available for places, see below
 * **easting** - only available for places, see below
+
 
 Dates
 +++++
@@ -66,6 +69,15 @@ see: :doc:`/form/date`
 * Missing values for time spans will be discarded silently, e.g. a valid value in **begin_to** but an empty value in **begin_from**
 * There are no advanced checks between dates e.g. end dates can be before begin dates. You should check them after the import at :doc:`/admin/data_integrity_checks`
 
+Types
++++++
+It is possible to link entities to types at the import which can be very useful e.g. if you have
+a custom type **Case studies** to link them all in one go.
+
+* Type ids can be entered at the column **type_ids**
+* You can enter multiple separated with a space
+* The id of a type can be looked up at the detail view of a type
+
 Places
 ++++++
 If importing places, point coordinates can be imported too. Keep in mind to use
@@ -75,6 +87,7 @@ is present and rows contain number values.
 
 * **northing** - number value
 * **easting** - number value
+
 
 Import options
 --------------
@@ -88,3 +101,6 @@ When the import went through you'll see a summary which data was imported (like 
 Also you can browse the projects to see which imported entities are associated with them.
 If you enabled the advanced layout you can also see in the detail view of an entity from which
 project it was imported, which user did the import and the origin_id value.
+
+Although the script makes a lot of validation checks it's always a good idea to run
+:doc:`/admin/data_integrity_checks` after each import.

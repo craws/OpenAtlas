@@ -2,11 +2,14 @@ class Changelog:
 
     versions = {
         '5.4.0': ['TBA', {
+            'feature': {
+                '1321': 'Import with types',},
             'fix': {
                 '1306': 'Search results: small table, missing mouse over description',
                 '1308': 'Missing connection for actors created from place',
                 '1319': 'Datatabel Error in View',
-                '1326': 'User Table in Admin is not responsive '
+                '1326': 'User Table in Admin is not responsive',
+                '1328': 'Table layout error at check link duplicates function'
             }
         }],
         '5.3.0': ['2020-07-15', {

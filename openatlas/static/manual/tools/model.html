@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Overview &mdash; OpenAtlas 5.3.0 documentation</title>
+  <title>Model &mdash; OpenAtlas 5.3.0 documentation</title>
   
 
   
@@ -36,8 +36,8 @@
   <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
   <link rel="stylesheet" href="../_static/style.css" type="text/css" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Source" href="source.html" />
-    <link rel="prev" title="Menu" href="index.html" /> 
+    <link rel="next" title="API" href="api.html" />
+    <link rel="prev" title="Table" href="table.html" /> 
 </head>
 
 <body class="wy-body-for-nav">
@@ -89,19 +89,19 @@
             
             
               <ul class="current">
-<li class="toctree-l1 current"><a class="reference internal" href="index.html">Menu</a><ul class="current">
-<li class="toctree-l2 current"><a class="current reference internal" href="#">Overview</a></li>
-<li class="toctree-l2"><a class="reference internal" href="source.html">Source</a></li>
-<li class="toctree-l2"><a class="reference internal" href="event.html">Event</a></li>
-<li class="toctree-l2"><a class="reference internal" href="actor.html">Actor</a></li>
-<li class="toctree-l2"><a class="reference internal" href="place.html">Place</a></li>
-<li class="toctree-l2"><a class="reference internal" href="reference.html">Reference</a></li>
-<li class="toctree-l2"><a class="reference internal" href="object.html">Object</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../form/type.html">Types</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../menu/index.html">Menu</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../form/index.html">Form</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Tools</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="search.html">Search</a></li>
+<li class="toctree-l2"><a class="reference internal" href="profile.html">Profile</a></li>
+<li class="toctree-l2"><a class="reference internal" href="map.html">Map</a></li>
+<li class="toctree-l2"><a class="reference internal" href="network.html">Network visualization</a></li>
+<li class="toctree-l2"><a class="reference internal" href="file.html">File</a></li>
+<li class="toctree-l2"><a class="reference internal" href="table.html">Table</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Model</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api.html">API</a></li>
 </ul>
 </li>
-<li class="toctree-l1"><a class="reference internal" href="../form/index.html">Form</a></li>
-<li class="toctree-l1"><a class="reference internal" href="../tools/index.html">Tools</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../admin/index.html">Admin</a></li>
 <li class="toctree-l1"><a class="reference internal" href="../troubleshooting/index.html">Troubleshooting</a></li>
 </ul>
@@ -149,9 +149,9 @@
     
       <li><a href="../index.html">Docs</a> &raquo;</li>
         
-          <li><a href="index.html">Menu</a> &raquo;</li>
+          <li><a href="index.html">Tools</a> &raquo;</li>
         
-      <li>Overview</li>
+      <li>Model</li>
     
     
       <li class="wy-breadcrumbs-aside">
@@ -168,19 +168,36 @@
           <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
            <div itemprop="articleBody">
             
-  <div class="section" id="overview">
-<h1>Overview<a class="headerlink" href="#overview" title="Permalink to this headline">¶</a></h1>
+  <div class="section" id="model">
+<h1>Model<a class="headerlink" href="#model" title="Permalink to this headline">¶</a></h1>
 <div class="toctree-wrapper compound">
 </div>
-<p>The overview is also the start page and can be reached when clicking on the logo at the upper left.
-When logged in following is displayed:</p>
-<ul class="simple">
-<li>an overview table of already entered entities</li>
-<li>links to manual, <a class="reference internal" href="../tools/model.html"><span class="doc">Model</span></a> and network visualizations</li>
-<li>a list of the latest entries</li>
-<li>your bookmarks</li>
-<li>your notes</li>
-</ul>
+<p>The software automatically maps information to the international standard of the
+<a class="reference external" href="http://www.cidoc-crm.org/">CIDOC CRM</a>. The CIDOC CRM was imported to the system, can be
+browsed and is used to verify link conformity between entities.</p>
+<p>Although it was paid much attention to design a web interface where users don’t have to be aware of
+the underlying data model, interested user can get insights how their data is mapped.</p>
+<p>After login there is a <strong>Model</strong> button on the start page which leads to a graphical presentation of
+the model (see below), a link checker and links to browse the classes and properties.</p>
+<img alt="../_images/openatlas_schema.png" src="../_images/openatlas_schema.png" />
+<p>You can also active the <strong>advanced Layout</strong> in your <a class="reference internal" href="profile.html"><span class="doc">Profile</span></a> which displays the CIDOC
+CRM class of an entity at the detail view.</p>
+<div class="section" id="classes">
+<h2>Classes<a class="headerlink" href="#classes" title="Permalink to this headline">¶</a></h2>
+<p>All entities belong to a CIDOC CRM class. E.g. a person has the class <strong>Person (E21)</strong>. In the
+overview table you can browse the classes and see how often they were used. A click on the
+class name will get you to a detail view with more information, e.g. a description and their super
+and sub classes.</p>
+</div>
+<div class="section" id="properties">
+<h2>Properties<a class="headerlink" href="#properties" title="Permalink to this headline">¶</a></h2>
+<p>Entities are linked with a CIDOC CRM property. E.g. if you select a location for an activity,
+the <strong>Activity (E7)</strong> will be linked with the property <strong>took place at (P7)</strong> to a <strong>Place (E53)</strong>.</p>
+</div>
+<div class="section" id="link-checker">
+<h2>Link Checker<a class="headerlink" href="#link-checker" title="Permalink to this headline">¶</a></h2>
+<p>With the link checker you can test if certain class and property connections are CIDOC CRM conform.</p>
+</div>
 </div>
 
 
@@ -191,10 +208,10 @@ When logged in following is displayed:</p>
   
     <div class="rst-footer-buttons" role="navigation" aria-label="footer navigation">
       
-        <a href="source.html" class="btn btn-neutral float-right" title="Source" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
+        <a href="api.html" class="btn btn-neutral float-right" title="API" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right"></span></a>
       
       
-        <a href="index.html" class="btn btn-neutral float-left" title="Menu" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
+        <a href="table.html" class="btn btn-neutral float-left" title="Table" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left"></span> Previous</a>
       
     </div>
   
