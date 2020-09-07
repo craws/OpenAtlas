@@ -10,6 +10,14 @@ After following the instructions restart Apache and test if the application is w
 
     service apache2 restart
 
+### 5.3.0 to 5.4.0
+
+**Important**: we renamed our main branch which is also used for productive systems from **master**
+to **main**. So to do the update you have to pull and checkout the **main** branch. You can delete
+the master branch afterwards.
+
+Otherwise it's just a normal code update without database changes.
+
 ### 5.2.0 to 5.3.0
 
 Install flask-cors packages e.g. on Debian: 
