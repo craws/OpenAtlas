@@ -124,8 +124,7 @@ class Validation:
         if 'not' in show_:
             show_.clear()
         if not show_:
-            show_= Validation.default['show']
-        reveal_type(show_)
+            show_.append(Validation.default['show'])
         return show_
 
     @staticmethod
