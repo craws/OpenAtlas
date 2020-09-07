@@ -16,7 +16,7 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
 
 class Query:
 
-    def __init__(self, row: NamedTupleCursor.Record) -> None:
+    def __init__(self, row: NamedTupleCursor.Record) -> None: # pragma: no cover
         from openatlas.forms.date import DateForm
 
         self.id = row.id
@@ -69,7 +69,7 @@ class Query:
             self.table_name = self.system_type.replace(' ', '_')
 
     @staticmethod
-    def build_sql(nodes: bool = False, aliases: bool = False) -> str:
+    def build_sql(nodes: bool = False, aliases: bool = False) -> str: # pragma: no cover
         # Performance: only join nodes and/or aliases if requested
         sql = """
             SELECT
@@ -100,73 +100,6 @@ class Query:
                 LEFT JOIN model.entity alias ON la.range_id = alias.id """
         return sql
 
-
-    # @staticmethod
-    # def get_by_system_type(system_type: str,
-    #                        nodes: bool = False,
-    #                        aliases: bool = False) -> List[Query]:
-    #     sql = Query.build_sql_pagination(nodes=nodes, aliases=aliases)
-    #     sql += ' WHERE e.system_type = %(system_type)s GROUP BY e.id;'
-    #     g.execute(sql, {'system_type': system_type})
-    #     return [Query(row) for row in g.cursor.fetchall()]
-
-    # @staticmethod
-    # def get_display_files() -> List[Query]:
-    #     g.execute(Query.build_sql_pagination(
-    #         nodes=True) + " WHERE e.system_type = 'file' GROUP BY e.id;")
-    #     entities = []
-    #     for row in g.cursor.fetchall():
-    #         if get_file_extension(row.id)[1:] in app.config['DISPLAY_FILE_EXTENSIONS']:
-    #             entities.append(Query(row))
-    #     return entities
-
-    # @staticmethod
-    # def get_by_id(entity_id: int,
-    #               nodes: bool = False,
-    #               aliases: bool = False,
-    #               view_name: Optional[str] = None) -> Query:
-    #     from openatlas import logger
-    #     if entity_id in g.nodes:  # pragma: no cover, just in case a node is requested
-    #         return g.nodes[entity_id]
-    #     sql = Query.build_sql_pagination(nodes,
-    #                                      aliases) + ' WHERE e.id = %(id)s GROUP BY e.id;'
-    #     g.execute(sql, {'id': entity_id})
-    #     entity = Query(g.cursor.fetchone())
-    #     if view_name and view_name != entity.view_name:  # Entity was called from wrong view, abort!
-    #         logger.log('error', 'model', 'entity ({id}) view name="{view}", requested="{request}"'.
-    #                    format(id=entity_id, view=entity.view_name, request=view_name))
-    #         abort(422)
-    #     return entity
-
-    # @staticmethod
-    # def get_by_ids(entity_ids: Any, nodes: bool = False) -> List[Query]:
-    #     if not entity_ids:
-    #         return []
-    #     sql = Query.build_sql_pagination(
-    #         nodes) + ' WHERE e.id IN %(ids)s GROUP BY e.id ORDER BY e.name'
-    #     g.execute(sql, {'ids': tuple(entity_ids)})
-    #     return [Query(row) for row in g.cursor.fetchall()]
-
-    # @staticmethod
-    # def get_by_project_id(project_id: int) -> List[Query]:
-    #     sql = """
-    #         SELECT e.id, ie.origin_id, e.class_code, e.name, e.description, e.created, e.modified,
-    #             e.system_type,
-    #         array_to_json(
-    #             array_agg((t.range_id, t.description)) FILTER (WHERE t.range_id IS NOT NULL)
-    #         ) as nodes
-    #         FROM model.entity e
-    #         LEFT JOIN model.link t ON e.id = t.domain_id AND t.property_code IN ('P2', 'P89')
-    #         JOIN import.entity ie ON e.id = ie.entity_id
-    #         WHERE ie.project_id = %(id)s GROUP BY e.id, ie.origin_id;"""
-    #     g.execute(sql, {'id': project_id})
-    #     entities = []
-    #     for row in g.cursor.fetchall():
-    #         entity = Query(row)
-    #         entity.origin_id = row.origin_id
-    #         entities.append(entity)
-    #     return entities
-
     @staticmethod
     def get_by_class_code(code: Union[str, List[str]],
                           meta: Dict[str, Any]) -> List[Query]:
@@ -182,7 +115,7 @@ class Query:
 
     @staticmethod
     def get_by_menu_item(menu_item: str,
-                         meta: Dict[str, Any]) -> List[Query]:
+                         meta: Dict[str, Any]) -> List[Query]:  # pragma: no cover
         # Possible class names: actor, event, place, reference, source, object
         if menu_item == 'source':
             sql = Query.build_sql(nodes=True) + """
@@ -207,4 +140,3 @@ class Query:
                                                    sort=meta['sort'])
         g.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][menu_item])})
         return [Query(row) for row in g.cursor.fetchall()]
-

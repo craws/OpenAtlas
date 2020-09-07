@@ -12,7 +12,8 @@ class ApiTests(TestBaseCase):
         with app.app_context():  # type: ignore
             rv = self.app.post(url_for('place_insert'),
                                data={'name': 'Nostromos',
-                                     'description': 'In space, no one can hears you scream'})
+                                     'description': 'In space, no one can hears you scream',
+                                     'alias-0': 'Valhöll'})
             place_id = rv.location.split('/')[-1]
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
@@ -56,6 +57,10 @@ class ApiTests(TestBaseCase):
                                data=data,
                                follow_redirects=True)
             assert b'Asgard' in rv.data
+            rv = self.app.post(url_for('place_insert', origin_id=source.id),
+                               data=data,
+                               follow_redirects=True)
+            assert b'Asgard' in rv.data
             rv = self.app.get(url_for('api_index'))
             assert b'Test API' in rv.data
             rv = self.app.get(url_for('api_entity', id_=place_id))
@@ -64,6 +69,9 @@ class ApiTests(TestBaseCase):
                 url_for('api_get_by_menu_item', code='place', limit=10, sort='desc', column='name',
                         filter='or(eq,name,Nostromos)', first=place_id))
             assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('api_get_by_menu_item', code='reference'))
+            assert b'openatlas' in rv.data
+
             rv = self.app.get(
                 url_for('api_get_by_class', class_code='E18', filter='or(like,name,Nostr)'))
             assert b'Nostromos' in rv.data
@@ -78,6 +86,7 @@ class ApiTests(TestBaseCase):
             rv = self.app.post(url_for('place_insert', origin_id=source.id),
                                data=data,
                                follow_redirects=True)
+            assert b'Necronomicon' in rv.data
             rv = self.app.get(url_for('api_get_by_class', class_code='E33'))
             assert b'Necronomicon' in rv.data
             rv = self.app.get(url_for('api_get_by_class', class_code='E18', last=place_id))
