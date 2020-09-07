@@ -86,6 +86,10 @@ class ApiTests(TestBaseCase):
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('api_download_entity', id_=place_id))
             assert b'@context"' in rv.data
+            rv = self.app.get(url_for('api_get_by_class', class_code='E33', show='types'))
+            assert b'Necronomicon' in rv.data
+            rv = self.app.get(url_for('api_get_by_class', class_code='E33', show='not'))
+            assert b'Necronomicon' in rv.data
 
             # Test for error codes
             rv = self.app.get(url_for('api_entity', id_=99999999))
