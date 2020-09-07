@@ -115,7 +115,7 @@ class Validation:
         return first_[0]
 
     @staticmethod
-    def validate_show(show: Union[List[str], str, None]) -> Union[List[str], str, None]:
+    def validate_show(show: Union[bool, List[str], str, None]) -> Union[bool, List[str], str, None]:
         show_ = []
         valid = ['when', 'types', 'relations', 'names', 'links', 'geometry', 'depictions', 'not']
         for pattern in valid:
@@ -125,6 +125,8 @@ class Validation:
             show_.clear()
         if not show_:
             show_ = Validation.default['show']
+        print(type(Validation.default['show']))
+        print(type(show))
         return show_
 
     @staticmethod
