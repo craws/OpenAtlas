@@ -120,15 +120,6 @@ class Api:
             entities.append(Api.get_entity(entity.id, meta=meta))
         return entities
 
-    # Not used?
-    # @staticmethod
-    # def get_entities_by_id(ids: List[int], meta: Dict[str, Any]) -> List[
-    #     Dict[str, Any]]:  # pragma: nocover
-    #     entities = []
-    #     for i in ids:
-    #         for entity in Entity.get_by_ids(i, nodes=True):
-    #             entities.append(Api.get_entity(entity.id, meta=meta))
-    #     return entities
 
     @staticmethod
     def get_node(entity: Entity) -> List[Dict[str, Any]]:
