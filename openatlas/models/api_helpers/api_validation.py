@@ -123,7 +123,7 @@ class Validation:
                 show_.append(pattern)
         if not show_:
             show_.extend(valid)
-        if 'not' in show:
+        if 'none' in show:
             show_.clear()
         return show_
 
