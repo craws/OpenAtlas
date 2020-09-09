@@ -122,7 +122,7 @@ def page_not_found(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
     return render_template('404.html', e=e), 404
 
 
-@app.errorhandler(405)
+@app.errorhandler(405)  # pragma: no cover
 def method_not_allowed(e: Exception) -> Tuple[Union[Dict[str, str], str], int]:
     return str(APIError('Method Not Allowed', status_code=405, payload="405").to_dict()), 405
 

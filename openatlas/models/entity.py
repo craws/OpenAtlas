@@ -149,13 +149,13 @@ class Entity:
                 %(end_from)s, %(end_to)s, %(end_comment)s)
             WHERE id = %(id)s;"""
         g.execute(sql, {'id': self.id,
-                        'name': self.name,
+                        'name': str(self.name).strip(),
                         'begin_from': Date.datetime64_to_timestamp(self.begin_from),
                         'begin_to': Date.datetime64_to_timestamp(self.begin_to),
                         'end_from': Date.datetime64_to_timestamp(self.end_from),
                         'end_to': Date.datetime64_to_timestamp(self.end_to),
-                        'begin_comment': self.begin_comment,
-                        'end_comment': self.end_comment,
+                        'begin_comment': str(self.begin_comment).strip(),
+                        'end_comment': str(self.end_comment).strip(),
                         'description': sanitize(self.description, 'description')})
 
     def update_aliases(self, form: FlaskForm) -> None:
