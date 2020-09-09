@@ -1,7 +1,7 @@
 class Changelog:
 
     versions = {
-        '5.4.0': ['TBA', {
+        '5.4.0': ['2020-09-09', {
             'feature': {
                 '1317': 'Additional manual content',
                 '1321': 'Import with types',
@@ -14,9 +14,7 @@ class Changelog:
                 '1308': 'Missing connection for actors created from place',
                 '1319': 'Data table error in view',
                 '1326': 'User table in admin is not responsive',
-                '1328': 'Table layout error at check link duplicates function'
-            }
-        }],
+                '1328': 'Table layout error at check link duplicates function'}}],
         '5.3.0': ['2020-07-15', {
             'feature': {
                 '1272': 'Tabs redesign',
