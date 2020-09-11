@@ -12,7 +12,8 @@ class ApiTests(TestBaseCase):
         with app.app_context():  # type: ignore
             rv = self.app.post(url_for('place_insert'),
                                data={'name': 'Nostromos',
-                                     'description': 'In space, no one can hears you scream'})
+                                     'description': 'In space, no one can hears you scream',
+                                     'alias-0': 'Valhöll'})
             place_id = rv.location.split('/')[-1]
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
@@ -22,6 +23,7 @@ class ApiTests(TestBaseCase):
                 place = Entity.get_by_id(place_id)
                 place.link("P2", place_node)
                 reference = Entity.insert('E31', 'https://openatlas.eu', 'external reference')
+                source = Entity.insert('E33', 'Necronomicon')
                 unit_node = Node.get_hierarchy('Administrative Unit')
                 unit_sub1 = g.nodes[unit_node.subs[0]]
                 unit_sub2 = g.nodes[unit_node.subs[1]]
@@ -55,21 +57,53 @@ class ApiTests(TestBaseCase):
                                data=data,
                                follow_redirects=True)
             assert b'Asgard' in rv.data
+            rv = self.app.post(url_for('place_insert', origin_id=source.id),
+                               data=data,
+                               follow_redirects=True)
+            assert b'Asgard' in rv.data
             rv = self.app.get(url_for('api_index'))
             assert b'Test API' in rv.data
             rv = self.app.get(url_for('api_entity', id_=place_id))
             assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('api_get_by_menu_item', code='place'))
+            rv = self.app.get(
+                url_for('api_get_by_menu_item', code='place', limit=10, sort='desc', column='name',
+                        filter='or(eq,name,Nostromos)', first=place_id))
             assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('api_get_by_class', class_code='E18'))
+            rv = self.app.get(url_for('api_get_by_menu_item', code='reference'))
+            assert b'openatlas' in rv.data
+
+            rv = self.app.get(
+                url_for('api_get_by_class', class_code='E18', filter='or(like,name,Nostr)'))
             assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('api_get_by_class', class_code='E18',
+                                      filter='AND(in,name,[Nostromos:hallo])'))
+            assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('api_get_by_class', class_code='E18',
+                                      filter='AND(in,name,[Nostromos])'))
+            assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('api_get_by_class', class_code='E31'))
+            assert b'https://openatlas.eu' in rv.data
+            rv = self.app.post(url_for('place_insert', origin_id=source.id),
+                               data=data,
+                               follow_redirects=True)
+            assert b'Necronomicon' in rv.data
+            rv = self.app.get(url_for('api_get_by_class', class_code='E33'))
+            assert b'Necronomicon' in rv.data
+            rv = self.app.get(url_for('api_get_by_class', class_code='E18', last=place_id))
+            assert b'entities' in rv.data
             rv = self.app.get(url_for('api_get_latest', limit=10))
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('api_download_entity', id_=place_id))
             assert b'@context"' in rv.data
+            rv = self.app.get(url_for('api_get_by_class', class_code='E33', show='types'))
+            assert b'Necronomicon' in rv.data
+            rv = self.app.get(url_for('api_get_by_class', class_code='E33', show='not'))
+            assert b'Necronomicon' in rv.data
 
             # Test for error codes
             rv = self.app.get(url_for('api_entity', id_=99999999))
+            assert b'404a' in rv.data
+            rv = self.app.get(url_for('api_get_by_class', class_code='E18', last=1231223121321))
             assert b'404a' in rv.data
             rv = self.app.get(url_for('api_entity', id_="EEEE"))
             assert b'404b' in rv.data
@@ -79,8 +113,8 @@ class ApiTests(TestBaseCase):
             assert b'404' in rv.data
             rv = self.app.get(url_for('api_get_by_menu_item', code='TWART'))
             assert b'404c' in rv.data
-            rv = self.app.put(url_for('api_get_entities_by_json'))
-            assert b'405' in rv.data
+            # rv = self.app.post(url_for('api_get_entities_by_json'))
+            # assert b'405' in rv.data
             self.app.get(url_for('logout'), follow_redirects=True)
             rv = self.app.get(url_for('api_entity', id_=place_id))
             assert b'403' in rv.data

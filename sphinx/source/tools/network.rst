@@ -6,6 +6,19 @@ Network visualization
 With the integration of `D3.js <https://d3js.org/>`_ data can be visualized as a network graph
 available at one of the **Network visualization** buttons at the :doc:`/menu/overview`.
 
+.. figure:: network_classic.png
+   :align: left
+
+   Classic
+.. figure:: network_2d.png
+   :align: left
+
+   2D
+.. figure:: network_3d.png
+   :align: left
+
+   3D
+
 Navigation
 ----------
 * Zoom with mouse wheel

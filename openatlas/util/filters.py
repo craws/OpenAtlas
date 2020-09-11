@@ -57,7 +57,7 @@ def crumb(self: Any, crumbs: List[Any]) -> str:
                 url=url_for(item[1]) if len(item) == 2 else url_for(item[1], **item[2]),
                 label=util.truncate(util.uc_first(str(item[0])))))
         else:
-            items.append(util.truncate(util.uc_first(item)))
+            items.append(util.uc_first(item))
     return Markup('&nbsp;>&nbsp; '.join(items))
 
 

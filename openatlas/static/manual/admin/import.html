@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Import &mdash; OpenAtlas 5.3.0 documentation</title>
+  <title>Import &mdash; OpenAtlas 5.4.0 documentation</title>
   
 
   
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                5.3.0
+                5.4.0
               </div>
             
           
@@ -179,10 +179,11 @@
 from <a class="reference external" href="https://en.wikipedia.org/wiki/Comma-separated_values">CSV</a> files.
 Currently lists can be imported containing:</p>
 <ul class="simple">
-<li>name</li>
-<li>description</li>
-<li>dates</li>
+<li>Name</li>
+<li>Description</li>
+<li>Dates</li>
 <li>GIS data</li>
+<li>Types</li>
 <li>origin_id</li>
 </ul>
 <div class="section" id="preparations">
@@ -225,6 +226,7 @@ an error message.</p>
 <li><strong>begin_to</strong> - used for dates, see below</li>
 <li><strong>end_from</strong> - used for dates, see below</li>
 <li><strong>end_to</strong> - used for dates, see below</li>
+<li><strong>type_ids</strong> - used to link to types, see below</li>
 <li><strong>northing</strong> - only available for places, see below</li>
 <li><strong>easting</strong> - only available for places, see below</li>
 </ul>
@@ -237,6 +239,16 @@ see: <a class="reference internal" href="../form/date.html"><span class="doc">Da
 <li>If the date format is incorrect they will be displayed in red and won’t be imported</li>
 <li>Missing values for time spans will be discarded silently, e.g. a valid value in <strong>begin_to</strong> but an empty value in <strong>begin_from</strong></li>
 <li>There are no advanced checks between dates e.g. end dates can be before begin dates. You should check them after the import at <a class="reference internal" href="data_integrity_checks.html"><span class="doc">Data integrity checks</span></a></li>
+</ul>
+</div>
+<div class="section" id="types">
+<h3>Types<a class="headerlink" href="#types" title="Permalink to this headline">¶</a></h3>
+<p>It is possible to link entities to types at the import which can be very useful e.g. if you have
+a custom type <strong>Case studies</strong> to link them all in one go.</p>
+<ul class="simple">
+<li>Type ids can be entered at the column <strong>type_ids</strong></li>
+<li>You can enter multiple separated with a space</li>
+<li>The id of a type can be looked up at the detail view of a type</li>
 </ul>
 </div>
 <div class="section" id="places">
@@ -265,6 +277,8 @@ is present and rows contain number values.</p>
 Also you can browse the projects to see which imported entities are associated with them.
 If you enabled the advanced layout you can also see in the detail view of an entity from which
 project it was imported, which user did the import and the origin_id value.</p>
+<p>Although the script makes a lot of validation checks it’s always a good idea to run
+<a class="reference internal" href="data_integrity_checks.html"><span class="doc">Data integrity checks</span></a> after each import.</p>
 </div>
 </div>
 

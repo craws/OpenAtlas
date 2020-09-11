@@ -1,15 +1,16 @@
+import itertools
 import os
 from typing import Any, Dict, List
 
 from flask import g, session, url_for
 
 from openatlas import app
-from openatlas.models.api_error import APIError
+from openatlas.models.api_helpers.api_error import APIError
+from openatlas.models.api_helpers.api_sql import Query
 from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
-from openatlas.models.node import Node
 from openatlas.util.util import format_date, get_file_path
 
 
@@ -74,33 +75,51 @@ class Api:
         return file_license
 
     @staticmethod
-    def get_entities_by_menu_item(code_: str) -> List[Dict[str, Any]]:
+    def get_entities_by_menu_item(code_: str, meta: Dict[str, Any]) -> List[int]:
         entities = []
-        for entity in Entity.get_by_menu_item(code_):
-            entities.append(Api.get_entity(entity.id))
+        for entity in Query.get_by_menu_item(code_, meta):
+            entities.append(entity.id)
         return entities
 
     @staticmethod
-    def get_entities_by_class(class_code_: str) -> List[Dict[str, Any]]:
+    def get_entities_by_class(class_code_: str, meta: Dict[str, Any]) -> List[int]:
         entities = []
-        for entity in Entity.get_by_class_code(class_code_):
-            entities.append(Api.get_entity(entity.id))
+        for entity in Query.get_by_class_code(class_code_, meta):
+            entities.append(entity.id)
         return entities
 
     @staticmethod
-    def get_entities_get_latest(limit_: int) -> List[Dict[str, Any]]:
+    def pagination(entities: List[int], meta: Dict[str, Any]) -> List[Dict[str, Any]]:
+        result = []
+        index = []
+        total = entities
+        for num, i in enumerate(list(itertools.islice(entities, 0, None, int(meta['limit'])))):
+            index.append(({'page': num + 1, 'start_id': i}))
+        if meta['last'] or meta['first']:
+            if meta['last'] and int(meta['last']) in entities:
+                entities = list(
+                    itertools.islice(entities, entities.index(int(meta['last'])) + 1, None))
+            elif meta['first'] and int(meta['first']) in entities:
+                entities = list(
+                    itertools.islice(entities, entities.index(int(meta['first'])), None))
+            else:
+                raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
+        else:
+            pass
+
+        for entity in entities[:int(meta['limit'])]:
+            result.append(Api.get_entity(entity, meta))
+        result.append({'entity_per_page': int(meta['limit']), 'entities': len(total),
+                       'index': index, 'total_pages': len(index)})
+        return result
+
+    @staticmethod
+    def get_entities_get_latest(limit_: int, meta: Dict[str, Any]) -> List[Dict[str, Any]]:
         entities = []
         for entity in Entity.get_latest(limit_):
-            entities.append(Api.get_entity(entity.id))
+            entities.append(Api.get_entity(entity.id, meta=meta))
         return entities
 
-    @staticmethod
-    def get_entities_by_id(ids: List[int]) -> List[Dict[str, Any]]:  # pragma: nocover
-        entities = []
-        for i in ids:
-            for entity in Entity.get_by_ids(i, nodes=True):
-                entities.append(Api.get_entity(entity.id))
-        return entities
 
     @staticmethod
     def get_node(entity: Entity) -> List[Dict[str, Any]]:
@@ -116,7 +135,6 @@ class Api:
             if 'unit' not in nodes_dict and node.description:
                 nodes_dict['description'] = node.description
 
-            #  This feature is solely for the THANADOS project
             hierarchy = []
             for root in node.root:
                 hierarchy.append(g.nodes[root].name)  # pragma: nocover
@@ -128,7 +146,7 @@ class Api:
         return nodes
 
     @staticmethod
-    def get_entity(id_: int) -> Dict[str, Any]:
+    def get_entity(id_: int, meta: Dict[str, Any]) -> Dict[str, Any]:
         try:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
         except Exception:
@@ -143,10 +161,8 @@ class Api:
                     'crmClass': "crm:" + class_code,
                     'properties': {'title': entity.name}}
 
-        # Types
-
         # Relations
-        if Api.get_links(entity):
+        if Api.get_links(entity) and 'relations' in meta['show']:
             features['relations'] = Api.get_links(entity)
 
         # Descriptions
@@ -154,7 +170,7 @@ class Api:
             features['description'] = [{'value': entity.description}]
 
         # Types
-        if Api.get_node(entity):
+        if Api.get_node(entity) and 'types' in meta['show']:
             features['types'] = Api.get_node(entity)
 
         if entity.aliases:  # pragma: nocover
@@ -163,30 +179,32 @@ class Api:
                 features['names'].append({"alias": value})
 
         # Depictions
-        if Api.get_file(entity):  # pragma: nocover
+        if Api.get_file(entity) and 'depictions' in meta['show']:  # pragma: nocover
             features['depictions'] = Api.get_file(entity)
 
         # Time spans
-        if entity.begin_from or entity.end_from:  # pragma: nocover
-            time = {}
-            if entity.begin_from:
-                start = {'earliest': format_date(entity.begin_from)}
-                if entity.begin_to:
-                    start['latest'] = format_date(entity.begin_to)
-                if entity.begin_comment:
-                    start['comment'] = entity.begin_comment
-                time['start'] = start
-            if entity.end_from:
-                end = {'earliest': format_date(entity.end_from)}
-                if entity.end_to:
-                    end['latest'] = format_date(entity.end_to)
-                if entity.end_comment:
-                    end['comment'] = entity.end_comment
-                time['end'] = end
-            features['when'] = {'timespans': [time]}
+        if 'when' in meta['show']:
+            if entity.begin_from or entity.end_from:  # pragma: nocover
+                time = {}
+                if entity.begin_from:
+                    start = {'earliest': format_date(entity.begin_from)}
+                    if entity.begin_to:
+                        start['latest'] = format_date(entity.begin_to)
+                    if entity.begin_comment:
+                        start['comment'] = entity.begin_comment
+                    time['start'] = start
+                if entity.end_from:
+                    end = {'earliest': format_date(entity.end_from)}
+                    if entity.end_to:
+                        end['latest'] = format_date(entity.end_to)
+                    if entity.end_comment:
+                        end['comment'] = entity.end_comment
+                    time['end'] = end
+                features['when'] = {'timespans': [time]}
 
         # Geonames
-        if geonames_link and geonames_link.range.class_.code == 'E18':
+        if geonames_link and geonames_link.range.class_.code == 'E18' \
+                and 'geometry' in meta['show']:
             geo_name = {}
             if geonames_link.type.name:
                 geo_name['type'] = Api.to_camelcase(geonames_link.type.name)
@@ -201,7 +219,7 @@ class Api:
         geometries = []
         shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
         features['geometry'] = {'type': 'GeometryCollection', 'geometries': []}
-        if entity.location:
+        if entity.location and 'geometry' in meta['show']:
             for geometry in Gis.get_by_id(entity.location.id):
                 geo_dict = {'type': shape[geometry['shape']],
                             'coordinates': geometry['geometry']['coordinates']}

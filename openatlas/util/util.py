@@ -24,7 +24,7 @@ from werkzeug.utils import redirect
 
 import openatlas
 from openatlas import app
-from openatlas.models.api_error import APIError
+from openatlas.models.api_helpers.api_error import APIError
 from openatlas.models.date import Date
 from openatlas.models.model import CidocClass, CidocProperty
 
@@ -217,11 +217,14 @@ def add_system_data(entity: 'Entity',
             data[_('imported by')] = link(info['import_user'])
         if info['import_origin_id']:
             data['origin ID'] = info['import_origin_id']
-        data['API'] = '<a href="{url}" target="_blank">GeoJSON</a>'.format(
-            url=url_for('api_entity', id_=entity.id)) + \
-                      ' <a class="btn btn-outline-primary btn-sm" href="{url}" target="_blank" title="Download">' \
-                      ' <i class="fas fa-download"></i> Download</a>'.format(
-                          url=url_for('api_download_entity', id_=entity.id))
+        data_api = '<a href="{url}" target="_blank">GeoJSON</a>'.format(url=url_for('api_entity',
+                                                                                    id_=entity.id))
+        data_api += '''
+            <a class="btn btn-outline-primary btn-sm" href="{url}" target="_blank" title="Download">
+                <i class="fas fa-download"></i> {label}
+            </a>'''.format(url=url_for('api_download_entity', id_=entity.id),
+                           label=uc_first('download'))
+        data['API'] = data_api
     return data
 
 
@@ -489,7 +492,8 @@ def truncate(string: Optional[str] = '', length: int = 40, span: bool = True) ->
         return string
     if not span:
         return string[:length] + '..'
-    return '<span title="' + string.replace('"', '') + '">' + string[:length] + '..' + '</span>'
+    return '<span title="' + string.replace('"', '') + '">' + string[:length] \
+           + '..' + '</span>'  # pragma: no cover
 
 
 def get_base_table_data(entity: 'Entity',

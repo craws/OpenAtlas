@@ -10,13 +10,21 @@ After following the instructions restart Apache and test if the application is w
 
     service apache2 restart
 
-### 5.3.0 to 5.4.0
+### 5.4.0 to 5.5.0
 
 Execute install/upgrade/5.4.0.sql after making backups
 
 There are now more module settings in admin/modules which can be set as default. They can be
 overridden in user profiles so you might want to check the default settings and your own
 profile after the upgrade.
+
+### 5.3.0 to 5.4.0
+
+**Important**: we renamed our main branch which is also used for productive systems from **master**
+to **main**. For this upgrade you have to fetch and checkout the **main** branch. You can delete
+the master branch afterwards.
+
+Otherwise it's a normal code update without database changes.
 
 ### 5.2.0 to 5.3.0
 
