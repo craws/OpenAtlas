@@ -45,14 +45,15 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
     dirs = {'uploads': True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False,
             'export/sql': True if os.access(export_path.joinpath('sql'), os.W_OK) else False,
             'export/csv': True if os.access(export_path.joinpath('csv'), os.W_OK) else False}
-    tables = {'user': Table(['username', 'group', 'email', 'newsletter', 'created', 'last login',
-                             'entities']),
+    tables = {'user': Table(['username', 'name', 'group', 'email', 'newsletter', 'created',
+                             'last login', 'entities']),
               'content': Table(['name'] + [language for language in app.config['LANGUAGES'].keys()]
                                + ['text'])}
     for user in User.get_all():
         count = User.get_created_entities_count(user.id)
         email = user.email if is_authorized('manager') or user.settings['show_email'] else ''
         tables['user'].rows.append([link(user),
+                                    user.real_name,
                                     user.group,
                                     email,
                                     _('yes') if user.settings['newsletter'] else '',

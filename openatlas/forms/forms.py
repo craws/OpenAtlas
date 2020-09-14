@@ -555,7 +555,7 @@ def set_form_settings(form: Any) -> None:
 def get_profile_form_settings(form: Any) -> Dict[str, str]:
     settings = {}
     if isinstance(form, ProfileForm):
-        return {'name': current_user.username,
+        return {'name': current_user.real_name,
                 'email': current_user.email,
                 'show_email': _('on') if current_user.settings['show_email'] else _('off'),
                 'newsletter': _('on') if current_user.settings['newsletter'] else _('off')}
@@ -578,5 +578,11 @@ def get_profile_form_settings(form: Any) -> Dict[str, str]:
 def set_form_profile_settings(form: Any) -> None:
     for field in form:
         if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
+            continue
+        if field.name == 'name':
+            field.data = current_user.real_name
+            continue
+        if field.name == 'email':
+            field.data = current_user.email
             continue
         field.data = current_user.settings[field.name]
