@@ -7,7 +7,7 @@ import jinja2
 from flask import g, request, session, url_for
 from flask_babel import format_number as babel_format_number, lazy_gettext as _
 from flask_login import current_user
-from jinja2 import escape, evalcontextfilter
+from jinja2 import escape
 from markupsafe import Markup
 from wtforms import IntegerField
 from wtforms.validators import Email
