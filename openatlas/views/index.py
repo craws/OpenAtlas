@@ -81,7 +81,7 @@ def set_locale(language: str) -> Response:
     session['language'] = language
     if hasattr(current_user, 'id') and current_user.id:
         current_user.settings['language'] = language
-        current_user.update_settings()
+        current_user.update_language()
     return redirect(request.referrer)
 
 
@@ -155,8 +155,8 @@ def index_unsubscribe(code: str) -> str:
     text = _('unsubscribe link not valid')
     if user:  # pragma: no cover
         user.settings['newsletter'] = ''
-        user.update()
         user.unsubscribe_code = ''
-        user.update_settings()
+        user.update()
+        user.remove_newsletter()
         text = _('You have successfully unsubscribed. You can subscribe again in your Profile.')
     return render_template('index/unsubscribe.html', text=text)

@@ -14,12 +14,22 @@ class ProfileTests(TestBaseCase):
             rv = self.app.get(url_for('profile_settings', category='profile'))
             assert b'Alice' in rv.data
             data = {'name': 'Alice Abernathy',
-                    'email': 'alice@umbrella.net'}
+                    'email': 'alice@umbrella.net',
+                    'show_email': ''}
             rv = self.app.post(url_for('profile_settings', category='profile'),
                                data=data,
                                follow_redirects=True)
             assert b'saved' in rv.data
             assert b'Alice Abernathy' in rv.data
+            rv = self.app.post(url_for('profile_settings', category='display'),
+                               data={'language': 'en',
+                                     'table_rows': 10,
+                                     'layout': 'default',
+                                     'map_zoom_default': 10,
+                                     'map_zoom_max': 10},
+                               follow_redirects=True)
+            assert b'saved' in rv.data
+            assert b'English' in rv.data
 
             # Change password
             rv = self.app.get(url_for('profile_password'))

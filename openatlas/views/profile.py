@@ -13,8 +13,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.admin_forms import DisplayForm, ModulesForm, ProfileForm
-from openatlas.forms.forms import get_form_settings, get_profile_form_settings, \
-    set_form_profile_settings, set_form_settings
+from openatlas.forms.forms import get_profile_form_settings, set_form_profile_settings
 from openatlas.util.util import required_group, uc_first
 
 
@@ -72,7 +71,7 @@ def profile_settings(category: str) -> Union[str, Response]:
         g.cursor.execute('BEGIN')
         try:
             current_user.update()
-            current_user.update_settings()
+            current_user.update_settings(form)
             g.cursor.execute('COMMIT')
             session['language'] = current_user.settings['language']
             flash(_('info update'), 'info')

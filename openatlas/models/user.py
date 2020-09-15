@@ -15,7 +15,6 @@ from werkzeug.exceptions import abort
 
 from openatlas.models.entity import Entity
 from openatlas.util.util import is_authorized
-from openatlas.views.profile import ProfileForm
 
 
 class User(UserMixin):  # type: ignore
@@ -67,20 +66,32 @@ class User(UserMixin):  # type: ignore
                         'password_reset_code': self.password_reset_code,
                         'password_reset_date': self.password_reset_date})
 
-    def update_settings(self) -> None:
-        for name, value in self.settings.items():
-            if name in ['module_geonames',
-                        'module_map_overlay',
-                        'module_notes',
-                        'newsletter',
-                        'table_show_aliases',
-                        'show_email']:
-                value = 'True' if self.settings[name] else ''
+    def update_settings(self, form) -> None:
+        for field in form:
+            if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField'] or \
+                    field.name in ['name', 'email']:
+                continue
+            value = field.data
+            if field.type == 'BooleanField':
+                value = 'True' if value else ''
+            elif field.type == 'IntegerField' or field.name == 'table_rows':
+                value = int(value)
             sql = """
                 INSERT INTO web.user_settings (user_id, "name", "value")
                 VALUES (%(user_id)s, %(name)s, %(value)s)
                 ON CONFLICT (user_id, name) DO UPDATE SET "value" = excluded.value;"""
-            g.execute(sql, {'user_id': self.id, 'name': name, 'value': value})
+            g.execute(sql, {'user_id': self.id, 'name': field.name, 'value': value})
+
+    def remove_newsletter(self):
+        sql = "DELETE FROM web.user_settings WHERE name = 'newsletter' AND user_id = %(user_id)s;"
+        g.execute(sql, {'user_id': self.id})
+
+    def update_language(self):
+        sql = """
+            INSERT INTO web.user_settings (user_id, "name", "value")
+            VALUES (%(user_id)s, 'language', %(value)s)
+            ON CONFLICT (user_id, name) DO UPDATE SET "value" = excluded.value;"""
+        g.execute(sql, {'user_id': self.id, 'value': current_user.settings['language']})
 
     def login_attempts_exceeded(self) -> bool:
         failed_login_tries = int(session['settings']['failed_login_tries'])
@@ -224,10 +235,6 @@ class User(UserMixin):  # type: ignore
             settings[row.name] = row.value
             if row.name in ['table_rows']:
                 settings[row.name] = int(row.value)
-            #if form_field.type == 'BooleanField':
-            #    value = True if value == 'True' else False
-            #elif form_field.type == 'IntegerField' or form_field.name == 'table_rows':
-            #    value = int(value)
         return settings
 
     @staticmethod
