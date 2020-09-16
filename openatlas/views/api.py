@@ -87,6 +87,8 @@ def api_get_entities_by_json() -> Response:  # pragma: nocover
 def api_get_by_menu_item(code: str) -> Response:
     validation = Validation.validate_url_query(request.args)
     try:
+        if validation['count']:
+            return jsonify(len(Api.get_entities_by_menu_item(code_=code, meta=validation)))
         Api.get_entities_by_menu_item(code_=code, meta=validation)
         return jsonify(Api.pagination(Api.get_entities_by_menu_item(code_=code, meta=validation),
                                       meta=validation))
@@ -101,6 +103,8 @@ def api_get_by_class(class_code: str) -> Response:
     validation = Validation.validate_url_query(request.args)
     if len(Api.get_entities_by_class(class_code_=class_code, meta=validation)) == 0:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404d")
+    if validation['count']:
+        return jsonify(len(Api.get_entities_by_class(class_code_=class_code, meta=validation)))
     return jsonify(
         Api.pagination(Api.get_entities_by_class(class_code_=class_code, meta=validation),
                        meta=validation))
@@ -123,6 +127,7 @@ def api_get_query() -> Response:  # pragma: nocover
     validation = Validation.validate_url_query(request.args)
     if request.args:
         out = []
+        count = 0
         if request.args.getlist('entities[]'):
             entities = request.args.getlist('entities[]')
             ids = []
@@ -132,6 +137,7 @@ def api_get_query() -> Response:  # pragma: nocover
                 except Exception:
                     raise APIError('Syntax is incorrect!', status_code=404, payload="404b")
             result = Api.pagination(ids, meta=validation)
+            count += len(result) - 1
             out.append({'entities': result})
         if request.args.getlist('items[]'):
             items = request.args.getlist('items[]')
@@ -139,7 +145,9 @@ def api_get_query() -> Response:  # pragma: nocover
                 try:
                     out.append({'result': Api.pagination(
                         Api.get_entities_by_menu_item(code_=i, meta=validation), meta=validation),
-                                'code': i})
+                        'code': i})
+                    if validation['count']:
+                        count += len(Api.get_entities_by_menu_item(code_=i, meta=validation))
                 except Exception:
                     raise APIError('Syntax is incorrect!', status_code=404, payload="404c")
         if request.args.getlist('classes[]'):
@@ -150,6 +158,10 @@ def api_get_query() -> Response:  # pragma: nocover
                 out.append({'result': Api.pagination(
                     Api.get_entities_by_class(class_code_=class_code, meta=validation),
                     meta=validation), 'class': class_code})
+                if validation['count']:
+                    count += len(Api.get_entities_by_class(class_code_=class_code, meta=validation))
+        if validation['count']:
+            return jsonify(count)
         return jsonify(out)
     else:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404")

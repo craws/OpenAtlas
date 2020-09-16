@@ -69,6 +69,8 @@ class ApiTests(TestBaseCase):
                 url_for('api_get_by_menu_item', code='place', limit=10, sort='desc', column='name',
                         filter='or(eq,name,Nostromos)', first=place_id))
             assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('api_get_by_menu_item', code='place', count='none'))
+            assert b'3' in rv.data
             rv = self.app.get(url_for('api_get_by_menu_item', code='reference'))
             assert b'openatlas' in rv.data
 
@@ -97,8 +99,10 @@ class ApiTests(TestBaseCase):
             assert b'@context"' in rv.data
             rv = self.app.get(url_for('api_get_by_class', class_code='E33', show='types'))
             assert b'Necronomicon' in rv.data
-            rv = self.app.get(url_for('api_get_by_class', class_code='E33', show='not'))
+            rv = self.app.get(url_for('api_get_by_class', class_code='E33', show='none'))
             assert b'Necronomicon' in rv.data
+            rv = self.app.get(url_for('api_get_by_class', class_code='E33', count='none'))
+            assert b'1' in rv.data
 
             # Test for error codes
             rv = self.app.get(url_for('api_entity', id_=99999999))

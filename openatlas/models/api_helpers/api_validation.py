@@ -10,6 +10,7 @@ class Validation:
                'last': None,
                'first': None,
                'show': ['when', 'types', 'relations', 'names', 'links', 'geometry', 'depictions'],
+               'count': False,
                'subtype': False}
     column = ['id', 'class_code', 'name', 'description', 'created', 'modified', 'system_type',
               'begin_from', 'begin_to', 'end_from', 'end_to']
@@ -28,6 +29,7 @@ class Validation:
                  'last': Validation.validate_last(query.getlist('last')),
                  'first': Validation.validate_first(query.getlist('first')),
                  'show': Validation.validate_show(query.getlist('show')),
+                 'count': Validation.validate_count(query.getlist('count')),
                  'subtype': Validation.validate_subtype(query.get('subtype'))}
         return query
 
@@ -59,59 +61,48 @@ class Validation:
         return filter_query
 
     @staticmethod
-    def validate_limit(limit: List[Any]) -> Union[str, int]:
-        limit_ = []
+    def validate_limit(limit: List[Any]) -> Union[bool, List[str], str, None]:
+        limit_ = [Validation.default['limit']]
         if limit:
             for item in limit:
                 if item.isdigit():
-                    limit_.append(item)
-        else:
-            limit_.append(Validation.default['limit'])
+                    limit_ = [item]
         return limit_[0]
 
     @staticmethod
     def validate_sort(sort: List[Any]) -> Union[bool, List[str], str, None]:
-        sort_ = []
+        sort_ = [Validation.default['sort']]
         if sort:
             for item in reversed(sort):
                 if isinstance(item, str) and item.lower() in ['asc', 'desc']:
-                    sort_.append(item)
-            return sort_[0]
-        else:
-            return Validation.default['sort']
+                    sort_ = [item]
+        return sort_[0]
 
     @staticmethod
     def validate_column(column: List[Any]) -> Union[List[str], str, None]:
-        column_ = []
+        column_ = [str(Validation.default['column'])]
         if column:
             for item in column:
                 if isinstance(item, str) and item.lower() in Validation.column:
-                    column_.append(item)
-
-        else:
-            column_.append(str(Validation.default['column']))
+                    column_ = [item]
         return column_
 
     @staticmethod
-    def validate_last(last: List[Any]) -> Union[str, int]:
-        last_ = []
+    def validate_last(last: List[Any]) -> Union[bool, List[str], str, None]:
+        last_ = [Validation.default['last']]
         if last:
             for item in last:
                 if item.isdigit():
-                    last_.append(item)
-        else:
-            last_.append(Validation.default['last'])
+                    last_ = [item]
         return last_[0]
 
     @staticmethod
-    def validate_first(first: List[Any]) -> Union[str, int]:
-        first_ = []
+    def validate_first(first: List[Any]) -> Union[bool, List[str], str, None]:
+        first_ = [Validation.default['first']]
         if first:
             for item in first:
                 if item.isdigit():
-                    first_.append(item)
-        else:
-            first_.append(Validation.default['first'])
+                    first_ = [item]
         return first_[0]
 
     @staticmethod
@@ -123,9 +114,17 @@ class Validation:
                 show_.append(pattern)
         if not show_:
             show_.extend(valid)
-        if 'not' in show:
+        if 'none' in show:
             show_.clear()
         return show_
+
+    @staticmethod
+    def validate_count(count: bool) -> bool:
+        count_ = False
+        if count:
+            count_ = True
+        return count_
+
 
     @staticmethod
     def validate_subtype(subtype: str) -> bool:
