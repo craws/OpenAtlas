@@ -173,7 +173,7 @@ class Api:
         if Api.get_node(entity) and 'types' in meta['show']:
             features['types'] = Api.get_node(entity)
 
-        if entity.aliases:  # pragma: nocover
+        if entity.aliases and 'names' in meta['show']:  # pragma: nocover
             features['names'] = []
             for key, value in entity.aliases.items():
                 features['names'].append({"alias": value})
