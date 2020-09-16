@@ -74,8 +74,7 @@ class Validation:
             for item in reversed(sort):
                 if isinstance(item, str) and item.lower() in ['asc', 'desc']:
                     sort_ = [item]
-            return sort_[0]
-
+        return sort_[0]
 
     @staticmethod
     def validate_column(column: List[Any]) -> Union[List[str], str, None]:
@@ -108,12 +107,15 @@ class Validation:
     def validate_show(show: List[str]) -> List[str]:
         show_ = []
         valid = ['when', 'types', 'relations', 'names', 'links', 'geometry', 'depictions']
+        print(show)
         for pattern in valid:
+            print(pattern)
             if re.search(pattern, str(show)):
                 show_.append(pattern)
         if not show_:
             show_.extend(valid)
         if 'none' in show:
+            print("trigger")
             show_.clear()
         return show_
 
