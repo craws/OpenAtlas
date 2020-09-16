@@ -61,7 +61,7 @@ class Validation:
         return filter_query
 
     @staticmethod
-    def validate_limit(limit: List[Any]) -> Union[str, int]:
+    def validate_limit(limit: List[Any]) -> Union[bool, List[str], str, None]:
         limit_ = [Validation.default['limit']]
         if limit:
             for item in limit:
@@ -88,7 +88,7 @@ class Validation:
         return column_
 
     @staticmethod
-    def validate_last(last: List[Any]) -> Union[str, int]:
+    def validate_last(last: List[Any]) -> Union[bool, List[str], str, None]:
         last_ = [Validation.default['last']]
         if last:
             for item in last:
@@ -97,7 +97,7 @@ class Validation:
         return last_[0]
 
     @staticmethod
-    def validate_first(first: List[Any]) -> Union[str, int]:
+    def validate_first(first: List[Any]) -> Union[bool, List[str], str, None]:
         first_ = [Validation.default['first']]
         if first:
             for item in first:
