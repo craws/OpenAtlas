@@ -10,6 +10,7 @@ class Validation:
                'last': None,
                'first': None,
                'show': ['when', 'types', 'relations', 'names', 'links', 'geometry', 'depictions'],
+               'count': False,
                'subtype': False}
     column = ['id', 'class_code', 'name', 'description', 'created', 'modified', 'system_type',
               'begin_from', 'begin_to', 'end_from', 'end_to']
@@ -28,6 +29,7 @@ class Validation:
                  'last': Validation.validate_last(query.getlist('last')),
                  'first': Validation.validate_first(query.getlist('first')),
                  'show': Validation.validate_show(query.getlist('show')),
+                 'count': Validation.validate_count(query.getlist('count')),
                  'subtype': Validation.validate_subtype(query.get('subtype'))}
         return query
 
@@ -115,6 +117,14 @@ class Validation:
         if 'none' in show:
             show_.clear()
         return show_
+
+    @staticmethod
+    def validate_count(count: bool) -> bool:
+        count_ = False
+        if count:
+            count_ = True
+        return count_
+
 
     @staticmethod
     def validate_subtype(subtype: str) -> bool:
