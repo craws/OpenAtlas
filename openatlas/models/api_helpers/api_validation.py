@@ -60,13 +60,11 @@ class Validation:
 
     @staticmethod
     def validate_limit(limit: List[Any]) -> Union[str, int]:
-        limit_ = []
+        limit_ = [Validation.default['limit']]
         if limit:
             for item in limit:
                 if item.isdigit():
-                    limit_.append(item)
-        else:
-            limit_.append(Validation.default['limit'])
+                    limit_ = [item]
         return limit_[0]
 
     @staticmethod
