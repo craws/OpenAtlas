@@ -11,6 +11,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
+from openatlas.models.node import Node
 from openatlas.util.util import format_date, get_file_path
 
 
@@ -142,7 +143,7 @@ class Api:
             nodes_dict['hierarchy'] = ' > '.join(map(str, hierarchy))
 
             nodes.append(nodes_dict)
-
+            print(nodes)
         return nodes
 
     @staticmethod
@@ -161,6 +162,8 @@ class Api:
                     'crmClass': "crm:" + class_code,
                     'properties': {'title': entity.name}}
 
+        for n in entity.nodes:
+            print(n)
         # Relations
         if Api.get_links(entity) and 'relations' in meta['show']:
             features['relations'] = Api.get_links(entity)
