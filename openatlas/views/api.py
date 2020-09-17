@@ -9,7 +9,8 @@ from openatlas.models.api_helpers.api_validation import Validation
 from openatlas.util.util import api_access
 
 
-# Todo: unit test
+# Todo: unit test -> remove # pragma: nocover
+# Todo: prevent code duplication
 
 
 @app.route('/api/0.1/entity/<id_>', strict_slashes=False)
