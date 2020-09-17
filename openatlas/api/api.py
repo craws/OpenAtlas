@@ -5,8 +5,8 @@ from typing import Any, Dict, List
 from flask import g, session, url_for
 
 from openatlas import app
-from openatlas.models.api_helpers.api_error import APIError
-from openatlas.models.api_helpers.api_sql import Query
+from openatlas.api.error import APIError
+from openatlas.api.sql import Query
 from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
 from openatlas.models.gis import Gis

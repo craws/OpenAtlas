@@ -10,7 +10,7 @@ from wtforms import SelectField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.models.api_helpers.api_error import APIError
+from openatlas.api.error import APIError
 from openatlas.models.content import Content
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
