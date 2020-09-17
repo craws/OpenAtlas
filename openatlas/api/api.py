@@ -120,7 +120,6 @@ class Api:
             entities.append(Api.get_entity(entity.id, meta=meta))
         return entities
 
-
     @staticmethod
     def get_node(entity: Entity) -> List[Dict[str, Any]]:
         nodes = []
