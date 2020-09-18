@@ -12,20 +12,17 @@ class APINode:
     def get_node(id_: int) -> List[Dict[str, Any]]:
         if id_ not in g.nodes:
             raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
-
         entities = g.nodes[id_].get_linked_entities(['P2', 'P89'], inverse=True)
         data = []
         for e in entities:
             data.append({'id': e.id, 'label': e.name,
                          'url': url_for('api_entity', id_=e.id, _external=True)})
-
         return data
 
     @staticmethod
     def get_node_all(id_: int) -> List[Dict[str, Any]]:
         if id_ not in g.nodes:
             raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
-
         return APINode.get_recursiv_node_entities(id_, [])
 
     @staticmethod
@@ -39,11 +36,3 @@ class APINode:
             APINode.get_recursiv_node_entities(sub_id, data)
         return data
 
-# for stratographical things and features
-# node = g.nodes[id_]
-# structure = get_structure(node)
-# print(structure)
-# for n in structure['subunits']:
-#     print(n.nodes)
-#     for ni in n.nodes:
-#         print(ni.name)
