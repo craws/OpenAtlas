@@ -2,6 +2,7 @@ from typing import List, Optional, Union
 
 from flask import g, url_for
 from flask_babel import format_number, lazy_gettext as _
+from flask_login import current_user
 
 from openatlas import app
 from openatlas.models.entity import Entity
@@ -101,10 +102,10 @@ class Tab:
                     label = g.classes[code].name
                     buttons.append(button(label, url_for('event_insert', code=code, origin_id=id_)))
         elif name == 'feature':
-            if system_type == 'place':
+            if current_user.settings['module_sub_units'] and system_type == 'place':
                 buttons = [button(_('feature'), url_for('place_insert', origin_id=id_))]
         elif name == 'find':
-            if system_type == 'stratigraphic unit':
+            if current_user.settings['module_sub_units'] and system_type == 'stratigraphic unit':
                 buttons = [button(_('find'), url_for('place_insert', origin_id=id_))]
         elif name == 'file':
             table.header = Table.HEADERS['file'] + [_('main image')]
@@ -115,7 +116,7 @@ class Tab:
                 buttons = [button(_('link'), url_for('entity_add_file', id_=id_))]
             buttons.append(button(_('file'), url_for('file_insert', origin_id=id_)))
         elif name == 'human_remains':
-            if system_type == 'stratigraphic unit':
+            if current_user.settings['module_sub_units'] and system_type == 'stratigraphic unit':
                 buttons = [button(_('human remains'), url_for('place_insert',
                                                               origin_id=id_,
                                                               system_type='human_remains'))]
@@ -165,7 +166,7 @@ class Tab:
             else:
                 table.header = Table.HEADERS['event']
         elif name == 'stratigraphic_unit':
-            if system_type == 'feature':
+            if current_user.settings['module_sub_units'] and system_type == 'feature':
                 buttons = [button(_('stratigraphic unit'), url_for('place_insert', origin_id=id_))]
         elif name == 'text':
             buttons = [button(_('text'), url_for('translation_insert', source_id=id_))]
