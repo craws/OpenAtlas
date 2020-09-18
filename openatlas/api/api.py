@@ -5,12 +5,14 @@ from typing import Any, Dict, List
 from flask import g, session, url_for
 
 from openatlas import app
-from openatlas.models.api_helpers.api_error import APIError
-from openatlas.models.api_helpers.api_sql import Query
+from openatlas.api.error import APIError
+from openatlas.api.sql import Query
 from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
+from openatlas.models.node import Node
+from openatlas.models.place import get_structure
 from openatlas.util.util import format_date, get_file_path
 
 
@@ -120,7 +122,6 @@ class Api:
             entities.append(Api.get_entity(entity.id, meta=meta))
         return entities
 
-
     @staticmethod
     def get_node(entity: Entity) -> List[Dict[str, Any]]:
         nodes = []
@@ -140,7 +141,6 @@ class Api:
                 hierarchy.append(g.nodes[root].name)  # pragma: nocover
             hierarchy.reverse()
             nodes_dict['hierarchy'] = ' > '.join(map(str, hierarchy))
-
             nodes.append(nodes_dict)
 
         return nodes
@@ -160,6 +160,14 @@ class Api:
                     'type': 'Feature',
                     'crmClass': "crm:" + class_code,
                     'properties': {'title': entity.name}}
+
+        # # for stratographical things and features
+        # structure = get_structure(entity)
+        # print(structure)
+        # for n in structure['subunits']:
+        #     print(n.nodes)
+        #     for node in n.nodes:
+        #         print(node.name)
 
         # Relations
         if Api.get_links(entity) and 'relations' in meta['show']:

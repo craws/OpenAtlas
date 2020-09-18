@@ -1,12 +1,15 @@
 import re
-from typing import Any, Dict, Iterable, List, Union
+from typing import Any, Dict, List, Optional, Union
+
+
+class Default:
+    limit: int = 20
+    sort: str = 'ASC'
+    filter: str = ''
 
 
 class Validation:
-    default = {'filter': '',
-               'limit': '20',
-               'sort': 'ASC',
-               'column': 'name',
+    default = {'column': 'name',
                'last': None,
                'first': None,
                'show': ['when', 'types', 'relations', 'names', 'links', 'geometry', 'depictions'],
@@ -22,9 +25,9 @@ class Validation:
 
     @staticmethod
     def validate_url_query(query: Any) -> Dict[str, Any]:
-        query = {'filter': Validation.validate_filter(query.getlist('filter')),
-                 'limit': Validation.validate_limit(query.getlist('limit')),
-                 'sort': Validation.validate_sort(query.getlist('sort')),
+        query = {'filter': Validation.validate_filter(query.get('filter')),
+                 'limit': Validation.validate_limit(query.get('limit')),
+                 'sort': Validation.validate_sort(query.get('sort')),
                  'column': Validation.validate_column(query.getlist('column')),
                  'last': Validation.validate_last(query.getlist('last')),
                  'first': Validation.validate_first(query.getlist('first')),
@@ -34,10 +37,12 @@ class Validation:
         return query
 
     @staticmethod
-    def validate_filter(filter_: Iterable[str]) -> str:
-        filter_ = re.findall(r'(\w+)\((.*?)\)', ''.join(filter_))
+    def validate_filter(filter_: str) -> str:
+        if not filter_:
+            return Default.filter
+
         filter_query = ''
-        for item in filter_:
+        for item in re.findall(r'(\w+)\((.*?)\)', filter_):
             operator = item[0].lower()
             if operator in Validation.operators_dict:
                 filter_query += Validation.operators_dict[operator]
@@ -61,22 +66,12 @@ class Validation:
         return filter_query
 
     @staticmethod
-    def validate_limit(limit: List[Any]) -> Union[bool, List[str], str, None]:
-        limit_ = [Validation.default['limit']]
-        if limit:
-            for item in limit:
-                if item.isdigit():
-                    limit_ = [item]
-        return limit_[0]
+    def validate_limit(limit: Optional[str] = None) -> int:
+        return int(limit) if limit and limit.isdigit() else Default.limit
 
     @staticmethod
-    def validate_sort(sort: List[Any]) -> Union[bool, List[str], str, None]:
-        sort_ = [Validation.default['sort']]
-        if sort:
-            for item in reversed(sort):
-                if isinstance(item, str) and item.lower() in ['asc', 'desc']:
-                    sort_ = [item]
-        return sort_[0]
+    def validate_sort(sort: Optional[str] = None) -> str:
+        return Default.sort if not sort or sort.lower() != 'desc' else 'DESC'
 
     @staticmethod
     def validate_column(column: List[Any]) -> Union[List[str], str, None]:
@@ -124,7 +119,6 @@ class Validation:
         if count:
             count_ = True
         return count_
-
 
     @staticmethod
     def validate_subtype(subtype: str) -> bool:

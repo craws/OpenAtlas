@@ -3,13 +3,15 @@ from flask_cors import cross_origin
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.models.api import Api
-from openatlas.models.api_helpers.api_error import APIError
-from openatlas.models.api_helpers.api_validation import Validation
+from openatlas.api.api import Api
+from openatlas.api.error import APIError
+from openatlas.api.node import APINode
+from openatlas.api.validation import Validation
 from openatlas.util.util import api_access
 
 
-# Todo: unit test
+# Todo: unit test -> remove # pragma: nocover
+# Todo: prevent code duplication
 
 
 @app.route('/api/0.1/entity/<id_>', strict_slashes=False)
@@ -165,6 +167,28 @@ def api_get_query() -> Response:  # pragma: nocover
         return jsonify(out)
     else:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404")
+
+
+@app.route('/api/0.1/node_entities/<id_>', strict_slashes=False)
+@api_access()  # type: ignore
+@cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
+def api_node_entities(id_: int) -> Response:
+    try:
+        out = APINode.get_node(int(id_))
+    except Exception:
+        raise APIError('Syntax is incorrect!', status_code=404, payload="404b")
+    return jsonify(out)
+
+
+@app.route('/api/0.1/node_entities_all/<id_>', strict_slashes=False)
+@api_access()  # type: ignore
+@cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
+def api_node_entities_all(id_: int) -> Response:
+    try:
+        out = APINode.get_node_all(int(id_))
+    except Exception:
+        raise APIError('Syntax is incorrect!', status_code=404, payload="404b")
+    return jsonify(out)
 
 
 @app.route('/api', strict_slashes=False)
