@@ -84,7 +84,7 @@ class ApiTests(TestBaseCase):
                         filter='or(eq,name,Nostromos)', first=place_id))
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('api_get_by_menu_item', code='place', count='none'))
-            assert b'3' in rv.data
+            assert b'4' in rv.data
             rv = self.app.get(url_for('api_get_by_menu_item', code='reference'))
             assert b'openatlas' in rv.data
 

@@ -141,9 +141,8 @@ class Api:
                 hierarchy.append(g.nodes[root].name)  # pragma: nocover
             hierarchy.reverse()
             nodes_dict['hierarchy'] = ' > '.join(map(str, hierarchy))
-
             nodes.append(nodes_dict)
-            print(nodes)
+
         return nodes
 
     @staticmethod
@@ -162,13 +161,13 @@ class Api:
                     'crmClass': "crm:" + class_code,
                     'properties': {'title': entity.name}}
 
-        # for stratographical things and features
-        structure = get_structure(entity)
-        print(structure)
-        for n in structure['subunits']:
-            print(n.nodes)
-            for node in n.nodes:
-                print(node.name)
+        # # for stratographical things and features
+        # structure = get_structure(entity)
+        # print(structure)
+        # for n in structure['subunits']:
+        #     print(n.nodes)
+        #     for node in n.nodes:
+        #         print(node.name)
 
         # Relations
         if Api.get_links(entity) and 'relations' in meta['show']:
