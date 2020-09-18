@@ -103,12 +103,13 @@ def api_get_by_menu_item(code: str) -> Response:
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_get_by_class(class_code: str) -> Response:
     validation = Validation.validate_url_query(request.args)
-    out = Api.get_entities_by_class(class_code_=class_code, meta=validation)
-    if len(out) == 0:
+    if len(Api.get_entities_by_class(class_code_=class_code, meta=validation)) == 0:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404d")
     if validation['count']:
-        return jsonify(len(out))
-    return jsonify(Api.pagination(out, meta=validation))
+        return jsonify(len(Api.get_entities_by_class(class_code_=class_code, meta=validation)))
+    return jsonify(
+        Api.pagination(Api.get_entities_by_class(class_code_=class_code, meta=validation),
+                       meta=validation))
 
 
 @app.route('/api/0.1/latest/<int:limit>', strict_slashes=False)

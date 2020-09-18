@@ -17,7 +17,7 @@ class APINode:
         data = []
         for e in entities:
             data.append({'id': e.id, 'label': e.name,
-                         'relation': url_for('api_entity', id_=e.id, _external=True)})
+                         'url': url_for('api_entity', id_=e.id, _external=True)})
 
         return data
 
@@ -33,7 +33,7 @@ class APINode:
         entities = g.nodes[id_].get_linked_entities(['P2', 'P89'], inverse=True)
         for e in entities:
             data.append({'id': e.id, 'label': e.name,
-                         'relation': url_for('api_entity', id_=e.id, _external=True)})
+                         'url': url_for('api_entity', id_=e.id, _external=True)})
         node = g.nodes[id_]
         for sub_id in node.subs:
             APINode.get_recursiv_node_entities(sub_id, data)
