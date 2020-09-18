@@ -314,11 +314,14 @@ class TableSelect(HiddenInput):  # type: ignore
             if len(entity.aliases) > 0:
                 data[0] = """
                     <p>
-                        <a onclick="selectFromTable(this,'{name}', {entity_id}, '{entity_name}')" href="#">{entity_name}</a>
+                        <a onclick="selectFromTable(this,'{name}', {entity_id}, '{entity_name}')"
+                            href="#">{entity_name}</a>
                     </p>""".format(name=field.id, entity_id=entity.id, entity_name=entity.name)
             else:
                 data[0] = """
-                    <a onclick="selectFromTable(this,'{name}', {entity_id}, '{entity_name}')" href="#">{entity_name}</a>
+                    <a
+                        onclick="selectFromTable(this,'{name}', {entity_id}, '{entity_name}')"
+                        href="#">{entity_name}</a>
                     """.format(name=field.id, entity_id=entity.id, entity_name=entity.name)
             for i, (id_, alias) in enumerate(entity.aliases.items()):
                 if i == len(entity.aliases) - 1:
@@ -327,9 +330,17 @@ class TableSelect(HiddenInput):  # type: ignore
                     data[0] = ''.join([data[0]] + ['<p>' + alias + '</p>'])
             data.insert(0, """
                 <div style="position: relative; top: 10px;" >
-                <div class="btn btn-outline-primary btn-sm" style="position: absolute; top: -30px; height: 27px" onclick="selectFromTable(this,'{name}', {entity_id}, '{entity_name}')">{label}</div>
+                    <div
+                        class="btn btn-outline-primary btn-sm"
+                        style="position: absolute; top: -30px; height: 27px"
+                        onclick="selectFromTable(this,'{name}', {entity_id}, '{entity_name}')">
+                            {label}
+                    </div>
                 </div>
-                """.format(name=field.id, entity_id=entity.id, entity_name=entity.name, label=uc_first(_('select'))))
+                """.format(name=field.id,
+                           entity_id=entity.id,
+                           entity_name=entity.name,
+                           label=uc_first(_('select'))))
             table.rows.append(data)
         html = """
             <input id="{name}-button" name="{name}-button" class="table-select {required}"
@@ -519,13 +530,18 @@ def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
                           table=table.display(class_name))
 
 
-def get_form_settings(form: Any) -> Dict[str, str]:
+def get_form_settings(form: Any, profile: bool = False) -> Dict[str, str]:
+    if isinstance(form, ProfileForm):
+        return {'name': current_user.real_name,
+                'email': current_user.email,
+                'show_email': _('on') if current_user.settings['show_email'] else _('off'),
+                'newsletter': _('on') if current_user.settings['newsletter'] else _('off')}
     settings = {}
     for field in form:
         if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
             continue
         label = uc_first(field.label.text)
-        value = session['settings'][field.name]
+        value = current_user.settings[field.name] if profile else session['settings'][field.name]
         if field.type in ['StringField', 'IntegerField']:
             settings[label] = value
         if field.type == 'BooleanField':
@@ -539,50 +555,23 @@ def get_form_settings(form: Any) -> Dict[str, str]:
     return settings
 
 
-def set_form_settings(form: Any) -> None:
+def set_form_settings(form: Any, profile: Optional[bool] = False) -> None:
     for field in form:
         if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
             continue
-        if field.name in ['log_level']:  # pragma: no cover
+        if profile and field.name == 'name':
+            field.data = current_user.real_name
+            continue
+        if profile and field.name == 'email':
+            field.data = current_user.email
+            continue
+        if profile:
+            field.data = current_user.settings[field.name]
+            continue
+        if field.name in ['log_level']:
             field.data = int(session['settings'][field.name])
             continue
         if field.name in ['mail_recipients_feedback', 'file_upload_allowed_extension']:
             field.data = ' '.join(session['settings'][field.name])
             continue
         field.data = session['settings'][field.name]
-
-
-def get_profile_form_settings(form: Any) -> Dict[str, str]:
-    settings = {}
-    if isinstance(form, ProfileForm):
-        return {'name': current_user.real_name,
-                'email': current_user.email,
-                'show_email': _('on') if current_user.settings['show_email'] else _('off'),
-                'newsletter': _('on') if current_user.settings['newsletter'] else _('off')}
-    for field in form:
-        if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
-            continue
-        label = uc_first(field.label.text)
-        value = current_user.settings[field.name]
-        if field.type in ['StringField', 'IntegerField']:
-            settings[label] = value
-        if field.type == 'BooleanField':
-            settings[label] = _('on') if value else _('off')
-        if field.type == 'SelectField':
-            if type(value) is str and value.isdigit():
-                value = int(value)
-            settings[label] = dict(field.choices).get(value)
-    return settings
-
-
-def set_form_profile_settings(form: Any) -> None:
-    for field in form:
-        if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
-            continue
-        if field.name == 'name':
-            field.data = current_user.real_name
-            continue
-        if field.name == 'email':
-            field.data = current_user.email
-            continue
-        field.data = current_user.settings[field.name]

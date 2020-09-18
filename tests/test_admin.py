@@ -114,14 +114,17 @@ class ContentTests(TestBaseCase):
                                follow_redirects=True)
             assert b'Max Headroom' in rv.data
 
+            rv = self.app.get(url_for('admin_settings', category='general'))
+            assert b'Log level' in rv.data
+
             # Content
             rv = self.app.get(url_for('admin_content', item='legal_notice'))
             assert b'Save' in rv.data
-            data = {'en': 'Legal notice', 'de': 'Impressum'}
+            data = {'en': 'My legal notice', 'de': 'German notice'}
             rv = self.app.post(url_for('admin_content', item='legal_notice'),
                                data=data,
                                follow_redirects=True)
-            assert b'Legal notice' in rv.data
+            assert b'My legal notice' in rv.data
             self.app.get('/index/setlocale/de')
-            rv = self.app.get('/', follow_redirects=True)
-            assert b'Impressum' in rv.data
+            rv = self.app.get(url_for('index_content', item='legal_notice'))
+            assert b'German notice' in rv.data

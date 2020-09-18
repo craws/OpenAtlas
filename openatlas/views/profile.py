@@ -13,7 +13,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.admin_forms import DisplayForm, ModulesForm, ProfileForm
-from openatlas.forms.forms import get_profile_form_settings, set_form_profile_settings
+from openatlas.forms.forms import get_form_settings, set_form_settings
 from openatlas.util.util import required_group, uc_first
 
 
@@ -48,9 +48,9 @@ class PasswordForm(FlaskForm):  # type: ignore
 @login_required
 def profile_index() -> str:
     return render_template('profile/index.html',
-                           info={'profile': get_profile_form_settings(ProfileForm()),
-                                 'modules': get_profile_form_settings(ModulesForm()),
-                                 'display': get_profile_form_settings(DisplayForm())})
+                           info={'profile': get_form_settings(ProfileForm(), True),
+                                 'modules': get_form_settings(ModulesForm(), True),
+                                 'display': get_form_settings(DisplayForm(), True)})
 
 
 @app.route('/profile/settings/<category>', methods=['POST', 'GET'])
@@ -80,7 +80,7 @@ def profile_settings(category: str) -> Union[str, Response]:
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         return redirect(url_for('profile_index') + '#tab-' + category)
-    set_form_profile_settings(form)
+    set_form_settings(form, True)
     return render_template('profile/settings.html', form=form, category=category)
 
 

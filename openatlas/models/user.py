@@ -19,6 +19,13 @@ from openatlas.util.util import is_authorized
 
 class User(UserMixin):  # type: ignore
 
+    sql = """
+        SELECT u.id, u.username, u.password, u.active, u.real_name, u.info, u.created, u.modified,
+            u.login_last_success, u.login_last_failure, u.login_failed_count, u.password_reset_code,
+            u.password_reset_date, u.email, r.name as group_name, u.unsubscribe_code
+        FROM web."user" u
+        LEFT JOIN web.group r ON u.group_id = r.id """
+
     def __init__(self,
                  row: NamedTupleCursor.Record = None,
                  bookmarks: Optional[List[int]] = None) -> None:
@@ -66,7 +73,7 @@ class User(UserMixin):  # type: ignore
                         'password_reset_code': self.password_reset_code,
                         'password_reset_date': self.password_reset_date})
 
-    def update_settings(self, form) -> None:
+    def update_settings(self, form: Any) -> None:
         for field in form:
             if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField'] or \
                     field.name in ['name', 'email']:
@@ -82,11 +89,11 @@ class User(UserMixin):  # type: ignore
                 ON CONFLICT (user_id, name) DO UPDATE SET "value" = excluded.value;"""
             g.execute(sql, {'user_id': self.id, 'name': field.name, 'value': value})
 
-    def remove_newsletter(self):
+    def remove_newsletter(self) -> None:  # pragma: no cover
         sql = "DELETE FROM web.user_settings WHERE name = 'newsletter' AND user_id = %(user_id)s;"
         g.execute(sql, {'user_id': self.id})
 
-    def update_language(self):
+    def update_language(self) -> None:
         sql = """
             INSERT INTO web.user_settings (user_id, "name", "value")
             VALUES (%(user_id)s, 'language', %(value)s)
@@ -103,13 +110,6 @@ class User(UserMixin):  # type: ignore
         if last_failure_date > datetime.datetime.now():
             return True
         return False  # pragma no cover - not waiting in tests for forget_minutes to pass
-
-    sql = """
-        SELECT u.id, u.username, u.password, u.active, u.real_name, u.info, u.created, u.modified,
-            u.login_last_success, u.login_last_failure, u.login_failed_count, u.password_reset_code,
-            u.password_reset_date, u.email, r.name as group_name, u.unsubscribe_code
-        FROM web."user" u
-        LEFT JOIN web.group r ON u.group_id = r.id """
 
     @staticmethod
     def get_all() -> List[User]:
@@ -190,7 +190,7 @@ class User(UserMixin):  # type: ignore
     def delete(id_: int) -> None:
         user = User.get_by_id(id_)
         if not is_authorized('manager') or user.id == current_user.id or (
-            (user.group == 'admin' and not is_authorized('admin'))):
+                (user.group == 'admin' and not is_authorized('admin'))):
             abort(403)  # pragma: no cover
         sql = 'DELETE FROM web."user" WHERE id = %(user_id)s;'
         g.execute(sql, {'user_id': id_})

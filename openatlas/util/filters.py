@@ -106,8 +106,6 @@ def display_info(self: Any, data: Dict[str, Union[str, List[str]]]) -> str:
     html = '<div class="data-table">'
     for label, value in data.items():
         if value or value == 0:
-            if isinstance(value, bool):  # Used in display of settings
-                value = _('on') if value else _('off')
             if isinstance(value, list):
                 value = '<br>'.join(value)
             html += '''
@@ -404,12 +402,6 @@ def display_form(self: Any,
 @blueprint.app_template_filter()
 def test_file(self: Any, file_name: str) -> Optional[str]:
     return file_name if os.path.isfile(app.root_path + '/' + file_name) else None
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
-def display_tooltip(self: Any, text: str) -> str:
-    return util.display_tooltip(text)
 
 
 @jinja2.contextfilter
