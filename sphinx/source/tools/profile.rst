@@ -28,17 +28,17 @@ Display
 
 Modules
 -------
-With modules you can decide which features you want the user interface to include.
+With module options you can adjust shown interface elements to your preferences. You will still
+e.g. existing sub units when you deactivate them but the interface elements to add them will
+disappear.
 
 * **GeoNames** - to use the GeoNames feature at :doc:`/menu/place` insert or update.
 * **Map Overlay** - to see overlays on the :doc:`/tools/map` or insert new ones (editor or above).
 * **Notes** - an additional tool for your workflow, e.g. to add a personal reminder to an entity.
 
-If notes are activated you can add notes with **+ Note** when viewing an entity. Notes will be
-displayed at the entity view and also all notes will be displayed at the :doc:`/menu/overview`.
-
-Be aware that:
-
-* Your notes are only visible to you (for public notes use the description field)
-* There is only one note per entity possible
-* Notes will get deleted if the entity is deleted by you or anybody else
+   * If activated you can add notes with **+ Note** when viewing an entity.
+   * Notes will be displayed at the entity and at the :doc:`/menu/overview`.
+   * Your notes are only visible to you (for public notes use the description field)
+   * There is only one note per entity possible
+   * Notes will get deleted if the entity is deleted by you or anybody else
+* **Sub units** - to insert archeological sub units at places, see: :doc:`/menu/place`
