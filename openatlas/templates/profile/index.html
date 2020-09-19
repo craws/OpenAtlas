@@ -8,7 +8,9 @@
     <div class="col-12">
         <ul class="nav nav-tabs" role="tablist">
             {{ 'profile'|tab_header(active=True) }}
-            {{ 'modules'|tab_header }}
+            {% if 'manager'|is_authorized %}
+                {{ 'modules'|tab_header }}
+            {% endif %}
             {{ 'display'|tab_header }}
         </ul>
         <div class="tab-content">
@@ -24,17 +26,19 @@
                     {{ info.profile|display_info }}
                 </div>
             </div>
-            <div class="tab-pane fade" role="tabpanel" id="tab-modules">
-                <div class="toolbar">
-                    {{ 'tools/profile'|manual }}
-                    {% if not config['DEMO_MODE'] %}
-                        {{ _('edit')|button(url_for('profile_settings', category='modules')) }}
-                    {% endif %}
+            {% if 'contributor'|is_authorized %}
+                <div class="tab-pane fade" role="tabpanel" id="tab-modules">
+                    <div class="toolbar">
+                        {{ 'tools/profile'|manual }}
+                        {% if not config['DEMO_MODE'] %}
+                            {{ _('edit')|button(url_for('profile_settings', category='modules')) }}
+                        {% endif %}
+                    </div>
+                    <div>
+                        {{ info.modules|display_info }}
+                    </div>
                 </div>
-                <div>
-                    {{ info.modules|display_info }}
-                </div>
-            </div>
+            {% endif %}
             <div class="tab-pane fade" role="tabpanel" id="tab-display">
                 <div class="toolbar">
                     {{ 'tools/profile'|manual }}

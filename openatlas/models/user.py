@@ -219,16 +219,14 @@ class User(UserMixin):  # type: ignore
         # Set defaults
         settings = {'layout': 'default',
                     'language': session['language'],
-                    'map_zoom_max': session['settings']['map_zoom_max'],
-                    'map_zoom_default': session['settings']['map_zoom_default'],
-                    'module_notes': False,
-                    'module_geonames': session['settings']['module_geonames'],
-                    'module_sub_units': session['settings']['module_sub_units'],
-                    'module_map_overlay': False,
                     'newsletter': False,
                     'table_rows': session['settings']['default_table_rows'],
                     'table_show_aliases': True,
                     'show_email': False}
+        for setting in session['settings']:
+            if setting in ['map_zoom_max', 'map_zoom_default'] or setting.startswith('module_'):
+                settings[setting] = session['settings'][setting]
+
         sql = 'SELECT "name", value FROM web.user_settings WHERE user_id = %(user_id)s;'
         g.execute(sql, {'user_id': user_id})
         for row in g.cursor.fetchall():
