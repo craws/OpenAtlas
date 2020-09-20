@@ -7,6 +7,7 @@ BEGIN;
 UPDATE model.entity SET name = TRIM(name);
 
 -- #929: Module options
+UPDATE web.settings SET name = 'table_rows' WHERE name = 'default_table_rows';
 INSERT INTO web.settings (name, value) VALUES
     ('module_geonames', ''),
     ('module_map_overlay', ''),

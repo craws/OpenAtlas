@@ -45,7 +45,7 @@ API_SCHEMA = 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master
 CORS_ALLOWANCE = '*'
 
 # Table options
-DEFAULT_TABLE_ROWS = {10: '10', 25: '25', 50: '50', 100: '100'}
+TABLE_ROWS = {10: '10', 25: '25', 50: '50', 100: '100'}
 
 # Minimum required characters for table filters
 MIN_CHARS_JSTREE_SEARCH = 1

@@ -24,9 +24,9 @@ class GeneralForm(FlaskForm):  # type: ignore
     site_name = StringField(_('site name'), [InputRequired()])
     default_language = SelectField(_('default language'),
                                    choices=list(app.config['LANGUAGES'].items()))
-    default_table_rows = SelectField(_('default table rows'),
-                                     coerce=int,
-                                     choices=list(app.config['DEFAULT_TABLE_ROWS'].items()))
+    table_rows = SelectField(_('default table rows'),
+                             coerce=int,
+                             choices=list(app.config['TABLE_ROWS'].items()))
     log_level = SelectField(_('log level'),
                             coerce=int,
                             choices=list(app.config['LOG_LEVELS'].items()))
@@ -113,7 +113,7 @@ class DisplayForm(FlaskForm):  # type: ignore
     language = SelectField(_('language'), choices=list(app.config['LANGUAGES'].items()))
     table_rows = SelectField(_('table rows'),
                              description=_('tooltip table rows'),
-                             choices=list(app.config['DEFAULT_TABLE_ROWS'].items()),
+                             choices=list(app.config['TABLE_ROWS'].items()),
                              coerce=int)
     table_show_aliases = BooleanField(_('show aliases in tables'))
     layout_choices = [('default', _('default')), ('advanced', _('advanced'))]

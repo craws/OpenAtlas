@@ -220,11 +220,11 @@ class User(UserMixin):  # type: ignore
         settings = {'layout': 'default',
                     'language': session['language'],
                     'newsletter': False,
-                    'table_rows': session['settings']['default_table_rows'],
                     'table_show_aliases': True,
                     'show_email': False}
         for setting in session['settings']:
-            if setting in ['map_zoom_max', 'map_zoom_default'] or setting.startswith('module_'):
+            if setting in ['map_zoom_max', 'map_zoom_default', 'table_rows'] or \
+                    setting.startswith('module_'):
                 settings[setting] = session['settings'][setting]
 
         sql = 'SELECT "name", value FROM web.user_settings WHERE user_id = %(user_id)s;'
