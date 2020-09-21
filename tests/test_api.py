@@ -1,4 +1,4 @@
-from flask import url_for, g
+from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
@@ -62,7 +62,7 @@ class ApiTests(TestBaseCase):
                                follow_redirects=True)
             assert b'Necronomicon' in rv.data
 
-            # API Tests
+            # View Tests
             rv = self.app.get(url_for('api_index'))
             assert b'Test API' in rv.data
             rv = self.app.get(url_for('api_get_latest', limit=10))
