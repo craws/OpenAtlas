@@ -83,8 +83,6 @@ class ApiTests(TestBaseCase):
                 url_for('api_get_by_menu_item', code='place', limit=10, sort='desc', column='name',
                         filter='or(eq,name,Nostromos)', first=place_id))
             assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('api_get_by_menu_item', code='place', count='none'))
-            assert b'3' in rv.data
             rv = self.app.get(url_for('api_get_by_menu_item', code='reference'))
             assert b'openatlas' in rv.data
 
@@ -112,8 +110,8 @@ class ApiTests(TestBaseCase):
             # Parameter: count
             rv = self.app.get(url_for('api_get_by_class', class_code='E33', count='none'))
             assert b'1' in rv.data
-            rv = self.app.get(url_for('api_get_by_menu_item', code='place', count='none'))
-            assert b'4' in rv.data
+            rv = self.app.get(url_for('api_get_by_menu_item', code='reference', count='none'))
+            assert b'2' in rv.data  # Assert can vary, to get around use \n
 
             # Error Codes
             rv = self.app.get(url_for('api_entity', id_=99999999))

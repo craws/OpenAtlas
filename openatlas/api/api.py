@@ -143,7 +143,6 @@ class Api:
             nodes_dict['hierarchy'] = ' > '.join(map(str, hierarchy))
 
             nodes.append(nodes_dict)
-            print(nodes)
         return nodes
 
     @staticmethod
