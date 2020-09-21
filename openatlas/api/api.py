@@ -162,14 +162,6 @@ class Api:
                     'crmClass': "crm:" + class_code,
                     'properties': {'title': entity.name}}
 
-        # for stratographical things and features
-        structure = get_structure(entity)
-        print(structure)
-        for n in structure['subunits']:
-            print(n.nodes)
-            for node in n.nodes:
-                print(node.name)
-
         # Relations
         if Api.get_links(entity) and 'relations' in meta['show']:
             features['relations'] = Api.get_links(entity)

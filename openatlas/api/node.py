@@ -1,9 +1,10 @@
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from flask import g, url_for
 
 from openatlas.api.error import APIError
 from openatlas.models.entity import Entity
+from openatlas.models.place import get_structure
 
 
 class APINode:
@@ -39,11 +40,23 @@ class APINode:
             APINode.get_recursiv_node_entities(sub_id, data)
         return data
 
-# for stratographical things and features
-# node = g.nodes[id_]
-# structure = get_structure(node)
-# print(structure)
-# for n in structure['subunits']:
-#     print(n.nodes)
-#     for ni in n.nodes:
-#         print(ni.name)
+    @staticmethod
+    def get_stratographic_node(id_: int) -> List[Dict[str, Any]]:
+        try:
+            entity = Entity.get_by_id(id_, nodes=True, aliases=True)
+
+        except Exception:
+            raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
+        return APINode.get_recursiv_stratographic_node(entity, [])
+
+    @staticmethod
+    def get_recursiv_stratographic_node(entity: Optional[Entity], data: List[Dict[str, Any]])\
+            -> List[Dict[str, Any]]:
+        structure = get_structure(entity)
+        for n in structure['subunits']:
+            data.append({'id': n.id, 'label': n.name,
+                         'url': url_for('api_entity', id_=n.id, _external=True)})
+        node = get_structure(entity)
+        for sub_id in node['subunits']:
+            APINode.get_recursiv_stratographic_node(sub_id, data)
+        return data
