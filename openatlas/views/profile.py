@@ -6,6 +6,7 @@ from flask import flash, g, render_template, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
+from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
 from wtforms import BooleanField, PasswordField, SubmitField
@@ -14,7 +15,7 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.forms.admin_forms import DisplayForm, ModulesForm, ProfileForm
 from openatlas.forms.forms import get_form_settings, set_form_settings
-from openatlas.util.util import required_group, uc_first
+from openatlas.util.util import is_authorized, uc_first
 
 
 class PasswordForm(FlaskForm):  # type: ignore
@@ -54,8 +55,10 @@ def profile_index() -> str:
 
 
 @app.route('/profile/settings/<category>', methods=['POST', 'GET'])
-@required_group('contributor')
+@login_required
 def profile_settings(category: str) -> Union[str, Response]:
+    if category not in ['profile', 'display'] and not is_authorized('contributor'):
+        abort(403)  # pragma: no cover
     form = getattr(importlib.import_module('openatlas.forms.admin_forms'),
                    uc_first(category) + 'Form')()  # Get forms dynamically
     if form.validate_on_submit():
