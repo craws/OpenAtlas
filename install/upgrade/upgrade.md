@@ -12,7 +12,7 @@ After following the instructions restart Apache and test if the application is w
 
 ### 5.4.0 to 5.5.0
 
-Execute install/upgrade/5.4.0.sql after making backups
+Execute install/upgrade/5.5.0.sql after making backups
 
 Default modules for new user can now be set at admin/modules which can be overridden in user
 profiles. You might want to check the default settings and your own profile after the upgrade.
