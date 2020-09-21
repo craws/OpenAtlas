@@ -14,9 +14,8 @@ After following the instructions restart Apache and test if the application is w
 
 Execute install/upgrade/5.4.0.sql after making backups
 
-There are now more module settings in admin/modules which can be set as default. They can be
-overridden in user profiles so you might want to check the default settings and your own
-profile after the upgrade.
+Default modules for new user can now be set at admin/modules which can be overridden in user
+profiles. You might want to check the default settings and your own profile after the upgrade.
 
 ### 5.3.0 to 5.4.0
 
