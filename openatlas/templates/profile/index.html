@@ -4,19 +4,51 @@
     {{ [_('profile')]|crumb }}
 {% endblock %}
 {% block content %}
-    {% if not config['DEMO_MODE'] %}
-        <div class="toolbar">
-            {{ 'tools/profile'|manual }}
-            {{ _('edit')|button(url_for('profile_update')) }}
-            {{ _('change password')|button(url_for('profile_password')) }}
-        </div>
-    {% endif %}
-    {% for category in ['general', 'display', 'modules'] %}
-        {% if category != 'modules' or 'contributor'|is_authorized %}
-            <div style="float:left;margin-right: 2em;">
-                <h1>{{ _(category)|uc_first }}</h1>
-                {{ data[category]|display_info }}
+<div class="row">
+    <div class="col-12">
+        <ul class="nav nav-tabs" role="tablist">
+            {{ 'profile'|tab_header(active=True) }}
+            {% if 'manager'|is_authorized %}
+                {{ 'modules'|tab_header }}
+            {% endif %}
+            {{ 'display'|tab_header }}
+        </ul>
+        <div class="tab-content">
+            <div class="tab-pane fade show active" role="tabpanel" id="tab-profile">
+                <div class="toolbar">
+                    {{ 'tools/profile'|manual }}
+                    {% if not config['DEMO_MODE'] %}
+                        {{ _('edit')|button(url_for('profile_settings', category='profile')) }}
+                        {{ _('change password')|button(url_for('profile_password')) }}
+                    {% endif %}
+                </div>
+                <div>
+                    {{ info.profile|display_info }}
+                </div>
             </div>
-        {% endif %}
-    {% endfor %}
+            {% if 'contributor'|is_authorized %}
+                <div class="tab-pane fade" role="tabpanel" id="tab-modules">
+                    <div class="toolbar">
+                        {{ 'tools/profile'|manual }}
+                        {% if not config['DEMO_MODE'] %}
+                            {{ _('edit')|button(url_for('profile_settings', category='modules')) }}
+                        {% endif %}
+                    </div>
+                    <div>
+                        {{ info.modules|display_info }}
+                    </div>
+                </div>
+            {% endif %}
+            <div class="tab-pane fade" role="tabpanel" id="tab-display">
+                <div class="toolbar">
+                    {{ 'tools/profile'|manual }}
+                    {% if not config['DEMO_MODE'] %}
+                        {{ _('edit')|button(url_for('profile_settings', category='display')) }}
+                    {% endif %}
+                </div>
+                <div>
+                    {{ info.display|display_info }}
+                </div>
+            </div>
+        </div>
 {% endblock %}

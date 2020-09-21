@@ -7,18 +7,19 @@
 <div class="row">
     <div class="col-12">
         <ul class="nav nav-tabs" role="tablist">
-            <li class="nav-item"><a class="nav-link active" data-toggle="tab" role="tab" aria-selected="true" href="#tab-files">{{ _('files')|uc_first }}</a></li>
-            <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-user">{{ _('user')|uc_first }} {{ tables.user|format_tab_number }}</a></li>
+            {{ 'files'|tab_header(active=True) }}
+            {{ 'user'|tab_header(table=tables.user) }}
             {% if 'admin'|is_authorized %}
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-general">{{ _('general')|uc_first }}</a></li>
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-mail">{{ _('email')|uc_first }}</a></li>
+                {{ 'general'|tab_header }}
+                {{ 'email'|tab_header }}
             {% endif  %}
             {% if 'manager'|is_authorized: %}
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-map">{{ _('map')|uc_first }}</a></li>
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-content">{{ _('content')|uc_first }}</a></li>
+                {{ 'modules'|tab_header }}
+                {{ 'map'|tab_header }}
+                {{ 'content'|tab_header }}
             {% endif %}
             {% if 'contributor'|is_authorized %}
-                <li class="nav-item"><a class="nav-link" data-toggle="tab" role="tab" aria-selected="false" href="#tab-data">{{ _('data')|uc_first }}</a></li>
+                {{ 'data'|tab_header }}
             {% endif %}
         </ul>
         <div class="tab-content">
@@ -26,7 +27,7 @@
                 <div class="toolbar">
                     {{ 'admin/files'|manual }}
                     {% if 'manager'|is_authorized %}
-                        {{  _('edit settings')|button(url_for('admin_settings', category='files')) }}
+                        {{  _('edit')|button(url_for('admin_settings', category='files')) }}
                     {% endif %}
                     {{ _('list')|button(url_for('file_index')) }}
                     {{ _('file')|button(url_for('file_insert')) }}
@@ -84,15 +85,15 @@
                 <div class="tab-pane fade" role="tabpanel" id="tab-general">
                     <div class="toolbar">
                         {{ 'admin/general'|manual }}
-                        {{ _('edit settings')|button(url_for('admin_settings', category='general')) }}
+                        {{ _('edit')|button(url_for('admin_settings', category='general')) }}
                         {{ _('system log')|button(url_for('admin_log')) }}
                     </div>
                     {{ info.general|display_info }}
                 </div>
-                <div class="tab-pane fade" role="tabpanel" id="tab-mail">
+                <div class="tab-pane fade" role="tabpanel" id="tab-email">
                     <div class="toolbar">
                         {{ 'admin/mail'|manual }}
-                        {{ _('edit settings')|button(url_for('admin_settings', category='mail')) }}
+                        {{ _('edit')|button(url_for('admin_settings', category='mail')) }}
                     </div>
                     {{ info.mail|display_info }}
                     {% if settings.mail %}
@@ -101,10 +102,20 @@
                 </div>
             {% endif  %}
             {% if 'manager'|is_authorized %}
+                <div class="tab-pane fade" role="tabpanel" id="tab-modules">
+                    <div class="toolbar">
+                        {{ 'admin/modules'|manual }}
+                        {{ _('edit')|button(url_for('admin_settings', category='modules')) }}
+                    </div>
+                    <div>
+                        <h1>{{ _('Defaults for new user') }}</h1>
+                        {{ info.modules|display_info }}
+                    </div>
+                </div>
                 <div class="tab-pane fade" role="tabpanel" id="tab-map">
                     <div class="toolbar">
                         {{ 'admin/map'|manual }}
-                        {{ _('edit settings')|button(url_for('admin_settings', category='map')) }}
+                        {{ _('edit')|button(url_for('admin_settings', category='map')) }}
                     </div>
                     <div>
                         {{ info.map|display_info }}
@@ -145,7 +156,7 @@
                         <h1>{{ 'API'|uc_first }}</h1>
                         {{ 'admin/api'|manual }}
                         {% if 'manager'|is_authorized %}
-                            {{ _('edit settings')|button(url_for('admin_settings', category='api')) }}
+                            {{ _('edit')|button(url_for('admin_settings', category='api')) }}
                         {% endif %}
                     </div>
                     {{ info.api|display_info }}

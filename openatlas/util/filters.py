@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Union
 import flask
 import jinja2
 from flask import g, request, session, url_for
-from flask_babel import format_number as babel_format_number, lazy_gettext as _
+from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from jinja2 import escape
 from markupsafe import Markup
@@ -17,7 +17,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.imports import Project
 from openatlas.models.model import CidocClass, CidocProperty
 from openatlas.models.user import User
-from openatlas.util import util
+from openatlas.util import tab, util
 from openatlas.util.table import Table
 from openatlas.util.util import get_file_path
 
@@ -81,17 +81,17 @@ def note(self: Any, entity: Entity) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def format_tab_number(self: Any, param: Union[int, Table]) -> str:
-    length = len(param.rows) if isinstance(param, Table) else param
-    if not length:
-        return ''
-    return Markup('<span class="tab-counter">' + babel_format_number(length) + '</span>')
+def is_authorized(self: Any, group: str) -> bool:
+    return util.is_authorized(group)
 
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def is_authorized(self: Any, group: str) -> bool:
-    return util.is_authorized(group)
+def tab_header(self: Any,
+               item: str,
+               table: Optional[Table] = None,
+               active: Optional[bool] = False) -> str:
+    return Markup(tab.tab_header(item, table, active))
 
 
 @jinja2.contextfilter
@@ -106,8 +106,6 @@ def display_info(self: Any, data: Dict[str, Union[str, List[str]]]) -> str:
     html = '<div class="data-table">'
     for label, value in data.items():
         if value or value == 0:
-            if isinstance(value, bool):  # Used in display of settings
-                value = _('on') if value else _('off')
             if isinstance(value, list):
                 value = '<br>'.join(value)
             html += '''
@@ -404,12 +402,6 @@ def display_form(self: Any,
 @blueprint.app_template_filter()
 def test_file(self: Any, file_name: str) -> Optional[str]:
     return file_name if os.path.isfile(app.root_path + '/' + file_name) else None
-
-
-@jinja2.contextfilter
-@blueprint.app_template_filter()
-def display_tooltip(self: Any, text: str) -> str:
-    return util.display_tooltip(text)
 
 
 @jinja2.contextfilter

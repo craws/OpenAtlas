@@ -4,16 +4,7 @@
         <div class="col-12">
             <ul class="nav nav-tabs" role="tablist">
                 {% for id_, tab in tabs.items() if id_ == 'info' or tab.buttons or tab.table.rows %}
-                    <li class="nav-item">
-                        <a
-                            role="tab"
-                            data-toggle="tab"
-                            href="#tab-{{ id_|replace('_', '-') }}"
-                            class="nav-link {{ 'active' if loop.first else '' }}"
-                            aria-selected="{{ 'true' if loop.first else 'false' }}">
-                                {{ tab.title|uc_first }} {{ tab.table|format_tab_number }}
-                        </a>
-                    </li>
+                    {{ id_|tab_header(active=True if loop.first else False, table=tab.table) }}
                 {% endfor %}
             </ul>
             <div class="tab-content">

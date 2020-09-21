@@ -15,10 +15,16 @@ from werkzeug.exceptions import abort
 
 from openatlas.models.entity import Entity
 from openatlas.util.util import is_authorized
-from openatlas.views.profile import ProfileForm
 
 
 class User(UserMixin):  # type: ignore
+
+    sql = """
+        SELECT u.id, u.username, u.password, u.active, u.real_name, u.info, u.created, u.modified,
+            u.login_last_success, u.login_last_failure, u.login_failed_count, u.password_reset_code,
+            u.password_reset_date, u.email, r.name as group_name, u.unsubscribe_code
+        FROM web."user" u
+        LEFT JOIN web.group r ON u.group_id = r.id """
 
     def __init__(self,
                  row: NamedTupleCursor.Record = None,
@@ -67,20 +73,32 @@ class User(UserMixin):  # type: ignore
                         'password_reset_code': self.password_reset_code,
                         'password_reset_date': self.password_reset_date})
 
-    def update_settings(self) -> None:
-        for name, value in self.settings.items():
-            if name in ['module_geonames',
-                        'module_map_overlay',
-                        'module_notes',
-                        'newsletter',
-                        'table_show_aliases',
-                        'show_email']:
-                value = 'True' if self.settings[name] else ''
+    def update_settings(self, form: Any) -> None:
+        for field in form:
+            if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField'] or \
+                    field.name in ['name', 'email']:
+                continue
+            value = field.data
+            if field.type == 'BooleanField':
+                value = 'True' if value else ''
+            elif field.type == 'IntegerField' or field.name == 'table_rows':
+                value = int(value)
             sql = """
                 INSERT INTO web.user_settings (user_id, "name", "value")
                 VALUES (%(user_id)s, %(name)s, %(value)s)
                 ON CONFLICT (user_id, name) DO UPDATE SET "value" = excluded.value;"""
-            g.execute(sql, {'user_id': self.id, 'name': name, 'value': value})
+            g.execute(sql, {'user_id': self.id, 'name': field.name, 'value': value})
+
+    def remove_newsletter(self) -> None:  # pragma: no cover
+        sql = "DELETE FROM web.user_settings WHERE name = 'newsletter' AND user_id = %(user_id)s;"
+        g.execute(sql, {'user_id': self.id})
+
+    def update_language(self) -> None:
+        sql = """
+            INSERT INTO web.user_settings (user_id, "name", "value")
+            VALUES (%(user_id)s, 'language', %(value)s)
+            ON CONFLICT (user_id, name) DO UPDATE SET "value" = excluded.value;"""
+        g.execute(sql, {'user_id': self.id, 'value': current_user.settings['language']})
 
     def login_attempts_exceeded(self) -> bool:
         failed_login_tries = int(session['settings']['failed_login_tries'])
@@ -92,13 +110,6 @@ class User(UserMixin):  # type: ignore
         if last_failure_date > datetime.datetime.now():
             return True
         return False  # pragma no cover - not waiting in tests for forget_minutes to pass
-
-    sql = """
-        SELECT u.id, u.username, u.password, u.active, u.real_name, u.info, u.created, u.modified,
-            u.login_last_success, u.login_last_failure, u.login_failed_count, u.password_reset_code,
-            u.password_reset_date, u.email, r.name as group_name, u.unsubscribe_code
-        FROM web."user" u
-        LEFT JOIN web.group r ON u.group_id = r.id """
 
     @staticmethod
     def get_all() -> List[User]:
@@ -114,7 +125,7 @@ class User(UserMixin):  # type: ignore
             bookmarks = [row.entity_id for row in g.cursor.fetchall()]
         g.execute(User.sql + ' WHERE u.id = %(id)s;', {'id': user_id})
         if not g.cursor.rowcount:
-            return None   # pragma no cover - something went wrong, e.g. obsolete session values
+            return None  # pragma no cover - something went wrong, e.g. obsolete session values
         return User(g.cursor.fetchone(), bookmarks)
 
     @staticmethod
@@ -208,26 +219,20 @@ class User(UserMixin):  # type: ignore
         # Set defaults
         settings = {'layout': 'default',
                     'language': session['language'],
-                    'map_zoom_max': session['settings']['map_zoom_max'],
-                    'map_zoom_default': session['settings']['map_zoom_default'],
-                    'module_notes': False,
-                    'module_geonames': False,
-                    'module_map_overlay': False,
                     'newsletter': False,
-                    'table_rows': session['settings']['default_table_rows'],
                     'table_show_aliases': True,
                     'show_email': False}
+        for setting in session['settings']:
+            if setting in ['map_zoom_max', 'map_zoom_default', 'table_rows'] or \
+                    setting.startswith('module_'):
+                settings[setting] = session['settings'][setting]
+
         sql = 'SELECT "name", value FROM web.user_settings WHERE user_id = %(user_id)s;'
         g.execute(sql, {'user_id': user_id})
-        form = ProfileForm()
         for row in g.cursor.fetchall():
-            value = row.value
-            form_field = getattr(form, row.name)   # Use profile form to determine value data types
-            if form_field.type == 'BooleanField':
-                value = True if value == 'True' else False
-            elif form_field.type == 'IntegerField' or form_field.name == 'table_rows':
-                value = int(value)
-            settings[row.name] = value
+            settings[row.name] = row.value
+            if row.name in ['table_rows']:
+                settings[row.name] = int(row.value)
         return settings
 
     @staticmethod

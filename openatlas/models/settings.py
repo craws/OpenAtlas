@@ -11,7 +11,7 @@ class Settings:
         settings = {}
         for row in g.cursor.fetchall():
             settings[row.name] = row.value
-            if row.name in ['default_table_rows',
+            if row.name in ['table_rows',
                             'failed_login_forget_minutes',
                             'failed_login_tries',
                             'file_upload_max_size',

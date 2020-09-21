@@ -1,0 +1,9 @@
+{% extends "layout.html" %}
+{% block title_name %} - {{ _('profile')|uc_first }}{% endblock %}
+{% block breadcrumb %}
+    <a href="{{ url_for('profile_index') }}#tab-{{ category }}">{{ _('profile')|uc_first }}</a>
+    &nbsp;> {{ _(category)|uc_first }}
+{% endblock %}
+{% block content %}
+    {{ form|display_form(manual_page='admin/' + category) }}
+{% endblock %}

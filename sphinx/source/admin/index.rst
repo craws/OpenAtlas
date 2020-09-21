@@ -7,6 +7,7 @@ Admin
    user
    general
    mail
+   modules
    map
    content
    data_integrity_checks

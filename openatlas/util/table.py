@@ -46,14 +46,11 @@ class Table:
         columns: List[Dict[str, str]] = [{'title': _(item).capitalize() if item else ''} for item in
                                          self.header]
         columns += [{'title': ''} for i in range(len(self.rows[0]) - len(self.header))]  # Add empty
-        table_rows = session['settings']['default_table_rows']
-        if hasattr(current_user, 'settings'):
-            table_rows = current_user.settings['table_rows']
         data_table = {'data': self.rows,
                       'stateSave': 'false' if session['settings']['debug_mode'] else 'true',
                       'columns': columns,
                       'paging': self.paging,
-                      'pageLength': table_rows,
+                      'pageLength': current_user.settings['table_rows'],
                       'autoWidth': 'false'}
         if self.order:
             data_table['order'] = self.order
@@ -77,5 +74,5 @@ class Table:
             name=name)
         html += '<style type="text/css">{header} {toolbar}</style>'.format(
             header=css_header if not self.header else '',
-            toolbar=css_toolbar if len(self.rows) <= table_rows else '')
+            toolbar=css_toolbar if len(self.rows) <= current_user.settings['table_rows'] else '')
         return html

@@ -1,15 +1,46 @@
-from typing import List, Optional
+from typing import List, Optional, Union
 
 from flask import g, url_for
+from flask_babel import format_number, lazy_gettext as _
+from flask_login import current_user
+
 from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.util.table import Table
 from openatlas.util.util import button, is_authorized, uc_first
-from flask_babel import lazy_gettext as _
 
-# Needed for translations
+# Needed for translations of tab titles
 _('member of')
 _('texts')
+_('invalid dates')
+_('invalid link dates')
+_('invalid involvement dates')
+_('unlinked')
+_('missing files')
+_('orphaned files')
+_('circular dependencies')
+
+
+def format_tab_number(param: Union[int, Table]) -> str:
+    length = len(param.rows) if isinstance(param, Table) else param
+    return ' <span class="tab-counter">' + format_number(length) + '</span>' if length else ''
+
+
+def tab_header(id_: str, table: Optional[Table] = None, active: Optional[bool] = False) -> str:
+    return '''
+        <li class="nav-item">
+            <a 
+                class="nav-link {active}" 
+                data-toggle="tab" 
+                role="tab" 
+                aria-selected="{selected}" 
+                href="#tab-{id}">{label}
+            </a>
+        </li>'''.format(active=' active' if active else '',
+                        selected='true' if active else 'false',
+                        label=uc_first(_(id_.replace('_', ' '))) +
+                              (format_tab_number(table) if table else ''),
+                        id=id_.replace('_', '-').replace(' ', '-'))
 
 
 class Tab:
@@ -65,15 +96,16 @@ class Tab:
                 elif code in class_codes['source']:
                     buttons = [button('link', url_for('source_add', id_=id_, class_name='event'))]
                 elif code in class_codes['reference']:
-                    buttons = [button('link', url_for('reference_add', id_=id_, class_name='event'))]
+                    buttons = [button('link',
+                                      url_for('reference_add', id_=id_, class_name='event'))]
                 for code in class_codes['event']:
                     label = g.classes[code].name
                     buttons.append(button(label, url_for('event_insert', code=code, origin_id=id_)))
         elif name == 'feature':
-            if system_type == 'place':
+            if current_user.settings['module_sub_units'] and system_type == 'place':
                 buttons = [button(_('feature'), url_for('place_insert', origin_id=id_))]
         elif name == 'find':
-            if system_type == 'stratigraphic unit':
+            if current_user.settings['module_sub_units'] and system_type == 'stratigraphic unit':
                 buttons = [button(_('find'), url_for('place_insert', origin_id=id_))]
         elif name == 'file':
             table.header = Table.HEADERS['file'] + [_('main image')]
@@ -84,7 +116,7 @@ class Tab:
                 buttons = [button(_('link'), url_for('entity_add_file', id_=id_))]
             buttons.append(button(_('file'), url_for('file_insert', origin_id=id_)))
         elif name == 'human_remains':
-            if system_type == 'stratigraphic unit':
+            if current_user.settings['module_sub_units'] and system_type == 'stratigraphic unit':
                 buttons = [button(_('human remains'), url_for('place_insert',
                                                               origin_id=id_,
                                                               system_type='human_remains'))]
@@ -134,7 +166,7 @@ class Tab:
             else:
                 table.header = Table.HEADERS['event']
         elif name == 'stratigraphic_unit':
-            if system_type == 'feature':
+            if current_user.settings['module_sub_units'] and system_type == 'feature':
                 buttons = [button(_('stratigraphic unit'), url_for('place_insert', origin_id=id_))]
         elif name == 'text':
             buttons = [button(_('text'), url_for('translation_insert', source_id=id_))]

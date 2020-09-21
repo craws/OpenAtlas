@@ -12,13 +12,21 @@ class ContentForm(FlaskForm):  # type: ignore
     pass
 
 
+class ModulesForm(FlaskForm):  # type: ignore
+    module_geonames = BooleanField('GeoNames')
+    module_map_overlay = BooleanField(_('map overlay'))
+    module_notes = BooleanField(_('notes'))
+    module_sub_units = BooleanField(_('sub units'))
+    save = SubmitField(_('save'))
+
+
 class GeneralForm(FlaskForm):  # type: ignore
     site_name = StringField(_('site name'), [InputRequired()])
     default_language = SelectField(_('default language'),
                                    choices=list(app.config['LANGUAGES'].items()))
-    default_table_rows = SelectField(_('default table rows'),
-                                     coerce=int,
-                                     choices=list(app.config['DEFAULT_TABLE_ROWS'].items()))
+    table_rows = SelectField(_('default table rows'),
+                             coerce=int,
+                             choices=list(app.config['TABLE_ROWS'].items()))
     log_level = SelectField(_('log level'),
                             coerce=int,
                             choices=list(app.config['LOG_LEVELS'].items()))
@@ -91,3 +99,25 @@ class SimilarForm(FlaskForm):  # type: ignore
     classes = SelectField(_('class'), choices=[])
     ratio = IntegerField(default=100)
     apply = SubmitField(_('search'))
+
+
+class ProfileForm(FlaskForm):  # type: ignore
+    name = StringField(_('full name'), description=_('tooltip full name'))
+    email = StringField(_('email'), [InputRequired(), Email()], description=_('tooltip email'))
+    show_email = BooleanField(_('show email'), description=_('tooltip show email'))
+    newsletter = BooleanField(_('newsletter'), description=_('tooltip newsletter'))
+    save = SubmitField(_('save'))
+
+
+class DisplayForm(FlaskForm):  # type: ignore
+    language = SelectField(_('language'), choices=list(app.config['LANGUAGES'].items()))
+    table_rows = SelectField(_('table rows'),
+                             description=_('tooltip table rows'),
+                             choices=list(app.config['TABLE_ROWS'].items()),
+                             coerce=int)
+    table_show_aliases = BooleanField(_('show aliases in tables'))
+    layout_choices = [('default', _('default')), ('advanced', _('advanced'))]
+    layout = SelectField(_('layout'), description=_('tooltip layout'), choices=layout_choices)
+    map_zoom_default = IntegerField(_('default map zoom'), [InputRequired()])
+    map_zoom_max = IntegerField(_('max map zoom'), [InputRequired()])
+    save = SubmitField(_('save'))

@@ -1,3 +1,4 @@
+import importlib
 from typing import Union
 
 import bcrypt
@@ -5,13 +6,16 @@ from flask import flash, g, render_template, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user, login_required
 from flask_wtf import FlaskForm
+from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import BooleanField, IntegerField, PasswordField, SelectField, StringField, SubmitField
-from wtforms.validators import Email, InputRequired
+from wtforms import BooleanField, PasswordField, SubmitField
+from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.util.util import uc_first
+from openatlas.forms.admin_forms import DisplayForm, ModulesForm, ProfileForm
+from openatlas.forms.forms import get_form_settings, set_form_settings
+from openatlas.util.util import is_authorized, uc_first
 
 
 class PasswordForm(FlaskForm):  # type: ignore
@@ -41,100 +45,46 @@ class PasswordForm(FlaskForm):  # type: ignore
         return valid
 
 
-class ProfileForm(FlaskForm):  # type: ignore
-    name = StringField(_('full name'), description=_('tooltip full name'))
-    email = StringField(_('email'), [InputRequired(), Email()], description=_('tooltip email'))
-    show_email = BooleanField(_('show email'), description=_('tooltip show email'))
-    newsletter = BooleanField(_('newsletter'), description=_('tooltip newsletter'))
-    language = SelectField(_('language'), choices=list(app.config['LANGUAGES'].items()))
-    table_rows = SelectField(_('table rows'),
-                             description=_('tooltip table rows'),
-                             choices=list(app.config['DEFAULT_TABLE_ROWS'].items()),
-                             coerce=int)
-    table_show_aliases = BooleanField(_('show aliases in tables'))
-    layout_choices = [('default', _('default')), ('advanced', _('advanced'))]
-    layout = SelectField(_('layout'), description=_('tooltip layout'), choices=layout_choices)
-    map_zoom_default = IntegerField(_('default map zoom'), [InputRequired()])
-    map_zoom_max = IntegerField(_('max map zoom'), [InputRequired()])
-    module_geonames = BooleanField('GeoNames', description=_('tooltip geonames'))
-    module_map_overlay = BooleanField(_('map overlay'), description=_('tooltip map overlay'))
-    module_notes = BooleanField(_('notes'), description=_('tooltip notes'))
-    save = SubmitField(_('save'))
-
-
 @app.route('/profile', methods=['POST', 'GET'])
 @login_required
 def profile_index() -> str:
-    data = {'general': {_('username'): current_user.username,
-                        _('full name'): current_user.real_name,
-                        _('email'): current_user.email,
-                        _('show email'): current_user.settings['show_email'],
-                        _('newsletter'): current_user.settings['newsletter']},
-            'display': {_('language'): current_user.settings['language'],
-                        _('table rows'): current_user.settings['table_rows'],
-                        _('show aliases in tables'): current_user.settings['table_show_aliases'],
-                        _('layout'): current_user.settings['layout'],
-                        _('default map zoom'): current_user.settings['map_zoom_default'],
-                        _('max map zoom'): current_user.settings['map_zoom_max']},
-            'modules': {'GeoNames': current_user.settings['module_geonames'],
-                        _('map overlay'): current_user.settings['module_map_overlay'],
-                        _('notes'): current_user.settings['module_notes']}}
-    return render_template('profile/index.html', data=data)
+    return render_template('profile/index.html',
+                           info={'profile': get_form_settings(ProfileForm(), True),
+                                 'modules': get_form_settings(ModulesForm(), True),
+                                 'display': get_form_settings(DisplayForm(), True)})
 
 
-@app.route('/profile/update', methods=['POST', 'GET'])
+@app.route('/profile/settings/<category>', methods=['POST', 'GET'])
 @login_required
-def profile_update() -> Union[str, Response]:
-    form = ProfileForm()
-    user = current_user
+def profile_settings(category: str) -> Union[str, Response]:
+    if category not in ['profile', 'display'] and not is_authorized('contributor'):
+        abort(403)  # pragma: no cover
+    form = getattr(importlib.import_module('openatlas.forms.admin_forms'),
+                   uc_first(category) + 'Form')()  # Get forms dynamically
     if form.validate_on_submit():
         for field in form:
             if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
                 continue
             if field.name == 'name':
-                user.real_name = field.data
+                current_user.real_name = field.data
             elif field.name == 'email':
-                user.email = field.data
+                current_user.email = field.data
             else:
-                user.settings[field.name] = field.data
+                current_user.settings[field.name] = field.data
         g.cursor.execute('BEGIN')
         try:
-            user.update()
-            user.update_settings()
+            current_user.update()
+            current_user.update_settings(form)
             g.cursor.execute('COMMIT')
-            session['language'] = form.language.data
+            session['language'] = current_user.settings['language']
             flash(_('info update'), 'info')
         except Exception as e:  # pragma: no cover
             g.cursor.execute('ROLLBACK')
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        return redirect(url_for('profile_index'))
-    for field in form:
-        if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
-            continue
-        field.label.text = uc_first(field.label.text)
-        if field.name == 'name':
-            field.data = current_user.real_name
-        elif field.name == 'email':
-            field.data = current_user.email
-        else:
-            field.data = current_user.settings[field.name]
-    form.save.label.text = uc_first(_('save'))
-    return render_template('profile/update.html',
-                           form=form,
-                           form_fields={_('general'): [form.name,
-                                                       form.email,
-                                                       form.show_email,
-                                                       form.newsletter],
-                                        _('display'): [form.language,
-                                                       form.table_rows,
-                                                       form.table_show_aliases,
-                                                       form.layout,
-                                                       form.map_zoom_default,
-                                                       form.map_zoom_max],
-                                        _('modules'): [form.module_geonames,
-                                                       form.module_map_overlay,
-                                                       form.module_notes]})
+        return redirect(url_for('profile_index') + '#tab-' + category)
+    set_form_settings(form, True)
+    return render_template('profile/settings.html', form=form, category=category)
 
 
 @app.route('/profile/password', methods=['POST', 'GET'])
