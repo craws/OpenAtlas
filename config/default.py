@@ -40,9 +40,7 @@ THUNDERFOREST_KEY = '7878b4fb224f4902ab42fc846e92b96a'
 
 # API
 API_SCHEMA = 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.jsonld'
-
-# Cross-Origin source (CORS)
-CORS_ALLOWANCE = '*'
+CORS_ALLOWANCE = '*'  # Cross-Origin source (CORS), declared here because used in decorators
 
 # Table options
 TABLE_ROWS = {10: '10', 25: '25', 50: '50', 100: '100'}

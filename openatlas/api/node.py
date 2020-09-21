@@ -3,7 +3,6 @@ from typing import Any, Dict, List
 from flask import g, url_for
 
 from openatlas.api.error import APIError
-from openatlas.models.entity import Entity
 
 
 class APINode:
