@@ -12,7 +12,7 @@ class Content:
     @staticmethod
     def get_content() -> Dict[str, Dict[str, str]]:
         content: Dict[str, Dict[str, str]] = {}
-        for name in ['intro', 'legal_notice', 'contact']:
+        for name in ['intro', 'legal_notice', 'contact', 'citation_example']:
             content[name] = {language: '' for language in app.config['LANGUAGES'].keys()}
         g.execute("SELECT name, language, text FROM web.i18n;")
         for row in g.cursor.fetchall():
