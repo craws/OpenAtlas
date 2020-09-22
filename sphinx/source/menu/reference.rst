@@ -17,6 +17,11 @@ Form fields
 * :doc:`/form/type`
 * :doc:`/form/description`
 
+Citation example
+----------------
+At :doc:`/admin/content` an example citation can be defined which will be displayed under the
+form at insert/update of an edition or a bibliography.
+
 Can be linked via tabs to
 -------------------------
 * :doc:`source`
