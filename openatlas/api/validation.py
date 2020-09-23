@@ -1,5 +1,5 @@
 import re
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, List, Optional
 
 from openatlas.api.error import APIError
 
@@ -22,7 +22,6 @@ class Default:
 
 
 class Validation:
-    default = {'subtype': False}
 
     @staticmethod
     def validate_url_query(query: Any) -> Dict[str, Any]:
@@ -33,8 +32,7 @@ class Validation:
                  'last': Validation.validate_last(query.get('last')),
                  'first': Validation.validate_first(query.get('first')),
                  'show': Validation.validate_show(query.get('show')),
-                 'count': Validation.validate_count(query.getlist('count')),
-                 'subtype': Validation.validate_subtype(query.get('subtype'))}
+                 'count': Validation.validate_count(query.getlist('count'))}
         return query
 
     @staticmethod
@@ -103,9 +101,3 @@ class Validation:
     @staticmethod
     def validate_count(count: bool) -> bool:
         return Default.count if not count or count is True else True
-
-    # Todo: What does this function do? Kill it?
-    @staticmethod
-    def validate_subtype(subtype: str) -> bool:
-        subtype_ = True if subtype == 'show' else False
-        return subtype_
