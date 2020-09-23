@@ -196,6 +196,7 @@ input[type="text"].value_input {
 
 #index-search input {
     margin: 2px 5px 2px 5px;
+    width: 120px;
 }
 
 .iconbutton {
