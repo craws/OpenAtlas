@@ -12,7 +12,7 @@ class ProfileTests(TestBaseCase):
             rv = self.app.get(url_for('profile_index'))
             assert b'alice@example.com' in rv.data
             rv = self.app.get(url_for('profile_settings', category='profile'))
-            assert b'Alice' in rv.data
+            assert b'alice@example.com' in rv.data
             data = {'name': 'Alice Abernathy',
                     'email': 'alice@umbrella.net',
                     'show_email': ''}
