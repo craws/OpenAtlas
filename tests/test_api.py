@@ -126,6 +126,10 @@ class ApiTests(TestBaseCase):
             assert b'404' in rv.data
             rv = self.app.get(url_for('api_get_by_menu_item', code='TWART'))
             assert b'404c' in rv.data
+            rv = self.app.get(
+                url_for('api_get_by_menu_item', code='place', limit=10, sort='desc', column='name',
+                        filter='or(WRONG,name,Nostromos)', first=place_id))
+            assert b'404f' in rv.data
             # rv = self.app.post(url_for('api_get_entities_by_json'))
             # assert b'405' in rv.data
             self.app.get(url_for('logout'), follow_redirects=True)
