@@ -6,11 +6,11 @@ class Default:
     limit: int = 20
     sort: str = 'ASC'
     filter: str = ''
+    column: str = 'name'
 
 
 class Validation:
-    default = {'column': 'name',
-               'last': None,
+    default = {'last': None,
                'first': None,
                'show': ['when', 'types', 'relations', 'names', 'links', 'geometry', 'depictions'],
                'count': False,
@@ -28,7 +28,7 @@ class Validation:
         query = {'filter': Validation.validate_filter(query.get('filter')),
                  'limit': Validation.validate_limit(query.get('limit')),
                  'sort': Validation.validate_sort(query.get('sort')),
-                 'column': Validation.validate_column(query.getlist('column')),
+                 'column': Validation.validate_column(query.get('column')),
                  'last': Validation.validate_last(query.getlist('last')),
                  'first': Validation.validate_first(query.getlist('first')),
                  'show': Validation.validate_show(query.getlist('show')),
@@ -74,13 +74,8 @@ class Validation:
         return Default.sort if not sort or sort.lower() != 'desc' else 'DESC'
 
     @staticmethod
-    def validate_column(column: List[Any]) -> Union[List[str], str, None]:
-        column_ = [str(Validation.default['column'])]
-        if column:
-            for item in column:
-                if isinstance(item, str) and item.lower() in Validation.column:
-                    column_ = [item]
-        return column_
+    def validate_column(column: Optional[str]) -> str:
+        return Default.column if not column and column.lower() in Validation.column else column
 
     @staticmethod
     def validate_last(last: List[Any]) -> Union[bool, List[str], str, None]:

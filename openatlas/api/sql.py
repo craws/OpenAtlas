@@ -107,7 +107,7 @@ class Query:
         g.execute(
             Query.build_sql() + """WHERE class_code IN %(codes)s {filter} ORDER BY {order} {sort};""".format(
                 filter=meta['filter'],
-                order=', '.join(meta['column']),
+                order=meta['column'],
                 sort=meta['sort']),
             {'codes': tuple(codes)})
 
@@ -136,7 +136,7 @@ class Query:
                                   aliases=aliases) + """
                 WHERE e.class_code IN %(codes)s {filter} GROUP BY e.id
                 ORDER BY {order} {sort};""".format(filter=meta['filter'],
-                                                   order=', '.join(meta['column']),
+                                                   order=meta['column'],
                                                    sort=meta['sort'])
         g.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][menu_item])})
         return [Query(row) for row in g.cursor.fetchall()]
