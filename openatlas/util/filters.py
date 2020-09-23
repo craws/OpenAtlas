@@ -13,6 +13,7 @@ from wtforms import IntegerField
 from wtforms.validators import Email
 
 from openatlas import app
+from openatlas.models.content import Content
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Project
 from openatlas.models.model import CidocClass, CidocProperty
@@ -40,6 +41,15 @@ def button(self: Any,
            id_: Optional[str] = None,
            onclick: Optional[str] = '') -> str:
     return util.button(label, url, css, id_, onclick)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def display_citation_example(self: Any, code: str) -> str:
+    example = Content.get_translation('citation_example')
+    if not example or code not in ['edition', 'bibliography']:
+        return ''
+    return Markup('<h1>' + util.uc_first(_('citation_example')) + '</h1>' + example)
 
 
 @jinja2.contextfilter

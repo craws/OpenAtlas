@@ -2,11 +2,12 @@
 {% block title_name %} - {{ _('reference')|uc_first }}{% endblock %}
 {% block breadcrumb %}
     {% if origin %}
-        {{ [[_(origin.view_name), origin.view_name + '_index'], origin, '+ ' + _(code)|uc_first]|crumb }}
+        {{ [[_(origin.view_name), origin.view_name + '_index'], origin, '+ ' + _(code|replace('_', ' '))|uc_first]|crumb }}
     {% else %}
-        {{ [[_('reference'), 'reference_index'], '+ ' + _(code)|uc_first]|crumb }}
+        {{ [[_('reference'), 'reference_index'], '+ ' + _(code|replace('_', ' '))|uc_first]|crumb }}
     {% endif %}
 {% endblock %}
 {% block content %}
     {{ form|display_form(code, manual_page='menu/reference') }}
+    {{ code|display_citation_example }}
 {% endblock %}

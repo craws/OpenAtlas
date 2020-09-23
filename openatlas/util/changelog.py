@@ -3,8 +3,9 @@ class Changelog:
     versions = {
         '5.5.0': ['TBA', {
             'feature': {
-                '929': 'Module options'
-            },}],
+                '929': 'Module options',
+                '1289': 'Citation example for edition and bibliography'
+            }, }],
         '5.4.0': ['2020-09-09', {
             'feature': {
                 '1317': 'Additional manual content',
