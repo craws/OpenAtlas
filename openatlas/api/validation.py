@@ -78,11 +78,11 @@ class Validation:
         return Default.column if not column or column.lower() not in Default.column else column
 
     @staticmethod
-    def validate_last(last: Optional[str]) -> str:
+    def validate_last(last: Optional[str]) -> Optional[str]:
         return Default.last if not last or last.isdigit() is not True else last
 
     @staticmethod
-    def validate_first(first: Optional[str]) -> str:
+    def validate_first(first: Optional[str]) -> Optional[str]:
         return Default.first if not first or first.isdigit() is not True else first
 
     @staticmethod
