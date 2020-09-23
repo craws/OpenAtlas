@@ -22,6 +22,7 @@ class APIError(Exception):
         "404d": "The syntax is incorrect. These class code is not supported. "
                       "For the classes please confer the model.",
         "404e": "The syntax is incorrect. Only integers between 1 and 100 are allowed.",
+        "404f": "The syntax is incorrect. Only valid operators are allowed.",
         "405": "The method used is not supported. Right now only GET is allowed.",
         "500": "Please notify the administrator. Sorry for the inconvenience."}
 
