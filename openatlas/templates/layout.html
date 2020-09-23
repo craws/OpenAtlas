@@ -77,10 +77,22 @@
                     </form>
                 </div>
             </div>
+        {% endif %}
+        <div class="btn-group btn-group-toggle">
+            {% for language in config['LANGUAGES'].keys()|sort %}
+                {% if 'language' in session and session['language'] == language %}
+                    <span class="btn btn-secondary active btn-sm">{{ language|upper }}</span>
+                {% else %}
+                    <a class="btn btn-secondary btn-sm"
+                       href="{{ url_for('set_locale', language=language) }}">{{ language|upper }}</a>
+                {% endif %}
+            {% endfor %}
+        </div>
+        {% if current_user.is_authenticated %}
             <div class="iconbutton dropdown">
                 <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" style="padding: 0px!important;"
-                   aria-expanded="false"><span><i class="far fa-user"></i></span></a>
-                <div class="dropdown-menu">
+                   aria-expanded="false"><span><i class="fa fa-cog"></i></span></a>
+                <div class="dropdown-menu dropdown-menu-right">
                     <a class="dropdown-item" href="{{ url_for('profile_index') }}">
                         <span>Profile</span>
                     </a>
@@ -114,18 +126,6 @@
                     {% endif %}
                 </div>
             </div>
-        {% endif %}
-        <div class="btn-group btn-group-toggle">
-            {% for language in config['LANGUAGES'].keys()|sort %}
-                {% if 'language' in session and session['language'] == language %}
-                    <span class="btn btn-secondary active btn-sm">{{ language|upper }}</span>
-                {% else %}
-                    <a class="btn btn-secondary btn-sm"
-                       href="{{ url_for('set_locale', language=language) }}">{{ language|upper }}</a>
-                {% endif %}
-            {% endfor %}
-        </div>
-        {% if current_user.is_authenticated %}
         {% else %}
             <a class="btn btn-warning btn-sm" href="/login">{{ _('login')|uc_first }}</a>
         {% endif %}
