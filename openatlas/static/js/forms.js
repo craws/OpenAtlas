@@ -136,7 +136,7 @@ $(document).ready(function () {
 
     $("div[id*='-modal']").on('shown.bs.modal', function () {
         $("input[id*='-tree-search']").focus();
-        $("input[id*='_table_filter']").focus();
+        $("input[type='search']").focus();
     });
 
 });

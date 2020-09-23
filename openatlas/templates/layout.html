@@ -78,7 +78,7 @@
                 </div>
             </div>
             <div class="iconbutton dropdown">
-                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true"
+                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" style="padding: 0px!important;"
                    aria-expanded="false"><span><i class="far fa-user"></i></span></a>
                 <div class="dropdown-menu">
                     <a class="dropdown-item" href="{{ url_for('profile_index') }}">
@@ -98,6 +98,20 @@
                             </span>
                         </a>
                     {% endif %}
+                    {% if current_user.is_authenticated %}
+                        <a class="dropdown-item" href="/admin">
+                            <span>
+                                {{ _('admin')|uc_first }}
+                            </span>
+                        </a>
+                    {% endif %}
+                    {% if current_user.is_authenticated %}
+                        <a class="dropdown-item" href="/logout">
+                            <span>
+                                {{ _('logout')|uc_first }}
+                            </span>
+                        </a>
+                    {% endif %}
                 </div>
             </div>
         {% endif %}
@@ -112,7 +126,6 @@
             {% endfor %}
         </div>
         {% if current_user.is_authenticated %}
-            <a class="btn btn-warning btn-sm" href="/logout">{{ _('logout')|uc_first }}</a>
         {% else %}
             <a class="btn btn-warning btn-sm" href="/login">{{ _('login')|uc_first }}</a>
         {% endif %}
