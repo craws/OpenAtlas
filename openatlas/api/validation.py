@@ -9,8 +9,8 @@ class Default:
     sort: str = 'ASC'
     filter: str = ''
     column: str = 'name'
-    last: str = None
-    first: str = None
+    last: Optional[str, bool] = None
+    first: Optional[str, bool] = None
     count: bool = False
     operators_dict: Dict[str, Any] = {'eq': '=', 'ne': '!=', 'lt': '<', 'le': '<=', 'gt': '>',
                                       'ge': '>=', 'and': 'AND', 'or': 'OR', 'onot': 'OR NOT',
@@ -39,15 +39,12 @@ class Validation:
     def validate_filter(filter_: str) -> str:
         if not filter_:
             return Default.filter
-
         filter_query = ''
         for item in re.findall(r'(\w+)\((.*?)\)', filter_):
             operator = item[0].lower()
             if operator in Default.operators_dict:
                 filter_query += Default.operators_dict[operator]
-
                 item = re.split('[,]', item[1])
-                print(item)
                 if item[0] in Default.operators_dict and item[1] in Default.column:
                     if item[0] == 'like':
                         item[2] = '\'' + item[2] + '%%\''
