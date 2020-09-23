@@ -367,11 +367,6 @@ class TableSelect(HiddenInput):  # type: ignore
                     </div>
                 </div>
             </div>
-            <script>
-                $('#{name}-modal').on('shown.bs.modal', function () {{
-                    $('#{name}_table_filter input').focus();
-                }});
-            </script>
             """.format(name=field.id,
                        title=uc_first(_(field.id.replace('_', ' '))),
                        button_class=app.config['CSS']['button']['secondary'],
