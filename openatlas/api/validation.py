@@ -9,8 +9,8 @@ class Default:
     sort: str = 'ASC'
     filter: str = ''
     column: str = 'name'
-    last: Optional[str, bool] = None
-    first: Optional[str, bool] = None
+    last: Optional[str] = None
+    first: Optional[str] = None
     count: bool = False
     operators_dict: Dict[str, Any] = {'eq': '=', 'ne': '!=', 'lt': '<', 'le': '<=', 'gt': '>',
                                       'ge': '>=', 'and': 'AND', 'or': 'OR', 'onot': 'OR NOT',
