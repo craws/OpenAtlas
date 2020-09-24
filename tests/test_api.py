@@ -27,29 +27,34 @@ class ApiTests(TestBaseCase):
                 unit_node = Node.get_hierarchy('Administrative Unit')
                 unit_sub1 = g.nodes[unit_node.subs[0]]
                 unit_sub2 = g.nodes[unit_node.subs[1]]
+                stratigraphic_node = Node.get_hierarchy('Stratigraphic Unit')
+                stratigraphic_sub = g.nodes[stratigraphic_node.subs[0]]
 
             # Data for geometric results
             data = {'name': 'Asgard', 'alias-0': 'Valhöll', 'geonames_id': '123',
-                    'geonames_precision': True, 'geonames_description': "Muhahahaa",
+                    'geonames_precision': True, 'geonames_description': "Alexander",
                     'description': 'In space, no one can hears you scream',
                     unit_node.id: str([unit_sub1.id, unit_sub2.id]),
                     'gis_points': """[{
                             "type":"Feature",
                             "geometry":{"type":"Point","coordinates":[9,17]},
-                            "properties":{"name":"Valhalla","description":"","shapeType":"centerpoint"}}]""",
+                            "properties":{"name":"Valhalla","description":"",
+                            "shapeType":"centerpoint"}}]""",
                     'gis_lines': """[{
                             "type":"Feature",
                             "geometry":{
                                 "type":"LineString",
                                 "coordinates":[[9.75307425847859,17.8111792731339],
-                                [9.75315472474904,17.8110005175436],[9.75333711496205,17.8110873417098]]},
+                                [9.75315472474904,17.8110005175436],
+                                [9.75333711496205,17.8110873417098]]},
                             "properties":{"name":"","description":"","shapeType":"line"}}]""",
                     'gis_polygons': """[{
                             "type":"Feature",
                             "geometry":{
                                 "type":"Polygon",
                                 "coordinates":[[[9.75307425847859,17.8111792731339],
-                                [9.75315472474904,17.8110005175436],[9.75333711496205,17.8110873417098],
+                                [9.75315472474904,17.8110005175436],
+                                [9.75333711496205,17.8110873417098],
                                 [9.75307425847859,17.8111792731339]]]},
                             "properties":{"name":"","description":"","shapeType":"shape"}}]"""}
             rv = self.app.post(url_for('place_insert', origin_id=reference.id), data=data,
@@ -77,6 +82,19 @@ class ApiTests(TestBaseCase):
             assert b'Necronomicon' in rv.data
             rv = self.app.get(url_for('api_get_by_class', class_code='E31'))
             assert b'https://openatlas.eu' in rv.data
+            rv = self.app.get(url_for('api_node_entities', id_=unit_node.id))
+            assert b'Austria' in rv.data
+            rv = self.app.get(url_for('api_node_entities_all', id_=unit_node.id))
+            assert b'Austria' in rv.data
+
+            # Testing Subunit
+            rv = self.app.post(url_for('place_insert', origin_id=place_id), data={'name': "Item"})
+            feature_id = rv.location.split('/')[-1]
+            self.app.post(url_for('place_insert', origin_id=feature_id), data={'name': "Pot"})
+            rv = self.app.get(url_for('api_subunit', id_=place_id))
+            assert b'Item' in rv.data and b'Pot' not in rv.data
+            rv = self.app.get(url_for('api_subunit_hierarchy', id_=place_id))
+            assert b'Pot' in rv.data
 
             # Parameter: filter and first
             rv = self.app.get(
@@ -118,13 +136,13 @@ class ApiTests(TestBaseCase):
             assert b'404a' in rv.data
             rv = self.app.get(url_for('api_get_by_class', class_code='E18', last=1231223121321))
             assert b'404a' in rv.data
-            rv = self.app.get(url_for('api_entity', id_="EEEE"))
+            rv = self.app.get(url_for('api_entity', id_="Hello"))
             assert b'404b' in rv.data
             rv = self.app.get(url_for('api_get_latest', limit=99999))
             assert b'404e' in rv.data
             rv = self.app.get(url_for('api_get_by_class', class_code='E19'))
             assert b'404' in rv.data
-            rv = self.app.get(url_for('api_get_by_menu_item', code='TWART'))
+            rv = self.app.get(url_for('api_get_by_menu_item', code='Hello'))
             assert b'404c' in rv.data
             rv = self.app.get(
                 url_for('api_get_by_menu_item', code='place', limit=10, sort='desc', column='name',

@@ -191,26 +191,27 @@ def api_node_entities_all(id_: int) -> Response:
     return jsonify(out)
 
 
-@app.route('/api/0.1/stratographic_node/<id_>', strict_slashes=False)
+@app.route('/api/0.1/subunit/<id_>', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
-def api_stratographic_node(id_: int) -> Response:
+def api_subunit(id_: int) -> Response:
     try:
-        out = APINode.get_stratographic_node(int(id_))
+        out = APINode.get_subunits(int(id_))
     except Exception:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404b")
     return jsonify(out)
 
 
-@app.route('/api/0.1/stratographic_node_all/<id_>', strict_slashes=False)
+@app.route('/api/0.1/subunit_hierarchy/<id_>', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
-def api_stratographic_node_all(id_: int) -> Response:
+def api_subunit_hierarchy(id_: int) -> Response:
     try:
-        out = APINode.get_stratographic_node_all(int(id_))
+        out = APINode.get_subunits_hierarchy(int(id_))
     except Exception:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404b")
     return jsonify(out)
+
 
 @app.route('/api', strict_slashes=False)
 @api_access()  # type: ignore

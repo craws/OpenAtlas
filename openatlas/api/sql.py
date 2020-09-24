@@ -73,8 +73,9 @@ class Query:
         # Performance: only join nodes and/or aliases if requested
         sql = """
             SELECT
-                e.id as id, e.class_code as class_code, e.name as name, e.description as description,
-                e.created as created, e.modified as modified, e.system_type as system_type,
+                e.id as id, e.class_code as class_code, e.name as name,
+                e.description as description, e.created as created, e.modified as modified,
+                e.system_type as system_type,
                 COALESCE(to_char(e.begin_from, 'yyyy-mm-dd BC'), '') AS begin_from, e.begin_comment,
                 COALESCE(to_char(e.begin_to, 'yyyy-mm-dd BC'), '') AS begin_to,
                 COALESCE(to_char(e.end_from, 'yyyy-mm-dd BC'), '') AS end_from, e.end_comment,
@@ -105,7 +106,8 @@ class Query:
                           meta: Dict[str, Any]) -> List[Query]:
         codes = code if isinstance(code, list) else [code]
         g.execute(
-            Query.build_sql() + """WHERE class_code IN %(codes)s {filter} ORDER BY {order} {sort};""".format(
+            Query.build_sql() + """WHERE class_code IN %(codes)s {filter}
+             ORDER BY {order} {sort};""".format(
                 filter=meta['filter'],
                 order=meta['column'],
                 sort=meta['sort']),
