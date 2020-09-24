@@ -130,8 +130,8 @@ def api_get_query() -> Response:  # pragma: nocover
     if request.args:
         out = []
         count = 0
-        if request.args.getlist('entities[]'):
-            entities = request.args.getlist('entities[]')
+        if request.args.getlist('entities'):
+            entities = request.args.getlist('entities')
             ids = []
             for e in entities:
                 try:
@@ -141,8 +141,8 @@ def api_get_query() -> Response:  # pragma: nocover
             result = Api.pagination(ids, meta=validation)
             count += len(result) - 1
             out.append({'entities': result})
-        if request.args.getlist('items[]'):
-            items = request.args.getlist('items[]')
+        if request.args.getlist('items'):
+            items = request.args.getlist('items')
             for i in items:
                 try:
                     out.append({'result': Api.pagination(
@@ -152,8 +152,8 @@ def api_get_query() -> Response:  # pragma: nocover
                         count += len(Api.get_entities_by_menu_item(code_=i, meta=validation))
                 except Exception:
                     raise APIError('Syntax is incorrect!', status_code=404, payload="404c")
-        if request.args.getlist('classes[]'):
-            classes = request.args.getlist('classes[]')
+        if request.args.getlist('classes'):
+            classes = request.args.getlist('classes')
             for class_code in classes:
                 if len(Api.get_entities_by_class(class_code_=class_code, meta=validation)) == 0:
                     raise APIError('Syntax is incorrect!', status_code=404, payload="404d")
