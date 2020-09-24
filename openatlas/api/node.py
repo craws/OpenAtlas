@@ -52,9 +52,10 @@ class APINode:
         except Exception:
             raise APIError('Subunit doesn\'t exist', status_code=404, payload="404a")
         data = []
-        for n in structure['subunits']:
-            data.append({'id': n.id, 'label': n.name,
-                         'url': url_for('api_entity', id_=n.id, _external=True)})
+        if structure:
+            for n in structure['subunits']:
+                data.append({'id': n.id, 'label': n.name,
+                             'url': url_for('api_entity', id_=n.id, _external=True)})
         return data
 
     @staticmethod
@@ -69,10 +70,12 @@ class APINode:
     def get_subunits_recursive(entity: Optional[Entity], data: List[Dict[str, Any]]) \
             -> List[Dict[str, Any]]:
         structure = get_structure(entity)
-        for n in structure['subunits']:
-            data.append({'id': n.id, 'label': n.name,
-                         'url': url_for('api_entity', id_=n.id, _external=True)})
+        if structure:
+            for n in structure['subunits']:
+                data.append({'id': n.id, 'label': n.name,
+                             'url': url_for('api_entity', id_=n.id, _external=True)})
         node = get_structure(entity)
-        for sub_id in node['subunits']:
-            APINode.get_subunits_recursive(sub_id, data)
+        if structure:
+            for sub_id in node['subunits']:
+                APINode.get_subunits_recursive(sub_id, data)
         return data
