@@ -4,6 +4,7 @@ class Changelog:
         '5.5.0': ['TBA', {
             'feature': {
                 '929': 'Module options',
+                '999': 'Navigation for archeological subunits',
                 '1189': 'User interface improvements',
                 '1222': 'Usability improvement at select tables',
                 '1289': 'Citation example for edition and bibliography'
