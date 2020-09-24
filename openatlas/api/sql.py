@@ -121,13 +121,13 @@ class Query:
             sql = Query.build_sql(nodes=True) + """
                 WHERE e.class_code IN %(codes)s AND e.system_type = 'source content' {filter}
                 GROUP BY e.id ORDER BY {order} {sort};""".format(filter=meta['filter'],
-                                                                 order=', '.join(meta['column']),
+                                                                 order=meta['column'],
                                                                  sort=meta['sort'])
         elif menu_item == 'reference':
             sql = Query.build_sql(nodes=True) + """
                 WHERE e.class_code IN %(codes)s AND e.system_type != 'file' {filter} GROUP BY e.id
                  ORDER BY {order} {sort};""".format(filter=meta['filter'],
-                                                    order=', '.join(meta['column']),
+                                                    order=meta['column'],
                                                     sort=meta['sort'])
         else:
             aliases = True if menu_item == 'actor' and current_user.is_authenticated and \
