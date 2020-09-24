@@ -4,6 +4,10 @@ html, body, input, select, textarea {
     font-family: helvetica, arial, sans-serif;
 }
 
+.navbar .dropdown-toggle::after {
+    display: none;
+}
+
 #global-term {
     width: 120px;
 }
