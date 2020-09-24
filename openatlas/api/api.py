@@ -11,8 +11,6 @@ from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
-from openatlas.models.node import Node
-from openatlas.models.place import get_structure
 from openatlas.util.util import format_date, get_file_path
 
 

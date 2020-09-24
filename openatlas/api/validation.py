@@ -25,15 +25,14 @@ class Validation:
 
     @staticmethod
     def validate_url_query(query: Any) -> Dict[str, Any]:
-        query = {'filter': Validation.validate_filter(query.get('filter')),
-                 'limit': Validation.validate_limit(query.get('limit')),
-                 'sort': Validation.validate_sort(query.get('sort')),
-                 'column': Validation.validate_column(query.get('column')),
-                 'last': Validation.validate_last(query.get('last')),
-                 'first': Validation.validate_first(query.get('first')),
-                 'show': Validation.validate_show(query.get('show')),
-                 'count': Validation.validate_count(query.getlist('count'))}
-        return query
+        return {'filter': Validation.validate_filter(query.get('filter')),
+                'limit': Validation.validate_limit(query.get('limit')),
+                'sort': Validation.validate_sort(query.get('sort')),
+                'column': Validation.validate_column(query.get('column')),
+                'last': Validation.validate_last(query.get('last')),
+                'first': Validation.validate_first(query.get('first')),
+                'show': Validation.validate_show(query.get('show')),
+                'count': Validation.validate_count(query.getlist('count'))}
 
     @staticmethod
     def validate_filter(filter_: str) -> str:
