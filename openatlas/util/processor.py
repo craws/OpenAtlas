@@ -11,7 +11,6 @@ from openatlas.util.util import get_file_extension
 
 class GlobalSearchForm(FlaskForm):  # type: ignore
     term = StringField('', render_kw={"placeholder": _('search term')})
-    search = SubmitField(_('search'))
 
 
 @app.context_processor

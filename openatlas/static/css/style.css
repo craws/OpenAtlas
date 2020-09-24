@@ -8,6 +8,15 @@ html, body, input, select, textarea {
     display: none;
 }
 
+.search-button {
+    color: gray;
+    padding: 0;
+    padding-right: 5px;
+    padding-top: 3px;
+    font-size: 26px;
+    display: inline-flex;
+}
+
 #global-term {
     width: 120px;
 }

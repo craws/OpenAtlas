@@ -70,10 +70,12 @@
         {% if current_user.is_authenticated %}
             <div id="index-search-button" class="iconbutton">
                 <div id="index-search">
-                    <form method="post" action="{{ url_for('search_index') }}" style="display: inline-flex">
+                    <form  class="form-group has-search" method="post" action="{{ url_for('search_index') }}" style="display: inline-flex">
                         {{ search_form.csrf_token }}
                         {{ search_form.term }}
-                        {{ search_form.search(class_=config['CSS']['button']['primary']) }}
+                        <button type="submit" class="btn btn-link search-button">
+                            <i class="fas fa-search"></i>
+                        </button>
                     </form>
                 </div>
             </div>
