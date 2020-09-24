@@ -3,7 +3,7 @@ from typing import Dict, Union
 from flask import session, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import StringField, SubmitField
+from wtforms import StringField
 
 from openatlas import app
 from openatlas.util.util import get_file_extension
