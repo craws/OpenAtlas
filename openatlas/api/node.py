@@ -48,7 +48,7 @@ class APINode:
         except Exception:
             raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
         try:
-            structure = get_structure(entity)
+            structure: Dict[str, Any] = get_structure(entity)
         except Exception:
             raise APIError('Subunit doesn\'t exist', status_code=404, payload="404a")
         data = []
