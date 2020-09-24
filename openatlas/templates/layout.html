@@ -83,50 +83,66 @@
                 {% if 'language' in session and session['language'] == language %}
                     <span class="btn btn-secondary active btn-sm">{{ language|upper }}</span>
                 {% else %}
-                    <a class="btn btn-secondary btn-sm"
-                       href="{{ url_for('set_locale', language=language) }}">{{ language|upper }}</a>
+                    <a class="btn btn-secondary btn-sm" href="{{ url_for('set_locale', language=language) }}">{{ language|upper }}</a>
                 {% endif %}
             {% endfor %}
         </div>
+        {% if current_user.is_authenticated %}
             <div class="iconbutton dropdown">
-                <a class="nav-link dropdown-toggle" data-toggle="dropdown" href="#" role="button" aria-haspopup="true" style="padding: 0px!important;"
-                   aria-expanded="false"><span><i class="fa fa-cog"></i></span></a>
+                <a  class="nav-link dropdown-toggle"
+                    data-toggle="dropdown"
+                    href="#"
+                    role="button"
+                    aria-haspopup="true"
+                    style="padding: 0px!important;"
+                    aria-expanded="false"><span><i class="fa fa-cog"></i></span></a>
                 <div class="dropdown-menu dropdown-menu-right">
-                    {% if current_user.is_authenticated %}
-                        <a class="dropdown-item" href="{{ url_for('profile_index') }}">
-                            <span>Profile</span>
-                        </a>
-                        <a class="dropdown-item" href="/admin">
-                            <span>
-                                {{ _('admin')|uc_first }}
-                            </span>
-                        </a>
-                    {% endif %}
+                    <a class="dropdown-item" href="{{ url_for('profile_index') }}">
+                        <span>{{ _('profile')|uc_first }}</span>
+                    </a>
+                    <a class="dropdown-item" href="/admin">
+                        <span>{{ _('admin')|uc_first }}</span>
+                    </a>
                     {% if 'contact'|display_content_translation %}
                         <a class="dropdown-item" href="{{ url_for('index_content', item='contact') }}">
-                            <span>
-                                Contact
-                            </span>
+                            <span>{{ _('contact')|uc_first }}</span>
                         </a>
                     {% endif %}
                     {% if 'legal_notice'|display_content_translation %}
                         <a class="dropdown-item" href="{{ url_for('index_content', item='legal_notice') }}">
-                            <span>
-                                Legal Notice
-                            </span>
+                            <span>{{ _('legal_notice')|uc_first }}</span>
                         </a>
                     {% endif %}
                     {% if current_user.is_authenticated %}
                         <a class="dropdown-item" href="/logout">
-                            <span>
-                                {{ _('logout')|uc_first }}
-                            </span>
+                            <span>{{ _('logout')|uc_first }}</span>
                         </a>
                     {% endif %}
                 </div>
             </div>
-        {% if current_user.is_authenticated %}
         {% else %}
+            {% if 'contact'|display_content_translation %}
+                <div class="iconbutton"
+                     data-toggle="popover"
+                     data-placement="bottom"
+                     data-content="{{ _('contact')|uc_first }}"
+                     data-trigger="hover">
+                    <a href="{{ url_for('index_content', item='contact') }}" >
+                        <span><i class="fas fa-at"></i></span>
+                    </a>
+                </div>
+            {% endif %}
+            {% if 'legal_notice'|display_content_translation %}
+                <div class="iconbutton"
+                     data-toggle="popover"
+                     data-placement="bottom"
+                     data-content="{{ _('legal_notice')|uc_first }}"
+                     data-trigger="hover">
+                    <a href="{{ url_for('index_content', item='legal_notice') }}" >
+                        <span><i class="fas fa-balance-scale"></i></span>
+                    </a>
+                </div>
+            {% endif %}
             <a class="btn btn-warning btn-sm" href="/login">{{ _('login')|uc_first }}</a>
         {% endif %}
     </div>
