@@ -34,6 +34,7 @@
                 {{ '3D'|button(url_for('model_network', dimensions=3)) }}
             </div>
             <p style="font-size:0.8em;margin-top:1em;">
+                {{ _('hello')|uc_first }} {{ current_user.username }}.
                 {% if session['login_previous_success'] %}
                     {{ _('last login')|uc_first }}: {{ session['login_previous_success'] }}
                     {% if session['login_previous_failures'] > 0 %}

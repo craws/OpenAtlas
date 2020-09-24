@@ -367,11 +367,6 @@ class TableSelect(HiddenInput):  # type: ignore
                     </div>
                 </div>
             </div>
-            <script>
-                $('#{name}-modal').on('shown.bs.modal', function () {{
-                    $('#{name}_table_filter input').focus();
-                }});
-            </script>
             """.format(name=field.id,
                        title=uc_first(_(field.id.replace('_', ' '))),
                        button_class=app.config['CSS']['button']['secondary'],
@@ -532,10 +527,10 @@ def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
 
 def get_form_settings(form: Any, profile: bool = False) -> Dict[str, str]:
     if isinstance(form, ProfileForm):
-        return {'name': current_user.real_name,
-                'email': current_user.email,
-                'show_email': _('on') if current_user.settings['show_email'] else _('off'),
-                'newsletter': _('on') if current_user.settings['newsletter'] else _('off')}
+        return {_('name'): current_user.real_name,
+                _('email'): current_user.email,
+                _('show email'): _('on') if current_user.settings['show_email'] else _('off'),
+                _('newsletter'): _('on') if current_user.settings['newsletter'] else _('off')}
     settings = {}
     for field in form:
         if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:

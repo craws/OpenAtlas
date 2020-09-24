@@ -20,6 +20,7 @@
                     {% endif %}
                 {% endif %}
                 {{ object_.id|bookmark_toggle }}
+                {{ object_|siblings_pager(structure) }}
             </div>
             <h1>{{ object_.name }}</h1>
             {{ profile_image_id|display_profile_image }}

@@ -1,5 +1,6 @@
 import os
 import re
+from collections import OrderedDict
 from typing import Any, Dict, List, Optional, Union
 
 import flask
@@ -50,6 +51,30 @@ def display_citation_example(self: Any, code: str) -> str:
     if not example or code not in ['edition', 'bibliography']:
         return ''
     return Markup('<h1>' + util.uc_first(_('citation_example')) + '</h1>' + example)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
+def siblings_pager(self: Any, entity: Entity, structure: Optional[Dict[str, Any]]) -> str:
+    if not structure or len(structure['siblings']) < 2:
+        return ''
+    structure['siblings'].sort(key=lambda x: x.id)
+    previous_id = None
+    next_id = None
+    position = None
+    for counter, sibling in enumerate(structure['siblings']):
+        position = counter + 1
+        previous_id = sibling.id if sibling.id < entity.id else previous_id
+        if sibling.id > entity.id:
+            next_id = sibling.id
+            position = counter
+            break
+    return Markup('{previous} {next} {position} {of_label} {count}'.format(
+        previous=util.button('<', url_for('entity_view', id_=previous_id)) if previous_id else '',
+        next=util.button('>', url_for('entity_view', id_=next_id)) if next_id else '',
+        position=position,
+        of_label=_('of'),
+        count=len(structure['siblings'])))
 
 
 @jinja2.contextfilter
@@ -436,7 +461,7 @@ def display_menu(self: Any, entity: Optional[Entity]) -> str:
     """ Returns HTML with the menu and mark appropriate item as selected."""
     html = ''
     if current_user.is_authenticated:
-        items = ['source', 'event', 'actor', 'place', 'reference', 'object', 'types', 'admin']
+        items = ['source', 'event', 'actor', 'place', 'reference', 'object', 'types']
         if request.path.startswith('/entity'):
             try:
                 entity = Entity.get_by_id(int(request.path.split('/')[-1]))
