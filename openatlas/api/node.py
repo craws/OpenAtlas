@@ -75,7 +75,7 @@ class APINode:
                 data.append({'id': n.id, 'label': n.name,
                              'url': url_for('api_entity', id_=n.id, _external=True)})
         node = get_structure(entity)
-        if structure:
+        if node:
             for sub_id in node['subunits']:
                 APINode.get_subunits_recursive(sub_id, data)
         return data
