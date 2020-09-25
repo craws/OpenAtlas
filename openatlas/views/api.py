@@ -174,10 +174,10 @@ def api_get_query() -> Response:  # pragma: nocover
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_node_entities(id_: int) -> Response:
     try:
-        out = APINode.get_node(int(id_))
+        id_ = int(id_)
     except Exception:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404b")
-    return jsonify(out)
+    return jsonify(APINode.get_node(id_))
 
 
 @app.route('/api/0.1/node_entities_all/<id_>', strict_slashes=False)
@@ -185,10 +185,10 @@ def api_node_entities(id_: int) -> Response:
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_node_entities_all(id_: int) -> Response:
     try:
-        out = APINode.get_node_all(int(id_))
+        id_ = int(id_)
     except Exception:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404b")
-    return jsonify(out)
+    return jsonify(APINode.get_node_all(id_))
 
 
 @app.route('/api/0.1/subunit/<id_>', strict_slashes=False)
@@ -196,10 +196,10 @@ def api_node_entities_all(id_: int) -> Response:
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_subunit(id_: int) -> Response:
     try:
-        out = APINode.get_subunits(int(id_))
+        id_ = int(id_)
     except Exception:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404b")
-    return jsonify(out)
+    return jsonify(APINode.get_subunits(id_))
 
 
 @app.route('/api/0.1/subunit_hierarchy/<id_>', strict_slashes=False)
@@ -207,10 +207,10 @@ def api_subunit(id_: int) -> Response:
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_subunit_hierarchy(id_: int) -> Response:
     try:
-        out = APINode.get_subunits_hierarchy(int(id_))
+        id_ = int(id_)
     except Exception:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404b")
-    return jsonify(out)
+    return jsonify(APINode.get_subunits_hierarchy(id_))
 
 
 @app.route('/api', strict_slashes=False)

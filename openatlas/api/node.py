@@ -47,15 +47,14 @@ class APINode:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
         except Exception:
             raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
-        try:
-            structure = get_structure(entity)
-        except Exception:
-            raise APIError('Subunit doesn\'t exist', status_code=404, payload="404a")
+        structure = get_structure(entity)
         data = []
-        if structure:
+        if structure['subunits']:
             for n in structure['subunits']:
                 data.append({'id': n.id, 'label': n.name,
                              'url': url_for('api_entity', id_=n.id, _external=True)})
+        else:
+            raise APIError('Subunit doesn\'t exist', status_code=404, payload="404a")
         return data
 
     @staticmethod

@@ -148,6 +148,25 @@ class ApiTests(TestBaseCase):
                 url_for('api_get_by_menu_item', code='place', limit=10, sort='desc', column='name',
                         filter='or(WRONG,name,Nostromos)', first=place_id))
             assert b'404f' in rv.data
+            rv = self.app.get(url_for('api_node_entities', id_='Hello'))
+            assert b'404b' in rv.data
+            rv = self.app.get(url_for('api_node_entities_all', id_='Hello'))
+            assert b'404b' in rv.data
+            rv = self.app.get(url_for('api_subunit', id_='Hello'))
+            assert b'404b' in rv.data
+            rv = self.app.get(url_for('api_subunit_hierarchy', id_='Hello'))
+            assert b'404b' in rv.data
+            rv = self.app.get(url_for('api_node_entities', id_=9999999))
+            assert b'404a' in rv.data
+            rv = self.app.get(url_for('api_node_entities_all', id_=9999999))
+            assert b'404a' in rv.data
+            rv = self.app.get(url_for('api_subunit', id_=99999999))
+            assert b'404a' in rv.data
+            rv = self.app.get(url_for('api_subunit_hierarchy', id_=9999999))
+            assert b'404a' in rv.data
+            rv = self.app.get(url_for('api_subunit', id_=source.id))
+            print(rv.data)
+            assert b'404a' in rv.data
             # rv = self.app.post(url_for('api_get_entities_by_json'))
             # assert b'405' in rv.data
             self.app.get(url_for('logout'), follow_redirects=True)
