@@ -49,7 +49,7 @@ class APINode:
             raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
         structure = get_structure(entity)
         data = []
-        if structure['subunits']:
+        if structure:
             for n in structure['subunits']:
                 data.append({'id': n.id, 'label': n.name,
                              'url': url_for('api_entity', id_=n.id, _external=True)})

@@ -7,8 +7,9 @@ class Changelog:
                 '999': 'Navigation for archeological subunits',
                 '1189': 'User interface improvements',
                 '1222': 'Usability improvement at select tables',
-                '1289': 'Citation example for edition and bibliography'
-            }, }],
+                '1289': 'Citation example for edition and bibliography',
+                '1206': 'API: Show entities of subtypes',
+                '1331': 'API: Front end queries'}}],
         '5.4.0': ['2020-09-09', {
             'feature': {
                 '1317': 'Additional manual content',

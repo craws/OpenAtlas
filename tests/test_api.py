@@ -27,8 +27,8 @@ class ApiTests(TestBaseCase):
                 unit_node = Node.get_hierarchy('Administrative Unit')
                 unit_sub1 = g.nodes[unit_node.subs[0]]
                 unit_sub2 = g.nodes[unit_node.subs[1]]
-                stratigraphic_node = Node.get_hierarchy('Stratigraphic Unit')
-                stratigraphic_sub = g.nodes[stratigraphic_node.subs[0]]
+                # stratigraphic_node = Node.get_hierarchy('Stratigraphic Unit')
+                # stratigraphic_sub = g.nodes[stratigraphic_node.subs[0]]
 
             # Data for geometric results
             data = {'name': 'Asgard', 'alias-0': 'Valhöll', 'geonames_id': '123',
@@ -98,8 +98,13 @@ class ApiTests(TestBaseCase):
 
             # Parameter: filter and first
             rv = self.app.get(
-                url_for('api_get_by_menu_item', code='place', limit=10, sort='desc', column='name',
-                        filter='or(eq,name,Nostromos)', first=place_id))
+                url_for('api_get_by_menu_item',
+                        code='place',
+                        limit=10,
+                        sort='desc',
+                        column='name',
+                        filter='or(eq,name,Nostromos)',
+                        first=place_id))
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('api_get_by_menu_item', code='reference'))
             assert b'openatlas' in rv.data
@@ -109,13 +114,16 @@ class ApiTests(TestBaseCase):
             assert b'entities' in rv.data
 
             # Parameter: filter
-            rv = self.app.get(url_for('api_get_by_class', class_code='E18',
+            rv = self.app.get(url_for('api_get_by_class',
+                                      class_code='E18',
                                       filter='AND(in,name,[Nostromos:hallo])'))
             assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('api_get_by_class', class_code='E18',
+            rv = self.app.get(url_for('api_get_by_class',
+                                      class_code='E18',
                                       filter='AND(in,name,[Nostromos])'))
             assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('api_get_by_class', class_code='E18',
+            rv = self.app.get(url_for('api_get_by_class',
+                                      class_code='E18',
                                       filter='or(like,name,Nostr)'))
             assert b'Nostromos' in rv.data
 
@@ -145,8 +153,13 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for('api_get_by_menu_item', code='Hello'))
             assert b'404c' in rv.data
             rv = self.app.get(
-                url_for('api_get_by_menu_item', code='place', limit=10, sort='desc', column='name',
-                        filter='or(WRONG,name,Nostromos)', first=place_id))
+                url_for('api_get_by_menu_item',
+                        code='place',
+                        limit=10,
+                        sort='desc',
+                        column='name',
+                        filter='or(WRONG,name,Nostromos)',
+                        first=place_id))
             assert b'404f' in rv.data
             rv = self.app.get(url_for('api_node_entities', id_='Hello'))
             assert b'404b' in rv.data
@@ -165,7 +178,6 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for('api_subunit_hierarchy', id_=9999999))
             assert b'404a' in rv.data
             rv = self.app.get(url_for('api_subunit', id_=source.id))
-            print(rv.data)
             assert b'404a' in rv.data
             # rv = self.app.post(url_for('api_get_entities_by_json'))
             # assert b'405' in rv.data
