@@ -8,7 +8,7 @@
     <div class="col-12">
         <ul class="nav nav-tabs" role="tablist">
             {{ 'profile'|tab_header(active=True) }}
-            {% if 'manager'|is_authorized %}
+            {% if 'contributor'|is_authorized %}
                 {{ 'modules'|tab_header }}
             {% endif %}
             {{ 'display'|tab_header }}
