@@ -94,8 +94,7 @@ class Changelog:
             'fix': {
                 '1069': 'Overlay maps: interchanged easting and northing',
                 '1071': "Filter function in jsTree doesn't clear correctly",
-                '1100': 'Save geometry not working'
-            }}],
+                '1100': 'Save geometry not working'}}],
         '3.20.1': ['2019-10-13', {
             'fix': {
                 '1069': 'Overlay maps: interchanged easting and northing'}}],

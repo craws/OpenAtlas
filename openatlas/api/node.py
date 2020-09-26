@@ -53,7 +53,7 @@ class APINode:
             for n in structure['subunits']:
                 data.append({'id': n.id, 'label': n.name,
                              'url': url_for('api_entity', id_=n.id, _external=True)})
-        else:
+        else:  # pragma: no cover
             raise APIError('Subunit doesn\'t exist', status_code=404, payload="404a")
         return data
 

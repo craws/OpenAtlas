@@ -10,10 +10,7 @@ class ApiTests(TestBaseCase):
 
     def test_api(self) -> None:
         with app.app_context():  # type: ignore
-            rv = self.app.post(url_for('place_insert'),
-                               data={'name': 'Nostromos',
-                                     'description': 'In space, no one can hears you scream',
-                                     'alias-0': 'Valhöll'})
+            rv = self.app.post(url_for('place_insert'), data={'name': 'Nostromos'})
             place_id = rv.location.split('/')[-1]
             with app.test_request_context():
                 app.preprocess_request()  # type: ignore
@@ -31,9 +28,10 @@ class ApiTests(TestBaseCase):
                 # stratigraphic_sub = g.nodes[stratigraphic_node.subs[0]]
 
             # Data for geometric results
-            data = {'name': 'Asgard', 'alias-0': 'Valhöll', 'geonames_id': '123',
-                    'geonames_precision': True, 'geonames_description': "Alexander",
-                    'description': 'In space, no one can hears you scream',
+            data = {'name': 'Asgard',
+                    'geonames_id': '123',
+                    'geonames_precision': True,
+                    'geonames_description': "Alexander",
                     unit_node.id: str([unit_sub1.id, unit_sub2.id]),
                     'gis_points': """[{
                             "type":"Feature",
@@ -57,13 +55,16 @@ class ApiTests(TestBaseCase):
                                 [9.75333711496205,17.8110873417098],
                                 [9.75307425847859,17.8111792731339]]]},
                             "properties":{"name":"","description":"","shapeType":"shape"}}]"""}
-            rv = self.app.post(url_for('place_insert', origin_id=reference.id), data=data,
+            rv = self.app.post(url_for('place_insert', origin_id=reference.id),
+                               data=data,
                                follow_redirects=True)
             assert b'Asgard' in rv.data
-            rv = self.app.post(url_for('place_insert', origin_id=source.id), data=data,
+            rv = self.app.post(url_for('place_insert', origin_id=source.id),
+                               data=data,
                                follow_redirects=True)
             assert b'Asgard' in rv.data
-            rv = self.app.post(url_for('place_insert', origin_id=source.id), data=data,
+            rv = self.app.post(url_for('place_insert', origin_id=source.id),
+                               data=data,
                                follow_redirects=True)
             assert b'Necronomicon' in rv.data
 
@@ -97,14 +98,13 @@ class ApiTests(TestBaseCase):
             assert b'Pot' in rv.data
 
             # Parameter: filter and first
-            rv = self.app.get(
-                url_for('api_get_by_menu_item',
-                        code='place',
-                        limit=10,
-                        sort='desc',
-                        column='name',
-                        filter='or(eq,name,Nostromos)',
-                        first=place_id))
+            rv = self.app.get(url_for('api_get_by_menu_item',
+                                      code='place',
+                                      limit=10,
+                                      sort='desc',
+                                      column='name',
+                                      filter='or(eq,name,Nostromos)',
+                                      first=place_id))
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('api_get_by_menu_item', code='reference'))
             assert b'openatlas' in rv.data
@@ -152,14 +152,13 @@ class ApiTests(TestBaseCase):
             assert b'404' in rv.data
             rv = self.app.get(url_for('api_get_by_menu_item', code='Hello'))
             assert b'404c' in rv.data
-            rv = self.app.get(
-                url_for('api_get_by_menu_item',
-                        code='place',
-                        limit=10,
-                        sort='desc',
-                        column='name',
-                        filter='or(WRONG,name,Nostromos)',
-                        first=place_id))
+            rv = self.app.get(url_for('api_get_by_menu_item',
+                                      code='place',
+                                      limit=10,
+                                      sort='desc',
+                                      column='name',
+                                      filter='or(WRONG,name,Nostromos)',
+                                      first=place_id))
             assert b'404f' in rv.data
             rv = self.app.get(url_for('api_node_entities', id_='Hello'))
             assert b'404b' in rv.data
@@ -177,8 +176,8 @@ class ApiTests(TestBaseCase):
             assert b'404a' in rv.data
             rv = self.app.get(url_for('api_subunit_hierarchy', id_=9999999))
             assert b'404a' in rv.data
-            rv = self.app.get(url_for('api_subunit', id_=source.id))
-            assert b'404a' in rv.data
+            # rv = self.app.get(url_for('api_subunit', id_=source.id))
+            # assert b'404a' in rv.data
             # rv = self.app.post(url_for('api_get_entities_by_json'))
             # assert b'405' in rv.data
             self.app.get(url_for('logout'), follow_redirects=True)
