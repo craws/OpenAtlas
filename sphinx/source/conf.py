@@ -2,8 +2,8 @@
 # -*- coding: utf-8 -*-
 from typing import List
 
-version = '5.5.0'
-release = '5.5.0'
+version = '5.6.0'
+release = '5.6.0'
 templates_path = ['_templates']
 source_suffix = '.rst'
 master_doc = 'index'
@@ -21,7 +21,6 @@ html_use_index = False
 html_copy_source = False  # prevent including source html files
 html_show_copyright = False
 
-html_theme_options = {
-    'display_version': True,
-    'style_external_links': True,
-    'navigation_depth': 2}
+html_theme_options = {'display_version': True,
+                      'style_external_links': True,
+                      'navigation_depth': 2}

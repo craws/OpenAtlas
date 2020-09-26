@@ -1,6 +1,8 @@
 class Changelog:
 
     versions = {
+        '5.6.0': ['TBA', {
+            'feature': {}}],
         '5.5.0': ['2020-09-26', {
             'feature': {
                 '929': 'Module options',
