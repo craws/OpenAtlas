@@ -8,11 +8,11 @@ personal information and adapt the user interface to your preferences.
 
 Change password
 ---------------
-When clicking on **Change password** you have to enter your current password and a new one (twice).
+When clicking on **Change password** you have to enter the current password and a new one twice.
 
 General
 -------
-* **Full name** - optional, provide your full name to make it easier for other users to identify you.
+* **Name** - optional, provide your full name to make it easier for other users to identify you.
 * **Email** - providing an email address is important in case you have to reset your password.
 * **Show email** - uncheck to hide your email for other users (except admins and managers).
 * **Newsletter** - check to receive newsletters including an unsubscribe link.
@@ -28,12 +28,12 @@ Display
 
 Modules
 -------
-With module options you can adjust shown interface elements to your preferences. You will still
-e.g. existing sub units when you deactivate them but the interface elements to add them will
-disappear.
+Here you can adjust shown interface elements to your preferences. You still see e.g. existing sub
+units even when you deactivate them but the interface elements to add them will disappear.
 
 * **GeoNames** - to use the GeoNames feature at :doc:`/menu/place` insert or update.
 * **Map Overlay** - to see overlays on the :doc:`/tools/map` or insert new ones (editor or above).
+* **Sub units** - to insert archeological sub units at places, see: :doc:`/menu/place`
 * **Notes** - an additional tool for your workflow, e.g. to add a personal reminder to an entity.
 
    * If activated you can add notes with **+ Note** when viewing an entity.
@@ -41,4 +41,4 @@ disappear.
    * Your notes are only visible to you (for public notes use the description field)
    * There is only one note per entity possible
    * Notes will get deleted if the entity is deleted by you or anybody else
-* **Sub units** - to insert archeological sub units at places, see: :doc:`/menu/place`
+
