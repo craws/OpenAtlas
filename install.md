@@ -105,6 +105,7 @@ e.g.
 ### Finishing
 
 Login with username "OpenAtlas" and password "change_me_PLEASE!" and change the password in profile.
+You may want to check the admin area to set up default site settings, email and similar.
 
 ### Upgrade
 

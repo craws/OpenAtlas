@@ -1,7 +1,7 @@
 class Changelog:
 
     versions = {
-        '5.5.0': ['TBA', {
+        '5.5.0': ['2020-09-26', {
             'feature': {
                 '929': 'Module options',
                 '999': 'Navigation for archeological subunits',
