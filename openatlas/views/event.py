@@ -211,9 +211,7 @@ def event_view(event: Entity) -> str:
         if is_authorized('contributor'):
             data.append(
                 link(_('edit'), url_for('involvement_update', id_=link_.id, origin_id=event.id)))
-            data.append(remove_link(
-                link_.range.name,
-                url_for('link_delete', id_=link_.id, origin_id=event.id) + '#tab-actor'))
+            data.append(remove_link(link_.range.name, link_, event, 'actor'))
         tabs['actor'].table.rows.append(data)
     profile_image_id = event.get_profile_image_id()
     event.note = User.get_note(event)
@@ -234,9 +232,7 @@ def event_view(event: Entity) -> str:
                                                     link_id=link_.id,
                                                     origin_id=event.id)))
         if is_authorized('contributor'):
-            data.append(remove_link(domain.name,
-                                    url_for('link_delete', id_=link_.id, origin_id=event.id) +
-                                    '#tab-' + domain.view_name))
+            data.append(remove_link(domain.name, link_, event, domain.view_name))
         tabs[domain.view_name].table.rows.append(data)
     objects = [location.get_linked_entity_safe('P53', True)
                for location in event.get_linked_entities(['P7', 'P26', 'P27'])]

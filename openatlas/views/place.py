@@ -237,9 +237,7 @@ def place_view(obj: Entity) -> str:
             else:
                 data.append('')
         if is_authorized('contributor'):
-            data.append(remove_link(domain.name,
-                                    url_for('link_delete', id_=link_.id, origin_id=obj.id) +
-                                    '#tab-' + domain.view_name))
+            data.append(remove_link(domain.name, link_, obj, domain.view_name))
         tabs[domain.view_name].table.rows.append(data)
     event_ids = []  # Keep track of already inserted events to prevent doubles
     for event in location.get_linked_entities(['P7', 'P26', 'P27'], inverse=True):

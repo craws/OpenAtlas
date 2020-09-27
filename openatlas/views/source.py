@@ -141,9 +141,7 @@ def source_view(source: Entity) -> str:
         range_ = link_.range
         data = get_base_table_data(range_)
         if is_authorized('contributor'):
-            data.append(remove_link(range_.name,
-                                    url_for('link_delete', id_=link_.id, origin_id=source.id) +
-                                    '#tab-' + range_.table_name))
+            data.append(remove_link(range_.name, link_, source, range_.table_name))
         tabs[range_.table_name].table.rows.append(data)
     profile_image_id = source.get_profile_image_id()
     for link_ in source.get_links('P67', True):
@@ -163,9 +161,7 @@ def source_view(source: Entity) -> str:
                                                     link_id=link_.id,
                                                     origin_id=source.id)))
         if is_authorized('contributor'):
-            data.append(remove_link(domain.name,
-                                    url_for('link_delete', id_=link_.id, origin_id=source.id) +
-                                    '#tab-' + domain.view_name))
+            data.append(remove_link(domain.name, link_, source, domain.view_name))
         tabs[domain.view_name].table.rows.append(data)
     source.note = User.get_note(source)
     return render_template('source/view.html',

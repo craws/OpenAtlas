@@ -199,9 +199,7 @@ def node_view(node: Node) -> str:
             if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                 profile_image_id = domain.id
         if is_authorized('contributor'):
-            data.append(remove_link(domain.name,
-                                    url_for('link_delete', id_=link_.id, origin_id=node.id) +
-                                    '#tab-' + domain.view_name))
+            data.append(remove_link(domain.name, link_, node, domain.view_name))
         tabs[domain.view_name].table.rows.append(data)
     for sub_id in node.subs:
         sub = g.nodes[sub_id]

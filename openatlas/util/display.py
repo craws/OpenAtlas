@@ -12,7 +12,7 @@ from typing import Any, Dict, List, Optional, TYPE_CHECKING, Tuple, Union
 
 import numpy
 from flask import g, url_for
-from flask_babel import format_number, lazy_gettext as _
+from flask_babel import LazyString, format_number, lazy_gettext as _
 from flask_login import current_user
 from markupsafe import Markup
 
@@ -33,13 +33,15 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
 def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'User'],
          url: Optional[str] = None,
          class_: Optional[str] = None,
-         uc_first_: Optional[bool] = True) -> str:
+         uc_first_: Optional[bool] = True,
+         js: Optional[str] = None) -> str:
 
-    if type(object_) is str:  # An link with given label and destination URL
-        return '<a href="{url}" {class_}>{label}</a>'.format(
+    if type(object_) is str or type(object_) is LazyString:
+        return '<a href="{url}" {class_} {js}>{label}</a>'.format(
             url=url,
-            label=uc_first(object_) if uc_first_ else object_,
-            class_='class="' + class_ + '"' if class_ else '')
+            class_='class="' + class_ + '"' if class_ else '',
+            js='onclick="{js}"'.format(js=js) if js else '',
+            label=(uc_first(object_)) if uc_first_ else object_)
 
     # Builds an HTML link to a detail view of an object
     from openatlas.models.entity import Entity
@@ -53,12 +55,19 @@ def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'Us
                     class_='' if object_.active else 'inactive',
                     uc_first_=False)
     if isinstance(object_, CidocClass):
-        return link(object_.code, url_for('class_view', code=object_.code), uc_first_=False)
+        return link(object_.code, url_for('class_view', code=object_.code))
     if isinstance(object_, CidocProperty):
-        return link(object_.code, url_for('property_view', code=object_.code), uc_first_=False)
+        return link(object_.code, url_for('property_view', code=object_.code))
     if isinstance(object_, Entity):
         return link(object_.name, url_for('entity_view', id_=object_.id), uc_first_=False)
     return ''
+
+
+def remove_link(name: str, link_: Link, origin: Entity, tab: str) -> str:
+    return(link(
+        _('remove'),
+        url_for('link_delete', id_=link_.id, origin_id=origin.id) + '#tab-' + tab,
+        js="return confirm('{x}')".format(x=_('Remove %(name)s?', name=name.replace("'", '')))))
 
 
 def uc_first(string: str) -> str:
@@ -216,13 +225,6 @@ def tooltip(text: str) -> str:
         return ''
     return '<span><i class="fas fa-info-circle tooltipicon" title="{title}"></i></span>'.format(
         title=text.replace('"', "'"))
-
-
-def remove_link(name: str, url: str) -> str:
-    """ Build a link to remove a link with a JavaScript confirmation dialog"""
-    name = name.replace('\'', '')
-    confirm = 'onclick="return confirm(\'' + _('Remove %(name)s?', name=name) + '\')"'
-    return '<a ' + confirm + ' href="' + url + '">' + uc_first(_('remove')) + '</a>'
 
 
 def truncate(string: Optional[str] = '', length: int = 40, span: bool = True) -> str:

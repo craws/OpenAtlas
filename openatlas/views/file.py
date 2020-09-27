@@ -160,9 +160,7 @@ def file_view(file: Entity) -> str:
         range_ = link_.range
         data = get_base_table_data(range_)
         if is_authorized('contributor'):
-            data.append(remove_link(range_.name,
-                                    url_for('link_delete', id_=link_.id, origin_id=file.id) +
-                                    '#tab-' + range_.table_name))
+            data.append(remove_link(range_.name, link_, file, range_.table_name))
         tabs[range_.table_name].table.rows.append(data)
     for link_ in file.get_links('P67', True):
         data = get_base_table_data(link_.domain)
@@ -170,9 +168,7 @@ def file_view(file: Entity) -> str:
         if is_authorized('contributor'):
             data.append(link(_('edit'),
                              url_for('reference_link_update', link_id=link_.id, origin_id=file.id)))
-            data.append(remove_link(
-                link_.domain.name,
-                url_for('link_delete', id_=link_.id, origin_id=file.id) + '#tab-reference'))
+            data.append(remove_link(link_.domain.name, link_, file, 'reference'))
         tabs['reference'].table.rows.append(data)
     path = get_file_path(file.id)
     return render_template('file/view.html',

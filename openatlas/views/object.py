@@ -68,24 +68,23 @@ def object_update(id_: int) -> Union[str, Response]:
     return render_template('object/update.html', form=form, object_=object_)
 
 
-def object_view(obj: Entity) -> str:
-    tabs = {name: Tab(name, origin=obj) for name in ['info', 'source', 'event']}
-    for link_ in obj.get_links('P128'):
+def object_view(object_: Entity) -> str:
+    tabs = {name: Tab(name, origin=object_) for name in ['info', 'source', 'event']}
+    for link_ in object_.get_links('P128'):
         data = get_base_table_data(link_.range)
         if is_authorized('contributor'):
-            data.append(remove_link(link_.range.name,
-                                    url_for('link_delete', id_=link_.id, origin_id=obj.id) +
-                                    '#tab-' + link_.range.table_name))
+            data.append(remove_link(link_.range.name, link_, object_, link_.range.table_name))
         tabs['source'].table.rows.append(data)
-    for link_ in obj.get_links('P25', inverse=True):
+    for link_ in object_.get_links('P25', inverse=True):
         data = get_base_table_data(link_.domain)
         if is_authorized('contributor'):
-            data.append(remove_link(link_.range.name,
-                                    url_for('link_delete', id_=link_.id, origin_id=obj.id) +
-                                    '#tab-' + link_.range.table_name))
+            data.append(remove_link(link_.range.name, link_, object_, link_.range.table_name))
         tabs['event'].table.rows.append(data)
-    obj.note = User.get_note(obj)
-    return render_template('object/view.html', object_=obj, tabs=tabs, info=get_entity_data(obj))
+    object_.note = User.get_note(object_)
+    return render_template('object/view.html',
+                           object_=object_,
+                           tabs=tabs,
+                           info=get_entity_data(object_))
 
 
 def save(form: Any, object_: Optional[Entity] = None) -> str:

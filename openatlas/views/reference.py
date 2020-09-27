@@ -170,9 +170,7 @@ def reference_view(reference: Entity) -> str:
         domain = link_.domain
         data = get_base_table_data(domain)
         if is_authorized('contributor'):
-            data.append(remove_link(domain.name,
-                                    url_for('link_delete', id_=link_.id, origin_id=reference.id) +
-                                    '#tab-file'))
+            data.append(remove_link(domain.name, link_, reference, 'file'))
         tabs['file'].table.rows.append(data)
     profile_image_id = reference.get_profile_image_id()
     for link_ in reference.get_links(['P67', 'P128']):
@@ -186,9 +184,7 @@ def reference_view(reference: Entity) -> str:
             data.append(link(_('edit'), url_for('reference_link_update',
                                                 link_id=link_.id,
                                                 origin_id=reference.id)))
-            data.append(remove_link(range_.name,
-                                    url_for('link_delete', id_=link_.id, origin_id=reference.id) +
-                                    '#tab-' + range_.table_name))
+            data.append(remove_link(range_.name, link_, reference, range_.table_name))
         tabs[range_.table_name].table.rows.append(data)
     reference.note = User.get_note(reference)
     return render_template('reference/view.html',
