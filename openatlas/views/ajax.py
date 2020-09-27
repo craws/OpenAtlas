@@ -3,7 +3,7 @@ from flask import jsonify, request
 from openatlas import app
 from openatlas.models.user import User
 from openatlas.util.util import required_group
-from openatlas.util.html import uc_first
+from openatlas.util.display import uc_first
 
 
 @app.route('/ajax/bookmark', methods=['POST'])

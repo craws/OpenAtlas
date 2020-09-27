@@ -10,7 +10,7 @@ from psycopg2.extras import NamedTupleCursor
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from openatlas.util.html import get_file_path
+from openatlas.util.display import get_file_path
 
 
 class Overlay:

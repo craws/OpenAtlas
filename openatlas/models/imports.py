@@ -8,7 +8,7 @@ from psycopg2.extras import NamedTupleCursor
 
 from openatlas import app
 from openatlas.util.util import is_float
-from openatlas.util.html import sanitize, uc_first
+from openatlas.util.display import sanitize, uc_first
 
 
 class Project:

@@ -17,7 +17,7 @@ from openatlas.models.node import Node
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (is_authorized, required_group)
-from openatlas.util.html import display_remove_link, get_base_table_data, get_entity_data, \
+from openatlas.util.display import remove_link, get_base_table_data, get_entity_data, \
     get_profile_image_table_link, \
     link, sanitize, uc_first
 
@@ -199,8 +199,9 @@ def node_view(node: Node) -> str:
             if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                 profile_image_id = domain.id
         if is_authorized('contributor'):
-            url = url_for('link_delete', id_=link_.id, origin_id=node.id)
-            data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
+            data.append(remove_link(domain.name,
+                                    url_for('link_delete', id_=link_.id, origin_id=node.id) +
+                                    '#tab-' + domain.view_name))
         tabs[domain.view_name].table.rows.append(data)
     for sub_id in node.subs:
         sub = g.nodes[sub_id]

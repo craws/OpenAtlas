@@ -13,7 +13,7 @@ from openatlas import app, logger
 from openatlas.models.export import Export
 from openatlas.util.table import Table
 from openatlas.util.util import is_authorized, required_group
-from openatlas.util.html import convert_size, link, uc_first
+from openatlas.util.display import convert_size, link, uc_first
 
 
 class ExportSqlForm(FlaskForm):  # type: ignore

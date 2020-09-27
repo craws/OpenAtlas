@@ -15,7 +15,7 @@ from openatlas.models.user import User
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (is_authorized, required_group, was_modified)
-from openatlas.util.html import display_remove_link, get_base_table_data, get_entity_data, link
+from openatlas.util.display import remove_link, get_base_table_data, get_entity_data, link
 
 
 class InformationCarrierForm(FlaskForm):  # type: ignore
@@ -73,16 +73,16 @@ def object_view(obj: Entity) -> str:
     for link_ in obj.get_links('P128'):
         data = get_base_table_data(link_.range)
         if is_authorized('contributor'):
-            url = url_for('link_delete', id_=link_.id, origin_id=obj.id)
-            data.append(display_remove_link(url + '#tab-' + link_.range.table_name,
-                                            link_.range.name))
+            data.append(remove_link(link_.range.name,
+                                    url_for('link_delete', id_=link_.id, origin_id=obj.id) +
+                                    '#tab-' + link_.range.table_name))
         tabs['source'].table.rows.append(data)
     for link_ in obj.get_links('P25', inverse=True):
         data = get_base_table_data(link_.domain)
         if is_authorized('contributor'):
-            url = url_for('link_delete', id_=link_.id, origin_id=obj.id)
-            data.append(display_remove_link(url + '#tab-' + link_.range.table_name,
-                                            link_.range.name))
+            data.append(remove_link(link_.range.name,
+                                    url_for('link_delete', id_=link_.id, origin_id=obj.id) +
+                                    '#tab-' + link_.range.table_name))
         tabs['event'].table.rows.append(data)
     obj.note = User.get_note(obj)
     return render_template('object/view.html', object_=obj, tabs=tabs, info=get_entity_data(obj))

@@ -16,13 +16,11 @@ from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.user import User
+from openatlas.util.display import (get_base_table_data, get_entity_data, get_profile_image_table_link,
+                                    link, remove_link)
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import (is_authorized, required_group,
-                                 was_modified)
-from openatlas.util.html import display_remove_link, get_base_table_data, get_entity_data, \
-    get_profile_image_table_link, \
-    link
+from openatlas.util.util import is_authorized, required_group, was_modified
 
 
 class EventForm(DateForm):
@@ -211,10 +209,11 @@ def event_view(event: Entity) -> str:
                 first, last,
                 link_.description]
         if is_authorized('contributor'):
-            data.append(link(_('edit'),
-                             url_for('involvement_update', id_=link_.id, origin_id=event.id)))
-            unlink = url_for('link_delete', id_=link_.id, origin_id=event.id) + '#tab-actor'
-            data.append(display_remove_link(unlink, link_.range.name))
+            data.append(
+                link(_('edit'), url_for('involvement_update', id_=link_.id, origin_id=event.id)))
+            data.append(remove_link(
+                link_.range.name,
+                url_for('link_delete', id_=link_.id, origin_id=event.id) + '#tab-actor'))
         tabs['actor'].table.rows.append(data)
     profile_image_id = event.get_profile_image_id()
     event.note = User.get_note(event)
@@ -235,8 +234,9 @@ def event_view(event: Entity) -> str:
                                                     link_id=link_.id,
                                                     origin_id=event.id)))
         if is_authorized('contributor'):
-            url = url_for('link_delete', id_=link_.id, origin_id=event.id)
-            data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
+            data.append(remove_link(domain.name,
+                                    url_for('link_delete', id_=link_.id, origin_id=event.id) +
+                                    '#tab-' + domain.view_name))
         tabs[domain.view_name].table.rows.append(data)
     objects = [location.get_linked_entity_safe('P53', True)
                for location in event.get_linked_entities(['P7', 'P26', 'P27'])]

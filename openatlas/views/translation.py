@@ -13,7 +13,7 @@ from openatlas import app, logger
 from openatlas.forms.forms import build_form
 from openatlas.models.entity import Entity
 from openatlas.util.util import required_group
-from openatlas.util.html import get_entity_data
+from openatlas.util.display import get_entity_data
 
 
 class TranslationForm(FlaskForm):  # type: ignore

@@ -27,7 +27,7 @@ from openatlas.models.user import User
 from openatlas.util.table import Table
 from openatlas.util.util import (get_file_stats, is_authorized, required_group,
                                  send_mail)
-from openatlas.util.html import convert_size, format_date, format_datetime, get_disk_space_info, \
+from openatlas.util.display import convert_size, format_date, format_datetime, get_disk_space_info, \
     get_file_path, link, sanitize, \
     truncate, uc_first
 

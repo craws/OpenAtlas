@@ -13,13 +13,12 @@ from openatlas.forms.forms import TableField, build_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.user import User
+from openatlas.util.display import (add_system_data, add_type_data, format_entry_begin,
+                                    format_entry_end, get_appearance, get_base_table_data,
+                                    get_profile_image_table_link, link, remove_link)
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import (is_authorized,
-                                 required_group, was_modified)
-from openatlas.util.html import add_system_data, add_type_data, display_remove_link, \
-    format_entry_begin, format_entry_end, get_appearance, get_base_table_data, \
-    get_profile_image_table_link, link
+from openatlas.util.util import is_authorized, required_group, was_modified
 
 
 class ActorForm(DateForm):
@@ -156,25 +155,24 @@ def actor_view(actor: Entity) -> str:
     profile_image_id = actor.get_profile_image_id()
     for link_ in actor.get_links('P67', True):
         domain = link_.domain
-        data_ = get_base_table_data(domain)
+        data = get_base_table_data(domain)
         if domain.view_name == 'file':
-            extension = data_[3].replace('.', '')
-            data_.append(
-                get_profile_image_table_link(domain, actor, extension, profile_image_id))
+            extension = data[3].replace('.', '')
+            data.append(get_profile_image_table_link(domain, actor, extension, profile_image_id))
             if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                 profile_image_id = domain.id
         if domain.view_name not in ['source', 'file']:
-            data_.append(link_.description)
+            data.append(link_.description)
             if domain.system_type == 'external reference':
                 actor.external_references.append(link_)
             if is_authorized('contributor'):
-                data_.append(link(_('edit'), url_for('reference_link_update',
-                                                     link_id=link_.id,
-                                                     origin_id=actor.id)))
+                data.append(link(_('edit'), url_for('reference_link_update',
+                                                    link_id=link_.id,
+                                                    origin_id=actor.id)))
         if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=actor.id)
-            data_.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
-        tabs[domain.view_name].table.rows.append(data_)
+            data.append(remove_link(domain.name, url + '#tab-' + domain.view_name))
+        tabs[domain.view_name].table.rows.append(data)
 
     # Todo: Performance - getting every place of every object for every event is very costly
     event_links = actor.get_links(['P11', 'P14', 'P22', 'P23', 'P25'], True)
@@ -201,11 +199,12 @@ def actor_view(actor: Entity) -> str:
                 last,
                 link_.description]
         if is_authorized('contributor'):
-            data.append(link(_('edit'),
-                             url_for('involvement_update', id_=link_.id, origin_id=actor.id)))
-            data.append(display_remove_link(
-                url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-event',
-                link_.domain.name))
+            data.append(link(_('edit'), url_for('involvement_update',
+                                                id_=link_.id,
+                                                origin_id=actor.id)))
+            data.append(remove_link(link_.domain.name, url_for('link_delete',
+                                                               id_=link_.id,
+                                                               origin_id=actor.id) + '#tab-event'))
         tabs['event'].table.rows.append(data)
 
     # Add info of dates and places
@@ -250,8 +249,9 @@ def actor_view(actor: Entity) -> str:
         if is_authorized('contributor'):
             data.append(link(_('edit'),
                              url_for('relation_update', id_=link_.id, origin_id=actor.id)))
-            unlink_url = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-relation'
-            data.append(display_remove_link(unlink_url, related.name))
+            data.append(remove_link(
+                related.name,
+                url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-relation'))
         tabs['relation'].table.rows.append(data)
     for link_ in actor.get_links('P107', True):
         data = [link(link_.domain),
@@ -261,8 +261,9 @@ def actor_view(actor: Entity) -> str:
                 link_.description]
         if is_authorized('contributor'):
             data.append(link(_('edit'), url_for('member_update', id_=link_.id, origin_id=actor.id)))
-            unlink = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-member-of'
-            data.append(display_remove_link(unlink, link_.domain.name))
+            data.append(remove_link(
+                link_.domain.name,
+                url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-member-of'))
         tabs['member_of'].table.rows.append(data)
     if actor.class_.code not in app.config['CLASS_CODES']['group']:
         del tabs['member']
@@ -274,10 +275,11 @@ def actor_view(actor: Entity) -> str:
                     link_.last,
                     link_.description]
             if is_authorized('contributor'):
-                data.append(link(_('edit'),
-                                 url_for('member_update', id_=link_.id, origin_id=actor.id)))
-                unlink = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-member'
-                data.append(display_remove_link(unlink, link_.range.name))
+                data.append(
+                    link(_('edit'), url_for('member_update', id_=link_.id, origin_id=actor.id)))
+                data.append(remove_link(
+                    link_.range.name,
+                    url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-member'))
             tabs['member'].table.rows.append(data)
     gis_data = Gis.get_all(objects) if objects else None
     if gis_data and gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]':

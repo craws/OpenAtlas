@@ -7,7 +7,7 @@ from flask_wtf import FlaskForm
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Project
 from openatlas.models.node import Node
-from openatlas.util.html import sanitize
+from openatlas.util.display import sanitize
 
 
 class InvalidGeomException(Exception):

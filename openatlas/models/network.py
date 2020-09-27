@@ -4,7 +4,7 @@ from flask import flash, g
 from flask_wtf import FlaskForm
 from psycopg2.extras import NamedTupleCursor
 
-from openatlas.util.html import truncate
+from openatlas.util.display import truncate
 
 
 class Network:

@@ -9,7 +9,7 @@ from psycopg2.extras import NamedTupleCursor
 
 from openatlas import logger
 from openatlas.models.date import Date
-from openatlas.util.html import link, uc_first
+from openatlas.util.display import link, uc_first
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
@@ -240,7 +240,7 @@ class Link:
     @staticmethod
     def check_links() -> List[Dict[str, str]]:
         """ Check all existing links for CIDOC CRM validity and return the invalid ones."""
-        from openatlas.util.html import link
+        from openatlas.util.display import link
         from openatlas.models.entity import Entity
         sql = """
             SELECT DISTINCT l.property_code AS property, d.class_code AS domain,

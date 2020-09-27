@@ -16,7 +16,7 @@ from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (is_authorized, required_group,
                                  was_modified)
-from openatlas.util.html import display_remove_link, get_base_table_data, get_entity_data, \
+from openatlas.util.display import remove_link, get_base_table_data, get_entity_data, \
     get_profile_image_table_link, \
     link
 
@@ -141,8 +141,9 @@ def source_view(source: Entity) -> str:
         range_ = link_.range
         data = get_base_table_data(range_)
         if is_authorized('contributor'):
-            url = url_for('link_delete', id_=link_.id, origin_id=source.id)
-            data.append(display_remove_link(url + '#tab-' + range_.table_name, range_.name))
+            data.append(remove_link(range_.name,
+                                    url_for('link_delete', id_=link_.id, origin_id=source.id) +
+                                    '#tab-' + range_.table_name))
         tabs[range_.table_name].table.rows.append(data)
     profile_image_id = source.get_profile_image_id()
     for link_ in source.get_links('P67', True):
@@ -162,8 +163,9 @@ def source_view(source: Entity) -> str:
                                                     link_id=link_.id,
                                                     origin_id=source.id)))
         if is_authorized('contributor'):
-            url = url_for('link_delete', id_=link_.id, origin_id=source.id)
-            data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
+            data.append(remove_link(domain.name,
+                                    url_for('link_delete', id_=link_.id, origin_id=source.id) +
+                                    '#tab-' + domain.view_name))
         tabs[domain.view_name].table.rows.append(data)
     source.note = User.get_note(source)
     return render_template('source/view.html',

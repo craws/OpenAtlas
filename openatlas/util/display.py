@@ -28,6 +28,8 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.user import User
 
 
+# This file was created in an effort to move all HTML code out of views and util.py to one place
+
 def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'User'],
          url: Optional[str] = None,
          class_: Optional[str] = None,
@@ -89,7 +91,7 @@ def add_dates_to_form(form: Any, for_person: bool = False) -> str:
             </div>
         </div>""".format(date=uc_first(_('date')),
                          button_class=app.config['CSS']['button']['secondary'],
-                         tooltip=display_tooltip(_('tooltip date')),
+                         tooltip=tooltip(_('tooltip date')),
                          show=uc_first(switch_label))
     html += '<div class="table-row date-switch" ' + style + '>'
     html += '<div>' + uc_first(_('birth') if for_person else _('begin')) + '</div>'
@@ -209,14 +211,14 @@ def button(label: str,
     return Markup(html)
 
 
-def display_tooltip(text: str) -> str:
+def tooltip(text: str) -> str:
     if not text:
         return ''
     return '<span><i class="fas fa-info-circle tooltipicon" title="{title}"></i></span>'.format(
         title=text.replace('"', "'"))
 
 
-def display_remove_link(url: str, name: str) -> str:
+def remove_link(name: str, url: str) -> str:
     """ Build a link to remove a link with a JavaScript confirmation dialog"""
     name = name.replace('\'', '')
     confirm = 'onclick="return confirm(\'' + _('Remove %(name)s?', name=name) + '\')"'

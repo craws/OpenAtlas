@@ -16,8 +16,8 @@ from openatlas.forms.forms import build_form, build_table_form
 from openatlas.models.entity import Entity
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import (get_file_stats, is_authorized, required_group, was_modified)
-from openatlas.util.html import convert_size, display_remove_link, format_date, get_base_table_data, \
+from openatlas.util.util import get_file_stats, is_authorized, required_group, was_modified
+from openatlas.util.display import convert_size, remove_link, format_date, get_base_table_data, \
     get_entity_data, get_file_path, link
 
 
@@ -160,8 +160,9 @@ def file_view(file: Entity) -> str:
         range_ = link_.range
         data = get_base_table_data(range_)
         if is_authorized('contributor'):
-            url = url_for('link_delete', id_=link_.id, origin_id=file.id)
-            data.append(display_remove_link(url + '#tab-' + range_.table_name, range_.name))
+            data.append(remove_link(range_.name,
+                                    url_for('link_delete', id_=link_.id, origin_id=file.id) +
+                                    '#tab-' + range_.table_name))
         tabs[range_.table_name].table.rows.append(data)
     for link_ in file.get_links('P67', True):
         data = get_base_table_data(link_.domain)
@@ -169,8 +170,9 @@ def file_view(file: Entity) -> str:
         if is_authorized('contributor'):
             data.append(link(_('edit'),
                              url_for('reference_link_update', link_id=link_.id, origin_id=file.id)))
-            unlink = url_for('link_delete', id_=link_.id, origin_id=file.id)
-            data.append(display_remove_link(unlink + '#tab-reference', link_.domain.name))
+            data.append(remove_link(
+                link_.domain.name,
+                url_for('link_delete', id_=link_.id, origin_id=file.id) + '#tab-reference'))
         tabs['reference'].table.rows.append(data)
     path = get_file_path(file.id)
     return render_template('file/view.html',
