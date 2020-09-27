@@ -16,7 +16,8 @@ from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.changelog import Changelog
 from openatlas.util.table import Table
-from openatlas.util.util import (bookmark_toggle, format_date, link, required_group, send_mail,
+from openatlas.util.util import (bookmark_toggle, format_date, html_link, link, required_group,
+                                 send_mail,
                                  uc_first)
 
 
@@ -59,11 +60,10 @@ def index() -> str:
         for name, count in Entity.get_overview_counts().items():
             if not count:
                 continue
-            label = uc_first(_(name))
-            if name not in ('find', 'human remains'):
-                label = '<a href="{url}">{text}</a>'.format(url=url_for(name + '_index'),
-                                                            text=label)
-            tables['overview'].rows.append([label, format_number(count)])
+            tables['overview'].rows.append([
+                uc_first(_(name)) if name in ['find', 'human remains'] else html_link(
+                    _(name), url_for(name + '_index')),
+                format_number(count)])
         for entity in Entity.get_latest(8):
             tables['latest'].rows.append([
                 link(entity),

@@ -215,8 +215,8 @@ def add_system_data(entity: 'Entity',
             data[_('imported by')] = link(info['import_user'])
         if info['import_origin_id']:
             data['origin ID'] = info['import_origin_id']
-        data_api = '<a href="{url}" target="_blank">GeoJSON</a>'.format(url=url_for('api_entity',
-                                                                                    id_=entity.id))
+        data_api = '<a href="{url}" target="_blank">GeoJSON</a>'.format(
+            url=url_for('api_entity', id_=entity.id))
         data_api += '''
             <a class="btn btn-outline-primary btn-sm" href="{url}" target="_blank" title="Download">
                 <i class="fas fa-download"></i> {label}
@@ -442,41 +442,41 @@ def get_profile_image_table_link(file: 'Entity',
                                  extension: str,
                                  profile_image_id: Optional[int] = None) -> str:
     if file.id == profile_image_id:
-        return '<a href="{url}">{label}</a>'.format(
-            url=url_for('file_remove_profile_image', entity_id=entity.id),
-            label=uc_first(_('unset')))
+        return html_link(_('unset'), url_for('file_remove_profile_image', entity_id=entity.id))
     elif extension in app.config['DISPLAY_FILE_EXTENSIONS']:
-        return '<a href="{url}">{label}</a>'.format(
-            url=url_for('file_set_as_profile_image', id_=file.id, origin_id=entity.id),
-            label=uc_first(_('set')))
+        return html_link(_('set'), url_for('set_profile_image', id_=file.id, origin_id=entity.id))
     return ''  # pragma: no cover - only happens for non image files
 
 
-def link(entity: Union['Entity', CidocClass, CidocProperty, 'Project', 'User']) -> str:
-    # Builds an HTML link to entity view for display
+def html_link(label: str,
+              url: str,
+              class_: Optional[str] = '',
+              uc_first_: Optional[bool] = True) -> str:
+    return '<a href="{url}" class="{class_}">{label}</a>'.format(
+        label=uc_first(label) if uc_first_ else label,
+        url=url,
+        class_=class_)
+
+
+def link(object_: Union['Entity', CidocClass, CidocProperty, 'Project', 'User']) -> str:
+    # Builds an HTML link to a detail view of an object
     from openatlas.models.entity import Entity
     from openatlas.models.imports import Project
     from openatlas.models.user import User
-    if not entity:
-        return ''
-    html = ''
-    if type(entity) is Project:
-        url = url_for('import_project_view', id_=entity.id)
-        html = '<a href="' + url + '">' + entity.name + '</a>'
-    elif isinstance(entity, User):
-        style = '' if entity.active else 'class="inactive"'
-        url = url_for('user_view', id_=entity.id)
-        html = '<a ' + style + ' href="' + url + '">' + entity.username + '</a>'
-    elif isinstance(entity, CidocClass):
-        url = url_for('class_view', code=entity.code)
-        html = '<a href="' + url + '">' + entity.code + '</a>'
-    elif isinstance(entity, CidocProperty):
-        url = url_for('property_view', code=entity.code)
-        html = '<a href="' + url + '">' + entity.code + '</a>'
-    elif isinstance(entity, Entity):
-        url = url_for('entity_view', id_=entity.id)
-        html = '<a href="' + url + '">' + entity.name + '</a>'
-    return html
+    if type(object_) is Project:
+        return html_link(object_.name, url_for('import_project_view', id_=object_.id))
+    if isinstance(object_, User):
+        return html_link(object_.username,
+                         url_for('user_view', id_=object_.id),
+                         class_='' if object_.active else 'inactive',
+                         uc_first_=False)
+    if isinstance(object_, CidocClass):
+        return html_link(object_.code, url_for('class_view', code=object_.code), uc_first_=False)
+    if isinstance(object_, CidocProperty):
+        return html_link(object_.code, url_for('property_view', code=object_.code), uc_first_=False)
+    if isinstance(object_, Entity):
+        return html_link(object_.name, url_for('entity_view', id_=object_.id), uc_first_=False)
+    return ''
 
 
 def truncate(string: Optional[str] = '', length: int = 40, span: bool = True) -> str:
@@ -574,8 +574,7 @@ def get_appearance(event_links: List['Link']) -> Tuple[str, str]:
     for link_ in event_links:
         event = link_.domain
         actor = link_.range
-        event_link = '<a href="{url}">{label}</a> '.format(label=uc_first(_('event')),
-                                                           url=url_for('entity_view', id_=event.id))
+        event_link = html_link(_('event'), url_for('entity_view', id_=event.id))
         if not actor.first:
             if link_.first and (not first_year or int(link_.first) < int(first_year)):
                 first_year = link_.first

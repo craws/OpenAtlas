@@ -74,7 +74,7 @@ class FileTest(TestBaseCase):
             assert b'OpenAtlas logo' in rv.data
 
             # Set and unset as main image
-            self.app.get(url_for('file_set_as_profile_image', id_=file_id, origin_id=actor.id),
+            self.app.get(url_for('set_profile_image', id_=file_id, origin_id=actor.id),
                          follow_redirects=True)
             self.app.get(url_for('file_remove_profile_image', entity_id=actor.id))
 
