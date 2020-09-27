@@ -22,7 +22,8 @@ from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (is_authorized, required_group,
                                  was_modified)
-from openatlas.util.display import add_remove_link, get_base_table_data, get_entity_data, \
+from openatlas.util.display import add_edit_link, add_remove_link, get_base_table_data, \
+    get_entity_data, \
     get_profile_image_table_link, \
     link, uc_first
 
@@ -217,8 +218,8 @@ def place_view(obj: Entity) -> str:
             if is_authorized('editor') and current_user.settings['module_map_overlay']:
                 if extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                     if domain.id in overlays:
-                        data.append(link(_('edit'),
-                                         url_for('overlay_update', id_=overlays[domain.id].id)))
+                        data = add_edit_link(data,
+                                             url_for('overlay_update', id_=overlays[domain.id].id))
                     else:
                         data.append(link(_('link'), url_for('overlay_insert',
                                                             image_id=domain.id,
@@ -230,10 +231,10 @@ def place_view(obj: Entity) -> str:
             data.append(link_.description)
             if domain.system_type.startswith('external reference'):
                 obj.external_references.append(link_)
-            if is_authorized('contributor') and domain.system_type != 'external reference geonames':
-                data.append(link(_('edit'), url_for('reference_link_update',
-                                                    link_id=link_.id,
-                                                    origin_id=obj.id)))
+            if domain.system_type != 'external reference geonames':
+                data = add_edit_link(data, url_for('reference_link_update',
+                                                   link_id=link_.id,
+                                                   origin_id=obj.id))
             else:
                 data.append('')
         data = add_remove_link(data, domain.name, link_, obj, domain.view_name)

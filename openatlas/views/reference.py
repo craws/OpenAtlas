@@ -19,7 +19,8 @@ from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (is_authorized, required_group,
                                  was_modified)
-from openatlas.util.display import add_remove_link, get_base_table_data, get_entity_data, \
+from openatlas.util.display import add_edit_link, add_remove_link, get_base_table_data, \
+    get_entity_data, \
     get_profile_image_table_link, \
     link, uc_first
 
@@ -179,10 +180,9 @@ def reference_view(reference: Entity) -> str:
         if range_.view_name == 'file':  # pragma: no cover
             ext = data[3].replace('.', '')
             data.append(get_profile_image_table_link(range_, reference, ext, profile_image_id))
-        if is_authorized('contributor'):
-            data.append(link(_('edit'), url_for('reference_link_update',
-                                                link_id=link_.id,
-                                                origin_id=reference.id)))
+        data = add_edit_link(data, url_for('reference_link_update',
+                                           link_id=link_.id,
+                                           origin_id=reference.id))
         data = add_remove_link(data, range_.name, link_, reference, range_.table_name)
         tabs[range_.table_name].table.rows.append(data)
     reference.note = User.get_note(reference)

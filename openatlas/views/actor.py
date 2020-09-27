@@ -13,7 +13,8 @@ from openatlas.forms.forms import TableField, build_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.user import User
-from openatlas.util.display import (add_system_data, add_type_data, format_entry_begin,
+from openatlas.util.display import (add_edit_link, add_system_data, add_type_data,
+                                    format_entry_begin,
                                     format_entry_end, get_appearance, get_base_table_data,
                                     get_profile_image_table_link, link, add_remove_link)
 from openatlas.util.tab import Tab
@@ -165,10 +166,9 @@ def actor_view(actor: Entity) -> str:
             data.append(link_.description)
             if domain.system_type == 'external reference':
                 actor.external_references.append(link_)
-            if is_authorized('contributor'):
-                data.append(link(_('edit'), url_for('reference_link_update',
-                                                    link_id=link_.id,
-                                                    origin_id=actor.id)))
+            data = add_edit_link(data, url_for('reference_link_update',
+                                               link_id=link_.id,
+                                               origin_id=actor.id))
         data = add_remove_link(data, domain.name, link_, actor, domain.view_name)
         tabs[domain.view_name].table.rows.append(data)
 
@@ -196,10 +196,7 @@ def actor_view(actor: Entity) -> str:
                 first,
                 last,
                 link_.description]
-        if is_authorized('contributor'):
-            data.append(link(_('edit'), url_for('involvement_update',
-                                                id_=link_.id,
-                                                origin_id=actor.id)))
+        data = add_edit_link(data, url_for('involvement_update', id_=link_.id, origin_id=actor.id))
         data = add_remove_link(data, link_.domain.name, link_, actor, 'event')
         tabs['event'].table.rows.append(data)
 
@@ -242,9 +239,7 @@ def actor_view(actor: Entity) -> str:
             type_ = link_.type.get_name_directed(True) if link_.type else ''
             related = link_.domain
         data = [type_, link(related), link_.first, link_.last, link_.description]
-        if is_authorized('contributor'):
-            data.append(link(_('edit'),
-                             url_for('relation_update', id_=link_.id, origin_id=actor.id)))
+        data = add_edit_link(data, url_for('relation_update', id_=link_.id, origin_id=actor.id))
         data = add_remove_link(data, related.name, link_, actor, 'relation')
         tabs['relation'].table.rows.append(data)
     for link_ in actor.get_links('P107', True):
@@ -253,8 +248,7 @@ def actor_view(actor: Entity) -> str:
                 link_.first,
                 link_.last,
                 link_.description]
-        if is_authorized('contributor'):
-            data.append(link(_('edit'), url_for('member_update', id_=link_.id, origin_id=actor.id)))
+        data = add_edit_link(data, url_for('member_update', id_=link_.id, origin_id=actor.id))
         data = add_remove_link(data, link_.domain.name, link_, actor, 'member-of')
         tabs['member_of'].table.rows.append(data)
     if actor.class_.code not in app.config['CLASS_CODES']['group']:

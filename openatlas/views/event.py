@@ -16,7 +16,8 @@ from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.user import User
-from openatlas.util.display import (get_base_table_data, get_entity_data, get_profile_image_table_link,
+from openatlas.util.display import (add_edit_link, get_base_table_data, get_entity_data,
+                                    get_profile_image_table_link,
                                     link, add_remove_link)
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
@@ -227,10 +228,9 @@ def event_view(event: Entity) -> str:
             if domain.system_type == 'external reference':
                 event.external_references.append(link_)
             data.append(link_.description)
-            if is_authorized('contributor'):
-                data.append(link(_('edit'), url_for('reference_link_update',
-                                                    link_id=link_.id,
-                                                    origin_id=event.id)))
+            data = add_edit_link(data, url_for('reference_link_update',
+                                               link_id=link_.id,
+                                               origin_id=event.id))
         data = add_remove_link(data, domain.name, link_, event, domain.view_name)
         tabs[domain.view_name].table.rows.append(data)
     objects = [location.get_linked_entity_safe('P53', True)

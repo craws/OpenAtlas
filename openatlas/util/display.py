@@ -73,6 +73,12 @@ def add_remove_link(data, name: str, link_: Link, origin: Entity, tab: str) -> s
     return data
 
 
+def add_edit_link(data, url: str) -> str:
+    if is_authorized('contributor'):
+        data.append(link(_('edit'), url))
+    return data
+
+
 def uc_first(string: str) -> str:
     return str(string)[0].upper() + str(string)[1:] if string else ''
 
