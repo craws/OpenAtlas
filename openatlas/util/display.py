@@ -81,13 +81,13 @@ def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'Us
             url=url,
             class_='class="' + class_ + '"' if class_ else '',
             js='onclick="{js}"'.format(js=js) if js else '',
-            label=(uc_first(object_)) if uc_first_ else object_)
+            label=(uc_first(str(object_))) if uc_first_ else object_)
 
     # Builds an HTML link to a detail view of an object
     from openatlas.models.entity import Entity
     from openatlas.models.imports import Project
     from openatlas.models.user import User
-    if type(object_) is Project:
+    if isinstance(object_, Project):
         return link(object_.name, url_for('import_project_view', id_=object_.id))
     if isinstance(object_, User):
         return link(object_.username,
@@ -103,7 +103,7 @@ def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'Us
     return ''
 
 
-def add_remove_link(data, name: str, link_: Link, origin: Entity, tab: str) -> str:
+def add_remove_link(data: List[Any], name: str, link_: Link, origin: Entity, tab: str) -> List[Any]:
     if is_authorized('contributor'):
         data.append(link(
             _('remove'),
@@ -112,7 +112,7 @@ def add_remove_link(data, name: str, link_: Link, origin: Entity, tab: str) -> s
     return data
 
 
-def add_edit_link(data, url: str) -> str:
+def add_edit_link(data: List[Any], url: str) -> List[Any]:
     if is_authorized('contributor'):
         data.append(link(_('edit'), url))
     return data
@@ -374,7 +374,7 @@ def get_profile_image_table_link(file: 'Entity',
 
 
 def get_base_table_data(entity: 'Entity',
-                        file_stats: Optional[Dict[Union[int, str], Any]] = None) -> List[str]:
+                        file_stats: Optional[Dict[Union[int, str], Any]] = None) -> List[Any]:
     """ Returns standard table data for an entity"""
     if len(entity.aliases) > 0:
         data: List[str] = ['<p>' + link(entity) + '</p>']
