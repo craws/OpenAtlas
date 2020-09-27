@@ -17,8 +17,8 @@ from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (add_system_data, add_type_data, display_remove_link,
                                  format_entry_begin, format_entry_end, get_appearance,
-                                 get_base_table_data, get_profile_image_table_link,
-                                 html_link, is_authorized, link, required_group, was_modified)
+                                 get_base_table_data, get_profile_image_table_link, is_authorized,
+                                 link, required_group, was_modified)
 
 
 class ActorForm(DateForm):
@@ -167,9 +167,9 @@ def actor_view(actor: Entity) -> str:
             if domain.system_type == 'external reference':
                 actor.external_references.append(link_)
             if is_authorized('contributor'):
-                data_.append(html_link(_('edit'), url_for('reference_link_update',
-                                                          link_id=link_.id,
-                                                          origin_id=actor.id)))
+                data_.append(link(_('edit'), url_for('reference_link_update',
+                                                     link_id=link_.id,
+                                                     origin_id=actor.id)))
         if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=actor.id)
             data_.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))
@@ -200,8 +200,8 @@ def actor_view(actor: Entity) -> str:
                 last,
                 link_.description]
         if is_authorized('contributor'):
-            data.append(html_link(_('edit'),
-                                  url_for('involvement_update', id_=link_.id, origin_id=actor.id)))
+            data.append(link(_('edit'),
+                             url_for('involvement_update', id_=link_.id, origin_id=actor.id)))
             data.append(display_remove_link(
                 url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-event',
                 link_.domain.name))
@@ -247,8 +247,8 @@ def actor_view(actor: Entity) -> str:
             related = link_.domain
         data = [type_, link(related), link_.first, link_.last, link_.description]
         if is_authorized('contributor'):
-            data.append(html_link(_('edit'),
-                                  url_for('relation_update', id_=link_.id, origin_id=actor.id)))
+            data.append(link(_('edit'),
+                             url_for('relation_update', id_=link_.id, origin_id=actor.id)))
             unlink_url = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-relation'
             data.append(display_remove_link(unlink_url, related.name))
         tabs['relation'].table.rows.append(data)
@@ -259,8 +259,7 @@ def actor_view(actor: Entity) -> str:
                 link_.last,
                 link_.description]
         if is_authorized('contributor'):
-            data.append(html_link(_('edit'),
-                                  url_for('member_update', id_=link_.id, origin_id=actor.id)))
+            data.append(link(_('edit'), url_for('member_update', id_=link_.id, origin_id=actor.id)))
             unlink = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-member-of'
             data.append(display_remove_link(unlink, link_.domain.name))
         tabs['member_of'].table.rows.append(data)
@@ -274,8 +273,8 @@ def actor_view(actor: Entity) -> str:
                     link_.last,
                     link_.description]
             if is_authorized('contributor'):
-                data.append(html_link(_('edit'),
-                                      url_for('member_update', id_=link_.id, origin_id=actor.id)))
+                data.append(link(_('edit'),
+                                 url_for('member_update', id_=link_.id, origin_id=actor.id)))
                 unlink = url_for('link_delete', id_=link_.id, origin_id=actor.id) + '#tab-member'
                 data.append(display_remove_link(unlink, link_.range.name))
             tabs['member'].table.rows.append(data)

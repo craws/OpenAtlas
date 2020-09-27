@@ -14,8 +14,8 @@ from wtforms import TextAreaField
 
 from openatlas import app, logger
 from openatlas.forms.admin_forms import (ApiForm, ContentForm, FilesForm, GeneralForm, LogForm,
-                                         MailForm, MapForm, NewsLetterForm, SimilarForm,
-                                         TestMailForm, ModulesForm)
+                                         MailForm, MapForm, ModulesForm, NewsLetterForm,
+                                         SimilarForm, TestMailForm)
 from openatlas.forms.forms import get_form_settings, set_form_settings
 from openatlas.models.content import Content
 from openatlas.models.date import Date
@@ -26,8 +26,7 @@ from openatlas.models.settings import Settings
 from openatlas.models.user import User
 from openatlas.util.table import Table
 from openatlas.util.util import (convert_size, format_date, format_datetime, get_disk_space_info,
-                                 get_file_path, get_file_stats, html_link, is_authorized, link,
-                                 required_group,
+                                 get_file_path, get_file_stats, is_authorized, link, required_group,
                                  sanitize, send_mail, truncate, uc_first)
 
 
@@ -67,7 +66,7 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
         for language in app.config['LANGUAGES'].keys():
             content.append(html_ok if languages[language] else '')
         content.append(sanitize(languages[session['language']], 'text'))
-        content.append(html_link(_('edit'), url_for('admin_content', item=item)))
+        content.append(link(_('edit'), url_for('admin_content', item=item)))
         tables['content'].rows.append(content)
     form = None
     if is_authorized('admin'):
@@ -236,8 +235,7 @@ def admin_check_dates() -> str:
         elif link_.property.code in ['P11', 'P14', 'P22', 'P23']:
             label = 'involvement'
         tables['link_dates'].rows.append([
-            html_link(_(label),
-                      url_for(label + '_update', id_=link_.id, origin_id=link_.domain.id)),
+            link(_(label), url_for(label + '_update', id_=link_.id, origin_id=link_.domain.id)),
             link(link_.domain),
             link(link_.range)])
     for link_ in Date.invalid_involvement_dates():
@@ -248,8 +246,7 @@ def admin_check_dates() -> str:
                 g.classes[event.class_.code].name,
                 link_.type.name if link_.type else '',
                 link_.description,
-                html_link(_('edit'),
-                          url_for('involvement_update', id_=link_.id, origin_id=actor.id))]
+                link(_('edit'), url_for('involvement_update', id_=link_.id, origin_id=actor.id))]
         tables['involvement_dates'].rows.append(data)
     return render_template('admin/check_dates.html', tables=tables)
 
@@ -301,7 +298,7 @@ def admin_orphans() -> str:
                     convert_size(file.stat().st_size),
                     format_date(datetime.datetime.utcfromtimestamp(file.stat().st_ctime)),
                     splitext(name)[1],
-                    html_link(_('download'), url_for('download_file', filename=name)),
+                    link(_('download'), url_for('download_file', filename=name)),
                     '<a href="{url}" {confirm}>{label}</a>'.format(
                         url=url_for('admin_file_delete', filename=name),
                         confirm=confirm,
@@ -325,7 +322,7 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
         if entity.id in file_stats:
             date = format_date(datetime.datetime.utcfromtimestamp(file_stats[entity.id]['date']))
         table.rows.append([
-            html_link(_('set'), url_for('admin_logo', id_=entity.id)),
+            link(_('set'), url_for('admin_logo', id_=entity.id)),
             truncate(entity.name),
             entity.print_base_type(),
             convert_size(file_stats[entity.id]['size']) if entity.id in file_stats else 'N/A',

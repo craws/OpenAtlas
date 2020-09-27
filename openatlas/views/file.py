@@ -18,8 +18,7 @@ from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (convert_size, display_remove_link, format_date,
                                  get_base_table_data, get_entity_data, get_file_path,
-                                 get_file_stats, html_link, is_authorized, link,
-                                 required_group, uc_first, was_modified)
+                                 get_file_stats, is_authorized, link, required_group, was_modified)
 
 
 class FileForm(FlaskForm):  # type: ignore
@@ -168,9 +167,8 @@ def file_view(file: Entity) -> str:
         data = get_base_table_data(link_.domain)
         data.append(link_.description)
         if is_authorized('contributor'):
-            data.append(html_link(_('edit'), url_for('reference_link_update',
-                                                     link_id=link_.id,
-                                                     origin_id=file.id)))
+            data.append(link(_('edit'),
+                             url_for('reference_link_update', link_id=link_.id, origin_id=file.id)))
             unlink = url_for('link_delete', id_=link_.id, origin_id=file.id)
             data.append(display_remove_link(unlink + '#tab-reference', link_.domain.name))
         tabs['reference'].table.rows.append(data)

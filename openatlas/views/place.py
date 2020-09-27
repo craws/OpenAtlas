@@ -21,8 +21,7 @@ from openatlas.models.user import User
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 get_profile_image_table_link, html_link, is_authorized, link,
-                                 required_group,
+                                 get_profile_image_table_link, is_authorized, link, required_group,
                                  uc_first, was_modified)
 
 
@@ -216,13 +215,13 @@ def place_view(obj: Entity) -> str:
             if is_authorized('editor') and current_user.settings['module_map_overlay']:
                 if extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                     if domain.id in overlays:
-                        data.append(html_link(_('edit'), url_for('overlay_update',
-                                                                 id_=overlays[domain.id].id)))
+                        data.append(link(_('edit'),
+                                         url_for('overlay_update', id_=overlays[domain.id].id)))
                     else:
-                        data.append(html_link(_('link'), url_for('overlay_insert',
-                                                                 image_id=domain.id,
-                                                                 place_id=obj.id,
-                                                                 link_id=link_.id)))
+                        data.append(link(_('link'), url_for('overlay_insert',
+                                                            image_id=domain.id,
+                                                            place_id=obj.id,
+                                                            link_id=link_.id)))
                 else:  # pragma: no cover
                     data.append('')
         if domain.view_name not in ['source', 'file']:
@@ -230,9 +229,9 @@ def place_view(obj: Entity) -> str:
             if domain.system_type.startswith('external reference'):
                 obj.external_references.append(link_)
             if is_authorized('contributor') and domain.system_type != 'external reference geonames':
-                data.append(html_link(_('edit'), url_for('reference_link_update',
-                                                         link_id=link_.id,
-                                                         origin_id=obj.id)))
+                data.append(link(_('edit'), url_for('reference_link_update',
+                                                    link_id=link_.id,
+                                                    origin_id=obj.id)))
             else:
                 data.append('')
         if is_authorized('contributor'):

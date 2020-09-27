@@ -11,7 +11,7 @@ from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.network import Network
 from openatlas.util.table import Table
-from openatlas.util.util import html_link, link, required_group, uc_first
+from openatlas.util.util import link, required_group, uc_first
 
 
 class LinkCheckForm(FlaskForm):  # type: ignore
@@ -80,8 +80,8 @@ def class_index() -> str:
         if class_.count:
             count = format_number(class_.count)
             if class_.code not in ['E53', 'E41', 'E82']:
-                count = html_link(format_number(class_.count), url_for('class_entities',
-                                                                       code=class_.code))
+                count = link(format_number(class_.count),
+                             url_for('class_entities', code=class_.code))
         table.rows.append([link(class_), class_.name, count])
     return render_template('model/class.html', table=table)
 

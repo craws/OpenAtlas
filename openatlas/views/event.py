@@ -19,8 +19,8 @@ from openatlas.models.user import User
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 get_profile_image_table_link, html_link, is_authorized, link,
-                                 required_group, was_modified)
+                                 get_profile_image_table_link, is_authorized, link, required_group,
+                                 was_modified)
 
 
 class EventForm(DateForm):
@@ -209,8 +209,8 @@ def event_view(event: Entity) -> str:
                 first, last,
                 link_.description]
         if is_authorized('contributor'):
-            data.append(html_link(_('edit'),
-                                  url_for('involvement_update', id_=link_.id, origin_id=event.id)))
+            data.append(link(_('edit'),
+                             url_for('involvement_update', id_=link_.id, origin_id=event.id)))
             unlink = url_for('link_delete', id_=link_.id, origin_id=event.id) + '#tab-actor'
             data.append(display_remove_link(unlink, link_.range.name))
         tabs['actor'].table.rows.append(data)
@@ -229,9 +229,9 @@ def event_view(event: Entity) -> str:
                 event.external_references.append(link_)
             data.append(link_.description)
             if is_authorized('contributor'):
-                data.append(html_link(_('edit'), url_for('reference_link_update',
-                                                         link_id=link_.id,
-                                                         origin_id=event.id)))
+                data.append(link(_('edit'), url_for('reference_link_update',
+                                                    link_id=link_.id,
+                                                    origin_id=event.id)))
         if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=event.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))

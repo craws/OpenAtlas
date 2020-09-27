@@ -14,7 +14,7 @@ from openatlas.forms.forms import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
 from openatlas.util.table import Table
-from openatlas.util.util import html_link, required_group, sanitize, uc_first
+from openatlas.util.util import link, required_group, sanitize
 
 
 class HierarchyForm(FlaskForm):  # type: ignore
@@ -74,10 +74,9 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
     form.multiple = root.multiple
     table = Table(['form', 'count'], paging=False)
     for form_id, form_ in root.forms.items():
-        link = html_link(_('remove'),
-                         url_for('hierarchy_remove_form', id_=root.id, remove_id=form_id))
+        link_ = link(_('remove'), url_for('hierarchy_remove_form', id_=root.id, remove_id=form_id))
         count = Node.get_form_count(root, form_id)
-        table.rows.append([form_['name'], format_number(count) if count else link])
+        table.rows.append([form_['name'], format_number(count) if count else link_])
     return render_template('hierarchy/update.html',
                            node=root,
                            form=form,

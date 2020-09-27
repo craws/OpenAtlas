@@ -15,8 +15,8 @@ from openatlas.models.user import User
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 get_profile_image_table_link, html_link, is_authorized, link,
-                                 required_group, was_modified)
+                                 get_profile_image_table_link, is_authorized, link, required_group,
+                                 was_modified)
 
 
 class SourceForm(FlaskForm):  # type: ignore
@@ -156,9 +156,9 @@ def source_view(source: Entity) -> str:
             if domain.system_type == 'external reference':
                 source.external_references.append(link_)
             if is_authorized('contributor'):
-                data.append(html_link(_('edit'), url_for('reference_link_update',
-                                                         link_id=link_.id,
-                                                         origin_id=source.id)))
+                data.append(link(_('edit'), url_for('reference_link_update',
+                                                    link_id=link_.id,
+                                                    origin_id=source.id)))
         if is_authorized('contributor'):
             url = url_for('link_delete', id_=link_.id, origin_id=source.id)
             data.append(display_remove_link(url + '#tab-' + domain.view_name, domain.name))

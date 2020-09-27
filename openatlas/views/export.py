@@ -12,7 +12,7 @@ from wtforms import BooleanField, SelectField, SubmitField
 from openatlas import app, logger
 from openatlas.models.export import Export
 from openatlas.util.table import Table
-from openatlas.util.util import convert_size, html_link, is_authorized, required_group, uc_first
+from openatlas.util.util import convert_size, is_authorized, link, required_group, uc_first
 
 
 class ExportSqlForm(FlaskForm):  # type: ignore
@@ -57,7 +57,7 @@ def export_sql() -> Union[str, Response]:
             continue
         data = [name,
                 convert_size(os.path.getsize(path.joinpath(name))),
-                html_link(_('download'), url_for('download_sql', filename=name))]
+                link(_('download'), url_for('download_sql', filename=name))]
         if is_authorized('admin') and writeable:
             delete = '<a href="{url}" onclick="return confirm(\'{confirm}\');">{label}</a>'.format(
                 url=url_for('delete_sql', filename=name),
@@ -113,7 +113,7 @@ def export_csv() -> Union[str, Response]:
             continue
         data = [name,
                 convert_size(os.path.getsize(path.joinpath(name))),
-                html_link(_('download'), url_for('download_csv', filename=name))]
+                link(_('download'), url_for('download_csv', filename=name))]
         if is_authorized('admin') and writeable:
             confirm = ' onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
             delete = '<a href="' + url_for('delete_csv', filename=name)
