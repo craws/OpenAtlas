@@ -15,7 +15,7 @@ from openatlas.models.gis import Gis
 from openatlas.models.user import User
 from openatlas.util.display import (add_system_data, add_type_data, format_entry_begin,
                                     format_entry_end, get_appearance, get_base_table_data,
-                                    get_profile_image_table_link, link, remove_link)
+                                    get_profile_image_table_link, link, add_remove_link)
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import is_authorized, required_group, was_modified
@@ -169,8 +169,7 @@ def actor_view(actor: Entity) -> str:
                 data.append(link(_('edit'), url_for('reference_link_update',
                                                     link_id=link_.id,
                                                     origin_id=actor.id)))
-        if is_authorized('contributor'):
-            data.append(remove_link(domain.name, link_, actor, domain.view_name))
+        data = add_remove_link(data, domain.name, link_, actor, domain.view_name)
         tabs[domain.view_name].table.rows.append(data)
 
     # Todo: Performance - getting every place of every object for every event is very costly
@@ -201,7 +200,7 @@ def actor_view(actor: Entity) -> str:
             data.append(link(_('edit'), url_for('involvement_update',
                                                 id_=link_.id,
                                                 origin_id=actor.id)))
-            data.append(remove_link(link_.domain.name, link_, actor, 'event'))
+        data = add_remove_link(data, link_.domain.name, link_, actor, 'event')
         tabs['event'].table.rows.append(data)
 
     # Add info of dates and places
@@ -246,7 +245,7 @@ def actor_view(actor: Entity) -> str:
         if is_authorized('contributor'):
             data.append(link(_('edit'),
                              url_for('relation_update', id_=link_.id, origin_id=actor.id)))
-            data.append(remove_link(related.name, link_, actor, 'relation'))
+        data = add_remove_link(data, related.name, link_, actor, 'relation')
         tabs['relation'].table.rows.append(data)
     for link_ in actor.get_links('P107', True):
         data = [link(link_.domain),
@@ -256,7 +255,7 @@ def actor_view(actor: Entity) -> str:
                 link_.description]
         if is_authorized('contributor'):
             data.append(link(_('edit'), url_for('member_update', id_=link_.id, origin_id=actor.id)))
-            data.append(remove_link(link_.domain.name, link_, actor, 'member-of'))
+        data = add_remove_link(data, link_.domain.name, link_, actor, 'member-of')
         tabs['member_of'].table.rows.append(data)
     if actor.class_.code not in app.config['CLASS_CODES']['group']:
         del tabs['member']
@@ -270,7 +269,7 @@ def actor_view(actor: Entity) -> str:
             if is_authorized('contributor'):
                 data.append(
                     link(_('edit'), url_for('member_update', id_=link_.id, origin_id=actor.id)))
-                data.append(remove_link(link_.range.name, link_, actor, 'member'))
+            data = add_remove_link(data, link_.range.name, link_, actor, 'member')
             tabs['member'].table.rows.append(data)
     gis_data = Gis.get_all(objects) if objects else None
     if gis_data and gis_data['gisPointSelected'] == '[]' and gis_data['gisPolygonSelected'] == '[]':

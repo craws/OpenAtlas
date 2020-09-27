@@ -20,6 +20,7 @@ import openatlas
 from openatlas import app
 from openatlas.models.date import Date
 from openatlas.models.model import CidocClass, CidocProperty
+from openatlas.util.util import is_authorized
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity
@@ -63,11 +64,13 @@ def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'Us
     return ''
 
 
-def remove_link(name: str, link_: Link, origin: Entity, tab: str) -> str:
-    return(link(
-        _('remove'),
-        url_for('link_delete', id_=link_.id, origin_id=origin.id) + '#tab-' + tab,
-        js="return confirm('{x}')".format(x=_('Remove %(name)s?', name=name.replace("'", '')))))
+def add_remove_link(data, name: str, link_: Link, origin: Entity, tab: str) -> str:
+    if is_authorized('contributor'):
+        data.append(link(
+            _('remove'),
+            url_for('link_delete', id_=link_.id, origin_id=origin.id) + '#tab-' + tab,
+            js="return confirm('{x}')".format(x=_('Remove %(name)s?', name=name.replace("'", '')))))
+    return data
 
 
 def uc_first(string: str) -> str:

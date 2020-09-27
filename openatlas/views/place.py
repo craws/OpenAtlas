@@ -22,7 +22,7 @@ from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (is_authorized, required_group,
                                  was_modified)
-from openatlas.util.display import remove_link, get_base_table_data, get_entity_data, \
+from openatlas.util.display import add_remove_link, get_base_table_data, get_entity_data, \
     get_profile_image_table_link, \
     link, uc_first
 
@@ -236,8 +236,7 @@ def place_view(obj: Entity) -> str:
                                                     origin_id=obj.id)))
             else:
                 data.append('')
-        if is_authorized('contributor'):
-            data.append(remove_link(domain.name, link_, obj, domain.view_name))
+        data = add_remove_link(data, domain.name, link_, obj, domain.view_name)
         tabs[domain.view_name].table.rows.append(data)
     event_ids = []  # Keep track of already inserted events to prevent doubles
     for event in location.get_linked_entities(['P7', 'P26', 'P27'], inverse=True):

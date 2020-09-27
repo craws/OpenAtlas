@@ -15,7 +15,7 @@ from openatlas.models.user import User
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import (is_authorized, required_group, was_modified)
-from openatlas.util.display import remove_link, get_base_table_data, get_entity_data, link
+from openatlas.util.display import add_remove_link, get_base_table_data, get_entity_data, link
 
 
 class InformationCarrierForm(FlaskForm):  # type: ignore
@@ -72,13 +72,11 @@ def object_view(object_: Entity) -> str:
     tabs = {name: Tab(name, origin=object_) for name in ['info', 'source', 'event']}
     for link_ in object_.get_links('P128'):
         data = get_base_table_data(link_.range)
-        if is_authorized('contributor'):
-            data.append(remove_link(link_.range.name, link_, object_, link_.range.table_name))
+        data = add_remove_link(data, link_.range.name, link_, object_, link_.range.table_name)
         tabs['source'].table.rows.append(data)
     for link_ in object_.get_links('P25', inverse=True):
         data = get_base_table_data(link_.domain)
-        if is_authorized('contributor'):
-            data.append(remove_link(link_.range.name, link_, object_, link_.range.table_name))
+        data = add_remove_link(data, link_.range.name, link_, object_, link_.range.table_name)
         tabs['event'].table.rows.append(data)
     object_.note = User.get_note(object_)
     return render_template('object/view.html',
