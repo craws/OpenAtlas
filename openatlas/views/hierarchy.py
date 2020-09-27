@@ -13,9 +13,9 @@ from openatlas import app, logger
 from openatlas.forms.forms import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
+from openatlas.util.display import link, sanitize
 from openatlas.util.table import Table
 from openatlas.util.util import required_group
-from openatlas.util.display import link, sanitize
 
 
 class HierarchyForm(FlaskForm):  # type: ignore

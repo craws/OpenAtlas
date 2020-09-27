@@ -10,9 +10,9 @@ from wtforms.validators import InputRequired
 from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.network import Network
+from openatlas.util.display import link, uc_first
 from openatlas.util.table import Table
 from openatlas.util.util import required_group
-from openatlas.util.display import link, uc_first
 
 
 class LinkCheckForm(FlaskForm):  # type: ignore
@@ -92,11 +92,11 @@ def class_index() -> str:
 def property_index() -> str:
     classes = g.classes
     properties = g.properties
-    table = Table(['code', 'name', 'inverse', 'domain', 'domain name', 'range', 'range name',
-                   'count'],
-                  defs=[{'className': 'dt-body-right', 'targets': 7},
-                        {'orderDataType': 'cidoc-model', 'targets': [0, 3, 5]},
-                        {'sType': 'numeric', 'targets': [0]}])
+    table = Table(
+        ['code', 'name', 'inverse', 'domain', 'domain name', 'range', 'range name', 'count'],
+        defs=[{'className': 'dt-body-right', 'targets': 7},
+              {'orderDataType': 'cidoc-model', 'targets': [0, 3, 5]},
+              {'sType': 'numeric', 'targets': [0]}])
     for property_id, property_ in properties.items():
         table.rows.append([link(property_),
                            property_.name,

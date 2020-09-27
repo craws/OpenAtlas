@@ -13,10 +13,9 @@ from openatlas.forms.forms import TableField, build_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.user import User
-from openatlas.util.display import (add_edit_link, add_system_data, add_type_data,
-                                    format_entry_begin,
-                                    format_entry_end, get_appearance, get_base_table_data,
-                                    get_profile_image_table_link, link, add_remove_link)
+from openatlas.util.display import (add_edit_link, add_remove_link, add_system_data, add_type_data,
+                                    format_entry_begin, format_entry_end, get_appearance,
+                                    get_base_table_data, get_profile_image_table_link, link)
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import is_authorized, required_group, was_modified

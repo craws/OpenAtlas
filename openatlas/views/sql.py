@@ -5,8 +5,8 @@ from wtforms import SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.util.util import required_group
 from openatlas.util.display import get_backup_file_data
+from openatlas.util.util import required_group
 
 
 @app.route('/sql')

@@ -15,8 +15,8 @@ from wtforms.validators import InputRequired
 from openatlas import app, logger
 from openatlas.forms.admin_forms import DisplayForm, ModulesForm, ProfileForm
 from openatlas.forms.forms import get_form_settings, set_form_settings
-from openatlas.util.util import is_authorized
 from openatlas.util.display import uc_first
+from openatlas.util.util import is_authorized
 
 
 class PasswordForm(FlaskForm):  # type: ignore

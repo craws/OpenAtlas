@@ -16,9 +16,8 @@ from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.models.user import User
-from openatlas.util.display import (add_edit_link, get_base_table_data, get_entity_data,
-                                    get_profile_image_table_link,
-                                    link, add_remove_link)
+from openatlas.util.display import (add_edit_link, add_remove_link, get_base_table_data,
+                                    get_entity_data, get_profile_image_table_link, link)
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import is_authorized, required_group, was_modified
@@ -233,8 +232,8 @@ def event_view(event: Entity) -> str:
                                                origin_id=event.id))
         data = add_remove_link(data, domain.name, link_, event, domain.view_name)
         tabs[domain.view_name].table.rows.append(data)
-    objects = [location.get_linked_entity_safe('P53', True)
-               for location in event.get_linked_entities(['P7', 'P26', 'P27'])]
+    objects = [location.get_linked_entity_safe('P53', True) for location
+               in event.get_linked_entities(['P7', 'P26', 'P27'])]
     return render_template('event/view.html',
                            event=event,
                            tabs=tabs,

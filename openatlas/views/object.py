@@ -12,10 +12,10 @@ from openatlas import app, logger
 from openatlas.forms.forms import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
+from openatlas.util.display import add_remove_link, get_base_table_data, get_entity_data, link
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import (is_authorized, required_group, was_modified)
-from openatlas.util.display import add_remove_link, get_base_table_data, get_entity_data, link
+from openatlas.util.util import required_group, was_modified
 
 
 class InformationCarrierForm(FlaskForm):  # type: ignore

@@ -1,6 +1,6 @@
-from typing import Any, Dict, List, Optional, Union
+from typing import Dict, Optional, Union
 
-from flask import abort, flash, g, render_template, request, url_for, session
+from flask import abort, flash, g, render_template, request, url_for
 from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
@@ -14,12 +14,11 @@ from openatlas.forms.forms import build_move_form, build_node_form
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
+from openatlas.util.display import (add_remove_link, get_base_table_data, get_entity_data,
+                                    get_profile_image_table_link, link, tree_select, uc_first)
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import (required_group)
-from openatlas.util.display import add_remove_link, get_base_table_data, get_entity_data, \
-    get_profile_image_table_link, \
-    link, tree_select, uc_first
+from openatlas.util.util import required_group
 
 
 class NodeForm(FlaskForm):  # type: ignore

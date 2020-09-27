@@ -69,6 +69,7 @@ def tree_select(name: str) -> str:
                             name=sanitize(name),
                             tree_data=walk_tree(Node.get_nodes(name)))
 
+
 def link(object_: Union[str, 'Entity', CidocClass, CidocProperty, 'Project', 'User'],
          url: Optional[str] = None,
          class_: Optional[str] = None,

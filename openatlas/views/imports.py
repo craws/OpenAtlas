@@ -15,9 +15,9 @@ from openatlas import app, logger
 from openatlas.models.date import Date
 from openatlas.models.entity import Entity
 from openatlas.models.imports import Import
+from openatlas.util.display import format_date, get_backup_file_data, link, uc_first
 from openatlas.util.table import Table
 from openatlas.util.util import (is_float, required_group)
-from openatlas.util.display import format_date, get_backup_file_data, link, uc_first
 
 
 class ProjectForm(FlaskForm):  # type: ignore

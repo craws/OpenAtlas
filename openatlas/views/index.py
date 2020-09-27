@@ -15,9 +15,9 @@ from openatlas.models.content import Content
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.changelog import Changelog
-from openatlas.util.table import Table
-from openatlas.util.util import (required_group, send_mail)
 from openatlas.util.display import bookmark_toggle, format_date, link, uc_first
+from openatlas.util.table import Table
+from openatlas.util.util import required_group, send_mail
 
 
 class FeedbackForm(FlaskForm):  # type: ignore
@@ -57,12 +57,11 @@ def index() -> str:
                                          entity.last,
                                          text])
         for name, count in Entity.get_overview_counts().items():
-            if not count:
-                continue
-            tables['overview'].rows.append([
-                uc_first(_(name)) if name in ['find', 'human remains'] else link(
-                    _(name), url_for(name + '_index')),
-                format_number(count)])
+            if count:
+                tables['overview'].rows.append([
+                    uc_first(_(name)) if name in ['find', 'human remains'] else link(
+                        _(name), url_for(name + '_index')),
+                    format_number(count)])
         for entity in Entity.get_latest(8):
             tables['latest'].rows.append([
                 link(entity),
@@ -71,8 +70,9 @@ def index() -> str:
                 entity.last,
                 format_date(entity.created),
                 link(logger.get_log_for_advanced_view(entity.id)['creator'])])
-    intro = Content.get_translation('intro')
-    return render_template('index/index.html', intro=intro, tables=tables)
+    return render_template('index/index.html',
+                           intro=Content.get_translation('intro'),
+                           tables=tables)
 
 
 @app.route('/index/setlocale/<language>')

@@ -18,14 +18,11 @@ from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
 from openatlas.models.user import User
+from openatlas.util.display import (add_edit_link, add_remove_link, get_base_table_data,
+                                    get_entity_data, get_profile_image_table_link, link, uc_first)
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import (is_authorized, required_group,
-                                 was_modified)
-from openatlas.util.display import add_edit_link, add_remove_link, get_base_table_data, \
-    get_entity_data, \
-    get_profile_image_table_link, \
-    link, uc_first
+from openatlas.util.util import is_authorized, required_group, was_modified
 
 
 class PlaceForm(DateForm):

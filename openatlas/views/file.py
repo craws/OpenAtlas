@@ -14,12 +14,11 @@ import openatlas
 from openatlas import app, logger
 from openatlas.forms.forms import build_form, build_table_form
 from openatlas.models.entity import Entity
+from openatlas.util.display import (add_edit_link, add_remove_link, convert_size, format_date,
+                                    get_base_table_data, get_entity_data, get_file_path, link)
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import get_file_stats, is_authorized, required_group, was_modified
-from openatlas.util.display import add_edit_link, convert_size, add_remove_link, format_date, \
-    get_base_table_data, \
-    get_entity_data, get_file_path, link
+from openatlas.util.util import get_file_stats, required_group, was_modified
 
 
 class FileForm(FlaskForm):  # type: ignore

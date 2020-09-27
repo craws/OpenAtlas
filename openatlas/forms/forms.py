@@ -551,7 +551,7 @@ def get_form_settings(form: Any, profile: bool = False) -> Dict[str, str]:
     return settings
 
 
-def set_form_settings(form: Any, profile: Optional[bool] = False) -> None:
+def set_form_settings(form: Any, profile: bool = False) -> None:
     for field in form:
         if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
             continue

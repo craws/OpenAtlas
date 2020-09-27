@@ -11,9 +11,9 @@ from wtforms import BooleanField, SelectField, SubmitField
 
 from openatlas import app, logger
 from openatlas.models.export import Export
+from openatlas.util.display import convert_size, delete_link, link, uc_first
 from openatlas.util.table import Table
 from openatlas.util.util import is_authorized, required_group
-from openatlas.util.display import convert_size, delete_link, link, uc_first
 
 
 class ExportSqlForm(FlaskForm):  # type: ignore
@@ -23,8 +23,9 @@ class ExportSqlForm(FlaskForm):  # type: ignore
 class ExportCsvForm(FlaskForm):  # type: ignore
     zip = BooleanField(_('export as ZIP and add info file'), default=True)
     timestamps = BooleanField('created and modified dates', default=False)
-    gis_format = SelectField(_('GIS format'), choices=[
-        ('coordinates', _('coordinates')), ('wkt', 'WKT'), ('postgis', 'PostGIS Geometry')])
+    gis_format = SelectField(_('GIS format'), choices=[('coordinates', _('coordinates')),
+                                                       ('wkt', 'WKT'),
+                                                       ('postgis', 'PostGIS Geometry')])
     model_class = BooleanField('model.class', default=True)
     model_class_inheritance = BooleanField('model.class_inheritance', default=True)
     model_entity = BooleanField('model.entity', default=True)
