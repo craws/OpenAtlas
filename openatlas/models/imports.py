@@ -79,7 +79,7 @@ class Import:
             WHERE id = %(id)s;"""
         g.execute(sql, {'id': project.id,
                         'name': project.name,
-                        'description': sanitize(project.description, 'description')})
+                        'description': sanitize(project.description, 'text')})
 
     @staticmethod
     def check_type_id(type_id: str, class_code: str) -> bool:  # pragma: no cover

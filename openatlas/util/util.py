@@ -125,15 +125,13 @@ class MLStripper(HTMLParser):
 def sanitize(string: Optional[str], mode: Optional[str] = None) -> str:
     if not string:
         return ''
-    if mode == 'node':
-        # Remove all characters from a string except letters, numbers and spaces
+    if mode == 'node':  # Only keep letters, numbers and spaces
         return re.sub(r'([^\s\w]|_)+', '', string).strip()
-    if mode == 'description':
+    if mode == 'text':  # Remove HTML tags, keep linebreaks
         s = MLStripper()
         s.feed(string)
         return s.get_data().strip()
-    # Remove all characters from a string except ASCII letters and numbers
-    return re.sub('[^A-Za-z0-9]+', '', string).strip()
+    return re.sub('[^A-Za-z0-9]+', '', string)  # Only keep ASCII letters and numbers
 
 
 def get_file_stats(path: str = app.config['UPLOAD_FOLDER_PATH']) -> Dict[Union[int, str], Any]:
@@ -193,7 +191,7 @@ def add_type_data(entity: 'Entity',
     for root_type in type_data:
         type_data[root_type].sort()
 
-    # Move the base type to the top
+    # Move the standard type to the top
     if 'type' in type_data:
         type_data.move_to_end('type', last=False)
     for root_name, nodes in type_data.items():

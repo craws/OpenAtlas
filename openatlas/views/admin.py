@@ -65,9 +65,9 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
         html_ok = '<img src="/static/images/icons/dialog-apply.png" alt="ok">'
         for language in app.config['LANGUAGES'].keys():
             content.append(html_ok if languages[language] else '')
-        content.append(sanitize(languages[session['language']], 'description'))
-        content.append('<a href="' + url_for('admin_content', item=item) + '">' +
-                       uc_first(_('edit')) + '</a>')
+        content.append(sanitize(languages[session['language']], 'text'))
+        content.append('<a href="{url}">{label}</a>'.format(url=url_for('admin_content', item=item),
+                                                            label=uc_first(_('edit'))))
         tables['content'].rows.append(content)
     form = None
     if is_authorized('admin'):
@@ -275,7 +275,7 @@ def admin_orphans() -> str:
     for node in Node.get_node_orphans():
         tables['nodes'].rows.append([link(node), link(g.nodes[node.root[-1]])])
 
-    # Get orphaned file entities (no corresponding file)
+    # Get orphaned file entities with no corresponding file
     file_ids = []
     for entity in Entity.get_by_system_type('file', nodes=True):
         file_ids.append(str(entity.id))
@@ -288,7 +288,7 @@ def admin_orphans() -> str:
                                                  format_date(entity.modified),
                                                  entity.description])
 
-    # Get orphaned files (no corresponding entity)
+    # Get orphaned files with no corresponding entity
     with os.scandir(app.config['UPLOAD_FOLDER_PATH']) as it:
         for file in it:
             name = file.name
@@ -299,10 +299,12 @@ def admin_orphans() -> str:
                     convert_size(file.stat().st_size),
                     format_date(datetime.datetime.utcfromtimestamp(file.stat().st_ctime)),
                     splitext(name)[1],
-                    '<a href="' + url_for('download_file', filename=name) + '">' + uc_first(
-                        _('download')) + '</a>',
-                    '<a href="' + url_for('admin_file_delete', filename=name) + '" ' +
-                    confirm + '>' + uc_first(_('delete')) + '</a>'])
+                    '<a href="">{label}</a>'.format(url=url_for('download_file', filename=name),
+                                                    label=uc_first(_('download'))),
+                    '<a href="{url}" {confirm}>{label}</a>'.format(
+                        url=url_for('admin_file_delete', filename=name),
+                        confirm=confirm,
+                        label=uc_first(_('delete')))])
         return render_template('admin/check_orphans.html', tables=tables)
 
 
@@ -415,7 +417,9 @@ def admin_newsletter() -> Union[str, Response]:
     table = Table(['username', 'email', 'receiver'])
     for user in User.get_all():
         if user and user.settings['newsletter'] and user.active:  # pragma: no cover
-            checkbox = '<input value="' + str(user.id) + '" name="recipient"'
-            checkbox += ' type="checkbox" checked="checked">'
-            table.rows.append([user.username, user.email, checkbox])
+            table.rows.append([
+                user.username,
+                user.email,
+                '<input value="{id}" name="recipient" type="checkbox" checked="checked">'.format(
+                    id=user.id)])
     return render_template('admin/newsletter.html', form=form, table=table)

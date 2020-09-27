@@ -156,7 +156,7 @@ class Entity:
                         'end_to': Date.datetime64_to_timestamp(self.end_to),
                         'begin_comment': str(self.begin_comment).strip(),
                         'end_comment': str(self.end_comment).strip(),
-                        'description': sanitize(self.description, 'description')})
+                        'description': sanitize(self.description, 'text')})
 
     def update_aliases(self, form: FlaskForm) -> None:
         old_aliases = self.aliases
@@ -316,7 +316,7 @@ class Entity:
         params = {'name': str(name).strip(),
                   'code': code,
                   'system_type': system_type.strip() if system_type else None,
-                  'description': sanitize(description, 'description') if description else None}
+                  'description': sanitize(description, 'text') if description else None}
         g.execute(sql, params)
         return Entity.get_by_id(g.cursor.fetchone()[0])
 

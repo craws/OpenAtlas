@@ -249,7 +249,7 @@ class User(UserMixin):  # type: ignore
             VALUES (%(user_id)s, %(entity_id)s, %(text)s);"""
         g.execute(sql, {'user_id': current_user.id,
                         'entity_id': entity.id,
-                        'text': sanitize(note, 'description')})
+                        'text': sanitize(note, 'text')})
 
     @staticmethod
     def update_note(entity: Entity, note: str) -> None:
@@ -259,7 +259,7 @@ class User(UserMixin):  # type: ignore
             WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s;"""
         g.execute(sql, {'user_id': current_user.id,
                         'entity_id': entity.id,
-                        'text': sanitize(note, 'description')})
+                        'text': sanitize(note, 'text')})
 
     @staticmethod
     def get_note(entity: Entity) -> Optional[str]:

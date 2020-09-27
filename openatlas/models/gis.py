@@ -168,12 +168,11 @@ class Gis:
                         %(type)s,
                         public.ST_SetSRID(public.ST_GeomFromGeoJSON(%(geojson)s),4326));
                     """.format(shape=shape if shape != 'line' else 'linestring')
-                g.execute(sql, {
-                    'entity_id': entity.id,
-                    'name': sanitize(item['properties']['name'], 'description'),
-                    'description': sanitize(item['properties']['description'], 'description'),
-                    'type': item['properties']['shapeType'],
-                    'geojson': json.dumps(item['geometry'])})
+                g.execute(sql, {'entity_id': entity.id,
+                                'name': sanitize(item['properties']['name'], 'text'),
+                                'description': sanitize(item['properties']['description'], 'text'),
+                                'type': item['properties']['shapeType'],
+                                'geojson': json.dumps(item['geometry'])})
 
     @staticmethod
     def insert_import(entity: Entity,
@@ -193,8 +192,8 @@ class Gis:
             'entity_id': location.id,
             'name': '',
             'description': 'Imported centerpoint of {name} from the {project} project'.format(
-                name=sanitize(entity.name, 'description'),
-                project=sanitize(project.name, 'description')),
+                name=sanitize(entity.name, 'text'),
+                project=sanitize(project.name, 'text')),
             'type': 'centerpoint',
             'geojson': '''{{"type":"Point", "coordinates": [{easting},{northing}]}}'''.format(
                 easting=easting, northing=northing)})
