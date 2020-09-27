@@ -27,7 +27,8 @@ from openatlas.models.user import User
 from openatlas.util.table import Table
 from openatlas.util.util import (get_file_stats, is_authorized, required_group,
                                  send_mail)
-from openatlas.util.display import convert_size, format_date, format_datetime, get_disk_space_info, \
+from openatlas.util.display import convert_size, delete_link, format_date, format_datetime, \
+    get_disk_space_info, \
     get_file_path, link, sanitize, \
     truncate, uc_first
 
@@ -294,17 +295,13 @@ def admin_orphans() -> str:
         for file in it:
             name = file.name
             if name != '.gitignore' and splitext(file.name)[0] not in file_ids:
-                confirm = ' onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
                 tables['orphaned_files'].rows.append([
                     name,
                     convert_size(file.stat().st_size),
                     format_date(datetime.datetime.utcfromtimestamp(file.stat().st_ctime)),
                     splitext(name)[1],
                     link(_('download'), url_for('download_file', filename=name)),
-                    '<a href="{url}" {confirm}>{label}</a>'.format(
-                        url=url_for('admin_file_delete', filename=name),
-                        confirm=confirm,
-                        label=uc_first(_('delete')))])
+                    delete_link(name, url_for('admin_file_delete', filename=name))])
         return render_template('admin/check_orphans.html', tables=tables)
 
 

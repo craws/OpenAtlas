@@ -1,6 +1,6 @@
 from typing import Any, Dict, List, Optional, Union
 
-from flask import abort, flash, g, render_template, request, session, url_for
+from flask import abort, flash, g, render_template, request, url_for, session
 from flask_babel import format_number, lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
@@ -16,10 +16,10 @@ from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import (is_authorized, required_group)
+from openatlas.util.util import (required_group)
 from openatlas.util.display import add_remove_link, get_base_table_data, get_entity_data, \
     get_profile_image_table_link, \
-    link, sanitize, uc_first
+    link, tree_select, uc_first
 
 
 class NodeForm(FlaskForm):  # type: ignore
@@ -131,44 +131,6 @@ def node_move_entities(id_: int) -> Union[str, Response]:
     form.save.label.text = uc_first(_('move'))
     getattr(form, str(root.id)).data = node.id
     return render_template('types/move.html', node=node, root=root, form=form)
-
-
-def walk_tree(nodes: List[int]) -> List[Dict[str, Any]]:
-    items = []
-    for id_ in nodes:
-        item = g.nodes[id_]
-        count_subs = ' (' + format_number(item.count_subs) + ')' if item.count_subs else ''
-        items.append({
-            'id': item.id,
-            'href': url_for('entity_view', id_=item.id),
-            'a_attr': {'href': url_for('entity_view', id_=item.id)},
-            'text': item.name.replace("'", "&apos;") + ' ' + format_number(item.count) + count_subs,
-            'children': walk_tree(item.subs)})
-    return items
-
-
-def tree_select(name: str) -> str:
-    return """
-        <div id="{name}-tree"></div>
-        <script>
-            $(document).ready(function () {{
-                $("#{name}-tree").jstree({{
-                    "search": {{ "case_insensitive": true, "show_only_matches": true }},
-                    "plugins" : ["core", "html_data", "search"],
-                    "core": {{ "data": {tree_data} }}
-                }});
-                $("#{name}-tree").on("select_node.jstree", function (e, data) {{
-                    document.location.href = data.node.original.href;
-                }});
-                $("#{name}-tree-search").keyup(function() {{
-                    if (this.value.length >= {min_chars}) {{
-                        $("#{name}-tree").jstree("search", $(this).val());
-                    }}
-                }});
-            }});
-        </script>""".format(min_chars=session['settings']['minimum_jstree_search'],
-                            name=sanitize(name),
-                            tree_data=walk_tree(Node.get_nodes(name)))
 
 
 def node_view(node: Node) -> str:

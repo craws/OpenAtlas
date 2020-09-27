@@ -13,7 +13,7 @@ from openatlas import app, logger
 from openatlas.models.export import Export
 from openatlas.util.table import Table
 from openatlas.util.util import is_authorized, required_group
-from openatlas.util.display import convert_size, link, uc_first
+from openatlas.util.display import convert_size, delete_link, link, uc_first
 
 
 class ExportSqlForm(FlaskForm):  # type: ignore
@@ -60,11 +60,7 @@ def export_sql() -> Union[str, Response]:
                 convert_size(os.path.getsize(path.joinpath(name))),
                 link(_('download'), url_for('download_sql', filename=name))]
         if is_authorized('admin') and writeable:
-            delete = '<a href="{url}" onclick="return confirm(\'{confirm}\');">{label}</a>'.format(
-                url=url_for('delete_sql', filename=name),
-                confirm=_('Delete %(name)s?', name=name),
-                label=uc_first(_('delete')))
-            data.append(delete)
+            data.append(delete_link(name, url_for('delete_sql', filename=name)))
         table.rows.append(data)
     return render_template('export/export_sql.html', form=form, table=table, writeable=writeable)
 
@@ -116,10 +112,7 @@ def export_csv() -> Union[str, Response]:
                 convert_size(os.path.getsize(path.joinpath(name))),
                 link(_('download'), url_for('download_csv', filename=name))]
         if is_authorized('admin') and writeable:
-            confirm = ' onclick="return confirm(\'' + _('Delete %(name)s?', name=name) + '\')"'
-            delete = '<a href="' + url_for('delete_csv', filename=name)
-            delete += '" ' + confirm + '>' + uc_first(_('delete')) + '</a>'
-            data.append(delete)
+            data.append(delete_link(name, url_for('delete_csv', filename=name)))
         table.rows.append(data)
     return render_template('export/export_csv.html', form=form, table=table, writeable=writeable)
 
