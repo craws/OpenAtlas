@@ -243,7 +243,7 @@ class User(UserMixin):  # type: ignore
 
     @staticmethod
     def insert_note(entity: Entity, note: str) -> None:
-        from openatlas.util.util import sanitize
+        from openatlas.util.html import sanitize
         sql = """
             INSERT INTO web.user_notes (user_id, entity_id, text)
             VALUES (%(user_id)s, %(entity_id)s, %(text)s);"""
@@ -253,7 +253,7 @@ class User(UserMixin):  # type: ignore
 
     @staticmethod
     def update_note(entity: Entity, note: str) -> None:
-        from openatlas.util.util import sanitize
+        from openatlas.util.html import sanitize
         sql = """
             UPDATE web.user_notes SET text = %(text)s
             WHERE user_id = %(user_id)s AND entity_id = %(entity_id)s;"""

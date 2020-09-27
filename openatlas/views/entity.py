@@ -10,7 +10,8 @@ from werkzeug.wrappers import Response
 from openatlas import app
 from openatlas.forms.forms import build_table_form
 from openatlas.models.entity import Entity
-from openatlas.util.util import required_group, uc_first
+from openatlas.util.util import required_group
+from openatlas.util.html import uc_first
 from openatlas.views.reference import AddReferenceForm
 from openatlas.views.types import node_view
 

@@ -40,7 +40,7 @@ class Table:
         self.defs = defs if defs else ''
 
     def display(self, name: str = 'table') -> str:
-        from openatlas.util.util import uc_first
+        from openatlas.util.html import uc_first
         if not self.rows:
             return '<p>' + uc_first(_('no entries')) + '</p>'
         columns: List[Dict[str, str]] = [{'title': _(item).capitalize() if item else ''} for item in

@@ -13,6 +13,7 @@ from markupsafe import Markup
 from wtforms import IntegerField
 from wtforms.validators import Email
 
+import openatlas.util.html
 from openatlas import app
 from openatlas.models.content import Content
 from openatlas.models.entity import Entity
@@ -21,7 +22,7 @@ from openatlas.models.model import CidocClass, CidocProperty
 from openatlas.models.user import User
 from openatlas.util import tab, util
 from openatlas.util.table import Table
-from openatlas.util.util import get_file_path
+from openatlas.util.html import get_file_path
 
 blueprint: flask.Blueprint = flask.Blueprint('filters', __name__)
 paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
@@ -30,7 +31,7 @@ paragraph_re = re.compile(r'(?:\r\n|\r|\n){2,}')
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def link(self: Any, entity: Entity) -> str:
-    return util.link(entity)
+    return openatlas.util.html.link(entity)
 
 
 @jinja2.contextfilter
@@ -41,7 +42,7 @@ def button(self: Any,
            css: Optional[str] = 'primary',
            id_: Optional[str] = None,
            onclick: Optional[str] = '') -> str:
-    return util.button(label, url, css, id_, onclick)
+    return openatlas.util.html.button(label, url, css, id_, onclick)
 
 
 @jinja2.contextfilter
@@ -50,7 +51,7 @@ def display_citation_example(self: Any, code: str) -> str:
     example = Content.get_translation('citation_example')
     if not example or code not in ['edition', 'bibliography']:
         return ''
-    return Markup('<h1>' + util.uc_first(_('citation_example')) + '</h1>' + example)
+    return Markup('<h1>' + openatlas.util.html.uc_first(_('citation_example')) + '</h1>' + example)
 
 
 @jinja2.contextfilter
@@ -70,8 +71,8 @@ def siblings_pager(self: Any, entity: Entity, structure: Optional[Dict[str, Any]
             position = counter
             break
     return Markup('{previous} {next} {position} {of_label} {count}'.format(
-        previous=util.button('<', url_for('entity_view', id_=previous_id)) if previous_id else '',
-        next=util.button('>', url_for('entity_view', id_=next_id)) if next_id else '',
+        previous=openatlas.util.html.button('<', url_for('entity_view', id_=previous_id)) if previous_id else '',
+        next=openatlas.util.html.button('>', url_for('entity_view', id_=next_id)) if next_id else '',
         position=position,
         of_label=_('of'),
         count=len(structure['siblings'])))
@@ -85,14 +86,14 @@ def crumb(self: Any, crumbs: List[Any]) -> str:
         if not item:
             continue  # Item can be None e.g. if a dynamic generated URL has no origin parameter
         elif isinstance(item, Entity) or isinstance(item, Project) or isinstance(item, User):
-            items.append(util.link(item))
+            items.append(openatlas.util.html.link(item))
         elif isinstance(item, list):
             items.append('<a href="{url}">{label}</a>'.format(
                 # If there are more than 2 arguments pass them as parameters with **
                 url=url_for(item[1]) if len(item) == 2 else url_for(item[1], **item[2]),
-                label=util.truncate(util.uc_first(str(item[0])))))
+                label=openatlas.util.html.truncate(openatlas.util.html.uc_first(str(item[0])))))
         else:
-            items.append(util.uc_first(item))
+            items.append(openatlas.util.html.uc_first(item))
     return Markup('&nbsp;>&nbsp; '.join(items))
 
 
@@ -104,13 +105,13 @@ def note(self: Any, entity: Entity) -> str:
     if not entity.note:
         html = '<p><a href="{url}">{label}</a></p>'.format(
             url=url_for('note_insert', entity_id=entity.id),
-            label=util.uc_first(_('note')))
+            label=openatlas.util.html.uc_first(_('note')))
     else:
         html = '<h2>{label}</h2><p>{note}</p><a href="{url}">{edit}</a>'.format(
-            label=util.uc_first(_('note')),
+            label=openatlas.util.html.uc_first(_('note')),
             note=entity.note,
             url=url_for('note_update', entity_id=entity.id),
-            edit=util.uc_first(_('edit note')))
+            edit=openatlas.util.html.uc_first(_('edit note')))
     return Markup(html)
 
 
@@ -132,7 +133,7 @@ def tab_header(self: Any,
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def uc_first(self: Any, string: str) -> str:
-    return util.uc_first(string)
+    return openatlas.util.html.uc_first(string)
 
 
 @jinja2.contextfilter
@@ -147,14 +148,14 @@ def display_info(self: Any, data: Dict[str, Union[str, List[str]]]) -> str:
                 <div class="table-row">
                     <div>{label}</div>
                     <div class="table-cell">{value}</div>
-                </div>'''.format(label=util.uc_first(label), value=value)
+                </div>'''.format(label=openatlas.util.html.uc_first(label), value=value)
     return Markup(html + '</div>')
 
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def bookmark_toggle(self: Any, entity_id: int) -> str:
-    return Markup(util.bookmark_toggle(entity_id))
+    return Markup(openatlas.util.html.bookmark_toggle(entity_id))
 
 
 @jinja2.contextfilter
@@ -165,15 +166,15 @@ def display_move_form(self: Any, form: Any, root_name: str) -> str:
     for field in form:
         if type(field) is TreeField:
             html += '<p>' + root_name + ' ' + str(field) + '</p>'
-    table = Table(header=['#', util.uc_first(_('selection'))],
+    table = Table(header=['#', openatlas.util.html.uc_first(_('selection'))],
                   rows=[[item, item.label.text] for item in form.selection])
     return html + """
         <div class="toolbar">
             {select_all}
             {deselect_all}
         </div>
-        {table}""".format(select_all=util.button(_('select all'), id_="select-all"),
-                          deselect_all=util.button(_('deselect all'), id_="select-none"),
+        {table}""".format(select_all=openatlas.util.html.button(_('select all'), id_="select-all"),
+                          deselect_all=openatlas.util.html.button(_('deselect all'), id_="select-none"),
                           table=table.display('move'))
 
 
@@ -219,7 +220,7 @@ def table_select_model(self: Any,
                 </div>
             </div>""".format(name=name,
                              value=value,
-                             close_label=util.uc_first(_('close')),
+                             close_label=openatlas.util.html.uc_first(_('close')),
                              table=table.display(name))
     return html
 
@@ -235,9 +236,9 @@ def get_class_name(self: Any, code: str) -> str:
 def description(self: Any, entity: Entity) -> str:
     if not entity.description:
         return ''
-    label = util.uc_first(_('description'))
+    label = openatlas.util.html.uc_first(_('description'))
     if hasattr(entity, 'system_type') and entity.system_type == 'source content':
-        label = util.uc_first(_('content'))
+        label = openatlas.util.html.uc_first(_('content'))
     return Markup("""<h2>{label}</h2><div class="description more">{description}</div>""".format(
         label=label,
         description=entity.description.replace('\r\n', '<br>')))
@@ -277,7 +278,7 @@ def manual(self: Any, site: str) -> str:  # Creates a link to a manual page
         <a class="{css}" href="/static/manual/{site}.html" target="_blank" title="{label}">
             <img style="height:14px;" src="/static/images/icons/book.png" alt=''>
         </a>""".format(site=site,
-                       label=util.uc_first('manual'),
+                       label=openatlas.util.html.uc_first('manual'),
                        css=app.config['CSS']['button']['primary']))
 
 
@@ -322,16 +323,16 @@ def display_form(self: Any,
             class_ += ' email' if type(validator) is Email else ''
         errors = ''
         for error in field.errors:
-            errors += util.uc_first(error)
+            errors += openatlas.util.html.uc_first(error)
 
         if field.type in ['TreeField', 'TreeMultiField']:
             hierarchy_id = int(field.id)
             node = g.nodes[hierarchy_id]
             label = node.name
             if node.name in app.config['BASE_TYPES']:
-                label = util.uc_first(_('type'))
+                label = openatlas.util.html.uc_first(_('type'))
             if field.label.text == 'super':
-                label = util.uc_first(_('super'))
+                label = openatlas.util.html.uc_first(_('super'))
             if node.value_type and 'is_node_form' not in form:
                 html['value_types'] += """
                     <div class="table-row value-type-switch">
@@ -341,11 +342,11 @@ def display_form(self: Any,
                         </div>
                     </div>
                     {value_fields}""".format(label=label,
-                                             tooltip=util.display_tooltip(node.description),
+                                             tooltip=openatlas.util.html.display_tooltip(node.description),
                                              value_fields=display_value_type_fields(node.subs))
                 continue
             else:
-                tooltip = '' if 'is_node_form' in form else util.display_tooltip(node.description)
+                tooltip = '' if 'is_node_form' in form else openatlas.util.html.display_tooltip(node.description)
                 type_field = """
                     <div class="table-row">
                         <div><label>{label}</label> {tooltip}</div>
@@ -360,7 +361,7 @@ def display_form(self: Any,
         if field.type in ['CSRFTokenField', 'HiddenField']:
             html['header'] += str(field)
             continue
-        field.label.text = util.uc_first(field.label.text)
+        field.label.text = openatlas.util.html.uc_first(field.label.text)
         field.label.text += ' *' if field.flags.required and form_id != 'login-form' else ''
         if field.id == 'description':
             html['footer'] += '''<div class="table-row">
@@ -373,10 +374,10 @@ def display_form(self: Any,
             continue
         if field.id.split('_', 1)[0] in ('begin', 'end'):  # If it's a date field use a function
             if field.id == 'begin_year_from':
-                html['footer'] += util.add_dates_to_form(form, for_persons)
+                html['footer'] += openatlas.util.html.add_dates_to_form(form, for_persons)
             continue
         errors = ' <span class="error">' + errors + ' </span>' if errors else ''
-        tooltip = util.display_tooltip(field.description)
+        tooltip = openatlas.util.html.display_tooltip(field.description)
         if field.id in ('file', 'name'):
             html['header'] += '''
                 <div class="table-row">
@@ -423,8 +424,8 @@ def display_form(self: Any,
                     {switcher}
                 </div>
             </div>
-            """.format(values=util.uc_first(_('values')),
-                       switcher=util.button(_('show'), id_="value-type-switcher", css="secondary"))
+            """.format(values=openatlas.util.html.uc_first(_('values')),
+                       switcher=openatlas.util.html.button(_('show'), id_="value-type-switcher", css="secondary"))
         html['value_types'] = values_html + html['value_types']
     if manual_page:
         html['buttons'] = str(escape(manual(None, manual_page))) + ' ' + html['buttons']
@@ -442,7 +443,7 @@ def test_file(self: Any, file_name: str) -> Optional[str]:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def sanitize(self: Any, string: str) -> str:
-    return util.sanitize(string)
+    return openatlas.util.html.sanitize(string)
 
 
 @jinja2.contextfilter
@@ -450,9 +451,9 @@ def sanitize(self: Any, string: str) -> str:
 def display_delete_link(self: Any, entity: Entity) -> str:
     """ Build a link to delete an entity with a JavaScript confirmation dialog."""
     name = entity.name.replace('\'', '')
-    return util.button(_('delete'),
-                       url_for(entity.view_name + '_index', action='delete', id_=entity.id),
-                       onclick="return confirm('" + _('Delete %(name)s?', name=name) + "')")
+    return openatlas.util.html.button(_('delete'),
+                                      url_for(entity.view_name + '_index', action='delete', id_=entity.id),
+                                      onclick="return confirm('" + _('Delete %(name)s?', name=name) + "')")
 
 
 @jinja2.contextfilter
@@ -474,7 +475,7 @@ def display_menu(self: Any, entity: Optional[Entity]) -> str:
                 css = 'active' if request.path.startswith('/' + item) or \
                                   (item == 'overview' and request.path == '/') else ''
             html += '<a href="/{item}" class="nav-item nav-link {css}">{label}</a>'.format(
-                css=css, item=item, label=util.uc_first(_(item)))
+                css=css, item=item, label=openatlas.util.html.uc_first(_(item)))
     return html
 
 
@@ -508,11 +509,11 @@ def display_external_references(self: Any, entity: Entity) -> str:
     html = ''
     for link_ in entity.external_references:
         url = link_.domain.name
-        name = util.truncate(url.replace('http://', '').replace('https://', ''), span=False)
+        name = openatlas.util.html.truncate(url.replace('http://', '').replace('https://', ''), span=False)
         if link_.description:
             name = link_.description
         if link_.domain.system_type == 'external reference geonames':
             name = 'GeoNames (' + link_.domain.name + ')'
             url = session['settings']['geonames_url'] + link_.domain.name
         html += '<a target="_blank" href="{url}">{name}</a><br>'.format(url=url, name=name)
-    return Markup('<h2>' + util.uc_first(_('external references')) + '</h2>' + html) if html else ''
+    return Markup('<h2>' + openatlas.util.html.uc_first(_('external references')) + '</h2>' + html) if html else ''

@@ -7,7 +7,8 @@ from flask_login import current_user
 from psycopg2.extras import NamedTupleCursor
 
 from openatlas import app
-from openatlas.util.util import is_float, uc_first
+from openatlas.util.util import is_float
+from openatlas.util.html import sanitize, uc_first
 
 
 class Project:
@@ -73,7 +74,6 @@ class Import:
 
     @staticmethod
     def update_project(project: Project) -> None:
-        from openatlas.util.util import sanitize
         sql = """
             UPDATE import.project SET (name, description) = (%(name)s, %(description)s)
             WHERE id = %(id)s;"""

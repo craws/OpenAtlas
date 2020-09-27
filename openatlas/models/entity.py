@@ -14,7 +14,8 @@ from werkzeug.exceptions import abort
 from openatlas import app
 from openatlas.models.date import Date
 from openatlas.models.link import Link
-from openatlas.util.util import is_authorized, get_file_extension
+from openatlas.util.util import is_authorized
+from openatlas.util.html import get_file_extension
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.node import Node
@@ -125,7 +126,7 @@ class Entity:
 
     def update(self, form: Optional[FlaskForm] = None) -> None:
         from openatlas.forms.date import DateForm
-        from openatlas.util.util import sanitize
+        from openatlas.util.html import sanitize
         if form:
             self.save_nodes(form)
             for field in ['name', 'description']:
@@ -237,7 +238,7 @@ class Entity:
 
     def get_name_directed(self, inverse: bool = False) -> str:
         """ Returns name part of a directed type e.g. Actor Actor Relation: Parent of (Child of)"""
-        from openatlas.util.util import sanitize
+        from openatlas.util.html import sanitize
         name_parts = self.name.split(' (')
         if inverse and len(name_parts) > 1:  # pragma: no cover
             return sanitize(name_parts[1], 'node')
@@ -304,7 +305,7 @@ class Entity:
                name: str,
                system_type: Optional[str] = None,
                description: Optional[str] = None) -> Entity:
-        from openatlas.util.util import sanitize
+        from openatlas.util.html import sanitize
         from openatlas import logger
         if not name:  # pragma: no cover
             logger.log('error', 'database', 'Insert entity without name')

@@ -11,7 +11,7 @@ from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
-from openatlas.util.util import format_date, get_file_path
+from openatlas.util.html import format_date, get_file_path
 
 
 class Api:

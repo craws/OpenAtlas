@@ -16,9 +16,9 @@ from openatlas.forms.forms import build_form, build_table_form
 from openatlas.models.entity import Entity
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import (convert_size, display_remove_link, format_date,
-                                 get_base_table_data, get_entity_data, get_file_path,
-                                 get_file_stats, is_authorized, link, required_group, was_modified)
+from openatlas.util.util import (get_file_stats, is_authorized, required_group, was_modified)
+from openatlas.util.html import convert_size, display_remove_link, format_date, get_base_table_data, \
+    get_entity_data, get_file_path, link
 
 
 class FileForm(FlaskForm):  # type: ignore

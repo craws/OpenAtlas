@@ -7,7 +7,8 @@ from flask_login import current_user
 from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.util.table import Table
-from openatlas.util.util import button, is_authorized, uc_first
+from openatlas.util.util import is_authorized
+from openatlas.util.html import button, uc_first
 
 # Needed for translations of tab titles
 _('member of')

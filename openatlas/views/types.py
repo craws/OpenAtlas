@@ -16,9 +16,10 @@ from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 get_profile_image_table_link, is_authorized, link, required_group,
-                                 sanitize, uc_first)
+from openatlas.util.util import (is_authorized, required_group)
+from openatlas.util.html import display_remove_link, get_base_table_data, get_entity_data, \
+    get_profile_image_table_link, \
+    link, sanitize, uc_first
 
 
 class NodeForm(FlaskForm):  # type: ignore

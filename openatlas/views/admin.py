@@ -25,9 +25,11 @@ from openatlas.models.node import Node
 from openatlas.models.settings import Settings
 from openatlas.models.user import User
 from openatlas.util.table import Table
-from openatlas.util.util import (convert_size, format_date, format_datetime, get_disk_space_info,
-                                 get_file_path, get_file_stats, is_authorized, link, required_group,
-                                 sanitize, send_mail, truncate, uc_first)
+from openatlas.util.util import (get_file_stats, is_authorized, required_group,
+                                 send_mail)
+from openatlas.util.html import convert_size, format_date, format_datetime, get_disk_space_info, \
+    get_file_path, link, sanitize, \
+    truncate, uc_first
 
 
 @app.route('/admin', methods=["GET", "POST"])

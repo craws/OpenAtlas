@@ -14,9 +14,11 @@ from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import (display_remove_link, get_base_table_data, get_entity_data,
-                                 get_profile_image_table_link, is_authorized, link, required_group,
+from openatlas.util.util import (is_authorized, required_group,
                                  was_modified)
+from openatlas.util.html import display_remove_link, get_base_table_data, get_entity_data, \
+    get_profile_image_table_link, \
+    link
 
 
 class SourceForm(FlaskForm):  # type: ignore

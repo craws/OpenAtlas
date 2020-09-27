@@ -12,7 +12,8 @@ from wtforms.validators import InputRequired
 from openatlas import app
 from openatlas.models.entity import Entity
 from openatlas.models.overlay import Overlay
-from openatlas.util.util import required_group, uc_first
+from openatlas.util.util import required_group
+from openatlas.util.html import uc_first
 
 
 class OverlayForm(FlaskForm):  # type: ignore

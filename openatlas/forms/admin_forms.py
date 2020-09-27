@@ -5,7 +5,7 @@ from wtforms import (BooleanField, IntegerField, SelectField, StringField, Submi
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app
-from openatlas.util.util import (uc_first)
+from openatlas.util.html import uc_first
 
 
 class ContentForm(FlaskForm):  # type: ignore
