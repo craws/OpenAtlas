@@ -106,11 +106,12 @@ class Api:
                 raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
         else:
             pass
-
+        entity_result =[]
         for entity in entities[:int(meta['limit'])]:
-            result.append(Api.get_entity(entity, meta))
-        result.append({'entity_per_page': int(meta['limit']), 'entities': len(total),
-                       'index': index, 'total_pages': len(index)})
+            entity_result.append(Api.get_entity(entity, meta))
+        result.append(entity_result)
+        result.append([{'entity_per_page': int(meta['limit']), 'entities': len(total),
+                       'index': index, 'total_pages': len(index)}])
         return result
 
     @staticmethod

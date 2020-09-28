@@ -132,22 +132,17 @@ def api_get_query() -> Response:  # pragma: nocover
         count = 0
         if request.args.getlist('entities'):
             entities = request.args.getlist('entities')
-            ids = []
             for e in entities:
                 try:
-                    ids.append(int(e))
+                    out.append(int(e))
                 except Exception:
                     raise APIError('Syntax is incorrect!', status_code=404, payload="404b")
-            result = Api.pagination(ids, meta=validation)
-            count += len(result) - 1
-            out.append({'entities': result})
+            count += len(out)
         if request.args.getlist('items'):
             items = request.args.getlist('items')
             for i in items:
                 try:
-                    out.append({'result': Api.pagination(
-                        Api.get_entities_by_menu_item(code_=i, meta=validation), meta=validation),
-                        'code': i})
+                    out.extend(Api.get_entities_by_menu_item(code_=i, meta=validation))
                     if validation['count']:
                         count += len(Api.get_entities_by_menu_item(code_=i, meta=validation))
                 except Exception:
@@ -157,14 +152,12 @@ def api_get_query() -> Response:  # pragma: nocover
             for class_code in classes:
                 if len(Api.get_entities_by_class(class_code_=class_code, meta=validation)) == 0:
                     raise APIError('Syntax is incorrect!', status_code=404, payload="404d")
-                out.append({'result': Api.pagination(
-                    Api.get_entities_by_class(class_code_=class_code, meta=validation),
-                    meta=validation), 'class': class_code})
+                out.extend(Api.get_entities_by_class(class_code_=class_code, meta=validation))
                 if validation['count']:
                     count += len(Api.get_entities_by_class(class_code_=class_code, meta=validation))
         if validation['count']:
             return jsonify(count)
-        return jsonify(out)
+        return jsonify(Api.pagination(out, meta=validation))
     else:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404")
 
