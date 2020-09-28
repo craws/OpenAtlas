@@ -55,133 +55,133 @@
     </title>
 </head>
 <body>
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
-    <a class="navbar-brand" href="/"><img src="{{ get_logo|safe }}" id="logo" alt="Logo"></a>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
-            aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
-        <span class="navbar-toggler-icon"></span>
-    </button>
-    <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-        <div class="navbar-nav">
-            {{ origin|display_menu|safe }}
-        </div>
-    </div>
-    <div style="float: right;">
-        {% if current_user.is_authenticated %}
-            <div id="index-search-button" class="iconbutton">
-                <div id="index-search">
-                    <form  class="form-group has-search" method="post" action="{{ url_for('search_index') }}" style="display: inline-flex">
-                        {{ search_form.csrf_token }}
-                        {{ search_form.term }}
-                        <button type="submit" class="btn btn-link search-button">
-                            <i class="fas fa-search"></i>
-                        </button>
-                    </form>
-                </div>
+    <nav class="navbar navbar-expand-lg navbar-light bg-light">
+        <a class="navbar-brand" href="/"><img src="{{ get_logo|safe }}" id="logo" alt="Logo"></a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup"
+                aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
+            <div class="navbar-nav">
+                {{ origin|display_menu|safe }}
             </div>
-        {% endif %}
-        <div class="btn-group btn-group-toggle">
-            {% for language in config['LANGUAGES'].keys()|sort %}
-                {% if 'language' in session and session['language'] == language %}
-                    <span class="btn btn-secondary active btn-sm">{{ language|upper }}</span>
-                {% else %}
-                    <a class="btn btn-secondary btn-sm" href="{{ url_for('set_locale', language=language) }}">{{ language|upper }}</a>
+        </div>
+        <div style="float: right;">
+            {% if current_user.is_authenticated %}
+                <div id="index-search-button" class="iconbutton">
+                    <div id="index-search">
+                        <form  class="form-group has-search" method="post" action="{{ url_for('search_index') }}" style="display:inline-flex">
+                            {{ search_form.csrf_token }}
+                            {{ search_form.term }}
+                            <button type="submit" class="btn btn-link search-button">
+                                <i class="fas fa-search"></i>
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% endif %}
+            <div class="btn-group btn-group-toggle">
+                {% for language in config['LANGUAGES'].keys()|sort %}
+                    {% if 'language' in session and session['language'] == language %}
+                        <span class="btn btn-secondary active btn-sm">{{ language|upper }}</span>
+                    {% else %}
+                        <a class="btn btn-secondary btn-sm" href="{{ url_for('set_locale', language=language) }}">{{ language|upper }}</a>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            {% if current_user.is_authenticated %}
+                <div class="iconbutton dropdown">
+                    <a  class="nav-link dropdown-toggle"
+                        data-toggle="dropdown"
+                        href="#"
+                        role="button"
+                        aria-haspopup="true"
+                        style="padding: 0px!important;"
+                        aria-expanded="false"><span><i class="fa fa-cog"></i></span></a>
+                    <div class="dropdown-menu dropdown-menu-right">
+                        <a class="dropdown-item" href="{{ url_for('profile_index') }}">
+                            <span>{{ _('profile')|uc_first }}</span>
+                        </a>
+                        <a class="dropdown-item" href="/admin">
+                            <span>{{ _('admin')|uc_first }}</span>
+                        </a>
+                        {% if 'contact'|display_content_translation %}
+                            <a class="dropdown-item" href="{{ url_for('index_content', item='contact') }}">
+                                <span>{{ _('contact')|uc_first }}</span>
+                            </a>
+                        {% endif %}
+                        {% if 'legal_notice'|display_content_translation %}
+                            <a class="dropdown-item" href="{{ url_for('index_content', item='legal_notice') }}">
+                                <span>{{ _('legal_notice')|uc_first }}</span>
+                            </a>
+                        {% endif %}
+                        {% if current_user.is_authenticated %}
+                            <a class="dropdown-item" href="/logout">
+                                <span>{{ _('logout')|uc_first }}</span>
+                            </a>
+                        {% endif %}
+                    </div>
+                </div>
+            {% else %}
+                {% if 'contact'|display_content_translation %}
+                    <div class="iconbutton"
+                         data-toggle="popover"
+                         data-placement="bottom"
+                         data-content="{{ _('contact')|uc_first }}"
+                         data-trigger="hover">
+                        <a href="{{ url_for('index_content', item='contact') }}" >
+                            <span><i class="fas fa-at"></i></span>
+                        </a>
+                    </div>
                 {% endif %}
+                {% if 'legal_notice'|display_content_translation %}
+                    <div class="iconbutton"
+                         data-toggle="popover"
+                         data-placement="bottom"
+                         data-content="{{ _('legal_notice')|uc_first }}"
+                         data-trigger="hover">
+                        <a href="{{ url_for('index_content', item='legal_notice') }}" >
+                            <span><i class="fas fa-balance-scale"></i></span>
+                        </a>
+                    </div>
+                {% endif %}
+                <a class="btn btn-warning btn-sm" href="/login">{{ _('login')|uc_first }}</a>
+            {% endif %}
+        </div>
+    </nav>
+    <nav aria-label="breadcrumb">
+        <div class="breadcrumb">
+            {% block breadcrumb %}{% endblock %}
+            <div id="site-name-and-version">
+                {{ session['settings']['site_name'] }}
+                <a href="{{ url_for('index_changelog') }}">{{ config['VERSION'] }}</a>
+            </div>
+        </div>
+    </nav>
+    <noscript>
+        <div class="error">{{ _('warning no js') }}</div>
+    </noscript>
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }}" role="alert">
+                    {{ message|uc_first }}
+                </div>
             {% endfor %}
-        </div>
-        {% if current_user.is_authenticated %}
-            <div class="iconbutton dropdown">
-                <a  class="nav-link dropdown-toggle"
-                    data-toggle="dropdown"
-                    href="#"
-                    role="button"
-                    aria-haspopup="true"
-                    style="padding: 0px!important;"
-                    aria-expanded="false"><span><i class="fa fa-cog"></i></span></a>
-                <div class="dropdown-menu dropdown-menu-right">
-                    <a class="dropdown-item" href="{{ url_for('profile_index') }}">
-                        <span>{{ _('profile')|uc_first }}</span>
-                    </a>
-                    <a class="dropdown-item" href="/admin">
-                        <span>{{ _('admin')|uc_first }}</span>
-                    </a>
-                    {% if 'contact'|display_content_translation %}
-                        <a class="dropdown-item" href="{{ url_for('index_content', item='contact') }}">
-                            <span>{{ _('contact')|uc_first }}</span>
-                        </a>
-                    {% endif %}
-                    {% if 'legal_notice'|display_content_translation %}
-                        <a class="dropdown-item" href="{{ url_for('index_content', item='legal_notice') }}">
-                            <span>{{ _('legal_notice')|uc_first }}</span>
-                        </a>
-                    {% endif %}
-                    {% if current_user.is_authenticated %}
-                        <a class="dropdown-item" href="/logout">
-                            <span>{{ _('logout')|uc_first }}</span>
-                        </a>
-                    {% endif %}
-                </div>
-            </div>
-        {% else %}
-            {% if 'contact'|display_content_translation %}
-                <div class="iconbutton"
-                     data-toggle="popover"
-                     data-placement="bottom"
-                     data-content="{{ _('contact')|uc_first }}"
-                     data-trigger="hover">
-                    <a href="{{ url_for('index_content', item='contact') }}" >
-                        <span><i class="fas fa-at"></i></span>
-                    </a>
+        {% endif %}
+    {% endwith %}
+    <main>
+        <div id="content">
+            <div style="float:left" class="container-fluid">{% block content %}{% endblock %}</div>
+            {% if session['settings']['debug_mode'] and 'admin'|is_authorized %}
+                <div class="data-table"
+                     style="float:right;margin:1em;position: absolute;right: 5px;background: rgba(230,219,0,0.4);top: 150px;padding: 5px;">
+                    <p>Debug</p>
+                    {{ debug_model|display_debug_info(form)|safe }}
                 </div>
             {% endif %}
-            {% if 'legal_notice'|display_content_translation %}
-                <div class="iconbutton"
-                     data-toggle="popover"
-                     data-placement="bottom"
-                     data-content="{{ _('legal_notice')|uc_first }}"
-                     data-trigger="hover">
-                    <a href="{{ url_for('index_content', item='legal_notice') }}" >
-                        <span><i class="fas fa-balance-scale"></i></span>
-                    </a>
-                </div>
-            {% endif %}
-            <a class="btn btn-warning btn-sm" href="/login">{{ _('login')|uc_first }}</a>
-        {% endif %}
-    </div>
-</nav>
-<nav aria-label="breadcrumb">
-    <div class="breadcrumb">
-        {% block breadcrumb %}{% endblock %}
-        <div id="site-name-and-version">
-            {{ session['settings']['site_name'] }}
-            <a href="{{ url_for('index_changelog') }}">{{ config['VERSION'] }}</a>
+            <div style="clear:both"></div>
         </div>
-    </div>
-</nav>
-<noscript>
-    <div class="error">{{ _('warning no js') }}</div>
-</noscript>
-{% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-            <div class="alert alert-{{ category }}" role="alert">
-                {{ message|uc_first }}
-            </div>
-        {% endfor %}
-    {% endif %}
-{% endwith %}
-<main>
-    <div id="content">
-        <div style="float:left" class="container-fluid">{% block content %}{% endblock %}</div>
-        {% if session['settings']['debug_mode'] and 'admin'|is_authorized %}
-            <div class="data-table"
-                 style="float:right;margin:1em;position: absolute;right: 5px;background: rgba(230,219,0,0.4);top: 150px;padding: 5px;">
-                <p>Debug</p>
-                {{ debug_model|display_debug_info(form)|safe }}
-            </div>
-        {% endif %}
-        <div style="clear:both"></div>
-    </div>
-</main>
+    </main>
 </body>
 </html>

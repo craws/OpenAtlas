@@ -4,78 +4,78 @@
     <a href="{{ url_for('admin_index') }}#tab-data">{{ _('admin')|uc_first }}</a>&nbsp;> {{ _('orphans')|uc_first }}
 {% endblock %}
 {% block content %}
-<div class="toolbar">
-    {{ 'admin/data_integrity_checks'|manual }}
-</div>
-<div class="row">
-    <div class="col-6">
-        <ul class="nav nav-tabs" role="tablist">
-            {{ 'orphans'|tab_header(active=True, table=tables.orphans) }}
-            {{ 'unlinked'|tab_header(table=tables.unlinked) }}
-            {{ 'type'|tab_header(table=tables.nodes) }}
-            {{ 'missing files'|tab_header(table=tables.missing_files) }}
-            {{ 'orphaned files'|tab_header(table=tables.orphaned_files) }}
-            {{ 'circular dependencies'|tab_header(table=tables.circular) }}
-        </ul>
-        <div class="tab-content">
-            <div class="tab-pane fade show active" role="tabpanel" id="tab-orphans">
-                {% if tables.orphans.rows and 'admin'|is_authorized %}
-                    <div class="toolbar">
-                        {{ _('delete orphans')|button(url_for('admin_orphans_delete', parameter='orphans'), onclick="return confirm('" + _('delete orphans')|uc_first + "?')") }}
-                    </div>
-                {% endif %}
-                {% if tables.orphans.rows %}
-                    {{ tables.orphans.display('orphans')|safe }}
-                {% else %}
-                    {{ _('Congratulations, everything looks fine!') }}
-                {% endif %}
-            </div>
-            <div class="tab-pane fade" role="tabpanel" id="tab-unlinked">
-                {% if tables.unlinked.rows %}
-                    {{ tables.unlinked.display('unlinked')|safe }}
-                {% else %}
-                    {{ _('Congratulations, everything looks fine!') }}
-                {% endif %}
-            </div>
-            <div class="tab-pane fade" role="tabpanel" id="tab-type">
-                {% if tables.nodes.rows and 'admin'|is_authorized %}
-                    <div class="toolbar">
-                        {{ _('delete types')|button(url_for('admin_orphans_delete', parameter='types'), onclick="return confirm('" + _('delete types')|uc_first + "?')") }}
-                    </div>
-                {% endif %}
-                {% if tables.nodes.rows %}
-                    {{ tables.nodes.display('nodes')|safe }}
-                {% else %}
-                    {{ _('Congratulations, everything looks fine!') }}
-                {% endif %}
-            </div>
-            <div class="tab-pane fade" role="tabpanel" id="tab-missing-files">
-                {% if tables.missing_files.rows %}
-                    {{ tables.missing_files.display('missing_files')|safe }}
-                {% else %}
-                    {{ _('Congratulations, everything looks fine!') }}
-                {% endif %}
-            </div>
-            <div class="tab-pane fade" role="tabpanel" id="tab-orphaned-files">
-                {% if tables.orphaned_files.rows and 'admin'|is_authorized %}
-                    <div class="toolbar">
-                        {{ _('delete all files')|button(url_for('admin_file_delete', filename='all'), onclick="return confirm('" + _('delete all files without corresponding entities?')|uc_first + "')") }}
-                    </div>
-                {% endif %}
-                {% if tables.orphaned_files.rows %}
-                    {{ tables.orphaned_files.display('orphaned_files')|safe }}
-                {% else %}
-                    {{ _('Congratulations, everything looks fine!') }}
-                {% endif %}
-            </div>
-            <div class="tab-pane fade" role="tabpanel" id="tab-circular-dependencies">
-                {% if tables.circular.rows %}
-                    {{ tables.circular.display('circular')|safe }}
-                {% else %}
-                    {{ _('Congratulations, everything looks fine!') }}
-                {% endif %}
+    <div class="toolbar">
+        {{ 'admin/data_integrity_checks'|manual }}
+    </div>
+    <div class="row">
+        <div class="col-6">
+            <ul class="nav nav-tabs" role="tablist">
+                {{ 'orphans'|tab_header(active=True, table=tables.orphans) }}
+                {{ 'unlinked'|tab_header(table=tables.unlinked) }}
+                {{ 'type'|tab_header(table=tables.nodes) }}
+                {{ 'missing files'|tab_header(table=tables.missing_files) }}
+                {{ 'orphaned files'|tab_header(table=tables.orphaned_files) }}
+                {{ 'circular dependencies'|tab_header(table=tables.circular) }}
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane fade show active" role="tabpanel" id="tab-orphans">
+                    {% if tables.orphans.rows and 'admin'|is_authorized %}
+                        <div class="toolbar">
+                            {{ _('delete orphans')|button(url_for('admin_orphans_delete', parameter='orphans'), onclick="return confirm('" + _('delete orphans')|uc_first + "?')") }}
+                        </div>
+                    {% endif %}
+                    {% if tables.orphans.rows %}
+                        {{ tables.orphans.display('orphans')|safe }}
+                    {% else %}
+                        {{ _('Congratulations, everything looks fine!') }}
+                    {% endif %}
+                </div>
+                <div class="tab-pane fade" role="tabpanel" id="tab-unlinked">
+                    {% if tables.unlinked.rows %}
+                        {{ tables.unlinked.display('unlinked')|safe }}
+                    {% else %}
+                        {{ _('Congratulations, everything looks fine!') }}
+                    {% endif %}
+                </div>
+                <div class="tab-pane fade" role="tabpanel" id="tab-type">
+                    {% if tables.nodes.rows and 'admin'|is_authorized %}
+                        <div class="toolbar">
+                            {{ _('delete types')|button(url_for('admin_orphans_delete', parameter='types'), onclick="return confirm('" + _('delete types')|uc_first + "?')") }}
+                        </div>
+                    {% endif %}
+                    {% if tables.nodes.rows %}
+                        {{ tables.nodes.display('nodes')|safe }}
+                    {% else %}
+                        {{ _('Congratulations, everything looks fine!') }}
+                    {% endif %}
+                </div>
+                <div class="tab-pane fade" role="tabpanel" id="tab-missing-files">
+                    {% if tables.missing_files.rows %}
+                        {{ tables.missing_files.display('missing_files')|safe }}
+                    {% else %}
+                        {{ _('Congratulations, everything looks fine!') }}
+                    {% endif %}
+                </div>
+                <div class="tab-pane fade" role="tabpanel" id="tab-orphaned-files">
+                    {% if tables.orphaned_files.rows and 'admin'|is_authorized %}
+                        <div class="toolbar">
+                            {{ _('delete all files')|button(url_for('admin_file_delete', filename='all'), onclick="return confirm('" + _('delete all files without corresponding entities?')|uc_first + "')") }}
+                        </div>
+                    {% endif %}
+                    {% if tables.orphaned_files.rows %}
+                        {{ tables.orphaned_files.display('orphaned_files')|safe }}
+                    {% else %}
+                        {{ _('Congratulations, everything looks fine!') }}
+                    {% endif %}
+                </div>
+                <div class="tab-pane fade" role="tabpanel" id="tab-circular-dependencies">
+                    {% if tables.circular.rows %}
+                        {{ tables.circular.display('circular')|safe }}
+                    {% else %}
+                        {{ _('Congratulations, everything looks fine!') }}
+                    {% endif %}
+                </div>
             </div>
         </div>
     </div>
-</div>
 {% endblock %}

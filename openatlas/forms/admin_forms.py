@@ -1,7 +1,6 @@
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import (BooleanField, IntegerField, SelectField, StringField, SubmitField,
-                     TextAreaField)
+from wtforms import BooleanField, IntegerField, SelectField, StringField, SubmitField, TextAreaField
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app

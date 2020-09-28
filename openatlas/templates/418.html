@@ -3,14 +3,14 @@
     418 - I’m a teapot
 {% endblock %}
 {% block content %}
-<div class="container" style="text-align:center;">
-    <h1>418 - I’m a teapot</h1>
-    <p>
-        {{ _("This entry doesn't exist. Maybe you followed an obsolete link.") }}
-    </p>
-    <div class="toolbar">
-        {{ 'troubleshooting/error_codes'|manual }}
+    <div class="container" style="text-align:center;">
+        <h1>418 - I’m a teapot</h1>
+        <p>
+            {{ _("This entry doesn't exist. Maybe you followed an obsolete link.") }}
+        </p>
+        <div class="toolbar">
+            {{ 'troubleshooting/error_codes'|manual }}
+        </div>
+        <img src="/static/images/layout/418.jpg" alt="418 - I’m a teapot">
     </div>
-    <img src="/static/images/layout/418.jpg" alt="418 - I’m a teapot">
-</div>
 {% endblock %}

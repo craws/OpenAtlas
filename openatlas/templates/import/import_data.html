@@ -4,7 +4,6 @@
     {{ [[_('admin'), 'admin_index'], [_('import'), 'import_index'], project, class_label]|crumb }}
 {% endblock %}
 {% block content %}
-
     {% if file_data.file %}
         <div class="toolbar">
             {{ _('latest backup')|uc_first }}: {{ file_data.file }}, {{ file_data.size }}

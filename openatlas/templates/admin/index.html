@@ -4,165 +4,165 @@
     {{ [_('admin')]|crumb }}
 {% endblock %}
 {% block content %}
-<div class="row">
-    <div class="col-12">
-        <ul class="nav nav-tabs" role="tablist">
-            {{ 'files'|tab_header(active=True) }}
-            {{ 'user'|tab_header(table=tables.user) }}
-            {% if 'admin'|is_authorized %}
-                {{ 'general'|tab_header }}
-                {{ 'email'|tab_header }}
-            {% endif  %}
-            {% if 'manager'|is_authorized: %}
-                {{ 'modules'|tab_header }}
-                {{ 'map'|tab_header }}
-                {{ 'content'|tab_header }}
-            {% endif %}
-            {% if 'contributor'|is_authorized %}
-                {{ 'data'|tab_header }}
-            {% endif %}
-        </ul>
-        <div class="tab-content">
-            <div class="tab-pane fade show active" role="tabpanel" id="tab-files">
-                <div class="toolbar">
-                    {{ 'admin/files'|manual }}
-                    {% if 'manager'|is_authorized %}
-                        {{  _('edit')|button(url_for('admin_settings', category='files')) }}
-                    {% endif %}
-                    {{ _('list')|button(url_for('file_index')) }}
-                    {{ _('file')|button(url_for('file_insert')) }}
-                </div>
-                <div style="float:left;">
-                    {% for dir, value in writeable_dirs.items() %}
-                        {% if not value %}
-                            <p>
-                                <span class="error">{{ _('directory not writable')|uc_first }}: {{ dir }}</span>
-                            </p>
+    <div class="row">
+        <div class="col-12">
+            <ul class="nav nav-tabs" role="tablist">
+                {{ 'files'|tab_header(active=True) }}
+                {{ 'user'|tab_header(table=tables.user) }}
+                {% if 'admin'|is_authorized %}
+                    {{ 'general'|tab_header }}
+                    {{ 'email'|tab_header }}
+                {% endif  %}
+                {% if 'manager'|is_authorized: %}
+                    {{ 'modules'|tab_header }}
+                    {{ 'map'|tab_header }}
+                    {{ 'content'|tab_header }}
+                {% endif %}
+                {% if 'contributor'|is_authorized %}
+                    {{ 'data'|tab_header }}
+                {% endif %}
+            </ul>
+            <div class="tab-content">
+                <div class="tab-pane fade show active" role="tabpanel" id="tab-files">
+                    <div class="toolbar">
+                        {{ 'admin/files'|manual }}
+                        {% if 'manager'|is_authorized %}
+                            {{  _('edit')|button(url_for('admin_settings', category='files')) }}
                         {% endif %}
-                    {% endfor %}
-                    {{ info.file|display_info }}
-                    {% if disk_space_info %}
-                        <div id="disk-size"></div>
-                        <p>
-                            {{ _('total disk space')|uc_first }} <strong>{{ disk_space_info.total }}</strong> -
-                            {{ _('free disk space')|uc_first }} <strong>{{ disk_space_info.free }}</strong>
-                        </p>
-                        <script>
-                            $( function() {
-                                $("#disk-size").progressbar({value: {{ disk_space_info.percent }} });
-                            });
-                        </script>
-                    {% endif %}
-                </div>
-                {% if 'manager'|is_authorized %}
-                    <div style="float:left;margin-left:2em;">
-                        <img src="{{ get_logo|safe }}" id="logo-preview" alt="Logo" style="max-width:400px;"><br>
-                        <div class="toolbar">
-                            {% if settings.logo_file_id: %}
-                                {{ _('remove custom logo')|button(url_for('admin_index', action='remove_logo', id_=0)) }}
-                            {% else %}
-                                {{  _('choose custom logo')|button(url_for('admin_logo')) }}
+                        {{ _('list')|button(url_for('file_index')) }}
+                        {{ _('file')|button(url_for('file_insert')) }}
+                    </div>
+                    <div style="float:left;">
+                        {% for dir, value in writeable_dirs.items() %}
+                            {% if not value %}
+                                <p>
+                                    <span class="error">{{ _('directory not writable')|uc_first }}: {{ dir }}</span>
+                                </p>
                             {% endif %}
+                        {% endfor %}
+                        {{ info.file|display_info }}
+                        {% if disk_space_info %}
+                            <div id="disk-size"></div>
+                            <p>
+                                {{ _('total disk space')|uc_first }} <strong>{{ disk_space_info.total }}</strong> -
+                                {{ _('free disk space')|uc_first }} <strong>{{ disk_space_info.free }}</strong>
+                            </p>
+                            <script>
+                                $( function() {
+                                    $("#disk-size").progressbar({value: {{ disk_space_info.percent }} });
+                                });
+                            </script>
+                        {% endif %}
+                    </div>
+                    {% if 'manager'|is_authorized %}
+                        <div style="float:left;margin-left:2em;">
+                            <img src="{{ get_logo|safe }}" id="logo-preview" alt="Logo" style="max-width:400px;"><br>
+                            <div class="toolbar">
+                                {% if settings.logo_file_id: %}
+                                    {{ _('remove custom logo')|button(url_for('admin_index', action='remove_logo', id_=0)) }}
+                                {% else %}
+                                    {{  _('choose custom logo')|button(url_for('admin_logo')) }}
+                                {% endif %}
+                            </div>
+                        </div>
+                    {% endif %}
+                    <div style="clear:both;"></div>
+                </div>
+                <div class="tab-pane fade" role="tabpanel" id="tab-user">
+                    <div class="toolbar">
+                        {{ 'admin/user'|manual }}
+                        {{ _('activity')|button(url_for('user_activity')) }}
+                        {% if 'manager'|is_authorized %}
+                            {% if session.settings.mail %}
+                                {{ _('newsletter')|button(url_for('admin_newsletter')) }}
+                            {% endif %}
+                            {{ _('user')|button(url_for('user_insert')) }}
+                        {% endif %}
+                    </div>
+                    {{ tables.user.display('user')|safe }}
+                </div>
+                {% if 'admin'|is_authorized: %}
+                    <div class="tab-pane fade" role="tabpanel" id="tab-general">
+                        <div class="toolbar">
+                            {{ 'admin/general'|manual }}
+                            {{ _('edit')|button(url_for('admin_settings', category='general')) }}
+                            {{ _('system log')|button(url_for('admin_log')) }}
+                        </div>
+                        {{ info.general|display_info }}
+                    </div>
+                    <div class="tab-pane fade" role="tabpanel" id="tab-email">
+                        <div class="toolbar">
+                            {{ 'admin/mail'|manual }}
+                            {{ _('edit')|button(url_for('admin_settings', category='mail')) }}
+                        </div>
+                        {{ info.mail|display_info }}
+                        {% if settings.mail %}
+                            {{ form|display_form }}
+                        {% endif %}
+                    </div>
+                {% endif  %}
+                {% if 'manager'|is_authorized %}
+                    <div class="tab-pane fade" role="tabpanel" id="tab-modules">
+                        <div class="toolbar">
+                            {{ 'admin/modules'|manual }}
+                            {{ _('edit')|button(url_for('admin_settings', category='modules')) }}
+                        </div>
+                        <div>
+                            <h1>{{ _('Defaults for new user') }}</h1>
+                            {{ info.modules|display_info }}
                         </div>
                     </div>
+                    <div class="tab-pane fade" role="tabpanel" id="tab-map">
+                        <div class="toolbar">
+                            {{ 'admin/map'|manual }}
+                            {{ _('edit')|button(url_for('admin_settings', category='map')) }}
+                        </div>
+                        <div>
+                            {{ info.map|display_info }}
+                        </div>
+                    </div>
+                    <div class="tab-pane fade" role="tabpanel" id="tab-content">
+                        <div class="toolbar">
+                            {{ 'admin/content'|manual }}
+                        </div>
+                        <div>
+                            {{ tables.content.display('content')|safe }}
+                        </div>
+                    </div>
+                {% endif  %}
+                {% if 'contributor'|is_authorized %}
+                    <div class="tab-pane fade" role="tabpanel" id="tab-data">
+                        <h1>{{ _('data integrity checks')|uc_first }}</h1>
+                        <div class="toolbar">
+                            {{ 'admin/data_integrity_checks'|manual }}
+                            {{ _('orphans')|button(url_for('admin_orphans')) }}
+                            {{ _('dates')|button(url_for('admin_check_dates')) }}
+                            {{ _('similar names')|button(url_for('admin_check_similar')) }}
+                            {{ _('links')|button(url_for('admin_check_links')) }}
+                            {{ _('link duplicates')|button(url_for('admin_check_link_duplicates')) }}
+                        </div>
+                        <h1>{{ _('data transfer')|uc_first }}</h1>
+                        <div class="toolbar">
+                            {{ _('import')|button(url_for('import_index')) }}
+                            {% if 'manager'|is_authorized %}
+                                {{ (_('export') + ' CSV')|button(url_for('export_csv')) }}
+                                {{ (_('export') + ' SQL')|button(url_for('export_sql')) }}
+                            {% endif %}
+                            {% if 'admin'|is_authorized %}
+                                {{ _('execute SQL')|button(url_for('sql_index')) }}
+                            {% endif %}
+                        </div>
+                        <div class="toolbar">
+                            <h1>{{ 'API'|uc_first }}</h1>
+                            {{ 'admin/api'|manual }}
+                            {% if 'manager'|is_authorized %}
+                                {{ _('edit')|button(url_for('admin_settings', category='api')) }}
+                            {% endif %}
+                        </div>
+                        {{ info.api|display_info }}
+                    </div>
                 {% endif %}
-                <div style="clear:both;"></div>
             </div>
-            <div class="tab-pane fade" role="tabpanel" id="tab-user">
-                <div class="toolbar">
-                    {{ 'admin/user'|manual }}
-                    {{ _('activity')|button(url_for('user_activity')) }}
-                    {% if 'manager'|is_authorized %}
-                        {% if session.settings.mail %}
-                            {{ _('newsletter')|button(url_for('admin_newsletter')) }}
-                        {% endif %}
-                        {{ _('user')|button(url_for('user_insert')) }}
-                    {% endif %}
-                </div>
-                {{ tables.user.display('user')|safe }}
-            </div>
-            {% if 'admin'|is_authorized: %}
-                <div class="tab-pane fade" role="tabpanel" id="tab-general">
-                    <div class="toolbar">
-                        {{ 'admin/general'|manual }}
-                        {{ _('edit')|button(url_for('admin_settings', category='general')) }}
-                        {{ _('system log')|button(url_for('admin_log')) }}
-                    </div>
-                    {{ info.general|display_info }}
-                </div>
-                <div class="tab-pane fade" role="tabpanel" id="tab-email">
-                    <div class="toolbar">
-                        {{ 'admin/mail'|manual }}
-                        {{ _('edit')|button(url_for('admin_settings', category='mail')) }}
-                    </div>
-                    {{ info.mail|display_info }}
-                    {% if settings.mail %}
-                        {{ form|display_form }}
-                    {% endif %}
-                </div>
-            {% endif  %}
-            {% if 'manager'|is_authorized %}
-                <div class="tab-pane fade" role="tabpanel" id="tab-modules">
-                    <div class="toolbar">
-                        {{ 'admin/modules'|manual }}
-                        {{ _('edit')|button(url_for('admin_settings', category='modules')) }}
-                    </div>
-                    <div>
-                        <h1>{{ _('Defaults for new user') }}</h1>
-                        {{ info.modules|display_info }}
-                    </div>
-                </div>
-                <div class="tab-pane fade" role="tabpanel" id="tab-map">
-                    <div class="toolbar">
-                        {{ 'admin/map'|manual }}
-                        {{ _('edit')|button(url_for('admin_settings', category='map')) }}
-                    </div>
-                    <div>
-                        {{ info.map|display_info }}
-                    </div>
-                </div>
-                <div class="tab-pane fade" role="tabpanel" id="tab-content">
-                    <div class="toolbar">
-                        {{ 'admin/content'|manual }}
-                    </div>
-                    <div>
-                        {{ tables.content.display('content')|safe }}
-                    </div>
-                </div>
-            {% endif  %}
-            {% if 'contributor'|is_authorized %}
-                <div class="tab-pane fade" role="tabpanel" id="tab-data">
-                    <h1>{{ _('data integrity checks')|uc_first }}</h1>
-                    <div class="toolbar">
-                        {{ 'admin/data_integrity_checks'|manual }}
-                        {{ _('orphans')|button(url_for('admin_orphans')) }}
-                        {{ _('dates')|button(url_for('admin_check_dates')) }}
-                        {{ _('similar names')|button(url_for('admin_check_similar')) }}
-                        {{ _('links')|button(url_for('admin_check_links')) }}
-                        {{ _('link duplicates')|button(url_for('admin_check_link_duplicates')) }}
-                    </div>
-                    <h1>{{ _('data transfer')|uc_first }}</h1>
-                    <div class="toolbar">
-                        {{ _('import')|button(url_for('import_index')) }}
-                        {% if 'manager'|is_authorized %}
-                            {{ (_('export') + ' CSV')|button(url_for('export_csv')) }}
-                            {{ (_('export') + ' SQL')|button(url_for('export_sql')) }}
-                        {% endif %}
-                        {% if 'admin'|is_authorized %}
-                            {{ _('execute SQL')|button(url_for('sql_index')) }}
-                        {% endif %}
-                    </div>
-                    <div class="toolbar">
-                        <h1>{{ 'API'|uc_first }}</h1>
-                        {{ 'admin/api'|manual }}
-                        {% if 'manager'|is_authorized %}
-                            {{ _('edit')|button(url_for('admin_settings', category='api')) }}
-                        {% endif %}
-                    </div>
-                    {{ info.api|display_info }}
-                </div>
-            {% endif %}
         </div>
     </div>
-</div>
 {% endblock %}
