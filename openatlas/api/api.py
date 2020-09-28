@@ -89,7 +89,7 @@ class Api:
         return entities
 
     @staticmethod
-    def pagination(entities: List[int], meta: Dict[str, Any]) -> List[Dict[str, Any]]:
+    def pagination(entities: List[int], meta: Dict[str, Any]) -> List[List[Dict[str, Any]]]:
         result = []
         index = []
         total = entities
