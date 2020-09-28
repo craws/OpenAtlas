@@ -19,7 +19,7 @@ class APIError(Exception):
                 "For further usage, please confer the help page",
         "404c": "The syntax is incorrect. Valid codes are: actor, event, place, source,"
                 " reference and object. For further usage, please confer the help page.",
-        "404d": "The syntax is incorrect. These class code is not supported. "
+        "404d": "The class code is not supported or contains no entities."
                 "For the classes please confer the model.",
         "404e": "The syntax is incorrect. Only integers between 1 and 100 are allowed.",
         "404f": "The syntax is incorrect. Only valid operators are allowed.",
