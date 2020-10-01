@@ -52,30 +52,31 @@ def api_get_entities_by_json() -> Response:  # pragma: nocover
                 ids.append(int(e))
             except Exception:
                 raise APIError('Syntax is incorrect!', status_code=404, payload="404b")
-            result = Model.pagination(ids, meta=validation)
+            result = Model.pagination(ids, validation=validation)
             out.append({'entities': result})
     if 'item' in req_data:
         item = req_data['item']
         for i in item:
             try:
                 out.append({'result': Model.pagination(
-                    Model.get_entities_by_menu_item(code_=i, meta=validation), meta=validation),
+                    Model.get_entities_by_menu_item(code_=i, validation=validation),
+                    validation=validation),
                     'code': i})
             except Exception:
                 raise APIError('Syntax is incorrect!', status_code=404, payload="404c")
     if 'class_code' in req_data:
         classes = req_data['class_code']
         for class_code in classes:
-            if len(Model.get_entities_by_class(class_code_=class_code, meta=validation)) == 0:
+            if len(Model.get_entities_by_class(class_code=class_code, validation=validation)) == 0:
                 raise APIError('Syntax is incorrect!', status_code=404, payload="404d")
             out.append({'result': Model.pagination(
-                Model.get_entities_by_class(class_code_=class_code, meta=validation),
-                meta=validation), 'class': class_code})
+                Model.get_entities_by_class(class_code=class_code, validation=validation),
+                validation=validation), 'class': class_code})
     if 'latest' in req_data:
         latest = req_data['latest'][0]
         if type(latest) is int:
             if 0 < latest < 101:
-                out.extend(Model.get_entities_get_latest(limit_=latest, meta=validation))
+                out.extend(Model.get_entities_get_latest(limit_=latest, validation=validation))
             else:
                 raise APIError('Syntax is incorrect!', status_code=404, payload="404e")
         else:
@@ -91,10 +92,11 @@ def api_get_by_menu_item(code: str) -> Response:
     validation = Validation.validate_url_query(request.args)
     try:
         if validation['count']:
-            return jsonify(len(Model.get_entities_by_menu_item(code_=code, meta=validation)))
-        Model.get_entities_by_menu_item(code_=code, meta=validation)
-        return jsonify(Model.pagination(Model.get_entities_by_menu_item(code_=code, meta=validation),
-                                      meta=validation))
+            return jsonify(len(Model.get_entities_by_menu_item(code_=code, validation=validation)))
+        else:
+            return jsonify(
+                Model.pagination(Model.get_entities_by_menu_item(code_=code, validation=validation),
+                                 validation=validation))
     except Exception:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404c")
 
@@ -104,13 +106,16 @@ def api_get_by_menu_item(code: str) -> Response:
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_get_by_class(class_code: str) -> Response:
     validation = Validation.validate_url_query(request.args)
-    if len(Model.get_entities_by_class(class_code_=class_code, meta=validation)) == 0:
-        raise APIError('Syntax is incorrect!', status_code=404, payload="404d")
+    # if len(Model.get_entities_by_class(class_code_=class_code, meta=validation)) == 0:
+    #     raise APIError('Syntax is incorrect!', status_code=404, payload="404d")
     if validation['count']:
-        return jsonify(len(Model.get_entities_by_class(class_code_=class_code, meta=validation)))
-    return jsonify(
-        Model.pagination(Model.get_entities_by_class(class_code_=class_code, meta=validation),
-                       meta=validation))
+        return jsonify(
+            len(Model.get_entities_by_class(class_code=class_code, validation=validation)))
+    else:
+        return jsonify(
+            Model.pagination(
+                Model.get_entities_by_class(class_code=class_code, validation=validation),
+                validation=validation))
 
 
 @app.route('/api/0.1/latest/<int:limit>', strict_slashes=False)
@@ -119,7 +124,7 @@ def api_get_by_class(class_code: str) -> Response:
 def api_get_latest(limit: int) -> Response:
     validation = Validation.validate_url_query(request.args)
     if 0 < limit < 100:
-        return jsonify(Model.get_entities_get_latest(limit_=limit, meta=validation))
+        return jsonify(Model.get_entities_get_latest(limit_=limit, validation=validation))
     raise APIError('Syntax is incorrect!', status_code=404, payload="404e")
 
 
@@ -143,22 +148,26 @@ def api_get_query() -> Response:  # pragma: nocover
             items = request.args.getlist('items')
             for i in items:
                 try:
-                    out.extend(Model.get_entities_by_menu_item(code_=i, meta=validation))
                     if validation['count']:
-                        count += len(Model.get_entities_by_menu_item(code_=i, meta=validation))
+                        count += len(
+                            Model.get_entities_by_menu_item(code_=i, validation=validation))
+                    else:
+                        out.extend(Model.get_entities_by_menu_item(code_=i, validation=validation))
                 except Exception:
                     raise APIError('Syntax is incorrect!', status_code=404, payload="404c")
         if request.args.getlist('classes'):
             classes = request.args.getlist('classes')
             for class_code in classes:
-                if len(Model.get_entities_by_class(class_code_=class_code, meta=validation)) == 0:
-                    raise APIError('Syntax is incorrect!', status_code=404, payload="404d")
-                out.extend(Model.get_entities_by_class(class_code_=class_code, meta=validation))
                 if validation['count']:
-                    count += len(Model.get_entities_by_class(class_code_=class_code, meta=validation))
+                    count += len(
+                        Model.get_entities_by_class(class_code=class_code, validation=validation))
+                else:
+                    out.extend(
+                        Model.get_entities_by_class(class_code=class_code, validation=validation))
+
         if validation['count']:
             return jsonify(count)
-        return jsonify(Model.pagination(out, meta=validation))
+        return jsonify(Model.pagination(out, validation=validation))
     else:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404")
 

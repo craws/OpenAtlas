@@ -44,7 +44,7 @@ class Validation:
             if operator in Default.operators_dict:
                 filter_query += Default.operators_dict[operator]
                 item = re.split('[,]', item[1])
-                if item[0] in Default.operators_dict and item[1] in Default.column:
+                if item[0] in Default.operators_dict and item[1] in Default.column_validation:
                     if item[0] == 'like':
                         item[2] = '\'' + item[2] + '%%\''
                         item[1] = item[1] + '::text'

@@ -16,7 +16,7 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
 
 class Query:
 
-    def __init__(self, row: NamedTupleCursor.Record) -> None: # pragma: no cover
+    def __init__(self, row: NamedTupleCursor.Record) -> None:  # pragma: no cover
         from openatlas.forms.date import DateForm
 
         self.id = row.id
@@ -69,7 +69,7 @@ class Query:
             self.table_name = self.system_type.replace(' ', '_')
 
     @staticmethod
-    def build_sql(nodes: bool = False, aliases: bool = False) -> str: # pragma: no cover
+    def build_sql(nodes: bool = False, aliases: bool = False) -> str:  # pragma: no cover
         # Performance: only join nodes and/or aliases if requested
         sql = """
             SELECT
@@ -105,15 +105,20 @@ class Query:
     def get_by_class_code(code: Union[str, List[str]],
                           meta: Dict[str, Any]) -> List[Query]:
         codes = code if isinstance(code, list) else [code]
-        g.execute(
-            Query.build_sql() + """WHERE class_code IN %(codes)s {filter}
+        sql = Query.build_sql() + """WHERE class_code IN %(codes)s {filter}
              ORDER BY {order} {sort};""".format(
-                filter=meta['filter'],
-                order=meta['column'],
-                sort=meta['sort']),
-            {'codes': tuple(codes)})
+            filter=meta['filter'],
+            order=meta['column'],
+            sort=meta['sort'])
+        # sql = Query.build_sql() + "WHERE class_code IN %(codes)s"
+        # sql += " AND column LIKE %(search)s "
+        # sql += " ORDER BY {order} {sort};".format(order=meta['column'], sort=meta['sort'])
+
+        g.execute(sql, {'codes': tuple(codes)})
 
         return [Query(row) for row in g.cursor.fetchall()]
+
+
 
     @staticmethod
     def get_by_menu_item(menu_item: str,
