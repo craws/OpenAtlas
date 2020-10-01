@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title_name %} - {{ _('admin')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    <a href="{{ url_for('admin_index') }}#tab-general">{{ _('admin')|uc_first }}</a>&nbsp;> {{ _('logo')|uc_first }}
+    <a href="{{ url_for('admin_index') }}#tab-files">{{ _('admin')|uc_first }}</a>&nbsp;> {{ _('logo')|uc_first }}
 {% endblock %}
 {% block content %}
     {{ table.display()|safe }}

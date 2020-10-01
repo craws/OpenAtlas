@@ -20,6 +20,7 @@ from openatlas.forms.forms import get_form_settings, set_form_settings
 from openatlas.models.content import Content
 from openatlas.models.date import Date
 from openatlas.models.entity import Entity
+from openatlas.models.imports import Import
 from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.models.settings import Settings
@@ -86,6 +87,7 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
                            settings=session['settings'],
                            writeable_dirs=dirs,
                            disk_space_info=get_disk_space_info(),
+                           imports=Import.get_all_projects(),
                            info={'file': get_form_settings(FilesForm()),
                                  'general': get_form_settings(GeneralForm()),
                                  'mail': get_form_settings(MailForm()),

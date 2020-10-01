@@ -1,7 +1,8 @@
 {% extends "layout.html" %}
 {% block title_name %} - {{ _('import')|uc_first }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'], [_('import'), 'import_index'], _('project')]|crumb }}
+    <a href="{{ url_for('admin_index') }}#tab-data">{{ _('admin')|uc_first }}</a>&nbsp;>&nbsp;
+    {{ [[_('import'), 'import_index'], _('project')]|crumb }}
 {% endblock %}
 {% block content %}
     {{ form|display_form(manual_page='admin/import') }}
