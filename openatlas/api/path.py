@@ -9,7 +9,7 @@ from openatlas.api.sql import Query
 from openatlas.models.entity import Entity
 
 
-class Model:
+class Path:
 
     @staticmethod
     def get_entities_by_menu_item(code_: str, validation: Dict[str, Any]) -> List[int]:
