@@ -108,8 +108,10 @@ class Query:
         sql = Query.build_sql() + """WHERE class_code IN %(codes)s {filter}
              ORDER BY {order} {sort};""".format(
             filter=meta['filter'],
-            order=meta['column'],
+            order=', '.join(meta['column']),  # join the list
             sort=meta['sort'])
+        print(meta['filter'])
+        print(meta['column'])
         # sql = Query.build_sql() + "WHERE class_code IN %(codes)s"
         # sql += " AND column LIKE %(search)s "
         # sql += " ORDER BY {order} {sort};".format(order=meta['column'], sort=meta['sort'])
@@ -117,8 +119,6 @@ class Query:
         g.execute(sql, {'codes': tuple(codes)})
 
         return [Query(row) for row in g.cursor.fetchall()]
-
-
 
     @staticmethod
     def get_by_menu_item(menu_item: str,

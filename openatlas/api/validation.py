@@ -1,14 +1,12 @@
 import re
-from typing import Any, Dict, List, Optional
-
-from openatlas.api.error import APIError
+from typing import Any, Dict, Iterable, List, Optional
 
 
 class Default:
     limit: int = 20
     sort: str = 'ASC'
     filter: str = ''
-    column: str = 'name'
+    column: List = ['name']
     last: Optional[str] = None
     first: Optional[str] = None
     count: bool = False
@@ -20,33 +18,38 @@ class Default:
                                     'modified', 'system_type', 'begin_from', 'begin_to', 'end_from']
     show_validation: List[str] = ['when', 'types', 'relations', 'names', 'links', 'geometry',
                                   'depictions']
+    # show_validation: Dict[str, str] = {'when': 'when', 'types': 'types', 'relations': 'relations',
+    #                               'names': 'names', 'links': 'links', 'geometry': 'geometry',
+    #                               'depictions': 'depictions'}
 
 
 class Validation:
 
     @staticmethod
     def validate_url_query(query: Any) -> Dict[str, Any]:
-        return {'filter': Validation.validate_filter(query.get('filter')),
+        return {'filter': Validation.validate_filter(query.getlist('filter')),  # has to be list
                 'limit': Validation.validate_limit(query.get('limit')),
                 'sort': Validation.validate_sort(query.get('sort')),
-                'column': Validation.validate_column(query.get('column')),
+                'column': Validation.validate_column(query.getlist('column')),  # has to be list
                 'last': Validation.validate_last(query.get('last')),
                 'first': Validation.validate_first(query.get('first')),
-                'show': Validation.validate_show(query.get('show')),
-                'count': Validation.validate_count(query.getlist('count')),
-                'download': Validation.validate_download(query.getlist('download'))}
+                'show': Validation.validate_show(query.getlist('show')),  # has to be list
+                'count': Validation.validate_count(query.getlist('count')),  # has to be list
+                'download': Validation.validate_download(
+                    query.getlist('download'))}  # has to be list
 
     @staticmethod
-    def validate_filter(filter_: str) -> str:
+    def validate_filter(filter_: Iterable[str]) -> str:
         if not filter_:
             return Default.filter
+        filter_ = re.findall(r'(\w+)\((.*?)\)', ''.join(filter_))
         filter_query = ''
-        for item in re.findall(r'(\w+)\((.*?)\)', filter_):
+        for item in filter_:
             operator = item[0].lower()
             if operator in Default.operators_dict:
                 filter_query += Default.operators_dict[operator]
                 item = re.split('[,]', item[1])
-                if item[0] in Default.operators_dict and item[1] in Default.column_validation:
+                if item[0] in Default.operators_dict and item[1] in Default.column:
                     if item[0] == 'like':
                         item[2] = '\'' + item[2] + '%%\''
                         item[1] = item[1] + '::text'
@@ -62,8 +65,6 @@ class Validation:
                         item[2] = '\'' + item[2] + '\''
                     filter_query += ' ' + item[1] + ' ' \
                                     + Default.operators_dict[item[0]] + ' ' + item[2] + ' '
-                else:
-                    raise APIError('Syntax is incorrect!', status_code=404, payload="404f")
         return filter_query
 
     @staticmethod
@@ -75,8 +76,9 @@ class Validation:
         return Default.sort if not sort or sort.lower() != 'desc' else 'DESC'
 
     @staticmethod
-    def validate_column(column: Optional[str]) -> str:
-        return Default.column if not column or column.lower() not in Default.column else column
+    def validate_column(column: List[str]) -> List[str]:
+        return Default.column if not column or [c.lower() for c in
+                                                column] in Default.column else column
 
     @staticmethod
     def validate_last(last: Optional[str]) -> Optional[str]:
@@ -87,14 +89,10 @@ class Validation:
         return Default.first if not first or first.isdigit() is not True else first
 
     @staticmethod
-    def validate_show(show: Optional[str]) -> List[str]:
-        show_ = []
-        for pattern in Default.show_validation:
-            if show and re.search(pattern, show):
-                show_.append(pattern)
-        if show and 'none' in show:
-            show_.clear()
-        return Default.show_validation if not show_ else show_
+    def validate_show(show: List[str]) -> List[str]:
+        data = [True] if 'none' in show else [valid for valid in show if
+                                              valid in Default.show_validation]
+        return Default.show_validation if not data else data
 
     @staticmethod
     def validate_count(count: bool) -> bool:
