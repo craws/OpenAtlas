@@ -45,7 +45,6 @@ class Validation:
                  f.split('|')[0] in Default.operators_logical.keys() and f.split('|')[
                      1] in Default.column_validation and f.split('|')[
                      2] in Default.operators_compare.keys()] for f in filter_]
-        print(data)
         out = [{'operators': Default.operators_logical[i[0]] + ' ' + i[1] + ' ' +
                              Default.operators_compare[i[2]], 'query': i[3] + '%%'} for i in data if
                i]
