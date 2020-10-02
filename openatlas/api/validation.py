@@ -12,6 +12,7 @@ class Default:
     last: Optional[str] = None
     first: Optional[str] = None
     count: bool = False
+    download: bool = False
     operators_dict: Dict[str, Any] = {'eq': '=', 'ne': '!=', 'lt': '<', 'le': '<=', 'gt': '>',
                                       'ge': '>=', 'and': 'AND', 'or': 'OR', 'onot': 'OR NOT',
                                       'anot': 'AND NOT', 'like': 'LIKE', 'in': 'IN'}
@@ -32,7 +33,8 @@ class Validation:
                 'last': Validation.validate_last(query.get('last')),
                 'first': Validation.validate_first(query.get('first')),
                 'show': Validation.validate_show(query.get('show')),
-                'count': Validation.validate_count(query.getlist('count'))}
+                'count': Validation.validate_count(query.getlist('count')),
+                'download': Validation.validate_download(query.getlist('download'))}
 
     @staticmethod
     def validate_filter(filter_: str) -> str:
@@ -97,3 +99,7 @@ class Validation:
     @staticmethod
     def validate_count(count: bool) -> bool:
         return Default.count if not count or count is True else True
+
+    @staticmethod
+    def validate_download(download: bool) -> bool:
+        return Default.download if not download or download is True else True

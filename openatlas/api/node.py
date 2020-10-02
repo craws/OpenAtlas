@@ -58,7 +58,7 @@ class APINode:
         return data
 
     @staticmethod
-    def get_subunits_hierarchy(id_: int) -> List[Dict[str, Any]]:
+    def get_subunit_hierarchy(id_: int) -> List[Dict[str, Any]]:
         try:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
         except Exception:

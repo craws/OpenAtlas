@@ -148,7 +148,7 @@ class ApiTests(TestBaseCase):
             assert b'404b' in rv.data
             rv = self.app.get(url_for('api_get_latest', limit=99999))
             assert b'404e' in rv.data
-            rv = self.app.get(url_for('api_get_by_class', class_code='E19'))
+            rv = self.app.get(url_for('api_get_by_class', class_code='E99999'))
             assert b'404' in rv.data
             rv = self.app.get(url_for('api_get_by_menu_item', code='Hello'))
             assert b'404c' in rv.data
