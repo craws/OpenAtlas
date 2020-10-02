@@ -94,38 +94,7 @@ class Api:
             nodes.append(nodes_dict)
         return nodes
 
-    @staticmethod
-    def get_when(entity: Entity):
-        if entity.begin_from or entity.end_from:  # pragma: nocover
-            time = {}
-            if entity.begin_from:
-                start = {'earliest': format_date(entity.begin_from)}
-                if entity.begin_to:
-                    start['latest'] = format_date(entity.begin_to)
-                if entity.begin_comment:
-                    start['comment'] = entity.begin_comment
-                time['start'] = start
-            if entity.end_from:
-                end = {'earliest': format_date(entity.end_from)}
-                if entity.end_to:
-                    end['latest'] = format_date(entity.end_to)
-                if entity.end_comment:
-                    end['comment'] = entity.end_comment
-                time['end'] = end
-            return time
 
-    @staticmethod
-    def get_geonames(entity: Entity):
-        geonames_link = Geonames.get_geonames_link(entity)
-        if geonames_link and geonames_link.range.class_.code == 'E18':
-            geo_name = {}
-            if geonames_link.type.name:
-                geo_name['type'] = Api.to_camelcase(geonames_link.type.name)
-            if geonames_link.domain.name:
-                geo_name['identifier'] = session['settings']['geonames_url'] + \
-                                         geonames_link.domain.name
-            if geonames_link.type.name or geonames_link.domain.name:
-                return geo_name
 
     @staticmethod
     def get_entity(id_: int, meta: Dict[str, Any]) -> Dict[str, Any]:
@@ -134,7 +103,7 @@ class Api:
         except Exception:
             raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
 
-
+        geonames_link = Geonames.get_geonames_link(entity)
         type_ = 'FeatureCollection'
 
         class_code = ''.join(entity.class_.code + " " + entity.class_.i18n['en']).replace(" ", "_")
@@ -166,12 +135,36 @@ class Api:
 
         # Time spans
         if 'when' in meta['show']:
-            features['when'] = {'timespans': [Api.get_when(entity)]}
+            if entity.begin_from or entity.end_from:  # pragma: nocover
+                time = {}
+                if entity.begin_from:
+                    start = {'earliest': format_date(entity.begin_from)}
+                    if entity.begin_to:
+                        start['latest'] = format_date(entity.begin_to)
+                    if entity.begin_comment:
+                        start['comment'] = entity.begin_comment
+                    time['start'] = start
+                if entity.end_from:
+                    end = {'earliest': format_date(entity.end_from)}
+                    if entity.end_to:
+                        end['latest'] = format_date(entity.end_to)
+                    if entity.end_comment:
+                        end['comment'] = entity.end_comment
+                    time['end'] = end
+                features['when'] = {'timespans': [time]}
 
         # Geonames
-        if 'geometry' in meta['show']:
-            features['links'] = []
-            features['links'].append(Api.get_geonames(entity))
+        if geonames_link and geonames_link.range.class_.code == 'E18' \
+                and 'geometry' in meta['show']:
+            geo_name = {}
+            if geonames_link.type.name:
+                geo_name['type'] = Api.to_camelcase(geonames_link.type.name)
+            if geonames_link.domain.name:
+                geo_name['identifier'] = session['settings']['geonames_url'] + \
+                                         geonames_link.domain.name
+            if geonames_link.type.name or geonames_link.domain.name:
+                features['links'] = []
+                features['links'].append(geo_name)
 
         # Geometry
         geometries = []
