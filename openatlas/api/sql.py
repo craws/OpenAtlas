@@ -105,18 +105,12 @@ class Query:
     def get_by_class_code(code: Union[str, List[str]],
                           meta: Dict[str, Any]) -> List[Query]:
         codes = code if isinstance(code, list) else [code]
-        sql = Query.build_sql() + """WHERE class_code IN %(codes)s {filter}
+        sql = Query.build_sql() + """WHERE class_code IN %(codes)s {filter} %(search)s
              ORDER BY {order} {sort};""".format(
-            filter=meta['filter'],
+            filter=meta['filter'][0]['operators'],
             order=', '.join(meta['column']),  # join the list
             sort=meta['sort'])
-        print(meta['filter'])
-        print(meta['column'])
-        # sql = Query.build_sql() + "WHERE class_code IN %(codes)s"
-        # sql += " AND column LIKE %(search)s "
-        # sql += " ORDER BY {order} {sort};".format(order=meta['column'], sort=meta['sort'])
-
-        g.execute(sql, {'codes': tuple(codes)})
+        g.execute(sql, {'codes': tuple(codes), 'search': meta['filter'][0]['query']})
 
         return [Query(row) for row in g.cursor.fetchall()]
 
@@ -128,13 +122,13 @@ class Query:
             sql = Query.build_sql(nodes=True) + """
                 WHERE e.class_code IN %(codes)s AND e.system_type = 'source content' {filter}
                 GROUP BY e.id ORDER BY {order} {sort};""".format(filter=meta['filter'],
-                                                                 order=meta['column'],
+                                                                 order=', '.join(meta['column']),
                                                                  sort=meta['sort'])
         elif menu_item == 'reference':
             sql = Query.build_sql(nodes=True) + """
                 WHERE e.class_code IN %(codes)s AND e.system_type != 'file' {filter} GROUP BY e.id
                  ORDER BY {order} {sort};""".format(filter=meta['filter'],
-                                                    order=meta['column'],
+                                                    order=', '.join(meta['column']),
                                                     sort=meta['sort'])
         else:
             aliases = True if menu_item == 'actor' and current_user.is_authenticated and \
@@ -143,7 +137,7 @@ class Query:
                                   aliases=aliases) + """
                 WHERE e.class_code IN %(codes)s {filter} GROUP BY e.id
                 ORDER BY {order} {sort};""".format(filter=meta['filter'],
-                                                   order=meta['column'],
+                                                   order=', '.join(meta['column']),
                                                    sort=meta['sort'])
         g.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][menu_item])})
         return [Query(row) for row in g.cursor.fetchall()]

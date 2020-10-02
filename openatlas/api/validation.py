@@ -1,26 +1,24 @@
 import re
-from typing import Any, Dict, Iterable, List, Optional
+from typing import Any, Dict, Iterable, List, Optional, Union
 
 
 class Default:
     limit: int = 20
     sort: str = 'ASC'
-    filter: str = ''
+    filter: List = ['']
     column: List = ['name']
     last: Optional[str] = None
     first: Optional[str] = None
     count: bool = False
     download: bool = False
-    operators_dict: Dict[str, Any] = {'eq': '=', 'ne': '!=', 'lt': '<', 'le': '<=', 'gt': '>',
-                                      'ge': '>=', 'and': 'AND', 'or': 'OR', 'onot': 'OR NOT',
-                                      'anot': 'AND NOT', 'like': 'LIKE', 'in': 'IN'}
+    operators_compare: Dict[str, Any] = {'eq': '=', 'ne': '!=', 'lt': '<', 'le': '<=', 'gt': '>',
+                                         'ge': '>=', 'like': 'LIKE', 'in': 'IN'}
+    operators_logical: Dict[str, Any] = {'and': 'AND', 'or': 'OR', 'onot': 'OR NOT',
+                                         'anot': 'AND NOT'}
     column_validation: List[str] = ['id', 'class_code', 'name', 'description', 'created', 'end_to',
                                     'modified', 'system_type', 'begin_from', 'begin_to', 'end_from']
     show_validation: List[str] = ['when', 'types', 'relations', 'names', 'links', 'geometry',
                                   'depictions']
-    # show_validation: Dict[str, str] = {'when': 'when', 'types': 'types', 'relations': 'relations',
-    #                               'names': 'names', 'links': 'links', 'geometry': 'geometry',
-    #                               'depictions': 'depictions'}
 
 
 class Validation:
@@ -39,33 +37,19 @@ class Validation:
                     query.getlist('download'))}  # has to be list
 
     @staticmethod
-    def validate_filter(filter_: Iterable[str]) -> str:
+    def validate_filter(filter_: List[str]) -> List[Dict[str, Union[str, Any]]]:
         if not filter_:
             return Default.filter
-        filter_ = re.findall(r'(\w+)\((.*?)\)', ''.join(filter_))
-        filter_query = ''
-        for item in filter_:
-            operator = item[0].lower()
-            if operator in Default.operators_dict:
-                filter_query += Default.operators_dict[operator]
-                item = re.split('[,]', item[1])
-                if item[0] in Default.operators_dict and item[1] in Default.column:
-                    if item[0] == 'like':
-                        item[2] = '\'' + item[2] + '%%\''
-                        item[1] = item[1] + '::text'
-                    elif item[0] == 'in':
-                        item[2] = item[2].replace('[', '')
-                        item[2] = item[2].replace(']', '')
-                        if len(list(map(str, item[2].split(':')))) == 1:
-                            tmp = list(map(str, item[2].split(':')))
-                            item[2] = '(\'' + tmp[0] + '\')'
-                        else:
-                            item[2] = str(tuple(map(str, item[2].split(':'))))
-                    else:
-                        item[2] = '\'' + item[2] + '\''
-                    filter_query += ' ' + item[1] + ' ' \
-                                    + Default.operators_dict[item[0]] + ' ' + item[2] + ' '
-        return filter_query
+        # Validate operators and add unsanitized 4th value
+        data = [[word for word in f.split('|') if
+                 f.split('|')[0] in Default.operators_logical.keys() and f.split('|')[
+                     1] in Default.column_validation and f.split('|')[
+                     2] in Default.operators_compare.keys()] for f in filter_]
+        print(data)
+        out = [{'operators': Default.operators_logical[i[0]] + ' ' + i[1] + ' ' +
+                             Default.operators_compare[i[2]], 'query': i[3] + '%%'} for i in data if
+               i]
+        return out
 
     @staticmethod
     def validate_limit(limit: Optional[str] = None) -> int:
