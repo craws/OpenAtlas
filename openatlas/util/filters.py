@@ -510,6 +510,8 @@ def display_external_references(self: Any, entity: Entity) -> str:
             name = 'GeoNames (' + link_.domain.name + ')'
             url = session['settings']['geonames_url'] + link_.domain.name
         html += '<a target="_blank" href="{url}">{name}</a><br>'.format(url=url, name=name)
+    if 'module_wikidata' in current_user.settings and current_user.settings['module_wikidata']:
+        html += '<p>Wikidata<p/>'
     if not html:
         return ''
     return Markup('<h2>' + display.uc_first(_('external references')) + '</h2>' + html)

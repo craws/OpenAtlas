@@ -25,7 +25,10 @@ class Settings:
 
     @staticmethod
     def update(form: Any) -> None:
-        sql = 'UPDATE web.settings SET "value" = %(value)s WHERE "name" = %(name)s;'
+        # For each setting: insert if it doesn't exist (e.g. after an upgrade) or update
+        sql = """
+            INSERT INTO web.settings (name, value) VALUES (%(name)s, %(value)s)
+            ON CONFLICT (name) DO UPDATE SET "value" = %(value)s;"""
         for field in form:
             if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
                 continue

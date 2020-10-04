@@ -537,7 +537,12 @@ def get_form_settings(form: Any, profile: bool = False) -> Dict[str, str]:
         if field.type in ['CSRFTokenField', 'HiddenField', 'SubmitField']:
             continue
         label = uc_first(field.label.text)
-        value = current_user.settings[field.name] if profile else session['settings'][field.name]
+        if profile and field.name in current_user.settings:
+            value = current_user.settings[field.name]
+        elif field.name in session['settings']:
+            value = session['settings'][field.name]
+        else:
+            value = ''
         if field.type in ['StringField', 'IntegerField']:
             settings[label] = value
         if field.type == 'BooleanField':
@@ -561,7 +566,7 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
         if profile and field.name == 'email':
             field.data = current_user.email
             continue
-        if profile:
+        if profile and field.name in current_user.settings:
             field.data = current_user.settings[field.name]
             continue
         if field.name in ['log_level']:
@@ -569,5 +574,8 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
             continue
         if field.name in ['mail_recipients_feedback', 'file_upload_allowed_extension']:
             field.data = ' '.join(session['settings'][field.name])
+            continue
+        if field.name not in session['settings']:
+            field.data = ''
             continue
         field.data = session['settings'][field.name]

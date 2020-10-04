@@ -12,6 +12,7 @@ class ContentForm(FlaskForm):  # type: ignore
 
 
 class ModulesForm(FlaskForm):  # type: ignore
+    module_wikidata = BooleanField('Wikidata')
     module_geonames = BooleanField('GeoNames')
     module_map_overlay = BooleanField(_('map overlay'))
     module_notes = BooleanField(_('notes'))

@@ -14,6 +14,9 @@ After following the instructions restart Apache and test if the application is w
 
 A code base update (e.g. with git pull) and an Apache restart should be sufficient.
 
+The new Wikidata module will be inactive by default but you can activate it as default at 
+admin/modules after the upgrade.
+
 ### 5.4.0 to 5.5.0
 
 Execute install/upgrade/5.5.0.sql after making backups
