@@ -49,8 +49,8 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
             'export/csv': True if os.access(export_path.joinpath('csv'), os.W_OK) else False}
     tables = {'user': Table(['username', 'name', 'group', 'email', 'newsletter', 'created',
                              'last login', 'entities']),
-              'content': Table(['name'] + [language for language in app.config['LANGUAGES'].keys()]
-                               + ['text'])}
+              'content':
+                  Table(['name'] + [language for language in app.config['LANGUAGES'].keys()])}
     for user in User.get_all():
         count = User.get_created_entities_count(user.id)
         email = user.email if is_authorized('manager') or user.settings['show_email'] else ''
@@ -64,10 +64,8 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
                                     format_number(count) if count else ''])
     for item, languages in Content.get_content().items():
         content = [uc_first(_(item))]
-        html_ok = '<img src="/static/images/icons/dialog-apply.png" alt="ok">'
         for language in app.config['LANGUAGES'].keys():
-            content.append(html_ok if languages[language] else '')
-        content.append(sanitize(languages[session['language']], 'text'))
+            content.append(sanitize(languages[language], 'text'))
         content.append(link(_('edit'), url_for('admin_content', item=item)))
         tables['content'].rows.append(content)
     form = None

@@ -272,11 +272,8 @@ def display_content_translation(self: Any, text: str) -> str:
 @blueprint.app_template_filter()
 def manual(self: Any, site: str) -> str:  # Creates a link to a manual page
     return Markup("""
-        <a class="{css}" href="/static/manual/{site}.html" target="_blank" title="{label}">
-            <img style="height:14px;" src="/static/images/icons/book.png" alt=''>
-        </a>""".format(site=site,
-                       label=display.uc_first('manual'),
-                       css=app.config['CSS']['button']['primary']))
+        <a class="manual" href="/static/manual/{site}.html" target="_blank" title="{label}">
+            <i class="fas fa-book"></i></a>""".format(site=site, label=display.uc_first('manual')))
 
 
 @jinja2.contextfilter

@@ -17,6 +17,12 @@ html, body, input, select, textarea {
     display: inline-flex;
 }
 
+a.manual {
+    font-size: 1.6em;
+    vertical-align: middle;
+    margin-right: 0.2em;
+}
+
 #global-term {
     width: 120px;
 }
