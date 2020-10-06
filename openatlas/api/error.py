@@ -15,9 +15,9 @@ class APIError(Exception):
                "user interface or token based authentication.",
         "404": "Something went wrong! Maybe only digits are allowed. Please check the URL",
         "404a": "The requested entity doesn't exist. Try another ID",
-        "404b": "The syntax is incorrect. Only digits are allowed. "
-                "For further usage, please confer the help page",
-        "404c": "The syntax is incorrect. Valid codes are: actor, event, place, source,"
+        "404b": "That is not a valid ID. Only digits are allowed. "
+                "For further usage, please confer the help page.",
+        "404c": "The code is not valid. Valid codes are: actor, event, place, source,"
                 " reference and object. For further usage, please confer the help page.",
         "404d": "This is not a valid CIDOC CRM class code."
                 "Please confer the model.",

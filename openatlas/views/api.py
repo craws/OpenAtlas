@@ -23,9 +23,10 @@ def api_entity(id_: int) -> Response:
     try:
         int(id_)
     except Exception:
-        raise APIError('Syntax is incorrect!', status_code=404, payload="404b")
+        raise APIError('Invalid ID', status_code=404, payload="404b")
     if validation['download']:
-        return Response(json.dumps(Api.get_entity(id_=id_, meta=validation)), mimetype='application/json',
+        return Response(json.dumps(Api.get_entity(id_=id_, meta=validation)),
+                        mimetype='application/json',
                         headers={
                             'Content-Disposition': 'attachment;filename=' + str(id_) + '.json'})
     return jsonify(Api.get_entity(id_=id_, meta=validation))
@@ -56,11 +57,10 @@ def api_get_by_menu_item(code: str) -> Response:
                 headers={'Content-Disposition': 'attachment;filename=' + str(code) + '.json'})
 
     except Exception:
-        raise APIError('Syntax is incorrect!', status_code=404, payload="404c")
+        raise APIError('Invalid codes.', status_code=404, payload="404c")
     return jsonify(
         Path.pagination(Path.get_entities_by_menu_item(code_=code, validation=validation),
                         validation=validation))
-
 
 @app.route('/api/0.1/class/<class_code>', strict_slashes=False)
 @api_access()  # type: ignore

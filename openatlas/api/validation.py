@@ -14,8 +14,12 @@ class Default:
                                          'ge': '>=', 'like': 'LIKE', 'in': 'IN'}
     operators_logical: Dict[str, Any] = {'and': 'AND', 'or': 'OR', 'onot': 'OR NOT',
                                          'anot': 'AND NOT'}
-    column_validation: List[str] = ['id', 'class_code', 'name', 'description', 'created', 'end_to',
-                                    'modified', 'system_type', 'begin_from', 'begin_to', 'end_from']
+    column_validation: Dict[str, str] = {'id': 'e.id', 'class_code': 'e.class_code',
+                                         'name': 'e.name', 'description': 'e.description',
+                                         'created': 'e.created', 'end_to': 'e.end_to',
+                                         'modified': 'e.modified', 'system_type': 'e.system_type',
+                                         'begin_from': 'e.begin_from', 'begin_to': 'e.begin_to',
+                                         'end_from': 'e.end_from'}
     show_validation: List[str] = ['when', 'types', 'relations', 'names', 'links', 'geometry',
                                   'depictions', 'geonames']
 
@@ -44,9 +48,9 @@ class Validation:
                  f.split('|')[0] in Default.operators_logical.keys() and f.split('|')[
                      1] in Default.column_validation and f.split('|')[
                      2] in Default.operators_compare.keys()] for f in filter_]
-        out = [{'operators': Default.operators_logical[i[0]] + ' ' + i[1] + ' ' +
-                             Default.operators_compare[i[2]], 'query': i[3] + '%%'} for i in data if
-               i]
+        out = [{'operators': Default.operators_logical[i[0]] + ' ' + Default.column_validation[
+            i[1]] + ' ' + Default.operators_compare[i[2]], 'query': i[3] + '%%'} for i in data if i]
+        print(out)
         return out
 
     @staticmethod
