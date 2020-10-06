@@ -50,7 +50,6 @@ class Validation:
                      2] in Default.operators_compare.keys()] for f in filter_]
         out = [{'operators': Default.operators_logical[i[0]] + ' ' + Default.column_validation[
             i[1]] + ' ' + Default.operators_compare[i[2]], 'query': i[3] + '%%'} for i in data if i]
-        print(out)
         return out
 
     @staticmethod

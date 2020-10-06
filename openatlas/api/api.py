@@ -147,9 +147,14 @@ class Api:
     @staticmethod
     def get_entity(id_: int, meta: Dict[str, Any]) -> Dict[str, Any]:
         try:
+            int(id_)
+        except Exception:
+            raise APIError('Invalid ID: ' + str(id_), status_code=404, payload="404b")
+        try:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
         except Exception:
-            raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
+            raise APIError('Entity ID ' + str(id_) + ' doesn\'t exist', status_code=404,
+                           payload="404a")
 
         type_ = 'FeatureCollection'
         class_code = ''.join(entity.class_.code + " " + entity.class_.i18n['en']).replace(" ", "_")

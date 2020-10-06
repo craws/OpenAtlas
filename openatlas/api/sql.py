@@ -118,8 +118,6 @@ class Query:
     def get_by_menu_item(menu_item: str,
                          meta: Dict[str, Any]) -> List[Query]:  # pragma: no cover
         # Possible class names: actor, event, place, reference, source, object
-        print(meta['filter'][0]['operators'])
-        print(meta['filter'][0]['query'])
         if menu_item == 'source':
             sql = Query.build_sql(nodes=True) + """
                 WHERE e.class_code IN %(codes)s AND e.system_type = 'source content' {filter} %(search)s
