@@ -68,7 +68,7 @@ class ApiTests(TestBaseCase):
                                follow_redirects=True)
             assert b'Necronomicon' in rv.data
 
-            # View Tests
+            # Path Tests
             rv = self.app.get(url_for('api_index'))
             assert b'Test API' in rv.data
             rv = self.app.get(url_for('api_get_latest', limit=10))
@@ -87,6 +87,9 @@ class ApiTests(TestBaseCase):
             assert b'Austria' in rv.data
             rv = self.app.get(url_for('api_node_entities_all', id_=unit_node.id))
             assert b'Austria' in rv.data
+            rv = self.app.get(url_for('api_get_query', entities=place_id, classes='E18', items='place'))
+            assert b'Nostromos' in rv.data
+
 
             # Testing Subunit
             rv = self.app.post(url_for('place_insert', origin_id=place_id), data={'name': "Item"})
@@ -97,38 +100,41 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for('api_subunit_hierarchy', id_=place_id))
             assert b'Pot' in rv.data
 
-            # Parameter: filter and first
-            rv = self.app.get(url_for('api_get_by_menu_item',
-                                      code='place',
-                                      limit=10,
-                                      sort='desc',
-                                      column='name',
-                                      filter='or(eq,name,Nostromos)',
-                                      first=place_id))
-            assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('api_get_by_menu_item', code='reference'))
-            assert b'openatlas' in rv.data
+            # # Parameter: filter
+            # rv = self.app.get(url_for('api_get_by_menu_item',
+            #                           code='place',
+            #                           limit=10,
+            #                           sort='desc',
+            #                           column='name',
+            #                           filter='and|name|eq|Nostromos)'))
+            # assert b'Nostromos' in rv.data
+            # rv = self.app.get(url_for('api_get_by_menu_item', code='reference'))
+            # assert b'openatlas' in rv.data
+            #
+            # rv = self.app.get(url_for('api_get_by_class',
+            #                           class_code='E18',
+            #                           filter='and|name|in|("Nostromos", "hallo")'))
+            # assert b'Nostromos' in rv.data
+            # rv = self.app.get(url_for('api_get_by_class',
+            #                           class_code='E18',
+            #                           filter='AND|NAME|in|("Nostromos")'))
+            # assert b'Nostromos' in rv.data
+            # rv = self.app.get(url_for('api_get_by_class',
+            #                           class_code='E18',
+            #                           filter='or|name|like|Nostr)'))
+            # assert b'Nostromos' in rv.data
 
             # Parameter: last
             rv = self.app.get(url_for('api_get_by_class', class_code='E18', last=place_id))
             assert b'entities' in rv.data
-
-            # Parameter: filter
-            rv = self.app.get(url_for('api_get_by_class',
-                                      class_code='E18',
-                                      filter='AND(in,name,[Nostromos:hallo])'))
-            assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('api_get_by_class',
-                                      class_code='E18',
-                                      filter='AND(in,name,[Nostromos])'))
-            assert b'Nostromos' in rv.data
-            rv = self.app.get(url_for('api_get_by_class',
-                                      class_code='E18',
-                                      filter='or(like,name,Nostr)'))
-            assert b'Nostromos' in rv.data
+            # Parameter: first
+            rv = self.app.get(url_for('api_get_by_class', class_code='E18', first=place_id))
+            assert b'entities' in rv.data
 
             # Parameter: show
             rv = self.app.get(url_for('api_get_by_class', class_code='E33', show='types'))
+            assert b'Necronomicon' in rv.data
+            rv = self.app.get(url_for('api_get_by_class', class_code='E33', show='when'))
             assert b'Necronomicon' in rv.data
             rv = self.app.get(url_for('api_get_by_class', class_code='E33', show='none'))
             assert b'Necronomicon' in rv.data
@@ -148,18 +154,19 @@ class ApiTests(TestBaseCase):
             assert b'404b' in rv.data
             rv = self.app.get(url_for('api_get_latest', limit=99999))
             assert b'404e' in rv.data
+            rv = self.app.get(url_for('api_get_latest', limit='wrong'))
+            assert b'404e' in rv.data
             rv = self.app.get(url_for('api_get_by_class', class_code='E99999'))
             assert b'404' in rv.data
             rv = self.app.get(url_for('api_get_by_menu_item', code='Hello'))
             assert b'404c' in rv.data
-            rv = self.app.get(url_for('api_get_by_menu_item',
-                                      code='place',
-                                      limit=10,
-                                      sort='desc',
-                                      column='name',
-                                      filter='or(WRONG,name,Nostromos)',
-                                      first=place_id))
-            assert b'404f' in rv.data
+            # rv = self.app.get(url_for('api_get_by_menu_item',
+            #                           code='place',
+            #                           limit=10,
+            #                           sort='desc',
+            #                           column='name',
+            #                           filter='or|name|wrong|Nostromos'))
+            # assert b'404f' in rv.data
             rv = self.app.get(url_for('api_node_entities', id_='Hello'))
             assert b'404b' in rv.data
             rv = self.app.get(url_for('api_node_entities_all', id_='Hello'))
@@ -169,9 +176,9 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for('api_subunit_hierarchy', id_='Hello'))
             assert b'404b' in rv.data
             rv = self.app.get(url_for('api_node_entities', id_=9999999))
-            assert b'404a' in rv.data
+            assert b'404g' in rv.data
             rv = self.app.get(url_for('api_node_entities_all', id_=9999999))
-            assert b'404a' in rv.data
+            assert b'404g' in rv.data
             rv = self.app.get(url_for('api_subunit', id_=99999999))
             assert b'404a' in rv.data
             rv = self.app.get(url_for('api_subunit_hierarchy', id_=9999999))

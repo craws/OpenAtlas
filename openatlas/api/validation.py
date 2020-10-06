@@ -40,7 +40,7 @@ class Validation:
                     query.getlist('download'))}  # has to be list
 
     @staticmethod
-    def validate_filter(filter_: List[str]) -> List[Dict[str, Union[str, Any]]]:
+    def validate_filter(filter_: List[str]) -> List[Dict[str, Union[str, Any]]]:  # pragma: no cover
         if not filter_:
             return Default.filter
         # Validate operators and add unsanitized 4th value
@@ -49,7 +49,8 @@ class Validation:
                      1] in Default.column_validation and f.split('|')[
                      2] in Default.operators_compare.keys()] for f in filter_]
         out = [{'operators': Default.operators_logical[i[0]] + ' ' + Default.column_validation[
-            i[1]] + ' ' + Default.operators_compare[i[2]], 'query': i[3] + '%%'} for i in data if i]
+            i[1]] + ' ' + Default.operators_compare[i[2]],
+                'query': i[3] if isinstance(i[3], int) else i[3] + '%%'} for i in data if i]
         return out
 
     @staticmethod

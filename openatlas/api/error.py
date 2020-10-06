@@ -21,7 +21,7 @@ class APIError(Exception):
                 "reference and object. For further usage, please confer the help page.",
         "404d": "This is not a valid CIDOC CRM class code. "
                 "Please confer the model.",
-        "404e": "The syntax is incorrect. Only integers between 1 and 100 are allowed.",
+        "404e": "Only integers between 1 and 100 are allowed.",
         "404f": "The syntax is incorrect. Only valid operators are allowed.",
         "404g": "The requested node or subunit doesn't exist. Try another node ID",
         "405": "The method used is not supported. Right now only GET is allowed.",
