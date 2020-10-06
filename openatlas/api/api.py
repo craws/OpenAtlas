@@ -94,7 +94,55 @@ class Api:
             nodes.append(nodes_dict)
         return nodes
 
+    @staticmethod
+    def get_time(entity: Entity) -> Dict[str, Any]:
+        if entity.begin_from or entity.end_from:  # pragma: nocover
+            time = {}
+            if entity.begin_from:
+                start = {'earliest': format_date(entity.begin_from)}
+                if entity.begin_to:
+                    start['latest'] = format_date(entity.begin_to)
+                if entity.begin_comment:
+                    start['comment'] = entity.begin_comment
+                time['start'] = start
+            if entity.end_from:
+                end = {'earliest': format_date(entity.end_from)}
+                if entity.end_to:
+                    end['latest'] = format_date(entity.end_to)
+                if entity.end_comment:
+                    end['comment'] = entity.end_comment
+                time['end'] = end
+            return time
 
+    @staticmethod
+    def get_geometry(entity: Entity):
+        geometries = []
+        shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
+        if entity.location:
+            for geometry in Gis.get_by_id(entity.location.id):
+                geo_dict = {'type': shape[geometry['shape']],
+                            'coordinates': geometry['geometry']['coordinates']}
+                if geometry['description']:
+                    geo_dict['description'] = geometry['description']  # pragma: nocover
+                if geometry['name']:
+                    geo_dict['title'] = geometry['name']
+                geometries.append(geo_dict)
+            if len(geometries) == 1:
+                return geometries[0]  # pragma: nocover
+            else:
+                return {'type': 'GeometryCollection', 'geometries': geometries}
+
+    @staticmethod
+    def get_geonames(entity: Entity):
+        geonames_link = Geonames.get_geonames_link(entity)
+        if geonames_link and geonames_link.range.class_.code == 'E18':
+            geo_name = {}
+            if geonames_link.type.name:
+                geo_name['type'] = Api.to_camelcase(geonames_link.type.name)
+            if geonames_link.domain.name:
+                geo_name['identifier'] = session['settings']['geonames_url'] + \
+                                         geonames_link.domain.name
+            return geo_name
 
     @staticmethod
     def get_entity(id_: int, meta: Dict[str, Any]) -> Dict[str, Any]:
@@ -103,9 +151,7 @@ class Api:
         except Exception:
             raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
 
-        geonames_link = Geonames.get_geonames_link(entity)
         type_ = 'FeatureCollection'
-
         class_code = ''.join(entity.class_.code + " " + entity.class_.i18n['en']).replace(" ", "_")
         features = {'@id': url_for('entity_view', id_=entity.id, _external=True),
                     'type': 'Feature',
@@ -134,55 +180,18 @@ class Api:
             features['depictions'] = Api.get_file(entity)
 
         # Time spans
-        if 'when' in meta['show']:
-            if entity.begin_from or entity.end_from:  # pragma: nocover
-                time = {}
-                if entity.begin_from:
-                    start = {'earliest': format_date(entity.begin_from)}
-                    if entity.begin_to:
-                        start['latest'] = format_date(entity.begin_to)
-                    if entity.begin_comment:
-                        start['comment'] = entity.begin_comment
-                    time['start'] = start
-                if entity.end_from:
-                    end = {'earliest': format_date(entity.end_from)}
-                    if entity.end_to:
-                        end['latest'] = format_date(entity.end_to)
-                    if entity.end_comment:
-                        end['comment'] = entity.end_comment
-                    time['end'] = end
-                features['when'] = {'timespans': [time]}
+        if Api.get_time(entity) and 'when' in meta['show']:
+            features['when'] = {'timespans': [Api.get_time(entity)]}
 
         # Geonames
-        if geonames_link and geonames_link.range.class_.code == 'E18' \
-                and 'geometry' in meta['show']:
-            geo_name = {}
-            if geonames_link.type.name:
-                geo_name['type'] = Api.to_camelcase(geonames_link.type.name)
-            if geonames_link.domain.name:
-                geo_name['identifier'] = session['settings']['geonames_url'] + \
-                                         geonames_link.domain.name
-            if geonames_link.type.name or geonames_link.domain.name:
-                features['links'] = []
-                features['links'].append(geo_name)
+        if Api.get_geonames(entity) and 'geonames' in meta['show']:
+            features['links'] = [Api.get_geonames(entity)]
 
         # Geometry
-        geometries = []
-        shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
-        features['geometry'] = {'type': 'GeometryCollection', 'geometries': []}
-        if entity.location and 'geometry' in meta['show']:
-            for geometry in Gis.get_by_id(entity.location.id):
-                geo_dict = {'type': shape[geometry['shape']],
-                            'coordinates': geometry['geometry']['coordinates']}
-                if geometry['description']:
-                    geo_dict['description'] = geometry['description']  # pragma: nocover
-                if geometry['name']:
-                    geo_dict['title'] = geometry['name']
-                geometries.append(geo_dict)
-            if len(geometries) == 1:
-                features['geometry'] = geometries[0]  # pragma: nocover
-            else:
-                features['geometry'] = {'type': 'GeometryCollection', 'geometries': geometries}
+        if 'geometry' in meta['show']:
+            features['geometry'] = {'type': 'GeometryCollection',
+                                    'geometries': [Api.get_geometry(entity)]}
+
         data: Dict[str, Any] = {'type': type_,
                                 '@context': app.config['API_SCHEMA'],
                                 'features': [features]}

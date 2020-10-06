@@ -17,7 +17,7 @@ class Default:
     column_validation: List[str] = ['id', 'class_code', 'name', 'description', 'created', 'end_to',
                                     'modified', 'system_type', 'begin_from', 'begin_to', 'end_from']
     show_validation: List[str] = ['when', 'types', 'relations', 'names', 'links', 'geometry',
-                                  'depictions']
+                                  'depictions', 'geonames']
 
 
 class Validation:
