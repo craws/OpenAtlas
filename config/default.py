@@ -8,7 +8,7 @@ DEMO_MODE = False  # If in demo mode some options are disabled and the login for
 IS_UNIT_TEST = False
 
 LANGUAGES = {'en': 'English', 'de': 'Deutsch'}
-DEBUG = True
+DEBUG = False
 
 DATABASE_NAME = 'openatlas'
 DATABASE_USER = 'openatlas'
