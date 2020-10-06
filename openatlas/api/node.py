@@ -19,14 +19,12 @@ class APINode:
         for e in entities:
             data.append({'id': e.id, 'label': e.name,
                          'url': url_for('api_entity', id_=e.id, _external=True)})
-
         return data
 
     @staticmethod
     def get_node_all(id_: int) -> List[Dict[str, Any]]:
         if id_ not in g.nodes:
             raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
-
         return APINode.get_recursive_node_entities(id_, [])
 
     @staticmethod

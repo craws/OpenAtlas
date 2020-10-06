@@ -54,11 +54,12 @@ def api_get_by_menu_item(code: str) -> Response:
                 Path.pagination(Path.get_entities_by_menu_item(code_=code, validation=validation),
                                 validation=validation)), mimetype='application/json',
                 headers={'Content-Disposition': 'attachment;filename=' + str(code) + '.json'})
-        return jsonify(
-            Path.pagination(Path.get_entities_by_menu_item(code_=code, validation=validation),
-                            validation=validation))
+
     except Exception:
         raise APIError('Syntax is incorrect!', status_code=404, payload="404c")
+    return jsonify(
+        Path.pagination(Path.get_entities_by_menu_item(code_=code, validation=validation),
+                        validation=validation))
 
 
 @app.route('/api/0.1/class/<class_code>', strict_slashes=False)

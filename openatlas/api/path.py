@@ -14,8 +14,6 @@ class Path:
     @staticmethod
     def get_entities_by_menu_item(code_: str, validation: Dict[str, Any]) -> List[int]:
         entities = []
-        # if not Entity.get_overview_counts()[code_] :
-        #     raise APIError('Syntax is incorrect!', status_code=404, payload="404c")
         for entity in Query.get_by_menu_item(code_, validation):
             entities.append(entity.id)
         return entities

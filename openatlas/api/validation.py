@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Union
 class Default:
     limit: int = 20
     sort: str = 'ASC'
-    filter: List = [{'operators': 'and id >=', 'query': '1'}]
+    filter: List = [{'operators': 'and e.id >=', 'query': '1'}]
     column: List = ['name']
     last: Optional[str] = None
     first: Optional[str] = None
