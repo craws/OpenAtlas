@@ -4,6 +4,7 @@ class Changelog:
         '5.6.0': ['TBA', {
             'feature': {
                 '1347': 'All icons to Font Awesome icons',
+                '1379': 'Feature votes',
                 '1350': 'API: Pagination in an extra array',
                 '1370': 'API: Secure SQL statements',
                 '1375': 'API: Download result of request path'
