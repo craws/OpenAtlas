@@ -223,20 +223,19 @@ def add_type_data(entity: 'Entity',
     type_data: OrderedDict[str, Any] = OrderedDict()
     for node, node_value in entity.nodes.items():
         root = g.nodes[node.root[-1]]
-        name = 'type' if root.name in app.config['BASE_TYPES'] else root.name
+        label = 'type' if root.name in app.config['BASE_TYPES'] else root.name
         if root.name not in type_data:
-            type_data[name] = []
+            type_data[label] = []
         text = ''
         if root.value_type:  # Text for value types
             text = ': {value} <span style="font-style:italic;">{description}</span>'.format(
                 value=format_number(node_value), description=node.description)
-        type_data[name].append('<span title="{path}">{link}</span>{text}'.format(
+        type_data[label].append('<span title="{path}">{link}</span>{text}'.format(
             link=link(node),
             path=' > '.join([g.nodes[id_].name for id_ in node.root]),
             text=text))
 
     # Sort types by name
-    type_data = OrderedDict(sorted(type_data.items(), key=lambda t: t[0]))
     for root_type in type_data:
         type_data[root_type].sort()
 
