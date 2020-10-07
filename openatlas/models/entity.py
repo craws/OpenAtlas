@@ -28,6 +28,7 @@ class Entity:
 
         self.id = row.id
         self.nodes: Dict['Node', str] = {}
+
         if hasattr(row, 'nodes') and row.nodes:
             for node in row.nodes:
                 self.nodes[g.nodes[node['f1']]] = node['f2']  # f1 = node id, f2 = value
