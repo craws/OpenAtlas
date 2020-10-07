@@ -12,7 +12,7 @@ class APINode:
     @staticmethod
     def get_node(id_: int) -> List[Dict[str, Any]]:
         try:
-            int(id_)
+            id_ = int(id_)
         except Exception:
             raise APIError('Invalid ID: ' + str(id_), status_code=404, payload="404b")
         if id_ not in g.nodes:
@@ -28,7 +28,7 @@ class APINode:
     @staticmethod
     def get_node_all(id_: int) -> List[Dict[str, Any]]:
         try:
-            int(id_)
+            id_ = int(id_)
         except Exception:
             raise APIError('Invalid ID: ' + str(id_), status_code=404, payload="404b")
         if id_ not in g.nodes:
@@ -51,7 +51,7 @@ class APINode:
     def get_subunits(id_: int) -> List[Dict[str, Any]]:
         # Get first level of subunits
         try:
-            int(id_)
+            id_ = int(id_)
         except Exception:
             raise APIError('Invalid ID: ' + str(id_), status_code=404, payload="404b")
         try:
@@ -73,7 +73,7 @@ class APINode:
     @staticmethod
     def get_subunit_hierarchy(id_: int) -> List[Dict[str, Any]]:
         try:
-            int(id_)
+            id_ = int(id_)
         except Exception:
             raise APIError('Invalid ID: ' + str(id_), status_code=404, payload="404b")
         try:

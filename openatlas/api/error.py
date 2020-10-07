@@ -24,6 +24,8 @@ class APIError(Exception):
         "404e": "Only integers between 1 and 100 are allowed.",
         "404f": "The syntax is incorrect. Only valid operators are allowed.",
         "404g": "The requested node or subunit doesn't exist. Try another node ID",
+        "404h": "The query path needs a valid parameter input. Valid inputs are entities, classes"
+                " and items. Please confer the help page.",
         "405": "The method used is not supported. Right now only GET is allowed.",
         "500": "Please notify the administrator. Sorry for the inconvenience."}
 

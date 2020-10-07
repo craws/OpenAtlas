@@ -26,7 +26,7 @@ class Api:
     def get_links(entity: Entity) -> List[Dict[str, str]]:
         links = []
 
-        for link in Link.get_links(entity.id):  # pragma: nocover
+        for link in Link.get_links(entity.id):
             links.append({'label': link.range.name,
                           'relationTo': url_for('api_entity', id_=link.range.id, _external=True),
                           'relationType': 'crm:' + link.property.code + '_'
@@ -34,7 +34,7 @@ class Api:
             if link.property.code == 'P53':
                 entity.location = link.range
 
-        for link in Link.get_links(entity.id, inverse=True):  # pragma: nocover
+        for link in Link.get_links(entity.id, inverse=True):
             links.append({'label': link.domain.name,
                           'relationTo': url_for('api_entity', id_=link.domain.id, _external=True),
                           'relationType': 'crm:' + link.property.code + 'i_'
@@ -79,7 +79,7 @@ class Api:
             nodes_dict = {'identifier': url_for('api_entity', id_=node.id, _external=True),
                           'label': node.name}
             for link in Link.get_links(entity.id):
-                if link.range.id == node.id and link.description:  # pragma: nocover
+                if link.range.id == node.id and link.description: # pragma: nocover
                     nodes_dict['value'] = link.description
                     if link.range.id == node.id and node.description:
                         nodes_dict['unit'] = node.description
@@ -88,7 +88,7 @@ class Api:
 
             hierarchy = []
             for root in node.root:
-                hierarchy.append(g.nodes[root].name)  # pragma: nocover
+                hierarchy.append(g.nodes[root].name) # pragma: nocover
             hierarchy.reverse()
             nodes_dict['hierarchy'] = ' > '.join(map(str, hierarchy))
             nodes.append(nodes_dict)
@@ -96,7 +96,7 @@ class Api:
 
     @staticmethod
     def get_time(entity: Entity) -> Dict[str, Any]:
-        if entity.begin_from or entity.end_from:  # pragma: nocover
+        if entity.begin_from or entity.end_from:
             time = {}
             if entity.begin_from:
                 start = {'earliest': format_date(entity.begin_from)}
@@ -112,10 +112,10 @@ class Api:
                 if entity.end_comment:
                     end['comment'] = entity.end_comment
                 time['end'] = end
-            return time
+        return time
 
     @staticmethod
-    def get_geometry(entity: Entity):
+    def get_geometry(entity: Entity) -> Dict[str, Any]:
         geometries = []
         shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
         if entity.location:
@@ -123,17 +123,17 @@ class Api:
                 geo_dict = {'type': shape[geometry['shape']],
                             'coordinates': geometry['geometry']['coordinates']}
                 if geometry['description']:
-                    geo_dict['description'] = geometry['description']  # pragma: nocover
+                    geo_dict['description'] = geometry['description']
                 if geometry['name']:
                     geo_dict['title'] = geometry['name']
                 geometries.append(geo_dict)
             if len(geometries) == 1:
-                return geometries[0]  # pragma: nocover
+                return geometries[0]
             else:
                 return {'type': 'GeometryCollection', 'geometries': geometries}
 
     @staticmethod
-    def get_geonames(entity: Entity):
+    def get_geonames(entity: Entity) -> Dict[str, Any]:
         geonames_link = Geonames.get_geonames_link(entity)
         if geonames_link and geonames_link.range.class_.code == 'E18':
             geo_name = {}
@@ -175,7 +175,8 @@ class Api:
         if Api.get_node(entity) and 'types' in meta['show']:
             features['types'] = Api.get_node(entity)
 
-        if entity.aliases and 'names' in meta['show']:  # pragma: nocover
+        # Alias
+        if entity.aliases and 'names' in meta['show']:
             features['names'] = []
             for key, value in entity.aliases.items():
                 features['names'].append({"alias": value})
