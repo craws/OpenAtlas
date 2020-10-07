@@ -60,6 +60,10 @@ def build_form(form: Any,
     for item in delete_list:
         delattr(form_instance, item)
 
+    # Wikidata
+    if 'wikidata_id' in form_instance and not current_user.settings['module_wikidata']:
+        delattr(form_instance, 'wikidata_id')
+
     # Set field data if available and only if it's a GET request
     if selected_object and request_origin and request_origin.method == 'GET':
         from openatlas.forms.date import DateForm

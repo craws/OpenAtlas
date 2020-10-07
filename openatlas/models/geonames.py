@@ -19,17 +19,17 @@ class Geonames:
 
     @staticmethod
     def update_geonames(form: FlaskForm, object_: Entity) -> None:
-        new_geonames_id = form.geonames_id.data
-        geonames_link = Geonames.get_geonames_link(object_)
-        geonames_entity = geonames_link.domain if geonames_link else None
+        new_id = form.geonames_id.data
+        link_ = Geonames.get_geonames_link(object_)
+        reference = link_.domain if link_ else None  # former external reference
 
-        if not new_geonames_id:
-            if geonames_entity:
-                if len(geonames_entity.get_links(['P67'])) > 1:  # pragma: no cover
-                    if geonames_link:
-                        geonames_link.delete()  # There are more linked so only remove this link
+        if not new_id:
+            if reference:
+                if len(reference.get_links(['P67'])) > 1:  # pragma: no cover
+                    if link_:
+                        link_.delete()  # There are more linked so only remove this link
                 else:
-                    geonames_entity.delete()  # Nothing else is linked to the reference so delete it
+                    reference.delete()  # Nothing else is linked to the reference so delete it
             return
 
         # Get id of the match type
@@ -43,38 +43,35 @@ class Geonames:
                 break
 
         # There wasn't one linked before
-        if not geonames_entity:
-            reference = Entity.get_by_name_and_system_type(new_geonames_id,
-                                                           'external reference geonames')
+        if not reference:
+            reference = Entity.get_by_name_and_system_type(new_id, 'external reference geonames')
             if not reference:  # The selected reference doesn't exist so create it
                 reference = Entity.insert('E31',
-                                          new_geonames_id,
+                                          new_id,
                                           'external reference geonames',
                                           description='GeoNames ID')
             object_.link('P67', reference, inverse=True, type_id=match_id)
             return
 
-        if geonames_link and int(new_geonames_id) == int(geonames_entity.name) \
-                and match_id == geonames_link.type.id:
+        if link_ and int(new_id) == int(reference.name) and match_id == link_.type.id:
             return  # It's the same link so do nothing
 
-        # Only the match type change so delete and recreate the link
-        if geonames_link and int(new_geonames_id) == int(geonames_entity.name):
-            geonames_link.delete()
-            object_.link('P67', geonames_entity, inverse=True, type_id=match_id)
+        # Only the match type changed so delete and recreate the link
+        if link_ and int(new_id) == int(reference.name):
+            link_.delete()
+            object_.link('P67', reference, inverse=True, type_id=match_id)
             return
 
-        # Its linked to a different geonames reference
-        if geonames_link and len(geonames_entity.get_links(['P67'])) > 1:
-            geonames_link.delete()  # There are more linked so only remove this link
+        # It's linked to a different geonames reference
+        if link_ and len(reference.get_links(['P67'])) > 1:
+            link_.delete()  # There are more linked so only remove this link
         else:  # pragma: no cover
-            geonames_entity.delete()  # Nothing else is linked to the reference so delete it
-        reference = Entity.get_by_name_and_system_type(new_geonames_id,
-                                                       'external reference geonames')
+            reference.delete()  # Nothing else is linked to the reference so delete it
+        reference = Entity.get_by_name_and_system_type(new_id, 'external reference geonames')
 
         if not reference:  # The selected reference doesn't exist so create it
             reference = Entity.insert('E31',
-                                      new_geonames_id,
+                                      new_id,
                                       'external reference geonames',
                                       description='GeoNames ID')
         object_.link('P67', reference, inverse=True, type_id=match_id)
