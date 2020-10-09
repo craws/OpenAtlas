@@ -154,8 +154,9 @@ class Entity:
                         'begin_to': Date.datetime64_to_timestamp(self.begin_to),
                         'end_from': Date.datetime64_to_timestamp(self.end_from),
                         'end_to': Date.datetime64_to_timestamp(self.end_to),
-                        'begin_comment': str(self.begin_comment).strip(),
-                        'end_comment': str(self.end_comment).strip(),
+                        'begin_comment': str(self.begin_comment).strip() if
+                        self.begin_comment else None,
+                        'end_comment': str(self.end_comment).strip() if self.end_comment else None,
                         'description': sanitize(self.description, 'description')})
 
     def update_aliases(self, form: FlaskForm) -> None:
