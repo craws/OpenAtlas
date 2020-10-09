@@ -1,6 +1,8 @@
 class Changelog:
 
     versions = {
+        '5.5.1': ['2020-10-09', {
+            'fix': {'1380': "Empty date comment is saved as 'None'"}}],
         '5.5.0': ['2020-09-26', {
             'feature': {
                 '929': 'Module options',

@@ -3,7 +3,7 @@ import pathlib
 
 from openatlas import app
 
-VERSION = '5.5.0'
+VERSION = '5.5.1'
 DEMO_MODE = False  # If in demo mode some options are disabled and the login form is pre filled
 IS_UNIT_TEST = False
 
