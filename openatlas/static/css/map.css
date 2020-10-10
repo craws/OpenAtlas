@@ -17,6 +17,11 @@ svg.svg-inline--fa {
     font-size: 1.2em;
 }
 
+/* overwrite the icon size above for the manual icon */
+a.manual svg.svg-inline--fa {
+    font-size: 1em;
+}
+
 #geometryForm {
     width: 300px;
     overflow: hidden;
