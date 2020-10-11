@@ -1,7 +1,7 @@
 {% extends "layout.html" %}
 {% block title_name %} - SQL{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'], 'SQL']|crumb }}
+    <a href="{{ url_for('admin_index') }}#tab-data">{{ _('admin')|uc_first }}</a>&nbsp;> {{ _('SQL') }}
 {% endblock %}
 {% block content %}
     <div class="toolbar">

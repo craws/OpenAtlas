@@ -1,3 +1,5 @@
+import pathlib
+
 from flask import url_for
 
 from openatlas import app
@@ -20,7 +22,7 @@ class FileTest(TestBaseCase):
             # Insert
             rv = self.app.get(url_for('file_insert', origin_id=actor.id))
             assert b'+ File' in rv.data
-            logo = app.config['ROOT_PATH'].joinpath('static', 'images', 'layout', 'logo.png')
+            logo = pathlib.Path(app.root_path) / 'static' / 'images' / 'layout' / 'logo.png'
             with open(logo, 'rb') as img:
                 rv = self.app.post(url_for('file_insert', origin_id=actor.id),
                                    data={'name': 'OpenAtlas logo', 'file': img},
@@ -48,7 +50,7 @@ class FileTest(TestBaseCase):
                               follow_redirects=True)
             assert b'Logo' in rv.data
 
-            with open(app.config['ROOT_PATH'].joinpath('views', 'index.py'), 'rb') as invalid_file:
+            with open(pathlib.Path(app.root_path) / 'views' / 'index.py', 'rb') as invalid_file:
                 rv = self.app.post(url_for('file_insert', origin_id=actor.id),
                                    data={'name': 'Invalid file', 'file': invalid_file},
                                    follow_redirects=True)

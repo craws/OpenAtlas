@@ -14,8 +14,8 @@ from werkzeug.exceptions import abort
 from openatlas import app
 from openatlas.models.date import Date
 from openatlas.models.link import Link
-from openatlas.util.util import is_authorized
 from openatlas.util.display import get_file_extension
+from openatlas.util.util import is_authorized
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.node import Node
@@ -136,8 +136,8 @@ class Entity:
             if isinstance(form, DateForm):
                 self.set_dates(form)
             if hasattr(form, 'alias') and (
-                self.system_type == 'place' or
-                self.class_.code in app.config['CLASS_CODES']['actor']):
+                    self.system_type == 'place' or
+                    self.class_.code in app.config['CLASS_CODES']['actor']):
                 self.update_aliases(form)
         if self.class_.code == 'E53':
             self.name = sanitize(self.name, 'node')
@@ -298,7 +298,7 @@ class Entity:
         g.execute(Entity.build_sql(nodes=True) + " WHERE e.system_type = 'file' GROUP BY e.id;")
         entities = []
         for row in g.cursor.fetchall():
-            if get_file_extension(row.id)[1:] in app.config['DISPLAY_FILE_EXTENSIONS']:
+            if get_file_extension(row.id) in app.config['DISPLAY_FILE_EXTENSIONS']:
                 entities.append(Entity(row))
         return entities
 

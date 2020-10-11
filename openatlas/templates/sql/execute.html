@@ -1,7 +1,8 @@
 {% extends "layout.html" %}
 {% block title_name %} - SQL{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('admin'), 'admin_index'], ['SQL', 'sql_index'], _('execute')]|crumb }}
+    <a href="{{ url_for('admin_index') }}#tab-data">{{ _('admin')|uc_first }}</a>&nbsp;>&nbsp;
+    {{ [['SQL', 'sql_index'], _('execute')]|crumb }}
 {% endblock %}
 {% block content %}
     {% if file_data['file'] %}
