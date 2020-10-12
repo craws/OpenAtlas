@@ -14,8 +14,8 @@ class Path:
     @staticmethod
     def get_entities_by_menu_item(code_: str, validation: Dict[str, Any]) -> List[int]:
         entities = []
-        # if not Entity.get_overview_counts()[code_] :
-        #     raise APIError('Syntax is incorrect!', status_code=404, payload="404c")
+        if code_ not in ['actor', 'event', 'place', 'reference', 'source', 'object']:
+            raise APIError('Invalid code: ' + code_, status_code=404, payload="404c")
         for entity in Query.get_by_menu_item(code_, validation):
             entities.append(entity.id)
         return entities
@@ -24,7 +24,8 @@ class Path:
     def get_entities_by_class(class_code: str, validation: Dict[str, Any]) -> List[int]:
         entities = []
         if class_code not in g.classes:
-            raise APIError('Invalid CIDOC CRM class code.', status_code=404, payload="404d")
+            raise APIError('Invalid CIDOC CRM class code: ' + class_code, status_code=404,
+                           payload="404d")
         for entity in Query.get_by_class_code(class_code, validation):
             entities.append(entity.id)
         return entities
@@ -32,16 +33,24 @@ class Path:
     @staticmethod
     def get_entities_get_latest(limit_: int, validation: Dict[str, Any]) -> List[Dict[str, Any]]:
         entities = []
-        for entity in Entity.get_latest(limit_):
-            entities.append(Api.get_entity(entity.id, meta=validation))
-        return entities
+        try:
+            limit_ = int(limit_)
+        except Exception:
+            raise APIError('Invalid limit.', status_code=404, payload="404e")
+        if 1 < limit_ < 101:
+            for entity in Entity.get_latest(limit_):
+                entities.append(Api.get_entity(entity.id, meta=validation))
+            return entities
+        else:
+            raise APIError('Invalid limit.', status_code=404, payload="404e")
 
     @staticmethod
     def pagination(entities: List[int], validation: Dict[str, Any]) -> List[List[Dict[str, Any]]]:
         result = []
         index = []
         total = entities
-        for num, i in enumerate(list(itertools.islice(entities, 0, None, int(validation['limit'])))):
+        for num, i in enumerate(
+                list(itertools.islice(entities, 0, None, int(validation['limit'])))):
             index.append(({'page': num + 1, 'start_id': i}))
         if validation['last'] or validation['first']:
             if validation['last'] and int(validation['last']) in entities:
@@ -54,10 +63,10 @@ class Path:
                 raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
         else:
             pass
-        entity_result =[]
+        entity_result = []
         for entity in entities[:int(validation['limit'])]:
             entity_result.append(Api.get_entity(entity, validation))
         result.append(entity_result)
         result.append([{'entity_per_page': int(validation['limit']), 'entities': len(total),
-                       'index': index, 'total_pages': len(index)}])
+                        'index': index, 'total_pages': len(index)}])
         return result

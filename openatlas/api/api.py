@@ -1,12 +1,11 @@
 import itertools
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from flask import g, session, url_for
 
 from openatlas import app
 from openatlas.api.error import APIError
-from openatlas.api.sql import Query
 from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
 from openatlas.models.gis import Gis
@@ -28,7 +27,7 @@ class Api:
     def get_links(entity: Entity) -> List[Dict[str, str]]:
         links = []
 
-        for link in Link.get_links(entity.id):  # pragma: nocover
+        for link in Link.get_links(entity.id):
             links.append({'label': link.range.name,
                           'relationTo': url_for('api_entity', id_=link.range.id, _external=True),
                           'relationType': 'crm:' + link.property.code + '_'
@@ -36,7 +35,7 @@ class Api:
             if link.property.code == 'P53':
                 entity.location = link.range
 
-        for link in Link.get_links(entity.id, inverse=True):  # pragma: nocover
+        for link in Link.get_links(entity.id, inverse=True):
             links.append({'label': link.domain.name,
                           'relationTo': url_for('api_entity', id_=link.domain.id, _external=True),
                           'relationType': 'crm:' + link.property.code + 'i_'
@@ -55,6 +54,7 @@ class Api:
                 license_ = Api.get_license(link.domain.id)
                 if license_:
                     file_dict['license'] = license_
+                path = get_file_path(link.domain.id)
                 if path:
                     try:
                         file_dict['url'] = url_for('display_file',
@@ -73,7 +73,6 @@ class Api:
                 file_license = link.range.name
 
         return file_license
-
 
     @staticmethod
     def get_node(entity: Entity) -> List[Dict[str, Any]]:
@@ -97,14 +96,62 @@ class Api:
             nodes.append(nodes_dict)
         return nodes
 
+    @staticmethod
+    def get_time(entity: Entity) -> Dict[str, Any]:
+        time = {}
+        if entity.begin_from:
+            start = {'earliest': format_date(entity.begin_from)}
+            if entity.begin_to:
+                start['latest'] = format_date(entity.begin_to)
+            if entity.begin_comment:
+                start['comment'] = entity.begin_comment
+            time['start'] = start
+        if entity.end_from:
+            end = {'earliest': format_date(entity.end_from)}
+            if entity.end_to:
+                end['latest'] = format_date(entity.end_to)
+            if entity.end_comment:
+                end['comment'] = entity.end_comment
+            time['end'] = end
+        return time
 
+    @staticmethod
+    def get_geometry(entity: Entity) -> Dict[str, Any]:
+        geometries = []
+        shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
+        for geometry in Gis.get_by_id(entity.location.id):
+            geo_dict = {'type': shape[geometry['shape']],
+                        'coordinates': geometry['geometry']['coordinates']}
+            if geometry['description']:
+                geo_dict['description'] = geometry['description']
+            if geometry['name']:
+                geo_dict['title'] = geometry['name']
+            geometries.append(geo_dict)
+        if len(geometries) == 1:
+            return geometries[0]
+        else:
+            return {'type': 'GeometryCollection', 'geometries': geometries}
+
+    @staticmethod
+    def get_geonames(geonames_link: Link) -> Dict[str, Any]:
+        geo_name = {}
+        if geonames_link.type.name:
+            geo_name['type'] = Api.to_camelcase(geonames_link.type.name)
+        if geonames_link.domain.name:
+            geo_name['identifier'] = session['settings']['geonames_url'] + geonames_link.domain.name
+        return geo_name
 
     @staticmethod
     def get_entity(id_: int, meta: Dict[str, Any]) -> Dict[str, Any]:
         try:
+            int(id_)
+        except Exception:
+            raise APIError('Invalid ID: ' + str(id_), status_code=404, payload="404b")
+        try:
             entity = Entity.get_by_id(id_, nodes=True, aliases=True)
         except Exception:
-            raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
+            raise APIError('Entity ID ' + str(id_) + ' doesn\'t exist', status_code=404,
+                           payload="404a")
 
         geonames_link = Geonames.get_geonames_link(entity)
         type_ = 'FeatureCollection'
@@ -127,7 +174,8 @@ class Api:
         if Api.get_node(entity) and 'types' in meta['show']:
             features['types'] = Api.get_node(entity)
 
-        if entity.aliases and 'names' in meta['show']:  # pragma: nocover
+        # Alias
+        if entity.aliases and 'names' in meta['show']:
             features['names'] = []
             for key, value in entity.aliases.items():
                 features['names'].append({"alias": value})
@@ -137,55 +185,21 @@ class Api:
             features['depictions'] = Api.get_file(entity)
 
         # Time spans
-        if 'when' in meta['show']:
-            if entity.begin_from or entity.end_from:  # pragma: nocover
-                time = {}
-                if entity.begin_from:
-                    start = {'earliest': format_date(entity.begin_from)}
-                    if entity.begin_to:
-                        start['latest'] = format_date(entity.begin_to)
-                    if entity.begin_comment:
-                        start['comment'] = entity.begin_comment
-                    time['start'] = start
-                if entity.end_from:
-                    end = {'earliest': format_date(entity.end_from)}
-                    if entity.end_to:
-                        end['latest'] = format_date(entity.end_to)
-                    if entity.end_comment:
-                        end['comment'] = entity.end_comment
-                    time['end'] = end
-                features['when'] = {'timespans': [time]}
+        if Api.get_time(entity) and 'when' in meta['show']:
+            if entity.begin_from or entity.end_from:
+                features['when'] = {'timespans': [Api.get_time(entity)]}
 
         # Geonames
-        if geonames_link and geonames_link.range.class_.code == 'E18' \
-                and 'geometry' in meta['show']:
-            geo_name = {}
-            if geonames_link.type.name:
-                geo_name['type'] = Api.to_camelcase(geonames_link.type.name)
-            if geonames_link.domain.name:
-                geo_name['identifier'] = session['settings']['geonames_url'] + \
-                                         geonames_link.domain.name
-            if geonames_link.type.name or geonames_link.domain.name:
-                features['links'] = []
-                features['links'].append(geo_name)
+        geonames_link = Geonames.get_geonames_link(entity)
+        if Api.get_geonames(geonames_link) and 'geonames' in meta['show']:
+            if geonames_link and geonames_link.range.class_.code == 'E18':
+                features['links'] = [Api.get_geonames(geonames_link)]
 
         # Geometry
-        geometries = []
-        shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
-        features['geometry'] = {'type': 'GeometryCollection', 'geometries': []}
-        if entity.location and 'geometry' in meta['show']:
-            for geometry in Gis.get_by_id(entity.location.id):
-                geo_dict = {'type': shape[geometry['shape']],
-                            'coordinates': geometry['geometry']['coordinates']}
-                if geometry['description']:
-                    geo_dict['description'] = geometry['description']  # pragma: nocover
-                if geometry['name']:
-                    geo_dict['title'] = geometry['name']
-                geometries.append(geo_dict)
-            if len(geometries) == 1:
-                features['geometry'] = geometries[0]  # pragma: nocover
-            else:
-                features['geometry'] = {'type': 'GeometryCollection', 'geometries': geometries}
+        if 'geometry' in meta['show'] and entity.location:
+            features['geometry'] = {'type': 'GeometryCollection',
+                                    'geometries': [Api.get_geometry(entity)]}
+
         data: Dict[str, Any] = {'type': type_,
                                 '@context': app.config['API_SCHEMA'],
                                 'features': [features]}
