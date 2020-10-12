@@ -132,14 +132,13 @@ class Api:
             return {'type': 'GeometryCollection', 'geometries': geometries}
 
     @staticmethod
-    def get_geonames(entity: Entity, geonames_link) -> Dict[str, Any]:
-            geo_name = {}
-            if geonames_link.type.name:
-                geo_name['type'] = Api.to_camelcase(geonames_link.type.name)
-            if geonames_link.domain.name:
-                geo_name['identifier'] = session['settings']['geonames_url'] + \
-                                         geonames_link.domain.name
-            return geo_name
+    def get_geonames(geonames_link) -> Dict[str, Any]:
+        geo_name = {}
+        if geonames_link.type.name:
+            geo_name['type'] = Api.to_camelcase(geonames_link.type.name)
+        if geonames_link.domain.name:
+            geo_name['identifier'] = session['settings']['geonames_url'] + geonames_link.domain.name
+        return geo_name
 
     @staticmethod
     def get_entity(id_: int, meta: Dict[str, Any]) -> Dict[str, Any]:
@@ -190,9 +189,9 @@ class Api:
 
         # Geonames
         geonames_link = Geonames.get_geonames_link(entity)
-        if Api.get_geonames(entity, geonames_link) and 'geonames' in meta['show']:
+        if Api.get_geonames(geonames_link) and 'geonames' in meta['show']:
             if geonames_link and geonames_link.range.class_.code == 'E18':
-                features['links'] = [Api.get_geonames(entity, geonames_link)]
+                features['links'] = [Api.get_geonames(geonames_link)]
 
         # Geometry
         if 'geometry' in meta['show'] and entity.location:
