@@ -1,6 +1,6 @@
 import itertools
 import os
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from flask import g, session, url_for
 
@@ -54,7 +54,6 @@ class Api:
                 license_ = Api.get_license(link.domain.id)
                 if license_:
                     file_dict['license'] = license_
-                path = get_file_path(link.domain.id)
                 if path:
                     try:
                         file_dict['url'] = url_for('display_file',
@@ -133,13 +132,16 @@ class Api:
             return {'type': 'GeometryCollection', 'geometries': geometries}
 
     @staticmethod
-    def get_geonames(geonames_link: Link) -> Dict[str, Any]:
-        geo_name = {}
-        if geonames_link.type.name:
-            geo_name['type'] = Api.to_camelcase(geonames_link.type.name)
-        if geonames_link.domain.name:
-            geo_name['identifier'] = session['settings']['geonames_url'] + geonames_link.domain.name
-        return geo_name
+    def get_geonames(entity: Entity) -> Dict[str, Any]:
+        geonames_link = Geonames.get_geonames_link(entity)
+        if geonames_link and geonames_link.range.class_.code == 'E18':
+            geo_name = {}
+            if geonames_link.type.name:
+                geo_name['type'] = Api.to_camelcase(geonames_link.type.name)
+            if geonames_link.domain.name:
+                geo_name['identifier'] = session['settings']['geonames_url'] + \
+                                         geonames_link.domain.name
+            return geo_name
 
     @staticmethod
     def get_entity(id_: int, meta: Dict[str, Any]) -> Dict[str, Any]:
@@ -153,7 +155,6 @@ class Api:
             raise APIError('Entity ID ' + str(id_) + ' doesn\'t exist', status_code=404,
                            payload="404a")
 
-        geonames_link = Geonames.get_geonames_link(entity)
         type_ = 'FeatureCollection'
 
         class_code = ''.join(entity.class_.code + " " + entity.class_.i18n['en']).replace(" ", "_")
@@ -190,10 +191,8 @@ class Api:
                 features['when'] = {'timespans': [Api.get_time(entity)]}
 
         # Geonames
-        geonames_link = Geonames.get_geonames_link(entity)
-        if Api.get_geonames(geonames_link) and 'geonames' in meta['show']:
-            if geonames_link and geonames_link.range.class_.code == 'E18':
-                features['links'] = [Api.get_geonames(geonames_link)]
+        if Api.get_geonames(entity) and 'geonames' in meta['show']:
+            features['links'] = [Api.get_geonames(entity)]
 
         # Geometry
         if 'geometry' in meta['show'] and entity.location:
