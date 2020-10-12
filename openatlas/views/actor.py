@@ -191,7 +191,7 @@ def actor_view(actor: Entity) -> str:
             last = '<span class="inactive">' + event.last + '</span>'
         data = [link(event),
                 g.classes[event.class_.code].name,
-                link_.type.name if link_.type else '',
+                link(link_.type),
                 first,
                 last,
                 link_.description]
@@ -231,22 +231,23 @@ def actor_view(actor: Entity) -> str:
     add_system_data(actor, info)
 
     for link_ in actor.get_links('OA7') + actor.get_links('OA7', True):
+        type_ = ''
         if actor.id == link_.domain.id:
-            type_ = link_.type.get_name_directed() if link_.type else ''
             related = link_.range
+            if link_.type:
+                type_ = link(link_.type.get_name_directed(),
+                             url_for('entity_view', id_=link_.type.id))
         else:
-            type_ = link_.type.get_name_directed(True) if link_.type else ''
             related = link_.domain
+            if link_.type:
+                type_ = link(link_.type.get_name_directed(True),
+                             url_for('entity_view', id_=link_.type.id))
         data = [type_, link(related), link_.first, link_.last, link_.description]
         data = add_edit_link(data, url_for('relation_update', id_=link_.id, origin_id=actor.id))
         data = add_remove_link(data, related.name, link_, actor, 'relation')
         tabs['relation'].table.rows.append(data)
     for link_ in actor.get_links('P107', True):
-        data = [link(link_.domain),
-                link_.type.name if link_.type else '',
-                link_.first,
-                link_.last,
-                link_.description]
+        data = [link(link_.domain), link(link_.type), link_.first, link_.last, link_.description]
         data = add_edit_link(data, url_for('member_update', id_=link_.id, origin_id=actor.id))
         data = add_remove_link(data, link_.domain.name, link_, actor, 'member-of')
         tabs['member_of'].table.rows.append(data)
@@ -254,14 +255,10 @@ def actor_view(actor: Entity) -> str:
         del tabs['member']
     else:
         for link_ in actor.get_links('P107'):
-            data = [link(link_.range),
-                    link_.type.name if link_.type else '',
-                    link_.first,
-                    link_.last,
-                    link_.description]
+            data = [link(link_.range), link(link_.type), link_.first, link_.last, link_.description]
             if is_authorized('contributor'):
-                data.append(
-                    link(_('edit'), url_for('member_update', id_=link_.id, origin_id=actor.id)))
+                data.append(link(_('edit'),
+                                 url_for('member_update', id_=link_.id, origin_id=actor.id)))
             data = add_remove_link(data, link_.range.name, link_, actor, 'member')
             tabs['member'].table.rows.append(data)
     gis_data = Gis.get_all(objects) if objects else None
