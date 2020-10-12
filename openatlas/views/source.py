@@ -145,7 +145,7 @@ def source_view(source: Entity) -> str:
         domain = link_.domain
         data = get_base_table_data(domain)
         if domain.view_name == 'file':  # pragma: no cover
-            extension = data[3].replace('.', '')
+            extension = data[3]
             data.append(get_profile_image_table_link(domain, source, extension, profile_image_id))
             if not profile_image_id and extension in app.config['DISPLAY_FILE_EXTENSIONS']:
                 profile_image_id = domain.id

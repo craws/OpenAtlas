@@ -1,13 +1,12 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-import glob
 import math
 import os
 import re
 from collections import OrderedDict
 from datetime import datetime, timedelta
 from html.parser import HTMLParser
-from os.path import basename
+from pathlib import Path
 from typing import Any, Dict, List, Optional, TYPE_CHECKING, Tuple, Union
 
 import numpy
@@ -223,20 +222,19 @@ def add_type_data(entity: 'Entity',
     type_data: OrderedDict[str, Any] = OrderedDict()
     for node, node_value in entity.nodes.items():
         root = g.nodes[node.root[-1]]
-        name = 'type' if root.name in app.config['BASE_TYPES'] else root.name
+        label = 'type' if root.name in app.config['BASE_TYPES'] else root.name
         if root.name not in type_data:
-            type_data[name] = []
+            type_data[label] = []
         text = ''
         if root.value_type:  # Text for value types
             text = ': {value} <span style="font-style:italic;">{description}</span>'.format(
                 value=format_number(node_value), description=node.description)
-        type_data[name].append('<span title="{path}">{link}</span>{text}'.format(
+        type_data[label].append('<span title="{path}">{link}</span>{text}'.format(
             link=link(node),
             path=' > '.join([g.nodes[id_].name for id_ in node.root]),
             text=text))
 
     # Sort types by name
-    type_data = OrderedDict(sorted(type_data.items(), key=lambda t: t[0]))
     for root_type in type_data:
         type_data[root_type].sort()
 
@@ -510,22 +508,22 @@ def format_date(value: Union[datetime, numpy.datetime64]) -> str:
 
 
 def get_backup_file_data() -> Dict[str, Any]:
-    path = app.config['EXPORT_FOLDER_PATH'].joinpath('sql')
+    path = app.config['EXPORT_DIR'] / 'sql'
     latest_file = None
     latest_file_date = None
-    for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
-        if basename(file) == '.gitignore':
+    for file in [f for f in path.iterdir() if (path / f).is_file()]:
+        if file.name == '.gitignore':
             continue
-        file_date = datetime.utcfromtimestamp(os.path.getmtime(path.joinpath(file)))
+        file_date = datetime.utcfromtimestamp((path / file).stat().st_ctime)
         if not latest_file_date or file_date > latest_file_date:
             latest_file = file
             latest_file_date = file_date
     file_data: Dict[str, Any] = {'backup_too_old': True}
     if latest_file and latest_file_date:
         yesterday = datetime.today() - timedelta(days=1)
-        file_data['file'] = latest_file
+        file_data['file'] = latest_file.name
         file_data['backup_too_old'] = True if yesterday > latest_file_date else False
-        file_data['size'] = convert_size(os.path.getsize(path.joinpath(latest_file)))
+        file_data['size'] = convert_size(latest_file.stat().st_size)
         file_data['date'] = format_date(latest_file_date)
     return file_data
 
@@ -540,13 +538,13 @@ def convert_size(size_bytes: int) -> str:
 
 def print_file_size(entity: 'Entity') -> str:
     path = get_file_path(entity.id)
-    return convert_size(os.path.getsize(path)) if path else 'N/A'
+    return convert_size(path.stat().st_size) if path else 'N/A'
 
 
 def get_disk_space_info() -> Optional[Dict[str, Any]]:
     if os.name != "posix":  # pragma: no cover - e.g. Windows has no statvfs
         return None
-    statvfs = os.statvfs(app.config['UPLOAD_FOLDER_PATH'])
+    statvfs = os.statvfs(app.config['UPLOAD_DIR'])
     disk_space = statvfs.f_frsize * statvfs.f_blocks
     free_space = statvfs.f_frsize * statvfs.f_bavail  # Available space without reserved blocks
     return {'total': convert_size(statvfs.f_frsize * statvfs.f_blocks),
@@ -556,10 +554,10 @@ def get_disk_space_info() -> Optional[Dict[str, Any]]:
 
 def get_file_extension(entity: Union[int, 'Entity']) -> str:
     path = get_file_path(entity if isinstance(entity, int) else entity.id)
-    return os.path.splitext(path)[1] if path else 'N/A'
+    return path.suffix if path else 'N/A'
 
 
-def get_file_path(entity: Union[int, 'Entity']) -> Optional[str]:
+def get_file_path(entity: Union[int, 'Entity']) -> Optional[Path]:
     entity_id = entity if isinstance(entity, int) else entity.id
-    path = glob.glob(os.path.join(app.config['UPLOAD_FOLDER_PATH'], str(entity_id) + '.*'))
-    return path[0] if path else None
+    path = next(app.config['UPLOAD_DIR'].glob(str(entity_id) + '.*'), None)
+    return path if path else None

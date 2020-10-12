@@ -1,4 +1,4 @@
-import os
+import pathlib
 import re
 from typing import Any, Dict, List, Optional, Union
 
@@ -246,8 +246,8 @@ def description(self: Any, entity: Entity) -> str:
 def display_profile_image(self: Any, image_id: int) -> str:
     if not image_id:
         return ''
-    file_path = display.get_file_path(image_id)
-    if file_path:
+    path = display.get_file_path(image_id)
+    if path:
         html = """
             <div id="profile_image_div">
                 <a href="/entity/{id}">
@@ -255,7 +255,7 @@ def display_profile_image(self: Any, image_id: int) -> str:
                 </a>
             </div>
             """.format(id=image_id,
-                       src=url_for('display_file', filename=os.path.basename(file_path)),
+                       src=url_for('display_file', filename=path.name),
                        width=session['settings']['profile_image_width'])
         return Markup(html)
     return ''  # pragma no cover
@@ -431,7 +431,7 @@ def display_form(self: Any,
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def test_file(self: Any, file_name: str) -> Optional[str]:
-    return file_name if os.path.isfile(app.root_path + '/' + file_name) else None
+    return file_name if (pathlib.Path(app.root_path) / file_name).is_file() else None
 
 
 @jinja2.contextfilter

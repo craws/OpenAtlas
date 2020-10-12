@@ -1,13 +1,16 @@
 class Changelog:
 
     versions = {
-        '5.6.0': ['TBA', {
+	'5.6.0': ['TBA', {
             'feature': {
                 '1347': 'All icons to Font Awesome icons',
+                '1379': 'Feature votes',
                 '1350': 'API: Pagination in an extra array',
                 '1370': 'API: Secure SQL statements',
                 '1375': 'API: Download result of request path'
             }}],
+        '5.5.1': ['2020-10-09', {
+            'fix': {'1380': "Empty date comment is saved as 'None'"}}],
         '5.5.0': ['2020-09-26', {
             'feature': {
                 '929': 'Module options',

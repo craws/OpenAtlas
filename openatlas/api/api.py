@@ -1,3 +1,4 @@
+import itertools
 import os
 from typing import Any, Dict, List
 
@@ -5,6 +6,7 @@ from flask import g, session, url_for
 
 from openatlas import app
 from openatlas.api.error import APIError
+from openatlas.api.sql import Query
 from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
 from openatlas.models.gis import Gis
@@ -71,6 +73,7 @@ class Api:
                 file_license = link.range.name
 
         return file_license
+
 
     @staticmethod
     def get_node(entity: Entity) -> List[Dict[str, Any]]:

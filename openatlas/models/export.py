@@ -1,4 +1,3 @@
-import os
 import shutil
 import subprocess
 
@@ -17,12 +16,12 @@ class Export:
         """ Creates CSV file(s) in export/csv folder, filename begins with current date_time."""
         import pandas.io.sql as psql
         date_string = Date.current_date_for_filename()
-        path = app.config['EXPORT_FOLDER_PATH'].joinpath('csv')
+        path = app.config['EXPORT_DIR'] / 'csv'
         if form.zip.data:
-            path = app.config['TMP_FOLDER_PATH'].joinpath(date_string + '_openatlas_csv_export')
-            if os.path.exists(path):
+            path = app.config['TMP_DIR'] / (date_string + '_openatlas_csv_export')
+            if path.is_dir():
                 shutil.rmtree(path)  # pragma: no cover
-            os.makedirs(path)
+            path.mkdir()
         tables = {'model_class': ['id', 'name', 'code'],
                   'model_class_inheritance': ['id', 'super_code', 'sub_code'],
                   'model_entity': ['id',
@@ -74,16 +73,16 @@ class Export:
                 sql = "SELECT {fields} FROM {table};".format(fields=','.join(fields),
                                                              table=table.replace('_', '.', 1))
                 data_frame = psql.read_sql(sql, g.db)
-                data_frame.to_csv(path.joinpath(date_string + '_' + table + '.csv'), index=False)
+                data_frame.to_csv(path / (date_string + '_' + table + '.csv'), index=False)
         if form.zip.data:
             info = 'CSV export from: {host}\n'.format(host=request.headers['Host'])
             info += 'Created: {date} by {user}\nOpenAtlas version: {version}'.format(
                 date=date_string,
                 user=current_user.username,
                 version=app.config['VERSION'])
-            with open(path.joinpath('info.txt'), "w") as file:
+            with open(path / 'info.txt', "w") as file:
                 print(info, file=file)
-            zip_file = app.config['EXPORT_FOLDER_PATH'].joinpath('csv', date_string + '_csv')
+            zip_file = app.config['EXPORT_DIR'] / 'csv' / (date_string + '_csv')
             shutil.make_archive(zip_file, 'zip', path)
             shutil.rmtree(path)
 
@@ -91,14 +90,13 @@ class Export:
     def export_sql() -> bool:
         """ Creates pg_dump file in export/sql folder, filename begins with current date_time."""
         # Todo: prevent exposing the database password to the process list
-        file_name = Date.current_date_for_filename() + '_dump.sql'
-        path = app.config['EXPORT_FOLDER_PATH'].joinpath('sql', file_name)
         command = """pg_dump -h {host} -d {database} -U {user} -p {port} -f {file}""".format(
             host=app.config['DATABASE_HOST'],
             database=app.config['DATABASE_NAME'],
             port=app.config['DATABASE_PORT'],
             user=app.config['DATABASE_USER'],
-            file=path)
+            file=app.config['EXPORT_DIR'] / 'sql' / (Date.current_date_for_filename() + '_dump.sql')
+        )
         try:
             subprocess.Popen(command,
                              shell=True,
