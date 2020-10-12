@@ -1,4 +1,4 @@
-from flask import g, json, jsonify, render_template, request
+from flask import json, jsonify, render_template, request
 from flask_cors import cross_origin
 from werkzeug.wrappers import Response
 
@@ -9,10 +9,6 @@ from openatlas.api.node import APINode
 from openatlas.api.path import Path
 from openatlas.api.validation import Validation
 from openatlas.util.util import api_access
-
-
-# Todo: unit test -> remove # pragma: nocover
-# Todo: prevent code duplication
 
 
 @app.route('/api/0.1/entity/<id_>', strict_slashes=False)
@@ -194,7 +190,6 @@ def api_subunit_hierarchy(id_: int) -> Response:
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_index() -> str:
     return render_template('api/index.html')
-
 
 # # Deprecated
 # @app.route('/api/0.1/', methods=['GET', 'POST', 'VIEW', 'PUT'], strict_slashes=False)

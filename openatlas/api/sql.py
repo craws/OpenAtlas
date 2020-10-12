@@ -120,8 +120,8 @@ class Query:
         # Possible class names: actor, event, place, reference, source, object
         if menu_item == 'source':
             sql = Query.build_sql(nodes=True) + """
-                WHERE e.class_code IN %(codes)s AND e.system_type = 'source content' {filter} %(search)s
-                GROUP BY e.id ORDER BY {order} {sort};""".format(
+                WHERE e.class_code IN %(codes)s AND e.system_type = 'source content' {filter} 
+                %(search)s GROUP BY e.id ORDER BY {order} {sort};""".format(
                 filter=meta['filter'][0]['operators'],
                 order=', '.join(meta['column']),
                 sort=meta['sort'])

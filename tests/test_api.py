@@ -1,3 +1,5 @@
+import pathlib
+
 from flask import url_for, g
 
 from openatlas import app
@@ -126,14 +128,12 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for('api_subunit', id_=place_id, download=True))
             assert b'Item' in rv.data and b'Pot' not in rv.data
             rv = self.app.get(url_for('api_subunit', id_=place_id, count=True))
-            print(rv.data)
             assert b'1' in rv.data
             rv = self.app.get(url_for('api_subunit_hierarchy', id_=place_id))
             assert b'Pot' in rv.data
             rv = self.app.get(url_for('api_subunit_hierarchy', id_=place_id, download=True))
             assert b'Pot' in rv.data
             rv = self.app.get(url_for('api_subunit_hierarchy', id_=place_id, count=True))
-            print(rv.data)
             assert b'2' in rv.data
 
             # # Parameter: filter
@@ -185,10 +185,8 @@ class ApiTests(TestBaseCase):
                         count=True))
             assert b'1' in rv.data
             rv = self.app.get(url_for('api_node_entities', id_=unit_node.id, count=True))
-            print(rv.data)
             assert b'6' in rv.data
             rv = self.app.get(url_for('api_node_entities_all', id_=unit_node.id, count=True))
-            print(rv.data)
             assert b'14' in rv.data
 
             # Error Codes
