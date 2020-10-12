@@ -1,11 +1,11 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
-import os
 import smtplib
 from datetime import datetime
 from email.header import Header
 from email.mime.text import MIMEText
 from functools import wraps
+from pathlib import Path
 from typing import Any, Dict, List, TYPE_CHECKING, Union
 
 from flask import abort, flash, request, session, url_for
@@ -59,17 +59,15 @@ def send_mail(subject: str,
     return True
 
 
-def get_file_stats(path: str = app.config['UPLOAD_FOLDER_PATH']) -> Dict[Union[int, str], Any]:
+def get_file_stats(path: Path = app.config['UPLOAD_DIR']) -> Dict[Union[int, str], Any]:
     """ Build a dict with file ids and stats from files in given directory.
         It's much faster to do this in one call for every file."""
     file_stats: Dict[Union[int, str], Any] = {}
-    with os.scandir(path) as it:
-        for file in it:
-            split_name = os.path.splitext(file.name)
-            if len(split_name) > 1 and split_name[0].isdigit():
-                file_stats[int(split_name[0])] = {'ext': split_name[1],
-                                                  'size': file.stat().st_size,
-                                                  'date': file.stat().st_ctime}
+    for file in path.iterdir():
+        if file.stem.isdigit():
+            file_stats[int(file.stem)] = {'ext': file.suffix,
+                                          'size': file.stat().st_size,
+                                          'date': file.stat().st_ctime}
     return file_stats
 
 

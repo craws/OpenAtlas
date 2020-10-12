@@ -1,7 +1,6 @@
 import datetime
 import importlib
 import os
-from os.path import basename, splitext
 from typing import Optional, Union
 
 from flask import flash, g, render_template, request, session, url_for
@@ -43,10 +42,9 @@ def admin_index(action: Optional[str] = None, id_: Optional[int] = None) -> Unio
         elif action == 'remove_logo':
             Settings.set_logo()
             return redirect(url_for('admin_index') + '#tab-file')
-    export_path = app.config['EXPORT_FOLDER_PATH']
-    dirs = {'uploads': True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False,
-            'export/sql': True if os.access(export_path.joinpath('sql'), os.W_OK) else False,
-            'export/csv': True if os.access(export_path.joinpath('csv'), os.W_OK) else False}
+    dirs = {'uploads': True if os.access(app.config['UPLOAD_DIR'], os.W_OK) else False,
+            'export/sql': True if os.access(app.config['EXPORT_DIR'] / 'sql', os.W_OK) else False,
+            'export/csv': True if os.access(app.config['EXPORT_DIR'] / 'csv', os.W_OK) else False}
     tables = {'user': Table(['username', 'name', 'group', 'email', 'newsletter', 'created',
                              'last login', 'entities']),
               'content':
@@ -278,7 +276,7 @@ def admin_orphans() -> str:
     # Get orphaned file entities with no corresponding file
     file_ids = []
     for entity in Entity.get_by_system_type('file', nodes=True):
-        file_ids.append(str(entity.id))
+        file_ids.append(entity.id)
         if not get_file_path(entity):
             tables['missing_files'].rows.append([link(entity),
                                                  link(entity.class_),
@@ -289,18 +287,17 @@ def admin_orphans() -> str:
                                                  entity.description])
 
     # Get orphaned files with no corresponding entity
-    with os.scandir(app.config['UPLOAD_FOLDER_PATH']) as it:
-        for file in it:
-            name = file.name
-            if name != '.gitignore' and splitext(file.name)[0] not in file_ids:
-                tables['orphaned_files'].rows.append([
-                    name,
-                    convert_size(file.stat().st_size),
-                    format_date(datetime.datetime.utcfromtimestamp(file.stat().st_ctime)),
-                    splitext(name)[1],
-                    link(_('download'), url_for('download_file', filename=name)),
-                    delete_link(name, url_for('admin_file_delete', filename=name))])
-        return render_template('admin/check_orphans.html', tables=tables)
+    for file in app.config['UPLOAD_DIR'].iterdir():
+        if file.name != '.gitignore' and int(file.stem) not in file_ids:
+            tables['orphaned_files'].rows.append([
+                file.stem,
+                convert_size(file.stat().st_size),
+                format_date(datetime.datetime.utcfromtimestamp(file.stat().st_ctime)),
+                file.suffix,
+                link(_('download'), url_for('download_file', filename=file.name)),
+                delete_link(file.name, url_for('admin_file_delete', filename=file.name))])
+
+    return render_template('admin/check_orphans.html', tables=tables)
 
 
 @app.route('/admin/logo/')
@@ -334,7 +331,7 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
 def admin_file_delete(filename: str) -> Response:  # pragma: no cover
     if filename != 'all':
         try:
-            os.remove(app.config['UPLOAD_FOLDER_PATH'].joinpath(filename))
+            (app.config['UPLOAD_DIR'] / filename).unlink()
             flash(filename + ' ' + _('was deleted'), 'info')
         except Exception as e:
             logger.log('error', 'file', 'deletion of ' + filename + ' failed', e)
@@ -343,17 +340,16 @@ def admin_file_delete(filename: str) -> Response:  # pragma: no cover
 
     if is_authorized('admin'):
         # Get all files with entities
-        file_ids = [str(entity.id) for entity in Entity.get_by_system_type('file')]
+        file_ids = [entity.id for entity in Entity.get_by_system_type('file')]
 
         # Get orphaned files (no corresponding entity)
-        path = app.config['UPLOAD_FOLDER_PATH']
-        for file in [f for f in os.listdir(path) if os.path.isfile(os.path.join(path, f))]:
-            filename = basename(file)
-            if filename != '.gitignore' and splitext(filename)[0] not in file_ids:
+        path = app.config['UPLOAD_DIR']
+        for file in [f for f in path.iterdir() if (path / f).is_file()]:
+            if file.name != '.gitignore' and int(file.stem) not in file_ids:
                 try:
-                    os.remove(app.config['UPLOAD_FOLDER_PATH'].joinpath(filename))
+                    (app.config['UPLOAD_DIR'] / file.name).unlink()
                 except Exception as e:
-                    logger.log('error', 'file', 'deletion of ' + filename + ' failed', e)
+                    logger.log('error', 'file', 'deletion of ' + file.name + ' failed', e)
                     flash(_('error file delete'), 'error')
     return redirect(url_for('admin_orphans') + '#tab-orphaned-files')
 

@@ -42,25 +42,21 @@ class FileForm(FlaskForm):  # type: ignore
         return valid
 
 
-def preview_file(name: str) -> bool:
-    return name.rsplit('.', 1)[1].lower() in app.config['DISPLAY_FILE_EXTENSIONS']
-
-
 @app.route('/download/<path:filename>')
 @required_group('readonly')
 def download_file(filename: str) -> Any:
-    return send_from_directory(app.config['UPLOAD_FOLDER_PATH'], filename, as_attachment=True)
+    return send_from_directory(app.config['UPLOAD_DIR'], filename, as_attachment=True)
 
 
 @app.route('/display/<path:filename>')
 @required_group('readonly')
 def display_file(filename: str) -> Any:
-    return send_from_directory(app.config['UPLOAD_FOLDER_PATH'], filename)
+    return send_from_directory(app.config['UPLOAD_DIR'], filename)
 
 
 @app.route('/display_logo/<path:filename>')
 def display_logo(filename: str) -> Any:  # File display function for public
-    return send_from_directory(app.config['UPLOAD_FOLDER_PATH'], filename)
+    return send_from_directory(app.config['UPLOAD_DIR'], filename)
 
 
 @app.route('/file/set_as_profile_image/<int:id_>/<int:origin_id>')
@@ -90,8 +86,8 @@ def file_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
             flash(_('error database'), 'error')
         try:
             path = get_file_path(id_)
-            if path:
-                os.remove(path)
+            if path:  # Only delete the file on disk if it exists to prevent a missing file error
+                path.unlink()
         except Exception as e:  # pragma: no cover
             logger.log('error', 'file', 'file deletion failed', e)
             flash(_('error file delete'), 'error')
@@ -148,7 +144,7 @@ def file_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
     form = build_form(FileForm, 'File')
     if form.validate_on_submit():
         return redirect(save(form, origin=origin))
-    writeable = True if os.access(app.config['UPLOAD_FOLDER_PATH'], os.W_OK) else False
+    writeable = True if os.access(app.config['UPLOAD_DIR'], os.W_OK) else False
     return render_template('file/insert.html', form=form, origin=origin, writeable=writeable)
 
 
@@ -169,13 +165,16 @@ def file_view(file: Entity) -> str:
         data = add_remove_link(data, link_.domain.name, link_, file, 'reference')
         tabs['reference'].table.rows.append(data)
     path = get_file_path(file.id)
+    preview = False
+    if path and path.suffix.lower() in app.config['DISPLAY_FILE_EXTENSIONS']:
+        preview = True
     return render_template('file/view.html',
                            missing_file=False if path else True,
                            entity=file,
                            info=get_entity_data(file),
                            tabs=tabs,
-                           preview=True if path and preview_file(path) else False,
-                           filename=os.path.basename(path) if path else False)
+                           preview=preview,
+                           filename=path.name if path else False)
 
 
 def save(form: FileForm, file: Optional[Entity] = None, origin: Optional[Entity] = None) -> str:
@@ -189,8 +188,7 @@ def save(form: FileForm, file: Optional[Entity] = None, origin: Optional[Entity]
             # Add an 'a' to prevent emtpy filename
             filename = secure_filename('a' + file_.filename)  # type: ignore
             new_name = str(file.id) + '.' + filename.rsplit('.', 1)[1].lower()
-            full_path = os.path.join(app.config['UPLOAD_FOLDER_PATH'], new_name)
-            file_.save(full_path)
+            file_.save(str(app.config['UPLOAD_DIR'] / new_name))
         file.update(form)
         url = url_for('entity_view', id_=file.id)
         if origin:

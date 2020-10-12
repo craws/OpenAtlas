@@ -1,8 +1,9 @@
+import pathlib
+import random
 import unittest
 from typing import Optional
 
 import psycopg2
-import random
 
 from openatlas import app
 
@@ -41,6 +42,6 @@ class TestBaseCase(unittest.TestCase):
         cursor = connection.cursor()
         for file_name in ['1_structure.sql', '2_data_web.sql', '3_data_model.sql',
                           '4_data_node.sql', 'data_test.sql']:
-            path = app.config['ROOT_PATH'].joinpath('..', 'install', file_name)
-            with open(path, encoding='utf8') as sqlFile:
+            with open(pathlib.Path(app.root_path).parent / 'install' / file_name,
+                      encoding='utf8') as sqlFile:
                 cursor.execute(sqlFile.read())

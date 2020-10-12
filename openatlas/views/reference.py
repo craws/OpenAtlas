@@ -175,8 +175,7 @@ def reference_view(reference: Entity) -> str:
         data = get_base_table_data(range_)
         data.append(link_.description)
         if range_.view_name == 'file':  # pragma: no cover
-            ext = data[3].replace('.', '')
-            data.append(get_profile_image_table_link(range_, reference, ext, profile_image_id))
+            data.append(get_profile_image_table_link(range_, reference, data[3], profile_image_id))
         data = add_edit_link(data, url_for('reference_link_update',
                                            link_id=link_.id,
                                            origin_id=reference.id))

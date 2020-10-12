@@ -19,7 +19,7 @@ in the configuration file (e.g. instance/production.py) default is:
 
 .. code-block:: python
 
-   DISPLAY_FILE_EXTENSIONS = ['bmp', 'gif', 'ico', 'jpeg', 'jpg', 'png', 'svg']
+   DISPLAY_FILE_EXTENSIONS = ['.bmp', '.gif', '.ico', '.jpeg', '.jpg', '.png', '.svg']
 
 Logo
 ----

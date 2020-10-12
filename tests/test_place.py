@@ -1,4 +1,5 @@
 import os
+import pathlib
 
 from flask import g, url_for
 
@@ -120,7 +121,7 @@ class PlaceTest(TestBaseCase):
             assert b'An invalid geometry was entered' in rv.data
 
             # Test Overlays
-            path = app.config['ROOT_PATH'].joinpath('static', 'images', 'layout', 'logo.png')
+            path = pathlib.Path(app.root_path) / 'static' / 'images' / 'layout' / 'logo.png'
             with open(path, 'rb') as img:
                 rv = self.app.post(
                     url_for('file_insert', origin_id=place.id),

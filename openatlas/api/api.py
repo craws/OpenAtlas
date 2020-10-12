@@ -1,5 +1,4 @@
 import itertools
-import os
 from typing import Any, Dict, List
 
 from flask import g, session, url_for
@@ -48,17 +47,17 @@ class Api:
         files = []
         for link in Link.get_links(entity.id, inverse=True):  # pragma: nocover
             if link.domain.system_type == 'file':
-                path = get_file_path(link.domain.id)
                 file_dict = {'@id': url_for('api_entity', id_=link.domain.id, _external=True),
                              'title': link.domain.name}
                 # Todo: better just add licence and if empty ignore somewhere else
                 license_ = Api.get_license(link.domain.id)
                 if license_:
                     file_dict['license'] = license_
+                path = get_file_path(link.domain.id)
                 if path:
                     try:
                         file_dict['url'] = url_for('display_file',
-                                                   filename=os.path.basename(path),
+                                                   filename=path.name,
                                                    _external=True)
                     except TypeError:
                         pass
@@ -106,7 +105,7 @@ class Api:
                 raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
         else:
             pass
-        entity_result =[]
+        entity_result = []
         for entity in entities[:int(meta['limit'])]:
             entity_result.append(Api.get_entity(entity, meta))
         result.append(entity_result)
