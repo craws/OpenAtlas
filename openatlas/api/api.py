@@ -118,19 +118,18 @@ class Api:
     def get_geometry(entity: Entity) -> Dict[str, Any]:
         geometries = []
         shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
-        if entity.location:
-            for geometry in Gis.get_by_id(entity.location.id):
-                geo_dict = {'type': shape[geometry['shape']],
-                            'coordinates': geometry['geometry']['coordinates']}
-                if geometry['description']:
-                    geo_dict['description'] = geometry['description']
-                if geometry['name']:
-                    geo_dict['title'] = geometry['name']
-                geometries.append(geo_dict)
-            if len(geometries) == 1:
-                return geometries[0]
-            else:
-                return {'type': 'GeometryCollection', 'geometries': geometries}
+        for geometry in Gis.get_by_id(entity.location.id):
+            geo_dict = {'type': shape[geometry['shape']],
+                        'coordinates': geometry['geometry']['coordinates']}
+            if geometry['description']:
+                geo_dict['description'] = geometry['description']
+            if geometry['name']:
+                geo_dict['title'] = geometry['name']
+            geometries.append(geo_dict)
+        if len(geometries) == 1:
+            return geometries[0]
+        else:
+            return {'type': 'GeometryCollection', 'geometries': geometries}
 
     @staticmethod
     def get_geonames(entity: Entity) -> Dict[str, Any]:
@@ -197,7 +196,7 @@ class Api:
             features['links'] = [Api.get_geonames(entity)]
 
         # Geometry
-        if 'geometry' in meta['show']:
+        if 'geometry' in meta['show'] and entity.location:
             features['geometry'] = {'type': 'GeometryCollection',
                                     'geometries': [Api.get_geometry(entity)]}
 
