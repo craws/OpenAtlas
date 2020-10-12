@@ -1,3 +1,4 @@
+import itertools
 import os
 from typing import Any, Dict, List
 
@@ -71,6 +72,7 @@ class Api:
                 file_license = link.range.name
 
         return file_license
+
 
     @staticmethod
     def get_node(entity: Entity) -> List[Dict[str, Any]]:
@@ -156,7 +158,9 @@ class Api:
             raise APIError('Entity ID ' + str(id_) + ' doesn\'t exist', status_code=404,
                            payload="404a")
 
+        geonames_link = Geonames.get_geonames_link(entity)
         type_ = 'FeatureCollection'
+
         class_code = ''.join(entity.class_.code + " " + entity.class_.i18n['en']).replace(" ", "_")
         features = {'@id': url_for('entity_view', id_=entity.id, _external=True),
                     'type': 'Feature',

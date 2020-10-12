@@ -4,6 +4,53 @@ html, body, input, select, textarea {
     font-family: helvetica, arial, sans-serif;
 }
 
+.inactive,
+.inactive a {
+    color: #666666;
+}
+
+body {
+    color: #000000;
+}
+
+h1, h2, h3 {
+    font-size: 100%;
+}
+
+.inactive,
+.inactive a {
+    color: #666666;
+}
+
+a,
+.info,
+.jstree-default .jstree-search {
+    color: #007bff;
+}
+
+.overlay {
+    background-color: #000000;
+}
+
+#header,
+.date-switch label.error,
+.info,
+select,
+input[type="text"] {
+    background-color: #ffffff;
+}
+
+.text-preview {
+    border-color: #000000;
+}
+
+textarea,
+input[type=text],
+input[type=password],
+select {
+    border-color: #adadad;
+}
+
 .navbar .dropdown-toggle::after {
     display: none;
 }
@@ -19,8 +66,13 @@ html, body, input, select, textarea {
 
 a.manual {
     font-size: 1.6em;
-    vertical-align: middle;
+    vertical-align: top;
     margin-right: 0.2em;
+}
+
+form ul, form ol, form li {
+    list-style: none;
+    padding: 0;
 }
 
 #global-term {

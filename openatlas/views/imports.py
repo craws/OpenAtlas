@@ -127,8 +127,7 @@ def import_data(project_id: int, class_code: str) -> str:
         class_label = g.classes[class_code].name
     if form.validate_on_submit():
         file_ = request.files['file']
-        file_path = app.config['TMP_FOLDER_PATH'].joinpath(
-            secure_filename(file_.filename))  # type: ignore
+        file_path = app.config['TMP_DIR'] / secure_filename(file_.filename)  # type: ignore
         columns: Dict[str, List[str]] = {'allowed': ['name', 'id', 'description', 'begin_from',
                                                      'begin_to', 'begin_comment', 'end_from',
                                                      'end_to', 'end_comment', 'type_ids'],

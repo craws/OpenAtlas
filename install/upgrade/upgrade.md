@@ -9,6 +9,10 @@ If you are using git and want to update to the latest stable release you can fet
 After following the instructions restart Apache and test if the application is working.
 
     service apache2 restart
+    
+### 5.5.0 to 5.5.1
+
+Execute install/upgrade/5.5.1.sql after making backups (can also be done in Admin/Execute SQL)
 
 ### 5.5.0 to 5.6.0
 
