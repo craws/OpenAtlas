@@ -132,7 +132,7 @@ class Api:
             return {'type': 'GeometryCollection', 'geometries': geometries}
 
     @staticmethod
-    def get_geonames(geonames_link: Optional[Link]) -> Dict[str, Any]:
+    def get_geonames(geonames_link: Link) -> Dict[str, Any]:
         geo_name = {}
         if geonames_link.type.name:
             geo_name['type'] = Api.to_camelcase(geonames_link.type.name)
