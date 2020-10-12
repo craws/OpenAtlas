@@ -73,7 +73,6 @@ class Api:
 
         return file_license
 
-
     @staticmethod
     def get_node(entity: Entity) -> List[Dict[str, Any]]:
         nodes = []
@@ -81,7 +80,7 @@ class Api:
             nodes_dict = {'identifier': url_for('api_entity', id_=node.id, _external=True),
                           'label': node.name}
             for link in Link.get_links(entity.id):
-                if link.range.id == node.id and link.description: # pragma: nocover
+                if link.range.id == node.id and link.description:  # pragma: nocover
                     nodes_dict['value'] = link.description
                     if link.range.id == node.id and node.description:
                         nodes_dict['unit'] = node.description
@@ -90,7 +89,7 @@ class Api:
 
             hierarchy = []
             for root in node.root:
-                hierarchy.append(g.nodes[root].name) # pragma: nocover
+                hierarchy.append(g.nodes[root].name)  # pragma: nocover
             hierarchy.reverse()
             nodes_dict['hierarchy'] = ' > '.join(map(str, hierarchy))
             nodes.append(nodes_dict)
@@ -98,22 +97,21 @@ class Api:
 
     @staticmethod
     def get_time(entity: Entity) -> Dict[str, Any]:
-        if entity.begin_from or entity.end_from:
-            time = {}
-            if entity.begin_from:
-                start = {'earliest': format_date(entity.begin_from)}
-                if entity.begin_to:
-                    start['latest'] = format_date(entity.begin_to)
-                if entity.begin_comment:
-                    start['comment'] = entity.begin_comment
-                time['start'] = start
-            if entity.end_from:
-                end = {'earliest': format_date(entity.end_from)}
-                if entity.end_to:
-                    end['latest'] = format_date(entity.end_to)
-                if entity.end_comment:
-                    end['comment'] = entity.end_comment
-                time['end'] = end
+        time = {}
+        if entity.begin_from:
+            start = {'earliest': format_date(entity.begin_from)}
+            if entity.begin_to:
+                start['latest'] = format_date(entity.begin_to)
+            if entity.begin_comment:
+                start['comment'] = entity.begin_comment
+            time['start'] = start
+        if entity.end_from:
+            end = {'earliest': format_date(entity.end_from)}
+            if entity.end_to:
+                end['latest'] = format_date(entity.end_to)
+            if entity.end_comment:
+                end['comment'] = entity.end_comment
+            time['end'] = end
         return time
 
     @staticmethod
@@ -191,7 +189,8 @@ class Api:
 
         # Time spans
         if Api.get_time(entity) and 'when' in meta['show']:
-            features['when'] = {'timespans': [Api.get_time(entity)]}
+            if entity.begin_from or entity.end_from:
+                features['when'] = {'timespans': [Api.get_time(entity)]}
 
         # Geonames
         if Api.get_geonames(entity) and 'geonames' in meta['show']:
