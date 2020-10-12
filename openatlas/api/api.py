@@ -1,6 +1,6 @@
 import itertools
 import os
-from typing import Any, Dict, List
+from typing import Any, Dict, List, Optional
 
 from flask import g, session, url_for
 
@@ -132,7 +132,7 @@ class Api:
             return {'type': 'GeometryCollection', 'geometries': geometries}
 
     @staticmethod
-    def get_geonames(geonames_link) -> Dict[str, Any]:
+    def get_geonames(geonames_link: Optional[Link]) -> Dict[str, Any]:
         geo_name = {}
         if geonames_link.type.name:
             geo_name['type'] = Api.to_camelcase(geonames_link.type.name)
