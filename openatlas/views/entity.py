@@ -41,7 +41,7 @@ def entity_view(id_: int) -> Union[str, Response]:
     if not entity.view_name:  # pragma: no cover
         flash(_("This entity can't be viewed directly."), 'error')
         abort(400)
-    # return the respective view function, e.g. place_view() in views/place.py if it is a place
+    # Return the respective view function, e.g. place_view() in views/place.py if it is a place
     return getattr(sys.modules['openatlas.views.' + entity.view_name],
                    '{name}_view'.format(name=entity.view_name))(entity)
 
