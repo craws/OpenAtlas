@@ -274,9 +274,9 @@ def admin_orphans() -> str:
         tables['nodes'].rows.append([link(node), link(g.nodes[node.root[-1]])])
 
     # Get orphaned file entities with no corresponding file
-    file_ids = []
+    entity_file_ids = []
     for entity in Entity.get_by_system_type('file', nodes=True):
-        file_ids.append(entity.id)
+        entity_file_ids.append(entity.id)
         if not get_file_path(entity):
             tables['missing_files'].rows.append([link(entity),
                                                  link(entity.class_),
@@ -288,7 +288,7 @@ def admin_orphans() -> str:
 
     # Get orphaned files with no corresponding entity
     for file in app.config['UPLOAD_DIR'].iterdir():
-        if file.name != '.gitignore' and int(file.stem) not in file_ids:
+        if file.name != '.gitignore' and int(file.stem) not in entity_file_ids:
             tables['orphaned_files'].rows.append([
                 file.stem,
                 convert_size(file.stat().st_size),
@@ -298,6 +298,30 @@ def admin_orphans() -> str:
                 delete_link(file.name, url_for('admin_file_delete', filename=file.name))])
 
     return render_template('admin/check_orphans.html', tables=tables)
+
+
+@app.route('/admin/file/delete/<filename>')
+@required_group('contributor')
+def admin_file_delete(filename: str) -> Response:  # pragma: no cover
+    if filename != 'all':  # Delete one file
+        try:
+            (app.config['UPLOAD_DIR'] / filename).unlink()
+            flash(filename + ' ' + _('was deleted'), 'info')
+        except Exception as e:
+            logger.log('error', 'file', 'deletion of ' + filename + ' failed', e)
+            flash(_('error file delete'), 'error')
+        return redirect(url_for('admin_orphans') + '#tab-orphaned-files')
+
+    if is_authorized('admin'):  # Delete all files with no corresponding entity
+        entity_file_ids = [entity.id for entity in Entity.get_by_system_type('file')]
+        for file in app.config['UPLOAD_DIR'].iterdir():
+            if file.name != '.gitignore' and int(file.stem) not in entity_file_ids:
+                try:
+                    (app.config['UPLOAD_DIR'] / file.name).unlink()
+                except Exception as e:
+                    logger.log('error', 'file', 'deletion of ' + file.name + ' failed', e)
+                    flash(_('error file delete'), 'error')
+    return redirect(url_for('admin_orphans') + '#tab-orphaned-files')
 
 
 @app.route('/admin/logo/')
@@ -324,34 +348,6 @@ def admin_logo(id_: Optional[int] = None) -> Union[str, Response]:
             entity.description,
             date])
     return render_template('admin/logo.html', table=table)
-
-
-@app.route('/admin/file/delete/<filename>')
-@required_group('contributor')
-def admin_file_delete(filename: str) -> Response:  # pragma: no cover
-    if filename != 'all':
-        try:
-            (app.config['UPLOAD_DIR'] / filename).unlink()
-            flash(filename + ' ' + _('was deleted'), 'info')
-        except Exception as e:
-            logger.log('error', 'file', 'deletion of ' + filename + ' failed', e)
-            flash(_('error file delete'), 'error')
-        return redirect(url_for('admin_orphans') + '#tab-orphaned-files')
-
-    if is_authorized('admin'):
-        # Get all files with entities
-        file_ids = [entity.id for entity in Entity.get_by_system_type('file')]
-
-        # Get orphaned files (no corresponding entity)
-        path = app.config['UPLOAD_DIR']
-        for file in [f for f in path.iterdir() if (path / f).is_file()]:
-            if file.name != '.gitignore' and int(file.stem) not in file_ids:
-                try:
-                    (app.config['UPLOAD_DIR'] / file.name).unlink()
-                except Exception as e:
-                    logger.log('error', 'file', 'deletion of ' + file.name + ' failed', e)
-                    flash(_('error file delete'), 'error')
-    return redirect(url_for('admin_orphans') + '#tab-orphaned-files')
 
 
 @app.route('/admin/log', methods=['POST', 'GET'])
