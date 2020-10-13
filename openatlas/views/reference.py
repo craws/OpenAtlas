@@ -183,7 +183,7 @@ def reference_view(reference: Entity) -> str:
         tabs[range_.table_name].table.rows.append(data)
     reference.note = User.get_note(reference)
     return render_template('reference/view.html',
-                           reference=reference,
+                           entity=reference,
                            tabs=tabs,
                            info=get_entity_data(reference),
                            profile_image_id=profile_image_id)

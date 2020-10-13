@@ -192,8 +192,8 @@ def save(form: FlaskForm,
 
 
 def event_view(event: Entity) -> str:
-    tabs = {name: Tab(name, origin=event) for name in [
-        'info', 'subs', 'source', 'actor', 'reference', 'file']}
+    tabs = {name: Tab(name, origin=event) for name in ['info', 'subs', 'source', 'actor',
+                                                       'reference', 'file']}
     for sub_event in event.get_linked_entities('P117', inverse=True, nodes=True):
         tabs['subs'].table.rows.append(get_base_table_data(sub_event))
     for link_ in event.get_links(['P11', 'P14', 'P22', 'P23']):
@@ -235,7 +235,7 @@ def event_view(event: Entity) -> str:
     objects = [location.get_linked_entity_safe('P53', True) for location
                in event.get_linked_entities(['P7', 'P26', 'P27'])]
     return render_template('event/view.html',
-                           event=event,
+                           entity=event,
                            tabs=tabs,
                            info=get_entity_data(event),
                            profile_image_id=profile_image_id,

@@ -1,7 +1,7 @@
 {% extends "tabs.html" %}
-{% block title_name %} - {{ actor.name }}{% endblock %}
+{% block title_name %} - {{ entity.name }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('actor'), 'actor_index'], actor.name]|crumb }}
+    {{ [[_('actor'), 'actor_index'], entity.name]|crumb }}
 {% endblock %}
 {% block tab_info %}
     <div class="row">
@@ -9,18 +9,18 @@
             <div class="toolbar">
                 {{ 'menu/actor'|manual }}
                 {% if 'contributor'|is_authorized %}
-                    {{ _('edit')|button(url_for('actor_update', id_=actor.id)) }}
-                    {{ actor|display_delete_link }}
+                    {{ _('edit')|button(url_for('actor_update', id_=entity.id)) }}
+                    {{ entity|display_delete_link }}
                 {% endif %}
-                {{ actor.id|bookmark_toggle }}
+                {{ entity.id|bookmark_toggle }}
             </div>
-            <h1>{{ actor.name }}</h1>
+            <h1>{{ entity.name }}</h1>
             {{ profile_image_id|display_profile_image }}
             <div style="float:left;">
                 {{ info|display_info }}
-                {{ actor|note }}
-                {{ actor|display_external_references }}
-                {{ actor|description }}
+                {{ entity|note }}
+                {{ entity|display_external_references }}
+                {{ entity|description }}
             </div>
         </div>
         <div class="col-6">

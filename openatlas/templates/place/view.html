@@ -1,11 +1,11 @@
 {% extends "tabs.html" %}
-{% block title_name %}- {{ object_.name }}{% endblock %}
+{% block title_name %}- {{ entity.name }}{% endblock %}
 {% block breadcrumb %}
     {{ [['place', 'place_index'],
         structure['place'],
         structure['feature'],
         structure['stratigraphic_unit'],
-        object_.name]|crumb }}
+        entity.name]|crumb }}
 {% endblock %}
 {% block tab_info %}
     <div class="row">
@@ -13,21 +13,21 @@
             <div class="toolbar">
                 {{ 'menu/place'|manual }}
                 {% if 'contributor'|is_authorized %}
-                    {{ _('edit')|button(url_for('place_update', id_=object_.id)) }}
+                    {{ _('edit')|button(url_for('place_update', id_=entity.id)) }}
                     {% if not subunits %}
-                        {{ object_|display_delete_link }}
+                        {{ entity|display_delete_link }}
                     {% endif %}
                 {% endif %}
-                {{ object_.id|bookmark_toggle }}
-                {{ object_|siblings_pager(structure) }}
+                {{ entity.id|bookmark_toggle }}
+                {{ entity|siblings_pager(structure) }}
             </div>
-            <h1>{{ object_.name }}</h1>
+            <h1>{{ entity.name }}</h1>
             {{ profile_image_id|display_profile_image }}
             <div style="float:left;">
                 {{ info|display_info }}
-                {{ object_|note }}
-                {{ object_|display_external_references }}
-                {{ object_|description }}
+                {{ entity|note }}
+                {{ entity|display_external_references }}
+                {{ entity|description }}
             </div>
         </div>
         <div class="col-6">
