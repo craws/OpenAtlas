@@ -4,6 +4,12 @@
     {{ [[_('types'), 'node_index'], node, _('edit')]|crumb }}
 {% endblock %}
 {% block content %}
-    {{ form|display_form(manual_page='form/type') }}
-    {{ table.display()|safe }}
+    <div class="row">
+        <div class="col">
+            {{ form|display_form(manual_page='form/type') }}
+        </div>
+        <div class="col">
+            {{ table.display()|safe }}
+        </div>
+    </div>
 {% endblock %}
