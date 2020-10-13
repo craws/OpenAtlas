@@ -460,10 +460,10 @@ def display_menu(self: Any, entity: Optional[Entity]) -> str:
         if request.path.startswith('/entity'):
             try:
                 entity = Entity.get_by_id(int(request.path.split('/')[-1]))
-            except:  # Catch the exception to prevent a recursive call
+            except:  # Catch exception to prevent a recursive call when dealing with 404
                 pass
         for item in items:
-            if entity:
+            if entity:  # Either origin was passed as entity or entity was build above
                 css = 'active' if entity.view_name == item else ''
             else:
                 css = 'active' if request.path.startswith('/' + item) or \
