@@ -170,7 +170,7 @@ def node_view(node: Node) -> str:
             tabs['entities'].table.rows.append([link(Entity.get_by_id(row.domain_id)),
                                                 link(Entity.get_by_id(row.range_id))])
     return render_template('types/view.html',
-                           node=node,
+                           entity=node,
                            super_=super_,
                            tabs=tabs,
                            root=root,

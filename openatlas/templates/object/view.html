@@ -1,23 +1,23 @@
 {% extends "tabs.html" %}
-{% block title_name %}- {{ object_.name }}{% endblock %}
+{% block title_name %}- {{ entity.name }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('object'), 'object_index'], object_.name]|crumb }}
+    {{ [[_('object'), 'object_index'], entity.name]|crumb }}
 {% endblock %}
 {% block tab_info %}
     <div class="toolbar">
         {{ 'menu/object'|manual }}
         {% if 'contributor'|is_authorized %}
-            {{ _('edit')|button(url_for('object_update', id_=object_.id)) }}
-            {{ object_|display_delete_link }}
+            {{ _('edit')|button(url_for('object_update', id_=entity.id)) }}
+            {{ entity|display_delete_link }}
         {% endif %}
-        {{ object_.id|bookmark_toggle }}
+        {{ entity.id|bookmark_toggle }}
     </div>
-    <h1>{{ object_.name }}</h1>
+    <h1>{{ entity.name }}</h1>
     <div>
         <div style="float:left;">
             {{ info|display_info }}
-            {{ object_|note }}
-            {{ object_|description }}
+            {{ entity|note }}
+            {{ entity|description }}
         </div>
         <div style="clear:both;"></div>
     </div>

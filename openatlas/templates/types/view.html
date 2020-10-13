@@ -1,19 +1,19 @@
 {% extends "tabs.html" %}
-{% block title_name %} - {{ node.name }}{% endblock %}
+{% block title_name %} - {{ entity.name }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('types'), 'node_index'], root, node.name]|crumb }}
+    {{ [[_('types'), 'node_index'], root, entity.name]|crumb }}
 {% endblock %}
 {% block tab_info %}
     <div class="toolbar">
         {{ 'form/type'|manual }}
-        {% if 'editor'|is_authorized and node.root and not root.locked %}
-            {{ _('edit')|button(url_for('node_update', id_=node.id)) }}
-                {% if not node.system and node.count < 1 and not node.subs %}
-                    {{ _('delete')|button(url_for('node_delete', id_=node.id), onclick="return confirm('" + _('delete')|uc_first + " " + node.name.replace("'", '').replace('"', '') + "?');") }}
-                {% endif %}
+        {% if 'editor'|is_authorized and entity.root and not root.locked %}
+            {{ _('edit')|button(url_for('node_update', id_=entity.id)) }}
+            {% if not entity.system and entity.count < 1 and not entity.subs %}
+                {{ _('delete')|button(url_for('node_delete', id_=entity.id), onclick="return confirm('" + _('delete')|uc_first + " " + entity.name.replace("'", '').replace('"', '') + "?');") }}
+            {% endif %}
         {% endif %}
     </div>
-    <h1>{{ node.name }}</h1>
+    <h1>{{ entity.name }}</h1>
     {{ profile_image_id|display_profile_image }}
     <div style="float:left;">
         {% if super_ %}
@@ -21,12 +21,12 @@
         {% endif %}
         {{ info|display_info }}
         {% if root.value_type %}
-            <p>{{ _('unit')|uc_first }}: {{ node.description }}</p>
+            <p>{{ _('unit')|uc_first }}: {{ entity.description }}</p>
         {% else %}
-            {{ node|description }}
+            {{ entity|description }}
         {% endif %}
         <p>
-            {{ _('ID for imports') }}: {{ node.id }}
+            {{ _('ID for imports') }}: {{ entity.id }}
         </p>
     </div>
     <div style="clear:both;"></div>

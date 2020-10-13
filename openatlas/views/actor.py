@@ -266,7 +266,7 @@ def actor_view(actor: Entity) -> str:
         gis_data = None
     actor.note = User.get_note(actor)
     return render_template('actor/view.html',
-                           actor=actor,
+                           entity=actor,
                            info=info,
                            tabs=tabs,
                            gis_data=gis_data,

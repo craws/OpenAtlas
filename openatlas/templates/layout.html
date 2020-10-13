@@ -60,7 +60,7 @@
         </button>
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
             <div class="navbar-nav">
-                {{ origin|display_menu|safe }}
+                {{ entity|display_menu(origin=origin)|safe }}
             </div>
         </div>
         <div style="float: right;">

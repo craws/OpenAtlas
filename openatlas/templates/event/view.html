@@ -1,7 +1,7 @@
 {% extends "tabs.html" %}
-{% block title_name %} - {{ event.name }}{% endblock %}
+{% block title_name %} - {{ entity.name }}{% endblock %}
 {% block breadcrumb %}
-    {{ [[_('event'), 'event_index'], event.name]|crumb }}
+    {{ [[_('event'), 'event_index'], entity.name]|crumb }}
 {% endblock %}
 {% block tab_info %}
     <div class="row">
@@ -9,18 +9,18 @@
             <div class="toolbar">
                 {{ 'menu/event'|manual }}
                 {% if 'contributor'|is_authorized %}
-                    {{ _('edit')|button(url_for('event_update', id_=event.id)) }}
-                    {{ event|display_delete_link }}
+                    {{ _('edit')|button(url_for('event_update', id_=entity.id)) }}
+                    {{ entity|display_delete_link }}
                 {% endif %}
-                {{ event.id|bookmark_toggle }}
+                {{ entity.id|bookmark_toggle }}
             </div>
-            <h1>{{ event.name }}</h1>
+            <h1>{{ entity.name }}</h1>
             {{ profile_image_id|display_profile_image }}
             <div style="float:left;">
                 {{ info|display_info }}
-                {{ event|note }}
-                {{ event|display_external_references }}
-                {{ event|description }}
+                {{ entity|note }}
+                {{ entity|display_external_references }}
+                {{ entity|description }}
             </div>
         </div>
         <div class="col-6">
