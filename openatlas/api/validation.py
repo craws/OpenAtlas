@@ -6,7 +6,7 @@ from openatlas.api.error import APIError
 class Default:
     limit: int = 20
     sort: str = 'ASC'
-    filter: List = [{'clause': 'and e.id >=', 'term': '1'}]
+    filter: List = [{'clause': 'and e.id >=', 'term': 1, 'idx': '0'}]
     column: List = ['name']
     last: Optional[str] = None
     first: Optional[str] = None
@@ -60,7 +60,7 @@ class Validation:
                 raise APIError('No search term.', status_code=404, payload="404i")
             out.append({
                 'idx': idx,
-                'term': filter_[3] if isinstance(filter_[3], int) else '%%' + filter_[3] + '%%',
+                'term': filter_[3] if isinstance(filter_[3], int) else 'LOWER(%%' + filter_[3] + '%%)',
                 'clause': Default.operators_logical[filter_[0]] +
                           ' LOWER(' + Default.column_validation[filter_[1]] + ') ' +
                           Default.operators_compare[filter_[2]]})
