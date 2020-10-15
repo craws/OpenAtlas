@@ -136,17 +136,16 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(url_for('api_subunit_hierarchy', id_=place_id, count=True))
             assert b'2' in rv.data
 
-            # # Parameter: filter
-            # rv = self.app.get(url_for('api_get_by_menu_item',
-            #                           code='place',
-            #                           limit=10,
-            #                           sort='desc',
-            #                           column='name',
-            #                           filter='and|name|eq|Nostromos)'))
-            # assert b'Nostromos' in rv.data
-            # rv = self.app.get(url_for('api_get_by_menu_item', code='reference'))
-            # assert b'openatlas' in rv.data
-            #
+            # Parameter: filter
+            rv = self.app.get(url_for('api_get_by_menu_item',
+                                      code='place',
+                                      limit=10,
+                                      sort='desc',
+                                      column='name',
+                                      filter='or|name|like|Nostromos'))
+            assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('api_get_by_menu_item', code='reference'))
+            assert b'openatlas' in rv.data
             # rv = self.app.get(url_for('api_get_by_class',
             #                           class_code='E18',
             #                           filter='and|name|in|("Nostromos", "hallo")'))
@@ -155,10 +154,10 @@ class ApiTests(TestBaseCase):
             #                           class_code='E18',
             #                           filter='AND|NAME|in|("Nostromos")'))
             # assert b'Nostromos' in rv.data
-            # rv = self.app.get(url_for('api_get_by_class',
-            #                           class_code='E18',
-            #                           filter='or|name|like|Nostr)'))
-            # assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('api_get_by_class',
+                                      class_code='E18',
+                                      filter='or|name|like|Nostr'))
+            assert b'Nostromos' in rv.data
 
             # Parameter: last
             rv = self.app.get(url_for('api_get_by_class', class_code='E18', last=place_id))
