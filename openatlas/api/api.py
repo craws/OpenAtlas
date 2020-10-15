@@ -1,4 +1,3 @@
-import os
 from typing import Any, Dict, List
 
 from flask import g, session, url_for
@@ -24,7 +23,6 @@ class Api:
     @staticmethod
     def get_links(entity: Entity) -> List[Dict[str, str]]:
         links = []
-
         for link in Link.get_links(entity.id):
             links.append({'label': link.range.name,
                           'relationTo': url_for('api_entity', id_=link.range.id, _external=True),
@@ -43,21 +41,15 @@ class Api:
     @staticmethod
     def get_file(entity: Entity) -> List[Dict[str, str]]:
         files = []
-        for link in Link.get_links(entity.id, inverse=True):  # pragma: nocover
+        for link in Link.get_links(entity.id, codes="P67", inverse=True):  # pragma: nocover
             if link.domain.system_type == 'file':
-                file_dict = {'@id': url_for('api_entity', id_=link.domain.id, _external=True),
-                             'title': link.domain.name}
-                if Api.get_license(link.domain.id):
-                    file_dict['license'] = Api.get_license(link.domain.id)
-                if get_file_path(link.domain.id):
-                    try:
-                        file_dict['url'] = url_for('display_file',
-                                                   filename=os.path.basename(
-                                                       get_file_path(link.domain.id)),
-                                                   _external=True)
-                    except TypeError:
-                        pass
-                    files.append(file_dict)
+                path = get_file_path(link.domain.id)
+                files.append({'@id': url_for('api_entity', id_=link.domain.id, _external=True),
+                              'title': link.domain.name,
+                              'license': Api.get_license(link.domain.id),
+                              'url': url_for('display_file',
+                                             filename=path.name,
+                                             _external=True) if path else "N/A"})
         return files
 
     @staticmethod
