@@ -53,8 +53,8 @@ class Validation:
             out.append({
                 'idx': idx,
                 'term': filter_[3] if isinstance(filter_[3], int) else '%%' + filter_[3] + '%%',
-                'clause': Default.operators_logical[filter_[0]] + ' ' +
-                          Default.column_validation[filter_[1]] + ' ' +
+                'clause': Default.operators_logical[filter_[0]] +
+                          ' LOWER(' + Default.column_validation[filter_[1]] + ') ' +
                           Default.operators_compare[filter_[2]]})
         return out
 

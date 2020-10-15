@@ -106,13 +106,14 @@ class Query:
         clause = ""
         parameters = {'codes': tuple(code if isinstance(code, list) else [code])}
         for filter_ in meta['filter']:
-            clause += ' ' + filter_['clause'] + ' %(' + str(filter_['idx']) + ')s'
+            clause += ' ' + filter_['clause'] + ' LOWER(%(' + str(filter_['idx']) + ')s)'
             parameters[str(filter_['idx'])] = filter_['term']
         sql = Query.build_sql() + """
             WHERE class_code IN %(codes)s {clause} 
             ORDER BY {order} {sort};""".format(clause=clause,
                                                order=', '.join(meta['column']),
                                                sort=meta['sort'])
+        print(sql)
         g.execute(sql, parameters)
         return [Query(row) for row in g.cursor.fetchall()]
 
@@ -123,7 +124,7 @@ class Query:
         clause = ""
         parameters = {'codes': tuple(app.config['CLASS_CODES'][menu_item])}
         for filter_ in meta['filter']:
-            clause += ' ' + filter_['clause'] + ' %(' + str(filter_['idx']) + ')s'
+            clause += ' ' + filter_['clause'] + ' LOWER(%(' + str(filter_['idx']) + ')s)'
             parameters[str(filter_['idx'])] = filter_['term']
         if menu_item == 'source':
             sql = Query.build_sql(nodes=True) + """
