@@ -1,5 +1,7 @@
 from typing import Any, Dict, List, Optional, Union
 
+from openatlas.api.error import APIError
+
 
 class Default:
     limit: int = 20
@@ -44,12 +46,18 @@ class Validation:
         if not filter_:
             return Default.filter
         # Validate operators and add unsanitized 4th value
-        data = [[word for word in f.split('|') if
-                 f.split('|')[0] in Default.operators_logical.keys() and f.split('|')[
-                     1] in Default.column_validation and f.split('|')[
-                     2] in Default.operators_compare.keys()] for f in filter_]
+        data = [[word for word in f.split('|')
+                 if f.split('|')[0] in Default.operators_logical.keys()
+                 and f.split('|')[1] in Default.column_validation
+                 and f.split('|')[2] in Default.operators_compare.keys()]
+                for f in filter_]
         out = []
+        for i in data:
+            if not i:
+                raise APIError('Filter operators are wrong.', status_code=404, payload="404j")
         for idx, filter_ in enumerate(data):
+            if not filter_[3]:
+                raise APIError('No search term.', status_code=404, payload="404i")
             out.append({
                 'idx': idx,
                 'term': filter_[3] if isinstance(filter_[3], int) else '%%' + filter_[3] + '%%',
