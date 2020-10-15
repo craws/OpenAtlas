@@ -102,16 +102,18 @@ class Query:
         return sql
 
     @staticmethod
-    def get_by_class_code(code: Union[str, List[str]],
-                          meta: Dict[str, Any]) -> List[Query]:
-        codes = code if isinstance(code, list) else [code]
-        sql = Query.build_sql() + """WHERE class_code IN %(codes)s {filter} %(search)s
-             ORDER BY {order} {sort};""".format(
-            filter=meta['filter'][0]['operators'],
-            order=', '.join(meta['column']),  # join the list
-            sort=meta['sort'])
-        g.execute(sql, {'codes': tuple(codes), 'search': meta['filter'][0]['query']})
-
+    def get_by_class_code(code: Union[str, List[str]], meta: Dict[str, Any]) -> List[Query]:
+        clause = ""
+        parameters = {'codes': tuple(code if isinstance(code, list) else [code])}
+        for filter_ in meta['filter']:
+            clause += ' ' + filter_['clause'] + ' %(' + str(filter_['idx']) + ')s'
+            parameters[str(filter_['idx'])] = filter_['term']
+        sql = Query.build_sql() + """
+            WHERE class_code IN %(codes)s {clause} 
+            ORDER BY {order} {sort};""".format(clause=clause,
+                                               order=', '.join(meta['column']),
+                                               sort=meta['sort'])
+        g.execute(sql, parameters)
         return [Query(row) for row in g.cursor.fetchall()]
 
     @staticmethod

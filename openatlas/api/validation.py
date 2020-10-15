@@ -4,7 +4,7 @@ from typing import Any, Dict, List, Optional, Union
 class Default:
     limit: int = 20
     sort: str = 'ASC'
-    filter: List = [{'operators': 'and e.id >=', 'query': '1'}]
+    filter: List = [{'clause': 'and e.id >=', 'term': '1'}]
     column: List = ['name']
     last: Optional[str] = None
     first: Optional[str] = None
@@ -48,9 +48,14 @@ class Validation:
                  f.split('|')[0] in Default.operators_logical.keys() and f.split('|')[
                      1] in Default.column_validation and f.split('|')[
                      2] in Default.operators_compare.keys()] for f in filter_]
-        out = [{'operators': Default.operators_logical[i[0]] + ' ' + Default.column_validation[
-            i[1]] + ' ' + Default.operators_compare[i[2]],
-                'query': i[3] if isinstance(i[3], int) else i[3] + '%%'} for i in data if i]
+        out = []
+        for idx, filter_ in enumerate(data):
+            out.append({
+                'idx': idx,
+                'term': filter_[3] if isinstance(filter_[3], int) else '%%' + filter_[3] + '%%',
+                'clause': Default.operators_logical[filter_[0]] + ' ' +
+                          Default.column_validation[filter_[1]] + ' ' +
+                          Default.operators_compare[filter_[2]]})
         return out
 
     @staticmethod
