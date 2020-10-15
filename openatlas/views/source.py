@@ -160,7 +160,7 @@ def source_view(source: Entity) -> str:
         tabs[domain.view_name].table.rows.append(data)
     source.note = User.get_note(source)
     return render_template('source/view.html',
-                           source=source,
+                           entity=source,
                            tabs=tabs,
                            info=get_entity_data(source),
                            profile_image_id=profile_image_id)

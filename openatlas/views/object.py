@@ -80,7 +80,7 @@ def object_view(object_: Entity) -> str:
         tabs['event'].table.rows.append(data)
     object_.note = User.get_note(object_)
     return render_template('object/view.html',
-                           object_=object_,
+                           entity=object_,
                            tabs=tabs,
                            info=get_entity_data(object_))
 

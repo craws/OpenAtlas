@@ -263,7 +263,7 @@ def place_view(obj: Entity) -> str:
             and (not structure or not structure['super_id']):
         gis_data = {}
     return render_template('place/view.html',
-                           object_=obj,
+                           entity=obj,
                            tabs=tabs,
                            overlays=overlays,
                            info=get_entity_data(obj, location),

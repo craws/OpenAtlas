@@ -14,7 +14,7 @@ from werkzeug.exceptions import abort
 from openatlas import app
 from openatlas.models.date import Date
 from openatlas.models.link import Link
-from openatlas.util.display import get_file_extension
+from openatlas.util.display import get_file_extension, link
 from openatlas.util.util import is_authorized
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
@@ -235,7 +235,7 @@ class Entity:
         root_id = Node.get_hierarchy(root_name).id
         for node in self.nodes:
             if node.root and node.root[-1] == root_id:
-                return node.name
+                return link(node)
         return ''
 
     def get_name_directed(self, inverse: bool = False) -> str:

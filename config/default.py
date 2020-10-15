@@ -1,5 +1,5 @@
 # Don't edit this file. To override settings please use instance/production.py
-import pathlib
+from pathlib import Path
 
 from openatlas import app
 
@@ -18,16 +18,15 @@ DATABASE_PASS = 'CHANGE ME'
 MAIL_PASSWORD = 'CHANGE ME'
 SECRET_KEY = 'CHANGE ME'
 
-
 # Files with these extensions are available as profile image and will be displayed in the browser
 DISPLAY_FILE_EXTENSIONS = ['.bmp', '.gif', '.ico', '.jpeg', '.jpg', '.png', '.svg']
 
 # Paths are implemented operating system independent using pathlib.
 # If you want to override them (in instance/production.py) either use them like here
 # or use absolute paths like e.g. pathlib.Path('/some/location/somewhere')
-TMP_DIR = pathlib.Path('/tmp')  # e.g. for processing import/export files
-EXPORT_DIR = pathlib.Path(app.root_path) / 'export'
-UPLOAD_DIR = pathlib.Path(app.root_path) / 'uploads'
+TMP_DIR = Path('/tmp')  # e.g. for processing import/export files
+EXPORT_DIR = Path(app.root_path) / 'export'
+UPLOAD_DIR = Path(app.root_path) / 'uploads'
 
 # Security
 SESSION_COOKIE_SECURE = False  # Should be set to True in production.py if using HTTPS only

@@ -73,7 +73,7 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
         flash(_('info update'), 'info')
         return redirect(url_for('node_index') + tab_hash + str(root.id))
     form.multiple = root.multiple
-    table = Table(['form', 'count'], paging=False)
+    table = Table(paging=False)
     for form_id, form_ in root.forms.items():
         link_ = link(_('remove'), url_for('hierarchy_remove_form', id_=root.id, remove_id=form_id))
         count = Node.get_form_count(root, form_id)

@@ -452,22 +452,21 @@ def display_delete_link(self: Any, entity: Entity) -> str:
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
-def display_menu(self: Any, entity: Optional[Entity]) -> str:
+def display_menu(self: Any, entity: Optional[Entity], origin: Optional[Entity]) -> str:
     """ Returns HTML with the menu and mark appropriate item as selected."""
     html = ''
     if current_user.is_authenticated:
         items = ['source', 'event', 'actor', 'place', 'reference', 'object', 'types']
-        if request.path.startswith('/entity'):
-            try:
-                entity = Entity.get_by_id(int(request.path.split('/')[-1]))
-            except:  # Catch the exception to prevent a recursive call
-                pass
+        view_name = ''
+        if entity:
+            view_name = entity.view_name
+        if origin:
+            view_name = origin.view_name
         for item in items:
-            if entity:
-                css = 'active' if entity.view_name == item else ''
+            if view_name:
+                css = 'active' if view_name.replace('node', 'types') == item else ''
             else:
-                css = 'active' if request.path.startswith('/' + item) or \
-                                  (item == 'overview' and request.path == '/') else ''
+                css = 'active' if request.path.startswith('/' + item) else ''
             html += '<a href="/{item}" class="nav-item nav-link {css}">{label}</a>'.format(
                 css=css, item=item, label=display.uc_first(_(item)))
     return html
