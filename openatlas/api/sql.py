@@ -120,29 +120,31 @@ class Query:
     def get_by_menu_item(menu_item: str,
                          meta: Dict[str, Any]) -> List[Query]:  # pragma: no cover
         # Possible class names: actor, event, place, reference, source, object
+        clause = ""
+        parameters = {'codes': tuple(app.config['CLASS_CODES'][menu_item])}
+        for filter_ in meta['filter']:
+            clause += ' ' + filter_['clause'] + ' %(' + str(filter_['idx']) + ')s'
+            parameters[str(filter_['idx'])] = filter_['term']
         if menu_item == 'source':
             sql = Query.build_sql(nodes=True) + """
-                WHERE e.class_code IN %(codes)s AND e.system_type = 'source content' {filter} 
-                %(search)s GROUP BY e.id ORDER BY {order} {sort};""".format(
-                filter=meta['filter'][0]['operators'],
-                order=', '.join(meta['column']),
-                sort=meta['sort'])
+                WHERE e.class_code IN %(codes)s AND e.system_type = 'source content' {clause}
+                 GROUP BY e.id ORDER BY {order} {sort};""".format(clause=clause,
+                                                                  order=', '.join(meta['column']),
+                                                                  sort=meta['sort'])
         elif menu_item == 'reference':
             sql = Query.build_sql(nodes=True) + """
-                WHERE e.class_code IN %(codes)s AND e.system_type != 'file' {filter}  %(search)s
-                 GROUP BY e.id ORDER BY {order} {sort};""".format(
-                filter=meta['filter'][0]['operators'],
-                order=', '.join(meta['column']),
-                sort=meta['sort'])
+                WHERE e.class_code IN %(codes)s AND e.system_type != 'file' {clause} 
+                 GROUP BY e.id ORDER BY {order} {sort};""".format(clause=clause,
+                                                                  order=', '.join(meta['column']),
+                                                                  sort=meta['sort'])
         else:
             aliases = True if menu_item == 'actor' and current_user.is_authenticated and \
                               current_user.settings['table_show_aliases'] else False
             sql = Query.build_sql(nodes=True if menu_item == 'event' else False,
                                   aliases=aliases) + """
-                WHERE e.class_code IN %(codes)s {filter} %(search)s GROUP BY e.id
-                ORDER BY {order} {sort};""".format(filter=meta['filter'][0]['operators'],
+                WHERE e.class_code IN %(codes)s {clause} GROUP BY e.id
+                ORDER BY {order} {sort};""".format(clause=clause,
                                                    order=', '.join(meta['column']),
                                                    sort=meta['sort'])
-        g.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][menu_item]),
-                        'search': meta['filter'][0]['query']})
+        g.execute(sql, parameters)
         return [Query(row) for row in g.cursor.fetchall()]
