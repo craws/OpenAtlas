@@ -113,6 +113,8 @@ class Query:
             ORDER BY {order} {sort};""".format(clause=clause,
                                                order=', '.join(meta['column']),
                                                sort=meta['sort'])
+        print(sql)
+        print(parameters)
         g.execute(sql, parameters)
         return [Query(row) for row in g.cursor.fetchall()]
 

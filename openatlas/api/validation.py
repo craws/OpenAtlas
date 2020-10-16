@@ -51,6 +51,7 @@ class Validation:
                  and f.split('|')[1] in Default.column_validation
                  and f.split('|')[2] in Default.operators_compare.keys()]
                 for f in filter_]
+        print(data)
         out = []
         for i in data:
             if not i:
@@ -58,12 +59,17 @@ class Validation:
         for idx, filter_ in enumerate(data):
             if not filter_[3]:
                 raise APIError('No search term.', status_code=404, payload="404i")
+
+            column = Default.column_validation[filter_[1]] \
+                if filter_[3].isdigit() else 'LOWER(' + Default.column_validation[filter_[1]] + ')'
             out.append({
                 'idx': idx,
-                'term': filter_[3] if isinstance(filter_[3], int) else 'LOWER(%%' + filter_[3] + '%%)',
-                'clause': Default.operators_logical[filter_[0]] +
-                          ' LOWER(' + Default.column_validation[filter_[1]] + ') ' +
+                'term': int(filter_[3]) if filter_[3].isdigit() else 'LOWER(%' + filter_[
+                    3] + '%)',
+                'clause': Default.operators_logical[filter_[0]] + ' ' +
+                          column + ' ' +
                           Default.operators_compare[filter_[2]]})
+        print(out)
         return out
 
     @staticmethod
