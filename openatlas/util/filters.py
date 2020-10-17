@@ -382,8 +382,9 @@ def display_form(self: Any,
                                  field=field(class_=class_),
                                  tooltip=tooltip)
             continue
-        if field.id == 'geonames_id':
-            precision_field = getattr(form, 'geonames_precision')
+        if field.id in ['geonames_id', 'wikidata_id']:
+            name = field.id.replace('_id', '')
+            precision_field = getattr(form, name + '_precision')
             html['main'] += '''
             <div class="table-row">
                 <div>{label} {tooltip}</div>
@@ -395,8 +396,8 @@ def display_form(self: Any,
                              precision_field=precision_field,
                              precision_label=precision_field.label)
             continue
-        if field.id == 'geonames_precision':
-            continue  # Is already added with geonames_id field
+        if field.id in ['geonames_precision', 'wikidata_precision']:
+            continue  # Is already added with _id field
         html['main'] += '''
             <div class="table-row">
                 <div>{label} {tooltip}</div>
@@ -508,9 +509,10 @@ def display_external_references(self: Any, entity: Entity) -> str:
         if link_.domain.system_type == 'external reference geonames':
             name = 'GeoNames (' + link_.domain.name + ')'
             url = session['settings']['geonames_url'] + link_.domain.name
+        if link_.domain.system_type == 'external reference wikidata':
+            name = 'Wikidata (' + link_.domain.name + ')'
+            url = app.config['WIKIDATA_URL'] + link_.domain.name
         html += '<a target="_blank" href="{url}">{name}</a><br>'.format(url=url, name=name)
-    if 'module_wikidata' in current_user.settings and current_user.settings['module_wikidata']:
-        html += '<p>Wikidata<p/>'
     if not html:
         return ''
     return Markup('<h2>' + display.uc_first(_('external references')) + '</h2>' + html)

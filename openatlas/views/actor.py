@@ -28,7 +28,6 @@ class ActorForm(DateForm):
     residence = TableField(_('residence'))
     begins_in = TableField()
     ends_in = TableField()
-    wikidata_id = StringField('Wikidata Id')
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
     insert_and_continue = SubmitField(_('insert and continue'))

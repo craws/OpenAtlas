@@ -137,7 +137,7 @@ span.tab-counter {
     width: 36em;
 }
 
-#geonames_id {
+#geonames_id, #wikidata_id {
     width: 5em;
 }
 

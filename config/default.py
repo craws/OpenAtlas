@@ -36,6 +36,9 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 # Key for Thunderforest map layer
 THUNDERFOREST_KEY = '7878b4fb224f4902ab42fc846e92b96a'
 
+# External References
+WIKIDATA_URL = 'https://www.wikidata.org/entity/'
+
 # API
 API_SCHEMA = 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.jsonld'
 CORS_ALLOWANCE = '*'  # Cross-Origin source (CORS), declared here because used in decorators

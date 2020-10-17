@@ -29,6 +29,8 @@ class PlaceForm(DateForm):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     geonames_id = IntegerField('GeoNames Id', [OptValidator()], description=_('tooltip geonames'))
     geonames_precision = BooleanField('exact match')
+    wikidata_id = StringField('Wikidata Id', [OptValidator()])
+    wikidata_precision = BooleanField('exact match')
     alias = FieldList(StringField(''), description=_('tooltip alias'))
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
@@ -167,13 +169,14 @@ def place_update(id_: int) -> Union[str, Response]:
         for alias in object_.aliases.values():
             form.alias.append_entry(alias)
         form.alias.append_entry('')
-    if hasattr(form, 'geonames_id') and current_user.settings['module_geonames']:
-        geonames_link = Reference.get_link(object_)
-        if geonames_link:
-            geonames_entity = geonames_link.domain
-            form.geonames_id.data = geonames_entity.name if geonames_entity else ''
-            exact_match = True if g.nodes[geonames_link.type.id].name == 'exact match' else False
-            form.geonames_precision.data = exact_match
+    for name in ['geonames', 'wikidata']:
+        if hasattr(form, name + '_id') and current_user.settings['module_' + name]:
+            link_ = Reference.get_link(object_, name)
+            if link_:
+                reference = link_.domain
+                getattr(form, name + '_id').data = reference.name if reference else ''
+                exact_match = True if g.nodes[link_.type.id].name == 'exact match' else False
+                getattr(form, name + '_precision').data = exact_match
     structure = get_structure(object_)
     return render_template('place/update.html',
                            form=form,
@@ -297,8 +300,7 @@ def save(form: DateForm,
             object_.link('P53', location)
         object_.update(form)
         location.update(form)
-        if hasattr(form, 'geonames_id') and current_user.settings['module_geonames']:
-            Reference.update(form, object_)
+        Reference.update(form, object_)
         url = url_for('entity_view', id_=object_.id)
         if origin:
             url = url_for('entity_view', id_=origin.id) + '#tab-place'

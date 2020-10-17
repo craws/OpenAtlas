@@ -224,7 +224,7 @@ class Entity:
         root_name = self.view_name.title()
         if self.view_name == 'reference':
             root_name = self.system_type.title()
-            if root_name == 'External Reference Geonames':
+            if root_name in ['External Reference Geonames', 'External Reference Wikidata']:
                 root_name = 'External Reference'
         elif self.view_name == 'file':
             root_name = 'License'

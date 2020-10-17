@@ -120,7 +120,7 @@ class Api:
 
     @staticmethod
     def get_geonames(entity: Entity) -> Dict[str, Any]:
-        geonames_link = Reference.get_link(entity)
+        geonames_link = Reference.get_link(entity, 'geonames')
         if geonames_link and geonames_link.range.class_.code == 'E18':
             geo_name = {}
             if geonames_link.type.name:
