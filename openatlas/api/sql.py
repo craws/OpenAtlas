@@ -16,7 +16,7 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
 
 class Query:
 
-    def __init__(self, row: NamedTupleCursor.Record) -> None: # pragma: no cover
+    def __init__(self, row: NamedTupleCursor.Record) -> None:  # pragma: no cover
         from openatlas.forms.date import DateForm
 
         self.id = row.id
@@ -69,7 +69,7 @@ class Query:
             self.table_name = self.system_type.replace(' ', '_')
 
     @staticmethod
-    def build_sql(nodes: bool = False, aliases: bool = False) -> str: # pragma: no cover
+    def build_sql(nodes: bool = False, aliases: bool = False) -> str:  # pragma: no cover
         # Performance: only join nodes and/or aliases if requested
         sql = """
             SELECT
@@ -102,43 +102,49 @@ class Query:
         return sql
 
     @staticmethod
-    def get_by_class_code(code: Union[str, List[str]],
-                          meta: Dict[str, Any]) -> List[Query]:
-        codes = code if isinstance(code, list) else [code]
-        g.execute(
-            Query.build_sql() + """WHERE class_code IN %(codes)s {filter}
-             ORDER BY {order} {sort};""".format(
-                filter=meta['filter'],
-                order=meta['column'],
-                sort=meta['sort']),
-            {'codes': tuple(codes)})
-
+    def get_by_class_code(code: Union[str, List[str]], meta: Dict[str, Any]) -> List[Query]:
+        clause = ""
+        parameters = {'codes': tuple(code if isinstance(code, list) else [code])}
+        for filter_ in meta['filter']:
+            clause += ' ' + filter_['clause'] + ' %(' + str(filter_['idx']) + ')s'
+            parameters[str(filter_['idx'])] = filter_['term']
+        sql = Query.build_sql() + """
+            WHERE class_code IN %(codes)s {clause} 
+            ORDER BY {order} {sort};""".format(clause=clause,
+                                               order=', '.join(meta['column']),
+                                               sort=meta['sort'])
+        g.execute(sql, parameters)
         return [Query(row) for row in g.cursor.fetchall()]
 
     @staticmethod
     def get_by_menu_item(menu_item: str,
                          meta: Dict[str, Any]) -> List[Query]:  # pragma: no cover
         # Possible class names: actor, event, place, reference, source, object
+        clause = ""
+        parameters = {'codes': tuple(app.config['CLASS_CODES'][menu_item])}
+        for filter_ in meta['filter']:
+            clause += ' ' + filter_['clause'] + ' %(' + str(filter_['idx']) + ')s'
+            parameters[str(filter_['idx'])] = filter_['term']
         if menu_item == 'source':
             sql = Query.build_sql(nodes=True) + """
-                WHERE e.class_code IN %(codes)s AND e.system_type = 'source content' {filter}
-                GROUP BY e.id ORDER BY {order} {sort};""".format(filter=meta['filter'],
-                                                                 order=meta['column'],
-                                                                 sort=meta['sort'])
+                WHERE e.class_code IN %(codes)s AND e.system_type = 'source content' {clause}
+                 GROUP BY e.id ORDER BY {order} {sort};""".format(clause=clause,
+                                                                  order=', '.join(meta['column']),
+                                                                  sort=meta['sort'])
         elif menu_item == 'reference':
             sql = Query.build_sql(nodes=True) + """
-                WHERE e.class_code IN %(codes)s AND e.system_type != 'file' {filter} GROUP BY e.id
-                 ORDER BY {order} {sort};""".format(filter=meta['filter'],
-                                                    order=meta['column'],
-                                                    sort=meta['sort'])
+                WHERE e.class_code IN %(codes)s AND e.system_type != 'file' {clause} 
+                 GROUP BY e.id ORDER BY {order} {sort};""".format(clause=clause,
+                                                                  order=', '.join(meta['column']),
+                                                                  sort=meta['sort'])
         else:
             aliases = True if menu_item == 'actor' and current_user.is_authenticated and \
                               current_user.settings['table_show_aliases'] else False
             sql = Query.build_sql(nodes=True if menu_item == 'event' else False,
                                   aliases=aliases) + """
-                WHERE e.class_code IN %(codes)s {filter} GROUP BY e.id
-                ORDER BY {order} {sort};""".format(filter=meta['filter'],
-                                                   order=meta['column'],
+                WHERE e.class_code IN %(codes)s {clause} GROUP BY e.id
+                ORDER BY {order} {sort};""".format(clause=clause,
+                                                   order=', '.join(meta['column']),
                                                    sort=meta['sort'])
-        g.execute(sql, {'codes': tuple(app.config['CLASS_CODES'][menu_item])})
+        g.execute(sql, parameters)
         return [Query(row) for row in g.cursor.fetchall()]

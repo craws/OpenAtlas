@@ -14,15 +14,20 @@ class APIError(Exception):
                "Please authenticate with the server, either through login via the "
                "user interface or token based authentication.",
         "404": "Something went wrong! Maybe only digits are allowed. Please check the URL",
-        "404a": "The requested entity doesn't exist. Try another ID",
-        "404b": "The syntax is incorrect. Only digits are allowed. "
-                "For further usage, please confer the help page",
-        "404c": "The syntax is incorrect. Valid codes are: actor, event, place, source,"
-                " reference and object. For further usage, please confer the help page.",
-        "404d": "The class code is not supported or contains no entities."
-                "For the classes please confer the model.",
-        "404e": "The syntax is incorrect. Only integers between 1 and 100 are allowed.",
+        "404a": "The requested ID doesn't exist. Try another entity ID",
+        "404b": "That is not a valid ID. Only digits are allowed. "
+                "For further usage, please confer the help page.",
+        "404c": "The code is not valid. Valid codes are: actor, event, place, source, "
+                "reference and object. For further usage, please confer the help page.",
+        "404d": "This is not a valid CIDOC CRM class code. "
+                "Please confer the model.",
+        "404e": "Only integers between 1 and 100 are allowed.",
         "404f": "The syntax is incorrect. Only valid operators are allowed.",
+        "404g": "The requested node or subunit doesn't exist. Try another node ID",
+        "404h": "The query path needs a valid parameter input. Valid inputs are entities, classes"
+                " and items. Please confer the help page.",
+        "404i": "The filter parameter has no search string.",
+        "404j": "The filter operators are wrong",
         "405": "The method used is not supported. Right now only GET is allowed.",
         "500": "Please notify the administrator. Sorry for the inconvenience."}
 

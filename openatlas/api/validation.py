@@ -1,5 +1,4 @@
-import re
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Union
 
 from openatlas.api.error import APIError
 
@@ -7,62 +6,65 @@ from openatlas.api.error import APIError
 class Default:
     limit: int = 20
     sort: str = 'ASC'
-    filter: str = ''
-    column: str = 'name'
+    filter: List = [{'clause': 'and e.id >=', 'term': 1, 'idx': '0'}]
+    column: List = ['name']
     last: Optional[str] = None
     first: Optional[str] = None
     count: bool = False
-    operators_dict: Dict[str, Any] = {'eq': '=', 'ne': '!=', 'lt': '<', 'le': '<=', 'gt': '>',
-                                      'ge': '>=', 'and': 'AND', 'or': 'OR', 'onot': 'OR NOT',
-                                      'anot': 'AND NOT', 'like': 'LIKE', 'in': 'IN'}
-    column_validation: List[str] = ['id', 'class_code', 'name', 'description', 'created', 'end_to',
-                                    'modified', 'system_type', 'begin_from', 'begin_to', 'end_from']
+    download: bool = False
+    operators_compare: Dict[str, Any] = {'eq': '=', 'ne': '!=', 'lt': '<', 'le': '<=', 'gt': '>',
+                                         'ge': '>=', 'like': 'LIKE', 'in': 'IN'}
+    operators_logical: Dict[str, Any] = {'and': 'AND', 'or': 'OR', 'onot': 'OR NOT',
+                                         'anot': 'AND NOT'}
+    column_validation: Dict[str, str] = {'id': 'e.id', 'class_code': 'e.class_code',
+                                         'name': 'e.name', 'description': 'e.description',
+                                         'created': 'e.created', 'end_to': 'e.end_to',
+                                         'modified': 'e.modified', 'system_type': 'e.system_type',
+                                         'begin_from': 'e.begin_from', 'begin_to': 'e.begin_to',
+                                         'end_from': 'e.end_from'}
     show_validation: List[str] = ['when', 'types', 'relations', 'names', 'links', 'geometry',
-                                  'depictions']
+                                  'depictions', 'geonames']
 
 
 class Validation:
 
     @staticmethod
     def validate_url_query(query: Any) -> Dict[str, Any]:
-        return {'filter': Validation.validate_filter(query.get('filter')),
+        return {'filter': Validation.validate_filter(query.getlist('filter')),  # has to be list
                 'limit': Validation.validate_limit(query.get('limit')),
                 'sort': Validation.validate_sort(query.get('sort')),
-                'column': Validation.validate_column(query.get('column')),
+                'column': Validation.validate_column(query.getlist('column')),  # has to be list
                 'last': Validation.validate_last(query.get('last')),
                 'first': Validation.validate_first(query.get('first')),
-                'show': Validation.validate_show(query.get('show')),
-                'count': Validation.validate_count(query.getlist('count'))}
+                'show': Validation.validate_show(query.getlist('show')),  # has to be list
+                'count': Validation.validate_count(query.getlist('count')),  # has to be list
+                'download': Validation.validate_download(
+                    query.getlist('download'))}  # has to be list
 
     @staticmethod
-    def validate_filter(filter_: str) -> str:
+    def validate_filter(filter_: List[str]) -> List[Dict[str, Union[str, Any]]]:  # pragma: no cover
         if not filter_:
             return Default.filter
-        filter_query = ''
-        for item in re.findall(r'(\w+)\((.*?)\)', filter_):
-            operator = item[0].lower()
-            if operator in Default.operators_dict:
-                filter_query += Default.operators_dict[operator]
-                item = re.split('[,]', item[1])
-                if item[0] in Default.operators_dict and item[1] in Default.column:
-                    if item[0] == 'like':
-                        item[2] = '\'' + item[2] + '%%\''
-                        item[1] = item[1] + '::text'
-                    elif item[0] == 'in':
-                        item[2] = item[2].replace('[', '')
-                        item[2] = item[2].replace(']', '')
-                        if len(list(map(str, item[2].split(':')))) == 1:
-                            tmp = list(map(str, item[2].split(':')))
-                            item[2] = '(\'' + tmp[0] + '\')'
-                        else:
-                            item[2] = str(tuple(map(str, item[2].split(':'))))
-                    else:
-                        item[2] = '\'' + item[2] + '\''
-                    filter_query += ' ' + item[1] + ' ' \
-                                    + Default.operators_dict[item[0]] + ' ' + item[2] + ' '
-                else:
-                    raise APIError('Syntax is incorrect!', status_code=404, payload="404f")
-        return filter_query
+        # Validate operators and add unsanitized 4th value
+        data = [[word for word in f.split('|')
+                 if f.split('|')[0] in Default.operators_logical.keys()
+                 and f.split('|')[1] in Default.column_validation
+                 and f.split('|')[2] in Default.operators_compare.keys()]
+                for f in filter_]
+        out = []
+        for i in data:
+            if not i:
+                raise APIError('Filter operators are wrong.', status_code=404, payload="404j")
+        for idx, filter_ in enumerate(data):
+            if not filter_[3]:
+                raise APIError('No search term.', status_code=404, payload="404i")
+            out.append({
+                'idx': idx,
+                'term': filter_[3] if isinstance(filter_[3], int) else 'LOWER(%%' + filter_[3] + '%%)',
+                'clause': Default.operators_logical[filter_[0]] +
+                          ' LOWER(' + Default.column_validation[filter_[1]] + ') ' +
+                          Default.operators_compare[filter_[2]]})
+        return out
 
     @staticmethod
     def validate_limit(limit: Optional[str] = None) -> int:
@@ -73,8 +75,9 @@ class Validation:
         return Default.sort if not sort or sort.lower() != 'desc' else 'DESC'
 
     @staticmethod
-    def validate_column(column: Optional[str]) -> str:
-        return Default.column if not column or column.lower() not in Default.column else column
+    def validate_column(column: List[str]) -> List[str]:
+        return Default.column if not column or [c.lower() for c in
+                                                column] in Default.column else column
 
     @staticmethod
     def validate_last(last: Optional[str]) -> Optional[str]:
@@ -85,15 +88,15 @@ class Validation:
         return Default.first if not first or first.isdigit() is not True else first
 
     @staticmethod
-    def validate_show(show: Optional[str]) -> List[str]:
-        show_ = []
-        for pattern in Default.show_validation:
-            if show and re.search(pattern, show):
-                show_.append(pattern)
-        if show and 'none' in show:
-            show_.clear()
-        return Default.show_validation if not show_ else show_
+    def validate_show(show: List[str]) -> List[str]:
+        data = [True] if 'none' in show else [valid for valid in show if
+                                              valid in Default.show_validation]
+        return Default.show_validation if not data else data
 
     @staticmethod
     def validate_count(count: bool) -> bool:
         return Default.count if not count or count is True else True
+
+    @staticmethod
+    def validate_download(download: bool) -> bool:
+        return Default.download if not download or download is True else True

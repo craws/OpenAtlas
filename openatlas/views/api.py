@@ -6,12 +6,9 @@ from openatlas import app
 from openatlas.api.api import Api
 from openatlas.api.error import APIError
 from openatlas.api.node import APINode
+from openatlas.api.path import Path
 from openatlas.api.validation import Validation
 from openatlas.util.util import api_access
-
-
-# Todo: unit test -> remove # pragma: nocover
-# Todo: prevent code duplication
 
 
 @app.route('/api/0.1/entity/<id_>', strict_slashes=False)
@@ -19,10 +16,11 @@ from openatlas.util.util import api_access
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_entity(id_: int) -> Response:
     validation = Validation.validate_url_query(request.args)
-    try:
-        int(id_)
-    except Exception:
-        raise APIError('Syntax is incorrect!', status_code=404, payload="404b")
+    if validation['download']:
+        return Response(json.dumps(Api.get_entity(id_=id_, meta=validation)),
+                        mimetype='application/json',
+                        headers={
+                            'Content-Disposition': 'attachment;filename=' + str(id_) + '.json'})
     return jsonify(Api.get_entity(id_=id_, meta=validation))
 
 
@@ -36,66 +34,22 @@ def api_download_entity(id_: int) -> Response:
                     headers={'Content-Disposition': 'attachment;filename=' + str(id_) + '.json'})
 
 
-@app.route('/api/0.1/', methods=['GET', 'POST', 'VIEW', 'PUT'], strict_slashes=False)
-@api_access()  # type: ignore
-@cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET', 'POST', 'VIEW', 'PUT'])
-def api_get_entities_by_json() -> Response:  # pragma: nocover
-    validation = Validation.validate_url_query(request.args)
-    out = []
-    req_data = request.get_json()
-    if 'id' in req_data:
-        entity = req_data['id']
-        ids = []
-        for e in entity:
-            try:
-                ids.append(int(e))
-            except Exception:
-                raise APIError('Syntax is incorrect!', status_code=404, payload="404b")
-            result = Api.pagination(ids, meta=validation)
-            out.append({'entities': result})
-    if 'item' in req_data:
-        item = req_data['item']
-        for i in item:
-            try:
-                out.append({'result': Api.pagination(
-                    Api.get_entities_by_menu_item(code_=i, meta=validation), meta=validation),
-                    'code': i})
-            except Exception:
-                raise APIError('Syntax is incorrect!', status_code=404, payload="404c")
-    if 'class_code' in req_data:
-        classes = req_data['class_code']
-        for class_code in classes:
-            if len(Api.get_entities_by_class(class_code_=class_code, meta=validation)) == 0:
-                raise APIError('Syntax is incorrect!', status_code=404, payload="404d")
-            out.append({'result': Api.pagination(
-                Api.get_entities_by_class(class_code_=class_code, meta=validation),
-                meta=validation), 'class': class_code})
-    if 'latest' in req_data:
-        latest = req_data['latest'][0]
-        if type(latest) is int:
-            if 0 < latest < 101:
-                out.extend(Api.get_entities_get_latest(limit_=latest, meta=validation))
-            else:
-                raise APIError('Syntax is incorrect!', status_code=404, payload="404e")
-        else:
-            raise APIError('Syntax is incorrect!', status_code=404, payload="404")
-
-    return jsonify(out)
-
-
 @app.route('/api/0.1/code/<code>', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_get_by_menu_item(code: str) -> Response:
     validation = Validation.validate_url_query(request.args)
-    try:
-        if validation['count']:
-            return jsonify(len(Api.get_entities_by_menu_item(code_=code, meta=validation)))
-        Api.get_entities_by_menu_item(code_=code, meta=validation)
-        return jsonify(Api.pagination(Api.get_entities_by_menu_item(code_=code, meta=validation),
-                                      meta=validation))
-    except Exception:
-        raise APIError('Syntax is incorrect!', status_code=404, payload="404c")
+    if validation['count']:
+        return jsonify(len(Path.get_entities_by_menu_item(code_=code, validation=validation)))
+    if validation['download']:
+        return Response(json.dumps(
+            Path.pagination(
+                Path.get_entities_by_menu_item(code_=code, validation=validation),
+                validation=validation)), mimetype='application/json',
+            headers={'Content-Disposition': 'attachment;filename=' + str(code) + '.json'})
+    return jsonify(
+        Path.pagination(Path.get_entities_by_menu_item(code_=code, validation=validation),
+                        validation=validation))
 
 
 @app.route('/api/0.1/class/<class_code>', strict_slashes=False)
@@ -103,29 +57,37 @@ def api_get_by_menu_item(code: str) -> Response:
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_get_by_class(class_code: str) -> Response:
     validation = Validation.validate_url_query(request.args)
-    if len(Api.get_entities_by_class(class_code_=class_code, meta=validation)) == 0:
-        raise APIError('Syntax is incorrect!', status_code=404, payload="404d")
     if validation['count']:
-        return jsonify(len(Api.get_entities_by_class(class_code_=class_code, meta=validation)))
+        return jsonify(
+            len(Path.get_entities_by_class(class_code=class_code, validation=validation)))
+    if validation['download']:
+        return Response(json.dumps(
+            Path.pagination(
+                Path.get_entities_by_class(class_code=class_code, validation=validation),
+                validation=validation)), mimetype='application/json',
+            headers={'Content-Disposition': 'attachment;filename=' + str(class_code) + '.json'})
     return jsonify(
-        Api.pagination(Api.get_entities_by_class(class_code_=class_code, meta=validation),
-                       meta=validation))
+        Path.pagination(Path.get_entities_by_class(class_code=class_code, validation=validation),
+                        validation=validation))
 
 
-@app.route('/api/0.1/latest/<int:limit>', strict_slashes=False)
+@app.route('/api/0.1/latest/<limit>', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_get_latest(limit: int) -> Response:
     validation = Validation.validate_url_query(request.args)
-    if 0 < limit < 100:
-        return jsonify(Api.get_entities_get_latest(limit_=limit, meta=validation))
-    raise APIError('Syntax is incorrect!', status_code=404, payload="404e")
+    if validation['download']:
+        return Response(json.dumps(
+            Path.get_entities_get_latest(limit_=limit, validation=validation)),
+            mimetype='application/json',
+            headers={'Content-Disposition': 'attachment;filename=latest_' + str(limit) + '.json'})
+    return jsonify(Path.get_entities_get_latest(limit_=limit, validation=validation))
 
 
 @app.route('/api/0.1/query', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
-def api_get_query() -> Response:  # pragma: nocover
+def api_get_query() -> Response:
     validation = Validation.validate_url_query(request.args)
     if request.args:
         out = []
@@ -133,43 +95,48 @@ def api_get_query() -> Response:  # pragma: nocover
         if request.args.getlist('entities'):
             entities = request.args.getlist('entities')
             for e in entities:
-                try:
-                    out.append(int(e))
-                except Exception:
-                    raise APIError('Syntax is incorrect!', status_code=404, payload="404b")
+                out.append(e)
             count += len(out)
         if request.args.getlist('items'):
             items = request.args.getlist('items')
             for i in items:
-                try:
-                    out.extend(Api.get_entities_by_menu_item(code_=i, meta=validation))
-                    if validation['count']:
-                        count += len(Api.get_entities_by_menu_item(code_=i, meta=validation))
-                except Exception:
-                    raise APIError('Syntax is incorrect!', status_code=404, payload="404c")
+                if validation['count']:
+                    count += len(
+                        Path.get_entities_by_menu_item(code_=i, validation=validation))
+                else:
+                    out.extend(Path.get_entities_by_menu_item(code_=i, validation=validation))
         if request.args.getlist('classes'):
             classes = request.args.getlist('classes')
             for class_code in classes:
-                if len(Api.get_entities_by_class(class_code_=class_code, meta=validation)) == 0:
-                    raise APIError('Syntax is incorrect!', status_code=404, payload="404d")
-                out.extend(Api.get_entities_by_class(class_code_=class_code, meta=validation))
                 if validation['count']:
-                    count += len(Api.get_entities_by_class(class_code_=class_code, meta=validation))
+                    count += len(
+                        Path.get_entities_by_class(class_code=class_code, validation=validation))
+                else:
+                    out.extend(
+                        Path.get_entities_by_class(class_code=class_code, validation=validation))
+
         if validation['count']:
             return jsonify(count)
-        return jsonify(Api.pagination(out, meta=validation))
+        if validation['download']:
+            return Response(json.dumps(out), mimetype='application/json',
+                            headers={'Content-Disposition': 'attachment;filename=query.json'})
+        return jsonify(Path.pagination(out, validation=validation))
     else:
-        raise APIError('Syntax is incorrect!', status_code=404, payload="404")
+        raise APIError('Not input given.', status_code=404, payload="404h")
 
 
 @app.route('/api/0.1/node_entities/<id_>', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_node_entities(id_: int) -> Response:
-    try:
-        id_ = int(id_)
-    except Exception:
-        raise APIError('Syntax is incorrect!', status_code=404, payload="404b")
+    validation = Validation.validate_url_query(request.args)
+    if validation['count']:
+        return jsonify(len(APINode.get_node(id_)))
+    if validation['download']:
+        return Response(json.dumps(APINode.get_node(id_)), mimetype='application/json',
+                        headers={
+                            'Content-Disposition': 'attachment;filename=node_entities_' + str(
+                                id_) + '.json'})
     return jsonify(APINode.get_node(id_))
 
 
@@ -177,10 +144,14 @@ def api_node_entities(id_: int) -> Response:
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_node_entities_all(id_: int) -> Response:
-    try:
-        id_ = int(id_)
-    except Exception:
-        raise APIError('Syntax is incorrect!', status_code=404, payload="404b")
+    validation = Validation.validate_url_query(request.args)
+    if validation['count']:
+        return jsonify(len(APINode.get_node_all(id_)))
+    if validation['download']:
+        return Response(json.dumps(APINode.get_node_all(id_)), mimetype='application/json',
+                        headers={
+                            'Content-Disposition': 'attachment;filename=node_entities_all_' + str(
+                                id_) + '.json'})
     return jsonify(APINode.get_node_all(id_))
 
 
@@ -188,10 +159,14 @@ def api_node_entities_all(id_: int) -> Response:
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_subunit(id_: int) -> Response:
-    try:
-        id_ = int(id_)
-    except Exception:
-        raise APIError('Syntax is incorrect!', status_code=404, payload="404b")
+    validation = Validation.validate_url_query(request.args)
+    if validation['count']:
+        return jsonify(len(APINode.get_subunits(id_)))
+    if validation['download']:
+        return Response(json.dumps(APINode.get_subunits(id_)), mimetype='application/json',
+                        headers={
+                            'Content-Disposition': 'attachment;filename=subunit_' + str(
+                                id_) + '.json'})
     return jsonify(APINode.get_subunits(id_))
 
 
@@ -199,11 +174,15 @@ def api_subunit(id_: int) -> Response:
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_subunit_hierarchy(id_: int) -> Response:
-    try:
-        id_ = int(id_)
-    except Exception:
-        raise APIError('Syntax is incorrect!', status_code=404, payload="404b")
-    return jsonify(APINode.get_subunits_hierarchy(id_))
+    validation = Validation.validate_url_query(request.args)
+    if validation['count']:
+        return jsonify(len(APINode.get_subunit_hierarchy(id_)))
+    if validation['download']:
+        return Response(json.dumps(APINode.get_subunit_hierarchy(id_)), mimetype='application/json',
+                        headers={
+                            'Content-Disposition': 'attachment;filename=subunit_hierarchy_' + str(
+                                id_) + '.json'})
+    return jsonify(APINode.get_subunit_hierarchy(id_))
 
 
 @app.route('/api', strict_slashes=False)
@@ -211,3 +190,4 @@ def api_subunit_hierarchy(id_: int) -> Response:
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_index() -> str:
     return render_template('api/index.html')
+
