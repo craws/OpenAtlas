@@ -9,7 +9,8 @@ from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import TableMultiField, build_form, build_table_form
+from openatlas.forms.util import build_form, build_table_form
+from openatlas.forms.field import TableMultiField
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.display import (add_edit_link, add_remove_link, get_base_table_data,

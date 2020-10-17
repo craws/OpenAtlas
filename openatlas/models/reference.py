@@ -9,6 +9,7 @@ from openatlas.models.node import Node
 
 
 class Reference:
+    # Tools for external references like Wikidata or GeoNames
 
     @staticmethod
     def get_link(object_: Entity) -> Optional[Link]:

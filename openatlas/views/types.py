@@ -10,7 +10,8 @@ from wtforms import (HiddenField, SelectMultipleField, StringField, SubmitField,
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import build_move_form, build_node_form
+from openatlas.forms.util import build_node_form
+from openatlas.forms.field import build_move_form
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node

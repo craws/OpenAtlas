@@ -11,7 +11,8 @@ from wtforms.validators import InputRequired, URL
 
 import openatlas
 from openatlas import app, logger
-from openatlas.forms.forms import TableField, build_form
+from openatlas.forms.util import build_form
+from openatlas.forms.field import TableField
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.user import User

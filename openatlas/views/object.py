@@ -9,7 +9,7 @@ from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import build_form
+from openatlas.forms.util import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.display import add_remove_link, get_base_table_data, get_entity_data, link

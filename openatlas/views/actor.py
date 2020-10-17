@@ -9,7 +9,8 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
-from openatlas.forms.forms import TableField, build_form
+from openatlas.forms.util import build_form
+from openatlas.forms.field import TableField
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.user import User

@@ -158,7 +158,7 @@ def bookmark_toggle(self: Any, entity_id: int) -> str:
 @jinja2.contextfilter
 @blueprint.app_template_filter()
 def display_move_form(self: Any, form: Any, root_name: str) -> str:
-    from openatlas.forms.forms import TreeField
+    from openatlas.forms.field import TreeField
     html = ''
     for field in form:
         if type(field) is TreeField:
@@ -283,7 +283,7 @@ def display_form(self: Any,
                  form_id: Optional[str] = None,
                  for_persons: bool = False,
                  manual_page: Optional[str] = None) -> str:
-    from openatlas.forms.forms import ValueFloatField
+    from openatlas.forms.field import ValueFloatField
     multipart = 'enctype="multipart/form-data"' if hasattr(form, 'file') else ''
     if 'update' in request.path:
         if hasattr(form, 'save') and hasattr(form.save, 'label'):

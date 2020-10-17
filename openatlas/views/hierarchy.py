@@ -10,7 +10,7 @@ from wtforms import (BooleanField, SelectMultipleField, StringField, SubmitField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import build_form
+from openatlas.forms.util import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
 from openatlas.util.display import link, sanitize

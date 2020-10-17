@@ -11,7 +11,7 @@ from wtforms.validators import InputRequired, Optional as OptValidator
 
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
-from openatlas.forms.forms import build_form
+from openatlas.forms.util import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.reference import Reference
 from openatlas.models.gis import Gis, InvalidGeomException

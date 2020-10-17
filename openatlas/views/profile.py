@@ -13,8 +13,8 @@ from wtforms import BooleanField, PasswordField, SubmitField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.admin_forms import DisplayForm, ModulesForm, ProfileForm
-from openatlas.forms.forms import get_form_settings, set_form_settings
+from openatlas.forms.form import DisplayForm, ModulesForm, ProfileForm
+from openatlas.forms.util import get_form_settings, set_form_settings
 from openatlas.util.display import uc_first
 from openatlas.util.util import is_authorized
 
@@ -60,7 +60,7 @@ def profile_index() -> str:
 def profile_settings(category: str) -> Union[str, Response]:
     if category not in ['profile', 'display'] and not is_authorized('contributor'):
         abort(403)  # pragma: no cover
-    form = getattr(importlib.import_module('openatlas.forms.admin_forms'),
+    form = getattr(importlib.import_module('openatlas.forms.form'),
                    uc_first(category) + 'Form')()  # Get forms dynamically
     if form.validate_on_submit():
         for field in form:

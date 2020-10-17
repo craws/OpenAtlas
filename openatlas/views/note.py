@@ -9,7 +9,7 @@ from wtforms import (SubmitField, TextAreaField)
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.forms import build_form
+from openatlas.forms.util import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.util import (required_group)
