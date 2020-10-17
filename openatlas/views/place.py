@@ -227,7 +227,7 @@ def place_view(obj: Entity) -> str:
             data.append(link_.description)
             if domain.system_type.startswith('external reference'):
                 obj.external_references.append(link_)
-            if domain.system_type != 'external reference geonames':
+            if domain.system_type not in ['external reference geonames', 'external reference wikidata']:
                 data = add_edit_link(data, url_for('reference_link_update',
                                                    link_id=link_.id,
                                                    origin_id=obj.id))
