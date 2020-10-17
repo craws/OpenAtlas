@@ -8,19 +8,19 @@ from openatlas.models.link import Link
 from openatlas.models.node import Node
 
 
-class Geonames:
+class Reference:
 
     @staticmethod
-    def get_geonames_link(object_: Entity) -> Optional[Link]:
+    def get_link(object_: Entity) -> Optional[Link]:
         for link_ in object_.get_links('P67', inverse=True):
             if link_.domain.system_type == 'external reference geonames':
                 return link_
         return None
 
     @staticmethod
-    def update_geonames(form: FlaskForm, object_: Entity) -> None:
+    def update(form: FlaskForm, object_: Entity) -> None:
         new_id = form.geonames_id.data
-        link_ = Geonames.get_geonames_link(object_)
+        link_ = Reference.get_link(object_)
         reference = link_.domain if link_ else None  # former external reference
 
         if not new_id:

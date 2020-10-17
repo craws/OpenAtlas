@@ -13,7 +13,7 @@ from openatlas import app, logger
 from openatlas.forms.date import DateForm
 from openatlas.forms.forms import build_form
 from openatlas.models.entity import Entity
-from openatlas.models.geonames import Geonames
+from openatlas.models.reference import Reference
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
@@ -112,8 +112,6 @@ def place_insert(origin_id: Optional[int] = None,
         geonames_buttons = True if current_user.settings['module_geonames'] else False
         if origin:
             del form.insert_and_continue, form.insert_continue_sub
-    if hasattr(form, 'geonames_id') and not current_user.settings['module_geonames']:
-        del form.geonames_id, form.geonames_precision  # pragma: no cover
     if form.validate_on_submit():
         return redirect(save(form, origin=origin, system_type=system_type))
 
@@ -149,8 +147,6 @@ def place_update(id_: int) -> Union[str, Response]:
     else:
         geonames_buttons = True if current_user.settings['module_geonames'] else False
         form = build_form(PlaceForm, 'Place', object_, request, location)
-    if hasattr(form, 'geonames_id') and not current_user.settings['module_geonames']:
-        del form.geonames_id, form.geonames_precision  # pragma: no cover
     if hasattr(form, 'insert_continue_sub'):
         del form.insert_continue_sub
     if hasattr(form, 'insert_continue_human_remains'):
@@ -172,7 +168,7 @@ def place_update(id_: int) -> Union[str, Response]:
             form.alias.append_entry(alias)
         form.alias.append_entry('')
     if hasattr(form, 'geonames_id') and current_user.settings['module_geonames']:
-        geonames_link = Geonames.get_geonames_link(object_)
+        geonames_link = Reference.get_link(object_)
         if geonames_link:
             geonames_entity = geonames_link.domain
             form.geonames_id.data = geonames_entity.name if geonames_entity else ''
@@ -302,7 +298,7 @@ def save(form: DateForm,
         object_.update(form)
         location.update(form)
         if hasattr(form, 'geonames_id') and current_user.settings['module_geonames']:
-            Geonames.update_geonames(form, object_)
+            Reference.update(form, object_)
         url = url_for('entity_view', id_=object_.id)
         if origin:
             url = url_for('entity_view', id_=origin.id) + '#tab-place'

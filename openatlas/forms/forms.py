@@ -60,6 +60,10 @@ def build_form(form: Any,
     for item in delete_list:
         delattr(form_instance, item)
 
+    # GeoNames
+    if 'geonames_id' in form_instance and not current_user.settings['module_geonames']:
+        del form_instance.geonames_id, form_instance.geonames_precision
+
     # Wikidata
     if 'wikidata_id' in form_instance and not current_user.settings['module_wikidata']:
         delattr(form_instance, 'wikidata_id')
