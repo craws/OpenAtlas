@@ -83,10 +83,6 @@ table.dataTable th {
     white-space:nowrap;
 }
 
-li.changelog {
-    margin-top: 0.3em;
-}
-
 textarea {
     resize: both;
 }
