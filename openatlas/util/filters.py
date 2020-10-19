@@ -511,7 +511,7 @@ def display_external_references(self: Any, entity: Entity) -> str:
             url = session['settings']['geonames_url'] + link_.domain.name
         if link_.domain.system_type == 'external reference wikidata':
             name = 'Wikidata (' + link_.domain.name + ')'
-            url = app.config['WIKIDATA_URL'] + link_.domain.name
+            url = app.config['EXTERNAL']['wikidata']['url'] + link_.domain.name
         html += '<a target="_blank" href="{url}">{name}</a><br>'.format(url=url, name=name)
     if not html:
         return ''
