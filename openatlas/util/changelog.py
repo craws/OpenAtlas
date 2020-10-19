@@ -1,12 +1,10 @@
 class Changelog:
-
     versions = {
-	'5.6.0': ['TBA', {
+        '5.6.0': ['TBA', {
             'feature': {
                 '1347': 'All icons to Font Awesome icons',
                 '1379': 'Feature votes',
                 '1350': 'API: Pagination in an extra array',
-                '1370': 'API: Secure SQL statements',
                 '1375': 'API: Download result of request path'
             }}],
         '5.5.1': ['2020-10-09', {
@@ -98,7 +96,7 @@ class Changelog:
                 '1049': 'Upgrade Python to 3.7',
                 '1003': 'Import with dates',
                 '1068': 'Place import with point coordinates',
-                '1072':  'Show places of movement at the person view',
+                '1072': 'Show places of movement at the person view',
                 '1079': 'Static type checking with Mypy',
                 '1101': 'Disable showing default images for reference'},
             'fix': {
