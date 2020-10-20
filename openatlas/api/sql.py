@@ -106,7 +106,10 @@ class Query:
         clause = ""
         parameters = {'codes': tuple(code if isinstance(code, list) else [code])}
         for filter_ in meta['filter']:
-            clause += ' ' + filter_['clause'] + ' %(' + str(filter_['idx']) + ')s'
+            if 'LIKE' in filter_['clause']:
+                clause += ' ' + filter_['clause'] + ' LOWER(%(' + str(filter_['idx']) + ')s)'
+            else:
+                clause += ' ' + filter_['clause'] + ' %(' + str(filter_['idx']) + ')s'
             parameters[str(filter_['idx'])] = filter_['term']
         sql = Query.build_sql() + """
             WHERE class_code IN %(codes)s {clause} 
@@ -123,7 +126,10 @@ class Query:
         clause = ""
         parameters = {'codes': tuple(app.config['CLASS_CODES'][menu_item])}
         for filter_ in meta['filter']:
-            clause += ' ' + filter_['clause'] + ' %(' + str(filter_['idx']) + ')s'
+            if 'LIKE' in filter_['clause']:
+                clause += ' ' + filter_['clause'] + ' LOWER(%(' + str(filter_['idx']) + ')s)'
+            else:
+                clause += ' ' + filter_['clause'] + ' %(' + str(filter_['idx']) + ')s'
             parameters[str(filter_['idx'])] = filter_['term']
         if menu_item == 'source':
             sql = Query.build_sql(nodes=True) + """

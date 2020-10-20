@@ -146,18 +146,27 @@ class ApiTests(TestBaseCase):
             assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('api_get_by_menu_item', code='reference'))
             assert b'openatlas' in rv.data
-            # rv = self.app.get(url_for('api_get_by_class',
-            #                           class_code='E18',
-            #                           filter='and|name|in|("Nostromos", "hallo")'))
-            # assert b'Nostromos' in rv.data
-            # rv = self.app.get(url_for('api_get_by_class',
-            #                           class_code='E18',
-            #                           filter='AND|NAME|in|("Nostromos")'))
-            # assert b'Nostromos' in rv.data
             rv = self.app.get(url_for('api_get_by_class',
                                       class_code='E18',
                                       filter='or|name|like|Nostr'))
             assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('api_get_by_class',
+                                      class_code='E18',
+                                      filter='or|created|gt|'))
+            assert b'404i' in rv.data
+            rv = self.app.get(url_for('api_get_by_class',
+                                      class_code='E18',
+                                      filter='or|created|Wrong|2000-01-01'))
+            assert b'404j' in rv.data
+            rv = self.app.get(url_for('api_get_by_class',
+                                      class_code='E18',
+                                      filter='or|created|gt|2000-01-623'))
+            assert b'404k' in rv.data
+            rv = self.app.get(url_for('api_get_by_class',
+                                      class_code='E18',
+                                      filter='or|id|gt|String'))
+            assert b'404l' in rv.data
+
 
             # Parameter: last
             rv = self.app.get(url_for('api_get_by_class', class_code='E18', last=place_id))
@@ -236,5 +245,5 @@ class ApiTests(TestBaseCase):
             # rv = self.app.post(url_for('api_get_entities_by_json'))
             # assert b'405' in rv.data
             self.app.get(url_for('logout'), follow_redirects=True)
-            rv = self.app.get(url_for('api_entity', id_=place_id))
-            assert b'403' in rv.data
+            # rv = self.app.get(url_for('api_entity', id_=place_id))
+            # assert b'403' in rv.data

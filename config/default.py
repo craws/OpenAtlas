@@ -44,6 +44,7 @@ EXTERNAL_REFERENCES = {'geonames': {'name': 'GeoNames', 'url': ''},
 # API
 API_SCHEMA = 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.jsonld'
 CORS_ALLOWANCE = '*'  # Cross-Origin source (CORS), declared here because used in decorators
+ALLOWED_IPS = ['127.0.0.1']  # Todo: move to backend config
 
 # Table options
 TABLE_ROWS = {10: '10', 25: '25', 50: '50', 100: '100'}

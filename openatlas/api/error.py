@@ -27,7 +27,10 @@ class APIError(Exception):
         "404h": "The query path needs a valid parameter input. Valid inputs are entities, classes"
                 " and items. Please confer the help page.",
         "404i": "The filter parameter has no search string.",
-        "404j": "The filter operators are wrong",
+        "404j": "Filter operator is not implemented or wrong.",
+        "404k": "The search term must be a valid date e.g. 2020-01-01."
+                " A valid date contains yyyy-mm-dd.",
+        "404l": "The search term must be a valid number.",
         "405": "The method used is not supported. Right now only GET is allowed.",
         "500": "Please notify the administrator. Sorry for the inconvenience."}
 

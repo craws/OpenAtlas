@@ -90,9 +90,11 @@ def api_access():  # type: ignore
     def wrapper(f):  # type: ignore
         @wraps(f)
         def wrapped(*args, **kwargs):  # type: ignore
-            if not current_user.is_authenticated and not session['settings']['api_public']:
-                raise APIError('Syntax is incorrect!', status_code=403,
-                               payload="403")  # pragma: nocover
+            if not current_user.is_authenticated and not \
+                    session['settings']['api_public']:  # pragma: no cover
+                ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
+                if ip and ip not in app.config['ALLOWED_IPS'] and not current_user.is_authenticated:
+                    raise APIError('Access denied!', status_code=403, payload="403")
             return f(*args, **kwargs)
 
         return wrapped
