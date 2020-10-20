@@ -8,13 +8,12 @@ from openatlas.api.error import APIError
 from openatlas.api.node import APINode
 from openatlas.api.path import Path
 from openatlas.api.validation import Validation
-from openatlas.util.util import api_access, check_ip
+from openatlas.util.util import api_access
 
 
 @app.route('/api/0.1/entity/<id_>', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
-@check_ip()
 def api_entity(id_: int) -> Response:
     validation = Validation.validate_url_query(request.args)
     if validation['download']:
@@ -28,7 +27,6 @@ def api_entity(id_: int) -> Response:
 @app.route('/api/0.1/entity/download/<int:id_>', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
-@check_ip()
 def api_download_entity(id_: int) -> Response:
     validation = Validation.validate_url_query(request.args)
     return Response(json.dumps(Api.get_entity(id_=id_, meta=validation)),
@@ -39,7 +37,6 @@ def api_download_entity(id_: int) -> Response:
 @app.route('/api/0.1/code/<code>', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
-@check_ip()
 def api_get_by_menu_item(code: str) -> Response:
     validation = Validation.validate_url_query(request.args)
     if validation['count']:
@@ -48,7 +45,8 @@ def api_get_by_menu_item(code: str) -> Response:
         return Response(json.dumps(
             Path.pagination(
                 Path.get_entities_by_menu_item(code_=code, validation=validation),
-                validation=validation)), mimetype='application/json',
+                validation=validation)),
+            mimetype='application/json',
             headers={'Content-Disposition': 'attachment;filename=' + str(code) + '.json'})
     return jsonify(
         Path.pagination(Path.get_entities_by_menu_item(code_=code, validation=validation),
@@ -58,7 +56,6 @@ def api_get_by_menu_item(code: str) -> Response:
 @app.route('/api/0.1/class/<class_code>', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
-@check_ip()
 def api_get_by_class(class_code: str) -> Response:
     validation = Validation.validate_url_query(request.args)
     if validation['count']:
@@ -68,7 +65,8 @@ def api_get_by_class(class_code: str) -> Response:
         return Response(json.dumps(
             Path.pagination(
                 Path.get_entities_by_class(class_code=class_code, validation=validation),
-                validation=validation)), mimetype='application/json',
+                validation=validation)),
+            mimetype='application/json',
             headers={'Content-Disposition': 'attachment;filename=' + str(class_code) + '.json'})
     return jsonify(
         Path.pagination(Path.get_entities_by_class(class_code=class_code, validation=validation),
@@ -78,7 +76,6 @@ def api_get_by_class(class_code: str) -> Response:
 @app.route('/api/0.1/latest/<limit>', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
-@check_ip()
 def api_get_latest(limit: int) -> Response:
     validation = Validation.validate_url_query(request.args)
     if validation['download']:
@@ -92,7 +89,6 @@ def api_get_latest(limit: int) -> Response:
 @app.route('/api/0.1/query', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
-@check_ip()
 def api_get_query() -> Response:
     validation = Validation.validate_url_query(request.args)
     if request.args:
@@ -124,7 +120,8 @@ def api_get_query() -> Response:
         if validation['count']:
             return jsonify(count)
         if validation['download']:
-            return Response(json.dumps(out), mimetype='application/json',
+            return Response(json.dumps(out),
+                            mimetype='application/json',
                             headers={'Content-Disposition': 'attachment;filename=query.json'})
         return jsonify(Path.pagination(out, validation=validation))
     else:
@@ -139,7 +136,8 @@ def api_node_entities(id_: int) -> Response:
     if validation['count']:
         return jsonify(len(APINode.get_node(id_)))
     if validation['download']:
-        return Response(json.dumps(APINode.get_node(id_)), mimetype='application/json',
+        return Response(json.dumps(APINode.get_node(id_)),
+                        mimetype='application/json',
                         headers={
                             'Content-Disposition': 'attachment;filename=node_entities_' + str(
                                 id_) + '.json'})
@@ -154,7 +152,8 @@ def api_node_entities_all(id_: int) -> Response:
     if validation['count']:
         return jsonify(len(APINode.get_node_all(id_)))
     if validation['download']:
-        return Response(json.dumps(APINode.get_node_all(id_)), mimetype='application/json',
+        return Response(json.dumps(APINode.get_node_all(id_)),
+                        mimetype='application/json',
                         headers={
                             'Content-Disposition': 'attachment;filename=node_entities_all_' + str(
                                 id_) + '.json'})
@@ -169,7 +168,8 @@ def api_subunit(id_: int) -> Response:
     if validation['count']:
         return jsonify(len(APINode.get_subunits(id_)))
     if validation['download']:
-        return Response(json.dumps(APINode.get_subunits(id_)), mimetype='application/json',
+        return Response(json.dumps(APINode.get_subunits(id_)),
+                        mimetype='application/json',
                         headers={
                             'Content-Disposition': 'attachment;filename=subunit_' + str(
                                 id_) + '.json'})
@@ -184,7 +184,8 @@ def api_subunit_hierarchy(id_: int) -> Response:
     if validation['count']:
         return jsonify(len(APINode.get_subunit_hierarchy(id_)))
     if validation['download']:
-        return Response(json.dumps(APINode.get_subunit_hierarchy(id_)), mimetype='application/json',
+        return Response(json.dumps(APINode.get_subunit_hierarchy(id_)),
+                        mimetype='application/json',
                         headers={
                             'Content-Disposition': 'attachment;filename=subunit_hierarchy_' + str(
                                 id_) + '.json'})
@@ -196,4 +197,3 @@ def api_subunit_hierarchy(id_: int) -> Response:
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_index() -> str:
     return render_template('api/index.html')
-
