@@ -116,8 +116,6 @@ class Query:
             ORDER BY {order} {sort};""".format(clause=clause,
                                                order=', '.join(meta['column']),
                                                sort=meta['sort'])
-        print(sql)
-        print(parameters)
         g.execute(sql, parameters)
         return [Query(row) for row in g.cursor.fetchall()]
 
@@ -128,7 +126,10 @@ class Query:
         clause = ""
         parameters = {'codes': tuple(app.config['CLASS_CODES'][menu_item])}
         for filter_ in meta['filter']:
-            clause += ' ' + filter_['clause'] + ' %(' + str(filter_['idx']) + ')s'
+            if 'LIKE' in filter_['clause']:
+                clause += ' ' + filter_['clause'] + ' LOWER(%(' + str(filter_['idx']) + ')s)'
+            else:
+                clause += ' ' + filter_['clause'] + ' %(' + str(filter_['idx']) + ')s'
             parameters[str(filter_['idx'])] = filter_['term']
         if menu_item == 'source':
             sql = Query.build_sql(nodes=True) + """
