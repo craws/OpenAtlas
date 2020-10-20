@@ -29,11 +29,11 @@ Please refer to [install.md](install.md) for requirements and installation.
 
 **Christoph Hoffmann** - Frontend Development
 
-**Veronika Gründhammer** - Project Administration
+**Nina Brundke** - Bioarchaeological Expertise
 
 **Jan Belik** - Logo Design and Design Consulting
 
-**Daniel Kittel** - Quality Assurance
+**Veronika Gründhammer** - Project Administration
 
 # Licensing
 
