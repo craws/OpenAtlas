@@ -42,6 +42,16 @@ class PlaceForm(DateForm):
     continue_ = HiddenField()
     opened = HiddenField()
 
+    def validate(self) -> bool:
+        valid = DateForm.validate(self)
+        if self.wikidata_id.data:
+            if self.wikidata_id.data[0].upper() != 'Q' or not self.wikidata_id.data[1:].isdigit():
+                self.wikidata_id.errors.append(uc_first(_('wrong format')))
+                valid = False
+            else:
+                self.wikidata_id.data = uc_first(self.wikidata_id.data)
+        return valid
+
 
 class FeatureForm(DateForm):
     name = StringField(_('name'), [InputRequired()])
@@ -165,6 +175,7 @@ def place_update(id_: int) -> Union[str, Response]:
                                    modifier=modifier)
         save(form, object_, location)
         return redirect(url_for('entity_view', id_=id_))
+
     if object_.system_type == 'place':
         for alias in object_.aliases.values():
             form.alias.append_entry(alias)
@@ -172,7 +183,7 @@ def place_update(id_: int) -> Union[str, Response]:
     for name in g.external:
         if hasattr(form, name + '_id') and current_user.settings['module_' + name]:
             link_ = Reference.get_link(object_, name)
-            if link_:
+            if link_ and not getattr(form, name + '_id').data:
                 reference = link_.domain
                 getattr(form, name + '_id').data = reference.name if reference else ''
                 exact_match = True if g.nodes[link_.type.id].name == 'exact match' else False
