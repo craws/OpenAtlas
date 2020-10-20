@@ -7,8 +7,8 @@ from openatlas.api.error import APIError
 class Default:
     limit: int = 20
     sort: str = 'ASC'
-    filter: List = [{'clause': 'and e.id >=', 'term': 1, 'idx': '0'}]
-    column: List = ['name']
+    filter: List[str] = [{'clause': 'and e.id >=', 'term': 1, 'idx': '0'}]
+    column: List[str] = ['name']
     last: Optional[str] = None
     first: Optional[str] = None
     count: bool = False
@@ -47,7 +47,7 @@ class Validation:
                     query.getlist('download'))}  # has to be list
 
     @staticmethod
-    def validate_filter(filter_: List[str]) -> List[Dict[str, Union[str, Any]]]:  # pragma: no cover
+    def validate_filter(filter_: List[str]) -> List[Dict[str, Union[str, Any]]]:
         out = []
         if not filter_:
             return Default.filter
