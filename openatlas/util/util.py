@@ -107,8 +107,7 @@ def check_ip():  # type: ignore
             ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
             if ip:
                 if ip not in app.config['ALLOWED_IPS']:
-                    if not current_user.is_authenticated and not session['settings'][
-                            'api_public']:
+                    if not current_user.is_authenticated:
                         raise APIError('Syntax is incorrect!', status_code=401,
                                        payload="401")  # pragma: nocover
             return f(*args, **kwargs)
