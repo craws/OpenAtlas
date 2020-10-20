@@ -1,3 +1,5 @@
+import re
+import datetime
 from typing import Any, Dict, List, Optional, Union
 
 from openatlas.api.error import APIError
@@ -13,15 +15,19 @@ class Default:
     count: bool = False
     download: bool = False
     operators_compare: Dict[str, Any] = {'eq': '=', 'ne': '!=', 'lt': '<', 'le': '<=', 'gt': '>',
-                                         'ge': '>=', 'like': 'LIKE', 'in': 'IN'}
+                                         'ge': '>=', 'like': 'LIKE'}
     operators_logical: Dict[str, Any] = {'and': 'AND', 'or': 'OR', 'onot': 'OR NOT',
                                          'anot': 'AND NOT'}
     column_validation: Dict[str, str] = {'id': 'e.id', 'class_code': 'e.class_code',
                                          'name': 'e.name', 'description': 'e.description',
-                                         'created': 'e.created', 'end_to': 'e.end_to',
-                                         'modified': 'e.modified', 'system_type': 'e.system_type',
+                                         'system_type': 'e.system_type',
                                          'begin_from': 'e.begin_from', 'begin_to': 'e.begin_to',
-                                         'end_from': 'e.end_from'}
+                                         'created': 'e.created', 'modified': 'e.modified',
+                                         'end_to': 'e.end_to', 'end_from': 'e.end_from'}
+    date_column_validation: Dict[str, str] = {'begin_from': 'e.begin_from',
+                                              'begin_to': 'e.begin_to',
+                                              'created': 'e.created', 'modified': 'e.modified',
+                                              'end_to': 'e.end_to', 'end_from': 'e.end_from'}
     show_validation: List[str] = ['when', 'types', 'relations', 'names', 'links', 'geometry',
                                   'depictions', 'geonames']
 
@@ -43,6 +49,7 @@ class Validation:
 
     @staticmethod
     def validate_filter(filter_: List[str]) -> List[Dict[str, Union[str, Any]]]:  # pragma: no cover
+        out = []
         if not filter_:
             return Default.filter
         # Validate operators and add unsanitized 4th value
@@ -51,26 +58,48 @@ class Validation:
                  and f.split('|')[1] in Default.column_validation
                  and f.split('|')[2] in Default.operators_compare.keys()]
                 for f in filter_]
-        print(data)
-        out = []
+
         for i in data:
             if not i:
-                raise APIError('Filter operators are wrong.', status_code=404, payload="404j")
+                raise APIError('Filter operators is not implemented or wrong.', status_code=404,
+                               payload="404j")
+
         for idx, filter_ in enumerate(data):
             if not filter_[3]:
                 raise APIError('No search term.', status_code=404, payload="404i")
-
-            column = Default.column_validation[filter_[1]] \
-                if filter_[3].isdigit() else 'LOWER(' + Default.column_validation[filter_[1]] + ')'
+             # column = Default.column_validation[filter_[1]] \
+             #    if filter_[3].isdigit() else 'LOWER(' + Default.column_validation[filter_[1]] + ')'
+            column = 'LOWER(' + Default.column_validation[filter_[1]] + ')' if filter_[2] == 'LIKE' else Default.column_validation[filter_[1]]
+            print(column)
             out.append({
                 'idx': idx,
-                'term': int(filter_[3]) if filter_[3].isdigit() else 'LOWER(%' + filter_[
-                    3] + '%)',
+                'term': Validation.validate_term(filter_),
                 'clause': Default.operators_logical[filter_[0]] + ' ' +
                           column + ' ' +
                           Default.operators_compare[filter_[2]]})
         print(out)
         return out
+
+    @staticmethod
+    def validate_term(filter_: List[str]) -> Union[int, str]:
+        # Check if search term is a valid date if needed
+        if Default.column_validation[filter_[1]] in Default.date_column_validation.values():
+            try:
+                datetime.datetime.strptime(filter_[3], "%Y-%m-%d")
+            except:
+                raise APIError('Invalid search term: ' + filter_[3], status_code=404,
+                               payload="404k")
+        # Check if search term is an integer if column is id
+        if Default.column_validation[filter_[1]] == 'e.id':
+            try:
+                int(filter_[3])
+            except:
+                raise APIError('Invalid search term: ' + filter_[3], status_code=404, payload="404l")
+
+        operator = Default.operators_compare[filter_[2]]
+        # int(filter_[3]) if filter_[3].isdigit() else '%%' + filter_[3] + '%%',
+
+        return filter_[3]
 
     @staticmethod
     def validate_limit(limit: Optional[str] = None) -> int:
