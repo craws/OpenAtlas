@@ -169,7 +169,7 @@ def place_update(id_: int) -> Union[str, Response]:
         for alias in object_.aliases.values():
             form.alias.append_entry(alias)
         form.alias.append_entry('')
-    for name in ['geonames', 'wikidata']:
+    for name in g.external:
         if hasattr(form, name + '_id') and current_user.settings['module_' + name]:
             link_ = Reference.get_link(object_, name)
             if link_:
@@ -225,14 +225,14 @@ def place_view(obj: Entity) -> str:
                     data.append('')
         if domain.view_name not in ['source', 'file']:
             data.append(link_.description)
-            if domain.system_type.startswith('external reference'):
-                obj.external_references.append(link_)
-            if domain.system_type not in ['external reference geonames', 'external reference wikidata']:
+            if not domain.system_type.startswith('external reference '):
                 data = add_edit_link(data, url_for('reference_link_update',
                                                    link_id=link_.id,
                                                    origin_id=obj.id))
             else:
                 data.append('')
+            if domain.system_type.startswith('external reference'):
+                obj.external_references.append(link_)
         data = add_remove_link(data, domain.name, link_, obj, domain.view_name)
         tabs[domain.view_name].table.rows.append(data)
     event_ids = []  # Keep track of already inserted events to prevent doubles

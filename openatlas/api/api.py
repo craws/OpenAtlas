@@ -126,8 +126,7 @@ class Api:
             if geonames_link.type.name:
                 geo_name['type'] = Api.to_camelcase(geonames_link.type.name)
             if geonames_link.domain.name:
-                geo_name['identifier'] = session['settings']['geonames_url'] + \
-                                         geonames_link.domain.name
+                geo_name['identifier'] = g.external['geonames']['url'] + geonames_link.domain.name
             return geo_name
 
     @staticmethod

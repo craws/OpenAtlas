@@ -22,7 +22,7 @@ class Reference:
 
     @staticmethod
     def update(form: FlaskForm, object_: Entity) -> None:
-        for name in ['geonames', 'wikidata']:
+        for name in g.external:
             if not current_user.settings['module_' + name] or not hasattr(form, name + '_id'):
                 continue
             new_id = getattr(form, name + '_id').data

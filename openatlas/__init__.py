@@ -83,6 +83,8 @@ def before_request() -> None:
     g.nodes = Node.get_all_nodes()
     session['settings'] = Settings.get_settings()
     session['language'] = get_locale()
+    g.external = app.config['EXTERNAL_REFERENCES']
+    g.external['geonames']['url'] = session['settings']['geonames_url']
     debug_model['model'] = time.time() - debug_model['current']
     debug_model['current'] = time.time()
 

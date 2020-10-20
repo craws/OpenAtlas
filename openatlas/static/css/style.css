@@ -236,10 +236,6 @@ p {
     margin: 0.5em 0 1em;
 }
 
-#geonames_precision {
-    margin: 0 0.4em;
-}
-
 form input[type="text"].year {
     text-align: right;
     width: 4em;

@@ -37,8 +37,9 @@ SESSION_COOKIE_SAMESITE = 'Lax'
 THUNDERFOREST_KEY = '7878b4fb224f4902ab42fc846e92b96a'
 
 # External References
-EXTERNAL = {'geonames': {'name': 'GeoNames', 'url': ''},  # GeoNames URL is in db and set in admin
-            'wikidata': {'name': 'Wikidata', 'url': 'https://www.wikidata.org/entity/'}}
+# Will moved to db and be configurable in admin when more options (GeoNames URL already is in db)
+EXTERNAL_REFERENCES = {'geonames': {'name': 'GeoNames', 'url': ''},
+                       'wikidata': {'name': 'Wikidata', 'url': 'https://www.wikidata.org/entity/'}}
 
 # API
 API_SCHEMA = 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.jsonld'

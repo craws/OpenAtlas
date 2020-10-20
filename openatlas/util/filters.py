@@ -382,7 +382,9 @@ def display_form(self: Any,
                                  field=field(class_=class_),
                                  tooltip=tooltip)
             continue
-        if field.id in ['geonames_id', 'wikidata_id']:
+
+        # External Reference
+        if field.id in [name + '_id' for name in g.external]:
             name = field.id.replace('_id', '')
             precision_field = getattr(form, name + '_precision')
             html['main'] += '''
@@ -396,8 +398,9 @@ def display_form(self: Any,
                              precision_field=precision_field,
                              precision_label=precision_field.label)
             continue
-        if field.id in ['geonames_precision', 'wikidata_precision']:
+        if field.id in [name + '_precision' for name in g.external]:
             continue  # Is already added with _id field
+
         html['main'] += '''
             <div class="table-row">
                 <div>{label} {tooltip}</div>
@@ -506,12 +509,10 @@ def display_external_references(self: Any, entity: Entity) -> str:
         name = display.truncate(url.replace('http://', '').replace('https://', ''), span=False)
         if link_.description:
             name = link_.description
-        if link_.domain.system_type == 'external reference geonames':
-            name = 'GeoNames (' + link_.domain.name + ')'
-            url = session['settings']['geonames_url'] + link_.domain.name
-        if link_.domain.system_type == 'external reference wikidata':
-            name = 'Wikidata (' + link_.domain.name + ')'
-            url = app.config['EXTERNAL']['wikidata']['url'] + link_.domain.name
+        if link_.domain.system_type.startswith('external reference '):
+            reference = link_.domain.system_type.replace('external reference ', '')
+            name = g.external[reference]['name'] + ' (' + link_.domain.name + ')'
+            url = g.external[reference]['url'] + link_.domain.name
         html += '<a target="_blank" href="{url}">{name}</a><br>'.format(url=url, name=name)
     if not html:
         return ''

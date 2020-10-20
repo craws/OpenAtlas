@@ -219,17 +219,15 @@ class Entity:
 
     def print_base_type(self) -> str:
         from openatlas.models.node import Node
-        if not self.view_name or self.view_name == 'actor':  # actors have no base type
+        if not self.view_name or self.view_name == 'actor':  # Actors have no base type
             return ''
+        if self.system_type and self.system_type.startswith('external reference '):
+            return ''   # e.g. "External Reference GeoNames"
         root_name = self.view_name.title()
-        if self.view_name == 'reference':
+        if self.view_name in ['reference', 'place']:
             root_name = self.system_type.title()
-            if root_name in ['External Reference Geonames', 'External Reference Wikidata']:
-                root_name = 'External Reference'
         elif self.view_name == 'file':
             root_name = 'License'
-        elif self.view_name == 'place':
-            root_name = self.system_type.title()
         elif self.class_.code == 'E84':
             root_name = 'Information Carrier'
         root_id = Node.get_hierarchy(root_name).id
