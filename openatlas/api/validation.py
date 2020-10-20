@@ -1,4 +1,3 @@
-import re
 import datetime
 from typing import Any, Dict, List, Optional, Union
 
@@ -67,17 +66,14 @@ class Validation:
         for idx, filter_ in enumerate(data):
             if not filter_[3]:
                 raise APIError('No search term.', status_code=404, payload="404i")
-             # column = Default.column_validation[filter_[1]] \
-             #    if filter_[3].isdigit() else 'LOWER(' + Default.column_validation[filter_[1]] + ')'
-            column = 'LOWER(' + Default.column_validation[filter_[1]] + ')' if filter_[2] == 'LIKE' else Default.column_validation[filter_[1]]
-            print(column)
+            column = 'LOWER(' + Default.column_validation[filter_[1]] + ')' if \
+                Default.operators_compare[filter_[2]] == 'LIKE' else Default.column_validation[
+                filter_[1]]
             out.append({
                 'idx': idx,
                 'term': Validation.validate_term(filter_),
-                'clause': Default.operators_logical[filter_[0]] + ' ' +
-                          column + ' ' +
+                'clause': Default.operators_logical[filter_[0]] + ' ' + column + ' ' +
                           Default.operators_compare[filter_[2]]})
-        print(out)
         return out
 
     @staticmethod
@@ -94,12 +90,12 @@ class Validation:
             try:
                 int(filter_[3])
             except:
-                raise APIError('Invalid search term: ' + filter_[3], status_code=404, payload="404l")
-
-        operator = Default.operators_compare[filter_[2]]
-        # int(filter_[3]) if filter_[3].isdigit() else '%%' + filter_[3] + '%%',
-
-        return filter_[3]
+                raise APIError('Invalid search term: ' + filter_[3], status_code=404,
+                               payload="404l")
+        # If operator is LIKE then % are needed
+        term = '%' + filter_[3] + '%' if Default.operators_compare[filter_[2]] == 'LIKE' else \
+            filter_[3]
+        return term
 
     @staticmethod
     def validate_limit(limit: Optional[str] = None) -> int:
