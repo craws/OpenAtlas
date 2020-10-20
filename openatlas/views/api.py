@@ -8,12 +8,13 @@ from openatlas.api.error import APIError
 from openatlas.api.node import APINode
 from openatlas.api.path import Path
 from openatlas.api.validation import Validation
-from openatlas.util.util import api_access
+from openatlas.util.util import api_access, check_ip
 
 
 @app.route('/api/0.1/entity/<id_>', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
+@check_ip()
 def api_entity(id_: int) -> Response:
     validation = Validation.validate_url_query(request.args)
     if validation['download']:
