@@ -8,7 +8,7 @@ from functools import wraps
 from pathlib import Path
 from typing import Any, Dict, List, TYPE_CHECKING, Union
 
-from flask import abort, current_app, flash, request, session, url_for
+from flask import abort, flash, request, session, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from flask_wtf import FlaskForm
@@ -105,11 +105,8 @@ def check_ip():  # type: ignore
         @wraps(f)
         def wrapped(*args, **kwargs):  # type: ignore
             ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
-            if ip:
-                if ip not in app.config['ALLOWED_IPS']:
-                    if not current_user.is_authenticated:
-                        raise APIError('Syntax is incorrect!', status_code=401,
-                                       payload="401")  # pragma: nocover
+            if ip and ip not in app.config['ALLOWED_IPS'] and not current_user.is_authenticated:
+                raise APIError('Access denied!', status_code=401, payload="401")  # pragma: nocover
             return f(*args, **kwargs)
 
         return wrapped
