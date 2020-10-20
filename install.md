@@ -91,11 +91,9 @@ Test Apache configuration and restart
 
 Make these directories writeable for the Apache user:
 
-openatlas/uploads
-
-openatlas/export/csv
-
-openatlas/export/sql
+    openatlas/uploads
+    openatlas/export/csv
+    openatlas/export/sql
 
 e.g.
 
@@ -117,7 +115,7 @@ You don't need this to run the application but it will improve server side secur
 
 Use certbot to create a https vhost.
 
-When configured Apache to use HTTPS only, add this line to instance/production.py:
+After Apache is configured to use HTTPS only, add this line to instance/production.py:
 
     SESSION_COOKIE_SECURE = True
 
@@ -134,12 +132,12 @@ As postgres
     $ cd install
     $ cat 1_structure.sql 2_data_web.sql 3_data_model.sql 4_data_node.sql | psql -d openatlas_test -f -
 
-Copy instance/example_testing.py to instance/testing.py
+Copy instance/example_testing.py to instance/testing.py and add/change values as appropriate.
 
     $ cp instance/example_testing.py instance/testing.py
 
-Add/change values as appropriate. If using PyCharm create a Nosetest.
 
-Use these parameters to run tests with coverage and HTML report:
+
+If using PyCharm create a Nosetest, use these parameters for tests with coverage and HTML report:
 
     --with-coverage --cover-html --cover-package tests --cover-package openatlas --cover-tests --cover-erase
