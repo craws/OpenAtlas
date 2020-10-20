@@ -138,6 +138,6 @@ Copy instance/example_testing.py to instance/testing.py and add/change values as
 
 
 
-If using PyCharm create a Nosetest, use these parameters for tests with coverage and HTML report:
+If using PyCharm, create a Nosetest and use these parameters for tests with coverage and HTML report:
 
     --with-coverage --cover-html --cover-package tests --cover-package openatlas --cover-tests --cover-erase
