@@ -225,12 +225,9 @@ def place_view(obj: Entity) -> str:
                     data.append('')
         if domain.view_name not in ['source', 'file']:
             data.append(link_.description)
-            if not domain.system_type.startswith('external reference '):
-                data = add_edit_link(data, url_for('reference_link_update',
-                                                   link_id=link_.id,
-                                                   origin_id=obj.id))
-            else:
-                data.append('')
+            data = add_edit_link(
+                data,
+                url_for('reference_link_update', link_id=link_.id, origin_id=obj.id))
             if domain.system_type.startswith('external reference'):
                 obj.external_references.append(link_)
         data = add_remove_link(data, domain.name, link_, obj, domain.view_name)
