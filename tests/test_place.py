@@ -28,12 +28,12 @@ class PlaceTest(TestBaseCase):
             data = {'name': 'Asgard',
                     'alias-0': 'Valhöll',
                     'geonames_id': '123',
-                    'geonames_precision': True,
+                    'geonames_precision': 'close match',
                     unit_node.id: str([unit_sub1.id, unit_sub2.id])}
             rv = self.app.post(url_for('place_insert', origin_id=reference.id),
                                data=data,
                                follow_redirects=True)
-            assert b'Asgard' in rv.data
+            assert b'Asgard' in rv.data and b'An entry has been created' in rv.data
             data['gis_points'] = """[{
                 "type":"Feature",
                 "geometry":{"type":"Point","coordinates":[9,17]},

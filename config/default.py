@@ -40,6 +40,7 @@ THUNDERFOREST_KEY = '7878b4fb224f4902ab42fc846e92b96a'
 # Will moved to db and be configurable in admin when more options (GeoNames URL already is in db)
 EXTERNAL_REFERENCES = {'geonames': {'name': 'GeoNames', 'url': ''},
                        'wikidata': {'name': 'Wikidata', 'url': 'https://www.wikidata.org/entity/'}}
+REFERENCE_PRECISION = [('',''), ('close match', 'close match'), ('exact match', 'exact match')]
 
 # API
 API_SCHEMA = 'https://raw.githubusercontent.com/LinkedPasts/linked-places/master/linkedplaces-context-v1.jsonld'

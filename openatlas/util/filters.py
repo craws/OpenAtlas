@@ -390,13 +390,13 @@ def display_form(self: Any,
             html['main'] += '''
             <div class="table-row">
                 <div>{label} {tooltip}</div>
-                <div class="table-cell">{field}{precision_field}{precision_label} {errors}</div>
+                <div class="table-cell">{field} {precision_label} {precision_field} {errors}</div>
             </div>'''.format(label=field.label,
                              errors=errors,
                              field=field(class_=class_),
                              tooltip=tooltip,
                              precision_field=precision_field,
-                             precision_label=precision_field.label)
+                             precision_label=display.uc_first(_('precision')))
             continue
         if field.id in [name + '_precision' for name in g.external]:
             continue  # Is already added with _id field

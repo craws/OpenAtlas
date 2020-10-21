@@ -41,11 +41,7 @@ class Reference:
             # Get id of the match type
             match_id = None
             for node_id in Node.get_hierarchy('External Reference Match').subs:
-                match_name = g.nodes[node_id].name
-                if match_name == 'exact match' and getattr(form, name + '_precision').data:
-                    match_id = node_id
-                    break
-                if match_name == 'close match' and not getattr(form, name + '_precision').data:
+                if g.nodes[node_id].name == getattr(form, name + '_precision').data:
                     match_id = node_id
                     break
 

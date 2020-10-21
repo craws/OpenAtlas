@@ -5,18 +5,18 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import (BooleanField, FieldList, HiddenField, IntegerField, StringField, SubmitField,
-                     TextAreaField)
+from wtforms import (BooleanField, FieldList, HiddenField, IntegerField, SelectField, StringField,
+                     SubmitField, TextAreaField)
 from wtforms.validators import InputRequired, Optional as OptValidator
 
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
 from openatlas.forms.util import build_form
 from openatlas.models.entity import Entity
-from openatlas.models.reference import Reference
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
 from openatlas.models.place import get_structure
+from openatlas.models.reference import Reference
 from openatlas.models.user import User
 from openatlas.util.display import (add_edit_link, add_remove_link, get_base_table_data,
                                     get_entity_data, get_profile_image_table_link, link, uc_first)
@@ -28,9 +28,10 @@ from openatlas.util.util import is_authorized, required_group, was_modified
 class PlaceForm(DateForm):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
     geonames_id = IntegerField('GeoNames Id', [OptValidator()], description=_('tooltip geonames'))
-    geonames_precision = BooleanField('exact match')
+    geonames_precision = SelectField(choices=app.config['REFERENCE_PRECISION'],
+                                     default='close match')
     wikidata_id = StringField('Wikidata Id', [OptValidator()])
-    wikidata_precision = BooleanField('exact match')
+    wikidata_precision = SelectField(choices=app.config['REFERENCE_PRECISION'], default='')
     alias = FieldList(StringField(''), description=_('tooltip alias'))
     description = TextAreaField(_('description'))
     save = SubmitField(_('insert'))
@@ -50,6 +51,11 @@ class PlaceForm(DateForm):
                 valid = False
             else:
                 self.wikidata_id.data = uc_first(self.wikidata_id.data)
+        for name in g.external:
+            if hasattr(self, name + '_id'):
+                if getattr(self, name + '_id').data and not getattr(self, name + '_precision').data:
+                    valid = False
+                    getattr(self, name + '_id').errors.append(uc_first(_('precision required')))
         return valid
 
 
@@ -186,8 +192,7 @@ def place_update(id_: int) -> Union[str, Response]:
             if link_ and not getattr(form, name + '_id').data:
                 reference = link_.domain
                 getattr(form, name + '_id').data = reference.name if reference else ''
-                exact_match = True if g.nodes[link_.type.id].name == 'exact match' else False
-                getattr(form, name + '_precision').data = exact_match
+                getattr(form, name + '_precision').data = g.nodes[link_.type.id].name
     structure = get_structure(object_)
     return render_template('place/update.html',
                            form=form,

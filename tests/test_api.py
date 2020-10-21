@@ -1,6 +1,4 @@
-import pathlib
-
-from flask import url_for, g
+from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
@@ -41,7 +39,7 @@ class ApiTests(TestBaseCase):
                 # stratigraphic_sub = g.nodes[stratigraphic_node.subs[0]]
 
             # Data for geometric results
-            data = {'name': 'Asgard', 'geonames_id': '123', 'geonames_precision': True,
+            data = {'name': 'Asgard', 'geonames_id': '123', 'geonames_precision': 'close match',
                     'geonames_description': "Alexander",
                     unit_node.id: str([unit_sub1.id, unit_sub2.id]),
                     'gis_points': """[{

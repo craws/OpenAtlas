@@ -137,6 +137,10 @@ span.tab-counter {
     width: 5em;
 }
 
+#geonames_precision, #wikidata_precision {
+    width: auto;
+}
+
 .date-switch label.error {
     padding: 0.2em;
 }
