@@ -94,7 +94,7 @@ def api_access():  # type: ignore
                     session['settings']['api_public']:  # pragma: no cover
                 ip = request.environ.get('HTTP_X_REAL_IP', request.remote_addr)
                 if ip and ip not in app.config['ALLOWED_IPS'] and not current_user.is_authenticated:
-                    raise APIError('Access denied!', status_code=403, payload="403")
+                    raise APIError('Access denied.', status_code=403, payload="403")
             return f(*args, **kwargs)
 
         return wrapped
