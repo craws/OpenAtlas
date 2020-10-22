@@ -18,7 +18,7 @@ from openatlas.util.display import (add_edit_link, add_remove_link, convert_size
                                     get_base_table_data, get_entity_data, get_file_path, link)
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
-from openatlas.util.util import get_file_stats, required_group, was_modified
+from openatlas.util.util import api_access, get_file_stats, required_group, was_modified
 
 
 class FileForm(FlaskForm):  # type: ignore
@@ -49,7 +49,7 @@ def download_file(filename: str) -> Any:
 
 
 @app.route('/display/<path:filename>')
-@required_group('readonly')
+@api_access()
 def display_file(filename: str) -> Any:
     return send_from_directory(app.config['UPLOAD_DIR'], filename)
 
