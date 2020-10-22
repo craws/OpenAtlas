@@ -11,8 +11,6 @@ from tests.base import TestBaseCase
 class ExportTest(TestBaseCase):
 
     def test_export(self) -> None:
-        if os.name != "posix":  # pragma: no cover, for e.g. Windows make backup file to pass check
-            (app.config['EXPORT_DIR'] / 'sql' / 'fake.sql').touch()
         with app.app_context():  # type: ignore
             # Projects
             rv = self.app.get(url_for('import_project_insert'))
@@ -45,8 +43,7 @@ class ExportTest(TestBaseCase):
                 rv = self.app.post(url_for('import_data', class_code='E18', project_id=project_id),
                                    data={'file': file, 'duplicate': True},
                                    follow_redirects=True)
-            if os.name == 'posix':
-                assert b'IDs already in database' in rv.data
+            assert b'IDs already in database' in rv.data
             with open(pathlib.Path(app.root_path) / 'static' / 'favicon.ico', 'rb') as file:
                 rv = self.app.post(url_for('import_data', class_code='E18', project_id=project_id),
                                    data={'file': file},
