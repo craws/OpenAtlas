@@ -122,7 +122,7 @@ def api_get_query() -> Response:
         if validation['count']:
             return jsonify(count)
         if validation['download']:
-            return Response(json.dumps(out),
+            return Response(json.dumps(Path.pagination(out, validation=validation)),
                             mimetype='application/json',
                             headers={'Content-Disposition': 'attachment;filename=query.json'})
         return jsonify(Path.pagination(out, validation=validation))
