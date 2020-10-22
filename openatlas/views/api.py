@@ -10,6 +10,8 @@ from openatlas.api.error import APIError
 from openatlas.api.node import APINode
 from openatlas.api.path import Path
 from openatlas.api.validation import Validation
+from openatlas.models.entity import Entity
+from openatlas.models.node import Node
 from openatlas.util.util import api_access
 
 
@@ -192,6 +194,21 @@ def api_subunit_hierarchy(id_: int) -> Response:
                             'Content-Disposition': 'attachment;filename=subunit_hierarchy_' + str(
                                 id_) + '.json'})
     return jsonify(APINode.get_subunit_hierarchy(id_))
+
+
+@app.route('/api/display/<path:filename>')
+@api_access()  # type: ignore
+@cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
+def display_file_api(filename: str) -> Any:
+    from pathlib import Path as Pathlib_path
+    entity = Entity.get_by_id(int(Pathlib_path(filename).stem), nodes=True)
+    license_ = None
+    for node in entity.nodes:
+        if node.root and node.root[-1] == Node.get_hierarchy('License').id:
+            license_ = node.name
+    if license_:
+        return send_from_directory(app.config['UPLOAD_DIR'], filename)
+    raise APIError('Access denied.', status_code=403, payload="403")
 
 
 @app.route('/api', strict_slashes=False)
