@@ -133,11 +133,11 @@ span.tab-counter {
     width: 36em;
 }
 
-#geonames_id, #wikidata_id {
-    width: 5em;
+.external-reference input[type="text"] {
+    width: 4em;
 }
 
-#geonames_precision, #wikidata_precision {
+.external-reference select {
     width: auto;
 }
 

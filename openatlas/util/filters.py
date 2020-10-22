@@ -388,7 +388,7 @@ def display_form(self: Any,
             name = field.id.replace('_id', '')
             precision_field = getattr(form, name + '_precision')
             html['main'] += '''
-            <div class="table-row">
+            <div class="table-row external-reference">
                 <div>{label} {tooltip}</div>
                 <div class="table-cell">{field} {precision_label} {precision_field} {errors}</div>
             </div>'''.format(label=field.label,
