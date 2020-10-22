@@ -194,13 +194,6 @@ def api_subunit_hierarchy(id_: int) -> Response:
     return jsonify(APINode.get_subunit_hierarchy(id_))
 
 
-@app.route('/api/display/<path:filename>')
-@api_access()  # type: ignore
-@cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
-def display_file_api(filename: str) -> Any:
-    return send_from_directory(app.config['UPLOAD_DIR'], filename)
-
-
 @app.route('/api', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])

@@ -47,7 +47,7 @@ class Api:
                 files.append({'@id': url_for('api_entity', id_=link.domain.id, _external=True),
                               'title': link.domain.name,
                               'license': Api.get_license(link.domain.id),
-                              'url': url_for('display_file_api',
+                              'url': url_for('display_file',
                                              filename=path.name,
                                              _external=True) if path else "N/A"})
         return files
