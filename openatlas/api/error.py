@@ -43,14 +43,9 @@ class APIError(Exception):
         self.error_code = status_code
 
     def to_dict(self) -> Dict[str, str]:
-        rv = {'title': self.message,
-              'status': str(self.status_code),
-              'intern-status': self.payload,
-              'detail': str(self.error_detail[self.payload]),
-              'instance': request.base_url,
-              'timestamp': str(datetime.now())}
-        if self.status_code in [403, 401]:
-            rv['wiki'] = "https://redmine.openatlas.eu/projects/uni/wiki/API_Authentication"
-        else:
-            rv['wiki'] = "https://redmine.openatlas.eu/projects/uni/wiki/Api"
+        rv = {'title': self.message, 'status': str(self.status_code), 'intern-status': self.payload,
+              'detail': str(self.error_detail[self.payload]), 'instance': request.base_url,
+              'timestamp': str(datetime.now()),
+              'wiki': "https://redmine.openatlas.eu/projects/uni/wiki/Api"}
+
         return rv

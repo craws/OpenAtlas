@@ -1,3 +1,4 @@
+import os
 import shutil
 import subprocess
 
@@ -90,18 +91,30 @@ class Export:
     def export_sql() -> bool:
         """ Creates pg_dump file in export/sql folder, filename begins with current date_time."""
         # Todo: prevent exposing the database password to the process list
-        command = """pg_dump -h {host} -d {database} -U {user} -p {port} -f {file}""".format(
-            host=app.config['DATABASE_HOST'],
-            database=app.config['DATABASE_NAME'],
-            port=app.config['DATABASE_PORT'],
-            user=app.config['DATABASE_USER'],
-            file=app.config['EXPORT_DIR'] / 'sql' / (Date.current_date_for_filename() + '_dump.sql')
-        )
-        try:
-            subprocess.Popen(command,
-                             shell=True,
-                             stdin=subprocess.PIPE,
-                             env={'PGPASSWORD': app.config['DATABASE_PASS']}).wait()
-        except Exception:  # pragma: no cover
-            return False
+        if os.name == 'posix':
+            command = """pg_dump -h {host} -d {database} -U {user} -p {port} -f {file}""".format(
+                host=app.config['DATABASE_HOST'],
+                database=app.config['DATABASE_NAME'],
+                port=app.config['DATABASE_PORT'],
+                user=app.config['DATABASE_USER'],
+                file=app.config['EXPORT_DIR'] / 'sql' / (
+                        Date.current_date_for_filename() + '_dump.sql')
+            )
+            try:
+                subprocess.Popen(command,
+                                 shell=True,
+                                 stdin=subprocess.PIPE,
+                                 env={'PGPASSWORD': app.config['DATABASE_PASS']}).wait()
+            except Exception:  # pragma: no cover
+                return False
+        else:  # pragma: no cover
+            os.popen("""{pg_dump} -h {host} -d {database} -U {user} -p {port} > {file}""".format(
+                host='127.0.0.1',
+                database=app.config['DATABASE_NAME'],
+                port=app.config['DATABASE_PORT'],
+                user=app.config['DATABASE_USER'],
+                pg_dump='"' + shutil.which('pg_dump') + '"',
+                file=app.config['EXPORT_DIR'] / 'sql' / (
+                            Date.current_date_for_filename() + '_dump.sql')
+            ))
         return True
