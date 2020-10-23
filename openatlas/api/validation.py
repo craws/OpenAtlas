@@ -7,7 +7,7 @@ from openatlas.api.error import APIError
 class Default:
     limit: int = 20
     sort: str = 'ASC'
-    filter: List[str] = [{'clause': 'and e.id >=', 'term': 1, 'idx': '0'}]
+    filter: List[Dict[str, Union[str, Any]]] = [{'clause': 'and e.id >=', 'term': 1, 'idx': '0'}]
     column: List[str] = ['name']
     last: Optional[str] = None
     first: Optional[str] = None
