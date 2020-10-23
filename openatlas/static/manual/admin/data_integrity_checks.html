@@ -9,7 +9,7 @@
   
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <title>Data integrity checks &mdash; OpenAtlas 5.5.0 documentation</title>
+  <title>Data integrity checks &mdash; OpenAtlas 5.6.0 documentation</title>
   
 
   
@@ -22,10 +22,10 @@
   
     
       <script type="text/javascript" id="documentation_options" data-url_root="../" src="../_static/documentation_options.js"></script>
-        <script type="text/javascript" src="../_static/jquery.js"></script>
-        <script type="text/javascript" src="../_static/underscore.js"></script>
-        <script type="text/javascript" src="../_static/doctools.js"></script>
-        <script type="text/javascript" src="../_static/language_data.js"></script>
+        <script src="../_static/jquery.js"></script>
+        <script src="../_static/underscore.js"></script>
+        <script src="../_static/doctools.js"></script>
+        <script src="../_static/language_data.js"></script>
     
     <script type="text/javascript" src="../_static/js/theme.js"></script>
 
@@ -64,7 +64,7 @@
             
             
               <div class="version">
-                5.5.0
+                5.6.0
               </div>
             
           
@@ -97,6 +97,7 @@
 <li class="toctree-l2"><a class="reference internal" href="user.html">User</a></li>
 <li class="toctree-l2"><a class="reference internal" href="general.html">General</a></li>
 <li class="toctree-l2"><a class="reference internal" href="mail.html">Mail</a></li>
+<li class="toctree-l2"><a class="reference internal" href="modules.html">Modules</a></li>
 <li class="toctree-l2"><a class="reference internal" href="map.html">Map</a></li>
 <li class="toctree-l2"><a class="reference internal" href="content.html">Content</a></li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Data integrity checks</a></li>
@@ -248,8 +249,8 @@ could happen because of imports or unknown bugs.</p>
 <p>Here you can search for similar names. Depending on selection and data volume this might take some
 time.</p>
 <ul class="simple">
-<li><strong>Classes</strong> - select the class which you want to search for similar names</li>
-<li><strong>Ratio</strong> - select how similar the names should be. 100 is the default and means absolute identical. The lower you set the number the more names which are similar will be found but it will also get more time consuming, so you should begin with a higher numbers.</li>
+<li><p><strong>Classes</strong> - select the class which you want to search for similar names</p></li>
+<li><p><strong>Ratio</strong> - select how similar the names should be. 100 is the default and means absolute identical. The lower you set the number the more names which are similar will be found but it will also get more time consuming, so you should begin with a higher numbers.</p></li>
 </ul>
 <p>To find similar names the Python <a class="reference external" href="https://pypi.org/project/fuzzywuzzy/">fuzzywuzzy</a> package is used
 which in turn uses the <a class="reference external" href="https://en.wikipedia.org/wiki/Levenshtein_distance">Levenshtein Distance</a>.</p>
