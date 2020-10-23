@@ -203,6 +203,7 @@ def display_file_api(filename: str) -> Any:
     from pathlib import Path as Pathlib_path
     entity = Entity.get_by_id(int(Pathlib_path(filename).stem), nodes=True)
     license_ = None
+    # If img has no license, it will not displayed
     for node in entity.nodes:
         if node.root and node.root[-1] == Node.get_hierarchy('License').id:
             license_ = node.name
