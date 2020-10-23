@@ -27,7 +27,7 @@ from openatlas.util.util import is_authorized, required_group, was_modified
 
 class PlaceForm(DateForm):
     name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
-    geonames_id = IntegerField('GeoNames Id', [OptValidator()], description=_('tooltip geonames'))
+    geonames_id = IntegerField('GeoNames Id', [OptValidator()])
     geonames_precision = SelectField(choices=app.config['REFERENCE_PRECISION'],
                                      default='close match')
     wikidata_id = StringField('Wikidata Id', [OptValidator()])
