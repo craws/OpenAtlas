@@ -199,7 +199,7 @@ def api_subunit_hierarchy(id_: int) -> Response:
 @app.route('/api/display/<path:filename>')
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
-def display_file_api(filename: str) -> Any:
+def display_file_api(filename: str) -> Any:  # pragma: no cover
     from pathlib import Path as Pathlib_path
     entity = Entity.get_by_id(int(Pathlib_path(filename).stem), nodes=True)
     license_ = None
