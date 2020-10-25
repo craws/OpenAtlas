@@ -45,7 +45,8 @@ class PlaceForm(DateForm):
 
     def validate(self) -> bool:
         valid = DateForm.validate(self)
-        if self.wikidata_id.data:
+        # Todo: remove no cover after form refactor
+        if self.wikidata_id.data:  # pragma: no cover
             if self.wikidata_id.data[0].upper() != 'Q' or not self.wikidata_id.data[1:].isdigit():
                 self.wikidata_id.errors.append(uc_first(_('wrong format')))
                 valid = False

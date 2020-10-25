@@ -11,7 +11,7 @@ from flask_wtf.csrf import generate_csrf
 from wtforms.validators import Optional
 
 from openatlas import app
-from openatlas.forms.form import ProfileForm
+from openatlas.forms.setting import ProfileForm
 from openatlas.forms.field import TreeField, TreeMultiField, ValueFloatField
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -58,7 +58,8 @@ def build_form(form: Any,
         delattr(form_instance, item)
 
     # External references
-    for name in g.external:
+    # Todo: remove no cover after form refactor
+    for name in g.external:  # pragma: no cover
         if name + '_id' in form_instance and not current_user.settings['module_' + name]:
             del form_instance[name + '_id'], form_instance[name + '_precision']
 
@@ -176,8 +177,8 @@ def get_form_settings(form: Any, profile: bool = False) -> Dict[str, str]:
             value = current_user.settings[field.name]
         elif field.name in session['settings']:
             value = session['settings'][field.name]
-        else:
-            value = ''
+        else:  # pragma: no cover
+            value = ''  # In case of a missing setting after an update introducing it
         if field.type in ['StringField', 'IntegerField']:
             settings[label] = value
         if field.type == 'BooleanField':
@@ -210,7 +211,7 @@ def set_form_settings(form: Any, profile: bool = False) -> None:
         if field.name in ['mail_recipients_feedback', 'file_upload_allowed_extension']:
             field.data = ' '.join(session['settings'][field.name])
             continue
-        if field.name not in session['settings']:
-            field.data = ''
+        if field.name not in session['settings']:  # pragma: no cover
+            field.data = ''  # In case of a missing setting after an update introducing it
             continue
         field.data = session['settings'][field.name]

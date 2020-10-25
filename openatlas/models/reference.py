@@ -60,7 +60,8 @@ class Reference:
                 continue  # It's the same link so do nothing
 
             # Only the match type changed so delete and recreate the link
-            if link_ and str(new_id) == str(reference.name):
+            # Todo: remove no cover after form refactor
+            if link_ and str(new_id) == str(reference.name):  # pragma: no cover
                 link_.delete()
                 object_.link('P67', reference, inverse=True, type_id=match_id)
                 continue
