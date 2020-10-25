@@ -10,7 +10,7 @@ from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.util import build_form
+from openatlas.forms.util import build_form2
 from openatlas.models.entity import Entity
 from openatlas.util.display import get_entity_data
 from openatlas.util.util import required_group
@@ -28,7 +28,7 @@ class TranslationForm(FlaskForm):  # type: ignore
 @required_group('contributor')
 def translation_insert(source_id: int) -> Union[str, Response]:
     source = Entity.get_by_id(source_id, view_name='source')
-    form = build_form(TranslationForm, 'Source translation')
+    form = build_form2(TranslationForm, 'Source translation')
     if form.validate_on_submit():
         translation = save(form, source=source)
         flash(_('entity created'), 'info')
@@ -51,7 +51,7 @@ def translation_delete(id_: int, source_id: int) -> Response:
 def translation_update(id_: int) -> Union[str, Response]:
     translation = Entity.get_by_id(id_, nodes=True)
     source = translation.get_linked_entity('P73', True)
-    form = build_form(TranslationForm, 'Source translation', translation, request)
+    form = build_form2(TranslationForm, 'Source translation', translation, request)
     if form.validate_on_submit():
         save(form, translation)
         flash(_('info update'), 'info')

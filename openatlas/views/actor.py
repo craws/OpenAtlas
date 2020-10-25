@@ -9,7 +9,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
-from openatlas.forms.util import build_form
+from openatlas.forms.util import build_form2
 from openatlas.forms.field import TableField
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
@@ -54,7 +54,7 @@ def actor_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
 def actor_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id) if origin_id else None
     code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
-    form = build_form(ActorForm, code_class[code])
+    form = build_form2(ActorForm, code_class[code])
     if form.validate_on_submit():
         return redirect(save(form, code=code, origin=origin))
     form.alias.append_entry('')
@@ -73,7 +73,7 @@ def actor_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Respo
 def actor_update(id_: int) -> Union[str, Response]:
     actor = Entity.get_by_id(id_, nodes=True, aliases=True, view_name='actor')
     code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
-    form = build_form(ActorForm, code_class[actor.class_.code], actor, request)
+    form = build_form2(ActorForm, code_class[actor.class_.code], actor, request)
     if form.validate_on_submit():
         if was_modified(form, actor):  # pragma: no cover
             del form.save

@@ -9,7 +9,8 @@ from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.util import build_form, build_table_form
+from openatlas.forms.cidoc import build_form
+from openatlas.forms.util import build_form2, build_table_form
 from openatlas.forms.field import TableMultiField
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
@@ -48,7 +49,7 @@ def source_index(action: Optional[str] = None, id_: Optional[int] = None) -> str
 @required_group('contributor')
 def source_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    form = build_form(SourceForm, 'Source')
+    form = build_form('source')
     if origin:
         del form.insert_and_continue
     if form.validate_on_submit():
@@ -74,7 +75,7 @@ def source_add(id_: int, class_name: str) -> Union[str, Response]:
 @required_group('contributor')
 def source_update(id_: int) -> Union[str, Response]:
     source = Entity.get_by_id(id_, nodes=True, view_name='source')
-    form = build_form(SourceForm, 'Source', source, request)
+    form = build_form2(SourceForm, 'Source', source, request)
     if form.validate_on_submit():
         if was_modified(form, source):  # pragma: no cover
             del form.save

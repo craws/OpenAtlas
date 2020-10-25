@@ -10,7 +10,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
-from openatlas.forms.util import build_form, get_link_type
+from openatlas.forms.util import build_form2, get_link_type
 from openatlas.forms.field import TableMultiField
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -43,7 +43,7 @@ class MemberForm(DateForm):
 @required_group('contributor')
 def membership_insert(origin_id: int) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
-    form = build_form(MemberForm, 'Member')
+    form = build_form2(MemberForm, 'Member')
     del form.actor
     form.origin_id.data = origin.id
     if form.validate_on_submit():
@@ -70,7 +70,7 @@ def membership_insert(origin_id: int) -> Union[str, Response]:
 @required_group('contributor')
 def member_insert(origin_id: int) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
-    form = build_form(MemberForm, 'Member')
+    form = build_form2(MemberForm, 'Member')
     del form.group
     form.origin_id.data = origin.id
     if form.validate_on_submit():
@@ -100,7 +100,7 @@ def member_update(id_: int, origin_id: int) -> Union[str, Response]:
     domain = Entity.get_by_id(link_.domain.id)
     range_ = Entity.get_by_id(link_.range.id)
     origin = range_ if origin_id == range_.id else domain
-    form = build_form(MemberForm, 'Member', link_, request)
+    form = build_form2(MemberForm, 'Member', link_, request)
     del form.actor, form.group, form.insert_and_continue
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')

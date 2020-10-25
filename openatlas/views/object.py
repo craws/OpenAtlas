@@ -9,7 +9,7 @@ from wtforms import HiddenField, StringField, SubmitField, TextAreaField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.util import build_form
+from openatlas.forms.util import build_form2
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.display import add_remove_link, get_base_table_data, get_entity_data, link
@@ -43,7 +43,7 @@ def object_index(action: Optional[str] = None, id_: Optional[int] = None) -> str
 @app.route('/object/insert', methods=['POST', 'GET'])
 @required_group('contributor')
 def object_insert() -> Union[str, Response]:
-    form = build_form(InformationCarrierForm, 'Information Carrier')
+    form = build_form2(InformationCarrierForm, 'Information Carrier')
     if form.validate_on_submit():
         return redirect(save(form))
     return render_template('object/insert.html', form=form)
@@ -53,7 +53,7 @@ def object_insert() -> Union[str, Response]:
 @required_group('contributor')
 def object_update(id_: int) -> Union[str, Response]:
     object_ = Entity.get_by_id(id_, nodes=True, view_name='object')
-    form = build_form(InformationCarrierForm, object_.system_type.title(), object_, request)
+    form = build_form2(InformationCarrierForm, object_.system_type.title(), object_, request)
     if form.validate_on_submit():
         if was_modified(form, object_):  # pragma: no cover
             del form.save

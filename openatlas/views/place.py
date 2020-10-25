@@ -11,7 +11,7 @@ from wtforms.validators import InputRequired, Optional as OptValidator
 
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
-from openatlas.forms.util import build_form
+from openatlas.forms.util import build_form2
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
@@ -108,25 +108,25 @@ def place_insert(origin_id: Optional[int] = None,
     geonames_buttons = False
     if origin and origin.system_type == 'place':
         title = 'feature'
-        form = build_form(FeatureForm, 'Feature')
+        form = build_form2(FeatureForm, 'Feature')
         form.insert_continue_sub.label.text += ' ' + _('with') + ' ' + _('stratigraphic unit')
         del form.insert_continue_human_remains
     elif origin and origin.system_type == 'feature':
         title = 'stratigraphic unit'
-        form = build_form(FeatureForm, 'Stratigraphic Unit')
+        form = build_form2(FeatureForm, 'Stratigraphic Unit')
         form.insert_continue_sub.label.text += ' ' + _('with') + ' ' + _('find')
         form.insert_continue_human_remains.label.text += ' ' + _('with') + ' ' + _('human remains')
     elif origin and origin.system_type == 'stratigraphic unit':
         if system_type == 'human_remains':  # URL param system_type only used for human remains
             title = 'human remains'
-            form = build_form(FeatureForm, 'Human Remains')
+            form = build_form2(FeatureForm, 'Human Remains')
         else:
             title = 'find'
-            form = build_form(FeatureForm, 'Find')
+            form = build_form2(FeatureForm, 'Find')
         del form.insert_continue_sub, form.insert_continue_human_remains
     else:
         title = 'place'
-        form = build_form(PlaceForm, 'Place')
+        form = build_form2(PlaceForm, 'Place')
         form.insert_continue_sub.label.text += ' ' + _('with') + ' ' + _('feature')
         geonames_buttons = True if current_user.settings['module_geonames'] else False
         if origin:
@@ -156,16 +156,16 @@ def place_update(id_: int) -> Union[str, Response]:
     location = object_.get_linked_entity_safe('P53', nodes=True)
     geonames_buttons = False
     if object_.system_type == 'feature':
-        form = build_form(FeatureForm, 'Feature', object_, request, location)
+        form = build_form2(FeatureForm, 'Feature', object_, request, location)
     elif object_.system_type == 'stratigraphic unit':
-        form = build_form(FeatureForm, 'Stratigraphic Unit', object_, request, location)
+        form = build_form2(FeatureForm, 'Stratigraphic Unit', object_, request, location)
     elif object_.system_type == 'find':
-        form = build_form(FeatureForm, 'Find', object_, request, location)
+        form = build_form2(FeatureForm, 'Find', object_, request, location)
     elif object_.system_type == 'human remains':
-        form = build_form(FeatureForm, 'Human Remains', object_, request, location)
+        form = build_form2(FeatureForm, 'Human Remains', object_, request, location)
     else:
         geonames_buttons = True if current_user.settings['module_geonames'] else False
-        form = build_form(PlaceForm, 'Place', object_, request, location)
+        form = build_form2(PlaceForm, 'Place', object_, request, location)
     if hasattr(form, 'insert_continue_sub'):
         del form.insert_continue_sub
     if hasattr(form, 'insert_continue_human_remains'):

@@ -12,7 +12,7 @@ from wtforms.validators import InputRequired
 
 import openatlas
 from openatlas import app, logger
-from openatlas.forms.util import build_form, build_table_form
+from openatlas.forms.util import build_form2, build_table_form
 from openatlas.models.entity import Entity
 from openatlas.util.display import (add_edit_link, add_remove_link, convert_size, format_date,
                                     get_base_table_data, get_entity_data, get_file_path, link)
@@ -123,7 +123,7 @@ def file_add(id_: int, class_name: str) -> Union[str, Response]:
 @required_group('contributor')
 def file_update(id_: int) -> Union[str, Response]:
     file_ = Entity.get_by_id(id_, nodes=True)
-    form = build_form(FileForm, 'File', file_, request)
+    form = build_form2(FileForm, 'File', file_, request)
     del form.file
     if form.validate_on_submit():
         if was_modified(form, file_):  # pragma: no cover
@@ -141,7 +141,7 @@ def file_update(id_: int) -> Union[str, Response]:
 @required_group('contributor')
 def file_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    form = build_form(FileForm, 'File')
+    form = build_form2(FileForm, 'File')
     if form.validate_on_submit():
         return redirect(save(form, origin=origin))
     writeable = True if os.access(app.config['UPLOAD_DIR'], os.W_OK) else False

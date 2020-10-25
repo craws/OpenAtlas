@@ -10,7 +10,7 @@ from wtforms import (BooleanField, SelectMultipleField, StringField, SubmitField
 from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.util import build_form
+from openatlas.forms.util import build_form2
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
 from openatlas.util.display import link, sanitize
@@ -35,7 +35,7 @@ class HierarchyForm(FlaskForm):  # type: ignore
 @app.route('/hierarchy/insert/<param>', methods=['POST', 'GET'])
 @required_group('manager')
 def hierarchy_insert(param: str) -> Union[str, Response]:
-    form = build_form(HierarchyForm, 'hierarchy')
+    form = build_form2(HierarchyForm, 'hierarchy')
     form.forms.choices = Node.get_form_choices()
     if param == 'value':
         del form.multiple
@@ -59,7 +59,7 @@ def hierarchy_update(id_: int) -> Union[str, Response]:
         tab_hash = '#menu-tab-custom_collapse-'
     if root.standard:
         abort(403)
-    form = build_form(HierarchyForm, 'hierarchy', root)
+    form = build_form2(HierarchyForm, 'hierarchy', root)
     form.forms.choices = Node.get_form_choices(root)
     if root.value_type:
         del form.multiple

@@ -29,11 +29,11 @@ def get_link_type(form: Any) -> Optional_Type[Entity]:
     return None
 
 
-def build_form(form: Any,
-               form_name: str,
-               selected_object: Union[Entity, Link, None] = None,
-               request_origin: Optional_Type[Request] = None,
-               entity2: Optional_Type[Entity] = None) -> Any:
+def build_form2(form: Any,
+                form_name: str,
+                selected_object: Union[Entity, Link, None] = None,
+                request_origin: Optional_Type[Request] = None,
+                entity2: Optional_Type[Entity] = None) -> Any:
     def add_value_type_fields(subs: List[int]) -> None:
         for sub_id in subs:
             sub = g.nodes[sub_id]

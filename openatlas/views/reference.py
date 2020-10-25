@@ -11,7 +11,7 @@ from wtforms.validators import InputRequired, URL
 
 import openatlas
 from openatlas import app, logger
-from openatlas.forms.util import build_form
+from openatlas.forms.util import build_form2
 from openatlas.forms.field import TableField
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -128,7 +128,7 @@ def reference_index(action: Optional[str] = None, id_: Optional[int] = None) -> 
 @required_group('contributor')
 def reference_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    form = build_form(ReferenceForm, 'External Reference' if code == 'external_reference' else code)
+    form = build_form2(ReferenceForm, 'External Reference' if code == 'external_reference' else code)
     if code == 'external_reference':
         form.name.validators = [InputRequired(), URL()]
         form.name.label.text = 'URL'
@@ -143,7 +143,7 @@ def reference_insert(code: str, origin_id: Optional[int] = None) -> Union[str, R
 @required_group('contributor')
 def reference_update(id_: int) -> Union[str, Response]:
     reference = Entity.get_by_id(id_, nodes=True, view_name='reference')
-    form = build_form(ReferenceForm, reference.system_type.title(), reference, request)
+    form = build_form2(ReferenceForm, reference.system_type.title(), reference, request)
     if reference.system_type == 'external reference':
         form.name.validators = [InputRequired(), URL()]
         form.name.label.text = 'URL'

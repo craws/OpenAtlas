@@ -11,7 +11,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
-from openatlas.forms.util import build_form
+from openatlas.forms.util import build_form2
 from openatlas.forms.field import TableField, TableMultiField
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
@@ -82,7 +82,7 @@ def prepare_form(form: EventForm, code: str) -> FlaskForm:
 @required_group('contributor')
 def event_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    form = prepare_form(build_form(EventForm, 'Event'), code)
+    form = prepare_form(build_form2(EventForm, 'Event'), code)
     if origin:
         del form.insert_and_continue
     if form.validate_on_submit():
@@ -102,7 +102,7 @@ def event_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Respo
 @required_group('contributor')
 def event_update(id_: int) -> Union[str, Response]:
     event = Entity.get_by_id(id_, nodes=True, view_name='event')
-    form = prepare_form(build_form(EventForm, 'Event', event, request), event.class_.code)
+    form = prepare_form(build_form2(EventForm, 'Event', event, request), event.class_.code)
     form.event_id.data = event.id
     if form.validate_on_submit():
         if was_modified(form, event):  # pragma: no cover

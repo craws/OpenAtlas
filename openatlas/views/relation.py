@@ -10,7 +10,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
-from openatlas.forms.util import build_form, get_link_type
+from openatlas.forms.util import build_form2, get_link_type
 from openatlas.forms.field import TableMultiField
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
@@ -39,7 +39,7 @@ class RelationForm(DateForm):
 @required_group('contributor')
 def relation_insert(origin_id: int) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id)
-    form = build_form(RelationForm, 'Actor Actor Relation')
+    form = build_form2(RelationForm, 'Actor Actor Relation')
     form.origin_id.data = origin.id
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')
@@ -72,7 +72,7 @@ def relation_update(id_: int, origin_id: int) -> Union[str, Response]:
     range_ = Entity.get_by_id(link_.range.id)
     origin = range_ if origin_id == range_.id else domain
     related = range_ if origin_id == domain.id else domain
-    form = build_form(RelationForm, 'Actor Actor Relation', link_, request)
+    form = build_form2(RelationForm, 'Actor Actor Relation', link_, request)
     del form.actor, form.insert_and_continue, form.origin_id
     if form.validate_on_submit():
         g.cursor.execute('BEGIN')

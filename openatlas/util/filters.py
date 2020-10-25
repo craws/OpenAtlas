@@ -278,6 +278,161 @@ def manual(self: Any, site: str) -> str:  # Creates a link to a manual page
 
 @jinja2.contextfilter
 @blueprint.app_template_filter()
+def display_new_form(self: Any,
+                     form: Any,
+                     form_id: Optional[str] = None,
+                     for_persons: bool = False,
+                     manual_page: Optional[str] = None) -> str:
+    from openatlas.forms.field import ValueFloatField
+
+    def display_value_type_fields(subs: List[int], html_: str = '') -> str:
+        for sub_id in subs:
+            sub = g.nodes[sub_id]
+            field_ = getattr(form, str(sub_id))
+            html_ += """
+                <div class="table-row value-type-switch">
+                    <div><label>{label}</label></div>
+                    <div class="table-cell">{field} {unit}</div>
+                </div>
+                {value_fields}""".format(label=sub.name,
+                                         unit=sub.description,
+                                         field=field_(class_='value-type'),
+                                         value_fields=display_value_type_fields(sub.subs))
+            return html_
+
+    html = '<form method="post" {id} {multipart}><div class="data-table">'.format(
+        id=('id="' + form_id + '" ') if form_id else '',
+        multipart='enctype="multipart/form-data"' if hasattr(form, 'file') else '')
+
+    for field in form:
+        # if type(field) is ValueFloatField:
+        #    continue
+        if field.id in ['insert_and_continue']:
+            continue  # will be handled elsewhere
+        if field.type in ['CSRFTokenField', 'HiddenField']:
+            html += str(field)
+            continue
+
+        class_ = 'required' if field.flags.required else ''
+        class_ += ' integer' if type(field) is IntegerField else ''
+        for validator in field.validators:
+            class_ += ' email' if type(validator) is Email else ''
+        errors = ''.join(display.uc_first(error) for error in field.errors)
+
+        if field.type in ['TreeField', 'TreeMultiField']:
+            hierarchy_id = int(field.id)
+            node = g.nodes[hierarchy_id]
+            label = node.name
+            if node.name in app.config['BASE_TYPES']:
+                label = display.uc_first(_('type'))
+            if field.label.text == 'super':
+                label = display.uc_first(_('super'))
+            if node.value_type and 'is_node_form' not in form:
+                html += """
+                    <div class="table-row value-type-switch">
+                        <div></div>
+                        <div class="table-cell">
+                            <label style="font-weight:bold;">{label}</label> {tooltip}
+                        </div>
+                    </div>
+                    {value_fields}""".format(label=label,
+                                             tooltip=display.tooltip(node.description),
+                                             value_fields=display_value_type_fields(node.subs))
+                continue
+            tooltip = '' if 'is_node_form' in form else display.tooltip(node.description)
+            type_field = """
+                <div class="table-row">
+                    <div><label>{label}</label> {tooltip}</div>
+                    <div class="table-cell">{field}</div>
+                </div>
+            """.format(label=label, field=str(field(class_=class_)) + errors, tooltip=tooltip)
+            html += type_field
+            continue
+
+        field.label.text = display.uc_first(field.label.text)
+        field.label.text += ' *' if field.flags.required and form_id != 'login-form' else ''
+        if field.id == 'description':
+            html += '''<div class="table-row">
+                                    <div>{label}</div>
+                                    <div class="table-cell">{field}</div>
+                                </div>'''.format(label=field.label, field=field(class_=class_))
+            continue
+        if field.id == 'save':
+            html += """
+                <div class="table-row">
+                    <div></div>
+                    <div class ="toolbar">{manual} {save} {continue_}</div>
+                </div>""".format(
+                    manual=escape(manual(None, manual_page)) if manual_page else '',
+                    save=field(class_=app.config['CSS']['button']['primary']),
+                    continue_=
+                    form.insert_and_continue(class_=app.config['CSS']['button']['primary']) if
+                    'insert_and_continue' in form else '')
+            continue
+        if field.id.split('_', 1)[0] in ('begin', 'end'):  # If it's a date field use a function
+            if field.id == 'begin_year_from':
+                html += display.add_dates_to_form(form, for_persons)
+            continue
+        errors = ' <span class="error">' + errors + ' </span>' if errors else ''
+        tooltip = display.tooltip(field.description)
+        if field.id in ('file', 'name'):
+            html += '''
+                <div class="table-row">
+                    <div>{label} {tooltip}</div>
+                    <div class="table-cell">{field} {errors}</div>
+                </div>'''.format(label=field.label,
+                                 errors=errors,
+                                 field=field(class_=class_),
+                                 tooltip=tooltip)
+            continue
+
+        # External Reference
+        if field.id in [name + '_id' for name in g.external]:
+            name = field.id.replace('_id', '')
+            precision_field = getattr(form, name + '_precision')
+            html += '''
+            <div class="table-row external-reference">
+                <div>{label} {tooltip}</div>
+                <div class="table-cell">{field} {precision_label} {precision_field} {errors}</div>
+            </div>'''.format(label=field.label,
+                             errors=errors,
+                             field=field(class_=class_),
+                             tooltip=tooltip,
+                             precision_field=precision_field,
+                             precision_label=display.uc_first(_('precision')))
+            continue
+        if field.id in [name + '_precision' for name in g.external]:
+            continue  # Is already added with _id field
+
+        html += '''
+            <div class="table-row">
+                <div>{label} {tooltip}</div>
+                <div class="table-cell">{field} {errors}</div>
+            </div>'''.format(label=field.label,
+                             errors=errors,
+                             field=field(class_=class_).replace('> ', '>'),
+                             tooltip=tooltip)
+
+    # if html['value_types']:
+    #     values_html = """
+    #         <div class="table-row">
+    #             <div>
+    #                 <label>{values}</label>
+    #             </div>
+    #             <div class="table-cell value-type-switcher">
+    #                 {switcher}
+    #             </div>
+    #         </div>""".format(
+    #         values=display.uc_first(_('values')),
+    #         switcher=display.button(_('show'), id_="value-type-switcher", css="secondary"))
+    #     html['value_types'] = values_html + html['value_types']
+
+    html += '</div></form>'
+    return Markup(html)
+
+
+@jinja2.contextfilter
+@blueprint.app_template_filter()
 def display_form(self: Any,
                  form: Any,
                  form_id: Optional[str] = None,
