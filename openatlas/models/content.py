@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, Optional
 
 from flask import flash, g, session
 from flask_babel import lazy_gettext as _
@@ -21,9 +21,14 @@ class Content:
         return content
 
     @staticmethod
-    def get_translation(name: str) -> str:
-        translations = Content.get_content()[name]
-        if translations[session['language']]:  # pragma: no cover
+    def get_translation(name: str, lang: Optional[str] = None) -> str:
+        items = Content.get_content()
+        if name not in items:  # pragma: no cover
+            return ''  # May was added with an software update and isn't available yet
+        translations = items[name]
+        if lang and lang in translations and translations[lang]:
+            return translations[lang]  # can be used by API
+        if translations[session['language']]:
             return translations[session['language']]
         return translations[session['settings']['default_language']]
 
