@@ -21,6 +21,11 @@ _('missing files')
 _('orphaned files')
 _('circular dependencies')
 
+# Needed for translations of content items
+_('intro_for_frontend')
+_('legal_notice_for_frontend')
+_('contact_for_frontend')
+
 
 def format_tab_number(param: Union[int, Table]) -> str:
     length = len(param.rows) if isinstance(param, Table) else param
