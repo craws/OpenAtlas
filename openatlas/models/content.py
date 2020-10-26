@@ -12,7 +12,8 @@ class Content:
     @staticmethod
     def get_content() -> Dict[str, Dict[str, str]]:
         content: Dict[str, Dict[str, str]] = {}
-        for name in ['intro', 'legal_notice', 'contact', 'citation_example']:
+        for name in ['intro', 'legal_notice', 'contact', 'citation_example',
+                     'intro_for_frontend', 'legal_notice_for_frontend', 'contact_for_frontend']:
             content[name] = {language: '' for language in app.config['LANGUAGES'].keys()}
         g.execute("SELECT name, language, text FROM web.i18n;")
         for row in g.cursor.fetchall():
