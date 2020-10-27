@@ -6,6 +6,7 @@ from flask import g
 from openatlas.api.api import Api
 from openatlas.api.error import APIError
 from openatlas.api.sql import Query
+from openatlas.models.content import Content
 from openatlas.models.entity import Entity
 
 
@@ -70,3 +71,12 @@ class Path:
         result.append([{'entity_per_page': int(validation['limit']), 'entities': len(total),
                         'index': index, 'total_pages': len(index)}])
         return result
+
+    @staticmethod
+    def get_content(validation: Dict[str, Any]) -> Dict[str, str]:
+        content = {'intro': Content.get_translation('intro_for_frontend', validation['lang']),
+                   'contact': Content.get_translation('contact_for_frontend', validation['lang']),
+                   'legal': Content.get_translation('legal_notice_for_frontend',
+                                                    validation['lang'])
+                   }
+        return content
