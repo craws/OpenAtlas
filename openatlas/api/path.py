@@ -78,4 +78,5 @@ class Path:
                    'contact': Content.get_translation('contact_for_frontend', validation['lang']),
                    'legal-notice': Content.get_translation('legal_notice_for_frontend',
                                                            validation['lang'])}
+        print(validation['lang'])
         return content
