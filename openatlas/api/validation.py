@@ -137,4 +137,4 @@ class Validation:
 
     @staticmethod
     def validate_lang(lang: Optional[str] = None) -> str:
-        return Default.lang if not lang.lower() in Default.lang_validation else lang.lower()
+        return Default.lang if not lang or lang.lower() in Default.lang_validation else lang.lower()
