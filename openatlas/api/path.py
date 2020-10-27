@@ -76,7 +76,6 @@ class Path:
     def get_content(validation: Dict[str, Any]) -> Dict[str, str]:
         content = {'intro': Content.get_translation('intro_for_frontend', validation['lang']),
                    'contact': Content.get_translation('contact_for_frontend', validation['lang']),
-                   'legal': Content.get_translation('legal_notice_for_frontend',
-                                                    validation['lang'])
-                   }
+                   'legal-notice': Content.get_translation('legal_notice_for_frontend',
+                                                           validation['lang'])}
         return content
