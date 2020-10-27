@@ -100,6 +100,8 @@ class ApiTests(TestBaseCase):
             rv = self.app.get(
                 url_for('api_get_query', entities=place_id, classes='E18', items='place'))
             assert b'Nostromos' in rv.data
+            rv = self.app.get(url_for('api_content', lang='de'))
+            assert b'intro' in rv.data
 
             # Path test with download
             rv = self.app.get(url_for('api_entity', id_=place_id, download=True))
