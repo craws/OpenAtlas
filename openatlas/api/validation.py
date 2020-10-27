@@ -12,7 +12,7 @@ class Default:
     last: Optional[str] = None
     first: Optional[str] = None
     count: bool = False
-    lang: str = ''
+    lang: str = None
     download: bool = False
     operators_compare: Dict[str, Any] = {'eq': '=', 'ne': '!=', 'lt': '<', 'le': '<=', 'gt': '>',
                                          'ge': '>=', 'like': 'LIKE'}
