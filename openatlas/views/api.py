@@ -1,6 +1,6 @@
 from typing import Any
 
-from flask import json, jsonify, render_template, request, send_from_directory
+from flask import json, jsonify, render_template, request, send_file, send_from_directory
 from flask_cors import cross_origin
 from werkzeug.wrappers import Response
 
@@ -174,9 +174,8 @@ def api_subunit(id_: int) -> Response:
     if validation['download']:
         return Response(json.dumps(APINode.get_subunits(id_)),
                         mimetype='application/json',
-                        headers={
-                            'Content-Disposition': 'attachment;filename=subunit_' + str(
-                                id_) + '.json'})
+                        headers={'Content-Disposition': 'attachment;filename=subunit_' + str(id_)
+                                                        + '.json'})
     return jsonify(APINode.get_subunits(id_))
 
 
@@ -196,10 +195,11 @@ def api_subunit_hierarchy(id_: int) -> Response:
     return jsonify(APINode.get_subunit_hierarchy(id_))
 
 
-@app.route('/api/display/<path:filename>')
+@app.route('/api/display/<path:filename>', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def display_file_api(filename: str) -> Any:  # pragma: no cover
+    validation = Validation.validate_url_query(request.args)
     from pathlib import Path as Pathlib_path
     entity = Entity.get_by_id(int(Pathlib_path(filename).stem), nodes=True)
     license_ = None
@@ -208,8 +208,22 @@ def display_file_api(filename: str) -> Any:  # pragma: no cover
         if node.root and node.root[-1] == Node.get_hierarchy('License').id:
             license_ = node.name
     if license_:
+        if validation['download']:
+            return send_file(str(app.config['UPLOAD_DIR']) + '/' + filename, as_attachment=True)
         return send_from_directory(app.config['UPLOAD_DIR'], filename)
     raise APIError('Access denied.', status_code=403, payload="403")
+
+
+@app.route('/api/0.1/content/', strict_slashes=False)
+@api_access()  # type: ignore
+@cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
+def api_content() -> Response:
+    validation = Validation.validate_url_query(request.args)
+    if validation['download']:
+        return Response(json.dumps(Path.get_content(validation=validation)),
+                        mimetype='application/json',
+                        headers={'Content-Disposition': 'attachment;filename=content.json'})
+    return jsonify(Path.get_content(validation=validation))
 
 
 @app.route('/api', strict_slashes=False)

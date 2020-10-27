@@ -12,7 +12,9 @@ class Default:
     last: Optional[str] = None
     first: Optional[str] = None
     count: bool = False
+    lang: str = None
     download: bool = False
+    lang_validation: List[str] = ['en', 'de']
     operators_compare: Dict[str, Any] = {'eq': '=', 'ne': '!=', 'lt': '<', 'le': '<=', 'gt': '>',
                                          'ge': '>=', 'like': 'LIKE'}
     operators_logical: Dict[str, Any] = {'and': 'AND', 'or': 'OR', 'onot': 'OR NOT',
@@ -43,6 +45,7 @@ class Validation:
                 'first': Validation.validate_first(query.get('first')),
                 'show': Validation.validate_show(query.getlist('show')),  # has to be list
                 'count': Validation.validate_count(query.getlist('count')),  # has to be list
+                'lang': Validation.validate_lang(query.get('lang')),
                 'download': Validation.validate_download(
                     query.getlist('download'))}  # has to be list
 
@@ -131,3 +134,7 @@ class Validation:
     @staticmethod
     def validate_download(download: bool) -> bool:
         return Default.download if not download or download is True else True
+
+    @staticmethod
+    def validate_lang(lang: Optional[str] = None) -> str:
+        return Default.lang if not lang or lang.lower() not in Default.lang_validation else lang
