@@ -1,6 +1,9 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
+from collections import OrderedDict
 from typing import Any, List, Optional as OptionalType
+
+from flask import g
 from wtforms.validators import Optional
 
 from flask_babel import lazy_gettext as _
@@ -8,6 +11,7 @@ from flask_wtf import FlaskForm
 from wtforms import (StringField, TextAreaField, SubmitField, HiddenField)
 from wtforms.validators import InputRequired
 
+from openatlas import app
 from openatlas.forms.field import TableMultiField, TreeMultiField, TreeField, ValueFloatField
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
@@ -24,12 +28,17 @@ def build_form(name: str, entity: OptionalType[Entity] = None) -> FlaskForm:
     if 'name' in forms[name]:
         setattr(Form, 'name', StringField(validators=[InputRequired()],
                                           render_kw={'autofocus': True}))
-    add_fields(name, Form)
+    types = OrderedDict(Node.get_nodes_for_form(uc_first(name)))
+    for id_, node in types.items():  # Move base type to top
+        if node.name in app.config['BASE_TYPES']:
+            types.move_to_end(node.id, last=False)
+            break
 
-    for id_, node in Node.get_nodes_for_form(uc_first(name)).items():
+    for id_, node in types.items():
         setattr(Form, str(id_), TreeMultiField(str(id_)) if node.multiple else TreeField(str(id_)))
         if node.value_type:
             add_value_type_fields(Form, node.subs)
+    add_fields(name, Form)
 
     if 'description' in forms[name]:
         label = _('content') if name == 'source' else _('description')
