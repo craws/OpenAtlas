@@ -175,9 +175,8 @@ def api_subunit(id_: int) -> Response:
     if validation['download']:
         return Response(json.dumps(APINode.get_subunits(id_)),
                         mimetype='application/json',
-                        headers={
-                            'Content-Disposition': 'attachment;filename=subunit_' + str(
-                                id_) + '.json'})
+                        headers={'Content-Disposition': 'attachment;filename=subunit_' + str(id_)
+                                                        + '.json'})
     return jsonify(APINode.get_subunits(id_))
 
 
@@ -218,6 +217,10 @@ def display_file_api(filename: str) -> Any:  # pragma: no cover
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_content():
     validation = Validation.validate_url_query(request.args)
+    if validation['download']:
+        return Response(json.dumps(Path.get_content(validation=validation)),
+                        mimetype='application/json',
+                        headers={'Content-Disposition': 'attachment;filename=content.json'})
     return jsonify(Path.get_content(validation=validation))
 
 
