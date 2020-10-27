@@ -1,6 +1,6 @@
 from typing import Any
 
-from flask import json, jsonify, render_template, request, send_from_directory
+from flask import json, jsonify, render_template, request, send_file, send_from_directory
 from flask_cors import cross_origin
 from werkzeug.wrappers import Response
 
@@ -10,7 +10,6 @@ from openatlas.api.error import APIError
 from openatlas.api.node import APINode
 from openatlas.api.path import Path
 from openatlas.api.validation import Validation
-from openatlas.models.content import Content
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
 from openatlas.util.util import api_access
@@ -200,6 +199,7 @@ def api_subunit_hierarchy(id_: int) -> Response:
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def display_file_api(filename: str) -> Any:  # pragma: no cover
+    validation = Validation.validate_url_query(request.args)
     from pathlib import Path as Pathlib_path
     entity = Entity.get_by_id(int(Pathlib_path(filename).stem), nodes=True)
     license_ = None
@@ -208,6 +208,8 @@ def display_file_api(filename: str) -> Any:  # pragma: no cover
         if node.root and node.root[-1] == Node.get_hierarchy('License').id:
             license_ = node.name
     if license_:
+        if validation['download']:
+            return send_file(str(app.config['UPLOAD_DIR']) + '/' + filename, as_attachment=True)
         return send_from_directory(app.config['UPLOAD_DIR'], filename)
     raise APIError('Access denied.', status_code=403, payload="403")
 
