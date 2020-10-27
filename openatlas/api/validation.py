@@ -121,7 +121,7 @@ class Validation:
         return Default.first if not first or first.isdigit() is not True else first
 
     @staticmethod
-    def validate_show(show: List[str]) -> List[str]:
+    def validate_show(show: List[bool]) -> List[bool]:
         data = [True] if 'none' in show else [valid for valid in show if
                                               valid in Default.show_validation]
         return Default.show_validation if not data else data

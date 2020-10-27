@@ -215,7 +215,7 @@ def display_file_api(filename: str) -> Any:  # pragma: no cover
 @app.route('/api/0.1/content/', strict_slashes=False)
 @api_access()  # type: ignore
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
-def api_content():
+def api_content() -> Response:
     validation = Validation.validate_url_query(request.args)
     if validation['download']:
         return Response(json.dumps(Path.get_content(validation=validation)),
