@@ -14,6 +14,7 @@ class Default:
     count: bool = False
     lang: str = None
     download: bool = False
+    lang_validation: List[str] = ['en', 'de', None]
     operators_compare: Dict[str, Any] = {'eq': '=', 'ne': '!=', 'lt': '<', 'le': '<=', 'gt': '>',
                                          'ge': '>=', 'like': 'LIKE'}
     operators_logical: Dict[str, Any] = {'and': 'AND', 'or': 'OR', 'onot': 'OR NOT',
@@ -136,4 +137,4 @@ class Validation:
 
     @staticmethod
     def validate_lang(lang: Optional[str] = None) -> str:
-        return Default.lang if not lang or lang.lower() != 'de' else 'de'
+        return Default.lang if not lang.lower() in Default.lang_validation else lang.lower()
