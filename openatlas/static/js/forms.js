@@ -1,6 +1,15 @@
+
+/* Show and hide function for value type input fields. Has to be outside of $(document).ready() */
+function switch_value_types() {
+    $(".value-type-switch").toggleClass('display-none');
+    $(this).text(function (i, text) {
+        return text === show ? hide : show;
+    })
+}
+
 $(document).ready(function () {
 
-    // Write selected DataTables checkboxes to hidden input
+    /* Write selected DataTables checkboxes to hidden input */
     $('#checkbox-form').submit((a) => {
         ids = [];
         $('#checkbox-form .dataTable').DataTable().rows().nodes().to$().find('input[type="checkbox"]').each(
@@ -12,7 +21,7 @@ $(document).ready(function () {
         $('#checkbox_values').val(ids.length > 0 ? '[' + ids + ']' : '');
     });
 
-    // Needed for ajax bookmark functionality
+    /* Needed for ajax bookmark functionality */
     $.ajaxSetup({
         beforeSend: function (xhr, settings) {
             if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
@@ -29,15 +38,7 @@ $(document).ready(function () {
         })
     });
 
-    // Show and hide function for value type input fields
-    $("#value-type-switcher").click(function () {
-        $(".value-type-switch").toggleClass('display-none');
-        $(this).text(function (i, text) {
-            return text === show ? hide : show;
-        })
-    })
-
-    // Hide date fields if there are any and if they are empty
+    /* Hide date fields if there are any and if they are empty */
     if ($('#begin_year_from').length &&
         $('#begin_year_from').val() == '' && $('#end_year_from').val() == '') {
         $('.date-switch').addClass('display-none');
@@ -56,10 +57,7 @@ $(document).ready(function () {
         }
     });
 
-
-    /*
-    below section sets up jquery validate for various forms
-     */
+    /* below section sets up jquery validate for various forms */
     // Enable validation for hidden fields
     let v = $.validator;
     v.setDefaults({

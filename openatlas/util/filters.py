@@ -276,22 +276,6 @@ def manual(self: Any, site: str) -> str:  # Creates a link to a manual page
             <i class="fas fa-book"></i></a>""".format(site=site, label=display.uc_first('manual')))
 
 
-# def display_value_type_fields(subs: List[int], html_: str = '') -> str:
-#     for sub_id in subs:
-#         sub = g.nodes[sub_id]
-#         field_ = getattr(form, str(sub_id))
-#         html_ += """
-#             <div class="table-row value-type-switch">
-#                 <div><label>{label}</label></div>
-#                 <div class="table-cell">{field} {unit}</div>
-#             </div>
-#             {value_fields}""".format(label=sub.name,
-#                                      unit=sub.description,
-#                                      field=field_(class_='value-type'),
-#                                      value_fields=display_value_type_fields(sub.subs))
-#         return html_
-
-
 def add_row(field,
             label: Optional[str] = None,
             value: Optional[str] = None) -> str:
@@ -327,12 +311,27 @@ def display_new_form(self: Any,
                      manual_page: Optional[str] = None) -> str:
     from openatlas.forms.field import ValueFloatField
 
+    def display_value_type_fields(subs: List[int], html_: str = '') -> str:
+        for sub_id in subs:
+            sub = g.nodes[sub_id]
+            field_ = getattr(form, str(sub_id))
+            html_ += """
+                <div class="table-row  value-type-switch">
+                    <div><label>{label}</label></div>
+                    <div class="table-cell">{field} {unit}</div>
+                </div>
+                {value_fields}""".format(label=sub.name,
+                                         unit=sub.description,
+                                         field=field_(class_='value-type'),
+                                         value_fields=display_value_type_fields(sub.subs))
+        return html_
+
     html = ''
     for field in form:
         if field.id in ['insert_and_continue'] \
             or type(field) is ValueFloatField \
-            or field.id in [name + '_precision' for name in g.external]:
-            continue  # Will be added in combination with other fields
+                or field.id in [name + '_precision' for name in g.external]:
+            continue  # These fields will be added in combination with other fields
 
         if field.type in ['CSRFTokenField', 'HiddenField']:
             html += str(field)
@@ -351,18 +350,13 @@ def display_new_form(self: Any,
                 label = display.uc_first(_('type'))
             if field.label.text == 'super':
                 label = display.uc_first(_('super'))
-            # if node.value_type and 'is_node_form' not in form:
-            #     html += """
-            #         <div class="table-row value-type-switch">
-            #             <div></div>
-            #             <div class="table-cell">
-            #                 <label style="font-weight:bold;">{label}</label> {tooltip}
-            #             </div>
-            #         </div>
-            #         {value_fields}""".format(label=label,
-            #                                  tooltip=display.tooltip(node.description),
-            #                                  value_fields=display_value_type_fields(node.subs))
-            #    continue
+            if node.value_type and 'is_node_form' not in form:
+                field.description = node.description
+                html += add_row(field, label, display.button(_('show'),
+                                                             onclick='switch_value_types()',
+                                                             css='secondary'))
+                html += display_value_type_fields(node.subs)
+                continue
             tooltip = '' if 'is_node_form' in form else ' ' + display.tooltip(node.description)
             html += add_row(field, label + tooltip)
             continue
@@ -388,20 +382,6 @@ def display_new_form(self: Any,
             continue
 
         html += add_row(field)
-
-    # if html['value_types']:
-    #     values_html = """
-    #         <div class="table-row">
-    #             <div>
-    #                 <label>{values}</label>
-    #             </div>
-    #             <div class="table-cell value-type-switcher">
-    #                 {switcher}
-    #             </div>
-    #         </div>""".format(
-    #         values=display.uc_first(_('values')),
-    #         switcher=display.button(_('show'), id_="value-type-switcher", css="secondary"))
-    #     html['value_types'] = values_html + html['value_types']
 
     return Markup("""
         <form method="post" {id} {multi}>
