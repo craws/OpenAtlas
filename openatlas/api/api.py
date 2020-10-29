@@ -1,4 +1,6 @@
-from typing import Any, Dict, List
+import ast
+import json
+from typing import Any, Dict, List, Optional
 
 from flask import g, session, url_for
 
@@ -12,6 +14,7 @@ from openatlas.util.display import format_date, get_file_path
 
 
 class Api:
+
 
     @staticmethod
     def to_camelcase(string: str) -> str:  # pragma: nocover
@@ -119,6 +122,33 @@ class Api:
             return {'type': 'GeometryCollection', 'geometries': geometries}
 
     @staticmethod
+    def get_geom_by_entity(entity: Entity):
+        if entity.class_.code != 'E53':
+            return 'Wrong class'
+        geom = []
+        for shape in ['point', 'polygon', 'linestring']:
+            sql = """
+                    SELECT
+                        {shape}.id,
+                        {shape}.name,
+                        {shape}.description,
+                        public.ST_AsGeoJSON({shape}.geom) AS geojson
+                    FROM model.entity e
+                    JOIN gis.{shape} {shape} ON e.id = {shape}.entity_id
+                    WHERE e.id = %(entity_id)s;""".format(shape=shape)
+            g.execute(sql, {'entity_id': entity.id})
+            for row in g.cursor.fetchall():
+                test = ast.literal_eval(row.geojson)
+                test['title'] = row.name.replace('"', '\"') if row.name else ''
+                test['description'] = row.description.replace('"',
+                                                              '\"') if row.description else ''
+                geom.append(test)
+        if len(geom) == 1:
+            return geom[0]
+        else:
+            return {'type': 'GeometryCollection', 'geometries': geom}
+
+    @staticmethod
     def get_geonames(entity: Entity) -> Dict[str, Any]:
         geonames_link = Geonames.get_geonames_link(entity)
         if geonames_link and geonames_link.range.class_.code == 'E18':
@@ -182,9 +212,11 @@ class Api:
             features['links'] = [Api.get_geonames(entity)]
 
         # Geometry
-        if 'geometry' in meta['show'] and entity.location:
-            features['geometry'] = {'type': 'GeometryCollection',
-                                    'geometries': [Api.get_geometry(entity)]}
+        # Todo: both functions are basically the same, compare and merge functions
+        if 'geometry' in meta['show'] and entity.class_.code == 'E53':
+            features['geometry'] = Api.get_geom_by_entity(entity)
+        elif 'geometry' in meta['show'] and entity.location:
+            features['geometry'] = Api.get_geom_by_entity(entity.location)
 
         data: Dict[str, Any] = {'type': type_,
                                 '@context': app.config['API_SCHEMA'],
