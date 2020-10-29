@@ -1,6 +1,4 @@
-import pathlib
-
-from flask import url_for, g
+from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
