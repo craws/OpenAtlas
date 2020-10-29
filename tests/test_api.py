@@ -1,6 +1,4 @@
-import pathlib
-
-from flask import url_for, g
+from flask import g, url_for
 
 from openatlas import app
 from openatlas.models.entity import Entity
@@ -120,6 +118,8 @@ class ApiTests(TestBaseCase):
             assert b'Austria' in rv.data
             rv = self.app.get(url_for('api_get_query', entities=place_id, download=True))
             assert b'106' in rv.data
+            rv = self.app.get(url_for('api_content', lang='de', download=True))
+            assert b'intro' in rv.data
 
             # Testing Subunit
             rv = self.app.post(url_for('place_insert', origin_id=place_id), data={'name': "Item"})
