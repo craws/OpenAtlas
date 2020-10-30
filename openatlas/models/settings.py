@@ -2,6 +2,8 @@ from typing import Any, Dict, Optional
 
 from flask import g
 
+from openatlas import app
+
 
 class Settings:
 
@@ -9,6 +11,8 @@ class Settings:
     def get_settings() -> Dict[str, Any]:
         g.execute("SELECT name, value FROM web.settings;")
         settings = {}
+        for name in app.config['MODULES']:  # Set default if doesn't exist (e.g. after an upgrade)
+            settings['module_' + name] = False
         for row in g.cursor.fetchall():
             settings[row.name] = row.value
             if row.name in ['table_rows',
@@ -25,7 +29,7 @@ class Settings:
 
     @staticmethod
     def update(form: Any) -> None:
-        # For each setting: insert if it doesn't exist (e.g. after an upgrade) or update
+        # For each setting: update or insert if doesn't exist (e.g. after an upgrade)
         sql = """
             INSERT INTO web.settings (name, value) VALUES (%(name)s, %(value)s)
             ON CONFLICT (name) DO UPDATE SET "value" = %(value)s;"""
