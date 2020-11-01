@@ -5,13 +5,10 @@ from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import HiddenField, StringField, SubmitField, TextAreaField
-from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.form import build_form
-from openatlas.forms.util import build_form2, build_table_form
-from openatlas.forms.field import TableMultiField
+from openatlas.forms.util import build_table_form
 from openatlas.models.entity import Entity
 from openatlas.models.user import User
 from openatlas.util.display import (add_edit_link, add_remove_link, get_base_table_data,
@@ -19,16 +16,6 @@ from openatlas.util.display import (add_edit_link, add_remove_link, get_base_tab
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import required_group, was_modified
-
-
-class SourceForm(FlaskForm):  # type: ignore
-    name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
-    information_carrier = TableMultiField()
-    description = TextAreaField(_('content'))
-    save = SubmitField(_('insert'))
-    insert_and_continue = SubmitField(_('insert and continue'))
-    continue_ = HiddenField()
-    opened = HiddenField()
 
 
 @app.route('/source')
@@ -75,7 +62,7 @@ def source_add(id_: int, class_name: str) -> Union[str, Response]:
 @required_group('contributor')
 def source_update(id_: int) -> Union[str, Response]:
     source = Entity.get_by_id(id_, nodes=True, view_name='source')
-    form = build_form2(SourceForm, 'Source', source, request)
+    form = build_form('source', source)
     if form.validate_on_submit():
         if was_modified(form, source):  # pragma: no cover
             del form.save
@@ -117,7 +104,7 @@ def save(form: FlaskForm, source: Optional[Entity] = None, origin: Optional[Enti
             elif origin.class_.code != 'E84':
                 source.link('P67', origin)
         g.cursor.execute('COMMIT')
-        if form.continue_.data == 'yes':
+        if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             url = url_for('source_insert', origin_id=origin.id if origin else None)
         logger.log_user(source.id, log_action)
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')

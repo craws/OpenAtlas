@@ -1,18 +1,17 @@
 from __future__ import annotations  # Needed for Python 4.0 type annotations
 
+import time
 from collections import OrderedDict
-from typing import Any, List, Optional as OptionalType
+from typing import Any, Dict, List, Optional as OptionalType
 
-from flask import g
-from wtforms.validators import Optional
-
+from flask import g, request
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
-from wtforms import (StringField, TextAreaField, SubmitField, HiddenField)
-from wtforms.validators import InputRequired
+from wtforms import (HiddenField, StringField, SubmitField, TextAreaField)
+from wtforms.validators import InputRequired, Optional
 
 from openatlas import app
-from openatlas.forms.field import TableMultiField, TreeMultiField, TreeField, ValueFloatField
+from openatlas.forms.field import TableMultiField, TreeField, TreeMultiField, ValueFloatField
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
 from openatlas.util.display import uc_first
@@ -52,6 +51,28 @@ def build_form(name: str, entity: OptionalType[Entity] = None) -> FlaskForm:
 
 def populate_form(form: FlaskForm, entity: Entity) -> FlaskForm:
     form.save.label.text = 'update'
+    from openatlas.forms.date import DateForm
+    if entity and request and request.method == 'GET':
+        # Important to use isinstance instead type check, because can be a sub type (e.g. ActorForm)
+        if isinstance(form, DateForm):
+            form.populate_dates(entity)
+        nodes = entity.nodes
+        # 4ht parameter entity2 (location) at places with build_form2, is this needed?
+        # if isinstance(entity2, Entity):
+        #     nodes.update(entity2.nodes)  # type: ignore
+        if hasattr(form, 'opened'):
+            form.opened.data = time.time()
+        node_data: Dict[int, List[int]] = {}
+        for node, node_value in nodes.items():  # type: ignore
+            root = g.nodes[node.root[-1]] if node.root else node
+            if root.id not in node_data:
+                node_data[root.id] = []
+            node_data[root.id].append(node.id)
+            if root.value_type:
+                getattr(form, str(node.id)).data = node_value
+        for root_id, nodes_ in node_data.items():
+            if hasattr(form, str(root_id)):
+                getattr(form, str(root_id)).data = nodes_
     return form
 
 
