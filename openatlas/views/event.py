@@ -11,6 +11,7 @@ from wtforms.validators import InputRequired
 
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
+from openatlas.forms.form import build_form
 from openatlas.forms.util import build_form2
 from openatlas.forms.field import TableField, TableMultiField
 from openatlas.models.entity import Entity
@@ -82,7 +83,7 @@ def prepare_form(form: EventForm, code: str) -> FlaskForm:
 @required_group('contributor')
 def event_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    form = prepare_form(build_form2(EventForm, 'Event'), code)
+    form = build_form('event', code=code)
     if origin:
         del form.insert_and_continue
     if form.validate_on_submit():

@@ -11,16 +11,21 @@ from wtforms import (HiddenField, StringField, SubmitField, TextAreaField)
 from wtforms.validators import InputRequired, Optional
 
 from openatlas import app
-from openatlas.forms.field import TableMultiField, TreeField, TreeMultiField, ValueFloatField
+from openatlas.forms.field import (TableField, TableMultiField, TreeField, TreeMultiField,
+                                   ValueFloatField)
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
 from openatlas.util.display import uc_first
 
 forms = {'source': ['name', 'description', 'continue'],
+         'event': ['name', 'date', 'description', 'continue'],
          }
 
 
-def build_form(name: str, entity: OptionalType[Entity] = None) -> FlaskForm:
+def build_form(name: str,
+               entity: OptionalType[Entity] = None,
+               code: Optional[str] = None) -> FlaskForm:
+
     class Form(FlaskForm):  # type: ignore
         opened = HiddenField()
 
@@ -37,7 +42,10 @@ def build_form(name: str, entity: OptionalType[Entity] = None) -> FlaskForm:
         setattr(Form, str(id_), TreeMultiField(str(id_)) if node.multiple else TreeField(str(id_)))
         if node.value_type:
             add_value_type_fields(Form, node.subs)
-    add_fields(name, Form)
+    add_fields(name, Form, code)
+    if 'date' in forms[name]:
+        # Todo: add dates
+        pass
 
     if 'description' in forms[name]:
         label = _('content') if name == 'source' else _('description')
@@ -51,17 +59,15 @@ def build_form(name: str, entity: OptionalType[Entity] = None) -> FlaskForm:
 
 def populate_form(form: FlaskForm, entity: Entity) -> FlaskForm:
     form.save.label.text = 'update'
-    from openatlas.forms.date import DateForm
     if entity and request and request.method == 'GET':
         # Important to use isinstance instead type check, because can be a sub type (e.g. ActorForm)
-        if isinstance(form, DateForm):
-            form.populate_dates(entity)
+        #if getattr(form, 'begin_year_from'):
+        #    form.populate_dates(entity)
         nodes = entity.nodes
         # 4ht parameter entity2 (location) at places with build_form2, is this needed?
         # if isinstance(entity2, Entity):
         #     nodes.update(entity2.nodes)  # type: ignore
-        if hasattr(form, 'opened'):
-            form.opened.data = time.time()
+        form.opened.data = time.time()
         node_data: Dict[int, List[int]] = {}
         for node, node_value in nodes.items():  # type: ignore
             root = g.nodes[node.root[-1]] if node.root else node
@@ -83,6 +89,18 @@ def add_value_type_fields(form: any, subs: List[int]) -> None:
         add_value_type_fields(form, sub.subs)
 
 
-def add_fields(name: str, form: Any) -> None:
+def add_fields(name: str, form: Any, code: Optional[str] = None) -> None:
     if name == 'source':
         setattr(form, 'information_carrier', TableMultiField())
+    elif code == 'E7':
+        setattr(form, 'event', TableField(_('sub event of')))
+        setattr(form, 'event_id', HiddenField())
+        setattr(form, 'place', TableField(_('location')))
+
+# place = TableField(_('location'))
+# place_from = TableField(_('from'))
+# place_to = TableField(_('to'))
+# object = TableMultiField()
+# person = TableMultiField()
+# event_id = HiddenField()
+# given_place = TableMultiField(_('given place'))
