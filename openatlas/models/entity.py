@@ -126,14 +126,13 @@ class Entity:
         Link.delete_by_codes(self, codes, inverse)
 
     def update(self, form: Optional[FlaskForm] = None) -> None:
-        from openatlas.forms.date import DateForm
         from openatlas.util.display import sanitize
         if form:
             self.save_nodes(form)
             for field in ['name', 'description']:
                 if hasattr(form, field):
                     setattr(self, field, getattr(form, field).data)
-            if isinstance(form, DateForm):
+            if hasattr(form, 'begin_year_from'):
                 self.set_dates(form)
             if hasattr(form, 'alias') and (self.system_type == 'place' or
                                            self.class_.code in app.config['CLASS_CODES']['actor']):

@@ -362,12 +362,15 @@ def display_new_form(self: Any,
             continue
 
         if field.id == 'save':
+            field.label.text = display.uc_first(field.label.text)
+            continue_ = ''
+            if 'insert_and_continue' in form:
+                form.insert_and_continue.label.text = display.uc_first(form.insert_and_continue.label.text)
+                continue_ = form.insert_and_continue(class_=app.config['CSS']['button']['primary'])
             text = '<div class ="toolbar">{manual} {save} {continue_}</div>'.format(
                 manual=escape(manual(None, manual_page)) if manual_page else '',
                 save=field(class_=app.config['CSS']['button']['primary']),
-                continue_=
-                form.insert_and_continue(class_=app.config['CSS']['button']['primary']) if
-                'insert_and_continue' in form else '')
+                continue_=continue_)
             html += add_row(field, '', text)
             continue
 

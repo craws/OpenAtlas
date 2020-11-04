@@ -11,6 +11,7 @@ from wtforms import (HiddenField, StringField, SubmitField, TextAreaField)
 from wtforms.validators import InputRequired, Optional
 
 from openatlas import app
+from openatlas.forms import date
 from openatlas.forms.field import (TableField, TableMultiField, TreeField, TreeMultiField,
                                    ValueFloatField)
 from openatlas.models.entity import Entity
@@ -42,10 +43,10 @@ def build_form(name: str,
         setattr(Form, str(id_), TreeMultiField(str(id_)) if node.multiple else TreeField(str(id_)))
         if node.value_type:
             add_value_type_fields(Form, node.subs)
-    add_fields(name, Form, code)
+    add_fields(name, Form, code=entity.class_.code if entity else code)
     if 'date' in forms[name]:
-        # Todo: add dates
-        pass
+        date.add_date_fields(Form)
+        setattr(Form, 'validate', date.validate)
 
     if 'description' in forms[name]:
         label = _('content') if name == 'source' else _('description')
@@ -60,9 +61,8 @@ def build_form(name: str,
 def populate_form(form: FlaskForm, entity: Entity) -> FlaskForm:
     form.save.label.text = 'update'
     if entity and request and request.method == 'GET':
-        # Important to use isinstance instead type check, because can be a sub type (e.g. ActorForm)
-        #if getattr(form, 'begin_year_from'):
-        #    form.populate_dates(entity)
+        if hasattr(form, 'begin_year_from'):
+            date.populate_dates(form, entity)
         nodes = entity.nodes
         # 4ht parameter entity2 (location) at places with build_form2, is this needed?
         # if isinstance(entity2, Entity):

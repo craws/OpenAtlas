@@ -1,19 +1,14 @@
 from typing import Optional, Union
 
-from flask import flash, g, render_template, request, url_for
+from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_wtf import FlaskForm
 from werkzeug.exceptions import abort
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import HiddenField, StringField, SubmitField, TextAreaField
-from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.date import DateForm
 from openatlas.forms.form import build_form
-from openatlas.forms.util import build_form2
-from openatlas.forms.field import TableField, TableMultiField
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.link import Link
@@ -23,33 +18,6 @@ from openatlas.util.display import (add_edit_link, add_remove_link, get_base_tab
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import is_authorized, required_group, was_modified
-
-
-class EventForm(DateForm):
-    name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
-    event = TableField(_('sub event of'))
-    place = TableField(_('location'))
-    place_from = TableField(_('from'))
-    place_to = TableField(_('to'))
-    object = TableMultiField()
-    person = TableMultiField()
-    event_id = HiddenField()
-    description = TextAreaField(_('description'))
-    save = SubmitField(_('insert'))
-    insert_and_continue = SubmitField(_('insert and continue'))
-    continue_ = HiddenField()
-    opened = HiddenField()
-    given_place = TableMultiField(_('given place'))
-
-    def validate(self) -> bool:
-        """ Check if selected super event is allowed."""
-        # Todo: also check if super is not a sub event of itself (recursively)
-        valid = DateForm.validate(self)
-        if self.event.data:
-            if str(self.event.data) == str(self.event_id.data):
-                self.event.errors.append(_('error node self as super'))
-                valid = False
-        return valid
 
 
 @app.route('/event')
@@ -63,19 +31,6 @@ def event_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
     table = Table(Table.HEADERS['event'], defs=[{'className': 'dt-body-right', 'targets': [3, 4]}])
     table.rows = [get_base_table_data(item) for item in Entity.get_by_menu_item('event')]
     return render_template('event/index.html', table=table)
-
-
-def prepare_form(form: EventForm, code: str) -> FlaskForm:
-    if code != 'E8':
-        del form.given_place
-    if code == 'E9':
-        del form.place
-    else:
-        del form.place_from
-        del form.place_to
-        del form.object
-        del form.person
-    return form
 
 
 @app.route('/event/insert/<code>', methods=['POST', 'GET'])
@@ -103,7 +58,7 @@ def event_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Respo
 @required_group('contributor')
 def event_update(id_: int) -> Union[str, Response]:
     event = Entity.get_by_id(id_, nodes=True, view_name='event')
-    form = prepare_form(build_form2(EventForm, 'Event', event, request), event.class_.code)
+    form = build_form('event', event)
     form.event_id.data = event.id
     if form.validate_on_submit():
         if was_modified(form, event):  # pragma: no cover
@@ -180,7 +135,7 @@ def save(form: FlaskForm,
             elif origin.view_name == 'actor':
                 link_id = event.link('P11', origin)[0]
                 url = url_for('involvement_update', id_=link_id, origin_id=origin.id)
-        if form.continue_.data == 'yes':
+        if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             url = url_for('event_insert', code=code, origin_id=origin.id if origin else None)
         g.cursor.execute('COMMIT')
         logger.log_user(event.id, log_action)
