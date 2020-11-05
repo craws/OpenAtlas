@@ -1,6 +1,5 @@
 import ast
-import json
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 
 from flask import g, session, url_for
 
@@ -8,7 +7,6 @@ from openatlas import app
 from openatlas.api.error import APIError
 from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
-from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.util.display import format_date, get_file_path
 
@@ -104,22 +102,22 @@ class Api:
             time['end'] = end
         return time
 
-    @staticmethod
-    def get_geometry(entity: Entity) -> Dict[str, Any]:
-        geometries = []
-        shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
-        for geometry in Gis.get_by_id(entity.location.id):
-            geo_dict = {'type': shape[geometry['shape']],
-                        'coordinates': geometry['geometry']['coordinates']}
-            if geometry['description']:
-                geo_dict['description'] = geometry['description']
-            if geometry['name']:
-                geo_dict['title'] = geometry['name']
-            geometries.append(geo_dict)
-        if len(geometries) == 1:
-            return geometries[0]
-        else:
-            return {'type': 'GeometryCollection', 'geometries': geometries}
+    # @staticmethod
+    # def get_geometry(entity: Entity) -> Dict[str, Any]:
+    #     geometries = []
+    #     shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
+    #     for geometry in Gis.get_by_id(entity.location.id):
+    #         geo_dict = {'type': shape[geometry['shape']],
+    #                     'coordinates': geometry['geometry']['coordinates']}
+    #         if geometry['description']:
+    #             geo_dict['description'] = geometry['description']
+    #         if geometry['name']:
+    #             geo_dict['title'] = geometry['name']
+    #         geometries.append(geo_dict)
+    #     if len(geometries) == 1:
+    #         return geometries[0]
+    #     else:
+    #         return {'type': 'GeometryCollection', 'geometries': geometries}
 
     @staticmethod
     def get_geom_by_entity(entity: Entity):
@@ -212,7 +210,6 @@ class Api:
             features['links'] = [Api.get_geonames(entity)]
 
         # Geometry
-        # Todo: both functions are basically the same, compare and merge functions
         if 'geometry' in meta['show'] and entity.class_.code == 'E53':
             features['geometry'] = Api.get_geom_by_entity(entity)
         elif 'geometry' in meta['show'] and entity.location:
