@@ -1,5 +1,7 @@
-from flask import request
-from flask_restful import Api, Resource, reqparse
+import json
+
+from flask import jsonify, request
+from flask_restful import Api, Resource, fields, marshal, marshal_with, reqparse
 from openatlas.api.apifunction import ApiFunction
 from openatlas import app
 from openatlas.api.parameter import Validation
@@ -8,6 +10,7 @@ from openatlas.api.path import Path
 api = Api(app)  # Establish connection between API and APP
 app.config['BUNDLE_ERRORS'] = True  # Every parser shows bundled errors
 
+# Parser
 default_parser = reqparse.RequestParser()
 default_parser.add_argument('download', type=bool, help='{error_msg}', default=False)
 default_parser.add_argument('count', type=bool, help='{error_msg}', default=False)
@@ -17,7 +20,7 @@ language_parser.add_argument('lang', type=str,
                              help='{error_msg}',
                              choices=app.config['LANGUAGES'].keys())
 
-parser = default_parser.copy()
+parser = default_parser.copy()  # inherit the default parser
 parser.add_argument('sort', choices=('desc', 'asc'), type=str, default='asc', case_sensitive=False,
                     help='{error_msg}. Only "desc" or "asc" will work.')
 parser.add_argument('column', type=str, default=['name'], action='append', case_sensitive=False,
@@ -36,13 +39,22 @@ parser.add_argument('show', type=str, help='{error_msg}.', action='append', case
                              'depictions', 'geonames', 'none'))
 parser.add_argument('filter', type=str, help='{error_msg}', action='append', default='and|id|gt|1')
 
+# Template
+
+entity_json = {'@context': fields.String,
+               'type': fields.String,
+               'features': fields.List(fields.String)}
+
 
 class GetEntity(Resource):
+    @marshal_with(entity_json)
     def get(self, id_):
         args = parser.parse_args()
-        print(args)
         validation = Validation.validate_url_query(request.args)
         entity = ApiFunction.get_entity(id_, validation)
+        entity = {"@context": "teteet",
+               "type": "fields.String",
+               "features": ["fields.List(fields.String)", "testing"]}
         return entity
 
 
