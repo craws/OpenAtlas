@@ -40,10 +40,12 @@ parser.add_argument('show', type=str, help='{error_msg}.', action='append', case
 parser.add_argument('filter', type=str, help='{error_msg}', action='append', default='and|id|gt|1')
 
 # Template
+feature = {"test": fields.String}
 
 entity_json = {'@context': fields.String,
                'type': fields.String,
-               'features': fields.List(fields.String)}
+               'features': fields.List(fields.Nested(feature))}
+
 
 
 class GetEntity(Resource):
@@ -54,7 +56,8 @@ class GetEntity(Resource):
         entity = ApiFunction.get_entity(id_, validation)
         entity = {"@context": "teteet",
                "type": "fields.String",
-               "features": ["fields.List(fields.String)", "testing"]}
+               "features": [{"test": "funktioniert"}]
+                  }
         return entity
 
 
