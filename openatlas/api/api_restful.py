@@ -32,6 +32,7 @@ parser.add_argument('show', type=str, help='{error_msg}.', action='append', case
                              'depictions', 'geonames'],
                     choices=('when', 'types', 'relations', 'names', 'links', 'geometry',
                              'depictions', 'geonames', 'none'))
+parser.add_argument('filter', type=str, help='{error_msg}', action='append', default='and|id|gt|1')
 
 
 class GetEntity(Resource):
