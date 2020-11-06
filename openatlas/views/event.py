@@ -38,9 +38,7 @@ def event_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
 @required_group('contributor')
 def event_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    form = build_form('event', code=code)
-    if origin:
-        del form.insert_and_continue
+    form = build_form('event', code=code, origin=origin)
     if form.validate_on_submit():
         return redirect(save(form, code=code, origin=origin))
     if origin:

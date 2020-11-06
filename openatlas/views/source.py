@@ -36,9 +36,7 @@ def source_index(action: Optional[str] = None, id_: Optional[int] = None) -> str
 @required_group('contributor')
 def source_insert(origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    form = build_form('source')
-    if origin:
-        del form.insert_and_continue
+    form = build_form('source', origin=origin)
     if form.validate_on_submit():
         return redirect(save(form, origin=origin))
     if origin and origin.class_.code == 'E84':

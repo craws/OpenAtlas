@@ -25,7 +25,8 @@ forms = {'source': ['name', 'description', 'continue'],
 
 def build_form(name: str,
                entity: OptionalType[Entity] = None,
-               code: Optional[str] = None) -> FlaskForm:
+               code: Optional[str] = None,
+               origin: Optional[Entity] = None) -> FlaskForm:
 
     class Form(FlaskForm):  # type: ignore
         opened = HiddenField()
@@ -52,7 +53,7 @@ def build_form(name: str,
         label = _('content') if name == 'source' else _('description')
         setattr(Form, 'description', TextAreaField(label))
     setattr(Form, 'save', SubmitField(_('insert')))
-    if not entity and 'continue' in forms[name]:
+    if not entity and not origin and 'continue' in forms[name]:
         setattr(Form, 'insert_and_continue', SubmitField(_('insert and continue')))
         setattr(Form, 'continue_', HiddenField())
     return populate_form(Form(obj=entity), entity) if entity else Form()
