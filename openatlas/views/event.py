@@ -108,7 +108,7 @@ def save(form: FlaskForm,
         event.update(form)
         if form.event.data:
             event.link_string('P117', form.event.data)
-        if form.place and form.place.data:
+        if hasattr(form, 'place') and form.place.data:
             event.link('P7', Link.get_linked_entity_safe(int(form.place.data), 'P53'))
         if event.class_.code == 'E8' and form.given_place.data:  # Link place for acquisition
             event.link_string('P24', form.given_place.data)

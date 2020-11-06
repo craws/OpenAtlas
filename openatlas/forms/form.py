@@ -93,15 +93,16 @@ def add_value_type_fields(form: any, subs: List[int]) -> None:
 def add_fields(name: str, form: Any, code: Optional[str] = None) -> None:
     if name == 'source':
         setattr(form, 'information_carrier', TableMultiField())
-    elif code == 'E7':
-        setattr(form, 'event', TableField(_('sub event of')))
+    elif name == 'event':
         setattr(form, 'event_id', HiddenField())
-        setattr(form, 'place', TableField(_('location')))
-
-# place = TableField(_('location'))
-# place_from = TableField(_('from'))
-# place_to = TableField(_('to'))
-# object = TableMultiField()
-# person = TableMultiField()
-# event_id = HiddenField()
-# given_place = TableMultiField(_('given place'))
+        setattr(form, 'event', TableField(_('sub event of')))
+        if code == 'E7':
+            setattr(form, 'place', TableField(_('location')))
+        if code == 'E8':
+            setattr(form, 'place', TableField(_('location')))
+            setattr(form, 'given_place', TableMultiField(_('given place')))
+        elif code == 'E9':
+            setattr(form, 'place_from', TableField(_('from')))
+            setattr(form, 'place_to', TableField(_('to')))
+            setattr(form, 'object', TableMultiField())
+            setattr(form, 'person', TableMultiField())
