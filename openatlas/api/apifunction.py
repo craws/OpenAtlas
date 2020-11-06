@@ -11,7 +11,7 @@ from openatlas.models.link import Link
 from openatlas.util.display import format_date, get_file_path
 
 
-class Api:
+class ApiFunction:
 
 
     @staticmethod
@@ -47,7 +47,7 @@ class Api:
                 path = get_file_path(link.domain.id)
                 files.append({'@id': url_for('api_entity', id_=link.domain.id, _external=True),
                               'title': link.domain.name,
-                              'license': Api.get_license(link.domain.id),
+                              'license': ApiFunction.get_license(link.domain.id),
                               'url': url_for('display_file_api',
                                              filename=path.name,
                                              _external=True) if path else "N/A"})
@@ -152,7 +152,7 @@ class Api:
         if geonames_link and geonames_link.range.class_.code == 'E18':
             geo_name = {}
             if geonames_link.type.name:
-                geo_name['type'] = Api.to_camelcase(geonames_link.type.name)
+                geo_name['type'] = ApiFunction.to_camelcase(geonames_link.type.name)
             if geonames_link.domain.name:
                 geo_name['identifier'] = session['settings']['geonames_url'] + \
                                          geonames_link.domain.name
@@ -179,16 +179,16 @@ class Api:
                     'properties': {'title': entity.name}}
 
         # Relations
-        if Api.get_links(entity) and 'relations' in meta['show']:
-            features['relations'] = Api.get_links(entity)
+        if ApiFunction.get_links(entity) and 'relations' in meta['show']:
+            features['relations'] = ApiFunction.get_links(entity)
 
         # Descriptions
         if entity.description:
             features['description'] = [{'value': entity.description}]
 
         # Types
-        if Api.get_node(entity) and 'types' in meta['show']:
-            features['types'] = Api.get_node(entity)
+        if ApiFunction.get_node(entity) and 'types' in meta['show']:
+            features['types'] = ApiFunction.get_node(entity)
 
         # Alias
         if entity.aliases and 'names' in meta['show']:
@@ -197,23 +197,23 @@ class Api:
                 features['names'].append({"alias": value})
 
         # Depictions
-        if Api.get_file(entity) and 'depictions' in meta['show']:  # pragma: nocover
-            features['depictions'] = Api.get_file(entity)
+        if ApiFunction.get_file(entity) and 'depictions' in meta['show']:  # pragma: nocover
+            features['depictions'] = ApiFunction.get_file(entity)
 
         # Time spans
-        if Api.get_time(entity) and 'when' in meta['show']:
+        if ApiFunction.get_time(entity) and 'when' in meta['show']:
             if entity.begin_from or entity.end_from:
-                features['when'] = {'timespans': [Api.get_time(entity)]}
+                features['when'] = {'timespans': [ApiFunction.get_time(entity)]}
 
         # Geonames
-        if Api.get_geonames(entity) and 'geonames' in meta['show']:
-            features['links'] = [Api.get_geonames(entity)]
+        if ApiFunction.get_geonames(entity) and 'geonames' in meta['show']:
+            features['links'] = [ApiFunction.get_geonames(entity)]
 
         # Geometry
         if 'geometry' in meta['show'] and entity.class_.code == 'E53':
-            features['geometry'] = Api.get_geom_by_entity(entity)
+            features['geometry'] = ApiFunction.get_geom_by_entity(entity)
         elif 'geometry' in meta['show'] and entity.location:
-            features['geometry'] = Api.get_geom_by_entity(entity.location)
+            features['geometry'] = ApiFunction.get_geom_by_entity(entity.location)
 
         data: Dict[str, Any] = {'type': type_,
                                 '@context': app.config['API_SCHEMA'],

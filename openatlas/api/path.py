@@ -3,7 +3,7 @@ from typing import Any, Dict, List
 
 from flask import g
 
-from openatlas.api.api import Api
+from openatlas.api.apifunction import ApiFunction
 from openatlas.api.error import APIError
 from openatlas.api.sql import Query
 from openatlas.models.content import Content
@@ -40,7 +40,7 @@ class Path:
             raise APIError('Invalid limit.', status_code=404, payload="404e")
         if 1 < limit_ < 101:
             for entity in Entity.get_latest(limit_):
-                entities.append(Api.get_entity(entity.id, meta=validation))
+                entities.append(ApiFunction.get_entity(entity.id, meta=validation))
             return entities
         else:
             raise APIError('Invalid limit.', status_code=404, payload="404e")
@@ -66,7 +66,7 @@ class Path:
             pass
         entity_result = []
         for entity in entities[:int(validation['limit'])]:
-            entity_result.append(Api.get_entity(entity, validation))
+            entity_result.append(ApiFunction.get_entity(entity, validation))
         result.append(entity_result)
         result.append([{'entity_per_page': int(validation['limit']), 'entities': len(total),
                         'index': index, 'total_pages': len(index)}])

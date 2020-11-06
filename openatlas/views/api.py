@@ -5,7 +5,7 @@ from flask_cors import cross_origin
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.api.api import Api
+from openatlas.api.apifunction import ApiFunction
 from openatlas.api.error import APIError
 from openatlas.api.node import APINode
 from openatlas.api.path import Path
@@ -21,11 +21,11 @@ from openatlas.util.util import api_access
 def api_entity(id_: int) -> Response:
     validation = Validation.validate_url_query(request.args)
     if validation['download']:
-        return Response(json.dumps(Api.get_entity(id_=id_, meta=validation)),
+        return Response(json.dumps(ApiFunction.get_entity(id_=id_, meta=validation)),
                         mimetype='application/json',
                         headers={
                             'Content-Disposition': 'attachment;filename=' + str(id_) + '.json'})
-    return jsonify(Api.get_entity(id_=id_, meta=validation))
+    return jsonify(ApiFunction.get_entity(id_=id_, meta=validation))
 
 
 @app.route('/api/0.1/entity/download/<int:id_>', strict_slashes=False)
@@ -33,7 +33,7 @@ def api_entity(id_: int) -> Response:
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_download_entity(id_: int) -> Response:
     validation = Validation.validate_url_query(request.args)
-    return Response(json.dumps(Api.get_entity(id_=id_, meta=validation)),
+    return Response(json.dumps(ApiFunction.get_entity(id_=id_, meta=validation)),
                     mimetype='application/json',
                     headers={'Content-Disposition': 'attachment;filename=' + str(id_) + '.json'})
 
