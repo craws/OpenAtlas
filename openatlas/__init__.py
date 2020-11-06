@@ -9,9 +9,11 @@ from flask import Flask, Response, g, request, session
 from flask_babel import Babel
 from flask_wtf.csrf import CSRFProtect
 
+from flask_restful import Api,Resource
 
 app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
+
 
 # Use the test database if running tests
 instance_name = 'production' if 'test_runner.py' not in sys.argv[0] else 'testing'
@@ -26,7 +28,6 @@ if os.name == "posix":  # For other operating systems e.g. Windows, we would nee
 babel = Babel(app)
 debug_model: Dict[str, float] = {}
 
-
 from openatlas.models.logger import Logger
 
 logger = Logger()
@@ -36,6 +37,10 @@ from openatlas.views import (actor, admin, ajax, api, entity, event, export, fil
                              involvement, imports, link, login, member, model, note, object,
                              overlay, place, profile, reference, relation, search, source, sql,
                              translation, types, user)
+#  Restful API import
+from openatlas.api import api_restful
+
+
 
 
 @babel.localeselector
@@ -110,7 +115,6 @@ def teardown_request(exception: Any) -> None:
 
 app.register_blueprint(filters.blueprint)
 app.add_template_global(debug_model, 'debug_model')
-
 
 if __name__ == "__main__":  # pragma: no cover
     app.run()
