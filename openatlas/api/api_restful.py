@@ -13,7 +13,9 @@ default_parser.add_argument('download', type=bool, help='{error_msg}', default=F
 default_parser.add_argument('count', type=bool, help='{error_msg}', default=False)
 
 language_parser = reqparse.RequestParser()
-language_parser.add_argument('lang', type=str, help='Not valid language code')
+language_parser.add_argument('lang', type=str,
+                             help='{error_msg}',
+                             choices=app.config['LANGUAGES'].keys())
 
 parser = default_parser.copy()
 parser.add_argument('sort', choices=('desc', 'asc'), type=str, default='asc', case_sensitive=False,
@@ -55,5 +57,15 @@ class GetClass(Resource):
         return class_
 
 
+class GetContent(Resource):
+    def get(self):
+        args = language_parser.parse_args()
+        print(args)
+        validation = Validation.validate_url_query(request.args)
+        content = Path.get_content(validation=validation)
+        return content
+
+
 api.add_resource(GetEntity, '/api/0.1/restful/entity/<int:id_>', endpoint='entity')
 api.add_resource(GetClass, '/api/0.1/restful/class/<string:class_code>', endpoint="class")
+api.add_resource(GetContent, '/api/0.1/restful/content/', endpoint="content")
