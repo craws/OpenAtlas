@@ -328,7 +328,7 @@ def save(form: DateForm,
                 origin.link('P67', object_)
         Gis.insert(location, form)
         g.cursor.execute('COMMIT')
-        if form.continue_.data == 'yes':
+        if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             url = url_for('place_insert',
                           origin_id=origin.id if origin else None,
                           system_type=system_type if system_type else None)

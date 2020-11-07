@@ -216,7 +216,7 @@ def save(form: FlaskForm, node=None, root: Optional[Node] = None) -> Optional[st
             node.link(property_code, new_super)
         g.cursor.execute('COMMIT')
         url = url_for('entity_view', id_=node.id)
-        if form.continue_.data == 'yes':
+        if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             url = url_for('node_insert', root_id=root.id,  # type: ignore
                           super_id=new_super_id if new_super_id else None)
         logger.log_user(node.id, log_action)

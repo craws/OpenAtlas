@@ -1,16 +1,13 @@
 from typing import Dict, List, Optional, Union
 
-from flask import flash, g, render_template, request, url_for
+from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
+from flask_wtf import FlaskForm
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import FieldList, HiddenField, StringField, SubmitField, TextAreaField
-from wtforms.validators import InputRequired
 
 from openatlas import app, logger
-from openatlas.forms.date import DateForm
-from openatlas.forms.util import build_form2
-from openatlas.forms.field import TableField
+from openatlas.forms.form import build_form
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis
 from openatlas.models.user import User
@@ -20,19 +17,6 @@ from openatlas.util.display import (add_edit_link, add_remove_link, add_system_d
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import is_authorized, required_group, was_modified
-
-
-class ActorForm(DateForm):
-    name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
-    alias = FieldList(StringField(''), description=_('tooltip alias'))
-    residence = TableField(_('residence'))
-    begins_in = TableField()
-    ends_in = TableField()
-    description = TextAreaField(_('description'))
-    save = SubmitField(_('insert'))
-    insert_and_continue = SubmitField(_('insert and continue'))
-    continue_ = HiddenField()
-    opened = HiddenField()
 
 
 @app.route('/actor')
@@ -53,18 +37,12 @@ def actor_index(action: Optional[str] = None, id_: Optional[int] = None) -> str:
 @required_group('contributor')
 def actor_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id) if origin_id else None
-    code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
-    form = build_form2(ActorForm, code_class[code])
+    form = build_form('actor', code=code, origin=origin)
     if form.validate_on_submit():
         return redirect(save(form, code=code, origin=origin))
     form.alias.append_entry('')
-    if origin:
-        del form.insert_and_continue
-        if origin.system_type == 'place':
-            form.residence.data = origin_id
-    if code == 'E21':
-        form.begins_in.label.text = _('born in')
-        form.ends_in.label.text = _('died in')
+    if origin and origin.system_type == 'place':
+        form.residence.data = origin_id
     return render_template('actor/insert.html', form=form, code=code, origin=origin)
 
 
@@ -72,8 +50,7 @@ def actor_insert(code: str, origin_id: Optional[int] = None) -> Union[str, Respo
 @required_group('contributor')
 def actor_update(id_: int) -> Union[str, Response]:
     actor = Entity.get_by_id(id_, nodes=True, aliases=True, view_name='actor')
-    code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
-    form = build_form2(ActorForm, code_class[actor.class_.code], actor, request)
+    form = build_form('actor', actor)
     if form.validate_on_submit():
         if was_modified(form, actor):  # pragma: no cover
             del form.save
@@ -91,13 +68,10 @@ def actor_update(id_: int) -> Union[str, Response]:
     for alias in actor.aliases.values():
         form.alias.append_entry(alias)
     form.alias.append_entry('')
-    if actor.class_.code == 'E21':
-        form.begins_in.label.text = _('born in')
-        form.ends_in.label.text = _('died in')
     return render_template('actor/update.html', form=form, actor=actor)
 
 
-def save(form: ActorForm,
+def save(form: FlaskForm,
          actor: Optional[Entity] = None,
          code: str = '',
          origin: Optional[Entity] = None) -> Union[str, Response]:
@@ -137,7 +111,7 @@ def save(form: ActorForm,
                 url = url_for('relation_update', id_=link_id, origin_id=origin.id)
             elif origin.view_name == 'place':
                 url = url_for('entity_view', id_=origin.id) + '#tab-actor'
-        if form.continue_.data == 'yes' and code:
+        if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             url = url_for('actor_insert', code=code)
         logger.log_user(actor.id, log_action)
         g.cursor.execute('COMMIT')

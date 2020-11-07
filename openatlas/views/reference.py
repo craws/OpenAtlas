@@ -209,7 +209,7 @@ def save(form: Any,
         if origin:
             link_id = reference.link('P67', origin)[0]
             url = url_for('reference_link_update', link_id=link_id, origin_id=origin.id)
-        if form.continue_.data == 'yes' and code:
+        if hasattr(form, 'continue_') and form.continue_.data == 'yes' and code:
             url = url_for('reference_insert', code=code)
         g.cursor.execute('COMMIT')
         logger.log_user(reference.id, log_action)

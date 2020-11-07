@@ -32,7 +32,7 @@ def translation_insert(source_id: int) -> Union[str, Response]:
     if form.validate_on_submit():
         translation = save(form, source=source)
         flash(_('entity created'), 'info')
-        if form.continue_.data == 'yes':
+        if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             return redirect(url_for('translation_insert', source_id=source.id))
         return redirect(url_for('entity_view', id_=translation.id))
     return render_template('translation/insert.html', source=source, form=form)

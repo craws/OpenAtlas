@@ -66,7 +66,7 @@ def involvement_insert(origin_id: int) -> Union[str, Response]:
             g.cursor.execute('ROLLBACK')
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        if form.continue_.data == 'yes':
+        if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             return redirect(url_for('involvement_insert', origin_id=origin_id))
         tab = 'actor' if origin.view_name == 'event' else 'event'
         return redirect(url_for('entity_view', id_=origin.id) + '#tab-' + tab)

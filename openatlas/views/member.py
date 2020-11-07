@@ -60,7 +60,7 @@ def membership_insert(origin_id: int) -> Union[str, Response]:
             g.cursor.execute('ROLLBACK')
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        if form.continue_.data == 'yes':
+        if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             return redirect(url_for('membership_insert', origin_id=origin_id))
         return redirect(url_for('entity_view', id_=origin.id) + '#tab-member-of')
     return render_template('member/insert.html', origin=origin, form=form)
@@ -87,7 +87,7 @@ def member_insert(origin_id: int) -> Union[str, Response]:
             g.cursor.execute('ROLLBACK')
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
-        if form.continue_.data == 'yes':
+        if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             return redirect(url_for('member_insert', origin_id=origin_id))
         return redirect(url_for('entity_view', id_=origin.id) + '#tab-member')
     return render_template('member/insert.html', origin=origin, form=form)

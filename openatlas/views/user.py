@@ -159,7 +159,7 @@ def user_insert() -> Union[str, Response]:
             else:
                 flash(_('Failed to send account details to %(email)s.',
                         email=form.email.data), 'error')
-        if form.continue_.data == 'yes':
+        if hasattr(form, 'continue_') and form.continue_.data == 'yes':
             return redirect(url_for('user_insert'))
         return redirect(url_for('user_view', id_=user_id))
     return render_template('user/insert.html', form=form)
