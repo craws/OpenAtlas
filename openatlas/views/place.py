@@ -5,12 +5,13 @@ from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import (BooleanField, FieldList, HiddenField, IntegerField, SelectField, StringField,
-                     SubmitField, TextAreaField)
+from wtforms import (FieldList, HiddenField, IntegerField, SelectField, StringField, SubmitField,
+                     TextAreaField)
 from wtforms.validators import InputRequired, Optional as OptValidator
 
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
+from openatlas.forms.form import build_form
 from openatlas.forms.util import build_form2
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
@@ -109,28 +110,29 @@ def place_insert(origin_id: Optional[int] = None,
     if origin and origin.system_type == 'place':
         title = 'feature'
         form = build_form2(FeatureForm, 'Feature')
+        # form = build_form('actor', code=code, origin=origin)
         form.insert_continue_sub.label.text += ' ' + _('with') + ' ' + _('stratigraphic unit')
         del form.insert_continue_human_remains
     elif origin and origin.system_type == 'feature':
         title = 'stratigraphic unit'
         form = build_form2(FeatureForm, 'Stratigraphic Unit')
+        # form = build_form('actor', code=code, origin=origin)
         form.insert_continue_sub.label.text += ' ' + _('with') + ' ' + _('find')
         form.insert_continue_human_remains.label.text += ' ' + _('with') + ' ' + _('human remains')
     elif origin and origin.system_type == 'stratigraphic unit':
         if system_type == 'human_remains':  # URL param system_type only used for human remains
             title = 'human remains'
             form = build_form2(FeatureForm, 'Human Remains')
+            # form = build_form('actor', code=code, origin=origin)
         else:
             title = 'find'
             form = build_form2(FeatureForm, 'Find')
+            # form = build_form('actor', code=code, origin=origin)
         del form.insert_continue_sub, form.insert_continue_human_remains
     else:
         title = 'place'
-        form = build_form2(PlaceForm, 'Place')
-        form.insert_continue_sub.label.text += ' ' + _('with') + ' ' + _('feature')
+        form = build_form('place', origin=origin)
         geonames_buttons = True if current_user.settings['module_geonames'] else False
-        if origin:
-            del form.insert_and_continue, form.insert_continue_sub
     if form.validate_on_submit():
         return redirect(save(form, origin=origin, system_type=system_type))
 
@@ -166,10 +168,10 @@ def place_update(id_: int) -> Union[str, Response]:
     else:
         geonames_buttons = True if current_user.settings['module_geonames'] else False
         form = build_form2(PlaceForm, 'Place', object_, request, location)
-    if hasattr(form, 'insert_continue_sub'):
-        del form.insert_continue_sub
-    if hasattr(form, 'insert_continue_human_remains'):
-        del form.insert_continue_human_remains
+    # if hasattr(form, 'insert_continue_sub'):
+    #    del form.insert_continue_sub
+    # if hasattr(form, 'insert_continue_human_remains'):
+    #    del form.insert_continue_human_remains
     if form.validate_on_submit():
         if was_modified(form, object_):  # pragma: no cover
             del form.save

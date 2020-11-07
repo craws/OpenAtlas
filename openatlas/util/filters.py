@@ -328,15 +328,18 @@ def display_new_form(self: Any,
 
     html = ''
     for field in form:
-        if field.id in ['insert_and_continue'] \
-            or type(field) is ValueFloatField \
-                or field.id in [name + '_precision' for name in g.external]:
-            continue  # These fields will be added in combination with other fields
+
+        # These fields will be added in combination with other fields
+        if type(field) is ValueFloatField:
+            continue
+        if field.id in ['insert_and_continue', 'insert_continue_sub']:
+            continue
+        if field.id in [reference + '_precision' for reference in g.external]:
+            continue
 
         if field.type in ['CSRFTokenField', 'HiddenField']:
             html += str(field)
             continue
-
         if field.id.split('_', 1)[0] in ('begin', 'end'):  # If it's a date field use a function
             if field.id == 'begin_year_from':
                 html += display.add_dates_to_form(form, for_persons)
@@ -362,26 +365,26 @@ def display_new_form(self: Any,
             continue
 
         if field.id == 'save':
-            field.label.text = display.uc_first(field.label.text)
             continue_ = ''
             if 'insert_and_continue' in form:
-                form.insert_and_continue.label.text = display.uc_first(form.insert_and_continue.label.text)
                 continue_ = form.insert_and_continue(class_=app.config['CSS']['button']['primary'])
-            text = '<div class ="toolbar">{manual} {save} {continue_}</div>'.format(
+            continue_sub = ''
+            if 'insert_continue_sub' in form:
+                continue_sub = form.insert_continue_sub(class_=app.config['CSS']['button']['primary'])
+            text = '<div class ="toolbar">{manual} {save} {continue_} {continue_sub}</div>'.format(
                 manual=escape(manual(None, manual_page)) if manual_page else '',
                 save=field(class_=app.config['CSS']['button']['primary']),
-                continue_=continue_)
+                continue_=continue_,
+                continue_sub=continue_sub)
             html += add_row(field, '', text)
             continue
 
         # External Reference
         if field.id in [name + '_id' for name in g.external]:
-            name = field.id.replace('_id', '')
-            precision_field = getattr(form, name + '_precision')
-            html += add_row(field, '{field} {precision_label} {precision_field}'.format(
-                field=field,
-                precision_field=precision_field,
-                precision_label=display.uc_first(_('precision'))))
+            precision_field = getattr(form, field.id.replace('_id', '_precision'))
+            html += add_row(field, field.label, ' '.join([str(field),
+                                                          str(precision_field.label),
+                                                          str(precision_field)]))
             continue
 
         html += add_row(field)

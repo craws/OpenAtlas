@@ -6,8 +6,10 @@ from typing import Any, Dict, List, Optional, Union
 
 from flask import g, request
 from flask_babel import lazy_gettext as _
+from flask_login import current_user
 from flask_wtf import FlaskForm
-from wtforms import FieldList, HiddenField, StringField, SubmitField, TextAreaField
+from wtforms import (FieldList, HiddenField, IntegerField, SelectField, StringField, SubmitField,
+                     TextAreaField)
 from wtforms.validators import InputRequired, Optional as OptionalValidator
 
 from openatlas import app
@@ -18,9 +20,10 @@ from openatlas.models.entity import Entity
 from openatlas.models.node import Node
 from openatlas.util.display import uc_first
 
-forms = {'source': ['name', 'description', 'continue'],
-         'event': ['name', 'date', 'description', 'continue'],
-         'actor': ['name', 'alias', 'date', 'description', 'continue']
+forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'description', 'continue'],
+         'event': ['name', 'date', 'wikidata', 'description', 'continue'],
+         'place': ['name', 'alias', 'date', 'wikidata', 'geonames', 'description', 'continue'],
+         'source': ['name', 'description', 'continue'],
          }
 
 
@@ -44,17 +47,15 @@ def build_form(name: str,
     code = entity.class_.code if entity else code
     add_types(Form, name, code)
     add_fields(Form, name, code)
+    add_external_references(Form, name)
     if 'date' in forms[name]:
         date.add_date_fields(Form)
         setattr(Form, 'validate', date.validate)
-
     if 'description' in forms[name]:
         label = _('content') if name == 'source' else _('description')
         setattr(Form, 'description', TextAreaField(label))
-    setattr(Form, 'save', SubmitField(_('insert')))
-    if not entity and not origin and 'continue' in forms[name]:
-        setattr(Form, 'insert_and_continue', SubmitField(_('insert and continue')))
-        setattr(Form, 'continue_', HiddenField())
+    add_buttons(Form, name, entity, origin)
+
     return populate_form(Form(obj=entity), entity) if entity else Form()
 
 
@@ -80,6 +81,33 @@ def populate_form(form: FlaskForm, entity: Entity) -> FlaskForm:
             if hasattr(form, str(root_id)):
                 getattr(form, str(root_id)).data = nodes_
     return form
+
+
+def add_buttons(form: any, name: str, entity: Union[Entity, None], origin) -> None:
+    setattr(form, 'save', SubmitField(uc_first(_('insert'))))
+    if not entity and not origin and 'continue' in forms[name]:
+        setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
+        setattr(form, 'continue_', HiddenField())
+    if not entity and not origin and name == 'place':
+        label = uc_first(_('insert and continue')) + ' ' + _('with') + ' ' + _('feature')
+        setattr(form, 'insert_continue_sub', SubmitField(label))
+    return form
+
+
+def add_external_references(form: any, form_name: str) -> None:
+    for name, ref in g.external.items():
+        if name not in forms[form_name] or not current_user.settings['module_' + name]:
+            continue
+        if name == 'geonames':
+            field = IntegerField(ref['name'] + ' Id', [OptionalValidator()])
+        else:
+            field = StringField(ref['name'] + ' Id', [OptionalValidator()])
+        setattr(form, name + '_id', field)
+        setattr(form,
+                name + '_precision',
+                SelectField(uc_first(_('precision')),
+                            choices=app.config['REFERENCE_PRECISION'],
+                            default='close match' if name == 'geonames' else ''))
 
 
 def add_value_type_fields(form: any, subs: List[int]) -> None:
@@ -124,5 +152,9 @@ def add_fields(form: Any, name: str, code: Optional[str] = None) -> None:
             setattr(form, 'place_to', TableField(_('to')))
             setattr(form, 'object', TableMultiField())
             setattr(form, 'person', TableMultiField())
+    elif name == 'place':
+        setattr(form, 'gis_points', HiddenField(default='[]'))
+        setattr(form, 'gis_polygons', HiddenField(default='[]'))
+        setattr(form, 'gis_lines', HiddenField(default='[]'))
     elif name == 'source':
         setattr(form, 'information_carrier', TableMultiField())
