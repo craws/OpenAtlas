@@ -33,12 +33,12 @@ from openatlas.models.logger import Logger
 logger = Logger()
 
 from openatlas.util import filters, processor
-from openatlas.views import (actor, admin, ajax, api, entity, event, export, file, hierarchy, index,
+from openatlas.views import (actor, admin, ajax, api_, entity, event, export, file, hierarchy, index,
                              involvement, imports, link, login, member, model, note, object,
                              overlay, place, profile, reference, relation, search, source, sql,
                              translation, types, user)
 #  Restful API import
-from openatlas.api import api_restful
+from openatlas.api import routes
 
 
 

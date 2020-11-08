@@ -8,8 +8,8 @@ from openatlas import app
 from openatlas.api.apifunction import ApiFunction
 from openatlas.api.error import APIError
 from openatlas.api.node import APINode
-from openatlas.api.path import Path
 from openatlas.api.parameter import Validation
+from openatlas.api.path import Path
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
 from openatlas.util.util import api_access
