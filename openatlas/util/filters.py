@@ -330,9 +330,7 @@ def display_new_form(self: Any,
     for field in form:
 
         # These fields will be added in combination with other fields
-        if type(field) is ValueFloatField:
-            continue
-        if field.id in ['insert_and_continue', 'insert_continue_sub']:
+        if type(field) is ValueFloatField or field.id.startswith('insert_'):
             continue
         if field.id in [reference + '_precision' for reference in g.external]:
             continue
@@ -371,11 +369,15 @@ def display_new_form(self: Any,
             continue_sub = ''
             if 'insert_continue_sub' in form:
                 continue_sub = form.insert_continue_sub(class_=app.config['CSS']['button']['primary'])
-            text = '<div class ="toolbar">{manual} {save} {continue_} {continue_sub}</div>'.format(
+            continue_remains = ''
+            if 'insert_continue_human_remains' in form:
+                continue_remains = form.insert_continue_human_remains(class_=app.config['CSS']['button']['primary'])
+            text = '<div class ="toolbar">{manual} {save} {continue_} {continue_sub} {continue_remains}</div>'.format(
                 manual=escape(manual(None, manual_page)) if manual_page else '',
                 save=field(class_=app.config['CSS']['button']['primary']),
                 continue_=continue_,
-                continue_sub=continue_sub)
+                continue_sub=continue_sub,
+                continue_remains=continue_remains)
             html += add_row(field, '', text)
             continue
 

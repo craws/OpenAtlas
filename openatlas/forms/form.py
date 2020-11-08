@@ -22,8 +22,14 @@ from openatlas.util.display import uc_first
 
 forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'description', 'continue'],
          'event': ['name', 'date', 'wikidata', 'description', 'continue'],
-         'place': ['name', 'alias', 'date', 'wikidata', 'geonames', 'description', 'continue'],
+         'feature': ['name', 'date', 'description', 'continue', 'map'],
+         'find': ['name', 'date', 'description', 'continue', 'map'],
+         'human_remains': ['name', 'date', 'description', 'continue', 'map'],
+         'place': ['name', 'alias', 'date', 'wikidata', 'geonames', 'description', 'continue',
+                   'map'],
          'source': ['name', 'description', 'continue'],
+         'stratigraphic_unit': ['name', 'date', 'description', 'continue', 'map'],
+
          }
 
 
@@ -54,6 +60,10 @@ def build_form(name: str,
     if 'description' in forms[name]:
         label = _('content') if name == 'source' else _('description')
         setattr(Form, 'description', TextAreaField(label))
+    if 'map' in forms[name]:
+        setattr(Form, 'gis_points', HiddenField(default='[]'))
+        setattr(Form, 'gis_polygons', HiddenField(default='[]'))
+        setattr(Form, 'gis_lines', HiddenField(default='[]'))
     add_buttons(Form, name, entity, origin)
 
     return populate_form(Form(obj=entity), entity) if entity else Form()
@@ -88,9 +98,22 @@ def add_buttons(form: any, name: str, entity: Union[Entity, None], origin) -> No
     if not entity and not origin and 'continue' in forms[name]:
         setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())
-    if not entity and not origin and name == 'place':
-        label = uc_first(_('insert and continue')) + ' ' + _('with') + ' ' + _('feature')
-        setattr(form, 'insert_continue_sub', SubmitField(label))
+    insert_and_add = uc_first(_('insert and add')) + ' '
+    if not entity and name == 'place':
+        setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
+        setattr(form, 'continue_', HiddenField())
+        setattr(form, 'insert_continue_sub', SubmitField(insert_and_add + _('feature')))
+    elif name == 'feature' and origin and origin.system_type == 'place':
+        setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
+        setattr(form, 'continue_', HiddenField())
+        setattr(form, 'insert_continue_sub', SubmitField(insert_and_add + _('stratigraphic unit')))
+    elif name == 'stratigraphic_unit':
+        setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
+        setattr(form, 'continue_', HiddenField())
+        setattr(form, 'insert_continue_sub', SubmitField(insert_and_add + _('find')))
+        setattr(form,
+                'insert_continue_human_remains',
+                SubmitField(insert_and_add + _('human remains')))
     return form
 
 
@@ -119,7 +142,7 @@ def add_value_type_fields(form: any, subs: List[int]) -> None:
 
 def add_types(form: any, name: str, code: Union[str, None]):
     code_class = {'E21': 'Person', 'E74': 'Group', 'E40': 'Legal Body'}
-    type_name = uc_first(name)
+    type_name = name.replace('_', ' ').title()
     if code in code_class:
         type_name = code_class[code]
     types = OrderedDict(Node.get_nodes_for_form(type_name))
@@ -152,9 +175,5 @@ def add_fields(form: Any, name: str, code: Optional[str] = None) -> None:
             setattr(form, 'place_to', TableField(_('to')))
             setattr(form, 'object', TableMultiField())
             setattr(form, 'person', TableMultiField())
-    elif name == 'place':
-        setattr(form, 'gis_points', HiddenField(default='[]'))
-        setattr(form, 'gis_polygons', HiddenField(default='[]'))
-        setattr(form, 'gis_lines', HiddenField(default='[]'))
     elif name == 'source':
         setattr(form, 'information_carrier', TableMultiField())

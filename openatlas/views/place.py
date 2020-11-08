@@ -107,35 +107,25 @@ def place_insert(origin_id: Optional[int] = None,
                  system_type: Optional[str] = None) -> Union[str, Response]:
     origin = Entity.get_by_id(origin_id) if origin_id else None
     geonames_buttons = False
-    if origin and origin.system_type == 'place':
-        title = 'feature'
-        form = build_form2(FeatureForm, 'Feature')
-        # form = build_form('actor', code=code, origin=origin)
-        form.insert_continue_sub.label.text += ' ' + _('with') + ' ' + _('stratigraphic unit')
-        del form.insert_continue_human_remains
-    elif origin and origin.system_type == 'feature':
-        title = 'stratigraphic unit'
-        form = build_form2(FeatureForm, 'Stratigraphic Unit')
-        # form = build_form('actor', code=code, origin=origin)
-        form.insert_continue_sub.label.text += ' ' + _('with') + ' ' + _('find')
-        form.insert_continue_human_remains.label.text += ' ' + _('with') + ' ' + _('human remains')
-    elif origin and origin.system_type == 'stratigraphic unit':
-        if system_type == 'human_remains':  # URL param system_type only used for human remains
-            title = 'human remains'
-            form = build_form2(FeatureForm, 'Human Remains')
-            # form = build_form('actor', code=code, origin=origin)
-        else:
-            title = 'find'
-            form = build_form2(FeatureForm, 'Find')
-            # form = build_form('actor', code=code, origin=origin)
-        del form.insert_continue_sub, form.insert_continue_human_remains
-    else:
-        title = 'place'
-        form = build_form('place', origin=origin)
+    title = 'place'
+    form = build_form('place', origin=origin)
+    if not origin:
         geonames_buttons = True if current_user.settings['module_geonames'] else False
+    elif origin.system_type == 'place':
+        title = 'feature'
+        form = build_form('feature', origin=origin)
+    elif origin.system_type == 'feature':
+        title = 'stratigraphic unit'
+        form = build_form('stratigraphic_unit', origin=origin)
+    elif origin.system_type == 'stratigraphic unit' and system_type == 'human_remains':
+        title = 'human remains'
+        form = build_form('human_remains')
+    elif origin.system_type == 'stratigraphic unit':
+        title = 'find'
+        form = build_form('find')
+
     if form.validate_on_submit():
         return redirect(save(form, origin=origin, system_type=system_type))
-
     if title == 'place':
         form.alias.append_entry('')
     structure = get_structure(super_=origin)
