@@ -141,16 +141,11 @@ class Tab:
                 buttons = [button(_('link'), url_for('source_add', id_=id_, class_name='place'))]
             buttons.append(button(_('place'), url_for('place_insert', origin_id=id_)))
         elif name == 'reference':
-            buttons = [button(_('link'), url_for('entity_add_reference', id_=id_)),
-                       button(_('bibliography'), url_for('reference_insert',
-                                                         code='bibliography',
-                                                         origin_id=id_)),
-                       button(_('edition'), url_for('reference_insert',
-                                                    code='edition',
-                                                    origin_id=id_)),
-                       button(_('external reference'), url_for('reference_insert',
-                                                               code='external_reference',
-                                                               origin_id=id_))]
+            buttons = [button(_('link'), url_for('entity_add_reference', id_=id_))]
+            for category in ['bibliography', 'edition', 'external reference']:
+                buttons.append(button(_(category), url_for('reference_insert',
+                                                           category=category,
+                                                           origin_id=id_)))
         elif name == 'relation':
             table.defs = [{'className': 'dt-body-right', 'targets': [2, 3]}]
             buttons = [button(_('link'), url_for('relation_insert', origin_id=id_))]

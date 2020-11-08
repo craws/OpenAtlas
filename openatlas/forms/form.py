@@ -10,7 +10,7 @@ from flask_login import current_user
 from flask_wtf import FlaskForm
 from wtforms import (FieldList, HiddenField, IntegerField, SelectField, StringField, SubmitField,
                      TextAreaField)
-from wtforms.validators import InputRequired, Optional as OptionalValidator
+from wtforms.validators import InputRequired, Optional as OptionalValidator, URL
 
 from openatlas import app
 from openatlas.forms import date
@@ -19,9 +19,13 @@ from openatlas.forms.field import (TableField, TableMultiField, TreeField, TreeM
 from openatlas.models.date import Date
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
+from openatlas.models.reference import Reference
 from openatlas.util.display import uc_first
 
 forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'description', 'continue'],
+         'bibliography': ['name', 'description', 'continue'],
+         'edition': ['name', 'description', 'continue'],
+         'external_reference': ['name', 'description', 'continue'],
          'event': ['name', 'date', 'wikidata', 'description', 'continue'],
          'feature': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
          'find': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
@@ -29,9 +33,7 @@ forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'description', 'continue
          'place': ['name', 'alias', 'date', 'wikidata', 'geonames', 'description', 'continue',
                    'map'],
          'source': ['name', 'description', 'continue'],
-         'stratigraphic_unit': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
-
-         }
+         'stratigraphic_unit': ['name', 'date', 'wikidata', 'description', 'continue', 'map']}
 
 
 def build_form(name: str,
@@ -47,9 +49,12 @@ def build_form(name: str,
         opened = HiddenField()
 
     if 'name' in forms[name]:
-        setattr(Form, 'name', StringField(_('name'),
-                                          validators=[InputRequired()],
+        label = _('URL') if name == 'external_reference' else _('name')
+        validators = [InputRequired(), URL()] if name == 'external_reference' else [InputRequired()]
+        setattr(Form, 'name', StringField(label,
+                                          validators=validators,
                                           render_kw={'autofocus': True}))
+
     if 'alias' in forms[name]:
         setattr(Form, 'alias', FieldList(StringField(''), description=_('tooltip alias')))
     code = entity.class_.code if entity else code
@@ -72,24 +77,39 @@ def build_form(name: str,
 
 def populate_form(form: FlaskForm, entity: Entity, location: Optional[Entity]) -> FlaskForm:
     form.save.label.text = uc_first(_('save'))
-    if entity and request and request.method == 'GET':
-        if hasattr(form, 'begin_year_from'):
-            date.populate_dates(form, entity)
-        nodes = entity.nodes
-        if location:  # Needed for administrative unit and historical place nodes
-            nodes.update(location.nodes)
-        form.opened.data = time.time()
-        node_data: Dict[int, List[int]] = {}
-        for node, node_value in nodes.items():
-            root = g.nodes[node.root[-1]] if node.root else node
-            if root.id not in node_data:
-                node_data[root.id] = []
-            node_data[root.id].append(node.id)
-            if root.value_type:
-                getattr(form, str(node.id)).data = node_value
-        for root_id, nodes_ in node_data.items():
-            if hasattr(form, str(root_id)):
-                getattr(form, str(root_id)).data = nodes_
+    if not entity or not request or request.method != 'GET':
+        return form
+
+    # Dates
+    if hasattr(form, 'begin_year_from'):
+        date.populate_dates(form, entity)
+
+    # Nodes
+    nodes = entity.nodes
+    if location:  # Needed for administrative unit and historical place nodes
+        nodes.update(location.nodes)
+    form.opened.data = time.time()
+    node_data: Dict[int, List[int]] = {}
+    for node, node_value in nodes.items():
+        root = g.nodes[node.root[-1]] if node.root else node
+        if root.id not in node_data:
+            node_data[root.id] = []
+        node_data[root.id].append(node.id)
+        if root.value_type:
+            getattr(form, str(node.id)).data = node_value
+    for root_id, nodes_ in node_data.items():
+        if hasattr(form, str(root_id)):
+            getattr(form, str(root_id)).data = nodes_
+
+    # External references
+    for name in g.external:
+        if hasattr(form, name + '_id') and current_user.settings['module_' + name]:
+            link_ = Reference.get_link(entity, name)
+            if link_ and not getattr(form, name + '_id').data:
+                reference = link_.domain
+                getattr(form, name + '_id').data = reference.name if reference else ''
+                getattr(form, name + '_precision').data = g.nodes[link_.type.id].name
+
     return form
 
 
