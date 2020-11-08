@@ -36,12 +36,12 @@ timespans = {'start': fields.Nested(start),
 when = {'timespans': fields.List(fields.Nested(timespans))}
 
 geometries = {'type': fields.String,
-              #'coordinates': fields.Float,
+              'coordinates': fields.List(fields.Float),
               'title': fields.String,
               'description': fields.String}
 
 geometry = {'type': fields.String,
-            'geometries': fields.List(fields.Nested(geometries))}
+            'geometries': fields.Nested(geometries)}
 
 feature = {'@id': fields.String,
            'type': fields.String,
@@ -54,7 +54,12 @@ feature = {'@id': fields.String,
            'relations': fields.List(fields.Nested(relations)),
            'depictions': fields.List(fields.Nested(depictions)),
            'links': fields.List(fields.Nested(links)),
-           'geometry': fields.Nested(geometry)}
+           # ToDo: geometry has to be dynamic, if it is only one geometry than geometries will never be returned. If it is a Point, the coordinates are list of two floats, else it is a list of lists, or maybe a lists of lists of lists...
+           # Look into that: https://blog.fossasia.org/dynamically-marshaling-output-in-flask-restplus/
+           # https://github.com/flask-restful/flask-restful/issues/212
+           # --> Maybe return the geometric with flask_restful.marshal_with_field
+           # 'geometry': fields.Nested(geometries)
+           }
 
 entity_json = {'@context': fields.String,
                'type': fields.String,
