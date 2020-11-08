@@ -1,4 +1,5 @@
 from flask_restful import fields
+from flask_restful.fields import Arbitrary
 
 title = {'title': fields.String}
 
@@ -25,7 +26,9 @@ start = {'earliest': fields.String,
          'latest': fields.String}
 
 end = {'earliest': fields.String,
-         'latest': fields.String}
+       'latest': fields.String}
+
+description = {'value': fields.String}
 
 timespans = {'start': fields.Nested(start),
              'end': fields.Nested(end)}
@@ -33,26 +36,25 @@ timespans = {'start': fields.Nested(start),
 when = {'timespans': fields.List(fields.Nested(timespans))}
 
 geometries = {'type': fields.String,
-              'coordinates': fields.List,
+              #'coordinates': fields.Float,
               'title': fields.String,
               'description': fields.String}
 
 geometry = {'type': fields.String,
-            'geometries': fields.List(fields.Nested(geometries)) }
+            'geometries': fields.List(fields.Nested(geometries))}
 
 feature = {'@id': fields.String,
            'type': fields.String,
            'crmClass': fields.String,
            'properties': fields.Nested(title),
-           'description': fields.String,
+           'description': fields.List(fields.Nested(description)),
            'types': fields.List(fields.Nested(types)),
            'names': fields.List(fields.Nested(names)),
            'when': fields.Nested(when),
            'relations': fields.List(fields.Nested(relations)),
            'depictions': fields.List(fields.Nested(depictions)),
            'links': fields.List(fields.Nested(links)),
-           'geometry': fields.Nested(geometry)
-           }
+           'geometry': fields.Nested(geometry)}
 
 entity_json = {'@context': fields.String,
                'type': fields.String,
