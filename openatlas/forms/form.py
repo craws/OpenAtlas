@@ -16,19 +16,20 @@ from openatlas import app
 from openatlas.forms import date
 from openatlas.forms.field import (TableField, TableMultiField, TreeField, TreeMultiField,
                                    ValueFloatField)
+from openatlas.models.date import Date
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
 from openatlas.util.display import uc_first
 
 forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'description', 'continue'],
          'event': ['name', 'date', 'wikidata', 'description', 'continue'],
-         'feature': ['name', 'date', 'description', 'continue', 'map'],
-         'find': ['name', 'date', 'description', 'continue', 'map'],
-         'human_remains': ['name', 'date', 'description', 'continue', 'map'],
+         'feature': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
+         'find': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
+         'human_remains': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
          'place': ['name', 'alias', 'date', 'wikidata', 'geonames', 'description', 'continue',
                    'map'],
          'source': ['name', 'description', 'continue'],
-         'stratigraphic_unit': ['name', 'date', 'description', 'continue', 'map'],
+         'stratigraphic_unit': ['name', 'date', 'wikidata', 'description', 'continue', 'map'],
 
          }
 
@@ -36,7 +37,8 @@ forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'description', 'continue
 def build_form(name: str,
                entity: Optional[Entity] = None,
                code: Optional[str] = None,
-               origin: Optional[Entity] = None) -> FlaskForm:
+               origin: Optional[Entity] = None,
+               location: Optional[Entity] = None) -> FlaskForm:
 
     # Builds a form for CIDOC CRM entities which has to be dynamic because of types, module
     # settings and class specific fields
@@ -56,7 +58,6 @@ def build_form(name: str,
     add_external_references(Form, name)
     if 'date' in forms[name]:
         date.add_date_fields(Form)
-        setattr(Form, 'validate', date.validate)
     if 'description' in forms[name]:
         label = _('content') if name == 'source' else _('description')
         setattr(Form, 'description', TextAreaField(label))
@@ -65,22 +66,21 @@ def build_form(name: str,
         setattr(Form, 'gis_polygons', HiddenField(default='[]'))
         setattr(Form, 'gis_lines', HiddenField(default='[]'))
     add_buttons(Form, name, entity, origin)
+    setattr(Form, 'validate', validate)
+    return populate_form(Form(obj=entity), entity, location) if entity else Form()
 
-    return populate_form(Form(obj=entity), entity) if entity else Form()
 
-
-def populate_form(form: FlaskForm, entity: Entity) -> FlaskForm:
-    form.save.label.text = 'update'
+def populate_form(form: FlaskForm, entity: Entity, location: Optional[Entity]) -> FlaskForm:
+    form.save.label.text = uc_first(_('save'))
     if entity and request and request.method == 'GET':
         if hasattr(form, 'begin_year_from'):
             date.populate_dates(form, entity)
         nodes = entity.nodes
-        # 4ht parameter entity2 (location) at places with build_form2, is this needed?
-        # if isinstance(entity2, Entity):
-        #     nodes.update(entity2.nodes)  # type: ignore
+        if location:  # Needed for administrative unit and historical place nodes
+            nodes.update(location.nodes)
         form.opened.data = time.time()
         node_data: Dict[int, List[int]] = {}
-        for node, node_value in nodes.items():  # type: ignore
+        for node, node_value in nodes.items():
             root = g.nodes[node.root[-1]] if node.root else node
             if root.id not in node_data:
                 node_data[root.id] = []
@@ -95,11 +95,13 @@ def populate_form(form: FlaskForm, entity: Entity) -> FlaskForm:
 
 def add_buttons(form: any, name: str, entity: Union[Entity, None], origin) -> None:
     setattr(form, 'save', SubmitField(uc_first(_('insert'))))
-    if not entity and not origin and 'continue' in forms[name]:
+    if entity:
+        return form
+    if not origin and 'continue' in forms[name]:
         setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())
     insert_and_add = uc_first(_('insert and add')) + ' '
-    if not entity and name == 'place':
+    if name == 'place':
         setattr(form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
         setattr(form, 'continue_', HiddenField())
         setattr(form, 'insert_continue_sub', SubmitField(insert_and_add + _('feature')))
@@ -146,9 +148,9 @@ def add_types(form: any, name: str, code: Union[str, None]):
     if code in code_class:
         type_name = code_class[code]
     types = OrderedDict(Node.get_nodes_for_form(type_name))
-    for id_, node in types.items():  # Move base type to top
+    for id_, node in types.items():
         if node.name in app.config['BASE_TYPES']:
-            types.move_to_end(node.id, last=False)
+            types.move_to_end(node.id, last=False)  # Move standard type to top
             break
 
     for id_, node in types.items():
@@ -177,3 +179,73 @@ def add_fields(form: Any, name: str, code: Optional[str] = None) -> None:
             setattr(form, 'person', TableMultiField())
     elif name == 'source':
         setattr(form, 'information_carrier', TableMultiField())
+
+
+def validate(self) -> bool:
+    valid = FlaskForm.validate(self)
+
+    # Check date format, if valid put dates into a list called "dates"
+    if hasattr(self, 'begin_year_from'):
+        dates = {}
+        for prefix in ['begin_', 'end_']:
+            if getattr(self, prefix + 'year_to').data and not getattr(self,
+                                                                      prefix + 'year_from').data:
+                getattr(self, prefix + 'year_from').errors.append(
+                    _("Required for time span"))
+                valid = False
+            for postfix in ['_from', '_to']:
+                if getattr(self, prefix + 'year' + postfix).data:
+                    date_ = Date.form_to_datetime64(
+                        getattr(self, prefix + 'year' + postfix).data,
+                        getattr(self, prefix + 'month' + postfix).data,
+                        getattr(self, prefix + 'day' + postfix).data)
+                    if not date_:
+                        getattr(self, prefix + 'day' + postfix).errors.append(
+                            _('not a valid date'))
+                        valid = False
+                    else:
+                        dates[prefix + postfix.replace('_', '')] = date_
+
+        # Check for valid date combination e.g. begin not after end
+        if valid:
+            for prefix in ['begin', 'end']:
+                if prefix + '_from' in dates and prefix + '_to' in dates:
+                    if dates[prefix + '_from'] > dates[prefix + '_to']:
+                        field = getattr(self, prefix + '_day_from')
+                        field.errors.append(_('First date cannot be after second.'))
+                        valid = False
+        if 'begin_from' in dates and 'end_from' in dates:
+            field = getattr(self, 'begin_day_from')
+            if len(dates) == 4:  # All dates are used
+                if dates['begin_from'] > dates['end_from'] or dates['begin_to'] > dates['end_to']:
+                    field.errors.append(_('Begin dates cannot start after end dates.'))
+                    valid = False
+            else:
+                first = dates['begin_to'] if 'begin_to' in dates else dates['begin_from']
+                second = dates['end_from'] if 'end_from' in dates else dates['end_to']
+                if first > second:
+                    field.errors.append(_('Begin dates cannot start after end dates.'))
+                    valid = False
+
+    # Super event
+    if hasattr(self, 'event'):
+        """ Check if selected super event is allowed."""
+        # Todo: also check if super is not a sub event of itself (recursively)
+        if self.event.data:
+            if str(self.event.data) == str(self.event_id.data):
+                self.event.errors.append(_('error node self as super'))
+                valid = False
+
+    # External references
+    if hasattr(self, 'wikidata_id') and self.wikidata_id.data:  # pragma: no cover
+        if self.wikidata_id.data[0].upper() != 'Q' or not self.wikidata_id.data[1:].isdigit():
+            self.wikidata_id.errors.append(uc_first(_('wrong format')))
+            valid = False
+        else:
+            self.wikidata_id.data = uc_first(self.wikidata_id.data)
+    for name in g.external:
+        if hasattr(self, name + '_id'):
+            if getattr(self, name + '_id').data and not getattr(self, name + '_precision').data:
+                valid = False
+                getattr(self, name + '_id').errors.append(uc_first(_('precision required')))
+    return valid

@@ -46,62 +46,6 @@ def add_date_fields(form: Any) -> None:
             StringField(render_kw={'placeholder': _('comment')}))
 
 
-def validate(self) -> bool:
-    valid = FlaskForm.validate(self)
-
-    # Check date format, if valid put dates into a list called "dates"
-    dates = {}
-    for prefix in ['begin_', 'end_']:
-        if getattr(self, prefix + 'year_to').data and not getattr(self,
-                                                                  prefix + 'year_from').data:
-            getattr(self, prefix + 'year_from').errors.append(
-                _("Required for time span"))
-            valid = False
-        for postfix in ['_from', '_to']:
-            if getattr(self, prefix + 'year' + postfix).data:
-                date = Date.form_to_datetime64(
-                    getattr(self, prefix + 'year' + postfix).data,
-                    getattr(self, prefix + 'month' + postfix).data,
-                    getattr(self, prefix + 'day' + postfix).data)
-                if not date:
-                    getattr(self, prefix + 'day' + postfix).errors.append(
-                        _('not a valid date'))
-                    valid = False
-                else:
-                    dates[prefix + postfix.replace('_', '')] = date
-
-    # Check for valid date combination e.g. begin not after end
-    if valid:
-        for prefix in ['begin', 'end']:
-            if prefix + '_from' in dates and prefix + '_to' in dates:
-                if dates[prefix + '_from'] > dates[prefix + '_to']:
-                    field = getattr(self, prefix + '_day_from')
-                    field.errors.append(_('First date cannot be after second.'))
-                    valid = False
-    if 'begin_from' in dates and 'end_from' in dates:
-        field = getattr(self, 'begin_day_from')
-        if len(dates) == 4:  # All dates are used
-            if dates['begin_from'] > dates['end_from'] or dates['begin_to'] > dates['end_to']:
-                field.errors.append(_('Begin dates cannot start after end dates.'))
-                valid = False
-        else:
-            first = dates['begin_to'] if 'begin_to' in dates else dates['begin_from']
-            second = dates['end_from'] if 'end_from' in dates else dates['end_to']
-            if first > second:
-                field.errors.append(_('Begin dates cannot start after end dates.'))
-                valid = False
-
-    if hasattr(self, 'event'):
-        """ Check if selected super event is allowed."""
-        # Todo: move somewhere else than date validation (validation chaining needed)
-        # Todo: also check if super is not a sub event of itself (recursively)
-        if self.event.data:
-            if str(self.event.data) == str(self.event_id.data):
-                self.event.errors.append(_('error node self as super'))
-                valid = False
-    return valid
-
-
 def populate_dates(form, item: Union[Entity, Link]) -> None:
     """ Populates date form fields with date values of an entity or link."""
     if item.begin_from:

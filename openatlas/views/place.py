@@ -1,18 +1,14 @@
 from typing import Optional, Union
 
-from flask import flash, g, render_template, request, url_for
+from flask import flash, g, render_template, url_for
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
 from werkzeug.utils import redirect
 from werkzeug.wrappers import Response
-from wtforms import (FieldList, HiddenField, IntegerField, SelectField, StringField, SubmitField,
-                     TextAreaField)
-from wtforms.validators import InputRequired, Optional as OptValidator
 
 from openatlas import app, logger
 from openatlas.forms.date import DateForm
 from openatlas.forms.form import build_form
-from openatlas.forms.util import build_form2
 from openatlas.models.entity import Entity
 from openatlas.models.gis import Gis, InvalidGeomException
 from openatlas.models.overlay import Overlay
@@ -24,55 +20,6 @@ from openatlas.util.display import (add_edit_link, add_remove_link, get_base_tab
 from openatlas.util.tab import Tab
 from openatlas.util.table import Table
 from openatlas.util.util import is_authorized, required_group, was_modified
-
-
-class PlaceForm(DateForm):
-    name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
-    geonames_id = IntegerField('GeoNames Id', [OptValidator()])
-    geonames_precision = SelectField(choices=app.config['REFERENCE_PRECISION'],
-                                     default='close match')
-    wikidata_id = StringField('Wikidata Id', [OptValidator()])
-    wikidata_precision = SelectField(choices=app.config['REFERENCE_PRECISION'], default='')
-    alias = FieldList(StringField(''), description=_('tooltip alias'))
-    description = TextAreaField(_('description'))
-    save = SubmitField(_('insert'))
-    insert_and_continue = SubmitField(_('insert and continue'))
-    insert_continue_sub = SubmitField(_('insert and continue'))
-    gis_points = HiddenField(default='[]')
-    gis_polygons = HiddenField(default='[]')
-    gis_lines = HiddenField(default='[]')
-    continue_ = HiddenField()
-    opened = HiddenField()
-
-    def validate(self) -> bool:
-        valid = DateForm.validate(self)
-        # Todo: remove no cover after form refactor
-        if self.wikidata_id.data:  # pragma: no cover
-            if self.wikidata_id.data[0].upper() != 'Q' or not self.wikidata_id.data[1:].isdigit():
-                self.wikidata_id.errors.append(uc_first(_('wrong format')))
-                valid = False
-            else:
-                self.wikidata_id.data = uc_first(self.wikidata_id.data)
-        for name in g.external:
-            if hasattr(self, name + '_id'):
-                if getattr(self, name + '_id').data and not getattr(self, name + '_precision').data:
-                    valid = False
-                    getattr(self, name + '_id').errors.append(uc_first(_('precision required')))
-        return valid
-
-
-class FeatureForm(DateForm):
-    name = StringField(_('name'), [InputRequired()])
-    description = TextAreaField(_('description'))
-    save = SubmitField(_('insert'))
-    gis_points = HiddenField(default='[]')
-    gis_polygons = HiddenField(default='[]')
-    gis_lines = HiddenField(default='[]')
-    insert_and_continue = SubmitField(_('insert and continue'))
-    insert_continue_sub = SubmitField(_('insert and continue'))
-    insert_continue_human_remains = SubmitField(_('insert and continue'))
-    continue_ = HiddenField()
-    opened = HiddenField()
 
 
 @app.route('/place')
@@ -148,20 +95,16 @@ def place_update(id_: int) -> Union[str, Response]:
     location = object_.get_linked_entity_safe('P53', nodes=True)
     geonames_buttons = False
     if object_.system_type == 'feature':
-        form = build_form2(FeatureForm, 'Feature', object_, request, location)
+        form = build_form('feature', object_, location=location)
     elif object_.system_type == 'stratigraphic unit':
-        form = build_form2(FeatureForm, 'Stratigraphic Unit', object_, request, location)
+        form = build_form('stratigraphic_unit', object_, location=location)
     elif object_.system_type == 'find':
-        form = build_form2(FeatureForm, 'Find', object_, request, location)
+        form = build_form('find', object_, location=location)
     elif object_.system_type == 'human remains':
-        form = build_form2(FeatureForm, 'Human Remains', object_, request, location)
+        form = build_form('human_remains', object_, location=location)
     else:
         geonames_buttons = True if current_user.settings['module_geonames'] else False
-        form = build_form2(PlaceForm, 'Place', object_, request, location)
-    # if hasattr(form, 'insert_continue_sub'):
-    #    del form.insert_continue_sub
-    # if hasattr(form, 'insert_continue_human_remains'):
-    #    del form.insert_continue_human_remains
+        form = build_form('place', object_, location=location)
     if form.validate_on_submit():
         if was_modified(form, object_):  # pragma: no cover
             del form.save
@@ -324,7 +267,7 @@ def save(form: DateForm,
             url = url_for('place_insert',
                           origin_id=origin.id if origin else None,
                           system_type=system_type if system_type else None)
-        elif form.continue_.data in ['sub', 'human_remains']:
+        elif hasattr(form, 'continue_') and form.continue_.data in ['sub', 'human_remains']:
             url = url_for('place_insert', origin_id=object_.id, system_type=form.continue_.data)
         logger.log_user(object_.id, log_action)
         flash(_('entity created') if log_action == 'insert' else _('info update'), 'info')
