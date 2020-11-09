@@ -66,10 +66,13 @@ class Path:
                 raise APIError('Entity ID doesn\'t exist', status_code=404, payload="404a")
         else:
             pass
+        # Finding the entity with the wanted id
+        h = [i for i, x in enumerate(entities) if x.id == total[0]]
         entity_result = []
-        for idx, entity in enumerate(total[:int(validation['limit'])]):
-            entity_result.append(Api.get_entity(entities[idx], validation))
-        result.append(entity_result)
+        for idx, e in enumerate(entities[h[0]:]):
+            entity_result.append(e)
+        for r in entity_result[:int(validation['limit'])]:
+            result.append(Api.get_entity(r, validation))
         result.append([{'entity_per_page': int(validation['limit']), 'entities': len(total),
                         'index': index, 'total_pages': len(index)}])
         return result
