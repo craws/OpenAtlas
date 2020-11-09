@@ -15,7 +15,6 @@ from openatlas.util.display import format_date, get_file_path
 
 class Api:
 
-
     @staticmethod
     def to_camelcase(string: str) -> str:  # pragma: nocover
         if not string:
@@ -161,7 +160,7 @@ class Api:
             return geo_name
 
     @staticmethod
-    def get_entity(id_: int, meta: Dict[str, Any]) -> Dict[str, Any]:
+    def get_entity_by_id(id_: int) -> Entity:
         try:
             int(id_)
         except Exception:
@@ -172,6 +171,10 @@ class Api:
             raise APIError('Entity ID ' + str(id_) + ' doesn\'t exist', status_code=404,
                            payload="404a")
 
+        return entity
+
+    @staticmethod
+    def get_entity(entity: Entity, meta: Dict[str, Any]) -> Dict[str, Any]:
         type_ = 'FeatureCollection'
 
         class_code = ''.join(entity.class_.code + " " + entity.class_.i18n['en']).replace(" ", "_")
@@ -212,7 +215,6 @@ class Api:
             features['links'] = [Api.get_geonames(entity)]
 
         # Geometry
-        # Todo: both functions are basically the same, compare and merge functions
         if 'geometry' in meta['show'] and entity.class_.code == 'E53':
             features['geometry'] = Api.get_geom_by_entity(entity)
         elif 'geometry' in meta['show'] and entity.location:
