@@ -1,7 +1,7 @@
 import datetime
 from typing import Any, Dict, List, Optional, Union
 
-from openatlas.api.error import APIError
+from openatlas.api.v01.error import APIError
 
 
 class Default:

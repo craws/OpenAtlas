@@ -16,7 +16,7 @@ from werkzeug.utils import redirect
 
 import openatlas
 from openatlas import app
-from openatlas.api.error import APIError
+from openatlas.api.v01.error import APIError
 
 if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
     from openatlas.models.entity import Entity

@@ -1,5 +1,4 @@
 from flask_restful import fields
-from flask_restful.fields import Arbitrary
 
 title = {'title': fields.String}
 

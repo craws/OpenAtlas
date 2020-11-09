@@ -5,11 +5,11 @@ from flask_cors import cross_origin
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.api.apifunction import ApiFunction
-from openatlas.api.error import APIError
-from openatlas.api.node import APINode
-from openatlas.api.parameter import Validation
-from openatlas.api.path import Path
+from openatlas.api.v01.apifunction import ApiFunction
+from openatlas.api.v01.error import APIError
+from openatlas.api.v01.node import APINode
+from openatlas.api.v01.parameter import Validation
+from openatlas.api.v01.path import Path
 from openatlas.models.entity import Entity
 from openatlas.models.node import Node
 from openatlas.util.util import api_access

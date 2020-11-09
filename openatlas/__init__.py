@@ -9,8 +9,6 @@ from flask import Flask, Response, g, request, session
 from flask_babel import Babel
 from flask_wtf.csrf import CSRFProtect
 
-from flask_restful import Api,Resource
-
 app: Flask = Flask(__name__, instance_relative_config=True)
 csrf = CSRFProtect(app)  # Make sure all forms are CSRF protected
 
@@ -38,9 +36,7 @@ from openatlas.views import (actor, admin, ajax, api_, entity, event, export, fi
                              overlay, place, profile, reference, relation, search, source, sql,
                              translation, types, user)
 #  Restful API import
-from openatlas.api import routes
-
-
+from openatlas.api.v02 import routes
 
 
 @babel.localeselector

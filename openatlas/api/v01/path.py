@@ -3,9 +3,9 @@ from typing import Any, Dict, List
 
 from flask import g
 
-from openatlas.api.apifunction import ApiFunction
-from openatlas.api.error import APIError
-from openatlas.api.sql import Query
+from openatlas.api.v01.apifunction import ApiFunction
+from openatlas.api.v01.error import APIError
+from openatlas.api.v01.sql import Query
 from openatlas.models.content import Content
 from openatlas.models.entity import Entity
 

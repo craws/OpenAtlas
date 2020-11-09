@@ -2,7 +2,7 @@ from typing import Any, Dict, List, Optional
 
 from flask import g, url_for
 
-from openatlas.api.error import APIError
+from openatlas.api.v01.error import APIError
 from openatlas.models.entity import Entity
 from openatlas.models.place import get_structure
 
