@@ -40,7 +40,7 @@ class Path:
             raise APIError('Invalid limit.', status_code=404, payload="404e")
         if 1 < limit_ < 101:
             for entity in Entity.get_latest(limit_):
-                entities.append(Api.get_entity(entity.id, meta=validation))
+                entities.append(Api.get_entity(entity, meta=validation))
             return entities
         else:
             raise APIError('Invalid limit.', status_code=404, payload="404e")

@@ -104,7 +104,7 @@ class Api:
         return time
 
     @staticmethod
-    def get_geometry(entity: Entity) -> Dict[str, Any]:
+    def get_geometry(entity: Entity) -> Dict[str, Any]: # pragma: nocover
         geometries = []
         shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
         for geometry in Gis.get_by_id(entity.location.id):
@@ -122,7 +122,7 @@ class Api:
 
     @staticmethod
     def get_geom_by_entity(entity: Entity):
-        if entity.class_.code != 'E53':
+        if entity.class_.code != 'E53': # pragma: nocover
             return 'Wrong class'
         geom = []
         for shape in ['point', 'polygon', 'linestring']:
@@ -196,7 +196,7 @@ class Api:
             features['types'] = Api.get_node(entity)
 
         # Alias
-        if entity.aliases and 'names' in meta['show']:
+        if entity.aliases and 'names' in meta['show']: # pragma: nocover
             features['names'] = []
             for key, value in entity.aliases.items():
                 features['names'].append({"alias": value})
