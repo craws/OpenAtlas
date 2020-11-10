@@ -15,7 +15,7 @@ if TYPE_CHECKING:  # pragma: no cover - Type checking is disabled in tests
 class Query(Entity):
 
     @staticmethod
-    def get_by_class_code_api(code: Union[str, List[str]], meta: Dict[str, Any]) -> List[Query]:
+    def get_by_class_code_api(code: Union[str, List[str]], meta: Dict[str, Any]) -> List[Entity]:
         clause = ""
         parameters = {'codes': tuple(code if isinstance(code, list) else [code])}
         for filter_ in meta['filter']:
@@ -34,7 +34,7 @@ class Query(Entity):
 
     @staticmethod
     def get_by_menu_item_api(menu_item: str,
-                             meta: Dict[str, Any]) -> List[Query]:  # pragma: no cover
+                             meta: Dict[str, Any]) -> List[Entity]:  # pragma: no cover
         # Possible class names: actor, event, place, reference, source, object
         clause = ""
         parameters = {'codes': tuple(app.config['CLASS_CODES'][menu_item])}

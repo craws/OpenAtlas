@@ -12,7 +12,7 @@ class Default:
     last: Optional[str] = None
     first: Optional[str] = None
     count: bool = False
-    lang: str = None
+    lang: Optional[str] = None
     download: bool = False
     lang_validation: List[str] = ['en', 'de']
     operators_compare: Dict[str, Any] = {'eq': '=', 'ne': '!=', 'lt': '<', 'le': '<=', 'gt': '>',
@@ -122,7 +122,7 @@ class Validation:
         return Default.first if not first or first.isdigit() is not True else first
 
     @staticmethod
-    def validate_show(show: List[str]) -> List[str]:
+    def validate_show(show: List[str]) -> List[str, bool]:
         data = [True] if 'none' in show else [valid for valid in show if
                                               valid in Default.show_validation]
         return Default.show_validation if not data else data

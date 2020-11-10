@@ -13,7 +13,7 @@ from openatlas.models.entity import Entity
 class Path:
 
     @staticmethod
-    def get_entities_by_menu_item(code_: str, validation: Dict[str, Any]) -> List[Query]:
+    def get_entities_by_menu_item(code_: str, validation: Dict[str, Any]) -> List[Entity]:
         entities = []
         if code_ not in ['actor', 'event', 'place', 'reference', 'source', 'object']:
             raise APIError('Invalid code: ' + code_, status_code=404, payload="404c")
@@ -22,7 +22,7 @@ class Path:
         return entities
 
     @staticmethod
-    def get_entities_by_class(class_code: str, validation: Dict[str, Any]) -> List[Query]:
+    def get_entities_by_class(class_code: str, validation: Dict[str, Any]) -> List[Entity]:
         entities = []
         if class_code not in g.classes:
             raise APIError('Invalid CIDOC CRM class code: ' + class_code, status_code=404,
@@ -46,7 +46,7 @@ class Path:
             raise APIError('Invalid limit.', status_code=404, payload="404e")
 
     @staticmethod
-    def pagination(entities: List[Query], validation: Dict[str, Any]) -> List[List[Dict[str, Any]]]:
+    def pagination(entities: List[Entity], validation: Dict[str, Any]) -> List[List[Dict[str, Any]]]:
         result = []
         index = []
         total = []
@@ -68,11 +68,13 @@ class Path:
             pass
         # Finding the entity with the wanted id
         h = [i for i, x in enumerate(entities) if x.id == total[0]]
-        entity_result = []
+        entity_limit = []
         for idx, e in enumerate(entities[h[0]:]):
-            entity_result.append(e)
-        for r in entity_result[:int(validation['limit'])]:
-            result.append(Api.get_entity(r, validation))
+            entity_limit.append(e)
+        entities_result=[]
+        for r in entity_limit[:int(validation['limit'])]:
+            entities_result.append(Api.get_entity(r, validation))
+        result.append(entities_result)
         result.append([{'entity_per_page': int(validation['limit']), 'entities': len(total),
                         'index': index, 'total_pages': len(index)}])
         return result
