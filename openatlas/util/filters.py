@@ -363,21 +363,19 @@ def display_new_form(self: Any,
             continue
 
         if field.id == 'save':
-            continue_ = ''
+            field.label.text = display.uc_first(field.label.text)
+            class_ = app.config['CSS']['button']['primary']
+            buttons = []
+            if manual_page:
+                buttons.append(escape(manual(None, manual_page)))
+            buttons.append(field(class_=class_))
             if 'insert_and_continue' in form:
-                continue_ = form.insert_and_continue(class_=app.config['CSS']['button']['primary'])
-            continue_sub = ''
+                buttons.append(form.insert_and_continue(class_=class_))
             if 'insert_continue_sub' in form:
-                continue_sub = form.insert_continue_sub(class_=app.config['CSS']['button']['primary'])
-            continue_remains = ''
+                buttons.append(form.insert_continue_sub(class_=class_))
             if 'insert_continue_human_remains' in form:
-                continue_remains = form.insert_continue_human_remains(class_=app.config['CSS']['button']['primary'])
-            text = '<div class ="toolbar">{manual} {save} {continue_} {continue_sub} {continue_remains}</div>'.format(
-                manual=escape(manual(None, manual_page)) if manual_page else '',
-                save=field(class_=app.config['CSS']['button']['primary']),
-                continue_=continue_,
-                continue_sub=continue_sub,
-                continue_remains=continue_remains)
+                buttons.append(form.insert_continue_human_remains(class_=class_))
+            text = '<div class ="toolbar">{buttons}</div>'.format(buttons=' '.join(buttons))
             html += add_row(field, '', text)
             continue
 

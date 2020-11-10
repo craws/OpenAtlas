@@ -118,7 +118,7 @@ def populate_form(form: FlaskForm, entity: Entity, location: Optional[Entity]) -
 
 
 def add_buttons(form: any, name: str, entity: Union[Entity, None], origin) -> None:
-    setattr(form, 'save', SubmitField(uc_first(_('save' if entity else 'insert'))))
+    setattr(form, 'save', SubmitField(_('save' if entity else 'insert')))
     if entity:
         return form
     if not origin and 'continue' in forms[name]:

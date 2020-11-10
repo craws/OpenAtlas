@@ -178,6 +178,7 @@ def admin_settings(category: str) -> Union[str, Response]:
             logger.log('error', 'database', 'transaction failed', e)
             flash(_('error transaction'), 'error')
         tab = 'data' if category == 'api' else category
+        tab = 'email' if category == 'mail' else tab
         return redirect(url_for('admin_index') + '#tab-' + tab)
     set_form_settings(form)
     return render_template('admin/settings.html', form=form, category=category)

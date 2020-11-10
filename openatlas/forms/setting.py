@@ -4,7 +4,6 @@ from wtforms import BooleanField, IntegerField, SelectField, StringField, Submit
 from wtforms.validators import Email, InputRequired
 
 from openatlas import app
-from openatlas.util.display import uc_first
 
 
 class ContentForm(FlaskForm):  # type: ignore
@@ -42,7 +41,7 @@ class GeneralForm(FlaskForm):  # type: ignore
 
 class TestMailForm(FlaskForm):  # type: ignore
     receiver = StringField(_('test mail receiver'), [InputRequired(), Email()])
-    send = SubmitField(_('send test mail'))
+    save = SubmitField(_('send test mail'))
 
 
 class MailForm(FlaskForm):  # type: ignore
@@ -61,7 +60,7 @@ class NewsLetterForm(FlaskForm):  # type: ignore
                           [InputRequired()],
                           render_kw={'placeholder': _('subject'), 'autofocus': True})
     body = TextAreaField('', [InputRequired()], render_kw={'placeholder': _('content')})
-    send = SubmitField(uc_first(_('send')))
+    save = SubmitField(_('send'))
 
 
 class LogForm(FlaskForm):  # type: ignore
@@ -70,7 +69,7 @@ class LogForm(FlaskForm):  # type: ignore
                            choices=(list(app.config['LOG_LEVELS'].items())),
                            default=6)
     user = SelectField(_('user'), choices=([(0, _('all'))]), default=0)
-    apply = SubmitField(_('apply'))
+    save = SubmitField(_('apply'))
 
 
 class MapForm(FlaskForm):  # type: ignore
@@ -80,25 +79,25 @@ class MapForm(FlaskForm):  # type: ignore
     map_cluster_max_radius = IntegerField(_('max cluster radius'))
     geonames_username = StringField('GeoNames ' + _('username'))
     geonames_url = StringField('GeoNames URL')
-    save = SubmitField(uc_first(_('save')))
+    save = SubmitField(_('save'))
 
 
 class ApiForm(FlaskForm):  # type: ignore
     api_public = BooleanField('public')
-    save = SubmitField(uc_first(_('save')))
+    save = SubmitField(_('save'))
 
 
 class FilesForm(FlaskForm):  # type: ignore
     file_upload_max_size = IntegerField(_('maximum file size in MB'))
     profile_image_width = IntegerField(_('profile image width in pixel'))
     file_upload_allowed_extension = StringField(_('allowed file extensions'))
-    save = SubmitField(uc_first(_('save')))
+    save = SubmitField(_('save'))
 
 
 class SimilarForm(FlaskForm):  # type: ignore
     classes = SelectField(_('class'), choices=[])
     ratio = IntegerField(default=100)
-    apply = SubmitField(_('search'))
+    save = SubmitField(_('search'))
 
 
 class ProfileForm(FlaskForm):  # type: ignore
