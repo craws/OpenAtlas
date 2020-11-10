@@ -5,7 +5,7 @@ from flask_cors import cross_origin
 from werkzeug.wrappers import Response
 
 from openatlas import app
-from openatlas.api.v01.apifunction import ApiFunction
+from openatlas.api.v01.apifunction import Api
 from openatlas.api.v01.error import APIError
 from openatlas.api.v01.node import APINode
 from openatlas.api.v01.parameter import Validation
@@ -21,11 +21,11 @@ from openatlas.util.util import api_access
 def api_entity(id_: int) -> Response:
     validation = Validation.validate_url_query(request.args)
     if validation['download']:
-        return Response(json.dumps(ApiFunction.get_entity(id_=id_, meta=validation)),
+        return Response(json.dumps(Api.get_entity(Api.get_entity_by_id(id_=id_), meta=validation)),
                         mimetype='application/json',
                         headers={
                             'Content-Disposition': 'attachment;filename=' + str(id_) + '.json'})
-    return jsonify(ApiFunction.get_entity(id_=id_, meta=validation))
+    return jsonify(Api.get_entity(Api.get_entity_by_id(id_=id_), meta=validation))
 
 
 @app.route('/api/0.1/entity/download/<int:id_>', strict_slashes=False)
@@ -33,7 +33,7 @@ def api_entity(id_: int) -> Response:
 @cross_origin(origins=app.config['CORS_ALLOWANCE'], methods=['GET'])
 def api_download_entity(id_: int) -> Response:
     validation = Validation.validate_url_query(request.args)
-    return Response(json.dumps(ApiFunction.get_entity(id_=id_, meta=validation)),
+    return Response(json.dumps(Api.get_entity(Api.get_entity_by_id(id_=id_), meta=validation)),
                     mimetype='application/json',
                     headers={'Content-Disposition': 'attachment;filename=' + str(id_) + '.json'})
 
@@ -101,7 +101,7 @@ def api_get_query() -> Response:
         if request.args.getlist('entities'):
             entities = request.args.getlist('entities')
             for e in entities:
-                out.append(e)
+                out.append(Api.get_entity_by_id(e))
             count += len(out)
         if request.args.getlist('items'):
             items = request.args.getlist('items')
@@ -118,9 +118,7 @@ def api_get_query() -> Response:
                     count += len(
                         Path.get_entities_by_class(class_code=class_code, validation=validation))
                 else:
-                    out.extend(
-                        Path.get_entities_by_class(class_code=class_code, validation=validation))
-
+                    out.extend(Path.get_entities_by_class(class_code=class_code, validation=validation))
         if validation['count']:
             return jsonify(count)
         if validation['download']:

@@ -7,12 +7,12 @@ from openatlas import app
 from openatlas.api.v01.error import APIError
 from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
+from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.util.display import format_date, get_file_path
 
 
 class GeoJsonEntity:
-
 
     @staticmethod
     def to_camelcase(string: str) -> str:  # pragma: nocover
@@ -102,6 +102,22 @@ class GeoJsonEntity:
             time['end'] = end
         return time
 
+    @staticmethod
+    def get_geometry(entity: Entity) -> Dict[str, Any]:
+        geometries = []
+        shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
+        for geometry in Gis.get_by_id(entity.location.id):
+            geo_dict = {'type': shape[geometry['shape']],
+                        'coordinates': geometry['geometry']['coordinates']}
+            if geometry['description']:
+                geo_dict['description'] = geometry['description']
+            if geometry['name']:
+                geo_dict['title'] = geometry['name']
+            geometries.append(geo_dict)
+        if len(geometries) == 1:
+            return geometries[0]
+        else:
+            return {'type': 'GeometryCollection', 'geometries': geometries}
 
     @staticmethod
     def get_geom_by_entity(entity: Entity):
@@ -143,7 +159,7 @@ class GeoJsonEntity:
             return geo_name
 
     @staticmethod
-    def get_entity(id_: int, meta: Dict[str, Any]) -> Dict[str, Any]:
+    def get_entity_by_id(id_: int) -> Entity:
         try:
             int(id_)
         except Exception:
@@ -154,6 +170,10 @@ class GeoJsonEntity:
             raise APIError('Entity ID ' + str(id_) + ' doesn\'t exist', status_code=404,
                            payload="404a")
 
+        return entity
+
+    @staticmethod
+    def get_entity(entity: Entity, meta: Dict[str, Any]) -> Dict[str, Any]:
         type_ = 'FeatureCollection'
 
         class_code = ''.join(entity.class_.code + " " + entity.class_.i18n['en']).replace(" ", "_")
@@ -194,6 +214,7 @@ class GeoJsonEntity:
             features['links'] = [GeoJsonEntity.get_geonames(entity)]
 
         # Geometry
+        # Todo: both functions are basically the same, compare and merge functions
         if 'geometry' in meta['show'] and entity.class_.code == 'E53':
             features['geometry'] = GeoJsonEntity.get_geom_by_entity(entity)
         elif 'geometry' in meta['show'] and entity.location:

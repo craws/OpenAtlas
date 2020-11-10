@@ -1,5 +1,6 @@
 import ast
-from typing import Any, Dict, List
+import json
+from typing import Any, Dict, List, Optional
 
 from flask import g, session, url_for
 
@@ -7,12 +8,12 @@ from openatlas import app
 from openatlas.api.v01.error import APIError
 from openatlas.models.entity import Entity
 from openatlas.models.geonames import Geonames
+from openatlas.models.gis import Gis
 from openatlas.models.link import Link
 from openatlas.util.display import format_date, get_file_path
 
 
-class ApiFunction:
-
+class Api:
 
     @staticmethod
     def to_camelcase(string: str) -> str:  # pragma: nocover
@@ -47,7 +48,7 @@ class ApiFunction:
                 path = get_file_path(link.domain.id)
                 files.append({'@id': url_for('api_entity', id_=link.domain.id, _external=True),
                               'title': link.domain.name,
-                              'license': ApiFunction.get_license(link.domain.id),
+                              'license': Api.get_license(link.domain.id),
                               'url': url_for('display_file_api',
                                              filename=path.name,
                                              _external=True) if path else "N/A"})
@@ -102,26 +103,26 @@ class ApiFunction:
             time['end'] = end
         return time
 
-    # @staticmethod
-    # def get_geometry(entity: Entity) -> Dict[str, Any]:
-    #     geometries = []
-    #     shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
-    #     for geometry in Gis.get_by_id(entity.location.id):
-    #         geo_dict = {'type': shape[geometry['shape']],
-    #                     'coordinates': geometry['geometry']['coordinates']}
-    #         if geometry['description']:
-    #             geo_dict['description'] = geometry['description']
-    #         if geometry['name']:
-    #             geo_dict['title'] = geometry['name']
-    #         geometries.append(geo_dict)
-    #     if len(geometries) == 1:
-    #         return geometries[0]
-    #     else:
-    #         return {'type': 'GeometryCollection', 'geometries': geometries}
+    @staticmethod
+    def get_geometry(entity: Entity) -> Dict[str, Any]: # pragma: nocover
+        geometries = []
+        shape = {'linestring': 'LineString', 'polygon': 'Polygon', 'point': 'Point'}
+        for geometry in Gis.get_by_id(entity.location.id):
+            geo_dict = {'type': shape[geometry['shape']],
+                        'coordinates': geometry['geometry']['coordinates']}
+            if geometry['description']:
+                geo_dict['description'] = geometry['description']
+            if geometry['name']:
+                geo_dict['title'] = geometry['name']
+            geometries.append(geo_dict)
+        if len(geometries) == 1:
+            return geometries[0]
+        else:
+            return {'type': 'GeometryCollection', 'geometries': geometries}
 
     @staticmethod
     def get_geom_by_entity(entity: Entity):
-        if entity.class_.code != 'E53':
+        if entity.class_.code != 'E53': # pragma: nocover
             return 'Wrong class'
         geom = []
         for shape in ['point', 'polygon', 'linestring']:
@@ -152,14 +153,14 @@ class ApiFunction:
         if geonames_link and geonames_link.range.class_.code == 'E18':
             geo_name = {}
             if geonames_link.type.name:
-                geo_name['type'] = ApiFunction.to_camelcase(geonames_link.type.name)
+                geo_name['type'] = Api.to_camelcase(geonames_link.type.name)
             if geonames_link.domain.name:
                 geo_name['identifier'] = session['settings']['geonames_url'] + \
                                          geonames_link.domain.name
             return geo_name
 
     @staticmethod
-    def get_entity(id_: int, meta: Dict[str, Any]) -> Dict[str, Any]:
+    def get_entity_by_id(id_: int) -> Entity:
         try:
             int(id_)
         except Exception:
@@ -170,6 +171,10 @@ class ApiFunction:
             raise APIError('Entity ID ' + str(id_) + ' doesn\'t exist', status_code=404,
                            payload="404a")
 
+        return entity
+
+    @staticmethod
+    def get_entity(entity: Entity, meta: Dict[str, Any]) -> Dict[str, Any]:
         type_ = 'FeatureCollection'
 
         class_code = ''.join(entity.class_.code + " " + entity.class_.i18n['en']).replace(" ", "_")
@@ -179,41 +184,41 @@ class ApiFunction:
                     'properties': {'title': entity.name}}
 
         # Relations
-        if ApiFunction.get_links(entity) and 'relations' in meta['show']:
-            features['relations'] = ApiFunction.get_links(entity)
+        if Api.get_links(entity) and 'relations' in meta['show']:
+            features['relations'] = Api.get_links(entity)
 
         # Descriptions
         if entity.description:
             features['description'] = [{'value': entity.description}]
 
         # Types
-        if ApiFunction.get_node(entity) and 'types' in meta['show']:
-            features['types'] = ApiFunction.get_node(entity)
+        if Api.get_node(entity) and 'types' in meta['show']:
+            features['types'] = Api.get_node(entity)
 
         # Alias
-        if entity.aliases and 'names' in meta['show']:
+        if entity.aliases and 'names' in meta['show']: # pragma: nocover
             features['names'] = []
             for key, value in entity.aliases.items():
                 features['names'].append({"alias": value})
 
         # Depictions
-        if ApiFunction.get_file(entity) and 'depictions' in meta['show']:  # pragma: nocover
-            features['depictions'] = ApiFunction.get_file(entity)
+        if Api.get_file(entity) and 'depictions' in meta['show']:  # pragma: nocover
+            features['depictions'] = Api.get_file(entity)
 
         # Time spans
-        if ApiFunction.get_time(entity) and 'when' in meta['show']:
+        if Api.get_time(entity) and 'when' in meta['show']:
             if entity.begin_from or entity.end_from:
-                features['when'] = {'timespans': [ApiFunction.get_time(entity)]}
+                features['when'] = {'timespans': [Api.get_time(entity)]}
 
         # Geonames
-        if ApiFunction.get_geonames(entity) and 'geonames' in meta['show']:
-            features['links'] = [ApiFunction.get_geonames(entity)]
+        if Api.get_geonames(entity) and 'geonames' in meta['show']:
+            features['links'] = [Api.get_geonames(entity)]
 
         # Geometry
         if 'geometry' in meta['show'] and entity.class_.code == 'E53':
-            features['geometry'] = ApiFunction.get_geom_by_entity(entity)
+            features['geometry'] = Api.get_geom_by_entity(entity)
         elif 'geometry' in meta['show'] and entity.location:
-            features['geometry'] = ApiFunction.get_geom_by_entity(entity.location)
+            features['geometry'] = Api.get_geom_by_entity(entity.location)
 
         data: Dict[str, Any] = {'type': type_,
                                 '@context': app.config['API_SCHEMA'],
