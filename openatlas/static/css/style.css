@@ -303,7 +303,7 @@ form input[type="text"].month, form input[type="text"].day {
     width: 2em;
 }
 
-#description {
+textarea#description {
     height: 8em;
     width: 65%;
 }

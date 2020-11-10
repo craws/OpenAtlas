@@ -6,19 +6,14 @@ from typing import Any, Dict, List, Optional as Optional_Type, Union
 from flask import Request, g, session
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
-from flask_wtf import FlaskForm
-from flask_wtf.csrf import generate_csrf
 from wtforms.validators import Optional
 
-from openatlas import app
-from openatlas.forms.setting import ProfileForm
 from openatlas.forms.field import TreeField, TreeMultiField, ValueFloatField
+from openatlas.forms.setting import ProfileForm
 from openatlas.models.entity import Entity
 from openatlas.models.link import Link
 from openatlas.models.node import Node
-from openatlas.util.table import Table
-from openatlas.util.util import get_file_stats
-from openatlas.util.display import get_base_table_data, uc_first
+from openatlas.util.display import uc_first
 
 
 def get_link_type(form: Any) -> Optional_Type[Entity]:
@@ -86,80 +81,6 @@ def build_form2(form: Any,
             if hasattr(form_instance, str(root_id)):
                 getattr(form_instance, str(root_id)).data = nodes_
     return form_instance
-
-
-def build_node_form(form: Any,
-                    node_: Node,
-                    request_origin: Optional_Type[Request] = None) -> FlaskForm:
-    if not request_origin:
-        root = node_
-        node = None
-    else:
-        node = node_
-        root = g.nodes[node_.root[-1]]
-    setattr(form, str(root.id), TreeField(str(root.id)))
-    form_instance = form(obj=node)
-    if not root.directional:
-        del form_instance.name_inverse
-    if root.value_type:
-        del form_instance.description
-    else:
-        del form_instance.unit
-
-    # Delete custom fields except the one specified for the form
-    delete_list = []  # Can't delete fields in the loop so creating a list for later deletion
-    for field in form_instance:
-        if type(field) is TreeField and int(field.id) != root.id:
-            delete_list.append(field.id)
-    for item in delete_list:
-        delattr(form_instance, item)
-
-    # Set field data if available and only if it's a GET request
-    if node and request_origin and request_origin.method == 'GET':
-        name_parts = node.name.split(' (')
-        form_instance.name.data = name_parts[0]
-        if root.directional and len(name_parts) > 1:
-            form_instance.name_inverse.data = name_parts[1][:-1]  # remove the ")" from 2nd part
-        if root.value_type:
-            form_instance.unit.data = node.description
-        else:
-            form_instance.description.data = node.description
-        if root:  # Set super if exists and is not same as root
-            super_ = g.nodes[node.root[0]]
-            getattr(form_instance, str(root.id)).data = super_.id if super_.id != root.id else None
-    return form_instance
-
-
-def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
-    """ Returns a form with a list of entities with checkboxes."""
-    if class_name == 'file':
-        entities = Entity.get_by_system_type('file', nodes=True)
-    elif class_name == 'place':
-        entities = Entity.get_by_system_type('place', nodes=True, aliases=True)
-    else:
-        entities = Entity.get_by_menu_item(class_name)
-
-    linked_ids = [entity.id for entity in linked_entities]
-    table = Table([''] + Table.HEADERS[class_name], order=[[1, 'asc']])
-    file_stats = get_file_stats() if class_name == 'file' else None
-    for entity in entities:
-        if entity.id in linked_ids:
-            continue  # Don't show already linked entries
-        input_ = '<input id="selection-{id}" name="values" type="checkbox" value="{id}">'.format(
-            id=entity.id)
-        table.rows.append([input_] + get_base_table_data(entity, file_stats))
-    if not table.rows:
-        return uc_first(_('no entries'))
-    return """
-        <form class="table" id="checkbox-form" method="post">
-            <input id="csrf_token" name="csrf_token" type="hidden" value="{token}">
-            <input id="checkbox_values" name="checkbox_values" type="hidden">
-            {table}
-            <input id="save" class="{class_}" name="save" type="submit" value="{link}">
-        </form>""".format(link=uc_first(_('link')),
-                          token=generate_csrf(),
-                          class_=app.config['CSS']['button']['primary'],
-                          table=table.display(class_name))
 
 
 def get_form_settings(form: Any, profile: bool = False) -> Dict[str, str]:

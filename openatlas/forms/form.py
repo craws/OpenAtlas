@@ -7,20 +7,24 @@ from typing import Any, Dict, List, Optional, Union
 from flask import g, request
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
-from flask_wtf import FlaskForm
-from wtforms import (FieldList, HiddenField, IntegerField, SelectField, StringField, SubmitField,
-                     TextAreaField)
+from flask_wtf import FlaskForm, widgets
+from flask_wtf.csrf import generate_csrf
+from wtforms import (FieldList, HiddenField, IntegerField, SelectField, SelectMultipleField,
+                     StringField, SubmitField, TextAreaField, widgets)
 from wtforms.validators import InputRequired, Optional as OptionalValidator, URL
 
 from openatlas import app
 from openatlas.forms import date
 from openatlas.forms.field import (TableField, TableMultiField, TreeField, TreeMultiField,
                                    ValueFloatField)
-from openatlas.models.date import Date
+from openatlas.forms.validation import validate
 from openatlas.models.entity import Entity
+from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.models.reference import Reference
-from openatlas.util.display import uc_first
+from openatlas.util.display import get_base_table_data, uc_first
+from openatlas.util.table import Table
+from openatlas.util.util import get_file_stats
 
 forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'description', 'continue'],
          'bibliography': ['name', 'description', 'continue'],
@@ -35,17 +39,6 @@ forms = {'actor': ['name', 'alias', 'date', 'wikidata', 'description', 'continue
                    'map'],
          'source': ['name', 'description', 'continue'],
          'stratigraphic_unit': ['name', 'date', 'wikidata', 'description', 'continue', 'map']}
-
-
-def build_add_reference_form(class_name: str) -> FlaskForm:
-
-    class Form(FlaskForm):  # type: ignore
-        pass
-
-    setattr(Form, class_name, TableField(_(class_name), [InputRequired()]))
-    setattr(Form, 'page', StringField(_('page')))
-    setattr(Form, 'save', SubmitField(uc_first(_('insert'))))
-    return Form()
 
 
 def build_form(name: str,
@@ -88,7 +81,6 @@ def build_form(name: str,
 
 
 def populate_form(form: FlaskForm, entity: Entity, location: Optional[Entity]) -> FlaskForm:
-    form.save.label.text = uc_first(_('save'))
     if not entity or not request or request.method != 'GET':
         return form
 
@@ -126,7 +118,7 @@ def populate_form(form: FlaskForm, entity: Entity, location: Optional[Entity]) -
 
 
 def add_buttons(form: any, name: str, entity: Union[Entity, None], origin) -> None:
-    setattr(form, 'save', SubmitField(uc_first(_('insert'))))
+    setattr(form, 'save', SubmitField(uc_first(_('save' if entity else 'insert'))))
     if entity:
         return form
     if not origin and 'continue' in forms[name]:
@@ -213,71 +205,111 @@ def add_fields(form: Any, name: str, code: Optional[str] = None) -> None:
         setattr(form, 'information_carrier', TableMultiField())
 
 
-def validate(self) -> bool:
-    valid = FlaskForm.validate(self)
+def build_add_reference_form(class_name: str) -> FlaskForm:
 
-    # Check date format, if valid put dates into a list called "dates"
-    if hasattr(self, 'begin_year_from'):
-        dates = {}
-        for prefix in ['begin_', 'end_']:
-            if getattr(self, prefix + 'year_to').data and not getattr(self,
-                                                                      prefix + 'year_from').data:
-                getattr(self, prefix + 'year_from').errors.append(
-                    _("Required for time span"))
-                valid = False
-            for postfix in ['_from', '_to']:
-                if getattr(self, prefix + 'year' + postfix).data:
-                    date_ = Date.form_to_datetime64(
-                        getattr(self, prefix + 'year' + postfix).data,
-                        getattr(self, prefix + 'month' + postfix).data,
-                        getattr(self, prefix + 'day' + postfix).data)
-                    if not date_:
-                        getattr(self, prefix + 'day' + postfix).errors.append(
-                            _('not a valid date'))
-                        valid = False
-                    else:
-                        dates[prefix + postfix.replace('_', '')] = date_
+    class Form(FlaskForm):  # type: ignore
+        pass
 
-        # Check for valid date combination e.g. begin not after end
-        if valid:
-            for prefix in ['begin', 'end']:
-                if prefix + '_from' in dates and prefix + '_to' in dates:
-                    if dates[prefix + '_from'] > dates[prefix + '_to']:
-                        field = getattr(self, prefix + '_day_from')
-                        field.errors.append(_('First date cannot be after second.'))
-                        valid = False
-        if 'begin_from' in dates and 'end_from' in dates:
-            field = getattr(self, 'begin_day_from')
-            if len(dates) == 4:  # All dates are used
-                if dates['begin_from'] > dates['end_from'] or dates['begin_to'] > dates['end_to']:
-                    field.errors.append(_('Begin dates cannot start after end dates.'))
-                    valid = False
-            else:
-                first = dates['begin_to'] if 'begin_to' in dates else dates['begin_from']
-                second = dates['end_from'] if 'end_from' in dates else dates['end_to']
-                if first > second:
-                    field.errors.append(_('Begin dates cannot start after end dates.'))
-                    valid = False
+    setattr(Form, class_name, TableField(_(class_name), [InputRequired()]))
+    setattr(Form, 'page', StringField(_('page')))
+    setattr(Form, 'save', SubmitField(uc_first(_('insert'))))
+    return Form()
 
-    # Super event
-    if hasattr(self, 'event'):
-        """ Check if selected super event is allowed."""
-        # Todo: also check if super is not a sub event of itself (recursively)
-        if self.event.data:
-            if str(self.event.data) == str(self.event_id.data):
-                self.event.errors.append(_('error node self as super'))
-                valid = False
 
-    # External references
-    if hasattr(self, 'wikidata_id') and self.wikidata_id.data:  # pragma: no cover
-        if self.wikidata_id.data[0].upper() != 'Q' or not self.wikidata_id.data[1:].isdigit():
-            self.wikidata_id.errors.append(uc_first(_('wrong format')))
-            valid = False
-        else:
-            self.wikidata_id.data = uc_first(self.wikidata_id.data)
-    for name in g.external:
-        if hasattr(self, name + '_id'):
-            if getattr(self, name + '_id').data and not getattr(self, name + '_precision').data:
-                valid = False
-                getattr(self, name + '_id').errors.append(uc_first(_('precision required')))
-    return valid
+def build_node_form(node: Optional[Node] = None, root: Optional[Node] = None) -> FlaskForm:
+
+    class Form(FlaskForm):  # type: ignore
+        name = StringField(_('name'), [InputRequired()], render_kw={'autofocus': True})
+        is_node_form = HiddenField()
+
+    root = g.nodes[node.root[-1]] if not root else root
+    setattr(Form, str(root.id), TreeField(str(root.id)))
+    if root.directional:
+        setattr(Form, 'name_inverse', StringField(_('inverse')))
+    if root.value_type:
+        setattr(Form, 'description', StringField(_('unit')))
+    else:
+        setattr(Form, 'description', TextAreaField(_('description')))
+    setattr(Form, 'save', SubmitField(uc_first(_('save' if node else 'insert'))))
+    if not node:
+        setattr(Form, 'continue_', HiddenField())
+        setattr(Form, 'insert_and_continue', SubmitField(uc_first(_('insert and continue'))))
+    form = Form()
+    getattr(form, str(root.id)).label.text = 'super'
+
+    # Set field data if available and only if it's a GET request
+    if node and request and request.method == 'GET':
+        name_parts = node.name.split(' (')
+        form.name.data = name_parts[0]
+        form.description.data = node.description
+        if root.directional and len(name_parts) > 1:
+            form.name_inverse.data = name_parts[1][:-1]  # remove the ")" from 2nd part
+        if root:  # Set super if exists and is not same as root
+            super_ = g.nodes[node.root[0]]
+            getattr(form, str(root.id)).data = super_.id if super_.id != root.id else None
+    return form
+
+
+def build_table_form(class_name: str, linked_entities: List[Entity]) -> str:
+    """ Returns a form with a list of entities with checkboxes."""
+    if class_name == 'file':
+        entities = Entity.get_by_system_type('file', nodes=True)
+    elif class_name == 'place':
+        entities = Entity.get_by_system_type('place', nodes=True, aliases=True)
+    else:
+        entities = Entity.get_by_menu_item(class_name)
+
+    linked_ids = [entity.id for entity in linked_entities]
+    table = Table([''] + Table.HEADERS[class_name], order=[[1, 'asc']])
+    file_stats = get_file_stats() if class_name == 'file' else None
+    for entity in entities:
+        if entity.id in linked_ids:
+            continue  # Don't show already linked entries
+        input_ = '<input id="selection-{id}" name="values" type="checkbox" value="{id}">'.format(
+            id=entity.id)
+        table.rows.append([input_] + get_base_table_data(entity, file_stats))
+    if not table.rows:
+        return uc_first(_('no entries'))
+    return """
+        <form class="table" id="checkbox-form" method="post">
+            <input id="csrf_token" name="csrf_token" type="hidden" value="{token}">
+            <input id="checkbox_values" name="checkbox_values" type="hidden">
+            {table}
+            <input id="save" class="{class_}" name="save" type="submit" value="{link}">
+        </form>""".format(link=uc_first(_('link')),
+                          token=generate_csrf(),
+                          class_=app.config['CSS']['button']['primary'],
+                          table=table.display(class_name))
+
+
+def build_move_form(node: Node) -> FlaskForm:
+
+    class Form(FlaskForm):  # type: ignore
+        is_node_form = HiddenField()
+        checkbox_values = HiddenField()
+        selection = SelectMultipleField('',
+                                        [InputRequired()],
+                                        coerce=int,
+                                        option_widget=widgets.CheckboxInput(),
+                                        widget=widgets.ListWidget(prefix_label=False))
+        save = SubmitField(uc_first(_('move')))
+
+    root = g.nodes[node.root[-1]]
+    setattr(Form, str(root.id), TreeField(str(root.id)))
+    form = Form(obj=node)
+    choices = []
+    if root.class_.code == 'E53':
+        for entity in node.get_linked_entities('P89', True):
+            place = entity.get_linked_entity('P53', True)
+            if place:
+                choices.append((entity.id, place.name))
+    elif root.name in app.config['PROPERTY_TYPES']:
+        for row in Link.get_entities_by_node(node):
+            domain = Entity.get_by_id(row.domain_id)
+            range_ = Entity.get_by_id(row.range_id)
+            choices.append((row.id, domain.name + ' - ' + range_.name))
+    else:
+        for entity in node.get_linked_entities('P2', True):
+            choices.append((entity.id, entity.name))
+    form.selection.choices = choices
+    return form

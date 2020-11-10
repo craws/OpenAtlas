@@ -7,14 +7,12 @@ from typing import Any
 from flask import g, session
 from flask_babel import lazy_gettext as _
 from flask_login import current_user
-from flask_wtf import FlaskForm
 
 from wtforms import FloatField, HiddenField
 from wtforms.widgets import HiddenInput
 
 from openatlas import app
 from openatlas.models.entity import Entity
-from openatlas.models.link import Link
 from openatlas.models.node import Node
 from openatlas.util.display import get_base_table_data, uc_first
 from openatlas.util.table import Table
@@ -95,38 +93,6 @@ class TableMultiField(HiddenField):  # type: ignore
 
 class ValueFloatField(FloatField):  # type: ignore
     pass
-
-
-def build_move_form(form: Any, node: Node) -> FlaskForm:
-    root = g.nodes[node.root[-1]]
-    setattr(form, str(root.id), TreeField(str(root.id)))
-    form_instance = form(obj=node)
-
-    # Delete custom fields except the ones specified for the form
-    delete_list = []  # Can't delete fields in the loop so creating a list for later deletion
-    for field in form_instance:
-        if type(field) is TreeField and int(field.id) != root.id:
-            delete_list.append(field.id)
-    for item in delete_list:
-        delattr(form_instance, item)
-
-    choices = []
-    if root.class_.code == 'E53':
-        for entity in node.get_linked_entities('P89', True):
-            place = entity.get_linked_entity('P53', True)
-            if place:
-                choices.append((entity.id, place.name))
-    elif root.name in app.config['PROPERTY_TYPES']:
-        for row in Link.get_entities_by_node(node):
-            domain = Entity.get_by_id(row.domain_id)
-            range_ = Entity.get_by_id(row.range_id)
-            choices.append((row.id, domain.name + ' - ' + range_.name))
-    else:
-        for entity in node.get_linked_entities('P2', True):
-            choices.append((entity.id, entity.name))
-
-    form_instance.selection.choices = choices
-    return form_instance
 
 
 class TableSelect(HiddenInput):  # type: ignore
